@@ -1,0 +1,70 @@
+<template>
+  <view class="login-container">
+    <view class="title">
+      <text class="title-text">登录页</text>
+    </view>
+    <button class="login-btn" @click="doLogin">
+      点击模拟登录
+    </button>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useTokenStore, ISingleTokenRes, useUserStore, IUserInfo } from '../../store'
+
+const tokenStore = useTokenStore()
+const userStore = useUserStore()
+
+function doLogin() {
+  if (tokenStore.hasValidLogin()) {
+    uni.navigateBack()
+    return
+  }
+
+  // 模拟登录：设置 token 与用户信息
+  tokenStore.setSingleToken({
+    token: 'mock-token-UNIX-123456',
+    expiresIn: 7200
+  } as ISingleTokenRes)
+
+  userStore.setUserInfo({
+    userId: 1001,
+    username: 'UNIX',
+    nickname: 'UNIX 开发者',
+    avatar: '/static/logo.png'
+  } as IUserInfo)
+
+  uni.showToast({
+    title: '登录成功',
+    icon: 'success'
+  })
+
+  setTimeout(() => {
+    uni.navigateBack()
+  }, 1000)
+}
+</script>
+
+<style scoped>
+.login-container {
+  flex: 1;
+  padding: 30px;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8fafc;
+}
+.title {
+  margin-bottom: 30px;
+}
+.title-text {
+  font-size: 20px;
+  font-weight: bold;
+  color: #1e293b;
+}
+.login-btn {
+  width: 200px;
+  background-color: #3b82f6;
+  color: #ffffff;
+  border-radius: 8px;
+}
+</style>

@@ -1,0 +1,62 @@
+<template>
+	<Card :title="$t('about.langTitle')">
+		<!-- 当前语言预览 -->
+		<view style="background-color: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0;">
+			<text style="font-size: 12px; color: #94a3b8; margin-bottom: 6px;">{{ $t('about.langPreview') }}</text>
+			
+			<text style="font-size: 16px; font-weight: bold; color: #1e293b;">
+				{{ $t('message.welcome') }}
+			</text>
+			
+			<text style="font-size: 14px; color: #475569; margin-top: 8px;">
+				{{ $t('message.hello', { msg: 'hi' }) }}
+			</text>
+		</view>
+
+		<!-- 选项列表 -->
+		<!-- 简体中文 -->
+		<view @click="switchLanguage('zh-CN')" style="flex-direction: row; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #f1f5f9;">
+			<view style="flex-direction: row; align-items: center;">
+				<text style="font-size: 15px; color: #334155; font-weight: 500;">简体中文</text>
+			</view>
+			<view style="flex-direction: row; align-items: center;">
+				<uni-icons v-if="currentLocale === 'zh-CN'" type="checkmarkempty" size="20" style="color: #3b82f6;"></uni-icons>
+			</view>
+		</view>
+
+		<!-- English -->
+		<view @click="switchLanguage('en-US')" style="flex-direction: row; align-items: center; justify-content: space-between; padding: 12px 0;">
+			<view style="flex-direction: row; align-items: center;">
+				<text style="font-size: 15px; color: #334155; font-weight: 500;">English</text>
+			</view>
+			<view style="flex-direction: row; align-items: center;">
+				<uni-icons v-if="currentLocale === 'en-US'" type="checkmarkempty" size="20" style="color: #3b82f6;"></uni-icons>
+			</view>
+		</view>
+	</Card>
+</template>
+
+<script setup lang="uts">
+	import Card from './Card.uvue'
+	import i18n from '@/src/i18n'
+	import { t } from '@/src/utils/i18n'
+
+	// 使用 computed 响应式获取当前 i18n 对象的语言环境
+	const currentLocale = computed(() : string => {
+		return i18n.global.locale.value
+	})
+	
+	
+	function switchLanguage(lang : string) {
+		i18n.global.locale.value = lang
+		
+		uni.showToast({
+			title: t('message.switch_success'),
+			icon: 'none',
+			duration: 1500
+		})
+	}
+</script>
+
+<style>
+</style>

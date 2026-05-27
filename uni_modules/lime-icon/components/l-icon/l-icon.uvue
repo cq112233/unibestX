@@ -1,0 +1,116 @@
+<template>
+	<!-- 字体图标 -->
+	<text 
+		v-if="type == 'font' && !fontLoading" 
+		class="l-icon l-icon--font l-class"
+		:class="classes"
+		:style="styles"
+		@click="handleClick"
+	>
+		{{ fontIcon?.char }}
+	</text>
+	
+	<!-- 图片图标 -->
+	<image 
+		v-else-if="type == 'image' && (!parsed.isSvg || color == null)" 
+		class="l-icon l-icon--image l-class"
+		:class="classes"
+		:style="styles"
+		:src="imageUrl"
+		@click="handleClick"
+	></image>
+	
+	<!-- SVG图标（包括Iconify和带有颜色的SVG图片） -->
+	<l-svg 
+		v-else-if="iconifyUrl != null || (type == 'image' && parsed.isSvg && color != null)" 
+		class="l-icon l-icon--image l-class"
+		:class="classes"
+		:style="styles"
+		:src="iconifyUrl ?? imageUrl"
+		:color="color"
+		:inherit="inherit"
+		:web="web"
+		@click="handleClick"
+	></l-svg>
+</template>
+<script lang="uts" setup>
+	/**
+	 * LimeIcon 图标
+	 * @description ICON集
+	 * <br> 插件类型：LIconComponentPublicInstance 
+	 * @tutorial https://ext.dcloud.net.cn/plugin?id=14057
+	 * @property {String} name 图标名称
+	 * @property {String} color 颜色
+	 * @property {String} size 尺寸
+	 * @property {String} prefix 字体图标前缀  
+	 * @property {Boolean} inherit 是否继承颜色 
+	 * @property {Boolean} web 原生 app(nvue,uvue) 是否使用web渲染  
+	 * @event {Function} click 点击事件
+	 */
+	import { classNames } from '@/uni_modules/lime-shared/classNames'
+	import { stringifyStyle } from '@/uni_modules/lime-shared/stringifyStyle'
+	import { addUnit } from '@/uni_modules/lime-shared/addUnit';
+	import type { IconProps } from './type';
+	import { useIcon, loadingFonts } from '@/uni_modules/lime-icon';
+	
+	defineOptions({
+		styleIsolation: 'app-shared',
+		inheritAttrs: true,
+		externalClasses: ['l-class'],
+		options: {
+			// #ifndef MP-TOUTIAO
+			virtualHost: true,
+			// #endif
+		}
+	})
+	
+	const props = withDefaults(defineProps<IconProps>(), {
+		name: '',
+		inherit: true,
+		web: false,
+		prefix: 'l'
+	});
+	
+	const emit = defineEmits(['click']);
+	// 使用 useIcon hook 获取图标信息
+	const { type, fontIcon, imageUrl, iconifyUrl, parsed } = useIcon(
+		computed((): string => props.name), 
+		{ prefix: props.prefix }
+	);
+	
+	// 字体是否正载加载中
+	const fontLoading = computed(()=> {
+		if(type.value == 'font') {
+			if(fontIcon.value?.fontFamily == 'l') return false
+			// 在正在加载的字体列表中查找匹配的fontFamily
+			return loadingFonts.value.some(item => item.fontFamily == fontIcon.value?.fontFamily)
+		}
+		return false
+	})
+	
+	const classes = computed(()=> {
+		const prefix = props.prefix ?? 'l'
+		return classNames( type.value == 'font' ? prefix : null, props.lClass)
+	})
+	
+	// 计算图标样式
+	const styles = computed(()=> {
+		const fontSize = addUnit(props.size);
+		const isFont = type.value == 'font'
+		return stringifyStyle({
+			fontFamily: isFont ? fontIcon.value?.fontFamily : false,
+			fontSize:   isFont ? fontSize : false,
+			color:   	isFont ? props.color : false,
+			width:    	!isFont ? fontSize: false,
+			height:   	!isFont ? fontSize: false,
+		}, props.lStyle)
+	})
+	
+	// 处理点击事件
+	const handleClick = () => {
+		emit('click');
+	};
+</script>
+<style lang="scss">
+	@import './index.scss';
+</style>

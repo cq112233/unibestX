@@ -1,0 +1,638 @@
+@import '../mixins/create.scss';
+@import '../color/colorPalette.scss';
+@import '../color/colors.scss';
+@import '../mixins/useTheme';
+
+$blue-1:  #{genColor($blue, 1, dark)};
+$blue-2:  #{genColor($blue, 2, dark)};
+$blue-3:  #{genColor($blue, 3, dark)};
+$blue-4:  #{genColor($blue, 4, dark)};
+$blue-5:  #{genColor($blue, 5, dark)};
+$blue-6:  #{genColor($blue, 6, dark)};
+$blue-7:  #{genColor($blue, 7, dark)};
+$blue-8:  #{genColor($blue, 8, dark)};
+$blue-9:  #{genColor($blue, 9, dark)};
+$blue-10: #{genColor($blue, 10, dark)};
+
+$info-color-1:  #{genColor($info-color, 1, dark)};
+$info-color-2:  #{genColor($info-color, 2, dark)};
+$info-color-3:  #{genColor($info-color, 3, dark)};
+$info-color-4:  #{genColor($info-color, 4, dark)};
+$info-color-5:  #{genColor($info-color, 5, dark)};
+$info-color-6:  #{genColor($info-color, 6, dark)};
+$info-color-7:  #{genColor($info-color, 7, dark)};
+$info-color-8:  #{genColor($info-color, 8, dark)};
+$info-color-9:  #{genColor($info-color, 9, dark)};
+$info-color-10: #{genColor($info-color, 10, dark)};
+
+$primary-color-1: #{genColor($primary-color, 1, dark)}; // 浅色/白底悬浮
+$primary-color-2: #{genColor($primary-color, 2, dark)}; // 文字禁用
+$primary-color-3: #{genColor($primary-color, 3, dark)}; // 一般禁用
+$primary-color-4: #{genColor($primary-color, 4, dark)}; // 特殊场景 禁用
+$primary-color-5: #{genColor($primary-color, 5, dark)}; // 悬浮
+$primary-color-6: #{genColor($primary-color, 6, dark)}; // 常规
+$primary-color-7: #{genColor($primary-color, 7, dark)}; // 点击
+$primary-color-8: #{genColor($primary-color, 8, dark)}; // 
+$primary-color-9: #{genColor($primary-color, 9, dark)};
+$primary-color-10: #{genColor($primary-color, 10, dark)};
+
+$error-color-1: #{genColor($error-color, 1, dark)};
+$error-color-2: #{genColor($error-color, 2, dark)};
+$error-color-3: #{genColor($error-color, 3, dark)};
+$error-color-4: #{genColor($error-color, 4, dark)};
+$error-color-5: #{genColor($error-color, 5, dark)};
+$error-color-6: #{genColor($error-color, 6, dark)};
+$error-color-7: #{genColor($error-color, 7, dark)};
+$error-color-8: #{genColor($error-color, 8, dark)};
+$error-color-9: #{genColor($error-color, 9, dark)};
+$error-color-10: #{genColor($error-color, 10, dark)};
+
+$warning-color-1: #{genColor($warning-color, 1, dark)};
+$warning-color-2: #{genColor($warning-color, 2, dark)};
+$warning-color-3: #{genColor($warning-color, 3, dark)};
+$warning-color-4: #{genColor($warning-color, 4, dark)};
+$warning-color-5: #{genColor($warning-color, 5, dark)};
+$warning-color-6: #{genColor($warning-color, 6, dark)};
+$warning-color-7: #{genColor($warning-color, 7, dark)};
+$warning-color-8: #{genColor($warning-color, 8, dark)};
+$warning-color-9: #{genColor($warning-color, 9, dark)};
+$warning-color-10: #{genColor($warning-color, 10, dark)};
+
+$success-color-1: #{genColor($success-color, 1, dark)}; // 浅色/白底悬浮
+$success-color-2: #{genColor($success-color, 2, dark)}; // 文字禁用
+$success-color-3: #{genColor($success-color, 3, dark)}; // 一般禁用
+$success-color-4: #{genColor($success-color, 4, dark)}; // 特殊场景
+$success-color-5: #{genColor($success-color, 5, dark)}; // 悬浮
+$success-color-6: #{genColor($success-color, 6, dark)}; // 常规
+$success-color-7: #{genColor($success-color, 7, dark)}; // 点击
+$success-color-8: #{genColor($success-color, 8, dark)};
+$success-color-9: #{genColor($success-color, 9, dark)};
+$success-color-10: #{genColor($success-color, 10, dark)};
+
+// $gray-1: #f3f3f3;
+// $gray-2: #eeeeee;
+// $gray-3: #e7e7e7;
+// $gray-4: #dcdcdc;
+// $gray-5: #c5c5c5;
+// $gray-6: #a6a6a6;
+// $gray-7: #8b8b8b;
+// $gray-8: #777777;
+// $gray-9: #5e5e5e;
+// $gray-10: #4b4b4b;
+// $gray-11: #383838;
+// $gray-12: #2c2c2c;
+// $gray-13: #242424;
+// $gray-14: #181818;
+
+// 暗色模式的灰度
+$gray-1:  #181818;  // 最深
+$gray-2:  #242424;
+$gray-3:  #2c2c2c;
+$gray-4:  #383838;
+$gray-5:  #4b4b4b;
+$gray-6:  #5e5e5e;
+$gray-7:  #777777;
+$gray-8:  #8b8b8b;
+$gray-9:  #a6a6a6;
+$gray-10:  #c5c5c5;
+$gray-11:  #dcdcdc;
+$gray-12:  #e7e7e7;
+$gray-13:  #eeeeee;
+$gray-14:  #f3f3f3; // 最浅
+
+$text-color-1: rgba(255,255,255,0.85); //primary
+$text-color-2: rgba(255,255,255,0.65); //secondary
+$text-color-3: rgba(255,255,255,0.45); //placeholder
+$text-color-4: rgba(255,255,255,0.25); //disabled
+
+// 容器
+$bg-color-page: $gray-1;//#000000; // 整体背景色 布局
+$bg-color-container: $gray-2;//#1d1d1d; // 一级容器背景 组件
+$bg-color-elevated: $gray-2;//#1f1f1f; // 二级容器背景 浮层
+$bg-color-spotlight: $gray-5;  // 引起注意的如 Tooltip
+$bg-color-mask: rgba(0, 0, 0, 0.65);  // 蒙层
+
+// 填充
+$fill-1: rgba(255,255,255,0.18);
+$fill-2: rgba(255,255,255,0.12);
+$fill-3: rgba(255,255,255,0.08);
+$fill-4: rgba(255,255,255,0.04);
+
+// 描边
+$border-color-1: $gray-3;//#{getSolidColor(#000, 26%)}; //#424242; // 浅色
+$border-color-2: $gray-4;//#{getSolidColor(#000, 19%)}; //#303030; // 一般
+$border-color-3: $gray-5;//#{getSolidColor(#000, 15%)}; //$gray-4; // 深/悬浮
+$border-color-4: $gray-6;//#{getSolidColor(#000, 12%)}; //$gray-6; // 重/按钮描边
+
+
+@mixin theme-dark {
+	// 蓝色系
+	--l-blue-1: #{$blue-1};
+	--l-blue-2: #{$blue-2};
+	--l-blue-3: #{$blue-3};
+	--l-blue-4: #{$blue-4};
+	--l-blue-5: #{$blue-5};
+	--l-blue-6: #{$blue-6};
+	--l-blue-7: #{$blue-7};
+	--l-blue-8: #{$blue-8};
+	--l-blue-9: #{$blue-9};
+	--l-blue-10: #{$blue-10};
+	
+	--l-info-color-1:  #{$info-color-1};
+	--l-info-color-2:  #{$info-color-2};
+	--l-info-color-3:  #{$info-color-3};
+	--l-info-color-4:  #{$info-color-4};
+	--l-info-color-5:  #{$info-color-5};
+	--l-info-color-6:  #{$info-color-6};
+	--l-info-color-7:  #{$info-color-7};
+	--l-info-color-8:  #{$info-color-8};
+	--l-info-color-9:  #{$info-color-9};
+	--l-info-color-10: #{$info-color-10};
+	
+	// 主色系
+	--l-primary-color-1: #{$primary-color-1};
+	--l-primary-color-2: #{$primary-color-2};
+	--l-primary-color-3: #{$primary-color-3};
+	--l-primary-color-4: #{$primary-color-4};
+	--l-primary-color-5: #{$primary-color-5};
+	--l-primary-color-6: #{$primary-color-6};
+	--l-primary-color-7: #{$primary-color-7};
+	--l-primary-color-8: #{$primary-color-8};
+	--l-primary-color-9: #{$primary-color-9};
+	--l-primary-color-10: #{$primary-color-10};
+
+	// 错误色系
+	--l-error-color-1: #{$error-color-1};
+	--l-error-color-2: #{$error-color-2};
+	--l-error-color-3: #{$error-color-3};
+	--l-error-color-4: #{$error-color-4};
+	--l-error-color-5: #{$error-color-5};
+	--l-error-color-6: #{$error-color-6};
+	--l-error-color-7: #{$error-color-7};
+	--l-error-color-8: #{$error-color-8};
+	--l-error-color-9: #{$error-color-9};
+	--l-error-color-10: #{$error-color-10};
+
+	// 警告色系
+	--l-warning-color-1: #{$warning-color-1};
+	--l-warning-color-2: #{$warning-color-2};
+	--l-warning-color-3: #{$warning-color-3};
+	--l-warning-color-4: #{$warning-color-4};
+	--l-warning-color-5: #{$warning-color-5};
+	--l-warning-color-6: #{$warning-color-6};
+	--l-warning-color-7: #{$warning-color-7};
+	--l-warning-color-8: #{$warning-color-8};
+	--l-warning-color-9: #{$warning-color-9};
+	--l-warning-color-10: #{$warning-color-10};
+
+	// 成功色系
+	--l-success-color-1: #{$success-color-1};
+	--l-success-color-2: #{$success-color-2};
+	--l-success-color-3: #{$success-color-3};
+	--l-success-color-4: #{$success-color-4};
+	--l-success-color-5: #{$success-color-5};
+	--l-success-color-6: #{$success-color-6};
+	--l-success-color-7: #{$success-color-7};
+	--l-success-color-8: #{$success-color-8};
+	--l-success-color-9: #{$success-color-9};
+	--l-success-color-10: #{$success-color-10};
+
+	// 灰色系
+	--l-gray-1: #{$gray-1};
+	--l-gray-2: #{$gray-2};
+	--l-gray-3: #{$gray-3};
+	--l-gray-4: #{$gray-4};
+	--l-gray-5: #{$gray-5};
+	--l-gray-6: #{$gray-6};
+	--l-gray-7: #{$gray-7};
+	--l-gray-8: #{$gray-8};
+	--l-gray-9: #{$gray-9};
+	--l-gray-10: #{$gray-10};
+	--l-gray-11: #{$gray-11};
+	--l-gray-12: #{$gray-12};
+	--l-gray-13: #{$gray-13};
+	--l-gray-14: #{$gray-14};
+
+	// 文字颜色
+	--l-text-color-1: #{$text-color-1};
+	--l-text-color-2: #{$text-color-2};
+	--l-text-color-3: #{$text-color-3};
+	--l-text-color-4: #{$text-color-4};
+
+	// 容器背景色
+	--l-bg-color-page: #{$bg-color-page};
+	--l-bg-color-container: #{$bg-color-container};
+	--l-bg-color-elevated: #{$bg-color-elevated};
+	--l-bg-color-spotlight: #{$bg-color-spotlight};
+	--l-bg-color-mask: #{$bg-color-mask};
+
+	// 填充色
+	--l-fill-1: #{$fill-1};
+	--l-fill-2: #{$fill-2};
+	--l-fill-3: #{$fill-3};
+	--l-fill-4: #{$fill-4};
+
+	// 描边色
+	--l-border-color-1: #{$border-color-1};
+	--l-border-color-2: #{$border-color-2};
+	--l-border-color-3: #{$border-color-3};
+	--l-border-color-4: #{$border-color-4};
+	
+	// loading
+	--l-loading-text-color: #{$text-color-3};
+	
+	// load-more
+	--l-load-more-text-color: #{$text-color-3};
+	--l-load-more-color: #{$text-color-4};
+	
+	// 按钮
+	--l-button-default-solid-text-color: #000;
+	--l-button-default-border-color: #{$gray-5};
+	--l-button-default-color:  #{$gray-14};
+	--l-button-default-light-color: #{$gray-4};
+	--l-button-default-light-hover-color: #{$gray-5};
+	--l-button-primary-light-color: #{$primary-color-2};
+	--l-button-primary-light-hover-color: #{$primary-color-3};
+	--l-button-danger-light-color: #{$error-color-2};
+	--l-button-danger-light-hover-color: #{$error-color-3};
+	--l-button-warning-light-color: #{$warning-color-2};
+	--l-button-warning-light-hover-color: #{$warning-color-3};
+	--l-button-success-light-color: #{$success-color-2};
+	--l-button-success-light-hover-color: #{$success-color-3};
+	--l-button-info-light-color: #{$info-color-1};
+	--l-button-info-light-hover-color: #{$info-color-2};
+	--l-button-primary-color: #{$primary-color-6};
+	--l-button-danger-color: #{$error-color-6};
+	--l-button-warning-color: #{$warning-color-6};
+	--l-button-info-color: #{$info-color-6};
+	
+	// 遮罩
+	// --l-overlay-bg-color: #{$bg-color-mask};
+	// 弹窗
+	--l-popup-bg-color: #{$bg-color-elevated};
+	--l-popup-close-icon-color: #{$text-color-2};
+	
+	// 单元格
+	--l-cell-group-title-color: #{$text-color-3};
+	--l-cell-group-border-color: #{$border-color-3};
+	--l-cell-bg-color: #{$bg-color-container};
+	--l-cell-hover-color: #{$gray-3};
+	--l-cell-border-color: #{$border-color-2};
+	--l-cell-note-color: #{$text-color-3};
+	--l-cell-description-color: #{$text-color-2};
+	--l-cell-title-color: #{$text-color-1};
+	--l-cell-right-icon-color: #{$text-color-3};
+	
+	// 步进器
+	--l-stepper-button-bg-color: #{$gray-4};
+	--l-stepper-input-disabled-bg:  #{$gray-3};
+	--l-stepper-input-color: #{$text-color-1};
+	--l-stepper-input-disabled-color: #{$text-color-4};
+	--l-stepper-border-color: #{$gray-4};
+	
+	// tabbar
+	--l-tabbar-bg-color: #{$bg-color-container};
+	--l-tabbar-border-color: #{$border-color-1};
+	--l-tabbar-color: #{$text-color-1};
+	--l-tabbar-active-color: #{$primary-color-6};
+	--l-tabbar-active-bg-color: #{$primary-color-1};
+	
+	// link
+	--l-link-default-color:  #{$text-color-1};
+	
+	// image
+	--l-image-loading-bg-color: #{$fill-3};
+	--l-image-color:  #{$text-color-3};
+	
+	// divider 分割线
+	--l-divider-color: #{$border-color-2};
+	--l-divider-text-color: #{$text-color-2};
+	
+	// card 卡片
+	--l-card-bg-color: #{$bg-color-container};
+	--l-card-title-color: #{$text-color-1};
+	--l-card-extra-color: #{$text-color-3};
+	--l-card-note-color: #{$text-color-3};
+	--l-card-border-color: #{$border-color-2};
+	
+	// grid 宫格
+	--l-grid-item-bg-color: #{$bg-color-container};
+	--l-grid-item-image-bg-color: #{$fill-4};
+	--l-grid-item-text-color: #{$text-color-1};
+	--l-grid-item-hover-bg-color: #{$fill-3};
+	--l-grid-item-description-color: #{$text-color-3};
+	--l-grid-item-border-color: #{$border-color-2};
+	--l-grid-item-icon-color: #{$text-color-1};
+	
+	// cascader 级联
+	--l-cascader-title-color: #{$text-color-1};
+	--l-cascader-bg-color: #{$bg-color-container};
+	--l-cascader-cell-title-color: #{$text-color-1};
+	--l-cascader-disabled-color: #{$text-color-3};
+	--l-cascader-options-title-color: #{$text-color-3};
+	--l-cascader-close-icon-color: #{$text-color-2};
+	
+	// tabs 标签页
+	--l-tab-nav-bg-color:  #{$bg-color-container};
+	--l-tab-content-bg-color:  #{$bg-color-container};
+	--l-tab-split-color:  #{$border-color-1};
+	--l-tab-item-color:  #{$text-color-2};
+	--l-tab-item-disabled-color:  #{$text-color-4};
+	
+	// checkbox 复选框
+	--l-checkbox-border-icon-color:  #{$gray-8};
+	--l-checkbox-icon-bg-color: #{$bg-color-container};
+	--l-checkbox-text-color:  #{$text-color-1};
+	--l-checkbox-icon-disabled-bg-color:  #{$gray-3};
+	--l-checkbox-icon-disabled-color:  #{$gray-6};
+	
+	// radio 单选框
+	--l-radio-border-icon-color:  #{$gray-8};
+	--l-radio-icon-bg-color: #{$bg-color-container};
+	--l-radio-text-color:  #{$text-color-1};
+	--l-radio-icon-disabled-bg-color:  #{$gray-3};
+	--l-radio-icon-disabled-color:  #{$gray-6};
+	
+	// search 搜索
+	--l-search-bg-color: #{$fill-3};
+	--l-search-icon-color: #{$text-color-4};
+	--l-search-clear-icon-color: #{$text-color-4};
+	--l-search-text-color: #{$text-color-1};
+	--l-search-label-color: #{$text-color-1};
+	--l-search-placeholder-color: #{$text-color-3};
+	
+	// switch
+	--l-switch-checked-disabled-color: #{$primary-color-3};
+	--l-switch-unchecked-color: #{$gray-5};
+	--l-switch-unchecked-disabled-color: #{$gray-4};
+	
+	// input 输入框
+	--l-input-text-color: #{$text-color-1};
+	--l-input-tips-color: #{$text-color-3};
+	--l-input-bg-color: #{$bg-color-container};
+	--l-input-border-color: #{$border-color-2};
+	--l-input-placeholder-text-color: #{$text-color-3};
+	--l-input-prefix-icon-color: #{$text-color-1};
+	--l-input-suffix-icon-color: #{$text-color-3};
+	--l-input-label-text-color: #{$text-color-1};
+	--l-input-suffix-text-color: #{$text-color-1};
+	--l-input-disabled-text-color: #{$text-color-4};
+	--l-input-disabled-bg-color: #{$fill-3};
+	--l-input-border-color: #{$border-color-2};
+	
+	// textarea 
+	--l-textarea-bg-color: #{$bg-color-container};
+	--l-textarea-placeholder-color: #{$text-color-3};
+	--l-textarea-text-color: #{$text-color-1};
+	--l-textarea-label-color: #{$text-color-1};
+	--l-textarea-indicator-text-color: #{$text-color-3};
+	--l-textarea-border-color: #{$border-color-2};
+	--l-textarea-disabled-text-color: #{$text-color-4};
+	
+	// upload
+	--l-upload-bg-color: #{$gray-4};
+	--l-upload-add-bg-color: #{$gray-4};
+	--l-upload-add-color: #{$text-color-3};
+	
+	// picker
+	--l-picker-bg-color: #{$bg-color-container};
+	--l-picker-cancel-color:  #{$text-color-2};
+	--l-picker-title-color:  #{$text-color-1};
+	--l-picker-item-active-color:  #{$text-color-1};
+	--l-picker-mask-top-color: #{$gray-2};
+	--l-picker-loading-mask-color: rgba(0,0,0,.6);
+	--l-picker-item-color:  #{$text-color-1};
+	--l-picker-indicator-bg-color:  #{$fill-3};
+	
+	// empty
+	--l-empty-opacity: 0.6;
+	
+	// segmented
+	--l-segmented-bg-color: #{$gray-4};
+	--l-segmented-text-color: #{$text-color-2};
+	--l-segmented-active-bg-color: #{$gray-5};
+	
+	// keyboard
+	--l-keyboard-bg-color: #{$bg-color-elevated};
+	--l-keyboard-color: #{$text-color-1};
+	--l-keyboard-key-bg-color: #{$gray-5};
+	--l-keyboard-key-hover-bg-color: #{$gray-4};
+	--l-keyboard-icon-bg-color: #{$gray-5};
+	--l-keyboard-icon-color: #{$text-color-3};
+	
+	// code-input
+	--l-code-input-bg-color: #{$gray-4};
+	--l-code-input-active-bg-color: #{$gray-5};
+	--l-code-input-info-color: #{$text-color-3};
+	--l-code-input-dot-color: #{$text-color-1};
+	--l-code-input-text-color: #{$text-color-1};
+	--l-code-input-cursor-color: #{$text-color-1};
+	--l-code-input-active-border-color:  #{$gray-6};
+	
+	// steps
+	--l-step-description-color: #{$text-color-3};
+	--l-step-wait-circle-bg-color: #{$gray-4};
+	--l-step-wait-circle-color: #{$text-color-3};
+	--l-step-wait-title-color: #{$text-color-3};
+	--l-step-wait-icon-color: #{$text-color-3};
+	--l-step-wait-dot-border-color: #{$gray-5};
+	--l-step-line-color: #{$gray-5};
+	--l-step-finish-title-color: #{$text-color-1};
+	--l-step-finish-circle-bg-color: #{$primary-color-2};
+	--l-step-error-circle-bg-color: #{$error-color-2};
+	
+	// date-strip
+	--l-date-strip-bg-color: #{$bg-color-container};
+	--l-date-strip-color: #{$text-color-1};
+	--l-date-strip-prefix-color: #{$text-color-3};
+	--l-date-strip-color: #{$text-color-2};
+	
+	// slider
+	--l-slider-rail-color: #{$gray-5};
+	--l-slider-thumb-border-color: #{$gray-11};
+	
+	// form
+	--l-form-item-border-color: #{$border-color-2};
+	--l-form-bg-color: #{$bg-color-container};
+	--l-form-item-label-color: #{$text-color-1};
+	
+	// color-picker
+	--l-color-picker-color: #{$text-color-1};
+	--l-color-picker-label-color: #{$text-color-2};
+	--l-color-picker-field-bg-color: #{$fill-2};
+	--l-color-picker-divider-color: #{$border-color-2};
+	
+	// calendar
+	--l-calendar-bg-color: #{$bg-color-container};
+	--l-calendar-title-color: #{$text-color-1};
+	--l-calendar-days-color: #{$text-color-2};
+	--l-calendar-item-color: #{$text-color-1};
+	--l-calendar-item-disabled-color: #{$text-color-4};
+	--l-calendar-item-centre-color: #{$primary-color-2};
+	--l-calendar-month-mark-color: #{$fill-3};
+	--l-calendar-switch-mode-icon-color: #{$text-color-2};
+	--l-calendar-switch-mode-icon-disabled-color: #{$text-color-4};
+	--l-calendar-header-border-color: #{$border-color-2};
+	
+	// loading
+	--l-loading-text-color: #{$text-color-3};
+	
+	// dialog
+	--l-dialog-title-color:  #{$text-color-1};
+	--l-dialog-content-color:  #{$text-color-2};
+	--l-dialog-close-color:  #{$text-color-3};
+	// --l-dialog-bg-color:  #{$bg-color-container};
+	--l-dialog-bg-color:  #{$gray-3};
+	--l-dialog-split-color: #{$border-color-2};
+	
+	// action-sheet
+	--l-action-sheet-item-disabled-color: #{$text-color-4};
+	--l-action-sheet-hover-color: #{$gray-3};
+	--l-action-sheet-border-color: #{$border-color-1};
+	--l-action-sheet-gap-color: #{$bg-color-page};
+	--l-action-sheet-color: #{$text-color-1};
+	--l-action-sheet-description-color: #{$text-color-3};
+	--l-action-sheet-cancel-color: #{$text-color-1};
+	--l-action-sheet-cancel-bg-color: #{$bg-color-container};
+	--l-action-sheet-image-bg-color: #{$fill-3};
+	--l-action-sheet-title-color: #{$text-color-1};
+	--l-action-sheet-close-btn-color: #{$text-color-1};
+	
+	// sorter
+	--l-sorter-color: #{$text-color-1};
+	
+	// floating-panel
+	--l-floating-panel-bg-color: #{$bg-color-elevated};
+	--l-floating-panel-bar-color: #{$fill-1};
+	
+	// dropdown-menu
+	--l-dropdown-menu-color: #{$text-color-1};
+	--l-dropdown-menu-bg-color: #{$bg-color-container};
+	--l-dropdown-menu-border-color: #{$border-color-1};
+	--l-dropdown-menu-disabled-color: #{$border-color-3};
+	--l-dropdown-menu-arrow-color: #{$gray-6};
+	--l-dropdown-menu-arrow-active-color: #{$gray-4};
+	--l-dropdown-item-cell-title-color: #{$text-color-1};
+	
+	// pull-refresh
+	--l-pull-refresh-refresher-color: #{$text-color-2};
+	
+	// circle
+	--l-circle-trail-color: #{$gray-5};
+	
+	// collapse
+	--l-collapse-panel-bg-color: #{$bg-color-container};
+	--l-collapse-content-text-color: #{$text-color-1};
+	--l-collapse-right-icon-color: #{$text-color-4};
+	--l-collapse-border-color: #{$border-color-2};
+	
+	// count-down
+	--l-count-down-text-color: #{$text-color-1};
+	
+	// empty
+	--l-empty-description-color: #{$text-color-3};
+	// progress
+	--l-progress-trail-color: #{$gray-5};
+	--l-progress-text-color: #{$text-color-2};
+	
+	// tag
+	// --l-tag-default-solid-text-color: #000;
+	--l-tag-text-color: #{$gray-14};
+	--l-tag-default-color: #{$gray-6};
+	--l-tag-default-light-color: #{$gray-4};
+	--l-tag-default-border-color: #{$gray-5};
+	--l-tag-primary-light-color: #{$primary-color-2};
+	--l-tag-danger-light-color: #{$error-color-2};
+	--l-tag-warning-light-color: #{$warning-color-2};
+	--l-tag-success-light-color: #{$success-color-2};
+	
+	// amount
+	--l-amount-color:  #{$text-color-1};
+	
+	// avatar
+	--l-avatar-bg-color: #{$primary-color-1};
+	--l-avatar-border-color: #{$gray-2};
+	
+	// highlight
+	--l-highlight-normal-color:  #{$text-color-1};
+	
+	// text-ellipsis
+	--l-text-ellipsis-color:  #{$text-color-1};
+	
+	// read-more
+	--l-read-more-handle-color:  #{$text-color-2};
+	--l-read-more-read-start: rgba(36, 36, 36, 0.9);
+	--l-read-more-read-end:  rgba(36, 36, 36, 0.3);
+	--l-read-more-mask-bg-color: linear-gradient(
+					to top, 
+					rgba(0,0,0,0), 
+					rgba(0,0,0,1), 
+				);
+	// notice-bar
+	--l-notice-bar-info-bg-color: #{$info-color-1};
+	--l-notice-bar-success-bg-color: #{$success-color-1};
+	--l-notice-bar-warning-bg-color: #{$warning-color-1};
+	--l-notice-bar-danger-bg-color: #{$error-color-1};
+	
+	// scrollx
+	--l-scrollx-track-color: #{$gray-4};
+	
+	// dateformat
+	--l-dateformat-color:  #{$text-color-1};
+	
+	// footer
+	--l-footer-text-color: #{$text-color-3};
+	--l-footer-link-dividing-line-color: #{$text-color-3};
+	--l-footer-logo-title-color: #{$text-color-1};
+	
+	// tree
+	--l-tree-node-text-color: #{$text-color-1};
+	--l-tree-arrow-color: #{$gray-6};
+	
+	// table
+	--l-table-bg-color: #{$bg-color-container};
+	--l-table-border-color: #{$border-color-2};
+	--l-table-td-fixed-bg-color: #{$bg-color-container};
+	--l-table-tr-fixed-bg-color: #{$bg-color-container};
+	
+	// sidebar
+	--l-sidebar-bg-color: #{$gray-3};
+	--l-sidebar-selected-bg-color: #{$bg-color-container};
+	--l-sidebar-text-color: #{$text-color-2};
+	--l-sidebar-disabled-text-color: #{$text-color-4};
+	
+	// back-top
+	--l-back-top-bg-color: #{$bg-color-elevated};
+	--l-back-top-border-color:  #{$border-color-2};
+	--l-back-top-text-color: #{$text-color-2};
+	
+	// navbar
+	--l-navbar-bg-color:  #{$bg-color-container};
+	--l-navbar-color: #{$text-color-1};
+	--l-navbar-capsule-border-color:  #{$border-color-2};
+	
+	// pagination
+	--l-pagination-bg-color:  #{$gray-4};
+	--l-pagination-disabled-bg-color:  #{$gray-3};
+	--l-pagination-hover-bg-color:  #{$gray-5};
+	--l-pagination-text-color: #{$text-color-2};
+	--l-pagination-disabled-color:  #{$text-color-4};
+	--l-pagination-simple-text-color: #{$text-color-1};
+	
+	// indexes
+	--l-indexes-sidebar-color: #{$text-color-1};
+	--l-indexes-anchor-color: #{$text-color-1};
+	--l-indexes-anchor-bg-color: #{$gray-4};
+	--l-indexes-anchor-active-bg-color: #{$gray-4};
+	--l-indexes-sidebar-tips-bg-color: #{$primary-color-1};
+	
+	// typing
+	--l-typing-bg-color:  #{$bg-color-container};
+	--l-typing-text-color: #{$text-color-1};
+	
+	// fit-swiper
+	--l-fit-swiper-indicator-color: #{$gray-5};
+	
+	// skeleton
+	--l-skeleton-bg-color: #{$fill-2}
+}

@@ -1,0 +1,72 @@
+<script setup lang="uts">
+	import { navigateToInterceptor } from './src/router/interceptor'
+
+	// #ifdef APP-ANDROID || APP-HARMONY
+	let firstBackTime = 0
+	// #endif
+
+	onLaunch(() => {
+		console.log('App Launch')
+	})
+
+	// #ifdef APP
+	onAppShow((options) => {
+		console.log('App Show')
+	})
+
+	onAppHide(() => {
+		console.log('App Hide')
+	})
+	// #endif
+
+	// #ifndef APP
+	onShow((options) => {
+		console.log('App Show')
+		// 处理直接输入 URL（H5）、小程序分享链接等绕过路由拦截器的场景
+		// 参考 unibest 的处理方式：手动调用拦截器的 invoke 函数补上权限校验
+		if (options != null && options.path != null && options.path != '') {
+			navigateToInterceptor.invoke({ url: `/${options.path}` } as any)
+		}
+	})
+
+	onHide(() => {
+		console.log('App Hide')
+	})
+	// #endif
+
+	// #ifdef APP-ANDROID || APP-HARMONY
+	onLastPageBackPress(() => {
+		console.log('App LastPageBackPress')
+		if (firstBackTime == 0) {
+			uni.showToast({
+				title: '再按一次退出应用',
+				position: 'bottom',
+			})
+			firstBackTime = Date.now()
+			setTimeout(() => {
+				firstBackTime = 0
+			}, 2000)
+		} else if (Date.now() - firstBackTime < 2000) {
+			firstBackTime = Date.now()
+			uni.exit()
+		}
+	})
+
+	onExit(() => {
+		console.log('App Exit')
+	})
+	// #endif
+</script>
+
+<style lang="scss">
+	@import './src/style/index.scss';
+
+	/*每个页面公共css */
+	.uni-row {
+		flex-direction: row;
+	}
+
+	.uni-column {
+		flex-direction: column;
+	}
+</style>

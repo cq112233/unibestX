@@ -1,0 +1,11 @@
+/* #ifdef VUE3 */
+@use "sass:math";
+// #endif
+@function divide($dividend, $divisor) {
+	/* #ifdef VUE3 */
+	@return math.div($dividend, $divisor);
+	/* #endif
+	/* #ifndef VUE3 */
+	@return $dividend / $divisor;
+	/* #endif
+}

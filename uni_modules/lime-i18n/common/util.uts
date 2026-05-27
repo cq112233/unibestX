@@ -1,0 +1,350 @@
+// @ts-nocheck
+/* @flow */
+
+/**
+ * constants
+ */
+import { errorMessages } from './errors'
+import { warnMessages } from './warnings'
+export const numberFormatKeys = [
+	'compactDisplay',
+	'currency',
+	'currencyDisplay',
+	'currencySign',
+	'localeMatcher',
+	'notation',
+	'numberingSystem',
+	'signDisplay',
+	'style',
+	'unit',
+	'unitDisplay',
+	'useGrouping',
+	'minimumIntegerDigits',
+	'minimumFractionDigits',
+	'maximumFractionDigits',
+	'minimumSignificantDigits',
+	'maximumSignificantDigits'
+]
+
+export const dateTimeFormatKeys = [
+	'dateStyle',
+	'timeStyle',
+	'calendar',
+	'localeMatcher',
+	"hour12",
+	"hourCycle",
+	"timeZone",
+	"formatMatcher",
+	'weekday',
+	'era',
+	'year',
+	'month',
+	'day',
+	'hour',
+	'minute',
+	'second',
+	'timeZoneName',
+]
+
+/**
+ * utilities
+ */
+
+export function getAllKeys(map:Map<string, UTSJSONObject>):string[] {
+	let keys:string[] = []
+	map.forEach((_, key) => {
+		keys.push(key)
+	})
+	return keys
+}
+
+export function isArray(value : any) : boolean {
+	return Array.isArray(value)
+}
+/**
+ * 判断一个值是否为对象
+ * @param {mixed} obj - 需要判断的值
+ * @returns {boolean} - 如果值为对象，则返回 true，否则返回 false
+ */
+export function isObject(obj : any | null) : boolean {
+	return obj != null && typeof obj == 'object'
+}
+/**
+ * 判断一个值是否为布尔值
+ * @param {mixed} val - 需要判断的值
+ * @returns {boolean} - 如果值为布尔值，则返回 true，否则返回 false
+ */
+export function isBoolean(val : any) : boolean {
+	return typeof val == 'boolean'
+}
+/**
+ * 判断一个值是否为字符串
+ * @param {mixed} val - 需要判断的值
+ * @returns {boolean} - 如果值为字符串，则返回 true，否则返回 false
+ */
+export function isString(val : any) : boolean {
+	return typeof val == 'string'
+}
+
+
+/**
+ * 判断一个值是否为普通对象
+ * @param {any} obj - 需要判断的值
+ * @returns {boolean} - 如果值为普通对象，则返回 true，否则返回 false
+ */
+export function isPlainObject(obj : any) : boolean {
+
+	// #ifndef APP-ANDROID || APP-IOS
+	const toString = Object.prototype.toString
+	const OBJECT_STRING : string = '[object Object]'
+	return toString.call(obj) === OBJECT_STRING
+	// #endif
+
+	// #ifdef APP-ANDROID || APP-IOS
+	return typeof obj == 'object' && obj instanceof UTSJSONObject
+	// #endif
+}
+
+/**
+ * 判断一个值是否为 null 或 undefined
+ * @param {mixed} val - 需要判断的值
+ * @returns {boolean} - 如果值为 null 或 undefined，则返回 true，否则返回 false
+ */
+// #ifndef APP-ANDROID || APP-IOS
+export function isNull(val : any | null | undefined) : boolean {
+	return val == null || val == undefined
+}
+// #endif
+// #ifdef APP-ANDROID || APP-IOS
+export function isNull(val : any | null) : boolean {
+	return val == null
+}
+// #endif
+
+/**
+ * 判断一个值是否为函数
+ * @param {mixed} val - 需要判断的值
+ * @returns {boolean} - 如果值为函数，则返回 true，否则返回 false
+ */
+export function isFunction(val : any) : boolean {
+	return typeof val == 'function'
+}
+
+/**
+ * 解析参数
+ * @param {...mixed} args - 输入的参数
+ * @returns {Object} - 包含 locale 和 params 的对象
+ */
+ 
+export function parseArgs(...args : Array<any>) : Map<string, UTSJSONObject> {
+	let locale : string | null = null
+	let params : UTSJSONObject | null = null
+
+	if (args.length == 1) {
+		if (isObject(args[0]) || isArray(args[0]) ) {
+			params = args[0] //as UTSJSONObject
+		} else if (typeof args[0] == 'string') {
+			locale = args[0] as string
+		}
+	} else if (args.length == 2) {
+		if (typeof args[0] == 'string') {
+			locale = args[0] as string
+		}
+		if (isObject(args[1]) || isArray(args[1])) {
+			params = args[1] //as UTSJSONObject
+		}
+	}
+	if(locale == null || params == null) return new Map<string, UTSJSONObject>()
+	return new Map([
+		[locale, params]
+	])
+}
+
+/**
+ * looseClone 函数用于对一个对象进行浅拷贝。
+ * 它通过将对象序列化为 JSON 字符串，然后再将其解析回对象来实现这一目的。
+ * 请注意，这种方法仅适用于可序列化的对象，不适用于包含循环引用或特殊对象（如函数、Date 对象等）的对象。
+ *
+ * @param {Object} obj - 需要进行浅拷贝的对象。
+ * @returns {Object} 返回一个新的对象，它是原始对象的浅拷贝。
+ */
+export function looseClone(obj : UTSJSONObject) : UTSJSONObject {
+	return JSON.parse<UTSJSONObject>(JSON.stringify(obj))
+}
+
+/**
+ * remove 函数用于从数组中删除指定的元素。
+ * 如果成功删除元素，则返回修改后的数组；否则，不返回任何值。
+ *
+ * @param {Array} arr - 需要操作的数组。
+ * @param {*} item - 需要删除的元素。
+ * @returns {Array} 返回修改后的数组，或者不返回任何值。
+ */
+export function remove(arr : Set<any>, item : any) : Set<any> | null {
+	if (arr.delete(item)) {
+		return arr
+	}
+	return null
+}
+
+/**
+ * arrayFrom 函数用于将类数组对象（如 Set 集合）转换为数组。
+ *
+ * @param {Set} arr - 需要转换的类数组对象。
+ * @returns {Array} 返回一个新数组，其中包含原类数组对象的所有元素。
+ */
+export function arrayFrom(arr : Set<any>) : Array<any> {
+	const ret : any[] = []
+	arr.forEach(a => {
+		ret.push(a)
+	})
+	return ret
+}
+
+
+/**
+ * includes 函数用于检查数组中是否包含指定的元素。
+ *
+ * @param {Array} arr - 需要检查的数组。
+ * @param {*} item - 需要查找的元素。
+ * @returns {boolean} 如果数组中包含指定元素，则返回 true，否则返回 false。
+ */
+export function includes(arr : Array<any>, item : any) : boolean {
+	return arr.indexOf(item)
+}
+
+
+/**
+ * hasOwn 函数用于检查对象是否具有指定的属性。
+ * 与直接使用 `obj.hasOwnProperty` 不同，此函数可以正确处理通过原型链继承的属性。
+ *
+ * @param {Object|Array} obj - 需要检查的对象或数组。
+ * @param {string} key - 需要检查的属性名。
+ * @returns {boolean} 如果对象具有指定的属性，则返回 true，否则返回 false。
+ */
+export function hasOwn(obj : UTSJSONObject, key : string) : boolean {
+	return obj[key] != null
+}
+
+
+/**
+ * merge 函数用于合并多个对象。
+ * 它会将源对象的所有可枚举属性值复制到目标对象。
+ * 如果目标对象和源对象有相同的属性，且它们的属性值都是对象，则会递归地合并这两个属性值。
+ *
+ * @param {Object} target - 目标对象，将被合并的对象。
+ * @returns {Object} 返回合并后的新对象。
+ */
+export function merge(...target : UTSJSONObject[]) : UTSJSONObject {
+	return UTSJSONObject.assign(...target)
+	// const output = Object(target)
+	// for (let i = 1; i < arguments.length; i++) {
+	// 	const source = arguments[i]
+	// 	if (source !== undefined && source !== null) {
+	// 		let key
+	// 		for (key in source) {
+	// 			if (hasOwn(source, key)) {
+	// 				if (isObject(source[key])) {
+	// 					output[key] = merge(output[key], source[key])
+	// 				} else {
+	// 					output[key] = source[key]
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
+	// return output
+}
+
+
+/**
+ * looseEqual 函数用于比较两个值是否宽松相等。
+ * 宽松相等意味着在比较时会进行类型转换，例如将字符串转换为数字。
+ * 该函数可以处理对象、数组和其他基本数据类型的值。
+ *
+ * @param {any} a - 要比较的第一个值。
+ * @param {any} b - 要比较的第二个值。
+ * @returns {boolean} 如果两个值宽松相等，则返回 true，否则返回 false。
+ */
+export function looseEqual(a : any, b : any) : boolean {
+	// 如果 a 和 b 严格相等，直接返回 true
+	if (a == b) { return true }
+
+	// 检查 a 和 b 是否都是对象
+	const isObjectA : boolean = isObject(a)
+	const isObjectB : boolean = isObject(b)
+
+	// 如果 a 和 b 都是对象
+	if (isObjectA && isObjectB) {
+		try {
+			// 检查 a 和 b 是否都是数组
+			const isArrayA : boolean = Array.isArray(a)
+			const isArrayB : boolean = Array.isArray(b)
+
+			// 如果 a 和 b 都是数组
+			if (isArrayA && isArrayB) {
+				// 比较它们的长度是否相等，以及它们的每个元素是否宽松相等
+				return (a as any[]).length == (b as any[]).length && a.every((e : any, i : number) : boolean => {
+					return looseEqual(e, b[i])
+				})
+			} else if (!isArrayA && !isArrayB) { // 如果 a 和 b 都不是数组
+				// 比较它们的键的数量是否相等，以及对应的键对应的值是否宽松相等
+				const keysA : Array<string> = UTSJSONObject.keys(a as UTSJSONObject)
+				const keysB : Array<string> = UTSJSONObject.keys(b as UTSJSONObject)
+				return keysA.length == keysB.length && keysA.every((key : string) : boolean => {
+					const valueA = a[key]
+					const valueB = b[key]
+					if(valueA == null || valueB == null) {
+						return false
+					}
+					return looseEqual(valueA, valueB)
+				})
+			} else {
+				// 如果 a 和 b 类型不同（一个是数组，另一个不是），返回 false
+				return false
+			}
+		} catch (e) {
+			// 如果在比较过程中发生异常，返回 false
+			return false
+		}
+	} else if (!isObjectA && !isObjectB) { // 如果 a 和 b 都不是对象
+		// 尝试将它们转换为字符串并比较
+		return `${a}` == `${b}`
+	} else {
+		// 如果 a 和 b 类型不同（一个是对象，另一个不是），返回 false
+		return false
+	}
+}
+
+
+/**
+ * 对用户输入的原始文本进行 HTML 特殊字符转义，以降低 XSS 攻击的风险。
+ * @param {string} rawText - 需要转义的原始用户输入文本。
+ * @returns {string} 返回转义后的文本。
+ */
+function escapeHtml(rawText: string): string {
+  return rawText
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;')
+}
+
+/**
+ * 从 `parseArgs().params` 返回的所有提供的参数中转义 HTML 标签和特殊符号。
+ * 此方法对 `params` 对象执行原地操作。
+ *
+ * @param {any} params - 从 `parseArgs().params` 提供的参数。
+ *                         可能是字符串数组或字符串到任意值的映射。
+ * @returns {any} 返回被操纵过的 `params` 对象。
+ */
+export function escapeParams(params: UTSJSONObject|null): UTSJSONObject|null {
+  if(params != null) {
+    UTSJSONObject.keys(params).forEach(key => {
+      if(typeof(params[key]) == 'string') {
+        params[key] = escapeHtml(params[key])
+      }
+    })
+  }
+  return params
+}

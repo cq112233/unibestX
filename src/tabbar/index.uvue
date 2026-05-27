@@ -1,0 +1,123 @@
+<script setup lang="uts">
+	import { tabbarList, curIdx, setCurIdx, syncCurIdxByCurrentPage, themeColor } from './store'
+	import TabbarItem from './TabbarItem.uvue'
+
+	const inactiveColor = '#999999'
+
+	function getColorByIndex(index : number) : string {
+		return curIdx.value === index ? themeColor.value : inactiveColor
+	}
+
+	/** 中间鼓包 tabbarItem 点击事件 */
+	function handleClickBulge() {
+		uni.showToast({ title: '点击了中间鼓包按钮', icon: 'none' })
+	}
+
+	/** 点击 tab 切换 */
+	function handleClick(index : number) {
+		if (index === curIdx.value) return
+		const list = tabbarList
+		if (list.length <= index) return
+		if (list[index].isBulge) {
+			handleClickBulge()
+			return
+		}
+		const url = list[index].pagePath
+		setCurIdx(index)
+		uni.switchTab({ url })
+	}
+
+	// 首次挂载时同步索引
+	onMounted(() => {
+		syncCurIdxByCurrentPage()
+		// #ifndef MP-WEIXIN || MP-ALIPAY
+		uni.hideTabBar({
+			fail: (err : any) => {
+				console.log('hideTabBar fail: ', err)
+			}
+		})
+		// #endif
+	})
+</script>
+
+<template>
+	<view class="tabbar-placeholder">
+		<view class="tabbar-placeholder-inner"></view>
+		<view class="tabbar-placeholder-safe"></view>
+		<view class="tabbar-container">
+			<view class="tabbar-inner">
+				<view v-for="(item, index) in tabbarList" :key="index" class="tabbar-item"
+					:style="{ color: getColorByIndex(index) }" @click="handleClick(index)">
+					<!-- 鼓包项 -->
+					<view v-if="item.isBulge" class="bulge-wrapper">
+						<view class="bulge">
+							<TabbarItem :item="item" :index="index" :isBulge="true" />
+						</view>
+					</view>
+					<!-- 普通项 -->
+					<TabbarItem v-else :item="item" :index="index" :isBulge="false" />
+				</view>
+			</view>
+			<!-- 底部安全区域 -->
+			<view class="pb-safe" />
+		</view>
+	</view>
+</template>
+
+<style>
+	.tabbar-placeholder {
+		flex-direction: column;
+	}
+
+	.tabbar-placeholder-inner {
+		height: 50px;
+	}
+
+	.tabbar-placeholder-safe {
+		height: env(safe-area-inset-bottom);
+	}
+
+	.tabbar-container {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		z-index: 1000;
+		background-color: #ffffff;
+		border-top-width: 1rpx;
+		border-top-style: solid;
+		border-top-color: #eeeeee;
+	}
+
+	.tabbar-inner {
+		height: 50px;
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.tabbar-item {
+		flex: 1;
+		align-items: center;
+		justify-content: center;
+		height: 50px;
+	}
+
+	/* 鼓包样式 */
+	.bulge-wrapper {
+		position: relative;
+	}
+
+	.bulge {
+		position: absolute;
+		top: -20px;
+		width: 50px;
+		height: 50px;
+		border-radius: 50px;
+		background-color: #ffffff;
+		align-items: center;
+		justify-content: center;
+		border-width: 1rpx;
+		border-style: solid;
+		border-color: #eeeeee;
+	}
+</style>

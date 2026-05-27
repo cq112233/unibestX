@@ -1,0 +1,64 @@
+@import './mixins/create.scss';
+// 公共前缀
+$prefix: l !default;
+
+// Spacer
+$spacer: 	 create-var('spacer', 16px) !default; // base
+$spacer-tn:  create-var('spacer-tn', 4px) !default; // Tiny
+$spacer-xs:  create-var('spacer-xs', 8px) !default; // Extra Small
+$spacer-sm:  create-var('spacer-sm', 12px) !default; // Small
+$spacer-md:  create-var('spacer-md', 24px) !default; // Medium
+$spacer-lg:  create-var('spacer-lg', 32px) !default; // Large
+$spacer-xl:  create-var('spacer-xl', 48px) !default; // Extra Large
+$spacer-hg:  create-var('spacer-hg', 80px) !default; // Huge //Ultra Big
+
+// Font 官方建议字体不跟随页面变化
+$font-size:    create-var('font-size', 14px) !default;
+$font-size-xs: create-var('font-size-xs', 10px) !default;
+$font-size-sm: create-var('font-size-sm', 12px) !default;
+$font-size-md: create-var('font-size-md', 16px) !default;
+$font-size-lg: create-var('font-size-lg',20px) !default;
+$font-size-xl: create-var('font-size-xl', 36px) !default;
+
+$font-size-heading-1: create-var('font-size-heading-1', 38px) !default;
+$font-size-heading-2: create-var('font-size-heading-2', 30px) !default;
+$font-size-heading-3: create-var('font-size-heading-3', 24px) !default;
+$font-size-heading-4: create-var('font-size-heading-4', 20px) !default;
+$font-size-heading-5: create-var('font-size-heading-5', 16px) !default;
+
+
+$font-family:    create-var('font-family', PingFang SC, Microsoft YaHei, Arial Regular) !default; // 字体-磅数-常规
+$font-family-md: create-var('font-family-md', PingFang SC, Microsoft YaHei, Arial Medium) !default; // 字体-磅数-粗体
+
+
+// 行高
+$line-height:    create-var('line-height', 1.5714285714285714) !default;
+$line-height-sm: create-var('line-height-sm', 1.6666666666666667) !default;
+$line-height-md: create-var('line-height-lg', 1.5) !default;
+$line-height-lg: create-var('line-height-lg', 1.4) !default;
+
+$line-height-heading-1: create-var('line-height-heading-1', 1.2105263157894737) !default;
+$line-height-heading-2: create-var('line-height-heading-2', 1.2666666666666666) !default;
+$line-height-heading-3: create-var('line-height-heading-3', 1.3333333333333333) !default;
+$line-height-heading-4: create-var('line-height-heading-4', 1.4) !default;
+$line-height-heading-5: create-var('line-height-heading-5', 1.5) !default;
+
+
+// 圆角
+$border-radius: 	create-var('border-radius', 6px) !default;
+$border-radius-xs: 	create-var('border-radius-xs', 2px) !default;
+$border-radius-sm: 	create-var('border-radius-sm', 3px) !default;
+$border-radius-md: 	create-var('border-radius-md', 6px) !default;
+$border-radius-lg: 	create-var('border-radius-lg', 9px) !default;
+$border-radius-xl: 	create-var('border-radius-xl', 12px) !default;
+$border-radius-hg:  create-var('border-radius-hg', 999px) !default;
+// $border-radius-circle: var(--l-border-radius-circle, 50%);
+
+
+// 动画
+$anim-time-fn-easing: 		create-var('anim-time-fn-easing', cubic-bezier(0.38, 0, 0.24, 1)) !default;
+$anim-time-fn-ease-out: 	create-var('anim-time-fn-ease-out', cubic-bezier(0, 0, 0.15, 1)) !default;
+$anim-time-fn-ease-in: 		create-var('anim-time-fn-ease-in', cubic-bezier(0.82, 0, 1, 0.9)) !default;
+$anim-duration-base: 		create-var('anim-duration-base', 0.2s) !default;
+$anim-duration-moderate: 	create-var('anim-duration-moderate', 0.24s) !default;
+$anim-duration-slow: 		create-var('anim-duration-slow', 0.28s) !default;

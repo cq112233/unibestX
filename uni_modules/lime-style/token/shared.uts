@@ -1,0 +1,24 @@
+import { TinyColor, generate } from '@/uni_modules/lime-color';
+import { LGenerateOptions } from '@/uni_modules/lime-color/utssdk/interface';
+
+export const getAlphaColor = (baseColor : string, alpha : number) : string =>
+	new TinyColor(baseColor).setAlpha(alpha).toRgbString();
+
+export const getSolidColor = (baseColor : string, brightness : number) : string => {
+	const instance = new TinyColor(baseColor);
+	return instance.lighten(brightness).toHexString();
+};
+
+export function generateColorPalettes(baseColor : string | null, name : string, theme: string = 'default') : UTSJSONObject {
+	if (baseColor == null) return {}
+	const colors = generate(baseColor, { theme } as LGenerateOptions);
+	const colorPalettes = colors.reduce((prev:UTSJSONObject, color:string, index:number) : UTSJSONObject => {
+		prev[`${name}${index + 1}`] = color;
+		return prev
+	}, {})
+	
+	// 默认为中间色
+	colorPalettes[name] = colorPalettes[`${name}${6}`]
+	return colorPalettes
+}
+

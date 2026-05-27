@@ -1,0 +1,295 @@
+/**
+ * PiniaStoreBase
+ *
+ * 用户继承本类来定义 store。基类提供 $id / $state / $subscribe / $onAction / $dispose
+ * 等核心能力；$reset / $patch / 持久化 这种依赖 "框架自动操作 state 字段" 的功能，
+ * 由于 UTS 没有 Proxy 也无法把 reactive 对象 cast 为 UTSJSONObject，
+ * 改为 **Template Method 模式**：子类按需重写 `_doReset` / `_hydrate` / `_serialize`。
+ *
+ * @example
+ * ```uts
+ * type CounterState = { count : number, name : string }
+ *
+ * export class CounterStore extends PiniaStoreBase {
+ *   state : CounterState = reactive<CounterState>({ count: 0, name: '' })
+ *
+ *   constructor() {
+ *     super()
+ *     this.bindState(this.state)
+ *   }
+ *
+ *   // actions = 普通 method
+ *   increment() : void { this.state.count++ }
+ *   setName(n : string) : void { this.state.name = n }
+ *
+ *   // 想要 $reset 工作？重写 _doReset
+ *   override _doReset() : void {
+ *     this.state.count = 0
+ *     this.state.name = ''
+ *   }
+ *
+ *   // 想要 $patch 或持久化工作？重写 _hydrate + _serialize
+ *   override _hydrate(data : UTSJSONObject) : void {
+ *     if (data['count'] != null) this.state.count = data['count'] as number
+ *     if (data['name'] != null) this.state.name = data['name'] as string
+ *   }
+ *
+ *   override _serialize() : UTSJSONObject {
+ *     return { count: this.state.count, name: this.state.name } as UTSJSONObject
+ *   }
+ * }
+ * ```
+ *
+ * @author tmui4x
+ * @copyright https://tmui.design
+ */
+
+import {
+	IPinia,
+	SubscriptionMutation,
+	StateSubscriptionCallback,
+	ActionSubscriptionCallback,
+	ActionContext,
+	UnsubscribeFn
+} from './types.uts'
+import { StateSubscriptionList, ActionSubscriptionList, ActionTriggerResult } from './subscriptions.uts'
+
+export class PiniaStoreBase {
+	/** store 唯一 id（由 defineStore 注入；用户不要手动赋值） */
+	$id : string = ''
+
+	// ============ 内部字段 ============
+
+	/** 用户绑定的 state 引用（任意类型，通常是 reactive(...)） */
+	protected _state : any | null = null
+	/** 状态订阅集合 */
+	protected _stateSubs : StateSubscriptionList = new StateSubscriptionList()
+	/** action 订阅集合 */
+	protected _actionSubs : ActionSubscriptionList = new ActionSubscriptionList()
+	/** watch 停止函数 */
+	protected _watchStopper : (() => void) | null = null
+	/** 所属 Pinia 实例（由 _setupBy 注入） */
+	protected _pinia : IPinia | null = null
+	/** 是否已绑定过 state */
+	protected _bound : boolean = false
+	/**
+	 * effect 作用域（由 defineStore 在 new XxxStore() 之前注入）。
+	 * store 内所有的 computed / watch 都绑定到本 scope，不会被外层组件销毁影响 ——
+	 * 这样跨页面共享 store 时（返回上页 → 再进入），computed 仍然有效。
+	 */
+	_scope : EffectScope | null = null
+
+	constructor() { }
+
+	/** 当前 state 引用（与子类的 state 字段是同一对象；可能为 null，子类未调用 bindState 时） */
+	get $state() : any | null {
+		return this._state
+	}
+
+	// ============ 子类必调工具 ============
+
+	/**
+	 * 绑定状态。子类必须在 constructor 中调用一次：
+	 * ```uts
+	 * constructor() {
+	 *   super()
+	 *   this.bindState(this.state)   // this.state 是子类自己声明的 reactive 对象
+	 * }
+	 * ```
+	 *
+	 * 入参类型为 any —— UTS 名义类型系统下，用户的 state 类型 (reactive<T>) 与
+	 * 任何系统类型都不兼容；用 any 让调用方无需 cast，且内部不再尝试转 UTSJSONObject
+	 * （以前的 `state as any as UTSJSONObject` 会在运行时抛 ClassCastException）。
+	 */
+	protected bindState(state : any) : void {
+		if (this._bound) {
+			console.warn('[x-pinia-s][' + this.$id + '] bindState 只能调用一次')
+			return
+		}
+		this._bound = true
+		this._state = state
+	}
+
+	// ============ 可重写的 Template Method（按需重写） ============
+
+	/**
+	 * 子类重写：定义 `$reset()` 时如何把 state 设回初始值。
+	 * 默认空实现 —— 不重写则 `$reset()` 是 no-op（仅触发订阅器）。
+	 */
+	_doReset() : void { }
+
+	/**
+	 * 子类重写：把外部 UTSJSONObject 数据装载到 state。
+	 * - `$patch(partial)` 调用本方法
+	 * - 持久化插件启动恢复时调用本方法
+	 *
+	 * 实现时建议判断字段是否存在，再赋值，以兼容 partial：
+	 * ```uts
+	 * if (data['count'] != null) this.state.count = data['count'] as number
+	 * ```
+	 *
+	 * 默认空实现 —— 不重写则 `$patch()` 和持久化恢复都是 no-op。
+	 */
+	_hydrate(_data : UTSJSONObject) : void { }
+
+	/**
+	 * 子类重写：把 state 序列化为 UTSJSONObject。
+	 * - 状态变更订阅（$subscribe）回调用本方法生成 state 视图
+	 * - 持久化插件保存时调用本方法
+	 *
+	 * 默认返回空对象 —— 不重写则订阅器收到的 state 永远是 `{}`，持久化也无意义。
+	 */
+	_serialize() : UTSJSONObject {
+		return ({} as UTSJSONObject)
+	}
+
+	// ============ Action 包装（可选） ============
+
+	/**
+	 * 让某个 action 触发 $onAction 订阅器。普通 action 直接写 method 即可，
+	 * 仅在主动想被 $onAction 追踪时才包装。
+	 */
+	protected callAction(name : string, fn : () => any) : any | null {
+		return this._invokeAction(name, fn, [] as Array<any>)
+	}
+
+	/**
+	 * 同 callAction，但额外把参数列表上报给订阅器。
+	 */
+	protected callActionWithArgs(name : string, fn : () => any, args : Array<any>) : any | null {
+		return this._invokeAction(name, fn, args)
+	}
+
+	/** 内部 action 执行器 */
+	private _invokeAction(name : string, fn : () => any, args : Array<any>) : any | null {
+		const actionCtx : ActionContext = {
+			name: name,
+			storeId: this.$id,
+			args: args
+		}
+		const triggerResult : ActionTriggerResult = this._actionSubs.trigger(actionCtx)
+		let result : any | null = null
+		try {
+			result = fn()
+		} catch (e) {
+			for (let i = 0; i < triggerResult.errorList.length; i++) {
+				try {
+					triggerResult.errorList[i](e)
+				} catch (e2) {
+					console.warn('[x-pinia-s][' + this.$id + '] onError callback error:', e2)
+				}
+			}
+			throw e
+		}
+		for (let i = 0; i < triggerResult.afterList.length; i++) {
+			try {
+				triggerResult.afterList[i](result)
+			} catch (e3) {
+				console.warn('[x-pinia-s][' + this.$id + '] after callback error:', e3)
+			}
+		}
+		return result
+	}
+
+	// ============ 公共方法 ============
+
+	/** 浅合并 partial 到 state（依赖子类的 _hydrate 实现） */
+	$patch(partial : UTSJSONObject) : void {
+		this._hydrate(partial)
+		const m : SubscriptionMutation = {
+			type: 'patch object',
+			storeId: this.$id,
+			payload: partial,
+			timestamp: Date.now()
+		}
+		const snapshot : UTSJSONObject = this._serialize()
+		this._stateSubs.trigger(m, snapshot)
+		if (this._pinia != null) {
+			this._pinia!.state[this.$id] = snapshot
+		}
+	}
+
+	/** 重置 state 到初始值（依赖子类的 _doReset 实现） */
+	$reset() : void {
+		this._doReset()
+		const m : SubscriptionMutation = {
+			type: 'reset',
+			storeId: this.$id,
+			payload: null,
+			timestamp: Date.now()
+		}
+		const snapshot : UTSJSONObject = this._serialize()
+		this._stateSubs.trigger(m, snapshot)
+		if (this._pinia != null) {
+			this._pinia!.state[this.$id] = snapshot
+		}
+	}
+
+	/** 订阅状态变更，返回取消订阅函数 */
+	$subscribe(cb : StateSubscriptionCallback) : UnsubscribeFn {
+		return this._stateSubs.add(cb)
+	}
+
+	/** 订阅 action 调用，返回取消订阅函数 */
+	$onAction(cb : ActionSubscriptionCallback) : UnsubscribeFn {
+		return this._actionSubs.add(cb)
+	}
+
+	/** 销毁 store：停止 watch、清空订阅、停止 effect 作用域、从 Pinia 注册表移除 */
+	$dispose() : void {
+		if (this._watchStopper != null) {
+			try {
+				this._watchStopper!()
+			} catch (e) {
+				console.warn('[x-pinia-s][' + this.$id + '] watch stop error:', e)
+			}
+			this._watchStopper = null
+		}
+		this._stateSubs.clear()
+		this._actionSubs.clear()
+		// 停止 effect 作用域：清理 store 内所有 computed / watch
+		if (this._scope != null) {
+			try {
+				this._scope!.stop()
+			} catch (e) {
+				console.warn('[x-pinia-s][' + this.$id + '] scope stop error:', e)
+			}
+			this._scope = null
+		}
+		if (this._pinia != null) {
+			this._pinia!._stores.delete(this.$id)
+		}
+	}
+
+	// ============ 内部初始化（由 defineStore 调用） ============
+
+	/**
+	 * 由 defineStore 调用，注入 id、pinia、启动 watch。
+	 * @internal 用户代码不要调用本方法。
+	 */
+	_setupBy(id : string, pinia : IPinia) : void {
+		this.$id = id
+		this._pinia = pinia
+		// 监听 state 引用变化（deep）
+		if (this._state != null) {
+			const stateRef : any = this._state!     // null 检查后用 ! 断言为非空
+			const sl : StateSubscriptionList = this._stateSubs
+			const sid : string = id
+			const piniaRef : IPinia = pinia
+			const selfRef : PiniaStoreBase = this
+			this._watchStopper = watch(() : any => stateRef, () : void => {
+				const m : SubscriptionMutation = {
+					type: 'direct',
+					storeId: sid,
+					payload: null,
+					timestamp: Date.now()
+				}
+				const snapshot : UTSJSONObject = selfRef._serialize()
+				sl.trigger(m, snapshot)
+				piniaRef.state[sid] = snapshot
+			}, { deep: true })
+		}
+		// 初始化 pinia.state[id] = 当前序列化结果（可能是 {}）
+		pinia.state[id] = this._serialize()
+	}
+}

@@ -1,0 +1,49 @@
+// import type { FontMapToken } from '../../interface';
+import { getFontSizes } from './genFontSizes';
+
+export const genFontMapToken = (fontSize : number | null) : UTSJSONObject => {
+	if (fontSize == null) return {}
+	const fontSizePairs = getFontSizes(fontSize);
+	const fontSizes = fontSizePairs.map((pair) : number => pair.size);
+	const lineHeights = fontSizePairs.map((pair) : number => pair.lineHeight);
+
+	const fontSizeXS = fontSizes[0];
+	const fontSizeSM = fontSizes[1];
+	const fontSizeMD = fontSizes[3];
+	const fontSizeLG = fontSizes[4];
+
+	const lineHeight = lineHeights[2];
+	const lineHeightSM = lineHeights[1];
+	const lineHeightMD = lineHeights[3];
+	const lineHeightLG = lineHeights[4];
+
+	return {
+		fontSize,
+		fontSizeXS,
+		fontSizeSM,
+		fontSizeMD,
+		fontSizeLG,
+		fontSizeXL: fontSizes[5],
+
+		fontSizeHeading1: fontSizes[7],
+		fontSizeHeading2: fontSizes[6],
+		fontSizeHeading3: fontSizes[5],
+		fontSizeHeading4: fontSizes[4],
+		fontSizeHeading5: fontSizes[3],
+
+		lineHeight,
+		lineHeightLG,
+		lineHeightMD,
+		lineHeightSM,
+
+		fontHeight: Math.round(lineHeight * fontSizeMD),
+		fontHeightLG: Math.round(lineHeightLG * fontSizeLG),
+		fontHeightSM: Math.round(lineHeightSM * fontSizeSM),
+
+		lineHeightHeading1: lineHeights[7],
+		lineHeightHeading2: lineHeights[6],
+		lineHeightHeading3: lineHeights[5],
+		lineHeightHeading4: lineHeights[4],
+		lineHeightHeading5: lineHeights[3],
+	};
+};

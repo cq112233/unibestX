@@ -1,0 +1,92 @@
+<template>
+	<view>
+		<text>测试：{{ $t('headMenus.userName') }}</text>
+		<text>测试：{{ $t('common.hello', {msg: '隔壁老王'}) }}</text>
+		<text>测试：{{ $t('message.link') }}</text>
+		<text>测试：{{ $t('message.linkHelloName', {name: '隔壁老王'}) }}</text>
+		<text>测试：{{ $t('message.linkLinkHelloName', {name: '隔壁老王'}) }}</text>
+		<text>测试：{{ $t('message.linkEnd') }}</text>
+		<text>测试：{{ $t('message.linkWithin') }}</text>
+		<text>测试：{{ $t('message.linkMultiple') }}</text>
+		<text>测试：{{ $t('message.linkBrackets') }}</text>
+		<text>测试：{{ $t('message.linkHyphen') }}</text>
+		<text>测试：{{ $t('message.linkUnderscore') }}</text>
+		<text>测试：{{ $t('message.linkPipe') }}</text>
+		<text>测试：{{ $t('message.linkList', ['数组值1', '数组值2']) }}</text>
+		<text>测试：{{ $t('message.linkCaseLower') }}</text>
+		<text>测试：{{ $t('message.linkCaseUpper') }}</text>
+		<text>测试：{{ $t('message.linkCaseCapitalize') }}</text>
+		<text>测试：{{ $t('message.linkCaseUnknown') }}</text>
+		<text>测试：{{ $t('message.linkCaseCustom') }}</text>
+		<text>测试：{{ $t('message.circular1') }}</text>
+		<text>测试：{{ $t('message.linkTwice') }}</text>
+		<text>测试：{{ $t('address', { account: 'foo', domain: 'domain.com' }) }}</text>
+		<text>测试：{{ $t('message.linked') }}</text>
+		<text>测试：{{ $t('message.missingHomeAddress') }}</text>
+		<text>测试：{{ $t('message.custom_modifier') }}</text>
+		<text>测试：{{ $t('headMenus.userName', {}) }}</text>
+		<text>复数：{{ $tc('plurals.apple') }}</text>
+		<text>复数：{{ $tc('plurals.apple', 0) }}</text>
+		<text>复数：{{ $tc('plurals.apple', 1) }}</text>
+		<text>复数：{{ $tc('plurals.apple', 10, { count: 10 }) }}</text>
+		<text>复数：{{ $tc('plurals.apple', 10, { count: 'Many' }) }}</text>
+		<text>复数：{{ $tc('plurals.apple', 10) }}</text>
+		<text>复数：{{ $tc('plurals.car', 1) }}</text>
+		<text>复数：{{ $tc('plurals.car', 2) }}</text>
+		<text>复数自定义规则:{{ $tc('car', 1, 'ru') }}</text>
+		<text>复数自定义规则:{{ $tc('car', 2, 'ru') }}</text>
+		<text>复数自定义规则:{{ $tc('car', 4, 'ru') }}</text>
+		<text>复数自定义规则:{{ $tc('car', 12, 'ru') }}</text>
+		<text>复数自定义规则:{{ $tc('car', 21, 'ru') }}</text>
+		
+		<text>复数自定义规则:{{ $tc('banana', 0, 'ru') }}</text>
+		<text>复数自定义规则:{{ $tc('banana', 4, 'ru') }}</text>
+		<text>复数自定义规则:{{ $tc('banana', 11, 'ru') }}</text>
+		<text>复数自定义规则:{{ $tc('banana', 31, 'ru') }}</text>
+		<text>
+			<text v-for="item in $i18n.availableLocales">{{item}}</text>
+		</text>
+		
+		<text>{{ $d(new Date(), 'short') }}</text>
+		<text>{{ $d(new Date(), 'long', 'zh-CN') }}</text>
+		<text>{{ $n(10000, 'currency') }}</text>
+		<text>{{ $n(10000, 'currency', 'zh-CN') }}</text>
+		<text>{{ $n(10000, 'currency', 'zh-CN', { useGrouping: false }) }}</text>
+		<text>{{ $n(987654321, 'currency', { notation: 'compact' }) }}</text>
+		<text>{{ $n(0.99123, 'percent') }}</text>
+		<text>{{ $n(0.99123, 'percent', { minimumFractionDigits: 2 }) }}</text>
+		<text>{{ $n(12.11612345, 'decimal') }}</text>
+		<text>{{ $n(12145281111, 'decimal', 'zh-CN') }}</text>
+		<!-- <button @click="onClick">切换{{locale}}</button> -->
+		<!-- <button @click="$locale.value = $locale.value != 'zh-CN' ? 'zh-CN' : 'en-US'">切换,当前：{{$locale}}</button> -->
+		<button @click="onClick">切换,当前：{{$locale}}</button>
+	</view>
+</template>
+
+<script setup>
+	import { useI18n } from '@/uni_modules/lime-i18n';
+	// import * as test from '@/uni_modules/lime-i18n/message-compiler/test'
+	// import * as test from '@/uni_modules/lime-i18n/common/test'
+	import i18n from '@/uni_modules/lime-i18n/test'
+
+
+	import { getCurrentInstance } from 'vue'
+	const context = getCurrentInstance()
+	// 局部国际化
+	// const {locale, setLocaleMessage} = useI18n() 
+	
+	const onClick = () => {
+		if(context == null) return
+		context.proxy!.$locale.value = context.proxy!.$locale.value != 'zh-CN' ? 'zh-CN' : 'en-US'
+		// context!.proxy!.$locale.value = 'zh-CN' ? 'zh-CN' : 'en-US'
+		// locale.value = locale.value != 'zh-CN' ? 'zh-CN' : 'en-US'
+		// console.log(`$i18n.t`, context?.proxy?.$i18n.t('headMenus.userName', {}))
+		// console.log(`$i18n.t`, context!.proxy!.$t('headMenus.userName'))
+		console.log(`$i18n.t`, i18n!.$t('headMenus.userName'))
+		console.log(`$i18n.t`, context.proxy?.$i18n.global.t('headMenus.userName'))
+	}
+</script>
+
+<style>
+
+</style>

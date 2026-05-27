@@ -1,0 +1,52 @@
+<template>
+  <view class="register-container">
+    <view class="title">
+      <text class="title-text">注册页</text>
+    </view>
+    <button class="register-btn" @click="doRegister">
+      点击模拟注册
+    </button>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { LOGIN_PAGE } from '../../router/config'
+
+function doRegister() {
+  uni.showToast({
+    title: '注册成功',
+    icon: 'success'
+  })
+  
+  // 延迟后跳转到登录页
+  setTimeout(() => {
+    uni.navigateTo({
+      url: LOGIN_PAGE
+    })
+  }, 1000)
+}
+</script>
+
+<style scoped>
+.register-container {
+  flex: 1;
+  padding: 30px;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8fafc;
+}
+.title {
+  margin-bottom: 30px;
+}
+.title-text {
+  font-size: 20px;
+  font-weight: bold;
+  color: #1e293b;
+}
+.register-btn {
+  width: 200px;
+  background-color: #10b981; /* Emerald-500 for register */
+  color: #ffffff;
+  border-radius: 8px;
+}
+</style>

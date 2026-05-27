@@ -1,0 +1,99 @@
+// import { createComposer } from './composer'
+import { ComposerClass, createComposer } from './composer-class'
+import { getAllKeys } from './util'
+import { I18nErrorCodes } from './errors'
+type I18nMode = "legacy" | "composition"
+
+// #ifndef APP
+type VuePlugin = any
+// #endif
+
+let lime_i18n : UvueI18n | null = null
+class UvueI18n {
+	private __global : ComposerClass
+	private __scope : EffectScope
+	constructor(options : UTSJSONObject = {}, root : ComposerClass | null = null) {
+		this.__scope = effectScope()
+		this.__global = this.__scope.run(() : ComposerClass => createComposer(UTSJSONObject.assign({}, options), root))!
+	}
+	get mode() : I18nMode {
+		return "composition"
+	}
+	get global() : ComposerClass {
+		return this.__global
+	}
+	get availableLocales():string[] {
+		return getAllKeys(this.global.messages.value).sort()
+	}
+	dispose() {
+		this.__scope.stop()
+	}
+	$t(key : string, values : any|null = null, locale : string|null = null):string {
+		const isLocale = typeof values == 'string'
+		const _values = isLocale ? null : values
+		const _locale = isLocale ? values as string : locale
+		return this.global.t(key, _values, _locale)
+	}
+	$tc(key : string, choice : number|null = null, values : any|null = null, locale : string|null = null) : string {
+		const isLocale = typeof values == 'string'
+		const _values = isLocale ? null : values
+		const _locale = isLocale ? values as string : locale
+		return this.global.tc(key, choice, _values, _locale)
+	}
+	$d(date: any, key: string|null = null, locale : string|null = null, options: UTSJSONObject | null = null):string {
+		return this.global.d(date, key, locale, options)
+	}
+	$n(number: number, key: string|null = null, locale : any|null = null, options: UTSJSONObject | null = null):string {
+		const _locale = typeof locale == 'string' ? locale as string : null
+		const _options = typeof locale == 'object' && locale != null ? locale as UTSJSONObject : options
+		return this.global.n(number, key, _locale, _options)
+	}
+	get install() : VuePlugin {
+		const _install = (app : VueApp) => {
+			app.config.globalProperties.$i18n = lime_i18n!
+			app.config.globalProperties.$t = function (key : string, values : any|null = null, locale : string|null = null) : string {
+				const isLocale = typeof values == 'string'
+				const _values = isLocale ? null : values
+				const _locale = isLocale ? values as string : locale
+				return lime_i18n!.global.t(key, _values, _locale)
+			}
+			app.config.globalProperties.$tc = function (key : string, choice : number|null = null, values : any|null = null, locale : string|null = null) : string {
+				const isLocale = typeof values == 'string'
+				const _values = isLocale ? null : values
+				const _locale = isLocale ? values as string : locale
+				return lime_i18n!.global.tc(key, choice, _values, _locale)
+			}
+			app.config.globalProperties.$d = function(date: any, key: string|null = null, locale : string|null = null, options: UTSJSONObject | null = null):string {
+				return lime_i18n!.global.d(date, key, locale, options)
+			}
+			app.config.globalProperties.$n = function(number: number, key: string|null = null, locale : any|null = null, options: UTSJSONObject | null = null):string {
+				const _locale = typeof locale == 'string' ? locale as string : null
+				const _options = typeof locale == 'object' && locale != null ? locale as UTSJSONObject : options
+				return lime_i18n!.global.n(number, key, _locale, _options)
+			}
+			app.config.globalProperties.$locale = lime_i18n!.global.locale
+		}
+		//  #ifdef APP-ANDROID
+		return definePlugin({
+			install: _install
+		})
+		// #endif
+		//  #ifndef APP-ANDROID
+		return _install
+		// #endif
+	}
+}
+
+export function createI18n(options : UTSJSONObject = {}) : UvueI18n {
+	// const __legacyMode = true
+	lime_i18n = new UvueI18n(options)
+	return lime_i18n!
+}
+
+export function useI18n(options : UTSJSONObject = {}) : UvueI18n {
+	const instance = getCurrentInstance()
+	if (instance == null) {
+		console.error(I18nErrorCodes.MUST_BE_CALL_SETUP_TOP)
+	}
+	return new UvueI18n(options, lime_i18n!.global)//.global
+}

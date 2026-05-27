@@ -1,0 +1,68 @@
+export default {
+	common: {
+		more: "Look More",
+		hello: '{msg} world'
+	},
+	leftMenus: {
+		// "/": "Home",
+		// Home: "Home",
+		home: "Home",
+	},
+	headMenus: {
+		"subTitle": "Organization service platform",
+		"userName": "ZhangSan"
+	},
+	login: {
+		"personal_center": "personal center",
+		"sign_out": "sign out"
+	},
+	plurals: {
+		car: 'car | cars',
+		apple: 'no apples | one apple | {count} apples',
+		format: {
+			named: 'Hello {name}, how are you? | Hi {name}, you look fine',
+			list: 'Hello {0}, how are you? | Hi {0}, you look fine'
+		},
+		fallback: 'this is fallback | this is a plural fallback'
+	},
+	message: {
+		directPass: 'direct Pass',
+		threeDirect: 'three Direct',
+		hello: 'the world',
+		helloName: 'Hello {name}',
+		hoge: 'hoge',
+		link: '@:message.hello',
+		linkHelloName: '@:message.helloName',
+		linkLinkHelloName: '@:message.linkHelloName',
+		linkEnd: 'This is a linked translation to @:message.hello',
+		linkWithin: 'Isn\'t @:message.hello we live in great?',
+		linkMultiple: 'Hello @:message.hoge!, isn\'t @:message.hello great?',
+		linkBrackets: 'Hello @:(message.hoge). Isn\'t @:(message.hello) great?',
+		linkHyphen: '@:hyphen-hello',
+		linkUnderscore: '@:underscore_hello',
+		linkPipe: '@:pipe|hello',
+		linkColon: '@:(colon:hello)',
+		linkList: '@:message.hello: {0} {1}',
+		linkCaseLower: 'Please provide @.lower:message.homeAddress',
+		linkCaseUpper: '@.upper:message.homeAddress',
+		linkCaseCapitalize: '@.capitalize:message.homeAddress',
+		linkCaseUnknown: '@.unknown:message.homeAddress',
+		linkCaseCustom: '@.custom:message.homeAddress',
+		homeAddress: 'home Address',
+		circular1: 'Foo @:message.circular2',
+		circular2: 'Bar @:message.circular3',
+		circular3: 'Buz @:message.circular1',
+		linkTwice: '@:message.hello: @:message.hello',
+		the_world: 'the world',
+		dio: 'DIO:',
+		linked: '@:message.dio @:message.the_world !!!!',
+		missingHomeAddress: 'Please provide @.lower:message.homeAddress',
+		snake: 'snake case',
+		custom_modifier: "custom modifiers example: @.snakeCase:{'message.snake'}"
+	},
+	address: "{account}{'@'}{domain}",
+	'hyphen-hello': 'hyphen the wolrd',
+	underscore_hello: 'underscore the wolrd',
+	// 'colon:hello': 'hello colon',
+	'pipe|hello': 'hello pipe',
+};

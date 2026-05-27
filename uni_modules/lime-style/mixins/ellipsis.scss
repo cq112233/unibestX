@@ -1,0 +1,22 @@
+@mixin ellipsis {
+	// overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	/* #ifndef UNI-APP-X && APP || APP-NVUE */ 
+	word-wrap: normal;
+	/* #endif */
+}
+
+
+@mixin ellipsisLn($line) {
+  // overflow: hidden;
+  text-overflow: ellipsis;
+  /* #ifdef UNI-APP-X && APP || APP-NVUE */
+  lines: $line;
+  /* #endif */
+  /* #ifndef UNI-APP-X && APP || APP-NVUE */ 
+  -webkit-line-clamp: $line;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  /* #endif */
+}

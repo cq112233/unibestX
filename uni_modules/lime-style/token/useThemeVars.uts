@@ -1,0 +1,123 @@
+// @ts-nocheck
+import { isDarkMode } from './useThemeMode'
+import type { SeedToken } from './interface';
+import { genFontMapToken } from './genFontMapToken';
+import { genSizeMapToken } from './genSizeMapToken';
+import { genColorMapToken as genLightColorMapToken } from './light';
+import { genColorMapToken as genDarkColorMapToken } from './dark';
+import { computed, reactive  } from 'vue'; // 或相应的响应式系统
+
+
+
+// #ifndef UNI-APP-X
+export type VueApp = any
+export type UTSJSONObject = Record<string, any>
+const UTSJSONObject = Object
+// #endif
+
+
+// 内部存储的 tokens
+type LimeTokens = {
+	light : UTSJSONObject
+	dark : UTSJSONObject
+}
+
+// 默认的基础 token
+const DEFAULT_SEED_TOKEN : SeedToken = {
+	primaryColor: '#3283ff'
+};
+
+export const themeTokenMaps = reactive<LimeTokens>({
+	light: {},
+	dark: {},
+})
+
+
+// 初始化默认 tokens
+function initDefaultTokens() {
+	// Light 主题颜色
+	const lightColors = {
+		white: '#fff',
+		gray1: '#f3f3f3',
+		gray2: '#eeeeee',
+		gray3: '#e7e7e7',
+		gray4: '#dcdcdc',
+		gray5: '#c5c5c5',
+		gray6: '#a6a6a6',
+		gray7: '#8b8b8b',
+		gray8: '#777777',
+		gray9: '#5e5e5e',
+		gray10: '#4b4b4b',
+		gray11: '#383838',
+		gray12: '#2c2c2c',
+		gray13: '#242424',
+		gray14: '#181818',
+		black: '#000',
+		...genLightColorMapToken(DEFAULT_SEED_TOKEN)
+	};
+	// Dark 主题颜色
+	const darkColors = {
+		white: '#000',  // 在暗黑模式下反转
+		gray1: '#181818',
+		gray2: '#242424',
+		gray3: '#2c2c2c',
+		gray4: '#383838',
+		gray5: '#4b4b4b',
+		gray6: '#5e5e5e',
+		gray7: '#777777',
+		gray8: '#8b8b8b',
+		gray9: '#a6a6a6',
+		gray10: '#c5c5c5',
+		gray11: '#dcdcdc',
+		gray12: '#e7e7e7',
+		gray13: '#eeeeee',
+		gray14: '#f3f3f3',
+		black: '#fff',  // 在暗黑模式下反转
+		...genDarkColorMapToken(DEFAULT_SEED_TOKEN)
+	};
+
+	themeTokenMaps.light = UTSJSONObject.assign({}, lightColors, lightColors)
+	themeTokenMaps.dark = UTSJSONObject.assign({}, darkColors, darkColors)
+}
+
+initDefaultTokens();
+
+// 导出的 themeTokens 是计算属性，自动返回当前主题的 tokens
+export const themeTokens = computed(():UTSJSONObject => {
+	return isDarkMode.value ? themeTokenMaps.dark : themeTokenMaps.light;
+});
+
+
+
+export function useThemeToken(token : SeedToken | null = null) {
+	if (token != null) {
+		const lightColors = genLightColorMapToken(token!);
+		const darkColors = genDarkColorMapToken(token!);
+
+		// 只有在提供了相关属性时才重新生成 fonts 和 sizes
+		const fonts = genFontMapToken(token!.fontSize)
+		const sizes = genSizeMapToken(token!.sizeUnit, token.sizeStep)
+
+		themeTokenMaps.light = UTSJSONObject.assign({}, themeTokenMaps.light, lightColors, fonts, sizes)
+		themeTokenMaps.dark = UTSJSONObject.assign({}, themeTokenMaps.dark, darkColors, fonts, sizes)
+	}
+}
+
+export function useThemeVars(options : UTSJSONObject | null = null) {
+	if (options != null) {
+		const currentTheme = isDarkMode.value ? themeTokenMaps.dark : themeTokenMaps.light;
+
+		// #ifdef UNI-APP-X && APP
+		options.toMap().forEach((value, key) => {
+			currentTheme.set(key, value);
+		});
+		// #endif
+
+		// #ifndef UNI-APP-X && APP
+		Object.entries(options).forEach(([key, value]) => {
+			// currentTheme.set(key, value);
+			currentTheme[key] = value
+		});
+		// #endif
+	}
+}

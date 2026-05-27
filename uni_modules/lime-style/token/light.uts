@@ -1,0 +1,66 @@
+import { TinyColor, generate } from '@/uni_modules/lime-color';
+import { getAlphaColor, getSolidColor, generateColorPalettes } from './shared'
+import { SeedToken } from './interface'
+// #ifndef UNI-APP-X
+export type UTSJSONObject = Record<string, any>
+const UTSJSONObject = Object
+// #endif
+
+export function generateNeutralColorPalettes(
+	bgBaseColor : string | null,
+	textBaseColor : string | null
+) : UTSJSONObject {
+	const colorBgBase = bgBaseColor ?? '#fff';
+	const colorTextBase = textBaseColor ?? '#000';
+
+	return {
+		'bgColorBase': bgBaseColor,
+		'textColorBase': textBaseColor,
+
+		'textColor1': getAlphaColor(colorTextBase, 0.88),
+		'textColor2': getAlphaColor(colorTextBase, 0.65),
+		'textColor3': getAlphaColor(colorTextBase, 0.45),
+		'textColor4': getAlphaColor(colorTextBase, 0.25),
+
+		'fill1': getAlphaColor(colorTextBase, 0.15),
+		'fill2': getAlphaColor(colorTextBase, 0.06),
+		'fill3': getAlphaColor(colorTextBase, 0.04),
+		'fill4': getAlphaColor(colorTextBase, 0.02),
+
+		'bgColorPage': getSolidColor(colorBgBase, 4),
+		'bgColorContainer': getSolidColor(colorBgBase, 0),
+		'bgColorElevated': getSolidColor(colorBgBase, 0),
+		'bgColorMask': getAlphaColor(colorTextBase, 0.45),
+		'bgColorSpotlight': getAlphaColor(colorTextBase, 0.85),
+		'bgColorBlur': 'transparent',
+		
+		'borderColor1': getSolidColor(colorBgBase, 15),
+		'borderColor2': getSolidColor(colorBgBase, 6)
+	}
+};
+
+export function genColorMapToken(token : SeedToken) : UTSJSONObject {
+	const colorPrimaryBase = token.primaryColor
+	const colorSuccessBase = token.successColor
+	const colorWarningBase = token.warningColor
+	const colorErrorBase = token.errorColor
+	const colorInfoBase = token.infoColor
+	const colorBgBase = token.bgColorBase
+	const colorTextBase = token.textColorBase
+
+	const primaryColors = generateColorPalettes(colorPrimaryBase, 'primaryColor');
+	const successColors = generateColorPalettes(colorSuccessBase, 'successColor');
+	const warningColors = generateColorPalettes(colorWarningBase, 'warningColor');
+	const errorColors = generateColorPalettes(colorErrorBase, 'errorColor');
+	const infoColors = generateColorPalettes(colorInfoBase, 'infoColor');
+	const neutralColors = generateNeutralColorPalettes(colorBgBase, colorTextBase);
+
+	return UTSJSONObject.assign(
+		{},
+		primaryColors,
+		successColors,
+		warningColors,
+		errorColors,
+		infoColors,
+		neutralColors)
+}

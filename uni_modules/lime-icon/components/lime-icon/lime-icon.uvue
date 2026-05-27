@@ -1,0 +1,107 @@
+<template>
+	<view class="demo-block">
+		<text class="text-2xl font-bold mb-2">Icon 图标</text>
+		<text class="text-sm text-gray-5 mb-4">iconify图标集，超过15,0000个开源矢量图标</text>
+		<view class="demo-block__body">
+			<view class="bg-white p-4 mb-4 rounded">
+				<text class="text-lg font-bold mb-4">基础使用</text>
+				<view class="flex flex-row flex-wrap">
+					<view class="flex items-center py-2 grid-item">
+						<l-icon name="logo-alipay" size="30px"></l-icon>
+					</view>
+					<view class="flex items-center py-2 grid-item">
+						<l-icon name="animation-1" size="30px"></l-icon>
+					</view>
+					<view class="flex items-center py-2 grid-item">
+						<l-icon name="object-storage" size="30px"></l-icon>
+					</view>
+					<view class="flex items-center py-2 grid-item">
+						<l-icon name="animation" size="30px"></l-icon>
+					</view>
+					<view class="flex items-center py-2 grid-item">
+						<l-icon name="brightness-1" size="30px"></l-icon>
+					</view>
+				</view>
+			</view>
+
+			<view class="bg-white p-4 mb-4 rounded">
+				<text class="text-lg font-bold mb-4">使用图片</text>
+				<view class="flex flex-row flex-wrap">
+					<view class="flex items-center py-2 grid-item" v-for="item in imageList" :key="item">
+						<l-icon :name="item" size="30px" color="blue"></l-icon>
+					</view>
+				</view>
+			</view>
+
+			<view class="bg-white p-4 mb-4 rounded">
+				<text class="text-lg font-bold mb-4">iconify</text>
+				<view class="flex flex-row flex-wrap">
+					<view class="flex items-center py-2 grid-item">
+						<l-icon size="30px" name="uil:12-plus" color="blue"></l-icon>
+					</view>
+					<view class="flex items-center py-2 grid-item">
+						<l-icon size="30px" name="icon-park-outline:abdominal"></l-icon>
+					</view>
+					<view class="flex items-center py-2 grid-item">
+						<l-icon size="30px" name="icon-park-outline:acoustic"></l-icon>
+					</view>
+					<view class="flex items-center py-2 grid-item">
+						<l-icon size="30px" name="ph:tabs-bold"></l-icon>
+					</view>
+					<view class="flex items-center py-2 grid-item">
+						<l-icon size="30px" name="ri:aliens-fill"></l-icon>
+					</view>
+				</view>
+			</view>
+
+			<view class="bg-white p-4 mb-4 rounded">
+				<text class="text-lg font-bold mb-4">自定义图标</text>
+				<view class="flex flex-row flex-wrap">
+					<view class="flex items-center py-2 grid-item">
+						<l-icon size="30px" prefix="keyicon" name="close"></l-icon>
+					</view>
+					<view class="flex items-center py-2 grid-item">
+						<l-icon size="30px" :name="`\uE6EF`"></l-icon>
+					</view>
+					<view class="flex items-center py-2 grid-item">
+						<l-icon size="30px" :name="dynamicIcon"></l-icon>
+					</view>
+				</view>
+				<button @click="toggleIcon" type="primary" class="mt-4">切换图标</button>
+			</view>
+		</view>
+	</view>
+</template>
+<script setup lang="uts">
+	import { registerFontIcon, type FontIconConfig } from '@/uni_modules/lime-icon'
+	import { imageList } from './imageList'
+	
+	const dynamicIcon = ref('earth')
+	const toggleIcon = () => {
+		dynamicIcon.value = dynamicIcon.value !== 'heart' ? 'heart' : 'earth'
+	}
+
+	onMounted(() => {
+		registerFontIcon({
+			fontFamily: 'keyicon',
+			prefix: 'keyicon',
+			fontUrl: 'https://at.alicdn.com/t/c/font_4741157_ul7wcp52yys.ttf',
+			icons: {
+				close: 'E6EF'
+			}
+		} as FontIconConfig)
+	})
+</script>
+<style lang="scss">
+	@import '@/uni_modules/lime-style/atomic.scss';
+
+	.grid {
+		&-item {
+			flex-basis: 20%;
+		}
+	}
+
+	.demo-block {
+		padding: 32px 16px 0;
+	}
+</style>

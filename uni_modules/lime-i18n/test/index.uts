@@ -1,0 +1,113 @@
+import { createI18n } from '@/uni_modules/lime-i18n/index.uts'
+// import { createI18n, setLocaleMessage } from '../index.uts'
+
+import zhCN from './locales/zh-CN'
+import enUS from './locales/en_US'
+
+
+
+
+const i18n = createI18n({
+	locale: uni.getStorageSync('uVueI18nLocale').toString().length != 0 ? uni.getStorageSync('uVueI18nLocale') : 'zh-CN', // 默认显示语言
+	fallbackLocale: 'en-US',
+	// Key - 在这种情况下，用于规则 `'ru'` 的语言
+	// Value - 选择正确的复数形式的功能
+	pluralizationRules: {
+		/**
+		 * @param choice {number} 输入给$的选择索引 $tc：`$tc('path.to.rule', choiceIndex)`
+		 * @param choicesLength {number} 可用选择总数
+		 * @returns 最终选择索引以选择复数单词
+		 */
+		'ru': function (choice : number, choicesLength : number) : number {
+			if (choice == 0) {
+				return 0;
+			}
+			const teen = choice > 10 && choice < 20;
+			const endsWithOne = (choice % 10) == 1;
+
+			if (choicesLength < 4) {
+				return (!teen && endsWithOne) ? 1 : 2;
+			}
+			if (!teen && endsWithOne) {
+				return 1;
+			}
+			if (!teen && (choice % 10) >= 2 && (choice % 10) <= 4) {
+				return 2;
+			}
+
+			return (choicesLength < 4) ? 2 : 3;
+		}
+	},
+	messages: {
+		'zh-CN': zhCN,
+		'en-US': enUS,
+		'ru': {
+			car: '0 машин | {n} машина | {n} машины | {n} машин',
+			banana: 'нет бананов | {n} банан | {n} банана | {n} бананов'
+		}
+	},
+	modifiers: {
+		snakeCase: (str : string) : string => str.split(' ').join('_')
+	},
+	numberFormats: {
+		'en-US': {
+			currency: {
+				style: 'currency', currency: 'USD', notation: 'standard'
+			},
+			decimal: {
+				style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2
+			},
+			percent: {
+				style: 'percent', useGrouping: false
+			}
+		},
+		'zh-CN': {
+			currency: {
+				style: 'currency', currency: 'CNY', useGrouping: true, currencyDisplay: 'symbol'
+			},
+			decimal: {
+				style: 'decimal', minimumSignificantDigits: 3, maximumSignificantDigits: 5
+			},
+			percent: {
+				style: 'percent', useGrouping: false
+			}
+		}
+	},
+	datetimeFormats: {
+		'en-US': {
+			short: {
+				year: 'numeric', month: 'short', day: 'numeric'
+			},
+			long: {
+				year: 'numeric', month: 'short', day: 'numeric',
+				weekday: 'short', hour: 'numeric', minute: 'numeric'
+			}
+		},
+		'zh-CN': {
+			short: {
+				year: 'numeric', month: 'short', day: 'numeric'
+			},
+			long: {
+				year: 'numeric', month: 'short', day: 'numeric',
+				weekday: 'short', hour: 'numeric', minute: 'numeric', hour12: true
+			}
+		}
+	},
+	tabBars: {
+		'en-US': ['home','User Center'],
+		'zh-CN': ['首页','用户中心'],
+	}
+})
+
+export default i18n
+
+
+
+setTimeout(() => {
+	// console.log('getLocale:::', uni.getLocale())
+	console.log('getLocale:::',typeof uni.getStorageSync('lllluVueI18nLocale'))
+	// console.log('i18n install', i18n.global)
+	// setLocaleMessage('zh-CN', zhCN)
+	i18n.global.locale.value = 'zh-CN'
+	console.log('i18n', i18n)
+}, 5000)

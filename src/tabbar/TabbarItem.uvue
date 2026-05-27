@@ -1,0 +1,139 @@
+<script setup lang="uts">
+import { curIdx, themeColor } from './store'
+
+interface TabBarItemPropType {
+  text : string
+  pagePath : string
+  iconType : string
+  icon : string
+  iconActive : string
+  badge : any | null
+  isBulge : boolean
+}
+
+const props = defineProps<{
+  item : TabBarItemPropType
+  index : number
+  isBulge : boolean
+}>()
+
+const inactiveColor = '#999999'
+
+/** 根据选中状态返回对应图标 */
+function getIcon() : string {
+  if (curIdx.value === props.index && props.item.iconActive.length > 0) {
+    return props.item.iconActive
+  }
+  return props.item.icon
+}
+
+/** 获取当前文字和图标的颜色 */
+function getActiveColor() : string {
+  return curIdx.value === props.index ? themeColor.value : inactiveColor
+}
+
+/** 是否显示小红点 */
+function isDotBadge() : boolean {
+  return props.item.badge != null && props.item.badge === 'dot'
+}
+
+/** 是否显示数字角标 */
+function isNumberBadge() : boolean {
+  return props.item.badge != null && props.item.badge !== 'dot'
+}
+
+/** 获取角标文本 */
+function getBadgeText() : string {
+  const badge = props.item.badge
+  if (badge == null || badge === 'dot') return ''
+  if (typeof badge === 'number') {
+    const num = badge as number
+    if (num > 99) return '99+'
+    return `${num}`
+  }
+  return `${badge}`
+}
+</script>
+
+<template>
+  <view class="tabbar-item-inner">
+    <!-- 图片图标 -->
+    <image
+      v-if="props.item.iconType === 'image'"
+      :src="getIcon()"
+      mode="scaleToFill"
+      :class="props.isBulge ? 'icon-bulge' : 'icon-normal'"
+    />
+    
+    <!-- uni-icons 字体图标 -->
+    <uni-icons
+      v-if="props.item.iconType === 'icon'"
+      :type="getIcon()"
+      size="24"
+      :style="{ color: getActiveColor() }"
+      :class="props.isBulge ? 'icon-bulge' : 'icon-normal'"
+    ></uni-icons>
+    
+    <!-- 文本（包含 i18n 翻译，支持动态语言切换） -->
+    <text v-if="!props.isBulge" class="tabbar-text" :style="{ color: getActiveColor() }">{{ $t(props.item.text) }}</text>
+    
+    <!-- 角标：小红点 -->
+    <view v-if="isDotBadge()" class="badge-dot" />
+    
+    <!-- 角标：数字 -->
+    <view v-if="isNumberBadge()" class="badge-count">
+      <text class="badge-count-text">{{ getBadgeText() }}</text>
+    </view>
+  </view>
+</template>
+
+<style>
+.tabbar-item-inner {
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.icon-normal {
+  width: 24px;
+  height: 24px;
+  justify-content: center;
+  align-items: center;
+}
+.icon-bulge {
+  width: 40px;
+  height: 40px;
+  justify-content: center;
+  align-items: center;
+}
+.tabbar-text {
+  font-size: 10px;
+  margin-top: 2px;
+  text-align: center;
+}
+.badge-dot {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 8px;
+  background-color: #f56c6c;
+}
+.badge-count {
+  position: absolute;
+  top: 0;
+  right: -6px;
+  height: 16px;
+  padding-left: 4px;
+  padding-right: 4px;
+  border-radius: 16px;
+  background-color: #f56c6c;
+  align-items: center;
+  justify-content: center;
+}
+.badge-count-text {
+  font-size: 10px;
+  color: #ffffff;
+  text-align: center;
+}
+</style>

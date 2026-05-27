@@ -1,0 +1,34 @@
+<template>
+	<view >
+		<view>
+			<!-- 使用封装的图标示例组件 -->
+			<IconDemoCard />
+
+			<!-- 使用封装的多语言切换组件 -->
+			<LangSwitchCard />
+
+			<!-- 使用封装的主题切换组件 -->
+			<ThemeSwitchCard />
+
+			<!-- 使用路由拦截与传参演示组件 -->
+			<RouterDemoCard />
+		</view>
+		<Tabbar />
+	</view>
+</template>
+
+<script setup lang="uts">
+	import Tabbar from '../../tabbar/index.uvue'
+	import IconDemoCard from './components/IconDemoCard.uvue'
+	import LangSwitchCard from './components/LangSwitchCard.uvue'
+	import ThemeSwitchCard from './components/ThemeSwitchCard.uvue'
+	import RouterDemoCard from './components/RouterDemoCard.uvue'
+	import { syncCurIdxByCurrentPage } from '../../tabbar/store'
+
+	onShow(() => {
+		syncCurIdxByCurrentPage()
+	})
+</script>
+
+<style>
+</style>

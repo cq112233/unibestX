@@ -1,0 +1,34 @@
+<template>
+	<view style="flex:1">
+		<!-- #ifdef APP -->
+		<scroll-view style="flex:1">
+		<!-- #endif -->
+			<view>
+				<image class="w-100px h-100px mx-auto mt-40px rounded-20px" src="/static/logo.png"></image>
+				<text class="text-32px text-bold mx-auto mt-10px text-[#d14328]">unibestX</text>
+				<view class="text-center text-25px mt-10px"> 最好用的 uni-appX 开发模板 </view>
+				<view class="textIndent mt-10px m-auto px-30px text-justify indent text-16px">unibestX 是一个集成了多种工具和技术的 uni-appX 开发模板，由 uni-appX +
+					Vue3 + Ts + + UnoCss + VSCode 构建，模板具有代码提示、自动格式化、统一配置、代码片段等功能，并内置了许多常用的基本组件和基本功能，让你编写 uni-appX 拥有 best
+					体验。</view>
+			</view>
+		<!-- #ifdef APP -->
+		</scroll-view>
+		<!-- #endif -->
+		<Tabbar />
+	</view>
+</template>
+
+<script setup lang="uts">
+import Tabbar from '../../tabbar/index.uvue'
+import { syncCurIdxByCurrentPage } from '../../tabbar/store'
+
+onShow(() => {
+	syncCurIdxByCurrentPage()
+})
+</script>
+
+<style lang="scss">
+	.textIndent {
+		text-indent:20px
+	}
+</style>

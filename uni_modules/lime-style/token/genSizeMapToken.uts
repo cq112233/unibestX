@@ -1,0 +1,20 @@
+// import {SizeMapToken} from './interface'
+
+/**
+ * sizeUnit 尺寸变化单位
+ * sizeStep 尺寸步长
+ */
+export function genSizeMapToken(sizeUnit : number | null = 4, sizeStep : number | null = 4) : UTSJSONObject {
+	if (sizeUnit == null || sizeStep == null) return {}
+	return {
+		spacerHG: sizeUnit * (sizeStep + 16), // 80   
+		spacerXL: sizeUnit * (sizeStep + 8), // 48
+		spacerLG: sizeUnit * (sizeStep + 4), // 32
+		spacerMD: sizeUnit * (sizeStep + 2), // 24
+		spacerMS: sizeUnit * sizeStep, // 16
+		spacer:   sizeUnit * sizeStep, // 16
+		spacerSM: sizeUnit * (sizeStep - 1), // 12
+		spacerXS: sizeUnit * (sizeStep - 2), // 8
+		spacerTN: sizeUnit * (sizeStep - 3), // 4
+	};
+}

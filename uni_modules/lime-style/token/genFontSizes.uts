@@ -1,0 +1,30 @@
+import { FontSize } from './interface';
+
+export function getLineHeight(fontSize : number) : number {
+	return (fontSize + 8) / fontSize;
+}
+
+// https://zhuanlan.zhihu.com/p/32746810
+export function getFontSizes(base : number) : FontSize[] {
+	const length = 11 // 10
+	const offset = 2 // 1
+	// #ifdef APP-ANDROID
+	const arr = Array.fromNative(new IntArray(length.toInt()));
+	// #endif
+	// #ifndef APP-ANDROID
+	 const arr = Array.from({ length });
+	// #endif
+	const fontSizes = arr.map((_, index) : number => {
+		const i = index - offset;
+		const baseSize = base * Math.pow(Math.E, i / 5);
+		const intSize = index > 1 ? Math.floor(baseSize) : Math.ceil(baseSize);
+
+		// Convert to even
+		return Math.floor(intSize / 2) * 2;
+	});
+	fontSizes[offset] = base;
+	return fontSizes.map((size) : FontSize => ({
+		size,
+		lineHeight: getLineHeight(size),
+	} as FontSize));
+}

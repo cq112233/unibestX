@@ -1,0 +1,126 @@
+// @ts-nocheck
+// #ifndef UNI-APP-X
+import { type ComputedRef, ref, watch,  getCurrentScope, onScopeDispose, computed, reactive  } from './vue';
+// #endif
+
+type ThemeMode = 'light' | 'dark' | 'auto'
+const THEME_LOCAL_STORAGE_KEY = 'app-theme-preference'
+
+let limeThemeId = -1
+const limeThemeMode = ref<ThemeMode>('auto')
+const limeTheme = ref(getTheme())
+
+
+function setWeb (theme: ThemeMode) {
+	// #ifdef WEB
+	const pageHead = document.querySelector(".uni-page-head");
+	if(!pageHead) return
+	if (theme == 'dark') {
+		pageHead.style.backgroundColor = '#181818'
+		pageHead.style.color = ''
+	} else {
+		pageHead.style.backgroundColor = 'rgb(245, 245, 245)'
+		pageHead.style.color = 'rgb(0, 0, 0)'
+	}
+	// #endif
+}
+
+
+export function getTheme(): 'dark' | 'light' {
+	// #ifndef UNI-APP-X && APP
+	let mode = uni.getStorageSync(THEME_LOCAL_STORAGE_KEY)
+	limeThemeMode.value = (mode || 'auto')
+	const hostTheme = uni.getAppBaseInfo().hostTheme;
+	return limeThemeMode.value === 'auto' ? (hostTheme || 'light') : limeThemeMode.value
+	// #endif
+	
+	// #ifdef UNI-APP-X && APP
+	let { osTheme, appTheme } = uni.getSystemInfoSync();
+	return appTheme == "auto" ? osTheme! : appTheme!
+	// #endif
+	
+	
+}
+
+// #ifndef UNI-APP-X
+let limeThemeCallBack = (result) => {
+	limeTheme.value = result.theme
+};
+// #endif
+
+export function stop() {
+	// #ifndef UNI-APP-X
+	uni.offThemeChange(limeThemeCallBack)
+	// #endif
+	// #ifdef UNI-APP-X
+	// #ifndef UNI-APP-X && APP
+	uni.offHostThemeChange(limeThemeId)
+	
+	// #endif
+	// #ifdef UNI-APP-X && APP
+	uni.offAppThemeChange(limeThemeId)
+	// #endif
+	// #endif
+}
+
+
+// 检查系统主题
+export const checkSystemTheme = () => {
+	stop()
+	limeTheme.value = getTheme()
+	// #ifndef UNI-APP-X
+	uni.onThemeChange(limeThemeCallBack); 
+	// #endif
+	// #ifdef UNI-APP-X
+	// #ifndef UNI-APP-X && APP
+	limeThemeId = uni.onHostThemeChange((result) => {
+		limeTheme.value = result.hostTheme
+	});
+	// #endif
+	// #ifdef UNI-APP-X && APP
+	limeThemeId = uni.onAppThemeChange((res : AppThemeChangeResult) => {
+		limeTheme.value = res.appTheme.trim()
+	})
+	// #endif
+	// #endif
+}
+
+
+export const isDarkMode = computed(() => {
+	return limeTheme.value == "dark";
+});
+
+export function setThemeMode(theme: 'dark' | 'light' | 'auto') {
+	// #ifdef UNI-APP-X && APP
+	if (limeTheme.value == theme) return;
+	uni.setAppTheme({
+		theme,
+		success: function (result: SetAppThemeSuccessResult) {
+			console.log("设置appTheme为"+ result.theme +"成功")
+			limeTheme.value = result.theme
+		},
+		fail: function (e : IAppThemeFail) {
+			console.log("设置appTheme为 auto 失败,原因:", e.errMsg)
+		}
+	})
+	// #endif
+	// #ifndef UNI-APP-X && APP
+	limeThemeMode.value = theme
+	uni.setStorageSync(THEME_LOCAL_STORAGE_KEY, theme)
+	limeTheme.value = getTheme()
+	// #endif
+	// #ifdef WEB
+	setWeb(limeTheme.value )
+	// #endif
+}
+
+
+export function toggleTheme() {
+	setThemeMode(isDarkMode.value ? 'light' : 'dark')
+}
+
+// #ifdef WEB
+watch(isDarkMode, ()=>{
+	setWeb(limeTheme.value)
+})
+// #endif

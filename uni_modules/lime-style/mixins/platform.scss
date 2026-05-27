@@ -1,0 +1,17 @@
+/* #ifdef APP-NVUE || UNI-APP-X && APP */
+$is-app: true;
+/* #endif */
+/* #ifndef APP-NVUE || UNI-APP-X && APP */
+$is-app: false;
+/* #endif */
+
+@mixin is-app {
+	@if $is-app {
+		@content;
+	} 
+}
+@mixin not-app {
+	@if not($is-app) {
+		@content;
+	} 
+}

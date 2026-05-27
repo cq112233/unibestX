@@ -1,0 +1,855 @@
+/**
+ * 国际化处理核心类文件
+ * 包含了国际化相关的各种功能，如翻译、日期格式化、数字格式化等
+ */
+
+// 导入基础格式化器
+import BaseFormatter from './format'
+// 导入工具函数
+import { getAllKeys } from './util'
+// 导入类型定义
+import { Interpolate, Link, WarnDefault, LinkedModify, PluralizationRule, Availabilities } from './types'
+
+// #ifndef APP
+// 定义拦截器类型
+type Interceptor = any
+// #endif
+
+/**
+ * 国际化API可用性检查类
+ * 用于检查当前环境是否支持Intl相关API
+ */
+export class AvailabilitiesImpl implements Availabilities {
+	// 日期时间格式化是否可用
+	dateTimeFormat : boolean = false
+	// 数字格式化是否可用
+	numberFormat : boolean = false
+
+	/**
+	 * 构造函数
+	 * 检查Intl API的可用性
+	 */
+	constructor() {
+		// #ifndef APP
+		// 检查Intl是否定义
+		const intlDefined = typeof Intl !== 'undefined'
+		// 检查DateTimeFormat是否可用
+		this.dateTimeFormat = intlDefined && typeof Intl.DateTimeFormat !== 'undefined'
+		// 检查NumberFormat是否可用
+		this.numberFormat = intlDefined && typeof Intl.NumberFormat !== 'undefined'
+		// #endif
+	}
+}
+
+// HTML标签匹配正则
+const htmlTagMatcher = /<\/?[\w\s="/.':;#-\/]+>/;
+// 链接键匹配正则
+const linkKeyMatcher = /(?:@(?:\.[a-zA-Z0-9_-]+)?:)(?:[\w\-_|:./]+|\([\w\-_|:./]+\)|(?:\{[^}]+?\}))/g;
+// 链接键前缀匹配正则
+const linkKeyPrefixMatcher = /^@(?:\.([a-zA-Z]+))?:/;
+// 括号匹配正则
+const bracketsMatcher = /[()\{\}\']/g;
+
+/**
+ * 默认修饰器映射
+ * 包含常用的文本修饰器函数
+ */
+const defaultModifiers : Map<string, LinkedModify> = new Map([
+	// 转大写
+	['upper', (str : string) : string => str.toLocaleUpperCase()],
+	// 转小写
+	['lower', (str : string) : string => str.toLocaleLowerCase()],
+	// 首字母大写
+	['capitalize', (str : string) : string => `${str.charAt(0).toLocaleUpperCase()}${str.substring(1)}`]
+])
+
+// 默认语言环境
+const DEFAULT_LOCALE = "en-US"
+// 默认格式化器实例
+const defaultFormatter = new BaseFormatter()
+// 国际化API可用性实例
+const availabilities = new AvailabilitiesImpl()
+
+/**
+ * 设置TabBar项目的国际化文本
+ * @param tabbar TabBar文本数组
+ */
+function setTabBarItems(tabbar : string[] | null) {
+	if (tabbar == null) return
+	// 获取当前页面栈
+	const pages = getCurrentPages()
+	// 获取当前页面
+	const page = pages.length > 0 ? pages[pages.length - 1] : null;
+	// @ts-ignore
+	// #ifndef APP-ANDROID
+	const isTabBar = page != null //page.$vm.$basePage.openType == 'switchTab'// page != null && page.$page.meta.isTabBar
+	// #endif
+
+	// #ifdef APP-ANDROID
+	const isTabBar = page != null
+	// #endif
+
+	// 如果不是TabBar页面，直接返回
+	if (!isTabBar) return
+
+	// 遍历设置TabBar文本
+	tabbar.forEach((text, index) => {
+		uni.setTabBarItem({
+			text,
+			index,
+			// success() {},
+			fail(err) {
+				console.warn(err.errMsg)
+			}
+		} as SetTabBarItemOptions)
+	})
+}
+
+/**
+ * 获取语言映射
+ * @param locale 当前语言
+ * @param key 配置键名
+ * @param options 配置选项
+ * @param root 根Composer实例
+ * @returns 语言映射Map
+ */
+function getLocaleMap(locale : string, key : string, options : UTSJSONObject, root : any | null = null) : Map<string, UTSJSONObject> {
+	// 获取配置的JSON对象
+	const __messages = UTSJSONObject.assign({}, options.getJSON(key) ?? {})
+
+	// #ifdef APP
+	let map = new Map<string, UTSJSONObject>()
+	// 遍历转换为Map
+	__messages.toMap().forEach((value, key) => {
+		if (value instanceof UTSJSONObject) {
+			map.set(key, value)
+		}
+	})
+	// #endif
+
+	// #ifndef APP
+	// 直接转换为Map
+	let map = __messages.toMap()
+	// #endif
+
+	// 如果映射为空且有根实例
+	if (map.size == 0 && root != null) {
+		// 如果没有当前语言的映射，添加一个空对象
+		if (!map.has(locale)) {
+			map.set(locale, {})
+		}
+	}
+	return map
+}
+/**
+ * 获取语言TabBar映射
+ * @param locale 当前语言
+ * @param key 配置键名
+ * @param options 配置选项
+ * @returns TabBar映射Map
+ */
+function getLocaleTabbarMap(locale : string, key : string, options : UTSJSONObject) : Map<string, string[]> {
+	// 获取配置的JSON对象
+	const __messages = options.getJSON(key) ?? {}
+	let map = new Map<string, string[]>()
+
+	// 遍历转换为Map
+	__messages.toMap().forEach((tabbar, key) => {
+		if (Array.isArray(tabbar)) {
+			map.set(key, tabbar as string[]);
+			// 如果是当前语言，设置TabBar
+			if (key == locale) {
+				setTimeout(() => {
+					setTabBarItems(tabbar as string[])
+				}, 500)
+			}
+		}
+	})
+
+	return map
+}
+/**
+ * 获取修饰器映射
+ * @param options 配置选项
+ * @returns 修饰器映射Map
+ */
+function getModifiers(options : UTSJSONObject) : Map<string, LinkedModify> {
+	// 获取配置的修饰器
+	const __modifiers = (options.getJSON('modifiers') ?? {}).toMap();
+	const _modifiers = new Map<string, LinkedModify>()
+
+	// 遍历转换为修饰器Map
+	__modifiers.forEach((value, key) => {
+		if (typeof value == 'function') {
+			try {
+				_modifiers.set(key, value as LinkedModify)
+			} catch (e) {
+				console.warn(35, '自定义修饰器函数必须是类型：(str: string) => string')
+			}
+		}
+	})
+	return _modifiers
+}
+/**
+ * 获取复数规则映射
+ * @param options 配置选项
+ * @returns 复数规则映射Map
+ */
+function getPluralizationRules(options : UTSJSONObject) : Map<string, PluralizationRule> {
+	// 获取配置的复数规则
+	const __pluralizationRules = (options.getJSON('pluralizationRules') ?? {}).toMap()
+	const _pluralizationRules = new Map<string, PluralizationRule>()
+
+	// 遍历转换为复数规则Map
+	__pluralizationRules.forEach((value, key) => {
+		if (typeof value == 'function') {
+			try {
+				_pluralizationRules.set(key, value as PluralizationRule)
+			} catch (e) {
+				if (process.env.NODE_ENV !== 'production') {
+					console.warn(35, '自定义复数化规则函数必须是类型: ( choice: number, choicesLength: number) => number')
+				}
+			}
+		}
+	})
+	return _pluralizationRules
+}
+/**
+ * 获取格式化器
+ * @param options 配置选项
+ * @returns 格式化器实例
+ */
+function getFormatter(options : UTSJSONObject) : BaseFormatter {
+	// 获取配置的格式化器
+	const __formatter = options.get('formatter')
+	// 如果有配置且是BaseFormatter实例，使用配置的格式化器，否则使用默认格式化器
+	return __formatter != null && __formatter instanceof BaseFormatter ? __formatter : defaultFormatter;
+}
+
+// Composer实例ID计数器
+let composerID = 0;
+
+/**
+ * 国际化处理核心类
+ * 提供翻译、日期格式化、数字格式化等功能
+ */
+export class ComposerClass {
+	// 实例ID
+	id : number;
+	// 当前语言
+	locale : Ref<string>;
+	// 回退语言
+	fallbackLocale : ComputedRefImpl<any>;
+	// 语言消息映射
+	messages : Ref<Map<string, UTSJSONObject>>;
+	// 可用语言列表
+	availableLocales : string[];
+	// 国际化API可用性
+	availabilities : Availabilities;
+
+	// 插值函数
+	private _interpolate : Interpolate | null = null;
+	// 链接处理函数
+	private _link : Link | null = null;
+	// 默认警告函数
+	private _warnDefault : WarnDefault | null = null;
+	// 格式化器
+	private _formatter : BaseFormatter;
+	// 修饰器映射
+	private _modifiers : Map<string, LinkedModify>;
+	// 复数规则映射
+	private _pluralizationRules : Map<string, PluralizationRule>;
+	// 数字格式映射
+	private _numberFormats : Ref<Map<string, UTSJSONObject>>;
+	// 日期时间格式映射
+	private _datetimeFormats : Ref<Map<string, UTSJSONObject>>;
+	// TabBar映射
+	private _tabBars : Ref<Map<string, string[]>>;
+
+	/**
+	 * 构造函数
+	 * @param options 配置选项
+	 * @param __root 根Composer实例
+	 */
+	constructor(options : UTSJSONObject = {}, __root : ComposerClass | null = null) {
+		// 初始化格式化器
+		this._formatter = getFormatter(options);
+		// 初始化修饰器
+		this._modifiers = getModifiers(options);
+		// 初始化复数规则
+		this._pluralizationRules = getPluralizationRules(options);
+
+		// 是否继承根实例的语言
+		const _inheritLocale = options.getBoolean('inheritLocale') ?? true;
+		const useRoot = __root != null && _inheritLocale;
+
+		// 初始化语言
+		const __locale = ref<string>(
+			useRoot
+				? __root.locale.value
+				: options.getString('locale') ?? DEFAULT_LOCALE
+		);
+
+		// 初始化回退语言
+		const _fallbackLocale = ref<any | null>(
+			useRoot
+				? __root.fallbackLocale.value
+				: options.get('fallbackLocale')
+		);
+
+		// 初始化消息映射
+		this.messages = ref<Map<string, UTSJSONObject>>(getLocaleMap(__locale.value, 'messages', options, __root));
+		// 初始化数字格式映射
+		this._numberFormats = ref<Map<string, UTSJSONObject>>(getLocaleMap(__locale.value, 'numberFormats', options, __root));
+		// 初始化日期时间格式映射
+		this._datetimeFormats = ref<Map<string, UTSJSONObject>>(getLocaleMap(__locale.value, 'datetimeFormats', options, __root));
+		// 初始化TabBar映射
+		this._tabBars = ref<Map<string, string[]>>(getLocaleTabbarMap(__locale.value, 'tabBars', options));
+
+		// 定义语言计算属性
+		this.locale = computed<string>({
+			set: (val : string) => {
+				// 设置语言值
+				__locale.value = val;
+				// 设置缓存 只有全局才会缓存
+				if (__root == null) {
+					uni.setStorageSync('uVueI18nLocale', val);
+				}
+				// 设置tabbar
+				setTabBarItems(this._tabBars.value.get(val));
+			},
+			get: () => {
+				return __locale.value;
+			}
+		} as WritableComputedOptions<string>);
+
+		// 定义回退语言计算属性
+		this.fallbackLocale = computed<any>({
+			set: (val : any) => {
+				_fallbackLocale.value = val;
+			},
+			get: () => {
+				return _fallbackLocale.value ?? false;
+			}
+		} as WritableComputedOptions<any>);
+
+		// 初始化可用语言列表
+		this.availableLocales = getAllKeys(this.messages.value).sort();
+		// 设置国际化API可用性
+		this.availabilities = availabilities;
+
+		// 初始化方法
+		this._initMethods();
+
+		// 增加实例ID
+		composerID++;
+		this.id = composerID;
+
+		// 定义页面切换拦截器
+		const interceptor = {
+			complete: (_ : NavigateToComplete) => {
+				setTimeout(() => {
+					// 切换TabBar时更新TabBar文本
+					setTabBarItems(this._tabBars.value.get(this.locale.value));
+				}, 50);
+			}
+		} as Interceptor;
+
+		// 只在全局实例添加拦截器
+		if (__root == null) {
+			uni.addInterceptor('switchTab', interceptor);
+		}
+	}
+
+	/**
+	 * 初始化内部方法
+	 */
+	private _initMethods() : void {
+		/**
+		 * 处理链接
+		 * @param str 包含链接的字符串
+		 * @param locale 语言
+		 * @param values 插值值
+		 * @param visitedLinkStack 访问过的链接栈
+		 * @param interpolateMode 插值模式
+		 * @returns 处理后的字符串
+		 */
+		this._link = (str : string, locale : string | null, values : any, visitedLinkStack : string[], interpolateMode : string) : string | null => {
+			// 匹配链接
+			const matches = str.match(linkKeyMatcher);
+			let ret : string = str;
+			if (matches == null) return str;
+
+			// 遍历处理每个链接
+			for (let i = 0; i < matches.length; i++) {
+				const link = matches[i];
+				// 匹配链接前缀
+				const linkKeyPrefixMatches = link!.match(linkKeyPrefixMatcher);
+				if (linkKeyPrefixMatches == null) continue;
+				const [linkPrefix, formatterName] = linkKeyPrefixMatches;
+
+				// 去掉字符串前面的 @:、@.case: 、括号及大括号
+				const linkPlaceholder : string = link.replace(linkPrefix!, '').replace(bracketsMatcher, '');
+
+				// 检查循环引用
+				if (visitedLinkStack.includes(linkPlaceholder)) {
+					console.warn(`发现循环引用。"${link}"已经在link"已经在${visitedLinkStack.reverse().join(' <- ')}链中访问过`);
+					return ret;
+				}
+
+				if (this._interpolate == null || this._warnDefault == null) {
+					return ret;
+				}
+
+				// 添加到访问栈
+				visitedLinkStack.push(linkPlaceholder);
+				// 插值处理
+				let translated = this._interpolate!(linkPlaceholder, locale, values, visitedLinkStack, interpolateMode);
+
+				// 处理默认警告
+				translated = this._warnDefault!(linkPlaceholder, translated, values, interpolateMode);
+
+				// 如果有自定义_modifiers 否则使用默认defaultModifiers
+				if (this._modifiers.size > 0 && formatterName != null && this._modifiers.has(formatterName)) {
+					// 使用自定义修饰器
+				} else if (translated != null && formatterName != null && defaultModifiers.has(formatterName)) {
+					// 使用默认修饰器
+					const modifier = defaultModifiers.get(formatterName) as LinkedModify;
+					translated = modifier(translated);
+				}
+
+				// 从访问栈中移除
+				visitedLinkStack.pop();
+
+				// 将链接替换为已翻译的
+				ret = translated == null ? ret : ret.replace(link, translated);
+			}
+
+			return ret;
+		};
+
+		/**
+		 * 插值处理
+		 * @param key 翻译键
+		 * @param locale 语言
+		 * @param values 插值值
+		 * @param visitedLinkStack 访问过的链接栈
+		 * @param interpolateMode 插值模式
+		 * @returns 插值后的字符串
+		 */
+		this._interpolate = (key : string, locale : string | null, values : any, visitedLinkStack : string[], interpolateMode : string) : string | null => {
+			// 获取语言
+			const ___locale = locale ?? this.locale.value;
+			// 获取翻译
+			// 之所以展开，是因为小程序读取根目录loace时对象不再是UTSJSONObject
+			let ret = UTSJSONObject.assign({}, this.messages.value.get(___locale)??{})?.getString(key);
+
+			// 如果没有翻译且有回退语言
+			if (this.fallbackLocale.value != false && ret == null) {
+				// 处理回退语言
+				if (typeof this.fallbackLocale.value == 'string' && ___locale != this.fallbackLocale.value) {
+					ret = this.messages.value.get(this.fallbackLocale.value as string)?.getString(key) ?? ret;
+				} else if (Array.isArray(this.fallbackLocale.value)) {
+					const arr = (this.fallbackLocale.value as string[]);
+					for (let i = 0; i < arr.length; i++) {
+						const _ret = this.messages.value.get(arr[i])?.getString(key);
+						if (_ret != null) {
+							ret = _ret;
+							break;
+						}
+					}
+				}
+			}
+
+			// 检查翻译后的字符串中是否存在链接
+			if (typeof ret == 'string' && (ret!.indexOf('@:') >= 0 || ret!.indexOf('@.') >= 0)) {
+				// @ts-ignore
+				ret = this._link!(ret!, locale, values, visitedLinkStack, interpolateMode);
+			}
+			return ret;
+		};
+
+		/**
+		 * 处理默认警告
+		 * @param key 翻译键
+		 * @param message 翻译消息
+		 * @param values 插值值
+		 * @param interpolateMode 插值模式
+		 * @returns 处理后的消息
+		 */
+		this._warnDefault = (key : string, message : string | null, values : any, interpolateMode : string) : string | null => {
+			// 如果没有翻译，显示警告
+			if (message == null) {
+				console.warn(`无法翻译键路径 '${key}'. ` + '使用键路径的值作为默认值.');
+			}
+			if (message == null) return null;
+			if (key == message) return key;
+			// 渲染消息
+			return this._render(message, values, interpolateMode);
+		};
+	}
+
+	/**
+	 * 渲染消息
+	 * @param message 消息模板
+	 * @param values 插值值
+	 * @param interpolateMode 插值模式
+	 * @returns 渲染后的字符串
+	 */
+	private _render(message : string, values : any, interpolateMode : string) : string {
+		// 插值处理
+		const ret = this._formatter.interpolate(message, values);
+		// 根据模式返回不同格式
+		return interpolateMode == 'string' ? `${ret.join('')}` : JSON.stringify(ret);
+	}
+
+	/**
+	 * 获取复数形式
+	 * @param message 消息模板
+	 * @param choice 选择值
+	 * @param locale 语言
+	 * @returns 复数形式的消息
+	 */
+	private fetchChoice(message : string, choice : number | null = null, locale : string | null = null) : string {
+		if (message == '') return message;
+		// 分割选项
+		const choices : Array<string> = message.split('|');
+
+		// 默认 vue-i18n（旧）getChoiceIndex实现 - 兼容英文
+		const defaultImpl = (_choice : number | null, _choicesLength : number) : number => {
+			_choice = Math.abs(_choice ?? 1);
+			if (_choicesLength == 2) {
+				return _choice != 0
+					? _choice > 1
+						? 1
+						: 0
+					: 1;
+			}
+			return _choice != 0 ? Math.min(_choice, 2) : 0;
+		};
+
+		let index : number;
+		// 如果有对应语言的复数规则，使用自定义规则
+		if (this._pluralizationRules.has(locale ?? this.locale.value)) {
+			index = this._pluralizationRules.get(locale ?? this.locale.value)!(choice ?? 1, choices.length);
+		} else {
+			// 使用默认规则
+			index = defaultImpl(choice, choices.length);
+		}
+
+		if (choices[index] == '') return message;
+		return choices[index].trim();
+	}
+
+	/**
+	 * 翻译方法
+	 * @param key 翻译键
+	 * @param values 插值值
+	 * @param locale 语言
+	 * @returns 翻译后的字符串
+	 */
+	t(key : string, values : any | null = null, locale : string | null = null) : string {
+		const parsedArgs = values ?? {};
+		// #ifndef APP
+		if (this._warnDefault == null || this._interpolate == null) return '';
+		// #endif
+		// 处理翻译
+		const msg = this._warnDefault!(
+			key,
+			this._interpolate!(
+				key,
+				locale,
+				parsedArgs,
+				[key],
+				'string'
+			),
+			parsedArgs,
+			'string'
+		);
+		return msg ?? '';
+	}
+
+	/**
+	 * 带复数的翻译方法
+	 * @param key 翻译键
+	 * @param choice 选择值
+	 * @param values 插值值
+	 * @param locale 语言
+	 * @returns 翻译后的字符串
+	 */
+	tc(key : string, choice : number | null = null, values : any | null = null, locale : string | null = null) : string {
+		// 预定义的count和n参数
+		const _obj = { 'count': choice, 'n': choice };
+		const predefined = values == null
+			? _obj
+			: values instanceof UTSJSONObject
+				? UTSJSONObject.assign(_obj, values as UTSJSONObject)
+				: values;
+
+		// 获取翻译并处理复数
+		return this.fetchChoice(this.t(key, predefined, locale), choice, locale);
+	}
+
+	/**
+	 * 日期格式化方法
+	 * @param date 日期
+	 * @param key 格式键
+	 * @param locale 语言
+	 * @param options 格式化选项
+	 * @returns 格式化后的日期字符串
+	 */
+	d(date : any, key : string | null = null, locale : string | null = null, options : UTSJSONObject | null = null) : string {
+		// 检查是否支持日期格式化
+		if (!this.availabilities.dateTimeFormat) {
+			console.warn('无法格式化日期值，因为不支持 Intl.DateTimeFormat. ' + `key: ${key}, locale: ${locale}, options: ${options}`);
+			return `${date}`;
+		}
+
+		// #ifndef APP
+		const __locale = locale ?? this.locale.value;
+		if (key == null) {
+			// @ts-ignore
+			// 使用默认格式
+			const dtf = options == null ? new Intl.DateTimeFormat(__locale) : new Intl.DateTimeFormat(__locale, options);
+			return dtf.format(date);
+		}
+		// 获取格式配置
+		const formats = this._datetimeFormats.value!.get(__locale);
+		let formatter;
+		if (formats == null || formats!.getJSON(key) == null) {
+			console.warn(`回退到根号下的日期时间本地化：key '${key}'。`);
+			return `${date}`;
+		}
+		const format = formats!.getJSON(key) ?? {};
+		if (options != null) {
+			// @ts-ignore
+			// 合并格式选项
+			formatter = new Intl.DateTimeFormat(__locale, Object.assign({}, format, options));
+		} else {
+			// @ts-ignore
+			// 使用配置的格式
+			formatter = new Intl.DateTimeFormat(__locale, format);
+		}
+		return formatter.format(date);
+		// #endif
+		return `${date}`;
+	}
+
+	/**
+	 * 数字格式化方法
+	 * @param number 数字
+	 * @param key 格式键
+	 * @param locale 语言
+	 * @param options 格式化选项
+	 * @returns 格式化后的数字字符串
+	 */
+	n(number : number, key : string | null = null, locale : string | null = null, options : UTSJSONObject | null = null) : string {
+		// 检查是否支持数字格式化
+		if (!this.availabilities.numberFormat) {
+			console.warn('无法格式化数字值，因为不支持 Intl.NumberFormat. ' + `key: ${key}, locale: ${locale}, options: ${options}`);
+			return number.toString();
+		}
+
+		// #ifndef APP
+		const __locale = locale ?? this.locale.value;
+		if (key == null) {
+			// @ts-ignore
+			// 使用默认格式
+			const nf = options == null ? new Intl.NumberFormat(__locale) : new Intl.NumberFormat(locale, options);
+			return nf.format(number);
+		}
+		// 获取格式配置
+		const formats = this._numberFormats.value!.get(__locale);
+		let formatter;
+		if (formats == null || formats!.getJSON(key) == null) {
+			console.warn(`回退到根号下的数字本地化：key '${key}'`);
+			return number.toString();
+		}
+		const format = formats!.getJSON(key);
+		if (options != null) {
+			// @ts-ignore
+			// 合并格式选项
+			formatter = new Intl.NumberFormat(__locale, Object.assign({}, format, options));
+		} else {
+			// @ts-ignore
+			// 使用配置的格式
+			formatter = new Intl.NumberFormat(__locale, format);
+		}
+		if (formatter) {
+			return formatter.format(number);
+		}
+		// #endif
+		return number.toString();
+	}
+
+	/**
+	 * 设置语言消息
+	 * @param locale 语言
+	 * @param message 消息对象
+	 */
+	setLocaleMessage(locale : string, message : UTSJSONObject) : void {
+		const map = new Map<string, UTSJSONObject>();
+		// 复制现有消息
+		this.messages.value.forEach((value, key) => {
+			map.set(key, value);
+		});
+		// 设置新消息
+		map.set(locale, message);
+		this.messages.value = map;
+		// 更新可用语言列表
+		this.availableLocales = getAllKeys(map).sort();
+	}
+
+	/**
+	 * 获取语言消息
+	 * @param locale 语言
+	 * @returns 消息对象
+	 */
+	getLocaleMessage(locale : string) : UTSJSONObject {
+		return this.messages.value.get(locale) ?? {};
+	}
+
+	/**
+	 * 合并语言消息
+	 * @param locale 语言
+	 * @param message 消息对象
+	 */
+	mergeLocaleMessage(locale : string, message : UTSJSONObject) : void {
+		const map = new Map<string, UTSJSONObject>();
+		// 遍历现有消息
+		this.messages.value.forEach((value, key) => {
+			if (key == locale) {
+				// 合并消息
+				map.set(key, UTSJSONObject.assign({}, value, message));
+			} else {
+				map.set(key, value);
+			}
+		});
+		this.messages.value = map;
+		// 更新可用语言列表
+		this.availableLocales = getAllKeys(map).sort();
+	}
+
+	/**
+	 * 设置日期时间格式
+	 * @param locale 语言
+	 * @param format 格式对象
+	 */
+	setDateTimeFormat(locale : string, format : UTSJSONObject) : void {
+		const map = new Map<string, UTSJSONObject>();
+		// 复制现有格式
+		this._datetimeFormats.value.forEach((value, key) => {
+			map.set(key, value);
+		});
+		// 设置新格式
+		map.set(locale, format);
+		this._datetimeFormats.value = map;
+	}
+
+	/**
+	 * 获取日期时间格式
+	 * @param locale 语言
+	 * @returns 格式对象
+	 */
+	getDateTimeFormat(locale : string) : UTSJSONObject {
+		return this._datetimeFormats.value.get(locale) ?? {};
+	}
+
+	/**
+	 * 合并日期时间格式
+	 * @param locale 语言
+	 * @param format 格式对象
+	 */
+	mergeDateTimeFormat(locale : string, format : UTSJSONObject) : void {
+		const map = new Map<string, UTSJSONObject>();
+		// 遍历现有格式
+		this._datetimeFormats.value.forEach((value, key) => {
+			if (key == locale) {
+				// 合并格式
+				map.set(key, UTSJSONObject.assign({}, value, format));
+			} else {
+				map.set(key, value);
+			}
+		});
+		this._datetimeFormats.value = map;
+	}
+
+	/**
+	 * 设置数字格式
+	 * @param locale 语言
+	 * @param format 格式对象
+	 */
+	setNumberFormat(locale : string, format : UTSJSONObject) : void {
+		const map = new Map<string, UTSJSONObject>();
+		// 复制现有格式
+		this._numberFormats.value.forEach((value, key) => {
+			map.set(key, value);
+		});
+		// 设置新格式
+		map.set(locale, format);
+		this._numberFormats.value = map;
+	}
+
+	/**
+	 * 获取数字格式
+	 * @param locale 语言
+	 * @returns 格式对象
+	 */
+	getNumberFormat(locale : string) : UTSJSONObject {
+		return this._numberFormats.value.get(locale) ?? {};
+	}
+
+	/**
+	 * 合并数字格式
+	 * @param locale 语言
+	 * @param format 格式对象
+	 */
+	mergeNumberFormat(locale : string, format : UTSJSONObject) : void {
+		const map = new Map<string, UTSJSONObject>();
+		// 遍历现有格式
+		this._numberFormats.value.forEach((value, key) => {
+			if (key == locale) {
+				// 合并格式
+				map.set(key, UTSJSONObject.assign({}, value, format));
+			} else {
+				map.set(key, value);
+			}
+		});
+		this._numberFormats.value = map;
+	}
+
+	/**
+	 * 设置TabBar
+	 * @param locale 语言
+	 * @param tabbar TabBar文本数组
+	 */
+	setTabBar(locale : string, tabbar : string[]) : void {
+		const map = new Map<string, string[]>();
+		// 复制现有TabBar
+		this._tabBars.value.forEach((value, key) => {
+			map.set(key, value);
+		});
+		// 设置新TabBar
+		map.set(locale, tabbar);
+		this._tabBars.value = map;
+	}
+
+	/**
+	 * 获取TabBar
+	 * @param locale 语言
+	 * @returns TabBar文本数组
+	 */
+	getTabBar(locale : string) : string[] {
+		return this._tabBars.value.get(locale) ?? [];
+	}
+}
+
+/**
+ * 创建一个Composer实例，用于处理国际化信息。
+ * @param {UTSJSONObject} [options={}] - 配置对象，包含语言环境、格式化器等设置。
+ * @param {ComposerClass|null} [__root=null] - 根Composer实例，用于继承语言环境等信息。
+ * @returns {ComposerClass} 返回一个新的Composer实例。
+ */
+export function createComposer(options : UTSJSONObject = {}, __root : ComposerClass | null = null) : ComposerClass {
+	return new ComposerClass(options, __root);
+}

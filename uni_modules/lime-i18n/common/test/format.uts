@@ -1,0 +1,29 @@
+console.log('i18n format test:::::::::::::::::::')
+
+import { parse, compile } from '../format'
+function appTest() {
+	// 示例1：文本插值
+	const tokens = parse('Hello, {name}!')
+	const values = { name: 'Alice' }
+	console.log('tokens app', tokens)
+	console.log('compile app', compile(tokens, values)) // 输出：['Hello, ', 'Alice', '!']
+	
+	// 示例2：列表插值
+	const tokens2 = parse('The {0}st person is {1}.')
+	const values2 = ['first', 'Alice']
+	console.log('tokens2 app', tokens2)
+	console.log('compile2 app', compile(tokens2, values2))
+	
+	// 示例3：混合插值
+	const tokens3 = parse('The {0}st person is {name}.')
+	const values3 = ['first', { name: 'Alice' }]
+	console.log('tokens3 app', tokens3)
+	console.log('compile2 app',compile(tokens3, values3)) // 输出：['The ', 'first', 'st person is ', 'Alice', '.']
+	
+	// 示例4：未知类型
+	const tokens4 = parse('Hello, {unknown}!')
+	const values4 = { name: 'Alice' }
+	console.log('tokens4 web', tokens4)
+	console.log('compile4 web',compile(tokens4, values4)) // 输出：['Hello, ', 'unknown', '!']
+}
+appTest()

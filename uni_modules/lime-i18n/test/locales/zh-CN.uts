@@ -1,0 +1,55 @@
+export default {
+	common: {
+		more: "查看更多",
+		hello: "{msg} 世界"
+	},
+	leftMenus: {
+		home: "首页"
+	},
+	headMenus: {
+		subTitle: "组织服务平台",
+		userName: "张三"
+	},
+	login: {
+		personal_center: "个人中心",
+		sign_out: "退出登录"
+	},
+	plurals: {
+		car: '车 | 辆车',
+		apple: '没有苹果 | 一个苹果 | {count} 个苹果',
+		format: {
+			named: '你好 {name}，你好吗？ | 嗨 {name}，你看起来不错',
+			list: '你好 {0}，你好吗？ | 嗨 {0}，你看起来不错'
+		},
+		fallback: '这是备选 | 这是一个复数备选'
+	},
+	message: {
+		directPass: '世界',
+		threeDirect: '你好',
+		hello: '世界',
+		helloName: '你好，{name}',
+		hoge: 'hoge',
+		link: '@:message.hello',
+		linkHelloName: '@:message.helloName',
+		linkLinkHelloName: '@:message.linkHelloName',
+		linkEnd: '这是一个链接翻译到 @:message.hello',
+		linkWithin: '难道我们不是生活在美好的世界里吗？',
+		linkMultiple: '你好，@:message.hoge！难道 @:message.hello 不美好吗？',
+		linkBrackets: '你好，@:(message.hoge)。难道 @:(message.hello) 不美好吗？',
+		linkHyphen: '@:hyphen-hello',
+		linkUnderscore: '@:underscore_hello',
+		linkPipe: '@:pipe|hello',
+		linkColon: '@:(colon:hello)',
+		linkList: '@:message.hello：{0} {1}',
+		linkCaseLower: '请提供 @.lower:message.homeAddress',
+		linkCaseUpper: '@.upper:message.homeAddress',
+		linkCaseCapitalize: '@.capitalize:message.homeAddress',
+		linkCaseUnknown: '@.unknown:message.homeAddress',
+		linkCaseCustom: '@.custom:message.homeAddress',
+		homeAddress: '家庭地址',
+		circular1: 'Foo @:message.circular2',
+		circular2: 'Bar @:message.circular3',
+		circular3: 'Buz @:message.circular1',
+		linkTwice: '@:message.hello：@:message.hello',
+	}
+};
