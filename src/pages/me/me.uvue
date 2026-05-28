@@ -1,6 +1,5 @@
 <template>
-  <view class="profile-container">
-    <scroll-view class="profile-scroll" scroll-y="true">
+  <tabbar-layout bgColor="#f8fafc">
       <view class="profile-content">
         <!-- 头部卡片：用户头像及状态 -->
         <view class="avatar-section">
@@ -38,13 +37,11 @@
           </button>
         </view>
       </view>
-    </scroll-view>
-    <Tabbar />
-  </view>
+  </tabbar-layout>
 </template>
 
 <script setup lang="uts">
-import Tabbar from '../../tabbar/index.uvue'
+import TabbarLayout from '../../layouts/tabbar-layout.uvue'
 import { syncCurIdxByCurrentPage } from '../../tabbar/store'
 import { useUserStore, useTokenStore } from '../../store'
 import { LOGIN_PAGE } from '../../router/config'

@@ -1,30 +1,35 @@
 <script setup lang="uts">
+import type { CustomTabBarItem } from './types'
 import { curIdx, themeColor } from './store'
 
-interface TabBarItemPropType {
-  text : string
-  pagePath : string
-  iconType : string
-  icon : string
-  iconActive : string
-  badge : any | null
-  isBulge : boolean
-}
-
-const props = defineProps<{
-  item : TabBarItemPropType
-  index : number
-  isBulge : boolean
-}>()
+const props = defineProps({
+  item: {
+    type: Object,
+    required: true
+  },
+  index: {
+    type: Number,
+    required: true
+  },
+  isBulge: {
+    type: Boolean,
+    default: false
+  }
+})
 
 const inactiveColor = '#999999'
 
+// 将 props.item 转换为强类型的 CustomTabBarItem
+const tabbarItem = computed(() : CustomTabBarItem => {
+  return props.item as CustomTabBarItem
+})
+
 /** 根据选中状态返回对应图标 */
 function getIcon() : string {
-  if (curIdx.value === props.index && props.item.iconActive.length > 0) {
-    return props.item.iconActive
+  if (curIdx.value === props.index && tabbarItem.value.iconActive.length > 0) {
+    return tabbarItem.value.iconActive
   }
-  return props.item.icon
+  return tabbarItem.value.icon
 }
 
 /** 获取当前文字和图标的颜色 */
@@ -34,17 +39,17 @@ function getActiveColor() : string {
 
 /** 是否显示小红点 */
 function isDotBadge() : boolean {
-  return props.item.badge != null && props.item.badge === 'dot'
+  return tabbarItem.value.badge != null && tabbarItem.value.badge === 'dot'
 }
 
 /** 是否显示数字角标 */
 function isNumberBadge() : boolean {
-  return props.item.badge != null && props.item.badge !== 'dot'
+  return tabbarItem.value.badge != null && tabbarItem.value.badge !== 'dot'
 }
 
 /** 获取角标文本 */
 function getBadgeText() : string {
-  const badge = props.item.badge
+  const badge = tabbarItem.value.badge
   if (badge == null || badge === 'dot') return ''
   if (typeof badge === 'number') {
     const num = badge as number
@@ -59,23 +64,27 @@ function getBadgeText() : string {
   <view class="tabbar-item-inner">
     <!-- 图片图标 -->
     <image
-      v-if="props.item.iconType === 'image'"
+      v-if="tabbarItem.iconType === 'image'"
       :src="getIcon()"
       mode="scaleToFill"
       :class="props.isBulge ? 'icon-bulge' : 'icon-normal'"
     />
     
     <!-- uni-icons 字体图标 -->
-    <uni-icons
-      v-if="props.item.iconType === 'icon'"
-      :type="getIcon()"
-      size="24"
-      :style="{ color: getActiveColor() }"
-      :class="props.isBulge ? 'icon-bulge' : 'icon-normal'"
-    ></uni-icons>
+    <view 
+      v-if="tabbarItem.iconType === 'icon'" 
+      :class="props.isBulge ? 'icon-bulge' : 'icon-normal'" 
+      style="align-items: center; justify-content: center;"
+    >
+      <uni-icons
+        :type="getIcon()"
+        size="24"
+        :style="{ color: getActiveColor() }"
+      ></uni-icons>
+    </view>
     
     <!-- 文本（包含 i18n 翻译，支持动态语言切换） -->
-    <text v-if="!props.isBulge" class="tabbar-text" :style="{ color: getActiveColor() }">{{ $t(props.item.text) }}</text>
+    <text v-if="!props.isBulge" class="tabbar-text" :style="{ color: getActiveColor() }">{{ $t(tabbarItem.text) }}</text>
     
     <!-- 角标：小红点 -->
     <view v-if="isDotBadge()" class="badge-dot" />
@@ -96,14 +105,10 @@ function getBadgeText() : string {
 .icon-normal {
   width: 24px;
   height: 24px;
-  justify-content: center;
-  align-items: center;
 }
 .icon-bulge {
   width: 40px;
   height: 40px;
-  justify-content: center;
-  align-items: center;
 }
 .tabbar-text {
   font-size: 10px;

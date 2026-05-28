@@ -53,7 +53,7 @@ export function syncCurIdxByCurrentPage() {
   if (route == null || route.length == 0) return
   const path = route.startsWith('/') ? route : `/${route}`
   for (let i = 0; i < tabbarList.length; i++) {
-    if (tabbarList[i].pagePath === path) {
+    if (tabbarList[i].pagePath === path || tabbarList[i].pagePath.endsWith(path)) {
       setCurIdx(i)
       break
     }

@@ -2,12 +2,6 @@
 	import { tabbarList, curIdx, setCurIdx, syncCurIdxByCurrentPage, themeColor } from './store'
 	import TabbarItem from './TabbarItem.uvue'
 
-	const inactiveColor = '#999999'
-
-	function getColorByIndex(index : number) : string {
-		return curIdx.value === index ? themeColor.value : inactiveColor
-	}
-
 	/** 中间鼓包 tabbarItem 点击事件 */
 	function handleClickBulge() {
 		uni.showToast({ title: '点击了中间鼓包按钮', icon: 'none' })
@@ -47,7 +41,7 @@
 		<view class="tabbar-container">
 			<view class="tabbar-inner">
 				<view v-for="(item, index) in tabbarList" :key="index" class="tabbar-item"
-					:style="{ color: getColorByIndex(index) }" @click="handleClick(index)">
+					@click="handleClick(index)">
 					<!-- 鼓包项 -->
 					<view v-if="item.isBulge" class="bulge-wrapper">
 						<view class="bulge">
