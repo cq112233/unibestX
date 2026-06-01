@@ -1,0 +1,100 @@
+// [z-paging-x]工具类
+
+type RefresherTimeTextMapType = {
+	title: string,
+	none: string,
+	today: string,
+	yesterday: string
+}
+
+const refresherTimeStorageKey: string = 'Z-PAGING-X-REFRESHER-TIME-STORAGE-KEY';
+
+const refresherTimeTextMap: RefresherTimeTextMapType = {
+	title: '最后更新：',
+	none: '无',
+	today: '今天',
+	yesterday: '昨天'
+} as RefresherTimeTextMapType
+
+// 更新数据刷新时间
+export function updateRefesrherTime(key: string): void {
+	const datas: UTSJSONObject = _getRefesrherTime() ?? {};
+	datas[key] = getTime();
+	uni.setStorageSync(refresherTimeStorageKey, datas);
+}
+
+// 通过下拉刷新标识key获取下拉刷新时间(格式化之后)
+export function getRefesrherFormatTimeByKey(key: string): string {
+	const time: number | null = _getRefesrherTimeByKey(key);
+	const timeText = time != null ? _timeFormat(time) : refresherTimeTextMap.none;
+	return `${refresherTimeTextMap.title}${timeText}`;
+}
+
+// 获取当前时间
+export function getTime(): number {
+	return (new Date()).getTime();
+}
+
+// 获取下拉刷新时间
+function _getRefesrherTime(): UTSJSONObject | null {
+	const result: any| null = uni.getStorageSync(refresherTimeStorageKey);
+	return result != null && result instanceof UTSJSONObject ? result : null;
+}
+
+// 通过下拉刷新标识key获取下拉刷新时间
+function _getRefesrherTimeByKey(key: string): number | null {
+	const datas: UTSJSONObject | null = _getRefesrherTime();
+	if (datas != null) {
+		return datas.getNumber(key);
+	}
+	return null;
+}
+
+// 时间格式化
+function _timeFormat(time: number): string {
+	const date: Date = new Date(time);
+	const currentDate: Date = new Date();
+	const dateDay = _onlyKeepDateDay(new Date(time));
+	const currentDateDay = _onlyKeepDateDay(new Date());
+	const disTime: number = dateDay.getTime() - currentDateDay.getTime();
+	let dayStr: string;
+	const timeStr = _dateTimeFormat(date);
+	if (disTime == 0) {
+		dayStr = refresherTimeTextMap.today;
+	} else if (disTime == -86400000) {
+		dayStr = refresherTimeTextMap.yesterday;
+	} else {
+		dayStr = _dateDayFormat(date, date.getFullYear() !== currentDate.getFullYear());
+	}
+	return `${dayStr} ${timeStr}`;
+}
+
+// 去除Date的时分秒毫秒信息，仅保留年月日
+function _onlyKeepDateDay(date: Date): Date {
+	date.setHours(0);
+	date.setMinutes(0);
+	date.setSeconds(0);
+	date.setMilliseconds(0);
+	return date;
+}
+
+// date格式化为年月日
+function _dateDayFormat(date: Date, showYear: boolean = true): string {
+	const year: number = date.getFullYear();
+	const month: number = date.getMonth() + 1;
+	const day: number = date.getDate();
+	return showYear ? `${year}-${_fullZeroToTwo(month)}-${_fullZeroToTwo(day)}` : `${_fullZeroToTwo(month)}-${_fullZeroToTwo(day)}`;
+}
+
+// data格式化为时分
+function _dateTimeFormat(date: Date): string {
+	const hour: number = date.getHours();
+	const minute: number = date.getMinutes();
+	return `${_fullZeroToTwo(hour)}:${_fullZeroToTwo(minute)}`;
+}
+
+// 不满2位在前面填充0
+function _fullZeroToTwo(value: number): string{
+	const str: string = value.toString();
+	return str.length == 1 ? '0' + str : str;
+}

@@ -1,0 +1,137 @@
+<!-- [z-paging-x]上拉加载更多view -->
+<template name="z-paging-refresher">
+	<view class="zpx-r-container" :style="{height: showUpdateTime ? '60px' : '40px'}">
+		<z-paging-loading v-if="isLoading"/>
+		<image v-else class="zpx-r-image" :class="{'zpx-r-arrow-down': isDefault}" :src="base64ArrowImg"></image>
+		<view class="zpx-r-text-container" :style="{marginLeft: showRefresherTimeText ? '25rpx' : '10rpx'}">
+			<text class="zpx-r-text">{{statusText}}</text>
+			<text v-if="showRefresherTimeText" class="zpx-r-text zpx-r-time-text">
+				{{refresherTimeText}}
+			</text>
+		</view>
+	</view>
+</template>
+<script lang="uts">
+	import { base64Arrow } from '../static/index.uts'
+	import zPagingLoading from '../components/z-paging-loading.uvue'
+	import Enum from '../enums/index.uts'
+	import { getRefesrherFormatTimeByKey } from '../utils/index.uts'
+	export default {
+		name: 'z-paging-refresher',
+		components: { zPagingLoading },
+		props: {
+			// 下拉刷新状态
+			status: {
+				type: String,
+				default: Enum.Refresher.Default,
+			},
+			// 自定义下拉刷新默认状态下的文字，默认：继续下拉刷新
+			defaultText: {
+				type: String,
+				default: '继续下拉刷新'
+			},
+			// 自定义下拉刷新松手立即刷新状态下的文字，默认：松开立即刷新
+			pullingText: {
+				type: String,
+				default: '松开立即刷新'
+			},
+			// 自定义下拉刷新刷新中状态下的文字，默认：正在刷新...
+			refreshingText: {
+				type: String,
+				default: '正在刷新...'
+			},
+			// 是否显示最后更新时间，默认为否
+			showUpdateTime: {
+				type: Boolean,
+				default: false
+			},
+			// 用户区分不同z-paging-x组件的最后更新时间
+			updateTimeKey: {
+				type: String,
+				default: 'default'
+			},
+			// 最后更新时间更新的时间戳
+			timeTextTimestamp: {
+				type: Number,
+				default: 0
+			},
+		},
+		data() {
+			return {
+				times: 0,
+				base64ArrowImg: base64Arrow
+			};
+		},
+		computed: {
+			isDefault(): boolean {
+				return this.status === Enum.Refresher.Default;
+			},
+			isReleaseToRefresh(): boolean {
+				return this.status === Enum.Refresher.ReleaseToRefresh;
+			},
+			isLoading(): boolean {
+				return this.status === Enum.Refresher.Loading;
+			},
+			statusText(): string {
+				// 下拉刷新状态 default:默认状态 release-to-refresh:松手立即刷新 loading:刷新中 complete:刷新结束
+				if (this.isDefault) {
+					return this.defaultText;
+				} else if (this.isReleaseToRefresh) {
+					return this.pullingText;
+				} else if (this.isLoading) {
+					return this.refreshingText;
+				} else {
+					return '';
+				}
+			},
+			refresherTimeText(): string {
+				this.timeTextTimestamp;
+				return getRefesrherFormatTimeByKey(this.updateTimeKey); 
+			},
+			showRefresherTimeText(): boolean {
+				return this.showUpdateTime && this.refresherTimeText.length > 0;
+			}
+		}
+	}
+</script>
+
+<style scoped>
+	.zpx-r-container {
+		/* 这里下拉刷新view高度需要用px，否则在iOS中下拉刷新view会被展示在最底部 */
+		height: 40px;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+	}
+	
+	.zpx-r-image {
+		width: 34rpx;
+		height: 34rpx;
+		transition-duration: .2s;
+		transition-property: transform;
+		transform: rotate(0deg);
+	}
+	
+	.zpx-r-arrow-top {
+		transform: rotate(0deg);
+	}
+	
+	.zpx-r-arrow-down {
+		transform: rotate(180deg);
+	}
+	
+	.zpx-r-text-container {
+		flex-direction: column;
+		align-items: center;
+	}
+	
+	.zpx-r-text {
+		color: grey;
+		font-size: 28rpx;
+	}
+	
+	.zpx-r-time-text {
+		font-size: 26rpx;
+		margin-top: 10rpx;
+	}
+</style>

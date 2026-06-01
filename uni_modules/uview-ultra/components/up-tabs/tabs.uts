@@ -1,0 +1,34 @@
+/*
+ * @Author       : jry
+ * @Description  :
+ * @version      : 4.0
+ * @Date         : 2025-12-22 00:10:00
+ * @LastAuthor   : jry
+ * @lastTime     : 2025-12-22 00:10:00
+ * @FilePath     : /uview-ultra/libs/config/props/tabs.uts
+ */
+import color from '../../libs/config/color'
+export default {
+    //
+    tabs: {
+        duration: 300,
+        list: [] as Array<UTSJSONObject>,
+        lineColor: color['primary'] as string,
+        activeStyle: {
+            color: '#303133'
+        },
+        inactiveStyle: {
+            color: '#606266'
+        },
+        lineWidth: 20,
+        lineHeight: 3,
+        lineBgSize: 'cover',
+        itemStyle: {
+            height: '44px'
+        },
+        scrollable: true,
+		current: 0,
+		keyName: 'name',
+        iconStyle: {}
+    }
+} as UTSJSONObject

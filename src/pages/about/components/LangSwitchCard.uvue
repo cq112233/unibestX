@@ -38,17 +38,18 @@
 
 <script setup lang="uts">
 	import Card from './Card.uvue'
-	import i18n from '@/src/i18n'
+	import { useAppStore } from '@/src/store'
 	import { t } from '@/src/utils/i18n'
+
+	const appStore = useAppStore()
 
 	// 使用 computed 响应式获取当前 i18n 对象的语言环境
 	const currentLocale = computed(() : string => {
-		return i18n.global.locale.value
+		return appStore.state.locale
 	})
 	
-	
 	function switchLanguage(lang : string) {
-		i18n.global.locale.value = lang
+		appStore.setLocale(lang)
 		
 		uni.showToast({
 			title: t('message.switch_success'),

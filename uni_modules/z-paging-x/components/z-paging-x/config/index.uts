@@ -1,0 +1,17 @@
+// [z-paging-x]全局配置
+
+let config: null | UTSJSONObject = null;
+
+// 获取默认配置信息
+export function gc<T>(key: string, defaultValue: T): T {
+	// 如果全局配置不存在，则返回默认值
+	if (config == null) return defaultValue;
+	const value: null | any = config![key];
+	// 如果全局配置存在但对应的配置项不存在，则返回默认值；反之返回配置项
+	return (value == null ? defaultValue : value) as T;
+}
+
+// 设置默认全局配置
+export function setZPXConfig(_config: UTSJSONObject) {
+	config = _config;
+}

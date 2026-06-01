@@ -1,5 +1,5 @@
 <template>
-	<tabbar-layout>
+	<layout show-tabbar>
 		<view>
 			<image class="w-100px h-100px mx-auto mt-40px rounded-20px" src="/static/logo.png"></image>
 			<text class="text-32px text-bold mx-auto mt-10px text-[#d14328]" >unibestX</text>
@@ -7,13 +7,31 @@
 			<text class="mt-10px m-auto px-30px text-justify text-16px text-bold">　　unibestX 是一个集成了多种工具和技术的 uni-appX 开发模板，由 uni-appX +
 				Vue3 + Ts + + UnoCss + VSCode 构建，模板具有代码提示、自动格式化、统一配置、代码片段等功能，并内置了许多常用的基本组件和基本功能，让你编写 uni-appX 拥有 best
 				体验。</text>
+			
+			<!-- 主题色按钮 -->
+			<button  class="mt-30px mx-auto w-200px h-44px rounded-8px text-white text-14px bg-primary">
+				主题色按钮
+			</button>
+			
+			<!-- <up-button text="月落"></up-button> -->
+			
+			<uni-link-x 
+			href="https://uniapp.dcloud.net.cn" 
+			font-size="16px"
+			color="#23335D">
+				https://uniapp.dcloud.net.cn
+			</uni-link-x>
+
 		</view>
-	</tabbar-layout>
+	</layout>
 </template>
 
 <script setup lang="uts">
-import TabbarLayout from '../../layouts/tabbar-layout.uvue'
+import Layout from '@/src/layouts/layout.uvue'
 import { syncCurIdxByCurrentPage } from '../../tabbar/store'
+import { useAppStore } from '@/src/store'
+
+const appStore = useAppStore()
 
 onShow(() => {
 	syncCurIdxByCurrentPage()

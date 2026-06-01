@@ -1,0 +1,160 @@
+<template>
+	<view class="up-avatar-group">
+		<view
+		    class="up-avatar-group__item"
+		    v-for="(item, index) in showUrl"
+		    :key="index"
+		    :style="{
+				marginLeft: index == 0 ? 0 : $upAddUnit(0-parseFloat(size.toString()) * parseFloat(gap.toString()))
+			}"
+		>
+			<up-avatar
+			    :size="size"
+			    :shape="shape"
+			    :mode="mode"
+			    :src="src(item)"
+			></up-avatar>
+			<view
+			    class="up-avatar-group__item__show-more"
+			    v-if="showMore && index == showUrl.length - 1
+					&& (urls.length > parseInt(maxCount.toString())
+					|| parseInt(extraValue.toString()) > 0)"
+				@tap="clickHandler"
+			>
+				<up-text
+				    color="#ffffff"
+				    :size="parseInt(size.toString()) * 0.4"
+				    :text="textStr"
+					align="center"
+					:style="{justifyContent: 'center'}"
+				></up-text>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="ts">
+import defProps from './avatarGroup'
+import { addUnit } from '../../libs/function/index'
+
+defineOptions({
+  //...mpSharedMpOptions,
+  name: 'up-avatar-group'
+})
+
+// 定义props
+const props = defineProps({
+    // 头像图片组
+    urls: {
+        type: Array as PropType<string[]>,
+		default: () : Array<string> => {
+			return defProps.getArray<string>('avatarGroup.urls') ?? []
+		}
+    },
+    // 最多展示的头像数量
+    maxCount: {
+        type: [String, Number],
+        default: () => defProps.getNumber('avatarGroup.maxCount')
+    },
+    // 头像形状
+    shape: {
+        type: String,
+        default: () => defProps.getString('avatarGroup.shape')
+    },
+    // 图片裁剪模式
+    mode: {
+        type: String,
+        default: () => defProps.getString('avatarGroup.mode')
+    },
+    // 超出maxCount时是否显示查看更多的提示
+    showMore: {
+        type: Boolean,
+        default: () => defProps.getBoolean('avatarGroup.showMore')
+    },
+    // 头像大小
+    size: {
+        type: [String, Number],
+        default: () => defProps.getNumber('avatarGroup.size')
+    },
+    // 指定从数组的对象元素中读取哪个属性作为图片地址
+    keyName: {
+        type: String,
+        default: () => defProps.getString('avatarGroup.keyName')
+    },
+	// 头像之间的遮挡比例
+    gap: {
+        type: [String, Number],
+        validator(value: string|number) {
+            return parseFloat(value.toString()) >= 0 && parseFloat(value.toString()) <= 1
+        },
+        default: () => defProps.getNumber('avatarGroup.gap')
+    },
+	// 需额外显示的值
+	extraValue: {
+		type: [Number, String],
+		default: () => defProps.getNumber('avatarGroup.extraValue')
+	}
+});
+
+// 定义emit
+const emit = defineEmits(['showMore']);
+
+const showUrl = computed(() => {
+    return props.urls.slice(0, parseInt(props.maxCount.toString()))
+});
+
+// 计算属性
+const textStr = computed(() => {
+    let str = props.extraValue.toString() != ''
+        ? props.extraValue.toString()
+        : (props.urls.length - showUrl.value.length).toString()
+    return '+' + str
+});
+
+// 方法
+const src = (item: any): string => {
+    if (typeof item == 'object') {
+        let item1 = item as UTSJSONObject
+        return (props.keyName != '' && item1.getString(props.keyName.toString()) != null)
+            ? item1.getString(props.keyName.toString())!
+            : item1.getString('url')!
+    } else {
+        return item.toString()
+    }
+};
+
+const clickHandler = () => {
+    emit('showMore')
+};
+</script>
+
+<style lang="scss" scoped>
+	@import "../../libs/css/components.scss";
+
+	.up-avatar-group {
+		@include flex;
+
+		&__item {
+			margin-left: -10px;
+			position: relative;
+
+			&--no-indent {
+				// 如果你想质疑作者不会使用:first-child，说明你太年轻，因为nvue不支持
+				margin-left: 0;
+			}
+
+			&__show-more {
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				background-color: rgba(0, 0, 0, 0.3);
+				@include flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: 100px;
+			}
+		}
+	}
+</style>

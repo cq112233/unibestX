@@ -1,0 +1,266 @@
+<template>
+	<view class="up-collapse-item">
+		<up-cell
+			:title="titleCpu"
+			:value="value"
+			:label="label"
+			:icon="icon"
+			:isLink="isLink"
+			:clickable="clickable"
+			:border="parentData['border'] != null && parentData['border'] as Boolean && showBorder"
+			@click="clickHandler"
+			:arrowDirection="expanded ? 'up' : 'down'"
+			:disabled="disabled"
+		>
+			<!-- 微信小程序不支持，因为微信中不支持 <slot name="title" #title />的写法 -->
+			<template #title>
+				<slot name="title">
+					<text v-if="$slots['title'] != null && title !=''">
+						{{title}}
+					</text>
+				</slot>
+			</template>
+			<template #icon>
+				<slot name="icon">
+					<up-icon v-if="$slots['icon'] != null && icon != ''" :size="22"
+						:name="icon"></up-icon>
+				</slot>
+			</template>
+			<template #value>
+				<slot name="value">
+					<text v-if="$slots['value'] != null && value != ''">
+						{{value}}
+					</text>
+				</slot>
+			</template>
+			<template #right-icon>
+				<template v-if="showRight">
+					<up-icon v-if="$slots['right-icon'] != null" :size="16"
+						name="arrow-right"></up-icon>
+					<slot name="right-icon">
+					</slot>
+				</template>
+			</template>
+		</up-cell>
+		<view
+			class="up-collapse-item__content"
+			:style="{height: $up.addUnit(height)}"
+			:animation="animationData"
+			ref="animation"
+		>
+			<view
+				class="up-collapse-item__content__text content-class"
+				:id="elId"
+				:ref="elId"
+			><slot /></view>
+		</view>
+		<up-line v-if="parentData['border']"></up-line>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { nextTick, ref, watch, computed } from 'vue'
+	import defProps from './collapseItem.uts'
+	import { guid, sleep, upGetRect, error } from '../../libs/function/index'
+	import { array as testArray } from '../../libs/function/test'
+	import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'
+	const { parent, parentData, getParentData } = useUltraUI()
+	const instance = getCurrentInstance()!.proxy!
+	
+	defineOptions({
+		name: "up-collapse-item"
+	})
+	
+	// 定义 props
+	const props = defineProps({
+		title: {
+			type: [String],
+			default: defProps.getString('collapseItem.title')
+		},
+		value: {
+			type: [String],
+			default: defProps.getString('collapseItem.value')
+		},
+		label: {
+			type: [String],
+			default: defProps.getString('collapseItem.label')
+		},
+		disabled: {
+			type: [Boolean],
+			default: defProps.getBoolean('collapseItem.disabled')
+		},
+		isLink: {
+			type: [Boolean],
+			default: defProps.getBoolean('collapseItem.isLink')
+		},
+		clickable: {
+			type: [Boolean],
+			default: defProps.getBoolean('collapseItem.clickable')
+		},
+		border: {
+			type: [Boolean],
+			default: defProps.getBoolean('collapseItem.border')
+		},
+		align: {
+			type: [String],
+			default: defProps.getString('collapseItem.align')
+		},
+		name: {
+			type: [String, Number],
+			default: defProps.getString('collapseItem.name')
+		},
+		icon: {
+			type: [String],
+			default: defProps.getString('collapseItem.icon')
+		},
+		duration: {
+			type: [Number, String],
+			default: defProps.getNumber('collapseItem.duration')
+		},
+		showRight: {
+			type: [Boolean],
+			default: defProps.getBoolean('collapseItem.showRight')
+		}
+	})
+	
+	// 定义响应式数据
+	const timer = ref(0)
+	const elId = ref(guid())
+	const height = ref(0)
+	// uni.createAnimation的导出数据
+	const animationData = ref({})
+	// 是否展开状态
+	const expanded = ref(false)
+	// 根据expanded确定是否显示border，为了控制展开时，cell的下划线更好的显示效果，进行一定时间的延时
+	const showBorder = ref(false)
+	// 是否动画中，如果是则不允许继续触发点击
+	const animating = ref(false)
+	
+	// 监听 expanded 变化
+	watch(expanded, (n: boolean) => {
+		clearTimeout(timer.value)
+		timer.value = 0
+		// 这里根据expanded的值来进行一定的延时，是为了cell的下划线更好的显示效果
+		timer.value = setTimeout(() => {
+			showBorder.value = n
+		}, n ? 10 : 290)
+	})
+	
+	const titleCpu = computed((): string => {
+		if (instance?.$slots['title'] == null) {
+			return props.title.toString()
+		} else {
+			return ''
+		}
+	})
+	
+	const setContentAnimate = async function(expandedFrom: boolean) {
+		// 每次面板打开或者收起时，都查询元素尺寸
+		// 好处是，父组件从服务端获取内容后，变更折叠面板后可以获得最新的高度
+		expanded.value = expandedFrom
+		const rect: NodeInfo = await upGetRect(`#${elId.value}`, false, instance)
+		height.value = expanded.value ? (rect.height == null ? 0 : rect.height) : 0
+		animating.value = true
+	
+		// #ifndef APP-NVUE
+		// const animation = uni.createAnimation({
+		// 	timingFunction: 'ease-in-out',
+		// });
+		// animation
+		// 	.height(height)
+		// 	.step({
+		// 		duration: this.duration,
+		// 	})
+		// 	.step()
+		// // 导出动画数据给面板的animationData值
+		// this.animationData = animation.export()
+		// 标识动画结束
+		await sleep(parseInt(props.duration.toString()))
+		animating.value = false
+		// #endif
+	}
+	
+	// 初始化数据
+	const init = async function() {
+		getParentData('up-collapse', instance, false)
+		if (parent.value == null) {
+			return error('up-collapse-item必须要搭配up-collapse组件使用')
+		}
+		let value = parentData.value['value'] ?? ''
+		const accordion = parentData.value['accordion']
+
+		if (accordion != null && accordion as boolean) {
+			if (testArray(value)) {
+				return error('手风琴模式下，up-collapse组件的value参数不能为数组')
+			}
+			expanded.value = (props.name.toString() == value.toString())
+		} else {
+			if (!testArray(value) && value != '') {
+				console.log('#', value, '#')
+				return error('非手风琴模式下，up-collapse组件的value参数必须为数组')
+			}
+			// @ts-ignore
+			if (value == '') {
+				value = [] as string[]
+			}
+			const valueArr = value as string[]
+			const sameName = (element: string): boolean => element == props.name.toString()
+			expanded.value = valueArr.some(sameName)
+		}
+		// 设置组件的展开或收起状态
+		await nextTick()
+		setContentAnimate(expanded.value)
+	}
+	
+	// 点击collapsehead头部
+	const clickHandler = function() {
+		if (props.disabled || animating.value) return
+		// 设置本组件为相反的状态
+		if (parent.value != null ) {
+			parent.value.$callMethod('onChange', instance)
+		} else {
+			console.error('parent is null')
+		}
+	}
+	
+	// 在组件挂载时初始化
+	onMounted(() => {
+		init()
+		// console.log('$slots', this.$slots)
+	})
+	
+	const getInternalState = ():UTSJSONObject => {
+		return {
+			name: props.name,
+			expanded: expanded.value
+		}
+	}
+
+	defineExpose({
+		init,
+		setContentAnimate,
+		getInternalState
+	})
+</script>
+
+<style lang="scss" scoped>
+	@import "../../libs/css/components.scss";
+
+	.up-collapse-item {
+
+		&__content {
+			overflow: hidden;
+			height: 0;
+			transition: height 0.5s ease-out;
+
+			&__text {
+				padding: 12px 15px;
+				.text {
+					color: $up-content-color;
+					font-size: 14px;
+					line-height: 18px;
+				}
+			}
+		}
+	}
+</style>

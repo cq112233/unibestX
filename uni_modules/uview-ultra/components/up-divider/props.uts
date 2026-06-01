@@ -1,0 +1,57 @@
+/*
+ * @Author       : jry
+ * @Description  :
+ * @version      : 4.0
+ * @Date         : 2025-11-18 00:52:08
+ * @LastAuthor   : jry
+ * @lastTime     : 2025-11-18 00:52:08
+ * @FilePath     : /uview-ultra/uni_modules/uview-ultra/components/up-divider/props.uts
+ */
+import { defineMixin } from '../../libs/vue.uts'
+import defProps from './divider.uts'
+let crtProp = defProps['divider'] as UTSJSONObject
+
+export const propsDivider = defineMixin({
+    props: {
+        // 是否虚线
+        dashed: {
+            type: Boolean,
+            default: crtProp['dashed']
+        },
+        // 是否细线
+        hairline: {
+            type: Boolean,
+            default: crtProp['hairline']
+        },
+        // 是否以点替代文字，优先于text字段起作用
+        dot: {
+            type: Boolean,
+            default: crtProp['dot']
+        },
+        // 内容文本的位置，left-左边，center-中间，right-右边
+        textPosition: {
+            type: String,
+            default: crtProp['textPosition']
+        },
+        // 文本内容
+        text: {
+            type: [String, Number],
+            default: crtProp['text']
+        },
+        // 文本大小
+        textSize: {
+            type: [String, Number],
+            default: crtProp['textSize']
+        },
+        // 文本颜色
+        textColor: {
+            type: String,
+            default: crtProp['textColor']
+        },
+        // 线条颜色
+        lineColor: {
+            type: String,
+            default: crtProp['lineColor']
+        }
+    }
+})

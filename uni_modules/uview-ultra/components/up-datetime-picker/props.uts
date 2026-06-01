@@ -1,0 +1,169 @@
+/*
+ * @Author       : jry
+ * @Description  : uview-plus component's props mixin file
+ * @version      : 4.0
+ * @Date         : 2024-04-22 16:44:21
+ * @LastAuthor   : jry
+ * @lastTime     : 2024-08-28 12:27:20
+ */
+import { defineMixin } from '../../libs/vue.uts'
+import defProps from './datetimePicker.uts'
+let datetimePickerProp = defProps['datetimePicker'] as UTSJSONObject
+
+export const propsDatetimePicker = defineMixin({
+    props: {
+        // 是否显示input
+        hasInput: {
+            type: Boolean,
+            default: datetimePickerProp['hasInput']
+        },
+        placeholder: {
+            type: String,
+            default: datetimePickerProp['placeholder']
+        },
+        format: {
+            type: String,
+            default: datetimePickerProp['format']
+        },
+        // 是否打开组件
+        show: {
+            type: Boolean,
+            default: datetimePickerProp['show']
+        },
+        // 弹出的方向，可选值为 top bottom right left center
+        popupMode: {
+            type: String,
+            default: datetimePickerProp['popupMode']
+        },
+        // 是否展示顶部的操作栏
+        showToolbar: {
+            type: Boolean,
+            default: datetimePickerProp['showToolbar']
+        },
+        // 工具栏右侧内容
+        toolbarRightSlot: {
+            type: Boolean,
+            default: datetimePickerProp['toolbarRightSlot']
+        },
+        // 绑定值
+        value: {
+            type: [String, Number],
+            default: datetimePickerProp['value']
+        },
+        // 绑定值
+        modelValue: {
+            type: [String, Number],
+            default: datetimePickerProp['modelValue']
+        },
+        // 顶部标题
+        title: {
+            type: String,
+            default: datetimePickerProp['title']
+        },
+        // 展示格式，支持date、time、year-month、datetime、datehour、timesecond、datetimesecond
+        mode: {
+            type: String,
+            default: datetimePickerProp['mode']
+        },
+        // 可选的最大时间
+        maxDate: {
+            type: Number,
+            default: datetimePickerProp['maxDate']
+        },
+        // 可选的最小时间
+        minDate: {
+            type: Number,
+            default: datetimePickerProp['minDate']
+        },
+        // 可选的最小小时，仅mode=time/timesecond有效
+        minHour: {
+            type: Number,
+            default: datetimePickerProp['minHour']
+        },
+        // 可选的最大小时，仅mode=time/timesecond有效
+        maxHour: {
+            type: Number,
+            default: datetimePickerProp['maxHour']
+        },
+        // 可选的最小分钟，仅mode=time/timesecond有效
+        minMinute: {
+            type: Number,
+            default: datetimePickerProp['minMinute']
+        },
+        // 可选的最大分钟，仅mode=time/timesecond有效
+        maxMinute: {
+            type: Number,
+            default: datetimePickerProp['maxMinute']
+        },
+        // 可选的最小秒，仅mode=timesecond有效
+        minSecond: {
+            type: Number,
+            default: datetimePickerProp['minSecond']
+        },
+        // 可选的最大秒，仅mode=timesecond有效
+        maxSecond: {
+            type: Number,
+            default: datetimePickerProp['maxSecond']
+        },
+        // 选项过滤函数
+        filter: {
+            type: [Function, null],
+            default: datetimePickerProp['filter']
+        },
+        // 选项格式化函数
+        formatter: {
+            type: [Function, null],
+            default: datetimePickerProp['formatter']
+        },
+        // 是否显示加载中状态
+        loading: {
+            type: Boolean,
+            default: datetimePickerProp['loading']
+        },
+        // 各列中，单个选项的高度
+        itemHeight: {
+            type: [String, Number],
+            default: datetimePickerProp['itemHeight']
+        },
+        // 取消按钮的文字
+        cancelText: {
+            type: String,
+            default: datetimePickerProp['cancelText']
+        },
+        // 确认按钮的文字
+        confirmText: {
+            type: String,
+            default: datetimePickerProp['confirmText']
+        },
+        // 取消按钮的颜色
+        cancelColor: {
+            type: String,
+            default: datetimePickerProp['cancelColor']
+        },
+        // 确认按钮的颜色
+        confirmColor: {
+            type: String,
+            default: datetimePickerProp['confirmColor']
+        },
+        // 每列中可见选项的数量
+        visibleItemCount: {
+            type: [String, Number],
+            default: datetimePickerProp['visibleItemCount']
+        },
+        // 是否允许点击遮罩关闭选择器
+        closeOnClickOverlay: {
+            type: Boolean,
+            default: datetimePickerProp['closeOnClickOverlay']
+        },
+        // 各列的默认索引
+        defaultIndex: {
+            type: Array,
+            default: datetimePickerProp['defaultIndex']
+        },
+        // 是否内联在页面中（不使用弹窗形式）
+        pageInline: {
+            type: Boolean,
+            default: datetimePickerProp['pageInline']
+        }
+    }
+});

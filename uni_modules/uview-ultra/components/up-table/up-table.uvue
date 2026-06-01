@@ -1,0 +1,111 @@
+<template>
+	<view class="up-table" :style="[tableStyle]">
+		<template v-if="show">
+			<slot />
+		</template>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { ref, watch, computed, getCurrentInstance } from 'vue'
+	import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'
+	import defProps from './table.uts'
+	const instance = getCurrentInstance()!.proxy!
+	
+	// options
+	defineOptions({
+	  name: 'up-table'
+	})
+	
+	// props
+	const props = defineProps({
+		borderColor: {
+			type: String,
+			default: defProps.getString('table.borderColor')
+		},
+		align: {
+			type: String,
+			default: defProps.getString('table.align')
+		},
+		// td的内边距
+		padding: {
+			type: String,
+			default: defProps.getString('table.padding')
+		},
+		// 字体大小
+		fontSize: {
+			type: [String, Number],
+			default: defProps.getNumber('table.fontSize')
+		},
+		// 字体颜色
+		color: {
+			type: String,
+			default: defProps.getString('table.color')
+		},
+		// th的自定义样式
+		thStyle: {
+			type: Object,
+			default: () => {
+				return defProps.getAny('table.thStyle') as UTSJSONObject
+			}
+		},
+		// table的背景颜色
+		bgColor: {
+			type: String,
+			default: defProps.getString('table.bgColor')
+		}
+	})
+	
+	const show = ref<boolean>(true)
+	
+	const tableStyle = computed(() => {
+		let style = {}
+		style['borderLeft'] = `solid 1px ${props.borderColor}`
+		style['borderTop'] = `solid 1px ${props.borderColor}`
+		style['backgroundColor'] = props.bgColor
+		return style
+	})
+	
+	function change() {
+		show.value = false
+		// 使用 $nextTick 更新显示状态
+		setTimeout(() => {
+			show.value = true
+		}, 0)
+	}
+	
+	// 监听align和borderColor的变化
+	// 注意：在组合式API中，我们需要使用watch来监听props的变化
+	watch(():string => props.align, () => {
+		change()
+	})
+	
+	watch((): string => props.borderColor, () => {
+		change()
+	})
+	
+	const getProps = function(): UTSJSONObject {
+		return {
+			borderColor: props.borderColor,
+			align: props.align,
+			padding: props.padding,
+			fontSize: props.fontSize,
+			color: props.color,
+			thStyle: props.thStyle,
+			bgColor: props.bgColor
+		}
+	}
+	const getRefs = function() {
+		return {
+		}
+	}
+
+	defineExpose({
+		getProps,
+		getRefs,
+	})
+</script>
+
+<style lang="scss" scoped>
+	
+</style>

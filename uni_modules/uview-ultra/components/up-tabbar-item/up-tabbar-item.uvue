@@ -1,0 +1,255 @@
+<template>
+	<view
+	    class="up-tabbar-item"
+	    :style="[addStyle(customStyle)]"
+	    :class="[isMidButton ? 'up-tabbar-item--mid-button' : '']"
+	    @tap="clickHandler"
+	>
+		<view 
+			class="up-tabbar-item__icon"
+			:class="[isMidButton ? 'up-tabbar-item__icon--mid-button' : '']"
+		>
+			<view class="up-tabbar-item--mid-button-cover" v-if="isMidButton">
+			</view>
+			<up-icon
+			    v-if="icon"
+			    :name="icon"
+			    :color="isActive? parentData['activeColor'] : parentData['inactiveColor']"
+			    :size="isMidButton ? 26 : 20"
+			></up-icon>
+			<template v-else>
+				<slot
+				    v-if="isActive"
+				    name="active-icon"
+				/>
+				<slot
+				    v-else
+				    name="inactive-icon"
+				/>
+			</template>
+			<up-badge
+				absolute
+				:offset="[0, dot ? '34rpx' : parseInt(badge.toString()) > 9 ? '14rpx' : '20rpx']"
+			    :customStyle="badgeStyle"
+			    :isDot="dot"
+			    :value="badge != null  ? (dot ? 1 : badge) : 0"
+			    :show="dot ? dot : parseInt(badge.toString()) > 0"
+			></up-badge>
+		</view>
+		
+		<slot name="text">
+			<text
+			    class="up-tabbar-item__text"
+			    :style="{
+					color: isActive? parentData['activeColor'] : parentData['inactiveColor']
+				}"
+			>{{ text }}</text>
+		</slot>
+	</view>
+</template>
+
+<script lang="uts">
+	import { propsTabbarItem } from './props.uts';
+	import { mpMixin } from '../../libs/mixin/mpMixin.uts';
+	import { mixin } from '../../libs/mixin/mixin.uts';
+	import { addStyle, error } from '../../libs/function/index.uts';
+	import { nextTick } from 'vue';
+	/**
+	 * TabbarItem 底部导航栏子组件
+	 * @description 此组件提供了自定义tabbar的能力。
+	 * @tutorial https://uview-plus.jiangruyi.com/components/tabbar.html
+	 * @property {String | Number}	name		item标签的名称，作为与up-tabbar的value参数匹配的标识符
+	 * @property {String}			icon		uView内置图标或者绝对路径的图片
+	 * @property {String | Number}	badge		右上角的角标提示信息
+	 * @property {Boolean}			dot			是否显示圆点，将会覆盖badge参数（默认 false ）
+	 * @property {String}			text		描述文本
+	 * @property {Object | String}	badgeStyle	控制徽标的位置，对象或者字符串形式，可以设置top和right属性（默认 'top: 6px;right:2px;' ）
+	 * @property {Object}			customStyle	定义需要用到的外部样式
+	 * 
+	 * @example <up-tabbar :value="value2" :placeholder="false" @change="name => value2 = name" :fixed="false" :safeAreaInsetBottom="false"><up-tabbar-item text="首页" icon="home" dot ></up-tabbar-item></up-tabbar>
+	 */
+	export default {
+		name: 'up-tabbar-item',
+		mixins: [mpMixin, mixin, propsTabbarItem],
+		data() {
+			return {
+				isActive: false, // 是否处于激活状态
+				routeSyncTimer: 0 as number,
+				routeSyncLast: '',
+				parentData: {
+					value: null as string | number | null,
+					activeColor: '',
+					inactiveColor: ''
+				}
+			}
+		},
+		//  微信小程序中 options 选项
+		options: {
+		    virtualHost: true //将自定义节点设置成虚拟的，更加接近Vue组件的表现。我们不希望自定义组件的这个节点本身可以设置样式、响应 flex 布局等
+		},
+		computed: {
+			// 计算是否为中间按钮
+			isMidButton(): boolean {
+				return this.mode === 'midButton';
+			}
+		},
+		created() {
+			this.init()
+		},
+		mounted() {
+			this.startRouteSync()
+		},
+		beforeUnmount() {
+			this.clearRouteSync()
+		},
+		emits: ["click", "change"],
+		methods: {
+			addStyle(val: any): any {
+				return addStyle(val)
+			},
+			clearRouteSync() {
+				if (this.routeSyncTimer != null) {
+					clearInterval(this.routeSyncTimer)
+					this.routeSyncTimer = 0
+				}
+			},
+			getCurrentRoutePath(): string {
+				// @ts-ignore
+				const pages = getCurrentPages()
+				if (pages == null || pages.length == 0) return ''
+				const currentPage = pages[pages.length - 1]
+				// @ts-ignore
+				const route = (currentPage != null && currentPage.route != null) ? currentPage.route.toString() : ''
+				if (route == '') return ''
+				return route.startsWith('/') ? route : `/${route}`
+			},
+			normalizeRoutePath(path: string): string {
+				return path.replace(/^[#\\/]+/, '')
+			},
+			syncActiveByRouteOrValue() {
+				this.updateParentData()
+				// @ts-ignore
+				const index = this.getChildIndex(this)
+				const name = this.name != null ? this.name : index
+				const routePath = this.getCurrentRoutePath()
+				if (typeof name === 'string' && routePath != '') {
+					const isRouteMatch = this.normalizeRoutePath(name) == this.normalizeRoutePath(routePath)
+					if (isRouteMatch) {
+						this.isActive = true
+						return
+					}
+				}
+				this.isActive = name === this.parentData['value']
+			},
+			startRouteSync() {
+				this.clearRouteSync()
+				if (!(typeof this.name === 'string' && this.name.indexOf('/') > -1)) return
+				this.routeSyncLast = this.getCurrentRoutePath()
+				this.routeSyncTimer = setInterval(() => {
+					const current = this.getCurrentRoutePath()
+					if (current != this.routeSyncLast) {
+						this.routeSyncLast = current
+						this.syncActiveByRouteOrValue()
+					}
+				}, 200) as number
+			},
+			init() {
+				if (this.parent == null) {
+					error('up-tabbar-item必须搭配up-tabbar组件使用')
+				}
+				this.syncActiveByRouteOrValue()
+			},
+			updateParentData() {
+				// 此方法在mixin中
+				// @ts-ignore
+				this.getParentData('up-tabbar')
+			},
+			// 此方法将会被父组件up-tabbar调用
+			updateFromParent() {
+				// 重新初始化
+				this.init()
+			},
+			clickHandler() {
+				nextTick(() => {
+					// @ts-ignore
+					const index = this.getChildIndex(this)
+					const name = this.name != null ? this.name : index
+					// 点击的item为非激活的item才发出change事件
+					// @ts-ignore
+					if (this.parent != null && name.toString() != this.parent.$props['value'].toString()) {
+						// @ts-ignore
+						this.parent.$emit('change', name)
+					}
+					this.$emit('click', name)
+				})
+			}
+		},
+	}
+</script>
+
+<style lang="scss" scoped>
+	@import '../../libs/css/components.scss';
+	
+	.up-tabbar-item {
+		@include flex(column);
+		align-items: center;
+		justify-content: center;
+		flex: 1;
+		/* #ifndef APP-NVUE */
+		width: 100%;
+		height: 100%;
+		/* #endif */
+		/* #ifdef H5 */
+		cursor: pointer;
+		/* #endif */
+		
+		&__icon {
+			@include flex;
+			position: relative;
+			width: 150rpx;
+			justify-content: center;
+		}
+
+		&__text {
+			margin-top: 2px;
+			font-size: 12px;
+			color: $up-content-color;
+		}
+	}
+	
+	// 中间按钮样式
+	.up-tabbar-item--mid-button {
+		/* #ifndef APP-NVUE */
+		transform: translateY(-10px);
+		/* #endif */
+	}
+	
+	.up-tabbar-item--mid-button-cover {
+		background-color: #fff;
+		position: absolute;
+		top: 22px;
+		left: -10px;
+		// right: -10px;
+		width: 90px;
+		bottom: 0;
+	}
+	
+	.up-tabbar-item__icon--mid-button {
+		width: 70px;
+		height: 70px;
+		border-radius: 100px;
+		background-color: #ffffff;
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	/* #ifdef MP */
+	// 由于小程序都使用shadow DOM形式实现，需要给影子宿主设置flex: 1才能让其撑开
+	:host {
+		flex: 1;
+		width: 100%;
+	}
+	/* #endif */
+</style>

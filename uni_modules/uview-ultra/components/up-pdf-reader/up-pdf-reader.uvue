@@ -1,0 +1,83 @@
+<template>
+	<view class="up-pdf-reader" :style="readerStyle">
+		<web-view :fullscreen="false"
+			:src="viewerUrl" :style="webViewStyle"
+            :webview-styles="webViewStyle"
+			frameborder="0"
+		></web-view>
+	</view>
+</template>
+
+<script lang="uts">
+	/**
+	 * pdfReader PDF阅读器
+	 * @description 基于pdf.js的PDF阅读器组件
+	 * @tutorial https://uview-plus.jiangruyi.com/components/pdfReader.html
+	 * @property {String}			src				PDF文件地址
+	 * @property {String}	        height			组件高度，默认为'700px'
+	 * @property {String}			pdfjsDomain		pdfjs资源域名，默认为'https://uview-plus.jiangruyi.com/h5'
+	 * @example <up-pdf-reader src="https://example.com/file.pdf"></up-pdf-reader>
+	 */
+	export default {
+		name: 'up-pdf-reader',
+		props: {
+			src: {
+				type: String,
+				default: ''
+			},
+			height: {
+				type: String,
+				default: '500px'
+			},
+			baseUrl: {
+				type: String,
+				default: 'https://uview-plus.jiangruyi.com/h5'
+			}
+		},
+        data() {
+            return {
+                baseUrlInner: 'https://uview-plus.jiangruyi.com/h5',
+                viewerUrl: ''
+            }
+        },
+		computed: {
+			readerStyle(): UTSJSONObject {
+				const style = {} as UTSJSONObject
+				style['height'] = this.height
+				return style
+			},
+			webViewStyle(): UTSJSONObject {
+				const style = {} as UTSJSONObject
+				style['width'] = '750rpx'
+				style['height'] = this.height
+				return style
+			}
+		},
+        watch: {
+            baseUrl(val: string) {
+                this.baseUrlInner = val;
+                this.updateViewerUrl()
+            },
+            src(val: string) {
+                this.updateViewerUrl()
+            }
+        },
+        mounted() {
+            if (this.baseUrl.length > 0) {
+                this.baseUrlInner = this.baseUrl;
+            }
+            this.updateViewerUrl()
+		},
+		methods: {
+			updateViewerUrl(): void {
+				const base = this.baseUrlInner.length > 0 ? this.baseUrlInner : 'https://uview-plus.jiangruyi.com/h5'
+				this.viewerUrl = base + '/static/pdfjs/web/viewer.html?file=' + encodeURIComponent(this.src);
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>	
+	.up-pdf-reader {
+	}
+</style>

@@ -1,0 +1,113 @@
+/**
+ * vue版本动画内置的动画模式有如下：
+ * fade：淡入
+ * zoom：缩放
+ * fade-zoom：缩放淡入
+ * fade-up：上滑淡入
+ * fade-down：下滑淡入
+ * fade-left：左滑淡入
+ * fade-right：右滑淡入
+ * slide-up：上滑进入
+ * slide-down：下滑进入
+ * slide-left：左滑进入
+ * slide-right：右滑进入
+ */
+
+$up-zoom-scale: scale(0.95);
+
+.up-fade-enter-active,
+.up-fade-leave-active {
+	transition-property: opacity;
+}
+
+.up-fade-enter,
+.up-fade-leave-to {
+	opacity: 0
+}
+
+.up-fade-zoom-enter,
+.up-fade-zoom-leave-to {
+	transform: $up-zoom-scale;
+	opacity: 0;
+}
+
+.up-fade-zoom-enter-active,
+.up-fade-zoom-leave-active {
+	transition-property: transform, opacity;
+}
+
+.up-fade-down-enter-active,
+.up-fade-down-leave-active,
+.up-fade-left-enter-active,
+.up-fade-left-leave-active,
+.up-fade-right-enter-active,
+.up-fade-right-leave-active,
+.up-fade-up-enter-active,
+.up-fade-up-leave-active {
+	transition-property: opacity, transform;
+}
+
+.up-fade-up-enter,
+.up-fade-up-leave-to {
+	transform: translateY(100%);
+	opacity: 0
+}
+
+.up-fade-down-enter,
+.up-fade-down-leave-to {
+	transform: translateY(-100%);
+	opacity: 0
+}
+
+.up-fade-left-enter,
+.up-fade-left-leave-to {
+	transform: translateX(-100%);
+	opacity: 0
+}
+
+.up-fade-right-enter,
+.up-fade-right-leave-to {
+	transform: translateX(100%);
+	opacity: 0
+}
+
+.up-slide-down-enter-active,
+.up-slide-down-leave-active,
+.up-slide-left-enter-active,
+.up-slide-left-leave-active,
+.up-slide-right-enter-active,
+.up-slide-right-leave-active,
+.up-slide-up-enter-active,
+.up-slide-up-leave-active {
+	transition-property: transform;
+}
+
+.up-slide-up-enter,
+.up-slide-up-leave-to {
+	transform: translateY(100%)
+}
+
+.up-slide-down-enter,
+.up-slide-down-leave-to {
+	transform: translateY(-100%)
+}
+
+.up-slide-left-enter,
+.up-slide-left-leave-to {
+	transform: translateX(-100%)
+}
+
+.up-slide-right-enter,
+.up-slide-right-leave-to {
+	transform: translateX(100%)
+}
+
+.up-zoom-enter-active,
+.up-zoom-leave-active {
+	transition-property: transform
+}
+
+.up-zoom-enter,
+.up-zoom-leave-to {
+	transform: $up-zoom-scale
+}

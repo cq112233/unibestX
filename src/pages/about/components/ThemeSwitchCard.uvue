@@ -1,11 +1,11 @@
 <template>
-	<Card :title="$t('about.themeTitle')">
+	<Card :title="$t('about.themeTitle')" style="var">
 		<!-- 预览区域 -->
 		<view style="background-color: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0; align-items: center;">
 			<text style="font-size: 12px; color: #94a3b8; margin-bottom: 8px;">{{ $t('about.themePreview') }}</text>
 			
 			<!-- 动态按钮演示 -->
-			<button :style="{ backgroundColor: currentThemeColor, color: '#ffffff', borderRadius: '8px', padding: '6px 20px', fontSize: '14px', border: 'none' }">
+			<button :style="{ backgroundColor: appStore.state.theme, color: '#ffffff', borderRadius: '8px', padding: '6px 20px', fontSize: '14px', border: 'none' }">
 				{{ $t('about.themeButton') }}
 			</button>
 		</view>
@@ -13,8 +13,8 @@
 		<!-- 颜色选择区 -->
 		<view style="flex-direction: row; justify-content: space-around; align-items: center; padding: 10px 0;">
 			<view v-for="(item, index) in colorOptions" :key="index" @click="changeTheme(item)" 
-				  :style="{ width: '40px', height: '40px', borderRadius: '20px', backgroundColor: item, alignItems: 'center', justifyContent: 'center', borderWidth: currentThemeColor === item ? '2px' : '0px', borderStyle: 'solid', borderColor: '#334155' }">
-				<uni-icons v-if="currentThemeColor === item" type="checkmarkempty" size="16" style="color: #ffffff;"></uni-icons>
+				  :style="{ width: '40px', height: '40px', borderRadius: '20px', backgroundColor: item, alignItems: 'center', justifyContent: 'center', borderWidth: appStore.state.theme === item ? '2px' : '0px', borderStyle: 'solid', borderColor: '#334155' }">
+				<uni-icons v-if="appStore.state.theme === item" type="checkmarkempty" size="16" style="color: #ffffff;"></uni-icons>
 			</view>
 		</view>
 	</Card>
@@ -22,8 +22,10 @@
 
 <script setup lang="uts">
 	import Card from './Card.uvue'
-	import { themeColor as currentThemeColor } from '@/src/tabbar/store'
+	import { useAppStore } from '@/src/store'
 	import { t } from '@/src/utils/i18n'
+
+	const appStore = useAppStore()
 
 	// 可选的主题色列表
 	const colorOptions = [
@@ -35,14 +37,7 @@
 	]
 
 	function changeTheme(color : string) {
-		currentThemeColor.value = color
-		
-		// #ifdef H5
-		const docEl = document.documentElement
-		if (docEl != null) {
-			docEl.style.setProperty('--theme-color', color)
-		}
-		// #endif
+		appStore.setTheme(color)
 		
 		uni.showToast({
 			title: t('about.themeSuccess'),

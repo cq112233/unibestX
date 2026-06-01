@@ -1,0 +1,39 @@
+import { defineMixin } from '../../libs/vue'
+
+export const propsTable = defineMixin({
+    props: {
+    	borderColor: {
+    		type: String,
+    		default: '#e4e7ed'
+    	},
+    	align: {
+    		type: String,
+    		default: 'center'
+    	},
+    	// td的内边距
+    	padding: {
+    		type: String,
+    		default: '5px 3px'
+    	},
+    	// 字体大小
+    	fontSize: {
+    		type: [String],
+    		default: '14px'
+    	},
+    	// 字体颜色
+    	color: {
+    		type: String,
+    		default: '#606266'
+    	},
+    	// th的自定义样式
+    	thStyle: {
+    		type: UTSJSONObject,
+    		default: {}
+    	},
+    	// table的背景颜色
+    	bgColor: {
+    		type: String,
+    		default: '#ffffff'
+    	}
+    }
+})

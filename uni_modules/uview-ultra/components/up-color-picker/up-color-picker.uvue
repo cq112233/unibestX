@@ -1,0 +1,931 @@
+<template>
+	<view class="up-color-picker">
+		<view class="up-color-picker__trigger" :style="triggerStyle" @click="open">
+			<slot></slot>
+		</view>
+		<up-popup :show="show" mode="bottom" round="10" @close="close" :closeOnClickOverlay="true">
+			<view class="up-color-picker__content">
+				<view class="up-color-picker__header">
+					<text class="up-color-picker__title">选择颜色</text>
+				</view>
+
+				<view class="up-color-picker__switch">
+					<view
+						class="up-color-picker__switch-item"
+						:class="{ 'up-color-picker__switch-item--active': colorTypeIndex == 0 }"
+						@click="changeColorType(0)"
+					>
+						<text class="up-color-picker__switch-text">纯色</text>
+					</view>
+					<view
+						class="up-color-picker__switch-item"
+						:class="{ 'up-color-picker__switch-item--active': colorTypeIndex == 1 }"
+						@click="changeColorType(1)"
+					>
+						<text class="up-color-picker__switch-text">渐变</text>
+					</view>
+				</view>
+
+				<view v-if="colorTypeIndex == 1" class="up-color-picker__gradient">
+					<view class="up-color-picker__gradient-track" :style="gradientTrackStyle">
+						<view
+							v-for="(item, index) in gradientColors"
+							:key="index"
+							class="up-color-picker__gradient-pointer"
+							:style="getGradientPointerStyle(item)"
+							@touchstart="onPointerTouchStart(index)"
+							@touchmove="onPointerTouchMove"
+							@touchend="onPointerTouchEnd"
+							@click="openColorPickerForGradient(index)"
+						>
+							<view class="up-color-picker__gradient-pointer-inner" :style="getGradientPointerInnerStyle(item)"></view>
+						</view>
+					</view>
+					<view class="up-color-picker__gradient-controls">
+						<up-button type="primary" size="mini" plain class="up-color-picker__add-btn" @click="addGradientColor">添加颜色</up-button>
+						<up-button type="info" size="mini" plain class="up-color-picker__add-btn" @click="removeEditingGradientColor">删除当前</up-button>
+					</view>
+					<view class="up-color-picker__gradient-direction">
+						<text class="up-color-picker__label">方向:</text>
+						<view
+							class="up-color-picker__direction-circle"
+							@touchstart="onDirectionTouchStart"
+							@touchmove="onDirectionTouchMove"
+							@touchend="onDirectionTouchEnd"
+						>
+							<view class="up-color-picker__direction-pointer" :style="directionPointerStyle"></view>
+						</view>
+					</view>
+				</view>
+
+				<view class="up-color-picker__solid">
+					<view
+						class="up-color-picker__saturation"
+						:style="saturationStyle"
+						@touchstart="onSaturationTouchStart"
+						@touchmove="onSaturationTouchMove"
+						@touchend="onSaturationTouchEnd"
+					>
+						<view class="up-color-picker__saturation-white"></view>
+						<view class="up-color-picker__saturation-black"></view>
+						<view class="up-color-picker__saturation-pointer" :style="saturationPointerStyle"></view>
+					</view>
+
+					<view
+						class="up-color-picker__hue"
+						@touchstart="onHueTouchStart"
+						@touchmove="onHueTouchMove"
+						@touchend="onHueTouchEnd"
+					>
+						<view class="up-color-picker__hue-pointer" :style="huePointerStyle"></view>
+					</view>
+
+					<view
+						v-if="colorTypeIndex == 0"
+						class="up-color-picker__alpha"
+						@touchstart="onAlphaTouchStart"
+						@touchmove="onAlphaTouchMove"
+						@touchend="onAlphaTouchEnd"
+					>
+						<view class="up-color-picker__alpha-bg"></view>
+						<view class="up-color-picker__alpha-mask"></view>
+						<view class="up-color-picker__alpha-pointer" :style="alphaPointerStyle"></view>
+					</view>
+				</view>
+
+				<view v-if="normalizedCommonColors.length > 0" class="up-color-picker__common">
+					<text class="up-color-picker__common-title">常用颜色</text>
+					<view class="up-color-picker__common-list">
+						<view
+							v-for="(color, index) in normalizedCommonColors"
+							:key="index"
+							class="up-color-picker__common-item"
+							:style="getColorStyle(color)"
+							@click="selectCommonColor(color)"
+						></view>
+					</view>
+				</view>
+
+				<view class="up-color-picker__footer">
+					<view class="up-color-picker__preview">
+						<view class="up-color-picker__preview-color" :style="previewStyle"></view>
+						<text class="up-color-picker__preview-text">{{ displayColor }}</text>
+					</view>
+					<view class="up-color-picker__actions">
+						<up-button type="primary" size="small" class="up-color-picker__btn" @click="confirm">确定</up-button>
+						<up-button type="info" size="small" class="up-color-picker__btn" @click="close">取消</up-button>
+					</view>
+				</view>
+			</view>
+		</up-popup>
+	</view>
+</template>
+
+<script lang="uts">
+type Point = {
+	x: number,
+	y: number
+}
+
+type GradientColor = {
+	color: string,
+	percent: number
+}
+
+function defaultColors(): Array<string> {
+	return [
+		'#ff0000',
+		'#ff9900',
+		'#ffff00',
+		'#00ff00',
+		'#00ffff',
+		'#0000ff',
+		'#9900ff',
+		'#ffffff',
+		'#000000'
+	] as Array<string>
+}
+
+function clamp(value: number, min: number, max: number): number {
+	return Math.max(min, Math.min(max, value))
+}
+
+function touchPoint(e: UniTouchEvent): UniTouch | null {
+	if (e.touches.length > 0) return e.touches[0]
+	if (e.changedTouches.length > 0) return e.changedTouches[0]
+	return null
+}
+
+function round255(value: number): number {
+	return Math.round(value * 255)
+}
+
+function parseHexPair(value: string, index: number): number {
+	return parseInt(value.substring(index, index + 2), 16)
+}
+
+function rgbToHsl(r: number, g: number, b: number): UTSJSONObject {
+	const rn = r / 255
+	const gn = g / 255
+	const bn = b / 255
+	const max = Math.max(rn, Math.max(gn, bn))
+	const min = Math.min(rn, Math.min(gn, bn))
+	let h = 0
+	let s = 0
+	const l = (max + min) / 2
+	if (max != min) {
+		const d = max - min
+		s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+		if (max == rn) {
+			h = (gn - bn) / d + (gn < bn ? 6 : 0)
+		} else if (max == gn) {
+			h = (bn - rn) / d + 2
+		} else {
+			h = (rn - gn) / d + 4
+		}
+		h = h / 6
+	}
+	return {
+		h: Math.round(h * 360),
+		s: s * 100,
+		l: l * 100
+	} as UTSJSONObject
+}
+
+function hslToRgba(hue: number, saturation: number, lightness: number, alpha: number): string {
+	let h = hue / 360
+	let s = saturation / 100
+	let l = lightness / 100
+	let r = l
+	let g = l
+	let b = l
+	if (s != 0) {
+		const q = l < 0.5 ? l * (1 + s) : l + s - l * s
+		const p = 2 * l - q
+		r = hueToRgb(p, q, h + 1 / 3)
+		g = hueToRgb(p, q, h)
+		b = hueToRgb(p, q, h - 1 / 3)
+	}
+	return 'rgba(' + round255(r).toString() + ', ' + round255(g).toString() + ', ' + round255(b).toString() + ', ' + alpha.toFixed(2) + ')'
+}
+
+function hueToRgb(p: number, q: number, t: number): number {
+	let value = t
+	if (value < 0) value += 1
+	if (value > 1) value -= 1
+	if (value < 1 / 6) return p + (q - p) * 6 * value
+	if (value < 1 / 2) return q
+	if (value < 2 / 3) return p + (q - p) * (2 / 3 - value) * 6
+	return p
+}
+
+function parseSolidColorToState(color: string): UTSJSONObject {
+	if (color.startsWith('#') && (color.length == 7 || color.length == 4)) {
+		let r = 0
+		let g = 0
+		let b = 0
+		if (color.length == 7) {
+			r = parseHexPair(color, 1)
+			g = parseHexPair(color, 3)
+			b = parseHexPair(color, 5)
+		} else {
+			r = parseInt(color.substring(1, 2) + color.substring(1, 2), 16)
+			g = parseInt(color.substring(2, 3) + color.substring(2, 3), 16)
+			b = parseInt(color.substring(3, 4) + color.substring(3, 4), 16)
+		}
+		return rgbToHsl(r, g, b)
+	}
+	return {
+		h: 0,
+		s: 100,
+		l: 50
+	} as UTSJSONObject
+}
+
+function createGradientColor(color: string, percent: number): GradientColor {
+	return {
+		color,
+		percent
+	} as GradientColor
+}
+
+export default {
+	name: 'up-color-picker',
+	props: {
+		modelValue: {
+			type: String,
+			default: '#ff0000'
+		},
+		commonColors: {
+			type: Array,
+			default(): Array<string> {
+				return [] as Array<string>
+			}
+		}
+	},
+	emits: ['update:modelValue', 'confirm', 'close'],
+	data() {
+		return {
+			show: false,
+			colorTypeIndex: 0,
+			hue: 0,
+			saturation: 100,
+			lightness: 50,
+			alpha: 1,
+			saturationPosition: { x: 150, y: 0 } as Point,
+			huePosition: 0,
+			alphaPosition: 300,
+			gradientColors: [
+				createGradientColor('#ff0000', 0),
+				createGradientColor('#0000ff', 1)
+			] as Array<GradientColor>,
+			currentDirectionValue: 'to right',
+			currentColor: '#ff0000',
+			draggingPointerIndex: -1,
+			directionPointer: { x: 40, y: 20 } as Point,
+			editingGradientIndex: -1,
+			previewType: 'solid'
+		}
+	},
+	computed: {
+		normalizedCommonColors(): Array<string> {
+			const colors = this.commonColors as Array<string> | null
+			if (colors != null && colors.length > 0) {
+				return colors
+			}
+			return defaultColors()
+		},
+		triggerStyle(): UTSJSONObject {
+			return {
+				backgroundColor: this.modelValue
+			} as UTSJSONObject
+		},
+		displayColor(): string {
+			if (this.previewType == 'gradient') {
+				return this.gradientStyleText()
+			}
+			if (this.previewType == 'gradient-point' && this.editingGradientIndex >= 0 && this.editingGradientIndex < this.gradientColors.length) {
+				return this.gradientColors[this.editingGradientIndex].color
+			}
+			return this.currentColor
+		},
+		previewStyle(): UTSJSONObject {
+			return {
+				background: this.displayColor,
+				backgroundColor: this.displayColor
+			} as UTSJSONObject
+		},
+		saturationStyle(): UTSJSONObject {
+			return {
+				backgroundColor: 'hsl(' + this.hue.toString() + ', 100%, 50%)'
+			} as UTSJSONObject
+		},
+		saturationPointerStyle(): UTSJSONObject {
+			return {
+				left: this.saturationPosition.x.toString() + 'px',
+				top: this.saturationPosition.y.toString() + 'px'
+			} as UTSJSONObject
+		},
+		huePointerStyle(): UTSJSONObject {
+			return {
+				left: this.huePosition.toString() + 'px'
+			} as UTSJSONObject
+		},
+		alphaPointerStyle(): UTSJSONObject {
+			return {
+				left: this.alphaPosition.toString() + 'px'
+			} as UTSJSONObject
+		},
+		gradientTrackStyle(): UTSJSONObject {
+			return {
+				background: this.gradientStyleText()
+			} as UTSJSONObject
+		},
+		directionPointerStyle(): UTSJSONObject {
+			return {
+				left: this.directionPointer.x.toString() + 'px',
+				top: this.directionPointer.y.toString() + 'px'
+			} as UTSJSONObject
+		}
+	},
+	watch: {
+		modelValue(newVal: string) {
+			if (!this.show) {
+				this.initColor(newVal)
+			}
+		}
+	},
+	mounted(): void {
+		this.initColor(this.modelValue)
+	},
+	methods: {
+		open(): void {
+			this.initColor(this.modelValue)
+			this.show = true
+		},
+		close(): void {
+			this.show = false
+			this.$emit('close')
+		},
+		confirm(): void {
+			const color = this.colorTypeIndex == 1 ? this.gradientStyleText() : this.currentColor
+			this.$emit('update:modelValue', color)
+			this.$emit('confirm', color)
+			this.show = false
+			this.editingGradientIndex = -1
+			this.previewType = this.colorTypeIndex == 0 ? 'solid' : 'gradient'
+			this.$emit('close')
+		},
+		initColor(color: string): void {
+			if (color.includes('linear-gradient')) {
+				this.colorTypeIndex = 1
+				this.parseGradientColor(color)
+				this.previewType = 'gradient'
+			} else {
+				this.colorTypeIndex = 0
+				this.parseSolidColor(color)
+				this.previewType = 'solid'
+			}
+			this.setDirectionPointerByAngle(this.getDirectionAngle(this.currentDirectionValue))
+		},
+		parseSolidColor(color: string): void {
+			const state = parseSolidColorToState(color)
+			this.hue = state['h'] as number
+			this.saturation = state['s'] as number
+			this.lightness = state['l'] as number
+			this.alpha = 1
+			this.huePosition = this.hue / 360 * 300
+			this.saturationPosition = {
+				x: this.saturation / 100 * 300,
+				y: (100 - this.lightness) / 100 * 150
+			} as Point
+			this.alphaPosition = 300
+			this.currentColor = color
+		},
+		parseGradientColor(gradient: string): void {
+			this.currentColor = gradient
+			const colors = [] as Array<GradientColor>
+			const firstHash = gradient.indexOf('#')
+			if (firstHash >= 0 && gradient.length >= firstHash + 7) {
+				colors.push(createGradientColor(gradient.substring(firstHash, firstHash + 7), 0))
+			}
+			const secondHash = gradient.indexOf('#', firstHash + 1)
+			if (secondHash >= 0 && gradient.length >= secondHash + 7) {
+				colors.push(createGradientColor(gradient.substring(secondHash, secondHash + 7), 1))
+			}
+			if (colors.length >= 2) {
+				this.gradientColors = colors
+			}
+		},
+		changeColorType(index: number): void {
+			this.colorTypeIndex = index
+			this.previewType = index == 0 ? 'solid' : 'gradient'
+			if (index == 0 && this.currentColor.includes('linear-gradient')) {
+				this.currentColor = this.gradientColors[0].color
+				this.parseSolidColor(this.currentColor)
+			}
+		},
+		gradientStyleText(): string {
+			let colors = ''
+			for (let i = 0; i < this.gradientColors.length; i++) {
+				if (i > 0) colors += ', '
+				colors += this.gradientColors[i].color + ' ' + Math.round(this.gradientColors[i].percent * 100).toString() + '%'
+			}
+			return 'linear-gradient(' + this.currentDirectionValue + ', ' + colors + ')'
+		},
+		getGradientPointerStyle(item: GradientColor): UTSJSONObject {
+			return {
+				left: (item.percent * 300).toString() + 'px'
+			} as UTSJSONObject
+		},
+		getGradientPointerInnerStyle(item: GradientColor): UTSJSONObject {
+			return {
+				backgroundColor: item.color
+			} as UTSJSONObject
+		},
+		selectCommonColor(color: string): void {
+			if (this.colorTypeIndex == 1 && this.editingGradientIndex >= 0 && this.editingGradientIndex < this.gradientColors.length) {
+				this.gradientColors[this.editingGradientIndex].color = color
+				this.currentColor = color
+				this.previewType = 'gradient-point'
+			} else {
+				this.parseSolidColor(color)
+				this.previewType = 'solid'
+			}
+		},
+		getColorStyle(color: string): UTSJSONObject {
+			return {
+				backgroundColor: color
+			} as UTSJSONObject
+		},
+		openColorPickerForGradient(index: number): void {
+			if (index < 0 || index >= this.gradientColors.length) return
+			this.editingGradientIndex = index
+			this.currentColor = this.gradientColors[index].color
+			this.parseSolidColor(this.currentColor)
+			this.colorTypeIndex = 1
+			this.previewType = 'gradient-point'
+		},
+		addGradientColor(): void {
+			if (this.gradientColors.length >= 5) return
+			this.gradientColors.push(createGradientColor(this.currentColor, 1))
+			this.sortGradientColors()
+		},
+		removeEditingGradientColor(): void {
+			if (this.gradientColors.length <= 2) return
+			if (this.editingGradientIndex < 0 || this.editingGradientIndex >= this.gradientColors.length) return
+			this.gradientColors.splice(this.editingGradientIndex, 1)
+			this.editingGradientIndex = -1
+			this.previewType = 'gradient'
+		},
+		onPointerTouchStart(index: number): void {
+			this.draggingPointerIndex = index
+			this.editingGradientIndex = index
+			this.currentColor = this.gradientColors[index].color
+			this.previewType = 'gradient-point'
+		},
+		onPointerTouchMove(e: UniTouchEvent): void {
+			if (this.draggingPointerIndex < 0 || this.draggingPointerIndex >= this.gradientColors.length) return
+			const touch = touchPoint(e)
+			if (touch == null) return
+			this.updateTrackPercent(touch.clientX)
+		},
+		onPointerTouchEnd(): void {
+			this.draggingPointerIndex = -1
+		},
+		updateTrackPercent(clientX: number): void {
+			uni.createSelectorQuery()
+				.in(this)
+				.select('.up-color-picker__gradient-track')
+				.boundingClientRect()
+				.exec((res: Array<any>) => {
+					if (res.length == 0 || res[0] == null) return
+					const rect = res[0] as UTSJSONObject
+					const left = rect['left'] as number
+					const width = rect['width'] as number
+					const percent = clamp((clientX - left) / width, 0, 1)
+					this.gradientColors[this.draggingPointerIndex].percent = percent
+					this.sortGradientColors()
+				})
+		},
+		sortGradientColors(): void {
+			for (let i = 0; i < this.gradientColors.length - 1; i++) {
+				for (let j = i + 1; j < this.gradientColors.length; j++) {
+					if (this.gradientColors[i].percent > this.gradientColors[j].percent) {
+						const temp = this.gradientColors[i]
+						this.gradientColors[i] = this.gradientColors[j]
+						this.gradientColors[j] = temp
+					}
+				}
+			}
+		},
+		onSaturationTouchStart(e: UniTouchEvent): void { this.updateSaturationPosition(e) },
+		onSaturationTouchMove(e: UniTouchEvent): void { this.updateSaturationPosition(e) },
+		onSaturationTouchEnd(e: UniTouchEvent): void { this.updateSaturationPosition(e) },
+		onHueTouchStart(e: UniTouchEvent): void { this.updateHuePosition(e) },
+		onHueTouchMove(e: UniTouchEvent): void { this.updateHuePosition(e) },
+		onHueTouchEnd(e: UniTouchEvent): void { this.updateHuePosition(e) },
+		onAlphaTouchStart(e: UniTouchEvent): void { this.updateAlphaPosition(e) },
+		onAlphaTouchMove(e: UniTouchEvent): void { this.updateAlphaPosition(e) },
+		onAlphaTouchEnd(e: UniTouchEvent): void { this.updateAlphaPosition(e) },
+		updateSaturationPosition(e: UniTouchEvent): void {
+			const touch = touchPoint(e)
+			if (touch == null) return
+			uni.createSelectorQuery()
+				.in(this)
+				.select('.up-color-picker__saturation')
+				.boundingClientRect()
+				.exec((res: Array<any>) => {
+					if (res.length == 0 || res[0] == null) return
+					const rect = res[0] as UTSJSONObject
+					const left = rect['left'] as number
+					const top = rect['top'] as number
+					const width = rect['width'] as number
+					const height = rect['height'] as number
+					const x = clamp(touch.clientX - left, 0, width)
+					const y = clamp(touch.clientY - top, 0, height)
+					this.saturationPosition = { x, y } as Point
+					this.saturation = x / width * 100
+					this.lightness = 100 - y / height * 100
+					this.updateSolidColor()
+				})
+		},
+		updateHuePosition(e: UniTouchEvent): void {
+			const touch = touchPoint(e)
+			if (touch == null) return
+			uni.createSelectorQuery()
+				.in(this)
+				.select('.up-color-picker__hue')
+				.boundingClientRect()
+				.exec((res: Array<any>) => {
+					if (res.length == 0 || res[0] == null) return
+					const rect = res[0] as UTSJSONObject
+					const left = rect['left'] as number
+					const width = rect['width'] as number
+					const x = clamp(touch.clientX - left, 0, width)
+					this.huePosition = x
+					this.hue = Math.round(x / width * 360)
+					this.updateSolidColor()
+				})
+		},
+		updateAlphaPosition(e: UniTouchEvent): void {
+			const touch = touchPoint(e)
+			if (touch == null) return
+			uni.createSelectorQuery()
+				.in(this)
+				.select('.up-color-picker__alpha')
+				.boundingClientRect()
+				.exec((res: Array<any>) => {
+					if (res.length == 0 || res[0] == null) return
+					const rect = res[0] as UTSJSONObject
+					const left = rect['left'] as number
+					const width = rect['width'] as number
+					const x = clamp(touch.clientX - left, 0, width)
+					this.alphaPosition = x
+					this.alpha = x / width
+					this.updateSolidColor()
+				})
+		},
+		updateSolidColor(): void {
+			const color = hslToRgba(this.hue, this.saturation, this.lightness, this.alpha)
+			if (this.colorTypeIndex == 1 && this.editingGradientIndex >= 0 && this.editingGradientIndex < this.gradientColors.length) {
+				this.gradientColors[this.editingGradientIndex].color = color
+				this.currentColor = color
+				this.previewType = 'gradient-point'
+			} else {
+				this.currentColor = color
+				this.previewType = 'solid'
+			}
+		},
+		onDirectionTouchStart(e: UniTouchEvent): void { this.updateDirection(e) },
+		onDirectionTouchMove(e: UniTouchEvent): void { this.updateDirection(e) },
+		onDirectionTouchEnd(e: UniTouchEvent): void { this.updateDirection(e) },
+		updateDirection(e: UniTouchEvent): void {
+			const touch = touchPoint(e)
+			if (touch == null) return
+			uni.createSelectorQuery()
+				.in(this)
+				.select('.up-color-picker__direction-circle')
+				.boundingClientRect()
+				.exec((res: Array<any>) => {
+					if (res.length == 0 || res[0] == null) return
+					const rect = res[0] as UTSJSONObject
+					const left = rect['left'] as number
+					const top = rect['top'] as number
+					const width = rect['width'] as number
+					const height = rect['height'] as number
+					const centerX = left + width / 2
+					const centerY = top + height / 2
+					const x = touch.clientX - centerX
+					const y = touch.clientY - centerY
+					const distance = Math.sqrt(x * x + y * y)
+					const radius = width / 2
+					const ratio = distance > radius ? radius / distance : 1
+					this.directionPointer = {
+						x: x * ratio + width / 2,
+						y: y * ratio + height / 2
+					} as Point
+					let angle = Math.atan2(y, x) * 180 / Math.PI
+					if (angle < 0) angle += 360
+					this.updateGradientDirection(angle)
+				})
+		},
+		updateGradientDirection(angle: number): void {
+			if (angle >= 315 || angle < 45) {
+				this.currentDirectionValue = 'to right'
+			} else if (angle >= 45 && angle < 135) {
+				this.currentDirectionValue = 'to bottom'
+			} else if (angle >= 135 && angle < 225) {
+				this.currentDirectionValue = 'to left'
+			} else {
+				this.currentDirectionValue = 'to top'
+			}
+		},
+		getDirectionAngle(direction: string): number {
+			if (direction == 'to bottom') return 90
+			if (direction == 'to left') return 180
+			if (direction == 'to top') return 270
+			if (direction == 'to bottom right') return 45
+			if (direction == 'to bottom left') return 135
+			return 0
+		},
+		setDirectionPointerByAngle(angle: number): void {
+			const radius = 20
+			const radian = angle * Math.PI / 180
+			this.directionPointer = {
+				x: radius * Math.cos(radian) + 20,
+				y: radius * Math.sin(radian) + 20
+			} as Point
+		}
+	}
+}
+</script>
+
+<style lang="scss" scoped>
+.up-color-picker__trigger {
+	width: 32px;
+	height: 32px;
+	border-radius: 4px;
+	border: 1px solid #e5e5e5;
+}
+
+.up-color-picker__content {
+	width: 100%;
+	padding: 20px;
+	background-color: #ffffff;
+}
+
+.up-color-picker__header {
+	align-items: center;
+	margin-bottom: 16px;
+}
+
+.up-color-picker__title {
+	font-size: 18px;
+	font-weight: bold;
+	color: #333333;
+}
+
+.up-color-picker__switch {
+	display: flex;
+	flex-direction: row;
+	margin-bottom: 18px;
+	border: 1px solid #e5e5e5;
+	border-radius: 6px;
+	overflow: hidden;
+}
+
+.up-color-picker__switch-item {
+	flex: 1;
+	height: 34px;
+	align-items: center;
+	justify-content: center;
+	background-color: #ffffff;
+}
+
+.up-color-picker__switch-item--active {
+	background-color: #2979ff;
+}
+
+.up-color-picker__switch-text {
+	font-size: 14px;
+	color: #303133;
+}
+
+.up-color-picker__gradient {
+	margin-bottom: 12px;
+}
+
+.up-color-picker__gradient-track {
+	position: relative;
+	width: 300px;
+	height: 32px;
+	border-radius: 4px;
+	margin-bottom: 15px;
+}
+
+.up-color-picker__gradient-pointer {
+	position: absolute;
+	top: -10px;
+	width: 20px;
+	height: 52px;
+	transform: translateX(-10px);
+	align-items: center;
+}
+
+.up-color-picker__gradient-pointer-inner {
+	width: 20px;
+	height: 20px;
+	border-radius: 10px;
+	border: 2px solid #ffffff;
+	box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+}
+
+.up-color-picker__gradient-controls {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	margin-bottom: 15px;
+}
+
+.up-color-picker__add-btn {
+	margin-right: 10px;
+}
+
+.up-color-picker__gradient-direction {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin: 10px 0;
+}
+
+.up-color-picker__label {
+	font-size: 14px;
+	color: #606266;
+	margin-right: 12px;
+}
+
+.up-color-picker__direction-circle {
+	width: 40px;
+	height: 40px;
+	border-radius: 20px;
+	background-color: #f5f7fa;
+	position: relative;
+	border: 2px solid #eeeeee;
+}
+
+.up-color-picker__direction-pointer {
+	position: absolute;
+	width: 8px;
+	height: 8px;
+	background-color: #ffffff;
+	border: 2px solid #333333;
+	border-radius: 4px;
+	transform: translate(-4px, -4px);
+}
+
+.up-color-picker__solid {
+	margin-bottom: 10px;
+}
+
+.up-color-picker__saturation {
+	position: relative;
+	width: 300px;
+	height: 150px;
+	border-radius: 4px;
+	margin-bottom: 15px;
+	overflow: hidden;
+}
+
+.up-color-picker__saturation-white {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	background: linear-gradient(to right, #ffffff, rgba(255, 255, 255, 0));
+}
+
+.up-color-picker__saturation-black {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	background: linear-gradient(to top, #000000, rgba(0, 0, 0, 0));
+}
+
+.up-color-picker__saturation-pointer {
+	position: absolute;
+	width: 12px;
+	height: 12px;
+	border: 2px solid #ffffff;
+	border-radius: 6px;
+	transform: translate(-6px, -6px);
+	box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+}
+
+.up-color-picker__hue,
+.up-color-picker__alpha {
+	position: relative;
+	width: 300px;
+	height: 12px;
+	border-radius: 6px;
+	margin-bottom: 15px;
+}
+
+.up-color-picker__hue {
+	background: linear-gradient(to right, #ff0000 0%, #ffff00 16.66%, #00ff00 33.33%, #00ffff 50%, #0000ff 66.66%, #ff00ff 83.33%, #ff0000 100%);
+}
+
+.up-color-picker__alpha {
+	overflow: hidden;
+	background-color: #eeeeee;
+}
+
+.up-color-picker__alpha-bg,
+.up-color-picker__alpha-mask {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+}
+
+.up-color-picker__alpha-mask {
+	background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
+}
+
+.up-color-picker__hue-pointer,
+.up-color-picker__alpha-pointer {
+	position: absolute;
+	width: 4px;
+	height: 16px;
+	background-color: #ffffff;
+	border: 1px solid #cccccc;
+	border-radius: 2px;
+	transform: translateX(-2px);
+	top: -2px;
+	box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+}
+
+.up-color-picker__common {
+	margin-top: 16px;
+}
+
+.up-color-picker__common-title {
+	margin-bottom: 10px;
+	font-size: 14px;
+	color: #666666;
+}
+
+.up-color-picker__common-list {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+.up-color-picker__common-item {
+	width: 24px;
+	height: 24px;
+	border-radius: 12px;
+	margin-right: 10px;
+	margin-bottom: 10px;
+	border: 1px solid #eeeeee;
+}
+
+.up-color-picker__footer {
+	margin-top: 20px;
+}
+
+.up-color-picker__preview {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin-bottom: 15px;
+}
+
+.up-color-picker__preview-color {
+	width: 40px;
+	height: 40px;
+	border-radius: 4px;
+	border: 1px solid #eeeeee;
+	margin-right: 10px;
+}
+
+.up-color-picker__preview-text {
+	font-size: 14px;
+	color: #333333;
+	flex: 1;
+}
+
+.up-color-picker__actions {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+}
+
+.up-color-picker__btn {
+	margin-left: 10px;
+}
+</style>

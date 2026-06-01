@@ -1,0 +1,287 @@
+<template>
+	<up-transition
+	    mode="fade"
+	    :show="show"
+	>
+		<view
+		    class="up-alert"
+		    :class="[`up-alert--${type}--${effect}`]"
+		    @tap.stop="clickHandler"
+		    :style="[$upAddStyle(customStyle)]"
+		>
+			<view
+			    class="up-alert__icon"
+			    v-if="showIcon"
+			>
+				<up-icon
+				    :name="iconName"
+				    size="18"
+				    :color="iconColor"
+				></up-icon>
+			</view>
+			<view
+			    class="up-alert__content"
+			    :style="[{
+					paddingRight: closable ? '20px' : 0
+				}]"
+			>
+				<text
+				    class="up-alert__content__title"
+				    v-if="title"
+					:style="[style1]"
+				    :class="[effect === 'dark' ? 'up-alert__text--dark' : `up-alert__text--${type}--light`]"
+				>{{ title }}</text>
+				<text
+				    class="up-alert__content__desc"
+					v-if="description"
+					:style="[style1]"
+				    :class="[effect === 'dark' ? 'up-alert__text--dark' : `up-alert__text--${type}--light`]"
+				>{{ description }}</text>
+			</view>
+			<view
+			    class="up-alert__close"
+			    v-if="closable"
+			    @tap.stop="closeHandler"
+			>
+				<up-icon
+				    name="close"
+				    :color="iconColor"
+				    size="15"
+				></up-icon>
+			</view>
+		</view>
+	</up-transition>
+</template>
+
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+import { mpSharedMpOptions } from '../../libs/composable/useMp'
+import { addUnit, addStyle } from '../../libs/function/index'
+import defProps from './alert'
+
+// options
+defineOptions({
+  //...mpSharedMpOptions,
+  name: 'up-alert'
+})
+
+// 定义props
+const props = defineProps({
+    // 主题，success/warning/info/error
+    type: {
+        type: String,
+        default: defProps.getString('alert.type')
+    },
+    // 辅助性文字
+    description: {
+        type: String,
+        default: defProps.getString('alert.description')
+    },
+    // 是否可关闭
+    closable: {
+        type: Boolean,
+        default: defProps.getBoolean('alert.closable')
+    },
+    // 是否显示图标
+    showIcon: {
+        type: Boolean,
+        default: defProps.getBoolean('alert.showIcon')
+    },
+    // 浅或深色调，light-浅色，dark-深色
+    effect: {
+        type: String,
+        default: defProps.getString('alert.effect')
+    },
+    // 文字是否居中
+    center: {
+        type: Boolean,
+        default: defProps.getBoolean('alert.center')
+    },
+    // 字体大小
+    fontSize: {
+        type: [String, Number],
+        default: defProps.getNumber('alert.fontSize')
+    },
+    // 自定义样式
+    customStyle: {
+        type: Object,
+        default: () => ({})
+    },
+    // 标题文字
+    title: {
+        type: String,
+        default: defProps.getString('alert.title', '')
+    }
+});
+
+// 定义事件
+const emit = defineEmits(['click']);
+
+// 响应式数据
+const show = ref(true);
+
+// 计算属性
+const style1 = computed(() => {
+    return {
+        fontSize: addUnit(props.fontSize),
+        textAlign: props.center ? 'center' : 'left'
+    }
+});
+
+const iconColor = computed(() => {
+    return props.effect == 'light' ? props.type : '#ffffff'
+});
+
+// 不同主题对应不同的图标
+const iconName = computed(() => {
+    switch (props.type) {
+        case 'success':
+            return 'checkmark-circle-fill';
+        case 'error':
+            return 'close-circle-fill';
+        case 'warning':
+            return 'error-circle-fill';
+        case 'info':
+            return 'info-circle-fill';
+        case 'primary':
+            return 'more-circle-fill';
+        default: 
+            return 'error-circle-fill';
+    }
+});
+
+// 方法
+const addUnitFunc = (val: any) => {
+    return addUnit(val)
+};
+
+const addStyleFunc = (val: any) => {
+    return addStyle(val)
+};
+
+// 点击内容
+const clickHandler = () => {
+    emit('click')
+};
+
+// 点击关闭按钮
+const closeHandler = () => {
+    show.value = false
+};
+</script>
+
+<style lang="scss" scoped>
+	@import "../../libs/css/components.scss";
+
+	.up-alert {
+		position: relative;
+		background-color: $up-primary;
+		padding: 8px 10px;
+		@include flex(row);
+		align-items: center;
+		border-top-left-radius: 4px;
+		border-top-right-radius: 4px;
+		border-bottom-left-radius: 4px;
+		border-bottom-right-radius: 4px;
+
+		&--primary--dark {
+			background-color: $up-primary;
+		}
+
+		&--primary--light {
+			background-color: #ecf5ff;
+		}
+
+		&--error--dark {
+			background-color: $up-error;
+		}
+
+		&--error--light {
+			background-color: #FEF0F0;
+		}
+
+		&--success--dark {
+			background-color: $up-success;
+		}
+
+		&--success--light {
+			background-color: #f5fff0;
+		}
+
+		&--warning--dark {
+			background-color: $up-warning;
+		}
+
+		&--warning--light {
+			background-color: #FDF6EC;
+		}
+
+		&--info--dark {
+			background-color: $up-info;
+		}
+
+		&--info--light {
+			background-color: #f4f4f5;
+		}
+
+		&__icon {
+			margin-right: 5px;
+		}
+
+		&__content {
+			@include flex(column);
+			flex: 1;
+
+			&__title {
+				color: $up-main-color;
+				font-size: 14px;
+				font-weight: bold;
+				color: #fff;
+				margin-bottom: 2px;
+			}
+
+			&__desc {
+				color: $up-main-color;
+				font-size: 14px;
+				flex-wrap: wrap;
+				color: #fff;
+			}
+		}
+
+		&__title--dark,
+		&__desc--dark {
+			color: #FFFFFF;
+		}
+
+		&__text--primary--light,
+		&__text--primary--light {
+			color: $up-primary;
+		}
+
+		&__text--success--light,
+		&__text--success--light {
+			color: $up-success;
+		}
+
+		&__text--warning--light,
+		&__text--warning--light {
+			color: $up-warning;
+		}
+
+		&__text--error--light,
+		&__text--error--light {
+			color: $up-error;
+		}
+
+		&__text--info--light,
+		&__text--info--light {
+			color: $up-info;
+		}
+
+		&__close {
+			position: absolute;
+			top: 11px;
+			right: 10px;
+		}
+	}
+</style>

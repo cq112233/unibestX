@@ -1,0 +1,264 @@
+﻿<template>
+  <view class="up-virtual-list" :style="rootStyle" ref="container">
+    <scroll-view
+      class="virtual-scroll-container"
+      :scroll-y="true"
+      :scroll-top="scrollTop"
+      :style="{ height: '100%' }"
+      @scroll="handleScroll"
+    >
+      <view class="scroll-content">
+        <view :style="{ height: topPlaceholderHeight + 'px' }"></view>
+        
+        <view 
+          v-for="item in visibleItems" 
+          :key="getItemKey(item)"
+          class="list-item"
+          :style="{ height: itemHeight + 'px' }"
+        >
+          <slot :item="item" :index="getItemVirtualIndex(item)"></slot>
+        </view>
+        
+        <view :style="{ height: bottomPlaceholderHeight + 'px' }"></view>
+      </view>
+    </scroll-view>
+  </view>
+</template>
+
+<script>
+import type { PropType } from 'vue';
+import { addUnit, deepMerge } from '../../libs/function/index.uts'
+
+function createListData(): Array<UTSJSONObject> {
+  return [] as Array<UTSJSONObject>
+}
+
+function createItem(item: UTSJSONObject, virtualIndex: number): UTSJSONObject {
+  return deepMerge(item, {
+    _virtualIndex: virtualIndex
+  } as UTSJSONObject)
+}
+
+function valueToString(value: any | null): string {
+  return value == null ? '' : value.toString()
+}
+
+export default {
+  name: 'up-virtual-list',
+  props: {
+    listData: {
+      type: Array as PropType<Array<UTSJSONObject>>,
+      default(): Array<UTSJSONObject> {
+        return createListData()
+      }
+    },
+    itemHeight: {
+      type: Number,
+      default: 50
+    },
+    height: {
+      type: [String, Number],
+      default: '100%'
+    },
+    buffer: {
+      type: Number,
+      default: 4
+    },
+    keyField: {
+      type: String,
+      default: 'id'
+    },
+    scrollTop: {
+      type: Number,
+      default: 0
+    }
+  },
+  data() {
+    return {
+      startIndex: 0,
+      containerHeight: 0
+    }
+  },
+  computed: {
+    remain(): number {
+      if (this.containerHeight <= 0) {
+        const defaultRemain = Math.ceil(500 / this.itemHeight)
+        return defaultRemain > 0 ? defaultRemain : 10
+      }
+      const calculated = Math.ceil(this.containerHeight / this.itemHeight)
+      return Math.max(1, calculated)
+    },
+    visibleCount(): number {
+      return this.remain + this.buffer
+    },
+    rootStyle(): UTSJSONObject {
+      const style = {} as UTSJSONObject
+      style['height'] = addUnit(this.height)
+      return style
+    },
+    visibleItems(): Array<UTSJSONObject> {
+      const list = this.getListData()
+      const start = Math.max(0, this.startIndex - Math.floor(this.buffer / 2))
+      const end = Math.min(list.length, start + this.visibleCount)
+      const items = [] as Array<UTSJSONObject>
+      for (let i = start; i < end; i++) {
+        const item = list[i] as UTSJSONObject
+        items.push(createItem(item, i))
+      }
+      return items
+    },
+    topPlaceholderHeight(): number {
+      const start = Math.max(0, this.startIndex - Math.floor(this.buffer / 2))
+      return start * this.itemHeight
+    },
+    bottomPlaceholderHeight(): number {
+      const list = this.getListData()
+      const start = Math.max(0, this.startIndex - Math.floor(this.buffer / 2))
+      const end = Math.min(list.length, start + this.visibleCount)
+      return (list.length - end) * this.itemHeight
+    }
+  },
+  emits: ['update:scrollTop', 'scroll'],
+  watch: {
+    listData: {
+      handler() {
+        this.updateVisibleItems()
+      },
+      immediate: true
+    },
+    scrollTop: {
+      handler(_newVal: number) {
+        this.updateVisibleItems()
+      }
+    }
+  },
+  mounted() {
+    this.measureContainerHeight()
+  },
+  methods: {
+    addUnit,
+    measureContainerHeight(): void {
+      this.$nextTick(() => {
+        // #ifdef H5
+        const containerRef = this.$refs['container'] as any
+        if (containerRef != null) {
+          const element = containerRef.$el != null ? containerRef.$el : containerRef
+          const offsetHeight = element.offsetHeight
+          this.containerHeight = offsetHeight != null ? offsetHeight as number : 500
+        }
+        // #endif
+
+        // #ifndef H5
+        const query = uni.createSelectorQuery().in(this)
+        query.select('.up-virtual-list').boundingClientRect((res: any) => {
+          const rect = res as NodeInfo | null
+          if (rect != null && rect.height != null) {
+            this.containerHeight = rect.height as number
+          } else {
+            this.containerHeight = this.calculateDefaultHeight()
+          }
+        }).exec()
+        // #endif
+      })
+    },
+    calculateDefaultHeight(): number {
+      const height = this.height
+      if (typeof height === 'number') {
+        return height
+      }
+
+      if (typeof height === 'string') {
+        if (height.indexOf('px') >= 0) {
+          const parsed = parseInt(height)
+          return isNaN(parsed) ? 500 : parsed
+        }
+        if (height.indexOf('vh') >= 0) {
+          const vh = parseInt(height)
+          return isNaN(vh) ? 500 : (vh / 100) * this.getViewportHeight()
+        }
+        if (height.indexOf('%') >= 0) {
+          return 500
+        }
+        const num = parseInt(height)
+        return isNaN(num) ? 500 : num
+      }
+
+      return 500
+    },
+    getViewportHeight(): number {
+      // #ifdef H5
+      return window.innerHeight
+      // #endif
+
+      // #ifndef H5
+      try {
+        const res = uni.getSystemInfoSync()
+        return res.windowHeight
+      } catch (e) {
+        return 600
+      }
+      // #endif
+    },
+    getListData(): Array<UTSJSONObject> {
+      return this.listData as Array<UTSJSONObject>
+    },
+    getItemVirtualIndex(item: UTSJSONObject): number {
+      const index = item['_virtualIndex']
+      if (index == null) {
+        return 0
+      }
+      if (typeof index === 'number') {
+        return index
+      }
+      const parsed = parseInt(index.toString())
+      return isNaN(parsed) ? 0 : parsed
+    },
+    getItemKey(item: UTSJSONObject): string {
+      const itemKey = item[this.keyField]
+      if (itemKey != null && valueToString(itemKey) != '') {
+        return valueToString(itemKey)
+      }
+      return this.getItemVirtualIndex(item).toString()
+    },
+    updateVisibleItems(): void {
+      const index = Math.floor(this.scrollTop / this.itemHeight)
+      this.startIndex = Math.max(0, index)
+    },
+    handleScroll(e: UniScrollEvent): void {
+      const scrollTop = e.detail.scrollTop
+      this.$emit('update:scrollTop', scrollTop)
+      this.$emit('scroll', scrollTop)
+    },
+    handleTouchMove(e: UniEvent): void {
+      e.stopPropagation()
+    },
+    getVisibleRange(): UTSJSONObject {
+      const list = this.getListData()
+      const start = Math.max(0, this.startIndex - Math.floor(this.buffer / 2))
+      const end = Math.min(list.length, start + this.visibleCount)
+      return {
+        start: start,
+        end: end
+      } as UTSJSONObject
+    }
+  }
+}
+</script>
+
+<style scoped lang="scss">
+.up-virtual-list {
+  position: relative;
+  overflow: hidden;
+}
+
+.virtual-scroll-container {
+  height: 100%;
+}
+
+.scroll-content {
+  position: relative;
+}
+
+.list-item {
+}
+</style>

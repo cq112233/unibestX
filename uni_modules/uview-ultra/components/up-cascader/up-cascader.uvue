@@ -1,0 +1,373 @@
+<template>
+	<up-popup
+		:show="popupShow"
+		mode="bottom"
+		:popup="false"
+		:mask="true"
+		:closeable="closeable"
+		:safe-area-inset-bottom="true"
+		close-icon-color="#ffffff"
+		:z-index="uZIndex"
+		:maskCloseAble="maskCloseAble"
+		@close="close"
+	>
+		<view class="up-p-t-30 up-p-l-20 up-m-b-10" v-if="headerDirection == 'column'">
+			<up-steps v-if="popupShow" dot direction="column" v-model:current="tabsIndex">
+				<up-steps-item
+					v-for="(item, index) in genTabsList"
+					:key="index"
+					:title="getTabName(item)"
+					@click="tabsIndex = index"
+				></up-steps-item>
+			</up-steps>
+		</view>
+		<view class="up-p-t-20 up-m-b-10" v-else>
+			<up-tabs
+				v-if="popupShow"
+				:list="genTabsList"
+				:scrollable="true"
+				v-model:current="tabsIndex"
+				@change="tabsChange"
+				ref="tabs"
+			></up-tabs>
+		</view>
+		<view class="area-box">
+			<view class="area-box__levels up-flex" :class="{ 'change': isChange }" :style="levelWrapStyle">
+				<template v-for="(levelData, levelIndex) in levelList" :key="levelIndex">
+					<view
+						v-if="optionsCols == 2 || levelIndex == tabsIndex"
+						class="area-item"
+						:style="getAreaItemStyle()"
+					>
+						<view class="up-padding-10 up-bg-gray" style="height: 100%;">
+							<scroll-view :scroll-y="true" style="height: 100%;">
+								<up-cell-group v-if="canShowLevel(levelIndex)">
+									<up-cell
+										v-for="(item,index) in levelData"
+										:key="index"
+										:title="getItemLabel(item)"
+										:arrow="false"
+										:index="index"
+										@click="levelChange(levelIndex, index)"
+									>
+										<template v-slot:right-icon>
+											<up-icon
+												v-if="isSelected(levelIndex, index)"
+												size="17"
+												name="checkbox-mark"
+											></up-icon>
+										</template>
+									</up-cell>
+								</up-cell-group>
+							</scroll-view>
+						</view>
+					</view>
+				</template>
+			</view>
+		</view>
+		<view class="up-cascader-action up-flex up-flex-between">
+			<view class="up-padding-20 up-flex-fill">
+				<up-button @click="handleCancel" type="default">{{ cancelText }}</up-button>
+			</view>
+			<view class="up-padding-20 up-flex-fill">
+				<up-button @click="handleConfirm" type="primary">{{ confirmText }}</up-button>
+			</view>
+		</view>
+	</up-popup>
+</template>
+
+<script lang="uts">
+import { t } from '../../libs/i18n'
+
+function toText(value: any | null): string {
+	return value == null ? '' : value.toString()
+}
+
+function sameValue(left: any | null, right: any | null): boolean {
+	return toText(left) == toText(right)
+}
+
+function emptyObjectList(): Array<UTSJSONObject> {
+	return [] as Array<UTSJSONObject>
+}
+
+export default {
+	name: 'up-cascader',
+	props: {
+		show: {
+			type: Boolean,
+			default: false
+		},
+		data: {
+			type: Array,
+			default() {
+				return []
+			}
+		},
+		modelValue: {
+			type: Array,
+			default() {
+				return []
+			}
+		},
+		valueKey: {
+			type: String,
+			default: 'value'
+		},
+		labelKey: {
+			type: String,
+			default: 'label'
+		},
+		childrenKey: {
+			type: String,
+			default: 'children'
+		},
+		maskCloseAble: {
+			type: Boolean,
+			default: true
+		},
+		zIndex: {
+			type: [String, Number],
+			default: 0
+		},
+		autoClose: {
+			type: Boolean,
+			default: false
+		},
+		headerDirection: {
+			type: String,
+			default: 'row'
+		},
+		optionsCols: {
+			type: Number,
+			default: 2
+		},
+		closeable: {
+			type: Boolean,
+			default: true
+		}
+	},
+	emits: ['update:modelValue', 'update:show', 'change', 'confirm', 'cancel'],
+	data() {
+		return {
+			levelList: [] as Array<Array<UTSJSONObject>>,
+			selectedValueIndexs: [] as Array<number>,
+			tabsIndex: 0,
+			popupShow: false,
+			confirmValues: [] as Array<any>
+		}
+	},
+	watch: {
+		data: {
+			handler() {
+				this.initLevelList()
+				this.setDefaultValue()
+			},
+			immediate: true
+		},
+		show() {
+			this.popupShow = this.show
+		},
+		modelValue: {
+			handler() {
+				this.setDefaultValue()
+			},
+			immediate: true
+		}
+	},
+	computed: {
+		isChange(): boolean {
+			return this.tabsIndex > 1
+		},
+		levelWrapStyle(): string {
+			if (this.optionsCols == 2 && this.isChange) {
+				return 'transform: translateX(-33.3333333%)'
+			}
+			return ''
+		},
+		cancelText(): string {
+			return t('up.common.cancel')
+		},
+		confirmText(): string {
+			return t('up.common.confirm')
+		},
+		placeholderText(): string {
+			return t('up.common.pleaseChoose')
+		},
+		genTabsList(): Array<UTSJSONObject> {
+			const tabsList = [] as Array<UTSJSONObject>
+			tabsList.push({ name: this.placeholderText } as UTSJSONObject)
+			for (let i = 0; i < this.selectedValueIndexs.length; i++) {
+				if (i >= this.levelList.length) break
+				const selectedIndex = this.selectedValueIndexs[i]
+				const levelData = this.levelList[i]
+				if (selectedIndex < 0 || selectedIndex >= levelData.length) continue
+				const selectedItem = levelData[selectedIndex]
+				tabsList[i] = { name: this.getItemLabel(selectedItem) } as UTSJSONObject
+				const children = this.getChildren(selectedItem)
+				if (i == this.selectedValueIndexs.length - 1 && children.length > 0) {
+					tabsList.push({ name: this.placeholderText } as UTSJSONObject)
+				}
+			}
+			return tabsList
+		},
+		uZIndex(): number {
+			if (typeof this.zIndex == 'number' && this.zIndex > 0) {
+				return this.zIndex
+			}
+			const parsed = parseInt(toText(this.zIndex))
+			return isNaN(parsed) || parsed <= 0 ? 1075 : parsed
+		}
+	},
+	methods: {
+		t,
+		getAreaItemStyle(): string {
+			return this.optionsCols == 2 ? 'width:33.33333%' : 'width:750rpx'
+		},
+		getDataList(): Array<UTSJSONObject> {
+			return this.data as Array<UTSJSONObject>
+		},
+		getChildren(item: UTSJSONObject): Array<UTSJSONObject> {
+			const children = item[this.childrenKey]
+			if (children == null) return emptyObjectList()
+			return children as Array<UTSJSONObject>
+		},
+		getItemLabel(item: UTSJSONObject): string {
+			return toText(item[this.labelKey])
+		},
+		getItemValue(item: UTSJSONObject): any | null {
+			return item[this.valueKey]
+		},
+		getTabName(item: UTSJSONObject): string {
+			return toText(item['name'])
+		},
+		isSelected(levelIndex: number, index: number): boolean {
+			if (levelIndex < 0 || levelIndex >= this.selectedValueIndexs.length) return false
+			return this.selectedValueIndexs[levelIndex] == index
+		},
+		canShowLevel(levelIndex: number): boolean {
+			return levelIndex == 0 || this.selectedValueIndexs.length >= levelIndex
+		},
+		getSelectedValues(): Array<any> {
+			const result = [] as Array<any>
+			for (let i = 0; i < this.selectedValueIndexs.length; i++) {
+				if (i >= this.levelList.length) break
+				const selectedIndex = this.selectedValueIndexs[i]
+				const levelData = this.levelList[i]
+				if (selectedIndex < 0 || selectedIndex >= levelData.length) continue
+				const value = this.getItemValue(levelData[selectedIndex])
+				if (value != null) result.push(value)
+			}
+			return result
+		},
+		initLevelList(): void {
+			const list = this.getDataList()
+			this.levelList = list.length > 0 ? [list] as Array<Array<UTSJSONObject>> : [] as Array<Array<UTSJSONObject>>
+			this.selectedValueIndexs = [] as Array<number>
+			this.tabsIndex = 0
+			this.confirmValues = [] as Array<any>
+		},
+		setDefaultValue(): void {
+			const values = this.modelValue as Array<any>
+			const root = this.getDataList()
+			this.selectedValueIndexs = [] as Array<number>
+			this.levelList = root.length > 0 ? [root] as Array<Array<UTSJSONObject>> : [] as Array<Array<UTSJSONObject>>
+			if (values.length == 0 || root.length == 0) {
+				this.confirmValues = [] as Array<any>
+				this.tabsIndex = 0
+				return
+			}
+			let currentLevelData = root
+			for (let i = 0; i < values.length; i++) {
+				if (i >= this.levelList.length) {
+					this.levelList.push(currentLevelData)
+				} else {
+					this.levelList[i] = currentLevelData
+				}
+				const index = this.findValueIndex(currentLevelData, values[i])
+				if (index == -1) break
+				this.selectedValueIndexs.push(index)
+				const children = this.getChildren(currentLevelData[index])
+				if (children.length == 0) break
+				currentLevelData = children
+				if (i < values.length - 1) {
+					this.levelList.push(children)
+				}
+			}
+			this.confirmValues = this.getSelectedValues()
+			this.tabsIndex = this.selectedValueIndexs.length > 0 ? this.selectedValueIndexs.length - 1 : 0
+		},
+		findValueIndex(list: Array<UTSJSONObject>, value: any | null): number {
+			for (let i = 0; i < list.length; i++) {
+				if (sameValue(this.getItemValue(list[i]), value)) return i
+			}
+			return -1
+		},
+		close(): void {
+			this.$emit('cancel')
+			this.$emit('update:show', false)
+		},
+		tabsChange(item: UTSJSONObject): void {
+			const index = parseInt(toText(item['index']))
+			if (!isNaN(index)) {
+				this.tabsIndex = index
+			}
+		},
+		levelChange(levelIndex: number, index: number): void {
+			if (levelIndex < 0 || levelIndex >= this.levelList.length) return
+			const levelData = this.levelList[levelIndex]
+			if (index < 0 || index >= levelData.length) return
+			this.selectedValueIndexs.splice(levelIndex)
+			this.selectedValueIndexs.push(index)
+			this.levelList.splice(levelIndex + 1)
+			const currentItem = levelData[index]
+			const children = this.getChildren(currentItem)
+			if (children.length > 0) {
+				this.levelList.push(children)
+				this.tabsIndex = levelIndex + 1
+				this.confirmValues = this.getSelectedValues()
+				this.$emit('change', this.confirmValues)
+				return
+			}
+			this.tabsIndex = levelIndex
+			this.confirmValues = this.getSelectedValues()
+			this.$emit('change', this.confirmValues)
+			if (this.autoClose) {
+				this.handleConfirm()
+			}
+		},
+		handleCancel(): void {
+			this.close()
+		},
+		handleConfirm(): void {
+			const values = this.confirmValues.length > 0 ? this.confirmValues : this.getSelectedValues()
+			this.confirmValues = values
+			this.$emit('update:modelValue', values)
+			this.$emit('confirm', values)
+			this.$emit('update:show', false)
+		}
+	}
+}
+</script>
+
+<style lang="scss">
+.area-box {
+	width: 100%;
+	overflow: hidden;
+	height: 800rpx;
+}
+
+.area-box__levels {
+	width: 150%;
+	transition: transform 0.3s ease-in-out 0s;
+	transform: translateX(0);
+}
+
+.area-item {
+	height: 800rpx;
+}
+
+.up-cascader-action {
+	border-top: 1px solid #eee;
+}
+</style>

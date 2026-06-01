@@ -1,0 +1,123 @@
+<template>
+	<view class="up-swiper-indicator">
+		<view
+			class="up-swiper-indicator__wrapper"
+			v-if="indicatorMode === 'line'"
+			:class="[`up-swiper-indicator__wrapper--${indicatorMode}`]"
+			:style="{
+				width: addUnit(lineWidth * (length as number)),
+				backgroundColor: indicatorInactiveColor
+			}"
+		>
+			<view
+				class="up-swiper-indicator__wrapper--line__bar"
+				:style="[lineStyle]"
+			></view>
+		</view>
+		<view
+			class="up-swiper-indicator__wrapper"
+			v-if="indicatorMode === 'dot'"
+		>
+			<view
+				class="up-swiper-indicator__wrapper__dot"
+				v-for="(item, index) in lengthArray"
+				:key="index"
+				:class="[index === (current as number) ? 'up-swiper-indicator__wrapper__dot--active' : '']"
+				:style="[dotStyle(index)]"
+			>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script lang="uts">
+	import { propsSwiperIndicator } from './props.uts';
+	import { mpMixin } from '../../libs/mixin/mpMixin.uts';
+	import { mixin } from '../../libs/mixin/mixin.uts';
+	import { addUnit } from '../../libs/function/index.uts';
+	/**
+	 * SwiperIndicator 轮播图指示器
+	 * @description 该组件一般用于导航轮播，广告展示等场景,可开箱即用，
+	 * @tutorial https://uview-plus.jiangruyi.com/components/swiper.html
+	 * @property {String | Number}	length					轮播的长度（默认 0 ）
+	 * @property {String | Number}	current					当前处于活动状态的轮播的索引（默认 0 ）
+	 * @property {String}			indicatorActiveColor	指示器非激活颜色
+	 * @property {String}			indicatorInactiveColor	指示器的激活颜色
+	 * @property {String}			indicatorMode			指示器模式（默认 'line' ）
+	 * @example	<up-swiper :list="list4" indicator keyName="url" :autoplay="false"></up-swiper>
+	 */
+	export default {
+		name: 'up-swiper-indicator',
+		mixins: [mpMixin, mixin, propsSwiperIndicator],
+		data() {
+			return {
+				lineWidth: 22
+			}
+		},
+		computed: {
+			lengthArray(): Array<string> {
+				let list: Array<string> = []
+				// @ts-ignore
+				for (var index = 0; index < this.$props['length'] as number; index++) {
+					list.push(index.toString())
+				}
+				return list
+			},
+			// 指示器为线型的样式
+			lineStyle(): any {
+				let style = {}
+				style['width'] = addUnit(this.lineWidth)
+				style['transform'] = `translateX(${ addUnit(this.current as number * this.lineWidth) })`
+				style['backgroundColor'] = this.indicatorActiveColor
+				return style
+			}
+		},
+		methods: {
+			addUnit(val: any): string {
+				return addUnit(val)
+			},
+			// 指示器为点型的样式
+			dotStyle(index: number): any {
+				let style = {}
+				style['backgroundColor'] = index === this.current ? this.indicatorActiveColor : this.indicatorInactiveColor
+				return style
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	@import '../../libs/css/components.scss';
+
+	.up-swiper-indicator {
+
+		&__wrapper {
+			@include flex;
+
+			&--line {
+				border-radius: 100px;
+				height: 4px;
+
+				&__bar {
+					width: 22px;
+					height: 4px;
+					border-radius: 100px;
+					background-color: #FFFFFF;
+					transition: transform 0.3s;
+				}
+			}
+
+			&__dot {
+				width: 5px;
+				height: 5px;
+				border-radius: 100px;
+				margin: 0 4px;
+
+				&--active {
+					width: 12px;
+				}
+			}
+
+		}
+	}
+</style>

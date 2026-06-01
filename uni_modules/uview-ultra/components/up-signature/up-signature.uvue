@@ -1,0 +1,454 @@
+<template>
+	<view class="up-signature">
+		<view class="up-signature__canvas-wrap" :style="canvasWrapStyle">
+			<up-canvas
+				ref="signatureCanvas"
+				:canvas-id="canvasId"
+				:width="canvasWidth"
+				:height="canvasHeight"
+				:bg-color="bgColor"
+				@touchstart="touchStart"
+				@touchmove="touchMove"
+				@touchend="touchEnd"
+				class="up-signature__canvas"
+			></up-canvas>
+		</view>
+
+		<view v-if="showToolbar" class="up-signature__toolbar">
+			<view class="up-signature__toolbar-icons up-flex up-flex-x">
+				<view class="up-signature__toolbar-icon" @click="undo">
+				<up-icon name="arrow-left" size="22" :color="pathCount == 0 ? '#ccc' : '#999'"></up-icon>
+				</view>
+				<view class="up-signature__toolbar-icon" @click="clearCanvas">
+					<up-icon name="trash" size="25" color="#999"></up-icon>
+				</view>
+				<view class="up-signature__toolbar-icon" @click="toggleBrushSettings">
+					<up-icon name="edit-pen" size="25" color="#999"></up-icon>
+				</view>
+				<view class="up-signature__toolbar-icon" @click="toggleColorSettings">
+					<up-icon name="grid" size="24" color="#999"></up-icon>
+				</view>
+				<view class="up-signature__toolbar-icon" @click="exportSignature">
+					<up-icon name="checkmark" size="25" :color="isEmpty ? '#ccc' : '#999'"></up-icon>
+				</view>
+			</view>
+
+			<view v-if="showBrushSettings" class="up-signature__brush-settings">
+				<view class="up-signature__progress">
+					<text class="up-signature__progress-label">{{ penSizeLabel }}:</text>
+					<up-slider
+						v-model="lineWidth"
+						:min="1"
+						:max="20"
+						:step="1"
+						:value-show="lineWidth"
+					></up-slider>
+				</view>
+			</view>
+
+			<view v-if="showColorSettings" class="up-signature__color-settings">
+				<view class="up-signature__color-picker">
+					<text class="up-signature__color-label">{{ penColorLabel }}:</text>
+					<view class="up-signature__colors">
+						<view
+							v-for="(color, index) in colorItems"
+							:key="index"
+							class="up-signature__color-item"
+							:class="lineColor === color ? 'up-signature__color-item--active' : ''"
+							:style="getColorStyle(color)"
+							@click="selectColor(color)"
+						></view>
+					</view>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script lang="uts">
+import { t } from '../../libs/i18n/index.uts'
+
+type SignaturePoint = {
+	x: number,
+	y: number,
+	type: string,
+	color: string,
+	width: number
+}
+
+function normalizeNumber(value: any | null, defaultValue: number = 0): number {
+	if (typeof value === 'number') {
+		return value
+	}
+	if (value == null) {
+		return defaultValue
+	}
+	const parsed = parseFloat(value.toString())
+	return isNaN(parsed) ? defaultValue : parsed
+}
+
+function createPath(): Array<SignaturePoint> {
+	return [] as Array<SignaturePoint>
+}
+
+function createPathStack(): Array<Array<SignaturePoint>> {
+	return [] as Array<Array<SignaturePoint>>
+}
+
+function createColors(): Array<string> {
+	return [
+		'#000000',
+		'#ff0000',
+		'#00ff00',
+		'#0000ff',
+		'#ffff00',
+		'#00ffff',
+		'#ff00ff',
+		'#ffffff'
+	] as Array<string>
+}
+
+function createPoint(x: number, y: number, type: string, color: string, width: number): SignaturePoint {
+	return {
+		x,
+		y,
+		type,
+		color,
+		width
+	} as SignaturePoint
+}
+
+function getTouchPoint(e: UniTouchEvent): SignaturePoint {
+	let x = 0
+	let y = 0
+	if (e.touches.length > 0) {
+		x = e.touches[0].pageX
+		y = e.touches[0].pageY
+	} else if (e.changedTouches.length > 0) {
+		x = e.changedTouches[0].pageX
+		y = e.changedTouches[0].pageY
+	}
+	return createPoint(x, y, 'move', '', 0)
+}
+
+export default {
+	name: 'up-signature',
+	props: {
+		width: {
+			type: [String, Number],
+			default: 300
+		},
+		height: {
+			type: [String, Number],
+			default: 200
+		},
+		bgColor: {
+			type: String,
+			default: '#ffffff'
+		},
+		color: {
+			type: String,
+			default: '#000000'
+		},
+		thickness: {
+			type: [String, Number],
+			default: 3
+		},
+		showToolbar: {
+			type: Boolean,
+			default: true
+		}
+	},
+	emits: ['confirm', 'error', 'change', 'clear'],
+	data() {
+		return {
+			canvasId: 'up-signature-' + Date.now().toString(),
+			canvasWidth: normalizeNumber(this.width, 300),
+			canvasHeight: normalizeNumber(this.height, 200),
+			lineColor: this.color,
+			lineWidth: normalizeNumber(this.thickness, 3),
+			isDrawing: false,
+			pathStack: createPathStack(),
+			currentPath: createPath(),
+			isEmpty: true,
+			presetColors: createColors(),
+			showBrushSettings: false,
+			showColorSettings: false
+		}
+	},
+	watch: {
+		width: {
+			handler(newVal: any | null) {
+				this.canvasWidth = normalizeNumber(newVal, 300)
+			},
+			immediate: true
+		},
+		height: {
+			handler(newVal: any | null) {
+				this.canvasHeight = normalizeNumber(newVal, 200)
+			},
+			immediate: true
+		},
+		color: {
+			handler(newVal: string) {
+				this.lineColor = newVal
+			},
+			immediate: true
+		},
+		thickness: {
+			handler(newVal: any | null) {
+				this.lineWidth = normalizeNumber(newVal, 3)
+			},
+			immediate: true
+		}
+	},
+	computed: {
+		pathCount(): number {
+			const stack = this.pathStack as Array<Array<SignaturePoint>>
+			return stack.length
+		},
+		colorItems(): Array<string> {
+			return this.presetColors as Array<string>
+		},
+		canvasWrapStyle(): UTSJSONObject {
+			const style = {} as UTSJSONObject
+			style['width'] = this.canvasWidth.toString() + 'px'
+			style['height'] = this.canvasHeight.toString() + 'px'
+			style['background'] = this.bgColor
+			return style
+		},
+		penSizeLabel(): string {
+			return t('up.signature.penSize')
+		},
+		penColorLabel(): string {
+			return t('up.signature.penColor')
+		}
+	},
+	methods: {
+		getColorStyle(color: string): UTSJSONObject {
+			const style = {} as UTSJSONObject
+			style['backgroundColor'] = color
+			return style
+		},
+		getCanvasInstance(): ComponentPublicInstance | null {
+			const canvas = this.$refs['signatureCanvas'] as ComponentPublicInstance | null
+			return canvas
+		},
+		getLineColor(): string {
+			const color = this.lineColor
+			return color == null ? '#000000' : color.toString()
+		},
+		getLineWidth(): number {
+			return normalizeNumber(this.lineWidth, 3)
+		},
+		touchStart(e: UniTouchEvent): void {
+			const canvas = this.getCanvasInstance()
+			if (canvas == null) {
+				return
+			}
+			this.isDrawing = true
+			this.isEmpty = false
+			this.currentPath = createPath()
+			const point = getTouchPoint(e)
+			const color = this.getLineColor()
+			const width = this.getLineWidth()
+			const startPoint = createPoint(normalizeNumber(point.x, 0), normalizeNumber(point.y, 0), 'start', color, width)
+			const currentPath = this.currentPath as Array<SignaturePoint>
+			currentPath.push(startPoint)
+			canvas.$callMethod('setLineStyle', color, width)
+			canvas.$callMethod('beginPath')
+			canvas.$callMethod('moveTo', startPoint.x, startPoint.y)
+			this.$emit('change', currentPath)
+		},
+		touchMove(e: UniTouchEvent): void {
+			if (this.isDrawing == false) {
+				return
+			}
+			const canvas = this.getCanvasInstance()
+			if (canvas == null) {
+				return
+			}
+			const point = getTouchPoint(e)
+			const movePoint = createPoint(normalizeNumber(point.x, 0), normalizeNumber(point.y, 0), 'move', this.getLineColor(), this.getLineWidth())
+			const currentPath = this.currentPath as Array<SignaturePoint>
+			currentPath.push(movePoint)
+			canvas.$callMethod('lineTo', movePoint.x, movePoint.y)
+			canvas.$callMethod('stroke')
+			canvas.$callMethod('draw', false)
+			this.$emit('change', currentPath)
+		},
+		touchEnd(): void {
+			if (this.isDrawing == false) {
+				return
+			}
+			const canvas = this.getCanvasInstance()
+			this.isDrawing = false
+			if (canvas != null) {
+				canvas.$callMethod('closePath')
+				canvas.$callMethod('draw', true)
+			}
+			const currentPath = this.currentPath as Array<SignaturePoint>
+			if (currentPath.length > 0) {
+				const stack = this.pathStack as Array<Array<SignaturePoint>>
+				stack.push(currentPath)
+			}
+			this.currentPath = createPath()
+		},
+		selectColor(color: string): void {
+			this.lineColor = color
+		},
+		undo(): void {
+			const stack = this.pathStack as Array<Array<SignaturePoint>>
+			if (stack.length == 0) {
+				return
+			}
+			stack.pop()
+			this.redraw()
+		},
+		redraw(): void {
+			const canvas = this.getCanvasInstance()
+			if (canvas == null) {
+				return
+			}
+			canvas.$callMethod('clearCanvas')
+			const stack = this.pathStack as Array<Array<SignaturePoint>>
+			if (stack.length == 0) {
+				this.isEmpty = true
+				return
+			}
+			this.isEmpty = false
+			for (let i = 0; i < stack.length; i++) {
+				const path = stack[i]
+				if (path.length == 0) {
+					continue
+				}
+				canvas.$callMethod('beginPath')
+				for (let j = 0; j < path.length; j++) {
+					const point = path[j]
+					if (j == 0 && point.type === 'start') {
+						canvas.$callMethod('setLineStyle', point.color, point.width)
+						canvas.$callMethod('moveTo', point.x, point.y)
+					} else if (point.type === 'move') {
+						canvas.$callMethod('lineTo', point.x, point.y)
+					}
+				}
+				canvas.$callMethod('stroke')
+				canvas.$callMethod('draw', true)
+			}
+		},
+		clearCanvas(): void {
+			const canvas = this.getCanvasInstance()
+			if (canvas != null) {
+				canvas.$callMethod('clearCanvas')
+			}
+			this.pathStack = createPathStack()
+			this.currentPath = createPath()
+			this.isEmpty = true
+			this.$emit('clear')
+		},
+		exportSignature(): void {
+			if (this.isEmpty) {
+				this.$emit('error', '签名为空')
+				return
+			}
+			const canvas = this.getCanvasInstance()
+			if (canvas == null) {
+				this.$emit('error', '无法获取画布实例')
+				return
+			}
+			this.redraw()
+			const result = canvas.$callMethod('exportImage', 'png', 1)
+			if (result == null) {
+				this.$emit('error', '导出签名图片失败')
+				return
+			}
+			;(result as Promise<string>).then((imagePath: string) => {
+				this.$emit('confirm', imagePath)
+			}).catch((error: any | null) => {
+				this.$emit('error', error)
+			})
+		},
+		toggleBrushSettings(): void {
+			this.showBrushSettings = !this.showBrushSettings
+			if (this.showBrushSettings) {
+				this.showColorSettings = false
+			}
+		},
+		toggleColorSettings(): void {
+			this.showColorSettings = !this.showColorSettings
+			if (this.showColorSettings) {
+				this.showBrushSettings = false
+			}
+		}
+	}
+}
+</script>
+
+<style lang="scss" scoped>
+	.up-signature {
+		display: flex;
+		flex-direction: column;
+
+		&__canvas-wrap {
+			border: 1px solid #e0e0e0;
+			border-radius: 4px;
+			overflow: hidden;
+		}
+
+		&__canvas {
+			width: 100%;
+			height: 100%;
+		}
+
+		&__toolbar {
+			margin-top: 5px;
+			background-color: #fff;
+		}
+
+		&__toolbar-icons {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 1px 0;
+			border-radius: 4px;
+		}
+
+		&__toolbar-icon {
+			padding: 5px;
+		}
+
+		&__brush-settings,
+		&__color-settings {
+			margin-top: 15px;
+			padding: 1px;
+			border-radius: 4px;
+		}
+
+		&__progress-label,
+		&__color-label {
+			display: flex;
+			margin-bottom: 10px;
+			font-size: 14px;
+			color: #999;
+		}
+
+		&__colors {
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap;
+		}
+
+		&__color-item {
+			width: 30px;
+			height: 30px;
+			border-radius: 50%;
+			margin-right: 10px;
+			margin-bottom: 10px;
+			border: 2px solid transparent;
+
+			&--active {
+				border-color: #2979ff;
+			}
+		}
+	}
+</style>

@@ -1,0 +1,142 @@
+<template>
+	<view
+	    class="up-divider"
+	    :style="[$up.addStyle(customStyle)]"
+		@tap="clickHandler"
+	>
+		<up-line
+		    :color="lineColor"
+		    :customStyle="leftLineStyle"
+		    :hairline="hairline"
+			:dashed="dashed"
+		></up-line>
+		<text
+		    v-if="dot"
+		    class="up-divider__dot"
+		>●</text>
+		<text
+		    v-else-if="text"
+		    class="up-divider__text"
+		    :style="[textStyle]"
+		>{{text}}</text>
+		<up-line
+		    :color="lineColor"
+		    :customStyle="rightLineStyle"
+		    :hairline="hairline"
+			:dashed="dashed"
+		></up-line>
+	</view>
+</template>
+
+<script lang="uts" setup>
+	import { computed } from 'vue'
+	import defProps from './divider'
+	import { addStyle, addUnit } from '../../libs/function/index.uts'
+	
+	const props = defineProps({
+		// 是否虚线
+		dashed: {
+			type: Boolean,
+			default: defProps.getBoolean('divider.dashed')
+		},
+		// 是否细线
+		hairline: {
+			type: Boolean,
+			default: defProps.getBoolean('divider.hairline')
+		},
+		// 是否以点替代文字，优先于text字段起作用
+		dot: {
+			type: Boolean,
+			default: defProps.getBoolean('divider.dot')
+		},
+		// 内容文本的位置，left-左边，center-中间，right-右边
+		textPosition: {
+			type: String,
+			default: defProps.getString('divider.textPosition')
+		},
+		// 文本内容
+		text: {
+			type: [String, Number],
+			default: defProps.getString('divider.text')
+		},
+		// 文本大小
+		textSize: {
+			type: [String, Number],
+			default: defProps.getNumber('divider.textSize')
+		},
+		// 文本颜色
+		textColor: {
+			type: String,
+			default: defProps.getString('divider.textColor')
+		},
+		// 线条颜色
+		lineColor: {
+			type: String,
+			default: defProps.getString('divider.lineColor')
+		}
+	});
+	
+	const emit = defineEmits(['click']);
+	
+	const textStyle = computed(() => {
+		const style = {};
+		style['fontSize'] = addUnit(props.textSize);
+		style['color'] = props.textColor;
+		return style;
+	});
+	
+	// 左边线条的的样式
+	const leftLineStyle = computed(() => {
+		const style = {};
+		// 如果是在左边，设置左边的宽度为固定值
+		if (props.textPosition === 'left') {
+			style['width'] = '80rpx';
+		} else {
+			style['flex'] = 1;
+		}
+		return style;
+	});
+	
+	// 右边线条的的样式
+	const rightLineStyle = computed(() => {
+		const style = {};
+		// 如果是在右边，设置右边的宽度为固定值
+		if (props.textPosition === 'right') {
+			style['width'] = '80rpx';
+		} else {
+			style['flex'] = 1;
+		}
+		return style;
+	});
+	
+	// divider组件被点击时触发
+	const clickHandler = () => {
+		emit('click');
+	};
+</script>
+
+<style lang="scss" scoped>
+	@import '../../libs/css/components.scss';
+	$up-divider-margin:15px 0 !default;
+	$up-divider-text-margin:0 15px !default;
+	$up-divider-dot-font-size:12px !default;
+	$up-divider-dot-margin:0 12px !default;
+	$up-divider-dot-color: #c0c4cc !default;
+
+	.up-divider {
+		@include flex;
+		flex-direction: row;
+		align-items: center;
+		margin: $up-divider-margin;
+
+		&__text {
+			margin: $up-divider-text-margin;
+		}
+
+		&__dot {
+			font-size: $up-divider-dot-font-size;
+			margin: $up-divider-dot-margin;
+			color: $up-divider-dot-color;
+		}
+	}
+</style>

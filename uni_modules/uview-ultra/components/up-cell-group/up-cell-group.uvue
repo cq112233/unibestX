@@ -1,0 +1,61 @@
+<template>
+    <view :style="[$up.addStyle(customStyle)]"
+		:class="[customClass]" class="up-cell-group">
+        <view v-if="title" class="up-cell-group__title">
+            <slot name="title">
+				<text class="up-cell-group__title__text">
+					{{ title }}
+				</text>
+			</slot>
+        </view>
+        <view class="up-cell-group__wrapper">
+			<up-line v-if="border"></up-line>
+            <slot />
+        </view>
+    </view>
+</template>
+
+<script setup lang="ts">
+	import defProps from './cellGroup'
+	// props
+	const props = defineProps({
+		title: {
+			type: String,
+			default: defProps.getString('cellGroup.title')
+		},
+		border: {
+			type: Boolean,
+			default: defProps.getBoolean('cellGroup.border')
+		}
+	})
+	defineOptions({
+		name: "up-cell-group"
+	})
+</script>
+
+<style lang="scss" scoped>
+	@import "../../libs/css/components.scss";
+	
+	$up-cell-group-title-padding: 16px 16px 8px !default;
+	$up-cell-group-title-font-size: 15px !default;
+	$up-cell-group-title-line-height: 16px !default;
+	$up-cell-group-title-color: $up-main-color !default;
+
+    .up-cell-group {
+		
+        &__title {
+            padding: $up-cell-group-title-padding;
+
+            &__text {
+                font-size: $up-cell-group-title-font-size;
+                line-height: $up-cell-group-title-line-height;
+                color: $up-cell-group-title-color;
+            }
+        }
+		
+		&__wrapper {
+			position: relative;
+		}
+    }
+</style>
+

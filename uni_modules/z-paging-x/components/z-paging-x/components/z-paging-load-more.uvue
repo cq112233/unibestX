@@ -1,0 +1,105 @@
+<!-- [z-paging-x]上拉加载更多view -->
+<template name="z-paging-load-more">
+	<view class="zpx-l-container"  @click="onClickMore">
+		<view v-if="isNoMore" class="zpx-l-line" />
+		<z-paging-loading v-if="isLoading" />
+		<text class="zpx-l-loading-text">{{statusText}}</text>
+		<view v-if="isNoMore" class="zpx-l-line" />
+	</view>
+</template>
+<script lang="uts">
+	import Enum from '../enums/index.uts'
+	import zPagingLoading from '../components/z-paging-loading.uvue'
+	export default {
+		name: 'z-paging-load-more',
+		components: { zPagingLoading },
+		props: {
+			// 下拉刷新状态
+			status: {
+				type: String,
+				default: Enum.More.Default,
+			},
+			// 滑动到底部"默认"文字，默认：点击加载更多
+			defaultText: {
+				type: String,
+				default: '点击加载更多'
+			},
+			// 滑动到底部"加载中"文字，默认：正在加载...
+			loadingText: {
+				type: String,
+				default: '正在加载...'
+			},
+			// 滑动到底部"没有更多"文字，默认：没有更多了
+			noMoreText: {
+				type: String,
+				default: '没有更多了'
+			},
+			// 滑动到底部"加载失败"文字，默认：加载失败，点击重新加载
+			failText: {
+				type: String,
+				default: '加载失败，点击重新加载'
+			},
+		},
+		data() {
+			return {
+				
+			};
+		},
+		computed: {
+			isDefault(): boolean {
+				return this.status === Enum.More.Default;
+			},
+			isLoading(): boolean {
+				return this.status === Enum.More.Loading;
+			},
+			isNoMore(): boolean {
+				return this.status === Enum.More.NoMore;
+			},
+			isFail(): boolean {
+				return this.status === Enum.More.Fail;
+			},
+			statusText(): string {
+				// 底部加载更多状态 default:默认状态 loading:加载中 no-more:没有更多数据 fail:加载失败
+				if (this.isDefault) {
+					return this.defaultText;
+				} else if (this.isLoading) {
+					return this.loadingText;
+				} else if (this.isNoMore) {
+					return this.noMoreText;
+				} else if (this.isFail) {
+					return this.failText;
+				} else {
+					return '';
+				}
+			}
+		},
+		methods: {
+			onClickMore() {
+				this.$emit('clickMore');
+			}
+		}
+	}
+</script>
+
+<style scoped>
+	.zpx-l-container {
+		height: 80rpx;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+	}
+	
+	.zpx-l-loading-text {
+		color: #a4a4a4;
+		margin-left: 10rpx;
+		font-size: 28rpx;
+	}
+	
+	.zpx-l-line {
+		background-color: #eeeeee;
+		width: 100rpx;
+		height: 1px;
+		margin: 0rpx 10rpx;
+	}
+
+</style>

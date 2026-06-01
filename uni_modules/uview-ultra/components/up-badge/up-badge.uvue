@@ -1,0 +1,260 @@
+<template>
+	<text class="up-badge"
+		v-if="show && ((parseInt(value.toString()) == 0 ? showZero : true) || isDot)"
+		:class="[isDot ? 'up-badge--dot' : 'up-badge--not-dot',
+			inverted ? 'up-badge--inverted' : '',
+			shape === 'horn' ? 'up-badge--horn' : '',
+			inverted ? `up-badge--${type}--inverted` : `up-badge--${type}`]"
+		:style="[$upAddStyle(customStyle), badgeStyle]"
+	>{{ isDot ? '' : showValue }}</text>
+</template>
+
+<script setup lang="uts">
+	import type { PropType } from 'vue'
+	import { computed } from 'vue'
+	import { addUnit } from '../../libs/function/index';
+	import defProps from './badge.uts'
+	
+	/**
+	 * badge 徽标数
+	 * @description 该组件一般用于图标右上角显示未读的消息数量，提示用户点击，有圆点和圆包含文字两种形式。
+	 * @tutorial https://uview-plus.jiangruyi.com/components/badge.html
+	 * 
+	 * @property {Boolean} 			isDot 		是否显示圆点 （默认 false ）
+	 * @property {String | Number} 	value 		显示的内容
+	 * @property {Boolean} 			show 		是否显示 （默认 true ）
+	 * @property {String | Number} 	max 		最大值，超过最大值会显示 '{max}+'  （默认999）
+	 * @property {String} 			type 		主题类型，error|warning|success|primary （默认 'error' ）
+	 * @property {Boolean} 			showZero	当数值为 0 时，是否展示 Badge （默认 false ）
+	 * @property {String} 			bgColor 	背景颜色，优先级比type高，如设置，type参数会失效
+	 * @property {String} 			color 		字体颜色 （默认 '#ffffff' ）
+	 * @property {String} 			shape 		徽标形状，circle-四角均为圆角，horn-左下角为直角 （默认 'circle' ）
+	 * @property {String} 			numberType	设置数字的显示方式，overflow|ellipsis|limit  （默认 'overflow' ）
+	 * @property {Array}} 			offset		设置badge的位置偏移，格式为 [x, y]，也即设置的为top和right的值，absolute为true时有效
+	 * @property {Boolean} 			inverted	是否反转背景和字体颜色（默认 false ）
+	 * @property {Boolean} 			absolute	是否绝对定位（默认 false ）
+	 * @property {Object}			customStyle	定义需要用到的外部样式
+	 * @example <up-badge :type="type" :count="count"></up-badge>
+	 */
+	
+	// options
+	defineOptions({
+	  name: 'up-badge'
+	})
+
+	// props
+	const props = defineProps({
+		// 是否显示圆点
+		isDot: {
+			type: Boolean,
+			default: defProps.getBoolean('badge.isDot')
+		},
+		// 显示的内容
+		value: {
+			type: [Number, String],
+			default: defProps.getString('badge.value')
+		},
+		// 显示的内容
+		modelValue: {
+			type: [Number, String],
+			default: defProps.getString('badge.modelValue')
+		},
+		// 是否显示
+		show: {
+			type: Boolean,
+			default: defProps.getBoolean('badge.show')
+		},
+		// 最大值，超过最大值会显示 '{max}+'
+		max: {
+			type: [Number, String],
+			default: defProps.getNumber('badge.max')
+		},
+		// 主题类型，error|warning|success|primary
+		type: {
+			type: String,
+			default: defProps.getString('badge.type')
+		},
+		// 当数值为 0 时，是否展示 Badge
+		showZero: {
+			type: Boolean,
+			default: defProps.getBoolean('badge.showZero')
+		},
+		// 背景颜色，优先级比type高，如设置，type参数会失效
+		bgColor: {
+			type: String,
+			default: defProps.getString('badge.bgColor')
+		},
+		// 字体颜色
+		color: {
+			type: String,
+			default: defProps.getString('badge.color')
+		},
+		// 徽标形状，circle-四角均为圆角，horn-左下角为直角
+		shape: {
+			type: String,
+			default: defProps.getString('badge.shape')
+		},
+		// 设置数字的显示方式，overflow|ellipsis|limit
+		// overflow会根据max字段判断，超出显示`${max}+`
+		// ellipsis会根据max判断，超出显示`${max}...`
+		// limit会依据1000作为判断条件，超出1000，显示`${value/1000}K`，比如2.2k、3.34w，最多保留2位小数
+		numberType: {
+			type: String,
+			default: defProps.getString('badge.numberType')
+		},
+		// 设置badge的位置偏移，格式为 [x, y]，也即设置的为top和right的值，absolute为true时有效
+		offset: {
+			type: Array as PropType<number[]>,
+			default: defProps.getArray<number>('badge.offset')
+		},
+		// 是否反转背景和字体颜色
+		inverted: {
+			type: Boolean,
+			default: defProps.getBoolean('badge.inverted')
+		},
+		// 是否绝对定位
+		absolute: {
+			type: Boolean,
+			default: defProps.getBoolean('badge.absolute')
+		}
+	})
+
+	// 整个组件的样式
+	const badgeStyle = computed(() => {
+		const style: UTSJSONObject = {}
+		if(props.color != '') {
+			style['color'] = props.color
+		}
+		if (props.bgColor != '' && !props.inverted) {
+			style['backgroundColor'] = props.bgColor
+		}
+		if (props.absolute) {
+			style['position'] = 'absolute'
+			let offsetArray = props.offset as number[]
+			// 如果有设置offset参数
+			if(offsetArray.length > 0) {
+				// top和right分为为offset的第一个和第二个值，如果没有第二个值，则right等于top
+				const top = offsetArray[0]
+				style['top'] = addUnit(top)
+				if (offsetArray.length == 2) {
+					style['right'] = addUnit(offsetArray[1])
+				} else {
+					style['right'] = addUnit(top)
+				}
+			}
+		}
+		return style
+	})
+
+	// 显示值
+	const showValue = computed(():string => {
+		let valueReturn = ''
+		switch (props.numberType.toString()) {
+			case "overflow":
+				valueReturn = parseInt(props.value.toString()) > parseInt(props.max.toString()) ? props.max.toString() + "+" : props.value.toString()
+				break;
+			case "ellipsis":
+				valueReturn = parseInt(props.value.toString()) > parseInt(props.max.toString()) ? "..." : props.value.toString()
+				break;
+			case "limit":
+				valueReturn = parseInt(props.value.toString()) > 999
+						?
+							parseInt(props.value.toString()) >= 9999 ?
+							(Math.floor(parseInt(props.value.toString()) / 1e4 * 100) / 100).toString() + "w"
+							: (Math.floor(parseInt(props.value.toString()) / 1e3 * 100) / 100).toString() + "k"
+						: props.value.toString()
+				break;
+			default:
+				valueReturn = props.value.toString()
+		}
+		return valueReturn
+	})
+</script>
+
+<style lang="scss" scoped>
+	@import "../../libs/css/components.scss";
+
+	$up-badge-primary: $up-primary !default;
+	$up-badge-error: $up-error !default;
+	$up-badge-success: $up-success !default;
+	$up-badge-info: $up-info !default;
+	$up-badge-warning: $up-warning !default;
+	$up-badge-dot-radius: 100px !default;
+	$up-badge-dot-size: 8px !default;
+	$up-badge-dot-right: 4px !default;
+	$up-badge-dot-top: 0 !default;
+	$up-badge-text-font-size: 11px !default;
+	$up-badge-text-right: 10px !default;
+	$up-badge-text-padding: 2px 5px !default;
+	$up-badge-text-align: center !default;
+	$up-badge-text-color: #FFFFFF !default;
+
+	.up-badge {
+		border-top-right-radius: $up-badge-dot-radius;
+		border-top-left-radius: $up-badge-dot-radius;
+		border-bottom-left-radius: $up-badge-dot-radius;
+		border-bottom-right-radius: $up-badge-dot-radius;
+		// @include flex;
+		line-height: $up-badge-text-font-size;
+		text-align: $up-badge-text-align;
+		font-size: $up-badge-text-font-size;
+		color: $up-badge-text-color;
+
+		&--dot {
+			height: $up-badge-dot-size;
+			width: $up-badge-dot-size;
+		}
+		
+		&--inverted {
+			font-size: 13px;
+		}
+		
+		&--not-dot {
+			padding: $up-badge-text-padding;
+		}
+
+		&--horn {
+			border-bottom-left-radius: 0;
+		}
+
+		&--primary {
+			background-color: $up-badge-primary;
+		}
+		
+		&--primary--inverted {
+			color: $up-badge-primary;
+		}
+
+		&--error {
+			background-color: $up-badge-error;
+		}
+		
+		&--error--inverted {
+			color: $up-badge-error;
+		}
+
+		&--success {
+			background-color: $up-badge-success;
+		}
+		
+		&--success--inverted {
+			color: $up-badge-success;
+		}
+
+		&--info {
+			background-color: $up-badge-info;
+		}
+		
+		&--info--inverted {
+			color: $up-badge-info;
+		}
+
+		&--warning {
+			background-color: $up-badge-warning;
+		}
+		
+		&--warning--inverted {
+			color: $up-badge-warning;
+		}
+	}
+</style>

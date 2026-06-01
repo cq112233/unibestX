@@ -1,0 +1,228 @@
+<template>
+	<view class="up-skeleton">
+		<view
+		    class="up-skeleton__wrapper"
+		    ref="up-skeleton__wrapper"
+		    v-if="loading"
+			style="display: flex; flex-direction: row;"
+		>
+			<view
+			    class="up-skeleton__wrapper__avatar"
+			    v-if="avatar"
+			    :class="[`up-skeleton__wrapper__avatar--${avatarShape}`, animate ? 'animate' : '']"
+			    :style="{
+						height: addUnit(avatarSize),
+						width: addUnit(avatarSize)
+					}"
+			></view>
+			<view
+			    class="up-skeleton__wrapper__content"
+			    ref="up-skeleton__wrapper__content"
+				style="flex: 1;"
+			>
+				<view
+				    class="up-skeleton__wrapper__content__title"
+				    v-if="title"
+				    :style="{
+							width: uTitleWidth,
+							height: addUnit(titleHeight),
+						}"
+				    :class="[animate ? 'animate' : '']"
+				></view>
+				<view
+				    class="up-skeleton__wrapper__content__rows"
+				    :class="[animate ? 'animate' : '']"
+				    v-for="(item, index) in rowsArray"
+				    :key="index"
+				    :style="{
+							 width: item['width'],
+							 height: item['height'],
+							 marginTop: item['marginTop']
+						}"
+				>
+		
+				</view>
+			</view>
+		</view>
+		<slot v-else />
+	</view>
+</template>
+
+<script lang="uts">
+	import { propsSkeleton } from './props';
+	import { mpMixin } from '../../libs/mixin/mpMixin';
+	import { mixin } from '../../libs/mixin/mixin';
+	import { addUnit, sleep } from '../../libs/function/index';
+	
+	/**
+	 * Skeleton 骨架屏
+	 * @description 骨架屏一般用于页面在请求远程数据尚未完成时，页面用灰色块预显示本来的页面结构，给用户更好的体验。
+	 * @tutorial https://uview-plus.jiangruyi.com/components/skeleton.html
+	 * @property {Boolean}					loading		是否显示骨架占位图，设置为false将会展示子组件内容 (默认 true )
+	 * @property {Boolean}					animate		是否开启动画效果 (默认 true )
+	 * @property {String | Number}			rows		段落占位图行数 (默认 0 )
+	 * @property {String | Number | Array}	rowsWidth	段落占位图的宽度，可以为百分比，数值，带单位字符串等，可通过数组传入指定每个段落行的宽度 (默认 '100%' )
+	 * @property {String | Number | Array}	rowsHeight	段落的高度 (默认 18 )
+	 * @property {Boolean}					title		是否展示标题占位图 (默认 true )
+	 * @property {String | Number}			titleWidth	标题的宽度 (默认 '50%' )
+	 * @property {String | Number}			titleHeight	标题的高度 (默认 18 )
+	 * @property {Boolean}					avatar		是否展示头像占位图 (默认 false )
+	 * @property {String | Number}			avatarSize	头像占位图大小 (默认 32 )
+	 * @property {String}					avatarShape	头像占位图的形状，circle-圆形，square-方形 (默认 'circle' )
+	 * @example <up-search placeholder="日照香炉生紫烟" v-model="keyword"></up-search>
+	 */
+	export default {
+		name: 'up-skeleton',
+		mixins: [mpMixin, mixin, propsSkeleton],
+		data() {
+			return {
+				width: 0
+			}
+		},
+		watch: {
+			loading: {
+				handler: function() {
+					this.getComponentWidth()
+				}
+			}
+		},
+		computed: {
+			rowsArray(): Array<UTSJSONObject> {
+				const rows: Array<UTSJSONObject> = []
+				// @ts-ignore
+				for (let i = 0; i < parseInt(this.rows.toString()); i++) {
+					let item: UTSJSONObject = {}
+					// 需要预防超出数组边界的情况
+					let rowWidth: string | number = ''
+					if (this.rowsWidth instanceof Array) {
+						// 数组形式
+						// @ts-ignore
+						if (i === parseInt(this.rows.toString()) - 1) {
+							rowWidth = '70%'
+						} else {
+							rowWidth = this.rowsWidth[i] != null ? this.rowsWidth[i]??'0px'
+								// @ts-ignore
+								:  (i === this.rowsWidth.length ? '70%' : '100%')
+						}
+					} else {
+						// 非数组形式
+						// @ts-ignore
+						if (i === parseInt(this.rows.toString()) - 1) {
+							rowWidth = '70%'
+						} else {
+							// @ts-ignore
+							rowWidth = this.rowsWidth.toString()
+						}
+					}
+					
+					let rowHeight: string | number = ''
+					if (this.rowsHeight instanceof Array) {
+						// @ts-ignore
+						rowHeight = this.rowsHeight[i] != null ? this.rowsHeight[i]??'0px' : '18px'
+					} else {
+						// @ts-ignore
+						rowHeight = this.rowsHeight.toString()
+					}
+					
+					// 如果有title占位图，第一个段落占位图的外边距需要大一些，如果没有title占位图，第一个段落占位图则无需外边距
+					// 之所以需要这么做，是因为weex的无能，以提升性能为借口不支持css的一些伪类
+					if (!this.title && i == 0) {
+						item['marginTop'] = '0px'
+					} else if (this.title && i == 0) {
+						item['marginTop'] = '20px'
+					} else {
+						item['marginTop'] = '12px'
+					}
+
+					item['width'] = addUnit(rowWidth)
+					item['height'] = addUnit(rowHeight)
+					rows.push(item)
+				}
+				return rows
+			},
+			uTitleWidth(): string {
+				let tWidth = '0px'
+				tWidth = addUnit(this.titleWidth)
+				return addUnit(tWidth)
+			}
+		},
+		mounted() {
+			this.init()
+		},
+		methods: {
+			addUnit(e: any): string {
+				return addUnit(e)
+			},
+			init() {
+				this.getComponentWidth()
+			},
+			// 获取组件的宽度
+			async getComponentWidth() {
+				// 延时一定时间，以获取dom尺寸
+				await sleep(20)
+				// #ifndef APP-NVUE
+				// 这里需要模拟 $uGetRect 方法
+				// #endif
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	@mixin background {
+		background-color: #F1F2F4;
+	}
+	.up-skeleton {
+		flex: 1;
+		
+		&__wrapper {
+			@include flex(row);
+			
+			&__avatar {
+				/* #ifndef APP-NVUE */
+				@include background;
+				// background-size: 400% 100%;
+				/* #endif */
+				margin-right: 15px;
+			
+				&--circle {
+					border-radius: 100px;
+				}
+			
+				&--square {
+					border-radius: 4px;
+				}
+			}
+			
+			&__content {
+				flex: 1;
+			
+				&__rows,
+				&__title {
+					/* #ifndef APP-NVUE */
+					@include background;
+					// background-size: 400% 100%;
+					/* #endif */
+					border-radius: 3px;
+				}
+			}
+		}
+	}
+
+	/* #ifndef APP-NVUE */
+	// .animate {
+	// 	animation: skeleton 1.8s ease infinite
+	// }
+
+	// @keyframes skeleton {
+	// 	0% {
+	// 		background-position: 100% 50%
+	// 	}
+
+	// 	100% {
+	// 		background-position: 0 50%
+	// 	}
+	// }
+
+	/* #endif */
+</style>

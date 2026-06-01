@@ -1,0 +1,196 @@
+<template>
+	<view
+	    class="up-col"
+		ref="up-col"
+	    :class="[
+			'up-col-' + span
+		]"
+	    :style="[colStyle, $upAddStyle(customStyle)]"
+	    @tap="clickHandler"
+	>
+		<slot></slot>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import type { PropType } from 'vue'
+	import { ref, computed, getCurrentInstance } from 'vue'
+	import defProps from './col.uts'
+	import { addStyle, addUnit, deepMerge, getPx } from '../../libs/function/index'
+	import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'
+	const { parent, parentData, getParentData } = useUltraUI({
+		gutter: 0
+	})
+	
+	defineOptions({
+		namne: 'up-col'
+	})
+	
+	// props
+	const props = defineProps({
+		// 占父容器宽度的多少等分，总分为12份
+		span: {
+			type: [String, Number],
+			default: defProps.getNumber('col.span')
+		},
+		// 指定栅格左侧的间隔数(总12栏)
+		offset: {
+			type: [String, Number],
+			default: defProps.getNumber('col.offset')
+		},
+		// 水平排列方式，可选值为`start`(或`flex-start`)、`end`(或`flex-end`)、`center`、`around`(或`space-around`)、`between`(或`space-between`)
+		justify: {
+			type: String,
+			default: defProps.getString('col.justify')
+		},
+		// 垂直对齐方式，可选值为top、center、bottom、stretch
+		align: {
+			type: String,
+			default: defProps.getString('col.align')
+		},
+		// 文字对齐方式
+		textAlign: {
+			type: String,
+			default: defProps.getString('col.textAlign')
+		}
+	})
+	
+	// 定义事件
+	const emit = defineEmits(['click'])
+	
+	// 获取实例
+	const instance = getCurrentInstance()!.proxy!
+	
+	// 响应式数据
+	const width = ref(0)
+	const gridNum = ref(12)
+	
+	// 计算属性
+	const uJustify = computed(() => {
+		if (props.justify == 'end' || props.justify == 'start') return 'flex-' + props.justify
+		else if (props.justify == 'around' || props.justify == 'between') return 'space-' + props.justify
+		else return props.justify
+	})
+	
+	const uAlignItem = computed(() => {
+		if (props.align == 'top') return 'flex-start'
+		if (props.align == 'bottom') return 'flex-end'
+		else return props.align
+	})
+	
+	const colStyle = computed(() => {
+		// @ts-ignore
+		let pct = 100 / gridNum.value * parseInt(props.span.toString());
+		const style = {
+			// 这里写成"padding: 0 10px"的形式是因为nvue的需要
+			// @ts-ignore
+			paddingLeft: addUnit(parseInt(getPx(parentData.value['gutter'].toString()))/2),
+			// @ts-ignore
+			paddingRight: addUnit(parseInt(getPx(parentData.value['gutter'].toString()))/2),
+			alignItems: uAlignItem.value,
+			// @ts-ignore
+			justifyContent: uJustify.value,
+			textAlign: props.textAlign,
+			flex: `0 0 ${pct.toString()}%`,
+			// @ts-ignore
+			marginLeft: (100 / 12 * parseInt(props.offset.toString())).toString() + '%'
+		}
+		return style
+	})
+	
+	const updateParentData = (): void => {
+		// @ts-ignore
+		getParentData('up-row', instance, false)
+	}
+	
+	// 方法
+	const init = (): void => {
+		// 支付宝小程序不支持provide/inject，所以使用这个方法获取整个父组件，在created定义，避免循环引用
+		updateParentData()
+		let promise = parent.value?.$callMethod('getComponentWidth')
+		if (promise != null) {
+			(promise as Promise<number|null>).then((widthTmp: number|null) => {
+				if (widthTmp != null) {
+					width.value = parseInt(widthTmp.toString())
+				}
+			})
+		}
+	}
+	
+	const clickHandler = (e: any): void => {
+		emit('click');
+	}
+	
+	// 初始化
+	init()
+</script>
+
+<style lang="scss" scoped>
+	@import "../../libs/css/components.scss";
+
+	.up-col {
+		padding: 0;
+		/* #ifndef APP-NVUE */
+		box-sizing:border-box;
+		/* #endif */
+		/* #ifdef MP */
+		display: block;
+		/* #endif */
+	}
+
+	// nvue下百分比无效
+	/* #ifndef APP-NVUE */
+	.up-col-0 {
+		width: 0;
+	}
+
+	.up-col-1 {
+		width: calc(100%/12);
+	}
+
+	.up-col-2 {
+		width: calc(100%/12 * 2);
+	}
+
+	.up-col-3 {
+		width: calc(100%/12 * 3);
+	}
+
+	.up-col-4 {
+		width: calc(100%/12 * 4);
+	}
+
+	.up-col-5 {
+		width: calc(100%/12 * 5);
+	}
+
+	.up-col-6 {
+		width: calc(100%/12 * 6);
+	}
+
+	.up-col-7 {
+		width: calc(100%/12 * 7);
+	}
+
+	.up-col-8 {
+		width: calc(100%/12 * 8);
+	}
+
+	.up-col-9 {
+		width: calc(100%/12 * 9);
+	}
+
+	.up-col-10 {
+		width: calc(100%/12 * 10);
+	}
+
+	.up-col-11 {
+		width: calc(100%/12 * 11);
+	}
+
+	.up-col-12 {
+		width: calc(100%/12 * 12);
+	}
+
+	/* #endif */
+</style>

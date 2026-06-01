@@ -1,0 +1,552 @@
+<template>
+    <view class="up-goods-sku"> 
+        <view @click="open">
+            <slot name="trigger"></slot>
+        </view>
+        <up-popup
+            v-model:show="show"
+            mode="bottom"
+            :closeable="pageInline ? false : closeable"
+            :pageInline="pageInline"
+            :border-radius="20"
+            @close="close"
+        >
+            <view class="up-goods-sku-container" :style="{padding: pageInline ? '0px' : ''}">
+                <view class="up-goods-sku__header">
+                    <slot name="header">
+                        <view class="up-goods-sku__header__image">
+                            <image :src="goodsImage" mode="aspectFill"></image>
+                        </view>
+                        <view class="up-goods-sku__header__info">
+                            <view class="up-goods-sku__header__info__price">
+                                <text class="up-goods-sku__header__info__price__symbol">¥</text>
+                                <text class="up-goods-sku__header__info__price__value">{{ price }}</text>
+                            </view>
+                            <view class="up-goods-sku__header__info__stock">库存 {{ stock }} 件</view>
+                            <view class="up-goods-sku__header__info__selected">已选: {{ selectedSkuText }}</view>
+                        </view>
+                    </slot>
+                </view>
+                
+                <scroll-view class="up-goods-sku__content" scroll-y>
+                    <view v-for="(treeItem, index) in skuTreeList" :key="index" class="up-goods-sku__content__item">
+                        <view class="up-goods-sku__content__item__title">{{ getTreeLabel(treeItem) }}</view>
+                        <view class="up-goods-sku__content__item__list">
+                            <view 
+                                v-for="(leafItem, leafIndex) in getTreeChildren(treeItem)" 
+                                :key="leafIndex"
+                                class="up-goods-sku__content__item__list__item"
+                                :class="{
+                                    'up-goods-sku__content__item__list__item--active': isSelected(getTreeName(treeItem), getLeafId(leafItem)),
+                                    'up-goods-sku__content__item__list__item--disabled': isDisabled(getTreeName(treeItem), getLeafId(leafItem))
+                                }"
+                                @click="onSkuClick(getTreeName(treeItem), leafItem)"
+                            >
+                                <text>{{ getLeafName(leafItem) }}</text>
+                            </view>
+                        </view>
+                    </view>
+                    
+                    <view class="up-goods-sku__content__count">
+                        <view class="up-goods-sku__content__count__title">购买数量</view>
+                        <view class="up-goods-sku__content__count__control">
+                            <up-number-box 
+                                v-model="buyNum" 
+                                :min="1" 
+                                :max="maxBuyNum"
+                                :disabled="!canBuy"
+                                @change="onNumChange"
+                            ></up-number-box>
+                        </view>
+                    </view>
+                </scroll-view>
+                
+                <view class="up-goods-sku__footer">
+                    <up-button 
+                        type="primary" 
+                        :disabled="!canBuy" 
+                        @click="onConfirm"
+                    >
+                        {{ confirmText }}
+                    </up-button>
+                </view>
+            </view>
+        </up-popup>
+    </view>
+</template>
+
+<script>
+	import type { PropType } from 'vue'
+	import { t } from '../../libs/i18n'
+	function emptySkuList(): Array<UTSJSONObject> {
+		return [] as Array<UTSJSONObject>
+	}
+	function emptyStringList(): Array<string> {
+		return [] as Array<string>
+	}
+	function emptyObject(): UTSJSONObject {
+		return {} as UTSJSONObject
+	}
+	function normalizeNumber(value: any | null, defaultValue: number = 0): number {
+		if (typeof value === 'number') {
+			return value
+		}
+		if (value == null) {
+			return defaultValue
+		}
+		const parsed = parseFloat(value.toString())
+		return isNaN(parsed) ? defaultValue : parsed
+	}
+	function hasValue(value: any | null): boolean {
+		return value != null && value.toString().length > 0
+	}
+	function sameValue(left: any | null, right: any | null): boolean {
+		if (left == null || right == null) {
+			return left == right
+		}
+		return left.toString() == right.toString()
+	}
+	function getFirstNumber(obj: UTSJSONObject | null, firstKey: string, secondKey: string, defaultValue: number = 0): number {
+		if (obj == null) {
+			return defaultValue
+		}
+		const firstValue = obj[firstKey]
+		if (hasValue(firstValue)) {
+			return normalizeNumber(firstValue, defaultValue)
+		}
+		const secondValue = obj[secondKey]
+		if (hasValue(secondValue)) {
+			return normalizeNumber(secondValue, defaultValue)
+		}
+		return defaultValue
+	}
+	export default {
+		name: 'up-goods-sku',
+		props: {
+			// 商品信息
+			goodsInfo: {
+				type: Object as PropType<UTSJSONObject>,
+				default(): UTSJSONObject {
+					return emptyObject()
+				}
+			},
+			// SKU树形结构
+			skuTree: {
+				type: Array as PropType<Array<UTSJSONObject>>,
+				default(): Array<UTSJSONObject> {
+					return emptySkuList()
+				}
+			},
+			// SKU列表
+			skuList: {
+				type: Array as PropType<Array<UTSJSONObject>>,
+				default(): Array<UTSJSONObject> {
+					return emptySkuList()
+				}
+			},
+			// 最大购买数量
+			maxBuy: {
+				type: Number,
+				default: 999
+			},
+			// 确认按钮文字
+			confirmText: {
+				type: String,
+				default: '确定'
+			},
+            // 是否显示关闭弹窗按钮
+            closeable: {
+				type: Boolean,
+				default: true
+			},
+            // 是否页面内联模式
+            pageInline: {
+				type: Boolean,
+				default: false
+			}
+		},
+		data() {
+			return {
+                show: false,
+				// 已选择的SKU
+				selectedSku: emptyObject(),
+				// 购买数量
+				buyNum: 1
+			}
+		},
+		computed: {
+			skuTreeList(): Array<UTSJSONObject> {
+				return this.skuTree as Array<UTSJSONObject>
+			},
+			skuDataList(): Array<UTSJSONObject> {
+				return this.skuList as Array<UTSJSONObject>
+			},
+			// 当前价格
+			price(): number {
+				const selectedSkuComb = this.getSelectedSkuComb()
+				if (selectedSkuComb != null) {
+					return getFirstNumber(selectedSkuComb, 'price', 'price_fee', 0)
+				}
+				return getFirstNumber(this.goodsInfo as UTSJSONObject | null, 'price', 'price_fee', 0)
+			},
+			// 当前库存
+			stock(): number {
+				const selectedSkuComb = this.getSelectedSkuComb()
+				if (selectedSkuComb != null) {
+					return getFirstNumber(selectedSkuComb, 'stock', 'quantity', 0)
+				}
+				return getFirstNumber(this.goodsInfo as UTSJSONObject | null, 'stock', 'quantity', 0)
+			},
+			goodsImage(): string {
+				const goods = this.goodsInfo as UTSJSONObject | null
+				if (goods == null) {
+					return ''
+				}
+				const image = goods['image']
+				if (image != null && image.toString().length > 0) {
+					return image.toString()
+				}
+				const picture = goods['picture']
+				return picture == null ? '' : picture.toString()
+			},
+			// 最大购买数量
+			maxBuyNum(): number {
+				const stock = this.stock
+				return stock > this.maxBuy ? this.maxBuy : stock
+			},
+			// 是否可以购买
+			canBuy(): boolean {
+				const selectedSkuCount = this.getSelectedCount(this.selectedSku as UTSJSONObject)
+				const skuTreeCount = this.skuTreeList.length
+				return selectedSkuCount === skuTreeCount && this.buyNum > 0 && this.stock > 0
+			},
+			// 已选SKU文字描述
+			selectedSkuText(): string {
+				const selected = emptyStringList()
+				const selectedSku = this.selectedSku as UTSJSONObject
+				const keys = UTSJSONObject.keys(selectedSku)
+				for (let i = 0; i < keys.length; i++) {
+					const key = keys[i]
+					const value = selectedSku[key]
+					if (hasValue(value)) {
+						const treeList = this.skuTreeList
+						for (let treeIndex = 0; treeIndex < treeList.length; treeIndex++) {
+							const treeItem = treeList[treeIndex]
+							if (this.getTreeName(treeItem) == key) {
+								const children = this.getTreeChildren(treeItem)
+								for (let leafIndex = 0; leafIndex < children.length; leafIndex++) {
+									const leafItem = children[leafIndex]
+									if (sameValue(this.getLeafId(leafItem), value)) {
+										selected.push(this.getLeafName(leafItem))
+									}
+								}
+							}
+						}
+					}
+				}
+				return selected.join(', ')
+			}
+		},
+		watch: {
+		},
+        emits: ['open', 'confirm', 'close'],
+        created() {
+            if (this.pageInline) {
+                this.show = true;
+            }
+		},
+		methods: {
+			t,
+			getTreeLabel(treeItem: UTSJSONObject): string {
+				const value = treeItem['label']
+				return value == null ? '' : value.toString()
+			},
+			getTreeName(treeItem: UTSJSONObject): string {
+				const value = treeItem['name']
+				return value == null ? '' : value.toString()
+			},
+			getTreeChildren(treeItem: UTSJSONObject): Array<UTSJSONObject> {
+				const children = treeItem['children'] as Array<UTSJSONObject> | null
+				return children == null ? emptySkuList() : children
+			},
+			getLeafId(leafItem: UTSJSONObject): any | null {
+				return leafItem['id']
+			},
+			getLeafName(leafItem: UTSJSONObject): string {
+				const value = leafItem['name']
+				return value == null ? '' : value.toString()
+			},
+			getSelectedCount(selectedSku: UTSJSONObject): number {
+				let count = 0
+				const keys = UTSJSONObject.keys(selectedSku)
+				for (let i = 0; i < keys.length; i++) {
+					if (hasValue(selectedSku[keys[i]])) {
+						count++
+					}
+				}
+				return count
+			},
+			cloneSelectedWithValue(skuKey: string, skuValueId: any | null): UTSJSONObject {
+				const tempSelected = emptyObject()
+				const selectedSku = this.selectedSku as UTSJSONObject
+				const keys = UTSJSONObject.keys(selectedSku)
+				for (let i = 0; i < keys.length; i++) {
+					const key = keys[i]
+					tempSelected[key] = selectedSku[key]
+				}
+				tempSelected[skuKey] = skuValueId
+				return tempSelected
+			},
+			// 判断SKU是否被选中
+			isSelected(skuKey: string, skuValueId: any | null): boolean {
+				const selectedSku = this.selectedSku as UTSJSONObject
+				return sameValue(selectedSku[skuKey], skuValueId)
+			},
+			// 判断SKU是否禁用
+			isDisabled(skuKey: string, skuValueId: any | null): boolean {
+				// 构造一个临时的已选中SKU对象
+				const tempSelected = this.cloneSelectedWithValue(skuKey, skuValueId)
+				
+				// 检查是否还有未选择的SKU维度
+				const selectedCount = this.getSelectedCount(tempSelected)
+				const totalSkuCount = this.skuTreeList.length
+				
+				// 如果所有SKU都已选择，则检查组合是否存在
+				if (selectedCount === totalSkuCount) {
+					return this.getSkuComb(tempSelected) == null
+				}
+				
+				// 检查当前选择的SKU是否会导致无法组成有效组合
+				const list = this.skuDataList
+				for (let i = 0; i < list.length; i++) {
+					const sku = list[i]
+					let match = true
+					
+					// 检查已选中的SKU是否匹配
+					const keys = UTSJSONObject.keys(tempSelected)
+					for (let keyIndex = 0; keyIndex < keys.length; keyIndex++) {
+						const key = keys[keyIndex]
+						if (hasValue(tempSelected[key]) && !sameValue(sku[key], tempSelected[key])) {
+							match = false
+							break
+						}
+					}
+					
+					if (match) {
+						return false
+					}
+				}
+				
+				return true
+			},
+			// SKU点击事件
+			onSkuClick(skuKey: string, skuValue: UTSJSONObject): void {
+				const skuValueId = this.getLeafId(skuValue)
+				// 如果是禁用状态，直接返回
+				if (this.isDisabled(skuKey, skuValueId)) {
+					return
+				}
+				
+				// 如果已选中，则取消选中
+				const selectedSku = this.selectedSku as UTSJSONObject
+				if (sameValue(selectedSku[skuKey], skuValueId)) {
+					selectedSku[skuKey] = ''
+				} else {
+					selectedSku[skuKey] = skuValueId
+				}
+			},
+			// 数量改变事件
+			onNumChange(e: UTSJSONObject): void {
+				this.buyNum = normalizeNumber(e['value'], this.buyNum)
+			},
+			// 获取选中的SKU组合
+			getSelectedSkuComb(): UTSJSONObject | null {
+				return this.getSkuComb(this.selectedSku as UTSJSONObject)
+			},
+			// 根据已选SKU获取组合信息
+			getSkuComb(selectedSku: UTSJSONObject): UTSJSONObject | null {
+				const selected = emptyObject()
+				const selectedKeys = UTSJSONObject.keys(selectedSku)
+				for (let selectedIndex = 0; selectedIndex < selectedKeys.length; selectedIndex++) {
+					const key = selectedKeys[selectedIndex]
+					if (hasValue(selectedSku[key])) {
+						selected[key] = selectedSku[key]
+					}
+				}
+				
+				// 检查是否所有SKU都已选择
+				if (UTSJSONObject.keys(selected).length !== this.skuTreeList.length) {
+					return null
+				}
+				
+				// 查找匹配的SKU组合
+				const list = this.skuDataList
+				for (let i = 0; i < list.length; i++) {
+					const sku = list[i]
+					let match = true
+					
+					const keys = UTSJSONObject.keys(selected)
+					for (let keyIndex = 0; keyIndex < keys.length; keyIndex++) {
+						const key = keys[keyIndex]
+						if (!sameValue(sku[key], selected[key])) {
+							match = false
+							break
+						}
+					}
+					
+					if (match) {
+						return sku
+					}
+				}
+				
+				return null
+			},
+			// 重置选择
+			reset(): void {
+				this.selectedSku = emptyObject()
+				this.buyNum = 1
+			},
+            open(): void {
+                this.show = true;
+                this.$emit('open')
+            },
+			// 关闭弹窗
+			close(): void {
+                this.show = false;
+				this.$emit('close')
+			},
+			// 确认选择
+			onConfirm(): void {
+				if (this.canBuy == false) {
+					return
+				}
+				
+				const selectedSkuComb = this.getSelectedSkuComb()
+				this.$emit('confirm', {
+					sku: selectedSkuComb,
+					goodsInfo: this.goodsInfo,
+					num: this.buyNum,
+					selectedText: this.selectedSkuText
+				} as UTSJSONObject)
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.up-goods-sku {
+		background-color: #fff;
+		overflow: hidden;
+
+        .up-goods-sku-container {
+            padding: 4rpx 30rpx;
+        }
+		
+		&__header {
+			display: flex;
+            flex-direction: row;
+			padding: 30rpx 0;
+			position: relative;
+			
+			&__image {
+				width: 180rpx;
+				height: 180rpx;
+				border-radius: 10rpx;
+				overflow: hidden;
+				margin-right: 20rpx;
+}
+			
+			&__info {
+				flex: 1;
+				
+				&__price {
+					display: flex;
+                    flex-direction: row;
+					align-items: flex-end;
+					margin-bottom: 20rpx;
+					
+					&__symbol {
+						font-size: 24rpx;
+						color: #fa3534;
+						margin-right: 4rpx;
+					}
+					
+					&__value {
+						font-size: 36rpx;
+						color: #fa3534;
+						font-weight: bold;
+					}
+				}
+				
+				&__stock {
+					font-size: 26rpx;
+					color: #999;
+					margin-bottom: 20rpx;
+				}
+				
+				&__selected {
+					font-size: 26rpx;
+					color: #333;
+				}
+			}
+		}
+		
+		&__content {
+			max-height: 600rpx;
+			padding: 0 30rpx 30rpx 0;
+			
+			&__item {
+				margin-bottom: 30rpx;
+				
+				&__title {
+					font-size: 28rpx;
+					color: #333;
+					margin-bottom: 20rpx;
+				}
+				
+				&__list {
+					display: flex;
+                    flex-direction: row;
+					flex-wrap: wrap;
+					
+					&__item {
+						padding: 10rpx 20rpx;
+						border: 2rpx solid #eee;
+						border-radius: 10rpx;
+						margin-right: 20rpx;
+						margin-bottom: 20rpx;
+						font-size: 26rpx;
+						color: #333;
+						
+						&--active {
+							border-color: #fa3534;
+							color: #fa3534;
+						}
+						
+						&--disabled {
+							color: #ccc;
+							border-color: #eee;
+						}
+					}
+				}
+			}
+			
+			&__count {
+				display: flex;
+                flex-direction: row;
+				align-items: center;
+				justify-content: space-between;
+				margin-top: 20rpx;
+				
+				&__title {
+					font-size: 28rpx;
+					color: #333;
+				}
+			}
+		}
+		
+		&__footer {
+			padding: 20rpx 0rpx 40rpx 0;
+		}
+	}
+</style>

@@ -1,0 +1,292 @@
+<template>
+	<view
+		class="up-card"
+		@tap.stop="click"
+		:class="{ 'up-border': border, 'up-card-full': full,
+			'up-card--border': parseInt($upGetPx(borderRadius)) > 0 }"
+		:style="{
+			borderRadius: $up.addUnit(borderRadius),
+			margin: margin,
+			boxShadow: boxShadow
+		}"
+	>
+		<view
+			v-if="showHead"
+			class="up-card__head"
+			:style="[{padding: $up.addUnit(paddingHead != '' ? paddingHead : padding)}, headStyle]"
+			:class="{
+				'up-border-bottom': headBorderBottom
+			}"
+			@tap="headClick"
+		>
+			<view v-if="$slots['head'] == null"
+				class="up-flex up-row-between up-flex-between up-flex-items-center">
+				<view class="up-card__head--left up-flex up-flex-items-center up-line-11"
+					v-if="title != ''">
+					<image
+						:src="thumb"
+						class="up-card__head--left__thumb"
+						mode="aspectFill"
+						v-if="thumb"
+						:style="{ 
+							height: $up.addUnit(thumbWidth), 
+							width: $up.addUnit(thumbWidth), 
+							borderRadius: thumbCircle ? '50px' : '4px' 
+						}"
+					></image>
+					<text
+						class="up-card__head--left__title up-line-1"
+						:style="{
+							fontSize: $up.addUnit(titleSize),
+							color: titleColor
+						}"
+					>
+						{{ title }}
+					</text>
+				</view>
+				<view class="up-card__head--right up-line-1"
+					v-if="subTitle != ''">
+					<text
+						class="up-card__head__title__text"
+						:style="{
+							fontSize: $up.addUnit(subTitleSize),
+							color: subTitleColor
+						}"
+					>
+						{{ subTitle }}
+					</text>
+				</view>
+			</view>
+			<slot name="head" v-else />
+		</view>
+		<view @tap="bodyClick" class="up-card__body"
+			:style="[{padding: $upAddUnit(paddingBody != '' ? paddingBody : padding)}, bodyStyle]">
+			<slot name="body" />
+		</view>
+		<view
+			v-if="showFoot"
+			class="up-card__foot"
+			 @tap="footClick"
+			:style="[{padding: $slots['foot'] != null ? $upAddUnit(paddingFoot != '' ? paddingFoot : padding) : 0}, footStyle]"
+			:class="{
+				'up-border-top': footBorderTop
+			}"
+		>
+			<slot name="foot" />
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import type { PropType } from 'vue'
+import { computed } from 'vue'
+import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'
+import { addUnit, getPx } from '../../libs/function/index'
+import defProps from './card.uts'
+
+// options
+defineOptions({
+  name: 'up-card'
+})
+
+// props
+const props = defineProps({
+  // 与屏幕两侧是否留空隙
+  full: {
+    type: Boolean,
+    default: defProps.getBoolean('card.full')
+  },
+  // 标题
+  title: {
+    type: String,
+    default: defProps.getString('card.title')
+  },
+  // 标题颜色
+  titleColor: {
+    type: String,
+    default: defProps.getString('card.titleColor')
+  },
+  // 标题字体大小
+  titleSize: {
+    type: [Number, String],
+    default: defProps.getString('card.titleSize')
+  },
+  // 副标题
+  subTitle: {
+    type: String,
+    default: defProps.getString('card.subTitle')
+  },
+  // 副标题颜色
+  subTitleColor: {
+    type: String,
+    default: defProps.getString('card.subTitleColor')
+  },
+  // 副标题字体大小
+  subTitleSize: {
+    type: [Number, String],
+    default: defProps.getBoolean('card.subTitleSize')
+  },
+  // 是否显示外部边框，只对full=false时有效(卡片与边框有空隙时)
+  border: {
+    type: Boolean,
+    default: defProps.getBoolean('card.border')
+  },
+  // 用于标识点击了第几个
+  index: {
+    type: [Number, String, Object],
+    default: defProps.getString('card.index')
+  },
+  // 用于隔开上下左右的边距，带单位的写法，如："30px 30px"，"20px 20px 30px 30px"
+  margin: {
+    type: String,
+    default: defProps.getString('card.margin')
+  },
+  // card卡片的圆角
+  borderRadius: {
+    type: [Number, String],
+    default: defProps.getString('card.borderRadius')
+  },
+  // 头部自定义样式，对象形式
+  headStyle: {
+    type: Object,
+    default: defProps.getAny('card.headStyle') as UTSJSONObject
+  },
+  // 主体自定义样式，对象形式
+  bodyStyle: {
+    type: Object,
+    default: defProps.getAny('card.bodyStyle') as UTSJSONObject
+  },
+  // 底部自定义样式，对象形式
+  footStyle: {
+    type: Object,
+    default: defProps.getAny('card.footStyle') as UTSJSONObject
+  },
+  // 头部是否下边框
+  headBorderBottom: {
+    type: Boolean,
+    default: defProps.getBoolean('card.headBorderBottom')
+  },
+  // 底部是否有上边框
+  footBorderTop: {
+    type: Boolean,
+    default: defProps.getBoolean('card.footBorderTop')
+  },
+  // 标题左边的缩略图
+  thumb: {
+    type: String,
+    default: defProps.getString('card.thumb')
+  },
+  // 缩略图宽高
+  thumbWidth: {
+    type: [String, Number],
+    default: defProps.getString('card.thumbWidth')
+  },
+  // 缩略图是否为圆形
+  thumbCircle: {
+    type: Boolean,
+    default: defProps.getBoolean('card.thumbCircle')
+  },
+  // 给head，body，foot的内边距
+  padding: {
+    type: [String, Number],
+    default: defProps.getString('card.padding')
+  },
+  paddingHead: {
+    type: [String, Number],
+    default: defProps.getString('card.paddingHead')
+  },
+  paddingBody: {
+    type: [String, Number],
+    default: defProps.getString('card.paddingBody')
+  },
+  paddingFoot: {
+    type: [String, Number],
+    default: defProps.getString('card.paddingFoot')
+  },
+  // 是否显示头部
+  showHead: {
+    type: Boolean,
+    default: defProps.getBoolean('card.showHead')
+  },
+  // 是否显示尾部
+  showFoot: {
+    type: Boolean,
+    default: defProps.getBoolean('card.showFoot')
+  },
+  // 卡片外围阴影，字符串形式
+  boxShadow: {
+    type: String,
+    default: defProps.getString('card.boxShadow')
+  }
+})
+
+// 定义事件
+const emit = defineEmits(['click', 'head-click', 'body-click', 'foot-click'])
+
+// 方法
+const click = () => {
+  emit('click', props.index);
+}
+
+const headClick = () => {
+  emit('head-click', props.index);
+}
+
+const bodyClick = () => {
+  emit('body-click', props.index);
+}
+
+const footClick = () => {
+  emit('foot-click', props.index);
+}
+</script>
+
+<style lang="scss" scoped>
+@import "../../libs/css/components.scss";
+	
+.up-card {
+	position: relative;
+	overflow: hidden;
+	font-size: 28rpx;
+	background-color: #ffffff;
+	box-sizing: border-box;
+	
+	&-full {
+		// 如果是与屏幕之间不留空隙，应该设置左右边距为0
+		margin-left: 0 !important;
+		margin-right: 0 !important;
+		width: 100%;
+	}
+	
+	&--border:after {
+		border-radius: 16rpx;
+	}
+
+	&__head {
+		&--left {
+			color: $up-main-color;
+			
+			&__thumb {
+				margin-right: 16rpx;
+			}
+			
+			&__title {
+				max-width: 400rpx;
+			}
+		}
+
+		&--right {
+			color: $up-tips-color;
+			margin-left: 16rpx;
+		}
+	}
+
+	&__body {
+		color: $up-content-color;
+	}
+
+	&__foot {
+		color: $up-tips-color;
+	}
+}
+</style>

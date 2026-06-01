@@ -1,0 +1,195 @@
+<template>
+	<view
+	    class="up-checkbox-group"
+	    :class="bemClass"
+	>
+		<slot></slot>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { computed, ref, watch } from 'vue'
+	import defProps from './checkboxGroup.uts'
+	import { bem } from '../../libs/function/index'
+	import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'
+	const { children, getChildren, addChild } = useUltraUI()
+	const instance = getCurrentInstance()!.proxy!
+	
+	defineOptions({
+		//...mpSharedMpOptions,
+		name: 'up-checkbox-group'
+	})
+	
+	// 定义 props
+	const props = defineProps({
+		// 标识符 
+		name: {
+			type: String,
+			default: defProps.getString('checkboxGroup.name')
+		},
+		// 绑定的值
+		modelValue: {
+			type: Array as PropType<any[]>,
+			default: () => defProps.getArray<any>('checkboxGroup.value')
+		},
+		// 形状，circle-圆形，square-方形
+		shape: {
+			type: String,
+			default: defProps.getString('checkboxGroup.shape')
+		},
+		// 是否禁用全部checkbox
+		disabled: {
+			type: Boolean,
+			default: defProps.getBoolean('checkboxGroup.disabled')
+		},
+		// 选中状态下的颜色，如设置此值，将会覆盖parent的activeColor值
+		activeColor: {
+			type: String,
+			default: defProps.getString('checkboxGroup.activeColor')
+		},
+		// 未选中的颜色
+		inactiveColor: {
+			type: String,
+			default: defProps.getString('checkboxGroup.inactiveColor')
+		},
+		// 整个组件的尺寸 单位px
+		size: {
+			type: [String, Number],
+			default: defProps.getNumber('checkboxGroup.size')
+		},
+		// 布局方式，row-横向，column-纵向
+		placement: {
+			type: String,
+			default: defProps.getString('checkboxGroup.placement')
+		},
+		// label的字体大小，px单位
+		labelSize: {
+			type: [String, Number],
+			default: defProps.getNumber('checkboxGroup.labelSize')
+		},
+		// label的字体颜色
+		labelColor: {
+			type: String,
+			default: defProps.getString('checkboxGroup.labelColor')
+		},
+		// 是否禁止点击文本操作
+		labelDisabled: {
+			type: Boolean,
+			default: defProps.getBoolean('checkboxGroup.labelDisabled')
+		},
+		// 图标颜色
+		iconColor: {
+			type: String,
+			default: defProps.getString('checkboxGroup.iconColor')
+		},
+		// 图标的大小，单位px
+		iconSize: {
+			type: [String, Number],
+			default: defProps.getNumber('checkboxGroup.iconSize')
+		},
+		// 勾选图标的对齐方式，left-左边，right-右边
+		iconPlacement: {
+			type: String,
+			default: defProps.getString('checkboxGroup.iconPlacement')
+		},
+		// placement为row时，是否显示下边框
+		borderBottom: {
+			type: Boolean,
+			default: defProps.getBoolean('checkboxGroup.borderBottom')
+		}
+	});
+	
+	// 定义 emit
+	const emit = defineEmits(['update:modelValue', 'change']);
+	
+	// 这里computed的变量，都是子组件up-checkbox需要用到的，由于头条小程序的兼容性差异，子组件无法实时监听父组件参数的变化
+	// 所以需要手动通知子组件，这里返回一个parentDataSelf变量，供watch监听，在其中去通知每一个子组件
+	const parentDataSelf = computed((): UTSJSONObject => {
+		return {
+			modelValue: props.modelValue,
+			disabled: props.disabled,
+			inactiveColor: props.inactiveColor,
+			activeColor: props.activeColor,
+			size: props.size,
+			labelColor: props.labelColor,
+			labelDisabled: props.labelDisabled,
+			labelSize: props.labelSize,
+			shape: props.shape,
+			iconColor: props.iconColor,
+			iconSize: props.iconSize,
+			iconPlacement: props.iconPlacement,
+			borderBottom: props.borderBottom,
+			placement: props.placement,
+		};
+	});
+	
+	const bemClass = computed(() => {
+		return bem('checkbox-group', [props.placement], [])
+	});
+	
+	// 将其他的checkbox设置为未选中的状态
+	function unCheckedOther(childInstance: ComponentPublicInstance) {
+		const values = [] as string[];
+		// if (children.value != null) {
+			children.value?.map((child: ComponentPublicInstance) => {
+				// 将被选中的checkbox，放到数组中返回
+				let istats = child.$callMethod('getInternalState') as UTSJSONObject
+				// console.log(istats)
+				// if (istats != null) {
+					if (istats['name'] != null && istats['isChecked'] != null && istats['isChecked'].toString() == 'true') {
+						values.push(istats['name'].toString())
+					}
+				// }
+			})
+		// }
+		// 发出事件
+		emit('change', values, childInstance.$callMethod('getInternalState') as UTSJSONObject)
+		// 修改通过v-model绑定的值
+		emit("update:modelValue", values)
+	}
+	
+	// 监听 parentDataSelf 变化
+	watch(parentDataSelf, () => {
+		// if (children.value != null) {
+			children.value?.map((child: ComponentPublicInstance) => {
+				// 判断子组件(up-checkbox)如果有init方法的话，就就执行(执行的结果是子组件重新从父组件拉取了最新的值)
+				child?.$callMethod('init');
+			});
+		// }
+	}, { deep: true });
+	
+	const getProps = function(): UTSJSONObject {
+		return parentDataSelf.value
+	}
+	const getRefs = function() {
+		return {
+		}
+	}
+	
+	// 暴露方法给子组件
+	defineExpose({
+		unCheckedOther,
+		getChildren,
+		addChild,
+		getProps,
+		getRefs
+	})
+</script>
+
+<style lang="scss" scoped>
+	@import "../../libs/css/components.scss";
+
+	.up-checkbox-group {
+
+		&--row {
+			/* #ifndef APP-NVUE */
+			display: flex;
+			/* #endif */
+			flex-flow: row wrap;
+		}
+
+		&--column {
+			@include flex(column);
+		}
+	}
+</style>

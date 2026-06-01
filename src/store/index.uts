@@ -14,7 +14,7 @@ const pinia = createPinia()
 // 持久化插件配置
 pinia.use(createPersistPlugin({
   keyPrefix: 'pinia:',
-  includeStores: ['token', 'user'],  // 仅持久化 token 和 user store
+  includeStores: ['token', 'user', 'app'],  // 持久化 token, user 和 app store
   excludeStores: [] as string[],
   serializer: null,
 } as PersistOptions))
@@ -27,3 +27,4 @@ export default pinia
 // 模块统一导出
 export * from './token'
 export * from './user'
+export * from './app'

@@ -1,0 +1,337 @@
+<template>
+	<up-popup
+	    :show="show"
+	    mode="bottom"
+	    @close="closeHandler"
+	    :safeAreaInsetBottom="safeAreaInsetBottom"
+	    :round="round"
+	>
+		<view class="up-action-sheet">
+			<view
+			    class="up-action-sheet__header"
+			    v-if="title"
+			>
+				<text class="up-action-sheet__header__title up-line-1">{{title}}</text>
+			    <view
+			        class="up-action-sheet__header__icon-wrap"
+			        @tap.stop="cancel"
+			    >
+			        <up-icon
+			            name="close"
+			            size="17"
+			            color="#c8c9cc"
+			            bold
+			        ></up-icon>
+			    </view>
+			</view>
+			<text
+			    class="up-action-sheet__description"
+				:style="[{
+					marginTop: `${title != '' && description != '' ? 0 : '18px'}`
+				}]"
+			    v-if="description"
+			>{{description}}</text>
+			<slot>
+				<up-line v-if="description"></up-line>
+				<scroll-view scroll-y class="up-action-sheet__item-wrap" :style="{maxHeight: wrapMaxHeight}">
+					<view :key="index" v-for="(item, index) in actions">
+						<!-- #ifdef MP -->
+						<button
+						    class="up-reset-button"
+						    :openType="item['openType']"
+						    @getuserinfo="onOpenType('getuserinfo', $event)"
+						    @contact="onOpenType('contact', $event)"
+						    @getphonenumber="onOpenType('getphonenumber', $event)"
+						    @error="onOpenType('error', $event)"
+						    @launchapp="onOpenType('launchapp', $event)"
+						    @opensetting="onOpenType('opensetting', $event)"
+						    :lang="lang"
+						    :session-from="sessionFrom"
+						    :send-message-title="sendMessageTitle"
+						    :send-message-path="sendMessagePath"
+						    :send-message-img="sendMessageImg"
+						    :show-message-card="showMessageCard"
+						    :app-parameter="appParameter"
+						    @tap="selectHandler(index)"
+						    :hover-class="!item['disabled'] && !item['loading'] ? 'up-action-sheet--hover' : ''"
+						>
+							<!-- #endif -->
+							<view
+							    class="up-action-sheet__item-wrap__item"
+							    @tap.stop="selectHandler(index)"
+							    :hover-class="item['disabled'] != true && item['loading'] != true ? 'up-action-sheet--hover' : ''"
+							    :hover-stay-time="150"
+							>
+								<up-loading-icon
+								    v-if="item['loading']"
+								    custom-class="van-action-sheet__loading"
+								    size="18"
+								    mode="circle"
+								/>
+								<template v-else>
+									<text
+									    class="up-action-sheet__item-wrap__item__name"
+									    :style="[itemStyle(index)]"
+									>{{ item['name'] }}</text>
+									<text
+									    v-if="item['subname'] != ''"
+									    class="up-action-sheet__item-wrap__item__subname"
+									>{{ item['subname'] }}</text>
+								</template>
+							</view>
+							<!-- #ifdef MP -->
+						</button>
+						<!-- #endif -->
+						<up-line v-if="index !== actions.length - 1"></up-line>
+					</view>
+				</scroll-view>
+			</slot>
+			<up-gap
+			    bgColor="#eaeaec"
+			    height="6"
+			    v-if="cancelText"
+			></up-gap>
+			<view class="up-action-sheet__item-wrap__item up-action-sheet__cancel"
+				hover-class="up-action-sheet--hover" @tap="cancel" v-if="cancelText">
+				<text
+				    @touchmove.stop
+				    :hover-stay-time="150"
+				    class="up-action-sheet__cancel-text"
+				>{{cancelText}}</text>
+			</view>
+		</view>
+	</up-popup>
+</template>
+
+<script setup lang="uts">
+import type { PropType } from 'vue'
+import { computed, onBeforeUnmount, getCurrentInstance } from 'vue'
+// import { propsActionSheet } from './props'
+import { useOpenType } from '../../libs/composable/useOpenType'
+import { buttonProps } from '../../libs/composable/useButton'
+import { mpSharedMpOptions } from '../../libs/composable/useMp'
+import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'
+import { addUnit } from '../../libs/function/index'
+import { UPActionSheetItem, UPActionSheetProps } from './types.uts'
+import defProps from './actionSheet.uts'
+const { onComponentDestroy, preventEvent, noop} = useUltraUI()
+const instance = getCurrentInstance()!.proxy!
+
+// options
+defineOptions({
+  // ...mpSharedMpOptions,
+  name: 'up-action-sheet'
+})
+
+// props
+const props = defineProps({
+	// 操作菜单是否展示 （默认false）
+	show: {
+	    type: Boolean,
+	    default: defProps.getBoolean('actionSheet.show')
+	},
+	// 标题
+	title: {
+	    type: String,
+	    default: defProps.getString('actionSheet.title')
+	},
+	// 选项上方的描述信息
+	description: {
+	    type: String,
+	    default: defProps.getString('actionSheet.description')
+	},
+	// 数据
+	actions: {
+	    type: Array as PropType<UTSJSONObject[]>,
+	    default: () : Array<UTSJSONObject> => {
+		    return []
+	    }
+	},
+	// 取消按钮的文字，不为空时显示按钮
+	cancelText: {
+	    type: String,
+	    default: defProps.getString('actionSheet.cancelText')
+	},
+	// 点击某个菜单项时是否关闭弹窗
+	closeOnClickAction: {
+	    type: Boolean,
+	    default: defProps.getBoolean('actionSheet.closeOnClickAction')
+	},
+	// 处理底部安全区（默认true）
+	safeAreaInsetBottom: {
+	    type: Boolean,
+	    default: defProps.getBoolean('actionSheet.safeAreaInsetBottom')
+	},
+	// 小程序的打开方式
+	openType: {
+	    type: String,
+	    default: defProps.getString('actionSheet.openType')
+	},
+	// 点击遮罩是否允许关闭 (默认true)
+	closeOnClickOverlay: {
+	    type: Boolean,
+	    default: defProps.getBoolean('actionSheet.closeOnClickOverlay')
+	},
+	// 圆角值
+	round: {
+	    type: [Boolean, String, Number],
+	    default: defProps.getAny('actionSheet.round')
+	},
+	// 选项区域最大高度
+	wrapMaxHeight: {
+	    type: [String],
+	    default: defProps.getString('actionSheet.wrapMaxHeight')
+	},
+	// 	...commonProps,
+	// 	...buttonProps
+})
+
+onMounted(() => {
+	// console.log(props)
+})
+
+onBeforeUnmount(() => {
+	onComponentDestroy(instance)
+})
+
+// emit定义
+const emit = defineEmits([
+	'close', 'select', 'update:show',
+	'getuserinfo', 'contact', 'getphonenumber', 'error', 'launchapp', 'opensetting'
+])
+const onOpenType = (name: string, event: UniCustomEvent<UTSJSONObject>) => {
+	// @ts-ignore
+	emit(name, event.detail)
+}
+
+// 操作项目的样式
+const itemStyle = computed(() => {
+    return (index: number): any => {
+        let style = {}
+        // if (props['actions'][index]['color'] != null && props.actions[index]['color'] != '') {
+        //     style['color'] = props.actions[index].color
+        // }
+        // if (props.actions[index]['fontSize'] != null && props.actions[index]['fontSize'] != '') {
+        //      style['fontSize'] = addUnit(props.actions[index].fontSize)
+        // }
+        // // 选项被禁用的样式
+        // if (props.actions[index]['disabled'] != null && props.actions[index]['disabled'] == true) {
+        //     style['color'] = '#c0c4cc'
+        // }
+        return style
+    }
+})
+
+const closeHandler = () => {
+    // 允许点击遮罩关闭时，才发出close事件
+    if(props.closeOnClickOverlay) {
+        emit('update:show')
+        emit('close')
+    }
+}
+
+// 点击取消按钮
+const cancel = () => {
+    emit('update:show')
+    emit('close')
+}
+
+const selectHandler = (index: number) => {
+    const item = props.actions[index]
+    if (item['disabled'] != true && item['loading'] != true) {
+        emit('select', item as UTSJSONObject)
+        if (props.closeOnClickAction) {
+            emit('update:show')
+            emit('close')
+        }
+    }
+}
+</script>
+
+<style lang="scss" scoped>
+	@import "../../libs/css/components.scss";
+	$up-action-sheet-reset-button-width:100% !default;
+	$up-action-sheet-title-font-size: 16px !default;
+	$up-action-sheet-title-padding: 12px 30px !default;
+	$up-action-sheet-title-color: $up-main-color !default;
+	$up-action-sheet-header-icon-wrap-right:15px !default;
+	$up-action-sheet-header-icon-wrap-top:15px !default;
+	$up-action-sheet-description-font-size:13px !default;
+	$up-action-sheet-description-color:14px !default;
+	$up-action-sheet-description-margin: 18px 15px !default;
+	$up-action-sheet-item-wrap-item-padding:17px !default;
+	$up-action-sheet-item-wrap-name-font-size:16px !default;
+	$up-action-sheet-item-wrap-subname-font-size:13px !default;
+	$up-action-sheet-item-wrap-subname-color: #c0c4cc !default;
+	$up-action-sheet-item-wrap-subname-margin-top:10px !default;
+	$up-action-sheet-cancel-text-font-size:16px !default;
+	$up-action-sheet-cancel-text-color:$up-content-color !default;
+	$up-action-sheet-cancel-text-font-size:15px !default;
+	$up-action-sheet-cancel-text-hover-background-color:rgb(242, 243, 245) !default;
+
+	.up-reset-button {
+		width: $up-action-sheet-reset-button-width;
+	}
+
+	.up-action-sheet {
+		// text-align: center;
+		&__header {
+			position: relative;
+			padding: $up-action-sheet-title-padding;
+			&__title {
+				font-size: $up-action-sheet-title-font-size;
+				color: $up-action-sheet-title-color;
+				font-weight: bold;
+				text-align: center;
+			}
+
+			&__icon-wrap {
+				position: absolute;
+				right: $up-action-sheet-header-icon-wrap-right;
+				top: $up-action-sheet-header-icon-wrap-top;
+			}
+		}
+
+		&__description {
+			font-size: $up-action-sheet-description-font-size;
+			color: $up-tips-color;
+			margin: $up-action-sheet-description-margin;
+			text-align: center;
+		}
+
+		&__item-wrap {
+
+			&__item {
+				padding: $up-action-sheet-item-wrap-item-padding;
+				@include flex;
+				align-items: center;
+				justify-content: center;
+				flex-direction: column;
+
+				&__name {
+					font-size: $up-action-sheet-item-wrap-name-font-size;
+					color: $up-main-color;
+					text-align: center;
+				}
+
+				&__subname {
+					font-size: $up-action-sheet-item-wrap-subname-font-size;
+					color: $up-action-sheet-item-wrap-subname-color;
+					margin-top: $up-action-sheet-item-wrap-subname-margin-top;
+					text-align: center;
+				}
+			}
+		}
+
+		&__cancel-text {
+			font-size: $up-action-sheet-cancel-text-font-size;
+			color: $up-action-sheet-cancel-text-color;
+			text-align: center;
+			// padding: $up-action-sheet-cancel-text-font-size;
+		}
+
+		&--hover {
+			background-color: $up-action-sheet-cancel-text-hover-background-color;
+		}
+	}
+</style>

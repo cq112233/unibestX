@@ -1,0 +1,26 @@
+/*
+ * @Author       : jry
+ * @Description  : uview-plus component's props mixin file
+ * @version      : 4.0
+ * @Date         : 2024-04-22 16:44:21
+ * @LastAuthor   : jry
+ * @lastTime     : 2024-08-28 12:27:20
+ */
+import { defineMixin } from '../../libs/vue.uts'
+import defProps from './cellGroup.uts'
+let cellGroup = defProps['cellGroup'] as UTSJSONObject
+
+export const propsCellGroup = defineMixin({
+    props: {
+        // 分组标题
+        title: {
+            type: String,
+            default: cellGroup['title']
+        },
+        // 是否显示外边框
+        border: {
+            type: Boolean,
+            default: cellGroup['border']
+        }
+    }
+})

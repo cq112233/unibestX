@@ -1,0 +1,350 @@
+<template>
+    <view class="up-waterfall">
+        <!-- 新增支持多列布局 -->
+        <view 
+            v-for="(column, index) in columnList" 
+            :key="index"
+            :ref="`up-column-${index}`"
+            :id="`up-column-${index}`"
+            class="up-column"
+            :style="getColumnStyle(index)"
+        >
+            <slot name="column"
+                :colIndex="index" 
+                :colList="column">
+            </slot>
+            <slot name="left"
+                :colIndex="index" 
+                :leftList="column">
+            </slot>
+            <template v-if="$slots['left'] == null && $slots['column'] == null"
+				v-for="(item, itemIndex) in column" :key="itemIndex">
+                <slot :item="item" :itemIndex="itemIndex"></slot>
+            </template>
+        </view>
+    </view>
+</template>
+
+<script lang="uts">
+    /**
+     * waterfall 瀑布流
+     * @description 这是一个瀑布流形式的组件，对原组件进行升级已经支持自定义列数模式，便于适配不同屏幕。搭配loadMore 加载更多组件，让您开箱即用，眼前一亮。
+     * @tutorial https://uview-plus.jiangruyi.com/components/waterfall.html
+     * @property {Array} flow-list 用于渲染的数据
+     * @property {String Number} add-time 单条数据添加到队列的时间间隔，单位ms，见上方注意事项说明（默认200）
+     * @property {String Number} columns 瀑布流列数，默认为2，设置为auto时自动根据屏幕宽度调整列数
+     * @example <up-waterfall :flowList="flowList"></up-waterfall>
+     */
+    import { propsWaterfall } from './props.uts';
+    import { mpMixin } from '../../libs/mixin/mpMixin.uts';
+	import { mixin } from '../../libs/mixin/mixin.uts';
+    import { sleep } from '../../libs/function/index.uts';
+    import { nextTick } from 'vue';
+    
+    export default {
+        name: "up-waterfall",
+        mixins: [mpMixin, mixin, propsWaterfall],
+        data() {
+            return {
+                columnList: [[], []] as UTSJSONObject[][], // 存储每列的数据
+                // children: [] as ComponentPublicInstance[],
+                // 用于标记是否已经初始化
+                initialized: false,
+                windowWidth: 375,
+                windowHeight: 0,
+                resizeTimer: 0
+            }
+        },
+        watch: {
+            copyFlowList: {
+                handler(nVal: UTSJSONObject[], oVal: UTSJSONObject[]) {
+					// @ts-ignore
+                    if (nVal.length == 0) {
+                        this.clear(false);
+                    } else {
+                        if (this.columnList.length == 1) {
+                            this.initColumnList()
+                        }
+                        // 取差值，即这一次数组变化新增的部分
+                        let startIndex = Array.isArray(oVal) && oVal.length > 0 ? oVal.length : 0;
+                        // 直接处理数据，不再使用tempList和splitData
+                        this.handleData(nVal.slice(startIndex));
+                    }
+                },
+                immediate: true
+            },
+            columns: {
+                handler() {
+                    this.initColumnList();
+                    // 重新分配数据
+                    if (this.copyFlowList.length > 0) {
+                        this.redistributeData();
+                    }
+                },
+                immediate: false
+            }
+        },
+        created() { 
+            this.initColumnList();
+        },
+        mounted() {
+            this.initialized = true;
+            // 添加窗口大小变化监听
+            // #ifdef H5
+            if (this.columns === 'auto') {
+				// @ts-ignore
+                uni.onWindowResize(this.handleWindowResize);
+            }
+            // #endif
+        },
+        // 添加beforeUnmount生命周期清理事件监听
+        beforeUnmount() {
+            // #ifdef H5
+			// todo2026 wait uni-app-x
+            // if (this.columns === 'auto') {
+            //     uni.offWindowResize(this.handleWindowResize);
+            // }
+            // #endif
+        },
+        computed: {
+            // 破坏flowList变量的引用，否则watch的结果新旧值是一样的
+            copyFlowList(): UTSJSONObject[] {
+                // @ts-ignore
+				if (this.modelValue.length == 0) {
+                    // console.log('clear');
+                    return [];
+                } else {
+                    return this.cloneData(this.modelValue);
+                }
+            }
+        },
+        emits: ['update:modelValue', 'update:value', 'after-add-one', 'after-add-all'],
+        methods: {
+            // 初始化列数据数组
+            initColumnList() {
+                this.windowWidth = uni.getSystemInfoSync().windowWidth;
+                const cols = this.getColumnsCount();
+                // console.log('********cols***********', cols)
+				this.columnList = []
+				for (var index = 0; index < cols; index++) {
+					this.columnList.push([] as UTSJSONObject[])
+				}
+            },
+            
+            // 获取列数，支持auto模式
+            getColumnsCount(): number {
+                if (this.columns === 'auto') {
+                    // 列间距为10rpx(约等于7px)
+                    const columnGap = 7;
+                    // 计算可容纳的列数
+                    let columnCount = Math.max(1, Math.floor(this.windowWidth / (this.minColumnWidth + columnGap)));
+                    // @ts-ignore
+					if (columnCount < this.columnsMin as number) {
+                        columnCount = this.columnsMin as number
+                    }
+                    return columnCount;
+                }
+                return parseInt(this.columns as string) ?? 2;
+            },
+            
+            // 窗口大小变化处理函数
+            getColumnStyle(index: number): UTSJSONObject {
+                const style = {} as UTSJSONObject
+                if (index > 0) {
+                    style['marginLeft'] = '10rpx'
+                }
+                return style
+            },
+
+            handleWindowResize(res: UTSJSONObject): void {
+                const size = res['size'] as UTSJSONObject | null
+                if (size != null) {
+                    const width = size['windowWidth']
+                    const height = size['windowHeight']
+                    if (width != null) {
+                        this.windowWidth = parseInt(width.toString())
+                    }
+                    if (height != null) {
+                        this.windowHeight = parseInt(height.toString())
+                    }
+                } else {
+                    this.windowWidth = uni.getSystemInfoSync().windowWidth
+                }
+                const newColumnsCount = this.getColumnsCount()
+                const oldColumnsCount = this.columnList.length
+                if (newColumnsCount != oldColumnsCount) {
+                    this.redistributeData()
+                }
+            },
+            
+            // 重新分配所有数据
+            async redistributeData() {
+                // 清空所有列
+                this.initColumnList();
+                // 保存所有数据
+                const allData = this.cloneData(this.copyFlowList);
+                // 重新分配数据
+                this.handleData(allData);
+            },
+            
+            // 处理新增数据
+            async handleData(newData: UTSJSONObject[]) {
+				// @ts-ignore
+                if (newData.length == 0) return;
+                
+                // 初始化列高度数组
+				let columnHeights: Array<number> = []
+				for (var index = 0; index < this.columnList.length; index++) {
+					columnHeights.push(0)
+				}
+                // const columnHeights = new UPArray(this.columnList.length).fill(0);
+                
+                // 获取各列当前高度
+                for (let i = 0; i < this.columnList.length; i++) {
+                    // try {
+                        // @ts-ignore
+						const rect: NodeInfo = await this.upGetRect(`#up-column-${i}`);
+                        // console.log(`#up-column-${i}`, rect.height)
+                        columnHeights[i] = rect.height ?? 0;
+                    // } catch (e) {
+                    //     columnHeights[i] = 0;
+                    // }
+                }
+                
+                // 分配新数据到最短的列
+                for (let item of newData) {
+                    const minHeightIndex = columnHeights.indexOf(Math.min(...columnHeights));
+                    // console.log('this.columnList', this.columnList)
+                    this.columnList[minHeightIndex].push(item);
+                    
+                    // 获取实际渲染后的元素高度而不是估算
+                    await sleep(this.addTime as number)
+					await nextTick();
+					try {
+					    // @ts-ignore
+						const rect: NodeInfo = await this.upGetRect(`#up-column-${minHeightIndex}`)
+						// console.log(`#up-column-${minHeightIndex}`, rect.height)
+						if (rect.height != null) {
+							columnHeights[minHeightIndex] = rect.height ?? 0;
+							// 加载一个后置事件
+							this.$emit('after-add-one', {
+								...item,
+								height: rect.height
+							});
+						}
+					} catch (e) {
+					    // console.log(e)
+					    // columnHeights[i] = 0;
+					}
+                }
+                // 加载所有后置事件
+                this.$emit('after-add-all', {
+                    columnHeights: columnHeights,
+                    newData: newData
+                });
+            },
+
+            // 复制而不是引用对象和数组
+            cloneData(data: UTSJSONObject[]): UTSJSONObject[] {
+                return JSON.parse(JSON.stringify(data)) as UTSJSONObject[];
+            },
+            
+            // 清空数据列表
+            clear(bak: boolean = true) {
+                this.initColumnList();
+                // 同时清除父组件列表中的数据
+                if (bak) {
+                    this.$emit('update:modelValue', [] as UTSJSONObject[]);
+                }
+            },
+            
+            // 清除某一条指定的数据，根据id实现
+            remove(id: any | null) {
+				if (id == null) return
+                // 遍历所有列查找并删除数据
+                for (let i = 0; i < this.columnList.length; i++) {
+                    const index = (this.columnList[i] as UTSJSONObject[]).findIndex((val: UTSJSONObject) => {
+						// @ts-ignore
+						return val[this.idKey].toString() == id.toString()
+					});
+                    if (index != -1) {
+                        this.columnList[i].splice(index, 1);
+                        break;
+                    }
+                }
+                
+                // 同时清除父组件的数据中的对应id的条目
+                // @ts-ignore
+				const modelValueIndex = this.modelValue.findIndex((val: UTSJSONObject) => {
+					// @ts-ignore
+					return val[this.idKey].toString() == id.toString()
+				});
+                if (modelValueIndex != -1) {
+                    const newModelValue = this.cloneData(this.modelValue);
+                    newModelValue.splice(modelValueIndex, 1);
+                    this.$emit('update:modelValue', newModelValue);
+                }
+            },
+            
+            // 修改某条数据的某个属性
+            modify(id: any, key: string, value: any) {
+                let found = false;
+                let targetItem: UTSJSONObject = {};
+                
+                // 在所有列中查找数据
+                for (let i = 0; i < this.columnList.length; i++) {
+                    const index = this.columnList[i].findIndex((val: UTSJSONObject) => {
+						// @ts-ignore
+						return val[this.idKey] != null && val[this.idKey].toString() == id.toString()
+					});
+                    if (index != -1) {
+                        // 修改对应key的值
+                        this.columnList[i][index][key] = value;
+                        targetItem = this.columnList[i][index];
+                        found = true;
+                        break;
+                    }
+                }
+                
+				// @ts-ignore
+                if (found && targetItem != null) {
+                    // 修改父组件的数据中的对应id的条目
+					// @ts-ignore
+                    const modelValueIndex = this.modelValue.findIndex((val: UTSJSONObject) => {
+						// @ts-ignore
+						return val[this.idKey] != null && val[this.idKey].toString() == id.toString()
+					});
+                    if (modelValueIndex != -1) {
+                        let data = this.cloneData(this.modelValue);
+                        data[modelValueIndex][key] = value;
+                        this.$emit('update:modelValue', data);
+                    }
+                }
+            }
+        }
+    }
+</script>
+
+<style lang="scss" scoped>
+    .up-waterfall {
+        @include flex;
+        flex-direction: row;
+        align-items: flex-start;
+    }
+
+    .up-column {
+        @include flex;
+        flex: 1;
+        flex-direction: column;
+        overflow: hidden;
+        /* #ifndef APP-NVUE */
+        height: 100%;
+        /* #endif */
+    }
+
+    .up-image {
+        /* #ifndef APP-NVUE */
+        // max-width: 100%;
+        /* #endif */
+    }
+</style>

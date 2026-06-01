@@ -1,0 +1,160 @@
+<template>
+	<view
+		class="up-line-progress"
+		:style="[addStyle(customStyle)]"
+	>
+		<view
+			class="up-line-progress__background"
+			:style="[backgroundStyle]"
+		>
+		</view>
+		<view
+			class="up-line-progress__line"
+			:style="[progressStyle]"
+		>
+			<slot>
+				<text v-if="showText && percentageValue >= 10" class="up-line-progress__text">{{ innerPercentage + '%' }}</text>
+			</slot>
+		</view>
+	</view>
+</template>
+
+<script>
+	import { mpMixin } from '../../libs/mixin/mpMixin.uts'
+	import { mixin } from '../../libs/mixin/mixin.uts'
+	import { addUnit, addStyle, sleep, range, upGetRect } from '../../libs/function/index.uts'
+	import defProps from './lineProgress.uts'
+	let crtProp = defProps['lineProgress'] as UTSJSONObject
+
+	function normalizeNumber(value: any | null, defaultValue: number = 0): number {
+		if (typeof value === 'number') {
+			return value
+		}
+		if (value == null) {
+			return defaultValue
+		}
+		const parsed = parseFloat(value.toString())
+		return isNaN(parsed) ? defaultValue : parsed
+	}
+
+	export default {
+		name: 'up-line-progress',
+		mixins: [mpMixin, mixin],
+		props: {
+			activeColor: {
+				type: String,
+				default: crtProp['activeColor']
+			},
+			inactiveColor: {
+				type: String,
+				default: crtProp['inactiveColor']
+			},
+			percentage: {
+				type: [String, Number],
+				default: crtProp['percentage']
+			},
+			showText: {
+				type: Boolean,
+				default: crtProp['showText']
+			},
+			height: {
+				type: [String, Number],
+				default: crtProp['height']
+			}
+		},
+		data() {
+			return {
+				lineWidth: '0px'
+			}
+		},
+		watch: {
+			percentage() {
+				this.resizeProgressWidth()
+			},
+			height() {
+				this.resizeProgressWidth()
+			}
+		},
+		computed: {
+			percentageValue(): number {
+				return normalizeNumber(this.percentage, 0)
+			},
+			innerPercentage(): number {
+				return range(0, 100, this.percentageValue)
+			},
+			backgroundStyle(): UTSJSONObject {
+				return {
+					backgroundColor: this.inactiveColor,
+					height: addUnit(this.height)
+				}
+			},
+			progressStyle(): UTSJSONObject {
+				return {
+					width: this.lineWidth,
+					backgroundColor: this.activeColor,
+					height: addUnit(this.height)
+				}
+			}
+		},
+		mounted() {
+			this.init()
+		},
+		methods: {
+			addStyle(e: any): any {
+				return addStyle(e)
+			},
+			init() {
+				sleep(20).then(() => {
+					this.resizeProgressWidth()
+				})
+			},
+			resizeProgressWidth() {
+				upGetRect('.up-line-progress__background', false, this).then((size: NodeInfo) => {
+					const width = size.width != null ? size.width : 0
+					this.lineWidth = (width * this.innerPercentage / 100).toString() + 'px'
+				})
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	@import "../../libs/css/components.scss";
+
+	.up-line-progress {
+		align-items: stretch;
+		position: relative;
+		@include flex(row);
+		flex: 1;
+		overflow: hidden;
+		border-radius: 100px;
+
+		&__background {
+			background-color: #ececec;
+			border-radius: 100px;
+			flex: 1;
+		}
+
+		&__line {
+			position: absolute;
+			top: 0;
+			left: 0;
+			bottom: 0;
+			align-items: center;
+			@include flex(row);
+			color: #ffffff;
+			border-radius: 100px;
+			transition: width 0.5s ease;
+			justify-content: flex-end;
+		}
+
+		&__text {
+			font-size: 10px;
+			align-items: center;
+			text-align: right;
+			color: #FFFFFF;
+			margin-right: 5px;
+			transform: scale(0.9);
+		}
+	}
+</style>

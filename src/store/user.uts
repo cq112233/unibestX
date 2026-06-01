@@ -13,7 +13,6 @@ export type IUserInfo = {
 
 export type IUserState = {
   userInfo : IUserInfo
-  theme : string
 }
 
 const DEFAULT_AVATAR = '/static/images/default-avatar.png'
@@ -27,7 +26,6 @@ const defaultUserInfo : IUserInfo = {
 
 const defaultUserState : IUserState = {
   userInfo: defaultUserInfo,
-  theme: 'light',
 }
 
 // ==========================================
@@ -43,7 +41,6 @@ export class UserStore extends PiniaStoreBase {
       nickname: '',
       avatar: DEFAULT_AVATAR,
     } as IUserInfo,
-    theme: 'light',
   })
 
   // 2. constructor
@@ -61,25 +58,23 @@ export class UserStore extends PiniaStoreBase {
     this.state.userInfo.username = defaultUserInfo.username
     this.state.userInfo.nickname = defaultUserInfo.nickname
     this.state.userInfo.avatar = defaultUserInfo.avatar
-    this.state.theme = defaultUserState.theme
   }
 
-  override _hydrate(data : UTSJSONObject) : void {
+  override _hydrate(_data : UTSJSONObject) : void {
     // 兼容历史老版本根目录下直接存放用户信息的数据结构
-    if (data['userId'] != null) this.state.userInfo.userId = data['userId'] as number
-    if (data['username'] != null) this.state.userInfo.username = data['username'] as string
-    if (data['nickname'] != null) this.state.userInfo.nickname = data['nickname'] as string
-    if (data['avatar'] != null) this.state.userInfo.avatar = data['avatar'] as string
+    if (_data['userId'] != null) this.state.userInfo.userId = _data['userId'] as number
+    if (_data['username'] != null) this.state.userInfo.username = _data['username'] as string
+    if (_data['nickname'] != null) this.state.userInfo.nickname = _data['nickname'] as string
+    if (_data['avatar'] != null) this.state.userInfo.avatar = _data['avatar'] as string
 
     // 新版本嵌套结构
-    if (data['userInfo'] != null) {
-      const infoObj = data['userInfo'] as UTSJSONObject
+    if (_data['userInfo'] != null) {
+      const infoObj = _data['userInfo'] as UTSJSONObject
       if (infoObj['userId'] != null) this.state.userInfo.userId = infoObj['userId'] as number
       if (infoObj['username'] != null) this.state.userInfo.username = infoObj['username'] as string
       if (infoObj['nickname'] != null) this.state.userInfo.nickname = infoObj['nickname'] as string
       if (infoObj['avatar'] != null) this.state.userInfo.avatar = infoObj['avatar'] as string
     }
-    if (data['theme'] != null) this.state.theme = data['theme'] as string
   }
 
   override _serialize() : UTSJSONObject {
@@ -92,7 +87,6 @@ export class UserStore extends PiniaStoreBase {
 
     return {
       userInfo: infoObj,
-      theme: this.state.theme,
     } as UTSJSONObject
   }
 
@@ -119,12 +113,7 @@ export class UserStore extends PiniaStoreBase {
     this.state.userInfo.avatar = avatar
   }
 
-  /**
-   * 设置主题色
-   */
-  setTheme(theme : string) : void {
-    this.state.theme = theme
-  }
+
 
   /**
    * 清除用户信息（退出登录时调用）

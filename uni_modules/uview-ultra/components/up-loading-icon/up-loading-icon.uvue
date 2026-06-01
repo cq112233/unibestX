@@ -1,0 +1,343 @@
+<template>
+	<view
+		class="up-loading-icon"
+		:style="[addStyle(customStyle)]"
+		:class="[vertical ? 'up-loading-icon--vertical' : '']"
+		v-if="show"
+	>
+		<view
+			v-if="!webviewHide"
+			class="up-loading-icon__spinner"
+			:class="[`up-loading-icon__spinner--${mode}`]"
+			ref="ani"
+			:style="{
+				transform: transform,
+				width: addUnit(size),
+				height: addUnit(size),
+				borderTopColor: color,
+				borderBottomColor: otherBorderColor,
+				borderLeftColor: otherBorderColor,
+				borderRightColor: otherBorderColor
+				// 'animation-duration': `${duration}ms`,
+				// 'animation-timing-function': (mode === 'semicircle' || mode === 'circle') ? timingFunction : ''
+			}"
+		>
+			<template v-if="mode === 'spinner'">
+				<view
+					v-for="(item, index) in array12"
+					:key="index"
+					class="up-loading-icon__dot"
+					:style="[spinnerStyle[index], getSpinnerDotStyle(index)]"
+				>
+				</view>
+			</template>
+		</view>
+		<text
+			v-if="text != ''"
+			class="up-loading-icon__text"
+			:style="{
+				fontSize: addUnit(textSize),
+				color: textColor,
+			}"
+		>{{text}}</text>
+	</view>
+</template>
+
+<script>
+	import { propsLoadicon } from './props';
+	import { mpMixin } from '../../libs/mixin/mpMixin';
+	import { mixin } from '../../libs/mixin/mixin';
+	import { addUnit, addStyle, getPx } from '../../libs/function/index';
+	import { colorGradient } from '../../libs/function/colorGradient';
+	/**
+	 * loading 加载动画
+	 * @author jry ijry@qq.com 2024
+	 * @description 警此组件为一个小动画，目前用在loadmore加载更多和switch开关等组件的正在加载状态场景。
+	 * @tutorial https://ijry.github.io/uview-plus/components/loading.html
+	 * @property {Boolean}			show			是否显示组件  (默认 true)
+	 * @property {String}			color			动画活动区域的颜色，只对 mode = flower 模式有效（默认color['up-tips-color']）
+	 * @property {String}			textColor		提示文本的颜色（默认color['up-tips-color']）
+	 * @property {Boolean}			vertical		文字和图标是否垂直排列 (默认 false )
+	 * @property {String}			mode			模式选择，见官网说明（默认 'circle' ）
+	 * @property {String, Number}	size			加载图标的大小，单位px （默认 24 ）
+	 * @property {String, Number}	textSize		文字大小（默认 15 ）
+	 * @property {String, Number}	text			文字内容 
+	 * @property {String}			timingFunction	动画模式 （默认 'ease-in-out' ）
+	 * @property {String, Number}	duration		动画执行周期时间（默认 1200）
+	 * @property {String}			inactiveColor	mode=circle时的暗边颜色 
+	 * @property {Object}			customStyle		定义需要用到的外部样式
+	 * @example <up-loading mode="circle"></up-loading>
+	 */
+	export default {
+		name: 'up-loading-icon',
+		mixins: [mpMixin, mixin, propsLoadicon],
+		data() {
+			return {
+				array12: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+				// 这里需要设置默认值为360，否则在安卓nvue上，会延迟一个duration周期后才执行
+				// 在iOS nvue上，则会一开始默认执行两个周期的动画
+				aniAngel: 360, // 动画旋转角度
+				webviewHide: false, // 监听webview的状态，如果隐藏了页面，则停止动画，以免性能消耗
+				loading: false, // 是否运行中，针对nvue使用
+				degree: 0, // js方案旋转角度因为uni-app-x不支持keyframes
+				transform: '', // js方案旋转
+				spinnerStyle: [
+					{left: 0, top: 0},{left: 0, top: 0},{left: 0, top: 0},{left: 0, top: 0},
+					{left: 0, top: 0},{left: 0, top: 0},{left: 0, top: 0},{left: 0, top: 0},
+					{left: 0, top: 0},{left: 0, top: 0},{left: 0, top: 0},{left: 0, top: 0}
+				] as UTSJSONObject[],
+				animationFrame: 0
+			}
+		},
+		computed: {
+			// 当为circle类型时，给其另外三边设置一个更轻一些的颜色
+			// 之所以需要这么做的原因是，比如父组件传了color为红色，那么需要另外的三个边为浅红色
+			// 而不能是固定的某一个其他颜色(因为这个固定的颜色可能浅蓝，导致效果没有那么细腻良好)
+			otherBorderColor(): string {
+				const lightColor = colorGradient(this.color, '#ffffff', 100)[80]
+				if (this.mode === 'circle') {
+					return this.inactiveColor != '' ? this.inactiveColor : lightColor
+				} else {
+					return 'transparent'
+				}
+				// return this.mode === 'circle' ? this.inactiveColor ? this.inactiveColor : lightColor : 'transparent'
+			}
+		},
+		watch: {
+			show(nVal: boolean) {
+				if (nVal) {
+					this.startRotate()
+				} else {
+					this.stopRotate()
+				}
+			}
+		},
+		mounted() {
+			this.init()
+		},
+		beforeUnmount() {
+			this.stopRotate()
+		},
+		methods: {
+			addStyle(val: any): any {
+				return addStyle(val)
+			},
+			addUnit(val: any): string {
+				return addUnit(val)
+			},
+			getSpinnerDotStyle(index: number): UTSJSONObject {
+				const style = {} as UTSJSONObject
+				style['backgroundColor'] = this.color
+				style['transform'] = `rotate(${((index + 1) * 30).toString()}deg)`
+				style['opacity'] = 1 - 0.0625 * index
+				return style
+			},
+			rotateLoader(): void {
+				this.degree = (this.degree + this.getRotateStep()) % 360
+				this.transform = `rotate(${this.degree.toString()}deg)`
+			},
+			init(): void {
+				this.calcSpinnerTopAndLeft()
+				this.startRotate()
+			},
+			getRotateDuration(): number {
+				const durationValue = this.$props['duration']
+				const durationNumber = parseInt(durationValue.toString())
+				return durationNumber > 0 ? durationNumber : 1200
+			},
+			getRotateStep(): number {
+				return 360 * 16 / this.getRotateDuration()
+			},
+			startRotate(): void {
+				if (!this.show || this.animationFrame > 0) {
+					return
+				}
+				this.animationFrame = setInterval(() => {
+					this.rotateLoader()
+				}, 16)
+			},
+			stopRotate(): void {
+				if (this.animationFrame > 0) {
+					clearInterval(this.animationFrame)
+					this.animationFrame = 0
+				}
+			},
+			calculateSquareRadius(sideLength: number): number {  
+				// 计算正方形的对角线长度  
+				const diagonalLength = Math.sqrt(sideLength * sideLength + sideLength * sideLength);  
+				// 对角线长度的一半即为等效圆的半径  
+				const radius = diagonalLength / 2;  
+				return radius;  
+			},
+			// 因为uni-app-x不支持:before所以实现Spinner得用JS计算坐标
+			calcSpinnerTopAndLeft(){
+				this.array12.forEach((ele: number, index: number) => {
+					const angle = index * (360 / 12); // 计算角度  
+					const angleRad = angle * (Math.PI / 180); // 转换为弧度  
+					const banjing = this.calculateSquareRadius(parseInt(getPx(parseInt(this.$props['size'].toString()) * 2)));  // 半径
+					const xOffset = banjing * Math.cos(angleRad);
+					const yOffset = banjing * Math.sin(angleRad);  
+					// 假设.loading-container的position是relative，并且宽度和高度都是100% 
+					this.spinnerStyle[index]['left'] = `${Math.round(45 + xOffset).toString()}%`; 
+					this.spinnerStyle[index]['top'] = `${Math.round(34 + yOffset).toString()}%`;  
+					// 注意：这里可能需要调整50%的偏移量
+				})
+			},
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	@import "../../libs/css/components.scss";
+
+	$up-loading-icon-color: #c8c9cc !default;
+	$up-loading-icon-text-margin-left:4px !default;
+	$up-loading-icon-text-color:$up-content-color !default;
+	$up-loading-icon-text-font-size:14px !default;
+	$up-loading-icon-text-line-height:20px !default;
+	$up-loading-width:30px !default;
+	$up-loading-height:30px !default;
+	$up-loading-max-width:100% !default;
+	$up-loading-max-height:100% !default;
+	$up-loading-semicircle-border-width: 2px !default;
+	$up-loading-semicircle-border-color:transparent !default;
+	$up-loading-semicircle-border-top-right-radius: 100px !default;
+	$up-loading-semicircle-border-top-left-radius: 100px !default;
+	$up-loading-semicircle-border-bottom-left-radius: 100px !default;
+	$up-loading-semicircle-border-bottom-right-radiu: 100px !default;
+	$up-loading-semicircle-border-style: solid !default;
+	$up-loading-circle-border-top-right-radius: 100px !default;
+	$up-loading-circle-border-top-left-radius: 100px !default;
+	$up-loading-circle-border-bottom-left-radius: 100px !default;
+	$up-loading-circle-border-bottom-right-radiu: 100px !default;
+	$up-loading-circle-border-width:2px !default;
+	$up-loading-circle-border-top-color:#e5e5e5 !default;
+	$up-loading-circle-border-right-color:$up-loading-circle-border-top-color !default;
+	$up-loading-circle-border-bottom-color:$up-loading-circle-border-top-color !default;
+	$up-loading-circle-border-left-color:$up-loading-circle-border-top-color !default;
+	$up-loading-circle-border-style:solid !default;
+	$up-loading-icon-host-font-size:0px !default;
+	$up-loading-icon-host-line-height:1 !default;
+	$up-loading-icon-vertical-margin:6px 0 0 !default;
+	$up-loading-icon-dot-top:0 !default;
+	$up-loading-icon-dot-left:0 !default;
+	$up-loading-icon-dot-width:100% !default;
+	$up-loading-icon-dot-height:100% !default;
+	$up-loading-icon-dot-before-width:2px !default;
+	$up-loading-icon-dot-before-height:25% !default;
+	$up-loading-icon-dot-before-margin:0 auto !default;
+	$up-loading-icon-dot-before-background-color: #ffffff !default;
+	$up-loading-icon-dot-before-border-radius:8px !default;
+
+	.up-loading-icon {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		// color: $up-loading-icon-color;
+
+		&__text {
+			margin-left: $up-loading-icon-text-margin-left;
+			color: $up-loading-icon-text-color;
+			font-size: $up-loading-icon-text-font-size;
+			line-height: $up-loading-icon-text-line-height;
+		}
+
+		&__spinner {
+			width: $up-loading-width;
+			height: $up-loading-height;
+			position: relative;
+			box-sizing: border-box;
+			// max-width: $up-loading-max-width;
+			// max-height: $up-loading-max-height;
+			// animation: up-rotate 1s linear infinite;
+		}
+
+		&__spinner--semicircle {
+			border-width: $up-loading-semicircle-border-width;
+			border-color: $up-loading-semicircle-border-color;
+			border-top-right-radius: $up-loading-semicircle-border-top-right-radius;
+			border-top-left-radius: $up-loading-semicircle-border-top-left-radius;
+			border-bottom-left-radius: $up-loading-semicircle-border-bottom-left-radius;
+			border-bottom-right-radius: $up-loading-semicircle-border-bottom-right-radiu;
+			border-style: $up-loading-semicircle-border-style;
+		}
+
+		&__spinner--circle {
+			border-top-right-radius: $up-loading-circle-border-top-right-radius;
+			border-top-left-radius: $up-loading-circle-border-top-left-radius;
+			border-bottom-left-radius: $up-loading-circle-border-bottom-left-radius;
+			border-bottom-right-radius: $up-loading-circle-border-bottom-right-radiu;
+			border-width: $up-loading-circle-border-width;
+			border-top-color: $up-loading-circle-border-top-color;
+			border-right-color: $up-loading-circle-border-right-color;
+			border-bottom-color: $up-loading-circle-border-bottom-color;
+			border-left-color: $up-loading-circle-border-left-color;
+			border-style: $up-loading-circle-border-style;
+		}
+
+		&--vertical {
+			flex-direction: column
+		}
+	}
+
+	// :host {
+	// 	font-size: $up-loading-icon-host-font-size;
+	// 	line-height: $up-loading-icon-host-line-height;
+	// }
+
+	.up-loading-icon {
+		&__spinner--spinner {
+			// todo2026 wait uni-app-x
+			// #ifndef APP
+			animation-timing-function: steps(12)
+			// #endif
+		}
+
+		&__text:empty {
+			display: none
+		}
+
+		&--vertical &__text {
+			margin: $up-loading-icon-vertical-margin;
+			color: $up-content-color;
+		}
+
+		&__dot {
+			position: absolute;
+			// top: $up-loading-icon-dot-top;
+			// left: $up-loading-icon-dot-left;
+			width: $up-loading-icon-dot-width;
+			height: $up-loading-icon-dot-height;
+
+			//&:before {
+				width: $up-loading-icon-dot-before-width;
+				height: $up-loading-icon-dot-before-height;
+				// margin: $up-loading-icon-dot-before-margin;
+				background-color: $up-loading-icon-dot-before-background-color;
+				border-radius: $up-loading-icon-dot-before-border-radius;
+			//}
+		}
+	}
+
+	$radius: v-bind(size)px;
+	@for $i from 1 through 12 {
+		// .up-loading-icon__dot:nth-of-type(#{$i}) {
+		// 	transform: rotate(($i + 2) * 30deg);
+		// 	opacity: 1 - 0.0625 * ($i - 1);
+		// }
+	}
+
+	// todo2026 wait uni-app-x
+	// #ifndef APP
+	@keyframes up-rotate {
+		0% {
+			transform: rotate(0deg)
+		}
+	
+		to {
+			transform: rotate(1turn)
+		}
+	}
+	// #endif
+</style>

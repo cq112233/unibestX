@@ -1,0 +1,364 @@
+<template>
+    <view class="up-album">
+        <view
+            class="up-album__row"
+            ref="up-album__row"
+            v-for="(arr, index) in showUrls"
+            :forComputedUse="albumWidth"
+            :key="index"
+            :style="{flexWrap: autoWrap ? 'wrap' : 'nowrap'}"
+        >
+            <view
+                class="up-album__row__wrapper"
+                v-for="(item, index1) in arr"
+                :key="index1"
+                :style="[imageStyle(index + 1, index1 + 1)]"
+                @tap="onPreviewTap($event, getSrc(item))"
+            >
+                <image
+                    :src="getSrc(item)"
+                    :mode="
+                        urls.length == 1
+                            ? (imageHeight != '0px' && imageHeight != '0rpx')
+                                ? singleMode
+                                : 'widthFix'
+                            : multipleMode
+                    "
+                    :style="[
+                        {
+                            width: imageWidth,
+                            height: imageHeight,
+                            borderRadius: shape == 'circle' ? '10000px' : $upAddUnit(radius)
+                        }
+                    ]"
+                ></image>
+                <view
+                    v-if="
+                        showMore &&
+                        urls.length > parseInt(rowCount.toString()) * showUrls.length &&
+                        index === showUrls.length - 1 &&
+                        index1 === showUrls[showUrls.length - 1].length - 1
+                    "
+                    class="up-album__row__wrapper__text"
+                    :style="{
+					    borderRadius: shape == 'circle' ? '50%' : $upAddUnit(radius),
+				    }"
+                >
+                    <up-text
+                        :text="`+${urls.length - parseInt(maxCount.toString())}`"
+                        color="#fff"
+                        :size="parseInt(multipleSize.toString()) * 0.3"
+                        align="center"
+                        customStyle="justify-content: center"
+                    ></up-text>
+                </view>
+            </view>
+        </view>
+    </view>
+</template>
+
+<script setup lang="uts">
+import type { PropType } from 'vue'
+import { ref, computed, watch, getCurrentInstance } from 'vue'
+// import { propsAlbum } from './props'
+import { mpSharedMpOptions } from '../../libs/composable/useMp'
+import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'
+import { addUnit, getPx, sleep, upGetRect } from '../../libs/function/index'
+import defProps from './album.uts'
+import imageProps from '../up-image/image.uts'
+const instance = getCurrentInstance()!.proxy!
+
+// options
+defineOptions({
+//   ...mpSharedMpOptions,
+  name: 'up-album'
+})
+
+// props
+const props = defineProps({
+	// 图片地址，Array<String>|Array<Object>形式
+	urls: {
+	    type: Array as PropType<any[]>,
+	    default: defProps.getArray<any>('album.urls')
+	},
+	// 指定从数组的对象元素中读取哪个属性作为图片地址
+	keyName: {
+	    type: String,
+	    default: defProps.getString('album.keyName')
+	},
+	// 单图时，图片长边的长度
+	singleSize: {
+	    type: [String, Number],
+	    default: defProps.getNumber('album.singleSize')
+	},
+	// 多图时，图片边长
+	multipleSize: {
+	    type: [String, Number],
+	    default: defProps.getNumber('album.multipleSize')
+	},
+	// 多图时，图片水平和垂直之间的间隔
+	space: {
+	    type: [String, Number],
+	    default: defProps.getNumber('album.space')
+	},
+	// 单图时，图片缩放裁剪的模式
+	singleMode: {
+	    type: String,
+	    default: defProps.getString('album.singleMode')
+	},
+	// 多图时，图片缩放裁剪的模式
+	multipleMode: {
+	    type: String,
+	    default: defProps.getString('album.multipleMode')
+	},
+	// 最多展示的图片数量，超出时最后一个位置将会显示剩余图片数量
+	maxCount: {
+	    type: [String, Number],
+	    default: defProps.getNumber('album.maxCount')
+	},
+	// 是否可以预览图片
+	previewFullImage: {
+	    type: Boolean,
+	    default: defProps.getBoolean('album.previewFullImage')
+	},
+	// 每行展示图片数量，如设置，singleSize和multipleSize将会无效
+	rowCount: {
+	    type: [String, Number],
+	    default: defProps.getNumber('album.rowCount')
+	},
+	// 超出maxCount时是否显示查看更多的提示
+	showMore: {
+	    type: Boolean,
+	    default: defProps.getBoolean('album.showMore')
+	},
+	// 图片形状，circle-圆形，square-方形
+	shape: {
+	    type: String,
+	    default: imageProps.getString('image.shape')
+	},
+	// 圆角，单位任意
+	radius: {
+	    type: [String, Number],
+	    default: imageProps.getNumber('image.radius')
+	},
+	// 自适应换行
+	autoWrap: {
+	    type: Boolean,
+	    default: defProps.getBoolean('album.autoWrap')
+	},
+	// 单位
+	unit: {
+	    type: String,
+	    default: defProps.getString('album.unit')
+	},
+	// 阻止点击冒泡
+	stop: {
+	    type: Boolean,
+	    default: defProps.getBoolean('album.stop')
+	}
+    // ...propsAlbum.props,
+    // ...commonProps
+})
+
+// 定义 emits
+const emit = defineEmits(["preview", "albumWidth"])
+const { preventEvent } = useUltraUI()
+
+// 响应式数据
+const singleWidth = ref(0)
+const singleHeight = ref(0)
+// 单图时，如果无法获取图片的尺寸信息，让图片宽度默认为容器的一定百分比
+const singlePercent = ref(0.6)
+
+// 获取图片的路径
+const getSrc = (item: any): string => {
+    if (typeof item == 'object') {
+        let item1 = item as UTSJSONObject;
+        return (props.keyName != '' && item1.getString(props.keyName) != null)
+            ? item1.getString(props.keyName)!
+            : item1.getString('src')!
+    } else {
+        return item.toString()
+    }
+}
+
+// 获取组件的宽度
+const getComponentWidth = async () => {
+    // 延时一定时间，以获取dom尺寸
+    sleep(30).then(() => {
+        upGetRect('.up-album__row', false, instance).then((res: any) => {
+            let size = res as NodeInfo
+            let width = size.width
+            if (width != null) {
+                singleWidth.value = width * singlePercent.value as number
+            }
+        })
+    })
+}
+
+// 计算属性 - 显示的 URL 数组
+const showUrls = computed(() => {
+    if (props.autoWrap) {
+        return [ props.urls.slice(0, parseInt(props.maxCount.toString())) ];
+    } else {
+        const arr: Array<Array<any>> = []
+        props.urls.map((item, index) => {
+            // 限制最大展示数量
+            if (index + 1 <= parseInt(props.maxCount.toString())) {
+                // 计算该元素为第几个数组内
+                const itemIndex = Math.floor(index / parseInt(props.rowCount.toString()))
+                // 判断对应的索引是否存在
+                if (arr.length == 0 || itemIndex >= arr.length) {
+                    arr.push([] as Array<any>)
+                }
+                arr[arr.length-1].push(item)
+            }
+        })
+        return arr
+    }
+})
+
+// 单图时，获取图片的尺寸
+// 在小程序中，需要将网络图片的的域名添加到小程序的download域名才可能获取尺寸
+// 在没有添加的情况下，让单图宽度默认为盒子的一定宽度(singlePercent)
+const getImageRect = () => {
+    const src = getSrc(props.urls[0])
+    uni.getImageInfo({
+        src,
+        success: (res: GetImageInfoSuccess ) => {
+            // 判断图片横向还是竖向展示方式
+            const isHorizotal = res.width >= res.height
+            singleWidth.value = isHorizotal
+                ? props.singleSize as number
+				// @ts-ignore
+                : (res.width / res.height) * getPx(props.singleSize) as number
+            singleHeight.value = !isHorizotal
+                ? props.singleSize as number
+                : (res.height / res.width) * singleWidth.value as number
+        },
+        fail: () => {
+            getComponentWidth()
+        }
+    })
+}
+
+onMounted(() => {
+    if (props.urls.length == 1) {
+        getImageRect()
+    }
+})
+
+// 监听 urls 变化
+watch(() : Array<any> => props.urls, (newVal: Array<any>) => {
+  if (newVal.length == 1) {
+      getImageRect()
+  }
+}, {
+  // 侦听器延迟到组件渲染之后触发
+  flush: 'post',
+  immediate: false
+})
+
+// 计算属性 - 图片样式
+const imageStyle = computed(() => {
+    return (index1: number, index2: number) => {
+        const { space, rowCount, multipleSize, urls } = props
+        const rowLen = showUrls.value.length
+        const allLen = props.urls.length
+        const style = {
+            marginRight: addUnit(space),
+            marginBottom: addUnit(space)
+        }
+        // 如果为最后一行，则每个图片都无需下边框
+        if (index1 === rowLen && !props.autoWrap) style.marginBottom = 0
+        // 每行的最右边一张和总长度的最后一张无需右边框
+        if (!props.autoWrap) {
+            if (
+                index2 === parseInt(rowCount.toString()) ||
+                (index1 == rowLen &&
+                    index2 == showUrls.value[index1 - 1].length)
+            )
+                style.marginRight = 0
+        }
+        return style
+    }
+})
+
+// 计算属性 - 图片宽度
+const imageWidth = computed(() => {
+    return addUnit(
+        props.urls.length == 1 ? singleWidth.value : props.multipleSize, props.unit
+    )
+})
+
+// 计算属性 - 图片高度
+const imageHeight = computed(() => {
+    return addUnit(
+        props.urls.length == 1 ? singleHeight.value : props.multipleSize, props.unit
+    )
+})
+
+// 计算属性 - 相册宽度
+const albumWidth = computed(() => {
+    let width = 0
+    if (props.urls.length == 1) {
+        width = singleWidth.value
+    } else {
+        width =
+            showUrls.value[0].length * parseInt(props.multipleSize.toString()) +
+            parseInt(props.space.toString()) * (showUrls.value[0].length - 1)
+    }
+    emit('albumWidth', width)
+    return width
+})
+
+// 预览图片
+const onPreviewTap = (e: any, url: string) => {
+	let ee = e as UniPointerEvent
+    const urls = props.urls.map((item: any) => {
+        return getSrc(item)
+    })
+    if (props.previewFullImage) {
+        uni.previewImage({
+            current: url,
+            urls
+        })
+        if (props.stop) {
+            preventEvent(ee)
+        }
+    } else {
+        emit('preview', {
+            urls,
+            currentIndex: urls.indexOf(url)
+        })
+    }
+}
+</script>
+
+<style lang="scss" scoped>
+@import '../../libs/css/components.scss';
+
+.up-album {
+    @include flex(column);
+
+    &__row {
+        @include flex(row);
+
+        &__wrapper {
+            position: relative;
+
+            &__text {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.3);
+                @include flex(row);
+                justify-content: center;
+                align-items: center;
+            }
+        }
+    }
+}
+</style>

@@ -1,0 +1,413 @@
+import { UPFormRuleItem } from '../../components/up-form/types.uts'
+	
+type ValidateCbType = (errors: UTSJSONObject[] | null, fields: UTSJSONObject | null) => void
+type ValidateCbTypeWrap = ValidateCbType | null
+
+function createError(field : string, message : string) : UTSJSONObject {
+	return {
+		field,
+		message
+	}
+}
+
+function createMessages() : UTSJSONObject {
+	return {
+		required: '%s is required',
+		enum: '%s must be one of %s',
+		whitespace: '%s cannot be empty',
+		types: {
+			string: '%s is not a %s',
+			number: '%s is not a %s',
+			boolean: '%s is not a %s',
+			array: '%s is not an %s',
+			object: '%s is not an %s',
+			integer: '%s is not an %s',
+			float: '%s is not a %s',
+			email: '%s is not a valid %s',
+			url: '%s is not a valid %s',
+			hex: '%s is not a valid %s'
+		},
+		string: {
+			len: '%s must be exactly %s characters',
+			min: '%s must be at least %s characters',
+			max: '%s cannot be longer than %s characters',
+			range: '%s must be between %s and %s characters'
+		},
+		number: {
+			len: '%s must equal %s',
+			min: '%s cannot be less than %s',
+			max: '%s cannot be greater than %s',
+			range: '%s must be between %s and %s'
+		},
+		array: {
+			len: '%s must be exactly %s in length',
+			min: '%s cannot be less than %s in length',
+			max: '%s cannot be greater than %s in length',
+			range: '%s must be between %s and %s in length'
+		},
+		pattern: {
+			mismatch: '%s value %s does not match pattern %s'
+		}
+	}
+}
+
+function formatMessage(template : any, a : any|null = null, b : any|null = null, c : any|null = null) : string {
+	let msg = typeof template == 'string' ? template : (template == null ? '' : template.toString())
+	const args = [a, b, c]
+	let i = 0
+	return msg
+	//todo
+	// return msg.replace(/%s/g, () => {
+	// 	const v = i < args.length ? args[i] : ''
+	// 	i += 1
+	// 	return v == null ? '' : v.toString()
+	// })
+}
+
+function toFieldErrors(errors : UTSJSONObject[] | null) : UTSJSONObject | null {
+	if (errors == null || errors.length == 0) return null
+	const fields: UTSJSONObject = {}
+	errors.forEach((e: UTSJSONObject) => {
+		const f = e['field']!.toString()
+		let ff: UTSJSONObject[] = []
+		const existed = fields[f]
+		if (existed != null && Array.isArray(existed)) {
+			ff = existed as UTSJSONObject[]
+		}
+		ff.push(e)
+		fields[f] = ff
+	})
+	return fields
+}
+
+function isEmpty(value : any|null, type : string) : boolean {
+	if (value == null) return true
+	if (type == 'array' && Array.isArray(value) && value.length == 0) return true
+	if ((type == 'string' || type == 'email' || type == 'url' || type == 'hex' || type == 'pattern') && typeof value == 'string' && value.length == 0) return true
+	return false
+}
+
+function getValue(source : UTSJSONObject, field : string) : any|null {
+	if (field.indexOf('.') == -1) return source[field]
+	const chain: string[] = field.split('.')
+	let cur: UTSJSONObject = source
+	for (let i = 0; i < chain.length; i++) {
+		if (cur == null) return null
+		cur = cur[chain[i]] as UTSJSONObject
+	}
+	return cur
+}
+
+function hasValue(source : UTSJSONObject, field : string) : boolean {
+	if (field.indexOf('.') == -1) return UTSJSONObject.keys(source).includes(field)
+	const chain: string[] = field.split('.')
+	let cur: UTSJSONObject = source
+	for (let i = 0; i < chain.length; i++) {
+		// if (cur == null || !UTSJSONObject.keys(cur).includes((chain[i])) return false
+		// cur = cur[chain[i]] as UTSJSONObject
+	}
+	return true
+}
+
+function checkType(type : string, value : any|null) : boolean {
+	switch (type) {
+		case 'string': return typeof value == 'string'
+		case 'number': return typeof value == 'number' || (typeof value == 'string' && value.length > 0 && !isNaN(parseFloat(value)))
+		case 'boolean': return typeof value == 'boolean'
+		case 'array': return Array.isArray(value)
+		case 'object': return value != null && typeof value == 'object' && !Array.isArray(value) && !(value instanceof Date)
+		case 'integer': return typeof value == 'number' ? Math.floor(value) == value : /^(-)?\d+$/.test((value.toString() + ''))
+		case 'float': return typeof value == 'number' ? true : /^(-)?\d+(\.\d+)?$/.test((value.toString() + ''))
+		case 'email': return typeof value == 'string' && /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(value)
+		case 'url': return typeof value == 'string' && /^(?!mailto:)(?:(?:http|https|ftp):\/\/|\/\/)/i.test(value.toString())
+		case 'hex': return typeof value == 'string' && /^#?([a-f0-9]{6}|[a-f0-9]{3})$/i.test(value)
+		case 'pattern': return true
+		default: return true
+	}
+}
+
+const customValidators : UTSJSONObject = {}
+
+function normalizeRuleObject(ruleRaw: any|null): UPFormRuleItem {
+	const rule: UPFormRuleItem = {}
+	if (ruleRaw == null) return rule
+	let rawObj: UTSJSONObject|null = null
+	try {
+		rawObj = ruleRaw as UTSJSONObject
+	} catch (e: any) {
+		rawObj = null
+	}
+	if (rawObj == null) return rule
+
+	if (rawObj['trigger'] != null) {
+		const triggerVal = rawObj['trigger']
+		if (Array.isArray(triggerVal)) {
+			const triggerList = triggerVal as any[]
+			const normalizedTrigger: string[] = []
+			for (let i = 0; i < triggerList.length; i++) {
+				normalizedTrigger.push(triggerList[i]!.toString())
+			}
+			rule.trigger = normalizedTrigger
+		} else {
+			rule.trigger = triggerVal!.toString()
+		}
+	}
+	if (rawObj['required'] != null) rule.required = rawObj['required'] as boolean
+	if (rawObj['min'] != null) rule.min = parseFloat(rawObj['min']!.toString())
+	if (rawObj['max'] != null) rule.max = parseFloat(rawObj['max']!.toString())
+	if (rawObj['len'] != null) rule.len = parseFloat(rawObj['len']!.toString())
+	if (rawObj['message'] != null) rule.message = rawObj['message']!.toString()
+	if (rawObj['type'] != null) rule.type = rawObj['type']!.toString()
+	if (rawObj['pattern'] != null) rule.pattern = rawObj['pattern']
+	if (rawObj['enum'] != null && Array.isArray(rawObj['enum'])) {
+		const enumList: string[] = []
+		const rawEnum = rawObj['enum'] as any[]
+		for (let i = 0; i < rawEnum.length; i++) {
+			enumList.push(rawEnum[i]!.toString())
+		}
+		rule.enum = enumList
+	}
+	if (rawObj['whitespace'] != null) rule.whitespace = rawObj['whitespace'] as boolean
+	if (rawObj['validator'] != null) rule.validator = rawObj['validator'] as any
+	if (rawObj['asyncValidator'] != null) rule.asyncValidator = rawObj['asyncValidator'] as any
+	if (rawObj['transform'] != null) rule.transform = rawObj['transform'] as any
+	if (rawObj['field'] != null) rule.field = rawObj['field']!.toString()
+	if (rawObj['fullField'] != null) rule.fullField = rawObj['fullField']!.toString()
+	return rule
+}
+
+class Schema {
+	rules: UTSJSONObject = {}
+	_messages : UTSJSONObject = createMessages()
+
+	constructor(rules : UTSJSONObject) {
+		// if (rules == null || UTSJSONObject.keys(rules).length == 0) throw new Error('Cannot configure a schema with no rules')
+		if (typeof rules != 'object' || Array.isArray(rules)) throw new Error('Rules must be an object')
+		UTSJSONObject.keys(rules).forEach((k) => {
+			const item = rules[k]
+			// 这里保留传入规则本身，避免已归一化规则在 Android 端被再次转换时丢字段
+			this.rules[k] = Array.isArray(item) ? item : [item]
+		})
+	}
+
+	messages(custom : UTSJSONObject|null = null) : any {
+		if (custom != null) {
+			this._messages = UTSJSONObject.assign(createMessages(), custom)
+		}
+		return this._messages
+	}
+
+	getType(rule : UPFormRuleItem) : string {
+		if (rule.type == null && rule.pattern instanceof RegExp) return 'pattern'
+		return rule.type != null ? rule.type : 'string'
+	}
+
+	getValidationMethod(rule : UPFormRuleItem): any|null {
+		if (typeof rule.validator == 'function') return rule.validator!
+		const t = this.getType(rule)
+		const v = customValidators[t]
+		return typeof v == 'function' ? v : null
+	}
+
+	execBuiltIn(rule : UPFormRuleItem, value : any|null, source : UTSJSONObject, field : string, options : UTSJSONObject) : UTSJSONObject[] {
+		const errors : UTSJSONObject[] = []
+		const messages: UTSJSONObject = options['messages'] != null ? options['messages'] as UTSJSONObject: this._messages
+		const type = this.getType(rule)
+
+		if (rule.required == true && (!hasValue(source, field) || isEmpty(value, type))) {
+			errors.push(createError(field, rule.message != null ? rule.message : formatMessage(messages.required!, field)))
+			return errors
+		}
+		if (isEmpty(value, type)) return errors
+
+		if (!checkType(type, value)) {
+			let types = messages['types']! as UTSJSONObject
+			errors.push(createError(field, rule.message != null ? rule.message :  formatMessage(types[type]!, field, type)))
+			return errors
+		}
+
+		const len = rule.len
+		const min = rule.min
+		const max = rule.max
+		if (len != null || min != null || max != null) {
+			if (type == 'number' || type == 'integer' || type == 'float') {
+				const cur = parseFloat(value.toString())
+				const nm = messages['number'] as UTSJSONObject
+				if (len != null && cur != len) errors.push(createError(field, rule.message != null ? rule.message : formatMessage(nm['len']!, field, len)))
+				if (min != null && max != null && (cur < min || cur > max)) errors.push(createError(field, rule.message != null ? rule.message :  formatMessage(nm['range']!, field, min, max)))
+				if (min != null && max == null && cur < min) errors.push(createError(field, rule.message != null ? rule.message : formatMessage(nm['min']!, field, min)))
+				if (max != null && min == null && cur > max) errors.push(createError(field, rule.message != null ? rule.message : formatMessage(nm['max']!, field, max)))
+			} else {
+				const cur = Array.isArray(value) ? value.length : ((value.toString() + '').length)
+				const rm = type == 'array' ? messages.array as UTSJSONObject : messages.string as UTSJSONObject
+				if (len != null && cur != len) errors.push(createError(field, rule.message != null ? rule.message :  formatMessage(rm['len']!, field, len)))
+				if (min != null && max != null && (cur < min || cur > max)) errors.push(createError(field, rule.message != null ? rule.message :  formatMessage(rm['range']!, field, min, max)))
+				if (min != null && max == null && cur < min) errors.push(createError(field, rule.message != null ? rule.message : formatMessage(rm['min']!, field, min)))
+				if (max != null && min == null && cur > max) errors.push(createError(field, rule.message != null ? rule.message : formatMessage(rm['max']!, field, max)))
+			}
+		}
+
+		if (rule.enum != null && Array.isArray(rule.enum) && rule.enum!.indexOf(value) == -1) {
+			errors.push(createError(field, rule.message != null ? rule.message : formatMessage(messages.enum!, field, rule.enum.join(', '))))
+		}
+
+		// todo
+		// if (rule.pattern != null && rule.pattern != '') {
+		// 	let ok = true
+		// 	if (rule.pattern instanceof RegExp) ok = rule.pattern.test(value)
+		// 	else if (typeof rule.pattern == 'string') ok = new RegExp(rule.pattern).test(value)
+		// 	if (!ok) errors.push(createError(field, rule.message != null ? rule.message : formatMessage(messages.pattern.mismatch, field, value, rule.pattern)))
+		// }
+
+		if (rule.whitespace != null && rule.whitespace! == true && typeof value == 'string' && value.trim().length == 0) {
+			errors.push(createError(field, rule.message != null ? rule.message : formatMessage(messages.whitespace!, field)))
+		}
+
+		return errors
+	}
+
+	executeRule(rule : UPFormRuleItem, value : any|null, source : UTSJSONObject,
+		options : UTSJSONObject, field : string) : Promise<UTSJSONObject[]> {
+		return new Promise((resolve) => {
+			const builtIn = this.execBuiltIn(rule, value, source, field, options)
+			if (builtIn.length > 0) {
+				resolve(builtIn)
+				return
+			}
+			
+			let asyncValidator = rule.asyncValidator
+			const validator = this.getValidationMethod(rule)
+			const exec = asyncValidator != null ? asyncValidator : validator
+			if (typeof exec != 'function') {
+				resolve([])
+				return
+			}
+
+			let doneCalled = false
+			function done(errs: UTSJSONObject[]|string|null|Error = null) {
+				if (doneCalled) return
+				doneCalled = true
+				if (errs == null) {
+					resolve([])
+					return
+				}
+				if (Array.isArray(errs)) {
+					resolve(
+					  errs.map((e: UTSJSONObject) =>
+					    typeof e == 'string'
+					      ? createError(field, e.toString())
+					      : (e['message'] != null ? e : createError(field, e.toString() + ''))
+					  )
+					)
+					return
+				}
+				if (typeof errs == 'string') {
+					resolve([createError(field, errs)])
+					return
+				}
+				if (errs instanceof Error) {
+					resolve([createError(field, errs.message)])
+					return
+				}
+				resolve([])
+			}
+
+			// todo
+			// const ret = exec(rule, value, done, source, options)
+			// if (ret && typeof ret.then == 'function') {
+			// 	ret.then((r : any) => {
+			// 		if (r === false) done(rule.message != null ? rule.message : (field + ' fails'))
+			// 		else done(r)
+			// 	}).catch((e : any) => done(e))
+			// 	return
+			// }
+			// if (ret === true || ret == null) done()
+			// else if (ret === false) done(rule.message != null ? rule.message : (field + ' fails'))
+			// else done(ret)
+			done()
+		})
+	}
+
+	validate(source: UTSJSONObject, options : UTSJSONObject|null = null, callback: ValidateCbTypeWrap = null) : any {
+		let validateOptions: UTSJSONObject = {}
+		let cb : ValidateCbTypeWrap = callback
+		if (options != null) validateOptions = options
+
+		validateOptions['messages'] = validateOptions['messages'] != null ? validateOptions['messages'] : this.messages()
+		if (this.rules == null || UTSJSONObject.keys(this.rules).length == 0) {
+			if (cb != null) cb(null, null)
+			return Promise.resolve(null)
+		}
+
+		return new Promise((resolve, reject) => {
+			const errors : UTSJSONObject[] = []
+			const keys = validateOptions['keys'] != null ? validateOptions['keys'] as string[] : UTSJSONObject.keys(this.rules)
+			const schema = this
+
+			function runValidate(fieldIndex : number, ruleIndex : number): void {
+				if (fieldIndex >= keys.length) {
+					const finalErrors = errors.length > 0 ? errors : null
+					const fields: UTSJSONObject | null = toFieldErrors(finalErrors)
+					if (cb != null) cb(finalErrors, fields)
+					if (finalErrors != null) reject({ errors: finalErrors, fields })
+					else resolve(null)
+					return
+				}
+
+				const field = keys[fieldIndex]
+				let tmp = schema.rules[field] as UPFormRuleItem[]
+				const list:UPFormRuleItem[] = tmp != null ? tmp : [] as UPFormRuleItem[]
+				if (ruleIndex >= list.length) {
+					runValidate(fieldIndex + 1, 0)
+					return
+				}
+
+				let rule = list[ruleIndex]
+				rule.field = field
+				rule.fullField = rule.fullField != null ? rule.fullField : field
+				rule.type = schema.getType(rule)
+				const transformVal = rule.transform
+				if (transformVal != null && typeof transformVal == 'function') {
+					const transformFn = transformVal as (e: any | null) => any
+					source[field] = transformFn(getValue(source, field))
+				}
+				
+				const value = getValue(source, field)
+
+				schema.executeRule(rule, value, source, validateOptions, field).then((es : UTSJSONObject[]) => {
+					if (es.length > 0) {
+						errors.push(...es)
+						// if (!validateOptions.suppressWarning) {
+						// 	Schema.warning('async-validator:', es)
+						// }
+						const firstVal = validateOptions['first']
+						if (firstVal != null && typeof firstVal == 'boolean' && (firstVal as boolean) == true) {
+							const fields = toFieldErrors(errors)
+							if (cb != null) cb(errors, fields)
+							reject({ errors, fields })
+							return
+						}
+					}
+					runValidate(fieldIndex, ruleIndex + 1)
+				})
+			}
+
+			runValidate(0, 0)
+		})
+	}
+
+	static register(type : string, validator : any) : void {
+		if (typeof validator != 'function') {
+			throw new Error('Cannot register a validator by type, validator is not a function')
+		}
+		customValidators[type] = validator
+	}
+
+	static warning(type : string, errors : any[]) : void {
+		 // if (typeof console != 'undefined' && console.warn != null && errors != null && errors.length > 0) {
+			console.warn(type, errors)
+		 // }
+	}
+}
+
+export default Schema

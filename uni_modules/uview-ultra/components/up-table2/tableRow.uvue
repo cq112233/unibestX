@@ -1,0 +1,366 @@
+﻿<style lang="scss" scoped>
+.up-table-row {
+    display: flex;
+    flex-direction: row;
+    position: relative;
+}
+
+// 娣诲姞border鏍峰紡鏀寔
+.up-table-border {
+    border-top: 1px solid #ebeef5;
+    border-left: 1px solid #ebeef5;
+    border-right: 1px solid #ebeef5;
+    .up-table-cell {
+        border-right: 1px solid #ebeef5;
+    }
+    
+    .up-table-cell:last-child {
+        border-right: none;
+    }
+}
+
+.up-table-cell {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 1px;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.1;
+    border-bottom: 1px solid #ebeef5;
+    &.up-text-left {
+        justify-content: flex-start;
+        text-align: left;
+    }
+    &.up-text-center {
+        justify-content: center;
+        text-align: center;
+    }
+    &.up-text-right {
+        justify-content: flex-end;
+        text-align: right;
+    }
+}
+
+.up-table-row-zebra {
+    background-color: #fafafa;
+}
+
+.up-table-row-highlight {
+    background-color: #f5f7fa;
+}
+
+.up-table-empty {
+    text-align: center;
+    padding: 20px;
+    color: #999;
+}
+
+// 闅愯棌琚悎骞剁殑鍗曞厓鏍?
+.up-table-cell-hidden {
+    opacity: 0;
+}
+
+// 鍚堝苟鍗曞厓鏍兼牱寮?
+.up-table-cell-merged {
+    z-index: 1;
+}
+</style>
+<template>
+    <view class="up-table-row up-table-row-child"
+        :class="[highlightCurrentRow && currentRow === row ? 'up-table-row-highlight' : '',
+        rowClassName ? rowClassName(row, rowIndex) : '',
+        stripe && rowIndex % 2 === 1 ? 'up-table-row-zebra' : ''
+        ]" :style="{height: rowHeight}" @click="handleRowClick(row)">
+        <view v-for="(col, colIndex) in columns" :key="col.key" 
+            class="up-table-cell"
+            :class="[col.align ? 'up-text-' + col.align : '',
+                cellClassName ? cellClassName(row, col) : '',
+                getFixedClass(col),
+                getCellSpanClass(rowIndex, colIndex)
+            ]"
+            :style="[cellStyleInner({row: row, column: col, rowIndex: rowIndex, columnIndex: colIndex, level: level}), getCellSpanStyle(rowIndex, colIndex)]">
+                <!-- 澶嶉€夋鍒?-->
+                <view v-if="col.type === 'selection'">
+                    <checkbox :checked="isSelected(row)"
+                        @click.stop="$emit('toggleSelect', row)" />
+                </view>
+                <template v-else>
+                    <!-- 鍦╩ainCol鍒楁樉绀哄睍寮€鍥炬爣 -->
+                    <view v-if="col.key === computedMainCol && hasTree"
+                        @click.stop="toggleExpand(row)" :style="{width: expandWidth}">
+                        <view v-if="row[treeProps.children] && row[treeProps.children].length > 0">
+                            {{ isExpanded(row) ? '-' : '+' }}
+                        </view>
+                    </view>
+                    <slot name="cellChild" :row="row" :column="col" :prow="parentRow"
+                        :rowIndex="rowIndex" :columnIndex="colIndex" :level="level">
+                        <view class="up-table-cell_content">
+                            {{ row[col.key] }}
+                        </view>
+                    </slot>
+                </template>
+        </view>
+    </view>
+    <!-- 閫掑綊娓叉煋鏇存繁灞傜殑瀛愮骇 -->
+        <template v-if="isExpanded(row) && row[treeProps.children] && row[treeProps.children].length">
+            <template v-for="(rowChild, childIndex) in row[treeProps.children]" :key="rowChild[rowKey] != null ? rowChild[rowKey] : childIndex">
+                <table-row 
+                    :row="rowChild" 
+                    :rowIndex="childIndex"
+                    :parent-row="row"
+                    :columns="columns"
+                    :tree-props="treeProps"
+                    :row-key="rowKey"
+                    :expanded-keys="expandedKeys"
+                    :cell-style-inner="cellStyleInner"
+                    :is-expanded="isExpanded"
+                    :row-class-name="rowClassName"
+                    :stripe="stripe"
+                    :cell-class-name="cellClassName"
+                    :get-fixed-class="getFixedClass"
+                    :highlight-current-row="highlightCurrentRow"
+                    :current-row="currentRow"
+                    :handle-row-click="handleRowClick"
+                    :toggle-expand="toggleExpand"
+                    :level="level + 1"
+                    :rowHeight="rowHeight"
+                    :hasTree="hasTree"
+                    :selectedRows="selectedRows"
+                    :expandWidth="expandWidth"
+                    :computed-main-col="computedMainCol"
+                    :span-method="spanMethod"
+                    @toggle-select="$emit('toggleSelect', $event)"
+                    @row-click="$emit('rowClick', $event)"
+                    @toggle-expand="$emit('toggleExpand', $event)"
+                >
+                <template v-slot:cellChild="scope">
+                    <slot name="cellChild" :row="scope.row" :column="scope.column" :prow="scope.prow"
+                        :rowIndex="scope.rowIndex" :columnIndex="scope.columnIndex" :level="level">
+                    </slot>                      
+                </template>
+                </table-row>
+            </template>
+        </template>
+</template>
+
+<script>
+import type { PropType } from 'vue';
+
+function createRowList(): UTSJSONObject[] {
+    return [] as UTSJSONObject[];
+}
+
+function createEmptyObject(): UTSJSONObject {
+    return {} as UTSJSONObject;
+}
+
+function createSpan(rowspan: number = 1, colspan: number = 1): UTSJSONObject {
+    return {
+        rowspan: rowspan,
+        colspan: colspan
+    } as UTSJSONObject;
+}
+
+function createSpanArray(): number[] {
+    return [1, 1] as number[];
+}
+
+function valueToString(value: any): string {
+    return value == null ? '' : value.toString();
+}
+
+export default {
+    name: 'tableRow',
+    props: {
+        row: {
+            type: Object,
+            required: true
+        },
+        rowIndex: {
+            type: Number,
+            required: true
+        },
+        parentRow: {
+            type: Object,
+            default: null
+        },
+        columns: {
+            type: Array as PropType<UTSJSONObject[]>,
+            required: true
+        },
+        treeProps: {
+            type: Object,
+            required: true
+        },
+        rowKey: {
+            type: String,
+            required: true
+        },
+        expandedKeys: {
+            type: Array as PropType<string[]>,
+            required: true
+        },
+        cellStyleInner: {
+            type: Function,
+            required: true
+        },
+        isExpanded: {
+            type: Function,
+            required: true
+        },
+        rowClassName: {
+            type: Function,
+            default: null
+        },
+        stripe: {
+            type: Boolean,
+            default: false
+        },
+        cellClassName: {
+            type: Function,
+            default: null
+        },
+        getFixedClass: {
+            type: Function,
+            required: true
+        },
+        highlightCurrentRow: {
+            type: Boolean,
+            default: false
+        },
+        currentRow: {
+            type: Object,
+            default: null
+        },
+        handleRowClick: {
+            type: Function,
+            required: true
+        },
+        toggleExpand: {
+            type: Function,
+            required: true
+        },
+        level: {
+            type: Number,
+            required: true
+        },
+        computedMainCol: {
+            type: String,
+            required: true
+        },
+        expandWidth: {
+            type: String,
+            required: true
+        },
+        hasTree: {
+            type: Boolean,
+            default: false
+        },
+        selectedRows: {
+            type: Array as PropType<UTSJSONObject[]>,
+            default(): UTSJSONObject[] {
+                return createRowList();
+            }
+        },
+        rowHeight: {
+            type: String,
+            required: true
+        },
+        spanMethod: {
+            type: Function as PropType<UTSCallback | null>,
+            default: null
+        }
+    },
+    emits: ['rowClick', 'toggleExpand', 'toggleSelect'],
+    methods: {
+        getChildrenKey(): string {
+            const props = this.treeProps as UTSJSONObject;
+            const childrenKey = props['children'];
+            return valueToString(childrenKey) == '' ? 'children' : valueToString(childrenKey);
+        },
+        getRowKeyValue(row: UTSJSONObject): string {
+            return valueToString(row[this.rowKey]);
+        },
+        findSelectedRowIndex(row: UTSJSONObject): number {
+            const rowKeyValue = this.getRowKeyValue(row);
+            const selectedRows = this.selectedRows as UTSJSONObject[];
+            for (let i = 0; i < selectedRows.length; i++) {
+                const selectedRow = selectedRows[i] as UTSJSONObject;
+                if (this.getRowKeyValue(selectedRow) == rowKeyValue) {
+                    return i;
+                }
+            }
+            return -1;
+        },
+        isSelected(row: UTSJSONObject): boolean {
+            return this.findSelectedRowIndex(row) >= 0;
+        },
+        getSpanValue(value: any, fallback: number = 1): number {
+            if (value == null || valueToString(value) == '') {
+                return fallback;
+            }
+            const parsed = parseInt(value.toString());
+            return isNaN(parsed) ? fallback : parsed;
+        },
+        getCellSpan(rowIndex: number, columnIndex: number): UTSJSONObject {
+            if (typeof this.spanMethod !== 'function') {
+                return createSpan();
+            }
+            const spanMethod = this.spanMethod as UTSCallback | null;
+            if (spanMethod == null) {
+                return createSpan();
+            }
+            const row = this.row as UTSJSONObject;
+            const column = (this.columns as UTSJSONObject[])[columnIndex] as UTSJSONObject;
+            const result = spanMethod.invoke({
+                row: row,
+                column: column,
+                rowIndex: rowIndex,
+                columnIndex: columnIndex
+            } as UTSJSONObject);
+            if (Array.isArray(result)) {
+                const arr = result as number[];
+                const rowspan = arr.length > 0 ? this.getSpanValue(arr[0], 1) : 1;
+                const colspan = arr.length > 1 ? this.getSpanValue(arr[1], 1) : 1;
+                return createSpan(rowspan, colspan);
+            }
+            return createSpan();
+        },
+        getCellSpanClass(rowIndex: number, columnIndex: number): string {
+            const span = this.getCellSpan(rowIndex, columnIndex);
+            if ((span['rowspan'] as number) == 0 || (span['colspan'] as number) == 0) {
+                return 'up-table-cell-hidden';
+            }
+            if ((span['rowspan'] as number) > 1 || (span['colspan'] as number) > 1) {
+                return 'up-table-cell-merged';
+            }
+            return '';
+        },
+        getCellSpanStyle(rowIndex: number, columnIndex: number): UTSJSONObject {
+            const span = this.getCellSpan(rowIndex, columnIndex);
+            const style = createEmptyObject();
+            const rowspan = span['rowspan'] as number;
+            const colspan = span['colspan'] as number;
+            if (rowspan > 1) {
+                const currentHeight = parseInt(this.rowHeight);
+                if (!isNaN(currentHeight)) {
+                    style['height'] = `${rowspan * currentHeight}px`;
+                }
+            }
+            if (colspan > 1) {
+                style['flex'] = colspan;
+            }
+            if (rowspan == 0 || colspan == 0) {
+                style['display'] = 'none';
+            }
+            return style;
+        }
+    }
+}
+</script>
+
+

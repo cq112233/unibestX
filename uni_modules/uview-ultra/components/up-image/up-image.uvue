@@ -1,0 +1,246 @@
+<template>
+	<view
+		mode="fade"
+		:show="show"
+		:duration="fade ? 1000 : 0"
+	>
+		<view
+			class="up-image"
+			@tap="onClick"
+			:style="[wrapStyle, backgroundStyle, $up.addStyle(customStyle)]"
+		>
+			<image
+				:src="src"
+				:mode="mode"
+				@error="onErrorHandler"
+				@load="onLoadHandler"
+				:lazy-load="lazyLoad"
+				class="up-image__image"
+				:style="{
+					borderRadius: shape == 'circle' ? '10000px' : $up.addUnit(radius),
+					width: $up.addUnit(width),
+					height: $up.addUnit(height)
+				}"
+			></image>
+			<view
+				v-if="showLoading && loading"
+				class="up-image__loading"
+				:style="{
+					borderRadius: shape == 'circle' ? '50%' : $up.addUnit(radius),
+					backgroundColor: bgColor,
+					width: $up.addUnit(width),
+					height: $up.addUnit(height)
+				}"
+			>
+				<slot name="loading">
+					<up-icon
+						:name="loadingIcon"
+						:width="width"
+						:height="height"
+					></up-icon>
+				</slot>
+			</view>
+			<view
+				v-if="showError && isError && !loading"
+				class="up-image__error"
+				:style="{
+					borderRadius: shape == 'circle' ? '50%' : $up.addUnit(radius),
+					width: $up.addUnit(width),
+					height: $up.addUnit(height)
+				}"
+			>
+				<slot name="error">
+					<up-icon
+						:name="errorIcon"
+						:width="width"
+						:height="height"
+					></up-icon>
+				</slot>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script setup>
+	import { nextTick, ref, computed, onMounted } from 'vue'
+	import { addUnit, addStyle, deepMerge } from '../../libs/function/index'
+	import defProps from './image'
+	
+	// 定义 props
+	const props = defineProps({
+		src: {
+			type: String,
+			default: () => defProps.getString('image.src')
+		},
+		mode: {
+			type: String,
+			default: () => defProps.getString('image.mode')
+		},
+		width: {
+			type: String,
+			default: () => defProps.getString('image.width')
+		},
+		height: {
+			type: String,
+			default: () => defProps.getString('image.height')
+		},
+		shape: {
+			type: String,
+			default: () => defProps.getString('image.shape')
+		},
+		radius: {
+			type: String,
+			default: () => defProps.getString('image.radius')
+		},
+		lazyLoad: {
+			type: Boolean,
+			default: () => defProps.getBoolean('image.lazyLoad')
+		},
+		showMenuByLongpress: {
+			type: Boolean,
+			default: () => defProps.getBoolean('image.showMenuByLongpress')
+		},
+		loadingIcon: {
+			type: String,
+			default: () => defProps.getString('image.loadingIcon')
+		},
+		errorIcon: {
+			type: String,
+			default: () => defProps.getString('image.errorIcon')
+		},
+		showLoading: {
+			type: Boolean,
+			default: () => defProps.getBoolean('image.showLoading')
+		},
+		showError: {
+			type: Boolean,
+			default: () => defProps.getBoolean('image.showError')
+		},
+		fade: {
+			type: Boolean,
+			default: () => defProps.getBoolean('image.fade')
+		},
+		webp: {
+			type: Boolean,
+			default: () => defProps.getBoolean('image.webp')
+		},
+		duration: {
+			type: Number,
+			default: () => defProps.getNumber('image.duration')
+		},
+		bgColor: {
+			type: String,
+			default: () => defProps.getString('image.bgColor')
+		}
+	})
+	
+	// 图片是否加载错误，如果是，则显示错误占位图
+	const isError = ref(true)
+	// 初始化组件时，默认为加载中状态
+	const loading = ref(true)
+	// 不透明度，为了实现淡入淡出的效果
+	const opacity = ref(1)
+	// 图片加载完成时，去掉背景颜色，用于淡入淡出效果
+	const backgroundStyle = ref({})
+	// 用于fade模式的控制组件显示与否
+	const show = ref(false)
+
+	const emit = defineEmits(['click', 'error', 'load'])
+	
+	const wrapStyle = computed(() => {
+		let style = {};
+		// 通过调用addUnit()方法，如果有单位，如百分比，px单位等，直接返回，如果是纯粹的数值，则加上rpx单位
+		style['width'] = addUnit(props.width)
+		style['height'] = addUnit(props.height)
+		// 如果是显示圆形，设置一个很多的半径值即可
+		style['borderRadius'] = props.shape == 'circle' ? '10000px' : addUnit(props.radius)
+		// 如果设置圆角，必须要有hidden，否则可能圆角无效
+		if (props.radius != null) {
+			style['overflow'] = parseInt(props.radius as string) > 0 ? 'hidden' : 'visible'
+		}
+		return deepMerge(style, {})
+	})
+	
+	onMounted(() => {
+		show.value = true
+		if (props.src == '') {
+			// 如果传入null或者''，或者false，或者undefined，标记为错误状态
+			isError.value = true
+		} else {
+			isError.value = false
+			loading.value = true
+		}
+	})
+	
+	// 点击图片
+	const onClick = () => {
+		emit('click')
+	}
+	
+	// 图片加载失败
+	const onErrorHandler = (err: any) => {
+		loading.value = false
+		isError.value = true
+		emit('error', err)
+	}
+	
+	// 移除图片的背景色
+	const removeBgColor = () => {
+		// 淡入动画过渡完成后，将背景设置为透明色，否则png图片会看到灰色的背景
+		backgroundStyle.value = {
+			backgroundColor: 'transparent'
+		}
+	}
+	
+	// 图片加载完成，标记loading结束
+	const onLoadHandler = (event: any) => {
+		loading.value = false
+		isError.value = false
+		emit('load', event)
+		removeBgColor()
+	}
+	
+	// 监听 src 属性变化
+	defineExpose({
+		onClick,
+		onErrorHandler,
+		onLoadHandler
+	})
+</script>
+
+<style lang="scss" scoped>
+	@import '../../libs/css/components.scss';
+
+	$up-image-error-top:0px !default;
+	$up-image-error-left:0px !default;
+	$up-image-error-width:100% !default;
+	$up-image-error-hight:100% !default;
+	$up-image-error-background-color:$up-bg-color !default;
+	$up-image-error-color:$up-tips-color !default;
+	$up-image-error-font-size: 46rpx !default;
+
+	.up-image {
+		position: relative;
+		transition: opacity 0.5s ease-in-out;
+
+		&__image {
+			width: 100%;
+			height: 100%;
+		}
+
+		&__loading,
+		&__error {
+			position: absolute;
+			top: $up-image-error-top;
+			left: $up-image-error-left;
+			width: $up-image-error-width;
+			height: $up-image-error-hight;
+			@include flex;
+			align-items: center;
+			justify-content: center;
+			background-color: $up-image-error-background-color;
+			// color: $up-image-error-color;
+			// font-size: $up-image-error-font-size;
+		}
+	}
+</style>

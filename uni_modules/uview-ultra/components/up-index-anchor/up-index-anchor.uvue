@@ -1,0 +1,129 @@
+<template>
+	<view
+	    class="up-index-anchor up-border-bottom"
+		:class="{ 'up-index-anchor--sticky': parentSticky }"
+		:ref="`up-index-anchor-${textName}`"
+	    :style="{
+			height: $up.addUnit(height),
+			backgroundColor: bgColor
+		}"
+	>
+		<text
+		    class="up-index-anchor__text"
+		    :style="{
+				fontSize: $up.addUnit(size),
+				color: color
+			}"
+		>{{ textName }}</text>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { computed, onMounted, getCurrentInstance} from 'vue'
+	import { addUnit, error, getParentFunc } from '../../libs/function/index'
+	import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'
+	const { parent, parentData, getParent } = useUltraUI()
+	import defProps from './indexAnchor.uts'
+
+	const instance = getCurrentInstance()!.proxy!
+	
+	defineOptions({
+		name: 'up-index-anchor'
+	})
+	
+	// 定义 props
+	const props = defineProps({
+		text: {
+			type: [String, Number],
+			default: defProps.getString('indexAnchor.text')
+		},
+		color: {
+			type: String,
+			default: defProps.getString('indexAnchor.color')
+		},
+		size: {
+			type: [String, Number],
+			default: defProps.getNumber('indexAnchor.size')
+		},
+		bgColor: {
+			type: String,
+			default: defProps.getString('indexAnchor.bgColor')
+		},
+		height: {
+			type: [String, Number],
+			default: defProps.getNumber('indexAnchor.height')
+		}
+	})
+	
+	const emit = defineEmits([])
+	
+	const textName = computed((): string => {
+		return props.text.toString()
+	})
+	
+	const parentSticky = computed((): boolean => {
+		const indexList = getParent("up-index-list", instance)
+		if (parentData.value['sticky'] != null) {
+			return indexList != null ? parentData.value['sticky'] as boolean : true
+		} else {
+			return false
+		}
+	})
+	
+	const init = function() {
+		// 此处会活动父组件实例，并赋值给实例的parent属性
+		const indexList = getParent('up-index-list', instance)
+		if (indexList == null) { 
+			return error('up-index-anchor必须要搭配up-index-list组件使用')
+		}
+		// 将当前实例放入到up-index-list中
+		if (parent.value != null) {
+			parent.value.$callMethod('addAnchors', instance)
+		}
+		const indexListItem = getParentFunc('up-index-item', instance)
+		// // #ifndef APP-NVUE
+		// // 只有在非nvue下，up-index-anchor才是嵌套在u-index-item中的
+		if (indexListItem == null) {
+			return error('up-index-anchor必须要搭配up-index-item组件使用')
+		}
+		// 设置up-index-item的id为anchor的text标识符，因为非nvue下滚动列表需要依赖scroll-view滚动到元素的特定
+		// if (typeof this.text == 'string') {
+			// 元素id不能包含特殊字符会导致H5下点击索引滚动失效
+			if (props.text.toString().charCodeAt(0) != null) {
+				indexListItem.$callMethod('setId', props.text.toString().charCodeAt(0).toString())
+			}
+		// } else {
+			// indexListItem.$callMethod('setId', props.text['name'].toString().charCodeAt(0).toString())
+		// }
+		// #endif
+	}
+	
+	onMounted(() => {
+		init()
+	})
+</script>
+
+<style lang="scss" scoped>
+	@import "../../libs/css/components.scss";
+
+	.up-index-anchor {
+		// wait
+		position: relative;
+		top: 0;
+		@include flex;
+		align-items: center;
+		padding-left: 15px;
+		z-index: 1;
+
+		&--sticky {
+			// wait
+			position: relative;
+			top: 0;
+		}
+
+		&__text {
+			// @include flex;
+			// align-items: center;
+		}
+	}
+</style>

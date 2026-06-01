@@ -1,0 +1,206 @@
+import { ref, reactive } from 'vue'
+import { bem, upGetRect, getParentFunc } from '../function/index'
+import { array as testArray } from '../function/test.uts'
+
+export const commonProps = {
+    // 每个组件都有的父组件传递的样式，可以为字符串或者对象形式
+    customStyle: {
+        type: [UTSJSONObject, String],
+        default: {}
+    },
+    customClass: {
+        type: String,
+        default: ''
+    },
+    // 跳转的页面路径
+    url: {
+        type: String,
+        default: ''
+    },
+    // 页面跳转的类型
+    linkType: {
+        type: String,
+        default: 'navigateTo'
+    }
+}
+
+export type UPUseUltraUIType = {
+	parent: Ref<ComponentPublicInstance|null>,
+	parentData: Ref<UTSJSONObject>,
+	children: Ref<ComponentPublicInstance[]>,
+	childrenRefs: Ref<string[]>,
+	openPage:(urlKey: string) => void,
+	getChildIndex: (ins: ComponentPublicInstance) => number,
+	getParent: (name: string, instance: ComponentPublicInstance) => ComponentPublicInstance|null,
+	addChild: (ins: ComponentPublicInstance) => void,
+	addChildRef: (str: string) => void,
+	getChildren: () => ComponentPublicInstance[],
+	getParentData: (parentName: string, instance: ComponentPublicInstance, refMode: boolean) => ComponentPublicInstance|null,
+	onComponentDestroy: (instance: ComponentPublicInstance) => void,
+	preventEvent: (e: UniEvent) => void,
+	noop: (e: UniEvent) => void,
+}
+
+// 定义组件公共属性和方法的组合式函数
+export function useUltraUI(parentDataInit: UTSJSONObject = {}): UPUseUltraUIType  {
+    // 定义响应式数据
+    const parent = ref<ComponentPublicInstance | null>(null)
+    const parentData = ref(parentDataInit) as Ref<UTSJSONObject>
+    const children = ref<ComponentPublicInstance[]>([])
+    const childrenRefs = ref<string[]>([])
+
+    // 跳转某一个页面
+    const openPage = function(urlKey: string): void {
+        // const url: string = this.$data?.[urlKey].toString()
+        // if (url != '') {
+        //     // h5官方回应：发行h5会自动摇树优化，所有使用uni的地方，都会被直接转换成具体的API调用 https://ask.dcloud.net.cn/question/161523?notification_id-1201922__rf-false__item_id-226372
+        //     // 使用封装的 route 进行跳转（直接调用方法），不使用 uni 对象
+        //     // route({ type: this.linkType, url })
+        //     // 执行类似uni.navigateTo的方法
+        //     uni[this.linkType]({
+        //         url
+        //     })
+        // }
+    }
+
+    // 获取子组件索引
+    const getChildIndex = function(ins: ComponentPublicInstance): number {
+        let index = -1
+        if (parent.value != null) {
+            (parent.value!!.$data['children'] as ComponentPublicInstance[]).forEach((child: ComponentPublicInstance, idx: number) => {
+                if (child == ins) {
+                    index = idx
+                }
+            })
+        }
+        return index
+    }
+
+    // 获取父组件
+    const getParent = function(name: string, instance: ComponentPublicInstance): ComponentPublicInstance | null {
+        let parentTmp = getParentFunc(name, instance)
+        parent.value = parentTmp
+        return parentTmp
+    }
+
+    // 添加子组件
+    const addChild = function(ins: ComponentPublicInstance): void {
+        let exist = false
+        let childs: ComponentPublicInstance[] = children.value
+        childs.map((child: ComponentPublicInstance) => {
+            if (ins == child) {
+                exist = true
+            }
+        })
+        if (!exist) {
+            children.value.push(ins)
+        }
+    }
+
+    // 添加子组件引用
+    const addChildRef = function(str: string): void {
+        let index = childrenRefs.value.indexOf('str')
+        if (index <= -1) {
+            childrenRefs.value.push(str)
+        }
+    }
+	
+	const getChildren = function(): ComponentPublicInstance[] {
+		return children.value
+	}
+
+    // 获取父组件数据
+    const getParentData = function(parentName: string, instance: ComponentPublicInstance, refMode: boolean): ComponentPublicInstance|null {
+        // 避免在created中去定义parent变量
+        // 这里的本质原理是，通过获取父组件实例(也即类似up-radio的父组件up-radio-group的this)
+        // 将父组件this中对应的参数，赋值给本组件up-radio的this)的parentData对象中对应的属性
+        // 之所以需要这么做，是因为所有端中，头条小程序不支持通过this.parent.xxx去监听父组件参数的变化
+        // 此处并不会自动更新子组件的数据，而是依赖父组件up-radio-group去监听data的变化，手动调用更新子组件的方法去重新获取
+        // 注意不能赋值给parent,会导致与addChild中push冲突
+        let parentIns = getParent(parentName, instance)
+		// console.log('parentIns', parentIns)
+        // parent.value = parentIns
+        if (parentIns != null) {
+			let chds: ComponentPublicInstance[]|null = parentIns.$callMethod('getChildren') as ComponentPublicInstance[]
+            if (chds != null) {
+                // 如果父组件的children不存在本组件的实例，才将本实例添加到父组件的children中
+                if (refMode) {
+                    // if (Reflect.has(parentIns!, 'addChildRef')) {
+                        parentIns?.$callMethod('addChildRef', instance.$data['refstr'])
+                    // }
+                } else {
+                    // if (Reflect.has(parentIns, 'addChild')) {
+                        parentIns?.$callMethod('addChild', instance)
+                    // }
+                }
+            }
+            // 遍历parentData中的属性，将parent中的同名属性赋值给parentData
+            UTSJSONObject.keys(parentData.value).map((key: string) => {
+                // if (Reflect.has(parentIns!, 'getProps')) {
+                    const propsData = parentIns?.$callMethod('getProps') as UTSJSONObject
+                    // console.log(propsData)
+                    // console.log(key, '=', propsData)
+                    if (UTSJSONObject.keys(propsData).includes(key)) {
+                        parentData.value[key] = propsData?.[key]
+                    }
+                // }
+
+				// if (Reflect.has(parentIns!, 'getRefs')) {
+                    const refsData = parentIns?.$callMethod('getRefs') as UTSJSONObject
+                    if (UTSJSONObject.keys(refsData).includes(key)) {
+                        parentData.value[key] = refsData?.[key]
+                    }
+                // }
+            })
+        }
+        return parentIns
+    }
+
+    // 阻止事件冒泡
+    const preventEvent = function(e: UniEvent): void {
+        e.stopPropagation()
+    }
+
+    // 空操作
+    const noop = function(e: UniEvent): void {
+        preventEvent(e)
+    }
+
+    // 组件销毁时清理逻辑
+    const onComponentDestroy = function(instance: ComponentPublicInstance)  {
+        // 判断当前页面是否存在parent和children，一般在checkbox和checkbox-group父子联动的场景会有此情况
+        // 组件销毁时，移除子组件在父组件children数组中的实例，释放资源，避免数据混乱
+        if (parent.value != null) {
+            // 组件销毁时，移除父组件中的children数组中对应的实例
+            const childrenList = parent.value.$callMethod('getChildren') as ComponentPublicInstance[]
+			//if (childrenList != null) {
+				childrenList.map((child: ComponentPublicInstance, index: number) => {
+				    // 如果相等，则移除
+				    if (child === instance) {
+				        childrenList.splice(index, 1)
+				    }
+				})
+			//}
+        }
+    }
+
+    return {
+        // 响应式数据
+        parent,
+        parentData,
+        children,
+        childrenRefs,
+
+        // 方法
+        openPage,
+        getChildIndex,
+        getParent,
+        addChild,
+        addChildRef,
+        getParentData,
+		getChildren,
+        preventEvent,
+        noop,
+        onComponentDestroy
+    }
+}

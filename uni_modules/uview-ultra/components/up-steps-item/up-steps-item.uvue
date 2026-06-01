@@ -1,0 +1,412 @@
+<template>
+	<view class="up-steps-item" ref="up-steps-item" :class="[`up-steps-item--${parentData['direction']}`]">
+		<view class="up-steps-item__line"
+			:class="[`up-steps-item__line--${parentData['direction']}`]" :style="[lineStyle]"></view>
+		<view class="up-steps-item__line"
+			:class="[`up-steps-item__line--${parentData['direction']}`]" :style="[lineStyle2]"></view>
+		<view class="up-steps-item__wrapper"
+			:class="[`up-steps-item__wrapper--${parentData['direction']}`,
+				(parentData['dot'] != null && parentData['dot'] as boolean) ? `up-steps-item__wrapper--${parentData['direction']}--dot` : '']"
+			:style="[itemStyleInner]">
+			<slot name="icon">
+				<view class="up-steps-item__wrapper__dot"
+					v-if="(parentData['dot'] != null && parentData['dot'] as boolean)" :style="{
+						backgroundColor: statusColor
+					}">
+
+				</view>
+				<view class="up-steps-item__wrapper__icon"
+					v-else-if="parentData['activeIcon'] != '' || parentData['inactiveIcon'] != ''">
+					<up-icon :name="index <= parseInt(parentData['current'].toString()) ? parentData['activeIcon'] : parentData['inactiveIcon']"
+						:size="iconSize"
+						:color="index <= parseInt(parentData['current'].toString()) ? parentData['activeColor'] : parentData['inactiveColor']">
+					</up-icon>
+				</view>
+				<view v-else :style="{
+						backgroundColor: statusClass === 'process' ? parentData['activeColor'] : 'transparent',
+						borderColor: statusColor
+					}" class="up-steps-item__wrapper__circle">
+					<text v-if="statusClass === 'process' || statusClass === 'wait'"
+						class="up-steps-item__wrapper__circle__text" :style="{
+							color: index == parseInt(parentData['current'].toString()) ? '#ffffff' : parentData['inactiveColor']
+						}">{{ index + 1}}</text>
+					<up-icon v-else :color="statusClass === 'error' ? 'error' : parentData['activeColor']" size="12"
+						:name="statusClass === 'error' ? 'close' : 'checkmark'"></up-icon>
+				</view>
+			</slot>
+		</view>
+		<view class="up-steps-item__content" :class="[`up-steps-item__content--${parentData['direction']}`,
+			parseInt(parentData['current'].toString()) == index ? 'up-steps-item__content--current' : '']"
+			:style="[contentStyle]">
+			<slot name="content" :index="index">
+			</slot>
+			<template v-if="$slots['content'] == null">
+				<view class="up-steps-item__content__title">
+					<slot name="title">
+					</slot>
+					<up-text v-if="$slots['title'] == null" :text="title" lineHeight="20px"
+						:type="parseInt(parentData['current'].toString()) == index ? 'main' : 'content'"
+						:size="parseInt(parentData['current'].toString()) == index ? 14 : 13"></up-text>
+				</view>
+				<view class="up-steps-item__content__desc">
+					<slot name="desc">
+					</slot>
+					<up-text v-if="$slots['desc'] == null"
+						:text="desc" type="tips" size="12"></up-text>
+				</view>
+			</template>
+		</view>
+	</view>
+</template>
+
+<script>
+	import { propsStepsItem } from './props';
+	import { mpMixin } from '../../libs/mixin/mpMixin';
+	import { mixin } from '../../libs/mixin/mixin';
+	import { sleep, error } from '../../libs/function/index';
+	import color from '../../libs/config/color';
+	/**
+	 * StepsItem 步骤条的子组件
+	 * @description 本组件需要和up-steps配合使用
+	 * @tutorial https://uview-plus.jiangruyi.com/components/steps.html
+	 * @property {String}			title			标题文字
+	 * @property {String}			current			描述文本
+	 * @property {String | Number}	iconSize		图标大小  (默认 17 )
+	 * @property {Boolean}			error			当前步骤是否处于失败状态  (默认 false )
+	 * @example <up-steps current="0"><up-steps-item title="已出库" desc="10:35" ></up-steps-item></up-steps>
+	 */
+	export default {
+		name: 'up-steps-item',
+		mixins: [mpMixin, mixin, propsStepsItem],
+		data() {
+			return {
+				index: 0,
+				childLength: 0,
+				showLine: false,
+				size: {
+					height: 0,
+					width: 0
+				},
+				parentData: {
+					direction: 'row',
+					current: 0,
+					activeColor: '',
+					inactiveColor: '',
+					activeIcon: '',
+					inactiveIcon: '',
+					dot: false
+				} as UTSJSONObject
+			}
+		},
+		watch: {
+			parentData() {
+			}
+		},
+		created() {
+			this.init()
+		},
+		computed: {
+			lineStyle2() {
+				const style = {}
+				// @ts-ignore
+				if (this.parentData['direction'].toString() === 'row') {
+					if (this.index == 0) {
+						style['width'] = '0px'
+						style['left'] = (this.size['width'] as number / 2).toString() + 'px'
+						// @ts-ignore
+					} else if (this.index == (this.parent!.$data['children'] as ComponentPublicInstance[]).length - 1) {
+						style['width'] = '0px'
+						style['left'] = '0px'
+					} else {
+						style['width'] = (this.size['width'] as number / 2).toString() + 'px'
+						style['left'] = '0px'
+					}
+				}
+
+				// @ts-ignore
+				if (this.parent != null
+				// @ts-ignore
+					&& this.parent.$data['children'] != null
+					// @ts-ignore
+					&& this.index + 1 < (this.parent.$data['children'] as ComponentPublicInstance[]).length) {
+					// @ts-ignore
+					const nextChild = (this.parent.$data['children'] as ComponentPublicInstance[])[this.index + 1];
+					// @ts-ignore
+					if (nextChild != null && nextChild.$props['error'] as boolean) {
+						style['backgroundColor'] = color['error']
+						// @ts-ignore
+					} else if ((this.index - 1) < parseInt(this.parentData['current'].toString())) {
+						style['backgroundColor'] = this.parentData['activeColor']
+					} else {
+						style['backgroundColor'] = this.parentData['inactiveColor']
+					}
+				}
+				return style
+			},
+			lineStyle() {
+				const style = {}
+				// @ts-ignore
+				if (this.parentData['direction'].toString() === 'row') {
+					if (this.index == 0) {
+						style['width'] = (this.size['width'] as number).toString() + 'px'
+						style['left'] = (this.size['width'] as number / 2).toString() + 'px'
+						// @ts-ignore
+					} else if (this.index == (this.parent!.$data['children'] as ComponentPublicInstance[]).length - 1) {
+						style['width'] = (this.size['width'] as number / 2).toString() + 'px'
+						style['left'] = '0px'
+					} else {
+						style['width'] = (this.size['width'] as number).toString() + 'px'
+						style['left'] = '0px'
+					}
+				} else {
+					style['height'] = this.size['height'].toString() + 'px'
+					// style['top'] = (this.size['height'] / 2).toString() + 'px'
+				}
+				
+				// @ts-ignore
+				if (this.parent != null
+				// @ts-ignore
+					&& this.parent.$data['children'] != null
+					// @ts-ignore
+					&& this.index + 1 < (this.parent.$data['children'] as ComponentPublicInstance[]).length) {
+					// @ts-ignore
+					const nextChild = (this.parent.$data['children'] as ComponentPublicInstance[])[this.index + 1];
+					// @ts-ignore
+					if (nextChild != null && nextChild.$props['error'] as boolean) {
+						style['backgroundColor'] = color['error']
+						// @ts-ignore
+					} else if (this.index < parseInt(this.parentData['current'].toString())) {
+						style['backgroundColor'] = this.parentData['activeColor']
+					} else {
+						style['backgroundColor'] = this.parentData['inactiveColor']
+					}
+				}
+				return style
+			},
+			itemStyleInner(): any {
+				return {
+					// @ts-ignore
+					...this.itemStyle
+				}
+			},
+			statusClass() {
+				let index = this.index
+				// @ts-ignore
+				let error = this.error
+				// @ts-ignore
+				let current = parseInt(this.parentData['current'].toString())
+				if (current == index) {
+					return error == true ? 'error' : 'process'
+				} else if (error) {
+					return 'error'
+				} else if (current > index) {
+					return 'finish'
+				} else {
+					return 'wait'
+				}
+			},
+			statusColor() {
+				let colorTmp = '#f1f1f1'
+				switch (this.statusClass) {
+					case 'finish':
+						colorTmp = this.parentData['activeColor'] as string
+						break
+					case 'error':
+						colorTmp = color['error'] as string
+						break
+					case 'process':
+						colorTmp = this.parentData['dot'] as boolean ? this.parentData['activeColor'] as string : 'transparent'
+						break
+					default:
+						colorTmp = this.parentData['inactiveColor'] as string
+						break
+				}
+				return colorTmp
+			},
+			contentStyle(): any {
+				const style = {}
+				// @ts-ignore
+				if (this.parentData['direction'].toString() === 'column') {
+					// @ts-ignore
+					style['marginLeft'] = this.parentData['dot'].toString() == 'true' ? '2px' : '6px'
+					// @ts-ignore
+					style['marginTop'] = this.parentData['dot'].toString() == 'true' ? '0px' : '6px'
+				} else {
+					// @ts-ignore
+					style['marginTop'] = this.parentData['dot'].toString() == 'true' ? '2px' : '6px'
+					// @ts-ignore
+					style['marginLeft'] = this.parentData['dot'].toString() == 'true' ? '2px' : '6px'
+				}
+
+				return style
+			}
+		},
+		mounted() {
+			// @ts-ignore
+			if (this.parent != null) {
+				// @ts-ignore
+				this.parent?.$callMethod('updateFromChild')
+			}
+			sleep().then(() => {
+				this.getStepsItemRect()
+			})
+		},
+		methods: {
+			init() {
+				// 初始化数据
+				this.updateParentData()
+				// @ts-ignore
+				if (this.parent == null) {
+					return error('up-steps-item必须要搭配up-steps组件使用')
+				}
+				// @ts-ignore
+				(this.parent.$data['children'] as ComponentPublicInstance[]).forEach((child: ComponentPublicInstance, index: number) => {
+					if (child == this) {
+						this.index = index
+					}
+				})
+				// @ts-ignore
+				this.childLength = (this.parent.$data['children'] as ComponentPublicInstance[]).length
+			},
+			updateParentData() {
+				// 此方法在mixin中
+				// @ts-ignore
+				this.getParentData('up-steps')
+			},
+			// 父组件数据发生变化
+			updateFromParent() {
+				this.init()
+			},
+			// 获取组件的尺寸，用于设置横线的位置
+			getStepsItemRect() {
+				// @ts-ignore
+				this.upGetRect('.up-steps-item').then((size: NodeInfo) => {
+					// console.log(size)
+					this.size['width'] = size.width != null ? size.width : 0
+					this.size['height'] = size.height != null ? size.height : 0
+				})
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	@import "../../libs/css/components.scss";
+
+	.up-steps-item {
+		flex: 1;
+		@include flex;
+
+		&--row {
+			flex-direction: column;
+			align-items: center;
+			position: relative;
+		}
+
+		&--column {
+			position: relative;
+			flex-direction: row;
+			justify-content: flex-start;
+			padding-bottom: 5px;
+		}
+
+		&__wrapper {
+			@include flex;
+			justify-content: center;
+			align-items: center;
+			position: relative;
+			background-color: #fff;
+			border-radius: 50px;
+
+			&--column {
+				width: 20px;
+				height: 20px;
+
+				&--dot {
+					height: 20px;
+					width: 20px;
+				}
+			}
+
+			&--row {
+				width: 20px;
+				height: 20px;
+
+				&--dot {
+					width: 20px;
+					height: 20px;
+				}
+			}
+
+			&__circle {
+				width: 20px;
+				height: 20px;
+				/* #ifndef APP-NVUE */
+				box-sizing: border-box;
+				flex-shrink: 0;
+				/* #endif */
+				border-radius: 100px;
+				border-width: 1px;
+				border-color: $up-tips-color;
+				border-style: solid;
+				@include flex(row);
+				align-items: center;
+				justify-content: center;
+				transition: background-color 0.3s;
+
+				&__text {
+					color: $up-tips-color;
+					font-size: 11px;
+					@include flex(row);
+					align-items: center;
+					justify-content: center;
+					text-align: center;
+					line-height: 11px;
+				}
+			}
+
+			&__dot {
+				width: 10px;
+				height: 10px;
+				border-radius: 100px;
+				background-color: $up-content-color;
+			}
+		}
+
+		&__content {
+			@include flex;
+			flex: 1;
+
+			&__title {
+				// #ifdef H5
+				cursor: pointer;
+				// #endif
+			}
+
+			&--row {
+				flex-direction: column;
+				align-items: center;
+			}
+
+			&--column {
+				flex-direction: column;
+				margin-left: 6px;
+			}
+		}
+
+		&__line {
+			position: absolute;
+			background: $up-tips-color;
+
+			&--row {
+				top: 10px;
+				height: 1px;
+			}
+
+			&--column {
+				width: 1px;
+				left: 10px;
+			}
+		}
+	}
+</style>

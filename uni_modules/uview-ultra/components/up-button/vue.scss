@@ -1,0 +1,85 @@
+// nvue下hover-class无效
+$up-button-before-top:50% !default;
+$up-button-before-left:50% !default;
+$up-button-before-width:100% !default;
+$up-button-before-height:100% !default;
+$up-button-before-transform:translate(-50%, -50%) !default;
+$up-button-before-opacity:0 !default;
+$up-button-before-background-color:#000 !default;
+$up-button-before-border-color:#000 !default;
+$up-button-active-before-opacity:.15 !default;
+$up-button-icon-margin-left:4px !default;
+$up-button-plain-up-button-info-color:$up-info;
+$up-button-plain-up-button-success-color:$up-success;
+$up-button-plain-up-button-error-color:$up-error;
+$up-button-plain-up-button-warning-color:$up-error;
+
+.up-button {
+	width: 100%;
+	white-space: nowrap;
+	
+	&__text {
+		white-space: nowrap;
+		line-height: 1;
+	}
+	
+	&:before {
+		position: absolute;
+		top:$up-button-before-top;
+		left:$up-button-before-left;
+		width:$up-button-before-width;
+		height:$up-button-before-height;
+		/* #ifndef UNI-APP-X */
+		border: inherit;
+		border-radius: inherit;
+		/* #endif */
+		transform:$up-button-before-transform;
+		opacity:$up-button-before-opacity;
+		// content: " ";
+		background-color:$up-button-before-background-color;
+		border-color:$up-button-before-border-color;
+	}
+	
+	&--active {
+		&:before {
+			opacity: .15
+		}
+	}
+	
+	/* #ifndef UNI-APP-X */
+	&__icon+&__text:not(:empty),
+	/* #endif */
+	&__loading-text {
+		margin-left:$up-button-icon-margin-left;
+	}
+	
+	&--plain {
+		&.up-button--primary {
+			color: $up-primary;
+		}
+	}
+	
+	&--plain {
+		&.up-button--info {
+			color:$up-button-plain-up-button-info-color;
+		}
+	}
+
+	&--plain {
+		&.up-button--success {
+			color:$up-button-plain-up-button-success-color;
+		}
+	}
+	
+	&--plain {
+		&.up-button--error {
+			color:$up-button-plain-up-button-error-color;
+		}
+	}
+	
+	&--plain {
+		&.up-button--warning {
+			color:$up-button-plain-up-button-warning-color;
+		}
+	}
+}

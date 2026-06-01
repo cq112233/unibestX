@@ -1,0 +1,115 @@
+<!-- [z-paging-x]空数据&加载失败view -->
+<template name="z-paging-x-empty">
+	<view :class="{'zpx-container':true}" :style="[emptyStyle]" @click="emptyClick">
+		<view class="zpx-main">
+			<image v-if="emptyImg.length > 0" class="zpx-main-image" :style="[emptyImgStyle]" :src="emptyImg" />
+			<image v-else class="zpx-main-image" mode="aspectFit" :style="[emptyImgStyle]" :src="localEmptyImg" />
+			<text class="zpx-main-title" :style="[emptyTitleStyle]">{{emptyText}}</text>
+			<text v-if="showEmptyReload" class="zpx-main-error-btn" :style="[emptyReloadStyle]" @click.stop="reloadClick">{{emptyReloadText}}</text>
+		</view>
+	</view>
+</template>
+
+<script>
+	import { base64Empty, base64Error } from '../z-paging-x/static/index.uts'
+	export default {
+		name: "z-paging-x-empty",
+		data() {
+			return {
+				
+			};
+		},
+		props: {
+			// 空数据描述文字
+			emptyText: {
+				type: String,
+				default: '没有数据哦~'
+			},
+			// 空数据图片
+			emptyImg: {
+				type: String,
+				default: ''
+			},
+			// 是否显示空数据图重新加载按钮
+			showEmptyReload: {
+				type: Boolean,
+				default: false
+			},
+			// 空数据点击重新加载文字
+			emptyReloadText: {
+				type: String,
+				default: '重新加载'
+			},
+			// 是否是加载失败
+			isLoadFailed: {
+				type: Boolean,
+				default: false
+			},
+			// 空数据图样式
+			emptyStyle: {
+				type: Object
+			},
+			// 空数据图img样式
+			emptyImgStyle: {
+				type: Object
+			},
+			// 空数据图描述文字样式
+			emptyTitleStyle: {
+				type: Object
+			},
+			// 空数据图重新加载按钮样式
+			emptyReloadStyle: {
+				type: Object
+			}
+		},
+		computed: {
+			localEmptyImg(): string {
+                return this.isLoadFailed ? base64Error : base64Empty;
+			}
+		},
+		methods: {
+			reloadClick() {
+				this.$emit('reload');
+			},
+			emptyClick() {
+				this.$emit('viewClick');
+			}
+		}
+	}
+</script>
+
+<style scoped>
+	.zpx-container{
+		flex: 1;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.zpx-main{
+		flex-direction: column;
+		align-items: center;
+        padding: 50rpx 0rpx;
+	}
+
+	.zpx-main-image {
+		width: 240rpx;
+		height: 240rpx;
+	}
+
+	.zpx-main-title {
+		font-size: 28rpx;
+		color: #aaaaaa;
+		text-align: center;
+		margin-top: 10rpx;
+		padding: 0rpx 20rpx;
+	}
+
+	.zpx-main-error-btn {
+		font-size: 28rpx;
+		padding: 8rpx 24rpx;
+		border: solid 1px #dddddd;
+		border-radius: 6rpx;
+		color: #aaaaaa;
+		margin-top: 50rpx;
+	}
+</style>

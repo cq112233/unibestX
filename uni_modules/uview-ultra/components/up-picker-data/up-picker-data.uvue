@@ -1,0 +1,149 @@
+<template>
+	<view class="up-picker-data">
+		<view class="up-picker-data__trigger">
+			<slot name="trigger"></slot>
+			<up-input
+				v-if="!hasTrigger"
+				:model-value="current"
+				disabled
+				disabled-color="#ffffff"
+				:placeholder="title"
+				border="none"
+			></up-input>
+			<view class="up-picker-data__trigger__cover" @click="show = true"></view>
+		</view>
+		<up-picker
+			:show="show"
+			:columns="columns"
+			:key-name="labelKey"
+			:default-index="defaultIndex"
+			@confirm="confirm"
+			@cancel="cancel"
+			@close="close"
+		></up-picker>
+	</view>
+</template>
+
+<script lang="uts">
+function stringValue(value: any | null): string {
+	return value == null ? '' : value.toString()
+}
+
+function createIndexList(): Array<number> {
+	return [] as Array<number>
+}
+
+export default {
+	name: 'up-picker-data',
+	props: {
+		modelValue: {
+			type: [String, Number],
+			default: ''
+		},
+		title: {
+			type: String,
+			default: ''
+		},
+		description: {
+			type: String,
+			default: ''
+		},
+		options: {
+			type: Array,
+			default(): Array<UTSJSONObject> {
+				return [] as Array<UTSJSONObject>
+			}
+		},
+		valueKey: {
+			type: String,
+			default: 'id'
+		},
+		labelKey: {
+			type: String,
+			default: 'name'
+		}
+	},
+	emits: ['update:modelValue', 'cancel', 'close', 'confirm'],
+	data() {
+		return {
+			show: false,
+			current: '',
+			defaultIndex: createIndexList()
+		}
+	},
+	computed: {
+		hasTrigger(): boolean {
+			return this.$slots['trigger'] != null
+		},
+		columns(): Array<Array<UTSJSONObject>> {
+			return [this.options as Array<UTSJSONObject>] as Array<Array<UTSJSONObject>>
+		}
+	},
+	watch: {
+		modelValue: {
+			handler() {
+				this.syncCurrent()
+			},
+			immediate: true
+		},
+		options: {
+			handler() {
+				this.syncCurrent()
+			},
+			immediate: true
+		}
+	},
+	methods: {
+		syncCurrent(): void {
+			const list = this.options as Array<UTSJSONObject>
+			const model = stringValue(this.modelValue)
+			this.current = ''
+			this.defaultIndex = createIndexList()
+			for (let i = 0; i < list.length; i++) {
+				const item = list[i]
+				if (stringValue(item[this.valueKey]) == model) {
+					this.current = stringValue(item[this.labelKey])
+					this.defaultIndex = [i] as Array<number>
+					return
+				}
+			}
+		},
+		cancel(): void {
+			this.show = false
+			this.$emit('cancel')
+		},
+		close(): void {
+			this.show = false
+			this.$emit('close')
+		},
+		confirm(e: UTSJSONObject): void {
+			const value = e['value'] as Array<UTSJSONObject>
+			if (value.length == 0) {
+				this.show = false
+				this.$emit('confirm')
+				return
+			}
+			const item = value[0]
+			this.show = false
+			this.$emit('update:modelValue', item[this.valueKey])
+			this.current = stringValue(item[this.labelKey])
+			this.$emit('confirm')
+		}
+	}
+}
+</script>
+
+<style lang="scss" scoped>
+	.up-picker-data__trigger {
+		position: relative;
+	}
+
+	.up-picker-data__trigger__cover {
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		z-index: 10;
+	}
+</style>

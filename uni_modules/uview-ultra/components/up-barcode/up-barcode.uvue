@@ -1,0 +1,747 @@
+<template>
+  <view class="up-barcode" :style="rootStyle">
+    <canvas
+      v-if="showCanvas"
+      class="up-barcode__canvas"
+      :id="canvasId"
+      :canvas-id="canvasId"
+      :style="canvasStyle"
+    ></canvas>
+    <image
+      v-if="showImage"
+      :src="barcodeImage"
+      :style="imageStyle"
+      mode="aspectFit"
+    ></image>
+    <template v-else>
+      <text v-if="showTopText" class="up-barcode__text" :style="textStyle">{{ displayText }}</text>
+      <view v-if="error.length > 0" class="up-barcode__error" :style="barcodeStyle">
+        <text class="up-barcode__error-text">{{ error }}</text>
+      </view>
+      <view v-else class="up-barcode__bars" :style="barcodeStyle">
+        <view
+          v-for="(bar, index) in bars"
+          :key="index"
+          class="up-barcode__bar"
+          :style="getBarStyle(bar)"
+        ></view>
+      </view>
+      <text v-if="showBottomText" class="up-barcode__text" :style="textStyle">{{ displayText }}</text>
+    </template>
+  </view>
+</template>
+
+<script>
+function stringValue(value: any | null): string {
+  return value == null ? '' : value.toString()
+}
+
+function normalizeNumber(value: any | null, defaultValue: number): number {
+  if (typeof value === 'number') {
+    return value
+  }
+  if (value == null) {
+    return defaultValue
+  }
+  const parsed = parseFloat(value.toString())
+  return isNaN(parsed) ? defaultValue : parsed
+}
+
+function digitAt(value: string, index: number): number {
+  return parseInt(value.substring(index, index + 1))
+}
+
+function code128Patterns(): Array<string> {
+  return [
+    '11011001100', '11001101100', '11001100110', '10010011000',
+    '10010001100', '10001001100', '10011001000', '10011000100',
+    '10001100100', '11001001000', '11001000100', '11000100100',
+    '10110011100', '10011011100', '10011001110', '10111001100',
+    '10011101100', '10011100110', '11001110010', '11001011100',
+    '11001001110', '11011100100', '11001110100', '11101101110',
+    '11101001100', '11100101100', '11100100110', '11101100100',
+    '11100110100', '11100110010', '11011011000', '11011000110',
+    '11000110110', '10100011000', '10001011000', '10001000110',
+    '10110001000', '10001101000', '10001100010', '11010001000',
+    '11000101000', '11000100010', '10110111000', '10110001110',
+    '10001101110', '10111011000', '10111000110', '10001110110',
+    '11101110110', '11010001110', '11000101110', '11011101000',
+    '11011100010', '11011101110', '11101011000', '11101000110',
+    '11100010110', '11101101000', '11101100010', '11100011010',
+    '11101111010', '11001000010', '11110001010', '10100110000',
+    '10100001100', '10010110000', '10010000110', '10000101100',
+    '10000100110', '10110010000', '10110000100', '10011010000',
+    '10011000010', '10000110100', '10000110010', '11000010010',
+    '11001010000', '11110111010', '11000010100', '10001111010',
+    '10100111100', '10010111100', '10010011110', '10111100100',
+    '10011110100', '10011110010', '11110100100', '11110010100',
+    '11110010010', '11011011110', '11011110110', '11110110110',
+    '10101111000', '10100011110', '10001011110', '10111101000',
+    '10111100010', '11110101000', '11110100010', '10111011110',
+    '10111101110', '11101011110', '11110101110', '11010000100',
+    '11010010000', '11010011100', '11000111010'
+  ] as Array<string>
+}
+
+function leftOddCodes(): Array<string> {
+  return [
+    '0001101', '0011001', '0010011', '0111101', '0100011',
+    '0110001', '0101111', '0111011', '0110111', '0001011'
+  ] as Array<string>
+}
+
+function leftEvenCodes(): Array<string> {
+  return [
+    '0100111', '0110011', '0011011', '0100001', '0011101',
+    '0111001', '0000101', '0010001', '0001001', '0010111'
+  ] as Array<string>
+}
+
+function rightCodes(): Array<string> {
+  return [
+    '1110010', '1100110', '1101100', '1000010', '1011100',
+    '1001110', '1010000', '1000100', '1001000', '1110100'
+  ] as Array<string>
+}
+
+function code39Map(): UTSJSONObject {
+  return {
+    '0': '101000111011101',
+    '1': '111010001010111',
+    '2': '101110001010111',
+    '3': '111011100010101',
+    '4': '101000111010111',
+    '5': '111010001110101',
+    '6': '101110001110101',
+    '7': '101000101110111',
+    '8': '111010001011101',
+    '9': '101110001011101',
+    'A': '111010100010111',
+    'B': '101110100010111',
+    'C': '111011101000101',
+    'D': '101011100010111',
+    'E': '111010111000101',
+    'F': '101110111000101',
+    'G': '101010001110111',
+    'H': '111010100011101',
+    'I': '101110100011101',
+    'J': '101011100011101',
+    'K': '111010101000111',
+    'L': '101110101000111',
+    'M': '111011101010001',
+    'N': '101011101000111',
+    'O': '111010111010001',
+    'P': '101110111010001',
+    'Q': '101010111000111',
+    'R': '111010101110001',
+    'S': '101110101110001',
+    'T': '101011101110001',
+    'U': '111000101010111',
+    'V': '100011101010111',
+    'W': '111000111010101',
+    'X': '100010111010111',
+    'Y': '111000101110101',
+    'Z': '100011101110101',
+    '-': '100010101110111',
+    '.': '111000101011101',
+    ' ': '100011101011101',
+    '*': '100010111011101',
+    '$': '100010001000101',
+    '/': '100010001010001',
+    '+': '100010100010001',
+    '%': '101000100010001'
+  } as UTSJSONObject
+}
+
+export default {
+  name: 'up-barcode',
+  props: {
+    value: {
+      type: [String, Number],
+      default: ''
+    },
+    format: {
+      type: String,
+      default: 'auto'
+    },
+    width: {
+      type: Number,
+      default: 200
+    },
+    height: {
+      type: Number,
+      default: 80
+    },
+    displayValue: {
+      type: Boolean,
+      default: true
+    },
+    text: {
+      type: String,
+      default: ''
+    },
+    fontOptions: {
+      type: String,
+      default: ''
+    },
+    font: {
+      type: String,
+      default: 'monospace'
+    },
+    textAlign: {
+      type: String,
+      default: 'center'
+    },
+    textPosition: {
+      type: String,
+      default: 'bottom'
+    },
+    textMargin: {
+      type: Number,
+      default: 2
+    },
+    fontSize: {
+      type: Number,
+      default: 14
+    },
+    background: {
+      type: String,
+      default: '#ffffff'
+    },
+    lineColor: {
+      type: String,
+      default: '#000000'
+    },
+    margin: {
+      type: Number,
+      default: 10
+    },
+    marginTop: {
+      type: Number,
+      default: -1
+    },
+    marginBottom: {
+      type: Number,
+      default: -1
+    },
+    marginLeft: {
+      type: Number,
+      default: -1
+    },
+    marginRight: {
+      type: Number,
+      default: -1
+    },
+    useCanvas: {
+      type: Boolean,
+      default: true
+    }
+  },
+  emits: ['rendered', 'error'],
+  data() {
+    return {
+      canvasId: 'up-barcode-' + Date.now().toString(),
+      barcodeImage: '',
+      showCanvas: false,
+      canvasContext: null as CanvasContext | null,
+      ctx: null as CanvasRenderingContext2D | null,
+      bars: [] as Array<UTSJSONObject>,
+      canvasWidth: 200,
+      canvasHeight: 80,
+      error: ''
+    }
+  },
+  computed: {
+    marginTopValue(): number {
+      return this.marginTop >= 0 ? this.marginTop : this.margin
+    },
+    marginBottomValue(): number {
+      return this.marginBottom >= 0 ? this.marginBottom : this.margin
+    },
+    marginLeftValue(): number {
+      return this.marginLeft >= 0 ? this.marginLeft : this.margin
+    },
+    marginRightValue(): number {
+      return this.marginRight >= 0 ? this.marginRight : this.margin
+    },
+    displayText(): string {
+      return this.text.length > 0 ? this.text : stringValue(this.value)
+    },
+    showTopText(): boolean {
+      return this.displayValue && this.textPosition == 'top' && this.error.length == 0
+    },
+    showBottomText(): boolean {
+      return this.displayValue && this.textPosition != 'top' && this.error.length == 0
+    },
+    showImage(): boolean {
+      return this.useCanvas == false && this.barcodeImage.length > 0 && this.error.length == 0
+    },
+    rootStyle(): UTSJSONObject {
+      return {
+        width: this.canvasWidth.toString() + 'px',
+        minHeight: this.canvasHeight.toString() + 'px',
+        paddingTop: this.marginTopValue.toString() + 'px',
+        paddingBottom: this.marginBottomValue.toString() + 'px',
+        paddingLeft: this.marginLeftValue.toString() + 'px',
+        paddingRight: this.marginRightValue.toString() + 'px',
+        backgroundColor: this.background
+      } as UTSJSONObject
+    },
+    barcodeStyle(): UTSJSONObject {
+      return {
+        width: this.width.toString() + 'px',
+        height: this.height.toString() + 'px',
+        backgroundColor: this.background
+      } as UTSJSONObject
+    },
+    canvasStyle(): UTSJSONObject {
+      return {
+        width: this.canvasWidth.toString() + 'px',
+        height: this.canvasHeight.toString() + 'px'
+      } as UTSJSONObject
+    },
+    imageStyle(): UTSJSONObject {
+      return {
+        width: this.canvasWidth.toString() + 'px',
+        height: this.canvasHeight.toString() + 'px'
+      } as UTSJSONObject
+    },
+    textStyle(): UTSJSONObject {
+      const style = {
+        fontSize: this.fontSize.toString() + 'px',
+        lineHeight: (this.fontSize + this.textMargin).toString() + 'px',
+        color: this.lineColor,
+        textAlign: this.textAlign
+      } as UTSJSONObject
+      return style
+    }
+  },
+  watch: {
+    value() { this.generateBarcode() },
+    format() { this.generateBarcode() },
+    width() { this.generateBarcode() },
+    height() { this.generateBarcode() },
+    displayValue() { this.generateBarcode() },
+    text() { this.generateBarcode() },
+    textPosition() { this.generateBarcode() },
+    textMargin() { this.generateBarcode() },
+    fontSize() { this.generateBarcode() },
+    background() { this.generateBarcode() },
+    lineColor() { this.generateBarcode() },
+    margin() { this.generateBarcode() }
+  },
+  mounted(): void {
+    this.generateBarcode()
+  },
+  methods: {
+    getBarStyle(bar: UTSJSONObject): UTSJSONObject {
+      return {
+        width: normalizeNumber(bar['width'], 1).toString() + 'px',
+        height: this.height.toString() + 'px',
+        backgroundColor: stringValue(bar['color'])
+      } as UTSJSONObject
+    },
+    generateBarcode(): void {
+      try {
+        this.error = ''
+        const bits = this.encodeBarcode(stringValue(this.value), this.format)
+        this.bars = this.createBars(bits)
+        const textHeight = this.displayValue ? this.fontSize + this.textMargin : 0
+        this.canvasWidth = this.width + this.marginLeftValue + this.marginRightValue
+        this.canvasHeight = this.height + this.marginTopValue + this.marginBottomValue + textHeight
+        if (this.useCanvas == false) {
+          this.$nextTick(() => {
+            this.exportImage().then((path: string) => {
+              this.barcodeImage = path
+            }).catch((error: any | null) => {
+              this.$emit('error', error)
+            })
+          })
+        } else {
+          this.barcodeImage = ''
+        }
+        this.$emit('rendered', {
+          type: this.useCanvas == false ? 'image' : 'view',
+          value: this.value,
+          format: this.format,
+          path: this.barcodeImage
+        } as UTSJSONObject)
+      } catch (error) {
+        const message = this.getErrorMessage(error)
+        this.error = message.length > 0 ? message : '生成条码失败'
+        this.bars = [] as Array<UTSJSONObject>
+        this.$emit('error', {
+          message: this.error,
+          value: this.value,
+          format: this.format
+        } as UTSJSONObject)
+      }
+    },
+    toTempFilePath(options: UTSJSONObject = {} as UTSJSONObject): void {
+      const success = options['success'] as ((res: UTSJSONObject) => void) | null
+      const fail = options['fail'] as ((err: any | null) => void) | null
+      this.exportImage().then((path: string) => {
+        if (success != null) {
+          success({ tempFilePath: path, path } as UTSJSONObject)
+        }
+      }).catch((error: any | null) => {
+        if (fail != null) {
+          fail(error)
+        } else {
+          this.$emit('error', error)
+        }
+      })
+    },
+    exportImage(): Promise<string> {
+      return new Promise((resolve, reject) => {
+        this.showCanvas = true
+        this.$nextTick(() => {
+          this.initCanvas().then(() => {
+            this.drawCanvasBarcode().then(() => {
+              const canvas = this.canvasContext
+              if (canvas == null) {
+                this.showCanvas = false
+                reject(new Error('Canvas is not ready'))
+                return
+              }
+              const dataUrl = canvas.toDataURL('image/png', 1)
+              this.showCanvas = false
+              this.$emit('rendered', { type: 'image', value: this.value, path: dataUrl } as UTSJSONObject)
+              resolve(dataUrl)
+            }).catch((error: any | null) => {
+              this.showCanvas = false
+              reject(error)
+            })
+          }).catch((error: any | null) => {
+            this.showCanvas = false
+            reject(error)
+          })
+        })
+      })
+    },
+    initCanvas(): Promise<void> {
+      return new Promise((resolve, reject) => {
+        uni.createCanvasContextAsync({
+          id: this.canvasId.toString() as string.IDString,
+          component: this,
+          success: (context: CanvasContext) => {
+            this.canvasContext = context
+            this.ctx = context.getContext('2d')
+            resolve()
+          },
+          fail: (error: UniError) => {
+            reject(error)
+          }
+        })
+      })
+    },
+    drawCanvasBarcode(): Promise<void> {
+      return new Promise((resolve, reject) => {
+        const context = this.ctx
+        if (context == null) {
+          reject(new Error('Canvas is not ready'))
+          return
+        }
+        try {
+          const bits = this.encodeBarcode(stringValue(this.value), this.format)
+          context.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
+          context.fillStyle = this.background
+          context.fillRect(0, 0, this.canvasWidth, this.canvasHeight)
+          let barcodeY = this.marginTopValue
+          const textHeight = this.displayValue ? this.fontSize + this.textMargin : 0
+          if (this.displayValue && this.textPosition == 'top') {
+            barcodeY += textHeight
+          }
+          const moduleWidth = this.width / Math.max(1, bits.length)
+          context.fillStyle = this.lineColor
+          let x = this.marginLeftValue
+          for (let i = 0; i < bits.length; i++) {
+            if (bits.substring(i, i + 1) == '1') {
+              context.fillRect(x, barcodeY, moduleWidth + 0.5, this.height)
+            }
+            x += moduleWidth
+          }
+          if (this.displayValue) {
+            this.drawCanvasText(context, barcodeY, textHeight)
+          }
+          context.draw()
+          resolve()
+        } catch (error) {
+          reject(error)
+        }
+      })
+    },
+    drawCanvasText(context: CanvasRenderingContext2D, barcodeY: number, textHeight: number): void {
+      const text = this.displayText
+      const textX = this.textAlign == 'left'
+        ? this.marginLeftValue
+        : (this.textAlign == 'right' ? this.canvasWidth - this.marginRightValue : this.canvasWidth / 2)
+      let textY = this.textPosition == 'top'
+        ? this.marginTopValue + this.fontSize
+        : barcodeY + this.height + this.textMargin + this.fontSize
+      if (textY > this.canvasHeight - this.marginBottomValue) {
+        textY = this.canvasHeight - this.marginBottomValue - 2
+      }
+      context.fillStyle = this.lineColor
+      context.font = this.fontOptions.length > 0
+        ? this.fontOptions + ' ' + this.fontSize.toString() + 'px ' + this.font
+        : this.fontSize.toString() + 'px ' + this.font
+      context.textAlign = this.textAlign
+      context.fillText(text, textX, textY)
+    },
+    getErrorMessage(error: any | null): string {
+      if (error == null) {
+        return ''
+      }
+      const err = error as UTSJSONObject
+      const message = err['message']
+      return message == null ? error.toString() : message.toString()
+    },
+    createBars(bits: string): Array<UTSJSONObject> {
+      const list = [] as Array<UTSJSONObject>
+      if (bits.length == 0) {
+        return list
+      }
+      const moduleWidth = this.width / bits.length
+      let current = bits.substring(0, 1)
+      let count = 1
+      for (let i = 1; i < bits.length; i++) {
+        const bit = bits.substring(i, i + 1)
+        if (bit == current) {
+          count++
+        } else {
+          list.push({
+            color: current == '1' ? this.lineColor : this.background,
+            width: count * moduleWidth
+          } as UTSJSONObject)
+          current = bit
+          count = 1
+        }
+      }
+      list.push({
+        color: current == '1' ? this.lineColor : this.background,
+        width: count * moduleWidth
+      } as UTSJSONObject)
+      return list
+    },
+    encodeBarcode(value: string, format: string): string {
+      switch (format) {
+        case 'CODE39':
+          return this.encodeCode39(value)
+        case 'EAN13':
+          return this.encodeEAN13(value)
+        case 'EAN8':
+          return this.encodeEAN8(value)
+        case 'EAN5':
+        case 'EAN2':
+          return this.encodeEAN52(value, format)
+        case 'UPC':
+        case 'UPCA':
+          return this.encodeUPCA(value)
+        case 'UPCE':
+          return this.encodeUPCE(value)
+        case 'CODE128':
+        case 'auto':
+        default:
+          return this.encodeCode128(value)
+      }
+    },
+    encodeCode128(data: string): string {
+      const chars = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
+      const codes = [] as Array<number>
+      let checksum = 104
+      codes.push(104)
+      for (let i = 0; i < data.length; i++) {
+        const code = chars.indexOf(data.substring(i, i + 1))
+        if (code < 0) {
+          throw new Error('Invalid character in CODE128')
+        }
+        codes.push(code)
+        checksum += code * (i + 1)
+      }
+      codes.push(checksum % 103)
+      codes.push(106)
+      const patterns = code128Patterns()
+      let barcode = ''
+      for (let i = 0; i < codes.length; i++) {
+        barcode += patterns[codes[i]]
+      }
+      return barcode + '00000'
+    },
+    encodeCode39(data: string): string {
+      const codes = code39Map()
+      const value = data.toUpperCase()
+      let barcode = stringValue(codes['*'])
+      for (let i = 0; i < value.length; i++) {
+        const char = value.substring(i, i + 1)
+        const code = codes[char]
+        if (code == null) {
+          throw new Error('Invalid character in CODE39')
+        }
+        barcode += '0' + code.toString()
+      }
+      return barcode + '0' + stringValue(codes['*'])
+    },
+    encodeEAN13(data: string): string {
+      if (!/^\d{13}$/.test(data)) {
+        throw new Error('EAN13 must be 13 digits')
+      }
+      let sum = 0
+      for (let i = 0; i < 12; i++) {
+        const digit = digitAt(data, i)
+        sum += i % 2 == 0 ? digit : digit * 3
+      }
+      const checkDigit = (10 - (sum % 10)) % 10
+      if (digitAt(data, 12) != checkDigit) {
+        throw new Error('Invalid EAN13 check digit')
+      }
+      const leftData = data.substring(1, 7)
+      const rightData = data.substring(7, 13)
+      const parity = [
+        'LLLLLL', 'LLGLGG', 'LLGGLG', 'LLGGGL', 'LGLLGG',
+        'LGGLLG', 'LGGGLL', 'LGLGLG', 'LGLGGL', 'LGGLGL'
+      ] as Array<string>
+      const odd = leftOddCodes()
+      const even = leftEvenCodes()
+      const right = rightCodes()
+      const pattern = parity[digitAt(data, 0)]
+      let barcode = '101'
+      for (let i = 0; i < leftData.length; i++) {
+        const digit = digitAt(leftData, i)
+        barcode += pattern.substring(i, i + 1) == 'L' ? odd[digit] : even[digit]
+      }
+      barcode += '01010'
+      for (let i = 0; i < rightData.length; i++) {
+        barcode += right[digitAt(rightData, i)]
+      }
+      return barcode + '101'
+    },
+    encodeEAN8(data: string): string {
+      if (!/^\d{8}$/.test(data)) {
+        throw new Error('EAN8 must be 8 digits')
+      }
+      let sum = 0
+      for (let i = 0; i < 7; i++) {
+        const digit = digitAt(data, i)
+        sum += digit * (i % 2 == 0 ? 3 : 1)
+      }
+      const checkDigit = (10 - (sum % 10)) % 10
+      if (digitAt(data, 7) != checkDigit) {
+        throw new Error('Invalid EAN8 check digit')
+      }
+      const odd = leftOddCodes()
+      const right = rightCodes()
+      let barcode = '101'
+      for (let i = 0; i < 4; i++) {
+        barcode += odd[digitAt(data, i)]
+      }
+      barcode += '01010'
+      for (let i = 4; i < 8; i++) {
+        barcode += right[digitAt(data, i)]
+      }
+      return barcode + '101'
+    },
+    encodeEAN52(data: string, format: string): string {
+      const length = format == 'EAN5' ? 5 : 2
+      if (data.length != length || !/^\d+$/.test(data)) {
+        throw new Error(format + ' must be ' + length.toString() + ' digits')
+      }
+      const codes = leftOddCodes()
+      let barcode = '1011'
+      for (let i = 0; i < data.length; i++) {
+        if (i > 0) {
+          barcode += '01'
+        }
+        barcode += codes[digitAt(data, i)]
+      }
+      return barcode
+    },
+    encodeUPCA(data: string): string {
+      let value = data
+      if (/^\d{11}$/.test(value)) {
+        let sum = 0
+        for (let i = 0; i < 11; i++) {
+          const digit = digitAt(value, i)
+          sum += i % 2 == 0 ? digit * 3 : digit
+        }
+        value += ((10 - (sum % 10)) % 10).toString()
+      }
+      if (!/^\d{12}$/.test(value)) {
+        throw new Error('UPC-A must be 11 or 12 digits')
+      }
+      return this.encodeEAN13('0' + value)
+    },
+    encodeUPCE(data: string): string {
+      let value = data
+      if (/^\d{7}$/.test(value)) {
+        let sum = 0
+        for (let i = 0; i < 7; i++) {
+          const digit = digitAt(value, i)
+          sum += i % 2 == 0 ? digit * 3 : digit
+        }
+        value += ((10 - (sum % 10)) % 10).toString()
+      }
+      if (!/^\d{8}$/.test(value)) {
+        throw new Error('UPC-E must be 7 or 8 digits')
+      }
+      const odd = leftOddCodes()
+      const even = leftEvenCodes()
+      const middle = value.substring(1, 7)
+      const checkDigit = value.substring(7, 8)
+      let pattern = 'EEOOOO'
+      if (checkDigit == '0' || checkDigit == '1' || checkDigit == '2' || checkDigit == '3') {
+        pattern = 'EEEEOO'
+      } else if (checkDigit == '4') {
+        pattern = 'EEEOOO'
+      }
+      let barcode = '101'
+      for (let i = 0; i < middle.length; i++) {
+        const digit = digitAt(middle, i)
+        barcode += pattern.substring(i, i + 1) == 'E' ? even[digit] : odd[digit]
+      }
+      return barcode + '010101101'
+    }
+  }
+}
+</script>
+
+<style scoped lang="scss">
+.up-barcode {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.up-barcode__bars {
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+}
+
+.up-barcode__bar {
+  flex-shrink: 0;
+}
+
+.up-barcode__canvas {
+  position: fixed;
+  left: -9999px;
+  top: -9999px;
+}
+
+.up-barcode__text {
+  display: flex;
+  width: 100%;
+}
+
+.up-barcode__error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f8f8;
+}
+
+.up-barcode__error-text {
+  color: #fa3534;
+  font-size: 14px;
+}
+</style>

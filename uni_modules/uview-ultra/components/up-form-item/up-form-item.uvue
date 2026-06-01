@@ -1,0 +1,332 @@
+<template>
+	<view class="up-form-item" :class="{'up-form-item--error':(message != '' && parentData['errorType'] == 'message')}">
+		<view
+			class="up-form-item__body"
+			@tap="clickHandler"
+			:style="[$up.addStyle(customStyle), {
+                flexDirection: (labelPosition != '' ? labelPosition : parentData['labelPosition']) == 'left' ? 'row' : 'column'
+			}]"
+		>
+			<!-- 微信小程序中，将一个参数设置空字符串，结果会变成字符串"true" -->
+			<slot name="label">
+				<!-- {{required}} -->
+				<view
+					class="up-form-item__body__left"
+					v-if="required || leftIcon != '' || label != ''"
+					:style="{
+						width: $up.addUnit(labelWidth != '' ? labelWidth : parentData['labelWidth']),
+						marginBottom: (labelPosition != '' ? labelPosition : parentData['labelPosition']) == 'left' ? 0 : '5px',
+					}"
+				>
+					<!-- 为了块对齐 -->
+					<view class="up-form-item__body__left__content">
+						<!-- nvue不支持伪元素before -->
+						<text
+							v-if="required"
+							class="up-form-item__body__left__content__required"
+						>*</text>
+						<view
+							class="up-form-item__body__left__content__icon"
+							v-if="leftIcon != ''"
+						>
+							<up-icon
+								:name="leftIcon"
+								:custom-style="leftIconStyle"
+							></up-icon>
+						</view>
+						<text
+							class="up-form-item__body__left__content__label"
+							:style="[parentData['labelStyle'], {
+								justifyContent: parentData['labelAlign'] == 'left' ? 'flex-start' : parentData['labelAlign'] == 'center' ? 'center' : 'flex-end'
+							}]"
+						>{{ label }}</text>
+					</view>
+				</view>
+			</slot>
+			<view class="up-form-item__body__right">
+				<view class="up-form-item__body__right__content">
+					<view class="up-form-item__body__right__content__slot">
+						<slot />
+					</view>
+					<view
+						class="item__body__right__content__icon"
+						v-if="$slots['right'] != null"
+					>
+						<slot name="right" />
+					</view>
+				</view>
+			</view>
+		</view>
+		<slot name="error">
+			<text
+				v-if="message != '' && parentData['errorType'] == 'message'"
+				class="up-form-item__body__right__message"
+				:style="{
+					marginLeft:  $up.addUnit((labelPosition ?? parentData['labelPosition']) == 'top' ? 0 : (labelWidth != null ? labelWidth : parentData['labelWidth']))
+				}"
+			>{{ message }}</text>
+		</slot>
+		<up-line
+			v-if="borderBottom"
+			:color="message != '' && parentData['errorType'] == 'border-bottom' ? color['error'] : propsLine['color']"
+			:customStyle="`margin-top: ${message != '' && parentData['errorType'] == 'message' ? '5px' : 0}`"
+		></up-line>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import type { PropType } from 'vue'
+	import { getCurrentInstance, ref, reactive, computed, onMounted, watch } from 'vue'
+	import defProps from './formItem.uts'
+	import propsLine from '../up-line/line.uts'
+	import color from '../../libs/config/color.uts'
+	import { addStyle, addUnit, getProperty, setProperty, error } from '../../libs/function/index.uts'
+	import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'
+	const { parent, parentData, getParentData } = useUltraUI({
+		// 提示文本的位置
+		labelPosition: 'left',
+		// 提示文本对齐方式
+		labelAlign: 'left',
+		// 提示文本的样式
+		labelStyle: {},
+		// 提示文本的宽度
+		labelWidth: 45,
+		// 错误提示方式
+		errorType: 'message',
+		originalModel: {}
+	})
+	const instance = getCurrentInstance()!.proxy!
+	
+	defineOptions({
+		name: 'up-form-item'
+	})
+	
+	// 定义props
+	const props = defineProps({
+		// input的label提示语
+		label: {
+			type: String,
+			default: defProps.getString('formItem.label')
+		},
+		// 绑定的值
+		prop: {
+			type: String,
+			default: defProps.getString('formItem.prop')
+		},
+		// 绑定的规则
+		rules: {
+			type: [UTSJSONObject, Array],
+			default: defProps.getAny('formItem.rules') as UTSJSONObject
+		},
+		// 是否显示表单域的下划线边框
+		borderBottom: {
+			type: [String, Boolean],
+			default: defProps.getString('formItem.borderBottom')
+		},
+		// label的位置，left-左边，top-上边
+		labelPosition: {
+			type: String,
+			default: defProps.getString('formItem.labelPosition')
+		},
+		// label的宽度，单位px
+		labelWidth: {
+			type: [String, Number],
+			default: defProps.getString('formItem.labelWidth')
+		},
+		// 右侧图标
+		rightIcon: {
+			type: String,
+			default: defProps.getString('formItem.rightIcon')
+		},
+		// 左侧图标
+		leftIcon: {
+			type: String,
+			default: defProps.getString('formItem.leftIcon')
+		},
+		// 是否显示左边的必填星号，只作显示用，具体校验必填的逻辑，请在rules中配置
+		required: {
+			type: Boolean,
+			default: defProps.getBoolean('formItem.required')
+		},
+		leftIconStyle: {
+			type: [String, UTSJSONObject],
+			default: defProps.getString('formItem.leftIconStyle')
+		}
+	})
+	
+	// 定义emits
+	const emit = defineEmits(["click"])
+	
+	// 响应式数据
+	const message = ref('')
+	const itemRules = ref<UTSJSONObject[]|UTSJSONObject>({})
+
+	// 获取父组件的参数
+	const updateParentData = () => {
+		getParentData('up-form', instance, false);
+	}
+	
+	// 初始化
+	const init = () => {
+		updateParentData()
+		if (parent.value == null) {
+			error('up-form-item需要结合up-form组件使用')
+		}
+	}
+	
+	// 手动设置校验的规则，如果规则中有函数的话，微信小程序中会过滤掉，所以只能手动调用设置规则
+	const setRules = (rules: UTSJSONObject[]|UTSJSONObject) => {
+		// 判断是否有规则
+		if (Array.isArray(rules)) {
+			if (rules.length == 0) {
+				itemRules.value = {};
+				return
+			};
+		} else {
+			if (UTSJSONObject.keys(rules).length == 0) {
+				itemRules.value = {};
+				return
+			};
+		}
+		
+		itemRules.value = rules;
+	}
+	
+	// 移除up-form-item的校验结果
+	const clearValidate = () => {
+		message.value = ''
+	}
+	
+	// 清空当前的组件的校验结果，并重置为初始值
+	const resetField = () => {
+		// 找到原始值
+		const value = getProperty(parentData.value['originalModel']!, props.prop)
+		// 将up-form的model的prop属性链还原原始值
+		setProperty(parent.value!.$props['model'], props.prop, value)
+		// 移除校验结果
+		message.value = ''
+	}
+	
+	// 点击组件
+	const clickHandler = () => {
+		emit('click')
+	}
+	
+	// 监听规则的变化todo
+	watch((): Array<UTSJSONObject>|UTSJSONObject => props.rules, (newVal: Array<UTSJSONObject>|UTSJSONObject) => {
+		setRules(newVal);
+	}, { immediate: true })
+	
+	// 在组件挂载后初始化
+	onMounted(() => {
+		init()
+	})
+	
+	
+	const getProps = function(): UTSJSONObject {
+		return {
+			prop: props.prop,
+			rules: itemRules.value,
+			label: props.label,
+			borderBottom: props.borderBottom,
+			labelPosition: props.labelPosition,
+			labelWidth: props.labelWidth,
+			rightIcon: props.rightIcon,
+			leftIcon: props.leftIcon,
+			required: props.required,
+			leftIconStyle: props.leftIconStyle
+		}
+	}
+	const getRefs = function() {
+		return {
+			message: message.value,
+			itemRules: itemRules.value
+		}
+	}
+	
+	const setMessage = function(msg: string) {
+		message.value = msg
+	}
+	
+	// 暴露方法
+	defineExpose({
+		getProps,
+		getRefs,
+		setMessage
+	})
+</script>
+
+<style lang="scss" scoped>
+	.up-form-item {
+		@include flex(column);
+		font-size: 14px;
+		color: $up-main-color;
+
+		&__body {
+			@include flex;
+			padding: 10px 0;
+
+			&__left {
+				@include flex;
+				align-items: center;
+
+				&__content {
+					position: relative;
+					@include flex;
+					align-items: center;
+					padding-right: 10rpx;
+					flex: 1;
+
+					&__icon {
+						margin-right: 8rpx;
+					}
+
+					&__required {
+						position: absolute;
+						left: -9px;
+						color: $up-error;
+						line-height: 20px;
+						font-size: 20px;
+						top: 3px;
+					}
+
+					&__label {
+						@include flex;
+						align-items: center;
+						flex: 1;
+						color: $up-main-color;
+						font-size: 15px;
+					}
+				}
+			}
+
+			&__right {
+				flex: 1;
+
+				&__content {
+					@include flex;
+					align-items: center;
+					flex: 1;
+
+					&__slot {
+						flex: 1;
+						@include flex;
+						align-items: center;
+					}
+
+					&__icon {
+						margin-left: 10rpx;
+						color: $up-light-color;
+						font-size: 30rpx;
+					}
+				}
+
+				&__message {
+					font-size: 12px;
+					line-height: 12px;
+					color: $up-error;
+				}
+			}
+		}
+	}
+</style>

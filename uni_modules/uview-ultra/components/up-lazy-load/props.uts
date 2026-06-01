@@ -1,0 +1,74 @@
+/*
+ * @Author       : jry
+ * @Description  : uview-plus component's props mixin file
+ * @version      : 4.0
+ * @Date         : 2025-12-17 12:47:51
+ * @LastAuthor   : jry
+ * @lastTime     : 2025-12-17 12:47:51
+ */
+import { defineMixin } from '../../libs/vue.uts'
+import defProps from './lazyLoad.uts'
+
+let lazyLoadProp = defProps['lazyLoad'] as UTSJSONObject
+
+export const propsLazyLoad = defineMixin({
+	props: {
+		// 用户自定义值，在事件触发时回调，用以区分是哪个图片
+		index: {
+			type: [Number, String],
+			default: lazyLoadProp['index']
+		},
+		// 要显示的图片
+		image: {
+			type: String,
+			default: lazyLoadProp['image']
+		},
+		// 图片裁剪模式
+		imgMode: {
+			type: String,
+			default: lazyLoadProp['imgMode']
+		},
+		// 占位图片路径
+		loadingImg: {
+			type: String,
+			default: lazyLoadProp['loadingImg']
+		},
+		// 加载失败的错误占位图
+		errorImg: {
+			type: String,
+			default: lazyLoadProp['errorImg']
+		},
+		// 图片进入可见区域前多少像素时，单位rpx，开始加载图片
+		// 负数为图片超出屏幕底部多少距离后触发懒加载，正数为图片顶部距离屏幕底部多少距离时触发(图片还没出现在屏幕上)
+		threshold: {
+			type: [Number, String],
+			default: 100
+		},
+		// 淡入淡出动画的过渡时间
+		duration: {
+			type: [Number, String],
+			default: 500
+		},
+		// 渡效果的速度曲线，各个之间差别不大，因为这是淡入淡出，且时间很短，不是那些变形或者移动的情况，会明显
+		// linear|ease|ease-in|ease-out|ease-in-out|cubic-bezier(n,n,n,n);
+		effect: {
+			type: String,
+			default: 'ease-in-out'
+		},
+		// 是否使用过渡效果
+		isEffect: {
+			type: Boolean,
+			default: true
+		},
+		// 圆角值
+		borderRadius: {
+			type: [Number, String],
+			default: 0
+		},
+		// 图片高度，单位rpx
+		height: {
+			type: [Number, String],
+			default: '200'
+		}
+	}
+});

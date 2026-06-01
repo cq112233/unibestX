@@ -1,0 +1,658 @@
+ <!--                        _             
+  ____     _ __   __ _  __ _(_)_ __   __ _ 
+ |_  /____| '_ \ / _` |/ _` | | '_ \ / _` |
+  / /_____| |_) | (_| | (_| | | | | | (_| |
+ /___|    | .__/ \__,_|\__, |_|_| |_|\__, |
+          |_|          |___/         |___/ -X
+		  
+v0.3.6 (2025-06-07)
+by ZXLee
+-->
+<!-- 文档地址：https://ext.dcloud.net.cn/plugin?name=z-paging-x -->
+<!-- github地址：https://github.com/SmileZXLee/uni-z-paging-x -->
+<!-- dcloud地址：https://ext.dcloud.net.cn/plugin?name=z-paging-x -->
+<!-- 反馈QQ群：371624008 -->
+
+<template name="z-paging-x">
+	<view ref="zPagingX" :class="{ 'zpx-content':true }" :style="[pagingStyle]">
+		<!-- 顶部固定的slot -->
+		<slot name="top" />
+		<!-- 因使用component :is的时候设置的list-view在web端无法正常渲染，且不支持微信小程序，因此目前只能先写死list-view和scroll-view节点，通过v-if切换 -->
+		<list-view v-if="listIs === 'list-view'" ref="zpxList" class="zpx-list-view zpx-flex1"
+		:id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="customNestedScroll" :refresher-background="refresherBackground" 
+		:rebound="rebound" :scroll-top="scrollTop" :show-scrollbar="showScrollbar" :scroll-with-animation="finalScrollWithAnimation"
+		@refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @refresherrestore="_onRefresherrestore" @refresherabort="_onRefresherabort" @scrolltolower="_onScrolltolower" @scrolltoupper="_onScrolltoupper" @scroll="_onScroll"
+		@startnestedscroll="_onStartNestedScroll" @nestedprescroll="_onNestedPreScroll">
+			<slot />
+			<list-item>
+				<template v-if="showLoadMore">
+					<slot v-if="$slots['loadMore']" :loadMoreStatus="loadMoreStatus" name="loadMore" />
+					<z-paging-load-more v-else :status="loadMoreStatus" :default-text="loadMoreDefaultText" :loading-text="loadMoreLoadingText" :no-more-text="loadMoreNoMoreText" :fail-text="loadMoreFailText" @clickMore="_handleLoadMore"/>
+				</template>
+			</list-item>
+			<!-- 这里微信小程序不支持component，但是如果直接使用list-item在web中无法显示下拉刷新，因此需要分开处理 -->
+			<!-- #ifdef WEB -->
+			<component :is="listItemIs" slot="refresher">
+			<!-- #endif -->
+			<!-- #ifndef WEB -->
+			<list-item slot="refresher">
+			<!-- #endif -->
+				<view ref="zpxListRefresher" class="zpx-list-refresher" :style="{ width: contentWidth + 'px' }">
+					<slot v-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
+					<z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp"/>
+				</view>
+			<!-- #ifdef WEB -->
+			</component>
+			<!-- #endif -->
+			<!-- #ifndef WEB -->
+			</list-item>
+			<!-- #endif -->
+			
+			<!-- #ifdef WEB -->
+			<component :is="listItemIs" :class="showEmpty ? 'zpx-flex1' : ''">
+			<!-- #endif -->
+			<!-- #ifndef WEB -->
+			<list-item :class="showEmpty ? 'zpx-flex1' : ''">
+			<!-- #endif -->
+				<template v-if="showEmpty">
+					<slot v-if="$slots['empty']" :isLoadFailed="isLoadFailed" name="empty" />
+					<z-paging-x-empty v-else :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
+				</template>
+				<slot v-if="showLoading" name="loading" />
+			<!-- #ifdef WEB -->
+			</component>
+			<!-- #endif -->
+			<!-- #ifndef WEB -->
+			</list-item>
+			<!-- #endif -->
+		</list-view>
+		<scroll-view v-else ref="zpxList" class="zpx-list-view zpx-flex1"
+		:id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="customNestedScroll" :refresher-background="refresherBackground" 
+		:rebound="rebound" :scroll-top="scrollTop" :show-scrollbar="showScrollbar" :scroll-with-animation="finalScrollWithAnimation"
+		@refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @refresherrestore="_onRefresherrestore" @refresherabort="_onRefresherabort" @scrolltolower="_onScrolltolower" @scrolltoupper="_onScrolltoupper" @scroll="_onScroll"
+		@startnestedscroll="_onStartNestedScroll" @nestedprescroll="_onNestedPreScroll">
+			<slot />
+			<view>
+				<template v-if="showLoadMore">
+					<slot v-if="$slots['loadMore']" :loadMoreStatus="loadMoreStatus" name="loadMore" />
+					<z-paging-load-more v-else :status="loadMoreStatus" :default-text="loadMoreDefaultText" :loading-text="loadMoreLoadingText" :no-more-text="loadMoreNoMoreText" :fail-text="loadMoreFailText" @clickMore="_handleLoadMore"/>
+				</template>
+			</view>
+			<!-- 这里微信小程序不支持component，但是如果直接使用view在web中无法显示下拉刷新，因此需要分开处理 -->
+			<!-- #ifdef WEB -->
+			<component :is="listItemIs" slot="refresher">
+			<!-- #endif -->
+			<!-- #ifndef WEB -->
+			<view slot="refresher">
+			<!-- #endif -->
+				<view ref="zpxListRefresher" class="zpx-list-refresher" :style="{ width: contentWidth + 'px' }">
+					<slot v-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
+					<z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp"/>
+				</view>
+			<!-- #ifdef WEB -->
+			</component>
+			<!-- #endif -->
+			<!-- #ifndef WEB -->
+			</view>
+			<!-- #endif -->
+			<view :class="showEmpty ? 'zpx-flex1' : ''">
+				<template v-if="showEmpty">
+					<slot v-if="$slots['empty']" :isLoadFailed="isLoadFailed" name="empty" />
+					<z-paging-x-empty v-else :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
+				</template>
+				<slot v-if="showLoading" name="loading" />
+			</view>
+		</scroll-view>
+		<!-- 底部固定的slot -->
+		<slot name="bottom" />
+		<!-- 点击返回顶部view -->
+		<view v-if="showBackToTopClass" :class="backToTopClass" :style="[backToTopStyle]" @click.stop="_onBackToTopClick">
+			<slot v-if="$slots['backToTop']" name="backToTop" />
+			<image v-else class="zpx-back-to-top-img" :src="backToTopImg.length > 0 ? backToTopImg : base64BackToTopImg" />
+		</view>
+	</view>
+</template>
+
+<script lang="uts"> 
+	import zPagingRefresher from './components/z-paging-refresher.uvue'
+	import zPagingLoadMore from './components/z-paging-load-more.uvue'
+	import zPagingXEmpty from '../z-paging-x-empty/z-paging-x-empty.uvue'
+	import Enum from './enums/index.uts'
+	import { gc } from './config/index.uts'
+	import { base64BackToTop } from './static/index.uts'
+	import { updateRefesrherTime, getTime } from './utils/index.uts'
+	export default {
+		components: { zPagingRefresher, zPagingLoadMore, zPagingXEmpty },
+		props: {
+			// 自定义初始的pageNo，默认为1
+			defaultPageNo: {
+				type: Number,
+				default: gc<number>('default-page-no', 1)
+			},
+			// 自定义pageSize，默认为10
+			defaultPageSize: {
+				type: Number,
+				default: gc<number>('default-page-size', 10)
+			},
+			// 设置组件的style
+			pagingStyle: {
+				type: Object,
+				default: gc<object>('paging-style', {})
+			},
+			// 是否开启自定义下拉刷新，默认为是
+			refresherEnabled: {
+				type: Boolean,
+				default: gc<boolean>('refresher-enabled', true)
+			},
+			// 设置自定义下拉刷新阈值，默认等于refresher高度，单位为px
+			refresherThreshold: {
+				type: Number,
+				default: gc<number>('refresher-threshold', 0)
+			},
+			// 自定义下拉刷新默认状态下的文字，默认：继续下拉刷新
+			refresherDefaultText: {
+				type: String,
+				default: gc<string>('refresher-default-text', '继续下拉刷新')
+			},
+			// 自定义下拉刷新松手立即刷新状态下的文字，默认：松开立即刷新
+			refresherPullingText: {
+				type: String,
+				default: gc<string>('refresher-pulling-text', '松开立即刷新')
+			},
+			// 自定义下拉刷新刷新中状态下的文字，默认：正在刷新...
+			refresherRefreshingText: {
+				type: String,
+				default: gc<string>('refresher-refreshing-text', '正在刷新...')
+			},
+			// 下拉刷新区域背景颜色
+			refresherBackground: {
+				type: String,
+				default: gc<string>('refresher-background', '#FFF')
+			},
+			// 是否使用自定义的下拉刷新，默认为是，即使用z-paging-x的下拉刷新。设置为false即代表使用unix自带的下拉刷新
+			useCustomRefresher: {
+				type: Boolean,
+				default: gc<boolean>('use-custom-refresher', true)
+			},
+			// 列表刷新时自动显示下拉刷新view，默认为否
+			showRefresherWhenReload: {
+				type: Boolean,
+				default: gc<boolean>('show-refresher-when-reload', false)
+			},
+			// 是否显示最后更新时间，默认为否
+			showRefresherUpdateTime: {
+				type: Boolean,
+				default: gc<boolean>('show-refresher-update-time', false)
+			},
+			// 如果需要区别不同页面的最后更新时间，请为不同页面的z-paging-x的`refresher-update-time-key`设置不同的字符串
+			refresherUpdateTimeKey: {
+				type: String,
+				default: gc<string>('refresher-update-time-key', 'default')
+			},
+			// 是否启用加载更多数据(含滑动到底部加载更多数据和点击加载更多数据)，默认为是
+			loadMoreEnabled: {
+				type: Boolean,
+				default: gc<boolean>('load-more-enabled', true)
+			},
+			// 滑动到底部"默认"文字，默认：点击加载更多
+			loadMoreDefaultText: {
+				type: String,
+				default: gc<string>('load-more-default-text', '点击加载更多')
+			},
+			// 滑动到底部"加载中"文字，默认：正在加载...
+			loadMoreLoadingText: {
+				type: String,
+				default: gc<string>('load-more-loading-text', '正在加载...')
+			},
+			// 滑动到底部"没有更多"文字，默认：没有更多了
+			loadMoreNoMoreText: {
+				type: String,
+				default: gc<string>('load-more-no-more-text', '没有更多了')
+			},
+			// 滑动到底部"加载失败"文字，默认：加载失败，点击重新加载
+			loadMoreFailText: {
+				type: String,
+				default: gc<string>('load-more-fail-text', '加载失败，点击重新加载')
+			},
+			// mounted后自动调用reload方法(mounted后自动调用接口)，默认为是
+			auto: {
+				type: Boolean,
+				default: gc<boolean>('auto', true)
+			},
+			// reload时自动滚动到顶部，默认为是
+			scrollToTopWhenReload: {
+				type: Boolean,
+				default: gc<boolean>('scrollToTopWhenReload', true)
+			},
+			// reload时立即自动清空原list，默认为是，若立即自动清空，则在reload之后、请求回调之前页面是空白的
+			cleanListWhenReload: {
+				type: Boolean,
+				default: gc<boolean>('cleanListWhenReload', true)
+			},
+			// 空数据描述文字
+			emptyText: {
+				type: String,
+				default: gc<string>('empty-text', '没有数据哦~')
+			},
+			// 空数据加载失败文字
+			emptyErrorText: {
+				type: String,
+				default: gc<string>('empty-error-text', '很抱歉，加载失败')
+			},
+			// 空数据图片
+			emptyImg: {
+				type: String,
+				default: gc<string>('empty-img', '')
+			},
+			// 空数据加载失败图片
+			emptyErrorImg: {
+				type: String,
+				default: gc<string>('empty-error-img', '')
+			},
+			//自动显示点击返回顶部按钮，默认为否
+			showBackToTop: {
+				type: Boolean,
+				default: gc<boolean>('show-back-to-top', false)
+			},
+			//点击返回顶部按钮显示/隐藏的阈值(滚动距离)，单位为px，默认为300px
+			backToTopThreshold: {
+				type: Number,
+				default: gc<number>('back-to-top-threshold', 300)
+			},
+			//点击返回顶部按钮的自定义图片地址，默认使用z-paging内置的图片
+			backToTopImg: {
+				type: String,
+				default: gc<string>('back-to-top-img', '')
+			},
+			// 点击返回顶部按钮的style
+			backToTopStyle: {
+				type: Object,
+				default: gc<object>('back-to-top-style', {}),
+			},
+			// 在设置滚动条位置时使用动画过渡，默认为否
+			scrollWithAnimation: {
+				type: Boolean,
+				default: gc<boolean>('scroll-with-animation', false),
+			},
+			// list的类型：list-view或scroll-view，默认为list-view
+			listIs: {
+				type: String,
+				default: gc<string>('list-is', 'list-view'),
+			},
+			// list的id
+			listId: {
+				type: String,
+				default: gc<string>('list-id', ''),
+			},
+			// 控制是否出现滚动条
+			showScrollbar: {
+				type: Boolean,
+				default: gc<boolean>('show-scrollbar', true),
+			},
+			// 控制是否回弹效果
+			rebound: {
+				type: Boolean,
+				default: gc<boolean>('rebound', true),
+			},
+			// (子元素中使用)子元素是否开启嵌套滚动，将滚动事件与父元素协商处理
+			customNestedScroll: {
+				type: Boolean,
+				default: gc<boolean>('custom-nested-scroll', false),
+			},
+			// (仅listIs = scroll-view有效，父元素中使用)是否与子元素开启滚动协商
+			startNestedScroll: {
+				type: Boolean,
+				default: gc<boolean>('start-nested-scroll', false),
+			},
+			// (仅listIs = scroll-view有效)嵌套滚动子元素的id属性，不支持ref，scroll-view惯性滚动时会让对应id元素视图进行滚动，子元素滚动时会触发scroll-view的nestedprescroll事件，嵌套子元素需要设置custom-nested-scroll = true
+			nestedScrollChild: {
+				type: String,
+				default: gc<string>('nested-scroll-child', ''),
+			},
+		},
+		data() {
+			return {
+				// z-paging-x中list-view或scroll-view的节点
+				$zpxList: null as null | UniElement,
+				// 下拉刷新状态
+				refresherStatus: Enum.Refresher.Default,
+				// 设置当前下拉刷新状态，true 表示下拉刷新已经被触发，false 表示下拉刷新未被触发
+				refresherTriggered: false,
+				// refresher节点高度
+				refresherNodeHeight: 0 as number,
+				// 下拉刷新最后更新时间更新的时间戳
+				refresherTimeTextTimestamp: 0,
+				// 底部加载更多状态
+				loadMoreStatus: Enum.More.Default,
+				// 触发query来源
+				queryFrom: '',
+				// 是否是加载失败
+				isLoadFailed: false,
+				// 是否是开发者自定义的加载更多，-1代表交由z-paging自行判断；1代表没有更多了；0代表还有更多数据
+				customNoMore: -1,
+				// 是否强制隐藏当前加载更多
+				forceHideLoadMore: false,
+				// 内容宽度
+				contentWidth: 0,
+				
+				// 是否是加载中状态
+				isLoading: true,
+				// 竖向滚动条位置
+				scrollTop: 0,
+				// 记录当前滚动位置
+				oldScrollTop: 0,
+				
+				// 当前页
+				pageNo: 1,
+				// 当前列表总数据
+				totalData: [] as any[],
+				
+				// 默认的点击返回顶部图片
+				base64BackToTopImg: base64BackToTop,
+				// 点击返回顶部class
+				backToTopClass: 'zpx-back-to-top zpx-back-to-top-hide',
+				// 上次点击返回顶部的时间
+				lastBackToTopShowTime: 0,
+				// 点击返回顶部显示的class是否在展示中，使得按钮展示/隐藏过度效果更自然
+				showBackToTopClass: false,
+				// z-paging-x内部判断的滚动是否有动画效果，-1代表采取默认状态，1代表有动画效果，0代表没有动画效果
+				privateScrollWithAnimation: -1
+				
+			}
+		},
+		computed: {
+			isFirstPage(): boolean {
+				return this.pageNo === this.defaultPageNo;
+			},
+			finalRefresherThreshold(): number {
+				return this.refresherThreshold > 0 ? this.refresherThreshold : this.refresherNodeHeight > 0 ? this.refresherNodeHeight : 40;
+			},
+			showEmpty(): boolean {
+				return this.totalData.length == 0 && !this.isLoading;
+			},
+			showLoading(): boolean {
+				return this.$slots['loading'] != null && this.isLoading && this.totalData.length == 0;
+			},
+			showLoadMore(): boolean {
+				return this.loadMoreEnabled && !this.forceHideLoadMore && (!this.isLoading || this.totalData.length > 0) && !this.showEmpty;
+			},
+			finalScrollWithAnimation(): boolean {
+				if (this.privateScrollWithAnimation != -1) {
+					const scrollWithAnimation = this.privateScrollWithAnimation == 1;
+					this.privateScrollWithAnimation = -1;
+					return scrollWithAnimation;
+				}
+				return this.scrollWithAnimation;
+			},
+			listItemIs(): String {
+				return this.listIs === 'list-view' ? 'list-item' : 'view';
+			}
+		},
+		watch: {
+			totalData(newVal: any[]) {
+				this.$emit('update:modelValue', newVal);
+			},
+			refresherStatus(newVal: string) {
+				this.$emit('refresherStatusChange', newVal);
+			},
+			loadMoreStatus(newVal: string) {
+				this.$emit('loadMoreStatusChange', newVal);
+			},
+		},
+		mounted() {
+			this.$zpxList = this.$refs['zpxList'] as UniElement;
+			this.pageNo = this.defaultPageNo;
+			if (this.auto) {
+				this.reload();
+			}
+			// 更新缓存的refresher高度
+			this.$nextTick(() => {
+				if (this.refresherEnabled) {
+					const refresherEle = this.$refs["zpxListRefresher"] as UniElement | null;
+					if (refresherEle !== null) {
+						refresherEle.getBoundingClientRectAsync()!.then((rect : DOMRect) => {
+							this.refresherNodeHeight = rect.height;
+						})
+					}
+				}
+				
+				
+				const zPagingXEle = this.$refs["zPagingX"] as UniElement | null;
+				if (zPagingXEle !== null) {
+					zPagingXEle.getBoundingClientRectAsync()!.then((rect : DOMRect) => {
+						this.contentWidth = rect.width;
+					})
+				}
+			})
+			
+		},
+		methods: {
+			// 刷新列表数据
+			reload() {
+				this.pageNo = this.defaultPageNo;
+				this.forceHideLoadMore = true;
+				if (this.showRefresherWhenReload) {
+					this.$nextTick(() => {
+						this.refresherTriggered = true;
+					})
+					return;
+				}
+				if (this.cleanListWhenReload) {
+					this.totalData = [];
+				}
+				if (this.scrollToTopWhenReload) {
+					this.scrollToTop(false);
+				}
+				this.queryFrom = Enum.QueryFrom.Reload;
+				this._emitQuery(this.pageNo, this.defaultPageSize);
+			},
+			// 请求结束(成功)调用此方法，将请求的结果数组传递给z-paging-x处理
+			complete(data: null | any[]) {
+				const finalData: any[] = data === null ? [] : data;
+				this.isLoadFailed = false;
+				this.endRefresh();
+				const currentData: any[] = [...finalData];
+				
+				// customNoMore：-1代表交由z-paging-x自行判断；1代表没有更多了；0代表还有更多数据
+				if (this.customNoMore != -1) {
+					// 如果customNoMore等于1 或者 customNoMore不是0并且新增数组长度为0(也就是不是明确的还有更多数据并且新增的数组长度为0)，则没有更多数据了
+					if (this.customNoMore == 1 || (this.customNoMore != 0 && finalData.length == 0)) {
+						this.loadMoreStatus = Enum.More.NoMore;
+					}
+				} else {
+					// 如果新增的数据数组长度为0 或者 新增的数组长度小于默认的pageSize，则没有更多数据了
+					if (finalData.length == 0 || (finalData.length > 0 && finalData.length < this.defaultPageSize)) {
+						this.loadMoreStatus = Enum.More.NoMore;
+					} else {
+						this.loadMoreStatus = Enum.More.Default;
+					}
+				}
+				// 如果是第一页，则覆盖当前数据；如果是加载更多，则拼接数据
+				if (this.isFirstPage) {
+					this.totalData = currentData;
+					if (this.showRefresherUpdateTime) {
+						// 更新数据刷新时间
+						updateRefesrherTime(this.refresherUpdateTimeKey);
+						this.refresherTimeTextTimestamp = getTime();
+					}
+				} else {
+					this.totalData = this.totalData.concat(currentData);
+				}
+				this.$nextTick(() => {
+					setTimeout(() => {
+						this.forceHideLoadMore = false;
+					}, 100)
+				})
+			},
+			//【通过total判断是否有更多数据】请求成功调用此方法，将请求的结果传递给z-paging-x处理，第一个参数为请求结果数组，第二个参数为total(列表总数)
+			completeByTotal(data: null | any[], total: number) {
+				const finalData: any[] = data === null ? [] : data;
+				this.$nextTick(() => {
+					let nomore = false;
+					const realTotalDataCount = this.isFirstPage ? 0 : this.totalData.length;
+					const dataLength = finalData.length;
+					let exceedCount = realTotalDataCount + dataLength - total;
+					// 没有更多数据了
+					if (exceedCount >= 0) {
+						nomore = true;
+						// 仅截取total内部分的数据
+						exceedCount = this.defaultPageSize - exceedCount;
+						if (exceedCount > 0 && exceedCount < finalData.length) {
+							data = finalData.splice(0, exceedCount);
+						}
+					}
+					this.completeByNoMore(data, nomore);
+				})
+			},
+			//【自行判断是否有更多数据】请求成功调用此方法，将请求的结果传递给z-paging-x处理，第一个参数为请求结果数组，第二个参数为是否没有更多数据
+			completeByNoMore(data: null | any[], nomore: boolean) {
+				this.customNoMore = nomore == true ? 1 : 0;
+				this.complete(data);
+			},
+			// 请求结束(失败)调用此方法，将自动展示失败页面
+			completeByError() {
+				this.isLoadFailed = true;
+				this.endRefresh();
+			},
+			// 直接结束下拉刷新状态
+			endRefresh() {
+				// 设置下拉刷新状态为结束
+				this.refresherTriggered = false;
+				this.refresherStatus = Enum.Refresher.Default;
+				this.isLoading = false;
+			},
+			// 滚动到顶部
+			scrollToTop(animate: boolean) {
+				this.scrollToY(0, animate);
+				this._checkShouldShowBackToTop(0);
+			},
+			// 滚动到底部
+			scrollToBottom(animate: boolean) {
+				this.scrollToY(99999999, animate);
+			},
+			// 滚动到指定位置，y为与顶部的距离，单位为px
+			scrollToY(y: number, animate: boolean) {
+				this.privateScrollWithAnimation = animate ? 1 : 0;
+				this.scrollTop = this.oldScrollTop;
+				this.$nextTick(() => {
+					this.scrollTop = y;
+				})
+			},
+			// (仅listIs = scroll-view有效)子元素开始滚动时触发, return ture表示与子元素开启滚动协商
+			_onStartNestedScroll(_: StartNestedScrollEvent) : boolean {
+				return this.startNestedScroll;
+			},
+			// (仅listIs = scroll-view有效)子元素滚动时触发，可执行event.consumed(x,y)告知子元素deltaX、deltaY各消耗多少。子元素将执行差值后的deltaX、deltaY滚动距离
+			_onNestedPreScroll(event: NestedPreScrollEvent) {
+				if (this.$zpxList != null) {
+					this.$emit('nestedprescroll', event, this.$zpxList!);
+				}
+			},
+			// 下拉刷新控件被下拉事件
+			_onRefresherpulling(e: RefresherEvent) {
+				this.$emit('refresherpulling', e.detail.dy);
+				if (!this.isLoading) {
+					this.refresherStatus = e.detail.dy < this.finalRefresherThreshold ? Enum.Refresher.Default : Enum.Refresher.ReleaseToRefresh;
+				}
+			},
+			// 下拉刷新被触发事件
+			_onRefresherrefresh(e: RefresherEvent) {
+				this.$emit('refresherrefresh', e);
+				this._handleRefresh();
+			},
+			// 下拉刷新被复位事件
+			_onRefresherrestore(e: RefresherEvent) {
+				this.$emit('refresherrestore', e);
+				this.refresherStatus = Enum.Refresher.Default;
+			},
+			// 下拉刷新被中止事件
+			_onRefresherabort(e: RefresherEvent) {
+				this.$emit('refresherabort', e);
+			},
+			// 滚动到底部事件
+			_onScrolltolower(e: ScrollToLowerEvent) {
+				this._handleLoadMore();
+				this.$emit('scrolltolower', e);
+			},
+			// 滚动到顶部事件
+			_onScrolltoupper(e: ScrollToUpperEvent) {
+				this.$emit('scrolltoupper', e);
+			},
+			// 列表正在滚动事件
+			_onScroll(e: ScrollEvent) {
+				this.$emit('scroll', e);
+				this.oldScrollTop = e.detail.scrollTop;
+				this._checkShouldShowBackToTop(this.oldScrollTop);
+			},
+			// 处理用户下拉刷新
+			_handleRefresh() {
+				this.refresherStatus = Enum.Refresher.Loading;
+				this.refresherTriggered = true;
+				this.pageNo = this.defaultPageNo;
+				this.queryFrom = Enum.QueryFrom.UserPullDown;
+				this._emitQuery(this.pageNo, this.defaultPageSize);
+			},
+			// 处理加载更多数据
+			_handleLoadMore() {
+				if (!this.loadMoreEnabled || this.isLoading || this.loadMoreStatus === Enum.More.NoMore) return;
+				// 将底部加载更多状态设置为加载中
+				this.loadMoreStatus = Enum.More.Loading;
+				this.pageNo ++;
+				this.queryFrom = Enum.QueryFrom.LoadMore;
+				this._emitQuery(this.pageNo, this.defaultPageSize);
+			},
+			// emit query事件
+			_emitQuery(pageNo: number, pageSize: number){
+				this.isLoading = true;
+				this.$emit('query', pageNo, pageSize, this.queryFrom);
+			},
+			
+			//判断是否要显示返回顶部按钮
+			_checkShouldShowBackToTop(scrollTop: number) {
+				if (!this.showBackToTop) {
+					this.showBackToTopClass = false;
+					return;
+				}
+				if (scrollTop > this.backToTopThreshold) {
+					if (!this.showBackToTopClass) {
+						this.showBackToTopClass = true;
+						this.lastBackToTopShowTime = new Date().getTime();
+						setTimeout(() => {
+							this.backToTopClass = 'zpx-back-to-top zpx-back-to-top-show';
+						}, 300)
+					}
+				} else {
+					if (this.showBackToTopClass) {
+						this.backToTopClass = 'zpx-back-to-top zpx-back-to-top-hide';
+						setTimeout(() => {
+							this.showBackToTopClass = false;
+						}, new Date().getTime() - this.lastBackToTopShowTime < 500 ? 0 : 300)
+					}
+				}
+			},
+			//点击返回顶部
+			_onBackToTopClick() {
+				let callbacked: boolean = false;
+				this.$emit('backToTopClick', (toTop: boolean) => {
+					if (toTop != false) {
+						this._handleToTop();
+					}
+					callbacked = true;
+				});
+				this.$nextTick(() => {
+					if (!callbacked) {
+						this._handleToTop();
+					}
+				})
+			},
+			//处理滚动到顶部
+			_handleToTop() {
+				this.scrollToTop(true);
+			},
+		}
+	}
+</script>
+
+<style scoped>
+	@import "./css/z-paging-main.css";
+</style>

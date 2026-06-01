@@ -1,0 +1,71 @@
+<template>
+	<view class="up-copy" @click="handleClick">
+        <slot>复制</slot>
+    </view>
+</template>
+
+<script setup lang="uts">
+interface Props {
+    content?: string | null
+    alertStyle?: string | null
+    notice?: string | null
+}
+
+interface Emits {
+    (e: 'success'): void
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    content: null,
+    alertStyle: null,
+    notice: null
+})
+
+const emit = defineEmits<Emits>()
+
+const handleClick = (): void => {
+    let content = props.content
+    if (content == null || content.length == 0) {
+        uni.showToast({
+            title: '暂无',
+            icon: 'none',
+            duration: 2000,
+        })
+        return
+    }
+    content = typeof content === 'string' ? content : content.toString() // 复制内容，必须字符串，数字需要转换为字符串
+    
+    /**
+    * 小程序端 和 app端的复制逻辑
+    */
+    uni.setClipboardData({
+        data: content,
+        success: function() {
+            const alertStyle = props.alertStyle == null ? 'toast' : props.alertStyle
+            const notice = props.notice == null ? '复制成功' : props.notice
+            if (alertStyle == 'modal') {
+                uni.showModal({
+                    title: '提示',
+                    content: notice
+                });
+            } else {
+                uni.showToast({
+                    title: notice,
+                    icon: 'none'
+                });
+            }
+            emit('success')
+        },
+        fail: function() {
+            uni.showToast({
+                title: '复制失败',
+                icon: 'none',
+                duration: 3000,
+            });
+        }
+    });
+}
+</script>
+
+<style lang="scss" scoped>
+</style>

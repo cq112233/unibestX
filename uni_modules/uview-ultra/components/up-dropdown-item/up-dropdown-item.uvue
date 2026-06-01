@@ -1,0 +1,170 @@
+<template>
+	<view class="up-dropdown-item" v-if="active"
+		@touchmove.stop.prevent="() => {}"@tap.stop.prevent="() => {}">
+		<template v-if="$slots['default'] == null && $slots['$default'] == null">
+			<view class="up-dropdown-item__scroll" scroll-y="false" :style="{
+				height: $up.addUnit(props.height)
+			}">
+				<view class="up-dropdown-item__options">
+					<up-cell-group>
+						<up-cell @click="cellClick(item['value'])"
+							:arrow="false" :title="item['label'].toString()"
+							v-for="(item, index) in props.options"
+							:key="index" :title-style="{
+								color: (props.modelValue).toString() == item['value'].toString() ? activeColor : inactiveColor
+						}">
+							<up-icon v-if="(props.modelValue).toString() == item['value'].toString()"
+								name="checkbox-mark" :color="activeColor" size="32"></up-icon>
+						</up-cell>
+					</up-cell-group>
+				</view>
+			</view>
+		</template>
+		<template v-else>
+			<slot />
+		</template>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { computed, ref, watch, onMounted } from 'vue'
+	import { addUnit, getParentFunc } from '../../libs/function/index.uts';
+	import defProps from './dropdown-item.uts'
+	import { UPDropdownMenu} from '../up-dropdown/types.uts';
+	import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'
+	const { parent, parentData, getParentData } = useUltraUI()
+	const instance = getCurrentInstance()!.proxy!
+	
+	defineOptions({
+		name: 'up-dropdown-item',
+		options: {
+            styleIsolation: 'shared',
+        }
+	})
+	
+	// 定义 props
+	const props = defineProps({
+		// #ifdef VUE3
+		// 当前选中项的value值
+		modelValue: {
+			type: [Number, String, Array],
+			default: defProps.getAny('dropdownItem.value')
+		},
+		// #endif
+		// #ifdef VUE2
+		// 当前选中项的value值
+		value: {
+			type: [Number, String, Array],
+			default: defProps.getAny('dropdownItem.value')
+		},
+		// #endif
+		// 菜单项标题
+		title: {
+			type: [String, Number],
+			default: defProps.getString('dropdownItem.title')
+		},
+		// 选项数据，如果传入了默认slot，此参数无效
+		options: {
+			type: Array as PropType<Array<UTSJSONObject>>,
+			default: () => defProps.getArray<UTSJSONObject>('dropdownItem.options')
+		},
+		// 是否禁用此菜单项
+		disabled: {
+			type: Boolean,
+			default: defProps.getBoolean('dropdownItem.disabled')
+		},
+		// 下拉弹窗的高度
+		height: {
+			type: [Number, String],
+			default: defProps.getNumber('dropdownItem.height')
+		},
+		// 点击遮罩是否可以收起弹窗
+		closeOnClickOverlay: {
+			type: Boolean,
+			default: defProps.getBoolean('dropdownItem.closeOnClickOverlay')
+		}
+	});
+	
+	// 定义 emit
+	const emit = defineEmits(['update:modelValue', 'change']);
+	
+	// 定义响应式数据
+	const active = ref(false); // 当前项是否处于展开状态
+	const activeColor = ref('#2979ff'); // 激活时左边文字和右边对勾图标的颜色
+	const inactiveColor = ref('#606266'); // 未激活时左边文字和右边对勾图标的颜色
+	
+	// 监听props是否发生了变化，有些值需要传递给父组件up-dropdown，无法双向绑定
+	const propsChange = computed(() => {
+		return `${props.title}-${props.disabled}`;
+	});
+	
+	// 监听 active 变化
+	watch(active, (val: boolean) => {
+		// console.log('changed', val)
+	});
+	
+	// 监听 propsChange 变化
+	watch(propsChange, () => {
+		// 当值变化时，通知父组件重新初始化，让父组件执行每个子组件的init()方法
+		// 将所有子组件数据重新整理一遍
+		if (parent.value != null) parent.value.$callMethod('init');
+	});
+	
+	function init() {
+		// 获取父组件up-dropdown
+		getParentData('up-dropdown', instance, false)
+		let parentRef = parent.value;
+		if (parentRef != null) {
+			// 将子组件的激活颜色配置为父组件设置的激活和未激活时的颜色
+			if (parentRef.$data['activeColor'] != null) {
+				activeColor.value = parentRef.$data['activeColor'].toString();
+			}
+			if (parentRef.$data['inactiveColor'] != null) {
+				inactiveColor.value = parentRef.$data['inactiveColor'].toString();
+			}
+			if ((parentRef.$data['children'] as Array<ComponentPublicInstance>).length == 1) active.value = true;
+			// 父组件无法监听children的变化，故将子组件的title，传入父组件的menuList数组中
+			parentRef.$callMethod('addMenuListItem', {
+				title: props.title.toString(),
+				disabled: props.disabled
+			} as UPDropdownMenu)
+		}
+	}
+	
+	// cell被点击
+	function cellClick(value?: any) {
+		// 修改通过v-model绑定的值
+        // #ifdef VUE2
+		emit('input', value)
+        // #endif
+        // #ifdef VUE3
+        emit('update:modelValue', value)
+        // #endif
+		// 通知父组件(up-dropdown)收起菜单
+		if (parent.value != null) parent.value.$callMethod('close')
+		// 发出事件，抛出当前勾选项的value
+		emit('change', value)
+	}
+	
+	const setActive = (val: boolean) => {
+		active.value = val
+	}
+	
+	// 在组件挂载时初始化
+	onMounted(() => {
+		init()
+	});
+	
+	// 暴露方法给父组件
+	defineExpose({
+		init,
+		active,
+		setActive
+	})
+</script>
+
+<style scoped lang="scss">
+    .up-dropdown-item__scroll {
+        background: #ffffff;
+    }
+</style>

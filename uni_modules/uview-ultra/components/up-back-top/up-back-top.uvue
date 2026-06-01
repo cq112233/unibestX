@@ -1,0 +1,157 @@
+<template>
+	<up-transition
+	    mode="fade"
+	    :customStyle="backTopStyle"
+	    :show="show"
+	>
+		<view
+		    class="up-back-top"
+			:style="[contentStyle]"
+		    v-if="$slots['default'] == null && $slots['$default'] == null"
+			@click="backToTop"
+		>
+			<up-icon
+			    :name="icon"
+			    :custom-style="iconStyle"
+			></up-icon>
+			<text
+			    v-if="text"
+			    class="up-back-top__text"
+			>{{text}}</text>
+		</view>
+		<slot v-else />
+	</up-transition>
+</template>
+
+<script setup lang="uts">
+	import { computed } from "vue";
+	import defProps from './backtop.uts';
+	import { addUnit, addStyle, getPx, deepMerge } from '../../libs/function/index';
+	
+	// 在 defineProps 中直接定义 props，参考 album 组件的实现
+	const prop = defineProps({
+		// 返回顶部的形状，circle-圆形，square-方形
+		mode: {
+			type: String,
+			default: defProps.getString('backtop.mode')
+		},
+		// 自定义图标
+		icon: {
+			type: String,
+			default: defProps.getString('backtop.icon')
+		},
+		// 提示文字
+		text: {
+			type: String,
+			default: defProps.getString('backtop.text')
+		},
+		// 返回顶部滚动时间
+		duration: {
+			type: [String, Number],
+			default: defProps.getNumber('backtop.duration')
+		},
+		// 滚动距离
+		scrollTop: {
+			type: [String, Number],
+			default: defProps.getNumber('backtop.scrollTop')
+		},
+		// 距离顶部多少距离显示，单位px
+		top: {
+			type: [String, Number],
+			default: defProps.getNumber('backtop.top')
+		},
+		// 返回顶部按钮到底部的距离，单位px
+		bottom: {
+			type: [String, Number],
+			default: defProps.getNumber('backtop.bottom')
+		},
+		// 返回顶部按钮到右边的距离，单位px
+		right: {
+			type: [String, Number],
+			default: defProps.getNumber('backtop.right')
+		},
+		// 层级
+		zIndex: {
+			type: [String, Number],
+			default: defProps.getNumber('backtop.zIndex')
+		},
+		// 图标的样式，对象形式
+		iconStyle: {
+			type: Object,
+			default: (): UTSJSONObject => {
+				return defProps.getAny('backtop.iconStyle') as UTSJSONObject ?? {}
+			}
+		},
+		// 定义需要用到的外部样式
+		customStyle: {
+			type: Object,
+			default: (): UTSJSONObject => ({})
+		}
+	});
+	
+	// 定义 emit
+	const emit = defineEmits(['click']);
+	
+	// 计算属性 - 动画组件样式
+	const backTopStyle = computed(() => {
+		const style = {
+			bottom: addUnit(prop.bottom),
+			right: addUnit(prop.right),
+			width: '40px',
+			height: '40px',
+			position: 'fixed',
+			zIndex: 10,
+		}
+		return style
+	});
+	
+	// 计算属性 - 是否显示
+	const show = computed(() => {
+		return parseInt(getPx(prop.scrollTop)) > parseInt(getPx(prop.top.toString()))
+	});
+	
+	// 计算属性 - 内容样式
+	const contentStyle = computed(() => {
+		const style = {}
+		let radius = '0px'
+		// 是否圆形
+		if(prop.mode === 'circle') {
+			radius = '100px'
+		} else {
+			radius = '4px'
+		}
+		style['borderRadius'] = radius
+		return deepMerge(style, addStyle(prop.customStyle))
+	});
+	
+	// 方法 - 返回顶部
+	function backToTop(e: any) {
+		uni.pageScrollTo({
+			scrollTop: 0,
+			duration: parseInt(prop.duration.toString())
+		});
+		emit('click', e)
+	}
+</script>
+
+<style lang="scss" scoped>
+	@import '../../libs/css/components.scss';
+     $up-back-top-flex:1 !default;
+     $up-back-top-height:100% !default;
+     $up-back-top-background-color:#E1E1E1 !default;
+     $up-back-top-tips-font-size:12px !default;
+	.up-back-top {
+		@include flex;
+		flex-direction: column;
+		align-items: center;
+		flex:$up-back-top-flex;
+		height: $up-back-top-height;
+		justify-content: center;
+		background-color: $up-back-top-background-color;
+
+		&__tips {
+			font-size:$up-back-top-tips-font-size;
+			transform: scale(0.8);
+		}
+	}
+</style>

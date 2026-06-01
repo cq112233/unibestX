@@ -1,0 +1,38 @@
+import { defineMixin } from '../../libs/vue'
+import defProps from './scrollList'
+let crtProp = defProps['scrollList'] as UTSJSONObject
+
+export const propsScrollList = defineMixin({
+    props: {
+        // 指示器的整体宽度
+        indicatorWidth: {
+            type: [String, Number],
+            default: crtProp['indicatorWidth']
+        },
+        // 滑块的宽度
+        indicatorBarWidth: {
+            type: [String, Number],
+            default: crtProp['indicatorBarWidth']
+        },
+        // 是否显示面板指示器
+        indicator: {
+            type: Boolean,
+            default: crtProp['indicator']
+        },
+        // 指示器非激活颜色
+        indicatorColor: {
+            type: String,
+            default: crtProp['indicatorColor']
+        },
+        // 指示器的激活颜色
+        indicatorActiveColor: {
+            type: String,
+            default: crtProp['indicatorActiveColor']
+        },
+        // 指示器样式，可通过bottom，left，right进行定位
+        indicatorStyle: {
+            type: [String, UTSJSONObject],
+            default: crtProp['indicatorStyle']
+        }
+    }
+})

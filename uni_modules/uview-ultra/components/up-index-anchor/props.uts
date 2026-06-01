@@ -1,0 +1,41 @@
+/*
+ * @Author       : jry
+ * @Description  : uview-plus component's props mixin file
+ * @version      : 4.0
+ * @Date         : 2024-04-22 16:44:21
+ * @LastAuthor   : jry
+ * @lastTime     : 2024-08-28 12:27:20
+ */
+import { defineMixin } from '../../libs/vue.uts'
+import defProps from './indexAnchor.uts'
+let indexAnchorDef = defProps['indexAnchor'] as UTSJSONObject
+
+export const propsIndexAnchor = defineMixin({
+    props: {
+        // 列表锚点文本内容
+        text: {
+            type: [String, Number],
+            default: indexAnchorDef['text']
+        },
+        // 列表锚点文字颜色
+        color: {
+            type: String,
+            default: indexAnchorDef['color']
+        },
+        // 列表锚点文字大小
+        size: {
+            type: [String, Number],
+            default: indexAnchorDef['size']
+        },
+        // 列表锚点背景颜色
+        bgColor: {
+            type: String,
+            default: indexAnchorDef['bgColor']
+        },
+        // 列表锚点高度
+        height: {
+            type: [String, Number],
+            default: indexAnchorDef['height']
+        }
+    }
+})

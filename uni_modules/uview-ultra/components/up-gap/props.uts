@@ -1,0 +1,36 @@
+/*
+ * @Author       : jry
+ * @Description  : uview-plus component's props mixin file
+ * @version      : 4.0
+ * @Date         : 2024-04-22 16:44:21
+ * @LastAuthor   : jry
+ * @lastTime     : 2024-08-28 12:27:20
+ */
+import { defineMixin } from '../../libs/vue.uts'
+import defProps from './gap.uts'
+let gap = defProps['gap'] as UTSJSONObject
+
+export const propsGap = defineMixin({
+    props: {
+        // 背景颜色（默认transparent）
+        bgColor: {
+            type: String,
+            default: gap['bgColor']
+        },
+        // 分割槽高度（默认30px）
+        height: {
+            type: String,
+            default: gap['height']
+        },
+        // 与上一个组件的距离
+        marginTop: {
+            type: String,
+            default: gap['marginTop']
+        },
+        // 与下一个组件的距离
+        marginBottom: {
+            type: String,
+            default: gap['marginBottom']
+        }
+    }
+})

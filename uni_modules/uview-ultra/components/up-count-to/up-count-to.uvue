@@ -1,0 +1,307 @@
+<template>
+	<text
+		class="up-count-num"
+		:style="{
+			fontSize: $up.addUnit(fontSize),
+			fontWeight: bold ? 'bold' : 'normal',
+			color: color
+		}"
+	>{{ displayValue }}</text>
+</template>
+
+<script setup lang="uts">
+import { mpMixin } from '../../libs/mixin/mpMixin.uts';
+import { mixin } from '../../libs/mixin/mixin.uts';
+import { addUnit } from '../../libs/function/index.uts';
+import defProps from './countTo';
+
+/**
+ * countTo 数字滚动
+ * @description 该组件一般用于需要滚动数字到某一个值的场景，目标要求是一个递增的值。
+ * @tutorial https://ijry.github.io/uview-plus/components/countTo.html
+ * @property {String | Number}	startVal	开始的数值，默认从0增长到某一个数（默认 0 ）
+ * @property {String | Number}	endVal		要滚动的目标数值，必须 （默认 0 ）
+ * @property {String | Number}	duration	滚动到目标数值的动画持续时间，单位为毫秒（ms） （默认 2000 ）
+ * @property {Boolean}			autoplay	设置数值后是否自动开始滚动 （默认 true ）
+ * @property {String | Number}	decimals	要显示的小数位数，见官网说明（默认 0 ）
+ * @property {Boolean}			useEasing	滚动结束时，是否缓动结尾，见官网说明（默认 true ）
+ * @property {String}			decimal		十进制分割 （ 默认 "." ）
+ * @property {String}			color		字体颜色（ 默认 '#606266' )
+ * @property {String | Number}	fontSize	字体大小，单位px（ 默认 22 ）
+ * @property {Boolean}			bold		字体是否加粗（默认 false ）
+ * @property {String}			separator	千位分隔符，见官网说明
+ * @event {Function} end 数值滚动到目标值时触发
+ * @example <up-count-to ref="uCountTo" :end-val="endVal" :autoplay="autoplay"></up-count-to>
+ */
+
+// props
+const props = defineProps({
+	startVal: {
+		type: [String, Number],
+		default: defProps.getNumber('countTo.startVal')
+	},
+	endVal: {
+		type: [String, Number],
+		default: defProps.getNumber('countTo.endVal')
+	},
+	duration: {
+		type: [String, Number],
+		default: defProps.getNumber('countTo.duration')
+	},
+	autoplay: {
+		type: Boolean,
+		default: defProps.getBoolean('countTo.autoplay')
+	},
+	decimals: {
+		type: [String, Number],
+		default: defProps.getNumber('countTo.decimals')
+	},
+	useEasing: {
+		type: Boolean,
+		default: defProps.getBoolean('countTo.useEasing')
+	},
+	decimal: {
+		type: String,
+		default: defProps.getString('countTo.decimal')
+	},
+	color: {
+		type: String,
+		default: defProps.getString('countTo.color')
+	},
+	fontSize: {
+		type: [String, Number],
+		default: defProps.getNumber('countTo.fontSize')
+	},
+	bold: {
+		type: Boolean,
+		default: defProps.getBoolean('countTo.bold')
+	},
+	separator: {
+		type: String,
+		default: defProps.getString('countTo.separator')
+	}
+});
+
+// emits
+const emit = defineEmits(['end'])
+
+// 导入ref
+import { ref } from 'vue';
+
+let localStartVal = ref<number>(0);
+let displayValue = ref<string>('');
+let printVal = ref<number | null>(null);
+let paused = ref<boolean>(false); // 是否暂停
+let localDuration = ref<number>(0);
+let startTime = ref<number | null>(null); // 开始的时间
+let timestamp = ref<number | null>(null); // 时间戳
+let remaining = ref<number | null>(null); // 停留的时间
+let rAF = ref<number>(0);
+let lastTime = ref<number>(0); // 上一次的时间
+
+const countDown: boolean = parseInt(props.startVal.toString()) > parseInt(props.endVal.toString());
+
+function easingFn(t: number, b: number, c: number, d: number): number {
+	return (c * (-Math.pow(2, (-10 * t) / d) + 1) * 1024) / 1023 + b;
+}
+
+function formatNumber(num: any): string {
+	// 将num转为Number类型，因为其值可能为字符串数值，调用toFixed会报错
+	num = parseFloat(num.toString());
+	let numStr: string = num.toFixed(parseFloat(props.decimals.toString())).toString();
+	const x: string[] = numStr.split('.');
+	let x1 = x[0];
+	const x2 = x.length > 1 ? props.decimals.toString() + x[1] : '';
+	const rgx = /(\d+)(\d{3})/;
+	if (props.separator != '' && !isNumber(props.separator)) {
+		while (rgx.test(x1)) {
+			x1 = x1.replace(rgx, '$1' + props.separator + '$2');
+		}
+	}
+	return x1 + x2;
+}
+
+// function requestAnimationFrame(countFunc: (tt: number) => void): number {
+// 	const currTime = new Date().getTime();
+// 	// 为了使setTimteout的尽可能的接近每秒60帧的效果
+// 	const timeToCall: number = Math.max(0, 16 - (currTime - lastTime.value));
+// 	const id = setTimeout(() => {
+// 		countFunc(new Date().getTime());
+// 	}, timeToCall);
+// 	lastTime.value = currTime + timeToCall;
+// 	return id;
+// }
+
+// const count = function(tt: number) {
+// 	if (startTime.value == null || startTime.value === 0) startTime.value = tt;
+// 	timestamp.value = tt;
+// 	const progress = tt - startTime.value;
+// 	remaining.value = localDuration.value - progress;
+	
+// 	if (props.useEasing) {
+// 		if (countDown) {
+// 			printVal.value = localStartVal.value - easingFn(progress, 0, localStartVal.value - parseInt(props.endVal.toString()), localDuration.value);
+// 		} else {
+// 			printVal.value = easingFn(progress, localStartVal.value, parseInt(props.endVal.toString()) - localStartVal.value, localDuration.value);
+// 		}
+// 	} else {
+// 		if (countDown) {
+// 			printVal.value = localStartVal.value - (localStartVal.value - parseInt(props.endVal.toString())) * (progress / localDuration.value);
+// 		} else {
+// 			printVal.value = localStartVal.value + (parseInt(props.endVal.toString()) - localStartVal.value) * (progress / localDuration.value);
+// 		}
+// 	}
+	
+// 	if (countDown) {
+// 		printVal.value = printVal.value < (props.endVal as number) ? (props.endVal as number) : printVal.value;
+// 	} else {
+// 		printVal.value = printVal.value > (props.endVal as number) ? (props.endVal as number) : printVal.value;
+// 	}
+	
+// 	displayValue.value = formatNumber(printVal.value.toString());
+	
+// 	if (progress < localDuration.value) {
+// 		rAF.value = requestAnimationFrame(count);
+// 	} else {
+// 		displayValue.value = formatNumber(parseFloat(props.endVal.toString()));
+// 		emit('end');
+// 	}
+// }
+
+// 合并requestAnimationFrame和count功能的方法
+function animateCount(timestamp: number) {
+	if(startTime.value == null) startTime.value = timestamp
+	timestamp = timestamp
+	const progress = timestamp - startTime.value!
+	remaining.value = localDuration.value - progress
+	
+	if(props.useEasing) {
+		if(countDown) {
+			printVal.value = localStartVal.value - easingFn(progress, 0, localStartVal.value - parseInt(props.endVal.toString()), localDuration.value)
+		} else {
+			printVal.value = localStartVal.value + (parseInt(props.endVal.toString()) - localStartVal.value) * (progress / localDuration.value)
+		}
+	} else {
+		if(countDown) {
+			printVal.value = localStartVal.value - (localStartVal.value - parseInt(props.endVal.toString())) * (progress / localDuration.value)
+		} else {
+			printVal.value = localStartVal.value + (parseInt(props.endVal.toString()) - localStartVal.value) * (progress / localDuration.value)
+		}
+	}
+	
+	if(countDown) {
+		printVal.value = printVal.value < parseInt(props.endVal.toString()) ? parseInt(props.endVal.toString()) : printVal.value
+	} else {
+		printVal.value = printVal.value > parseInt(props.endVal.toString()) ? parseInt(props.endVal.toString()) : printVal.value
+	}
+	
+	displayValue.value = formatNumber(printVal.value!)
+	
+	if(progress < localDuration.value) {
+		// 直接在这里实现requestAnimationFrame逻辑，而不是调用另一个方法
+		const currTime = new Date().getTime()
+		// 为了使setTimeout的尽可能的接近每秒60帧的效果
+		const timeToCall = Math.max(0, 16 - (currTime - lastTime.value))
+		rAF.value = setTimeout(() => {
+			animateCount(currTime + timeToCall)
+		}, timeToCall)
+		lastTime.value = currTime + timeToCall
+	} else {
+		displayValue.value = formatNumber(parseInt(props.endVal.toString()))
+		emit('end')
+	}
+}
+
+function cancelAnimationFrame(id: number) {
+	clearTimeout(id);
+}
+
+// 开始滚动数字
+function start() {
+	localStartVal.value = parseInt(props.startVal.toString());
+	startTime.value = null;
+	localDuration.value = parseInt(props.duration.toString());
+	paused.value = false;
+	// 使用合并后的方法
+	const currTime = new Date().getTime();
+	lastTime.value = currTime;
+	rAF.value = setTimeout(() => {
+		animateCount(currTime);
+	}, 0);
+}
+
+// 暂停
+function stop() {
+	animateCount(rAF.value);
+}
+
+// 重新开始(暂停的情况下)
+function resume() {
+	if (remaining.value == null) return
+	startTime.value = 0;
+	localDuration.value = remaining.value;
+	localStartVal.value = printVal.value as number;
+	// 使用合并后的方法
+	const currTime = new Date().getTime();
+	rAF.value = setTimeout(() => {
+		animateCount(currTime);
+	}, 0);
+}
+
+// 暂定状态，重新再开始滚动；或者滚动状态下，暂停
+function reStart() {
+	if (paused.value) {
+		resume();
+		paused.value = false;
+	} else {
+		stop();
+		paused.value = true;
+	}
+}
+
+// 重置
+function reset() {
+	startTime.value = null;
+	if (rAF.value != null) {
+		cancelAnimationFrame(rAF.value);
+	}
+	displayValue.value = formatNumber(props.startVal.toString());
+}
+
+// 判断是否数字
+function isNumber(val: string): boolean {
+	return !isNaN(parseFloat(val));
+}
+
+// 初始化
+localStartVal.value = parseInt(props.startVal.toString())
+displayValue.value = formatNumber(props.startVal.toString())
+localDuration.value = parseInt(props.duration.toString())
+if (props.autoplay) {
+	start();
+}
+
+function destroyed() {
+	if(rAF.value != null) {
+		clearTimeout(rAF.value)
+	}
+}
+
+// 导出供模板使用的方法
+	defineExpose({
+		start,
+		stop,
+		resume
+	})
+</script>
+
+<style lang="scss" scoped>
+@import "../../libs/css/components.scss";
+
+.up-count-num {
+	/* #ifndef APP-NVUE */
+	display: flex;
+	/* #endif */
+	text-align: center;
+}
+</style>

@@ -1,0 +1,90 @@
+<template>
+	<view class="up-view" :style="viewStyle" @click="clickHandler">
+		<slot></slot>
+	</view>
+</template>
+
+<script lang="uts">
+function stringValue(value: any | null): string {
+	return value == null ? '' : value.toString()
+}
+
+export default {
+	name: 'up-view',
+	props: {
+		backgroundColor: {
+			type: String,
+			default: ''
+		},
+		color: {
+			type: String,
+			default: ''
+		},
+		flexDirection: {
+			type: String,
+			default: ''
+		},
+		justifyContent: {
+			type: String,
+			default: ''
+		},
+		alignItems: {
+			type: String,
+			default: ''
+		},
+		flex1: {
+			type: [String, Number],
+			default: ''
+		},
+		width: {
+			type: String,
+			default: ''
+		},
+		height: {
+			type: String,
+			default: ''
+		},
+		padding: {
+			type: String,
+			default: ''
+		},
+		margin: {
+			type: String,
+			default: ''
+		},
+		borderColor: {
+			type: String,
+			default: ''
+		}
+	},
+	emits: ['click'],
+	computed: {
+		viewStyle(): UTSJSONObject {
+			const style = {} as UTSJSONObject
+			if (this.backgroundColor.length > 0) style['backgroundColor'] = this.backgroundColor
+			if (this.color.length > 0) style['color'] = this.color
+			if (this.flexDirection.length > 0) style['flexDirection'] = this.flexDirection
+			if (this.justifyContent.length > 0) style['justifyContent'] = this.justifyContent
+			if (this.alignItems.length > 0) style['alignItems'] = this.alignItems
+			if (stringValue(this.flex1).length > 0) style['flex'] = stringValue(this.flex1)
+			if (this.width.length > 0) style['width'] = this.width
+			if (this.height.length > 0) style['height'] = this.height
+			if (this.padding.length > 0) style['padding'] = this.padding
+			if (this.margin.length > 0) style['margin'] = this.margin
+			if (this.borderColor.length > 0) style['borderColor'] = this.borderColor
+			return style
+		}
+	},
+	methods: {
+		clickHandler(): void {
+			this.$emit('click')
+		}
+	}
+}
+</script>
+
+<style lang="scss" scoped>
+	.up-view {
+		display: flex;
+	}
+</style>

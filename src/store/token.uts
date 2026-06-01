@@ -79,13 +79,13 @@ export class TokenStore extends PiniaStoreBase {
     this.state.refreshExpiresIn = 0
   }
 
-  override _hydrate(data : UTSJSONObject) : void {
-    if (data['token'] != null) this.state.token = data['token'] as string
-    if (data['expiresIn'] != null) this.state.expiresIn = data['expiresIn'] as number
-    if (data['accessToken'] != null) this.state.accessToken = data['accessToken'] as string
-    if (data['accessExpiresIn'] != null) this.state.accessExpiresIn = data['accessExpiresIn'] as number
-    if (data['refreshToken'] != null) this.state.refreshToken = data['refreshToken'] as string
-    if (data['refreshExpiresIn'] != null) this.state.refreshExpiresIn = data['refreshExpiresIn'] as number
+  override _hydrate(_data : UTSJSONObject) : void {
+    if (_data['token'] != null) this.state.token = _data['token'] as string
+    if (_data['expiresIn'] != null) this.state.expiresIn = _data['expiresIn'] as number
+    if (_data['accessToken'] != null) this.state.accessToken = _data['accessToken'] as string
+    if (_data['accessExpiresIn'] != null) this.state.accessExpiresIn = _data['accessExpiresIn'] as number
+    if (_data['refreshToken'] != null) this.state.refreshToken = _data['refreshToken'] as string
+    if (_data['refreshExpiresIn'] != null) this.state.refreshExpiresIn = _data['refreshExpiresIn'] as number
   }
 
   override _serialize() : UTSJSONObject {

@@ -1,0 +1,746 @@
+<template>
+	<view class="up-cropper">
+		<view v-if="visible" class="up-cropper__panel">
+			<canvas
+				class="up-cropper__canvas"
+				:id="canvasId"
+				:canvas-id="canvasId"
+				:style="canvasStyle"
+				@touchstart="touchStart"
+				@touchmove="touchMove"
+				@touchend="touchEnd"
+				@touchcancel="touchEnd"
+			></canvas>
+			<canvas
+				class="up-cropper__export"
+				:id="exportCanvasId"
+				:canvas-id="exportCanvasId"
+				:style="exportCanvasStyle"
+			></canvas>
+			<view class="up-cropper__toolbar">
+				<template v-if="!previewing">
+					<text class="up-cropper__button" @click="select">重选</text>
+					<text class="up-cropper__button" @click="close">关闭</text>
+					<text v-if="showRotateButton" class="up-cropper__button" @click="rotate">旋转</text>
+					<text class="up-cropper__button" @click="preview">预览</text>
+					<text class="up-cropper__button" @click="confirm">确定</text>
+				</template>
+				<template v-else>
+					<text class="up-cropper__button" @click="exitPreview">返回</text>
+					<text class="up-cropper__button" @click="confirm">确定</text>
+				</template>
+			</view>
+		</view>
+		<view v-else @click="openDefault">
+			<slot></slot>
+		</view>
+	</view>
+</template>
+
+<script lang="uts">
+type CropTouch = {
+	x: number,
+	y: number
+}
+
+function makeId(prefix: string): string {
+	return prefix + Date.now().toString()
+}
+
+function toObject(value: any | null): UTSJSONObject {
+	return value == null ? ({} as UTSJSONObject) : value as UTSJSONObject
+}
+
+function normalizeString(value: any | null, fallback: string = ''): string {
+	return value == null ? fallback : value.toString()
+}
+
+function rpxToPx(value: any | null, fallback: number): number {
+	if (typeof value === 'number') {
+		return value
+	}
+	if (value == null) {
+		return fallback
+	}
+	const text = value.toString()
+	if (text.endsWith('rpx')) {
+		const parsed = parseFloat(text.substring(0, text.length - 3))
+		return isNaN(parsed) ? fallback : parsed * uni.getWindowInfo().windowWidth / 750
+	}
+	if (text.endsWith('px')) {
+		const parsed = parseFloat(text.substring(0, text.length - 2))
+		return isNaN(parsed) ? fallback : parsed
+	}
+	const parsed = parseFloat(text)
+	return isNaN(parsed) ? fallback : parsed
+}
+
+function numberValue(value: any | null, fallback: number = 0): number {
+	if (typeof value === 'number') {
+		return value
+	}
+	if (value == null) {
+		return fallback
+	}
+	const parsed = parseFloat(value.toString())
+	return isNaN(parsed) ? fallback : parsed
+}
+
+function touchPoint(e: UniTouchEvent): CropTouch {
+	let x = 0
+	let y = 0
+	if (e.touches.length > 0) {
+		x = e.touches[0].pageX
+		y = e.touches[0].pageY
+	} else if (e.changedTouches.length > 0) {
+		x = e.changedTouches[0].pageX
+		y = e.changedTouches[0].pageY
+	}
+	return { x, y } as CropTouch
+}
+
+function touchAt(e: UniTouchEvent, index: number): CropTouch | null {
+	if (e.touches.length > index) {
+		return {
+			x: e.touches[index].pageX,
+			y: e.touches[index].pageY
+		} as CropTouch
+	}
+	return null
+}
+
+function distanceBetween(a: CropTouch, b: CropTouch): number {
+	const x = a.x - b.x
+	const y = a.y - b.y
+	return Math.sqrt(x * x + y * y)
+}
+
+function clamp(value: number, min: number, max: number): number {
+	if (value < min) return min
+	if (value > max) return max
+	return value
+}
+
+export default {
+	name: 'up-cropper',
+	props: {
+		minScale: {
+			type: [String, Number],
+			default: 0.3
+		},
+		maxScale: {
+			type: [String, Number],
+			default: 4
+		},
+		canScale: {
+			type: Boolean,
+			default: true
+		},
+		canRotate: {
+			type: Boolean,
+			default: true
+		},
+		lockWidth: {
+			type: [String, Number],
+			default: ''
+		},
+		lockHeight: {
+			type: [String, Number],
+			default: ''
+		},
+		stretch: {
+			type: String,
+			default: ''
+		},
+		lock: {
+			type: String,
+			default: ''
+		},
+		noTab: {
+			type: Boolean,
+			default: true
+		},
+		inner: {
+			type: Boolean,
+			default: false
+		},
+		quality: {
+			type: [String, Number],
+			default: 1
+		},
+		canChangeSize: {
+			type: Boolean,
+			default: false
+		},
+		areaWidth: {
+			type: String,
+			default: '300rpx'
+		},
+		areaHeight: {
+			type: String,
+			default: '300rpx'
+		},
+		exportWidth: {
+			type: String,
+			default: '260rpx'
+		},
+		exportHeight: {
+			type: String,
+			default: '260rpx'
+		},
+		fillColor: {
+			type: String,
+			default: 'transparent'
+		},
+		index: {
+			type: [String, Number],
+			default: 0
+		}
+	},
+	emits: ['avtinit', 'confirm', 'cancel', 'error'],
+	data() {
+		return {
+			canvasId: makeId('up-cropper-'),
+			exportCanvasId: makeId('up-cropper-export-'),
+			canvasContext: null as CanvasContext | null,
+			exportCanvasContext: null as CanvasContext | null,
+			ctx: null as CanvasRenderingContext2D | null,
+			exportCtx: null as CanvasRenderingContext2D | null,
+			imageElement: null as UniImageElementImpl | null,
+			imagePath: '',
+			imageWidth: 0,
+			imageHeight: 0,
+			visible: false,
+			canvasWidth: uni.getWindowInfo().windowWidth,
+			canvasHeight: uni.getWindowInfo().windowHeight - 70,
+			cropWidth: rpxToPx(this.areaWidth, 300),
+			cropHeight: rpxToPx(this.areaHeight, 300),
+			outputWidth: rpxToPx(this.exportWidth, 260),
+			outputHeight: rpxToPx(this.exportHeight, 260),
+			imageX: 0,
+			imageY: 0,
+			baseDisplayWidth: 0,
+			baseDisplayHeight: 0,
+			displayWidth: 0,
+			displayHeight: 0,
+			scaleValue: 1,
+			minScaleValue: numberValue(this.minScale, 0.3),
+			maxScaleValue: numberValue(this.maxScale, 4),
+			rotateDeg: 0,
+			canScaleLocal: this.canScale,
+			canRotateLocal: this.canRotate && !this.inner,
+			canChangeSizeLocal: this.canChangeSize,
+			lockMode: normalizeString(this.lock),
+			stretchMode: normalizeString(this.stretch),
+			innerMode: this.inner,
+			returnData: null as any | null,
+			lastOptions: {} as UTSJSONObject,
+			activeTouch: null as CropTouch | null,
+			secondTouch: null as CropTouch | null,
+			startPinchDistance: 0,
+			startScaleValue: 1,
+			resizeHandle: '',
+			previewing: false,
+			currentIndex: 0
+		}
+	},
+	computed: {
+		canvasStyle(): UTSJSONObject {
+			return {
+				width: this.canvasWidth.toString() + 'px',
+				height: this.canvasHeight.toString() + 'px'
+			} as UTSJSONObject
+		},
+		exportCanvasStyle(): UTSJSONObject {
+			return {
+				width: this.outputWidth.toString() + 'px',
+				height: this.outputHeight.toString() + 'px'
+			} as UTSJSONObject
+		},
+		cropLeft(): number {
+			return (numberValue(this.canvasWidth, 0) - numberValue(this.cropWidth, 0)) / 2
+		},
+		cropTop(): number {
+			return (numberValue(this.canvasHeight, 0) - numberValue(this.cropHeight, 0)) / 2
+		},
+		showRotateButton(): boolean {
+			return this.canRotateLocal as boolean
+		}
+	},
+	methods: {
+		openDefault(): void {
+			this.chooseImage(0, {} as UTSJSONObject)
+		},
+		initCanvas(): Promise<void> {
+			return new Promise((resolve, reject) => {
+				uni.createCanvasContextAsync({
+					id: this.canvasId.toString() as string.IDString,
+					component: this,
+					success: (context: CanvasContext) => {
+						this.canvasContext = context
+						this.ctx = context.getContext('2d')
+						uni.createCanvasContextAsync({
+							id: this.exportCanvasId.toString() as string.IDString,
+							component: this,
+							success: (exportContext: CanvasContext) => {
+								this.exportCanvasContext = exportContext
+								this.exportCtx = exportContext.getContext('2d')
+								resolve()
+							},
+							fail: (error: UniError) => {
+								reject(error)
+							}
+						})
+					},
+					fail: (error: UniError) => {
+						reject(error)
+					}
+				})
+			})
+		},
+		chooseImage(index: any | null = 0, params: UTSJSONObject = {} as UTSJSONObject, data: any | null = null): void {
+			const options = toObject(params)
+			this.lastOptions = options
+			this.currentIndex = typeof index === 'number' ? index : 0
+			this.cropWidth = rpxToPx(options['areaWidth'], rpxToPx(this.areaWidth, 300))
+			this.cropHeight = rpxToPx(options['areaHeight'], rpxToPx(this.areaHeight, 300))
+			this.outputWidth = rpxToPx(options['exportWidth'], rpxToPx(this.exportWidth, 260))
+			this.outputHeight = rpxToPx(options['exportHeight'], rpxToPx(this.exportHeight, 260))
+			this.minScaleValue = numberValue(options['minScale'], numberValue(this.minScale, 0.3))
+			this.maxScaleValue = numberValue(options['maxScale'], numberValue(this.maxScale, 4))
+			this.canScaleLocal = options['canScale'] == null ? this.canScale : (options['canScale'] as boolean)
+			this.canRotateLocal = (options['canRotate'] == null ? this.canRotate : (options['canRotate'] as boolean)) && !(options['inner'] == null ? this.inner : (options['inner'] as boolean))
+			this.canChangeSizeLocal = options['canChangeSize'] == null ? this.canChangeSize : (options['canChangeSize'] as boolean)
+			this.innerMode = options['inner'] == null ? this.inner : (options['inner'] as boolean)
+			this.lockMode = normalizeString(options['lock'], normalizeString(this.lock))
+			this.stretchMode = normalizeString(options['stretch'], normalizeString(this.stretch))
+			this.returnData = data
+			this.previewing = false
+			uni.chooseImage({
+				count: 1,
+				sizeType: ['original', 'compressed'],
+				sourceType: ['album', 'camera'],
+				success: (res: ChooseImageSuccess) => {
+					if (res.tempFilePaths.length == 0) {
+						return
+					}
+					this.loadImage(res.tempFilePaths[0])
+				},
+				fail: () => {
+					this.$emit('cancel')
+				}
+			})
+		},
+		select(): void {
+			this.chooseImage(this.currentIndex, this.lastOptions, this.returnData)
+		},
+		loadImage(path: string): void {
+			uni.getImageInfo({
+				src: path,
+				success: (info: GetImageInfoSuccess) => {
+					this.imagePath = path
+					this.imageWidth = info.width
+					this.imageHeight = info.height
+					this.visible = true
+					this.$nextTick(() => {
+						this.initCanvas().then(() => {
+							this.createCanvasImage(info.path)
+						}).catch((error: any | null) => {
+							this.$emit('error', error)
+						})
+					})
+				},
+				fail: () => {
+					this.$emit('error', '读取图片失败')
+				}
+			})
+		},
+		createCanvasImage(path: string): void {
+			const canvas = this.canvasContext
+			if (canvas == null) {
+				this.$emit('error', new Error('Canvas is not ready'))
+				return
+			}
+			const image = canvas.createImage()
+			image.onload = () => {
+				this.imageElement = image
+				this.fitImage()
+				this.draw()
+			}
+			image.onerror = () => {
+				this.$emit('error', new Error('Image load failed'))
+			}
+			image.src = path
+		},
+		fitImage(): void {
+			const cropW = numberValue(this.cropWidth, 300)
+			const cropH = numberValue(this.cropHeight, 300)
+			const imgW = Math.max(1, numberValue(this.imageWidth, 1))
+			const imgH = Math.max(1, numberValue(this.imageHeight, 1))
+			let scale = Math.max(cropW / imgW, cropH / imgH)
+			const imageRadio = imgW / imgH
+			const mode = this.stretchMode
+			if (mode == 'x') {
+				scale = cropW / imgW
+			} else if (mode == 'y') {
+				scale = cropH / imgH
+			} else if (mode == 'long') {
+				scale = imageRadio > 1 ? cropW / imgW : cropH / imgH
+			} else if (mode == 'short') {
+				scale = imageRadio > 1 ? cropH / imgH : cropW / imgW
+			}
+			let displayW = imgW * scale
+			let displayH = imgH * scale
+			if (this.innerMode as boolean) {
+				if (displayW < cropW) {
+					displayW = cropW
+					displayH = displayW / imageRadio
+				}
+				if (displayH < cropH) {
+					displayH = cropH
+					displayW = displayH * imageRadio
+				}
+			}
+			this.baseDisplayWidth = displayW
+			this.baseDisplayHeight = displayH
+			this.displayWidth = displayW
+			this.displayHeight = displayH
+			this.scaleValue = 1
+			this.rotateDeg = 0
+			this.imageX = this.cropLeft + (cropW - displayW) / 2
+			this.imageY = this.cropTop + (cropH - displayH) / 2
+			this.keepImageInCrop()
+			this.$emit('avtinit')
+		},
+		draw(): void {
+			const context = this.ctx
+			const image = this.imageElement
+			if (context == null || image == null) {
+				return
+			}
+			const canvasW = numberValue(this.canvasWidth, 0)
+			const canvasH = numberValue(this.canvasHeight, 0)
+			const cropL = this.cropLeft
+			const cropT = this.cropTop
+			const cropW = numberValue(this.cropWidth, 0)
+			const cropH = numberValue(this.cropHeight, 0)
+			const imageX = numberValue(this.imageX, 0)
+			const imageY = numberValue(this.imageY, 0)
+			const displayW = numberValue(this.displayWidth, 0)
+			const displayH = numberValue(this.displayHeight, 0)
+			context.clearRect(0, 0, canvasW, canvasH)
+			context.fillStyle = 'rgba(0,0,0,0.72)'
+			context.fillRect(0, 0, canvasW, canvasH)
+			context.save()
+			context.beginPath()
+			context.rect(cropL, cropT, cropW, cropH)
+			context.clip()
+			context.fillStyle = this.fillColor
+			context.fillRect(cropL, cropT, cropW, cropH)
+			context.translate(imageX + displayW / 2, imageY + displayH / 2)
+			context.rotate(this.rotateDeg * Math.PI / 180)
+			context.drawImage(image, -displayW / 2, -displayH / 2, displayW, displayH)
+			context.restore()
+			context.strokeStyle = '#ffffff'
+			context.lineWidth = 2
+			context.strokeRect(cropL, cropT, cropW, cropH)
+			if (this.canChangeSizeLocal as boolean) {
+				this.drawResizeHandles(context, cropL, cropT, cropW, cropH)
+			}
+			context.draw()
+		},
+		touchStart(e: UniTouchEvent): void {
+			if (this.previewing) {
+				return
+			}
+			const first = touchAt(e, 0)
+			const second = touchAt(e, 1)
+			if (first != null && second != null) {
+				this.activeTouch = first
+				this.secondTouch = second
+				this.startPinchDistance = distanceBetween(first, second)
+				this.startScaleValue = this.scaleValue
+				this.resizeHandle = ''
+				return
+			}
+			const point = touchPoint(e)
+			this.activeTouch = point
+			this.secondTouch = null
+			this.resizeHandle = (this.canChangeSizeLocal as boolean) ? this.getResizeHandle(point) : ''
+		},
+		touchMove(e: UniTouchEvent): void {
+			if (this.previewing) {
+				return
+			}
+			const first = touchAt(e, 0)
+			const second = touchAt(e, 1)
+			if (first != null && second != null) {
+				this.handlePinch(first, second)
+				return
+			}
+			const last = this.activeTouch
+			if (last == null) {
+				return
+			}
+			const point = touchPoint(e)
+			if (this.resizeHandle.length > 0) {
+				this.resizeCrop(point)
+			} else {
+				if (!this.isMoveLockedX()) {
+					this.imageX += point.x - last.x
+				}
+				if (!this.isMoveLockedY()) {
+					this.imageY += point.y - last.y
+				}
+			}
+			this.activeTouch = point
+			this.keepImageInCrop()
+			this.draw()
+		},
+		touchEnd(): void {
+			this.activeTouch = null
+			this.secondTouch = null
+			this.resizeHandle = ''
+		},
+		keepImageInCrop(): void {
+			const cropL = this.cropLeft
+			const cropT = this.cropTop
+			const cropW = numberValue(this.cropWidth, 0)
+			const cropH = numberValue(this.cropHeight, 0)
+			const displayW = numberValue(this.displayWidth, 0)
+			const displayH = numberValue(this.displayHeight, 0)
+			if (displayW <= cropW) {
+				this.imageX = cropL + (cropW - displayW) / 2
+			} else {
+				if (numberValue(this.imageX, 0) > cropL) {
+					this.imageX = cropL
+				}
+				if (numberValue(this.imageX, 0) + displayW < cropL + cropW) {
+					this.imageX = cropL + cropW - displayW
+				}
+			}
+			if (displayH <= cropH) {
+				this.imageY = cropT + (cropH - displayH) / 2
+			} else {
+				if (numberValue(this.imageY, 0) > cropT) {
+					this.imageY = cropT
+				}
+				if (numberValue(this.imageY, 0) + displayH < cropT + cropH) {
+					this.imageY = cropT + cropH - displayH
+				}
+			}
+		},
+		drawResizeHandles(context: CanvasRenderingContext2D, left: number, top: number, width: number, height: number): void {
+			const size = 12
+			context.fillStyle = '#ffffff'
+			context.strokeStyle = '#d14343'
+			context.lineWidth = 1
+			this.drawHandle(context, left, top, size)
+			this.drawHandle(context, left + width, top, size)
+			this.drawHandle(context, left, top + height, size)
+			this.drawHandle(context, left + width, top + height, size)
+		},
+		drawHandle(context: CanvasRenderingContext2D, x: number, y: number, size: number): void {
+			context.fillRect(x - size / 2, y - size / 2, size, size)
+			context.strokeRect(x - size / 2, y - size / 2, size, size)
+		},
+		getResizeHandle(point: CropTouch): string {
+			const tolerance = 28
+			const left = this.cropLeft
+			const top = this.cropTop
+			const width = numberValue(this.cropWidth, 0)
+			const height = numberValue(this.cropHeight, 0)
+			if (Math.abs(point.x - left) <= tolerance && Math.abs(point.y - top) <= tolerance) return 'top-left'
+			if (Math.abs(point.x - left - width) <= tolerance && Math.abs(point.y - top) <= tolerance) return 'top-right'
+			if (Math.abs(point.x - left) <= tolerance && Math.abs(point.y - top - height) <= tolerance) return 'bottom-left'
+			if (Math.abs(point.x - left - width) <= tolerance && Math.abs(point.y - top - height) <= tolerance) return 'bottom-right'
+			return ''
+		},
+		resizeCrop(point: CropTouch): void {
+			const minSize = 50
+			const oldW = numberValue(this.cropWidth, 0)
+			const oldH = numberValue(this.cropHeight, 0)
+			const centerX = this.cropLeft + oldW / 2
+			const centerY = this.cropTop + oldH / 2
+			let nextW = Math.abs(point.x - centerX) * 2
+			let nextH = Math.abs(point.y - centerY) * 2
+			const maxW = numberValue(this.canvasWidth, 0) - 24
+			const maxH = numberValue(this.canvasHeight, 0) - 24
+			nextW = clamp(nextW, minSize, maxW)
+			nextH = clamp(nextH, minSize, maxH)
+			const lockedWidth = rpxToPx(this.lockWidth, 0)
+			const lockedHeight = rpxToPx(this.lockHeight, 0)
+			if (lockedWidth > 0) nextW = lockedWidth
+			if (lockedHeight > 0) nextH = lockedHeight
+			this.cropWidth = nextW
+			this.cropHeight = nextH
+		},
+		handlePinch(first: CropTouch, second: CropTouch): void {
+			const currentDistance = distanceBetween(first, second)
+			if (this.startPinchDistance > 0 && (this.canScaleLocal as boolean)) {
+				const minScale = numberValue(this.minScaleValue, 0.3)
+				const maxScale = numberValue(this.maxScaleValue, 4)
+				const nextScale = clamp(this.startScaleValue * currentDistance / this.startPinchDistance, minScale, maxScale)
+				this.applyScale(nextScale)
+			}
+			this.keepImageInCrop()
+			this.draw()
+		},
+		applyScale(nextScale: number): void {
+			const centerX = this.imageX + this.displayWidth / 2
+			const centerY = this.imageY + this.displayHeight / 2
+			this.scaleValue = nextScale
+			this.displayWidth = this.baseDisplayWidth * nextScale
+			this.displayHeight = this.baseDisplayHeight * nextScale
+			this.imageX = centerX - this.displayWidth / 2
+			this.imageY = centerY - this.displayHeight / 2
+		},
+		isMoveLockedX(): boolean {
+			return this.lockMode == 'x' || this.lockMode == 'longSel' || this.lockMode == 'long'
+		},
+		isMoveLockedY(): boolean {
+			return this.lockMode == 'y' || this.lockMode == 'shortSel' || this.lockMode == 'short'
+		},
+		rotate(): void {
+			if ((this.canRotateLocal as boolean) == false || (this.previewing as boolean)) {
+				return
+			}
+			this.rotateDeg = (this.rotateDeg + 90) % 360
+			this.draw()
+		},
+		preview(): void {
+			this.previewing = true
+			this.drawPreview()
+		},
+		exitPreview(): void {
+			this.previewing = false
+			this.draw()
+		},
+		drawPreview(): void {
+			const context = this.ctx
+			const image = this.imageElement
+			if (context == null || image == null) {
+				return
+			}
+			const canvasW = numberValue(this.canvasWidth, 0)
+			const canvasH = numberValue(this.canvasHeight, 0)
+			const cropW = numberValue(this.cropWidth, 0)
+			const cropH = numberValue(this.cropHeight, 0)
+			const previewW = Math.min(canvasW - 40, cropW)
+			const previewH = cropH * previewW / Math.max(1, cropW)
+			const x = (canvasW - previewW) / 2
+			const y = Math.max(20, (canvasH - previewH) / 2)
+			context.clearRect(0, 0, canvasW, canvasH)
+			context.fillStyle = '#000000'
+			context.fillRect(0, 0, canvasW, canvasH)
+			context.save()
+			context.beginPath()
+			context.rect(x, y, previewW, previewH)
+			context.clip()
+			context.fillStyle = this.fillColor
+			context.fillRect(x, y, previewW, previewH)
+			const scaleX = previewW / cropW
+			const scaleY = previewH / cropH
+			const cropL = this.cropLeft
+			const cropT = this.cropTop
+			const displayW = numberValue(this.displayWidth, 0)
+			const displayH = numberValue(this.displayHeight, 0)
+			context.translate(x + (this.imageX + displayW / 2 - cropL) * scaleX, y + (this.imageY + displayH / 2 - cropT) * scaleY)
+			context.rotate(this.rotateDeg * Math.PI / 180)
+			context.drawImage(image, -displayW * scaleX / 2, -displayH * scaleY / 2, displayW * scaleX, displayH * scaleY)
+			context.restore()
+			context.strokeStyle = '#ffffff'
+			context.lineWidth = 1
+			context.strokeRect(x, y, previewW, previewH)
+			context.draw()
+		},
+		confirm(): void {
+			const context = this.exportCtx
+			const canvas = this.exportCanvasContext
+			const image = this.imageElement
+			if (context == null || canvas == null || image == null) {
+				this.$emit('error', new Error('Canvas is not ready'))
+				return
+			}
+			const outputW = numberValue(this.outputWidth, 0)
+			const outputH = numberValue(this.outputHeight, 0)
+			const displayW = Math.max(1, numberValue(this.displayWidth, 1))
+			const displayH = Math.max(1, numberValue(this.displayHeight, 1))
+			const cropW = numberValue(this.cropWidth, 0)
+			const cropH = numberValue(this.cropHeight, 0)
+			const cropL = this.cropLeft
+			const cropT = this.cropTop
+			const imageX = numberValue(this.imageX, 0)
+			const imageY = numberValue(this.imageY, 0)
+			context.clearRect(0, 0, outputW, outputH)
+			context.fillStyle = this.fillColor
+			context.fillRect(0, 0, outputW, outputH)
+			context.save()
+			const scaleX = outputW / Math.max(1, cropW)
+			const scaleY = outputH / Math.max(1, cropH)
+			context.scale(scaleX, scaleY)
+			context.translate(imageX + displayW / 2 - cropL, imageY + displayH / 2 - cropT)
+			context.rotate(this.rotateDeg * Math.PI / 180)
+			context.drawImage(image, -displayW / 2, -displayH / 2, displayW, displayH)
+			context.restore()
+			context.draw()
+			const quality = clamp(numberValue(this.quality, 1), 0, 1)
+			const path = canvas.toDataURL('image/png', quality)
+			this.visible = false
+			this.previewing = false
+			this.$emit('confirm', {
+				path,
+				avatar: path,
+				index: this.currentIndex,
+				data: this.returnData
+			} as UTSJSONObject)
+		},
+		close(): void {
+			this.visible = false
+			this.$emit('cancel')
+		}
+	}
+}
+</script>
+
+<style lang="scss" scoped>
+	.up-cropper {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.up-cropper__panel {
+		position: fixed;
+		left: 0;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		z-index: 999;
+		background-color: #000000;
+	}
+
+	.up-cropper__canvas {
+		display: flex;
+	}
+
+	.up-cropper__export {
+		position: fixed;
+		left: -9999px;
+		top: -9999px;
+	}
+
+	.up-cropper__toolbar {
+		height: 70px;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-around;
+		background-color: #111111;
+	}
+
+	.up-cropper__button {
+		color: #ffffff;
+		font-size: 15px;
+		padding: 10px;
+	}
+</style>

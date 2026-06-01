@@ -1,0 +1,65 @@
+import zhHans from './locales/zh-Hans.uts'
+import zhHant from './locales/zh-Hant.uts'
+import en from './locales/en.uts'
+import es from './locales/es.uts'
+import fr from './locales/fr.uts'
+import de from './locales/de.uts'
+import ko from './locales/ko.uts'
+import ja from './locales/ja.uts'
+import ru from './locales/ru.uts'
+
+let settings = {
+    // lang: uni.getLocale(),
+	lang: 'zh-Hans',
+    locales: {
+        en,
+        es,
+        fr,
+        de,
+        ko,
+        ja,
+        ru,
+        'zh-Hant': zhHant,
+        'zh-Hans': zhHans
+    } as UTSJSONObject
+} as UTSJSONObject
+
+// uni.onLocaleChange((locale) => {
+//     settings['lang'] = locale;
+// })
+
+/**
+ * 多语言方法
+ */
+export function t(value: string, params: UTSJSONObject = {}): string {
+    // console.log(settings['locales'][settings['lang']])
+    if (value != '') {
+		value = value.replaceAll('.', '_')
+		// console.log('**************', value)
+        let lang = settings['lang']
+		let locales = settings['locales'] as UTSJSONObject
+        // if (locales != null && locales[settings['lang']] == null) {
+            lang = 'zh-Hans'
+        // }
+		let result = ''
+		if (locales[lang] != null) {
+			// @ts-ignore
+			result = (locales[lang] as UTSJSONObject)[value].toString()
+		} else {
+			result = value
+		}
+		let resultStr = result.toString()
+        // 替换{xxx}格式的变量
+        // UTSJSONObject.keys(params).forEach((key: string) => {
+        //     const reg = new RegExp(`{${key}}`, 'g');
+        //     resultStr = resultStr.replace(reg, params[key]);
+        // });
+         return resultStr;
+    } else {
+        return value;
+    }
+}
+
+export default {
+    settings: settings
+}

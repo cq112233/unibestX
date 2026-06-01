@@ -1,0 +1,584 @@
+<template>
+	<view class="up-short-video">
+		<view class="up-short-video__header">
+			<slot name="menu">
+				<view class="up-short-video__header__menu">
+					<up-icon name="grid" size="24"></up-icon>
+				</view>
+			</slot>
+			
+			<up-tabs 
+				:list="tabsList" 
+				:current="currentTab"
+                lineColor="#ddd"
+                :activeStyle="{
+                    color: '#ddd',
+                    fontWeight: 400,
+                    transform: 'scale(1)'
+                }"
+                :inactiveStyle="{
+                    color: '#bbb',
+                    transform: 'scale(1)'
+                }"
+				@change="handleTabChange"
+				class="up-short-video__header__tabs"
+			></up-tabs>
+			
+			<slot name="search">
+				<view class="up-short-video__header__search">
+					<up-icon name="search" size="24"></up-icon>
+				</view>
+			</slot>
+		</view>
+		
+		<swiper 
+			:vertical="true" 
+			:autoplay="false" 
+			@change="handleSwiperChange"
+			:current="currentVideo"
+			class="up-short-video__content"
+		>
+			<swiper-item v-for="(item, index) in videoItems" :key="index">
+				<view class="up-short-video__content__item">
+					<view class="up-short-video__content__video">
+						<video 
+							:id="getVideoId(index)"
+							:src="getVideoUrl(item)" 
+							:autoplay="index === currentVideo" 
+							:controls="false"
+							:show-fullscreen-btn="false"
+							:show-play-btn="false"
+							:show-center-play-btn="false"
+							:enable-progress-gesture="true"
+							:loop="true"
+							:playback-rate="getPlaybackRate(item)"
+							@play="onVideoPlay"
+							@pause="onVideoPause"
+							@ended="onVideoEnded"
+							@timeupdate="onTimeUpdate"
+							@loadedmetadata="onLoadedMetadata"
+							style="width: 100%; height: 100%;"
+						></video>
+					</view>
+					
+					<view class="up-short-video__content__author">
+						<view class="up-short-video__content__author__avatar">
+							<up-avatar :src="getAuthorAvatar(item)" size="50px"></up-avatar>
+						</view>
+						<view class="up-short-video__content__author__info">
+							<text class="up-short-video__content__author__name">{{ getAuthorName(item) }}</text>
+							<text class="up-short-video__content__author__desc">{{ getAuthorDesc(item) }}</text>
+						</view>
+						<view class="up-short-video__content__author__follow">
+							<up-button type="primary" size="mini">Follow</up-button>
+						</view>
+					</view>
+					
+					<view class="up-short-video__content__actions">
+						<slot name="actions" :item="item" :index="index">
+							<view class="up-short-video__content__actions__item" @click="handleLike(item, index)">
+								<up-icon color="#eee" :name="isLiked(item) ? 'thumb-up-fill' : 'thumb-up'" size="32px"></up-icon>
+								<text class="up-short-video__content__actions__text">{{ getCountText(item, 'likeCount') }}</text>
+							</view>
+							<view class="up-short-video__content__actions__item" @click="handleComment(item, index)">
+								<up-icon color="#eee" name="chat" size="32px"></up-icon>
+								<text class="up-short-video__content__actions__text">{{ getCountText(item, 'commentCount') }}</text>
+							</view>
+							<view class="up-short-video__content__actions__item" @click="handleShare(item, index)">
+								<up-icon color="#eee" name="share" size="32px"></up-icon>
+								<text class="up-short-video__content__actions__text">{{ getCountText(item, 'shareCount') }}</text>
+							</view>
+							<view class="up-short-video__content__actions__item" @click="handleCollect(item, index)">
+								<up-icon color="#eee" :name="isCollected(item) ? 'bookmark-fill' : 'bookmark'" size="32px"></up-icon>
+								<text class="up-short-video__content__actions__text">{{ getCountText(item, 'collectCount') }}</text>
+							</view>
+						</slot>
+					</view>
+				</view>
+			</swiper-item>
+		</swiper>
+		
+		<up-action-sheet
+			:show="showSpeedSheet"
+			:actions="speedOptions"
+			title="Playback speed"
+			@close="showSpeedSheet = false"
+			@select="selectSpeed"
+		></up-action-sheet>
+		
+		<view class="up-short-video__footer">
+			<view class="up-short-video__progress" style="z-index: 999;">
+				<up-slider 
+					:value="currentProgress" 
+					:min="0" 
+					:max="100" 
+					:step="1"
+					:show-value="false"
+                    :innerStyle="{ padding: 0 }"
+                    activeColor="rgba(255,255,255,0.32)"
+					inactive-color="rgba(255,255,255,0.3)"
+					block-size="6px"
+                    block-color="rgba(255,255,255,0.5)"
+					height="1px"
+					@changing="onProgressChanging"
+					@change="onProgressChange"
+				></up-slider>
+			</view>
+			
+			<slot name="tabbar">
+				<up-tabbar
+                    :fixed="true"
+                    :placeholder="true"
+                    :safeAreaInsetBottom="true"
+                    borderColor="rgba(255,255,255,0.25) !important"
+                    backgroundColor="rgba(255,255,255,0.05)"
+                >
+					<up-tabbar-item
+						@click="goNext"
+						text="Home"
+						icon="home"
+					>
+					</up-tabbar-item>
+					<up-tabbar-item
+						text="Discover"
+						icon="photo"
+					></up-tabbar-item>
+					<up-tabbar-item
+						text="Live"
+						icon="play-right"
+					></up-tabbar-item>
+					<up-tabbar-item
+						text="Mine"
+						icon="account"
+					></up-tabbar-item>
+				</up-tabbar>
+			</slot>
+		</view>
+	</view>
+</template>
+
+<script>
+import type { PropType } from 'vue'
+
+function createTabsList(): Array<UTSJSONObject> {
+	const tabs = [] as Array<UTSJSONObject>
+	const names = ['Recommend', 'Follow', 'Friends', 'Local']
+	for (let i = 0; i < names.length; i++) {
+		const item = {} as UTSJSONObject
+		item['name'] = names[i]
+		tabs.push(item)
+	}
+	return tabs
+}
+
+function createVideoList(): Array<UTSJSONObject> {
+	return [] as Array<UTSJSONObject>
+}
+
+function createSpeedOptions(): Array<UTSJSONObject> {
+	const options = [] as Array<UTSJSONObject>
+	const values = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0]
+	for (let i = 0; i < values.length; i++) {
+		const item = {} as UTSJSONObject
+		item['name'] = `${values[i]}x`
+		item['value'] = values[i]
+		options.push(item)
+	}
+	return options
+}
+
+function copyObject(item: UTSJSONObject): UTSJSONObject {
+	const copied = {} as UTSJSONObject
+	const keys = UTSJSONObject.keys(item)
+	for (let i = 0; i < keys.length; i++) {
+		const key = keys[i]
+		const value = item[key]
+		if (value != null && typeof value === 'object' && !Array.isArray(value)) {
+			copied[key] = copyObject(value as UTSJSONObject)
+		} else {
+			copied[key] = value
+		}
+	}
+	return copied
+}
+
+function copyVideoList(list: Array<UTSJSONObject>): Array<UTSJSONObject> {
+	const copied = [] as Array<UTSJSONObject>
+	for (let i = 0; i < list.length; i++) {
+		copied.push(copyObject(list[i]))
+	}
+	return copied
+}
+
+function normalizeNumber(value: any | null, defaultValue: number = 0): number {
+	if (typeof value === 'number') {
+		return value
+	}
+	if (value == null) {
+		return defaultValue
+	}
+	const parsed = parseFloat(value.toString())
+	return isNaN(parsed) ? defaultValue : parsed
+}
+
+function stringValue(value: any | null): string {
+	return value == null ? '' : value.toString()
+}
+
+function booleanValue(value: any | null): boolean {
+	if (typeof value === 'boolean') {
+		return value
+	}
+	return value != null && value.toString() == 'true'
+}
+
+export default {
+	name: 'up-short-video',
+	props: {
+		tabsList: {
+			type: Array as PropType<Array<UTSJSONObject>>,
+			default(): Array<UTSJSONObject> {
+				return createTabsList()
+			}
+		},
+		videoList: {
+			type: Array as PropType<Array<UTSJSONObject>>,
+			default(): Array<UTSJSONObject> {
+				return createVideoList()
+			}
+		},
+		currentTab: {
+			type: Number,
+			default: 0
+		},
+		currentVideo: {
+			type: Number,
+			default: 0
+		}
+	},
+	emits: [
+		'tabChange',
+		'videoChange',
+		'like',
+		'comment',
+		'share',
+		'collect',
+		'progressChanging',
+		'progressChange',
+		'videoPlay',
+		'videoPause',
+		'videoEnded',
+		'timeUpdate',
+		'loadedMetadata',
+		'goNext'
+	],
+	data() {
+		return {
+			internalVideoList: createVideoList() as Array<UTSJSONObject>,
+			showSpeedSheet: false,
+			currentSpeedVideoIndex: 0,
+			speedOptions: createSpeedOptions()
+		}
+	},
+	computed: {
+		videoItems(): Array<UTSJSONObject> {
+			return this.internalVideoList as Array<UTSJSONObject>
+		},
+		currentProgress(): number {
+			const item = this.getVideoItem(this.currentVideo)
+			if (item == null) {
+				return 0
+			}
+			return normalizeNumber(item['progress'], 0)
+		}
+	},
+	watch: {
+		videoList: {
+			handler(newVal: Array<UTSJSONObject>) {
+				this.syncVideoList(newVal)
+			},
+			immediate: true
+		}
+	},
+	methods: {
+		syncVideoList(list: Array<UTSJSONObject>): void {
+			this.internalVideoList = copyVideoList(list)
+		},
+		getVideoItem(index: number): UTSJSONObject | null {
+			const list = this.videoItems
+			if (index < 0 || index >= list.length) {
+				return null
+			}
+			return list[index]
+		},
+		getVideoId(index: number): string {
+			return `video-${index}`
+		},
+		getPlaybackRate(item: UTSJSONObject): number {
+			return normalizeNumber(item['playbackRate'], 1)
+		},
+		getVideoUrl(item: UTSJSONObject): string {
+			return stringValue(item['videoUrl'])
+		},
+		getAuthor(item: UTSJSONObject): UTSJSONObject {
+			const author = item['author'] as UTSJSONObject | null
+			return author == null ? ({} as UTSJSONObject) : author
+		},
+		getAuthorAvatar(item: UTSJSONObject): string {
+			return stringValue(this.getAuthor(item)['avatar'])
+		},
+		getAuthorName(item: UTSJSONObject): string {
+			return stringValue(this.getAuthor(item)['name'])
+		},
+		getAuthorDesc(item: UTSJSONObject): string {
+			return stringValue(this.getAuthor(item)['desc'])
+		},
+		isLiked(item: UTSJSONObject): boolean {
+			return booleanValue(item['isLiked'])
+		},
+		isCollected(item: UTSJSONObject): boolean {
+			return booleanValue(item['isCollected'])
+		},
+		getCountText(item: UTSJSONObject, key: string): string {
+			return stringValue(item[key])
+		},
+		updateVideoItemValue(index: number, key: string, value: any): void {
+			const item = this.getVideoItem(index)
+			if (item == null) {
+				return
+			}
+			item[key] = value
+		},
+		getEventNumber(detail: UTSJSONObject, key: string, defaultValue: number = 0): number {
+			return normalizeNumber(detail[key], defaultValue)
+		},
+		handleTabChange(index: number): void {
+			this.$emit('tabChange', index)
+		},
+		handleSwiperChange(e: UniCustomEvent<UTSJSONObject>): void {
+			const currentIndex = this.getEventNumber(e.detail, 'current', 0)
+			this.pauseCurrentVideo()
+			this.$nextTick(() => {
+				this.playVideo(currentIndex)
+			})
+			this.$emit('videoChange', currentIndex)
+		},
+		handleLike(item: UTSJSONObject, index: number): void {
+			this.$emit('like', { item: item, index: index } as UTSJSONObject)
+		},
+		handleComment(item: UTSJSONObject, index: number): void {
+			this.$emit('comment', { item: item, index: index } as UTSJSONObject)
+		},
+		handleShare(item: UTSJSONObject, index: number): void {
+			this.$emit('share', { item: item, index: index } as UTSJSONObject)
+		},
+		handleCollect(item: UTSJSONObject, index: number): void {
+			this.$emit('collect', { item: item, index: index } as UTSJSONObject)
+		},
+		onProgressChanging(value: UniCustomEvent<UTSJSONObject>): void {
+			const progress = this.getEventNumber(value.detail, 'value', 0)
+			this.updateVideoItemValue(this.currentVideo, 'progressValue', progress)
+			this.$emit('progressChanging', {
+				progress: progress,
+				index: this.currentVideo
+			} as UTSJSONObject)
+		},
+		onProgressChange(value: UniCustomEvent<UTSJSONObject>): void {
+			const progress = this.getEventNumber(value.detail, 'value', 0)
+			this.updateVideoItemValue(this.currentVideo, 'progressValue', progress)
+			this.$emit('progressChange', {
+				progress: progress,
+				index: this.currentVideo
+			} as UTSJSONObject)
+		},
+		showSpeedOptions(index: number): void {
+			this.currentSpeedVideoIndex = index
+			this.showSpeedSheet = true
+		},
+		selectSpeed(action: UTSJSONObject): void {
+			const videoContext = uni.createVideoContext(this.getVideoId(this.currentSpeedVideoIndex), this)
+			const speed = normalizeNumber(action['value'], 1)
+			if (videoContext != null) {
+				videoContext.playbackRate(speed)
+			}
+			this.updateVideoItemValue(this.currentSpeedVideoIndex, 'playbackRate', speed)
+			this.showSpeedSheet = false
+		},
+		playVideo(index: number): void {
+			const videoContext = uni.createVideoContext(this.getVideoId(index), this)
+			if (videoContext != null) {
+				videoContext.play()
+			}
+		},
+		pauseCurrentVideo(): void {
+			const videoContext = uni.createVideoContext(this.getVideoId(this.currentVideo), this)
+			if (videoContext != null) {
+				videoContext.pause()
+			}
+		},
+		onVideoPlay(e: UniEvent): void {
+			this.$emit('videoPlay', { index: this.currentVideo, event: e } as UTSJSONObject)
+		},
+		onVideoPause(e: UniEvent): void {
+			this.$emit('videoPause', { index: this.currentVideo, event: e } as UTSJSONObject)
+		},
+		onVideoEnded(e: UniEvent): void {
+			this.$emit('videoEnded', { index: this.currentVideo, event: e } as UTSJSONObject)
+		},
+		onTimeUpdate(e: UniCustomEvent<UTSJSONObject>): void {
+			const currentTime = this.getEventNumber(e.detail, 'currentTime', 0)
+			const duration = this.getEventNumber(e.detail, 'duration', 0)
+			if (duration > 0) {
+				this.updateVideoItemValue(this.currentVideo, 'progress', currentTime / duration * 100)
+			}
+			this.$emit('timeUpdate', { index: this.currentVideo, event: e } as UTSJSONObject)
+		},
+		onLoadedMetadata(e: UniEvent): void {
+			this.$emit('loadedMetadata', { index: this.currentVideo, event: e } as UTSJSONObject)
+		},
+		goNext(): void {
+			this.$emit('goNext')
+		}
+	}
+}
+</script>
+
+<style lang="scss" scoped>
+	.up-short-video {
+		width: 100%;
+		height: 100%;
+		position: relative;
+		
+		&__header {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			z-index: 10;
+			display: flex;
+            flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+			padding: 10px 15px;
+			background-color: rgba(255, 255, 255, 0.05);
+            opacity: 1;
+			
+			&__menu, &__search {
+				width: 40px;
+				height: 40px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: #fff;
+			}
+			
+			&__tabs {
+				flex: 1;
+				margin: 0 10px;
+			}
+		}
+		
+		&__content {
+			width: 100%;
+			height: 100%;
+			
+			&__item {
+				width: 100%;
+				height: 100%;
+				position: relative;
+			}
+			
+			&__video {
+				width: 100%;
+				height: 100%;
+				position: relative;
+				
+				&__speed {
+					position: absolute;
+					top: 15px;
+					right: 15px;
+					z-index: 10;
+					background-color: rgba(0, 0, 0, 0.3);
+					border-radius: 20px;
+					padding: 5px 10px;
+					display: flex;
+					align-items: center;
+					
+					.speed-text {
+						color: #fff;
+						font-size: 12px;
+						margin-right: 4px;
+					}
+				}
+			}
+			
+			&__author {
+				position: absolute;
+				left: 15px;
+				bottom: 100px;
+				display: flex;
+                flex-direction: row;
+				align-items: center;
+				z-index: 10;
+				
+				&__info {
+					margin-left: 10px;
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+				}
+
+                &__name {
+						color: #eee;
+						font-size: 16px;
+						font-weight: bold;
+						margin-bottom: 5px;
+					}
+					
+					&__desc {
+						color: rgba(255, 255, 255, 0.8);
+						font-size: 14px;
+					}
+				
+				&__follow {
+					margin-left: 15px;
+				}
+			}
+			
+			&__actions {
+				position: absolute;
+				right: 15px;
+				bottom: 100px;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				z-index: 10;
+				
+				&__item {
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					margin-bottom: 20px;
+					color: #fff;
+				}
+				
+				&__text {
+					color: #fff;
+					font-size: 12px;
+					margin-top: 5px;
+				}
+			}
+		}
+		
+		&__footer {
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			z-index: 10;
+		}
+		
+		&__progress {
+		}
+	}
+</style>

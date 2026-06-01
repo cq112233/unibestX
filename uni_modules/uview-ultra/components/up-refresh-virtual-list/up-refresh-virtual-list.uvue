@@ -1,0 +1,85 @@
+﻿<template>
+  <up-pull-refresh
+    :refreshing="refreshing"
+    :threshold="50"
+    @refresh="handleRefresh"
+  >
+    <up-virtual-list
+      ref="virtualList"
+      :list-data="listData"
+      :item-height="itemHeight"
+      :height="height"
+      :buffer="buffer"
+      :key-field="keyField"
+      :scroll-top="scrollTop"
+      @scroll="handleScroll"
+    >
+      <template #default="{ item, index }">
+        <slot :item="item" :index="index"></slot>
+      </template>
+    </up-virtual-list>
+  </up-pull-refresh>
+</template>
+
+<script>
+import type { PropType } from 'vue';
+
+function createListData(): Array<UTSJSONObject> {
+  return [] as Array<UTSJSONObject>;
+}
+
+export default {
+  name: 'up-refresh-virtual-list',
+  props: {
+    listData: {
+      type: Array as PropType<Array<UTSJSONObject>>,
+      default(): Array<UTSJSONObject> {
+        return createListData();
+      }
+    },
+    itemHeight: {
+      type: Number,
+      default: 50
+    },
+    height: {
+      type: [String, Number],
+      default: '100%'
+    },
+    buffer: {
+      type: Number,
+      default: 4
+    },
+    keyField: {
+      type: String,
+      default: 'id'
+    }
+  },
+  emits: ['refresh', 'scroll'],
+  data() {
+    return {
+      refreshing: false,
+      scrollTop: 0
+    }
+  },
+  methods: {
+    handleRefresh(): void {
+      this.refreshing = true
+      this.$emit('refresh')
+    },
+    handleScroll(scrollTop: number): void {
+      this.scrollTop = scrollTop
+      this.$emit('scroll', scrollTop)
+    },
+    finishRefresh(): void {
+      this.refreshing = false
+    },
+    scrollTo(top: number): void {
+      this.scrollTop = top
+    },
+    scrollToTop(): void {
+      this.scrollTo(0)
+    }
+  }
+}
+</script>
+

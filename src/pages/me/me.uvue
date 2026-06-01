@@ -1,47 +1,47 @@
 <template>
-  <tabbar-layout bgColor="#f8fafc">
-      <view class="profile-content">
-        <!-- 头部卡片：用户头像及状态 -->
-        <view class="avatar-section">
-          <image class="avatar-img" :src="avatarUrl" />
-          <text class="username-text">
-            {{ userStore.state.userInfo.username != '' ? userStore.state.userInfo.username : '未登录用户' }}
+  <layout bgColor="#f8fafc" show-tabbar>
+    <view class="flex flex-col py-24px px-16px items-center">
+      <!-- 头部卡片：用户头像及状态 -->
+      <view class="w-full bg-white rounded-12px py-30px px-20px items-center mb-20px">
+        <image class="w-90px h-90px rounded-45px mb-16px border-[3px] border-solid border-[#f1f5f9]" :src="avatarUrl" />
+        <text class="text-20px font-bold text-[#1e293b] mb-4px">
+          {{ userStore.state.userInfo.username != '' ? userStore.state.userInfo.username : '未登录用户' }}
+        </text>
+        <text class="text-14px text-[#64748b] mb-12px" v-if="userStore.state.userInfo.username != ''">
+          {{ userStore.state.userInfo.nickname }}
+        </text>
+        <view class="flex flex-row">
+          <text class="text-12px py-4px px-12px rounded-20px font-medium overflow-hidden" :class="tokenStore.hasValidLogin() ? 'bg-[#d1fae5] text-[#065f46]' : 'bg-[#f1f5f9] text-[#64748b]'">
+            {{ tokenStore.hasValidLogin() ? '已登录' : '未登录' }}
           </text>
-          <text class="nickname-text" v-if="userStore.state.userInfo.username != ''">
-            {{ userStore.state.userInfo.nickname }}
-          </text>
-          <view class="status-badge-container">
-            <text class="status-badge" :class="tokenStore.hasValidLogin() ? 'status-online' : 'status-offline'">
-              {{ tokenStore.hasValidLogin() ? '已登录' : '未登录' }}
-            </text>
-          </view>
-        </view>
-
-        <!-- 信息区域：序列化数据展示 -->
-        <view class="info-section">
-          <view class="section-header">
-            <text class="section-title">用户信息 (JSON)</text>
-          </view>
-          <scroll-view class="json-box" scroll-y="true">
-            <text class="json-text">{{ userInfoJson }}</text>
-          </scroll-view>
-        </view>
-
-        <!-- 按钮区域 -->
-        <view class="btn-section">
-          <button v-if="tokenStore.hasValidLogin()" type="warn" class="action-btn logout-btn" @click="handleLogout">
-            退出登录
-          </button>
-          <button v-else type="primary" class="action-btn login-btn" @click="handleLogin">
-            登录
-          </button>
         </view>
       </view>
-  </tabbar-layout>
+
+      <!-- 信息区域：序列化数据展示 -->
+      <view class="w-full bg-white rounded-12px p-20px mb-24px">
+        <view class="border-b border-solid border-[#f1f5f9] pb-8px mb-12px">
+          <text class="text-15px font-semibold text-[#334155]">用户信息 (JSON)</text>
+        </view>
+        <scroll-view class="bg-[#0f172a] rounded-8px p-12px max-h-180px" scroll-y="true">
+          <text class="text-13px text-[#38bdf8] lh-1.6" style="font-family: monospace;">{{ userInfoJson }}</text>
+        </scroll-view>
+      </view>
+
+      <!-- 按钮区域 -->
+      <view class="w-full px-8px">
+        <button v-if="tokenStore.hasValidLogin()" class="w-full h-48px rounded-8px bg-[#ef4444] text-[#ffffff]" @click="handleLogout">
+          退出登录
+        </button>
+        <button v-else class="w-full h-48px rounded-8px bg-[#3b82f6] text-[#ffffff]"  @click="handleLogin">
+          登录
+        </button>
+      </view>
+    </view>
+  </layout>
 </template>
 
 <script setup lang="uts">
-import TabbarLayout from '../../layouts/tabbar-layout.uvue'
+import Layout from '../../layouts/layout.uvue'
 import { syncCurIdxByCurrentPage } from '../../tabbar/store'
 import { useUserStore, useTokenStore } from '../../store'
 import { LOGIN_PAGE } from '../../router/config'
@@ -106,109 +106,4 @@ function handleLogout() {
 </script>
 
 <style scoped>
-.profile-container {
-  flex: 1;
-  background-color: #f8fafc;
-}
-.profile-scroll {
-  flex: 1;
-}
-.profile-content {
-  padding: 24px 16px;
-  align-items: center;
-}
-.avatar-section {
-  width: 100%;
-  background-color: #ffffff;
-  border-radius: 12px;
-  padding: 30px 20px;
-  align-items: center;
-  margin-bottom: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-.avatar-img {
-  width: 90px;
-  height: 90px;
-  border-radius: 45px;
-  margin-bottom: 16px;
-  border: 3px solid #f1f5f9;
-}
-.username-text {
-  font-size: 20px;
-  font-weight: bold;
-  color: #1e293b;
-  margin-bottom: 4px;
-}
-.nickname-text {
-  font-size: 14px;
-  color: #64748b;
-  margin-bottom: 12px;
-}
-.status-badge-container {
-  flex-direction: row;
-}
-.status-badge {
-  font-size: 12px;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-weight: 500;
-  overflow: hidden;
-}
-.status-online {
-  background-color: #d1fae5;
-  color: #065f46;
-}
-.status-offline {
-  background-color: #f1f5f9;
-  color: #64748b;
-}
-.info-section {
-  width: 100%;
-  background-color: #ffffff;
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-.section-header {
-  border-bottom: 1px solid #f1f5f9;
-  padding-bottom: 8px;
-  margin-bottom: 12px;
-}
-.section-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: #334155;
-}
-.json-box {
-  background-color: #0f172a;
-  border-radius: 8px;
-  padding: 12px;
-  max-height: 180px;
-}
-.json-text {
-  font-size: 13px;
-  font-family: monospace;
-  color: #38bdf8;
-  line-height: 1.6;
-}
-.btn-section {
-  width: 100%;
-  padding: 0 8px;
-}
-.action-btn {
-  width: 100%;
-  height: 48px;
-  border-radius: 8px;
-  justify-content: center;
-  align-items: center;
-}
-.login-btn {
-  background-color: #3b82f6;
-  color: #ffffff;
-}
-.logout-btn {
-  background-color: #ef4444;
-  color: #ffffff;
-}
 </style>

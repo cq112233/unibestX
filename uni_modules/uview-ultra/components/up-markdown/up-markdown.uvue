@@ -1,0 +1,176 @@
+<template>
+  <view class="up-markdown" :class="theme" :style="markdownStyle">
+    <up-parse
+      :content="parsedContent"
+      :previewImg="previewImg"
+      :tag-style="markdownTagStyle"
+    ></up-parse>
+  </view>
+</template>
+
+<script lang="uts">
+import { useMarked } from '../../libs/marked-uts/common/marked'
+
+const marked = useMarked()
+
+async function renderMarkdown(content: string): Promise<string> {
+  const parsed = await marked.parse(content, null) as string
+  return parsed
+}
+
+function addLineNumbersToCodeBlocks(html: string): string {
+  const closeCode = '</code></pre>'
+  let result = ''
+  let index = 0
+  while (index < html.length) {
+    const preStart = html.indexOf('<pre><code', index)
+    if (preStart == -1) {
+      result += html.substring(index)
+      break
+    }
+    const codeStart = html.indexOf('>', preStart)
+    const codeEnd = html.indexOf(closeCode, codeStart + 1)
+    if (codeStart == -1 || codeEnd == -1) {
+      result += html.substring(index)
+      break
+    }
+    result += html.substring(index, codeStart + 1)
+    result += addLineNumbers(html.substring(codeStart + 1, codeEnd))
+    result += closeCode
+    index = codeEnd + closeCode.length
+  }
+  return result
+}
+
+function addLineNumbers(code: string): string {
+  const lines = code.split('\n')
+  let result = ''
+  let lineNumber = 1
+  for (let i = 0; i < lines.length; i++) {
+    if (i == lines.length - 1 && lines[i].length == 0) continue
+    if (result.length > 0) result += '\n'
+    result += lineNumber.toString() + '  ' + lines[i]
+    lineNumber++
+  }
+  return result
+}
+
+function styleMap(theme: string): UTSJSONObject {
+  const dark = theme == 'dark'
+  const textColor = dark ? '#dcdcdc' : '#333333'
+  const mutedColor = dark ? '#bbbbbb' : '#666666'
+  const linkColor = dark ? '#4da6ff' : '#007aff'
+  const codeBackground = dark ? '#2d2d2d' : '#f6f8fa'
+  const borderColor = dark ? '#4b5563' : '#dfe2e5'
+  const tableRowBackground = dark ? '#252525' : '#f6f8fa'
+  return {
+    h1: 'font-size:32px;margin:8px 0;font-weight:bold;color:' + textColor,
+    h2: 'font-size:24px;margin:8px 0;font-weight:bold;color:' + textColor,
+    h3: 'font-size:18px;margin:7px 0;font-weight:bold;color:' + textColor,
+    h4: 'font-size:16px;margin:7px 0;font-weight:bold;color:' + textColor,
+    h5: 'font-size:13px;margin:6px 0;font-weight:bold;color:' + textColor,
+    h6: 'font-size:10px;margin:5px 0;font-weight:bold;color:' + textColor,
+    p: 'margin:16px 0;color:' + textColor,
+    a: 'color:' + linkColor + ';text-decoration:none',
+    ul: 'margin:16px 0;padding-left:32px;color:' + textColor,
+    ol: 'margin:16px 0;padding-left:32px;color:' + textColor,
+    li: 'margin:8px 0;color:' + textColor,
+    blockquote: 'margin:8px 0;padding:0 10px;border-left:4px solid #cccccc;color:' + mutedColor,
+    code: 'font-family:monospace;font-size:14px;background-color:' + codeBackground + ';padding:3px 6px;color:' + textColor,
+    pre: 'font-family:monospace;font-size:14px;background-color:' + codeBackground + ';padding:16px;overflow:auto;border-radius:6px;margin:16px 0;color:' + textColor,
+    table: 'border-collapse:collapse;margin:16px 0;width:100%;color:' + textColor,
+    th: 'padding:6px 13px;border:1px solid ' + borderColor + ';font-weight:600;background-color:' + tableRowBackground,
+    td: 'padding:6px 13px;border:1px solid ' + borderColor,
+    img: 'max-width:100%;box-sizing:content-box;background-color:#ffffff;margin:16px 0',
+    hr: 'height:1px;padding:0;margin:24px 0;background-color:' + borderColor + ';border:0'
+  } as UTSJSONObject
+}
+
+export default {
+  name: 'up-markdown',
+  props: {
+    // markdown内容
+    content: {
+      type: String,
+      default: ''
+    },
+    // 是否启用图片预览
+    previewImg: {
+      type: Boolean,
+      default: true
+    },
+    // 是否显示代码块行号
+    showLineNumber: {
+      type: Boolean,
+      default: false
+    },
+    // 主题样式 'light' | 'dark'
+    theme: {
+      type: String,
+      default: 'light'
+    }
+  },
+  data() {
+    return {
+      parsedContent: ''
+    };
+  },
+  computed: {
+    markdownStyle(): string {
+      if (this.theme == 'dark') {
+        return 'background-color:#1e1e1e;color:#cccccc'
+      }
+      return ''
+    },
+    markdownTagStyle(): UTSJSONObject {
+      return styleMap(this.theme)
+    }
+  },
+  watch: {
+    content: {
+      handler(newVal: string) {
+        this.parseMarkdown(newVal);
+      },
+      immediate: true
+    }
+  },
+  methods: {
+    // 解析markdown内容
+    async parseMarkdown(content: string): Promise<void> {
+      if (content.length == 0) {
+        this.parsedContent = '';
+        return;
+      }
+
+      let parsed = await renderMarkdown(content)
+      if (this.showLineNumber) {
+        parsed = addLineNumbersToCodeBlocks(parsed)
+      }
+      this.parsedContent = parsed;
+    }
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+.up-markdown {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #333;
+  padding: 16px;
+  
+  /* 标题样式 */
+/* 段落样式 */
+/* 链接样式 */
+/* 列表样式 */
+/* 引用样式 */
+/* 代码样式 */
+/* 表格样式 */
+/* 图片样式 */
+/* 分割线样式 */
+/* 深色主题 */
+}
+
+/* 代码块行号样式 */
+</style>

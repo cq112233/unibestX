@@ -1,5 +1,6 @@
 <script setup lang="uts">
 	import { navigateToInterceptor } from './src/router/interceptor'
+	import { useAppStore } from './src/store'
 
 	// #ifdef APP-ANDROID || APP-HARMONY
 	let firstBackTime = 0
@@ -7,17 +8,8 @@
 
 	onLaunch(() => {
 		console.log('App Launch')
+		useAppStore()
 	})
-
-	// #ifdef APP
-	onAppShow((options) => {
-		console.log('App Show')
-	})
-
-	onAppHide(() => {
-		console.log('App Hide')
-	})
-	// #endif
 
 	// #ifndef APP
 	onShow((options) => {

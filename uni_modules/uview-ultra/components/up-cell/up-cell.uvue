@@ -1,0 +1,301 @@
+<template>
+	<view class="up-cell" :class="[customClass]" :style="[$up.addStyle(customStyle)]"
+		:hover-class="(!disabled && (clickable || isLink)) ? 'up-cell--clickable' : ''" :hover-stay-time="250"
+		@tap="clickHandler">
+		<view class="up-cell__body"
+			aclass="[ center && 'up-cell--center', size === 'large' && 'up-cell__body--large']">
+			<view class="up-cell__body__content">
+				<view class="up-cell__left-icon-wrap"
+					v-if="$slots['icon'] != null || icon != ''">
+					<slot name="icon" v-if="$slots['icon'] != null">
+					</slot>
+					<up-icon v-else :name="icon"
+						:custom-style="iconStyle"
+						:size="size === 'large' ? '22px' : '18px'"></up-icon>
+				</view>
+				<view class="up-cell__title">
+					<slot name="title" v-if="$slots['title'] != null && title == ''">
+					</slot>
+					<text v-else class="up-cell__title-text"
+						:style="[titleTextStyle]"
+						aclass="[disabled && 'up-cell--disabled', size === 'large' && 'up-cell__title-text--large']">
+						{{ title }}
+					</text>
+					<slot name="label">
+						<text class="up-cell__label" v-if="label"
+							aclass="[disabled && 'up-cell--disabled', size === 'large' && 'up-cell__label--large']">
+							{{ label }}
+							</text>
+					</slot>
+				</view>
+			</view>
+			<slot name="value">
+				<text class="up-cell__value"
+					aclass="[disabled && 'up-cell--disabled', size === 'large' && 'up-cell__value--large']"
+					v-if="testEmpty(value) == false">{{ value }}</text>
+			</slot>
+			<view class="up-cell__right-icon-wrap"
+				v-if="$slots['right-icon'] != null || isLink"
+				:class="[`up-cell__right-icon-wrap--${arrowDirection}`]">
+				<slot name="right-icon">
+					<up-icon v-if="rightIcon" :name="rightIcon"
+						:custom-style="rightIconStyle" :color="disabled ? '#c8c9cc' : 'info'"
+						:size="size === 'large' ? '18px' : '16px'"></up-icon>
+				</slot>
+			</view>
+			<view class="up-cell__right-icon-wrap" v-if="$slots['righticon'] != null"
+				:class="[`up-cell__right-icon-wrap--${arrowDirection}`]">
+				<slot name="righticon">
+				</slot>
+			</view>
+		</view>
+		<up-line v-if="border"></up-line>
+	</view>
+</template>
+
+<script setup lang="ts">
+	import { computed } from 'vue'
+	import defProps from './cell'
+	import { addStyle } from '../../libs/function/index'
+	import { empty as _testEmpty } from '../../libs/function/test'
+	// props
+	const props = defineProps({
+		title: {
+			type: String,
+			default: defProps.getString('cell.title')
+		},
+		label: {
+			type: String,
+			default: defProps.getString('cell.label')
+		},
+		value: {
+			type: [String, Number],
+			default: defProps.getString('cell.value')
+		},
+		icon: {
+			type: String,
+			default: defProps.getString('cell.icon')
+		},
+		iconStyle: {
+			type: [String, Object],
+			default: defProps.getAny('cell.iconStyle')
+		},
+		rightIcon: {
+			type: String,
+			default: defProps.getString('cell.rightIcon')
+		},
+		rightIconStyle: {
+			type: [String, Object],
+			default: defProps.getAny('cell.rightIconStyle')
+		},
+		size: {
+			type: String,
+			default: defProps.getString('cell.size')
+		},
+		center: {
+			type: Boolean,
+			default: defProps.getBoolean('cell.center')
+		},
+		url: {
+			type: String,
+			default: defProps.getString('cell.url')
+		},
+		name: {
+			type: [String, Number],
+			default: defProps.getString('cell.name')
+		},
+		linkType: {
+			type: String,
+			default: defProps.getString('cell.linkType')
+		},
+		clickable: {
+			type: Boolean,
+			default: defProps.getBoolean('cell.clickable')
+		},
+		isLink: {
+			type: Boolean,
+			default: defProps.getBoolean('cell.isLink')
+		},
+		arrowDirection: {
+			type: String,
+			default: defProps.getString('cell.arrowDirection')
+		},
+		border: {
+			type: Boolean,
+			default: defProps.getBoolean('cell.border')
+		},
+		disabled: {
+			type: Boolean,
+			default: defProps.getBoolean('cell.disabled')
+		},
+		titleStyle: {
+			type: Object,
+			default: defProps.getAny('cell.titleStyle')
+		},
+	})
+	defineOptions({
+		name: "up-cell"
+	})
+
+	const emits = defineEmits(['click'])
+
+	const testEmpty = function(val: string|number) {
+		return _testEmpty(val)
+	}
+
+	const titleTextStyle = computed(() => {
+		return addStyle(props.titleStyle)
+	})
+
+	const clickHandler = (e: any) => {
+		if (props.disabled) return
+		emits('click', {
+			name: props.name
+		})
+		// 如果配置了url(此props参数通过mixin引入)参数，跳转页面
+		// openPage()
+		if (!props.isLink) return
+		if (props.url != '') {
+			uni.navigateTo({
+				url: props.url
+			})
+		}
+
+		// 是否阻止事件传播
+		// todo
+		// this.stop && this.preventEvent(e)
+	}
+
+	defineExpose({
+		testEmpty
+	})
+</script>
+
+<style lang="scss" scoped>
+	@import "../../libs/css/components.scss";
+
+	$up-cell-padding: 10px 15px !important;
+	$up-cell-font-size: 15px !important;
+	$up-cell-line-height: 24px !important;
+	$up-cell-color: $up-main-color !important;
+	$up-cell-icon-size: 16px !important;
+	$up-cell-title-font-size: 15px !important;
+	$up-cell-title-line-height: 22px !important;
+	$up-cell-title-color: $up-main-color !important;
+	$up-cell-label-font-size: 12px !important;
+	$up-cell-label-color: $up-tips-color !important;
+	$up-cell-label-line-height: 18px !important;
+	$up-cell-value-font-size: 14px !important;
+	$up-cell-value-color: $up-content-color !important;
+	$up-cell-clickable-color: $up-bg-color !important;
+	$up-cell-disabled-color: #c8c9cc !important;
+	$up-cell-padding-top-large: 13px !important;
+	$up-cell-padding-bottom-large: 13px !important;
+	$up-cell-value-font-size-large: 15px !important;
+	$up-cell-label-font-size-large: 14px !important;
+	$up-cell-title-font-size-large: 16px !important;
+	$up-cell-left-icon-wrap-margin-right: 4px !important;
+	$up-cell-right-icon-wrap-margin-left: 4px !important;
+	$up-cell-title-flex:1 !important;
+	$up-cell-label-margin-top:5px !important;
+
+
+	.up-cell {
+		&__body {
+			@include flex();
+			/* #ifndef APP-NVUE */
+			box-sizing: border-box;
+			/* #endif */
+			padding: $up-cell-padding;
+			// font-size: $up-cell-font-size;
+			// color: $up-cell-color;
+			// line-height: $up-cell-line-height;
+			align-items: center;
+
+			&__content {
+				@include flex(row);
+				align-items: center;
+				flex: 1;
+			}
+
+			&--large {
+				padding-top: $up-cell-padding-top-large;
+				padding-bottom: $up-cell-padding-bottom-large;
+			}
+		}
+
+		&__left-icon-wrap,
+		&__right-icon-wrap {
+			@include flex();
+			align-items: center;
+			// height: $up-cell-line-height;
+		// 	font-size: $up-cell-icon-size;
+		}
+
+		&__left-icon-wrap {
+			margin-right: $up-cell-left-icon-wrap-margin-right;
+		}
+
+		&__right-icon-wrap {
+			margin-left: $up-cell-right-icon-wrap-margin-left;
+			transition: transform 0.3s;
+
+			&--up {
+				transform: rotate(-90deg);
+			}
+
+			&--down {
+				transform: rotate(90deg);
+			}
+		}
+
+		&__title {
+			flex: $up-cell-title-flex;
+
+			&-text {
+				font-size: $up-cell-title-font-size;
+				line-height: $up-cell-title-line-height;
+				color: $up-cell-title-color;
+
+				&--large {
+					font-size: $up-cell-title-font-size-large;
+				}
+			}
+
+		}
+
+		&__label {
+			margin-top: $up-cell-label-margin-top;
+			font-size: $up-cell-label-font-size;
+			color: $up-cell-label-color;
+			line-height: $up-cell-label-line-height;
+
+			&--large {
+				font-size: $up-cell-label-font-size-large;
+			}
+		}
+
+		&__value {
+			text-align: right;
+			margin-left: auto;
+			font-size: $up-cell-value-font-size;
+			line-height: $up-cell-line-height;
+			color: $up-cell-value-color;
+			&--large {
+				font-size: $up-cell-value-font-size-large;
+			}
+		}
+
+		&--clickable {
+			background-color: $up-cell-clickable-color;
+		}
+
+		&--disabled {
+			color: $up-cell-disabled-color;
+		}
+
+		&--center {
+			align-items: center;
+		}
+	}
+</style>

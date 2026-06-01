@@ -1,0 +1,304 @@
+<template>
+  <view
+    class="up-pull-refresh"
+    @touchstart="onTouchStart"
+    @touchmove="onTouchMove"
+    @touchend="onTouchEnd"
+    @touchcancel="onTouchEnd"
+  >
+    <view
+      class="refresh-area"
+      :style="{ height: refreshDistance + 'px' }"
+      :class="{ refreshing: isRefreshing }"
+    >
+      <slot
+        v-if="refreshStatus === 'pull'"
+        name="pull"
+        :distance="refreshDistance"
+        :threshold="threshold"
+      >
+        <view class="refresh-content">
+          <view class="refresh-indicator">
+            <up-icon name="arrow-downward" size="26px"></up-icon>
+          </view>
+          <text class="refresh-text">下拉刷新</text>
+        </view>
+      </slot>
+
+      <slot
+        v-else-if="refreshStatus === 'release'"
+        name="release"
+        :distance="refreshDistance"
+        :threshold="threshold"
+      >
+        <view class="refresh-content">
+          <view class="refresh-indicator">
+            <up-icon name="arrow-upward" size="26px"></up-icon>
+          </view>
+          <text class="refresh-text">释放刷新</text>
+        </view>
+      </slot>
+
+      <slot
+        v-else-if="refreshStatus === 'refreshing'"
+        name="refreshing"
+      >
+        <view class="refresh-content">
+          <view class="refresh-indicator">
+            <view class="spinner"></view>
+          </view>
+          <text class="refresh-text">刷新中...</text>
+        </view>
+      </slot>
+    </view>
+
+    <view
+      class="refresh-content-wrapper"
+      :style="{ transform: `translateY(${contentTranslateY}px)` }"
+    >
+      <scroll-view
+        v-if="useScrollView"
+        class="scroll-wrapper"
+        :scroll-y="true"
+        :enable-back-to-top="enableBackToTop"
+        :scroll-top="scrollTop"
+        :lower-threshold="lowerThreshold"
+        @scroll="handleScroll"
+        @scrolltolower="handleScrollToLower"
+      >
+        <slot></slot>
+
+        <up-loadmore
+          v-if="showLoadmore"
+          v-bind="loadmoreProps"
+        />
+      </scroll-view>
+
+      <view v-else>
+        <slot></slot>
+
+        <up-loadmore
+          v-if="showLoadmore"
+          v-bind="loadmoreProps"
+        />
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import type { PropType } from 'vue'
+
+function createLoadmoreProps(): UTSJSONObject {
+  const props = {} as UTSJSONObject
+  props['status'] = 'loadmore'
+  return props
+}
+
+function getTouchPageY(e: UniTouchEvent): number {
+  if (e.touches != null && e.touches.length > 0) {
+    return e.touches[0].pageY
+  }
+  if (e.changedTouches != null && e.changedTouches.length > 0) {
+    return e.changedTouches[0].pageY
+  }
+  return 0
+}
+
+function stringValue(value: any | null): string {
+  return value == null ? '' : value.toString()
+}
+
+export default {
+  name: 'up-pull-refresh',
+  props: {
+    refreshing: {
+      type: Boolean,
+      default: false
+    },
+    threshold: {
+      type: Number,
+      default: 80
+    },
+    damping: {
+      type: Number,
+      default: 0.4
+    },
+    maxDistance: {
+      type: Number,
+      default: 120
+    },
+    showLoadmore: {
+      type: Boolean,
+      default: false
+    },
+    loadmoreProps: {
+      type: Object as PropType<UTSJSONObject>,
+      default(): UTSJSONObject {
+        return createLoadmoreProps()
+      }
+    },
+    useScrollView: {
+      type: Boolean,
+      default: true
+    },
+    enableBackToTop: {
+      type: Boolean,
+      default: false
+    },
+    lowerThreshold: {
+      type: [Number, String],
+      default: 50
+    },
+    scrollTop: {
+      type: [Number, String],
+      default: 0
+    }
+  },
+  emits: ['refresh', 'loadmore', 'scroll'],
+  data() {
+    return {
+      isRefreshing: false,
+      refreshStatus: 'pull',
+      refreshDistance: 0,
+      startY: 0,
+      currentY: 0,
+      currentScrollTop: 0,
+      touching: false,
+      contentTranslateY: 0
+    }
+  },
+  watch: {
+    refreshing: {
+      handler(newVal: boolean) {
+        if (newVal) {
+          this.startRefresh()
+        } else {
+          this.finishRefresh()
+        }
+      }
+    }
+  },
+  methods: {
+    getLoadmoreStatus(): string {
+      return stringValue((this.loadmoreProps as UTSJSONObject)['status'])
+    },
+    onTouchStart(e: UniTouchEvent): void {
+      if (this.isRefreshing) {
+        return
+      }
+      this.touching = true
+      this.startY = getTouchPageY(e)
+      this.currentY = this.startY
+      this.refreshStatus = 'pull'
+    },
+    onTouchMove(e: UniTouchEvent): void {
+      if (!this.touching || this.isRefreshing) {
+        return
+      }
+      this.currentY = getTouchPageY(e)
+      const diff = this.currentY - this.startY
+      if (diff > 0 && this.isScrollViewAtTop()) {
+        this.refreshDistance = Math.min(diff * this.damping, this.maxDistance)
+        this.contentTranslateY = this.refreshDistance
+        if (this.refreshDistance >= this.threshold) {
+          this.refreshStatus = 'release'
+        } else {
+          this.refreshStatus = 'pull'
+        }
+        e.preventDefault()
+        e.stopPropagation()
+      }
+    },
+    onTouchEnd(): void {
+      if (!this.touching) {
+        return
+      }
+      this.touching = false
+      if (this.refreshDistance >= this.threshold && !this.isRefreshing) {
+        this.startRefresh()
+        this.$emit('refresh')
+      } else {
+        this.resetRefresh()
+      }
+    },
+    startRefresh(): void {
+      this.isRefreshing = true
+      this.refreshStatus = 'refreshing'
+      this.refreshDistance = this.threshold
+      this.contentTranslateY = this.threshold
+    },
+    finishRefresh(): void {
+      this.isRefreshing = false
+      this.refreshStatus = 'pull'
+      this.resetRefresh()
+    },
+    resetRefresh(): void {
+      this.refreshDistance = 0
+      this.contentTranslateY = 0
+    },
+    isScrollViewAtTop(): boolean {
+      return this.currentScrollTop <= 0
+    },
+    handleScroll(e: UniScrollEvent): void {
+      this.currentScrollTop = e.detail.scrollTop
+      this.$emit('scroll', e)
+    },
+    handleScrollToLower(_e: UniEvent): void {
+      if (this.showLoadmore && this.getLoadmoreStatus() == 'loadmore') {
+        this.$emit('loadmore')
+      }
+    }
+  }
+}
+</script>
+
+<style scoped lang="scss">
+.up-pull-refresh {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+
+.refresh-area {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+  transition: height 0.2s ease-out;
+}
+
+.refresh-content-wrapper {
+  height: 100%;
+  transition: transform 0.2s ease-out;
+}
+
+.scroll-wrapper {
+  height: 100%;
+}
+
+.refresh-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding-bottom: 10px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #666;
+  border-radius: 50%;
+}
+.refresh-text {
+  font-size: 14px;
+  color: #666;
+}
+</style>
