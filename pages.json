@@ -1,6 +1,5 @@
 {
-	"pages": [
-		{
+	"pages": [{
 			"path": "src/pages/index/index",
 			"style": {
 				"navigationStyle": "custom",
@@ -38,6 +37,13 @@
 			}
 		}
 	],
+	"easycom": {
+		"autoscan": true,
+		"custom": {
+			"^up-(.*)": "@/uni_modules/uview-ultra/components/up-$1/up-$1.uvue",
+			"^u-([^-].*)": "@/uni_modules/uview-plus/components/u-$1/u-$1.uvue"
+		}
+	},
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "uni-app x",
@@ -49,8 +55,7 @@
 		"color": "#999999",
 		"selectedColor": "#1890ff",
 		"backgroundColor": "#F8F8F8",
-		"list": [
-			{
+		"list": [{
 				"pagePath": "src/pages/index/index",
 				"text": "首页"
 			},
