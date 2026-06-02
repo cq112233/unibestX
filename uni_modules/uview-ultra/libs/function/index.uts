@@ -285,7 +285,7 @@ export function deepMerge(
 	// #ifdef APP
 	target = UTSJSONObject.assign(targetJson, sourceJson)
 	// #endif
-	// #ifdef WEB
+	// #ifndef APP
 	target = Object.assign(targetJson, sourceJson)
 	// #endif
  //    if (typeof target !== 'object' || typeof source !== 'object') return false

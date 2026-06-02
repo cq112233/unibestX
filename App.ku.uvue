@@ -1,7 +1,7 @@
 <template>
 	<view class="container" :style="{ '--theme-color': appStore.state.theme }">
 		<scroll-view scroll-y="true" class="scroll-view">
-			<slot></slot>
+			<slot />
 		</scroll-view>
 		<Tabbar v-if="isCurrentPageTabbar" />
 		<up-toast ref="uToastRef" />
@@ -9,54 +9,55 @@
 </template>
 
 <script setup lang="uts">
-	import Tabbar from '@/src/tabbar/index.uvue'
-	import { useAppStore } from '@/src/store'
-	import { isPageTabbar } from '@/src/tabbar/store'
-	import { registerToast, unregisterToast } from '@/src/utils/toast'
-	import { ref, onMounted, onUnmounted, ComponentPublicInstance } from 'vue'
+import Tabbar from '@/src/tabbar/index.uvue'
+import { useAppStore } from '@/src/store'
+import { isPageTabbar } from '@/src/tabbar/store'
+import { registerToast, unregisterToast } from '@/src/utils/toast'
+import type { ComponentPublicInstance } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 
-	const appStore = useAppStore()
+const appStore = useAppStore()
 
-	const isCurrentPageTabbar = ref(false)
-	const uToastRef = ref<ComponentPublicInstance | null>(null)
+const isCurrentPageTabbar = ref(false)
+const uToastRef = ref<ComponentPublicInstance | null>(null)
 
-	onShow(() => {
-		const pages = getCurrentPages()
-		if (pages.length > 0) {
-			const route = pages[pages.length - 1].route
-			if (route != null && route.length > 0) {
-				const path = route.startsWith('/') ? route : `/${route}`
-				isCurrentPageTabbar.value = isPageTabbar(path)
-			}
-		}
-		if (uToastRef.value != null) {
-			registerToast(uToastRef.value!)
-		}
-	})
+onShow(() => {
+  const pages = getCurrentPages()
+  if (pages.length > 0) {
+    const route = pages[pages.length - 1].route
+    if (route != null && route.length > 0) {
+      const path = route.startsWith('/') ? route : `/${route}`
+      isCurrentPageTabbar.value = isPageTabbar(path)
+    }
+  }
+  if (uToastRef.value != null) {
+    registerToast(uToastRef.value!)
+  }
+})
 
-	onMounted(() => {
-		console.log('注册',uToastRef.value)
-		if (uToastRef.value != null) {
-			registerToast(uToastRef.value!)
-		}
-	})
+onMounted(() => {
+  console.log('注册', uToastRef.value)
+  if (uToastRef.value != null) {
+    registerToast(uToastRef.value!)
+  }
+})
 
-	onUnmounted(() => {
-		console.log('卸载')
-		if (uToastRef.value != null) {
-			unregisterToast(uToastRef.value!)
-		}
-	})
+onUnmounted(() => {
+  console.log('卸载')
+  if (uToastRef.value != null) {
+    unregisterToast(uToastRef.value!)
+  }
+})
 </script>
 
 <style lang="scss">
 	.container {
-		display: flex;
-		flex-direction: column;
-		flex: 1;
-		height: 100%;
-	}
-	.scroll-view {
-		flex:1
-	}
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+}
+.scroll-view {
+  flex: 1;
+}
 </style>
