@@ -1,6 +1,6 @@
 <template>
-	<view class="h-full flex-col flex" :style="{ '--theme-color': appStore.state.theme }">
-		<scroll-view scroll-y="true" class="flex-1">
+	<view class="container" :style="{ '--theme-color': appStore.state.theme }">
+		<scroll-view scroll-y="true" class="scroll-view">
 			<slot></slot>
 		</scroll-view>
 		<Tabbar v-if="isCurrentPageTabbar" />
@@ -29,20 +29,34 @@
 				isCurrentPageTabbar.value = isPageTabbar(path)
 			}
 		}
+		if (uToastRef.value != null) {
+			registerToast(uToastRef.value!)
+		}
 	})
 
 	onMounted(() => {
+		console.log('注册',uToastRef.value)
 		if (uToastRef.value != null) {
 			registerToast(uToastRef.value!)
 		}
 	})
 
 	onUnmounted(() => {
+		console.log('卸载')
 		if (uToastRef.value != null) {
 			unregisterToast(uToastRef.value!)
 		}
 	})
 </script>
 
-<style>
+<style lang="scss">
+	.container {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		height: 100%;
+	}
+	.scroll-view {
+		flex:1
+	}
 </style>

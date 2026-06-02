@@ -8,9 +8,12 @@ const toastStack = [] as ComponentPublicInstance[]
  */
 export function registerToast(toastInstance : ComponentPublicInstance) {
   const index = toastStack.indexOf(toastInstance)
-  if (index === -1) {
-    toastStack.push(toastInstance)
+  if (index !== -1) {
+    toastStack.splice(index, 1)
   }
+  toastStack.push(toastInstance)
+		
+  console.log(toastStack,toastStack.length,'toastStack')
 }
 
 /**
@@ -43,6 +46,7 @@ export function showToast(options : UTSJSONObject) {
  * 快捷调用 toast
  */
 export function toast(message : string, type : string = 'default') {
+		console.log(3456)
   showToast({
     message: message,
     type: type

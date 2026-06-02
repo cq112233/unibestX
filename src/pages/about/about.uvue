@@ -11,7 +11,7 @@
 
     <!-- 使用路由拦截与传参演示组件 -->
     <RouterDemoCard />
-</view>
+  </view>
 </template>
 
 <script setup lang="uts">
@@ -19,7 +19,7 @@ import IconDemoCard from './components/IconDemoCard.uvue'
 import LangSwitchCard from './components/LangSwitchCard.uvue'
 import ThemeSwitchCard from './components/ThemeSwitchCard.uvue'
 import RouterDemoCard from './components/RouterDemoCard.uvue'
-import { syncCurIdxByCurrentPage } from '../../tabbar/store'
+import { syncCurIdxByCurrentPage } from '@/src/tabbar/store'
 
 onShow(() => {
   syncCurIdxByCurrentPage()

@@ -1,8 +1,8 @@
 /** vite.config.js */
-import { defineConfig } from "vite";
-import uni from "@dcloudio/vite-plugin-uni";
-import { unovite } from "./js_sdk/a-hua-unocss";
-import autoRootPlugin from "./plugins/root-plugin";
+import { defineConfig } from 'vite'
+import uni from '@dcloudio/vite-plugin-uni'
+import { unovite } from './js_sdk/a-hua-unocss'
+import autoRootPlugin from './plugins/root-plugin'
 
 export default defineConfig({
   define: {
@@ -12,33 +12,36 @@ export default defineConfig({
   server: {
     port: 9001,
   },
+  build: {
+    sourcemap: false, // 关闭 sourcemap，警告直接消失
+  },
   plugins: [
     autoRootPlugin(), // 你的根组件
     uni(),
     unovite({
       rules: [
         [
-          "p-safe",
+          'p-safe',
           {
             padding:
-              "env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)",
+              'env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)',
           },
         ],
-        ["pt-safe", { "padding-top": "env(safe-area-inset-top)" }],
-        ["pb-safe", { "padding-bottom": "env(safe-area-inset-bottom)" }],
+        ['pt-safe', { 'padding-top': 'env(safe-area-inset-top)' }],
+        ['pb-safe', { 'padding-bottom': 'env(safe-area-inset-bottom)' }],
       ],
       shortcuts: {},
       theme: {
         colors: {
           /** 主题色，用法如: text-primary */
-          primary: "var(--theme-color,#0957DE)",
+          primary: 'var(--theme-color,#0957DE)',
         },
         fontSize: {
           /** 提供更小号的字体，用法如：text-2xs */
-          "2xs": ["20rpx", "28rpx"],
-          "3xs": ["18rpx", "26rpx"],
+          '2xs': ['20rpx', '28rpx'],
+          '3xs': ['18rpx', '26rpx'],
         },
       },
     }),
   ],
-});
+})

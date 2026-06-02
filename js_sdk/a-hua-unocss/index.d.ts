@@ -16,6 +16,7 @@ interface RecordType<T = S> {
 interface Theme {
 	generator?: B;
 	colors?: Colors;
+	[key: S]: any;
 }
 
 /**
@@ -48,7 +49,7 @@ export declare function unovite(options?: {
 	prefix?: ItemOrArray<S>;
 	include?: ItemOrArray<S | R>;
 	exclude?: ItemOrArray<S | R>;
-	handler: <T extends { uno?: ItemOrArray<[S, S]>; selector: S, pseudo?: S }>(prefix: S, item: T) => T;
+	handler?: <T extends { uno?: ItemOrArray<[S, S]>; selector: S, pseudo?: S }>(prefix: S, item: T) => T;
 	unit?: "rpx" | "px" | "em" | "rem" | "vh" | "vw" | "pt" | "pc" | "in" | "mm" | "cm" | "svh" | "lvh" | "dvh" | "vmin" | "vmax" | "vi" | "vb" | "svmin" | "dvmin" | "svmax" | "dvmax" | "svi" | "dvi" | "svb" | "dvb";
 	default?: {
 		none?: SOrN;
@@ -69,6 +70,6 @@ export declare function unovite(options?: {
 	};
 }): { 
 	name: string, 
-	enforce: string, 
+	enforce?: "pre" | "post", 
 	transform: (code: string, id: string) => void 
 };
