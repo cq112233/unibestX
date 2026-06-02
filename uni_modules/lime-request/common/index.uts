@@ -1,0 +1,408 @@
+// @ts-nocheck
+import type { LimeRequestConfig, LimeRequestTask, LimeInterceptors, LimeRequestResponse, LimeRequestFail, LimeeRequestRejected, LimeRequestSource } from '../utssdk/interface.uts'
+import { mergeConfig, mergeUrl, createInterceptors, isJSON } from './utils.uts'
+import { LimeResponseImpl } from '../utssdk/unierror.uts'
+// import { LimeRequestFailImpl } from './utssdk/unierror.uts'
+export { type LimeRequestConfig, type LimeRequestTask, type LimeInterceptors, type LimeRequestResponse, type LimeRequestFail, type LimeeRequestRejected } //from './utssdk/interface.uts'
+
+
+
+export class Request {
+	defaultConfig : LimeRequestConfig
+	interceptors : LimeInterceptors<LimeRequestConfig, LimeRequestResponse<any>>
+	constructor(config : LimeRequestConfig) {
+		const defaultRequestConfig : LimeRequestConfig = {
+			baseURL: ''
+		}
+		this.defaultConfig = mergeConfig(defaultRequestConfig, config)
+		this.interceptors = createInterceptors<LimeRequestConfig, LimeRequestResponse<any>>()
+	}
+	// #ifdef APP-ANDROID
+	@UTSAndroid.keyword("inline")
+	@UTSAndroid.keyword("reified")
+	// #endif
+	request<T = any>(config : LimeRequestConfig) : Promise<LimeRequestResponse<T>> {
+		return new Promise((resolve, reject) => {
+			let interceptors = this.interceptors as LimeInterceptors<LimeRequestConfig, LimeRequestResponse<T>>
+			
+			// if(interceptors == null) {
+			// 	this.interceptors = createInterceptors<LimeRequestConfig, T>()
+			// 	interceptors = this.interceptors as LimeInterceptors<LimeRequestConfig, LimeRequestResponse<T>>
+			// }
+			
+			const _config = mergeConfig(this.defaultConfig, config)
+			interceptors.request.resolve(_config)
+				.then((config : any) => {
+					const { baseURL, params, getTask, url } = config as LimeRequestConfig
+					
+					const mergedUrl = mergeUrl(baseURL, url, params)
+					let task : LimeRequestTask | null
+					const errMsg = `lime-request ${config.method} ok`
+					switch (config.method) {
+						case 'DOWNLOAD':
+							task = uni.downloadFile({
+								url: mergedUrl,
+								header: config.header,
+								filePath: config.filePath,
+								timeout: config.timeout ?? 120000,
+								// enableHttp2: config.enableHttp2,
+								// enableProfile: config.enableProfile,
+								// enableQuic: config.enableQuic,
+								// useHighPerformanceMode: config.useHighPerformanceMode,
+								success(result) {
+									const {
+										tempFilePath, 
+										statusCode, 
+										// filePath, 
+										// profile
+									} = result
+									
+									const apFilePath = ''
+									const filePath = ''
+									const fileContent = ''
+									
+									const res = new LimeResponseImpl<T>(
+										'' as T,
+										statusCode,
+										'',//header,
+										[],// cookies,
+										config,
+										errMsg,
+										tempFilePath,
+										apFilePath,
+										filePath,
+										fileContent,
+									)
+									interceptors.response.resolve(res).then(resolve, reject)
+									// resolve(res)
+								},
+								fail(error) {
+									// const err = new LimeRequestFailImpl(
+									// 	error.errCode,
+									// 	error.data,
+									// 	error.cause,
+									// 	error.errMsg,
+									// )
+									const err = {
+										errCode: error.errCode,
+										errSubject: 'lime-request',
+										data: error.data,
+										cause: error.cause,
+										errMsg: error.errMsg,
+									} as LimeRequestFail
+									// reject(err)
+									interceptors.response.reject(err).then((res: LimeRequestFail)=> {
+										reject(res)
+									}, reject)
+								}
+							}) as DownloadTask
+							break
+						case 'UPLOAD':
+							task = uni.uploadFile({
+								url: mergedUrl,
+								filePath: config.filePath,
+								name: config.name,
+								files: config.files,
+								header: config.header,
+								formData: config.formData,
+								// enableHttp2: config.enableHttp2,
+								// enableProfile: config.enableProfile,
+								// enableQuic: config.enableQuic,
+								// useHighPerformanceMode: config.useHighPerformanceMode,
+								timeout: config.timeout ?? 60000,
+								success(result) {
+									const {data, statusCode} = result
+									
+									const tempFilePath = ''
+									const apFilePath = ''
+									const filePath = ''
+									const fileContent = ''
+									
+									const res = new LimeResponseImpl<T>(
+										data as T,
+										statusCode,
+										'',//header,
+										[],// cookies,
+										config,
+										errMsg,
+										tempFilePath,
+										apFilePath,
+										filePath,
+										fileContent,
+									)
+									// resolve(res)
+									interceptors.response.resolve(res).then(resolve, reject)
+									
+								},
+								fail(error) {
+									// const err = new LimeRequestFailImpl(
+									// 	error.errCode,
+									// 	error.data,
+									// 	error.cause,
+									// 	error.errMsg,
+									// )
+									const err = {
+										errCode: error.errCode,
+										errSubject: 'lime-request',
+										data: error.data,
+										cause: error.cause,
+										errMsg: error.errMsg,
+									} as LimeRequestFail
+									interceptors.response.reject(err).then((res: LimeRequestFail)=> {
+										reject(res)
+									}, reject)
+									// reject(err)
+								}
+							}) as UploadTask
+							break
+						default:
+							// #ifdef UNI-APP-X
+							let data: any|null = config.data
+							if(isRef(data)) {
+								data = unref(data)
+							}
+							if(isReactive(data)) {
+								data = {...toRaw(data)}
+							}
+							// #endif 
+							// #ifndef UNI-APP-X
+							const data = config.data
+							// #endif 
+							task = uni.request<T>({
+								url: mergedUrl,
+								data,
+								header: config.header,
+								method: config.method,
+								timeout: config.timeout ?? 60000,
+								withCredentials: config.withCredentials,
+								firstIpv4: config.firstIpv4,
+								enableChunked: config.enableChunked,
+								success(result: RequestSuccess<T>) {
+									const {
+										data,
+										statusCode,
+										header,
+										cookies,
+									} = result as RequestSuccess<T>
+									
+									const tempFilePath = ''
+									const apFilePath = ''
+									const filePath = ''
+									const fileContent = ''
+									let parsedData = data
+									if (typeof data == 'string') {
+										try {
+											if(isJSON(data as string)) {
+												 parsedData = JSON.parse<T>(data as string)
+											}
+										} catch (error) {
+											//TODO handle the exception
+										}
+									}
+									const res = new LimeResponseImpl<T>(
+										parsedData as T,
+										statusCode,
+										header,
+										cookies,
+										config,
+										errMsg,
+										tempFilePath,
+										apFilePath,
+										filePath,
+										fileContent,
+									)
+									// resolve(res)
+									interceptors.response.resolve(res).then(resolve, reject)
+								},
+								fail(error) {
+									// const err = new LimeRequestFailImpl(
+									// 	error.errCode,
+									// 	error.data,
+									// 	error.cause,
+									// 	error.errMsg,
+									// )
+									const source: LimeRequestSource = {
+										url: mergedUrl,
+										baseURL,
+										path: url,
+										method: config.method,
+									}
+									const err = {
+										errCode: error.errCode,
+										errSubject: 'lime-request',
+										data: error.data,
+										cause: error.cause,
+										errMsg: error.errMsg,
+										source
+									} as LimeRequestFail
+									// reject(err)
+									interceptors.response.reject(err).then((res: LimeRequestFail)=> {
+										reject(res)
+									}, reject)
+									reject(err)
+								}
+							}) as RequestTask
+							break
+					}
+					if (getTask != null) {
+						getTask(task!)
+					}
+				}).catch(reject)
+		})
+	}
+
+	// #ifdef APP-ANDROID
+	@UTSAndroid.keyword("inline")
+	@UTSAndroid.keyword("reified")
+	// @JvmOverloads
+	// #endif
+	get<T>(url : string, config : LimeRequestConfig | null = null): Promise<LimeRequestResponse<T>> {
+		const _config = (config ?? {}) as LimeRequestConfig
+		_config.url = url
+		_config.method = 'GET'
+		return this.request<T>(_config)
+	}
+	// #ifdef APP-ANDROID
+	@UTSAndroid.keyword("inline")
+	@UTSAndroid.keyword("reified")
+	// @JvmOverloads
+	// #endif
+	head<T>(url : string, config : LimeRequestConfig | null = null): Promise<LimeRequestResponse<T>> { 
+		const _config = (config ?? {}) as LimeRequestConfig
+		_config.url = url
+		_config.method = 'HEAD'
+		return this.request<T>(_config)
+	}
+	// #ifdef APP-ANDROID
+	@UTSAndroid.keyword("inline")
+	@UTSAndroid.keyword("reified")
+	// @JvmOverloads
+	// #endif
+	connect<T>(url : string, config : LimeRequestConfig | null = null): Promise<LimeRequestResponse<T>> { 
+		const _config = (config ?? {}) as LimeRequestConfig
+		_config.url = url
+		_config.method = 'CONNECT'
+		return this.request<T>(_config)
+	}
+	// #ifdef APP-ANDROID
+	@UTSAndroid.keyword("inline")
+	@UTSAndroid.keyword("reified")
+	// @JvmOverloads
+	// #endif
+	trace<T>(url : string, config : LimeRequestConfig | null = null): Promise<LimeRequestResponse<T>> { 
+		const _config = (config ?? {}) as LimeRequestConfig
+		_config.url = url
+		_config.method = 'TRACE'
+		return this.request<T>(_config)
+	}
+	// #ifdef APP-ANDROID
+	@UTSAndroid.keyword("inline")
+	@UTSAndroid.keyword("reified")
+	// @JvmOverloads
+	// #endif
+	post<T>(url: string, data: any|null = null, config : LimeRequestConfig | null = null) {
+		const _config = (config ?? {}) as LimeRequestConfig
+		_config.url = url
+		_config.data = data
+		_config.method = 'POST'
+		return this.request<T>(_config)
+	}
+	// #ifdef APP-ANDROID
+	@UTSAndroid.keyword("inline")
+	@UTSAndroid.keyword("reified")
+	// @JvmOverloads
+	// #endif
+	put<T>(url: string, data: any|null = null, config : LimeRequestConfig | null = null) {
+		const _config = (config ?? {}) as LimeRequestConfig
+		_config.url = url
+		_config.data = data
+		_config.method = 'PUT'
+		return this.request<T>(_config)
+	}
+	// #ifdef APP-ANDROID
+	@UTSAndroid.keyword("inline")
+	@UTSAndroid.keyword("reified")
+	// @JvmOverloads
+	// #endif
+	delete<T>(url: string, data: any|null = null, config : LimeRequestConfig | null = null) {
+		const _config = (config ?? {}) as LimeRequestConfig
+		_config.url = url
+		_config.data = data
+		_config.method = 'DELETE'
+		return this.request<T>(_config)
+	}
+	// #ifdef APP-ANDROID
+	@UTSAndroid.keyword("inline")
+	@UTSAndroid.keyword("reified")
+	// @JvmOverloads
+	// #endif
+	options<T>(url: string, data: any|null = null, config : LimeRequestConfig | null = null) {
+		const _config = (config ?? {}) as LimeRequestConfig
+		_config.url = url
+		_config.data = data
+		_config.method = 'OPTIONS'
+		return this.request<T>(_config)
+	}
+	upload(url: string, config : LimeRequestConfig | null = null) { 
+		const _config = (config ?? {}) as LimeRequestConfig
+		_config.url = url
+		_config.method = 'UPLOAD'
+		return this.request(_config)
+	}
+	download(url: string, config : LimeRequestConfig | null = null) { 
+		const _config = (config ?? {}) as LimeRequestConfig
+		_config.url = url
+		_config.method = 'DOWNLOAD'
+		return this.request(_config)
+	}
+}
+
+
+
+export function getRequestFail(error: any|null): LimeRequestFail {
+	// #ifdef APP-ANDROID
+	if(error instanceof LimeRequestFail) {
+		return error as LimeRequestFail
+	}
+	// let err:LimeRequestFail;
+	if(error == null) {
+		// err = new LimeRequestFailImpl(
+		// 	0,
+		// 	'空值',
+		// 	null,
+		// 	'没有错误内容'
+		// )
+		return {
+			errCode: 0,
+			errSubject: 'lime-request',
+			data: null,
+			cause: null,
+			errMsg:  '未知错误',
+		} as LimeRequestFail
+		
+	} else {
+		const obj = JSON.parseObject<LimeRequestFail>(JSON.stringify(error))
+		if(obj != null) {
+			return obj
+		}
+		return {
+			errCode: 0,
+			errSubject: 'lime-request',
+			data: null,
+			cause: null,
+			errMsg:  '未知错误',
+		} as LimeRequestFail
+		// return err
+		// err = new LimeRequestFailImpl(
+		// 	obj.getNumber('errCode') ?? 0,
+		// 	obj.get('data'),
+		// 	errImpl,
+		// 	obj.getString('errMsg') ?? '没有错误内容2',
+		// )
+	}
+	// return err
+	// #endif
+	// #ifndef APP-ANDROID
+	return error as LimeRequestFail
+	// #endif
+}

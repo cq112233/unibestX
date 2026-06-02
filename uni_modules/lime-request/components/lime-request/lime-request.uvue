@@ -1,0 +1,225 @@
+<template>
+	<view>
+		<button @click="onGet">get</button>
+		<button @click="onPost">post</button>
+		<button @click="onUpload">upload</button>
+		<button @click="onDownload">download</button>
+	</view>
+</template>
+
+<script setup>
+	import { getRequestFail, type LimeRequestConfig, type LimeRequestFail, type LimeRequestResponse } from '@/uni_modules/lime-request'
+	import { request, type User } from './http.uts'
+	// import KLDRequestTool, { type requestBlock } from './a.uts'
+	
+	
+	// const http = new KLDRequestTool()
+	// const request = new Request({
+	// 	baseURL: 'https://m1.apifoxmock.com/m1/7151265-6875205-default1',
+	// } as LimeRequestConfig)
+
+	// type User = {
+	// 	id : string
+	// 	username : string
+	// 	email : string
+	// 	phone : string
+	// 	avatar : string
+	// 	nickname : string
+	// 	gender : string
+	// 	birthday : string
+	// }
+
+	// 向给定ID的用户发起请求
+	// uni.request<Name[]>({
+	// 	url: 'https://m1.apifoxmock.com/m1/7151265-6875205-default/names',
+	// 	success(res) {
+	// 		console.log('res::1', res?.data[0])
+	// 	},
+	// 	fail(err) {
+	// 		console.log('err:::', err)
+	// 	}
+	// })	
+	let requestTask : RequestTask | null = null
+	const onGet = () => {
+		console.log('get::::::::::::::::::')
+		
+		// uni.request({
+		// 	url:  "http://www.kld20s.cn:88/Appfile/App/Tcrysta/kld/TcnAppUpgrade.json" ,
+		// 	method: 'GET',
+		// 	success(res) {
+		// 		console.log('success')
+		// 	},
+		// 	fail(res) {
+		// 		console.log('fail')
+		// 	},
+		// })
+		
+		// http.getAppUpgradeInfo({
+		// 	success(res) {
+		// 		console.log('res', res)
+		// 	},
+		// 	fail(err) {
+		// 		console.log('err11111', err)
+		// 	}
+		// } as requestBlock)
+		request
+			.get<User[]>('/user', {
+				params: {
+					ID: 12345,
+				},
+				getTask(task) {
+					console.log('getTask', task)
+					requestTask = task as RequestTask
+				},
+			} as LimeRequestConfig)
+			.then((response) => {
+				// 处理成功情况
+				console.log('onGet response:::', response.data?.[0])
+				// console.log('response:::2',  JSON.parse<Name[]>(JSON.stringify(response.data))?.[0])
+			})
+			.catch((error) => {
+				// const err = getRequestFail(error)å
+				// 处理错误情况
+				console.log('onGet error:::', (error as LimeRequestFail).errMsg)
+			})
+		// setTimeout(() => {
+		// 	requestTask?.abort()
+		// }, 100)
+	}
+
+	type UserType = {
+		name: string,
+		status: string,
+	}
+	// const data = reactive<UserType>({
+	// 	name: 'Hello Kitty',
+	// 	status: 'sold',
+	// } as UserType)
+	
+	const data = ref<UserType>({
+			name: 'Hello Kitty',
+			status: 'sold',
+	})
+	type Category = {
+		id: number,
+		name: string,
+	}
+	type Cat = {
+		"id": number,
+		"category": Category,
+		"name": string,
+		"photoUrls": string[],
+		"tags": Category[],
+		"status": string
+	}
+	type Cat2<T> = {
+		code: number,
+		data: T
+	}
+	
+	type Result<T> = {
+		code: number,
+		data: T
+	};
+	
+	const onPost = () => {
+		console.log('post::::::::::::::::::')
+		
+		// uni.request({
+		// 	url: 'https://m1.apifoxmock.com/m1/7151265-6875205-default/user?ID=12345',
+		// 	method: 'GET',
+		// 	success(res) {
+		// 		console.log('res')
+		// 	},
+		// 	fail(err) {
+		// 		console.log('err', err)
+		// 	}
+		// })
+		
+		// return
+		request
+			.post<Result<Cat>>('/pet', data)
+			.then((response) => {
+				// 处理成功情况
+				console.log('onPost response:::2', response.data?.code)
+				// console.log('response:::2',  JSON.parse<Name[]>(JSON.stringify(response.data))?.[0])
+			})
+			.catch((error) => {
+				// 处理错误情况
+				console.log('onPost error:::', error)
+			})
+	}
+
+	const onUpload = () => {
+		console.log('upload::::::::::::::::::')
+		request
+			.upload('https://service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo', {
+				filePath: '/static/logo.png'
+			} as LimeRequestConfig)
+			.then((response) => {
+				// 处理成功情况
+				console.log('onUpload response:::', response.data)
+				// console.log('response:::2',  JSON.parse<Name[]>(JSON.stringify(response.data))?.[0])
+			})
+			.catch((error) => {
+				// 处理错误情况
+				console.log('onUpload error:::', error)
+			})
+	}
+
+	const onDownload = () => {
+		console.log('download::::::::::::::::::')
+
+		request
+			.download('https://dy.2study.top/data/videos.json')
+			.then((response) => {
+				// 处理成功情况
+				console.log('onDownload response:::', response.data)
+				// console.log('response:::2',  JSON.parse<Name[]>(JSON.stringify(response.data))?.[0])
+			})
+			.catch((error) => {
+				// 处理错误情况
+				console.log('onDownload error:::', error)
+			})
+	}
+
+	
+	// 添加请求拦截器
+	request.interceptors.request.use(
+		(config) : LimeRequestConfig => {
+			// 在发送请求之前做些什么
+			console.log('interceptors use fulfilled')
+			return config
+		},
+		(error) : Promise<LimeRequestFail> => {
+			console.log('interceptors use rejected')
+			// 对请求错误做些什么
+			return Promise.reject(error) as Promise<LimeRequestFail>
+		},
+	)
+	
+	// 添加响应拦截器
+	request.interceptors.response.use(
+		(response):LimeRequestResponse<any> => {
+			 // 处理成功的响应
+			if (response.statusCode == 200) {
+				// HTTP状态码为200，请求成功
+			}
+			// 处理业务数据
+			const data = response.data as Result<any>
+			if(data.code == 200) {
+				 // 业务状态码为200，业务处理成功
+			}
+			
+			return response //Promise.reject(new Error('请求失败'))
+		}, 
+		(error):Promise<LimeRequestFail> => {
+			// 对响应错误做点什么
+			console.error('请求出错', error)
+			return Promise.reject(error) as Promise<LimeRequestFail>
+	})
+</script>
+
+<style>
+
+</style>

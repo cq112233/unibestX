@@ -1,0 +1,125 @@
+
+import { Request, LimeRequestConfig, LimeRequestFail, LimeRequestResponse } from '@/uni_modules/lime-request'
+
+
+// 接口调用回调类型
+export type requestBlock = {
+	success ?: (option: any) => void
+	fail ?: (option: RequestFail | LimeRequestFail | string | number | null) => void
+}
+
+// app升级信息对象
+export type appUpgradeInfo = {
+	versionCode     ?: number | null                            // 版本号（number）
+	hasUpdate       ?: boolean | null                           // 是否允许升级
+	versionName     ?: string | null                            // 版本号（string）
+	updateLog       ?: string | null                            // 升级日志
+	upgradeFileSize ?: string | null                            // 升级包大小
+	webUrl          ?: string | null                            // 网页下载地址
+	upgradeFileUrl  ?: string | null                            // 直接升级地址
+}
+
+export const domain = ""                    // 域名
+
+// 创建请求实例
+const http = new Request({
+  baseURL: domain,
+  timeout: 30000
+} as LimeRequestConfig)
+
+class KLDRequestTool {
+	// 初始化静态属性 _instance 为 null
+	private static _instance : KLDRequestTool | null = null
+	
+	// app升级信息Url
+	static appUpgradeAddress () {
+		return ``
+	}
+	
+	private static request : RequestTask | null = null          // 当前请求对象
+
+	private constructor() { }
+
+    /**
+	 * 获取单利对象
+	 * @returns KLDRequestTool - 单利对象
+	 */
+	public static getInstance() : KLDRequestTool {
+		let instance = this._instance
+		if (instance == null) {
+			instance = new KLDRequestTool()
+			this._instance = instance
+			this._instance.initInterceptors()
+		}
+		return instance
+	}
+	
+	/**
+	 * 请求APP升级信息
+	 * @param {requestBlock} task : 请求回调 appUpgradeInfo
+	 * @returns void
+	 */
+	public getAppUpgradeInfo(task : requestBlock) {
+		http.get<appUpgradeInfo>(KLDRequestTool.appUpgradeAddress(), {
+			getTask: (t) => {
+			    KLDRequestTool.request = t as RequestTask
+			}
+		}).then((res : LimeRequestResponse<appUpgradeInfo>) => {
+			if (res.statusCode == 200) {
+				task.success?.(res.data as any)
+			}else {
+				task.fail?.(res.errMsg)
+			}
+		}).catch((error : LimeRequestFail) => {
+			task.fail?.(error)
+		})
+	}
+	
+	// ==================================================================== 拦截器 & 中断请求 ====================================================================
+	
+	// 初始化拦截器
+	private initInterceptors() {
+		// 请求拦截器
+		http.interceptors.request.use(
+		    (config) : LimeRequestConfig => {
+		        // 在发送请求之前做些什么
+		        return config
+		    },
+		    (error) : Promise<LimeRequestFail> => {
+		        // 对请求错误做些什么
+				console.error('请求拦截器 - 请求出错', error)
+		        return Promise.reject(error) as Promise<LimeRequestFail>
+		    },
+		)
+		
+		// 响应拦截器
+		http.interceptors.response.use(
+		    (response) => {
+		        response as LimeRequestResponse<any>
+		        // 对响应数据做点什么
+		        if (response.statusCode == 200) {
+		            // return response.data
+		        }
+		        return response //Promise.reject(new Error('请求失败'))
+		    }, 
+		    (error) : Promise<LimeRequestFail> => {
+		        // 对响应错误做点什么
+		        console.error('响应拦截器 - 请求出错', error)
+		        return Promise.reject(error) as Promise<LimeRequestFail>
+		})
+	}
+	
+	
+	/**
+	 * 中断当前请求
+	 * @returns void
+	 */
+	public abordRequest() {
+		if (KLDRequestTool.request != null) {
+			(KLDRequestTool.request as RequestTask).abort()
+		}
+	}
+	
+}
+
+export default KLDRequestTool

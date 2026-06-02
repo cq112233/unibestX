@@ -1,0 +1,9 @@
+/**
+ * 通用响应格式（兼容 message 与 msg 字段）
+ */
+export type IResponse<T> = {
+  code : number
+  data : T
+  message : string
+  msg ?: string
+}

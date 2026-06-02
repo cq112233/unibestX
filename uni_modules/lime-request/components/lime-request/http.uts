@@ -1,0 +1,18 @@
+import { Request, getRequestFail, type LimeRequestConfig, type LimeRequestFail, type LimeRequestResponse } from '@/uni_modules/lime-request'
+
+
+export const request = new Request({
+	baseURL: 'https://m1.apifoxmock.com/m1/7151265-6875205-default',
+	// baseURL: 'https://sggs.kingwn.com/upgrade/upgrade/checkVersion',
+} as LimeRequestConfig)
+
+export type User = {
+	id : string
+	username : string
+	email : string
+	phone : string
+	avatar : string
+	nickname : string
+	gender : string
+	birthday : string
+}
