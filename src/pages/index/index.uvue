@@ -1,21 +1,46 @@
 <template>
-		<view>
-			<image class="w-100px h-100px mx-auto mt-40px rounded-20px" src="/static/logo.png"></image>
-			<text class="text-32px text-bold mx-auto mt-10px text-[#d14328]" >unibestX</text>
-			<text class="text-center text-25px mt-10px"> 最好用的 uni-appX 开发模板 </text>
-			<text class="mt-10px m-auto px-30px text-justify text-16px text-bold">　　unibestX 是一个集成了多种工具和技术的 uni-appX 开发模板，由 uni-appX +
-				Vue3 + Ts + + UnoCss + VSCode 构建，模板具有代码提示、自动格式化、统一配置、代码片段等功能，并内置了许多常用的基本组件和基本功能，让你编写 uni-appX 拥有 best
-				体验。</text>
-		</view>
+  <view>
+    <image
+      class="w-100px h-100px mx-auto mt-40px rounded-20px"
+      src="/static/logo.png"
+    />
+    <text class="text-32px text-bold mx-auto mt-10px text-[#d14328]">
+      unibestX
+    </text>
+    <text class="text-center text-25px mt-10px">
+      最好用的 uni-appX 开发模板
+    </text>
+    <text class="mt-10px m-auto px-30px text-justify text-16px text-bold">
+      　　unibestX 是一个集成了多种工具 and 技术的 uni-appX 开发模板，由
+      uni-appX + Vue3 + Ts + + UnoCss + VSCode
+      构建，模板具有代码提示、自动格式化、统一配置、代码片段等功能，并内置了许多常用的基本组件和基本功能，让你编写
+      uni-appX 拥有 best 体验。
+    </text>
+
+    <view class="flex flex-row justify-between mt-30px px-30px">
+      <up-button type="success" @click="handleSuccessToast">
+        成功提示
+      </up-button>
+      <up-button type="error" @click="handleErrorToast">
+错误提示
+</up-button>
+    </view>
+  </view>
 </template>
 
 <script setup lang="uts">
 import { syncCurIdxByCurrentPage } from '../../tabbar/store'
+import { toastError, toastSuccess } from '@/src/utils/toast'
 
 onShow(() => {
-	syncCurIdxByCurrentPage()
+  syncCurIdxByCurrentPage()
 })
-</script>
 
-<style lang="scss">
-</style>
+function handleSuccessToast() {
+  toastSuccess('操作成功！')
+}
+
+function handleErrorToast() {
+  toastError('发生错误，请重试')
+}
+</script>

@@ -4,17 +4,12 @@
 		<view style="background-color: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0; align-items: center;">
 			<text style="font-size: 12px; color: #94a3b8; margin-bottom: 8px;">{{ $t('about.themePreview') }}</text>
 			
-			<!-- 动态按钮演示 -->
-			<button :style="{ backgroundColor: appStore.state.theme, color: '#ffffff', borderRadius: '8px', padding: '6px 20px', fontSize: '14px', border: 'none' }">
-				{{ $t('about.themeButton') }}
-			</button>
-
 			<!-- 主题色按钮 -->
 			<button class="mt-10px mx-auto w-200px h-44px rounded-8px text-white text-14px !bg-primary">
-				主题色按钮
+					uni：{{ $t('about.themeButton') }}
 			</button>
 			<up-button type="primary" class="mt-10px">
-				月落
+					uview-ultra： {{ $t('about.themeButton') }}
 			</up-button>
 		</view>
 

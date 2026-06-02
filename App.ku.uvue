@@ -4,6 +4,7 @@
 			<slot></slot>
 		</scroll-view>
 		<Tabbar v-if="isCurrentPageTabbar" />
+		<up-toast ref="uToastRef" />
 	</view>
 </template>
 
@@ -11,11 +12,13 @@
 	import Tabbar from '@/src/tabbar/index.uvue'
 	import { useAppStore } from '@/src/store'
 	import { isPageTabbar } from '@/src/tabbar/store'
+	import { registerToast, unregisterToast } from '@/src/utils/toast'
+	import { ref, onMounted, onUnmounted, ComponentPublicInstance } from 'vue'
 
 	const appStore = useAppStore()
-	const bgColor = '#f7fafc'
 
 	const isCurrentPageTabbar = ref(false)
+	const uToastRef = ref<ComponentPublicInstance | null>(null)
 
 	onShow(() => {
 		const pages = getCurrentPages()
@@ -25,6 +28,18 @@
 				const path = route.startsWith('/') ? route : `/${route}`
 				isCurrentPageTabbar.value = isPageTabbar(path)
 			}
+		}
+	})
+
+	onMounted(() => {
+		if (uToastRef.value != null) {
+			registerToast(uToastRef.value!)
+		}
+	})
+
+	onUnmounted(() => {
+		if (uToastRef.value != null) {
+			unregisterToast(uToastRef.value!)
 		}
 	})
 </script>

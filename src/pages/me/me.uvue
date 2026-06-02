@@ -6,7 +6,7 @@
         <text class="text-20px font-bold text-[#1e293b] mb-4px">
           {{ userStore.state.userInfo.username != '' ? userStore.state.userInfo.username : '未登录用户' }}
         </text>
-        <text class="text-14px text-[#64748b] mb-12px" v-if="userStore.state.userInfo.username != ''">
+        <text v-if="userStore.state.userInfo.username != ''" class="text-14px text-[#64748b] mb-12px">
           {{ userStore.state.userInfo.nickname }}
         </text>
         <view class="flex flex-row">
@@ -31,7 +31,7 @@
         <button v-if="tokenStore.hasValidLogin()" class="w-full h-48px rounded-8px bg-[#ef4444] text-[#ffffff]" @click="handleLogout">
           退出登录
         </button>
-        <button v-else class="w-full h-48px rounded-8px bg-[#3b82f6] text-[#ffffff]"  @click="handleLogin">
+        <button v-else class="w-full h-48px rounded-8px bg-[#3b82f6] text-[#ffffff]" @click="handleLogin">
           登录
         </button>
       </view>
@@ -39,16 +39,15 @@
 </template>
 
 <script setup lang="uts">
-import Layout from '../../layouts/layout.uvue'
 import { syncCurIdxByCurrentPage } from '../../tabbar/store'
-import { useUserStore, useTokenStore } from '../../store'
+import { useTokenStore, useUserStore } from '../../store'
 import { LOGIN_PAGE } from '../../router/config'
 
 const userStore = useUserStore()
 const tokenStore = useTokenStore()
 
 // 计算头像
-const avatarUrl = computed(() : string => {
+const avatarUrl = computed((): string => {
   if (userStore.state.userInfo.avatar != '') {
     return userStore.state.userInfo.avatar
   }
@@ -56,27 +55,27 @@ const avatarUrl = computed(() : string => {
 })
 
 // 序列化用户信息为 JSON
-const userInfoJson = computed(() : string => {
+const userInfoJson = computed((): string => {
   const info = {
-    "userId": userStore.state.userInfo.userId,
-    "username": userStore.state.userInfo.username,
-    "nickname": userStore.state.userInfo.nickname,
-    "avatar": userStore.state.userInfo.avatar
+    userId: userStore.state.userInfo.userId,
+    username: userStore.state.userInfo.username,
+    nickname: userStore.state.userInfo.nickname,
+    avatar: userStore.state.userInfo.avatar,
   }
   return JSON.stringify(info, null, 2)
 })
 
 onShow(() => {
   syncCurIdxByCurrentPage()
-  console.log("All storage keys:", uni.getStorageInfoSync().keys)
-  console.log("pinia:token:", uni.getStorageSync("pinia:token"))
-  console.log("pinia:user:", uni.getStorageSync("pinia:user"))
+  console.log('All storage keys:', uni.getStorageInfoSync().keys)
+  console.log('pinia:token:', uni.getStorageSync('pinia:token'))
+  console.log('pinia:user:', uni.getStorageSync('pinia:user'))
 })
 
 // 登录
 function handleLogin() {
   uni.navigateTo({
-    url: LOGIN_PAGE
+    url: LOGIN_PAGE,
   })
 }
 
@@ -91,14 +90,14 @@ function handleLogout() {
         userStore.clearUserInfo()
         uni.showToast({
           title: '退出登录成功',
-          icon: 'success'
+          icon: 'success',
         })
         // 退出后跳回首页（me 页需要登录，不能停留）
         setTimeout(() => {
           uni.switchTab({ url: '/src/pages/index/index' })
         }, 0)
       }
-    }
+    },
   })
 }
 </script>
