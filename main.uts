@@ -12,7 +12,17 @@ export function createApp() {
 	
 	app.use(i18n)
 	
-	app.use(ultraUI)
+	app.use(ultraUI, () => {
+		return {
+			options: {
+				// 修改config对象的属性
+				config: {
+					// 只加载一次字体图标
+					loadFontOnce: true
+				}
+			}
+		}
+	})
 	return {
 		app
 	}

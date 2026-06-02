@@ -1,6 +1,7 @@
 <script setup lang="uts">
 	import { navigateToInterceptor } from './src/router/interceptor'
 	import { useAppStore } from './src/store'
+	import { loadFont } from '@/uni_modules/uview-ultra/index.uts'
 
 	// #ifdef APP-ANDROID || APP-HARMONY
 	let firstBackTime = 0
@@ -8,6 +9,7 @@
 
 	onLaunch(() => {
 		console.log('App Launch')
+		loadFont()
 		useAppStore()
 	})
 
