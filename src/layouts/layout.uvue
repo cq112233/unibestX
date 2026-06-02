@@ -1,18 +1,10 @@
 <template>
-	<view class="flex-1 flex-col h-full" :style="{ backgroundColor: bgColor, '--theme-color': appStore.state.theme }">
-		<scroll-view scroll-y="true" class="flex-1">
-			<slot></slot>
-		</scroll-view>
-		<Tabbar v-if="showTabbar" />
+	<view>
+		<slot></slot>
 	</view>
 </template>
 
 <script setup lang="uts">
-	import Tabbar from '../tabbar/index.uvue'
-	import { useAppStore } from '@/src/store'
-
-	const appStore = useAppStore()
-
 	defineProps({
 		bgColor: {
 			type: String,
@@ -27,3 +19,4 @@
 
 <style>
 </style>
+

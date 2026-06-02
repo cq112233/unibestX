@@ -59,3 +59,16 @@ export function syncCurIdxByCurrentPage() {
     }
   }
 }
+
+/** 判断是否是 tabbar 页面 */
+export function isPageTabbar(path : string) : boolean {
+  const cleanPath = path.startsWith('/') ? path : `/${path}`
+  for (let i = 0; i < tabbarList.length; i++) {
+    const tabPath = tabbarList[i].pagePath.startsWith('/') ? tabbarList[i].pagePath : `/${tabbarList[i].pagePath}`
+    if (tabPath === cleanPath || tabPath.endsWith(cleanPath)) {
+      return true
+    }
+  }
+  return false
+}
+

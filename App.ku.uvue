@@ -1,0 +1,33 @@
+<template>
+	<view class="h-full flex-col flex" :style="{ '--theme-color': appStore.state.theme }">
+		<scroll-view scroll-y="true" class="flex-1">
+			<slot></slot>
+		</scroll-view>
+		<Tabbar v-if="isCurrentPageTabbar" />
+	</view>
+</template>
+
+<script setup lang="uts">
+	import Tabbar from '@/src/tabbar/index.uvue'
+	import { useAppStore } from '@/src/store'
+	import { isPageTabbar } from '@/src/tabbar/store'
+
+	const appStore = useAppStore()
+	const bgColor = '#f7fafc'
+
+	const isCurrentPageTabbar = ref(false)
+
+	onShow(() => {
+		const pages = getCurrentPages()
+		if (pages.length > 0) {
+			const route = pages[pages.length - 1].route
+			if (route != null && route.length > 0) {
+				const path = route.startsWith('/') ? route : `/${route}`
+				isCurrentPageTabbar.value = isPageTabbar(path)
+			}
+		}
+	})
+</script>
+
+<style>
+</style>

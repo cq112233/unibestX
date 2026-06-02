@@ -1,5 +1,4 @@
 <template>
-	<layout show-tabbar>
 		<!-- 使用封装的图标示例组件 -->
 		<IconDemoCard />
 
@@ -11,17 +10,14 @@
 
 		<!-- 使用路由拦截与传参演示组件 -->
 		<RouterDemoCard />
-	</layout>
 </template>
 
 <script setup lang="uts">
-	import Layout from '../../layouts/layout.uvue'
 	import IconDemoCard from './components/IconDemoCard.uvue'
 	import LangSwitchCard from './components/LangSwitchCard.uvue'
 	import ThemeSwitchCard from './components/ThemeSwitchCard.uvue'
 	import RouterDemoCard from './components/RouterDemoCard.uvue'
 	import { syncCurIdxByCurrentPage } from '../../tabbar/store'
-
 	onShow(() => {
 		syncCurIdxByCurrentPage()
 	})

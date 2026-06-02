@@ -2,6 +2,7 @@
 import { defineConfig } from "vite";
 import uni from "@dcloudio/vite-plugin-uni";
 import { unovite } from "./js_sdk/a-hua-unocss";
+import autoRootPlugin from "./plugins/root-plugin";
 
 export default defineConfig({
   define: {
@@ -12,6 +13,7 @@ export default defineConfig({
     port: 9001,
   },
   plugins: [
+    autoRootPlugin(), // 你的根组件
     uni(),
     unovite({
       rules: [

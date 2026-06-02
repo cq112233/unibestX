@@ -1,5 +1,5 @@
 import { useTokenStore } from '../store/token'
-import { tabbarList } from '../tabbar/store'
+import { tabbarList, isPageTabbar } from '../tabbar/store'
 import { EXCLUDE_LOGIN_PATH_LIST, isNeedLoginMode, LOGIN_PAGE } from './config'
 
 /**
@@ -42,20 +42,7 @@ export function parseUrlToObj(url : string) : UrlObj {
   return { path, query } as UrlObj
 }
 
-/**
- * 判断指定路径是否为底部 tabbar 页面
- */
-export function isPageTabbar(path : string) : boolean {
-  const cleanPath = path.startsWith('/') ? path : `/${path}`
-  for (let i = 0; i < tabbarList.length; i++) {
-    const item = tabbarList[i]
-    const tabPath = item.pagePath.startsWith('/') ? item.pagePath : `/${item.pagePath}`
-    if (tabPath === cleanPath) {
-      return true
-    }
-  }
-  return false
-}
+
 
 /**
  * 判断路径是否符合排除登录校验名单 (EXCLUDE_LOGIN_PATH_LIST)
