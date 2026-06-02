@@ -4,24 +4,34 @@ import { useTokenStore } from '../store/token'
 import { toLoginPage } from '../utils/toLoginPage'
 import { ContentTypeEnum, ResultEnum, ShowMessage } from './tools/enum'
 
+// ==========================================
+// 域名配置
+// ==========================================
+
 // #ifdef H5
-const defaultUrl = (import.meta.env.VITE_SERVER_BASEURL != null) ? import.meta.env.VITE_SERVER_BASEURL : 'https://ukw0y1.laf.run'
-const secondaryUrl = (import.meta.env.VITE_SERVER_BASEURL_SECONDARY != null) ? import.meta.env.VITE_SERVER_BASEURL_SECONDARY : 'https://ukw0y1.laf.run'
+// H5 环境下从 Vite 环境变量读取，模板字符串确保为 string 类型
+const defaultUrl : string = `${import.meta.env.VITE_SERVER_BASEURL ?? 'https://ukw0y1.laf.run'}`
+const secondaryUrl : string = `${import.meta.env.VITE_SERVER_BASEURL_SECONDARY ?? 'https://ukw0y1.laf.run'}`
 // #endif
 // #ifndef H5
-const defaultUrl = 'https://ukw0y1.laf.run'
-const secondaryUrl = 'https://ukw0y1.laf.run'
+// 非 H5 环境直接硬编码（编译期不存在 import.meta.env）
+const defaultUrl : string = 'https://ukw0y1.laf.run'
+const secondaryUrl : string = 'https://ukw0y1.laf.run'
 // #endif
 
-// 配置动态域名
-export const API_DOMAINS = {
+type ApiDomainConfig = {
+  DEFAULT: string;
+  SECONDARY: string;
+}
+
+export const API_DOMAINS : ApiDomainConfig = {
   DEFAULT: defaultUrl,
   SECONDARY: secondaryUrl,
 }
 
-/**
- * 创建底层的 lime-request 请求实例
- */
+// ==========================================
+// 创建底层 lime-request 实例
+// ==========================================
 const requestInstance = new Request({
   baseURL: API_DOMAINS.DEFAULT,
   timeout: 5000,
@@ -32,40 +42,44 @@ const requestInstance = new Request({
 } as LimeRequestConfig)
 
 // ==========================================
-// 1. 请求拦截器 (Request Interceptor)
+// 1. 请求拦截器
 // ==========================================
 requestInstance.interceptors.request.use(
   (config : LimeRequestConfig) : LimeRequestConfig => {
-    // 确保 header 被初始化
-    if (config.header == null) {
+    if (config.header === null) {
       config.header = {} as UTSJSONObject
     }
-    
-    // 设置默认请求头
-    if (config.header!['Content-Type'] == null) {
-      config.header!['Content-Type'] = ContentTypeEnum.AppJson
+    const header = config.header as UTSJSONObject
+    if (header.getString('Content-Type') === null) {
+      header['Content-Type'] = ContentTypeEnum.AppJson
     }
-    if (config.header!['Accept'] == null) {
-      config.header!['Accept'] = 'application/json, text/plain, */*'
+    if (header.getString('Accept') === null) {
+      header['Accept'] = 'application/json, text/plain, */*'
     }
 
     const extra = config.extra
-    // 处理认证信息：默认需要 token 认证，除非在 extra 里显式配置了 ignoreAuth = true
-    const ignoreAuth = (extra != null && extra['ignoreAuth'] != null) ? (extra['ignoreAuth'] as boolean) : false
-    if (!ignoreAuth) {
-      const tokenStore = useTokenStore()
-      const token = tokenStore.getToken()
-      if (token == '') {
-        throw new Error('[请求错误]：未登录')
-      } else {
-        // 自行处理认证 token 的头部字段名，这里设为 'token'，以匹配 unibest 规范
-        config.header!['token'] = token
+    let ignoreAuth = false
+    if (extra !== null) {
+      const authVal = (extra as UTSJSONObject).getBoolean('ignoreAuth')
+      if (authVal === true) {
+        ignoreAuth = true
       }
     }
 
-    // 处理动态域名
-    if (extra != null && extra['domain'] != null) {
-      config.baseURL = extra['domain'] as string
+    if (!ignoreAuth) {
+      const tokenStore = useTokenStore()
+      const token = tokenStore.getToken()
+      if (token === '') {
+        throw new Error('[请求错误]：未登录')
+      }
+      header['token'] = token
+    }
+
+    if (extra !== null) {
+      const domain = (extra as UTSJSONObject).getString('domain')
+      if (domain !== null) {
+        config.baseURL = domain
+      }
     }
 
     return config
@@ -76,7 +90,7 @@ requestInstance.interceptors.request.use(
 )
 
 // ==========================================
-// 2. 响应拦截器 (Response Interceptor)
+// 2. 响应拦截器
 // ==========================================
 requestInstance.interceptors.response.use(
   (response : LimeRequestResponse<any>) : LimeRequestResponse<any> => {
@@ -84,59 +98,55 @@ requestInstance.interceptors.response.use(
     const extra = config.extra
     const method = config.method
 
-    // 如果是上传或下载，直接返回响应
     if (method === 'UPLOAD' || method === 'DOWNLOAD') {
       return response
     }
 
     const statusCode = response.statusCode
-    // 处理 HTTP 状态码错误
     if (statusCode !== 200) {
-      const errorMessage = ShowMessage(statusCode) || `HTTP请求错误[${statusCode}]`
+      const errorMessage = ShowMessage(statusCode)
       console.error('errorMessage===>', errorMessage)
-      uni.showToast({
-        title: errorMessage,
-        icon: 'error',
-      })
-
-      // 如果是 401 未授权错误，清空 token 并跳转登录页
+      uni.showToast({ title: errorMessage, icon: 'error' })
       if (statusCode === 401) {
         const tokenStore = useTokenStore()
         tokenStore.clearToken()
         toLoginPage({ mode: 'reLaunch' } as UTSJSONObject)
       }
-
       throw new Error(`${errorMessage}：${response.errMsg}`)
     }
 
-    // 处理业务逻辑错误
     const rawData = response.data
-    if (rawData == null) {
+    if (rawData === null) {
       throw new Error('返回的响应数据为空')
     }
 
     const resultObj = JSON.parseObject(JSON.stringify(rawData))
-    if (resultObj != null) {
+    if (resultObj !== null) {
       const code = resultObj.getNumber('code')
-      const message = resultObj.getString('message') ?? resultObj.getString('msg') ?? '未知错误'
+      const msgByKey = resultObj.getString('message')
+      const msgByMsg = resultObj.getString('msg')
+      const message : string = msgByKey !== null ? msgByKey : (msgByMsg !== null ? msgByMsg : '未知错误')
 
-      if (code != null && code !== ResultEnum.Success0 && code !== ResultEnum.Success200) {
-        const toastEnabled = (extra == null || extra['toast'] == null || extra['toast'] as boolean !== false)
-        if (toastEnabled) {
-          uni.showToast({
-            title: message,
-            icon: 'none',
-          })
+      if (code !== null) {
+        const codeVal = code as number
+        if (codeVal !== ResultEnum.Success0 && codeVal !== ResultEnum.Success200) {
+          let toastEnabled = true
+          if (extra !== null) {
+            const toastVal = (extra as UTSJSONObject).getBoolean('toast')
+            if (toastVal === false) {
+              toastEnabled = false
+            }
+          }
+          if (toastEnabled) {
+            uni.showToast({ title: message, icon: 'none' })
+          }
+          if (codeVal === ResultEnum.Unauthorized) {
+            const tokenStore = useTokenStore()
+            tokenStore.clearToken()
+            toLoginPage({ mode: 'reLaunch' } as UTSJSONObject)
+          }
+          throw new Error(`请求错误[${codeVal}]：${message}`)
         }
-
-        // 如果是 401 业务授权码失效，清空 token 并跳转登录页
-        if (code === ResultEnum.Unauthorized || code === 401) {
-          const tokenStore = useTokenStore()
-          tokenStore.clearToken()
-          toLoginPage({ mode: 'reLaunch' } as UTSJSONObject)
-        }
-
-        throw new Error(`请求错误[${code}]：${message}`)
       }
     }
 
@@ -144,73 +154,79 @@ requestInstance.interceptors.response.use(
   },
   (error : LimeRequestFail) : Promise<LimeRequestFail> => {
     console.error('request error ===>', error)
-    uni.showToast({
-      title: '网络错误，请稍后再试',
-      icon: 'none',
-    })
+    uni.showToast({ title: '网络错误，请稍后再试', icon: 'none' })
     return Promise.reject(error) as Promise<LimeRequestFail>
   }
 )
 
 // ==========================================
-// 3. 封装通用的 http 对象
+// 3. 封装 http 类（class 支持泛型方法 + this + 默认参数）
+//    Android 端泛型方法需要 inline + reified 注解
 // ==========================================
-export const http = {
-  /**
-   * 核心请求方法，返回 unwrapped 业务数据 T
-   */
+export class HttpClient {
+  // #ifdef APP-ANDROID
+  @UTSAndroid.keyword("inline")
+  @UTSAndroid.keyword("reified")
+  // #endif
   request<T>(config : LimeRequestConfig) : Promise<T> {
     return requestInstance.request<any>(config).then((res : LimeRequestResponse<any>) : T => {
       const rawData = res.data
-      if (rawData != null) {
-        const obj = JSON.parseObject(JSON.stringify(rawData))
-        // 如果返回体是标准的 IResponse 并包含 data 字段，解包返回
-        if (obj != null && obj.get('code') != null) {
+      if (rawData === null) {
+        return null as T
+      }
+      const obj = JSON.parseObject(JSON.stringify(rawData))
+      if (obj !== null) {
+        const code = obj.getNumber('code')
+        if (code !== null) {
           const innerData = obj.get('data')
-          if (innerData != null) {
+          if (innerData !== null) {
             return innerData as T
           }
         }
       }
       return rawData as T
     })
-  },
+  }
 
-  /**
-   * GET 请求
-   */
+  // #ifdef APP-ANDROID
+  @UTSAndroid.keyword("inline")
+  @UTSAndroid.keyword("reified")
+  // #endif
   get<T>(url : string, config : LimeRequestConfig | null = null) : Promise<T> {
     const _config = (config ?? {}) as LimeRequestConfig
     _config.url = url
     _config.method = 'GET'
     return this.request<T>(_config)
-  },
+  }
 
-  /**
-   * POST 请求
-   */
+  // #ifdef APP-ANDROID
+  @UTSAndroid.keyword("inline")
+  @UTSAndroid.keyword("reified")
+  // #endif
   post<T>(url : string, data : any | null = null, config : LimeRequestConfig | null = null) : Promise<T> {
     const _config = (config ?? {}) as LimeRequestConfig
     _config.url = url
     _config.data = data
     _config.method = 'POST'
     return this.request<T>(_config)
-  },
+  }
 
-  /**
-   * PUT 请求
-   */
+  // #ifdef APP-ANDROID
+  @UTSAndroid.keyword("inline")
+  @UTSAndroid.keyword("reified")
+  // #endif
   put<T>(url : string, data : any | null = null, config : LimeRequestConfig | null = null) : Promise<T> {
     const _config = (config ?? {}) as LimeRequestConfig
     _config.url = url
     _config.data = data
     _config.method = 'PUT'
     return this.request<T>(_config)
-  },
+  }
 
-  /**
-   * DELETE 请求
-   */
+  // #ifdef APP-ANDROID
+  @UTSAndroid.keyword("inline")
+  @UTSAndroid.keyword("reified")
+  // #endif
   delete<T>(url : string, data : any | null = null, config : LimeRequestConfig | null = null) : Promise<T> {
     const _config = (config ?? {}) as LimeRequestConfig
     _config.url = url
@@ -220,4 +236,5 @@ export const http = {
   }
 }
 
+export const http = new HttpClient()
 export default http
