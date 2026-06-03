@@ -1,0 +1,73 @@
+<template>
+  <Card title="系统与安全区域信息">
+    <!-- 预览区域：安全区域 Insets -->
+    <view style="background-color: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0;">
+      <text style="font-size: 13px; font-weight: bold; color: #1e293b; margin-bottom: 12px;">安全区域内边距 (SafeAreaInsets)</text>
+
+      <view style="flex-direction: row; justify-content: space-between; margin-bottom: 8px;">
+        <text style="font-size: 14px; color: #64748b;">Top (顶部距离)</text>
+        <text style="font-size: 14px; font-weight: bold; color: #334155;">{{ safeAreaTop }}</text>
+      </view>
+      <view style="flex-direction: row; justify-content: space-between; margin-bottom: 8px;">
+        <text style="font-size: 14px; color: #64748b;">Bottom (底部距离)</text>
+        <text style="font-size: 14px; font-weight: bold; color: #334155;">{{ safeAreaBottom }}</text>
+      </view>
+      <view style="flex-direction: row; justify-content: space-between; margin-bottom: 8px;">
+        <text style="font-size: 14px; color: #64748b;">Left (左侧距离)</text>
+        <text style="font-size: 14px; font-weight: bold; color: #334155;">{{ safeAreaLeft }}</text>
+      </view>
+      <view style="flex-direction: row; justify-content: space-between;">
+        <text style="font-size: 14px; color: #64748b;">Right (右侧距离)</text>
+        <text style="font-size: 14px; font-weight: bold; color: #334155;">{{ safeAreaRight }}</text>
+      </view>
+    </view>
+
+    <!-- 预览区域：系统窗口信息 -->
+    <view style="background-color: #f8fafc; border-radius: 12px; padding: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0;">
+      <text style="font-size: 13px; font-weight: bold; color: #1e293b; margin-bottom: 12px;">设备窗口规格 (WindowInfo)</text>
+
+      <view style="flex-direction: row; justify-content: space-between; margin-bottom: 8px;">
+        <text style="font-size: 14px; color: #64748b;">屏幕宽度</text>
+        <text style="font-size: 14px; font-weight: bold; color: #334155;">{{ screenWidth }} px</text>
+      </view>
+      <view style="flex-direction: row; justify-content: space-between; margin-bottom: 8px;">
+        <text style="font-size: 14px; color: #64748b;">屏幕高度</text>
+        <text style="font-size: 14px; font-weight: bold; color: #334155;">{{ screenHeight }} px</text>
+      </view>
+      <view style="flex-direction: row; justify-content: space-between; margin-bottom: 8px;">
+        <text style="font-size: 14px; color: #64748b;">可用窗口宽度</text>
+        <text style="font-size: 14px; font-weight: bold; color: #334155;">{{ windowWidth }} px</text>
+      </view>
+      <view style="flex-direction: row; justify-content: space-between; margin-bottom: 8px;">
+        <text style="font-size: 14px; color: #64748b;">可用窗口高度</text>
+        <text style="font-size: 14px; font-weight: bold; color: #334155;">{{ windowHeight }} px</text>
+      </view>
+      <view style="flex-direction: row; justify-content: space-between; margin-bottom: 8px;">
+        <text style="font-size: 14px; color: #64748b;">状态栏高度 (statusBarHeight)</text>
+        <text style="font-size: 14px; font-weight: bold; color: #334155;">{{ statusBarHeight }} px</text>
+      </view>
+      <view style="flex-direction: row; justify-content: space-between;">
+        <text style="font-size: 14px; color: #64748b;">设备像素比 (pixelRatio)</text>
+        <text style="font-size: 14px; font-weight: bold; color: #334155;">{{ pixelRatio }}</text>
+      </view>
+    </view>
+  </Card>
+</template>
+
+<script setup lang="uts">
+import Card from './Card.uvue'
+import { safeAreaInsets, systemInfo } from '@/src/utils/systemInfo'
+import { computed } from 'vue'
+
+const screenWidth = computed((): number => systemInfo.value?.screenWidth ?? 0)
+const screenHeight = computed((): number => systemInfo.value?.screenHeight ?? 0)
+const windowWidth = computed((): number => systemInfo.value?.windowWidth ?? 0)
+const windowHeight = computed((): number => systemInfo.value?.windowHeight ?? 0)
+const statusBarHeight = computed((): number => systemInfo.value?.statusBarHeight ?? 0)
+const pixelRatio = computed((): number => systemInfo.value?.pixelRatio ?? 1)
+
+const safeAreaTop = computed((): string => safeAreaInsets.value != null ? `${safeAreaInsets.value!.top}px` : 'N/A')
+const safeAreaBottom = computed((): string => safeAreaInsets.value != null ? `${safeAreaInsets.value!.bottom}px` : 'N/A')
+const safeAreaLeft = computed((): string => safeAreaInsets.value != null ? `${safeAreaInsets.value!.left}px` : 'N/A')
+const safeAreaRight = computed((): string => safeAreaInsets.value != null ? `${safeAreaInsets.value!.right}px` : 'N/A')
+</script>

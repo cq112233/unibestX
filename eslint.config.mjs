@@ -22,6 +22,7 @@ const composer = uniHelper({
   ],
   // https://eslint-config.antfu.me/rules
   rules: {
+    'vue/html-self-closing': 'off',
     'no-useless-return': 'off',
     'no-console': 'off',
     'no-unused-vars': 'off',

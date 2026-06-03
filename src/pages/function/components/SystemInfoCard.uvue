@@ -1,0 +1,52 @@
+<template>
+  <Card :title="$t('function.sysInfoTitle')">
+    <view style="background-color: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0;">
+      <view style="flex-direction: row; justify-content: space-between; margin-bottom: 10px;">
+        <text style="font-size: 14px; color: #718096;">{{ $t('function.brand') }}</text>
+        <text style="font-size: 14px; font-weight: bold; color: #2d3748;">{{ sysBrand !== '' ? sysBrand : $t('function.noData') }}</text>
+      </view>
+      <view style="flex-direction: row; justify-content: space-between; margin-bottom: 10px;">
+        <text style="font-size: 14px; color: #718096;">{{ $t('function.model') }}</text>
+        <text style="font-size: 14px; font-weight: bold; color: #2d3748;">{{ sysModel !== '' ? sysModel : $t('function.noData') }}</text>
+      </view>
+      <view style="flex-direction: row; justify-content: space-between; margin-bottom: 10px;">
+        <text style="font-size: 14px; color: #718096;">{{ $t('function.system') }}</text>
+        <text style="font-size: 14px; font-weight: bold; color: #2d3748;">{{ sysSystem !== '' ? sysSystem : $t('function.noData') }}</text>
+      </view>
+      <view style="flex-direction: row; justify-content: space-between;">
+        <text style="font-size: 14px; color: #718096;">{{ $t('function.platform') }}</text>
+        <text style="font-size: 14px; font-weight: bold; color: #2d3748;">{{ sysPlatform !== '' ? sysPlatform : $t('function.noData') }}</text>
+      </view>
+    </view>
+    <up-button type="primary" @click="fetchSystemInfo">
+      {{ $t('function.getSysInfoBtn') }}
+    </up-button>
+  </Card>
+</template>
+
+<script setup lang="uts">
+import Card from '../../basic/components/Card.uvue'
+import { onMounted, ref } from 'vue'
+
+const sysBrand = ref('')
+const sysModel = ref('')
+const sysSystem = ref('')
+const sysPlatform = ref('')
+
+function fetchSystemInfo() {
+  try {
+    const info = uni.getSystemInfoSync()
+    sysBrand.value = info.brand ?? ''
+    sysModel.value = info.model ?? ''
+    sysSystem.value = info.system ?? ''
+    sysPlatform.value = info.uniPlatform ?? ''
+  }
+  catch (err) {
+    console.error(err)
+  }
+}
+
+onMounted(() => {
+  fetchSystemInfo()
+})
+</script>

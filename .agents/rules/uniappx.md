@@ -72,3 +72,33 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
     只处理 `src/pages/` 下的页面 `.uvue` 文件，并且必须排除 layout、子组件（如 `/components/`）以及 `App.uvue`，防止重复或非法转换。建议在判断路径前将反斜杠 `\` 规范化为斜杠 `/` 以支持多端跨平台编译（如 Windows）。
 *   **保护 `<style>` 与其它辅助标签**：
     在自定义 `transform(code, id)` 插件时，不要直接用模板字面量覆盖整个代码内容。应通过正则替换 `<template>` 和 `<script>` 节点内部的代码，确保 `<style>` 标签内的公共和局部 CSS 代码不丢失。
+
+---
+
+## 6. UTS 核心语法与类型规范
+
+为了确保 UTS 代码在编译成 Kotlin (Android)、Swift (iOS) 等原生语言时不会报错，必须严格遵守以下语法与类型标准：
+
+*   **变量与类型声明 (Variables & Type Declarations)**：
+    *   UTS 不支持 `undefined`。变量必须被初始化（即使初始化为 `null`，例如 `let value: string | null = null`）。
+    *   除了 `string` 和 `boolean` 可以采用字面量自动推导外，**数字 (number) 和数组 (Array) 类型必须显式声明类型**，避免不同原生平台（如 Kotlin Int/Double 差异）下的推导歧义：
+        *   *正确做法*：`let count: number = 1`，`let list: Array<string> = ['a', 'b']`
+    *   UTS 的联合类型目前**仅支持与 `null` 的联合**（如 `string | null`）。不支持任意类型联合（如 `string | number`，此类情况需要声明为 `any`）。
+*   **方法与函数声明 (Functions)**：
+    *   所有函数参数必须显式声明类型，返回值也需要声明类型。若无返回值，必须声明为 `:void`：
+        *   *正确做法*：`function test(score: number): boolean { return score >= 60 }`
+*   **安全调用运算符 (Safe Calls)**：
+    *   对于声明为可空类型（如 `Type | null`）的变量，在调用其方法或属性时**必须使用安全调用运算符 `?.`**，否则编译器将报错：
+        *   *正确做法*：`const len = str?.length`
+*   **类型转换与断言 (Type Assertion)**：
+    *   在 Vue 选项式组件的 `data()` 定义中，或针对 `any` 类型的变量，建议使用 `as` 关键字进行显式类型转换：
+        *   *正确做法*：`const year = date.getFullYear() as number`
+*   **代码语句分割**：
+    *   多行书写时行尾分号 `;` 可省略。同行多条语句必须以分号分割。
+*   **对象字面量与接口限制 (Object Literals & Interfaces)**：
+    *   UTS 不允许将对象字面量直接赋值给 `interface` 定义的类型（会触发 `UTS110111163` 编译错误）。对于需要接收/赋值对象字面量的类型，必须使用 `type`（类型别名）进行定义。
+        *   *错误做法*：`interface Config { name: string }; const c: Config = { name: "UTS" }`
+        *   *正确做法*：`type Config = { name: string }; const c: Config = { name: "UTS" }`
+*   **模板自闭合标签限制 (Template Void Elements)**：
+    *   在 `.uvue` 模板中，像 `<input>` 等 HTML Void 元素必须显式地进行自闭合（如 `<input />`），否则 uni-app X 编译器会报 `Element is missing end tag` 错误。同时，可以在 ESLint 中配置或关闭相关的 html-self-closing 规则以避免 lint 冲突。
+

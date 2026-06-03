@@ -1,23 +1,26 @@
 <template>
-	<view>
-<!-- 使用封装的图标示例组件 -->
-		<IconDemoCard />
+  <view>
+    <!-- 系统与安全区域信息组件 -->
+    <SystemInfoDemoCard />
 
-		<!-- 使用封装的多语言切换组件 -->
-		<LangSwitchCard />
+    <!-- 使用封装的图标示例组件 -->
+    <IconDemoCard />
 
-		<!-- 使用封装的主题切换组件 -->
-		<ThemeSwitchCard />
+    <!-- 使用封装的多语言切换组件 -->
+    <LangSwitchCard />
 
-		<!-- 使用路由拦截与传参演示组件 -->
-		<RouterDemoCard />
+    <!-- 使用封装的主题切换组件 -->
+    <ThemeSwitchCard />
 
-		<!-- HTTP 请求 Demo 组件 -->
-		<HttpDemoCard />
+    <!-- 使用路由拦截与传参演示组件 -->
+    <RouterDemoCard />
 
-		<!-- ECharts 图表示例组件 -->
-		<EchartsDemoCard />
-</view>
+    <!-- HTTP 请求 Demo 组件 -->
+    <HttpDemoCard />
+
+    <!-- ECharts 图表示例组件 -->
+    <EchartsDemoCard />
+  </view>
 </template>
 
 <script setup lang="uts">
@@ -27,10 +30,16 @@ import ThemeSwitchCard from './components/ThemeSwitchCard.uvue'
 import RouterDemoCard from './components/RouterDemoCard.uvue'
 import HttpDemoCard from './components/HttpDemoCard.uvue'
 import EchartsDemoCard from './components/EchartsDemoCard.uvue'
+import SystemInfoDemoCard from './components/SystemInfoDemoCard.uvue'
 import { syncCurIdxByCurrentPage } from '@/src/tabbar/store'
+import { updateSystemInfo } from '@/src/utils/systemInfo'
 
 onShow(() => {
   syncCurIdxByCurrentPage()
+})
+
+onResize(() => {
+  updateSystemInfo()
 })
 </script>
 

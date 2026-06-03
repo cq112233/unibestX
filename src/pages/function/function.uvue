@@ -6,184 +6,31 @@
       <text style="font-size: 13px; color: #718096; margin-top: 4px;">演示 iOS/Android 原生设备 API 调用与状态读取</text>
     </view>
 
-    <!-- 设备系统信息 Card -->
-    <Card :title="$t('function.sysInfoTitle')">
-      <view style="background-color: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0;">
-        <view style="flex-direction: row; justify-content: space-between; margin-bottom: 10px;">
-          <text style="font-size: 14px; color: #718096;">{{ $t('function.brand') }}</text>
-          <text style="font-size: 14px; font-weight: bold; color: #2d3748;">{{ sysBrand !== '' ? sysBrand : $t('function.noData') }}</text>
-        </view>
-        <view style="flex-direction: row; justify-content: space-between; margin-bottom: 10px;">
-          <text style="font-size: 14px; color: #718096;">{{ $t('function.model') }}</text>
-          <text style="font-size: 14px; font-weight: bold; color: #2d3748;">{{ sysModel !== '' ? sysModel : $t('function.noData') }}</text>
-        </view>
-        <view style="flex-direction: row; justify-content: space-between; margin-bottom: 10px;">
-          <text style="font-size: 14px; color: #718096;">{{ $t('function.system') }}</text>
-          <text style="font-size: 14px; font-weight: bold; color: #2d3748;">{{ sysSystem !== '' ? sysSystem : $t('function.noData') }}</text>
-        </view>
-        <view style="flex-direction: row; justify-content: space-between;">
-          <text style="font-size: 14px; color: #718096;">{{ $t('function.platform') }}</text>
-          <text style="font-size: 14px; font-weight: bold; color: #2d3748;">{{ sysPlatform !== '' ? sysPlatform : $t('function.noData') }}</text>
-        </view>
-      </view>
-      <up-button type="primary" @click="fetchSystemInfo">
-        {{ $t('function.getSysInfoBtn') }}
-      </up-button>
-    </Card>
+    <!-- 系统信息卡片 -->
+    <SystemInfoCard />
 
-    <!-- 触感与工具 Card -->
-    <Card :title="$t('function.hapticsTitle')">
-      <!-- 剪贴板测试 -->
-      <view style="background-color: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0;">
-        <text style="font-size: 12px; color: #94a3b8; margin-bottom: 8px;">剪贴板测试文本</text>
-        <input
-          v-model="copyText"
-          placeholder="请输入要复制的文本"
-          style="background-color: #ffffff; border-radius: 6px; padding: 8px 12px; border-width: 1px; border-style: solid; border-color: #cbd5e1; font-size: 14px; color: #334155; margin-bottom: 12px;"
-        >
-        <up-button type="success" size="small" @click="handleCopy">
-          {{ $t('function.copyBtn') }}
-        </up-button>
-      </view>
+    <!-- 触感与工具卡片 -->
+    <HapticsCard />
 
-      <!-- 短震动 -->
-      <up-button type="warning" @click="triggerVibration">
-        {{ $t('function.vibrateBtn') }}
-      </up-button>
-    </Card>
-
-    <!-- 相机与多媒体 Card -->
-    <Card :title="$t('function.mediaTitle')">
-      <view style="background-color: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0; align-items: center; justify-content: center;">
-        <text v-if="photoUrl === ''" style="font-size: 14px; color: #94a3b8;">未选择照片</text>
-        <image v-else :src="photoUrl" style="width: 150px; height: 150px; border-radius: 8px;" mode="aspectFill" />
-      </view>
-      <up-button type="primary" style="margin-bottom: 12px;" @click="chooseImage">
-        {{ $t('function.choosePhotoBtn') }}
-      </up-button>
-
-      <!-- 扫码测试 -->
-      <view style="background-color: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0;">
-        <text style="font-size: 12px; color: #94a3b8; margin-bottom: 8px;">{{ $t('function.scanResult') }}</text>
-        <text style="font-size: 14px; font-weight: bold; color: #334155;">{{ scanResult !== '' ? scanResult : $t('function.noData') }}</text>
-      </view>
-      <up-button type="success" @click="scanCode">
-        {{ $t('function.scanCodeBtn') }}
-      </up-button>
-    </Card>
+    <!-- 相机与多媒体卡片 -->
+    <MediaCard />
   </scroll-view>
 </template>
 
 <script setup lang="uts">
-import Card from '../basic/components/Card.uvue'
+import SystemInfoCard from './components/SystemInfoCard.uvue'
+import HapticsCard from './components/HapticsCard.uvue'
+import MediaCard from './components/MediaCard.uvue'
 import { syncCurIdxByCurrentPage } from '@/src/tabbar/store'
-import { t } from '@/src/utils/i18n'
-import { ref } from 'vue'
-
-// #ifdef APP-ANDROID
-/* eslint-disable */
-import Context from 'android.content.Context';
-import Vibrator from 'android.os.Vibrator';
-import Build from 'android.os.Build';
-import VibrationEffect from 'android.os.VibrationEffect';
-/* eslint-enable */
-// #endif
-
-const sysBrand = ref('')
-const sysModel = ref('')
-const sysSystem = ref('')
-const sysPlatform = ref('')
-
-const copyText = ref('Hello unibestX!')
-const photoUrl = ref('')
-const scanResult = ref('')
+import { updateSystemInfo } from '@/src/utils/systemInfo'
 
 onShow(() => {
   syncCurIdxByCurrentPage()
 })
 
-function fetchSystemInfo() {
-  try {
-    const info = uni.getSystemInfoSync()
-    sysBrand.value = info.brand ?? ''
-    sysModel.value = info.model ?? ''
-    sysSystem.value = info.system ?? ''
-    sysPlatform.value = info.uniPlatform ?? ''
-  }
-  catch (err) {
-    console.error(err)
-  }
-}
-
-function triggerVibration() {
-  // #ifdef APP-ANDROID
-  const context = UTSAndroid.getAppContext()
-  if (context != null) {
-    const vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-    if (Build.VERSION.SDK_INT >= 26) {
-      vibrator.vibrate(VibrationEffect.createOneShot(15, VibrationEffect.DEFAULT_AMPLITUDE))
-    }
-    else {
-      vibrator.vibrate(15)
-    }
-    uni.showToast({
-      title: t('function.vibrateSuccess'),
-      icon: 'none',
-    })
-  }
-  // #endif
-
-  // #ifndef APP-ANDROID
-  uni.vibrateShort({
-    success: () => {
-      uni.showToast({
-        title: t('function.vibrateSuccess'),
-        icon: 'none',
-      })
-    },
-  })
-  // #endif
-}
-
-function handleCopy() {
-  if (copyText.value === '')
-    return
-  uni.setClipboardData({
-    data: copyText.value,
-    success: () => {
-      uni.showToast({
-        title: t('function.copySuccess'),
-        icon: 'success',
-      })
-    },
-  })
-}
-
-function chooseImage() {
-  uni.chooseImage({
-    count: 1,
-    success: (res) => {
-      const paths = res.tempFilePaths
-      if (paths.length > 0) {
-        photoUrl.value = paths[0]
-      }
-    },
-    fail: (err) => {
-      console.error(err)
-    },
-  })
-}
-
-function scanCode() {
-  uni.scanCode({
-    success: (res) => {
-      scanResult.value = res.result
-    },
-    fail: (err) => {
-      console.error(err)
-    },
-  })
-}
+onResize(() => {
+  updateSystemInfo()
+})
 </script>
 
 <style>
