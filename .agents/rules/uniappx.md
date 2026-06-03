@@ -32,8 +32,14 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
     ```
 *   **按钮样式限制 (Button Layout Restrictions)**：
     在 App 原生平台下，系统底层的 `<button>` 元素是作为一个专门的文本对齐控件实现的。
-    *   **重要限制**：**禁止**在原生 `<button>` 元素上直接使用 `flex` 相关的对齐属性（如 `justify-content`, `align-items` 以及 UnoCSS 的 `justify-center`, `items-center`），否则会触发编译报错。
-    *   *解决办法*：如需自定义高度或带图标的按钮，建议用 `<view>` 作为外层容器并用 UnoCSS 排版，内层套一个透明度为 0 且带 `open-type` 等能力的 `<button>` 绝对定位覆盖其上，或者直接使用 UI 库提供的组件。
+    *   **重要限制**：**禁止**在原生 `<button>` 元素上直接使用 `flex` 相关的对齐属性（如 `justify-content`, `align-items` 以及 UnoCSS 的 `justify-center`, `items-center`），否则会触发编译报错：
+        > `style property justify-content|align-items is only supported on <view>|<scroll-view>|<list-view>|<list-item>|<flow-item>|<swiper-item>|<navigator>`
+    *   *解决办法*：移除 `<button>` 上的 `justify-content` 和 `align-items` 样式（文本对齐一般使用 `text-align`）。如需使用复杂的 Flex 布局或带图标的自定义按钮，建议使用 `<view>` 作为外层容器进行 Flex 排版，内层使用普通文本或其它元素，或使用 UI 库提供的组件。
+*   **文字颜色样式限制 (Color Property Restrictions)**：
+    在 App 原生平台下，`color` 属性仅支持在 `<text>`, `<button>`, `<input>`, `<textarea>` 元素上使用。
+    *   **重要限制**：**禁止**在 `<view>` 元素上直接使用 `color` 属性（包括在应用于 `<view>` 的 class 中定义 `color`），否则会触发编译报错：
+        > `style property color is only supported on <text>|<button>|<input>|<textarea>`
+    *   *解决办法*：将 `color` 属性移到子级的 `<text>` 元素上进行渲染控制，或者移除 `<view>` 标签上冗余/无效的 `color` 定义。
 *   **SCSS 变量的动态化覆盖**：
     在 `uni.scss` 中引入第三方组件库（如 `uview-ultra`）的 `theme.scss` 变量后，如需将某些编译期 SCSS 变量（如 `$up-primary`）转化为运行时的动态 CSS 变量，可在 `uni.scss` 引入之后重新赋值：
     ```scss
@@ -101,4 +107,9 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
         *   *正确做法*：`type Config = { name: string }; const c: Config = { name: "UTS" }`
 *   **模板自闭合标签限制 (Template Void Elements)**：
     *   在 `.uvue` 模板中，像 `<input>` 等 HTML Void 元素必须显式地进行自闭合（如 `<input />`），否则 uni-app X 编译器会报 `Element is missing end tag` 错误。同时，可以在 ESLint 中配置或关闭相关的 html-self-closing 规则以避免 lint 冲突。
+*   **等值比较限制 (Value Equality vs Identity Equality)**：
+    *   在 UTS 中，避免对数字 (`Number`/`Int`/`Double`) 或布尔值（如可空的 `Boolean?` 与 `Boolean`）使用身份全等运算符 `===`。
+    *   因为这在 Kotlin (Android) 原生端会编译为引用/身份比较，而隐式装箱（Implicit Boxing）会导致不同包装对象之间即使数值/状态相同，引用比较也返回 `false`。
+    *   *错误示例*：`if (statusCode === 401)`，`if (toastVal === false)`
+    *   *正确做法*：使用普通值相等运算符 `==` 或值不等运算符 `!=`（例如 `if (statusCode == 401)`，`if (toastVal == false)`）。
 

@@ -107,7 +107,7 @@ requestInstance.interceptors.response.use(
       const errorMessage = ShowMessage(statusCode)
       console.error('errorMessage===>', errorMessage)
       uni.showToast({ title: errorMessage, icon: 'error' })
-      if (statusCode === 401) {
+      if (statusCode == 401) {
         const tokenStore = useTokenStore()
         tokenStore.clearToken()
         toLoginPage({ mode: 'reLaunch' } as UTSJSONObject)
@@ -133,7 +133,7 @@ requestInstance.interceptors.response.use(
           let toastEnabled = true
           if (extra !== null) {
             const toastVal = (extra as UTSJSONObject).getBoolean('toast')
-            if (toastVal === false) {
+            if (toastVal == false) {
               toastEnabled = false
             }
           }

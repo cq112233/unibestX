@@ -15,10 +15,10 @@
 
 		<!-- 操作按钮区 -->
 		<view style="flex-direction: row; justify-content: space-between;">
-			<button style="flex: 1; background-color: #3182ce; color: #ffffff; border-radius: 8px; font-size: 14px; text-align: center; height: 42px; justify-content: center; align-items: center;" @click="jumpToTest">
+			<button style="flex: 1; background-color: #3182ce; color: #ffffff; border-radius: 8px; font-size: 14px; text-align: center; height: 42px;" @click="jumpToTest">
 				跳转 Test 页 (传参)
 			</button>
-			<button style="flex: 1; margin-left: 12px; background-color: #ef4444; color: #ffffff; border-radius: 8px; font-size: 14px; text-align: center; height: 42px; justify-content: center; align-items: center;" @click="handleLogout">
+			<button style="flex: 1; margin-left: 12px; background-color: #ef4444; color: #ffffff; border-radius: 8px; font-size: 14px; text-align: center; height: 42px;" @click="handleLogout">
 				清除登录状态
 			</button>
 		</view>
@@ -39,7 +39,7 @@ const hasLogin = computed((): boolean => {
 
 function jumpToTest() {
   uni.navigateTo({
-    url: '/src/pages/test/test?id=999&name=UNIX',
+    url: '/src/sub/test/test?id=999&name=UNIX',
   })
 }
 
