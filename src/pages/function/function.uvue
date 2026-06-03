@@ -21,16 +21,6 @@
 import SystemInfoCard from './components/SystemInfoCard.uvue'
 import HapticsCard from './components/HapticsCard.uvue'
 import MediaCard from './components/MediaCard.uvue'
-import { syncCurIdxByCurrentPage } from '@/src/tabbar/store'
-import { updateSystemInfo } from '@/src/utils/systemInfo'
-
-onShow(() => {
-  syncCurIdxByCurrentPage()
-})
-
-onResize(() => {
-  updateSystemInfo()
-})
 </script>
 
 <style>

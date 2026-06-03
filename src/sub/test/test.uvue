@@ -37,8 +37,9 @@ onLoad((options: UTSJSONObject | null) => {
 })
 
 function getOptionValue(key: string): string {
-  if (queryOptions.value != null) {
-    const val = queryOptions.value![key]
+  const options = queryOptions.value
+  if (options != null) {
+    const val = options.get(key)
     if (val != null) {
       return `${val}`
     }

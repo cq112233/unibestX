@@ -11,7 +11,7 @@
 <script setup lang="uts">
 import Tabbar from '@/src/tabbar/index.uvue'
 import { useAppStore } from '@/src/store'
-import { isPageTabbar } from '@/src/tabbar/store'
+import { isPageTabbar, syncCurIdxByCurrentPage } from '@/src/tabbar/store'
 import { registerToast, unregisterToast } from '@/src/utils/toast'
 import type { ComponentPublicInstance } from 'vue'
 import { onMounted, onUnmounted, ref } from 'vue'
@@ -27,7 +27,11 @@ onShow(() => {
     const route = pages[pages.length - 1].route
     if (route != null && route.length > 0) {
       const path = route.startsWith('/') ? route : `/${route}`
-      isCurrentPageTabbar.value = isPageTabbar(path)
+      const isTabbar = isPageTabbar(path)
+      isCurrentPageTabbar.value = isTabbar
+      if (isTabbar) {
+        syncCurIdxByCurrentPage()
+      }
     }
   }
   if (uToastRef.value != null) {
@@ -51,7 +55,7 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss">
-	.container {
+.container {
   display: flex;
   flex-direction: column;
   flex: 1;

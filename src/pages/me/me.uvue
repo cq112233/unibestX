@@ -39,7 +39,6 @@
 </template>
 
 <script setup lang="uts">
-import { syncCurIdxByCurrentPage } from '../../tabbar/store'
 import { useTokenStore, useUserStore } from '../../store'
 import { LOGIN_PAGE } from '../../router/config'
 
@@ -66,7 +65,6 @@ const userInfoJson = computed((): string => {
 })
 
 onShow(() => {
-  syncCurIdxByCurrentPage()
   console.log('All storage keys:', uni.getStorageInfoSync().keys)
   console.log('pinia:token:', uni.getStorageSync('pinia:token'))
   console.log('pinia:user:', uni.getStorageSync('pinia:user'))

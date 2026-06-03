@@ -31,12 +31,7 @@ import RouterDemoCard from './components/RouterDemoCard.uvue'
 import HttpDemoCard from './components/HttpDemoCard.uvue'
 import EchartsDemoCard from './components/EchartsDemoCard.uvue'
 import SystemInfoDemoCard from './components/SystemInfoDemoCard.uvue'
-import { syncCurIdxByCurrentPage } from '@/src/tabbar/store'
 import { updateSystemInfo } from '@/src/utils/systemInfo'
-
-onShow(() => {
-  syncCurIdxByCurrentPage()
-})
 
 onResize(() => {
   updateSystemInfo()

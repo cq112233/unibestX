@@ -26,12 +26,7 @@
 </template>
 
 <script setup lang="uts">
-import { syncCurIdxByCurrentPage } from '../../tabbar/store'
 import { toastError, toastSuccess } from '@/src/utils/toast'
-
-onShow(() => {
-  syncCurIdxByCurrentPage()
-})
 
 function handleSuccessToast() {
   toastSuccess('操作成功！')
