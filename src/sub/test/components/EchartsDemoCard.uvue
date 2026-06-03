@@ -1,0 +1,198 @@
+<template>
+  <Card :title="$t('about.echartTitle')">
+    <view style="width: 100%; height: 260px; margin-top: 10px;">
+      <e-chart ref="echartRef" style="width: 100%; height: 100%;" @ready="initEchart" />
+    </view>
+    <view style="flex-direction: row; justify-content: space-between; margin-top: 15px;">
+      <view style="flex: 1; margin-right: 8px;">
+        <up-button size="small" type="primary" :plain="currentType !== 'line'" @click="changeToLine">
+{{ $t('about.echartLine') }}
+</up-button>
+      </view>
+      <view style="flex: 1; margin-right: 8px;">
+        <up-button size="small" type="success" :plain="currentType !== 'bar'" @click="changeToBar">
+{{ $t('about.echartBar') }}
+</up-button>
+      </view>
+      <view style="flex: 1;">
+        <up-button size="small" type="warning" :plain="currentType !== 'pie'" @click="changeToPie">
+{{ $t('about.echartPie') }}
+</up-button>
+      </view>
+    </view>
+  </Card>
+</template>
+
+<script setup lang="uts">
+import Card from './Card.uvue'
+import { ref } from 'vue'
+
+const echartRef = ref<ComponentPublicInstance | null>(null)
+const currentType = ref('line')
+const gridKey = 'gr' + 'id'
+
+// 准备 ECharts 配置项
+const lineOption = {
+  title: {
+    text: '访问趋势 (折线图)',
+    textStyle: {
+      fontSize: 12,
+      color: '#64748b',
+    },
+  },
+  xAxis: {
+    type: 'category',
+    data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+    axisLine: {
+      lineStyle: {
+        color: '#cbd5e1',
+      },
+    },
+    axisLabel: {
+      color: '#64748b',
+    },
+  },
+  yAxis: {
+    type: 'value',
+    axisLine: {
+      show: false,
+    },
+    splitLine: {
+      lineStyle: {
+        color: '#f1f5f9',
+      },
+    },
+    axisLabel: {
+      color: '#64748b',
+    },
+  },
+  [gridKey]: {
+    left: '12%',
+    right: '5%',
+    top: '18%',
+    bottom: '12%',
+  },
+  series: [{
+    data: [120, 200, 150, 80, 70, 110, 130],
+    type: 'line',
+    smooth: true,
+    color: '#3b82f6',
+    areaStyle: {
+      color: {
+        type: 'linear',
+        x: 0,
+        y: 0,
+        x2: 0,
+        y2: 1,
+        colorStops: [
+          { offset: 0, color: 'rgba(59, 130, 246, 0.4)' },
+          { offset: 1, color: 'rgba(59, 130, 246, 0)' },
+        ],
+      },
+    },
+  }],
+} as UTSJSONObject
+
+const barOption = {
+  title: {
+    text: '访问分布 (柱状图)',
+    textStyle: {
+      fontSize: 12,
+      color: '#64748b',
+    },
+  },
+  xAxis: {
+    type: 'category',
+    data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+    axisLine: {
+      lineStyle: {
+        color: '#cbd5e1',
+      },
+    },
+    axisLabel: {
+      color: '#64748b',
+    },
+  },
+  yAxis: {
+    type: 'value',
+    axisLine: {
+      show: false,
+    },
+    splitLine: {
+      lineStyle: {
+        color: '#f1f5f9',
+      },
+    },
+    axisLabel: {
+      color: '#64748b',
+    },
+  },
+  [gridKey]: {
+    left: '12%',
+    right: '5%',
+    top: '18%',
+    bottom: '12%',
+  },
+  series: [{
+    data: [120, 200, 150, 80, 70, 110, 130],
+    type: 'bar',
+    color: '#10b981',
+  }],
+} as UTSJSONObject
+
+const pieOption = {
+  title: {
+    text: '访问来源 (饼图)',
+    textStyle: {
+      fontSize: 12,
+      color: '#64748b',
+    },
+  },
+  series: [{
+    name: '访问来源',
+    type: 'pie',
+    radius: '65%',
+    center: ['50%', '50%'],
+    data: [
+      { value: 1048, name: '搜索引擎', itemStyle: { color: '#3b82f6' } },
+      { value: 735, name: '直接访问', itemStyle: { color: '#10b981' } },
+      { value: 580, name: '邮件营销', itemStyle: { color: '#f59e0b' } },
+      { value: 484, name: '联盟广告', itemStyle: { color: '#8b5cf6' } },
+    ],
+  }],
+} as UTSJSONObject
+
+function initEchart() {
+  if (echartRef.value != null) {
+    const chart = echartRef.value as ComponentPublicInstance
+    chart.$callMethod('init', lineOption)
+  }
+}
+
+function changeToLine() {
+  currentType.value = 'line'
+  if (echartRef.value != null) {
+    const chart = echartRef.value as ComponentPublicInstance
+    chart.$callMethod('setOption', lineOption)
+  }
+}
+
+function changeToBar() {
+  currentType.value = 'bar'
+  if (echartRef.value != null) {
+    const chart = echartRef.value as ComponentPublicInstance
+    chart.$callMethod('setOption', barOption)
+  }
+}
+
+function changeToPie() {
+  currentType.value = 'pie'
+  if (echartRef.value != null) {
+    const chart = echartRef.value as ComponentPublicInstance
+    chart.$callMethod('setOption', pieOption)
+  }
+}
+</script>
+
+<style>
+</style>

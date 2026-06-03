@@ -1,73 +1,77 @@
 {
-	"pages": [{
-			"path": "src/pages/index/index",
-			"style": {
-				"navigationStyle": "custom",
-				"navigationBarTitleText": "首页"
-			}
-		},
-		{
-			"path": "src/pages/me/me",
-			"style": {
-				"navigationBarTitleText": "我的"
-			}
-		},
-		{
-			"path": "src/pages/about/about",
-			"style": {
-				"navigationBarTitleText": "例子"
-			}
-		},
-		{
-			"path": "src/pages/auth/login",
-			"style": {
-				"navigationBarTitleText": "登录"
-			}
-		},
-		{
-			"path": "src/pages/auth/register",
-			"style": {
-				"navigationBarTitleText": "注册"
-			}
-		},
-		{
-			"path": "src/pages/test/test",
-			"style": {
-				"navigationBarTitleText": ""
-			}
-		}
-	],
-	"easycom": {
-		"autoscan": true,
-		"custom": {
-			"^up-(.*)": "@/uni_modules/uview-ultra/components/up-$1/up-$1.uvue",
-			"^u-([^-].*)": "@/uni_modules/uview-plus/components/u-$1/u-$1.uvue"
-		}
-	},
-	"globalStyle": {
-		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "uni-app x",
-		"navigationBarBackgroundColor": "#F8F8F8",
-		"backgroundColor": "#F8F8F8"
-	},
-	"tabBar": {
-		"custom": true,
-		"color": "#999999",
-		"selectedColor": "#1890ff",
-		"backgroundColor": "#F8F8F8",
-		"list": [{
-				"pagePath": "src/pages/index/index",
-				"text": "首页"
-			},
-			{
-				"pagePath": "src/pages/about/about",
-				"text": "例子"
-			},
-			{
-				"pagePath": "src/pages/me/me",
-				"text": "我的"
-			}
-		]
-	},
-	"uniIdRouter": {}
+  "pages": [{
+    "path": "src/pages/index/index",
+    "style": {
+      "navigationStyle": "custom",
+      "navigationBarTitleText": "首页"
+    }
+  }, {
+    "path": "src/pages/me/me",
+    "style": {
+      "navigationBarTitleText": "我的"
+    }
+  }, {
+    "path": "src/pages/basic/basic",
+    "style": {
+      "navigationBarTitleText": "基础"
+    }
+  }, {
+    "path": "src/pages/function/function",
+    "style": {
+      "navigationBarTitleText": "功能"
+    }
+  }],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "uni-app x",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#999999",
+    "selectedColor": "#1890ff",
+    "backgroundColor": "#F8F8F8",
+    "list": [{
+      "pagePath": "src/pages/index/index",
+      "text": "首页"
+    }, {
+      "pagePath": "src/pages/basic/basic",
+      "text": "基础"
+    }, {
+      "pagePath": "src/pages/function/function",
+      "text": "功能"
+    }, {
+      "pagePath": "src/pages/me/me",
+      "text": "我的"
+    }]
+  },
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^e-chart$": "@/uni_modules/e-chart/components/e-chart/e-chart.uvue",
+      "^up-(.*)": "@/uni_modules/uview-ultra/components/up-$1/up-$1.uvue",
+      "^u-([^-].*)": "@/uni_modules/uview-plus/components/u-$1/u-$1.uvue"
+    }
+  },
+  "subPackages": [{
+    "root": "src/sub",
+    "pages": [{
+      "path": "auth/login",
+      "style": {
+        "navigationBarTitleText": "登录"
+      }
+    }, {
+      "path": "auth/register",
+      "style": {
+        "navigationBarTitleText": "注册"
+      }
+    }, {
+      "path": "test/test",
+      "style": {
+        "navigationBarTitleText": ""
+      }
+    }]
+  }],
+  "uniIdRouter": {}
 }

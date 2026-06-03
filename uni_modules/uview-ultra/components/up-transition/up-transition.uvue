@@ -63,15 +63,17 @@ export default {
 	computed: {
 	    mergeStyle(): UTSJSONObject {
 	        const { viewStyle, customStyle } = this
-			const duration = this.duration != null ? this.duration.toString() : '0'
+			const modeVal = (this.$props['mode'] ?? 'fade').toString()
+			const durationVal = this.$props['duration']
+			const duration = durationVal != null ? durationVal.toString() : '0'
 			
 			// 显式指定 transitionProperty 以确保在 App 原生平台可靠触发过渡
 			let transitionProp = 'all'
-			if (this.mode === 'fade') {
+			if (modeVal === 'fade') {
 				transitionProp = 'opacity'
-			} else if (this.mode.startsWith('slide')) {
+			} else if (modeVal.startsWith('slide')) {
 				transitionProp = 'transform'
-			} else if (this.mode.startsWith('fade-zoom') || this.mode === 'zoom' || this.mode.startsWith('fade-up') || this.mode.startsWith('fade-down') || this.mode.startsWith('fade-left') || this.mode.startsWith('fade-right')) {
+			} else if (modeVal.startsWith('fade-zoom') || modeVal === 'zoom' || modeVal.startsWith('fade-up') || modeVal.startsWith('fade-down') || modeVal.startsWith('fade-left') || modeVal.startsWith('fade-right')) {
 				transitionProp = 'transform, opacity'
 			}
 			

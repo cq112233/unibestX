@@ -1,0 +1,171 @@
+<template>
+	<Card title="HTTP 请求 Demo">
+		<!-- 说明区域 -->
+		<view style="background-color: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0;">
+			<text style="font-size: 12px; color: #64748b; line-height: 20px;">
+				基于 lime-request 封装的 http 请求演示，包含 Mock 数据与真实接口请求两种模式。
+			</text>
+		</view>
+
+		<!-- Mock 数据区域 -->
+		<view style="margin-bottom: 16px;">
+			<text style="font-size: 14px; font-weight: bold; color: #2d3748; margin-bottom: 10px;">Mock 数据列表（ID 为任意类型）</text>
+			<view v-for="(item, index) in mockList" :key="index" style="flex-direction: row; align-items: center; padding: 10px 12px; background-color: #f1f5f9; border-radius: 8px; margin-top: 8px;">
+				<view style="width: 28px; height: 28px; border-radius: 14px; background-color: #3182ce; justify-content: center; align-items: center; margin-right: 10px;">
+					<text style="font-size: 12px; color: #ffffff; font-weight: bold;">{{ item.id }}</text>
+				</view>
+				<text style="font-size: 14px; color: #334155;">{{ item.name }}</text>
+			</view>
+		</view>
+
+		<!-- 请求状态展示 -->
+		<view style="background-color: #f8fafc; border-radius: 10px; padding: 12px; margin-bottom: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0;">
+			<view style="flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+				<text style="font-size: 13px; color: #64748b;">接口请求状态:</text>
+				<view :style="{ paddingLeft: '8px', paddingRight: '8px', paddingTop: '2px', paddingBottom: '2px', borderRadius: 10, backgroundColor: statusBgColor }">
+					<text :style="{ fontSize: 12, color: statusColor }">{{ statusText }}</text>
+				</view>
+			</view>
+			<view v-if="hasResponseData" style="background-color: #ffffff; border-radius: 8px; padding: 10px; border-width: 1px; border-style: solid; border-color: #e2e8f0;">
+				<text style="font-size: 12px; color: #475569;">{{ responseText }}</text>
+			</view>
+			<view v-if="hasErrorMsg" style="background-color: #fff5f5; border-radius: 8px; padding: 10px; border-width: 1px; border-style: solid; border-color: #fecaca; margin-top: 6px;">
+				<text style="font-size: 12px; color: #ef4444;">错误：{{ errorMsg }}</text>
+			</view>
+		</view>
+
+		<!-- 操作按钮：用 margin-right 代替 gap -->
+		<view style="flex-direction: row;">
+			<view style="flex: 1; margin-right: 10px;">
+				<button
+					@click="loadMockData"
+					style="background-color: #3182ce; color: #ffffff; border-radius: 8px; font-size: 14px; height: 42px; width: 100%;"
+				>
+					加载 Mock 数据
+				</button>
+			</view>
+			<view style="flex: 1;">
+				<button
+					@click="fetchRealApi"
+					:disabled="loading"
+					style="background-color: #10b981; color: #ffffff; border-radius: 8px; font-size: 14px; height: 42px; width: 100%;"
+				>
+					{{ loading ? '请求中...' : '真实 API 请求' }}
+				</button>
+			</view>
+		</view>
+	</Card>
+</template>
+
+<script setup lang="uts">
+import { ref, computed } from 'vue'
+import Card from './Card.uvue'
+import { getFooList, foo, type IFoo } from '@/src/api/foo'
+import { toastSuccess } from '@/src/utils/toast.uts'
+
+// ==========================================
+// 响应式状态
+// ==========================================
+const mockList = ref<IFoo[]>([])
+const loading = ref<boolean>(false)
+const requestStatus = ref<string>('idle') // idle | loading | success | error
+const responseData = ref<IFoo | null>(null)
+const errorMsg = ref<string>('')
+
+// ==========================================
+// 计算属性
+// ==========================================
+const statusText = computed((): string => {
+	switch (requestStatus.value) {
+		case 'loading': return '请求中'
+		case 'success': return '请求成功'
+		case 'error': return '请求失败'
+		default: return '待请求'
+	}
+})
+
+const statusColor = computed((): string => {
+	switch (requestStatus.value) {
+		case 'loading': return '#d97706'
+		case 'success': return '#059669'
+		case 'error': return '#dc2626'
+		default: return '#94a3b8'
+	}
+})
+
+const statusBgColor = computed((): string => {
+	switch (requestStatus.value) {
+		case 'loading': return '#fef9c3'
+		case 'success': return '#d1fae5'
+		case 'error': return '#fee2e2'
+		default: return '#f1f5f9'
+	}
+})
+
+// 用显式 boolean 计算属性替换模板里的 != null / != '' 条件判断
+const hasResponseData = computed((): boolean => {
+	return responseData.value != null
+})
+
+const hasErrorMsg = computed((): boolean => {
+	return errorMsg.value.length > 0
+})
+
+const responseText = computed((): string => {
+	const data = responseData.value
+	if (data == null) return ''
+	return `id: ${data.id}, name: ${data.name}`
+})
+
+// ==========================================
+// 方法
+// ==========================================
+
+/**
+ * 加载 Mock 数据（本地，无需网络）
+ */
+async function loadMockData() {
+	try {
+		const list = await getFooList()
+		mockList.value = list
+		toastSuccess(`加载了 ${list.length} 条数据`)
+	} catch (err) {
+		console.error('loadMockData error:', err)
+	}
+}
+
+/**
+ * 发起真实 API 请求（演示拦截器与错误处理）
+ * 使用 async/await 与 try/catch，这在 UTS 中类型推导更稳定
+ */
+async function fetchRealApi() {
+	loading.value = true
+	requestStatus.value = 'loading'
+	responseData.value = null
+	errorMsg.value = ''
+
+	try {
+		const res = await foo()
+		responseData.value = res
+		requestStatus.value = 'success'
+	} catch (err) {
+		console.log(err, 'err')
+		requestStatus.value = 'error'
+		let errStr = ''
+		if (err !== null) {
+			errStr = JSON.stringify(err)
+		}
+		errorMsg.value = errStr.length > 0 ? errStr : '请求失败'
+	}
+	
+	loading.value = false
+}
+
+// 页面挂载时自动加载 Mock 数据
+onMounted(() => {
+	loadMockData()
+})
+</script>
+
+<style>
+</style>

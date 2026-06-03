@@ -422,7 +422,9 @@ export default {
                   success: () => {
                     resolve(filePath);
                   },
-				  fail
+				  fail: (err : IFileSystemManagerFail) => {
+					fail(err as UTSJSONObject)
+				  }
                 })
             }, 
             fail
