@@ -151,7 +151,7 @@ export const chooseLocationInterceptor : Interceptor = {
  * 全局路由拦截安装器
  */
 export const routeInterceptor = {
-  install: function () {
+  install: function (app: any) {
     uni.addInterceptor('navigateTo', navigateToInterceptor)
     uni.addInterceptor('reLaunch', navigateToInterceptor)
     uni.addInterceptor('redirectTo', navigateToInterceptor)
