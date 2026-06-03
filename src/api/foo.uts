@@ -6,7 +6,7 @@ import type { LimeRequestConfig } from '@/uni_modules/lime-request'
 // ==========================================
 
 export type IFoo = {
-  id : number
+  id : any
   name : string
 }
 
@@ -50,8 +50,8 @@ export function getFooById(id : number) : Promise<IFoo | null> {
  * GET 请求示例 —— 对应 foo-alova.ts 中的 foo() 函数
  * 使用次要域名（SECONDARY），参考 API_DOMAINS 配置
  */
-export function foo() : Promise<IFoo> {
-  return http.get<IFoo>('/foo', {
+export function foo() :Promise<IFoo> {
+   const res = http.get<IFoo>('/foo', {
     params: {
       name: '菲鸽',
       page: 1,
@@ -62,6 +62,16 @@ export function foo() : Promise<IFoo> {
       ignoreAuth: true, // 此接口不需要鉴权
     } as UTSJSONObject,
   } as LimeRequestConfig)
+  // console.log(333)
+		console.log(res,'res112233')
+		return res
+			
+  // return new Promise((resolve)=>{
+		// 	resolve({
+		// 	  id:1,
+		// 			name:'cq'
+		// 	})
+		// }) 
 }
 
 /**

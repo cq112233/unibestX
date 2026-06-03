@@ -61,7 +61,7 @@ requestInstance.interceptors.request.use(
     let ignoreAuth = false
     if (extra !== null) {
       const authVal = (extra as UTSJSONObject).getBoolean('ignoreAuth')
-      if (authVal === true) {
+      if (authVal == true) { // eslint-disable-line eqeqeq
         ignoreAuth = true
       }
     }
@@ -103,7 +103,7 @@ requestInstance.interceptors.response.use(
     }
 
     const statusCode = response.statusCode
-    if (statusCode !== 200) {
+    if (statusCode != 200) { // eslint-disable-line eqeqeq
       const errorMessage = ShowMessage(statusCode)
       console.error('errorMessage===>', errorMessage)
       uni.showToast({ title: errorMessage, icon: 'error' })
@@ -172,7 +172,7 @@ export class HttpClient {
     return requestInstance.request<any>(config).then((res : LimeRequestResponse<any>) : T => {
       const rawData = res.data
       if (rawData === null) {
-        return null as T
+        throw new Error('响应数据为空')
       }
       const obj = JSON.parseObject(JSON.stringify(rawData))
       if (obj !== null) {
@@ -180,11 +180,29 @@ export class HttpClient {
         if (code !== null) {
           const innerData = obj.get('data')
           if (innerData !== null) {
-            return innerData as T
+            const innerStr = JSON.stringify(innerData)
+            const parsedData = JSON.parse<T>(innerStr)
+            if (parsedData !== null) {
+              return parsedData as T
+            } else {
+              throw new Error('响应 data 字段无法解析为指定的类型，请检查数据结构是否匹配。数据：' + innerStr)
+            }
           }
+          // 如果外层有 code 但没有 data 字段，或者 data 为 null
+          // 有些接口可能只返回 code 和 msg，不返回 data。此时如果 T 是 any 可以，否则应该报错
+          throw new Error('响应结构包含 code，但 data 字段为空')
         }
       }
-      return rawData as T
+      
+      // 如果没有 code，说明不是外层包装格式
+      const rawStr = JSON.stringify(rawData)
+      const parsedRaw = JSON.parse<T>(rawStr)
+      if (parsedRaw !== null) {
+        return parsedRaw as T
+      }
+      
+      // 无法反序列化为 T，直接强转必定导致 Kotlin NPE
+      throw new Error('原始响应数据无法解析为指定类型。原始数据：' + rawStr)
     })
   }
 

@@ -85,7 +85,17 @@
 					overlay: true, // 是否防止触摸穿透
 					loading: false, // 是否加载中状态
 				},
-				tmpConfig: {}, // 将用户配置和内置配置合并后的临时配置变量
+				tmpConfig: {
+					message: '',
+					type: '',
+					zIndex: 10090,
+					duration: 2000,
+					icon: true,
+					position: 'center',
+					complete: null as (() => void) | null,
+					overlay: true,
+					loading: false,
+				} as UTSJSONObject, // 将用户配置和内置配置合并后的临时配置变量
 			}
 		},
 		computed: {

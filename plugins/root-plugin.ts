@@ -1,5 +1,6 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
+import process from 'node:process'
 
 // 自动给所有页面套上 App.ku.uvue
 export default function autoRootPlugin() {
@@ -9,7 +10,7 @@ export default function autoRootPlugin() {
       const normalizedId = id.replace(/\\/g, '/')
       // 只处理 src/pages 下的非组件 uvue 页面，排除 App.uvue、App.ku.uvue 以及组件目录
       if (!normalizedId.includes('src/pages/') || normalizedId.includes('/components/') || normalizedId.includes('App.ku.uvue')) {
-        return code
+        return null
       }
 
       // 自动检测并生成 App.ku.uvue 文件于项目根目录
@@ -37,7 +38,10 @@ export default function autoRootPlugin() {
         return `${match}\nimport AppKu from '@/App.ku.uvue'`
       })
 
-      return newCode
+      return {
+        code: newCode,
+        map: { mappings: '' }
+      }
     }
   }
 }

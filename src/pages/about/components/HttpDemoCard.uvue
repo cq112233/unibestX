@@ -9,8 +9,8 @@
 
 		<!-- Mock 数据区域 -->
 		<view style="margin-bottom: 16px;">
-			<text style="font-size: 14px; font-weight: bold; color: #2d3748; margin-bottom: 10px;">Mock 数据列表</text>
-			<view v-for="item in mockList" :key="item.id" style="flex-direction: row; align-items: center; padding: 10px 12px; background-color: #f1f5f9; border-radius: 8px; margin-top: 8px;">
+			<text style="font-size: 14px; font-weight: bold; color: #2d3748; margin-bottom: 10px;">Mock 数据列表（ID 为任意类型）</text>
+			<view v-for="(item, index) in mockList" :key="index" style="flex-direction: row; align-items: center; padding: 10px 12px; background-color: #f1f5f9; border-radius: 8px; margin-top: 8px;">
 				<view style="width: 28px; height: 28px; border-radius: 14px; background-color: #3182ce; justify-content: center; align-items: center; margin-right: 10px;">
 					<text style="font-size: 12px; color: #ffffff; font-weight: bold;">{{ item.id }}</text>
 				</view>
@@ -61,6 +61,7 @@
 import { ref, computed } from 'vue'
 import Card from './Card.uvue'
 import { getFooList, foo, type IFoo } from '@/src/api/foo'
+import { toastSuccess } from '@/src/utils/toast.uts'
 
 // ==========================================
 // 响应式状态
@@ -127,10 +128,7 @@ async function loadMockData() {
 	try {
 		const list = await getFooList()
 		mockList.value = list
-		uni.showToast({
-			title: `加载了 ${list.length} 条数据`,
-			icon: 'success'
-		})
+		toastSuccess(`加载了 ${list.length} 条数据`)
 	} catch (err) {
 		console.error('loadMockData error:', err)
 	}
@@ -151,6 +149,7 @@ async function fetchRealApi() {
 		responseData.value = res
 		requestStatus.value = 'success'
 	} catch (err) {
+		console.log(err, 'err')
 		requestStatus.value = 'error'
 		let errStr = ''
 		if (err !== null) {
