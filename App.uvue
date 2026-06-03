@@ -1,10 +1,7 @@
 <script setup lang="uts">
 import { navigateToInterceptor } from './src/router/interceptor'
 import { loadFont } from '@/uni_modules/uview-ultra/index.uts'
-
-// #ifdef APP-ANDROID || APP-HARMONY
-let firstBackTime = 0
-// #endif
+import { handleBackPressExit } from '@/src/utils/backPress'
 
 onLaunch(() => {
   console.log('App Launch')
@@ -29,20 +26,7 @@ onHide(() => {
 // #ifdef APP-ANDROID
 onLastPageBackPress(() => {
   console.log('App LastPageBackPress')
-  if (firstBackTime == 0) { // eslint-disable-line eqeqeq
-    uni.showToast({
-      title: '再按一次退出应用',
-      position: 'bottom',
-    })
-    firstBackTime = Date.now()
-    setTimeout(() => {
-      firstBackTime = 0
-    }, 2000)
-  }
-  else if (Date.now() - firstBackTime < 2000) {
-    firstBackTime = Date.now()
-    uni.exit()
-  }
+  handleBackPressExit()
 })
 
 onExit(() => {

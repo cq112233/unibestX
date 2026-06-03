@@ -27,6 +27,16 @@
 
 <script setup lang="uts">
 import { toastError, toastSuccess } from '@/src/utils/toast'
+import { handleBackPressExit } from '@/src/utils/backPress'
+
+onBackPress((options: OnBackPressOptions): boolean => {
+  // #ifdef APP-HARMONY
+  if (options.from === 'backbutton') {
+    return handleBackPressExit()
+  }
+  // #endif
+  return false
+})
 
 function handleSuccessToast() {
   toastSuccess('操作成功！')

@@ -1,0 +1,27 @@
+let firstBackTime = 0
+
+/**
+ * 针对鸿蒙 (HarmonyOS) 或没有全局 App 级别 onLastPageBackPress 的平台，
+ * 实现“再按一次退出应用”的页面级辅助函数。
+ */
+export function handleBackPressExit() : boolean {
+  const now = Date.now()
+  if (firstBackTime == 0 || now - firstBackTime > 2000) {
+    firstBackTime = now
+    uni.showToast({
+      title: '再按一次退出应用',
+      position: 'bottom',
+    })
+    setTimeout(() => {
+      // 2秒后如果未再次点击则重置时间
+      if (firstBackTime == now) {
+        firstBackTime = 0
+      }
+    }, 2000)
+    return true // 拦截默认返回操作
+  }
+  
+  // 2秒内再次触发，则直接退出
+  uni.exit()
+  return false
+}

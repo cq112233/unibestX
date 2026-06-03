@@ -48,93 +48,186 @@ export function parseUrlToObj(url : string) : UrlObj {
  * 判断路径是否符合排除登录校验名单 (EXCLUDE_LOGIN_PATH_LIST)
  */
 export function judgeIsExcludePath(path : string) : boolean {
-  return EXCLUDE_LOGIN_PATH_LIST.indexOf(path) >= 0
+  let normalizedPath = path
+  if (normalizedPath.startsWith('src/')) {
+    normalizedPath = '/' + normalizedPath
+  }
+  return EXCLUDE_LOGIN_PATH_LIST.indexOf(normalizedPath) >= 0
 }
 
 /**
- * 路由跳转拦截器
+ * 核心拦截业务逻辑函数
+ */
+function doIntercept(url : string) : boolean {
+  console.log('doIntercept url:', url)
+  if (url == null || url == '') {
+    return true
+  }
+
+  const urlObj = parseUrlToObj(url)
+  let path = urlObj.path
+  const query = urlObj.query
+
+  // 1. 规范化路径：如果以 'src/' 开头，补充前导 '/' 使其变为 '/src/'
+  if (path.startsWith('src/')) {
+    path = '/' + path
+  }
+
+  // 相对路径解析：将 "subpage" 转换为基于当前页面所在目录的绝对路径 "/src/pages/.../subpage"
+  if (!path.startsWith('/') && !path.startsWith('plugin://') && !path.startsWith('http://') && !path.startsWith('https://')) {
+    const pages = getCurrentPages()
+    let currentPath = ''
+    if (pages.length > 0) {
+      currentPath = pages[pages.length - 1].route
+    }
+    let normalizedCurrentPath = currentPath
+    if (normalizedCurrentPath.startsWith('src/')) {
+      normalizedCurrentPath = '/' + normalizedCurrentPath
+    }
+    if (!normalizedCurrentPath.startsWith('/')) {
+      normalizedCurrentPath = '/' + normalizedCurrentPath
+    }
+    const lastSlashIdx = normalizedCurrentPath.lastIndexOf('/')
+    let baseDir = ''
+    if (lastSlashIdx >= 0) {
+      baseDir = normalizedCurrentPath.substring(0, lastSlashIdx)
+    }
+    path = `${baseDir}/${path}`
+  }
+
+  // 确保最终 path 也是以 '/' 开头的绝对路径形式，便于后面和 LOGIN_PAGE 及排除列表匹配
+  if (path.startsWith('src/')) {
+    path = '/' + path
+  }
+
+  console.log('doIntercept normalized path:', path)
+
+  // 检查 Token 登录有效性
+  const tokenStore = useTokenStore()
+  const hasLogin = tokenStore.hasValidLogin()
+  console.log('doIntercept login status - hasLogin:', hasLogin)
+
+  if (hasLogin) {
+    // 已经登录的情况下，如果目标不是登录页直接放行
+    if (path !== LOGIN_PAGE) {
+      return true
+    } else {
+      // 如果已登录但尝试再次进入登录页，则重定向到 redirect 对应的目的页或首页
+      const redirect = query.get('redirect')
+      const redirectUrl = (redirect != null && redirect != '') ? redirect : '/src/pages/index/index'
+      if (isPageTabbar(redirectUrl)) {
+        uni.switchTab({ url: redirectUrl })
+      } else {
+        uni.navigateTo({ url: redirectUrl })
+      }
+      return false
+    }
+  }
+
+  // 未登录情况下，记录想要跳转的完整 fullPath 并在登录成功后跳转回去
+  let fullPath = path
+  if (query.size > 0) {
+    const paramsList : string[] = []
+    query.forEach((val, key) => {
+      paramsList.push(`${key}=${val}`)
+    })
+    fullPath += `?${paramsList.join('&')}`
+  }
+  const redirectUrl = `${LOGIN_PAGE}?redirect=${encodeURIComponent(fullPath)}`
+
+  // 1. 默认需要登录模式（白名单策略）：EXCLUDE_LOGIN_PATH_LIST 中存放免登录页面
+  if (isNeedLoginMode) {
+    if (judgeIsExcludePath(path)) {
+      return true
+    } else {
+      // 目标是登录页本身，放行以防无限重定向
+      if (path === LOGIN_PAGE) {
+        return true
+      }
+      console.log('doIntercept: redirecting to login page', redirectUrl)
+      uni.navigateTo({ url: redirectUrl })
+      return false
+    }
+  } 
+  // 2. 默认无需登录模式（黑名单策略）：EXCLUDE_LOGIN_PATH_LIST 中存放必须登录的页面
+  else {
+    if (judgeIsExcludePath(path)) {
+      console.log('doIntercept: blacklisted path, redirecting to login page', redirectUrl)
+      uni.navigateTo({ url: redirectUrl })
+      return false
+    }
+    return true
+  }
+}
+
+/**
+ * 各路由跳转 API 独立拦截器，保证在 App (Android/Kotlin) 原生端能够正确将 options 强转为对应的 Options 类型
  */
 export const navigateToInterceptor : Interceptor = {
-  invoke: function (options : UTSJSONObject) : boolean {
-    console.log(options, 'options')
-    const url = (options['url'] != null) ? (options['url'] as string) : ''
-    if (url == null || url == '') {
-      return true
+  invoke: function (options : any) : boolean {
+    let url = ''
+    if (options != null) {
+      // #ifdef APP
+      const opt = options as NavigateToOptions
+      url = opt.url
+      // #endif
+      // #ifndef APP
+      const urlObj = options as UTSJSONObject
+      url = (urlObj['url'] != null) ? (urlObj['url'] as string) : ''
+      // #endif
     }
+    return doIntercept(url)
+  }
+}
 
-    const urlObj = parseUrlToObj(url)
-    let path = urlObj.path
-    const query = urlObj.query
-
-    // 相对路径解析：将 "subpage" 转换为基于当前页面所在目录的绝对路径 "/src/pages/.../subpage"
-    if (!path.startsWith('/') && !path.startsWith('plugin://') && !path.startsWith('http://') && !path.startsWith('https://')) {
-      const pages = getCurrentPages()
-      let currentPath = ''
-      if (pages.length > 0) {
-        currentPath = pages[pages.length - 1].route
-      }
-      const normalizedCurrentPath = currentPath.startsWith('/') ? currentPath : `/${currentPath}`
-      const lastSlashIdx = normalizedCurrentPath.lastIndexOf('/')
-      let baseDir = ''
-      if (lastSlashIdx >= 0) {
-        baseDir = normalizedCurrentPath.substring(0, lastSlashIdx)
-      }
-      path = `${baseDir}/${path}`
+export const redirectToInterceptor : Interceptor = {
+  invoke: function (options : any) : boolean {
+    let url = ''
+    if (options != null) {
+      // #ifdef APP
+      const opt = options as RedirectToOptions
+      url = opt.url
+      // #endif
+      // #ifndef APP
+      const urlObj = options as UTSJSONObject
+      url = (urlObj['url'] != null) ? (urlObj['url'] as string) : ''
+      // #endif
     }
+    return doIntercept(url)
+  }
+}
 
-    // 检查 Token 登录有效性
-    const tokenStore = useTokenStore()
-    const hasLogin = tokenStore.hasValidLogin()
-
-    if (hasLogin) {
-      // 已经登录的情况下，如果目标不是登录页直接放行
-      if (path !== LOGIN_PAGE) {
-        return true
-      } else {
-        // 如果已登录但尝试再次进入登录页，则重定向到 redirect 对应的目的页或首页
-        const redirect = query.get('redirect')
-        const redirectUrl = (redirect != null && redirect != '') ? redirect : '/src/pages/index/index'
-        if (isPageTabbar(redirectUrl)) {
-          uni.switchTab({ url: redirectUrl })
-        } else {
-          uni.navigateTo({ url: redirectUrl })
-        }
-        return false
-      }
+export const reLaunchInterceptor : Interceptor = {
+  invoke: function (options : any) : boolean {
+    let url = ''
+    if (options != null) {
+      // #ifdef APP
+      const opt = options as ReLaunchOptions
+      url = opt.url
+      // #endif
+      // #ifndef APP
+      const urlObj = options as UTSJSONObject
+      url = (urlObj['url'] != null) ? (urlObj['url'] as string) : ''
+      // #endif
     }
+    return doIntercept(url)
+  }
+}
 
-    // 未登录情况下，记录想要跳转的完整 fullPath 并在登录成功后跳转回去
-    let fullPath = path
-    if (query.size > 0) {
-      const paramsList : string[] = []
-      query.forEach((val, key) => {
-        paramsList.push(`${key}=${val}`)
-      })
-      fullPath += `?${paramsList.join('&')}`
+export const switchTabInterceptor : Interceptor = {
+  invoke: function (options : any) : boolean {
+    let url = ''
+    if (options != null) {
+      // #ifdef APP
+      const opt = options as SwitchTabOptions
+      url = opt.url
+      // #endif
+      // #ifndef APP
+      const urlObj = options as UTSJSONObject
+      url = (urlObj['url'] != null) ? (urlObj['url'] as string) : ''
+      // #endif
     }
-    const redirectUrl = `${LOGIN_PAGE}?redirect=${encodeURIComponent(fullPath)}`
-
-    // 1. 默认需要登录模式（白名单策略）：EXCLUDE_LOGIN_PATH_LIST 中存放免登录页面
-    if (isNeedLoginMode) {
-      if (judgeIsExcludePath(path)) {
-        return true
-      } else {
-        // 目标是登录页本身，放行以防无限重定向
-        if (path === LOGIN_PAGE) {
-          return true
-        }
-        uni.navigateTo({ url: redirectUrl })
-        return false
-      }
-    } 
-    // 2. 默认无需登录模式（黑名单策略）：EXCLUDE_LOGIN_PATH_LIST 中存放必须登录的页面
-    else {
-      if (judgeIsExcludePath(path)) {
-        uni.navigateTo({ url: redirectUrl })
-        return false
-      }
-      return true
-    }
+    return doIntercept(url)
   }
 }
 
@@ -142,7 +235,7 @@ export const navigateToInterceptor : Interceptor = {
  * 地图选点调用拦截器（默认直接放行）
  */
 export const chooseLocationInterceptor : Interceptor = {
-  invoke: function (options : UTSJSONObject) : boolean {
+  invoke: function (options : any) : boolean {
     return true
   }
 }
@@ -150,12 +243,10 @@ export const chooseLocationInterceptor : Interceptor = {
 /**
  * 全局路由拦截安装器
  */
-export const routeInterceptor = {
-  install: function (app: any) {
-    uni.addInterceptor('navigateTo', navigateToInterceptor)
-    uni.addInterceptor('reLaunch', navigateToInterceptor)
-    uni.addInterceptor('redirectTo', navigateToInterceptor)
-    uni.addInterceptor('switchTab', navigateToInterceptor)
-    uni.addInterceptor('chooseLocation', chooseLocationInterceptor)
-  }
+export function installRouteInterceptor() {
+  uni.addInterceptor('navigateTo', navigateToInterceptor)
+  uni.addInterceptor('reLaunch', reLaunchInterceptor)
+  uni.addInterceptor('redirectTo', redirectToInterceptor)
+  uni.addInterceptor('switchTab', switchTabInterceptor)
+  uni.addInterceptor('chooseLocation', chooseLocationInterceptor)
 }

@@ -3,16 +3,18 @@ import { createSSRApp } from 'vue'
 import pinia from './src/store'  // 顶层定义（app-android 平台强制约束）
 import i18n from './src/i18n'
 import ultraUI from '@/uni_modules/uview-ultra/index.uts' // uni-app-x
-import { routeInterceptor } from './src/router/interceptor'
+import { installRouteInterceptor } from './src/router/interceptor'
 
 export function createApp() {
+	// 直接执行全局路由拦截器安装，保证 Kotlin/Android 端正常初始化
+	installRouteInterceptor()
+
 	const app = createSSRApp(App)
 	app.use(pinia)  // 注册 pinia
 	// 可选：暴露给 Options API 模板（仅当你用 this.$pinia 时才加这行）
 	app.config.globalProperties.$pinia = pinia
 	
 	app.use(i18n)
-	app.use(routeInterceptor)
 	
 	app.use(ultraUI, () => {
 		return {

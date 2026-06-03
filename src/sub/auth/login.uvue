@@ -3,44 +3,79 @@
     <view class="title">
       <text class="title-text">登录页</text>
     </view>
-    <up-button  type='primary' @click="doLogin">
+    <up-button type="primary" @click="doLogin">
       点击模拟登录
     </up-button>
   </view>
 </template>
 
 <script setup lang="uts">
-import { useTokenStore, ISingleTokenRes, useUserStore, IUserInfo } from '../../store'
+import { ref } from 'vue'
+import type { ISingleTokenRes, IUserInfo } from '../../store'
+import { useTokenStore, useUserStore } from '../../store'
+import { isPageTabbar } from '../../tabbar/store'
 
 const tokenStore = useTokenStore()
 const userStore = useUserStore()
+const redirectUrl = ref<string>('')
+
+onLoad((options: UTSJSONObject | null) => {
+  if (options != null) {
+    const redirect = options.getString('redirect')
+    if (redirect != null) {
+      redirectUrl.value = redirect
+    }
+  }
+})
 
 function doLogin() {
   if (tokenStore.hasValidLogin()) {
-    uni.navigateBack()
+    if (redirectUrl.value !== '') {
+      const targetUrl = decodeURIComponent(redirectUrl.value) ?? ''
+      if (isPageTabbar(targetUrl)) {
+        uni.switchTab({ url: targetUrl })
+      }
+      else {
+        uni.redirectTo({ url: targetUrl })
+      }
+    }
+    else {
+      uni.navigateBack()
+    }
     return
   }
 
   // 模拟登录：设置 token 与用户信息
   tokenStore.setSingleToken({
     token: 'mock-token-UNIX-123456',
-    expiresIn: 7200
+    expiresIn: 7200,
   } as ISingleTokenRes)
 
   userStore.setUserInfo({
     userId: 1001,
     username: 'UNIX',
     nickname: 'UNIX 开发者',
-    avatar: '/static/logo.png'
+    avatar: '/static/logo.png',
   } as IUserInfo)
 
   uni.showToast({
     title: '登录成功',
-    icon: 'success'
+    icon: 'success',
   })
 
   setTimeout(() => {
-    uni.navigateBack()
+    if (redirectUrl.value !== '') {
+      const targetUrl = decodeURIComponent(redirectUrl.value) ?? ''
+      if (isPageTabbar(targetUrl)) {
+        uni.switchTab({ url: targetUrl })
+      }
+      else {
+        uni.redirectTo({ url: targetUrl })
+      }
+    }
+    else {
+      uni.navigateBack()
+    }
   }, 1000)
 }
 </script>

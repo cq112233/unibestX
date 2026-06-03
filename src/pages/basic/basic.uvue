@@ -32,6 +32,16 @@ import HttpDemoCard from './components/HttpDemoCard.uvue'
 import EchartsDemoCard from './components/EchartsDemoCard.uvue'
 import SystemInfoDemoCard from './components/SystemInfoDemoCard.uvue'
 import { updateSystemInfo } from '@/src/utils/systemInfo'
+import { handleBackPressExit } from '@/src/utils/backPress'
+
+onBackPress((options: OnBackPressOptions): boolean => {
+  // #ifdef APP-HARMONY
+  if (options.from === 'backbutton') {
+    return handleBackPressExit()
+  }
+  // #endif
+  return false
+})
 
 onResize(() => {
   updateSystemInfo()

@@ -21,6 +21,16 @@
 import SystemInfoCard from './components/SystemInfoCard.uvue'
 import HapticsCard from './components/HapticsCard.uvue'
 import MediaCard from './components/MediaCard.uvue'
+import { handleBackPressExit } from '@/src/utils/backPress'
+
+onBackPress((options: OnBackPressOptions): boolean => {
+  // #ifdef APP-HARMONY
+  if (options.from === 'backbutton') {
+    return handleBackPressExit()
+  }
+  // #endif
+  return false
+})
 </script>
 
 <style>

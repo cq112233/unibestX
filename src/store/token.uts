@@ -150,18 +150,22 @@ export class TokenStore extends PiniaStoreBase {
    * 检查 accessToken 是否有效（未过期）
    */
   isTokenValid() : boolean {
-    const expireTime = uni.getStorageSync('accessTokenExpireTime') as number | null
-    if (expireTime == null) return false
-    return Date.now() < (expireTime as number)
+    const val = uni.getStorageSync('accessTokenExpireTime')
+    if (val == null || val === '') return false
+    const num = parseFloat(val.toString())
+    if (isNaN(num)) return false
+    return Date.now() < num
   }
 
   /**
    * 检查 refreshToken 是否有效（未过期）
    */
   isRefreshTokenValid() : boolean {
-    const expireTime = uni.getStorageSync('refreshTokenExpireTime') as number | null
-    if (expireTime == null) return false
-    return Date.now() < (expireTime as number)
+    const val = uni.getStorageSync('refreshTokenExpireTime')
+    if (val == null || val === '') return false
+    const num = parseFloat(val.toString())
+    if (isNaN(num)) return false
+    return Date.now() < num
   }
 
   /**
