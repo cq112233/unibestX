@@ -1,20 +1,20 @@
 <template>
-  <Card :title="$t('function.mediaTitle')">
+  <Card title="相机与多媒体">
     <view style="background-color: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0; align-items: center; justify-content: center;">
       <text v-if="photoUrl === ''" style="font-size: 14px; color: #94a3b8;">未选择照片</text>
       <image v-else :src="photoUrl" style="width: 150px; height: 150px; border-radius: 8px;" mode="aspectFill" />
     </view>
     <up-button type="primary" style="margin-bottom: 12px;" @click="chooseImage">
-      {{ $t('function.choosePhotoBtn') }}
+      拍摄/选择照片
     </up-button>
 
     <!-- 扫码测试 -->
     <view style="background-color: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0;">
-      <text style="font-size: 12px; color: #94a3b8; margin-bottom: 8px;">{{ $t('function.scanResult') }}</text>
-      <text style="font-size: 14px; font-weight: bold; color: #334155;">{{ scanResult !== '' ? scanResult : $t('function.noData') }}</text>
+      <text style="font-size: 12px; color: #94a3b8; margin-bottom: 8px;">扫码结果</text>
+      <text style="font-size: 14px; font-weight: bold; color: #334155;">{{ scanResult !== '' ? scanResult : '暂无数据' }}</text>
     </view>
     <up-button type="success" @click="scanCode">
-      {{ $t('function.scanCodeBtn') }}
+      扫码测试
     </up-button>
   </Card>
 </template>

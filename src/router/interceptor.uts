@@ -7,16 +7,16 @@ import { EXCLUDE_LOGIN_PATH_LIST, isNeedLoginMode, LOGIN_PAGE } from './config'
  */
 export type UrlObj = {
   /** 页面路由路径（不含参数） */
-  path : string
+  path: string
   /** 路由参数键值对 Map */
-  query : Map<string, string>
+  query: Map<string, string>
 }
 
 /**
  * 解析 URL 字符串为路径与参数键值对
  * 例如: "/src/pages/login?redirect=index" -> { path: "/src/pages/login", query: { redirect: "index" } }
  */
-export function parseUrlToObj(url : string) : UrlObj {
+export function parseUrlToObj(url: string): UrlObj {
   const parts = url.split('?')
   const path = parts[0]
   const query = new Map<string, string>()
@@ -47,7 +47,7 @@ export function parseUrlToObj(url : string) : UrlObj {
 /**
  * 判断路径是否符合排除登录校验名单 (EXCLUDE_LOGIN_PATH_LIST)
  */
-export function judgeIsExcludePath(path : string) : boolean {
+export function judgeIsExcludePath(path: string): boolean {
   let normalizedPath = path
   if (normalizedPath.startsWith('src/')) {
     normalizedPath = '/' + normalizedPath
@@ -58,7 +58,7 @@ export function judgeIsExcludePath(path : string) : boolean {
 /**
  * 核心拦截业务逻辑函数
  */
-function doIntercept(url : string) : boolean {
+function doIntercept(url: string): boolean {
   console.log('doIntercept url:', url)
   if (url == null || url == '') {
     return true
@@ -127,7 +127,7 @@ function doIntercept(url : string) : boolean {
   // 未登录情况下，记录想要跳转的完整 fullPath 并在登录成功后跳转回去
   let fullPath = path
   if (query.size > 0) {
-    const paramsList : string[] = []
+    const paramsList: string[] = []
     query.forEach((val, key) => {
       paramsList.push(`${key}=${val}`)
     })
@@ -148,7 +148,7 @@ function doIntercept(url : string) : boolean {
       uni.navigateTo({ url: redirectUrl })
       return false
     }
-  } 
+  }
   // 2. 默认无需登录模式（黑名单策略）：EXCLUDE_LOGIN_PATH_LIST 中存放必须登录的页面
   else {
     if (judgeIsExcludePath(path)) {
@@ -163,8 +163,8 @@ function doIntercept(url : string) : boolean {
 /**
  * 各路由跳转 API 独立拦截器，保证在 App (Android/Kotlin) 原生端能够正确将 options 强转为对应的 Options 类型
  */
-export const navigateToInterceptor : Interceptor = {
-  invoke: function (options : any) : boolean {
+export const navigateToInterceptor: Interceptor = {
+  invoke: function (options: any): boolean {
     let url = ''
     if (options != null) {
       // #ifdef APP
@@ -180,8 +180,8 @@ export const navigateToInterceptor : Interceptor = {
   }
 }
 
-export const redirectToInterceptor : Interceptor = {
-  invoke: function (options : any) : boolean {
+export const redirectToInterceptor: Interceptor = {
+  invoke: function (options: any): boolean {
     let url = ''
     if (options != null) {
       // #ifdef APP
@@ -197,8 +197,8 @@ export const redirectToInterceptor : Interceptor = {
   }
 }
 
-export const reLaunchInterceptor : Interceptor = {
-  invoke: function (options : any) : boolean {
+export const reLaunchInterceptor: Interceptor = {
+  invoke: function (options: any): boolean {
     let url = ''
     if (options != null) {
       // #ifdef APP
@@ -214,8 +214,8 @@ export const reLaunchInterceptor : Interceptor = {
   }
 }
 
-export const switchTabInterceptor : Interceptor = {
-  invoke: function (options : any) : boolean {
+export const switchTabInterceptor: Interceptor = {
+  invoke: function (options: any): boolean {
     let url = ''
     if (options != null) {
       // #ifdef APP
@@ -234,8 +234,8 @@ export const switchTabInterceptor : Interceptor = {
 /**
  * 地图选点调用拦截器（默认直接放行）
  */
-export const chooseLocationInterceptor : Interceptor = {
-  invoke: function (options : any) : boolean {
+export const chooseLocationInterceptor: Interceptor = {
+  invoke: function (options: any): boolean {
     return true
   }
 }
@@ -243,7 +243,7 @@ export const chooseLocationInterceptor : Interceptor = {
 /**
  * 全局路由拦截安装器
  */
-export function installRouteInterceptor() {
+export const installRouteInterceptor = () => {
   uni.addInterceptor('navigateTo', navigateToInterceptor)
   uni.addInterceptor('reLaunch', reLaunchInterceptor)
   uni.addInterceptor('redirectTo', redirectToInterceptor)

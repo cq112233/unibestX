@@ -1,64 +1,37 @@
 <template>
-  <Card :title="$t('function.hapticsTitle')">
+  <Card title="触感与工具">
     <!-- 剪贴板测试 -->
     <view style="background-color: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0;">
       <text style="font-size: 12px; color: #94a3b8; margin-bottom: 8px;">剪贴板测试文本</text>
       <input
         v-model="copyText"
         placeholder="请输入要复制的文本"
-        style="background-color: #ffffff; border-radius: 6px; padding: 8px 12px; border-width: 1px; border-style: solid; border-color: #cbd5e1; font-size: 14px; color: #334155; margin-bottom: 12px;"
+        style="height: 38px; background-color: #ffffff; border-radius: 6px; padding: 0 12px; border-width: 1px; border-style: solid; border-color: #cbd5e1; font-size: 14px; color: #334155; margin-bottom: 12px;"
       />
       <up-button type="success" size="small" @click="handleCopy">
-        {{ $t('function.copyBtn') }}
+        复制测试文本
       </up-button>
     </view>
 
     <!-- 短震动 -->
     <up-button type="warning" @click="triggerVibration">
-      {{ $t('function.vibrateBtn') }}
+      短震动反馈
     </up-button>
   </Card>
 </template>
 
 <script setup lang="uts">
 import Card from '../../basic/components/Card.uvue'
-import { t } from '@/src/utils/i18n'
 import { ref } from 'vue'
-
-// #ifdef APP-ANDROID
-/* eslint-disable */
-import Context from 'android.content.Context';
-import Vibrator from 'android.os.Vibrator';
-import Build from 'android.os.Build';
-import VibrationEffect from 'android.os.VibrationEffect';
-/* eslint-enable */
-// #endif
 
 const copyText = ref('Hello unibestX!')
 
 function triggerVibration() {
-  // #ifdef APP-ANDROID
-  const context = UTSAndroid.getAppContext()
-  if (context != null) {
-    const vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-    if (Build.VERSION.SDK_INT >= 26) {
-      vibrator.vibrate(VibrationEffect.createOneShot(15, VibrationEffect.DEFAULT_AMPLITUDE))
-    }
-    else {
-      vibrator.vibrate(15)
-    }
-    uni.showToast({
-      title: t('function.vibrateSuccess'),
-      icon: 'none',
-    })
-  }
-  // #endif
-
-  // #ifndef APP-ANDROID
+  // #ifndef APP
   uni.vibrateShort({
     success: () => {
       uni.showToast({
-        title: t('function.vibrateSuccess'),
+        title: '已触发短震动',
         icon: 'none',
       })
     },
@@ -73,7 +46,7 @@ function handleCopy() {
     data: copyText.value,
     success: () => {
       uni.showToast({
-        title: t('function.copySuccess'),
+        title: '复制成功',
         icon: 'success',
       })
     },

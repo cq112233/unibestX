@@ -1,34 +1,35 @@
 <template>
-	<Card :title="$t('basic.themeTitle')">
-		<!-- 预览区域 -->
-		<view style="background-color: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0; align-items: center;">
-			<text style="font-size: 12px; color: #94a3b8; margin-bottom: 8px;">{{ $t('basic.themePreview') }}</text>
+  <Card title="主题设置">
+    <!-- 预览区域 -->
+    <view style="background-color: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0; align-items: center;">
+      <text style="font-size: 12px; color: #94a3b8; margin-bottom: 8px;">主题色效果预览</text>
 
-			<!-- 主题色按钮 -->
-			<button class="mt-10px mx-auto w-200px h-44px rounded-8px text-white text-14px !bg-primary">
-					uni：{{ $t('basic.themeButton') }}
-			</button>
-			<up-button type="primary" class="mt-10px">
-					uview-ultra： {{ $t('basic.themeButton') }}
-			</up-button>
-		</view>
+      <!-- 主题色按钮 -->
+      <button class="mt-10px mx-auto w-200px h-44px rounded-8px text-white text-14px !bg-primary">
+        uni：主题按钮
+      </button>
+      <up-button type="primary" class="mt-10px">
+        uview-ultra： 主题按钮
+      </up-button>
+    </view>
 
-		<!-- 颜色选择区 -->
-		<view style="flex-direction: row; justify-content: space-around; align-items: center; padding: 10px 0;">
-			<view
-v-for="(item, index) in colorOptions" :key="index" :style="{ width: '40px', height: '40px', borderRadius: '20px', backgroundColor: item, alignItems: 'center', justifyContent: 'center', borderWidth: appStore.state.theme === item ? '2px' : '0px', borderStyle: 'solid', borderColor: '#334155' }"
-				  @click="changeTheme(item)"
->
-				<uni-icons v-if="appStore.state.theme === item" type="checkmarkempty" size="16" style="color: #ffffff;" />
-			</view>
-		</view>
-	</Card>
+    <!-- 颜色选择区 -->
+    <view style="flex-direction: row; justify-content: space-around; align-items: center; padding: 10px 0;">
+      <view
+        v-for="(item, index) in colorOptions"
+        :key="index"
+        :style="{ width: '40px', height: '40px', borderRadius: '20px', backgroundColor: item, alignItems: 'center', justifyContent: 'center', borderWidth: appStore.state.theme === item ? '2px' : '0px', borderStyle: 'solid', borderColor: '#334155' }"
+        @click="changeTheme(item)"
+      >
+        <uni-icons v-if="appStore.state.theme === item" type="checkmarkempty" size="16" style="color: #ffffff;" />
+      </view>
+    </view>
+  </Card>
 </template>
 
 <script setup lang="uts">
 import Card from './Card.uvue'
 import { useAppStore } from '@/src/store'
-import { t } from '@/src/utils/i18n'
 
 const appStore = useAppStore()
 
@@ -45,7 +46,7 @@ function changeTheme(color: string) {
   appStore.setTheme(color)
 
   uni.showToast({
-    title: t('basic.themeSuccess'),
+    title: '主题切换成功',
     icon: 'none',
     duration: 1500,
   })

@@ -11,9 +11,26 @@ export type IAppState = {
   locale : string
 }
 
+function getSystemLocale() : string {
+  try {
+    const sysInfo = uni.getSystemInfoSync()
+    const appLang = sysInfo.appLanguage
+    if (appLang != null && appLang.toLowerCase().includes('zh')) {
+      return 'zh-CN'
+    }
+    if (appLang != null && appLang.toLowerCase().includes('en')) {
+      return 'en-US'
+    }
+  }
+  catch (e) {
+    // ignore
+  }
+  return 'zh-CN'
+}
+
 const defaultAppState : IAppState = {
   theme: '#37c2bc',
-  locale: 'zh-CN',
+  locale: getSystemLocale(),
 }
 
 // ==========================================
@@ -24,7 +41,7 @@ export class AppStore extends PiniaStoreBase {
   // 1. 响应式状态
   state : IAppState = reactive<IAppState>({
     theme: '#37c2bc',
-    locale: 'zh-CN',
+    locale: getSystemLocale(),
   })
 
   // 2. constructor

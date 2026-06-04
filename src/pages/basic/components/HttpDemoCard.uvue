@@ -130,7 +130,7 @@ async function loadMockData() {
   try {
     const list = await getFooList()
     mockList.value = list
-    toastSuccess(`加载了 ${list.length} 条数据`)
+    // toastSuccess(`加载了 ${list.length} 条数据`)
   }
   catch (err) {
     console.error('loadMockData error:', err)

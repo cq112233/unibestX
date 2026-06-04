@@ -1,23 +1,23 @@
 <template>
-  <Card :title="$t('basic.echartTitle')">
+  <Card title="ECharts 图表示例">
     <view style="width: 100%; height: 260px; margin-top: 10px;">
       <e-chart ref="echartRef" style="width: 100%; height: 100%;" @ready="initEchart" />
     </view>
     <view style="flex-direction: row; justify-content: space-between; margin-top: 15px;">
       <view style="flex: 1; margin-right: 8px;">
         <up-button size="small" type="primary" :plain="currentType !== 'line'" @click="changeToLine">
-{{ $t('basic.echartLine') }}
-</up-button>
+          折线图
+        </up-button>
       </view>
       <view style="flex: 1; margin-right: 8px;">
         <up-button size="small" type="success" :plain="currentType !== 'bar'" @click="changeToBar">
-{{ $t('basic.echartBar') }}
-</up-button>
+          柱状图
+        </up-button>
       </view>
       <view style="flex: 1;">
         <up-button size="small" type="warning" :plain="currentType !== 'pie'" @click="changeToPie">
-{{ $t('basic.echartPie') }}
-</up-button>
+          饼图
+        </up-button>
       </view>
     </view>
   </Card>
