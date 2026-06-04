@@ -1,0 +1,183 @@
+<template>
+  <view class="page-root">
+    <!-- 导航栏 -->
+    <NavBar title="分页加载 (z-paging-x)" :show-back="true" />
+
+    <!-- 顶部过滤 Tabs (移到 z-paging-x 外部) -->
+    <view style="background-color: #ffffff; padding: 12px 16px; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #f1f5f9;">
+      <view style="flex-direction: row; background-color: #f1f5f9; border-radius: 12px; padding: 4px;">
+        <view
+          v-for="(tab, index) in tabList"
+          :key="index"
+          style="flex: 1; align-items: center; justify-content: center; padding: 8px 0; border-radius: 8px;"
+          :style="{ backgroundColor: tabIndex === index ? '#ffffff' : 'transparent' }"
+          @click="tabChange(index)"
+        >
+          <text
+            style="font-size: 13px; font-weight: bold;"
+            :style="{ color: tabIndex === index ? 'var(--theme-color, #37c2bc)' : '#64748b' }"
+          >
+            {{ tab }}
+          </text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 分页组件 -->
+    <z-paging-x
+      ref="pagingX"
+      :model-value="dataList"
+      @update:model-value="onUpdateModelValue"
+      :default-page-size="10"
+      @query="onQuery"
+      class="flex-1"
+    >
+      <!-- 列表数据 -->
+      <list-item v-for="item in dataList" :key="item.id">
+        <view style="margin: 8px 16px; padding: 16px; background-color: #ffffff; border-radius: 12px; border-width: 1px; border-style: solid; border-color: #edf2f7; box-shadow: 0 1px 3px rgba(0,0,0,0.01);">
+          <!-- 头部信息 -->
+          <view style="flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <view :style="{ backgroundColor: item.tagBgColor, padding: '2px 8px', borderRadius: '6px' }">
+              <text :style="{ color: item.tagColor, fontSize: '10px', fontWeight: 'bold' }">{{ item.tag }}</text>
+            </view>
+            <text style="font-size: 12px; color: #94a3b8;">#{{ item.id }}</text>
+          </view>
+          
+          <!-- 标题 & 摘要 -->
+          <text style="font-size: 15px; font-weight: bold; color: #1e293b; margin-bottom: 6px;">{{ item.title }}</text>
+          <text style="font-size: 13px; color: #64748b; line-height: 18px; margin-bottom: 12px;">{{ item.summary }}</text>
+          
+          <!-- 底部栏 -->
+          <view style="flex-direction: row; justify-content: space-between; align-items: center; border-top-width: 1px; border-top-style: solid; border-top-color: #f8fafc; padding-top: 8px;">
+            <text style="font-size: 12px; color: #475569; font-weight: 500;">{{ item.author }}</text>
+            <text style="font-size: 11px; color: #94a3b8;">{{ item.createTime }}</text>
+          </view>
+        </view>
+      </list-item>
+    </z-paging-x>
+  </view>
+</template>
+
+<script setup lang="uts">
+/* eslint-disable eqeqeq */
+/* eslint-disable ts/consistent-type-definitions */
+import { ref } from 'vue'
+
+// 声明 ArticleItem 类型（使用 type 别名符合 UTS 强类型规范）
+type ArticleItem = {
+  id: number
+  title: string
+  summary: string
+  author: string
+  createTime: string
+  tag: string
+  tagBgColor: string
+  tagColor: string
+}
+
+// 选项卡配置
+const tabList = ['全部', '技术', '设计', '生活']
+const tabIndex = ref<number>(0)
+
+// z-paging-x 组件引用与数据绑定
+const pagingX = ref<ComponentPublicInstance | null>(null)
+const dataList = ref<ArticleItem[]>([])
+
+// 手动更新绑定的列表数据，避免 compiler 产生 union types
+function onUpdateModelValue(val: any[]) {
+  dataList.value = val as ArticleItem[]
+}
+
+// 模拟获取数据 API 函数
+function getMockArticles(category: string, pageNo: number, pageSize: number): ArticleItem[] {
+  const list = [] as ArticleItem[]
+  const start = (pageNo - 1) * pageSize
+  
+  for (let i = 0; i < pageSize; i++) {
+    const itemId = start + i + 1
+    // 限制列表总大小为 35 条，以演示 "没有更多数据"
+    if (itemId > 35) {
+      break
+    }
+    
+    // 确定文章标签与对应的颜色配方
+    let tag = category
+    if (category == '全部') {
+      const idx = itemId % 3
+      if (idx == 0) tag = '技术'
+      else if (idx == 1) tag = '设计'
+      else tag = '生活'
+    }
+    
+    let tagBgColor = '#e0f2fe'
+    let tagColor = '#0284c7'
+    if (tag == '设计') {
+      tagBgColor = '#f3e8ff'
+      tagColor = '#7c3aed'
+    } else if (tag == '生活') {
+      tagBgColor = '#dcfce7'
+      tagColor = '#16a34a'
+    }
+    
+    list.push({
+      id: itemId,
+      title: `${tag}专栏 · 探索移动端开发的未来第 ${itemId} 篇`,
+      summary: `这是关于 ${tag} 领域的精选分享文章。通过全新的跨端原生开发理念，帮助开发者在性能与效率之间找到完美的平衡点。`,
+      author: '技术专家 · 菲鸽',
+      createTime: `06-04 15:${30 - i}`,
+      tag,
+      tagBgColor,
+      tagColor
+    } as ArticleItem)
+  }
+  return list
+}
+
+// 下拉刷新或触底加载的回调
+function onQuery(pageNo: number, pageSize: number) {
+  const currentCategory = tabList[tabIndex.value]
+  
+  // 模拟 800ms 的网络延时
+  setTimeout(() => {
+    try {
+      const data = getMockArticles(currentCategory, pageNo, pageSize)
+      if (pagingX.value != null) {
+        pagingX.value!.$callMethod('complete', data)
+      }
+    } catch (e) {
+      if (pagingX.value != null) {
+        pagingX.value!.$callMethod('completeByError')
+      }
+    }
+  }, 800)
+}
+
+// 切换 Tab 时触发重新加载
+function tabChange(index: number) {
+  tabIndex.value = index
+  if (pagingX.value != null) {
+    pagingX.value!.$callMethod('reload')
+  }
+}
+</script>
+
+<style>
+/* #ifndef APP */
+page {
+  height: 100%;
+  display: flex;
+}
+/* #endif */
+
+.page-root {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+  background-color: #f7fafc;
+}
+
+.flex-1 {
+  flex: 1;
+}
+</style>

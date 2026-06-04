@@ -22,6 +22,9 @@ const composer = uniHelper({
   ],
   // https://eslint-config.antfu.me/rules
   rules: {
+    'vue/v-slot-style': 'off',
+    'style/vue/v-slot-style': 'off',
+    'vue/no-deprecated-slot-attribute': 'off',
     'vue/html-self-closing': 'off',
     'no-useless-return': 'off',
     'no-console': 'off',

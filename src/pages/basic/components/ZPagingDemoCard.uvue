@@ -1,0 +1,191 @@
+<template>
+  <Card title="数据分页列表 (z-paging-x)">
+    <view style="flex-direction: column; margin-bottom: 12px;">
+      <text style="font-size: 13px; color: #64748b; line-height: 18px; margin-bottom: 8px;">
+        在卡片中直接体验实时分页，支持触底加载、下拉刷新以及各种状态切换。
+      </text>
+
+      <!-- 快捷操作栏：用 margin-right 代替 gap -->
+      <view style="flex-direction: row; margin-bottom: 12px;">
+        <view style="flex: 1; margin-right: 8px;">
+          <up-button 
+            size="mini" 
+            type="error" 
+            :plain="true" 
+            @click="triggerError"
+          >
+            模拟加载错误
+          </up-button>
+        </view>
+        <view style="flex: 1;">
+          <up-button 
+            size="mini" 
+            type="warning" 
+            :plain="true" 
+            @click="triggerClear"
+          >
+            清空数据
+          </up-button>
+        </view>
+      </view>
+    </view>
+
+    <!-- 顶部 Tab 过滤 (移到 z-paging-x 外部) -->
+    <view style="background-color: #ffffff; padding: 8px 12px; border-width: 1px; border-style: solid; border-color: #edf2f7; border-bottom-width: 0px; border-top-left-radius: 12px; border-top-right-radius: 12px;">
+      <view style="flex-direction: row; background-color: #f1f5f9; border-radius: 8px; padding: 2px;">
+        <view
+          v-for="(tab, index) in tabList"
+          :key="index"
+          style="flex: 1; align-items: center; justify-content: center; padding: 6px 0; border-radius: 6px;"
+          :style="{ backgroundColor: tabIndex === index ? '#ffffff' : 'transparent' }"
+          @click="tabChange(index)"
+        >
+          <text
+            style="font-size: 12px; font-weight: bold;"
+            :style="{ color: tabIndex === index ? 'var(--theme-color, #37c2bc)' : '#64748b' }"
+          >
+            {{ tab }}
+          </text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 分页容器 -->
+    <z-paging-x
+      ref="pagingX"
+      :model-value="dataList"
+      @update:model-value="onUpdateModelValue"
+      :default-page-size="5"
+      list-is="scroll-view"
+      :paging-style="{ height: '200px', border: '1px solid #edf2f7', borderTopWidth: '0px', borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px', backgroundColor: '#f8fafc' }"
+      @query="onQuery"
+    >
+      <!-- 列表数据项 (默认插槽) -->
+      <view v-for="item in dataList" :key="item.id" style="margin: 8px 12px; padding: 12px; background-color: #ffffff; border-radius: 8px; border-width: 1px; border-style: solid; border-color: #edf2f7;">
+        <view style="flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <view :style="{ backgroundColor: item.tagBgColor, padding: '1px 6px', borderRadius: '4px' }">
+            <text :style="{ color: item.tagColor, fontSize: '9px', fontWeight: 'bold' }">{{ item.tag }}</text>
+          </view>
+          <text style="font-size: 11px; color: #94a3b8;">#{{ item.id }}</text>
+        </view>
+        <text style="font-size: 14px; font-weight: bold; color: #1e293b; margin-bottom: 4px;">{{ item.title }}</text>
+        <text style="font-size: 12px; color: #64748b; line-height: 16px;">{{ item.summary }}</text>
+      </view>
+    </z-paging-x>
+  </Card>
+</template>
+
+<script setup lang="uts">
+/* eslint-disable eqeqeq */
+/* eslint-disable ts/consistent-type-definitions */
+import { ref } from 'vue'
+import Card from './Card.uvue'
+
+type CompactArticleItem = {
+  id: number
+  title: string
+  summary: string
+  tag: string
+  tagBgColor: string
+  tagColor: string
+}
+
+// 模拟加载状态控制
+const shouldFail = ref<boolean>(false)
+
+// 选项卡配置
+const tabList = ['全部', '技术', '设计']
+const tabIndex = ref<number>(0)
+
+// z-paging-x 组件引用与数据绑定
+const pagingX = ref<ComponentPublicInstance | null>(null)
+const dataList = ref<CompactArticleItem[]>([])
+
+// 手动更新 modelValue
+function onUpdateModelValue(val: any[]) {
+  dataList.value = val as CompactArticleItem[]
+}
+
+// 切换选项卡
+function tabChange(index: number) {
+  tabIndex.value = index
+  if (pagingX.value != null) {
+    pagingX.value!.$callMethod('reload')
+  }
+}
+
+// 触发错误模拟
+function triggerError() {
+  shouldFail.value = true
+  if (pagingX.value != null) {
+    pagingX.value!.$callMethod('reload')
+  }
+}
+
+// 清空数据模拟
+function triggerClear() {
+  dataList.value = []
+  if (pagingX.value != null) {
+    pagingX.value!.$callMethod('complete', [] as CompactArticleItem[])
+  }
+}
+
+// 模拟获取数据
+function getMockArticles(category: string, pageNo: number, pageSize: number): CompactArticleItem[] {
+  const list = [] as CompactArticleItem[]
+  const start = (pageNo - 1) * pageSize
+  
+  for (let i = 0; i < pageSize; i++) {
+    const itemId = start + i + 1
+    // 限制列表总数为 12 条
+    if (itemId > 12) {
+      break
+    }
+    
+    let tag = category
+    if (category == '全部') {
+      tag = itemId % 2 == 0 ? '技术' : '设计'
+    }
+    
+    let tagBgColor = '#e0f2fe'
+    let tagColor = '#0284c7'
+    if (tag == '设计') {
+      tagBgColor = '#f3e8ff'
+      tagColor = '#7c3aed'
+    }
+    
+    list.push({
+      id: itemId,
+      title: `${tag}动态 · 原生探索第 ${itemId} 篇`,
+      summary: `卡片演示中的 ${tag} 文章，支持局部滚动加载数据。`,
+      tag,
+      tagBgColor,
+      tagColor
+    } as CompactArticleItem)
+  }
+  return list
+}
+
+// 查询数据回调
+function onQuery(pageNo: number, pageSize: number) {
+  const currentCategory = tabList[tabIndex.value]
+  
+  setTimeout(() => {
+    if (shouldFail.value) {
+      shouldFail.value = false
+      if (pagingX.value != null) {
+        pagingX.value!.$callMethod('completeByError')
+      }
+      return
+    }
+    
+    const data = getMockArticles(currentCategory, pageNo, pageSize)
+    if (pagingX.value != null) {
+      pagingX.value!.$callMethod('complete', data)
+    }
+  }, 600)
+}
+</script>
+
+<style>
+</style>
