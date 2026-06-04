@@ -8,20 +8,20 @@
       <!-- 快捷操作栏：用 margin-right 代替 gap -->
       <view style="flex-direction: row; margin-bottom: 12px;">
         <view style="flex: 1; margin-right: 8px;">
-          <up-button 
-            size="mini" 
-            type="error" 
-            :plain="true" 
+          <up-button
+            size="mini"
+            type="error"
+            :plain="true"
             @click="triggerError"
           >
             模拟加载错误
           </up-button>
         </view>
         <view style="flex: 1;">
-          <up-button 
-            size="mini" 
-            type="warning" 
-            :plain="true" 
+          <up-button
+            size="mini"
+            type="warning"
+            :plain="true"
             @click="triggerClear"
           >
             清空数据
@@ -54,10 +54,10 @@
     <z-paging-x
       ref="pagingX"
       :model-value="dataList"
-      @update:model-value="onUpdateModelValue"
       :default-page-size="5"
       list-is="scroll-view"
       :paging-style="{ height: '200px', border: '1px solid #edf2f7', borderTopWidth: '0px', borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px', backgroundColor: '#f8fafc' }"
+      @update:model-value="onUpdateModelValue"
       @query="onQuery"
     >
       <!-- 列表数据项 (默认插槽) -->
@@ -134,33 +134,33 @@ function triggerClear() {
 function getMockArticles(category: string, pageNo: number, pageSize: number): CompactArticleItem[] {
   const list = [] as CompactArticleItem[]
   const start = (pageNo - 1) * pageSize
-  
+
   for (let i = 0; i < pageSize; i++) {
     const itemId = start + i + 1
     // 限制列表总数为 12 条
     if (itemId > 12) {
       break
     }
-    
+
     let tag = category
     if (category == '全部') {
       tag = itemId % 2 == 0 ? '技术' : '设计'
     }
-    
+
     let tagBgColor = '#e0f2fe'
     let tagColor = '#0284c7'
     if (tag == '设计') {
       tagBgColor = '#f3e8ff'
       tagColor = '#7c3aed'
     }
-    
+
     list.push({
       id: itemId,
       title: `${tag}动态 · 原生探索第 ${itemId} 篇`,
       summary: `卡片演示中的 ${tag} 文章，支持局部滚动加载数据。`,
       tag,
       tagBgColor,
-      tagColor
+      tagColor,
     } as CompactArticleItem)
   }
   return list
@@ -169,7 +169,7 @@ function getMockArticles(category: string, pageNo: number, pageSize: number): Co
 // 查询数据回调
 function onQuery(pageNo: number, pageSize: number) {
   const currentCategory = tabList[tabIndex.value]
-  
+
   setTimeout(() => {
     if (shouldFail.value) {
       shouldFail.value = false
@@ -178,7 +178,7 @@ function onQuery(pageNo: number, pageSize: number) {
       }
       return
     }
-    
+
     const data = getMockArticles(currentCategory, pageNo, pageSize)
     if (pagingX.value != null) {
       pagingX.value!.$callMethod('complete', data)

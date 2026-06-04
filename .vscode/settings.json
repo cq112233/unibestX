@@ -18,7 +18,24 @@
   "typescript.validate.enable": false,
   "javascript.validate.enable": false,
 
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.expand": false,
+  "explorer.fileNesting.patterns": {
+    "README.md": "index.html,favicon.ico,robots.txt,CHANGELOG.md",
+    "docker.md": "Dockerfile,docker*.md,nginx*,.dockerignore",
+    "pages.config.ts": "manifest.config.ts,openapi-ts-request.config.ts",
+    "package.json": "tsconfig.json,pnpm-lock.yaml,pnpm-workspace.yaml,LICENSE,.gitattributes,.gitignore,.gitpod.yml,CNAME,.npmrc,.browserslistrc",
+    "eslint.config.mjs": ".commitlintrc.*,.prettier*,.editorconfig,.commitlint.cjs,.eslint*"
+  },
+
+  "stylelint.enable": false,
+  "css.validate": false,
+  "scss.validate": false,
+  "less.validate": false,
+
   "typescript.tsdk": "node_modules/typescript/lib",
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
+  "js/ts.tsdk.promptToUseWorkspaceVersion": true,
   "editor.formatOnSave": true,
   "prettier.enable": false,
   "editor.defaultFormatter": "dbaeumer.vscode-eslint",
@@ -98,6 +115,6 @@
     "strict": false
   },
   "[typescript]": {
-    "editor.defaultFormatter": "vscode.typescript-language-features"
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   }
 }
