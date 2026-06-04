@@ -101,15 +101,20 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
         *   *正确做法*：`const year = date.getFullYear() as number`
 *   **代码语句分割**：
     *   多行书写时行尾分号 `;` 可省略。同行多条语句必须以分号分割。
-*   **对象字面量与接口限制 (Object Literals & Interfaces)**：
-    *   UTS 不允许将对象字面量直接赋值给 `interface` 定义的类型（会触发 `UTS110111163` 编译错误）。对于需要接收/赋值对象字面量的类型，必须使用 `type`（类型别名）进行定义。
-        *   *错误做法*：`interface Config { name: string }; const c: Config = { name: "UTS" }`
-        *   *正确做法*：`type Config = { name: string }; const c: Config = { name: "UTS" }`
-*   **模板自闭合标签限制 (Template Void Elements)**：
-    *   在 `.uvue` 模板中，像 `<input>` 等 HTML Void 元素必须显式地进行自闭合（如 `<input />`），否则 uni-app X 编译器会报 `Element is missing end tag` 错误。同时，可以在 ESLint 中配置或关闭相关的 html-self-closing 规则以避免 lint 冲突。
-*   **等值比较限制 (Value Equality vs Identity Equality)**：
-    *   在 UTS 中，避免对数字 (`Number`/`Int`/`Double`) 或布尔值（如可空的 `Boolean?` 与 `Boolean`）使用身份全等运算符 `===`。
-    *   因为这在 Kotlin (Android) 原生端会编译为引用/身份比较，而隐式装箱（Implicit Boxing）会导致不同包装对象之间即使数值/状态相同，引用比较也返回 `false`。
-    *   *错误示例*：`if (statusCode === 401)`，`if (toastVal === false)`
-    *   *正确做法*：使用普通值相等运算符 `==` 或值不等运算符 `!=`（例如 `if (statusCode == 401)`，`if (toastVal == false)`）。
-
+* **对象字面量与接口限制 (Object Literals & Interfaces)**：
+  * UTS 不允许将对象字面量直接赋值给 `interface` 定义的类型（会触发 `UTS110111163` 编译错误）。对于需要接收/赋值对象字面量的类型，必须使用 `type`（类型别名）进行定义。
+  * *错误示例*：`interface Config { name: string }; const c: Config = { name: "UTS" }`
+  * *正确做法*：`type Config = { name: string }; const c: Config = { name: "UTS" }`
+* **模板自闭合标签限制 (Template Void Elements)**：
+  * 在 `.uvue` 模板中，像 `<input>` 等 HTML Void 元素必须显式地进行自闭合（如 `<input />`），否则 uni-app X 编译器会报 `Element is missing end tag` 错误。同时，可以在 ESLint 中配置或关闭相关的 html-self-closing 规则以避免 lint 冲突。
+* **等值比较限制 (Value Equality vs Identity Equality)**：
+  * 在 UTS 中，避免对数字 (`Number`/`Int`/`Double`)、布尔值（如可空的 `Boolean?` 与 `Boolean`）以及**字符串 (`String`)** 使用身份全等运算符 `===`。
+  * 因为这在 Kotlin (Android) 原生端会编译为引用/身份比较。对于字符串，`===` 比较的是它们的内存地址，即使文本内容完全一样也可能因为不是同一引用而返回 `false`；对于数字/布尔值，隐式装箱（Implicit Boxing）会导致不同包装对象之间的引用比较返回 `false`。
+  * *错误示例*：`if (statusCode === 401)`，`if (toastVal === false)`，`if (currentLocale === 'zh-CN')`
+  * *正确做法*：使用普通值相等运算符 `==` 或值不等运算符 `!=`（例如 `if (statusCode == 401)`，`if (toastVal == false)`，`if (currentLocale == 'zh-CN')`）。
+* **平台特定 API 与条件编译 (Platform Specific APIs & Conditional Compilation)**：
+  * 某些原生平台不支持的或限制的通用 API（如 `uni.vibrateShort`、`uni.getLocale` 等），在 App-Android/iOS 编译时会触发 `请检查 xxx 的拼写是否正确` 的编译错误。
+  * *正确做法*：对于此类非全端支持的 API，必须使用条件编译（如 `// #ifndef APP` 或 `// #ifdef H5 || MP-WEIXIN`）进行包裹隔离，防止在不支持的平台触发编译失败。
+* **安全获取系统与应用语言 (Safe Access to System Locale)**：
+  * 在原生 Android/iOS 平台上，`uni.getLocale()` 不被直接支持或编译时可能报错。
+  * *正确做法*：在 App 端，使用 `uni.getSystemInfoSync().appLanguage`（应用当前语言）或 `uni.getDeviceInfo().osLanguage`（系统底层语言）来获取安全真实的语言。
