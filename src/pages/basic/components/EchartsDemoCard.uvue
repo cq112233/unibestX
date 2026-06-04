@@ -25,7 +25,8 @@
 
 <script setup lang="uts">
 import Card from './Card.uvue'
-import { ref } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { systemInfo } from '@/src/utils/systemInfo'
 
 const echartRef = ref<ComponentPublicInstance | null>(null)
 const currentType = ref('line')
@@ -192,6 +193,20 @@ function changeToPie() {
     chart.$callMethod('setOption', pieOption)
   }
 }
+
+// 监听屏幕/窗口宽度变化，触发 ECharts 重绘 resize
+const windowWidth = computed((): number => {
+  return systemInfo.value?.windowWidth ?? 0
+})
+
+watch(windowWidth, () => {
+  setTimeout(() => {
+    if (echartRef.value != null) {
+      const chart = echartRef.value as ComponentPublicInstance
+      chart.$callMethod('resize')
+    }
+  }, 100)
+})
 </script>
 
 <style>
