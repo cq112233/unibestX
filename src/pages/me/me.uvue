@@ -4,9 +4,9 @@
       <view class="w-full bg-white rounded-12px py-30px px-20px items-center mb-20px">
         <image class="w-90px h-90px rounded-45px mb-16px border-[3px] border-solid border-[#f1f5f9]" :src="avatarUrl" />
         <text class="text-20px font-bold text-[#1e293b] mb-4px">
-          {{ userStore.state.userInfo.username !== '' ? userStore.state.userInfo.username : '未登录用户' }}
+          {{ userStore.state.userInfo.username.length > 0 ? userStore.state.userInfo.username : '未登录用户' }}
         </text>
-        <text v-if="userStore.state.userInfo.username !== ''" class="text-14px text-[#64748b] mb-12px">
+        <text v-if="userStore.state.userInfo.username.length > 0" class="text-14px text-[#64748b] mb-12px">
           {{ userStore.state.userInfo.nickname }}
         </text>
         <view class="flex flex-row">
@@ -39,13 +39,14 @@
 </template>
 
 <script setup lang="uts">
+/* eslint-disable eqeqeq */
 import { useTokenStore, useUserStore } from '../../store'
 import { LOGIN_PAGE } from '../../router/config'
 import { handleBackPressExit } from '@/src/utils/backPress'
 
 onBackPress((options: OnBackPressOptions): boolean => {
-  // #ifdef APP-HARMONY
-  if (options.from === 'backbutton') {
+  // #ifdef APP
+  if (options.from == 'backbutton') {
     return handleBackPressExit()
   }
   // #endif
@@ -57,7 +58,7 @@ const tokenStore = useTokenStore()
 
 // 计算头像
 const avatarUrl = computed((): string => {
-  if (userStore.state.userInfo.avatar !== '') {
+  if (userStore.state.userInfo.avatar.length > 0) {
     return userStore.state.userInfo.avatar
   }
   return '/static/logo.png'

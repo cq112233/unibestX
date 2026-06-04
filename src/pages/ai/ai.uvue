@@ -1,0 +1,248 @@
+<template>
+  <view class="page-root bg-[#f8fafc]">
+    <!-- 自定义导航栏 -->
+    <NavBar title="AI 智能助手" :show-back="true" />
+
+    <!-- 消息滚动区 -->
+    <scroll-view
+      class="flex-1 px-15px py-10px"
+      scroll-y="true"
+      :scroll-top="scrollTop"
+      :scroll-with-animation="true"
+      style="height: 0px;"
+    >
+      <view v-for="msg in messages" :key="msg.id" class="mb-15px flex-col">
+        <!-- AI 消息 -->
+        <view v-if="isAiMessage(msg.sender)" class="msg-row-start">
+          <view class="w-36px h-36px rounded-18px bg-[#2563eb] items-center justify-center mr-10px shadow-sm">
+            <text class="text-white text-12px font-bold">AI</text>
+          </view>
+          <view class="msg-content-left">
+            <view class="bg-white p-12px rounded-r-16px rounded-bl-16px shadow-sm border border-[#e2e8f0]">
+              <text class="text-[#1e293b] text-14px leading-relaxed">{{ msg.content }}</text>
+            </view>
+            <text class="text-[#94a3b8] text-10px mt-4px ml-4px">{{ msg.time }}</text>
+          </view>
+        </view>
+
+        <!-- 用户消息 -->
+        <view v-else class="msg-row-end">
+          <view class="msg-content-right">
+            <view class="bg-[#10b981] p-12px rounded-l-16px rounded-br-16px shadow-sm">
+              <text class="text-white text-14px leading-relaxed">{{ msg.content }}</text>
+            </view>
+            <text class="text-[#94a3b8] text-10px mt-4px mr-4px">{{ msg.time }}</text>
+          </view>
+          <view class="w-36px h-36px rounded-18px bg-[#e2e8f0] items-center justify-center ml-10px shadow-sm">
+            <text class="text-[#64748b] text-12px font-bold">ME</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- AI 正在输入状态 -->
+      <view v-if="isTyping" class="msg-row-start mb-15px">
+        <view class="w-36px h-36px rounded-18px bg-[#2563eb] items-center justify-center mr-10px shadow-sm">
+          <text class="text-white text-12px font-bold">AI</text>
+        </view>
+        <view class="bg-white p-12px rounded-r-16px rounded-bl-16px shadow-sm border border-[#e2e8f0]">
+          <text class="text-[#64748b] text-14px">AI 正在思考中...</text>
+        </view>
+      </view>
+
+      <!-- 底部安全间距占位 -->
+      <view class="h-20px" />
+    </scroll-view>
+
+    <!-- 底部输入框区 -->
+    <view class="bg-white border-t border-[#e2e8f0] p-10px flex-col" :style="{ paddingBottom: `${safeAreaBottom + 10}px` }">
+      <view class="flex-row items-center bg-[#f1f5f9] rounded-24px px-12px py-6px">
+        <input
+          v-model="inputText"
+          type="text"
+          placeholder="和 AI 助手聊点什么吧..."
+          placeholder-style="color: #94a3b8"
+          class="chat-input"
+          confirm-type="send"
+          @confirm="sendMessage"
+        />
+        <view class="w-32px h-32px rounded-16px bg-[#2563eb] items-center justify-center ml-8px" @click="sendMessage">
+          <uni-icons type="paperplane-filled" size="18" color="#ffffff"></uni-icons>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+/* eslint-disable eqeqeq */
+/* eslint-disable ts/consistent-type-definitions */
+import NavBar from '@/src/components/NavBar/NavBar.uvue'
+import { safeAreaInsets } from '@/src/utils/systemInfo'
+
+type ChatMessage = {
+  id: string
+  sender: string
+  content: string
+  time: string
+}
+
+const messages = ref<ChatMessage[]>([])
+const inputText = ref<string>('')
+const isTyping = ref<boolean>(false)
+const scrollTop = ref<number>(0)
+
+// 判断是否为 AI 消息
+function isAiMessage(sender: string): boolean {
+  return sender == 'ai'
+}
+
+// 底部安全区
+const safeAreaBottom = computed<number>((): number => {
+  const insets = safeAreaInsets.value
+  if (insets != null) {
+    return insets.bottom
+  }
+  return 0
+})
+
+// 获取当前时间字符串
+function getCurrentTime(): string {
+  const date = new Date()
+  const hours = date.getHours() as number
+  const minutes = date.getMinutes() as number
+  const hStr = hours < 10 ? `0${hours}` : `${hours}`
+  const mStr = minutes < 10 ? `0${minutes}` : `${minutes}`
+  return `${hStr}:${mStr}`
+}
+
+// 自动滚动到底部
+function scrollToBottom() {
+  setTimeout(() => {
+    scrollTop.value = scrollTop.value + 1000
+  }, 100)
+}
+
+// 发送消息
+function sendMessage() {
+  const text = inputText.value.trim()
+  if (text == '') return
+
+  // 添加用户消息
+  const userMsgId = Date.now().toString()
+  messages.value.push({
+    id: userMsgId,
+    sender: 'user',
+    content: text,
+    time: getCurrentTime()
+  } as ChatMessage)
+
+  inputText.value = ''
+  scrollToBottom()
+
+  // 模拟 AI 回复
+  isTyping.value = true
+
+  setTimeout(() => {
+    isTyping.value = false
+    let replyContent = '收到你的消息！目前这只是一个模拟的 AI 对话窗口，你可以在此基础上接入你自己的大语言模型（如 DeepSeek、OpenAI、Gemini等）。'
+
+    if (text.includes('你好') || text.includes('hello')) {
+      replyContent = '你好！我是你的 AI 助手，很高兴为你提供服务。有什么我可以帮你的吗？😊'
+    } else if (text.includes('模板') || text.includes('unibest')) {
+      replyContent = 'unibestX 是基于 uni-app X 极速开发模板。它支持 TypeScript、UnoCSS、UTS 插件，并能完美编译为原生 Android/iOS App！'
+    } else if (text.includes('组件')) {
+      replyContent = '当前模板内置了许多优秀的组件，例如 NavBar 导航栏、uview UI 库组件等，你都可以直接使用。'
+    }
+
+    messages.value.push({
+      id: Date.now().toString(),
+      sender: 'ai',
+      content: replyContent,
+      time: getCurrentTime()
+    } as ChatMessage)
+
+    scrollToBottom()
+  }, 800)
+}
+
+onMounted(() => {
+  // 欢迎语
+  messages.value.push({
+    id: 'welcome',
+    sender: 'ai',
+    content: '你好！我是你的 AI 智能助手。你可以询问我任何关于本应用的问题，或者只是和我随便聊聊！✨',
+    time: getCurrentTime()
+  } as ChatMessage)
+})
+</script>
+
+<style>
+/* #ifndef APP */
+page {
+  height: 100%;
+  display: flex;
+}
+/* #endif */
+.page-root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.msg-row-start {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+.msg-row-end {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+.msg-content-left {
+  display: flex;
+  flex-direction: column;
+  /* #ifndef APP */
+  max-width: 70%;
+  /* #endif */
+  /* #ifdef APP */
+  max-width: 270px;
+  /* #endif */
+}
+.msg-content-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  /* #ifndef APP */
+  max-width: 70%;
+  /* #endif */
+  /* #ifdef APP */
+  max-width: 270px;
+  /* #endif */
+}
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+.items-center {
+  align-items: center;
+}
+.justify-center {
+  justify-content: center;
+}
+.flex-1 {
+  flex: 1;
+}
+.chat-input {
+  flex: 1;
+  height: 36px;
+  background-color: #f1f5f9;
+  color: #1e293b;
+  font-size: 14px;
+  border-width: 0px;
+}
+</style>

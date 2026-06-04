@@ -18,14 +18,15 @@
 </template>
 
 <script setup lang="uts">
+/* eslint-disable eqeqeq */
 import SystemInfoCard from './components/SystemInfoCard.uvue'
 import HapticsCard from './components/HapticsCard.uvue'
 import MediaCard from './components/MediaCard.uvue'
 import { handleBackPressExit } from '@/src/utils/backPress'
 
 onBackPress((options: OnBackPressOptions): boolean => {
-  // #ifdef APP-HARMONY
-  if (options.from === 'backbutton') {
+  // #ifdef APP
+  if (options.from == 'backbutton') {
     return handleBackPressExit()
   }
   // #endif

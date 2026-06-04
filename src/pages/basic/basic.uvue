@@ -27,6 +27,7 @@
 </template>
 
 <script setup lang="uts">
+/* eslint-disable eqeqeq */
 import IconDemoCard from './components/IconDemoCard.uvue'
 import LangSwitchCard from './components/LangSwitchCard.uvue'
 import ThemeSwitchCard from './components/ThemeSwitchCard.uvue'
@@ -39,8 +40,8 @@ import { updateSystemInfo } from '@/src/utils/systemInfo'
 import { handleBackPressExit } from '@/src/utils/backPress'
 
 onBackPress((options: OnBackPressOptions): boolean => {
-  // #ifdef APP-HARMONY
-  if (options.from === 'backbutton') {
+  // #ifdef APP
+  if (options.from == 'backbutton') {
     return handleBackPressExit()
   }
   // #endif

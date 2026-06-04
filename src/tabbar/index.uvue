@@ -1,15 +1,34 @@
 <script setup lang="uts">
+/* eslint-disable eqeqeq */
 import { curIdx, setCurIdx, syncCurIdxByCurrentPage, tabbarList } from './store'
 import TabbarItem from './TabbarItem.uvue'
+import { safeAreaInsets } from '../utils/systemInfo'
+
+/** tabbar 白色底板高度（px） */
+const TABBAR_HEIGHT: number = 50
+
+/** tabbar 容器总高度（包含鼓包突出的部分） */
+const TABBAR_CONTAINER_HEIGHT: number = 80
+
+/** 安全区底部高度，从全局 systemInfo 工具中响应式读取 */
+const safeAreaBottom = computed<number>((): number => {
+  const insets = safeAreaInsets.value
+  if (insets != null) {
+    return insets.bottom
+  }
+  return 0
+})
 
 /** 中间鼓包 tabbarItem 点击事件 */
 function handleClickBulge() {
-  uni.showToast({ title: '点击了 AI 助手', icon: 'none' })
+  uni.navigateTo({
+    url: '/src/pages/ai/ai',
+  })
 }
 
 /** 点击 tab 切换 */
 function handleClick(index: number) {
-  if (index === curIdx.value)
+  if (index == curIdx.value)
     return
   const list = tabbarList
   if (list.length <= index)
@@ -26,6 +45,7 @@ function handleClick(index: number) {
 // 首次挂载时同步索引
 onMounted(() => {
   syncCurIdxByCurrentPage()
+
   // #ifndef MP-WEIXIN || MP-ALIPAY
   uni.hideTabBar({
     fail: (err: any) => {
@@ -37,74 +57,59 @@ onMounted(() => {
 </script>
 
 <template>
-  <view class="tabbar-placeholder">
-    <view class="tabbar-placeholder-inner"></view>
-    <view class="tabbar-placeholder-safe"></view>
+  <!-- 占位块：防止页面内容被固定底栏遮挡 -->
+  <view class="tabbar-placeholder" :style="{ height: `${TABBAR_HEIGHT + safeAreaBottom}px` }">
+    <view
+      class="tabbar-container"
+      :style="{ height: `${TABBAR_CONTAINER_HEIGHT + safeAreaBottom}px` }"
+    >
+<!-- 【整体白色底板】覆盖「固定高度 + 安全区」的全部区域 -->
+      <view
+        class="tabbar-bg"
+        :style="{ height: `${TABBAR_HEIGHT + safeAreaBottom}px` }"
+      ></view>
 
-    <view class="tabbar-container">
-      <!-- 底部白色底板背景（贴在最底下） -->
-      <view class="tabbar-bg"></view>
-
-      <!-- 选项按钮布局层 -->
+      <!-- 【固定高度】tab 图标按鈕区 -->
       <view class="tabbar-inner">
         <view
           v-for="(item, index) in tabbarList"
           :key="index"
           class="tabbar-item"
+          :class="{ 'tabbar-item-bulge': item.isBulge }"
           @click="handleClick(index)"
         >
-          <!-- 鼓包项 -->
-          <view v-if="item.isBulge" class="bulge-item">
-            <view class="bulge-btn">
-              <text class="ai-btn-text">AI</text>
-            </view>
-          </view>
-
-          <!-- 普通项 -->
-          <view v-else class="normal-item-wrapper">
-            <TabbarItem :item="item" :index="index" :is-bulge="false" />
-          </view>
+          <TabbarItem :item="item" :index="index" :is-bulge="item.isBulge" />
         </view>
       </view>
 
-      <!-- 底部安全区域背景块 -->
-      <view class="safe-area-bg" />
-    </view>
+      <!-- 【安全区】底部安全区白色填充块 -->
+      <view class="safe-area-bg" :style="{ height: `${safeAreaBottom}px` }" />
+</view>
   </view>
 </template>
 
 <style>
 .tabbar-placeholder {
-  flex-direction: column;
+  /* 高度通过 :style 动态绑定 */
 }
 
-.tabbar-placeholder-inner {
-  height: 50px;
-}
-
-.tabbar-placeholder-safe {
-  height: env(safe-area-inset-bottom);
-}
-
+/* 固定在底部的容器，内部级联展示三个层 */
 .tabbar-container {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   z-index: 1000;
-  background-color: transparent; /* 外层透明，防止裁剪溢出的鼓包 */
-  height: 68px; /* 预留高度给鼓包组件 */
-  display: flex;
+  background-color: transparent;
   flex-direction: column;
 }
 
-/* 底部白色背景块 */
+/* 【底板层】覆盖「固定高度 + 安全区」的白色底板，绑定高度动态设定 */
 .tabbar-bg {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 50px;
   background-color: #ffffff;
   border-top-width: 1rpx;
   border-top-style: solid;
@@ -112,69 +117,28 @@ onMounted(() => {
   z-index: 1;
 }
 
-/* 安全区域背景色填充 */
-.safe-area-bg {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: env(safe-area-inset-bottom);
-  background-color: #ffffff;
-  z-index: 1;
-}
-
+/* 【固定高度层】tab 图标按鈕区，与底板同高；鼓包由 TabbarItem 内绝对定位向上突出 */
 .tabbar-inner {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 68px;
   flex-direction: row;
-  align-items: flex-end; /* 子项靠底对齐 */
+  height: 80px;
+  align-items: flex-end;
   z-index: 2;
 }
 
 .tabbar-item {
   flex: 1;
   align-items: center;
-  justify-content: flex-end;
-  height: 68px;
-}
-
-/* 鼓包项容器 */
-.bulge-item {
-  height: 68px;
-  justify-content: flex-start; /* 鼓包按钮往上靠齐 */
-  align-items: center;
-  padding-top: 5px; /* 微调高度，使其比例更协调 */
-}
-
-/* 鼓包按钮 */
-.bulge-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 22px;
-  background-image: linear-gradient(135deg, #0ea5e9, #2563eb); /* 科技蓝渐变 */
-  border-width: 1px;
-  border-style: solid;
-  border-color: rgba(255, 255, 255, 0.5); /* 玻璃质感半透明白边 */
-  align-items: center;
   justify-content: center;
-  box-shadow: 0px 3px 8px rgba(37, 99, 235, 0.25); /* 软科技蓝自然微阴影 */
-}
-
-.ai-btn-text {
-  color: #ffffff;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-align: center;
-}
-
-.normal-item-wrapper {
   height: 50px;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
+}
+
+.tabbar-item-bulge {
+  height: 80px;
+}
+
+/* 【安全区层】底部安全区白色填充，高度动态设定 */
+.safe-area-bg {
+  z-index: 2;
+  background-color: #ffffff;
 }
 </style>
