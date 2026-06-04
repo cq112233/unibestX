@@ -1,36 +1,14 @@
 <script setup lang="uts">
-import { navigateToInterceptor } from './src/router/interceptor'
+import { checkDirectEntry } from './src/router/interceptor'
 import { loadFont } from '@/uni_modules/uview-ultra/index.uts'
-import { handleBackPressExit } from '@/src/utils/backPress'
 
 onLaunch(() => {
-  console.log('App Launch')
   loadFont()
 })
 
 // #ifndef APP
 onShow((options) => {
-  console.log('App Show')
-  // 处理直接输入 URL（H5）、小程序分享链接等绕过路由拦截器的场景
-  // 参考 unibest 的处理方式：手动调用拦截器的 invoke 函数补上权限校验
-  if (options !== null && options.path !== null && options.path !== '') {
-    navigateToInterceptor.invoke({ url: `/${options.path}` } as any)
-  }
-})
-
-onHide(() => {
-  console.log('App Hide')
-})
-// #endif
-
-// #ifdef APP-ANDROID
-onLastPageBackPress(() => {
-  console.log('App LastPageBackPress')
-  handleBackPressExit()
-})
-
-onExit(() => {
-  console.log('App Exit')
+  checkDirectEntry(options)
 })
 // #endif
 </script>
@@ -48,13 +26,4 @@ page {
   flex-direction: column;
 }
 /* #endif */
-
-/*每个页面公共css */
-.uni-row {
-  flex-direction: row;
-}
-
-.uni-column {
-  flex-direction: column;
-}
 </style>

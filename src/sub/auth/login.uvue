@@ -10,6 +10,7 @@
 </template>
 
 <script setup lang="uts">
+/* eslint-disable dot-notation */
 import { ref } from 'vue'
 import type { ISingleTokenRes, IUserInfo } from '../../store'
 import { useTokenStore, useUserStore } from '../../store'
@@ -21,7 +22,7 @@ const redirectUrl = ref<string>('')
 
 onLoad((options: UTSJSONObject | null) => {
   if (options != null) {
-    const redirect = options.getString('redirect')
+    const redirect = options['redirect'] as string | null
     if (redirect != null) {
       redirectUrl.value = redirect
     }

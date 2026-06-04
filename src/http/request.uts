@@ -10,13 +10,13 @@ import { ContentTypeEnum, ResultEnum, ShowMessage } from './tools/enum'
 
 // #ifdef H5
 // H5 环境下从 Vite 环境变量读取，模板字符串确保为 string 类型
-const defaultUrl : string = `${import.meta.env.VITE_SERVER_BASEURL ?? 'https://ukw0y1.laf.run'}`
-const secondaryUrl : string = `${import.meta.env.VITE_SERVER_BASEURL_SECONDARY ?? 'https://ukw0y1.laf.run'}`
+const defaultUrl: string = `${import.meta.env.VITE_SERVER_BASEURL ?? 'https://ukw0y1.laf.run'}`
+const secondaryUrl: string = `${import.meta.env.VITE_SERVER_BASEURL_SECONDARY ?? 'https://ukw0y1.laf.run'}`
 // #endif
 // #ifndef H5
 // 非 H5 环境直接硬编码（编译期不存在 import.meta.env）
-const defaultUrl : string = 'https://ukw0y1.laf.run'
-const secondaryUrl : string = 'https://ukw0y1.laf.run'
+const defaultUrl: string = 'https://ukw0y1.laf.run'
+const secondaryUrl: string = 'https://ukw0y1.laf.run'
 // #endif
 
 type ApiDomainConfig = {
@@ -24,7 +24,7 @@ type ApiDomainConfig = {
   SECONDARY: string;
 }
 
-export const API_DOMAINS : ApiDomainConfig = {
+export const API_DOMAINS: ApiDomainConfig = {
   DEFAULT: defaultUrl,
   SECONDARY: secondaryUrl,
 }
@@ -45,15 +45,15 @@ const requestInstance = new Request({
 // 1. 请求拦截器
 // ==========================================
 requestInstance.interceptors.request.use(
-  (config : LimeRequestConfig) : LimeRequestConfig => {
+  (config: LimeRequestConfig): LimeRequestConfig => {
     if (config.header === null) {
       config.header = {} as UTSJSONObject
     }
     const header = config.header as UTSJSONObject
-    if (header.getString('Content-Type') === null) {
+    if (header['Content-Type'] == null) {
       header['Content-Type'] = ContentTypeEnum.AppJson
     }
-    if (header.getString('Accept') === null) {
+    if (header['Accept'] == null) {
       header['Accept'] = 'application/json, text/plain, */*'
     }
 
@@ -76,15 +76,15 @@ requestInstance.interceptors.request.use(
     }
 
     if (extra !== null) {
-      const domain = (extra as UTSJSONObject).getString('domain')
-      if (domain !== null) {
+      const domain = (extra as UTSJSONObject)['domain'] as string | null
+      if (domain != null) {
         config.baseURL = domain
       }
     }
 
     return config
   },
-  (error : LimeRequestFail) : Promise<LimeRequestFail> => {
+  (error: LimeRequestFail): Promise<LimeRequestFail> => {
     return Promise.reject(error) as Promise<LimeRequestFail>
   }
 )
@@ -93,7 +93,7 @@ requestInstance.interceptors.request.use(
 // 2. 响应拦截器
 // ==========================================
 requestInstance.interceptors.response.use(
-  (response : LimeRequestResponse<any>) : LimeRequestResponse<any> => {
+  (response: LimeRequestResponse<any>): LimeRequestResponse<any> => {
     const config = response.config
     const extra = config.extra
     const method = config.method
@@ -123,9 +123,9 @@ requestInstance.interceptors.response.use(
     const resultObj = JSON.parseObject(JSON.stringify(rawData))
     if (resultObj !== null) {
       const code = resultObj.getNumber('code')
-      const msgByKey = resultObj.getString('message')
-      const msgByMsg = resultObj.getString('msg')
-      const message : string = msgByKey !== null ? msgByKey : (msgByMsg !== null ? msgByMsg : '未知错误')
+      const msgByKey = resultObj['message'] as string | null
+      const msgByMsg = resultObj['msg'] as string | null
+      const message: string = msgByKey != null ? msgByKey : (msgByMsg != null ? msgByMsg : '未知错误')
 
       if (code !== null) {
         const codeVal = code as number
@@ -152,7 +152,7 @@ requestInstance.interceptors.response.use(
 
     return response
   },
-  (error : LimeRequestFail) : Promise<LimeRequestFail> => {
+  (error: LimeRequestFail): Promise<LimeRequestFail> => {
     console.error('request error ===>', error)
     uni.showToast({ title: '网络错误，请稍后再试', icon: 'none' })
     return Promise.reject(error) as Promise<LimeRequestFail>
@@ -168,8 +168,8 @@ export class HttpClient {
   @UTSAndroid.keyword("inline")
   @UTSAndroid.keyword("reified")
   // #endif
-  request<T>(config : LimeRequestConfig) : Promise<T> {
-    return requestInstance.request<any>(config).then((res : LimeRequestResponse<any>) : T => {
+  request<T>(config: LimeRequestConfig): Promise<T> {
+    return requestInstance.request<any>(config).then((res: LimeRequestResponse<any>): T => {
       const rawData = res.data
       if (rawData === null) {
         throw new Error('响应数据为空')
@@ -193,14 +193,14 @@ export class HttpClient {
           throw new Error('响应结构包含 code，但 data 字段为空')
         }
       }
-      
+
       // 如果没有 code，说明不是外层包装格式
       const rawStr = JSON.stringify(rawData)
       const parsedRaw = JSON.parse<T>(rawStr)
       if (parsedRaw !== null) {
         return parsedRaw as T
       }
-      
+
       // 无法反序列化为 T，直接强转必定导致 Kotlin NPE
       throw new Error('原始响应数据无法解析为指定类型。原始数据：' + rawStr)
     })
@@ -210,7 +210,7 @@ export class HttpClient {
   @UTSAndroid.keyword("inline")
   @UTSAndroid.keyword("reified")
   // #endif
-  get<T>(url : string, config : LimeRequestConfig | null = null) : Promise<T> {
+  get<T>(url: string, config: LimeRequestConfig | null = null): Promise<T> {
     const _config = (config ?? {}) as LimeRequestConfig
     _config.url = url
     _config.method = 'GET'
@@ -221,7 +221,7 @@ export class HttpClient {
   @UTSAndroid.keyword("inline")
   @UTSAndroid.keyword("reified")
   // #endif
-  post<T>(url : string, data : any | null = null, config : LimeRequestConfig | null = null) : Promise<T> {
+  post<T>(url: string, data: any | null = null, config: LimeRequestConfig | null = null): Promise<T> {
     const _config = (config ?? {}) as LimeRequestConfig
     _config.url = url
     _config.data = data
@@ -233,7 +233,7 @@ export class HttpClient {
   @UTSAndroid.keyword("inline")
   @UTSAndroid.keyword("reified")
   // #endif
-  put<T>(url : string, data : any | null = null, config : LimeRequestConfig | null = null) : Promise<T> {
+  put<T>(url: string, data: any | null = null, config: LimeRequestConfig | null = null): Promise<T> {
     const _config = (config ?? {}) as LimeRequestConfig
     _config.url = url
     _config.data = data
@@ -245,7 +245,7 @@ export class HttpClient {
   @UTSAndroid.keyword("inline")
   @UTSAndroid.keyword("reified")
   // #endif
-  delete<T>(url : string, data : any | null = null, config : LimeRequestConfig | null = null) : Promise<T> {
+  delete<T>(url: string, data: any | null = null, config: LimeRequestConfig | null = null): Promise<T> {
     const _config = (config ?? {}) as LimeRequestConfig
     _config.url = url
     _config.data = data

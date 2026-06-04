@@ -165,6 +165,7 @@ function doIntercept(url: string): boolean {
  */
 export const navigateToInterceptor: Interceptor = {
   invoke: function (options: any): boolean {
+    // debugger
     let url = ''
     if (options != null) {
       // #ifdef APP
@@ -249,4 +250,32 @@ export const installRouteInterceptor = () => {
   uni.addInterceptor('redirectTo', redirectToInterceptor)
   uni.addInterceptor('switchTab', switchTabInterceptor)
   uni.addInterceptor('chooseLocation', chooseLocationInterceptor)
+}
+
+/**
+ * 校验并处理直接进入（如 H5 直链、小程序分享链接等）的路由场景，补充权限校验
+ */
+export function checkDirectEntry(options: UTSJSONObject | null) {
+  if (options != null) {
+    const pathVal = options['path'] as string | null
+    if (pathVal != null && pathVal != '') {
+      let url = `/${pathVal}`
+
+      // #ifdef H5
+      let h5Url = ''
+      const hash = window.location.hash
+      if (hash.startsWith('#/')) {
+        h5Url = hash.substring(1)
+      }
+      else {
+        h5Url = window.location.pathname + window.location.search
+      }
+      if (h5Url !== '' && h5Url !== '/') {
+        url = h5Url
+      }
+      // #endif
+
+      navigateToInterceptor.invoke({ url } as any)
+    }
+  }
 }

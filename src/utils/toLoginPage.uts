@@ -12,9 +12,8 @@ export function toLoginPage(options : UTSJSONObject | null = null) {
   lastRedirectTime = now
 
   const opts = options ?? ({} as UTSJSONObject)
-  // 使用 UTSJSONObject.getString() 代替括号访问，返回 string | null，null合并后得到 string
-  const mode = opts.getString('mode') ?? 'navigateTo'
-  const queryString = opts.getString('queryString') ?? ''
+  const mode = opts['mode'] as string | null ?? 'navigateTo'
+  const queryString = opts['queryString'] as string | null ?? ''
 
   const LOGIN_PAGE = '/src/pages/auth/login'
   const url = `${LOGIN_PAGE}${queryString}`
