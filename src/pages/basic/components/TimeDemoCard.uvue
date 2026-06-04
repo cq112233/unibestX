@@ -1,0 +1,133 @@
+<template>
+  <Card title="时间日期操作 (lime-dayuts)">
+    <!-- 实时时间与自定义格式化展示 -->
+    <view style="background-color: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0;">
+      <text style="font-size: 13px; font-weight: bold; color: #1e293b; margin-bottom: 8px;">实时高精度时钟 (更新于每一百毫秒)</text>
+      <text style="font-size: 24px; font-weight: 800; color: var(--theme-color, #37c2bc); font-family: monospace; margin-bottom: 6px;">
+        {{ currentFullTime }}
+      </text>
+      <text style="font-size: 12px; color: #94a3b8;">
+        格式模板: YYYY-MM-DD HH:mm:ss.SSS dddd
+      </text>
+    </view>
+
+    <!-- 日期加减偏移计算 -->
+    <view style="background-color: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0;">
+      <text style="font-size: 13px; font-weight: bold; color: #1e293b; margin-bottom: 12px;">日期偏移操作</text>
+
+      <view style="flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+        <text style="font-size: 14px; color: #64748b;">当前偏移天数:</text>
+        <text style="font-size: 16px; font-weight: bold; color: #334155;">{{ offsetDays > 0 ? '+' : '' }}{{ offsetDays }} 天</text>
+      </view>
+
+      <view style="flex-direction: row; justify-content: space-between; margin-bottom: 12px;">
+        <up-button size="small" type="primary" :plain="true" style="flex: 1; margin-right: 8px;" @click="adjustOffset(-7)">
+          -7 天
+        </up-button>
+        <up-button size="small" type="primary" :plain="true" style="flex: 1; margin-right: 8px;" @click="adjustOffset(-1)">
+          -1 天
+        </up-button>
+        <up-button size="small" type="primary" :plain="true" style="flex: 1; margin-right: 8px;" @click="adjustOffset(1)">
+          +1 天
+        </up-button>
+        <up-button size="small" type="primary" :plain="true" style="flex: 1;" @click="adjustOffset(7)">
+          +7 天
+        </up-button>
+      </view>
+
+      <view style="border-top-width: 1px; border-top-style: solid; border-top-color: #e2e8f0; pt-8px; margin-top: 8px;">
+        <text style="font-size: 12px; color: #94a3b8; margin-bottom: 4px;">计算得到的目标时间:</text>
+        <text style="font-size: 14px; font-weight: bold; color: #334155;">{{ targetOffsetTime }}</text>
+      </view>
+    </view>
+
+    <!-- 快捷日期边界与比较计算 -->
+    <view style="background-color: #f8fafc; border-radius: 12px; padding: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0;">
+      <text style="font-size: 13px; font-weight: bold; color: #1e293b; margin-bottom: 12px;">常用日期边界与区间计算</text>
+
+      <view style="flex-direction: row; justify-content: space-between; margin-bottom: 8px;">
+        <text style="font-size: 14px; color: #64748b;">本月第一天</text>
+        <text style="font-size: 14px; font-weight: 500; color: #334155;">{{ startOfMonth }}</text>
+      </view>
+      <view style="flex-direction: row; justify-content: space-between; margin-bottom: 8px;">
+        <text style="font-size: 14px; color: #64748b;">本月最后一天</text>
+        <text style="font-size: 14px; font-weight: 500; color: #334155;">{{ endOfMonth }}</text>
+      </view>
+      <view style="flex-direction: row; justify-content: space-between; margin-bottom: 8px;">
+        <text style="font-size: 14px; color: #64748b;">今年天数</text>
+        <text style="font-size: 14px; font-weight: 500; color: #334155;">{{ isLeapYear ? '366天 (闰年)' : '365天 (平年)' }}</text>
+      </view>
+      <view style="flex-direction: row; justify-content: space-between;">
+        <text style="font-size: 14px; color: #64748b;">距离今年底倒计时</text>
+        <text style="font-size: 14px; font-weight: bold; color: #f43f5e;">{{ daysToYearEnd }} 天</text>
+      </view>
+    </view>
+  </Card>
+</template>
+
+<script setup lang="uts">
+/* eslint-disable eqeqeq */
+import Card from './Card.uvue'
+import { dayuts } from '@/uni_modules/lime-dayuts'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+
+// 实时时间状态
+const currentFullTime = ref('')
+let timerId = 0
+
+// 偏移时间计算
+const offsetDays = ref(0)
+
+// 实时时钟更新
+function updateClock() {
+  currentFullTime.value = dayuts().format('YYYY-MM-DD HH:mm:ss.SSS dddd')
+}
+
+// 偏移量调节
+function adjustOffset(days: number) {
+  offsetDays.value += days
+}
+
+// 计算属性：目标偏移时间
+const targetOffsetTime = computed((): string => {
+  return dayuts().add(offsetDays.value, 'day').format('YYYY-MM-DD HH:mm:ss')
+})
+
+// 计算属性：本月首日
+const startOfMonth = computed((): string => {
+  return dayuts().startOf('month').format('YYYY-MM-DD')
+})
+
+// 计算属性：本月尾日
+const endOfMonth = computed((): string => {
+  return dayuts().endOf('month').format('YYYY-MM-DD')
+})
+
+// 计算属性：是否为闰年
+const isLeapYear = computed((): boolean => {
+  return dayuts().isLeapYear()
+})
+
+// 计算属性：距离今年底的天数
+const daysToYearEnd = computed((): number => {
+  const endOfYear = dayuts().endOf('year')
+  const diffVal = endOfYear.diff(dayuts(), 'day')
+  return Math.ceil(diffVal)
+})
+
+onMounted(() => {
+  updateClock()
+  timerId = setInterval(() => {
+    updateClock()
+  }, 100)
+})
+
+onUnmounted(() => {
+  if (timerId != 0) {
+    clearInterval(timerId)
+  }
+})
+</script>
+
+<style>
+</style>

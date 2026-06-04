@@ -1,11 +1,15 @@
 <template>
-	<view class="container" :style="{ '--theme-color': appStore.state.theme }">
-		<scroll-view scroll-y="true" class="scroll-view">
-			<slot />
-		</scroll-view>
-		<Tabbar v-if="isCurrentPageTabbar" />
-		<up-toast ref="uToastRef" />
-	</view>
+  <!-- 应用全局骨架与皮肤容器，通过 CSS 变量绑定响应式主题色 -->
+  <view class="container" :style="{ '--theme-color': appStore.state.theme }">
+    <!-- 主滚动区域，包裹子页面插槽内容 -->
+    <scroll-view scroll-y="true" class="scroll-view">
+      <slot />
+    </scroll-view>
+    <!-- 仅在当前页面为底部 Tabbar 页面时渲染自定义导航栏 -->
+    <Tabbar v-if="isCurrentPageTabbar" />
+    <!-- 全局统一绑定的 Toast 轻提示弹窗组件 -->
+    <up-toast ref="uToastRef" />
+  </view>
 </template>
 
 <script setup lang="uts">
@@ -16,11 +20,15 @@ import { registerToast, unregisterToast } from '@/src/utils/toast'
 import type { ComponentPublicInstance } from 'vue'
 import { onMounted, onUnmounted, ref } from 'vue'
 
+// 激活应用状态管理 Store
 const appStore = useAppStore()
 
+// 控制当前页面是否需要显示底部导航栏
 const isCurrentPageTabbar = ref(false)
+// 挂载全局 Toast 组件的 DOM/组件实例引用
 const uToastRef = ref<ComponentPublicInstance | null>(null)
 
+// 页面显示钩子：解析当前路由，动态控制导航栏显示及同步选中索引
 onShow(() => {
   const pages = getCurrentPages()
   if (pages.length > 0) {
@@ -29,25 +37,29 @@ onShow(() => {
       const path = route.startsWith('/') ? route : `/${route}`
       const isTabbar = isPageTabbar(path)
       isCurrentPageTabbar.value = isTabbar
+      // 如果是 Tabbar 路由，同步底部导航的激活索引
       if (isTabbar) {
         syncCurIdxByCurrentPage()
       }
     }
   }
+  // 注册全局 Toast 组件引用，供 HTTP 或工具类直接调用
   if (uToastRef.value != null) {
     registerToast(uToastRef.value!)
   }
 })
 
+// 组件挂载钩子：注册全局 Toast
 onMounted(() => {
-  console.log('注册', uToastRef.value)
+  console.log('注册 Toast 实例', uToastRef.value)
   if (uToastRef.value != null) {
     registerToast(uToastRef.value!)
   }
 })
 
+// 组件销毁钩子：反注册 Toast 以释放内存防内存泄漏
 onUnmounted(() => {
-  console.log('卸载')
+  console.log('卸载 Toast 实例')
   if (uToastRef.value != null) {
     unregisterToast(uToastRef.value!)
   }
@@ -55,6 +67,7 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss">
+/* 布局样式定义 */
 .container {
   display: flex;
   flex-direction: column;
