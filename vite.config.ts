@@ -1,7 +1,7 @@
-/** vite.config.js */
 import { defineConfig } from 'vite'
 import uni from '@dcloudio/vite-plugin-uni'
 import { unovite } from './js_sdk/a-hua-unocss'
+import uniLayoutsPlugin from './plugins/uni-layouts-plugin'
 import autoRootPlugin from './plugins/root-plugin'
 
 export default defineConfig({
@@ -16,7 +16,8 @@ export default defineConfig({
     sourcemap: false, // 关闭 sourcemap，警告直接消失
   },
   plugins: [
-    autoRootPlugin(), // 你的根组件
+    uniLayoutsPlugin(), // 仿照 vite-plugin-uni-layouts 的跨端 Layout 布局插件
+    autoRootPlugin(), // 自动给页面套上 App.ku.uvue 根包裹组件
     uni(),
     unovite({
       rules: [
