@@ -1,7 +1,6 @@
 <p align="center">
   <a href="https://github.com/cq112233/unibestX">
-    <img width="160" src="
-https://uniappx.oss-cn-beijing.aliyuncs.com/logo.png" style="border-radius: 20px;" alt="转存失败，建议直接上传图片文件">
+    <img width="160" src="https://uniappx.oss-cn-beijing.aliyuncs.com/logo.png" style="border-radius: 20px;" alt="unibestX Logo">
   </a>
 </p>
 
