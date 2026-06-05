@@ -1,5 +1,4 @@
 <script setup lang="uts">
-/* eslint-disable eqeqeq */
 import { curIdx, setCurIdx, syncCurIdxByCurrentPage, tabbarList } from './store'
 import TabbarItem from './TabbarItem.uvue'
 import { safeAreaInsets } from '../utils/systemInfo'
@@ -63,7 +62,7 @@ onMounted(() => {
       class="tabbar-container"
       :style="{ height: `${TABBAR_CONTAINER_HEIGHT + safeAreaBottom}px` }"
     >
-<!-- 【整体白色底板】覆盖「固定高度 + 安全区」的全部区域 -->
+      <!-- 【整体白色底板】覆盖「固定高度 + 安全区」的全部区域 -->
       <view
         class="tabbar-bg"
         :style="{ height: `${TABBAR_HEIGHT + safeAreaBottom}px` }"
@@ -84,7 +83,7 @@ onMounted(() => {
 
       <!-- 【安全区】底部安全区白色填充块 -->
       <view class="safe-area-bg" :style="{ height: `${safeAreaBottom}px` }" />
-</view>
+    </view>
   </view>
 </template>
 
@@ -99,7 +98,7 @@ onMounted(() => {
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 1000;
+  z-index: 9999;
   background-color: transparent;
   flex-direction: column;
 }
@@ -114,7 +113,7 @@ onMounted(() => {
   border-top-width: 1rpx;
   border-top-style: solid;
   border-top-color: #eeeeee;
-  z-index: 1;
+  z-index: 9999;
 }
 
 /* 【固定高度层】tab 图标按鈕区，与底板同高；鼓包由 TabbarItem 内绝对定位向上突出 */
@@ -122,7 +121,7 @@ onMounted(() => {
   flex-direction: row;
   height: 80px;
   align-items: flex-end;
-  z-index: 2;
+  z-index: 9999;
 }
 
 .tabbar-item {
@@ -138,7 +137,7 @@ onMounted(() => {
 
 /* 【安全区层】底部安全区白色填充，高度动态设定 */
 .safe-area-bg {
-  z-index: 2;
+  z-index: 9999;
   background-color: #ffffff;
 }
 </style>
