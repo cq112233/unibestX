@@ -280,9 +280,9 @@ pnpm install
 
 Copyright (c) 2026 HTwoO
 
-## 捐赠
+## 请作者喝杯咖啡 ☕
 
-<p align='center'>
-<img alt="微信收款码" src="https://uniappx.oss-cn-beijing.aliyuncs.com/wx.jpg" height="330" style="display:inline-block; height:330px;">
+如果你觉得这个项目好用，可以请作者喝杯咖啡 ☕
+
 <img alt="支付宝收款码" src="https://uniappx.oss-cn-beijing.aliyuncs.com/zfb.jpg" height="330" style="display:inline-block; height:330px; margin-left:10px;">
 </p>
