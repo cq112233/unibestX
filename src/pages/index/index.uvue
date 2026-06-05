@@ -1,5 +1,5 @@
 <template>
-  <scroll-view class="page-root" direction="vertical">
+  <view>
     <NavBar title="首页" :show-back="false" />
     <view class="content-container">
       <image class="w-100px h-100px mx-auto mt-40px rounded-20px" src="/static/logo.png" />
@@ -70,18 +70,20 @@
       <!-- 底部安全间距 -->
       <view style="height: 40px;" />
     </view>
-  </scroll-view>
+  </view>
 </template>
 
-<script setup lang="ts">
+<script setup lang="uts">
 import { ref } from 'vue'
-import NavBar from '@/src/components/NavBar/NavBar'
-import MyTabs from '@/src/components/MyTabs/MyTabs'
-import MySteps from '@/src/components/MySteps/MySteps'
-import MyStepsItem from '@/src/components/MyStepsItem/MyStepsItem'
-import MySubsection from '@/src/components/MySubsection/MySubsection'
-import { toastError, toastSuccess } from '@/src/utils/toast'
-import { handleBackPressExit } from '@/src/utils/backPress'
+import NavBar from '@/src/components/NavBar/NavBar.uvue'
+import MyTabs from '../../components/MyTabs/MyTabs.uvue'
+import MySteps from '../../components/MySteps/MySteps.uvue'
+import MyStepsItem from '../../components/MyStepsItem/MyStepsItem.uvue'
+import MySubsection from '../../components/MySubsection/MySubsection.uvue'
+import { toastError, toastSuccess } from '../../utils/toast.uts'
+import { handleBackPressExit } from '../../utils/backPress.uts'
+
+console.log(NavBar, 'NavBar')
 
 onBackPress((options: OnBackPressOptions): boolean => {
   // #ifdef APP
