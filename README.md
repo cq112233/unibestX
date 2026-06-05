@@ -16,7 +16,7 @@ https://uniappx.oss-cn-beijing.aliyuncs.com/logo.png" style="border-radius: 20px
 ![node version](https://img.shields.io/badge/node-%3E%3D22-green)
 ![pnpm version](https://img.shields.io/badge/pnpm-%3E%3D7.30-green)
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/cq112233/unibestX)
-![GitHub License](https://img.shields.io/github/license/cq112233/unibestX)
+![unibest License](https://img.shields.io/github/license/cq112233/unibestX)
 
 </div>
 
