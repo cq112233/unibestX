@@ -15,6 +15,7 @@ export default defineConfig({
     __X_STYLE_ISOLATION_UP_ARROW__: false,
   },
   server: {
+    host: '0.0.0.0',
     port: 9001,
   },
   build: {
