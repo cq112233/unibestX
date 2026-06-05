@@ -3,6 +3,7 @@
     "target": "esnext",
     "jsx": "preserve",
     "lib": ["esnext", "dom"],
+    "baseUrl": ".",
     "module": "esnext",
     "moduleResolution": "bundler",
     "paths": {
@@ -19,6 +20,12 @@
     "noImplicitThis": true,
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true
+  },
+  "vueCompilerOptions": {
+    "extensions": [
+      ".vue",
+      ".uvue"
+    ]
   },
   "include": [
     "vite.config.ts",

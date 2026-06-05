@@ -1,6 +1,6 @@
 // 假设在单独的文件中创建了 i18n 实例
 import { createI18n } from '@/uni_modules/lime-i18n'
-import zhCN from './locales/zh-CN'
+import zhCN from './locales/zh_CN'
 import enUS from './locales/en_US'
 
 const i18n = createI18n({
@@ -8,9 +8,9 @@ const i18n = createI18n({
   locale: 'zh-CN', // 默认显示语言
   fallbackLocale: 'en-US',
   messages: {
-    'zh-CN': zhCN,
-    'en-US': enUS
-  }
-})
+    'zh-CN': zhCN as UTSJSONObject,
+    'en-US': enUS as UTSJSONObject
+  } as UTSJSONObject
+} as UTSJSONObject)
 
 export default i18n
