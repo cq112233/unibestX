@@ -47,11 +47,11 @@
 
 ## 平台兼容性
 
-| Android | iOS | 鸿蒙 | H5 | 微信小程序 | 字节小程序 | 支付宝小程序 | 百度小程序 |
-| ------- | --- | ---- | -- | ---------- | ---------- | ------------ | ---------- |
-| √       | √   | √    | √  | √          | √          | √            | √          |
+| Android | iOS | 鸿蒙 | H5 | 微信小程序 |
+| ------- | --- | ---- | -- | ---------- |
+| √       | √   | √    | √  | √          |
 
-> 注意：uni-app X 以原生应用为主要目标平台（Android / iOS / 鸿蒙），同时兼容 H5 和各端小程序。
+> 注意：uni-app X 目前兼容以上 5 个端平台。
 
 ## ⚙️ 环境
 
@@ -167,6 +167,7 @@ cd unibestX
 ### 自定义 TabBar
 
 内置自定义 TabBar 组件，支持：
+
 - 5 个 Tab 项配置
 - 中间凸起按钮（如 AI 入口）
 - 角标显示
@@ -175,6 +176,7 @@ cd unibestX
 ### 路由守卫
 
 提供灵活的登录拦截策略：
+
 - **黑名单模式**（默认）：仅指定页面需要登录
 - **白名单模式**：除指定页面外，全部需要登录
 - 支持登录后自动跳回原页面
@@ -182,6 +184,7 @@ cd unibestX
 ### 请求封装
 
 基于 `lime-request` 封装的 HTTP 客户端：
+
 - 自动携带 Token
 - 请求/响应拦截器
 - 多域名支持
@@ -191,6 +194,7 @@ cd unibestX
 ### 状态管理
 
 基于 `x-pinia-s`（Pinia for uni-app X）：
+
 - `AppStore` — 主题色、语言设置
 - `TokenStore` — 支持单 Token 和双 Token（access + refresh）模式
 - `UserStore` — 用户信息管理
@@ -199,6 +203,7 @@ cd unibestX
 ### i18n 多语言
 
 基于 `lime-i18n` 的国际化方案：
+
 - 内置中文（zh-CN）和英文（en-US）
 - 自动检测系统语言
 - VSCode i18n-ally 插件支持
@@ -207,6 +212,7 @@ cd unibestX
 ### Layout 布局
 
 通过自定义 Vite 插件实现：
+
 - 自动为页面包裹 Layout 组件
 - 支持页面级别 `<route>` 配置自定义布局
 - 可通过 `layout: false` 禁用布局
@@ -249,6 +255,6 @@ Copyright (c) 2026 HTwoO
 ## 捐赠
 
 <p align='center'>
-<img alt="微信收款码" src="https://uniappx.oss-cn-beijing.aliyuncs.com/wx.jpg?Expires=1780639691&OSSAccessKeyId=TMP.3KyYRBJoMwuKLmxipBLNZtWzUw4kkCS2HLNXMXsYortd3htjYRtJ11Xwgmv7FvQJDoaZSeyzG8Vk6EDtYePZehVJsh1EB1&Signature=2i3Paq%2B%2FXBQnRhYa6UMEs2altiY%3D" height="330" style="display:inline-block; height:330px;">
-<img alt="支付宝收款码" src="https://uniappx.oss-cn-beijing.aliyuncs.com/zfb.jpg?Expires=1780639710&OSSAccessKeyId=TMP.3KyYRBJoMwuKLmxipBLNZtWzUw4kkCS2HLNXMXsYortd3htjYRtJ11Xwgmv7FvQJDoaZSeyzG8Vk6EDtYePZehVJsh1EB1&Signature=6VZK4vdNUKZSZLTBXjcd7V8PjL4%3D" height="330" style="display:inline-block; height:330px; margin-left:10px;">
+<img alt="微信收款码" src="https://uniappx.oss-cn-beijing.aliyuncs.com/wx.jpg" height="330" style="display:inline-block; height:330px;">
+<img alt="支付宝收款码" src="https://uniappx.oss-cn-beijing.aliyuncs.com/zfb.jpg" height="330" style="display:inline-block; height:330px; margin-left:10px;">
 </p>
