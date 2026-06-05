@@ -155,23 +155,7 @@ pnpm install
 
 ## 📦 运行（支持热更新）
 
-### 1. 命令行 (CLI) 运行方式
-
-可以通过命令行直接运行和调试 **H5** 以及 **微信小程序**：
-
-* **H5 平台**：在项目根目录下执行 `pnpm dev`（等同于 `pnpm dev:h5`）
-* **微信小程序**：在项目根目录下执行 `pnpm dev:mp-weixin`
-
-### 2. 命令行 (CLI) 打包方式
-
-可以通过命令行直接打包和构建 **H5** 以及 **微信小程序**：
-
-* **H5 平台**：在项目根目录下执行 `pnpm build`（等同于 `pnpm build:h5`）
-* **微信小程序**：在项目根目录下执行 `pnpm build:mp-weixin`
-
-### 3. HBuilderX 运行方式
-
-对于 App 平台（Android、iOS、鸿蒙），建议通过 **HBuilderX** 启动：
+通过 **HBuilderX** 启动运行：
 
 * **Android 平台**：在 HBuilderX 中选择 `运行 → 运行到手机或模拟器`，选择目标设备即可。
 * **iOS 平台**：在 HBuilderX 中选择 `运行 → 运行到手机或模拟器`，选择 iOS 设备（需 macOS + Xcode 环境）。
