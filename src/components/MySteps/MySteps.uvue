@@ -1,0 +1,58 @@
+<template>
+  <view class="my-steps">
+    <slot />
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, provide, ref } from 'vue'
+
+const props = defineProps({
+  current: {
+    type: Number,
+    default: 0,
+  },
+  activeColor: {
+    type: String,
+    default: 'var(--theme-color, #0957DE)',
+  },
+  inactiveColor: {
+    type: String,
+    default: '#c8c9cc',
+  },
+  bgColor: {
+    type: String,
+    default: '#ffffff',
+  },
+})
+
+const items = ref([] as string[])
+
+provide('stepsCurrent', computed((): number => props.current))
+provide('stepsActiveColor', props.activeColor)
+provide('stepsInactiveColor', props.inactiveColor)
+provide('stepsBgColor', props.bgColor)
+provide('stepsItems', computed((): string[] => items.value))
+
+provide('registerItem', (id: string) => {
+  if (!items.value.includes(id)) {
+    items.value.push(id)
+  }
+})
+
+provide('unregisterItem', (id: string) => {
+  const idx = items.value.indexOf(id)
+  if (idx > -1) {
+    items.value.splice(idx, 1)
+  }
+})
+</script>
+
+<style lang="scss" scoped>
+.my-steps {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  width: 100%;
+}
+</style>

@@ -154,7 +154,7 @@
 		}
 	})
 	
-	const setContentAnimate = async function(expandedFrom: boolean) {
+	async function setContentAnimate(expandedFrom: boolean) {
 		// 每次面板打开或者收起时，都查询元素尺寸
 		// 好处是，父组件从服务端获取内容后，变更折叠面板后可以获得最新的高度
 		expanded.value = expandedFrom
@@ -181,7 +181,7 @@
 	}
 	
 	// 初始化数据
-	const init = async function() {
+	async function init() {
 		getParentData('up-collapse', instance, false)
 		if (parent.value == null) {
 			return error('up-collapse-item必须要搭配up-collapse组件使用')

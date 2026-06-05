@@ -1,0 +1,212 @@
+<template>
+  <view class="my-steps-item">
+    <!-- Left Connector Line -->
+    <view
+      v-if="hasLeftLine"
+      class="my-steps-item__line my-steps-item__line--left"
+      :style="{ backgroundColor: leftLineActive ? activeColor : inactiveColor }"
+    ></view>
+    <!-- Right Connector Line -->
+    <view
+      v-if="hasRightLine"
+      class="my-steps-item__line my-steps-item__line--right"
+      :style="{ backgroundColor: rightLineActive ? activeColor : inactiveColor }"
+    ></view>
+
+    <!-- Icon/Circle Wrapper -->
+    <view class="my-steps-item__icon-wrapper">
+      <view
+        class="my-steps-item__circle"
+        :style="[circleStyle]"
+      >
+        <text
+          class="my-steps-item__circle-text"
+          :style="{ color: circleTextColor }"
+        >
+{{ circleText }}
+</text>
+      </view>
+    </view>
+
+    <!-- Content -->
+    <view class="my-steps-item__content">
+      <text
+        class="my-steps-item__title"
+        :style="{ color: isCurrent ? '#303133' : '#606266', fontWeight: isCurrent ? 'bold' : 'normal' }"
+      >
+{{ title }}
+</text>
+      <text class="my-steps-item__desc">{{ desc }}</text>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+/* eslint-disable dot-notation */
+import { computed, inject, onMounted, onUnmounted, ref } from 'vue'
+
+defineProps({
+  title: {
+    type: String,
+    default: '',
+  },
+  desc: {
+    type: String,
+    default: '',
+  },
+})
+
+// Inject parent steps states
+const current = inject('stepsCurrent') as ComputedRef<number>
+const activeColor = inject('stepsActiveColor') as string
+const inactiveColor = inject('stepsInactiveColor') as string
+const bgColor = inject('stepsBgColor') as string
+const stepsItems = inject('stepsItems') as ComputedRef<string[]>
+const registerItem = inject('registerItem') as ((id: string) => void)
+const unregisterItem = inject('unregisterItem') as ((id: string) => void)
+
+const itemUniqueId = ref(Math.random().toString())
+
+onMounted(() => {
+  registerItem(itemUniqueId.value)
+})
+
+onUnmounted(() => {
+  unregisterItem(itemUniqueId.value)
+})
+
+const index = computed((): number => {
+  return stepsItems.value.indexOf(itemUniqueId.value)
+})
+
+const isCurrent = computed((): boolean => {
+  return index.value === current.value
+})
+
+const isFinished = computed((): boolean => {
+  return index.value < current.value
+})
+
+const circleText = computed((): string => {
+  if (isFinished.value) {
+    return '✓'
+  }
+  return (index.value + 1).toString()
+})
+
+const circleTextColor = computed((): string => {
+  if (isCurrent.value) {
+    return '#ffffff'
+  }
+  if (isFinished.value) {
+    return activeColor
+  }
+  return inactiveColor
+})
+
+const circleStyle = computed((): any => {
+  const style = {} as UTSJSONObject
+  if (isCurrent.value) {
+    style['backgroundColor'] = activeColor
+    style['borderColor'] = activeColor
+  }
+  else if (isFinished.value) {
+    style['backgroundColor'] = 'transparent'
+    style['borderColor'] = activeColor
+  }
+  else {
+    style['backgroundColor'] = 'transparent'
+    style['borderColor'] = inactiveColor
+  }
+  return style
+})
+
+const hasLeftLine = computed((): boolean => {
+  return index.value > 0
+})
+
+const hasRightLine = computed((): boolean => {
+  const len = stepsItems.value.length
+  return index.value >= 0 && index.value < len - 1
+})
+
+const leftLineActive = computed((): boolean => {
+  return index.value <= current.value
+})
+
+const rightLineActive = computed((): boolean => {
+  return index.value < current.value
+})
+</script>
+
+<style lang="scss" scoped>
+.my-steps-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.my-steps-item__icon-wrapper {
+  position: relative;
+  z-index: 2;
+  background-color: transparent;
+}
+
+.my-steps-item__line {
+  position: absolute;
+  top: 10px;
+  height: 1px;
+  z-index: 1;
+}
+
+.my-steps-item__line--left {
+  left: 0;
+  right: 50%;
+  margin-right: 12px;
+}
+
+.my-steps-item__line--right {
+  left: 50%;
+  right: 0;
+  margin-left: 12px;
+}
+
+.my-steps-item__circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 100px;
+  border-width: 1px;
+  border-style: solid;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.my-steps-item__circle-text {
+  font-size: 11px;
+  line-height: 11px;
+  text-align: center;
+}
+
+.my-steps-item__content {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.my-steps-item__title {
+  font-size: 13px;
+  text-align: center;
+}
+
+.my-steps-item__desc {
+  font-size: 11px;
+  color: #909399;
+  margin-top: 2px;
+  text-align: center;
+}
+</style>

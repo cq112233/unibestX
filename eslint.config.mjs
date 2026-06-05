@@ -28,6 +28,7 @@ const composer = uniHelper({
     'vue/html-self-closing': 'off',
     'no-useless-return': 'off',
     'no-console': 'off',
+    'eqeqeq': 'off',
     'no-unused-vars': 'off',
     'vue/no-unused-refs': 'off',
     'unused-imports/no-unused-vars': 'off',
@@ -97,6 +98,102 @@ for (const config of configs) {
       config.files = newFiles
     }
   }
+
+  // Also make sure extraFileExtensions contains .uvue and .uts
+  if (config.languageOptions?.parserOptions) {
+    const parserOptions = config.languageOptions.parserOptions
+    if (parserOptions.extraFileExtensions) {
+      if (Array.isArray(parserOptions.extraFileExtensions)) {
+        if (!parserOptions.extraFileExtensions.includes('.uvue')) {
+          parserOptions.extraFileExtensions.push('.uvue')
+        }
+        if (!parserOptions.extraFileExtensions.includes('.uts')) {
+          parserOptions.extraFileExtensions.push('.uts')
+        }
+      }
+    }
+  }
+
+  // Wrap the parser to treat .uvue as .vue during parsing
+  if (config.languageOptions?.parser && typeof config.languageOptions.parser.parseForESLint === 'function') {
+    const originalParser = config.languageOptions.parser
+    config.languageOptions.parser = {
+      ...originalParser,
+      parseForESLint(code, options) {
+        const originalFilePath = options.filePath
+        if (options.filePath && options.filePath.endsWith('.uvue')) {
+          options.filePath = options.filePath.replace(/\.uvue$/, '.vue')
+        }
+        try {
+          const result = originalParser.parseForESLint(code, options)
+          if (result.services?.defineTemplateBodyVisitor) {
+            const originalDefine = result.services.defineTemplateBodyVisitor
+            result.services.defineTemplateBodyVisitor = function (templateBodyVisitor, scriptVisitor, options) {
+              const wrappedScriptVisitor = originalDefine.call(this, templateBodyVisitor, scriptVisitor, options)
+              if (wrappedScriptVisitor['Program:exit']) {
+                const originalExit = wrappedScriptVisitor['Program:exit']
+                wrappedScriptVisitor['Program:exit'] = function (node) {
+                  return originalExit.call(this, node)
+                }
+              }
+              return wrappedScriptVisitor
+            }
+          }
+          return result
+        }
+        finally {
+          options.filePath = originalFilePath
+        }
+      },
+    }
+  }
+
+  // Wrap all vue rules to treat .uvue files as .vue files
+  if (config.plugins?.vue) {
+    const vuePlugin = config.plugins.vue
+    if (vuePlugin.rules) {
+      for (const ruleName of Object.keys(vuePlugin.rules)) {
+        const originalRule = vuePlugin.rules[ruleName]
+        if (originalRule && typeof originalRule.create === 'function') {
+          vuePlugin.rules[ruleName] = {
+            ...originalRule,
+            create(context) {
+              const wrappedContext = Object.create(context, {
+                filename: {
+                  get() {
+                    const val = context.filename
+                    if (val && val.endsWith('.uvue')) {
+                      return val.replace(/\.uvue$/, '.vue')
+                    }
+                    return val
+                  },
+                  configurable: true,
+                },
+                getFilename: {
+                  value() {
+                    const val = context.getFilename()
+                    if (val && val.endsWith('.uvue')) {
+                      return val.replace(/\.uvue$/, '.vue')
+                    }
+                    return val
+                  },
+                  configurable: true,
+                },
+              })
+              return originalRule.create(wrappedContext)
+            },
+          }
+        }
+      }
+    }
+  }
 }
+
+configs.push({
+  rules: {
+    'eqeqeq': 'off',
+    'vue/eqeqeq': 'off',
+  },
+})
 
 export default configs

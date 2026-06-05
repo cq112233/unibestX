@@ -1,0 +1,686 @@
+<template>
+  <view class="page-container">
+    <up-navbar
+      title="uview-ultra 组件演示"
+      :auto-back="true"
+      :safe-area-inset-top="true"
+      :placeholder="true"
+      bg-color="#ffffff"
+    ></up-navbar>
+
+    <scroll-view direction="vertical" class="flex-1 h-0px">
+      <!-- ==================== 基础组件 ==================== -->
+      <view class="section-title">
+基础组件
+</view>
+
+      <!-- Button 按钮 -->
+      <view class="demo-block">
+        <view class="demo-label">
+Button 按钮
+</view>
+        <view class="demo-row">
+          <up-button type="primary" text="主要" size="mini"></up-button>
+          <up-button type="success" text="成功" size="mini"></up-button>
+          <up-button type="warning" text="警告" size="mini"></up-button>
+          <up-button type="error" text="错误" size="mini"></up-button>
+          <up-button type="info" text="信息" size="mini"></up-button>
+        </view>
+        <view class="demo-row">
+          <up-button type="primary" text="朴素" :plain="true" size="mini"></up-button>
+          <up-button type="primary" text="细边框" :plain="true" :hairline="true" size="mini"></up-button>
+          <up-button type="primary" text="圆形" shape="circle" size="mini"></up-button>
+          <up-button type="primary" text="禁用" :disabled="true" size="mini"></up-button>
+        </view>
+        <view class="demo-row">
+          <up-button type="primary" text="加载中" :loading="true" size="mini"></up-button>
+          <up-button type="primary" text="自定义色" color="#7232dd" size="mini"></up-button>
+        </view>
+      </view>
+
+      <!-- Icon 图标 -->
+      <view class="demo-block">
+        <view class="demo-label">
+Icon 图标
+</view>
+        <view class="demo-row">
+          <up-icon name="home" size="28" label="home" label-size="10" label-pos="bottom"></up-icon>
+          <up-icon name="search" size="28" color="#2979ff" label="search" label-size="10" label-pos="bottom"></up-icon>
+          <up-icon name="setting" size="28" color="#ff9900" label="setting" label-size="10" label-pos="bottom"></up-icon>
+          <up-icon name="heart" size="28" color="#fa3534" label="heart" label-size="10" label-pos="bottom"></up-icon>
+          <up-icon name="star" size="28" color="#ffca28" label="star" label-size="10" label-pos="bottom"></up-icon>
+          <up-icon name="photo" size="28" color="#19be6b" label="photo" label-size="10" label-pos="bottom"></up-icon>
+          <up-icon name="map" size="28" color="#909399" label="map" label-size="10" label-pos="bottom"></up-icon>
+        </view>
+      </view>
+
+      <!-- Tag 标签 -->
+      <view class="demo-block">
+        <view class="demo-label">
+Tag 标签
+</view>
+        <view class="demo-row">
+          <up-tag text="主要" type="primary"></up-tag>
+          <up-tag text="成功" type="success"></up-tag>
+          <up-tag text="警告" type="warning"></up-tag>
+          <up-tag text="错误" type="error"></up-tag>
+          <up-tag text="信息" type="info"></up-tag>
+        </view>
+        <view class="demo-row">
+          <up-tag text="朴素" type="primary" :plain="true"></up-tag>
+          <up-tag text="圆形" type="primary" shape="circle"></up-tag>
+          <up-tag text="大号" type="primary" size="large"></up-tag>
+          <up-tag text="中号" type="primary" size="medium"></up-tag>
+          <up-tag text="小号" type="primary" size="mini"></up-tag>
+        </view>
+      </view>
+
+      <!-- Badge 徽标 -->
+      <view class="demo-block">
+        <view class="demo-label">
+Badge 徽标
+</view>
+        <view class="demo-row">
+          <up-badge :value="9" type="error"></up-badge>
+          <up-badge :value="99" type="error"></up-badge>
+          <up-badge :value="999" type="error" :max="99"></up-badge>
+          <up-badge :is-dot="true" type="error"></up-badge>
+          <up-badge value="new" type="error"></up-badge>
+        </view>
+      </view>
+
+      <!-- Avatar 头像 -->
+      <view class="demo-block">
+        <view class="demo-label">
+Avatar 头像
+</view>
+        <view class="demo-row">
+          <up-avatar text="U" size="40" bg-color="#2979ff"></up-avatar>
+          <up-avatar text="A" size="40" bg-color="#19be6b"></up-avatar>
+          <up-avatar text="V" size="40" bg-color="#fa3534"></up-avatar>
+          <up-avatar :random-bg-color="true" text="张" size="40"></up-avatar>
+          <up-avatar :random-bg-color="true" text="李" size="40"></up-avatar>
+        </view>
+      </view>
+
+      <!-- Cell 单元格 -->
+      <view class="demo-block">
+        <view class="demo-label">
+Cell 单元格
+</view>
+        <up-cell-group>
+          <up-cell title="单元格" value="内容"></up-cell>
+          <up-cell title="带图标" value="内容" icon="setting"></up-cell>
+          <up-cell title="可点击" value="内容" is-link></up-cell>
+          <up-cell title="箭头向下" value="内容" is-link arrow-direction="down"></up-cell>
+        </up-cell-group>
+      </view>
+
+      <!-- LoadingIcon 加载动画 -->
+      <view class="demo-block">
+        <view class="demo-label">
+LoadingIcon 加载动画
+</view>
+        <view class="demo-row">
+          <up-loading-icon mode="circle"></up-loading-icon>
+          <up-loading-icon mode="spinner"></up-loading-icon>
+          <up-loading-icon mode="semicircle"></up-loading-icon>
+          <up-loading-icon mode="circle" text="加载中" :vertical="true"></up-loading-icon>
+        </view>
+      </view>
+
+      <up-divider text="基础组件结束"></up-divider>
+
+      <!-- ==================== 表单组件 ==================== -->
+      <view class="section-title">
+表单组件
+</view>
+
+      <!-- Input 输入框 -->
+      <view class="demo-block">
+        <view class="demo-label">
+Input 输入框
+</view>
+        <up-input v-model="inputValue" placeholder="请输入内容" border="surround" clearable></up-input>
+        <view style="height: 10px;"></view>
+        <up-input v-model="passwordValue" placeholder="请输入密码" :password="true" border="surround"></up-input>
+        <view style="height: 10px;"></view>
+        <up-input placeholder="带图标" prefix-icon="search" border="surround"></up-input>
+      </view>
+
+      <!-- Search 搜索 -->
+      <view class="demo-block">
+        <view class="demo-label">
+Search 搜索
+</view>
+        <up-search v-model="searchValue" placeholder="搜索关键字" :show-action="true" action-text="搜索"></up-search>
+      </view>
+
+      <!-- Switch 开关 -->
+      <view class="demo-block">
+        <view class="demo-label">
+Switch 开关
+</view>
+        <view class="demo-row" style="justify-content: flex-start;">
+          <up-switch v-model="switchValue1"></up-switch>
+          <view style="width: 20px;"></view>
+          <up-switch v-model="switchValue2" active-color="#fa3534"></up-switch>
+          <view style="width: 20px;"></view>
+          <up-switch :disabled="true"></up-switch>
+          <view style="width: 20px;"></view>
+          <up-switch :loading="true"></up-switch>
+        </view>
+      </view>
+
+      <!-- Checkbox 复选框 -->
+      <view class="demo-block">
+        <view class="demo-label">
+Checkbox 复选框
+</view>
+        <up-checkbox-group v-model="checkboxValue" placement="row">
+          <up-checkbox name="apple" label="苹果" :checked="true"></up-checkbox>
+          <up-checkbox name="banana" label="香蕉"></up-checkbox>
+          <up-checkbox name="orange" label="橙子"></up-checkbox>
+        </up-checkbox-group>
+      </view>
+
+      <!-- Radio 单选框 -->
+      <view class="demo-block">
+        <view class="demo-label">
+Radio 单选框
+</view>
+        <up-radio-group v-model="radioValue" placement="row">
+          <up-radio name="male" label="男"></up-radio>
+          <up-radio name="female" label="女"></up-radio>
+        </up-radio-group>
+      </view>
+
+      <!-- Slider 滑块 -->
+      <view class="demo-block">
+        <view class="demo-label">
+Slider 滑块
+</view>
+        <up-slider v-model="sliderValue" :min="0" :max="100" :step="1" :show-value="true"></up-slider>
+      </view>
+
+      <!-- Rate 评分 -->
+      <view class="demo-block">
+        <view class="demo-label">
+Rate 评分
+</view>
+        <view class="demo-row">
+          <up-rate v-model="rateValue" :count="5"></up-rate>
+          <text style="font-size: 14px; color: #909399; margin-left: 10px;">{{ rateValue }} 分</text>
+        </view>
+      </view>
+
+      <!-- NumberBox 步进器 -->
+      <view class="demo-block">
+        <view class="demo-label">
+NumberBox 步进器
+</view>
+        <view class="demo-row" style="justify-content: flex-start;">
+          <up-number-box v-model="numberValue" :min="0" :max="100"></up-number-box>
+        </view>
+      </view>
+
+      <up-divider text="表单组件结束"></up-divider>
+
+      <!-- ==================== 数据组件 ==================== -->
+      <view class="section-title">
+数据组件
+</view>
+
+      <!-- CountDown 倒计时 -->
+      <view class="demo-block">
+        <view class="demo-label">
+CountDown 倒计时
+</view>
+        <up-count-down :time="30 * 60 * 1000" format="HH:mm:ss"></up-count-down>
+      </view>
+
+      <!-- CountTo 数字滚动 -->
+      <view class="demo-block">
+        <view class="demo-label">
+CountTo 数字滚动
+</view>
+        <view class="demo-row" style="justify-content: flex-start;">
+          <up-count-to :start-val="0" :end-val="9999" :duration="3000"></up-count-to>
+        </view>
+      </view>
+
+      <!-- Empty 空状态 -->
+      <view class="demo-block">
+        <view class="demo-label">
+Empty 空状态
+</view>
+        <up-empty mode="search" text="暂无搜索结果"></up-empty>
+      </view>
+
+      <up-divider text="数据组件结束"></up-divider>
+
+      <!-- ==================== 反馈组件 ==================== -->
+      <view class="section-title">
+反馈组件
+</view>
+
+      <!-- Alert 警告提示 -->
+      <view class="demo-block">
+        <view class="demo-label">
+Alert 警告提示
+</view>
+        <up-alert title="成功提示" type="success" :show-icon="true"></up-alert>
+        <view style="height: 10px;"></view>
+        <up-alert title="警告提示" type="warning" :show-icon="true"></up-alert>
+        <view style="height: 10px;"></view>
+        <up-alert title="错误提示" type="error" :show-icon="true"></up-alert>
+        <view style="height: 10px;"></view>
+        <up-alert title="信息提示" type="info" :show-icon="true"></up-alert>
+      </view>
+
+      <!-- NoticeBar 滚动通知 -->
+      <view class="demo-block">
+        <view class="demo-label">
+NoticeBar 滚动通知
+</view>
+        <up-notice-bar text="uview-ultra 是一款专为 uni-app X 设计的高品质 UI 组件库" mode="link"></up-notice-bar>
+      </view>
+
+      <!-- Collapse 折叠面板 -->
+      <view class="demo-block">
+        <view class="demo-label">
+Collapse 折叠面板
+</view>
+        <up-collapse :value="collapseValue" :accordion="true">
+          <up-collapse-item title="第一项" name="1">
+            <text class="collapse-text">uview-ultra 是基于 uview-plus 修改的 uni-app-x 版本</text>
+          </up-collapse-item>
+          <up-collapse-item title="第二项" name="2">
+            <text class="collapse-text">支持 iOS、Android、H5、小程序等多端</text>
+          </up-collapse-item>
+          <up-collapse-item title="第三项" name="3">
+            <text class="collapse-text">高度适配 UTS 强类型系统与原生跨端开发</text>
+          </up-collapse-item>
+        </up-collapse>
+      </view>
+
+      <!-- Toast 消息提示 -->
+      <view class="demo-block">
+        <view class="demo-label">
+Toast 消息提示
+</view>
+        <view class="demo-row">
+          <up-button type="primary" text="成功提示" size="mini" @click="showToast('success')"></up-button>
+          <up-button type="error" text="错误提示" size="mini" @click="showToast('error')"></up-button>
+          <up-button type="warning" text="警告提示" size="mini" @click="showToast('warning')"></up-button>
+          <up-button type="info" text="默认提示" size="mini" @click="showToast('default')"></up-button>
+        </view>
+      </view>
+
+      <!-- Notify 消息通知 -->
+      <view class="demo-block">
+        <view class="demo-label">
+Notify 消息通知
+</view>
+        <view class="demo-row">
+          <up-button type="primary" text="主要通知" size="mini" @click="showNotify('primary')"></up-button>
+          <up-button type="success" text="成功通知" size="mini" @click="showNotify('success')"></up-button>
+          <up-button type="warning" text="警告通知" size="mini" @click="showNotify('warning')"></up-button>
+          <up-button type="error" text="错误通知" size="mini" @click="showNotify('error')"></up-button>
+        </view>
+      </view>
+
+      <!-- Modal 模态框 -->
+      <view class="demo-block">
+        <view class="demo-label">
+Modal 模态框
+</view>
+        <view class="demo-row">
+          <up-button type="primary" text="弹窗提示" size="mini" @click="showModal"></up-button>
+          <up-button type="warning" text="确认弹窗" size="mini" @click="showConfirmModal"></up-button>
+        </view>
+      </view>
+
+      <!-- Popup 弹出层 -->
+      <view class="demo-block">
+        <view class="demo-label">
+Popup 弹出层
+</view>
+        <view class="demo-row">
+          <up-button type="primary" text="顶部弹出" size="mini" @click="openPopup('top')"></up-button>
+          <up-button type="primary" text="底部弹出" size="mini" @click="openPopup('bottom')"></up-button>
+          <up-button type="primary" text="左侧弹出" size="mini" @click="openPopup('left')"></up-button>
+          <up-button type="primary" text="右侧弹出" size="mini" @click="openPopup('right')"></up-button>
+        </view>
+      </view>
+
+      <up-divider text="反馈组件结束"></up-divider>
+
+      <!-- ==================== 布局组件 ==================== -->
+      <view class="section-title">
+布局组件
+</view>
+
+      <!-- Grid 宫格 -->
+      <view class="demo-block">
+        <view class="demo-label">
+Grid 宫格
+</view>
+        <up-grid :col="4" :border="true">
+          <up-grid-item>
+            <up-icon name="home" :size="26"></up-icon>
+            <text class="grid-text">首页</text>
+          </up-grid-item>
+          <up-grid-item>
+            <up-icon name="search" :size="26"></up-icon>
+            <text class="grid-text">搜索</text>
+          </up-grid-item>
+          <up-grid-item>
+            <up-icon name="setting" :size="26"></up-icon>
+            <text class="grid-text">设置</text>
+          </up-grid-item>
+          <up-grid-item>
+            <up-icon name="heart" :size="26"></up-icon>
+            <text class="grid-text">收藏</text>
+          </up-grid-item>
+          <up-grid-item>
+            <up-icon name="photo" :size="26"></up-icon>
+            <text class="grid-text">相册</text>
+          </up-grid-item>
+          <up-grid-item>
+            <up-icon name="star" :size="26"></up-icon>
+            <text class="grid-text">评分</text>
+          </up-grid-item>
+          <up-grid-item>
+            <up-icon name="map" :size="26"></up-icon>
+            <text class="grid-text">地图</text>
+          </up-grid-item>
+          <up-grid-item>
+            <up-icon name="chat" :size="26"></up-icon>
+            <text class="grid-text">消息</text>
+          </up-grid-item>
+        </up-grid>
+      </view>
+
+      <!-- Skeleton 骨架屏 -->
+      <view class="demo-block">
+        <view class="demo-label">
+Skeleton 骨架屏
+</view>
+        <up-skeleton :loading="skeletonLoading" :animate="true" :rows="3" :title="true" :avatar="true"></up-skeleton>
+        <view style="height: 10px;"></view>
+        <up-button type="primary" text="切换骨架屏状态" size="mini" @click="toggleSkeleton"></up-button>
+      </view>
+
+      <!-- Divider 分割线 -->
+      <view class="demo-block">
+        <view class="demo-label">
+Divider 分割线
+</view>
+        <up-divider text="分割线"></up-divider>
+        <up-divider text="虚线" :dashed="true"></up-divider>
+      </view>
+
+      <up-divider text="布局组件结束"></up-divider>
+
+      <!-- ==================== 导航组件 ==================== -->
+      <view class="section-title">
+导航组件
+</view>
+
+      <!-- Tabs 标签页 -->
+      <view class="demo-block">
+        <view class="demo-label">
+Tabs 标签页
+</view>
+        <up-tabs :list="tabsList" :current="tabsCurrent" @change="onTabsChange"></up-tabs>
+        <view style="padding: 15px; background-color: #fff;">
+          <text style="font-size: 14px; color: #606266;">{{ tabsList.length > tabsCurrent ? tabsList[tabsCurrent].name : '' }} 的内容区域</text>
+        </view>
+      </view>
+
+      <!-- Steps 步骤条 -->
+      <view class="demo-block">
+        <view class="demo-label">
+Steps 步骤条
+</view>
+        <up-steps :current="stepsCurrent" direction="row">
+          <up-steps-item title="下单" desc="已下单"></up-steps-item>
+          <up-steps-item title="出库" desc="已出库"></up-steps-item>
+          <up-steps-item title="运输" desc="运输中"></up-steps-item>
+          <up-steps-item title="签收" desc="已签收"></up-steps-item>
+        </up-steps>
+        <view style="height: 10px;"></view>
+        <view class="demo-row">
+          <up-button type="primary" text="上一步" size="mini" @click="prevStep"></up-button>
+          <up-button type="primary" text="下一步" size="mini" @click="nextStep"></up-button>
+        </view>
+      </view>
+
+      <!-- Subsection 分段器 -->
+      <view class="demo-block">
+        <view class="demo-label">
+Subsection 分段器
+</view>
+        <up-subsection :list="subsectionList" :current="subsectionCurrent" @change="onSubsectionChange"></up-subsection>
+      </view>
+
+      <up-divider text="导航组件结束"></up-divider>
+
+      <!-- 底部安全间距 -->
+      <view style="height: 40px;"></view>
+
+      <!-- Toast 组件 -->
+      <up-toast ref="uToast"></up-toast>
+
+      <!-- Notify 组件 -->
+      <up-notify ref="uNotify"></up-notify>
+
+      <!-- Modal 组件 -->
+      <up-modal
+        :show="modalShow"
+        :title="modalTitle"
+        :content="modalContent"
+        :show-confirm-button="true"
+        :show-cancel-button="modalShowCancel"
+        @confirm="onModalConfirm"
+        @close="onModalClose"
+      ></up-modal>
+
+      <!-- Popup 组件 -->
+      <up-popup
+        :show="popupShow"
+        :mode="popupMode"
+        :closeable="true"
+        :round="10"
+        @close="onPopupClose"
+      >
+        <view style="padding: 30px; align-items: center;">
+          <text style="font-size: 16px; color: #303133;">{{ popupMode }} 弹出层内容</text>
+        </view>
+      </up-popup>
+    </scroll-view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue'
+
+// ==================== 表单组件 ====================
+const inputValue = ref('')
+const passwordValue = ref('')
+const searchValue = ref('')
+const switchValue1 = ref(true)
+const switchValue2 = ref(false)
+const checkboxValue = ref(['apple'] as string[])
+const radioValue = ref('male')
+const sliderValue = ref(50)
+const rateValue = ref(3)
+const numberValue = ref(1)
+
+// ==================== 反馈组件 ====================
+const collapseValue = ref('1')
+const modalShow = ref(false)
+const modalTitle = ref('')
+const modalContent = ref('')
+const modalShowCancel = ref(false)
+const popupShow = ref(false)
+const popupMode = ref('bottom')
+
+// Toast
+const uToast = ref(null as ComponentPublicInstance | null)
+function showToast(type: string) {
+  const toast = uToast.value
+  if (toast != null) {
+    const configs = {
+      success: { message: '操作成功！', type: 'success' },
+      error: { message: '操作失败！', type: 'error' },
+      warning: { message: '请注意风险！', type: 'warning' },
+      default: { message: '这是一条提示', type: 'default' },
+    } as UTSJSONObject
+    const config = configs[type] as UTSJSONObject
+    toast.$callMethod('show', {
+      message: config.message as string,
+      type: config.type as string,
+    })
+  }
+}
+
+// Notify
+const uNotify = ref(null as ComponentPublicInstance | null)
+function showNotify(type: string) {
+  const notify = uNotify.value
+  if (notify != null) {
+    const msgs = {
+      primary: '主要通知消息',
+      success: '操作成功通知',
+      warning: '请注意安全通知',
+      error: '发生错误通知',
+    } as UTSJSONObject
+    notify.$callMethod('show', {
+      message: msgs[type] as string,
+      type,
+    })
+  }
+}
+
+// Modal
+function showModal() {
+  modalTitle.value = '提示'
+  modalContent.value = '这是一个模态弹窗，用于提示重要信息。'
+  modalShowCancel.value = false
+  modalShow.value = true
+}
+function showConfirmModal() {
+  modalTitle.value = '确认操作'
+  modalContent.value = '确定要执行此操作吗？此操作不可撤销。'
+  modalShowCancel.value = true
+  modalShow.value = true
+}
+function onModalConfirm() {
+  modalShow.value = false
+  showToast('success')
+}
+function onModalClose() {
+  modalShow.value = false
+}
+
+// Popup
+function openPopup(mode: string) {
+  popupMode.value = mode
+  popupShow.value = true
+}
+function onPopupClose() {
+  popupShow.value = false
+}
+
+// ==================== 布局组件 ====================
+const skeletonLoading = ref(true)
+function toggleSkeleton() {
+  skeletonLoading.value = !skeletonLoading.value
+}
+
+// ==================== 导航组件 ====================
+const tabsCurrent = ref(0)
+const tabsList = ref([
+  { name: '推荐' },
+  { name: '热门' },
+  { name: '最新' },
+  { name: '关注' },
+] as UTSJSONObject[])
+function onTabsChange(item: UTSJSONObject) {
+  // eslint-disable-next-line dot-notation
+  tabsCurrent.value = item['index'] as number
+}
+
+const stepsCurrent = ref(1)
+function prevStep() {
+  if (stepsCurrent.value > 0) {
+    stepsCurrent.value = stepsCurrent.value - 1
+  }
+}
+function nextStep() {
+  if (stepsCurrent.value < 3) {
+    stepsCurrent.value = stepsCurrent.value + 1
+  }
+}
+
+const subsectionCurrent = ref(0)
+const subsectionList = ref(['待付款', '待发货', '待收货'] as string[])
+function onSubsectionChange(index: number) {
+  subsectionCurrent.value = index
+}
+</script>
+
+<style>
+.page-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #f5f5f5;
+}
+
+.section-title {
+  padding: 16px 16px 8px 16px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #303133;
+}
+
+.demo-block {
+  margin: 0 12px 12px 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+
+.demo-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.collapse-text {
+  font-size: 13px;
+  color: #909399;
+  line-height: 20px;
+}
+
+.grid-text {
+  font-size: 12px;
+  color: #606266;
+  margin-top: 4px;
+}
+</style>
