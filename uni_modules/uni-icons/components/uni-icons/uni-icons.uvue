@@ -77,10 +77,15 @@
 </script>
 
 <style scoped>
+	/* #ifdef MP-WEIXIN */
+	@import './uniicons_mp.css';
+	/* #endif */
+	/* #ifndef MP-WEIXIN */
 	@font-face {
 		font-family: UniIconsFontFamily;
 		src: url('./uniicons.ttf');
 	}
+	/* #endif */
 
 	.uni-icons {
 		font-family: UniIconsFontFamily;

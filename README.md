@@ -1,7 +1,7 @@
 <p align="center">
   <a href="https://github.com/cq112233/unibestX">
-    <img width="160" src="转存失败，建议直接上传图片文件
-    https://uniappx.oss-cn-beijing.aliyuncs.com/logo.png" style="border-radius: 20px;" alt="转存失败，建议直接上传图片文件">
+    <img width="160" src="
+https://uniappx.oss-cn-beijing.aliyuncs.com/logo.png" style="border-radius: 20px;" alt="转存失败，建议直接上传图片文件">
   </a>
 </p>
 
@@ -11,11 +11,11 @@
 
 <div align="center">
 
-[![GitHub Repo stars](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/cdfa8e9cd98b47b9b4e9d439edde121a~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAg5LqS6IGU572R6Z-t6I-c:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiMTExOTcyNTQyOTQ2MzU1OSJ9&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1781253404&x-orig-sign=jWKS1BZ713EyKB%2B6RzUPgf13wo0%3D)](https://github.com/cq112233/unibestX)
-[![GitHub forks](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/fc4e5b6bceea4ae397a1cec6665d2949~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAg5LqS6IGU572R6Z-t6I-c:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiMTExOTcyNTQyOTQ2MzU1OSJ9&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1781253404&x-orig-sign=4Ogsz6O85k0m6VW9GcRbqYWF7JI%3D)](https://github.com/cq112233/unibestX)
-![node version](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/c64b233c4f37404f969eb43959102d6f~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAg5LqS6IGU572R6Z-t6I-c:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiMTExOTcyNTQyOTQ2MzU1OSJ9&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1781253404&x-orig-sign=edaii5h7kxvWXA6sqGW7g6S3mW4%3D)
-![pnpm version](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/79d0dd65d8e0459cadb6e9745a0ebde9~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAg5LqS6IGU572R6Z-t6I-c:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiMTExOTcyNTQyOTQ2MzU1OSJ9&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1781253404&x-orig-sign=11kykkWS%2FM8G1Y3tpozP848BhuA%3D)
-![GitHub License](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/54a86271f52b4433af8ab9edc4672b1d~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAg5LqS6IGU572R6Z-t6I-c:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiMTExOTcyNTQyOTQ2MzU1OSJ9&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1781253404&x-orig-sign=uxB7Vcjq2AsMpQ4GjzbL3jBe2xg%3D)
+[![GitHub Repo stars](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/cdfa8e9cd98b47b9b4e9d439edde121a~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAg5LqS6IGU572R6Z-t6I-c:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiMTExOTcyNTQyOTQ2MzU1OSJ9&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1781255292&x-orig-sign=%2BE89s%2FQsLO7QYFsXzvEI0ZHaOkM%3D)](https://github.com/cq112233/unibestX)
+[![GitHub forks](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/fc4e5b6bceea4ae397a1cec6665d2949~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAg5LqS6IGU572R6Z-t6I-c:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiMTExOTcyNTQyOTQ2MzU1OSJ9&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1781255292&x-orig-sign=pfFt5EYyXtcchglOujIgHA2dOso%3D)](https://github.com/cq112233/unibestX)
+![node version](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/c64b233c4f37404f969eb43959102d6f~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAg5LqS6IGU572R6Z-t6I-c:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiMTExOTcyNTQyOTQ2MzU1OSJ9&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1781255292&x-orig-sign=32bgsA%2BmZSMPiCfeF1BsbIhyvUI%3D)
+![pnpm version](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/79d0dd65d8e0459cadb6e9745a0ebde9~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAg5LqS6IGU572R6Z-t6I-c:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiMTExOTcyNTQyOTQ2MzU1OSJ9&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1781255292&x-orig-sign=FHQZ677hVjqW4mHT60FKqRZF164%3D)
+![GitHub License](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/54a86271f52b4433af8ab9edc4672b1d~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAg5LqS6IGU572R6Z-t6I-c:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiMTExOTcyNTQyOTQ2MzU1OSJ9&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1781255292&x-orig-sign=eoy%2FJeOfABXK3P%2BmMsEPLwg%2BMT0%3D)
 
 </div>
 
@@ -284,6 +284,5 @@ Copyright (c) 2026 HTwoO
 
 <p align='center'>
 <img alt="微信收款码" src="https://uniappx.oss-cn-beijing.aliyuncs.com/wx.jpg" height="330" style="display:inline-block; height:330px;">
-<img alt="支付宝收款码" src="
-https://uniappx.oss-cn-beijing.aliyuncs.com/zfb.jpg" height="330" style="display:inline-block; height:330px; margin-left:10px;">
+<img alt="支付宝收款码" src="https://uniappx.oss-cn-beijing.aliyuncs.com/zfb.jpg" height="330" style="display:inline-block; height:330px; margin-left:10px;">
 </p>
