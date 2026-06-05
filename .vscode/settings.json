@@ -1,7 +1,7 @@
 {
   "files.associations": {
-    // *.uvue 关联为 "vue"，使 ESLint 能以 vue 模式格式化
-    // Volar template 检查已通过 vue.server.includeLanguages: [] 禁用，不会误报
+    // *.uvue 关联为 "vue"，让 Volar 语言服务器处理
+    // Volar 内部在 lang="uts" 时会 fallback 到 ts，从而支持 import 路径跳转
     "*.uvue": "vue",
     "*.uts": "typescript",
     "pages.json": "jsonc",
@@ -36,6 +36,10 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "js/ts.tsdk.path": "node_modules/typescript/lib",
   "js/ts.tsdk.promptToUseWorkspaceVersion": true,
+  // 加载 Volar 的 TypeScript 服务器插件，让其处理 .uvue 文件中 lang="uts" 的 import 跳转定义
+  "typescript.tsserver.pluginPaths": [
+    "/Users/chenqi/.antigravity-ide/extensions/vue.volar-3.3.3-universal/dist"
+  ],
   "editor.formatOnSave": true,
   "prettier.enable": false,
   "editor.defaultFormatter": "dbaeumer.vscode-eslint",
@@ -68,6 +72,7 @@
     "typescript",
     "typescriptreact",
     "vue",
+    "uvue",
     "html",
     "markdown",
     "json",
@@ -86,6 +91,10 @@
     "postcss"
   ],
   "[vue]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "editor.diagnostics": false
+  },
+  "[uvue]": {
     "editor.defaultFormatter": "dbaeumer.vscode-eslint",
     "editor.diagnostics": false
   },

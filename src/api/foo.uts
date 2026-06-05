@@ -22,7 +22,7 @@ export type IFooList = {
 // ==========================================
 
 const MOCK_FOO_LIST : IFoo[] = [
-  { id: 1, name: '菲鸽' },
+  { id: 1, name: 'unix' },
   { id: 2, name: 'UnibestX' },
   { id: 3, name: 'lime-request' },
 ]
@@ -53,7 +53,7 @@ export function getFooById(id : number) : Promise<IFoo | null> {
 export function foo() :Promise<IFoo> {
    const res = http.get<IFoo>('/foo', {
     params: {
-      name: '菲鸽',
+      name: 'unix',
       page: 1,
       pageSize: 10,
     } as UTSJSONObject,
