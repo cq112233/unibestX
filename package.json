@@ -1,17 +1,50 @@
 {
-	"dependencies": {
-		"@dcloudio/uni-cli-shared": "3.0.0-4070620250821001",
-		"@dcloudio/uni-components": "3.0.0-4070620250821001",
-		"@dcloudio/vite-plugin-uni": "3.0.0-4070620250821001",
-		"vite": "5.2.8"
-	},
-	"devDependencies": {
-		"@dcloudio/types": "^3.4.31",
-		"@uni-helper/eslint-config": "0.5.0",
-		"@uni-helper/uni-app-types": "^1.0.1",
-		"eslint": "^9.39.4",
-		"eslint-plugin-format": "^1.5.0",
-		"sass": "^1.63.2",
-		"sass-loader": "10.4.1"
-	}
+  "name": "unibestx",
+  "version": "1.0.0",
+  "description": "unibestX - 最好的 uni-app X 开发框架",
+  "scripts": {
+    "dev:app": "UNI_INPUT_DIR=. uni -p app",
+    "dev:app-android": "UNI_INPUT_DIR=. uni -p app-android",
+    "dev:app-ios": "UNI_INPUT_DIR=. uni -p app-ios",
+    "dev:app-harmony": "UNI_INPUT_DIR=. uni -p app-harmony",
+    "dev:h5": "UNI_INPUT_DIR=. uni",
+    "dev:mp-weixin": "UNI_INPUT_DIR=. uni -p mp-weixin",
+    "build:app": "UNI_INPUT_DIR=. uni build -p app",
+    "build:app-android": "UNI_INPUT_DIR=. uni build -p app-android",
+    "build:app-ios": "UNI_INPUT_DIR=. uni build -p app-ios",
+    "build:app-harmony": "UNI_INPUT_DIR=. uni build -p app-harmony",
+    "build:h5": "UNI_INPUT_DIR=. uni build",
+    "build:mp-weixin": "UNI_INPUT_DIR=. uni build -p mp-weixin",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "@dcloudio/uni-app": "3.0.0-4070620250821001",
+    "@dcloudio/uni-cli-shared": "3.0.0-4070620250821001",
+    "@dcloudio/uni-components": "3.0.0-4070620250821001",
+    "@dcloudio/vite-plugin-uni": "3.0.0-4070620250821001",
+    "vite": "5.2.8",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@dcloudio/types": "^3.4.31",
+    "@uni-helper/eslint-config": "0.5.0",
+    "@uni-helper/uni-app-types": "^1.0.1",
+    "eslint": "^9.39.4",
+    "eslint-plugin-format": "^1.5.0",
+    "sass": "^1.63.2",
+    "sass-loader": "10.4.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "@vue/compiler-core": "^3.5.13",
+      "@vue/compiler-dom": "^3.5.13",
+      "@vue/compiler-sfc": "^3.5.13",
+      "@vue/reactivity": "^3.5.13",
+      "@vue/runtime-core": "^3.5.13",
+      "@vue/server-renderer": "^3.5.13",
+      "@vue/shared": "^3.5.13",
+      "vue": "^3.5.13"
+    }
+  }
 }

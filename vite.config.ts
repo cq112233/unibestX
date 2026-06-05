@@ -5,6 +5,11 @@ import uniLayoutsPlugin from './plugins/uni-layouts-plugin'
 import autoRootPlugin from './plugins/root-plugin'
 
 export default defineConfig({
+  resolve: {
+    alias: [
+      { find: /^vue$/, replacement: '@dcloudio/uni-h5-vue' }
+    ],
+  },
   define: {
     __X_STYLE_ISOLATION__: false,
     __X_STYLE_ISOLATION_UP_ARROW__: false,
