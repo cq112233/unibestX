@@ -8,10 +8,10 @@
     "manifest.json": "jsonc"
   },
 
-  // uni-app x: 禁用 Volar 对 .uvue 文件 template 的 TS 类型报错
-  // view / image / text 等原生标签的类型由 DCloud "uni-app x 语言服务" 插件提供
-  // VS Code 原生 TS 引擎对 lang="uts" 无法识别，下面配置屏蔽掉虚假报错
-  "vue.server.includeLanguages": [],
+  // uni-app x: 启用 Volar 对 .uvue 文件的基本解析（如跳转定义），但在下面通过 [vue] block 禁用其模板类型报错
+  "vue.server.additionalExtensions": [
+    "uvue"
+  ],
 
   // 禁用内置 TS/JS 验证，避免对 .uvue 文件产生大量假报错
   // 真正的类型检查由 DCloud 语言服务插件和 ESLint 负责
@@ -86,7 +86,8 @@
     "postcss"
   ],
   "[vue]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "editor.diagnostics": false
   },
   "i18n-ally.localesPaths": [
     "src/i18n/locales"
