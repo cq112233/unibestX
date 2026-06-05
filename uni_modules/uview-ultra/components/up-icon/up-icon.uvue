@@ -210,7 +210,15 @@
 <style lang="scss" scoped>
 	@import "../../libs/css/components.scss";
 
-
+	/* #ifdef MP-WEIXIN */
+	@import './upicon_mp.css';
+	/* #endif */
+	/* #ifndef MP-WEIXIN */
+	@font-face {
+		font-family: iconfont;
+		src: url('./iconfont.ttf');
+	}
+	/* #endif */
 
 	// 变量定义
 	$up-icon-primary: $up-primary !default;

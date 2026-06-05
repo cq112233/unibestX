@@ -4,6 +4,20 @@ import { loadFont } from '@/uni_modules/uview-ultra/index.uts'
 
 onLaunch(() => {
   loadFont()
+  // #ifdef MP-WEIXIN
+  // 微信小程序真机 @font-face 不生效，使用 uni.loadFontFace 加载 uni-icons 字体
+  uni.loadFontFace({
+    global: true,
+    family: 'UniIconsFontFamily',
+    source: "url('/static/uniicons.ttf')",
+    success() {
+      console.log('global loadFontFace uniicons.ttf success')
+    },
+    fail(error) {
+      console.warn('global loadFontFace uniicons.ttf fail', error.errMsg)
+    }
+  })
+  // #endif
 })
 
 // #ifndef APP
@@ -22,4 +36,10 @@ onShow((options) => {
 @import '@/uni_modules/uview-ultra/index.scss';
 @import './src/style/index.scss';
 @import './js_sdk/a-hua-unocss/temp.scss';
+
+/* #ifdef MP-WEIXIN */
+/* 微信小程序真机：在全局 app.wxss 中注册字体，确保组件内可用 */
+@import '@/uni_modules/uni-icons/components/uni-icons/uniicons_mp.css';
+@import '@/uni_modules/uview-ultra/components/up-icon/upicon_mp.css';
+/* #endif */
 </style>
