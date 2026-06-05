@@ -283,6 +283,7 @@ Copyright (c) 2026 HTwoO
 ## 捐赠
 
 <p align='center'>
-<img alt="微信收款码" src="https://i-blog.csdnimg.cn/img_convert/0188a5b7004ba3f32f7e57ca727f481a.jpeg" height="330" style="display:inline-block; height:330px;">
-<img alt="支付宝收款码" src="https://i-blog.csdnimg.cn/img_convert/09955a15ed6256293fa9d0d0a1843a3e.jpeg" height="330" style="display:inline-block; height:330px; margin-left:10px;">
+<img alt="微信收款码" src="https://uniappx.oss-cn-beijing.aliyuncs.com/wx.jpg" height="330" style="display:inline-block; height:330px;">
+<img alt="支付宝收款码" src="
+https://uniappx.oss-cn-beijing.aliyuncs.com/zfb.jpg" height="330" style="display:inline-block; height:330px; margin-left:10px;">
 </p>
