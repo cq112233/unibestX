@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/cq112233/unibestX">
-    <img width="160" src="./static/logo.png">
+    <img width="160" src="./static/logo.png" style="border-radius: 20px;">
   </a>
 </p>
 
