@@ -91,7 +91,16 @@
 					safeAreaInsetTop: notifyPropCrt['safeAreaInsetTop']
 				},
 				// 合并后的配置，避免多次调用组件后，可能会复用之前使用的配置参数
-				tmpConfig: {}
+				tmpConfig: {
+				top: notifyPropCrt['top'],
+				type: notifyPropCrt['type'],
+				color: notifyPropCrt['color'],
+				bgColor: notifyPropCrt['bgColor'],
+				message: '',
+				duration: notifyPropCrt['duration'],
+				fontSize: notifyPropCrt['fontSize'],
+				safeAreaInsetTop: notifyPropCrt['safeAreaInsetTop']
+			}
 			}
 		},
 		computed: {

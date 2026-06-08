@@ -170,14 +170,14 @@
 		transform.value = `translateX(${currentPosition.value}px)`;
 		
 		// 继续下一帧动画
-		animationFrameId.value = requestAnimationFrame((ts) => animate(ts));
+		animationFrameId.value = setTimeout(() => animate(Date.now()), 16);
 	}
 	
 	// 初始化并开始滚动
 	const startScroll = async () => {
 		// 如果已在动画中，先停止
 		if (animationFrameId.value > 0) {
-			cancelAnimationFrame(animationFrameId.value);
+			clearTimeout(animationFrameId.value);
 			animationFrameId.value = 0;
 		}
 		
@@ -205,7 +205,7 @@
 	const stopScroll = () => {
 		isAnimating.value = false;
 		if (animationFrameId.value > 0) {
-			cancelAnimationFrame(animationFrameId.value);
+			clearTimeout(animationFrameId.value);
 			animationFrameId.value = 0;
 		}
 	}
@@ -281,22 +281,13 @@
 		}
 
 		&__content {
-			text-align: right;
 			flex: 1;
 			@include flex;
 			flex-wrap: nowrap;
 			overflow: hidden;
 
 			&__text {
-				font-size: 14px;
-				color: $up-warning;
-				/* #ifndef APP-NVUE */
-				// 这一句很重要，为了能让滚动左右连接起来
-				// word-break: keep-all;
-				white-space: nowrap;
-				/* #endif */
 				@include flex(row);
-				line-height: 1;
 			}
 		}
 
