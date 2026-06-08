@@ -11,14 +11,14 @@
     <scroll-view direction="vertical" class="flex-1 h-0px">
       <!-- ==================== 基础组件 ==================== -->
       <text class="section-title">
-基础组件
-</text>
+        基础组件
+      </text>
 
       <!-- Button 按钮 -->
       <view class="demo-block">
         <text class="demo-label">
-Button 按钮
-</text>
+          Button 按钮
+        </text>
         <view class="demo-row">
           <up-button type="primary" text="主要" size="mini"></up-button>
           <up-button type="success" text="成功" size="mini"></up-button>
@@ -41,8 +41,8 @@ Button 按钮
       <!-- Icon 图标 -->
       <view class="demo-block">
         <text class="demo-label">
-Icon 图标
-</text>
+          Icon 图标
+        </text>
         <view class="demo-row">
           <up-icon name="home" size="28" label="home" label-size="10" label-pos="bottom"></up-icon>
           <up-icon name="search" size="28" color="#2979ff" label="search" label-size="10" label-pos="bottom"></up-icon>
@@ -57,8 +57,8 @@ Icon 图标
       <!-- Tag 标签 -->
       <view class="demo-block">
         <text class="demo-label">
-Tag 标签
-</text>
+          Tag 标签
+        </text>
         <view class="demo-row">
           <up-tag text="主要" type="primary"></up-tag>
           <up-tag text="成功" type="success"></up-tag>
@@ -78,8 +78,8 @@ Tag 标签
       <!-- Badge 徽标 -->
       <view class="demo-block">
         <text class="demo-label">
-Badge 徽标
-</text>
+          Badge 徽标
+        </text>
         <view class="demo-row">
           <up-badge :value="9" type="error"></up-badge>
           <up-badge :value="99" type="error"></up-badge>
@@ -92,8 +92,8 @@ Badge 徽标
       <!-- Avatar 头像 -->
       <view class="demo-block">
         <text class="demo-label">
-Avatar 头像
-</text>
+          Avatar 头像
+        </text>
         <view class="demo-row">
           <up-avatar text="U" size="40" bg-color="#2979ff"></up-avatar>
           <up-avatar text="A" size="40" bg-color="#19be6b"></up-avatar>
@@ -106,8 +106,8 @@ Avatar 头像
       <!-- Cell 单元格 -->
       <view class="demo-block">
         <text class="demo-label">
-Cell 单元格
-</text>
+          Cell 单元格
+        </text>
         <up-cell-group>
           <up-cell title="单元格" value="内容"></up-cell>
           <up-cell title="带图标" value="内容" icon="setting"></up-cell>
@@ -119,8 +119,8 @@ Cell 单元格
       <!-- LoadingIcon 加载动画 -->
       <view class="demo-block">
         <text class="demo-label">
-LoadingIcon 加载动画
-</text>
+          LoadingIcon 加载动画
+        </text>
         <view class="demo-row">
           <up-loading-icon mode="circle"></up-loading-icon>
           <up-loading-icon mode="spinner"></up-loading-icon>
@@ -133,14 +133,14 @@ LoadingIcon 加载动画
 
       <!-- ==================== 表单组件 ==================== -->
       <text class="section-title">
-表单组件
-</text>
+        表单组件
+      </text>
 
       <!-- Input 输入框 -->
       <view class="demo-block">
         <text class="demo-label">
-Input 输入框
-</text>
+          Input 输入框
+        </text>
         <up-input v-model="inputValue" placeholder="请输入内容" border="surround" clearable></up-input>
         <view style="height: 10px;"></view>
         <up-input v-model="passwordValue" placeholder="请输入密码" :password="true" border="surround"></up-input>
@@ -151,16 +151,16 @@ Input 输入框
       <!-- Search 搜索 -->
       <view class="demo-block">
         <text class="demo-label">
-Search 搜索
-</text>
+          Search 搜索
+        </text>
         <up-search v-model="searchValue" placeholder="搜索关键字" :show-action="true" action-text="搜索"></up-search>
       </view>
 
       <!-- Switch 开关 -->
       <view class="demo-block">
         <text class="demo-label">
-Switch 开关
-</text>
+          Switch 开关
+        </text>
         <view class="demo-row" style="justify-content: flex-start;">
           <up-switch v-model="switchValue1"></up-switch>
           <view style="width: 20px;"></view>
@@ -175,8 +175,8 @@ Switch 开关
       <!-- Checkbox 复选框 -->
       <view class="demo-block">
         <text class="demo-label">
-Checkbox 复选框
-</text>
+          Checkbox 复选框
+        </text>
         <up-checkbox-group v-model="checkboxValue" placement="row">
           <up-checkbox name="apple" label="苹果" :checked="true"></up-checkbox>
           <up-checkbox name="banana" label="香蕉"></up-checkbox>
@@ -187,8 +187,8 @@ Checkbox 复选框
       <!-- Radio 单选框 -->
       <view class="demo-block">
         <text class="demo-label">
-Radio 单选框
-</text>
+          Radio 单选框
+        </text>
         <up-radio-group v-model="radioValue" placement="row">
           <up-radio name="male" label="男"></up-radio>
           <up-radio name="female" label="女"></up-radio>
@@ -198,16 +198,16 @@ Radio 单选框
       <!-- Slider 滑块 -->
       <view class="demo-block">
         <text class="demo-label">
-Slider 滑块
-</text>
+          Slider 滑块
+        </text>
         <up-slider v-model="sliderValue" :min="0" :max="100" :step="1" :show-value="true"></up-slider>
       </view>
 
       <!-- Rate 评分 -->
       <view class="demo-block">
         <text class="demo-label">
-Rate 评分
-</text>
+          Rate 评分
+        </text>
         <view class="demo-row">
           <up-rate v-model="rateValue" :count="5"></up-rate>
           <text style="font-size: 14px; color: #909399; margin-left: 10px;">{{ rateValue }} 分</text>
@@ -217,8 +217,8 @@ Rate 评分
       <!-- NumberBox 步进器 -->
       <view class="demo-block">
         <text class="demo-label">
-NumberBox 步进器
-</text>
+          NumberBox 步进器
+        </text>
         <view class="demo-row" style="justify-content: flex-start;">
           <up-number-box v-model="numberValue" :min="0" :max="100"></up-number-box>
         </view>
@@ -228,22 +228,22 @@ NumberBox 步进器
 
       <!-- ==================== 数据组件 ==================== -->
       <text class="section-title">
-数据组件
-</text>
+        数据组件
+      </text>
 
       <!-- CountDown 倒计时 -->
       <view class="demo-block">
         <text class="demo-label">
-CountDown 倒计时
-</text>
+          CountDown 倒计时
+        </text>
         <up-count-down :time="30 * 60 * 1000" format="HH:mm:ss"></up-count-down>
       </view>
 
       <!-- CountTo 数字滚动 -->
       <view class="demo-block">
         <text class="demo-label">
-CountTo 数字滚动
-</text>
+          CountTo 数字滚动
+        </text>
         <view class="demo-row" style="justify-content: flex-start;">
           <up-count-to :start-val="0" :end-val="9999" :duration="3000"></up-count-to>
         </view>
@@ -252,8 +252,8 @@ CountTo 数字滚动
       <!-- Empty 空状态 -->
       <view class="demo-block">
         <text class="demo-label">
-Empty 空状态
-</text>
+          Empty 空状态
+        </text>
         <up-empty mode="search" text="暂无搜索结果"></up-empty>
       </view>
 
@@ -261,14 +261,14 @@ Empty 空状态
 
       <!-- ==================== 反馈组件 ==================== -->
       <text class="section-title">
-反馈组件
-</text>
+        反馈组件
+      </text>
 
       <!-- Alert 警告提示 -->
       <view class="demo-block">
         <text class="demo-label">
-Alert 警告提示
-</text>
+          Alert 警告提示
+        </text>
         <up-alert title="成功提示" type="success" :show-icon="true"></up-alert>
         <view style="height: 10px;"></view>
         <up-alert title="警告提示" type="warning" :show-icon="true"></up-alert>
@@ -281,16 +281,16 @@ Alert 警告提示
       <!-- NoticeBar 滚动通知 -->
       <view class="demo-block">
         <text class="demo-label">
-NoticeBar 滚动通知
-</text>
+          NoticeBar 滚动通知
+        </text>
         <up-notice-bar text="uview-ultra 是一款专为 uni-app X 设计的高品质 UI 组件库" mode="link"></up-notice-bar>
       </view>
 
       <!-- Collapse 折叠面板 -->
       <view class="demo-block">
         <text class="demo-label">
-Collapse 折叠面板
-</text>
+          Collapse 折叠面板
+        </text>
         <up-collapse :value="collapseValue" :accordion="true">
           <up-collapse-item title="第一项" name="1">
             <text class="collapse-text">uview-ultra 是基于 uview-plus 修改的 uni-app-x 版本</text>
@@ -307,8 +307,8 @@ Collapse 折叠面板
       <!-- Toast 消息提示 -->
       <view class="demo-block">
         <text class="demo-label">
-Toast 消息提示
-</text>
+          Toast 消息提示
+        </text>
         <view class="demo-row">
           <up-button type="primary" text="成功提示" size="mini" @click="showToast('success')"></up-button>
           <up-button type="error" text="错误提示" size="mini" @click="showToast('error')"></up-button>
@@ -320,8 +320,8 @@ Toast 消息提示
       <!-- Notify 消息通知 -->
       <view class="demo-block">
         <text class="demo-label">
-Notify 消息通知
-</text>
+          Notify 消息通知
+        </text>
         <view class="demo-row">
           <up-button type="primary" text="主要通知" size="mini" @click="showNotify('primary')"></up-button>
           <up-button type="success" text="成功通知" size="mini" @click="showNotify('success')"></up-button>
@@ -333,8 +333,8 @@ Notify 消息通知
       <!-- Modal 模态框 -->
       <view class="demo-block">
         <text class="demo-label">
-Modal 模态框
-</text>
+          Modal 模态框
+        </text>
         <view class="demo-row">
           <up-button type="primary" text="弹窗提示" size="mini" @click="showModal"></up-button>
           <up-button type="warning" text="确认弹窗" size="mini" @click="showConfirmModal"></up-button>
@@ -344,8 +344,8 @@ Modal 模态框
       <!-- Popup 弹出层 -->
       <view class="demo-block">
         <text class="demo-label">
-Popup 弹出层
-</text>
+          Popup 弹出层
+        </text>
         <view class="demo-row">
           <up-button type="primary" text="顶部弹出" size="mini" @click="openPopup('top')"></up-button>
           <up-button type="primary" text="底部弹出" size="mini" @click="openPopup('bottom')"></up-button>
@@ -358,14 +358,14 @@ Popup 弹出层
 
       <!-- ==================== 布局组件 ==================== -->
       <text class="section-title">
-布局组件
-</text>
+        布局组件
+      </text>
 
       <!-- Grid 宫格 -->
       <view class="demo-block">
         <text class="demo-label">
-Grid 宫格
-</text>
+          Grid 宫格
+        </text>
         <up-grid :col="4" :border="true">
           <up-grid-item>
             <up-icon name="home" :size="26"></up-icon>
@@ -405,8 +405,8 @@ Grid 宫格
       <!-- Skeleton 骨架屏 -->
       <view class="demo-block">
         <text class="demo-label">
-Skeleton 骨架屏
-</text>
+          Skeleton 骨架屏
+        </text>
         <up-skeleton :loading="skeletonLoading" :animate="true" :rows="3" :title="true" :avatar="true"></up-skeleton>
         <view style="height: 10px;"></view>
         <up-button type="primary" text="切换骨架屏状态" size="mini" @click="toggleSkeleton"></up-button>
@@ -415,8 +415,8 @@ Skeleton 骨架屏
       <!-- Divider 分割线 -->
       <view class="demo-block">
         <text class="demo-label">
-Divider 分割线
-</text>
+          Divider 分割线
+        </text>
         <up-divider text="分割线"></up-divider>
         <up-divider text="虚线" :dashed="true"></up-divider>
       </view>
@@ -425,14 +425,14 @@ Divider 分割线
 
       <!-- ==================== 导航组件 ==================== -->
       <text class="section-title">
-导航组件
-</text>
+        导航组件
+      </text>
 
       <!-- Tabs 标签页 -->
       <view class="demo-block">
         <text class="demo-label">
-Tabs 标签页
-</text>
+          Tabs 标签页
+        </text>
         <up-tabs :list="tabsList" :current="tabsCurrent" @change="onTabsChange"></up-tabs>
         <view style="padding: 15px; background-color: #fff;">
           <text style="font-size: 14px; color: #606266;">{{ tabsList.length > tabsCurrent ? tabsList[tabsCurrent].name : '' }} 的内容区域</text>
@@ -442,8 +442,8 @@ Tabs 标签页
       <!-- Steps 步骤条 -->
       <view class="demo-block">
         <text class="demo-label">
-Steps 步骤条
-</text>
+          Steps 步骤条
+        </text>
         <up-steps :current="stepsCurrent" direction="row">
           <up-steps-item title="下单" desc="已下单"></up-steps-item>
           <up-steps-item title="出库" desc="已出库"></up-steps-item>
@@ -460,8 +460,8 @@ Steps 步骤条
       <!-- Subsection 分段器 -->
       <view class="demo-block">
         <text class="demo-label">
-Subsection 分段器
-</text>
+          Subsection 分段器
+        </text>
         <up-subsection :list="subsectionList" :current="subsectionCurrent" @change="onSubsectionChange"></up-subsection>
       </view>
 
