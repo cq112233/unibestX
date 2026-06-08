@@ -51,7 +51,7 @@ onShow(() => {
 
 // 组件挂载钩子：注册全局 Toast
 onMounted(() => {
-  console.log('注册 Toast 实例', uToastRef.value)
+  // 注册 Toast 实例
   if (uToastRef.value != null) {
     registerToast(uToastRef.value!)
   }
@@ -59,7 +59,7 @@ onMounted(() => {
 
 // 组件销毁钩子：反注册 Toast 以释放内存防内存泄漏
 onUnmounted(() => {
-  console.log('卸载 Toast 实例')
+  // 卸载 Toast 实例
   if (uToastRef.value != null) {
     unregisterToast(uToastRef.value!)
   }

@@ -200,7 +200,6 @@
 					backgroundColor: this.bgColor,
 					width: addUnit(this.buttonWidth),
 					height: addUnit(this.buttonSize),
-					color: this.color,
 					borderRadius: this.buttonRadius
 				} as UTSJSONObject
 				if (this.isDisabled(type)) {
@@ -415,7 +414,6 @@
 			}
 
 			&--disabled {
-				color: $up-numberBox-disabled-color;
 				background-color: $up-numberBox-disabled-bgColor;
 			}
 		}
@@ -431,14 +429,10 @@
 		}
 
 		&__input {
-			position: relative;
 			text-align: $up-numberBox-input-text-align;
 			font-size: $up-numberBox-input-font-size;
 			padding: $up-numberBox-input-padding;
 			margin: $up-numberBox-input-margin;
-			@include flex;
-			align-items: center;
-			justify-content: center;
 
 			&--disabled {
 				color: $up-numberBox-input-disabled-color;
