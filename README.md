@@ -59,11 +59,11 @@
 ## 📱 各端首页截图
 
 <p align="center">
-  <img src="https://uniappx.oss-cn-beijing.aliyuncs.com/wxxcx.png" width="19%" alt="微信小程序" />
-  <img src="https://uniappx.oss-cn-beijing.aliyuncs.com/android.png" width="19%" alt="Android" />
-  <img src="https://uniappx.oss-cn-beijing.aliyuncs.com/h5.png" width="19%" alt="H5" />
-  <img src="https://uniappx.oss-cn-beijing.aliyuncs.com/ios.png" width="19%" alt="iOS" />
-  <img src="https://uniappx.oss-cn-beijing.aliyuncs.com/hm.png" width="19%" alt="鸿蒙" />
+  <img src="https://uniappx.oss-cn-beijing.aliyuncs.com/wxxcx.png?t=Math.random()" width="19%" alt="微信小程序" />
+  <img src="https://uniappx.oss-cn-beijing.aliyuncs.com/android.png?t=Math.random()" width="19%" alt="Android" />
+  <img src="https://uniappx.oss-cn-beijing.aliyuncs.com/h5.png?t=Math.random()" width="19%" alt="H5" />
+  <img src="https://uniappx.oss-cn-beijing.aliyuncs.com/ios.png?t=Math.random()" width="19%" alt="iOS" />
+  <img src="https://uniappx.oss-cn-beijing.aliyuncs.com/hm.png?t=Math.random()" width="19%" alt="鸿蒙" />
 </p>
 
 <p align="center">
