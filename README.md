@@ -56,6 +56,20 @@
 
 > 注意：uni-app X 目前兼容以上 5 个端平台。
 
+## 📱 各端首页截图
+
+<p align="center">
+  <img src="https://uniappx.oss-cn-beijing.aliyuncs.com/wxxcx.png" width="19%" alt="微信小程序" />
+  <img src="https://uniappx.oss-cn-beijing.aliyuncs.com/android.png" width="19%" alt="Android" />
+  <img src="https://uniappx.oss-cn-beijing.aliyuncs.com/h5.png" width="19%" alt="H5" />
+  <img src="https://uniappx.oss-cn-beijing.aliyuncs.com/ios.png" width="19%" alt="iOS" />
+  <img src="https://uniappx.oss-cn-beijing.aliyuncs.com/hm.png" width="19%" alt="鸿蒙" />
+</p>
+
+<p align="center">
+  微信小程序 &nbsp;&nbsp;|&nbsp;&nbsp; Android &nbsp;&nbsp;|&nbsp;&nbsp; H5 &nbsp;&nbsp;|&nbsp;&nbsp; iOS &nbsp;&nbsp;|&nbsp;&nbsp; 鸿蒙
+</p>
+
 ## ⚙️ 环境
 
 * Node >= 22
@@ -274,5 +288,3 @@ Copyright (c) 2026 HTwoO
 
 <p align='center'>
 <img alt="微信收款码" src="https://uniappx.oss-cn-beijing.aliyuncs.com/wx.jpg" height="330" style="display:inline-block; height:330px;">
-<img alt="支付宝收款码" src="https://uniappx.oss-cn-beijing.aliyuncs.com/zfb.jpg" height="330" style="display:inline-block; height:330px; margin-left:10px;">
-</p>
