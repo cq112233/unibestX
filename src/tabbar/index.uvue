@@ -98,7 +98,7 @@ onMounted(() => {
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 9999;
+  z-index: 1;
   background-color: transparent;
   flex-direction: column;
 }
@@ -113,7 +113,7 @@ onMounted(() => {
   border-top-width: 1rpx;
   border-top-style: solid;
   border-top-color: #eeeeee;
-  z-index: 9999;
+  z-index: 1;
 }
 
 /* 【固定高度层】tab 图标按鈕区，与底板同高；鼓包由 TabbarItem 内绝对定位向上突出 */
@@ -121,7 +121,7 @@ onMounted(() => {
   flex-direction: row;
   height: 80px;
   align-items: flex-end;
-  z-index: 9999;
+  z-index: 2;
 }
 
 .tabbar-item {
@@ -137,7 +137,7 @@ onMounted(() => {
 
 /* 【安全区层】底部安全区白色填充，高度动态设定 */
 .safe-area-bg {
-  z-index: 9999;
+  z-index: 1;
   background-color: #ffffff;
 }
 </style>
