@@ -1,20 +1,20 @@
 <template>
-  <view class="p-5 min-h-screen bg-[#f8fafc]">
-    <view class="bg-white rounded-lg p-5 shadow-sm border border-[#e2e8f0]">
+  <view class="p-5px min-h-screen bg-[#f8fafc]">
+    <view class="bg-white rounded-lg p-5px shadow-sm border-width-1px border-style-solid border-color-[#e2e8f0]">
       <text class="text-20px font-bold text-[#1e293b]">URL Query 页面参数获取测试</text>
-      <text class="text-12px text-[#94a3b8] mt-2">本页面用于展示并测试如何获取 URL 中携带的 query 参数。</text>
+      <text class="text-12px text-[#94a3b8] mt-2px">本页面用于展示并测试如何获取 URL 中携带的 query 参数。</text>
 
-      <view class="mt-4 border-t border-[#f1f5f9] pt-4">
-        <view class="mb-4">
+      <view class="mt-4px border-top-width-1px border-top-style-solid border-top-color-[#f1f5f9] pt-4px">
+        <view class="mb-4px">
           <text class="text-14px font-bold text-[#64748b]">解析到的参数详情：</text>
         </view>
 
-        <view v-for="key in optionKeys" :key="key" class="flex flex-row justify-between items-center py-2 border-b border-[#f8fafc]">
+        <view v-for="key in optionKeys" :key="key" class="flex flex-row justify-between items-center py-2px border-bottom-width-1px border-bottom-style-solid border-bottom-color-[#f8fafc]">
           <text class="text-14px text-[#64748b] font-medium">{{ key }}:</text>
           <text class="text-14px text-[#334155] font-semibold">{{ getOptionValue(key) }}</text>
         </view>
 
-        <view v-if="optionKeys.length === 0" class="py-4 text-center">
+        <view v-if="optionKeys.length === 0" class="py-4px text-center">
           <text class="text-14px text-[#94a3b8]">暂无任何 query 参数</text>
         </view>
       </view>

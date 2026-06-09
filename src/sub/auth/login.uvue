@@ -1,7 +1,7 @@
 <template>
-  <view class="login-container">
-    <view class="title">
-      <text class="title-text">登录页</text>
+  <view class="flex-1 p-30px items-center justify-center bg-[#f8fafc]">
+    <view class="mb-30px">
+      <text class="text-20px font-bold text-[#1e293b]">登录页</text>
     </view>
     <up-button type="primary" @click="doLogin">
       点击模拟登录
@@ -80,27 +80,3 @@ function doLogin() {
   }, 1000)
 }
 </script>
-
-<style scoped>
-.login-container {
-  flex: 1;
-  padding: 30px;
-  align-items: center;
-  justify-content: center;
-  background-color: #f8fafc;
-}
-.title {
-  margin-bottom: 30px;
-}
-.title-text {
-  font-size: 20px;
-  font-weight: bold;
-  color: #1e293b;
-}
-.login-btn {
-  width: 200px;
-  background-color: #3b82f6;
-  color: #ffffff;
-  border-radius: 8px;
-}
-</style>
