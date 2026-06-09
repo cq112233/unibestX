@@ -250,7 +250,7 @@ export default {
         // 默认的姓名脱敏规则
         formatName(name: string): string {
             let value = ''
-            if (name.length === 2) {
+            if (name.length == 2) {
                 value = name.substring(0, 1) + '*'
             } else if (name.length > 2) {
                 let char = ''

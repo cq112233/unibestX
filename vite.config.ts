@@ -36,6 +36,9 @@ export default defineConfig({
         ],
         ['pt-safe', { 'padding-top': 'env(safe-area-inset-top)' }],
         ['pb-safe', { 'padding-bottom': 'env(safe-area-inset-bottom)' }],
+        // uni-app X 不支持 start 值，必须用 flex-start
+        ['justify-start', { 'justify-content': 'flex-start' }],
+        ['self-start', { 'align-self': 'flex-start' }],
       ],
       shortcuts: {},
       theme: {
