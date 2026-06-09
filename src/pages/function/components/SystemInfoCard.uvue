@@ -1,21 +1,21 @@
 <template>
   <Card title="设备系统信息">
-    <view style="background-color: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0;">
-      <view style="flex-direction: row; justify-content: space-between; margin-bottom: 10px;">
-        <text style="font-size: 14px; color: #718096;">手机品牌</text>
-        <text style="font-size: 14px; font-weight: bold; color: #2d3748;">{{ sysBrand !== '' ? sysBrand : '暂无数据' }}</text>
+    <view class="bg-[#f8fafc] rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
+      <view class="flex-row justify-between mb-10px">
+        <text class="text-14px text-[#718096]">手机品牌</text>
+        <text class="text-14px font-bold text-[#2d3748]">{{ sysBrand !== '' ? sysBrand : '暂无数据' }}</text>
       </view>
-      <view style="flex-direction: row; justify-content: space-between; margin-bottom: 10px;">
-        <text style="font-size: 14px; color: #718096;">手机型号</text>
-        <text style="font-size: 14px; font-weight: bold; color: #2d3748;">{{ sysModel !== '' ? sysModel : '暂无数据' }}</text>
+      <view class="flex-row justify-between mb-10px">
+        <text class="text-14px text-[#718096]">手机型号</text>
+        <text class="text-14px font-bold text-[#2d3748]">{{ sysModel !== '' ? sysModel : '暂无数据' }}</text>
       </view>
-      <view style="flex-direction: row; justify-content: space-between; margin-bottom: 10px;">
-        <text style="font-size: 14px; color: #718096;">操作系统</text>
-        <text style="font-size: 14px; font-weight: bold; color: #2d3748;">{{ sysSystem !== '' ? sysSystem : '暂无数据' }}</text>
+      <view class="flex-row justify-between mb-10px">
+        <text class="text-14px text-[#718096]">操作系统</text>
+        <text class="text-14px font-bold text-[#2d3748]">{{ sysSystem !== '' ? sysSystem : '暂无数据' }}</text>
       </view>
-      <view style="flex-direction: row; justify-content: space-between;">
-        <text style="font-size: 14px; color: #718096;">运行平台</text>
-        <text style="font-size: 14px; font-weight: bold; color: #2d3748;">{{ sysPlatform !== '' ? sysPlatform : '暂无数据' }}</text>
+      <view class="flex-row justify-between">
+        <text class="text-14px text-[#718096]">运行平台</text>
+        <text class="text-14px font-bold text-[#2d3748]">{{ sysPlatform !== '' ? sysPlatform : '暂无数据' }}</text>
       </view>
     </view>
     <up-button type="primary" @click="fetchSystemInfo">
