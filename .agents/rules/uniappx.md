@@ -57,7 +57,13 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
     *   *错误示例*：`font-mono`（触发编译报错）
     *   *正确做法*：通过内联 `style="font-family: monospace;"` 设置字体族
 
-*   **SCSS 变量的动态化覆盖**：
+*   *
+	*   **UnoCSS 对齐值限制 (Alignment Values)**：
+	    uni-app X 原生平台不支持 `justify-content: start` 和 `align-self: start`，必须使用 `flex-start`。已在 `vite.config.ts` 中通过自定义 rules 覆盖：
+	    *   `justify-start` → `justify-content: flex-start`
+	    *   `self-start` → `align-self: flex-start`
+
+	*SCSS 变量的动态化覆盖**：
     在 `uni.scss` 中引入第三方组件库（如 `uview-ultra`）的 `theme.scss` 变量后，如需将某些编译期 SCSS 变量（如 `$up-primary`）转化为运行时的动态 CSS 变量，可在 `uni.scss` 引入之后重新赋值：
     ```scss
     @import '@/uni_modules/uview-ultra/theme.scss';

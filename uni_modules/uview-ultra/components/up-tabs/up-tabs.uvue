@@ -288,7 +288,7 @@
 			// 获取所有标签的尺寸
 			resize() {
 				// 如果不存在list，则不处理
-				if((this.$props['list'] as Array<UTSJSONObject>).length === 0) {
+				if((this.$props['list'] as Array<UTSJSONObject>).length == 0) {
 					return
 				}
 				Promise.all([this.getTabsRect(), this.getAllItemRect()]).then((res: Array<Array<NodeInfo>>) => {
