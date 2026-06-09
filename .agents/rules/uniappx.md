@@ -52,6 +52,11 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
     <view class="border-width-5px border-color-[#ccc] border-solid"></view>
     ```
 
+*   **UnoCSS 字体族设置限制 (Font Family Utilities)**：
+    在 uni-app X 中**禁止**使用 UnoCSS 的 `font-mono`、`font-sans`、`font-serif` 等字体族工具类。这些类生成的 CSS 会被原生平台的严格解析器当作 `font` 简写属性处理，因缺少必需的 `font-size` 而报错：`[parse-css-font] Missing required font-size.`
+    *   *错误示例*：`font-mono`（触发编译报错）
+    *   *正确做法*：通过内联 `style="font-family: monospace;"` 设置字体族
+
 *   **SCSS 变量的动态化覆盖**：
     在 `uni.scss` 中引入第三方组件库（如 `uview-ultra`）的 `theme.scss` 变量后，如需将某些编译期 SCSS 变量（如 `$up-primary`）转化为运行时的动态 CSS 变量，可在 `uni.scss` 引入之后重新赋值：
     ```scss

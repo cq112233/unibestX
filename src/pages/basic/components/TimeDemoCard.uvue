@@ -1,65 +1,65 @@
 <template>
   <Card title="时间日期操作 (lime-dayuts)">
     <!-- 实时时间与自定义格式化展示 -->
-    <view style="background-color: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0;">
-      <text style="font-size: 13px; font-weight: bold; color: #1e293b; margin-bottom: 8px;">实时高精度时钟 (更新于每一百毫秒)</text>
-      <text style="font-size: 24px; font-weight: 700; color: var(--theme-color, #37c2bc); font-family: monospace; margin-bottom: 6px;">
+    <view class="bg-[#f8fafc] rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
+      <text class="text-13px font-bold text-[#1e293b] mb-8px">实时高精度时钟 (更新于每一百毫秒)</text>
+      <text class="text-24px font-bold text-[var(--theme-color,#37c2bc)] mb-6px" style="font-family: monospace;">
         {{ currentFullTime }}
       </text>
-      <text style="font-size: 12px; color: #94a3b8;">
+      <text class="text-12px text-[#94a3b8]">
         格式模板: YYYY-MM-DD HH:mm:ss.SSS dddd
       </text>
     </view>
 
     <!-- 日期加减偏移计算 -->
-    <view style="background-color: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0;">
-      <text style="font-size: 13px; font-weight: bold; color: #1e293b; margin-bottom: 12px;">日期偏移操作</text>
+    <view class="bg-[#f8fafc] rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
+      <text class="text-13px font-bold text-[#1e293b] mb-12px">日期偏移操作</text>
 
-      <view style="flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-        <text style="font-size: 14px; color: #64748b;">当前偏移天数:</text>
-        <text style="font-size: 16px; font-weight: bold; color: #334155;">{{ offsetDays > 0 ? '+' : '' }}{{ offsetDays }} 天</text>
+      <view class="flex-row items-center justify-between mb-12px">
+        <text class="text-14px text-[#64748b]">当前偏移天数:</text>
+        <text class="text-16px font-bold text-[#334155]">{{ offsetDays > 0 ? '+' : '' }}{{ offsetDays }} 天</text>
       </view>
 
-      <view style="flex-direction: row; justify-content: space-between; margin-bottom: 12px;">
-        <up-button size="small" type="primary" :plain="true" style="flex: 1; margin-right: 8px;" @click="adjustOffset(-7)">
+      <view class="flex-row justify-between mb-12px">
+        <up-button size="small" type="primary" :plain="true" class="flex-1 mr-8px" @click="adjustOffset(-7)">
           -7 天
         </up-button>
-        <up-button size="small" type="primary" :plain="true" style="flex: 1; margin-right: 8px;" @click="adjustOffset(-1)">
+        <up-button size="small" type="primary" :plain="true" class="flex-1 mr-8px" @click="adjustOffset(-1)">
           -1 天
         </up-button>
-        <up-button size="small" type="primary" :plain="true" style="flex: 1; margin-right: 8px;" @click="adjustOffset(1)">
+        <up-button size="small" type="primary" :plain="true" class="flex-1 mr-8px" @click="adjustOffset(1)">
           +1 天
         </up-button>
-        <up-button size="small" type="primary" :plain="true" style="flex: 1;" @click="adjustOffset(7)">
+        <up-button size="small" type="primary" :plain="true" class="flex-1" @click="adjustOffset(7)">
           +7 天
         </up-button>
       </view>
 
-      <view style="border-top-width: 1px; border-top-style: solid; border-top-color: #e2e8f0; padding-top: 8px; margin-top: 8px;">
-        <text style="font-size: 12px; color: #94a3b8; margin-bottom: 4px;">计算得到的目标时间:</text>
-        <text style="font-size: 14px; font-weight: bold; color: #334155;">{{ targetOffsetTime }}</text>
+      <view class="border-top-width-1px border-top-style-solid border-top-color-[#e2e8f0] pt-8px mt-8px">
+        <text class="text-12px text-[#94a3b8] mb-4px">计算得到的目标时间:</text>
+        <text class="text-14px font-bold text-[#334155]">{{ targetOffsetTime }}</text>
       </view>
     </view>
 
     <!-- 快捷日期边界与比较计算 -->
-    <view style="background-color: #f8fafc; border-radius: 12px; padding: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0;">
-      <text style="font-size: 13px; font-weight: bold; color: #1e293b; margin-bottom: 12px;">常用日期边界与区间计算</text>
+    <view class="bg-[#f8fafc] rounded-12px p-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
+      <text class="text-13px font-bold text-[#1e293b] mb-12px">常用日期边界与区间计算</text>
 
-      <view style="flex-direction: row; justify-content: space-between; margin-bottom: 8px;">
-        <text style="font-size: 14px; color: #64748b;">本月第一天</text>
-        <text style="font-size: 14px; font-weight: 500; color: #334155;">{{ startOfMonth }}</text>
+      <view class="flex-row justify-between mb-8px">
+        <text class="text-14px text-[#64748b]">本月第一天</text>
+        <text class="text-14px font-medium text-[#334155]">{{ startOfMonth }}</text>
       </view>
-      <view style="flex-direction: row; justify-content: space-between; margin-bottom: 8px;">
-        <text style="font-size: 14px; color: #64748b;">本月最后一天</text>
-        <text style="font-size: 14px; font-weight: 500; color: #334155;">{{ endOfMonth }}</text>
+      <view class="flex-row justify-between mb-8px">
+        <text class="text-14px text-[#64748b]">本月最后一天</text>
+        <text class="text-14px font-medium text-[#334155]">{{ endOfMonth }}</text>
       </view>
-      <view style="flex-direction: row; justify-content: space-between; margin-bottom: 8px;">
-        <text style="font-size: 14px; color: #64748b;">今年天数</text>
-        <text style="font-size: 14px; font-weight: 500; color: #334155;">{{ isLeapYear ? '366天 (闰年)' : '365天 (平年)' }}</text>
+      <view class="flex-row justify-between mb-8px">
+        <text class="text-14px text-[#64748b]">今年天数</text>
+        <text class="text-14px font-medium text-[#334155]">{{ isLeapYear ? '366天 (闰年)' : '365天 (平年)' }}</text>
       </view>
-      <view style="flex-direction: row; justify-content: space-between;">
-        <text style="font-size: 14px; color: #64748b;">距离今年底倒计时</text>
-        <text style="font-size: 14px; font-weight: bold; color: #f43f5e;">{{ daysToYearEnd }} 天</text>
+      <view class="flex-row justify-between">
+        <text class="text-14px text-[#64748b]">距离今年底倒计时</text>
+        <text class="text-14px font-bold text-[#f43f5e]">{{ daysToYearEnd }} 天</text>
       </view>
     </view>
   </Card>

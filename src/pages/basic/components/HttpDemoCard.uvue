@@ -1,60 +1,60 @@
 <template>
-	<Card title="HTTP 请求 Demo">
-		<!-- 说明区域 -->
-		<view style="background-color: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0;">
-			<text style="font-size: 12px; color: #64748b; line-height: 20px;">
-				基于 lime-request 封装的 http 请求演示，包含 Mock 数据与真实接口请求两种模式。
-			</text>
-		</view>
+  <Card title="HTTP 请求 Demo">
+    <!-- 说明区域 -->
+    <view class="bg-[#f8fafc] rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
+      <text class="text-12px text-[#64748b] leading-20px">
+        基于 lime-request 封装的 http 请求演示，包含 Mock 数据与真实接口请求两种模式。
+      </text>
+    </view>
 
-		<!-- Mock 数据区域 -->
-		<view style="margin-bottom: 16px;">
-			<text style="font-size: 14px; font-weight: bold; color: #2d3748; margin-bottom: 10px;">Mock 数据列表（ID 为任意类型）</text>
-			<view v-for="(item, index) in mockList" :key="index" style="flex-direction: row; align-items: center; padding: 10px 12px; background-color: #f1f5f9; border-radius: 8px; margin-top: 8px;">
-				<view style="width: 28px; height: 28px; border-radius: 14px; background-color: #3182ce; justify-content: center; align-items: center; margin-right: 10px;">
-					<text style="font-size: 12px; color: #ffffff; font-weight: bold;">{{ item.id }}</text>
-				</view>
-				<text style="font-size: 14px; color: #334155;">{{ item.name }}</text>
-			</view>
-		</view>
+    <!-- Mock 数据区域 -->
+    <view class="mb-16px">
+      <text class="text-14px font-bold text-[#2d3748] mb-10px">Mock 数据列表（ID 为任意类型）</text>
+      <view v-for="(item, index) in mockList" :key="index" class="flex-row items-center py-10px px-12px bg-[#f1f5f9] rounded-8px mt-8px">
+        <view class="w-28px h-28px rounded-14px bg-[#3182ce] justify-center items-center mr-10px">
+          <text class="text-12px text-white font-bold">{{ item.id }}</text>
+        </view>
+        <text class="text-14px text-[#334155]">{{ item.name }}</text>
+      </view>
+    </view>
 
-		<!-- 请求状态展示 -->
-		<view style="background-color: #f8fafc; border-radius: 10px; padding: 12px; margin-bottom: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0;">
-			<view style="flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-				<text style="font-size: 13px; color: #64748b;">接口请求状态:</text>
-				<view :style="{ paddingLeft: '8px', paddingRight: '8px', paddingTop: '2px', paddingBottom: '2px', borderRadius: 10, backgroundColor: statusBgColor }">
-					<text :style="{ fontSize: 12, color: statusColor }">{{ statusText }}</text>
-				</view>
-			</view>
-			<view v-if="hasResponseData" style="background-color: #ffffff; border-radius: 8px; padding: 10px; border-width: 1px; border-style: solid; border-color: #e2e8f0;">
-				<text style="font-size: 12px; color: #475569;">{{ responseText }}</text>
-			</view>
-			<view v-if="hasErrorMsg" style="background-color: #fff5f5; border-radius: 8px; padding: 10px; border-width: 1px; border-style: solid; border-color: #fecaca; margin-top: 6px;">
-				<text style="font-size: 12px; color: #ef4444;">错误：{{ errorMsg }}</text>
-			</view>
-		</view>
+    <!-- 请求状态展示 -->
+    <view class="bg-[#f8fafc] rounded-10px p-12px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
+      <view class="flex-row justify-between items-center mb-6px">
+        <text class="text-13px text-[#64748b]">接口请求状态:</text>
+        <view :style="{ paddingLeft: '8px', paddingRight: '8px', paddingTop: '2px', paddingBottom: '2px', borderRadius: 10, backgroundColor: statusBgColor }">
+          <text :style="{ fontSize: 12, color: statusColor }">{{ statusText }}</text>
+        </view>
+      </view>
+      <view v-if="hasResponseData" class="bg-white rounded-8px p-10px border-width-1px border-style-solid border-color-[#e2e8f0]">
+        <text class="text-12px text-[#475569]">{{ responseText }}</text>
+      </view>
+      <view v-if="hasErrorMsg" class="bg-[#fff5f5] rounded-8px p-10px border-width-1px border-style-solid border-color-[#fecaca] mt-6px">
+        <text class="text-12px text-[#ef4444]">错误：{{ errorMsg }}</text>
+      </view>
+    </view>
 
-		<!-- 操作按钮：用 margin-right 代替 gap -->
-		<view style="flex-direction: row;">
-			<view style="flex: 1; margin-right: 10px;">
-				<button
-					style="background-color: #3182ce; color: #ffffff; border-radius: 8px; font-size: 14px; height: 42px; width: 100%;"
-					@click="loadMockData"
-				>
-					加载 Mock 数据
-				</button>
-			</view>
-			<view style="flex: 1;">
-				<button
-					:disabled="loading"
-					style="background-color: #10b981; color: #ffffff; border-radius: 8px; font-size: 14px; height: 42px; width: 100%;"
-					@click="fetchRealApi"
-				>
-					{{ loading ? '请求中...' : '真实 API 请求' }}
-				</button>
-			</view>
-		</view>
-	</Card>
+    <!-- 操作按钮：用 margin-right 代替 gap -->
+    <view class="flex-row">
+      <view class="flex-1 mr-10px">
+        <button
+          class="bg-[#3182ce] text-white rounded-8px text-14px h-42px w-full"
+          @click="loadMockData"
+        >
+          加载 Mock 数据
+        </button>
+      </view>
+      <view class="flex-1">
+        <button
+          :disabled="loading"
+          class="bg-[#10b981] text-white rounded-8px text-14px h-42px w-full"
+          @click="fetchRealApi"
+        >
+          {{ loading ? '请求中...' : '真实 API 请求' }}
+        </button>
+      </view>
+    </view>
+  </Card>
 </template>
 
 <script setup lang="uts">
