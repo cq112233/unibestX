@@ -18,7 +18,7 @@ import { useAppStore } from '@/src/store'
 import { isPageTabbar, syncCurIdxByCurrentPage } from '@/src/tabbar/store'
 import { registerToast, unregisterToast } from '@/src/utils/toast'
 import type { ComponentPublicInstance } from 'vue'
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onBeforeMount, onMounted, onUnmounted, ref } from 'vue'
 
 // 激活应用状态管理 Store
 const appStore = useAppStore()
@@ -29,7 +29,7 @@ const isCurrentPageTabbar = ref(false)
 const uToastRef = ref<ComponentPublicInstance | null>(null)
 
 // 页面显示钩子：解析当前路由，动态控制导航栏显示及同步选中索引
-onShow(() => {
+onBeforeMount(() => {
   const pages = getCurrentPages()
   if (pages.length > 0) {
     const route = pages[pages.length - 1].route

@@ -8,8 +8,9 @@ export default function autoRootPlugin() {
     name: 'auto-root',
     transform(code: string, id: string) {
       const normalizedId = id.replace(/\\/g, '/')
-      // 只处理 src/pages 下的非组件 uvue 页面，排除 App.uvue、App.ku.uvue 以及组件目录
-      if (!normalizedId.includes('src/pages/') || normalizedId.includes('/components/') || normalizedId.includes('App.ku.uvue')) {
+      // 只处理 src/pages 和 src/sub 下的非组件 uvue 页面，排除 App.uvue、App.ku.uvue 以及组件目录
+      const isPage = normalizedId.includes('src/pages/') || normalizedId.includes('src/sub/')
+      if (!isPage || normalizedId.includes('/components/') || normalizedId.includes('App.ku.uvue')) {
         return null
       }
 
