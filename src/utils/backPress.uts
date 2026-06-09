@@ -1,8 +1,9 @@
 let firstBackTime = 0
 
 /**
- * 针对鸿蒙 (HarmonyOS) 或没有全局 App 级别 onLastPageBackPress 的平台，
- * 实现“再按一次退出应用”的页面级辅助函数。
+ * 退出应用辅助函数。
+ * Android: 先 finishAffinity() 播放退出动画，延迟后 System.exit(0) 彻底杀进程，
+ * 确保下次启动是干净冷启动，避免 re-entry 时 setupRenderEffect NPE。
  */
 export function handleBackPressExit() : boolean {
   const now = Date.now()
@@ -13,15 +14,33 @@ export function handleBackPressExit() : boolean {
       position: 'bottom',
     })
     setTimeout(() => {
-      // 2秒后如果未再次点击则重置时间
       if (firstBackTime == now) {
         firstBackTime = 0
       }
     }, 2000)
-    return true // 拦截默认返回操作
+    return true
   }
-  
-  // 2秒内再次触发，则直接退出
+
+  // 2秒内再次触发，退出应用
+  // #ifdef APP-ANDROID
+  try {
+    const activity = UTSAndroid.getUniActivity()
+    if (activity != null) {
+      // 先关闭 Activity（带退出动画）
+      activity.finishAffinity()
+    }
+    // 等退出动画播放完毕后，强制杀进程确保彻底退出
+    setTimeout(() => {
+      java.lang.System.exit(0)
+    }, 500)
+  } catch (_e) {
+    java.lang.System.exit(0)
+  }
+  // #endif
+
+  // #ifndef APP-ANDROID
   uni.exit()
+  // #endif
+
   return false
 }
