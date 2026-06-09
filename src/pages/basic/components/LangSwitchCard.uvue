@@ -1,35 +1,35 @@
 <template>
   <Card :title="$t('basic.langTitle')">
     <!-- 当前语言预览 -->
-    <view style="background-color: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; border-width: 1px; border-style: solid; border-color: #e2e8f0;">
-      <text style="font-size: 12px; color: #94a3b8; margin-bottom: 6px;">{{ $t('basic.langPreview') }}</text>
+    <view class="bg-[#f8fafc] rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
+      <text class="text-12px text-[#94a3b8] mb-6px">{{ $t('basic.langPreview') }}</text>
 
-      <text style="font-size: 16px; font-weight: bold; color: #1e293b;">
+      <text class="text-16px font-bold text-[#1e293b]">
         {{ $t('message.welcome') }}
       </text>
 
-      <text style="font-size: 14px; color: #475569; margin-top: 8px;">
+      <text class="text-14px text-[#475569] mt-8px">
         {{ $t('message.hello', { msg: 'hi' }) }}
       </text>
     </view>
 
     <!-- 选项列表 -->
     <!-- 简体中文 -->
-    <view style="flex-direction: row; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #f1f5f9;" @click="switchLanguage('zh-CN')">
-      <view style="flex-direction: row; align-items: center;">
-        <text style="font-size: 15px; color: #334155; font-weight: 500;">简体中文</text>
+    <view class="flex-row items-center justify-between py-12px border-bottom-width-1px border-bottom-style-solid border-bottom-color-[#f1f5f9]" @click="switchLanguage('zh-CN')">
+      <view class="flex-row items-center">
+        <text class="text-15px text-[#334155] font-medium">简体中文</text>
       </view>
-      <view style="flex-direction: row; align-items: center;">
+      <view class="flex-row items-center">
         <uni-icons v-if="isZhCN" type="checkmarkempty" size="20" style="color: #3b82f6;" />
       </view>
     </view>
 
     <!-- English -->
-    <view style="flex-direction: row; align-items: center; justify-content: space-between; padding: 12px 0;" @click="switchLanguage('en-US')">
-      <view style="flex-direction: row; align-items: center;">
-        <text style="font-size: 15px; color: #334155; font-weight: 500;">English</text>
+    <view class="flex-row items-center justify-between py-12px" @click="switchLanguage('en-US')">
+      <view class="flex-row items-center">
+        <text class="text-15px text-[#334155] font-medium">English</text>
       </view>
-      <view style="flex-direction: row; align-items: center;">
+      <view class="flex-row items-center">
         <uni-icons v-if="isEnUS" type="checkmarkempty" size="20" style="color: #3b82f6;" />
       </view>
     </view>
@@ -60,7 +60,7 @@ function switchLanguage(lang: string) {
   appStore.setLocale(lang)
 
   uni.showToast({
-    title: t('message.switch_success'),
+    title: t('message.switch_success', null),
     icon: 'none',
     duration: 1500,
   })
