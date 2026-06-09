@@ -1,20 +1,20 @@
 <template>
-  <view class="page-root">
+  <view class="flex flex-col flex-1 h-full bg-[#f7fafc]">
     <!-- 导航栏 -->
     <NavBar title="分页加载 (z-paging-x)" :show-back="true" />
 
     <!-- 顶部过滤 Tabs (移到 z-paging-x 外部) -->
-    <view style="background-color: #ffffff; padding: 12px 16px; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #f1f5f9;">
-      <view style="flex-direction: row; background-color: #f1f5f9; border-radius: 12px; padding: 4px;">
+    <view class="bg-white py-12px px-16px border-bottom-width-1px border-bottom-style-solid border-bottom-color-[#f1f5f9]">
+      <view class="flex-row bg-[#f1f5f9] rounded-12px p-4px">
         <view
           v-for="(tab, index) in tabList"
           :key="index"
-          style="flex: 1; align-items: center; justify-content: center; padding: 8px 0; border-radius: 8px;"
+          class="flex-1 items-center justify-center py-8px rounded-8px"
           :style="{ backgroundColor: tabIndex === index ? '#ffffff' : 'transparent' }"
           @click="tabChange(index)"
         >
           <text
-            style="font-size: 13px; font-weight: bold;"
+            class="text-13px font-bold"
             :style="{ color: tabIndex === index ? 'var(--theme-color, #37c2bc)' : '#64748b' }"
           >
             {{ tab }}
@@ -34,23 +34,23 @@
     >
       <!-- 列表数据 -->
       <list-item v-for="item in dataList" :key="item.id">
-        <view style="margin: 8px 16px; padding: 16px; background-color: #ffffff; border-radius: 12px; border-width: 1px; border-style: solid; border-color: #edf2f7; box-shadow: 0 1px 3px rgba(0,0,0,0.01);">
+        <view class="mx-16px my-8px p-16px bg-white rounded-12px border-width-1px border-style-solid border-color-[#edf2f7] shadow-sm">
           <!-- 头部信息 -->
-          <view style="flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <view class="flex-row justify-between items-center mb-8px">
             <view :style="{ backgroundColor: item.tagBgColor, padding: '2px 8px', borderRadius: '6px' }">
               <text :style="{ color: item.tagColor, fontSize: '10px', fontWeight: 'bold' }">{{ item.tag }}</text>
             </view>
-            <text style="font-size: 12px; color: #94a3b8;">#{{ item.id }}</text>
+            <text class="text-12px text-[#94a3b8]">#{{ item.id }}</text>
           </view>
-          
+
           <!-- 标题 & 摘要 -->
-          <text style="font-size: 15px; font-weight: bold; color: #1e293b; margin-bottom: 6px;">{{ item.title }}</text>
-          <text style="font-size: 13px; color: #64748b; line-height: 18px; margin-bottom: 12px;">{{ item.summary }}</text>
-          
+          <text class="text-15px font-bold text-[#1e293b] mb-6px">{{ item.title }}</text>
+          <text class="text-13px text-[#64748b] leading-18px mb-12px">{{ item.summary }}</text>
+
           <!-- 底部栏 -->
-          <view style="flex-direction: row; justify-content: space-between; align-items: center; border-top-width: 1px; border-top-style: solid; border-top-color: #f8fafc; padding-top: 8px;">
-            <text style="font-size: 12px; color: #475569; font-weight: 500;">{{ item.author }}</text>
-            <text style="font-size: 11px; color: #94a3b8;">{{ item.createTime }}</text>
+          <view class="flex-row justify-between items-center border-top-width-1px border-top-style-solid border-top-color-[#f8fafc] pt-8px">
+            <text class="text-12px text-[#475569] font-medium">{{ item.author }}</text>
+            <text class="text-11px text-[#94a3b8]">{{ item.createTime }}</text>
           </view>
         </view>
       </list-item>
@@ -92,14 +92,14 @@ function onUpdateModelValue(val: any[]) {
 function getMockArticles(category: string, pageNo: number, pageSize: number): ArticleItem[] {
   const list = [] as ArticleItem[]
   const start = (pageNo - 1) * pageSize
-  
+
   for (let i = 0; i < pageSize; i++) {
     const itemId = start + i + 1
     // 限制列表总大小为 35 条，以演示 "没有更多数据"
     if (itemId > 35) {
       break
     }
-    
+
     // 确定文章标签与对应的颜色配方
     let tag = category
     if (category == '全部') {
@@ -108,7 +108,7 @@ function getMockArticles(category: string, pageNo: number, pageSize: number): Ar
       else if (idx == 1) tag = '设计'
       else tag = '生活'
     }
-    
+
     let tagBgColor = '#e0f2fe'
     let tagColor = '#0284c7'
     if (tag == '设计') {
@@ -118,7 +118,7 @@ function getMockArticles(category: string, pageNo: number, pageSize: number): Ar
       tagBgColor = '#dcfce7'
       tagColor = '#16a34a'
     }
-    
+
     list.push({
       id: itemId,
       title: `${tag}专栏 · 探索移动端开发的未来第 ${itemId} 篇`,
@@ -136,7 +136,7 @@ function getMockArticles(category: string, pageNo: number, pageSize: number): Ar
 // 下拉刷新或触底加载的回调
 function onQuery(pageNo: number, pageSize: number) {
   const currentCategory = tabList[tabIndex.value]
-  
+
   // 模拟 800ms 的网络延时
   setTimeout(() => {
     try {
@@ -168,16 +168,4 @@ page {
   display: flex;
 }
 /* #endif */
-
-.page-root {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  height: 100%;
-  background-color: #f7fafc;
-}
-
-.flex-1 {
-  flex: 1;
-}
 </style>

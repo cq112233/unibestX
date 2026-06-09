@@ -1,9 +1,9 @@
 <template>
-  <view class="register-container">
-    <view class="title">
-      <text class="title-text">注册页</text>
+  <view class="flex-1 p-30px items-center justify-center bg-[#f8fafc]">
+    <view class="mb-30px">
+      <text class="text-20px font-bold text-[#1e293b]">注册页</text>
     </view>
-    <button class="register-btn" @click="doRegister">
+    <button class="w-200px bg-[#10b981] text-white rounded-8px" @click="doRegister">
       点击模拟注册
     </button>
   </view>
@@ -17,7 +17,7 @@ function doRegister() {
     title: '注册成功',
     icon: 'success'
   })
-  
+
   // 延迟后跳转到登录页
   setTimeout(() => {
     uni.navigateTo({
@@ -26,27 +26,3 @@ function doRegister() {
   }, 1000)
 }
 </script>
-
-<style scoped>
-.register-container {
-  flex: 1;
-  padding: 30px;
-  align-items: center;
-  justify-content: center;
-  background-color: #f8fafc;
-}
-.title {
-  margin-bottom: 30px;
-}
-.title-text {
-  font-size: 20px;
-  font-weight: bold;
-  color: #1e293b;
-}
-.register-btn {
-  width: 200px;
-  background-color: #10b981; /* Emerald-500 for register */
-  color: #ffffff;
-  border-radius: 8px;
-}
-</style>

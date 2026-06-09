@@ -143,9 +143,9 @@
           Input 输入框
         </text>
         <up-input v-model="inputValue" placeholder="请输入内容" border="surround" clearable></up-input>
-        <view style="height: 10px;"></view>
+        <view class="h-10px"></view>
         <up-input v-model="passwordValue" placeholder="请输入密码" :password="true" border="surround"></up-input>
-        <view style="height: 10px;"></view>
+        <view class="h-10px"></view>
         <up-input placeholder="带图标" prefix-icon="search" border="surround"></up-input>
       </view>
 
@@ -162,13 +162,13 @@
         <text class="demo-label">
           Switch 开关
         </text>
-        <view class="demo-row" style="justify-content: flex-start;">
+        <view class="demo-row justify-start">
           <up-switch v-model="switchValue1"></up-switch>
-          <view style="width: 20px;"></view>
+          <view class="w-20px"></view>
           <up-switch v-model="switchValue2" active-color="#fa3534"></up-switch>
-          <view style="width: 20px;"></view>
+          <view class="w-20px"></view>
           <up-switch :disabled="true"></up-switch>
-          <view style="width: 20px;"></view>
+          <view class="w-20px"></view>
           <up-switch :loading="true"></up-switch>
         </view>
       </view>
@@ -211,7 +211,7 @@
         </text>
         <view class="demo-row">
           <up-rate v-model="rateValue" :count="5"></up-rate>
-          <text style="font-size: 14px; color: #909399; margin-left: 10px;">{{ rateValue }} 分</text>
+          <text class="text-14px text-[#909399] ml-10px">{{ rateValue }} 分</text>
         </view>
       </view>
 
@@ -220,7 +220,7 @@
         <text class="demo-label">
           NumberBox 步进器
         </text>
-        <view class="demo-row" style="justify-content: flex-start;">
+        <view class="demo-row justify-start">
           <up-number-box v-model="numberValue" :min="0" :max="100"></up-number-box>
         </view>
       </view>
@@ -245,7 +245,7 @@
         <text class="demo-label">
           CountTo 数字滚动
         </text>
-        <view class="demo-row" style="justify-content: flex-start;">
+        <view class="demo-row justify-start">
           <up-count-to :start-val="0" :end-val="9999" :duration="3000"></up-count-to>
         </view>
       </view>
@@ -271,11 +271,11 @@
           Alert 警告提示
         </text>
         <up-alert title="成功提示" type="success" :show-icon="true"></up-alert>
-        <view style="height: 10px;"></view>
+        <view class="h-10px"></view>
         <up-alert title="警告提示" type="warning" :show-icon="true"></up-alert>
-        <view style="height: 10px;"></view>
+        <view class="h-10px"></view>
         <up-alert title="错误提示" type="error" :show-icon="true"></up-alert>
-        <view style="height: 10px;"></view>
+        <view class="h-10px"></view>
         <up-alert title="信息提示" type="info" :show-icon="true"></up-alert>
       </view>
 
@@ -409,7 +409,7 @@
           Skeleton 骨架屏
         </text>
         <up-skeleton :loading="skeletonLoading" :animate="true" :rows="3" :title="true" :avatar="true"></up-skeleton>
-        <view style="height: 10px;"></view>
+        <view class="h-10px"></view>
         <up-button type="primary" text="切换骨架屏状态" size="mini" @click="toggleSkeleton"></up-button>
       </view>
 
@@ -435,8 +435,8 @@
           Tabs 标签页
         </text>
         <up-tabs :list="tabsList" :current="tabsCurrent" @change="onTabsChange"></up-tabs>
-        <view style="padding: 15px; background-color: #fff;">
-          <text style="font-size: 14px; color: #606266;">{{ tabsList.length > tabsCurrent ? tabsList[tabsCurrent].name : '' }} 的内容区域</text>
+        <view class="p-15px bg-white">
+          <text class="text-14px text-[#606266]">{{ tabsList.length > tabsCurrent ? tabsList[tabsCurrent].name : '' }} 的内容区域</text>
         </view>
       </view>
 
@@ -451,7 +451,7 @@
           <up-steps-item title="运输" desc="运输中"></up-steps-item>
           <up-steps-item title="签收" desc="已签收"></up-steps-item>
         </up-steps>
-        <view style="height: 10px;"></view>
+        <view class="h-10px"></view>
         <view class="demo-row">
           <up-button type="primary" text="上一步" size="mini" @click="prevStep"></up-button>
           <up-button type="primary" text="下一步" size="mini" @click="nextStep"></up-button>
@@ -469,7 +469,7 @@
       <up-divider text="导航组件结束"></up-divider>
 
       <!-- 底部安全间距 -->
-      <view style="height: 40px;"></view>
+      <view class="h-40px"></view>
 
       <!-- Toast 组件 -->
       <up-toast ref="uToast"></up-toast>
@@ -496,8 +496,8 @@
         :round="10"
         @close="onPopupClose"
       >
-        <view style="padding: 30px; align-items: center;">
-          <text style="font-size: 16px; color: #303133;">{{ popupMode }} 弹出层内容</text>
+        <view class="p-30px items-center">
+          <text class="text-16px text-[#303133]">{{ popupMode }} 弹出层内容</text>
         </view>
       </up-popup>
     </scroll-view>
