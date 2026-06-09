@@ -40,6 +40,18 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
     *   **重要限制**：**禁止**在 `<view>` 元素上直接使用 `color` 属性（包括在应用于 `<view>` 的 class 中定义 `color`），否则会触发编译报错：
         > `style property color is only supported on <text>|<button>|<input>|<textarea>`
     *   *解决办法*：将 `color` 属性移到子级的 `<text>` 元素上进行渲染控制，或者移除 `<view>` 标签上冗余/无效的 `color` 定义。
+*   **UnoCSS 边框设置 (Border Utilities)**：
+    在 uni-app X 中使用 UnoCSS 设置边框时，不能使用合并写法（如 `border`、`border-2`、`border-solid border-gray-200`），必须将边框拆分为三个独立的属性分别设置：
+    *   `border-width-{值}` — 边框宽度，如 `border-width-5px`、`border-width-1px`
+    *   `border-color-{值}` — 边框颜色，支持任意值语法，如 `border-color-[#ccc]`、`border-color-[#e5e7eb]`
+    *   `border-solid` — 边框样式（实线）
+    *   *错误示例*：`border border-gray-200`（合并简写在 uni-app X 原生平台不生效）
+    *   *正确做法*：`border-width-1px border-color-[#e5e7eb] border-solid`（三个属性分开写）
+
+    ```html
+    <view class="border-width-5px border-color-[#ccc] border-solid"></view>
+    ```
+
 *   **SCSS 变量的动态化覆盖**：
     在 `uni.scss` 中引入第三方组件库（如 `uview-ultra`）的 `theme.scss` 变量后，如需将某些编译期 SCSS 变量（如 `$up-primary`）转化为运行时的动态 CSS 变量，可在 `uni.scss` 引入之后重新赋值：
     ```scss
