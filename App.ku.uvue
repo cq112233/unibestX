@@ -1,9 +1,9 @@
 <template>
   <!-- 应用全局骨架与皮肤容器，通过 CSS 变量绑定响应式主题色 -->
-  <view class="container" :style="{ '--theme-color': appStore.state.theme }">
+  <view class="flex flex-col flex-1 h-full" :style="{ '--theme-color': appStore.state.theme }">
     <!-- 主滚动区域，包裹子页面插槽内容 -->
-    <scroll-view direction="vertical" class="scroll-view">
-     <slot></slot>
+    <scroll-view direction="vertical" class="flex-1 h-0">
+      <slot></slot>
     </scroll-view>
     <!-- 仅在当前页面为底部 Tabbar 页面时渲染自定义导航栏 -->
     <Tabbar v-if="isCurrentPageTabbar" />
@@ -65,17 +65,3 @@ onUnmounted(() => {
   }
 })
 </script>
-
-<style lang="scss">
-/* 布局样式定义 */
-.container {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  height: 100%;
-}
-.scroll-view {
-  flex: 1;
-  height: 0;
-}
-</style>
