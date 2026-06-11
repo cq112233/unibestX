@@ -547,6 +547,17 @@
         </view>
       </view>
 
+      <!-- Overlay 遮罩层 -->
+      <view class="demo-block">
+        <text class="demo-label">
+          up-overlay
+        </text>
+        <view class="demo-row">
+          <up-button type="primary" text="显示遮罩" size="mini" @click="overlayShow = true"></up-button>
+          <up-button type="warning" text="半透明遮罩" size="mini" @click="overlayOpacity = 0.3; overlayShow = true"></up-button>
+        </view>
+      </view>
+
       <!-- Modal 模态框 -->
       <view class="demo-block">
         <text class="demo-label">
@@ -568,6 +579,21 @@
           <up-button type="primary" text="底部弹出" size="mini" @click="openPopup('bottom')"></up-button>
           <up-button type="primary" text="左侧弹出" size="mini" @click="openPopup('left')"></up-button>
           <up-button type="primary" text="右侧弹出" size="mini" @click="openPopup('right')"></up-button>
+          <up-button type="primary" text="居中弹出" size="mini" @click="openPopup('center')"></up-button>
+        </view>
+      </view>
+
+      <!-- Tooltip 长按提示 -->
+      <view class="demo-block">
+        <text class="demo-label">
+          up-tooltip
+        </text>
+        <view class="demo-row justify-start">
+          <up-tooltip text="长按此处复制文本" direction="top"></up-tooltip>
+          <view class="w-30px"></view>
+          <up-tooltip text="长按显示操作" direction="top" :show-copy="false" :buttons="tooltipButtons"></up-tooltip>
+          <view class="w-30px"></view>
+          <up-tooltip text="底部弹出" direction="bottom" color="#2979ff" bg-color="#f0f5ff"></up-tooltip>
         </view>
       </view>
 
@@ -728,6 +754,24 @@
         展示组件
       </text>
 
+      <!-- Card 卡片 -->
+      <view class="demo-block">
+        <text class="demo-label">
+          up-card
+        </text>
+        <up-card title="基础卡片" sub-title="副标题" margin="0" :show-foot="false">
+          <text slot="body" class="text-13px text-[#606266] leading-20px">这是卡片主体内容区域，可以放置任意内容。</text>
+        </up-card>
+        <view class="h-10px"></view>
+        <up-card title="带缩略图" thumb="/static/logo.png" :thumb-circle="true" thumb-width="36px" margin="0">
+          <text slot="body" class="text-13px text-[#606266] leading-20px">左侧缩略图为圆形，适合展示头像或图标。</text>
+          <view slot="foot" class="flex-row justify-between w-full">
+            <text class="text-12px text-[#909399]">底部区域</text>
+            <text class="text-12px text-[#2979ff]">查看详情</text>
+          </view>
+        </up-card>
+      </view>
+
       <!-- List 高性能列表 -->
       <view class="demo-block">
         <text class="demo-label">
@@ -744,12 +788,12 @@
           <view
             v-for="(item, idx) in listItems"
             :key="idx"
-            class="demo-list-item"
+            class="demo-list-cell"
           >
-            <view class="demo-list-item-avatar">
+            <view class="demo-list-cell-avatar">
               <up-icon name="account" size="20" color="#ffffff"></up-icon>
             </view>
-            <view class="demo-list-item-content">
+            <view class="demo-list-cell-content">
               <text class="text-14px font-500 text-[#303133]">{{ item['title'] as string }}</text>
               <text class="text-12px text-[#909399] mt-4px">{{ item['desc'] as string }}</text>
             </view>
@@ -765,6 +809,16 @@
 
       <!-- 底部安全间距 -->
       <view class="h-40px"></view>
+
+      <!-- Overlay 遮罩层 -->
+      <up-overlay :show="overlayShow" :opacity="overlayOpacity" @click="overlayShow = false">
+        <view class="flex-1 items-center justify-center">
+          <view class="bg-white rounded-8px p-20px items-center" @click.stop="">
+            <up-loading-icon mode="circle"></up-loading-icon>
+            <text class="text-14px text-[#303133] mt-10px">加载中，点击遮罩关闭</text>
+          </view>
+        </view>
+      </up-overlay>
 
       <!-- Toast 组件 -->
       <up-toast ref="uToast"></up-toast>
@@ -1102,6 +1156,11 @@ const modalContent = ref('')
 const modalShowCancel = ref(false)
 const popupShow = ref(false)
 const popupMode = ref('bottom')
+const overlayShow = ref(false)
+const overlayOpacity = ref(0.5)
+
+// Tooltip
+const tooltipButtons = ref(['编辑', '删除'] as string[])
 
 // Toast
 const uToast = ref(null as ComponentPublicInstance | null)
@@ -1351,7 +1410,7 @@ function onListRefresh(): void {
   border-bottom: 1px solid #f0f0f0;
 }
 
-.demo-list-item {
+.demo-list-cell {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -1360,7 +1419,7 @@ function onListRefresh(): void {
   border-bottom: 1px solid #f5f5f5;
 }
 
-.demo-list-item-avatar {
+.demo-list-cell-avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -1371,7 +1430,7 @@ function onListRefresh(): void {
   margin-right: 12px;
 }
 
-.demo-list-item-content {
+.demo-list-cell-content {
   display: flex;
   flex-direction: column;
   flex: 1;

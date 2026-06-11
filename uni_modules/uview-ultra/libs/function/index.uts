@@ -16,7 +16,7 @@ export function upGetRect(selector: string, all: boolean = false, comp: Componen
 				.in(comp).select(selector)
 				.boundingClientRect((res) => {
 					const nodeInfoArray = res as NodeInfo[]
-					const nodeInfoArrayItem = nodeInfoArray[0]
+					const nodeInfoArrayItem = nodeInfoArray != null && nodeInfoArray.length > 0 ? nodeInfoArray[0] : ({} as NodeInfo)
 					resolve(nodeInfoArrayItem)
 				})
 				.exec()
@@ -25,7 +25,7 @@ export function upGetRect(selector: string, all: boolean = false, comp: Componen
 				.in(comp).selectAll(selector)
 				.boundingClientRect((res) => {
 					const nodeInfoArray = res as NodeInfo[]
-					const nodeInfoArrayItem = nodeInfoArray[0]
+					const nodeInfoArrayItem = nodeInfoArray != null && nodeInfoArray.length > 0 ? nodeInfoArray[0] : ({} as NodeInfo)
 					resolve(nodeInfoArrayItem)
 				})
 				.exec()
