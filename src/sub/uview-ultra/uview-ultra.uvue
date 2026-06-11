@@ -719,12 +719,12 @@
           <view
             v-for="(item, idx) in listItems"
             :key="idx"
-            class="list-item"
+            class="demo-list-item"
           >
-            <view class="list-item-avatar">
+            <view class="demo-list-item-avatar">
               <up-icon name="account" size="20" color="#ffffff"></up-icon>
             </view>
-            <view class="list-item-content">
+            <view class="demo-list-item-content">
               <text class="text-14px font-500 text-[#303133]">{{ item['title'] as string }}</text>
               <text class="text-12px text-[#909399] mt-4px">{{ item['desc'] as string }}</text>
             </view>
@@ -1320,7 +1320,7 @@ function onListRefresh(): void {
   border-bottom: 1px solid #f0f0f0;
 }
 
-.list-item {
+.demo-list-item {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -1329,7 +1329,7 @@ function onListRefresh(): void {
   border-bottom: 1px solid #f5f5f5;
 }
 
-.list-item-avatar {
+.demo-list-item-avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -1340,7 +1340,7 @@ function onListRefresh(): void {
   margin-right: 12px;
 }
 
-.list-item-content {
+.demo-list-item-content {
   display: flex;
   flex-direction: column;
   flex: 1;
