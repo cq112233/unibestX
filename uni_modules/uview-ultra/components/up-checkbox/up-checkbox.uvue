@@ -182,20 +182,28 @@
 	
 	// 组件选中激活时的颜色
 	const elActiveColor = computed((): string => {
-		return props.activeColor != ''
-			? props.activeColor
-			: (parentData.value['activeColor'] != null
-				? parentData.value['activeColor'].toString() 
-				: '#2979ff');
+		const activeColorProp = props.activeColor
+		if (activeColorProp != null && activeColorProp.toString() != '') {
+			return activeColorProp.toString()
+		}
+		const parentActiveColor = parentData.value['activeColor']
+		if (parentActiveColor != null && parentActiveColor.toString() != '') {
+			return parentActiveColor.toString()
+		}
+		return '#2979ff'
 	})
 	
 	// 组件选未中激活时的颜色
 	const elInactiveColor = computed((): string => {
-		return props.inactiveColor != ''
-			? props.inactiveColor
-			: (parentData.value['inactiveColor'] != null
-				? parentData.value['inactiveColor'].toString() 
-				: '#c8c9cc');
+		const inactiveColorProp = props.inactiveColor
+		if (inactiveColorProp != null && inactiveColorProp.toString() != '') {
+			return inactiveColorProp.toString()
+		}
+		const parentInactiveColor = parentData.value['inactiveColor']
+		if (parentInactiveColor != null && parentInactiveColor.toString() != '') {
+			return parentInactiveColor.toString()
+		}
+		return '#c8c9cc'
 	})
 	
 	// label的颜色
@@ -250,6 +258,9 @@
 		if (isChecked.value && elDisabled.value as boolean) {
 			classes.push('up-checkbox__icon-wrap--disabled--checked')
 		}
+		if (isChecked.value && !elDisabled.value && elActiveColor.value == '#2979ff') {
+			classes.push('up-checkbox__icon-wrap--active')
+		}
 		let classStr = ""
 		classStr = classes.join(' ')
 		return classStr
@@ -258,8 +269,15 @@
 	const iconWrapStyle = computed((): any => {
 		// checkbox的整体样式
 		const style = {};
-		style['backgroundColor'] = isChecked.value && !elDisabled.value ? elActiveColor.value : '#ffffff'
-		style['borderColor'] = isChecked.value && !elDisabled.value ? elActiveColor.value : elInactiveColor.value
+		if (isChecked.value && !elDisabled.value) {
+			if (elActiveColor.value != '#2979ff') {
+				style['backgroundColor'] = elActiveColor.value
+				style['borderColor'] = elActiveColor.value
+			}
+		} else {
+			style['backgroundColor'] = '#ffffff'
+			style['borderColor'] = elInactiveColor.value
+		}
 		style['width'] = addUnit(elSize.value)
 		style['height'] = addUnit(elSize.value)
 		// 如果是图标在右边的话，移除它的右边距
@@ -455,7 +473,7 @@
 		}
 
 		&__icon-wrap {
-			/* #ifndef APP-NVUE */
+			/* #ifndef APP */
 			box-sizing: border-box;
 			// nvue下，border-color过渡有问题
 			transition-property: border-color, background-color, color;
@@ -489,6 +507,11 @@
 				color: $up-checkbox-icon-wrap-checked-color;
 				background-color: $up-checkbox-icon-wrap-checked-background-color;
 				border-color: $up-checkbox-icon-wrap-checked-border-color;
+			}
+
+			&--active {
+				background-color: $up-primary;
+				border-color: $up-primary;
 			}
 
 			&--disabled {

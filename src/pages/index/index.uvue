@@ -2,8 +2,41 @@
   <view>
     <NavBar title="首页" :show-back="false" />
     <view class="content-container">
+      <view :class="[isBg ? 'bg' : '']">
+        <view @click="switchBg()">
+          切换
+        </view>
+      </view>
       <up-switch v-model="themeSwitchVal" class="!mt-20px" />
       <up-switch v-model="themeSwitchVal2" class="!mt-20px" />
+
+      <!-- Checkbox 复选框 -->
+      <view class="!mt-20px px-30px">
+        <up-checkbox-group v-model="checkboxValue" placement="row">
+          <up-checkbox name="apple" label="苹果" :checked="true"></up-checkbox>
+          <up-checkbox name="banana" label="香蕉"></up-checkbox>
+          <up-checkbox name="orange" label="橙子"></up-checkbox>
+        </up-checkbox-group>
+      </view>
+
+      <!-- Radio 单选框 -->
+      <view class="!mt-20px px-30px">
+        <up-radio-group v-model="radioValue" placement="row">
+          <up-radio name="male" label="男"></up-radio>
+          <up-radio name="female" label="女"></up-radio>
+        </up-radio-group>
+      </view>
+
+      <!-- Slider 滑块 -->
+      <view class="!mt-20px px-30px">
+        <up-slider v-model="sliderValue" />
+      </view>
+
+      <!-- Rate 评分 -->
+      <view class="!mt-20px px-30px">
+        <up-rate v-model="rateValue" />
+      </view>
+
       <image class="w-100px h-100px mx-auto mt-40px rounded-20px" src="/static/logo.png" />
       <text class="text-32px text-bold mx-auto mt-10px text-[#d14328]">
         unibestX
@@ -67,7 +100,20 @@ onBackPress((options: OnBackPressOptions): boolean => {
 
 const themeSwitchVal = ref(true)
 const themeSwitchVal2 = ref(false)
+
+const checkboxValue = ref(['apple'] as string[])
+const radioValue = ref('male')
+const sliderValue = ref(30)
+const rateValue = ref(3)
+
+const isBg = ref(true)
+function switchBg() {
+  isBg.value = !isBg.value
+}
 </script>
 
 <style lang="scss" scoped>
+.bg {
+  background-color: $up-primary;
+}
 </style>
