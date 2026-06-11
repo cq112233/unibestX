@@ -657,60 +657,60 @@
         @confirm="onModalConfirm"
         @close="onModalClose"
       ></up-modal>
-    </scroll-view>
 
-    <!-- Popup 组件 -->
-    <up-popup
-      :show="popupShow"
-      :mode="popupMode"
-      :closeable="true"
-      :round="10"
-      @close="onPopupClose"
-    >
-      <view class="p-30px items-center">
-        <text class="text-16px text-[#303133]">{{ popupMode }} 弹出层内容</text>
-      </view>
-    </up-popup>
-    <!-- LoadingPage 组件 -->
-    <up-loading-page
-      :loading="loadingPageShow"
-      loading-text="页面正在加载中..."
-      loading-mode="circle"
-    ></up-loading-page>
-    <!-- Calendar 组件 -->
-    <up-calendar
-      :show="calendarShow"
-      mode="single"
-      @confirm="onCalendarConfirm"
-      @close="calendarShow = false"
-    ></up-calendar>
-    <!-- Keyboard 组件 -->
-    <up-keyboard
-      :show="keyboardShow"
-      :mode="keyboardMode"
-      @change="onKeyboardChange"
-      @backspace="onKeyboardBackspace"
-      @close="keyboardShow = false"
-      @confirm="keyboardShow = false"
-      @cancel="keyboardShow = false"
-    ></up-keyboard>
-    <!-- Picker 组件 -->
-    <up-picker
-      :show="pickerShow"
-      :columns="pickerColumns"
-      @confirm="onPickerConfirm"
-      @cancel="pickerShow = false"
-      @close="pickerShow = false"
-    ></up-picker>
-    <!-- DatetimePicker 组件 -->
-    <up-datetime-picker
-      v-model="datetimePickerValue"
-      :show="datetimePickerShow"
-      mode="date"
-      @confirm="onDatetimePickerConfirm"
-      @cancel="datetimePickerShow = false"
-      @close="datetimePickerShow = false"
-    ></up-datetime-picker>
+      <!-- Popup 组件 -->
+      <up-popup
+        :show="popupShow"
+        :mode="popupMode"
+        :closeable="true"
+        :round="10"
+        @close="onPopupClose"
+      >
+        <view class="p-30px items-center">
+          <text class="text-16px text-[#303133]">{{ popupMode }} 弹出层内容</text>
+        </view>
+      </up-popup>
+      <!-- LoadingPage 组件 -->
+      <up-loading-page
+        :loading="loadingPageShow"
+        loading-text="页面正在加载中..."
+        loading-mode="circle"
+      ></up-loading-page>
+      <!-- Calendar 组件 -->
+      <up-calendar
+        :show="calendarShow"
+        mode="single"
+        @confirm="onCalendarConfirm"
+        @close="calendarShow = false"
+      ></up-calendar>
+      <!-- Keyboard 组件 -->
+      <up-keyboard
+        :show="keyboardShow"
+        :mode="keyboardMode"
+        @change="onKeyboardChange"
+        @backspace="onKeyboardBackspace"
+        @close="keyboardShow = false"
+        @confirm="keyboardShow = false"
+        @cancel="keyboardShow = false"
+      ></up-keyboard>
+      <!-- Picker 组件 -->
+      <up-picker
+        :show="pickerShow"
+        :columns="pickerColumns"
+        @confirm="onPickerConfirm"
+        @cancel="pickerShow = false"
+        @close="pickerShow = false"
+      ></up-picker>
+      <!-- DatetimePicker 组件 -->
+      <up-datetime-picker
+        v-model="datetimePickerValue"
+        :show="datetimePickerShow"
+        mode="date"
+        @confirm="onDatetimePickerConfirm"
+        @cancel="datetimePickerShow = false"
+        @close="datetimePickerShow = false"
+      ></up-datetime-picker>
+    </scroll-view>
   </view>
 </template>
 
