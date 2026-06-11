@@ -268,7 +268,7 @@ const iconColorCom = computed(() => {
 const baseColor = computed(() => {
     let style = {
     } as UTSJSONObject;
-    // if (props.color != '') {
+    if (props.color != '') {
         // 针对自定义了color颜色的情况，镂空状态下，就是用自定义的颜色
         // style['color'] = props.plain ? props.color : "white";
         if (!props.plain) {
@@ -289,7 +289,7 @@ const baseColor = computed(() => {
             style['borderWidth'] = "1px";
             style['borderStyle'] = "solid";
         }
-    // }
+    }
     return style;
 });
 
