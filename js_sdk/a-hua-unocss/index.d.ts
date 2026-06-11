@@ -1,22 +1,22 @@
-type R = RegExp;
-type S = string;
-type N = number;
-type B = boolean;
-type SOrN = S | N;
-type ItemOrArray<T> = T | T[];
-type Colors = RecordType<Colors | S>;
-type Shortcuts = RecordType | ProductionShortcuts;
-type ProductionShortcuts = (RecordType | [RegExp | S, S | ((classNames: S[]) => S)])[];
-type Rules = [R | S, RecordType | ((selector: S[], colors: Colors) => RecordType | [S, S][])][];
+type R = RegExp
+type S = string
+type N = number
+type B = boolean
+type SOrN = S | N
+type ItemOrArray<T> = T | T[]
+type Colors = RecordType<Colors | S>
+type Shortcuts = RecordType | ProductionShortcuts
+type ProductionShortcuts = (RecordType | [RegExp | S, S | ((classNames: S[]) => S)])[]
+type Rules = [R | S, RecordType | ((selector: S[], colors: Colors) => RecordType | [S, S][])][]
 
-interface RecordType<T = S> { 
-	[key: S]: T;
+interface RecordType<T = S> {
+  [key: S]: T
 }
 
 interface Theme {
-	generator?: B;
-	colors?: Colors;
-	[key: S]: any;
+  generator?: B
+  colors?: Colors
+  [key: S]: any
 }
 
 /**
@@ -43,33 +43,33 @@ interface Theme {
  * @param options.default.radius.4xs' 默认圆角值；默认：32rpx；
  */
 export declare function unovite(options?: {
-	rules?: Rules;
-	theme?: Theme;
-	shortcuts?: Shortcuts;
-	prefix?: ItemOrArray<S>;
-	include?: ItemOrArray<S | R>;
-	exclude?: ItemOrArray<S | R>;
-	handler?: <T extends { uno?: ItemOrArray<[S, S]>; selector: S, pseudo?: S }>(prefix: S, item: T) => T;
-	unit?: "rpx" | "px" | "em" | "rem" | "vh" | "vw" | "pt" | "pc" | "in" | "mm" | "cm" | "svh" | "lvh" | "dvh" | "vmin" | "vmax" | "vi" | "vb" | "svmin" | "dvmin" | "svmax" | "dvmax" | "svi" | "dvi" | "svb" | "dvb";
-	default?: {
-		none?: SOrN;
-		opacity?: SOrN;
-		line?: {
-			width?: SOrN;
-		};
-		radius?: {
-			lg?: SOrN;
-			md?: SOrN;
-			sm?: SOrN;
-			xl?: SOrN;
-			xs?: SOrN;
-			'2xs'?: SOrN;
-			'3xs'?: SOrN;
-			'4xs'?: SOrN;
-		};
-	};
-}): { 
-	name: string, 
-	enforce?: "pre" | "post", 
-	transform: (code: string, id: string) => void 
-};
+  rules?: Rules
+  theme?: Theme
+  shortcuts?: Shortcuts
+  prefix?: ItemOrArray<S>
+  include?: ItemOrArray<S | R>
+  exclude?: ItemOrArray<S | R>
+  handler?: <T extends { uno?: ItemOrArray<[S, S]>, selector: S, pseudo?: S }>(prefix: S, item: T) => T
+  unit?: 'rpx' | 'px' | 'em' | 'rem' | 'vh' | 'vw' | 'pt' | 'pc' | 'in' | 'mm' | 'cm' | 'svh' | 'lvh' | 'dvh' | 'vmin' | 'vmax' | 'vi' | 'vb' | 'svmin' | 'dvmin' | 'svmax' | 'dvmax' | 'svi' | 'dvi' | 'svb' | 'dvb'
+  default?: {
+    none?: SOrN
+    opacity?: SOrN
+    line?: {
+      width?: SOrN
+    }
+    radius?: {
+      'lg'?: SOrN
+      'md'?: SOrN
+      'sm'?: SOrN
+      'xl'?: SOrN
+      'xs'?: SOrN
+      '2xs'?: SOrN
+      '3xs'?: SOrN
+      '4xs'?: SOrN
+    }
+  }
+}): {
+  name: string
+  enforce?: 'pre' | 'post'
+  transform: (code: string, id: string) => void
+}

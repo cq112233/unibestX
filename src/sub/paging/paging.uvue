@@ -27,10 +27,10 @@
     <z-paging-x
       ref="pagingX"
       :model-value="dataList"
-      @update:model-value="onUpdateModelValue"
       :default-page-size="10"
-      @query="onQuery"
       class="flex-1"
+      @update:model-value="onUpdateModelValue"
+      @query="onQuery"
     >
       <!-- 列表数据 -->
       <list-item v-for="item in dataList" :key="item.id">
@@ -59,7 +59,6 @@
 </template>
 
 <script setup lang="uts">
-/* eslint-disable eqeqeq */
 /* eslint-disable ts/consistent-type-definitions */
 import { ref } from 'vue'
 
@@ -104,8 +103,10 @@ function getMockArticles(category: string, pageNo: number, pageSize: number): Ar
     let tag = category
     if (category == '全部') {
       const idx = itemId % 3
-      if (idx == 0) tag = '技术'
-      else if (idx == 1) tag = '设计'
+      if (idx == 0)
+        tag = '技术'
+      else if (idx == 1)
+        tag = '设计'
       else tag = '生活'
     }
 
@@ -114,7 +115,8 @@ function getMockArticles(category: string, pageNo: number, pageSize: number): Ar
     if (tag == '设计') {
       tagBgColor = '#f3e8ff'
       tagColor = '#7c3aed'
-    } else if (tag == '生活') {
+    }
+    else if (tag == '生活') {
       tagBgColor = '#dcfce7'
       tagColor = '#16a34a'
     }
@@ -127,7 +129,7 @@ function getMockArticles(category: string, pageNo: number, pageSize: number): Ar
       createTime: `06-04 15:${30 - i}`,
       tag,
       tagBgColor,
-      tagColor
+      tagColor,
     } as ArticleItem)
   }
   return list
@@ -144,7 +146,8 @@ function onQuery(pageNo: number, pageSize: number) {
       if (pagingX.value != null) {
         pagingX.value!.$callMethod('complete', data)
       }
-    } catch (e) {
+    }
+    catch (e) {
       if (pagingX.value != null) {
         pagingX.value!.$callMethod('completeByError')
       }

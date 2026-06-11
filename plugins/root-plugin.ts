@@ -22,7 +22,8 @@ export default function autoRootPlugin() {
         try {
           fs.writeFileSync(targetFilePath, defaultContent, 'utf-8')
           console.log('自动生成了缺少的 App.ku.uvue 文件')
-        } catch (e) {
+        }
+        catch (e) {
           console.error('自动生成 App.ku.uvue 失败:', e)
         }
       }
@@ -41,8 +42,8 @@ export default function autoRootPlugin() {
 
       return {
         code: newCode,
-        map: { mappings: '' }
+        map: { mappings: '' },
       }
-    }
+    },
   }
 }

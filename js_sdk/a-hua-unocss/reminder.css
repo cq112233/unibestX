@@ -1,74 +1,425 @@
-.content-baseline,.content-stretch,.content-normal,.content-center,.content-flex-start,.content-start,.content-flex-end,.content-end,.content-between,.content-evenly,.content-aroun{}
-.items-baseline,.items-stretch,.items-normal,.items-center,.items-start,.items-end,.items-flex-start,.items-flex-end,.items-self-start,.items-self-end{}
-.self-{}
-.aspect-{}
-.animate-delay-,.animate-duration-,.animate-infinite-,.animate-running,.animate-paused{}
-.backdrop-{}
-.backface-visible,.backface-hidden{}
-.bottom-{}
-.bg-blend-,.bg-clip-,.bg-origin-,.bg-position-,.bg-x-,.bg-y-,.bg-repeat-x,.bg-repeat-y,.bg-repeat,.bg-no-repeat,.bg-space,.bg-round,.bg-auto,.bg-cover,.bg-contain,.bg-size-full{}
-.b,.border,.b-t,.b-r,.b-b,.b-l{}
-.rd-full,.rd-lg,.rd-sm,.rd-md,.rd-xl,.rd-xs,.rd-2xl,.rd-3xl,.rd-4xl{};
-.box-content,.box-border,.box-sizing{}
-.shadow,.shadow-none,.shadow-inner,.shadow-2xl,.shadow-xl,.shadow-md,.shadow-sm,.shadow-lg,.shadow-op,.shadow-blue,.shadow-current,.shadow-gray,.shadow-green,.shadow-red,.shadow-white,.shadow-yellow,.shadow-transparent,.shadow-pink,.shadow-black,.shadow-op-full,.shadow-2xs,.inset-shadow-none,.ring{}
-.clear-{}
-.text-op,.text-blue,.text-gray,.text-green,.text-red,.text-white,.text-yellow,.text-transparent,.text-current,.text-black,.text-pink,.text-op-full,.c-red,.color-op{}
-.column-{}
-.contentp-normal,.content-empty,.content-none,.content-open,.content-close,.content-no-open{}
-.cursor-{}
-.block,.inline,.inline-block,.flex,.inline-flex,.grid,.inline-grid,.flow-root,.none,.hidden,.contents,.table,.table-row,.list-item{}
-.filter{}
-.flex-none,.flex-min,.flex-max,.flex-fit,.flex-auto,.basis-,.flex-row,.flex-col,.flex-row-reverse,.flex-col-reverse,.grow-,.shrink-,.flex-wrap,.flex-nowrap,.flex-wrap-reverse{}
-.float-{}
-.font-caption,.font-sans,.font-mono,.font-serif,.font-italic,.font-oblique,.fw-400,.fw-700{}
-.gap-,.gap-col-,.gap-row-{}
-.grid-none,.grid-area-auto,.grid-auto-cols-,.auto-cols-auto,.auto-cols-min,.auto-cols-max,.grid-auto-rows-,.auto-rows-auto,.auto-rows-min,.auto-rows-max,.grid-cols-,.grid-rows-{}
-.inset-{}
-.line-clamp-,.lh-normal{}
-.h-full{}
-.justify-center,.justify-start,.justify-end,.justify-between,.justify-around,.justify-evenly,.justify-content-,.justify-flex-start,.justify-flex-end,.justify-right,.justify-left,.justify-stretch,.justify-normal,.justify-items-,.justify-self-{}
-.letter-,.tracking-{}
-.left-{}
-.list-{}
-.m-auto,.mx-auto,.my-auto,.ml-auto,.mt-auto,.mb-auto,.mr-auto{}
-.mix-blend-{}
-.max-full{}
-.min-full{}
-.object-contain,.object-fill,.object-none,.object-scale-down,.object-cover{}
-.op-,.opacity-{}
-.order-first,.order-last,.order-none{}
-.outline-{}
-.of-visible,.of-hidden,.of-scroll,.of-auto,.of-clip,.overflow-{}
-.p-,.px-,.py-,.pl-,.pt-,.pb-,.pr-{}
-.perspective-none,.perspect-none{}
-.perspect-full,.perspect-top,.perspect-bottom,.perspect-left,.perspect-right,.perspect-center,.perspect-center-center,.perspect-top-center{}
-.place-{}
-.pointer-{}
-.relative,.absolute,.fixed,.sticky,.static,.pos-,.position-{}
-.resize-both,.resize-horizontal,.resize-vertical,.resize-none,.resize-block{}
-.right-{}
-.rotate-{};
-.scale-{};
-.top-{};
-.touch-auto,.touch-none,.touch-pan-x,.touch-pan-left,.touch-pan-right,.touch-pan-y,.touch-pan-up,.touch-pan-down,.touch-pinch-zoom,.touch-manipulation{}
-.transform,.transform-none{}
-.transform-view,.transform-content,.transform-border,.transform-fill,.transform-strok{}
-.origin-center-top,.origin-center-bottom,.origin-center-left,.origin-center-right,.origin-bottom-right,.origin-top-left,.origin-top-right,.origin-bottom-center,.origin-bottom-left{}
-.transform-3d,.transform-flat{}
-.transition,.transition-auto,.transition-none{}
-.behavior-{}
-.delay-{}
-.duration-{}
-.roperty-right,.property-bottom,.property-left,.property-top,.property-none,.property-all,.property-auto,.property-background-color,.property-color,.property-fill,.property-transform,.property-border-color,.property-border-width,.property-border-style,.property-outline-color,.property-filter,.property-backdrop-filter,.property-opacity,.property-padding,.property-margin,.property-width,.property-height,.property-shadow,.property-box-shadow,.property-font,.property-font-size{}
-.transition-ease,.transition-ease-in,.transition-ease-out,.transition-ease-in-out,.transition-linear,.transition-step-start,.transition-step-end,.transition-timing-function-ease,.transition-timing-ease{}
-.translate-{}
-.modify-{}
-.select-none,.select-all,.select-text,.select-auto{}
-.v-baseline,.v-full,.v-sub,.v-super,.v-text-top,.v-text-bottom,.v-middle,.v-top,.v-bottom{}
-.s-normal,.ws-pre,.ws-pre-wrap,.ws-pre-line,.ws-wrap,.ws-collapse{}
-.w-full{}
-.will-change-{}
-.break-all,.break-keep,.break-normal,.break-word,.break-auto-phrase{}
-.word-spacing-{}
-.z-{}
-.zoom-{}
+.content-baseline,
+.content-stretch,
+.content-normal,
+.content-center,
+.content-flex-start,
+.content-start,
+.content-flex-end,
+.content-end,
+.content-between,
+.content-evenly,
+.content-aroun {
+}
+.items-baseline,
+.items-stretch,
+.items-normal,
+.items-center,
+.items-start,
+.items-end,
+.items-flex-start,
+.items-flex-end,
+.items-self-start,
+.items-self-end {
+}
+.self- {
+}
+.aspect- {
+}
+.animate-delay-,
+.animate-duration-,
+.animate-infinite-,
+.animate-running,
+.animate-paused {
+}
+.backdrop- {
+}
+.backface-visible,
+.backface-hidden {
+}
+.bottom- {
+}
+.bg-blend-,
+.bg-clip-,
+.bg-origin-,
+.bg-position-,
+.bg-x-,
+.bg-y-,
+.bg-repeat-x,
+.bg-repeat-y,
+.bg-repeat,
+.bg-no-repeat,
+.bg-space,
+.bg-round,
+.bg-auto,
+.bg-cover,
+.bg-contain,
+.bg-size-full {
+}
+.b,
+.border,
+.b-t,
+.b-r,
+.b-b,
+.b-l {
+}
+.rd-full,
+.rd-lg,
+.rd-sm,
+.rd-md,
+.rd-xl,
+.rd-xs,
+.rd-2xl,
+.rd-3xl,
+.rd-4xl {
+}
+.box-content,
+.box-border,
+.box-sizing {
+}
+.shadow,
+.shadow-none,
+.shadow-inner,
+.shadow-2xl,
+.shadow-xl,
+.shadow-md,
+.shadow-sm,
+.shadow-lg,
+.shadow-op,
+.shadow-blue,
+.shadow-current,
+.shadow-gray,
+.shadow-green,
+.shadow-red,
+.shadow-white,
+.shadow-yellow,
+.shadow-transparent,
+.shadow-pink,
+.shadow-black,
+.shadow-op-full,
+.shadow-2xs,
+.inset-shadow-none,
+.ring {
+}
+.clear- {
+}
+.text-op,
+.text-blue,
+.text-gray,
+.text-green,
+.text-red,
+.text-white,
+.text-yellow,
+.text-transparent,
+.text-current,
+.text-black,
+.text-pink,
+.text-op-full,
+.c-red,
+.color-op {
+}
+.column- {
+}
+.contentp-normal,
+.content-empty,
+.content-none,
+.content-open,
+.content-close,
+.content-no-open {
+}
+.cursor- {
+}
+.block,
+.inline,
+.inline-block,
+.flex,
+.inline-flex,
+.grid,
+.inline-grid,
+.flow-root,
+.none,
+.hidden,
+.contents,
+.table,
+.table-row,
+.list-item {
+}
+.filter {
+}
+.flex-none,
+.flex-min,
+.flex-max,
+.flex-fit,
+.flex-auto,
+.basis-,
+.flex-row,
+.flex-col,
+.flex-row-reverse,
+.flex-col-reverse,
+.grow-,
+.shrink-,
+.flex-wrap,
+.flex-nowrap,
+.flex-wrap-reverse {
+}
+.float- {
+}
+.font-caption,
+.font-sans,
+.font-mono,
+.font-serif,
+.font-italic,
+.font-oblique,
+.fw-400,
+.fw-700 {
+}
+.gap-,
+.gap-col-,
+.gap-row- {
+}
+.grid-none,
+.grid-area-auto,
+.grid-auto-cols-,
+.auto-cols-auto,
+.auto-cols-min,
+.auto-cols-max,
+.grid-auto-rows-,
+.auto-rows-auto,
+.auto-rows-min,
+.auto-rows-max,
+.grid-cols-,
+.grid-rows- {
+}
+.inset- {
+}
+.line-clamp-,
+.lh-normal {
+}
+.h-full {
+}
+.justify-center,
+.justify-start,
+.justify-end,
+.justify-between,
+.justify-around,
+.justify-evenly,
+.justify-content-,
+.justify-flex-start,
+.justify-flex-end,
+.justify-right,
+.justify-left,
+.justify-stretch,
+.justify-normal,
+.justify-items-,
+.justify-self- {
+}
+.letter-,
+.tracking- {
+}
+.left- {
+}
+.list- {
+}
+.m-auto,
+.mx-auto,
+.my-auto,
+.ml-auto,
+.mt-auto,
+.mb-auto,
+.mr-auto {
+}
+.mix-blend- {
+}
+.max-full {
+}
+.min-full {
+}
+.object-contain,
+.object-fill,
+.object-none,
+.object-scale-down,
+.object-cover {
+}
+.op-,
+.opacity- {
+}
+.order-first,
+.order-last,
+.order-none {
+}
+.outline- {
+}
+.of-visible,
+.of-hidden,
+.of-scroll,
+.of-auto,
+.of-clip,
+.overflow- {
+}
+.p-,
+.px-,
+.py-,
+.pl-,
+.pt-,
+.pb-,
+.pr- {
+}
+.perspective-none,
+.perspect-none {
+}
+.perspect-full,
+.perspect-top,
+.perspect-bottom,
+.perspect-left,
+.perspect-right,
+.perspect-center,
+.perspect-center-center,
+.perspect-top-center {
+}
+.place- {
+}
+.pointer- {
+}
+.relative,
+.absolute,
+.fixed,
+.sticky,
+.static,
+.pos-,
+.position- {
+}
+.resize-both,
+.resize-horizontal,
+.resize-vertical,
+.resize-none,
+.resize-block {
+}
+.right- {
+}
+.rotate- {
+}
+.scale- {
+}
+.top- {
+}
+.touch-auto,
+.touch-none,
+.touch-pan-x,
+.touch-pan-left,
+.touch-pan-right,
+.touch-pan-y,
+.touch-pan-up,
+.touch-pan-down,
+.touch-pinch-zoom,
+.touch-manipulation {
+}
+.transform,
+.transform-none {
+}
+.transform-view,
+.transform-content,
+.transform-border,
+.transform-fill,
+.transform-strok {
+}
+.origin-center-top,
+.origin-center-bottom,
+.origin-center-left,
+.origin-center-right,
+.origin-bottom-right,
+.origin-top-left,
+.origin-top-right,
+.origin-bottom-center,
+.origin-bottom-left {
+}
+.transform-3d,
+.transform-flat {
+}
+.transition,
+.transition-auto,
+.transition-none {
+}
+.behavior- {
+}
+.delay- {
+}
+.duration- {
+}
+.roperty-right,
+.property-bottom,
+.property-left,
+.property-top,
+.property-none,
+.property-all,
+.property-auto,
+.property-background-color,
+.property-color,
+.property-fill,
+.property-transform,
+.property-border-color,
+.property-border-width,
+.property-border-style,
+.property-outline-color,
+.property-filter,
+.property-backdrop-filter,
+.property-opacity,
+.property-padding,
+.property-margin,
+.property-width,
+.property-height,
+.property-shadow,
+.property-box-shadow,
+.property-font,
+.property-font-size {
+}
+.transition-ease,
+.transition-ease-in,
+.transition-ease-out,
+.transition-ease-in-out,
+.transition-linear,
+.transition-step-start,
+.transition-step-end,
+.transition-timing-function-ease,
+.transition-timing-ease {
+}
+.translate- {
+}
+.modify- {
+}
+.select-none,
+.select-all,
+.select-text,
+.select-auto {
+}
+.v-baseline,
+.v-full,
+.v-sub,
+.v-super,
+.v-text-top,
+.v-text-bottom,
+.v-middle,
+.v-top,
+.v-bottom {
+}
+.s-normal,
+.ws-pre,
+.ws-pre-wrap,
+.ws-pre-line,
+.ws-wrap,
+.ws-collapse {
+}
+.w-full {
+}
+.will-change- {
+}
+.break-all,
+.break-keep,
+.break-normal,
+.break-word,
+.break-auto-phrase {
+}
+.word-spacing- {
+}
+.z- {
+}
+.zoom- {
+}

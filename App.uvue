@@ -9,13 +9,13 @@ onLaunch(() => {
   uni.loadFontFace({
     global: true,
     family: 'UniIconsFontFamily',
-    source: "url('/static/uniicons.ttf')",
+    source: 'url(\'/static/uniicons.ttf\')',
     success() {
       console.log('global loadFontFace uniicons.ttf success')
     },
     fail(error) {
       console.warn('global loadFontFace uniicons.ttf fail', error.errMsg)
-    }
+    },
   })
   // #endif
 })
@@ -25,10 +25,6 @@ onShow((options) => {
   checkDirectEntry(options)
 })
 // #endif
-
-
-
-
 </script>
 
 <style lang="scss">
