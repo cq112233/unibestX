@@ -30,7 +30,7 @@
 			<scroll-view
 				v-if="!monthSwitch"
 				:style="{height: addUnit(listHeight)}"
-				scroll-y
+				direction="vertical"
 				@scroll="onScroll"
 				:scroll-top="scrollTop"
 				:scrollIntoView="scrollIntoView"
@@ -89,7 +89,7 @@
 			</view>
 			<slot name="footer" v-if="showConfirm">
 				<view class="up-calendar__confirm">
-					<!-- <up-button
+					<up-button
 						shape="circle"
 						:text="
                             buttonDisabled ? confirmDisabledText : confirmText
@@ -97,7 +97,7 @@
 						:color="color"
 						@click="confirm"
 						:disabled="buttonDisabled"
-					></up-button> -->
+					></up-button>
 				</view>
 			</slot>
 		</view>
@@ -400,9 +400,9 @@ export default {
 			return $t('up.calendar.today')
 		},
 		todayDisabled(): boolean {
-			let today = dayuts(this.todayDate as string)
-			let innerMinDate = this.innerMinDate as string
-			let innerMaxDate = this.innerMaxDate as string
+			let today = dayuts(this.todayDate as any as string)
+			let innerMinDate = this.innerMinDate as any as string
+			let innerMaxDate = this.innerMaxDate as any as string
 			if (innerMinDate != '' && innerMinDate != '0' && today.isBefore(dayuts(innerMinDate), 'day')) {
 				return true
 			}
@@ -480,13 +480,14 @@ export default {
 		addUnit(e: any) {
 			return addUnit(e)
 		},
-		getConfirmValue(selected: Array<string> = this.selected as Array<string>): Array<string> {
+		getConfirmValue(selected: Array<string> | null = null): Array<string> {
+			const sel = selected ?? (this.selected as Array<string>)
 			// @ts-ignore
-			if (this.mode == 'range' && this.rangeResultMode == 'boundary' && selected.length >= 2) {
-				let len = selected.length - 1
-				return [selected[0], selected[len]]
+			if (this.mode == 'range' && this.rangeResultMode == 'boundary' && sel.length >= 2) {
+				let len = sel.length - 1
+				return [sel[0], sel[len]]
 			}
-			return selected
+			return sel
 		},
 		// 在微信小程序中，不支持将函数当做props参数，故只能通过ref形式调用
 		setFormatter(e: object)  {

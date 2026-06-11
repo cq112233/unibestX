@@ -58,6 +58,7 @@ import { randomArray } from '../../libs/function/index';
 export default {
 	name: 'up-number-keyboard',
 	mixins: [mpMixin, mixin, propsNumberKeyboard],
+	emits: ["change", "backspace"],
 	data() {
 		return {
 			backspace: 'backspace', // 退格键内容
