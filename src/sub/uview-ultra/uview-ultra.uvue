@@ -268,22 +268,61 @@
       <!-- Form 表单 -->
       <view class="demo-block">
         <text class="demo-label">
-          up-form
+          基础使用
         </text>
         <up-form
           ref="uForm"
           :model="formModel"
           :rules="formRules"
+          label-width="80px"
           error-type="toast"
         >
           <up-form-item label="姓名" prop="name" :border-bottom="true">
             <up-input v-model="formModel.name" placeholder="请输入姓名" border="none"></up-input>
           </up-form-item>
-          <up-form-item label="性别" prop="gender" :border-bottom="true">
-            <up-radio-group v-model="formModel.gender" placement="row">
-              <up-radio name="male" label="男"></up-radio>
-              <up-radio name="female" label="女"></up-radio>
+          <up-form-item label="性别" prop="gender" :border-bottom="true" @click="genderActionShow = true">
+            <view class="flex-row items-center justify-between w-full">
+              <text class="text-15px" :class="formModel.gender == '' ? 'text-[#c0c4cc]' : 'text-[#303133]'">{{ formModel.gender != '' ? formModel.gender : '请选择性别' }}</text>
+              <up-icon name="arrow-right" color="#c0c4cc" size="16"></up-icon>
+            </view>
+          </up-form-item>
+          <up-form-item label="年龄" prop="age" :border-bottom="true">
+            <up-input v-model="formModel.age" type="number" placeholder="请输入年龄" border="none" :custom-style="{backgroundColor: '#f2f3f5', padding: '4px 10px', borderRadius: '4px', width: '100%'}"></up-input>
+          </up-form-item>
+          <up-form-item label="水果" prop="fruit" :border-bottom="true">
+            <up-radio-group v-model="formModel.fruit" placement="row">
+              <up-radio name="apple" label="苹果" shape="circle"></up-radio>
+              <up-radio name="banana" label="香蕉" shape="circle"></up-radio>
+              <up-radio name="orange" label="毒橙子" shape="circle"></up-radio>
             </up-radio-group>
+          </up-form-item>
+          <up-form-item label="兴趣爱好" prop="hobbies" :border-bottom="true">
+            <up-checkbox-group v-model="formModel.hobbies" placement="row">
+              <up-checkbox name="badminton" label="羽毛球"></up-checkbox>
+              <up-checkbox name="running" label="跑步"></up-checkbox>
+              <up-checkbox name="climbing" label="爬山"></up-checkbox>
+            </up-checkbox-group>
+          </up-form-item>
+          <up-form-item label="简介" prop="intro" :border-bottom="true">
+            <up-textarea v-model="formModel.intro" placeholder="不低于3个字" count maxlength="140" height="80px"></up-textarea>
+          </up-form-item>
+          <up-form-item label="住店时间" prop="stayTime" :border-bottom="true" @click="calendarShow = true">
+            <view class="flex-row items-center justify-between w-full">
+              <text class="text-15px" :class="formModel.stayTime == '' ? 'text-[#c0c4cc]' : 'text-[#303133]'">{{ formModel.stayTime != '' ? formModel.stayTime : '请选择住店和离店时间' }}</text>
+              <up-icon name="arrow-right" color="#c0c4cc" size="16"></up-icon>
+            </view>
+          </up-form-item>
+          <up-form-item label="验证码" prop="code" :border-bottom="true">
+            <view class="flex-row items-center justify-between w-full">
+              <up-input v-model="formModel.code" placeholder="请填写验证码" border="none" class="flex-1"></up-input>
+              <up-button type="success" text="获取验证码" size="mini" :custom-style="{backgroundColor: '#4cd964', border: 'none', color: '#fff', marginLeft: '10px'}"></up-button>
+            </view>
+          </up-form-item>
+          <up-form-item label="生日" prop="birthday" :border-bottom="true" @click="datetimePickerShow = true">
+            <view class="flex-row items-center justify-between w-full">
+              <text class="text-15px" :class="formModel.birthday == '' ? 'text-[#c0c4cc]' : 'text-[#303133]'">{{ formModel.birthday != '' ? formModel.birthday : '请选择生日' }}</text>
+              <up-icon name="arrow-right" color="#c0c4cc" size="16"></up-icon>
+            </view>
           </up-form-item>
         </up-form>
         <view class="mt-15px flex-row justify-between">
@@ -679,7 +718,7 @@
       <!-- Calendar 组件 -->
       <up-calendar
         :show="calendarShow"
-        mode="single"
+        mode="range"
         @confirm="onCalendarConfirm"
         @close="calendarShow = false"
       ></up-calendar>
@@ -710,6 +749,14 @@
         @cancel="datetimePickerShow = false"
         @close="datetimePickerShow = false"
       ></up-datetime-picker>
+      <!-- ActionSheet 性别选择 -->
+      <up-action-sheet
+        :show="genderActionShow"
+        :actions="genderActions"
+        title="请选择性别"
+        @select="onGenderSelect"
+        @close="genderActionShow = false"
+      ></up-action-sheet>
     </scroll-view>
   </view>
 </template>
@@ -734,8 +781,15 @@ const rateValue = ref(3)
 const numberValue = ref(1)
 
 const formModel = reactive({
-  name: '',
-  gender: 'male',
+  name: '楼兰',
+  gender: '',
+  age: '0',
+  fruit: 'apple',
+  hobbies: [] as string[],
+  intro: '',
+  stayTime: '',
+  code: '',
+  birthday: '',
 })
 
 const formRules = {
@@ -750,6 +804,56 @@ const formRules = {
     {
       required: true,
       message: '请选择性别',
+      trigger: ['blur', 'change'],
+    },
+  ],
+  age: [
+    {
+      required: true,
+      message: '请输入年龄',
+      trigger: ['blur', 'change'],
+    },
+  ],
+  fruit: [
+    {
+      required: true,
+      message: '请选择水果',
+      trigger: ['blur', 'change'],
+    },
+  ],
+  hobbies: [
+    {
+      type: 'array',
+      required: true,
+      message: '请选择兴趣爱好',
+      trigger: ['blur', 'change'],
+    },
+  ],
+  intro: [
+    {
+      required: true,
+      message: '请填写简介',
+      trigger: ['blur', 'change'],
+    },
+  ],
+  stayTime: [
+    {
+      required: true,
+      message: '请选择住店时间',
+      trigger: ['blur', 'change'],
+    },
+  ],
+  code: [
+    {
+      required: true,
+      message: '请填写验证码',
+      trigger: ['blur', 'change'],
+    },
+  ],
+  birthday: [
+    {
+      required: true,
+      message: '请选择生日',
       trigger: ['blur', 'change'],
     },
   ],
@@ -778,12 +882,28 @@ function resetForm() {
   }
 }
 
+const genderActionShow = ref(false)
+const genderActions = ref([
+  { name: '男' },
+  { name: '女' },
+] as UTSJSONObject[])
+
+function onGenderSelect(item: UTSJSONObject) {
+  formModel.gender = item.getString('name') ?? ""
+  genderActionShow.value = false
+}
+
 const calendarShow = ref(false)
 const calendarValue = ref('')
 
 function onCalendarConfirm(dates: string[]) {
   if (dates.length > 0) {
     calendarValue.value = dates[0]
+    if (dates.length > 1) {
+      formModel.stayTime = `${dates[0]} 至 ${dates[dates.length - 1]}`
+    } else {
+      formModel.stayTime = dates[0]
+    }
   }
   calendarShow.value = false
 }
@@ -847,6 +967,7 @@ function onDatetimePickerConfirm(e: UTSJSONObject): void {
     const monthStr = month < 10 ? `0${month}` : `${month}`
     const dateStr = date < 10 ? `0${date}` : `${date}`
     datetimePickerLabel.value = `${year}-${monthStr}-${dateStr}`
+    formModel.birthday = `${year}-${monthStr}-${dateStr}`
   }
   datetimePickerShow.value = false
 }
