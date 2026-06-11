@@ -54,7 +54,7 @@
 							v-if="showCopyLine"
 							length="18"
 						></up-line>
-						<block v-for="(item , index) in buttonItems" :key="index">
+						<template v-for="(item , index) in buttonItems" :key="index">
 							<view
 								class="up-tooltip__wrapper__popup__list__btn"
 								hover-class="up-tooltip__wrapper__popup__list__btn--hover"
@@ -70,7 +70,7 @@
 								v-if="index < buttonCount - 1"
 								length="18"
 							></up-line>
-						</block>
+						</template>
 					</view>
 				</view>
 			</up-transition>
@@ -226,11 +226,11 @@
 				return text == null ? '' : text.toString()
 			},
 			rootStyle(): UTSJSONObject {
-				const customStyle = this.customStyle as UTSJSONObject
+				const customStyle = (this.customStyle != null ? this.customStyle : {}) as UTSJSONObject
 				return addStyle(customStyle) as UTSJSONObject
 			},
 			buttonItems(): Array<string> {
-				return this.buttons as Array<string>
+				return (this.buttons != null ? this.buttons : []) as Array<string>
 			},
 			buttonCount(): number {
 				return this.buttonItems.length
@@ -258,7 +258,7 @@
 				style['position'] = 'absolute'
 				style['top'] = addUnit(this.tooltipTop)
 				style['zIndex'] = this.zIndex
-				return UTSJSONObject.assign(style, this.tooltipStyle)
+				return UTSJSONObject.assign(style, this.tooltipStyle != null ? this.tooltipStyle : ({} as UTSJSONObject))
 			},
 			indicatorMergedStyle(): UTSJSONObject {
 				const indicatorStyle = this.indicatorStyle as UTSJSONObject
