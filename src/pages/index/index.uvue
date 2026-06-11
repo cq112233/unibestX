@@ -7,6 +7,9 @@
           切换
         </view>
       </view>
+      <view class="bg-primary">
+        123
+      </view>
       <up-switch v-model="themeSwitchVal" class="!mt-20px" />
       <up-switch v-model="themeSwitchVal2" class="!mt-20px" />
 
@@ -35,6 +38,11 @@
       <!-- Rate 评分 -->
       <view class="!mt-20px px-30px">
         <up-rate v-model="rateValue" />
+      </view>
+
+      <!-- 主题切换 -->
+      <view class="!mt-20px px-30px">
+        <ThemeSwitchCard />
       </view>
 
       <image class="w-100px h-100px mx-auto mt-40px rounded-20px" src="/static/logo.png" />
@@ -88,6 +96,7 @@
 
 <script setup lang="uts">
 import { handleBackPressExit } from '../../utils/backPress.uts'
+import ThemeSwitchCard from '../basic/components/ThemeSwitchCard.uvue'
 
 onBackPress((options: OnBackPressOptions): boolean => {
   // #ifdef APP

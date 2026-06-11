@@ -30,6 +30,14 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
       </view>
     </template>
     ```
+    *   **iOS 原生控件（如 `button`）对 CSS 变量更新的继承限制**：
+        对于标准布局元素（如 `<view>`，底层映射为原生基本视图），样式引擎能够完美处理并响应继承的 CSS 变量更新（例如使用 `class="bg-primary"`）。
+        但对于底层映射为系统特定原生控件的元素（例如 iOS 端的 `<button>` 映射为原生 `UIButton`），其原生控件渲染器在 CSS 变量更新时无法自动触发样式重绘。
+        *   *错误做法*：在 `<button>` 等原生控件上依赖 CSS 变量做动态换肤（如：`class="!bg-primary"`，此处的 `bg-primary` 依赖了 `var(--theme-color)`）。
+        *   *正确做法*：在 `<button>`、`<input>` 等原生控件上，通过 Vue 响应式行内样式直接绑定具体变量值，绕过 CSS 变量继承限制：
+            ```html
+            <button :style="{ backgroundColor: appStore.state.theme }">按钮</button>
+            ```
 *   **按钮样式限制 (Button Layout Restrictions)**：
     在 App 原生平台下，系统底层的 `<button>` 元素是作为一个专门的文本对齐控件实现的。
     *   **重要限制**：**禁止**在原生 `<button>` 元素上直接使用 `flex` 相关的对齐属性（如 `justify-content`, `align-items` 以及 UnoCSS 的 `justify-center`, `items-center`），否则会触发编译报错：
@@ -92,6 +100,32 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
         ```
 *   **Pinia Store 重写方法匹配**：
     自定义的 Pinia 基类（如 `PiniaStoreBase`）重写或覆写内置方法（如 `_hydrate`）时，参数的命名和数量必须与父类类型签名严格对应，否则在部分平台（如 App-Android）下无法通过编译器对泛型基类方法的强校验。
+*   **运行时 Map 转换为 UTSJSONObject 的 ClassCastException 与 模板 :style 类型安全**:
+    *   在原生 Android (Kotlin) 端，由 Vue props 或动态对象传递过来的样式/属性对象在底层为 Kotlin `Map` (例如 `LinkedHashMap`)，而不是 `UTSJSONObject`。
+    *   **重要限制**：
+        1. **禁止**在组件的 UTS 代码中或者模板绑定中将此类动态样式对象直接强转为 `UTSJSONObject`（例如 `as UTSJSONObject`），否则在运行时会触发 `java.lang.ClassCastException: Map cannot be cast to UTSJSONObject` 崩溃。
+        2. 若在模板中直接使用 `parentData['styleKey']` 形式进行属性绑定（如 `:style` 绑定），因为 bracket 属性访问返回的类型是 nullable 的 `Any?`，而某些 Vue 原生节点或自定义组件属性期望接收非空 `Any` (或 `any`)，这会导致 `参数类型不匹配：实际类型为 'Any?'，预期类型为 'Any'` 编译报错。
+    *   *解决办法*：使用双问号合并运算符提供空兜底，并使用 `as any` 将其转换为非空的 `any` 类型避开强类型转换限制，如：
+        ```html
+        :style="(parentData['labelStyle'] ?? {}) as any"
+        ```
+*   **组件自定义事件名与局部方法同名冲突 (Event Emit and Method Name Collision)**：
+    在 Options API 组件中，**禁止**将局部方法声明为与组件声明的自定义事件（`emits` 中的项）同名（例如在 template 中绑定 `@change="change"` 且在 `methods` 中声明 `change(e)`，或者 `@backspace="backspace"` 且 `methods` 中声明 `backspace()`）。
+    *   *问题原因*：uni-app X 在 Android 端会将 Options API 组件编译为原生 Kotlin 类。如果方法与自定义事件同名，编译器/模板解析器在解析事件监听器（如 `@change="change"`）时，可能会将 `change` 优先解析为代表事件回调的属性而非实例方法，从而导致事件处理方法在原生 App 端不会被执行（虽然 H5/Web 等 JS 动态环境可以正常工作）。
+    *   *解决办法*：将方法重命名以示区分（例如将方法改名为 `keyboardChange` 或 `onKeyboardChange`），并在模板中绑定该重命名后的方法：
+        ```html
+        @change="keyboardChange"
+        ```
+*   **键盘高度变化事件类型声明错误导致的 ClassCastException**:
+    *   在 `<input>` 或 `<textarea>` 组件中，监听 `@keyboardheightchange` 事件时，**必须**使用 `UniInputKeyboardHeightChangeEvent` 作为事件处理函数的参数类型，**不得**直接声明为 `UniInputKeyboardHeightChangeEventDetail`。
+    *   *问题原因*：`UniInputKeyboardHeightChangeEventDetail` 仅是该事件的 `detail` 属性类型，若将其直接声明为事件本身的参数类型，在 Android 运行分发事件时会触发 `java.lang.ClassCastException: ...UniInputKeyboardHeightChangeEvent cannot be cast to ...UniInputKeyboardHeightChangeEventDetail` 的运行时崩溃。
+    *   *正确做法*：
+        ```uts
+        const onkeyboardheightchange = (event: UniInputKeyboardHeightChangeEvent) => {
+            const height = event.detail.height;
+            emit("keyboardheightchange", event);
+        }
+        ```
 
 ---
 
