@@ -49,8 +49,8 @@
 			<template v-if="mode == 'number' || mode == 'card'">
 				<up-number-keyboard
 					:random="random"
-					@backspace="backspace"
-					@change="change"
+					@backspace="keyboardBackspace"
+					@change="keyboardChange"
 					:mode="mode"
 					:dotDisabled="dotDisabled"
 				></up-number-keyboard>
@@ -59,8 +59,8 @@
 				<up-car-keyboard
 					:random="random"
 					:autoChange="autoChange"
-					@backspace="backspace"
-					@change="change"
+					@backspace="keyboardBackspace"
+					@change="keyboardChange"
 				></up-car-keyboard>
 			</template>
 		</view>
@@ -108,8 +108,8 @@ export default {
 	mixins: [mpMixin, mixin, propsKeyboard],
 	emits: ["change", "close", "confirm", "cancel", "backspace"],
 	methods: {
-		change(e: any) {
-			this.$emit('change', e);
+		keyboardChange(e: any) {
+			this.$emit('change', e.toString());
 		},
 		// 键盘关闭
 		popupClose() {
@@ -124,7 +124,7 @@ export default {
 			this.$emit('cancel');
 		},
 		// 退格键
-		backspace() {
+		keyboardBackspace() {
 			this.$emit('backspace');
 		}
 	}

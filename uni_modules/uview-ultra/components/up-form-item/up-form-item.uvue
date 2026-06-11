@@ -42,7 +42,7 @@
 						>
 							<text
 								class="up-form-item__body__left__content__label__text"
-								:style="parentData['labelStyle'] ?? {} as UTSJSONObject"
+								:style="(parentData['labelStyle'] ?? {}) as any"
 							>{{ label }}</text>
 						</view>
 					</view>

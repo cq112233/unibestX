@@ -311,7 +311,7 @@
         </text>
         <view class="demo-row justify-start items-center">
           <view class="flex-1">
-            <up-input v-model="keyboardValue" placeholder="通过键盘输入内容" border="surround" readonly></up-input>
+            <up-input v-model="keyboardValue" placeholder="通过键盘输入内容" border="surround" readonly @click="openKeyboard('number')"></up-input>
           </view>
           <view class="w-10px"></view>
           <up-button type="info" text="清空" size="mini" @click="keyboardValue = ''"></up-button>
@@ -798,6 +798,7 @@ function openKeyboard(mode: string): void {
 }
 
 function onKeyboardChange(val: string): void {
+  console.log(val, 'val')
   keyboardValue.value = keyboardValue.value + val
 }
 
