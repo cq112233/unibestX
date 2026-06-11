@@ -132,13 +132,13 @@
 			<template v-if="isInCount">
 				<view
 				    v-if="$slots['trigger'] != null"
-				    @tap="chooseFile"
+				    @tap="onChooseTap"
 				>
 					<slot name="trigger" />
 				</view>
 				<view
 				    v-else-if="$slots['trigger'] == null && ($slots['default'] != null || $slots['$default'] != null)"
-				    @tap="chooseFile"
+				    @tap="onChooseTap"
 				>
 					<slot />
 				</view>
@@ -147,7 +147,7 @@
 				    class="up-upload__button"
 				    :hover-class="!disabled ? 'up-upload__button--hover' : ''"
 				    hover-stay-time="150"
-				    @tap="chooseFile"
+				    @tap="onChooseTap"
 				    :class="[disabled ? 'up-upload__button--disabled' : '']"
 					:style="[{
 						width: addUnit(width),
@@ -522,6 +522,10 @@
 				this.lists = lists
 				this.isInCount = lists.length < maxCount
 			},
+			// @tap 事件处理器，不接收事件对象参数，内部透传到 chooseFile
+			onChooseTap(): void {
+				this.chooseFile({} as UTSJSONObject)
+			},
 			chooseFile(params: UTSJSONObject): boolean {
 				let maxCount = this.maxCount as number
 				let multiple = this.multiple
@@ -542,12 +546,13 @@
 					maxCount: maxCount - lists.length,
 					...params
 				})
-				// @ts-ignore
-				let chooseParamsObj = JSON.parseObject(JSON.stringify(chooseParams)) as UPUploadChooseFileOptions
-				chooseFile(chooseParamsObj).then((res: Array<UPUploadFileChoosed|null>) => {
-					const result = chooseParams['multiple'] != null && chooseParams['multiple'] != false ? res : res
-					this.onBeforeRead(result);
-				})
+				let chooseParamsObj = JSON.parseObject<UPUploadChooseFileOptions>(JSON.stringify(chooseParams))
+				if (chooseParamsObj != null) {
+					chooseFile(chooseParamsObj).then((res: Array<UPUploadFileChoosed|null>) => {
+						const result = chooseParams['multiple'] != null && chooseParams['multiple'] != false ? res : res
+						this.onBeforeRead(result);
+					})
+				}
 				return true
 				// return result
 				// .catch((error) => {
@@ -568,7 +573,7 @@
 					this.$emit(
 						'beforeRead',
 						UTSJSONObject.assign(UTSJSONObject.assign({
-							file
+							file: this.convertFileToUTSJSON(file)
 						}, this.getDetail(null)), {
 							callback: (ok: boolean) => {
 								if (ok) {
@@ -588,6 +593,19 @@
 					const readFile = (res != null ? res : file) as Array<UPUploadFileChoosed | null>
 					this.onAfterRead(readFile);
 				}
+			},
+			// 将 UPUploadFileChoosed 数组转换为 UTSJSONObject 数组，用于 emit 到父组件
+			convertFileToUTSJSON(file: Array<UPUploadFileChoosed | null>): Array<UTSJSONObject> {
+				const result: Array<UTSJSONObject> = []
+				file.forEach((item: UPUploadFileChoosed | null) => {
+					if (item != null) {
+						const obj = JSON.parseObject(JSON.stringify(item))
+						if (obj != null) {
+							result.push(obj)
+						}
+					}
+				})
+				return result
 			},
 			getDetail(index: number|null = null) {
 				const fileList = this.fileList as Array<UTSJSONObject>
@@ -614,7 +632,7 @@
 						title: $t("up.upload.sizeExceed", {} as UTSJSONObject)
 					})
 					this.$emit('oversize', UTSJSONObject.assign({
-						file
+						file: this.convertFileToUTSJSON(file)
 					}, this.getDetail(null)));
 					return;
 				}
@@ -627,12 +645,14 @@
 					let fileListLen = fileList.length;
 					lists.map((item: UPUploadFileChoosed) => {
 						// @ts-ignore
-						fileList.push({
-							...item as UTSJSONObject,
-							status: 'uploading',
-							message: $t("up.upload.uploading", {} as UTSJSONObject),
-							progress: 0
-						});
+						const itemJSON = JSON.parseObject(JSON.stringify(item))
+						if (itemJSON != null) {
+							fileList.push(UTSJSONObject.assign(itemJSON, {
+								status: 'uploading',
+								message: $t("up.upload.uploading", {} as UTSJSONObject),
+								progress: 0
+							} as UTSJSONObject));
+						}
 					});
 					let that = this;
 					this.$emit('update:fileList', fileList);
@@ -747,7 +767,7 @@
 						;(afterRead as UPUploadReadCallback)(file, this.getDetail(null));
 					}
 					this.$emit('afterRead', UTSJSONObject.assign({
-						file
+						file: this.convertFileToUTSJSON(file)
 					}, this.getDetail(null)));
 				}
 			},
