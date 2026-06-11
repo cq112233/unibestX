@@ -546,6 +546,27 @@
         </view>
       </view>
 
+      <!-- SwipeAction 滑动操作 -->
+      <view class="demo-block">
+        <text class="demo-label">
+          up-swipe-action
+        </text>
+        <up-swipe-action :auto-close="true">
+          <up-swipe-action-item
+            v-for="(item, idx) in swipeActionList"
+            :key="item['id'] as string"
+            :options="swipeActionOptions"
+            :name="idx"
+            :close-on-click="true"
+            @click="onSwipeActionClick"
+          >
+            <view class="swipe-action-content">
+              <text class="text-14px text-[#303133]">{{ item['title'] as string }}</text>
+            </view>
+          </up-swipe-action-item>
+        </up-swipe-action>
+      </view>
+
       <up-divider text="反馈组件结束"></up-divider>
 
       <!-- ==================== 布局组件 ==================== -->
@@ -1078,6 +1099,38 @@ function onPopupClose() {
   popupShow.value = false
 }
 
+// ==================== SwipeAction ====================
+const swipeActionList = ref([
+  { id: '1', title: '左滑可编辑或删除此项（第一项）' } as UTSJSONObject,
+  { id: '2', title: '左滑可编辑或删除此项（第二项）' } as UTSJSONObject,
+  { id: '3', title: '左滑可编辑或删除此项（第三项）' } as UTSJSONObject,
+  { id: '4', title: '左滑可编辑或删除此项（第四项）' } as UTSJSONObject,
+] as UTSJSONObject[])
+
+const swipeActionOptions = ref([
+  { text: '编辑', style: { backgroundColor: '#3c9cff' } },
+  { text: '删除', style: { backgroundColor: '#f56c6c' } },
+] as UTSJSONObject[])
+
+function onSwipeActionClick(e: UTSJSONObject): void {
+  // eslint-disable-next-line dot-notation
+  const btnIndex = e['index'] as number       // 按钮在 options 中的索引
+  // eslint-disable-next-line dot-notation
+  const listIndex = e['name'] as number        // 列表项索引 (name prop)
+  const item = swipeActionList.value[listIndex]
+  const btn = swipeActionOptions.value[btnIndex]
+  if (btn != null && item != null) {
+    const action = btn['text'] as string
+    const title = item['title'] as string
+    if (action === '删除') {
+      swipeActionList.value.splice(listIndex, 1)
+      uni.showToast({ title: `已删除: ${title}`, icon: 'none' })
+    } else {
+      uni.showToast({ title: `点击了「${action}」: ${title}`, icon: 'none' })
+    }
+  }
+}
+
 // ==================== 布局组件 ====================
 const skeletonLoading = ref(true)
 function toggleSkeleton() {
@@ -1179,5 +1232,11 @@ function onSubsectionChange(index: number) {
 }
 .bg-purple-dark {
   background-color: #a2b4cd;
+}
+
+.swipe-action-content {
+  padding: 16px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #f0f0f0;
 }
 </style>
