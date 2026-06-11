@@ -431,6 +431,31 @@
         </view>
       </view>
 
+      <!-- LineProgress 线形进度条 -->
+      <view class="demo-block">
+        <text class="demo-label">
+          up-line-progress
+        </text>
+        <view class="flex-col gap-y-10px">
+          <view class="flex-row items-center gap-x-10px">
+            <text class="text-12px text-[#909399] w-40px text-right">{{ lineProgressValue1 }}%</text>
+            <up-line-progress :percentage="lineProgressValue1" :show-text="true" active-color="#2979ff"></up-line-progress>
+          </view>
+          <view class="flex-row items-center gap-x-10px">
+            <text class="text-12px text-[#909399] w-40px text-right">{{ lineProgressValue2 }}%</text>
+            <up-line-progress :percentage="lineProgressValue2" :show-text="true" active-color="#19be6b"></up-line-progress>
+          </view>
+          <view class="flex-row items-center gap-x-10px">
+            <text class="text-12px text-[#909399] w-40px text-right">{{ lineProgressValue3 }}%</text>
+            <up-line-progress :percentage="lineProgressValue3" :show-text="true" active-color="#ff9900"></up-line-progress>
+          </view>
+          <view class="flex-row items-center gap-x-10px">
+            <text class="text-12px text-[#909399] w-40px text-right">{{ lineProgressValue4 }}%</text>
+            <up-line-progress :percentage="lineProgressValue4" :show-text="false" active-color="#fa3534" height="8"></up-line-progress>
+          </view>
+        </view>
+      </view>
+
       <!-- Empty 空状态 -->
       <view class="demo-block">
         <text class="demo-label">
@@ -1054,6 +1079,12 @@ function onUploadDelete(e: UTSJSONObject): void {
     uploadList.value.splice(index, 1)
   }
 }
+
+// ==================== 数据组件 - LineProgress ====================
+const lineProgressValue1 = ref(70)
+const lineProgressValue2 = ref(45)
+const lineProgressValue3 = ref(90)
+const lineProgressValue4 = ref(30)
 
 // ==================== 反馈组件 ====================
 const loadingPageShow = ref(false)
