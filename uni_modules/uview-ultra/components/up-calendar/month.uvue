@@ -11,11 +11,19 @@
 				</view>
 				<template v-for="(item1, index1) in item.date" :key="index1">
 					<view class="up-calendar-month__days__day"
-						:style="[dayStyle(index, index1, item1)]" @tap="clickHandler(index, index1, item1)"
-						:class="{'up-calendar-month__days__day__select--selected': item1.selected}">
-						<view class="up-calendar-month__days__day__select" :style="[daySelectStyle(index, index1, item1)]">
+						:style="[dayStyle(index, index1, item1)]" @tap="clickHandler(index, index1, item1)">
+						<view class="up-calendar-month__days__day__select" 
+							:style="[daySelectStyle(index, index1, item1)]"
+							:class="{
+								'up-calendar-month__days__day__select--selected': isSelected(item1),
+								'up-calendar-month__days__day__select--today': isToday(item1)
+							}">
+							<view v-if="isRangeMiddle(item1)" class="up-calendar-month__days__day__select__range-bg" :style="[rangeBgStyle(item1)]"></view>
 							<text class="up-calendar-month__days__day__select__info"
-								:class="{'up-calendar-month__days__day__select__info--disabled': item1.disabled}"
+								:class="{
+									'up-calendar-month__days__day__select__info--disabled': item1.disabled,
+									'up-calendar-month__days__day__select__info--range-middle': isRangeMiddle(item1)
+								}"
 								:style="[textStyle(item1)]">{{ item1['day'] }}</text>
 							<text v-if="getBottomInfo(index, index1, item1)"
 								class="up-calendar-month__days__day__select__buttom-info"
@@ -33,7 +41,6 @@
 </template>
 
 <script>
-	import { useAppStore } from '@/src/store';
 	import { mpMixin } from '../../libs/mixin/mpMixin';
 	import { mixin } from '../../libs/mixin/mixin';
 	import { addUnit, deepClone, toast, sleep, getWindowInfo } from '../../libs/function/index';
@@ -169,17 +176,6 @@
 			}
 		},
 		computed: {
-			elColor(): string {
-				if (this.color == '#3c9cff') {
-					try {
-						const appStore = useAppStore()
-						return appStore.state.theme
-					} catch (e) {
-						return '#3c9cff'
-					}
-				}
-				return this.color
-			},
 			// 多个条件的变化，会引起选中日期的变化，这里统一管理监听
 			selectedChange(): any {
 				return [this.minDate, this.maxDate, this.defaultDate]
@@ -210,10 +206,19 @@
 					// 判断date是否在selected数组中，因为月份可能会需要补0，所以使用dateSame判断，而不用数组的includes判断
 					const sameDate = (element: string): boolean => this.dateSame(element, date)
 					if (this.selected.some(sameDate)) {
-						style['backgroundColor'] = this.elColor
+						let shouldActiveBg = true
+						if (this.mode == 'range' && this.selected.length >= 2) {
+							const len = this.selected.length - 1
+							if (!this.dateSame(date, this.selected[0]) && !this.dateSame(date, this.selected[len])) {
+								shouldActiveBg = false
+							}
+						}
+						if (shouldActiveBg) {
+							style['backgroundColor'] = this.color == '#3c9cff' ? 'var(--theme-color, #3c9cff)' : this.color
+						}
 					}
 					if (this.todayDate != '' && this.dateSame(date, this.todayDate) && !this.selected.some(sameDate)) {
-						style['border'] = `1px solid ${this.elColor}`
+						style['border'] = `1px solid ${this.color == '#3c9cff' ? 'var(--theme-color, #3c9cff)' : this.color}`
 						style['boxSizing'] = 'border-box'
 					}
 					if (this.mode == 'single') {
@@ -234,13 +239,7 @@
 								style['borderTopRightRadius'] = '3px'
 								style['borderBottomRightRadius'] = '3px'
 							}
-							// 处于第一和最后一个之间的日期，背景色设置为浅色，通过将对应颜色进行等分，再取其尾部的颜色值
-							if (dayuts(date).isAfter(dayuts(this.selected[0])) && dayuts(date).isBefore(dayuts(this
-									.selected[len]))) {
-								style['backgroundColor'] = colorGradient(this.elColor, '#ffffff', 100)[90]
-								// 增加一个透明度，让范围区间的背景色也能看到底部的mark水印字符
-								style['opacity'] = 0.7
-							}
+							// 处于第一和最后一个之间的日期由绝对定位背景层单独渲染以防止 opacity 影响文字
 						} else if (this.selected.length == 1) {
 							// 之所以需要这么写，是因为DCloud公司的iOS客户端的开发者能力有限导致的bug
 							// 进行还原操作，否则在nvue的iOS，uni-app有bug，会导致诡异的表现
@@ -271,7 +270,7 @@
 						// 如果是范围选择模式，第一个和最后一个之间的日期，文字颜色设置为高亮的主题色
 						if (dayuts(date).isAfter(dayuts(this.selected[0])) && dayuts(date).isBefore(dayuts(this
 								.selected[len]))) {
-							style['color'] = this.elColor
+							style['color'] = this.color == '#3c9cff' ? 'var(--theme-color, #3c9cff)' : this.color
 						}
 					}
 					return style
@@ -317,6 +316,35 @@
 		},
 		emits: ['monthSelected', 'updateMonthTop'],
 		methods: {
+			isRangeMiddle(item: UPCalendarMonthsItemDate): boolean {
+				if (this.mode != 'range' || this.selected.length < 2) return false
+				const date = (item['dateStr'] != null ? item['dateStr'] as string : dayuts(item['date']).format("YYYY-MM-DD"))
+				const len = this.selected.length - 1
+				return dayuts(date).isAfter(dayuts(this.selected[0])) && dayuts(date).isBefore(dayuts(this.selected[len]))
+			},
+			rangeBgStyle(item: UPCalendarMonthsItemDate): any {
+				const style = {} as UTSJSONObject
+				if (this.color != '#3c9cff') {
+					style['backgroundColor'] = colorGradient(this.color, '#ffffff', 100)[90]
+					style['opacity'] = 0.7
+				}
+				return style
+			},
+			isSelected(item: UPCalendarMonthsItemDate): boolean {
+				const date = (item['dateStr'] != null ? item['dateStr'] as string : dayuts(item['date']).format("YYYY-MM-DD"))
+				const sameDate = (element: string): boolean => this.dateSame(element, date)
+				if (!this.selected.some(sameDate)) return false
+				if (this.mode == 'range' && this.selected.length >= 2) {
+					const len = this.selected.length - 1
+					return this.dateSame(date, this.selected[0]) || this.dateSame(date, this.selected[len])
+				}
+				return true
+			},
+			isToday(item: UPCalendarMonthsItemDate): boolean {
+				const date = (item['dateStr'] != null ? item['dateStr'] as string : dayuts(item['date']).format("YYYY-MM-DD"))
+				const sameDate = (element: string): boolean => this.dateSame(element, date)
+				return this.todayDate != '' && this.dateSame(date, this.todayDate) && !this.selected.some(sameDate)
+			},
 			init() {
 				// 初始化默认选中
 				// this.$emit('monthSelected', this.selected, 'init')
@@ -557,6 +585,17 @@
 					justify-content: center;
 					position: relative;
 
+					&__range-bg {
+						position: absolute;
+						top: 0;
+						bottom: 0;
+						left: 0;
+						right: 0;
+						z-index: 1;
+						background-color: $up-primary;
+						opacity: 0.15;
+					}
+
 					&__dot {
 						width: 7px;
 						height: 7px;
@@ -565,6 +604,7 @@
 						position: absolute;
 						top: 12px;
 						right: 7px;
+						z-index: 2;
 					}
 
 					&__buttom-info {
@@ -576,6 +616,7 @@
 						text-align: center;
 						left: 0;
 						right: 0;
+						z-index: 2;
 
 						&--selected {
 							color: #ffffff;
@@ -589,6 +630,8 @@
 					&__info {
 						text-align: center;
 						font-size: 16px;
+						position: relative;
+						z-index: 2;
 
 						&--selected {
 							color: #ffffff;
@@ -597,6 +640,17 @@
 						&--disabled {
 							color: #cacbcd;
 						}
+
+						&--range-middle {
+							color: $up-primary;
+						}
+					}
+
+					&--today {
+						border-width: 1px;
+						border-style: solid;
+						border-color: $up-primary;
+						box-sizing: border-box;
 					}
 
 					&--selected {

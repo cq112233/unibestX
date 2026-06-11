@@ -36,7 +36,7 @@
 				:scrollIntoView="scrollIntoView"
 			>
 				<uMonth
-					:color="elColor"
+					:color="color"
 					:rowHeight="rowHeight"
 					:showMark="showMark"
 					:months="months"
@@ -64,7 +64,7 @@
 				:style="{height: addUnit(listHeight)}"
 			>
 				<uMonth
-					:color="elColor"
+					:color="color"
 					:rowHeight="rowHeight"
 					:showMark="showMark"
 					:months="currentMonths"
@@ -94,7 +94,8 @@
 						:text="
                             buttonDisabled ? confirmDisabledText : confirmText
                         "
-						:color="elColor"
+						:color="color == '#3c9cff' ? '' : color"
+						:type="color == '#3c9cff' ? 'primary' : ''"
 						@click="confirm"
 						:disabled="buttonDisabled"
 					></up-button>
@@ -105,7 +106,6 @@
 </template>
 
 <script>
-import { useAppStore } from '@/src/store'
 import uHeader from './header.uvue'
 import { UPCalendarMonthsItemDate } from './types.uts'
 import uMonth, { monthsItem } from './month.uvue'
@@ -377,17 +377,6 @@ export default {
 		}
 	},
 	computed: {
-		elColor(): string {
-			if (this.color == '#3c9cff') {
-				try {
-					const appStore = useAppStore()
-					return appStore.state.theme
-				} catch (e) {
-					return '#3c9cff'
-				}
-			}
-			return this.color
-		},
 		// 由于maxDate和minDate可以为字符串(2021-10-10)，或者数值(时间戳)，但是dayuts如果接受字符串形式的时间戳会有问题，这里进行处理
 		innerMaxDate(): string {
 			// @ts-ignore

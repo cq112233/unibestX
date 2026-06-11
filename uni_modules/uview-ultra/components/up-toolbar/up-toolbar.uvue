@@ -36,8 +36,8 @@
 					class="up-toolbar__wrapper__confirm"
 					@tap="confirm"
 					:style="{
-					color: confirmColor
-				}"
+						color: elConfirmColor
+					}"
 				>{{ confirmText }}</text>
 			</view>
 			<template v-else>
@@ -69,6 +69,15 @@
 		name: 'up-toolbar',
 		mixins: [mpMixin, mixin, propsToolbar],
 		emits: ["confirm", "cancel"],
+		computed: {
+			elConfirmColor(): string {
+				// 默认色时不设置内联样式，让 SCSS 中 $up-primary CSS变量生效
+				if (this.confirmColor == '#3c9cff') {
+					return ''
+				}
+				return this.confirmColor
+			}
+		},
 		created() {
 			// console.log(this.$slots)
 		},
