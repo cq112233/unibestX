@@ -728,42 +728,75 @@ export function getProperty(obj: UTSJSONObject|null, key: string): any {
     return obj[key] ?? {}
 }
 
-// /**
-//  * @description 设置对象的属性值，如果'a.b.c'的形式进行设置
-//  * @param {object} obj 对象
-//  * @param {string} key 需要设置的属性
-//  * @param {string} value 设置的值
-//  */
-export function setProperty(obj: UTSJSONObject, key: string, value: any): void {
-    if (typeof obj !== 'object') {
+function setNestedValue(obj: any | null, keys: string[], index: number, value: any): void {
+    if (obj == null) {
         return
     }
-    // 递归赋值
-    const inFn = function(_obj: object, keys: Array<string>, v: string) {
-        // 最后一个属性key
-        if (keys.length === 1) {
-            _obj[keys[0]] = v
-            return
+    const k = keys[index]
+    if (index === keys.length - 1) {
+        // #ifdef APP
+        if (obj instanceof Map) {
+            (obj as Map<string, any>).set(k, value)
+        } else {
+            (obj as UTSJSONObject)[k] = value
         }
-        // 0~length-1个key
-        while (keys.length > 1) {
-            const k = keys[0]
-            if (!_obj[k] || (typeof _obj[k] !== 'object')) {
-                _obj[k] = {}
-            }
-            const key = keys.shift()
-            // 自调用判断是否存在属性，不存在则自动创建对象
-            inFn(_obj[k], keys, v)
-        }
+        // #endif
+        // #ifndef APP
+        obj[k] = value
+        // #endif
+        return
     }
-
-    if (typeof key !== 'string' || key === '') {
-
-    } else if (key.indexOf('.') != -1) { // 支持多层级赋值操作
-        const keys = key.split('.')
-    //     inFn(obj, keys, value)
+    
+    let nextObj: any | null = null
+    // #ifdef APP
+    if (obj instanceof Map) {
+        nextObj = (obj as Map<string, any>).get(k)
     } else {
+        nextObj = (obj as UTSJSONObject)[k]
+    }
+    // #endif
+    // #ifndef APP
+    nextObj = obj[k]
+    // #endif
+    
+    if (nextObj == null || typeof nextObj !== 'object') {
+        nextObj = {} as UTSJSONObject
+        // #ifdef APP
+        if (obj instanceof Map) {
+            (obj as Map<string, any>).set(k, nextObj)
+        } else {
+            (obj as UTSJSONObject)[k] = nextObj
+        }
+        // #endif
+        // #ifndef APP
+        obj[k] = nextObj
+        // #endif
+    }
+    
+    setNestedValue(nextObj, keys, index + 1, value)
+}
+
+export function setProperty(obj: any, key: string, value: any): void {
+    if (obj == null || typeof obj !== 'object') {
+        return
+    }
+    if (typeof key !== 'string' || key === '') {
+        return
+    }
+    
+    if (key.indexOf('.') != -1) {
+        setNestedValue(obj, key.split('.'), 0, value)
+    } else {
+        // #ifdef APP
+        if (obj instanceof Map) {
+            (obj as Map<string, any>).set(key, value)
+        } else {
+            (obj as UTSJSONObject)[key] = value
+        }
+        // #endif
+        // #ifndef APP
         obj[key] = value
+        // #endif
     }
 }
 
