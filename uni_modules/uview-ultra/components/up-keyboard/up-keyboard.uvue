@@ -106,6 +106,7 @@ export default {
 		}
 	},
 	mixins: [mpMixin, mixin, propsKeyboard],
+	emits: ["change", "close", "confirm", "cancel", "backspace"],
 	methods: {
 		change(e: any) {
 			this.$emit('change', e);
