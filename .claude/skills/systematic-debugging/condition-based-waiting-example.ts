@@ -2,8 +2,8 @@
 // From: Lace test infrastructure improvements (2025-10-03)
 // Context: Fixed 15 flaky tests by replacing arbitrary timeouts
 
-import type { ThreadManager } from '~/threads/thread-manager';
-import type { LaceEvent, LaceEventType } from '~/threads/types';
+import type { ThreadManager } from '~/threads/thread-manager'
+import type { LaceEvent, LaceEventType } from '~/threads/types'
 
 /**
  * Wait for a specific event type to appear in thread
@@ -21,26 +21,28 @@ export function waitForEvent(
   threadManager: ThreadManager,
   threadId: string,
   eventType: LaceEventType,
-  timeoutMs = 5000
+  timeoutMs = 5000,
 ): Promise<LaceEvent> {
   return new Promise((resolve, reject) => {
-    const startTime = Date.now();
+    const startTime = Date.now()
 
     const check = () => {
-      const events = threadManager.getEvents(threadId);
-      const event = events.find((e) => e.type === eventType);
+      const events = threadManager.getEvents(threadId)
+      const event = events.find(e => e.type === eventType)
 
       if (event) {
-        resolve(event);
-      } else if (Date.now() - startTime > timeoutMs) {
-        reject(new Error(`Timeout waiting for ${eventType} event after ${timeoutMs}ms`));
-      } else {
-        setTimeout(check, 10); // Poll every 10ms for efficiency
+        resolve(event)
       }
-    };
+      else if (Date.now() - startTime > timeoutMs) {
+        reject(new Error(`Timeout waiting for ${eventType} event after ${timeoutMs}ms`))
+      }
+      else {
+        setTimeout(check, 10) // Poll every 10ms for efficiency
+      }
+    }
 
-    check();
-  });
+    check()
+  })
 }
 
 /**
@@ -62,30 +64,32 @@ export function waitForEventCount(
   threadId: string,
   eventType: LaceEventType,
   count: number,
-  timeoutMs = 5000
+  timeoutMs = 5000,
 ): Promise<LaceEvent[]> {
   return new Promise((resolve, reject) => {
-    const startTime = Date.now();
+    const startTime = Date.now()
 
     const check = () => {
-      const events = threadManager.getEvents(threadId);
-      const matchingEvents = events.filter((e) => e.type === eventType);
+      const events = threadManager.getEvents(threadId)
+      const matchingEvents = events.filter(e => e.type === eventType)
 
       if (matchingEvents.length >= count) {
-        resolve(matchingEvents);
-      } else if (Date.now() - startTime > timeoutMs) {
+        resolve(matchingEvents)
+      }
+      else if (Date.now() - startTime > timeoutMs) {
         reject(
           new Error(
-            `Timeout waiting for ${count} ${eventType} events after ${timeoutMs}ms (got ${matchingEvents.length})`
-          )
-        );
-      } else {
-        setTimeout(check, 10);
+            `Timeout waiting for ${count} ${eventType} events after ${timeoutMs}ms (got ${matchingEvents.length})`,
+          ),
+        )
       }
-    };
+      else {
+        setTimeout(check, 10)
+      }
+    }
 
-    check();
-  });
+    check()
+  })
 }
 
 /**
@@ -113,26 +117,28 @@ export function waitForEventMatch(
   threadId: string,
   predicate: (event: LaceEvent) => boolean,
   description: string,
-  timeoutMs = 5000
+  timeoutMs = 5000,
 ): Promise<LaceEvent> {
   return new Promise((resolve, reject) => {
-    const startTime = Date.now();
+    const startTime = Date.now()
 
     const check = () => {
-      const events = threadManager.getEvents(threadId);
-      const event = events.find(predicate);
+      const events = threadManager.getEvents(threadId)
+      const event = events.find(predicate)
 
       if (event) {
-        resolve(event);
-      } else if (Date.now() - startTime > timeoutMs) {
-        reject(new Error(`Timeout waiting for ${description} after ${timeoutMs}ms`));
-      } else {
-        setTimeout(check, 10);
+        resolve(event)
       }
-    };
+      else if (Date.now() - startTime > timeoutMs) {
+        reject(new Error(`Timeout waiting for ${description} after ${timeoutMs}ms`))
+      }
+      else {
+        setTimeout(check, 10)
+      }
+    }
 
-    check();
-  });
+    check()
+  })
 }
 
 // Usage example from actual debugging session:

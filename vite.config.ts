@@ -7,7 +7,7 @@ import autoRootPlugin from './plugins/root-plugin'
 export default defineConfig({
   resolve: {
     alias: [
-      { find: /^vue$/, replacement: '@dcloudio/uni-h5-vue' }
+      { find: /^vue$/, replacement: '@dcloudio/uni-h5-vue' },
     ],
   },
   define: {

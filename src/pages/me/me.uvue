@@ -1,45 +1,44 @@
 <template>
-    <view class="flex flex-col py-24px px-16px items-center">
-      <!-- 头部卡片：用户头像及状态 -->
-      <view class="w-full bg-white rounded-12px py-30px px-20px items-center mb-20px">
-        <image class="w-90px h-90px rounded-45px mb-16px border-[3px] border-solid border-[#f1f5f9]" :src="avatarUrl" />
-        <text class="text-20px font-bold text-[#1e293b] mb-4px">
-          {{ userStore.state.userInfo.username.length > 0 ? userStore.state.userInfo.username : '未登录用户' }}
+  <view class="flex flex-col py-24px px-16px items-center">
+    <!-- 头部卡片：用户头像及状态 -->
+    <view class="w-full bg-white rounded-12px py-30px px-20px items-center mb-20px">
+      <image class="w-90px h-90px rounded-45px mb-16px border-[3px] border-solid border-[#f1f5f9]" :src="avatarUrl" />
+      <text class="text-20px font-bold text-[#1e293b] mb-4px">
+        {{ userStore.state.userInfo.username.length > 0 ? userStore.state.userInfo.username : '未登录用户' }}
+      </text>
+      <text v-if="userStore.state.userInfo.username.length > 0" class="text-14px text-[#64748b] mb-12px">
+        {{ userStore.state.userInfo.nickname }}
+      </text>
+      <view class="flex flex-row">
+        <text class="text-12px py-4px px-12px rounded-20px font-medium overflow-hidden" :class="tokenStore.hasValidLogin() ? 'bg-[#d1fae5] text-[#065f46]' : 'bg-[#f1f5f9] text-[#64748b]'">
+          {{ tokenStore.hasValidLogin() ? '已登录' : '未登录' }}
         </text>
-        <text v-if="userStore.state.userInfo.username.length > 0" class="text-14px text-[#64748b] mb-12px">
-          {{ userStore.state.userInfo.nickname }}
-        </text>
-        <view class="flex flex-row">
-          <text class="text-12px py-4px px-12px rounded-20px font-medium overflow-hidden" :class="tokenStore.hasValidLogin() ? 'bg-[#d1fae5] text-[#065f46]' : 'bg-[#f1f5f9] text-[#64748b]'">
-            {{ tokenStore.hasValidLogin() ? '已登录' : '未登录' }}
-          </text>
-        </view>
-      </view>
-
-      <!-- 信息区域：序列化数据展示 -->
-      <view class="w-full bg-white rounded-12px p-20px mb-24px">
-        <view class="border-b border-solid border-[#f1f5f9] pb-8px mb-12px">
-          <text class="text-15px font-semibold text-[#334155]">用户信息 (JSON)</text>
-        </view>
-        <scroll-view class="bg-[#0f172a] rounded-8px p-12px max-h-180px" scroll-y="true">
-          <text class="text-13px text-[#38bdf8] lh-1.6" style="font-family: monospace;">{{ userInfoJson }}</text>
-        </scroll-view>
-      </view>
-
-      <!-- 按钮区域 -->
-      <view class="w-full px-8px">
-        <button v-if="tokenStore.hasValidLogin()" class="w-full h-48px rounded-8px bg-[#ef4444] text-[#ffffff]" @click="handleLogout">
-          退出登录
-        </button>
-        <button v-else class="w-full h-48px rounded-8px bg-[#3b82f6] text-[#ffffff]" @click="handleLogin">
-          登录
-        </button>
       </view>
     </view>
+
+    <!-- 信息区域：序列化数据展示 -->
+    <view class="w-full bg-white rounded-12px p-20px mb-24px">
+      <view class="border-b border-solid border-[#f1f5f9] pb-8px mb-12px">
+        <text class="text-15px font-semibold text-[#334155]">用户信息 (JSON)</text>
+      </view>
+      <scroll-view class="bg-[#0f172a] rounded-8px p-12px max-h-180px" scroll-y="true">
+        <text class="text-13px text-[#38bdf8] lh-1.6" style="font-family: monospace;">{{ userInfoJson }}</text>
+      </scroll-view>
+    </view>
+
+    <!-- 按钮区域 -->
+    <view class="w-full px-8px">
+      <button v-if="tokenStore.hasValidLogin()" class="w-full h-48px rounded-8px bg-[#ef4444] text-[#ffffff]" @click="handleLogout">
+        退出登录
+      </button>
+      <button v-else class="w-full h-48px rounded-8px bg-[#3b82f6] text-[#ffffff]" @click="handleLogin">
+        登录
+      </button>
+    </view>
+  </view>
 </template>
 
 <script setup lang="uts">
-/* eslint-disable eqeqeq */
 import { useTokenStore, useUserStore } from '../../store'
 import { LOGIN_PAGE } from '../../router/config'
 import { handleBackPressExit } from '@/src/utils/backPress'

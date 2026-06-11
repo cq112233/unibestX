@@ -111,7 +111,7 @@ import uMonth, { monthsItem } from './month.uvue'
 import { propsCalendar } from './props'
 import util from './util'
 import {dayuts} from '@/uni_modules/lime-dayuts';
-import { t } from '../../libs/i18n/index.uts'
+import { t as $t } from '../../libs/i18n/index.uts'
 // import Calendar from '../../libs/util/calendar'
 import { mpMixin } from '../../libs/mixin/mpMixin'
 import { mixin } from '../../libs/mixin/mixin'
@@ -397,7 +397,7 @@ export default {
 			return dayuts().format('YYYY-MM-DD')
 		},
 		todayText(): string {
-			return t('up.calendar.today')
+			return $t('up.calendar.today')
 		},
 		todayDisabled(): boolean {
 			let today = dayuts(this.todayDate as string)

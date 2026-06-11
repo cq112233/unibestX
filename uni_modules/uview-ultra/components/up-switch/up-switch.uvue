@@ -1,13 +1,19 @@
 <template>
 	<view
-	    class="up-switch cursor-pointer"
-	    :class="[disabled ? 'up-switch--disabled' : '']"
+	    :class="switchClass"
 	    :style="[switchStyle, addStyle(customStyle)]"
 	    @tap="clickHandler"
 	>
 		<view
+			class="up-switch__bg-active"
+			:style="[bgActiveStyle]"
+			v-if="isActive"
+		>
+		</view>
+		<view
 		    class="up-switch__bg"
 		    :style="[bgStyle]"
+			v-if="!isActive"
 		>
 		</view>
 		<view
@@ -71,23 +77,54 @@
 			}
 		},
 		computed: {
+			switchClass(): string {
+				let classes = ['up-switch', 'cursor-pointer']
+				if (this.disabled) {
+					classes.push('up-switch--disabled')
+				}
+				if (this.isActive) {
+					classes.push('up-switch--on')
+				} else {
+					classes.push('up-switch--off')
+				}
+				return classes.join(' ')
+			},
 			isActive(){
 				return this.modelValue === this.activeValue;
 			},
 			switchStyle(): UTSJSONObject {
 				let style = {}
-				// 这里需要加2，是为了腾出边框的距离，否则圆点node会和外边框紧贴在一起
+				
+				// 仅当 size 不是默认值 25 时，才把 width 和 height 写入内联样式中，避免内联属性污染
+				if (this.size.toString() != '25') {
+					// @ts-ignore
+					style['width'] = addUnit(parseInt(this.size.toString()) * 2 + 2)
+					// @ts-ignore
+					style['height'] = addUnit(parseInt(this.size.toString()) + 2)
+				}
+				
+				// 开启和关闭时，内联更改 borderColor 以绕开原生平台的背景穿透限制。开启时为透明，关闭时恢复为默认灰色
+				if (this.isActive) {
+					style['borderColor'] = 'rgba(0, 0, 0, 0)'
+				} else {
+					if (this.customInactiveColor) {
+						style['borderColor'] = 'rgba(0, 0, 0, 0)'
+					} else {
+						style['borderColor'] = 'rgba(0, 0, 0, 0.12)'
+					}
+				}
+				
+				return style;
+			},
+			bgActiveStyle(): UTSJSONObject {
+				let style = {}
 				// @ts-ignore
 				style['width'] = addUnit(parseInt(this.size.toString()) * 2 + 2)
 				// @ts-ignore
 				style['height'] = addUnit(parseInt(this.size.toString()) + 2)
-				// style['borderColor'] = this.value ? 'rgba(0, 0, 0, 0)' : 'rgba(0, 0, 0, 0.12)'
-				// 如果自定义了“非激活”演示，name边框颜色设置为透明(跟非激活颜色一致)
-				// 这里不能简单的设置为非激活的颜色，否则打开状态时，会有边框，所以需要透明
-				if(this.customInactiveColor) {
-					style['borderColor'] = 'rgba(0, 0, 0, 0)'
+				if (this.activeColor != '#2979ff') {
+					style['backgroundColor'] = this.activeColor
 				}
-				style['backgroundColor'] = this.isActive ? this.activeColor : this.inactiveColor
 				return style;
 			},
 			nodeStyle(): UTSJSONObject {
@@ -103,9 +140,9 @@
 			},
 			bgStyle(): UTSJSONObject {
 				let style = {}
-				// 这里配置一个多余的元素在HTML中，是为了让switch切换时，有更良好的背景色扩充体验(见实际效果)
+				// 这里宽度设置为 parseInt(size) * 2，刚好填满容器内部宽度，防止关闭时两侧露出绿色背景
 				// @ts-ignore
-				style['width'] = addUnit(parseInt(this.size.toString()) * 2 - parseInt(this.size.toString()) / 2)
+				style['width'] = addUnit(parseInt(this.size.toString()) * 2)
 				// @ts-ignore
 				style['height'] = addUnit(parseInt(this.size.toString()))
 				style['backgroundColor'] = this.inactiveColor
@@ -146,11 +183,14 @@
 
 	.up-switch {
 		@include flex(row);
-		/* #ifndef APP-NVUE */
+		/* #ifndef APP */
 		box-sizing: border-box;
 		/* #endif */
 		position: relative;
-		background-color: #fff;
+		
+		// 将容器背景色设为透明，避免关闭时背景色穿透边框露出主题色
+		background-color: rgba(0, 0, 0, 0);
+		
 		border-width: 1px;
 		border-radius: 100px;
 		transition: background-color 0.4s;
@@ -161,6 +201,21 @@
 		// 由于weex为阿里逗着玩的KPI项目，导致bug奇多，这必须要写这一行，
 		// 否则在iOS上，点击页面任意地方，都会触发switch的点击事件
 		overflow: hidden;
+
+		// 默认 size = 25 时的宽高，使默认时容器内联样式完全为空，支持纯 Class 变色
+		width: 52px;
+		height: 27px;
+
+		&__bg-active {
+			position: absolute;
+			top: -1px;
+			left: -1px;
+			border-radius: 100px;
+			background-color: $up-primary;
+			// 默认 size = 25 时的宽高（加2px以完全覆盖容器和边框）
+			width: 52px;
+			height: 27px;
+		}
 
 		&__node {
 			@include flex(row);

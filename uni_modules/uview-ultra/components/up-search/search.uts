@@ -7,18 +7,18 @@
  * @lastTime     : 2025-12-19 20:17:21
  * @FilePath     : /uview-ultra/libs/config/props/search.uts
  */
-import { t } from '../../libs/i18n'
+import { t as $t } from '../../libs/i18n/index.uts'
 export default {
     // search
     search: {
         shape: 'round',
         bgColor: '#f2f2f2',
-        placeholder: t("up.search.placeholder"),
+        placeholder: $t("up.search.placeholder"),
         clearabled: true,
         focus: false,
         showAction: true,
         actionStyle: {} as UTSJSONObject,
-        actionText: t("up.common.search"),
+        actionText: $t("up.common.search"),
         inputAlign: 'left',
         inputStyle: {} as UTSJSONObject,
         disabled: false,
