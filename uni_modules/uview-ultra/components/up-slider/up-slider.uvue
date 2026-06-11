@@ -1,7 +1,7 @@
 <template>
 	<view
 		class="up-slider"
-		:style="[addStyle(customStyle)]"
+		:style="addStyle(customStyle)"
 	>
 		<template v-if="!useNative || isRange">
 			<view ref="up-slider-inner" class="up-slider-inner" @click="onClick"
@@ -11,37 +11,27 @@
 			>
 				<view ref="up-slider__base"
 					class="up-slider__base"
-					:style="[
-						{
-							height: height,
-							backgroundColor: inactiveColor
-						}
-					]"
+					:style="{
+						height: height,
+						backgroundColor: inactiveColor
+					}"
 				>
 				</view>
 				<view
 					@click="onClick"
 					class="up-slider__gap"
-					:style="[
-						barStyle,
-						{
-							height: height,
-							marginTop: '-' + height,
-							backgroundColor: activeColor
-						}
-					]"
+					:style="gapStyleCpu"
 				>
 				</view>
 				<view v-if="isRange"
 					class="up-slider__gap up-slider__gap-0"
-					:style="[
-						barStyle0,
-						{
-							height: height,
-							marginTop: '-' + height,
-							backgroundColor: inactiveColor
-						}
-					]"
+					:style="{
+						width: barStyle0.width,
+						transition: barStyle0.transition,
+						height: height,
+						marginTop: '-' + height,
+						backgroundColor: inactiveColor
+					}"
 				>
 				</view>
 				<text v-if="isRange && showValue"
@@ -59,11 +49,7 @@
 						@touchmove="onTouchMove($event, 0)" @touchend="onTouchEnd($event, 0)"
 						@touchcancel="onTouchEnd($event, 0)" :style="{left: (parseFloat(getPx(barStyle0.width)) + parseFloat(getPx(blockSize))/2).toString() + 'px'}">
 						<slot name="min" v-if="$slots['min'] != null || $slots['$min'] != null"/>
-						<view v-else class="up-slider__button" :style="[blockStyle, {
-							height: getPx(blockSize, true),
-							width: getPx(blockSize, true),
-							backgroundColor: blockColor,
-						}]"></view>
+						<view v-else class="up-slider__button" :style="blockStyleCpu"></view>
 					</view>
 				</template>
 				<view class="up-slider__button-wrap" @touchstart="onTouchStart($event)"
@@ -71,11 +57,7 @@
 					@touchcancel="onTouchEnd($event)" :style="{left: (parseFloat(getPx(barStyle.width)) + parseFloat(getPx(blockSize))/2) + 'px'}">
 					<slot name="max" v-if="isRange && ($slots['max'] != null || $slots['$max'] != null)"/>
 					<slot v-else-if="$slots['default'] != null || $slots['$default'] != null"/>
-					<view v-else class="up-slider__button" :style="[blockStyle, {
-						height: getPx(blockSize, true),
-						width: getPx(blockSize, true),
-						backgroundColor: blockColor
-					}]"></view>
+					<view v-else class="up-slider__button" :style="blockStyleCpu"></view>
 				</view>
 			</view>
 			<view class="up-slider__show-value"
@@ -189,12 +171,39 @@
 		created() {
 		},
 		computed: {
-			innerStyleCpu() {
+			innerStyleCpu(): UTSJSONObject {
 				let style: UTSJSONObject = this.innerStyle;
 
 				style['height'] = (this.isRange && this.showValue)
 					? (parseFloat(getPx(this.blockSize)) + 24).toString() + 'px'
 					: (getPx(this.blockSize)) + 'px';
+				return style;
+			},
+			blockStyleCpu(): UTSJSONObject {
+				let style = {} as UTSJSONObject;
+				const blockStyle = this.blockStyle;
+				if (blockStyle != null) {
+					// #ifdef APP
+					UTSJSONObject.assign(style, blockStyle);
+					// #endif
+					// #ifndef APP
+					Object.assign(style, blockStyle);
+					// #endif
+				}
+				style['height'] = this.getPx(this.blockSize, true);
+				style['width'] = this.getPx(this.blockSize, true);
+				style['backgroundColor'] = this.blockColor;
+				return style;
+			},
+			gapStyleCpu(): UTSJSONObject {
+				let style = {} as UTSJSONObject;
+				style['width'] = this.barStyle.width;
+				style['transition'] = this.barStyle.transition;
+				style['height'] = this.height;
+				style['marginTop'] = '-' + this.height;
+				if (this.activeColor !== '#2979ff') {
+					style['backgroundColor'] = this.activeColor;
+				}
 				return style;
 			}
 		},
@@ -520,7 +529,8 @@
 			position: relative;
 			border-radius: 999px;
 			transition: width 0.2s;
-			background-color: #1989fa;
+			background-color: $up-primary;
+			align-self: flex-start;
 		}
 
 		&__button {

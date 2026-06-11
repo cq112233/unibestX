@@ -31,7 +31,7 @@
                             disabled
                                 ? '#c8c9cc'
                                 : Math.floor(parseFloat(activeIndex.toString())) > index
-                                ? activeColor
+                                ? (activeColor === '#FA3534' ? 'primary' : activeColor)
                                 : inactiveColor
                         "
                         :custom-style="{
@@ -59,7 +59,7 @@
                             disabled
                                 ? '#c8c9cc'
                                 : Math.ceil(parseFloat(activeIndex.toString())) > index
-                                ? activeColor
+                                ? (activeColor === '#FA3534' ? 'primary' : activeColor)
                                 : inactiveColor
                         "
                         :custom-style="{
