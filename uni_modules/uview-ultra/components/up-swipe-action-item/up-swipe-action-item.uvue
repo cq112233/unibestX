@@ -2,27 +2,27 @@
 	<view class="up-swipe-action-item" ref="up-swipe-action-item">
 		<view class="up-swipe-action-item__right">
 			<slot name="button">
-				<view v-for="(item,index) in options as UPSwipeActionItemOption[]" :key="index" class="up-swipe-action-item__right__button"
+				<view v-for="(item,index) in options" :key="index" class="up-swipe-action-item__right__button"
 					:ref="`up-swipe-action-item__right__button-${index}`" :style="[{
-						alignItems: item.style != null && item.style.borderRadius != null ? 'center' : 'stretch'
+						alignItems: item['style'] != null && item['style']['borderRadius'] != null ? 'center' : 'stretch'
 					}]" @tap="buttonClickHandler(item, index)">
 					<view class="up-swipe-action-item__right__button__wrapper" :style="[{
-							backgroundColor: item.style != null && item.style.backgroundColor != null ? item.style.backgroundColor : '#C7C6CD',
-							borderRadius: item.style != null && item.style.borderRadius != null ? item.style.borderRadius : '0',
-							padding: item.style != null && item.style.borderRadius != null ? '0' : '0 15px',
-						}, item.style]">
-						<up-icon v-if="item.icon" :name="item.icon"
-							:color="item.style != null && item.style.color != null ? item.style.color : '#ffffff'"
-							:size="item.iconSize != null ? addUnit(item.iconSize.toString()) : item.style != null && item.style.fontSize != null ? parseFloat(getPx(item.style.fontSize.toString())) * 1.2 : 17"
+							backgroundColor: item['style'] != null && item['style']['backgroundColor'] != null ? item['style']['backgroundColor'] : '#C7C6CD',
+							borderRadius: item['style'] != null && item['style']['borderRadius'] != null ? item['style']['borderRadius'] : '0',
+							padding: item['style'] != null && item['style']['borderRadius'] != null ? '0' : '0 15px',
+						}, item['style']]">
+						<up-icon v-if="item['icon']" :name="item['icon']"
+							:color="item['style'] != null && item['style']['color'] != null ? item['style']['color'] : '#ffffff'"
+							:size="item['iconSize'] != null ? addUnit(item['iconSize']) : item['style'] != null && item['style']['fontSize'] != null ? addUnit(item['style']['fontSize']) : 17"
 							:customStyle="{
-								marginRight: item.text != null ? '2px' : 0
+								marginRight: item['text'] != null ? '2px' : 0
 							}"></up-icon>
-						<text v-if="item.text" class="up-swipe-action-item__right__button__wrapper__text up-line-1"
+						<text v-if="item['text']" class="up-swipe-action-item__right__button__wrapper__text up-line-1"
 							:style="[{
-								color: item.style != null && item.style.color != null ? item.style.color : '#ffffff',
-								fontSize: item.style != null && item.style.fontSize != null ? item.style.fontSize : '16px',
-								lineHeight: item.style != null && item.style.fontSize != null ? item.style.fontSize : '16px',
-							}]">{{ item.text }}</text>
+								color: item['style'] != null && item['style']['color'] != null ? item['style']['color'] : '#ffffff',
+								fontSize: item['style'] != null && item['style']['fontSize'] != null ? item['style']['fontSize'] : '16px',
+								lineHeight: item['style'] != null && item['style']['fontSize'] != null ? item['style']['fontSize'] : '16px',
+							}]">{{ item['text'] }}</text>
 					</view>
 				</view>
 			</slot>
@@ -172,7 +172,7 @@
 			},
 			// #endif
 			// 按钮被点击
-			buttonClickHandler(item: UPSwipeActionItemOption , index: number) {
+			buttonClickHandler(item: any, index: number) {
 				let ret = this.$emit('click', {
 					index,
 					name: this.name
