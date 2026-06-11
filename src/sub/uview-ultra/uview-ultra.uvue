@@ -698,6 +698,46 @@
 
       <up-divider text="导航组件结束"></up-divider>
 
+      <!-- ==================== 展示组件 ==================== -->
+      <text class="section-title">
+        展示组件
+      </text>
+
+      <!-- List 高性能列表 -->
+      <view class="demo-block">
+        <text class="demo-label">
+          up-list
+        </text>
+        <up-list
+          :height="300"
+          :lower-threshold="20"
+          :refresher-enabled="true"
+          :refresher-triggered="listRefreshing"
+          @scrolltolower="onListLoadMore"
+          @refresherrefresh="onListRefresh"
+        >
+          <view
+            v-for="(item, idx) in listItems"
+            :key="idx"
+            class="list-item"
+          >
+            <view class="list-item-avatar">
+              <up-icon name="account" size="20" color="#ffffff"></up-icon>
+            </view>
+            <view class="list-item-content">
+              <text class="text-14px font-500 text-[#303133]">{{ item['title'] as string }}</text>
+              <text class="text-12px text-[#909399] mt-4px">{{ item['desc'] as string }}</text>
+            </view>
+          </view>
+          <view v-if="listLoading" class="list-loading">
+            <up-loading-icon mode="circle" size="20"></up-loading-icon>
+            <text class="text-12px text-[#909399] ml-8px">加载中...</text>
+          </view>
+        </up-list>
+      </view>
+
+      <up-divider text="展示组件结束"></up-divider>
+
       <!-- 底部安全间距 -->
       <view class="h-40px"></view>
 
@@ -1167,6 +1207,46 @@ const subsectionList = ref(['待付款', '待发货', '待收货'] as string[])
 function onSubsectionChange(index: number) {
   subsectionCurrent.value = index
 }
+
+// ==================== 展示组件 ====================
+const listItems = ref([
+  { title: 'List 列表项 01', desc: '这是高性能列表的第一项' },
+  { title: 'List 列表项 02', desc: '支持下拉刷新和滚动加载更多' },
+  { title: 'List 列表项 03', desc: '基于 scroll-view 封装' },
+  { title: 'List 列表项 04', desc: '适用于长列表滚动场景' },
+  { title: 'List 列表项 05', desc: '内置 refresher 下拉刷新能力' },
+  { title: 'List 列表项 06', desc: '支持 scrolltolower 触底加载' },
+] as UTSJSONObject[])
+const listLoading = ref(false)
+const listRefreshing = ref(false)
+let listLoadCount = 1
+
+function onListLoadMore(): void {
+  if (listLoading.value) return
+  listLoading.value = true
+  setTimeout(() => {
+    listLoadCount += 1
+    const newItems: UTSJSONObject[] = []
+    for (let i = 1; i <= 3; i++) {
+      const idx = listItems.value.length + i
+      newItems.push({
+        title: `加载项 ${listLoadCount}-${i}`,
+        desc: `这是第 ${listLoadCount} 批加载的第 ${i} 条数据`
+      } as UTSJSONObject)
+    }
+    listItems.value = listItems.value.concat(newItems)
+    listLoading.value = false
+    uni.showToast({ title: `加载了 ${newItems.length} 条`, icon: 'none', duration: 1500 })
+  }, 1000)
+}
+
+function onListRefresh(): void {
+  listRefreshing.value = true
+  setTimeout(() => {
+    listRefreshing.value = false
+    uni.showToast({ title: '刷新完成', icon: 'none', duration: 1500 })
+  }, 1500)
+}
 </script>
 
 <style>
@@ -1238,5 +1318,39 @@ function onSubsectionChange(index: number) {
   padding: 16px;
   background-color: #ffffff;
   border-bottom: 1px solid #f0f0f0;
+}
+
+.list-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 16px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.list-item-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #3c9cff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+}
+
+.list-item-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.list-loading {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
 }
 </style>
