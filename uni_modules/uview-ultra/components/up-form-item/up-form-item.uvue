@@ -34,12 +34,17 @@
 								:custom-style="leftIconStyle"
 							></up-icon>
 						</view>
-						<text
+						<view
 							class="up-form-item__body__left__content__label"
-							:style="[parentData['labelStyle'], {
+							:style="{
 								justifyContent: parentData['labelAlign'] == 'left' ? 'flex-start' : parentData['labelAlign'] == 'center' ? 'center' : 'flex-end'
-							}]"
-						>{{ label }}</text>
+							}"
+						>
+							<text
+								class="up-form-item__body__left__content__label__text"
+								:style="parentData['labelStyle'] ?? {} as UTSJSONObject"
+							>{{ label }}</text>
+						</view>
 					</view>
 				</view>
 			</slot>
@@ -213,9 +218,9 @@
 	}
 	
 	// 监听规则的变化todo
-	watch((): Array<UTSJSONObject>|UTSJSONObject => props.rules, (newVal: Array<UTSJSONObject>|UTSJSONObject) => {
-		setRules(newVal);
-	}, { immediate: true })
+		watch((): any => props.rules, (newVal: any) => {
+			setRules(newVal as UTSJSONObject[]|UTSJSONObject);
+		}, { immediate: true })
 	
 	// 在组件挂载后初始化
 	onMounted(() => {
@@ -259,8 +264,6 @@
 <style lang="scss" scoped>
 	.up-form-item {
 		@include flex(column);
-		font-size: 14px;
-		color: $up-main-color;
 
 		&__body {
 			@include flex;
@@ -294,8 +297,11 @@
 						@include flex;
 						align-items: center;
 						flex: 1;
-						color: $up-main-color;
-						font-size: 15px;
+
+						&__text {
+							color: $up-main-color;
+							font-size: 15px;
+						}
 					}
 				}
 			}

@@ -191,7 +191,7 @@
 		methods: {
 			init() {
 				// #ifdef VUE3
-				this.currentValue = this.format(this.modelValue != null ? this.modelValue.toString() : '0')
+				this.currentValue = this.format(this.modelValue != null ? (this.modelValue as any).toString() : '0')
 				// #endif
 			},
 			// 按钮的样式
@@ -220,7 +220,7 @@
 				return (
 					this.disabled ||
 					this.disableMinus ||
-					parseFloat(this.currentValue.toString()) <= parseFloat(this.min.toString())
+					parseFloat((this.currentValue as any).toString()) <= parseFloat((this.min as any).toString())
 				)
 			},
 			// 格式化整理数据，限制范围

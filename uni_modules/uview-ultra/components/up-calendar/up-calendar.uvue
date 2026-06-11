@@ -397,7 +397,7 @@ export default {
 			return dayuts().format('YYYY-MM-DD')
 		},
 		todayText(): string {
-			return $t('up.calendar.today')
+			return $t('up.calendar.today', {} as UTSJSONObject)
 		},
 		todayDisabled(): boolean {
 			let today = dayuts(this.todayDate as any as string)
@@ -481,6 +481,7 @@ export default {
 			return addUnit(e)
 		},
 		getConfirmValue(selected: Array<string> | null = null): Array<string> {
+			// @ts-ignore
 			const sel = selected ?? (this.selected as Array<string>)
 			// @ts-ignore
 			if (this.mode == 'range' && this.rangeResultMode == 'boundary' && sel.length >= 2) {

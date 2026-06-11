@@ -309,7 +309,7 @@
 										console.log('rule-errors', childProps['prop']!.toString(), errors)
 										finishRule(errors)
 									}
-								) as UTSPromise<any>
+								) as Promise<any>
 								validateRet.then((res: any): void => {
 									finishRule([])
 								}, (err: any): void => {
@@ -376,14 +376,15 @@
 			// 获取所有form-item的prop，交给validateField方法进行校验
 			const formItemProps: string[] = children.value.map(
 				(item: ComponentPublicInstance): string => {
-					return (item.$callMethod('getProps') as UTSJSONObject)!['prop'].toString()
+					const props = item.$callMethod('getProps') as UTSJSONObject
+					return props != null ? (props['prop'] as any).toString() : ''
 				}
 			);
 			console.log('formItemProps', formItemProps)
 			let func = function(errors: UTSJSONObject[]): void {
 				if(errors.length > 0) {
 					// 如果错误提示方式为toast，则进行提示
-					if(props.errorType == 'toast') toast(errors[0]['message'].toString())
+					if(props.errorType == 'toast' && errors[0] != null) toast((errors[0]['message'] as any).toString())
 					console.log('errors', errors.length)
 					reject(errors)
 				} else {

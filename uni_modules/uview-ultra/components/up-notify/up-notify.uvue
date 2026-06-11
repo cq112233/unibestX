@@ -185,11 +185,12 @@
 			},
 			show(options: UTSJSONObject) {
 				// 不将结果合并到this.config变量，避免多次调用up-toast，前后的配置造成混乱
+				// @ts-ignore
 				this.tmpConfig = deepMerge(this.config, options)
 				// 任何定时器初始化之前，都要执行清除操作，否则可能会造成混乱
 				this.clearTimer()
 				this.open = true
-				if (parseInt(this.tmpConfig['duration'].toString()) > 0) {
+				if (parseInt((this.tmpConfig['duration'] as any).toString()) > 0) {
 					this.timer = setTimeout(() => {
 						this.open = false
 						// 倒计时结束，清除定时器，隐藏toast组件
@@ -199,7 +200,7 @@
 						if (typeof complete === 'function') {
 							;(complete as () => void)()
 						}
-					}, parseInt(this.tmpConfig['duration'].toString()))
+					}, parseInt((this.tmpConfig['duration'] as any).toString()))
 				}
 			},
 			// 关闭notify
