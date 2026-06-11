@@ -33,6 +33,7 @@
 </template>
 
 <script>
+	import { useAppStore } from '@/src/store';
 	import { mpMixin } from '../../libs/mixin/mpMixin';
 	import { mixin } from '../../libs/mixin/mixin';
 	import { addUnit, deepClone, toast, sleep, getWindowInfo } from '../../libs/function/index';
@@ -168,6 +169,17 @@
 			}
 		},
 		computed: {
+			elColor(): string {
+				if (this.color == '#3c9cff') {
+					try {
+						const appStore = useAppStore()
+						return appStore.state.theme
+					} catch (e) {
+						return '#3c9cff'
+					}
+				}
+				return this.color
+			},
 			// 多个条件的变化，会引起选中日期的变化，这里统一管理监听
 			selectedChange(): any {
 				return [this.minDate, this.maxDate, this.defaultDate]
@@ -198,10 +210,10 @@
 					// 判断date是否在selected数组中，因为月份可能会需要补0，所以使用dateSame判断，而不用数组的includes判断
 					const sameDate = (element: string): boolean => this.dateSame(element, date)
 					if (this.selected.some(sameDate)) {
-						style['backgroundColor'] = this.color
+						style['backgroundColor'] = this.elColor
 					}
 					if (this.todayDate != '' && this.dateSame(date, this.todayDate) && !this.selected.some(sameDate)) {
-						style['border'] = `1px solid ${this.color}`
+						style['border'] = `1px solid ${this.elColor}`
 						style['boxSizing'] = 'border-box'
 					}
 					if (this.mode == 'single') {
@@ -217,7 +229,7 @@
 								style['borderTopLeftRadius'] = '3px'
 								style['borderBottomLeftRadius'] = '3px'
 							}
-							// 最后一个日期设置右上角和右下角的圆角
+							// 最后一个日期设置右上角 and 右下角的圆角
 							if (this.dateSame(date, this.selected[len])) {
 								style['borderTopRightRadius'] = '3px'
 								style['borderBottomRightRadius'] = '3px'
@@ -225,7 +237,7 @@
 							// 处于第一和最后一个之间的日期，背景色设置为浅色，通过将对应颜色进行等分，再取其尾部的颜色值
 							if (dayuts(date).isAfter(dayuts(this.selected[0])) && dayuts(date).isBefore(dayuts(this
 									.selected[len]))) {
-								style['backgroundColor'] = colorGradient(this.color, '#ffffff', 100)[90]
+								style['backgroundColor'] = colorGradient(this.elColor, '#ffffff', 100)[90]
 								// 增加一个透明度，让范围区间的背景色也能看到底部的mark水印字符
 								style['opacity'] = 0.7
 							}
@@ -259,7 +271,7 @@
 						// 如果是范围选择模式，第一个和最后一个之间的日期，文字颜色设置为高亮的主题色
 						if (dayuts(date).isAfter(dayuts(this.selected[0])) && dayuts(date).isBefore(dayuts(this
 								.selected[len]))) {
-							style['color'] = this.color
+							style['color'] = this.elColor
 						}
 					}
 					return style
