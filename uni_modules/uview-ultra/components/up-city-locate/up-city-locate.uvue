@@ -14,9 +14,7 @@
 				<up-index-anchor :text="getIndexText(index)"></up-index-anchor>
 				<!-- #endif -->
 				<up-index-item>
-					<!-- #ifndef APP-NVUE -->
 					<up-index-anchor :text="getIndexText(index)"></up-index-anchor>
-					<!-- #endif -->
 					<view class="hot-city-list" v-if="index == 0">
 						<view class="" v-for="(item1, index1) in getCityGroup(item)" :key="index1" @tap="selectedCity(item1)">
 							<view class="hot-city-item">{{ getCityName(item1) }}</view>

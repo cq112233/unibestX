@@ -11,6 +11,28 @@
     <scroll-view direction="vertical" class="flex-1 h-0px">
       <ThemeSwitchCard />
 
+      <!-- SwipeAction 滑动操作 -->
+      <view class="demo-block">
+        <text class="demo-label">
+          up-swipe-action
+        </text>
+        <up-swipe-action :auto-close="true">
+          <up-swipe-action-item
+            v-for="(item, idx) in swipeActionList"
+            :key="item.id as string"
+            :options="swipeActionOptions"
+            :name="idx"
+            :close-on-click="true"
+            @click="onSwipeActionClick"
+          >
+            <view class="swipe-action-content">
+              <text class="text-14px text-[#303133]">{{ item.title as string }}</text>
+            </view>
+          </up-swipe-action-item>
+        </up-swipe-action>
+      </view>
+
+
       <!-- Swiper 轮播图 -->
       <up-swiper
         :list="swiperList"
@@ -617,27 +639,6 @@
           up-no-network
         </text>
         <text class="text-12px text-[#909399]">引入即自动监听网络状态，断网时全屏展示遮罩提示。</text>
-      </view>
-
-      <!-- SwipeAction 滑动操作 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-swipe-action
-        </text>
-        <up-swipe-action :auto-close="true">
-          <up-swipe-action-item
-            v-for="(item, idx) in swipeActionList"
-            :key="item.id as string"
-            :options="swipeActionOptions"
-            :name="idx"
-            :close-on-click="true"
-            @click="onSwipeActionClick"
-          >
-            <view class="swipe-action-content">
-              <text class="text-14px text-[#303133]">{{ item.title as string }}</text>
-            </view>
-          </up-swipe-action-item>
-        </up-swipe-action>
       </view>
 
       <up-divider text="反馈组件结束"></up-divider>

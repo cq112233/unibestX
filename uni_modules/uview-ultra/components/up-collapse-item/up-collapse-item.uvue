@@ -162,7 +162,6 @@
 		height.value = expanded.value ? (rect.height == null ? 0 : rect.height) : 0
 		animating.value = true
 	
-		// #ifndef APP-NVUE
 		// const animation = uni.createAnimation({
 		// 	timingFunction: 'ease-in-out',
 		// });
@@ -177,7 +176,6 @@
 		// 标识动画结束
 		await sleep(parseInt(props.duration.toString()))
 		animating.value = false
-		// #endif
 	}
 	
 	// 初始化数据

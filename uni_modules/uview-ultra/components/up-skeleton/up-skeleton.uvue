@@ -160,9 +160,7 @@
 			async getComponentWidth() {
 				// 延时一定时间，以获取dom尺寸
 				await sleep(20)
-				// #ifndef APP-NVUE
 				// 这里需要模拟 $uGetRect 方法
-				// #endif
 			}
 		}
 	}
@@ -179,10 +177,8 @@
 			@include flex(row);
 			
 			&__avatar {
-				/* #ifndef APP-NVUE */
 				@include background;
 				// background-size: 400% 100%;
-				/* #endif */
 				margin-right: 15px;
 			
 				&--circle {
@@ -199,17 +195,14 @@
 			
 				&__rows,
 				&__title {
-					/* #ifndef APP-NVUE */
 					@include background;
 					// background-size: 400% 100%;
-					/* #endif */
 					border-radius: 3px;
 				}
 			}
 		}
 	}
 
-	/* #ifndef APP-NVUE */
 	// .animate {
 	// 	animation: skeleton 1.8s ease infinite
 	// }
@@ -224,5 +217,4 @@
 	// 	}
 	// }
 
-	/* #endif */
 </style>

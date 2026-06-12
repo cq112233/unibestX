@@ -81,7 +81,6 @@
 			parent.value.$callMethod('addAnchors', instance)
 		}
 		const indexListItem = getParentFunc('up-index-item', instance)
-		// // #ifndef APP-NVUE
 		// // 只有在非nvue下，up-index-anchor才是嵌套在u-index-item中的
 		if (indexListItem == null) {
 			return error('up-index-anchor必须要搭配up-index-item组件使用')
@@ -95,7 +94,6 @@
 		// } else {
 			// indexListItem.$callMethod('setId', props.text['name'].toString().charCodeAt(0).toString())
 		// }
-		// #endif
 	}
 	
 	onMounted(() => {

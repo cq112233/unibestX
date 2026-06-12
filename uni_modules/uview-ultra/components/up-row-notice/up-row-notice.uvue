@@ -211,9 +211,7 @@
 	}
 	
 	watch(():string => props.text, (newValue: string) => {
-		// #ifndef APP-NVUE
 		startScroll();
-		// #endif
 		
 		if(!testString(newValue)) {
 			error('noticebar组件direction为row时，要求text参数为字符串形式')
@@ -221,15 +219,11 @@
 	}, {immediate: true})
 	
 	watch((): string|number => props.fontSize, () => {
-		// #ifndef APP-NVUE
 		startScroll();
-		// #endif
 	})
 	
 	watch((): string|number => props.speed, () => {
-		// #ifndef APP-NVUE
 		startScroll();
-		// #endif
 	})
 	
 	onMounted(() => {
@@ -249,9 +243,7 @@
 		})
 		// #endif
 
-		// #ifndef APP-NVUE
 		startScroll();
-		// #endif
 
 		if(!testString(props.text)) {
 			error('noticebar组件direction为row时，要求text参数为字符串形式')
