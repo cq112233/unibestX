@@ -10,6 +10,20 @@
 
     <scroll-view direction="vertical" class="flex-1 h-0px">
       <ThemeSwitchCard />
+
+      <!-- Swiper 轮播图 -->
+      <up-swiper
+        :list="swiperList"
+        key-name="image"
+        :indicator="true"
+        indicator-mode="dot"
+        :circular="true"
+        :autoplay="true"
+        :interval="3000"
+        height="180"
+        :show-title="true"
+      ></up-swiper>
+
       <!-- ==================== 基础组件 ==================== -->
       <text class="section-title">
         基础组件
@@ -287,7 +301,7 @@
             </view>
           </up-form-item>
           <up-form-item label="年龄" prop="age" :border-bottom="true">
-            <up-input v-model="formModel.age" type="number" placeholder="请输入年龄" border="none" :custom-style="{backgroundColor: '#f2f3f5', padding: '4px 10px', borderRadius: '4px', width: '100%'}"></up-input>
+            <up-input v-model="formModel.age" type="number" placeholder="请输入年龄" border="none" :custom-style="{ backgroundColor: '#f2f3f5', padding: '4px 10px', borderRadius: '4px', width: '100%' }"></up-input>
           </up-form-item>
           <up-form-item label="水果" prop="fruit" :border-bottom="true">
             <up-radio-group v-model="formModel.fruit" placement="row">
@@ -315,7 +329,7 @@
           <up-form-item label="验证码" prop="code" :border-bottom="true">
             <view class="flex-row items-center justify-between w-full">
               <up-input v-model="formModel.code" placeholder="请填写验证码" border="none" class="flex-1"></up-input>
-              <up-button type="success" text="获取验证码" size="mini" :custom-style="{backgroundColor: '#4cd964', border: 'none', color: '#fff', marginLeft: '10px'}"></up-button>
+              <up-button type="success" text="获取验证码" size="mini" :custom-style="{ backgroundColor: '#4cd964', border: 'none', color: '#fff', marginLeft: '10px' }"></up-button>
             </view>
           </up-form-item>
           <up-form-item label="生日" prop="birthday" :border-bottom="true" @click="datetimePickerShow = true">
@@ -597,6 +611,14 @@
         </view>
       </view>
 
+      <!-- NoNetwork 无网络提示 -->
+      <view class="demo-block">
+        <text class="demo-label">
+          up-no-network
+        </text>
+        <text class="text-12px text-[#909399]">引入即自动监听网络状态，断网时全屏展示遮罩提示。</text>
+      </view>
+
       <!-- SwipeAction 滑动操作 -->
       <view class="demo-block">
         <text class="demo-label">
@@ -605,14 +627,14 @@
         <up-swipe-action :auto-close="true">
           <up-swipe-action-item
             v-for="(item, idx) in swipeActionList"
-            :key="item['id'] as string"
+            :key="item.id as string"
             :options="swipeActionOptions"
             :name="idx"
             :close-on-click="true"
             @click="onSwipeActionClick"
           >
             <view class="swipe-action-content">
-              <text class="text-14px text-[#303133]">{{ item['title'] as string }}</text>
+              <text class="text-14px text-[#303133]">{{ item.title as string }}</text>
             </view>
           </up-swipe-action-item>
         </up-swipe-action>
@@ -794,8 +816,8 @@
               <up-icon name="account" size="20" color="#ffffff"></up-icon>
             </view>
             <view class="demo-list-cell-content">
-              <text class="text-14px font-500 text-[#303133]">{{ item['title'] as string }}</text>
-              <text class="text-12px text-[#909399] mt-4px">{{ item['desc'] as string }}</text>
+              <text class="text-14px font-500 text-[#303133]">{{ item.title as string }}</text>
+              <text class="text-12px text-[#909399] mt-4px">{{ item.desc as string }}</text>
             </view>
           </view>
           <view v-if="listLoading" class="list-loading">
@@ -809,6 +831,9 @@
 
       <!-- 底部安全间距 -->
       <view class="h-40px"></view>
+
+      <!-- NoNetwork 无网络组件 -->
+      <up-no-network></up-no-network>
 
       <!-- Overlay 遮罩层 -->
       <up-overlay :show="overlayShow" :opacity="overlayOpacity" @click="overlayShow = false">
@@ -904,6 +929,13 @@
 <script setup lang="uts">
 import { reactive, ref } from 'vue'
 import ThemeSwitchCard from '@/src/pages/basic/components/ThemeSwitchCard.uvue'
+
+// ==================== Swiper 轮播图 ====================
+const swiperList = ref([
+  { image: '/static/logo.png', title: 'uview-ultra 组件演示' },
+  { image: '/static/logo.png', title: '高品质 UI 组件库' },
+  { image: '/static/logo.png', title: '多端适配 · 开箱即用' },
+] as UTSJSONObject[])
 
 // ==================== 基础组件 ====================
 const showTag = ref(true)
@@ -1029,7 +1061,7 @@ const genderActions = ref([
 ] as UTSJSONObject[])
 
 function onGenderSelect(item: UTSJSONObject) {
-  formModel.gender = item.getString('name') ?? ""
+  formModel.gender = item.getString('name') ?? ''
   genderActionShow.value = false
 }
 
@@ -1041,7 +1073,8 @@ function onCalendarConfirm(dates: string[]) {
     calendarValue.value = dates[0]
     if (dates.length > 1) {
       formModel.stayTime = `${dates[0]} 至 ${dates[dates.length - 1]}`
-    } else {
+    }
+    else {
       formModel.stayTime = dates[0]
     }
   }
@@ -1244,18 +1277,19 @@ const swipeActionOptions = ref([
 
 function onSwipeActionClick(e: UTSJSONObject): void {
   // eslint-disable-next-line dot-notation
-  const btnIndex = e['index'] as number       // 按钮在 options 中的索引
+  const btnIndex = e['index'] as number // 按钮在 options 中的索引
   // eslint-disable-next-line dot-notation
-  const listIndex = e['name'] as number        // 列表项索引 (name prop)
+  const listIndex = e['name'] as number // 列表项索引 (name prop)
   const item = swipeActionList.value[listIndex]
   const btn = swipeActionOptions.value[btnIndex]
   if (btn != null && item != null) {
-    const action = btn['text'] as string
-    const title = item['title'] as string
+    const action = btn.text as string
+    const title = item.title as string
     if (action === '删除') {
       swipeActionList.value.splice(listIndex, 1)
       uni.showToast({ title: `已删除: ${title}`, icon: 'none' })
-    } else {
+    }
+    else {
       uni.showToast({ title: `点击了「${action}」: ${title}`, icon: 'none' })
     }
   }
@@ -1312,7 +1346,8 @@ const listRefreshing = ref(false)
 let listLoadCount = 1
 
 function onListLoadMore(): void {
-  if (listLoading.value) return
+  if (listLoading.value)
+    return
   listLoading.value = true
   setTimeout(() => {
     listLoadCount += 1
@@ -1321,7 +1356,7 @@ function onListLoadMore(): void {
       const idx = listItems.value.length + i
       newItems.push({
         title: `加载项 ${listLoadCount}-${i}`,
-        desc: `这是第 ${listLoadCount} 批加载的第 ${i} 条数据`
+        desc: `这是第 ${listLoadCount} 批加载的第 ${i} 条数据`,
       } as UTSJSONObject)
     }
     listItems.value = listItems.value.concat(newItems)
