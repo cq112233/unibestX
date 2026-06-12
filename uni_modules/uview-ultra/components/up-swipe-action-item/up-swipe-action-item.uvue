@@ -115,7 +115,9 @@
 		},
 		mounted() {
 			this.init()
-			this.getBtnWidth()
+			sleep(100).then(() => {
+				this.getBtnWidth()
+			})
 		},
 		beforeUnmount() {
 			this.closeHandler()
@@ -150,8 +152,26 @@
 			getButtonStyle(item: UTSJSONObject): any {
 				const style = this.getOptionStyle(item)
 				const hasBorderRadius = style != null && style['borderRadius'] != null
+				
+				// 计算明确的宽度，防止在鸿蒙等平台上因弹性计算折叠
+				let widthStr = '80px'
+				if (style != null && style['width'] != null) {
+					widthStr = style['width'] as string
+				} else {
+					let baseWidth = 30 // padding
+					if (item['text'] != null) {
+						baseWidth += (item['text'] as string).length * 15
+					}
+					if (item['icon'] != null) {
+						baseWidth += 20
+					}
+					widthStr = Math.max(80, baseWidth) + 'px'
+				}
+				
 				return {
-					alignItems: hasBorderRadius ? 'center' : 'stretch'
+					alignItems: hasBorderRadius ? 'center' : 'stretch',
+					width: widthStr,
+					flexShrink: 0
 				}
 			},
 			// 内层 wrapper 样式
@@ -162,6 +182,8 @@
 					backgroundColor: style != null && style['backgroundColor'] != null ? style['backgroundColor'] as string : '#C7C6CD',
 					borderRadius: hasBorderRadius ? style!['borderRadius'] as string : '0',
 					padding: hasBorderRadius ? '0' : '0 15px',
+					width: '100%',
+					height: '100%'
 				} as UTSJSONObject
 				// 合并原始 style 属性
 				if (style != null) {
@@ -258,6 +280,9 @@
 				var touches = event.touches
 				this.state['startX'] = touches[0].pageX
 				this.state['startY'] = touches[0].pageY
+				
+				// 每次触碰时重新获取按钮宽度，确保边界值完全正确
+				this.getBtnWidth()
 				
 				// 关闭其它
 				if (this.parent != null) {
@@ -396,12 +421,15 @@
 	.up-swipe-action-item {
 		position: relative;
 		overflow: hidden;
+		display: flex;
+		flex-direction: column;
 
 		&__content {
             transform: translateX(0px); // 修复某些情况下默认右侧按钮是展开的问题
 			background-color: #FFFFFF;
 			z-index: 10;
 			width: 100%;
+			flex: 1;
 		}
 
 		&__right {
