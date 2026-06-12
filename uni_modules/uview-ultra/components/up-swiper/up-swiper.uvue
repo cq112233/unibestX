@@ -153,14 +153,12 @@
 			},
 			itemStyle(index: number): any {
 				const style = {}
-				// #ifndef APP-NVUE || MP-TOUTIAO
 				// 左右流出空间的写法不支持nvue和头条
 				// 只有配置了此二值，才加上对应的圆角，以及缩放
 				if (this.nextMargin != '' && this.previousMargin != '') {
 					style['borderRadius'] = addUnit(this.radius)
 					if (index !== this.currentIndex) style['transform'] = 'scale(0.92)'
 				}
-				// #endif
 				return style
 			},
 			testObject(e: any|null): boolean {

@@ -38,7 +38,6 @@
 
 		},
 		watch: {
-			// #ifndef APP-NVUE
 			// 'uList.innerScrollTop'(n) {
 			// 	const preLoadScreen = this.uList.preLoadScreen
 			// 	const windowHeight = this.sys.windowHeight
@@ -48,7 +47,6 @@
 			// 		this.parent.updateOffsetFromChild(this.rect.top)
 			// 	}
 			// }
-			// #endif
 		},
 		created() {
 		},
@@ -91,7 +89,6 @@
 							this.rect = size
 							const preLoadScreen = parseFloat(parentIns.$props['preLoadScreen'] != null ? parentIns.$props['preLoadScreen'].toString() : '0')
 							const windowHeight = this.sys.windowHeight
-							// #ifndef APP-NVUE
 							if (lastChild != null) {
 								this.rect.top = ((lastChild.$data['rect']as NodeInfo).top ?? 0)
 									+ ((lastChild.$data['rect'] as NodeInfo).height ?? 0)
@@ -101,7 +98,6 @@
 								this.show = false
 							}
 						}
-						// #endif
 					} else {
 						console.log('index == 0')
 					}

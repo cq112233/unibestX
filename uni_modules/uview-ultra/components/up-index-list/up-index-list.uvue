@@ -457,11 +457,9 @@
 			// #endif
 			return child
 		})
-		// #ifndef APP-NVUE
 		// 非nvue通过detail获取滚动条位移
 		scrollTopNum = e.detail.scrollTop
 		// console.log('scrollTop', scrollTopNum, this.customNavHeight)
-		// #endif
 		// 在弹窗中需要加上弹窗距离顶部的高度topOffset
 		scrollTopNum = scrollTopNum + parseInt(getPx(props.customNavHeight))
 		for (let i = 0; i < len; i++) {

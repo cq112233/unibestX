@@ -113,14 +113,12 @@ export default {
             style['width'] = `${this.itemRect['width']}px`;
             style['height'] = `${this.itemRect['height']}px`;
 			// 通过translateX移动滑块，其移动的距离为索引*item的宽度
-			// #ifndef APP-NVUE
 			if (this.itemRect.width != null) {
 				style.transform = `translateX(${
 					// @ts-ignore
 				    this.innerCurrent * (this.itemRect['width'] as Number)
 				}px)`;
 			}
-			// #endif
             if (this.mode === "subsection") {
                 // 在subsection模式下，需要动态设置滑块的圆角，因为移动滑块使用的是translateX，无法通过父元素设置overflow: hidden隐藏滑块的直角
                 style['backgroundColor'] = this.activeColor;
@@ -208,13 +206,11 @@ export default {
 		},
         // 获取组件的尺寸
         getRect() {
-            // #ifndef APP-NVUE
 			// @ts-ignore
             this.upGetRect(".up-subsection__item--0", false).then((res) => {
 				let size = res as NodeInfo;
                 this.itemRect = size;
             });
-            // #endif
         },
 	        clickHandler(index: number) {
 				if (this.disabled) return
@@ -232,10 +228,8 @@ export default {
     @include flex;
     position: relative;
     overflow: hidden;
-	/* #ifndef APP-NVUE */
 	width: 100%;
 	box-sizing: border-box;
-	/* #endif */
 
     &--button {
         height: 34px;
@@ -256,11 +250,9 @@ export default {
 
     &__bar {
         position: absolute;
-        /* #ifndef APP-NVUE */
         transition-property: transform, color;
         transition-duration: 0.3s;
         transition-timing-function: ease-in-out;
-        /* #endif */
 
         &--first {
             border-top-left-radius: 4px;

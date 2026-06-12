@@ -18,7 +18,7 @@
 			</slot>
 		</view>
 		<view class="up-swipe-action-item__content" @click="clickHandler" @touchstart="touchstart" @touchmove="touchmove"
-			@touchend="touchend" :style="sliderStyle">
+			@touchend="touchend" @touchcancel="touchcancel" :style="sliderStyle">
 			<slot></slot>
 		</view>
 	</view>
@@ -53,9 +53,7 @@
 		mixins: [
 			mpMixin,
 			mixin,
-			// #ifndef APP-NVUE
 			touchMixin,
-			// #endif
 			propsSwipeActionItem
 		],
 		data() {
@@ -79,14 +77,9 @@
 		},
 		watch: {
 			// 由于wxs无法直接读取外部的值，需要在外部值变化时，重新执行赋值逻辑
-			// #ifndef APP-NVUE
 			// wxsInit(newValue, oldValue) {
 			// 	this.queryRect()
 			// },
-			// #endif
-			status(newValue) {
-				
-			},
 			show(newValue) {
 				if (newValue) {
 					this.status = 'open'
@@ -94,7 +87,7 @@
 					this.status = 'close'
 				}
 			},
-			status(newValue: string) {
+			status(newValue: string, oldValue: string) {
 				if (newValue === 'open') {
 					this.$emit('update:show', true)
 					if (this.parent != null) {
@@ -105,9 +98,9 @@
 				}
 				if (this.disabled) return
 				// 打开或关闭单元格
-				if (newValue === 'close' && this.status === 'open') {
+				if (newValue === 'close' && oldValue === 'open') {
 					this.closeSwipeAction()
-				} else if(newValue === 'open' && this.status === 'close') {
+				} else if(newValue === 'open' && oldValue === 'close') {
 					this.openSwipeAction()
 				}
 			},
@@ -124,7 +117,7 @@
 			this.init()
 			this.getBtnWidth()
 		},
-		beforeUmount() {
+		beforeUnmount() {
 			this.closeHandler()
 		},
 		methods: {
@@ -207,17 +200,14 @@
 			init() {
 				// 初始化父组件数据
 				this.updateParentData()
-				// #ifndef APP-NVUE
 				sleep().then(() => {
 					this.queryRect()
 				})
-				// #endif
 			},
 			updateParentData() {
 				// 此方法在mixin中
 				this.getParentData('up-swipe-action')
 			},
-			// #ifndef APP-NVUE
 			// 查询节点
 			queryRect() {
 				// this.upGetRects('.up-swipe-action-item__right__button').then(buttons => {
@@ -230,7 +220,6 @@
 				// 	}
 				// })
 			},
-			// #endif
 			// 按钮被点击
 			buttonClickHandler(item: any, index: number) {
 				let ret = this.$emit('click', {
@@ -344,6 +333,15 @@
 					}
 				}
 			},
+			touchcancel(event: UniTouchEvent) {
+				if (this.state['moving'] == false || this.disabled) return
+				this.state['moving'] = false
+				if (this.status === 'open') {
+					this.openSwipeAction()
+				} else {
+					this.closeSwipeAction()
+				}
+			},
 			// 一次性展开滑动菜单
 			openSwipeAction() {
 				// 处理duration单位问题
@@ -398,14 +396,12 @@
 	.up-swipe-action-item {
 		position: relative;
 		overflow: hidden;
-		/* #ifndef APP-NVUE || MP-WEIXIN */
-		touch-action: pan-y;
-		/* #endif */
 
 		&__content {
             transform: translateX(0px); // 修复某些情况下默认右侧按钮是展开的问题
 			background-color: #FFFFFF;
 			z-index: 10;
+			width: 100%;
 		}
 
 		&__right {
@@ -414,6 +410,7 @@
 			bottom: 0;
 			right: 0;
 			@include flex;
+			z-index: 1;
 
 			&__button {
 				@include flex;

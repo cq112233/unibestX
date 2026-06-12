@@ -140,7 +140,6 @@ export default {
 		init() {
 			this.getComponentWidth()
 		},
-		// #ifndef APP-NVUE || MP-WEIXIN || H5 || APP-VUE || MP-QQ
 		// scroll-view触发滚动事件
 		scrollHandler(e: UniScrollEvent) {
 			this.scrollInfo['scrollLeft'] = e.detail.scrollLeft
@@ -157,7 +156,6 @@ export default {
 			this.scrollInfo['scrollLeft'] = parseFloat(getPx(this.indicatorWidth.toString()))
 				- parseFloat(getPx(this.indicatorBarWidth))
 		},
-		// #endif
 		//
 		scrollEvent(status: string) {
 			// @ts-ignore

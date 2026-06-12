@@ -300,9 +300,7 @@
 				this.status = 'start';
 
 				let clientX = 0;
-				// #ifndef APP-NVUE
 				clientX = touches.clientX;
-				// #endif
 				// #ifdef APP-NVUE
 				clientX = touches.screenX;
 				// #endif
@@ -326,9 +324,7 @@
 				// console.log('touchs', touches)
 				// 滑块的左边不一定跟屏幕左边接壤，所以需要减去最外层父元素的左边值
 				let clientX = 0;
-				// #ifndef APP-NVUE
 				clientX = touches.clientX;
-				// #endif
 				// #ifdef APP-NVUE
 				clientX = touches.screenX;
 				// #endif
@@ -374,13 +370,11 @@
 				if (this.disabled) return;
 				// 直接点击滑块的情况，计算方式与onTouchMove方法相同
 				// console.log('click', event)
-				// #ifndef APP-NVUE
 				// nvue下暂时无法获取坐标
 				let clientX = event.x - this.sliderRect.left
 				// @ts-ignore
 				this.newValue = ((clientX / this.sliderRect.width) * (parseFloat(this.max.toString()) - parseFloat(this.min.toString()))) + parseFloat(this.min.toString());
 				this.updateValue(this.newValue, false, 1);
-				// #endif
 			},
 			updateValue(value: number, drag: boolean, index = 1): Array<number> | number {
 				// 去掉小数部分，同时也是对step步进的处理
@@ -512,7 +506,6 @@
 			background-color: #ebedf0;
 		}
 
-		/* #ifndef APP-NVUE */
 		&-inner:before {
 			position: absolute;
 			right: 0;
@@ -523,7 +516,6 @@
 			bottom: -8px;
 			z-index: -1;
 		}
-		/* #endif */
 
 		&__gap {
 			position: relative;
