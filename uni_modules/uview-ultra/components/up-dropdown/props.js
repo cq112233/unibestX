@@ -1,11 +1,12 @@
 import { defineMixin } from '../../libs/vue'
 import defProps from '../../libs/config/props.js'
+import config from '../../libs/config/config'
 export const props = defineMixin({
     props: {
         // 菜单标题和选项的激活态颜色
         activeColor: {
             type: String,
-            default: '#2979ff'
+            default: config.color['up-primary']
         },
         // 菜单标题和选项的未激活态颜色
         inactiveColor: {

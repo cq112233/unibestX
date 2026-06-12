@@ -72,11 +72,14 @@
 	const clickHandler = () => {
 		let name = props.name;
 		// 如果没有设置name属性，历遍父组件的children数组，判断当前的元素是否和本实例this相等，找出当前组件的索引
-		// @ts-ignore
-		const children: ComponentPublicInstance[] = parent.value?.$data['children'] as ComponentPublicInstance[];
+		let children = parent.value?.$callMethod('getChildren') as ComponentPublicInstance[] | null;
+		if (children == null) {
+			children = parent.value?.$data['children'] as ComponentPublicInstance[] | null;
+		}
+		const finalChildren = children != null ? children : ([] as ComponentPublicInstance[]);
 		if(props.name === null) {
 			// @ts-ignore
-			name = children.findIndex((child: ComponentPublicInstance) => child === instance);
+			name = finalChildren.findIndex((child: ComponentPublicInstance) => child === instance);
 		}
 		// 调用父组件方法，发出事件
 		// @ts-ignore

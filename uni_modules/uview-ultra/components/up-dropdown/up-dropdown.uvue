@@ -9,16 +9,15 @@
 		}">
 			<view class="up-dropdown__menu__item" v-for="(item, index) in menuList" :key="index" @tap.stop="menuClick(index)">
 				<view class="up-flex up-flex-row">
-					<text class="up-dropdown__menu__item__text" :style="{
-						color: item.disabled ? '#c0c4cc' : (index === current || highlightIndexList.includes(index)) ? props.activeColor : props.inactiveColor,
-						fontSize: $up.addUnit(props.titleSize)
-					}">{{item['title']}}</text>
+					<text class="up-dropdown__menu__item__text" :class="{
+						'up-dropdown__menu__item__text--active': (index == current || highlightIndexList.includes(index)) && props.activeColor == '#2979ff'
+					}" :style="[getContentTextStyle(item, index)]">{{item['title']}}</text>
 					<view class="up-dropdown__menu__item__arrow" :class="{
-						'up-dropdown__menu__item__arrow--rotate': index === current
+						'up-dropdown__menu__item__arrow--rotate': index == current
 					}">
 						<up-icon :custom-style="{display: 'flex'}" :name="props.menuIcon"
 							:size="$up.addUnit(props.menuIconSize)"
-							:color="index === current || highlightIndexList.includes(index) ? props.activeColor : '#c0c4cc'"></up-icon>
+							:color="index == current || highlightIndexList.includes(index) ? (props.activeColor == '#2979ff' ? 'primary' : props.activeColor) : '#c0c4cc'"></up-icon>
 					</view>
 				</view>
 			</view>
@@ -128,11 +127,17 @@
 	const highlightIndexList = ref([] as Array<number>)
 	const contentHeight = ref(0 as number)
 	
+	watch(contentHeight, (newVal: number) => {
+		if (active.value) {
+			contentStyle.value['height'] = newVal + 'px'
+		}
+	})
+	
 	// 下拉出来部分的样式
 	const popupStyle = computed(() => {
 		let style = {}
 		// 进行Y轴位移，展开状态时，恢复原位。收齐状态时，往上位移100%，进行隐藏
-		style['transform'] = `translateY(${active.value ? 0 : '-100%'})`
+		style['transform'] = `translateY(${active.value ? '0%' : '-100%'})`
 		// @ts-ignore
 		style['transition-duration'] = parseInt(props.duration.toString()) / 1000 + 's'
 		style['borderRadius'] = `0 0 ${addUnit(props.borderRadius)} ${addUnit(props.borderRadius)}`
@@ -176,14 +181,15 @@
 	
 	// 打开下拉菜单
 	function open(index: number) {
-		// 嵌套popup使用时可能获取不到正确的高度，重新计算
-		if (contentHeight.value < 1) getContentHeight();
+		// 每次打开重新获取高度，确保尺寸始终准确
+		getContentHeight();
 		// 重置高亮索引，否则会造成多个菜单同时高亮
 		// highlightIndex = 9999;
 		// 展开时，设置下拉内容的样式
 		contentStyle.value = {
 			zIndex: 11,
-			height: contentHeight.value + 'px'
+			height: contentHeight.value + 'px',
+			opacity: 1
 		};
 		// 标记展开状态以及当前展开项的索引
 		active.value = true;
@@ -221,12 +227,12 @@
 		// 判断是否被禁用
 		if (menuList.value[index].disabled) return;
 		// 如果点击时的索引和当前激活项索引相同，意味着点击了激活项，需要收起下拉菜单
-		if (index === current.value && props.closeOnClickSelf) {
+		if (index == current.value && props.closeOnClickSelf) {
 			close();
 			// 等动画结束后，再移除下拉菜单中的内容，否则直接移除，也就没有下拉菜单收起的效果了
 			setTimeout(() => {
 				if (children.value != null && children.value[index] != null) {
-					children.value[index].$data['active'] = false;
+					children.value[index].$callMethod('setActive', false);
 				}
 			}, parseInt(props.duration.toString()));
 			return;
@@ -262,6 +268,39 @@
 		getContentHeight();
 	});
 	
+	const getProps = function(): UTSJSONObject {
+		return {
+			activeColor: props.activeColor,
+			inactiveColor: props.inactiveColor,
+			closeOnClickMask: props.closeOnClickMask,
+			closeOnClickSelf: props.closeOnClickSelf,
+			duration: props.duration,
+			height: props.height,
+			borderBottom: props.borderBottom,
+			titleSize: props.titleSize,
+			borderRadius: props.borderRadius,
+			menuIcon: props.menuIcon,
+			menuIconSize: props.menuIconSize
+		} as UTSJSONObject
+	}
+
+	function getContentTextStyle(item: UPDropdownMenu, index: number): UTSJSONObject {
+		const style = {} as UTSJSONObject
+		style['fontSize'] = addUnit(props.titleSize)
+		
+		const isActive = index == current.value || highlightIndexList.value.includes(index)
+		if (item.disabled) {
+			style['color'] = '#c0c4cc'
+		} else if (isActive) {
+			if (props.activeColor != '#2979ff') {
+				style['color'] = props.activeColor
+			}
+		} else {
+			style['color'] = props.inactiveColor
+		}
+		return style
+	}
+
 	// 暴露方法给子组件
 	defineExpose({
 		init,
@@ -270,14 +309,15 @@
 		getChildren,
 		addChild,
 		children,
-		addMenuListItem
+		addMenuListItem,
+		getProps
 	});
 </script>
 
 <style scoped lang="scss">
 
 	.up-dropdown {
-		flex: 1;
+		flex: none;
 		width: 100%;
 		position: relative;
 
@@ -300,6 +340,10 @@
 				&__text {
 					font-size: 28rpx;
 					color: $up-content-color;
+
+					&--active {
+						color: $up-primary;
+					}
 				}
 
 				&__arrow {

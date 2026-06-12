@@ -11,6 +11,15 @@
     <scroll-view direction="vertical" class="flex-1 h-0px">
       <ThemeSwitchCard />
 
+      <!-- Dropdown 下拉菜单 -->
+      <view class="demo-block" style="margin-bottom: 0px;">
+        <text class="demo-label">up-dropdown</text>
+      </view>
+      <up-dropdown>
+        <up-dropdown-item v-model="value1" title="距离" :options="options1"></up-dropdown-item>
+        <up-dropdown-item v-model="value2" title="温度" :options="options2"></up-dropdown-item>
+      </up-dropdown>
+
       <!-- SwipeAction 滑动操作 -->
       <view class="demo-block">
         <text class="demo-label">
@@ -930,6 +939,19 @@
 import { reactive, ref } from 'vue'
 import ThemeSwitchCard from '@/src/pages/basic/components/ThemeSwitchCard.uvue'
 
+// ==================== Dropdown 下拉菜单 ====================
+const value1 = ref(1)
+const value2 = ref(2)
+const options1 = ref([
+  { label: '默认排序', value: 1 },
+  { label: '距离优先', value: 2 },
+  { label: '价格优先', value: 3 },
+] as UTSJSONObject[])
+const options2 = ref([
+  { label: '去冰', value: 1 },
+  { label: '加冰', value: 2 },
+] as UTSJSONObject[])
+
 // ==================== Swiper 轮播图 ====================
 const swiperList = ref([
   { image: '/static/logo.png', title: 'uview-ultra 组件演示' },
@@ -1271,7 +1293,7 @@ const swipeActionList = ref([
 ] as UTSJSONObject[])
 
 const swipeActionOptions = ref([
-  { text: '编辑', style: { backgroundColor: '#3c9cff' } },
+  { text: '编辑', style: { backgroundColor: 'primary' } },
   { text: '删除', style: { backgroundColor: '#f56c6c' } },
 ] as UTSJSONObject[])
 
