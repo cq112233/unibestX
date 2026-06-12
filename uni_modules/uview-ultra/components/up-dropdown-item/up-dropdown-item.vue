@@ -25,6 +25,7 @@
     import { mpMixin } from '../../libs/mixin/mpMixin';
 	import { mixin } from '../../libs/mixin/mixin';
 	import { addUnit, $parent } from '../../libs/function/index';
+	import config from '../../libs/config/config';
 	/**
 	 * dropdown-item 下拉菜单
 	 * @description 该组件一般用于向下展开菜单，同时可切换多个选项卡的场景
@@ -46,7 +47,7 @@
 		data() {
 			return {
 				active: false, // 当前项是否处于展开状态
-				activeColor: '#2979ff', // 激活时左边文字和右边对勾图标的颜色
+				activeColor: config.color['up-primary'], // 激活时左边文字和右边对勾图标的颜色
 				inactiveColor: '#606266', // 未激活时左边文字和右边对勾图标的颜色
 			}
 		},

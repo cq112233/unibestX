@@ -4,7 +4,9 @@
 			<slot name="button">
 				<view v-for="(item,index) in options" :key="index" class="up-swipe-action-item__right__button"
 					:ref="`up-swipe-action-item__right__button-${index}`" :style="[getButtonStyle(item)]" @tap="buttonClickHandler(item, index)">
-					<view class="up-swipe-action-item__right__button__wrapper" :style="[getWrapperStyle(item)]">
+					<view class="up-swipe-action-item__right__button__wrapper" :class="{
+						'up-swipe-action-item__right__button__wrapper--primary': getOptionStyleProp(item, 'backgroundColor', '') == 'primary'
+					}" :style="[getWrapperStyle(item)]">
 						<up-icon v-if="item['icon']" :name="item['icon']"
 							:color="getOptionStyleProp(item, 'color', '#ffffff')"
 							:size="getOptionIconSize(item)"
@@ -178,17 +180,30 @@
 			getWrapperStyle(item: UTSJSONObject): any {
 				const style = this.getOptionStyle(item)
 				const hasBorderRadius = style != null && style['borderRadius'] != null
+				let bgColor = '#C7C6CD'
+				if (style != null && style['backgroundColor'] != null) {
+					const bg = style['backgroundColor'] as string
+					if (bg == 'primary') {
+						bgColor = ''
+					} else {
+						bgColor = bg
+					}
+				}
 				const result = {
-					backgroundColor: style != null && style['backgroundColor'] != null ? style['backgroundColor'] as string : '#C7C6CD',
 					borderRadius: hasBorderRadius ? style!['borderRadius'] as string : '0',
 					padding: hasBorderRadius ? '0' : '0 15px',
 					width: '100%',
 					height: '100%'
 				} as UTSJSONObject
+				if (bgColor != '') {
+					result['backgroundColor'] = bgColor
+				}
 				// 合并原始 style 属性
 				if (style != null) {
 					style.toMap().forEach((value: any | null, key: string) => {
-						result[key] = value
+						if (key != 'backgroundColor') {
+							result[key] = value
+						}
 					})
 				}
 				return result
@@ -451,6 +466,10 @@
 					align-items: center;
 					justify-content: center;
 					padding: 0 15px;
+
+					&--primary {
+						background-color: $up-primary;
+					}
 
 					&__text {
 						@include flex;

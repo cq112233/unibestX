@@ -67,11 +67,18 @@ export function useUltraUI(parentDataInit: UTSJSONObject = {}): UPUseUltraUIType
     const getChildIndex = function(ins: ComponentPublicInstance): number {
         let index = -1
         if (parent.value != null) {
-            (parent.value!!.$data['children'] as ComponentPublicInstance[]).forEach((child: ComponentPublicInstance, idx: number) => {
-                if (child == ins) {
-                    index = idx
-                }
-            })
+            const parentIns = parent.value!!
+            let childs = parentIns.$callMethod('getChildren') as ComponentPublicInstance[] | null
+            if (childs == null) {
+                childs = parentIns.$data['children'] as ComponentPublicInstance[] | null
+            }
+            if (childs != null) {
+                childs.forEach((child: ComponentPublicInstance, idx: number) => {
+                    if (child == ins) {
+                        index = idx
+                    }
+                })
+            }
         }
         return index
     }
@@ -136,21 +143,15 @@ export function useUltraUI(parentDataInit: UTSJSONObject = {}): UPUseUltraUIType
             }
             // 遍历parentData中的属性，将parent中的同名属性赋值给parentData
             UTSJSONObject.keys(parentData.value).map((key: string) => {
-                // if (Reflect.has(parentIns!, 'getProps')) {
-                    const propsData = parentIns?.$callMethod('getProps') as UTSJSONObject
-                    // console.log(propsData)
-                    // console.log(key, '=', propsData)
-                    if (UTSJSONObject.keys(propsData).includes(key)) {
-                        parentData.value[key] = propsData?.[key]
-                    }
-                // }
+                const propsData = parentIns?.$callMethod('getProps') as UTSJSONObject | null
+                if (propsData != null && UTSJSONObject.keys(propsData).includes(key)) {
+                    parentData.value[key] = propsData[key]
+                }
 
-				// if (Reflect.has(parentIns!, 'getRefs')) {
-                    const refsData = parentIns?.$callMethod('getRefs') as UTSJSONObject
-                    if (UTSJSONObject.keys(refsData).includes(key)) {
-                        parentData.value[key] = refsData?.[key]
-                    }
-                // }
+                const refsData = parentIns?.$callMethod('getRefs') as UTSJSONObject | null
+                if (refsData != null && UTSJSONObject.keys(refsData).includes(key)) {
+                    parentData.value[key] = refsData[key]
+                }
             })
         }
         return parentIns
