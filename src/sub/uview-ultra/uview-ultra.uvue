@@ -11,6 +11,35 @@
     <scroll-view direction="vertical" class="flex-1 h-0px">
       <ThemeSwitchCard />
 
+      <!-- Waterfall 瀑布流 -->
+      <view class="demo-block">
+        <text class="demo-label">up-waterfall</text>
+        <view class="waterfall-container">
+          <view class="waterfall-column">
+            <view v-for="item in waterfallLeftList" :key="item.getString('id')" class="waterfall-card">
+              <image :src="item.getString('image')" mode="widthFix" class="waterfall-image"></image>
+              <view class="waterfall-info">
+                <text class="waterfall-title">{{ item.getString('title') }}</text>
+                <text class="waterfall-price">{{ item.getString('price') }}</text>
+              </view>
+            </view>
+          </view>
+          <view class="waterfall-column waterfall-column-right">
+            <view v-for="item in waterfallRightList" :key="item.getString('id')" class="waterfall-card">
+              <image :src="item.getString('image')" mode="widthFix" class="waterfall-image"></image>
+              <view class="waterfall-info">
+                <text class="waterfall-title">{{ item.getString('title') }}</text>
+                <text class="waterfall-price">{{ item.getString('price') }}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+        <view class="demo-row mt-10px">
+          <up-button type="primary" text="加载更多" size="mini" @click="loadMoreWaterfall"></up-button>
+          <up-button type="info" text="清空" size="mini" @click="clearWaterfall"></up-button>
+        </view>
+      </view>
+
       <!-- Dropdown 下拉菜单 -->
       <view class="demo-block" style="margin-bottom: 0px;">
         <text class="demo-label">up-dropdown</text>
@@ -936,7 +965,7 @@
 </template>
 
 <script setup lang="uts">
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import ThemeSwitchCard from '@/src/pages/basic/components/ThemeSwitchCard.uvue'
 
 // ==================== Dropdown 下拉菜单 ====================
@@ -951,6 +980,39 @@ const options2 = ref([
   { label: '去冰', value: 1 },
   { label: '加冰', value: 2 },
 ] as UTSJSONObject[])
+
+// ==================== Waterfall 瀑布流 ====================
+const waterfallList = ref([
+  { id: '1', image: 'https://picsum.photos/400/300?random=1', title: '简约风小茶几', price: '¥299' },
+  { id: '2', image: 'https://picsum.photos/400/500?random=2', title: '北欧风落地灯', price: '¥599' },
+  { id: '3', image: 'https://picsum.photos/400/350?random=3', title: '日式花瓶摆件', price: '¥89' },
+  { id: '4', image: 'https://picsum.photos/400/450?random=4', title: '复古台灯', price: '¥399' },
+  { id: '5', image: 'https://picsum.photos/400/280?random=5', title: 'ins风挂画', price: '¥159' },
+  { id: '6', image: 'https://picsum.photos/400/520?random=6', title: '实木相框组合', price: '¥129' },
+] as UTSJSONObject[])
+
+const waterfallLeftList = computed(() => waterfallList.value.filter((_: UTSJSONObject, idx: number) => idx % 2 === 0))
+const waterfallRightList = computed(() => waterfallList.value.filter((_: UTSJSONObject, idx: number) => idx % 2 === 1))
+
+function loadMoreWaterfall(): void {
+  const newItems: UTSJSONObject[] = []
+  const base = waterfallList.value.length + 1
+  for (let i = 0; i < 4; i++) {
+    const idx = base + i
+    const heights = [280, 350, 420, 300, 500, 380]
+    newItems.push({
+      id: `${idx}`,
+      image: `https://picsum.photos/400/${heights[i % heights.length]}?random=${idx}`,
+      title: `商品 ${idx}`,
+      price: `¥${(Math.random() * 500 + 50).toFixed(0)}`,
+    } as UTSJSONObject)
+  }
+  waterfallList.value = waterfallList.value.concat(newItems)
+}
+
+function clearWaterfall(): void {
+  waterfallList.value = [] as UTSJSONObject[]
+}
 
 // ==================== Swiper 轮播图 ====================
 const swiperList = ref([
@@ -1499,5 +1561,49 @@ function onListRefresh(): void {
   align-items: center;
   justify-content: center;
   padding: 16px;
+}
+
+.waterfall-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.waterfall-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.waterfall-column-right {
+  margin-left: 8px;
+}
+
+.waterfall-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.waterfall-image {
+  width: 100%;
+}
+
+.waterfall-info {
+  padding: 8px;
+}
+
+.waterfall-title {
+  font-size: 13px;
+  color: #303133;
+  line-height: 18px;
+}
+
+.waterfall-price {
+  font-size: 14px;
+  font-weight: bold;
+  color: #fa3534;
+  margin-top: 4px;
 }
 </style>
