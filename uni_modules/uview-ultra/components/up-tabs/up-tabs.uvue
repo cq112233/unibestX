@@ -68,14 +68,7 @@
 						<view
 							class="up-tabs__wrapper__nav__line"
 							ref="up-tabs__wrapper__nav__line"
-							:style="[{
-								width: addUnit(lineWidth),
-								transform: 'translateX('+ (lineOffsetLeft)+'px)',
-								transitionDuration: `${firstTime ? 0 : duration}ms`,
-								height: addUnit(lineHeight),
-								backgroundColor: lineColor,
-								backgroundSize: lineBgSize,
-							}]"
+							:style="lineStyle"
 						>
 						</view>
 					</view>
@@ -165,6 +158,18 @@
 		computed: {
 			propsBadge(): UTSJSONObject {
 				return badgeProps['badge'] as UTSJSONObject
+			},
+			lineStyle(): any {
+				const style = {} as UTSJSONObject;
+				style['width'] = addUnit(this.lineWidth);
+				style['transform'] = 'translateX('+ (this.lineOffsetLeft)+'px)';
+				style['transitionDuration'] = `${this.firstTime ? 0 : this.duration}ms`;
+				style['height'] = addUnit(this.lineHeight);
+				style['backgroundSize'] = this.lineBgSize;
+				if (this.lineColor != '#3c9cff') {
+					style['backgroundColor'] = this.lineColor;
+				}
+				return style;
 			}
 		},
 		mounted() {
@@ -471,7 +476,7 @@
 
 				&__line {
 					height: 3px;
-					backgroundColor: $up-primary;
+					background-color: $up-primary;
 					width: 30px;
 					position: absolute;
 					bottom: 2px;

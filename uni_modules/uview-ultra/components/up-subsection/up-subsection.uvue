@@ -8,14 +8,20 @@
         <view
             class="up-subsection__bar cursor-pointer"
             ref="up-subsection__bar"
-            :style="[barStyle]"
-            :class="{
-				'up-subsection--button__bar': mode === 'button',
-				'up-subsection__bar--first': (innerCurrent == 0 && mode === 'subsection'),
-				'up-subsection__bar--center': (innerCurrent > 0 && innerCurrent < list.length - 1 && mode === 'subsection'),
-				'up-subsection__bar--last': (innerCurrent == list.length - 1 && mode === 'subsection')
-			}"
-        ></view>
+            :style="barStyle"
+        >
+            <view
+                class="up-subsection__bar__inner"
+                :class="{
+					'up-subsection--button__bar': mode === 'button',
+					'up-subsection__bar__inner--button': mode === 'button',
+					'up-subsection__bar--first': (innerCurrent == 0 && mode === 'subsection'),
+					'up-subsection__bar--center': (innerCurrent > 0 && innerCurrent < list.length - 1 && mode === 'subsection'),
+					'up-subsection__bar--last': (innerCurrent == list.length - 1 && mode === 'subsection')
+				}"
+                :style="innerBarStyle"
+            ></view>
+        </view>
         <view
             class="up-subsection__item cursor-pointer"
 	            :class="[
@@ -35,7 +41,10 @@
 				<slot name="item" :item="item" :index="index">
 					<text
 					    class="up-subsection__item__text"
-						:class="[disabled ? 'up-subsection__item__text--disabled' : '']"
+						:class="[
+							disabled ? 'up-subsection__item__text--disabled' : '',
+							(innerCurrent == index && mode === 'button' && activeColor == '#3c9cff') ? 'up-subsection__item__text--active' : ''
+						]"
 					    :style="[textStyle(index)]"
 					    >{{ getText(item) }}</text
 					>
@@ -75,12 +84,9 @@ export default {
 	],
     data() {
         return {
-            // 组件尺寸
-            itemRect: {
-                width: 0,
-                height: 0,
-            } as NodeInfo,
             innerCurrent: 0,
+            componentWidth: 0,
+            firstTime: true,
             windowResizeCallback: {}
         };
     },
@@ -108,20 +114,34 @@ export default {
             return style;
         },
         // 滑块的样式
-        barStyle() {
+        barStyle(): any {
             const style = {};
-            style['width'] = `${this.itemRect['width']}px`;
-            style['height'] = `${this.itemRect['height']}px`;
-			// 通过translateX移动滑块，其移动的距离为索引*item的宽度
-			if (this.itemRect.width != null) {
-				style.transform = `translateX(${
-					// @ts-ignore
-				    this.innerCurrent * (this.itemRect['width'] as Number)
-				}px)`;
-			}
+            if (this.componentWidth > 0) {
+                const itemWidth = this.componentWidth / this.list.length;
+                style['width'] = itemWidth.toString() + 'px';
+                style['transform'] = `translateX(${this.innerCurrent * itemWidth}px)`;
+            } else {
+                if (this.list.length > 0) {
+                    style['width'] = (100.0 / this.list.length).toString() + '%';
+                }
+                style['transform'] = `translateX(${this.innerCurrent * 100}%)`;
+            }
+            if (this.firstTime) {
+                style['transitionDuration'] = '0ms';
+            } else {
+                style['transitionDuration'] = '300ms';
+            }
+            style['left'] = '0px';
+            style['top'] = '0px';
+            style['bottom'] = '0px';
+            return style;
+        },
+        innerBarStyle(): any {
+            const style = {};
             if (this.mode === "subsection") {
-                // 在subsection模式下，需要动态设置滑块的圆角，因为移动滑块使用的是translateX，无法通过父元素设置overflow: hidden隐藏滑块的直角
-                style['backgroundColor'] = this.activeColor;
+                if (this.activeColor != '#3c9cff') {
+                    style['backgroundColor'] = this.activeColor;
+                }
             }
             return style;
         }
@@ -144,55 +164,91 @@ export default {
         addUnit(e: any) {
         	return addUnit(e);
         },
-        async init() {
+        init() {
 			// @ts-ignore
             this.innerCurrent = parseInt(this.current.toString())
-			await sleep(30);
-			this.getRect();
+            this.$nextTick(() => {
+                this.resize()
+            })
+        },
+        resize() {
+            this.getWrapperRect().then((rect: NodeInfo | null) => {
+                if (rect != null && rect.width != null && rect.width! > 0) {
+                    this.componentWidth = rect.width!
+                    if (this.firstTime) {
+                        this.$nextTick(() => {
+                            setTimeout(() => {
+                                this.firstTime = false
+                            }, 50)
+                        })
+                    }
+                }
+            })
+        },
+        getWrapperRect(): Promise<NodeInfo | null> {
+            return new Promise((resolve) => {
+                uni.createSelectorQuery()
+                    .in(this)
+                    .select('.up-subsection')
+                    .boundingClientRect()
+                    .exec((rect) => {
+                        if (rect != null && rect.length > 0) {
+                            resolve(rect[0] as NodeInfo);
+                        } else {
+                            resolve(null);
+                        }
+                    })
+            })
         },
 		itemStyle(index: number) {
 			const style = {};
 			if (this.mode === "subsection") {
 				// 设置border的样式
-				style['borderColor'] = this.activeColor;
+				if (this.activeColor != '#3c9cff') {
+					style['borderColor'] = this.activeColor;
+				}
 				style['borderWidth'] = "1px";
 				style['borderStyle'] = "solid";
 			}
 			return style;
 		},
-			textStyle(index: number) {
-				const style = {};
-				if (this.disabled) {
-					style['fontWeight'] = 'normal';
-					style['fontSize'] = addUnit(this.fontSize);
-					style['color'] = '#c8c9cc';
-					return style;
-				}
-				style['fontWeight'] =
-					this.bold && this.innerCurrent === index ? "bold" : "normal";
+		textStyle(index: number) {
+			const style = {};
+			if (this.disabled) {
+				style['fontWeight'] = 'normal';
 				style['fontSize'] = addUnit(this.fontSize);
-				const item = this.list[index];
-				const activeColorTemp =
-					typeof item == 'object' && item != null
-						? ((item as UTSJSONObject)[this.activeColorKeyName] as string)
-						: '';
-				const inactiveColorTemp =
-					typeof item === 'object' && item != null
-						? ((item as UTSJSONObject)[this.inactiveColorKeyName] as string)
-						: '';
-				// subsection模式下，激活时默认为白色的文字
-				if (this.mode === "subsection") {
-					style['color'] =
-						this.innerCurrent === index ? (activeColorTemp != '' ? activeColorTemp : "#fff") : (inactiveColorTemp != '' ? inactiveColorTemp : this.inactiveColor);
-				} else {
-					// button模式下，激活时文字颜色默认为activeColor
-					style['color'] =
-						this.innerCurrent == index
-							? (activeColorTemp != '' ? activeColorTemp :  this.activeColor)
-							: (inactiveColorTemp != '' ? inactiveColorTemp : this.inactiveColor);
-				}
+				style['color'] = '#c8c9cc';
 				return style;
-			},
+			}
+			style['fontWeight'] =
+				this.bold && this.innerCurrent === index ? "bold" : "normal";
+			style['fontSize'] = addUnit(this.fontSize);
+			const item = this.list[index];
+			const activeColorTemp =
+				typeof item == 'object' && item != null
+					? ((item as UTSJSONObject)[this.activeColorKeyName] as string)
+					: '';
+			const inactiveColorTemp =
+				typeof item === 'object' && item != null
+					? ((item as UTSJSONObject)[this.inactiveColorKeyName] as string)
+					: '';
+			// subsection模式下，激活时默认为白色的文字
+			if (this.mode === "subsection") {
+				style['color'] =
+					this.innerCurrent === index ? (activeColorTemp != '' ? activeColorTemp : "#fff") : (inactiveColorTemp != '' ? inactiveColorTemp : this.inactiveColor);
+			} else {
+				// button模式下，激活时文字颜色默认为activeColor
+				const c = activeColorTemp != '' ? activeColorTemp : this.activeColor;
+				if (this.innerCurrent == index) {
+					if (c != '#3c9cff') {
+						style['color'] = c;
+					}
+				} else {
+					style['color'] = inactiveColorTemp != '' ? inactiveColorTemp : this.inactiveColor;
+				}
+			}
+			return style;
+		},
 		// 判断展示文本
 		getText(item: any|null): string|null {
 			if (typeof item === 'string') {
@@ -204,14 +260,7 @@ export default {
 				return "error";
 			}
 		},
-        // 获取组件的尺寸
-        getRect() {
-			// @ts-ignore
-            this.upGetRect(".up-subsection__item--0", false).then((res) => {
-				let size = res as NodeInfo;
-                this.itemRect = size;
-            });
-        },
+
 	        clickHandler(index: number) {
 				if (this.disabled) return
 	            this.innerCurrent = index
@@ -250,9 +299,24 @@ export default {
 
     &__bar {
         position: absolute;
+        left: 0;
         transition-property: transform, color;
         transition-duration: 0.3s;
         transition-timing-function: ease-in-out;
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+
+        &__inner {
+            flex: 1;
+            align-self: stretch;
+            background-color: $up-primary;
+
+            &--button {
+                margin: 3px;
+                background-color: #ffffff;
+            }
+        }
 
         &--first {
             border-top-left-radius: 4px;
@@ -283,6 +347,7 @@ export default {
         align-items: center;
         // vue环境下，需要设置相对定位，因为滑块为绝对定位，item需要在滑块的上面
         position: relative;
+        border-color: $up-primary;
 
         &--no-border-right {
             border-right-width: 0 !important;
@@ -293,26 +358,30 @@ export default {
             border-bottom-left-radius: 4px;
         }
 
-	        &--last {
-	            border-top-right-radius: 4px;
-	            border-bottom-right-radius: 4px;
-	        }
+        &--last {
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
 
-			&--disabled {
-			}
+        &--disabled {
+        }
 
-	        &__text {
-	            font-size: 12px;
-	            line-height: 14px;
-	            // @include flex;
-	            // align-items: center;
-	            transition-property: color;
-	            transition-duration: 0.3s;
+        &__text {
+            font-size: 12px;
+            line-height: 14px;
+            // @include flex;
+            // align-items: center;
+            transition-property: color;
+            transition-duration: 0.3s;
 
-				&--disabled {
-					color: #c8c9cc !important;
-				}
-	        }
-	    }
+            &--disabled {
+                color: #c8c9cc !important;
+            }
+
+            &--active {
+                color: $up-primary;
+            }
+        }
+    }
 	}
 </style>
