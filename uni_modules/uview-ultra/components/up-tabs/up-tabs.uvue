@@ -1,19 +1,23 @@
 <template>
 	<view class="up-tabs" :class="[customClass]">
-		<view class="up-tabs__wrapper">
+		<view class="up-tabs__wrapper" :style="{ height: addUnit(height) }">
 			<slot name="left" />
 			<view class="up-tabs__wrapper__scroll-view-wrapper">
 				<scroll-view
 					direction="horizontal"
+					:scroll-x="scrollable"
+					:enable-flex="true"
 					:scroll-left="scrollLeft"
 					scroll-with-animation
 					class="up-tabs__wrapper__scroll-view"
 					:show-scrollbar="false"
 					ref="up-tabs__wrapper__scroll-view"
+					:style="{ height: addUnit(height) }"
 				>
 					<view
 						class="up-tabs__wrapper__nav"
 						ref="up-tabs__wrapper__nav"
+						:style="{ height: addUnit(height) }"
 					>
 						<view
 							class="up-tabs__wrapper__nav__item"
@@ -22,7 +26,7 @@
 							@tap="clickHandler(item, index)"
 							@longpress="longPressHandler(item,index)"
 							:ref="`up-tabs__wrapper__nav__item-${index}`"
-							:style="[addStyle(itemStyle), {flex: scrollable ? '' : 1}]"
+							:style="[addStyle(itemStyle), {flex: scrollable ? 'none' : '1'}]"
 							:class="[`up-tabs__wrapper__nav__item-${index}`,
 								(item['disabled'] != null && (item['disabled'] as boolean)) ? 'up-tabs__wrapper__nav__item--disabled' : '',
 								innerCurrent == index ? 'up-tabs__wrapper__nav__item-active' : '']"
@@ -121,6 +125,8 @@
 				} as NodeInfo,
 				innerCurrent: 0,
 				moving: false,
+				retryCount: 0,
+				itemRects: [] as Array<NodeInfo>,
 			}
 		},
 		watch: {
@@ -135,13 +141,22 @@
 							this.innerCurrent = newValue
 						}
 						this.$nextTick(() => {
-							this.resize()
+							const hasRect = this.itemRects.length > 0 && this.itemRects.length === this.list.length && (this.itemRects[0].width ?? 0) > 0
+							if (hasRect) {
+								this.setLineLeft()
+								this.setScrollLeft()
+							} else {
+								this.resize()
+							}
 						})
 					}
 				}
 			},
 			// list变化时，重新渲染list各项信息
-			list() {
+			list(newValue: Array<UTSJSONObject>, oldValue: Array<UTSJSONObject> | null) {
+				if (oldValue != null && this.isListEqual(newValue, oldValue)) {
+					return
+				}
 				this.$nextTick(() => {
 					this.resize()
 				})
@@ -206,20 +221,38 @@
 				}
 				return deepMerge(customeStyle, style)
 			},
+			isListEqual(list1: Array<UTSJSONObject>, list2: Array<UTSJSONObject>): boolean {
+				if (list1.length != list2.length) {
+					return false
+				}
+				for (let i = 0; i < list1.length; i++) {
+					const item1 = list1[i]
+					const item2 = list2[i]
+					if (item1[this.keyName] != item2[this.keyName]) {
+						return false
+					}
+				}
+				return true
+			},
 			setLineLeft() {
-				const tabItem = this.list[this.innerCurrent];
+				if (this.itemRects.length <= this.innerCurrent) {
+					return;
+				}
+				const tabItem = this.itemRects[this.innerCurrent];
 				if (tabItem == null) {
 					return;
 				}
 				// 获取滑块该移动的位置
-				let lineOffsetLeft = (this.$props['list'] as Array<UTSJSONObject>)
+				let lineOffsetLeft = this.itemRects
 					.slice(0, this.innerCurrent)
-					.reduce((total: number, curr: UTSJSONObject) => {
-						return total + ((curr['rect'] as NodeInfo).width ?? 0)
+					.reduce((total: number, curr: NodeInfo) => {
+						return total + (curr.width ?? 0)
 					}, 0);
                 // 获取下划线的数值px表示法
 				const lineWidth = parseFloat(getPx(this.lineWidth));
-				this.lineOffsetLeft = lineOffsetLeft + (((tabItem['rect'] as NodeInfo).width ?? 0) - lineWidth) / 2
+				const tabWidth = tabItem.width ?? 0
+				const offset = tabWidth > 0 ? (tabWidth - lineWidth) / 2 : 0
+				this.lineOffsetLeft = lineOffsetLeft + offset
 
 				// 如果是第一次执行此方法，让滑块在初始化时，瞬间滑动到第一个tab item的中间
 				// 这里需要一个定时器，因为在非nvue下，是直接通过style绑定过渡时间，需要等其过渡完成后，再设置为false(非第一次移动滑块)
@@ -242,7 +275,13 @@
 				if (this.innerCurrent == index) return
 				this.innerCurrent = index
                 this.$nextTick(() => {
-                    this.resize()
+                    const hasRect = this.itemRects.length > 0 && this.itemRects.length === this.list.length && (this.itemRects[0].width ?? 0) > 0
+                    if (hasRect) {
+                        this.setLineLeft()
+                        this.setScrollLeft()
+                    } else {
+                        this.resize()
+                    }
                 })
 				this.$emit('update:current', index)
 				this.$emit('change', {
@@ -258,7 +297,9 @@
 				})
 			},
 			init() {
-				sleep().then(() => {
+				this.retryCount = 0
+				// 延迟 30ms 启动测量，搭配自适应的动态宽度期望值重试机制，确保鸿蒙等端稳定排版后精确对齐且无视觉抖动
+				sleep(30).then(() => {
 					this.resize()
 				})
 			},
@@ -267,19 +308,23 @@
 				if (this.innerCurrent < 0) {
                     this.innerCurrent = 0;
                 }
-				const tabRect = (this.$props['list'] as Array<UTSJSONObject>)[this.innerCurrent]
+				if (this.itemRects.length <= this.innerCurrent) {
+					return;
+				}
+				const tabRect = this.itemRects[this.innerCurrent]
+				if (tabRect == null) {
+					return;
+				}
 				// 累加得到当前item到左边的距离
-				// @ts-ignore
-				const offsetLeft = this.list
-					// @ts-ignore
+				const offsetLeft = this.itemRects
 					.slice(0, this.innerCurrent)
-					.reduce((total: number, curr: UTSJSONObject) => {
-						return total + ((curr['rect'] as NodeInfo).width ?? 0)
+					.reduce((total: number, curr: NodeInfo) => {
+						return total + (curr.width ?? 0)
 					}, 0)
 				// 此处为屏幕宽度
 				const windowWidth = getWindowInfo().windowWidth
 				// 将活动的tabs-item移动到屏幕正中间，实际上是对scroll-view的移动
-				let scrollLeft = offsetLeft - ((this.tabsRect?.width ?? 0) - ((tabRect['rect'] as NodeInfo).width ?? 0)) / 2 - (windowWidth - (this.tabsRect
+				let scrollLeft = offsetLeft - ((this.tabsRect?.width ?? 0) - (tabRect.width ?? 0)) / 2 - (windowWidth - (this.tabsRect
 					?.right ?? 0)) / 2 + (this.tabsRect?.left ?? 0) / 2
 				// 这里做一个限制，限制scrollLeft的最大值为整个scroll-view宽度减去tabs组件的宽度
 				scrollLeft = Math.min(scrollLeft, this.scrollViewWidth - (this.tabsRect?.width ?? 0))
@@ -295,6 +340,24 @@
 					// [tabsRect, itemRect = []]
 					let tabsRect = (res[0] as Array<NodeInfo>)[0]
 					let itemRect = res[1] as Array<NodeInfo>
+					
+					// 兼容部分原生平台（如鸿蒙/ArkUI）冷启动渲染排版较慢，导致首次测量为 0 或宽度不准确（未撑开）的情况，进行高精度自适应延迟重试测量
+					const firstWidth = (itemRect.length > 0 && itemRect[0] != null) ? (itemRect[0].width ?? 0) : 0
+					let minWidthExpected = 30
+					if (this.list.length > 0) {
+						const firstItemName = this.list[0][this.keyName]
+						if (firstItemName != null) {
+							const nameStr = firstItemName.toString()
+							minWidthExpected = nameStr.length * 12 + 20
+						}
+					}
+					if ((firstWidth < minWidthExpected) && this.retryCount < 5) {
+						this.retryCount++
+						setTimeout(() => {
+							this.resize()
+						}, 50)
+						return
+					}
 					// console.log('******itemRect******', itemRect)
 					// 兼容在swiper组件中使用
 					if ((tabsRect.left ?? 0) > (tabsRect.width ?? 0)) {
@@ -303,9 +366,10 @@
 					}
 					// console.log(tabsRect)
 					this.tabsRect = tabsRect
+					this.itemRects = itemRect
 					this.scrollViewWidth = 0
 					itemRect.map((item: NodeInfo, index: number) => {
-						// 计算scroll-view的宽度，这里
+						// 计算scroll-view of the width，这里
 						if (item != null) {
 							this.scrollViewWidth = this.scrollViewWidth + (item.width??0)
 							// 另外计算每一个item的中心点X轴坐标
@@ -356,7 +420,8 @@
 	.up-tabs {
 
 		&__wrapper {
-			@include flex;
+			display: flex;
+			flex-direction: row;
 			align-items: center;
 
 			&__scroll-view-wrapper {
@@ -365,19 +430,24 @@
 			}
 
 			&__scroll-view {
-				@include flex;
+				display: flex;
+				flex-direction: row;
 				flex: 1;
 			}
 
 			&__nav {
-				@include flex;
+				display: flex;
+				flex-direction: row;
 				position: relative;
 
 				&__item {
 					padding: 0 11px;
-					@include flex;
+					display: flex;
+					flex-direction: row;
 					align-items: center;
 					justify-content: center;
+					flex-shrink: 0;
+					height: 100%;
 					/* #ifdef H5 */
 					cursor: pointer;
 					/* #endif */

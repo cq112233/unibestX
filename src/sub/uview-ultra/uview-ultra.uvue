@@ -8,8 +8,45 @@
       bg-color="#ffffff"
     ></up-navbar>
 
-    <scroll-view direction="vertical" class="flex-1 h-0px">
+    <scroll-view :scroll-y="true" direction="vertical" :style="{ height: `${scrollHeight}px` }" :scroll-top="scrollViewScrollTop" :scroll-with-animation="true" @scroll="onScroll">
       <ThemeSwitchCard />
+
+      <!-- Tabs 标签页 -->
+      <view class="demo-block">
+        <text class="demo-label">
+          up-tabs
+        </text>
+        <up-tabs :list="tabsList" :current="tabsCurrent" @change="onTabsChange"></up-tabs>
+        <view class="p-15px bg-white">
+          <text class="text-14px text-[#606266]">{{ tabsList.length > tabsCurrent ? tabsList[tabsCurrent].name : '' }} 的内容区域</text>
+        </view>
+      </view>
+
+      <!-- Steps 步骤条 -->
+      <view class="demo-block">
+        <text class="demo-label">
+          up-steps
+        </text>
+        <up-steps :current="stepsCurrent" direction="row">
+          <up-steps-item title="下单" desc="已下单"></up-steps-item>
+          <up-steps-item title="出库" desc="已出库"></up-steps-item>
+          <up-steps-item title="运输" desc="运输中"></up-steps-item>
+          <up-steps-item title="签收" desc="已签收"></up-steps-item>
+        </up-steps>
+        <view class="h-10px"></view>
+        <view class="demo-row">
+          <up-button type="primary" text="上一步" size="mini" @click="prevStep"></up-button>
+          <up-button type="primary" text="下一步" size="mini" @click="nextStep"></up-button>
+        </view>
+      </view>
+
+      <!-- Subsection 分段器 -->
+      <view class="demo-block">
+        <text class="demo-label">
+          up-subsection
+        </text>
+        <up-subsection :list="subsectionList" :current="subsectionCurrent" @change="onSubsectionChange"></up-subsection>
+      </view>
 
       <!-- Waterfall 瀑布流 -->
       <view class="demo-block">
@@ -770,42 +807,7 @@
         导航组件
       </text>
 
-      <!-- Tabs 标签页 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-tabs
-        </text>
-        <up-tabs :list="tabsList" :current="tabsCurrent" @change="onTabsChange"></up-tabs>
-        <view class="p-15px bg-white">
-          <text class="text-14px text-[#606266]">{{ tabsList.length > tabsCurrent ? tabsList[tabsCurrent].name : '' }} 的内容区域</text>
-        </view>
-      </view>
 
-      <!-- Steps 步骤条 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-steps
-        </text>
-        <up-steps :current="stepsCurrent" direction="row">
-          <up-steps-item title="下单" desc="已下单"></up-steps-item>
-          <up-steps-item title="出库" desc="已出库"></up-steps-item>
-          <up-steps-item title="运输" desc="运输中"></up-steps-item>
-          <up-steps-item title="签收" desc="已签收"></up-steps-item>
-        </up-steps>
-        <view class="h-10px"></view>
-        <view class="demo-row">
-          <up-button type="primary" text="上一步" size="mini" @click="prevStep"></up-button>
-          <up-button type="primary" text="下一步" size="mini" @click="nextStep"></up-button>
-        </view>
-      </view>
-
-      <!-- Subsection 分段器 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-subsection
-        </text>
-        <up-subsection :list="subsectionList" :current="subsectionCurrent" @change="onSubsectionChange"></up-subsection>
-      </view>
 
       <up-divider text="导航组件结束"></up-divider>
 
@@ -866,6 +868,16 @@
       </view>
 
       <up-divider text="展示组件结束"></up-divider>
+
+      <!-- BackTop 回到顶部 -->
+      <view class="demo-block">
+        <text class="demo-label">
+          up-back-top
+        </text>
+        <text class="text-12px text-[#909399] mb-8px">
+          滚动页面，右下角将出现回到顶部按钮
+        </text>
+      </view>
 
       <!-- 底部安全间距 -->
       <view class="h-40px"></view>
@@ -961,12 +973,51 @@
         @close="genderActionShow = false"
       ></up-action-sheet>
     </scroll-view>
+
+    <!-- BackTop 回到顶部 -->
+    <up-back-top
+      :scroll-top="scrollTop"
+      mode="circle"
+      icon="arrow-upward"
+      text="顶部"
+      :top="200"
+      :duration="300"
+      :bottom="100"
+      :right="20"
+      :z-index="99"
+      :icon-style="{ fontSize: '20px', color: '#ffffff' }"
+      :custom-style="{ backgroundColor: '#2979ff' }"
+      @click="onBackTopClick"
+    ></up-back-top>
   </view>
 </template>
 
 <script setup lang="uts">
-import { computed, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import ThemeSwitchCard from '@/src/pages/basic/components/ThemeSwitchCard.uvue'
+
+// ==================== BackTop 回到顶部 ====================
+const scrollTop = ref(0)
+const scrollViewScrollTop = ref(0)
+const scrollHeight = ref(0)
+
+onMounted(() => {
+  const sysInfo = uni.getWindowInfo()
+  scrollHeight.value = sysInfo.windowHeight - 44
+})
+
+function onScroll(e: UniScrollEvent): void {
+  const currentScrollTop = e.detail.scrollTop
+  console.log('scroll-view scrollTop:', currentScrollTop)
+  scrollTop.value = currentScrollTop
+}
+function onBackTopClick(): void {
+  // 先把控制位置的变量同步为当前实际位置，然后再变回 0，强制触发 Vue 属性变更响应
+  scrollViewScrollTop.value = scrollTop.value
+  setTimeout(() => {
+    scrollViewScrollTop.value = 0
+  }, 20)
+}
 
 // ==================== Dropdown 下拉菜单 ====================
 const value1 = ref(1)

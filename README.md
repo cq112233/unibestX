@@ -38,7 +38,7 @@
 * 🚀 **uni-app X** — 基于 UTS 语言的原生渲染，性能远超 WebView 方案
 * 💪 **Vue3 + Vite5** — 最新前端技术栈，开发体验极佳
 * 🎨 **UnoCSS** — 原子化 CSS 引擎，高效编写样式
-* 📦 **uview-ultra** — 专为 uni-app X 打造的 UI 组件库
+* 📦 **uview-ultra** — 专为 uni-app X 打造的 UI 组件库（本项目深度修复了大量的 bug 与兼容性问题，如针对 uni-app X 原生平台暂不支持 `gap`、`display: grid` 等 CSS 属性的限制，重构并修复了 `up-box`、`up-sticky`、`up-tooltip` 等核心组件，保障原生端的流畅体验）
 * 📜 **z-paging-x** — 强大的分页列表组件
 * 🔧 **Pinia 持久化** — 状态管理 + 本地持久化，开箱即用
 * 🌐 **i18n 多语言** — 内置中英文切换，支持自动检测系统语言
@@ -249,7 +249,7 @@ pnpm install
 | 前端框架    | Vue 3                 | Composition API                        |
 | 构建工具    | Vite 5                | 极速开发体验                                 |
 | CSS 引擎  | UnoCSS                | 原子化 CSS，自定义规则                          |
-| UI 组件库  | uview-ultra           | uni-app X 专用 UI 库                      |
+| UI 组件库  | uview-ultra           | uni-app X 专用 UI 库（已深度重构修复原生 `gap`/`grid` 限制下的多端兼容问题，如 `up-sticky`、`up-box` 等） |
 | 分页组件    | z-paging-x            | 强大的下拉刷新 + 分页加载                         |
 | 状态管理    | x-pinia-s (Pinia)     | uni-app X 版 Pinia                      |
 | HTTP 请求 | lime-request          | uni-app X 兼容请求库                        |

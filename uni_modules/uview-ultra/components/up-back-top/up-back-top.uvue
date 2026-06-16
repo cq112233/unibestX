@@ -1,15 +1,11 @@
 <template>
-	<up-transition
-	    mode="fade"
-	    :customStyle="backTopStyle"
-	    :show="show"
+	<view
+	    v-if="show"
+	    :style="[backTopStyle, contentStyle]"
+	    class="up-back-top"
+	    @click="backToTop"
 	>
-		<view
-		    class="up-back-top"
-			:style="[contentStyle]"
-		    v-if="$slots['default'] == null && $slots['$default'] == null"
-			@click="backToTop"
-		>
+		<block v-if="$slots['default'] == null && $slots['$default'] == null">
 			<up-icon
 			    :name="icon"
 			    :custom-style="iconStyle"
@@ -18,13 +14,13 @@
 			    v-if="text"
 			    class="up-back-top__text"
 			>{{text}}</text>
-		</view>
-		<slot v-else />
-	</up-transition>
+		</block>
+		<slot v-else></slot>
+	</view>
 </template>
 
 <script setup lang="uts">
-	import { computed } from "vue";
+	import { computed, watch, ref } from "vue";
 	import defProps from './backtop.uts';
 	import { addUnit, addStyle, getPx, deepMerge } from '../../libs/function/index';
 	
@@ -100,15 +96,16 @@
 			width: '40px',
 			height: '40px',
 			position: 'fixed',
-			zIndex: 10,
+			zIndex: parseInt(prop.zIndex.toString()),
 		}
 		return style
 	});
 	
-	// 计算属性 - 是否显示
-	const show = computed(() => {
-		return parseInt(getPx(prop.scrollTop)) > parseInt(getPx(prop.top.toString()))
-	});
+	// 响应式状态 - 是否显示
+	const show = ref(false);
+	watch((): any => prop.scrollTop, (newVal: any) => {
+		show.value = parseInt(getPx(newVal)) > parseInt(getPx(prop.top.toString()))
+	}, { immediate: true });
 	
 	// 计算属性 - 内容样式
 	const contentStyle = computed(() => {
