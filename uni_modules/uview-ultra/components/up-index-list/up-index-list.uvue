@@ -4,9 +4,10 @@
 			:scroll-top="scrollTop"
 			:scroll-into-view="scrollIntoView"
 			:style="{
-				height: '100%'
+				maxHeight: $up.addUnit(scrollViewHeight)
 			}"
 			direction="vertical"
+			:scroll-y="true"
 			@scroll="scrollHandler"
 			ref="up-index-list__scroll-view"
 			class="up-index-list__scroll-view"
@@ -209,16 +210,15 @@
 			} else {
 				customNavHeight = parseInt(getPx(props.customNavHeight))
 			}
-			getIndexListScrollViewRect().then((sizeScroll:NodeInfo) => {
-				// console.log('sizeScroll', sizeScroll)
-				letterInfo.value = {
-					height: height ?? 0,
-					// 为了让字母列表对屏幕绝对居中，让其对导航栏进行修正，也即往上偏移导航栏的一半高度
-					top: (sizeScroll.height ?? 0) / 2,
-					// top: (this.scrollViewHeight - height?? 0) / 2 + customNavHeight / 2,
-					itemHeight: Math.floor((height ?? 0) / uIndexList.value.length)
-				}
-			})
+			
+			// 直接使用已计算好的滚动区域高度，避免受首帧异步查询延迟的影响（默认为windowHeight - customNavHeight）
+			const scrollHeight = scrollViewHeight.value > 0 ? scrollViewHeight.value : (sysData.windowHeight - customNavHeight)
+			letterInfo.value = {
+				height: height ?? 0,
+				// 为了让字母列表对屏幕绝对居中，让其对导航栏进行修正，也即往上偏移导航栏的一半高度
+				top: scrollHeight / 2,
+				itemHeight: Math.floor((height ?? 0) / uIndexList.value.length)
+			}
 		})
 	}
 	
@@ -274,7 +274,9 @@
 		let customNavHeight = getPx(props.customNavHeight)
 		sys.value = getWindowInfo()
 		getIndexListRect().then((sizeScroll: NodeInfo) => {
-			scrollViewHeight.value = sizeScroll?.height != null ? sizeScroll?.height : sys.value!!.windowHeight - parseInt(customNavHeight)
+			const h = sizeScroll?.height != null && sizeScroll.height! > 0 ? sizeScroll.height! : sys.value!!.windowHeight - parseInt(customNavHeight)
+			scrollViewHeight.value = h
+			topOffset.value = sys.value!!.windowHeight - h
 		})
 	}
 

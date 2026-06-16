@@ -10,6 +10,25 @@
     <scroll-view :scroll-y="true" direction="vertical" :style="{ height: `${scrollHeight}px` }" :scroll-top="scrollViewScrollTop" :scroll-with-animation="true" @scroll="onScroll">
       <ThemeSwitchCard />
 
+      <!-- IndexList 索引列表 -->
+      <view class="demo-block">
+        <text class="demo-label">
+          up-index-list
+        </text>
+        <view class="index-list-demo-wrapper">
+          <up-index-list :index-list="indexList" :sticky="true">
+            <template v-for="(item, index) in itemArr" :key="index">
+              <up-index-item>
+                <up-index-anchor :text="indexList[index]"></up-index-anchor>
+                <view v-for="(cell, cellIndex) in item" :key="cellIndex" class="list-cell">
+                  <text class="list-cell-text">{{ cell as string }}</text>
+                </view>
+              </up-index-item>
+            </template>
+          </up-index-list>
+        </view>
+      </view>
+
       <!-- Tabbar 底部导航栏 -->
       <view class="demo-block">
         <text class="demo-label">
@@ -1180,6 +1199,31 @@ const swiperList = ref([
   { image: '/static/logo.png', title: '多端适配 · 开箱即用' },
 ] as UTSJSONObject[])
 
+// ==================== IndexList 索引列表 ====================
+const indexList = ref(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'] as string[])
+const itemArr = ref([
+  ['安徽', '澳门'],
+  ['北京'],
+  ['重庆', '成都', '长沙', '常州'],
+  ['东莞', '大连'],
+  ['鄂尔多斯'],
+  ['福州', '佛山'],
+  ['广州', '贵阳', '桂林'],
+  ['杭州', '合肥', '哈尔滨', '海口', '呼和浩特'],
+  ['济南'],
+  ['昆明'],
+  ['兰州', '拉萨', '柳州'],
+  ['南京', '南昌', '南宁', '宁波'],
+  ['青岛', '泉州'],
+  ['上海', '深圳', '苏州', '沈阳', '石家庄'],
+  ['天津', '太原', '台北'],
+  ['武汉', '无锡'],
+  ['西安', '厦门', '西宁', '香港'],
+  ['银川', '扬州'],
+  ['郑州'],
+] as string[][])
+
+
 // ==================== 基础组件 ====================
 const showTag = ref(true)
 
@@ -1782,6 +1826,33 @@ function onListRefresh(): void {
   font-weight: bold;
   color: #fa3534;
   margin-top: 4px;
+}
+
+.index-list-demo-wrapper {
+  height: 400px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.index-list-demo-wrapper :deep(.up-index-list) {
+  height: 100%;
+}
+
+.list-cell {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px 24rpx;
+  overflow: hidden;
+  background-color: #fff;
+}
+
+.list-cell-text {
+  color: #323233;
+  font-size: 14px;
+  line-height: 24px;
 }
 
 .u-nav-slot {
