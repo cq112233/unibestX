@@ -68,6 +68,11 @@ export const propsTabs = defineMixin({
         iconStyle: {
             type: [String, UTSJSONObject],
             default: crtProps['iconStyle']
+        },
+        // tabs高度
+        height: {
+            type: [String, Number],
+            default: crtProps['height'] != null ? crtProps['height'] : '44px'
         }
     }
 })
