@@ -4,12 +4,93 @@
       title="uview-ultra 组件演示"
       :auto-back="true"
       :safe-area-inset-top="true"
-      :placeholder="true"
       bg-color="#ffffff"
     ></up-navbar>
 
     <scroll-view :scroll-y="true" direction="vertical" :style="{ height: `${scrollHeight}px` }" :scroll-top="scrollViewScrollTop" :scroll-with-animation="true" @scroll="onScroll">
       <ThemeSwitchCard />
+
+      <!-- Tabbar 底部导航栏 -->
+      <view class="demo-block">
+        <text class="demo-label">
+          up-tabbar
+        </text>
+        <view class="tabbar-demo-wrapper">
+          <up-tabbar
+            :value="tabbarValue"
+            :fixed="false"
+            :placeholder="false"
+            :safe-area-inset-bottom="false"
+            @change="onTabbarChange"
+          >
+            <up-tabbar-item text="首页" icon="home" name="home"></up-tabbar-item>
+            <up-tabbar-item text="分类" icon="search" name="search"></up-tabbar-item>
+            <up-tabbar-item text="购物车" icon="heart" name="cart"></up-tabbar-item>
+            <up-tabbar-item text="我的" icon="account" name="mine"></up-tabbar-item>
+          </up-tabbar>
+        </view>
+      </view>
+
+      <!-- Navbar 导航栏 -->
+      <view class="demo-block">
+        <text class="demo-label">
+          up-navbar
+        </text>
+        <up-navbar
+          title="自定义导航栏"
+          :fixed="false"
+          :auto-back="false"
+          :safe-area-inset-top="false"
+          bg-color="#2979ff"
+        ></up-navbar>
+        <view class="h-10px"></view>
+
+        <up-navbar
+          title="浅色主题"
+          :fixed="false"
+          :auto-back="false"
+          :safe-area-inset-top="false"
+          bg-color="#ffffff"
+          :border="true"
+        ></up-navbar>
+
+        <view class="h-10px"></view>
+
+        <up-navbar
+          title="带返回按钮"
+          :fixed="false"
+          :auto-back="true"
+          :safe-area-inset-top="false"
+          bg-color="#f5f5f5"
+        ></up-navbar>
+
+        <view class="h-10px"></view>
+
+        <up-navbar
+          title="自定义标题"
+          :fixed="false"
+          :auto-back="false"
+          :safe-area-inset-top="false"
+          bg-color="#ffffff"
+          :border="true"
+          left-text="返回"
+          right-text="更多"
+        ></up-navbar>
+
+        <view class="h-10px"></view>
+
+        <up-navbar
+          title="自定义图标"
+          :fixed="false"
+          :auto-back="false"
+          :safe-area-inset-top="false"
+          bg-color="#ffffff"
+          :border="true"
+          left-text="返回"
+          left-icon="arrow-left"
+          right-icon="setting"
+        ></up-navbar>
+      </view>
 
       <!-- Tabs 标签页 -->
       <view class="demo-block">
@@ -806,9 +887,6 @@
       <text class="section-title">
         导航组件
       </text>
-
-
-
       <up-divider text="导航组件结束"></up-divider>
 
       <!-- ==================== 展示组件 ==================== -->
@@ -1437,6 +1515,13 @@ function toggleSkeleton() {
 }
 
 // ==================== 导航组件 ====================
+// Tabbar
+const tabbarValue = ref('home')
+function onTabbarChange(name: string) {
+  tabbarValue.value = name
+}
+
+// Tabs
 const tabsCurrent = ref(0)
 const tabsList = ref([
   { name: '推荐' },
@@ -1510,6 +1595,12 @@ function onListRefresh(): void {
 </script>
 
 <style>
+/* H5 构建不会拷贝 up-icon 的本地 iconfont.ttf，加 CDN 字体兜底 */
+@font-face {
+	font-family: iconfont;
+	src: url('https://at.alicdn.com/t/font_2225171_8kdcwk4po24.ttf') format('truetype');
+}
+
 .page-container {
   display: flex;
   flex-direction: column;
@@ -1649,6 +1740,11 @@ function onListRefresh(): void {
   font-size: 13px;
   color: #303133;
   line-height: 18px;
+}
+
+.tabbar-demo-wrapper {
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .waterfall-price {
