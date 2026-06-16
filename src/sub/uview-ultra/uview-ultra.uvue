@@ -1,17 +1,17 @@
 <template>
   <view class="page-container">
-    <up-navbar
+    <NavBar
       title="uview-ultra 组件演示"
       :auto-back="true"
       :safe-area-inset-top="true"
       bg-color="#ffffff"
-    ></up-navbar>
+    ></NavBar>
 
     <scroll-view :scroll-y="true" direction="vertical" :style="{ height: `${scrollHeight}px` }" :scroll-top="scrollViewScrollTop" :scroll-with-animation="true" @scroll="onScroll">
       <ThemeSwitchCard />
 
       <!-- Tabbar 底部导航栏 -->
-      <view class="demo-block">
+      <!-- <view class="demo-block">
         <text class="demo-label">
           up-tabbar
         </text>
@@ -29,7 +29,7 @@
             <up-tabbar-item text="我的" icon="account" name="mine"></up-tabbar-item>
           </up-tabbar>
         </view>
-      </view>
+      </view> -->
 
       <!-- Navbar 导航栏 -->
       <view class="demo-block">
