@@ -31,9 +31,18 @@ export default function autoRootPlugin() {
       let newCode = code
 
       // 1. 将 template 内的内容用 <AppKu> 包裹
-      newCode = newCode.replace(/<template>([\s\S]*?)<\/template>/, (match, p1) => {
-        return `<template>\n  <AppKu>\n${p1}\n  </AppKu>\n</template>`
-      })
+      const startTemplateIdx = code.indexOf('<template')
+      const endTemplateIdx = code.lastIndexOf('</template>')
+      if (startTemplateIdx !== -1 && endTemplateIdx !== -1 && startTemplateIdx < endTemplateIdx) {
+        const startTagEndIdx = code.indexOf('>', startTemplateIdx)
+        if (startTagEndIdx !== -1 && startTagEndIdx < endTemplateIdx) {
+          const templateAttrs = code.slice(startTemplateIdx + 9, startTagEndIdx)
+          const content = code.slice(startTagEndIdx + 1, endTemplateIdx)
+          const before = code.slice(0, startTemplateIdx)
+          const after = code.slice(endTemplateIdx + 11)
+          newCode = `${before}<template${templateAttrs}>\n  <AppKu>\n${content}\n  </AppKu>\n</template>${after}`
+        }
+      }
 
       // 2. 在 script setup 内引入 AppKu 组件
       newCode = newCode.replace(/<script setup([\s\S]*?)>/, (match) => {

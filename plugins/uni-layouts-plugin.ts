@@ -297,10 +297,19 @@ export default function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
 
       // 8. 包装页面的 <template>
       let hasTemplate = false
-      cleanCode = cleanCode.replace(/<template([^>]*)>([\s\S]*?)<\/template>/, (match, attrsStr, content) => {
-        hasTemplate = true
-        return `<template${attrsStr}>\n  <LayoutComponent${attrs}>\n${content}\n  </LayoutComponent>\n</template>`
-      })
+      const startTemplateIdx = cleanCode.indexOf('<template')
+      const endTemplateIdx = cleanCode.lastIndexOf('</template>')
+      if (startTemplateIdx !== -1 && endTemplateIdx !== -1 && startTemplateIdx < endTemplateIdx) {
+        const startTagEndIdx = cleanCode.indexOf('>', startTemplateIdx)
+        if (startTagEndIdx !== -1 && startTagEndIdx < endTemplateIdx) {
+          hasTemplate = true
+          const templateAttrs = cleanCode.slice(startTemplateIdx + 9, startTagEndIdx)
+          const content = cleanCode.slice(startTagEndIdx + 1, endTemplateIdx)
+          const before = cleanCode.slice(0, startTemplateIdx)
+          const after = cleanCode.slice(endTemplateIdx + 11)
+          cleanCode = `${before}<template${templateAttrs}>\n  <LayoutComponent${attrs}>\n${content}\n  </LayoutComponent>\n</template>${after}`
+        }
+      }
 
       if (!hasTemplate) {
         return {

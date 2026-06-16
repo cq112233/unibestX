@@ -90,6 +90,36 @@
           left-icon="arrow-left"
           right-icon="setting"
         ></up-navbar>
+
+        <view class="h-10px">
+        </view>
+        <up-navbar
+          :fixed="false"
+          left-text="返回"
+          title="个人中心"
+          :safe-area-inset-top="false"
+        >
+          <template #left>
+            <view
+              class="u-nav-slot"
+            >
+              <up-icon
+                name="arrow-left"
+                size="19"
+              ></up-icon>
+              <up-line
+                direction="column"
+                :hairline="false"
+                length="16"
+                margin="0 8px"
+              ></up-line>
+              <up-icon
+                name="home"
+                size="20"
+              ></up-icon>
+            </view>
+          </template>
+        </up-navbar>
       </view>
 
       <!-- Tabs 标签页 -->
@@ -1597,8 +1627,8 @@ function onListRefresh(): void {
 <style>
 /* H5 构建不会拷贝 up-icon 的本地 iconfont.ttf，加 CDN 字体兜底 */
 @font-face {
-	font-family: iconfont;
-	src: url('https://at.alicdn.com/t/font_2225171_8kdcwk4po24.ttf') format('truetype');
+  font-family: iconfont;
+  src: url('https://at.alicdn.com/t/font_2225171_8kdcwk4po24.ttf') format('truetype');
 }
 
 .page-container {
@@ -1752,5 +1782,18 @@ function onListRefresh(): void {
   font-weight: bold;
   color: #fa3534;
   margin-top: 4px;
+}
+
+.u-nav-slot {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #e4e7ed;
+  border-radius: 100px;
+  padding: 4px 12px;
+  background-color: #ffffff;
 }
 </style>
