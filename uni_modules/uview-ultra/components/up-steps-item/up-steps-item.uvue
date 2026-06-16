@@ -1,43 +1,57 @@
 <template>
-	<view class="up-steps-item" ref="up-steps-item" :class="[`up-steps-item--${parentData['direction']}`]">
+	<view class="up-steps-item" ref="up-steps-item" :class="[`up-steps-item--${parentData['direction']}`]" :style="itemWidthStyle">
 		<view class="up-steps-item__line"
-			:class="[`up-steps-item__line--${parentData['direction']}`]" :style="[lineStyle]"></view>
+			:class="[
+				`up-steps-item__line--${parentData['direction']}`,
+				(index < parseInt(parentData['current'].toString()) && parentData['activeColor'] == '#3c9cff') ? 'up-steps-item__line--active' : ''
+			]" :style="lineStyle"></view>
 		<view class="up-steps-item__line"
-			:class="[`up-steps-item__line--${parentData['direction']}`]" :style="[lineStyle2]"></view>
+			:class="[
+				`up-steps-item__line--${parentData['direction']}`,
+				((index - 1) < parseInt(parentData['current'].toString()) && parentData['activeColor'] == '#3c9cff') ? 'up-steps-item__line--active' : ''
+			]" :style="lineStyle2"></view>
 		<view class="up-steps-item__wrapper"
 			:class="[`up-steps-item__wrapper--${parentData['direction']}`,
 				(parentData['dot'] != null && parentData['dot'] as boolean) ? `up-steps-item__wrapper--${parentData['direction']}--dot` : '']"
-			:style="[itemStyleInner]">
+			:style="itemStyleInner">
 			<slot name="icon">
 				<view class="up-steps-item__wrapper__dot"
-					v-if="(parentData['dot'] != null && parentData['dot'] as boolean)" :style="{
-						backgroundColor: statusColor
-					}">
+					v-if="(parentData['dot'] != null && parentData['dot'] as boolean)"
+					:class="[
+						(statusClass === 'finish' || statusClass === 'process') ? 'up-steps-item__wrapper__dot--active' : ''
+					]"
+					:style="dotStyle">
 
 				</view>
 				<view class="up-steps-item__wrapper__icon"
 					v-else-if="parentData['activeIcon'] != '' || parentData['inactiveIcon'] != ''">
 					<up-icon :name="index <= parseInt(parentData['current'].toString()) ? parentData['activeIcon'] : parentData['inactiveIcon']"
 						:size="iconSize"
-						:color="index <= parseInt(parentData['current'].toString()) ? parentData['activeColor'] : parentData['inactiveColor']">
+						:color="index <= parseInt(parentData['current'].toString()) ? (parentData['activeColor'] == '#3c9cff' ? 'primary' : parentData['activeColor']) : parentData['inactiveColor']">
 					</up-icon>
 				</view>
-				<view v-else :style="{
-						backgroundColor: statusClass === 'process' ? parentData['activeColor'] : 'transparent',
-						borderColor: statusColor
-					}" class="up-steps-item__wrapper__circle">
+				<view v-else
+					:class="[
+						statusClass === 'process' ? 'up-steps-item__wrapper__circle--active' : '',
+						statusClass === 'finish' ? 'up-steps-item__wrapper__circle--finish' : '',
+						statusClass === 'wait' ? 'up-steps-item__wrapper__circle--wait' : '',
+						statusClass === 'error' ? 'up-steps-item__wrapper__circle--error' : ''
+					]"
+					:style="circleStyle" class="up-steps-item__wrapper__circle">
 					<text v-if="statusClass === 'process' || statusClass === 'wait'"
-						class="up-steps-item__wrapper__circle__text" :style="{
-							color: index == parseInt(parentData['current'].toString()) ? '#ffffff' : parentData['inactiveColor']
-						}">{{ index + 1}}</text>
-					<up-icon v-else :color="statusClass === 'error' ? 'error' : parentData['activeColor']" size="12"
+						class="up-steps-item__wrapper__circle__text"
+						:class="[
+							statusClass === 'process' ? 'up-steps-item__wrapper__circle__text--active' : ''
+						]"
+						:style="circleTextStyle">{{ index + 1}}</text>
+					<up-icon v-else :color="statusClass === 'error' ? 'error' : (parentData['activeColor'] == '#3c9cff' ? 'primary' : parentData['activeColor'])" size="12"
 						:name="statusClass === 'error' ? 'close' : 'checkmark'"></up-icon>
 				</view>
 			</slot>
 		</view>
 		<view class="up-steps-item__content" :class="[`up-steps-item__content--${parentData['direction']}`,
 			parseInt(parentData['current'].toString()) == index ? 'up-steps-item__content--current' : '']"
-			:style="[contentStyle]">
+			:style="contentStyle">
 			<slot name="content" :index="index">
 			</slot>
 			<template v-if="$slots['content'] == null">
@@ -45,7 +59,8 @@
 					<slot name="title">
 					</slot>
 					<up-text v-if="$slots['title'] == null" :text="title" lineHeight="20px"
-						:type="parseInt(parentData['current'].toString()) == index ? 'main' : 'content'"
+						:color="parseInt(parentData['current'].toString()) == index ? (parentData['activeColor'] == '#3c9cff' ? '' : (parentData['activeColor'] as string)) : (parentData['inactiveColor'] as string)"
+						:type="parseInt(parentData['current'].toString()) == index && parentData['activeColor'] == '#3c9cff' ? 'primary' : 'default'"
 						:size="parseInt(parentData['current'].toString()) == index ? 14 : 13"></up-text>
 				</view>
 				<view class="up-steps-item__content__desc">
@@ -83,10 +98,6 @@
 				index: 0,
 				childLength: 0,
 				showLine: false,
-				size: {
-					height: 0,
-					width: 0
-				},
 				parentData: {
 					direction: 'row',
 					current: 0,
@@ -106,20 +117,35 @@
 			this.init()
 		},
 		computed: {
+			itemWidthStyle(): any {
+				const style = {}
+				// @ts-ignore
+				if (this.parentData['direction'].toString() === 'row' && this.childLength > 0) {
+					// @ts-ignore
+					style['width'] = (100.0 / this.childLength).toString() + '%'
+				}
+				return style
+			},
 			lineStyle2() {
 				const style = {}
 				// @ts-ignore
 				if (this.parentData['direction'].toString() === 'row') {
 					if (this.index == 0) {
-						style['width'] = '0px'
-						style['left'] = (this.size['width'] as number / 2).toString() + 'px'
-						// @ts-ignore
-					} else if (this.index == (this.parent!.$data['children'] as ComponentPublicInstance[]).length - 1) {
-						style['width'] = '0px'
-						style['left'] = '0px'
+						style['display'] = 'none'
 					} else {
-						style['width'] = (this.size['width'] as number / 2).toString() + 'px'
 						style['left'] = '0px'
+						style['right'] = '50%'
+						style['width'] = 'auto'
+					}
+				} else {
+					if (this.index == 0) {
+						style['display'] = 'none'
+					} else {
+						style['top'] = '0px'
+						style['bottom'] = '50%'
+						style['left'] = '10px'
+						style['height'] = 'auto'
+						style['width'] = '1px'
 					}
 				}
 
@@ -136,7 +162,9 @@
 						style['backgroundColor'] = color['error']
 						// @ts-ignore
 					} else if ((this.index - 1) < parseInt(this.parentData['current'].toString())) {
-						style['backgroundColor'] = this.parentData['activeColor']
+						if (this.parentData['activeColor'] != '#3c9cff') {
+							style['backgroundColor'] = this.parentData['activeColor']
+						}
 					} else {
 						style['backgroundColor'] = this.parentData['inactiveColor']
 					}
@@ -147,20 +175,23 @@
 				const style = {}
 				// @ts-ignore
 				if (this.parentData['direction'].toString() === 'row') {
-					if (this.index == 0) {
-						style['width'] = (this.size['width'] as number).toString() + 'px'
-						style['left'] = (this.size['width'] as number / 2).toString() + 'px'
-						// @ts-ignore
-					} else if (this.index == (this.parent!.$data['children'] as ComponentPublicInstance[]).length - 1) {
-						style['width'] = (this.size['width'] as number / 2).toString() + 'px'
-						style['left'] = '0px'
+					if (this.index == this.childLength - 1) {
+						style['display'] = 'none'
 					} else {
-						style['width'] = (this.size['width'] as number).toString() + 'px'
-						style['left'] = '0px'
+						style['left'] = '50%'
+						style['right'] = '0px'
+						style['width'] = 'auto'
 					}
 				} else {
-					style['height'] = this.size['height'].toString() + 'px'
-					// style['top'] = (this.size['height'] / 2).toString() + 'px'
+					if (this.index == this.childLength - 1) {
+						style['display'] = 'none'
+					} else {
+						style['top'] = '50%'
+						style['bottom'] = '0px'
+						style['left'] = '10px'
+						style['height'] = 'auto'
+						style['width'] = '1px'
+					}
 				}
 				
 				// @ts-ignore
@@ -176,9 +207,58 @@
 						style['backgroundColor'] = color['error']
 						// @ts-ignore
 					} else if (this.index < parseInt(this.parentData['current'].toString())) {
-						style['backgroundColor'] = this.parentData['activeColor']
+						if (this.parentData['activeColor'] != '#3c9cff') {
+							style['backgroundColor'] = this.parentData['activeColor']
+						}
 					} else {
 						style['backgroundColor'] = this.parentData['inactiveColor']
+					}
+				}
+				return style
+			},
+			dotStyle(): any {
+				const style = {} as UTSJSONObject
+				const activeColor = this.parentData['activeColor'] as string
+				if (this.statusClass === 'finish' || this.statusClass === 'process') {
+					if (activeColor != '#3c9cff') {
+						style['backgroundColor'] = activeColor
+					}
+				} else {
+					style['backgroundColor'] = this.parentData['inactiveColor']
+				}
+				return style
+			},
+			circleStyle(): any {
+				const style = {} as UTSJSONObject
+				const activeColor = this.parentData['activeColor'] as string
+				const inactiveColor = this.parentData['inactiveColor'] as string
+				
+				if (activeColor != '#3c9cff' || inactiveColor != '#969799') {
+					if (this.statusClass === 'process') {
+						style['backgroundColor'] = activeColor
+						style['borderColor'] = activeColor
+					} else if (this.statusClass === 'finish') {
+						style['backgroundColor'] = 'rgba(0, 0, 0, 0)'
+						style['borderColor'] = activeColor
+					} else if (this.statusClass === 'wait') {
+						style['backgroundColor'] = 'rgba(0, 0, 0, 0)'
+						style['borderColor'] = inactiveColor
+					} else if (this.statusClass === 'error') {
+						style['backgroundColor'] = 'rgba(0, 0, 0, 0)'
+						style['borderColor'] = color['error']
+					}
+				}
+				return style
+			},
+			circleTextStyle(): any {
+				const style = {} as UTSJSONObject
+				const activeColor = this.parentData['activeColor'] as string
+				const inactiveColor = this.parentData['inactiveColor'] as string
+				if (activeColor != '#3c9cff' || inactiveColor != '#969799') {
+					if (this.statusClass === 'process') {
+						style['color'] = '#ffffff'
+					} else {
+						style['color'] = inactiveColor
 					}
 				}
 				return style
@@ -247,9 +327,6 @@
 				// @ts-ignore
 				this.parent?.$callMethod('updateFromChild')
 			}
-			sleep().then(() => {
-				this.getStepsItemRect()
-			})
 		},
 		methods: {
 			init() {
@@ -276,15 +353,6 @@
 			// 父组件数据发生变化
 			updateFromParent() {
 				this.init()
-			},
-			// 获取组件的尺寸，用于设置横线的位置
-			getStepsItemRect() {
-				// @ts-ignore
-				this.upGetRect('.up-steps-item').then((size: NodeInfo) => {
-					// console.log(size)
-					this.size['width'] = size.width != null ? size.width : 0
-					this.size['height'] = size.height != null ? size.height : 0
-				})
 			}
 		}
 	}
@@ -345,17 +413,39 @@
 				flex-shrink: 0;
 				border-radius: 100px;
 				border-width: 1px;
-				border-color: $up-tips-color;
 				border-style: solid;
 				@include flex(row);
 				align-items: center;
 				justify-content: center;
-				transition: background-color 0.3s;
+
+				&--wait {
+					border-color: $up-tips-color !important;
+					background-color: transparent !important;
+				}
+
+				&--active {
+					background-color: $up-primary !important;
+					border-color: $up-primary !important;
+				}
+
+				&--finish {
+					border-color: $up-primary !important;
+					background-color: transparent !important;
+				}
+
+				&--error {
+					border-color: $up-error !important;
+					background-color: transparent !important;
+				}
 
 				&__text {
 					color: $up-tips-color;
 					font-size: 11px;
 					text-align: center;
+
+					&--active {
+						color: #ffffff !important;
+					}
 				}
 			}
 
@@ -364,6 +454,10 @@
 				height: 10px;
 				border-radius: 100px;
 				background-color: $up-content-color;
+
+				&--active {
+					background-color: $up-primary;
+				}
 			}
 		}
 
@@ -391,6 +485,10 @@
 		&__line {
 			position: absolute;
 			background: $up-tips-color;
+
+			&--active {
+				background-color: $up-primary !important;
+			}
 
 			&--row {
 				top: 10px;

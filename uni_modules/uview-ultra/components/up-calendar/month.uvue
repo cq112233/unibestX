@@ -214,11 +214,15 @@
 							}
 						}
 						if (shouldActiveBg) {
-							style['backgroundColor'] = this.color == '#3c9cff' ? 'var(--theme-color, #3c9cff)' : this.color
+							if (this.color != '#3c9cff') {
+								style['backgroundColor'] = this.color
+							}
 						}
 					}
 					if (this.todayDate != '' && this.dateSame(date, this.todayDate) && !this.selected.some(sameDate)) {
-						style['border'] = `1px solid ${this.color == '#3c9cff' ? 'var(--theme-color, #3c9cff)' : this.color}`
+						if (this.color != '#3c9cff') {
+							style['border'] = `1px solid ${this.color}`
+						}
 						style['boxSizing'] = 'border-box'
 					}
 					if (this.mode == 'single') {
@@ -270,7 +274,9 @@
 						// 如果是范围选择模式，第一个和最后一个之间的日期，文字颜色设置为高亮的主题色
 						if (dayuts(date).isAfter(dayuts(this.selected[0])) && dayuts(date).isBefore(dayuts(this
 								.selected[len]))) {
-							style['color'] = this.color == '#3c9cff' ? 'var(--theme-color, #3c9cff)' : this.color
+							if (this.color != '#3c9cff') {
+								style['color'] = this.color
+							}
 						}
 					}
 					return style
