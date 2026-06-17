@@ -313,7 +313,7 @@ export default {
     buildImgStyle(n: HtmlNode): string {
       const attrs = n.attrs
       let style = attrs != null ? ((attrs!['style'] as string) ?? '') : ''
-      style = 'max-width:100%;' + style
+      style = 'max-width:750px;' + style
       if (n.w != null) {
         // 宽高都有，设置具体高度
       }

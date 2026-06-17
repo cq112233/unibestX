@@ -10,6 +10,188 @@
     <scroll-view :scroll-y="true" direction="vertical" :style="{ height: `${scrollHeight}px` }" :scroll-top="scrollViewScrollTop" :scroll-with-animation="true" @scroll="onScroll">
       <ThemeSwitchCard />
 
+      <!-- Avatar 头像 -->
+      <view class="demo-block">
+        <text class="demo-label">
+          up-avatar 头像
+        </text>
+        <!-- 图片头像：不同形状和尺寸 -->
+        <view class="demo-row-start">
+          <up-avatar :src="avatarSrc" size="40"></up-avatar>
+          <view class="w-15px"></view>
+          <up-avatar :src="avatarSrc" size="40" shape="square"></up-avatar>
+          <view class="w-15px"></view>
+          <up-avatar :src="avatarSrc" size="55" mode="aspectFill"></up-avatar>
+          <view class="w-15px"></view>
+          <up-avatar src="/invalid-path.png" size="40" default-url="/static/logo.png"></up-avatar>
+        </view>
+        <!-- 文字头像 -->
+        <view class="demo-row-start mt-10px">
+          <up-avatar text="U" size="40" bg-color="#2979ff"></up-avatar>
+          <view class="w-15px"></view>
+          <up-avatar text="A" size="40" bg-color="#19be6b"></up-avatar>
+          <view class="w-15px"></view>
+          <up-avatar :random-bg-color="true" text="张" size="40"></up-avatar>
+          <view class="w-15px"></view>
+          <up-avatar :random-bg-color="true" text="李" size="40" font-size="16"></up-avatar>
+          <view class="w-15px"></view>
+          <up-avatar :random-bg-color="true" text="王五" size="45" font-size="14"></up-avatar>
+        </view>
+        <!-- 图标头像 -->
+        <view class="demo-row-start mt-10px">
+          <up-avatar icon="star-fill" size="40" bg-color="#ffca28" font-size="22"></up-avatar>
+          <view class="w-15px"></view>
+          <up-avatar icon="heart-fill" size="40" bg-color="#fa3534" font-size="22"></up-avatar>
+          <view class="w-15px"></view>
+          <up-avatar icon="setting-fill" size="40" bg-color="#909399" font-size="22"></up-avatar>
+          <view class="w-15px"></view>
+          <up-avatar icon="photo-fill" size="40" bg-color="#19be6b" font-size="22"></up-avatar>
+        </view>
+        <!-- 头像组 -->
+        <view class="demo-row-start mt-10px items-center">
+          <text class="text-12px text-[#909399] mr-10px">头像组:</text>
+          <up-avatar-group :urls="avatarGroupUrls" size="35" :gap="0.4" :max-count="5" :show-more="true" @show-more="onAvatarGroupMore"></up-avatar-group>
+        </view>
+        <!-- 可点击头像 -->
+        <view class="demo-row-start mt-10px items-center">
+          <up-avatar :src="avatarSrc" size="40" @click="onAvatarClick"></up-avatar>
+          <text class="text-12px text-[#909399] ml-10px">点击头像可触发事件</text>
+        </view>
+      </view>
+
+      <!-- Link 超链接 -->
+      <view class="demo-block">
+        <text class="demo-label">
+          up-link 超链接
+        </text>
+        <!-- 基本使用 -->
+        <view class="demo-row-start">
+          <up-link href="https://uview-ultra.lingyun.net" text="打开 uview-ultra UI 文档" @click="onLinkClick"></up-link>
+        </view>
+        <!-- 带下划线 -->
+        <view class="demo-row-start mt-8px">
+          <up-link href="https://uniapp.dcloud.net.cn" text="uni-app X 官方文档" :under-line="true" @click="onLinkClick"></up-link>
+        </view>
+        <!-- 自定义颜色 + 下划线颜色 -->
+        <view class="demo-row-start mt-8px">
+          <up-link href="https://github.com" text="GitHub" color="#19be6b" line-color="#19be6b" :under-line="true" font-size="16" @click="onLinkClick"></up-link>
+          <view class="w-20px"></view>
+          <up-link href="https://www.baidu.com" text="百度一下" color="#fa3534" line-color="#fa3534" :under-line="true" font-size="16" @click="onLinkClick"></up-link>
+          <view class="w-20px"></view>
+          <up-link href="https://www.zhihu.com" text="知乎" color="#ff9900" font-size="16" @click="onLinkClick"></up-link>
+        </view>
+        <!-- 小程序复制提示 -->
+        <view class="demo-row-start mt-8px">
+          <up-link href="https://uview-ultra.lingyun.net" text="小程序内打开（复制链接到浏览器）" :under-line="true" mp-tips="链接已复制，请在浏览器中打开" font-size="13" color="#909399" @click="onLinkClick"></up-link>
+        </view>
+      </view>
+
+      <!-- LazyLoad 懒加载 -->
+      <view class="demo-block">
+        <text class="demo-label">
+          up-lazy-load 懒加载
+        </text>
+        <!-- 基本使用 -->
+        <view class="demo-row-start">
+          <view class="lazy-load-item">
+            <up-lazy-load
+              image="https://gtd.alicdn.com/sns_logo/i1/TB124_3NXXXXXasXVXXSutbFXXX.jpg_240x240xz.jpg"
+              loading-img="/static/logo.png"
+              :height="1020"
+              :border-radius="8"
+              index="img1"
+              @click="onLazyLoadClick"
+              @error="onLazyLoadError"
+            ></up-lazy-load>
+          </view>
+          <view class="lazy-load-item">
+            <up-lazy-load
+              image="https://picsum.photos/240/240?random=22"
+              loading-img="/static/logo.png"
+              :height="120"
+              :border-radius="8"
+              index="img2"
+              @click="onLazyLoadClick"
+              @error="onLazyLoadError"
+            ></up-lazy-load>
+          </view>
+          <view class="lazy-load-item">
+            <up-lazy-load
+              image="https://picsum.photos/240/240?random=23"
+              loading-img="/static/logo.png"
+              :height="120"
+              :border-radius="8"
+              index="img3"
+              @click="onLazyLoadClick"
+              @error="onLazyLoadError"
+            ></up-lazy-load>
+          </view>
+        </view>
+        <!-- 占位图 + 错误图 -->
+        <view class="demo-row-start mt-10px items-center">
+          <view class="lazy-load-item">
+            <up-lazy-load
+              image="https://invalid-url-test/not-exist.png"
+              loading-img="/static/logo.png"
+              error-img="/static/logo.png"
+              :height="100"
+              :border-radius="8"
+              index="error-img"
+            ></up-lazy-load>
+          </view>
+          <text class="text-12px text-[#909399] ml-10px">加载失败自动展示 error-img 占位图</text>
+        </view>
+      </view>
+
+      <!-- mp-html 富文本 -->
+      <view class="demo-block">
+        <text class="demo-label">
+          mp-html 富文本
+        </text>
+        <mp-html
+          :content="mpHtmlContent"
+          :preview-img="true"
+          :show-img-menu="true"
+          :selectable="true"
+          @load="onMpHtmlLoad"
+          @linktap="onMpHtmlLinktap"
+          @imgtap="onMpHtmlImgtap"
+          @error="onMpHtmlError"
+        ></mp-html>
+      </view>
+
+      <!-- Loadmore 加载更多 -->
+      <view class="demo-block">
+        <text class="demo-label">
+          up-loadmore
+        </text>
+        <view class="flex-col items-center">
+          <up-loadmore :status="loadmoreStatus" :is-dot="loadmoreIsDot" :line="true"></up-loadmore>
+          <view class="demo-row mt-10px">
+            <up-button type="primary" text="加载更多" size="mini" @click="loadmoreStatus = 'loadmore'; loadmoreIsDot = false"></up-button>
+            <up-button type="warning" text="加载中" size="mini" @click="loadmoreStatus = 'loading'; loadmoreIsDot = false"></up-button>
+            <up-button type="info" text="没有更多" size="mini" @click="loadmoreStatus = 'nomore'; loadmoreIsDot = false"></up-button>
+            <up-button type="error" text="显示圆点" size="mini" @click="loadmoreStatus = 'nomore'; loadmoreIsDot = true"></up-button>
+          </view>
+        </view>
+      </view>
+
+      <!-- Album 相册 -->
+      <view class="demo-block">
+        <text class="demo-label">
+          up-album
+        </text>
+        <up-album
+          :urls="albumUrls"
+          multiple-size="72"
+          space="6"
+          :max-count="9"
+          :show-more="true"
+          row-count="3"
+          radius="6"
+        ></up-album>
+      </view>
+
       <!-- IndexList 索引列表 -->
       <view class="demo-block">
         <text class="demo-label">
@@ -300,14 +482,14 @@
         <text class="demo-label">
           up-text
         </text>
-        <view class="demo-row justify-start">
+        <view class="demo-row-start">
           <up-text text="普通文本"></up-text>
           <view class="w-15px"></view>
           <up-text type="primary" text="主色文本"></up-text>
           <view class="w-15px"></view>
           <up-text type="error" text="错误提示" :bold="true"></up-text>
         </view>
-        <view class="demo-row justify-start mt-10px">
+        <view class="demo-row-start mt-10px">
           <up-text mode="price" text="99.9"></up-text>
           <view class="w-20px"></view>
           <up-text mode="phone" text="13800000000" format="encrypt"></up-text>
@@ -334,7 +516,7 @@
           <up-tag text="小号" type="primary" size="mini"></up-tag>
           <up-tag text="可关闭" type="error" :plain="true" :closable="true" :show="showTag" @close="showTag = false"></up-tag>
         </view>
-        <view class="demo-row justify-start mt-10px">
+        <view class="demo-row-start mt-10px">
           <up-tag text="图片标签" icon="/static/logo.png" size="medium" :plain="true"></up-tag>
         </view>
       </view>
@@ -353,26 +535,12 @@
         </view>
       </view>
 
-      <!-- Avatar 头像 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-avatar
-        </text>
-        <view class="demo-row">
-          <up-avatar text="U" size="40" bg-color="#2979ff"></up-avatar>
-          <up-avatar text="A" size="40" bg-color="#19be6b"></up-avatar>
-          <up-avatar text="V" size="40" bg-color="#fa3534"></up-avatar>
-          <up-avatar :random-bg-color="true" text="张" size="40"></up-avatar>
-          <up-avatar :random-bg-color="true" text="李" size="40"></up-avatar>
-        </view>
-      </view>
-
       <!-- Image 图片 -->
       <view class="demo-block">
         <text class="demo-label">
           up-image
         </text>
-        <view class="demo-row justify-start">
+        <view class="demo-row-start">
           <up-image src="/static/logo.png" width="60px" height="60px"></up-image>
           <view class="w-15px"></view>
           <up-image src="/static/logo.png" width="60px" height="60px" shape="circle"></up-image>
@@ -442,7 +610,7 @@
         <text class="demo-label">
           up-switch
         </text>
-        <view class="demo-row justify-start">
+        <view class="demo-row-start">
           <up-switch v-model="switchValue1"></up-switch>
           <view class="w-20px"></view>
           <up-switch v-model="switchValue2" active-color="#fa3534"></up-switch>
@@ -500,7 +668,7 @@
         <text class="demo-label">
           up-number-box
         </text>
-        <view class="demo-row justify-start">
+        <view class="demo-row-start">
           <up-number-box v-model="numberValue" :min="0" :max="100"></up-number-box>
         </view>
       </view>
@@ -576,7 +744,7 @@
         <text class="demo-label">
           up-calendar
         </text>
-        <view class="demo-row justify-start items-center">
+        <view class="demo-row-start items-center">
           <up-button type="primary" text="选择日期" size="mini" @click="calendarShow = true"></up-button>
           <view class="w-15px"></view>
           <text class="text-14px text-[#606266]">{{ calendarValue != '' ? `已选日期: ${calendarValue}` : '未选择日期' }}</text>
@@ -588,14 +756,14 @@
         <text class="demo-label">
           up-keyboard
         </text>
-        <view class="demo-row justify-start items-center">
+        <view class="demo-row-start items-center">
           <view class="flex-1">
             <up-input v-model="keyboardValue" placeholder="通过键盘输入内容" border="surround" readonly @click="openKeyboard('number')"></up-input>
           </view>
           <view class="w-10px"></view>
           <up-button type="info" text="清空" size="mini" @click="keyboardValue = ''"></up-button>
         </view>
-        <view class="demo-row justify-start mt-10px">
+        <view class="demo-row-start mt-10px">
           <up-button type="primary" text="数字键盘" size="mini" @click="openKeyboard('number')"></up-button>
           <view class="w-10px"></view>
           <up-button type="primary" text="身份证键盘" size="mini" @click="openKeyboard('card')"></up-button>
@@ -609,7 +777,7 @@
         <text class="demo-label">
           up-picker
         </text>
-        <view class="demo-row justify-start items-center">
+        <view class="demo-row-start items-center">
           <up-button type="primary" text="选择国家" size="mini" @click="pickerShow = true"></up-button>
           <view class="w-15px"></view>
           <text class="text-14px text-[#606266]">{{ pickerValue != '' ? `已选: ${pickerValue}` : '未选择' }}</text>
@@ -621,7 +789,7 @@
         <text class="demo-label">
           up-datetime-picker
         </text>
-        <view class="demo-row justify-start items-center">
+        <view class="demo-row-start items-center">
           <up-button type="primary" text="选择日期" size="mini" @click="datetimePickerShow = true"></up-button>
           <view class="w-15px"></view>
           <text class="text-14px text-[#606266]">{{ datetimePickerLabel != '' ? `已选: ${datetimePickerLabel}` : '未选择' }}</text>
@@ -633,7 +801,7 @@
         <text class="demo-label">
           up-upload
         </text>
-        <view class="demo-row justify-start">
+        <view class="demo-row-start">
           <up-upload
             :file-list="uploadList"
             :multiple="true"
@@ -666,7 +834,7 @@
         <text class="demo-label">
           up-count-to
         </text>
-        <view class="demo-row justify-start">
+        <view class="demo-row-start">
           <up-count-to :start-val="0" :end-val="9999" :duration="3000"></up-count-to>
         </view>
       </view>
@@ -782,7 +950,7 @@
         <text class="demo-label">
           up-loading-page
         </text>
-        <view class="demo-row justify-start">
+        <view class="demo-row-start">
           <up-button type="primary" text="触发全屏加载" size="mini" @click="triggerLoadingPage"></up-button>
         </view>
       </view>
@@ -828,7 +996,7 @@
         <text class="demo-label">
           up-tooltip
         </text>
-        <view class="demo-row justify-start">
+        <view class="demo-row-start">
           <up-tooltip text="长按此处复制文本" direction="top"></up-tooltip>
           <view class="w-30px"></view>
           <up-tooltip text="长按显示操作" direction="top" :show-copy="false" :buttons="tooltipButtons"></up-tooltip>
@@ -1122,6 +1290,7 @@
 <script setup lang="uts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import ThemeSwitchCard from '@/src/pages/basic/components/ThemeSwitchCard.uvue'
+import mpHtml from '../../../uni_modules/mp-html/components/mp-html/mp-html.uvue'
 
 // ==================== BackTop 回到顶部 ====================
 const scrollTop = ref(0)
@@ -1190,6 +1359,59 @@ function loadMoreWaterfall(): void {
 
 function clearWaterfall(): void {
   waterfallList.value = [] as UTSJSONObject[]
+}
+
+// ==================== Loadmore 加载更多 ====================
+const loadmoreStatus = ref('loadmore')
+const loadmoreIsDot = ref(false)
+
+// ==================== Album 相册 ====================
+const albumUrls = ref([
+  'https://picsum.photos/400/400?random=10',
+  'https://picsum.photos/400/400?random=11',
+  'https://picsum.photos/400/400?random=12',
+  'https://picsum.photos/400/400?random=13',
+  'https://picsum.photos/400/400?random=14',
+  'https://picsum.photos/400/400?random=15',
+  'https://picsum.photos/400/400?random=16',
+  'https://picsum.photos/400/400?random=17',
+  'https://picsum.photos/400/400?random=18',
+  'https://picsum.photos/400/400?random=19',
+  'https://picsum.photos/400/400?random=20',
+] as string[])
+
+// ==================== Avatar 头像 ====================
+const avatarSrc = ref('/static/logo.png')
+const avatarGroupUrls = ref([
+  'https://picsum.photos/200/200?random=1',
+  'https://picsum.photos/200/200?random=2',
+  'https://picsum.photos/200/200?random=3',
+  'https://picsum.photos/200/200?random=4',
+  'https://picsum.photos/200/200?random=5',
+  'https://picsum.photos/200/200?random=6',
+  'https://picsum.photos/200/200?random=7',
+] as string[])
+
+function onAvatarGroupMore(): void {
+  uni.showToast({ title: '查看更多头像', icon: 'none' })
+}
+
+function onAvatarClick(): void {
+  uni.showToast({ title: '头像被点击', icon: 'none' })
+}
+
+// ==================== Link 超链接 ====================
+function onLinkClick(): void {
+  uni.showToast({ title: '链接点击事件触发', icon: 'none' })
+}
+
+// ==================== LazyLoad 懒加载 ====================
+function onLazyLoadClick(index: number): void {
+  uni.showToast({ title: `图片 ${index} 被点击`, icon: 'none' })
+}
+
+function onLazyLoadError(err: UTSJSONObject): void {
+  console.log('懒加载图片出错:', err)
 }
 
 // ==================== Swiper 轮播图 ====================
@@ -1665,6 +1887,67 @@ function onListRefresh(): void {
     uni.showToast({ title: '刷新完成', icon: 'none', duration: 1500 })
   }, 1500)
 }
+
+// ==================== mp-html 富文本 ====================
+const mpHtmlContent = ref(`<h2 style="text-align:center">mp-html 富文本演示</h2>
+<p>这是一个 <strong>uni-app X</strong> 原生渲染的富文本组件，支持以下标签：</p>
+<h3>1. 文本格式</h3>
+<p><b>粗体文字</b>、<i>斜体文字</i>、<u>下划线文字</u>、<s>删除线文字</s></p>
+<p><em>强调文本</em>、<strong>加粗强调</strong>、<mark>高亮文本</mark></p>
+<p>普通文本中含有 <code>code 代码</code> 和 <small>小号字</small></p>
+<h3>2. 链接</h3>
+<p>点击 <a href="https://www.baidu.com">百度链接</a> 查看效果</p>
+<p>这是 <a href="https://github.com/jin-yufeng/mp-html">mp-html GitHub</a> 仓库</p>
+<h3>3. 图片</h3>
+<p>以下是一张示例图片：</p>
+<img src="https://picsum.photos/400/300?random=2" alt="示例图片" />
+<h3>4. 表格</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+  <tr><th>姓名</th><th>年龄</th><th>城市</th></tr>
+  <tr><td>张三</td><td>28</td><td>北京</td></tr>
+  <tr><td>李四</td><td>32</td><td>上海</td></tr>
+  <tr><td>王五</td><td>25</td><td>深圳</td></tr>
+</table>
+<h3>5. 列表</h3>
+<ul>
+  <li>uni-app X 原生渲染</li>
+  <li>完整的 HTML 标签支持</li>
+  <li>图片点击预览</li>
+  <li>链接点击处理</li>
+</ul>
+<ol>
+  <li>第一步：导入组件</li>
+  <li>第二步：传入 content</li>
+  <li>第三步：监听事件</li>
+</ol>
+<h3>6. 预格式文本</h3>
+<pre>function hello() {
+  console.log("Hello, mp-html!")
+}</pre>
+<h3>7. 分割线</h3>
+<hr />
+<p style="text-align:center;color:#909399">以上为 mp-html 组件演示内容</p>`)
+
+function onMpHtmlLoad(): void {
+  console.log('mp-html 渲染完成')
+}
+
+function onMpHtmlLinktap(e: UTSJSONObject): void {
+  console.log('链接点击:', e)
+  // eslint-disable-next-line dot-notation
+  const href = e['href'] as string
+  if (href != null) {
+    uni.showToast({ title: `链接: ${href}`, icon: 'none' })
+  }
+}
+
+function onMpHtmlImgtap(e: UTSJSONObject): void {
+  console.log('图片点击:', e)
+}
+
+function onMpHtmlError(e: UTSJSONObject): void {
+  console.log('mp-html error:', e)
+}
 </script>
 
 <style>
@@ -1710,6 +1993,16 @@ function onListRefresh(): void {
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+/* 用于替代 demo-row + justify-start，解决 App 端 UnoCSS 原子类覆盖不一致的问题 */
+.demo-row-start {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
   margin-bottom: 8px;
 }
 
@@ -1865,5 +2158,11 @@ function onListRefresh(): void {
   border-radius: 100px;
   padding: 4px 12px;
   background-color: #ffffff;
+}
+
+.lazy-load-item {
+  width: 30%;
+  margin-right: 8px;
+  margin-bottom: 8px;
 }
 </style>
