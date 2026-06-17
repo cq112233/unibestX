@@ -4,7 +4,7 @@
     <template v-for="(n, i) in localNodes" :key="i">
       <text v-if="n.type == 'text'" :decode="true">{{ n.text }}</text>
       <text v-else-if="n.name == 'br'">\n</text>
-      <image v-else-if="n.name == 'img'" :src="(n.attrs != null ? (n.attrs!['src'] as string) ?? '' : '')" style="max-width:100%" mode="widthFix" />
+      <image v-else-if="n.name == 'img'" :src="(n.attrs != null ? (n.attrs!['src'] as string) ?? '' : '')" style="max-width:750px" mode="widthFix" />
       <text v-else-if="n.name == 'a'" class="mp-a" @tap="onLinkTap(n)">{{ flatText(n) }}</text>
       <text v-else-if="isInline(n.name ?? '')" :style="inlineStyle(n.name ?? '')" :decode="true">{{ flatText(n) }}</text>
       <text v-else-if="n.name == 'h1' || n.name == 'h2' || n.name == 'h3' || n.name == 'h4' || n.name == 'h5' || n.name == 'h6'" :style="headingStyle(n.name ?? '')" :decode="true">{{ flatText(n) }}</text>
@@ -30,7 +30,7 @@
         <template v-for="(cn, ci) in (n.children ?? [])" :key="ci">
           <text v-if="cn.type == 'text'" :decode="true">{{ cn.text }}</text>
           <text v-else-if="cn.name == 'br'">\n</text>
-          <image v-else-if="cn.name == 'img'" :src="(cn.attrs != null ? (cn.attrs!['src'] as string) ?? '' : '')" style="max-width:100%" mode="widthFix" />
+          <image v-else-if="cn.name == 'img'" :src="(cn.attrs != null ? (cn.attrs!['src'] as string) ?? '' : '')" style="max-width:750px" mode="widthFix" />
           <text v-else-if="cn.name == 'a'" class="mp-a" @tap="onLinkTap(cn)">{{ flatText(cn) }}</text>
           <text v-else-if="isInline(cn.name ?? '')" :style="inlineStyle(cn.name ?? '')" :decode="true">{{ flatText(cn) }}</text>
           <text v-else :decode="true">{{ flatText(cn) }}</text>

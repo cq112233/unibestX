@@ -31,11 +31,10 @@
 		>
 			<view
 				class="up-index-list__letter__item"
+				:class="{'up-index-list__letter__item--active': activeIndex === index && activeColor === '#5677fc'}"
 				v-for="(item, index) in uIndexList"
 				:key="index"
-				:style="{
-					backgroundColor: activeIndex === index ? activeColor : 'transparent'
-				}"
+				:style="getItemStyle(index)"
 			>
 				<text
 					class="up-index-list__letter__item__index"
@@ -495,6 +494,14 @@
 		anchors.value = [] as Array<ComponentPublicInstance>
 		sys.value = getWindowInfo()
 	})
+
+	const getItemStyle = (index: number): UTSJSONObject => {
+		const style = {} as UTSJSONObject
+		if (activeIndex.value === index && props.activeColor !== '#5677fc') {
+			style['backgroundColor'] = props.activeColor
+		}
+		return style
+	}
 
 	const addAnchors = function(anchorIns: ComponentPublicInstance) {
 		anchors.value.push(anchorIns)
