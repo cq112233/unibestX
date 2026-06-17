@@ -1,0 +1,129 @@
+<template>
+  <view class="fab-tool">
+    <view id="toolfab">
+      <slot></slot>
+    </view>
+    <view class="fab-tool-content" :style="placementStyle" id="placementfab">
+      <slot name="content" v-if="visible"></slot>
+    </view>
+  </view>
+</template>
+
+<script lang="uts">
+export default {
+  name: 'fab-tool',
+  props: {
+    visible: {
+      type: Boolean,
+      default: false
+    },
+    placement: {
+      type: String,
+      default: 'auto'
+    }
+  },
+  data() {
+    return {
+      placementHeight: '0',
+      placementType: ''
+    }
+  },
+  watch: {
+    visible(newVal: boolean) {
+      if (newVal) {
+        const systemInfo = uni.getSystemInfoSync()
+        const screenWidth = systemInfo.screenWidth
+        const instance = this
+
+        this.$nextTick(() => {
+          let placementWidth = 0
+          
+          uni.createSelectorQuery()
+            .in(instance)
+            .select('#placementfab')
+            .boundingClientRect((res) => {
+              if (res != null) {
+                const rect = res as UTSJSONObject
+                const height = rect['height'] as number
+                instance.placementHeight = '-' + height.toString() + 'px'
+                placementWidth = rect['width'] as number
+                
+                // 开启自动模式后
+                if (instance.placement == 'auto') {
+                  uni.createSelectorQuery()
+                    .in(instance)
+                    .select('#toolfab')
+                    .boundingClientRect((toolRes) => {
+                      if (toolRes != null) {
+                        const toolRect = toolRes as UTSJSONObject
+                        const leftRemain = toolRect['left'] as number
+                        const rightRemain = screenWidth - leftRemain
+                        if (rightRemain > placementWidth) {
+                          instance.placementType = 'bottom-start'
+                        } else if (leftRemain > placementWidth) {
+                          instance.placementType = 'bottom-end'
+                        } else {
+                          instance.placementType = 'bottom-center'
+                        }
+                      }
+                    })
+                    .exec()
+                }
+              }
+            })
+            .exec()
+        })
+      }
+    }
+  },
+  mounted() {
+    this.placementType = this.placement
+  },
+  computed: {
+    placementStyle(): UTSJSONObject {
+      const position = {} as UTSJSONObject
+      const typeVal = this.placementType
+      const heightVal = this.placementHeight
+      
+      if (typeVal == 'top-start') {
+        position['top'] = heightVal
+        position['left'] = '0'
+      } else if (typeVal == 'top-center') {
+        position['top'] = heightVal
+        position['left'] = '50%'
+        position['transform'] = 'translateX(-50%)'
+      } else if (typeVal == 'top-end') {
+        position['top'] = heightVal
+        position['right'] = '0'
+      } else if (typeVal == 'bottom-start') {
+        position['bottom'] = heightVal
+        position['left'] = '0'
+      } else if (typeVal == 'bottom-center') {
+        position['bottom'] = heightVal
+        position['left'] = '50%'
+        position['transform'] = 'translateX(-50%)'
+      } else if (typeVal == 'bottom-end') {
+        position['bottom'] = heightVal
+        position['right'] = '0'
+      }
+      return position
+    }
+  }
+}
+</script>
+
+<style lang="scss">
+.fab-tool {
+  position: relative;
+
+  .fab-tool-content {
+    position: absolute;
+    z-index: 999;
+
+    background-color: #ffffff;
+    box-shadow: -2px -2px 4px rgba(0, 0, 0, 0.05), 2px 2px 4px rgba(0, 0, 0, 0.05);
+    border-radius: 12rpx;
+    box-sizing: border-box;
+  }
+}
+</style>

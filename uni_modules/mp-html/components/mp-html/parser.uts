@@ -1,0 +1,1240 @@
+/**
+ * @fileoverview mp-html HTML 解析器 (uni-app X / UTS 适配版)
+ * 将 HTML 字符串解析为节点树 (AST)，供 node.uvue 原生渲染使用
+ */
+
+// ==================== 类型定义 ====================
+
+type HtmlNode = {
+  name?: string
+  attrs?: UTSJSONObject
+  children?: HtmlNode[]
+  type?: string
+  text?: string
+  c?: number // 0=用rich-text, 1=需要拆分, 2=可递归渲染
+  f?: string // flex额外样式
+  t?: string // 表格内图片display类型
+  w?: string // 标记图片设置了宽
+  h?: string // 标记图片设置了高
+  m?: string // 图片mode (aspectFit/aspectFill)
+  a?: UTSJSONObject // 父级a标签属性
+  src?: string[] // video/audio 的多源
+  webp?: string
+  html?: string
+  pre?: number
+  flag?: number
+}
+
+type ParserOptions = {
+  domain?: string | null
+  tagStyle?: UTSJSONObject
+  useAnchor?: boolean | number | null
+  setTitle?: boolean
+  previewImg?: boolean | string | null
+  lazyLoad?: boolean
+  scrollTable?: boolean | string | null
+  containerStyle?: string
+  nodes?: HtmlNode[]
+  imgList?: string[]
+  plugins?: any[]
+}
+
+// ==================== 配置 ====================
+
+const blankChar: Map<string, boolean> = makeMap(' ,\r,\n,\t,\f')
+
+const config_trustTags: Map<string, boolean> = makeMap('a,abbr,ad,audio,b,blockquote,br,code,col,colgroup,dd,del,dl,dt,div,em,fieldset,h1,h2,h3,h4,h5,h6,hr,i,img,ins,label,legend,li,ol,p,q,ruby,rt,source,span,strong,sub,sup,table,tbody,td,tfoot,th,thead,tr,title,ul,video')
+
+const config_blockTags: Map<string, boolean> = makeMap('address,article,aside,body,caption,center,cite,footer,header,html,nav,pre,section')
+
+const config_inlineTags: Map<string, boolean> = makeMap('abbr,b,big,code,del,em,i,ins,label,q,small,span,strong,sub,sup')
+
+const config_ignoreTags: Map<string, boolean> = makeMap('area,base,canvas,embed,frame,head,iframe,input,link,map,meta,param,rp,script,source,style,textarea,title,track,wbr')
+
+const config_voidTags: Map<string, boolean> = makeMap('area,base,br,col,circle,ellipse,embed,frame,hr,img,input,line,link,meta,param,path,polygon,rect,source,track,use,wbr')
+
+const config_entities: UTSJSONObject = {
+  lt: '<',
+  gt: '>',
+  quot: '"',
+  apos: "'",
+  ensp: ' ',
+  emsp: ' ',
+  nbsp: '\xA0',
+  semi: ';',
+  ndash: '–',
+  mdash: '—',
+  middot: '·',
+  lsquo: '‘',
+  rsquo: '’',
+  ldquo: '“',
+  rdquo: '”',
+  bull: '•',
+  hellip: '…',
+  larr: '←',
+  uarr: '↑',
+  rarr: '→',
+  darr: '↓',
+}
+
+const config_tagStyle: UTSJSONObject = {
+  address: 'font-style:italic',
+  big: 'display:inline;font-size:1.2em',
+  caption: 'display:table-caption;text-align:center',
+  center: 'text-align:center',
+  cite: 'font-style:italic',
+  dd: 'margin-left:40px',
+  mark: 'background-color:yellow',
+  pre: 'font-family:monospace;white-space:pre',
+  s: 'text-decoration:line-through',
+  small: 'display:inline;font-size:0.8em',
+  strike: 'text-decoration:line-through',
+  u: 'text-decoration:underline',
+}
+
+const config_svgDict: UTSJSONObject = {
+  animatetransform: 'animateTransform',
+  lineargradient: 'linearGradient',
+  viewbox: 'viewBox',
+  attributename: 'attributeName',
+  repeatcount: 'repeatCount',
+  repeatdur: 'repeatDur',
+  foreignobject: 'foreignObject',
+}
+
+const tagSelector: UTSJSONObject = {}
+
+let windowWidth: number = 375
+let idIndex: number = 0
+
+// ==================== 工具函数 ====================
+
+function makeMap(str: string): Map<string, boolean> {
+  const map = new Map<string, boolean>()
+  const list = str.split(',')
+  for (let i = list.length; i--;) {
+    map.set(list[i], true)
+  }
+  return map
+}
+
+function decodeEntity(str: string, amp: boolean): string {
+  let i = str.indexOf('&')
+  while (i != -1) {
+    const j = str.indexOf(';', i + 3)
+    if (j == -1) break
+    if (str.charAt(i + 1) == '#') {
+      // &#123; 形式的实体
+      const hex = str.charAt(i + 2) == 'x'
+      const codeStr = str.substring(i + (hex ? 3 : 2), j)
+      const code = parseInt((hex ? '0x' : '') + codeStr)
+      if (!isNaN(code)) {
+        str = str.substring(0, i) + String.fromCharCode(code) + str.substring(j + 1)
+      }
+    } else {
+      // &nbsp; 形式的实体
+      const code = str.substring(i + 1, j)
+      const entity = config_entities[code] as string
+      if (entity != null) {
+        str = str.substring(0, i) + entity + str.substring(j + 1)
+      } else if (code == 'amp' && amp) {
+        str = str.substring(0, i) + '&' + str.substring(j + 1)
+      }
+    }
+    i = str.indexOf('&', i + 1)
+  }
+  return str
+}
+
+function mergeNodes(nodes: HtmlNode[]): void {
+  let i = nodes.length - 1
+  for (let j: number = i; j >= -1; j--) {
+    if (j == -1 || nodes[j].c != null || nodes[j].name == null ||
+      (nodes[j].name != 'div' && nodes[j].name != 'p' && (nodes[j].name ?? '')[0] != 'h') ||
+      ((nodes[j].attrs != null ? (nodes[j].attrs!['style'] as string) ?? '' : '').includes('inline'))) {
+      if (i - j >= 5) {
+        nodes.splice(j + 1, i - j, {
+          name: 'div',
+          attrs: {},
+          children: nodes.slice(j + 1, i + 1),
+        })
+      }
+      i = j - 1
+    }
+  }
+}
+
+function tryGetWindowWidth(): number {
+  try {
+    const systemInfo = uni.getSystemInfoSync()
+    return (systemInfo.windowWidth as number) ?? 375
+  } catch (e) {
+    return 375
+  }
+}
+
+// ==================== Parser 解析器类 ====================
+
+class Parser {
+  options: ParserOptions
+  tagStyle: UTSJSONObject
+  imgList: string[]
+  plugins: any[]
+  attrs: UTSJSONObject
+  stack: HtmlNode[]
+  nodes: HtmlNode[]
+  pre: number
+  xml: number
+  tagName: string
+  attrName: string | null
+
+  constructor(vm: ParserOptions | null) {
+    this.options = vm ?? ({} as ParserOptions)
+    const mergedTagStyle: UTSJSONObject = {}
+    // 合并 config_tagStyle
+    const configKeys = Object.keys(config_tagStyle)
+    for (let i = 0; i < configKeys.length; i++) {
+      mergedTagStyle[configKeys[i]] = config_tagStyle[configKeys[i]]
+    }
+    // 合并 options.tagStyle
+    if (this.options.tagStyle != null) {
+      const optKeys = Object.keys(this.options.tagStyle!)
+      for (let j = 0; j < optKeys.length; j++) {
+        mergedTagStyle[optKeys[j]] = (this.options.tagStyle!)[optKeys[j]]
+      }
+    }
+    this.tagStyle = mergedTagStyle
+    this.imgList = this.options.imgList ?? ([] as string[])
+    this.imgList.push('_unloadimgs' as any)
+    ;(this.imgList as any)['_unloadimgs'] = 0
+    this.plugins = this.options.plugins ?? ([] as any[])
+    this.attrs = {} as UTSJSONObject
+    this.stack = [] as HtmlNode[]
+    this.nodes = [] as HtmlNode[]
+    this.pre = 0
+    const cs = this.options.containerStyle ?? ''
+    if (cs.includes('white-space') && cs.includes('pre')) {
+      this.pre = 2
+    }
+    this.xml = 0
+    this.tagName = ''
+    this.attrName = null
+  }
+
+  parse(content: string): HtmlNode[] {
+    // 插件处理
+    for (let i = this.plugins.length; i--;) {
+      if (this.plugins[i].onUpdate != null) {
+        content = this.plugins[i].onUpdate(content, null) ?? content
+      }
+    }
+    new Lexer(this).parse(content)
+    // 出栈未闭合的标签
+    while (this.stack.length > 0) {
+      this.popNode()
+    }
+    if (this.nodes.length > 50) {
+      mergeNodes(this.nodes)
+    }
+    return this.nodes
+  }
+
+  expose(): void {
+    for (let i = this.stack.length; i--;) {
+      const item = this.stack[i]
+      if (item.c != null || item.name == 'a' || item.name == 'video' || item.name == 'audio') return
+      item.c = 1
+    }
+  }
+
+  hook(node: HtmlNode): boolean {
+    for (let i = this.plugins.length; i--;) {
+      if (this.plugins[i].onParse != null && this.plugins[i].onParse(node, this) == false) {
+        return false
+      }
+    }
+    return true
+  }
+
+  getUrl(url: string): string {
+    const domain = this.options.domain
+    if (url.charAt(0) == '/') {
+      if (url.charAt(1) == '/') {
+        url = (domain != null ? (domain as string).split('://')[0] : 'http') + ':' + url
+      } else if (domain != null) {
+        url = domain + url
+      }
+    } else if (!url.includes('data:') && !url.includes('://')) {
+      if (domain != null) {
+        url = domain + '/' + url
+      }
+    }
+    return url
+  }
+
+  parseStyle(node: HtmlNode): UTSJSONObject {
+    const attrs = node.attrs ?? ({} as UTSJSONObject)
+    const tagStyleVal = (this.tagStyle[node.name ?? ''] as string) ?? ''
+    const styleAttr = (attrs['style'] as string) ?? ''
+    const list = tagStyleVal.split(';').concat(styleAttr.split(';'))
+    const styleObj: UTSJSONObject = {}
+    let tmp = ''
+
+    if (attrs['id'] != null && this.xml == 0) {
+      if (this.options.useAnchor != null && this.options.useAnchor != false) {
+        this.expose()
+      } else if (node.name != 'img' && node.name != 'a' && node.name != 'video' && node.name != 'audio') {
+        attrs['id'] = null
+      }
+    }
+
+    // 转换 width 和 height 属性
+    if (attrs['width'] != null) {
+      const w = attrs['width'] as string
+      styleObj['width'] = parseFloat(w) + (w.includes('%') ? '%' : 'px')
+      attrs['width'] = null
+    }
+    if (attrs['height'] != null) {
+      const h = attrs['height'] as string
+      styleObj['height'] = parseFloat(h) + (h.includes('%') ? '%' : 'px')
+      attrs['height'] = null
+    }
+
+    for (let i = 0; i < list.length; i++) {
+      const info = list[i].split(':')
+      if (info.length < 2) continue
+      const key = info.shift()!.trim().toLowerCase()
+      let value = info.join(':').trim()
+      if ((value.charAt(0) == '-' && value.lastIndexOf('-') > 0) || value.includes('safe')) {
+        tmp += `;${key}:${value}`
+      } else if (styleObj[key] == null || value.includes('import') || !(styleObj[key] as string).includes('import')) {
+        if (value.includes('url')) {
+          let j = value.indexOf('(') + 1
+          if (j > 0) {
+            while (value.charAt(j) == '"' || value.charAt(j) == "'" || blankChar.has(value.charAt(j))) {
+              j++
+            }
+            value = value.substring(0, j) + this.getUrl(value.substring(j))
+          }
+        } else if (value.includes('rpx')) {
+          value = value.replace(/[0-9.]+\s*rpx/g, ($: string): string => (parseFloat($) * windowWidth / 750).toString() + 'px')
+        }
+        styleObj[key] = value
+      }
+    }
+
+    node.attrs!['style'] = tmp.length > 0 ? tmp : null
+    return styleObj
+  }
+
+  onTagName(name: string): void {
+    this.tagName = this.xml > 0 ? name : name.toLowerCase()
+    if (this.tagName == 'svg') {
+      this.xml = (this.xml > 0 ? this.xml : 0) + 1
+    }
+  }
+
+  onAttrName(name: string): void {
+    name = this.xml > 0 ? name : name.toLowerCase()
+    if (name.includes('?') || name.includes(';')) {
+      this.attrName = null
+      return
+    }
+    if (name.substring(0, 5) == 'data-') {
+      if (name == 'data-src' && this.attrs['src'] == null) {
+        this.attrName = 'src'
+      } else if (this.tagName == 'img' || this.tagName == 'a') {
+        this.attrName = name
+      } else {
+        this.attrName = null
+      }
+    } else {
+      this.attrName = name
+      this.attrs[name] = 'T' // boolean 型属性缺省设置
+    }
+  }
+
+  onAttrVal(val: string): void {
+    const name = this.attrName ?? ''
+    if (name == 'style' || name == 'href') {
+      this.attrs[name] = decodeEntity(val, true)
+    } else if (name.includes('src')) {
+      this.attrs[name] = this.getUrl(decodeEntity(val, true))
+    } else if (name != '') {
+      this.attrs[name] = val
+    }
+  }
+
+  onOpenTag(selfClose: boolean): void {
+    const node: HtmlNode = {
+      name: this.tagName,
+      attrs: this.attrs,
+    }
+    if ((this.options.nodes != null ? this.options.nodes!.length : 0) > 0) {
+      node.type = 'node'
+    }
+    this.attrs = {} as UTSJSONObject
+
+    const attrs = node.attrs!
+    const parent = this.stack.length > 0 ? this.stack[this.stack.length - 1] : null
+    const siblings = parent != null ? (parent.children ?? []) : this.nodes
+    const close = this.xml > 0 ? selfClose : config_voidTags.has(node.name ?? '')
+
+    // 替换标签名选择器
+    if (tagSelector[node.name ?? ''] != null) {
+      const cls = tagSelector[node.name ?? ''] as string
+      attrs['class'] = cls + (attrs['class'] != null ? ' ' + (attrs['class'] as string) : '')
+    }
+
+    // 转换 embed 标签
+    if (node.name == 'embed') {
+      const src = (attrs['src'] as string) ?? ''
+      if (src.includes('.mp4') || src.includes('.3gp') || src.includes('.m3u8') || ((attrs['type'] as string) ?? '').includes('video')) {
+        node.name = 'video'
+      } else if (src.includes('.mp3') || src.includes('.wav') || src.includes('.aac') || src.includes('.m4a') || ((attrs['type'] as string) ?? '').includes('audio')) {
+        node.name = 'audio'
+      }
+      if (attrs['autostart'] != null) {
+        attrs['autoplay'] = 'T'
+      }
+      attrs['controls'] = 'T'
+    }
+
+    // 处理音视频
+    if (node.name == 'video' || node.name == 'audio') {
+      if (node.name == 'video' && attrs['id'] == null) {
+        attrs['id'] = 'v' + idIndex.toString()
+        idIndex++
+      }
+      if (attrs['controls'] == null && attrs['autoplay'] == null) {
+        attrs['controls'] = 'T'
+      }
+      node.src = [] as string[]
+      if (attrs['src'] != null) {
+        node.src!.push(attrs['src'] as string)
+        attrs['src'] = null
+      }
+      this.expose()
+    }
+
+    // 处理自闭合标签
+    if (close) {
+      if (!this.hook(node) || config_ignoreTags.has(node.name ?? '')) {
+        if (node.name == 'base' && this.options.domain == null) {
+          this.options.domain = attrs['href'] as string
+        } else if (node.name == 'source' && parent != null && (parent.name == 'video' || parent.name == 'audio') && attrs['src'] != null) {
+          if (parent.src == null) parent.src = [] as string[]
+          parent.src!.push(attrs['src'] as string)
+        }
+        return
+      }
+
+      const styleObj = this.parseStyle(node)
+
+      // 处理图片
+      if (node.name == 'img') {
+        if (attrs['src'] != null) {
+          if ((attrs['src'] as string).includes('webp')) {
+            node.webp = 'T'
+          }
+          if ((attrs['src'] as string).includes('data:') && this.options.previewImg != 'all' && attrs['original-src'] == null) {
+            attrs['ignore'] = 'T'
+          }
+          if (attrs['ignore'] == null || node.webp != null || (attrs['src'] as string).includes('cloud://')) {
+            for (let k = this.stack.length; k--;) {
+              const item = this.stack[k]
+              if (item.name == 'a') {
+                node.a = item.attrs
+              }
+              if (item.name == 'table' && node.webp == null && !(attrs['src'] as string).includes('cloud://')) {
+                const sd = styleObj['display'] as string
+                if (sd == null || sd.includes('inline')) {
+                  node.t = 'inline-block'
+                } else {
+                  node.t = sd
+                }
+                styleObj['display'] = null
+              }
+              const itemStyle = (item.attrs != null ? (item.attrs!['style'] as string) ?? '' : '')
+              if (itemStyle.includes('flex:') && !itemStyle.includes('flex:0') && !itemStyle.includes('flex: 0') &&
+                (styleObj['width'] == null || parseInt(styleObj['width'] as string) > 100)) {
+                styleObj['width'] = '100% !important'
+                styleObj['height'] = null
+                for (let m = k + 1; m < this.stack.length; m++) {
+                  this.stack[m].attrs!['style'] = ((this.stack[m].attrs!['style'] as string) ?? '').replace('inline-', '')
+                }
+              } else if (itemStyle.includes('flex') && styleObj['width'] == '100%') {
+                for (let m = k + 1; m < this.stack.length; m++) {
+                  const style = (this.stack[m].attrs!['style'] as string) ?? ''
+                  if (!style.includes(';width') && !style.includes(' width') && style.indexOf('width') != 0) {
+                    styleObj['width'] = null
+                    break
+                  }
+                }
+              } else if (itemStyle.includes('inline-block')) {
+                if (styleObj['width'] != null && (styleObj['width'] as string).charAt((styleObj['width'] as string).length - 1) == '%') {
+                  item.attrs!['style'] = (item.attrs!['style'] as string ?? '') + ';max-width:' + (styleObj['width'] as string)
+                  styleObj['width'] = null
+                } else {
+                  item.attrs!['style'] = (item.attrs!['style'] as string ?? '') + ';max-width:100%'
+                }
+              }
+              item.c = 1
+            }
+            attrs['i'] = this.imgList.length.toString()
+            let src = (attrs['original-src'] as string) ?? (attrs['src'] as string)
+            if (this.imgList.includes(src)) {
+              let idx = src.indexOf('://')
+              if (idx != -1) {
+                idx += 3
+                let newSrc = src.substring(0, idx)
+                for (; idx < src.length; idx++) {
+                  if (src.charAt(idx) == '/') break
+                  newSrc += Math.random() > 0.5 ? src.charAt(idx).toUpperCase() : src.charAt(idx)
+                }
+                newSrc += src.substring(idx)
+                src = newSrc
+              }
+            }
+            this.imgList.push(src)
+            if (node.t == null) {
+              ;(this.imgList as any)['_unloadimgs'] += 1
+            }
+          }
+        }
+        if ((styleObj['display'] as string) == 'inline') {
+          styleObj['display'] = null
+        }
+        if (attrs['ignore'] != null) {
+          styleObj['max-width'] = (styleObj['max-width'] as string) ?? '100%'
+          attrs['style'] = ((attrs['style'] as string) ?? '') + ';-webkit-touch-callout:none'
+        }
+        if (!isNaN(parseInt(styleObj['width'] as string))) {
+          node.w = 'T'
+        }
+        const sh = styleObj['height'] as string
+        if (!isNaN(parseInt(sh)) && (!sh.includes('%') || (parent != null && ((parent.attrs!['style'] as string) ?? '').includes('height')))) {
+          node.h = 'T'
+        }
+        if (node.w != null && node.h != null && styleObj['object-fit'] != null) {
+          if ((styleObj['object-fit'] as string) == 'contain') {
+            node.m = 'aspectFit'
+          } else if ((styleObj['object-fit'] as string) == 'cover') {
+            node.m = 'aspectFill'
+          }
+        }
+      } else if (node.name == 'svg') {
+        siblings.push(node)
+        this.stack.push(node)
+        this.popNode()
+        return
+      }
+
+      // 合并 styleObj 到 attrs.style
+      const keys = Object.keys(styleObj)
+      for (let n = 0; n < keys.length; n++) {
+        const key = keys[n]
+        const val = styleObj[key]
+        if (val != null) {
+          attrs['style'] = ((attrs['style'] as string) ?? '') + `;${key}:${(val as string).replace(' !important', '')}`
+        }
+      }
+      const s = (attrs['style'] as string) ?? ''
+      attrs['style'] = s.length > 0 ? s.substring(1) : null
+    } else {
+      // 非自闭合标签，压栈
+      if ((node.name == 'pre' || (((attrs['style'] as string) ?? '').includes('white-space') && ((attrs['style'] as string) ?? '').includes('pre'))) && this.pre != 2) {
+        this.pre = 1
+        node.pre = 1
+      }
+      node.children = [] as HtmlNode[]
+      this.stack.push(node)
+    }
+
+    siblings.push(node)
+  }
+
+  onCloseTag(name: string): void {
+    name = this.xml > 0 ? name : name.toLowerCase()
+    let i: number = -1
+    for (i = this.stack.length; i--;) {
+      if (this.stack[i].name == name) break
+    }
+    if (i != -1) {
+      while (this.stack.length > i) {
+        this.popNode()
+      }
+    } else if (name == 'p' || name == 'br') {
+      const parent = this.stack.length > 0 ? this.stack[this.stack.length - 1] : null
+      const siblings = parent != null ? (parent.children ?? []) : this.nodes
+      siblings.push({
+        name,
+        attrs: {
+          class: tagSelector[name] ?? null,
+          style: this.tagStyle[name] ?? null,
+        },
+      })
+    }
+  }
+
+  popNode(): void {
+    const node = this.stack.pop()!
+    let attrs = node.attrs!
+    const children = node.children ?? ([] as HtmlNode[])
+    const parent = this.stack.length > 0 ? this.stack[this.stack.length - 1] : null
+    const siblings = parent != null ? (parent.children ?? []) : this.nodes
+
+    if (!this.hook(node) || config_ignoreTags.has(node.name ?? '')) {
+      if (node.name == 'title' && children.length > 0 && children[0].type == 'text' && this.options.setTitle == true) {
+        uni.setNavigationBarTitle({ title: children[0].text ?? '' })
+      }
+      siblings.pop()
+      return
+    }
+
+    if (node.pre != null && this.pre != 2) {
+      this.pre = 0
+      node.pre = undefined
+      for (let i = this.stack.length; i--;) {
+        if (this.stack[i].pre != null) {
+          this.pre = 1
+        }
+      }
+    }
+
+    const styleObj: UTSJSONObject = {}
+
+    // 转换 svg
+    if (node.name == 'svg') {
+      if (this.xml > 1) {
+        this.xml--
+        return
+      }
+      // SVG 转为 data:image/svg+xml
+      let src = ''
+      const savedStyle = attrs['style'] as string ?? ''
+      attrs['style'] = ''
+      attrs['xmlns'] = 'http://www.w3.org/2000/svg'
+      ;(function traversal(n: HtmlNode): void {
+        if (n.type == 'text') {
+          src += n.text ?? ''
+          return
+        }
+        const tagName = (config_svgDict[n.name ?? ''] as string) ?? n.name
+        if (tagName == 'foreignObject') {
+          for (const child of (n.children ?? [])) {
+            if (child.attrs != null && child.attrs!['xmlns'] == null) {
+              child.attrs!['xmlns'] = 'http://www.w3.org/1999/xhtml'
+              break
+            }
+          }
+        }
+        src += '<' + tagName
+        for (const item in n.attrs!) {
+          const val = n.attrs![item]
+          if (val != null) {
+            src += ` ${(config_svgDict[item] as string) ?? item}="${(val as string).replace(/"/g, '')}"`
+          }
+        }
+        if (n.children == null || n.children!.length == 0) {
+          src += '/>'
+        } else {
+          src += '>'
+          for (let c = 0; c < n.children!.length; c++) {
+            traversal(n.children![c])
+          }
+          src += '</' + tagName + '>'
+        }
+      })(node)
+      node.name = 'img'
+      node.attrs = {
+        src: 'data:image/svg+xml;utf8,' + src.replace(/#/g, '%23'),
+        style: savedStyle,
+        ignore: 'T',
+      }
+      node.children = null
+      node.children = undefined
+      this.xml = 0
+      return
+    }
+
+    // 转换 align 属性
+    if (attrs['align'] != null) {
+      if (node.name == 'table') {
+        if (attrs['align'] == 'center') {
+          styleObj['margin-inline-start'] = 'auto'
+          styleObj['margin-inline-end'] = 'auto'
+        } else {
+          styleObj['float'] = attrs['align']
+        }
+      } else {
+        styleObj['text-align'] = attrs['align']
+      }
+      attrs['align'] = null
+    }
+
+    // 转换 dir 属性
+    if (attrs['dir'] != null) {
+      styleObj['direction'] = attrs['dir']
+      attrs['dir'] = null
+    }
+
+    // 转换 font 标签的属性
+    if (node.name == 'font') {
+      if (attrs['color'] != null) {
+        styleObj['color'] = attrs['color']
+        attrs['color'] = null
+      }
+      if (attrs['face'] != null) {
+        styleObj['font-family'] = attrs['face']
+        attrs['face'] = null
+      }
+      if (attrs['size'] != null) {
+        let size = parseInt(attrs['size'] as string)
+        if (!isNaN(size)) {
+          if (size < 1) size = 1
+          else if (size > 7) size = 7
+          const sizes = ['x-small', 'small', 'medium', 'large', 'x-large', 'xx-large', 'xxx-large']
+          styleObj['font-size'] = sizes[size - 1]
+        }
+        attrs['size'] = null
+      }
+    }
+
+    // 编辑器 class
+    if (((attrs['class'] as string) ?? '').includes('align-center')) {
+      styleObj['text-align'] = 'center'
+    }
+
+    // 合并 parseStyle
+    const parsedStyle = this.parseStyle(node)
+    const parsedKeys = Object.keys(parsedStyle)
+    for (let k = 0; k < parsedKeys.length; k++) {
+      styleObj[parsedKeys[k]] = parsedStyle[parsedKeys[k]]
+    }
+
+    if (node.name != 'table' && parseInt(styleObj['width'] as string) > windowWidth) {
+      styleObj['max-width'] = '100%'
+      styleObj['box-sizing'] = 'border-box'
+    }
+
+    // 标签名转换
+    if (config_blockTags.has(node.name ?? '')) {
+      node.name = 'div'
+    } else if (!config_trustTags.has(node.name ?? '') && this.xml == 0) {
+      node.name = 'span'
+    }
+
+    if (node.name == 'a' || node.name == 'ad') {
+      this.expose()
+    } else if (node.name == 'video') {
+      if (((styleObj['height'] as string) ?? '').includes('auto')) {
+        styleObj['height'] = null
+      }
+    } else if ((node.name == 'ul' || node.name == 'ol') && node.c != null) {
+      const types: UTSJSONObject = {
+        a: 'lower-alpha',
+        A: 'upper-alpha',
+        i: 'lower-roman',
+        I: 'upper-roman',
+      }
+      if (types[attrs['type'] as string] != null && attrs['type'] != '1') {
+        attrs['style'] = ((attrs['style'] as string) ?? '') + ';list-style-type:' + (types[attrs['type'] as string] as string)
+        attrs['type'] = null
+      }
+      for (let ii = children.length; ii--;) {
+        if (children[ii].name == 'li') {
+          children[ii].c = 1
+        }
+      }
+    } else if (node.name == 'table') {
+      let padding = parseFloat(attrs['cellpadding'] as string)
+      let spacing = parseFloat(attrs['cellspacing'] as string)
+      const border = parseFloat(attrs['border'] as string)
+      const bordercolor = styleObj['border-color'] as string
+      const borderstyle = styleObj['border-style'] as string
+      if (node.c != null) {
+        if (isNaN(padding)) padding = 2
+        if (isNaN(spacing)) spacing = 2
+      }
+      if (border > 0) {
+        attrs['style'] = ((attrs['style'] as string) ?? '') + `;border:${border}px ${borderstyle ?? 'solid'} ${bordercolor ?? 'gray'}`
+      }
+      if (node.flag != null && node.c != null) {
+        // 有合并单元格 → grid 布局
+        styleObj['display'] = 'grid'
+        if ((styleObj['border-collapse'] as string) == 'collapse') {
+          styleObj['border-collapse'] = null
+          spacing = 0
+        }
+        if (spacing > 0) {
+          styleObj['grid-gap'] = spacing + 'px'
+          styleObj['padding'] = spacing + 'px'
+        } else if (border > 0) {
+          attrs['style'] = ((attrs['style'] as string) ?? '') + ';border-left:0;border-top:0'
+        }
+
+        const width: string[] = []
+        const trList: HtmlNode[] = []
+        const cells: HtmlNode[] = []
+        const map: UTSJSONObject = {}
+
+        ;(function traversal(nodes: HtmlNode[]): void {
+          for (let i = 0; i < nodes.length; i++) {
+            if (nodes[i].name == 'tr') {
+              trList.push(nodes[i])
+            } else if (nodes[i].name == 'colgroup') {
+              let colI = 1
+              for (const col of (nodes[i].children ?? [])) {
+                if (col.name == 'col') {
+                  const s = (col.attrs!['style'] as string) ?? ''
+                  const start = s.indexOf('width') != -1 ? s.indexOf(';width') : -1
+                  if (start != -1) {
+                    let end = s.indexOf(';', start + 6)
+                    if (end == -1) end = s.length
+                    width[colI] = s.substring(start != 0 ? start + 7 : 6, end)
+                  }
+                  colI += 1
+                }
+              }
+            } else {
+              traversal(nodes[i].children ?? [])
+            }
+          }
+        })(children)
+
+        for (let row = 1; row <= trList.length; row++) {
+          let col = 1
+          for (let j = 0; j < trList[row - 1].children!.length; j++) {
+            const td = trList[row - 1].children![j]
+            if (td.name == 'td' || td.name == 'th') {
+              while (map[row + '.' + col] != null) {
+                col++
+              }
+              let style = (td.attrs!['style'] as string) ?? ''
+              const start = style.indexOf('width') != -1 ? style.indexOf(';width') : -1
+              if (start != -1) {
+                let end = style.indexOf(';', start + 6)
+                if (end == -1) end = style.length
+                if (td.attrs!['colspan'] == null) {
+                  width[col] = style.substring(start != 0 ? start + 7 : 6, end)
+                }
+                style = style.substring(0, start) + style.substring(end)
+              }
+              style += ';display:flex'
+              const vaStart = style.indexOf('vertical-align')
+              if (vaStart != -1) {
+                const val = style.substring(vaStart + 15, vaStart + 25)
+                if (val.includes('middle')) style += ';align-items:center'
+                else if (val.includes('bottom')) style += ';align-items:flex-end'
+              } else {
+                style += ';align-items:center'
+              }
+              const taStart = style.indexOf('text-align')
+              if (taStart != -1) {
+                const val = style.substring(taStart + 11, taStart + 21)
+                if (val.includes('center')) style += ';justify-content:center'
+                else if (val.includes('right')) style += ';justify-content:flex-end'
+              }
+              style = (border > 0 ? `;border:${border}px ${borderstyle ?? 'solid'} ${bordercolor ?? 'gray'}` + (spacing > 0 ? '' : ';border-right:0;border-bottom:0') : '') +
+                (padding > 0 ? `;padding:${padding}px` : '') + ';' + style
+              if (td.attrs!['colspan'] != null) {
+                const cs = parseInt(td.attrs!['colspan'] as string)
+                style += `;grid-column-start:${col};grid-column-end:${col + cs}`
+                if (td.attrs!['rowspan'] == null) {
+                  style += `;grid-row-start:${row};grid-row-end:${row + 1}`
+                }
+                col += cs - 1
+              }
+              if (td.attrs!['rowspan'] != null) {
+                const rs = parseInt(td.attrs!['rowspan'] as string)
+                style += `;grid-row-start:${row};grid-row-end:${row + rs}`
+                if (td.attrs!['colspan'] == null) {
+                  style += `;grid-column-start:${col};grid-column-end:${col + 1}`
+                }
+                for (let rsp = 1; rsp < rs; rsp++) {
+                  for (let csp = 0; csp < (parseInt(td.attrs!['colspan'] as string) || 1); csp++) {
+                    map[(row + rsp) + '.' + (col - csp)] = 1
+                  }
+                }
+              }
+              if (style.length > 0) {
+                td.attrs!['style'] = style
+              }
+              cells.push(td)
+              col++
+            }
+          }
+          if (row == 1) {
+            let temp = ''
+            for (let w = 1; w < col; w++) {
+              temp += (width[w] != null ? width[w] : 'auto') + ' '
+            }
+            styleObj['grid-template-columns'] = temp
+          }
+        }
+        node.children = cells
+      } else {
+        // 没有合并单元格 → table 布局
+        if (node.c != null) {
+          styleObj['display'] = 'table'
+        }
+        if (!isNaN(spacing)) {
+          styleObj['border-spacing'] = spacing + 'px'
+        }
+        if (border > 0 || !isNaN(padding)) {
+          ;(function traversal(nodes: HtmlNode[]): void {
+            for (let i = 0; i < nodes.length; i++) {
+              const td = nodes[i]
+              if (td.name == 'th' || td.name == 'td') {
+                if (border > 0) {
+                  td.attrs!['style'] = `border:${border}px ${borderstyle ?? 'solid'} ${bordercolor ?? 'gray'};${td.attrs!['style'] as string ?? ''}`
+                }
+                if (!isNaN(padding)) {
+                  td.attrs!['style'] = `padding:${padding}px;${td.attrs!['style'] as string ?? ''}`
+                }
+              } else if (td.children != null) {
+                traversal(td.children!)
+              }
+            }
+          })(children)
+        }
+      }
+      // 表格横向滚动
+      if (this.options.scrollTable == true && !((attrs['style'] as string) ?? '').includes('inline')) {
+        const table: HtmlNode = {
+          name: node.name,
+          attrs: node.attrs,
+          children: node.children,
+        }
+        // 复制其他属性
+        table.c = node.c
+        table.flag = node.flag
+        node.name = 'div'
+        node.attrs = { style: 'overflow:auto' }
+        node.children = [table]
+        attrs = node.attrs!
+      }
+    } else if ((node.name == 'tbody' || node.name == 'tr') && node.flag != null && node.c != null) {
+      node.flag = undefined
+      ;(function traversal(nodes: HtmlNode[]): void {
+        for (let i = 0; i < nodes.length; i++) {
+          if (nodes[i].name == 'td') {
+            for (const styleKey of ['color', 'background', 'background-color']) {
+              if (styleObj[styleKey] != null) {
+                nodes[i].attrs!['style'] = styleKey + ':' + (styleObj[styleKey] as string) + ';' + ((nodes[i].attrs!['style'] as string) ?? '')
+              }
+            }
+          } else {
+            traversal(nodes[i].children ?? [])
+          }
+        }
+      })(children)
+    } else if ((node.name == 'td' || node.name == 'th') && (attrs['colspan'] != null || attrs['rowspan'] != null)) {
+      for (let i = this.stack.length; i--;) {
+        if (this.stack[i].name == 'table' || this.stack[i].name == 'tbody' || this.stack[i].name == 'tr') {
+          this.stack[i].flag = 1
+        }
+      }
+    } else if (node.name == 'ruby') {
+      node.name = 'span'
+      for (let i = 0; i < children.length - 1; i++) {
+        if (children[i].type == 'text' && children[i + 1].name == 'rt') {
+          children[i] = {
+            name: 'div',
+            attrs: { style: 'display:inline-block;text-align:center' },
+            children: [
+              {
+                name: 'div',
+                attrs: { style: 'font-size:50%;' + ((children[i + 1].attrs!['style'] as string) ?? '') },
+                children: children[i + 1].children,
+              },
+              children[i],
+            ],
+          }
+          children.splice(i + 1, 1)
+        }
+      }
+    } else if (node.c != null) {
+      ;(function traversal(n: HtmlNode): void {
+        n.c = 2
+        for (let i = (n.children ?? []).length; i--;) {
+          const child = (n.children ?? [])[i]
+          if (child.name != null && (config_inlineTags.has(child.name!) || (((child.attrs!['style'] as string) ?? '').includes('inline') && child.children != null)) && child.c == null) {
+            traversal(child)
+          }
+          if (child.c == null || child.name == 'table') {
+            n.c = 1
+          }
+        }
+      })(node)
+    }
+
+    // flex + rich-text 的处理 —— uni-app X 没有 rich-text，标记为 c=2 走递归渲染
+    if (((styleObj['display'] as string) ?? '').includes('flex') && node.c == null) {
+      for (let i = children.length; i--;) {
+        const item = children[i]
+        if (item.f != null) {
+          item.attrs!['style'] = ((item.attrs!['style'] as string) ?? '') + item.f
+          item.f = undefined
+        }
+      }
+    }
+
+    // 标记节点需要递归渲染
+    const parentStyle = parent != null ? ((parent.attrs!['style'] as string) ?? '') : ''
+    const flex = (parentStyle.includes('flex') || parentStyle.includes('grid')) && node.c == null
+    if (flex) {
+      node.f = ';max-width:100%'
+    }
+
+    if (children.length >= 50 && node.c != null && !((styleObj['display'] as string) ?? '').includes('flex')) {
+      mergeNodes(children)
+    }
+
+    // 合并 styleObj 到 attrs.style
+    const styleKeys = Object.keys(styleObj)
+    for (let k = 0; k < styleKeys.length; k++) {
+      const key = styleKeys[k]
+      const val = styleObj[key]
+      if (val != null) {
+        const suffix = `;${key}:${(val as string).replace(' !important', '')}`
+        if (flex && ((key.includes('flex') && key != 'flex-direction') || key == 'align-self' || key.includes('grid') || (key.includes('width') && suffix.includes('%')))) {
+          node.f = (node.f ?? '') + suffix
+          if (key == 'width') {
+            attrs['style'] = ((attrs['style'] as string) ?? '') + ';width:100%'
+          }
+        } else {
+          attrs['style'] = ((attrs['style'] as string) ?? '') + suffix
+        }
+      }
+    }
+    const finalStyle = (attrs['style'] as string) ?? ''
+    attrs['style'] = finalStyle.length > 0 ? finalStyle.substring(1) : null
+
+    // 确保有 children 的块级节点标记 c=2（走递归渲染）
+    if (children.length > 0 && node.c == null && node.name != 'img' && node.name != 'video' && node.name != 'audio' && node.name != 'br') {
+      node.c = 2
+    }
+  }
+
+  onText(text: string): void {
+    let processed = text
+    if (this.pre == 0) {
+      let trim = ''
+      let flag = false
+      for (let i = 0; i < processed.length; i++) {
+        if (!blankChar.has(processed.charAt(i))) {
+          trim += processed.charAt(i)
+        } else {
+          if (trim.length > 0 && trim.charAt(trim.length - 1) != ' ') {
+            trim += ' '
+          }
+          if (processed.charAt(i) == '\n' && !flag) {
+            flag = true
+          }
+        }
+      }
+      if (trim == ' ') {
+        if (flag) return
+        else {
+          const parent = this.stack.length > 0 ? this.stack[this.stack.length - 1] : null
+          if (parent != null && (parent.name ?? '')[0] == 't') return
+        }
+      }
+      processed = trim
+    }
+    const node: HtmlNode = {
+      type: 'text',
+      text: decodeEntity(processed, false),
+      attrs: {} as UTSJSONObject,
+    }
+    if (this.hook(node)) {
+      const siblings = this.stack.length > 0 ? (this.stack[this.stack.length - 1].children ?? []) : this.nodes
+      siblings.push(node)
+    }
+  }
+}
+
+// ==================== Lexer 词法分析器 ====================
+
+class Lexer {
+  handler: Parser
+  content: string
+  i: number
+  start: number
+  state: () => void
+
+  constructor(handler: Parser) {
+    this.handler = handler
+    this.content = ''
+    this.i = 0
+    this.start = 0
+    this.state = this.text
+  }
+
+  parse(content: string): void {
+    this.content = content ?? ''
+    this.i = 0
+    this.start = 0
+    this.state = this.text
+    const len = this.content.length
+    while (this.i != -1 && this.i < len) {
+      this.state()
+    }
+  }
+
+  checkClose(method: string): boolean {
+    const selfClose = this.content.charAt(this.i) == '/'
+    if (this.content.charAt(this.i) == '>' || (selfClose && this.content.charAt(this.i + 1) == '>')) {
+      if (method != '') {
+        const fn = (this.handler as any)[method] as ((s: string) => void) | null
+        if (fn != null) {
+          fn.call(this.handler, this.content.substring(this.start, this.i))
+        }
+      }
+      this.i += selfClose ? 2 : 1
+      this.start = this.i
+      this.handler.onOpenTag(selfClose)
+      if (this.handler.tagName == 'script') {
+        this.i = this.content.indexOf('</', this.i)
+        if (this.i != -1) {
+          this.i += 2
+          this.start = this.i
+        }
+        this.state = this.endTag
+      } else {
+        this.state = this.text
+      }
+      return true
+    }
+    return false
+  }
+
+  text(): void {
+    this.i = this.content.indexOf('<', this.i)
+    if (this.i == -1) {
+      if (this.start < this.content.length) {
+        this.handler.onText(this.content.substring(this.start, this.content.length))
+      }
+      return
+    }
+    const c = this.content.charAt(this.i + 1)
+    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+      if (this.start != this.i) {
+        this.handler.onText(this.content.substring(this.start, this.i))
+      }
+      this.start = ++this.i
+      this.state = this.tagName
+    } else if (c == '/' || c == '!' || c == '?') {
+      if (this.start != this.i) {
+        this.handler.onText(this.content.substring(this.start, this.i))
+      }
+      const next = this.content.charAt(this.i + 2)
+      if (c == '/' && ((next >= 'a' && next <= 'z') || (next >= 'A' && next <= 'Z'))) {
+        this.i += 2
+        this.start = this.i
+        this.state = this.endTag
+        return
+      }
+      let end = '-->'
+      if (c != '!' || this.content.charAt(this.i + 2) != '-' || this.content.charAt(this.i + 3) != '-') {
+        end = '>'
+      }
+      this.i = this.content.indexOf(end, this.i)
+      if (this.i != -1) {
+        this.i += end.length
+        this.start = this.i
+      }
+    } else {
+      this.i++
+    }
+  }
+
+  tagName(): void {
+    if (blankChar.has(this.content.charAt(this.i))) {
+      this.handler.onTagName(this.content.substring(this.start, this.i))
+      while (blankChar.has(this.content.charAt(++this.i))) { /* skip */ }
+      if (this.i < this.content.length && !this.checkClose('')) {
+        this.start = this.i
+        this.state = this.attrName
+      }
+    } else if (!this.checkClose('onTagName')) {
+      this.i++
+    }
+  }
+
+  attrName(): void {
+    const c = this.content.charAt(this.i)
+    if (blankChar.has(c) || c == '=') {
+      this.handler.onAttrName(this.content.substring(this.start, this.i))
+      let needVal = c == '='
+      const len = this.content.length
+      while (++this.i < len) {
+        const nc = this.content.charAt(this.i)
+        if (!blankChar.has(nc)) {
+          if (this.checkClose('')) return
+          if (needVal) {
+            this.start = this.i
+            this.state = this.attrVal
+            return
+          }
+          if (this.content.charAt(this.i) == '=') {
+            needVal = true
+          } else {
+            this.start = this.i
+            this.state = this.attrName
+            return
+          }
+        }
+      }
+    } else if (!this.checkClose('onAttrName')) {
+      this.i++
+    }
+  }
+
+  attrVal(): void {
+    const c = this.content.charAt(this.i)
+    const len = this.content.length
+    if (c == '"' || c == "'") {
+      this.start = ++this.i
+      this.i = this.content.indexOf(c, this.i)
+      if (this.i == -1) return
+      this.handler.onAttrVal(this.content.substring(this.start, this.i))
+    } else {
+      for (; this.i < len; this.i++) {
+        if (blankChar.has(this.content.charAt(this.i))) {
+          this.handler.onAttrVal(this.content.substring(this.start, this.i))
+          break
+        } else if (this.checkClose('onAttrVal')) return
+      }
+    }
+    while (blankChar.has(this.content.charAt(++this.i))) { /* skip */ }
+    if (this.i < len && !this.checkClose('')) {
+      this.start = this.i
+      this.state = this.attrName
+    }
+  }
+
+  endTag(): void {
+    const c = this.content.charAt(this.i)
+    if (blankChar.has(c) || c == '>' || c == '/') {
+      this.handler.onCloseTag(this.content.substring(this.start, this.i))
+      if (c != '>') {
+        this.i = this.content.indexOf('>', this.i)
+        if (this.i == -1) return
+      }
+      this.start = ++this.i
+      this.state = this.text
+    } else {
+      this.i++
+    }
+  }
+}
+
+// ==================== 导出 ====================
+// 初始化屏幕宽度
+windowWidth = tryGetWindowWidth()
+
+export { Parser, Lexer, windowWidth }
+export type { HtmlNode, ParserOptions }

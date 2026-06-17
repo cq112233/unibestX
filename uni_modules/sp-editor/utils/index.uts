@@ -1,0 +1,212 @@
+// 标识必须独一无二 - 标识是为了使用insertText插入标识文本后，查找到标识所在delta位置的索引
+export const linkFlag: string = '#-*=*-*=*-*=*@-link超链接标识link-@*=*-*=*-*=*-#'
+
+export function addLink(editorCtx: any, attr: UTSJSONObject, callback: (() => void) | null) {
+	// 先插入一段文本内容
+	editorCtx.insertText({
+		text: linkFlag
+	})
+	// 获取全文delta内容
+	editorCtx.getContents({
+		success(res: any) {
+			const resObj = res as UTSJSONObject
+			const delta = resObj['delta'] as UTSJSONObject
+			const ops = delta['ops'] as Array<any>
+			const findex = ops.findIndex((item: any): boolean => {
+				const itemObj = item as UTSJSONObject
+				const insert = itemObj['insert']
+				return insert != null && typeof insert == 'string' && (insert as string).indexOf(linkFlag) != -1
+			})
+			// 根据标识查找到插入的位置
+			if (findex > -1) {
+				const findOption = ops[findex] as UTSJSONObject
+				const findAttributes = findOption['attributes'] as UTSJSONObject | null
+				const insertVal = findOption['insert'] as string
+				// 将该findOption分成三部分：前内容 要插入的link 后内容
+				const parts = insertVal.split(linkFlag)
+				const prefix = parts[0]
+				const suffix = parts.length > 1 ? parts[1] : ''
+				const handleOps = [] as Array<any>
+				// 前内容
+				if (prefix.length > 0) {
+					const prefixOps = findAttributes != null ? {
+						insert: prefix,
+						attributes: findAttributes
+					} : {
+						insert: prefix
+					}
+					handleOps.push(prefixOps)
+				}
+				// 插入的link
+				const linkOps = {
+					insert: attr['text'] as string,
+					attributes: {
+						link: attr['href'] as string,
+						textDecoration: (attr['textDecoration'] ?? 'none') as string, // 下划线
+						color: (attr['color'] ?? '#007aff') as string
+					}
+				}
+				handleOps.push(linkOps)
+				// 后内容
+				if (suffix.length > 0) {
+					const suffixOps = findAttributes != null ? {
+						insert: suffix,
+						attributes: findAttributes
+					} : {
+						insert: suffix
+					}
+					handleOps.push(suffixOps)
+				}
+				// 删除原ops[findex]并在findex位置插入上述三个ops
+				ops.splice(findex, 1)
+				for (let i = handleOps.length - 1; i >= 0; i--) {
+					ops.splice(findex, 0, handleOps[i])
+				}
+				// 最后重新初始化内容，注意该方法会导致光标重置到最开始位置
+				editorCtx.setContents({
+					delta: {
+						ops: ops
+					}
+				})
+				// 所以最后建议使富文本光标失焦，让用户手动聚焦光标
+				editorCtx.blur()
+
+				// 后续回调操作
+				if (callback != null) callback()
+			}
+		}
+	})
+}
+
+/**
+ * 将含有特殊图片形式视频的富文本转换成正常视频的富文本
+ * @param {String} html 要进行处理的富文本字符串
+ * @returns {String} 返回处理结果
+ */
+export function handleHtmlWithVideo(html: string): string {
+	// 正则表达式用于匹配img标签中带有alt属性且alt属性值为视频链接的模式
+	const regex = /<img\s+src="[^"]*"\s+alt="([^"]*)"[^>]*>/g
+	// 使用replace方法和一个函数回调来替换匹配到的内容
+	return html.replace(regex, (match: string, videoUrl: string): string => {
+		// 替换为video标签，并添加controls属性以便用户可以控制播放
+		return `<video width="80%" controls><source src="${videoUrl}" type="video/mp4"></video>`
+	})
+}
+
+/**
+ * 将img标签中内联style属性中的宽高样式提取出标签width与height属性
+ * @param {Object} html 要处理的富文本字符串
+ * @returns {Object} 返回处理结果
+ */
+export function convertImgStylesToAttributes(html: string): string {
+	const regex = /<img\s+([^>]+)\s*>/g
+	return html.replace(regex, (match: string, attributes: string): string => {
+		// 分割属性
+		const attrs = attributes.split(/\s+/)
+
+		// 找到style属性的位置
+		const styleIndex = attrs.findIndex((attr: string): boolean => attr.startsWith('style='))
+		if (styleIndex == -1) return match // 如果没有找到style属性，则返回原样
+
+		// 提取style属性值
+		const styleAttr = attrs.splice(styleIndex, 1)[0]
+		const styleMatch = styleAttr.match(/"([^"]*)"/)
+		if (styleMatch == null) return match
+		const style = styleMatch[1]
+
+		// 解析 style 属性
+		const styleObj = {} as UTSJSONObject
+		style.split(';').forEach((part: string) => {
+			if (part.length > 0) {
+				const pair = part.split(':')
+				if (pair.length > 1) {
+					styleObj[pair[0].trim()] = pair[1].trim()
+				}
+			}
+		})
+
+		// 创建新的 img 标签
+		let newTag = '<img'
+		if (styleObj['width'] != null) {
+			newTag += ` width="${styleObj['width']!.toString()}"`
+		}
+		if (styleObj['height'] != null) {
+			newTag += ` height="${styleObj['height']!.toString()}"`
+		}
+
+		// 添加原有的属性，包括修改过的style属性
+		newTag += ` ${styleAttr} ${attrs.join(' ')}`
+
+		// 关闭 img 标签
+		newTag += '>'
+
+		return newTag
+	})
+}
+
+/**
+ * 获取iconfont图标Unicode字符
+ */
+export function getIconCharacter(name: string): string {
+	switch (name) {
+		case 'icon-redo': return '\ue627'
+		case 'icon-undo': return '\ue633'
+		case 'icon-indent': return '\ueb28'
+		case 'icon-outdent': return '\ue6e8'
+		case 'icon-fontsize': return '\ue6fd'
+		case 'icon-format-header-1': return '\ue860'
+		case 'icon-format-header-2': return '\ue75c'
+		case 'icon-format-header-3': return '\ue75d'
+		case 'icon-format-header-4': return '\ue863'
+		case 'icon-format-header-5': return '\ue864'
+		case 'icon-format-header-6': return '\ue865'
+		case 'icon-clearup': return '\ue64d'
+		case 'icon-preview': return '\ue631'
+		case 'icon-date': return '\ue63e'
+		case 'icon-fontbgcolor': return '\ue678'
+		case 'icon-clearedformat': return '\ue67e'
+		case 'icon-font': return '\ue684'
+		case 'icon-723bianjiqi_duanhouju': return '\ue65f'
+		case 'icon-722bianjiqi_duanqianju': return '\ue660'
+		case 'icon-text_color': return '\ue72c'
+		case 'icon--checklist': return '\ue664'
+		case 'icon-baocun': return '\uec09'
+		case 'icon-line-height': return '\ue7f8'
+		case 'icon-quanping': return '\uec13'
+		case 'icon-direction-rtl': return '\ue66e'
+		case 'icon-direction-ltr': return '\ue66d'
+		case 'icon-selectall': return '\ue62b'
+		case 'icon-fuzhi': return '\uec7a'
+		case 'icon-shanchu': return '\uec7b'
+		case 'icon-bianjisekuai': return '\uec7c'
+		case 'icon-fengexian': return '\uec7f'
+		case 'icon-dianzan': return '\uec80'
+		case 'icon-charulianjie': return '\uec81'
+		case 'icon-charutupian': return '\uec82'
+		case 'icon-wuxupailie': return '\uec83'
+		case 'icon-juzhongduiqi': return '\uec84'
+		case 'icon-yinyong': return '\uec85'
+		case 'icon-youxupailie': return '\uec86'
+		case 'icon-youduiqi': return '\uec87'
+		case 'icon-zitidaima': return '\uec88'
+		case 'icon-xiaolian': return '\uec89'
+		case 'icon-zitijiacu': return '\uec8a'
+		case 'icon-zitishanchuxian': return '\uec8b'
+		case 'icon-zitishangbiao': return '\uec8c'
+		case 'icon-zitibiaoti': return '\uec8d'
+		case 'icon-zitixiahuaxian': return '\uec8e'
+		case 'icon-zitixieti': return '\uec8f'
+		case 'icon-zitiyanse': return '\uec90'
+		case 'icon-zuoduiqi': return '\uec91'
+		case 'icon-zitiyulan': return '\uec92'
+		case 'icon-zitixiabiao': return '\uec93'
+		case 'icon-zuoyouduiqi': return '\uec94'
+		case 'icon-duigoux': return '\uec9e'
+		case 'icon-guanbi': return '\ueca0'
+		case 'icon-shengyin_shiti': return '\ueca5'
+		case 'icon-Character-Spacing': return '\ue964'
+		case 'icon-header': return '\ue61e'
+		case 'icon-video': return '\ue614'
+		default: return ''
+	}
+}
