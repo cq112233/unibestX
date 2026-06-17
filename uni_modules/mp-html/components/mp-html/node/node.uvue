@@ -1,0 +1,598 @@
+<template>
+  <template v-for="(n, i) in localChilds" :key="i">
+    <!-- ==================== 文本节点 ==================== -->
+    <text
+      v-if="n.type == 'text'"
+      :user-select="(opts['selectable'] as boolean) == true"
+      :decode="true"
+      :style="n.attrs != null ? (n.attrs['style'] as string) ?? '' : ''"
+      class="_textNode"
+    >{{ n.text }}</text>
+
+    <!-- ==================== 换行 ==================== -->
+    <text v-else-if="n.name == 'br'" class="_br">\n</text>
+
+    <!-- ==================== 图片 ==================== -->
+    <image
+      v-else-if="n.name == 'img'"
+      :src="getImgSrc(n)"
+      :style="buildImgStyle(n)"
+      :mode="getImgMode(n)"
+      :show-menu-by-longpress="(opts['showImgMenu'] as boolean) == true"
+      @tap="onImgTap(n, i)"
+      @load="onImgLoad(n, i)"
+      @error="onImgError(n, i)"
+      class="_img"
+    />
+
+    <!-- ==================== 视频 ==================== -->
+    <video
+      v-else-if="n.name == 'video'"
+      :src="getMediaSrc(n, 0)"
+      :style="(n.attrs != null ? (n.attrs!['style'] as string) ?? '' : '')"
+      :autoplay="(n.attrs != null ? n.attrs!['autoplay'] : null) == 'T'"
+      :controls="(n.attrs != null ? n.attrs!['controls'] : null) == 'T'"
+      :loop="(n.attrs != null ? n.attrs!['loop'] : null) == 'T'"
+      :muted="(n.attrs != null ? n.attrs!['muted'] : null) == 'T'"
+      :poster="(n.attrs != null ? n.attrs!['poster'] as string : null) ?? ''"
+      :object-fit="(n.attrs != null ? n.attrs!['object-fit'] as string : null) ?? 'contain'"
+      @play="onPlay(n)"
+      @error="onMediaError(n, i, 'video')"
+      class="_video"
+    />
+
+    <!-- ==================== 音频 ==================== -->
+    <!-- #ifndef APP-PLUS -->
+    <!-- uni-app X 部分平台可能不支持 audio 组件，降级为不渲染 -->
+    <!-- #endif -->
+
+    <!-- ==================== 链接 ==================== -->
+    <view
+      v-else-if="n.name == 'a'"
+      :style="buildLinkStyle(n)"
+      @tap="onLinkTap(n)"
+      class="_a"
+    >
+      <node
+        v-if="n.children != null && n.children!.length > 0"
+        :childs="n.children"
+        :opts="opts"
+        :root-ref="rootRef"
+      />
+      <text v-else>{{ getNodeText(n) }}</text>
+    </view>
+
+    <!-- ==================== 块级节点：div, p, section, header, footer, article, aside, nav, main, figure, figcaption, details, summary, blockquote, address ==================== -->
+    <view
+      v-else-if="isBlockContainer(n)"
+      :style="(n.attrs != null ? (n.attrs!['style'] as string) ?? '' : '') + (n.f != null ? n.f! : '')"
+      :class="(n.attrs != null ? (n.attrs!['class'] as string) ?? '' : '')"
+      class="_blockContainer"
+    >
+      <node
+        v-if="n.children != null && n.children!.length > 0"
+        :childs="n.children"
+        :opts="opts"
+        :root-ref="rootRef"
+      />
+      <text v-else>{{ getNodeText(n) }}</text>
+    </view>
+
+    <!-- ==================== 标题 h1-h6 ==================== -->
+    <view
+      v-else-if="isHeading(n)"
+      :style="getHeadingStyle(n)"
+      class="_heading"
+    >
+      <node
+        v-if="n.children != null && n.children!.length > 0"
+        :childs="n.children"
+        :opts="opts"
+        :root-ref="rootRef"
+      />
+      <text v-else :style="getHeadingTextStyle(n)">{{ getNodeText(n) }}</text>
+    </view>
+
+    <!-- ==================== 表格 ==================== -->
+    <view
+      v-else-if="n.name == 'table'"
+      :style="(n.attrs != null ? (n.attrs!['style'] as string) ?? '' : '') + ';display:flex;flex-direction:column'"
+      class="_table"
+    >
+      <view
+        v-for="(row, ri) in (n.children != null ? n.children : [] as HtmlNode[])"
+        :key="ri"
+        :style="getRowStyle(row)"
+        class="_tableRow"
+      >
+        <view
+          v-for="(cell, ci) in (row.children != null ? row.children : [] as HtmlNode[])"
+          :key="ci"
+          :style="getCellStyle(cell)"
+          class="_tableCell"
+        >
+          <node
+            :childs="cell.children != null ? cell.children : [] as HtmlNode[]"
+            :opts="opts"
+            :root-ref="rootRef"
+          />
+        </view>
+      </view>
+    </view>
+
+    <!-- ==================== 列表 ==================== -->
+    <view
+      v-else-if="n.name == 'ul' || n.name == 'ol'"
+      :style="(n.attrs != null ? (n.attrs!['style'] as string) ?? '' : '') + ';padding-left:40px'"
+      class="_list"
+    >
+      <view
+        v-for="(li, lii) in (n.children != null ? n.children : [] as HtmlNode[])"
+        :key="lii"
+        class="_listItem"
+      >
+        <text class="_listMarker">{{ n.name == 'ol' ? (lii + 1).toString() + '. ' : '• ' }}</text>
+        <node
+          v-if="li.children != null && li.children!.length > 0"
+          :childs="li.children"
+          :opts="opts"
+          :root-ref="rootRef"
+          style="display:inline"
+        />
+        <text v-else>{{ getNodeText(li) }}</text>
+      </view>
+    </view>
+
+    <!-- ==================== 列表项（嵌套在其他容器中时） ==================== -->
+    <view
+      v-else-if="n.name == 'li'"
+      :style="(n.attrs != null ? (n.attrs!['style'] as string) ?? '' : '')"
+      class="_liItem"
+    >
+      <node
+        v-if="n.children != null && n.children!.length > 0"
+        :childs="n.children"
+        :opts="opts"
+        :root-ref="rootRef"
+      />
+      <text v-else>{{ getNodeText(n) }}</text>
+    </view>
+
+    <!-- ==================== 行内元素：span, b, strong, i, em, u, ins, del, s, strike, sub, sup, code, mark, small, big, label, q, abbr, cite ==================== -->
+    <text
+      v-else-if="isInlineElement(n)"
+      :style="getInlineStyle(n)"
+      :user-select="(opts['selectable'] as boolean) == true"
+      :decode="true"
+    >{{ getNodeText(n) }}</text>
+
+    <!-- ==================== pre / code 块 ==================== -->
+    <view
+      v-else-if="n.name == 'pre' || n.name == 'code'"
+      :style="'font-family:monospace;white-space:pre;' + ((n.attrs != null ? (n.attrs!['style'] as string) ?? '' : ''))"
+      class="_codeBlock"
+    >
+      <text
+        :user-select="(opts['selectable'] as boolean) == true"
+        :decode="true"
+        style="font-family:monospace;white-space:pre"
+      >{{ getNodeText(n) }}</text>
+    </view>
+
+    <!-- ==================== 水平线 ==================== -->
+    <view
+      v-else-if="n.name == 'hr'"
+      :style="(n.attrs != null ? (n.attrs!['style'] as string) ?? '' : '') + ';height:1px;background-color:#e5e5e5;margin:10px 0'"
+      class="_hr"
+    />
+
+    <!-- ==================== 其他未知标签 → 按 div 处理 ==================== -->
+    <view
+      v-else
+      :style="(n.attrs != null ? (n.attrs!['style'] as string) ?? '' : '') + (n.f != null ? n.f! : '')"
+    >
+      <node
+        v-if="n.children != null && n.children!.length > 0"
+        :childs="n.children"
+        :opts="opts"
+        :root-ref="rootRef"
+      />
+      <text v-else-if="n.type == 'text'">{{ n.text }}</text>
+      <text v-else>{{ getNodeText(n) }}</text>
+    </view>
+  </template>
+</template>
+
+<script lang="uts">
+import { Parser, windowWidth } from '../parser.uts'
+import type { HtmlNode } from '../parser.uts'
+
+// 块级容器标签集合
+const BLOCK_CONTAINERS = new Set<string>()
+const blockTags = ['div', 'p', 'section', 'header', 'footer', 'article', 'aside', 'nav', 'main', 'figure', 'figcaption', 'details', 'summary', 'blockquote', 'address', 'center', 'caption', 'tbody', 'thead', 'tfoot', 'tr', 'td', 'th', 'dl', 'dt', 'dd', 'fieldset', 'legend', 'ruby']
+for (let i = 0; i < blockTags.length; i++) {
+  BLOCK_CONTAINERS.add(blockTags[i])
+}
+
+// 标题标签集合
+const HEADINGS = new Set<string>(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
+
+// 行内元素集合
+const INLINE_ELEMENTS = new Set<string>()
+const inlineTags = ['span', 'b', 'strong', 'i', 'em', 'u', 'ins', 'del', 's', 'strike', 'sub', 'sup', 'code', 'mark', 'small', 'big', 'label', 'q', 'abbr', 'cite', 'font']
+for (let j = 0; j < inlineTags.length; j++) {
+  INLINE_ELEMENTS.add(inlineTags[j])
+}
+
+// 标题字体大小映射
+const HEADING_SIZES: Map<string, string> = new Map<string, string>()
+HEADING_SIZES.set('h1', '2em')
+HEADING_SIZES.set('h2', '1.5em')
+HEADING_SIZES.set('h3', '1.17em')
+HEADING_SIZES.set('h4', '1em')
+HEADING_SIZES.set('h5', '0.83em')
+HEADING_SIZES.set('h6', '0.67em')
+
+// 行内元素样式映射
+const INLINE_STYLE: Map<string, string> = new Map<string, string>()
+INLINE_STYLE.set('b', 'font-weight:bold')
+INLINE_STYLE.set('strong', 'font-weight:bold')
+INLINE_STYLE.set('i', 'font-style:italic')
+INLINE_STYLE.set('em', 'font-style:italic')
+INLINE_STYLE.set('u', 'text-decoration:underline')
+INLINE_STYLE.set('ins', 'text-decoration:underline')
+INLINE_STYLE.set('del', 'text-decoration:line-through')
+INLINE_STYLE.set('s', 'text-decoration:line-through')
+INLINE_STYLE.set('strike', 'text-decoration:line-through')
+INLINE_STYLE.set('sub', 'font-size:smaller;vertical-align:sub')
+INLINE_STYLE.set('sup', 'font-size:smaller;vertical-align:super')
+INLINE_STYLE.set('code', 'font-family:monospace')
+INLINE_STYLE.set('small', 'font-size:0.8em')
+INLINE_STYLE.set('big', 'font-size:1.2em')
+INLINE_STYLE.set('mark', 'background-color:yellow')
+INLINE_STYLE.set('abbr', 'text-decoration:underline dotted')
+INLINE_STYLE.set('cite', 'font-style:italic')
+
+export default {
+  name: 'node',
+  props: {
+    childs: {
+      type: Array as any,
+      default: (): HtmlNode[] => [] as HtmlNode[],
+    },
+    opts: {
+      type: Object as any,
+      default: (): UTSJSONObject => ({} as UTSJSONObject),
+    },
+    rootRef: {
+      type: Object as any,
+      default: null,
+    },
+  },
+  data() {
+    return {
+      localChilds: [] as HtmlNode[],
+    }
+  },
+  watch: {
+    childs: {
+      handler(nodes: HtmlNode[]) {
+        // 保持长度一致，避免 Vue 列表渲染问题
+        const result: HtmlNode[] = []
+        for (let i = 0; i < nodes.length; i++) {
+          result.push(nodes[i])
+        }
+        this.localChilds = result
+      },
+      immediate: true,
+    },
+  },
+  methods: {
+    // ========== 判断方法 ==========
+
+    isBlockContainer(n: HtmlNode): boolean {
+      const name = n.name ?? ''
+      return BLOCK_CONTAINERS.has(name)
+    },
+
+    isHeading(n: HtmlNode): boolean {
+      return HEADINGS.has(n.name ?? '')
+    },
+
+    isInlineElement(n: HtmlNode): boolean {
+      return INLINE_ELEMENTS.has(n.name ?? '')
+    },
+
+    // ========== 样式构建 ==========
+
+    getImgSrc(n: HtmlNode): string {
+      if (n.attrs == null) return ''
+      return (n.attrs!['src'] as string) ?? ''
+    },
+
+    buildImgStyle(n: HtmlNode): string {
+      const attrs = n.attrs
+      let style = attrs != null ? ((attrs!['style'] as string) ?? '') : ''
+      style = 'max-width:100%;' + style
+      if (n.w != null) {
+        // 宽高都有，设置具体高度
+      }
+      return style
+    },
+
+    getImgMode(n: HtmlNode): string {
+      if (n.h == null && n.w == null) return 'widthFix'
+      if (n.h == null) return 'widthFix'
+      if (n.w == null) return 'heightFix'
+      if (n.m != null) return n.m!
+      return 'scaleToFill'
+    },
+
+    buildLinkStyle(n: HtmlNode): string {
+      let style = 'display:inline;'
+      if (n.attrs != null) {
+        style += ((n.attrs!['style'] as string) ?? '')
+      }
+      return style
+    },
+
+    getHeadingStyle(n: HtmlNode): string {
+      let style = 'display:block;'
+      const fontSize = HEADING_SIZES.get(n.name ?? '') ?? '1em'
+      style += 'font-size:' + fontSize + ';font-weight:bold;'
+      if (n.attrs != null) {
+        style += ((n.attrs!['style'] as string) ?? '')
+      }
+      return style
+    },
+
+    getHeadingTextStyle(n: HtmlNode): string {
+      const fontSize = HEADING_SIZES.get(n.name ?? '') ?? '1em'
+      return 'font-size:' + fontSize + ';font-weight:bold'
+    },
+
+    getInlineStyle(n: HtmlNode): string {
+      const base = INLINE_STYLE.get(n.name ?? '') ?? ''
+      let style = base
+      if (n.attrs != null) {
+        const attrStyle = (n.attrs!['style'] as string) ?? ''
+        if (attrStyle.length > 0) {
+          style = style.length > 0 ? style + ';' + attrStyle : attrStyle
+        }
+      }
+      return style
+    },
+
+    getRowStyle(row: HtmlNode): string {
+      let style = 'display:flex;flex-direction:row;'
+      if (row.attrs != null) {
+        style += ((row.attrs!['style'] as string) ?? '')
+      }
+      if (row.name == 'thead') {
+        style += ';font-weight:bold;background-color:#f5f5f5'
+      }
+      return style
+    },
+
+    getCellStyle(cell: HtmlNode): string {
+      let style = 'flex:1;padding:8px;'
+      if (cell.attrs != null) {
+        style += ((cell.attrs!['style'] as string) ?? '')
+      }
+      if (cell.name == 'th') {
+        style += ';font-weight:bold;text-align:center;background-color:#f5f5f5'
+      }
+      // border
+      style += ';border-width:1px;border-color:#e5e5e5;border-style:solid'
+      return style
+    },
+
+    getMediaSrc(n: HtmlNode, sourceIndex: number): string {
+      if (n.src != null && n.src!.length > sourceIndex) {
+        return n.src![sourceIndex]
+      }
+      if (n.attrs != null) {
+        return (n.attrs!['src'] as string) ?? ''
+      }
+      return ''
+    },
+
+    // ========== 文本提取 ==========
+
+    getNodeText(n: HtmlNode): string {
+      if (n.type == 'text') {
+        return n.text ?? ''
+      }
+      if (n.children != null && n.children!.length > 0) {
+        let text = ''
+        for (let i = 0; i < n.children!.length; i++) {
+          const child = n.children![i]
+          if (child.type == 'text') {
+            text += child.text ?? ''
+          } else if (child.children != null) {
+            text += this.getNodeText(child)
+          }
+        }
+        return text
+      }
+      return n.text ?? ''
+    },
+
+    // ========== 事件处理 ==========
+
+    onImgTap(n: HtmlNode, i: number): void {
+      if (n.a != null) {
+        // 图片在链接内，触发链接跳转
+        this.onLinkTap({ attrs: n.a } as HtmlNode)
+        return
+      }
+      const attrs = n.attrs
+      if (attrs != null && attrs['ignore'] == 'T') return
+
+      // 通知根组件
+      const root = this.rootRef as ComponentPublicInstance | null
+      if (root != null) {
+        root.$callMethod('handleImgTap', attrs ?? {} as UTSJSONObject)
+      }
+
+      // 预览图片
+      if ((this.opts['previewImg'] as boolean) == true) {
+        const imgList = (root as any)?.imgList as string[] | null
+        if (imgList != null && attrs != null) {
+          const current = parseInt((attrs['i'] as string) ?? '0')
+          uni.previewImage({
+            current: isNaN(current) ? 0 : current,
+            urls: imgList,
+          })
+        }
+      }
+    },
+
+    onImgLoad(n: HtmlNode, i: number): void {
+      // 图片加载完成，通知根组件更新计数
+      const root = this.rootRef as ComponentPublicInstance | null
+      if (root != null) {
+        root.$callMethod('handleImgLoad', n, i)
+      }
+    },
+
+    onImgError(n: HtmlNode, i: number): void {
+      const root = this.rootRef as ComponentPublicInstance | null
+      if (root != null) {
+        root.$callMethod('handleMediaError', 'img', n.attrs ?? {} as UTSJSONObject)
+      }
+      // 如果有错误占位图，显示
+      const errorImg = this.opts['errorImg'] as string
+      if (errorImg != null && errorImg.length > 0 && n.attrs != null) {
+        n.attrs!['src'] = errorImg
+      }
+    },
+
+    onLinkTap(n: HtmlNode): void {
+      const attrs = n.attrs ?? ({} as UTSJSONObject)
+      const href = (attrs['href'] as string) ?? ''
+
+      const root = this.rootRef as ComponentPublicInstance | null
+      if (root != null) {
+        root.$callMethod('handleLinkTap', attrs)
+      }
+
+      if (href.length > 0) {
+        if (href.charAt(0) == '#') {
+          // 锚点跳转
+          if (root != null) {
+            root.$callMethod('navigateTo', href.substring(1), 0)
+          }
+        } else if (href.includes('://')) {
+          // 外部链接
+          // #ifdef H5
+          // window.open(href) - H5 only
+          // #endif
+          uni.setClipboardData({
+            data: href,
+            success: () => {
+              uni.showToast({ title: '链接已复制', icon: 'none' })
+            },
+          })
+        } else {
+          // 内部页面跳转
+          uni.navigateTo({
+            url: href,
+            fail: () => {
+              uni.switchTab({ url: href })
+            },
+          })
+        }
+      }
+    },
+
+    onPlay(n: HtmlNode): void {
+      const root = this.rootRef as ComponentPublicInstance | null
+      if (root != null) {
+        root.$callMethod('handlePlay', n)
+      }
+    },
+
+    onMediaError(n: HtmlNode, i: number, sourceName: string): void {
+      const root = this.rootRef as ComponentPublicInstance | null
+      if (root != null) {
+        root.$callMethod('handleMediaError', sourceName, n.attrs ?? {} as UTSJSONObject)
+      }
+    },
+  },
+}
+</script>
+
+<style>
+._textNode {
+  /* 文本节点默认样式由行内 style 控制 */
+}
+
+._br {
+  /* 换行 */
+}
+
+._img {
+  /* 图片默认样式由 buildImgStyle 控制 */
+}
+
+._video {
+  width: 100%;
+  height: auto;
+}
+
+._a {
+  display: inline;
+}
+
+._blockContainer {
+  display: block;
+}
+
+._heading {
+  display: block;
+}
+
+._table {
+  display: flex;
+  flex-direction: column;
+}
+
+._tableRow {
+  display: flex;
+  flex-direction: row;
+}
+
+._tableCell {
+  flex: 1;
+}
+
+._list {
+  /* 列表容器 */
+}
+
+._listItem {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+._listMarker {
+  margin-right: 4px;
+}
+
+._liItem {
+  display: list-item;
+}
+
+._codeBlock {
+  background-color: #f5f5f5;
+  padding: 8px;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+._hr {
+  height: 1px;
+}
+</style>

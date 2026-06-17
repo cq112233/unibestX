@@ -1,0 +1,903 @@
+<template>
+	<view class="sp-editor" :style="{ '--icon-size': iconSize, '--icon-columns': iconColumns.toString() }">
+		<view class="sp-editor-toolbar" v-if="!readOnly">
+			<!-- 标题栏 -->
+			<view v-if="toolbarList.includes('header')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }">
+				<fab-tool :visible="curFab == 'header'">
+					<text
+						:class="formats['header'] != null ? 'ql-active' : ''"
+						class="sp-custom-icon"
+						title="标题"
+						@click.stop="fabTap('header')"
+					>{{ getIconCharacter('icon-header') }}</text>
+					<template #content>
+						<view class="fab-tools">
+							<view v-for="item in fabTools.header" :key="item.value" class="fab-sub-item">
+								<text
+									v-if="toolbarList.includes(item.name)"
+									class="sp-editor-icon"
+									:class="formats['header'] == item.value ? 'ql-active' : ''"
+									:title="item.title"
+									@click.stop="formatFabSub('header', item.value)"
+								>{{ getIconCharacter(item.icon) }}</text>
+							</view>
+						</view>
+					</template>
+				</fab-tool>
+			</view>
+			
+			<!-- 加粗 -->
+			<view v-if="toolbarList.includes('bold')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }" @tap="formatIcon('bold', '')">
+				<text
+					:class="formats['bold'] != null ? 'ql-active' : ''"
+					class="sp-editor-icon"
+					title="加粗"
+				>{{ getIconCharacter('icon-zitijiacu') }}</text>
+			</view>
+			
+			<!-- 斜体 -->
+			<view v-if="toolbarList.includes('italic')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }" @tap="formatIcon('italic', '')">
+				<text
+					:class="formats['italic'] != null ? 'ql-active' : ''"
+					class="sp-editor-icon"
+					title="斜体"
+				>{{ getIconCharacter('icon-zitixieti') }}</text>
+			</view>
+			
+			<!-- 下划线 -->
+			<view v-if="toolbarList.includes('underline')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }" @tap="formatIcon('underline', '')">
+				<text
+					:class="formats['underline'] != null ? 'ql-active' : ''"
+					class="sp-editor-icon"
+					title="下划线"
+				>{{ getIconCharacter('icon-zitixiahuaxian') }}</text>
+			</view>
+			
+			<!-- 删除线 -->
+			<view v-if="toolbarList.includes('strike')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }" @tap="formatIcon('strike', '')">
+				<text
+					:class="formats['strike'] != null ? 'ql-active' : ''"
+					class="sp-editor-icon"
+					title="删除线"
+				>{{ getIconCharacter('icon-zitishanchuxian') }}</text>
+			</view>
+			
+			<!-- 对齐方式 -->
+			<view v-if="toolbarList.includes('align')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }">
+				<fab-tool :visible="curFab == 'align'">
+					<text
+						:class="formats['align'] != null ? 'ql-active' : ''"
+						class="sp-editor-icon"
+						title="对齐方式"
+						@click.stop="fabTap('align')"
+					>{{ getIconCharacter('icon-zuoyouduiqi') }}</text>
+					<template #content>
+						<view class="fab-tools">
+							<view v-for="item in fabTools.align" :key="item.value" class="fab-sub-item">
+								<text
+									v-if="toolbarList.includes(item.name)"
+									class="sp-editor-icon"
+									:class="formats['align'] == item.value ? 'ql-active' : ''"
+									:title="item.title"
+									@click.stop="formatFabSub('align', item.value)"
+								>{{ getIconCharacter(item.icon) }}</text>
+							</view>
+						</view>
+					</template>
+				</fab-tool>
+			</view>
+			
+			<!-- 行间距 -->
+			<view v-if="toolbarList.includes('lineHeight')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }">
+				<fab-tool :visible="curFab == 'lineHeight'">
+					<text
+						:class="formats['lineHeight'] != null ? 'ql-active' : ''"
+						class="sp-editor-icon"
+						title="行间距"
+						@click.stop="fabTap('lineHeight')"
+					>{{ getIconCharacter('icon-line-height') }}</text>
+					<template #content>
+						<view class="fab-tools">
+							<view v-for="item in fabTools.lineHeight" :key="item.value" class="fab-sub-item">
+								<text
+									class="fab-sub"
+									:class="formats['lineHeight'] == item.value ? 'ql-active' : ''"
+									:title="item.title"
+									@click.stop="formatFabSub('lineHeight', item.value)"
+								>
+									{{ item.name }}
+								</text>
+							</view>
+						</view>
+					</template>
+				</fab-tool>
+			</view>
+			
+			<!-- 字间距 -->
+			<view v-if="toolbarList.includes('letterSpacing')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }">
+				<fab-tool :visible="curFab == 'letterSpacing'">
+					<text
+						:class="formats['letterSpacing'] != null ? 'ql-active' : ''"
+						class="sp-editor-icon"
+						title="字间距"
+						@click.stop="fabTap('letterSpacing')"
+					>{{ getIconCharacter('icon-Character-Spacing') }}</text>
+					<template #content>
+						<view class="fab-tools">
+							<view v-for="item in fabTools.space" :key="item.value" class="fab-sub-item">
+								<text
+									class="fab-sub"
+									:class="formats['letterSpacing'] == item.value ? 'ql-active' : ''"
+									:title="item.title"
+									@click.stop="formatFabSub('letterSpacing', item.value)"
+								>
+									{{ item.name }}
+								</text>
+							</view>
+						</view>
+					</template>
+				</fab-tool>
+			</view>
+			
+			<!-- 段前距 -->
+			<view v-if="toolbarList.includes('marginTop')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }">
+				<fab-tool :visible="curFab == 'marginTop'">
+					<text
+						:class="formats['marginTop'] != null ? 'ql-active' : ''"
+						class="sp-editor-icon"
+						title="段前距"
+						@click.stop="fabTap('marginTop')"
+					>{{ getIconCharacter('icon-722bianjiqi_duanqianju') }}</text>
+					<template #content>
+						<view class="fab-tools">
+							<view v-for="item in fabTools.space" :key="item.value" class="fab-sub-item">
+								<text
+									class="fab-sub"
+									:class="formats['marginTop'] == item.value ? 'ql-active' : ''"
+									:title="item.title"
+									@click.stop="formatFabSub('marginTop', item.value)"
+								>
+									{{ item.name }}
+								</text>
+							</view>
+						</view>
+					</template>
+				</fab-tool>
+			</view>
+			
+			<!-- 段后距 -->
+			<view v-if="toolbarList.includes('marginBottom')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }">
+				<fab-tool :visible="curFab == 'marginBottom'">
+					<text
+						:class="formats['marginBottom'] != null ? 'ql-active' : ''"
+						class="sp-editor-icon"
+						title="段后距"
+						@click.stop="fabTap('marginBottom')"
+					>{{ getIconCharacter('icon-723bianjiqi_duanhouju') }}</text>
+					<template #content>
+						<view class="fab-tools">
+							<view v-for="item in fabTools.space" :key="item.value" class="fab-sub-item">
+								<text
+									class="fab-sub"
+									:class="formats['marginBottom'] == item.value ? 'ql-active' : ''"
+									:title="item.title"
+									@click.stop="formatFabSub('marginBottom', item.value)"
+								>
+									{{ item.name }}
+								</text>
+							</view>
+						</view>
+					</template>
+				</fab-tool>
+			</view>
+			
+			<!-- 字体栏 -->
+			<view v-if="toolbarList.includes('fontFamily')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }">
+				<fab-tool :visible="curFab == 'fontFamily'">
+					<text
+						:class="formats['fontFamily'] != null ? 'ql-active' : ''"
+						class="sp-editor-icon"
+						title="字体"
+						@click.stop="fabTap('fontFamily')"
+					>{{ getIconCharacter('icon-font') }}</text>
+					<template #content>
+						<view class="fab-tools">
+							<view v-for="item in fabTools.fontFamily" :key="item.value" class="fab-sub-item">
+								<text
+									class="fab-sub"
+									:class="formats['fontFamily'] == item.value ? 'ql-active' : ''"
+									:title="item.title"
+									@click.stop="formatFabSub('fontFamily', item.value)"
+								>
+									{{ item.name }}
+								</text>
+							</view>
+						</view>
+					</template>
+				</fab-tool>
+			</view>
+			
+			<!-- 字体大小栏 -->
+			<view v-if="toolbarList.includes('fontSize')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }">
+				<fab-tool :visible="curFab == 'fontSize'">
+					<text
+						:class="formats['fontSize'] != null ? 'ql-active' : ''"
+						class="sp-editor-icon"
+						title="字号"
+						@click.stop="fabTap('fontSize')"
+					>{{ getIconCharacter('icon-fontsize') }}</text>
+					<template #content>
+						<view class="fab-tools">
+							<view v-for="item in fabTools.fontSize" :key="item.value" class="fab-sub-item">
+								<text
+									class="fab-sub"
+									:class="formats['fontSize'] == item.value ? 'ql-active' : ''"
+									:title="item.title"
+									@click.stop="formatFabSub('fontSize', item.value)"
+								>
+									{{ item.name }}
+								</text>
+							</view>
+						</view>
+					</template>
+				</fab-tool>
+			</view>
+			
+			<!-- 文字颜色 -->
+			<view v-if="toolbarList.includes('color')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }" @tap="formatIcon('color', '')">
+				<text
+					:style="{ color: formats['color'] != null ? textColor : 'initial' }"
+					class="sp-editor-icon"
+					title="文字颜色"
+				>{{ getIconCharacter('icon-text_color') }}</text>
+			</view>
+			
+			<!-- 背景颜色 -->
+			<view v-if="toolbarList.includes('backgroundColor')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }" @tap="formatIcon('backgroundColor', '')">
+				<text
+					:style="{ color: formats['backgroundColor'] != null ? backgroundColor : 'initial' }"
+					class="sp-editor-icon"
+					title="背景颜色"
+				>{{ getIconCharacter('icon-fontbgcolor') }}</text>
+			</view>
+			
+			<!-- 日期 -->
+			<view v-if="toolbarList.includes('date')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }" @tap="insertDate">
+				<text class="sp-editor-icon" title="日期">{{ getIconCharacter('icon-date') }}</text>
+			</view>
+			
+			<!-- 待办 -->
+			<view v-if="toolbarList.includes('listCheck')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }" @tap="formatIcon('list', 'check')">
+				<text class="sp-editor-icon" title="待办">{{ getIconCharacter('icon--checklist') }}</text>
+			</view>
+			
+			<!-- 有序列表 -->
+			<view v-if="toolbarList.includes('listOrdered')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }" @tap="formatIcon('list', 'ordered')">
+				<text
+					:class="formats['list'] == 'ordered' ? 'ql-active' : ''"
+					class="sp-editor-icon"
+					title="有序列表"
+				>{{ getIconCharacter('icon-youxupailie') }}</text>
+			</view>
+			
+			<!-- 无序列表 -->
+			<view v-if="toolbarList.includes('listBullet')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }" @tap="formatIcon('list', 'bullet')">
+				<text
+					:class="formats['list'] == 'bullet' ? 'ql-active' : ''"
+					class="sp-editor-icon"
+					title="无序列表"
+				>{{ getIconCharacter('icon-wuxupailie') }}</text>
+			</view>
+			
+			<!-- 分割线 -->
+			<view v-if="toolbarList.includes('divider')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }" @tap="insertDivider">
+				<text class="sp-editor-icon" title="分割线">{{ getIconCharacter('icon-fengexian') }}</text>
+			</view>
+			
+			<!-- 减少缩进 -->
+			<view v-if="toolbarList.includes('indentDec')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }" @tap="formatIcon('indent', '-1')">
+				<text class="sp-editor-icon" title="减少缩进">{{ getIconCharacter('icon-outdent') }}</text>
+			</view>
+			
+			<!-- 增加缩进 -->
+			<view v-if="toolbarList.includes('indentInc')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }" @tap="formatIcon('indent', '+1')">
+				<text class="sp-editor-icon" title="增加缩进">{{ getIconCharacter('icon-indent') }}</text>
+			</view>
+			
+			<!-- 下标 -->
+			<view v-if="toolbarList.includes('scriptSub')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }" @tap="formatIcon('script', 'sub')">
+				<text
+					:class="formats['script'] == 'sub' ? 'ql-active' : ''"
+					class="sp-editor-icon"
+					title="下标"
+				>{{ getIconCharacter('icon-zitixiabiao') }}</text>
+			</view>
+			
+			<!-- 上标 -->
+			<view v-if="toolbarList.includes('scriptSuper')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }" @tap="formatIcon('script', 'super')">
+				<text
+					:class="formats['script'] == 'super' ? 'ql-active' : ''"
+					class="sp-editor-icon"
+					title="上标"
+				>{{ getIconCharacter('icon-zitishangbiao') }}</text>
+			</view>
+			
+			<!-- 文本方向 -->
+			<view v-if="toolbarList.includes('direction')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }" @tap="formatIcon('direction', 'rtl')">
+				<text
+					:class="formats['direction'] == 'rtl' ? 'ql-active' : ''"
+					class="sp-editor-icon"
+					title="文本方向"
+				>{{ getIconCharacter('icon-direction-rtl') }}</text>
+			</view>
+			
+			<!-- 图片 -->
+			<view v-if="toolbarList.includes('image')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }" @tap="insertImage">
+				<text class="sp-editor-icon" title="图片">{{ getIconCharacter('icon-charutupian') }}</text>
+			</view>
+			
+			<!-- 视频 -->
+			<view v-if="toolbarList.includes('video')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }" @tap="insertVideo">
+				<text class="sp-custom-icon" title="视频">{{ getIconCharacter('icon-video') }}</text>
+			</view>
+			
+			<!-- 超链接 -->
+			<view v-if="toolbarList.includes('link')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }" @tap="insertLink">
+				<text class="sp-editor-icon" title="超链接">{{ getIconCharacter('icon-charulianjie') }}</text>
+			</view>
+			
+			<!-- 撤销 -->
+			<view v-if="toolbarList.includes('undo')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }" @tap="undo">
+				<text class="sp-editor-icon" title="撤销">{{ getIconCharacter('icon-undo') }}</text>
+			</view>
+			
+			<!-- 重做 -->
+			<view v-if="toolbarList.includes('redo')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }" @tap="redo">
+				<text class="sp-editor-icon" title="重做">{{ getIconCharacter('icon-redo') }}</text>
+			</view>
+			
+			<!-- 清除格式 -->
+			<view v-if="toolbarList.includes('removeFormat')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }" @tap="removeFormat">
+				<text class="sp-editor-icon" title="清除格式">{{ getIconCharacter('icon-clearedformat') }}</text>
+			</view>
+			
+			<!-- 清空 -->
+			<view v-if="toolbarList.includes('clear')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }" @tap="clear">
+				<text class="sp-editor-icon" title="清空">{{ getIconCharacter('icon-shanchu') }}</text>
+			</view>
+			
+			<!-- 导出 -->
+			<view v-if="toolbarList.includes('export')" class="toolbar-item" :style="{ width: (100 / iconColumns) + '%' }" @tap="exportHtml">
+				<text class="sp-editor-icon" title="导出">{{ getIconCharacter('icon-baocun') }}</text>
+			</view>
+		</view>
+
+		<!-- 自定义功能组件 -->
+		<!-- 调色板 -->
+		<color-picker
+			v-if="toolbarList.includes('color') || toolbarList.includes('backgroundColor')"
+			ref="colorPickerRef"
+			:color="defaultColor"
+			@confirm="confirmColor"
+		></color-picker>
+		<!-- 添加链接的操作弹窗 -->
+		<link-edit v-if="toolbarList.includes('link') && !readOnly" ref="linkEditRef" @confirm="confirmLink"></link-edit>
+		<view class="sp-editor-wrapper" @longpress="eLongpress">
+			<editor
+				:id="editorId"
+				class="ql-editor editor-container"
+				:class="{ 'ql-image-overlay-none': readOnly }"
+				show-img-size
+				show-img-toolbar
+				show-img-resize
+				:placeholder="placeholder"
+				:read-only="readOnly"
+				@statuschange="onStatusChange"
+				@ready="onEditorReady"
+				@input="onEditorInput"
+			></editor>
+		</view>
+	</view>
+</template>
+
+<script lang="uts">
+import ColorPicker from './color-picker.uvue'
+import LinkEdit from './link-edit.uvue'
+import FabTool from './fab-tool.uvue'
+import { addLink, linkFlag, getIconCharacter } from '../../utils/index.uts'
+
+type RgbColor = {
+  r: number,
+  g: number,
+  b: number,
+  a: number
+}
+
+export default {
+	name: 'sp-editor',
+	components: {
+		ColorPicker,
+		LinkEdit,
+		FabTool
+	},
+	props: {
+		// 编辑器id可传入，以便循环组件使用，防止id重复
+		editorId: {
+			type: String,
+			default: 'editor'
+		},
+		placeholder: {
+			type: String,
+			default: '写点什么吧 ~'
+		},
+		// 是否只读
+		readOnly: {
+			type: Boolean,
+			default: false
+		},
+		// 最大字数限制，-1不限
+		maxlength: {
+			type: Number,
+			default: -1
+		},
+		// 工具栏配置
+		toolbarConfig: {
+			type: Object,
+			default: (): UTSJSONObject => {
+				return {
+					keys: [] as Array<string>, // 要显示的工具，优先级最大
+					excludeKeys: [] as Array<string>, // 除这些指定的工具外，其他都显示
+					iconSize: '18px', // 工具栏字体大小
+					iconColumns: 10 // 工具栏列数
+				} as UTSJSONObject
+			}
+		}
+	},
+	watch: {
+		toolbarConfig: {
+			deep: true,
+			immediate: true,
+			handler(newToolbar: UTSJSONObject) {
+				const keys = newToolbar['keys'] as Array<string> | null
+				const excludeKeys = newToolbar['excludeKeys'] as Array<string> | null
+				const iconSize = newToolbar['iconSize'] as string | null
+				const iconColumns = newToolbar['iconColumns'] as number | null
+
+				if (keys != null && keys.length > 0) {
+					this.toolbarList = keys
+				} else {
+					if (excludeKeys != null && excludeKeys.length > 0) {
+						this.toolbarList = this.toolbarAllList.filter((item: string): boolean => !excludeKeys.includes(item))
+					} else {
+						this.toolbarList = this.toolbarAllList
+					}
+				}
+				this.iconSize = iconSize != null ? iconSize : '18px'
+				this.iconColumns = iconColumns != null ? iconColumns : 10
+			}
+		}
+	},
+	data() {
+		return {
+			formats: {} as UTSJSONObject,
+			curFab: '', // 当前悬浮工具栏
+			fabXY: {} as UTSJSONObject,
+			textColor: '',
+			backgroundColor: '',
+			curColor: '',
+			defaultColor: { r: 0, g: 0, b: 0, a: 1 } as RgbColor, // 调色板默认颜色
+			iconSize: '20px', // 工具栏图标字体大小
+			iconColumns: 10, // 工具栏列数
+			toolbarList: [] as Array<string>,
+			toolbarAllList: [
+				'header', // 标题
+				'H1', // 一级标题
+				'H2', // 二级标题
+				'H3', // 三级标题
+				'H4', // 四级标题
+				'H5', // 五级标题
+				'H6', // 六级标题
+				'bold', // 加粗
+				'italic', // 斜体
+				'underline', // 下划线
+				'strike', // 删除线
+				'align', // 对齐方式
+				'alignLeft', // 左对齐
+				'alignCenter', // 居中对齐
+				'alignRight', // 右对齐
+				'alignJustify', // 两端对齐
+				'lineHeight', // 行间距
+				'letterSpacing', // 字间距
+				'marginTop', // 段前距
+				'marginBottom', // 段后距
+				'fontFamily', // 字体
+				'fontSize', // 字号
+				'color', // 文字颜色
+				'backgroundColor', // 背景颜色
+				'date', // 日期
+				'listCheck', // 待办
+				'listOrdered', // 有序列表
+				'listBullet', // 无序列表
+				'indentInc', // 增加缩进
+				'indentDec', // 减少缩进
+				'divider', // 分割线
+				'scriptSub', // 下标
+				'scriptSuper', // 上标
+				'direction', // 文本方向
+				'image', // 图片
+				'video', // 视频
+				'link', // 超链接
+				'undo', // 撤销
+				'redo', // 重做
+				'removeFormat', // 清除格式
+				'clear', // 清空
+				'export' // 导出
+			] as Array<string>,
+			fabTools: {
+				header: [
+					{ title: '一级标题', name: 'H1', value: 1, icon: 'icon-format-header-1' },
+					{ title: '二级标题', name: 'H2', value: 2, icon: 'icon-format-header-2' },
+					{ title: '三级标题', name: 'H3', value: 3, icon: 'icon-format-header-3' },
+					{ title: '四级标题', name: 'H4', value: 4, icon: 'icon-format-header-4' },
+					{ title: '五级标题', name: 'H5', value: 5, icon: 'icon-format-header-5' },
+					{ title: '六级标题', name: 'H6', value: 6, icon: 'icon-format-header-6' }
+				],
+				fontFamily: [
+					{ title: '宋体', name: '宋', value: '宋体', icon: '' },
+					{ title: '黑体', name: '黑', value: '黑体', icon: '' },
+					{ title: '楷体', name: '楷', value: '楷体', icon: '' },
+					{ title: '仿宋', name: '仿', value: '仿宋', icon: '' },
+					{ title: '华文隶书', name: '隶', value: 'STLiti', icon: '' },
+					{ title: '华文行楷', name: '行', value: 'STXingkai', icon: '' },
+					{ title: '幼圆', name: '圆', value: 'YouYuan', icon: '' }
+				],
+				fontSize: [
+					{ title: '12', name: '12', value: '12px', icon: '' },
+					{ title: '14', name: '14', value: '14px', icon: '' },
+					{ title: '16', name: '16', value: '16px', icon: '' },
+					{ title: '18', name: '18', value: '18px', icon: '' },
+					{ title: '20', name: '20', value: '20px', icon: '' },
+					{ title: '22', name: '22', value: '22px', icon: '' },
+					{ title: '24', name: '24', value: '24px', icon: '' }
+				],
+				align: [
+					{ title: '左对齐', name: 'alignLeft', value: 'left', icon: 'icon-zuoduiqi' },
+					{ title: '居中对齐', name: 'alignCenter', value: 'center', icon: 'icon-juzhongduiqi' },
+					{ title: '右对齐', name: 'alignRight', value: 'right', icon: 'icon-youduiqi' },
+					{ title: '两端对齐', name: 'alignJustify', value: 'justify', icon: 'icon-zuoyouduiqi' }
+				],
+				lineHeight: [
+					{ title: '1倍', name: '1', value: '1', icon: '' },
+					{ title: '1.5倍', name: '1.5', value: '1.5', icon: '' },
+					{ title: '2倍', name: '2', value: '2', icon: '' },
+					{ title: '2.5倍', name: '2.5', value: '2.5', icon: '' },
+					{ title: '3倍', name: '3', value: '3', icon: '' }
+				],
+				// 字间距/段前距/段后距
+				space: [
+					{ title: '0.5倍', name: '0.5', value: '0.5em', icon: '' },
+					{ title: '1倍', name: '1', value: '1em', icon: '' },
+					{ title: '1.5倍', name: '1.5', value: '1.5em', icon: '' },
+					{ title: '2倍', name: '2', value: '2em', icon: '' },
+					{ title: '2.5倍', name: '2.5', value: '2.5em', icon: '' },
+					{ title: '3倍', name: '3', value: '3em', icon: '' }
+				]
+			} as UTSJSONObject,
+			editorCtx: null as any
+		}
+	},
+	methods: {
+		getIconCharacter(name: string): string {
+			return getIconCharacter(name)
+		},
+		onEditorReady() {
+			const instance = this
+			uni.createSelectorQuery()
+				.in(instance)
+				.select('#' + this.editorId)
+				.context((res) => {
+					if (res != null) {
+						instance.editorCtx = res.context
+						instance.$emit('init', instance.editorCtx, instance.editorId)
+					}
+				})
+				.exec()
+		},
+		undo() {
+			if (this.editorCtx != null) {
+				this.editorCtx.undo()
+			}
+		},
+		redo() {
+			if (this.editorCtx != null) {
+				this.editorCtx.redo()
+			}
+		},
+		formatIcon(name: string, value: any) {
+			if (this.editorCtx == null) return
+			if (name == 'color' || name == 'backgroundColor') {
+				this.curColor = name
+				this.showPicker()
+			} else {
+				this.editorCtx.format(name, value)
+			}
+		},
+		// 悬浮工具点击
+		fabTap(fabType: string) {
+			if (this.curFab != fabType) {
+				this.curFab = fabType
+			} else {
+				this.curFab = ''
+			}
+		},
+		// 悬浮工具子集点击
+		formatFabSub(name: string, value: any) {
+			this.formatIcon(name, value)
+			this.fabTap(name)
+		},
+		showPicker() {
+			const picker = this.$refs['colorPickerRef'] as any
+			if (picker == null) return
+
+			if (this.curColor == 'color') {
+				this.defaultColor = this.textColor != ''
+					? picker.hex2Rgb(this.textColor)
+					: { r: 0, g: 0, b: 0, a: 1 } as RgbColor
+			} else if (this.curColor == 'backgroundColor') {
+				this.defaultColor = this.backgroundColor != ''
+					? picker.hex2Rgb(this.backgroundColor)
+					: { r: 0, g: 0, b: 0, a: 0 } as RgbColor
+			}
+			picker.open()
+		},
+		confirmColor(e: UTSJSONObject) {
+			const hex = e['hex'] as string
+			if (this.curColor == 'color') {
+				this.textColor = hex
+				if (this.editorCtx != null) {
+					this.editorCtx.format('color', this.textColor)
+				}
+			} else if (this.curColor == 'backgroundColor') {
+				this.backgroundColor = hex
+				if (this.editorCtx != null) {
+					this.editorCtx.format('backgroundColor', this.backgroundColor)
+				}
+			}
+		},
+		onStatusChange(e: any) {
+			const detail = e.detail as UTSJSONObject
+			const color = detail['color'] as string | null
+			const backgroundColor = detail['backgroundColor'] as string | null
+			if (color != null) {
+				this.textColor = color
+			}
+			if (backgroundColor != null) {
+				this.backgroundColor = backgroundColor
+			}
+			this.formats = detail
+		},
+		insertDivider() {
+			if (this.editorCtx != null) {
+				this.editorCtx.insertDivider()
+			}
+		},
+		clear() {
+			uni.showModal({
+				title: '清空编辑器',
+				content: '确定清空编辑器吗？',
+				success: (res) => {
+					if (res.confirm && this.editorCtx != null) {
+						this.editorCtx.clear()
+					}
+				}
+			})
+		},
+		removeFormat() {
+			uni.showModal({
+				title: '文本格式化',
+				content: '确定要清除所选择部分文本块格式吗？',
+				showCancel: true,
+				success: (res) => {
+					if (res.confirm && this.editorCtx != null) {
+						this.editorCtx.removeFormat()
+					}
+				}
+			})
+		},
+		insertDate() {
+			const date = new Date()
+			const formatDate = date.getFullYear().toString() + '/' + (date.getMonth() + 1).toString() + '/' + date.getDate().toString()
+			if (this.editorCtx != null) {
+				this.editorCtx.insertText({ text: formatDate })
+			}
+		},
+		insertLink() {
+			const linkEdit = this.$refs['linkEditRef'] as any
+			if (linkEdit != null) {
+				linkEdit.open()
+			}
+		},
+		confirmLink(e: UTSJSONObject) {
+			const linkEdit = this.$refs['linkEditRef'] as any
+			if (linkEdit != null) {
+				linkEdit.close()
+			}
+			const instance = this
+			addLink(this.editorCtx, e, () => {
+				// 修复添加超链接后，不触发input更新当前最新内容的bug，这里做一下手动更新
+				if (instance.editorCtx != null) {
+					instance.editorCtx.getContents({
+						success: (res: any) => {
+							const resObj = res as UTSJSONObject
+							const html = resObj['html'] as string
+							const text = resObj['text'] as string
+							instance.$emit('input', { html: html, text: text } as UTSJSONObject, instance.editorId)
+						}
+					})
+				}
+			})
+			this.$emit('addLink', e, this.editorId)
+		},
+		insertImage() {
+			const instance = this
+			uni.chooseImage({
+				success: (res) => {
+					const tempFiles = res.tempFiles
+					instance.$emit('upinImage', tempFiles, instance.editorCtx, instance.editorId)
+				},
+				fail: () => {
+					uni.showToast({
+						title: '未授权访问相册权限，请授权后使用',
+						icon: 'none'
+					})
+				}
+			})
+		},
+		insertVideo() {
+			const instance = this
+			uni.chooseVideo({
+				sourceType: ['camera', 'album'],
+				success: (res) => {
+					const tempFilePath = res.tempFilePath
+					instance.$emit('upinVideo', tempFilePath, instance.editorCtx, instance.editorId)
+				},
+				fail: () => {
+					uni.showToast({
+						title: '未授权访问媒体权限，请授权后使用',
+						icon: 'none'
+					})
+				}
+			})
+		},
+		onEditorInput(e: any) {
+			const detail = e.detail as UTSJSONObject
+			const html = detail['html'] as string
+			const text = detail['text'] as string
+			// 识别到标识立即return
+			if (text.indexOf(linkFlag) != -1) return
+
+			const maxlength = parseInt(this.maxlength.toString())
+			const textStr = text.replace(/[ \t\r\n]/g, '')
+			if (textStr.length > maxlength && maxlength != -1) {
+				uni.showModal({
+					content: '超过' + maxlength.toString() + '字数啦~',
+					confirmText: '确定',
+					showCancel: false,
+					success: () => {
+						this.$emit('overMax', { html, text } as UTSJSONObject, this.editorId)
+					}
+				})
+			} else {
+				this.$emit('input', { html, text } as UTSJSONObject, this.editorId)
+			}
+		},
+		// 导出
+		exportHtml() {
+			if (this.editorCtx != null) {
+				this.editorCtx.getContents({
+					success: (res: any) => {
+						const resObj = res as UTSJSONObject
+						const html = resObj['html'] as string
+						this.$emit('exportHtml', html, this.editorId)
+					}
+				})
+			}
+		},
+		eLongpress() {}
+	}
+}
+</script>
+
+<style lang="scss">
+@import '@/uni_modules/sp-editor/icons/editor-icon.css';
+@import '@/uni_modules/sp-editor/icons/custom-icon.css';
+
+.sp-editor {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	position: relative;
+}
+
+.sp-editor-toolbar {
+	box-sizing: border-box;
+	padding: calc(var(--icon-size) / 4) 0;
+	border-bottom: 1px solid #e4e4e4;
+	font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+.toolbar-item {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: calc(var(--icon-size) * 1.8);
+	cursor: pointer;
+}
+
+.sp-editor-icon {
+	font-family: sp-editor-icon !important;
+	font-style: normal;
+	font-size: var(--icon-size);
+	line-height: calc(var(--icon-size) * 1.8);
+}
+
+.sp-custom-icon {
+	font-family: sp-custom-icon !important;
+	font-style: normal;
+	font-size: var(--icon-size);
+	line-height: calc(var(--icon-size) * 1.8);
+}
+
+.sp-editor-wrapper {
+	flex: 1;
+	overflow: hidden;
+	position: relative;
+}
+
+.editor-container {
+	padding: 8rpx 16rpx;
+	box-sizing: border-box;
+	width: 100%;
+	height: 100%;
+	font-size: 16px;
+	line-height: 1.5;
+}
+
+.ql-image-overlay-none {
+	::v-deep .ql-image-overlay {
+		pointer-events: none;
+		opacity: 0;
+	}
+}
+
+::v-deep .ql-editor.ql-blank::before {
+	font-style: normal;
+	color: #cccccc;
+}
+
+::v-deep .ql-container {
+	min-height: unset;
+}
+
+.ql-active {
+	color: #66ccff;
+}
+
+.fab-tools {
+	display: flex;
+	padding: 0 10rpx;
+	box-sizing: border-box;
+}
+
+.fab-sub-item {
+	width: auto;
+	height: auto;
+	margin: 10rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+</style>

@@ -1,0 +1,740 @@
+<template>
+  <view v-if="show" class="t-wrapper" @touchmove.stop.prevent="moveHandle">
+    <view class="t-mask" :class="{ active: active }" @click.stop="close"></view>
+    <view class="t-box" :class="{ active: active }">
+      <view class="t-header">
+        <view class="t-header-button" @click="close">取消</view>
+        <view class="t-header-button" @click="confirm">确认</view>
+      </view>
+      <view class="t-color__box" :style="{ background: 'rgb(' + bgcolor.r.toString() + ',' + bgcolor.g.toString() + ',' + bgcolor.b.toString() + ')' }">
+        <view
+          class="t-background boxs"
+          @touchstart="touchstart($event, 0)"
+          @touchmove="touchmove($event, 0)"
+          @touchend="touchend($event, 0)"
+        >
+          <view class="t-color-mask"></view>
+          <view class="t-pointer" :style="{ top: (site[0].top - 8).toString() + 'px', left: (site[0].left - 8).toString() + 'px' }"></view>
+        </view>
+      </view>
+      <view class="t-control__box">
+        <view class="t-control__color">
+          <view
+            class="t-control__color-content"
+            :style="{ background: 'rgba(' + rgba.r.toString() + ',' + rgba.g.toString() + ',' + rgba.b.toString() + ',' + rgba.a.toString() + ')' }"
+          ></view>
+        </view>
+        <view class="t-control-box__item">
+          <view
+            class="t-controller boxs"
+            @touchstart="touchstart($event, 1)"
+            @touchmove="touchmove($event, 1)"
+            @touchend="touchend($event, 1)"
+          >
+            <view class="t-hue">
+              <view class="t-circle" :style="{ left: (site[1].left - 12).toString() + 'px' }"></view>
+            </view>
+          </view>
+          <view
+            class="t-controller boxs"
+            @touchstart="touchstart($event, 2)"
+            @touchmove="touchmove($event, 2)"
+            @touchend="touchend($event, 2)"
+          >
+            <view class="t-transparency">
+              <view class="t-circle" :style="{ left: (site[2].left - 12).toString() + 'px' }"></view>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="t-result__box">
+        <view v-if="mode" class="t-result__item">
+          <view class="t-result__box-input">{{ hex }}</view>
+          <view class="t-result__box-text">HEX</view>
+        </view>
+        <template v-else>
+          <view class="t-result__item">
+            <view class="t-result__box-input">{{ rgba.r }}</view>
+            <view class="t-result__box-text">R</view>
+          </view>
+          <view class="t-result__item">
+            <view class="t-result__box-input">{{ rgba.g }}</view>
+            <view class="t-result__box-text">G</view>
+          </view>
+          <view class="t-result__item">
+            <view class="t-result__box-input">{{ rgba.b }}</view>
+            <view class="t-result__box-text">B</view>
+          </view>
+          <view class="t-result__item">
+            <view class="t-result__box-input">{{ rgba.a }}</view>
+            <view class="t-result__box-text">A</view>
+          </view>
+        </template>
+
+        <view class="t-result__item t-select" @click="select">
+          <view class="t-result__box-input">
+            <view>切换</view>
+            <view>模式</view>
+          </view>
+        </view>
+      </view>
+      <view class="t-alternative">
+        <view class="t-alternative__item" v-for="(item, idx) in colorList" :key="idx">
+          <view
+            class="t-alternative__item-content"
+            :style="{ background: 'rgba(' + item.r.toString() + ',' + item.g.toString() + ',' + item.b.toString() + ',' + item.a.toString() + ')' }"
+            @click="selectColor(item)"
+          ></view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script lang="uts">
+type RgbColor = {
+  r: number,
+  g: number,
+  b: number,
+  a: number
+}
+
+type HsbColor = {
+  h: number,
+  s: number,
+  b: number
+}
+
+type SiteItem = {
+  top: number,
+  left: number
+}
+
+export default {
+  name: 'color-picker',
+  props: {
+    color: {
+      type: Object,
+      default: (): RgbColor => {
+        return {
+          r: 0,
+          g: 0,
+          b: 0,
+          a: 0
+        } as RgbColor
+      }
+    },
+    spareColor: {
+      type: Array,
+      default(): Array<RgbColor> {
+        return [] as Array<RgbColor>
+      }
+    }
+  },
+  data() {
+    return {
+      show: false,
+      active: false,
+      rgba: {
+        r: 0,
+        g: 0,
+        b: 0,
+        a: 1
+      } as RgbColor,
+      hsb: {
+        h: 0,
+        s: 0,
+        b: 0
+      } as HsbColor,
+      site: [
+        { top: 0, left: 0 } as SiteItem,
+        { top: 0, left: 0 } as SiteItem,
+        { top: 0, left: 0 } as SiteItem
+      ] as Array<SiteItem>,
+      index: 0,
+      bgcolor: {
+        r: 255,
+        g: 0,
+        b: 0,
+        a: 1
+      } as RgbColor,
+      hex: '#000000',
+      mode: true,
+      colorList: [
+        { r: 244, g: 67, b: 54, a: 1 } as RgbColor,
+        { r: 233, g: 30, b: 99, a: 1 } as RgbColor,
+        { r: 156, g: 39, b: 176, a: 1 } as RgbColor,
+        { r: 103, g: 58, b: 183, a: 1 } as RgbColor,
+        { r: 63, g: 81, b: 181, a: 1 } as RgbColor,
+        { r: 33, g: 150, b: 243, a: 1 } as RgbColor,
+        { r: 3, g: 169, b: 244, a: 1 } as RgbColor,
+        { r: 0, g: 188, b: 212, a: 1 } as RgbColor,
+        { r: 0, g: 150, b: 136, a: 1 } as RgbColor,
+        { r: 76, g: 175, b: 80, a: 1 } as RgbColor,
+        { r: 139, g: 195, b: 74, a: 1 } as RgbColor,
+        { r: 205, g: 220, b: 57, a: 1 } as RgbColor,
+        { r: 255, g: 235, b: 59, a: 1 } as RgbColor,
+        { r: 255, g: 193, b: 7, a: 1 } as RgbColor,
+        { r: 255, g: 152, b: 0, a: 1 } as RgbColor,
+        { r: 255, g: 87, b: 34, a: 1 } as RgbColor,
+        { r: 121, g: 85, b: 72, a: 1 } as RgbColor,
+        { r: 158, g: 158, b: 158, a: 1 } as RgbColor,
+        { r: 0, g: 0, b: 0, a: 0.5 } as RgbColor,
+        { r: 0, g: 0, b: 0, a: 0 } as RgbColor
+      ] as Array<RgbColor>,
+      position: [] as Array<any>,
+      moveX: 0,
+      moveY: 0
+    }
+  },
+  created() {
+    this.ready()
+  },
+  methods: {
+    ready() {
+      this.rgba = this.color as RgbColor
+      const spareList = this.spareColor as Array<RgbColor>
+      if (spareList.length != 0) {
+        this.colorList = spareList
+      }
+    },
+    init() {
+      this.hsb = this.rgbToHsb(this.rgba)
+      this.setValue(this.rgba)
+    },
+    moveHandle() {},
+    open() {
+      this.show = true
+      this.$nextTick(() => {
+        this.init()
+        setTimeout(() => {
+          this.active = true
+          setTimeout(() => {
+            this.getSelectorQuery()
+          }, 350)
+        }, 50)
+      })
+    },
+    close() {
+      this.active = false
+      this.$nextTick(() => {
+        setTimeout(() => {
+          this.show = false
+        }, 500)
+      })
+    },
+    confirm() {
+      this.close()
+      this.$emit('confirm', {
+        rgba: this.rgba,
+        hex: this.hex
+      } as UTSJSONObject)
+    },
+    select() {
+      this.mode = !this.mode
+    },
+    selectColor(item: RgbColor) {
+      this.setColorBySelect(item)
+    },
+    touchstart(e: UniTouchEvent, index: number) {
+      if (e.touches.length > 0) {
+        const touch = e.touches[0]
+        this.moveX = touch.clientX
+        this.moveY = touch.clientY
+        this.setPosition(this.moveX, this.moveY, index)
+      }
+    },
+    touchmove(e: UniTouchEvent, index: number) {
+      if (e.touches.length > 0) {
+        const touch = e.touches[0]
+        this.moveX = touch.clientX
+        this.moveY = touch.clientY
+        this.setPosition(this.moveX, this.moveY, index)
+      }
+    },
+    touchend(e: UniTouchEvent, index: number) {},
+    setPosition(x: number, y: number, index: number) {
+      this.index = index
+      if (this.position.length > index) {
+        const pos = this.position[index] as UTSJSONObject
+        const top = pos['top'] as number
+        const left = pos['left'] as number
+        const width = pos['width'] as number
+        const height = pos['height'] as number
+
+        this.site[index].left = Math.max(0, Math.min(Math.round(x - left), width))
+        if (index == 0) {
+          this.site[index].top = Math.max(0, Math.min(Math.round(y - top), height))
+          this.hsb.s = Math.round((100 * this.site[index].left) / width)
+          this.hsb.b = Math.round(100 - (100 * this.site[index].top) / height)
+          this.setColor()
+          this.setValue(this.rgba)
+        } else {
+          this.setControl(index, this.site[index].left)
+        }
+      }
+    },
+    setColor() {
+      const rgb = this.HSBToRGB(this.hsb)
+      this.rgba.r = rgb.r
+      this.rgba.g = rgb.g
+      this.rgba.b = rgb.b
+    },
+    setValue(rgb: RgbColor) {
+      this.hex = '#' + this.rgbToHex(rgb)
+    },
+    setControl(index: number, x: number) {
+      if (this.position.length > index) {
+        const pos = this.position[index] as UTSJSONObject
+        const width = pos['width'] as number
+
+        if (index == 1) {
+          this.hsb.h = Math.round((360 * x) / width)
+          this.bgcolor = this.HSBToRGB({
+            h: this.hsb.h,
+            s: 100,
+            b: 100
+          } as HsbColor)
+          this.setColor()
+        } else {
+          this.rgba.a = parseFloat((x / width).toFixed(1))
+        }
+        this.setValue(this.rgba)
+      }
+    },
+    rgbToHex(rgb: RgbColor): string {
+      const rHex = rgb.r.toString(16)
+      const gHex = rgb.g.toString(16)
+      const bHex = rgb.b.toString(16)
+      const hexList = [
+        rHex.length == 1 ? '0' + rHex : rHex,
+        gHex.length == 1 ? '0' + gHex : gHex,
+        bHex.length == 1 ? '0' + bHex : bHex
+      ] as Array<string>
+      return hexList.join('')
+    },
+    setColorBySelect(getrgb: RgbColor) {
+      this.rgba = {
+        r: getrgb.r,
+        g: getrgb.g,
+        b: getrgb.b,
+        a: getrgb.a
+      } as RgbColor
+      this.hsb = this.rgbToHsb(this.rgba)
+      this.changeViewByHsb()
+    },
+    changeViewByHsb() {
+      if (this.position.length >= 3) {
+        const a = this.position[0] as UTSJSONObject
+        const b = this.position[1] as UTSJSONObject
+        const c = this.position[2] as UTSJSONObject
+        
+        const aWidth = a['width'] as number
+        const aHeight = a['height'] as number
+        const bWidth = b['width'] as number
+        const cWidth = c['width'] as number
+
+        this.site[0].left = Math.round((this.hsb.s * aWidth) / 100)
+        this.site[0].top = Math.round(((100 - this.hsb.b) * aHeight) / 100)
+        
+        this.setColor()
+        this.setValue(this.rgba)
+        this.bgcolor = this.HSBToRGB({
+          h: this.hsb.h,
+          s: 100,
+          b: 100
+        } as HsbColor)
+
+        this.site[1].left = Math.round((this.hsb.h / 360) * bWidth)
+        this.site[2].left = Math.round(this.rgba.a * cWidth)
+      }
+    },
+    HSBToRGB(hsb: HsbColor): RgbColor {
+      let r = 0
+      let g = 0
+      let b = 0
+      let h = Math.round(hsb.h)
+      let s = Math.round((hsb.s * 255) / 100)
+      let v = Math.round((hsb.b * 255) / 100)
+      if (s == 0) {
+        r = v
+        g = v
+        b = v
+      } else {
+        let t1 = v
+        let t2 = Math.round(((255 - s) * v) / 255)
+        let t3 = Math.round(((t1 - t2) * (h % 60)) / 60)
+        if (h == 360) h = 0
+        if (h < 60) {
+          r = t1
+          b = t2
+          g = t2 + t3
+        } else if (h < 120) {
+          g = t1
+          b = t2
+          r = t1 - t3
+        } else if (h < 180) {
+          g = t1
+          r = t2
+          b = t2 + t3
+        } else if (h < 240) {
+          b = t1
+          r = t2
+          g = t1 - t3
+        } else if (h < 300) {
+          b = t1
+          g = t2
+          r = t2 + t3
+        } else if (h < 360) {
+          r = t1
+          g = t2
+          b = t1 - t3
+        } else {
+          r = 0
+          g = 0
+          b = 0
+        }
+      }
+      return {
+        r: Math.round(r),
+        g: Math.round(g),
+        b: Math.round(b),
+        a: 1
+      } as RgbColor
+    },
+    rgbToHsb(rgb: RgbColor): HsbColor {
+      const hsb = {
+        h: 0,
+        s: 0,
+        b: 0
+      } as HsbColor
+      const min = Math.min(rgb.r, rgb.g, rgb.b)
+      const max = Math.max(rgb.r, rgb.g, rgb.b)
+      const delta = max - min
+      hsb.b = max
+      hsb.s = max != 0 ? Math.round((255 * delta) / max) : 0
+      if (hsb.s != 0) {
+        if (rgb.r == max) hsb.h = Math.round((rgb.g - rgb.b) / delta)
+        else if (rgb.g == max) hsb.h = Math.round(2 + (rgb.b - rgb.r) / delta)
+        else hsb.h = Math.round(4 + (rgb.r - rgb.g) / delta)
+      } else hsb.h = -1
+      hsb.h *= 60
+      if (hsb.h < 0) hsb.h = 0
+      hsb.s *= 100 / 255
+      hsb.b *= 100 / 255
+      return hsb
+    },
+    getSelectorQuery() {
+      const instance = this
+      uni.createSelectorQuery()
+        .in(instance)
+        .selectAll('.boxs')
+        .boundingClientRect()
+        .exec((res: Array<any>) => {
+          if (res.length == 0 || res[0] == null) return
+          const data = res[0] as Array<any>
+          if (data.length == 0) {
+            setTimeout(() => {
+              instance.getSelectorQuery()
+            }, 20)
+            return
+          }
+          instance.position = data
+          instance.setColorBySelect(instance.rgba)
+        })
+    },
+    hex2Rgb(hexColor: string, alpha: number = 1): RgbColor {
+      const color = hexColor.slice(1)
+      const r = parseInt(color.slice(0, 2), 16)
+      const g = parseInt(color.slice(2, 4), 16)
+      const b = parseInt(color.slice(4, 6), 16)
+      return {
+        r: r,
+        g: g,
+        b: b,
+        a: alpha
+      } as RgbColor
+    }
+  },
+  watch: {
+    spareColor(newVal: Array<RgbColor>) {
+      this.colorList = newVal
+    },
+    color(newVal: RgbColor) {
+      this.ready()
+    }
+  }
+}
+</script>
+
+<style>
+.t-wrapper {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  box-sizing: border-box;
+  z-index: 9999;
+}
+
+.t-box {
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  padding: 30upx 0;
+  padding-top: 0;
+  background: #fff;
+  transition: all 0.3s;
+  transform: translateY(100%);
+}
+
+.t-box.active {
+  transform: translateY(0%);
+}
+
+.t-header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  height: 100upx;
+  border-bottom: 1px #eee solid;
+  box-shadow: 1px 0 2px rgba(0, 0, 0, 0.1);
+  background: #fff;
+}
+
+.t-header-button {
+  display: flex;
+  align-items: center;
+  width: 150upx;
+  height: 100upx;
+  font-size: 30upx;
+  color: #666;
+  padding-left: 20upx;
+}
+
+.t-header-button:last-child {
+  justify-content: flex-end;
+  padding-right: 20upx;
+}
+
+.t-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: -1;
+  transition: all 0.3s;
+  opacity: 0;
+}
+
+.t-mask.active {
+  opacity: 1;
+}
+
+.t-color__box {
+  position: relative;
+  height: 400upx;
+  background: rgb(255, 0, 0);
+  overflow: hidden;
+  box-sizing: border-box;
+  margin: 0 20upx;
+  margin-top: 20upx;
+  box-sizing: border-box;
+}
+
+.t-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0));
+}
+
+.t-color-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 400upx;
+  background: linear-gradient(to top, #000, rgba(0, 0, 0, 0));
+}
+
+.t-pointer {
+  position: absolute;
+  bottom: -8px;
+  left: -8px;
+  z-index: 2;
+  width: 15px;
+  height: 15px;
+  border: 1px #fff solid;
+  border-radius: 50%;
+}
+
+.t-show-color {
+  width: 100upx;
+  height: 50upx;
+}
+
+.t-control__box {
+  margin-top: 50upx;
+  width: 100%;
+  display: flex;
+  padding-left: 20upx;
+  box-sizing: border-box;
+}
+
+.t-control__color {
+  flex-shrink: 0;
+  width: 100upx;
+  height: 100upx;
+  border-radius: 50%;
+  background-color: #fff;
+  background-image: linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%, #eee),
+    linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%, #eee);
+  background-size: 36upx 36upx;
+  background-position: 0 0, 18upx 18upx;
+  border: 1px #eee solid;
+  overflow: hidden;
+}
+
+.t-control__color-content {
+  width: 100%;
+  height: 100%;
+}
+
+.t-control-box__item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 30upx;
+}
+
+.t-controller {
+  position: relative;
+  width: 100%;
+  height: 16px;
+  background-color: #fff;
+  background-image: linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%, #eee),
+    linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%, #eee);
+  background-size: 32upx 32upx;
+  background-position: 0 0, 16upx 16upx;
+}
+
+.t-hue {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
+}
+
+.t-transparency {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgb(0, 0, 0));
+}
+
+.t-circle {
+  position: absolute;
+  /* right: -10px; */
+  top: -2px;
+  width: 20px;
+  height: 20px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.1);
+}
+
+.t-result__box {
+  margin-top: 20upx;
+  padding: 10upx;
+  width: 100%;
+  display: flex;
+  box-sizing: border-box;
+}
+
+.t-result__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10upx;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.t-result__box-input {
+  padding: 10upx 0;
+  width: 100%;
+  font-size: 28upx;
+  box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
+  color: #999;
+  text-align: center;
+  background: #fff;
+}
+
+.t-result__box-text {
+  margin-top: 10upx;
+  font-size: 28upx;
+  line-height: 2;
+}
+
+.t-select {
+  flex-shrink: 0;
+  width: 150upx;
+  padding: 0 30upx;
+}
+
+.t-select .t-result__box-input {
+  border-radius: 10upx;
+  border: none;
+  color: #999;
+  box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.1);
+  background: #fff;
+}
+
+.t-select .t-result__box-input:active {
+  box-shadow: 0px 0px 1px 0px rgba(0, 0, 0, 0.1);
+}
+
+.t-alternative {
+  display: flex;
+  flex-wrap: wrap;
+  /* justify-content: space-between; */
+  width: 100%;
+  padding-right: 10upx;
+  box-sizing: border-box;
+}
+
+.t-alternative__item {
+  margin-left: 12upx;
+  margin-top: 10upx;
+  width: 50upx;
+  height: 50upx;
+  border-radius: 10upx;
+  background-color: #fff;
+  background-image: linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%, #eee),
+    linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%, #eee);
+  background-size: 36upx 36upx;
+  background-position: 0 0, 18upx 18upx;
+  border: 1px #eee solid;
+  overflow: hidden;
+}
+
+.t-alternative__item-content {
+  width: 50upx;
+  height: 50upx;
+  background: rgba(255, 0, 0, 0.5);
+}
+
+.t-alternative__item:active {
+  transition: all 0.3s;
+  transform: scale(1.1);
+}
+</style>
