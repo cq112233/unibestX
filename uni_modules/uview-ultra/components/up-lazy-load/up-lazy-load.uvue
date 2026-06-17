@@ -238,12 +238,13 @@ onMounted(() => {
     })
     // mounted的时候，不一定挂载了这个元素，延时30ms，否则会报错或者不报错，但是也没有效果
     setTimeout(() => {
-        // #ifdef H5 || MP
-        // H5 / 小程序：使用 IntersectionObserver 监听可见性
-        // 注意：不传 componentInstance，因为 <script setup> 中 getCurrentInstance()?.proxy
-        // 在 H5 端无法作为有效的 observer 上下文，会导致选择器匹配不到元素。
-        // elIndex 已通过 guid() 全局唯一，页面级 observer 不会冲突。
-        const observer = uni.createIntersectionObserver()
+        // #ifdef H5
+        // H5 端：浏览器原生已高效处理图片加载，不需要手动懒加载，直接展示
+        isShow.value = true
+        // #endif
+        // #ifdef MP
+        // 小程序：使用 IntersectionObserver 监听可见性
+        const observer = uni.createIntersectionObserver(this)
         observer.relativeToViewport({
             bottom: getThreshold.value,
         }).observe('.up-lazy-item-' + elIndex, (res: any) => {
