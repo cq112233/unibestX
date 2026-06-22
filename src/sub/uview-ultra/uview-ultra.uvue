@@ -10,6 +10,29 @@
     <scroll-view :scroll-y="true" direction="vertical" :style="{ height: `${scrollHeight}px` }" :scroll-top="scrollViewScrollTop" :scroll-with-animation="true" @scroll="onScroll">
       <ThemeSwitchCard />
 
+      <!-- ReadMore 展开阅读更多 -->
+      <view class="demo-block">
+        <text class="demo-label">
+          up-read-more 展开阅读更多
+        </text>
+        <!-- 基本使用 -->
+        <up-read-more show-height="120">
+          <rich-text :nodes="readMoreContent"></rich-text>
+        </up-read-more>
+        <!-- 带展开/收起切换 -->
+        <view class="mt-10px">
+          <up-read-more :toggle="true" show-height="120" close-text="展开阅读全文" open-text="收起">
+            <rich-text :nodes="readMoreContent"></rich-text>
+          </up-read-more>
+        </view>
+        <!-- 自定义颜色和字号 -->
+        <view class="mt-10px">
+          <up-read-more show-height="100" color="#19be6b" :font-size="12" close-text="查看更多">
+            <rich-text :nodes="readMoreContent"></rich-text>
+          </up-read-more>
+        </view>
+      </view>
+
       <!-- Avatar 头像 -->
       <view class="demo-block">
         <text class="demo-label">
@@ -1379,6 +1402,9 @@ const albumUrls = ref([
   'https://picsum.photos/400/400?random=19',
   'https://picsum.photos/400/400?random=20',
 ] as string[])
+
+// ==================== ReadMore 展开阅读更多 ====================
+const readMoreContent = ref(`<p>山不在高，有仙则名。水不在深，有龙则灵。斯是陋室，惟吾德馨。苔痕上阶绿，草色入帘青。谈笑有鸿儒，往来无白丁。可以调素琴，阅金经。无丝竹之乱耳，无案牍之劳形。南阳诸葛庐，西蜀子云亭。孔子云：何陋之有？</p><p>锦瑟无端五十弦，一弦一柱思华年。庄生晓梦迷蝴蝶，望帝春心托杜鹃。沧海月明珠有泪，蓝田日暖玉生烟。此情可待成追忆，只是当时已惘然。</p>`)
 
 // ==================== Avatar 头像 ====================
 const avatarSrc = ref('/static/logo.png')

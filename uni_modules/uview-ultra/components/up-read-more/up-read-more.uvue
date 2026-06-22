@@ -3,8 +3,7 @@
 		<view
 		    class="up-read-more__content"
 		    :style="{
-				height: isLongContent && status === 'close' ? addUnit(showHeight) : addUnit(contentHeight),
-				textIndent: textIndent
+				height: isLongContent && status === 'close' ? addUnit(showHeight) : 'auto'
 			}"
 		>
 			<view
@@ -72,17 +71,28 @@
 		mixins: [mpMixin, mixin, propsReadMore],
 		data() {
 			return {
-				isLongContent: false, // 是否需要隐藏一部分内容
+				isLongContent: true, // 默认折叠，测量确认内容短再展开
 				status: 'close', // 当前隐藏与显示的状态，close-收起状态，open-展开状态
 				elId: guid(), // 生成唯一class
-				contentHeight: 100, // 内容高度
+				contentHeight: 0, // 内容高度
+				initRetryCount: 0 // 高度测量重试次数
 			}
 		},
 		computed: {
 			// 展开后无需阴影，收起时才需要阴影样式
 			innerShadowStyle() {
 				if (this.status === 'open') return {}
-				else return this.shadowStyle
+				// #ifdef APP
+				// APP 端 linear-gradient 不渲染，替换为半透明白色背景
+				const appStyle = {} as UTSJSONObject
+				appStyle['backgroundColor'] = 'rgba(255, 255, 255, 0.85)'
+				appStyle['paddingTop'] = this.shadowStyle['paddingTop'] ?? '100px'
+				appStyle['marginTop'] = this.shadowStyle['marginTop'] ?? '-100px'
+				return appStyle
+				// #endif
+				// #ifndef APP
+				return this.shadowStyle
+				// #endif
 			}
 		},
 		mounted() {
@@ -101,19 +111,20 @@
 				this.getContentHeight().then((size: NodeInfo) => {
 					this.contentHeight = size.height ?? 0
 					if (this.contentHeight <= 0) {
-						// 安卓上可能还未渲染完，重试
-						setTimeout(() => { this.init() }, 200)
+						// 测量失败，重试（最多3次）
+						this.initRetryCount = this.initRetryCount + 1
+						if (this.initRetryCount <= 3) {
+							setTimeout(() => { this.init() }, 200)
+						}
+						// 重试耗尽，保持 isLongContent = true（默认折叠状态）
 						return
 					}
-					// 判断高度，如果真实内容高度大于占位高度，则显示收起与展开的控制按钮
-					if (this.contentHeight > parseFloat(getPx(this.showHeight))) {
-						this.isLongContent = true
-						this.status = 'close'
-					} else {
-						// https://github.com/ijry/uview-plus/issues/270
+					// 判断高度，如果真实内容高度 小于等于 占位高度，内容太短不需要折叠
+					if (this.contentHeight <= parseFloat(getPx(this.showHeight))) {
 						this.isLongContent = false
 						this.status = 'close'
 					}
+					// 否则保持 isLongContent = true（默认折叠状态，无需额外操作）
 				})
 			},
 			// 获取内容的高度
@@ -143,7 +154,6 @@
 
 	&__content {
 		overflow: hidden;
-		color: $up-content-color;
 		font-size: 15px;
 		text-align: left;
 	}
