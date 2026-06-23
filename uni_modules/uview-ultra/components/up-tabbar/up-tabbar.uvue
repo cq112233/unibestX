@@ -125,17 +125,18 @@
 
 	.up-tabbar {
 		@include flex(column);
-		flex: 1;
-		justify-content: center;
-		
+		width: 100%;
+
 		&__content {
 			@include flex(column);
 			background-color: #fff;
-			
+
 			&__item-wrapper {
 				height: 50px;
 				@include flex(row);
 				justify-content: space-around;
+				align-items: stretch;
+				width: 100%;
 			}
 		}
 
