@@ -149,25 +149,17 @@
 					}
 				}
 
+				// 左半段连接线：从上一步连接到当前步骤，应检查当前步骤的 error 状态
 				// @ts-ignore
-				if (this.parent != null
-				// @ts-ignore
-					&& this.parent.$data['children'] != null
+				if (this.error as boolean) {
+					style['backgroundColor'] = color['error']
+				} else if ((this.index - 1) < parseInt(this.parentData['current'].toString())) {
 					// @ts-ignore
-					&& this.index + 1 < (this.parent.$data['children'] as ComponentPublicInstance[]).length) {
-					// @ts-ignore
-					const nextChild = (this.parent.$data['children'] as ComponentPublicInstance[])[this.index + 1];
-					// @ts-ignore
-					if (nextChild != null && nextChild.$props['error'] as boolean) {
-						style['backgroundColor'] = color['error']
-						// @ts-ignore
-					} else if ((this.index - 1) < parseInt(this.parentData['current'].toString())) {
-						if (this.parentData['activeColor'] != '#3c9cff') {
-							style['backgroundColor'] = this.parentData['activeColor']
-						}
-					} else {
-						style['backgroundColor'] = this.parentData['inactiveColor']
+					if (this.parentData['activeColor'] != '#3c9cff') {
+						style['backgroundColor'] = this.parentData['activeColor']
 					}
+				} else {
+					style['backgroundColor'] = this.parentData['inactiveColor']
 				}
 				return style
 			},
@@ -419,23 +411,23 @@
 				justify-content: center;
 
 				&--wait {
-					border-color: $up-tips-color !important;
-					background-color: transparent !important;
+					border-color: $up-tips-color;
+					background-color: transparent;
 				}
 
 				&--active {
-					background-color: $up-primary !important;
-					border-color: $up-primary !important;
+					background-color: $up-primary;
+					border-color: $up-primary;
 				}
 
 				&--finish {
-					border-color: $up-primary !important;
-					background-color: transparent !important;
+					border-color: $up-primary;
+					background-color: transparent;
 				}
 
 				&--error {
-					border-color: $up-error !important;
-					background-color: transparent !important;
+					border-color: $up-error;
+					background-color: transparent;
 				}
 
 				&__text {
@@ -444,7 +436,7 @@
 					text-align: center;
 
 					&--active {
-						color: #ffffff !important;
+						color: #ffffff;
 					}
 				}
 			}
@@ -484,10 +476,10 @@
 
 		&__line {
 			position: absolute;
-			background: $up-tips-color;
+			background-color: $up-tips-color;
 
 			&--active {
-				background-color: $up-primary !important;
+				background-color: $up-primary;
 			}
 
 			&--row {
