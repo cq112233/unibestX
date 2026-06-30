@@ -10,6 +10,111 @@
     <scroll-view :scroll-y="true" direction="vertical" :style="{ height: `${scrollHeight}px` }" :scroll-top="scrollViewScrollTop" :scroll-with-animation="true" @scroll="onScroll">
       <ThemeSwitchCard />
 
+      <!-- ==================== Transition 动画过渡（置顶方便查看） ==================== -->
+      <view class="demo-block">
+        <text class="demo-label">up-transition 动画过渡</text>
+
+        <!-- 1. 基本使用：fade 淡入淡出 -->
+        <text class="demo-sub-label">1. 基本使用（fade 淡入淡出 + 按钮切换）</text>
+        <view class="transition-demo-wrapper">
+          <up-transition :show="transitionShow1" mode="fade">
+            <view class="transition-demo-box transition-demo-blue">
+              <text class="text-14px text-white font-500">fade 淡入淡出</text>
+            </view>
+          </up-transition>
+          <up-button type="primary" :text="transitionShow1 ? '隐藏' : '显示'" size="mini" @click="transitionShow1 = !transitionShow1"></up-button>
+        </view>
+
+        <!-- 2. 多种动画模式 -->
+        <text class="demo-sub-label mt-15px">2. 多种动画模式（fade-up / slide-down / zoom-in / fade-left）</text>
+        <view class="transition-demo-grid">
+          <view v-for="item in transitionModes" :key="item.getString('mode')" class="transition-demo-item">
+            <text class="text-11px text-[#909399] mb-6px">{{ item.getString('mode') }}</text>
+            <up-transition :show="(item.getBoolean('show') ?? false) as boolean" :mode="item.getString('mode')">
+              <view class="transition-demo-box transition-demo-green">
+                <text class="text-12px text-white">{{ item.getString('mode') }}</text>
+              </view>
+            </up-transition>
+            <up-button type="primary" :text="(item.getBoolean('show') ?? false) ? '隐藏' : '显示'" size="mini" @click="toggleTransitionMode(item)"></up-button>
+          </view>
+        </view>
+
+        <!-- 3. 自定义动画时长 + 缓动 -->
+        <text class="demo-sub-label mt-15px">3. 自定义时长 + 缓动（duration="800" timing-function="linear"）</text>
+        <view class="transition-demo-wrapper">
+          <up-transition :show="transitionShow3" mode="slide-right" :duration="800" timing-function="linear">
+            <view class="transition-demo-box transition-demo-orange">
+              <text class="text-14px text-white font-500">slide-right · 800ms · linear</text>
+            </view>
+          </up-transition>
+          <up-button type="warning" :text="transitionShow3 ? '隐藏' : '显示'" size="mini" @click="transitionShow3 = !transitionShow3"></up-button>
+        </view>
+      </view>
+
+      <!-- ==================== QRCode 二维码（置顶方便查看） ==================== -->
+      <view class="demo-block">
+        <text class="demo-label">up-qrcode 二维码</text>
+
+        <!-- 1. 基本使用 -->
+        <text class="demo-sub-label">1. 基本使用（size + val）</text>
+        <view class="qrcode-demo-row">
+          <up-qrcode :size="180" val="https://uview-ultra.lingyun.net"></up-qrcode>
+        </view>
+
+        <!-- 2. 带 Logo 图标 -->
+        <text class="demo-sub-label mt-15px">2. 带中间 Logo 图标（icon）</text>
+        <view class="qrcode-demo-row">
+          <up-qrcode :size="180" val="uview-ultra" icon="https://uview-ultra.jiangruyi.com/uview-ultra/common/logo.png"></up-qrcode>
+        </view>
+
+        <!-- 3. 自定义颜色 -->
+        <text class="demo-sub-label mt-15px">3. 自定义颜色（background / foreground）</text>
+        <view class="qrcode-demo-row">
+          <up-qrcode :size="160" val="hello world" background="#19be6b" foreground="#ffffff"></up-qrcode>
+        </view>
+
+        <!-- 4. 加载状态 -->
+        <text class="demo-sub-label mt-15px">4. 加载状态（showLoading + loadingText）</text>
+        <view class="qrcode-demo-row">
+          <up-qrcode :size="160" val="https://github.com" :show-loading="true" loading-text="生成中..." @result="onQrcodeResult"></up-qrcode>
+        </view>
+      </view>
+
+      <!-- ==================== Parse 富文本解析（置顶方便查看） ==================== -->
+      <view class="demo-block">
+        <text class="demo-label">up-parse 富文本解析</text>
+
+        <!-- 1. 基本使用：段落 + 图片 -->
+        <text class="demo-sub-label">1. 基本使用（段落 + 图片）</text>
+        <view class="parse-demo-wrapper">
+          <up-parse :content="parseContent1"></up-parse>
+        </view>
+
+        <!-- 2. 富文本样式：标题、加粗、斜体、引用、代码 -->
+        <text class="demo-sub-label mt-15px">2. 富文本样式（h1~h6 / b / i / blockquote / code / pre）</text>
+        <view class="parse-demo-wrapper">
+          <up-parse :content="parseContent2"></up-parse>
+        </view>
+
+        <!-- 3. 图片 + 链接 + 预览 -->
+        <text class="demo-sub-label mt-15px">3. 图片 + 链接 + 预览（:preview-img="true" @imgTap @linkTap）</text>
+        <view class="parse-demo-wrapper">
+          <up-parse :content="parseContent3" :preview-img="true" @img-tap="onParseImgTap" @link-tap="onParseLinkTap"></up-parse>
+        </view>
+
+        <!-- 4. 表格渲染 -->
+        <text class="demo-sub-label mt-15px">4. 表格渲染（table / tr / th / td）</text>
+        <view class="parse-demo-wrapper">
+          <up-parse :content="parseContent4"></up-parse>
+        </view>
+
+        <!-- 5. 自定义标签样式 + 长按复制 -->
+        <text class="demo-sub-label mt-15px">5. 自定义标签样式（tagStyle）+ 长按复制（:selectable="true"）</text>
+        <view class="parse-demo-wrapper">
+          <up-parse :content="parseContent5" :tag-style="parseTagStyle" :selectable="true"></up-parse>
+        </view>
+      </view>
+
       <!-- ==================== Steps 步骤条（置顶方便查看） ==================== -->
       <view class="demo-block">
         <text class="demo-label">up-steps 步骤条</text>
@@ -91,8 +196,8 @@
             icon-color="#ffffff"
             :icon-size="18"
             height="32px"
-            @leftClick="onNavbarMiniLeftClick"
-            @homeClick="onNavbarMiniHomeClick"
+            @left-click="onNavbarMiniLeftClick"
+            @home-click="onNavbarMiniHomeClick"
           ></up-navbar-mini>
         </view>
 
@@ -217,7 +322,7 @@
             :fixed="false"
             :placeholder="false"
             :safe-area-inset-bottom="false"
-            @change="onTabbarChange1"
+            @change="(e: number | string) => onTabbarChange1(e)"
           >
             <up-tabbar-item text="首页" icon="home" name="0"></up-tabbar-item>
             <up-tabbar-item text="放映厅" icon="photo" name="1"></up-tabbar-item>
@@ -234,7 +339,7 @@
             :fixed="false"
             :placeholder="false"
             :safe-area-inset-bottom="false"
-            @change="onTabbarChange2"
+            @change="(e: number | string) => onTabbarChange2(e)"
           >
             <up-tabbar-item text="首页" icon="home" dot name="0"></up-tabbar-item>
             <up-tabbar-item text="消息" icon="chat" badge="3" name="1"></up-tabbar-item>
@@ -251,7 +356,7 @@
             :fixed="false"
             :placeholder="false"
             :safe-area-inset-bottom="false"
-            @change="onTabbarChange3"
+            @change="(e: number | string) => onTabbarChange3(e)"
           >
             <up-tabbar-item text="首页" icon="home" name="home"></up-tabbar-item>
             <up-tabbar-item text="分类" icon="list-dot" name="category"></up-tabbar-item>
@@ -270,7 +375,7 @@
             :safe-area-inset-bottom="false"
             active-color="#d81e06"
             inactive-color="#999999"
-            @change="onTabbarChange4"
+            @change="(e: number | string) => onTabbarChange4(e)"
           >
             <up-tabbar-item text="首页" icon="home" name="0"></up-tabbar-item>
             <up-tabbar-item text="放映厅" icon="photo" name="1"></up-tabbar-item>
@@ -288,7 +393,7 @@
             :placeholder="false"
             :safe-area-inset-bottom="false"
             active-color="#2979ff"
-            @change="onTabbarChange5"
+            @change="(e: number | string) => onTabbarChange5(e)"
           >
             <up-tabbar-item text="首页" name="0">
               <template #active-icon>
@@ -319,7 +424,7 @@
             :placeholder="false"
             :safe-area-inset-bottom="false"
             :border="false"
-            @change="onTabbarChange6"
+            @change="(e: number | string) => onTabbarChange6(e)"
           >
             <up-tabbar-item text="首页" icon="home" name="0"></up-tabbar-item>
             <up-tabbar-item text="放映厅" icon="photo" name="1"></up-tabbar-item>
@@ -336,7 +441,7 @@
             :fixed="false"
             :placeholder="false"
             :safe-area-inset-bottom="false"
-            @change="onTabbarChange7"
+            @change="(e: number | string) => onTabbarChange7(e)"
           >
             <up-tabbar-item text="首页" icon="home" name="0"></up-tabbar-item>
             <up-tabbar-item text="放映厅" icon="photo" name="1"></up-tabbar-item>
@@ -660,7 +765,6 @@
           </template>
         </up-navbar>
       </view>
-
 
       <!-- Subsection 分段器 -->
       <view class="demo-block">
@@ -1092,242 +1196,7 @@
 
       <up-divider text="基础组件结束"></up-divider>
 
-      <!-- ==================== 表单组件 ==================== -->
-      <text class="section-title">
-        表单组件
-      </text>
-
-      <!-- Input 输入框 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-input
-        </text>
-        <up-input v-model="inputValue" placeholder="请输入内容" border="surround" clearable></up-input>
-        <view class="h-10px"></view>
-        <up-input v-model="passwordValue" placeholder="请输入密码" :password="true" border="surround"></up-input>
-        <view class="h-10px"></view>
-        <up-input placeholder="带图标" prefix-icon="search" border="surround"></up-input>
-      </view>
-
-      <!-- Search 搜索 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-search
-        </text>
-        <up-search v-model="searchValue" placeholder="搜索关键字" :show-action="true" action-text="搜索"></up-search>
-      </view>
-
-      <!-- Switch 开关 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-switch
-        </text>
-        <view class="demo-row-start">
-          <up-switch v-model="switchValue1"></up-switch>
-          <view class="w-20px"></view>
-          <up-switch v-model="switchValue2" active-color="#fa3534"></up-switch>
-          <view class="w-20px"></view>
-          <up-switch :disabled="true"></up-switch>
-          <view class="w-20px"></view>
-          <up-switch :loading="true"></up-switch>
-        </view>
-      </view>
-
-      <!-- Checkbox 复选框 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-checkbox
-        </text>
-        <up-checkbox-group v-model="checkboxValue" placement="row">
-          <up-checkbox name="apple" label="苹果" :checked="true"></up-checkbox>
-          <up-checkbox name="banana" label="香蕉"></up-checkbox>
-          <up-checkbox name="orange" label="橙子"></up-checkbox>
-        </up-checkbox-group>
-      </view>
-
-      <!-- Radio 单选框 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-radio
-        </text>
-        <up-radio-group v-model="radioValue" placement="row">
-          <up-radio name="male" label="男"></up-radio>
-          <up-radio name="female" label="女"></up-radio>
-        </up-radio-group>
-      </view>
-
-      <!-- Slider 滑块 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-slider
-        </text>
-        <up-slider v-model="sliderValue" :min="0" :max="100" :step="1" :show-value="true"></up-slider>
-      </view>
-
-      <!-- Rate 评分 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-rate
-        </text>
-        <view class="demo-row">
-          <up-rate v-model="rateValue" :count="5"></up-rate>
-          <text class="text-14px text-[#909399] ml-10px">{{ rateValue }} 分</text>
-        </view>
-      </view>
-
-      <!-- NumberBox 步进器 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-number-box
-        </text>
-        <view class="demo-row-start">
-          <up-number-box v-model="numberValue" :min="0" :max="100"></up-number-box>
-        </view>
-      </view>
-
-      <!-- Form 表单 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          基础使用
-        </text>
-        <up-form
-          ref="uForm"
-          :model="formModel"
-          :rules="formRules"
-          label-width="80px"
-          error-type="toast"
-        >
-          <up-form-item label="姓名" prop="name" :border-bottom="true">
-            <up-input v-model="formModel.name" placeholder="请输入姓名" border="none"></up-input>
-          </up-form-item>
-          <up-form-item label="性别" prop="gender" :border-bottom="true" @click="genderActionShow = true">
-            <view class="flex-row items-center justify-between w-full">
-              <text class="text-15px" :class="formModel.gender == '' ? 'text-[#c0c4cc]' : 'text-[#303133]'">{{ formModel.gender != '' ? formModel.gender : '请选择性别' }}</text>
-              <up-icon name="arrow-right" color="#c0c4cc" size="16"></up-icon>
-            </view>
-          </up-form-item>
-          <up-form-item label="年龄" prop="age" :border-bottom="true">
-            <up-input v-model="formModel.age" type="number" placeholder="请输入年龄" border="none" :custom-style="{ backgroundColor: '#f2f3f5', padding: '4px 10px', borderRadius: '4px', width: '100%' }"></up-input>
-          </up-form-item>
-          <up-form-item label="水果" prop="fruit" :border-bottom="true">
-            <up-radio-group v-model="formModel.fruit" placement="row">
-              <up-radio name="apple" label="苹果" shape="circle"></up-radio>
-              <up-radio name="banana" label="香蕉" shape="circle"></up-radio>
-              <up-radio name="orange" label="毒橙子" shape="circle"></up-radio>
-            </up-radio-group>
-          </up-form-item>
-          <up-form-item label="兴趣爱好" prop="hobbies" :border-bottom="true">
-            <up-checkbox-group v-model="formModel.hobbies" placement="row">
-              <up-checkbox name="badminton" label="羽毛球"></up-checkbox>
-              <up-checkbox name="running" label="跑步"></up-checkbox>
-              <up-checkbox name="climbing" label="爬山"></up-checkbox>
-            </up-checkbox-group>
-          </up-form-item>
-          <up-form-item label="简介" prop="intro" :border-bottom="true">
-            <up-textarea v-model="formModel.intro" placeholder="不低于3个字" count maxlength="140" height="80px"></up-textarea>
-          </up-form-item>
-          <up-form-item label="住店时间" prop="stayTime" :border-bottom="true" @click="calendarShow = true">
-            <view class="flex-row items-center justify-between w-full">
-              <text class="text-15px" :class="formModel.stayTime == '' ? 'text-[#c0c4cc]' : 'text-[#303133]'">{{ formModel.stayTime != '' ? formModel.stayTime : '请选择住店和离店时间' }}</text>
-              <up-icon name="arrow-right" color="#c0c4cc" size="16"></up-icon>
-            </view>
-          </up-form-item>
-          <up-form-item label="验证码" prop="code" :border-bottom="true">
-            <view class="flex-row items-center justify-between w-full">
-              <up-input v-model="formModel.code" placeholder="请填写验证码" border="none" class="flex-1"></up-input>
-              <up-button type="success" text="获取验证码" size="mini" :custom-style="{ backgroundColor: '#4cd964', border: 'none', color: '#fff', marginLeft: '10px' }"></up-button>
-            </view>
-          </up-form-item>
-          <up-form-item label="生日" prop="birthday" :border-bottom="true" @click="datetimePickerShow = true">
-            <view class="flex-row items-center justify-between w-full">
-              <text class="text-15px" :class="formModel.birthday == '' ? 'text-[#c0c4cc]' : 'text-[#303133]'">{{ formModel.birthday != '' ? formModel.birthday : '请选择生日' }}</text>
-              <up-icon name="arrow-right" color="#c0c4cc" size="16"></up-icon>
-            </view>
-          </up-form-item>
-        </up-form>
-        <view class="mt-15px flex-row justify-between">
-          <up-button type="primary" text="提交" size="mini" @click="submitForm"></up-button>
-          <up-button type="info" text="重置" size="mini" @click="resetForm"></up-button>
-        </view>
-      </view>
-
-      <!-- Calendar 日历 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-calendar
-        </text>
-        <view class="demo-row-start items-center">
-          <up-button type="primary" text="选择日期" size="mini" @click="calendarShow = true"></up-button>
-          <view class="w-15px"></view>
-          <text class="text-14px text-[#606266]">{{ calendarValue != '' ? `已选日期: ${calendarValue}` : '未选择日期' }}</text>
-        </view>
-      </view>
-
-      <!-- Keyboard 键盘 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-keyboard
-        </text>
-        <view class="demo-row-start items-center">
-          <view class="flex-1">
-            <up-input v-model="keyboardValue" placeholder="通过键盘输入内容" border="surround" readonly @click="openKeyboard('number')"></up-input>
-          </view>
-          <view class="w-10px"></view>
-          <up-button type="info" text="清空" size="mini" @click="keyboardValue = ''"></up-button>
-        </view>
-        <view class="demo-row-start mt-10px">
-          <up-button type="primary" text="数字键盘" size="mini" @click="openKeyboard('number')"></up-button>
-          <view class="w-10px"></view>
-          <up-button type="primary" text="身份证键盘" size="mini" @click="openKeyboard('card')"></up-button>
-          <view class="w-10px"></view>
-          <up-button type="primary" text="车牌号键盘" size="mini" @click="openKeyboard('car')"></up-button>
-        </view>
-      </view>
-
-      <!-- Picker 选择器 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-picker
-        </text>
-        <view class="demo-row-start items-center">
-          <up-button type="primary" text="选择国家" size="mini" @click="pickerShow = true"></up-button>
-          <view class="w-15px"></view>
-          <text class="text-14px text-[#606266]">{{ pickerValue != '' ? `已选: ${pickerValue}` : '未选择' }}</text>
-        </view>
-      </view>
-
-      <!-- DatetimePicker 时间选择器 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-datetime-picker
-        </text>
-        <view class="demo-row-start items-center">
-          <up-button type="primary" text="选择日期" size="mini" @click="datetimePickerShow = true"></up-button>
-          <view class="w-15px"></view>
-          <text class="text-14px text-[#606266]">{{ datetimePickerLabel != '' ? `已选: ${datetimePickerLabel}` : '未选择' }}</text>
-        </view>
-      </view>
-
-      <!-- Upload 上传 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-upload
-        </text>
-        <view class="demo-row-start">
-          <up-upload
-            :file-list="uploadList"
-            :multiple="true"
-            :max-count="3"
-            width="80px"
-            height="80px"
-            @after-read="onUploadAfterRead"
-            @delete="onUploadDelete"
-          ></up-upload>
-        </view>
-      </view>
-
-      <up-divider text="表单组件结束"></up-divider>
-
+      <DemoForm />
       <!-- ==================== 数据组件 ==================== -->
       <text class="section-title">
         数据组件
@@ -1386,147 +1255,7 @@
 
       <up-divider text="数据组件结束"></up-divider>
 
-      <!-- ==================== 反馈组件 ==================== -->
-      <text class="section-title">
-        反馈组件
-      </text>
-
-      <!-- Alert 警告提示 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-alert
-        </text>
-        <up-alert title="成功提示" type="success" :show-icon="true"></up-alert>
-        <view class="h-10px"></view>
-        <up-alert title="警告提示" type="warning" :show-icon="true"></up-alert>
-        <view class="h-10px"></view>
-        <up-alert title="错误提示" type="error" :show-icon="true"></up-alert>
-        <view class="h-10px"></view>
-        <up-alert title="信息提示" type="info" :show-icon="true"></up-alert>
-      </view>
-
-      <!-- NoticeBar 滚动通知 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-notice-bar
-        </text>
-        <up-notice-bar text="uview-ultra 是一款专为 uni-app X 设计的高品质 UI 组件库" mode="link"></up-notice-bar>
-      </view>
-
-      <!-- Collapse 折叠面板 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-collapse
-        </text>
-        <up-collapse :value="collapseValue" :accordion="true">
-          <up-collapse-item title="第一项" name="1">
-            <text class="collapse-text">uview-ultra 是基于 uview-plus 修改的 uni-app-x 版本</text>
-          </up-collapse-item>
-          <up-collapse-item title="第二项" name="2">
-            <text class="collapse-text">支持 iOS、Android、H5、小程序等多端</text>
-          </up-collapse-item>
-          <up-collapse-item title="第三项" name="3">
-            <text class="collapse-text">高度适配 UTS 强类型系统与原生跨端开发</text>
-          </up-collapse-item>
-        </up-collapse>
-      </view>
-
-      <!-- Toast 消息提示 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-toast
-        </text>
-        <view class="demo-row">
-          <up-button type="primary" text="成功提示" size="mini" @click="showToast('success')"></up-button>
-          <up-button type="error" text="错误提示" size="mini" @click="showToast('error')"></up-button>
-          <up-button type="warning" text="警告提示" size="mini" @click="showToast('warning')"></up-button>
-          <up-button type="info" text="默认提示" size="mini" @click="showToast('default')"></up-button>
-        </view>
-      </view>
-
-      <!-- Notify 消息通知 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-notify
-        </text>
-        <view class="demo-row">
-          <up-button type="primary" text="主要通知" size="mini" @click="showNotify('primary')"></up-button>
-          <up-button type="success" text="成功通知" size="mini" @click="showNotify('success')"></up-button>
-          <up-button type="warning" text="警告通知" size="mini" @click="showNotify('warning')"></up-button>
-          <up-button type="error" text="错误通知" size="mini" @click="showNotify('error')"></up-button>
-        </view>
-      </view>
-
-      <!-- LoadingPage 加载页 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-loading-page
-        </text>
-        <view class="demo-row-start">
-          <up-button type="primary" text="触发全屏加载" size="mini" @click="triggerLoadingPage"></up-button>
-        </view>
-      </view>
-
-      <!-- Overlay 遮罩层 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-overlay
-        </text>
-        <view class="demo-row">
-          <up-button type="primary" text="显示遮罩" size="mini" @click="overlayShow = true"></up-button>
-          <up-button type="warning" text="半透明遮罩" size="mini" @click="overlayOpacity = 0.3; overlayShow = true"></up-button>
-        </view>
-      </view>
-
-      <!-- Modal 模态框 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-modal
-        </text>
-        <view class="demo-row">
-          <up-button type="primary" text="弹窗提示" size="mini" @click="showModal"></up-button>
-          <up-button type="warning" text="确认弹窗" size="mini" @click="showConfirmModal"></up-button>
-        </view>
-      </view>
-
-      <!-- Popup 弹出层 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-popup
-        </text>
-        <view class="demo-row">
-          <up-button type="primary" text="顶部弹出" size="mini" @click="openPopup('top')"></up-button>
-          <up-button type="primary" text="底部弹出" size="mini" @click="openPopup('bottom')"></up-button>
-          <up-button type="primary" text="左侧弹出" size="mini" @click="openPopup('left')"></up-button>
-          <up-button type="primary" text="右侧弹出" size="mini" @click="openPopup('right')"></up-button>
-          <up-button type="primary" text="居中弹出" size="mini" @click="openPopup('center')"></up-button>
-        </view>
-      </view>
-
-      <!-- Tooltip 长按提示 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-tooltip
-        </text>
-        <view class="demo-row-start">
-          <up-tooltip text="长按此处复制文本" direction="top"></up-tooltip>
-          <view class="w-30px"></view>
-          <up-tooltip text="长按显示操作" direction="top" :show-copy="false" :buttons="tooltipButtons"></up-tooltip>
-          <view class="w-30px"></view>
-          <up-tooltip text="底部弹出" direction="bottom" color="#2979ff" bg-color="#f0f5ff"></up-tooltip>
-        </view>
-      </view>
-
-      <!-- NoNetwork 无网络提示 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-no-network
-        </text>
-        <text class="text-12px text-[#909399]">引入即自动监听网络状态，断网时全屏展示遮罩提示。</text>
-      </view>
-
-      <up-divider text="反馈组件结束"></up-divider>
-
+      <DemoFeedback />
       <!-- ==================== 布局组件 ==================== -->
       <text class="section-title">
         布局组件
@@ -1612,70 +1341,8 @@
 
       <up-divider text="布局组件结束"></up-divider>
 
-      <!-- ==================== 导航组件 ==================== -->
-      <text class="section-title">
-        导航组件
-      </text>
-      <up-divider text="导航组件结束"></up-divider>
-
-      <!-- ==================== 展示组件 ==================== -->
-      <text class="section-title">
-        展示组件
-      </text>
-
-      <!-- Card 卡片 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-card
-        </text>
-        <up-card title="基础卡片" sub-title="副标题" margin="0" :show-foot="false">
-          <text slot="body" class="text-13px text-[#606266] leading-20px">这是卡片主体内容区域，可以放置任意内容。</text>
-        </up-card>
-        <view class="h-10px"></view>
-        <up-card title="带缩略图" thumb="/static/logo.png" :thumb-circle="true" thumb-width="36px" margin="0">
-          <text slot="body" class="text-13px text-[#606266] leading-20px">左侧缩略图为圆形，适合展示头像或图标。</text>
-          <view slot="foot" class="flex-row justify-between w-full">
-            <text class="text-12px text-[#909399]">底部区域</text>
-            <text class="text-12px text-[#2979ff]">查看详情</text>
-          </view>
-        </up-card>
-      </view>
-
-      <!-- List 高性能列表 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-list
-        </text>
-        <up-list
-          :height="300"
-          :lower-threshold="20"
-          :refresher-enabled="true"
-          :refresher-triggered="listRefreshing"
-          @scrolltolower="onListLoadMore"
-          @refresherrefresh="onListRefresh"
-        >
-          <view
-            v-for="(item, idx) in listItems"
-            :key="idx"
-            class="demo-list-cell"
-          >
-            <view class="demo-list-cell-avatar">
-              <up-icon name="account" size="20" color="#ffffff"></up-icon>
-            </view>
-            <view class="demo-list-cell-content">
-              <text class="text-14px font-500 text-[#303133]">{{ item.title as string }}</text>
-              <text class="text-12px text-[#909399] mt-4px">{{ item.desc as string }}</text>
-            </view>
-          </view>
-          <view v-if="listLoading" class="list-loading">
-            <up-loading-icon mode="circle" size="20"></up-loading-icon>
-            <text class="text-12px text-[#909399] ml-8px">加载中...</text>
-          </view>
-        </up-list>
-      </view>
-
-      <up-divider text="展示组件结束"></up-divider>
-
+      <DemoNav />
+      <DemoShow />
       <!-- BackTop 回到顶部 -->
       <view class="demo-block">
         <text class="demo-label">
@@ -1802,6 +1469,10 @@
 <script setup lang="uts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import ThemeSwitchCard from '@/src/pages/basic/components/ThemeSwitchCard.uvue'
+import DemoForm from './components/DemoForm.uvue'
+import DemoFeedback from './components/DemoFeedback.uvue'
+import DemoNav from './components/DemoNav.uvue'
+import DemoShow from './components/DemoShow.uvue'
 import mpHtml from '../../../uni_modules/mp-html/components/mp-html/mp-html.uvue'
 
 // ==================== BackTop 回到顶部 ====================
@@ -2077,327 +1748,11 @@ const itemArr = ref([
 // ==================== 基础组件 ====================
 const showTag = ref(true)
 
-// ==================== 表单组件 ====================
-const inputValue = ref('')
-const passwordValue = ref('')
-const searchValue = ref('')
-const switchValue1 = ref(true)
-const switchValue2 = ref(false)
-const checkboxValue = ref(['apple'] as string[])
-const radioValue = ref('male')
-const sliderValue = ref(50)
-const rateValue = ref(3)
-const numberValue = ref(1)
-
-const formModel = reactive({
-  name: '楼兰',
-  gender: '',
-  age: '0',
-  fruit: 'apple',
-  hobbies: [] as string[],
-  intro: '',
-  stayTime: '',
-  code: '',
-  birthday: '',
-})
-
-const formRules = {
-  name: [
-    {
-      required: true,
-      message: '请填写姓名',
-      trigger: ['blur', 'change'],
-    },
-  ],
-  gender: [
-    {
-      required: true,
-      message: '请选择性别',
-      trigger: ['blur', 'change'],
-    },
-  ],
-  age: [
-    {
-      required: true,
-      message: '请输入年龄',
-      trigger: ['blur', 'change'],
-    },
-  ],
-  fruit: [
-    {
-      required: true,
-      message: '请选择水果',
-      trigger: ['blur', 'change'],
-    },
-  ],
-  hobbies: [
-    {
-      type: 'array',
-      required: true,
-      message: '请选择兴趣爱好',
-      trigger: ['blur', 'change'],
-    },
-  ],
-  intro: [
-    {
-      required: true,
-      message: '请填写简介',
-      trigger: ['blur', 'change'],
-    },
-  ],
-  stayTime: [
-    {
-      required: true,
-      message: '请选择住店时间',
-      trigger: ['blur', 'change'],
-    },
-  ],
-  code: [
-    {
-      required: true,
-      message: '请填写验证码',
-      trigger: ['blur', 'change'],
-    },
-  ],
-  birthday: [
-    {
-      required: true,
-      message: '请选择生日',
-      trigger: ['blur', 'change'],
-    },
-  ],
-} as UTSJSONObject
-
-const uForm = ref(null as ComponentPublicInstance | null)
-
-function submitForm() {
-  const form = uForm.value
-  if (form != null) {
-    (form.$callMethod('validate') as Promise<any>).then((res: any) => {
-      uni.showToast({
-        title: '验证通过',
-        icon: 'success',
-      })
-    }).catch((err: any | null) => {
-      console.log('validate err:', err)
-    })
-  }
-}
-
-function resetForm() {
-  const form = uForm.value
-  if (form != null) {
-    form.$callMethod('resetFields')
-  }
-}
-
-const genderActionShow = ref(false)
-const genderActions = ref([
-  { name: '男' },
-  { name: '女' },
-] as UTSJSONObject[])
-
-function onGenderSelect(item: UTSJSONObject) {
-  formModel.gender = item.getString('name') ?? ''
-  genderActionShow.value = false
-}
-
-const calendarShow = ref(false)
-const calendarValue = ref('')
-
-function onCalendarConfirm(dates: string[]) {
-  if (dates.length > 0) {
-    calendarValue.value = dates[0]
-    if (dates.length > 1) {
-      formModel.stayTime = `${dates[0]} 至 ${dates[dates.length - 1]}`
-    }
-    else {
-      formModel.stayTime = dates[0]
-    }
-  }
-  calendarShow.value = false
-}
-
-const keyboardShow = ref(false)
-const keyboardMode = ref('number')
-const keyboardValue = ref('')
-
-function openKeyboard(mode: string): void {
-  keyboardMode.value = mode
-  keyboardShow.value = true
-}
-
-function onKeyboardChange(val: string): void {
-  console.log(val, 'val')
-  keyboardValue.value = keyboardValue.value + val
-}
-
-function onKeyboardBackspace(): void {
-  const len = keyboardValue.value.length
-  if (len > 0) {
-    keyboardValue.value = keyboardValue.value.substring(0, len - 1)
-  }
-}
-
-const pickerShow = ref(false)
-const pickerValue = ref('')
-const pickerColumns = ref([
-  ['中国', '美国', '日本', '英国', '法国'],
-] as string[][])
-
-function onPickerConfirm(e: UTSJSONObject): void {
-  // eslint-disable-next-line dot-notation
-  const indexs = e['indexs'] as number[]
-  if (indexs.length > 0) {
-    pickerValue.value = pickerColumns.value[0][indexs[0]]
-  }
-  pickerShow.value = false
-}
-
-const datetimePickerShow = ref(false)
-const datetimePickerValue = ref(new Date().getTime() as any)
-const datetimePickerLabel = ref('')
-
-function onDatetimePickerConfirm(e: UTSJSONObject): void {
-  // eslint-disable-next-line dot-notation
-  const value = e['value']
-  if (value != null) {
-    datetimePickerValue.value = value
-    let timestamp = 0
-    if (typeof value === 'number') {
-      timestamp = value as number
-    }
-    else {
-      timestamp = Number.parseInt(value.toString())
-    }
-    const d = new Date(timestamp)
-    const year = d.getFullYear()
-    const month = d.getMonth() + 1
-    const date = d.getDate()
-    const monthStr = month < 10 ? `0${month}` : `${month}`
-    const dateStr = date < 10 ? `0${date}` : `${date}`
-    datetimePickerLabel.value = `${year}-${monthStr}-${dateStr}`
-    formModel.birthday = `${year}-${monthStr}-${dateStr}`
-  }
-  datetimePickerShow.value = false
-}
-
-const uploadList = ref([
-  {
-    url: '/static/logo.png',
-  } as UTSJSONObject,
-] as UTSJSONObject[])
-
-function onUploadAfterRead(e: UTSJSONObject): void {
-  // eslint-disable-next-line dot-notation
-  const file = e['file'] as Array<UTSJSONObject>
-  file.forEach((item: UTSJSONObject) => {
-    uploadList.value.push(UTSJSONObject.assign({} as UTSJSONObject, item))
-  })
-}
-
-function onUploadDelete(e: UTSJSONObject): void {
-  // eslint-disable-next-line dot-notation
-  const index = e['index'] as number
-  if (index >= 0 && index < uploadList.value.length) {
-    uploadList.value.splice(index, 1)
-  }
-}
-
 // ==================== 数据组件 - LineProgress ====================
 const lineProgressValue1 = ref(70)
 const lineProgressValue2 = ref(45)
 const lineProgressValue3 = ref(90)
 const lineProgressValue4 = ref(30)
-
-// ==================== 反馈组件 ====================
-const loadingPageShow = ref(false)
-function triggerLoadingPage() {
-  loadingPageShow.value = true
-  setTimeout(() => {
-    loadingPageShow.value = false
-  }, 2000)
-}
-
-const collapseValue = ref('1')
-const modalShow = ref(false)
-const modalTitle = ref('')
-const modalContent = ref('')
-const modalShowCancel = ref(false)
-const popupShow = ref(false)
-const popupMode = ref('bottom')
-const overlayShow = ref(false)
-const overlayOpacity = ref(0.5)
-
-// Tooltip
-const tooltipButtons = ref(['编辑', '删除'] as string[])
-
-// Toast
-const uToast = ref(null as ComponentPublicInstance | null)
-function showToast(type: string) {
-  const toast = uToast.value
-  if (toast != null) {
-    const configs = {
-      success: { message: '操作成功！', type: 'success' },
-      error: { message: '操作失败！', type: 'error' },
-      warning: { message: '请注意风险！', type: 'warning' },
-      default: { message: '这是一条提示', type: 'default' },
-    } as UTSJSONObject
-    const config = configs[type] as UTSJSONObject
-    toast.$callMethod('show', {
-      message: config.message as string,
-      type: config.type as string,
-    })
-  }
-}
-
-// Notify
-const uNotify = ref(null as ComponentPublicInstance | null)
-function showNotify(type: string) {
-  const notify = uNotify.value
-  if (notify != null) {
-    const msgs = {
-      primary: '主要通知消息',
-      success: '操作成功通知',
-      warning: '请注意安全通知',
-      error: '发生错误通知',
-    } as UTSJSONObject
-    notify.$callMethod('show', {
-      message: msgs[type] as string,
-      type,
-    })
-  }
-}
-
-// Modal
-function showModal() {
-  modalTitle.value = '提示'
-  modalContent.value = '这是一个模态弹窗，用于提示重要信息。'
-  modalShowCancel.value = false
-  modalShow.value = true
-}
-function showConfirmModal() {
-  modalTitle.value = '确认操作'
-  modalContent.value = '确定要执行此操作吗？此操作不可撤销。'
-  modalShowCancel.value = true
-  modalShow.value = true
-}
-function onModalConfirm() {
-  modalShow.value = false
-  showToast('success')
-}
-function onModalClose() {
-  modalShow.value = false
-}
-
-// Popup
-function openPopup(mode: string) {
-  popupMode.value = mode
-  popupShow.value = true
-}
-function onPopupClose() {
-  popupShow.value = false
-}
 
 // ==================== SwipeAction ====================
 const swipeActionList = ref([
@@ -2436,161 +1791,6 @@ function onSwipeActionClick(e: UTSJSONObject): void {
 const skeletonLoading = ref(true)
 function toggleSkeleton() {
   skeletonLoading.value = !skeletonLoading.value
-}
-
-// ==================== 导航组件 ====================
-// NavbarMini 迷你导航栏
-function onNavbarMiniLeftClick(): void {
-  uni.showToast({ title: '点击了返回', icon: 'none' })
-}
-function onNavbarMiniHomeClick(): void {
-  uni.showToast({ title: '点击了首页', icon: 'none' })
-}
-
-// Tabbar 底部导航栏
-// 示例1: 数字 name（不显式设 name 则按索引匹配）
-const tabbarValue1 = ref(0)
-function onTabbarChange1(name: number) {
-  tabbarValue1.value = name
-}
-
-// 示例2: 徽标 dot + badge
-const tabbarValue2 = ref(0)
-function onTabbarChange2(name: number) {
-  tabbarValue2.value = name
-}
-
-// 示例3: 字符串 name
-const tabbarValue3 = ref('home')
-function onTabbarChange3(name: string) {
-  tabbarValue3.value = name
-}
-
-// 示例4: 自定义颜色
-const tabbarValue4 = ref(0)
-function onTabbarChange4(name: number) {
-  tabbarValue4.value = name
-}
-
-// 示例5: slot 图标
-const tabbarValue5 = ref(0)
-function onTabbarChange5(name: number) {
-  tabbarValue5.value = name
-}
-
-// 示例6: 无边框
-const tabbarValue6 = ref(0)
-function onTabbarChange6(name: number) {
-  tabbarValue6.value = name
-}
-
-// 示例7: 拦截切换
-const tabbarValue7 = ref(0)
-function onTabbarChange7(name: number) {
-  if (name === 1) {
-    uni.showToast({ title: '请您先登录', icon: 'none' })
-    return
-  }
-  tabbarValue7.value = name
-}
-
-// Tabs 标签页
-const tabsList1 = ref([
-  { name: '关注' },
-  { name: '推荐' },
-  { name: '电影' },
-  { name: '科技' },
-  { name: '音乐' },
-  { name: '美食' },
-  { name: '文化' },
-  { name: '财经' },
-  { name: '手工' },
-] as UTSJSONObject[])
-const tabsList2 = ref([
-  { name: '关注', disabled: true },
-  { name: '推荐', badge: { isDot: true } as UTSJSONObject },
-  { name: '电影', badge: { value: 5 } as UTSJSONObject },
-  { name: '科技', disabled: true },
-  { name: '音乐' },
-  { name: '美食' },
-  { name: '文化' },
-  { name: '财经' },
-  { name: '手工' },
-] as UTSJSONObject[])
-const tabsList4 = ref([
-  { name: '关注' },
-  { name: '推荐' },
-  { name: '电影' },
-  { name: '科技' },
-  { name: '音乐' },
-  { name: '美食' },
-  { name: '文化' },
-  { name: '财经' },
-  { name: '手工' },
-] as UTSJSONObject[])
-const tabsList4Small = ref([
-  { name: '推荐' },
-  { name: '热门' },
-  { name: '最新' },
-  { name: '关注' },
-] as UTSJSONObject[])
-
-function onTabsClick(item: UTSJSONObject): void {
-  uni.showToast({ title: `点击了: ${item.getString('name') ?? ''}`, icon: 'none' })
-}
-function onTabsChange(item: UTSJSONObject): void {
-  console.log('tabs change:', item)
-}
-function onTabsRightClick(): void {
-  uni.showToast({ title: '点击了右侧插槽', icon: 'none' })
-}
-
-
-const subsectionCurrent = ref(0)
-const subsectionList = ref(['待付款', '待发货', '待收货'] as string[])
-function onSubsectionChange(index: number) {
-  subsectionCurrent.value = index
-}
-
-// ==================== 展示组件 ====================
-const listItems = ref([
-  { title: 'List 列表项 01', desc: '这是高性能列表的第一项' },
-  { title: 'List 列表项 02', desc: '支持下拉刷新和滚动加载更多' },
-  { title: 'List 列表项 03', desc: '基于 scroll-view 封装' },
-  { title: 'List 列表项 04', desc: '适用于长列表滚动场景' },
-  { title: 'List 列表项 05', desc: '内置 refresher 下拉刷新能力' },
-  { title: 'List 列表项 06', desc: '支持 scrolltolower 触底加载' },
-] as UTSJSONObject[])
-const listLoading = ref(false)
-const listRefreshing = ref(false)
-let listLoadCount = 1
-
-function onListLoadMore(): void {
-  if (listLoading.value)
-    return
-  listLoading.value = true
-  setTimeout(() => {
-    listLoadCount += 1
-    const newItems: UTSJSONObject[] = []
-    for (let i = 1; i <= 3; i++) {
-      const idx = listItems.value.length + i
-      newItems.push({
-        title: `加载项 ${listLoadCount}-${i}`,
-        desc: `这是第 ${listLoadCount} 批加载的第 ${i} 条数据`,
-      } as UTSJSONObject)
-    }
-    listItems.value = listItems.value.concat(newItems)
-    listLoading.value = false
-    uni.showToast({ title: `加载了 ${newItems.length} 条`, icon: 'none', duration: 1500 })
-  }, 1000)
-}
-
-function onListRefresh(): void {
-  listRefreshing.value = true
-  setTimeout(() => {
-    listRefreshing.value = false
-    uni.showToast({ title: '刷新完成', icon: 'none', duration: 1500 })
-  }, 1500)
 }
 
 // ==================== mp-html 富文本 ====================
@@ -2652,6 +1852,231 @@ function onMpHtmlImgtap(e: UTSJSONObject): void {
 
 function onMpHtmlError(e: UTSJSONObject): void {
   console.log('mp-html error:', e)
+}
+
+// ==================== Transition 动画过渡 ====================
+const transitionShow1 = ref(true)
+const transitionShow3 = ref(false)
+const transitionModes = ref([
+  { mode: 'fade-up', show: false },
+  { mode: 'slide-down', show: false },
+  { mode: 'zoom-in', show: false },
+  { mode: 'fade-left', show: false },
+] as UTSJSONObject[])
+
+function toggleTransitionMode(item: UTSJSONObject): void {
+  const currentShow = (item.getBoolean('show') ?? false) as boolean
+  item.set('show', !currentShow)
+}
+
+// ==================== Tabs 标签页 ====================
+const tabsList1 = ref([
+  { name: '关注' },
+  { name: '推荐' },
+  { name: '电影' },
+  { name: '科技' },
+  { name: '音乐' },
+  { name: '美食' },
+  { name: '文化' },
+  { name: '财经' },
+  { name: '时事' },
+] as UTSJSONObject[])
+
+const tabsList2 = ref([
+  { name: '关注', badge: { isDot: false, value: 6 } },
+  { name: '推荐', badge: { isDot: true } },
+  { name: '电影' },
+  { name: '科技', disabled: true },
+  { name: '音乐' },
+] as UTSJSONObject[])
+
+const tabsList4 = ref([
+  { name: '关注' },
+  { name: '推荐' },
+  { name: '电影' },
+  { name: '科技' },
+  { name: '音乐' },
+] as UTSJSONObject[])
+
+const tabsList4Small = ref([
+  { name: '关注' },
+  { name: '推荐' },
+  { name: '电影' },
+] as UTSJSONObject[])
+
+function onTabsClick(e: UTSJSONObject): void {
+  console.log('tabs click:', e)
+}
+
+function onTabsChange(e: UTSJSONObject): void {
+  console.log('tabs change:', e)
+}
+
+function onTabsRightClick(): void {
+  uni.showToast({ title: '右侧按钮点击', icon: 'none' })
+}
+
+// ==================== Tabbar 底部导航栏 ====================
+const tabbarValue1 = ref('0')
+const tabbarValue2 = ref('1')
+const tabbarValue3 = ref('home')
+const tabbarValue4 = ref('2')
+const tabbarValue5 = ref('0')
+const tabbarValue6 = ref('0')
+const tabbarValue7 = ref('0')
+
+function onTabbarChange1(e: number | string): void {
+  tabbarValue1.value = e.toString()
+}
+function onTabbarChange2(e: number | string): void {
+  tabbarValue2.value = e.toString()
+}
+function onTabbarChange3(e: number | string): void {
+  tabbarValue3.value = e.toString()
+}
+function onTabbarChange4(e: number | string): void {
+  tabbarValue4.value = e.toString()
+}
+function onTabbarChange5(e: number | string): void {
+  tabbarValue5.value = e.toString()
+}
+function onTabbarChange6(e: number | string): void {
+  tabbarValue6.value = e.toString()
+}
+
+function onTabbarChange7(name: number | string): void {
+  if (name === '1') {
+    uni.showToast({ title: '请先登录', icon: 'none' })
+    return
+  }
+  tabbarValue7.value = name.toString()
+}
+
+// ==================== Subsection 分段器 ====================
+const subsectionList = ref([
+  { name: '关注' },
+  { name: '推荐' },
+  { name: '热点' },
+] as UTSJSONObject[])
+const subsectionCurrent = ref(0)
+
+function onSubsectionChange(e: UTSJSONObject): void {
+  subsectionCurrent.value = e.getNumber('index') ?? 0
+}
+
+// ==================== QRCode 二维码 ====================
+function onQrcodeResult(e: UTSJSONObject): void {
+  console.log('qrcode result:', e)
+}
+
+// ==================== Parse 富文本解析 ====================
+const parseContent1 = ref(`<p>这是一段普通的<span style="color: #2979ff;">富文本</span>内容，支持 <strong>加粗</strong>、<em>斜体</em> 等样式。</p><img src="https://picsum.photos/400/300?random=30" />`)
+const parseContent2 = ref(`<h1>一级标题</h1><h2>二级标题</h2><h3>三级标题</h3><p><b>粗体文字</b> <i>斜体文字</i> <u>下划线</u></p><blockquote>这是一段引用文字</blockquote><p>行内代码: <code>console.log('hello')</code></p><pre>function hello() {\n  return 'world'\n}</pre>`)
+const parseContent3 = ref(`<p>点击下方图片可预览：</p><img src="https://picsum.photos/400/300?random=31" /><p>点击 <a href="https://www.baidu.com">百度链接</a> 测试链接跳转</p>`)
+const parseContent4 = ref(`<table border="1" cellpadding="4" cellspacing="0"><tr><th>姓名</th><th>年龄</th></tr><tr><td>张三</td><td>28</td></tr><tr><td>李四</td><td>32</td></tr></table>`)
+const parseContent5 = ref(`<p>这是一段可以<span style="color: #fa3534;">长按复制</span>的文本内容，尝试长按选中。</p>`)
+const parseTagStyle = ref({
+  p: 'font-size: 15px; color: #303133; line-height: 24px;',
+} as UTSJSONObject)
+
+function onParseImgTap(e: UTSJSONObject): void {
+  console.log('parse img tap:', e)
+}
+
+function onParseLinkTap(e: UTSJSONObject): void {
+  console.log('parse link tap:', e)
+}
+
+// ==================== NavbarMini 迷你导航栏 ====================
+function onNavbarMiniLeftClick(): void {
+  uni.showToast({ title: '左侧按钮点击', icon: 'none' })
+}
+
+function onNavbarMiniHomeClick(): void {
+  uni.showToast({ title: '首页按钮点击', icon: 'none' })
+}
+
+// ==================== Overlay 遮罩层 ====================
+const overlayShow = ref(false)
+const overlayOpacity = ref(0.6)
+
+// ==================== Modal 组件 ====================
+const modalShow = ref(false)
+const modalTitle = ref('提示')
+const modalContent = ref('这是模态框内容')
+const modalShowCancel = ref(true)
+
+function onModalConfirm(): void {
+  modalShow.value = false
+  uni.showToast({ title: '点击了确认', icon: 'none' })
+}
+
+function onModalClose(): void {
+  modalShow.value = false
+}
+
+// ==================== Popup 组件 ====================
+const popupShow = ref(false)
+const popupMode = ref('bottom')
+
+function onPopupClose(): void {
+  popupShow.value = false
+}
+
+// ==================== LoadingPage 组件 ====================
+const loadingPageShow = ref(false)
+
+// ==================== Calendar 组件 ====================
+const calendarShow = ref(false)
+
+function onCalendarConfirm(e: UTSJSONObject): void {
+  console.log('calendar confirm:', e)
+  calendarShow.value = false
+}
+
+// ==================== Keyboard 组件 ====================
+const keyboardShow = ref(false)
+const keyboardMode = ref('number')
+
+function onKeyboardChange(e: UTSJSONObject): void {
+  console.log('keyboard change:', e)
+}
+
+function onKeyboardBackspace(): void {
+  console.log('keyboard backspace')
+}
+
+// ==================== Picker 组件 ====================
+const pickerShow = ref(false)
+const pickerColumns = ref([
+  ['中国', '美国', '日本'] as string[],
+] as string[][])
+
+function onPickerConfirm(e: UTSJSONObject): void {
+  console.log('picker confirm:', e)
+  pickerShow.value = false
+}
+
+// ==================== DatetimePicker 组件 ====================
+const datetimePickerValue = ref('')
+const datetimePickerShow = ref(false)
+
+function onDatetimePickerConfirm(e: UTSJSONObject): void {
+  console.log('datetime picker confirm:', e)
+  datetimePickerShow.value = false
+}
+
+// ==================== ActionSheet 性别选择 ====================
+const genderActionShow = ref(false)
+const genderActions = ref([
+  { name: '男' },
+  { name: '女' },
+  { name: '保密' },
+] as UTSJSONObject[])
+
+function onGenderSelect(e: UTSJSONObject): void {
+  console.log('gender select:', e)
+  genderActionShow.value = false
 }
 </script>
 
@@ -2811,6 +2236,65 @@ function onMpHtmlError(e: UTSJSONObject): void {
   font-size: 13px;
   color: #303133;
   line-height: 18px;
+}
+
+.transition-demo-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+}
+
+.transition-demo-grid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+.transition-demo-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 23%;
+  margin-bottom: 12px;
+}
+
+.transition-demo-box {
+  width: 70px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.transition-demo-blue {
+  background-color: #2979ff;
+}
+
+.transition-demo-green {
+  background-color: #19be6b;
+}
+
+.transition-demo-orange {
+  width: 180px;
+  background-color: #ff9900;
+}
+
+.qrcode-demo-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  padding: 12px;
+}
+
+.parse-demo-wrapper {
+  width: 100%;
+  background-color: #ffffff;
+  padding: 12px;
+  border-radius: 8px;
 }
 
 .steps-slot-icon {
