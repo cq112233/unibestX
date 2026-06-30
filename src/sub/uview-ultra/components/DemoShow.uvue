@@ -1,0 +1,110 @@
+<template>
+  <view>
+    <!-- ==================== 展示组件 ==================== -->
+      <text class="section-title">
+        展示组件
+      </text>
+
+      <!-- Card 卡片 -->
+      <view class="demo-block">
+        <text class="demo-label">
+          up-card
+        </text>
+        <up-card title="基础卡片" sub-title="副标题" margin="0" :show-foot="false">
+          <text slot="body" class="text-13px text-[#606266] leading-20px">这是卡片主体内容区域，可以放置任意内容。</text>
+        </up-card>
+        <view class="h-10px"></view>
+        <up-card title="带缩略图" thumb="/static/logo.png" :thumb-circle="true" thumb-width="36px" margin="0">
+          <text slot="body" class="text-13px text-[#606266] leading-20px">左侧缩略图为圆形，适合展示头像或图标。</text>
+          <view slot="foot" class="flex-row justify-between w-full">
+            <text class="text-12px text-[#909399]">底部区域</text>
+            <text class="text-12px text-[#2979ff]">查看详情</text>
+          </view>
+        </up-card>
+      </view>
+
+      <!-- List 高性能列表 -->
+      <view class="demo-block">
+        <text class="demo-label">
+          up-list
+        </text>
+        <up-list
+          :height="300"
+          :lower-threshold="20"
+          :refresher-enabled="true"
+          :refresher-triggered="listRefreshing"
+          @scrolltolower="onListLoadMore"
+          @refresherrefresh="onListRefresh"
+        >
+          <view
+            v-for="(item, idx) in listItems"
+            :key="idx"
+            class="demo-list-cell"
+          >
+            <view class="demo-list-cell-avatar">
+              <up-icon name="account" size="20" color="#ffffff"></up-icon>
+            </view>
+            <view class="demo-list-cell-content">
+              <text class="text-14px font-500 text-[#303133]">{{ item.title as string }}</text>
+              <text class="text-12px text-[#909399] mt-4px">{{ item.desc as string }}</text>
+            </view>
+          </view>
+          <view v-if="listLoading" class="list-loading">
+            <up-loading-icon mode="circle" size="20"></up-loading-icon>
+            <text class="text-12px text-[#909399] ml-8px">加载中...</text>
+          </view>
+        </up-list>
+      </view>
+
+      <up-divider text="展示组件结束"></up-divider>
+
+      
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, onMounted, reactive, ref } from 'vue'
+
+// ==================== 展示组件 ====================
+const listItems = ref([
+  { title: 'List 列表项 01', desc: '这是高性能列表的第一项' },
+  { title: 'List 列表项 02', desc: '支持下拉刷新和滚动加载更多' },
+  { title: 'List 列表项 03', desc: '基于 scroll-view 封装' },
+  { title: 'List 列表项 04', desc: '适用于长列表滚动场景' },
+  { title: 'List 列表项 05', desc: '内置 refresher 下拉刷新能力' },
+  { title: 'List 列表项 06', desc: '支持 scrolltolower 触底加载' },
+] as UTSJSONObject[])
+const listLoading = ref(false)
+const listRefreshing = ref(false)
+let listLoadCount = 1
+
+function onListLoadMore(): void {
+  if (listLoading.value)
+    return
+  listLoading.value = true
+  setTimeout(() => {
+    listLoadCount += 1
+    const newItems: UTSJSONObject[] = []
+    for (let i = 1; i <= 3; i++) {
+      const idx = listItems.value.length + i
+      newItems.push({
+        title: `加载项 ${listLoadCount}-${i}`,
+        desc: `这是第 ${listLoadCount} 批加载的第 ${i} 条数据`,
+      } as UTSJSONObject)
+    }
+    listItems.value = listItems.value.concat(newItems)
+    listLoading.value = false
+    uni.showToast({ title: `加载了 ${newItems.length} 条`, icon: 'none', duration: 1500 })
+  }, 1000)
+}
+
+function onListRefresh(): void {
+  listRefreshing.value = true
+  setTimeout(() => {
+    listRefreshing.value = false
+    uni.showToast({ title: '刷新完成', icon: 'none', duration: 1500 })
+  }, 1500)
+}
+
+
+</script>
