@@ -47,6 +47,187 @@
         </view>
       </view>
 
+      <!-- ==================== Table 表格（置顶方便查看） ==================== -->
+      <view class="demo-block">
+        <text class="demo-label">up-table 表格</text>
+
+        <!-- 1. 基本使用 -->
+        <text class="demo-sub-label">1. 基本使用（th 表头 + td 数据单元格）</text>
+        <up-table>
+          <up-tr>
+            <up-th>学校</up-th>
+            <up-th>班级</up-th>
+            <up-th>年龄</up-th>
+            <up-th>城市</up-th>
+          </up-tr>
+          <up-tr>
+            <up-td>浙江大学</up-td>
+            <up-td>二年级</up-td>
+            <up-td>22</up-td>
+            <up-td>杭州</up-td>
+          </up-tr>
+          <up-tr>
+            <up-td>清华大学</up-td>
+            <up-td>05班</up-td>
+            <up-td>24</up-td>
+            <up-td>北京</up-td>
+          </up-tr>
+          <up-tr>
+            <up-td>复旦大学</up-td>
+            <up-td>12班</up-td>
+            <up-td>21</up-td>
+            <up-td>上海</up-td>
+          </up-tr>
+        </up-table>
+
+        <!-- 2. 自定义样式 -->
+        <text class="demo-sub-label mt-15px">2. 自定义样式（borderColor / bgColor / align / padding / fontSize / color）</text>
+        <up-table border-color="#2979ff" bg-color="#f8faff" align="left" padding="12rpx 8rpx" font-size="13px" color="#303133">
+          <up-tr>
+            <up-th>姓名</up-th>
+            <up-th>职位</up-th>
+            <up-th>部门</up-th>
+          </up-tr>
+          <up-tr>
+            <up-td>张三</up-td>
+            <up-td>前端开发</up-td>
+            <up-td>技术部</up-td>
+          </up-tr>
+          <up-tr>
+            <up-td>李四</up-td>
+            <up-td>产品经理</up-td>
+            <up-td>产品部</up-td>
+          </up-tr>
+        </up-table>
+
+        <!-- 3. 自定义 th 表头样式 -->
+        <text class="demo-sub-label mt-15px">3. 自定义 th 表头样式（thStyle）</text>
+        <up-table :th-style="{ backgroundColor: '#19be6b', color: '#ffffff', fontWeight: 'bold' }">
+          <up-tr>
+            <up-th>商品</up-th>
+            <up-th>价格</up-th>
+            <up-th>销量</up-th>
+            <up-th>状态</up-th>
+          </up-tr>
+          <up-tr>
+            <up-td>苹果</up-td>
+            <up-td>¥5.8</up-td>
+            <up-td>1280</up-td>
+            <up-td>在售</up-td>
+          </up-tr>
+          <up-tr>
+            <up-td>香蕉</up-td>
+            <up-td>¥3.2</up-td>
+            <up-td>2560</up-td>
+            <up-td>在售</up-td>
+          </up-tr>
+          <up-tr>
+            <up-td>西瓜</up-td>
+            <up-td>¥12.5</up-td>
+            <up-td>890</up-td>
+            <up-td>售罄</up-td>
+          </up-tr>
+        </up-table>
+
+        <!-- 4. 自定义列宽（width） -->
+        <text class="demo-sub-label mt-15px">4. 自定义列宽（width 百分比）</text>
+        <up-table>
+          <up-tr>
+            <up-th width="30%">姓名</up-th>
+            <up-th width="20%">年龄</up-th>
+            <up-th width="50%">地址</up-th>
+          </up-tr>
+          <up-tr>
+            <up-td width="30%">小明</up-td>
+            <up-td width="20%">18</up-td>
+            <up-td width="50%">北京市朝阳区xxx路</up-td>
+          </up-tr>
+          <up-tr>
+            <up-td width="30%">小红</up-td>
+            <up-td width="20%">20</up-td>
+            <up-td width="50%">上海市浦东新区xxx号</up-td>
+          </up-tr>
+        </up-table>
+
+        <!-- 5. 使用 content 插槽渲染非纯文本内容 -->
+        <text class="demo-sub-label mt-15px">5. content 插槽（非纯文本内容：按钮、图标等）</text>
+        <up-table>
+          <up-tr>
+            <up-th>用户</up-th>
+            <up-th>等级</up-th>
+            <up-th>操作</up-th>
+          </up-tr>
+          <up-tr>
+            <up-td>张三</up-td>
+            <up-td>VIP</up-td>
+            <up-td>
+              <template #content>
+                <view class="demo-row-start">
+                  <up-button type="primary" text="编辑" size="mini"></up-button>
+                  <view class="w-8px"></view>
+                  <up-button type="error" text="删除" size="mini"></up-button>
+                </view>
+              </template>
+            </up-td>
+          </up-tr>
+          <up-tr>
+            <up-td>李四</up-td>
+            <up-td>
+              <template #content>
+                <up-tag text="高级会员" type="warning"></up-tag>
+              </template>
+            </up-td>
+            <up-td>
+              <template #content>
+                <up-button type="primary" text="查看" size="mini"></up-button>
+              </template>
+            </up-td>
+          </up-tr>
+        </up-table>
+      </view>
+
+      <!-- ==================== CodeInput 验证码输入（置顶方便查看） ==================== -->
+      <view class="demo-block">
+        <text class="demo-label">up-code-input 验证码输入</text>
+
+        <!-- 1. 基本使用：box 盒子模式 -->
+        <text class="demo-sub-label">1. 基本使用（box 盒子模式 + maxlength="6"）</text>
+        <view class="code-input-demo-row">
+          <up-code-input v-model="codeInputValue1" :maxlength="6" mode="box" @change="onCodeInputChange" @finish="onCodeInputFinish"></up-code-input>
+        </view>
+        <text class="text-12px text-[#909399] mt-6px">输入完成后会触发 finish 事件</text>
+
+        <!-- 2. 底部横线模式 -->
+        <text class="demo-sub-label mt-15px">2. 底部横线模式（mode="line"）</text>
+        <view class="code-input-demo-row">
+          <up-code-input v-model="codeInputValue2" :maxlength="4" mode="line" @finish="onCodeInputFinish"></up-code-input>
+        </view>
+
+        <!-- 3. 圆点密码模式 -->
+        <text class="demo-sub-label mt-15px">3. 圆点密码模式（dot）</text>
+        <view class="code-input-demo-row">
+          <up-code-input v-model="codeInputValue3" :maxlength="6" mode="box" :dot="true" @finish="onCodeInputFinish"></up-code-input>
+        </view>
+
+        <!-- 4. 自定义样式 -->
+        <text class="demo-sub-label mt-15px">4. 自定义样式（size / color / fontSize / borderColor / bold）</text>
+        <view class="code-input-demo-row">
+          <up-code-input v-model="codeInputValue4" :maxlength="6" mode="box" :size="50" color="#19be6b" :font-size="22" border-color="#19be6b" :bold="true" @finish="onCodeInputFinish"></up-code-input>
+        </view>
+
+        <!-- 5. 自定义间距 + 细边框 -->
+        <text class="demo-sub-label mt-15px">5. 自定义间距 + 细边框（space + hairline）</text>
+        <view class="code-input-demo-row">
+          <up-code-input v-model="codeInputValue5" :maxlength="6" mode="box" :space="12" :hairline="true" border-color="#ff9900" color="#ff9900" @finish="onCodeInputFinish"></up-code-input>
+        </view>
+
+        <!-- 6. 自动获取焦点 -->
+        <text class="demo-sub-label mt-15px">6. 自动获取焦点（:focus="true"）</text>
+        <view class="code-input-demo-row">
+          <up-code-input v-model="codeInputValue6" :maxlength="4" mode="box" :focus="true" @finish="onCodeInputFinish"></up-code-input>
+        </view>
+      </view>
+
       <!-- ==================== Transition 动画过渡（置顶方便查看） ==================== -->
       <view class="demo-block">
         <text class="demo-label">up-transition 动画过渡</text>
@@ -2119,6 +2300,22 @@ function onGenderSelect(e: UTSJSONObject): void {
 // ==================== Copy 复制 ====================
 function onCopySuccess(): void {
   uni.showToast({ title: '复制成功', icon: 'success' })
+}
+
+// ==================== CodeInput 验证码输入 ====================
+const codeInputValue1 = ref('')
+const codeInputValue2 = ref('')
+const codeInputValue3 = ref('')
+const codeInputValue4 = ref('')
+const codeInputValue5 = ref('')
+const codeInputValue6 = ref('')
+
+function onCodeInputChange(e: string): void {
+  console.log('code-input change:', e)
+}
+
+function onCodeInputFinish(e: string): void {
+  uni.showToast({ title: `输入完成: ${e}`, icon: 'success' })
 }
 </script>
 
