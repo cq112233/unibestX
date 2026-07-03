@@ -236,7 +236,52 @@
 
       <up-divider text="表单组件结束"></up-divider>
 
-      
+      <!-- Calendar 组件 -->
+      <up-calendar
+        :show="calendarShow"
+        mode="range"
+        @confirm="onCalendarConfirm"
+        @close="calendarShow = false"
+      ></up-calendar>
+
+      <!-- Keyboard 组件 -->
+      <up-keyboard
+        :show="keyboardShow"
+        :mode="keyboardMode"
+        @change="onKeyboardChange"
+        @backspace="onKeyboardBackspace"
+        @close="keyboardShow = false"
+        @confirm="keyboardShow = false"
+        @cancel="keyboardShow = false"
+      ></up-keyboard>
+
+      <!-- Picker 组件 -->
+      <up-picker
+        :show="pickerShow"
+        :columns="pickerColumns"
+        @confirm="onPickerConfirm"
+        @cancel="pickerShow = false"
+        @close="pickerShow = false"
+      ></up-picker>
+
+      <!-- DatetimePicker 组件 -->
+      <up-datetime-picker
+        v-model="datetimePickerValue"
+        :show="datetimePickerShow"
+        mode="date"
+        @confirm="onDatetimePickerConfirm"
+        @cancel="datetimePickerShow = false"
+        @close="datetimePickerShow = false"
+      ></up-datetime-picker>
+
+      <!-- ActionSheet 性别选择 -->
+      <up-action-sheet
+        :show="genderActionShow"
+        :actions="genderActions"
+        title="请选择性别"
+        @select="onGenderSelect"
+        @close="genderActionShow = false"
+      ></up-action-sheet>
   </view>
 </template>
 
@@ -472,3 +517,46 @@ function onUploadDelete(e: UTSJSONObject): void {
 
 
 </script>
+
+<style scoped>
+.section-title {
+  padding: 16px 16px 8px 16px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #303133;
+}
+
+.demo-block {
+  margin: 0 12px 12px 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+
+.demo-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.demo-row-start {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 8px;
+}
+</style>
