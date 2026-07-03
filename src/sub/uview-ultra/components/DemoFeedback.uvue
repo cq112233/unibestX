@@ -141,7 +141,52 @@
 
       <up-divider text="反馈组件结束"></up-divider>
 
-      
+      <!-- Overlay 遮罩层 -->
+      <up-overlay :show="overlayShow" :opacity="overlayOpacity" @click="overlayShow = false">
+        <view class="flex-1 items-center justify-center">
+          <view class="bg-white rounded-8px p-20px items-center" @click.stop="">
+            <up-loading-icon mode="circle"></up-loading-icon>
+            <text class="text-14px text-[#303133] mt-10px">加载中，点击遮罩关闭</text>
+          </view>
+        </view>
+      </up-overlay>
+
+      <!-- Toast 组件 -->
+      <up-toast ref="uToast"></up-toast>
+
+      <!-- Notify 组件 -->
+      <up-notify ref="uNotify"></up-notify>
+
+      <!-- Modal 组件 -->
+      <up-modal
+        :show="modalShow"
+        :title="modalTitle"
+        :content="modalContent"
+        :show-confirm-button="true"
+        :show-cancel-button="modalShowCancel"
+        @confirm="onModalConfirm"
+        @close="onModalClose"
+      ></up-modal>
+
+      <!-- Popup 组件 -->
+      <up-popup
+        :show="popupShow"
+        :mode="popupMode"
+        :closeable="true"
+        :round="10"
+        @close="onPopupClose"
+      >
+        <view class="p-30px items-center">
+          <text class="text-16px text-[#303133]">{{ popupMode }} 弹出层内容</text>
+        </view>
+      </up-popup>
+
+      <!-- LoadingPage 组件 -->
+      <up-loading-page
+        :loading="loadingPageShow"
+        loading-text="页面正在加载中..."
+        loading-mode="circle"
+      ></up-loading-page>
   </view>
 </template>
 
@@ -239,3 +284,52 @@ function onPopupClose() {
 
 
 </script>
+
+<style scoped>
+.section-title {
+  padding: 16px 16px 8px 16px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #303133;
+}
+
+.demo-block {
+  margin: 0 12px 12px 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+
+.demo-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.demo-row-start {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 8px;
+}
+
+.collapse-text {
+  font-size: 13px;
+  color: #909399;
+  line-height: 20px;
+}
+</style>
