@@ -10,6 +10,45 @@
     <scroll-view :scroll-y="true" direction="vertical" :style="{ height: `${scrollHeight}px` }" :scroll-top="scrollViewScrollTop" :scroll-with-animation="true" @scroll="onScroll">
       <ThemeSwitchCard />
 
+      <!-- ==================== Pagination 分页器（置顶方便调试） ==================== -->
+      <view class="demo-block">
+        <text class="demo-label">up-pagination 分页器</text>
+
+        <!-- 1. 基本使用 -->
+        <text class="demo-sub-label">1. 基本使用（prev, pager, next, total）</text>
+        <up-pagination
+          :current-page="paginationCurrentPage"
+          :page-size="paginationPageSize"
+          :total="paginationTotal"
+          layout="prev, pager, next, total"
+          @current-change="onPaginationCurrentChange"
+          @size-change="onPaginationSizeChange"
+        ></up-pagination>
+
+        <!-- 2. 简化版 -->
+        <text class="demo-sub-label mt-15px">2. 简化版（prev, total, next）</text>
+        <up-pagination
+          :current-page="paginationCurrentPage2"
+          :page-size="paginationPageSize2"
+          :total="paginationTotal2"
+          layout="prev, total, next"
+          prev-text="上一页"
+          next-text="下一页"
+          @current-change="onPaginationCurrentChange2"
+        ></up-pagination>
+
+        <!-- 3. 仅一页时隐藏 -->
+        <text class="demo-sub-label mt-15px">3. 仅一页时隐藏（hideOnSinglePage）</text>
+        <up-pagination
+          :current-page="paginationCurrentPage3"
+          :page-size="10"
+          :total="5"
+          :hide-on-single-page="true"
+          @current-change="onPaginationCurrentChange3"
+        ></up-pagination>
+        <text class="text-12px text-[#909399] mt-4px">total=5, pageSize=10 → 只有 1 页，分页器自动隐藏</text>
+      </view>
+
       <!-- ==================== Copy 复制（置顶方便查看） ==================== -->
       <view class="demo-block">
         <text class="demo-label">up-copy 复制</text>
@@ -1079,11 +1118,11 @@
         <up-dropdown ref="uDropdownRef1">
           <up-dropdown-item title="自定义">
             <view class="dropdown-slot-content">
-              <view class="text-14px text-[#606266] text-center py-15px">
-                其他自定义内容
+              <view class="py-15px">
+                <text class="text-14px text-[#606266]">其他自定义内容</text>
               </view>
-              <view class="text-12px text-[#909399] text-center pb-15px">
-                可以放任意组件或表单
+              <view class="pb-15px">
+                <text class="text-12px text-[#909399]">可以放任意组件或表单</text>
               </view>
               <up-button type="primary" text="确定" size="mini" @click="closeDropdown('uDropdownRef1')"></up-button>
             </view>
@@ -2183,7 +2222,7 @@ function onSubsectionChange(e: UTSJSONObject): void {
 }
 
 // ==================== QRCode 二维码 ====================
-function onQrcodeResult(e: UTSJSONObject): void {
+function onQrcodeResult(e: string): void {
   console.log('qrcode result:', e)
 }
 
@@ -2295,6 +2334,36 @@ const genderActions = ref([
 function onGenderSelect(e: UTSJSONObject): void {
   console.log('gender select:', e)
   genderActionShow.value = false
+}
+
+// ==================== Pagination 分页器 ====================
+const paginationCurrentPage = ref(1)
+const paginationPageSize = ref(10)
+const paginationTotal = ref(100)
+
+function onPaginationCurrentChange(page: number): void {
+  paginationCurrentPage.value = page
+  uni.showToast({ title: `当前页: ${page}`, icon: 'none' })
+}
+
+function onPaginationSizeChange(size: number): void {
+  paginationPageSize.value = size
+  uni.showToast({ title: `每页: ${size} 条`, icon: 'none' })
+}
+
+const paginationCurrentPage2 = ref(1)
+const paginationPageSize2 = ref(10)
+const paginationTotal2 = ref(50)
+
+function onPaginationCurrentChange2(page: number): void {
+  paginationCurrentPage2.value = page
+  uni.showToast({ title: `当前页: ${page}`, icon: 'none' })
+}
+
+const paginationCurrentPage3 = ref(1)
+
+function onPaginationCurrentChange3(page: number): void {
+  paginationCurrentPage3.value = page
 }
 
 // ==================== Copy 复制 ====================
