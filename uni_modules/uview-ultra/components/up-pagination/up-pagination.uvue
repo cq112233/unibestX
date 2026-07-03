@@ -1,18 +1,14 @@
 <template>
-  <view v-if="!hideOnSinglePage || totalPages > 1" class="up-pagination">
+  <view v-if="shouldShow" class="up-pagination">
     <!-- 上一页按钮 -->
     <view
-      :class="[
-        'up-pagination-btn',
-        { disabled: currentPage === 1 }
-      ]"
+      class="up-pagination-btn"
+      :class="{ 'btn-disabled': currentPage <= 1 }"
       :style="{ backgroundColor: buttonBgColor, borderColor: buttonBorderColor }"
       @click="prev"
     >
-      <template v-if="prevText">
-        {{ prevText }}
-      </template>
-      <up-icon v-else name="arrow-left"></up-icon>
+      <text v-if="prevText != ''" class="up-pagination-text">{{ prevText }}</text>
+      <up-icon v-else name="arrow-left" size="14"></up-icon>
     </view>
 
     <!-- 页码列表 -->
@@ -20,143 +16,52 @@
       <view
         v-for="(page, index) in displayedPages"
         :key="index"
-        :class="[
-          'up-pagination-item',
-          { active: page === currentPage }
-        ]"
+        class="up-pagination-item"
+        :class="{ 'item-active': page == currentPageStr }"
         @click="goTo(page)"
       >
-        {{ page }}
+        <text class="up-pagination-text" :class="{ 'text-active': page == currentPageStr }">{{ page }}</text>
       </view>
     </template>
 
     <!-- 总数显示 -->
-    <view v-if="total > 0 && showTotal" class="up-pagination-total">
-      {{ currentPage }} / {{ totalPages }}
+    <view v-if="showTotal" class="up-pagination-total">
+      <text class="up-pagination-text">共 {{ total }} 条</text>
     </view>
-
-    <!-- 每页数量选择器 -->
-    <!-- <picker
-      v-if="showSizes"
-      mode="selector"
-      :range="pageSizes"
-      range-key="label"
-      :value="pageSizeIndex"
-      @change="handleSizeChange"
-      class="up-pagination-sizes"
-    >
-      <view>{{ pageSizeLabel }}</view>
-    </picker> -->
 
     <!-- 下一页按钮 -->
     <view
-      :class="[
-        'up-pagination-btn',
-        { disabled: currentPage === totalPages }
-      ]"
+      class="up-pagination-btn"
+      :class="{ 'btn-disabled': currentPage >= totalPages }"
       :style="{ backgroundColor: buttonBgColor, borderColor: buttonBorderColor }"
       @click="next"
     >
-      <template v-if="nextText">
-        {{ nextText }}
-      </template>
-      <up-icon v-else name="arrow-right"></up-icon>
+      <text v-if="nextText != ''" class="up-pagination-text">{{ nextText }}</text>
+      <up-icon v-else name="arrow-right" size="14"></up-icon>
     </view>
-
-    <!-- 跳转输入框 -->
-    <!-- <view v-if="showJumper">
-      <text>鍓嶅線</text>
-      <input
-        type="number"
-        class="up-pagination-jumper"
-        :value="currentPageInput"
-        @input="onInputPage"
-        @confirm="onConfirmPage"
-      />
-      <text>椤?/text>
-    </view> -->
   </view>
 </template>
 
 <script>
-import type { PropType } from 'vue'
-import { t } from '../../libs/i18n'
-
-function createPageSizeOptions(): UTSJSONObject[] {
-  const items = [] as UTSJSONObject[]
-  const values = [10, 20, 30, 40, 50]
-  for (let i = 0; i < values.length; i++) {
-    const item = {} as UTSJSONObject
-    item['label'] = values[i].toString()
-    item['value'] = values[i]
-    items.push(item)
-  }
-  return items
-}
-
-function createDisplayedPages(): Array<string | number> {
-  return [] as Array<string | number>
-}
-
-function normalizeNumber(value: any | null, defaultValue: number = 0): number {
-  if (typeof value === 'number') {
-    return value
-  }
-  if (value == null) {
-    return defaultValue
-  }
-  const parsed = parseInt(value.toString())
-  return isNaN(parsed) ? defaultValue : parsed
-}
-
-function hasLayoutItem(layout: string | null, name: string): boolean {
-  if (layout == null || layout == '') return false
-  const items = layout.split(',')
-  for (let i = 0; i < items.length; i++) {
-    if (items[i].trim() == name) {
-      return true
-    }
-  }
-  return false
-}
-
-function getPageSizeValue(item: UTSJSONObject): number {
-  const value = item['value']
-  return value == null ? 0 : normalizeNumber(value, 0)
-}
-
-function getPageSizeLabel(item: UTSJSONObject): string {
-  const label = item['label']
-  if (label != null && label.toString() != '') {
-    return label.toString()
-  }
-  return getPageSizeValue(item).toString()
-}
-
 export default {
   name: 'up-pagination',
   props: {
-    // 当前页码
     currentPage: {
       type: Number,
       default: 1
     },
-    // 每页条目数
     pageSize: {
       type: Number,
       default: 10
     },
-    // 总数据条目数
     total: {
       type: Number,
       default: 0
     },
-    // 上一页按钮文案
     prevText: {
       type: String,
       default: ''
     },
-    // 下一页按钮文案
     nextText: {
       type: String,
       default: ''
@@ -169,218 +74,166 @@ export default {
       type: String,
       default: '#dcdfe6'
     },
-    // 可选的每页条目数
-    pageSizes: {
-      type: Array as PropType<UTSJSONObject[]>,
-      default(): UTSJSONObject[] {
-        return createPageSizeOptions()
-      }
-    },
-    // 布局方式（类似 el-pagination）
     layout: {
       type: String,
-      default: 'prev, pager, next'
+      default: 'prev, pager, next, total'
     },
-    // 是否隐藏只有一个页面时的分页控件
     hideOnSinglePage: {
       type: Boolean,
       default: false
     }
   },
   emits: ['update:currentPage', 'update:pageSize', 'current-change', 'size-change'],
-  data() {
-    return {
-      currentPageInput: this.currentPage.toString()
-    }
-  },
   computed: {
     totalPages(): number {
-      return Math.max(1, Math.ceil(this.total / this.pageSize))
+      const t = parseFloat(this.total.toString())
+      const p = parseFloat(this.pageSize.toString())
+      let pages = Math.ceil(t / p)
+      if (pages < 1) pages = 1
+      return pages
+    },
+    shouldShow(): boolean {
+      if (this.hideOnSinglePage && this.totalPages <= 1) {
+        return false
+      }
+      return true
     },
     showPager(): boolean {
-      return hasLayoutItem(this.layout, 'pager')
+      if (this.layout == null) return false
+      return this.layout.indexOf('pager') > -1
     },
     showTotal(): boolean {
-      return hasLayoutItem(this.layout, 'total')
+      if (this.layout == null) return false
+      return this.layout.indexOf('total') > -1
     },
-    showSizes(): boolean {
-      return hasLayoutItem(this.layout, 'sizes')
+    currentPageStr(): string {
+      return this.currentPage.toString()
     },
-    showJumper(): boolean {
-      return hasLayoutItem(this.layout, 'jumper')
-    },
-    pageSizeIndex(): number {
-      const sizes = this.pageSizes as UTSJSONObject[]
-      for (let i = 0; i < sizes.length; i++) {
-        if (getPageSizeValue(sizes[i]) == this.pageSize) {
-          return i
-        }
-      }
-      return 0
-    },
-    pageSizeLabel(): string {
-      const sizes = this.pageSizes as UTSJSONObject[]
-      for (let i = 0; i < sizes.length; i++) {
-        if (getPageSizeValue(sizes[i]) == this.pageSize) {
-          return getPageSizeLabel(sizes[i])
-        }
-      }
-      return this.pageSize.toString()
-    },
-    displayedPages(): Array<string | number> {
+    displayedPages(): Array<string> {
       const total = this.totalPages
       const current = this.currentPage
-      const pages = createDisplayedPages()
+      const pages = [] as Array<string>
 
       if (total <= 4) {
         for (let i = 1; i <= total; i++) {
-          pages.push(i)
+          pages.push(i.toString())
         }
         return pages
       }
 
-      // 当前页靠近头部
       if (current <= 2) {
         for (let i = 1; i <= 4; i++) {
-          pages.push(i)
+          pages.push(i.toString())
         }
         pages.push('...')
-        pages.push(total)
+        pages.push(total.toString())
         return pages
       }
 
-      // 当前页在尾部附近
       if (current >= total - 1) {
-        pages.push(1)
+        pages.push('1')
         pages.push('...')
         for (let i = total - 3; i <= total; i++) {
-          pages.push(i)
+          pages.push(i.toString())
         }
         return pages
       }
 
-      // 中间情况
-      pages.push(1)
+      pages.push('1')
       pages.push('...')
-      pages.push(current - 1)
-      pages.push(current)
-      pages.push(current + 1)
+      pages.push((current - 1).toString())
+      pages.push(current.toString())
+      pages.push((current + 1).toString())
       pages.push('...')
-      pages.push(total)
+      pages.push(total.toString())
       return pages
-    }
-    // 控制是否隐藏
-  },
-  watch: {
-    currentPage(val: number) {
-      this.currentPageInput = val.toString()
     }
   },
   methods: {
-    t,
-    handleSizeChange(e: UniCustomEvent<UTSJSONObject>): void {
-      let selected = 0
-      if (e.detail != null && e.detail['value'] != null) {
-        selected = normalizeNumber(e.detail['value'], 0)
-      }
-      const sizes = this.pageSizes as UTSJSONObject[]
-      let size = this.pageSize
-      if (selected >= 0 && selected < sizes.length) {
-        size = getPageSizeValue(sizes[selected])
-      } else if (sizes.length > 0) {
-        size = getPageSizeValue(sizes[0])
-      }
-      this.$emit('update:pageSize', size)
-      this.$emit('size-change', size)
-    },
-    prev(): void {
+    prev() {
       if (this.currentPage > 1) {
-        this.goTo(this.currentPage - 1)
+        this.emitChange(this.currentPage - 1)
       }
     },
-    next(): void {
+    next() {
       if (this.currentPage < this.totalPages) {
-        this.goTo(this.currentPage + 1)
+        this.emitChange(this.currentPage + 1)
       }
     },
-    goTo(page: string | number): void {
-      if (page === '...' || page === this.currentPage) {
+    goTo(page: string) {
+      if (page == '...' || page == this.currentPage.toString()) {
         return
       }
-      const nextPage = normalizeNumber(page, this.currentPage)
-      this.$emit('update:currentPage', nextPage)
-      this.$emit('current-change', nextPage)
-    },
-    onInputPage(e: UniCustomEvent<UTSJSONObject>): void {
-      if (e.detail != null && e.detail['value'] != null) {
-        this.currentPageInput = e.detail['value'].toString()
+      const num = parseInt(page)
+      if (!isNaN(num)) {
+        this.emitChange(num)
       }
     },
-    onConfirmPage(e: UniCustomEvent<UTSJSONObject>): void {
-      let num = NaN
-      if (e.detail != null && e.detail['value'] != null) {
-        num = parseInt(e.detail['value'].toString())
-      }
-      if (!isNaN(num) && num >= 1 && num <= this.totalPages) {
-        this.goTo(num)
-      }
+    emitChange(page: number) {
+      this.$emit('update:currentPage', page)
+      this.$emit('current-change', page)
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+@import "../../libs/css/components.scss";
+
 .up-pagination {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
   flex-wrap: wrap;
+  width: 100%;
+  min-height: 30px;
+}
+
+.up-pagination-text {
   font-size: 14px;
   color: #606266;
+}
 
-  .up-pagination-total {
-    margin-right: 10px;
-  }
+.text-active {
+  color: #ffffff;
+}
 
-  .up-pagination-sizes {
-    margin-right: 10px;
-    padding: 4px 4px;
-    border: 1rpx solid #dcdfe6;
-    border-radius: 4px;
-  }
+.up-pagination-total {
+  margin: 0 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
 
-  .up-pagination-btn {
-    margin: 0 3px;
-    padding: 4px 4px;
-    border: 1rpx solid #dcdfe6;
-    border-radius: 4px;
-    background-color: #f5f7fa;
+.up-pagination-btn {
+  margin: 0 3px;
+  padding: 0 8px;
+  height: 30px;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  background-color: #f5f7fa;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
 
-    &.disabled {
-      opacity: 0.5;
-    }
-  }
+.btn-disabled {
+  opacity: 0.5;
+}
 
-  .up-pagination-item {
-    margin: 0 2px;
-    padding: 4px 8px;
-    border-radius: 4px;
+.up-pagination-item {
+  margin: 0 2px;
+  padding: 0 8px;
+  height: 30px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
 
-    &.active {
-      background-color: #409eff;
-      color: white;
-    }
-  }
-
-  .up-pagination-jumper {
-    width: 40px;
-    height: 28px;
-    margin: 0 5px;
-    padding: 0 5px;
-    border: 1rpx solid #dcdfe6;
-    border-radius: 4px;
-    font-size: 14px;
-  }
+.item-active {
+  background-color: $up-primary;
 }
 </style>
