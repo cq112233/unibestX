@@ -2,6 +2,16 @@ import { useTokenStore } from '../store/token'
 import { tabbarList, isPageTabbar } from '../tabbar/store'
 import { EXCLUDE_LOGIN_PATH_LIST, isNeedLoginMode, LOGIN_PAGE } from './config'
 
+// #ifndef APP
+export type Interceptor = {
+  invoke: (options: any) => boolean
+  success?: (res: any) => void
+  fail?: (err: any) => void
+  complete?: (res: any) => void
+}
+// #endif
+
+
 /**
  * URL 解析结构体
  */

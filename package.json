@@ -10,7 +10,9 @@
     "build:h5": "UNI_INPUT_DIR=. uni build",
     "build:mp-weixin": "UNI_INPUT_DIR=. uni build -p mp-weixin",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "predeploy": "pnpm build:h5",
+    "deploy": "gh-pages -d dist/build/h5"
   },
   "dependencies": {
     "@dcloudio/uni-app": "3.0.0-4070620250821001",
@@ -26,6 +28,7 @@
     "@uni-helper/uni-app-types": "^1.0.1",
     "eslint": "^9.39.4",
     "eslint-plugin-format": "^1.5.0",
+    "gh-pages": "^6.3.0",
     "sass": "^1.63.2",
     "sass-loader": "10.4.1"
   },
