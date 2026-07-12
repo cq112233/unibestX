@@ -4,6 +4,10 @@ import { unovite } from './js_sdk/a-hua-unocss'
 import uniLayoutsPlugin from './plugins/uni-layouts-plugin'
 import autoRootPlugin from './plugins/root-plugin'
 
+// 修复 uni-app x web端/h5端 丢掉 easycom 导入的官方 bug
+import { uniEasycomPlugin } from '@dcloudio/uni-cli-shared/dist/vite/plugins/easycom.js'
+import { UNI_EASYCOM_EXCLUDE } from '@dcloudio/uni-cli-shared'
+
 export default defineConfig({
   resolve: {
     alias: [
@@ -22,6 +26,10 @@ export default defineConfig({
     sourcemap: false, // 关闭 sourcemap，警告直接消失
   },
   plugins: [
+    // 手动补充 easycom 插件（仅在 Web/H5 平台生效，避免影响 App 原生编译）
+    (process.env.UNI_PLATFORM === 'web' || process.env.UNI_PLATFORM === 'h5') 
+      ? uniEasycomPlugin({ exclude: UNI_EASYCOM_EXCLUDE }) 
+      : null,
     uniLayoutsPlugin(), // 仿照 vite-plugin-uni-layouts 的跨端 Layout 布局插件
     autoRootPlugin(), // 自动给页面套上 App.ku.uvue 根包裹组件
     uni(),
