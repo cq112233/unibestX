@@ -18,26 +18,9 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
 
-      - name: Install pnpm 📦
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9 # 或者项目所使用的 pnpm 版本
-
-      - name: Set Node.js 🟢
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-
-      - name: Install dependencies 🛠️
-        run: pnpm install --no-frozen-lockfile
-
-      - name: Build H5 🏗️
-        run: pnpm build:h5
-
       - name: Deploy to GitHub Pages 🚀
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist/build/h5 # 编译输出的 H5 静态资源目录
+          publish_dir: ./unpackage/dist/build/web # 部署打包后的 H5 产物目录
           force_orphan: true # 可选，使 gh-pages 分支的历史记录更干净
