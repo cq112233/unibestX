@@ -44,6 +44,20 @@ export function setTabbarItemBadge(idx : number, badge : CustomTabBarItemBadge) 
   }
 }
 
+/** 根据给定的页面路径手动同步索引 */
+export function setCurIdxByPath(path : string) {
+  let cleanPath = path.startsWith('/') ? path : `/${path}`
+  const parts = cleanPath.split('?')
+  cleanPath = parts[0]
+  for (let i = 0; i < tabbarList.length; i++) {
+    const tabPath = tabbarList[i].pagePath.startsWith('/') ? tabbarList[i].pagePath : `/${tabbarList[i].pagePath}`
+    if (tabPath === cleanPath || tabPath.endsWith(cleanPath)) {
+      setCurIdx(i)
+      break
+    }
+  }
+}
+
 /** 根据当前页面路径自动同步索引 */
 export function syncCurIdxByCurrentPage() {
   const pages = getCurrentPages()
@@ -51,13 +65,7 @@ export function syncCurIdxByCurrentPage() {
   const currentPage = pages[pages.length - 1]
   const route = currentPage.route
   if (route == null || route.length == 0) return
-  const path = route.startsWith('/') ? route : `/${route}`
-  for (let i = 0; i < tabbarList.length; i++) {
-    if (tabbarList[i].pagePath === path || tabbarList[i].pagePath.endsWith(path)) {
-      setCurIdx(i)
-      break
-    }
-  }
+  setCurIdxByPath(route)
 }
 
 /** 判断是否是 tabbar 页面 */

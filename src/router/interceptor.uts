@@ -1,5 +1,5 @@
 import { useTokenStore } from '../store/token'
-import { tabbarList, isPageTabbar } from '../tabbar/store'
+import { tabbarList, isPageTabbar, setCurIdxByPath } from '../tabbar/store'
 import { EXCLUDE_LOGIN_PATH_LIST, isNeedLoginMode, LOGIN_PAGE } from './config'
 
 // #ifndef APP
@@ -126,6 +126,7 @@ function doIntercept(url: string): boolean {
       const redirect = query.get('redirect')
       const redirectUrl = (redirect != null && redirect != '') ? redirect : '/src/pages/index/index'
       if (isPageTabbar(redirectUrl)) {
+        setCurIdxByPath(redirectUrl)
         uni.switchTab({ url: redirectUrl })
       } else {
         uni.navigateTo({ url: redirectUrl })
