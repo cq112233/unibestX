@@ -1,37 +1,37 @@
 <template>
-  <view class="flex flex-col py-24px px-16px items-center">
+  <view class="page-container">
     <!-- 头部卡片：用户头像及状态 -->
-    <view class="w-full bg-white rounded-12px py-30px px-20px items-center mb-20px">
-      <image class="w-90px h-90px rounded-45px mb-16px border-[3px] border-solid border-[#f1f5f9]" :src="avatarUrl" />
-      <text class="text-20px font-bold text-[#1e293b] mb-4px">
+    <view class="header-card">
+      <image class="avatar" :src="avatarUrl" />
+      <text class="username">
         {{ userStore.state.userInfo.username.length > 0 ? userStore.state.userInfo.username : '未登录用户' }}
       </text>
-      <text v-if="userStore.state.userInfo.username.length > 0" class="text-14px text-[#64748b] mb-12px">
+      <text v-if="userStore.state.userInfo.username.length > 0" class="nickname">
         {{ userStore.state.userInfo.nickname }}
       </text>
-      <view class="flex flex-row">
-        <text class="text-12px py-4px px-12px rounded-20px font-medium overflow-hidden" :class="tokenStore.hasValidLogin() ? 'bg-[#d1fae5] text-[#065f46]' : 'bg-[#f1f5f9] text-[#64748b]'">
+      <view class="status-wrap">
+        <text class="status-tag" :class="tokenStore.hasValidLogin() ? 'status-logged-in' : 'status-not-logged-in'">
           {{ tokenStore.hasValidLogin() ? '已登录' : '未登录' }}
         </text>
       </view>
     </view>
 
     <!-- 信息区域：序列化数据展示 -->
-    <view class="w-full bg-white rounded-12px p-20px mb-24px">
-      <view class="border-b border-solid border-[#f1f5f9] pb-8px mb-12px">
-        <text class="text-15px font-semibold text-[#334155]">用户信息 (JSON)</text>
+    <view class="info-card">
+      <view class="info-header">
+        <text class="info-title">用户信息 (JSON)</text>
       </view>
-      <scroll-view class="bg-[#0f172a] rounded-8px p-12px max-h-180px" scroll-y="true">
-        <text class="text-13px text-[#38bdf8] lh-1.6" style="font-family: monospace;">{{ userInfoJson }}</text>
+      <scroll-view class="json-scroll" scroll-y="true">
+        <text class="json-text">{{ userInfoJson }}</text>
       </scroll-view>
     </view>
 
     <!-- 按钮区域 -->
-    <view class="w-full px-8px">
-      <button v-if="tokenStore.hasValidLogin()" class="w-full h-48px rounded-8px bg-[#ef4444] text-[#ffffff]" @click="handleLogout">
+    <view class="btn-wrap">
+      <button v-if="tokenStore.hasValidLogin()" class="btn-logout" @click="handleLogout">
         退出登录
       </button>
-      <button v-else class="w-full h-48px rounded-8px bg-[#3b82f6] text-[#ffffff]" @click="handleLogin">
+      <button v-else class="btn-login" @click="handleLogin">
         登录
       </button>
     </view>
@@ -113,5 +113,139 @@ function handleLogout() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+
+.page-container {
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  align-items: center;
+  background-color: #f8f8f8;
+  /* #ifdef APP */
+  flex: 1;
+  /* #endif */
+  /* #ifndef APP */
+  min-height: 100%;
+  /* #endif */
+}
+
+.header-card {
+  width: 100%;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 30px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 45px;
+  margin-bottom: 16px;
+  border-width: 3px;
+  border-style: solid;
+  border-color: #f1f5f9;
+}
+
+.username {
+  font-size: 20px;
+  font-weight: bold;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.nickname {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 12px;
+}
+
+.status-wrap {
+  display: flex;
+  flex-direction: row;
+}
+
+.status-tag {
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 500;
+  overflow: hidden;
+}
+
+.status-logged-in {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-not-logged-in {
+  background-color: #f1f5f9;
+  color: #64748b;
+}
+
+.info-card {
+  width: 100%;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.info-header {
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #f1f5f9;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: row;
+}
+
+.info-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.json-scroll {
+  background-color: #0f172a;
+  border-radius: 8px;
+  padding: 12px;
+  max-height: 180px;
+}
+
+.json-text {
+  font-size: 13px;
+  color: #38bdf8;
+  line-height: 1.6;
+  font-family: monospace;
+}
+
+.btn-wrap {
+  width: 100%;
+  padding: 0 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.btn-logout {
+  width: 100%;
+  height: 48px;
+  border-radius: 8px;
+  background-color: #ef4444;
+  color: #ffffff;
+}
+
+.btn-login {
+  width: 100%;
+  height: 48px;
+  border-radius: 8px;
+  background-color: #3b82f6;
+  color: #ffffff;
+}
 </style>
