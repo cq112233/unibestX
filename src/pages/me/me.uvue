@@ -42,6 +42,7 @@
 import { useTokenStore, useUserStore } from '../../store'
 import { LOGIN_PAGE } from '../../router/config'
 import { handleBackPressExit } from '@/src/utils/backPress'
+import { setCurIdxByPath } from '@/src/tabbar/store'
 
 onBackPress((options: OnBackPressOptions): boolean => {
   // #ifdef APP
@@ -102,7 +103,9 @@ function handleLogout() {
         })
         // 退出后跳回首页（me 页需要登录，不能停留）
         setTimeout(() => {
-          uni.switchTab({ url: '/src/pages/index/index' })
+          const targetUrl = '/src/pages/index/index'
+          setCurIdxByPath(targetUrl)
+          uni.switchTab({ url: targetUrl })
         }, 0)
       }
     },

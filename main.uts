@@ -5,6 +5,21 @@ import i18n from './src/i18n' // 导入 i18n 国际化配置实例
 import ultraUI from '@/uni_modules/uview-ultra/index.uts' // 导入 uview-ultra 跨端 UI 组件库
 import { installRouteInterceptor } from './src/router/interceptor' // 导入全局路由拦截器安装函数
 
+// #ifdef H5
+import upPopup from '@/uni_modules/uview-ultra/components/up-popup/up-popup.uvue'
+import upOverlay from '@/uni_modules/uview-ultra/components/up-overlay/up-overlay.uvue'
+import upTransition from '@/uni_modules/uview-ultra/components/up-transition/up-transition.uvue'
+import upIcon from '@/uni_modules/uview-ultra/components/up-icon/up-icon.uvue'
+import upStatusBar from '@/uni_modules/uview-ultra/components/up-status-bar/up-status-bar.uvue'
+import upSafeBottom from '@/uni_modules/uview-ultra/components/up-safe-bottom/up-safe-bottom.uvue'
+import upLoadingIcon from '@/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.uvue'
+import upLine from '@/uni_modules/uview-ultra/components/up-line/up-line.uvue'
+import upNumberKeyboard from '@/uni_modules/uview-ultra/components/up-number-keyboard/up-number-keyboard.uvue'
+import upCarKeyboard from '@/uni_modules/uview-ultra/components/up-car-keyboard/up-car-keyboard.uvue'
+import upPicker from '@/uni_modules/uview-ultra/components/up-picker/up-picker.uvue'
+import upToolbar from '@/uni_modules/uview-ultra/components/up-toolbar/up-toolbar.uvue'
+// #endif
+
 /**
  * 创建应用实例的入口函数
  */
@@ -35,6 +50,22 @@ export function createApp() {
 			}
 		}
 	})
+
+	// #ifdef H5
+	// 临时修复 H5 生产环境 easycom 失效导致内置组件不渲染的问题
+	app.component('up-popup', upPopup)
+	app.component('up-overlay', upOverlay)
+	app.component('up-transition', upTransition)
+	app.component('up-icon', upIcon)
+	app.component('up-status-bar', upStatusBar)
+	app.component('up-safe-bottom', upSafeBottom)
+	app.component('up-loading-icon', upLoadingIcon)
+	app.component('up-line', upLine)
+	app.component('up-number-keyboard', upNumberKeyboard)
+	app.component('up-car-keyboard', upCarKeyboard)
+	app.component('up-picker', upPicker)
+	app.component('up-toolbar', upToolbar)
+	// #endif
 
 	// 返回创建好的应用实例对象，供系统挂载运行
 	return {
