@@ -49,12 +49,12 @@
         </view>
       </view>
 
-      <!-- 底部安全间距占位 -->
-      <view class="h-20px" />
+      <!-- 底部安全间距占位（加上底部输入框的高度避免遮挡） -->
+      <view :style="{ height: `${safeAreaBottom + 70}px` }" />
     </scroll-view>
 
     <!-- 底部输入框区 -->
-    <view class="bg-white border-t border-[#e2e8f0] p-10px flex-col" :style="{ paddingBottom: `${safeAreaBottom + 10}px` }">
+    <view class="footer-fixed bg-white border-t border-[#e2e8f0] p-10px flex-col" :style="{ paddingBottom: `${safeAreaBottom + 10}px` }">
       <view class="flex-row items-center bg-[#f1f5f9] rounded-24px px-12px py-6px">
         <input
           v-model="inputText"
@@ -189,6 +189,13 @@ page {
   height: 100%;
   display: flex;
   flex-direction: column;
+}
+.footer-fixed {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
 }
 .msg-row-start {
   display: flex;
