@@ -19,9 +19,9 @@
 
 </div>
 
-> 💡 **版本建议**
+> 💡 **HBuilderX 版本建议**
 >
-> 本项目开发版本是 5.0.7。由于新版安卓端打包存在一些问题，建议使用 5.0.7 及以下版本进行开发。
+> 本项目开发版本是 HBuilderX 5.0.7。由于新版安卓端打包存在一些问题，建议使用 HBuilderX 5.0.7 及以下版本进行开发。
 
 `unibestX` —— 最好的 `uni-app X` 开发模板，由 `uni-app X` + `Vue3` + `UTS` + `Vite5` + `UnoCSS` + `uview-ultra` + `z-paging-x` 构成，使用了下一代 uni-app 原生开发技术栈，通过 `HBuilderX` 运行 `Android`、`iOS`、`鸿蒙`、`H5` 和 `小程序` 等多端平台。
 
