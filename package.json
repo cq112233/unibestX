@@ -12,7 +12,10 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "predeploy": "pnpm build:h5",
-    "deploy": "gh-pages -d dist/build/h5"
+    "deploy": "gh-pages -d dist/build/h5",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
     "@dcloudio/uni-app": "3.0.0-4070620250821001",
@@ -30,7 +33,8 @@
     "eslint-plugin-format": "^1.5.0",
     "gh-pages": "^6.3.0",
     "sass": "^1.63.2",
-    "sass-loader": "10.4.1"
+    "sass-loader": "10.4.1",
+    "vitepress": "^1.6.4"
   },
   "pnpm": {
     "overrides": {
