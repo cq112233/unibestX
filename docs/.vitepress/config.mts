@@ -4,6 +4,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "unibestX",
   description: "最好的 uni-app X 开发框架",
+  base: '/unibestX/docs/',
   head: [
     ['link', { rel: 'icon', href: 'https://uniappx.oss-cn-beijing.aliyuncs.com/logo.png' }]
   ],
