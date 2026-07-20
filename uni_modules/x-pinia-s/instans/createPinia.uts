@@ -16,9 +16,9 @@ import { setActivePinia } from './rootState.uts'
 import { PiniaStoreBase } from './storeBase.uts'
 
 class Pinia implements IPinia {
-	override state : UTSJSONObject = {}
-	override _stores : Map<string, any> = new Map<string, any>()
-	override _plugins : Array<PiniaPlugin> = []
+	state : UTSJSONObject = {}
+	_stores : Map<string, any> = new Map<string, any>()
+	_plugins : Array<PiniaPlugin> = []
 	/**
 	 * Pinia 顶层 effect 作用域。
 	 * 字段初始化器中调用 `effectScope()` —— 因为 Pinia 必须在 main.uts 顶层 createPinia()
@@ -26,7 +26,7 @@ class Pinia implements IPinia {
 	 * 每个 store 在 defineStore 中通过 `pinia._e.run(() => effectScope())` 创建子 scope，
 	 * 嵌套在本 scope 下，与组件生命周期完全解耦。
 	 */
-	override _e : EffectScope = effectScope()
+	_e : EffectScope = effectScope()
 	private _installed : boolean = false
 
 	constructor() { }
@@ -34,7 +34,7 @@ class Pinia implements IPinia {
 	/**
 	 * Vue app.use(pinia) 时被调用
 	 */
-	override install(app : VueApp) : void {
+	install(app : VueApp) : void {
 		if (this._installed) {
 			console.warn('[x-pinia-s] pinia already installed on a Vue app')
 			return
@@ -53,7 +53,7 @@ class Pinia implements IPinia {
 	/**
 	 * 注册插件
 	 */
-	override use(plugin : PiniaPlugin) : IPinia {
+	use(plugin : PiniaPlugin) : IPinia {
 		this._plugins.push(plugin)
 		// 闭包内捕获 this 在 UTS 严格模式下不可靠，先把 this 引用提到外部
 		const piniaRef : IPinia = this
