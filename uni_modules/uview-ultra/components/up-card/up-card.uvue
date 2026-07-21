@@ -3,9 +3,9 @@
 		class="up-card"
 		@tap.stop="click"
 		:class="{ 'up-border': border, 'up-card-full': full,
-			'up-card--border': parseInt($upGetPx(borderRadius)) > 0 }"
+			'up-card--border': parseInt(getPx(borderRadius)) > 0 }"
 		:style="{
-			borderRadius: $up.addUnit(borderRadius),
+			borderRadius: addUnit(borderRadius),
 			margin: margin,
 			boxShadow: boxShadow
 		}"
@@ -13,7 +13,7 @@
 		<view
 			v-if="showHead"
 			class="up-card__head"
-			:style="[{padding: $up.addUnit(paddingHead != '' ? paddingHead : padding)}, headStyle]"
+			:style="[{padding: addUnit(paddingHead != '' ? paddingHead : padding)}, headStyle]"
 			:class="{
 				'up-border-bottom': headBorderBottom
 			}"
@@ -24,20 +24,20 @@
 				<view class="up-card__head--left up-flex up-flex-items-center up-line-11"
 					v-if="title != ''">
 					<image
-						:src="thumb"
+						:src="realThumb"
 						class="up-card__head--left__thumb"
 						mode="aspectFill"
-						v-if="thumb"
+						v-if="realThumb != ''"
 						:style="{ 
-							height: $up.addUnit(thumbWidth), 
-							width: $up.addUnit(thumbWidth), 
+							height: addUnit(thumbWidth), 
+							width: addUnit(thumbWidth), 
 							borderRadius: thumbCircle ? '50px' : '4px' 
 						}"
 					></image>
 					<text
 						class="up-card__head--left__title up-line-1"
 						:style="{
-							fontSize: $up.addUnit(titleSize),
+							fontSize: addUnit(titleSize),
 							color: titleColor
 						}"
 					>
@@ -49,7 +49,7 @@
 					<text
 						class="up-card__head__title__text"
 						:style="{
-							fontSize: $up.addUnit(subTitleSize),
+							fontSize: addUnit(subTitleSize),
 							color: subTitleColor
 						}"
 					>
@@ -60,14 +60,14 @@
 			<slot name="head" v-else />
 		</view>
 		<view @tap="bodyClick" class="up-card__body"
-			:style="[{padding: $upAddUnit(paddingBody != '' ? paddingBody : padding)}, bodyStyle]">
+			:style="[{padding: addUnit(paddingBody != '' ? paddingBody : padding)}, bodyStyle]">
 			<slot name="body"><slot /></slot>
 		</view>
 		<view
 			v-if="showFoot"
 			class="up-card__foot"
 			 @tap="footClick"
-			:style="[{padding: $slots['foot'] != null ? $upAddUnit(paddingFoot != '' ? paddingFoot : padding) : 0}, footStyle]"
+			:style="[{padding: $slots['foot'] != null ? addUnit(paddingFoot != '' ? paddingFoot : padding) : 0}, footStyle]"
 			:class="{
 				'up-border-top': footBorderTop
 			}"
@@ -218,6 +218,22 @@ const props = defineProps({
     type: String,
     default: defProps.getString('card.boxShadow')
   }
+})
+
+const realThumb = computed((): string => {
+  if (props.thumb == '') return ''
+  if (props.thumb.startsWith('/static/')) {
+    try {
+      const pages = getCurrentPages()
+      if (pages.length > 0) {
+        const route = pages[pages.length - 1].route
+        if (route.includes('sub/')) {
+          return '../../static/' + props.thumb.substring(8)
+        }
+      }
+    } catch (e) {}
+  }
+  return props.thumb
 })
 
 // 定义事件
