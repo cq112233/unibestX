@@ -219,13 +219,13 @@ open class GenUniModulesUviewUltraComponentsUpTableUpTable : VueComponent {
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "borderColor" to _uM("type" to "String", "default" to default__16.getString("table.borderColor")), "align" to _uM("type" to "String", "default" to default__16.getString("table.align")), "padding" to _uM("type" to "String", "default" to default__16.getString("table.padding")), "fontSize" to _uM("type" to _uA(
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "borderColor" to _uM("type" to "String", "default" to default__15.getString("table.borderColor")), "align" to _uM("type" to "String", "default" to default__15.getString("table.align")), "padding" to _uM("type" to "String", "default" to default__15.getString("table.padding")), "fontSize" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__16.getNumber("table.fontSize")), "color" to _uM("type" to "String", "default" to default__16.getString("table.color")), "thStyle" to _uM("default" to fun(): UTSJSONObject {
-            return default__16.getAny("table.thStyle") as UTSJSONObject
+        ), "default" to default__15.getNumber("table.fontSize")), "color" to _uM("type" to "String", "default" to default__15.getString("table.color")), "thStyle" to _uM("default" to fun(): UTSJSONObject {
+            return default__15.getAny("table.thStyle") as UTSJSONObject
         }
-        ), "bgColor" to _uM("type" to "String", "default" to default__16.getString("table.bgColor"))))
+        ), "bgColor" to _uM("type" to "String", "default" to default__15.getString("table.bgColor"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

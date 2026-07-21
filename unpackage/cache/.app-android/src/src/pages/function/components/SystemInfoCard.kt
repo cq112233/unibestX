@@ -149,7 +149,7 @@ open class GenSrcPagesFunctionComponentsSystemInfoCard : VueComponent {
                     sysPlatform.value = info.uniPlatform ?: ""
                 }
                  catch (err: Throwable) {
-                    console.error(err, " at src/pages/function/components/SystemInfoCard.uvue:61")
+                    console.error(err, " at src/pages/function/components/SystemInfoCard.uvue:70")
                 }
             }
             val fetchSystemInfo = ::gen_fetchSystemInfo_fn
@@ -158,7 +158,6 @@ open class GenSrcPagesFunctionComponentsSystemInfoCard : VueComponent {
             }
             )
             return fun(): Any? {
-                val _component_up_button = resolveEasyComponent("up-button", GenUniModulesUviewUltraComponentsUpButtonUpButtonClass)
                 return _cV(unref(GenSrcPagesBasicComponentsCardClass), _uM("title" to "设备系统信息"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                     return _uA(
                         _cE("view", _uM("class" to "bg-__f8fafc_ rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_"), _uA(
@@ -199,12 +198,9 @@ open class GenSrcPagesFunctionComponentsSystemInfoCard : VueComponent {
                                 ), 1)
                             ))
                         )),
-                        _cV(_component_up_button, _uM("type" to "primary", "onClick" to fetchSystemInfo), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                            return _uA(
-                                " 获取系统信息 "
-                            )
-                        }
-                        ), "_" to 1))
+                        _cE("view", _uM("class" to "w-full h-44px rounded-8px bg-__3b82f6_ flex flex-row items-center justify-center", "onClick" to fetchSystemInfo), _uA(
+                            _cE("text", _uM("class" to "text-__ffffff_ text-14px font-bold"), "获取系统信息")
+                        ))
                     )
                 }
                 ), "_" to 1))
@@ -217,7 +213,7 @@ open class GenSrcPagesFunctionComponentsSystemInfoCard : VueComponent {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("bg-__f8fafc_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#f8fafc")), "border-color-__e2e8f0_" to _pS(_uM("borderTopColor" to "#e2e8f0", "borderRightColor" to "#e2e8f0", "borderBottomColor" to "#e2e8f0", "borderLeftColor" to "#e2e8f0")), "border-style-solid" to _pS(_uM("borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid")), "border-width-1px" to _pS(_uM("borderTopWidth" to 1, "borderRightWidth" to 1, "borderBottomWidth" to 1, "borderLeftWidth" to 1)), "flex-row" to _pS(_uM("flexDirection" to "row")), "font-bold" to _pS(_uM("fontWeight" to "700")), "justify-between" to _pS(_uM("justifyContent" to "space-between")), "mb-10px" to _pS(_uM("marginBottom" to 10)), "mb-16px" to _pS(_uM("marginBottom" to 16)), "p-16px" to _pS(_uM("paddingTop" to 16, "paddingRight" to 16, "paddingBottom" to 16, "paddingLeft" to 16)), "rounded-12px" to _pS(_uM("borderTopLeftRadius" to 12, "borderTopRightRadius" to 12, "borderBottomRightRadius" to 12, "borderBottomLeftRadius" to 12)), "text-__2d3748_" to _pS(_uM("color" to "#2d3748")), "text-__718096_" to _pS(_uM("color" to "#718096")), "text-14px" to _pS(_uM("fontSize" to 14)))
+                return _uM("bg-__3b82f6_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#3b82f6")), "bg-__f8fafc_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#f8fafc")), "border-color-__e2e8f0_" to _pS(_uM("borderTopColor" to "#e2e8f0", "borderRightColor" to "#e2e8f0", "borderBottomColor" to "#e2e8f0", "borderLeftColor" to "#e2e8f0")), "border-style-solid" to _pS(_uM("borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid")), "border-width-1px" to _pS(_uM("borderTopWidth" to 1, "borderRightWidth" to 1, "borderBottomWidth" to 1, "borderLeftWidth" to 1)), "flex" to _pS(_uM("display" to "flex")), "flex-row" to _pS(_uM("flexDirection" to "row")), "font-bold" to _pS(_uM("fontWeight" to "700")), "h-44px" to _pS(_uM("height" to 44)), "items-center" to _pS(_uM("alignItems" to "center")), "justify-between" to _pS(_uM("justifyContent" to "space-between")), "justify-center" to _pS(_uM("justifyContent" to "center")), "mb-10px" to _pS(_uM("marginBottom" to 10)), "mb-16px" to _pS(_uM("marginBottom" to 16)), "p-16px" to _pS(_uM("paddingTop" to 16, "paddingRight" to 16, "paddingBottom" to 16, "paddingLeft" to 16)), "rounded-12px" to _pS(_uM("borderTopLeftRadius" to 12, "borderTopRightRadius" to 12, "borderBottomRightRadius" to 12, "borderBottomLeftRadius" to 12)), "rounded-8px" to _pS(_uM("borderTopLeftRadius" to 8, "borderTopRightRadius" to 8, "borderBottomRightRadius" to 8, "borderBottomLeftRadius" to 8)), "text-__2d3748_" to _pS(_uM("color" to "#2d3748")), "text-__718096_" to _pS(_uM("color" to "#718096")), "text-__ffffff_" to _pS(_uM("color" to "#ffffff")), "text-14px" to _pS(_uM("fontSize" to 14)), "text-center" to _pS(_uM("textAlign" to "center")), "w-full" to _pS(_uM("width" to "100%")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

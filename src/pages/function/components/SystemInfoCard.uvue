@@ -18,9 +18,9 @@
         <text class="text-14px font-bold text-[#2d3748]">{{ sysPlatform !== '' ? sysPlatform : '暂无数据' }}</text>
       </view>
     </view>
-    <up-button type="primary" @click="fetchSystemInfo">
-      获取系统信息
-    </up-button>
+    <view class="w-full h-44px rounded-8px bg-[#3b82f6] flex flex-row items-center justify-center" @click="fetchSystemInfo">
+      <text class="text-[#ffffff] text-14px font-bold">获取系统信息</text>
+    </view>
   </Card>
 </template>
 
@@ -50,3 +50,6 @@ onMounted(() => {
   fetchSystemInfo()
 })
 </script>
+
+<style>
+</style>

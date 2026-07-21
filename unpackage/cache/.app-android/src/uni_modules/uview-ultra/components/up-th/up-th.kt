@@ -192,7 +192,7 @@ open class GenUniModulesUviewUltraComponentsUpThUpTh : VueComponent {
             "String"
         ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "width" to _uM("type" to _uA(
             "String"
-        ), "default" to default__14.getString("th.width"))))
+        ), "default" to default__13.getString("th.width"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

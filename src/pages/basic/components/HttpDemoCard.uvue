@@ -37,21 +37,20 @@
     <!-- 操作按钮：用 margin-right 代替 gap -->
     <view class="flex-row">
       <view class="flex-1 mr-10px">
-        <button
-          class="bg-[#3182ce] text-white rounded-8px text-14px h-42px w-full"
+        <view
+          class="bg-[#3182ce] rounded-8px h-42px w-full flex flex-row items-center justify-center"
           @click="loadMockData"
         >
-          加载 Mock 数据
-        </button>
+          <text class="text-[#ffffff] text-14px">加载 Mock 数据</text>
+        </view>
       </view>
       <view class="flex-1">
-        <button
-          :disabled="loading"
-          class="bg-[#10b981] text-white rounded-8px text-14px h-42px w-full"
+        <view
+          class="bg-[#10b981] rounded-8px h-42px w-full flex flex-row items-center justify-center"
           @click="fetchRealApi"
         >
-          {{ loading ? '请求中...' : '真实 API 请求' }}
-        </button>
+          <text class="text-[#ffffff] text-14px">{{ loading ? '请求中...' : '真实 API 请求' }}</text>
+        </view>
       </view>
     </view>
   </Card>

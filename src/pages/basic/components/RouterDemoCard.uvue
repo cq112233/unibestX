@@ -15,12 +15,12 @@
 
     <!-- 操作按钮区 -->
     <view class="flex-row justify-between">
-      <button class="flex-1 bg-[#3182ce] text-white rounded-8px text-14px h-42px" @click="jumpToTest">
-        跳转 Test 页 (传参)
-      </button>
-      <button class="flex-1 ml-12px bg-[#ef4444] text-white rounded-8px text-14px h-42px" @click="handleLogout">
-        清除登录状态
-      </button>
+      <view class="flex-1 bg-[#3182ce] rounded-8px h-42px flex flex-row items-center justify-center" @click="jumpToTest">
+        <text class="text-[#ffffff] text-14px">跳转 Test 页 (传参)</text>
+      </view>
+      <view class="flex-1 ml-12px bg-[#ef4444] rounded-8px h-42px flex flex-row items-center justify-center" @click="handleLogout">
+        <text class="text-[#ffffff] text-14px">清除登录状态</text>
+      </view>
     </view>
   </Card>
 </template>
@@ -52,6 +52,3 @@ function handleLogout() {
   })
 }
 </script>
-
-<style>
-</style>

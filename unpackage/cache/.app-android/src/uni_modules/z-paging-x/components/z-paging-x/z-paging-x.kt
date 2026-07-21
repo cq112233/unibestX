@@ -385,7 +385,7 @@ open class GenUniModulesZPagingXComponentsZPagingXZPagingX : VueComponent {
     open var listItemIs: String by `$data`
     @Suppress("USELESS_CAST")
     override fun data(): Map<String, Any?> {
-        return _uM("parent" to null as ComponentPublicInstance?, "parentData" to _uO(), "children" to _uA<ComponentPublicInstance>(), "childrenRefs" to _uA<String>(), "\$zpxList" to null as UniElement?, "refresherStatus" to default__12.Refresher.Default, "refresherTriggered" to false, "refresherNodeHeight" to 0 as Number, "refresherTimeTextTimestamp" to 0, "loadMoreStatus" to default__12.More.Default, "queryFrom" to "", "isLoadFailed" to false, "customNoMore" to -1, "forceHideLoadMore" to false, "contentWidth" to 0, "isLoading" to true, "scrollTop" to 0, "oldScrollTop" to 0, "pageNo" to 1, "totalData" to _uA<Any>(), "base64BackToTopImg" to base64BackToTop, "backToTopClass" to "zpx-back-to-top zpx-back-to-top-hide", "lastBackToTopShowTime" to 0, "showBackToTopClass" to false, "privateScrollWithAnimation" to -1, "isFirstPage" to computed<Boolean>(fun(): Boolean {
+        return _uM("parent" to null as ComponentPublicInstance?, "parentData" to _uO(), "children" to _uA<ComponentPublicInstance>(), "childrenRefs" to _uA<String>(), "\$zpxList" to null as UniElement?, "refresherStatus" to default__11.Refresher.Default, "refresherTriggered" to false, "refresherNodeHeight" to 0 as Number, "refresherTimeTextTimestamp" to 0, "loadMoreStatus" to default__11.More.Default, "queryFrom" to "", "isLoadFailed" to false, "customNoMore" to -1, "forceHideLoadMore" to false, "contentWidth" to 0, "isLoading" to true, "scrollTop" to 0, "oldScrollTop" to 0, "pageNo" to 1, "totalData" to _uA<Any>(), "base64BackToTopImg" to base64BackToTop, "backToTopClass" to "zpx-back-to-top zpx-back-to-top-hide", "lastBackToTopShowTime" to 0, "showBackToTopClass" to false, "privateScrollWithAnimation" to -1, "isFirstPage" to computed<Boolean>(fun(): Boolean {
             return this.pageNo === this.defaultPageNo
         }
         ), "finalRefresherThreshold" to computed<Number>(fun(): Number {
@@ -543,7 +543,7 @@ open class GenUniModulesZPagingXComponentsZPagingXZPagingX : VueComponent {
         if (this.scrollToTopWhenReload) {
             this.scrollToTop(false)
         }
-        this.queryFrom = default__12.QueryFrom.Reload
+        this.queryFrom = default__11.QueryFrom.Reload
         this._emitQuery(this.pageNo, this.defaultPageSize)
     }
     open var complete = ::gen_complete_fn
@@ -558,13 +558,13 @@ open class GenUniModulesZPagingXComponentsZPagingXZPagingX : VueComponent {
         val currentData: UTSArray<Any> = finalData.slice()
         if (this.customNoMore != -1) {
             if (this.customNoMore == 1 || (this.customNoMore != 0 && finalData.length == 0)) {
-                this.loadMoreStatus = default__12.More.NoMore
+                this.loadMoreStatus = default__11.More.NoMore
             }
         } else {
             if (finalData.length == 0 || (finalData.length > 0 && finalData.length < this.defaultPageSize)) {
-                this.loadMoreStatus = default__12.More.NoMore
+                this.loadMoreStatus = default__11.More.NoMore
             } else {
-                this.loadMoreStatus = default__12.More.Default
+                this.loadMoreStatus = default__11.More.Default
             }
         }
         if (this.isFirstPage) {
@@ -629,7 +629,7 @@ open class GenUniModulesZPagingXComponentsZPagingXZPagingX : VueComponent {
     open var endRefresh = ::gen_endRefresh_fn
     open fun gen_endRefresh_fn() {
         this.refresherTriggered = false
-        this.refresherStatus = default__12.Refresher.Default
+        this.refresherStatus = default__11.Refresher.Default
         this.isLoading = false
     }
     open var scrollToTop = ::gen_scrollToTop_fn
@@ -669,9 +669,9 @@ open class GenUniModulesZPagingXComponentsZPagingXZPagingX : VueComponent {
         this.`$emit`("refresherpulling", e.detail.dy)
         if (!this.isLoading) {
             this.refresherStatus = if (e.detail.dy < this.finalRefresherThreshold) {
-                default__12.Refresher.Default
+                default__11.Refresher.Default
             } else {
-                default__12.Refresher.ReleaseToRefresh
+                default__11.Refresher.ReleaseToRefresh
             }
         }
     }
@@ -683,7 +683,7 @@ open class GenUniModulesZPagingXComponentsZPagingXZPagingX : VueComponent {
     open var _onRefresherrestore = ::gen__onRefresherrestore_fn
     open fun gen__onRefresherrestore_fn(e: RefresherEvent) {
         this.`$emit`("refresherrestore", e)
-        this.refresherStatus = default__12.Refresher.Default
+        this.refresherStatus = default__11.Refresher.Default
     }
     open var _onRefresherabort = ::gen__onRefresherabort_fn
     open fun gen__onRefresherabort_fn(e: RefresherEvent) {
@@ -706,20 +706,20 @@ open class GenUniModulesZPagingXComponentsZPagingXZPagingX : VueComponent {
     }
     open var _handleRefresh = ::gen__handleRefresh_fn
     open fun gen__handleRefresh_fn() {
-        this.refresherStatus = default__12.Refresher.Loading
+        this.refresherStatus = default__11.Refresher.Loading
         this.refresherTriggered = true
         this.pageNo = this.defaultPageNo
-        this.queryFrom = default__12.QueryFrom.UserPullDown
+        this.queryFrom = default__11.QueryFrom.UserPullDown
         this._emitQuery(this.pageNo, this.defaultPageSize)
     }
     open var _handleLoadMore = ::gen__handleLoadMore_fn
     open fun gen__handleLoadMore_fn() {
-        if (!this.loadMoreEnabled || this.isLoading || this.loadMoreStatus === default__12.More.NoMore) {
+        if (!this.loadMoreEnabled || this.isLoading || this.loadMoreStatus === default__11.More.NoMore) {
             return
         }
-        this.loadMoreStatus = default__12.More.Loading
+        this.loadMoreStatus = default__11.More.Loading
         this.pageNo++
-        this.queryFrom = default__12.QueryFrom.LoadMore
+        this.queryFrom = default__11.QueryFrom.LoadMore
         this._emitQuery(this.pageNo, this.defaultPageSize)
     }
     open var _emitQuery = ::gen__emitQuery_fn

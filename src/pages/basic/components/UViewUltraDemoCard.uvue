@@ -6,25 +6,26 @@
       </text>
 
       <!-- 亮点标签点缀 -->
-      <view class="flex-row items-center mb-4px">
-        <view class="mr-6px">
-          <up-tag text="高品质组件" type="primary" size="mini" :plain="true" />
+      <view class="flex-row items-center mb-4px flex-wrap">
+        <view class="mr-6px mb-4px px-10px py-3px rounded-20px bg-[#e0edff] border-width-1px border-style-solid border-color-[#bfdbfe]">
+          <text class="text-11px text-[#2563eb] font-medium">高品质组件</text>
         </view>
-        <view class="mr-6px">
-          <up-tag text="原生 UTS 支持" type="success" size="mini" :plain="true" />
+        <view class="mr-6px mb-4px px-10px py-3px rounded-20px bg-[#d1fae5] border-width-1px border-style-solid border-color-[#a7f3d0]">
+          <text class="text-11px text-[#059669] font-medium">原生 UTS 支持</text>
         </view>
-        <view>
-          <up-tag text="跨端一致性" type="warning" size="mini" :plain="true" />
+        <view class="mb-4px px-10px py-3px rounded-20px bg-[#fef3c7] border-width-1px border-style-solid border-color-[#fde68a]">
+          <text class="text-11px text-[#d97706] font-medium">跨端一致性</text>
         </view>
       </view>
     </view>
 
     <!-- 进入演示页面按钮 -->
-    <up-button
-      type="primary"
-      text="进入 uview-ultra 示例"
+    <view
+      class="w-full h-44px rounded-8px bg-[#3b82f6] flex flex-row items-center justify-center"
       @click="navigateToShowcase"
-    />
+    >
+      <text class="text-[#ffffff] text-14px font-bold">进入 uview-ultra 示例</text>
+    </view>
   </Card>
 </template>
 

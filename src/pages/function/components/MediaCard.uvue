@@ -4,18 +4,18 @@
       <text v-if="photoUrl === ''" class="text-14px text-[#94a3b8]">未选择照片</text>
       <image v-else :src="photoUrl" class="w-150px h-150px rounded-8px" mode="aspectFill" />
     </view>
-    <up-button type="primary" class="mb-12px" @click="chooseImage">
-      拍摄/选择照片
-    </up-button>
+    <view class="w-full h-44px rounded-8px bg-[#3b82f6] mb-12px flex flex-row items-center justify-center" @click="chooseImage">
+      <text class="text-[#ffffff] text-14px font-bold">拍摄/选择照片</text>
+    </view>
 
     <!-- 扫码测试 -->
     <view class="bg-[#f8fafc] rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
       <text class="text-12px text-[#94a3b8] mb-8px">扫码结果</text>
       <text class="text-14px font-bold text-[#334155]">{{ scanResult !== '' ? scanResult : '暂无数据' }}</text>
     </view>
-    <up-button type="success" @click="scanCode">
-      扫码测试
-    </up-button>
+    <view class="w-full h-44px rounded-8px bg-[#10b981] flex flex-row items-center justify-center" @click="scanCode">
+      <text class="text-[#ffffff] text-14px font-bold">扫码测试</text>
+    </view>
   </Card>
 </template>
 
@@ -52,3 +52,6 @@ function scanCode() {
   })
 }
 </script>
+
+<style>
+</style>

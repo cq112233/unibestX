@@ -21,18 +21,26 @@
       </view>
 
       <view class="flex-row justify-between mb-12px">
-        <up-button size="small" type="primary" :plain="true" class="flex-1 mr-8px" @click="adjustOffset(-7)">
-          -7 天
-        </up-button>
-        <up-button size="small" type="primary" :plain="true" class="flex-1 mr-8px" @click="adjustOffset(-1)">
-          -1 天
-        </up-button>
-        <up-button size="small" type="primary" :plain="true" class="flex-1 mr-8px" @click="adjustOffset(1)">
-          +1 天
-        </up-button>
-        <up-button size="small" type="primary" :plain="true" class="flex-1" @click="adjustOffset(7)">
-          +7 天
-        </up-button>
+        <view class="flex-1 mr-8px">
+          <view class="w-full h-36px rounded-8px bg-[#e0edff] flex flex-row items-center justify-center" @click="adjustOffset(-7)">
+            <text class="text-[#3b82f6] text-12px font-bold">-7 天</text>
+          </view>
+        </view>
+        <view class="flex-1 mr-8px">
+          <view class="w-full h-36px rounded-8px bg-[#e0edff] flex flex-row items-center justify-center" @click="adjustOffset(-1)">
+            <text class="text-[#3b82f6] text-12px font-bold">-1 天</text>
+          </view>
+        </view>
+        <view class="flex-1 mr-8px">
+          <view class="w-full h-36px rounded-8px bg-[#e0edff] flex flex-row items-center justify-center" @click="adjustOffset(1)">
+            <text class="text-[#3b82f6] text-12px font-bold">+1 天</text>
+          </view>
+        </view>
+        <view class="flex-1">
+          <view class="w-full h-36px rounded-8px bg-[#e0edff] flex flex-row items-center justify-center" @click="adjustOffset(7)">
+            <text class="text-[#3b82f6] text-12px font-bold">+7 天</text>
+          </view>
+        </view>
       </view>
 
       <view class="border-top-width-1px border-top-style-solid border-top-color-[#e2e8f0] pt-8px mt-8px">

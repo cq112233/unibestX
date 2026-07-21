@@ -65,16 +65,16 @@ open class GenUniModulesZPagingXComponentsZPagingXComponentsZPagingLoadMore : Vu
     @Suppress("USELESS_CAST")
     override fun data(): Map<String, Any?> {
         return _uM("parent" to null as ComponentPublicInstance?, "parentData" to _uO(), "children" to _uA<ComponentPublicInstance>(), "childrenRefs" to _uA<String>(), "isDefault" to computed<Boolean>(fun(): Boolean {
-            return this.status === default__12.More.Default
+            return this.status === default__11.More.Default
         }
         ), "isLoading" to computed<Boolean>(fun(): Boolean {
-            return this.status === default__12.More.Loading
+            return this.status === default__11.More.Loading
         }
         ), "isNoMore" to computed<Boolean>(fun(): Boolean {
-            return this.status === default__12.More.NoMore
+            return this.status === default__11.More.NoMore
         }
         ), "isFail" to computed<Boolean>(fun(): Boolean {
-            return this.status === default__12.More.Fail
+            return this.status === default__11.More.Fail
         }
         ), "statusText" to computed<String>(fun(): String {
             if (this.isDefault) {
@@ -213,7 +213,7 @@ open class GenUniModulesZPagingXComponentsZPagingXComponentsZPagingLoadMore : Vu
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "status" to _uM("type" to "String", "default" to default__12.More.Default), "defaultText" to _uM("type" to "String", "default" to "点击加载更多"), "loadingText" to _uM("type" to "String", "default" to "正在加载..."), "noMoreText" to _uM("type" to "String", "default" to "没有更多了"), "failText" to _uM("type" to "String", "default" to "加载失败，点击重新加载")))
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "status" to _uM("type" to "String", "default" to default__11.More.Default), "defaultText" to _uM("type" to "String", "default" to "点击加载更多"), "loadingText" to _uM("type" to "String", "default" to "正在加载..."), "noMoreText" to _uM("type" to "String", "default" to "没有更多了"), "failText" to _uM("type" to "String", "default" to "加载失败，点击重新加载")))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

@@ -174,10 +174,10 @@ open class GenAppku : VueComponent {
             )
             return fun(): Any? {
                 val _component_up_toast = resolveEasyComponent("up-toast", GenUniModulesUviewUltraComponentsUpToastUpToastClass)
-                return _cE("view", _uM("class" to "flex flex-col flex-1 h-full", "style" to _nS(_uM("--theme-color" to unref(appStore).state.theme))), _uA(
-                    _cE("scroll-view", _uM("direction" to "vertical", "class" to "flex-1 h-0"), _uA(
+                return _cE("view", _uM("class" to "flex flex-col flex-1 h-full", "style" to _nS(_uM("--theme-color" to unref(appStore).state.theme, "backgroundColor" to "#f8f8f8"))), _uA(
+                    _cE("scroll-view", _uM("direction" to "vertical", "class" to "flex-1 h-0", "style" to _nS(_uM("backgroundColor" to "#f8f8f8"))), _uA(
                         renderSlot(_ctx.`$slots`, "default")
-                    )),
+                    ), 4),
                     if (isTrue(isCurrentPageTabbar.value)) {
                         _cV(unref(GenSrcTabbarIndexClass), _uM("key" to 0))
                     } else {

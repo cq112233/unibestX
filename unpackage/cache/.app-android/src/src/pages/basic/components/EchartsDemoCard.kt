@@ -138,7 +138,7 @@ open class GenSrcPagesBasicComponentsEchartsDemoCard : VueComponent {
             val echartRef = ref<ComponentPublicInstance?>(null)
             val currentType = ref("line")
             val gridKey = "grid"
-            val lineOption: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("lineOption", "src/pages/basic/components/EchartsDemoCard.uvue", 79, 7), "title" to _uO("text" to "访问趋势 (折线图)", "textStyle" to _uO("fontSize" to 12, "color" to "#64748b")), "xAxis" to _uO("type" to "category", "data" to _uA(
+            val lineOption: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("lineOption", "src/pages/basic/components/EchartsDemoCard.uvue", 85, 7), "title" to _uO("text" to "访问趋势 (折线图)", "textStyle" to _uO("fontSize" to 12, "color" to "#64748b")), "xAxis" to _uO("type" to "category", "data" to _uA(
                 "周一",
                 "周二",
                 "周三",
@@ -160,7 +160,7 @@ open class GenSrcPagesBasicComponentsEchartsDemoCard : VueComponent {
                     _uO("offset" to 1, "color" to "rgba(59, 130, 246, 0)")
                 ))))
             ))
-            val barOption: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("barOption", "src/pages/basic/components/EchartsDemoCard.uvue", 140, 7), "title" to _uO("text" to "访问分布 (柱状图)", "textStyle" to _uO("fontSize" to 12, "color" to "#64748b")), "xAxis" to _uO("type" to "category", "data" to _uA(
+            val barOption: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("barOption", "src/pages/basic/components/EchartsDemoCard.uvue", 146, 7), "title" to _uO("text" to "访问分布 (柱状图)", "textStyle" to _uO("fontSize" to 12, "color" to "#64748b")), "xAxis" to _uO("type" to "category", "data" to _uA(
                 "周一",
                 "周二",
                 "周三",
@@ -179,7 +179,7 @@ open class GenSrcPagesBasicComponentsEchartsDemoCard : VueComponent {
                     130
                 ), "type" to "bar", "color" to "#10b981")
             ))
-            val pieOption: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("pieOption", "src/pages/basic/components/EchartsDemoCard.uvue", 187, 7), "title" to _uO("text" to "访问来源 (饼图)", "textStyle" to _uO("fontSize" to 12, "color" to "#64748b")), "series" to _uA(
+            val pieOption: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("pieOption", "src/pages/basic/components/EchartsDemoCard.uvue", 193, 7), "title" to _uO("text" to "访问来源 (饼图)", "textStyle" to _uO("fontSize" to 12, "color" to "#64748b")), "series" to _uA(
                 _uO("name" to "访问来源", "type" to "pie", "radius" to "65%", "center" to _uA(
                     "50%",
                     "50%"
@@ -237,7 +237,6 @@ open class GenSrcPagesBasicComponentsEchartsDemoCard : VueComponent {
             )
             return fun(): Any? {
                 val _component_e_chart = resolveEasyComponent("e-chart", GenUniModulesEChartComponentsEChartEChartClass)
-                val _component_up_button = resolveEasyComponent("up-button", GenUniModulesUviewUltraComponentsUpButtonUpButtonClass)
                 return _cV(unref(GenSrcPagesBasicComponentsCardClass), _uM("title" to "ECharts 图表示例"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                     return _uA(
                         _cE("view", _uM("class" to "w-full h-260px mt-10px"), _uA(
@@ -245,34 +244,61 @@ open class GenSrcPagesBasicComponentsEchartsDemoCard : VueComponent {
                         )),
                         _cE("view", _uM("class" to "flex-row justify-between mt-15px"), _uA(
                             _cE("view", _uM("class" to "flex-1 mr-8px"), _uA(
-                                _cV(_component_up_button, _uM("size" to "small", "type" to "primary", "plain" to (currentType.value !== "line"), "onClick" to changeToLine), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                    return _uA(
-                                        " 折线图 "
-                                    )
-                                }
-                                ), "_" to 1), 8, _uA(
-                                    "plain"
-                                ))
+                                _cE("view", _uM("class" to _nC(_uA(
+                                    "w-full h-36px rounded-8px flex flex-row items-center justify-center",
+                                    if (currentType.value !== "line") {
+                                        "bg-__e0edff_"
+                                    } else {
+                                        "bg-__3b82f6_"
+                                    }
+                                )), "onClick" to changeToLine), _uA(
+                                    _cE("text", _uM("class" to _nC(_uA(
+                                        "text-12px font-bold",
+                                        if (currentType.value !== "line") {
+                                            "text-__3b82f6_"
+                                        } else {
+                                            "text-__ffffff_"
+                                        }
+                                    ))), "折线图", 2)
+                                ), 2)
                             )),
                             _cE("view", _uM("class" to "flex-1 mr-8px"), _uA(
-                                _cV(_component_up_button, _uM("size" to "small", "type" to "success", "plain" to (currentType.value !== "bar"), "onClick" to changeToBar), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                    return _uA(
-                                        " 柱状图 "
-                                    )
-                                }
-                                ), "_" to 1), 8, _uA(
-                                    "plain"
-                                ))
+                                _cE("view", _uM("class" to _nC(_uA(
+                                    "w-full h-36px rounded-8px flex flex-row items-center justify-center",
+                                    if (currentType.value !== "bar") {
+                                        "bg-__d1fae5_"
+                                    } else {
+                                        "bg-__10b981_"
+                                    }
+                                )), "onClick" to changeToBar), _uA(
+                                    _cE("text", _uM("class" to _nC(_uA(
+                                        "text-12px font-bold",
+                                        if (currentType.value !== "bar") {
+                                            "text-__10b981_"
+                                        } else {
+                                            "text-__ffffff_"
+                                        }
+                                    ))), "柱状图", 2)
+                                ), 2)
                             )),
                             _cE("view", _uM("class" to "flex-1"), _uA(
-                                _cV(_component_up_button, _uM("size" to "small", "type" to "warning", "plain" to (currentType.value !== "pie"), "onClick" to changeToPie), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                    return _uA(
-                                        " 饼图 "
-                                    )
-                                }
-                                ), "_" to 1), 8, _uA(
-                                    "plain"
-                                ))
+                                _cE("view", _uM("class" to _nC(_uA(
+                                    "w-full h-36px rounded-8px flex flex-row items-center justify-center",
+                                    if (currentType.value !== "pie") {
+                                        "bg-__fef3c7_"
+                                    } else {
+                                        "bg-__f59e0b_"
+                                    }
+                                )), "onClick" to changeToPie), _uA(
+                                    _cE("text", _uM("class" to _nC(_uA(
+                                        "text-12px font-bold",
+                                        if (currentType.value !== "pie") {
+                                            "text-__f59e0b_"
+                                        } else {
+                                            "text-__ffffff_"
+                                        }
+                                    ))), "饼图", 2)
+                                ), 2)
                             ))
                         ))
                     )
@@ -287,7 +313,7 @@ open class GenSrcPagesBasicComponentsEchartsDemoCard : VueComponent {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("bg-__10b981_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#10b981")), "bg-__3b82f6_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#3b82f6")), "bg-__d1fae5_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#d1fae5")), "bg-__e0edff_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#e0edff")), "bg-__f59e0b_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#f59e0b")), "bg-__f8fafc_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#f8fafc")), "bg-__fef3c7_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#fef3c7")), "border-color-__e2e8f0_" to _pS(_uM("borderTopColor" to "#e2e8f0", "borderRightColor" to "#e2e8f0", "borderBottomColor" to "#e2e8f0", "borderLeftColor" to "#e2e8f0")), "border-style-solid" to _pS(_uM("borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid")), "border-width-1px" to _pS(_uM("borderTopWidth" to 1, "borderRightWidth" to 1, "borderBottomWidth" to 1, "borderLeftWidth" to 1)), "flex-1" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")), "flex-col" to _pS(_uM("flexDirection" to "column")), "flex-row" to _pS(_uM("flexDirection" to "row")), "font-bold" to _pS(_uM("fontWeight" to "700")), "h-200px" to _pS(_uM("height" to 200)), "h-260px" to _pS(_uM("height" to 260)), "h-36px" to _pS(_uM("height" to 36)), "i_h-full" to _pS(_uM("!height" to "100%")), "items-center" to _pS(_uM("alignItems" to "center")), "justify-around" to _pS(_uM("justifyContent" to "space-around")), "justify-between" to _pS(_uM("justifyContent" to "space-between")), "mb-4px" to _pS(_uM("marginBottom" to 4)), "mr-8px" to _pS(_uM("marginRight" to 8)), "mt-10px" to _pS(_uM("marginTop" to 10)), "mt-15px" to _pS(_uM("marginTop" to 15)), "mt-4px" to _pS(_uM("marginTop" to 4)), "pt-20px" to _pS(_uM("paddingTop" to 20)), "px-10px" to _pS(_uM("paddingLeft" to 10, "paddingRight" to 10)), "rounded-12px" to _pS(_uM("borderTopLeftRadius" to 12, "borderTopRightRadius" to 12, "borderBottomRightRadius" to 12, "borderBottomLeftRadius" to 12)), "rounded-8px" to _pS(_uM("borderTopLeftRadius" to 8, "borderTopRightRadius" to 8, "borderBottomRightRadius" to 8, "borderBottomLeftRadius" to 8)), "rounded-t-4px" to _pS(_uM("borderTopLeftRadius" to 4, "borderTopRightRadius" to 4)), "text-__10b981_" to _pS(_uM("color" to "#10b981")), "text-__3b82f6_" to _pS(_uM("color" to "#3b82f6")), "text-__94a3b8_" to _pS(_uM("color" to "#94a3b8")), "text-__f59e0b_" to _pS(_uM("color" to "#f59e0b")), "text-10px" to _pS(_uM("fontSize" to 10)), "text-12px" to _pS(_uM("fontSize" to 12)), "text-white" to _pS(_uM("color" to "rgba(255,255,255,var(--un-color-opacity,1))")), "w-70_f" to _pS(_uM("width" to "70%")), "w-full" to _pS(_uM("width" to "100%")))
+                return _uM("bg-__10b981_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#10b981")), "bg-__3b82f6_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#3b82f6")), "bg-__d1fae5_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#d1fae5")), "bg-__e0edff_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#e0edff")), "bg-__f59e0b_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#f59e0b")), "bg-__fef3c7_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#fef3c7")), "flex" to _pS(_uM("display" to "flex")), "flex-1" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")), "flex-row" to _pS(_uM("flexDirection" to "row")), "font-bold" to _pS(_uM("fontWeight" to "700")), "h-260px" to _pS(_uM("height" to 260)), "h-36px" to _pS(_uM("height" to 36)), "i_h-full" to _pS(_uM("!height" to "100%")), "items-center" to _pS(_uM("alignItems" to "center")), "justify-between" to _pS(_uM("justifyContent" to "space-between")), "justify-center" to _pS(_uM("justifyContent" to "center")), "mr-8px" to _pS(_uM("marginRight" to 8)), "mt-10px" to _pS(_uM("marginTop" to 10)), "mt-15px" to _pS(_uM("marginTop" to 15)), "rounded-8px" to _pS(_uM("borderTopLeftRadius" to 8, "borderTopRightRadius" to 8, "borderBottomRightRadius" to 8, "borderBottomLeftRadius" to 8)), "text-__10b981_" to _pS(_uM("color" to "#10b981")), "text-__3b82f6_" to _pS(_uM("color" to "#3b82f6")), "text-__f59e0b_" to _pS(_uM("color" to "#f59e0b")), "text-__ffffff_" to _pS(_uM("color" to "#ffffff")), "text-12px" to _pS(_uM("fontSize" to 12)), "text-center" to _pS(_uM("textAlign" to "center")), "w-full" to _pS(_uM("width" to "100%")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

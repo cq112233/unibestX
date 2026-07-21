@@ -399,100 +399,100 @@ open class GenUniModulesUviewUltraComponentsUpButtonUpButton : VueComponent {
             "Object",
             "String"
         ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "hairline" to _uM("type" to "Boolean", "default" to fun(): Boolean? {
-            return default__10.getBoolean("button.hairline")
+            return default__12.getBoolean("button.hairline")
         }
         ), "type" to _uM("type" to "String", "default" to fun(): String? {
-            return default__10.getString("button.type")
+            return default__12.getString("button.type")
         }
         ), "size" to _uM("type" to "String", "default" to fun(): String? {
-            return default__10.getString("button.size")
+            return default__12.getString("button.size")
         }
         ), "shape" to _uM("type" to "String", "default" to fun(): String? {
-            return default__10.getString("button.shape")
+            return default__12.getString("button.shape")
         }
         ), "plain" to _uM("type" to "Boolean", "default" to fun(): Boolean? {
-            return default__10.getBoolean("button.plain")
+            return default__12.getBoolean("button.plain")
         }
         ), "disabled" to _uM("type" to "Boolean", "default" to fun(): Boolean? {
-            return default__10.getBoolean("button.disabled")
+            return default__12.getBoolean("button.disabled")
         }
         ), "loading" to _uM("type" to "Boolean", "default" to fun(): Boolean? {
-            return default__10.getBoolean("button.loading")
+            return default__12.getBoolean("button.loading")
         }
         ), "loadingText" to _uM("type" to "String", "default" to fun(): String? {
-            return default__10.getString("button.loadingText")
+            return default__12.getString("button.loadingText")
         }
         ), "loadingMode" to _uM("type" to "String", "default" to fun(): String? {
-            return default__10.getString("button.loadingMode")
+            return default__12.getString("button.loadingMode")
         }
         ), "loadingSize" to _uM("type" to "Number", "default" to fun(): Number? {
-            return default__10.getNumber("button.loadingSize")
+            return default__12.getNumber("button.loadingSize")
         }
         ), "openType" to _uM("type" to "String", "default" to fun(): String? {
-            return default__10.getString("button.openType")
+            return default__12.getString("button.openType")
         }
         ), "formType" to _uM("type" to "String", "default" to fun(): String? {
-            return default__10.getString("button.formType")
+            return default__12.getString("button.formType")
         }
         ), "appParameter" to _uM("type" to "String", "default" to fun(): String? {
-            return default__10.getString("button.appParameter")
+            return default__12.getString("button.appParameter")
         }
         ), "hoverStopPropagation" to _uM("type" to "Boolean", "default" to fun(): Boolean? {
-            return default__10.getBoolean("button.hoverStopPropagation")
+            return default__12.getBoolean("button.hoverStopPropagation")
         }
         ), "lang" to _uM("type" to "String", "default" to fun(): String? {
-            return default__10.getString("button.lang")
+            return default__12.getString("button.lang")
         }
         ), "sessionFrom" to _uM("type" to "String", "default" to fun(): String? {
-            return default__10.getString("button.sessionFrom")
+            return default__12.getString("button.sessionFrom")
         }
         ), "sendMessageTitle" to _uM("type" to "String", "default" to fun(): String? {
-            return default__10.getString("button.sendMessageTitle")
+            return default__12.getString("button.sendMessageTitle")
         }
         ), "sendMessagePath" to _uM("type" to "String", "default" to fun(): String? {
-            return default__10.getString("button.sendMessagePath")
+            return default__12.getString("button.sendMessagePath")
         }
         ), "sendMessageImg" to _uM("type" to "String", "default" to fun(): String? {
-            return default__10.getString("button.sendMessageImg")
+            return default__12.getString("button.sendMessageImg")
         }
         ), "showMessageCard" to _uM("type" to "Boolean", "default" to fun(): Boolean? {
-            return default__10.getBoolean("button.showMessageCard")
+            return default__12.getBoolean("button.showMessageCard")
         }
         ), "dataName" to _uM("type" to "String", "default" to fun(): String? {
-            return default__10.getString("button.dataName")
+            return default__12.getString("button.dataName")
         }
         ), "throttleTime" to _uM("type" to _uA(
             "String",
             "Number"
         ), "default" to fun(): Number? {
-            return default__10.getNumber("button.throttleTime")
+            return default__12.getNumber("button.throttleTime")
         }
         ), "hoverStartTime" to _uM("type" to _uA(
             "String",
             "Number"
         ), "default" to fun(): Number? {
-            return default__10.getNumber("button.hoverStartTime")
+            return default__12.getNumber("button.hoverStartTime")
         }
         ), "hoverStayTime" to _uM("type" to _uA(
             "String",
             "Number"
         ), "default" to fun(): Number? {
-            return default__10.getNumber("button.hoverStayTime")
+            return default__12.getNumber("button.hoverStayTime")
         }
         ), "text" to _uM("type" to _uA(
             "String",
             "Number"
         ), "default" to fun(): String? {
-            return default__10.getString("button.text")
+            return default__12.getString("button.text")
         }
         ), "icon" to _uM("type" to "String", "default" to fun(): String? {
-            return default__10.getString("button.icon")
+            return default__12.getString("button.icon")
         }
         ), "iconColor" to _uM("type" to "String", "default" to fun(): String? {
-            return default__10.getString("button.iconColor")
+            return default__12.getString("button.iconColor")
         }
         ), "color" to _uM("type" to "String", "default" to fun(): String? {
-            return default__10.getString("button.color")
+            return default__12.getString("button.color")
         }
         )))
         var propsNeedCastKeys = _uA(

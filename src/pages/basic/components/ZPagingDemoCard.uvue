@@ -5,27 +5,23 @@
         在卡片中直接体验实时分页，支持触底加载、下拉刷新以及各种状态切换。
       </text>
 
-      <!-- 快捷操作栏：用 margin-right 代替 gap -->
+      <!-- 快捷操作栏 -->
       <view class="flex-row mb-12px">
         <view class="flex-1 mr-8px">
-          <up-button
-            size="mini"
-            type="error"
-            :plain="true"
+          <view
+            class="w-full h-36px rounded-8px bg-[#fee2e2] flex flex-row items-center justify-center"
             @click="triggerError"
           >
-            模拟加载错误
-          </up-button>
+            <text class="text-[#dc2626] text-12px font-bold">模拟加载错误</text>
+          </view>
         </view>
         <view class="flex-1">
-          <up-button
-            size="mini"
-            type="warning"
-            :plain="true"
+          <view
+            class="w-full h-36px rounded-8px bg-[#fef3c7] flex flex-row items-center justify-center"
             @click="triggerClear"
           >
-            清空数据
-          </up-button>
+            <text class="text-[#d97706] text-12px font-bold">清空数据</text>
+          </view>
         </view>
       </view>
     </view>
@@ -60,7 +56,7 @@
       @update:model-value="onUpdateModelValue"
       @query="onQuery"
     >
-      <!-- 列表数据项 (默认插槽) -->
+      <!-- 列表数据项 -->
       <view v-for="item in dataList" :key="item.id" class="mx-12px my-8px p-12px bg-white rounded-8px border-width-1px border-style-solid border-color-[#edf2f7]">
         <view class="flex-row justify-between items-center mb-6px">
           <view :style="{ backgroundColor: item.tagBgColor, padding: '1px 6px', borderRadius: '4px' }">
@@ -89,23 +85,18 @@ type CompactArticleItem = {
   tagColor: string
 }
 
-// 模拟加载状态控制
 const shouldFail = ref<boolean>(false)
 
-// 选项卡配置
 const tabList = ['全部', '技术', '设计']
 const tabIndex = ref<number>(0)
 
-// z-paging-x 组件引用与数据绑定
 const pagingX = ref<ComponentPublicInstance | null>(null)
 const dataList = ref<CompactArticleItem[]>([])
 
-// 手动更新 modelValue
 function onUpdateModelValue(val: any[]) {
   dataList.value = val as CompactArticleItem[]
 }
 
-// 切换选项卡
 function tabChange(index: number) {
   tabIndex.value = index
   if (pagingX.value != null) {
@@ -113,7 +104,6 @@ function tabChange(index: number) {
   }
 }
 
-// 触发错误模拟
 function triggerError() {
   shouldFail.value = true
   if (pagingX.value != null) {
@@ -121,7 +111,6 @@ function triggerError() {
   }
 }
 
-// 清空数据模拟
 function triggerClear() {
   dataList.value = []
   if (pagingX.value != null) {
@@ -129,14 +118,12 @@ function triggerClear() {
   }
 }
 
-// 模拟获取数据
 function getMockArticles(category: string, pageNo: number, pageSize: number): CompactArticleItem[] {
   const list = [] as CompactArticleItem[]
   const start = (pageNo - 1) * pageSize
 
   for (let i = 0; i < pageSize; i++) {
     const itemId = start + i + 1
-    // 限制列表总数为 12 条
     if (itemId > 12) {
       break
     }
@@ -165,7 +152,6 @@ function getMockArticles(category: string, pageNo: number, pageSize: number): Co
   return list
 }
 
-// 查询数据回调
 function onQuery(pageNo: number, pageSize: number) {
   const currentCategory = tabList[tabIndex.value]
 
