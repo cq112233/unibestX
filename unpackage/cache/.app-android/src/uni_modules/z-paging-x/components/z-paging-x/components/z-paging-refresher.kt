@@ -16,43 +16,6 @@ open class GenUniModulesZPagingXComponentsZPagingXComponentsZPagingRefresher : V
     constructor(__ins: ComponentInternalInstance) : super(__ins) {
         onCreated(fun() {}, __ins)
     }
-    @Suppress("UNUSED_PARAMETER", "UNUSED_VARIABLE")
-    override fun `$render`(): Any? {
-        val _ctx = this
-        val _cache = this.`$`.renderCache
-        val _component_z_paging_loading = resolveComponent("z-paging-loading")
-        return _cE("view", _uM("class" to "zpx-r-container", "style" to _nS(_uM("height" to if (_ctx.showUpdateTime) {
-            "60px"
-        } else {
-            "40px"
-        }
-        ))), _uA(
-            if (isTrue(_ctx.isLoading)) {
-                _cV(_component_z_paging_loading, _uM("key" to 0))
-            } else {
-                _cE("image", _uM("key" to 1, "class" to _nC(_uA(
-                    "zpx-r-image",
-                    _uM("zpx-r-arrow-down" to _ctx.isDefault)
-                )), "src" to _ctx.base64ArrowImg), null, 10, _uA(
-                    "src"
-                ))
-            }
-            ,
-            _cE("view", _uM("class" to "zpx-r-text-container", "style" to _nS(_uM("marginLeft" to if (_ctx.showRefresherTimeText) {
-                "25rpx"
-            } else {
-                "10rpx"
-            }
-            ))), _uA(
-                _cE("text", _uM("class" to "zpx-r-text"), _tD(_ctx.statusText), 1),
-                if (isTrue(_ctx.showRefresherTimeText)) {
-                    _cE("text", _uM("key" to 0, "class" to "zpx-r-text zpx-r-time-text"), _tD(_ctx.refresherTimeText), 1)
-                } else {
-                    _cC("v-if", true)
-                }
-            ), 4)
-        ), 4)
-    }
     open var customStyle: Any by `$props`
     open var customClass: String by `$props`
     open var url: String by `$props`
@@ -61,6 +24,7 @@ open class GenUniModulesZPagingXComponentsZPagingXComponentsZPagingRefresher : V
     open var defaultText: String by `$props`
     open var pullingText: String by `$props`
     open var refreshingText: String by `$props`
+    open var completeText: String by `$props`
     open var showUpdateTime: Boolean by `$props`
     open var updateTimeKey: String by `$props`
     open var timeTextTimestamp: Number by `$props`
@@ -68,44 +32,9 @@ open class GenUniModulesZPagingXComponentsZPagingXComponentsZPagingRefresher : V
     open var parentData: UTSJSONObject by `$data`
     open var children: UTSArray<ComponentPublicInstance> by `$data`
     open var childrenRefs: UTSArray<String> by `$data`
-    open var times: Number by `$data`
-    open var base64ArrowImg: Any? by `$data`
-    open var isDefault: Boolean by `$data`
-    open var isReleaseToRefresh: Boolean by `$data`
-    open var isLoading: Boolean by `$data`
-    open var statusText: String by `$data`
-    open var refresherTimeText: String by `$data`
-    open var showRefresherTimeText: Boolean by `$data`
     @Suppress("USELESS_CAST")
     override fun data(): Map<String, Any?> {
-        return _uM("parent" to null as ComponentPublicInstance?, "parentData" to _uO(), "children" to _uA<ComponentPublicInstance>(), "childrenRefs" to _uA<String>(), "times" to 0, "base64ArrowImg" to base64Arrow, "isDefault" to computed<Boolean>(fun(): Boolean {
-            return this.status === default__11.Refresher.Default
-        }
-        ), "isReleaseToRefresh" to computed<Boolean>(fun(): Boolean {
-            return this.status === default__11.Refresher.ReleaseToRefresh
-        }
-        ), "isLoading" to computed<Boolean>(fun(): Boolean {
-            return this.status === default__11.Refresher.Loading
-        }
-        ), "statusText" to computed<String>(fun(): String {
-            if (this.isDefault) {
-                return this.defaultText
-            } else if (this.isReleaseToRefresh) {
-                return this.pullingText
-            } else if (this.isLoading) {
-                return this.refreshingText
-            } else {
-                return ""
-            }
-        }
-        ), "refresherTimeText" to computed<String>(fun(): String {
-            this.timeTextTimestamp
-            return getRefesrherFormatTimeByKey(this.updateTimeKey)
-        }
-        ), "showRefresherTimeText" to computed<Boolean>(fun(): Boolean {
-            return this.showUpdateTime && this.refresherTimeText.length > 0
-        }
-        ))
+        return _uM("parent" to null as ComponentPublicInstance?, "parentData" to _uO(), "children" to _uA<ComponentPublicInstance>(), "childrenRefs" to _uA<String>())
     }
     open fun `$upAddUnit`(kVal: Any?, unit: String? = ""): String {
         return addUnit(kVal, unit)
@@ -209,6 +138,110 @@ open class GenUniModulesZPagingXComponentsZPagingXComponentsZPagingRefresher : V
         this.preventEvent(e)
     }
     companion object {
+        @Suppress("UNUSED_PARAMETER", "UNUSED_VARIABLE")
+        var setup: (__props: GenUniModulesZPagingXComponentsZPagingXComponentsZPagingRefresher) -> Any? = fun(__props): Any? {
+            val __ins = getCurrentInstance()!!
+            val _ctx = __ins.proxy as GenUniModulesZPagingXComponentsZPagingXComponentsZPagingRefresher
+            val _cache = __ins.renderCache
+            val props = __props
+            val base64ArrowImg = ref(base64Arrow)
+            val base64FlowerImg = ref(base64Flower)
+            val base64SuccessImg = ref(base64Success)
+            val isDefault = computed(fun(): Boolean {
+                return props.status === default__11.Refresher.Default
+            }
+            )
+            val isReleaseToRefresh = computed(fun(): Boolean {
+                return props.status === default__11.Refresher.ReleaseToRefresh
+            }
+            )
+            val isLoading = computed(fun(): Boolean {
+                return props.status === default__11.Refresher.Loading
+            }
+            )
+            val isComplete = computed(fun(): Boolean {
+                return props.status === default__11.Refresher.Complete
+            }
+            )
+            val getLeftImageClass = computed(fun(): String {
+                if (isDefault.value) {
+                    return "zpx-r-arrow-down"
+                } else if (isReleaseToRefresh.value) {
+                    return "zpx-r-arrow-top"
+                }
+                return ""
+            }
+            )
+            val getLeftImageSrc = computed(fun(): String {
+                if (isDefault.value) {
+                    return base64ArrowImg.value
+                } else if (isReleaseToRefresh.value) {
+                    return base64ArrowImg.value
+                } else if (isLoading.value) {
+                    return base64FlowerImg.value
+                } else if (isComplete.value) {
+                    return base64SuccessImg.value
+                }
+                return base64ArrowImg.value
+            }
+            )
+            val statusText = computed(fun(): String {
+                if (isDefault.value) {
+                    return props.defaultText
+                } else if (isReleaseToRefresh.value) {
+                    return props.pullingText
+                } else if (isLoading.value) {
+                    return props.refreshingText
+                } else if (isComplete.value) {
+                    return props.completeText
+                } else {
+                    return ""
+                }
+            }
+            )
+            val refresherTimeText = computed(fun(): String {
+                props.timeTextTimestamp
+                return getRefesrherFormatTimeByKey(props.updateTimeKey)
+            }
+            )
+            val showRefresherTimeText = computed(fun(): Boolean {
+                return props.showUpdateTime && refresherTimeText.value.length > 0
+            }
+            )
+            return fun(): Any? {
+                return _cE("view", _uM("class" to "zpx-r-container", "style" to _nS(_uM("height" to if (_ctx.showUpdateTime) {
+                    "60px"
+                } else {
+                    "40px"
+                }
+                ))), _uA(
+                    if (isTrue(isLoading.value)) {
+                        _cV(unref(GenUniModulesZPagingXComponentsZPagingXComponentsZPagingLoadingClass), _uM("key" to 0))
+                    } else {
+                        _cE("image", _uM("key" to 1, "class" to _nC(_uA(
+                            "zpx-r-image",
+                            getLeftImageClass.value
+                        )), "src" to getLeftImageSrc.value), null, 10, _uA(
+                            "src"
+                        ))
+                    }
+                    ,
+                    _cE("view", _uM("class" to "zpx-r-text-container", "style" to _nS(_uM("marginLeft" to if (showRefresherTimeText.value) {
+                        "25rpx"
+                    } else {
+                        "10rpx"
+                    }
+                    ))), _uA(
+                        _cE("text", _uM("class" to "zpx-r-text"), _tD(statusText.value), 1),
+                        if (isTrue(showRefresherTimeText.value)) {
+                            _cE("text", _uM("key" to 0, "class" to "zpx-r-text zpx-r-time-text"), _tD(refresherTimeText.value), 1)
+                        } else {
+                            _cC("v-if", true)
+                        }
+                    ), 4)
+                ), 4)
+            }
+        }
         var name = "z-paging-refresher"
         val styles: Map<String, Map<String, Map<String, Any>>> by lazy {
             _nCS(_uA(
@@ -225,7 +258,7 @@ open class GenUniModulesZPagingXComponentsZPagingXComponentsZPagingRefresher : V
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "status" to _uM("type" to "String", "default" to default__11.Refresher.Default), "defaultText" to _uM("type" to "String", "default" to "继续下拉刷新"), "pullingText" to _uM("type" to "String", "default" to "松开立即刷新"), "refreshingText" to _uM("type" to "String", "default" to "正在刷新..."), "showUpdateTime" to _uM("type" to "Boolean", "default" to false), "updateTimeKey" to _uM("type" to "String", "default" to "default"), "timeTextTimestamp" to _uM("type" to "Number", "default" to 0)))
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "status" to _uM("type" to "String", "default" to default__11.Refresher.Default), "defaultText" to _uM("type" to "String", "default" to "继续下拉刷新"), "pullingText" to _uM("type" to "String", "default" to "松开立即刷新"), "refreshingText" to _uM("type" to "String", "default" to "正在刷新..."), "completeText" to _uM("type" to "String", "default" to "刷新完成"), "showUpdateTime" to _uM("type" to "Boolean", "default" to false), "updateTimeKey" to _uM("type" to "String", "default" to "default"), "timeTextTimestamp" to _uM("type" to "Number", "default" to 0)))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",
@@ -235,10 +268,11 @@ open class GenUniModulesZPagingXComponentsZPagingXComponentsZPagingRefresher : V
             "defaultText",
             "pullingText",
             "refreshingText",
+            "completeText",
             "showUpdateTime",
             "updateTimeKey",
             "timeTextTimestamp"
         )
-        var components: Map<String, CreateVueComponent> = _uM("zPagingLoading" to GenUniModulesZPagingXComponentsZPagingXComponentsZPagingLoadingClass)
+        var components: Map<String, CreateVueComponent> = _uM()
     }
 }

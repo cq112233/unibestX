@@ -316,16 +316,16 @@ open class GenUniModulesUviewUltraComponentsUpActionSheetUpActionSheet : VueComp
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "show" to _uM("type" to "Boolean", "default" to default__89.getBoolean("actionSheet.show")), "title" to _uM("type" to "String", "default" to default__89.getString("actionSheet.title")), "description" to _uM("type" to "String", "default" to default__89.getString("actionSheet.description")), "actions" to _uM("type" to "Array", "default" to fun(): UTSArray<UTSJSONObject> {
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "show" to _uM("type" to "Boolean", "default" to default__87.getBoolean("actionSheet.show")), "title" to _uM("type" to "String", "default" to default__87.getString("actionSheet.title")), "description" to _uM("type" to "String", "default" to default__87.getString("actionSheet.description")), "actions" to _uM("type" to "Array", "default" to fun(): UTSArray<UTSJSONObject> {
             return _uA()
         }
-        ), "cancelText" to _uM("type" to "String", "default" to default__89.getString("actionSheet.cancelText")), "closeOnClickAction" to _uM("type" to "Boolean", "default" to default__89.getBoolean("actionSheet.closeOnClickAction")), "safeAreaInsetBottom" to _uM("type" to "Boolean", "default" to default__89.getBoolean("actionSheet.safeAreaInsetBottom")), "openType" to _uM("type" to "String", "default" to default__89.getString("actionSheet.openType")), "closeOnClickOverlay" to _uM("type" to "Boolean", "default" to default__89.getBoolean("actionSheet.closeOnClickOverlay")), "round" to _uM("type" to _uA(
+        ), "cancelText" to _uM("type" to "String", "default" to default__87.getString("actionSheet.cancelText")), "closeOnClickAction" to _uM("type" to "Boolean", "default" to default__87.getBoolean("actionSheet.closeOnClickAction")), "safeAreaInsetBottom" to _uM("type" to "Boolean", "default" to default__87.getBoolean("actionSheet.safeAreaInsetBottom")), "openType" to _uM("type" to "String", "default" to default__87.getString("actionSheet.openType")), "closeOnClickOverlay" to _uM("type" to "Boolean", "default" to default__87.getBoolean("actionSheet.closeOnClickOverlay")), "round" to _uM("type" to _uA(
             "Boolean",
             "String",
             "Number"
-        ), "default" to default__89.getAny("actionSheet.round")), "wrapMaxHeight" to _uM("type" to _uA(
+        ), "default" to default__87.getAny("actionSheet.round")), "wrapMaxHeight" to _uM("type" to _uA(
             "String"
-        ), "default" to default__89.getString("actionSheet.wrapMaxHeight"))))
+        ), "default" to default__87.getString("actionSheet.wrapMaxHeight"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

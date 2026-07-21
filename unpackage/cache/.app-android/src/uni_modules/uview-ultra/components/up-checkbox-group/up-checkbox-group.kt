@@ -243,19 +243,19 @@ open class GenUniModulesUviewUltraComponentsUpCheckboxGroupUpCheckboxGroup : Vue
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "name" to _uM("type" to "String", "default" to default__72.getString("checkboxGroup.name")), "modelValue" to _uM("type" to "Array", "default" to fun(): UTSArray<Any>? {
-            return default__72.getArray<Any>("checkboxGroup.value")
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "name" to _uM("type" to "String", "default" to default__71.getString("checkboxGroup.name")), "modelValue" to _uM("type" to "Array", "default" to fun(): UTSArray<Any>? {
+            return default__71.getArray<Any>("checkboxGroup.value")
         }
-        ), "shape" to _uM("type" to "String", "default" to default__72.getString("checkboxGroup.shape")), "disabled" to _uM("type" to "Boolean", "default" to default__72.getBoolean("checkboxGroup.disabled")), "activeColor" to _uM("type" to "String", "default" to default__72.getString("checkboxGroup.activeColor")), "inactiveColor" to _uM("type" to "String", "default" to default__72.getString("checkboxGroup.inactiveColor")), "size" to _uM("type" to _uA(
+        ), "shape" to _uM("type" to "String", "default" to default__71.getString("checkboxGroup.shape")), "disabled" to _uM("type" to "Boolean", "default" to default__71.getBoolean("checkboxGroup.disabled")), "activeColor" to _uM("type" to "String", "default" to default__71.getString("checkboxGroup.activeColor")), "inactiveColor" to _uM("type" to "String", "default" to default__71.getString("checkboxGroup.inactiveColor")), "size" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__72.getNumber("checkboxGroup.size")), "placement" to _uM("type" to "String", "default" to default__72.getString("checkboxGroup.placement")), "labelSize" to _uM("type" to _uA(
+        ), "default" to default__71.getNumber("checkboxGroup.size")), "placement" to _uM("type" to "String", "default" to default__71.getString("checkboxGroup.placement")), "labelSize" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__72.getNumber("checkboxGroup.labelSize")), "labelColor" to _uM("type" to "String", "default" to default__72.getString("checkboxGroup.labelColor")), "labelDisabled" to _uM("type" to "Boolean", "default" to default__72.getBoolean("checkboxGroup.labelDisabled")), "iconColor" to _uM("type" to "String", "default" to default__72.getString("checkboxGroup.iconColor")), "iconSize" to _uM("type" to _uA(
+        ), "default" to default__71.getNumber("checkboxGroup.labelSize")), "labelColor" to _uM("type" to "String", "default" to default__71.getString("checkboxGroup.labelColor")), "labelDisabled" to _uM("type" to "Boolean", "default" to default__71.getBoolean("checkboxGroup.labelDisabled")), "iconColor" to _uM("type" to "String", "default" to default__71.getString("checkboxGroup.iconColor")), "iconSize" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__72.getNumber("checkboxGroup.iconSize")), "iconPlacement" to _uM("type" to "String", "default" to default__72.getString("checkboxGroup.iconPlacement")), "borderBottom" to _uM("type" to "Boolean", "default" to default__72.getBoolean("checkboxGroup.borderBottom"))))
+        ), "default" to default__71.getNumber("checkboxGroup.iconSize")), "iconPlacement" to _uM("type" to "String", "default" to default__71.getString("checkboxGroup.iconPlacement")), "borderBottom" to _uM("type" to "Boolean", "default" to default__71.getBoolean("checkboxGroup.borderBottom"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

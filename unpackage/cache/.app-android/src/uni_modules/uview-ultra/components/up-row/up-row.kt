@@ -251,7 +251,7 @@ open class GenUniModulesUviewUltraComponentsUpRowUpRow : VueComponent {
         ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "gutter" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__54.getNumber("row.gutter")), "justify" to _uM("type" to "String", "default" to default__54.getNumber("row.justify")), "align" to _uM("type" to "String", "default" to default__54.getNumber("row.align"))))
+        ), "default" to default__61.getNumber("row.gutter")), "justify" to _uM("type" to "String", "default" to default__61.getNumber("row.justify")), "align" to _uM("type" to "String", "default" to default__61.getNumber("row.align"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

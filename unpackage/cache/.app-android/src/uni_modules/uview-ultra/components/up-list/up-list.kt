@@ -30,13 +30,14 @@ open class GenUniModulesUviewUltraComponentsUpListUpList : VueComponent {
     override fun `$render`(): Any? {
         val _ctx = this
         val _cache = this.`$`.renderCache
-        return _cE("scroll-view", _uM("class" to "up-list", "scroll-into-view" to _ctx.scrollIntoView, "style" to _nS(_uA(
+        return _cE("scroll-view", _uM("class" to "up-list", "direction" to "vertical", "custom-nested-scroll" to _ctx.customNestedScroll, "scroll-into-view" to _ctx.scrollIntoView, "style" to _nS(_uA(
             _ctx.listStyle
         )), "scroll-y" to _ctx.scrollable, "scroll-top" to parseFloat(_ctx.scrollTop.toString()), "lower-threshold" to parseFloat(_ctx.lowerThreshold.toString()), "upper-threshold" to parseFloat(_ctx.upperThreshold.toString()), "show-scrollbar" to _ctx.showScrollbar, "scroll-with-animation" to _ctx.scrollWithAnimation, "onScroll" to _ctx.onScroll, "onScrolltolower" to _ctx.scrolltolower, "onScrolltoupper" to _ctx.scrolltoupper, "refresher-enabled" to _ctx.refresherEnabled, "refresher-threshold" to _ctx.refresherThreshold, "refresher-default-style" to _ctx.refresherDefaultStyle, "refresher-background" to _ctx.refresherBackground, "refresher-triggered" to _ctx.refresherTriggered, "onRefresherpulling" to _ctx.refresherpulling, "onRefresherrefresh" to _ctx.refresherrefresh, "onRefresherrestore" to _ctx.refresherrestore, "onRefresherabort" to _ctx.refresherabort), _uA(
             _cE("view", null, _uA(
                 renderSlot(_ctx.`$slots`, "default")
             ))
         ), 44, _uA(
+            "custom-nested-scroll",
             "scroll-into-view",
             "scroll-y",
             "scroll-top",
@@ -81,6 +82,7 @@ open class GenUniModulesUviewUltraComponentsUpListUpList : VueComponent {
     open var refresherDefaultStyle: String by `$props`
     open var refresherBackground: String by `$props`
     open var refresherTriggered: Boolean by `$props`
+    open var customNestedScroll: Boolean by `$props`
     open var parent: ComponentPublicInstance? by `$data`
     open var parentData: UTSJSONObject by `$data`
     open var children: UTSArray<ComponentPublicInstance> by `$data`
@@ -92,7 +94,7 @@ open class GenUniModulesUviewUltraComponentsUpListUpList : VueComponent {
     @Suppress("USELESS_CAST")
     override fun data(): Map<String, Any?> {
         return _uM("parent" to null as ComponentPublicInstance?, "parentData" to _uO(), "children" to _uA<ComponentPublicInstance>(), "childrenRefs" to _uA<String>(), "innerScrollTop" to 0, "offset" to 0, "sys" to getWindowInfo() as GetWindowInfoResult, "listStyle" to computed<UTSJSONObject>(fun(): UTSJSONObject {
-            val style: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-list/up-list.uvue", 77, 11))
+            val style: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-list/up-list.uvue", 79, 11))
             if (this.width != 0) {
                 style["width"] = addUnit(this.width)
             }
@@ -291,7 +293,7 @@ open class GenUniModulesUviewUltraComponentsUpListUpList : VueComponent {
         ), "default" to listProp["width"]), "preLoadScreen" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to listProp["preLoadScreen"]), "refresherEnabled" to _uM("type" to "Boolean", "default" to listProp["refresherEnabled"]), "refresherThreshold" to _uM("type" to "Number", "default" to listProp["refresherThreshold"]), "refresherDefaultStyle" to _uM("type" to "String", "default" to listProp["refresherDefaultStyle"]), "refresherBackground" to _uM("type" to "String", "default" to listProp["refresherBackground"]), "refresherTriggered" to _uM("type" to "Boolean", "default" to listProp["refresherTriggered"])))
+        ), "default" to listProp["preLoadScreen"]), "refresherEnabled" to _uM("type" to "Boolean", "default" to listProp["refresherEnabled"]), "refresherThreshold" to _uM("type" to "Number", "default" to listProp["refresherThreshold"]), "refresherDefaultStyle" to _uM("type" to "String", "default" to listProp["refresherDefaultStyle"]), "refresherBackground" to _uM("type" to "String", "default" to listProp["refresherBackground"]), "refresherTriggered" to _uM("type" to "Boolean", "default" to listProp["refresherTriggered"]), "customNestedScroll" to _uM("type" to "Boolean", "default" to listProp["customNestedScroll"])))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",
@@ -315,7 +317,8 @@ open class GenUniModulesUviewUltraComponentsUpListUpList : VueComponent {
             "refresherThreshold",
             "refresherDefaultStyle",
             "refresherBackground",
-            "refresherTriggered"
+            "refresherTriggered",
+            "customNestedScroll"
         )
         var components: Map<String, CreateVueComponent> = _uM()
     }

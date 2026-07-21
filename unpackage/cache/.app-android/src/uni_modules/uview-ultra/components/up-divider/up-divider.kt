@@ -224,13 +224,13 @@ open class GenUniModulesUviewUltraComponentsUpDividerUpDivider : VueComponent {
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "dashed" to _uM("type" to "Boolean", "default" to default__59.getBoolean("divider.dashed")), "hairline" to _uM("type" to "Boolean", "default" to default__59.getBoolean("divider.hairline")), "dot" to _uM("type" to "Boolean", "default" to default__59.getBoolean("divider.dot")), "textPosition" to _uM("type" to "String", "default" to default__59.getString("divider.textPosition")), "text" to _uM("type" to _uA(
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "dashed" to _uM("type" to "Boolean", "default" to default__56.getBoolean("divider.dashed")), "hairline" to _uM("type" to "Boolean", "default" to default__56.getBoolean("divider.hairline")), "dot" to _uM("type" to "Boolean", "default" to default__56.getBoolean("divider.dot")), "textPosition" to _uM("type" to "String", "default" to default__56.getString("divider.textPosition")), "text" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__59.getString("divider.text")), "textSize" to _uM("type" to _uA(
+        ), "default" to default__56.getString("divider.text")), "textSize" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__59.getNumber("divider.textSize")), "textColor" to _uM("type" to "String", "default" to default__59.getString("divider.textColor")), "lineColor" to _uM("type" to "String", "default" to default__59.getString("divider.lineColor"))))
+        ), "default" to default__56.getNumber("divider.textSize")), "textColor" to _uM("type" to "String", "default" to default__56.getString("divider.textColor")), "lineColor" to _uM("type" to "String", "default" to default__56.getString("divider.lineColor"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

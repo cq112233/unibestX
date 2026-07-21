@@ -326,19 +326,19 @@ open class GenUniModulesUviewUltraComponentsUpCellUpCell : VueComponent {
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "title" to _uM("type" to "String", "default" to default__49.getString("cell.title")), "label" to _uM("type" to "String", "default" to default__49.getString("cell.label")), "value" to _uM("type" to _uA(
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "title" to _uM("type" to "String", "default" to default__47.getString("cell.title")), "label" to _uM("type" to "String", "default" to default__47.getString("cell.label")), "value" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__49.getString("cell.value")), "icon" to _uM("type" to "String", "default" to default__49.getString("cell.icon")), "iconStyle" to _uM("type" to _uA(
+        ), "default" to default__47.getString("cell.value")), "icon" to _uM("type" to "String", "default" to default__47.getString("cell.icon")), "iconStyle" to _uM("type" to _uA(
             "String",
             "Object"
-        ), "default" to default__49.getAny("cell.iconStyle")), "rightIcon" to _uM("type" to "String", "default" to default__49.getString("cell.rightIcon")), "rightIconStyle" to _uM("type" to _uA(
+        ), "default" to default__47.getAny("cell.iconStyle")), "rightIcon" to _uM("type" to "String", "default" to default__47.getString("cell.rightIcon")), "rightIconStyle" to _uM("type" to _uA(
             "String",
             "Object"
-        ), "default" to default__49.getAny("cell.rightIconStyle")), "size" to _uM("type" to "String", "default" to default__49.getString("cell.size")), "center" to _uM("type" to "Boolean", "default" to default__49.getBoolean("cell.center")), "url" to _uM("type" to "String", "default" to default__49.getString("cell.url")), "name" to _uM("type" to _uA(
+        ), "default" to default__47.getAny("cell.rightIconStyle")), "size" to _uM("type" to "String", "default" to default__47.getString("cell.size")), "center" to _uM("type" to "Boolean", "default" to default__47.getBoolean("cell.center")), "url" to _uM("type" to "String", "default" to default__47.getString("cell.url")), "name" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__49.getString("cell.name")), "linkType" to _uM("type" to "String", "default" to default__49.getString("cell.linkType")), "clickable" to _uM("type" to "Boolean", "default" to default__49.getBoolean("cell.clickable")), "isLink" to _uM("type" to "Boolean", "default" to default__49.getBoolean("cell.isLink")), "arrowDirection" to _uM("type" to "String", "default" to default__49.getString("cell.arrowDirection")), "border" to _uM("type" to "Boolean", "default" to default__49.getBoolean("cell.border")), "disabled" to _uM("type" to "Boolean", "default" to default__49.getBoolean("cell.disabled")), "titleStyle" to _uM("default" to default__49.getAny("cell.titleStyle"))))
+        ), "default" to default__47.getString("cell.name")), "linkType" to _uM("type" to "String", "default" to default__47.getString("cell.linkType")), "clickable" to _uM("type" to "Boolean", "default" to default__47.getBoolean("cell.clickable")), "isLink" to _uM("type" to "Boolean", "default" to default__47.getBoolean("cell.isLink")), "arrowDirection" to _uM("type" to "String", "default" to default__47.getString("cell.arrowDirection")), "border" to _uM("type" to "Boolean", "default" to default__47.getBoolean("cell.border")), "disabled" to _uM("type" to "Boolean", "default" to default__47.getBoolean("cell.disabled")), "titleStyle" to _uM("default" to default__47.getAny("cell.titleStyle"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

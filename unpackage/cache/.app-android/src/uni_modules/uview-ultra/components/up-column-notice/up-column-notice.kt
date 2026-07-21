@@ -265,40 +265,40 @@ open class GenUniModulesUviewUltraComponentsUpColumnNoticeUpColumnNotice : VueCo
             return _uA()
         }
         ), "icon" to _uM("type" to "String", "default" to fun(): String? {
-            return default__92.getString("columnNotice.icon")
+            return default__90.getString("columnNotice.icon")
         }
         ), "mode" to _uM("type" to "String", "default" to fun(): String? {
-            return default__92.getString("columnNotice.mode")
+            return default__90.getString("columnNotice.mode")
         }
         ), "color" to _uM("type" to "String", "default" to fun(): String? {
-            return default__92.getString("columnNotice.color")
+            return default__90.getString("columnNotice.color")
         }
         ), "bgColor" to _uM("type" to "String", "default" to fun(): String? {
-            return default__92.getString("columnNotice.bgColor")
+            return default__90.getString("columnNotice.bgColor")
         }
         ), "fontSize" to _uM("type" to _uA(
             "String",
             "Number"
         ), "default" to fun(): Number? {
-            return default__92.getNumber("columnNotice.fontSize")
+            return default__90.getNumber("columnNotice.fontSize")
         }
         ), "speed" to _uM("type" to _uA(
             "String",
             "Number"
         ), "default" to fun(): Number? {
-            return default__92.getNumber("columnNotice.speed")
+            return default__90.getNumber("columnNotice.speed")
         }
         ), "step" to _uM("type" to "Boolean", "default" to fun(): Boolean? {
-            return default__92.getBoolean("columnNotice.step")
+            return default__90.getBoolean("columnNotice.step")
         }
         ), "duration" to _uM("type" to _uA(
             "String",
             "Number"
         ), "default" to fun(): Number? {
-            return default__92.getNumber("columnNotice.duration")
+            return default__90.getNumber("columnNotice.duration")
         }
         ), "disableTouch" to _uM("type" to "Boolean", "default" to fun(): Boolean? {
-            return default__92.getBoolean("columnNotice.disableTouch")
+            return default__90.getBoolean("columnNotice.disableTouch")
         }
         )))
         var propsNeedCastKeys = _uA(

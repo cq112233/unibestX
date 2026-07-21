@@ -342,13 +342,13 @@ open class GenUniModulesUviewUltraComponentsUpRowNoticeUpRowNotice : VueComponen
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "text" to _uM("type" to "String", "default" to default__93.getString("rowNotice.text")), "icon" to _uM("type" to "String", "default" to default__93.getString("rowNotice.icon")), "mode" to _uM("type" to "String", "default" to default__93.getString("rowNotice.mode")), "color" to _uM("type" to "String", "default" to default__93.getString("rowNotice.color")), "bgColor" to _uM("type" to "String", "default" to default__93.getString("rowNotice.bgColor")), "fontSize" to _uM("type" to _uA(
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "text" to _uM("type" to "String", "default" to default__91.getString("rowNotice.text")), "icon" to _uM("type" to "String", "default" to default__91.getString("rowNotice.icon")), "mode" to _uM("type" to "String", "default" to default__91.getString("rowNotice.mode")), "color" to _uM("type" to "String", "default" to default__91.getString("rowNotice.color")), "bgColor" to _uM("type" to "String", "default" to default__91.getString("rowNotice.bgColor")), "fontSize" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__93.getNumber("rowNotice.fontSize")), "speed" to _uM("type" to _uA(
+        ), "default" to default__91.getNumber("rowNotice.fontSize")), "speed" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__93.getNumber("rowNotice.speed"))))
+        ), "default" to default__91.getNumber("rowNotice.speed"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

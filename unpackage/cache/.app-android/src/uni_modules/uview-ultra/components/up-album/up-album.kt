@@ -390,25 +390,25 @@ open class GenUniModulesUviewUltraComponentsUpAlbumUpAlbum : VueComponent {
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "urls" to _uM("type" to "Array", "default" to default__42.getArray<Any>("album.urls")), "keyName" to _uM("type" to "String", "default" to default__42.getString("album.keyName")), "singleSize" to _uM("type" to _uA(
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "urls" to _uM("type" to "Array", "default" to default__40.getArray<Any>("album.urls")), "keyName" to _uM("type" to "String", "default" to default__40.getString("album.keyName")), "singleSize" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__42.getNumber("album.singleSize")), "multipleSize" to _uM("type" to _uA(
+        ), "default" to default__40.getNumber("album.singleSize")), "multipleSize" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__42.getNumber("album.multipleSize")), "space" to _uM("type" to _uA(
+        ), "default" to default__40.getNumber("album.multipleSize")), "space" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__42.getNumber("album.space")), "singleMode" to _uM("type" to "String", "default" to default__42.getString("album.singleMode")), "multipleMode" to _uM("type" to "String", "default" to default__42.getString("album.multipleMode")), "maxCount" to _uM("type" to _uA(
+        ), "default" to default__40.getNumber("album.space")), "singleMode" to _uM("type" to "String", "default" to default__40.getString("album.singleMode")), "multipleMode" to _uM("type" to "String", "default" to default__40.getString("album.multipleMode")), "maxCount" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__42.getNumber("album.maxCount")), "previewFullImage" to _uM("type" to "Boolean", "default" to default__42.getBoolean("album.previewFullImage")), "rowCount" to _uM("type" to _uA(
+        ), "default" to default__40.getNumber("album.maxCount")), "previewFullImage" to _uM("type" to "Boolean", "default" to default__40.getBoolean("album.previewFullImage")), "rowCount" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__42.getNumber("album.rowCount")), "showMore" to _uM("type" to "Boolean", "default" to default__42.getBoolean("album.showMore")), "shape" to _uM("type" to "String", "default" to default__43.getString("image.shape")), "radius" to _uM("type" to _uA(
+        ), "default" to default__40.getNumber("album.rowCount")), "showMore" to _uM("type" to "Boolean", "default" to default__40.getBoolean("album.showMore")), "shape" to _uM("type" to "String", "default" to default__41.getString("image.shape")), "radius" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__43.getNumber("image.radius")), "autoWrap" to _uM("type" to "Boolean", "default" to default__42.getBoolean("album.autoWrap")), "unit" to _uM("type" to "String", "default" to default__42.getString("album.unit")), "stop" to _uM("type" to "Boolean", "default" to default__42.getBoolean("album.stop"))))
+        ), "default" to default__41.getNumber("image.radius")), "autoWrap" to _uM("type" to "Boolean", "default" to default__40.getBoolean("album.autoWrap")), "unit" to _uM("type" to "String", "default" to default__40.getString("album.unit")), "stop" to _uM("type" to "Boolean", "default" to default__40.getBoolean("album.stop"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

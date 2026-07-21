@@ -16,47 +16,6 @@ open class GenUniModulesZPagingXComponentsZPagingXEmptyZPagingXEmpty : VueCompon
     constructor(__ins: ComponentInternalInstance) : super(__ins) {
         onCreated(fun() {}, __ins)
     }
-    @Suppress("UNUSED_PARAMETER", "UNUSED_VARIABLE")
-    override fun `$render`(): Any? {
-        val _ctx = this
-        val _cache = this.`$`.renderCache
-        return _cE("view", _uM("class" to _nC(_uM("zpx-container" to true)), "style" to _nS(_uA(
-            _ctx.emptyStyle
-        )), "onClick" to _ctx.emptyClick), _uA(
-            _cE("view", _uM("class" to "zpx-main"), _uA(
-                if (_ctx.emptyImg.length > 0) {
-                    _cE("image", _uM("key" to 0, "class" to "zpx-main-image", "style" to _nS(_uA(
-                        _ctx.emptyImgStyle
-                    )), "src" to _ctx.emptyImg), null, 12, _uA(
-                        "src"
-                    ))
-                } else {
-                    _cE("image", _uM("key" to 1, "class" to "zpx-main-image", "mode" to "aspectFit", "style" to _nS(_uA(
-                        _ctx.emptyImgStyle
-                    )), "src" to _ctx.localEmptyImg), null, 12, _uA(
-                        "src"
-                    ))
-                }
-                ,
-                _cE("text", _uM("class" to "zpx-main-title", "style" to _nS(_uA(
-                    _ctx.emptyTitleStyle
-                ))), _tD(_ctx.emptyText), 5),
-                if (isTrue(_ctx.showEmptyReload)) {
-                    _cE("text", _uM("key" to 2, "class" to "zpx-main-error-btn", "style" to _nS(_uA(
-                        _ctx.emptyReloadStyle
-                    )), "onClick" to withModifiers(_ctx.reloadClick, _uA(
-                        "stop"
-                    ))), _tD(_ctx.emptyReloadText), 13, _uA(
-                        "onClick"
-                    ))
-                } else {
-                    _cC("v-if", true)
-                }
-            ))
-        ), 14, _uA(
-            "onClick"
-        ))
-    }
     open var customStyle: Any by `$props`
     open var customClass: String by `$props`
     open var url: String by `$props`
@@ -74,17 +33,9 @@ open class GenUniModulesZPagingXComponentsZPagingXEmptyZPagingXEmpty : VueCompon
     open var parentData: UTSJSONObject by `$data`
     open var children: UTSArray<ComponentPublicInstance> by `$data`
     open var childrenRefs: UTSArray<String> by `$data`
-    open var localEmptyImg: String by `$data`
     @Suppress("USELESS_CAST")
     override fun data(): Map<String, Any?> {
-        return _uM("parent" to null as ComponentPublicInstance?, "parentData" to _uO(), "children" to _uA<ComponentPublicInstance>(), "childrenRefs" to _uA<String>(), "localEmptyImg" to computed<String>(fun(): String {
-            return if (this.isLoadFailed) {
-                base64Error
-            } else {
-                base64Empty
-            }
-        }
-        ))
+        return _uM("parent" to null as ComponentPublicInstance?, "parentData" to _uO(), "children" to _uA<ComponentPublicInstance>(), "childrenRefs" to _uA<String>())
     }
     open fun `$upAddUnit`(kVal: Any?, unit: String? = ""): String {
         return addUnit(kVal, unit)
@@ -187,15 +138,65 @@ open class GenUniModulesZPagingXComponentsZPagingXEmptyZPagingXEmpty : VueCompon
     open fun gen_noop_fn(e: UniEvent) {
         this.preventEvent(e)
     }
-    open var reloadClick = ::gen_reloadClick_fn
-    open fun gen_reloadClick_fn() {
-        this.`$emit`("reload")
-    }
-    open var emptyClick = ::gen_emptyClick_fn
-    open fun gen_emptyClick_fn() {
-        this.`$emit`("viewClick")
-    }
     companion object {
+        @Suppress("UNUSED_PARAMETER", "UNUSED_VARIABLE")
+        var setup: (__props: GenUniModulesZPagingXComponentsZPagingXEmptyZPagingXEmpty) -> Any? = fun(__props): Any? {
+            val __ins = getCurrentInstance()!!
+            val _ctx = __ins.proxy as GenUniModulesZPagingXComponentsZPagingXEmptyZPagingXEmpty
+            val _cache = __ins.renderCache
+            val props = __props
+            fun emit(event: String, vararg do_not_transform_spread: Any?) {
+                __ins.emit(event, *do_not_transform_spread)
+            }
+            val localEmptyImg = computed(fun(): String {
+                return if (props.isLoadFailed) {
+                    base64Error
+                } else {
+                    base64Empty
+                }
+            }
+            )
+            val reloadClick = fun(){
+                emit("reload")
+            }
+            val emptyClick = fun(){
+                emit("viewClick")
+            }
+            return fun(): Any? {
+                return _cE("view", _uM("class" to _nC(_uM("zpx-container" to true)), "style" to _nS(_uA(
+                    _ctx.emptyStyle
+                )), "onClick" to emptyClick), _uA(
+                    _cE("view", _uM("class" to "zpx-main"), _uA(
+                        if (_ctx.emptyImg.length > 0) {
+                            _cE("image", _uM("key" to 0, "class" to "zpx-main-image", "style" to _nS(_uA(
+                                _ctx.emptyImgStyle
+                            )), "src" to _ctx.emptyImg), null, 12, _uA(
+                                "src"
+                            ))
+                        } else {
+                            _cE("image", _uM("key" to 1, "class" to "zpx-main-image", "mode" to "aspectFit", "style" to _nS(_uA(
+                                _ctx.emptyImgStyle
+                            )), "src" to localEmptyImg.value), null, 12, _uA(
+                                "src"
+                            ))
+                        }
+                        ,
+                        _cE("text", _uM("class" to "zpx-main-title", "style" to _nS(_uA(
+                            _ctx.emptyTitleStyle
+                        ))), _tD(_ctx.emptyText), 5),
+                        if (isTrue(_ctx.showEmptyReload)) {
+                            _cE("text", _uM("key" to 2, "class" to "zpx-main-error-btn", "style" to _nS(_uA(
+                                _ctx.emptyReloadStyle
+                            )), "onClick" to withModifiers(reloadClick, _uA(
+                                "stop"
+                            ))), _tD(_ctx.emptyReloadText), 5)
+                        } else {
+                            _cC("v-if", true)
+                        }
+                    ))
+                ), 6)
+            }
+        }
         var name = "z-paging-x-empty"
         val styles: Map<String, Map<String, Map<String, Any>>> by lazy {
             _nCS(_uA(
@@ -208,7 +209,7 @@ open class GenUniModulesZPagingXComponentsZPagingXEmptyZPagingXEmpty : VueCompon
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()
-        var emits: Map<String, Any?> = _uM()
+        var emits: Map<String, Any?> = _uM("reload" to null, "viewClick" to null)
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"

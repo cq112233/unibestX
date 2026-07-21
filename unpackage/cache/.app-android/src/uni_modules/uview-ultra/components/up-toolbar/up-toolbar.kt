@@ -208,7 +208,7 @@ open class GenUniModulesUviewUltraComponentsUpToolbarUpToolbar : VueComponent {
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "show" to _uM("type" to "Boolean", "default" to crtProp__25["show"]), "cancelText" to _uM("type" to "String", "default" to crtProp__25["cancelText"]), "confirmText" to _uM("type" to "String", "default" to crtProp__25["confirmText"]), "cancelColor" to _uM("type" to "String", "default" to crtProp__25["cancelColor"]), "confirmColor" to _uM("type" to "String", "default" to crtProp__25["confirmColor"]), "title" to _uM("type" to "String", "default" to crtProp__25["title"]), "rightSlot" to _uM("type" to "Boolean", "default" to false)))
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "show" to _uM("type" to "Boolean", "default" to crtProp__24["show"]), "cancelText" to _uM("type" to "String", "default" to crtProp__24["cancelText"]), "confirmText" to _uM("type" to "String", "default" to crtProp__24["confirmText"]), "cancelColor" to _uM("type" to "String", "default" to crtProp__24["cancelColor"]), "confirmColor" to _uM("type" to "String", "default" to crtProp__24["confirmColor"]), "title" to _uM("type" to "String", "default" to crtProp__24["title"]), "rightSlot" to _uM("type" to "Boolean", "default" to false)))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

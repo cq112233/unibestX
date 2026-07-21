@@ -7,11 +7,11 @@
 
 
 
-<h2 style="color: red">请注意，此插件仅支持uniappx！！！若您为uniapp项目请使用z-paging！</h2>
+## 请注意，此插件仅支持uniappx！！！若您为uniapp项目请使用[z-paging](https://ext.dcloud.net.cn/plugin?id=3935)！
 
 > z-paging uniapp x版
 
-[![version](https://img.shields.io/badge/version-0.3.6-blue)](https://github.com/SmileZXLee/uni-z-paging-x)
+[![version](https://img.shields.io/badge/version-0.4.0-blue)](https://github.com/SmileZXLee/uni-z-paging-x)
 [![license](https://img.shields.io/github/license/SmileZXLee/uni-z-paging-x)](https://en.wikipedia.org/wiki/MIT_License)
 
 ***
@@ -119,6 +119,7 @@ setZPXConfig({
 | default-page-size | 自定义pageSize(每页显示多少条)                               | Number  | 10     | -      |
 | auto              | mounted后自动调用reload方法(mounted后自动调用接口)           | Boolean | true   | false  |
 | paging-style      | 自定义组件的样式                                             | Object  | {}     | -      |
+| layout-only       | 是否只使用基础布局，设置为true后将关闭mounted自动请求数据、关闭下拉刷新和滚动到底部加载更多，强制隐藏空数据图 | Boolean | false  | true   |
 
 #### list-view&scroll-view相关配置
 
@@ -149,6 +150,9 @@ setZPXConfig({
 | refresher-default-text     | 自定义下拉刷新默认状态下的文字                               | String  | 继续下拉刷新 | -      |
 | refresher-pulling-text     | 自定义下拉刷新松手立即刷新状态下的文字                       | String  | 松开立即刷新 | -      |
 | refresher-refreshing-text  | 自定义下拉刷新刷新中状态下的文字                             | String  | 正在刷新...  | -      |
+| refresher-complete-text    | 自定义下拉刷新刷新结束状态下的文字                           | String  | 刷新完成     | -      |
+| refresher-complete-delay   | 自定义下拉刷新结束以后延迟回弹的时间，单位为毫秒，默认为0    | Number  | 0            | -      |
+| refresher-complete-duration | 自定义下拉刷新结束回弹动画时间，单位为毫秒                   | Number  | 300          | -      |
 | refresher-background       | 下拉刷新区域背景颜色                                         | String  | #FFF         |        |
 | show-refresher-when-reload | 列表刷新时自动显示下拉刷新view                               | Boolean | false        | true   |
 | refresher-update-time-key  | 如果需要区别不同页面的最后更新时间，请为不同页面的z-paging-x的`refresher-update-time-key`设置不同的字符串 | String  | default      | -      |
@@ -185,11 +189,12 @@ setZPXConfig({
 
 | 事件名                 | 说明                                                         | 回调参数                                                     |
 | ---------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| @query                 | 下拉刷新或滚动到底部时会自动触发此方法。`z-paging-x`加载时也会触发(若要禁止，请设置`:auto="false"`)。pageNo和pageSize会自动计算好，直接传给服务器即可。 | `参数1`:pageNo(当前第几页)；<br/>`参数2`:pageSize(每页多少条)(pageSize必须与传给服务器的一致，如果需要修改pageSize，请通过`:default-page-size="15"`修改)<br />`参数3`:from(@query的触发来源：user-pull-down:用户主动下拉刷新；reload:通过reload触发；load-more:通过滚动到底部加载更多或点击底部加载更多触发) |
+| @query                 | 下拉刷新或滚动到底部时会自动触发此方法。`z-paging-x`加载时也会触发(若要禁止，请设置`:auto="false"`)。pageNo和pageSize会自动计算好，直接传给服务器即可。 | `参数1`:pageNo(当前第几页)；<br/>`参数2`:pageSize(每页多少条)(pageSize必须与传给服务器的一致，如果需要修改pageSize，请通过`:default-page-size="15"`修改)<br />`参数3`:from(@query的触发来源：user-pull-down:用户主动下拉刷新；reload:通过reload触发；refresh:通过refresh触发；load-more:通过滚动到底部加载更多或点击底部加载更多触发) |
 | @refresherpulling      | 下拉刷新控件被下拉事件                                       | `参数1`:(event: [RefresherEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#unirefresherevent) => void |
 | @refresherrefresh      | 下拉刷新被触发事件                                           | `参数1`:(event: [RefresherEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#unirefresherevent) => void |
 | @refresherrestore      | 下拉刷新被复位事件                                           | `参数1`:(event: [RefresherEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#unirefresherevent) => void |
 | @refresherabort        | 下拉刷新被中止事件                                           | `参数1`:(event: [RefresherEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#unirefresherevent) => void |
+| @onRefresh             | 自定义下拉刷新被触发                                         | -                                                            |
 | @scroll                | 列表滚动时触发                                               | `参数1`:(event: [ScrollEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#uniscrollevent)) => void |
 | @scrolltolower         | 滚动到底部/右边，会触发 scrolltolower 事件                   | `参数1`:(event: [ScrollToLowerEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#uniscrolltolowerevent)) => void |
 | @scrolltoupper         | 滚动到顶部/左边，会触发 scrolltoupper 事件                   | `参数1`:(event: [ScrollToUpperEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#uniscrolltoupperevent)) => void |
@@ -202,10 +207,12 @@ setZPXConfig({
 | 方法名           | 说明                                                         | 参数                                                         |
 | ---------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | reload           | 重新加载分页数据，pageNo恢复为默认值，相当于下拉刷新的效果   | -                                                            |
+| refresh          | 刷新列表数据，pageNo和pageSize不会重置，列表数据会重新从服务端获取。调用此方法时会自动触发@query，pageNo=1，pageSize=当前已加载总条数 | -                                                            |
 | complete         | 请求成功调用此方法，将请求的结果数组传递给z-paging-x处理     | `参数1(必填)`:请求结果数组；                                 |
 | completeByTotal  | 【通过total判断是否有更多数据】请求成功调用此方法(将此方法替换`complete`方法即可，此方法为`complete`方法的功能扩展，遵循`complete`原有规则) | `参数1(必填)`:请求结果数组；`参数2(必填)`:列表总长度；       |
 | completeByNoMore | 【自行判断是否有更多数据】请求结束(成功或者失败)调用此方法，将请求的结果传递给z-paging-x处理(将此方法替换`complete`方法即可，此方法为`complete`方法的功能扩展，遵循`complete`原有规则) | `参数1(必填)`:请求结果数组；`参数2(必填)`:是否没有更多数据，若为true则代表没有更多数据了； |
 | completeByError  | 请求结束(失败)调用此方法，将自动展示失败页面                 | -                                                            |
+| endRefresh       | 直接结束下拉刷新状态                                         | -                                                            |
 | scrollToTop      | 滚动到顶部                                                   | `参数1(必填)`:是否有动画效果                                 |
 | scrollToBottom   | 滚动到底部                                                   | `参数1(必填)`:是否有动画效果                                 |
 | scrollToY        | 滚动到指定位置                                               | `参数1(必填)`:滚动到的位置；`参数2(必填)`:是否有动画效果     |

@@ -596,13 +596,13 @@ open class GenUniModulesUviewUltraComponentsUpStepsItemUpStepsItem : VueComponen
         ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "title" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__4["title"]), "desc" to _uM("type" to _uA(
+        ), "default" to crtProp__3["title"]), "desc" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__4["desc"]), "iconSize" to _uM("type" to _uA(
+        ), "default" to crtProp__3["desc"]), "iconSize" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__4["iconSize"]), "error" to _uM("type" to "Boolean", "default" to crtProp__4["error"]), "itemStyle" to _uM("type" to _uA(
+        ), "default" to crtProp__3["iconSize"]), "error" to _uM("type" to "Boolean", "default" to crtProp__3["error"]), "itemStyle" to _uM("type" to _uA(
             "UTSJSONObject"
         ), "default" to _uO())))
         var propsNeedCastKeys = _uA(

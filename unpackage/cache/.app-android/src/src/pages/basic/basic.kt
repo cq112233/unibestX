@@ -153,8 +153,9 @@ open class GenSrcPagesBasicBasic : BasePage {
                     return _uA(
                         _cV(unref(GenSrcLayoutsDefaultClass), _uM("navigation-bar-title-text" to "基础"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                             return _uA(
-                                _cE("view", null, _uA(
+                                _cE("scroll-view", _uM("direction" to "vertical", "class" to "flex-1 bg-__f7fafc_"), _uA(
                                     _cV(unref(GenSrcPagesBasicComponentsUViewUltraDemoCardClass)),
+                                    _cV(unref(GenSrcPagesBasicComponentsZPagingDemoCardClass)),
                                     _cV(unref(GenSrcPagesBasicComponentsSystemInfoDemoCardClass)),
                                     _cV(unref(GenSrcPagesBasicComponentsIconDemoCardClass)),
                                     _cV(unref(GenSrcPagesBasicComponentsLangSwitchCardClass)),
@@ -162,8 +163,7 @@ open class GenSrcPagesBasicBasic : BasePage {
                                     _cV(unref(GenSrcPagesBasicComponentsTimeDemoCardClass)),
                                     _cV(unref(GenSrcPagesBasicComponentsRouterDemoCardClass)),
                                     _cV(unref(GenSrcPagesBasicComponentsHttpDemoCardClass)),
-                                    _cV(unref(GenSrcPagesBasicComponentsEchartsDemoCardClass)),
-                                    _cV(unref(GenSrcPagesBasicComponentsZPagingDemoCardClass))
+                                    _cV(unref(GenSrcPagesBasicComponentsEchartsDemoCardClass))
                                 ))
                             )
                         }
@@ -174,8 +174,14 @@ open class GenSrcPagesBasicBasic : BasePage {
             }
         }
         val styles: Map<String, Map<String, Map<String, Any>>> by lazy {
-            _nCS(_uA())
+            _nCS(_uA(
+                styles0
+            ))
         }
+        val styles0: Map<String, Map<String, Map<String, Any>>>
+            get() {
+                return _uM("bg-__f7fafc_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#f7fafc")), "flex-1" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")))
+            }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()
         var emits: Map<String, Any?> = _uM()

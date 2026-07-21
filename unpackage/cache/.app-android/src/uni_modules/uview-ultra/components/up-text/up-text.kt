@@ -393,29 +393,29 @@ open class GenUniModulesUviewUltraComponentsUpTextUpText : VueComponent {
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "type" to _uM("type" to "String", "default" to crtProp__5["type"]), "show" to _uM("type" to "Boolean", "default" to crtProp__5["show"]), "text" to _uM("type" to _uA(
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "type" to _uM("type" to "String", "default" to crtProp__4["type"]), "show" to _uM("type" to "Boolean", "default" to crtProp__4["show"]), "text" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__5["text"]), "prefixIcon" to _uM("type" to "String", "default" to crtProp__5["prefixIcon"]), "suffixIcon" to _uM("type" to "String", "default" to crtProp__5["suffixIcon"]), "mode" to _uM("type" to "String", "default" to crtProp__5["mode"]), "href" to _uM("type" to "String", "default" to crtProp__5["href"]), "format" to _uM("type" to _uA(
+        ), "default" to crtProp__4["text"]), "prefixIcon" to _uM("type" to "String", "default" to crtProp__4["prefixIcon"]), "suffixIcon" to _uM("type" to "String", "default" to crtProp__4["suffixIcon"]), "mode" to _uM("type" to "String", "default" to crtProp__4["mode"]), "href" to _uM("type" to "String", "default" to crtProp__4["href"]), "format" to _uM("type" to _uA(
             "String",
             "Function"
-        ), "default" to crtProp__5["format"]), "call" to _uM("type" to "Boolean", "default" to crtProp__5["call"]), "openType" to _uM("type" to "String", "default" to crtProp__5["openType"]), "bold" to _uM("type" to "Boolean", "default" to crtProp__5["bold"]), "block" to _uM("type" to "Boolean", "default" to crtProp__5["block"]), "lines" to _uM("type" to _uA(
+        ), "default" to crtProp__4["format"]), "call" to _uM("type" to "Boolean", "default" to crtProp__4["call"]), "openType" to _uM("type" to "String", "default" to crtProp__4["openType"]), "bold" to _uM("type" to "Boolean", "default" to crtProp__4["bold"]), "block" to _uM("type" to "Boolean", "default" to crtProp__4["block"]), "lines" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__5["lines"]), "color" to _uM("type" to "String", "default" to crtProp__5["color"]), "size" to _uM("type" to _uA(
+        ), "default" to crtProp__4["lines"]), "color" to _uM("type" to "String", "default" to crtProp__4["color"]), "size" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__5["size"]), "iconStyle" to _uM("type" to _uA(
+        ), "default" to crtProp__4["size"]), "iconStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to crtProp__5["iconStyle"]), "decoration" to _uM("default" to crtProp__5["decoration"]), "margin" to _uM("type" to _uA(
+        ), "default" to crtProp__4["iconStyle"]), "decoration" to _uM("default" to crtProp__4["decoration"]), "margin" to _uM("type" to _uA(
             "Object",
             "String",
             "Number"
-        ), "default" to crtProp__5["margin"]), "lineHeight" to _uM("type" to _uA(
+        ), "default" to crtProp__4["margin"]), "lineHeight" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__5["lineHeight"]), "align" to _uM("type" to "String", "default" to crtProp__5["align"]), "wordWrap" to _uM("type" to "String", "default" to crtProp__5["wordWrap"]), "lang" to _uM("type" to "String", "default" to crtProp__5["lang"]), "sessionFrom" to _uM("type" to "String", "default" to crtProp__5["sessionFrom"]), "sendMessageTitle" to _uM("type" to "String", "default" to crtProp__5["sendMessageTitle"]), "sendMessagePath" to _uM("type" to "String", "default" to crtProp__5["sendMessagePath"]), "sendMessageImg" to _uM("type" to "String", "default" to crtProp__5["sendMessageImg"]), "showMessageCard" to _uM("type" to "Boolean", "default" to crtProp__5["showMessageCard"]), "appParameter" to _uM("type" to "String", "default" to crtProp__5["appParameter"])))
+        ), "default" to crtProp__4["lineHeight"]), "align" to _uM("type" to "String", "default" to crtProp__4["align"]), "wordWrap" to _uM("type" to "String", "default" to crtProp__4["wordWrap"]), "lang" to _uM("type" to "String", "default" to crtProp__4["lang"]), "sessionFrom" to _uM("type" to "String", "default" to crtProp__4["sessionFrom"]), "sendMessageTitle" to _uM("type" to "String", "default" to crtProp__4["sendMessageTitle"]), "sendMessagePath" to _uM("type" to "String", "default" to crtProp__4["sendMessagePath"]), "sendMessageImg" to _uM("type" to "String", "default" to crtProp__4["sendMessageImg"]), "showMessageCard" to _uM("type" to "Boolean", "default" to crtProp__4["showMessageCard"]), "appParameter" to _uM("type" to "String", "default" to crtProp__4["appParameter"])))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

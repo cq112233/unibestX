@@ -285,7 +285,7 @@ open class GenUniModulesUviewUltraComponentsUpReadMoreUpReadMore : VueComponent 
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("up-read-more__content" to _pS(_uM("overflow" to "hidden", "fontSize" to 15, "textAlign" to "left")), "up-read-more__toggle" to _pS(_uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "position" to "relative")), "up-read-more__toggle__text" to _pS(_uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "justifyContent" to "center", "marginTop" to 5)))
+                return _uM("up-read-more__content" to _pS(_uM("overflow" to "hidden")), "up-read-more__toggle" to _pS(_uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "position" to "relative")), "up-read-more__toggle__text" to _pS(_uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "justifyContent" to "center", "marginTop" to 5)))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()
@@ -296,16 +296,16 @@ open class GenUniModulesUviewUltraComponentsUpReadMoreUpReadMore : VueComponent 
         ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "showHeight" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__11["showHeight"]), "toggle" to _uM("type" to "Boolean", "default" to crtProp__11["toggle"]), "closeText" to _uM("type" to "String", "default" to crtProp__11["closeText"]), "openText" to _uM("type" to "String", "default" to crtProp__11["openText"]), "color" to _uM("type" to "String", "default" to crtProp__11["color"]), "fontSize" to _uM("type" to _uA(
+        ), "default" to crtProp__10["showHeight"]), "toggle" to _uM("type" to "Boolean", "default" to crtProp__10["toggle"]), "closeText" to _uM("type" to "String", "default" to crtProp__10["closeText"]), "openText" to _uM("type" to "String", "default" to crtProp__10["openText"]), "color" to _uM("type" to "String", "default" to crtProp__10["color"]), "fontSize" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__11["fontSize"]), "shadowStyle" to _uM("type" to "UTSJSONObject", "default" to fun(): UTSJSONObject {
+        ), "default" to crtProp__10["fontSize"]), "shadowStyle" to _uM("type" to "UTSJSONObject", "default" to fun(): UTSJSONObject {
             return _uO("backgroundImage" to "linear-gradient(-180deg, rgba(255, 255, 255, 0) 0%, #fff 80%)", "paddingTop" to "100px", "marginTop" to "-100px")
         }
-        ), "textIndent" to _uM("type" to "String", "default" to crtProp__11["textIndent"]), "name" to _uM("type" to _uA(
+        ), "textIndent" to _uM("type" to "String", "default" to crtProp__10["textIndent"]), "name" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__11["name"])))
+        ), "default" to crtProp__10["name"])))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

@@ -265,16 +265,16 @@ open class GenUniModulesUviewUltraComponentsUpBadgeUpBadge : VueComponent {
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "isDot" to _uM("type" to "Boolean", "default" to default__26.getBoolean("badge.isDot")), "value" to _uM("type" to _uA(
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "isDot" to _uM("type" to "Boolean", "default" to default__25.getBoolean("badge.isDot")), "value" to _uM("type" to _uA(
             "Number",
             "String"
-        ), "default" to default__26.getString("badge.value")), "modelValue" to _uM("type" to _uA(
+        ), "default" to default__25.getString("badge.value")), "modelValue" to _uM("type" to _uA(
             "Number",
             "String"
-        ), "default" to default__26.getString("badge.modelValue")), "show" to _uM("type" to "Boolean", "default" to default__26.getBoolean("badge.show")), "max" to _uM("type" to _uA(
+        ), "default" to default__25.getString("badge.modelValue")), "show" to _uM("type" to "Boolean", "default" to default__25.getBoolean("badge.show")), "max" to _uM("type" to _uA(
             "Number",
             "String"
-        ), "default" to default__26.getNumber("badge.max")), "type" to _uM("type" to "String", "default" to default__26.getString("badge.type")), "showZero" to _uM("type" to "Boolean", "default" to default__26.getBoolean("badge.showZero")), "bgColor" to _uM("type" to "String", "default" to default__26.getString("badge.bgColor")), "color" to _uM("type" to "String", "default" to default__26.getString("badge.color")), "shape" to _uM("type" to "String", "default" to default__26.getString("badge.shape")), "numberType" to _uM("type" to "String", "default" to default__26.getString("badge.numberType")), "offset" to _uM("type" to "Array", "default" to default__26.getArray<Number>("badge.offset")), "inverted" to _uM("type" to "Boolean", "default" to default__26.getBoolean("badge.inverted")), "absolute" to _uM("type" to "Boolean", "default" to default__26.getBoolean("badge.absolute"))))
+        ), "default" to default__25.getNumber("badge.max")), "type" to _uM("type" to "String", "default" to default__25.getString("badge.type")), "showZero" to _uM("type" to "Boolean", "default" to default__25.getBoolean("badge.showZero")), "bgColor" to _uM("type" to "String", "default" to default__25.getString("badge.bgColor")), "color" to _uM("type" to "String", "default" to default__25.getString("badge.color")), "shape" to _uM("type" to "String", "default" to default__25.getString("badge.shape")), "numberType" to _uM("type" to "String", "default" to default__25.getString("badge.numberType")), "offset" to _uM("type" to "Array", "default" to default__25.getArray<Number>("badge.offset")), "inverted" to _uM("type" to "Boolean", "default" to default__25.getBoolean("badge.inverted")), "absolute" to _uM("type" to "Boolean", "default" to default__25.getBoolean("badge.absolute"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

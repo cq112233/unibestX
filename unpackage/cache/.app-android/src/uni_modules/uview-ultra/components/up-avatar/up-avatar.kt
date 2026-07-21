@@ -293,16 +293,16 @@ open class GenUniModulesUviewUltraComponentsUpAvatarUpAvatar : VueComponent {
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "src" to _uM("type" to "String", "default" to default__39.getString("avatar.src")), "shape" to _uM("type" to "String", "default" to default__39.getString("avatar.shape")), "size" to _uM("type" to _uA(
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "src" to _uM("type" to "String", "default" to default__38.getString("avatar.src")), "shape" to _uM("type" to "String", "default" to default__38.getString("avatar.shape")), "size" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__39.getNumber("avatar.size")), "mode" to _uM("type" to "String", "default" to default__39.getString("avatar.mode")), "text" to _uM("type" to "String", "default" to default__39.getString("avatar.text")), "bgColor" to _uM("type" to "String", "default" to default__39.getString("avatar.bgColor")), "color" to _uM("type" to "String", "default" to default__39.getString("avatar.color")), "fontSize" to _uM("type" to _uA(
+        ), "default" to default__38.getNumber("avatar.size")), "mode" to _uM("type" to "String", "default" to default__38.getString("avatar.mode")), "text" to _uM("type" to "String", "default" to default__38.getString("avatar.text")), "bgColor" to _uM("type" to "String", "default" to default__38.getString("avatar.bgColor")), "color" to _uM("type" to "String", "default" to default__38.getString("avatar.color")), "fontSize" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__39.getNumber("avatar.fontSize")), "icon" to _uM("type" to "String", "default" to default__39.getString("avatar.icon")), "mpAvatar" to _uM("type" to "Boolean", "default" to default__39.getBoolean("avatar.mpAvatar")), "randomBgColor" to _uM("type" to "Boolean", "default" to default__39.getBoolean("avatar.randomBgColor")), "defaultUrl" to _uM("type" to "String", "default" to default__39.getString("avatar.defaultUrl")), "colorIndex" to _uM("type" to _uA(
+        ), "default" to default__38.getNumber("avatar.fontSize")), "icon" to _uM("type" to "String", "default" to default__38.getString("avatar.icon")), "mpAvatar" to _uM("type" to "Boolean", "default" to default__38.getBoolean("avatar.mpAvatar")), "randomBgColor" to _uM("type" to "Boolean", "default" to default__38.getBoolean("avatar.randomBgColor")), "defaultUrl" to _uM("type" to "String", "default" to default__38.getString("avatar.defaultUrl")), "colorIndex" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__39.getString("avatar.colorIndex")), "name" to _uM("type" to "String", "default" to default__39.getString("avatar.name"))))
+        ), "default" to default__38.getString("avatar.colorIndex")), "name" to _uM("type" to "String", "default" to default__38.getString("avatar.name"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

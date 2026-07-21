@@ -67,7 +67,7 @@
 						></video>
 						<view v-if="showTitle && getItemTitle(item) != '' && testImage(getSource(item))"
 							class="up-swiper__wrapper__item__wrapper__title">
-							<text class="up-line-1">{{ getItemTitle(item) }}</text>
+							<text class="up-line-1 up-swiper__wrapper__item__wrapper__title-text">{{ getItemTitle(item) }}</text>
 						</view>
 					</view>
 				</slot>
@@ -278,9 +278,12 @@
 						bottom: 0;
 						left: 0;
 						right: 0;
-						font-size: 28rpx;
 						padding: 12rpx 24rpx;
-						color: #FFFFFF;
+
+						&-text {
+							font-size: 28rpx;
+							color: #FFFFFF;
+						}
 					}
 				}
 			}

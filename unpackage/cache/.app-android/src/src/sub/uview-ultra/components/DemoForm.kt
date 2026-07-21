@@ -147,48 +147,13 @@ open class GenSrcSubUviewUltraComponentsDemoForm : VueComponent {
             val rateValue = ref(3)
             val numberValue = ref(1)
             val formModel = reactive(_uO("name" to "楼兰", "gender" to "", "age" to "0", "fruit" to "apple", "hobbies" to _uA<String>(), "intro" to "", "stayTime" to "", "code" to "", "birthday" to ""))
-            val formRules: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("formRules", "src/sub/uview-ultra/components/DemoForm.uvue", 337, 7), "name" to _uA(
+            val formRules: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("formRules", "src/sub/uview-ultra/components/DemoForm.uvue", 290, 7), "name" to _uA(
                 _uO("required" to true, "message" to "请填写姓名", "trigger" to _uA(
                     "blur",
                     "change"
                 ))
             ), "gender" to _uA(
                 _uO("required" to true, "message" to "请选择性别", "trigger" to _uA(
-                    "blur",
-                    "change"
-                ))
-            ), "age" to _uA(
-                _uO("required" to true, "message" to "请输入年龄", "trigger" to _uA(
-                    "blur",
-                    "change"
-                ))
-            ), "fruit" to _uA(
-                _uO("required" to true, "message" to "请选择水果", "trigger" to _uA(
-                    "blur",
-                    "change"
-                ))
-            ), "hobbies" to _uA(
-                _uO("type" to "array", "required" to true, "message" to "请选择兴趣爱好", "trigger" to _uA(
-                    "blur",
-                    "change"
-                ))
-            ), "intro" to _uA(
-                _uO("required" to true, "message" to "请填写简介", "trigger" to _uA(
-                    "blur",
-                    "change"
-                ))
-            ), "stayTime" to _uA(
-                _uO("required" to true, "message" to "请选择住店时间", "trigger" to _uA(
-                    "blur",
-                    "change"
-                ))
-            ), "code" to _uA(
-                _uO("required" to true, "message" to "请填写验证码", "trigger" to _uA(
-                    "blur",
-                    "change"
-                ))
-            ), "birthday" to _uA(
-                _uO("required" to true, "message" to "请选择生日", "trigger" to _uA(
                     "blur",
                     "change"
                 ))
@@ -201,7 +166,7 @@ open class GenSrcSubUviewUltraComponentsDemoForm : VueComponent {
                         uni_showToast(ShowToastOptions(title = "验证通过", icon = "success"))
                     }
                     ).`catch`(fun(err: Any?){
-                        console.log("validate err:", err, " at src/sub/uview-ultra/components/DemoForm.uvue:415")
+                        console.log("validate err:", err, " at src/sub/uview-ultra/components/DemoForm.uvue:318")
                     }
                     )
                 }
@@ -244,7 +209,7 @@ open class GenSrcSubUviewUltraComponentsDemoForm : VueComponent {
             }
             val openKeyboard = ::gen_openKeyboard_fn
             fun gen_onKeyboardChange_fn(kVal: String): Unit {
-                console.log(kVal, "val", " at src/sub/uview-ultra/components/DemoForm.uvue:464")
+                console.log(kVal, "val", " at src/sub/uview-ultra/components/DemoForm.uvue:367")
                 keyboardValue.value = keyboardValue.value + kVal
             }
             val onKeyboardChange = ::gen_onKeyboardChange_fn
@@ -334,9 +299,8 @@ open class GenSrcSubUviewUltraComponentsDemoForm : VueComponent {
                 val _component_up_number_box = resolveEasyComponent("up-number-box", GenUniModulesUviewUltraComponentsUpNumberBoxUpNumberBoxClass)
                 val _component_up_form_item = resolveEasyComponent("up-form-item", GenUniModulesUviewUltraComponentsUpFormItemUpFormItemClass)
                 val _component_up_icon = resolveEasyComponent("up-icon", GenUniModulesUviewUltraComponentsUpIconUpIconClass)
-                val _component_up_textarea = resolveEasyComponent("up-textarea", GenUniModulesUviewUltraComponentsUpTextareaUpTextareaClass)
-                val _component_up_button = resolveEasyComponent("up-button", GenUniModulesUviewUltraComponentsUpButtonUpButtonClass)
                 val _component_up_form = resolveEasyComponent("up-form", GenUniModulesUviewUltraComponentsUpFormUpFormClass)
+                val _component_up_button = resolveEasyComponent("up-button", GenUniModulesUviewUltraComponentsUpButtonUpButtonClass)
                 val _component_up_upload = resolveEasyComponent("up-upload", GenUniModulesUviewUltraComponentsUpUploadUpUploadClass)
                 val _component_up_divider = resolveEasyComponent("up-divider", GenUniModulesUviewUltraComponentsUpDividerUpDividerClass)
                 val _component_up_calendar = resolveEasyComponent("up-calendar", GenUniModulesUviewUltraComponentsUpCalendarUpCalendarClass)
@@ -362,9 +326,7 @@ open class GenSrcSubUviewUltraComponentsDemoForm : VueComponent {
                         , "placeholder" to "请输入密码", "password" to true, "border" to "surround"), null, 8, _uA(
                             "modelValue",
                             "onUpdate:modelValue"
-                        )),
-                        _cE("view", _uM("class" to "h-10px")),
-                        _cV(_component_up_input, _uM("placeholder" to "带图标", "prefix-icon" to "search", "border" to "surround"))
+                        ))
                     )),
                     _cE("view", _uM("class" to "demo-block"), _uA(
                         _cE("text", _uM("class" to "demo-label"), " up-search "),
@@ -393,11 +355,7 @@ open class GenSrcSubUviewUltraComponentsDemoForm : VueComponent {
                             , "active-color" to "#fa3534"), null, 8, _uA(
                                 "modelValue",
                                 "onUpdate:modelValue"
-                            )),
-                            _cE("view", _uM("class" to "w-20px")),
-                            _cV(_component_up_switch, _uM("disabled" to true)),
-                            _cE("view", _uM("class" to "w-20px")),
-                            _cV(_component_up_switch, _uM("loading" to true))
+                            ))
                         ))
                     )),
                     _cE("view", _uM("class" to "demo-block"), _uA(
@@ -408,8 +366,7 @@ open class GenSrcSubUviewUltraComponentsDemoForm : VueComponent {
                         , "placement" to "row"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                             return _uA(
                                 _cV(_component_up_checkbox, _uM("name" to "apple", "label" to "苹果", "checked" to true)),
-                                _cV(_component_up_checkbox, _uM("name" to "banana", "label" to "香蕉")),
-                                _cV(_component_up_checkbox, _uM("name" to "orange", "label" to "橙子"))
+                                _cV(_component_up_checkbox, _uM("name" to "banana", "label" to "香蕉"))
                             )
                         }
                         ), "_" to 1), 8, _uA(
@@ -509,135 +466,6 @@ open class GenSrcSubUviewUltraComponentsDemoForm : VueComponent {
                                 }
                                 ), "_" to 1), 8, _uA(
                                     "onClick"
-                                )),
-                                _cV(_component_up_form_item, _uM("label" to "年龄", "prop" to "age", "border-bottom" to true), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                    return _uA(
-                                        _cV(_component_up_input, _uM("modelValue" to formModel["age"], "onUpdate:modelValue" to fun(`$event`: Any?){
-                                            formModel["age"] = `$event`
-                                        }
-                                        , "type" to "number", "placeholder" to "请输入年龄", "border" to "none", "custom-style" to _uO("backgroundColor" to "#f2f3f5", "padding" to "4px 10px", "borderRadius" to "4px", "width" to "100%")), null, 8, _uA(
-                                            "modelValue",
-                                            "onUpdate:modelValue"
-                                        ))
-                                    )
-                                }
-                                ), "_" to 1)),
-                                _cV(_component_up_form_item, _uM("label" to "水果", "prop" to "fruit", "border-bottom" to true), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                    return _uA(
-                                        _cV(_component_up_radio_group, _uM("modelValue" to formModel["fruit"], "onUpdate:modelValue" to fun(`$event`: Any?){
-                                            formModel["fruit"] = `$event`
-                                        }
-                                        , "placement" to "row"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                            return _uA(
-                                                _cV(_component_up_radio, _uM("name" to "apple", "label" to "苹果", "shape" to "circle")),
-                                                _cV(_component_up_radio, _uM("name" to "banana", "label" to "香蕉", "shape" to "circle")),
-                                                _cV(_component_up_radio, _uM("name" to "orange", "label" to "毒橙子", "shape" to "circle"))
-                                            )
-                                        }
-                                        ), "_" to 1), 8, _uA(
-                                            "modelValue",
-                                            "onUpdate:modelValue"
-                                        ))
-                                    )
-                                }
-                                ), "_" to 1)),
-                                _cV(_component_up_form_item, _uM("label" to "兴趣爱好", "prop" to "hobbies", "border-bottom" to true), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                    return _uA(
-                                        _cV(_component_up_checkbox_group, _uM("modelValue" to formModel["hobbies"], "onUpdate:modelValue" to fun(`$event`: Any?){
-                                            formModel["hobbies"] = `$event`
-                                        }
-                                        , "placement" to "row"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                            return _uA(
-                                                _cV(_component_up_checkbox, _uM("name" to "badminton", "label" to "羽毛球")),
-                                                _cV(_component_up_checkbox, _uM("name" to "running", "label" to "跑步")),
-                                                _cV(_component_up_checkbox, _uM("name" to "climbing", "label" to "爬山"))
-                                            )
-                                        }
-                                        ), "_" to 1), 8, _uA(
-                                            "modelValue",
-                                            "onUpdate:modelValue"
-                                        ))
-                                    )
-                                }
-                                ), "_" to 1)),
-                                _cV(_component_up_form_item, _uM("label" to "简介", "prop" to "intro", "border-bottom" to true), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                    return _uA(
-                                        _cV(_component_up_textarea, _uM("modelValue" to formModel["intro"], "onUpdate:modelValue" to fun(`$event`: Any?){
-                                            formModel["intro"] = `$event`
-                                        }
-                                        , "placeholder" to "不低于3个字", "count" to "", "maxlength" to "140", "height" to "80px"), null, 8, _uA(
-                                            "modelValue",
-                                            "onUpdate:modelValue"
-                                        ))
-                                    )
-                                }
-                                ), "_" to 1)),
-                                _cV(_component_up_form_item, _uM("label" to "住店时间", "prop" to "stayTime", "border-bottom" to true, "onClick" to fun(){
-                                    calendarShow.value = true
-                                }
-                                ), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                    return _uA(
-                                        _cE("view", _uM("class" to "flex-row items-center justify-between w-full"), _uA(
-                                            _cE("text", _uM("class" to _nC(_uA(
-                                                "text-15px",
-                                                if (formModel["stayTime"] == "") {
-                                                    "text-__c0c4cc_"
-                                                } else {
-                                                    "text-__303133_"
-                                                }
-                                            ))), _tD(if (formModel["stayTime"] != "") {
-                                                formModel["stayTime"]
-                                            } else {
-                                                "请选择住店和离店时间"
-                                            }
-                                            ), 3),
-                                            _cV(_component_up_icon, _uM("name" to "arrow-right", "color" to "#c0c4cc", "size" to "16"))
-                                        ))
-                                    )
-                                }
-                                ), "_" to 1), 8, _uA(
-                                    "onClick"
-                                )),
-                                _cV(_component_up_form_item, _uM("label" to "验证码", "prop" to "code", "border-bottom" to true), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                    return _uA(
-                                        _cE("view", _uM("class" to "flex-row items-center justify-between w-full"), _uA(
-                                            _cV(_component_up_input, _uM("modelValue" to formModel["code"], "onUpdate:modelValue" to fun(`$event`: Any?){
-                                                formModel["code"] = `$event`
-                                            }
-                                            , "placeholder" to "请填写验证码", "border" to "none", "class" to "flex-1"), null, 8, _uA(
-                                                "modelValue",
-                                                "onUpdate:modelValue"
-                                            )),
-                                            _cV(_component_up_button, _uM("type" to "success", "text" to "获取验证码", "size" to "mini", "custom-style" to _uO("backgroundColor" to "#4cd964", "border" to "none", "color" to "#fff", "marginLeft" to "10px")))
-                                        ))
-                                    )
-                                }
-                                ), "_" to 1)),
-                                _cV(_component_up_form_item, _uM("label" to "生日", "prop" to "birthday", "border-bottom" to true, "onClick" to fun(){
-                                    datetimePickerShow.value = true
-                                }
-                                ), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                    return _uA(
-                                        _cE("view", _uM("class" to "flex-row items-center justify-between w-full"), _uA(
-                                            _cE("text", _uM("class" to _nC(_uA(
-                                                "text-15px",
-                                                if (formModel["birthday"] == "") {
-                                                    "text-__c0c4cc_"
-                                                } else {
-                                                    "text-__303133_"
-                                                }
-                                            ))), _tD(if (formModel["birthday"] != "") {
-                                                formModel["birthday"]
-                                            } else {
-                                                "请选择生日"
-                                            }
-                                            ), 3),
-                                            _cV(_component_up_icon, _uM("name" to "arrow-right", "color" to "#c0c4cc", "size" to "16"))
-                                        ))
-                                    )
-                                }
-                                ), "_" to 1), 8, _uA(
-                                    "onClick"
                                 ))
                             )
                         }
@@ -701,13 +529,6 @@ open class GenSrcSubUviewUltraComponentsDemoForm : VueComponent {
                             _cE("view", _uM("class" to "w-10px")),
                             _cV(_component_up_button, _uM("type" to "primary", "text" to "身份证键盘", "size" to "mini", "onClick" to fun(){
                                 openKeyboard("card")
-                            }
-                            ), null, 8, _uA(
-                                "onClick"
-                            )),
-                            _cE("view", _uM("class" to "w-10px")),
-                            _cV(_component_up_button, _uM("type" to "primary", "text" to "车牌号键盘", "size" to "mini", "onClick" to fun(){
-                                openKeyboard("car")
                             }
                             ), null, 8, _uA(
                                 "onClick"

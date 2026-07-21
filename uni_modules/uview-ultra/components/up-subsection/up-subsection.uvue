@@ -226,11 +226,11 @@ export default {
 			const item = this.list[index];
 			const activeColorTemp =
 				typeof item == 'object' && item != null
-					? ((item as UTSJSONObject)[this.activeColorKeyName] as string)
+					? (((item as UTSJSONObject)[this.activeColorKeyName] ?? '') as string)
 					: '';
 			const inactiveColorTemp =
 				typeof item === 'object' && item != null
-					? ((item as UTSJSONObject)[this.inactiveColorKeyName] as string)
+					? (((item as UTSJSONObject)[this.inactiveColorKeyName] ?? '') as string)
 					: '';
 			// subsection模式下，激活时默认为白色的文字
 			if (this.mode === "subsection") {

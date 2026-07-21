@@ -508,16 +508,18 @@ open class GenUniModulesUviewUltraComponentsUpSwipeActionItemUpSwipeActionItem :
             if (moveX < 0) {
                 moveX = 0
             }
-            if (moveX > this.state["buttonsWidth"] as Number) {
-                moveX = this.state["buttonsWidth"] as Number
+            val btnW = (this.state["buttonsWidth"] ?: 0) as Number
+            if (moveX > btnW) {
+                moveX = btnW
             }
-            this.moveSwipeAction(0 - this.state["buttonsWidth"] as Number + moveX)
+            this.moveSwipeAction(0 - btnW + moveX)
         } else {
             if (moveX > 0) {
                 moveX = 0
             }
-            if (Math.abs(moveX) > this.state["buttonsWidth"] as Number) {
-                moveX = 0 - this.state["buttonsWidth"] as Number
+            val btnW = (this.state["buttonsWidth"] ?: 0) as Number
+            if (Math.abs(moveX) > btnW) {
+                moveX = 0 - btnW
             }
             this.moveSwipeAction(moveX)
         }
@@ -604,7 +606,7 @@ open class GenUniModulesUviewUltraComponentsUpSwipeActionItemUpSwipeActionItem :
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("up-swipe-action-item" to _pS(_uM("position" to "relative", "overflow" to "hidden", "display" to "flex", "flexDirection" to "column")), "up-swipe-action-item__content" to _pS(_uM("transform" to "translateX(0px)", "backgroundColor" to "#FFFFFF", "zIndex" to 10, "width" to "100%", "flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")), "up-swipe-action-item__right" to _pS(_uM("position" to "absolute", "top" to 0, "bottom" to 0, "right" to 0, "display" to "flex", "flexDirection" to "row", "zIndex" to 1)), "up-swipe-action-item__right__button" to _pS(_uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "overflow" to "hidden", "alignItems" to "center")), "up-swipe-action-item__right__button__wrapper" to _pS(_uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "justifyContent" to "center", "paddingTop" to 0, "paddingRight" to 15, "paddingBottom" to 0, "paddingLeft" to 15)), "up-swipe-action-item__right__button__wrapper--primary" to _pS(_uM("backgroundColor" to "var(--theme-color, #0957de)")), "up-swipe-action-item__right__button__wrapper__text" to _pS(_uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "color" to "#FFFFFF", "fontSize" to 15, "textAlign" to "center", "justifyContent" to "center")))
+                return _uM("up-swipe-action-item" to _pS(_uM("position" to "relative", "overflow" to "hidden", "display" to "flex", "flexDirection" to "column")), "up-swipe-action-item__content" to _pS(_uM("transform" to "translateX(0px)", "backgroundColor" to "#FFFFFF", "zIndex" to 10, "width" to "100%", "flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")), "up-swipe-action-item__right" to _pS(_uM("position" to "absolute", "top" to 0, "bottom" to 0, "right" to 0, "display" to "flex", "flexDirection" to "row", "zIndex" to 1)), "up-swipe-action-item__right__button" to _pS(_uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "overflow" to "hidden", "alignItems" to "center")), "up-swipe-action-item__right__button__wrapper" to _pS(_uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "justifyContent" to "center", "paddingTop" to 0, "paddingRight" to 15, "paddingBottom" to 0, "paddingLeft" to 15)), "up-swipe-action-item__right__button__wrapper--primary" to _pS(_uM("backgroundColor" to "var(--theme-color, #0957de)")), "up-swipe-action-item__right__button__wrapper__text" to _pS(_uM("color" to "#FFFFFF", "fontSize" to 15, "textAlign" to "center")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()
@@ -612,13 +614,13 @@ open class GenUniModulesUviewUltraComponentsUpSwipeActionItemUpSwipeActionItem :
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "show" to _uM("type" to "Boolean", "default" to crtProp__15["show"]), "closeOnClick" to _uM("type" to "Boolean", "default" to crtProp__15["closeOnClick"]), "name" to _uM("type" to _uA(
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "show" to _uM("type" to "Boolean", "default" to crtProp__14["show"]), "closeOnClick" to _uM("type" to "Boolean", "default" to crtProp__14["closeOnClick"]), "name" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__15["name"]), "disabled" to _uM("type" to "Boolean", "default" to crtProp__15["disabled"]), "autoClose" to _uM("type" to "Boolean", "default" to crtProp__15["autoClose"]), "threshold" to _uM("type" to "Number", "default" to crtProp__15["threshold"]), "options" to _uM("type" to "Array", "default" to crtProp__15["options"]), "duration" to _uM("type" to _uA(
+        ), "default" to crtProp__14["name"]), "disabled" to _uM("type" to "Boolean", "default" to crtProp__14["disabled"]), "autoClose" to _uM("type" to "Boolean", "default" to crtProp__14["autoClose"]), "threshold" to _uM("type" to "Number", "default" to crtProp__14["threshold"]), "options" to _uM("type" to "Array", "default" to crtProp__14["options"]), "duration" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__15["duration"])))
+        ), "default" to crtProp__14["duration"])))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

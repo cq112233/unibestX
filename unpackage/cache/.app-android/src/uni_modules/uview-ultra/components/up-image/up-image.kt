@@ -314,52 +314,52 @@ open class GenUniModulesUviewUltraComponentsUpImageUpImage : VueComponent {
             "Object",
             "String"
         ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "src" to _uM("type" to "String", "default" to fun(): String? {
-            return default__43.getString("image.src")
+            return default__41.getString("image.src")
         }
         ), "mode" to _uM("type" to "String", "default" to fun(): String? {
-            return default__43.getString("image.mode")
+            return default__41.getString("image.mode")
         }
         ), "width" to _uM("type" to "String", "default" to fun(): String? {
-            return default__43.getString("image.width")
+            return default__41.getString("image.width")
         }
         ), "height" to _uM("type" to "String", "default" to fun(): String? {
-            return default__43.getString("image.height")
+            return default__41.getString("image.height")
         }
         ), "shape" to _uM("type" to "String", "default" to fun(): String? {
-            return default__43.getString("image.shape")
+            return default__41.getString("image.shape")
         }
         ), "radius" to _uM("type" to "String", "default" to fun(): String? {
-            return default__43.getString("image.radius")
+            return default__41.getString("image.radius")
         }
         ), "lazyLoad" to _uM("type" to "Boolean", "default" to fun(): Boolean? {
-            return default__43.getBoolean("image.lazyLoad")
+            return default__41.getBoolean("image.lazyLoad")
         }
         ), "showMenuByLongpress" to _uM("type" to "Boolean", "default" to fun(): Boolean? {
-            return default__43.getBoolean("image.showMenuByLongpress")
+            return default__41.getBoolean("image.showMenuByLongpress")
         }
         ), "loadingIcon" to _uM("type" to "String", "default" to fun(): String? {
-            return default__43.getString("image.loadingIcon")
+            return default__41.getString("image.loadingIcon")
         }
         ), "errorIcon" to _uM("type" to "String", "default" to fun(): String? {
-            return default__43.getString("image.errorIcon")
+            return default__41.getString("image.errorIcon")
         }
         ), "showLoading" to _uM("type" to "Boolean", "default" to fun(): Boolean? {
-            return default__43.getBoolean("image.showLoading")
+            return default__41.getBoolean("image.showLoading")
         }
         ), "showError" to _uM("type" to "Boolean", "default" to fun(): Boolean? {
-            return default__43.getBoolean("image.showError")
+            return default__41.getBoolean("image.showError")
         }
         ), "fade" to _uM("type" to "Boolean", "default" to fun(): Boolean? {
-            return default__43.getBoolean("image.fade")
+            return default__41.getBoolean("image.fade")
         }
         ), "webp" to _uM("type" to "Boolean", "default" to fun(): Boolean? {
-            return default__43.getBoolean("image.webp")
+            return default__41.getBoolean("image.webp")
         }
         ), "duration" to _uM("type" to "Number", "default" to fun(): Number? {
-            return default__43.getNumber("image.duration")
+            return default__41.getNumber("image.duration")
         }
         ), "bgColor" to _uM("type" to "String", "default" to fun(): String? {
-            return default__43.getString("image.bgColor")
+            return default__41.getString("image.bgColor")
         }
         )))
         var propsNeedCastKeys = _uA(

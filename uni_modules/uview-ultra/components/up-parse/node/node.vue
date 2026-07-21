@@ -1,6 +1,6 @@
 <template>
   <view :id="attrs.id" :class="'_block _'+name+' '+attrs.class" :style="attrs.style">
-    <block v-for="(n, i) in childs" v-bind:key="i">
+    <template v-for="(n, i) in childs" v-bind:key="i">
       <!-- 图片 -->
       <!-- 占位图 -->
       <image v-if="n.name==='img'&&!n.t&&((opts[1]&&!ctrl[i])||ctrl[i]<0)" class="_img" :style="n.attrs.style" :src="ctrl[i]<0?opts[2]:opts[1]" mode="widthFix" />
@@ -45,11 +45,13 @@
       <!-- 音频 -->
       <audio v-else-if="n.name==='audio'" :id="n.attrs.id" :class="n.attrs.class" :style="n.attrs.style" :author="n.attrs.author" :controls="n.attrs.controls" :loop="n.attrs.loop" :name="n.attrs.name" :poster="n.attrs.poster" :src="n.src[ctrl[i]||0]" :data-i="i" @play="play" @error="mediaError" />
       <!-- #endif -->
-      <view v-else-if="(n.name==='table'&&n.c)||n.name==='li'" :id="n.attrs.id" :class="'_'+n.name+' '+n.attrs.class" :style="n.attrs.style">
-        <node v-if="n.name==='li'" :childs="n.children" :opts="opts" />
+      <view v-else-if="n.name==='table'" :id="n.attrs.id" :class="'_table '+n.attrs.class" :style="n.attrs.style">
+        <view v-if="n.c" :class="'_tag _'+n.name">
+          <node v-for="(node, index) in n.children" v-bind:key="index" :childs="node.children" :opts="opts" />
+        </view>
         <view v-else v-for="(tbody, x) in n.children" v-bind:key="x" :class="'_'+tbody.name+' '+tbody.attrs.class" :style="tbody.attrs.style">
           <node v-if="tbody.name==='td'||tbody.name==='th'" :childs="tbody.children" :opts="opts" />
-          <block v-else v-for="(tr, y) in tbody.children" v-bind:key="y">
+          <template v-else v-for="(tr, y) in tbody.children" v-bind:key="y">
             <view v-if="tr.name==='td'||tr.name==='th'" :class="'_'+tr.name+' '+tr.attrs.class" :style="tr.attrs.style">
               <node :childs="tr.children" :opts="opts" />
             </view>
@@ -58,7 +60,7 @@
                 <node :childs="td.children" :opts="opts" />
               </view>
             </view>
-          </block>
+          </template>
         </view>
       </view>
 
@@ -74,7 +76,7 @@
         <node v-for="(n2, j) in n.children" v-bind:key="j" :style="n2.f" :name="n2.name" :attrs="n2.attrs" :childs="n2.children" :opts="opts" />
       </view>
       <node v-else :style="n.f" :name="n.name" :attrs="n.attrs" :childs="n.children" :opts="opts" />
-    </block>
+    </template>
   </view>
 </template>
 <script module="handler" lang="wxs">

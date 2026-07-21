@@ -223,16 +223,16 @@ open class GenUniModulesUviewUltraComponentsUpNoticeBarUpNoticeBar : VueComponen
         ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "text" to _uM("type" to _uA(
             "Array",
             "String"
-        ), "default" to crtProp__26["text"]), "direction" to _uM("type" to "String", "default" to crtProp__26["direction"]), "step" to _uM("type" to "Boolean", "default" to crtProp__26["step"]), "icon" to _uM("type" to "String", "default" to crtProp__26["icon"]), "mode" to _uM("type" to "String", "default" to crtProp__26["mode"]), "color" to _uM("type" to "String", "default" to crtProp__26["color"]), "bgColor" to _uM("type" to "String", "default" to crtProp__26["bgColor"]), "speed" to _uM("type" to _uA(
+        ), "default" to crtProp__25["text"]), "direction" to _uM("type" to "String", "default" to crtProp__25["direction"]), "step" to _uM("type" to "Boolean", "default" to crtProp__25["step"]), "icon" to _uM("type" to "String", "default" to crtProp__25["icon"]), "mode" to _uM("type" to "String", "default" to crtProp__25["mode"]), "color" to _uM("type" to "String", "default" to crtProp__25["color"]), "bgColor" to _uM("type" to "String", "default" to crtProp__25["bgColor"]), "speed" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__26["speed"]), "fontSize" to _uM("type" to _uA(
+        ), "default" to crtProp__25["speed"]), "fontSize" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__26["fontSize"]), "duration" to _uM("type" to _uA(
+        ), "default" to crtProp__25["fontSize"]), "duration" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__26["duration"]), "disableTouch" to _uM("type" to "Boolean", "default" to crtProp__26["disableTouch"]), "url" to _uM("type" to "String", "default" to crtProp__26["url"]), "linkType" to _uM("type" to "String", "default" to crtProp__26["linkType"])))
+        ), "default" to crtProp__25["duration"]), "disableTouch" to _uM("type" to "Boolean", "default" to crtProp__25["disableTouch"]), "url" to _uM("type" to "String", "default" to crtProp__25["url"]), "linkType" to _uM("type" to "String", "default" to crtProp__25["linkType"])))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

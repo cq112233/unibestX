@@ -373,7 +373,7 @@ open class GenUniModulesUviewUltraComponentsUpCarKeyboardUpCarKeyboard : VueComp
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "random" to _uM("type" to "Boolean", "default" to default__85.getBoolean("carKeyboard.random")), "autoChange" to _uM("type" to "Boolean", "default" to default__85.getBoolean("carKeyboard.autoChange"))))
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "random" to _uM("type" to "Boolean", "default" to default__83.getBoolean("carKeyboard.random")), "autoChange" to _uM("type" to "Boolean", "default" to default__83.getBoolean("carKeyboard.autoChange"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",
