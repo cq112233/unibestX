@@ -268,8 +268,8 @@ const DemoShow_uvue_vue_type_style_index_0_dataScoped_h0eae419ig1ju28uqps_lang =
 
 const DemoShow_uvue_vue_type_style_index_1_dataScoped_h0eae419ig1ju28uqps_lang = {};
 
-const uviewUltra_uvue_vue_type_style_index_0_dataScoped_6oc930k5dg1ju28rru5_lang = {};
+const uviewUltra_uvue_vue_type_style_index_0_dataScoped_n9lbnh85bg1ju293bot_lang = {};
 
-const uviewUltra_uvue_vue_type_style_index_1_dataScoped_6oc930k5dg1ju28rru5_lang = {};
+const uviewUltra_uvue_vue_type_style_index_1_dataScoped_n9lbnh85bg1ju293bot_lang = {};
 
 const App_uvue_vue_type_style_index_0_lang = {};

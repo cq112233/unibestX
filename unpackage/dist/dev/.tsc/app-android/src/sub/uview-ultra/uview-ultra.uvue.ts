@@ -82,7 +82,7 @@ onMounted(() => {
 
 function onScroll(e: UniScrollEvent): void {
   const currentScrollTop = e.detail.scrollTop
-  console.log('scroll-view scrollTop:', currentScrollTop, " at src/sub/uview-ultra/uview-ultra.uvue:910")
+
   scrollTop.value = currentScrollTop
 }
 function onBackTopClick(): void {
