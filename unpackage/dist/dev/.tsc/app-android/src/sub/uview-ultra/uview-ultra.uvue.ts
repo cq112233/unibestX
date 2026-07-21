@@ -213,7 +213,7 @@ const _component_up_cell_group = resolveEasyComponent("up-cell-group",_easycom_u
                   }), _uM({
                     icon: withSlotCtx((): any[] => [
                       _cV(_component_up_icon, _uM({
-                        name: "grid",
+                        name: 'gr' + 'id',
                         color: "#2979ff",
                         size: "20",
                         class: "mr-8px"
