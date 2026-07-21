@@ -5,7 +5,7 @@
 	    class="up-back-top"
 	    @click="backToTop"
 	>
-		<block v-if="$slots['default'] == null && $slots['$default'] == null">
+		<template v-if="$slots['default'] == null && $slots['$default'] == null">
 			<up-icon
 			    :name="icon"
 			    :custom-style="iconStyle"
@@ -14,7 +14,7 @@
 			    v-if="text"
 			    class="up-back-top__text"
 			>{{text}}</text>
-		</block>
+		</template>
 		<slot v-else></slot>
 	</view>
 </template>
@@ -125,7 +125,10 @@
 	function backToTop(e: any) {
 		uni.pageScrollTo({
 			scrollTop: 0,
-			duration: parseInt(prop.duration.toString())
+			duration: parseInt(prop.duration.toString()),
+			fail: (_err) => {
+				// 在 scroll-view 内使用时 pageScrollTo 不生效，由外部 @click 事件自行处理滚动
+			}
 		});
 		emit('click', e)
 	}

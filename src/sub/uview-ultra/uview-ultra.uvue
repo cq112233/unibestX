@@ -8,7 +8,38 @@
     ></NavBar>
 
     <scroll-view :scroll-y="true" direction="vertical" :style="{ height: `${scrollHeight}px` }" :scroll-top="scrollViewScrollTop" :scroll-with-animation="true" @scroll="onScroll">
+      <image src="/static/logo.png" style="width: 60px; height: 60px;"></image>
+      <image src="/static/logo.png" style="width: 60px; height: 60px;"></image>
+      <DemoShow />
+
       <ThemeSwitchCard />
+
+      <!-- Swiper 轮播图 -->
+      <up-swiper
+        :list="swiperList"
+        key-name="image"
+        :indicator="true"
+        indicator-mode="dot"
+        :circular="true"
+        :autoplay="true"
+        :interval="3000"
+        height="180"
+        :show-title="true"
+      ></up-swiper>
+
+      <!-- Image 图片 -->
+      <view class="demo-block">
+        <text class="demo-label">
+          up-image
+        </text>
+        <view class="demo-row-start">
+          <up-image src="/static/logo.png" width="60px" height="60px"></up-image>
+          <view class="w-15px"></view>
+          <up-image src="/static/logo.png" width="60px" height="60px" shape="circle"></up-image>
+          <view class="w-15px"></view>
+          <image src="/static/logo.png" style="width: 60px; height: 60px;" mode="aspectFill"></image>
+        </view>
+      </view>
 
       <!-- ==================== Pagination 分页器（置顶方便调试） ==================== -->
       <view class="demo-block">
@@ -36,17 +67,6 @@
           next-text="下一页"
           @current-change="onPaginationCurrentChange2"
         ></up-pagination>
-
-        <!-- 3. 仅一页时隐藏 -->
-        <text class="demo-sub-label mt-15px">3. 仅一页时隐藏（hideOnSinglePage）</text>
-        <up-pagination
-          :current-page="paginationCurrentPage3"
-          :page-size="10"
-          :total="5"
-          :hide-on-single-page="true"
-          @current-change="onPaginationCurrentChange3"
-        ></up-pagination>
-        <text class="text-12px text-[#909399] mt-4px">total=5, pageSize=10 → 只有 1 页，分页器自动隐藏</text>
       </view>
 
       <!-- ==================== Copy 复制（置顶方便查看） ==================== -->
@@ -66,22 +86,6 @@
         <view class="demo-row-start">
           <up-copy content="uview-ultra is great !" @success="onCopySuccess">
             <up-button type="primary" text="点击复制" size="mini"></up-button>
-          </up-copy>
-        </view>
-
-        <!-- 3. 不同提示样式 -->
-        <text class="demo-sub-label mt-15px">3. 不同提示样式（toast / modal / notice）</text>
-        <view class="demo-row-start">
-          <up-copy content="复制的内容 toast" alert-style="toast" @success="onCopySuccess">
-            <up-button type="primary" text="toast 提示" size="mini"></up-button>
-          </up-copy>
-          <view class="w-15px"></view>
-          <up-copy content="复制的内容 modal" alert-style="modal" @success="onCopySuccess">
-            <up-button type="success" text="modal 提示" size="mini"></up-button>
-          </up-copy>
-          <view class="w-15px"></view>
-          <up-copy content="复制的内容 notice" alert-style="notice" @success="onCopySuccess">
-            <up-button type="warning" text="notice 提示" size="mini"></up-button>
           </up-copy>
         </view>
       </view>
@@ -111,12 +115,6 @@
             <up-td>24</up-td>
             <up-td>北京</up-td>
           </up-tr>
-          <up-tr>
-            <up-td>复旦大学</up-td>
-            <up-td>12班</up-td>
-            <up-td>21</up-td>
-            <up-td>上海</up-td>
-          </up-tr>
         </up-table>
 
         <!-- 2. 自定义样式 -->
@@ -131,96 +129,6 @@
             <up-td>张三</up-td>
             <up-td>前端开发</up-td>
             <up-td>技术部</up-td>
-          </up-tr>
-          <up-tr>
-            <up-td>李四</up-td>
-            <up-td>产品经理</up-td>
-            <up-td>产品部</up-td>
-          </up-tr>
-        </up-table>
-
-        <!-- 3. 自定义 th 表头样式 -->
-        <text class="demo-sub-label mt-15px">3. 自定义 th 表头样式（thStyle）</text>
-        <up-table :th-style="{ backgroundColor: '#19be6b', color: '#ffffff', fontWeight: 'bold' }">
-          <up-tr>
-            <up-th>商品</up-th>
-            <up-th>价格</up-th>
-            <up-th>销量</up-th>
-            <up-th>状态</up-th>
-          </up-tr>
-          <up-tr>
-            <up-td>苹果</up-td>
-            <up-td>¥5.8</up-td>
-            <up-td>1280</up-td>
-            <up-td>在售</up-td>
-          </up-tr>
-          <up-tr>
-            <up-td>香蕉</up-td>
-            <up-td>¥3.2</up-td>
-            <up-td>2560</up-td>
-            <up-td>在售</up-td>
-          </up-tr>
-          <up-tr>
-            <up-td>西瓜</up-td>
-            <up-td>¥12.5</up-td>
-            <up-td>890</up-td>
-            <up-td>售罄</up-td>
-          </up-tr>
-        </up-table>
-
-        <!-- 4. 自定义列宽（width） -->
-        <text class="demo-sub-label mt-15px">4. 自定义列宽（width 百分比）</text>
-        <up-table>
-          <up-tr>
-            <up-th width="30%">姓名</up-th>
-            <up-th width="20%">年龄</up-th>
-            <up-th width="50%">地址</up-th>
-          </up-tr>
-          <up-tr>
-            <up-td width="30%">小明</up-td>
-            <up-td width="20%">18</up-td>
-            <up-td width="50%">北京市朝阳区xxx路</up-td>
-          </up-tr>
-          <up-tr>
-            <up-td width="30%">小红</up-td>
-            <up-td width="20%">20</up-td>
-            <up-td width="50%">上海市浦东新区xxx号</up-td>
-          </up-tr>
-        </up-table>
-
-        <!-- 5. 使用 content 插槽渲染非纯文本内容 -->
-        <text class="demo-sub-label mt-15px">5. content 插槽（非纯文本内容：按钮、图标等）</text>
-        <up-table>
-          <up-tr>
-            <up-th>用户</up-th>
-            <up-th>等级</up-th>
-            <up-th>操作</up-th>
-          </up-tr>
-          <up-tr>
-            <up-td>张三</up-td>
-            <up-td>VIP</up-td>
-            <up-td>
-              <template #content>
-                <view class="demo-row-start">
-                  <up-button type="primary" text="编辑" size="mini"></up-button>
-                  <view class="w-8px"></view>
-                  <up-button type="error" text="删除" size="mini"></up-button>
-                </view>
-              </template>
-            </up-td>
-          </up-tr>
-          <up-tr>
-            <up-td>李四</up-td>
-            <up-td>
-              <template #content>
-                <up-tag text="高级会员" type="warning"></up-tag>
-              </template>
-            </up-td>
-            <up-td>
-              <template #content>
-                <up-button type="primary" text="查看" size="mini"></up-button>
-              </template>
-            </up-td>
           </up-tr>
         </up-table>
       </view>
@@ -240,30 +148,6 @@
         <text class="demo-sub-label mt-15px">2. 底部横线模式（mode="line"）</text>
         <view class="code-input-demo-row">
           <up-code-input v-model="codeInputValue2" :maxlength="4" mode="line" @finish="onCodeInputFinish"></up-code-input>
-        </view>
-
-        <!-- 3. 圆点密码模式 -->
-        <text class="demo-sub-label mt-15px">3. 圆点密码模式（dot）</text>
-        <view class="code-input-demo-row">
-          <up-code-input v-model="codeInputValue3" :maxlength="6" mode="box" :dot="true" @finish="onCodeInputFinish"></up-code-input>
-        </view>
-
-        <!-- 4. 自定义样式 -->
-        <text class="demo-sub-label mt-15px">4. 自定义样式（size / color / fontSize / borderColor / bold）</text>
-        <view class="code-input-demo-row">
-          <up-code-input v-model="codeInputValue4" :maxlength="6" mode="box" :size="50" color="#19be6b" :font-size="22" border-color="#19be6b" :bold="true" @finish="onCodeInputFinish"></up-code-input>
-        </view>
-
-        <!-- 5. 自定义间距 + 细边框 -->
-        <text class="demo-sub-label mt-15px">5. 自定义间距 + 细边框（space + hairline）</text>
-        <view class="code-input-demo-row">
-          <up-code-input v-model="codeInputValue5" :maxlength="6" mode="box" :space="12" :hairline="true" border-color="#ff9900" color="#ff9900" @finish="onCodeInputFinish"></up-code-input>
-        </view>
-
-        <!-- 6. 自动获取焦点 -->
-        <text class="demo-sub-label mt-15px">6. 自动获取焦点（:focus="true"）</text>
-        <view class="code-input-demo-row">
-          <up-code-input v-model="codeInputValue6" :maxlength="4" mode="box" :focus="true" @finish="onCodeInputFinish"></up-code-input>
         </view>
       </view>
 
@@ -323,18 +207,6 @@
         <view class="qrcode-demo-row">
           <up-qrcode :size="180" val="uview-ultra" icon="https://uview-ultra.jiangruyi.com/uview-ultra/common/logo.png"></up-qrcode>
         </view>
-
-        <!-- 3. 自定义颜色 -->
-        <text class="demo-sub-label mt-15px">3. 自定义颜色（background / foreground）</text>
-        <view class="qrcode-demo-row">
-          <up-qrcode :size="160" val="hello world" background="#19be6b" foreground="#ffffff"></up-qrcode>
-        </view>
-
-        <!-- 4. 加载状态 -->
-        <text class="demo-sub-label mt-15px">4. 加载状态（showLoading + loadingText）</text>
-        <view class="qrcode-demo-row">
-          <up-qrcode :size="160" val="https://github.com" :show-loading="true" loading-text="生成中..." @result="onQrcodeResult"></up-qrcode>
-        </view>
       </view>
 
       <!-- ==================== Parse 富文本解析（置顶方便查看） ==================== -->
@@ -351,24 +223,6 @@
         <text class="demo-sub-label mt-15px">2. 富文本样式（h1~h6 / b / i / blockquote / code / pre）</text>
         <view class="parse-demo-wrapper">
           <up-parse :content="parseContent2"></up-parse>
-        </view>
-
-        <!-- 3. 图片 + 链接 + 预览 -->
-        <text class="demo-sub-label mt-15px">3. 图片 + 链接 + 预览（:preview-img="true" @imgTap @linkTap）</text>
-        <view class="parse-demo-wrapper">
-          <up-parse :content="parseContent3" :preview-img="true" @img-tap="onParseImgTap" @link-tap="onParseLinkTap"></up-parse>
-        </view>
-
-        <!-- 4. 表格渲染 -->
-        <text class="demo-sub-label mt-15px">4. 表格渲染（table / tr / th / td）</text>
-        <view class="parse-demo-wrapper">
-          <up-parse :content="parseContent4"></up-parse>
-        </view>
-
-        <!-- 5. 自定义标签样式 + 长按复制 -->
-        <text class="demo-sub-label mt-15px">5. 自定义标签样式（tagStyle）+ 长按复制（:selectable="true"）</text>
-        <view class="parse-demo-wrapper">
-          <up-parse :content="parseContent5" :tag-style="parseTagStyle" :selectable="true"></up-parse>
         </view>
       </view>
 
@@ -390,51 +244,6 @@
           <up-steps-item title="已下单" desc="10:30"></up-steps-item>
           <up-steps-item title="仓库着火" desc="10:35" :error="true"></up-steps-item>
           <up-steps-item title="破产清算" desc="11:40"></up-steps-item>
-        </up-steps>
-
-        <!-- 3. 点状模式 -->
-        <text class="demo-sub-label mt-15px">3. 点状模式（dot）</text>
-        <up-steps current="1" :dot="true">
-          <up-steps-item title="已下单" desc="10:30"></up-steps-item>
-          <up-steps-item title="已出库" desc="10:35"></up-steps-item>
-          <up-steps-item title="运输中" desc="11:40"></up-steps-item>
-        </up-steps>
-
-        <!-- 4. 竖向模式 -->
-        <text class="demo-sub-label mt-15px">4. 竖向模式（direction="column"）</text>
-        <up-steps current="1" direction="column">
-          <up-steps-item title="已下单" desc="2026-06-23 10:30"></up-steps-item>
-          <up-steps-item title="已出库" desc="2026-06-23 10:35"></up-steps-item>
-          <up-steps-item title="运输中" desc="2026-06-23 11:40"></up-steps-item>
-        </up-steps>
-
-        <!-- 5. 自定义图标 -->
-        <text class="demo-sub-label mt-15px">5. 自定义图标（activeIcon + inactiveIcon）</text>
-        <up-steps current="1" active-icon="checkmark" inactive-icon="arrow-right">
-          <up-steps-item title="已下单" desc="10:30"></up-steps-item>
-          <up-steps-item title="已出库" desc="10:35"></up-steps-item>
-          <up-steps-item title="运输中" desc="11:40"></up-steps-item>
-        </up-steps>
-
-        <!-- 6. Slot 自定义图标 -->
-        <text class="demo-sub-label mt-15px">6. Slot 自定义图标（#icon）</text>
-        <up-steps current="1">
-          <up-steps-item title="已下单" desc="10:30"></up-steps-item>
-          <up-steps-item title="已出库" desc="10:35"></up-steps-item>
-          <up-steps-item title="运输中" desc="11:40">
-            <template #icon>
-              <text class="steps-slot-icon">运</text>
-            </template>
-          </up-steps-item>
-        </up-steps>
-
-        <!-- 7. 自定义颜色 -->
-        <text class="demo-sub-label mt-15px">7. 自定义颜色（activeColor / inactiveColor）</text>
-        <up-steps current="2" active-color="#19be6b" inactive-color="#909399">
-          <up-steps-item title="提交订单" desc="已完成"></up-steps-item>
-          <up-steps-item title="商家审核" desc="已通过"></up-steps-item>
-          <up-steps-item title="派送中" desc="进行中"></up-steps-item>
-          <up-steps-item title="确认收货" desc="待完成"></up-steps-item>
         </up-steps>
       </view>
 
@@ -471,60 +280,6 @@
               height="30px"
             ></up-navbar-mini>
           </view>
-          <view class="navbar-mini-demo-item">
-            <up-navbar-mini
-              :fixed="false"
-              :safe-area-inset-top="false"
-              bg-color="rgba(250,53,52,0.85)"
-              icon-color="#ffffff"
-              :icon-size="16"
-              height="30px"
-            ></up-navbar-mini>
-          </view>
-          <view class="navbar-mini-demo-item">
-            <up-navbar-mini
-              :fixed="false"
-              :safe-area-inset-top="false"
-              bg-color="rgba(156,39,176,0.85)"
-              icon-color="#ffffff"
-              :icon-size="16"
-              height="30px"
-            ></up-navbar-mini>
-          </view>
-        </view>
-
-        <!-- 3. 自动返回上一页 + 自定义首页路径 -->
-        <text class="demo-sub-label mt-15px">3. 自动返回上一页（:auto-back="true"）+ 自定义首页路径</text>
-        <view class="navbar-mini-demo-wrapper">
-          <up-navbar-mini
-            :fixed="false"
-            :safe-area-inset-top="false"
-            :auto-back="true"
-            home-url="/"
-            bg-color="rgba(255,152,0,0.85)"
-            icon-color="#ffffff"
-            :icon-size="18"
-            height="32px"
-          ></up-navbar-mini>
-        </view>
-
-        <!-- 4. 自定义 slot（左侧图和中间图替换） -->
-        <text class="demo-sub-label mt-15px">4. 自定义 slot 图标</text>
-        <view class="navbar-mini-demo-wrapper">
-          <up-navbar-mini
-            :fixed="false"
-            :safe-area-inset-top="false"
-            bg-color="rgba(0,0,0,0.6)"
-            :icon-size="18"
-            height="34px"
-          >
-            <template #left>
-              <up-icon name="arrow-left" size="18" color="#ffffff"></up-icon>
-            </template>
-            <template #center>
-              <up-icon name="search" size="18" color="#ffffff"></up-icon>
-            </template>
-          </up-navbar-mini>
         </view>
       </view>
 
@@ -539,32 +294,6 @@
         <!-- 2. 显示徽标 + 禁用 -->
         <text class="demo-sub-label mt-15px">2. 显示徽标（badge.isDot / badge.value）+ 禁用（disabled）</text>
         <up-tabs :list="tabsList2" @click="onTabsClick"></up-tabs>
-
-        <!-- 3. 自定义样式 -->
-        <text class="demo-sub-label mt-15px">3. 自定义样式（activeStyle / inactiveStyle / itemStyle / lineWidth / lineColor）</text>
-        <up-tabs
-          :list="tabsList4"
-          line-width="30"
-          line-color="#f56c6c"
-          :active-style="{ color: '#303133', fontWeight: 'bold' }"
-          :inactive-style="{ color: '#606266' }"
-          item-style="padding-left: 15px; padding-right: 15px; height: 34px;"
-          @click="onTabsClick"
-        ></up-tabs>
-
-        <!-- 4. 不可滚动（scrollable=false） -->
-        <text class="demo-sub-label mt-15px">4. 不可滚动（:scrollable="false"）- 适用于标签少的场景</text>
-        <up-tabs :list="tabsList4Small" :scrollable="false" @click="onTabsClick"></up-tabs>
-
-        <!-- 5. 右侧自定义插槽 -->
-        <text class="demo-sub-label mt-15px">5. 右侧自定义插槽（#right slot）</text>
-        <up-tabs :list="tabsList1">
-          <template #right>
-            <view class="tabs-right-slot" @tap.stop="onTabsRightClick">
-              <up-icon name="list" size="21" bold></up-icon>
-            </view>
-          </template>
-        </up-tabs>
       </view>
 
       <!-- ==================== Tabbar 底部导航栏（置顶方便查看） ==================== -->
@@ -604,108 +333,6 @@
             <up-tabbar-item text="我的" icon="account" name="3"></up-tabbar-item>
           </up-tabbar>
         </view>
-
-        <!-- 3. 字符串 name 匹配 -->
-        <text class="demo-sub-label mt-15px">3. 字符串 name 匹配</text>
-        <view class="tabbar-demo-wrapper">
-          <up-tabbar
-            :value="tabbarValue3"
-            :fixed="false"
-            :placeholder="false"
-            :safe-area-inset-bottom="false"
-            @change="(e: number | string) => onTabbarChange3(e)"
-          >
-            <up-tabbar-item text="首页" icon="home" name="home"></up-tabbar-item>
-            <up-tabbar-item text="分类" icon="list-dot" name="category"></up-tabbar-item>
-            <up-tabbar-item text="消息" icon="chat" name="message"></up-tabbar-item>
-            <up-tabbar-item text="我的" icon="account" name="mine"></up-tabbar-item>
-          </up-tabbar>
-        </view>
-
-        <!-- 4. 自定义选中颜色 -->
-        <text class="demo-sub-label mt-15px">4. 自定义选中颜色（active-color / inactive-color）</text>
-        <view class="tabbar-demo-wrapper">
-          <up-tabbar
-            :value="tabbarValue4"
-            :fixed="false"
-            :placeholder="false"
-            :safe-area-inset-bottom="false"
-            active-color="#d81e06"
-            inactive-color="#999999"
-            @change="(e: number | string) => onTabbarChange4(e)"
-          >
-            <up-tabbar-item text="首页" icon="home" name="0"></up-tabbar-item>
-            <up-tabbar-item text="放映厅" icon="photo" name="1"></up-tabbar-item>
-            <up-tabbar-item text="直播" icon="play-right" name="2"></up-tabbar-item>
-            <up-tabbar-item text="我的" icon="account" name="3"></up-tabbar-item>
-          </up-tabbar>
-        </view>
-
-        <!-- 5. 自定义插槽图标（active-icon / inactive-icon slot） -->
-        <text class="demo-sub-label mt-15px">5. 自定义插槽图标（active-icon / inactive-icon slot）</text>
-        <view class="tabbar-demo-wrapper">
-          <up-tabbar
-            :value="tabbarValue5"
-            :fixed="false"
-            :placeholder="false"
-            :safe-area-inset-bottom="false"
-            active-color="#2979ff"
-            @change="(e: number | string) => onTabbarChange5(e)"
-          >
-            <up-tabbar-item text="首页" name="0">
-              <template #active-icon>
-                <image
-                  class="tabbar-slot-icon"
-                  src="https://cdn.uviewui.com/uview/common/bell-selected.png"
-                ></image>
-              </template>
-              <template #inactive-icon>
-                <image
-                  class="tabbar-slot-icon"
-                  src="https://cdn.uviewui.com/uview/common/bell.png"
-                ></image>
-              </template>
-            </up-tabbar-item>
-            <up-tabbar-item text="放映厅" icon="photo" name="1"></up-tabbar-item>
-            <up-tabbar-item text="直播" icon="play-right" name="2"></up-tabbar-item>
-            <up-tabbar-item text="我的" icon="account" name="3"></up-tabbar-item>
-          </up-tabbar>
-        </view>
-
-        <!-- 6. 移除顶部边框 -->
-        <text class="demo-sub-label mt-15px">6. 移除顶部边框（:border="false"）</text>
-        <view class="tabbar-demo-wrapper">
-          <up-tabbar
-            :value="tabbarValue6"
-            :fixed="false"
-            :placeholder="false"
-            :safe-area-inset-bottom="false"
-            :border="false"
-            @change="(e: number | string) => onTabbarChange6(e)"
-          >
-            <up-tabbar-item text="首页" icon="home" name="0"></up-tabbar-item>
-            <up-tabbar-item text="放映厅" icon="photo" name="1"></up-tabbar-item>
-            <up-tabbar-item text="直播" icon="play-right" name="2"></up-tabbar-item>
-            <up-tabbar-item text="我的" icon="account" name="3"></up-tabbar-item>
-          </up-tabbar>
-        </view>
-
-        <!-- 7. 拦截切换（change 事件校验） -->
-        <text class="demo-sub-label mt-15px">7. 拦截切换（点击"放映厅"弹 toast 拦截）</text>
-        <view class="tabbar-demo-wrapper">
-          <up-tabbar
-            :value="tabbarValue7"
-            :fixed="false"
-            :placeholder="false"
-            :safe-area-inset-bottom="false"
-            @change="(e: number | string) => onTabbarChange7(e)"
-          >
-            <up-tabbar-item text="首页" icon="home" name="0"></up-tabbar-item>
-            <up-tabbar-item text="放映厅" icon="photo" name="1"></up-tabbar-item>
-            <up-tabbar-item text="直播" icon="play-right" name="2"></up-tabbar-item>
-            <up-tabbar-item text="我的" icon="account" name="3"></up-tabbar-item>
-          </up-tabbar>
-        </view>
       </view>
 
       <!-- ReadMore 展开阅读更多 -->
@@ -723,12 +350,6 @@
             <rich-text :nodes="readMoreContent"></rich-text>
           </up-read-more>
         </view>
-        <!-- 自定义颜色和字号 -->
-        <view class="mt-10px">
-          <up-read-more show-height="100" color="#19be6b" :font-size="12" close-text="查看更多">
-            <rich-text :nodes="readMoreContent"></rich-text>
-          </up-read-more>
-        </view>
       </view>
 
       <!-- Avatar 头像 -->
@@ -741,42 +362,12 @@
           <up-avatar :src="avatarSrc" size="40"></up-avatar>
           <view class="w-15px"></view>
           <up-avatar :src="avatarSrc" size="40" shape="square"></up-avatar>
-          <view class="w-15px"></view>
-          <up-avatar :src="avatarSrc" size="55" mode="aspectFill"></up-avatar>
-          <view class="w-15px"></view>
-          <up-avatar src="/invalid-path.png" size="40" default-url="/static/logo.png"></up-avatar>
         </view>
         <!-- 文字头像 -->
         <view class="demo-row-start mt-10px">
           <up-avatar text="U" size="40" bg-color="#2979ff"></up-avatar>
           <view class="w-15px"></view>
           <up-avatar text="A" size="40" bg-color="#19be6b"></up-avatar>
-          <view class="w-15px"></view>
-          <up-avatar :random-bg-color="true" text="张" size="40"></up-avatar>
-          <view class="w-15px"></view>
-          <up-avatar :random-bg-color="true" text="李" size="40" font-size="16"></up-avatar>
-          <view class="w-15px"></view>
-          <up-avatar :random-bg-color="true" text="王五" size="45" font-size="14"></up-avatar>
-        </view>
-        <!-- 图标头像 -->
-        <view class="demo-row-start mt-10px">
-          <up-avatar icon="star-fill" size="40" bg-color="#ffca28" font-size="22"></up-avatar>
-          <view class="w-15px"></view>
-          <up-avatar icon="heart-fill" size="40" bg-color="#fa3534" font-size="22"></up-avatar>
-          <view class="w-15px"></view>
-          <up-avatar icon="setting-fill" size="40" bg-color="#909399" font-size="22"></up-avatar>
-          <view class="w-15px"></view>
-          <up-avatar icon="photo-fill" size="40" bg-color="#19be6b" font-size="22"></up-avatar>
-        </view>
-        <!-- 头像组 -->
-        <view class="demo-row-start mt-10px items-center">
-          <text class="text-12px text-[#909399] mr-10px">头像组:</text>
-          <up-avatar-group :urls="avatarGroupUrls" size="35" :gap="0.4" :max-count="5" :show-more="true" @show-more="onAvatarGroupMore"></up-avatar-group>
-        </view>
-        <!-- 可点击头像 -->
-        <view class="demo-row-start mt-10px items-center">
-          <up-avatar :src="avatarSrc" size="40" @click="onAvatarClick"></up-avatar>
-          <text class="text-12px text-[#909399] ml-10px">点击头像可触发事件</text>
         </view>
       </view>
 
@@ -793,18 +384,6 @@
         <view class="demo-row-start mt-8px">
           <up-link href="https://uniapp.dcloud.net.cn" text="uni-app X 官方文档" :under-line="true" @click="onLinkClick"></up-link>
         </view>
-        <!-- 自定义颜色 + 下划线颜色 -->
-        <view class="demo-row-start mt-8px">
-          <up-link href="https://github.com" text="GitHub" color="#19be6b" line-color="#19be6b" :under-line="true" font-size="16" @click="onLinkClick"></up-link>
-          <view class="w-20px"></view>
-          <up-link href="https://www.baidu.com" text="百度一下" color="#fa3534" line-color="#fa3534" :under-line="true" font-size="16" @click="onLinkClick"></up-link>
-          <view class="w-20px"></view>
-          <up-link href="https://www.zhihu.com" text="知乎" color="#ff9900" font-size="16" @click="onLinkClick"></up-link>
-        </view>
-        <!-- 小程序复制提示 -->
-        <view class="demo-row-start mt-8px">
-          <up-link href="https://uview-ultra.lingyun.net" text="小程序内打开（复制链接到浏览器）" :under-line="true" mp-tips="链接已复制，请在浏览器中打开" font-size="13" color="#909399" @click="onLinkClick"></up-link>
-        </view>
       </view>
 
       <!-- LazyLoad 懒加载 -->
@@ -818,14 +397,14 @@
             <up-lazy-load
               image="https://gtd.alicdn.com/sns_logo/i1/TB124_3NXXXXXasXVXXSutbFXXX.jpg_240x240xz.jpg"
               loading-img="/static/logo.png"
-              :height="1020"
+              :height="120"
               :border-radius="8"
               index="img1"
               @click="onLazyLoadClick"
               @error="onLazyLoadError"
             ></up-lazy-load>
           </view>
-          <view class="lazy-load-item">
+          <view class="lazy-load-item ml-10px">
             <up-lazy-load
               image="https://picsum.photos/240/240?random=22"
               loading-img="/static/logo.png"
@@ -836,31 +415,6 @@
               @error="onLazyLoadError"
             ></up-lazy-load>
           </view>
-          <view class="lazy-load-item">
-            <up-lazy-load
-              image="https://picsum.photos/240/240?random=23"
-              loading-img="/static/logo.png"
-              :height="120"
-              :border-radius="8"
-              index="img3"
-              @click="onLazyLoadClick"
-              @error="onLazyLoadError"
-            ></up-lazy-load>
-          </view>
-        </view>
-        <!-- 占位图 + 错误图 -->
-        <view class="demo-row-start mt-10px items-center">
-          <view class="lazy-load-item">
-            <up-lazy-load
-              image="https://invalid-url-test/not-exist.png"
-              loading-img="/static/logo.png"
-              error-img="/static/logo.png"
-              :height="100"
-              :border-radius="8"
-              index="error-img"
-            ></up-lazy-load>
-          </view>
-          <text class="text-12px text-[#909399] ml-10px">加载失败自动展示 error-img 占位图</text>
         </view>
       </view>
 
@@ -888,11 +442,10 @@
         </text>
         <view class="flex-col items-center">
           <up-loadmore :status="loadmoreStatus" :is-dot="loadmoreIsDot" :line="true"></up-loadmore>
-          <view class="demo-row mt-10px">
+          <view class="demo-row-start mt-10px">
             <up-button type="primary" text="加载更多" size="mini" @click="loadmoreStatus = 'loadmore'; loadmoreIsDot = false"></up-button>
+            <view class="w-10px"></view>
             <up-button type="warning" text="加载中" size="mini" @click="loadmoreStatus = 'loading'; loadmoreIsDot = false"></up-button>
-            <up-button type="info" text="没有更多" size="mini" @click="loadmoreStatus = 'nomore'; loadmoreIsDot = false"></up-button>
-            <up-button type="error" text="显示圆点" size="mini" @click="loadmoreStatus = 'nomore'; loadmoreIsDot = true"></up-button>
           </view>
         </view>
       </view>
@@ -920,14 +473,12 @@
         </text>
         <view class="index-list-demo-wrapper">
           <up-index-list :index-list="indexList" :sticky="true">
-            <template v-for="(item, index) in itemArr" :key="index">
-              <up-index-item>
-                <up-index-anchor :text="indexList[index]"></up-index-anchor>
-                <view v-for="(cell, cellIndex) in item" :key="cellIndex" class="list-cell">
-                  <text class="list-cell-text">{{ cell as string }}</text>
-                </view>
-              </up-index-item>
-            </template>
+            <up-index-item v-for="(item, index) in itemArr" :key="index">
+              <up-index-anchor :text="indexList[index]"></up-index-anchor>
+              <view v-for="(cell, cellIndex) in item" :key="cellIndex" class="list-cell">
+                <text class="list-cell-text">{{ cell as string }}</text>
+              </view>
+            </up-index-item>
           </up-index-list>
         </view>
       </view>
@@ -954,73 +505,6 @@
           bg-color="#ffffff"
           :border="true"
         ></up-navbar>
-
-        <view class="h-10px"></view>
-
-        <up-navbar
-          title="带返回按钮"
-          :fixed="false"
-          :auto-back="true"
-          :safe-area-inset-top="false"
-          bg-color="#f5f5f5"
-        ></up-navbar>
-
-        <view class="h-10px"></view>
-
-        <up-navbar
-          title="自定义标题"
-          :fixed="false"
-          :auto-back="false"
-          :safe-area-inset-top="false"
-          bg-color="#ffffff"
-          :border="true"
-          left-text="返回"
-          right-text="更多"
-        ></up-navbar>
-
-        <view class="h-10px"></view>
-
-        <up-navbar
-          title="自定义图标"
-          :fixed="false"
-          :auto-back="false"
-          :safe-area-inset-top="false"
-          bg-color="#ffffff"
-          :border="true"
-          left-text="返回"
-          left-icon="arrow-left"
-          right-icon="setting"
-        ></up-navbar>
-
-        <view class="h-10px">
-        </view>
-        <up-navbar
-          :fixed="false"
-          left-text="返回"
-          title="个人中心"
-          :safe-area-inset-top="false"
-        >
-          <template #left>
-            <view
-              class="u-nav-slot"
-            >
-              <up-icon
-                name="arrow-left"
-                size="19"
-              ></up-icon>
-              <up-line
-                direction="column"
-                :hairline="false"
-                length="16"
-                margin="0 8px"
-              ></up-line>
-              <up-icon
-                name="home"
-                size="20"
-              ></up-icon>
-            </view>
-          </template>
-        </up-navbar>
       </view>
 
       <!-- Subsection 分段器 -->
@@ -1089,188 +573,6 @@
         </up-dropdown>
       </view>
 
-      <!-- 3. 禁用某个选项卡 -->
-      <view class="demo-block">
-        <text class="demo-sub-label">3. 禁用某个选项卡</text>
-        <up-dropdown>
-          <up-dropdown-item v-model="dropdownDisValue1" title="正常项" :options="options1"></up-dropdown-item>
-          <up-dropdown-item title="已禁用" :options="options2" :disabled="true"></up-dropdown-item>
-        </up-dropdown>
-      </view>
-
-      <!-- 4. 选项点击事件 + 控制关闭行为 -->
-      <view class="demo-block">
-        <text class="demo-sub-label">4. 点击遮罩/自身标题不关闭，选项 change 事件</text>
-        <text class="text-12px text-[#909399] mb-6px">当前选中值: {{ dropdownEventValue }}</text>
-        <up-dropdown :close-on-click-mask="false" :close-on-click-self="false">
-          <up-dropdown-item
-            v-model="dropdownEventValue"
-            title="选项（不自动关）"
-            :options="options1"
-            @change="(value: string | number) => onDropdownChange(value)"
-          ></up-dropdown-item>
-        </up-dropdown>
-      </view>
-
-      <!-- 5. 自定义 Slot 内容 -->
-      <view class="demo-block">
-        <text class="demo-sub-label">5. 自定义 Slot 内容（带按钮关闭）</text>
-        <up-dropdown ref="uDropdownRef1">
-          <up-dropdown-item title="自定义">
-            <view class="dropdown-slot-content">
-              <view class="py-15px">
-                <text class="text-14px text-[#606266]">其他自定义内容</text>
-              </view>
-              <view class="pb-15px">
-                <text class="text-12px text-[#909399]">可以放任意组件或表单</text>
-              </view>
-              <up-button type="primary" text="确定" size="mini" @click="closeDropdown('uDropdownRef1')"></up-button>
-            </view>
-          </up-dropdown-item>
-        </up-dropdown>
-      </view>
-
-      <!-- 6. Slot 内嵌 scroll-view 滚动 -->
-      <view class="demo-block">
-        <text class="demo-sub-label">6. Slot 内嵌 scroll-view 滚动内容</text>
-        <up-dropdown ref="uDropdownRef2">
-          <up-dropdown-item title="滚动列表">
-            <view class="dropdown-slot-content" style="background-color: #ffffff;">
-              <scroll-view scroll-y="true" style="height: 180px;">
-                <view
-                  v-for="i in 15"
-                  :key="i"
-                  class="dropdown-scroll-item"
-                  @click="onDropdownScrollSelect(i); closeDropdown('uDropdownRef2')"
-                >
-                  <text class="text-14px text-[#303133]">选项 {{ i }}</text>
-                  <text class="text-12px text-[#909399]">这是第 {{ i }} 项的描述信息</text>
-                </view>
-              </scroll-view>
-              <view class="dropdown-scroll-footer">
-                <up-button type="info" text="关闭" size="mini" @click="closeDropdown('uDropdownRef2')"></up-button>
-              </view>
-            </view>
-          </up-dropdown-item>
-        </up-dropdown>
-        <text class="text-12px text-[#909399] mt-6px">已选滚动项: {{ dropdownScrollSelected }}</text>
-      </view>
-
-      <!-- 7. 保持菜单高亮 -->
-      <view class="demo-block">
-        <text class="demo-sub-label">7. 手动控制菜单高亮（open / close 事件 + highlight 方法）</text>
-        <up-dropdown ref="uDropdownRef3" @open="onDropdownOpen" @close="onDropdownClose">
-          <up-dropdown-item v-model="dropdownHLValue1" title="距离" :options="options1"></up-dropdown-item>
-          <up-dropdown-item v-model="dropdownHLValue2" title="温度" :options="options2"></up-dropdown-item>
-        </up-dropdown>
-      </view>
-
-      <!-- 8. 自定义 Slot 多列宫格布局 -->
-      <view class="demo-block">
-        <text class="demo-sub-label">8. 自定义 Slot 多列宫格布局（模拟服务分类菜单）</text>
-        <up-dropdown ref="uDropdownRefGrid1">
-          <up-dropdown-item title="分类">
-            <view class="dropdown-grid-panel">
-              <up-row gutter="10" justify="space-between">
-                <up-col v-for="item in dropdownGridItems" :key="item.getString('text')" span="6">
-                  <view
-                    class="dropdown-grid-item"
-                    @click="onDropdownGridSelect(item.getString('text') ?? ''); closeDropdown('uDropdownRefGrid1')"
-                  >
-                    <view class="dropdown-grid-icon">
-                      <up-icon :name="item.getString('icon')" size="24" :color="item.getString('color') ?? '#2979ff'"></up-icon>
-                    </view>
-                    <text class="dropdown-grid-label">{{ item.getString('text') }}</text>
-                  </view>
-                </up-col>
-              </up-row>
-            </view>
-          </up-dropdown-item>
-          <up-dropdown-item title="筛选">
-            <view class="dropdown-grid-panel">
-              <up-row gutter="10" justify="space-between">
-                <up-col v-for="item in dropdownGridFilterItems" :key="item.getString('text')" span="6">
-                  <view
-                    class="dropdown-grid-item"
-                    @click="onDropdownGridSelect(item.getString('text') ?? ''); closeDropdown('uDropdownRefGrid1')"
-                  >
-                    <view class="dropdown-grid-icon">
-                      <up-icon :name="item.getString('icon')" size="24" :color="item.getString('color') ?? '#19be6b'"></up-icon>
-                    </view>
-                    <text class="dropdown-grid-label">{{ item.getString('text') }}</text>
-                  </view>
-                </up-col>
-              </up-row>
-            </view>
-          </up-dropdown-item>
-        </up-dropdown>
-        <text class="text-12px text-[#909399] mt-6px">已选宫格项: {{ dropdownGridSelected }}</text>
-      </view>
-
-      <!-- 9. 自定义 Slot 卡片式布局 -->
-      <view class="demo-block">
-        <text class="demo-sub-label">9. 自定义 Slot 卡片式布局（带图片 + 标题 + 描述）</text>
-        <up-dropdown ref="uDropdownRefCard">
-          <up-dropdown-item title="热门推荐">
-            <view class="dropdown-card-panel">
-              <view class="dropdown-card-grid">
-                <view
-                  v-for="card in dropdownCardItems"
-                  :key="card.getString('id')"
-                  class="dropdown-card"
-                  @click="onDropdownCardSelect(card.getString('title') ?? ''); closeDropdown('uDropdownRefCard')"
-                >
-                  <image
-                    :src="card.getString('image')"
-                    mode="aspectFill"
-                    class="dropdown-card-img"
-                  ></image>
-                  <view class="dropdown-card-body">
-                    <text class="dropdown-card-title">{{ card.getString('title') }}</text>
-                    <text class="dropdown-card-desc">{{ card.getString('desc') }}</text>
-                    <view class="dropdown-card-footer">
-                      <text class="dropdown-card-price">{{ card.getString('price') }}</text>
-                      <view class="dropdown-card-tag">
-                        <text class="dropdown-card-tag-text">{{ card.getString('tag') }}</text>
-                      </view>
-                    </view>
-                  </view>
-                </view>
-              </view>
-            </view>
-          </up-dropdown-item>
-          <up-dropdown-item title="新品上市">
-            <view class="dropdown-card-panel">
-              <view class="dropdown-card-grid">
-                <view
-                  v-for="card in dropdownCardItems2"
-                  :key="card.getString('id')"
-                  class="dropdown-card"
-                  @click="onDropdownCardSelect(card.getString('title') ?? ''); closeDropdown('uDropdownRefCard')"
-                >
-                  <image
-                    :src="card.getString('image')"
-                    mode="aspectFill"
-                    class="dropdown-card-img"
-                  ></image>
-                  <view class="dropdown-card-body">
-                    <text class="dropdown-card-title">{{ card.getString('title') }}</text>
-                    <text class="dropdown-card-desc">{{ card.getString('desc') }}</text>
-                    <view class="dropdown-card-footer">
-                      <text class="dropdown-card-price">{{ card.getString('price') }}</text>
-                      <view class="dropdown-card-tag">
-                        <text class="dropdown-card-tag-text">{{ card.getString('tag') }}</text>
-                      </view>
-                    </view>
-                  </view>
-                </view>
-              </view>
-            </view>
-          </up-dropdown-item>
-        </up-dropdown>
-        <text class="text-12px text-[#909399] mt-6px">已选卡片: {{ dropdownCardSelected }}</text>
-      </view>
-
       <!-- SwipeAction 滑动操作 -->
       <view class="demo-block">
         <text class="demo-label">
@@ -1291,19 +593,6 @@
           </up-swipe-action-item>
         </up-swipe-action>
       </view>
-
-      <!-- Swiper 轮播图 -->
-      <up-swiper
-        :list="swiperList"
-        key-name="image"
-        :indicator="true"
-        indicator-mode="dot"
-        :circular="true"
-        :autoplay="true"
-        :interval="3000"
-        height="180"
-        :show-title="true"
-      ></up-swiper>
 
       <!-- ==================== 基础组件 ==================== -->
       <text class="section-title">
@@ -1328,10 +617,6 @@
           <up-button type="primary" text="圆形" shape="circle" size="mini"></up-button>
           <up-button type="primary" text="禁用" :disabled="true" size="mini"></up-button>
         </view>
-        <view class="demo-row">
-          <up-button type="primary" text="加载中" :loading="true" size="mini"></up-button>
-          <up-button type="primary" text="自定义色" color="#7232dd" size="mini"></up-button>
-        </view>
       </view>
 
       <!-- Icon 图标 -->
@@ -1339,14 +624,10 @@
         <text class="demo-label">
           up-icon
         </text>
-        <view class="demo-row">
+        <view class="demo-row-start">
           <up-icon name="home" size="28" label="home" label-size="10" label-pos="bottom"></up-icon>
+          <view class="w-20px"></view>
           <up-icon name="search" size="28" color="#2979ff" label="search" label-size="10" label-pos="bottom"></up-icon>
-          <up-icon name="setting" size="28" color="#ff9900" label="setting" label-size="10" label-pos="bottom"></up-icon>
-          <up-icon name="heart" size="28" color="#fa3534" label="heart" label-size="10" label-pos="bottom"></up-icon>
-          <up-icon name="star" size="28" color="#ffca28" label="star" label-size="10" label-pos="bottom"></up-icon>
-          <up-icon name="photo" size="28" color="#19be6b" label="photo" label-size="10" label-pos="bottom"></up-icon>
-          <up-icon name="map" size="28" color="#909399" label="map" label-size="10" label-pos="bottom"></up-icon>
         </view>
       </view>
 
@@ -1358,14 +639,7 @@
         <view class="demo-row-start">
           <up-text text="普通文本"></up-text>
           <view class="w-15px"></view>
-          <up-text type="primary" text="主色文本"></up-text>
-          <view class="w-15px"></view>
-          <up-text type="error" text="错误提示" :bold="true"></up-text>
-        </view>
-        <view class="demo-row-start mt-10px">
           <up-text mode="price" text="99.9"></up-text>
-          <view class="w-20px"></view>
-          <up-text mode="phone" text="13800000000" format="encrypt"></up-text>
         </view>
       </view>
 
@@ -1384,13 +658,6 @@
         <view class="demo-row">
           <up-tag text="朴素" type="primary" :plain="true"></up-tag>
           <up-tag text="圆形" type="primary" shape="circle"></up-tag>
-          <up-tag text="大号" type="primary" size="large"></up-tag>
-          <up-tag text="中号" type="primary" size="medium"></up-tag>
-          <up-tag text="小号" type="primary" size="mini"></up-tag>
-          <up-tag text="可关闭" type="error" :plain="true" :closable="true" :show="showTag" @close="showTag = false"></up-tag>
-        </view>
-        <view class="demo-row-start mt-10px">
-          <up-tag text="图片标签" icon="/static/logo.png" size="medium" :plain="true"></up-tag>
         </view>
       </view>
 
@@ -1399,28 +666,10 @@
         <text class="demo-label">
           up-badge
         </text>
-        <view class="demo-row">
-          <up-badge :value="9" type="error"></up-badge>
-          <up-badge :value="99" type="error"></up-badge>
-          <up-badge :value="999" type="error" :max="99"></up-badge>
-          <up-badge :is-dot="true" type="error"></up-badge>
-          <up-badge value="new" type="error"></up-badge>
-        </view>
-      </view>
-
-      <!-- Image 图片 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-image
-        </text>
         <view class="demo-row-start">
-          <up-image src="/static/logo.png" width="60px" height="60px"></up-image>
-          <view class="w-15px"></view>
-          <up-image src="/static/logo.png" width="60px" height="60px" shape="circle"></up-image>
-          <view class="w-15px"></view>
-          <up-image src="/static/logo.png" width="60px" height="60px" radius="8px"></up-image>
-          <view class="w-15px"></view>
-          <up-image src="https://invalid-url-test" width="60px" height="60px"></up-image>
+          <up-badge :value="9" type="error"></up-badge>
+          <view class="w-20px"></view>
+          <up-badge :value="99" type="error"></up-badge>
         </view>
       </view>
 
@@ -1432,9 +681,6 @@
         <up-cell-group>
           <up-cell title="单元格" value="内容"></up-cell>
           <up-cell icon="setting-fill" title="个人设置"></up-cell>
-          <up-cell icon="integral-fill" title="会员等级" value="新版本"></up-cell>
-          <up-cell title="可点击" value="内容" is-link></up-cell>
-          <up-cell title="箭头向下" value="内容" is-link arrow-direction="down"></up-cell>
         </up-cell-group>
       </view>
 
@@ -1443,11 +689,10 @@
         <text class="demo-label">
           up-loading-icon
         </text>
-        <view class="demo-row">
+        <view class="demo-row-start">
           <up-loading-icon mode="circle"></up-loading-icon>
+          <view class="w-20px"></view>
           <up-loading-icon mode="spinner"></up-loading-icon>
-          <up-loading-icon mode="semicircle"></up-loading-icon>
-          <up-loading-icon mode="circle" text="加载中" :vertical="true"></up-loading-icon>
         </view>
       </view>
 
@@ -1490,14 +735,6 @@
           <view class="flex-row items-center gap-x-10px">
             <text class="text-12px text-[#909399] w-40px text-right">{{ lineProgressValue2 }}%</text>
             <up-line-progress :percentage="lineProgressValue2" :show-text="true" active-color="#19be6b"></up-line-progress>
-          </view>
-          <view class="flex-row items-center gap-x-10px">
-            <text class="text-12px text-[#909399] w-40px text-right">{{ lineProgressValue3 }}%</text>
-            <up-line-progress :percentage="lineProgressValue3" :show-text="true" active-color="#ff9900"></up-line-progress>
-          </view>
-          <view class="flex-row items-center gap-x-10px">
-            <text class="text-12px text-[#909399] w-40px text-right">{{ lineProgressValue4 }}%</text>
-            <up-line-progress :percentage="lineProgressValue4" :show-text="false" active-color="#fa3534" height="8"></up-line-progress>
           </view>
         </view>
       </view>
@@ -1550,30 +787,6 @@
             <up-icon name="search" :size="26"></up-icon>
             <text class="grid-text">搜索</text>
           </up-grid-item>
-          <up-grid-item>
-            <up-icon name="setting" :size="26"></up-icon>
-            <text class="grid-text">设置</text>
-          </up-grid-item>
-          <up-grid-item>
-            <up-icon name="heart" :size="26"></up-icon>
-            <text class="grid-text">收藏</text>
-          </up-grid-item>
-          <up-grid-item>
-            <up-icon name="photo" :size="26"></up-icon>
-            <text class="grid-text">相册</text>
-          </up-grid-item>
-          <up-grid-item>
-            <up-icon name="star" :size="26"></up-icon>
-            <text class="grid-text">评分</text>
-          </up-grid-item>
-          <up-grid-item>
-            <up-icon name="map" :size="26"></up-icon>
-            <text class="grid-text">地图</text>
-          </up-grid-item>
-          <up-grid-item>
-            <up-icon name="chat" :size="26"></up-icon>
-            <text class="grid-text">消息</text>
-          </up-grid-item>
         </up-grid>
       </view>
 
@@ -1599,7 +812,7 @@
       <up-divider text="布局组件结束"></up-divider>
 
       <DemoNav />
-      <DemoShow />
+
       <!-- BackTop 回到顶部 -->
       <view class="demo-block">
         <text class="demo-label">
@@ -1615,8 +828,6 @@
 
       <!-- NoNetwork 无网络组件 -->
       <up-no-network></up-no-network>
-
-
     </scroll-view>
 
     <!-- BackTop 回到顶部 -->
@@ -1638,7 +849,7 @@
 </template>
 
 <script setup lang="uts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, nextTick, reactive, ref } from 'vue'
 import ThemeSwitchCard from '@/src/pages/basic/components/ThemeSwitchCard.uvue'
 import DemoForm from './components/DemoForm.uvue'
 import DemoFeedback from './components/DemoFeedback.uvue'
@@ -2166,8 +1377,6 @@ function onNavbarMiniLeftClick(): void {
 function onNavbarMiniHomeClick(): void {
   uni.showToast({ title: '首页按钮点击', icon: 'none' })
 }
-
-
 
 // ==================== Pagination 分页器 ====================
 const paginationCurrentPage = ref(1)

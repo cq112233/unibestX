@@ -5,19 +5,40 @@
     </view>
     <view class="flex-row justify-between mt-15px">
       <view class="flex-1 mr-8px">
-        <up-button size="small" type="primary" :plain="currentType !== 'line'" @click="changeToLine">
-          折线图
-        </up-button>
+        <view
+          class="w-full h-36px rounded-8px flex flex-row items-center justify-center"
+          :class="currentType !== 'line' ? 'bg-[#e0edff]' : 'bg-[#3b82f6]'"
+          @click="changeToLine"
+        >
+          <text
+            class="text-12px font-bold"
+            :class="currentType !== 'line' ? 'text-[#3b82f6]' : 'text-[#ffffff]'"
+          >折线图</text>
+        </view>
       </view>
       <view class="flex-1 mr-8px">
-        <up-button size="small" type="success" :plain="currentType !== 'bar'" @click="changeToBar">
-          柱状图
-        </up-button>
+        <view
+          class="w-full h-36px rounded-8px flex flex-row items-center justify-center"
+          :class="currentType !== 'bar' ? 'bg-[#d1fae5]' : 'bg-[#10b981]'"
+          @click="changeToBar"
+        >
+          <text
+            class="text-12px font-bold"
+            :class="currentType !== 'bar' ? 'text-[#10b981]' : 'text-[#ffffff]'"
+          >柱状图</text>
+        </view>
       </view>
       <view class="flex-1">
-        <up-button size="small" type="warning" :plain="currentType !== 'pie'" @click="changeToPie">
-          饼图
-        </up-button>
+        <view
+          class="w-full h-36px rounded-8px flex flex-row items-center justify-center"
+          :class="currentType !== 'pie' ? 'bg-[#fef3c7]' : 'bg-[#f59e0b]'"
+          @click="changeToPie"
+        >
+          <text
+            class="text-12px font-bold"
+            :class="currentType !== 'pie' ? 'text-[#f59e0b]' : 'text-[#ffffff]'"
+          >饼图</text>
+        </view>
       </view>
     </view>
   </Card>
@@ -32,7 +53,6 @@ const echartRef = ref<ComponentPublicInstance | null>(null)
 const currentType = ref('line')
 const gridKey = 'gr' + 'id'
 
-// 准备 ECharts 配置项
 const lineOption = {
   title: {
     text: '访问趋势 (折线图)',
@@ -194,7 +214,6 @@ function changeToPie() {
   }
 }
 
-// 监听屏幕/窗口宽度变化，触发 ECharts 重绘 resize
 const windowWidth = computed((): number => {
   return systemInfo.value?.windowWidth ?? 0
 })

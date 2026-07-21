@@ -16,7 +16,7 @@
     </view>
 
     <!-- 页码列表 -->
-    <block v-for="page in displayedPages" :key="page" v-if="layout.includes('pager')">
+    <template v-for="page in displayedPages" :key="page" v-if="layout.includes('pager')">
       <view
         :class="[
           'up-pagination-item',
@@ -26,7 +26,7 @@
       >
         {{ page }}
       </view>
-    </block>
+    </template>
 
     <!-- 总数显示 -->
     <view v-if="total > 0 && layout.includes('total')" class="up-pagination-total">

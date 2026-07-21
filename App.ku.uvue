@@ -1,8 +1,8 @@
 <template>
   <!-- 应用全局骨架与皮肤容器，通过 CSS 变量绑定响应式主题色 -->
-  <view class="flex flex-col flex-1 h-full" :style="{ '--theme-color': appStore.state.theme }">
-    <!-- 主滚动区域，包裹子页面插槽内容 -->
-    <scroll-view direction="vertical" class="flex-1 h-0">
+  <view class="flex flex-col flex-1 h-full" :style="{ '--theme-color': appStore.state.theme, 'backgroundColor': '#f8f8f8' }">
+    <!-- 主滚动区域，包裹子页面插槽内容（开启 custom-nested-scroll 以适配 HBuilderX 5.15+ 嵌套手势） -->
+    <scroll-view direction="vertical" class="flex-1 h-0"  :style="{ backgroundColor: '#f8f8f8' }">
       <slot></slot>
     </scroll-view>
     <!-- 仅在当前页面为底部 Tabbar 页面时渲染自定义导航栏 -->

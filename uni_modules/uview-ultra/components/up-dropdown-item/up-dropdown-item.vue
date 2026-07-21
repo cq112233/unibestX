@@ -1,6 +1,6 @@
 <template>
 	<view class="up-dropdown-item" v-if="active" @touchmove.stop.prevent="() => {}" @tap.stop.prevent="() => {}">
-		<block v-if="!$slots['default'] && !$slots['$default']">
+		<template v-if="!$slots['default'] && !$slots['$default']">
 			<scroll-view class="up-dropdown-item__scroll" scroll-y="true" :style="{
 				height: addUnit(height)
 			}">
@@ -15,7 +15,7 @@
 					</up-cell-group>
 				</view>
 			</scroll-view>
-		</block>
+		</template>
 		<slot v-else />
 	</view>
 </template>

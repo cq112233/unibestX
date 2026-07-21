@@ -67,7 +67,7 @@
 						></video>
 						<view v-if="showTitle && getItemTitle(item) != '' && testImage(getSource(item))"
 							class="up-swiper__wrapper__item__wrapper__title">
-							<text class="up-line-1">{{ getItemTitle(item) }}</text>
+							<text class="up-line-1 up-swiper__wrapper__item__wrapper__title-text">{{ getItemTitle(item) }}</text>
 						</view>
 					</view>
 				</slot>
@@ -181,13 +181,28 @@
 			},
 			// 获取目标路径，可能数组中为字符串，对象的形式，额外可指定对象的目标属性名keyName
 			getSource(item: any|null): string {
-				if (typeof item === 'string') return item
-				if (typeof item === 'object' && this.keyName != '') {
+				let src = ''
+				if (typeof item === 'string') src = item
+				else if (typeof item === 'object' && this.keyName != '') {
 					item = item as UTSJSONObject
-					return item[this.keyName].toString()
+					src = item[this.keyName].toString()
 				}
-				else error('请按格式传递列表参数')
-				return ''
+				else {
+					error('请按格式传递列表参数')
+					return ''
+				}
+				if (src.startsWith('/static/')) {
+					try {
+						const pages = getCurrentPages()
+						if (pages.length > 0) {
+							const route = pages[pages.length - 1].route
+							if (route.includes('sub/')) {
+								return '../../static/' + src.substring(8)
+							}
+						}
+					} catch (e) {}
+				}
+				return src
 			},
 			getItemTitle(item: any|null): string {
 				if (typeof item === 'string') return item
@@ -278,9 +293,12 @@
 						bottom: 0;
 						left: 0;
 						right: 0;
-						font-size: 28rpx;
 						padding: 12rpx 24rpx;
-						color: #FFFFFF;
+
+						&-text {
+							font-size: 28rpx;
+							color: #FFFFFF;
+						}
 					}
 				}
 			}

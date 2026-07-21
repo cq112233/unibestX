@@ -11,7 +11,7 @@
 		>
 			<image
 				v-if="!isError"
-				:src="src"
+				:src="realSrc"
 				:mode="mode"
 				@error="onErrorHandler"
 				@load="onLoadHandler"
@@ -118,17 +118,29 @@
 				immediate: true,
 				handler(n) {
 					if (!n) {
-						// 如果传入null或者''，或者false，或者undefined，标记为错误状态
-						this.isError = true
-						
+						this.isError = true;
+						this.loading = false;
 					} else {
 						this.isError = false;
-						this.loading = true;
+						if (typeof n === 'string' && !n.startsWith('http://') && !n.startsWith('https://')) {
+							this.loading = false;
+						} else {
+							this.loading = true;
+						}
 					}
 				}
 			}
 		},
 		computed: {
+			realSrc() {
+				if (!this.src) return '';
+				if (typeof this.src === 'string' && this.src.indexOf('/static/') === 0) {
+					// #ifdef APP-HARMONY
+					return '@' + this.src;
+					// #endif
+				}
+				return this.src;
+			},
 			wrapStyle() {
 				let style = {};
 				// 通过调用addUnit()方法，如果有单位，如百分比，px单位等，直接返回，如果是纯粹的数值，则加上rpx单位

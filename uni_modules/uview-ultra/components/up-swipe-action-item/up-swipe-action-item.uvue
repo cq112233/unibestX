@@ -328,14 +328,16 @@
 					// 在开启状态下，向左滑动，需忽略
 					if (moveX < 0) moveX = 0
 					// 想要收起菜单，最大能移动的距离为按钮的总宽度
-					if (moveX > this.state['buttonsWidth'] as number) moveX = this.state['buttonsWidth'] as number
+					const btnW = (this.state['buttonsWidth'] ?? 0) as number
+					if (moveX > btnW) moveX = btnW
 					// 如果是已经打开了的状态，向左滑动时，移动收起菜单
-					this.moveSwipeAction(0 - this.state['buttonsWidth'] as number + moveX)
+					this.moveSwipeAction(0 - btnW + moveX)
 				} else {
 					// 关闭状态下，右滑动需忽略
 					if (moveX > 0) moveX = 0
 					// 滑动的距离不允许超过所有按钮的总宽度，此时只能是左滑，最终设置按钮的总宽度，同时为负数
-					if (Math.abs(moveX) > this.state['buttonsWidth'] as number) moveX = 0-this.state['buttonsWidth'] as number
+					const btnW = (this.state['buttonsWidth'] ?? 0) as number
+					if (Math.abs(moveX) > btnW) moveX = 0 - btnW
 					// 只要是在滑过程中，就不断移动单元格内容部分，从而使隐藏的菜单显示出来
 					this.moveSwipeAction(moveX)
 				}
@@ -472,12 +474,9 @@
 					}
 
 					&__text {
-						@include flex;
-						align-items: center;
 						color: #FFFFFF;
 						font-size: 15px;
 						text-align: center;
-						justify-content: center;
 					}
 				}
 			}

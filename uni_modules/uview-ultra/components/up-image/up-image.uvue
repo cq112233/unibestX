@@ -7,29 +7,29 @@
 		<view
 			class="up-image"
 			@tap="onClick"
-			:style="[wrapStyle, backgroundStyle, $up.addStyle(customStyle)]"
+			:style="[wrapStyle, backgroundStyle, addStyle(customStyle)]"
 		>
 			<image
-				:src="src"
+				:src="realSrc"
 				:mode="mode"
 				@error="onErrorHandler"
 				@load="onLoadHandler"
 				:lazy-load="lazyLoad"
 				class="up-image__image"
 				:style="{
-					borderRadius: shape == 'circle' ? '10000px' : $up.addUnit(radius),
-					width: $up.addUnit(width),
-					height: $up.addUnit(height)
+					borderRadius: shape == 'circle' ? '10000px' : addUnit(radius),
+					width: addUnit(width),
+					height: addUnit(height)
 				}"
 			></image>
 			<view
 				v-if="showLoading && loading"
 				class="up-image__loading"
 				:style="{
-					borderRadius: shape == 'circle' ? '50%' : $up.addUnit(radius),
+					borderRadius: shape == 'circle' ? '50%' : addUnit(radius),
 					backgroundColor: bgColor,
-					width: $up.addUnit(width),
-					height: $up.addUnit(height)
+					width: addUnit(width),
+					height: addUnit(height)
 				}"
 			>
 				<slot name="loading">
@@ -44,9 +44,9 @@
 				v-if="showError && isError && !loading"
 				class="up-image__error"
 				:style="{
-					borderRadius: shape == 'circle' ? '50%' : $up.addUnit(radius),
-					width: $up.addUnit(width),
-					height: $up.addUnit(height)
+					borderRadius: shape == 'circle' ? '50%' : addUnit(radius),
+					width: addUnit(width),
+					height: addUnit(height)
 				}"
 			>
 				<slot name="error">
@@ -62,7 +62,7 @@
 </template>
 
 <script setup>
-	import { nextTick, ref, computed, onMounted } from 'vue'
+	import { nextTick, ref, computed, onMounted, watch } from 'vue'
 	import { addUnit, addStyle, deepMerge } from '../../libs/function/index'
 	import defProps from './image'
 	
@@ -146,6 +146,11 @@
 	const show = ref(false)
 
 	const emit = defineEmits(['click', 'error', 'load'])
+
+	const realSrc = computed((): string => {
+		if (props.src == '') return ''
+		return props.src
+	})
 	
 	const wrapStyle = computed(() => {
 		let style = {};
@@ -161,15 +166,29 @@
 		return deepMerge(style, {})
 	})
 	
-	onMounted(() => {
-		show.value = true
-		if (props.src == '') {
+	const initLoading = (src: string) => {
+		if (src == '') {
 			// 如果传入null或者''，或者false，或者undefined，标记为错误状态
 			isError.value = true
+			loading.value = false
 		} else {
 			isError.value = false
-			loading.value = true
+			// 如果不是网络图片 (http/https开头)，就认为是本地/base64资源，直接关闭 loading 遮罩
+			if (!src.startsWith('http://') && !src.startsWith('https://')) {
+				loading.value = false
+			} else {
+				loading.value = true
+			}
 		}
+	}
+
+	watch(() => props.src, (newVal) => {
+		initLoading(newVal as string)
+	})
+
+	onMounted(() => {
+		show.value = true
+		initLoading(props.src as string)
 	})
 	
 	// 点击图片

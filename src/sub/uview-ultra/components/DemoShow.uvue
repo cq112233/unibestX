@@ -1,69 +1,68 @@
 <template>
   <view>
     <!-- ==================== 展示组件 ==================== -->
-      <text class="section-title">
-        展示组件
+    <text class="section-title">
+      展示组件
+    </text>
+
+    <!-- Card 卡片 -->
+    <view class="demo-block">
+      <text class="demo-label">
+        up-card
       </text>
+      <up-card title="基础卡片" sub-title="副标题" margin="0" :show-foot="false">
+        <text slot="body" class="text-13px text-[#606266] leading-20px">这是卡片主体内容区域，可以放置任意内容。</text>
+      </up-card>
+      <view class="h-10px"></view>
+      <up-card title="带缩略图" :thumb="logoImg" :thumb-circle="true" thumb-width="36px" margin="0">
+        <text slot="body" class="text-13px text-[#606266] leading-20px">左侧缩略图为圆形，适合展示头像或图标。</text>
+        <view slot="foot" class="flex-row justify-between w-full">
+          <text class="text-12px text-[#909399]">底部区域</text>
+          <text class="text-12px text-[#2979ff]">查看详情</text>
+        </view>
+      </up-card>
+    </view>
 
-      <!-- Card 卡片 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-card
-        </text>
-        <up-card title="基础卡片" sub-title="副标题" margin="0" :show-foot="false">
-          <text slot="body" class="text-13px text-[#606266] leading-20px">这是卡片主体内容区域，可以放置任意内容。</text>
-        </up-card>
-        <view class="h-10px"></view>
-        <up-card title="带缩略图" thumb="/static/logo.png" :thumb-circle="true" thumb-width="36px" margin="0">
-          <text slot="body" class="text-13px text-[#606266] leading-20px">左侧缩略图为圆形，适合展示头像或图标。</text>
-          <view slot="foot" class="flex-row justify-between w-full">
-            <text class="text-12px text-[#909399]">底部区域</text>
-            <text class="text-12px text-[#2979ff]">查看详情</text>
-          </view>
-        </up-card>
-      </view>
-
-      <!-- List 高性能列表 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-list
-        </text>
-        <up-list
-          :height="300"
-          :lower-threshold="20"
-          :refresher-enabled="true"
-          :refresher-triggered="listRefreshing"
-          @scrolltolower="onListLoadMore"
-          @refresherrefresh="onListRefresh"
+    <!-- List 高性能列表 -->
+    <view class="demo-block">
+      <text class="demo-label">
+        up-list
+      </text>
+      <up-list
+        :height="300"
+        :lower-threshold="20"
+        :refresher-enabled="true"
+        :refresher-triggered="listRefreshing"
+        @scrolltolower="onListLoadMore"
+        @refresherrefresh="onListRefresh"
+      >
+        <view
+          v-for="(item, idx) in listItems"
+          :key="idx"
+          class="demo-list-cell"
         >
-          <view
-            v-for="(item, idx) in listItems"
-            :key="idx"
-            class="demo-list-cell"
-          >
-            <view class="demo-list-cell-avatar">
-              <up-icon name="account" size="20" color="#ffffff"></up-icon>
-            </view>
-            <view class="demo-list-cell-content">
-              <text class="text-14px font-500 text-[#303133]">{{ item.title as string }}</text>
-              <text class="text-12px text-[#909399] mt-4px">{{ item.desc as string }}</text>
-            </view>
+          <view class="demo-list-cell-avatar">
+            <up-icon name="account" size="20" color="#ffffff"></up-icon>
           </view>
-          <view v-if="listLoading" class="list-loading">
-            <up-loading-icon mode="circle" size="20"></up-loading-icon>
-            <text class="text-12px text-[#909399] ml-8px">加载中...</text>
+          <view class="demo-list-cell-content">
+            <text class="text-14px font-500 text-[#303133]">{{ item.title as string }}</text>
+            <text class="text-12px text-[#909399] mt-4px">{{ item.desc as string }}</text>
           </view>
-        </up-list>
-      </view>
+        </view>
+        <view v-if="listLoading" class="list-loading">
+          <up-loading-icon mode="circle" size="20"></up-loading-icon>
+          <text class="text-12px text-[#909399] ml-8px">加载中...</text>
+        </view>
+      </up-list>
+    </view>
 
-      <up-divider text="展示组件结束"></up-divider>
-
-      
+    <up-divider text="展示组件结束"></up-divider>
   </view>
 </template>
 
 <script setup lang="uts">
 import { computed, onMounted, reactive, ref } from 'vue'
+import logoImg from '@/src/assets/images/logo.png'
 
 // ==================== 展示组件 ====================
 const listItems = ref([
@@ -105,8 +104,6 @@ function onListRefresh(): void {
     uni.showToast({ title: '刷新完成', icon: 'none', duration: 1500 })
   }, 1500)
 }
-
-
 </script>
 
 <style scoped>
