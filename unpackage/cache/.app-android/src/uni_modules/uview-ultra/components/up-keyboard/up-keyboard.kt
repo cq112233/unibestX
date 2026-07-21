@@ -60,7 +60,7 @@ open class GenUniModulesUviewUltraComponentsUpKeyboardUpKeyboard : VueComponent 
                             )),
                             _cE("view", _uM("hover-class" to "up-hover-class", "hover-stay-time" to 100), _uA(
                                 if (isTrue(_ctx.showConfirm)) {
-                                    _cE("text", _uM("key" to 0, "onClick" to _ctx.onConfirm, "class" to "up-keyboard__tooltip__item up-keyboard__tooltip__submit", "hover-class" to "up-hover-class"), _tD(if (_ctx.showConfirm) {
+                                    _cE("text", _uM("key" to 0, "onClick" to _ctx.onConfirm, "class" to "up-keyboard__tooltip__item up-keyboard__tooltip__submit", "hover-class" to "up-hover-class"), _tD(if (isTruthy(_ctx.showConfirm)) {
                                         _ctx.confirmText
                                     } else {
                                         ""

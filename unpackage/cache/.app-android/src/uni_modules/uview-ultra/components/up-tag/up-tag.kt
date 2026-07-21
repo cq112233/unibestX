@@ -30,20 +30,20 @@ open class GenUniModulesUviewUltraComponentsUpTagUpTag : VueComponent {
                         "up-tag",
                         _uA(
                             "up-tag--" + _ctx.shape,
-                            if (!_ctx.plain) {
+                            if (!isTruthy(_ctx.plain)) {
                                 "up-tag--" + _ctx.type
                             } else {
                                 ""
                             }
                             ,
-                            if (_ctx.plain) {
+                            if (isTruthy(_ctx.plain)) {
                                 "up-tag--" + _ctx.type + "--plain"
                             } else {
                                 ""
                             }
                             ,
                             "up-tag--" + _ctx.size,
-                            if ((_ctx.plain && _ctx.plainFill)) {
+                            if ((isTruthy(_ctx.plain) && isTruthy(_ctx.plainFill))) {
                                 "up-tag--" + _ctx.type + "--plain--fill"
                             } else {
                                 ""
@@ -52,12 +52,12 @@ open class GenUniModulesUviewUltraComponentsUpTagUpTag : VueComponent {
                     )), "onClick" to withModifiers(_ctx.clickHandler, _uA(
                         "stop"
                     )), "style" to _nS(_uA(
-                        _uM("marginRight" to if (_ctx.closable) {
+                        _uM("marginRight" to if (isTruthy(_ctx.closable)) {
                             "10px"
                         } else {
                             0
                         }
-                        , "marginTop" to if (_ctx.closable) {
+                        , "marginTop" to if (isTruthy(_ctx.closable)) {
                             "10px"
                         } else {
                             0
@@ -93,7 +93,7 @@ open class GenUniModulesUviewUltraComponentsUpTagUpTag : VueComponent {
                             "up-tag__text",
                             _uA(
                                 "up-tag__text--" + _ctx.type,
-                                if (_ctx.plain) {
+                                if (isTruthy(_ctx.plain)) {
                                     "up-tag__text--" + _ctx.type + "--plain"
                                 } else {
                                     ""
@@ -232,7 +232,7 @@ open class GenUniModulesUviewUltraComponentsUpTagUpTag : VueComponent {
             return if (this.iconColor != "") {
                 this.iconColor
             } else {
-                if (this.plain) {
+                if (isTruthy(this.plain)) {
                     this.type
                 } else {
                     "#ffffff"

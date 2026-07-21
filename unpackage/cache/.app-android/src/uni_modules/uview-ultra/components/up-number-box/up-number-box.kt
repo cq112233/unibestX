@@ -43,7 +43,12 @@ open class GenUniModulesUviewUltraComponentsUpNumberBoxUpNumberBox : VueComponen
         val _cache = this.`$`.renderCache
         val _component_up_icon = resolveEasyComponent("up-icon", GenUniModulesUviewUltraComponentsUpIconUpIconClass)
         return _cE("view", _uM("class" to "up-number-box"), _uA(
-            if (isTrue(_ctx.showMinus && !_ctx.hideMinus && _ctx.`$slots`["minus"] != null)) {
+            if (isTrue((if (isTruthy(_ctx.showMinus)) {
+                !_ctx.hideMinus
+            } else {
+                _ctx.showMinus
+            }
+            ) && _ctx.`$slots`["minus"] != null)) {
                 _cE("view", _uM("key" to 0, "class" to "up-number-box__slot cursor-pointer", "onClick" to withModifiers(fun(){
                     _ctx.clickHandler("minus")
                 }, _uA(
@@ -60,7 +65,12 @@ open class GenUniModulesUviewUltraComponentsUpNumberBoxUpNumberBox : VueComponen
                     "onTouchend"
                 ))
             } else {
-                if (isTrue(_ctx.showMinus && !_ctx.hideMinus)) {
+                if (isTrue(if (isTruthy(_ctx.showMinus)) {
+                    !_ctx.hideMinus
+                } else {
+                    _ctx.showMinus
+                }
+                )) {
                     _cE("view", _uM("key" to 1, "class" to _nC(_uA(
                         "up-number-box__minus cursor-pointer",
                         _uM("up-number-box__minus--disabled" to _ctx.isDisabled("minus"))
@@ -96,8 +106,16 @@ open class GenUniModulesUviewUltraComponentsUpNumberBoxUpNumberBox : VueComponen
             if (isTrue(!_ctx.hideMinus)) {
                 renderSlot(_ctx.`$slots`, "input", _uM("key" to 2), fun(): UTSArray<Any> {
                     return _uA(
-                        _cE("input", _uM("disabled" to (_ctx.disabledInput || _ctx.disabled), "cursor-spacing" to _ctx.getCursorSpacing, "class" to _nC(_uA(
-                            _uM("up-number-box__input--disabled" to (_ctx.disabled || _ctx.disabledInput)),
+                        _cE("input", _uM("disabled" to if (isTruthy(_ctx.disabledInput)) {
+                            _ctx.disabledInput
+                        } else {
+                            _ctx.disabled
+                        }, "cursor-spacing" to _ctx.getCursorSpacing, "class" to _nC(_uA(
+                            _uM("up-number-box__input--disabled" to if (isTruthy(_ctx.disabled)) {
+                                _ctx.disabled
+                            } else {
+                                _ctx.disabledInput
+                            }),
                             "up-number-box__input"
                         )), "modelValue" to _ctx.currentValue, "onInput" to _uA<Any?>(fun(`$event`: UniInputEvent){
                             _ctx.currentValue = `$event`.detail.value
@@ -117,7 +135,12 @@ open class GenUniModulesUviewUltraComponentsUpNumberBoxUpNumberBox : VueComponen
                 _cC("v-if", true)
             }
             ,
-            if (isTrue(_ctx.showPlus && _ctx.`$slots`["plus"] != null)) {
+            if (isTrue(if (isTruthy(_ctx.showPlus)) {
+                _ctx.`$slots`["plus"] != null
+            } else {
+                _ctx.showPlus
+            }
+            )) {
                 _cE("view", _uM("key" to 3, "class" to "up-number-box__slot cursor-pointer", "onClick" to withModifiers(fun(){
                     _ctx.clickHandler("plus")
                 }, _uA(
@@ -384,7 +407,7 @@ open class GenUniModulesUviewUltraComponentsUpNumberBoxUpNumberBox : VueComponen
         var value = reassignedValue
         value = value.toString()
         value = (value as String).replace(UTSRegExp("[^0-9.-]", "g"), "")
-        if (this.integer && (value as String).indexOf(".") != -1) {
+        if (isTruthy(this.integer) && (value as String).indexOf(".") != -1) {
             value = (value as String).split(".")[0]
         }
         return value as String
@@ -424,7 +447,7 @@ open class GenUniModulesUviewUltraComponentsUpNumberBoxUpNumberBox : VueComponen
         this.emitChange(formatted2)
     }
     open fun emitChange(value: Any, type: String = "") {
-        if (!this.asyncChange) {
+        if (!isTruthy(this.asyncChange)) {
             this.`$nextTick`(fun(){
                 this.`$emit`("update:modelValue", value)
                 this.currentValue = value
@@ -470,7 +493,7 @@ open class GenUniModulesUviewUltraComponentsUpNumberBoxUpNumberBox : VueComponen
     }
     open var onTouchStart = ::gen_onTouchStart_fn
     open fun gen_onTouchStart_fn(type: String) {
-        if (!this.longPress) {
+        if (!isTruthy(this.longPress)) {
             return
         }
         this.clearTimeout()
@@ -483,7 +506,7 @@ open class GenUniModulesUviewUltraComponentsUpNumberBoxUpNumberBox : VueComponen
     }
     open var onTouchEnd = ::gen_onTouchEnd_fn
     open fun gen_onTouchEnd_fn() {
-        if (!this.longPress) {
+        if (!isTruthy(this.longPress)) {
             return
         }
         this.clearTimeout()

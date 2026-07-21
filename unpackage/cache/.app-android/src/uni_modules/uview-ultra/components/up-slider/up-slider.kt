@@ -18,7 +18,7 @@ open class GenUniModulesUviewUltraComponentsUpSliderUpSlider : VueComponent {
         onCreated(fun() {}, __ins)
         onCreated(fun() {}, __ins)
         onMounted(fun() {
-            if (!this.useNative) {
+            if (!isTruthy(this.useNative)) {
                 this.upGetRect(".up-slider__base").then(fun(rect: NodeInfo){
                     this.sliderRect.width = rect.width ?: 0
                     this.sliderRect.left = rect.left ?: 0
@@ -59,12 +59,12 @@ open class GenUniModulesUviewUltraComponentsUpSliderUpSlider : VueComponent {
         val _cache = this.`$`.renderCache
         val _component_slider = resolveComponent("slider")
         return _cE("view", _uM("class" to "up-slider", "style" to _nS(_ctx.addStyle(_ctx.customStyle))), _uA(
-            if (isTrue(!_ctx.useNative || _ctx.isRange)) {
+            if (isTrue(!isTruthy(_ctx.useNative) || _ctx.isRange)) {
                 _cE(Fragment, _uM("key" to 0), _uA(
                     _cE("view", _uM("ref" to "up-slider-inner", "class" to _nC(_uA(
                         "up-slider-inner",
                         _uA(
-                            if (_ctx.disabled) {
+                            if (isTruthy(_ctx.disabled)) {
                                 "up-slider--disabled"
                             } else {
                                 ""
@@ -88,12 +88,20 @@ open class GenUniModulesUviewUltraComponentsUpSliderUpSlider : VueComponent {
                         } else {
                             _cC("v-if", true)
                         },
-                        if (isTrue(_ctx.isRange && _ctx.showValue)) {
+                        if (isTrue(if (_ctx.isRange) {
+                            _ctx.showValue
+                        } else {
+                            _ctx.isRange
+                        })) {
                             _cE("text", _uM("key" to 1, "class" to "up-slider__show-range-value", "style" to _nS(_uM("left" to ((parseFloat(_ctx.getPx(_ctx.barStyle0.width)) + parseFloat(_ctx.getPx(_ctx.blockSize)) / 2) + "px")))), _tD(this.rangeValue[0] ?: ""), 5)
                         } else {
                             _cC("v-if", true)
                         },
-                        if (isTrue(_ctx.isRange && _ctx.showValue)) {
+                        if (isTrue(if (_ctx.isRange) {
+                            _ctx.showValue
+                        } else {
+                            _ctx.isRange
+                        })) {
                             _cE("text", _uM("key" to 2, "class" to "up-slider__show-range-value", "style" to _nS(_uM("left" to ((parseFloat(_ctx.getPx(_ctx.barStyle.width)) + parseFloat(_ctx.getPx(_ctx.blockSize)) / 2) + "px")))), _tD(this.rangeValue[1] ?: ""), 5)
                         } else {
                             _cC("v-if", true)
@@ -153,7 +161,11 @@ open class GenUniModulesUviewUltraComponentsUpSliderUpSlider : VueComponent {
                         "onTouchend",
                         "onTouchcancel"
                     )),
-                    if (isTrue(_ctx.showValue && !_ctx.isRange)) {
+                    if (isTrue(if (isTruthy(_ctx.showValue)) {
+                        !_ctx.isRange
+                    } else {
+                        _ctx.showValue
+                    })) {
                         _cE("view", _uM("key" to 0, "class" to "up-slider__show-value"), _tD(_ctx.modelValue), 1)
                     } else {
                         _cC("v-if", true)
@@ -217,7 +229,7 @@ open class GenUniModulesUviewUltraComponentsUpSliderUpSlider : VueComponent {
     override fun data(): Map<String, Any?> {
         return _uM("parent" to null as ComponentPublicInstance?, "parentData" to _uO(), "children" to _uA<ComponentPublicInstance>(), "childrenRefs" to _uA<String>(), "startX" to 0, "status" to "end", "newValue" to 0, "distanceX" to 0, "startValue0" to 0, "startValue" to 0, "barStyle0" to barStyleType(width = "0px"), "barStyle" to barStyleType(width = "0px", transition = ""), "sliderRect" to sliderRectType(left = 0, width = 0), "innerStyleCpu" to computed<UTSJSONObject>(fun(): UTSJSONObject {
             var style: UTSJSONObject = this.innerStyle
-            style["height"] = if ((this.isRange && this.showValue)) {
+            style["height"] = if ((this.isRange && isTruthy(this.showValue))) {
                 (parseFloat(uni.UNI5198058.getPx(this.blockSize)) + 24).toString(10) + "px"
             } else {
                 uni.UNI5198058.getPx(this.blockSize) + "px"
@@ -379,7 +391,7 @@ open class GenUniModulesUviewUltraComponentsUpSliderUpSlider : VueComponent {
     }
     open fun onTouchStart(e: Any, index: Number = 1) {
         var event = e as UniTouchEvent
-        if (this.disabled) {
+        if (isTruthy(this.disabled)) {
             return
         }
         this.startX = 0
@@ -402,7 +414,7 @@ open class GenUniModulesUviewUltraComponentsUpSliderUpSlider : VueComponent {
     }
     open fun onTouchMove(e: Any, index: Number = 1) {
         var event = e as UniTouchEvent
-        if (this.disabled) {
+        if (isTruthy(this.disabled)) {
             return
         }
         if (this.status == "start") {
@@ -418,7 +430,7 @@ open class GenUniModulesUviewUltraComponentsUpSliderUpSlider : VueComponent {
         this.`$emit`("changing", crtFmtValue)
     }
     open fun onTouchEnd(e: Any, index: Number = 1) {
-        if (this.disabled) {
+        if (isTruthy(this.disabled)) {
             return
         }
         if (this.status === "moving") {
@@ -438,7 +450,7 @@ open class GenUniModulesUviewUltraComponentsUpSliderUpSlider : VueComponent {
     }
     open var onClick = ::gen_onClick_fn
     open fun gen_onClick_fn(event: UniPointerEvent) {
-        if (this.disabled) {
+        if (isTruthy(this.disabled)) {
             return
         }
         var clientX = event.x - this.sliderRect.left

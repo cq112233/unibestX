@@ -33,7 +33,7 @@ open class GenUniModulesUviewUltraComponentsUpSwipeActionItemUpSwipeActionItem :
             return this.show
         }
         , fun(newValue: Boolean) {
-            if (newValue) {
+            if (isTruthy(newValue)) {
                 this.status = "open"
             } else {
                 this.status = "close"
@@ -52,7 +52,7 @@ open class GenUniModulesUviewUltraComponentsUpSwipeActionItemUpSwipeActionItem :
             } else {
                 this.`$emit`("update:show", false)
             }
-            if (this.disabled) {
+            if (isTruthy(this.disabled)) {
                 return
             }
             if (newValue === "close" && oldValue === "open") {
@@ -454,7 +454,7 @@ open class GenUniModulesUviewUltraComponentsUpSwipeActionItemUpSwipeActionItem :
     open var buttonClickHandler = ::gen_buttonClickHandler_fn
     open fun gen_buttonClickHandler_fn(item: Any, index: Number) {
         var ret = this.`$emit`("click", _uO("index" to index, "name" to this.name), fun(){})
-        if (this.closeOnClick) {
+        if (isTruthy(this.closeOnClick)) {
             this.closeHandler()
         }
     }
@@ -489,7 +489,7 @@ open class GenUniModulesUviewUltraComponentsUpSwipeActionItemUpSwipeActionItem :
     }
     open var touchmove = ::gen_touchmove_fn
     open fun gen_touchmove_fn(event: UniTouchEvent) {
-        if (this.disabled || this.state["moving"] == null) {
+        if (isTruthy(this.disabled) || this.state["moving"] == null) {
             return
         }
         var touches = event.touches
@@ -526,7 +526,7 @@ open class GenUniModulesUviewUltraComponentsUpSwipeActionItemUpSwipeActionItem :
     }
     open var touchend = ::gen_touchend_fn
     open fun gen_touchend_fn(event: UniTouchEvent) {
-        if (this.state["moving"] == false || this.disabled) {
+        if (this.state["moving"] == false || isTruthy(this.disabled)) {
             return
         }
         this.state["moving"] = false
@@ -559,7 +559,7 @@ open class GenUniModulesUviewUltraComponentsUpSwipeActionItemUpSwipeActionItem :
     }
     open var touchcancel = ::gen_touchcancel_fn
     open fun gen_touchcancel_fn(event: UniTouchEvent) {
-        if (this.state["moving"] == false || this.disabled) {
+        if (this.state["moving"] == false || isTruthy(this.disabled)) {
             return
         }
         this.state["moving"] = false

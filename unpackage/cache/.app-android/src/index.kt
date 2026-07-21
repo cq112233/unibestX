@@ -101,7 +101,7 @@ fun tryConnectSocket(host: String, port: String, id: String): UTSPromise<SocketT
         )
         socket.onMessage(fun(result){
             if (UTSAndroid.`typeof`(result["data"]) == "string") {
-                val message = UTSAndroid.consoleDebugError(JSON.parse<UTSJSONObject>(result["data"] as String), " at ../../../../../../../../../../Applications/HBuilderX.app/Contents/HBuilderX/plugins/uniapp-cli-vite/node_modules/@dcloudio/uni-console/src/runtime/app/socket.ts:67")!!
+                val message = UTSAndroid.consoleDebugError(JSON.parse<UTSJSONObject>(result["data"] as String), " at ../../../../../../../../../../Applications/HBuilderX 2.app/Contents/HBuilderX/plugins/uniapp-cli-vite/node_modules/@dcloudio/uni-console/src/runtime/app/socket.ts:67")!!
                 if ((message["type"] as String) == "screencap") {
                     val id = message["id"] as String
                     currentPageCaptureScreenshot(message["fullPage"] as Boolean, fun(base64: String, error: String){
@@ -119,7 +119,7 @@ fun tryConnectSocket(host: String, port: String, id: String): UTSPromise<SocketT
 fun initRuntimeSocketService(): UTSPromise<Boolean> {
     val hosts: String = "127.0.0.1,192.168.100.169,198.18.0.1,10.8.0.7"
     val port: String = "8090"
-    val id: String = "app-android_I8ncza"
+    val id: String = "app-android_b36yeY"
     if (hosts == "" || port == "" || id == "") {
         return UTSPromise.resolve(false)
     }
@@ -1261,13 +1261,41 @@ fun video(value: String): Boolean {
     val VIDEO_REGEXP = UTSRegExp("\\.(mp4|mpg|mpeg|dat|asf|avi|rm|rmvb|mov|wmv|flv|mkv|m3u8)", "i")
     return VIDEO_REGEXP.test(value)
 }
-val `default`: UTSJSONObject = _uO("v" to "4", "version" to "4", "type" to _uA(
-    "primary",
-    "success",
-    "info",
-    "error",
-    "warning"
-), "color" to _uO("up-primary" to "#2979ff", "up-warning" to "#ff9900", "up-success" to "#19be6b", "up-error" to "#fa3534", "up-info" to "#909399", "up-main-color" to "#303133", "up-content-color" to "#606266", "up-tips-color" to "#909399", "up-light-color" to "#c0c4cc"), "unit" to "px")
+fun __uts_large_default_export_prop_fill_fill_1(__obj: UTSJSONObject): Unit {
+    __obj["up-primary"] = "#2979ff"
+    __obj["up-warning"] = "#ff9900"
+    __obj["up-success"] = "#19be6b"
+    __obj["up-error"] = "#fa3534"
+    __obj["up-info"] = "#909399"
+    __obj["up-main-color"] = "#303133"
+    __obj["up-content-color"] = "#606266"
+    __obj["up-tips-color"] = "#909399"
+    __obj["up-light-color"] = "#c0c4cc"
+}
+fun __uts_large_default_export_prop_build_0(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/libs/config/config.uts", 13, 11))
+    __uts_large_default_export_prop_fill_fill_1(__obj)
+    return __obj
+}
+fun __uts_large_default_export_fill_fill_3(__obj: UTSJSONObject): Unit {
+    __obj["v"] = "4"
+    __obj["version"] = "4"
+    __obj["type"] = _uA(
+        "primary",
+        "success",
+        "info",
+        "error",
+        "warning"
+    )
+    __obj["color"] = __uts_large_default_export_prop_build_0()
+    __obj["unit"] = "px"
+}
+fun __uts_large_default_export_build_2(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/libs/config/config.uts", 31, 11))
+    __uts_large_default_export_fill_fill_3(__obj)
+    return __obj
+}
+val `default` = __uts_large_default_export_build_2()
 fun upGetRect(selector: String, all: Boolean = false, comp: Any? = null): UTSPromise<NodeInfo> {
     return UTSPromise(fun(resolve, _reject){
         if (all == true) {
@@ -1885,11 +1913,11 @@ open class GenApp : BaseApp {
             }
         val styles22: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("border-bottom-width-1px" to _pS(_uM("borderBottomWidth" to 1)), "border-color-__a7f3d0_" to _pS(_uM("borderTopColor" to "#a7f3d0", "borderRightColor" to "#a7f3d0", "borderBottomColor" to "#a7f3d0", "borderLeftColor" to "#a7f3d0")), "border-color-__bfdbfe_" to _pS(_uM("borderTopColor" to "#bfdbfe", "borderRightColor" to "#bfdbfe", "borderBottomColor" to "#bfdbfe", "borderLeftColor" to "#bfdbfe")), "border-color-__cbd5e1_" to _pS(_uM("borderTopColor" to "#cbd5e1", "borderRightColor" to "#cbd5e1", "borderBottomColor" to "#cbd5e1", "borderLeftColor" to "#cbd5e1")), "border-color-__e2e8f0_" to _pS(_uM("borderTopColor" to "#e2e8f0", "borderRightColor" to "#e2e8f0", "borderBottomColor" to "#e2e8f0", "borderLeftColor" to "#e2e8f0")), "border-color-__edf2f7_" to _pS(_uM("borderTopColor" to "#edf2f7", "borderRightColor" to "#edf2f7", "borderBottomColor" to "#edf2f7", "borderLeftColor" to "#edf2f7")), "border-color-__f1f5f9_" to _pS(_uM("borderTopColor" to "#f1f5f9", "borderRightColor" to "#f1f5f9", "borderBottomColor" to "#f1f5f9", "borderLeftColor" to "#f1f5f9")), "border-color-__fde68a_" to _pS(_uM("borderTopColor" to "#fde68a", "borderRightColor" to "#fde68a", "borderBottomColor" to "#fde68a", "borderLeftColor" to "#fde68a")), "border-color-__fecaca_" to _pS(_uM("borderTopColor" to "#fecaca", "borderRightColor" to "#fecaca", "borderBottomColor" to "#fecaca", "borderLeftColor" to "#fecaca")), "border-color-__ffe4e6_" to _pS(_uM("borderTopColor" to "#ffe4e6", "borderRightColor" to "#ffe4e6", "borderBottomColor" to "#ffe4e6", "borderLeftColor" to "#ffe4e6")), "border-solid" to _pS(_uM("borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid")), "border-style-solid" to _pS(_uM("borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid")), "border-t" to _pS(_uM("borderTopWidth" to "var(--un-line-width-default, 1px)")), "border-top-color-__e2e8f0_" to _pS(_uM("borderTopColor" to "#e2e8f0")), "border-top-color-__f1f5f9_" to _pS(_uM("borderTopColor" to "#f1f5f9")), "border-top-color-__f8fafc_" to _pS(_uM("borderTopColor" to "#f8fafc")), "border-top-style-solid" to _pS(_uM("borderTopStyle" to "solid")), "border-top-width-1px" to _pS(_uM("borderTopWidth" to 1)), "border-width-1px" to _pS(_uM("borderTopWidth" to 1, "borderRightWidth" to 1, "borderBottomWidth" to 1, "borderLeftWidth" to 1)), "border-width-3px" to _pS(_uM("borderTopWidth" to 3, "borderRightWidth" to 3, "borderBottomWidth" to 3, "borderLeftWidth" to 3)), "color-_19be6b" to _pS(_uM("color" to "rgba(25, 190, 107, var(--un-color-opacity, 1))")), "fixed" to _pS(_uM("position" to "fixed")), "flex" to _pS(_uM("display" to "flex")), "flex-1" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")), "flex-col" to _pS(_uM("flexDirection" to "column")), "flex-row" to _pS(_uM("flexDirection" to "row")), "flex-wrap" to _pS(_uM("flexWrap" to "wrap")), "font-500" to _pS(_uM("fontWeight" to "500")), "font-bold" to _pS(_uM("fontWeight" to "700")), "font-medium" to _pS(_uM("fontWeight" to "500")), "font-semibold" to _pS(_uM("fontWeight" to "600")), "h-10px" to _pS(_uM("height" to 10)), "h-150px" to _pS(_uM("height" to 150)), "h-16px" to _pS(_uM("height" to 16)), "h-180px" to _pS(_uM("height" to 180)), "h-260px" to _pS(_uM("height" to 260)), "h-28px" to _pS(_uM("height" to 28)), "h-32px" to _pS(_uM("height" to 32)), "h-36px" to _pS(_uM("height" to 36)), "h-38px" to _pS(_uM("height" to 38)), "h-40px" to _pS(_uM("height" to 40)), "h-42px" to _pS(_uM("height" to 42)), "h-44px" to _pS(_uM("height" to 44)), "h-48px" to _pS(_uM("height" to 48)), "h-6px" to _pS(_uM("height" to 6)), "h-90px" to _pS(_uM("height" to 90)), "h-full" to _pS(_uM("height" to "100%")), "i_h-full" to _pS(_uM("!height" to "100%")), "items-center" to _pS(_uM("alignItems" to "center")), "justify-between" to _pS(_uM("justifyContent" to "space-between")), "justify-center" to _pS(_uM("justifyContent" to "center")), "leading-16px" to _pS(_uM("lineHeight" to "16px")), "leading-18px" to _pS(_uM("lineHeight" to "18px")), "leading-20px" to _pS(_uM("lineHeight" to "20px")), "leading-normal" to _pS(_uM("lineHeight" to "normal")), "m-16px" to _pS(_uM("marginTop" to 16, "marginRight" to 16, "marginBottom" to 16, "marginLeft" to 16)), "mb-10px" to _pS(_uM("marginBottom" to 10)), "mb-12px" to _pS(_uM("marginBottom" to 12)), "mb-15px" to _pS(_uM("marginBottom" to 15)), "mb-16px" to _pS(_uM("marginBottom" to 16)), "mb-20px" to _pS(_uM("marginBottom" to 20)), "mb-24px" to _pS(_uM("marginBottom" to 24)), "mb-30px" to _pS(_uM("marginBottom" to 30)), "mb-4px" to _pS(_uM("marginBottom" to 4)), "mb-6px" to _pS(_uM("marginBottom" to 6)), "mb-8px" to _pS(_uM("marginBottom" to 8)), "ml-10px" to _pS(_uM("marginLeft" to 10)), "ml-12px" to _pS(_uM("marginLeft" to 12)), "ml-4px" to _pS(_uM("marginLeft" to 4)), "ml-8px" to _pS(_uM("marginLeft" to 8)), "mr-10px" to _pS(_uM("marginRight" to 10)), "mr-4px" to _pS(_uM("marginRight" to 4)), "mr-6px" to _pS(_uM("marginRight" to 6)), "mr-8px" to _pS(_uM("marginRight" to 8)), "mt-10px" to _pS(_uM("marginTop" to 10)), "mt-15px" to _pS(_uM("marginTop" to 15)), "mt-2px" to _pS(_uM("marginTop" to 2)), "mt-4px" to _pS(_uM("marginTop" to 4)), "mt-6px" to _pS(_uM("marginTop" to 6)), "mt-8px" to _pS(_uM("marginTop" to 8)), "mx-12px" to _pS(_uM("marginLeft" to 12, "marginRight" to 12)), "mx-16px" to _pS(_uM("marginLeft" to 16, "marginRight" to 16)), "mx-auto" to _pS(_uM("marginLeft" to "auto", "marginRight" to "auto")), "my-8px" to _pS(_uM("marginTop" to 8, "marginBottom" to 8)), "none" to _pS(_uM("display" to "none")), "overflow-hidden" to _pS(_uM("overflow" to "hidden")), "p-10px" to _pS(_uM("paddingTop" to 10, "paddingRight" to 10, "paddingBottom" to 10, "paddingLeft" to 10)), "p-12px" to _pS(_uM("paddingTop" to 12, "paddingRight" to 12, "paddingBottom" to 12, "paddingLeft" to 12)), "p-16px" to _pS(_uM("paddingTop" to 16, "paddingRight" to 16, "paddingBottom" to 16, "paddingLeft" to 16)), "p-20px" to _pS(_uM("paddingTop" to 20, "paddingRight" to 20, "paddingBottom" to 20, "paddingLeft" to 20)), "p-2px" to _pS(_uM("paddingTop" to 2, "paddingRight" to 2, "paddingBottom" to 2, "paddingLeft" to 2)), "p-30px" to _pS(_uM("paddingTop" to 30, "paddingRight" to 30, "paddingBottom" to 30, "paddingLeft" to 30)), "p-4px" to _pS(_uM("paddingTop" to 4, "paddingRight" to 4, "paddingBottom" to 4, "paddingLeft" to 4)), "p-5px" to _pS(_uM("paddingTop" to 5, "paddingRight" to 5, "paddingBottom" to 5, "paddingLeft" to 5)), "pb-10px" to _pS(_uM("paddingBottom" to 10)), "pb-8px" to _pS(_uM("paddingBottom" to 8)), "pt-20px" to _pS(_uM("paddingTop" to 20)), "pt-4px" to _pS(_uM("paddingTop" to 4)), "pt-8px" to _pS(_uM("paddingTop" to 8)), "px-10px" to _pS(_uM("paddingLeft" to 10, "paddingRight" to 10)))
+                return _uM("border-bottom-width-1px" to _pS(_uM("borderBottomWidth" to 1)), "border-color-__a7f3d0_" to _pS(_uM("borderTopColor" to "#a7f3d0", "borderRightColor" to "#a7f3d0", "borderBottomColor" to "#a7f3d0", "borderLeftColor" to "#a7f3d0")), "border-color-__bfdbfe_" to _pS(_uM("borderTopColor" to "#bfdbfe", "borderRightColor" to "#bfdbfe", "borderBottomColor" to "#bfdbfe", "borderLeftColor" to "#bfdbfe")), "border-color-__cbd5e1_" to _pS(_uM("borderTopColor" to "#cbd5e1", "borderRightColor" to "#cbd5e1", "borderBottomColor" to "#cbd5e1", "borderLeftColor" to "#cbd5e1")), "border-color-__e2e8f0_" to _pS(_uM("borderTopColor" to "#e2e8f0", "borderRightColor" to "#e2e8f0", "borderBottomColor" to "#e2e8f0", "borderLeftColor" to "#e2e8f0")), "border-color-__edf2f7_" to _pS(_uM("borderTopColor" to "#edf2f7", "borderRightColor" to "#edf2f7", "borderBottomColor" to "#edf2f7", "borderLeftColor" to "#edf2f7")), "border-color-__f1f5f9_" to _pS(_uM("borderTopColor" to "#f1f5f9", "borderRightColor" to "#f1f5f9", "borderBottomColor" to "#f1f5f9", "borderLeftColor" to "#f1f5f9")), "border-color-__fde68a_" to _pS(_uM("borderTopColor" to "#fde68a", "borderRightColor" to "#fde68a", "borderBottomColor" to "#fde68a", "borderLeftColor" to "#fde68a")), "border-color-__fecaca_" to _pS(_uM("borderTopColor" to "#fecaca", "borderRightColor" to "#fecaca", "borderBottomColor" to "#fecaca", "borderLeftColor" to "#fecaca")), "border-color-__ffe4e6_" to _pS(_uM("borderTopColor" to "#ffe4e6", "borderRightColor" to "#ffe4e6", "borderBottomColor" to "#ffe4e6", "borderLeftColor" to "#ffe4e6")), "border-solid" to _pS(_uM("borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid")), "border-style-solid" to _pS(_uM("borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid")), "border-t" to _pS(_uM("borderTopWidth" to "var(--un-line-width-default, 1px)")), "border-top-color-__e2e8f0_" to _pS(_uM("borderTopColor" to "#e2e8f0")), "border-top-color-__f1f5f9_" to _pS(_uM("borderTopColor" to "#f1f5f9")), "border-top-color-__f8fafc_" to _pS(_uM("borderTopColor" to "#f8fafc")), "border-top-style-solid" to _pS(_uM("borderTopStyle" to "solid")), "border-top-width-1px" to _pS(_uM("borderTopWidth" to 1)), "border-width-1px" to _pS(_uM("borderTopWidth" to 1, "borderRightWidth" to 1, "borderBottomWidth" to 1, "borderLeftWidth" to 1)), "border-width-3px" to _pS(_uM("borderTopWidth" to 3, "borderRightWidth" to 3, "borderBottomWidth" to 3, "borderLeftWidth" to 3)), "color-_19be6b" to _pS(_uM("color" to "rgba(25, 190, 107, var(--un-color-opacity, 1))")), "fixed" to _pS(_uM("position" to "fixed")), "flex" to _pS(_uM("display" to "flex")), "flex-1" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")), "flex-col" to _pS(_uM("flexDirection" to "column")), "flex-row" to _pS(_uM("flexDirection" to "row")), "flex-wrap" to _pS(_uM("flexWrap" to "wrap")), "font-500" to _pS(_uM("fontWeight" to 500)), "font-bold" to _pS(_uM("fontWeight" to 700)), "font-medium" to _pS(_uM("fontWeight" to 500)), "font-semibold" to _pS(_uM("fontWeight" to 600)), "h-100px" to _pS(_uM("height" to 100)), "h-10px" to _pS(_uM("height" to 10)), "h-150px" to _pS(_uM("height" to 150)), "h-16px" to _pS(_uM("height" to 16)), "h-180px" to _pS(_uM("height" to 180)), "h-260px" to _pS(_uM("height" to 260)), "h-28px" to _pS(_uM("height" to 28)), "h-32px" to _pS(_uM("height" to 32)), "h-36px" to _pS(_uM("height" to 36)), "h-38px" to _pS(_uM("height" to 38)), "h-40px" to _pS(_uM("height" to 40)), "h-42px" to _pS(_uM("height" to 42)), "h-44px" to _pS(_uM("height" to 44)), "h-48px" to _pS(_uM("height" to 48)), "h-6px" to _pS(_uM("height" to 6)), "h-90px" to _pS(_uM("height" to 90)), "h-full" to _pS(_uM("height" to "100%")), "i_h-full" to _pS(_uM("!height" to "100%")), "items-center" to _pS(_uM("alignItems" to "center")), "justify-between" to _pS(_uM("justifyContent" to "space-between")), "justify-center" to _pS(_uM("justifyContent" to "center")), "leading-16px" to _pS(_uM("lineHeight" to "16px")), "leading-18px" to _pS(_uM("lineHeight" to "18px")), "leading-20px" to _pS(_uM("lineHeight" to "20px")), "leading-normal" to _pS(_uM("lineHeight" to "normal")), "m-16px" to _pS(_uM("marginTop" to 16, "marginRight" to 16, "marginBottom" to 16, "marginLeft" to 16)), "m-auto" to _pS(_uM("marginTop" to "auto", "marginRight" to "auto", "marginBottom" to "auto", "marginLeft" to "auto")), "mb-10px" to _pS(_uM("marginBottom" to 10)), "mb-12px" to _pS(_uM("marginBottom" to 12)), "mb-15px" to _pS(_uM("marginBottom" to 15)), "mb-16px" to _pS(_uM("marginBottom" to 16)), "mb-20px" to _pS(_uM("marginBottom" to 20)), "mb-24px" to _pS(_uM("marginBottom" to 24)), "mb-30px" to _pS(_uM("marginBottom" to 30)), "mb-4px" to _pS(_uM("marginBottom" to 4)), "mb-6px" to _pS(_uM("marginBottom" to 6)), "mb-8px" to _pS(_uM("marginBottom" to 8)), "ml-10px" to _pS(_uM("marginLeft" to 10)), "ml-12px" to _pS(_uM("marginLeft" to 12)), "ml-4px" to _pS(_uM("marginLeft" to 4)), "ml-8px" to _pS(_uM("marginLeft" to 8)), "mr-10px" to _pS(_uM("marginRight" to 10)), "mr-4px" to _pS(_uM("marginRight" to 4)), "mr-6px" to _pS(_uM("marginRight" to 6)), "mr-8px" to _pS(_uM("marginRight" to 8)), "mt-10px" to _pS(_uM("marginTop" to 10)), "mt-15px" to _pS(_uM("marginTop" to 15)), "mt-2px" to _pS(_uM("marginTop" to 2)), "mt-40px" to _pS(_uM("marginTop" to 40)), "mt-4px" to _pS(_uM("marginTop" to 4)), "mt-6px" to _pS(_uM("marginTop" to 6)), "mt-8px" to _pS(_uM("marginTop" to 8)), "mx-12px" to _pS(_uM("marginLeft" to 12, "marginRight" to 12)), "mx-16px" to _pS(_uM("marginLeft" to 16, "marginRight" to 16)), "mx-30px" to _pS(_uM("marginLeft" to 30, "marginRight" to 30)), "mx-auto" to _pS(_uM("marginLeft" to "auto", "marginRight" to "auto")), "my-8px" to _pS(_uM("marginTop" to 8, "marginBottom" to 8)), "none" to _pS(_uM("display" to "none")), "overflow-hidden" to _pS(_uM("overflow" to "hidden")), "p-10px" to _pS(_uM("paddingTop" to 10, "paddingRight" to 10, "paddingBottom" to 10, "paddingLeft" to 10)), "p-12px" to _pS(_uM("paddingTop" to 12, "paddingRight" to 12, "paddingBottom" to 12, "paddingLeft" to 12)), "p-16px" to _pS(_uM("paddingTop" to 16, "paddingRight" to 16, "paddingBottom" to 16, "paddingLeft" to 16)), "p-20px" to _pS(_uM("paddingTop" to 20, "paddingRight" to 20, "paddingBottom" to 20, "paddingLeft" to 20)), "p-2px" to _pS(_uM("paddingTop" to 2, "paddingRight" to 2, "paddingBottom" to 2, "paddingLeft" to 2)), "p-30px" to _pS(_uM("paddingTop" to 30, "paddingRight" to 30, "paddingBottom" to 30, "paddingLeft" to 30)), "p-4px" to _pS(_uM("paddingTop" to 4, "paddingRight" to 4, "paddingBottom" to 4, "paddingLeft" to 4)), "p-5px" to _pS(_uM("paddingTop" to 5, "paddingRight" to 5, "paddingBottom" to 5, "paddingLeft" to 5)), "pb-10px" to _pS(_uM("paddingBottom" to 10)), "pb-8px" to _pS(_uM("paddingBottom" to 8)))
             }
         val styles23: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("px-12px" to _pS(_uM("paddingLeft" to 12, "paddingRight" to 12)), "px-15px" to _pS(_uM("paddingLeft" to 15, "paddingRight" to 15)), "px-16px" to _pS(_uM("paddingLeft" to 16, "paddingRight" to 16)), "px-20px" to _pS(_uM("paddingLeft" to 20, "paddingRight" to 20)), "px-6px" to _pS(_uM("paddingLeft" to 6, "paddingRight" to 6)), "px-8px" to _pS(_uM("paddingLeft" to 8, "paddingRight" to 8)), "py-10px" to _pS(_uM("paddingTop" to 10, "paddingBottom" to 10)), "py-12px" to _pS(_uM("paddingTop" to 12, "paddingBottom" to 12)), "py-24px" to _pS(_uM("paddingTop" to 24, "paddingBottom" to 24)), "py-2px" to _pS(_uM("paddingTop" to 2, "paddingBottom" to 2)), "py-30px" to _pS(_uM("paddingTop" to 30, "paddingBottom" to 30)), "py-3px" to _pS(_uM("paddingTop" to 3, "paddingBottom" to 3)), "py-4px" to _pS(_uM("paddingTop" to 4, "paddingBottom" to 4)), "py-6px" to _pS(_uM("paddingTop" to 6, "paddingBottom" to 6)), "py-8px" to _pS(_uM("paddingTop" to 8, "paddingBottom" to 8)), "rounded-10px" to _pS(_uM("borderTopLeftRadius" to 10, "borderTopRightRadius" to 10, "borderBottomRightRadius" to 10, "borderBottomLeftRadius" to 10)), "rounded-12px" to _pS(_uM("borderTopLeftRadius" to 12, "borderTopRightRadius" to 12, "borderBottomRightRadius" to 12, "borderBottomLeftRadius" to 12)), "rounded-14px" to _pS(_uM("borderTopLeftRadius" to 14, "borderTopRightRadius" to 14, "borderBottomRightRadius" to 14, "borderBottomLeftRadius" to 14)), "rounded-16px" to _pS(_uM("borderTopLeftRadius" to 16, "borderTopRightRadius" to 16, "borderBottomRightRadius" to 16, "borderBottomLeftRadius" to 16)), "rounded-18px" to _pS(_uM("borderTopLeftRadius" to 18, "borderTopRightRadius" to 18, "borderBottomRightRadius" to 18, "borderBottomLeftRadius" to 18)), "rounded-20px" to _pS(_uM("borderTopLeftRadius" to 20, "borderTopRightRadius" to 20, "borderBottomRightRadius" to 20, "borderBottomLeftRadius" to 20)), "rounded-24px" to _pS(_uM("borderTopLeftRadius" to 24, "borderTopRightRadius" to 24, "borderBottomRightRadius" to 24, "borderBottomLeftRadius" to 24)), "rounded-2px" to _pS(_uM("borderTopLeftRadius" to 2, "borderTopRightRadius" to 2, "borderBottomRightRadius" to 2, "borderBottomLeftRadius" to 2)), "rounded-3px" to _pS(_uM("borderTopLeftRadius" to 3, "borderTopRightRadius" to 3, "borderBottomRightRadius" to 3, "borderBottomLeftRadius" to 3)), "rounded-45px" to _pS(_uM("borderTopLeftRadius" to 45, "borderTopRightRadius" to 45, "borderBottomRightRadius" to 45, "borderBottomLeftRadius" to 45)), "rounded-4px" to _pS(_uM("borderTopLeftRadius" to 4, "borderTopRightRadius" to 4, "borderBottomRightRadius" to 4, "borderBottomLeftRadius" to 4)), "rounded-6px" to _pS(_uM("borderTopLeftRadius" to 6, "borderTopRightRadius" to 6, "borderBottomRightRadius" to 6, "borderBottomLeftRadius" to 6)), "rounded-8px" to _pS(_uM("borderTopLeftRadius" to 8, "borderTopRightRadius" to 8, "borderBottomRightRadius" to 8, "borderBottomLeftRadius" to 8)), "rounded-bl-16px" to _pS(_uM("borderBottomLeftRadius" to 16)), "rounded-br-16px" to _pS(_uM("borderBottomRightRadius" to 16)), "rounded-l-16px" to _pS(_uM("borderTopLeftRadius" to 16, "borderBottomLeftRadius" to 16)), "rounded-lg" to _pS(_uM("borderTopLeftRadius" to "var(--un-radius-lg-default, 8rpx)", "borderTopRightRadius" to "var(--un-radius-lg-default, 8rpx)", "borderBottomRightRadius" to "var(--un-radius-lg-default, 8rpx)", "borderBottomLeftRadius" to "var(--un-radius-lg-default, 8rpx)")), "rounded-r-16px" to _pS(_uM("borderTopRightRadius" to 16, "borderBottomRightRadius" to 16)), "self-start" to _pS(_uM("alignSelf" to "flex-start")), "shadow-sm" to _pS(_uM("boxShadow" to "var(--un-inset-shadow, 0 0 #0000), var(--un-inset-ring-shadow, 0 0 #0000), var(--un-ring-offset-shadow, 0 0 #0000), var(--un-ring-shadow, 0 0 #0000), var(--un-shadow, 0 1rpx 3rpx 0 var(--un-shadow-color, rgba(0, 0, 0, var(--un-shadow-opacity, 0.1))), 0 1rpx 2rpx -1rpx var(--un-shadow-color, rgba(0, 0, 0, var(--un-shadow-opacity, 0.1))))", "--un-shadow" to "0 1rpx 3rpx 0rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1)))")), "text-__059669_" to _pS(_uM("color" to "#059669")), "text-__065f46_" to _pS(_uM("color" to "#065f46")), "text-__10b981_" to _pS(_uM("color" to "#10b981")), "text-__1a202c_" to _pS(_uM("color" to "#1a202c")), "text-__1e293b_" to _pS(_uM("color" to "#1e293b")), "text-__2563eb_" to _pS(_uM("color" to "#2563eb")), "text-__2979ff_" to _pS(_uM("color" to "#2979ff")), "text-__2d3748_" to _pS(_uM("color" to "#2d3748")), "text-__303133_" to _pS(_uM("color" to "#303133")), "text-__334155_" to _pS(_uM("color" to "#334155")), "text-__38bdf8_" to _pS(_uM("color" to "#38bdf8")), "text-__3b82f6_" to _pS(_uM("color" to "#3b82f6")), "text-__475569_" to _pS(_uM("color" to "#475569")), "text-__606266_" to _pS(_uM("color" to "#606266")), "text-__64748b_" to _pS(_uM("color" to "#64748b")), "text-__718096_" to _pS(_uM("color" to "#718096")), "text-__909399_" to _pS(_uM("color" to "#909399")), "text-__94a3b8_" to _pS(_uM("color" to "#94a3b8")), "text-__c0c4cc_" to _pS(_uM("color" to "#c0c4cc")), "text-__d97706_" to _pS(_uM("color" to "#d97706")), "text-__dc2626_" to _pS(_uM("color" to "#dc2626")), "text-__ef4444_" to _pS(_uM("color" to "#ef4444")), "text-__f43f5e_" to _pS(_uM("color" to "#f43f5e")), "text-__f59e0b_" to _pS(_uM("color" to "#f59e0b")), "text-__ffffff_" to _pS(_uM("color" to "#ffffff")), "text-_var_--theme-color__37c2bc__" to _pS(_uM("color" to "var(--theme-color, #37c2bc)")), "text-10px" to _pS(_uM("fontSize" to 10)), "text-11px" to _pS(_uM("fontSize" to 11)), "text-12px" to _pS(_uM("fontSize" to 12)), "text-13px" to _pS(_uM("fontSize" to 13)), "text-14px" to _pS(_uM("fontSize" to 14)), "text-15px" to _pS(_uM("fontSize" to 15)), "text-16px" to _pS(_uM("fontSize" to 16)), "text-20px" to _pS(_uM("fontSize" to 20)), "text-24px" to _pS(_uM("fontSize" to 24)), "text-center" to _pS(_uM("textAlign" to "center")), "text-right" to _pS(_uM("textAlign" to "right")), "text-white" to _pS(_uM("color" to "rgba(255, 255, 255, var(--un-color-opacity, 1))")), "w-10px" to _pS(_uM("width" to 10)), "w-150px" to _pS(_uM("width" to 150)), "w-15px" to _pS(_uM("width" to 15)), "w-200px" to _pS(_uM("width" to 200)), "w-20px" to _pS(_uM("width" to 20)), "w-28px" to _pS(_uM("width" to 28)), "w-32px" to _pS(_uM("width" to 32)), "w-36px" to _pS(_uM("width" to 36)), "w-40px" to _pS(_uM("width" to 40)), "w-4px" to _pS(_uM("width" to 4)), "w-6px" to _pS(_uM("width" to 6)), "w-90px" to _pS(_uM("width" to 90)), "w-full" to _pS(_uM("width" to "100%")))
+                return _uM("pt-20px" to _pS(_uM("paddingTop" to 20)), "pt-4px" to _pS(_uM("paddingTop" to 4)), "pt-8px" to _pS(_uM("paddingTop" to 8)), "px-10px" to _pS(_uM("paddingLeft" to 10, "paddingRight" to 10)), "px-12px" to _pS(_uM("paddingLeft" to 12, "paddingRight" to 12)), "px-15px" to _pS(_uM("paddingLeft" to 15, "paddingRight" to 15)), "px-16px" to _pS(_uM("paddingLeft" to 16, "paddingRight" to 16)), "px-20px" to _pS(_uM("paddingLeft" to 20, "paddingRight" to 20)), "px-30px" to _pS(_uM("paddingLeft" to 30, "paddingRight" to 30)), "px-6px" to _pS(_uM("paddingLeft" to 6, "paddingRight" to 6)), "px-8px" to _pS(_uM("paddingLeft" to 8, "paddingRight" to 8)), "py-10px" to _pS(_uM("paddingTop" to 10, "paddingBottom" to 10)), "py-12px" to _pS(_uM("paddingTop" to 12, "paddingBottom" to 12)), "py-15px" to _pS(_uM("paddingTop" to 15, "paddingBottom" to 15)), "py-24px" to _pS(_uM("paddingTop" to 24, "paddingBottom" to 24)), "py-2px" to _pS(_uM("paddingTop" to 2, "paddingBottom" to 2)), "py-30px" to _pS(_uM("paddingTop" to 30, "paddingBottom" to 30)), "py-3px" to _pS(_uM("paddingTop" to 3, "paddingBottom" to 3)), "py-4px" to _pS(_uM("paddingTop" to 4, "paddingBottom" to 4)), "py-6px" to _pS(_uM("paddingTop" to 6, "paddingBottom" to 6)), "py-8px" to _pS(_uM("paddingTop" to 8, "paddingBottom" to 8)), "rounded-10px" to _pS(_uM("borderTopLeftRadius" to 10, "borderTopRightRadius" to 10, "borderBottomRightRadius" to 10, "borderBottomLeftRadius" to 10)), "rounded-12px" to _pS(_uM("borderTopLeftRadius" to 12, "borderTopRightRadius" to 12, "borderBottomRightRadius" to 12, "borderBottomLeftRadius" to 12)), "rounded-14px" to _pS(_uM("borderTopLeftRadius" to 14, "borderTopRightRadius" to 14, "borderBottomRightRadius" to 14, "borderBottomLeftRadius" to 14)), "rounded-16px" to _pS(_uM("borderTopLeftRadius" to 16, "borderTopRightRadius" to 16, "borderBottomRightRadius" to 16, "borderBottomLeftRadius" to 16)), "rounded-18px" to _pS(_uM("borderTopLeftRadius" to 18, "borderTopRightRadius" to 18, "borderBottomRightRadius" to 18, "borderBottomLeftRadius" to 18)), "rounded-20px" to _pS(_uM("borderTopLeftRadius" to 20, "borderTopRightRadius" to 20, "borderBottomRightRadius" to 20, "borderBottomLeftRadius" to 20)), "rounded-24px" to _pS(_uM("borderTopLeftRadius" to 24, "borderTopRightRadius" to 24, "borderBottomRightRadius" to 24, "borderBottomLeftRadius" to 24)), "rounded-2px" to _pS(_uM("borderTopLeftRadius" to 2, "borderTopRightRadius" to 2, "borderBottomRightRadius" to 2, "borderBottomLeftRadius" to 2)), "rounded-3px" to _pS(_uM("borderTopLeftRadius" to 3, "borderTopRightRadius" to 3, "borderBottomRightRadius" to 3, "borderBottomLeftRadius" to 3)), "rounded-45px" to _pS(_uM("borderTopLeftRadius" to 45, "borderTopRightRadius" to 45, "borderBottomRightRadius" to 45, "borderBottomLeftRadius" to 45)), "rounded-4px" to _pS(_uM("borderTopLeftRadius" to 4, "borderTopRightRadius" to 4, "borderBottomRightRadius" to 4, "borderBottomLeftRadius" to 4)), "rounded-6px" to _pS(_uM("borderTopLeftRadius" to 6, "borderTopRightRadius" to 6, "borderBottomRightRadius" to 6, "borderBottomLeftRadius" to 6)), "rounded-8px" to _pS(_uM("borderTopLeftRadius" to 8, "borderTopRightRadius" to 8, "borderBottomRightRadius" to 8, "borderBottomLeftRadius" to 8)), "rounded-bl-16px" to _pS(_uM("borderBottomLeftRadius" to 16)), "rounded-br-16px" to _pS(_uM("borderBottomRightRadius" to 16)), "rounded-l-16px" to _pS(_uM("borderTopLeftRadius" to 16, "borderBottomLeftRadius" to 16)), "rounded-lg" to _pS(_uM("borderTopLeftRadius" to "var(--un-radius-lg-default, 8rpx)", "borderTopRightRadius" to "var(--un-radius-lg-default, 8rpx)", "borderBottomRightRadius" to "var(--un-radius-lg-default, 8rpx)", "borderBottomLeftRadius" to "var(--un-radius-lg-default, 8rpx)")), "rounded-r-16px" to _pS(_uM("borderTopRightRadius" to 16, "borderBottomRightRadius" to 16)), "self-start" to _pS(_uM("alignSelf" to "flex-start")), "shadow-sm" to _pS(_uM("boxShadow" to "var(--un-inset-shadow, 0 0 #0000), var(--un-inset-ring-shadow, 0 0 #0000), var(--un-ring-offset-shadow, 0 0 #0000), var(--un-ring-shadow, 0 0 #0000), var(--un-shadow, 0 1rpx 3rpx 0 var(--un-shadow-color, rgba(0, 0, 0, var(--un-shadow-opacity, 0.1))), 0 1rpx 2rpx -1rpx var(--un-shadow-color, rgba(0, 0, 0, var(--un-shadow-opacity, 0.1))))", "--un-shadow" to "0 1rpx 3rpx 0rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1)))")), "text-__059669_" to _pS(_uM("color" to "#059669")), "text-__065f46_" to _pS(_uM("color" to "#065f46")), "text-__10b981_" to _pS(_uM("color" to "#10b981")), "text-__1a202c_" to _pS(_uM("color" to "#1a202c")), "text-__1e293b_" to _pS(_uM("color" to "#1e293b")), "text-__2563eb_" to _pS(_uM("color" to "#2563eb")), "text-__2979ff_" to _pS(_uM("color" to "#2979ff")), "text-__2d3748_" to _pS(_uM("color" to "#2d3748")), "text-__303133_" to _pS(_uM("color" to "#303133")), "text-__334155_" to _pS(_uM("color" to "#334155")), "text-__38bdf8_" to _pS(_uM("color" to "#38bdf8")), "text-__3b82f6_" to _pS(_uM("color" to "#3b82f6")), "text-__475569_" to _pS(_uM("color" to "#475569")), "text-__606266_" to _pS(_uM("color" to "#606266")), "text-__64748b_" to _pS(_uM("color" to "#64748b")), "text-__718096_" to _pS(_uM("color" to "#718096")), "text-__909399_" to _pS(_uM("color" to "#909399")), "text-__94a3b8_" to _pS(_uM("color" to "#94a3b8")), "text-__c0c4cc_" to _pS(_uM("color" to "#c0c4cc")), "text-__d14328_" to _pS(_uM("color" to "#d14328")), "text-__d97706_" to _pS(_uM("color" to "#d97706")), "text-__dc2626_" to _pS(_uM("color" to "#dc2626")), "text-__ef4444_" to _pS(_uM("color" to "#ef4444")), "text-__f43f5e_" to _pS(_uM("color" to "#f43f5e")), "text-__f59e0b_" to _pS(_uM("color" to "#f59e0b")), "text-__ffffff_" to _pS(_uM("color" to "#ffffff")), "text-_var_--theme-color__37c2bc__" to _pS(_uM("color" to "var(--theme-color, #37c2bc)")), "text-10px" to _pS(_uM("fontSize" to 10)), "text-11px" to _pS(_uM("fontSize" to 11)), "text-12px" to _pS(_uM("fontSize" to 12)), "text-13px" to _pS(_uM("fontSize" to 13)), "text-14px" to _pS(_uM("fontSize" to 14)), "text-15px" to _pS(_uM("fontSize" to 15)), "text-16px" to _pS(_uM("fontSize" to 16)), "text-20px" to _pS(_uM("fontSize" to 20)), "text-24px" to _pS(_uM("fontSize" to 24)), "text-25px" to _pS(_uM("fontSize" to 25)), "text-32px" to _pS(_uM("fontSize" to 32)), "text-center" to _pS(_uM("textAlign" to "center")), "text-right" to _pS(_uM("textAlign" to "right")), "text-white" to _pS(_uM("color" to "rgba(255, 255, 255, var(--un-color-opacity, 1))")), "w-100px" to _pS(_uM("width" to 100)), "w-10px" to _pS(_uM("width" to 10)), "w-150px" to _pS(_uM("width" to 150)), "w-15px" to _pS(_uM("width" to 15)), "w-200px" to _pS(_uM("width" to 200)), "w-20px" to _pS(_uM("width" to 20)), "w-28px" to _pS(_uM("width" to 28)), "w-32px" to _pS(_uM("width" to 32)), "w-36px" to _pS(_uM("width" to 36)), "w-40px" to _pS(_uM("width" to 40)), "w-4px" to _pS(_uM("width" to 4)), "w-6px" to _pS(_uM("width" to 6)), "w-90px" to _pS(_uM("width" to 90)), "w-full" to _pS(_uM("width" to "100%")))
             }
     }
 }
@@ -2907,8 +2935,114 @@ fun createI18n(options: UTSJSONObject = _uO()): UvueI18n {
     lime_i18n = UvueI18n(options)
     return lime_i18n!!
 }
-val default__2: UTSJSONObject = _uO("message" to _uO("hello" to "{msg}，世界！", "welcome" to "欢迎使用 unibestX！", "switch_success" to "切换为简体中文"), "tabbar" to _uO("home" to "首页", "basic" to "基础", "ai" to "AI", "function" to "功能", "me" to "我的"), "basic" to _uO("iconDemoTitle" to "字体图标示例", "svgAuthWarning" to "SVG模式需授权收费", "langTitle" to "语言设置", "langPreview" to "多语言文本预览", "themeTitle" to "主题设置", "themePreview" to "主题色效果预览", "themeButton" to "主题按钮", "themeSuccess" to "主题切换成功", "echartTitle" to "ECharts 图表示例", "echartLine" to "折线图", "echartBar" to "柱状图", "echartPie" to "饼图"), "function" to _uO("sysInfoTitle" to "设备系统信息", "brand" to "手机品牌", "model" to "手机型号", "system" to "操作系统", "platform" to "运行平台", "getSysInfoBtn" to "获取系统信息", "hapticsTitle" to "触感与工具", "vibrateBtn" to "短震动反馈", "vibrateSuccess" to "已触发短震动", "copyBtn" to "复制测试文本", "copySuccess" to "复制成功", "mediaTitle" to "相机与多媒体", "choosePhotoBtn" to "拍摄/选择照片", "scanCodeBtn" to "扫码测试", "scanResult" to "扫码结果", "noData" to "暂无数据"))
-val default__3: UTSJSONObject = _uO("message" to _uO("hello" to "The world says {msg}!", "welcome" to "Welcome to use unibestX!", "switch_success" to "Switched to English"), "tabbar" to _uO("home" to "Home", "basic" to "Basic", "ai" to "AI", "function" to "Function", "me" to "Me"), "basic" to _uO("iconDemoTitle" to "Font Icon Demo", "svgAuthWarning" to "SVG mode requires authorization & fee", "langTitle" to "Language Settings", "langPreview" to "Multi-language Preview", "themeTitle" to "Theme Settings", "themePreview" to "Theme Color Preview", "themeButton" to "Theme Button", "themeSuccess" to "Theme switched successfully", "echartTitle" to "ECharts Chart Demo", "echartLine" to "Line Chart", "echartBar" to "Bar Chart", "echartPie" to "Pie Chart"), "function" to _uO("sysInfoTitle" to "Device System Info", "brand" to "Brand", "model" to "Model", "system" to "OS", "platform" to "Platform", "getSysInfoBtn" to "Get System Info", "hapticsTitle" to "Haptics & Utilities", "vibrateBtn" to "Short Vibration Feedback", "vibrateSuccess" to "Vibration triggered", "copyBtn" to "Copy Test Text", "copySuccess" to "Copied successfully", "mediaTitle" to "Camera & Media", "choosePhotoBtn" to "Take Photo/Choose Image", "scanCodeBtn" to "Scan Code Test", "scanResult" to "Scan Result", "noData" to "No data"))
+fun __uts_large_default_export_prop_fill_fill_1__1(__obj: UTSJSONObject): Unit {
+    __obj["iconDemoTitle"] = "字体图标示例"
+    __obj["svgAuthWarning"] = "SVG模式需授权收费"
+    __obj["langTitle"] = "语言设置"
+    __obj["langPreview"] = "多语言文本预览"
+    __obj["themeTitle"] = "主题设置"
+    __obj["themePreview"] = "主题色效果预览"
+    __obj["themeButton"] = "主题按钮"
+    __obj["themeSuccess"] = "主题切换成功"
+    __obj["echartTitle"] = "ECharts 图表示例"
+    __obj["echartLine"] = "折线图"
+    __obj["echartBar"] = "柱状图"
+    __obj["echartPie"] = "饼图"
+}
+fun __uts_large_default_export_prop_build_0__1(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "src/i18n/locales/zh_CN.uts", 16, 11))
+    __uts_large_default_export_prop_fill_fill_1__1(__obj)
+    return __obj
+}
+fun __uts_large_default_export_prop_fill_fill_3(__obj: UTSJSONObject): Unit {
+    __obj["sysInfoTitle"] = "设备系统信息"
+    __obj["brand"] = "手机品牌"
+    __obj["model"] = "手机型号"
+    __obj["system"] = "操作系统"
+    __obj["platform"] = "运行平台"
+    __obj["getSysInfoBtn"] = "获取系统信息"
+    __obj["hapticsTitle"] = "触感与工具"
+    __obj["vibrateBtn"] = "短震动反馈"
+    __obj["vibrateSuccess"] = "已触发短震动"
+    __obj["copyBtn"] = "复制测试文本"
+    __obj["copySuccess"] = "复制成功"
+    __obj["mediaTitle"] = "相机与多媒体"
+    __obj["choosePhotoBtn"] = "拍摄/选择照片"
+    __obj["scanCodeBtn"] = "扫码测试"
+    __obj["scanResult"] = "扫码结果"
+    __obj["noData"] = "暂无数据"
+}
+fun __uts_large_default_export_prop_build_2(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "src/i18n/locales/zh_CN.uts", 39, 11))
+    __uts_large_default_export_prop_fill_fill_3(__obj)
+    return __obj
+}
+fun __uts_large_default_export_fill_fill_5(__obj: UTSJSONObject): Unit {
+    __obj["message"] = _uO("hello" to "{msg}，世界！", "welcome" to "欢迎使用 unibestX！", "switch_success" to "切换为简体中文")
+    __obj["tabbar"] = _uO("home" to "首页", "basic" to "基础", "ai" to "AI", "function" to "功能", "me" to "我的")
+    __obj["basic"] = __uts_large_default_export_prop_build_0__1()
+    __obj["function"] = __uts_large_default_export_prop_build_2()
+}
+fun __uts_large_default_export_build_4(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "src/i18n/locales/zh_CN.uts", 60, 11))
+    __uts_large_default_export_fill_fill_5(__obj)
+    return __obj
+}
+val default__2 = __uts_large_default_export_build_4()
+fun __uts_large_default_export_prop_fill_fill_1__2(__obj: UTSJSONObject): Unit {
+    __obj["iconDemoTitle"] = "Font Icon Demo"
+    __obj["svgAuthWarning"] = "SVG mode requires authorization & fee"
+    __obj["langTitle"] = "Language Settings"
+    __obj["langPreview"] = "Multi-language Preview"
+    __obj["themeTitle"] = "Theme Settings"
+    __obj["themePreview"] = "Theme Color Preview"
+    __obj["themeButton"] = "Theme Button"
+    __obj["themeSuccess"] = "Theme switched successfully"
+    __obj["echartTitle"] = "ECharts Chart Demo"
+    __obj["echartLine"] = "Line Chart"
+    __obj["echartBar"] = "Bar Chart"
+    __obj["echartPie"] = "Pie Chart"
+}
+fun __uts_large_default_export_prop_build_0__2(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "src/i18n/locales/en_US.uts", 16, 11))
+    __uts_large_default_export_prop_fill_fill_1__2(__obj)
+    return __obj
+}
+fun __uts_large_default_export_prop_fill_fill_3__1(__obj: UTSJSONObject): Unit {
+    __obj["sysInfoTitle"] = "Device System Info"
+    __obj["brand"] = "Brand"
+    __obj["model"] = "Model"
+    __obj["system"] = "OS"
+    __obj["platform"] = "Platform"
+    __obj["getSysInfoBtn"] = "Get System Info"
+    __obj["hapticsTitle"] = "Haptics & Utilities"
+    __obj["vibrateBtn"] = "Short Vibration Feedback"
+    __obj["vibrateSuccess"] = "Vibration triggered"
+    __obj["copyBtn"] = "Copy Test Text"
+    __obj["copySuccess"] = "Copied successfully"
+    __obj["mediaTitle"] = "Camera & Media"
+    __obj["choosePhotoBtn"] = "Take Photo/Choose Image"
+    __obj["scanCodeBtn"] = "Scan Code Test"
+    __obj["scanResult"] = "Scan Result"
+    __obj["noData"] = "No data"
+}
+fun __uts_large_default_export_prop_build_2__1(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "src/i18n/locales/en_US.uts", 39, 11))
+    __uts_large_default_export_prop_fill_fill_3__1(__obj)
+    return __obj
+}
+fun __uts_large_default_export_fill_fill_5__1(__obj: UTSJSONObject): Unit {
+    __obj["message"] = _uO("hello" to "The world says {msg}!", "welcome" to "Welcome to use unibestX!", "switch_success" to "Switched to English")
+    __obj["tabbar"] = _uO("home" to "Home", "basic" to "Basic", "ai" to "AI", "function" to "Function", "me" to "Me")
+    __obj["basic"] = __uts_large_default_export_prop_build_0__2()
+    __obj["function"] = __uts_large_default_export_prop_build_2__1()
+}
+fun __uts_large_default_export_build_4__1(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "src/i18n/locales/en_US.uts", 60, 11))
+    __uts_large_default_export_fill_fill_5__1(__obj)
+    return __obj
+}
+val default__3 = __uts_large_default_export_build_4__1()
 val i18n = createI18n(_uO("locale" to "zh-CN", "fallbackLocale" to "en-US", "messages" to _uO("zh-CN" to default__2 as UTSJSONObject, "en-US" to default__3 as UTSJSONObject)))
 open class IAppState (
     @JsonNotNull
@@ -3241,6 +3375,170 @@ val GenSrcComponentsNavBarNavBarClass = CreateVueComponent(GenSrcComponentsNavBa
     return GenSrcComponentsNavBarNavBar(instance)
 }
 )
+fun __uts_large_cssColors_fill_fill_1(__obj: UTSJSONObject): Unit {
+    __obj["aliceblue"] = "#f0f8ff"
+    __obj["antiquewhite"] = "#faebd7"
+    __obj["aqua"] = "#00ffff"
+    __obj["aquamarine"] = "#7fffd4"
+    __obj["azure"] = "#f0ffff"
+    __obj["beige"] = "#f5f5dc"
+    __obj["bisque"] = "#ffe4c4"
+    __obj["black"] = "#000000"
+    __obj["blanchedalmond"] = "#ffebcd"
+    __obj["blue"] = "#0000ff"
+    __obj["blueviolet"] = "#8a2be2"
+    __obj["brown"] = "#a52a2a"
+    __obj["burlywood"] = "#deb887"
+    __obj["cadetblue"] = "#5f9ea0"
+    __obj["chartreuse"] = "#7fff00"
+    __obj["chocolate"] = "#d2691e"
+    __obj["coral"] = "#ff7f50"
+    __obj["cornflowerblue"] = "#6495ed"
+    __obj["cornsilk"] = "#fff8dc"
+    __obj["crimson"] = "#dc143c"
+    __obj["cyan"] = "#00ffff"
+    __obj["darkblue"] = "#00008b"
+    __obj["darkcyan"] = "#008b8b"
+    __obj["darkgoldenrod"] = "#b8860b"
+    __obj["darkgray"] = "#a9a9a9"
+    __obj["darkgreen"] = "#006400"
+    __obj["darkgrey"] = "#a9a9a9"
+    __obj["darkkhaki"] = "#bdb76b"
+    __obj["darkmagenta"] = "#8b008b"
+    __obj["darkolivegreen"] = "#556b2f"
+    __obj["darkorange"] = "#ff8c00"
+    __obj["darkorchid"] = "#9932cc"
+    __obj["darkred"] = "#8b0000"
+    __obj["darksalmon"] = "#e9967a"
+    __obj["darkseagreen"] = "#8fbc8f"
+    __obj["darkslateblue"] = "#483d8b"
+    __obj["darkslategray"] = "#2f4f4f"
+    __obj["darkslategrey"] = "#2f4f4f"
+    __obj["darkturquoise"] = "#00ced1"
+    __obj["darkviolet"] = "#9400d3"
+    __obj["deeppink"] = "#ff1493"
+    __obj["deepskyblue"] = "#00bfff"
+    __obj["dimgray"] = "#696969"
+    __obj["dimgrey"] = "#696969"
+    __obj["dodgerblue"] = "#1e90ff"
+    __obj["firebrick"] = "#b22222"
+    __obj["floralwhite"] = "#fffaf0"
+    __obj["forestgreen"] = "#228b22"
+}
+fun __uts_large_cssColors_fill_fill_2(__obj: UTSJSONObject): Unit {
+    __obj["fuchsia"] = "#ff00ff"
+    __obj["gainsboro"] = "#dcdcdc"
+    __obj["ghostwhite"] = "#f8f8ff"
+    __obj["gold"] = "#ffd700"
+    __obj["goldenrod"] = "#daa520"
+    __obj["gray"] = "#808080"
+    __obj["green"] = "#008000"
+    __obj["greenyellow"] = "#adff2f"
+    __obj["grey"] = "#808080"
+    __obj["honeydew"] = "#f0fff0"
+    __obj["hotpink"] = "#ff69b4"
+    __obj["indianred"] = "#cd5c5c"
+    __obj["indigo"] = "#4b0082"
+    __obj["ivory"] = "#fffff0"
+    __obj["khaki"] = "#f0e68c"
+    __obj["lavender"] = "#e6e6fa"
+    __obj["lavenderblush"] = "#fff0f5"
+    __obj["lawngreen"] = "#7cfc00"
+    __obj["lemonchiffon"] = "#fffacd"
+    __obj["lightblue"] = "#add8e6"
+    __obj["lightcoral"] = "#f08080"
+    __obj["lightcyan"] = "#e0ffff"
+    __obj["lightgoldenrodyellow"] = "#fafad2"
+    __obj["lightgray"] = "#d3d3d3"
+    __obj["lightgreen"] = "#90ee90"
+    __obj["lightgrey"] = "#d3d3d3"
+    __obj["lightpink"] = "#ffb6c1"
+    __obj["lightsalmon"] = "#ffa07a"
+    __obj["lightseagreen"] = "#20b2aa"
+    __obj["lightskyblue"] = "#87cefa"
+    __obj["lightslategray"] = "#778899"
+    __obj["lightslategrey"] = "#778899"
+    __obj["lightsteelblue"] = "#b0c4de"
+    __obj["lightyellow"] = "#ffffe0"
+    __obj["lime"] = "#00ff00"
+    __obj["limegreen"] = "#32cd32"
+    __obj["linen"] = "#faf0e6"
+    __obj["magenta"] = "#ff00ff"
+    __obj["maroon"] = "#800000"
+    __obj["mediumaquamarine"] = "#66cdaa"
+    __obj["mediumblue"] = "#0000cd"
+    __obj["mediumorchid"] = "#ba55d3"
+    __obj["mediumpurple"] = "#9370db"
+    __obj["mediumseagreen"] = "#3cb371"
+    __obj["mediumslateblue"] = "#7b68ee"
+    __obj["mediumspringgreen"] = "#00fa9a"
+    __obj["mediumturquoise"] = "#48d1cc"
+    __obj["mediumvioletred"] = "#c71585"
+}
+fun __uts_large_cssColors_fill_fill_3(__obj: UTSJSONObject): Unit {
+    __obj["midnightblue"] = "#191970"
+    __obj["mintcream"] = "#f5fffa"
+    __obj["mistyrose"] = "#ffe4e1"
+    __obj["moccasin"] = "#ffe4b5"
+    __obj["navajowhite"] = "#ffdead"
+    __obj["navy"] = "#000080"
+    __obj["oldlace"] = "#fdf5e6"
+    __obj["olive"] = "#808000"
+    __obj["olivedrab"] = "#6b8e23"
+    __obj["orange"] = "#ffa500"
+    __obj["orangered"] = "#ff4500"
+    __obj["orchid"] = "#da70d6"
+    __obj["palegoldenrod"] = "#eee8aa"
+    __obj["palegreen"] = "#98fb98"
+    __obj["paleturquoise"] = "#afeeee"
+    __obj["palevioletred"] = "#db7093"
+    __obj["papayawhip"] = "#ffefd5"
+    __obj["peachpuff"] = "#ffdab9"
+    __obj["peru"] = "#cd853f"
+    __obj["pink"] = "#ffc0cb"
+    __obj["plum"] = "#dda0dd"
+    __obj["powderblue"] = "#b0e0e6"
+    __obj["purple"] = "#800080"
+    __obj["rebeccapurple"] = "#663399"
+    __obj["red"] = "#ff0000"
+    __obj["rosybrown"] = "#bc8f8f"
+    __obj["royalblue"] = "#4169e1"
+    __obj["saddlebrown"] = "#8b4513"
+    __obj["salmon"] = "#fa8072"
+    __obj["sandybrown"] = "#f4a460"
+    __obj["seagreen"] = "#2e8b57"
+    __obj["seashell"] = "#fff5ee"
+    __obj["sienna"] = "#a0522d"
+    __obj["silver"] = "#c0c0c0"
+    __obj["skyblue"] = "#87ceeb"
+    __obj["slateblue"] = "#6a5acd"
+    __obj["slategray"] = "#708090"
+    __obj["slategrey"] = "#708090"
+    __obj["snow"] = "#fffafa"
+    __obj["springgreen"] = "#00ff7f"
+    __obj["steelblue"] = "#4682b4"
+    __obj["tan"] = "#d2b48c"
+    __obj["teal"] = "#008080"
+    __obj["thistle"] = "#d8bfd8"
+    __obj["tomato"] = "#ff6347"
+    __obj["turquoise"] = "#40e0d0"
+    __obj["violet"] = "#ee82ee"
+    __obj["wheat"] = "#f5deb3"
+}
+fun __uts_large_cssColors_fill_fill_4(__obj: UTSJSONObject): Unit {
+    __obj["white"] = "#ffffff"
+    __obj["whitesmoke"] = "#f5f5f5"
+    __obj["yellow"] = "#ffff00"
+    __obj["yellowgreen"] = "#9acd32"
+}
+fun __uts_large_cssColors_build_0(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/libs/function/colorGradient.uts", 158, 11))
+    __uts_large_cssColors_fill_fill_1(__obj)
+    __uts_large_cssColors_fill_fill_2(__obj)
+    __uts_large_cssColors_fill_fill_3(__obj)
+    __uts_large_cssColors_fill_fill_4(__obj)
+    return __obj
+}
 fun colorGradient(startColor: String = "rgb(0, 0, 0)", endColor: String = "rgb(255, 255, 255)", step: Number = 10): UTSArray<String> {
     var startColorRgb = hexToRgb(startColor, false)
     var startRGB: UTSArray<Number> = _uA()
@@ -3278,7 +3576,7 @@ fun colorGradient(startColor: String = "rgb(0, 0, 0)", endColor: String = "rgb(2
     }
     return _uA()
 }
-val cssColors: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("cssColors", "uni_modules/uview-ultra/libs/function/colorGradient.uts", 43, 7), "aliceblue" to "#f0f8ff", "antiquewhite" to "#faebd7", "aqua" to "#00ffff", "aquamarine" to "#7fffd4", "azure" to "#f0ffff", "beige" to "#f5f5dc", "bisque" to "#ffe4c4", "black" to "#000000", "blanchedalmond" to "#ffebcd", "blue" to "#0000ff", "blueviolet" to "#8a2be2", "brown" to "#a52a2a", "burlywood" to "#deb887", "cadetblue" to "#5f9ea0", "chartreuse" to "#7fff00", "chocolate" to "#d2691e", "coral" to "#ff7f50", "cornflowerblue" to "#6495ed", "cornsilk" to "#fff8dc", "crimson" to "#dc143c", "cyan" to "#00ffff", "darkblue" to "#00008b", "darkcyan" to "#008b8b", "darkgoldenrod" to "#b8860b", "darkgray" to "#a9a9a9", "darkgreen" to "#006400", "darkgrey" to "#a9a9a9", "darkkhaki" to "#bdb76b", "darkmagenta" to "#8b008b", "darkolivegreen" to "#556b2f", "darkorange" to "#ff8c00", "darkorchid" to "#9932cc", "darkred" to "#8b0000", "darksalmon" to "#e9967a", "darkseagreen" to "#8fbc8f", "darkslateblue" to "#483d8b", "darkslategray" to "#2f4f4f", "darkslategrey" to "#2f4f4f", "darkturquoise" to "#00ced1", "darkviolet" to "#9400d3", "deeppink" to "#ff1493", "deepskyblue" to "#00bfff", "dimgray" to "#696969", "dimgrey" to "#696969", "dodgerblue" to "#1e90ff", "firebrick" to "#b22222", "floralwhite" to "#fffaf0", "forestgreen" to "#228b22", "fuchsia" to "#ff00ff", "gainsboro" to "#dcdcdc", "ghostwhite" to "#f8f8ff", "gold" to "#ffd700", "goldenrod" to "#daa520", "gray" to "#808080", "green" to "#008000", "greenyellow" to "#adff2f", "grey" to "#808080", "honeydew" to "#f0fff0", "hotpink" to "#ff69b4", "indianred" to "#cd5c5c", "indigo" to "#4b0082", "ivory" to "#fffff0", "khaki" to "#f0e68c", "lavender" to "#e6e6fa", "lavenderblush" to "#fff0f5", "lawngreen" to "#7cfc00", "lemonchiffon" to "#fffacd", "lightblue" to "#add8e6", "lightcoral" to "#f08080", "lightcyan" to "#e0ffff", "lightgoldenrodyellow" to "#fafad2", "lightgray" to "#d3d3d3", "lightgreen" to "#90ee90", "lightgrey" to "#d3d3d3", "lightpink" to "#ffb6c1", "lightsalmon" to "#ffa07a", "lightseagreen" to "#20b2aa", "lightskyblue" to "#87cefa", "lightslategray" to "#778899", "lightslategrey" to "#778899", "lightsteelblue" to "#b0c4de", "lightyellow" to "#ffffe0", "lime" to "#00ff00", "limegreen" to "#32cd32", "linen" to "#faf0e6", "magenta" to "#ff00ff", "maroon" to "#800000", "mediumaquamarine" to "#66cdaa", "mediumblue" to "#0000cd", "mediumorchid" to "#ba55d3", "mediumpurple" to "#9370db", "mediumseagreen" to "#3cb371", "mediumslateblue" to "#7b68ee", "mediumspringgreen" to "#00fa9a", "mediumturquoise" to "#48d1cc", "mediumvioletred" to "#c71585", "midnightblue" to "#191970", "mintcream" to "#f5fffa", "mistyrose" to "#ffe4e1", "moccasin" to "#ffe4b5", "navajowhite" to "#ffdead", "navy" to "#000080", "oldlace" to "#fdf5e6", "olive" to "#808000", "olivedrab" to "#6b8e23", "orange" to "#ffa500", "orangered" to "#ff4500", "orchid" to "#da70d6", "palegoldenrod" to "#eee8aa", "palegreen" to "#98fb98", "paleturquoise" to "#afeeee", "palevioletred" to "#db7093", "papayawhip" to "#ffefd5", "peachpuff" to "#ffdab9", "peru" to "#cd853f", "pink" to "#ffc0cb", "plum" to "#dda0dd", "powderblue" to "#b0e0e6", "purple" to "#800080", "rebeccapurple" to "#663399", "red" to "#ff0000", "rosybrown" to "#bc8f8f", "royalblue" to "#4169e1", "saddlebrown" to "#8b4513", "salmon" to "#fa8072", "sandybrown" to "#f4a460", "seagreen" to "#2e8b57", "seashell" to "#fff5ee", "sienna" to "#a0522d", "silver" to "#c0c0c0", "skyblue" to "#87ceeb", "slateblue" to "#6a5acd", "slategray" to "#708090", "slategrey" to "#708090", "snow" to "#fffafa", "springgreen" to "#00ff7f", "steelblue" to "#4682b4", "tan" to "#d2b48c", "teal" to "#008080", "thistle" to "#d8bfd8", "tomato" to "#ff6347", "turquoise" to "#40e0d0", "violet" to "#ee82ee", "wheat" to "#f5deb3", "white" to "#ffffff", "whitesmoke" to "#f5f5f5", "yellow" to "#ffff00", "yellowgreen" to "#9acd32")
+val cssColors = __uts_large_cssColors_build_0()
 fun hexToRgb(reassignedSColor: String, str: Boolean = true): Any {
     var sColor = reassignedSColor
     val reg = UTSRegExp("^#([0-9a-fA-f]{3}|[0-9a-fA-f]{6})\$", "")
@@ -3363,7 +3661,238 @@ val GenUniModulesUviewUltraComponentsUpLoadingIconUpLoadingIconClass = CreateVue
     return GenUniModulesUviewUltraComponentsUpLoadingIconUpLoadingIcon(instance)
 }
 )
-val default__5: UTSJSONObject = _uO("upicon-level" to "\ue693", "upicon-column-line" to "\ue68e", "upicon-checkbox-mark" to "\ue807", "uiupiconcon-folder" to "\ue7f5", "upicon-movie" to "\ue7f6", "upicon-star-fill" to "\ue669", "upicon-star" to "\ue65f", "upicon-phone-fill" to "\ue64f", "upicon-phone" to "\ue622", "upicon-apple-fill" to "\ue881", "upicon-chrome-circle-fill" to "\ue885", "upicon-backspace" to "\ue67b", "upicon-attach" to "\ue632", "upicon-cut" to "\ue948", "upicon-empty-car" to "\ue602", "upicon-empty-coupon" to "\ue682", "upicon-empty-address" to "\ue646", "upicon-empty-favor" to "\ue67c", "upicon-empty-permission" to "\ue686", "upicon-empty-news" to "\ue687", "upicon-empty-search" to "\ue664", "upicon-github-circle-fill" to "\ue887", "upicon-rmb" to "\ue608", "upicon-person-delete-fill" to "\ue66a", "upicon-reload" to "\ue788", "upicon-order" to "\ue68f", "upicon-server-man" to "\ue6bc", "upicon-search" to "\ue62a", "upicon-fingerprint" to "\ue955", "upicon-more-dot-fill" to "\ue630", "upicon-scan" to "\ue662", "upicon-share-square" to "\ue60b", "upicon-map" to "\ue61d", "upicon-map-fill" to "\ue64e", "upicon-tags" to "\ue629", "upicon-tags-fill" to "\ue651", "upicon-bookmark-fill" to "\ue63b", "upicon-bookmark" to "\ue60a", "upicon-eye" to "\ue613", "upicon-eye-fill" to "\ue641", "upicon-mic" to "\ue64a", "upicon-mic-off" to "\ue649", "upicon-calendar" to "\ue66e", "upicon-calendar-fill" to "\ue634", "upicon-trash" to "\ue623", "upicon-trash-fill" to "\ue658", "upicon-play-left" to "\ue66d", "upicon-play-right" to "\ue610", "upicon-minus" to "\ue618", "upicon-plus" to "\ue62d", "upicon-info" to "\ue653", "upicon-info-circle" to "\ue7d2", "upicon-info-circle-fill" to "\ue64b", "upicon-question" to "\ue715", "upicon-error" to "\ue6d3", "upicon-close" to "\ue685", "upicon-checkmark" to "\ue6a8", "upicon-android-circle-fill" to "\ue67e", "upicon-android-fill" to "\ue67d", "upicon-ie" to "\ue87b", "upicon-IE-circle-fill" to "\ue889", "upicon-google" to "\ue87a", "upicon-google-circle-fill" to "\ue88a", "upicon-setting-fill" to "\ue872", "upicon-setting" to "\ue61f", "upicon-minus-square-fill" to "\ue855", "upicon-plus-square-fill" to "\ue856", "upicon-heart" to "\ue7df", "upicon-heart-fill" to "\ue851", "upicon-camera" to "\ue7d7", "upicon-camera-fill" to "\ue870", "upicon-more-circle" to "\ue63e", "upicon-more-circle-fill" to "\ue645", "upicon-chat" to "\ue620", "upicon-chat-fill" to "\ue61e", "upicon-bag-fill" to "\ue617", "upicon-bag" to "\ue619", "upicon-error-circle-fill" to "\ue62c", "upicon-error-circle" to "\ue624", "upicon-close-circle" to "\ue63f", "upicon-close-circle-fill" to "\ue637", "upicon-checkmark-circle" to "\ue63d", "upicon-checkmark-circle-fill" to "\ue635", "upicon-question-circle-fill" to "\ue666", "upicon-question-circle" to "\ue625", "upicon-share" to "\ue631", "upicon-share-fill" to "\ue65e", "upicon-shopping-cart" to "\ue621", "upicon-shopping-cart-fill" to "\ue65d", "upicon-bell" to "\ue609", "upicon-bell-fill" to "\ue640", "upicon-list" to "\ue650", "upicon-list-dot" to "\ue616", "upicon-zhihu" to "\ue6ba", "upicon-zhihu-circle-fill" to "\ue709", "upicon-zhifubao" to "\ue6b9", "upicon-zhifubao-circle-fill" to "\ue6b8", "upicon-weixin-circle-fill" to "\ue6b1", "upicon-weixin-fill" to "\ue6b2", "upicon-twitter-circle-fill" to "\ue6ab", "upicon-twitter" to "\ue6aa", "upicon-taobao-circle-fill" to "\ue6a7", "upicon-taobao" to "\ue6a6", "upicon-weibo-circle-fill" to "\ue6a5", "upicon-weibo" to "\ue6a4", "upicon-qq-fill" to "\ue6a1", "upicon-qq-circle-fill" to "\ue6a0", "upicon-moments-circel-fill" to "\ue69a", "upicon-moments" to "\ue69b", "upicon-qzone" to "\ue695", "upicon-qzone-circle-fill" to "\ue696", "upicon-baidu-circle-fill" to "\ue680", "upicon-baidu" to "\ue681", "upicon-facebook-circle-fill" to "\ue68a", "upicon-facebook" to "\ue689", "upicon-car" to "\ue60c", "upicon-car-fill" to "\ue636", "upicon-warning-fill" to "\ue64d", "upicon-warning" to "\ue694", "upicon-clock-fill" to "\ue638", "upicon-clock" to "\ue60f", "upicon-edit-pen" to "\ue612", "upicon-edit-pen-fill" to "\ue66b", "upicon-email" to "\ue611", "upicon-email-fill" to "\ue642", "upicon-minus-circle" to "\ue61b", "upicon-minus-circle-fill" to "\ue652", "upicon-plus-circle" to "\ue62e", "upicon-plus-circle-fill" to "\ue661", "upicon-file-text" to "\ue663", "upicon-file-text-fill" to "\ue665", "upicon-pushpin" to "\ue7e3", "upicon-pushpin-fill" to "\ue86e", "upicon-grid" to "\ue673", "upicon-grid-fill" to "\ue678", "upicon-play-circle" to "\ue647", "upicon-play-circle-fill" to "\ue655", "upicon-pause-circle-fill" to "\ue654", "upicon-pause" to "\ue8fa", "upicon-pause-circle" to "\ue643", "upicon-eye-off" to "\ue648", "upicon-eye-off-outline" to "\ue62b", "upicon-gift-fill" to "\ue65c", "upicon-gift" to "\ue65b", "upicon-rmb-circle-fill" to "\ue657", "upicon-rmb-circle" to "\ue677", "upicon-kefu-ermai" to "\ue656", "upicon-server-fill" to "\ue751", "upicon-coupon-fill" to "\ue8c4", "upicon-coupon" to "\ue8ae", "upicon-integral" to "\ue704", "upicon-integral-fill" to "\ue703", "upicon-home-fill" to "\ue964", "upicon-home" to "\ue965", "upicon-hourglass-half-fill" to "\ue966", "upicon-hourglass" to "\ue967", "upicon-account" to "\ue628", "upicon-plus-people-fill" to "\ue626", "upicon-minus-people-fill" to "\ue615", "upicon-account-fill" to "\ue614", "upicon-thumb-down-fill" to "\ue726", "upicon-thumb-down" to "\ue727", "upicon-thumb-up" to "\ue733", "upicon-thumb-up-fill" to "\ue72f", "upicon-lock-fill" to "\ue979", "upicon-lock-open" to "\ue973", "upicon-lock-opened-fill" to "\ue974", "upicon-lock" to "\ue97a", "upicon-red-packet-fill" to "\ue690", "upicon-photo-fill" to "\ue98b", "upicon-photo" to "\ue98d", "upicon-volume-off-fill" to "\ue659", "upicon-volume-off" to "\ue644", "upicon-volume-fill" to "\ue670", "upicon-volume" to "\ue633", "upicon-red-packet" to "\ue691", "upicon-download" to "\ue63c", "upicon-arrow-up-fill" to "\ue6b0", "upicon-arrow-down-fill" to "\ue600", "upicon-play-left-fill" to "\ue675", "upicon-play-right-fill" to "\ue676", "upicon-rewind-left-fill" to "\ue679", "upicon-rewind-right-fill" to "\ue67a", "upicon-arrow-downward" to "\ue604", "upicon-arrow-leftward" to "\ue601", "upicon-arrow-rightward" to "\ue603", "upicon-arrow-upward" to "\ue607", "upicon-arrow-down" to "\ue60d", "upicon-arrow-right" to "\ue605", "upicon-arrow-left" to "\ue60e", "upicon-arrow-up" to "\ue606", "upicon-skip-back-left" to "\ue674", "upicon-skip-forward-right" to "\ue672", "upicon-rewind-right" to "\ue66f", "upicon-rewind-left" to "\ue671", "upicon-arrow-right-double" to "\ue68d", "upicon-arrow-left-double" to "\ue68c", "upicon-wifi-off" to "\ue668", "upicon-wifi" to "\ue667", "upicon-empty-data" to "\ue62f", "upicon-empty-history" to "\ue684", "upicon-empty-list" to "\ue68b", "upicon-empty-page" to "\ue627", "upicon-empty-order" to "\ue639", "upicon-man" to "\ue697", "upicon-woman" to "\ue69c", "upicon-man-add" to "\ue61c", "upicon-man-add-fill" to "\ue64c", "upicon-man-delete" to "\ue61a", "upicon-man-delete-fill" to "\ue66a", "upicon-zh" to "\ue70a", "upicon-en" to "\ue692")
+fun __uts_large_default_export_fill_fill_1(__obj: UTSJSONObject): Unit {
+    __obj["upicon-level"] = "\ue693"
+    __obj["upicon-column-line"] = "\ue68e"
+    __obj["upicon-checkbox-mark"] = "\ue807"
+    __obj["uiupiconcon-folder"] = "\ue7f5"
+    __obj["upicon-movie"] = "\ue7f6"
+    __obj["upicon-star-fill"] = "\ue669"
+    __obj["upicon-star"] = "\ue65f"
+    __obj["upicon-phone-fill"] = "\ue64f"
+    __obj["upicon-phone"] = "\ue622"
+    __obj["upicon-apple-fill"] = "\ue881"
+    __obj["upicon-chrome-circle-fill"] = "\ue885"
+    __obj["upicon-backspace"] = "\ue67b"
+    __obj["upicon-attach"] = "\ue632"
+    __obj["upicon-cut"] = "\ue948"
+    __obj["upicon-empty-car"] = "\ue602"
+    __obj["upicon-empty-coupon"] = "\ue682"
+    __obj["upicon-empty-address"] = "\ue646"
+    __obj["upicon-empty-favor"] = "\ue67c"
+    __obj["upicon-empty-permission"] = "\ue686"
+    __obj["upicon-empty-news"] = "\ue687"
+    __obj["upicon-empty-search"] = "\ue664"
+    __obj["upicon-github-circle-fill"] = "\ue887"
+    __obj["upicon-rmb"] = "\ue608"
+    __obj["upicon-person-delete-fill"] = "\ue66a"
+    __obj["upicon-reload"] = "\ue788"
+    __obj["upicon-order"] = "\ue68f"
+    __obj["upicon-server-man"] = "\ue6bc"
+    __obj["upicon-search"] = "\ue62a"
+    __obj["upicon-fingerprint"] = "\ue955"
+    __obj["upicon-more-dot-fill"] = "\ue630"
+    __obj["upicon-scan"] = "\ue662"
+    __obj["upicon-share-square"] = "\ue60b"
+    __obj["upicon-map"] = "\ue61d"
+    __obj["upicon-map-fill"] = "\ue64e"
+    __obj["upicon-tags"] = "\ue629"
+    __obj["upicon-tags-fill"] = "\ue651"
+    __obj["upicon-bookmark-fill"] = "\ue63b"
+    __obj["upicon-bookmark"] = "\ue60a"
+    __obj["upicon-eye"] = "\ue613"
+    __obj["upicon-eye-fill"] = "\ue641"
+    __obj["upicon-mic"] = "\ue64a"
+    __obj["upicon-mic-off"] = "\ue649"
+    __obj["upicon-calendar"] = "\ue66e"
+    __obj["upicon-calendar-fill"] = "\ue634"
+    __obj["upicon-trash"] = "\ue623"
+    __obj["upicon-trash-fill"] = "\ue658"
+    __obj["upicon-play-left"] = "\ue66d"
+    __obj["upicon-play-right"] = "\ue610"
+}
+fun __uts_large_default_export_fill_fill_2(__obj: UTSJSONObject): Unit {
+    __obj["upicon-minus"] = "\ue618"
+    __obj["upicon-plus"] = "\ue62d"
+    __obj["upicon-info"] = "\ue653"
+    __obj["upicon-info-circle"] = "\ue7d2"
+    __obj["upicon-info-circle-fill"] = "\ue64b"
+    __obj["upicon-question"] = "\ue715"
+    __obj["upicon-error"] = "\ue6d3"
+    __obj["upicon-close"] = "\ue685"
+    __obj["upicon-checkmark"] = "\ue6a8"
+    __obj["upicon-android-circle-fill"] = "\ue67e"
+    __obj["upicon-android-fill"] = "\ue67d"
+    __obj["upicon-ie"] = "\ue87b"
+    __obj["upicon-IE-circle-fill"] = "\ue889"
+    __obj["upicon-google"] = "\ue87a"
+    __obj["upicon-google-circle-fill"] = "\ue88a"
+    __obj["upicon-setting-fill"] = "\ue872"
+    __obj["upicon-setting"] = "\ue61f"
+    __obj["upicon-minus-square-fill"] = "\ue855"
+    __obj["upicon-plus-square-fill"] = "\ue856"
+    __obj["upicon-heart"] = "\ue7df"
+    __obj["upicon-heart-fill"] = "\ue851"
+    __obj["upicon-camera"] = "\ue7d7"
+    __obj["upicon-camera-fill"] = "\ue870"
+    __obj["upicon-more-circle"] = "\ue63e"
+    __obj["upicon-more-circle-fill"] = "\ue645"
+    __obj["upicon-chat"] = "\ue620"
+    __obj["upicon-chat-fill"] = "\ue61e"
+    __obj["upicon-bag-fill"] = "\ue617"
+    __obj["upicon-bag"] = "\ue619"
+    __obj["upicon-error-circle-fill"] = "\ue62c"
+    __obj["upicon-error-circle"] = "\ue624"
+    __obj["upicon-close-circle"] = "\ue63f"
+    __obj["upicon-close-circle-fill"] = "\ue637"
+    __obj["upicon-checkmark-circle"] = "\ue63d"
+    __obj["upicon-checkmark-circle-fill"] = "\ue635"
+    __obj["upicon-question-circle-fill"] = "\ue666"
+    __obj["upicon-question-circle"] = "\ue625"
+    __obj["upicon-share"] = "\ue631"
+    __obj["upicon-share-fill"] = "\ue65e"
+    __obj["upicon-shopping-cart"] = "\ue621"
+    __obj["upicon-shopping-cart-fill"] = "\ue65d"
+    __obj["upicon-bell"] = "\ue609"
+    __obj["upicon-bell-fill"] = "\ue640"
+    __obj["upicon-list"] = "\ue650"
+    __obj["upicon-list-dot"] = "\ue616"
+    __obj["upicon-zhihu"] = "\ue6ba"
+    __obj["upicon-zhihu-circle-fill"] = "\ue709"
+    __obj["upicon-zhifubao"] = "\ue6b9"
+}
+fun __uts_large_default_export_fill_fill_3__1(__obj: UTSJSONObject): Unit {
+    __obj["upicon-zhifubao-circle-fill"] = "\ue6b8"
+    __obj["upicon-weixin-circle-fill"] = "\ue6b1"
+    __obj["upicon-weixin-fill"] = "\ue6b2"
+    __obj["upicon-twitter-circle-fill"] = "\ue6ab"
+    __obj["upicon-twitter"] = "\ue6aa"
+    __obj["upicon-taobao-circle-fill"] = "\ue6a7"
+    __obj["upicon-taobao"] = "\ue6a6"
+    __obj["upicon-weibo-circle-fill"] = "\ue6a5"
+    __obj["upicon-weibo"] = "\ue6a4"
+    __obj["upicon-qq-fill"] = "\ue6a1"
+    __obj["upicon-qq-circle-fill"] = "\ue6a0"
+    __obj["upicon-moments-circel-fill"] = "\ue69a"
+    __obj["upicon-moments"] = "\ue69b"
+    __obj["upicon-qzone"] = "\ue695"
+    __obj["upicon-qzone-circle-fill"] = "\ue696"
+    __obj["upicon-baidu-circle-fill"] = "\ue680"
+    __obj["upicon-baidu"] = "\ue681"
+    __obj["upicon-facebook-circle-fill"] = "\ue68a"
+    __obj["upicon-facebook"] = "\ue689"
+    __obj["upicon-car"] = "\ue60c"
+    __obj["upicon-car-fill"] = "\ue636"
+    __obj["upicon-warning-fill"] = "\ue64d"
+    __obj["upicon-warning"] = "\ue694"
+    __obj["upicon-clock-fill"] = "\ue638"
+    __obj["upicon-clock"] = "\ue60f"
+    __obj["upicon-edit-pen"] = "\ue612"
+    __obj["upicon-edit-pen-fill"] = "\ue66b"
+    __obj["upicon-email"] = "\ue611"
+    __obj["upicon-email-fill"] = "\ue642"
+    __obj["upicon-minus-circle"] = "\ue61b"
+    __obj["upicon-minus-circle-fill"] = "\ue652"
+    __obj["upicon-plus-circle"] = "\ue62e"
+    __obj["upicon-plus-circle-fill"] = "\ue661"
+    __obj["upicon-file-text"] = "\ue663"
+    __obj["upicon-file-text-fill"] = "\ue665"
+    __obj["upicon-pushpin"] = "\ue7e3"
+    __obj["upicon-pushpin-fill"] = "\ue86e"
+    __obj["upicon-grid"] = "\ue673"
+    __obj["upicon-grid-fill"] = "\ue678"
+    __obj["upicon-play-circle"] = "\ue647"
+    __obj["upicon-play-circle-fill"] = "\ue655"
+    __obj["upicon-pause-circle-fill"] = "\ue654"
+    __obj["upicon-pause"] = "\ue8fa"
+    __obj["upicon-pause-circle"] = "\ue643"
+    __obj["upicon-eye-off"] = "\ue648"
+    __obj["upicon-eye-off-outline"] = "\ue62b"
+    __obj["upicon-gift-fill"] = "\ue65c"
+    __obj["upicon-gift"] = "\ue65b"
+}
+fun __uts_large_default_export_fill_fill_4(__obj: UTSJSONObject): Unit {
+    __obj["upicon-rmb-circle-fill"] = "\ue657"
+    __obj["upicon-rmb-circle"] = "\ue677"
+    __obj["upicon-kefu-ermai"] = "\ue656"
+    __obj["upicon-server-fill"] = "\ue751"
+    __obj["upicon-coupon-fill"] = "\ue8c4"
+    __obj["upicon-coupon"] = "\ue8ae"
+    __obj["upicon-integral"] = "\ue704"
+    __obj["upicon-integral-fill"] = "\ue703"
+    __obj["upicon-home-fill"] = "\ue964"
+    __obj["upicon-home"] = "\ue965"
+    __obj["upicon-hourglass-half-fill"] = "\ue966"
+    __obj["upicon-hourglass"] = "\ue967"
+    __obj["upicon-account"] = "\ue628"
+    __obj["upicon-plus-people-fill"] = "\ue626"
+    __obj["upicon-minus-people-fill"] = "\ue615"
+    __obj["upicon-account-fill"] = "\ue614"
+    __obj["upicon-thumb-down-fill"] = "\ue726"
+    __obj["upicon-thumb-down"] = "\ue727"
+    __obj["upicon-thumb-up"] = "\ue733"
+    __obj["upicon-thumb-up-fill"] = "\ue72f"
+    __obj["upicon-lock-fill"] = "\ue979"
+    __obj["upicon-lock-open"] = "\ue973"
+    __obj["upicon-lock-opened-fill"] = "\ue974"
+    __obj["upicon-lock"] = "\ue97a"
+    __obj["upicon-red-packet-fill"] = "\ue690"
+    __obj["upicon-photo-fill"] = "\ue98b"
+    __obj["upicon-photo"] = "\ue98d"
+    __obj["upicon-volume-off-fill"] = "\ue659"
+    __obj["upicon-volume-off"] = "\ue644"
+    __obj["upicon-volume-fill"] = "\ue670"
+    __obj["upicon-volume"] = "\ue633"
+    __obj["upicon-red-packet"] = "\ue691"
+    __obj["upicon-download"] = "\ue63c"
+    __obj["upicon-arrow-up-fill"] = "\ue6b0"
+    __obj["upicon-arrow-down-fill"] = "\ue600"
+    __obj["upicon-play-left-fill"] = "\ue675"
+    __obj["upicon-play-right-fill"] = "\ue676"
+    __obj["upicon-rewind-left-fill"] = "\ue679"
+    __obj["upicon-rewind-right-fill"] = "\ue67a"
+    __obj["upicon-arrow-downward"] = "\ue604"
+    __obj["upicon-arrow-leftward"] = "\ue601"
+    __obj["upicon-arrow-rightward"] = "\ue603"
+    __obj["upicon-arrow-upward"] = "\ue607"
+    __obj["upicon-arrow-down"] = "\ue60d"
+    __obj["upicon-arrow-right"] = "\ue605"
+    __obj["upicon-arrow-left"] = "\ue60e"
+    __obj["upicon-arrow-up"] = "\ue606"
+    __obj["upicon-skip-back-left"] = "\ue674"
+}
+fun __uts_large_default_export_fill_fill_5__2(__obj: UTSJSONObject): Unit {
+    __obj["upicon-skip-forward-right"] = "\ue672"
+    __obj["upicon-rewind-right"] = "\ue66f"
+    __obj["upicon-rewind-left"] = "\ue671"
+    __obj["upicon-arrow-right-double"] = "\ue68d"
+    __obj["upicon-arrow-left-double"] = "\ue68c"
+    __obj["upicon-wifi-off"] = "\ue668"
+    __obj["upicon-wifi"] = "\ue667"
+    __obj["upicon-empty-data"] = "\ue62f"
+    __obj["upicon-empty-history"] = "\ue684"
+    __obj["upicon-empty-list"] = "\ue68b"
+    __obj["upicon-empty-page"] = "\ue627"
+    __obj["upicon-empty-order"] = "\ue639"
+    __obj["upicon-man"] = "\ue697"
+    __obj["upicon-woman"] = "\ue69c"
+    __obj["upicon-man-add"] = "\ue61c"
+    __obj["upicon-man-add-fill"] = "\ue64c"
+    __obj["upicon-man-delete"] = "\ue61a"
+    __obj["upicon-man-delete-fill"] = "\ue66a"
+    __obj["upicon-zh"] = "\ue70a"
+    __obj["upicon-en"] = "\ue692"
+}
+fun __uts_large_default_export_build_0(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-icon/icons.uts", 224, 11))
+    __uts_large_default_export_fill_fill_1(__obj)
+    __uts_large_default_export_fill_fill_2(__obj)
+    __uts_large_default_export_fill_fill_3__1(__obj)
+    __uts_large_default_export_fill_fill_4(__obj)
+    __uts_large_default_export_fill_fill_5__2(__obj)
+    return __obj
+}
+val default__5 = __uts_large_default_export_build_0()
 val commonProps: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("commonProps", "uni_modules/uview-ultra/libs/composable/useUltraUI.uts", 4, 14), "customStyle" to _uO("type" to _uA(
     UTSJSONObject,
     String
@@ -8109,7 +8638,50 @@ val GenUniModulesUviewUltraComponentsUpCopyUpCopyClass = CreateVueComponent(GenU
     return GenUniModulesUviewUltraComponentsUpCopyUpCopy(instance)
 }
 )
-val default__12: UTSJSONObject = _uO("button" to _uO("hairline" to false, "type" to "info", "size" to "normal", "shape" to "square", "plain" to false, "disabled" to false, "loading" to false, "loadingText" to "", "loadingMode" to "spinner", "loadingSize" to 15, "openType" to "", "formType" to "", "appParameter" to "", "hoverStopPropagation" to true, "lang" to "en", "sessionFrom" to "", "sendMessageTitle" to "", "sendMessagePath" to "", "sendMessageImg" to "", "showMessageCard" to false, "dataName" to "", "throttleTime" to 0, "hoverStartTime" to 0, "hoverStayTime" to 200, "text" to "", "icon" to "", "iconColor" to "", "color" to ""))
+fun __uts_large_default_export_prop_fill_fill_1__3(__obj: UTSJSONObject): Unit {
+    __obj["hairline"] = false
+    __obj["type"] = "info"
+    __obj["size"] = "normal"
+    __obj["shape"] = "square"
+    __obj["plain"] = false
+    __obj["disabled"] = false
+    __obj["loading"] = false
+    __obj["loadingText"] = ""
+    __obj["loadingMode"] = "spinner"
+    __obj["loadingSize"] = 15
+    __obj["openType"] = ""
+    __obj["formType"] = ""
+    __obj["appParameter"] = ""
+    __obj["hoverStopPropagation"] = true
+    __obj["lang"] = "en"
+    __obj["sessionFrom"] = ""
+    __obj["sendMessageTitle"] = ""
+    __obj["sendMessagePath"] = ""
+    __obj["sendMessageImg"] = ""
+    __obj["showMessageCard"] = false
+    __obj["dataName"] = ""
+    __obj["throttleTime"] = 0
+    __obj["hoverStartTime"] = 0
+    __obj["hoverStayTime"] = 200
+    __obj["text"] = ""
+    __obj["icon"] = ""
+    __obj["iconColor"] = ""
+    __obj["color"] = ""
+}
+fun __uts_large_default_export_prop_build_0__3(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-button/button.uts", 32, 11))
+    __uts_large_default_export_prop_fill_fill_1__3(__obj)
+    return __obj
+}
+fun __uts_large_default_export_fill_fill_3__2(__obj: UTSJSONObject): Unit {
+    __obj["button"] = __uts_large_default_export_prop_build_0__3()
+}
+fun __uts_large_default_export_build_2__1(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-button/button.uts", 40, 11))
+    __uts_large_default_export_fill_fill_3__2(__obj)
+    return __obj
+}
+val default__12 = __uts_large_default_export_build_2__1()
 fun throttle(func: () -> Unit, wait: Number = 500, immediate: Boolean = true): Unit {
     var timer: Number = 0
     var flag = false
@@ -8188,7 +8760,37 @@ val GenUniModulesUviewUltraComponentsUpTableUpTableClass = CreateVueComponent(Ge
     return GenUniModulesUviewUltraComponentsUpTableUpTable(instance)
 }
 )
-val default__16: UTSJSONObject = _uO("codeInput" to _uO("adjustPosition" to true, "maxlength" to 6, "dot" to false, "mode" to "box", "hairline" to false, "space" to 10, "value" to "", "focus" to false, "bold" to false, "color" to "#606266", "fontSize" to 18, "size" to 35, "disabledKeyboard" to false, "borderColor" to "#c9cacc", "disabledDot" to true))
+fun __uts_large_default_export_prop_fill_fill_1__4(__obj: UTSJSONObject): Unit {
+    __obj["adjustPosition"] = true
+    __obj["maxlength"] = 6
+    __obj["dot"] = false
+    __obj["mode"] = "box"
+    __obj["hairline"] = false
+    __obj["space"] = 10
+    __obj["value"] = ""
+    __obj["focus"] = false
+    __obj["bold"] = false
+    __obj["color"] = "#606266"
+    __obj["fontSize"] = 18
+    __obj["size"] = 35
+    __obj["disabledKeyboard"] = false
+    __obj["borderColor"] = "#c9cacc"
+    __obj["disabledDot"] = true
+}
+fun __uts_large_default_export_prop_build_0__4(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-code-input/codeInput.uts", 19, 11))
+    __uts_large_default_export_prop_fill_fill_1__4(__obj)
+    return __obj
+}
+fun __uts_large_default_export_fill_fill_3__3(__obj: UTSJSONObject): Unit {
+    __obj["codeInput"] = __uts_large_default_export_prop_build_0__4()
+}
+fun __uts_large_default_export_build_2__2(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-code-input/codeInput.uts", 27, 11))
+    __uts_large_default_export_fill_fill_3__3(__obj)
+    return __obj
+}
+val default__16 = __uts_large_default_export_build_2__2()
 val GenUniModulesUviewUltraComponentsUpCodeInputUpCodeInputClass = CreateVueComponent(GenUniModulesUviewUltraComponentsUpCodeInputUpCodeInput::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = "", inheritAttrs = GenUniModulesUviewUltraComponentsUpCodeInputUpCodeInput.inheritAttrs, inject = GenUniModulesUviewUltraComponentsUpCodeInputUpCodeInput.inject, props = GenUniModulesUviewUltraComponentsUpCodeInputUpCodeInput.props, propsNeedCastKeys = GenUniModulesUviewUltraComponentsUpCodeInputUpCodeInput.propsNeedCastKeys, emits = GenUniModulesUviewUltraComponentsUpCodeInputUpCodeInput.emits, components = GenUniModulesUviewUltraComponentsUpCodeInputUpCodeInput.components, styles = GenUniModulesUviewUltraComponentsUpCodeInputUpCodeInput.styles, setup = fun(props: ComponentPublicInstance): Any? {
         return GenUniModulesUviewUltraComponentsUpCodeInputUpCodeInput.setup(props as GenUniModulesUviewUltraComponentsUpCodeInputUpCodeInput)
@@ -10255,7 +10857,50 @@ val GenUniModulesUviewUltraComponentsUpParseUpParseClass = CreateVueComponent(Ge
 )
 val default__17: UTSJSONObject = _uO("stepsItem" to _uO("title" to "", "desc" to "", "iconSize" to 17, "error" to false))
 var crtProp__3 = default__17["stepsItem"] as UTSJSONObject
-val default__18: UTSJSONObject = _uO("text" to _uO("type" to "", "show" to true, "text" to "", "prefixIcon" to "", "suffixIcon" to "", "mode" to "", "href" to "", "format" to "", "call" to false, "openType" to "", "bold" to false, "block" to false, "lines" to "", "color" to "#303133", "size" to "15px", "iconStyle" to _uO("fontSize" to "15px"), "decoration" to "none", "margin" to "0", "lineHeight" to "", "align" to "left", "wordWrap" to "normal", "lang" to "en", "sessionFrom" to "", "sendMessageTitle" to "", "sendMessagePath" to "", "sendMessageImg" to "", "showMessageCard" to false, "appParameter" to ""))
+fun __uts_large_default_export_prop_fill_fill_1__5(__obj: UTSJSONObject): Unit {
+    __obj["type"] = ""
+    __obj["show"] = true
+    __obj["text"] = ""
+    __obj["prefixIcon"] = ""
+    __obj["suffixIcon"] = ""
+    __obj["mode"] = ""
+    __obj["href"] = ""
+    __obj["format"] = ""
+    __obj["call"] = false
+    __obj["openType"] = ""
+    __obj["bold"] = false
+    __obj["block"] = false
+    __obj["lines"] = ""
+    __obj["color"] = "#303133"
+    __obj["size"] = "15px"
+    __obj["iconStyle"] = _uO("fontSize" to "15px")
+    __obj["decoration"] = "none"
+    __obj["margin"] = "0"
+    __obj["lineHeight"] = ""
+    __obj["align"] = "left"
+    __obj["wordWrap"] = "normal"
+    __obj["lang"] = "en"
+    __obj["sessionFrom"] = ""
+    __obj["sendMessageTitle"] = ""
+    __obj["sendMessagePath"] = ""
+    __obj["sendMessageImg"] = ""
+    __obj["showMessageCard"] = false
+    __obj["appParameter"] = ""
+}
+fun __uts_large_default_export_prop_build_0__5(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-text/text.uts", 34, 11))
+    __uts_large_default_export_prop_fill_fill_1__5(__obj)
+    return __obj
+}
+fun __uts_large_default_export_fill_fill_3__4(__obj: UTSJSONObject): Unit {
+    __obj["text"] = __uts_large_default_export_prop_build_0__5()
+}
+fun __uts_large_default_export_build_2__3(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-text/text.uts", 42, 11))
+    __uts_large_default_export_fill_fill_3__4(__obj)
+    return __obj
+}
+val default__18 = __uts_large_default_export_build_2__3()
 var crtProp__4 = default__18["text"] as UTSJSONObject
 val default__19: UTSJSONObject = _uO("link" to _uO("color" to `default`.getString("color.up-primary"), "fontSize" to "15px", "underLine" to false, "href" to "", "mpTips" to "链接已复制，请在浏览器打开", "lineColor" to "", "text" to ""))
 var crtProp__5 = default__19["link"] as UTSJSONObject
@@ -10361,15 +11006,861 @@ val GenUniModulesUviewUltraComponentsUpTabbarUpTabbarClass = CreateVueComponent(
     return GenUniModulesUviewUltraComponentsUpTabbarUpTabbar(instance)
 }
 )
-val default__28: UTSJSONObject = _uO("up_common_cancel" to "取消", "up_common_confirm" to "确定", "up_common_start" to "开始", "up_common_end" to "结束", "up_common_stop" to "停止", "up_common_copy" to "复制", "up_common_none" to "暂无", "up_common_tip" to "提示", "up_common_success" to "成功", "up_common_fail" to "失败", "up_common_close" to "关闭", "up_common_preview" to "预览", "up_common_re-select" to "重选", "up_common_rotate" to "旋转", "up_common_pleaseChoose" to "请选择", "up_common_loading" to "加载中", "up_common_loading2" to "正在加载", "up_common_inOperation" to "操作中", "up_common_settings" to "设置", "up_common_retry" to "重试", "up_common_search" to "搜索", "up_common_more" to "更多", "up_common_video" to "视频", "up_common_file" to "文件", "up_week_one" to "一", "up_week_two" to "二", "up_week_three" to "三", "up_week_four" to "四", "up_week_five" to "五", "up_week_six" to "六", "up_week_seven" to "日", "up_barcode_error" to "生成条码失败", "up_calendar_chooseDates" to "日期选择", "up_calendar_disabled" to "该日期已禁用", "up_calendar_daysExceed" to "选择天数不能超过{days}天", "up_calendar_today" to "今天", "up_cityLocate_locateCity" to "定位城市", "up_cityLocate_fail" to "定位失败，请点击重试。", "up_cityLocate_locating" to "定位中", "up_code_send" to "获取验证码", "up_code_resendAfter" to "X秒重新获取", "up_code_resend" to "重新获取", "up_cropper_emptyWidhtOrHeight" to "裁剪框的宽或高没有设置", "up_empty_car" to "购物车为空", "up_empty_page" to "页面不存在", "up_empty_search" to "没有搜索结果", "up_empty_address" to "没有收货地址", "up_empty_wifi" to "没有WiFi", "up_empty_order" to "订单为空", "up_empty_coupon" to "没有优惠券", "up_empty_favor" to "暂无收藏", "up_empty_permission" to "无权限", "up_empty_history" to "无历史记录", "up_empty_news" to "无新闻列表", "up_empty_message" to "消息列表为空", "up_empty_list" to "列表为空", "up_empty_data" to "数据为空", "up_empty_comment" to "暂无评论", "up_link_copyed" to "链接已复制，请在浏览器打开", "up_loadmoe_loadmore" to "加载更多", "up_loadmoe_nomore" to "没有更多了", "up_noNetwork_text" to "哎呀，网络信号丢失", "up_noNetwork_pleaseCheck" to "请检查网络，或前往", "up_noNetwork_connect" to "网络已连接", "up_noNetwork_disconnect" to "无网络连接", "up_pagination_previous" to "上一页", "up_pagination_next" to "下一页", "up_pullRefresh_pull" to "下拉刷新", "up_pullRefresh_release" to "释放刷新", "up_pullRefresh_refreshing" to "正在刷新", "up_readMore_expand" to "展开阅读全文", "up_readMore_fold" to "收起", "up_search_placeholder" to "请输入关键字", "up_signature_penSize" to "笔画大小", "up_signature_penColor" to "笔画颜色", "up_upload_sizeExceed" to "超过大小限制", "up_upload_uploading" to "上传中", "up_upload_previewImageFail" to "预览图片失败", "up_upload_previewVideoFail" to "预览视频失败", "up_goodsSku_stock" to "库存", "up_goodsSku_price" to "价格", "up_goodsSku_amount" to "件", "up_goodsSku_choosed" to "已选", "up_goodsSku_buyAmount" to "购买数量")
-val default__29: UTSJSONObject = _uO("up_common_cancel" to "取消", "up_common_confirm" to "確定", "up_common_start" to "開始", "up_common_end" to "結束", "up_common_stop" to "停止", "up_common_copy" to "複製", "up_common_none" to "暫無", "up_common_tip" to "提示", "up_common_success" to "成功", "up_common_fail" to "失敗", "up_common_close" to "關閉", "up_common_preview" to "預覽", "up_common_re-select" to "重選", "up_common_rotate" to "旋轉", "up_common_pleaseChoose" to "請選擇", "up_common_loading" to "載入中", "up_common_loading2" to "正在載入", "up_common_inOperation" to "操作中", "up_common_settings" to "設置", "up_common_retry" to "重試", "up_common_search" to "搜尋", "up_common_more" to "更多", "up_common_video" to "影片", "up_common_file" to "檔案", "up_week_one" to "一", "up_week_two" to "二", "up_week_three" to "三", "up_week_four" to "四", "up_week_five" to "五", "up_week_six" to "六", "up_week_seven" to "日", "up_barcode_error" to "生成條碼失敗", "up_calendar_chooseDates" to "日期選擇", "up_calendar_disabled" to "該日期已禁用", "up_calendar_daysExceed" to "選擇天數不能超過{days}天", "up_calendar_today" to "今天", "up_cityLocate_locateCity" to "定位城市", "up_cityLocate_fail" to "定位失敗，請點擊重試。", "up_cityLocate_locating" to "定位中", "up_code_send" to "獲取驗證碼", "up_code_resendAfter" to "X秒重新獲取", "up_code_resend" to "重新獲取", "up_cropper_emptyWidhtOrHeight" to "裁剪框的寬或高沒有設置", "up_empty_car" to "購物車為空", "up_empty_page" to "頁面不存在", "up_empty_search" to "沒有搜尋結果", "up_empty_address" to "沒有收貨地址", "up_empty_wifi" to "沒有WiFi", "up_empty_order" to "訂單為空", "up_empty_coupon" to "沒有優惠券", "up_empty_favor" to "暫無收藏", "up_empty_permission" to "無權限", "up_empty_history" to "無歷史記錄", "up_empty_news" to "無新聞列表", "up_empty_message" to "消息列表為空", "up_empty_list" to "列表為空", "up_empty_data" to "數據為空", "up_empty_comment" to "暫無評論", "up_link_copyed" to "鏈接已復制，請在瀏覽器打開", "up_loadmoe_loadmore" to "加載更多", "up_loadmoe_nomore" to "沒有更多了", "up_noNetwork_text" to "哎呀，網絡信號丟失", "up_noNetwork_pleaseCheck" to "請檢查網絡，或前往", "up_noNetwork_connect" to "網絡已連接", "up_noNetwork_disconnect" to "無網絡連接", "up_pagination_previous" to "上一頁", "up_pagination_next" to "下一頁", "up_pullRefresh_pull" to "下拉刷新", "up_pullRefresh_release" to "釋放刷新", "up_pullRefresh_refreshing" to "正在刷新", "up_readMore_expand" to "展開閱讀全文", "up_readMore_fold" to "收起", "up_search_placeholder" to "請輸入關鍵字", "up_signature_penSize" to "筆畫大小", "up_signature_penColor" to "筆畫顏色", "up_upload_sizeExceed" to "超過大小限制", "up_upload_uploading" to "上傳中", "up_upload_previewImageFail" to "預覽圖片失敗", "up_upload_previewVideoFail" to "預覽視頻失敗", "up_goodsSku_stock" to "庫存", "up_goodsSku_price" to "價格", "up_goodsSku_amount" to "件", "up_goodsSku_choosed" to "已選", "up_goodsSku_buyAmount" to "購買數量")
-val default__30: UTSJSONObject = _uO("up_common_cancel" to "Cancel", "up_common_confirm" to "Confirm", "up_common_start" to "Start", "up_common_end" to "End", "up_common_stop" to "Stop", "up_common_copy" to "Copy", "up_common_none" to "None", "up_common_tip" to "Tip", "up_common_success" to "Success", "up_common_fail" to "Fail", "up_common_close" to "Close", "up_common_preview" to "Preview", "up_common_re-select" to "Re-select", "up_common_rotate" to "Rotate", "up_common_pleaseChoose" to "Please choose", "up_common_loading" to "Loading", "up_common_loading2" to "Loading", "up_common_inOperation" to "In operation", "up_common_settings" to "Settings", "up_common_retry" to "Retry", "up_common_search" to "Search", "up_common_more" to "More", "up_common_video" to "Video", "up_common_file" to "File", "up_week_one" to "Mon", "up_week_two" to "Tue", "up_week_three" to "Wed", "up_week_four" to "Thu", "up_week_five" to "Fri", "up_week_six" to "Sat", "up_week_seven" to "Sun", "up_barcode_error" to "Failed to generate barcode", "up_calendar_chooseDates" to "Date selection", "up_calendar_disabled" to "This date is disabled", "up_calendar_daysExceed" to "The number of selected days cannot exceed {days} days", "up_calendar_today" to "Today", "up_cityLocate_locateCity" to "Locate city", "up_cityLocate_fail" to "Location failed, please click to retry.", "up_cityLocate_locating" to "Locating", "up_code_send" to "Get verification code", "up_code_resendAfter" to "Resend after X seconds", "up_code_resend" to "Resend", "up_cropper_emptyWidhtOrHeight" to "The width or height of the cropping box is not set", "up_empty_car" to "Shopping cart is empty", "up_empty_page" to "Page not found", "up_empty_search" to "No search results", "up_empty_address" to "No shipping address", "up_empty_wifi" to "No WiFi", "up_empty_order" to "Order is empty", "up_empty_coupon" to "No coupons", "up_empty_favor" to "No favorites", "up_empty_permission" to "No permission", "up_empty_history" to "No history", "up_empty_news" to "No news list", "up_empty_message" to "Message list is empty", "up_empty_list" to "List is empty", "up_empty_data" to "Data is empty", "up_empty_comment" to "No comments", "up_link_copyed" to "Link copied, please open in browser", "up_loadmoe_loadmore" to "Load more", "up_loadmoe_nomore" to "No more", "up_noNetwork_text" to "Oops, network signal lost", "up_noNetwork_pleaseCheck" to "Please check the network, or go to", "up_noNetwork_connect" to "Network connected", "up_noNetwork_disconnect" to "No network connection", "up_pagination_previous" to "Previous", "up_pagination_next" to "Next", "up_pullRefresh_pull" to "Pull to refresh", "up_pullRefresh_release" to "Release to refresh", "up_pullRefresh_refreshing" to "Refreshing", "up_readMore_expand" to "Expand to read more", "up_readMore_fold" to "Collapse", "up_search_placeholder" to "Please enter keywords", "up_signature_penSize" to "Stroke size", "up_signature_penColor" to "Stroke color", "up_upload_sizeExceed" to "Size limit exceeded", "up_upload_uploading" to "Uploading", "up_upload_previewImageFail" to "Failed to preview image", "up_upload_previewVideoFail" to "Failed to preview video", "up_goodsSku_stock" to "Stock", "up_goodsSku_price" to "Price", "up_goodsSku_amount" to "Items", "up_goodsSku_choosed" to "Selected", "up_goodsSku_buyAmount" to "Quantity")
-val default__31: UTSJSONObject = _uO("up_common_cancel" to "Cancelar", "up_common_confirm" to "Confirmar", "up_common_start" to "Empezar", "up_common_end" to "Finalizar", "up_common_stop" to "Detener", "up_common_copy" to "Copiar", "up_common_none" to "Ninguno", "up_common_tip" to "Consejo", "up_common_success" to "Éxito", "up_common_fail" to "Fallido", "up_common_close" to "Cerrar", "up_common_preview" to "Vista previa", "up_common_re-select" to "Volver a seleccionar", "up_common_rotate" to "Rotar", "up_common_pleaseChoose" to "Por favor seleccione", "up_common_loading" to "Cargando", "up_common_loading2" to "Cargando", "up_common_inOperation" to "En operación", "up_common_settings" to "Configuración", "up_common_retry" to "Reintentar", "up_common_search" to "Buscar", "up_common_more" to "Más", "up_common_video" to "Vídeo", "up_common_file" to "Archivo", "up_week_one" to "Lun", "up_week_two" to "Mar", "up_week_three" to "Mié", "up_week_four" to "Jue", "up_week_five" to "Vie", "up_week_six" to "Sáb", "up_week_seven" to "Dom", "up_barcode_error" to "Error al generar el código de barras", "up_calendar_chooseDates" to "Selección de fecha", "up_calendar_disabled" to "Esta fecha está deshabilitada", "up_calendar_daysExceed" to "El número de días seleccionados no puede exceder {days} días", "up_calendar_today" to "Hoy", "up_cityLocate_locateCity" to "Ubicar ciudad", "up_cityLocate_fail" to "Error de ubicación, haga clic para reintentar.", "up_cityLocate_locating" to "Ubicando", "up_code_send" to "Obtener código de verificación", "up_code_resendAfter" to "Reenviar después de X segundos", "up_code_resend" to "Reenviar", "up_cropper_emptyWidhtOrHeight" to "No se ha establecido el ancho o alto del recorte", "up_empty_car" to "Carrito vacío", "up_empty_page" to "Página no encontrada", "up_empty_search" to "Sin resultados de búsqueda", "up_empty_address" to "Sin dirección de envío", "up_empty_wifi" to "Sin WiFi", "up_empty_order" to "Pedido vacío", "up_empty_coupon" to "Sin cupones", "up_empty_favor" to "Sin favoritos", "up_empty_permission" to "Sin permiso", "up_empty_history" to "Sin historial", "up_empty_news" to "Sin lista de noticias", "up_empty_message" to "Lista de mensajes vacía", "up_empty_list" to "Lista vacía", "up_empty_data" to "Datos vacíos", "up_empty_comment" to "Sin comentarios", "up_link_copyed" to "Enlace copiado, por favor abra en el navegador", "up_loadmoe_loadmore" to "Cargar más", "up_loadmoe_nomore" to "No hay más", "up_noNetwork_text" to "¡Ups! Se perdió la señal de red", "up_noNetwork_pleaseCheck" to "Por favor revise la red, o vaya a", "up_noNetwork_connect" to "Red conectada", "up_noNetwork_disconnect" to "Sin conexión de red", "up_pagination_previous" to "Anterior", "up_pagination_next" to "Siguiente", "up_pullRefresh_pull" to "Tire para actualizar", "up_pullRefresh_release" to "Suelte para actualizar", "up_pullRefresh_refreshing" to "Actualizando", "up_readMore_expand" to "Expandir para leer más", "up_readMore_fold" to "Colapsar", "up_search_placeholder" to "Ingrese palabras clave", "up_signature_penSize" to "Tamaño del trazo", "up_signature_penColor" to "Color del trazo", "up_upload_sizeExceed" to "Límite de tamaño excedido", "up_upload_uploading" to "Subiendo", "up_upload_previewImageFail" to "Error al previsualizar imagen", "up_upload_previewVideoFail" to "Error al previsualizar video", "up_goodsSku_stock" to "Inventario", "up_goodsSku_price" to "Precio", "up_goodsSku_amount" to "Artículos", "up_goodsSku_choosed" to "Seleccionado", "up_goodsSku_buyAmount" to "Cantidad")
-val default__32: UTSJSONObject = _uO("up_common_cancel" to "Annuler", "up_common_confirm" to "Confirmer", "up_common_start" to "Démarrer", "up_common_end" to "Terminer", "up_common_stop" to "Arrêter", "up_common_copy" to "Copier", "up_common_none" to "Aucun", "up_common_tip" to "Conseil", "up_common_success" to "Succès", "up_common_fail" to "Échec", "up_common_close" to "Fermer", "up_common_preview" to "Aperçu", "up_common_re-select" to "Resélectionner", "up_common_rotate" to "Rotation", "up_common_pleaseChoose" to "Veuillez choisir", "up_common_loading" to "Chargement", "up_common_loading2" to "Chargement en cours", "up_common_inOperation" to "En cours d'opération", "up_common_settings" to "Paramètres", "up_common_retry" to "Réessayer", "up_common_search" to "Rechercher", "up_common_more" to "Plus", "up_common_video" to "Vidéo", "up_common_file" to "Fichier", "up_week_one" to "Lun", "up_week_two" to "Mar", "up_week_three" to "Mer", "up_week_four" to "Jeu", "up_week_five" to "Ven", "up_week_six" to "Sam", "up_week_seven" to "Dim", "up_barcode_error" to "Échec de génération du code-barres", "up_calendar_chooseDates" to "Sélection de dates", "up_calendar_disabled" to "Cette date est désactivée", "up_calendar_daysExceed" to "Le nombre de jours sélectionnés ne peut pas dépasser {days} jours", "up_calendar_today" to "Aujourd'hui", "up_cityLocate_locateCity" to "Localiser la ville", "up_cityLocate_fail" to "Échec de localisation, veuillez cliquer pour réessayer.", "up_cityLocate_locating" to "Localisation en cours", "up_code_send" to "Obtenir le code de vérification", "up_code_resendAfter" to "Renvoyer dans X secondes", "up_code_resend" to "Renvoyer", "up_cropper_emptyWidhtOrHeight" to "La largeur ou la hauteur de recadrage n'est pas définie", "up_empty_car" to "Panier vide", "up_empty_page" to "Page introuvable", "up_empty_search" to "Aucun résultat de recherche", "up_empty_address" to "Aucune adresse de livraison", "up_empty_wifi" to "Aucun Wi-Fi", "up_empty_order" to "Commande vide", "up_empty_coupon" to "Aucun coupon", "up_empty_favor" to "Aucun favori", "up_empty_permission" to "Aucune autorisation", "up_empty_history" to "Aucun historique", "up_empty_news" to "Aucune actualité", "up_empty_message" to "Liste de messages vide", "up_empty_list" to "Liste vide", "up_empty_data" to "Données vides", "up_empty_comment" to "Aucun commentaire", "up_link_copyed" to "Lien copié, veuillez ouvrir dans le navigateur", "up_loadmoe_loadmore" to "Charger plus", "up_loadmoe_nomore" to "Plus de contenu", "up_noNetwork_text" to "Oups, le signal réseau est perdu", "up_noNetwork_pleaseCheck" to "Veuillez vérifier le réseau, ou aller à", "up_noNetwork_connect" to "Réseau connecté", "up_noNetwork_disconnect" to "Aucune connexion réseau", "up_pagination_previous" to "Page précédente", "up_pagination_next" to "Page suivante", "up_pullRefresh_pull" to "Tirer pour actualiser", "up_pullRefresh_release" to "Relâcher pour actualiser", "up_pullRefresh_refreshing" to "Actualisation en cours", "up_readMore_expand" to "Développer pour lire la suite", "up_readMore_fold" to "Réduire", "up_search_placeholder" to "Veuillez saisir un mot-clé", "up_signature_penSize" to "Taille du trait", "up_signature_penColor" to "Couleur du trait", "up_upload_sizeExceed" to "Dépassement de la limite de taille", "up_upload_uploading" to "Téléchargement en cours", "up_upload_previewImageFail" to "Échec de l'aperçu de l'image", "up_upload_previewVideoFail" to "Échec de l'aperçu de la vidéo", "up_goodsSku_stock" to "Stock", "up_goodsSku_price" to "Prix", "up_goodsSku_amount" to "Pièces", "up_goodsSku_choosed" to "Sélectionné", "up_goodsSku_buyAmount" to "Quantité")
-val default__33: UTSJSONObject = _uO("up_common_cancel" to "Abbrechen", "up_common_confirm" to "Bestätigen", "up_common_start" to "Start", "up_common_end" to "Ende", "up_common_stop" to "Stopp", "up_common_copy" to "Kopieren", "up_common_none" to "Keine", "up_common_tip" to "Tipp", "up_common_success" to "Erfolg", "up_common_fail" to "Fehlgeschlagen", "up_common_close" to "Schließen", "up_common_preview" to "Vorschau", "up_common_re-select" to "Erneut auswählen", "up_common_rotate" to "Drehen", "up_common_pleaseChoose" to "Bitte wählen", "up_common_loading" to "Wird geladen", "up_common_loading2" to "Laden", "up_common_inOperation" to "In Bearbeitung", "up_common_settings" to "Einstellungen", "up_common_retry" to "Wiederholen", "up_common_search" to "Suchen", "up_common_more" to "Mehr", "up_common_video" to "Video", "up_common_file" to "Datei", "up_week_one" to "Mo", "up_week_two" to "Di", "up_week_three" to "Mi", "up_week_four" to "Do", "up_week_five" to "Fr", "up_week_six" to "Sa", "up_week_seven" to "So", "up_barcode_error" to "Barcode konnte nicht generiert werden", "up_calendar_chooseDates" to "Datum auswählen", "up_calendar_disabled" to "Dieses Datum ist deaktiviert", "up_calendar_daysExceed" to "Die Anzahl der ausgewählten Tage darf {days} Tage nicht überschreiten", "up_calendar_today" to "Heute", "up_cityLocate_locateCity" to "Stadt lokalisieren", "up_cityLocate_fail" to "Lokalisierung fehlgeschlagen, bitte klicken Sie, um es erneut zu versuchen.", "up_cityLocate_locating" to "Lokalisierung läuft", "up_code_send" to "Bestätigungscode erhalten", "up_code_resendAfter" to "Nach X Sekunden erneut senden", "up_code_resend" to "Erneut senden", "up_cropper_emptyWidhtOrHeight" to "Breite oder Höhe des Zuschneidebereichs ist nicht festgelegt", "up_empty_car" to "Warenkorb ist leer", "up_empty_page" to "Seite nicht gefunden", "up_empty_search" to "Keine Suchergebnisse", "up_empty_address" to "Keine Lieferadresse", "up_empty_wifi" to "Kein WLAN", "up_empty_order" to "Bestellung ist leer", "up_empty_coupon" to "Keine Coupons", "up_empty_favor" to "Keine Favoriten", "up_empty_permission" to "Keine Berechtigung", "up_empty_history" to "Kein Verlauf", "up_empty_news" to "Keine Nachrichtenliste", "up_empty_message" to "Nachrichtenliste ist leer", "up_empty_list" to "Liste ist leer", "up_empty_data" to "Daten sind leer", "up_empty_comment" to "Keine Kommentare", "up_link_copyed" to "Link kopiert, bitte im Browser öffnen", "up_loadmoe_loadmore" to "Mehr laden", "up_loadmoe_nomore" to "Keine weiteren Daten", "up_noNetwork_text" to "Ups, Netzwerksignal verloren", "up_noNetwork_pleaseCheck" to "Bitte überprüfen Sie das Netzwerk oder gehen Sie zu", "up_noNetwork_connect" to "Netzwerk verbunden", "up_noNetwork_disconnect" to "Keine Netzwerkverbindung", "up_pagination_previous" to "Zurück", "up_pagination_next" to "Weiter", "up_pullRefresh_pull" to "Zum Aktualisieren ziehen", "up_pullRefresh_release" to "Loslassen zum Aktualisieren", "up_pullRefresh_refreshing" to "Aktualisierung läuft", "up_readMore_expand" to "Erweitern, um mehr zu lesen", "up_readMore_fold" to "Einklappen", "up_search_placeholder" to "Bitte Schlüsselwort eingeben", "up_signature_penSize" to "Strichgröße", "up_signature_penColor" to "Strichfarbe", "up_upload_sizeExceed" to "Größenbegrenzung überschritten", "up_upload_uploading" to "Upload läuft", "up_upload_previewImageFail" to "Bildvorschau fehlgeschlagen", "up_upload_previewVideoFail" to "Videovorschau fehlgeschlagen", "up_goodsSku_stock" to "Lagerbestand", "up_goodsSku_price" to "Preis", "up_goodsSku_amount" to "Artikel", "up_goodsSku_choosed" to "Ausgewählt", "up_goodsSku_buyAmount" to "Anzahl")
-val default__34: UTSJSONObject = _uO("up_common_cancel" to "취소", "up_common_confirm" to "확인", "up_common_start" to "시작", "up_common_end" to "종료", "up_common_stop" to "중지", "up_common_copy" to "복사", "up_common_none" to "없음", "up_common_tip" to "팁", "up_common_success" to "성공", "up_common_fail" to "실패", "up_common_close" to "닫기", "up_common_preview" to "미리보기", "up_common_re-select" to "재선택", "up_common_rotate" to "회전", "up_common_pleaseChoose" to "선택해주세요", "up_common_loading" to "로딩 중", "up_common_loading2" to "로딩 중", "up_common_inOperation" to "작업 중", "up_common_settings" to "설정", "up_common_retry" to "재시도", "up_common_search" to "검색", "up_common_more" to "더보기", "up_common_video" to "비디오", "up_common_file" to "파일", "up_week_one" to "월", "up_week_two" to "화", "up_week_three" to "수", "up_week_four" to "목", "up_week_five" to "금", "up_week_six" to "토", "up_week_seven" to "일", "up_barcode_error" to "바코드 생성 실패", "up_calendar_chooseDates" to "날짜 선택", "up_calendar_disabled" to "이 날짜는 비활성화되었습니다", "up_calendar_daysExceed" to "선택한 일 수는 {days}일을 초과할 수 없습니다", "up_calendar_today" to "오늘", "up_cityLocate_locateCity" to "도시 위치 찾기", "up_cityLocate_fail" to "위치 찾기 실패, 클릭하여 재시도하세요.", "up_cityLocate_locating" to "위치 찾는 중", "up_code_send" to "인증번호 받기", "up_code_resendAfter" to "X초 후 재전송", "up_code_resend" to "재전송", "up_cropper_emptyWidhtOrHeight" to "자르기 상자의 너비나 높이가 설정되지 않았습니다", "up_empty_car" to "장바구니가 비어 있습니다", "up_empty_page" to "페이지를 찾을 수 없습니다", "up_empty_search" to "검색 결과가 없습니다", "up_empty_address" to "배송 주소가 없습니다", "up_empty_wifi" to "Wi-Fi 없음", "up_empty_order" to "주문이 비어 있습니다", "up_empty_coupon" to "쿠폰이 없습니다", "up_empty_favor" to "찜한 항목이 없습니다", "up_empty_permission" to "권한이 없습니다", "up_empty_history" to "기록이 없습니다", "up_empty_news" to "뉴스 목록이 없습니다", "up_empty_message" to "메시지 목록이 비어 있습니다", "up_empty_list" to "목록이 비어 있습니다", "up_empty_data" to "데이터가 없습니다", "up_empty_comment" to "댓글이 없습니다", "up_link_copyed" to "링크가 복사되었습니다. 브라우저에서 열어주세요", "up_loadmoe_loadmore" to "더 불러오기", "up_loadmoe_nomore" to "더 이상 없습니다", "up_noNetwork_text" to "앗, 네트워크 신호가 사라졌어요", "up_noNetwork_pleaseCheck" to "네트워크를 확인하거나 다음으로 이동하세요", "up_noNetwork_connect" to "네트워크 연결됨", "up_noNetwork_disconnect" to "네트워크 연결 없음", "up_pagination_previous" to "이전", "up_pagination_next" to "다음", "up_pullRefresh_pull" to "당겨서 새로고침", "up_pullRefresh_release" to "놓아서 새로고침", "up_pullRefresh_refreshing" to "새로고침 중", "up_readMore_expand" to "펼쳐서 더 읽기", "up_readMore_fold" to "접기", "up_search_placeholder" to "키워드를 입력하세요", "up_signature_penSize" to "선 굵기", "up_signature_penColor" to "선 색상", "up_upload_sizeExceed" to "크기 제한 초과", "up_upload_uploading" to "업로드 중", "up_upload_previewImageFail" to "이미지 미리보기 실패", "up_upload_previewVideoFail" to "비디오 미리보기 실패", "up_goodsSku_stock" to "재고", "up_goodsSku_price" to "가격", "up_goodsSku_amount" to "개", "up_goodsSku_choosed" to "선택됨", "up_goodsSku_buyAmount" to "구매 수량")
-val default__35: UTSJSONObject = _uO("up_common_cancel" to "キャンセル", "up_common_confirm" to "確認", "up_common_start" to "開始", "up_common_end" to "終了", "up_common_stop" to "停止", "up_common_copy" to "コピー", "up_common_none" to "なし", "up_common_tip" to "ヒント", "up_common_success" to "成功", "up_common_fail" to "失敗", "up_common_close" to "閉じる", "up_common_preview" to "プレビュー", "up_common_re-select" to "再選択", "up_common_rotate" to "回転", "up_common_pleaseChoose" to "選択してください", "up_common_loading" to "読み込み中", "up_common_loading2" to "読み込み中", "up_common_inOperation" to "操作中", "up_common_settings" to "設定", "up_common_retry" to "再試行", "up_common_search" to "検索", "up_common_more" to "もっと", "up_common_video" to "ビデオ", "up_common_file" to "ファイル", "up_week_one" to "月", "up_week_two" to "火", "up_week_three" to "水", "up_week_four" to "木", "up_week_five" to "金", "up_week_six" to "土", "up_week_seven" to "日", "up_barcode_error" to "バーコードの生成に失敗しました", "up_calendar_chooseDates" to "日付選択", "up_calendar_disabled" to "この日付は無効です", "up_calendar_daysExceed" to "選択日数は{days}日を超えることはできません", "up_calendar_today" to "今日", "up_cityLocate_locateCity" to "都市を特定", "up_cityLocate_fail" to "位置情報の取得に失敗しました。クリックして再試行してください。", "up_cityLocate_locating" to "位置情報を取得中", "up_code_send" to "認証コードを取得", "up_code_resendAfter" to "X秒後に再送信", "up_code_resend" to "再送信", "up_cropper_emptyWidhtOrHeight" to "切り抜きボックスの幅または高さが設定されていません", "up_empty_car" to "ショッピングカートは空です", "up_empty_page" to "ページが見つかりません", "up_empty_search" to "検索結果がありません", "up_empty_address" to "配送先住所がありません", "up_empty_wifi" to "Wi-Fiがありません", "up_empty_order" to "注文はありません", "up_empty_coupon" to "クーポンがありません", "up_empty_favor" to "お気に入りがありません", "up_empty_permission" to "権限がありません", "up_empty_history" to "履歴がありません", "up_empty_news" to "ニュースリストがありません", "up_empty_message" to "メッセージリストが空です", "up_empty_list" to "リストが空です", "up_empty_data" to "データが空です", "up_empty_comment" to "コメントがありません", "up_link_copyed" to "リンクをコピーしました。ブラウザで開いてください", "up_loadmoe_loadmore" to "さらに読み込む", "up_loadmoe_nomore" to "これ以上ありません", "up_noNetwork_text" to "おっと、ネットワーク信号が失われました", "up_noNetwork_pleaseCheck" to "ネットワークを確認するか、", "up_noNetwork_connect" to "ネットワーク接続済み", "up_noNetwork_disconnect" to "ネットワーク接続なし", "up_pagination_previous" to "前へ", "up_pagination_next" to "次へ", "up_pullRefresh_pull" to "引き下げて更新", "up_pullRefresh_release" to "指を離して更新", "up_pullRefresh_refreshing" to "更新中", "up_readMore_expand" to "続きを読む", "up_readMore_fold" to "折りたたむ", "up_search_placeholder" to "キーワードを入力してください", "up_signature_penSize" to "線の太さ", "up_signature_penColor" to "線の色", "up_upload_sizeExceed" to "サイズ制限を超えています", "up_upload_uploading" to "アップロード中", "up_upload_previewImageFail" to "画像のプレビューに失敗しました", "up_upload_previewVideoFail" to "動画のプレビューに失敗しました", "up_goodsSku_stock" to "在庫", "up_goodsSku_price" to "価格", "up_goodsSku_amount" to "アイテム", "up_goodsSku_choosed" to "選択済み", "up_goodsSku_buyAmount" to "購入数量")
-val default__36: UTSJSONObject = _uO("up_common_cancel" to "Отмена", "up_common_confirm" to "Подтвердить", "up_common_start" to "Начать", "up_common_end" to "Завершить", "up_common_stop" to "Остановить", "up_common_copy" to "Копировать", "up_common_none" to "Нет", "up_common_tip" to "Совет", "up_common_success" to "Успех", "up_common_fail" to "Ошибка", "up_common_close" to "Закрыть", "up_common_preview" to "Предпросмотр", "up_common_re-select" to "Выбрать снова", "up_common_rotate" to "Поворот", "up_common_pleaseChoose" to "Пожалуйста, выберите", "up_common_loading" to "Загрузка", "up_common_loading2" to "Загрузка", "up_common_inOperation" to "В процессе", "up_common_settings" to "Настройки", "up_common_retry" to "Повторить", "up_common_search" to "Поиск", "up_common_more" to "Еще", "up_common_video" to "Видео", "up_common_file" to "Файл", "up_week_one" to "Пн", "up_week_two" to "Вт", "up_week_three" to "Ср", "up_week_four" to "Чт", "up_week_five" to "Пт", "up_week_six" to "Сб", "up_week_seven" to "Вс", "up_barcode_error" to "Не удалось сгенерировать штрих-код", "up_calendar_chooseDates" to "Выбор даты", "up_calendar_disabled" to "Эта дата отключена", "up_calendar_daysExceed" to "Количество выбранных дней не может превышать {days} дней", "up_calendar_today" to "Сегодня", "up_cityLocate_locateCity" to "Определить город", "up_cityLocate_fail" to "Ошибка определения местоположения, нажмите, чтобы повторить попытку.", "up_cityLocate_locating" to "Определение местоположения", "up_code_send" to "Получить код подтверждения", "up_code_resendAfter" to "Повторная отправка через X секунд", "up_code_resend" to "Повторная отправка", "up_cropper_emptyWidhtOrHeight" to "Ширина или высота области обрезки не задана", "up_empty_car" to "Корзина пуста", "up_empty_page" to "Страница не найдена", "up_empty_search" to "Нет результатов поиска", "up_empty_address" to "Нет адреса доставки", "up_empty_wifi" to "Нет Wi-Fi", "up_empty_order" to "Заказ пуст", "up_empty_coupon" to "Нет купонов", "up_empty_favor" to "Нет избранного", "up_empty_permission" to "Нет разрешения", "up_empty_history" to "Нет истории", "up_empty_news" to "Нет новостей", "up_empty_message" to "Список сообщений пуст", "up_empty_list" to "Список пуст", "up_empty_data" to "Нет данных", "up_empty_comment" to "Нет комментариев", "up_link_copyed" to "Ссылка скопирована, откройте в браузере", "up_loadmoe_loadmore" to "Загрузить еще", "up_loadmoe_nomore" to "Больше нет", "up_noNetwork_text" to "Упс, потеряно сетевое соединение", "up_noNetwork_pleaseCheck" to "Проверьте сеть или перейдите в", "up_noNetwork_connect" to "Сеть подключена", "up_noNetwork_disconnect" to "Нет сетевого подключения", "up_pagination_previous" to "Предыдущая", "up_pagination_next" to "Следующая", "up_pullRefresh_pull" to "Потяните для обновления", "up_pullRefresh_release" to "Отпустите для обновления", "up_pullRefresh_refreshing" to "Обновление", "up_readMore_expand" to "Развернуть, чтобы прочитать больше", "up_readMore_fold" to "Свернуть", "up_search_placeholder" to "Введите ключевые слова", "up_signature_penSize" to "Размер линии", "up_signature_penColor" to "Цвет линии", "up_upload_sizeExceed" to "Превышен лимит размера", "up_upload_uploading" to "Загрузка", "up_upload_previewImageFail" to "Не удалось просмотреть изображение", "up_upload_previewVideoFail" to "Не удалось просмотреть видео", "up_goodsSku_stock" to "Запас", "up_goodsSku_price" to "Цена", "up_goodsSku_amount" to "Штуки", "up_goodsSku_choosed" to "Выбрано", "up_goodsSku_buyAmount" to "Количество")
+fun __uts_large_default_export_fill_fill_1__1(__obj: UTSJSONObject): Unit {
+    __obj["up_common_cancel"] = "取消"
+    __obj["up_common_confirm"] = "确定"
+    __obj["up_common_start"] = "开始"
+    __obj["up_common_end"] = "结束"
+    __obj["up_common_stop"] = "停止"
+    __obj["up_common_copy"] = "复制"
+    __obj["up_common_none"] = "暂无"
+    __obj["up_common_tip"] = "提示"
+    __obj["up_common_success"] = "成功"
+    __obj["up_common_fail"] = "失败"
+    __obj["up_common_close"] = "关闭"
+    __obj["up_common_preview"] = "预览"
+    __obj["up_common_re-select"] = "重选"
+    __obj["up_common_rotate"] = "旋转"
+    __obj["up_common_pleaseChoose"] = "请选择"
+    __obj["up_common_loading"] = "加载中"
+    __obj["up_common_loading2"] = "正在加载"
+    __obj["up_common_inOperation"] = "操作中"
+    __obj["up_common_settings"] = "设置"
+    __obj["up_common_retry"] = "重试"
+    __obj["up_common_search"] = "搜索"
+    __obj["up_common_more"] = "更多"
+    __obj["up_common_video"] = "视频"
+    __obj["up_common_file"] = "文件"
+    __obj["up_week_one"] = "一"
+    __obj["up_week_two"] = "二"
+    __obj["up_week_three"] = "三"
+    __obj["up_week_four"] = "四"
+    __obj["up_week_five"] = "五"
+    __obj["up_week_six"] = "六"
+    __obj["up_week_seven"] = "日"
+    __obj["up_barcode_error"] = "生成条码失败"
+    __obj["up_calendar_chooseDates"] = "日期选择"
+    __obj["up_calendar_disabled"] = "该日期已禁用"
+    __obj["up_calendar_daysExceed"] = "选择天数不能超过{days}天"
+    __obj["up_calendar_today"] = "今天"
+    __obj["up_cityLocate_locateCity"] = "定位城市"
+    __obj["up_cityLocate_fail"] = "定位失败，请点击重试。"
+    __obj["up_cityLocate_locating"] = "定位中"
+    __obj["up_code_send"] = "获取验证码"
+    __obj["up_code_resendAfter"] = "X秒重新获取"
+    __obj["up_code_resend"] = "重新获取"
+    __obj["up_cropper_emptyWidhtOrHeight"] = "裁剪框的宽或高没有设置"
+    __obj["up_empty_car"] = "购物车为空"
+    __obj["up_empty_page"] = "页面不存在"
+    __obj["up_empty_search"] = "没有搜索结果"
+    __obj["up_empty_address"] = "没有收货地址"
+    __obj["up_empty_wifi"] = "没有WiFi"
+}
+fun __uts_large_default_export_fill_fill_2__1(__obj: UTSJSONObject): Unit {
+    __obj["up_empty_order"] = "订单为空"
+    __obj["up_empty_coupon"] = "没有优惠券"
+    __obj["up_empty_favor"] = "暂无收藏"
+    __obj["up_empty_permission"] = "无权限"
+    __obj["up_empty_history"] = "无历史记录"
+    __obj["up_empty_news"] = "无新闻列表"
+    __obj["up_empty_message"] = "消息列表为空"
+    __obj["up_empty_list"] = "列表为空"
+    __obj["up_empty_data"] = "数据为空"
+    __obj["up_empty_comment"] = "暂无评论"
+    __obj["up_link_copyed"] = "链接已复制，请在浏览器打开"
+    __obj["up_loadmoe_loadmore"] = "加载更多"
+    __obj["up_loadmoe_nomore"] = "没有更多了"
+    __obj["up_noNetwork_text"] = "哎呀，网络信号丢失"
+    __obj["up_noNetwork_pleaseCheck"] = "请检查网络，或前往"
+    __obj["up_noNetwork_connect"] = "网络已连接"
+    __obj["up_noNetwork_disconnect"] = "无网络连接"
+    __obj["up_pagination_previous"] = "上一页"
+    __obj["up_pagination_next"] = "下一页"
+    __obj["up_pullRefresh_pull"] = "下拉刷新"
+    __obj["up_pullRefresh_release"] = "释放刷新"
+    __obj["up_pullRefresh_refreshing"] = "正在刷新"
+    __obj["up_readMore_expand"] = "展开阅读全文"
+    __obj["up_readMore_fold"] = "收起"
+    __obj["up_search_placeholder"] = "请输入关键字"
+    __obj["up_signature_penSize"] = "笔画大小"
+    __obj["up_signature_penColor"] = "笔画颜色"
+    __obj["up_upload_sizeExceed"] = "超过大小限制"
+    __obj["up_upload_uploading"] = "上传中"
+    __obj["up_upload_previewImageFail"] = "预览图片失败"
+    __obj["up_upload_previewVideoFail"] = "预览视频失败"
+    __obj["up_goodsSku_stock"] = "库存"
+    __obj["up_goodsSku_price"] = "价格"
+    __obj["up_goodsSku_amount"] = "件"
+    __obj["up_goodsSku_choosed"] = "已选"
+    __obj["up_goodsSku_buyAmount"] = "购买数量"
+}
+fun __uts_large_default_export_build_0__1(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/libs/i18n/locales/zh-Hans.uts", 90, 11))
+    __uts_large_default_export_fill_fill_1__1(__obj)
+    __uts_large_default_export_fill_fill_2__1(__obj)
+    return __obj
+}
+val default__28 = __uts_large_default_export_build_0__1()
+fun __uts_large_default_export_fill_fill_1__2(__obj: UTSJSONObject): Unit {
+    __obj["up_common_cancel"] = "取消"
+    __obj["up_common_confirm"] = "確定"
+    __obj["up_common_start"] = "開始"
+    __obj["up_common_end"] = "結束"
+    __obj["up_common_stop"] = "停止"
+    __obj["up_common_copy"] = "複製"
+    __obj["up_common_none"] = "暫無"
+    __obj["up_common_tip"] = "提示"
+    __obj["up_common_success"] = "成功"
+    __obj["up_common_fail"] = "失敗"
+    __obj["up_common_close"] = "關閉"
+    __obj["up_common_preview"] = "預覽"
+    __obj["up_common_re-select"] = "重選"
+    __obj["up_common_rotate"] = "旋轉"
+    __obj["up_common_pleaseChoose"] = "請選擇"
+    __obj["up_common_loading"] = "載入中"
+    __obj["up_common_loading2"] = "正在載入"
+    __obj["up_common_inOperation"] = "操作中"
+    __obj["up_common_settings"] = "設置"
+    __obj["up_common_retry"] = "重試"
+    __obj["up_common_search"] = "搜尋"
+    __obj["up_common_more"] = "更多"
+    __obj["up_common_video"] = "影片"
+    __obj["up_common_file"] = "檔案"
+    __obj["up_week_one"] = "一"
+    __obj["up_week_two"] = "二"
+    __obj["up_week_three"] = "三"
+    __obj["up_week_four"] = "四"
+    __obj["up_week_five"] = "五"
+    __obj["up_week_six"] = "六"
+    __obj["up_week_seven"] = "日"
+    __obj["up_barcode_error"] = "生成條碼失敗"
+    __obj["up_calendar_chooseDates"] = "日期選擇"
+    __obj["up_calendar_disabled"] = "該日期已禁用"
+    __obj["up_calendar_daysExceed"] = "選擇天數不能超過{days}天"
+    __obj["up_calendar_today"] = "今天"
+    __obj["up_cityLocate_locateCity"] = "定位城市"
+    __obj["up_cityLocate_fail"] = "定位失敗，請點擊重試。"
+    __obj["up_cityLocate_locating"] = "定位中"
+    __obj["up_code_send"] = "獲取驗證碼"
+    __obj["up_code_resendAfter"] = "X秒重新獲取"
+    __obj["up_code_resend"] = "重新獲取"
+    __obj["up_cropper_emptyWidhtOrHeight"] = "裁剪框的寬或高沒有設置"
+    __obj["up_empty_car"] = "購物車為空"
+    __obj["up_empty_page"] = "頁面不存在"
+    __obj["up_empty_search"] = "沒有搜尋結果"
+    __obj["up_empty_address"] = "沒有收貨地址"
+    __obj["up_empty_wifi"] = "沒有WiFi"
+}
+fun __uts_large_default_export_fill_fill_2__2(__obj: UTSJSONObject): Unit {
+    __obj["up_empty_order"] = "訂單為空"
+    __obj["up_empty_coupon"] = "沒有優惠券"
+    __obj["up_empty_favor"] = "暫無收藏"
+    __obj["up_empty_permission"] = "無權限"
+    __obj["up_empty_history"] = "無歷史記錄"
+    __obj["up_empty_news"] = "無新聞列表"
+    __obj["up_empty_message"] = "消息列表為空"
+    __obj["up_empty_list"] = "列表為空"
+    __obj["up_empty_data"] = "數據為空"
+    __obj["up_empty_comment"] = "暫無評論"
+    __obj["up_link_copyed"] = "鏈接已復制，請在瀏覽器打開"
+    __obj["up_loadmoe_loadmore"] = "加載更多"
+    __obj["up_loadmoe_nomore"] = "沒有更多了"
+    __obj["up_noNetwork_text"] = "哎呀，網絡信號丟失"
+    __obj["up_noNetwork_pleaseCheck"] = "請檢查網絡，或前往"
+    __obj["up_noNetwork_connect"] = "網絡已連接"
+    __obj["up_noNetwork_disconnect"] = "無網絡連接"
+    __obj["up_pagination_previous"] = "上一頁"
+    __obj["up_pagination_next"] = "下一頁"
+    __obj["up_pullRefresh_pull"] = "下拉刷新"
+    __obj["up_pullRefresh_release"] = "釋放刷新"
+    __obj["up_pullRefresh_refreshing"] = "正在刷新"
+    __obj["up_readMore_expand"] = "展開閱讀全文"
+    __obj["up_readMore_fold"] = "收起"
+    __obj["up_search_placeholder"] = "請輸入關鍵字"
+    __obj["up_signature_penSize"] = "筆畫大小"
+    __obj["up_signature_penColor"] = "筆畫顏色"
+    __obj["up_upload_sizeExceed"] = "超過大小限制"
+    __obj["up_upload_uploading"] = "上傳中"
+    __obj["up_upload_previewImageFail"] = "預覽圖片失敗"
+    __obj["up_upload_previewVideoFail"] = "預覽視頻失敗"
+    __obj["up_goodsSku_stock"] = "庫存"
+    __obj["up_goodsSku_price"] = "價格"
+    __obj["up_goodsSku_amount"] = "件"
+    __obj["up_goodsSku_choosed"] = "已選"
+    __obj["up_goodsSku_buyAmount"] = "購買數量"
+}
+fun __uts_large_default_export_build_0__2(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/libs/i18n/locales/zh-Hant.uts", 90, 11))
+    __uts_large_default_export_fill_fill_1__2(__obj)
+    __uts_large_default_export_fill_fill_2__2(__obj)
+    return __obj
+}
+val default__29 = __uts_large_default_export_build_0__2()
+fun __uts_large_default_export_fill_fill_1__3(__obj: UTSJSONObject): Unit {
+    __obj["up_common_cancel"] = "Cancel"
+    __obj["up_common_confirm"] = "Confirm"
+    __obj["up_common_start"] = "Start"
+    __obj["up_common_end"] = "End"
+    __obj["up_common_stop"] = "Stop"
+    __obj["up_common_copy"] = "Copy"
+    __obj["up_common_none"] = "None"
+    __obj["up_common_tip"] = "Tip"
+    __obj["up_common_success"] = "Success"
+    __obj["up_common_fail"] = "Fail"
+    __obj["up_common_close"] = "Close"
+    __obj["up_common_preview"] = "Preview"
+    __obj["up_common_re-select"] = "Re-select"
+    __obj["up_common_rotate"] = "Rotate"
+    __obj["up_common_pleaseChoose"] = "Please choose"
+    __obj["up_common_loading"] = "Loading"
+    __obj["up_common_loading2"] = "Loading"
+    __obj["up_common_inOperation"] = "In operation"
+    __obj["up_common_settings"] = "Settings"
+    __obj["up_common_retry"] = "Retry"
+    __obj["up_common_search"] = "Search"
+    __obj["up_common_more"] = "More"
+    __obj["up_common_video"] = "Video"
+    __obj["up_common_file"] = "File"
+    __obj["up_week_one"] = "Mon"
+    __obj["up_week_two"] = "Tue"
+    __obj["up_week_three"] = "Wed"
+    __obj["up_week_four"] = "Thu"
+    __obj["up_week_five"] = "Fri"
+    __obj["up_week_six"] = "Sat"
+    __obj["up_week_seven"] = "Sun"
+    __obj["up_barcode_error"] = "Failed to generate barcode"
+    __obj["up_calendar_chooseDates"] = "Date selection"
+    __obj["up_calendar_disabled"] = "This date is disabled"
+    __obj["up_calendar_daysExceed"] = "The number of selected days cannot exceed {days} days"
+    __obj["up_calendar_today"] = "Today"
+    __obj["up_cityLocate_locateCity"] = "Locate city"
+    __obj["up_cityLocate_fail"] = "Location failed, please click to retry."
+    __obj["up_cityLocate_locating"] = "Locating"
+    __obj["up_code_send"] = "Get verification code"
+    __obj["up_code_resendAfter"] = "Resend after X seconds"
+    __obj["up_code_resend"] = "Resend"
+    __obj["up_cropper_emptyWidhtOrHeight"] = "The width or height of the cropping box is not set"
+    __obj["up_empty_car"] = "Shopping cart is empty"
+    __obj["up_empty_page"] = "Page not found"
+    __obj["up_empty_search"] = "No search results"
+    __obj["up_empty_address"] = "No shipping address"
+    __obj["up_empty_wifi"] = "No WiFi"
+}
+fun __uts_large_default_export_fill_fill_2__3(__obj: UTSJSONObject): Unit {
+    __obj["up_empty_order"] = "Order is empty"
+    __obj["up_empty_coupon"] = "No coupons"
+    __obj["up_empty_favor"] = "No favorites"
+    __obj["up_empty_permission"] = "No permission"
+    __obj["up_empty_history"] = "No history"
+    __obj["up_empty_news"] = "No news list"
+    __obj["up_empty_message"] = "Message list is empty"
+    __obj["up_empty_list"] = "List is empty"
+    __obj["up_empty_data"] = "Data is empty"
+    __obj["up_empty_comment"] = "No comments"
+    __obj["up_link_copyed"] = "Link copied, please open in browser"
+    __obj["up_loadmoe_loadmore"] = "Load more"
+    __obj["up_loadmoe_nomore"] = "No more"
+    __obj["up_noNetwork_text"] = "Oops, network signal lost"
+    __obj["up_noNetwork_pleaseCheck"] = "Please check the network, or go to"
+    __obj["up_noNetwork_connect"] = "Network connected"
+    __obj["up_noNetwork_disconnect"] = "No network connection"
+    __obj["up_pagination_previous"] = "Previous"
+    __obj["up_pagination_next"] = "Next"
+    __obj["up_pullRefresh_pull"] = "Pull to refresh"
+    __obj["up_pullRefresh_release"] = "Release to refresh"
+    __obj["up_pullRefresh_refreshing"] = "Refreshing"
+    __obj["up_readMore_expand"] = "Expand to read more"
+    __obj["up_readMore_fold"] = "Collapse"
+    __obj["up_search_placeholder"] = "Please enter keywords"
+    __obj["up_signature_penSize"] = "Stroke size"
+    __obj["up_signature_penColor"] = "Stroke color"
+    __obj["up_upload_sizeExceed"] = "Size limit exceeded"
+    __obj["up_upload_uploading"] = "Uploading"
+    __obj["up_upload_previewImageFail"] = "Failed to preview image"
+    __obj["up_upload_previewVideoFail"] = "Failed to preview video"
+    __obj["up_goodsSku_stock"] = "Stock"
+    __obj["up_goodsSku_price"] = "Price"
+    __obj["up_goodsSku_amount"] = "Items"
+    __obj["up_goodsSku_choosed"] = "Selected"
+    __obj["up_goodsSku_buyAmount"] = "Quantity"
+}
+fun __uts_large_default_export_build_0__3(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/libs/i18n/locales/en.uts", 90, 11))
+    __uts_large_default_export_fill_fill_1__3(__obj)
+    __uts_large_default_export_fill_fill_2__3(__obj)
+    return __obj
+}
+val default__30 = __uts_large_default_export_build_0__3()
+fun __uts_large_default_export_fill_fill_1__4(__obj: UTSJSONObject): Unit {
+    __obj["up_common_cancel"] = "Cancelar"
+    __obj["up_common_confirm"] = "Confirmar"
+    __obj["up_common_start"] = "Empezar"
+    __obj["up_common_end"] = "Finalizar"
+    __obj["up_common_stop"] = "Detener"
+    __obj["up_common_copy"] = "Copiar"
+    __obj["up_common_none"] = "Ninguno"
+    __obj["up_common_tip"] = "Consejo"
+    __obj["up_common_success"] = "Éxito"
+    __obj["up_common_fail"] = "Fallido"
+    __obj["up_common_close"] = "Cerrar"
+    __obj["up_common_preview"] = "Vista previa"
+    __obj["up_common_re-select"] = "Volver a seleccionar"
+    __obj["up_common_rotate"] = "Rotar"
+    __obj["up_common_pleaseChoose"] = "Por favor seleccione"
+    __obj["up_common_loading"] = "Cargando"
+    __obj["up_common_loading2"] = "Cargando"
+    __obj["up_common_inOperation"] = "En operación"
+    __obj["up_common_settings"] = "Configuración"
+    __obj["up_common_retry"] = "Reintentar"
+    __obj["up_common_search"] = "Buscar"
+    __obj["up_common_more"] = "Más"
+    __obj["up_common_video"] = "Vídeo"
+    __obj["up_common_file"] = "Archivo"
+    __obj["up_week_one"] = "Lun"
+    __obj["up_week_two"] = "Mar"
+    __obj["up_week_three"] = "Mié"
+    __obj["up_week_four"] = "Jue"
+    __obj["up_week_five"] = "Vie"
+    __obj["up_week_six"] = "Sáb"
+    __obj["up_week_seven"] = "Dom"
+    __obj["up_barcode_error"] = "Error al generar el código de barras"
+    __obj["up_calendar_chooseDates"] = "Selección de fecha"
+    __obj["up_calendar_disabled"] = "Esta fecha está deshabilitada"
+    __obj["up_calendar_daysExceed"] = "El número de días seleccionados no puede exceder {days} días"
+    __obj["up_calendar_today"] = "Hoy"
+    __obj["up_cityLocate_locateCity"] = "Ubicar ciudad"
+    __obj["up_cityLocate_fail"] = "Error de ubicación, haga clic para reintentar."
+    __obj["up_cityLocate_locating"] = "Ubicando"
+    __obj["up_code_send"] = "Obtener código de verificación"
+    __obj["up_code_resendAfter"] = "Reenviar después de X segundos"
+    __obj["up_code_resend"] = "Reenviar"
+    __obj["up_cropper_emptyWidhtOrHeight"] = "No se ha establecido el ancho o alto del recorte"
+    __obj["up_empty_car"] = "Carrito vacío"
+    __obj["up_empty_page"] = "Página no encontrada"
+    __obj["up_empty_search"] = "Sin resultados de búsqueda"
+    __obj["up_empty_address"] = "Sin dirección de envío"
+    __obj["up_empty_wifi"] = "Sin WiFi"
+}
+fun __uts_large_default_export_fill_fill_2__4(__obj: UTSJSONObject): Unit {
+    __obj["up_empty_order"] = "Pedido vacío"
+    __obj["up_empty_coupon"] = "Sin cupones"
+    __obj["up_empty_favor"] = "Sin favoritos"
+    __obj["up_empty_permission"] = "Sin permiso"
+    __obj["up_empty_history"] = "Sin historial"
+    __obj["up_empty_news"] = "Sin lista de noticias"
+    __obj["up_empty_message"] = "Lista de mensajes vacía"
+    __obj["up_empty_list"] = "Lista vacía"
+    __obj["up_empty_data"] = "Datos vacíos"
+    __obj["up_empty_comment"] = "Sin comentarios"
+    __obj["up_link_copyed"] = "Enlace copiado, por favor abra en el navegador"
+    __obj["up_loadmoe_loadmore"] = "Cargar más"
+    __obj["up_loadmoe_nomore"] = "No hay más"
+    __obj["up_noNetwork_text"] = "¡Ups! Se perdió la señal de red"
+    __obj["up_noNetwork_pleaseCheck"] = "Por favor revise la red, o vaya a"
+    __obj["up_noNetwork_connect"] = "Red conectada"
+    __obj["up_noNetwork_disconnect"] = "Sin conexión de red"
+    __obj["up_pagination_previous"] = "Anterior"
+    __obj["up_pagination_next"] = "Siguiente"
+    __obj["up_pullRefresh_pull"] = "Tire para actualizar"
+    __obj["up_pullRefresh_release"] = "Suelte para actualizar"
+    __obj["up_pullRefresh_refreshing"] = "Actualizando"
+    __obj["up_readMore_expand"] = "Expandir para leer más"
+    __obj["up_readMore_fold"] = "Colapsar"
+    __obj["up_search_placeholder"] = "Ingrese palabras clave"
+    __obj["up_signature_penSize"] = "Tamaño del trazo"
+    __obj["up_signature_penColor"] = "Color del trazo"
+    __obj["up_upload_sizeExceed"] = "Límite de tamaño excedido"
+    __obj["up_upload_uploading"] = "Subiendo"
+    __obj["up_upload_previewImageFail"] = "Error al previsualizar imagen"
+    __obj["up_upload_previewVideoFail"] = "Error al previsualizar video"
+    __obj["up_goodsSku_stock"] = "Inventario"
+    __obj["up_goodsSku_price"] = "Precio"
+    __obj["up_goodsSku_amount"] = "Artículos"
+    __obj["up_goodsSku_choosed"] = "Seleccionado"
+    __obj["up_goodsSku_buyAmount"] = "Cantidad"
+}
+fun __uts_large_default_export_build_0__4(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/libs/i18n/locales/es.uts", 90, 11))
+    __uts_large_default_export_fill_fill_1__4(__obj)
+    __uts_large_default_export_fill_fill_2__4(__obj)
+    return __obj
+}
+val default__31 = __uts_large_default_export_build_0__4()
+fun __uts_large_default_export_fill_fill_1__5(__obj: UTSJSONObject): Unit {
+    __obj["up_common_cancel"] = "Annuler"
+    __obj["up_common_confirm"] = "Confirmer"
+    __obj["up_common_start"] = "Démarrer"
+    __obj["up_common_end"] = "Terminer"
+    __obj["up_common_stop"] = "Arrêter"
+    __obj["up_common_copy"] = "Copier"
+    __obj["up_common_none"] = "Aucun"
+    __obj["up_common_tip"] = "Conseil"
+    __obj["up_common_success"] = "Succès"
+    __obj["up_common_fail"] = "Échec"
+    __obj["up_common_close"] = "Fermer"
+    __obj["up_common_preview"] = "Aperçu"
+    __obj["up_common_re-select"] = "Resélectionner"
+    __obj["up_common_rotate"] = "Rotation"
+    __obj["up_common_pleaseChoose"] = "Veuillez choisir"
+    __obj["up_common_loading"] = "Chargement"
+    __obj["up_common_loading2"] = "Chargement en cours"
+    __obj["up_common_inOperation"] = "En cours d'opération"
+    __obj["up_common_settings"] = "Paramètres"
+    __obj["up_common_retry"] = "Réessayer"
+    __obj["up_common_search"] = "Rechercher"
+    __obj["up_common_more"] = "Plus"
+    __obj["up_common_video"] = "Vidéo"
+    __obj["up_common_file"] = "Fichier"
+    __obj["up_week_one"] = "Lun"
+    __obj["up_week_two"] = "Mar"
+    __obj["up_week_three"] = "Mer"
+    __obj["up_week_four"] = "Jeu"
+    __obj["up_week_five"] = "Ven"
+    __obj["up_week_six"] = "Sam"
+    __obj["up_week_seven"] = "Dim"
+    __obj["up_barcode_error"] = "Échec de génération du code-barres"
+    __obj["up_calendar_chooseDates"] = "Sélection de dates"
+    __obj["up_calendar_disabled"] = "Cette date est désactivée"
+    __obj["up_calendar_daysExceed"] = "Le nombre de jours sélectionnés ne peut pas dépasser {days} jours"
+    __obj["up_calendar_today"] = "Aujourd'hui"
+    __obj["up_cityLocate_locateCity"] = "Localiser la ville"
+    __obj["up_cityLocate_fail"] = "Échec de localisation, veuillez cliquer pour réessayer."
+    __obj["up_cityLocate_locating"] = "Localisation en cours"
+    __obj["up_code_send"] = "Obtenir le code de vérification"
+    __obj["up_code_resendAfter"] = "Renvoyer dans X secondes"
+    __obj["up_code_resend"] = "Renvoyer"
+    __obj["up_cropper_emptyWidhtOrHeight"] = "La largeur ou la hauteur de recadrage n'est pas définie"
+    __obj["up_empty_car"] = "Panier vide"
+    __obj["up_empty_page"] = "Page introuvable"
+    __obj["up_empty_search"] = "Aucun résultat de recherche"
+    __obj["up_empty_address"] = "Aucune adresse de livraison"
+    __obj["up_empty_wifi"] = "Aucun Wi-Fi"
+}
+fun __uts_large_default_export_fill_fill_2__5(__obj: UTSJSONObject): Unit {
+    __obj["up_empty_order"] = "Commande vide"
+    __obj["up_empty_coupon"] = "Aucun coupon"
+    __obj["up_empty_favor"] = "Aucun favori"
+    __obj["up_empty_permission"] = "Aucune autorisation"
+    __obj["up_empty_history"] = "Aucun historique"
+    __obj["up_empty_news"] = "Aucune actualité"
+    __obj["up_empty_message"] = "Liste de messages vide"
+    __obj["up_empty_list"] = "Liste vide"
+    __obj["up_empty_data"] = "Données vides"
+    __obj["up_empty_comment"] = "Aucun commentaire"
+    __obj["up_link_copyed"] = "Lien copié, veuillez ouvrir dans le navigateur"
+    __obj["up_loadmoe_loadmore"] = "Charger plus"
+    __obj["up_loadmoe_nomore"] = "Plus de contenu"
+    __obj["up_noNetwork_text"] = "Oups, le signal réseau est perdu"
+    __obj["up_noNetwork_pleaseCheck"] = "Veuillez vérifier le réseau, ou aller à"
+    __obj["up_noNetwork_connect"] = "Réseau connecté"
+    __obj["up_noNetwork_disconnect"] = "Aucune connexion réseau"
+    __obj["up_pagination_previous"] = "Page précédente"
+    __obj["up_pagination_next"] = "Page suivante"
+    __obj["up_pullRefresh_pull"] = "Tirer pour actualiser"
+    __obj["up_pullRefresh_release"] = "Relâcher pour actualiser"
+    __obj["up_pullRefresh_refreshing"] = "Actualisation en cours"
+    __obj["up_readMore_expand"] = "Développer pour lire la suite"
+    __obj["up_readMore_fold"] = "Réduire"
+    __obj["up_search_placeholder"] = "Veuillez saisir un mot-clé"
+    __obj["up_signature_penSize"] = "Taille du trait"
+    __obj["up_signature_penColor"] = "Couleur du trait"
+    __obj["up_upload_sizeExceed"] = "Dépassement de la limite de taille"
+    __obj["up_upload_uploading"] = "Téléchargement en cours"
+    __obj["up_upload_previewImageFail"] = "Échec de l'aperçu de l'image"
+    __obj["up_upload_previewVideoFail"] = "Échec de l'aperçu de la vidéo"
+    __obj["up_goodsSku_stock"] = "Stock"
+    __obj["up_goodsSku_price"] = "Prix"
+    __obj["up_goodsSku_amount"] = "Pièces"
+    __obj["up_goodsSku_choosed"] = "Sélectionné"
+    __obj["up_goodsSku_buyAmount"] = "Quantité"
+}
+fun __uts_large_default_export_build_0__5(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/libs/i18n/locales/fr.uts", 90, 11))
+    __uts_large_default_export_fill_fill_1__5(__obj)
+    __uts_large_default_export_fill_fill_2__5(__obj)
+    return __obj
+}
+val default__32 = __uts_large_default_export_build_0__5()
+fun __uts_large_default_export_fill_fill_1__6(__obj: UTSJSONObject): Unit {
+    __obj["up_common_cancel"] = "Abbrechen"
+    __obj["up_common_confirm"] = "Bestätigen"
+    __obj["up_common_start"] = "Start"
+    __obj["up_common_end"] = "Ende"
+    __obj["up_common_stop"] = "Stopp"
+    __obj["up_common_copy"] = "Kopieren"
+    __obj["up_common_none"] = "Keine"
+    __obj["up_common_tip"] = "Tipp"
+    __obj["up_common_success"] = "Erfolg"
+    __obj["up_common_fail"] = "Fehlgeschlagen"
+    __obj["up_common_close"] = "Schließen"
+    __obj["up_common_preview"] = "Vorschau"
+    __obj["up_common_re-select"] = "Erneut auswählen"
+    __obj["up_common_rotate"] = "Drehen"
+    __obj["up_common_pleaseChoose"] = "Bitte wählen"
+    __obj["up_common_loading"] = "Wird geladen"
+    __obj["up_common_loading2"] = "Laden"
+    __obj["up_common_inOperation"] = "In Bearbeitung"
+    __obj["up_common_settings"] = "Einstellungen"
+    __obj["up_common_retry"] = "Wiederholen"
+    __obj["up_common_search"] = "Suchen"
+    __obj["up_common_more"] = "Mehr"
+    __obj["up_common_video"] = "Video"
+    __obj["up_common_file"] = "Datei"
+    __obj["up_week_one"] = "Mo"
+    __obj["up_week_two"] = "Di"
+    __obj["up_week_three"] = "Mi"
+    __obj["up_week_four"] = "Do"
+    __obj["up_week_five"] = "Fr"
+    __obj["up_week_six"] = "Sa"
+    __obj["up_week_seven"] = "So"
+    __obj["up_barcode_error"] = "Barcode konnte nicht generiert werden"
+    __obj["up_calendar_chooseDates"] = "Datum auswählen"
+    __obj["up_calendar_disabled"] = "Dieses Datum ist deaktiviert"
+    __obj["up_calendar_daysExceed"] = "Die Anzahl der ausgewählten Tage darf {days} Tage nicht überschreiten"
+    __obj["up_calendar_today"] = "Heute"
+    __obj["up_cityLocate_locateCity"] = "Stadt lokalisieren"
+    __obj["up_cityLocate_fail"] = "Lokalisierung fehlgeschlagen, bitte klicken Sie, um es erneut zu versuchen."
+    __obj["up_cityLocate_locating"] = "Lokalisierung läuft"
+    __obj["up_code_send"] = "Bestätigungscode erhalten"
+    __obj["up_code_resendAfter"] = "Nach X Sekunden erneut senden"
+    __obj["up_code_resend"] = "Erneut senden"
+    __obj["up_cropper_emptyWidhtOrHeight"] = "Breite oder Höhe des Zuschneidebereichs ist nicht festgelegt"
+    __obj["up_empty_car"] = "Warenkorb ist leer"
+    __obj["up_empty_page"] = "Seite nicht gefunden"
+    __obj["up_empty_search"] = "Keine Suchergebnisse"
+    __obj["up_empty_address"] = "Keine Lieferadresse"
+    __obj["up_empty_wifi"] = "Kein WLAN"
+}
+fun __uts_large_default_export_fill_fill_2__6(__obj: UTSJSONObject): Unit {
+    __obj["up_empty_order"] = "Bestellung ist leer"
+    __obj["up_empty_coupon"] = "Keine Coupons"
+    __obj["up_empty_favor"] = "Keine Favoriten"
+    __obj["up_empty_permission"] = "Keine Berechtigung"
+    __obj["up_empty_history"] = "Kein Verlauf"
+    __obj["up_empty_news"] = "Keine Nachrichtenliste"
+    __obj["up_empty_message"] = "Nachrichtenliste ist leer"
+    __obj["up_empty_list"] = "Liste ist leer"
+    __obj["up_empty_data"] = "Daten sind leer"
+    __obj["up_empty_comment"] = "Keine Kommentare"
+    __obj["up_link_copyed"] = "Link kopiert, bitte im Browser öffnen"
+    __obj["up_loadmoe_loadmore"] = "Mehr laden"
+    __obj["up_loadmoe_nomore"] = "Keine weiteren Daten"
+    __obj["up_noNetwork_text"] = "Ups, Netzwerksignal verloren"
+    __obj["up_noNetwork_pleaseCheck"] = "Bitte überprüfen Sie das Netzwerk oder gehen Sie zu"
+    __obj["up_noNetwork_connect"] = "Netzwerk verbunden"
+    __obj["up_noNetwork_disconnect"] = "Keine Netzwerkverbindung"
+    __obj["up_pagination_previous"] = "Zurück"
+    __obj["up_pagination_next"] = "Weiter"
+    __obj["up_pullRefresh_pull"] = "Zum Aktualisieren ziehen"
+    __obj["up_pullRefresh_release"] = "Loslassen zum Aktualisieren"
+    __obj["up_pullRefresh_refreshing"] = "Aktualisierung läuft"
+    __obj["up_readMore_expand"] = "Erweitern, um mehr zu lesen"
+    __obj["up_readMore_fold"] = "Einklappen"
+    __obj["up_search_placeholder"] = "Bitte Schlüsselwort eingeben"
+    __obj["up_signature_penSize"] = "Strichgröße"
+    __obj["up_signature_penColor"] = "Strichfarbe"
+    __obj["up_upload_sizeExceed"] = "Größenbegrenzung überschritten"
+    __obj["up_upload_uploading"] = "Upload läuft"
+    __obj["up_upload_previewImageFail"] = "Bildvorschau fehlgeschlagen"
+    __obj["up_upload_previewVideoFail"] = "Videovorschau fehlgeschlagen"
+    __obj["up_goodsSku_stock"] = "Lagerbestand"
+    __obj["up_goodsSku_price"] = "Preis"
+    __obj["up_goodsSku_amount"] = "Artikel"
+    __obj["up_goodsSku_choosed"] = "Ausgewählt"
+    __obj["up_goodsSku_buyAmount"] = "Anzahl"
+}
+fun __uts_large_default_export_build_0__6(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/libs/i18n/locales/de.uts", 90, 11))
+    __uts_large_default_export_fill_fill_1__6(__obj)
+    __uts_large_default_export_fill_fill_2__6(__obj)
+    return __obj
+}
+val default__33 = __uts_large_default_export_build_0__6()
+fun __uts_large_default_export_fill_fill_1__7(__obj: UTSJSONObject): Unit {
+    __obj["up_common_cancel"] = "취소"
+    __obj["up_common_confirm"] = "확인"
+    __obj["up_common_start"] = "시작"
+    __obj["up_common_end"] = "종료"
+    __obj["up_common_stop"] = "중지"
+    __obj["up_common_copy"] = "복사"
+    __obj["up_common_none"] = "없음"
+    __obj["up_common_tip"] = "팁"
+    __obj["up_common_success"] = "성공"
+    __obj["up_common_fail"] = "실패"
+    __obj["up_common_close"] = "닫기"
+    __obj["up_common_preview"] = "미리보기"
+    __obj["up_common_re-select"] = "재선택"
+    __obj["up_common_rotate"] = "회전"
+    __obj["up_common_pleaseChoose"] = "선택해주세요"
+    __obj["up_common_loading"] = "로딩 중"
+    __obj["up_common_loading2"] = "로딩 중"
+    __obj["up_common_inOperation"] = "작업 중"
+    __obj["up_common_settings"] = "설정"
+    __obj["up_common_retry"] = "재시도"
+    __obj["up_common_search"] = "검색"
+    __obj["up_common_more"] = "더보기"
+    __obj["up_common_video"] = "비디오"
+    __obj["up_common_file"] = "파일"
+    __obj["up_week_one"] = "월"
+    __obj["up_week_two"] = "화"
+    __obj["up_week_three"] = "수"
+    __obj["up_week_four"] = "목"
+    __obj["up_week_five"] = "금"
+    __obj["up_week_six"] = "토"
+    __obj["up_week_seven"] = "일"
+    __obj["up_barcode_error"] = "바코드 생성 실패"
+    __obj["up_calendar_chooseDates"] = "날짜 선택"
+    __obj["up_calendar_disabled"] = "이 날짜는 비활성화되었습니다"
+    __obj["up_calendar_daysExceed"] = "선택한 일 수는 {days}일을 초과할 수 없습니다"
+    __obj["up_calendar_today"] = "오늘"
+    __obj["up_cityLocate_locateCity"] = "도시 위치 찾기"
+    __obj["up_cityLocate_fail"] = "위치 찾기 실패, 클릭하여 재시도하세요."
+    __obj["up_cityLocate_locating"] = "위치 찾는 중"
+    __obj["up_code_send"] = "인증번호 받기"
+    __obj["up_code_resendAfter"] = "X초 후 재전송"
+    __obj["up_code_resend"] = "재전송"
+    __obj["up_cropper_emptyWidhtOrHeight"] = "자르기 상자의 너비나 높이가 설정되지 않았습니다"
+    __obj["up_empty_car"] = "장바구니가 비어 있습니다"
+    __obj["up_empty_page"] = "페이지를 찾을 수 없습니다"
+    __obj["up_empty_search"] = "검색 결과가 없습니다"
+    __obj["up_empty_address"] = "배송 주소가 없습니다"
+    __obj["up_empty_wifi"] = "Wi-Fi 없음"
+}
+fun __uts_large_default_export_fill_fill_2__7(__obj: UTSJSONObject): Unit {
+    __obj["up_empty_order"] = "주문이 비어 있습니다"
+    __obj["up_empty_coupon"] = "쿠폰이 없습니다"
+    __obj["up_empty_favor"] = "찜한 항목이 없습니다"
+    __obj["up_empty_permission"] = "권한이 없습니다"
+    __obj["up_empty_history"] = "기록이 없습니다"
+    __obj["up_empty_news"] = "뉴스 목록이 없습니다"
+    __obj["up_empty_message"] = "메시지 목록이 비어 있습니다"
+    __obj["up_empty_list"] = "목록이 비어 있습니다"
+    __obj["up_empty_data"] = "데이터가 없습니다"
+    __obj["up_empty_comment"] = "댓글이 없습니다"
+    __obj["up_link_copyed"] = "링크가 복사되었습니다. 브라우저에서 열어주세요"
+    __obj["up_loadmoe_loadmore"] = "더 불러오기"
+    __obj["up_loadmoe_nomore"] = "더 이상 없습니다"
+    __obj["up_noNetwork_text"] = "앗, 네트워크 신호가 사라졌어요"
+    __obj["up_noNetwork_pleaseCheck"] = "네트워크를 확인하거나 다음으로 이동하세요"
+    __obj["up_noNetwork_connect"] = "네트워크 연결됨"
+    __obj["up_noNetwork_disconnect"] = "네트워크 연결 없음"
+    __obj["up_pagination_previous"] = "이전"
+    __obj["up_pagination_next"] = "다음"
+    __obj["up_pullRefresh_pull"] = "당겨서 새로고침"
+    __obj["up_pullRefresh_release"] = "놓아서 새로고침"
+    __obj["up_pullRefresh_refreshing"] = "새로고침 중"
+    __obj["up_readMore_expand"] = "펼쳐서 더 읽기"
+    __obj["up_readMore_fold"] = "접기"
+    __obj["up_search_placeholder"] = "키워드를 입력하세요"
+    __obj["up_signature_penSize"] = "선 굵기"
+    __obj["up_signature_penColor"] = "선 색상"
+    __obj["up_upload_sizeExceed"] = "크기 제한 초과"
+    __obj["up_upload_uploading"] = "업로드 중"
+    __obj["up_upload_previewImageFail"] = "이미지 미리보기 실패"
+    __obj["up_upload_previewVideoFail"] = "비디오 미리보기 실패"
+    __obj["up_goodsSku_stock"] = "재고"
+    __obj["up_goodsSku_price"] = "가격"
+    __obj["up_goodsSku_amount"] = "개"
+    __obj["up_goodsSku_choosed"] = "선택됨"
+    __obj["up_goodsSku_buyAmount"] = "구매 수량"
+}
+fun __uts_large_default_export_build_0__7(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/libs/i18n/locales/ko.uts", 90, 11))
+    __uts_large_default_export_fill_fill_1__7(__obj)
+    __uts_large_default_export_fill_fill_2__7(__obj)
+    return __obj
+}
+val default__34 = __uts_large_default_export_build_0__7()
+fun __uts_large_default_export_fill_fill_1__8(__obj: UTSJSONObject): Unit {
+    __obj["up_common_cancel"] = "キャンセル"
+    __obj["up_common_confirm"] = "確認"
+    __obj["up_common_start"] = "開始"
+    __obj["up_common_end"] = "終了"
+    __obj["up_common_stop"] = "停止"
+    __obj["up_common_copy"] = "コピー"
+    __obj["up_common_none"] = "なし"
+    __obj["up_common_tip"] = "ヒント"
+    __obj["up_common_success"] = "成功"
+    __obj["up_common_fail"] = "失敗"
+    __obj["up_common_close"] = "閉じる"
+    __obj["up_common_preview"] = "プレビュー"
+    __obj["up_common_re-select"] = "再選択"
+    __obj["up_common_rotate"] = "回転"
+    __obj["up_common_pleaseChoose"] = "選択してください"
+    __obj["up_common_loading"] = "読み込み中"
+    __obj["up_common_loading2"] = "読み込み中"
+    __obj["up_common_inOperation"] = "操作中"
+    __obj["up_common_settings"] = "設定"
+    __obj["up_common_retry"] = "再試行"
+    __obj["up_common_search"] = "検索"
+    __obj["up_common_more"] = "もっと"
+    __obj["up_common_video"] = "ビデオ"
+    __obj["up_common_file"] = "ファイル"
+    __obj["up_week_one"] = "月"
+    __obj["up_week_two"] = "火"
+    __obj["up_week_three"] = "水"
+    __obj["up_week_four"] = "木"
+    __obj["up_week_five"] = "金"
+    __obj["up_week_six"] = "土"
+    __obj["up_week_seven"] = "日"
+    __obj["up_barcode_error"] = "バーコードの生成に失敗しました"
+    __obj["up_calendar_chooseDates"] = "日付選択"
+    __obj["up_calendar_disabled"] = "この日付は無効です"
+    __obj["up_calendar_daysExceed"] = "選択日数は{days}日を超えることはできません"
+    __obj["up_calendar_today"] = "今日"
+    __obj["up_cityLocate_locateCity"] = "都市を特定"
+    __obj["up_cityLocate_fail"] = "位置情報の取得に失敗しました。クリックして再試行してください。"
+    __obj["up_cityLocate_locating"] = "位置情報を取得中"
+    __obj["up_code_send"] = "認証コードを取得"
+    __obj["up_code_resendAfter"] = "X秒後に再送信"
+    __obj["up_code_resend"] = "再送信"
+    __obj["up_cropper_emptyWidhtOrHeight"] = "切り抜きボックスの幅または高さが設定されていません"
+    __obj["up_empty_car"] = "ショッピングカートは空です"
+    __obj["up_empty_page"] = "ページが見つかりません"
+    __obj["up_empty_search"] = "検索結果がありません"
+    __obj["up_empty_address"] = "配送先住所がありません"
+    __obj["up_empty_wifi"] = "Wi-Fiがありません"
+}
+fun __uts_large_default_export_fill_fill_2__8(__obj: UTSJSONObject): Unit {
+    __obj["up_empty_order"] = "注文はありません"
+    __obj["up_empty_coupon"] = "クーポンがありません"
+    __obj["up_empty_favor"] = "お気に入りがありません"
+    __obj["up_empty_permission"] = "権限がありません"
+    __obj["up_empty_history"] = "履歴がありません"
+    __obj["up_empty_news"] = "ニュースリストがありません"
+    __obj["up_empty_message"] = "メッセージリストが空です"
+    __obj["up_empty_list"] = "リストが空です"
+    __obj["up_empty_data"] = "データが空です"
+    __obj["up_empty_comment"] = "コメントがありません"
+    __obj["up_link_copyed"] = "リンクをコピーしました。ブラウザで開いてください"
+    __obj["up_loadmoe_loadmore"] = "さらに読み込む"
+    __obj["up_loadmoe_nomore"] = "これ以上ありません"
+    __obj["up_noNetwork_text"] = "おっと、ネットワーク信号が失われました"
+    __obj["up_noNetwork_pleaseCheck"] = "ネットワークを確認するか、"
+    __obj["up_noNetwork_connect"] = "ネットワーク接続済み"
+    __obj["up_noNetwork_disconnect"] = "ネットワーク接続なし"
+    __obj["up_pagination_previous"] = "前へ"
+    __obj["up_pagination_next"] = "次へ"
+    __obj["up_pullRefresh_pull"] = "引き下げて更新"
+    __obj["up_pullRefresh_release"] = "指を離して更新"
+    __obj["up_pullRefresh_refreshing"] = "更新中"
+    __obj["up_readMore_expand"] = "続きを読む"
+    __obj["up_readMore_fold"] = "折りたたむ"
+    __obj["up_search_placeholder"] = "キーワードを入力してください"
+    __obj["up_signature_penSize"] = "線の太さ"
+    __obj["up_signature_penColor"] = "線の色"
+    __obj["up_upload_sizeExceed"] = "サイズ制限を超えています"
+    __obj["up_upload_uploading"] = "アップロード中"
+    __obj["up_upload_previewImageFail"] = "画像のプレビューに失敗しました"
+    __obj["up_upload_previewVideoFail"] = "動画のプレビューに失敗しました"
+    __obj["up_goodsSku_stock"] = "在庫"
+    __obj["up_goodsSku_price"] = "価格"
+    __obj["up_goodsSku_amount"] = "アイテム"
+    __obj["up_goodsSku_choosed"] = "選択済み"
+    __obj["up_goodsSku_buyAmount"] = "購入数量"
+}
+fun __uts_large_default_export_build_0__8(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/libs/i18n/locales/ja.uts", 90, 11))
+    __uts_large_default_export_fill_fill_1__8(__obj)
+    __uts_large_default_export_fill_fill_2__8(__obj)
+    return __obj
+}
+val default__35 = __uts_large_default_export_build_0__8()
+fun __uts_large_default_export_fill_fill_1__9(__obj: UTSJSONObject): Unit {
+    __obj["up_common_cancel"] = "Отмена"
+    __obj["up_common_confirm"] = "Подтвердить"
+    __obj["up_common_start"] = "Начать"
+    __obj["up_common_end"] = "Завершить"
+    __obj["up_common_stop"] = "Остановить"
+    __obj["up_common_copy"] = "Копировать"
+    __obj["up_common_none"] = "Нет"
+    __obj["up_common_tip"] = "Совет"
+    __obj["up_common_success"] = "Успех"
+    __obj["up_common_fail"] = "Ошибка"
+    __obj["up_common_close"] = "Закрыть"
+    __obj["up_common_preview"] = "Предпросмотр"
+    __obj["up_common_re-select"] = "Выбрать снова"
+    __obj["up_common_rotate"] = "Поворот"
+    __obj["up_common_pleaseChoose"] = "Пожалуйста, выберите"
+    __obj["up_common_loading"] = "Загрузка"
+    __obj["up_common_loading2"] = "Загрузка"
+    __obj["up_common_inOperation"] = "В процессе"
+    __obj["up_common_settings"] = "Настройки"
+    __obj["up_common_retry"] = "Повторить"
+    __obj["up_common_search"] = "Поиск"
+    __obj["up_common_more"] = "Еще"
+    __obj["up_common_video"] = "Видео"
+    __obj["up_common_file"] = "Файл"
+    __obj["up_week_one"] = "Пн"
+    __obj["up_week_two"] = "Вт"
+    __obj["up_week_three"] = "Ср"
+    __obj["up_week_four"] = "Чт"
+    __obj["up_week_five"] = "Пт"
+    __obj["up_week_six"] = "Сб"
+    __obj["up_week_seven"] = "Вс"
+    __obj["up_barcode_error"] = "Не удалось сгенерировать штрих-код"
+    __obj["up_calendar_chooseDates"] = "Выбор даты"
+    __obj["up_calendar_disabled"] = "Эта дата отключена"
+    __obj["up_calendar_daysExceed"] = "Количество выбранных дней не может превышать {days} дней"
+    __obj["up_calendar_today"] = "Сегодня"
+    __obj["up_cityLocate_locateCity"] = "Определить город"
+    __obj["up_cityLocate_fail"] = "Ошибка определения местоположения, нажмите, чтобы повторить попытку."
+    __obj["up_cityLocate_locating"] = "Определение местоположения"
+    __obj["up_code_send"] = "Получить код подтверждения"
+    __obj["up_code_resendAfter"] = "Повторная отправка через X секунд"
+    __obj["up_code_resend"] = "Повторная отправка"
+    __obj["up_cropper_emptyWidhtOrHeight"] = "Ширина или высота области обрезки не задана"
+    __obj["up_empty_car"] = "Корзина пуста"
+    __obj["up_empty_page"] = "Страница не найдена"
+    __obj["up_empty_search"] = "Нет результатов поиска"
+    __obj["up_empty_address"] = "Нет адреса доставки"
+    __obj["up_empty_wifi"] = "Нет Wi-Fi"
+}
+fun __uts_large_default_export_fill_fill_2__9(__obj: UTSJSONObject): Unit {
+    __obj["up_empty_order"] = "Заказ пуст"
+    __obj["up_empty_coupon"] = "Нет купонов"
+    __obj["up_empty_favor"] = "Нет избранного"
+    __obj["up_empty_permission"] = "Нет разрешения"
+    __obj["up_empty_history"] = "Нет истории"
+    __obj["up_empty_news"] = "Нет новостей"
+    __obj["up_empty_message"] = "Список сообщений пуст"
+    __obj["up_empty_list"] = "Список пуст"
+    __obj["up_empty_data"] = "Нет данных"
+    __obj["up_empty_comment"] = "Нет комментариев"
+    __obj["up_link_copyed"] = "Ссылка скопирована, откройте в браузере"
+    __obj["up_loadmoe_loadmore"] = "Загрузить еще"
+    __obj["up_loadmoe_nomore"] = "Больше нет"
+    __obj["up_noNetwork_text"] = "Упс, потеряно сетевое соединение"
+    __obj["up_noNetwork_pleaseCheck"] = "Проверьте сеть или перейдите в"
+    __obj["up_noNetwork_connect"] = "Сеть подключена"
+    __obj["up_noNetwork_disconnect"] = "Нет сетевого подключения"
+    __obj["up_pagination_previous"] = "Предыдущая"
+    __obj["up_pagination_next"] = "Следующая"
+    __obj["up_pullRefresh_pull"] = "Потяните для обновления"
+    __obj["up_pullRefresh_release"] = "Отпустите для обновления"
+    __obj["up_pullRefresh_refreshing"] = "Обновление"
+    __obj["up_readMore_expand"] = "Развернуть, чтобы прочитать больше"
+    __obj["up_readMore_fold"] = "Свернуть"
+    __obj["up_search_placeholder"] = "Введите ключевые слова"
+    __obj["up_signature_penSize"] = "Размер линии"
+    __obj["up_signature_penColor"] = "Цвет линии"
+    __obj["up_upload_sizeExceed"] = "Превышен лимит размера"
+    __obj["up_upload_uploading"] = "Загрузка"
+    __obj["up_upload_previewImageFail"] = "Не удалось просмотреть изображение"
+    __obj["up_upload_previewVideoFail"] = "Не удалось просмотреть видео"
+    __obj["up_goodsSku_stock"] = "Запас"
+    __obj["up_goodsSku_price"] = "Цена"
+    __obj["up_goodsSku_amount"] = "Штуки"
+    __obj["up_goodsSku_choosed"] = "Выбрано"
+    __obj["up_goodsSku_buyAmount"] = "Количество"
+}
+fun __uts_large_default_export_build_0__9(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/libs/i18n/locales/ru.uts", 90, 11))
+    __uts_large_default_export_fill_fill_1__9(__obj)
+    __uts_large_default_export_fill_fill_2__9(__obj)
+    return __obj
+}
+val default__36 = __uts_large_default_export_build_0__9()
 var settings: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("settings", "uni_modules/uview-ultra/libs/i18n/index.uts", 10, 5), "lang" to "zh-Hans", "locales" to _uO("en" to default__30, "es" to default__31, "fr" to default__32, "de" to default__33, "ko" to default__34, "ja" to default__35, "ru" to default__36, "zh-Hant" to default__29, "zh-Hans" to default__28))
 fun t__1(reassignedValue: String, params: UTSJSONObject = _uO()): String {
     var value = reassignedValue
@@ -10516,7 +12007,40 @@ val GenUniModulesMpHtmlComponentsMpHtmlMpHtmlClass = CreateVueComponent(GenUniMo
     return GenUniModulesMpHtmlComponentsMpHtmlMpHtml(instance)
 }
 )
-val default__39: UTSJSONObject = _uO("loadmore" to _uO("status" to "loadmore", "bgColor" to "transparent", "icon" to true, "fontSize" to 14, "iconSize" to 17, "color" to "#606266", "loadingIcon" to "spinner", "loadmoreText" to "加载更多", "loadingText" to "正在加载...", "nomoreText" to "没有更多了", "isDot" to false, "iconColor" to "#b7b7b7", "marginTop" to 10, "marginBottom" to 10, "height" to "auto", "line" to false, "lineColor" to "#E6E8EB", "dashed" to false))
+fun __uts_large_default_export_prop_fill_fill_1__6(__obj: UTSJSONObject): Unit {
+    __obj["status"] = "loadmore"
+    __obj["bgColor"] = "transparent"
+    __obj["icon"] = true
+    __obj["fontSize"] = 14
+    __obj["iconSize"] = 17
+    __obj["color"] = "#606266"
+    __obj["loadingIcon"] = "spinner"
+    __obj["loadmoreText"] = "加载更多"
+    __obj["loadingText"] = "正在加载..."
+    __obj["nomoreText"] = "没有更多了"
+    __obj["isDot"] = false
+    __obj["iconColor"] = "#b7b7b7"
+    __obj["marginTop"] = 10
+    __obj["marginBottom"] = 10
+    __obj["height"] = "auto"
+    __obj["line"] = false
+    __obj["lineColor"] = "#E6E8EB"
+    __obj["dashed"] = false
+}
+fun __uts_large_default_export_prop_build_0__6(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-loadmore/loadmore.uts", 22, 11))
+    __uts_large_default_export_prop_fill_fill_1__6(__obj)
+    return __obj
+}
+fun __uts_large_default_export_fill_fill_3__5(__obj: UTSJSONObject): Unit {
+    __obj["loadmore"] = __uts_large_default_export_prop_build_0__6()
+}
+fun __uts_large_default_export_build_2__4(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-loadmore/loadmore.uts", 30, 11))
+    __uts_large_default_export_fill_fill_3__5(__obj)
+    return __obj
+}
+val default__39 = __uts_large_default_export_build_2__4()
 var crtProp__11 = default__39["loadmore"] as UTSJSONObject
 val GenUniModulesUviewUltraComponentsUpLoadmoreUpLoadmoreClass = CreateVueComponent(GenUniModulesUviewUltraComponentsUpLoadmoreUpLoadmore::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = GenUniModulesUviewUltraComponentsUpLoadmoreUpLoadmore.name, inheritAttrs = GenUniModulesUviewUltraComponentsUpLoadmoreUpLoadmore.inheritAttrs, inject = GenUniModulesUviewUltraComponentsUpLoadmoreUpLoadmore.inject, props = GenUniModulesUviewUltraComponentsUpLoadmoreUpLoadmore.props, propsNeedCastKeys = GenUniModulesUviewUltraComponentsUpLoadmoreUpLoadmore.propsNeedCastKeys, emits = GenUniModulesUviewUltraComponentsUpLoadmoreUpLoadmore.emits, components = GenUniModulesUviewUltraComponentsUpLoadmoreUpLoadmore.components, styles = GenUniModulesUviewUltraComponentsUpLoadmoreUpLoadmore.styles)
@@ -10526,7 +12050,38 @@ val GenUniModulesUviewUltraComponentsUpLoadmoreUpLoadmoreClass = CreateVueCompon
 }
 )
 val default__40: UTSJSONObject = _uO("album" to _uO("urls" to _uA<Any>(), "keyName" to "", "singleSize" to 180, "multipleSize" to 70, "space" to 6, "singleMode" to "scaleToFill", "multipleMode" to "aspectFill", "maxCount" to 9, "previewFullImage" to true, "rowCount" to 3, "showMore" to true, "autoWrap" to false, "unit" to "px", "stop" to true))
-val default__41: UTSJSONObject = _uO("image" to _uO("src" to "", "mode" to "aspectFill", "width" to "300", "height" to "225", "shape" to "square", "radius" to "0", "lazyLoad" to false, "showMenuByLongpress" to true, "loadingIcon" to "photo", "errorIcon" to "error-circle", "showLoading" to true, "showError" to true, "fade" to true, "webp" to false, "duration" to 500, "bgColor" to "#f3f4f6"))
+fun __uts_large_default_export_prop_fill_fill_1__7(__obj: UTSJSONObject): Unit {
+    __obj["src"] = ""
+    __obj["mode"] = "aspectFill"
+    __obj["width"] = "300"
+    __obj["height"] = "225"
+    __obj["shape"] = "square"
+    __obj["radius"] = "0"
+    __obj["lazyLoad"] = false
+    __obj["showMenuByLongpress"] = true
+    __obj["loadingIcon"] = "photo"
+    __obj["errorIcon"] = "error-circle"
+    __obj["showLoading"] = true
+    __obj["showError"] = true
+    __obj["fade"] = true
+    __obj["webp"] = false
+    __obj["duration"] = 500
+    __obj["bgColor"] = "#f3f4f6"
+}
+fun __uts_large_default_export_prop_build_0__7(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-image/image.uts", 20, 11))
+    __uts_large_default_export_prop_fill_fill_1__7(__obj)
+    return __obj
+}
+fun __uts_large_default_export_fill_fill_3__6(__obj: UTSJSONObject): Unit {
+    __obj["image"] = __uts_large_default_export_prop_build_0__7()
+}
+fun __uts_large_default_export_build_2__5(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-image/image.uts", 28, 11))
+    __uts_large_default_export_fill_fill_3__6(__obj)
+    return __obj
+}
+val default__41 = __uts_large_default_export_build_2__5()
 val GenUniModulesUviewUltraComponentsUpAlbumUpAlbumClass = CreateVueComponent(GenUniModulesUviewUltraComponentsUpAlbumUpAlbum::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = GenUniModulesUviewUltraComponentsUpAlbumUpAlbum.name, inheritAttrs = GenUniModulesUviewUltraComponentsUpAlbumUpAlbum.inheritAttrs, inject = GenUniModulesUviewUltraComponentsUpAlbumUpAlbum.inject, props = GenUniModulesUviewUltraComponentsUpAlbumUpAlbum.props, propsNeedCastKeys = GenUniModulesUviewUltraComponentsUpAlbumUpAlbum.propsNeedCastKeys, emits = GenUniModulesUviewUltraComponentsUpAlbumUpAlbum.emits, components = GenUniModulesUviewUltraComponentsUpAlbumUpAlbum.components, styles = GenUniModulesUviewUltraComponentsUpAlbumUpAlbum.styles, setup = fun(props: ComponentPublicInstance): Any? {
         return GenUniModulesUviewUltraComponentsUpAlbumUpAlbum.setup(props as GenUniModulesUviewUltraComponentsUpAlbumUpAlbum)
@@ -10598,7 +12153,43 @@ val GenUniModulesUviewUltraComponentsUpSubsectionUpSubsectionClass = CreateVueCo
     return GenUniModulesUviewUltraComponentsUpSubsectionUpSubsection(instance)
 }
 )
-val default__47: UTSJSONObject = _uO("cell" to _uO("customClass" to "", "title" to "", "label" to "", "value" to "", "icon" to "", "disabled" to false, "border" to true, "center" to false, "url" to "", "linkType" to "navigateTo", "clickable" to false, "isLink" to false, "required" to false, "arrowDirection" to "", "iconStyle" to _uO(), "rightIconStyle" to _uO(), "rightIcon" to "arrow-right", "titleStyle" to _uO(), "size" to "", "stop" to true, "name" to ""))
+fun __uts_large_default_export_prop_fill_fill_1__8(__obj: UTSJSONObject): Unit {
+    __obj["customClass"] = ""
+    __obj["title"] = ""
+    __obj["label"] = ""
+    __obj["value"] = ""
+    __obj["icon"] = ""
+    __obj["disabled"] = false
+    __obj["border"] = true
+    __obj["center"] = false
+    __obj["url"] = ""
+    __obj["linkType"] = "navigateTo"
+    __obj["clickable"] = false
+    __obj["isLink"] = false
+    __obj["required"] = false
+    __obj["arrowDirection"] = ""
+    __obj["iconStyle"] = _uO()
+    __obj["rightIconStyle"] = _uO()
+    __obj["rightIcon"] = "arrow-right"
+    __obj["titleStyle"] = _uO()
+    __obj["size"] = ""
+    __obj["stop"] = true
+    __obj["name"] = ""
+}
+fun __uts_large_default_export_prop_build_0__8(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-cell/cell.uts", 25, 11))
+    __uts_large_default_export_prop_fill_fill_1__8(__obj)
+    return __obj
+}
+fun __uts_large_default_export_fill_fill_3__7(__obj: UTSJSONObject): Unit {
+    __obj["cell"] = __uts_large_default_export_prop_build_0__8()
+}
+fun __uts_large_default_export_build_2__6(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-cell/cell.uts", 33, 11))
+    __uts_large_default_export_fill_fill_3__7(__obj)
+    return __obj
+}
+val default__47 = __uts_large_default_export_build_2__6()
 val GenUniModulesUviewUltraComponentsUpCellUpCellClass = CreateVueComponent(GenUniModulesUviewUltraComponentsUpCellUpCell::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = GenUniModulesUviewUltraComponentsUpCellUpCell.name, inheritAttrs = GenUniModulesUviewUltraComponentsUpCellUpCell.inheritAttrs, inject = GenUniModulesUviewUltraComponentsUpCellUpCell.inject, props = GenUniModulesUviewUltraComponentsUpCellUpCell.props, propsNeedCastKeys = GenUniModulesUviewUltraComponentsUpCellUpCell.propsNeedCastKeys, emits = GenUniModulesUviewUltraComponentsUpCellUpCell.emits, components = GenUniModulesUviewUltraComponentsUpCellUpCell.components, styles = GenUniModulesUviewUltraComponentsUpCellUpCell.styles, setup = fun(props: ComponentPublicInstance, ctx: SetupContext): Any? {
         return GenUniModulesUviewUltraComponentsUpCellUpCell.setup(props as GenUniModulesUviewUltraComponentsUpCellUpCell, ctx)
@@ -10767,7 +12358,38 @@ val GenUniModulesUviewUltraComponentsUpSwiperUpSwiperClass = CreateVueComponent(
     return GenUniModulesUviewUltraComponentsUpSwiperUpSwiper(instance)
 }
 )
-val default__55: UTSJSONObject = _uO("tag" to _uO("type" to "primary", "disabled" to false, "size" to "medium", "shape" to "square", "text" to "", "bgColor" to "", "color" to "", "borderColor" to "", "closeColor" to "#C6C7CB", "name" to "", "plainFill" to false, "plain" to false, "closable" to false, "show" to true, "icon" to "", "iconColor" to ""))
+fun __uts_large_default_export_prop_fill_fill_1__9(__obj: UTSJSONObject): Unit {
+    __obj["type"] = "primary"
+    __obj["disabled"] = false
+    __obj["size"] = "medium"
+    __obj["shape"] = "square"
+    __obj["text"] = ""
+    __obj["bgColor"] = ""
+    __obj["color"] = ""
+    __obj["borderColor"] = ""
+    __obj["closeColor"] = "#C6C7CB"
+    __obj["name"] = ""
+    __obj["plainFill"] = false
+    __obj["plain"] = false
+    __obj["closable"] = false
+    __obj["show"] = true
+    __obj["icon"] = ""
+    __obj["iconColor"] = ""
+}
+fun __uts_large_default_export_prop_build_0__9(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-tag/tag.uts", 20, 11))
+    __uts_large_default_export_prop_fill_fill_1__9(__obj)
+    return __obj
+}
+fun __uts_large_default_export_fill_fill_3__8(__obj: UTSJSONObject): Unit {
+    __obj["tag"] = __uts_large_default_export_prop_build_0__9()
+}
+fun __uts_large_default_export_build_2__7(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-tag/tag.uts", 28, 11))
+    __uts_large_default_export_fill_fill_3__8(__obj)
+    return __obj
+}
+val default__55 = __uts_large_default_export_build_2__7()
 var crtProp__16 = default__55["tag"] as UTSJSONObject
 val GenUniModulesUviewUltraComponentsUpTagUpTagClass = CreateVueComponent(GenUniModulesUviewUltraComponentsUpTagUpTag::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = GenUniModulesUviewUltraComponentsUpTagUpTag.name, inheritAttrs = GenUniModulesUviewUltraComponentsUpTagUpTag.inheritAttrs, inject = GenUniModulesUviewUltraComponentsUpTagUpTag.inject, props = GenUniModulesUviewUltraComponentsUpTagUpTag.props, propsNeedCastKeys = GenUniModulesUviewUltraComponentsUpTagUpTag.propsNeedCastKeys, emits = GenUniModulesUviewUltraComponentsUpTagUpTag.emits, components = GenUniModulesUviewUltraComponentsUpTagUpTag.components, styles = GenUniModulesUviewUltraComponentsUpTagUpTag.styles)
@@ -11037,7 +12659,38 @@ val GenUniModulesUviewUltraComponentsUpRadioUpRadioClass = CreateVueComponent(Ge
     return GenUniModulesUviewUltraComponentsUpRadioUpRadio(instance)
 }
 )
-val default__73: UTSJSONObject = _uO("radioGroup" to _uO("value" to "", "disabled" to false, "shape" to "circle", "activeColor" to "#2979ff", "inactiveColor" to "#c8c9cc", "name" to "", "size" to 18, "placement" to "row", "label" to "", "labelColor" to "#303133", "labelSize" to 14, "labelDisabled" to false, "iconColor" to "#ffffff", "iconSize" to 12, "borderBottom" to false, "iconPlacement" to "left"))
+fun __uts_large_default_export_prop_fill_fill_1__10(__obj: UTSJSONObject): Unit {
+    __obj["value"] = ""
+    __obj["disabled"] = false
+    __obj["shape"] = "circle"
+    __obj["activeColor"] = "#2979ff"
+    __obj["inactiveColor"] = "#c8c9cc"
+    __obj["name"] = ""
+    __obj["size"] = 18
+    __obj["placement"] = "row"
+    __obj["label"] = ""
+    __obj["labelColor"] = "#303133"
+    __obj["labelSize"] = 14
+    __obj["labelDisabled"] = false
+    __obj["iconColor"] = "#ffffff"
+    __obj["iconSize"] = 12
+    __obj["borderBottom"] = false
+    __obj["iconPlacement"] = "left"
+}
+fun __uts_large_default_export_prop_build_0__10(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-radio-group/radioGroup.uts", 20, 11))
+    __uts_large_default_export_prop_fill_fill_1__10(__obj)
+    return __obj
+}
+fun __uts_large_default_export_fill_fill_3__9(__obj: UTSJSONObject): Unit {
+    __obj["radioGroup"] = __uts_large_default_export_prop_build_0__10()
+}
+fun __uts_large_default_export_build_2__8(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-radio-group/radioGroup.uts", 28, 11))
+    __uts_large_default_export_fill_fill_3__9(__obj)
+    return __obj
+}
+val default__73 = __uts_large_default_export_build_2__8()
 var crtProp__20 = default__73["radioGroup"] as UTSJSONObject
 var crtPropRadio = default__72["radio"] as UTSJSONObject
 val GenUniModulesUviewUltraComponentsUpRadioGroupUpRadioGroupClass = CreateVueComponent(GenUniModulesUviewUltraComponentsUpRadioGroupUpRadioGroup::class.java, fun(): VueComponentOptions {
@@ -11168,7 +12821,48 @@ val GenUniModulesUviewUltraComponentsUpRateUpRateClass = CreateVueComponent(GenU
     return GenUniModulesUviewUltraComponentsUpRateUpRate(instance)
 }
 )
-val default__76: UTSJSONObject = _uO("numberBox" to _uO("name" to "", "value" to 0, "min" to 1, "max" to 9999, "step" to 1, "integer" to false, "disabled" to false, "disabledInput" to false, "asyncChange" to false, "inputWidth" to 35, "showMinus" to true, "showPlus" to true, "decimalLength" to 0, "longPress" to true, "color" to "#323233", "buttonWidth" to 30, "buttonSize" to 30, "buttonRadius" to "0px", "bgColor" to "#EBECEE", "disabledBgColor" to "#f7f8fa", "inputBgColor" to "#EBECEE", "cursorSpacing" to 100, "disableMinus" to false, "disablePlus" to false, "iconStyle" to "", "miniMode" to false))
+fun __uts_large_default_export_prop_fill_fill_1__11(__obj: UTSJSONObject): Unit {
+    __obj["name"] = ""
+    __obj["value"] = 0
+    __obj["min"] = 1
+    __obj["max"] = 9999
+    __obj["step"] = 1
+    __obj["integer"] = false
+    __obj["disabled"] = false
+    __obj["disabledInput"] = false
+    __obj["asyncChange"] = false
+    __obj["inputWidth"] = 35
+    __obj["showMinus"] = true
+    __obj["showPlus"] = true
+    __obj["decimalLength"] = 0
+    __obj["longPress"] = true
+    __obj["color"] = "#323233"
+    __obj["buttonWidth"] = 30
+    __obj["buttonSize"] = 30
+    __obj["buttonRadius"] = "0px"
+    __obj["bgColor"] = "#EBECEE"
+    __obj["disabledBgColor"] = "#f7f8fa"
+    __obj["inputBgColor"] = "#EBECEE"
+    __obj["cursorSpacing"] = 100
+    __obj["disableMinus"] = false
+    __obj["disablePlus"] = false
+    __obj["iconStyle"] = ""
+    __obj["miniMode"] = false
+}
+fun __uts_large_default_export_prop_build_0__11(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-number-box/numberBox.uts", 30, 11))
+    __uts_large_default_export_prop_fill_fill_1__11(__obj)
+    return __obj
+}
+fun __uts_large_default_export_fill_fill_3__10(__obj: UTSJSONObject): Unit {
+    __obj["numberBox"] = __uts_large_default_export_prop_build_0__11()
+}
+fun __uts_large_default_export_build_2__9(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-number-box/numberBox.uts", 38, 11))
+    __uts_large_default_export_fill_fill_3__10(__obj)
+    return __obj
+}
+val default__76 = __uts_large_default_export_build_2__9()
 var numberBoxProp = default__76["numberBox"] as UTSJSONObject
 val GenUniModulesUviewUltraComponentsUpNumberBoxUpNumberBoxClass = CreateVueComponent(GenUniModulesUviewUltraComponentsUpNumberBoxUpNumberBox::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = GenUniModulesUviewUltraComponentsUpNumberBoxUpNumberBox.name, inheritAttrs = GenUniModulesUviewUltraComponentsUpNumberBoxUpNumberBox.inheritAttrs, inject = GenUniModulesUviewUltraComponentsUpNumberBoxUpNumberBox.inject, props = GenUniModulesUviewUltraComponentsUpNumberBoxUpNumberBox.props, propsNeedCastKeys = GenUniModulesUviewUltraComponentsUpNumberBoxUpNumberBox.propsNeedCastKeys, emits = GenUniModulesUviewUltraComponentsUpNumberBoxUpNumberBox.emits, components = GenUniModulesUviewUltraComponentsUpNumberBoxUpNumberBox.components, styles = GenUniModulesUviewUltraComponentsUpNumberBoxUpNumberBox.styles)
@@ -12196,7 +13890,38 @@ fun chooseFile(ref__1: UPUploadChooseFileOptions): UTSPromise<UTSArray<UPUploadF
     }
     )
 }
-val default__79: UTSJSONObject = _uO("popup" to _uO("show" to false, "overlay" to true, "mode" to "bottom", "duration" to 300, "closeable" to false, "overlayStyle" to _uO(), "closeOnClickOverlay" to true, "zIndex" to 10075, "safeAreaInsetBottom" to true, "safeAreaInsetTop" to false, "closeIconPos" to "top-right", "round" to 0, "zoom" to true, "bgColor" to "", "overlayOpacity" to 0.5, "pageInline" to false))
+fun __uts_large_default_export_prop_fill_fill_1__12(__obj: UTSJSONObject): Unit {
+    __obj["show"] = false
+    __obj["overlay"] = true
+    __obj["mode"] = "bottom"
+    __obj["duration"] = 300
+    __obj["closeable"] = false
+    __obj["overlayStyle"] = _uO()
+    __obj["closeOnClickOverlay"] = true
+    __obj["zIndex"] = 10075
+    __obj["safeAreaInsetBottom"] = true
+    __obj["safeAreaInsetTop"] = false
+    __obj["closeIconPos"] = "top-right"
+    __obj["round"] = 0
+    __obj["zoom"] = true
+    __obj["bgColor"] = ""
+    __obj["overlayOpacity"] = 0.5
+    __obj["pageInline"] = false
+}
+fun __uts_large_default_export_prop_build_0__12(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-popup/popup.uts", 20, 11))
+    __uts_large_default_export_prop_fill_fill_1__12(__obj)
+    return __obj
+}
+fun __uts_large_default_export_fill_fill_3__11(__obj: UTSJSONObject): Unit {
+    __obj["popup"] = __uts_large_default_export_prop_build_0__12()
+}
+fun __uts_large_default_export_build_2__10(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-popup/popup.uts", 28, 11))
+    __uts_large_default_export_fill_fill_3__11(__obj)
+    return __obj
+}
+val default__79 = __uts_large_default_export_build_2__10()
 var crtProp__22 = default__79["popup"] as UTSJSONObject
 val GenUniModulesUviewUltraComponentsUpPopupUpPopupClass = CreateVueComponent(GenUniModulesUviewUltraComponentsUpPopupUpPopup::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = GenUniModulesUviewUltraComponentsUpPopupUpPopup.name, inheritAttrs = GenUniModulesUviewUltraComponentsUpPopupUpPopup.inheritAttrs, inject = GenUniModulesUviewUltraComponentsUpPopupUpPopup.inject, props = GenUniModulesUviewUltraComponentsUpPopupUpPopup.props, propsNeedCastKeys = GenUniModulesUviewUltraComponentsUpPopupUpPopup.propsNeedCastKeys, emits = GenUniModulesUviewUltraComponentsUpPopupUpPopup.emits, components = GenUniModulesUviewUltraComponentsUpPopupUpPopup.components, styles = GenUniModulesUviewUltraComponentsUpPopupUpPopup.styles)
@@ -12473,7 +14198,38 @@ val GenUniModulesUviewUltraComponentsUpCalendarUpCalendarClass = CreateVueCompon
     return GenUniModulesUviewUltraComponentsUpCalendarUpCalendar(instance)
 }
 )
-val default__81: UTSJSONObject = _uO("keyboard" to _uO("mode" to "number", "dotDisabled" to false, "tooltip" to true, "showTips" to true, "tips" to "", "showCancel" to true, "showConfirm" to true, "random" to false, "safeAreaInsetBottom" to true, "closeOnClickOverlay" to true, "show" to false, "overlay" to true, "zIndex" to 1075, "cancelText" to "取消", "confirmText" to "确认", "autoChange" to false))
+fun __uts_large_default_export_prop_fill_fill_1__13(__obj: UTSJSONObject): Unit {
+    __obj["mode"] = "number"
+    __obj["dotDisabled"] = false
+    __obj["tooltip"] = true
+    __obj["showTips"] = true
+    __obj["tips"] = ""
+    __obj["showCancel"] = true
+    __obj["showConfirm"] = true
+    __obj["random"] = false
+    __obj["safeAreaInsetBottom"] = true
+    __obj["closeOnClickOverlay"] = true
+    __obj["show"] = false
+    __obj["overlay"] = true
+    __obj["zIndex"] = 1075
+    __obj["cancelText"] = "取消"
+    __obj["confirmText"] = "确认"
+    __obj["autoChange"] = false
+}
+fun __uts_large_default_export_prop_build_0__13(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-keyboard/keyboard.uts", 20, 11))
+    __uts_large_default_export_prop_fill_fill_1__13(__obj)
+    return __obj
+}
+fun __uts_large_default_export_fill_fill_3__12(__obj: UTSJSONObject): Unit {
+    __obj["keyboard"] = __uts_large_default_export_prop_build_0__13()
+}
+fun __uts_large_default_export_build_2__11(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-keyboard/keyboard.uts", 28, 11))
+    __uts_large_default_export_fill_fill_3__12(__obj)
+    return __obj
+}
+val default__81 = __uts_large_default_export_build_2__11()
 var keyboardProp = default__81["keyboard"] as UTSJSONObject
 val default__82: UTSJSONObject = _uO("numberKeyboard" to _uO("mode" to "number", "dotDisabled" to false, "random" to false))
 var keyboardProp__1 = default__82["numberKeyboard"] as UTSJSONObject
@@ -12727,7 +14483,48 @@ val GenSrcSubUviewUltraComponentsDemoNavClass = CreateVueComponent(GenSrcSubUvie
     return GenSrcSubUviewUltraComponentsDemoNav(instance)
 }
 )
-val default__97: UTSJSONObject = _uO("card" to _uO("full" to false, "title" to "", "titleColor" to "#303133", "titleSize" to "15px", "subTitle" to "", "subTitleColor" to "#909399", "subTitleSize" to "13", "border" to true, "index" to "", "margin" to "15px", "borderRadius" to "8px", "headStyle" to _uO(), "bodyStyle" to _uO(), "footStyle" to _uO(), "headBorderBottom" to true, "footBorderTop" to true, "thumb" to "", "thumbWidth" to "30px", "thumbCircle" to false, "padding" to "15px", "paddingHead" to "", "paddingBody" to "", "paddingFoot" to "", "showHead" to true, "showFoot" to true, "boxShadow" to "none"))
+fun __uts_large_default_export_prop_fill_fill_1__14(__obj: UTSJSONObject): Unit {
+    __obj["full"] = false
+    __obj["title"] = ""
+    __obj["titleColor"] = "#303133"
+    __obj["titleSize"] = "15px"
+    __obj["subTitle"] = ""
+    __obj["subTitleColor"] = "#909399"
+    __obj["subTitleSize"] = "13"
+    __obj["border"] = true
+    __obj["index"] = ""
+    __obj["margin"] = "15px"
+    __obj["borderRadius"] = "8px"
+    __obj["headStyle"] = _uO()
+    __obj["bodyStyle"] = _uO()
+    __obj["footStyle"] = _uO()
+    __obj["headBorderBottom"] = true
+    __obj["footBorderTop"] = true
+    __obj["thumb"] = ""
+    __obj["thumbWidth"] = "30px"
+    __obj["thumbCircle"] = false
+    __obj["padding"] = "15px"
+    __obj["paddingHead"] = ""
+    __obj["paddingBody"] = ""
+    __obj["paddingFoot"] = ""
+    __obj["showHead"] = true
+    __obj["showFoot"] = true
+    __obj["boxShadow"] = "none"
+}
+fun __uts_large_default_export_prop_build_0__14(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-card/card.uts", 30, 11))
+    __uts_large_default_export_prop_fill_fill_1__14(__obj)
+    return __obj
+}
+fun __uts_large_default_export_fill_fill_3__13(__obj: UTSJSONObject): Unit {
+    __obj["card"] = __uts_large_default_export_prop_build_0__14()
+}
+fun __uts_large_default_export_build_2__12(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-card/card.uts", 38, 11))
+    __uts_large_default_export_fill_fill_3__13(__obj)
+    return __obj
+}
+val default__97 = __uts_large_default_export_build_2__12()
 val GenUniModulesUviewUltraComponentsUpCardUpCardClass = CreateVueComponent(GenUniModulesUviewUltraComponentsUpCardUpCard::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = GenUniModulesUviewUltraComponentsUpCardUpCard.name, inheritAttrs = GenUniModulesUviewUltraComponentsUpCardUpCard.inheritAttrs, inject = GenUniModulesUviewUltraComponentsUpCardUpCard.inject, props = GenUniModulesUviewUltraComponentsUpCardUpCard.props, propsNeedCastKeys = GenUniModulesUviewUltraComponentsUpCardUpCard.propsNeedCastKeys, emits = GenUniModulesUviewUltraComponentsUpCardUpCard.emits, components = GenUniModulesUviewUltraComponentsUpCardUpCard.components, styles = GenUniModulesUviewUltraComponentsUpCardUpCard.styles, setup = fun(props: ComponentPublicInstance): Any? {
         return GenUniModulesUviewUltraComponentsUpCardUpCard.setup(props as GenUniModulesUviewUltraComponentsUpCardUpCard)
@@ -12738,7 +14535,42 @@ val GenUniModulesUviewUltraComponentsUpCardUpCardClass = CreateVueComponent(GenU
     return GenUniModulesUviewUltraComponentsUpCardUpCard(instance)
 }
 )
-val default__98: UTSJSONObject = _uO("list" to _uO("showScrollbar" to false, "lowerThreshold" to 50, "upperThreshold" to 0, "scrollTop" to 0, "offsetAccuracy" to 10, "enableFlex" to false, "pagingEnabled" to false, "scrollable" to true, "scrollIntoView" to "", "scrollWithAnimation" to false, "enableBackToTop" to false, "height" to 0, "width" to 0, "preLoadScreen" to 1, "refresherEnabled" to false, "refresherThreshold" to 45, "refresherDefaultStyle" to "black", "refresherBackground" to "#FFF", "refresherTriggered" to false, "customNestedScroll" to true))
+fun __uts_large_default_export_prop_fill_fill_1__15(__obj: UTSJSONObject): Unit {
+    __obj["showScrollbar"] = false
+    __obj["lowerThreshold"] = 50
+    __obj["upperThreshold"] = 0
+    __obj["scrollTop"] = 0
+    __obj["offsetAccuracy"] = 10
+    __obj["enableFlex"] = false
+    __obj["pagingEnabled"] = false
+    __obj["scrollable"] = true
+    __obj["scrollIntoView"] = ""
+    __obj["scrollWithAnimation"] = false
+    __obj["enableBackToTop"] = false
+    __obj["height"] = 0
+    __obj["width"] = 0
+    __obj["preLoadScreen"] = 1
+    __obj["refresherEnabled"] = false
+    __obj["refresherThreshold"] = 45
+    __obj["refresherDefaultStyle"] = "black"
+    __obj["refresherBackground"] = "#FFF"
+    __obj["refresherTriggered"] = false
+    __obj["customNestedScroll"] = true
+}
+fun __uts_large_default_export_prop_build_0__15(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-list/list.uts", 24, 11))
+    __uts_large_default_export_prop_fill_fill_1__15(__obj)
+    return __obj
+}
+fun __uts_large_default_export_fill_fill_3__14(__obj: UTSJSONObject): Unit {
+    __obj["list"] = __uts_large_default_export_prop_build_0__15()
+}
+fun __uts_large_default_export_build_2__13(): UTSJSONObject {
+    val __obj: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("__obj", "uni_modules/uview-ultra/components/up-list/list.uts", 32, 11))
+    __uts_large_default_export_fill_fill_3__14(__obj)
+    return __obj
+}
+val default__98 = __uts_large_default_export_build_2__13()
 var listProp = default__98["list"] as UTSJSONObject
 val GenUniModulesUviewUltraComponentsUpListUpListClass = CreateVueComponent(GenUniModulesUviewUltraComponentsUpListUpList::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = GenUniModulesUviewUltraComponentsUpListUpList.name, inheritAttrs = GenUniModulesUviewUltraComponentsUpListUpList.inheritAttrs, inject = GenUniModulesUviewUltraComponentsUpListUpList.inject, props = GenUniModulesUviewUltraComponentsUpListUpList.props, propsNeedCastKeys = GenUniModulesUviewUltraComponentsUpListUpList.propsNeedCastKeys, emits = GenUniModulesUviewUltraComponentsUpListUpList.emits, components = GenUniModulesUviewUltraComponentsUpListUpList.components, styles = GenUniModulesUviewUltraComponentsUpListUpList.styles)
@@ -12789,7 +14621,7 @@ open class UniAppConfig : io.dcloud.uniapp.appframe.AppConfig {
     override var appid: String = "__UNI__5198058"
     override var versionName: String = "1.0.0"
     override var versionCode: String = "100"
-    override var uniCompilerVersion: String = "5.07"
+    override var uniCompilerVersion: String = "5.15"
     constructor() : super() {}
 }
 fun definePageRoutes() {

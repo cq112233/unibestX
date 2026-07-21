@@ -65,7 +65,7 @@ open class GenUniModulesUviewUltraComponentsUpUploadUpUpload : VueComponent {
             return this.popupShow
         }
         , fun(newVal: Boolean) {
-            if (!newVal) {
+            if (!isTruthy(newVal)) {
                 this.currentItemIndex = -1
             }
         }
@@ -78,6 +78,7 @@ open class GenUniModulesUviewUltraComponentsUpUploadUpUpload : VueComponent {
         val _component_up_icon = resolveEasyComponent("up-icon", GenUniModulesUviewUltraComponentsUpIconUpIconClass)
         val _component_up_loading_icon = resolveEasyComponent("up-loading-icon", GenUniModulesUviewUltraComponentsUpLoadingIconUpLoadingIconClass)
         val _component_up_gap = resolveEasyComponent("up-gap", GenUniModulesUviewUltraComponentsUpGapUpGapClass)
+        val _component_video = resolveComponent("video")
         val _component_up_popup = resolveEasyComponent("up-popup", GenUniModulesUviewUltraComponentsUpPopupUpPopupClass)
         return _cE("view", _uM("class" to "up-upload", "style" to _nS(_uA(
             _ctx.addStyle(_ctx.customStyle)
@@ -284,11 +285,11 @@ open class GenUniModulesUviewUltraComponentsUpUploadUpUpload : VueComponent {
             ), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                 return _uA(
                     if (isTrue(_ctx.popupShow)) {
-                        _cE("video", _uM("key" to 0, "id" to "myVideo", "src" to if (_ctx.currentItemIndex >= 0) {
+                        _cV(_component_video, _uM("key" to 0, "id" to "myVideo", "src" to if (_ctx.currentItemIndex >= 0) {
                             _ctx.lists[_ctx.currentItemIndex].url
                         } else {
                             ""
-                        }, "onError" to _ctx.videoErrorCallback, "show-center-play-btn" to "", "object-fit" to _ctx.videoPreviewObjectFit, "show-fullscreen-btn" to "true", "enable-play-gesture" to "", "controls" to "", "autoplay" to true, "auto-pause-if-open-native" to "", "todoloadedmetadata" to "loadedVideoMetadata", "initial-time" to 0.1), null, 40, _uA(
+                        }, "onError" to _ctx.videoErrorCallback, "show-center-play-btn" to "", "object-fit" to _ctx.videoPreviewObjectFit, "show-fullscreen-btn" to "true", "enable-play-gesture" to "", "controls" to "", "autoplay" to true, "auto-pause-if-open-native" to "", "todoloadedmetadata" to "loadedVideoMetadata", "initial-time" to 0.1), null, 8, _uA(
                             "src",
                             "onError",
                             "object-fit"

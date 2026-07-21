@@ -324,7 +324,7 @@ open class GenUniModulesUviewUltraComponentsUpCountToUpCountTo : VueComponent {
             val destroyed = ::gen_destroyed_fn
             __expose(_uM("start" to start, "stop" to stop, "resume" to resume))
             return fun(): Any? {
-                return _cE("text", _uM("class" to "up-count-num", "style" to _nS(_uM("fontSize" to _ctx.`$up`.addUnit(_ctx.fontSize), "fontWeight" to if (_ctx.bold) {
+                return _cE("text", _uM("class" to "up-count-num", "style" to _nS(_uM("fontSize" to _ctx.`$up`.addUnit(_ctx.fontSize), "fontWeight" to if (isTruthy(_ctx.bold)) {
                     "bold"
                 } else {
                     "normal"

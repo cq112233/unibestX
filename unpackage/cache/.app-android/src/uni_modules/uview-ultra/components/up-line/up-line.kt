@@ -47,24 +47,24 @@ open class GenUniModulesUviewUltraComponentsUpLineUpLine : VueComponent {
             style["margin"] = this.margin
             if (this.direction === "row") {
                 style["borderBottomWidth"] = "1px"
-                style["borderBottomStyle"] = if (this.dashed) {
+                style["borderBottomStyle"] = if (isTruthy(this.dashed)) {
                     "dashed"
                 } else {
                     "solid"
                 }
                 style["width"] = addUnit(this.length)
-                if (this.hairline) {
+                if (isTruthy(this.hairline)) {
                     style["transform"] = "scaleY(0.5)"
                 }
             } else {
                 style["borderLeftWidth"] = "1px"
-                style["borderLeftStyle"] = if (this.dashed) {
+                style["borderLeftStyle"] = if (isTruthy(this.dashed)) {
                     "dashed"
                 } else {
                     "solid"
                 }
                 style["height"] = addUnit(this.length)
-                if (this.hairline) {
+                if (isTruthy(this.hairline)) {
                     style["transform"] = "scaleX(0.5)"
                 }
             }

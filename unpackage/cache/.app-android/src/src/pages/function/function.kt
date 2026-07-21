@@ -173,7 +173,7 @@ open class GenSrcPagesFunctionFunction : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("bg-__f7fafc_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#f7fafc")), "flex-1" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")), "font-bold" to _pS(_uM("fontWeight" to "700")), "mt-4px" to _pS(_uM("marginTop" to 4)), "pb-10px" to _pS(_uM("paddingBottom" to 10)), "pt-20px" to _pS(_uM("paddingTop" to 20)), "px-16px" to _pS(_uM("paddingLeft" to 16, "paddingRight" to 16)), "text-__1a202c_" to _pS(_uM("color" to "#1a202c")), "text-__718096_" to _pS(_uM("color" to "#718096")), "text-13px" to _pS(_uM("fontSize" to 13)), "text-20px" to _pS(_uM("fontSize" to 20)))
+                return _uM("bg-__f7fafc_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#f7fafc")), "flex-1" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")), "font-bold" to _pS(_uM("fontWeight" to 700)), "mt-4px" to _pS(_uM("marginTop" to 4)), "pb-10px" to _pS(_uM("paddingBottom" to 10)), "pt-20px" to _pS(_uM("paddingTop" to 20)), "px-16px" to _pS(_uM("paddingLeft" to 16, "paddingRight" to 16)), "text-__1a202c_" to _pS(_uM("color" to "#1a202c")), "text-__718096_" to _pS(_uM("color" to "#718096")), "text-13px" to _pS(_uM("fontSize" to 13)), "text-20px" to _pS(_uM("fontSize" to 20)))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

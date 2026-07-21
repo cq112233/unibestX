@@ -162,7 +162,7 @@ open class GenUniModulesUviewUltraComponentsUpTextUpText : VueComponent {
     @Suppress("USELESS_CAST")
     override fun data(): Map<String, Any?> {
         return _uM("parent" to null as ComponentPublicInstance?, "parentData" to _uO(), "children" to _uA<ComponentPublicInstance>(), "childrenRefs" to _uA<String>(), "valueStyle" to computed<UTSJSONObject>(fun(): UTSJSONObject {
-            var style: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-text/up-text.uvue", 125, 17), "textDecoration" to this.decoration, "fontWeight" to if (this.bold) {
+            var style: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-text/up-text.uvue", 125, 17), "textDecoration" to this.decoration, "fontWeight" to if (isTruthy(this.bold)) {
                 "bold"
             } else {
                 "normal"
@@ -177,7 +177,7 @@ open class GenUniModulesUviewUltraComponentsUpTextUpText : VueComponent {
             if (this.lineHeight != "") {
                 style["lineHeight"] = addUnit(this.lineHeight)
             }
-            if (this.block) {
+            if (isTruthy(this.block)) {
                 style["display"] = "block"
             }
             return deepMerge(style, uni.UNI5198058.addStyle(this.customStyle)) as UTSJSONObject
@@ -340,7 +340,7 @@ open class GenUniModulesUviewUltraComponentsUpTextUpText : VueComponent {
     }
     open var clickHandler = ::gen_clickHandler_fn
     open fun gen_clickHandler_fn() {
-        if (this.call && this.mode === "phone") {}
+        if (isTruthy(this.call) && this.mode === "phone") {}
         this.`$emit`("click")
     }
     open var formatName = ::gen_formatName_fn

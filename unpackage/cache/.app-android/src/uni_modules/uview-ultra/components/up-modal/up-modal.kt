@@ -65,7 +65,7 @@ open class GenUniModulesUviewUltraComponentsUpModalUpModal : VueComponent {
                     } else {
                         _cE(Fragment, _uM("key" to 2), _uA(
                             _cV(_component_up_line),
-                            _cE("view", _uM("class" to "up-modal__button-group", "style" to _nS(_uM("flexDirection" to if (_ctx.buttonReverse) {
+                            _cE("view", _uM("class" to "up-modal__button-group", "style" to _nS(_uM("flexDirection" to if (isTruthy(_ctx.buttonReverse)) {
                                 "row-reverse"
                             } else {
                                 "row"
@@ -75,7 +75,7 @@ open class GenUniModulesUviewUltraComponentsUpModalUpModal : VueComponent {
                                     _cE("view", _uM("key" to 0, "class" to _nC(_uA(
                                         "up-modal__button-group__wrapper up-modal__button-group__wrapper--cancel",
                                         _uA(
-                                            if ((_ctx.showCancelButton && !_ctx.showConfirmButton)) {
+                                            if ((isTruthy(_ctx.showCancelButton) && !isTruthy(_ctx.showConfirmButton))) {
                                                 "up-modal__button-group__wrapper--only-cancel"
                                             } else {
                                                 ""
@@ -90,7 +90,12 @@ open class GenUniModulesUviewUltraComponentsUpModalUpModal : VueComponent {
                                     _cC("v-if", true)
                                 }
                                 ,
-                                if (isTrue(_ctx.showConfirmButton && _ctx.showCancelButton)) {
+                                if (isTrue(if (isTruthy(_ctx.showConfirmButton)) {
+                                    _ctx.showCancelButton
+                                } else {
+                                    _ctx.showConfirmButton
+                                }
+                                )) {
                                     _cV(_component_up_line, _uM("key" to 1, "direction" to "column"))
                                 } else {
                                     _cC("v-if", true)
@@ -100,7 +105,7 @@ open class GenUniModulesUviewUltraComponentsUpModalUpModal : VueComponent {
                                     _cE("view", _uM("key" to 2, "class" to _nC(_uA(
                                         "up-modal__button-group__wrapper up-modal__button-group__wrapper--confirm",
                                         _uA(
-                                            if ((!_ctx.showCancelButton && _ctx.showConfirmButton)) {
+                                            if ((!isTruthy(_ctx.showCancelButton) && isTruthy(_ctx.showConfirmButton))) {
                                                 "up-modal__button-group__wrapper--only-confirm"
                                             } else {
                                                 ""
@@ -286,7 +291,7 @@ open class GenUniModulesUviewUltraComponentsUpModalUpModal : VueComponent {
     }
     open var confirmHandler = ::gen_confirmHandler_fn
     open fun gen_confirmHandler_fn() {
-        if (this.asyncClose) {
+        if (isTruthy(this.asyncClose)) {
             this.loading = true
         } else {
             this.`$emit`("update:show", false)
@@ -295,13 +300,13 @@ open class GenUniModulesUviewUltraComponentsUpModalUpModal : VueComponent {
     }
     open var cancelHandler = ::gen_cancelHandler_fn
     open fun gen_cancelHandler_fn() {
-        if (this.asyncClose && this.loading) {
+        if (isTruthy(this.asyncClose) && this.loading) {
             if (this.asyncCloseTip != "") {
                 uni_showToast(ShowToastOptions(title = this.asyncCloseTip, icon = "none"))
             }
             this.`$emit`("cancelOnAsync")
         } else {
-            if (!this.asyncCancelClose) {
+            if (!isTruthy(this.asyncCancelClose)) {
                 this.`$emit`("update:show", false)
             }
         }
@@ -309,7 +314,7 @@ open class GenUniModulesUviewUltraComponentsUpModalUpModal : VueComponent {
     }
     open var clickHandler = ::gen_clickHandler_fn
     open fun gen_clickHandler_fn() {
-        if (this.closeOnClickOverlay) {
+        if (isTruthy(this.closeOnClickOverlay)) {
             this.`$emit`("update:show", false)
             this.`$emit`("close")
         }

@@ -33,6 +33,7 @@ open class GenUniModulesUviewUltraComponentsUpSwiperUpSwiper : VueComponent {
         val _ctx = this
         val _cache = this.`$`.renderCache
         val _component_up_loading_icon = resolveEasyComponent("up-loading-icon", GenUniModulesUviewUltraComponentsUpLoadingIconUpLoadingIconClass)
+        val _component_video = resolveComponent("video")
         val _component_up_swiper_indicator = resolveEasyComponent("up-swiper-indicator", GenUniModulesUviewUltraComponentsUpSwiperIndicatorUpSwiperIndicatorClass)
         return _cE("view", _uM("class" to "up-swiper", "style" to _nS(_uM("backgroundColor" to _ctx.bgColor, "height" to _ctx.addUnit(_ctx.height), "borderRadius" to _ctx.addUnit(_ctx.radius)))), _uA(
             if (isTrue(_ctx.loading)) {
@@ -61,24 +62,30 @@ open class GenUniModulesUviewUltraComponentsUpSwiperUpSwiper : VueComponent {
                                         }
                                         ,
                                         if (_ctx.getItemType(item) === "video") {
-                                            _cE("video", _uM("key" to 1, "class" to "up-swiper__wrapper__item__wrapper__video", "id" to ("video-" + index), "enable-progress-gesture" to false, "src" to _ctx.getSource(item), "poster" to _ctx.getPoster(item), "title" to if (_ctx.showTitle && _ctx.testObject(item) && _ctx.getItemTitle(item) != "") {
+                                            _cV(_component_video, _uM("key" to 1, "class" to "up-swiper__wrapper__item__wrapper__video", "id" to ("video-" + index), "enable-progress-gesture" to false, "src" to _ctx.getSource(item), "poster" to _ctx.getPoster(item), "title" to if (isTruthy(_ctx.showTitle) && _ctx.testObject(item) && _ctx.getItemTitle(item) != "") {
                                                 _ctx.getItemTitle(item)
                                             } else {
                                                 ""
                                             }, "style" to _nS(_uM("height" to _ctx.addUnit(_ctx.height))), "controls" to "", "onClick" to fun(){
                                                 _ctx.clickHandler(index)
-                                            }), null, 12, _uA(
+                                            }), null, 8, _uA(
                                                 "id",
                                                 "src",
                                                 "poster",
                                                 "title",
+                                                "style",
                                                 "onClick"
                                             ))
                                         } else {
                                             _cC("v-if", true)
                                         }
                                         ,
-                                        if (isTrue(_ctx.showTitle && _ctx.getItemTitle(item) != "" && _ctx.testImage(_ctx.getSource(item)))) {
+                                        if (isTrue((if (isTruthy(_ctx.showTitle)) {
+                                            _ctx.getItemTitle(item) != ""
+                                        } else {
+                                            _ctx.showTitle
+                                        }
+                                        ) && _ctx.testImage(_ctx.getSource(item)))) {
                                             _cE("view", _uM("key" to 2, "class" to "up-swiper__wrapper__item__wrapper__title"), _uA(
                                                 _cE("text", _uM("class" to "up-line-1 up-swiper__wrapper__item__wrapper__title-text"), _tD(_ctx.getItemTitle(item)), 1)
                                             ))
@@ -108,7 +115,7 @@ open class GenUniModulesUviewUltraComponentsUpSwiperUpSwiper : VueComponent {
             ))), _uA(
                 renderSlot(_ctx.`$slots`, "indicator", _uO(), fun(): UTSArray<Any> {
                     return _uA(
-                        if (isTrue(!_ctx.loading && _ctx.indicator && !_ctx.showTitle)) {
+                        if (isTrue(!isTruthy(_ctx.loading) && _ctx.indicator && !isTruthy(_ctx.showTitle))) {
                             _cV(_component_up_swiper_indicator, _uM("key" to 0, "indicatorActiveColor" to _ctx.indicatorActiveColor, "indicatorInactiveColor" to _ctx.indicatorInactiveColor, "length" to _ctx.list.length, "current" to _ctx.currentIndex, "indicatorMode" to _ctx.indicatorMode), null, 8, _uA(
                                 "indicatorActiveColor",
                                 "indicatorInactiveColor",

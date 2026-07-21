@@ -61,7 +61,12 @@ open class GenUniModulesUviewUltraComponentsUpPickerUpPicker : VueComponent {
                 _cC("v-if", true)
             }
             ,
-            _cV(_component_up_popup, _uM("show" to (_ctx.pageInline || _ctx.show || (_ctx.hasInput && _ctx.showByClickInput)), "mode" to _ctx.popupMode, "pageInline" to _ctx.pageInline, "onClose" to _ctx.closeHandler), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+            _cV(_component_up_popup, _uM("show" to ((if (isTruthy(_ctx.pageInline)) {
+                _ctx.pageInline
+            } else {
+                _ctx.show
+            }
+            ) || (_ctx.hasInput && _ctx.showByClickInput)), "mode" to _ctx.popupMode, "pageInline" to _ctx.pageInline, "onClose" to _ctx.closeHandler), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                 return _uA(
                     _cE("view", _uM("class" to "up-picker"), _uA(
                         if (isTrue(_ctx.showToolbar)) {
@@ -355,7 +360,7 @@ open class GenUniModulesUviewUltraComponentsUpPickerUpPicker : VueComponent {
     }
     open var closeHandler = ::gen_closeHandler_fn
     open fun gen_closeHandler_fn(): Unit {
-        if (this.closeOnClickOverlay) {
+        if (isTruthy(this.closeOnClickOverlay)) {
             if (this.hasInput) {
                 this.showByClickInput = false
             }

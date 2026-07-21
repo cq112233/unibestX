@@ -398,7 +398,7 @@ open class GenUniModulesUviewUltraComponentsUpStepsItemUpStepsItem : VueComponen
                 } else {
                     "process"
                 }
-            } else if (error) {
+            } else if (isTruthy(error)) {
                 return "error"
             } else if (current > index) {
                 return "finish"

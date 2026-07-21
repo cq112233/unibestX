@@ -122,7 +122,7 @@ open class GenUniModulesUviewUltraComponentsUpLoadmoreUpLoadmore : VueComponent 
                 text = this.loadmoreText
             } else if (this.status == "loading") {
                 text = this.loadingText
-            } else if (this.status == "nomore" && this.isDot) {
+            } else if (this.status == "nomore" && isTruthy(this.isDot)) {
                 text = this.dotText
             } else {
                 text = this.nomoreText

@@ -35,7 +35,7 @@ open class GenUniModulesUviewUltraComponentsUpNavbarMiniUpNavbarMini : VueCompon
             _cE("view", _uM("class" to _nC(_uA(
                 "up-navbar-mini__inner",
                 _uA(
-                    if (_ctx.fixed) {
+                    if (isTruthy(_ctx.fixed)) {
                         "up-navbar-mini--fixed"
                     } else {
                         ""
@@ -224,7 +224,7 @@ open class GenUniModulesUviewUltraComponentsUpNavbarMiniUpNavbarMini : VueCompon
     open var leftClick = ::gen_leftClick_fn
     open fun gen_leftClick_fn(): Unit {
         this.`$emit`("leftClick")
-        if (this.autoBack) {
+        if (isTruthy(this.autoBack)) {
             uni_navigateBack(null)
         }
     }

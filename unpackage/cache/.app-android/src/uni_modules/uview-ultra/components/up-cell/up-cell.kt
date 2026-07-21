@@ -194,7 +194,7 @@ open class GenUniModulesUviewUltraComponentsUpCellUpCell : VueComponent {
                     )
                 )), "style" to _nS(_uA(
                     _ctx.`$up`.addStyle(_ctx.customStyle)
-                )), "hover-class" to if ((!_ctx.disabled && (_ctx.clickable || _ctx.isLink))) {
+                )), "hover-class" to if ((!isTruthy(_ctx.disabled) && (isTruthy(_ctx.clickable) || isTruthy(_ctx.isLink)))) {
                     "up-cell--clickable"
                 } else {
                     ""
@@ -263,7 +263,7 @@ open class GenUniModulesUviewUltraComponentsUpCellUpCell : VueComponent {
                                 renderSlot(_ctx.`$slots`, "right-icon", _uO(), fun(): UTSArray<Any> {
                                     return _uA(
                                         if (isTrue(_ctx.rightIcon)) {
-                                            _cV(_component_up_icon, _uM("key" to 0, "name" to _ctx.rightIcon, "custom-style" to _ctx.rightIconStyle, "color" to if (_ctx.disabled) {
+                                            _cV(_component_up_icon, _uM("key" to 0, "name" to _ctx.rightIcon, "custom-style" to _ctx.rightIconStyle, "color" to if (isTruthy(_ctx.disabled)) {
                                                 "#c8c9cc"
                                             } else {
                                                 "info"

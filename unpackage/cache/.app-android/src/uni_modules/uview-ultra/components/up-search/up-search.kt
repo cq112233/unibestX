@@ -82,7 +82,7 @@ open class GenUniModulesUviewUltraComponentsUpSearchUpSearch : VueComponent {
                     ))
                 )),
                 _cE("input", _uM("confirm-type" to "search", "onBlur" to _ctx.blurFunc, "value" to _ctx.keyword, "onConfirm" to _ctx.search, "onInput" to _ctx.inputChange, "disabled" to _ctx.disabled, "onFocus" to _ctx.getFocus, "focus" to _ctx.focus, "maxlength" to _ctx.maxlength, "adjust-position" to _ctx.adjustPosition, "auto-blur" to _ctx.autoBlur, "placeholder-class" to "up-search__content__input--placeholder", "placeholder" to _ctx.placeholder, "placeholder-style" to ("color: " + _ctx.placeholderColor), "class" to "up-search__content__input", "type" to "text", "style" to _nS(_uA(
-                    _uM("pointerEvents" to if (_ctx.disabled) {
+                    _uM("pointerEvents" to if (isTruthy(_ctx.disabled)) {
                         "none"
                     } else {
                         "auto"
@@ -179,7 +179,7 @@ open class GenUniModulesUviewUltraComponentsUpSearchUpSearch : VueComponent {
     @Suppress("USELESS_CAST")
     override fun data(): Map<String, Any?> {
         return _uM("parent" to null as ComponentPublicInstance?, "parentData" to _uO(), "children" to _uA<ComponentPublicInstance>(), "childrenRefs" to _uA<String>(), "keyword" to "", "show" to false, "focused" to false, "showActionBtn" to computed<Boolean>(fun(): Boolean {
-            return !this.animation && this.showAction
+            return !isTruthy(this.animation) && this.showAction
         }
         ), "isShowClear" to computed<Boolean>(fun(): Boolean {
             var clearabled = this.`$props`["clearabled"] as Boolean
@@ -337,7 +337,7 @@ open class GenUniModulesUviewUltraComponentsUpSearchUpSearch : VueComponent {
     open var getFocus = ::gen_getFocus_fn
     open fun gen_getFocus_fn() {
         this.focused = true
-        if (this.animation && this.showAction) {
+        if (isTruthy(this.animation) && isTruthy(this.showAction)) {
             this.show = true
         }
         this.`$emit`("focus", this.keyword)
@@ -353,7 +353,7 @@ open class GenUniModulesUviewUltraComponentsUpSearchUpSearch : VueComponent {
     }
     open var clickHandler = ::gen_clickHandler_fn
     open fun gen_clickHandler_fn() {
-        if (this.disabled) {
+        if (isTruthy(this.disabled)) {
             this.`$emit`("click")
         }
     }

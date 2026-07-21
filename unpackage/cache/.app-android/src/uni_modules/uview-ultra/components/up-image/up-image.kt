@@ -231,7 +231,7 @@ open class GenUniModulesUviewUltraComponentsUpImageUpImage : VueComponent {
             __expose(_uM("onClick" to onClick, "onErrorHandler" to onErrorHandler, "onLoadHandler" to onLoadHandler))
             return fun(): Any? {
                 val _component_up_icon = resolveEasyComponent("up-icon", GenUniModulesUviewUltraComponentsUpIconUpIconClass)
-                return _cE("view", _uM("mode" to "fade", "show" to show.value, "duration" to if (_ctx.fade) {
+                return _cE("view", _uM("mode" to "fade", "show" to show.value, "duration" to if (isTruthy(_ctx.fade)) {
                     1000
                 } else {
                     0
@@ -252,7 +252,12 @@ open class GenUniModulesUviewUltraComponentsUpImageUpImage : VueComponent {
                             "mode",
                             "lazy-load"
                         )),
-                        if (isTrue(_ctx.showLoading && loading.value)) {
+                        if (isTrue(if (isTruthy(_ctx.showLoading)) {
+                            loading.value
+                        } else {
+                            _ctx.showLoading
+                        }
+                        )) {
                             _cE("view", _uM("key" to 0, "class" to "up-image__loading", "style" to _nS(_uM("borderRadius" to if (_ctx.shape == "circle") {
                                 "50%"
                             } else {
@@ -272,7 +277,12 @@ open class GenUniModulesUviewUltraComponentsUpImageUpImage : VueComponent {
                             _cC("v-if", true)
                         }
                         ,
-                        if (isTrue(_ctx.showError && isError.value && !loading.value)) {
+                        if (isTrue((if (isTruthy(_ctx.showError)) {
+                            isError.value
+                        } else {
+                            _ctx.showError
+                        }
+                        ) && !loading.value)) {
                             _cE("view", _uM("key" to 1, "class" to "up-image__error", "style" to _nS(_uM("borderRadius" to if (_ctx.shape == "circle") {
                                 "50%"
                             } else {

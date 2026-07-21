@@ -44,7 +44,7 @@ open class GenUniModulesUviewUltraComponentsUpLoadingIconUpLoadingIcon : VueComp
             _cE("view", _uM("key" to 0, "class" to _nC(_uA(
                 "up-loading-icon",
                 _uA(
-                    if (_ctx.vertical) {
+                    if (isTruthy(_ctx.vertical)) {
                         "up-loading-icon--vertical"
                     } else {
                         ""
@@ -284,7 +284,7 @@ open class GenUniModulesUviewUltraComponentsUpLoadingIconUpLoadingIcon : VueComp
     }
     open var startRotate = ::gen_startRotate_fn
     open fun gen_startRotate_fn(): Unit {
-        if (!this.show || this.animationFrame > 0) {
+        if (!isTruthy(this.show) || this.animationFrame > 0) {
             return
         }
         this.animationFrame = setInterval(fun(){

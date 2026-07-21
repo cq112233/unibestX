@@ -89,7 +89,7 @@ open class GenUniModulesUviewUltraComponentsUpTabbarItemUpTabbarItem : VueCompon
                 ,
                 _cV(_component_up_badge, _uM("absolute" to "", "offset" to _uA(
                     0,
-                    if (_ctx.dot) {
+                    if (isTruthy(_ctx.dot)) {
                         "34rpx"
                     } else {
                         if (_ctx.badge != null && parseInt(_ctx.badge!!.toString()) > 9) {
@@ -99,7 +99,7 @@ open class GenUniModulesUviewUltraComponentsUpTabbarItemUpTabbarItem : VueCompon
                         }
                     }
                 ), "customStyle" to _ctx.badgeStyle, "isDot" to _ctx.dot, "value" to if (_ctx.badge != null) {
-                    if (_ctx.dot) {
+                    if (isTruthy(_ctx.dot)) {
                         1
                     } else {
                         _ctx.badge
@@ -107,7 +107,7 @@ open class GenUniModulesUviewUltraComponentsUpTabbarItemUpTabbarItem : VueCompon
                 } else {
                     0
                 }
-                , "show" to if (_ctx.dot) {
+                , "show" to if (isTruthy(_ctx.dot)) {
                     true
                 } else {
                     if (_ctx.badge != null) {

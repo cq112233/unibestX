@@ -82,7 +82,7 @@ open class GenUniModulesUviewUltraComponentsUpSubsectionUpSubsection : VueCompon
                             ""
                         }
                         ,
-                        if (_ctx.disabled) {
+                        if (isTruthy(_ctx.disabled)) {
                             "up-subsection__item--disabled"
                         } else {
                             ""
@@ -99,7 +99,7 @@ open class GenUniModulesUviewUltraComponentsUpSubsectionUpSubsection : VueCompon
                             _cE("text", _uM("class" to _nC(_uA(
                                 "up-subsection__item__text",
                                 _uA(
-                                    if (_ctx.disabled) {
+                                    if (isTruthy(_ctx.disabled)) {
                                         "up-subsection__item__text--disabled"
                                     } else {
                                         ""
@@ -357,13 +357,13 @@ open class GenUniModulesUviewUltraComponentsUpSubsectionUpSubsection : VueCompon
     open var textStyle = ::gen_textStyle_fn
     open fun gen_textStyle_fn(index: Number): UTSJSONObject {
         val style: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-subsection/up-subsection.uvue", 216, 10))
-        if (this.disabled) {
+        if (isTruthy(this.disabled)) {
             style["fontWeight"] = "normal"
             style["fontSize"] = uni.UNI5198058.addUnit(this.fontSize)
             style["color"] = "#c8c9cc"
             return style
         }
-        style["fontWeight"] = if (this.bold && this.innerCurrent === index) {
+        style["fontWeight"] = if (isTruthy(this.bold) && this.innerCurrent === index) {
             "bold"
         } else {
             "normal"
@@ -427,7 +427,7 @@ open class GenUniModulesUviewUltraComponentsUpSubsectionUpSubsection : VueCompon
     }
     open var clickHandler = ::gen_clickHandler_fn
     open fun gen_clickHandler_fn(index: Number) {
-        if (this.disabled) {
+        if (isTruthy(this.disabled)) {
             return
         }
         this.innerCurrent = index

@@ -251,7 +251,7 @@ open class GenUniModulesUviewUltraComponentsUpTransitionUpTransition : VueCompon
             "afterEnter"
         }
         )
-        if (!this.show && this.display) {
+        if (!isTruthy(this.show) && this.display) {
             this.display = false
             this.inited = false
         }

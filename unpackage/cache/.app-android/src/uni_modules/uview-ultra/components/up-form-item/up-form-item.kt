@@ -248,7 +248,12 @@ open class GenUniModulesUviewUltraComponentsUpFormItemUpFormItem : VueComponent 
                     ))), _uA(
                         renderSlot(_ctx.`$slots`, "label", _uO(), fun(): UTSArray<Any> {
                             return _uA(
-                                if (isTrue(_ctx.required || _ctx.leftIcon != "" || _ctx.label != "")) {
+                                if (isTrue((if (isTruthy(_ctx.required)) {
+                                    _ctx.required
+                                } else {
+                                    _ctx.leftIcon != ""
+                                }
+                                ) || _ctx.label != "")) {
                                     _cE("view", _uM("key" to 0, "class" to "up-form-item__body__left", "style" to _nS(_uM("width" to _ctx.`$up`.addUnit(if (_ctx.labelWidth != "") {
                                         _ctx.labelWidth
                                     } else {

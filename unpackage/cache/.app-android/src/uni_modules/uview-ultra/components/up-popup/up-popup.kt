@@ -44,8 +44,17 @@ open class GenUniModulesUviewUltraComponentsUpPopupUpPopup : VueComponent {
                 _ctx.customClass
             )
         ))), _uA(
-            if (isTrue(_ctx.overlay && !_ctx.pageInline)) {
-                _cV(_component_up_overlay, _uM("key" to 0, "show" to (_ctx.show && !_ctx.pageInline), "onClick" to _ctx.overlayClick, "zIndex" to _ctx.zIndex, "duration" to _ctx.overlayDuration, "customStyle" to _ctx.overlayStyle, "opacity" to _ctx.overlayOpacity), null, 8, _uA(
+            if (isTrue(if (isTruthy(_ctx.overlay)) {
+                !isTruthy(_ctx.pageInline)
+            } else {
+                _ctx.overlay
+            }
+            )) {
+                _cV(_component_up_overlay, _uM("key" to 0, "show" to if (isTruthy(_ctx.show)) {
+                    !isTruthy(_ctx.pageInline)
+                } else {
+                    _ctx.show
+                }, "onClick" to _ctx.overlayClick, "zIndex" to _ctx.zIndex, "duration" to _ctx.overlayDuration, "customStyle" to _ctx.overlayStyle, "opacity" to _ctx.overlayOpacity), null, 8, _uA(
                     "show",
                     "onClick",
                     "zIndex",
@@ -57,12 +66,12 @@ open class GenUniModulesUviewUltraComponentsUpPopupUpPopup : VueComponent {
                 _cC("v-if", true)
             }
             ,
-            _cV(_component_up_transition, _uM("show" to if (_ctx.pageInline) {
+            _cV(_component_up_transition, _uM("show" to if (isTruthy(_ctx.pageInline)) {
                 true
             } else {
                 _ctx.show
             }
-            , "customStyle" to _ctx.transitionStyle, "mode" to if (_ctx.pageInline) {
+            , "customStyle" to _ctx.transitionStyle, "mode" to if (isTruthy(_ctx.pageInline)) {
                 "none"
             } else {
                 _ctx.position
@@ -150,7 +159,7 @@ open class GenUniModulesUviewUltraComponentsUpPopupUpPopup : VueComponent {
     override fun data(): Map<String, Any?> {
         return _uM("parent" to null as ComponentPublicInstance?, "parentData" to _uO(), "children" to _uA<ComponentPublicInstance>(), "childrenRefs" to _uA<String>(), "overlayDuration" to 0, "transitionStyle" to computed<Any>(fun(): Any {
             val style: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-popup/up-popup.uvue", 101, 11), "display" to "flex")
-            if (!this.pageInline) {
+            if (!isTruthy(this.pageInline)) {
                 style["zIndex"] = parseInt(this.zIndex!!!!.toString()) + 1
                 style["position"] = "fixed"
             }
@@ -193,7 +202,7 @@ open class GenUniModulesUviewUltraComponentsUpPopupUpPopup : VueComponent {
         }
         ), "position" to computed<String>(fun(): String {
             if (this.mode === "center") {
-                return if (this.zoom) {
+                return if (isTruthy(this.zoom)) {
                     "fade-zoom"
                 } else {
                     "fade"
@@ -318,7 +327,7 @@ open class GenUniModulesUviewUltraComponentsUpPopupUpPopup : VueComponent {
     }
     open var overlayClick = ::gen_overlayClick_fn
     open fun gen_overlayClick_fn(): Unit {
-        if (this.closeOnClickOverlay) {
+        if (isTruthy(this.closeOnClickOverlay)) {
             this.`$emit`("update:show", false)
             this.`$emit`("close")
         }
