@@ -202,7 +202,7 @@ open class GenSrcSubUviewUltraComponentsDemoShow : VueComponent {
                     )),
                     _cE("view", _uM("class" to "demo-block"), _uA(
                         _cE("text", _uM("class" to "demo-label"), " up-list "),
-                        _cV(_component_up_list, _uM("height" to 300, "lower-threshold" to 20, "refresher-enabled" to true, "refresher-triggered" to listRefreshing.value, "onScrolltolower" to onListLoadMore, "onRefresherrefresh" to onListRefresh), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
+                        _cV(_component_up_list, _uM("height" to 300, "custom-nested-scroll" to true, "lower-threshold" to 20, "refresher-enabled" to true, "refresher-triggered" to listRefreshing.value, "onScrolltolower" to onListLoadMore, "onRefresherrefresh" to onListRefresh), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                             return _uA(
                                 _cE(Fragment, null, RenderHelpers.renderList(listItems.value, fun(item, idx, __index, _cached): Any {
                                     return _cE("view", _uM("key" to idx, "class" to "demo-list-cell"), _uA(

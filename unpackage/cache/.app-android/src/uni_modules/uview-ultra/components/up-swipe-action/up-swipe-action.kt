@@ -187,7 +187,7 @@ open class GenUniModulesUviewUltraComponentsUpSwipeActionUpSwipeAction : VueComp
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "autoClose" to _uM("type" to "Boolean", "default" to default__56["autoClose"]), "opendItem" to _uM("type" to "Boolean", "default" to false)))
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "autoClose" to _uM("type" to "Boolean", "default" to default__52["autoClose"]), "opendItem" to _uM("type" to "Boolean", "default" to false)))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

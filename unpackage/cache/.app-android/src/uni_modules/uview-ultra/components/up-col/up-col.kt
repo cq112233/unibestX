@@ -229,10 +229,10 @@ open class GenUniModulesUviewUltraComponentsUpColUpCol : VueComponent {
         ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "span" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__53.getNumber("col.span")), "offset" to _uM("type" to _uA(
+        ), "default" to default__60.getNumber("col.span")), "offset" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__53.getNumber("col.offset")), "justify" to _uM("type" to "String", "default" to default__53.getString("col.justify")), "align" to _uM("type" to "String", "default" to default__53.getString("col.align")), "textAlign" to _uM("type" to "String", "default" to default__53.getString("col.textAlign"))))
+        ), "default" to default__60.getNumber("col.offset")), "justify" to _uM("type" to "String", "default" to default__60.getString("col.justify")), "align" to _uM("type" to "String", "default" to default__60.getString("col.align")), "textAlign" to _uM("type" to "String", "default" to default__60.getString("col.textAlign"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

@@ -247,7 +247,7 @@ open class GenUniModulesUviewUltraComponentsUpGridUpGrid : VueComponent {
         ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "col" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__64.getNumber("grid.col")), "border" to _uM("type" to "Boolean", "default" to default__64.getBoolean("grid.border")), "align" to _uM("type" to "String", "default" to default__64.getString("grid.align"))))
+        ), "default" to default__63.getNumber("grid.col")), "border" to _uM("type" to "Boolean", "default" to default__63.getBoolean("grid.border")), "align" to _uM("type" to "String", "default" to default__63.getString("grid.align"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

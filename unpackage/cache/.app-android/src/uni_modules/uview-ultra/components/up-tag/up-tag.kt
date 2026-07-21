@@ -371,16 +371,16 @@ open class GenUniModulesUviewUltraComponentsUpTagUpTag : VueComponent {
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "type" to _uM("type" to "String", "default" to crtProp__3["type"]), "disabled" to _uM("type" to _uA(
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "type" to _uM("type" to "String", "default" to crtProp__16["type"]), "disabled" to _uM("type" to _uA(
             "Boolean",
             "String"
-        ), "default" to crtProp__3["disabled"]), "size" to _uM("type" to "String", "default" to crtProp__3["size"]), "shape" to _uM("type" to "String", "default" to crtProp__3["shape"]), "text" to _uM("type" to _uA(
+        ), "default" to crtProp__16["disabled"]), "size" to _uM("type" to "String", "default" to crtProp__16["size"]), "shape" to _uM("type" to "String", "default" to crtProp__16["shape"]), "text" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__3["text"]), "bgColor" to _uM("type" to "String", "default" to crtProp__3["bgColor"]), "color" to _uM("type" to "String", "default" to crtProp__3["color"]), "borderColor" to _uM("type" to "String", "default" to crtProp__3["borderColor"]), "closeColor" to _uM("type" to "String", "default" to crtProp__3["closeColor"]), "name" to _uM("type" to _uA(
+        ), "default" to crtProp__16["text"]), "bgColor" to _uM("type" to "String", "default" to crtProp__16["bgColor"]), "color" to _uM("type" to "String", "default" to crtProp__16["color"]), "borderColor" to _uM("type" to "String", "default" to crtProp__16["borderColor"]), "closeColor" to _uM("type" to "String", "default" to crtProp__16["closeColor"]), "name" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__3["name"]), "plainFill" to _uM("type" to "Boolean", "default" to crtProp__3["plainFill"]), "plain" to _uM("type" to "Boolean", "default" to crtProp__3["plain"]), "closable" to _uM("type" to "Boolean", "default" to crtProp__3["closable"]), "show" to _uM("type" to "Boolean", "default" to crtProp__3["show"]), "icon" to _uM("type" to "String", "default" to crtProp__3["icon,"]), "iconColor" to _uM("type" to "String", "default" to crtProp__3["iconColor"])))
+        ), "default" to crtProp__16["name"]), "plainFill" to _uM("type" to "Boolean", "default" to crtProp__16["plainFill"]), "plain" to _uM("type" to "Boolean", "default" to crtProp__16["plain"]), "closable" to _uM("type" to "Boolean", "default" to crtProp__16["closable"]), "show" to _uM("type" to "Boolean", "default" to crtProp__16["show"]), "icon" to _uM("type" to "String", "default" to crtProp__16["icon,"]), "iconColor" to _uM("type" to "String", "default" to crtProp__16["iconColor"])))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

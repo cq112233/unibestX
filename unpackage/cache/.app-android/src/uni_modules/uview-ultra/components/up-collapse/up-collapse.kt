@@ -264,9 +264,9 @@ open class GenUniModulesUviewUltraComponentsUpCollapseUpCollapse : VueComponent 
             "Number",
             "Array"
         ), "default" to fun(): String? {
-            return default__95.getString("collapse.value")
+            return default__93.getString("collapse.value")
         }
-        ), "accordion" to _uM("type" to "Boolean", "default" to default__95.getBoolean("collapse.accordion")), "border" to _uM("type" to "Boolean", "default" to default__95.getBoolean("collapse.border"))))
+        ), "accordion" to _uM("type" to "Boolean", "default" to default__93.getBoolean("collapse.accordion")), "border" to _uM("type" to "Boolean", "default" to default__93.getBoolean("collapse.border"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

@@ -231,7 +231,7 @@ open class GenUniModulesUviewUltraComponentsUpIndexItemUpIndexItem : VueComponen
         ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "text" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__45.getString("indexItem.text"))))
+        ), "default" to default__43.getString("indexItem.text"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

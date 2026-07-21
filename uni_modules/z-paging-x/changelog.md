@@ -1,3 +1,11 @@
+## 0.4.0（2026-06-11）
+1.`新增` props：`refresher-complete-text`、`refresher-complete-delay`、`refresher-complete-duration`，支持下拉刷新结束状态(complete状态)。  
+2.`新增` props：`layout-only`，是否只使用基础布局，设置为true后将关闭mounted自动请求数据、关闭下拉刷新和滚动到底部加载更多，强制隐藏空数据图。  
+3.`新增` 方法：`refresh`，刷新列表数据，pageNo和pageSize不会重置，列表数据会重新从服务端获取。  
+4.`新增` 方法：`endRefresh`，直接结束下拉刷新状态。  
+5.`新增` events：`@onRefresh`，自定义下拉刷新被触发。  
+6.`新增` demo：`common-setup-demo`，普通模式演示(组合式API写法)。  
+7.`优化` props注释统一为JSDoc格式。
 ## 0.3.6（2025-08-07）
 1.`新增` 添加编译到鸿蒙Next的支持。  
 2.`新增` `@query`新增`from`(触发来源)参数。  

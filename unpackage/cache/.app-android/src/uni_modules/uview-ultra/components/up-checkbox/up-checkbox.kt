@@ -529,25 +529,25 @@ open class GenUniModulesUviewUltraComponentsUpCheckboxUpCheckbox : VueComponent 
             "String",
             "Number",
             "Boolean"
-        ), "default" to default__71.getAny("checkbox.name")), "shape" to _uM("type" to "String", "default" to default__71.getString("checkbox.shape")), "size" to _uM("type" to _uA(
+        ), "default" to default__70.getAny("checkbox.name")), "shape" to _uM("type" to "String", "default" to default__70.getString("checkbox.shape")), "size" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__71.getAny("checkbox.size")), "checked" to _uM("type" to "Boolean", "default" to default__71.getBoolean("checkbox.checked")), "disabled" to _uM("type" to _uA(
+        ), "default" to default__70.getAny("checkbox.size")), "checked" to _uM("type" to "Boolean", "default" to default__70.getBoolean("checkbox.checked")), "disabled" to _uM("type" to _uA(
             "String",
             "Boolean"
-        ), "default" to default__71.getAny("checkbox.disabled")), "activeColor" to _uM("type" to "String", "default" to default__71.getString("checkbox.activeColor")), "inactiveColor" to _uM("type" to "String", "default" to default__71.getString("checkbox.inactiveColor")), "iconSize" to _uM("type" to _uA(
+        ), "default" to default__70.getAny("checkbox.disabled")), "activeColor" to _uM("type" to "String", "default" to default__70.getString("checkbox.activeColor")), "inactiveColor" to _uM("type" to "String", "default" to default__70.getString("checkbox.inactiveColor")), "iconSize" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__71.getAny("checkbox.iconSize")), "iconColor" to _uM("type" to "String", "default" to default__71.getString("checkbox.iconColor")), "label" to _uM("type" to _uA(
+        ), "default" to default__70.getAny("checkbox.iconSize")), "iconColor" to _uM("type" to "String", "default" to default__70.getString("checkbox.iconColor")), "label" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__71.getAny("checkbox.label")), "labelColor" to _uM("type" to "String", "default" to default__71.getString("checkbox.labelColor")), "labelSize" to _uM("type" to _uA(
+        ), "default" to default__70.getAny("checkbox.label")), "labelColor" to _uM("type" to "String", "default" to default__70.getString("checkbox.labelColor")), "labelSize" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__71.getAny("checkbox.labelSize")), "labelDisabled" to _uM("type" to _uA(
+        ), "default" to default__70.getAny("checkbox.labelSize")), "labelDisabled" to _uM("type" to _uA(
             "String",
             "Boolean"
-        ), "default" to default__71.getAny("checkbox.labelDisabled")), "customStyle" to _uM("default" to fun(): UTSJSONObject {
+        ), "default" to default__70.getAny("checkbox.labelDisabled")), "customStyle" to _uM("default" to fun(): UTSJSONObject {
             return (_uO())
         }
         ), "usedAlone" to _uM("type" to "Boolean", "default" to false)))

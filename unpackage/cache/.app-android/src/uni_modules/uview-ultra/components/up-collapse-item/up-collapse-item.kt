@@ -389,31 +389,31 @@ open class GenUniModulesUviewUltraComponentsUpCollapseItemUpCollapseItem : VueCo
             "String"
         ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "title" to _uM("type" to _uA(
             "String"
-        ), "default" to default__94.getString("collapseItem.title")), "value" to _uM("type" to _uA(
+        ), "default" to default__92.getString("collapseItem.title")), "value" to _uM("type" to _uA(
             "String"
-        ), "default" to default__94.getString("collapseItem.value")), "label" to _uM("type" to _uA(
+        ), "default" to default__92.getString("collapseItem.value")), "label" to _uM("type" to _uA(
             "String"
-        ), "default" to default__94.getString("collapseItem.label")), "disabled" to _uM("type" to _uA(
+        ), "default" to default__92.getString("collapseItem.label")), "disabled" to _uM("type" to _uA(
             "Boolean"
-        ), "default" to default__94.getBoolean("collapseItem.disabled")), "isLink" to _uM("type" to _uA(
+        ), "default" to default__92.getBoolean("collapseItem.disabled")), "isLink" to _uM("type" to _uA(
             "Boolean"
-        ), "default" to default__94.getBoolean("collapseItem.isLink")), "clickable" to _uM("type" to _uA(
+        ), "default" to default__92.getBoolean("collapseItem.isLink")), "clickable" to _uM("type" to _uA(
             "Boolean"
-        ), "default" to default__94.getBoolean("collapseItem.clickable")), "border" to _uM("type" to _uA(
+        ), "default" to default__92.getBoolean("collapseItem.clickable")), "border" to _uM("type" to _uA(
             "Boolean"
-        ), "default" to default__94.getBoolean("collapseItem.border")), "align" to _uM("type" to _uA(
+        ), "default" to default__92.getBoolean("collapseItem.border")), "align" to _uM("type" to _uA(
             "String"
-        ), "default" to default__94.getString("collapseItem.align")), "name" to _uM("type" to _uA(
+        ), "default" to default__92.getString("collapseItem.align")), "name" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__94.getString("collapseItem.name")), "icon" to _uM("type" to _uA(
+        ), "default" to default__92.getString("collapseItem.name")), "icon" to _uM("type" to _uA(
             "String"
-        ), "default" to default__94.getString("collapseItem.icon")), "duration" to _uM("type" to _uA(
+        ), "default" to default__92.getString("collapseItem.icon")), "duration" to _uM("type" to _uA(
             "Number",
             "String"
-        ), "default" to default__94.getNumber("collapseItem.duration")), "showRight" to _uM("type" to _uA(
+        ), "default" to default__92.getNumber("collapseItem.duration")), "showRight" to _uM("type" to _uA(
             "Boolean"
-        ), "default" to default__94.getBoolean("collapseItem.showRight"))))
+        ), "default" to default__92.getBoolean("collapseItem.showRight"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

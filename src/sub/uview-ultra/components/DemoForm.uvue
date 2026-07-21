@@ -1,292 +1,245 @@
 <template>
   <view>
     <!-- ==================== 表单组件 ==================== -->
-      <text class="section-title">
-        表单组件
+    <text class="section-title">
+      表单组件
+    </text>
+
+    <!-- Input 输入框 -->
+    <view class="demo-block">
+      <text class="demo-label">
+        up-input
       </text>
+      <up-input v-model="inputValue" placeholder="请输入内容" border="surround" clearable></up-input>
+      <view class="h-10px"></view>
+      <up-input v-model="passwordValue" placeholder="请输入密码" :password="true" border="surround"></up-input>
+    </view>
 
-      <!-- Input 输入框 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-input
-        </text>
-        <up-input v-model="inputValue" placeholder="请输入内容" border="surround" clearable></up-input>
-        <view class="h-10px"></view>
-        <up-input v-model="passwordValue" placeholder="请输入密码" :password="true" border="surround"></up-input>
-        <view class="h-10px"></view>
-        <up-input placeholder="带图标" prefix-icon="search" border="surround"></up-input>
+    <!-- Search 搜索 -->
+    <view class="demo-block">
+      <text class="demo-label">
+        up-search
+      </text>
+      <up-search v-model="searchValue" placeholder="搜索关键字" :show-action="true" action-text="搜索"></up-search>
+    </view>
+
+    <!-- Switch 开关 -->
+    <view class="demo-block">
+      <text class="demo-label">
+        up-switch
+      </text>
+      <view class="demo-row-start">
+        <up-switch v-model="switchValue1"></up-switch>
+        <view class="w-20px"></view>
+        <up-switch v-model="switchValue2" active-color="#fa3534"></up-switch>
       </view>
+    </view>
 
-      <!-- Search 搜索 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-search
-        </text>
-        <up-search v-model="searchValue" placeholder="搜索关键字" :show-action="true" action-text="搜索"></up-search>
+    <!-- Checkbox 复选框 -->
+    <view class="demo-block">
+      <text class="demo-label">
+        up-checkbox
+      </text>
+      <up-checkbox-group v-model="checkboxValue" placement="row">
+        <up-checkbox name="apple" label="苹果" :checked="true"></up-checkbox>
+        <up-checkbox name="banana" label="香蕉"></up-checkbox>
+      </up-checkbox-group>
+    </view>
+
+    <!-- Radio 单选框 -->
+    <view class="demo-block">
+      <text class="demo-label">
+        up-radio
+      </text>
+      <up-radio-group v-model="radioValue" placement="row">
+        <up-radio name="male" label="男"></up-radio>
+        <up-radio name="female" label="女"></up-radio>
+      </up-radio-group>
+    </view>
+
+    <!-- Slider 滑块 -->
+    <view class="demo-block">
+      <text class="demo-label">
+        up-slider
+      </text>
+      <up-slider v-model="sliderValue" :min="0" :max="100" :step="1" :show-value="true"></up-slider>
+    </view>
+
+    <!-- Rate 评分 -->
+    <view class="demo-block">
+      <text class="demo-label">
+        up-rate
+      </text>
+      <view class="demo-row">
+        <up-rate v-model="rateValue" :count="5"></up-rate>
+        <text class="text-14px text-[#909399] ml-10px">{{ rateValue }} 分</text>
       </view>
+    </view>
 
-      <!-- Switch 开关 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-switch
-        </text>
-        <view class="demo-row-start">
-          <up-switch v-model="switchValue1"></up-switch>
-          <view class="w-20px"></view>
-          <up-switch v-model="switchValue2" active-color="#fa3534"></up-switch>
-          <view class="w-20px"></view>
-          <up-switch :disabled="true"></up-switch>
-          <view class="w-20px"></view>
-          <up-switch :loading="true"></up-switch>
-        </view>
+    <!-- NumberBox 步进器 -->
+    <view class="demo-block">
+      <text class="demo-label">
+        up-number-box
+      </text>
+      <view class="demo-row-start">
+        <up-number-box v-model="numberValue" :min="0" :max="100"></up-number-box>
       </view>
+    </view>
 
-      <!-- Checkbox 复选框 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-checkbox
-        </text>
-        <up-checkbox-group v-model="checkboxValue" placement="row">
-          <up-checkbox name="apple" label="苹果" :checked="true"></up-checkbox>
-          <up-checkbox name="banana" label="香蕉"></up-checkbox>
-          <up-checkbox name="orange" label="橙子"></up-checkbox>
-        </up-checkbox-group>
-      </view>
-
-      <!-- Radio 单选框 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-radio
-        </text>
-        <up-radio-group v-model="radioValue" placement="row">
-          <up-radio name="male" label="男"></up-radio>
-          <up-radio name="female" label="女"></up-radio>
-        </up-radio-group>
-      </view>
-
-      <!-- Slider 滑块 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-slider
-        </text>
-        <up-slider v-model="sliderValue" :min="0" :max="100" :step="1" :show-value="true"></up-slider>
-      </view>
-
-      <!-- Rate 评分 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-rate
-        </text>
-        <view class="demo-row">
-          <up-rate v-model="rateValue" :count="5"></up-rate>
-          <text class="text-14px text-[#909399] ml-10px">{{ rateValue }} 分</text>
-        </view>
-      </view>
-
-      <!-- NumberBox 步进器 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-number-box
-        </text>
-        <view class="demo-row-start">
-          <up-number-box v-model="numberValue" :min="0" :max="100"></up-number-box>
-        </view>
-      </view>
-
-      <!-- Form 表单 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          基础使用
-        </text>
-        <up-form
-          ref="uForm"
-          :model="formModel"
-          :rules="formRules"
-          label-width="80px"
-          error-type="toast"
-        >
-          <up-form-item label="姓名" prop="name" :border-bottom="true">
-            <up-input v-model="formModel.name" placeholder="请输入姓名" border="none"></up-input>
-          </up-form-item>
-          <up-form-item label="性别" prop="gender" :border-bottom="true" @click="genderActionShow = true">
-            <view class="flex-row items-center justify-between w-full">
-              <text class="text-15px" :class="formModel.gender == '' ? 'text-[#c0c4cc]' : 'text-[#303133]'">{{ formModel.gender != '' ? formModel.gender : '请选择性别' }}</text>
-              <up-icon name="arrow-right" color="#c0c4cc" size="16"></up-icon>
-            </view>
-          </up-form-item>
-          <up-form-item label="年龄" prop="age" :border-bottom="true">
-            <up-input v-model="formModel.age" type="number" placeholder="请输入年龄" border="none" :custom-style="{ backgroundColor: '#f2f3f5', padding: '4px 10px', borderRadius: '4px', width: '100%' }"></up-input>
-          </up-form-item>
-          <up-form-item label="水果" prop="fruit" :border-bottom="true">
-            <up-radio-group v-model="formModel.fruit" placement="row">
-              <up-radio name="apple" label="苹果" shape="circle"></up-radio>
-              <up-radio name="banana" label="香蕉" shape="circle"></up-radio>
-              <up-radio name="orange" label="毒橙子" shape="circle"></up-radio>
-            </up-radio-group>
-          </up-form-item>
-          <up-form-item label="兴趣爱好" prop="hobbies" :border-bottom="true">
-            <up-checkbox-group v-model="formModel.hobbies" placement="row">
-              <up-checkbox name="badminton" label="羽毛球"></up-checkbox>
-              <up-checkbox name="running" label="跑步"></up-checkbox>
-              <up-checkbox name="climbing" label="爬山"></up-checkbox>
-            </up-checkbox-group>
-          </up-form-item>
-          <up-form-item label="简介" prop="intro" :border-bottom="true">
-            <up-textarea v-model="formModel.intro" placeholder="不低于3个字" count maxlength="140" height="80px"></up-textarea>
-          </up-form-item>
-          <up-form-item label="住店时间" prop="stayTime" :border-bottom="true" @click="calendarShow = true">
-            <view class="flex-row items-center justify-between w-full">
-              <text class="text-15px" :class="formModel.stayTime == '' ? 'text-[#c0c4cc]' : 'text-[#303133]'">{{ formModel.stayTime != '' ? formModel.stayTime : '请选择住店和离店时间' }}</text>
-              <up-icon name="arrow-right" color="#c0c4cc" size="16"></up-icon>
-            </view>
-          </up-form-item>
-          <up-form-item label="验证码" prop="code" :border-bottom="true">
-            <view class="flex-row items-center justify-between w-full">
-              <up-input v-model="formModel.code" placeholder="请填写验证码" border="none" class="flex-1"></up-input>
-              <up-button type="success" text="获取验证码" size="mini" :custom-style="{ backgroundColor: '#4cd964', border: 'none', color: '#fff', marginLeft: '10px' }"></up-button>
-            </view>
-          </up-form-item>
-          <up-form-item label="生日" prop="birthday" :border-bottom="true" @click="datetimePickerShow = true">
-            <view class="flex-row items-center justify-between w-full">
-              <text class="text-15px" :class="formModel.birthday == '' ? 'text-[#c0c4cc]' : 'text-[#303133]'">{{ formModel.birthday != '' ? formModel.birthday : '请选择生日' }}</text>
-              <up-icon name="arrow-right" color="#c0c4cc" size="16"></up-icon>
-            </view>
-          </up-form-item>
-        </up-form>
-        <view class="mt-15px flex-row justify-between">
-          <up-button type="primary" text="提交" size="mini" @click="submitForm"></up-button>
-          <up-button type="info" text="重置" size="mini" @click="resetForm"></up-button>
-        </view>
-      </view>
-
-      <!-- Calendar 日历 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-calendar
-        </text>
-        <view class="demo-row-start items-center">
-          <up-button type="primary" text="选择日期" size="mini" @click="calendarShow = true"></up-button>
-          <view class="w-15px"></view>
-          <text class="text-14px text-[#606266]">{{ calendarValue != '' ? `已选日期: ${calendarValue}` : '未选择日期' }}</text>
-        </view>
-      </view>
-
-      <!-- Keyboard 键盘 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-keyboard
-        </text>
-        <view class="demo-row-start items-center">
-          <view class="flex-1">
-            <up-input v-model="keyboardValue" placeholder="通过键盘输入内容" border="surround" readonly @click="openKeyboard('number')"></up-input>
+    <!-- Form 表单 -->
+    <view class="demo-block">
+      <text class="demo-label">
+        基础使用
+      </text>
+      <up-form
+        ref="uForm"
+        :model="formModel"
+        :rules="formRules"
+        label-width="80px"
+        error-type="toast"
+      >
+        <up-form-item label="姓名" prop="name" :border-bottom="true">
+          <up-input v-model="formModel.name" placeholder="请输入姓名" border="none"></up-input>
+        </up-form-item>
+        <up-form-item label="性别" prop="gender" :border-bottom="true" @click="genderActionShow = true">
+          <view class="flex-row items-center justify-between w-full">
+            <text class="text-15px" :class="formModel.gender == '' ? 'text-[#c0c4cc]' : 'text-[#303133]'">{{ formModel.gender != '' ? formModel.gender : '请选择性别' }}</text>
+            <up-icon name="arrow-right" color="#c0c4cc" size="16"></up-icon>
           </view>
-          <view class="w-10px"></view>
-          <up-button type="info" text="清空" size="mini" @click="keyboardValue = ''"></up-button>
-        </view>
-        <view class="demo-row-start mt-10px">
-          <up-button type="primary" text="数字键盘" size="mini" @click="openKeyboard('number')"></up-button>
-          <view class="w-10px"></view>
-          <up-button type="primary" text="身份证键盘" size="mini" @click="openKeyboard('card')"></up-button>
-          <view class="w-10px"></view>
-          <up-button type="primary" text="车牌号键盘" size="mini" @click="openKeyboard('car')"></up-button>
-        </view>
+        </up-form-item>
+      </up-form>
+      <view class="mt-15px flex-row justify-between">
+        <up-button type="primary" text="提交" size="mini" @click="submitForm"></up-button>
+        <up-button type="info" text="重置" size="mini" @click="resetForm"></up-button>
       </view>
+    </view>
 
-      <!-- Picker 选择器 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-picker
-        </text>
-        <view class="demo-row-start items-center">
-          <up-button type="primary" text="选择国家" size="mini" @click="pickerShow = true"></up-button>
-          <view class="w-15px"></view>
-          <text class="text-14px text-[#606266]">{{ pickerValue != '' ? `已选: ${pickerValue}` : '未选择' }}</text>
-        </view>
+    <!-- Calendar 日历 -->
+    <view class="demo-block">
+      <text class="demo-label">
+        up-calendar
+      </text>
+      <view class="demo-row-start items-center">
+        <up-button type="primary" text="选择日期" size="mini" @click="calendarShow = true"></up-button>
+        <view class="w-15px"></view>
+        <text class="text-14px text-[#606266]">{{ calendarValue != '' ? `已选日期: ${calendarValue}` : '未选择日期' }}</text>
       </view>
+    </view>
 
-      <!-- DatetimePicker 时间选择器 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-datetime-picker
-        </text>
-        <view class="demo-row-start items-center">
-          <up-button type="primary" text="选择日期" size="mini" @click="datetimePickerShow = true"></up-button>
-          <view class="w-15px"></view>
-          <text class="text-14px text-[#606266]">{{ datetimePickerLabel != '' ? `已选: ${datetimePickerLabel}` : '未选择' }}</text>
+    <!-- Keyboard 键盘 -->
+    <view class="demo-block">
+      <text class="demo-label">
+        up-keyboard
+      </text>
+      <view class="demo-row-start items-center">
+        <view class="flex-1">
+          <up-input v-model="keyboardValue" placeholder="通过键盘输入内容" border="surround" readonly @click="openKeyboard('number')"></up-input>
         </view>
+        <view class="w-10px"></view>
+        <up-button type="info" text="清空" size="mini" @click="keyboardValue = ''"></up-button>
       </view>
-
-      <!-- Upload 上传 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-upload
-        </text>
-        <view class="demo-row-start">
-          <up-upload
-            :file-list="uploadList"
-            :multiple="true"
-            :max-count="3"
-            width="80px"
-            height="80px"
-            @after-read="onUploadAfterRead"
-            @delete="onUploadDelete"
-          ></up-upload>
-        </view>
+      <view class="demo-row-start mt-10px">
+        <up-button type="primary" text="数字键盘" size="mini" @click="openKeyboard('number')"></up-button>
+        <view class="w-10px"></view>
+        <up-button type="primary" text="身份证键盘" size="mini" @click="openKeyboard('card')"></up-button>
       </view>
+    </view>
 
-      <up-divider text="表单组件结束"></up-divider>
+    <!-- Picker 选择器 -->
+    <view class="demo-block">
+      <text class="demo-label">
+        up-picker
+      </text>
+      <view class="demo-row-start items-center">
+        <up-button type="primary" text="选择国家" size="mini" @click="pickerShow = true"></up-button>
+        <view class="w-15px"></view>
+        <text class="text-14px text-[#606266]">{{ pickerValue != '' ? `已选: ${pickerValue}` : '未选择' }}</text>
+      </view>
+    </view>
 
-      <!-- Calendar 组件 -->
-      <up-calendar
-        :show="calendarShow"
-        mode="range"
-        @confirm="onCalendarConfirm"
-        @close="calendarShow = false"
-      ></up-calendar>
+    <!-- DatetimePicker 时间选择器 -->
+    <view class="demo-block">
+      <text class="demo-label">
+        up-datetime-picker
+      </text>
+      <view class="demo-row-start items-center">
+        <up-button type="primary" text="选择日期" size="mini" @click="datetimePickerShow = true"></up-button>
+        <view class="w-15px"></view>
+        <text class="text-14px text-[#606266]">{{ datetimePickerLabel != '' ? `已选: ${datetimePickerLabel}` : '未选择' }}</text>
+      </view>
+    </view>
 
-      <!-- Keyboard 组件 -->
-      <up-keyboard
-        :show="keyboardShow"
-        :mode="keyboardMode"
-        @change="onKeyboardChange"
-        @backspace="onKeyboardBackspace"
-        @close="keyboardShow = false"
-        @confirm="keyboardShow = false"
-        @cancel="keyboardShow = false"
-      ></up-keyboard>
+    <!-- Upload 上传 -->
+    <view class="demo-block">
+      <text class="demo-label">
+        up-upload
+      </text>
+      <view class="demo-row-start">
+        <up-upload
+          :file-list="uploadList"
+          :multiple="true"
+          :max-count="3"
+          width="80px"
+          height="80px"
+          @after-read="onUploadAfterRead"
+          @delete="onUploadDelete"
+        ></up-upload>
+      </view>
+    </view>
 
-      <!-- Picker 组件 -->
-      <up-picker
-        :show="pickerShow"
-        :columns="pickerColumns"
-        @confirm="onPickerConfirm"
-        @cancel="pickerShow = false"
-        @close="pickerShow = false"
-      ></up-picker>
+    <up-divider text="表单组件结束"></up-divider>
 
-      <!-- DatetimePicker 组件 -->
-      <up-datetime-picker
-        v-model="datetimePickerValue"
-        :show="datetimePickerShow"
-        mode="date"
-        @confirm="onDatetimePickerConfirm"
-        @cancel="datetimePickerShow = false"
-        @close="datetimePickerShow = false"
-      ></up-datetime-picker>
+    <!-- Calendar 组件 -->
+    <up-calendar
+      :show="calendarShow"
+      mode="range"
+      @confirm="onCalendarConfirm"
+      @close="calendarShow = false"
+    ></up-calendar>
 
-      <!-- ActionSheet 性别选择 -->
-      <up-action-sheet
-        :show="genderActionShow"
-        :actions="genderActions"
-        title="请选择性别"
-        @select="onGenderSelect"
-        @close="genderActionShow = false"
-      ></up-action-sheet>
+    <!-- Keyboard 组件 -->
+    <up-keyboard
+      :show="keyboardShow"
+      :mode="keyboardMode"
+      @change="onKeyboardChange"
+      @backspace="onKeyboardBackspace"
+      @close="keyboardShow = false"
+      @confirm="keyboardShow = false"
+      @cancel="keyboardShow = false"
+    ></up-keyboard>
+
+    <!-- Picker 组件 -->
+    <up-picker
+      :show="pickerShow"
+      :columns="pickerColumns"
+      @confirm="onPickerConfirm"
+      @cancel="pickerShow = false"
+      @close="pickerShow = false"
+    ></up-picker>
+
+    <!-- DatetimePicker 组件 -->
+    <up-datetime-picker
+      v-model="datetimePickerValue"
+      :show="datetimePickerShow"
+      mode="date"
+      @confirm="onDatetimePickerConfirm"
+      @cancel="datetimePickerShow = false"
+      @close="datetimePickerShow = false"
+    ></up-datetime-picker>
+
+    <!-- ActionSheet 性别选择 -->
+    <up-action-sheet
+      :show="genderActionShow"
+      :actions="genderActions"
+      title="请选择性别"
+      @select="onGenderSelect"
+      @close="genderActionShow = false"
+    ></up-action-sheet>
   </view>
 </template>
 
 <script setup lang="uts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { reactive, ref } from 'vue'
 
 // ==================== 表单组件 ====================
 const inputValue = ref('')
@@ -324,56 +277,6 @@ const formRules = {
     {
       required: true,
       message: '请选择性别',
-      trigger: ['blur', 'change'],
-    },
-  ],
-  age: [
-    {
-      required: true,
-      message: '请输入年龄',
-      trigger: ['blur', 'change'],
-    },
-  ],
-  fruit: [
-    {
-      required: true,
-      message: '请选择水果',
-      trigger: ['blur', 'change'],
-    },
-  ],
-  hobbies: [
-    {
-      type: 'array',
-      required: true,
-      message: '请选择兴趣爱好',
-      trigger: ['blur', 'change'],
-    },
-  ],
-  intro: [
-    {
-      required: true,
-      message: '请填写简介',
-      trigger: ['blur', 'change'],
-    },
-  ],
-  stayTime: [
-    {
-      required: true,
-      message: '请选择住店时间',
-      trigger: ['blur', 'change'],
-    },
-  ],
-  code: [
-    {
-      required: true,
-      message: '请填写验证码',
-      trigger: ['blur', 'change'],
-    },
-  ],
-  birthday: [
-    {
-      required: true,
-      message: '请选择生日',
       trigger: ['blur', 'change'],
     },
   ],
@@ -514,8 +417,6 @@ function onUploadDelete(e: UTSJSONObject): void {
     uploadList.value.splice(index, 1)
   }
 }
-
-
 </script>
 
 <style scoped>

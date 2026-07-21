@@ -16,34 +16,6 @@ open class GenUniModulesZPagingXComponentsZPagingXComponentsZPagingLoadMore : Vu
     constructor(__ins: ComponentInternalInstance) : super(__ins) {
         onCreated(fun() {}, __ins)
     }
-    @Suppress("UNUSED_PARAMETER", "UNUSED_VARIABLE")
-    override fun `$render`(): Any? {
-        val _ctx = this
-        val _cache = this.`$`.renderCache
-        val _component_z_paging_loading = resolveComponent("z-paging-loading")
-        return _cE("view", _uM("class" to "zpx-l-container", "onClick" to _ctx.onClickMore), _uA(
-            if (isTrue(_ctx.isNoMore)) {
-                _cE("view", _uM("key" to 0, "class" to "zpx-l-line"))
-            } else {
-                _cC("v-if", true)
-            }
-            ,
-            if (isTrue(_ctx.isLoading)) {
-                _cV(_component_z_paging_loading, _uM("key" to 1))
-            } else {
-                _cC("v-if", true)
-            }
-            ,
-            _cE("text", _uM("class" to "zpx-l-loading-text"), _tD(_ctx.statusText), 1),
-            if (isTrue(_ctx.isNoMore)) {
-                _cE("view", _uM("key" to 2, "class" to "zpx-l-line"))
-            } else {
-                _cC("v-if", true)
-            }
-        ), 8, _uA(
-            "onClick"
-        ))
-    }
     open var customStyle: Any by `$props`
     open var customClass: String by `$props`
     open var url: String by `$props`
@@ -57,39 +29,9 @@ open class GenUniModulesZPagingXComponentsZPagingXComponentsZPagingLoadMore : Vu
     open var parentData: UTSJSONObject by `$data`
     open var children: UTSArray<ComponentPublicInstance> by `$data`
     open var childrenRefs: UTSArray<String> by `$data`
-    open var isDefault: Boolean by `$data`
-    open var isLoading: Boolean by `$data`
-    open var isNoMore: Boolean by `$data`
-    open var isFail: Boolean by `$data`
-    open var statusText: String by `$data`
     @Suppress("USELESS_CAST")
     override fun data(): Map<String, Any?> {
-        return _uM("parent" to null as ComponentPublicInstance?, "parentData" to _uO(), "children" to _uA<ComponentPublicInstance>(), "childrenRefs" to _uA<String>(), "isDefault" to computed<Boolean>(fun(): Boolean {
-            return this.status === default__11.More.Default
-        }
-        ), "isLoading" to computed<Boolean>(fun(): Boolean {
-            return this.status === default__11.More.Loading
-        }
-        ), "isNoMore" to computed<Boolean>(fun(): Boolean {
-            return this.status === default__11.More.NoMore
-        }
-        ), "isFail" to computed<Boolean>(fun(): Boolean {
-            return this.status === default__11.More.Fail
-        }
-        ), "statusText" to computed<String>(fun(): String {
-            if (this.isDefault) {
-                return this.defaultText
-            } else if (this.isLoading) {
-                return this.loadingText
-            } else if (this.isNoMore) {
-                return this.noMoreText
-            } else if (this.isFail) {
-                return this.failText
-            } else {
-                return ""
-            }
-        }
-        ))
+        return _uM("parent" to null as ComponentPublicInstance?, "parentData" to _uO(), "children" to _uA<ComponentPublicInstance>(), "childrenRefs" to _uA<String>())
     }
     open fun `$upAddUnit`(kVal: Any?, unit: String? = ""): String {
         return addUnit(kVal, unit)
@@ -192,11 +134,72 @@ open class GenUniModulesZPagingXComponentsZPagingXComponentsZPagingLoadMore : Vu
     open fun gen_noop_fn(e: UniEvent) {
         this.preventEvent(e)
     }
-    open var onClickMore = ::gen_onClickMore_fn
-    open fun gen_onClickMore_fn() {
-        this.`$emit`("clickMore")
-    }
     companion object {
+        @Suppress("UNUSED_PARAMETER", "UNUSED_VARIABLE")
+        var setup: (__props: GenUniModulesZPagingXComponentsZPagingXComponentsZPagingLoadMore) -> Any? = fun(__props): Any? {
+            val __ins = getCurrentInstance()!!
+            val _ctx = __ins.proxy as GenUniModulesZPagingXComponentsZPagingXComponentsZPagingLoadMore
+            val _cache = __ins.renderCache
+            val props = __props
+            fun emit(event: String, vararg do_not_transform_spread: Any?) {
+                __ins.emit(event, *do_not_transform_spread)
+            }
+            val isDefault = computed(fun(): Boolean {
+                return props.status === default__11.More.Default
+            }
+            )
+            val isLoading = computed(fun(): Boolean {
+                return props.status === default__11.More.Loading
+            }
+            )
+            val isNoMore = computed(fun(): Boolean {
+                return props.status === default__11.More.NoMore
+            }
+            )
+            val isFail = computed(fun(): Boolean {
+                return props.status === default__11.More.Fail
+            }
+            )
+            val statusText = computed(fun(): String {
+                if (isDefault.value) {
+                    return props.defaultText
+                } else if (isLoading.value) {
+                    return props.loadingText
+                } else if (isNoMore.value) {
+                    return props.noMoreText
+                } else if (isFail.value) {
+                    return props.failText
+                } else {
+                    return ""
+                }
+            }
+            )
+            val onClickMore = fun(){
+                emit("clickMore")
+            }
+            return fun(): Any? {
+                return _cE("view", _uM("class" to "zpx-l-container", "onClick" to onClickMore), _uA(
+                    if (isTrue(isNoMore.value)) {
+                        _cE("view", _uM("key" to 0, "class" to "zpx-l-line"))
+                    } else {
+                        _cC("v-if", true)
+                    }
+                    ,
+                    if (isTrue(isLoading.value)) {
+                        _cV(unref(GenUniModulesZPagingXComponentsZPagingXComponentsZPagingLoadingClass), _uM("key" to 1))
+                    } else {
+                        _cC("v-if", true)
+                    }
+                    ,
+                    _cE("text", _uM("class" to "zpx-l-loading-text"), _tD(statusText.value), 1),
+                    if (isTrue(isNoMore.value)) {
+                        _cE("view", _uM("key" to 2, "class" to "zpx-l-line"))
+                    } else {
+                        _cC("v-if", true)
+                    }
+                ))
+            }
+        }
         var name = "z-paging-load-more"
         val styles: Map<String, Map<String, Map<String, Any>>> by lazy {
             _nCS(_uA(
@@ -209,7 +212,7 @@ open class GenUniModulesZPagingXComponentsZPagingXComponentsZPagingLoadMore : Vu
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()
-        var emits: Map<String, Any?> = _uM()
+        var emits: Map<String, Any?> = _uM("clickMore" to null)
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
@@ -225,6 +228,6 @@ open class GenUniModulesZPagingXComponentsZPagingXComponentsZPagingLoadMore : Vu
             "noMoreText",
             "failText"
         )
-        var components: Map<String, CreateVueComponent> = _uM("zPagingLoading" to GenUniModulesZPagingXComponentsZPagingXComponentsZPagingLoadingClass)
+        var components: Map<String, CreateVueComponent> = _uM()
     }
 }

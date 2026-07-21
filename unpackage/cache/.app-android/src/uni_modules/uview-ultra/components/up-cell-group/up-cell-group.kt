@@ -187,7 +187,7 @@ open class GenUniModulesUviewUltraComponentsUpCellGroupUpCellGroup : VueComponen
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "title" to _uM("type" to "String", "default" to default__50.getString("cellGroup.title")), "border" to _uM("type" to "Boolean", "default" to default__50.getBoolean("cellGroup.border"))))
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "title" to _uM("type" to "String", "default" to default__48.getString("cellGroup.title")), "border" to _uM("type" to "Boolean", "default" to default__48.getBoolean("cellGroup.border"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

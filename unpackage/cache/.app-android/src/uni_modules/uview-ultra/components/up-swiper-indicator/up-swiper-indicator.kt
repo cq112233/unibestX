@@ -79,9 +79,10 @@ open class GenUniModulesUviewUltraComponentsUpSwiperIndicatorUpSwiperIndicator :
     override fun data(): Map<String, Any?> {
         return _uM("parent" to null as ComponentPublicInstance?, "parentData" to _uO(), "children" to _uA<ComponentPublicInstance>(), "childrenRefs" to _uA<String>(), "lineWidth" to 22, "lengthArray" to computed<UTSArray<String>>(fun(): UTSArray<String> {
             var list: UTSArray<String> = _uA()
+            val len = (this.`$props`["length"] ?: 0) as Number
             run {
                 var index: Number = 0
-                while(index < this.`$props`["length"] as Number){
+                while(index < len){
                     list.push(index.toString(10))
                     index++
                 }

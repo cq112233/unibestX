@@ -1,6 +1,8 @@
 <template>
 	<scroll-view
 		class="up-list"
+		direction="vertical"
+		:custom-nested-scroll="customNestedScroll"
 		:scroll-into-view="scrollIntoView"
 		:style="[listStyle]"
 		:scroll-y="scrollable"

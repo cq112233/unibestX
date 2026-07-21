@@ -371,12 +371,12 @@ open class GenUniModulesUviewUltraComponentsUpSubsectionUpSubsection : VueCompon
         style["fontSize"] = uni.UNI5198058.addUnit(this.fontSize)
         val item = this.list[index]
         val activeColorTemp = if (UTSAndroid.`typeof`(item) == "object" && item != null) {
-            ((item as UTSJSONObject)[this.activeColorKeyName] as String)
+            (((item as UTSJSONObject)[this.activeColorKeyName] ?: "") as String)
         } else {
             ""
         }
         val inactiveColorTemp = if (UTSAndroid.`typeof`(item) === "object" && item != null) {
-            ((item as UTSJSONObject)[this.inactiveColorKeyName] as String)
+            (((item as UTSJSONObject)[this.inactiveColorKeyName] ?: "") as String)
         } else {
             ""
         }
@@ -450,13 +450,13 @@ open class GenUniModulesUviewUltraComponentsUpSubsectionUpSubsection : VueCompon
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "list" to _uM("type" to "Array", "default" to crtProp__14["list"]), "current" to _uM("type" to _uA(
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "list" to _uM("type" to "Array", "default" to crtProp__13["list"]), "current" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__14["current"]), "activeColor" to _uM("type" to "String", "default" to crtProp__14["activeColor"]), "inactiveColor" to _uM("type" to "String", "default" to crtProp__14["inactiveColor"]), "mode" to _uM("type" to "String", "default" to crtProp__14["mode"]), "fontSize" to _uM("type" to _uA(
+        ), "default" to crtProp__13["current"]), "activeColor" to _uM("type" to "String", "default" to crtProp__13["activeColor"]), "inactiveColor" to _uM("type" to "String", "default" to crtProp__13["inactiveColor"]), "mode" to _uM("type" to "String", "default" to crtProp__13["mode"]), "fontSize" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__14["fontSize"]), "bold" to _uM("type" to "Boolean", "default" to crtProp__14["bold"]), "bgColor" to _uM("type" to "String", "default" to crtProp__14["bgColor"]), "keyName" to _uM("type" to "String", "default" to crtProp__14["keyName"]), "activeColorKeyName" to _uM("type" to "String", "default" to crtProp__14["activeColorKeyName"]), "inactiveColorKeyName" to _uM("type" to "String", "default" to crtProp__14["inactiveColorKeyName"]), "disabled" to _uM("type" to "Boolean", "default" to crtProp__14["disabled"])))
+        ), "default" to crtProp__13["fontSize"]), "bold" to _uM("type" to "Boolean", "default" to crtProp__13["bold"]), "bgColor" to _uM("type" to "String", "default" to crtProp__13["bgColor"]), "keyName" to _uM("type" to "String", "default" to crtProp__13["keyName"]), "activeColorKeyName" to _uM("type" to "String", "default" to crtProp__13["activeColorKeyName"]), "inactiveColorKeyName" to _uM("type" to "String", "default" to crtProp__13["inactiveColorKeyName"]), "disabled" to _uM("type" to "Boolean", "default" to crtProp__13["disabled"])))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

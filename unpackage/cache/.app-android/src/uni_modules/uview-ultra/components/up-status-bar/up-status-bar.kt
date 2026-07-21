@@ -166,7 +166,7 @@ open class GenUniModulesUviewUltraComponentsUpStatusBarUpStatusBar : VueComponen
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "bgColor" to _uM("type" to "String", "default" to crtProp__9["bgColor"])))
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "bgColor" to _uM("type" to "String", "default" to crtProp__8["bgColor"])))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

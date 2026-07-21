@@ -425,22 +425,22 @@ open class GenUniModulesUviewUltraComponentsUpDropdownUpDropdown : VueComponent 
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "activeColor" to _uM("type" to "String", "default" to default__52.getString("dropdown.activeColor")), "inactiveColor" to _uM("type" to "String", "default" to default__52.getString("dropdown.inactiveColor")), "closeOnClickMask" to _uM("type" to "Boolean", "default" to default__52.getBoolean("dropdown.closeOnClickMask")), "closeOnClickSelf" to _uM("type" to "Boolean", "default" to default__52.getBoolean("dropdown.closeOnClickSelf")), "duration" to _uM("type" to _uA(
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "activeColor" to _uM("type" to "String", "default" to default__50.getString("dropdown.activeColor")), "inactiveColor" to _uM("type" to "String", "default" to default__50.getString("dropdown.inactiveColor")), "closeOnClickMask" to _uM("type" to "Boolean", "default" to default__50.getBoolean("dropdown.closeOnClickMask")), "closeOnClickSelf" to _uM("type" to "Boolean", "default" to default__50.getBoolean("dropdown.closeOnClickSelf")), "duration" to _uM("type" to _uA(
             "Number",
             "String"
-        ), "default" to default__52.getNumber("dropdown.duration")), "height" to _uM("type" to _uA(
+        ), "default" to default__50.getNumber("dropdown.duration")), "height" to _uM("type" to _uA(
             "Number",
             "String"
-        ), "default" to default__52.getNumber("dropdown.height")), "borderBottom" to _uM("type" to "Boolean", "default" to default__52.getBoolean("dropdown.borderBottom")), "titleSize" to _uM("type" to _uA(
+        ), "default" to default__50.getNumber("dropdown.height")), "borderBottom" to _uM("type" to "Boolean", "default" to default__50.getBoolean("dropdown.borderBottom")), "titleSize" to _uM("type" to _uA(
             "Number",
             "String"
-        ), "default" to default__52.getNumber("dropdown.titleSize")), "borderRadius" to _uM("type" to _uA(
+        ), "default" to default__50.getNumber("dropdown.titleSize")), "borderRadius" to _uM("type" to _uA(
             "Number",
             "String"
-        ), "default" to default__52.getNumber("dropdown.borderRadius")), "menuIcon" to _uM("type" to "String", "default" to default__52.getString("dropdown.menuIcon")), "menuIconSize" to _uM("type" to _uA(
+        ), "default" to default__50.getNumber("dropdown.borderRadius")), "menuIcon" to _uM("type" to "String", "default" to default__50.getString("dropdown.menuIcon")), "menuIconSize" to _uM("type" to _uA(
             "Number",
             "String"
-        ), "default" to default__52.getNumber("dropdown.menuIconSize"))))
+        ), "default" to default__50.getNumber("dropdown.menuIconSize"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

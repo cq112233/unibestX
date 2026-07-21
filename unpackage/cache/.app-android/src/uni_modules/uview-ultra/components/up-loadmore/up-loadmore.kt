@@ -263,22 +263,22 @@ open class GenUniModulesUviewUltraComponentsUpLoadmoreUpLoadmore : VueComponent 
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "status" to _uM("type" to "String", "default" to crtProp__12["status"]), "bgColor" to _uM("type" to "String", "default" to crtProp__12["bgColor"]), "icon" to _uM("type" to "Boolean", "default" to crtProp__12["icon"]), "fontSize" to _uM("type" to _uA(
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "status" to _uM("type" to "String", "default" to crtProp__11["status"]), "bgColor" to _uM("type" to "String", "default" to crtProp__11["bgColor"]), "icon" to _uM("type" to "Boolean", "default" to crtProp__11["icon"]), "fontSize" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__12["fontSize"]), "iconSize" to _uM("type" to _uA(
+        ), "default" to crtProp__11["fontSize"]), "iconSize" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__12["iconSize"]), "color" to _uM("type" to "String", "default" to crtProp__12["color"]), "loadingIcon" to _uM("type" to "String", "default" to crtProp__12["loadingIcon"]), "loadmoreText" to _uM("type" to "String", "default" to crtProp__12["loadmoreText"]), "loadingText" to _uM("type" to "String", "default" to crtProp__12["loadingText"]), "nomoreText" to _uM("type" to "String", "default" to crtProp__12["nomoreText"]), "isDot" to _uM("type" to "Boolean", "default" to crtProp__12["isDot"]), "iconColor" to _uM("type" to "String", "default" to crtProp__12["iconColor"]), "marginTop" to _uM("type" to _uA(
+        ), "default" to crtProp__11["iconSize"]), "color" to _uM("type" to "String", "default" to crtProp__11["color"]), "loadingIcon" to _uM("type" to "String", "default" to crtProp__11["loadingIcon"]), "loadmoreText" to _uM("type" to "String", "default" to crtProp__11["loadmoreText"]), "loadingText" to _uM("type" to "String", "default" to crtProp__11["loadingText"]), "nomoreText" to _uM("type" to "String", "default" to crtProp__11["nomoreText"]), "isDot" to _uM("type" to "Boolean", "default" to crtProp__11["isDot"]), "iconColor" to _uM("type" to "String", "default" to crtProp__11["iconColor"]), "marginTop" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__12["marginTop"]), "marginBottom" to _uM("type" to _uA(
+        ), "default" to crtProp__11["marginTop"]), "marginBottom" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__12["marginBottom"]), "height" to _uM("type" to _uA(
+        ), "default" to crtProp__11["marginBottom"]), "height" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__12["height"]), "line" to _uM("type" to "Boolean", "default" to crtProp__12["line"]), "lineColor" to _uM("type" to "String", "default" to crtProp__12["lineColor"]), "dashed" to _uM("type" to "Boolean", "default" to crtProp__12["dashed"])))
+        ), "default" to crtProp__11["height"]), "line" to _uM("type" to "Boolean", "default" to crtProp__11["line"]), "lineColor" to _uM("type" to "String", "default" to crtProp__11["lineColor"]), "dashed" to _uM("type" to "Boolean", "default" to crtProp__11["dashed"])))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

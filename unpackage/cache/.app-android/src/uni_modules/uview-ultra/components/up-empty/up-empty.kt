@@ -224,22 +224,22 @@ open class GenUniModulesUviewUltraComponentsUpEmptyUpEmpty : VueComponent {
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "icon" to _uM("type" to "String", "default" to default__62.getString("empty.icon")), "text" to _uM("type" to "String", "default" to default__62.getString("empty.text")), "textColor" to _uM("type" to "String", "default" to default__62.getString("empty.textColor")), "textSize" to _uM("type" to _uA(
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "icon" to _uM("type" to "String", "default" to default__59.getString("empty.icon")), "text" to _uM("type" to "String", "default" to default__59.getString("empty.text")), "textColor" to _uM("type" to "String", "default" to default__59.getString("empty.textColor")), "textSize" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__62.getNumber("empty.textSize")), "iconColor" to _uM("type" to "String", "default" to default__62.getString("empty.iconColor")), "iconSize" to _uM("type" to _uA(
+        ), "default" to default__59.getNumber("empty.textSize")), "iconColor" to _uM("type" to "String", "default" to default__59.getString("empty.iconColor")), "iconSize" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__62.getNumber("empty.iconSize")), "mode" to _uM("type" to "String", "default" to default__62.getString("empty.mode")), "width" to _uM("type" to _uA(
+        ), "default" to default__59.getNumber("empty.iconSize")), "mode" to _uM("type" to "String", "default" to default__59.getString("empty.mode")), "width" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__62.getNumber("empty.width")), "height" to _uM("type" to _uA(
+        ), "default" to default__59.getNumber("empty.width")), "height" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__62.getNumber("empty.height")), "show" to _uM("type" to "Boolean", "default" to default__62.getBoolean("empty.show")), "marginTop" to _uM("type" to _uA(
+        ), "default" to default__59.getNumber("empty.height")), "show" to _uM("type" to "Boolean", "default" to default__59.getBoolean("empty.show")), "marginTop" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__62.getNumber("empty.marginTop"))))
+        ), "default" to default__59.getNumber("empty.marginTop"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

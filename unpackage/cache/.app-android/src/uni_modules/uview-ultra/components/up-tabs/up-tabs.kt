@@ -211,7 +211,7 @@ open class GenUniModulesUviewUltraComponentsUpTabsUpTabs : VueComponent {
     @Suppress("USELESS_CAST")
     override fun data(): Map<String, Any?> {
         return _uM("parent" to null as ComponentPublicInstance?, "parentData" to _uO(), "children" to _uA<ComponentPublicInstance>(), "childrenRefs" to _uA<String>(), "firstTime" to true, "scrollLeft" to 0, "scrollViewWidth" to 0, "lineOffsetLeft" to 0, "tabsRect" to NodeInfo(left = 0, right = 0), "innerCurrent" to 0, "moving" to false, "retryCount" to 0, "itemRects" to _uA<NodeInfo>(), "propsBadge" to computed<UTSJSONObject>(fun(): UTSJSONObject {
-            return default__26["badge"] as UTSJSONObject
+            return default__25["badge"] as UTSJSONObject
         }
         ), "lineStyle" to computed<Any>(fun(): Any {
             val style: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-tabs/up-tabs.uvue", 163, 11))

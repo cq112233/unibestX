@@ -211,13 +211,13 @@ open class GenUniModulesUviewUltraComponentsUpIndexAnchorUpIndexAnchor : VueComp
         ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "text" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__44.getString("indexAnchor.text")), "color" to _uM("type" to "String", "default" to default__44.getString("indexAnchor.color")), "size" to _uM("type" to _uA(
+        ), "default" to default__42.getString("indexAnchor.text")), "color" to _uM("type" to "String", "default" to default__42.getString("indexAnchor.color")), "size" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__44.getNumber("indexAnchor.size")), "bgColor" to _uM("type" to "String", "default" to default__44.getString("indexAnchor.bgColor")), "height" to _uM("type" to _uA(
+        ), "default" to default__42.getNumber("indexAnchor.size")), "bgColor" to _uM("type" to "String", "default" to default__42.getString("indexAnchor.bgColor")), "height" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__44.getNumber("indexAnchor.height"))))
+        ), "default" to default__42.getNumber("indexAnchor.height"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

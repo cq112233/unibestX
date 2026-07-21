@@ -299,21 +299,21 @@ open class GenUniModulesUviewUltraComponentsUpNavbarUpNavbar : VueComponent {
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "safeAreaInsetTop" to _uM("type" to "Boolean", "default" to crtProp__13["safeAreaInsetTop"]), "placeholder" to _uM("type" to "Boolean", "default" to crtProp__13["placeholder"]), "fixed" to _uM("type" to "Boolean", "default" to crtProp__13["fixed"]), "border" to _uM("type" to "Boolean", "default" to crtProp__13["border"]), "leftIcon" to _uM("type" to "String", "default" to crtProp__13["leftIcon"]), "leftText" to _uM("type" to "String", "default" to crtProp__13["leftText"]), "rightText" to _uM("type" to "String", "default" to crtProp__13["rightText"]), "rightIcon" to _uM("type" to "String", "default" to crtProp__13["rightIcon"]), "title" to _uM("type" to _uA(
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "safeAreaInsetTop" to _uM("type" to "Boolean", "default" to crtProp__12["safeAreaInsetTop"]), "placeholder" to _uM("type" to "Boolean", "default" to crtProp__12["placeholder"]), "fixed" to _uM("type" to "Boolean", "default" to crtProp__12["fixed"]), "border" to _uM("type" to "Boolean", "default" to crtProp__12["border"]), "leftIcon" to _uM("type" to "String", "default" to crtProp__12["leftIcon"]), "leftText" to _uM("type" to "String", "default" to crtProp__12["leftText"]), "rightText" to _uM("type" to "String", "default" to crtProp__12["rightText"]), "rightIcon" to _uM("type" to "String", "default" to crtProp__12["rightIcon"]), "title" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__13["title"]), "bgColor" to _uM("type" to "String", "default" to crtProp__13["bgColor"]), "titleWidth" to _uM("type" to _uA(
+        ), "default" to crtProp__12["title"]), "bgColor" to _uM("type" to "String", "default" to crtProp__12["bgColor"]), "titleWidth" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__13["titleWidth"]), "height" to _uM("type" to _uA(
+        ), "default" to crtProp__12["titleWidth"]), "height" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__13["height"]), "leftIconSize" to _uM("type" to _uA(
+        ), "default" to crtProp__12["height"]), "leftIconSize" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__13["leftIconSize"]), "leftIconColor" to _uM("type" to "String", "default" to crtProp__13["leftIconColor"]), "autoBack" to _uM("type" to "Boolean", "default" to crtProp__13["autoBack"]), "titleStyle" to _uM("type" to _uA(
+        ), "default" to crtProp__12["leftIconSize"]), "leftIconColor" to _uM("type" to "String", "default" to crtProp__12["leftIconColor"]), "autoBack" to _uM("type" to "Boolean", "default" to crtProp__12["autoBack"]), "titleStyle" to _uM("type" to _uA(
             "Object"
-        ), "default" to crtProp__13["titleStyle"])))
+        ), "default" to crtProp__12["titleStyle"])))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

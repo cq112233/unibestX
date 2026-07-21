@@ -251,13 +251,13 @@ open class GenUniModulesUviewUltraComponentsUpNavbarMiniUpNavbarMini : VueCompon
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "safeAreaInsetTop" to _uM("type" to "Boolean", "default" to crtProp__8["safeAreaInsetTop"]), "fixed" to _uM("type" to "Boolean", "default" to crtProp__8["fixed"]), "leftIcon" to _uM("type" to "String", "default" to crtProp__8["leftIcon"]), "bgColor" to _uM("type" to "String", "default" to crtProp__8["bgColor"]), "height" to _uM("type" to _uA(
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "safeAreaInsetTop" to _uM("type" to "Boolean", "default" to crtProp__7["safeAreaInsetTop"]), "fixed" to _uM("type" to "Boolean", "default" to crtProp__7["fixed"]), "leftIcon" to _uM("type" to "String", "default" to crtProp__7["leftIcon"]), "bgColor" to _uM("type" to "String", "default" to crtProp__7["bgColor"]), "height" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__8["height"]), "iconSize" to _uM("type" to _uA(
+        ), "default" to crtProp__7["height"]), "iconSize" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__8["iconSize"]), "iconColor" to _uM("type" to "String", "default" to crtProp__8["iconColor"]), "autoBack" to _uM("type" to "Boolean", "default" to crtProp__8["autoBack"]), "homeUrl" to _uM("type" to "String", "default" to crtProp__8["homeUrl"])))
+        ), "default" to crtProp__7["iconSize"]), "iconColor" to _uM("type" to "String", "default" to crtProp__7["iconColor"]), "autoBack" to _uM("type" to "Boolean", "default" to crtProp__7["autoBack"]), "homeUrl" to _uM("type" to "String", "default" to crtProp__7["homeUrl"])))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

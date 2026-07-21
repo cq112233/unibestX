@@ -279,7 +279,7 @@ open class GenUniModulesUviewUltraComponentsUpGridItemUpGridItem : VueComponent 
         ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "name" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__63.getArray("grid-item.name")), "bgColor" to _uM("type" to "String", "default" to default__63.getString("grid-item.bgColor"))))
+        ), "default" to default__62.getArray("grid-item.name")), "bgColor" to _uM("type" to "String", "default" to default__62.getString("grid-item.bgColor"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

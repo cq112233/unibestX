@@ -356,23 +356,23 @@ open class GenUniModulesUviewUltraComponentsUpPopupUpPopup : VueComponent {
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "show" to _uM("type" to "Boolean", "default" to crtProp__23["show"]), "overlay" to _uM("type" to "Boolean", "default" to crtProp__23["overlay"]), "mode" to _uM("type" to "String", "default" to crtProp__23["mode"]), "duration" to _uM("type" to _uA(
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "show" to _uM("type" to "Boolean", "default" to crtProp__22["show"]), "overlay" to _uM("type" to "Boolean", "default" to crtProp__22["overlay"]), "mode" to _uM("type" to "String", "default" to crtProp__22["mode"]), "duration" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__23["duration"]), "closeable" to _uM("type" to "Boolean", "default" to crtProp__23["closeable"]), "overlayStyle" to _uM("type" to _uA(
+        ), "default" to crtProp__22["duration"]), "closeable" to _uM("type" to "Boolean", "default" to crtProp__22["closeable"]), "overlayStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to crtProp__23["overlayStyle"]), "closeOnClickOverlay" to _uM("type" to "Boolean", "default" to crtProp__23["closeOnClickOverlay"]), "zIndex" to _uM("type" to _uA(
+        ), "default" to crtProp__22["overlayStyle"]), "closeOnClickOverlay" to _uM("type" to "Boolean", "default" to crtProp__22["closeOnClickOverlay"]), "zIndex" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__23["zIndex"]), "safeAreaInsetBottom" to _uM("type" to "Boolean", "default" to crtProp__23["safeAreaInsetBottom"]), "safeAreaInsetTop" to _uM("type" to "Boolean", "default" to crtProp__23["safeAreaInsetTop"]), "closeIconPos" to _uM("type" to "String", "default" to crtProp__23["closeIconPos"]), "round" to _uM("type" to _uA(
+        ), "default" to crtProp__22["zIndex"]), "safeAreaInsetBottom" to _uM("type" to "Boolean", "default" to crtProp__22["safeAreaInsetBottom"]), "safeAreaInsetTop" to _uM("type" to "Boolean", "default" to crtProp__22["safeAreaInsetTop"]), "closeIconPos" to _uM("type" to "String", "default" to crtProp__22["closeIconPos"]), "round" to _uM("type" to _uA(
             "Boolean",
             "String",
             "Number"
-        ), "default" to crtProp__23["round"]), "zoom" to _uM("type" to "Boolean", "default" to crtProp__23["zoom"]), "bgColor" to _uM("type" to "String", "default" to crtProp__23["bgColor"]), "overlayOpacity" to _uM("type" to _uA(
+        ), "default" to crtProp__22["round"]), "zoom" to _uM("type" to "Boolean", "default" to crtProp__22["zoom"]), "bgColor" to _uM("type" to "String", "default" to crtProp__22["bgColor"]), "overlayOpacity" to _uM("type" to _uA(
             "Number",
             "String"
-        ), "default" to crtProp__23["overlayOpacity"]), "pageInline" to _uM("type" to "Boolean", "default" to crtProp__23["pageInline"])))
+        ), "default" to crtProp__22["overlayOpacity"]), "pageInline" to _uM("type" to "Boolean", "default" to crtProp__22["pageInline"])))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

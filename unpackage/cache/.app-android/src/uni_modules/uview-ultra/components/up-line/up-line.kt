@@ -191,10 +191,10 @@ open class GenUniModulesUviewUltraComponentsUpLineUpLine : VueComponent {
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "color" to _uM("type" to "String", "default" to crtProp__10["color"]), "length" to _uM("type" to _uA(
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "color" to _uM("type" to "String", "default" to crtProp__9["color"]), "length" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__10["length"]), "direction" to _uM("type" to "String", "default" to crtProp__10["direction"]), "hairline" to _uM("type" to "Boolean", "default" to crtProp__10["hairline"]), "margin" to _uM("type" to "String", "default" to crtProp__10["margin"]), "dashed" to _uM("type" to "Boolean", "default" to crtProp__10["dashed"])))
+        ), "default" to crtProp__9["length"]), "direction" to _uM("type" to "String", "default" to crtProp__9["direction"]), "hairline" to _uM("type" to "Boolean", "default" to crtProp__9["hairline"]), "margin" to _uM("type" to "String", "default" to crtProp__9["margin"]), "dashed" to _uM("type" to "Boolean", "default" to crtProp__9["dashed"])))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

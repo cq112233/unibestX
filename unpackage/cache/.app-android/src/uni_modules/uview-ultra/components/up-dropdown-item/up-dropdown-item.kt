@@ -316,16 +316,16 @@ open class GenUniModulesUviewUltraComponentsUpDropdownItemUpDropdownItem : VueCo
             "Number",
             "String",
             "Array"
-        ), "default" to default__51.getAny("dropdownItem.value")), "title" to _uM("type" to _uA(
+        ), "default" to default__49.getAny("dropdownItem.value")), "title" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__51.getString("dropdownItem.title")), "options" to _uM("type" to "Array", "default" to fun(): UTSArray<UTSJSONObject>? {
-            return default__51.getArray<UTSJSONObject>("dropdownItem.options")
+        ), "default" to default__49.getString("dropdownItem.title")), "options" to _uM("type" to "Array", "default" to fun(): UTSArray<UTSJSONObject>? {
+            return default__49.getArray<UTSJSONObject>("dropdownItem.options")
         }
-        ), "disabled" to _uM("type" to "Boolean", "default" to default__51.getBoolean("dropdownItem.disabled")), "height" to _uM("type" to _uA(
+        ), "disabled" to _uM("type" to "Boolean", "default" to default__49.getBoolean("dropdownItem.disabled")), "height" to _uM("type" to _uA(
             "Number",
             "String"
-        ), "default" to default__51.getNumber("dropdownItem.height")), "closeOnClickOverlay" to _uM("type" to "Boolean", "default" to default__51.getBoolean("dropdownItem.closeOnClickOverlay"))))
+        ), "default" to default__49.getNumber("dropdownItem.height")), "closeOnClickOverlay" to _uM("type" to "Boolean", "default" to default__49.getBoolean("dropdownItem.closeOnClickOverlay"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

@@ -208,10 +208,10 @@ open class GenUniModulesUviewUltraComponentsUpStepsUpSteps : VueComponent {
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "direction" to _uM("type" to "String", "default" to crtProp__7["direction"]), "current" to _uM("type" to _uA(
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "direction" to _uM("type" to "String", "default" to crtProp__6["direction"]), "current" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__7["current"]), "activeColor" to _uM("type" to "String", "default" to crtProp__7["activeColor"]), "inactiveColor" to _uM("type" to "String", "default" to crtProp__7["inactiveColor"]), "activeIcon" to _uM("type" to "String", "default" to crtProp__7["activeIcon"]), "inactiveIcon" to _uM("type" to "String", "default" to crtProp__7["inactiveIcon"]), "dot" to _uM("type" to "Boolean", "default" to crtProp__7["dot"])))
+        ), "default" to crtProp__6["current"]), "activeColor" to _uM("type" to "String", "default" to crtProp__6["activeColor"]), "inactiveColor" to _uM("type" to "String", "default" to crtProp__6["inactiveColor"]), "activeIcon" to _uM("type" to "String", "default" to crtProp__6["activeIcon"]), "inactiveIcon" to _uM("type" to "String", "default" to crtProp__6["inactiveIcon"]), "dot" to _uM("type" to "Boolean", "default" to crtProp__6["dot"])))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

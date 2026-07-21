@@ -288,13 +288,13 @@ open class GenUniModulesUviewUltraComponentsUpAlertUpAlert : VueComponent {
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()
         var emits: Map<String, Any?> = _uM("click" to null)
-        var props = _nP(_uM("customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "type" to _uM("type" to "String", "default" to default__90.getString("alert.type")), "description" to _uM("type" to "String", "default" to default__90.getString("alert.description")), "closable" to _uM("type" to "Boolean", "default" to default__90.getBoolean("alert.closable")), "showIcon" to _uM("type" to "Boolean", "default" to default__90.getBoolean("alert.showIcon")), "effect" to _uM("type" to "String", "default" to default__90.getString("alert.effect")), "center" to _uM("type" to "Boolean", "default" to default__90.getBoolean("alert.center")), "fontSize" to _uM("type" to _uA(
+        var props = _nP(_uM("customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "type" to _uM("type" to "String", "default" to default__88.getString("alert.type")), "description" to _uM("type" to "String", "default" to default__88.getString("alert.description")), "closable" to _uM("type" to "Boolean", "default" to default__88.getBoolean("alert.closable")), "showIcon" to _uM("type" to "Boolean", "default" to default__88.getBoolean("alert.showIcon")), "effect" to _uM("type" to "String", "default" to default__88.getString("alert.effect")), "center" to _uM("type" to "Boolean", "default" to default__88.getBoolean("alert.center")), "fontSize" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__90.getNumber("alert.fontSize")), "customStyle" to _uM("default" to fun(): UTSJSONObject {
+        ), "default" to default__88.getNumber("alert.fontSize")), "customStyle" to _uM("default" to fun(): UTSJSONObject {
             return (_uO())
         }
-        ), "title" to _uM("type" to "String", "default" to default__90.getString("alert.title", ""))))
+        ), "title" to _uM("type" to "String", "default" to default__88.getString("alert.title", ""))))
         var propsNeedCastKeys = _uA(
             "customClass",
             "url",

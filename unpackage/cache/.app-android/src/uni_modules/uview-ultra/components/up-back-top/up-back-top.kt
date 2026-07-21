@@ -176,32 +176,29 @@ open class GenUniModulesUviewUltraComponentsUpBackTopUpBackTop : VueComponent {
             }
             )
             fun gen_backToTop_fn(e: Any) {
-                uni_pageScrollTo(PageScrollToOptions(scrollTop = 0, duration = parseInt(prop.duration.toString())))
+                uni_pageScrollTo(PageScrollToOptions(scrollTop = 0, duration = parseInt(prop.duration.toString()), fail = fun(_err){}))
                 emit("click", e)
             }
             val backToTop = ::gen_backToTop_fn
             return fun(): Any? {
                 val _component_up_icon = resolveEasyComponent("up-icon", GenUniModulesUviewUltraComponentsUpIconUpIconClass)
-                val _component_block = resolveComponent("block")
                 return if (isTrue(show.value)) {
                     _cE("view", _uM("key" to 0, "style" to _nS(_uA(
                         backTopStyle.value,
                         contentStyle.value
                     )), "class" to "up-back-top", "onClick" to backToTop), _uA(
                         if (isTrue(_ctx.`$slots`["default"] == null && _ctx.`$slots`["\$default"] == null)) {
-                            _cV(_component_block, _uM("key" to 0), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                return _uA(
-                                    _cV(_component_up_icon, _uM("name" to _ctx.icon, "custom-style" to _ctx.iconStyle), null, 8, _uA(
-                                        "name",
-                                        "custom-style"
-                                    )),
-                                    if (isTrue(_ctx.text)) {
-                                        _cE("text", _uM("key" to 0, "class" to "up-back-top__text"), _tD(_ctx.text), 1)
-                                    } else {
-                                        _cC("v-if", true)
-                                    }
-                                )
-                            }), "_" to 1))
+                            _cE(Fragment, _uM("key" to 0), _uA(
+                                _cV(_component_up_icon, _uM("name" to _ctx.icon, "custom-style" to _ctx.iconStyle), null, 8, _uA(
+                                    "name",
+                                    "custom-style"
+                                )),
+                                if (isTrue(_ctx.text)) {
+                                    _cE("text", _uM("key" to 0, "class" to "up-back-top__text"), _tD(_ctx.text), 1)
+                                } else {
+                                    _cC("v-if", true)
+                                }
+                            ), 64)
                         } else {
                             renderSlot(_ctx.`$slots`, "default", _uM("key" to 1))
                         }
@@ -223,26 +220,26 @@ open class GenUniModulesUviewUltraComponentsUpBackTopUpBackTop : VueComponent {
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()
         var emits: Map<String, Any?> = _uM("click" to null)
-        var props = _nP(_uM("customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "mode" to _uM("type" to "String", "default" to default__67.getString("backtop.mode")), "icon" to _uM("type" to "String", "default" to default__67.getString("backtop.icon")), "text" to _uM("type" to "String", "default" to default__67.getString("backtop.text")), "duration" to _uM("type" to _uA(
+        var props = _nP(_uM("customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "mode" to _uM("type" to "String", "default" to default__66.getString("backtop.mode")), "icon" to _uM("type" to "String", "default" to default__66.getString("backtop.icon")), "text" to _uM("type" to "String", "default" to default__66.getString("backtop.text")), "duration" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__67.getNumber("backtop.duration")), "scrollTop" to _uM("type" to _uA(
+        ), "default" to default__66.getNumber("backtop.duration")), "scrollTop" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__67.getNumber("backtop.scrollTop")), "top" to _uM("type" to _uA(
+        ), "default" to default__66.getNumber("backtop.scrollTop")), "top" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__67.getNumber("backtop.top")), "bottom" to _uM("type" to _uA(
+        ), "default" to default__66.getNumber("backtop.top")), "bottom" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__67.getNumber("backtop.bottom")), "right" to _uM("type" to _uA(
+        ), "default" to default__66.getNumber("backtop.bottom")), "right" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__67.getNumber("backtop.right")), "zIndex" to _uM("type" to _uA(
+        ), "default" to default__66.getNumber("backtop.right")), "zIndex" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__67.getNumber("backtop.zIndex")), "iconStyle" to _uM("default" to fun(): UTSJSONObject {
-            return default__67.getAny("backtop.iconStyle") as UTSJSONObject ?: _uO()
+        ), "default" to default__66.getNumber("backtop.zIndex")), "iconStyle" to _uM("default" to fun(): UTSJSONObject {
+            return default__66.getAny("backtop.iconStyle") as UTSJSONObject ?: _uO()
         }
         ), "customStyle" to _uM("default" to fun(): UTSJSONObject {
             return (_uO())

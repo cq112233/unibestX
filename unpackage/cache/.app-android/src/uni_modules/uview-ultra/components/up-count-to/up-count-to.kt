@@ -350,19 +350,19 @@ open class GenUniModulesUviewUltraComponentsUpCountToUpCountTo : VueComponent {
         ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "startVal" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__60.getNumber("countTo.startVal")), "endVal" to _uM("type" to _uA(
+        ), "default" to default__57.getNumber("countTo.startVal")), "endVal" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__60.getNumber("countTo.endVal")), "duration" to _uM("type" to _uA(
+        ), "default" to default__57.getNumber("countTo.endVal")), "duration" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__60.getNumber("countTo.duration")), "autoplay" to _uM("type" to "Boolean", "default" to default__60.getBoolean("countTo.autoplay")), "decimals" to _uM("type" to _uA(
+        ), "default" to default__57.getNumber("countTo.duration")), "autoplay" to _uM("type" to "Boolean", "default" to default__57.getBoolean("countTo.autoplay")), "decimals" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__60.getNumber("countTo.decimals")), "useEasing" to _uM("type" to "Boolean", "default" to default__60.getBoolean("countTo.useEasing")), "decimal" to _uM("type" to "String", "default" to default__60.getString("countTo.decimal")), "color" to _uM("type" to "String", "default" to default__60.getString("countTo.color")), "fontSize" to _uM("type" to _uA(
+        ), "default" to default__57.getNumber("countTo.decimals")), "useEasing" to _uM("type" to "Boolean", "default" to default__57.getBoolean("countTo.useEasing")), "decimal" to _uM("type" to "String", "default" to default__57.getString("countTo.decimal")), "color" to _uM("type" to "String", "default" to default__57.getString("countTo.color")), "fontSize" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__60.getNumber("countTo.fontSize")), "bold" to _uM("type" to "Boolean", "default" to default__60.getBoolean("countTo.bold")), "separator" to _uM("type" to "String", "default" to default__60.getString("countTo.separator"))))
+        ), "default" to default__57.getNumber("countTo.fontSize")), "bold" to _uM("type" to "Boolean", "default" to default__57.getBoolean("countTo.bold")), "separator" to _uM("type" to "String", "default" to default__57.getString("countTo.separator"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

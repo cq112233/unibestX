@@ -110,8 +110,20 @@
 		return isNaN(parsed) ? fallback : parsed
 	}
 
-	function getObjNumber(obj: UTSJSONObject, key: string, fallback: number = 0): number {
-		return normalizeNumber(obj[key], fallback)
+	function getObjNumber(obj: any | null, key: string, fallback: number = 0): number {
+		if (obj == null) {
+			return fallback
+		}
+		if (obj instanceof NodeInfo) {
+			const n = obj as NodeInfo
+			if (key == 'width') return n.width ?? fallback
+			if (key == 'left') return n.left ?? fallback
+			if (key == 'right') return n.right ?? fallback
+			if (key == 'top') return n.top ?? fallback
+			if (key == 'bottom') return n.bottom ?? fallback
+			if (key == 'height') return n.height ?? fallback
+		}
+		return normalizeNumber((obj as UTSJSONObject)[key], fallback)
 	}
 	/**
 	 * Tooltip 
@@ -271,14 +283,14 @@
 			tooltipStyle(): UTSJSONObject {
 				const style = {} as UTSJSONObject
 				style['transform'] = this.direction === 'top' ? 'translateY(-100%)' : 'translateY(100%)'
-				const sysInfo = sys() as UTSJSONObject
-				const tooltipInfo = this.tooltipInfo as UTSJSONObject
-				const textInfo = this.textInfo as UTSJSONObject
+				const sysInfo = sys()
+				const tooltipInfo = this.tooltipInfo
+				const textInfo = this.textInfo
 				const tooltipWidth = getObjNumber(tooltipInfo, 'width')
 				const textWidth = getObjNumber(textInfo, 'width')
 				const textLeft = getObjNumber(textInfo, 'left')
 				const textRight = getObjNumber(textInfo, 'right')
-				const windowWidth = normalizeNumber((sysInfo as UTSJSONObject)['windowWidth'], 0)
+				const windowWidth = normalizeNumber(sysInfo.windowWidth, 0)
 				if (tooltipWidth / 2 > textLeft + textWidth / 2 - this.screenGap) {
 					this.indicatorStyle = emptyStyle()
 					const left = '-' + addUnit(textLeft - this.screenGap)
@@ -401,7 +413,6 @@
 		&__wrapper {
 			@include flex;
 			justify-content: center;
-			white-space: nowrap;
 
 			&__text {
 				font-size: 14px;

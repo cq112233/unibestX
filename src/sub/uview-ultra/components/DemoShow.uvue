@@ -30,6 +30,7 @@
         </text>
         <up-list
           :height="300"
+          :custom-nested-scroll="true"
           :lower-threshold="20"
           :refresher-enabled="true"
           :refresher-triggered="listRefreshing"
@@ -63,7 +64,7 @@
 </template>
 
 <script setup lang="uts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { ref } from 'vue'
 
 // ==================== 展示组件 ====================
 const listItems = ref([

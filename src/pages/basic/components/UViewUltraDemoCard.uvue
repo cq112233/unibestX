@@ -32,9 +32,20 @@
 <script setup lang="uts">
 import Card from './Card.uvue'
 
+let isNavigating = false
+
 function navigateToShowcase() {
+  if (isNavigating) {
+    return
+  }
+  isNavigating = true
   uni.navigateTo({
     url: '/src/sub/uview-ultra/uview-ultra',
+    complete: () => {
+      setTimeout(() => {
+        isNavigating = false
+      }, 500)
+    },
   })
 }
 </script>

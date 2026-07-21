@@ -65,7 +65,7 @@
 							v-if="showCopy && buttons.length > 0"
 							length="18"
 						></up-line>
-						<block v-for="(item , index) in buttons" :key="index">
+						<template v-for="(item , index) in buttons" :key="index">
 							<view
 								class="up-tooltip__wrapper__popup__list__btn"
 								hover-class="up-tooltip__wrapper__popup__list__btn--hover"
@@ -81,7 +81,7 @@
 								v-if="index < buttons.length - 1"
 								length="18"
 							></up-line>
-						</block>
+						</template>
 					</view>
 				</view>
 			</up-transition>

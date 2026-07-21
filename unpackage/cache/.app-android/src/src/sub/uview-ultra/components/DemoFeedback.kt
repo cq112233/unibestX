@@ -158,7 +158,7 @@ open class GenSrcSubUviewUltraComponentsDemoFeedback : VueComponent {
             fun gen_showToast_fn(type: String) {
                 val toast = uToast.value
                 if (toast != null) {
-                    val configs: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("configs", "src/sub/uview-ultra/components/DemoFeedback.uvue", 240, 11), "success" to _uO("message" to "操作成功！", "type" to "success"), "error" to _uO("message" to "操作失败！", "type" to "error"), "warning" to _uO("message" to "请注意风险！", "type" to "warning"), "default" to _uO("message" to "这是一条提示", "type" to "default"))
+                    val configs: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("configs", "src/sub/uview-ultra/components/DemoFeedback.uvue", 230, 11), "success" to _uO("message" to "操作成功！", "type" to "success"), "error" to _uO("message" to "操作失败！", "type" to "error"), "warning" to _uO("message" to "请注意风险！", "type" to "warning"), "default" to _uO("message" to "这是一条提示", "type" to "default"))
                     val config = configs[type] as UTSJSONObject
                     toast.`$callMethod`("show", _uO("message" to config["message"] as String, "type" to config["type"] as String))
                 }
@@ -168,7 +168,7 @@ open class GenSrcSubUviewUltraComponentsDemoFeedback : VueComponent {
             fun gen_showNotify_fn(type: String) {
                 val notify = uNotify.value
                 if (notify != null) {
-                    val msgs: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("msgs", "src/sub/uview-ultra/components/DemoFeedback.uvue", 259, 11), "primary" to "主要通知消息", "success" to "操作成功通知", "warning" to "请注意安全通知", "error" to "发生错误通知")
+                    val msgs: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("msgs", "src/sub/uview-ultra/components/DemoFeedback.uvue", 249, 11), "primary" to "主要通知消息", "success" to "操作成功通知", "warning" to "请注意安全通知", "error" to "发生错误通知")
                     notify.`$callMethod`("show", _uO("message" to msgs[type] as String, "type" to type))
                 }
             }
@@ -226,11 +226,7 @@ open class GenSrcSubUviewUltraComponentsDemoFeedback : VueComponent {
                         _cE("text", _uM("class" to "demo-label"), " up-alert "),
                         _cV(_component_up_alert, _uM("title" to "成功提示", "type" to "success", "show-icon" to true)),
                         _cE("view", _uM("class" to "h-10px")),
-                        _cV(_component_up_alert, _uM("title" to "警告提示", "type" to "warning", "show-icon" to true)),
-                        _cE("view", _uM("class" to "h-10px")),
-                        _cV(_component_up_alert, _uM("title" to "错误提示", "type" to "error", "show-icon" to true)),
-                        _cE("view", _uM("class" to "h-10px")),
-                        _cV(_component_up_alert, _uM("title" to "信息提示", "type" to "info", "show-icon" to true))
+                        _cV(_component_up_alert, _uM("title" to "警告提示", "type" to "warning", "show-icon" to true))
                     )),
                     _cE("view", _uM("class" to "demo-block"), _uA(
                         _cE("text", _uM("class" to "demo-label"), " up-notice-bar "),
@@ -251,12 +247,6 @@ open class GenSrcSubUviewUltraComponentsDemoFeedback : VueComponent {
                                         _cE("text", _uM("class" to "collapse-text"), "支持 iOS、Android、H5、小程序等多端")
                                     )
                                 }
-                                ), "_" to 1)),
-                                _cV(_component_up_collapse_item, _uM("title" to "第三项", "name" to "3"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                    return _uA(
-                                        _cE("text", _uM("class" to "collapse-text"), "高度适配 UTS 强类型系统与原生跨端开发")
-                                    )
-                                }
                                 ), "_" to 1))
                             )
                         }
@@ -266,27 +256,16 @@ open class GenSrcSubUviewUltraComponentsDemoFeedback : VueComponent {
                     )),
                     _cE("view", _uM("class" to "demo-block"), _uA(
                         _cE("text", _uM("class" to "demo-label"), " up-toast "),
-                        _cE("view", _uM("class" to "demo-row"), _uA(
+                        _cE("view", _uM("class" to "demo-row-start"), _uA(
                             _cV(_component_up_button, _uM("type" to "primary", "text" to "成功提示", "size" to "mini", "onClick" to fun(){
                                 showToast("success")
                             }
                             ), null, 8, _uA(
                                 "onClick"
                             )),
+                            _cE("view", _uM("class" to "w-10px")),
                             _cV(_component_up_button, _uM("type" to "error", "text" to "错误提示", "size" to "mini", "onClick" to fun(){
                                 showToast("error")
-                            }
-                            ), null, 8, _uA(
-                                "onClick"
-                            )),
-                            _cV(_component_up_button, _uM("type" to "warning", "text" to "警告提示", "size" to "mini", "onClick" to fun(){
-                                showToast("warning")
-                            }
-                            ), null, 8, _uA(
-                                "onClick"
-                            )),
-                            _cV(_component_up_button, _uM("type" to "info", "text" to "默认提示", "size" to "mini", "onClick" to fun(){
-                                showToast("default")
                             }
                             ), null, 8, _uA(
                                 "onClick"
@@ -295,27 +274,16 @@ open class GenSrcSubUviewUltraComponentsDemoFeedback : VueComponent {
                     )),
                     _cE("view", _uM("class" to "demo-block"), _uA(
                         _cE("text", _uM("class" to "demo-label"), " up-notify "),
-                        _cE("view", _uM("class" to "demo-row"), _uA(
+                        _cE("view", _uM("class" to "demo-row-start"), _uA(
                             _cV(_component_up_button, _uM("type" to "primary", "text" to "主要通知", "size" to "mini", "onClick" to fun(){
                                 showNotify("primary")
                             }
                             ), null, 8, _uA(
                                 "onClick"
                             )),
+                            _cE("view", _uM("class" to "w-10px")),
                             _cV(_component_up_button, _uM("type" to "success", "text" to "成功通知", "size" to "mini", "onClick" to fun(){
                                 showNotify("success")
-                            }
-                            ), null, 8, _uA(
-                                "onClick"
-                            )),
-                            _cV(_component_up_button, _uM("type" to "warning", "text" to "警告通知", "size" to "mini", "onClick" to fun(){
-                                showNotify("warning")
-                            }
-                            ), null, 8, _uA(
-                                "onClick"
-                            )),
-                            _cV(_component_up_button, _uM("type" to "error", "text" to "错误通知", "size" to "mini", "onClick" to fun(){
-                                showNotify("error")
                             }
                             ), null, 8, _uA(
                                 "onClick"
@@ -330,13 +298,14 @@ open class GenSrcSubUviewUltraComponentsDemoFeedback : VueComponent {
                     )),
                     _cE("view", _uM("class" to "demo-block"), _uA(
                         _cE("text", _uM("class" to "demo-label"), " up-overlay "),
-                        _cE("view", _uM("class" to "demo-row"), _uA(
+                        _cE("view", _uM("class" to "demo-row-start"), _uA(
                             _cV(_component_up_button, _uM("type" to "primary", "text" to "显示遮罩", "size" to "mini", "onClick" to fun(){
                                 overlayShow.value = true
                             }
                             ), null, 8, _uA(
                                 "onClick"
                             )),
+                            _cE("view", _uM("class" to "w-10px")),
                             _cV(_component_up_button, _uM("type" to "warning", "text" to "半透明遮罩", "size" to "mini", "onClick" to fun(){
                                 overlayOpacity.value = 0.3
                                 overlayShow.value = true
@@ -348,40 +317,24 @@ open class GenSrcSubUviewUltraComponentsDemoFeedback : VueComponent {
                     )),
                     _cE("view", _uM("class" to "demo-block"), _uA(
                         _cE("text", _uM("class" to "demo-label"), " up-modal "),
-                        _cE("view", _uM("class" to "demo-row"), _uA(
+                        _cE("view", _uM("class" to "demo-row-start"), _uA(
                             _cV(_component_up_button, _uM("type" to "primary", "text" to "弹窗提示", "size" to "mini", "onClick" to showModal)),
+                            _cE("view", _uM("class" to "w-10px")),
                             _cV(_component_up_button, _uM("type" to "warning", "text" to "确认弹窗", "size" to "mini", "onClick" to showConfirmModal))
                         ))
                     )),
                     _cE("view", _uM("class" to "demo-block"), _uA(
                         _cE("text", _uM("class" to "demo-label"), " up-popup "),
-                        _cE("view", _uM("class" to "demo-row"), _uA(
+                        _cE("view", _uM("class" to "demo-row-start"), _uA(
                             _cV(_component_up_button, _uM("type" to "primary", "text" to "顶部弹出", "size" to "mini", "onClick" to fun(){
                                 openPopup("top")
                             }
                             ), null, 8, _uA(
                                 "onClick"
                             )),
+                            _cE("view", _uM("class" to "w-10px")),
                             _cV(_component_up_button, _uM("type" to "primary", "text" to "底部弹出", "size" to "mini", "onClick" to fun(){
                                 openPopup("bottom")
-                            }
-                            ), null, 8, _uA(
-                                "onClick"
-                            )),
-                            _cV(_component_up_button, _uM("type" to "primary", "text" to "左侧弹出", "size" to "mini", "onClick" to fun(){
-                                openPopup("left")
-                            }
-                            ), null, 8, _uA(
-                                "onClick"
-                            )),
-                            _cV(_component_up_button, _uM("type" to "primary", "text" to "右侧弹出", "size" to "mini", "onClick" to fun(){
-                                openPopup("right")
-                            }
-                            ), null, 8, _uA(
-                                "onClick"
-                            )),
-                            _cV(_component_up_button, _uM("type" to "primary", "text" to "居中弹出", "size" to "mini", "onClick" to fun(){
-                                openPopup("center")
                             }
                             ), null, 8, _uA(
                                 "onClick"
@@ -392,12 +345,10 @@ open class GenSrcSubUviewUltraComponentsDemoFeedback : VueComponent {
                         _cE("text", _uM("class" to "demo-label"), " up-tooltip "),
                         _cE("view", _uM("class" to "demo-row-start"), _uA(
                             _cV(_component_up_tooltip, _uM("text" to "长按此处复制文本", "direction" to "top")),
-                            _cE("view", _uM("class" to "w-30px")),
+                            _cE("view", _uM("class" to "w-20px")),
                             _cV(_component_up_tooltip, _uM("text" to "长按显示操作", "direction" to "top", "show-copy" to false, "buttons" to tooltipButtons.value), null, 8, _uA(
                                 "buttons"
-                            )),
-                            _cE("view", _uM("class" to "w-30px")),
-                            _cV(_component_up_tooltip, _uM("text" to "底部弹出", "direction" to "bottom", "color" to "#2979ff", "bg-color" to "#f0f5ff"))
+                            ))
                         ))
                     )),
                     _cE("view", _uM("class" to "demo-block"), _uA(
@@ -459,7 +410,7 @@ open class GenSrcSubUviewUltraComponentsDemoFeedback : VueComponent {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("bg-white" to _pS(_uM("backgroundColor" to "rgba(255,255,255,var(--un-bg-opacity,1))")), "flex-1" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")), "h-10px" to _pS(_uM("height" to 10)), "items-center" to _pS(_uM("alignItems" to "center")), "justify-center" to _pS(_uM("justifyContent" to "center")), "mt-10px" to _pS(_uM("marginTop" to 10)), "p-20px" to _pS(_uM("paddingTop" to 20, "paddingRight" to 20, "paddingBottom" to 20, "paddingLeft" to 20)), "p-30px" to _pS(_uM("paddingTop" to 30, "paddingRight" to 30, "paddingBottom" to 30, "paddingLeft" to 30)), "rounded-8px" to _pS(_uM("borderTopLeftRadius" to 8, "borderTopRightRadius" to 8, "borderBottomRightRadius" to 8, "borderBottomLeftRadius" to 8)), "text-__303133_" to _pS(_uM("color" to "#303133")), "text-__909399_" to _pS(_uM("color" to "#909399")), "text-12px" to _pS(_uM("fontSize" to 12)), "text-14px" to _pS(_uM("fontSize" to 14)), "text-16px" to _pS(_uM("fontSize" to 16)), "w-30px" to _pS(_uM("width" to 30)), "section-title" to _pS(_uM("paddingTop" to 16, "paddingRight" to 16, "paddingBottom" to 8, "paddingLeft" to 16, "fontSize" to 18, "fontWeight" to "bold", "color" to "#303133")), "demo-block" to _pS(_uM("marginTop" to 0, "marginRight" to 12, "marginBottom" to 12, "marginLeft" to 12, "paddingTop" to 12, "paddingRight" to 12, "paddingBottom" to 12, "paddingLeft" to 12, "backgroundColor" to "#ffffff", "borderTopLeftRadius" to 8, "borderTopRightRadius" to 8, "borderBottomRightRadius" to 8, "borderBottomLeftRadius" to 8)), "demo-label" to _pS(_uM("fontSize" to 14, "fontWeight" to "bold", "color" to "#606266", "marginBottom" to 10, "paddingLeft" to 4, "borderLeftWidth" to 3, "borderLeftStyle" to "solid", "borderLeftColor" to "#2979ff")), "demo-row" to _pS(_uM("display" to "flex", "flexDirection" to "row", "flexWrap" to "wrap", "alignItems" to "center", "justifyContent" to "space-between", "marginBottom" to 8)), "demo-row-start" to _pS(_uM("display" to "flex", "flexDirection" to "row", "flexWrap" to "wrap", "alignItems" to "center", "justifyContent" to "flex-start", "marginBottom" to 8)), "collapse-text" to _pS(_uM("fontSize" to 13, "color" to "#909399", "lineHeight" to "20px")))
+                return _uM("bg-white" to _pS(_uM("backgroundColor" to "rgba(255,255,255,var(--un-bg-opacity,1))")), "flex-1" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")), "h-10px" to _pS(_uM("height" to 10)), "items-center" to _pS(_uM("alignItems" to "center")), "justify-center" to _pS(_uM("justifyContent" to "center")), "mt-10px" to _pS(_uM("marginTop" to 10)), "p-20px" to _pS(_uM("paddingTop" to 20, "paddingRight" to 20, "paddingBottom" to 20, "paddingLeft" to 20)), "p-30px" to _pS(_uM("paddingTop" to 30, "paddingRight" to 30, "paddingBottom" to 30, "paddingLeft" to 30)), "rounded-8px" to _pS(_uM("borderTopLeftRadius" to 8, "borderTopRightRadius" to 8, "borderBottomRightRadius" to 8, "borderBottomLeftRadius" to 8)), "text-__303133_" to _pS(_uM("color" to "#303133")), "text-__909399_" to _pS(_uM("color" to "#909399")), "text-12px" to _pS(_uM("fontSize" to 12)), "text-14px" to _pS(_uM("fontSize" to 14)), "text-16px" to _pS(_uM("fontSize" to 16)), "w-10px" to _pS(_uM("width" to 10)), "w-20px" to _pS(_uM("width" to 20)), "section-title" to _pS(_uM("paddingTop" to 16, "paddingRight" to 16, "paddingBottom" to 8, "paddingLeft" to 16, "fontSize" to 18, "fontWeight" to "bold", "color" to "#303133")), "demo-block" to _pS(_uM("marginTop" to 0, "marginRight" to 12, "marginBottom" to 12, "marginLeft" to 12, "paddingTop" to 12, "paddingRight" to 12, "paddingBottom" to 12, "paddingLeft" to 12, "backgroundColor" to "#ffffff", "borderTopLeftRadius" to 8, "borderTopRightRadius" to 8, "borderBottomRightRadius" to 8, "borderBottomLeftRadius" to 8)), "demo-label" to _pS(_uM("fontSize" to 14, "fontWeight" to "bold", "color" to "#606266", "marginBottom" to 10, "paddingLeft" to 4, "borderLeftWidth" to 3, "borderLeftStyle" to "solid", "borderLeftColor" to "#2979ff")), "demo-row" to _pS(_uM("display" to "flex", "flexDirection" to "row", "flexWrap" to "wrap", "alignItems" to "center", "justifyContent" to "space-between", "marginBottom" to 8)), "demo-row-start" to _pS(_uM("display" to "flex", "flexDirection" to "row", "flexWrap" to "wrap", "alignItems" to "center", "justifyContent" to "flex-start", "marginBottom" to 8)), "collapse-text" to _pS(_uM("fontSize" to 13, "color" to "#909399", "lineHeight" to "20px")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

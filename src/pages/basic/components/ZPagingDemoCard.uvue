@@ -51,22 +51,23 @@
       ref="pagingX"
       :model-value="dataList"
       :default-page-size="5"
-      list-is="scroll-view"
       :paging-style="{ height: '200px', border: '1px solid #edf2f7', borderTopWidth: '0px', borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px', backgroundColor: '#f8fafc' }"
       @update:model-value="onUpdateModelValue"
       @query="onQuery"
     >
       <!-- 列表数据项 -->
-      <view v-for="item in dataList" :key="item.id" class="mx-12px my-8px p-12px bg-white rounded-8px border-width-1px border-style-solid border-color-[#edf2f7]">
-        <view class="flex-row justify-between items-center mb-6px">
-          <view :style="{ backgroundColor: item.tagBgColor, padding: '1px 6px', borderRadius: '4px' }">
-            <text :style="{ color: item.tagColor, fontSize: '9px', fontWeight: 'bold' }">{{ item.tag }}</text>
+      <list-item v-for="item in dataList" :key="item.id">
+        <view class="mx-12px my-8px p-12px bg-white rounded-8px border-width-1px border-style-solid border-color-[#edf2f7]">
+          <view class="flex-row justify-between items-center mb-6px">
+            <view :style="{ backgroundColor: item.tagBgColor, padding: '1px 6px', borderRadius: '4px' }">
+              <text :style="{ color: item.tagColor, fontSize: '9px', fontWeight: 'bold' }">{{ item.tag }}</text>
+            </view>
+            <text class="text-11px text-[#94a3b8]">#{{ item.id }}</text>
           </view>
-          <text class="text-11px text-[#94a3b8]">#{{ item.id }}</text>
+          <text class="text-14px font-bold text-[#1e293b] mb-4px">{{ item.title }}</text>
+          <text class="text-12px text-[#64748b] leading-16px">{{ item.summary }}</text>
         </view>
-        <text class="text-14px font-bold text-[#1e293b] mb-4px">{{ item.title }}</text>
-        <text class="text-12px text-[#64748b] leading-16px">{{ item.summary }}</text>
-      </view>
+      </list-item>
     </z-paging-x>
   </Card>
 </template>

@@ -206,15 +206,15 @@ open class GenUniModulesUviewUltraComponentsUpLoadingPageUpLoadingPage : VueComp
         ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "loadingText" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__28["loadingText"]), "image" to _uM("type" to "String", "default" to crtProp__28["image"]), "loadingMode" to _uM("type" to "String", "default" to crtProp__28["loadingMode"]), "loading" to _uM("type" to "Boolean", "default" to crtProp__28["loading"]), "bgColor" to _uM("type" to "String", "default" to crtProp__28["bgColor"]), "color" to _uM("type" to "String", "default" to crtProp__28["color"]), "fontSize" to _uM("type" to _uA(
+        ), "default" to crtProp__27["loadingText"]), "image" to _uM("type" to "String", "default" to crtProp__27["image"]), "loadingMode" to _uM("type" to "String", "default" to crtProp__27["loadingMode"]), "loading" to _uM("type" to "Boolean", "default" to crtProp__27["loading"]), "bgColor" to _uM("type" to "String", "default" to crtProp__27["bgColor"]), "color" to _uM("type" to "String", "default" to crtProp__27["color"]), "fontSize" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__28["fontSize"]), "iconSize" to _uM("type" to _uA(
+        ), "default" to crtProp__27["fontSize"]), "iconSize" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to crtProp__28["fontSize"]), "loadingColor" to _uM("type" to "String", "default" to crtProp__28["loadingColor"]), "zIndex" to _uM("type" to _uA(
+        ), "default" to crtProp__27["fontSize"]), "loadingColor" to _uM("type" to "String", "default" to crtProp__27["loadingColor"]), "zIndex" to _uM("type" to _uA(
             "Number"
-        ), "default" to crtProp__28["zIndex"])))
+        ), "default" to crtProp__27["zIndex"])))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",
