@@ -3,7 +3,7 @@ const { defineComponent, onBackPress, ref, resolveDynamicComponent, openBlock, c
 import { A as AppKu, r as resolveEasycom } from "../../../App.ku.js";
 import { L as LayoutComponent } from "../../layouts/default.js";
 import { h as handleBackPressExit } from "../../utils/backPress.js";
-import { _ as _imports_0 } from "../../../static/logo.js";
+import { _ as _imports_1 } from "../../../static/logo.js";
 import { _ as _export_sfc } from "../../../plugin-vue-export-helper.js";
 import "../../utils/systemInfo.js";
 import "../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
@@ -82,7 +82,12 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     function switchBg() {
       isBg.value = !isBg.value;
     }
-    const __returned__ = { themeSwitchVal, themeSwitchVal2, checkboxValue, radioValue, sliderValue, rateValue, isBg, switchBg, get AppKu() {
+    function goToUiTest() {
+      uni.navigateTo({
+        url: "/src/sub/uiTest/uiTest"
+      });
+    }
+    const __returned__ = { themeSwitchVal, themeSwitchVal2, checkboxValue, radioValue, sliderValue, rateValue, isBg, switchBg, goToUiTest, get AppKu() {
       return AppKu;
     }, get LayoutComponent() {
       return LayoutComponent;
@@ -107,9 +112,15 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
               "show-back": false
             }),
             createElementVNode("view", { class: "content-container pb-20px" }, [
+              createElementVNode("view", { class: "mx-30px mt-15px" }, [
+                createElementVNode("button", {
+                  type: "primary",
+                  onClick: $setup.goToUiTest
+                }, "前往 uiTest 测试页")
+              ]),
               createElementVNode("image", {
                 class: "w-100px h-100px mx-auto mt-20px rounded-20px",
-                src: _imports_0
+                src: _imports_1
               }),
               createElementVNode("text", { class: "text-32px text-bold mx-auto mt-10px text-__d14328_" }, " unibestX "),
               createElementVNode("text", { class: "text-center text-25px mt-10px" }, " 最好用的 uni-appX 开发模板 "),

@@ -6,13 +6,15 @@ require('android.content.Context');
 require('android.os.Vibrator');
 require('android.os.VibratorManager');
 
-const NavBar_uvue_vue_type_style_index_0_dataScoped_8lfn1ess61ju294fpn_lang = {};
+const NavBar_uvue_vue_type_style_index_0_dataScoped_q1krle7geo1ju2afood_lang = {};
 
-const NavBar_uvue_vue_type_style_index_1_dataScoped_8lfn1ess61ju294fpn_lang = {};
+const NavBar_uvue_vue_type_style_index_1_dataScoped_q1krle7geo1ju2afood_lang = {};
 
 const upLoadingIcon_uvue_vue_type_style_index_0_lang = {};
 
 const upIcon_uvue_vue_type_style_index_0_lang = {};
+
+const upButton_uvue_vue_type_style_index_0_lang = {};
 
 const upGap_uvue_vue_type_style_index_0_lang = {};
 
@@ -24,33 +26,33 @@ const upToast_uvue_vue_type_style_index_0_lang = {};
 
 const uniIcons_uvue_vue_type_style_index_0_lang = {};
 
-const TabbarItem_uvue_vue_type_style_index_0_dataScoped_8v9tdgeogg1ju294gj8_lang = {};
+const TabbarItem_uvue_vue_type_style_index_0_dataScoped_ir5pptk7do1ju2afpgk_lang = {};
 
-const index_uvue_vue_type_style_index_0_dataScoped_4vprbl6ua81ju294g98_lang = {};
+const index_uvue_vue_type_style_index_0_dataScoped_q1aieimho1ju2afp4j_lang = {};
 
-const index_uvue_vue_type_style_index_0_dataScoped_mu69sa5n2g1ju294f76_lang = {};
+const index_uvue_vue_type_style_index_0_dataScoped_10qiq4n2ko1ju2b0mqq_lang = {};
 
-const me_uvue_vue_type_style_index_0_dataScoped_8d4nmcqdog1ju294f9f_lang = {};
+const me_uvue_vue_type_style_index_0_dataScoped_rnh0cu9b381ju2amep0_lang = {};
 
 const lIcon_uvue_vue_type_style_index_0_lang = {};
 
-const Card_uvue_vue_type_style_index_0_dataScoped_t6vj3gevp1ju294g9e_lang = {};
+const Card_uvue_vue_type_style_index_0_dataScoped_rgho83kus81ju2afp4t_lang = {};
 
-const IconDemoCard_uvue_vue_type_style_index_0_dataScoped_mmphk0t7k1ju294fr9_lang = {};
+const IconDemoCard_uvue_vue_type_style_index_0_dataScoped_899puu13fg1ju2afoos_lang = {};
 
-const LangSwitchCard_uvue_vue_type_style_index_0_dataScoped_eoubl248mo1ju294frg_lang = {};
+const LangSwitchCard_uvue_vue_type_style_index_0_dataScoped_0jmen1m211ju2afool_lang = {};
 
-const ThemeSwitchCard_uvue_vue_type_style_index_0_dataScoped_5fgg2l51dg1ju294fst_lang = {};
+const ThemeSwitchCard_uvue_vue_type_style_index_0_dataScoped_rnsd08leu1ju2afop2_lang = {};
 
-const TimeDemoCard_uvue_vue_type_style_index_0_dataScoped_52gn5finqg1ju294ftb_lang = {};
+const TimeDemoCard_uvue_vue_type_style_index_0_dataScoped_2qksr2vr681ju2afop9_lang = {};
 
-const RouterDemoCard_uvue_vue_type_style_index_0_dataScoped_7nqc3r5ec1ju294ftl_lang = {};
+const RouterDemoCard_uvue_vue_type_style_index_0_dataScoped_tlhs6hi7d1ju2afopf_lang = {};
 
-const HttpDemoCard_uvue_vue_type_style_index_0_dataScoped_30j9nqap4g1ju294ftv_lang = {};
+const HttpDemoCard_uvue_vue_type_style_index_0_dataScoped_7rr0vgpcd1ju2afopp_lang = {};
 
-const EchartsDemoCard_uvue_vue_type_style_index_0_dataScoped_89deug6vb1ju294fvt_lang = {};
+const EchartsDemoCard_uvue_vue_type_style_index_0_dataScoped_aal0nujlqg1ju2afoq9_lang = {};
 
-const SystemInfoDemoCard_uvue_vue_type_style_index_0_dataScoped_di7rt11qgo1ju294fu9_lang = {};
+const SystemInfoDemoCard_uvue_vue_type_style_index_0_dataScoped_hg26tnvb881ju2afoq0_lang = {};
 
 const zPagingXEmpty_uvue_vue_type_style_index_0_lang = {};
 
@@ -62,31 +64,31 @@ const zPagingLoadMore_uvue_vue_type_style_index_0_lang = {};
 
 const zPagingX_uvue_vue_type_style_index_0_lang = {};
 
-const ZPagingDemoCard_uvue_vue_type_style_index_0_dataScoped_7mp4h8m3h81ju294fvg_lang = {};
+const ZPagingDemoCard_uvue_vue_type_style_index_0_dataScoped_m2d084jqvg1ju2afoqk_lang = {};
 
-const UViewUltraDemoCard_uvue_vue_type_style_index_0_dataScoped_k4740b03u1ju294fuj_lang = {};
+const UViewUltraDemoCard_uvue_vue_type_style_index_0_dataScoped_c5e0in8vpo1ju2afor9_lang = {};
 
-const basic_uvue_vue_type_style_index_0_dataScoped_8i53ge3tvo1ju294fdv_lang = {};
+const basic_uvue_vue_type_style_index_0_dataScoped_5krglkvup81ju2amenv_lang = {};
 
-const SystemInfoCard_uvue_vue_type_style_index_0_dataScoped_s57duin6j1ju294fqc_lang = {};
+const SystemInfoCard_uvue_vue_type_style_index_0_dataScoped_tgun7adof81ju2afoqr_lang = {};
 
-const HapticsCard_uvue_vue_type_style_index_0_dataScoped_pndv3n8vsg1ju294fqp_lang = {};
+const HapticsCard_uvue_vue_type_style_index_0_dataScoped_8qf2hrrhog1ju2afor0_lang = {};
 
-const MediaCard_uvue_vue_type_style_index_0_dataScoped_s4sbk474b81ju294fr0_lang = {};
+const MediaCard_uvue_vue_type_style_index_0_dataScoped_d38l90httg1ju2afore_lang = {};
 
-const function_uvue_vue_type_style_index_0_dataScoped_osahgulqoo1ju294fc7_lang = {};
+const function_uvue_vue_type_style_index_0_dataScoped_d48b0nrvv81ju2amep9_lang = {};
 
-const ai_uvue_vue_type_style_index_0_dataScoped_v03f8vlllo1ju294fas_lang = {};
+const ai_uvue_vue_type_style_index_0_dataScoped_ms2s94vnf81ju2amem3_lang = {};
 
-const ai_uvue_vue_type_style_index_1_dataScoped_v03f8vlllo1ju294fas_lang = {};
+const ai_uvue_vue_type_style_index_1_dataScoped_ms2s94vnf81ju2amem3_lang = {};
 
-const login_uvue_vue_type_style_index_0_dataScoped_icsf90v0go1ju294fe9_lang = {};
+const login_uvue_vue_type_style_index_0_dataScoped_8961f2p8n1ju2ameol_lang = {};
 
-const register_uvue_vue_type_style_index_0_dataScoped_fkr39f94r81ju294fcc_lang = {};
+const register_uvue_vue_type_style_index_0_dataScoped_3qt8sq8k381ju2amepe_lang = {};
 
-const test_uvue_vue_type_style_index_0_dataScoped_m7bulre4sg1ju294fa5_lang = {};
+const test_uvue_vue_type_style_index_0_dataScoped_6t8uj8laq1ju2amepj_lang = {};
 
-const paging_uvue_vue_type_style_index_0_dataScoped_7seh67faio1ju294fdm_lang = {};
+const paging_uvue_vue_type_style_index_0_dataScoped_q6qrr7piq81ju2ameq0_lang = {};
 
 const upSwiperIndicator_uvue_vue_type_style_index_0_lang = {};
 
@@ -95,8 +97,6 @@ const upSwiper_uvue_vue_type_style_index_0_lang = {};
 const upImage_uvue_vue_type_style_index_0_lang = {};
 
 const upPagination_uvue_vue_type_style_index_0_lang = {};
-
-const upButton_uvue_vue_type_style_index_0_lang = {};
 
 const upTh_uvue_vue_type_style_index_0_lang = {};
 
@@ -232,9 +232,9 @@ const upDatetimePicker_uvue_vue_type_style_index_0_lang = {};
 
 const upActionSheet_uvue_vue_type_style_index_0_lang = {};
 
-const DemoForm_uvue_vue_type_style_index_0_dataScoped_gsflv35t6o1ju294g7v_lang = {};
+const DemoForm_uvue_vue_type_style_index_0_dataScoped_pta8hri7m81ju2afp2q_lang = {};
 
-const DemoForm_uvue_vue_type_style_index_1_dataScoped_gsflv35t6o1ju294g7v_lang = {};
+const DemoForm_uvue_vue_type_style_index_1_dataScoped_pta8hri7m81ju2afp2q_lang = {};
 
 const upAlert_uvue_vue_type_style_index_0_lang = {};
 
@@ -256,20 +256,22 @@ const upModal_uvue_vue_type_style_index_0_lang = {};
 
 const upLoadingPage_uvue_vue_type_style_index_0_lang = {};
 
-const DemoFeedback_uvue_vue_type_style_index_0_dataScoped_f86vmec2do1ju294g8j_lang = {};
+const DemoFeedback_uvue_vue_type_style_index_0_dataScoped_1m7241bslo1ju2afp37_lang = {};
 
-const DemoFeedback_uvue_vue_type_style_index_1_dataScoped_f86vmec2do1ju294g8j_lang = {};
+const DemoFeedback_uvue_vue_type_style_index_1_dataScoped_1m7241bslo1ju2afp37_lang = {};
 
 const upCard_uvue_vue_type_style_index_0_lang = {};
 
 const upList_uvue_vue_type_style_index_0_lang = {};
 
-const DemoShow_uvue_vue_type_style_index_0_dataScoped_ouiq7d53l1ju294g8c_lang = {};
+const DemoShow_uvue_vue_type_style_index_0_dataScoped_9naqs6m9lg1ju2afp3i_lang = {};
 
-const DemoShow_uvue_vue_type_style_index_1_dataScoped_ouiq7d53l1ju294g8c_lang = {};
+const DemoShow_uvue_vue_type_style_index_1_dataScoped_9naqs6m9lg1ju2afp3i_lang = {};
 
-const uviewUltra_uvue_vue_type_style_index_0_dataScoped_0nb07rlr681ju294ffu_lang = {};
+const uviewUltra_uvue_vue_type_style_index_0_dataScoped_s5uu4plkfo1ju2amerb_lang = {};
 
-const uviewUltra_uvue_vue_type_style_index_1_dataScoped_0nb07rlr681ju294ffu_lang = {};
+const uviewUltra_uvue_vue_type_style_index_1_dataScoped_s5uu4plkfo1ju2amerb_lang = {};
+
+const uiTest_uvue_vue_type_style_index_0_dataScoped_5o9r9s4l2g1ju2ameqg_lang = {};
 
 const App_uvue_vue_type_style_index_0_lang = {};

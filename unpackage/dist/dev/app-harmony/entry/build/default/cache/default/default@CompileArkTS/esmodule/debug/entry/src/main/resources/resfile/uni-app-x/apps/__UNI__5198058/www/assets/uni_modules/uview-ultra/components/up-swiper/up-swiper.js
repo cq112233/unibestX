@@ -80,18 +80,6 @@ const _sfc_main = defineComponent({
         error("请按格式传递列表参数");
         return "";
       }
-      if (src.startsWith("/static/")) {
-        try {
-          const pages = getCurrentPages();
-          if (pages.length > 0) {
-            const route = pages[pages.length - 1].route;
-            if (route.includes("sub/")) {
-              return "../../static/" + src.substring(8);
-            }
-          }
-        } catch (e) {
-        }
-      }
       return src;
     },
     getItemTitle(item = null) {

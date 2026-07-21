@@ -8,6 +8,7 @@ const SrcSubAuthRegister = () => import("./src/sub/auth/register.js");
 const SrcSubTestTest = () => import("./src/sub/test/test.js");
 const SrcSubPagingPaging = () => import("./src/sub/paging/paging.js");
 const SrcSubUviewUltraUviewUltra = () => import("./src/sub/uview-ultra/uview-ultra.js");
+const SrcSubUiTestUiTest = () => import("./src/sub/uiTest/uiTest.js");
 __definePage("src/pages/index/index", SrcPagesIndexIndex);
 __definePage("src/pages/me/me", SrcPagesMeMe);
 __definePage("src/pages/basic/basic", SrcPagesBasicBasic);
@@ -18,4 +19,5 @@ __definePage("src/sub/auth/register", SrcSubAuthRegister);
 __definePage("src/sub/test/test", SrcSubTestTest);
 __definePage("src/sub/paging/paging", SrcSubPagingPaging);
 __definePage("src/sub/uview-ultra/uview-ultra", SrcSubUviewUltraUviewUltra);
+__definePage("src/sub/uiTest/uiTest", SrcSubUiTestUiTest);
 //# sourceMappingURL=pages-json-uts.js.map

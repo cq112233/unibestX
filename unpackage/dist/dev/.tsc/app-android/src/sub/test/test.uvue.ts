@@ -36,7 +36,7 @@ return (): any | null => {
 
   return _cV(unref(AppKu), null, _uM({
     default: withSlotCtx((): any[] => [
-      _cV(unref(LayoutComponent), _uM({ "navigation-bar-title-text": '' }), _uM({
+      _cV(unref(LayoutComponent), _uM({ "navigation-bar-title-text": '测试' }), _uM({
         default: withSlotCtx((): any[] => [
           _cE("view", _uM({ class: "p-5px min-h-screen bg-__f8fafc_" }), [
             _cE("view", _uM({ class: "bg-white rounded-lg p-5px shadow-sm border-width-1px border-style-solid border-color-__e2e8f0_" }), [

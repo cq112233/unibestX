@@ -95,7 +95,7 @@ const _style_0 = { "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroun
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return openBlock(), createBlock($setup["AppKu"], null, {
     default: withCtx(() => [
-      createVNode($setup["LayoutComponent"], { "navigation-bar-title-text": "" }, {
+      createVNode($setup["LayoutComponent"], { "navigation-bar-title-text": "测试" }, {
         default: withCtx(() => [
           createElementVNode("view", { class: "p-5px min-h-screen bg-__f8fafc_" }, [
             createElementVNode("view", { class: "bg-white rounded-lg p-5px shadow-sm border-width-1px border-style-solid border-color-__e2e8f0_" }, [

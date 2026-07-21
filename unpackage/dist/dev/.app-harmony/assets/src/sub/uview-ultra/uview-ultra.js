@@ -60,7 +60,7 @@ import { D as DemoForm } from "./components/DemoForm.js";
 import { D as DemoFeedback } from "./components/DemoFeedback.js";
 import { D as DemoShow } from "./components/DemoShow.js";
 import { m as mpHtml } from "../../../uni_modules/mp-html/components/mp-html/mp-html.js";
-import { _ as _imports_0 } from "../../../static/logo.js";
+import { _ as _imports_1 } from "../../../static/logo.js";
 import { _ as _export_sfc } from "../../../plugin-vue-export-helper.js";
 import "../../utils/systemInfo.js";
 import "../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
@@ -878,11 +878,11 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
               onScroll: $setup.onScroll
             }, [
               createElementVNode("image", {
-                src: _imports_0,
+                src: _imports_1,
                 style: { "width": "60px", "height": "60px" }
               }),
               createElementVNode("image", {
-                src: _imports_0,
+                src: _imports_1,
                 style: { "width": "60px", "height": "60px" }
               }),
               createVNode($setup["DemoShow"]),
@@ -917,7 +917,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                   }),
                   createElementVNode("view", { class: "w-15px" }),
                   createElementVNode("image", {
-                    src: _imports_0,
+                    src: _imports_1,
                     style: { "width": "60px", "height": "60px" },
                     mode: "aspectFill"
                   })

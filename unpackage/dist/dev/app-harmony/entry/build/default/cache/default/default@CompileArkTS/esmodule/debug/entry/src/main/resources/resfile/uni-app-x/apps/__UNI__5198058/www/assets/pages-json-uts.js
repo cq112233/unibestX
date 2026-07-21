@@ -8,6 +8,7 @@ const SrcSubAuthRegister = () => import("@normalized:N&&&entry/src/main/resource
 const SrcSubTestTest = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/sub/test/test&");
 const SrcSubPagingPaging = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/sub/paging/paging&");
 const SrcSubUviewUltraUviewUltra = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/sub/uview-ultra/uview-ultra&");
+const SrcSubUiTestUiTest = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/sub/uiTest/uiTest&");
 __definePage("src/pages/index/index", SrcPagesIndexIndex);
 __definePage("src/pages/me/me", SrcPagesMeMe);
 __definePage("src/pages/basic/basic", SrcPagesBasicBasic);
@@ -18,4 +19,5 @@ __definePage("src/sub/auth/register", SrcSubAuthRegister);
 __definePage("src/sub/test/test", SrcSubTestTest);
 __definePage("src/sub/paging/paging", SrcSubPagingPaging);
 __definePage("src/sub/uview-ultra/uview-ultra", SrcSubUviewUltraUviewUltra);
+__definePage("src/sub/uiTest/uiTest", SrcSubUiTestUiTest);
 //# sourceMappingURL=pages-json-uts.js.map

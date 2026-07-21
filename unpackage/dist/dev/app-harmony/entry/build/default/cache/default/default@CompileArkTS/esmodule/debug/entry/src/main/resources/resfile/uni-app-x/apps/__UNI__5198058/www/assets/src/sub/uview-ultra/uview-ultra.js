@@ -60,7 +60,7 @@ import { D as DemoForm } from "@normalized:N&&&entry/src/main/resources/resfile/
 import { D as DemoFeedback } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/sub/uview-ultra/components/DemoFeedback&";
 import { D as DemoShow } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/sub/uview-ultra/components/DemoShow&";
 import { m as mpHtml } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/mp-html/components/mp-html/mp-html&";
-import { _ as _imports_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/static/logo&";
+import { _ as _imports_1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/static/logo&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/systemInfo&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-toast/up-toast&";
@@ -878,11 +878,11 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
               onScroll: $setup.onScroll
             }, [
               createElementVNode("image", {
-                src: _imports_0,
+                src: _imports_1,
                 style: { "width": "60px", "height": "60px" }
               }),
               createElementVNode("image", {
-                src: _imports_0,
+                src: _imports_1,
                 style: { "width": "60px", "height": "60px" }
               }),
               createVNode($setup["DemoShow"]),
@@ -917,7 +917,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                   }),
                   createElementVNode("view", { class: "w-15px" }),
                   createElementVNode("image", {
-                    src: _imports_0,
+                    src: _imports_1,
                     style: { "width": "60px", "height": "60px" },
                     mode: "aspectFill"
                   })

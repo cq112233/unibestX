@@ -58,6 +58,7 @@ import GenSrcSubAuthRegisterClass from './src/sub/auth/register.uvue';
 import GenSrcSubTestTestClass from './src/sub/test/test.uvue';
 import GenSrcSubPagingPagingClass from './src/sub/paging/paging.uvue';
 import GenSrcSubUviewUltraUviewUltraClass from './src/sub/uview-ultra/uview-ultra.uvue';
+import GenSrcSubUiTestUiTestClass from './src/sub/uiTest/uiTest.uvue';
 function definePageRoutes() {
     __uniRoutes.push({ path: "src/pages/index/index", component: GenSrcPagesIndexIndexClass, meta: { isQuit: true } as UniPageMeta, style: _uM([["navigationStyle", "custom"], ["navigationBarTitleText", "首页"]]) } as UniPageRoute);
     __uniRoutes.push({ path: "src/pages/me/me", component: GenSrcPagesMeMeClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText", "我的"]]) } as UniPageRoute);
@@ -66,9 +67,10 @@ function definePageRoutes() {
     __uniRoutes.push({ path: "src/pages/ai/ai", component: GenSrcPagesAiAiClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle", "custom"], ["navigationBarTitleText", "AI助手"]]) } as UniPageRoute);
     __uniRoutes.push({ path: "src/sub/auth/login", component: GenSrcSubAuthLoginClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText", "登录"]]) } as UniPageRoute);
     __uniRoutes.push({ path: "src/sub/auth/register", component: GenSrcSubAuthRegisterClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText", "注册"]]) } as UniPageRoute);
-    __uniRoutes.push({ path: "src/sub/test/test", component: GenSrcSubTestTestClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText", ""]]) } as UniPageRoute);
+    __uniRoutes.push({ path: "src/sub/test/test", component: GenSrcSubTestTestClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText", "测试"]]) } as UniPageRoute);
     __uniRoutes.push({ path: "src/sub/paging/paging", component: GenSrcSubPagingPagingClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle", "custom"], ["navigationBarTitleText", "分页加载"]]) } as UniPageRoute);
     __uniRoutes.push({ path: "src/sub/uview-ultra/uview-ultra", component: GenSrcSubUviewUltraUviewUltraClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle", "custom"], ["navigationBarTitleText", "uview-ultra 示例"]]) } as UniPageRoute);
+    __uniRoutes.push({ path: "src/sub/uiTest/uiTest", component: GenSrcSubUiTestUiTestClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText", "UI 测试"]]) } as UniPageRoute);
 }
 const __uniTabBar: Map<string, any | null> | null = _uM([["custom", true], ["color", "#999999"], ["selectedColor", "#1890ff"], ["backgroundColor", "#F8F8F8"], ["list", [_uM([["pagePath", "src/pages/index/index"], ["text", "首页"]]), _uM([["pagePath", "src/pages/basic/basic"], ["text", "基础"]]), _uM([["pagePath", "src/pages/function/function"], ["text", "功能"]]), _uM([["pagePath", "src/pages/me/me"], ["text", "我的"]])]]]);
 const __uniLaunchPage: Map<string, any | null> = _uM([["url", "src/pages/index/index"], ["style", _uM([["navigationStyle", "custom"], ["navigationBarTitleText", "首页"]])]]);
