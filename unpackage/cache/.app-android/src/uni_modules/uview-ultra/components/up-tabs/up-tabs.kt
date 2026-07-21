@@ -100,7 +100,7 @@ open class GenUniModulesUviewUltraComponentsUpTabsUpTabs : VueComponent {
                                 }
                                 , "ref_for" to true, "ref" to ("up-tabs__wrapper__nav__item-" + index), "style" to _nS(_uA(
                                     _ctx.addStyle(_ctx.itemStyle),
-                                    _uM("flex" to if (_ctx.scrollable) {
+                                    _uM("flex" to if (isTruthy(_ctx.scrollable)) {
                                         "none"
                                     } else {
                                         "1"

@@ -49,7 +49,7 @@ open class GenUniModulesUviewUltraComponentsUpLinkUpLink : VueComponent {
     @Suppress("USELESS_CAST")
     override fun data(): Map<String, Any?> {
         return _uM("parent" to null as ComponentPublicInstance?, "parentData" to _uO(), "children" to _uA<ComponentPublicInstance>(), "childrenRefs" to _uA<String>(), "linkStyle" to computed<Any>(fun(): Any {
-            val style: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-link/up-link.uvue", 35, 11), "color" to this.color, "fontSize" to addUnit(this.fontSize), "lineHeight" to addUnit(parseInt(getPx(this.fontSize)) + 2), "textDecoration" to if (this.underLine) {
+            val style: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-link/up-link.uvue", 35, 11), "color" to this.color, "fontSize" to addUnit(this.fontSize), "lineHeight" to addUnit(parseInt(getPx(this.fontSize)) + 2), "textDecoration" to if (isTruthy(this.underLine)) {
                 "underline"
             } else {
                 "none"

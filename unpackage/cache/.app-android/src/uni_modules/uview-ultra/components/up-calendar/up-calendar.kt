@@ -42,7 +42,7 @@ open class GenUniModulesUviewUltraComponentsUpCalendarUpCalendar : VueComponent 
             return this.show
         }
         , fun(nval: Boolean) {
-            if (nval) {
+            if (isTruthy(nval)) {
                 this.init()
             } else {
                 this.scrollIntoView = ""
@@ -289,7 +289,7 @@ open class GenUniModulesUviewUltraComponentsUpCalendarUpCalendar : VueComponent 
             }
         }
         ), "currentMonths" to computed<UTSArray<monthsItem>>(fun(): UTSArray<monthsItem> {
-            if (this.monthSwitch && this.months.length > 0) {
+            if (isTruthy(this.monthSwitch) && this.months.length > 0) {
                 return _uA(
                     this.months[this.monthIndex] as monthsItem
                 )
@@ -444,7 +444,7 @@ open class GenUniModulesUviewUltraComponentsUpCalendarUpCalendar : VueComponent 
     open var monthSelectedM = ::gen_monthSelectedM_fn
     open fun gen_monthSelectedM_fn(e: UTSArray<String>, scene: String) {
         this.selected = e
-        if (!this.showConfirm) {
+        if (!isTruthy(this.showConfirm)) {
             if (this.mode === "multiple" || this.mode === "single" || (this.mode === "range" && this.selected.length >= 2)) {
                 if (scene === "init") {
                     return
@@ -461,7 +461,7 @@ open class GenUniModulesUviewUltraComponentsUpCalendarUpCalendar : VueComponent 
             console.log(this.innerMaxDate, " at uni_modules/uview-ultra/components/up-calendar/up-calendar.uvue:535")
             return error("maxDate不能小于minDate时间")
         }
-        this.listHeight = (this.rowHeight as Number) * (if (this.monthSwitch) {
+        this.listHeight = (this.rowHeight as Number) * (if (isTruthy(this.monthSwitch)) {
             6
         } else {
             5
@@ -529,7 +529,7 @@ open class GenUniModulesUviewUltraComponentsUpCalendarUpCalendar : VueComponent 
                 i++
             }
         }
-        if (this.monthSwitch) {
+        if (isTruthy(this.monthSwitch)) {
             this.monthIndex = this.getDefaultMonthIndex()
         }
     }
@@ -586,7 +586,7 @@ open class GenUniModulesUviewUltraComponentsUpCalendarUpCalendar : VueComponent 
             return
         }
         val targetMonth = dayuts(this.todayDate).format("YYYY-MM")
-        if (this.monthSwitch) {
+        if (isTruthy(this.monthSwitch)) {
             val todayMonthIndex = this.months.findIndex(fun(ref__1): Boolean {
                 var year = ref__1.year
                 var month = ref__1.month
@@ -640,7 +640,7 @@ open class GenUniModulesUviewUltraComponentsUpCalendarUpCalendar : VueComponent 
     }
     open var onUpdateMonthTopM = ::gen_onUpdateMonthTopM_fn
     open fun gen_onUpdateMonthTopM_fn(topArr: UTSArray<Number>) {
-        if (this.monthSwitch) {
+        if (isTruthy(this.monthSwitch)) {
             return
         }
         this.updateMonthTopM(topArr)

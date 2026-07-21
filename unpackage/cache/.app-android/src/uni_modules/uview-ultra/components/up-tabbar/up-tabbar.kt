@@ -45,13 +45,13 @@ open class GenUniModulesUviewUltraComponentsUpTabbarUpTabbar : VueComponent {
             _cE("view", _uM("class" to _nC(_uA(
                 "up-tabbar__content",
                 _uA(
-                    if (_ctx.border) {
+                    if (isTruthy(_ctx.border)) {
                         "up-border-top"
                     } else {
                         ""
                     }
                     ,
-                    if (_ctx.fixed) {
+                    if (isTruthy(_ctx.fixed)) {
                         "up-tabbar--fixed"
                     } else {
                         ""
@@ -239,7 +239,7 @@ open class GenUniModulesUviewUltraComponentsUpTabbarUpTabbar : VueComponent {
     open var setPlaceholderHeight = ::gen_setPlaceholderHeight_fn
     open fun gen_setPlaceholderHeight_fn(): UTSPromise<Unit> {
         return wrapUTSPromise(suspend w@{
-                if (!this.fixed || !this.placeholder) {
+                if (!isTruthy(this.fixed) || !isTruthy(this.placeholder)) {
                     return@w
                 }
                 await(sleep(20))

@@ -76,8 +76,8 @@ open class GenUniModulesUviewUltraComponentsUpNumberKeyboardUpNumberKeyboard : V
     override fun data(): Map<String, Any?> {
         return _uM("parent" to null as ComponentPublicInstance?, "parentData" to _uO(), "children" to _uA<ComponentPublicInstance>(), "childrenRefs" to _uA<String>(), "backspace" to "backspace", "dot" to ".", "timer" to null as Number?, "cardX" to "X", "numList" to computed<UTSArray<Any>>(fun(): UTSArray<Any> {
             var tmp: UTSArray<Any> = _uA()
-            if (this.dotDisabled && this.mode == "number") {
-                if (!this.random) {
+            if (isTruthy(this.dotDisabled) && this.mode == "number") {
+                if (!isTruthy(this.random)) {
                     return _uA(
                         1,
                         2,
@@ -104,8 +104,8 @@ open class GenUniModulesUviewUltraComponentsUpNumberKeyboardUpNumberKeyboard : V
                         0
                     ))
                 }
-            } else if (!this.dotDisabled && this.mode == "number") {
-                if (!this.random) {
+            } else if (!isTruthy(this.dotDisabled) && this.mode == "number") {
+                if (!isTruthy(this.random)) {
                     return _uA(
                         1,
                         2,
@@ -135,7 +135,7 @@ open class GenUniModulesUviewUltraComponentsUpNumberKeyboardUpNumberKeyboard : V
                     ))
                 }
             } else if (this.mode == "card") {
-                if (!this.random) {
+                if (!isTruthy(this.random)) {
                     return _uA(
                         1,
                         2,
@@ -272,7 +272,7 @@ open class GenUniModulesUviewUltraComponentsUpNumberKeyboardUpNumberKeyboard : V
     }
     open var btnBgGray = ::gen_btnBgGray_fn
     open fun gen_btnBgGray_fn(index: Number): Boolean {
-        if (!this.random && index == 9 && (this.mode != "number" || (this.mode == "number" && !this.dotDisabled))) {
+        if (!isTruthy(this.random) && index == 9 && (this.mode != "number" || (this.mode == "number" && !isTruthy(this.dotDisabled)))) {
             return true
         } else {
             return false
@@ -281,7 +281,7 @@ open class GenUniModulesUviewUltraComponentsUpNumberKeyboardUpNumberKeyboard : V
     open var itemStyle = ::gen_itemStyle_fn
     open fun gen_itemStyle_fn(index: Number): Any {
         var style: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-number-keyboard/up-number-keyboard.uvue", 112, 9))
-        if (this.mode == "number" && this.dotDisabled && index == 9) {
+        if (this.mode == "number" && isTruthy(this.dotDisabled) && index == 9) {
             style["width"] = "464rpx"
         }
         return style
@@ -304,7 +304,7 @@ open class GenUniModulesUviewUltraComponentsUpNumberKeyboardUpNumberKeyboard : V
     open var keyboardClick = ::gen_keyboardClick_fn
     open fun gen_keyboardClick_fn(reassignedKVal: Any): Unit {
         var kVal = reassignedKVal
-        if (!this.dotDisabled && kVal != this.dot && kVal != this.cardX) {
+        if (!isTruthy(this.dotDisabled) && kVal != this.dot && kVal != this.cardX) {
             kVal = parseInt(kVal.toString())
         }
         this.`$emit`("change", kVal)
@@ -318,7 +318,7 @@ open class GenUniModulesUviewUltraComponentsUpNumberKeyboardUpNumberKeyboard : V
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("u-empty" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "u-empty__wrap" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "u-tabs" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "u-tabs__wrapper" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "u-tabs__wrapper__scroll-view-wrapper" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "u-tabs__wrapper__scroll-view" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "u-tabs__wrapper__nav" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "u-tabs__wrapper__nav__line" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "up-empty" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "up-empty__wrap" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "up-tabs" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "up-tabs__wrapper" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "up-tabs__wrapper__scroll-view-wrapper" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "up-tabs__wrapper__scroll-view" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "up-tabs__wrapper__nav" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "up-tabs__wrapper__nav__line" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "up-keyboard" to _pS(_uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-around", "backgroundColor" to "#e0e4e6", "flexWrap" to "wrap", "paddingTop" to 8, "paddingRight" to "10rpx", "paddingBottom" to 8, "paddingLeft" to "10rpx")), "up-keyboard__button-wrapper" to _pS(_uM("boxShadow" to "0 2px 0px #BBBCBE", "marginTop" to 4, "marginRight" to "6rpx", "marginBottom" to 4, "marginLeft" to "6rpx", "borderTopLeftRadius" to 4, "borderTopRightRadius" to 4, "borderBottomLeftRadius" to 4, "borderBottomRightRadius" to 4)), "up-keyboard__button-wrapper__button" to _pS(_uM("width" to "222rpx", "height" to "90rpx", "backgroundColor" to "#FFFFFF", "display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "borderTopLeftRadius" to 4, "borderTopRightRadius" to 4, "borderBottomLeftRadius" to 4, "borderBottomRightRadius" to 4)), "up-keyboard__button-wrapper__button__text" to _pS(_uM("fontSize" to 20, "fontWeight" to "400", "color" to "#303133")), "up-keyboard__button-wrapper__button--gray" to _pS(_uM("backgroundColor" to "#c8cad2")), "up-hover-class" to _pS(_uM("backgroundColor" to "#BBBCC6")))
+                return _uM("u-empty" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "u-empty__wrap" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "u-tabs" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "u-tabs__wrapper" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "u-tabs__wrapper__scroll-view-wrapper" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "u-tabs__wrapper__scroll-view" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "u-tabs__wrapper__nav" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "u-tabs__wrapper__nav__line" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "up-empty" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "up-empty__wrap" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "up-tabs" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "up-tabs__wrapper" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "up-tabs__wrapper__scroll-view-wrapper" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "up-tabs__wrapper__scroll-view" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "up-tabs__wrapper__nav" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "up-tabs__wrapper__nav__line" to _pS(_uM("display" to "flex", "flexDirection" to "column", "flexShrink" to 0, "flexGrow" to 0, "flexBasis" to "auto", "alignItems" to "stretch", "alignContent" to "flex-start")), "up-keyboard" to _pS(_uM("display" to "flex", "flexDirection" to "row", "justifyContent" to "space-around", "backgroundColor" to "#e0e4e6", "flexWrap" to "wrap", "paddingTop" to 8, "paddingRight" to "10rpx", "paddingBottom" to 8, "paddingLeft" to "10rpx")), "up-keyboard__button-wrapper" to _pS(_uM("boxShadow" to "0 2px 0px #BBBCBE", "marginTop" to 4, "marginRight" to "6rpx", "marginBottom" to 4, "marginLeft" to "6rpx", "borderTopLeftRadius" to 4, "borderTopRightRadius" to 4, "borderBottomLeftRadius" to 4, "borderBottomRightRadius" to 4)), "up-keyboard__button-wrapper__button" to _pS(_uM("width" to "222rpx", "height" to "90rpx", "backgroundColor" to "#FFFFFF", "display" to "flex", "flexDirection" to "row", "justifyContent" to "center", "alignItems" to "center", "borderTopLeftRadius" to 4, "borderTopRightRadius" to 4, "borderBottomLeftRadius" to 4, "borderBottomRightRadius" to 4)), "up-keyboard__button-wrapper__button__text" to _pS(_uM("fontSize" to 20, "fontWeight" to 400, "color" to "#303133")), "up-keyboard__button-wrapper__button--gray" to _pS(_uM("backgroundColor" to "#c8cad2")), "up-hover-class" to _pS(_uM("backgroundColor" to "#BBBCC6")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

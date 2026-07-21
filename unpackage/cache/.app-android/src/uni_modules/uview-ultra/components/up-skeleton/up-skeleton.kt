@@ -40,7 +40,7 @@ open class GenUniModulesUviewUltraComponentsUpSkeletonUpSkeleton : VueComponent 
                             "up-skeleton__wrapper__avatar",
                             _uA(
                                 "up-skeleton__wrapper__avatar--" + _ctx.avatarShape,
-                                if (_ctx.animate) {
+                                if (isTruthy(_ctx.animate)) {
                                     "animate"
                                 } else {
                                     ""
@@ -55,7 +55,7 @@ open class GenUniModulesUviewUltraComponentsUpSkeletonUpSkeleton : VueComponent 
                             _cE("view", _uM("key" to 0, "class" to _nC(_uA(
                                 "up-skeleton__wrapper__content__title",
                                 _uA(
-                                    if (_ctx.animate) {
+                                    if (isTruthy(_ctx.animate)) {
                                         "animate"
                                     } else {
                                         ""
@@ -69,7 +69,7 @@ open class GenUniModulesUviewUltraComponentsUpSkeletonUpSkeleton : VueComponent 
                             return _cE("view", _uM("class" to _nC(_uA(
                                 "up-skeleton__wrapper__content__rows",
                                 _uA(
-                                    if (_ctx.animate) {
+                                    if (isTruthy(_ctx.animate)) {
                                         "animate"
                                     } else {
                                         ""
@@ -146,9 +146,9 @@ open class GenUniModulesUviewUltraComponentsUpSkeletonUpSkeleton : VueComponent 
                     } else {
                         rowHeight = (this.rowsHeight as Any).toString()
                     }
-                    if (!this.title && i == 0) {
+                    if (!isTruthy(this.title) && i == 0) {
                         item["marginTop"] = "0px"
-                    } else if (this.title && i == 0) {
+                    } else if (isTruthy(this.title) && i == 0) {
                         item["marginTop"] = "20px"
                     } else {
                         item["marginTop"] = "12px"

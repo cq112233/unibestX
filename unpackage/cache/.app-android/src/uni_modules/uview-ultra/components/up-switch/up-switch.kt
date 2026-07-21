@@ -114,7 +114,7 @@ open class GenUniModulesUviewUltraComponentsUpSwitchUpSwitch : VueComponent {
                 "up-switch",
                 "cursor-pointer"
             )
-            if (this.disabled) {
+            if (isTruthy(this.disabled)) {
                 classes.push("up-switch--disabled")
             }
             if (this.isActive) {
@@ -294,13 +294,13 @@ open class GenUniModulesUviewUltraComponentsUpSwitchUpSwitch : VueComponent {
     }
     open var clickHandler = ::gen_clickHandler_fn
     open fun gen_clickHandler_fn() {
-        if (!this.disabled && !this.loading) {
+        if (!isTruthy(this.disabled) && !isTruthy(this.loading)) {
             val oldValue = if (this.isActive) {
                 this.inactiveValue
             } else {
                 this.activeValue
             }
-            if (!this.asyncChange) {
+            if (!isTruthy(this.asyncChange)) {
                 this.`$emit`("update:modelValue", oldValue)
             }
             this.`$nextTick`(fun(){

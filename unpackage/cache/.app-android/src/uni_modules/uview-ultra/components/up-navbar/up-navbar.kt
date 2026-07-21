@@ -36,14 +36,19 @@ open class GenUniModulesUviewUltraComponentsUpNavbarUpNavbar : VueComponent {
                 _ctx.customClass
             )
         ))), _uA(
-            if (isTrue(_ctx.fixed && _ctx.placeholder)) {
+            if (isTrue(if (isTruthy(_ctx.fixed)) {
+                _ctx.placeholder
+            } else {
+                _ctx.fixed
+            }
+            )) {
                 _cE("view", _uM("key" to 0, "class" to "up-navbar__placeholder", "style" to _nS(_uM("height" to _ctx.placeholderHeight))), null, 4)
             } else {
                 _cC("v-if", true)
             }
             ,
             _cE("view", _uM("class" to _nC(_uA(
-                if (_ctx.fixed) {
+                if (isTruthy(_ctx.fixed)) {
                     "up-navbar--fixed"
                 } else {
                     ""
@@ -60,7 +65,7 @@ open class GenUniModulesUviewUltraComponentsUpNavbarUpNavbar : VueComponent {
                 _cE("view", _uM("class" to _nC(_uA(
                     "up-navbar__content",
                     _uA(
-                        if (_ctx.border) {
+                        if (isTruthy(_ctx.border)) {
                             "up-border-bottom"
                         } else {
                             ""
@@ -274,7 +279,7 @@ open class GenUniModulesUviewUltraComponentsUpNavbarUpNavbar : VueComponent {
     open var leftClick = ::gen_leftClick_fn
     open fun gen_leftClick_fn(): Unit {
         this.`$emit`("leftClick")
-        if (this.autoBack) {
+        if (isTruthy(this.autoBack)) {
             uni_navigateBack(null)
         }
     }

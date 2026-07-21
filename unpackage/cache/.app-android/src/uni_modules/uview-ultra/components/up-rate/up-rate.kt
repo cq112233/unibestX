@@ -86,7 +86,7 @@ open class GenUniModulesUviewUltraComponentsUpRateUpRate : VueComponent {
                             } else {
                                 _ctx.inactiveIcon
                             }
-                            , "color" to if (_ctx.disabled) {
+                            , "color" to if (isTruthy(_ctx.disabled)) {
                                 "#c8c9cc"
                             } else {
                                 if (Math.floor(parseFloat(_ctx.activeIndex.toString(10))) > index) {
@@ -120,7 +120,7 @@ open class GenUniModulesUviewUltraComponentsUpRateUpRate : VueComponent {
                                     _ctx.activeIcon
                                 } else {
                                     _ctx.inactiveIcon
-                                }, "color" to if (_ctx.disabled) {
+                                }, "color" to if (isTruthy(_ctx.disabled)) {
                                     "#c8c9cc"
                                 } else {
                                     if (Math.ceil(parseFloat(_ctx.activeIndex.toString(10))) > index) {
@@ -383,7 +383,7 @@ open class GenUniModulesUviewUltraComponentsUpRateUpRate : VueComponent {
     }
     open var touchMove = ::gen_touchMove_fn
     open fun gen_touchMove_fn(e: UniTouchEvent) {
-        if (!this.touchable) {
+        if (!isTruthy(this.touchable)) {
             return
         }
         this.preventEvent(e)
@@ -393,7 +393,7 @@ open class GenUniModulesUviewUltraComponentsUpRateUpRate : VueComponent {
     }
     open var touchEnd = ::gen_touchEnd_fn
     open fun gen_touchEnd_fn(e: UniTouchEvent) {
-        if (!this.touchable) {
+        if (!isTruthy(this.touchable)) {
             return
         }
         this.preventEvent(e)
@@ -430,7 +430,7 @@ open class GenUniModulesUviewUltraComponentsUpRateUpRate : VueComponent {
     }
     open fun getActiveIndex(reassignedX: Number, isClick: Boolean = false) {
         var x = reassignedX
-        if (this.disabled || this.readonly) {
+        if (isTruthy(this.disabled) || isTruthy(this.readonly)) {
             return
         }
         if (!this.ensureRateMetrics()) {
@@ -444,7 +444,7 @@ open class GenUniModulesUviewUltraComponentsUpRateUpRate : VueComponent {
         x = range(this.rateBoxLeft, allRateWidth, x) - this.rateBoxLeft
         val distance = x
         var index: Number = 0
-        if (this.allowHalf) {
+        if (isTruthy(this.allowHalf)) {
             index = Math.floor(distance / this.rateWidth)
             val decimal = distance % this.rateWidth
             if (decimal <= this.rateWidth / 2 && decimal > 0) {

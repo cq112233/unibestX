@@ -662,7 +662,7 @@ open class GenUniModulesZPagingXComponentsZPagingXZPagingX : VueComponent {
                 ))), _uA(
                     renderSlot(_ctx.`$slots`, "top"),
                     if (_ctx.listIs === "list-view") {
-                        _cE("list-view", _uM("key" to 0, "ref_key" to "zpxList", "ref" to zpxList, "class" to "zpx-list-view zpx-flex1", "id" to _ctx.listId, "refresher-enabled" to _ctx.refresherEnabled, "refresher-threshold" to finalRefresherThreshold.value, "refresher-triggered" to refresherTriggered.value, "refresher-default-style" to if (_ctx.useCustomRefresher) {
+                        _cE("list-view", _uM("key" to 0, "ref_key" to "zpxList", "ref" to zpxList, "class" to "zpx-list-view zpx-flex1", "id" to _ctx.listId, "refresher-enabled" to _ctx.refresherEnabled, "refresher-threshold" to finalRefresherThreshold.value, "refresher-triggered" to refresherTriggered.value, "refresher-default-style" to if (isTruthy(_ctx.useCustomRefresher)) {
                             "none"
                         } else {
                             "black"
@@ -754,7 +754,7 @@ open class GenUniModulesZPagingXComponentsZPagingXZPagingX : VueComponent {
                             "scroll-with-animation"
                         ))
                     } else {
-                        _cE("scroll-view", _uM("key" to 1, "ref_key" to "zpxList", "ref" to zpxList, "class" to "zpx-list-view zpx-flex1", "id" to _ctx.listId, "refresher-enabled" to _ctx.refresherEnabled, "refresher-threshold" to finalRefresherThreshold.value, "refresher-triggered" to refresherTriggered.value, "refresher-default-style" to if (_ctx.useCustomRefresher) {
+                        _cE("scroll-view", _uM("key" to 1, "ref_key" to "zpxList", "ref" to zpxList, "class" to "zpx-list-view zpx-flex1", "id" to _ctx.listId, "refresher-enabled" to _ctx.refresherEnabled, "refresher-threshold" to finalRefresherThreshold.value, "refresher-triggered" to refresherTriggered.value, "refresher-default-style" to if (isTruthy(_ctx.useCustomRefresher)) {
                             "none"
                         } else {
                             "black"
