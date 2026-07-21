@@ -156,7 +156,9 @@ open class GenSrcSubAuthRegister : BasePage {
                                     _cE("view", _uM("class" to "mb-30px"), _uA(
                                         _cE("text", _uM("class" to "text-20px font-bold text-__1e293b_"), "注册页")
                                     )),
-                                    _cE("button", _uM("class" to "w-200px bg-__10b981_ text-white rounded-8px", "onClick" to doRegister), " 点击模拟注册 ")
+                                    _cE("view", _uM("class" to "w-200px h-44px rounded-8px bg-__10b981_ flex flex-row items-center justify-center", "onClick" to doRegister), _uA(
+                                        _cE("text", _uM("class" to "text-__ffffff_ text-14px font-bold"), "点击模拟注册")
+                                    ))
                                 ))
                             )
                         }
@@ -173,7 +175,7 @@ open class GenSrcSubAuthRegister : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("bg-__10b981_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#10b981")), "bg-__f8fafc_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#f8fafc")), "flex-1" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")), "font-bold" to _pS(_uM("fontWeight" to "700")), "items-center" to _pS(_uM("alignItems" to "center")), "justify-center" to _pS(_uM("justifyContent" to "center")), "mb-30px" to _pS(_uM("marginBottom" to 30)), "p-30px" to _pS(_uM("paddingTop" to 30, "paddingRight" to 30, "paddingBottom" to 30, "paddingLeft" to 30)), "rounded-8px" to _pS(_uM("borderTopLeftRadius" to 8, "borderTopRightRadius" to 8, "borderBottomRightRadius" to 8, "borderBottomLeftRadius" to 8)), "text-__1e293b_" to _pS(_uM("color" to "#1e293b")), "text-20px" to _pS(_uM("fontSize" to 20)), "text-white" to _pS(_uM("color" to "rgba(255,255,255,var(--un-color-opacity,1))")), "w-200px" to _pS(_uM("width" to 200)))
+                return _uM("bg-__10b981_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#10b981")), "bg-__f8fafc_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#f8fafc")), "flex" to _pS(_uM("display" to "flex")), "flex-1" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")), "flex-row" to _pS(_uM("flexDirection" to "row")), "font-bold" to _pS(_uM("fontWeight" to "700")), "h-44px" to _pS(_uM("height" to 44)), "items-center" to _pS(_uM("alignItems" to "center")), "justify-center" to _pS(_uM("justifyContent" to "center")), "mb-30px" to _pS(_uM("marginBottom" to 30)), "p-30px" to _pS(_uM("paddingTop" to 30, "paddingRight" to 30, "paddingBottom" to 30, "paddingLeft" to 30)), "rounded-8px" to _pS(_uM("borderTopLeftRadius" to 8, "borderTopRightRadius" to 8, "borderBottomRightRadius" to 8, "borderBottomLeftRadius" to 8)), "text-__1e293b_" to _pS(_uM("color" to "#1e293b")), "text-__ffffff_" to _pS(_uM("color" to "#ffffff")), "text-14px" to _pS(_uM("fontSize" to 14)), "text-20px" to _pS(_uM("fontSize" to 20)), "text-white" to _pS(_uM("color" to "rgba(255,255,255,var(--un-color-opacity,1))")), "w-200px" to _pS(_uM("width" to 200)))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()
