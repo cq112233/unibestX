@@ -11,15 +11,21 @@
           up-card
         </text>
         <up-card title="基础卡片" sub-title="副标题" margin="0" :show-foot="false">
-          <text slot="body" class="text-13px text-[#606266] leading-20px">这是卡片主体内容区域，可以放置任意内容。</text>
+          <template #body>
+            <text class="text-13px text-[#606266] leading-20px">这是卡片主体内容区域，可以放置任意内容。</text>
+          </template>
         </up-card>
         <view class="h-10px"></view>
         <up-card title="带缩略图" thumb="/static/logo.png" :thumb-circle="true" thumb-width="36px" margin="0">
-          <text slot="body" class="text-13px text-[#606266] leading-20px">左侧缩略图为圆形，适合展示头像或图标。</text>
-          <view slot="foot" class="flex-row justify-between w-full">
-            <text class="text-12px text-[#909399]">底部区域</text>
-            <text class="text-12px text-[#2979ff]">查看详情</text>
-          </view>
+          <template #body>
+            <text class="text-13px text-[#606266] leading-20px">左侧缩略图为圆形，适合展示头像或图标。</text>
+          </template>
+          <template #foot>
+            <view class="flex-row justify-between w-full">
+              <text class="text-12px text-[#909399]">底部区域</text>
+              <text class="text-12px text-[#2979ff]">查看详情</text>
+            </view>
+          </template>
         </up-card>
       </view>
 
@@ -148,6 +154,11 @@ function onListRefresh(): void {
   height: 40px;
   border-radius: 4px;
   margin-right: 12px;
+  background-color: #2979ff;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
 
 .demo-list-cell-content {

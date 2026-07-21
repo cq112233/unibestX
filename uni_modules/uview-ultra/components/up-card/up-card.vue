@@ -56,7 +56,7 @@
 			<slot name="head" v-else />
 		</view>
 		<view @tap="bodyClick" class="up-card__body"
-			:style="[{padding: addUnit(paddingBody || padding)}, bodyStyle]"><slot name="body" /></view>
+			:style="[{padding: addUnit(paddingBody || padding)}, bodyStyle]"><slot name="body"><slot /></slot></view>
 		<view
 			v-if="showFoot"
 			class="up-card__foot"
