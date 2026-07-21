@@ -149,17 +149,6 @@
 
 	const realSrc = computed((): string => {
 		if (props.src == '') return ''
-		if (props.src.startsWith('/static/')) {
-			try {
-				const pages = getCurrentPages()
-				if (pages.length > 0) {
-					const route = pages[pages.length - 1].route
-					if (route.includes('sub/')) {
-						return '../../static/' + props.src.substring(8)
-					}
-				}
-			} catch (e) {}
-		}
 		return props.src
 	})
 	

@@ -18,8 +18,8 @@
         <up-card title="卡片测试" sub-title="测试副标题" thumb="/static/logo.png">
           <view slot="body" class="flex-col items-center">
             <text class="text-14px text-[#606266] mb-10px">这是在首页直接调用 up-card 和 up-image</text>
-            <up-image :src="imgLogo" width="60px" height="60px" shape="circle"></up-image>
-            <image :src="imgLogo" style="width: 60px; height: 60px;" />
+            <up-image src="/static/logo.png" width="60px" height="60px" shape="circle"></up-image>
+            <image src="/static/logo.png" style="width: 60px; height: 60px;" />
           </view>
         </up-card>
       </view>
@@ -79,7 +79,6 @@
 <script setup lang="uts">
 // import UViewUltra from '@/src/sub/uview-ultra/uview-ultra.uvue'
 import { handleBackPressExit } from '../../utils/backPress.uts'
-import imgLogo from '@/src/assets/images/logo.png'
 
 onBackPress((options: OnBackPressOptions): boolean => {
   // #ifdef APP
@@ -92,8 +91,8 @@ onBackPress((options: OnBackPressOptions): boolean => {
 
 const swiperList = reactive([
   { image: '/static/logo.png', title: '昨夜星辰昨夜风，画楼西畔桂堂东' },
-  { image: imgLogo, title: '身无彩凤双飞翼，心有灵犀一点通' },
-  { image: imgLogo, title: '谁念西风独自凉，萧萧黄叶闭疏窗，沉思往事立残阳' },
+  { image: '/static/logo.png', title: '身无彩凤双飞翼，心有灵犀一点通' },
+  { image: '/static/logo.png', title: '谁念西风独自凉，萧萧黄叶闭疏窗，沉思往事立残阳' },
 ] as UTSJSONObject[])
 
 const themeSwitchVal = ref(true)

@@ -222,17 +222,6 @@ const props = defineProps({
 
 const realThumb = computed((): string => {
   if (props.thumb == '') return ''
-  if (props.thumb.startsWith('/static/')) {
-    try {
-      const pages = getCurrentPages()
-      if (pages.length > 0) {
-        const route = pages[pages.length - 1].route
-        if (route.includes('sub/')) {
-          return '../../static/' + props.thumb.substring(8)
-        }
-      }
-    } catch (e) {}
-  }
   return props.thumb
 })
 
