@@ -156,7 +156,7 @@ open class GenSrcSubAuthLogin : BasePage {
             fun gen_doLogin_fn() {
                 if (tokenStore.hasValidLogin()) {
                     if (redirectUrl.value !== "") {
-                        val targetUrl = UTSAndroid.consoleDebugError(decodeURIComponent(redirectUrl.value), " at src/sub/auth/login.uvue:56") ?: ""
+                        val targetUrl = UTSAndroid.consoleDebugError(decodeURIComponent(redirectUrl.value), " at src/sub/auth/login.uvue:67") ?: ""
                         if (isPageTabbar(targetUrl)) {
                             setCurIdxByPath(targetUrl)
                             uni_switchTab(SwitchTabOptions(url = targetUrl))
@@ -173,7 +173,7 @@ open class GenSrcSubAuthLogin : BasePage {
                 uni_showToast(ShowToastOptions(title = "登录成功", icon = "success"))
                 setTimeout(fun(){
                     if (redirectUrl.value !== "") {
-                        val targetUrl = UTSAndroid.consoleDebugError(decodeURIComponent(redirectUrl.value), " at src/sub/auth/login.uvue:91") ?: ""
+                        val targetUrl = UTSAndroid.consoleDebugError(decodeURIComponent(redirectUrl.value), " at src/sub/auth/login.uvue:102") ?: ""
                         if (isPageTabbar(targetUrl)) {
                             setCurIdxByPath(targetUrl)
                             uni_switchTab(SwitchTabOptions(url = targetUrl))
@@ -188,7 +188,6 @@ open class GenSrcSubAuthLogin : BasePage {
             }
             val doLogin = ::gen_doLogin_fn
             return fun(): Any? {
-                val _component_up_button = resolveEasyComponent("up-button", GenUniModulesUviewUltraComponentsUpButtonUpButtonClass)
                 return _cV(unref(GenAppkuClass), null, _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                     return _uA(
                         _cV(unref(GenSrcLayoutsDefaultClass), _uM("navigation-bar-title-text" to "登录"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
@@ -197,12 +196,9 @@ open class GenSrcSubAuthLogin : BasePage {
                                     _cE("view", _uM("class" to "mb-30px"), _uA(
                                         _cE("text", _uM("class" to "text-20px font-bold text-__1e293b_"), "登录页")
                                     )),
-                                    _cV(_component_up_button, _uM("type" to "primary", "onClick" to doLogin), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                        return _uA(
-                                            " 点击模拟登录 "
-                                        )
-                                    }
-                                    ), "_" to 1))
+                                    _cE("view", _uM("class" to "w-200px h-44px rounded-8px bg-__3b82f6_ flex flex-row items-center justify-center", "onClick" to doLogin), _uA(
+                                        _cE("text", _uM("class" to "text-__ffffff_ text-14px font-bold"), "点击模拟登录")
+                                    ))
                                 ))
                             )
                         }
@@ -219,7 +215,7 @@ open class GenSrcSubAuthLogin : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("bg-__f8fafc_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#f8fafc")), "flex-1" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")), "font-bold" to _pS(_uM("fontWeight" to "700")), "items-center" to _pS(_uM("alignItems" to "center")), "justify-center" to _pS(_uM("justifyContent" to "center")), "mb-30px" to _pS(_uM("marginBottom" to 30)), "p-30px" to _pS(_uM("paddingTop" to 30, "paddingRight" to 30, "paddingBottom" to 30, "paddingLeft" to 30)), "text-__1e293b_" to _pS(_uM("color" to "#1e293b")), "text-20px" to _pS(_uM("fontSize" to 20)))
+                return _uM("bg-__3b82f6_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#3b82f6")), "bg-__f8fafc_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#f8fafc")), "flex" to _pS(_uM("display" to "flex")), "flex-1" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")), "flex-row" to _pS(_uM("flexDirection" to "row")), "font-bold" to _pS(_uM("fontWeight" to "700")), "h-44px" to _pS(_uM("height" to 44)), "items-center" to _pS(_uM("alignItems" to "center")), "justify-center" to _pS(_uM("justifyContent" to "center")), "mb-30px" to _pS(_uM("marginBottom" to 30)), "p-30px" to _pS(_uM("paddingTop" to 30, "paddingRight" to 30, "paddingBottom" to 30, "paddingLeft" to 30)), "rounded-8px" to _pS(_uM("borderTopLeftRadius" to 8, "borderTopRightRadius" to 8, "borderBottomRightRadius" to 8, "borderBottomLeftRadius" to 8)), "text-__1e293b_" to _pS(_uM("color" to "#1e293b")), "text-__ffffff_" to _pS(_uM("color" to "#ffffff")), "text-14px" to _pS(_uM("fontSize" to 14)), "text-20px" to _pS(_uM("fontSize" to 20)), "w-200px" to _pS(_uM("width" to 200)))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

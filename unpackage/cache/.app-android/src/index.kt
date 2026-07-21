@@ -119,7 +119,7 @@ fun tryConnectSocket(host: String, port: String, id: String): UTSPromise<SocketT
 fun initRuntimeSocketService(): UTSPromise<Boolean> {
     val hosts: String = "127.0.0.1,192.168.100.169,198.18.0.1,10.8.0.9"
     val port: String = "8090"
-    val id: String = "app-android_hZqKIE"
+    val id: String = "app-android_dv5C6D"
     if (hosts == "" || port == "" || id == "") {
         return UTSPromise.resolve(false)
     }
@@ -7895,42 +7895,6 @@ val GenSrcPagesAiAiClass = CreateVueComponent(GenSrcPagesAiAi::class.java, fun()
     return GenSrcPagesAiAi(instance, renderer)
 }
 )
-val default__12: UTSJSONObject = _uO("button" to _uO("hairline" to false, "type" to "info", "size" to "normal", "shape" to "square", "plain" to false, "disabled" to false, "loading" to false, "loadingText" to "", "loadingMode" to "spinner", "loadingSize" to 15, "openType" to "", "formType" to "", "appParameter" to "", "hoverStopPropagation" to true, "lang" to "en", "sessionFrom" to "", "sendMessageTitle" to "", "sendMessagePath" to "", "sendMessageImg" to "", "showMessageCard" to false, "dataName" to "", "throttleTime" to 0, "hoverStartTime" to 0, "hoverStayTime" to 200, "text" to "", "icon" to "", "iconColor" to "", "color" to ""))
-fun throttle(func: () -> Unit, wait: Number = 500, immediate: Boolean = true): Unit {
-    var timer: Number = 0
-    var flag = false
-    if (immediate) {
-        if (!flag) {
-            flag = true
-            if (UTSAndroid.`typeof`(func) == "function") {
-                func()
-            }
-            timer = setTimeout(fun(){
-                flag = false
-            }
-            , wait)
-        }
-    } else if (!flag) {
-        flag = true
-        timer = setTimeout(fun(){
-            flag = false
-            if (UTSAndroid.`typeof`(func) == "function") {
-                func()
-            }
-        }
-        , wait)
-    }
-}
-val GenUniModulesUviewUltraComponentsUpButtonUpButtonClass = CreateVueComponent(GenUniModulesUviewUltraComponentsUpButtonUpButton::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = "", inheritAttrs = GenUniModulesUviewUltraComponentsUpButtonUpButton.inheritAttrs, inject = GenUniModulesUviewUltraComponentsUpButtonUpButton.inject, props = GenUniModulesUviewUltraComponentsUpButtonUpButton.props, propsNeedCastKeys = GenUniModulesUviewUltraComponentsUpButtonUpButton.propsNeedCastKeys, emits = GenUniModulesUviewUltraComponentsUpButtonUpButton.emits, components = GenUniModulesUviewUltraComponentsUpButtonUpButton.components, styles = GenUniModulesUviewUltraComponentsUpButtonUpButton.styles, setup = fun(props: ComponentPublicInstance): Any? {
-        return GenUniModulesUviewUltraComponentsUpButtonUpButton.setup(props as GenUniModulesUviewUltraComponentsUpButtonUpButton)
-    }
-    )
-}
-, fun(instance, renderer): GenUniModulesUviewUltraComponentsUpButtonUpButton {
-    return GenUniModulesUviewUltraComponentsUpButtonUpButton(instance)
-}
-)
 val GenSrcSubAuthLoginClass = CreateVueComponent(GenSrcSubAuthLogin::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "page", name = "", inheritAttrs = GenSrcSubAuthLogin.inheritAttrs, inject = GenSrcSubAuthLogin.inject, props = GenSrcSubAuthLogin.props, propsNeedCastKeys = GenSrcSubAuthLogin.propsNeedCastKeys, emits = GenSrcSubAuthLogin.emits, components = GenSrcSubAuthLogin.components, styles = GenSrcSubAuthLogin.styles, setup = fun(props: ComponentPublicInstance): Any? {
         return GenSrcSubAuthLogin.setup(props as GenSrcSubAuthLogin)
@@ -8127,6 +8091,42 @@ val GenUniModulesUviewUltraComponentsUpCopyUpCopyClass = CreateVueComponent(GenU
 }
 , fun(instance, renderer): GenUniModulesUviewUltraComponentsUpCopyUpCopy {
     return GenUniModulesUviewUltraComponentsUpCopyUpCopy(instance)
+}
+)
+val default__12: UTSJSONObject = _uO("button" to _uO("hairline" to false, "type" to "info", "size" to "normal", "shape" to "square", "plain" to false, "disabled" to false, "loading" to false, "loadingText" to "", "loadingMode" to "spinner", "loadingSize" to 15, "openType" to "", "formType" to "", "appParameter" to "", "hoverStopPropagation" to true, "lang" to "en", "sessionFrom" to "", "sendMessageTitle" to "", "sendMessagePath" to "", "sendMessageImg" to "", "showMessageCard" to false, "dataName" to "", "throttleTime" to 0, "hoverStartTime" to 0, "hoverStayTime" to 200, "text" to "", "icon" to "", "iconColor" to "", "color" to ""))
+fun throttle(func: () -> Unit, wait: Number = 500, immediate: Boolean = true): Unit {
+    var timer: Number = 0
+    var flag = false
+    if (immediate) {
+        if (!flag) {
+            flag = true
+            if (UTSAndroid.`typeof`(func) == "function") {
+                func()
+            }
+            timer = setTimeout(fun(){
+                flag = false
+            }
+            , wait)
+        }
+    } else if (!flag) {
+        flag = true
+        timer = setTimeout(fun(){
+            flag = false
+            if (UTSAndroid.`typeof`(func) == "function") {
+                func()
+            }
+        }
+        , wait)
+    }
+}
+val GenUniModulesUviewUltraComponentsUpButtonUpButtonClass = CreateVueComponent(GenUniModulesUviewUltraComponentsUpButtonUpButton::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = "", inheritAttrs = GenUniModulesUviewUltraComponentsUpButtonUpButton.inheritAttrs, inject = GenUniModulesUviewUltraComponentsUpButtonUpButton.inject, props = GenUniModulesUviewUltraComponentsUpButtonUpButton.props, propsNeedCastKeys = GenUniModulesUviewUltraComponentsUpButtonUpButton.propsNeedCastKeys, emits = GenUniModulesUviewUltraComponentsUpButtonUpButton.emits, components = GenUniModulesUviewUltraComponentsUpButtonUpButton.components, styles = GenUniModulesUviewUltraComponentsUpButtonUpButton.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenUniModulesUviewUltraComponentsUpButtonUpButton.setup(props as GenUniModulesUviewUltraComponentsUpButtonUpButton)
+    }
+    )
+}
+, fun(instance, renderer): GenUniModulesUviewUltraComponentsUpButtonUpButton {
+    return GenUniModulesUviewUltraComponentsUpButtonUpButton(instance)
 }
 )
 val default__13: UTSJSONObject = _uO("th" to _uO("width" to ""))
