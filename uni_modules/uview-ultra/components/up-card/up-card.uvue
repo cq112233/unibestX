@@ -61,7 +61,7 @@
 		</view>
 		<view @tap="bodyClick" class="up-card__body"
 			:style="[{padding: $upAddUnit(paddingBody != '' ? paddingBody : padding)}, bodyStyle]">
-			<slot name="body" />
+			<slot name="body"><slot /></slot>
 		</view>
 		<view
 			v-if="showFoot"
