@@ -150,35 +150,27 @@ open class GenSrcPagesBasicComponentsThemeSwitchCard : VueComponent {
             }
             val changeTheme = ::gen_changeTheme_fn
             return fun(): Any? {
-                val _component_up_button = resolveEasyComponent("up-button", GenUniModulesUviewUltraComponentsUpButtonUpButtonClass)
-                val _component_uni_icons = resolveEasyComponent("uni-icons", GenUniModulesUniIconsComponentsUniIconsUniIconsClass)
                 return _cV(unref(GenSrcPagesBasicComponentsCardClass), _uM("title" to "主题设置"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                     return _uA(
                         _cE("view", _uM("class" to "bg-__f8fafc_ rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_ items-center"), _uA(
                             _cE("text", _uM("class" to "text-12px text-__94a3b8_ mb-8px"), "主题色效果预览"),
-                            _cE("button", _uM("class" to "mt-10px mx-auto w-200px h-44px rounded-8px text-white text-14px", "style" to _nS(_uM("backgroundColor" to unref(appStore).state.theme))), " uni：主题按钮 ", 4),
-                            _cV(_component_up_button, _uM("type" to "primary", "class" to "mt-10px"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                return _uA(
-                                    " uview-ultra： 主题按钮 "
-                                )
-                            }
-                            ), "_" to 1))
+                            _cE("view", _uM("class" to "mt-10px mx-auto w-200px h-44px rounded-8px flex flex-row items-center justify-center", "style" to _nS(_uM("backgroundColor" to unref(appStore).state.theme))), _uA(
+                                _cE("text", _uM("class" to "text-__ffffff_ text-14px"), "主题按钮")
+                            ), 4)
                         )),
-                        _cE("view", _uM("class" to "flex-row justify-around items-center py-10px"), _uA(
+                        _cE("view", _uM("class" to "flex-row justify-between py-10px"), _uA(
                             _cE(Fragment, null, RenderHelpers.renderList(colorOptions, fun(item, index, __index, _cached): Any {
-                                return _cE("view", _uM("key" to index, "style" to _nS(_uM("width" to "40px", "height" to "40px", "borderRadius" to "20px", "backgroundColor" to item, "alignItems" to "center", "justifyContent" to "center", "borderWidth" to if (unref(appStore).state.theme === item) {
-                                    "2px"
+                                return _cE("view", _uM("key" to index, "class" to "w-40px h-40px rounded-20px items-center justify-center", "style" to _nS(_uM("backgroundColor" to item, "borderWidth" to if (unref(appStore).state.theme === item) {
+                                    "3px"
                                 } else {
                                     "0px"
                                 }
-                                , "borderStyle" to "solid", "borderColor" to "#334155")), "onClick" to fun(){
+                                , "borderStyle" to "solid", "borderColor" to "#1e293b")), "onClick" to fun(){
                                     changeTheme(item)
                                 }
                                 ), _uA(
                                     if (unref(appStore).state.theme === item) {
-                                        _cV(_component_uni_icons, _uM("key" to 0, "type" to "checkmarkempty", "size" to "16", "style" to _nS(_uM("color" to "#ffffff"))), null, 8, _uA(
-                                            "style"
-                                        ))
+                                        _cE("text", _uM("key" to 0, "class" to "text-16px text-white font-bold"), "✓")
                                     } else {
                                         _cC("v-if", true)
                                     }
@@ -200,7 +192,7 @@ open class GenSrcPagesBasicComponentsThemeSwitchCard : VueComponent {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("bg-__f8fafc_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#f8fafc")), "border-color-__e2e8f0_" to _pS(_uM("borderTopColor" to "#e2e8f0", "borderRightColor" to "#e2e8f0", "borderBottomColor" to "#e2e8f0", "borderLeftColor" to "#e2e8f0")), "border-style-solid" to _pS(_uM("borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid")), "border-width-1px" to _pS(_uM("borderTopWidth" to 1, "borderRightWidth" to 1, "borderBottomWidth" to 1, "borderLeftWidth" to 1)), "border-width-2px" to _pS(_uM("borderTopWidth" to 2, "borderRightWidth" to 2, "borderBottomWidth" to 2, "borderLeftWidth" to 2)), "flex-row" to _pS(_uM("flexDirection" to "row")), "h-36px" to _pS(_uM("height" to 36)), "h-44px" to _pS(_uM("height" to 44)), "items-center" to _pS(_uM("alignItems" to "center")), "justify-around" to _pS(_uM("justifyContent" to "space-around")), "justify-between" to _pS(_uM("justifyContent" to "space-between")), "mb-10px" to _pS(_uM("marginBottom" to 10)), "mb-16px" to _pS(_uM("marginBottom" to 16)), "mb-8px" to _pS(_uM("marginBottom" to 8)), "mt-10px" to _pS(_uM("marginTop" to 10)), "mt-12px" to _pS(_uM("marginTop" to 12)), "mx-auto" to _pS(_uM("marginLeft" to "auto", "marginRight" to "auto")), "none" to _pS(_uM("display" to "none")), "p-16px" to _pS(_uM("paddingTop" to 16, "paddingRight" to 16, "paddingBottom" to 16, "paddingLeft" to 16)), "py-10px" to _pS(_uM("paddingTop" to 10, "paddingBottom" to 10)), "rounded-12px" to _pS(_uM("borderTopLeftRadius" to 12, "borderTopRightRadius" to 12, "borderBottomRightRadius" to 12, "borderBottomLeftRadius" to 12)), "rounded-18px" to _pS(_uM("borderTopLeftRadius" to 18, "borderTopRightRadius" to 18, "borderBottomRightRadius" to 18, "borderBottomLeftRadius" to 18)), "rounded-8px" to _pS(_uM("borderTopLeftRadius" to 8, "borderTopRightRadius" to 8, "borderBottomRightRadius" to 8, "borderBottomLeftRadius" to 8)), "text-__475569_" to _pS(_uM("color" to "#475569")), "text-__64748b_" to _pS(_uM("color" to "#64748b")), "text-__94a3b8_" to _pS(_uM("color" to "#94a3b8")), "text-12px" to _pS(_uM("fontSize" to 12)), "text-13px" to _pS(_uM("fontSize" to 13)), "text-14px" to _pS(_uM("fontSize" to 14)), "text-center" to _pS(_uM("textAlign" to "center")), "text-white" to _pS(_uM("color" to "rgba(255,255,255,var(--un-color-opacity,1))")), "w-200px" to _pS(_uM("width" to 200)), "w-36px" to _pS(_uM("width" to 36)))
+                return _uM("bg-__f8fafc_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#f8fafc")), "border-color-__e2e8f0_" to _pS(_uM("borderTopColor" to "#e2e8f0", "borderRightColor" to "#e2e8f0", "borderBottomColor" to "#e2e8f0", "borderLeftColor" to "#e2e8f0")), "border-style-solid" to _pS(_uM("borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid")), "border-width-1px" to _pS(_uM("borderTopWidth" to 1, "borderRightWidth" to 1, "borderBottomWidth" to 1, "borderLeftWidth" to 1)), "flex" to _pS(_uM("display" to "flex")), "flex-row" to _pS(_uM("flexDirection" to "row")), "font-bold" to _pS(_uM("fontWeight" to "700")), "h-40px" to _pS(_uM("height" to 40)), "h-44px" to _pS(_uM("height" to 44)), "items-center" to _pS(_uM("alignItems" to "center")), "justify-between" to _pS(_uM("justifyContent" to "space-between")), "justify-center" to _pS(_uM("justifyContent" to "center")), "mb-16px" to _pS(_uM("marginBottom" to 16)), "mb-8px" to _pS(_uM("marginBottom" to 8)), "mt-10px" to _pS(_uM("marginTop" to 10)), "mx-auto" to _pS(_uM("marginLeft" to "auto", "marginRight" to "auto")), "none" to _pS(_uM("display" to "none")), "p-16px" to _pS(_uM("paddingTop" to 16, "paddingRight" to 16, "paddingBottom" to 16, "paddingLeft" to 16)), "py-10px" to _pS(_uM("paddingTop" to 10, "paddingBottom" to 10)), "rounded-12px" to _pS(_uM("borderTopLeftRadius" to 12, "borderTopRightRadius" to 12, "borderBottomRightRadius" to 12, "borderBottomLeftRadius" to 12)), "rounded-20px" to _pS(_uM("borderTopLeftRadius" to 20, "borderTopRightRadius" to 20, "borderBottomRightRadius" to 20, "borderBottomLeftRadius" to 20)), "rounded-8px" to _pS(_uM("borderTopLeftRadius" to 8, "borderTopRightRadius" to 8, "borderBottomRightRadius" to 8, "borderBottomLeftRadius" to 8)), "text-__94a3b8_" to _pS(_uM("color" to "#94a3b8")), "text-__ffffff_" to _pS(_uM("color" to "#ffffff")), "text-12px" to _pS(_uM("fontSize" to 12)), "text-14px" to _pS(_uM("fontSize" to 14)), "text-16px" to _pS(_uM("fontSize" to 16)), "text-center" to _pS(_uM("textAlign" to "center")), "text-white" to _pS(_uM("color" to "rgba(255,255,255,var(--un-color-opacity,1))")), "w-200px" to _pS(_uM("width" to 200)), "w-40px" to _pS(_uM("width" to 40)))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

@@ -223,7 +223,7 @@ open class GenSrcComponentsNavBarNavBar : VueComponent {
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "title" to _uM("type" to "String", "default" to ""), "titleColor" to _uM("type" to "String", "default" to "#1e293b"), "bgColor" to _uM("type" to "String", "default" to "#ffffff"), "showBack" to _uM("type" to "Boolean", "default" to true), "fixed" to _uM("type" to "Boolean", "default" to true), "placeholder" to _uM("type" to "Boolean", "default" to true), "border" to _uM("type" to "Boolean", "default" to true)))
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "title" to _uM("type" to "String", "default" to ""), "titleColor" to _uM("type" to "String", "default" to "#1e293b"), "bgColor" to _uM("type" to "String", "default" to "#ffffff"), "showBack" to _uM("type" to "Boolean", "default" to true), "fixed" to _uM("type" to "Boolean", "default" to true), "placeholder" to _uM("type" to "Boolean", "default" to true), "border" to _uM("type" to "Boolean", "default" to false)))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

@@ -219,7 +219,6 @@ open class GenSrcPagesBasicComponentsZPagingDemoCard : VueComponent {
             }
             val onQuery = ::gen_onQuery_fn
             return fun(): Any? {
-                val _component_up_button = resolveEasyComponent("up-button", GenUniModulesUviewUltraComponentsUpButtonUpButtonClass)
                 val _component_z_paging_x = resolveEasyComponent("z-paging-x", GenUniModulesZPagingXComponentsZPagingXZPagingXClass)
                 return _cV(unref(GenSrcPagesBasicComponentsCardClass), _uM("title" to "数据分页列表 (z-paging-x)"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                     return _uA(
@@ -227,20 +226,14 @@ open class GenSrcPagesBasicComponentsZPagingDemoCard : VueComponent {
                             _cE("text", _uM("class" to "text-13px text-__64748b_ leading-18px mb-8px"), " 在卡片中直接体验实时分页，支持触底加载、下拉刷新以及各种状态切换。 "),
                             _cE("view", _uM("class" to "flex-row mb-12px"), _uA(
                                 _cE("view", _uM("class" to "flex-1 mr-8px"), _uA(
-                                    _cV(_component_up_button, _uM("size" to "mini", "type" to "error", "plain" to true, "onClick" to triggerError), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                        return _uA(
-                                            " 模拟加载错误 "
-                                        )
-                                    }
-                                    ), "_" to 1))
+                                    _cE("view", _uM("class" to "w-full h-36px rounded-8px bg-__fee2e2_ flex flex-row items-center justify-center", "onClick" to triggerError), _uA(
+                                        _cE("text", _uM("class" to "text-__dc2626_ text-12px font-bold"), "模拟加载错误")
+                                    ))
                                 )),
                                 _cE("view", _uM("class" to "flex-1"), _uA(
-                                    _cV(_component_up_button, _uM("size" to "mini", "type" to "warning", "plain" to true, "onClick" to triggerClear), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                        return _uA(
-                                            " 清空数据 "
-                                        )
-                                    }
-                                    ), "_" to 1))
+                                    _cE("view", _uM("class" to "w-full h-36px rounded-8px bg-__fef3c7_ flex flex-row items-center justify-center", "onClick" to triggerClear), _uA(
+                                        _cE("text", _uM("class" to "text-__d97706_ text-12px font-bold"), "清空数据")
+                                    ))
                                 ))
                             ))
                         )),
@@ -301,7 +294,7 @@ open class GenSrcPagesBasicComponentsZPagingDemoCard : VueComponent {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("bg-__f1f5f9_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#f1f5f9")), "bg-white" to _pS(_uM("backgroundColor" to "rgba(255,255,255,var(--un-bg-opacity,1))")), "border-bottom-width-0px" to _pS(_uM("borderBottomWidth" to 0)), "border-color-__edf2f7_" to _pS(_uM("borderTopColor" to "#edf2f7", "borderRightColor" to "#edf2f7", "borderBottomColor" to "#edf2f7", "borderLeftColor" to "#edf2f7")), "border-style-solid" to _pS(_uM("borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid")), "border-width-1px" to _pS(_uM("borderTopWidth" to 1, "borderRightWidth" to 1, "borderBottomWidth" to 1, "borderLeftWidth" to 1)), "flex-1" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")), "flex-col" to _pS(_uM("flexDirection" to "column")), "flex-row" to _pS(_uM("flexDirection" to "row")), "font-bold" to _pS(_uM("fontWeight" to "700")), "items-center" to _pS(_uM("alignItems" to "center")), "justify-between" to _pS(_uM("justifyContent" to "space-between")), "justify-center" to _pS(_uM("justifyContent" to "center")), "leading-16px" to _pS(_uM("lineHeight" to "16px")), "leading-18px" to _pS(_uM("lineHeight" to "18px")), "mb-12px" to _pS(_uM("marginBottom" to 12)), "mb-4px" to _pS(_uM("marginBottom" to 4)), "mb-6px" to _pS(_uM("marginBottom" to 6)), "mb-8px" to _pS(_uM("marginBottom" to 8)), "mr-8px" to _pS(_uM("marginRight" to 8)), "mx-12px" to _pS(_uM("marginLeft" to 12, "marginRight" to 12)), "my-8px" to _pS(_uM("marginTop" to 8, "marginBottom" to 8)), "p-12px" to _pS(_uM("paddingTop" to 12, "paddingRight" to 12, "paddingBottom" to 12, "paddingLeft" to 12)), "p-2px" to _pS(_uM("paddingTop" to 2, "paddingRight" to 2, "paddingBottom" to 2, "paddingLeft" to 2)), "px-12px" to _pS(_uM("paddingLeft" to 12, "paddingRight" to 12)), "py-6px" to _pS(_uM("paddingTop" to 6, "paddingBottom" to 6)), "py-8px" to _pS(_uM("paddingTop" to 8, "paddingBottom" to 8)), "rounded-6px" to _pS(_uM("borderTopLeftRadius" to 6, "borderTopRightRadius" to 6, "borderBottomRightRadius" to 6, "borderBottomLeftRadius" to 6)), "rounded-8px" to _pS(_uM("borderTopLeftRadius" to 8, "borderTopRightRadius" to 8, "borderBottomRightRadius" to 8, "borderBottomLeftRadius" to 8)), "text-__1e293b_" to _pS(_uM("color" to "#1e293b")), "text-__64748b_" to _pS(_uM("color" to "#64748b")), "text-__94a3b8_" to _pS(_uM("color" to "#94a3b8")), "text-11px" to _pS(_uM("fontSize" to 11)), "text-12px" to _pS(_uM("fontSize" to 12)), "text-13px" to _pS(_uM("fontSize" to 13)), "text-14px" to _pS(_uM("fontSize" to 14)))
+                return _uM("bg-__f1f5f9_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#f1f5f9")), "bg-__fee2e2_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#fee2e2")), "bg-__fef3c7_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#fef3c7")), "bg-white" to _pS(_uM("backgroundColor" to "rgba(255,255,255,var(--un-bg-opacity,1))")), "border-bottom-width-0px" to _pS(_uM("borderBottomWidth" to 0)), "border-color-__edf2f7_" to _pS(_uM("borderTopColor" to "#edf2f7", "borderRightColor" to "#edf2f7", "borderBottomColor" to "#edf2f7", "borderLeftColor" to "#edf2f7")), "border-style-solid" to _pS(_uM("borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid")), "border-width-1px" to _pS(_uM("borderTopWidth" to 1, "borderRightWidth" to 1, "borderBottomWidth" to 1, "borderLeftWidth" to 1)), "flex" to _pS(_uM("display" to "flex")), "flex-1" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")), "flex-col" to _pS(_uM("flexDirection" to "column")), "flex-row" to _pS(_uM("flexDirection" to "row")), "font-bold" to _pS(_uM("fontWeight" to "700")), "h-36px" to _pS(_uM("height" to 36)), "items-center" to _pS(_uM("alignItems" to "center")), "justify-between" to _pS(_uM("justifyContent" to "space-between")), "justify-center" to _pS(_uM("justifyContent" to "center")), "leading-16px" to _pS(_uM("lineHeight" to "16px")), "leading-18px" to _pS(_uM("lineHeight" to "18px")), "mb-12px" to _pS(_uM("marginBottom" to 12)), "mb-4px" to _pS(_uM("marginBottom" to 4)), "mb-6px" to _pS(_uM("marginBottom" to 6)), "mb-8px" to _pS(_uM("marginBottom" to 8)), "mr-8px" to _pS(_uM("marginRight" to 8)), "mx-12px" to _pS(_uM("marginLeft" to 12, "marginRight" to 12)), "my-8px" to _pS(_uM("marginTop" to 8, "marginBottom" to 8)), "p-12px" to _pS(_uM("paddingTop" to 12, "paddingRight" to 12, "paddingBottom" to 12, "paddingLeft" to 12)), "p-2px" to _pS(_uM("paddingTop" to 2, "paddingRight" to 2, "paddingBottom" to 2, "paddingLeft" to 2)), "px-12px" to _pS(_uM("paddingLeft" to 12, "paddingRight" to 12)), "py-6px" to _pS(_uM("paddingTop" to 6, "paddingBottom" to 6)), "py-8px" to _pS(_uM("paddingTop" to 8, "paddingBottom" to 8)), "rounded-6px" to _pS(_uM("borderTopLeftRadius" to 6, "borderTopRightRadius" to 6, "borderBottomRightRadius" to 6, "borderBottomLeftRadius" to 6)), "rounded-8px" to _pS(_uM("borderTopLeftRadius" to 8, "borderTopRightRadius" to 8, "borderBottomRightRadius" to 8, "borderBottomLeftRadius" to 8)), "text-__1e293b_" to _pS(_uM("color" to "#1e293b")), "text-__64748b_" to _pS(_uM("color" to "#64748b")), "text-__94a3b8_" to _pS(_uM("color" to "#94a3b8")), "text-__d97706_" to _pS(_uM("color" to "#d97706")), "text-__dc2626_" to _pS(_uM("color" to "#dc2626")), "text-11px" to _pS(_uM("fontSize" to 11)), "text-12px" to _pS(_uM("fontSize" to 12)), "text-13px" to _pS(_uM("fontSize" to 13)), "text-14px" to _pS(_uM("fontSize" to 14)), "text-center" to _pS(_uM("textAlign" to "center")), "w-full" to _pS(_uM("width" to "100%")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

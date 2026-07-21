@@ -160,14 +160,14 @@ open class GenSrcPagesMeMe : BasePage {
             }
             )
             val userInfoJson = computed(fun(): String {
-                val info: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("info", "src/pages/me/me.uvue", 82, 9), "userId" to userStore.state.userInfo.userId, "username" to userStore.state.userInfo.username, "nickname" to userStore.state.userInfo.nickname, "avatar" to userStore.state.userInfo.avatar)
+                val info: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("info", "src/pages/me/me.uvue", 143, 9), "userId" to userStore.state.userInfo.userId, "username" to userStore.state.userInfo.username, "nickname" to userStore.state.userInfo.nickname, "avatar" to userStore.state.userInfo.avatar)
                 return JSON.stringify(info, null, 2)
             }
             )
             onShow(fun(){
-                console.log("All storage keys:", uni_getStorageInfoSync().keys, " at src/pages/me/me.uvue:92")
-                console.log("pinia:token:", uni_getStorageSync("pinia:token"), " at src/pages/me/me.uvue:93")
-                console.log("pinia:user:", uni_getStorageSync("pinia:user"), " at src/pages/me/me.uvue:94")
+                console.log("All storage keys:", uni_getStorageInfoSync().keys, " at src/pages/me/me.uvue:153")
+                console.log("pinia:token:", uni_getStorageSync("pinia:token"), " at src/pages/me/me.uvue:154")
+                console.log("pinia:user:", uni_getStorageSync("pinia:user"), " at src/pages/me/me.uvue:155")
             }
             )
             fun gen_handleLogin_fn() {
@@ -196,30 +196,30 @@ open class GenSrcPagesMeMe : BasePage {
                     return _uA(
                         _cV(unref(GenSrcLayoutsDefaultClass), _uM("navigation-bar-title-text" to "我的"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                             return _uA(
-                                _cE("view", _uM("class" to "page-container"), _uA(
-                                    _cE("view", _uM("class" to "header-card"), _uA(
-                                        _cE("image", _uM("class" to "avatar", "src" to unref(avatarUrl)), null, 8, _uA(
+                                _cE("view", _uM("class" to "flex flex-col items-center px-16px py-24px flex-1"), _uA(
+                                    _cE("view", _uM("class" to "w-full bg-white rounded-12px px-20px py-30px mb-20px flex flex-col items-center"), _uA(
+                                        _cE("image", _uM("class" to "w-90px h-90px rounded-45px mb-16px border-width-3px border-color-__f1f5f9_ border-solid", "src" to unref(avatarUrl)), null, 8, _uA(
                                             "src"
                                         )),
-                                        _cE("text", _uM("class" to "username"), _tD(if (unref(userStore).state.userInfo.username.length > 0) {
+                                        _cE("text", _uM("class" to "text-20px font-bold text-__1e293b_ mb-4px"), _tD(if (unref(userStore).state.userInfo.username.length > 0) {
                                             unref(userStore).state.userInfo.username
                                         } else {
                                             "未登录用户"
                                         }
                                         ), 1),
                                         if (unref(userStore).state.userInfo.username.length > 0) {
-                                            _cE("text", _uM("key" to 0, "class" to "nickname"), _tD(unref(userStore).state.userInfo.nickname), 1)
+                                            _cE("text", _uM("key" to 0, "class" to "text-14px text-__64748b_ mb-12px"), _tD(unref(userStore).state.userInfo.nickname), 1)
                                         } else {
                                             _cC("v-if", true)
                                         }
                                         ,
-                                        _cE("view", _uM("class" to "status-wrap"), _uA(
+                                        _cE("view", _uM("class" to "flex flex-row"), _uA(
                                             _cE("text", _uM("class" to _nC(_uA(
-                                                "status-tag",
+                                                "text-12px px-12px py-4px rounded-20px font-medium overflow-hidden",
                                                 if (unref(tokenStore).hasValidLogin()) {
-                                                    "status-logged-in"
+                                                    "bg-__d1fae5_ text-__065f46_"
                                                 } else {
-                                                    "status-not-logged-in"
+                                                    "bg-__f1f5f9_ text-__64748b_"
                                                 }
                                             ))), _tD(if (unref(tokenStore).hasValidLogin()) {
                                                 "已登录"
@@ -229,19 +229,23 @@ open class GenSrcPagesMeMe : BasePage {
                                             ), 3)
                                         ))
                                     )),
-                                    _cE("view", _uM("class" to "info-card"), _uA(
-                                        _cE("view", _uM("class" to "info-header"), _uA(
-                                            _cE("text", _uM("class" to "info-title"), "用户信息 (JSON)")
+                                    _cE("view", _uM("class" to "w-full bg-white rounded-12px p-20px mb-24px flex flex-col"), _uA(
+                                        _cE("view", _uM("class" to "border-bottom-width-1px border-bottom-style-solid border-bottom-color-__f1f5f9_ pb-8px mb-12px flex flex-row"), _uA(
+                                            _cE("text", _uM("class" to "text-15px font-semibold text-__334155_"), "用户信息 (JSON)")
                                         )),
-                                        _cE("scroll-view", _uM("class" to "json-scroll", "scroll-y" to "true"), _uA(
-                                            _cE("text", _uM("class" to "json-text"), _tD(unref(userInfoJson)), 1)
+                                        _cE("scroll-view", _uM("class" to "bg-__0f172a_ rounded-8px p-12px h-180px", "scroll-y" to "true"), _uA(
+                                            _cE("text", _uM("class" to "text-13px text-__38bdf8_ leading-20px", "style" to _nS(_uM("font-family" to "monospace"))), _tD(unref(userInfoJson)), 5)
                                         ))
                                     )),
-                                    _cE("view", _uM("class" to "btn-wrap"), _uA(
+                                    _cE("view", _uM("class" to "w-full px-8px flex flex-col"), _uA(
                                         if (isTrue(unref(tokenStore).hasValidLogin())) {
-                                            _cE("button", _uM("key" to 0, "class" to "btn-logout", "onClick" to handleLogout), " 退出登录 ")
+                                            _cE("view", _uM("key" to 0, "class" to "w-full h-48px rounded-8px bg-__ef4444_ flex flex-row items-center justify-center", "onClick" to handleLogout), _uA(
+                                                _cE("text", _uM("class" to "text-__ffffff_ text-14px font-bold"), "退出登录")
+                                            ))
                                         } else {
-                                            _cE("button", _uM("key" to 1, "class" to "btn-login", "onClick" to handleLogin), " 登录 ")
+                                            _cE("view", _uM("key" to 1, "class" to "w-full h-48px rounded-8px bg-__3b82f6_ flex flex-row items-center justify-center", "onClick" to handleLogin), _uA(
+                                                _cE("text", _uM("class" to "text-__ffffff_ text-14px font-bold"), "登录")
+                                            ))
                                         }
                                     ))
                                 ))
@@ -260,7 +264,7 @@ open class GenSrcPagesMeMe : BasePage {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("page-container" to _pS(_uM("display" to "flex", "flexDirection" to "column", "paddingTop" to 24, "paddingRight" to 16, "paddingBottom" to 24, "paddingLeft" to 16, "alignItems" to "center", "backgroundColor" to "#f8f8f8", "flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")), "header-card" to _pS(_uM("width" to "100%", "backgroundColor" to "#ffffff", "borderTopLeftRadius" to 12, "borderTopRightRadius" to 12, "borderBottomRightRadius" to 12, "borderBottomLeftRadius" to 12, "paddingTop" to 30, "paddingRight" to 20, "paddingBottom" to 30, "paddingLeft" to 20, "marginBottom" to 20, "display" to "flex", "flexDirection" to "column", "alignItems" to "center")), "avatar" to _pS(_uM("width" to 90, "height" to 90, "borderTopLeftRadius" to 45, "borderTopRightRadius" to 45, "borderBottomRightRadius" to 45, "borderBottomLeftRadius" to 45, "marginBottom" to 16, "borderTopWidth" to 3, "borderRightWidth" to 3, "borderBottomWidth" to 3, "borderLeftWidth" to 3, "borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid", "borderTopColor" to "#f1f5f9", "borderRightColor" to "#f1f5f9", "borderBottomColor" to "#f1f5f9", "borderLeftColor" to "#f1f5f9")), "username" to _pS(_uM("fontSize" to 20, "fontWeight" to "bold", "color" to "#1e293b", "marginBottom" to 4)), "nickname" to _pS(_uM("fontSize" to 14, "color" to "#64748b", "marginBottom" to 12)), "status-wrap" to _pS(_uM("display" to "flex", "flexDirection" to "row")), "status-tag" to _pS(_uM("fontSize" to 12, "paddingTop" to 4, "paddingRight" to 12, "paddingBottom" to 4, "paddingLeft" to 12, "borderTopLeftRadius" to 20, "borderTopRightRadius" to 20, "borderBottomRightRadius" to 20, "borderBottomLeftRadius" to 20, "fontWeight" to "500", "overflow" to "hidden")), "status-logged-in" to _pS(_uM("backgroundColor" to "#d1fae5", "color" to "#065f46")), "status-not-logged-in" to _pS(_uM("backgroundColor" to "#f1f5f9", "color" to "#64748b")), "info-card" to _pS(_uM("width" to "100%", "backgroundColor" to "#ffffff", "borderTopLeftRadius" to 12, "borderTopRightRadius" to 12, "borderBottomRightRadius" to 12, "borderBottomLeftRadius" to 12, "paddingTop" to 20, "paddingRight" to 20, "paddingBottom" to 20, "paddingLeft" to 20, "marginBottom" to 24, "display" to "flex", "flexDirection" to "column")), "info-header" to _pS(_uM("borderBottomWidth" to 1, "borderBottomStyle" to "solid", "borderBottomColor" to "#f1f5f9", "paddingBottom" to 8, "marginBottom" to 12, "display" to "flex", "flexDirection" to "row")), "info-title" to _pS(_uM("fontSize" to 15, "fontWeight" to "600", "color" to "#334155")), "json-scroll" to _pS(_uM("backgroundColor" to "#0f172a", "borderTopLeftRadius" to 8, "borderTopRightRadius" to 8, "borderBottomRightRadius" to 8, "borderBottomLeftRadius" to 8, "paddingTop" to 12, "paddingRight" to 12, "paddingBottom" to 12, "paddingLeft" to 12, "maxHeight" to 180)), "json-text" to _pS(_uM("fontSize" to 13, "color" to "#38bdf8", "lineHeight" to 1.6, "fontFamily" to "monospace")), "btn-wrap" to _pS(_uM("width" to "100%", "paddingTop" to 0, "paddingRight" to 8, "paddingBottom" to 0, "paddingLeft" to 8, "display" to "flex", "flexDirection" to "column")), "btn-logout" to _pS(_uM("width" to "100%", "height" to 48, "borderTopLeftRadius" to 8, "borderTopRightRadius" to 8, "borderBottomRightRadius" to 8, "borderBottomLeftRadius" to 8, "backgroundColor" to "#ef4444", "color" to "#ffffff")), "btn-login" to _pS(_uM("width" to "100%", "height" to 48, "borderTopLeftRadius" to 8, "borderTopRightRadius" to 8, "borderBottomRightRadius" to 8, "borderBottomLeftRadius" to 8, "backgroundColor" to "#3b82f6", "color" to "#ffffff")))
+                return _uM("bg-__0f172a_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#0f172a")), "bg-__3b82f6_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#3b82f6")), "bg-__d1fae5_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#d1fae5")), "bg-__ef4444_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#ef4444")), "bg-__f1f5f9_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#f1f5f9")), "bg-white" to _pS(_uM("backgroundColor" to "rgba(255,255,255,var(--un-bg-opacity,1))")), "border-bottom-color-__f1f5f9_" to _pS(_uM("borderBottomColor" to "#f1f5f9")), "border-bottom-style-solid" to _pS(_uM("borderBottomStyle" to "solid")), "border-bottom-width-1px" to _pS(_uM("borderBottomWidth" to 1)), "border-color-__f1f5f9_" to _pS(_uM("borderTopColor" to "#f1f5f9", "borderRightColor" to "#f1f5f9", "borderBottomColor" to "#f1f5f9", "borderLeftColor" to "#f1f5f9")), "border-solid" to _pS(_uM("borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid")), "border-width-3px" to _pS(_uM("borderTopWidth" to 3, "borderRightWidth" to 3, "borderBottomWidth" to 3, "borderLeftWidth" to 3)), "flex" to _pS(_uM("display" to "flex")), "flex-1" to _pS(_uM("flexGrow" to 1, "flexShrink" to 1, "flexBasis" to "0%")), "flex-col" to _pS(_uM("flexDirection" to "column")), "flex-row" to _pS(_uM("flexDirection" to "row")), "font-bold" to _pS(_uM("fontWeight" to "700")), "font-medium" to _pS(_uM("fontWeight" to "500")), "font-semibold" to _pS(_uM("fontWeight" to "600")), "h-180px" to _pS(_uM("height" to 180)), "h-48px" to _pS(_uM("height" to 48)), "h-90px" to _pS(_uM("height" to 90)), "items-center" to _pS(_uM("alignItems" to "center")), "justify-center" to _pS(_uM("justifyContent" to "center")), "leading-20px" to _pS(_uM("lineHeight" to "20px")), "mb-12px" to _pS(_uM("marginBottom" to 12)), "mb-16px" to _pS(_uM("marginBottom" to 16)), "mb-20px" to _pS(_uM("marginBottom" to 20)), "mb-24px" to _pS(_uM("marginBottom" to 24)), "mb-4px" to _pS(_uM("marginBottom" to 4)), "overflow-hidden" to _pS(_uM("overflow" to "hidden")), "p-12px" to _pS(_uM("paddingTop" to 12, "paddingRight" to 12, "paddingBottom" to 12, "paddingLeft" to 12)), "p-20px" to _pS(_uM("paddingTop" to 20, "paddingRight" to 20, "paddingBottom" to 20, "paddingLeft" to 20)), "pb-8px" to _pS(_uM("paddingBottom" to 8)), "px-12px" to _pS(_uM("paddingLeft" to 12, "paddingRight" to 12)), "px-16px" to _pS(_uM("paddingLeft" to 16, "paddingRight" to 16)), "px-20px" to _pS(_uM("paddingLeft" to 20, "paddingRight" to 20)), "px-8px" to _pS(_uM("paddingLeft" to 8, "paddingRight" to 8)), "py-24px" to _pS(_uM("paddingTop" to 24, "paddingBottom" to 24)), "py-30px" to _pS(_uM("paddingTop" to 30, "paddingBottom" to 30)), "py-4px" to _pS(_uM("paddingTop" to 4, "paddingBottom" to 4)), "rounded-12px" to _pS(_uM("borderTopLeftRadius" to 12, "borderTopRightRadius" to 12, "borderBottomRightRadius" to 12, "borderBottomLeftRadius" to 12)), "rounded-20px" to _pS(_uM("borderTopLeftRadius" to 20, "borderTopRightRadius" to 20, "borderBottomRightRadius" to 20, "borderBottomLeftRadius" to 20)), "rounded-45px" to _pS(_uM("borderTopLeftRadius" to 45, "borderTopRightRadius" to 45, "borderBottomRightRadius" to 45, "borderBottomLeftRadius" to 45)), "rounded-8px" to _pS(_uM("borderTopLeftRadius" to 8, "borderTopRightRadius" to 8, "borderBottomRightRadius" to 8, "borderBottomLeftRadius" to 8)), "text-__065f46_" to _pS(_uM("color" to "#065f46")), "text-__1e293b_" to _pS(_uM("color" to "#1e293b")), "text-__334155_" to _pS(_uM("color" to "#334155")), "text-__38bdf8_" to _pS(_uM("color" to "#38bdf8")), "text-__64748b_" to _pS(_uM("color" to "#64748b")), "text-__ffffff_" to _pS(_uM("color" to "#ffffff")), "text-12px" to _pS(_uM("fontSize" to 12)), "text-13px" to _pS(_uM("fontSize" to 13)), "text-14px" to _pS(_uM("fontSize" to 14)), "text-15px" to _pS(_uM("fontSize" to 15)), "text-20px" to _pS(_uM("fontSize" to 20)), "text-center" to _pS(_uM("textAlign" to "center")), "w-90px" to _pS(_uM("width" to 90)), "w-full" to _pS(_uM("width" to "100%")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

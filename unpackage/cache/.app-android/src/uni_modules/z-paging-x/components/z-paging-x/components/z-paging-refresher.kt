@@ -79,13 +79,13 @@ open class GenUniModulesZPagingXComponentsZPagingXComponentsZPagingRefresher : V
     @Suppress("USELESS_CAST")
     override fun data(): Map<String, Any?> {
         return _uM("parent" to null as ComponentPublicInstance?, "parentData" to _uO(), "children" to _uA<ComponentPublicInstance>(), "childrenRefs" to _uA<String>(), "times" to 0, "base64ArrowImg" to base64Arrow, "isDefault" to computed<Boolean>(fun(): Boolean {
-            return this.status === default__12.Refresher.Default
+            return this.status === default__11.Refresher.Default
         }
         ), "isReleaseToRefresh" to computed<Boolean>(fun(): Boolean {
-            return this.status === default__12.Refresher.ReleaseToRefresh
+            return this.status === default__11.Refresher.ReleaseToRefresh
         }
         ), "isLoading" to computed<Boolean>(fun(): Boolean {
-            return this.status === default__12.Refresher.Loading
+            return this.status === default__11.Refresher.Loading
         }
         ), "statusText" to computed<String>(fun(): String {
             if (this.isDefault) {
@@ -225,7 +225,7 @@ open class GenUniModulesZPagingXComponentsZPagingXComponentsZPagingRefresher : V
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "status" to _uM("type" to "String", "default" to default__12.Refresher.Default), "defaultText" to _uM("type" to "String", "default" to "继续下拉刷新"), "pullingText" to _uM("type" to "String", "default" to "松开立即刷新"), "refreshingText" to _uM("type" to "String", "default" to "正在刷新..."), "showUpdateTime" to _uM("type" to "Boolean", "default" to false), "updateTimeKey" to _uM("type" to "String", "default" to "default"), "timeTextTimestamp" to _uM("type" to "Number", "default" to 0)))
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "status" to _uM("type" to "String", "default" to default__11.Refresher.Default), "defaultText" to _uM("type" to "String", "default" to "继续下拉刷新"), "pullingText" to _uM("type" to "String", "default" to "松开立即刷新"), "refreshingText" to _uM("type" to "String", "default" to "正在刷新..."), "showUpdateTime" to _uM("type" to "Boolean", "default" to false), "updateTimeKey" to _uM("type" to "String", "default" to "default"), "timeTextTimestamp" to _uM("type" to "Number", "default" to 0)))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

@@ -4,27 +4,32 @@
     <view class="bg-[#f8fafc] rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0] items-center">
       <text class="text-12px text-[#94a3b8] mb-8px">主题色效果预览</text>
 
-      <button
-        class="mt-10px mx-auto w-200px h-44px rounded-8px text-white text-14px"
+      <view
+        class="mt-10px mx-auto w-200px h-44px rounded-8px flex flex-row items-center justify-center"
         :style="{ backgroundColor: appStore.state.theme }"
       >
-        uni：主题按钮
-      </button>
-
-      <up-button type="primary" class="mt-10px">
-        uview-ultra： 主题按钮
-      </up-button>
+        <text class="text-[#ffffff] text-14px">主题按钮</text>
+      </view>
     </view>
 
     <!-- 颜色选择区 -->
-    <view class="flex-row justify-around items-center py-10px">
+    <view class="flex-row justify-between py-10px">
       <view
         v-for="(item, index) in colorOptions"
         :key="index"
-        :style="{ width: '40px', height: '40px', borderRadius: '20px', backgroundColor: item, alignItems: 'center', justifyContent: 'center', borderWidth: appStore.state.theme === item ? '2px' : '0px', borderStyle: 'solid', borderColor: '#334155' }"
+        class="w-40px h-40px rounded-20px items-center justify-center"
+        :style="{
+          backgroundColor: item,
+          borderWidth: appStore.state.theme === item ? '3px' : '0px',
+          borderStyle: 'solid',
+          borderColor: '#1e293b'
+        }"
         @click="changeTheme(item)"
       >
-        <uni-icons v-if="appStore.state.theme === item" type="checkmarkempty" size="16" style="color: #ffffff;" />
+        <text
+          v-if="appStore.state.theme === item"
+          class="text-16px text-white font-bold"
+        >✓</text>
       </view>
     </view>
   </Card>
@@ -36,13 +41,12 @@ import { useAppStore } from '@/src/store/index.uts'
 
 const appStore = useAppStore()
 
-// 可选的主题色列表
 const colorOptions = [
-  '#37c2bc', // 默认青绿
-  '#0957DE', // 皇家蓝
-  '#10b981', // 翡翠绿
-  '#f43f5e', // 珊瑚红
-  '#f97316', // 温暖橙
+  '#37c2bc',
+  '#0957DE',
+  '#10b981',
+  '#f43f5e',
+  '#f97316',
 ]
 
 function changeTheme(color: string) {

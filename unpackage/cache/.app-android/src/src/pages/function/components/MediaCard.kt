@@ -147,7 +147,7 @@ open class GenSrcPagesFunctionComponentsMediaCard : VueComponent {
                     }
                 }
                 , fail = fun(err){
-                    console.error(err, " at src/pages/function/components/MediaCard.uvue:60")
+                    console.error(err, " at src/pages/function/components/MediaCard.uvue:68")
                 }
                 ))
             }
@@ -157,13 +157,12 @@ open class GenSrcPagesFunctionComponentsMediaCard : VueComponent {
                     scanResult.value = res.result
                 }
                 , fail = fun(err){
-                    console.error(err, " at src/pages/function/components/MediaCard.uvue:71")
+                    console.error(err, " at src/pages/function/components/MediaCard.uvue:79")
                 }
                 ))
             }
             val scanCode = ::gen_scanCode_fn
             return fun(): Any? {
-                val _component_up_button = resolveEasyComponent("up-button", GenUniModulesUviewUltraComponentsUpButtonUpButtonClass)
                 return _cV(unref(GenSrcPagesBasicComponentsCardClass), _uM("title" to "相机与多媒体"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                     return _uA(
                         _cE("view", _uM("class" to "bg-__f8fafc_ rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_ items-center justify-center"), _uA(
@@ -175,12 +174,9 @@ open class GenSrcPagesFunctionComponentsMediaCard : VueComponent {
                                 ))
                             }
                         )),
-                        _cV(_component_up_button, _uM("type" to "primary", "class" to "mb-12px", "onClick" to chooseImage), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                            return _uA(
-                                " 拍摄/选择照片 "
-                            )
-                        }
-                        ), "_" to 1)),
+                        _cE("view", _uM("class" to "w-full h-44px rounded-8px bg-__3b82f6_ mb-12px flex flex-row items-center justify-center", "onClick" to chooseImage), _uA(
+                            _cE("text", _uM("class" to "text-__ffffff_ text-14px font-bold"), "拍摄/选择照片")
+                        )),
                         _cE("view", _uM("class" to "bg-__f8fafc_ rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_"), _uA(
                             _cE("text", _uM("class" to "text-12px text-__94a3b8_ mb-8px"), "扫码结果"),
                             _cE("text", _uM("class" to "text-14px font-bold text-__334155_"), _tD(if (scanResult.value !== "") {
@@ -190,12 +186,9 @@ open class GenSrcPagesFunctionComponentsMediaCard : VueComponent {
                             }
                             ), 1)
                         )),
-                        _cV(_component_up_button, _uM("type" to "success", "onClick" to scanCode), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                            return _uA(
-                                " 扫码测试 "
-                            )
-                        }
-                        ), "_" to 1))
+                        _cE("view", _uM("class" to "w-full h-44px rounded-8px bg-__10b981_ flex flex-row items-center justify-center", "onClick" to scanCode), _uA(
+                            _cE("text", _uM("class" to "text-__ffffff_ text-14px font-bold"), "扫码测试")
+                        ))
                     )
                 }
                 ), "_" to 1))
@@ -208,7 +201,7 @@ open class GenSrcPagesFunctionComponentsMediaCard : VueComponent {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("bg-__f8fafc_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#f8fafc")), "border-color-__e2e8f0_" to _pS(_uM("borderTopColor" to "#e2e8f0", "borderRightColor" to "#e2e8f0", "borderBottomColor" to "#e2e8f0", "borderLeftColor" to "#e2e8f0")), "border-style-solid" to _pS(_uM("borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid")), "border-width-1px" to _pS(_uM("borderTopWidth" to 1, "borderRightWidth" to 1, "borderBottomWidth" to 1, "borderLeftWidth" to 1)), "font-bold" to _pS(_uM("fontWeight" to "700")), "h-150px" to _pS(_uM("height" to 150)), "items-center" to _pS(_uM("alignItems" to "center")), "justify-center" to _pS(_uM("justifyContent" to "center")), "mb-12px" to _pS(_uM("marginBottom" to 12)), "mb-16px" to _pS(_uM("marginBottom" to 16)), "mb-8px" to _pS(_uM("marginBottom" to 8)), "p-16px" to _pS(_uM("paddingTop" to 16, "paddingRight" to 16, "paddingBottom" to 16, "paddingLeft" to 16)), "rounded-12px" to _pS(_uM("borderTopLeftRadius" to 12, "borderTopRightRadius" to 12, "borderBottomRightRadius" to 12, "borderBottomLeftRadius" to 12)), "rounded-8px" to _pS(_uM("borderTopLeftRadius" to 8, "borderTopRightRadius" to 8, "borderBottomRightRadius" to 8, "borderBottomLeftRadius" to 8)), "text-__334155_" to _pS(_uM("color" to "#334155")), "text-__94a3b8_" to _pS(_uM("color" to "#94a3b8")), "text-12px" to _pS(_uM("fontSize" to 12)), "text-14px" to _pS(_uM("fontSize" to 14)), "w-150px" to _pS(_uM("width" to 150)))
+                return _uM("bg-__10b981_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#10b981")), "bg-__3b82f6_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#3b82f6")), "bg-__f8fafc_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#f8fafc")), "border-color-__e2e8f0_" to _pS(_uM("borderTopColor" to "#e2e8f0", "borderRightColor" to "#e2e8f0", "borderBottomColor" to "#e2e8f0", "borderLeftColor" to "#e2e8f0")), "border-style-solid" to _pS(_uM("borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid")), "border-width-1px" to _pS(_uM("borderTopWidth" to 1, "borderRightWidth" to 1, "borderBottomWidth" to 1, "borderLeftWidth" to 1)), "flex" to _pS(_uM("display" to "flex")), "flex-row" to _pS(_uM("flexDirection" to "row")), "font-bold" to _pS(_uM("fontWeight" to "700")), "h-150px" to _pS(_uM("height" to 150)), "h-44px" to _pS(_uM("height" to 44)), "items-center" to _pS(_uM("alignItems" to "center")), "justify-center" to _pS(_uM("justifyContent" to "center")), "mb-12px" to _pS(_uM("marginBottom" to 12)), "mb-16px" to _pS(_uM("marginBottom" to 16)), "mb-8px" to _pS(_uM("marginBottom" to 8)), "p-16px" to _pS(_uM("paddingTop" to 16, "paddingRight" to 16, "paddingBottom" to 16, "paddingLeft" to 16)), "rounded-12px" to _pS(_uM("borderTopLeftRadius" to 12, "borderTopRightRadius" to 12, "borderBottomRightRadius" to 12, "borderBottomLeftRadius" to 12)), "rounded-8px" to _pS(_uM("borderTopLeftRadius" to 8, "borderTopRightRadius" to 8, "borderBottomRightRadius" to 8, "borderBottomLeftRadius" to 8)), "text-__334155_" to _pS(_uM("color" to "#334155")), "text-__94a3b8_" to _pS(_uM("color" to "#94a3b8")), "text-__ffffff_" to _pS(_uM("color" to "#ffffff")), "text-12px" to _pS(_uM("fontSize" to 12)), "text-14px" to _pS(_uM("fontSize" to 14)), "text-center" to _pS(_uM("textAlign" to "center")), "w-150px" to _pS(_uM("width" to 150)), "w-full" to _pS(_uM("width" to "100%")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()

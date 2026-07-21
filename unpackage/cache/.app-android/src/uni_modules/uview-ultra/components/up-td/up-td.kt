@@ -210,7 +210,7 @@ open class GenUniModulesUviewUltraComponentsUpTdUpTd : VueComponent {
             "String"
         ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "width" to _uM("type" to _uA(
             "String"
-        ), "default" to default__15.getString("td.width")), "textAlign" to _uM("type" to "String", "default" to default__15.getString("td.textAlign")), "fontSize" to _uM("type" to "String", "default" to default__15.getString("td.fontSize")), "borderColor" to _uM("type" to "String", "default" to default__15.getString("td.borderColor")), "color" to _uM("type" to "String", "default" to default__15.getString("td.color"))))
+        ), "default" to default__14.getString("td.width")), "textAlign" to _uM("type" to "String", "default" to default__14.getString("td.textAlign")), "fontSize" to _uM("type" to "String", "default" to default__14.getString("td.fontSize")), "borderColor" to _uM("type" to "String", "default" to default__14.getString("td.borderColor")), "color" to _uM("type" to "String", "default" to default__14.getString("td.color"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

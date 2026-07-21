@@ -1,5 +1,9 @@
 @file:Suppress("UNCHECKED_CAST", "USELESS_CAST", "INAPPLICABLE_JVM_NAME", "UNUSED_ANONYMOUS_PARAMETER", "SENSELESS_COMPARISON", "NAME_SHADOWING", "UNNECESSARY_NOT_NULL_ASSERTION")
 package uni.UNI5198058
+import android.content.Context
+import android.os.Build
+import android.os.Vibrator
+import android.os.VibratorManager
 import io.dcloud.uniapp.*
 import io.dcloud.uniapp.extapi.*
 import io.dcloud.uniapp.framework.*
@@ -138,7 +142,39 @@ open class GenSrcPagesFunctionComponentsHapticsCard : VueComponent {
             val _ctx = __ins.proxy as GenSrcPagesFunctionComponentsHapticsCard
             val _cache = __ins.renderCache
             val copyText = ref("Hello unibestX!")
-            fun gen_triggerVibration_fn() {}
+            fun gen_vibrationAndroid_fn(): Unit {
+                val activity = UTSAndroid.getUniActivity()
+                if (activity == null) {
+                    uni_showToast(ShowToastOptions(title = "获取 Activity 失败", icon = "none"))
+                    return
+                }
+                try {
+                    if (Build.VERSION.SDK_INT >= 31) {
+                        val manager = activity.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+                        if (manager != null) {
+                            manager.defaultVibrator.vibrate(15)
+                            uni_showToast(ShowToastOptions(title = "已触发短震动", icon = "none"))
+                        } else {
+                            uni_showToast(ShowToastOptions(title = "获取震动服务失败", icon = "none"))
+                        }
+                    } else {
+                        val vibrator = activity.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                        if (vibrator != null) {
+                            vibrator.vibrate(15)
+                            uni_showToast(ShowToastOptions(title = "已触发短震动", icon = "none"))
+                        } else {
+                            uni_showToast(ShowToastOptions(title = "获取震动服务失败", icon = "none"))
+                        }
+                    }
+                }
+                 catch (e: Throwable) {
+                    uni_showToast(ShowToastOptions(title = "震动调用失败", icon = "none"))
+                }
+            }
+            val vibrationAndroid = ::gen_vibrationAndroid_fn
+            fun gen_triggerVibration_fn() {
+                vibrationAndroid()
+            }
             val triggerVibration = ::gen_triggerVibration_fn
             fun gen_handleCopy_fn() {
                 if (copyText.value === "") {
@@ -151,7 +187,6 @@ open class GenSrcPagesFunctionComponentsHapticsCard : VueComponent {
             }
             val handleCopy = ::gen_handleCopy_fn
             return fun(): Any? {
-                val _component_up_button = resolveEasyComponent("up-button", GenUniModulesUviewUltraComponentsUpButtonUpButtonClass)
                 return _cV(unref(GenSrcPagesBasicComponentsCardClass), _uM("title" to "触感与工具"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                     return _uA(
                         _cE("view", _uM("class" to "bg-__f8fafc_ rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_"), _uA(
@@ -163,19 +198,13 @@ open class GenSrcPagesFunctionComponentsHapticsCard : VueComponent {
                                 "modelValue",
                                 "onInput"
                             )),
-                            _cV(_component_up_button, _uM("type" to "success", "size" to "small", "onClick" to handleCopy), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                return _uA(
-                                    " 复制测试文本 "
-                                )
-                            }
-                            ), "_" to 1))
+                            _cE("view", _uM("class" to "w-full h-38px rounded-8px bg-__10b981_ flex flex-row items-center justify-center", "onClick" to handleCopy), _uA(
+                                _cE("text", _uM("class" to "text-__ffffff_ text-14px font-bold"), "复制测试文本")
+                            ))
                         )),
-                        _cV(_component_up_button, _uM("type" to "warning", "onClick" to triggerVibration), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                            return _uA(
-                                " 短震动反馈 "
-                            )
-                        }
-                        ), "_" to 1))
+                        _cE("view", _uM("class" to "w-full h-44px rounded-8px bg-__f59e0b_ flex flex-row items-center justify-center", "onClick" to triggerVibration), _uA(
+                            _cE("text", _uM("class" to "text-__ffffff_ text-14px font-bold"), "短震动反馈")
+                        ))
                     )
                 }
                 ), "_" to 1))
@@ -188,7 +217,7 @@ open class GenSrcPagesFunctionComponentsHapticsCard : VueComponent {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("bg-__f8fafc_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#f8fafc")), "bg-white" to _pS(_uM("backgroundColor" to "rgba(255,255,255,var(--un-bg-opacity,1))")), "border-color-__cbd5e1_" to _pS(_uM("borderTopColor" to "#cbd5e1", "borderRightColor" to "#cbd5e1", "borderBottomColor" to "#cbd5e1", "borderLeftColor" to "#cbd5e1")), "border-color-__e2e8f0_" to _pS(_uM("borderTopColor" to "#e2e8f0", "borderRightColor" to "#e2e8f0", "borderBottomColor" to "#e2e8f0", "borderLeftColor" to "#e2e8f0")), "border-style-solid" to _pS(_uM("borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid")), "border-width-1px" to _pS(_uM("borderTopWidth" to 1, "borderRightWidth" to 1, "borderBottomWidth" to 1, "borderLeftWidth" to 1)), "h-38px" to _pS(_uM("height" to 38)), "mb-12px" to _pS(_uM("marginBottom" to 12)), "mb-16px" to _pS(_uM("marginBottom" to 16)), "mb-8px" to _pS(_uM("marginBottom" to 8)), "p-16px" to _pS(_uM("paddingTop" to 16, "paddingRight" to 16, "paddingBottom" to 16, "paddingLeft" to 16)), "px-12px" to _pS(_uM("paddingLeft" to 12, "paddingRight" to 12)), "rounded-12px" to _pS(_uM("borderTopLeftRadius" to 12, "borderTopRightRadius" to 12, "borderBottomRightRadius" to 12, "borderBottomLeftRadius" to 12)), "rounded-6px" to _pS(_uM("borderTopLeftRadius" to 6, "borderTopRightRadius" to 6, "borderBottomRightRadius" to 6, "borderBottomLeftRadius" to 6)), "text-__334155_" to _pS(_uM("color" to "#334155")), "text-__94a3b8_" to _pS(_uM("color" to "#94a3b8")), "text-12px" to _pS(_uM("fontSize" to 12)), "text-14px" to _pS(_uM("fontSize" to 14)))
+                return _uM("bg-__10b981_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#10b981")), "bg-__f59e0b_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#f59e0b")), "bg-__f8fafc_" to _pS(_uM("backgroundImage" to "none", "backgroundColor" to "#f8fafc")), "bg-white" to _pS(_uM("backgroundColor" to "rgba(255,255,255,var(--un-bg-opacity,1))")), "border-color-__cbd5e1_" to _pS(_uM("borderTopColor" to "#cbd5e1", "borderRightColor" to "#cbd5e1", "borderBottomColor" to "#cbd5e1", "borderLeftColor" to "#cbd5e1")), "border-color-__e2e8f0_" to _pS(_uM("borderTopColor" to "#e2e8f0", "borderRightColor" to "#e2e8f0", "borderBottomColor" to "#e2e8f0", "borderLeftColor" to "#e2e8f0")), "border-style-solid" to _pS(_uM("borderTopStyle" to "solid", "borderRightStyle" to "solid", "borderBottomStyle" to "solid", "borderLeftStyle" to "solid")), "border-width-1px" to _pS(_uM("borderTopWidth" to 1, "borderRightWidth" to 1, "borderBottomWidth" to 1, "borderLeftWidth" to 1)), "flex" to _pS(_uM("display" to "flex")), "flex-row" to _pS(_uM("flexDirection" to "row")), "font-bold" to _pS(_uM("fontWeight" to "700")), "h-38px" to _pS(_uM("height" to 38)), "h-44px" to _pS(_uM("height" to 44)), "items-center" to _pS(_uM("alignItems" to "center")), "justify-center" to _pS(_uM("justifyContent" to "center")), "mb-12px" to _pS(_uM("marginBottom" to 12)), "mb-16px" to _pS(_uM("marginBottom" to 16)), "mb-8px" to _pS(_uM("marginBottom" to 8)), "none" to _pS(_uM("display" to "none")), "p-16px" to _pS(_uM("paddingTop" to 16, "paddingRight" to 16, "paddingBottom" to 16, "paddingLeft" to 16)), "px-12px" to _pS(_uM("paddingLeft" to 12, "paddingRight" to 12)), "rounded-12px" to _pS(_uM("borderTopLeftRadius" to 12, "borderTopRightRadius" to 12, "borderBottomRightRadius" to 12, "borderBottomLeftRadius" to 12)), "rounded-6px" to _pS(_uM("borderTopLeftRadius" to 6, "borderTopRightRadius" to 6, "borderBottomRightRadius" to 6, "borderBottomLeftRadius" to 6)), "rounded-8px" to _pS(_uM("borderTopLeftRadius" to 8, "borderTopRightRadius" to 8, "borderBottomRightRadius" to 8, "borderBottomLeftRadius" to 8)), "text-__334155_" to _pS(_uM("color" to "#334155")), "text-__94a3b8_" to _pS(_uM("color" to "#94a3b8")), "text-__ffffff_" to _pS(_uM("color" to "#ffffff")), "text-12px" to _pS(_uM("fontSize" to 12)), "text-14px" to _pS(_uM("fontSize" to 14)), "text-center" to _pS(_uM("textAlign" to "center")), "w-full" to _pS(_uM("width" to "100%")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()
