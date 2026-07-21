@@ -240,6 +240,7 @@
 
 <script setup lang="uts">
 import { reactive, ref } from 'vue'
+import logoImg from '@/src/assets/images/logo.png'
 
 // ==================== 表单组件 ====================
 const inputValue = ref('')
@@ -398,7 +399,7 @@ function onDatetimePickerConfirm(e: UTSJSONObject): void {
 
 const uploadList = ref([
   {
-    url: '/static/logo.png',
+    url: logoImg,
   } as UTSJSONObject,
 ] as UTSJSONObject[])
 

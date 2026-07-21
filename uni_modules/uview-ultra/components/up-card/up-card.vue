@@ -21,10 +21,10 @@
 			<view v-if="!$slots.head" class="up-flex up-row-between">
 				<view class="up-card__head--left up-flex up-line-1" v-if="title">
 					<image
-						:src="thumb"
+						:src="realThumb"
 						class="up-card__head--left__thumb"
 						mode="aspectFill"
-						v-if="thumb"
+						v-if="realThumb"
 						:style="{ 
 							height: addUnit(thumbWidth), 
 							width: addUnit(thumbWidth), 
@@ -115,6 +115,11 @@
         },
         mixins: [mpMixin, mixin, propsCard],
         emits: ['click', 'head-click', 'body-click', 'foot-click'],
+        computed: {
+            realThumb() {
+                return this.thumb || '';
+            }
+        },
         methods: {
 			addStyle,
 			addUnit,

@@ -8,9 +8,39 @@
     ></NavBar>
 
     <scroll-view :scroll-y="true" direction="vertical" :style="{ height: `${scrollHeight}px` }" :scroll-top="scrollViewScrollTop" :scroll-with-animation="true" @scroll="onScroll">
+      <image :src="logoImg" style="width: 60px; height: 60px;"></image>
+      <image src="/static/logo.png" style="width: 60px; height: 60px;"></image>
+      <DemoShow />
+
       <ThemeSwitchCard />
 
-      <DemoShow />
+      <!-- Swiper 轮播图 -->
+      <up-swiper
+        :list="swiperList"
+        key-name="image"
+        :indicator="true"
+        indicator-mode="dot"
+        :circular="true"
+        :autoplay="true"
+        :interval="3000"
+        height="180"
+        :show-title="true"
+      ></up-swiper>
+
+      <!-- Image 图片 -->
+      <view class="demo-block">
+        <text class="demo-label">
+          up-image
+        </text>
+        <view class="demo-row-start">
+          <up-image :src="logoImg" width="60px" height="60px"></up-image>
+          <view class="w-15px"></view>
+          <up-image :src="logoImg" width="60px" height="60px" shape="circle"></up-image>
+          <view class="w-15px"></view>
+          <image :src="logoImg" style="width: 60px; height: 60px;" mode="aspectFill"></image>
+        </view>
+        <text class="text-12px text-red-500 mt-10px">Debug logoImg: {{ logoImg }}</text>
+      </view>
 
       <!-- ==================== Pagination 分页器（置顶方便调试） ==================== -->
       <view class="demo-block">
@@ -367,7 +397,7 @@
           <view class="lazy-load-item">
             <up-lazy-load
               image="https://gtd.alicdn.com/sns_logo/i1/TB124_3NXXXXXasXVXXSutbFXXX.jpg_240x240xz.jpg"
-              loading-img="/static/logo.png"
+              :loading-img="logoImg"
               :height="120"
               :border-radius="8"
               index="img1"
@@ -378,7 +408,7 @@
           <view class="lazy-load-item ml-10px">
             <up-lazy-load
               image="https://picsum.photos/240/240?random=22"
-              loading-img="/static/logo.png"
+              :loading-img="logoImg"
               :height="120"
               :border-radius="8"
               index="img2"
@@ -565,19 +595,6 @@
         </up-swipe-action>
       </view>
 
-      <!-- Swiper 轮播图 -->
-      <up-swiper
-        :list="swiperList"
-        key-name="image"
-        :indicator="true"
-        indicator-mode="dot"
-        :circular="true"
-        :autoplay="true"
-        :interval="3000"
-        height="180"
-        :show-title="true"
-      ></up-swiper>
-
       <!-- ==================== 基础组件 ==================== -->
       <text class="section-title">
         基础组件
@@ -654,18 +671,6 @@
           <up-badge :value="9" type="error"></up-badge>
           <view class="w-20px"></view>
           <up-badge :value="99" type="error"></up-badge>
-        </view>
-      </view>
-
-      <!-- Image 图片 -->
-      <view class="demo-block">
-        <text class="demo-label">
-          up-image
-        </text>
-        <view class="demo-row-start">
-          <up-image src="/static/logo.png" width="60px" height="60px"></up-image>
-          <view class="w-15px"></view>
-          <up-image src="/static/logo.png" width="60px" height="60px" shape="circle"></up-image>
         </view>
       </view>
 
@@ -845,7 +850,8 @@
 </template>
 
 <script setup lang="uts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, reactive, ref } from 'vue'
+import logoImg from '@/src/assets/images/logo.png'
 import ThemeSwitchCard from '@/src/pages/basic/components/ThemeSwitchCard.uvue'
 import DemoForm from './components/DemoForm.uvue'
 import DemoFeedback from './components/DemoFeedback.uvue'
@@ -1059,7 +1065,7 @@ const albumUrls = ref([
 const readMoreContent = ref(`<p>山不在高，有仙则名。水不在深，有龙则灵。斯是陋室，惟吾德馨。苔痕上阶绿，草色入帘青。谈笑有鸿儒，往来无白丁。可以调素琴，阅金经。无丝竹之乱耳，无案牍之劳形。南阳诸葛庐，西蜀子云亭。孔子云：何陋之有？</p><p>锦瑟无端五十弦，一弦一柱思华年。庄生晓梦迷蝴蝶，望帝春心托杜鹃。沧海月明珠有泪，蓝田日暖玉生烟。此情可待成追忆，只是当时已惘然。</p>`)
 
 // ==================== Avatar 头像 ====================
-const avatarSrc = ref('/static/logo.png')
+const avatarSrc = ref(logoImg)
 const avatarGroupUrls = ref([
   'https://picsum.photos/200/200?random=1',
   'https://picsum.photos/200/200?random=2',
@@ -1094,9 +1100,9 @@ function onLazyLoadError(err: UTSJSONObject): void {
 
 // ==================== Swiper 轮播图 ====================
 const swiperList = ref([
-  { image: '/static/logo.png', title: 'uview-ultra 组件演示' },
-  { image: '/static/logo.png', title: '高品质 UI 组件库' },
-  { image: '/static/logo.png', title: '多端适配 · 开箱即用' },
+  { image: logoImg, title: 'uview-ultra 组件演示' },
+  { image: logoImg, title: '高品质 UI 组件库' },
+  { image: logoImg, title: '多端适配 · 开箱即用' },
 ] as UTSJSONObject[])
 
 // ==================== IndexList 索引列表 ====================
