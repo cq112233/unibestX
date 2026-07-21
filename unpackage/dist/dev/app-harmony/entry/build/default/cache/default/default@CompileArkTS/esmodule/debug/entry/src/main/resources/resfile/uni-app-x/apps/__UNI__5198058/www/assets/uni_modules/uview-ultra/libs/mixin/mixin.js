@@ -1,6 +1,6 @@
 
 import { a as array } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/test&";
-import { a as addUnit, b as addStyle, g as getPx, c as bem, u as upGetRect } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
+import { a as addUnit, b as addStyle, f as getPx, c as bem, u as upGetRect } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 const mixin = {
   // 定义每个组件都可能需要用到的外部样式以及类名
   props: {

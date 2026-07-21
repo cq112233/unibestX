@@ -1,0 +1,47 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="up-datetime-picker 时间选择" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <view class="demo-block">
+        <text class="demo-label">基础用法</text>
+        <view class="flex-row items-center">
+          <up-button type="primary" text="选择时间" size="mini" @click="datetimeShow = true"></up-button>
+        </view>
+      </view>
+    </view>
+    <up-datetime-picker
+      :show="datetimeShow"
+      mode="datetime"
+      @confirm="onDatetimeConfirm"
+      @cancel="datetimeShow = false"
+    ></up-datetime-picker>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue'
+
+const datetimeShow = ref(false)
+
+function onDatetimeConfirm(e: UTSJSONObject) {
+  console.log('datetime confirm', e)
+  datetimeShow.value = false
+}
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+</style>

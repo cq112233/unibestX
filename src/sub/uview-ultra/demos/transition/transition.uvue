@@ -1,0 +1,62 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Transition 动画" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <view class="demo-block">
+        <text class="demo-label">内置过渡动画</text>
+        <view class="transition-demo-wrapper">
+          <up-transition :show="transitionShow" mode="fade">
+            <view class="transition-demo-box transition-demo-blue">
+              <text class="text-14px text-white font-500">fade 淡入淡出</text>
+            </view>
+          </up-transition>
+          <view class="mt-10px">
+            <up-button type="primary" :text="transitionShow ? '隐藏动画' : '显示动画'" size="mini" @click="transitionShow = !transitionShow"></up-button>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue'
+
+const transitionShow = ref(true)
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+.transition-demo-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0;
+}
+.transition-demo-box {
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+.transition-demo-blue {
+  background-color: #2979ff;
+}
+</style>

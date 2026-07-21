@@ -1,0 +1,47 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Table 表格" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <view class="demo-block">
+        <text class="demo-label">基础表格</text>
+        <up-table>
+          <up-tr>
+            <up-th>学校</up-th>
+            <up-th>班级</up-th>
+            <up-th>年龄</up-th>
+          </up-tr>
+          <up-tr>
+            <up-td>浙江大学</up-td>
+            <up-td>二年级</up-td>
+            <up-td>22</up-td>
+          </up-tr>
+          <up-tr>
+            <up-td>清华大学</up-td>
+            <up-td>05班</up-td>
+            <up-td>24</up-td>
+          </up-tr>
+        </up-table>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+</style>

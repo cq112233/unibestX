@@ -1,5 +1,4 @@
 import _easycom_NavBar from '@/src/components/NavBar/NavBar.uvue'
-import _easycom_up_button from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue'
 import AppKu from '@/App.ku.uvue'
 import LayoutComponent from '@/src/layouts/default.uvue'
 import { handleBackPressExit } from '../../utils/backPress.uts'
@@ -43,7 +42,6 @@ function goToUiTest() {
 return (): any | null => {
 
 const _component_NavBar = resolveEasyComponent("NavBar",_easycom_NavBar)
-const _component_up_button = resolveEasyComponent("up-button",_easycom_up_button)
 
   return _cV(unref(AppKu), null, _uM({
     default: withSlotCtx((): any[] => [
@@ -58,6 +56,12 @@ const _component_up_button = resolveEasyComponent("up-button",_easycom_up_button
               "show-back": false
             })),
             _cE("view", _uM({ class: "content-container pb-20px" }), [
+              _cE("view", _uM({ class: "mx-30px mt-15px" }), [
+                _cE("button", _uM({
+                  type: "primary",
+                  onClick: goToUiTest
+                }), "前往 uiTest 测试页")
+              ]),
               _cE("image", _uM({
                 class: "w-100px h-100px mx-auto mt-20px rounded-20px",
                 src: "/static/logo.png"
@@ -109,14 +113,7 @@ const _component_up_button = resolveEasyComponent("up-button",_easycom_up_button
                   class: "text-14px",
                   style: _nS(_uM({"color":"#666","line-height":"26px"}))
                 }), " 📋 分页列表 — z-paging-x 分页加载，Tab 筛选、错误模拟、空数据 ", 4 /* STYLE */)
-              ], 4 /* STYLE */),
-              _cE("view", _uM({ class: "mx-30px mt-20px" }), [
-                _cV(_component_up_button, _uM({
-                  type: "primary",
-                  text: "前往 uiTest 测试页",
-                  onClick: goToUiTest
-                }))
-              ])
+              ], 4 /* STYLE */)
             ])
           ])
         ]),

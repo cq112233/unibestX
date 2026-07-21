@@ -242,8 +242,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     /* CLASS */
   );
 }
-const __easycom_35 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-icon/up-icon.uvue"]]);
+const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-icon/up-icon.uvue"]]);
 export {
-  __easycom_35 as _
+  __easycom_0 as _
 };
 //# sourceMappingURL=up-icon.js.map

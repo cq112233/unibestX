@@ -2,7 +2,7 @@ const { defineComponent, openBlock, createElementBlock, normalizeStyle } = globa
 import { p as propsLine } from "./props.js";
 import { m as mpMixin } from "../../libs/mixin/mpMixin.js";
 import { m as mixin } from "../../libs/mixin/mixin.js";
-import { a as addUnit, d as deepMerge, b as addStyle } from "../../libs/function/index.js";
+import { a as addUnit, h as deepMerge, b as addStyle } from "../../libs/function/index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
 const _sfc_main = defineComponent({
   name: "up-line",
@@ -42,8 +42,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     /* STYLE */
   );
 }
-const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-line/up-line.uvue"]]);
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-line/up-line.uvue"]]);
 export {
-  __easycom_0 as _
+  __easycom_1 as _
 };
 //# sourceMappingURL=up-line.js.map

@@ -166,8 +166,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     /* CLASS */
   );
 }
-const __easycom_6 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-checkbox-group/up-checkbox-group.uvue"]]);
+const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-checkbox-group/up-checkbox-group.uvue"]]);
 export {
-  __easycom_6 as _
+  __easycom_2 as _
 };
 //# sourceMappingURL=up-checkbox-group.js.map

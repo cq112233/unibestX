@@ -1,0 +1,46 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="up-collapse 折叠面板" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <view class="demo-block">
+        <text class="demo-label">基础用法</text>
+        <up-collapse :value="collapseValue" :accordion="true">
+          <up-collapse-item title="第一项" name="1">
+            <text class="collapse-text">uview-ultra 是基于 uview-plus 修改的 uni-app-x 版本</text>
+          </up-collapse-item>
+          <up-collapse-item title="第二项" name="2">
+            <text class="collapse-text">支持 iOS、Android、H5、小程序等多端</text>
+          </up-collapse-item>
+        </up-collapse>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue'
+
+const collapseValue = ref('1')
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+.collapse-text {
+  font-size: 13px;
+  color: #909399;
+  line-height: 20px;
+}
+</style>

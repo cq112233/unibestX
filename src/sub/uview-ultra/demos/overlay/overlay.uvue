@@ -1,0 +1,47 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="up-overlay 遮罩层" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <view class="demo-block">
+        <text class="demo-label">基础用法</text>
+        <view class="flex-row items-center">
+          <up-button type="primary" text="显示遮罩" size="mini" @click="overlayShow = true"></up-button>
+          <view class="w-10px"></view>
+          <up-button type="warning" text="半透明遮罩" size="mini" @click="overlayOpacity = 0.3; overlayShow = true"></up-button>
+        </view>
+      </view>
+    </view>
+    <up-overlay :show="overlayShow" :opacity="overlayOpacity" @click="overlayShow = false">
+      <view class="flex-1 items-center justify-center">
+        <view class="bg-white rounded-8px p-20px items-center" @click.stop="">
+          <up-loading-icon mode="circle"></up-loading-icon>
+          <text class="text-14px text-[#303133] mt-10px">加载中，点击遮罩关闭</text>
+        </view>
+      </view>
+    </up-overlay>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue'
+
+const overlayShow = ref(false)
+const overlayOpacity = ref(0.5)
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+</style>

@@ -1,6 +1,6 @@
 
 import { a as array } from "../function/test.js";
-import { a as addUnit, b as addStyle, g as getPx, c as bem, u as upGetRect } from "../function/index.js";
+import { a as addUnit, b as addStyle, f as getPx, c as bem, u as upGetRect } from "../function/index.js";
 const mixin = {
   // 定义每个组件都可能需要用到的外部样式以及类名
   props: {

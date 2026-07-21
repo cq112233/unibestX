@@ -1,0 +1,77 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="up-upload 上传" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <view class="demo-block">
+        <text class="demo-label">基础用法</text>
+        <up-upload
+          :file-list="fileList1"
+          @after-read="afterRead"
+          @delete="deletePic"
+          name="1"
+          multiple
+          :max-count="3"
+        ></up-upload>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue'
+
+const fileList1 = ref([] as UTSJSONObject[])
+
+async function uploadFilePromise(url: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve(url)
+    }, 1000)
+  })
+}
+
+async function afterRead(event: UTSJSONObject) {
+  const fileData = event.get('file')
+  const lists = (Array.isArray(fileData) ? fileData : [fileData]) as UTSJSONObject[]
+  let fileListLen = fileList1.value.length
+  lists.forEach((item) => {
+    fileList1.value.push({
+      ...item,
+      status: 'uploading',
+      message: '上传中'
+    } as UTSJSONObject)
+  })
+  for (let i = 0; i < lists.length; i++) {
+    const url = lists[i].getString('url') as string
+    const result = await uploadFilePromise(url)
+    const item = fileList1.value[fileListLen]
+    fileList1.value.splice(fileListLen, 1, Object.assign(item, {
+      status: 'success',
+      message: '',
+      url: result
+    }) as UTSJSONObject)
+    fileListLen++
+  }
+}
+
+function deletePic(event: UTSJSONObject) {
+  fileList1.value.splice(event.getNumber('index') as number, 1)
+}
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+</style>

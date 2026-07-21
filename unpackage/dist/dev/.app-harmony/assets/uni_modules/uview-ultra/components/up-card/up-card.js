@@ -1,6 +1,6 @@
 const { defineComponent, computed, openBlock, createElementBlock, normalizeClass, withModifiers, normalizeStyle, createCommentVNode, createElementVNode, toDisplayString, renderSlot } = globalThis.Vue
 import "../../libs/composable/useUltraUI.js";
-import { g as getPx, a as addUnit } from "../../libs/function/index.js";
+import { f as getPx, a as addUnit } from "../../libs/function/index.js";
 import { d as defProps } from "./card.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
 const _sfc_main = /* @__PURE__ */ defineComponent({
@@ -314,8 +314,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     /* CLASS, STYLE */
   );
 }
-const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-card/up-card.uvue"]]);
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-card/up-card.uvue"]]);
 export {
-  __easycom_0 as _
+  __easycom_1 as _
 };
 //# sourceMappingURL=up-card.js.map

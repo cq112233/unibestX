@@ -1,0 +1,74 @@
+import _easycom_NavBar from '@/src/components/NavBar/NavBar.uvue'
+import _easycom_up_button from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue'
+import _easycom_up_datetime_picker from '@/uni_modules/uview-ultra/components/up-datetime-picker/up-datetime-picker.uvue'
+import AppKu from '@/App.ku.uvue'
+import LayoutComponent from '@/src/layouts/default.uvue'
+import { ref } from 'vue'
+
+
+const __sfc__ = defineComponent({
+  __name: 'datetime-picker',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+const datetimeShow = ref(false)
+
+function onDatetimeConfirm(e: UTSJSONObject) {
+  console.log('datetime confirm', e, " at src/sub/uview-ultra/demos/datetime-picker/datetime-picker.uvue:44")
+  datetimeShow.value = false
+}
+
+return (): any | null => {
+
+const _component_NavBar = resolveEasyComponent("NavBar",_easycom_NavBar)
+const _component_up_button = resolveEasyComponent("up-button",_easycom_up_button)
+const _component_up_datetime_picker = resolveEasyComponent("up-datetime-picker",_easycom_up_datetime_picker)
+
+  return _cV(unref(AppKu), null, _uM({
+    default: withSlotCtx((): any[] => [
+      _cV(unref(LayoutComponent), _uM({
+        "navigation-style": 'custom',
+        "navigation-bar-title-text": 'up-datetime-picker 时间选择'
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({ class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }), [
+            _cV(_component_NavBar, _uM({
+              title: "up-datetime-picker 时间选择",
+              "auto-back": true,
+              "safe-area-inset-top": true,
+              "bg-color": "#ffffff"
+            })),
+            _cE("view", _uM({ class: "p-16px" }), [
+              _cE("view", _uM({ class: "demo-block" }), [
+                _cE("text", _uM({ class: "demo-label" }), "基础用法"),
+                _cE("view", _uM({ class: "flex-row items-center" }), [
+                  _cV(_component_up_button, _uM({
+                    type: "primary",
+                    text: "选择时间",
+                    size: "mini",
+                    onClick: () => {datetimeShow.value = true}
+                  }), null, 8 /* PROPS */, ["onClick"])
+                ])
+              ])
+            ]),
+            _cV(_component_up_datetime_picker, _uM({
+              show: datetimeShow.value,
+              mode: "datetime",
+              onConfirm: onDatetimeConfirm,
+              onCancel: () => {datetimeShow.value = false}
+            }), null, 8 /* PROPS */, ["show", "onCancel"])
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }))
+    ]),
+    _: 1 /* STABLE */
+  }))
+}
+}
+
+})
+export default __sfc__
+const GenSrcSubUviewUltraDemosDatetimePickerDatetimePickerStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]

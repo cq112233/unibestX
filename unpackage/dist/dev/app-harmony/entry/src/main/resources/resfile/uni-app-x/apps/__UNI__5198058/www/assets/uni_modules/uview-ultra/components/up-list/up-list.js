@@ -2,7 +2,7 @@ const { defineComponent, openBlock, createElementBlock, normalizeStyle, createEl
 import { p as propsList } from "./props.js";
 import { m as mpMixin } from "../../libs/mixin/mpMixin.js";
 import { m as mixin } from "../../libs/mixin/mixin.js";
-import { e as getWindowInfo, a as addUnit, d as deepMerge, b as addStyle, s as sleep } from "../../libs/function/index.js";
+import { g as getWindowInfo, a as addUnit, h as deepMerge, b as addStyle, s as sleep } from "../../libs/function/index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
 const _sfc_main = defineComponent({
   name: "up-list",

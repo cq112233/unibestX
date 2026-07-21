@@ -401,8 +401,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     renderSlot(_ctx.$slots, "default")
   ]);
 }
-const __easycom_13 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-form/up-form.uvue"]]);
+const __easycom_14 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-form/up-form.uvue"]]);
 export {
-  __easycom_13 as _
+  __easycom_14 as _
 };
 //# sourceMappingURL=up-form.js.map

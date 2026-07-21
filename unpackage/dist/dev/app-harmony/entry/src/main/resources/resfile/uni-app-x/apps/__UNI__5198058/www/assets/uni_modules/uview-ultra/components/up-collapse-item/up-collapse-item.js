@@ -1,10 +1,10 @@
-import { _ as __easycom_35 } from "../up-icon/up-icon.js";
+import { _ as __easycom_0 } from "../up-icon/up-icon.js";
 const { defineComponent, getCurrentInstance, ref, watch, computed, onMounted, nextTick, resolveDynamicComponent, openBlock, createElementBlock, createVNode, withCtx, renderSlot, toDisplayString, createCommentVNode, createBlock, Fragment, createElementVNode, normalizeStyle } = globalThis.Vue
 import { r as resolveEasycom } from "../../../../App.ku.js";
-import { _ as __easycom_39 } from "../up-cell/up-cell.js";
-import { _ as __easycom_0 } from "../up-line/up-line.js";
+import { _ as __easycom_1$1 } from "../up-cell/up-cell.js";
+import { _ as __easycom_1$2 } from "../up-line/up-line.js";
 import { d as defProps } from "./collapseItem.js";
-import { i as guid, u as upGetRect, s as sleep, f as error } from "../../libs/function/index.js";
+import { i as guid, u as upGetRect, s as sleep, e as error } from "../../libs/function/index.js";
 import { a as array } from "../../libs/function/test.js";
 import { u as useUltraUI } from "../../libs/composable/useUltraUI.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
@@ -157,9 +157,9 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
 });
 const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-collapse-item__content": { "": { "overflow": "hidden", "height": 0, "transitionProperty": "height", "transitionDuration": "0.5s", "transitionTimingFunction": "ease-out" } }, "up-collapse-item__content__text": { "": { "paddingTop": 12, "paddingRight": 15, "paddingBottom": 12, "paddingLeft": 15 } }, "text": { ".up-collapse-item__content__text ": { "color": "#606266", "fontSize": 14, "lineHeight": "18px" } }, "@TRANSITION": { "up-collapse-item__content": { "property": "height", "duration": "0.5s", "timingFunction": "ease-out" } } };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_icon = resolveEasycom(resolveDynamicComponent("up-icon"), __easycom_35);
-  const _component_up_cell = resolveEasycom(resolveDynamicComponent("up-cell"), __easycom_39);
-  const _component_up_line = resolveEasycom(resolveDynamicComponent("up-line"), __easycom_0);
+  const _component_up_icon = resolveEasycom(resolveDynamicComponent("up-icon"), __easycom_0);
+  const _component_up_cell = resolveEasycom(resolveDynamicComponent("up-cell"), __easycom_1$1);
+  const _component_up_line = resolveEasycom(resolveDynamicComponent("up-line"), __easycom_1$2);
   return openBlock(), createElementBlock("view", { class: "up-collapse-item" }, [
     createVNode(_component_up_cell, {
       title: $setup.titleCpu,
@@ -240,8 +240,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     $setup.parentData["border"] ? (openBlock(), createBlock(_component_up_line, { key: 0 })) : createCommentVNode("v-if", true)
   ]);
 }
-const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-collapse-item/up-collapse-item.uvue"]]);
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-collapse-item/up-collapse-item.uvue"]]);
 export {
-  __easycom_2 as _
+  __easycom_1 as _
 };
 //# sourceMappingURL=up-collapse-item.js.map

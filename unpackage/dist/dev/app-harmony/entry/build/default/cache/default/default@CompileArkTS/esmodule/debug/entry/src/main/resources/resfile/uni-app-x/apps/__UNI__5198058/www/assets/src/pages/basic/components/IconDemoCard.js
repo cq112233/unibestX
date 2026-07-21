@@ -2,7 +2,7 @@ import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfi
 const { defineComponent, resolveDynamicComponent, openBlock, createElementBlock, Fragment, createCommentVNode, createVNode, withCtx, createElementVNode } = globalThis.Vue
 import { r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { _ as __easycom_1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-icon/components/l-icon/l-icon&";
-import { _ as __easycom_35 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
+import { _ as __easycom_0$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
 import { C as Card } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/Card&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
 const _sfc_main = /* @__PURE__ */ defineComponent({
@@ -21,7 +21,7 @@ const _style_0 = { "bg-__10b981_": { "": { "backgroundImage": "none", "backgroun
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_uni_icons = resolveEasycom(resolveDynamicComponent("uni-icons"), __easycom_0);
   const _component_l_icon = resolveEasycom(resolveDynamicComponent("l-icon"), __easycom_1);
-  const _component_up_icon = resolveEasycom(resolveDynamicComponent("up-icon"), __easycom_35);
+  const _component_up_icon = resolveEasycom(resolveDynamicComponent("up-icon"), __easycom_0$1);
   return openBlock(), createElementBlock(
     Fragment,
     null,

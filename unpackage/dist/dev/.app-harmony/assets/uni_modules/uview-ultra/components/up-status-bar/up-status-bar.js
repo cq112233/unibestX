@@ -2,7 +2,7 @@ const { defineComponent, openBlock, createElementBlock, normalizeStyle, renderSl
 import { p as propsStatusBar } from "./props.js";
 import { m as mpMixin } from "../../libs/mixin/mpMixin.js";
 import { m as mixin } from "../../libs/mixin/mixin.js";
-import { a as addUnit, d as deepMerge, b as addStyle } from "../../libs/function/index.js";
+import { a as addUnit, h as deepMerge, b as addStyle } from "../../libs/function/index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
 const _sfc_main = defineComponent({
   name: "up-status-bar",

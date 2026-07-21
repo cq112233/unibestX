@@ -1,0 +1,44 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="up-calendar 日历" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <view class="demo-block">
+        <text class="demo-label">基础用法</text>
+        <view class="flex-row items-center">
+          <up-button type="primary" text="打开日历" size="mini" @click="calendarShow = true"></up-button>
+          <text class="text-14px ml-10px">所选日期: {{ selectedDate }}</text>
+        </view>
+      </view>
+    </view>
+    <up-calendar :show="calendarShow" mode="single" @confirm="onCalendarConfirm" @close="calendarShow = false"></up-calendar>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue'
+
+const calendarShow = ref(false)
+const selectedDate = ref('')
+
+function onCalendarConfirm(e: string[]) {
+  selectedDate.value = e.length > 0 ? e[0] : ''
+  calendarShow.value = false
+}
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+</style>

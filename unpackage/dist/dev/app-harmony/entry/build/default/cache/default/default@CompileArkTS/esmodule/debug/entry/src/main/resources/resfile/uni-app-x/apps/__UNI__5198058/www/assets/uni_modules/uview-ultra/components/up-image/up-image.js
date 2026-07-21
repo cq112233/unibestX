@@ -1,8 +1,8 @@
-import { _ as __easycom_35 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
+import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
 const { defineComponent, ref, computed, watch, onMounted, resolveDynamicComponent, openBlock, createElementBlock, createElementVNode, normalizeStyle, renderSlot, createVNode, createCommentVNode } = globalThis.Vue
 import { r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
-import { a as addUnit, d as deepMerge, b as addStyle } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
-import { i as imageProps } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-image/image&";
+import { a as addUnit, h as deepMerge, b as addStyle } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
+import { d as defProps } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-image/image&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
 const _sfc_main = /* @__PURE__ */ defineComponent({
   __name: "up-image",
@@ -10,97 +10,97 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     src: {
       type: String,
       default: () => {
-        return imageProps.getString("image.src");
+        return defProps.getString("image.src");
       }
     },
     mode: {
       type: String,
       default: () => {
-        return imageProps.getString("image.mode");
+        return defProps.getString("image.mode");
       }
     },
     width: {
       type: String,
       default: () => {
-        return imageProps.getString("image.width");
+        return defProps.getString("image.width");
       }
     },
     height: {
       type: String,
       default: () => {
-        return imageProps.getString("image.height");
+        return defProps.getString("image.height");
       }
     },
     shape: {
       type: String,
       default: () => {
-        return imageProps.getString("image.shape");
+        return defProps.getString("image.shape");
       }
     },
     radius: {
       type: String,
       default: () => {
-        return imageProps.getString("image.radius");
+        return defProps.getString("image.radius");
       }
     },
     lazyLoad: {
       type: Boolean,
       default: () => {
-        return imageProps.getBoolean("image.lazyLoad");
+        return defProps.getBoolean("image.lazyLoad");
       }
     },
     showMenuByLongpress: {
       type: Boolean,
       default: () => {
-        return imageProps.getBoolean("image.showMenuByLongpress");
+        return defProps.getBoolean("image.showMenuByLongpress");
       }
     },
     loadingIcon: {
       type: String,
       default: () => {
-        return imageProps.getString("image.loadingIcon");
+        return defProps.getString("image.loadingIcon");
       }
     },
     errorIcon: {
       type: String,
       default: () => {
-        return imageProps.getString("image.errorIcon");
+        return defProps.getString("image.errorIcon");
       }
     },
     showLoading: {
       type: Boolean,
       default: () => {
-        return imageProps.getBoolean("image.showLoading");
+        return defProps.getBoolean("image.showLoading");
       }
     },
     showError: {
       type: Boolean,
       default: () => {
-        return imageProps.getBoolean("image.showError");
+        return defProps.getBoolean("image.showError");
       }
     },
     fade: {
       type: Boolean,
       default: () => {
-        return imageProps.getBoolean("image.fade");
+        return defProps.getBoolean("image.fade");
       }
     },
     webp: {
       type: Boolean,
       default: () => {
-        return imageProps.getBoolean("image.webp");
+        return defProps.getBoolean("image.webp");
       }
     },
     duration: {
       type: Number,
       default: () => {
-        return imageProps.getNumber("image.duration");
+        return defProps.getNumber("image.duration");
       }
     },
     bgColor: {
       type: String,
       default: () => {
-        return imageProps.getString("image.bgColor");
+        return defProps.getString("image.bgColor");
       }
     },
     customStyle: {
@@ -213,7 +213,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
 });
 const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-image": { "": { "position": "relative", "transitionProperty": "opacity", "transitionDuration": "0.5s", "transitionTimingFunction": "ease-in-out" } }, "up-image__image": { "": { "width": "100%", "height": "100%" } }, "up-image__loading": { "": { "position": "absolute", "top": 0, "left": 0, "width": "100%", "height": "100%", "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "backgroundColor": "#f3f4f6" } }, "up-image__error": { "": { "position": "absolute", "top": 0, "left": 0, "width": "100%", "height": "100%", "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "backgroundColor": "#f3f4f6" } }, "@TRANSITION": { "up-image": { "property": "opacity", "duration": "0.5s", "timingFunction": "ease-in-out" } } };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_icon = resolveEasycom(resolveDynamicComponent("up-icon"), __easycom_35);
+  const _component_up_icon = resolveEasycom(resolveDynamicComponent("up-icon"), __easycom_0);
   return openBlock(), createElementBlock("view", {
     mode: "fade",
     show: $setup.show,
@@ -280,8 +280,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     )
   ], 8, ["show", "duration"]);
 }
-const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-image/up-image.uvue"]]);
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-image/up-image.uvue"]]);
 export {
-  __easycom_2 as _
+  __easycom_1 as _
 };
 //# sourceMappingURL=up-image.js.map

@@ -1,9 +1,9 @@
-import { _ as __easycom_35 } from "../up-icon/up-icon.js";
+import { _ as __easycom_0 } from "../up-icon/up-icon.js";
 const { defineComponent, resolveDynamicComponent, resolveComponent, openBlock, createElementBlock, normalizeStyle, createElementVNode, Fragment, renderList, createBlock, renderSlot, createCommentVNode, createVNode, toDisplayString, withModifiers, normalizeClass, withCtx } = globalThis.Vue
 import { r as resolveEasycom } from "../../../../App.ku.js";
-import { _ as __easycom_41 } from "../up-loading-icon/up-loading-icon.js";
+import { _ as __easycom_1$1 } from "../up-loading-icon/up-loading-icon.js";
 import { _ as __easycom_3 } from "../up-gap/up-gap.js";
-import { _ as __easycom_12$1 } from "../up-popup/up-popup.js";
+import { _ as __easycom_2 } from "../up-popup/up-popup.js";
 import { c as chooseFile } from "./utils.js";
 import { m as mixinUpload } from "./mixin.js";
 import { m as mpMixin } from "../../libs/mixin/mpMixin.js";
@@ -598,11 +598,11 @@ const _sfc_main = defineComponent({
 });
 const _style_0 = { "up-upload": { "": { "display": "flex", "flexDirection": "column", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-upload__wrap": { "": { "display": "flex", "flexDirection": "row", "flexWrap": "wrap" } }, "up-upload__wrap__preview": { "": { "borderTopLeftRadius": 2, "borderTopRightRadius": 2, "borderBottomRightRadius": 2, "borderBottomLeftRadius": 2, "marginTop": 0, "marginRight": 8, "marginBottom": 8, "marginLeft": 0, "position": "relative", "overflow": "hidden", "display": "flex", "flexDirection": "row" } }, "up-upload__wrap__preview__image": { "": { "width": 80, "height": 80 } }, "up-upload__wrap__preview__video": { "": { "width": 80, "height": 80, "backgroundColor": "#f2f2f2", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column", "justifyContent": "center", "alignItems": "center" } }, "up-upload__wrap__preview__other": { "": { "width": 80, "height": 80, "backgroundColor": "#f2f2f2", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column", "justifyContent": "center", "alignItems": "center" } }, "up-upload__wrap__preview__video__text": { "": { "fontSize": 11, "color": "#909193", "marginTop": 2 } }, "up-upload__wrap__preview__other__text": { "": { "fontSize": 11, "color": "#909193", "marginTop": 2 } }, "up-upload__wrap__play": { "": { "position": "absolute", "top": 0, "left": 0, "bottom": 0, "right": 0, "display": "flex", "justifyContent": "center", "alignItems": "center" } }, "up-upload__wrap__play__icon": { "": { "backgroundImage": "none", "backgroundColor": "#ffffff", "borderTopLeftRadius": 100, "borderTopRightRadius": 100, "borderBottomRightRadius": 100, "borderBottomLeftRadius": 100, "opacity": 0.8 } }, "up-upload__deletable": { "": { "position": "absolute", "top": 0, "right": 0, "backgroundColor": "#373737", "height": 14, "width": 14, "display": "flex", "flexDirection": "row", "borderBottomLeftRadius": 100, "alignItems": "center", "justifyContent": "center", "zIndex": 3 } }, "up-upload__deletable__icon": { "": { "position": "absolute", "transform": "scale(0.7)", "top": 0, "right": 0 } }, "up-upload__success": { "": { "position": "absolute", "bottom": 0, "right": 0, "display": "flex", "flexDirection": "row", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "rgba(0,0,0,0)", "borderLeftColor": "rgba(0,0,0,0)", "borderBottomColor": "#5ac725", "borderRightColor": "#5ac725", "borderTopWidth": 9, "borderRightWidth": 9, "borderBottomWidth": 9, "borderLeftWidth": 9, "alignItems": "center", "justifyContent": "center" } }, "up-upload__success__icon": { "": { "position": "absolute", "transform": "scale(0.7)", "bottom": -10, "right": -10 } }, "up-upload__progress": { "": { "!backgroundColor": "var(--theme-color, #0957de)", "position": "absolute", "bottom": 0, "left": 0 } }, "up-upload__status": { "": { "position": "absolute", "top": 0, "bottom": 0, "left": 0, "right": 0, "backgroundColor": "rgba(0,0,0,0.5)", "display": "flex", "flexDirection": "column", "alignItems": "center", "justifyContent": "center" } }, "up-upload__status__icon": { "": { "position": "relative", "zIndex": 1 } }, "up-upload__status__message": { "": { "fontSize": 12, "color": "#FFFFFF", "marginTop": 5 } }, "up-upload__button": { "": { "display": "flex", "flexDirection": "column", "alignItems": "center", "justifyContent": "center", "width": 80, "height": 80, "backgroundColor": "#f4f5f7", "borderTopLeftRadius": 2, "borderTopRightRadius": 2, "borderBottomRightRadius": 2, "borderBottomLeftRadius": 2, "marginTop": 0, "marginRight": 8, "marginBottom": 8, "marginLeft": 0, "boxSizing": "border-box" } }, "up-upload__button__text": { "": { "fontSize": 11, "color": "#909193", "marginTop": 2 } }, "up-upload__button--hover": { "": { "backgroundColor": "#e6e7e9" } }, "up-upload__button--disabled": { "": { "opacity": 0.5 } } };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_icon = resolveEasycom(resolveDynamicComponent("up-icon"), __easycom_35);
-  const _component_up_loading_icon = resolveEasycom(resolveDynamicComponent("up-loading-icon"), __easycom_41);
+  const _component_up_icon = resolveEasycom(resolveDynamicComponent("up-icon"), __easycom_0);
+  const _component_up_loading_icon = resolveEasycom(resolveDynamicComponent("up-loading-icon"), __easycom_1$1);
   const _component_up_gap = resolveEasycom(resolveDynamicComponent("up-gap"), __easycom_3);
   const _component_video = resolveComponent("video");
-  const _component_up_popup = resolveEasycom(resolveDynamicComponent("up-popup"), __easycom_12$1);
+  const _component_up_popup = resolveEasycom(resolveDynamicComponent("up-popup"), __easycom_2);
   return openBlock(), createElementBlock(
     "view",
     {
@@ -839,8 +839,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     /* STYLE */
   );
 }
-const __easycom_12 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-upload/up-upload.uvue"]]);
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-upload/up-upload.uvue"]]);
 export {
-  __easycom_12 as _
+  __easycom_1 as _
 };
 //# sourceMappingURL=up-upload.js.map

@@ -1,11 +1,11 @@
-import { _ as __easycom_35 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
+import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
 const { defineComponent, getCurrentInstance, ref, watch, onMounted, resolveDynamicComponent, openBlock, createElementBlock, normalizeClass, createElementVNode, normalizeStyle, createCommentVNode, renderSlot, createVNode, toDisplayString, createBlock } = globalThis.Vue
 import { r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
-import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-line/up-line&";
+import { _ as __easycom_1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-line/up-line&";
 import { d as defProps } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-form-item/formItem&";
 import { p as propsLine } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-line/line&";
 import { c as color } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/config/color&";
-import { f as error, j as getProperty, k as setProperty } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
+import { e as error, j as getProperty, k as setProperty } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import { u as useUltraUI } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useUltraUI&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
 const _sfc_main = /* @__PURE__ */ defineComponent({
@@ -166,8 +166,8 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
 });
 const _style_0 = { "up-form-item": { "": { "display": "flex", "flexDirection": "column" } }, "up-form-item__body": { "": { "display": "flex", "flexDirection": "row", "paddingTop": 10, "paddingRight": 0, "paddingBottom": 10, "paddingLeft": 0 } }, "up-form-item__body__left": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center" } }, "up-form-item__body__left__content": { "": { "position": "relative", "display": "flex", "flexDirection": "row", "alignItems": "center", "paddingRight": "10rpx", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-form-item__body__left__content__icon": { "": { "marginRight": "8rpx" } }, "up-form-item__body__left__content__required": { "": { "position": "absolute", "left": -9, "color": "#f56c6c", "lineHeight": "20px", "fontSize": 20, "top": 3 } }, "up-form-item__body__left__content__label": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-form-item__body__left__content__label__text": { "": { "color": "#303133", "fontSize": 15 } }, "up-form-item__body__right": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-form-item__body__right__content": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-form-item__body__right__content__slot": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "row", "alignItems": "center" } }, "up-form-item__body__right__content__icon": { "": { "marginLeft": "10rpx", "color": "#c0c4cc", "fontSize": "30rpx" } }, "up-form-item__body__right__message": { "": { "fontSize": 12, "lineHeight": "12px", "color": "#f56c6c" } } };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_icon = resolveEasycom(resolveDynamicComponent("up-icon"), __easycom_35);
-  const _component_up_line = resolveEasycom(resolveDynamicComponent("up-line"), __easycom_0);
+  const _component_up_icon = resolveEasycom(resolveDynamicComponent("up-icon"), __easycom_0);
+  const _component_up_line = resolveEasycom(resolveDynamicComponent("up-line"), __easycom_1);
   return openBlock(), createElementBlock(
     "view",
     {
@@ -285,8 +285,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     /* CLASS */
   );
 }
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-form-item/up-form-item.uvue"]]);
+const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-form-item/up-form-item.uvue"]]);
 export {
-  __easycom_1 as _
+  __easycom_2 as _
 };
 //# sourceMappingURL=up-form-item.js.map

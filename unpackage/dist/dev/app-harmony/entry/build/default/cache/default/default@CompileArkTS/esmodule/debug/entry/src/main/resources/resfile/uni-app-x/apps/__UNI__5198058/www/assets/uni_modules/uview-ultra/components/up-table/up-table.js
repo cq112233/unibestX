@@ -109,8 +109,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     /* STYLE */
   );
 }
-const __easycom_9 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-table/up-table.uvue"]]);
+const __easycom_4 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-table/up-table.uvue"]]);
 export {
-  __easycom_9 as _
+  __easycom_4 as _
 };
 //# sourceMappingURL=up-table.js.map

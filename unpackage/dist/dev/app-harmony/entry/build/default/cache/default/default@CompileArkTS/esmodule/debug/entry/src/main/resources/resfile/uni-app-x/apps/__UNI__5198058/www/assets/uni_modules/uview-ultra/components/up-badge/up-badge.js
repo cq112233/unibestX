@@ -1,6 +1,6 @@
 const { defineComponent, computed, openBlock, createElementBlock, normalizeClass, normalizeStyle, toDisplayString, createCommentVNode } = globalThis.Vue
 import { a as addUnit } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
-import { b as badgeProps } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-badge/badge&";
+import { d as defProps } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-badge/badge&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
 const _sfc_main = /* @__PURE__ */ defineComponent({
   ...{
@@ -11,52 +11,52 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     // 是否显示圆点
     isDot: {
       type: Boolean,
-      default: badgeProps.getBoolean("badge.isDot")
+      default: defProps.getBoolean("badge.isDot")
     },
     // 显示的内容
     value: {
       type: [Number, String],
-      default: badgeProps.getString("badge.value")
+      default: defProps.getString("badge.value")
     },
     // 显示的内容
     modelValue: {
       type: [Number, String],
-      default: badgeProps.getString("badge.modelValue")
+      default: defProps.getString("badge.modelValue")
     },
     // 是否显示
     show: {
       type: Boolean,
-      default: badgeProps.getBoolean("badge.show")
+      default: defProps.getBoolean("badge.show")
     },
     // 最大值，超过最大值会显示 '{max}+'
     max: {
       type: [Number, String],
-      default: badgeProps.getNumber("badge.max")
+      default: defProps.getNumber("badge.max")
     },
     // 主题类型，error|warning|success|primary
     type: {
       type: String,
-      default: badgeProps.getString("badge.type")
+      default: defProps.getString("badge.type")
     },
     // 当数值为 0 时，是否展示 Badge
     showZero: {
       type: Boolean,
-      default: badgeProps.getBoolean("badge.showZero")
+      default: defProps.getBoolean("badge.showZero")
     },
     // 背景颜色，优先级比type高，如设置，type参数会失效
     bgColor: {
       type: String,
-      default: badgeProps.getString("badge.bgColor")
+      default: defProps.getString("badge.bgColor")
     },
     // 字体颜色
     color: {
       type: String,
-      default: badgeProps.getString("badge.color")
+      default: defProps.getString("badge.color")
     },
     // 徽标形状，circle-四角均为圆角，horn-左下角为直角
     shape: {
       type: String,
-      default: badgeProps.getString("badge.shape")
+      default: defProps.getString("badge.shape")
     },
     // 设置数字的显示方式，overflow|ellipsis|limit
     // overflow会根据max字段判断，超出显示`${max}+`
@@ -64,22 +64,22 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     // limit会依据1000作为判断条件，超出1000，显示`${value/1000}K`，比如2.2k、3.34w，最多保留2位小数
     numberType: {
       type: String,
-      default: badgeProps.getString("badge.numberType")
+      default: defProps.getString("badge.numberType")
     },
     // 设置badge的位置偏移，格式为 [x, y]，也即设置的为top和right的值，absolute为true时有效
     offset: {
       type: Array,
-      default: badgeProps.getArray("badge.offset")
+      default: defProps.getArray("badge.offset")
     },
     // 是否反转背景和字体颜色
     inverted: {
       type: Boolean,
-      default: badgeProps.getBoolean("badge.inverted")
+      default: defProps.getBoolean("badge.inverted")
     },
     // 是否绝对定位
     absolute: {
       type: Boolean,
-      default: badgeProps.getBoolean("badge.absolute")
+      default: defProps.getBoolean("badge.absolute")
     }
   },
   setup(__props, _a) {
@@ -150,8 +150,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT, CLASS, STYLE */
   )) : createCommentVNode("v-if", true);
 }
-const __easycom_38 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-badge/up-badge.uvue"]]);
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-badge/up-badge.uvue"]]);
 export {
-  __easycom_38 as _
+  __easycom_1 as _
 };
 //# sourceMappingURL=up-badge.js.map

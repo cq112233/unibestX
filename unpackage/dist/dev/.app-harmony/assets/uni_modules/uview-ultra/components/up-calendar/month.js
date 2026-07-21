@@ -1,7 +1,7 @@
 const { defineComponent, openBlock, createElementBlock, Fragment, renderList, normalizeClass, createElementVNode, toDisplayString, createCommentVNode, normalizeStyle } = globalThis.Vue
 import { m as mpMixin } from "../../libs/mixin/mpMixin.js";
 import { m as mixin } from "../../libs/mixin/mixin.js";
-import { a as addUnit, e as getWindowInfo } from "../../libs/function/index.js";
+import { a as addUnit, g as getWindowInfo } from "../../libs/function/index.js";
 import { c as colorGradient } from "../../libs/function/colorGradient.js";
 import { a as array } from "../../libs/function/test.js";
 import { d as defProps } from "./calendar.js";

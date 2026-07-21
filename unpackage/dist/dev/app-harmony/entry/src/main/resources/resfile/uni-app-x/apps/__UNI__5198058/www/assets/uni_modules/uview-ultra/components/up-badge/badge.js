@@ -1,4 +1,4 @@
-const badgeProps = new UTSJSONObject({
+const defProps = new UTSJSONObject({
   // 徽标数组件
   badge: new UTSJSONObject({
     isDot: false,
@@ -17,6 +17,6 @@ const badgeProps = new UTSJSONObject({
   })
 });
 export {
-  badgeProps as b
+  defProps as d
 };
 //# sourceMappingURL=badge.js.map

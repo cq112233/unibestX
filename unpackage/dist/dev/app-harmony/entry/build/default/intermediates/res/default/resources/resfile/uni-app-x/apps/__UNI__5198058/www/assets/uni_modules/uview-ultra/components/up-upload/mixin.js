@@ -1,5 +1,5 @@
 
-import { f as error } from "../../libs/function/index.js";
+import { e as error } from "../../libs/function/index.js";
 const mixinUpload = {
   watch: {
     // 监听accept的变化，判断是否符合个平台要求

@@ -34,6 +34,7 @@ export default defineConfig({
     autoRootPlugin(), // 自动给页面套上 App.ku.uvue 根包裹组件
     uni(),
     unovite({
+      blocklist: ['table', 'grid', 'block', 'inline', 'inline-block'],
       rules: [
         [
           'p-safe',

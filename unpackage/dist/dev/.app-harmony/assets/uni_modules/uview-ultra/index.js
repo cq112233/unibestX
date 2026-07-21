@@ -2,7 +2,7 @@ import { m as mixin } from "./libs/mixin/mixin.js";
 
 import "./libs/config/config.js";
 import "./libs/config/color.js";
-import { a as addUnit, b as addStyle, g as getPx, v as timeFormat, t as toast } from "./libs/function/index.js";
+import { a as addUnit, b as addStyle, f as getPx, q as timeFormat, t as toast } from "./libs/function/index.js";
 function loadFont() {
   uni.loadFontFace({
     global: true,

@@ -1,0 +1,43 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="up-tag 标签" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <view class="demo-block">
+        <text class="demo-label">基础用法</text>
+        <view class="flex-row items-center flex-wrap">
+          <up-tag text="标签" type="primary" size="normal" class="mr-10px mb-10px"></up-tag>
+          <up-tag text="成功" type="success" size="normal" class="mr-10px mb-10px"></up-tag>
+          <up-tag text="警告" type="warning" size="normal" class="mr-10px mb-10px"></up-tag>
+          <up-tag text="危险" type="error" size="normal" class="mr-10px mb-10px"></up-tag>
+        </view>
+      </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">镂空标签</text>
+        <view class="flex-row items-center flex-wrap">
+          <up-tag text="镂空" type="primary" :plain="true" size="normal" class="mr-10px"></up-tag>
+          <up-tag text="镂空" type="success" :plain="true" size="normal" class="mr-10px"></up-tag>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+</style>

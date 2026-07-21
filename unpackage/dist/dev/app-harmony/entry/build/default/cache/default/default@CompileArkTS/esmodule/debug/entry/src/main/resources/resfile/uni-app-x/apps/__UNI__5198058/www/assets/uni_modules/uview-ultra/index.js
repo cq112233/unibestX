@@ -2,7 +2,7 @@ import { m as mixin } from "@normalized:N&&&entry/src/main/resources/resfile/uni
 
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/config/config&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/config/color&";
-import { a as addUnit, b as addStyle, g as getPx, v as timeFormat, t as toast } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
+import { a as addUnit, b as addStyle, f as getPx, q as timeFormat, t as toast } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 function loadFont() {
   uni.loadFontFace({
     global: true,

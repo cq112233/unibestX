@@ -1,0 +1,70 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="up-modal 模态框" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <view class="demo-block">
+        <text class="demo-label">基础用法</text>
+        <view class="flex-row items-center">
+          <up-button type="primary" text="弹窗提示" size="mini" @click="showModal"></up-button>
+          <view class="w-10px"></view>
+          <up-button type="warning" text="确认弹窗" size="mini" @click="showConfirmModal"></up-button>
+        </view>
+      </view>
+    </view>
+    <up-modal
+      :show="modalShow"
+      :title="modalTitle"
+      :content="modalContent"
+      :show-confirm-button="true"
+      :show-cancel-button="modalShowCancel"
+      @confirm="onModalConfirm"
+      @close="onModalClose"
+    ></up-modal>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue'
+
+const modalShow = ref(false)
+const modalTitle = ref('')
+const modalContent = ref('')
+const modalShowCancel = ref(false)
+
+function showModal() {
+  modalTitle.value = '提示'
+  modalContent.value = '这是一个模态弹窗，用于提示重要信息。'
+  modalShowCancel.value = false
+  modalShow.value = true
+}
+function showConfirmModal() {
+  modalTitle.value = '确认操作'
+  modalContent.value = '确定要执行此操作吗？此操作不可撤销。'
+  modalShowCancel.value = true
+  modalShow.value = true
+}
+function onModalConfirm() {
+  modalShow.value = false
+  uni.showToast({ title: '操作成功', icon: 'success' })
+}
+function onModalClose() {
+  modalShow.value = false
+}
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+</style>

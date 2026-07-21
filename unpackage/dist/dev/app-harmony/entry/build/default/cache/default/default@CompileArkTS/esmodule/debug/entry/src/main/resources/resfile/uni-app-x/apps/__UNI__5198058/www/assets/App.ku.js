@@ -1,4 +1,4 @@
-import { _ as __easycom_9 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-toast/up-toast&";
+import { _ as __easycom_2 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-toast/up-toast&";
 const { defineComponent, ref, onBeforeMount, onMounted, onUnmounted, resolveDynamicComponent, openBlock, createElementBlock, Fragment, createCommentVNode, createElementVNode, normalizeStyle, renderSlot, createBlock, createVNode } = globalThis.Vue
 import { T as Tabbar } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/tabbar/index&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/index&";
@@ -52,7 +52,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
   }
 });
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_toast = resolveEasycom(resolveDynamicComponent("up-toast"), __easycom_9);
+  const _component_up_toast = resolveEasycom(resolveDynamicComponent("up-toast"), __easycom_2);
   return openBlock(), createElementBlock(
     Fragment,
     null,

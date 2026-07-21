@@ -1,0 +1,56 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="up-button 按钮" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <view class="demo-block">
+        <text class="demo-label">基础用法</text>
+        <view class="mb-10px"><up-button type="primary" text="主要按钮"></up-button></view>
+        <view class="mb-10px"><up-button type="success" text="成功按钮"></up-button></view>
+        <view class="mb-10px"><up-button type="info" text="信息按钮"></up-button></view>
+        <view class="mb-10px"><up-button type="warning" text="警告按钮"></up-button></view>
+        <view class="mb-10px"><up-button type="error" text="危险按钮"></up-button></view>
+      </view>
+
+      <view class="demo-block">
+        <text class="demo-label">镂空按钮</text>
+        <view class="mb-10px"><up-button type="primary" text="主要按钮" :plain="true"></up-button></view>
+      </view>
+
+      <view class="demo-block">
+        <text class="demo-label">按钮尺寸</text>
+        <view class="flex-row items-center mb-10px">
+          <up-button type="primary" text="大尺寸" size="large"></up-button>
+        </view>
+        <view class="flex-row items-center mb-10px">
+          <up-button type="primary" text="普通尺寸" size="normal"></up-button>
+        </view>
+        <view class="flex-row items-center mb-10px">
+          <up-button type="primary" text="小尺寸" size="small"></up-button>
+        </view>
+        <view class="flex-row items-center mb-10px">
+          <up-button type="primary" text="迷你尺寸" size="mini"></up-button>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+</style>

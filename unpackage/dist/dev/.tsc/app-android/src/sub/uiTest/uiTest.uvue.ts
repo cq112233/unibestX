@@ -1,5 +1,7 @@
+import _imports_0 from './images/logo.png'
 import AppKu from '@/App.ku.uvue'
 import LayoutComponent from '@/src/layouts/default.uvue'
+import logoImg from './images/logo.png'
 
 
 const __sfc__ = defineComponent({
@@ -9,6 +11,7 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
+const logoSrc = logoImg
 
 return (): any | null => {
 
@@ -16,7 +19,33 @@ return (): any | null => {
     default: withSlotCtx((): any[] => [
       _cV(unref(LayoutComponent), _uM({ "navigation-bar-title-text": 'UI 测试' }), _uM({
         default: withSlotCtx((): any[] => [
-          _cE("view", _uM({ class: "p-5px min-h-screen bg-__f8fafc_" }), " 111 ")
+          _cE("view", _uM({ class: "p-16px min-h-screen bg-__f8fafc_" }), [
+            _cE("text", _uM({ class: "text-18px font-bold text-__334155_ mb-16px" }), "Image 标签测试"),
+            _cE("view", _uM({ class: "mb-16px p-12px bg-white rounded-8px shadow-xs" }), [
+              _cE("text", _uM({ class: "text-14px font-bold text-__64748b_ mb-8px" }), "1. 相对路径引用 (./images/logo.png)"),
+              _cE("image", _uM({
+                src: _imports_0,
+                style: _nS(_uM({"width":"80px","height":"80px"})),
+                mode: "aspectFit"
+              }), null, 4 /* STYLE */)
+            ]),
+            _cE("view", _uM({ class: "mb-16px p-12px bg-white rounded-8px shadow-xs" }), [
+              _cE("text", _uM({ class: "text-14px font-bold text-__64748b_ mb-8px" }), "2. 绝对静态路径 (/static/logo.png)"),
+              _cE("image", _uM({
+                src: "/static/logo.png",
+                style: _nS(_uM({"width":"80px","height":"80px"})),
+                mode: "aspectFit"
+              }), null, 4 /* STYLE */)
+            ]),
+            _cE("view", _uM({ class: "mb-16px p-12px bg-white rounded-8px shadow-xs" }), [
+              _cE("text", _uM({ class: "text-14px font-bold text-__64748b_ mb-8px" }), "3. JS 变量绑定 (imported logo)"),
+              _cE("image", _uM({
+                src: unref(logoSrc),
+                style: _nS(_uM({"width":"80px","height":"80px"})),
+                mode: "aspectFit"
+              }), null, 12 /* STYLE, PROPS */, ["src"])
+            ])
+          ])
         ]),
         _: 1 /* STABLE */
       }))
@@ -28,4 +57,4 @@ return (): any | null => {
 
 })
 export default __sfc__
-const GenSrcSubUiTestUiTestStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["p-5px", _pS(_uM([["paddingTop", 5], ["paddingRight", 5], ["paddingBottom", 5], ["paddingLeft", 5]]))]])]
+const GenSrcSubUiTestUiTestStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["bg-white", _pS(_uM([["backgroundColor", "rgba(255,255,255,var(--un-bg-opacity,1))"]]))], ["font-bold", _pS(_uM([["fontWeight", 700]]))], ["mb-16px", _pS(_uM([["marginBottom", 16]]))], ["mb-8px", _pS(_uM([["marginBottom", 8]]))], ["p-12px", _pS(_uM([["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["rounded-8px", _pS(_uM([["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["shadow-xs", _pS(_uM([["boxShadow", "var(--un-inset-shadow,0 0 #0000),var(--un-inset-ring-shadow,0 0 #0000),var(--un-ring-offset-shadow,0 0 #0000),var(--un-ring-shadow,0 0 #0000),var(--un-shadow,0 1rpx 3rpx 0 var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))))"], ["--un-shadow", "0 1rpx 2rpx 0rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.05)))"]]))], ["text-__334155_", _pS(_uM([["color", "#334155"]]))], ["text-__64748b_", _pS(_uM([["color", "#64748b"]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))], ["text-18px", _pS(_uM([["fontSize", 18]]))]])]

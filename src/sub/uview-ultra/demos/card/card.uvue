@@ -1,0 +1,42 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="up-card 卡片" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <view class="demo-block">
+        <text class="demo-label">基础卡片</text>
+        <up-card title="基础卡片" sub-title="副标题" margin="0" :show-foot="false">
+          <text slot="body" class="text-13px text-[#606266] leading-20px">这是卡片主体内容区域，可以放置任意内容。</text>
+        </up-card>
+        <view class="h-10px"></view>
+        <up-card title="带缩略图" :thumb="logoImg" :thumb-circle="true" thumb-width="36px" margin="0">
+          <text slot="body" class="text-13px text-[#606266] leading-20px">左侧缩略图为圆形，适合展示头像或图标。</text>
+          <view slot="foot" class="flex-row justify-between w-full">
+            <text class="text-12px text-[#909399]">底部区域</text>
+            <text class="text-12px text-[#2979ff]">查看详情</text>
+          </view>
+        </up-card>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+const logoImg = '/static/logo.png'
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+</style>

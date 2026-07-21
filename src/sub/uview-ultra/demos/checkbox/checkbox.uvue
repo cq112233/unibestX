@@ -1,0 +1,42 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="up-checkbox 复选框" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <view class="demo-block">
+        <text class="demo-label">基础用法</text>
+        <up-checkbox-group v-model="checkboxValue" @change="checkboxChange">
+          <up-checkbox name="apple" label="苹果" class="mb-10px mr-20px"></up-checkbox>
+          <up-checkbox name="banana" label="香蕉" class="mb-10px mr-20px"></up-checkbox>
+          <up-checkbox name="orange" label="橙子" class="mb-10px mr-20px" :disabled="true"></up-checkbox>
+        </up-checkbox-group>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue'
+
+const checkboxValue = ref(['apple'] as string[])
+
+function checkboxChange(n: string[]) {
+  console.log('checkbox change', n)
+}
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+</style>

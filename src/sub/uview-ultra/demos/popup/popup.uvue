@@ -1,0 +1,58 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="up-popup 弹出层" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <view class="demo-block">
+        <text class="demo-label">基础用法</text>
+        <view class="flex-row items-center">
+          <up-button type="primary" text="顶部弹出" size="mini" @click="openPopup('top')"></up-button>
+          <view class="w-10px"></view>
+          <up-button type="primary" text="底部弹出" size="mini" @click="openPopup('bottom')"></up-button>
+        </view>
+      </view>
+    </view>
+    <up-popup
+      :show="popupShow"
+      :mode="popupMode"
+      :closeable="true"
+      :round="10"
+      @close="onPopupClose"
+    >
+      <view class="p-30px items-center">
+        <text class="text-16px text-[#303133]">{{ popupMode }} 弹出层内容</text>
+      </view>
+    </up-popup>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue'
+
+const popupShow = ref(false)
+const popupMode = ref('bottom')
+
+function openPopup(mode: string) {
+  popupMode.value = mode
+  popupShow.value = true
+}
+function onPopupClose() {
+  popupShow.value = false
+}
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+</style>

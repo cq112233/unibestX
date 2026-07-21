@@ -2,7 +2,7 @@ const { defineComponent, openBlock, createElementBlock, normalizeClass, normaliz
 import { p as propsTextarea } from "./props.js";
 import { m as mpMixin } from "../../libs/mixin/mpMixin.js";
 import { m as mixin } from "../../libs/mixin/mixin.js";
-import { d as deepMerge, b as addStyle, a as addUnit } from "../../libs/function/index.js";
+import { h as deepMerge, b as addStyle, a as addUnit } from "../../libs/function/index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
 const defaultFormat = function(value) {
   return value;
@@ -163,8 +163,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     /* CLASS, STYLE */
   );
 }
-const __easycom_11 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-textarea/up-textarea.uvue"]]);
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-textarea/up-textarea.uvue"]]);
 export {
-  __easycom_11 as _
+  __easycom_1 as _
 };
 //# sourceMappingURL=up-textarea.js.map

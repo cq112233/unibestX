@@ -1,8 +1,8 @@
-import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-line/up-line&";
+import { _ as __easycom_1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-line/up-line&";
 const { defineComponent, resolveDynamicComponent, openBlock, createBlock, normalizeClass, withCtx, renderSlot, createElementVNode, normalizeStyle, createElementBlock, toDisplayString, createCommentVNode, Fragment, createVNode } = globalThis.Vue
 import { r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
-import { _ as __easycom_41 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon&";
-import { _ as __easycom_12 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-popup/up-popup&";
+import { _ as __easycom_1$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon&";
+import { _ as __easycom_2$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-popup/up-popup&";
 import { p as propsModal } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-modal/props&";
 import { m as mpMixin } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/mixin/mpMixin&";
 import { m as mixin } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/mixin/mixin&";
@@ -75,9 +75,9 @@ const _sfc_main = defineComponent({
 });
 const _style_0 = { "up-modal": { "": { "width": "650rpx", "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6, "overflow": "hidden" } }, "up-modal__title": { "": { "display": "flex", "flexDirection": "column", "justifyContent": "center", "alignItems": "center", "fontSize": 16, "fontWeight": "bold", "color": "#606266", "textAlign": "center", "paddingTop": 25 } }, "up-modal__content": { "": { "paddingTop": 12, "paddingRight": 25, "paddingBottom": 25, "paddingLeft": 25, "display": "flex", "flexDirection": "row", "justifyContent": "center" } }, "up-modal__content__text": { "": { "fontSize": 15, "color": "#606266", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-modal__button-group": { "": { "display": "flex", "flexDirection": "row" } }, "up-modal__button-group--confirm-button": { "": { "flexDirection": "column", "paddingTop": 0, "paddingRight": 25, "paddingBottom": 15, "paddingLeft": 25 } }, "up-modal__button-group__wrapper": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "height": 48 } }, "up-modal__button-group__wrapper--confirm": { "": { "borderBottomRightRadius": 6 } }, "up-modal__button-group__wrapper--only-cancel": { "": { "borderBottomRightRadius": 6 } }, "up-modal__button-group__wrapper--cancel": { "": { "borderBottomLeftRadius": 6 } }, "up-modal__button-group__wrapper--only-confirm": { "": { "borderBottomLeftRadius": 6 } }, "up-modal__button-group__wrapper--hover": { "": { "backgroundColor": "#f3f4f6" } }, "up-modal__button-group__wrapper__text": { "": { "color": "#606266", "fontSize": 16, "textAlign": "center" } } };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_line = resolveEasycom(resolveDynamicComponent("up-line"), __easycom_0);
-  const _component_up_loading_icon = resolveEasycom(resolveDynamicComponent("up-loading-icon"), __easycom_41);
-  const _component_up_popup = resolveEasycom(resolveDynamicComponent("up-popup"), __easycom_12);
+  const _component_up_line = resolveEasycom(resolveDynamicComponent("up-line"), __easycom_1);
+  const _component_up_loading_icon = resolveEasycom(resolveDynamicComponent("up-loading-icon"), __easycom_1$1);
+  const _component_up_popup = resolveEasycom(resolveDynamicComponent("up-popup"), __easycom_2$1);
   return openBlock(), createBlock(_component_up_popup, {
     mode: "center",
     zoom: _ctx.zoom,
@@ -232,8 +232,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     /* FORWARDED */
   }, 8, ["zoom", "show", "class", "customStyle", "closeOnClickOverlay", "duration", "onClick"]);
 }
-const __easycom_11 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-modal/up-modal.uvue"]]);
+const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-modal/up-modal.uvue"]]);
 export {
-  __easycom_11 as _
+  __easycom_2 as _
 };
 //# sourceMappingURL=up-modal.js.map

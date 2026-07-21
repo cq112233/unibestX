@@ -187,8 +187,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     /* CLASS, STYLE */
   )) : createCommentVNode("v-if", true);
 }
-const __easycom_11 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-transition/up-transition.uvue"]]);
+const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-transition/up-transition.uvue"]]);
 export {
-  __easycom_11 as _
+  __easycom_2 as _
 };
 //# sourceMappingURL=up-transition.js.map

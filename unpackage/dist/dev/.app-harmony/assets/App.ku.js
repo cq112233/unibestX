@@ -1,4 +1,4 @@
-import { _ as __easycom_9 } from "./uni_modules/uview-ultra/components/up-toast/up-toast.js";
+import { _ as __easycom_2 } from "./uni_modules/uview-ultra/components/up-toast/up-toast.js";
 const { defineComponent, ref, onBeforeMount, onMounted, onUnmounted, resolveDynamicComponent, openBlock, createElementBlock, Fragment, createCommentVNode, createElementVNode, normalizeStyle, renderSlot, createBlock, createVNode } = globalThis.Vue
 import { T as Tabbar } from "./src/tabbar/index.js";
 import "./src/store/index.js";
@@ -52,7 +52,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
   }
 });
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_toast = resolveEasycom(resolveDynamicComponent("up-toast"), __easycom_9);
+  const _component_up_toast = resolveEasycom(resolveDynamicComponent("up-toast"), __easycom_2);
   return openBlock(), createElementBlock(
     Fragment,
     null,

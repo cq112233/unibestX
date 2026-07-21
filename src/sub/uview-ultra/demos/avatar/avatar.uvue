@@ -1,0 +1,40 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="up-avatar 头像" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <view class="demo-block">
+        <text class="demo-label">基础用法</text>
+        <view class="flex-row items-center">
+          <up-avatar src="/static/logo.png" size="40" class="mr-10px"></up-avatar>
+          <up-avatar text="U" size="40" bg-color="#2979ff" class="mr-10px"></up-avatar>
+        </view>
+      </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">方形头像</text>
+        <view class="flex-row items-center">
+          <up-avatar src="/static/logo.png" shape="square" size="40"></up-avatar>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+</style>
