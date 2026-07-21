@@ -7,7 +7,7 @@
 		<view
 			class="up-image"
 			@tap="onClick"
-			:style="[wrapStyle, backgroundStyle, addStyle(customStyle)]"
+			:style="[wrapStyle, backgroundStyle, mergedCustomStyle]"
 		>
 			<image
 				:src="realSrc"
@@ -16,21 +16,12 @@
 				@load="onLoadHandler"
 				:lazy-load="lazyLoad"
 				class="up-image__image"
-				:style="{
-					borderRadius: shape == 'circle' ? '10000px' : addUnit(radius),
-					width: addUnit(width),
-					height: addUnit(height)
-				}"
+				:style="imageStyle"
 			></image>
 			<view
 				v-if="showLoading && loading"
 				class="up-image__loading"
-				:style="{
-					borderRadius: shape == 'circle' ? '50%' : addUnit(radius),
-					backgroundColor: bgColor,
-					width: addUnit(width),
-					height: addUnit(height)
-				}"
+				:style="loadingStyle"
 			>
 				<slot name="loading">
 					<up-icon
@@ -43,11 +34,7 @@
 			<view
 				v-if="showError && isError && !loading"
 				class="up-image__error"
-				:style="{
-					borderRadius: shape == 'circle' ? '50%' : addUnit(radius),
-					width: addUnit(width),
-					height: addUnit(height)
-				}"
+				:style="errorStyle"
 			>
 				<slot name="error">
 					<up-icon
@@ -131,6 +118,10 @@
 		bgColor: {
 			type: String,
 			default: () => defProps.getString('image.bgColor')
+		},
+		customStyle: {
+			type: [Object, String],
+			default: () => ({})
 		}
 	})
 	
@@ -165,6 +156,35 @@
 		}
 		return deepMerge(style, {})
 	})
+
+	const mergedCustomStyle = computed((): UTSJSONObject => {
+		return addStyle(props.customStyle) as UTSJSONObject
+	})
+
+	const imageStyle = computed((): UTSJSONObject => {
+		return {
+			borderRadius: props.shape == 'circle' ? '10000px' : addUnit(props.radius),
+			width: addUnit(props.width),
+			height: addUnit(props.height)
+		} as UTSJSONObject
+	})
+
+	const loadingStyle = computed((): UTSJSONObject => {
+		return {
+			borderRadius: props.shape == 'circle' ? '50%' : addUnit(props.radius),
+			backgroundColor: props.bgColor,
+			width: addUnit(props.width),
+			height: addUnit(props.height)
+		} as UTSJSONObject
+	})
+
+	const errorStyle = computed((): UTSJSONObject => {
+		return {
+			borderRadius: props.shape == 'circle' ? '50%' : addUnit(props.radius),
+			width: addUnit(props.width),
+			height: addUnit(props.height)
+		} as UTSJSONObject
+	})
 	
 	const initLoading = (src: string) => {
 		if (src == '') {
@@ -182,8 +202,8 @@
 		}
 	}
 
-	watch(() => props.src, (newVal) => {
-		initLoading(newVal as string)
+	watch((): string => props.src, (newVal: string) => {
+		initLoading(newVal)
 	})
 
 	onMounted(() => {

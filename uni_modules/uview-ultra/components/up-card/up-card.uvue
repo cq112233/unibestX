@@ -3,17 +3,13 @@
 		class="up-card"
 		@tap.stop="click"
 		:class="{ 'up-border': border, 'up-card-full': full,
-			'up-card--border': parseInt(getPx(borderRadius)) > 0 }"
-		:style="{
-			borderRadius: addUnit(borderRadius),
-			margin: margin,
-			boxShadow: boxShadow
-		}"
+			'up-card--border': hasBorderRadius }"
+		:style="cardStyle"
 	>
 		<view
 			v-if="showHead"
 			class="up-card__head"
-			:style="[{padding: addUnit(paddingHead != '' ? paddingHead : padding)}, headStyle]"
+			:style="[headPaddingStyle, (headStyle ?? {}) as any]"
 			:class="{
 				'up-border-bottom': headBorderBottom
 			}"
@@ -28,18 +24,11 @@
 						class="up-card__head--left__thumb"
 						mode="aspectFill"
 						v-if="realThumb != ''"
-						:style="{ 
-							height: addUnit(thumbWidth), 
-							width: addUnit(thumbWidth), 
-							borderRadius: thumbCircle ? '50px' : '4px' 
-						}"
+						:style="thumbStyle"
 					></image>
 					<text
 						class="up-card__head--left__title up-line-1"
-						:style="{
-							fontSize: addUnit(titleSize),
-							color: titleColor
-						}"
+						:style="titleStyle"
 					>
 						{{ title }}
 					</text>
@@ -48,10 +37,7 @@
 					v-if="subTitle != ''">
 					<text
 						class="up-card__head__title__text"
-						:style="{
-							fontSize: addUnit(subTitleSize),
-							color: subTitleColor
-						}"
+						:style="subTitleStyle"
 					>
 						{{ subTitle }}
 					</text>
@@ -60,14 +46,14 @@
 			<slot name="head" v-else />
 		</view>
 		<view @tap="bodyClick" class="up-card__body"
-			:style="[{padding: addUnit(paddingBody != '' ? paddingBody : padding)}, bodyStyle]">
+			:style="[bodyPaddingStyle, (bodyStyle ?? {}) as any]">
 			<slot name="body"><slot /></slot>
 		</view>
 		<view
 			v-if="showFoot"
 			class="up-card__foot"
 			 @tap="footClick"
-			:style="[{padding: $slots['foot'] != null ? addUnit(paddingFoot != '' ? paddingFoot : padding) : 0}, footStyle]"
+			:style="[footPaddingStyle, (footStyle ?? {}) as any]"
 			:class="{
 				'up-border-top': footBorderTop
 			}"
@@ -220,9 +206,60 @@ const props = defineProps({
   }
 })
 
+// ==================== computed ====================
 const realThumb = computed((): string => {
   if (props.thumb == '') return ''
   return props.thumb
+})
+
+const hasBorderRadius = computed((): boolean => {
+  const pxStr = getPx(props.borderRadius)
+  return parseFloat(pxStr) > 0
+})
+
+const cardStyle = computed((): UTSJSONObject => {
+  return {
+    borderRadius: addUnit(props.borderRadius),
+    margin: props.margin,
+    boxShadow: props.boxShadow
+  } as UTSJSONObject
+})
+
+const headPaddingStyle = computed((): UTSJSONObject => {
+  const padVal = props.paddingHead != '' ? props.paddingHead : props.padding
+  return { padding: addUnit(padVal) } as UTSJSONObject
+})
+
+const thumbStyle = computed((): UTSJSONObject => {
+  return {
+    height: addUnit(props.thumbWidth),
+    width: addUnit(props.thumbWidth),
+    borderRadius: props.thumbCircle ? '50px' : '4px'
+  } as UTSJSONObject
+})
+
+const titleStyle = computed((): UTSJSONObject => {
+  return {
+    fontSize: addUnit(props.titleSize),
+    color: props.titleColor
+  } as UTSJSONObject
+})
+
+const subTitleStyle = computed((): UTSJSONObject => {
+  return {
+    fontSize: addUnit(props.subTitleSize),
+    color: props.subTitleColor
+  } as UTSJSONObject
+})
+
+const bodyPaddingStyle = computed((): UTSJSONObject => {
+  const padVal = props.paddingBody != '' ? props.paddingBody : props.padding
+  return { padding: addUnit(padVal) } as UTSJSONObject
+})
+
+const footPaddingStyle = computed((): UTSJSONObject => {
+  const padVal = props.paddingFoot != '' ? props.paddingFoot : props.padding
+  return { padding: addUnit(padVal) } as UTSJSONObject
 })
 
 // 定义事件

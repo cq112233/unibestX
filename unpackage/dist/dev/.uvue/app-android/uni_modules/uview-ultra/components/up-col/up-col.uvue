@@ -1,0 +1,129 @@
+import type { PropType } from 'vue';
+import { ref, computed, getCurrentInstance } from 'vue';
+import defProps from './col.uts';
+import { addStyle, addUnit, deepMerge, getPx } from '../../libs/function/index';
+import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI';
+const __sfc__ = defineComponent({
+    __name: 'up-col',
+    namne: 'up-col',
+    props: {
+        // 占父容器宽度的多少等分，总分为12份
+        span: {
+            type: [String, Number],
+            default: defProps.getNumber('col.span')
+        },
+        // 指定栅格左侧的间隔数(总12栏)
+        offset: {
+            type: [String, Number],
+            default: defProps.getNumber('col.offset')
+        },
+        // 水平排列方式，可选值为`start`(或`flex-start`)、`end`(或`flex-end`)、`center`、`around`(或`space-around`)、`between`(或`space-between`)
+        justify: {
+            type: String,
+            default: defProps.getString('col.justify')
+        },
+        // 垂直对齐方式，可选值为top、center、bottom、stretch
+        align: {
+            type: String,
+            default: defProps.getString('col.align')
+        },
+        // 文字对齐方式
+        textAlign: {
+            type: String,
+            default: defProps.getString('col.textAlign')
+        }
+    },
+    emits: ['click'],
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        const { parent, parentData, getParentData } = useUltraUI({
+            gutter: 0
+        });
+        // props
+        const props = __props;
+        // 定义事件
+        function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+            __ins.emit(event, ...do_not_transform_spread);
+        }
+        // 获取实例
+        const instance = getCurrentInstance()!.proxy!;
+        // 响应式数据
+        const width = ref(0);
+        const gridNum = ref(12);
+        // 计算属性
+        const uJustify = computed((): string => {
+            if (props.justify == 'end' || props.justify == 'start')
+                return 'flex-' + props.justify;
+            else if (props.justify == 'around' || props.justify == 'between')
+                return 'space-' + props.justify;
+            else
+                return props.justify;
+        });
+        const uAlignItem = computed((): string => {
+            if (props.align == 'top')
+                return 'flex-start';
+            if (props.align == 'bottom')
+                return 'flex-end';
+            else
+                return props.align;
+        });
+        const colStyle = computed((): UTSJSONObject => {
+            // @ts-ignore
+            let pct = 100 / gridNum.value * parseInt(props.span.toString());
+            const style = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-col/up-col.uvue", 84, 9),
+                // 这里写成"padding: 0 10px"的形式是因为nvue的需要
+                // @ts-ignore
+                paddingLeft: addUnit(parseInt(getPx(parentData.value['gutter'].toString())) / 2),
+                // @ts-ignore
+                paddingRight: addUnit(parseInt(getPx(parentData.value['gutter'].toString())) / 2),
+                alignItems: uAlignItem.value,
+                // @ts-ignore
+                justifyContent: uJustify.value,
+                flex: `0 0 ${pct.toString(10)}%`,
+                // @ts-ignore
+                marginLeft: (100 / 12 * parseInt(props.offset.toString())).toString(10) + '%'
+            } as UTSJSONObject;
+            return style;
+        });
+        const updateParentData = (): void => {
+            // @ts-ignore
+            getParentData('up-row', instance, false);
+        };
+        // 方法
+        const init = (): void => {
+            // 支付宝小程序不支持provide/inject，所以使用这个方法获取整个父组件，在created定义，避免循环引用
+            updateParentData();
+            let promise = parent.value?.$callMethod('getComponentWidth');
+            if (promise != null) {
+                (promise as Promise<number | null>).then((widthTmp: number | null) => {
+                    if (widthTmp != null) {
+                        width.value = parseInt(widthTmp.toString(10));
+                    }
+                });
+            }
+        };
+        const clickHandler = (e: any): void => {
+            emit('click');
+        };
+        // 初始化
+        init();
+        return (): any | null => {
+            return _cE("view", _uM({
+                class: _nC(["up-col", [
+                        'up-col-' + _ctx.span
+                    ]]),
+                ref: "up-col",
+                style: _nS([colStyle.value, _ctx.$upAddStyle(_ctx.customStyle)]),
+                onClick: clickHandler
+            }), [
+                renderSlot(_ctx.$slots, "default")
+            ], 6 /* CLASS, STYLE */);
+        };
+    }
+});
+export default __sfc__;
+export type UpColComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpColUpColStyles = [_uM([["u-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-col", _pS(_uM([["paddingTop", 0], ["paddingRight", 0], ["paddingBottom", 0], ["paddingLeft", 0], ["boxSizing", "border-box"]]))], ["up-col-0", _pS(_uM([["width", 0]]))], ["up-col-1", _pS(_uM([["width", "8.3333333333%"]]))], ["up-col-2", _pS(_uM([["width", "16.6666666667%"]]))], ["up-col-3", _pS(_uM([["width", "25%"]]))], ["up-col-4", _pS(_uM([["width", "33.3333333333%"]]))], ["up-col-5", _pS(_uM([["width", "41.6666666667%"]]))], ["up-col-6", _pS(_uM([["width", "50%"]]))], ["up-col-7", _pS(_uM([["width", "58.3333333333%"]]))], ["up-col-8", _pS(_uM([["width", "66.6666666667%"]]))], ["up-col-9", _pS(_uM([["width", "75%"]]))], ["up-col-10", _pS(_uM([["width", "83.3333333333%"]]))], ["up-col-11", _pS(_uM([["width", "91.6666666667%"]]))], ["up-col-12", _pS(_uM([["width", "100%"]]))]])];
+//# sourceMappingURL=up-col.uvue.map

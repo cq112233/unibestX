@@ -1,0 +1,152 @@
+import _easycom_up_card from '@/uni_modules/uview-ultra/components/up-card/up-card.uvue';
+import _easycom_up_icon from '@/uni_modules/uview-ultra/components/up-icon/up-icon.uvue';
+import _easycom_up_loading_icon from '@/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.uvue';
+import _easycom_up_list from '@/uni_modules/uview-ultra/components/up-list/up-list.uvue';
+import _easycom_up_divider from '@/uni_modules/uview-ultra/components/up-divider/up-divider.uvue';
+import { computed, onMounted, reactive, ref } from 'vue';
+import logoImg from '@/src/assets/images/logo.png';
+// ==================== 展示组件 ====================
+const __sfc__ = defineComponent({
+    __name: 'DemoShow',
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        const listItems = ref([
+            { title: 'List 列表项 01', desc: '这是高性能列表的第一项' },
+            { title: 'List 列表项 02', desc: '支持下拉刷新和滚动加载更多' },
+            { title: 'List 列表项 03', desc: '基于 scroll-view 封装' },
+            { title: 'List 列表项 04', desc: '适用于长列表滚动场景' },
+            { title: 'List 列表项 05', desc: '内置 refresher 下拉刷新能力' },
+            { title: 'List 列表项 06', desc: '支持 scrolltolower 触底加载' },
+        ] as UTSJSONObject[]);
+        const listLoading = ref(false);
+        const listRefreshing = ref(false);
+        let listLoadCount = 1;
+        function onListLoadMore(): void {
+            if (listLoading.value)
+                return;
+            listLoading.value = true;
+            setTimeout(() => {
+                listLoadCount += 1;
+                const newItems: UTSJSONObject[] = [];
+                for (let i = 1; i <= 3; i++) {
+                    const idx = listItems.value.length + i;
+                    newItems.push({
+                        title: `加载项 ${listLoadCount}-${i}`,
+                        desc: `这是第 ${listLoadCount} 批加载的第 ${i} 条数据`,
+                    } as UTSJSONObject);
+                }
+                listItems.value = listItems.value.concat(newItems);
+                listLoading.value = false;
+                uni.showToast({ title: `加载了 ${newItems.length} 条`, icon: 'none', duration: 1500 });
+            }, 1000);
+        }
+        function onListRefresh(): void {
+            listRefreshing.value = true;
+            setTimeout(() => {
+                listRefreshing.value = false;
+                uni.showToast({ title: '刷新完成', icon: 'none', duration: 1500 });
+            }, 1500);
+        }
+        return (): any | null => {
+            const _component_up_card = resolveEasyComponent("up-card", _easycom_up_card);
+            const _component_up_icon = resolveEasyComponent("up-icon", _easycom_up_icon);
+            const _component_up_loading_icon = resolveEasyComponent("up-loading-icon", _easycom_up_loading_icon);
+            const _component_up_list = resolveEasyComponent("up-list", _easycom_up_list);
+            const _component_up_divider = resolveEasyComponent("up-divider", _easycom_up_divider);
+            return _cE("view", null, [
+                _cE("text", _uM({ class: "section-title" }), " 展示组件 "),
+                _cE("view", _uM({ class: "demo-block" }), [
+                    _cE("text", _uM({ class: "demo-label" }), " up-card "),
+                    _cV(_component_up_card, _uM({
+                        title: "基础卡片",
+                        "sub-title": "副标题",
+                        margin: "0",
+                        "show-foot": false
+                    }), _uM({
+                        default: withSlotCtx((): any[] => [
+                            _cE("text", _uM({
+                                slot: "body",
+                                class: "text-13px text-__606266_ leading-20px"
+                            }), "这是卡片主体内容区域，可以放置任意内容。")
+                        ]),
+                        _: 1 /* STABLE */
+                    })),
+                    _cE("view", _uM({ class: "h-10px" })),
+                    _cV(_component_up_card, _uM({
+                        title: "带缩略图",
+                        thumb: unref(logoImg),
+                        "thumb-circle": true,
+                        "thumb-width": "36px",
+                        margin: "0"
+                    }), _uM({
+                        default: withSlotCtx((): any[] => [
+                            _cE("text", _uM({
+                                slot: "body",
+                                class: "text-13px text-__606266_ leading-20px"
+                            }), "左侧缩略图为圆形，适合展示头像或图标。"),
+                            _cE("view", _uM({
+                                slot: "foot",
+                                class: "flex-row justify-between w-full"
+                            }), [
+                                _cE("text", _uM({ class: "text-12px text-__909399_" }), "底部区域"),
+                                _cE("text", _uM({ class: "text-12px text-__2979ff_" }), "查看详情")
+                            ])
+                        ]),
+                        _: 1 /* STABLE */
+                    }), 8 /* PROPS */, ["thumb"])
+                ]),
+                _cE("view", _uM({ class: "demo-block" }), [
+                    _cE("text", _uM({ class: "demo-label" }), " up-list "),
+                    _cV(_component_up_list, _uM({
+                        height: 300,
+                        "lower-threshold": 20,
+                        "refresher-enabled": true,
+                        "refresher-triggered": listRefreshing.value,
+                        onScrolltolower: onListLoadMore,
+                        onRefresherrefresh: onListRefresh
+                    }), _uM({
+                        default: withSlotCtx((): any[] => [
+                            _cE(Fragment, null, RenderHelpers.renderList(listItems.value, (item, idx, __index, _cached): any => {
+                                return _cE("view", _uM({
+                                    key: idx,
+                                    class: "demo-list-cell"
+                                }), [
+                                    _cE("view", _uM({ class: "demo-list-cell-avatar" }), [
+                                        _cV(_component_up_icon, _uM({
+                                            name: "account",
+                                            size: "20",
+                                            color: "#ffffff"
+                                        }))
+                                    ]),
+                                    _cE("view", _uM({ class: "demo-list-cell-content" }), [
+                                        _cE("text", _uM({ class: "text-14px font-500 text-__303133_" }), _tD(item["title"] as string), 1 /* TEXT */),
+                                        _cE("text", _uM({ class: "text-12px text-__909399_ mt-4px" }), _tD(item["desc"] as string), 1 /* TEXT */)
+                                    ])
+                                ]);
+                            }), 128 /* KEYED_FRAGMENT */),
+                            isTrue(listLoading.value)
+                                ? _cE("view", _uM({
+                                    key: 0,
+                                    class: "list-loading"
+                                }), [
+                                    _cV(_component_up_loading_icon, _uM({
+                                        mode: "circle",
+                                        size: "20"
+                                    })),
+                                    _cE("text", _uM({ class: "text-12px text-__909399_ ml-8px" }), "加载中...")
+                                ])
+                                : _cC("v-if", true)
+                        ]),
+                        _: 1 /* STABLE */
+                    }), 8 /* PROPS */, ["refresher-triggered"])
+                ]),
+                _cV(_component_up_divider, _uM({ text: "展示组件结束" }))
+            ]);
+        };
+    }
+});
+export default __sfc__;
+const GenSrcSubUviewUltraComponentsDemoShowStyles = [_uM([["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["font-500", _pS(_uM([["fontWeight", 500]]))], ["h-10px", _pS(_uM([["height", 10]]))], ["justify-between", _pS(_uM([["justifyContent", "space-between"]]))], ["leading-20px", _pS(_uM([["lineHeight", "20px"]]))], ["ml-8px", _pS(_uM([["marginLeft", 8]]))], ["mt-4px", _pS(_uM([["marginTop", 4]]))], ["none", _pS(_uM([["display", "none"]]))], ["text-__2979ff_", _pS(_uM([["color", "#2979ff"]]))], ["text-__303133_", _pS(_uM([["color", "#303133"]]))], ["text-__606266_", _pS(_uM([["color", "#606266"]]))], ["text-__909399_", _pS(_uM([["color", "#909399"]]))], ["text-12px", _pS(_uM([["fontSize", 12]]))], ["text-13px", _pS(_uM([["fontSize", 13]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))], ["w-full", _pS(_uM([["width", "100%"]]))], ["section-title", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 8], ["paddingLeft", 16], ["fontSize", 18], ["fontWeight", "bold"], ["color", "#303133"]]))], ["demo-block", _pS(_uM([["marginTop", 0], ["marginRight", 12], ["marginBottom", 12], ["marginLeft", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))], ["demo-list-cell", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16], ["backgroundColor", "#ffffff"], ["borderBottomWidth", 1], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f5f5f5"]]))], ["demo-list-cell-avatar", _pS(_uM([["width", 40], ["height", 40], ["borderTopLeftRadius", 4], ["borderTopRightRadius", 4], ["borderBottomRightRadius", 4], ["borderBottomLeftRadius", 4], ["marginRight", 12], ["backgroundColor", "#2979ff"], ["display", "flex"], ["justifyContent", "center"], ["alignItems", "center"]]))], ["demo-list-cell-content", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["list-loading", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["paddingTop", 15], ["paddingRight", 0], ["paddingBottom", 15], ["paddingLeft", 0]]))]])];
+//# sourceMappingURL=DemoShow.uvue.map

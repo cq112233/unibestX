@@ -1,0 +1,186 @@
+import { defineStore, PiniaStoreBase } from '@/uni_modules/x-pinia-s'
+
+// ==========================================
+// 类型定义
+// ==========================================
+
+/**
+ * 登录表单参数
+ */
+export type ILoginForm = {
+  username : string
+  password : string
+}
+
+/**
+ * 单 Token 模式返回值
+ */
+export type ISingleTokenRes = {
+  token : string
+  expiresIn : number
+}
+
+/**
+ * 双 Token 模式返回值
+ */
+export type IDoubleTokenRes = {
+  accessToken : string
+  accessExpiresIn : number
+  refreshToken : string
+  refreshExpiresIn : number
+}
+
+/**
+ * Token 信息联合类型（为保持 UTS 严格类型，使用单一 state 结构）
+ */
+export type ITokenState = {
+  /** 单 token 模式 */
+  token : string
+  expiresIn : number
+  /** 双 token 模式 */
+  accessToken : string
+  accessExpiresIn : number
+  refreshToken : string
+  refreshExpiresIn : number
+}
+
+// ==========================================
+// Store 实现
+// ==========================================
+
+export class TokenStore extends PiniaStoreBase {
+  // 1. 响应式状态
+  state : ITokenState = reactive<ITokenState>({
+    token: '',
+    expiresIn: 0,
+    accessToken: '',
+    accessExpiresIn: 0,
+    refreshToken: '',
+    refreshExpiresIn: 0,
+  })
+
+  // 2. constructor
+  constructor() {
+    super()
+    this.bindState(this.state)
+    // 启动时立即从持久化恢复（持久化插件会自动处理，此处无需额外操作）
+  }
+
+  // ==========================================
+  // 持久化钩子
+  // ==========================================
+
+  override _doReset() : void {
+    this.state.token = ''
+    this.state.expiresIn = 0
+    this.state.accessToken = ''
+    this.state.accessExpiresIn = 0
+    this.state.refreshToken = ''
+    this.state.refreshExpiresIn = 0
+  }
+
+  override _hydrate(_data : UTSJSONObject) : void {
+    if (_data['token'] != null) this.state.token = _data['token'] as string
+    if (_data['expiresIn'] != null) this.state.expiresIn = _data['expiresIn'] as number
+    if (_data['accessToken'] != null) this.state.accessToken = _data['accessToken'] as string
+    if (_data['accessExpiresIn'] != null) this.state.accessExpiresIn = _data['accessExpiresIn'] as number
+    if (_data['refreshToken'] != null) this.state.refreshToken = _data['refreshToken'] as string
+    if (_data['refreshExpiresIn'] != null) this.state.refreshExpiresIn = _data['refreshExpiresIn'] as number
+  }
+
+  override _serialize() : UTSJSONObject {
+    return {
+      token: this.state.token,
+      expiresIn: this.state.expiresIn,
+      accessToken: this.state.accessToken,
+      accessExpiresIn: this.state.accessExpiresIn,
+      refreshToken: this.state.refreshToken,
+      refreshExpiresIn: this.state.refreshExpiresIn,
+    } as UTSJSONObject
+  }
+
+  // ==========================================
+  // Actions
+  // ==========================================
+
+  /**
+   * 设置单 token 信息，并记录过期时间
+   */
+  setSingleToken(res : ISingleTokenRes) : void {
+    this.state.token = res.token
+    this.state.expiresIn = res.expiresIn
+    const expireTime = Date.now() + res.expiresIn * 1000
+    uni.setStorageSync('accessTokenExpireTime', expireTime)
+  }
+
+  /**
+   * 设置双 token 信息，并记录过期时间
+   */
+  setDoubleToken(res : IDoubleTokenRes) : void {
+    this.state.accessToken = res.accessToken
+    this.state.accessExpiresIn = res.accessExpiresIn
+    this.state.refreshToken = res.refreshToken
+    this.state.refreshExpiresIn = res.refreshExpiresIn
+    const now = Date.now()
+    uni.setStorageSync('accessTokenExpireTime', now + res.accessExpiresIn * 1000)
+    uni.setStorageSync('refreshTokenExpireTime', now + res.refreshExpiresIn * 1000)
+  }
+
+  /**
+   * 清除所有 token 信息
+   */
+  clearToken() : void {
+    this._doReset()
+    uni.removeStorageSync('accessTokenExpireTime')
+    uni.removeStorageSync('refreshTokenExpireTime')
+  }
+
+  /**
+   * 获取当前有效的 token 字符串（不校验过期，仅返回内存中的值）
+   * 建议配合 isTokenValid 使用
+   */
+  getToken() : string {
+    if (this.state.accessToken != '') {
+      return this.state.accessToken
+    }
+    return this.state.token
+  }
+
+  /**
+   * 检查 accessToken 是否有效（未过期）
+   */
+  isTokenValid() : boolean {
+    const val = uni.getStorageSync('accessTokenExpireTime')
+    if (val == null || val === '') return false
+    const num = parseFloat(val.toString())
+    if (isNaN(num)) return false
+    return Date.now() < num
+  }
+
+  /**
+   * 检查 refreshToken 是否有效（未过期）
+   */
+  isRefreshTokenValid() : boolean {
+    const val = uni.getStorageSync('refreshTokenExpireTime')
+    if (val == null || val === '') return false
+    const num = parseFloat(val.toString())
+    if (isNaN(num)) return false
+    return Date.now() < num
+  }
+
+  /**
+   * 是否已有登录 token 信息（不论是否过期）
+   */
+  hasLoginInfo() : boolean {
+    return this.state.accessToken != '' || this.state.token != ''
+  }
+
+  /**
+   * 是否已登录且 token 有效
+   */
+  hasValidLogin() : boolean {
+    return this.hasLoginInfo() && this.isTokenValid()
+  }
+}
+
+export const useTokenStore = defineStore<TokenStore>('token', () : TokenStore => new TokenStore())

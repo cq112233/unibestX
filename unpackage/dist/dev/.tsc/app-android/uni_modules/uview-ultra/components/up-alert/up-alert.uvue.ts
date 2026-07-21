@@ -1,0 +1,202 @@
+import _easycom_up_icon from '@/uni_modules/uview-ultra/components/up-icon/up-icon.uvue'
+import _easycom_up_transition from '@/uni_modules/uview-ultra/components/up-transition/up-transition.uvue'
+import { computed, ref } from 'vue'
+import { mpSharedMpOptions } from '../../libs/composable/useMp'
+import { addUnit, addStyle } from '../../libs/function/index'
+import defProps from './alert'
+
+// options
+
+const __sfc__ = defineComponent({
+  __name: 'up-alert',
+
+  //...mpSharedMpOptions,
+  name: 'up-alert'
+,
+  props: {
+    // 主题，success/warning/info/error
+    type: {
+        type: String,
+        default: defProps.getString('alert.type')
+    },
+    // 辅助性文字
+    description: {
+        type: String,
+        default: defProps.getString('alert.description')
+    },
+    // 是否可关闭
+    closable: {
+        type: Boolean,
+        default: defProps.getBoolean('alert.closable')
+    },
+    // 是否显示图标
+    showIcon: {
+        type: Boolean,
+        default: defProps.getBoolean('alert.showIcon')
+    },
+    // 浅或深色调，light-浅色，dark-深色
+    effect: {
+        type: String,
+        default: defProps.getString('alert.effect')
+    },
+    // 文字是否居中
+    center: {
+        type: Boolean,
+        default: defProps.getBoolean('alert.center')
+    },
+    // 字体大小
+    fontSize: {
+        type: [String, Number],
+        default: defProps.getNumber('alert.fontSize')
+    },
+    // 自定义样式
+    customStyle: {
+        type: Object,
+        default: () => ({})
+    },
+    // 标题文字
+    title: {
+        type: String,
+        default: defProps.getString('alert.title', '')
+    }
+},
+  emits: ['click'],
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+
+
+// 定义props
+const props = __props;
+
+// 定义事件
+function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+__ins.emit(event, ...do_not_transform_spread)
+}
+
+// 响应式数据
+const show = ref(true);
+
+// 计算属性
+const style1 = computed(() => {
+    return {
+        fontSize: addUnit(props.fontSize),
+        textAlign: props.center ? 'center' : 'left'
+    }
+});
+
+const iconColor = computed(() => {
+    return props.effect == 'light' ? props.type : '#ffffff'
+});
+
+// 不同主题对应不同的图标
+const iconName = computed(() => {
+    switch (props.type) {
+        case 'success':
+            return 'checkmark-circle-fill';
+        case 'error':
+            return 'close-circle-fill';
+        case 'warning':
+            return 'error-circle-fill';
+        case 'info':
+            return 'info-circle-fill';
+        case 'primary':
+            return 'more-circle-fill';
+        default: 
+            return 'error-circle-fill';
+    }
+});
+
+// 方法
+const addUnitFunc = (val: any) => {
+    return addUnit(val)
+};
+
+const addStyleFunc = (val: any) => {
+    return addStyle(val)
+};
+
+// 点击内容
+const clickHandler = () => {
+    emit('click')
+};
+
+// 点击关闭按钮
+const closeHandler = () => {
+    show.value = false
+};
+
+return (): any | null => {
+
+const _component_up_icon = resolveEasyComponent("up-icon",_easycom_up_icon)
+const _component_up_transition = resolveEasyComponent("up-transition",_easycom_up_transition)
+
+  return _cV(_component_up_transition, _uM({
+    mode: "fade",
+    show: show.value
+  }), _uM({
+    default: withSlotCtx((): any[] => [
+      _cE("view", _uM({
+        class: _nC(["up-alert", [`up-alert--${_ctx.type}--${_ctx.effect}`]]),
+        onClick: withModifiers(clickHandler, ["stop"]),
+        style: _nS([_ctx.$upAddStyle(_ctx.customStyle)])
+      }), [
+        isTrue(_ctx.showIcon)
+          ? _cE("view", _uM({
+              key: 0,
+              class: "up-alert__icon"
+            }), [
+              _cV(_component_up_icon, _uM({
+                name: iconName.value,
+                size: "18",
+                color: iconColor.value
+              }), null, 8 /* PROPS */, ["name", "color"])
+            ])
+          : _cC("v-if", true),
+        _cE("view", _uM({
+          class: "up-alert__content",
+          style: _nS([_uM({
+					paddingRight: _ctx.closable ? '20px' : 0
+				})])
+        }), [
+          isTrue(_ctx.title)
+            ? _cE("text", _uM({
+                key: 0,
+                class: _nC(["up-alert__content__title", [_ctx.effect === 'dark' ? 'up-alert__text--dark' : `up-alert__text--${_ctx.type}--light`]]),
+                style: _nS([style1.value])
+              }), _tD(_ctx.title), 7 /* TEXT, CLASS, STYLE */)
+            : _cC("v-if", true),
+          isTrue(_ctx.description)
+            ? _cE("text", _uM({
+                key: 1,
+                class: _nC(["up-alert__content__desc", [_ctx.effect === 'dark' ? 'up-alert__text--dark' : `up-alert__text--${_ctx.type}--light`]]),
+                style: _nS([style1.value])
+              }), _tD(_ctx.description), 7 /* TEXT, CLASS, STYLE */)
+            : _cC("v-if", true)
+        ], 4 /* STYLE */),
+        isTrue(_ctx.closable)
+          ? _cE("view", _uM({
+              key: 1,
+              class: "up-alert__close",
+              onClick: withModifiers(closeHandler, ["stop"])
+            }), [
+              _cV(_component_up_icon, _uM({
+                name: "close",
+                color: iconColor.value,
+                size: "15"
+              }), null, 8 /* PROPS */, ["color"])
+            ])
+          : _cC("v-if", true)
+      ], 6 /* CLASS, STYLE */)
+    ]),
+    _: 1 /* STABLE */
+  }), 8 /* PROPS */, ["show"])
+}
+}
+
+})
+export default __sfc__
+export type UpAlertComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpAlertUpAlertStyles = [_uM([["u-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-alert", _pS(_uM([["position", "relative"], ["backgroundColor", "var(--theme-color, #0957de)"], ["paddingTop", 8], ["paddingRight", 10], ["paddingBottom", 8], ["paddingLeft", 10], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["borderTopLeftRadius", 4], ["borderTopRightRadius", 4], ["borderBottomLeftRadius", 4], ["borderBottomRightRadius", 4]]))], ["up-alert--primary--dark", _pS(_uM([["backgroundColor", "var(--theme-color, #0957de)"]]))], ["up-alert--primary--light", _pS(_uM([["backgroundColor", "#ecf5ff"]]))], ["up-alert--error--dark", _pS(_uM([["backgroundColor", "#f56c6c"]]))], ["up-alert--error--light", _pS(_uM([["backgroundColor", "#FEF0F0"]]))], ["up-alert--success--dark", _pS(_uM([["backgroundColor", "#5ac725"]]))], ["up-alert--success--light", _pS(_uM([["backgroundColor", "#f5fff0"]]))], ["up-alert--warning--dark", _pS(_uM([["backgroundColor", "#f9ae3d"]]))], ["up-alert--warning--light", _pS(_uM([["backgroundColor", "#FDF6EC"]]))], ["up-alert--info--dark", _pS(_uM([["backgroundColor", "#909399"]]))], ["up-alert--info--light", _pS(_uM([["backgroundColor", "#f4f4f5"]]))], ["up-alert__icon", _pS(_uM([["marginRight", 5]]))], ["up-alert__content", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["up-alert__content__title", _pS(_uM([["color", "#ffffff"], ["fontSize", 14], ["fontWeight", "bold"], ["marginBottom", 2]]))], ["up-alert__content__desc", _pS(_uM([["color", "#ffffff"], ["fontSize", 14], ["flexWrap", "wrap"]]))], ["up-alert__title--dark", _pS(_uM([["color", "#FFFFFF"]]))], ["up-alert__desc--dark", _pS(_uM([["color", "#FFFFFF"]]))], ["up-alert__text--primary--light", _pS(_uM([["color", "var(--theme-color, #0957de)"]]))], ["up-alert__text--success--light", _pS(_uM([["color", "#5ac725"]]))], ["up-alert__text--warning--light", _pS(_uM([["color", "#f9ae3d"]]))], ["up-alert__text--error--light", _pS(_uM([["color", "#f56c6c"]]))], ["up-alert__text--info--light", _pS(_uM([["color", "#909399"]]))], ["up-alert__close", _pS(_uM([["position", "absolute"], ["top", 11], ["right", 10]]))]])]

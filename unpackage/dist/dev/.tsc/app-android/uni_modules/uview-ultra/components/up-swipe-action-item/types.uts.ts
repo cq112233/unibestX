@@ -1,0 +1,22 @@
+export type UPCommonStyle = {
+	color ?: string,
+	fontSize ?: string,
+	backgroundColor ?: string,
+	borderRadius ?: string,
+	width ?: string,
+	height ?: string,
+	margin ?: string,
+	padding ?: string,
+	transform ?: string,
+	borderColor ?: string,
+}
+
+export type UPSwipeActionItemOption = {
+	text ?: string,
+	icon ?: string,
+	iconSize ?: string,
+	disabled ?: boolean,
+	style ?: UPCommonStyle
+}
+
+export {}
