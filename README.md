@@ -270,6 +270,7 @@ pnpm install
 3. **CSS 限制**：部分 CSS 属性在原生平台不支持，具体参考 [uni-app X 文档](https://uniapp.dcloud.net.cn/uni-app-x/)
 4. **API 限制**：原生平台不支持浏览器 API（如 `window`、`document`、`localStorage` 等）
 5. **SCSS 变量**：支持 SCSS 变量，但动态覆盖需使用 CSS 变量方式
+6. **鸿蒙分包图片已知问题**：鸿蒙（App-Harmony）分包页面中 `<image>` 标签路径解析存在框架已知 Bug，详见 [DCloud Issue #6033](https://github.com/dcloudio/uni-app/issues/6033)，等待官方更新修复。
 
 > \[!IMPORTANT]
 > **安卓端语法最严**：Android 编译器的 UTS 类型与语法校验是所有平台中最严格的。一般如果 Android 端编译正常通过，其他平台（H5、微信小程序、iOS等）通常都不会有大问题。
