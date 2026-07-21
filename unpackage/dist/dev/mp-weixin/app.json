@@ -1,0 +1,52 @@
+{
+  "pages": [
+    "src/pages/index/index",
+    "src/pages/me/me",
+    "src/pages/basic/basic",
+    "src/pages/function/function",
+    "src/pages/ai/ai"
+  ],
+  "subPackages": [
+    {
+      "root": "src/sub",
+      "pages": [
+        "auth/login",
+        "auth/register",
+        "test/test",
+        "paging/paging",
+        "uview-ultra/uview-ultra"
+      ]
+    }
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "uni-app x",
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#F8F8F8"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#999999",
+    "selectedColor": "#1890ff",
+    "backgroundColor": "#F8F8F8",
+    "list": [
+      {
+        "pagePath": "src/pages/index/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "src/pages/basic/basic",
+        "text": "基础"
+      },
+      {
+        "pagePath": "src/pages/function/function",
+        "text": "功能"
+      },
+      {
+        "pagePath": "src/pages/me/me",
+        "text": "我的"
+      }
+    ]
+  },
+  "usingComponents": {}
+}

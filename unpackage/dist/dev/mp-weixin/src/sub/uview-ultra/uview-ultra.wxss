@@ -1,0 +1,437 @@
+@import "../../../uvue.wxss";
+:host{display:flex;flex-direction:column}
+
+.b{border-width:var(--un-line-width-default,1px)}
+.bg-purple{background-color:rgba(128,0,128,var(--un-bg-opacity,1))}
+.flex-col{flex-direction:column}
+.flex-row{flex-direction:row}
+.font-500{font-weight:500}
+.h-10px{height:10px}
+.h-40px{height:40px}
+.items-center{align-items:center}
+.mb-6px{margin-bottom:6px}
+.mb-8px{margin-bottom:8px}
+.ml-10px{margin-left:10px}
+.mt-10px{margin-top:10px}
+.mt-15px{margin-top:15px}
+.mt-6px{margin-top:6px}
+.mt-8px{margin-top:8px}
+.none{display:none}
+.text-__2979ff_{color:#2979ff}
+.text-__303133_{color:#303133}
+.text-__909399_{color:#909399}
+.text-11px{font-size:11px}
+.text-12px{font-size:12px}
+.text-14px{font-size:14px}
+.text-right{text-align:right}
+.text-white{color:rgba(255,255,255,var(--un-color-opacity,1))}
+.w-10px{width:10px}
+.w-15px{width:15px}
+.w-20px{width:20px}
+.w-40px{width:40px}
+
+
+/* H5 构建不会拷贝 up-icon 的本地 iconfont.ttf，加 CDN 字体兜底 */
+@font-face {
+  font-family: iconfont;
+  src: url('https://at.alicdn.com/t/font_2225171_8kdcwk4po24.ttf') format('truetype');
+}
+.page-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #f5f5f5;
+}
+.section-title {
+  padding: 16px 16px 8px 16px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #303133;
+}
+.demo-block {
+  margin: 0 12px 12px 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+.demo-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+/* 用于替代 demo-row + justify-start，解决 App 端 UnoCSS 原子类覆盖不一致的问题 */
+.demo-row-start {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 8px;
+}
+.collapse-text {
+  font-size: 13px;
+  color: #909399;
+  line-height: 20px;
+}
+.grid-text {
+  font-size: 12px;
+  color: #606266;
+  margin-top: 4px;
+}
+.demo-layout {
+  height: 30px;
+  border-radius: 4px;
+}
+.bg-purple-light {
+  background-color: #eef2f7;
+}
+.bg-purple {
+  background-color: #ced7e6;
+}
+.bg-purple-dark {
+  background-color: #a2b4cd;
+}
+.swipe-action-content {
+  padding: 16px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #f0f0f0;
+}
+.demo-list-cell {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 16px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #f5f5f5;
+}
+.demo-list-cell-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #3c9cff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+}
+.demo-list-cell-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.list-loading {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.waterfall-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+.waterfall-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.waterfall-column-right {
+  margin-left: 8px;
+}
+.waterfall-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.waterfall-image {
+  width: 100%;
+}
+.waterfall-info {
+  padding: 8px;
+}
+.waterfall-title {
+  font-size: 13px;
+  color: #303133;
+  line-height: 18px;
+}
+.transition-demo-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+}
+.transition-demo-grid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+.transition-demo-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 23%;
+  margin-bottom: 12px;
+}
+.transition-demo-box {
+  width: 70px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+.transition-demo-blue {
+  background-color: #2979ff;
+}
+.transition-demo-green {
+  background-color: #19be6b;
+}
+.transition-demo-orange {
+  width: 180px;
+  background-color: #ff9900;
+}
+.qrcode-demo-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  padding: 12px;
+}
+.parse-demo-wrapper {
+  width: 100%;
+  background-color: #ffffff;
+  padding: 12px;
+  border-radius: 8px;
+}
+.steps-slot-icon {
+  width: 21px;
+  height: 21px;
+  background-color: #f9ae3d;
+  border-radius: 100px;
+  font-size: 12px;
+  color: #ffffff;
+  line-height: 21px;
+  text-align: center;
+}
+.tabs-right-slot {
+  padding-left: 4px;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+.navbar-mini-demo-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  background-color: #f5f5f5;
+  padding: 12px;
+  border-radius: 8px;
+}
+.navbar-mini-demo-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  background-color: #f5f5f5;
+  padding: 12px;
+  border-radius: 8px;
+}
+.navbar-mini-demo-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.tabbar-demo-wrapper {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.tabbar-slot-icon {
+  width: 22px;
+  height: 22px;
+}
+.waterfall-price {
+  font-size: 14px;
+  font-weight: bold;
+  color: #fa3534;
+  margin-top: 4px;
+}
+.index-list-demo-wrapper {
+  height: 800px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.index-list-demo-wrapper .up-index-list {
+  height: 100%;
+}
+.list-cell {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px 24rpx;
+  overflow: hidden;
+  background-color: #fff;
+}
+.list-cell-text {
+  color: #323233;
+  font-size: 14px;
+  line-height: 24px;
+}
+.u-nav-slot {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #e4e7ed;
+  border-radius: 100px;
+  padding: 4px 12px;
+  background-color: #ffffff;
+}
+.lazy-load-item {
+  width: 30%;
+  margin-right: 8px;
+  margin-bottom: 8px;
+}
+
+/* ==================== Dropdown Slot 样式 ==================== */
+.demo-sub-label {
+  font-size: 13px;
+  font-weight: normal;
+  color: #909399;
+  margin-bottom: 10px;
+}
+.dropdown-slot-content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.dropdown-scroll-item {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f5f5f5;
+}
+.dropdown-scroll-footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  padding: 12px;
+}
+.dropdown-grid-panel {
+  padding: 12px 8px;
+  width: 100%;
+}
+.dropdown-grid-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 4px;
+  margin-bottom: 10px;
+  background-color: #f7f8fa;
+  border-radius: 10px;
+  transition: background-color 0.2s;
+}
+.dropdown-grid-item:active {
+  background-color: #eef0f4;
+}
+.dropdown-grid-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  margin-bottom: 8px;
+}
+.dropdown-grid-label {
+  font-size: 12px;
+  color: #606266;
+  text-align: center;
+}
+
+/* ==================== Dropdown Card 卡片式样式 ==================== */
+.dropdown-card-panel {
+  padding: 12px;
+  width: 100%;
+}
+.dropdown-card-grid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.dropdown-card {
+  width: 48%;
+  background-color: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+.dropdown-card:active {
+  background-color: #f8f8f8;
+}
+.dropdown-card-img {
+  width: 100%;
+  height: 120px;
+  background-color: #f5f5f5;
+}
+.dropdown-card-body {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+.dropdown-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #303133;
+  line-height: 20px;
+}
+.dropdown-card-desc {
+  font-size: 12px;
+  color: #909399;
+  margin-top: 4px;
+  line-height: 16px;
+}
+.dropdown-card-footer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+.dropdown-card-price {
+  font-size: 15px;
+  font-weight: bold;
+  color: #fa3534;
+}
+.dropdown-card-tag {
+  padding: 2px 8px;
+  background-color: #fff3e0;
+  border-radius: 4px;
+}
+.dropdown-card-tag-text {
+  font-size: 10px;
+  color: #ff9800;
+}

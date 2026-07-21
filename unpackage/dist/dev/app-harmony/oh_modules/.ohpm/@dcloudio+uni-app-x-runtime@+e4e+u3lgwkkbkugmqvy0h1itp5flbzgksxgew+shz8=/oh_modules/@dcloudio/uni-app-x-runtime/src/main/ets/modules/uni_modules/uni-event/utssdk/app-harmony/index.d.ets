@@ -1,0 +1,15 @@
+type $OnCallback = Function;
+type $On = (eventName: string, callback: $OnCallback) => number;
+type $OnceCallback = Function;
+type $Once = (eventName: string, callback: $OnceCallback) => number;
+type $Off = (eventName: string, callback?: Object | null) => void;
+type $Emit = (eventName: string, ...args: Array<Object | null>) => void;
+declare const $on: $On;
+declare const $once: $Once;
+declare const $off: $Off;
+declare const $emit: $Emit;
+export { $Emit as $Emit, $Off as $Off, $On as $On, $Once as $Once };
+export { $on as $on };
+export { $once as $once };
+export { $off as $off };
+export { $emit as $emit };

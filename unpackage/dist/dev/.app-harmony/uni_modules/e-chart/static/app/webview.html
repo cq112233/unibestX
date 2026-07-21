@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<style type="text/css">
+			html,
+			body,
+			#chartDom {
+                width: 100%;
+                height: 100%;
+				padding: 0;
+				margin: 0;
+				background-color: transparent;
+			}
+		</style>
+	</head>
+    
+	<body>
+		<div id="chartDom"></div>
+		<!-- static目录采用条件编译,放在app目录,避免打包到微信小程序: https://uniapp.dcloud.net.cn/tutorial/platform.html#static -->
+		<script type="text/javascript" src="./uni.webview.1.5.5.js"></script>
+		<script type="text/javascript" src="./echarts.min.js"></script>
+		
+		<!-- 日志输出 -->
+		<!-- <script type="text/javascript" src="https://unpkg.com/vconsole@3.15.1/dist/vconsole.min.js"></script> -->
+		
+		<script type="text/javascript">
+            let echartObj;
+
+			// 日志输出
+			// new window.VConsole();
+			
+			function vlog(...msg){
+				console.log(msg)
+			}
+			
+            // 初始化图表
+			function init(option) {
+				vlog('init', option);
+                const chartDom = document.getElementById('chartDom')
+				echartObj = echarts.init(chartDom, option.theme, option.opts)
+			}
+			
+            // 图表配置
+            function setOption(option, notMerge, lazyUpdate) {
+				vlog('setOption', option, notMerge, lazyUpdate);
+                echartObj.setOption(option, notMerge, lazyUpdate)
+            }
+			
+            // 获取宽度
+            function getWidth() {
+               const width = echartObj.getWidth()
+               postMessage('getWidth', {width});
+            }
+			
+            // 获取高度
+            function getHeight() {
+               const height = echartObj.getHeight()
+			   postMessage('getHeight', {height});
+            }
+			
+			// 获取配置
+			function getOption(){
+				const option = echartObj.getOption()
+				postMessage('getOption', option);
+			}
+			
+            // 改变图表尺寸
+            function resize(option) {
+				vlog('resize', option);
+            	echartObj.resize(option)
+            }
+            
+            // 触发图表行为
+            function dispatchAction(option) {
+				vlog('dispatchAction', option);
+            	echartObj.dispatchAction(option)
+            }
+			
+			// 图表事件 option: {name, query}; 不可写成on(name, query),因为无法传递单纯的string,必须为对象形态的string
+			function on(option) {
+				vlog('on', option);
+				const name = option.name;
+				const query = option.query;
+				const callback = function(e){
+					var event = {};
+					Object.keys(e).forEach(function(key) {
+						if (key != 'event') event[key] = e[key]; // 过滤无法序列化的属性
+					});
+					postMessage(name, event);
+				}
+				
+				if (query) {
+					echartObj.on(name, query, callback)
+				} else{
+					echartObj.on(name, callback)
+				}
+			}
+			
+			// 解绑事件
+			function off(option) {
+				vlog('off', option);
+				echartObj.off(option.name)
+			}
+			
+			// 显示加载动画
+			function showLoading(option) {
+				vlog('showLoading', option);
+				echartObj.showLoading('default', option)
+			}
+			
+			// 隐藏加载动画
+			function hideLoading() {
+				vlog('hideLoading');
+				echartObj.hideLoading()
+			}
+			
+			// 增加数据
+			function appendData(option) {
+				vlog('appendData', option);
+				echartObj.appendData(option)
+			}
+			
+            // 向webview外部派发消息
+            function postMessage(type, data) {
+				vlog('postMessage', type, data);
+            	uni.webView.postMessage({ data: {type, data} })
+            }
+            
+            // 图表转图片
+            function canvasToTempFilePath(option) {
+				vlog('canvasToTempFilePath', option);
+            	const base64 = echartObj.getDataURL(option)
+            	postMessage('canvasToTempFilePath', { base64 })
+            }
+            
+            // 清空当前实例
+            function clear() {
+				vlog('clear');
+            	echartObj.clear()
+            }
+			
+            // 销毁图表
+            function dispose() {
+				vlog('dispose');
+            	echartObj.dispose()
+            }
+		</script>
+	</body>
+</html>

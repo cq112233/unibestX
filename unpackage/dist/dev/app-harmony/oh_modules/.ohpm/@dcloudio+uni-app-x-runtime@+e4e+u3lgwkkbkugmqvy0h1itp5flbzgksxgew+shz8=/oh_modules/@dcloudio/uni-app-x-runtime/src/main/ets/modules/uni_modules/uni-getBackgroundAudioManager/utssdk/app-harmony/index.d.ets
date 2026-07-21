@@ -1,0 +1,53 @@
+import { IUniError } from "@dcloudio/uni-app-framework";
+type GetBackgroundAudioManager = () => BackgroundAudioManager;
+interface BackgroundAudioManager {
+    duration: number;
+    currentTime: number;
+    paused: boolean;
+    src: string;
+    startTime: number;
+    buffered: number;
+    title: string;
+    epname: string;
+    singer: string;
+    coverImgUrl: string;
+    webUrl: string;
+    protocol: string;
+    playbackRate?: number;
+    cache: boolean;
+    play(): void;
+    pause(): void;
+    seek(position: number): void;
+    stop(): void;
+    onCanplay(callback: (result: Object) => void): void;
+    onPlay(callback: (result: Object) => void): void;
+    onPause(callback: (result: Object) => void): void;
+    onStop(callback: (result: Object) => void): void;
+    onEnded(callback: (result: Object) => void): void;
+    onSeeking(callback: (result: Object) => void): void;
+    onSeeked(callback: (result: Object) => void): void;
+    onTimeUpdate(callback: (result: Object) => void): void;
+    onPrev(callback: (result: Object) => void): void;
+    onNext(callback: (result: Object) => void): void;
+    onError(callback: (result: ICreateBackgroundAudioFail) => void): void;
+    onWaiting(callback: (result: Object) => void): void;
+    offCanplay(): void;
+    offPlay(): void;
+    offPause(): void;
+    offStop(): void;
+    offEnded(): void;
+    offSeeking(): void;
+    offSeeked(): void;
+    offTimeUpdate(): void;
+    offPrev(): void;
+    offNext(): void;
+    offError(): void;
+    offWaiting(): void;
+}
+type CreateBackgroundAudioErrorCode = 1107601 | 1107602 | 1107603 | 1107604 | 1107605 | 1107609;
+interface ICreateBackgroundAudioFail extends IUniError {
+    errCode: CreateBackgroundAudioErrorCode;
+}
+declare const getBackgroundAudioManager: GetBackgroundAudioManager;
+export { BackgroundAudioManager as BackgroundAudioManager, CreateBackgroundAudioErrorCode as CreateBackgroundAudioErrorCode, GetBackgroundAudioManager as GetBackgroundAudioManager, ICreateBackgroundAudioFail as ICreateBackgroundAudioFail };
+export { getBackgroundAudioManager as getBackgroundAudioManager };
