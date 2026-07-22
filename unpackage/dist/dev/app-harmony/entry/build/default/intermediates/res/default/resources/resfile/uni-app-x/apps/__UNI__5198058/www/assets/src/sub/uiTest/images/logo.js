@@ -1,4 +1,4 @@
-const _imports_0 = "/assets/logo.de257528.png";
+const _imports_0 = "/static/logo.png";
 export {
   _imports_0 as _
 };

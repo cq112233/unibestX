@@ -24,11 +24,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.ref(30);
     common_vendor.ref(3);
     common_vendor.ref(true);
-    function goToUiTest() {
-      common_vendor.index.navigateTo({
-        url: "/src/sub/uiTest/uiTest"
-      });
-    }
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
@@ -36,17 +31,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           title: "首页",
           ["show-back"]: false
         }),
-        b: common_vendor.o(goToUiTest, "27"),
-        c: common_assets._imports_0,
-        d: common_vendor.p({
+        b: common_assets._imports_0,
+        c: common_vendor.p({
           ["navigation-style"]: "custom",
           ["navigation-bar-title-text"]: "首页"
         }),
-        e: common_vendor.gei(_ctx, ""),
-        f: common_vendor.p({
+        d: common_vendor.gei(_ctx, ""),
+        e: common_vendor.p({
           id: common_vendor.gei(_ctx, "")
         }),
-        g: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        f: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
       return __returned__;
     };

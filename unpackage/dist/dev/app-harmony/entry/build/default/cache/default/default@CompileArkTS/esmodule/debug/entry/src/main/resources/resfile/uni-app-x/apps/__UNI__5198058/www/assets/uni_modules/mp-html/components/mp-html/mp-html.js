@@ -309,7 +309,7 @@ const _sfc_main = defineComponent({
     parseTable(html) {
       const rows = [];
       let i = 0;
-      while (true) {
+      while (i < html.length) {
         const trS = html.indexOf("<tr", i);
         if (trS == -1)
           break;
@@ -319,25 +319,26 @@ const _sfc_main = defineComponent({
         const trE = html.indexOf("</tr>", trGt);
         if (trE == -1)
           break;
-        html.substring(trGt + 1, trE);
+        const trInner = html.substring(trGt + 1, trE);
         const cells = [];
         let ci = 0;
-        while (true) {
-          const tdS = html.indexOf("<t", trGt + 1 + ci);
-          if (tdS == -1 || tdS >= trE)
+        while (ci < trInner.length) {
+          const tdS = trInner.indexOf("<t", ci);
+          if (tdS == -1)
             break;
-          const cellTag = html.charAt(tdS + 1) == "h" ? "th" : html.charAt(tdS + 1) == "d" ? "td" : "";
+          const ch = trInner.charAt(tdS + 2).toLowerCase();
+          const cellTag = ch == "h" ? "th" : ch == "d" ? "td" : "";
           if (cellTag.length == 0) {
-            ci = tdS - trGt + 2;
+            ci = tdS + 2;
             continue;
           }
-          const tdGt = html.indexOf(">", tdS);
-          if (tdGt == -1 || tdGt >= trE)
+          const tdGt = trInner.indexOf(">", tdS);
+          if (tdGt == -1)
             break;
-          const tdE = html.indexOf("</" + cellTag + ">", tdGt);
-          if (tdE == -1 || tdE >= trE)
+          const tdE = trInner.indexOf("</" + cellTag + ">", tdGt);
+          if (tdE == -1)
             break;
-          const text = this.stripAllTags(html.substring(tdGt + 1, tdE));
+          const text = this.stripAllTags(trInner.substring(tdGt + 1, tdE));
           cells.push(new HtmlNode({
             attrs: null,
             type: null,
@@ -351,7 +352,7 @@ const _sfc_main = defineComponent({
               text
             })]
           }));
-          ci = tdE + cellTag.length + 3 - trGt - 1;
+          ci = tdE + cellTag.length + 3;
         }
         rows.push(new HtmlNode({
           attrs: null,
@@ -493,7 +494,7 @@ const _sfc_main = defineComponent({
       this.$emit("linktap", (_b = n.attrs) !== null && _b !== void 0 ? _b : new UTSJSONObject({}));
       if (href.length > 0 && href.includes("://")) {
         uni.setClipboardData({ data: href, success: () => {
-          return uni.showToast({ title: "链接已复制", icon: "none" });
+          uni.showToast({ title: "链接已复制", icon: "none" });
         } });
       }
     }

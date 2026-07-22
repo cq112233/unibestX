@@ -2,9 +2,9 @@
   <view>
     <NavBar title="首页" :show-back="false" />
     <view class="content-container pb-20px">
-      <view class="mx-30px mt-15px">
+      <!-- <view class="mx-30px mt-15px">
         <button type="primary" @click="goToUiTest">前往 uiTest 测试页</button>
-      </view>
+      </view> -->
       <image class="w-100px h-100px mx-auto mt-20px rounded-20px" src="/static/logo.png" />
       <text class="text-32px text-bold mx-auto mt-10px text-[#d14328]">
         unibestX
@@ -81,7 +81,7 @@ function switchBg() {
 
 function goToUiTest() {
   uni.navigateTo({
-    url: '/src/sub/uiTest/uiTest'
+    url: '/src/sub/uiTest/uiTest',
   })
 }
 </script>

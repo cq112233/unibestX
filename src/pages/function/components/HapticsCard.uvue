@@ -29,6 +29,10 @@ import type Vibrator from 'android.os.Vibrator'
 import type VibratorManager from 'android.os.VibratorManager'
 // #endif
 
+// #ifdef APP-HARMONY
+import vibrator from '@ohos.vibrator'
+// #endif
+
 const copyText = ref('Hello unibestX!')
 
 // #ifdef APP-ANDROID
@@ -69,12 +73,49 @@ function vibrationIOS() : void {
 }
 // #endif
 
+// #ifdef APP-HARMONY
+function vibrationHarmony() : void {
+  try {
+    vibrator.startVibration({
+      type: 'time',
+      duration: 15,
+    }, {
+      id: 0,
+      usage: 'unknown',
+    }).then(() => {
+      uni.showToast({ title: '已触发鸿蒙短震动', icon: 'none' })
+    }).catch((_err : any) => {
+      uni.vibrateShort({
+        success: () => {
+          uni.showToast({ title: '已触发鸿蒙短震动', icon: 'none' })
+        },
+        fail: () => {
+          uni.showToast({ title: '鸿蒙震动触发失败', icon: 'none' })
+        }
+      })
+    })
+  } catch (e : any) {
+    uni.vibrateShort({
+      success: () => {
+        uni.showToast({ title: '已触发鸿蒙短震动', icon: 'none' })
+      },
+      fail: () => {
+        uni.showToast({ title: '鸿蒙震动调用失败', icon: 'none' })
+      }
+    })
+  }
+}
+// #endif
+
 function triggerVibration() {
   // #ifdef APP-ANDROID
   vibrationAndroid()
   // #endif
   // #ifdef APP-IOS
   vibrationIOS()
+  // #endif
+  // #ifdef APP-HARMONY
+  vibrationHarmony()
   // #endif
   // #ifndef APP
   uni.showToast({

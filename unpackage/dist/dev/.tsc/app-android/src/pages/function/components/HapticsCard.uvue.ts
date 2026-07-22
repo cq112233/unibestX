@@ -9,6 +9,10 @@ import type VibratorManager from 'android.os.VibratorManager'
 
 
 
+
+
+
+
 const __sfc__ = defineComponent({
   __name: 'HapticsCard',
   setup(__props) {
@@ -56,9 +60,46 @@ function vibrationAndroid() : void {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function triggerVibration() {
 
   vibrationAndroid()
+
+
+
 
 
 

@@ -35,7 +35,7 @@ function switchBg() {
 
 function goToUiTest() {
   uni.navigateTo({
-    url: '/src/sub/uiTest/uiTest'
+    url: '/src/sub/uiTest/uiTest',
   })
 }
 
@@ -56,12 +56,6 @@ const _component_NavBar = resolveEasyComponent("NavBar",_easycom_NavBar)
               "show-back": false
             })),
             _cE("view", _uM({ class: "content-container pb-20px" }), [
-              _cE("view", _uM({ class: "mx-30px mt-15px" }), [
-                _cE("button", _uM({
-                  type: "primary",
-                  onClick: goToUiTest
-                }), "前往 uiTest 测试页")
-              ]),
               _cE("image", _uM({
                 class: "w-100px h-100px mx-auto mt-20px rounded-20px",
                 src: "/static/logo.png"

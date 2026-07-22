@@ -1,5 +1,5 @@
 import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/components/NavBar/NavBar&";
-const { defineComponent, onBackPress, ref, resolveDynamicComponent, openBlock, createBlock, withCtx, createVNode, createElementVNode } = globalThis.Vue
+const { defineComponent, onBackPress, ref, resolveDynamicComponent, openBlock, createBlock, withCtx, createVNode, createElementVNode, createCommentVNode } = globalThis.Vue
 import { A as AppKu, r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { L as LayoutComponent } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/layouts/default&";
 import { h as handleBackPressExit } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/backPress&";
@@ -112,12 +112,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
               "show-back": false
             }),
             createElementVNode("view", { class: "content-container pb-20px" }, [
-              createElementVNode("view", { class: "mx-30px mt-15px" }, [
-                createElementVNode("button", {
-                  type: "primary",
-                  onClick: $setup.goToUiTest
-                }, "前往 uiTest 测试页")
-              ]),
+              createCommentVNode(' <view class="mx-30px mt-15px">\n        <button type="primary" @click="goToUiTest">前往 uiTest 测试页</button>\n      </view> '),
               createElementVNode("image", {
                 class: "w-100px h-100px mx-auto mt-20px rounded-20px",
                 src: _imports_0

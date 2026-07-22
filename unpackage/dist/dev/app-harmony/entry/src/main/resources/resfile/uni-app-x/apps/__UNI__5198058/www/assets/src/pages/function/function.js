@@ -1,4 +1,4 @@
-const { defineComponent, onBackPress, openBlock, createBlock, withCtx, createVNode, createElementVNode, createCommentVNode } = globalThis.Vue
+import ohos_vibrator from '@ohos.vibrator';const { defineComponent, onBackPress, openBlock, createBlock, withCtx, createVNode, createElementVNode, createCommentVNode } = globalThis.Vue
 import { A as AppKu } from "../../../App.ku.js";
 import { L as LayoutComponent } from "../../layouts/default.js";
 import { S as SystemInfoCard } from "./components/SystemInfoCard.js";
@@ -63,6 +63,7 @@ import "../../i18n/locales/zh_CN.js";
 import "../../i18n/locales/en_US.js";
 import "../../utils/toast.js";
 import "../basic/components/Card.js";
+import "@ohos.vibrator";
 const _sfc_main = /* @__PURE__ */ defineComponent({
   __name: "function",
   setup(__props, _a) {

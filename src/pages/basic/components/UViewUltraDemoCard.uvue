@@ -5,6 +5,13 @@
         uview-ultra 是一款专为 uni-app X 设计的高品质 UI 组件库，高度适配 UTS 强类型系统与原生跨端开发，包含按钮、表单、反馈等丰富且精美的组件集。
       </text>
 
+      <!-- 官网网址提示 -->
+      <view class="flex-row items-center bg-[#f1f5f9] p-8px rounded-6px mb-12px" @click="copyWebsiteUrl">
+        <text class="text-12px text-[#475569] font-medium mr-4px">官网：</text>
+        <text class="text-12px text-[#2563eb] underline flex-1">https://uview-ultra.lingyun.net/</text>
+        <text class="text-11px text-[#94a3b8]">点击复制</text>
+      </view>
+
       <!-- 亮点标签点缀 -->
       <view class="flex-row items-center mb-4px flex-wrap">
         <view class="mr-6px mb-4px px-10px py-3px rounded-20px bg-[#e0edff] border-width-1px border-style-solid border-color-[#bfdbfe]">
@@ -33,6 +40,18 @@
 import Card from './Card.uvue'
 
 let isNavigating = false
+
+function copyWebsiteUrl() {
+  uni.setClipboardData({
+    data: 'https://uview-ultra.lingyun.net/',
+    success: () => {
+      uni.showToast({
+        title: '官网网址已复制到剪贴板',
+        icon: 'none',
+      })
+    },
+  })
+}
 
 function navigateToShowcase() {
   if (isNavigating) {
