@@ -33,6 +33,11 @@
             "value": true
           },
           {
+            "path": "strictMode.noExternalImportByPath",
+            "traceValue": true,
+            "value": true
+          },
+          {
             "path": "arkOptions",
             "traceValue": false,
             "value": ""
@@ -50,14 +55,11 @@
         ],
         "PACKAGE_JSON": [],
         "MODULE_TYPE": "entry",
-        "INCREMENTAL_TASKS": {
-          "COMPILE_ARKTS": false
-        },
-        "IS_INCREMENTAL_MODULE": false
+        "IS_INCREMENTAL_MODULE": true
       }
     ],
     "NATIVE_COMPILER": "Default",
-    "IS_FULL_BUILD": true,
+    "IS_FULL_BUILD": false,
     "PACKAGE_JSON": [],
     "BUILD_MODE": "debug",
     "USE_NORMALIZED_OHMURL": true
@@ -71,26 +73,16 @@
     "BUILD_ANALYSIS_MODE": "normal",
     "TASK_TIME": {
       "923fe53966c6cd9343e11af776cd4b05be315ea4b200b02e4d5dfb0f929b73bf": {
-        "PreBuild": 4101042,
-        "CreateModuleInfo": 224250,
-        "ConfigureCmake": 125500,
-        "MergeProfile": 2101458,
-        "CreateBuildProfile": 651125,
-        "PreCheckSyscap": 105833,
-        "GeneratePkgSdkInfo": 961667,
-        "ProcessIntegratedHsp": 491708,
-        "BuildNativeWithCmake": 108708,
-        "MakePackInfo": 981292,
-        "SyscapTransform": 1136875,
-        "ProcessProfile": 55268500,
-        "ProcessRouterMap": 952792,
-        "ProcessShareConfig": 697167,
-        "ProcessStartupConfig": 929416,
-        "BuildNativeWithNinja": 131709,
-        "GenerateLoaderJson": 5475208,
-        "ProcessLibs": 1399042,
-        "CompileResource": 410049458,
-        "BuildJS": 502000
+        "PreBuild": 10644208,
+        "ConfigureCmake": 114750,
+        "BuildNativeWithCmake": 77416,
+        "BuildNativeWithNinja": 290083,
+        "ProcessLibs": 59337709,
+        "ColdReloadArkTS": 1218651292,
+        "PrepareQuickfix": 16672834,
+        "PackageHqf": 160277958,
+        "SignHqf": 58954375,
+        "assembleDevHqf": 340125
       }
     },
     "CUSTOM_TASK_TIME": {},
@@ -103,76 +95,7 @@
       "ENABLE_CPP_FUNCTION_LEVEL_INCREMENTAL": false
     },
     "CONFIG_PROPERTIES": {},
-    "TOTAL_TIME": 2222612584,
-    "BUILD_ID": "202607221829070840",
-    "ERROR_MESSAGE": [
-      {
-        "CODE": "10505001",
-        "STACK": "...\n10505001 ArkTS Compiler Error\n...\n10505001 ArkTS Compiler Error\n...",
-        "PROJECT_CONFIG": {
-          "buildMode": "Debug",
-          "compileMode": "esmodule",
-          "moduleType": "entry",
-          "targetName": ".default",
-          "packageManagerType": "ohpm",
-          "isLocalTest": false,
-          "needCoverageInsert": false,
-          "debugLine": false,
-          "compileSdkVersion": 24,
-          "compatibleSdkVersion": 13,
-          "originCompatibleSdkVersion": "5.0.1(13)",
-          "etsLoaderVersion": "6.1.1.125",
-          "etsLoaderReleaseType": "Release",
-          "aotCompileMode": "type",
-          "isCrossplatform": false,
-          "bundleType": "app",
-          "apiVersion": 24,
-          "isFaMode": false,
-          "deviceTypes": [
-            "phone",
-            "tablet",
-            "2in1"
-          ],
-          "integratedHsp": false,
-          "branchElimination": false,
-          "tsImportSendable": false,
-          "resolveConflictMode": true,
-          "useNativeResolver": true,
-          "shouldEmitJs": true,
-          "useTscResolve": false,
-          "singleFileEmit": false,
-          "executionMode": "memory",
-          "isHarDeduplicateEnabled": false,
-          "autoLazyImport": false,
-          "allowEmptyBundleName": false,
-          "reExportCheckMode": "noCheck",
-          "usePathPlaceholder": false,
-          "writeRollupCache": true,
-          "isExpandImportEnabled": false,
-          "ignoreCrossplatformCheck": false,
-          "skipOhModulesLint": false,
-          "enableStrictCheckOHModule": false,
-          "useDeclarationFileSignature": false,
-          "isPreloadSoEnabled": false,
-          "strictMode.caseSensitiveCheck": true,
-          "strictMode.useNormalizedOHMUrl": true,
-          "strictMode.noExternalImportByPath": true,
-          "runtimeOS": "HarmonyOS",
-          "sdkInfo": "false:24:6.1.1.125:Release",
-          "useSourceHash": false,
-          "isByteCodeHarOptimize": false,
-          "copyCodeResourceEnable": true,
-          "uiTransformOptimization": false
-        }
-      },
-      {
-        "CODE": "10505001",
-        "TIMESTAMP": "1784716149306"
-      },
-      {
-        "CODE": "10505001",
-        "TIMESTAMP": "1784716149306"
-      }
-    ]
+    "TOTAL_TIME": 1640091667,
+    "BUILD_ID": "202607221842188870"
   }
 }

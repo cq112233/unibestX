@@ -136,13 +136,9 @@
 	
 	// 是否禁用，如果父组件up-checkbox-group禁用的话，将会忽略子组件的配置
 	const elDisabled = computed((): boolean => {
-		let disabledStr = props.disabled
-		if (disabledStr != '') {
-			if (disabledStr == 'true') {
-				return true;
-			} else {
-				return false;
-			}
+		let disabledVal = props.disabled
+		if (disabledVal != null && disabledVal.toString() != '') {
+			return disabledVal.toString() == 'true'
 		} else {
 			return parentData.value['disabled'] != null ? parentData.value['disabled'] as boolean : false
 		}
@@ -150,13 +146,9 @@
 	
 	// 是否禁用label点击
 	const elLabelDisabled = computed((): boolean => {
-		let labelDisabledStr = props.labelDisabled
-		if (labelDisabledStr != '') {
-			if (labelDisabledStr == 'true') {
-				return true;
-			} else {
-				return false;
-			}
+		let labelDisabledVal = props.labelDisabled
+		if (labelDisabledVal != null && labelDisabledVal.toString() != '') {
+			return labelDisabledVal.toString() == 'true'
 		} else {
 			return parentData.value['labelDisabled'] != null ? parentData.value['labelDisabled'] as boolean : false
 		}

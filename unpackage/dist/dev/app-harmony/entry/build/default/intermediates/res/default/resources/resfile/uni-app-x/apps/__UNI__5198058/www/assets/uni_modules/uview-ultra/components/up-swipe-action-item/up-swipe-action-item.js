@@ -93,13 +93,19 @@ const _sfc_main = defineComponent({
       if (UTS.isInstanceOf(style, UTSJSONObject))
         return style;
       try {
+        const obj = style;
+        if (obj != null)
+          return obj;
+      } catch (_e1) {
+      }
+      try {
         const m = style;
         const obj = new UTSJSONObject({});
         m.forEach((value = null, key) => {
           obj[key] = value;
         });
         return obj;
-      } catch (_e) {
+      } catch (_e2) {
         return null;
       }
     },

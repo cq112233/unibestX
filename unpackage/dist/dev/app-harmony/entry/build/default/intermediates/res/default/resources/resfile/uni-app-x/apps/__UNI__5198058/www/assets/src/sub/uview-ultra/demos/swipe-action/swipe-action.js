@@ -1,5 +1,5 @@
 import { _ as __easycom_0 } from "../../../../components/NavBar/NavBar.js";
-const { defineComponent, resolveDynamicComponent, openBlock, createBlock, withCtx, createVNode, createElementVNode } = globalThis.Vue
+const { defineComponent, ref, resolveDynamicComponent, openBlock, createBlock, withCtx, createVNode, createElementVNode } = globalThis.Vue
 import { A as AppKu, r as resolveEasycom } from "../../../../../App.ku.js";
 import { _ as __easycom_1 } from "../../../../../uni_modules/uview-ultra/components/up-swipe-action-item/up-swipe-action-item.js";
 import { _ as __easycom_2 } from "../../../../../uni_modules/uview-ultra/components/up-swipe-action/up-swipe-action.js";
@@ -72,7 +72,29 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
   setup(__props, _a) {
     var __expose = _a.expose;
     __expose();
-    const __returned__ = { get AppKu() {
+    const options1 = ref([
+      new UTSJSONObject({
+        text: "删除",
+        style: new UTSJSONObject({
+          backgroundColor: "#f56c6c"
+        })
+      })
+    ]);
+    const options2 = ref([
+      new UTSJSONObject({
+        text: "置顶",
+        style: new UTSJSONObject({
+          backgroundColor: "#2979ff"
+        })
+      }),
+      new UTSJSONObject({
+        text: "删除",
+        style: new UTSJSONObject({
+          backgroundColor: "#f56c6c"
+        })
+      })
+    ]);
+    const __returned__ = { options1, options2, get AppKu() {
       return AppKu;
     }, get LayoutComponent() {
       return LayoutComponent;
@@ -81,7 +103,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     return __returned__;
   }
 });
-const _style_0 = { "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "bg-__fff_": { "": { "backgroundImage": "none", "backgroundColor": "#ffffff" } }, "mt-12px": { "": { "marginTop": 12 } }, "p-15px": { "": { "paddingTop": 15, "paddingRight": 15, "paddingBottom": 15, "paddingLeft": 15 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "pb-30px": { "": { "paddingBottom": 30 } } };
+const _style_0 = { "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "bg-__fff_": { "": { "backgroundImage": "none", "backgroundColor": "#ffffff" } }, "mt-12px": { "": { "marginTop": 12 } }, "p-15px": { "": { "paddingTop": 15, "paddingRight": 15, "paddingBottom": 15, "paddingLeft": 15 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "pb-30px": { "": { "paddingBottom": 30 } }, "rounded-5px": { "": { "borderTopLeftRadius": 5, "borderTopRightRadius": 5, "borderBottomRightRadius": 5, "borderBottomLeftRadius": 5 } } };
 const _style_1 = { "demo-block": { "": { "marginBottom": 12, "paddingTop": 12, "paddingRight": 12, "paddingBottom": 12, "paddingLeft": 12, "backgroundColor": "#ffffff", "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "demo-label": { "": { "fontSize": 14, "fontWeight": "bold", "color": "#606266", "marginBottom": 10, "paddingLeft": 4, "borderLeftWidth": 3, "borderLeftStyle": "solid", "borderLeftColor": "#2979ff" } } };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_NavBar = resolveEasycom(resolveDynamicComponent("NavBar"), __easycom_0);
@@ -104,13 +126,15 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                 createElementVNode("text", { class: "demo-label" }, "基础用法"),
                 createVNode(_component_up_swipe_action, null, {
                   default: withCtx(() => [
-                    createVNode(_component_up_swipe_action_item, { options: [{ text: "删除", style: { backgroundColor: "#f56c6c" } }] }, {
+                    createVNode(_component_up_swipe_action_item, { options: $setup.options1 }, {
                       default: withCtx(() => [
-                        createElementVNode("view", { style: { "padding": "15px", "background": "#fff", "border-radius": "5px" } }, "左滑查看操作选项")
+                        createElementVNode("view", { class: "p-15px bg-__fff_ rounded-5px" }, [
+                          createElementVNode("text", null, "操作选项")
+                        ])
                       ]),
                       _: 1
                       /* STABLE */
-                    })
+                    }, 8, ["options"])
                   ]),
                   _: 1
                   /* STABLE */
@@ -120,13 +144,15 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                 createElementVNode("text", { class: "demo-label" }, "多按钮"),
                 createVNode(_component_up_swipe_action, null, {
                   default: withCtx(() => [
-                    createVNode(_component_up_swipe_action_item, { options: [{ text: "置顶", style: { backgroundColor: "#2979ff" } }, { text: "删除", style: { backgroundColor: "#f56c6c" } }] }, {
+                    createVNode(_component_up_swipe_action_item, { options: $setup.options2 }, {
                       default: withCtx(() => [
-                        createElementVNode("view", { class: "p-15px bg-__fff_ border-radius-5px" }, "左滑显示多按钮")
+                        createElementVNode("view", { class: "p-15px bg-__fff_ rounded-5px" }, [
+                          createElementVNode("text", null, "多按钮操作")
+                        ])
                       ]),
                       _: 1
                       /* STABLE */
-                    })
+                    }, 8, ["options"])
                   ]),
                   _: 1
                   /* STABLE */

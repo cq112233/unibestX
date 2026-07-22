@@ -1,0 +1,39 @@
+class UPCalendarMonthsItemDate extends UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          date: { type: "Unknown", optional: false },
+          dateStr: { type: String, optional: true },
+          selected: { type: Boolean, optional: true },
+          disabled: { type: Boolean, optional: true },
+          dot: { type: Boolean, optional: true },
+          day: { type: String, optional: true },
+          week: { type: Number, optional: false },
+          month: { type: Number, optional: true },
+          bottomInfo: { type: String, optional: true }
+        };
+      },
+      name: "UPCalendarMonthsItemDate"
+    };
+  }
+  constructor(options, metadata = UPCalendarMonthsItemDate.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.date = this.__props__.date;
+    this.dateStr = this.__props__.dateStr;
+    this.selected = this.__props__.selected;
+    this.disabled = this.__props__.disabled;
+    this.dot = this.__props__.dot;
+    this.day = this.__props__.day;
+    this.week = this.__props__.week;
+    this.month = this.__props__.month;
+    this.bottomInfo = this.__props__.bottomInfo;
+    delete this.__props__;
+  }
+}
+export {
+  UPCalendarMonthsItemDate as U
+};
+//# sourceMappingURL=types.js.map

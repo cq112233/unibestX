@@ -102,14 +102,9 @@ const __sfc__ = defineComponent({
         const isChecked = ref(false);
         // 是否禁用，如果父组件up-checkbox-group禁用的话，将会忽略子组件的配置
         const elDisabled = computed((): boolean => {
-            let disabledStr = props.disabled;
-            if (disabledStr != '') {
-                if (disabledStr == 'true') {
-                    return true;
-                }
-                else {
-                    return false;
-                }
+            let disabledVal = props.disabled;
+            if (disabledVal != null && disabledVal.toString() != '') {
+                return disabledVal.toString() == 'true';
             }
             else {
                 return parentData.value['disabled'] != null ? parentData.value['disabled'] as boolean : false;
@@ -117,14 +112,9 @@ const __sfc__ = defineComponent({
         });
         // 是否禁用label点击
         const elLabelDisabled = computed((): boolean => {
-            let labelDisabledStr = props.labelDisabled;
-            if (labelDisabledStr != '') {
-                if (labelDisabledStr == 'true') {
-                    return true;
-                }
-                else {
-                    return false;
-                }
+            let labelDisabledVal = props.labelDisabled;
+            if (labelDisabledVal != null && labelDisabledVal.toString() != '') {
+                return labelDisabledVal.toString() == 'true';
             }
             else {
                 return parentData.value['labelDisabled'] != null ? parentData.value['labelDisabled'] as boolean : false;
@@ -228,7 +218,7 @@ const __sfc__ = defineComponent({
         });
         const iconWrapStyle = computed((): any => {
             // checkbox的整体样式
-            const style = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-checkbox/up-checkbox.uvue", 271, 9), } as UTSJSONObject;
+            const style = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-checkbox/up-checkbox.uvue", 263, 9), } as UTSJSONObject;
             if (isChecked.value && !elDisabled.value) {
                 if (elActiveColor.value != '#2979ff') {
                     style['backgroundColor'] = elActiveColor.value;
@@ -251,7 +241,7 @@ const __sfc__ = defineComponent({
             return style;
         });
         const checkboxStyle = computed((): any => {
-            const style = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-checkbox/up-checkbox.uvue", 294, 9), } as UTSJSONObject;
+            const style = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-checkbox/up-checkbox.uvue", 286, 9), } as UTSJSONObject;
             if (!props.usedAlone && parentData.value != null && parentData.value['borderBottom'] != null) {
                 if (parentData.value['borderBottom']!.toString() == 'true' && parentData.value['placement'] == 'row') {
                     error('检测到您将borderBottom设置为true，需要同时将up-checkbox-group的placement设置为column才有效');
