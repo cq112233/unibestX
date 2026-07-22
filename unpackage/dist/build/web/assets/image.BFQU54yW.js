@@ -1,0 +1,1 @@
+const o=new UTSJSONObject({image:new UTSJSONObject({src:"",mode:"aspectFill",width:"300",height:"225",shape:"square",radius:"0",lazyLoad:!1,showMenuByLongpress:!0,loadingIcon:"photo",errorIcon:"error-circle",showLoading:!0,showError:!0,fade:!0,webp:!1,duration:500,bgColor:"#f3f4f6"})});export{o as i};
