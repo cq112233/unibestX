@@ -99,25 +99,17 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     const emit = __emit;
     const isChecked = ref(false);
     const elDisabled = computed(() => {
-      let disabledStr = props.disabled;
-      if (disabledStr != "") {
-        if (disabledStr == "true") {
-          return true;
-        } else {
-          return false;
-        }
+      let disabledVal = props.disabled;
+      if (disabledVal != null && disabledVal.toString() != "") {
+        return disabledVal.toString() == "true";
       } else {
         return parentData.value["disabled"] != null ? parentData.value["disabled"] : false;
       }
     });
     const elLabelDisabled = computed(() => {
-      let labelDisabledStr = props.labelDisabled;
-      if (labelDisabledStr != "") {
-        if (labelDisabledStr == "true") {
-          return true;
-        } else {
-          return false;
-        }
+      let labelDisabledVal = props.labelDisabled;
+      if (labelDisabledVal != null && labelDisabledVal.toString() != "") {
+        return labelDisabledVal.toString() == "true";
       } else {
         return parentData.value["labelDisabled"] != null ? parentData.value["labelDisabled"] : false;
       }

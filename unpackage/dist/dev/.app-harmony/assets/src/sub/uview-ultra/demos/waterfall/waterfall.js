@@ -1,6 +1,7 @@
 import { _ as __easycom_0 } from "../../../../components/NavBar/NavBar.js";
-const { defineComponent, ref, computed, resolveDynamicComponent, openBlock, createBlock, withCtx, createVNode, createElementVNode, createCommentVNode, createElementBlock, Fragment, renderList, normalizeStyle, toDisplayString } = globalThis.Vue
+const { defineComponent, ref, resolveDynamicComponent, openBlock, createBlock, withCtx, createVNode, createElementVNode, createElementBlock, Fragment, renderList, normalizeStyle, toDisplayString } = globalThis.Vue
 import { A as AppKu, r as resolveEasycom } from "../../../../../App.ku.js";
+import { _ as __easycom_1 } from "../../../../../uni_modules/uview-ultra/components/up-waterfall/up-waterfall.js";
 import { L as LayoutComponent } from "../../../../layouts/default.js";
 import { _ as _imports_0 } from "../../../../../static/logo.js";
 import { _ as _export_sfc } from "../../../../../plugin-vue-export-helper.js";
@@ -60,6 +61,8 @@ import "../../../../../uni_modules/lime-i18n/common/types.js";
 import "../../../../i18n/locales/zh_CN.js";
 import "../../../../i18n/locales/en_US.js";
 import "../../../../utils/toast.js";
+import "../../../../../uni_modules/uview-ultra/components/up-waterfall/props.js";
+import "../../../../../uni_modules/uview-ultra/components/up-waterfall/waterfall.js";
 const _sfc_main = /* @__PURE__ */ defineComponent({
   __name: "waterfall",
   setup(__props, _a) {
@@ -75,25 +78,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       new UTSJSONObject({ title: "响应式页面布局容器", desc: "完美适配屏幕", price: 79, imgHeight: "180px" }),
       new UTSJSONObject({ title: "开箱即用多端示例", desc: "快速构建产品原型", price: 99, imgHeight: "120px" })
     ]);
-    const leftList = computed(() => {
-      const result = [];
-      for (let i = 0; i < list.value.length; i++) {
-        if (i % 2 == 0) {
-          result.push(list.value[i]);
-        }
-      }
-      return result;
-    });
-    const rightList = computed(() => {
-      const result = [];
-      for (let i = 0; i < list.value.length; i++) {
-        if (i % 2 != 0) {
-          result.push(list.value[i]);
-        }
-      }
-      return result;
-    });
-    const __returned__ = { list, leftList, rightList, get AppKu() {
+    const __returned__ = { list, get AppKu() {
       return AppKu;
     }, get LayoutComponent() {
       return LayoutComponent;
@@ -102,10 +87,11 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     return __returned__;
   }
 });
-const _style_0 = { "bg-__f1f5f9_": { "": { "backgroundImage": "none", "backgroundColor": "#f1f5f9" } }, "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "font-bold": { "": { "fontWeight": 700 } }, "mb-8px": { "": { "marginBottom": 8 } }, "ml-10rpx": { "": { "marginLeft": "10rpx" } }, "mt-2px": { "": { "marginTop": 2 } }, "mt-4px": { "": { "marginTop": 4 } }, "mt-6px": { "": { "marginTop": 6 } }, "overflow-hidden": { "": { "overflow": "hidden" } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "p-6px": { "": { "paddingTop": 6, "paddingRight": 6, "paddingBottom": 6, "paddingLeft": 6 } }, "p-8px": { "": { "paddingTop": 8, "paddingRight": 8, "paddingBottom": 8, "paddingLeft": 8 } }, "pb-30px": { "": { "paddingBottom": 30 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__334155_": { "": { "color": "#334155" } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-__e11d48_": { "": { "color": "#e11d48" } }, "text-12px": { "": { "fontSize": 12 } }, "text-14px": { "": { "fontSize": 14 } } };
-const _style_1 = { "demo-block": { "": { "marginBottom": 12, "paddingTop": 12, "paddingRight": 12, "paddingBottom": 12, "paddingLeft": 12, "backgroundColor": "#ffffff", "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "demo-label": { "": { "fontSize": 14, "fontWeight": "bold", "color": "#606266", "marginBottom": 10, "paddingLeft": 4, "borderLeftWidth": 3, "borderLeftStyle": "solid", "borderLeftColor": "#2979ff" } }, "waterfall-container": { "": { "display": "flex", "flexDirection": "row", "alignItems": "flex-start" } }, "waterfall-col": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column" } }, "waterfall-card": { "": { "backgroundColor": "#f1f5f9", "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "overflow": "hidden", "paddingTop": 8, "paddingRight": 8, "paddingBottom": 8, "paddingLeft": 8, "marginBottom": 8 } }, "card-title": { "": { "fontSize": 14, "fontWeight": "bold", "color": "#334155", "marginTop": 6 } }, "card-desc": { "": { "fontSize": 12, "color": "#94a3b8", "marginTop": 2 } }, "card-price": { "": { "fontSize": 14, "color": "#e11d48", "marginTop": 4, "fontWeight": "bold" } } };
+const _style_0 = { "bg-__f1f5f9_": { "": { "backgroundImage": "none", "backgroundColor": "#f1f5f9" } }, "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "font-bold": { "": { "fontWeight": 700 } }, "mb-8px": { "": { "marginBottom": 8 } }, "mt-2px": { "": { "marginTop": 2 } }, "mt-4px": { "": { "marginTop": 4 } }, "mt-6px": { "": { "marginTop": 6 } }, "overflow-hidden": { "": { "overflow": "hidden" } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "p-6px": { "": { "paddingTop": 6, "paddingRight": 6, "paddingBottom": 6, "paddingLeft": 6 } }, "p-8px": { "": { "paddingTop": 8, "paddingRight": 8, "paddingBottom": 8, "paddingLeft": 8 } }, "pb-30px": { "": { "paddingBottom": 30 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__334155_": { "": { "color": "#334155" } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-__e11d48_": { "": { "color": "#e11d48" } }, "text-12px": { "": { "fontSize": 12 } }, "text-14px": { "": { "fontSize": 14 } } };
+const _style_1 = { "demo-block": { "": { "marginBottom": 12, "paddingTop": 12, "paddingRight": 12, "paddingBottom": 12, "paddingLeft": 12, "backgroundColor": "#ffffff", "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "demo-label": { "": { "fontSize": 14, "fontWeight": "bold", "color": "#606266", "marginBottom": 10, "paddingLeft": 4, "borderLeftWidth": 3, "borderLeftStyle": "solid", "borderLeftColor": "#2979ff" } } };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_NavBar = resolveEasycom(resolveDynamicComponent("NavBar"), __easycom_0);
+  const _component_up_waterfall = resolveEasycom(resolveDynamicComponent("up-waterfall"), __easycom_1);
   return openBlock(), createBlock($setup["AppKu"], null, {
     default: withCtx(() => [
       createVNode($setup["LayoutComponent"], {
@@ -121,103 +107,63 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
             createElementVNode("view", { class: "p-16px" }, [
               createElementVNode("view", { class: "demo-block" }, [
                 createElementVNode("text", { class: "demo-label" }, "基础瀑布流 (2列)"),
-                createCommentVNode(" 不依赖 up-waterfall 的异步分发，直接手动实现双列瀑布流布局 "),
-                createElementVNode("view", { class: "waterfall-container" }, [
-                  createElementVNode("view", { class: "waterfall-col" }, [
+                createVNode(_component_up_waterfall, {
+                  modelValue: $setup.list,
+                  "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.list = $event),
+                  columns: 2
+                }, {
+                  column: withCtx(({ colList }) => [
                     (openBlock(true), createElementBlock(
                       Fragment,
                       null,
-                      renderList($setup.leftList, (item, idx) => {
+                      renderList(colList, (item, idx) => {
                         return openBlock(), createElementBlock("view", {
                           key: idx,
-                          class: "waterfall-card"
+                          class: "p-6px"
                         }, [
-                          createElementVNode(
-                            "image",
-                            {
-                              src: _imports_0,
-                              mode: "aspectFit",
-                              style: normalizeStyle({ width: "100%", height: item.getString("imgHeight") ?? "100px", borderRadius: "6px", backgroundColor: "#ffffff" })
-                            },
-                            null,
-                            4
-                            /* STYLE */
-                          ),
-                          createElementVNode(
-                            "text",
-                            { class: "card-title" },
-                            toDisplayString(item.getString("title")),
-                            1
-                            /* TEXT */
-                          ),
-                          createElementVNode(
-                            "text",
-                            { class: "card-desc" },
-                            toDisplayString(item.getString("desc")),
-                            1
-                            /* TEXT */
-                          ),
-                          createElementVNode(
-                            "text",
-                            { class: "card-price" },
-                            "￥" + toDisplayString(item.getNumber("price")),
-                            1
-                            /* TEXT */
-                          )
+                          createElementVNode("view", { class: "bg-__f1f5f9_ rounded-8px overflow-hidden p-8px mb-8px" }, [
+                            createElementVNode(
+                              "image",
+                              {
+                                src: _imports_0,
+                                mode: "aspectFit",
+                                style: normalizeStyle({ width: "100%", height: item.getString("imgHeight") ?? "100px", borderRadius: "6px", backgroundColor: "#ffffff" })
+                              },
+                              null,
+                              4
+                              /* STYLE */
+                            ),
+                            createElementVNode(
+                              "text",
+                              { class: "text-14px font-bold text-__334155_ mt-6px" },
+                              toDisplayString(item.getString("title")),
+                              1
+                              /* TEXT */
+                            ),
+                            createElementVNode(
+                              "text",
+                              { class: "text-12px text-__94a3b8_ mt-2px" },
+                              toDisplayString(item.getString("desc")),
+                              1
+                              /* TEXT */
+                            ),
+                            createElementVNode(
+                              "text",
+                              { class: "text-14px text-__e11d48_ mt-4px font-bold" },
+                              "￥" + toDisplayString(item.getNumber("price")),
+                              1
+                              /* TEXT */
+                            )
+                          ])
                         ]);
                       }),
                       128
                       /* KEYED_FRAGMENT */
                     ))
                   ]),
-                  createElementVNode("view", { class: "waterfall-col ml-10rpx" }, [
-                    (openBlock(true), createElementBlock(
-                      Fragment,
-                      null,
-                      renderList($setup.rightList, (item, idx) => {
-                        return openBlock(), createElementBlock("view", {
-                          key: idx,
-                          class: "waterfall-card"
-                        }, [
-                          createElementVNode(
-                            "image",
-                            {
-                              src: _imports_0,
-                              mode: "aspectFit",
-                              style: normalizeStyle({ width: "100%", height: item.getString("imgHeight") ?? "100px", borderRadius: "6px", backgroundColor: "#ffffff" })
-                            },
-                            null,
-                            4
-                            /* STYLE */
-                          ),
-                          createElementVNode(
-                            "text",
-                            { class: "card-title" },
-                            toDisplayString(item.getString("title")),
-                            1
-                            /* TEXT */
-                          ),
-                          createElementVNode(
-                            "text",
-                            { class: "card-desc" },
-                            toDisplayString(item.getString("desc")),
-                            1
-                            /* TEXT */
-                          ),
-                          createElementVNode(
-                            "text",
-                            { class: "card-price" },
-                            "￥" + toDisplayString(item.getNumber("price")),
-                            1
-                            /* TEXT */
-                          )
-                        ]);
-                      }),
-                      128
-                      /* KEYED_FRAGMENT */
-                    ))
-                  ])
-                ])
+                  _: 1
+                  /* STABLE */
+                }, 8, ["modelValue"])
               ])
             ])
           ])

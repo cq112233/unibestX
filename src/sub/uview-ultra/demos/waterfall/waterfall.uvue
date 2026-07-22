@@ -4,40 +4,29 @@
     <view class="p-16px">
       <view class="demo-block">
         <text class="demo-label">基础瀑布流 (2列)</text>
-        <!-- 不依赖 up-waterfall 的异步分发，直接手动实现双列瀑布流布局 -->
-        <view class="waterfall-container">
-          <view class="waterfall-col">
-            <view v-for="(item, idx) in leftList" :key="idx" class="waterfall-card">
-              <image
-                src="/static/logo.png"
-                mode="aspectFit"
-                :style="{ width: '100%', height: item.getString('imgHeight') ?? '100px', borderRadius: '6px', backgroundColor: '#ffffff' }"
-              />
-              <text class="card-title">{{ item.getString('title') }}</text>
-              <text class="card-desc">{{ item.getString('desc') }}</text>
-              <text class="card-price">￥{{ item.getNumber('price') }}</text>
+        <up-waterfall v-model="list" :columns="2">
+          <template #column="{ colList }">
+            <view v-for="(item, idx) in (colList as UTSJSONObject[])" :key="idx" class="p-6px">
+              <view class="bg-[#f1f5f9] rounded-8px overflow-hidden p-8px mb-8px">
+                <image
+                  src="/static/logo.png"
+                  mode="aspectFit"
+                  :style="{ width: '100%', height: (item as UTSJSONObject).getString('imgHeight') ?? '100px', borderRadius: '6px', backgroundColor: '#ffffff' }"
+                />
+                <text class="text-14px font-bold text-[#334155] mt-6px">{{ (item as UTSJSONObject).getString('title') }}</text>
+                <text class="text-12px text-[#94a3b8] mt-2px">{{ (item as UTSJSONObject).getString('desc') }}</text>
+                <text class="text-14px text-[#e11d48] mt-4px font-bold">￥{{ (item as UTSJSONObject).getNumber('price') }}</text>
+              </view>
             </view>
-          </view>
-          <view class="waterfall-col ml-10rpx">
-            <view v-for="(item, idx) in rightList" :key="idx" class="waterfall-card">
-              <image
-                src="/static/logo.png"
-                mode="aspectFit"
-                :style="{ width: '100%', height: item.getString('imgHeight') ?? '100px', borderRadius: '6px', backgroundColor: '#ffffff' }"
-              />
-              <text class="card-title">{{ item.getString('title') }}</text>
-              <text class="card-desc">{{ item.getString('desc') }}</text>
-              <text class="card-price">￥{{ item.getNumber('price') }}</text>
-            </view>
-          </view>
-        </view>
+          </template>
+        </up-waterfall>
       </view>
     </view>
   </view>
 </template>
 
 <script setup lang="uts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 
 const list = ref<UTSJSONObject[]>([
   { title: 'uview-ultra 核心UI组件', desc: '轻量级UI框架', price: 129, imgHeight: '80px' } as UTSJSONObject,
@@ -49,27 +38,6 @@ const list = ref<UTSJSONObject[]>([
   { title: '响应式页面布局容器', desc: '完美适配屏幕', price: 79, imgHeight: '180px' } as UTSJSONObject,
   { title: '开箱即用多端示例', desc: '快速构建产品原型', price: 99, imgHeight: '120px' } as UTSJSONObject,
 ])
-
-// 手动交错分配到左右两列，模拟瀑布流效果
-const leftList = computed((): UTSJSONObject[] => {
-  const result: UTSJSONObject[] = []
-  for (let i: number = 0; i < list.value.length; i++) {
-    if (i % 2 == 0) {
-      result.push(list.value[i])
-    }
-  }
-  return result
-})
-
-const rightList = computed((): UTSJSONObject[] => {
-  const result: UTSJSONObject[] = []
-  for (let i: number = 0; i < list.value.length; i++) {
-    if (i % 2 != 0) {
-      result.push(list.value[i])
-    }
-  }
-  return result
-})
 </script>
 
 <style scoped>
@@ -86,39 +54,5 @@ const rightList = computed((): UTSJSONObject[] => {
   margin-bottom: 10px;
   padding-left: 4px;
   border-left: 3px solid #2979ff;
-}
-.waterfall-container {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-}
-.waterfall-col {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-.waterfall-card {
-  background-color: #f1f5f9;
-  border-radius: 8px;
-  overflow: hidden;
-  padding: 8px;
-  margin-bottom: 8px;
-}
-.card-title {
-  font-size: 14px;
-  font-weight: bold;
-  color: #334155;
-  margin-top: 6px;
-}
-.card-desc {
-  font-size: 12px;
-  color: #94a3b8;
-  margin-top: 2px;
-}
-.card-price {
-  font-size: 14px;
-  color: #e11d48;
-  margin-top: 4px;
-  font-weight: bold;
 }
 </style>
