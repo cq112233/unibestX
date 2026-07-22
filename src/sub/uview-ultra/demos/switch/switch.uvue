@@ -5,8 +5,37 @@
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
         <view class="flex-row items-center">
-          <up-switch v-model="switchValue" active-color="#2979ff"></up-switch>
-          <text class="text-14px ml-10px">{{ switchValue ? '已开启' : '已关闭' }}</text>
+          <up-switch v-model="switchValue1" active-color="#2979ff"></up-switch>
+          <text class="text-14px ml-10px">{{ switchValue1 ? '已开启' : '已关闭' }}</text>
+        </view>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">禁用状态</text>
+        <view class="flex-row items-center">
+          <up-switch v-model="switchValue2" :disabled="true"></up-switch>
+        </view>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">加载状态</text>
+        <view class="flex-row items-center">
+          <up-switch v-model="switchValue3" loading></up-switch>
+        </view>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">自定义颜色</text>
+        <view class="flex-row items-center">
+          <up-switch v-model="switchValue4" active-color="#fa3534" inactive-color="#f56c6c"></up-switch>
+        </view>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">不同尺寸</text>
+        <view class="flex-row items-center">
+          <up-switch v-model="switchValue5" size="20" class="mr-10px"></up-switch>
+          <up-switch v-model="switchValue5" size="28"></up-switch>
         </view>
       </view>
     </view>
@@ -15,7 +44,12 @@
 
 <script setup lang="uts">
 import { ref } from 'vue'
-const switchValue = ref(true)
+
+const switchValue1 = ref(true)
+const switchValue2 = ref(true)
+const switchValue3 = ref(true)
+const switchValue4 = ref(true)
+const switchValue5 = ref(true)
 </script>
 
 <style scoped>

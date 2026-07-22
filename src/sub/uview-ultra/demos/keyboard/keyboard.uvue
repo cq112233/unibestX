@@ -1,0 +1,134 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Keyboard 键盘" :auto-back="true" />
+    <view class="p-16px">
+      
+      <!-- 1. 数字键盘 -->
+      <view class="demo-block">
+        <text class="demo-label">数字键盘</text>
+        <!-- 模拟输入框，避免唤起系统自带键盘 -->
+        <view class="mock-input" @click="showNumber = true">
+          <text :class="valNumber ? 'mock-input-text' : 'mock-input-placeholder'">{{ valNumber || '请点击输入数字' }}</text>
+        </view>
+        <up-keyboard 
+          mode="number" 
+          :show="showNumber" 
+          @change="onNumberChange" 
+          @backspace="onNumberBackspace" 
+          @close="showNumber = false"
+          @cancel="showNumber = false"
+          @confirm="showNumber = false"
+        ></up-keyboard>
+      </view>
+
+      <!-- 2. 身份证键盘 -->
+      <view class="demo-block">
+        <text class="demo-label">身份证键盘</text>
+        <view class="mock-input" @click="showCard = true">
+          <text :class="valCard ? 'mock-input-text' : 'mock-input-placeholder'">{{ valCard || '请点击输入身份证' }}</text>
+        </view>
+        <up-keyboard 
+          mode="card" 
+          :show="showCard" 
+          @change="onCardChange" 
+          @backspace="onCardBackspace" 
+          @close="showCard = false"
+          @cancel="showCard = false"
+          @confirm="showCard = false"
+        ></up-keyboard>
+      </view>
+
+      <!-- 3. 车牌号键盘 -->
+      <view class="demo-block">
+        <text class="demo-label">车牌号键盘</text>
+        <view class="mock-input" @click="showCar = true">
+          <text :class="valCar ? 'mock-input-text' : 'mock-input-placeholder'">{{ valCar || '请点击输入车牌号' }}</text>
+        </view>
+        <up-keyboard 
+          mode="car" 
+          :show="showCar" 
+          @change="onCarChange" 
+          @backspace="onCarBackspace" 
+          @close="showCar = false"
+          @cancel="showCar = false"
+          @confirm="showCar = false"
+        ></up-keyboard>
+      </view>
+
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue'
+
+// --- 数字键盘 ---
+const showNumber = ref(false)
+const valNumber = ref('')
+const onNumberChange = (val: string) => {
+  valNumber.value += val
+}
+const onNumberBackspace = () => {
+  if (valNumber.value.length > 0) {
+    valNumber.value = valNumber.value.substring(0, valNumber.value.length - 1)
+  }
+}
+
+// --- 身份证键盘 ---
+const showCard = ref(false)
+const valCard = ref('')
+const onCardChange = (val: string) => {
+  valCard.value += val
+}
+const onCardBackspace = () => {
+  if (valCard.value.length > 0) {
+    valCard.value = valCard.value.substring(0, valCard.value.length - 1)
+  }
+}
+
+// --- 车牌号键盘 ---
+const showCar = ref(false)
+const valCar = ref('')
+const onCarChange = (val: string) => {
+  valCar.value += val
+}
+const onCarBackspace = () => {
+  if (valCar.value.length > 0) {
+    valCar.value = valCar.value.substring(0, valCar.value.length - 1)
+  }
+}
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+.mock-input {
+  height: 40px;
+  border-radius: 6px;
+  background-color: #f3f4f6;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 12px;
+}
+.mock-input-text {
+  font-size: 15px;
+  color: #333333;
+}
+.mock-input-placeholder {
+  font-size: 15px;
+  color: #9ca3af;
+}
+</style>

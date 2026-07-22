@@ -4,6 +4,7 @@ import AppKu from '@/App.ku.uvue'
 import LayoutComponent from '@/src/layouts/default.uvue'
 import { ref } from 'vue'
 
+
 const __sfc__ = defineComponent({
   __name: 'search',
   setup(__props) {
@@ -11,7 +12,11 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
-const searchValue = ref('')
+const searchValue1 = ref('')
+const searchValue2 = ref('')
+const searchValue3 = ref('')
+const searchValue4 = ref('')
+const searchValue5 = ref('')
 
 return (): any | null => {
 
@@ -36,18 +41,45 @@ const _component_up_search = resolveEasyComponent("up-search",_easycom_up_search
               _cE("view", _uM({ class: "demo-block" }), [
                 _cE("text", _uM({ class: "demo-label" }), "基础用法"),
                 _cV(_component_up_search, _uM({
-                  modelValue: searchValue.value,
-                  "onUpdate:modelValue": $event => {(searchValue).value = $event},
+                  modelValue: searchValue1.value,
+                  "onUpdate:modelValue": $event => {(searchValue1).value = $event},
                   placeholder: "请输入搜索关键字"
                 }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
               ]),
               _cE("view", _uM({ class: "demo-block mt-12px" }), [
                 _cE("text", _uM({ class: "demo-label" }), "隐藏右侧按钮"),
                 _cV(_component_up_search, _uM({
-                  modelValue: searchValue.value,
-                  "onUpdate:modelValue": $event => {(searchValue).value = $event},
+                  modelValue: searchValue2.value,
+                  "onUpdate:modelValue": $event => {(searchValue2).value = $event},
                   placeholder: "隐藏操作按钮",
                   "show-action": false
+                }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "方形与自定义图标颜色"),
+                _cV(_component_up_search, _uM({
+                  modelValue: searchValue3.value,
+                  "onUpdate:modelValue": $event => {(searchValue3).value = $event},
+                  shape: "square",
+                  "search-icon-color": "#fa3534",
+                  placeholder: "方形搜索框"
+                }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "自定义按钮文字"),
+                _cV(_component_up_search, _uM({
+                  modelValue: searchValue4.value,
+                  "onUpdate:modelValue": $event => {(searchValue4).value = $event},
+                  "action-text": "搜一下"
+                }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "禁用状态"),
+                _cV(_component_up_search, _uM({
+                  modelValue: searchValue5.value,
+                  "onUpdate:modelValue": $event => {(searchValue5).value = $event},
+                  disabled: true,
+                  placeholder: "禁用输入"
                 }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
               ])
             ])

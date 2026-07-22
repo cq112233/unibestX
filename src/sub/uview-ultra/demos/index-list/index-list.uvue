@@ -1,0 +1,69 @@
+<template>
+  <view class="page-container bg-[#f8fafc]" :style="{ height: `${windowHeight}px` }">
+    <NavBar title="IndexList 索引列表" :auto-back="true" />
+    <view class="flex-1 relative" style="flex: 1;">
+      <up-index-list style="flex: 1" :index-list="indexList">
+        <template v-for="(item, index) in itemArr" :key="index">
+          <up-index-item>
+            <up-index-anchor :text="indexList[index]"></up-index-anchor>
+            <view v-for="(cell, cellIndex) in item" :key="cellIndex" class="list-cell">
+              <text class="list-item-text">{{ cell }}</text>
+            </view>
+          </up-index-item>
+        </template>
+      </up-index-list>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue'
+
+const indexList = ref(['A', 'B', 'C', 'D', 'F', 'G', 'H', 'J', 'L', 'M', 'N', 'Q', 'R', 'S', 'T', 'W', 'X', 'Y', 'Z'])
+const itemArr = ref([
+  ['阿卡丽', '阿木木', '阿里'],
+  ['白起', '百里守约', '百里玄策', '扁鹊'],
+  ['曹操', '成吉思汗', '程咬金'],
+  ['妲己', '大乔', '狄仁杰', '貂蝉', '达摩'],
+  ['范海辛', '飞天'],
+  ['高渐离', '公孙离', '关羽', '宫本武藏', '干将莫邪'],
+  ['韩信', '后羿', '花木兰', '黄忠'],
+  ['姜子牙', '橘右京'],
+  ['兰陵王', '老夫子', '李白', '李元芳', '刘邦', '刘备', '刘禅', '吕布', '露娜', '鲁班七号'],
+  ['马可波罗', '梦奇', '明世隐', '墨子', '芈月'],
+  ['哪吒', '娜可露露', '牛魔', '女娲'],
+  ['奇迹暖暖', '青雉'],
+  ['任逍遥', '瑞文'],
+  ['孙膑', '孙尚香', '孙悟空', '苏烈', '沈梦溪'],
+  ['太乙真人', '提莫'],
+  ['王昭君', '武则天', '项羽'],
+  ['夏侯惇', '项羽', '小乔'],
+  ['雅典娜', '亚瑟', '杨戬', '杨玉环', '瑶', '虞姬', '嬴政', '元歌'],
+  ['张飞', '张良', '赵云', '甄姬', '钟馗', '钟无艳', '周瑜', '庄周', '诸葛亮', '猪八戒'],
+])
+
+const windowHeight = ref(uni.getWindowInfo().windowHeight);
+</script>
+
+<style scoped>
+.page-container {
+  display: flex;
+  flex-direction: column;
+}
+.list-cell {
+  display: flex;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px 12px;
+  overflow: hidden;
+  background-color: #ffffff;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #f3f4f6;
+}
+.list-item-text {
+  font-size: 14px;
+  line-height: 24px;
+  color: #323233;
+}
+</style>

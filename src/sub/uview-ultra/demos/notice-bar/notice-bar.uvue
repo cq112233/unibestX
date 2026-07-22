@@ -6,6 +6,18 @@
         <text class="demo-label">基础用法</text>
         <up-notice-bar text="uview-ultra 是一款专为 uni-app X 设计的高品质 UI 组件库" mode="link"></up-notice-bar>
       </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">不同主题</text>
+        <up-notice-bar text="通知：系统将于今晚 24:00 进行维护更新。" type="warning"></up-notice-bar>
+        <view class="h-10px"></view>
+        <up-notice-bar text="成功：数据已经成功备份到云端。" type="success"></up-notice-bar>
+        <view class="h-10px"></view>
+        <up-notice-bar text="错误：网络连接失败，请检查设置。" type="error"></up-notice-bar>
+      </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">竖向步进滚动</text>
+        <up-notice-bar :text="['第一条重要通知', '第二条重要通知', '第三条重要通知']" direction="column"></up-notice-bar>
+      </view>
     </view>
   </view>
 </template>

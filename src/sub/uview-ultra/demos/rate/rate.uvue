@@ -4,11 +4,27 @@
     <view class="p-16px">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
-        <up-rate v-model="rateValue" :count="5"></up-rate>
+        <up-rate v-model="rateValue1" :count="5"></up-rate>
       </view>
+
       <view class="demo-block mt-12px">
-        <text class="demo-label">自定义图标</text>
-        <up-rate v-model="customRateValue" :count="5" active-icon="heart-fill" inactive-icon="heart"></up-rate>
+        <text class="demo-label">自定义图标与颜色</text>
+        <up-rate v-model="rateValue2" :count="5" active-icon="heart-fill" inactive-icon="heart" active-color="#fa3534"></up-rate>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">半星展示</text>
+        <up-rate v-model="rateValue3" :count="5" :allow-half="true"></up-rate>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">只读状态</text>
+        <up-rate v-model="rateValue4" :count="5" :readonly="true"></up-rate>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">禁用状态</text>
+        <up-rate v-model="rateValue5" :count="5" :disabled="true"></up-rate>
       </view>
     </view>
   </view>
@@ -16,8 +32,12 @@
 
 <script setup lang="uts">
 import { ref } from 'vue'
-const rateValue = ref(3)
-const customRateValue = ref(4)
+
+const rateValue1 = ref(3)
+const rateValue2 = ref(4)
+const rateValue3 = ref(3.5)
+const rateValue4 = ref(4)
+const rateValue5 = ref(2)
 </script>
 
 <style scoped>

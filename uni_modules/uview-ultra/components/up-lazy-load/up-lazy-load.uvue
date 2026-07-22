@@ -232,7 +232,7 @@ onBeforeUnmount(() => {
 onMounted(() => {
     // 此uOnReachBottom事件由mixin.js发出，目的是让页面到底时，保证所有图片都进行加载，做到绝对稳定且可靠
     nextTick(() => {
-        uni.$once('uOnReachBottom', () => {
+        uni.$once('uOnReachBottom', (arg: any) => {
             if (isShow.value == false) isShow.value = true
         })
     })

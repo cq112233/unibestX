@@ -4,11 +4,27 @@
     <view class="p-16px">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
-        <up-search v-model="searchValue" placeholder="请输入搜索关键字"></up-search>
+        <up-search v-model="searchValue1" placeholder="请输入搜索关键字"></up-search>
       </view>
+
       <view class="demo-block mt-12px">
         <text class="demo-label">隐藏右侧按钮</text>
-        <up-search v-model="searchValue" placeholder="隐藏操作按钮" :show-action="false"></up-search>
+        <up-search v-model="searchValue2" placeholder="隐藏操作按钮" :show-action="false"></up-search>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">方形与自定义图标颜色</text>
+        <up-search v-model="searchValue3" shape="square" search-icon-color="#fa3534" placeholder="方形搜索框"></up-search>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">自定义按钮文字</text>
+        <up-search v-model="searchValue4" action-text="搜一下"></up-search>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">禁用状态</text>
+        <up-search v-model="searchValue5" :disabled="true" placeholder="禁用输入"></up-search>
       </view>
     </view>
   </view>
@@ -16,7 +32,12 @@
 
 <script setup lang="uts">
 import { ref } from 'vue'
-const searchValue = ref('')
+
+const searchValue1 = ref('')
+const searchValue2 = ref('')
+const searchValue3 = ref('')
+const searchValue4 = ref('')
+const searchValue5 = ref('')
 </script>
 
 <style scoped>

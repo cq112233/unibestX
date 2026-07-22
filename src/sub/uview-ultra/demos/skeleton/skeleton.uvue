@@ -1,0 +1,36 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Skeleton 骨架屏" :auto-back="true" />
+    <view class="p-16px">
+      <view class="demo-block">
+        <text class="demo-label">基础用法</text>
+        <up-skeleton :loading="true" :animate="true" :rows="3" title></up-skeleton>
+      </view>
+
+      <view class="demo-block">
+        <text class="demo-label">带头像</text>
+        <up-skeleton :loading="true" :animate="true" :rows="2" title avatar></up-skeleton>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+</style>

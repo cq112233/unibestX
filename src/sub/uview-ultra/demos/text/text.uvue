@@ -1,0 +1,42 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Text 文本" :auto-back="true" />
+    <view class="p-16px">
+      <view class="demo-block">
+        <text class="demo-label">基础类型</text>
+        <up-text text="主色文本" type="primary" class="mb-10px"></up-text>
+        <up-text text="成功文本" type="success" class="mb-10px"></up-text>
+        <up-text text="警告文本" type="warning" class="mb-10px"></up-text>
+        <up-text text="错误文本" type="error" class="mb-10px"></up-text>
+        <up-text text="常规文本" type="info"></up-text>
+      </view>
+
+      <view class="demo-block">
+        <text class="demo-label">文字脱敏</text>
+        <up-text text="13888888888" mode="phone" format="encrypt" class="mb-10px"></up-text>
+        <up-text text="张三疯" mode="name" format="encrypt" class="mb-10px"></up-text>
+        <up-text text="110105199001011234" mode="idcard" format="encrypt"></up-text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+</style>

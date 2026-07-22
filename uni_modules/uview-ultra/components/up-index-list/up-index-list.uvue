@@ -1,10 +1,18 @@
 <template>
 	<view ref="up-index-list" class="up-index-list">
+		<!-- 模拟吸顶锚点：在原生 App 端不支持 position: sticky 时作为平替方案 -->
+		<view 
+			v-if="sticky && activeIndex >= 0 && activeIndex < uIndexList.length" 
+			class="up-index-list__sticky-header"
+			style="position: absolute; top: 0; left: 0; right: 0; z-index: 2;"
+		>
+			<up-index-anchor :text="keyVal(uIndexList[activeIndex])" />
+		</view>
 		<scroll-view
 			:scroll-top="scrollTop"
 			:scroll-into-view="scrollIntoView"
 			:style="{
-				height: '100%'
+				flex: 1
 			}"
 			direction="vertical"
 			:scroll-y="true"
@@ -529,6 +537,9 @@
 
 	.up-index-list {
 		position: relative;
+		flex: 1;
+		display: flex;
+		flex-direction: column;
 
 		&__letter {
 			position: absolute;

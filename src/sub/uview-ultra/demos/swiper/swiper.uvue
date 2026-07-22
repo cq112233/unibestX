@@ -16,6 +16,19 @@
           :show-title="true"
         ></up-swiper>
       </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">卡片式轮播</text>
+        <up-swiper
+          :list="swiperList"
+          key-name="image"
+          :indicator="true"
+          indicator-mode="line"
+          :circular="true"
+          :previous-margin="30"
+          :next-margin="30"
+          height="160"
+        ></up-swiper>
+      </view>
     </view>
   </view>
 </template>

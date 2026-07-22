@@ -118,6 +118,22 @@ const _component_up_list = resolveEasyComponent("up-list",_easycom_up_list)
                   ]),
                   _: 1 /* STABLE */
                 }), 8 /* PROPS */, ["refresher-triggered"])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "简单静态列表"),
+                _cV(_component_up_list, _uM({ height: 200 }), _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cE(Fragment, null, RenderHelpers.renderList(10, (item, idx, __index, _cached): any => {
+                      return _cE("view", _uM({
+                        key: idx,
+                        class: "demo-list-cell"
+                      }), [
+                        _cE("text", _uM({ class: "text-14px font-500 text-__303133_" }), "静态列表项 " + _tD(item), 1 /* TEXT */)
+                      ])
+                    }), 64 /* STABLE_FRAGMENT */)
+                  ]),
+                  _: 1 /* STABLE */
+                }))
               ])
             ])
           ])
@@ -132,4 +148,4 @@ const _component_up_list = resolveEasyComponent("up-list",_easycom_up_list)
 
 })
 export default __sfc__
-const GenSrcSubUviewUltraDemosListListStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["font-500", _pS(_uM([["fontWeight", 500]]))], ["ml-8px", _pS(_uM([["marginLeft", 8]]))], ["mt-4px", _pS(_uM([["marginTop", 4]]))], ["none", _pS(_uM([["display", "none"]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["text-__303133_", _pS(_uM([["color", "#303133"]]))], ["text-__909399_", _pS(_uM([["color", "#909399"]]))], ["text-12px", _pS(_uM([["fontSize", 12]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))], ["demo-list-cell", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16], ["backgroundColor", "#ffffff"], ["borderBottomWidth", 1], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f5f5f5"]]))], ["demo-list-cell-avatar", _pS(_uM([["width", 40], ["height", 40], ["borderTopLeftRadius", 4], ["borderTopRightRadius", 4], ["borderBottomRightRadius", 4], ["borderBottomLeftRadius", 4], ["marginRight", 12], ["backgroundColor", "#2979ff"], ["display", "flex"], ["justifyContent", "center"], ["alignItems", "center"]]))], ["demo-list-cell-content", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["list-loading", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["paddingTop", 15], ["paddingRight", 0], ["paddingBottom", 15], ["paddingLeft", 0]]))]])]
+const GenSrcSubUviewUltraDemosListListStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["font-500", _pS(_uM([["fontWeight", 500]]))], ["ml-8px", _pS(_uM([["marginLeft", 8]]))], ["mt-12px", _pS(_uM([["marginTop", 12]]))], ["mt-4px", _pS(_uM([["marginTop", 4]]))], ["none", _pS(_uM([["display", "none"]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["text-__303133_", _pS(_uM([["color", "#303133"]]))], ["text-__909399_", _pS(_uM([["color", "#909399"]]))], ["text-12px", _pS(_uM([["fontSize", 12]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))], ["demo-list-cell", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16], ["backgroundColor", "#ffffff"], ["borderBottomWidth", 1], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f5f5f5"]]))], ["demo-list-cell-avatar", _pS(_uM([["width", 40], ["height", 40], ["borderTopLeftRadius", 4], ["borderTopRightRadius", 4], ["borderBottomRightRadius", 4], ["borderBottomLeftRadius", 4], ["marginRight", 12], ["backgroundColor", "#2979ff"], ["display", "flex"], ["justifyContent", "center"], ["alignItems", "center"]]))], ["demo-list-cell-content", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["list-loading", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["paddingTop", 15], ["paddingRight", 0], ["paddingBottom", 15], ["paddingLeft", 0]]))]])]

@@ -8,12 +8,41 @@
           <up-button type="primary" text="弹出面板" size="mini" @click="actionSheetShow = true"></up-button>
         </view>
       </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">显示取消按钮</text>
+        <view class="flex-row items-center">
+          <up-button type="success" text="带取消按钮" size="mini" @click="actionSheetShow2 = true"></up-button>
+        </view>
+      </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">带描述信息与禁用项</text>
+        <view class="flex-row items-center">
+          <up-button type="warning" text="复杂面板" size="mini" @click="actionSheetShow3 = true"></up-button>
+        </view>
+      </view>
     </view>
     <up-action-sheet
       :show="actionSheetShow"
       :actions="actionList"
       title="请选择操作"
       @close="actionSheetShow = false"
+      @select="onActionSelect"
+    ></up-action-sheet>
+    <up-action-sheet
+      :show="actionSheetShow2"
+      :actions="actionList"
+      title="请选择操作"
+      cancel-text="取消"
+      @close="actionSheetShow2 = false"
+      @select="onActionSelect"
+    ></up-action-sheet>
+    <up-action-sheet
+      :show="actionSheetShow3"
+      :actions="actionListComplex"
+      title="请选择操作"
+      description="这是一段描述信息"
+      cancel-text="取消"
+      @close="actionSheetShow3 = false"
       @select="onActionSelect"
     ></up-action-sheet>
   </view>
@@ -23,14 +52,23 @@
 import { ref } from 'vue'
 
 const actionSheetShow = ref(false)
+const actionSheetShow2 = ref(false)
+const actionSheetShow3 = ref(false)
 const actionList = ref([
   { name: '拍照' },
   { name: '从相册选择' }
+])
+const actionListComplex = ref([
+  { name: '着色选项', color: '#ffaa33' },
+  { name: '禁用选项', disabled: true },
+  { name: '带副标题选项', subname: '我是副标题' }
 ])
 
 function onActionSelect(e: UTSJSONObject) {
   console.log('action select', e)
   actionSheetShow.value = false
+  actionSheetShow2.value = false
+  actionSheetShow3.value = false
 }
 </script>
 

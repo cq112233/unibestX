@@ -1,0 +1,52 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Album 相册" :auto-back="true" />
+    <view class="p-16px">
+      <view class="demo-block">
+        <text class="demo-label">基础用法</text>
+        <up-album :urls="['https://cdn.uviewui.com/uview/album/1.jpg', 'https://cdn.uviewui.com/uview/album/2.jpg']"></up-album>
+      </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">单图模式</text>
+        <up-album :urls="['https://cdn.uviewui.com/uview/album/1.jpg']"></up-album>
+      </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">指定列数 (4列)</text>
+        <up-album :urls="albumUrls" max-count="8" :row-count="4"></up-album>
+      </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">自定义圆角与间隔</text>
+        <up-album :urls="albumUrls" radius="8" space="10"></up-album>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue'
+
+const albumUrls = ref([
+  'https://cdn.uviewui.com/uview/album/1.jpg',
+  'https://cdn.uviewui.com/uview/album/2.jpg',
+  'https://cdn.uviewui.com/uview/album/3.jpg',
+  'https://cdn.uviewui.com/uview/album/4.jpg',
+  'https://cdn.uviewui.com/uview/album/5.jpg'
+])
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+</style>

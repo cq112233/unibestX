@@ -2,6 +2,8 @@ import _easycom_NavBar from '@/src/components/NavBar/NavBar.uvue'
 import _easycom_up_tag from '@/uni_modules/uview-ultra/components/up-tag/up-tag.uvue'
 import AppKu from '@/App.ku.uvue'
 import LayoutComponent from '@/src/layouts/default.uvue'
+import { ref } from 'vue'
+
 
 const __sfc__ = defineComponent({
   __name: 'tag',
@@ -10,6 +12,10 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
+const showTag = ref(true)
+function closeTag() {
+  showTag.value = false
+}
 
 return (): any | null => {
 
@@ -77,6 +83,61 @@ const _component_up_tag = resolveEasyComponent("up-tag",_easycom_up_tag)
                     size: "normal",
                     class: "mr-10px"
                   }))
+                ])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "不同尺寸"),
+                _cE("view", _uM({ class: "flex-row items-center flex-wrap" }), [
+                  _cV(_component_up_tag, _uM({
+                    text: "大尺寸",
+                    size: "large",
+                    type: "primary",
+                    class: "mr-10px"
+                  })),
+                  _cV(_component_up_tag, _uM({
+                    text: "普通",
+                    size: "normal",
+                    type: "success",
+                    class: "mr-10px"
+                  })),
+                  _cV(_component_up_tag, _uM({
+                    text: "迷你",
+                    size: "mini",
+                    type: "warning",
+                    class: "mr-10px"
+                  }))
+                ])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "不同形状"),
+                _cE("view", _uM({ class: "flex-row items-center flex-wrap" }), [
+                  _cV(_component_up_tag, _uM({
+                    text: "半圆角",
+                    shape: "circle",
+                    type: "primary",
+                    class: "mr-10px"
+                  })),
+                  _cV(_component_up_tag, _uM({
+                    text: "直角",
+                    shape: "square",
+                    type: "primary",
+                    class: "mr-10px"
+                  }))
+                ])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "可关闭标签"),
+                _cE("view", _uM({ class: "flex-row items-center flex-wrap" }), [
+                  isTrue(showTag.value)
+                    ? _cV(_component_up_tag, _uM({
+                        key: 0,
+                        text: "点击关闭",
+                        type: "primary",
+                        closable: "",
+                        onClose: closeTag,
+                        class: "mr-10px"
+                      }))
+                    : _cC("v-if", true)
                 ])
               ])
             ])

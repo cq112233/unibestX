@@ -65,8 +65,26 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
     *   *错误示例*：`font-mono`（触发编译报错）
     *   *正确做法*：通过内联 `style="font-family: monospace;"` 设置字体族
 
-*   *
-	*   **UnoCSS 对齐值限制 (Alignment Values)**：
+*   **Display 属性与 UnoCSS 类名限制 (Display Property Restrictions)**：
+    原生平台仅支持 `display: flex` 和 `display: none`。**禁止**使用 `display: grid` 或 `display: list-item`。
+    *   **重要踩坑**：由于 UnoCSS 会对源码进行全局正则扫描匹配，如果在模板中写入 `class="grid"` 或 `class="list-item"`，UnoCSS 会自动为你生成包含不支持 display 属性的原子 CSS，从而导致编译崩溃。
+    *   *解决办法*：将此类容易触发静态解析的类名重命名，如把 `list-item` 改为 `index-list-cell`。
+
+*   **Position 属性不支持 sticky (Position Sticky Restriction)**：
+    原生平台仅支持 `relative`, `absolute`, `fixed`。**不支持** `position: sticky`。
+    *   **重要踩坑**：在代码中（如 js/ts 字符串里）直接写 `'sticky'` 也会被 UnoCSS 静态提取并生成 `.sticky { position: sticky; }` 从而导致编译崩溃。
+    *   *解决办法*：打破字符串字面量以避开提取，如改为 `'sti' + 'cky'`。
+
+*   **高度属性限制 (Height Units)**：
+    原生平台不支持 `vh`, `vw` 等视口单位。`height` 仅支持 `number`|`pixel`|`percent`|`auto`。
+    *   *错误示例*：`height: 100vh`
+    *   *正确做法*：使用 `height: 100%` 或 Flex 布局的 `flex: 1`。
+
+*   **Flex 布局中子元素高度塌陷 (Flex Child Height Collapse)**：
+    在 Flex 布局中，如果父元素是通过 `flex: 1` 撑开剩余空间，而没有显式的固定高度像素值，此时给子元素设置 `height: 100%`，在原生 Android/iOS 的底层布局引擎中，这个 `100%` 往往会被解析为 `0`（因为 100% 乘以 auto(0) 等于 0），导致内容完全消失或空白。
+    *   *解决办法*：废弃 `height: 100%` 的旧思维，直接给需要占满父元素的子元素也使用 `flex: 1`。
+
+*   **UnoCSS 对齐值限制 (Alignment Values)**：
 	    uni-app X 原生平台不支持 `justify-content: start` 和 `align-self: start`，必须使用 `flex-start`。已在 `vite.config.ts` 中通过自定义 rules 覆盖：
 	    *   `justify-start` → `justify-content: flex-start`
 	    *   `self-start` → `align-self: flex-start`

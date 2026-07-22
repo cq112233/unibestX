@@ -15,6 +15,32 @@
           </view>
         </view>
       </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">缩放动画</text>
+        <view class="transition-demo-wrapper">
+          <up-transition :show="transitionShow" mode="zoom">
+            <view class="transition-demo-box bg-[#19be6b]">
+              <text class="text-14px text-white font-500">zoom 缩放</text>
+            </view>
+          </up-transition>
+        </view>
+      </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">滑动动画</text>
+        <view class="transition-demo-wrapper">
+          <up-transition :show="slideShow" :mode="slideMode">
+            <view class="transition-demo-box bg-[#f56c6c]">
+              <text class="text-14px text-white font-500">slide 滑动</text>
+            </view>
+          </up-transition>
+        </view>
+        <view class="flex-row items-center justify-around mt-10px">
+          <up-button type="primary" text="上滑" size="mini" @click="triggerSlide('slide-up')" custom-style="margin: 0 4px;"></up-button>
+          <up-button type="success" text="下滑" size="mini" @click="triggerSlide('slide-down')" custom-style="margin: 0 4px;"></up-button>
+          <up-button type="warning" text="左滑" size="mini" @click="triggerSlide('slide-left')" custom-style="margin: 0 4px;"></up-button>
+          <up-button type="error" text="右滑" size="mini" @click="triggerSlide('slide-right')" custom-style="margin: 0 4px;"></up-button>
+        </view>
+      </view>
     </view>
   </view>
 </template>
@@ -23,6 +49,17 @@
 import { ref } from 'vue'
 
 const transitionShow = ref(true)
+
+const slideMode = ref('slide-up')
+const slideShow = ref(false)
+
+function triggerSlide(mode: string) {
+  slideMode.value = mode
+  slideShow.value = true
+  setTimeout(() => {
+    slideShow.value = false
+  }, 1500)
+}
 </script>
 
 <style scoped>

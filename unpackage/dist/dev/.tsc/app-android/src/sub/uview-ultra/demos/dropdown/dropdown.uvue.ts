@@ -1,0 +1,111 @@
+import _easycom_NavBar from '@/src/components/NavBar/NavBar.uvue'
+import _easycom_up_dropdown_item from '@/uni_modules/uview-ultra/components/up-dropdown-item/up-dropdown-item.uvue'
+import _easycom_up_dropdown from '@/uni_modules/uview-ultra/components/up-dropdown/up-dropdown.uvue'
+import AppKu from '@/App.ku.uvue'
+import LayoutComponent from '@/src/layouts/default.uvue'
+import { ref } from 'vue'
+
+
+const __sfc__ = defineComponent({
+  __name: 'dropdown',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+const value1 = ref(1)
+const value2 = ref(2)
+const value3 = ref(1)
+const value4 = ref(2)
+
+const options1 = ref([
+  { label: '默认', value: 1 },
+  { label: '最新', value: 2 },
+  { label: '最热', value: 3 }
+])
+
+const options2 = ref([
+  { label: '默认排序', value: 1 },
+  { label: '距离优先', value: 2 },
+  { label: '价格优先', value: 3 }
+])
+
+const options3 = ref([
+  { label: '全部', value: 1 },
+  { label: '中餐', value: 2 },
+  { label: '西餐', value: 3 }
+])
+
+return (): any | null => {
+
+const _component_NavBar = resolveEasyComponent("NavBar",_easycom_NavBar)
+const _component_up_dropdown_item = resolveEasyComponent("up-dropdown-item",_easycom_up_dropdown_item)
+const _component_up_dropdown = resolveEasyComponent("up-dropdown",_easycom_up_dropdown)
+
+  return _cV(unref(AppKu), null, _uM({
+    default: withSlotCtx((): any[] => [
+      _cV(unref(LayoutComponent), _uM({
+        "navigation-style": 'custom',
+        "navigation-bar-title-text": 'up-dropdown 下拉菜单'
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({ class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }), [
+            _cV(_component_NavBar, _uM({
+              title: "Dropdown 下拉菜单",
+              "auto-back": true
+            })),
+            _cE("view", _uM({ class: "p-16px" }), [
+              _cE("view", _uM({ class: "demo-block" }), [
+                _cE("text", _uM({ class: "demo-label" }), "基础用法"),
+                _cV(_component_up_dropdown, null, _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cV(_component_up_dropdown_item, _uM({
+                      modelValue: value1.value,
+                      "onUpdate:modelValue": $event => {(value1).value = $event},
+                      title: "属性",
+                      options: options1.value
+                    }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue", "options"]),
+                    _cV(_component_up_dropdown_item, _uM({
+                      modelValue: value2.value,
+                      "onUpdate:modelValue": $event => {(value2).value = $event},
+                      title: "排序",
+                      options: options2.value
+                    }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue", "options"])
+                  ]),
+                  _: 1 /* STABLE */
+                }))
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "自定义选中颜色"),
+                _cV(_component_up_dropdown, _uM({ "active-color": "#fa3534" }), _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cV(_component_up_dropdown_item, _uM({
+                      modelValue: value3.value,
+                      "onUpdate:modelValue": $event => {(value3).value = $event},
+                      title: "排序",
+                      options: options2.value
+                    }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue", "options"]),
+                    _cV(_component_up_dropdown_item, _uM({
+                      modelValue: value4.value,
+                      "onUpdate:modelValue": $event => {(value4).value = $event},
+                      title: "筛选",
+                      options: options3.value
+                    }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue", "options"])
+                  ]),
+                  _: 1 /* STABLE */
+                }))
+              ])
+            ])
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }))
+    ]),
+    _: 1 /* STABLE */
+  }))
+}
+}
+
+})
+export default __sfc__
+const GenSrcSubUviewUltraDemosDropdownDropdownStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["mt-12px", _pS(_uM([["marginTop", 12]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]

@@ -1,0 +1,39 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Navbar Mini 迷你导航栏" :auto-back="true" />
+    <view class="p-16px">
+      <view class="demo-block">
+        <text class="demo-label">基础用法</text>
+        <up-navbar-mini :safe-area-inset-top="false"></up-navbar-mini>
+      </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">自定义图标</text>
+        <up-navbar-mini :safe-area-inset-top="false" left-icon="arrow-up" home-url="/pages/index/index"></up-navbar-mini>
+      </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">自定义颜色</text>
+        <up-navbar-mini :safe-area-inset-top="false" bg-color="#fa3534" icon-color="#ffffff"></up-navbar-mini>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+</style>

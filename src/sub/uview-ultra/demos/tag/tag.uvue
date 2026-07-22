@@ -11,6 +11,7 @@
           <up-tag text="危险" type="error" size="normal" class="mr-10px mb-10px"></up-tag>
         </view>
       </view>
+      
       <view class="demo-block mt-12px">
         <text class="demo-label">镂空标签</text>
         <view class="flex-row items-center flex-wrap">
@@ -18,11 +19,41 @@
           <up-tag text="镂空" type="success" :plain="true" size="normal" class="mr-10px"></up-tag>
         </view>
       </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">不同尺寸</text>
+        <view class="flex-row items-center flex-wrap">
+          <up-tag text="大尺寸" size="large" type="primary" class="mr-10px"></up-tag>
+          <up-tag text="普通" size="normal" type="success" class="mr-10px"></up-tag>
+          <up-tag text="迷你" size="mini" type="warning" class="mr-10px"></up-tag>
+        </view>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">不同形状</text>
+        <view class="flex-row items-center flex-wrap">
+          <up-tag text="半圆角" shape="circle" type="primary" class="mr-10px"></up-tag>
+          <up-tag text="直角" shape="square" type="primary" class="mr-10px"></up-tag>
+        </view>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">可关闭标签</text>
+        <view class="flex-row items-center flex-wrap">
+          <up-tag text="点击关闭" type="primary" closable v-if="showTag" @close="closeTag" class="mr-10px"></up-tag>
+        </view>
+      </view>
     </view>
   </view>
 </template>
 
 <script setup lang="uts">
+import { ref } from 'vue'
+
+const showTag = ref(true)
+function closeTag() {
+  showTag.value = false
+}
 </script>
 
 <style scoped>

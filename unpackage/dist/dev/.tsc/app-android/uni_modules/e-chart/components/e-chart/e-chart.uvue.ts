@@ -419,13 +419,13 @@ const __sfc__ = defineComponent({
                   filePath,
                   encoding: "base64",
                   data: base64.replace('data:image/png;base64,', ''),
-                  success: () => {
+                  success: (res) => {
                     resolve(filePath);
                   },
-				  fail: (err : IFileSystemManagerFail) => {
+				  fail: (err) => {
 					fail(err as UTSJSONObject)
 				  }
-                })
+                } as WriteFileOptions)
             }, 
             fail
         });

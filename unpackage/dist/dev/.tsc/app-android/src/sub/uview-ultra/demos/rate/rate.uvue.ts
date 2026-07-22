@@ -4,6 +4,7 @@ import AppKu from '@/App.ku.uvue'
 import LayoutComponent from '@/src/layouts/default.uvue'
 import { ref } from 'vue'
 
+
 const __sfc__ = defineComponent({
   __name: 'rate',
   setup(__props) {
@@ -11,8 +12,11 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
-const rateValue = ref(3)
-const customRateValue = ref(4)
+const rateValue1 = ref(3)
+const rateValue2 = ref(4)
+const rateValue3 = ref(3.5)
+const rateValue4 = ref(4)
+const rateValue5 = ref(2)
 
 return (): any | null => {
 
@@ -37,19 +41,47 @@ const _component_up_rate = resolveEasyComponent("up-rate",_easycom_up_rate)
               _cE("view", _uM({ class: "demo-block" }), [
                 _cE("text", _uM({ class: "demo-label" }), "基础用法"),
                 _cV(_component_up_rate, _uM({
-                  modelValue: rateValue.value,
-                  "onUpdate:modelValue": $event => {(rateValue).value = $event},
+                  modelValue: rateValue1.value,
+                  "onUpdate:modelValue": $event => {(rateValue1).value = $event},
                   count: 5
                 }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
               ]),
               _cE("view", _uM({ class: "demo-block mt-12px" }), [
-                _cE("text", _uM({ class: "demo-label" }), "自定义图标"),
+                _cE("text", _uM({ class: "demo-label" }), "自定义图标与颜色"),
                 _cV(_component_up_rate, _uM({
-                  modelValue: customRateValue.value,
-                  "onUpdate:modelValue": $event => {(customRateValue).value = $event},
+                  modelValue: rateValue2.value,
+                  "onUpdate:modelValue": $event => {(rateValue2).value = $event},
                   count: 5,
                   "active-icon": "heart-fill",
-                  "inactive-icon": "heart"
+                  "inactive-icon": "heart",
+                  "active-color": "#fa3534"
+                }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "半星展示"),
+                _cV(_component_up_rate, _uM({
+                  modelValue: rateValue3.value,
+                  "onUpdate:modelValue": $event => {(rateValue3).value = $event},
+                  count: 5,
+                  "allow-half": true
+                }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "只读状态"),
+                _cV(_component_up_rate, _uM({
+                  modelValue: rateValue4.value,
+                  "onUpdate:modelValue": $event => {(rateValue4).value = $event},
+                  count: 5,
+                  readonly: true
+                }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "禁用状态"),
+                _cV(_component_up_rate, _uM({
+                  modelValue: rateValue5.value,
+                  "onUpdate:modelValue": $event => {(rateValue5).value = $event},
+                  count: 5,
+                  disabled: true
                 }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
               ])
             ])

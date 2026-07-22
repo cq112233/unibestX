@@ -10,6 +10,16 @@
           <up-button type="primary" text="底部弹出" size="mini" @click="openPopup('bottom')"></up-button>
         </view>
       </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">更多方向弹出</text>
+        <view class="flex-row items-center">
+          <up-button type="success" text="左侧弹出" size="mini" @click="openPopup('left')"></up-button>
+          <view class="w-10px"></view>
+          <up-button type="success" text="右侧弹出" size="mini" @click="openPopup('right')"></up-button>
+          <view class="w-10px"></view>
+          <up-button type="success" text="居中弹出" size="mini" @click="openPopup('center')"></up-button>
+        </view>
+      </view>
     </view>
     <up-popup
       :show="popupShow"

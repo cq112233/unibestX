@@ -3,32 +3,69 @@
     <NavBar title="up-picker 选择器" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
     <view class="p-16px">
       <view class="demo-block">
-        <text class="demo-label">基础用法</text>
+        <text class="demo-label">基础单列</text>
         <view class="flex-row items-center">
-          <up-button type="primary" text="打开选择器" size="mini" @click="pickerShow = true"></up-button>
+          <up-button type="primary" text="单列选择" size="mini" @click="showPicker1"></up-button>
+        </view>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">多列选择</text>
+        <view class="flex-row items-center">
+          <up-button type="success" text="多列选择" size="mini" @click="showPicker2"></up-button>
+        </view>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">加载状态</text>
+        <view class="flex-row items-center">
+          <up-button type="warning" text="加载中选择" size="mini" @click="showPicker3"></up-button>
         </view>
       </view>
     </view>
-    <up-picker
-      :show="pickerShow"
-      :columns="columns"
-      @confirm="onPickerConfirm"
-      @cancel="pickerShow = false"
-    ></up-picker>
+    
+    <up-picker :show="pickerShow1" :columns="columns1" @confirm="onConfirm1" @cancel="pickerShow1 = false"></up-picker>
+    <up-picker :show="pickerShow2" :columns="columns2" @confirm="onConfirm2" @cancel="pickerShow2 = false"></up-picker>
+    <up-picker :show="pickerShow3" :columns="columns1" :loading="true" @confirm="onConfirm3" @cancel="pickerShow3 = false"></up-picker>
   </view>
 </template>
 
 <script setup lang="uts">
 import { ref } from 'vue'
 
-const pickerShow = ref(false)
-const columns = ref([
+const pickerShow1 = ref(false)
+const pickerShow2 = ref(false)
+const pickerShow3 = ref(false)
+
+const columns1 = ref([
   ['中国', '美国', '日本', '英国']
 ])
+const columns2 = ref([
+  ['亚洲', '欧洲'],
+  ['中国', '英国']
+])
 
-function onPickerConfirm(e: UTSJSONObject) {
-  console.log('picker confirm', e)
-  pickerShow.value = false
+function showPicker1() {
+  pickerShow1.value = true
+}
+function showPicker2() {
+  pickerShow2.value = true
+}
+function showPicker3() {
+  pickerShow3.value = true
+}
+
+function onConfirm1(e: UTSJSONObject) {
+  console.log('picker 1 confirm', e)
+  pickerShow1.value = false
+}
+function onConfirm2(e: UTSJSONObject) {
+  console.log('picker 2 confirm', e)
+  pickerShow2.value = false
+}
+function onConfirm3(e: UTSJSONObject) {
+  console.log('picker 3 confirm', e)
+  pickerShow3.value = false
 }
 </script>
 

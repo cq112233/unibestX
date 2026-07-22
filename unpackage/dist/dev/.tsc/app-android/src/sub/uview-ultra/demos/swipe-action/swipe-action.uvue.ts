@@ -1,0 +1,77 @@
+import _easycom_NavBar from '@/src/components/NavBar/NavBar.uvue'
+import _easycom_up_swipe_action_item from '@/uni_modules/uview-ultra/components/up-swipe-action-item/up-swipe-action-item.uvue'
+import _easycom_up_swipe_action from '@/uni_modules/uview-ultra/components/up-swipe-action/up-swipe-action.uvue'
+import AppKu from '@/App.ku.uvue'
+import LayoutComponent from '@/src/layouts/default.uvue'
+
+const __sfc__ = defineComponent({
+  __name: 'swipe-action',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+
+return (): any | null => {
+
+const _component_NavBar = resolveEasyComponent("NavBar",_easycom_NavBar)
+const _component_up_swipe_action_item = resolveEasyComponent("up-swipe-action-item",_easycom_up_swipe_action_item)
+const _component_up_swipe_action = resolveEasyComponent("up-swipe-action",_easycom_up_swipe_action)
+
+  return _cV(unref(AppKu), null, _uM({
+    default: withSlotCtx((): any[] => [
+      _cV(unref(LayoutComponent), _uM({
+        "navigation-style": 'custom',
+        "navigation-bar-title-text": 'up-swipe-action 滑动操作'
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({ class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }), [
+            _cV(_component_NavBar, _uM({
+              title: "SwipeAction 滑动操作",
+              "auto-back": true
+            })),
+            _cE("view", _uM({ class: "p-16px" }), [
+              _cE("view", _uM({ class: "demo-block" }), [
+                _cE("text", _uM({ class: "demo-label" }), "基础用法"),
+                _cV(_component_up_swipe_action, null, _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cV(_component_up_swipe_action_item, _uM({ options: [{text:'删除', style:{backgroundColor:'#f56c6c'}}] }), _uM({
+                      default: withSlotCtx((): any[] => [
+                        _cE("view", _uM({
+                          style: _nS(_uM({"padding":"15px","background":"#fff","border-radius":"5px"}))
+                        }), "左滑查看操作选项", 4 /* STYLE */)
+                      ]),
+                      _: 1 /* STABLE */
+                    }))
+                  ]),
+                  _: 1 /* STABLE */
+                }))
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "多按钮"),
+                _cV(_component_up_swipe_action, null, _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cV(_component_up_swipe_action_item, _uM({ options: [{text:'置顶', style:{backgroundColor:'#2979ff'} as UTSJSONObject}, {text:'删除', style:{backgroundColor:'#f56c6c'} as UTSJSONObject}] }), _uM({
+                      default: withSlotCtx((): any[] => [
+                        _cE("view", _uM({ class: "p-15px bg-__fff_ border-radius-5px" }), "左滑显示多按钮")
+                      ]),
+                      _: 1 /* STABLE */
+                    }))
+                  ]),
+                  _: 1 /* STABLE */
+                }))
+              ])
+            ])
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }))
+    ]),
+    _: 1 /* STABLE */
+  }))
+}
+}
+
+})
+export default __sfc__
+const GenSrcSubUviewUltraDemosSwipeActionSwipeActionStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["bg-__fff_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#ffffff"]]))], ["mt-12px", _pS(_uM([["marginTop", 12]]))], ["p-15px", _pS(_uM([["paddingTop", 15], ["paddingRight", 15], ["paddingBottom", 15], ["paddingLeft", 15]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]

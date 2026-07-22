@@ -8,6 +8,22 @@
         <view class="h-10px"></view>
         <up-alert title="警告提示" type="warning" :show-icon="true"></up-alert>
       </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">不同主题</text>
+        <up-alert title="主要提示" type="primary"></up-alert>
+        <view class="h-10px"></view>
+        <up-alert title="错误提示" type="error"></up-alert>
+        <view class="h-10px"></view>
+        <up-alert title="信息提示" type="info"></up-alert>
+      </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">显示描述信息与图标</text>
+        <up-alert title="成功" type="success" description="这是一段成功的描述信息" :show-icon="true"></up-alert>
+      </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">可关闭提示</text>
+        <up-alert title="带关闭按钮的提示" type="warning" :closable="true" :show-icon="true"></up-alert>
+      </view>
     </view>
   </view>
 </template>

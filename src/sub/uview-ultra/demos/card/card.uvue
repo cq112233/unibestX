@@ -16,6 +16,22 @@
           </view>
         </up-card>
       </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">完整卡片(含头部和尾部)</text>
+        <up-card title="订单信息" sub-title="已完成" :thumb="logoImg" margin="0">
+          <text slot="body" class="text-14px text-[#333] leading-24px">订单编号：2023080112345678\n商品名称：某某精美商品一件\n购买时间：2023-08-01 12:34:56</text>
+          <view slot="foot" class="flex-row justify-end w-full">
+            <up-button text="评价" type="primary" size="mini" :plain="true" class="mr-10px"></up-button>
+            <up-button text="再次购买" type="primary" size="mini"></up-button>
+          </view>
+        </up-card>
+      </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">自定义阴影与边框</text>
+        <up-card title="带明显阴影" sub-title="自定义" margin="0" box-shadow="0 4px 12px rgba(0,0,0,0.1)" :border="false">
+          <text slot="body" class="text-13px text-[#606266]">这个卡片去掉了边框，并自定义了较深的阴影效果。</text>
+        </up-card>
+      </view>
     </view>
   </view>
 </template>

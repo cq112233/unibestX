@@ -95,6 +95,53 @@ const _component_up_table = resolveEasyComponent("up-table",_easycom_up_table)
                   ]),
                   _: 1 /* STABLE */
                 }))
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "无边框"),
+                _cV(_component_up_table, _uM({ border: false }), _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cV(_component_up_tr, null, _uM({
+                      default: withSlotCtx((): any[] => [
+                        _cV(_component_up_th, null, _uM({
+                          default: withSlotCtx((): any[] => ["名称"]),
+                          _: 1 /* STABLE */
+                        })),
+                        _cV(_component_up_th, null, _uM({
+                          default: withSlotCtx((): any[] => ["类型"]),
+                          _: 1 /* STABLE */
+                        }))
+                      ]),
+                      _: 1 /* STABLE */
+                    })),
+                    _cV(_component_up_tr, null, _uM({
+                      default: withSlotCtx((): any[] => [
+                        _cV(_component_up_td, null, _uM({
+                          default: withSlotCtx((): any[] => ["uview-ultra"]),
+                          _: 1 /* STABLE */
+                        })),
+                        _cV(_component_up_td, null, _uM({
+                          default: withSlotCtx((): any[] => ["UI库"]),
+                          _: 1 /* STABLE */
+                        }))
+                      ]),
+                      _: 1 /* STABLE */
+                    })),
+                    _cV(_component_up_tr, null, _uM({
+                      default: withSlotCtx((): any[] => [
+                        _cV(_component_up_td, null, _uM({
+                          default: withSlotCtx((): any[] => ["uni-app X"]),
+                          _: 1 /* STABLE */
+                        })),
+                        _cV(_component_up_td, null, _uM({
+                          default: withSlotCtx((): any[] => ["框架"]),
+                          _: 1 /* STABLE */
+                        }))
+                      ]),
+                      _: 1 /* STABLE */
+                    }))
+                  ]),
+                  _: 1 /* STABLE */
+                }))
               ])
             ])
           ])
@@ -109,4 +156,4 @@ const _component_up_table = resolveEasyComponent("up-table",_easycom_up_table)
 
 })
 export default __sfc__
-const GenSrcSubUviewUltraDemosTableTableStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]
+const GenSrcSubUviewUltraDemosTableTableStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["mt-12px", _pS(_uM([["marginTop", 12]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]

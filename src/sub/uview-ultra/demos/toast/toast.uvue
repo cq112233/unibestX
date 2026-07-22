@@ -10,6 +10,14 @@
           <up-button type="error" text="错误提示" size="mini" @click="showToast('error')"></up-button>
         </view>
       </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">更多类型</text>
+        <view class="flex-row items-center">
+          <up-button type="warning" text="警告提示" size="mini" @click="showToast('warning')"></up-button>
+          <view class="w-10px"></view>
+          <up-button type="default" text="默认提示" size="mini" @click="showToast('default')"></up-button>
+        </view>
+      </view>
     </view>
     <up-toast ref="uToast"></up-toast>
   </view>

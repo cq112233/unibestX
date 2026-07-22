@@ -5,6 +5,7 @@ import AppKu from '@/App.ku.uvue'
 import LayoutComponent from '@/src/layouts/default.uvue'
 import { ref } from 'vue'
 
+
 const __sfc__ = defineComponent({
   __name: 'radio',
   setup(__props) {
@@ -13,8 +14,12 @@ const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
 const radioValue = ref('apple')
+const radioValue2 = ref('apple')
+const radioValue3 = ref('square')
+const radioValue4 = ref('label')
+
 function radioChange(n: string) {
-  console.log('radio change', n, " at src/sub/uview-ultra/demos/radio/radio.uvue:38")
+  console.log('radio change', n, " at src/sub/uview-ultra/demos/radio/radio.uvue:66")
 }
 
 return (): any | null => {
@@ -55,12 +60,70 @@ const _component_up_radio_group = resolveEasyComponent("up-radio-group",_easycom
                       name: "banana",
                       label: "香蕉",
                       class: "mb-10px mr-20px"
+                    }))
+                  ]),
+                  _: 1 /* STABLE */
+                }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "禁用状态"),
+                _cV(_component_up_radio_group, _uM({
+                  modelValue: radioValue2.value,
+                  "onUpdate:modelValue": $event => {(radioValue2).value = $event}
+                }), _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cV(_component_up_radio, _uM({
+                      name: "apple",
+                      label: "苹果(禁用)",
+                      disabled: true,
+                      class: "mb-10px mr-20px"
                     })),
                     _cV(_component_up_radio, _uM({
-                      name: "orange",
-                      label: "橙子",
-                      class: "mb-10px mr-20px",
-                      disabled: true
+                      name: "banana",
+                      label: "香蕉(未禁用)",
+                      class: "mb-10px mr-20px"
+                    }))
+                  ]),
+                  _: 1 /* STABLE */
+                }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "自定义形状与颜色"),
+                _cV(_component_up_radio_group, _uM({
+                  modelValue: radioValue3.value,
+                  "onUpdate:modelValue": $event => {(radioValue3).value = $event}
+                }), _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cV(_component_up_radio, _uM({
+                      name: "square",
+                      label: "方形",
+                      shape: "square",
+                      "active-color": "#fa3534",
+                      class: "mb-10px mr-20px"
+                    })),
+                    _cV(_component_up_radio, _uM({
+                      name: "circle",
+                      label: "圆形",
+                      shape: "circle",
+                      "active-color": "#ff9900",
+                      class: "mb-10px mr-20px"
+                    }))
+                  ]),
+                  _: 1 /* STABLE */
+                }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "禁止点击标签切换"),
+                _cV(_component_up_radio_group, _uM({
+                  modelValue: radioValue4.value,
+                  "onUpdate:modelValue": $event => {(radioValue4).value = $event}
+                }), _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cV(_component_up_radio, _uM({
+                      name: "label",
+                      label: "只能点圈圈",
+                      "label-disabled": true,
+                      class: "mb-10px mr-20px"
                     }))
                   ]),
                   _: 1 /* STABLE */
@@ -79,4 +142,4 @@ const _component_up_radio_group = resolveEasyComponent("up-radio-group",_easycom
 
 })
 export default __sfc__
-const GenSrcSubUviewUltraDemosRadioRadioStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["mb-10px", _pS(_uM([["marginBottom", 10]]))], ["mr-20px", _pS(_uM([["marginRight", 20]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]
+const GenSrcSubUviewUltraDemosRadioRadioStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["mb-10px", _pS(_uM([["marginBottom", 10]]))], ["mr-20px", _pS(_uM([["marginRight", 20]]))], ["mt-12px", _pS(_uM([["marginTop", 12]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]

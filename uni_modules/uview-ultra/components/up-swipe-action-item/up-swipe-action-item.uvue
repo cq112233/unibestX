@@ -281,7 +281,7 @@
 				view.fields({
 					size: true,
 					scrollOffset: true
-					}, (data: any) => {
+					} as NodeField, (data: any) => {
 						this.state['buttonsWidth'] = (data as NodeInfo).width
 						// console.log("得到节点信息" + JSON.stringify(data));
 				}).exec();

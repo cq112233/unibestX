@@ -1,0 +1,45 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Gap 间隔槽" :auto-back="true" />
+    <view class="p-16px">
+      <view class="demo-block">
+        <text class="demo-label">基础用法</text>
+        <up-gap height="30" bg-color="#f3f4f6"></up-gap>
+      </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">自定义高度</text>
+        <up-gap height="50" bg-color="#f3f4f6"></up-gap>
+      </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">自定义背景色</text>
+        <up-gap height="30" bg-color="#fa3534"></up-gap>
+      </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">自定义上下外边距</text>
+        <view class="bg-[#2979ff] h-10px w-full"></view>
+        <up-gap height="20" bg-color="#f3f4f6" margin-top="10" margin-bottom="10"></up-gap>
+        <view class="bg-[#2979ff] h-10px w-full"></view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+</style>

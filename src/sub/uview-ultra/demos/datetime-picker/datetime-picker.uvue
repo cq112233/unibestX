@@ -3,29 +3,77 @@
     <NavBar title="up-datetime-picker 时间选择" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
     <view class="p-16px">
       <view class="demo-block">
-        <text class="demo-label">基础用法</text>
+        <text class="demo-label">完整时间</text>
         <view class="flex-row items-center">
-          <up-button type="primary" text="选择时间" size="mini" @click="datetimeShow = true"></up-button>
+          <up-button type="primary" text="年月日时分" size="mini" @click="showDt1"></up-button>
+        </view>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">仅选日期</text>
+        <view class="flex-row items-center">
+          <up-button type="success" text="年月日" size="mini" @click="showDt2"></up-button>
+        </view>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">年月选择</text>
+        <view class="flex-row items-center">
+          <up-button type="warning" text="年月" size="mini" @click="showDt3"></up-button>
+        </view>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">仅选时间</text>
+        <view class="flex-row items-center">
+          <up-button type="error" text="时分" size="mini" @click="showDt4"></up-button>
         </view>
       </view>
     </view>
-    <up-datetime-picker
-      :show="datetimeShow"
-      mode="datetime"
-      @confirm="onDatetimeConfirm"
-      @cancel="datetimeShow = false"
-    ></up-datetime-picker>
+    
+    <up-datetime-picker :show="dtShow1" mode="datetime" @confirm="onConfirm1" @cancel="dtShow1 = false"></up-datetime-picker>
+    <up-datetime-picker :show="dtShow2" mode="date" @confirm="onConfirm2" @cancel="dtShow2 = false"></up-datetime-picker>
+    <up-datetime-picker :show="dtShow3" mode="year-month" @confirm="onConfirm3" @cancel="dtShow3 = false"></up-datetime-picker>
+    <up-datetime-picker :show="dtShow4" mode="time" @confirm="onConfirm4" @cancel="dtShow4 = false"></up-datetime-picker>
   </view>
 </template>
 
 <script setup lang="uts">
 import { ref } from 'vue'
 
-const datetimeShow = ref(false)
+const dtShow1 = ref(false)
+const dtShow2 = ref(false)
+const dtShow3 = ref(false)
+const dtShow4 = ref(false)
 
-function onDatetimeConfirm(e: UTSJSONObject) {
-  console.log('datetime confirm', e)
-  datetimeShow.value = false
+function showDt1() {
+  dtShow1.value = true
+}
+function showDt2() {
+  dtShow2.value = true
+}
+function showDt3() {
+  dtShow3.value = true
+}
+function showDt4() {
+  dtShow4.value = true
+}
+
+function onConfirm1(e: UTSJSONObject) {
+  console.log('datetime', e)
+  dtShow1.value = false
+}
+function onConfirm2(e: UTSJSONObject) {
+  console.log('date', e)
+  dtShow2.value = false
+}
+function onConfirm3(e: UTSJSONObject) {
+  console.log('year-month', e)
+  dtShow3.value = false
+}
+function onConfirm4(e: UTSJSONObject) {
+  console.log('time', e)
+  dtShow4.value = false
 }
 </script>
 

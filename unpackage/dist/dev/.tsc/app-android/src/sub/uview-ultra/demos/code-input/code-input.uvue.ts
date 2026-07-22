@@ -13,6 +13,8 @@ const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
 const codeInputValue1 = ref('')
+const codeInputValue2 = ref('')
+const codeInputValue3 = ref('')
 function onCodeInputFinish(val: string): void {
   uni.showToast({ title: `输入的验证码为: ${val}`, icon: 'none' })
 }
@@ -46,6 +48,27 @@ const _component_up_code_input = resolveEasyComponent("up-code-input",_easycom_u
                   mode: "box",
                   onFinish: onCodeInputFinish
                 }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "横线模式"),
+                _cV(_component_up_code_input, _uM({
+                  modelValue: codeInputValue2.value,
+                  "onUpdate:modelValue": $event => {(codeInputValue2).value = $event},
+                  maxlength: 4,
+                  mode: "line"
+                }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "自定义间距与颜色"),
+                _cV(_component_up_code_input, _uM({
+                  modelValue: codeInputValue3.value,
+                  "onUpdate:modelValue": $event => {(codeInputValue3).value = $event},
+                  maxlength: 4,
+                  mode: "box",
+                  space: "10",
+                  color: "#2979ff",
+                  "border-color": "#2979ff"
+                }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
               ])
             ])
           ])
@@ -60,4 +83,4 @@ const _component_up_code_input = resolveEasyComponent("up-code-input",_easycom_u
 
 })
 export default __sfc__
-const GenSrcSubUviewUltraDemosCodeInputCodeInputStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["none", _pS(_uM([["display", "none"]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]
+const GenSrcSubUviewUltraDemosCodeInputCodeInputStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["mt-12px", _pS(_uM([["marginTop", 12]]))], ["none", _pS(_uM([["display", "none"]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]

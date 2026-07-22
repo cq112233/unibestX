@@ -275,7 +275,7 @@ async function loadJsonData(jsonUrl : string) : Promise<UTSJSONObject> {
 					fail: (err) => {
 						reject(err)
 					}
-				})
+				} as ReadFileOptions)
 			} catch (fsError) {
 				reject(fsError)
 			}

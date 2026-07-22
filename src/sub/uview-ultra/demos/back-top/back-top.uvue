@@ -1,0 +1,42 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Back Top 返回顶部" :auto-back="true" />
+    <view class="p-16px">
+      <view class="demo-block">
+        <text class="demo-label">基础用法</text>
+        <text style="font-size: 12px; color: #999;">请向下滑动页面，右下角会出现返回顶部按钮</text>
+        <view style="height: 1000px; display: flex; align-items: center; justify-content: center;">
+          <text style="color: #ccc;">向下滚动</text>
+        </view>
+        <up-back-top :scroll-top="scrollTop"></up-back-top>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue'
+import { onPageScroll } from '@dcloudio/uni-app'
+
+const scrollTop = ref(0)
+onPageScroll((e) => {
+  scrollTop.value = e.scrollTop
+})
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+</style>

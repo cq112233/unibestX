@@ -6,6 +6,14 @@
         <text class="demo-label">up-code-input</text>
         <up-code-input v-model="codeInputValue1" :maxlength="6" mode="box" @finish="onCodeInputFinish"></up-code-input>
       </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">横线模式</text>
+        <up-code-input v-model="codeInputValue2" :maxlength="4" mode="line"></up-code-input>
+      </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">自定义间距与颜色</text>
+        <up-code-input v-model="codeInputValue3" :maxlength="4" mode="box" space="10" color="#2979ff" border-color="#2979ff"></up-code-input>
+      </view>
     </view>
   </view>
 </template>
@@ -14,6 +22,8 @@
 import { ref } from 'vue'
 
 const codeInputValue1 = ref('')
+const codeInputValue2 = ref('')
+const codeInputValue3 = ref('')
 function onCodeInputFinish(val: string): void {
   uni.showToast({ title: `输入的验证码为: ${val}`, icon: 'none' })
 }

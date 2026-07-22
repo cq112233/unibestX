@@ -57,6 +57,96 @@ const _component_up_cell_group = resolveEasyComponent("up-cell-group",_easycom_u
               _cV(_component_up_cell_group, _uM({ border: false }), _uM({
                 default: withSlotCtx((): any[] => [
                   _cV(_component_up_cell, _uM({
+                    title: "Icon 图标",
+                    "is-link": "",
+                    onClick: () => {goToDemo('icon')}
+                  }), _uM({
+                    icon: withSlotCtx((): any[] => [
+                      _cV(_component_up_icon, _uM({
+                        name: "photo",
+                        color: "#2979ff",
+                        size: "20",
+                        class: "mr-8px"
+                      }))
+                    ]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_up_cell, _uM({
+                    title: "Text 文本",
+                    "is-link": "",
+                    onClick: () => {goToDemo('text')}
+                  }), _uM({
+                    icon: withSlotCtx((): any[] => [
+                      _cV(_component_up_icon, _uM({
+                        name: "file-text",
+                        color: "#2979ff",
+                        size: "20",
+                        class: "mr-8px"
+                      }))
+                    ]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_up_cell, _uM({
+                    title: "Empty 空白页",
+                    "is-link": "",
+                    onClick: () => {goToDemo('empty')}
+                  }), _uM({
+                    icon: withSlotCtx((): any[] => [
+                      _cV(_component_up_icon, _uM({
+                        name: "info-circle",
+                        color: "#2979ff",
+                        size: "20",
+                        class: "mr-8px"
+                      }))
+                    ]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_up_cell, _uM({
+                    title: "Divider 分割线",
+                    "is-link": "",
+                    onClick: () => {goToDemo('divider')}
+                  }), _uM({
+                    icon: withSlotCtx((): any[] => [
+                      _cV(_component_up_icon, _uM({
+                        name: "minus",
+                        color: "#2979ff",
+                        size: "20",
+                        class: "mr-8px"
+                      }))
+                    ]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_up_cell, _uM({
+                    title: "LoadingIcon 加载图标",
+                    "is-link": "",
+                    onClick: () => {goToDemo('loading-icon')}
+                  }), _uM({
+                    icon: withSlotCtx((): any[] => [
+                      _cV(_component_up_icon, _uM({
+                        name: "reload",
+                        color: "#2979ff",
+                        size: "20",
+                        class: "mr-8px"
+                      }))
+                    ]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_up_cell, _uM({
+                    title: "Skeleton 骨架屏",
+                    "is-link": "",
+                    onClick: () => {goToDemo('skeleton')}
+                  }), _uM({
+                    icon: withSlotCtx((): any[] => [
+                      _cV(_component_up_icon, _uM({
+                        name: "list-dot",
+                        color: "#2979ff",
+                        size: "20",
+                        class: "mr-8px"
+                      }))
+                    ]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_up_cell, _uM({
                     title: "Button 按钮",
                     "is-link": "",
                     onClick: () => {goToDemo('button')}
@@ -168,7 +258,7 @@ const _component_up_cell_group = resolveEasyComponent("up-cell-group",_easycom_u
                   }), _uM({
                     icon: withSlotCtx((): any[] => [
                       _cV(_component_up_icon, _uM({
-                        name: "image",
+                        name: "photo",
                         color: "#2979ff",
                         size: "20",
                         class: "mr-8px"
@@ -199,6 +289,81 @@ const _component_up_cell_group = resolveEasyComponent("up-cell-group",_easycom_u
                     icon: withSlotCtx((): any[] => [
                       _cV(_component_up_icon, _uM({
                         name: "order",
+                        color: "#2979ff",
+                        size: "20",
+                        class: "mr-8px"
+                      }))
+                    ]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_up_cell, _uM({
+                    title: "Grid 宫格",
+                    "is-link": "",
+                    onClick: () => {goToDemo('gr' + 'id')}
+                  }), _uM({
+                    icon: withSlotCtx((): any[] => [
+                      _cV(_component_up_icon, _uM({
+                        name: 'gr' + 'id',
+                        color: "#2979ff",
+                        size: "20",
+                        class: "mr-8px"
+                      }))
+                    ]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_up_cell, _uM({
+                    title: "Line 线条",
+                    "is-link": "",
+                    onClick: () => {goToDemo('line')}
+                  }), _uM({
+                    icon: withSlotCtx((): any[] => [
+                      _cV(_component_up_icon, _uM({
+                        name: "minus",
+                        color: "#2979ff",
+                        size: "20",
+                        class: "mr-8px"
+                      }))
+                    ]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_up_cell, _uM({
+                    title: "Album 相册",
+                    "is-link": "",
+                    onClick: () => {goToDemo('album')}
+                  }), _uM({
+                    icon: withSlotCtx((): any[] => [
+                      _cV(_component_up_icon, _uM({
+                        name: "photo",
+                        color: "#2979ff",
+                        size: "20",
+                        class: "mr-8px"
+                      }))
+                    ]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_up_cell, _uM({
+                    title: "Gap 间隔槽",
+                    "is-link": "",
+                    onClick: () => {goToDemo('gap')}
+                  }), _uM({
+                    icon: withSlotCtx((): any[] => [
+                      _cV(_component_up_icon, _uM({
+                        name: "minus",
+                        color: "#2979ff",
+                        size: "20",
+                        class: "mr-8px"
+                      }))
+                    ]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_up_cell, _uM({
+                    title: "Sticky 吸顶",
+                    "is-link": "",
+                    onClick: () => {goToDemo('sti' + 'cky')}
+                  }), _uM({
+                    icon: withSlotCtx((): any[] => [
+                      _cV(_component_up_icon, _uM({
+                        name: "arrow-up",
                         color: "#2979ff",
                         size: "20",
                         class: "mr-8px"
@@ -266,7 +431,7 @@ const _component_up_cell_group = resolveEasyComponent("up-cell-group",_easycom_u
                   }), _uM({
                     icon: withSlotCtx((): any[] => [
                       _cV(_component_up_icon, _uM({
-                        name: "empty-circle",
+                        name: "checkmark-circle",
                         color: "#19be6b",
                         size: "20",
                         class: "mr-8px"
@@ -402,6 +567,51 @@ const _component_up_cell_group = resolveEasyComponent("up-cell-group",_easycom_u
                     icon: withSlotCtx((): any[] => [
                       _cV(_component_up_icon, _uM({
                         name: "more-circle",
+                        color: "#19be6b",
+                        size: "20",
+                        class: "mr-8px"
+                      }))
+                    ]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_up_cell, _uM({
+                    title: "Keyboard 键盘",
+                    "is-link": "",
+                    onClick: () => {goToDemo('keyboard')}
+                  }), _uM({
+                    icon: withSlotCtx((): any[] => [
+                      _cV(_component_up_icon, _uM({
+                        name: "grid-fill",
+                        color: "#19be6b",
+                        size: "20",
+                        class: "mr-8px"
+                      }))
+                    ]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_up_cell, _uM({
+                    title: "Dropdown 下拉菜单",
+                    "is-link": "",
+                    onClick: () => {goToDemo('dropdown')}
+                  }), _uM({
+                    icon: withSlotCtx((): any[] => [
+                      _cV(_component_up_icon, _uM({
+                        name: "arrow-down-fill",
+                        color: "#19be6b",
+                        size: "20",
+                        class: "mr-8px"
+                      }))
+                    ]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_up_cell, _uM({
+                    title: "SwipeAction 滑动操作",
+                    "is-link": "",
+                    onClick: () => {goToDemo('swipe-action')}
+                  }), _uM({
+                    icon: withSlotCtx((): any[] => [
+                      _cV(_component_up_icon, _uM({
+                        name: "list",
                         color: "#19be6b",
                         size: "20",
                         class: "mr-8px"
@@ -658,6 +868,51 @@ const _component_up_cell_group = resolveEasyComponent("up-cell-group",_easycom_u
                     _: 1 /* STABLE */
                   }), 8 /* PROPS */, ["onClick"]),
                   _cV(_component_up_cell, _uM({
+                    title: "LineProgress 线型进度",
+                    "is-link": "",
+                    onClick: () => {goToDemo('line-progress')}
+                  }), _uM({
+                    icon: withSlotCtx((): any[] => [
+                      _cV(_component_up_icon, _uM({
+                        name: "minus",
+                        color: "#ff9900",
+                        size: "20",
+                        class: "mr-8px"
+                      }))
+                    ]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_up_cell, _uM({
+                    title: "CountDown 倒计时",
+                    "is-link": "",
+                    onClick: () => {goToDemo('count-down')}
+                  }), _uM({
+                    icon: withSlotCtx((): any[] => [
+                      _cV(_component_up_icon, _uM({
+                        name: "clock",
+                        color: "#ff9900",
+                        size: "20",
+                        class: "mr-8px"
+                      }))
+                    ]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_up_cell, _uM({
+                    title: "CountTo 数字滚动",
+                    "is-link": "",
+                    onClick: () => {goToDemo('count-to')}
+                  }), _uM({
+                    icon: withSlotCtx((): any[] => [
+                      _cV(_component_up_icon, _uM({
+                        name: "play-right-fill",
+                        color: "#ff9900",
+                        size: "20",
+                        class: "mr-8px"
+                      }))
+                    ]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_up_cell, _uM({
                     title: "Copy 文本复制",
                     "is-link": "",
                     onClick: () => {goToDemo('copy')}
@@ -666,6 +921,89 @@ const _component_up_cell_group = resolveEasyComponent("up-cell-group",_easycom_u
                       _cV(_component_up_icon, _uM({
                         name: "file-text",
                         color: "#ff9900",
+                        size: "20",
+                        class: "mr-8px"
+                      }))
+                    ]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["onClick"])
+                ]),
+                _: 1 /* STABLE */
+              }))
+            ]),
+            _cE("view", _uM({ class: "demo-group-card mt-12px" }), [
+              _cE("text", _uM({ class: "group-title" }), "导航组件"),
+              _cV(_component_up_cell_group, _uM({ border: false }), _uM({
+                default: withSlotCtx((): any[] => [
+                  _cV(_component_up_cell, _uM({
+                    title: "Navbar 导航栏",
+                    "is-link": "",
+                    onClick: () => {goToDemo('navbar')}
+                  }), _uM({
+                    icon: withSlotCtx((): any[] => [
+                      _cV(_component_up_icon, _uM({
+                        name: "arrow-left",
+                        color: "#909399",
+                        size: "20",
+                        class: "mr-8px"
+                      }))
+                    ]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_up_cell, _uM({
+                    title: "Tabbar 底部导航",
+                    "is-link": "",
+                    onClick: () => {goToDemo('tabbar')}
+                  }), _uM({
+                    icon: withSlotCtx((): any[] => [
+                      _cV(_component_up_icon, _uM({
+                        name: "list",
+                        color: "#909399",
+                        size: "20",
+                        class: "mr-8px"
+                      }))
+                    ]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_up_cell, _uM({
+                    title: "Tabs 标签页",
+                    "is-link": "",
+                    onClick: () => {goToDemo('tabs')}
+                  }), _uM({
+                    icon: withSlotCtx((): any[] => [
+                      _cV(_component_up_icon, _uM({
+                        name: "list",
+                        color: "#909399",
+                        size: "20",
+                        class: "mr-8px"
+                      }))
+                    ]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_up_cell, _uM({
+                    title: "Subsection 分段器",
+                    "is-link": "",
+                    onClick: () => {goToDemo('subsection')}
+                  }), _uM({
+                    icon: withSlotCtx((): any[] => [
+                      _cV(_component_up_icon, _uM({
+                        name: "list",
+                        color: "#909399",
+                        size: "20",
+                        class: "mr-8px"
+                      }))
+                    ]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_up_cell, _uM({
+                    title: "IndexList 索引列表",
+                    "is-link": "",
+                    onClick: () => {goToDemo('index-list')}
+                  }), _uM({
+                    icon: withSlotCtx((): any[] => [
+                      _cV(_component_up_icon, _uM({
+                        name: "list",
+                        color: "#909399",
                         size: "20",
                         class: "mr-8px"
                       }))

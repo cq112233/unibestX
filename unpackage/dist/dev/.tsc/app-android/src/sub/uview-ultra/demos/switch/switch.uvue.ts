@@ -4,6 +4,7 @@ import AppKu from '@/App.ku.uvue'
 import LayoutComponent from '@/src/layouts/default.uvue'
 import { ref } from 'vue'
 
+
 const __sfc__ = defineComponent({
   __name: 'switch',
   setup(__props) {
@@ -11,7 +12,11 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
-const switchValue = ref(true)
+const switchValue1 = ref(true)
+const switchValue2 = ref(true)
+const switchValue3 = ref(true)
+const switchValue4 = ref(true)
+const switchValue5 = ref(true)
 
 return (): any | null => {
 
@@ -37,11 +42,58 @@ const _component_up_switch = resolveEasyComponent("up-switch",_easycom_up_switch
                 _cE("text", _uM({ class: "demo-label" }), "基础用法"),
                 _cE("view", _uM({ class: "flex-row items-center" }), [
                   _cV(_component_up_switch, _uM({
-                    modelValue: switchValue.value,
-                    "onUpdate:modelValue": $event => {(switchValue).value = $event},
+                    modelValue: switchValue1.value,
+                    "onUpdate:modelValue": $event => {(switchValue1).value = $event},
                     "active-color": "#2979ff"
                   }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"]),
-                  _cE("text", _uM({ class: "text-14px ml-10px" }), _tD(switchValue.value ? '已开启' : '已关闭'), 1 /* TEXT */)
+                  _cE("text", _uM({ class: "text-14px ml-10px" }), _tD(switchValue1.value ? '已开启' : '已关闭'), 1 /* TEXT */)
+                ])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "禁用状态"),
+                _cE("view", _uM({ class: "flex-row items-center" }), [
+                  _cV(_component_up_switch, _uM({
+                    modelValue: switchValue2.value,
+                    "onUpdate:modelValue": $event => {(switchValue2).value = $event},
+                    disabled: true
+                  }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                ])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "加载状态"),
+                _cE("view", _uM({ class: "flex-row items-center" }), [
+                  _cV(_component_up_switch, _uM({
+                    modelValue: switchValue3.value,
+                    "onUpdate:modelValue": $event => {(switchValue3).value = $event},
+                    loading: ""
+                  }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                ])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "自定义颜色"),
+                _cE("view", _uM({ class: "flex-row items-center" }), [
+                  _cV(_component_up_switch, _uM({
+                    modelValue: switchValue4.value,
+                    "onUpdate:modelValue": $event => {(switchValue4).value = $event},
+                    "active-color": "#fa3534",
+                    "inactive-color": "#f56c6c"
+                  }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                ])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "不同尺寸"),
+                _cE("view", _uM({ class: "flex-row items-center" }), [
+                  _cV(_component_up_switch, _uM({
+                    modelValue: switchValue5.value,
+                    "onUpdate:modelValue": $event => {(switchValue5).value = $event},
+                    size: "20",
+                    class: "mr-10px"
+                  }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"]),
+                  _cV(_component_up_switch, _uM({
+                    modelValue: switchValue5.value,
+                    "onUpdate:modelValue": $event => {(switchValue5).value = $event},
+                    size: "28"
+                  }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
                 ])
               ])
             ])
@@ -57,4 +109,4 @@ const _component_up_switch = resolveEasyComponent("up-switch",_easycom_up_switch
 
 })
 export default __sfc__
-const GenSrcSubUviewUltraDemosSwitchSwitchStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["ml-10px", _pS(_uM([["marginLeft", 10]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]
+const GenSrcSubUviewUltraDemosSwitchSwitchStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["ml-10px", _pS(_uM([["marginLeft", 10]]))], ["mr-10px", _pS(_uM([["marginRight", 10]]))], ["mt-12px", _pS(_uM([["marginTop", 12]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]

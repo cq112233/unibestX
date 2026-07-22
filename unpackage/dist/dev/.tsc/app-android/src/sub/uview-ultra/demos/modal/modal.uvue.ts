@@ -30,6 +30,18 @@ function showConfirmModal() {
   modalShowCancel.value = true
   modalShow.value = true
 }
+function showNoTitleModal() {
+  modalTitle.value = ''
+  modalContent.value = '这是一个没有标题的弹窗，显得更加简洁。'
+  modalShowCancel.value = false
+  modalShow.value = true
+}
+function showLongModal() {
+  modalTitle.value = '用户协议'
+  modalContent.value = '1. 这是一个很长很长很长很长很长很长很长很长的内容\n2. 这是一个很长很长很长很长很长很长很长很长的内容'
+  modalShowCancel.value = false
+  modalShow.value = true
+}
 function onModalConfirm() {
   modalShow.value = false
   uni.showToast({ title: '操作成功', icon: 'success' })
@@ -76,6 +88,28 @@ const _component_up_modal = resolveEasyComponent("up-modal",_easycom_up_modal)
                     onClick: showConfirmModal
                   }))
                 ])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "无标题弹窗"),
+                _cE("view", _uM({ class: "flex-row items-center" }), [
+                  _cV(_component_up_button, _uM({
+                    type: "success",
+                    text: "无标题",
+                    size: "mini",
+                    onClick: showNoTitleModal
+                  }))
+                ])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "长内容弹窗"),
+                _cE("view", _uM({ class: "flex-row items-center" }), [
+                  _cV(_component_up_button, _uM({
+                    type: "error",
+                    text: "长内容",
+                    size: "mini",
+                    onClick: showLongModal
+                  }))
+                ])
               ])
             ]),
             _cV(_component_up_modal, _uM({
@@ -99,4 +133,4 @@ const _component_up_modal = resolveEasyComponent("up-modal",_easycom_up_modal)
 
 })
 export default __sfc__
-const GenSrcSubUviewUltraDemosModalModalStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["w-10px", _pS(_uM([["width", 10]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]
+const GenSrcSubUviewUltraDemosModalModalStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["mt-12px", _pS(_uM([["marginTop", 12]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["w-10px", _pS(_uM([["width", 10]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]

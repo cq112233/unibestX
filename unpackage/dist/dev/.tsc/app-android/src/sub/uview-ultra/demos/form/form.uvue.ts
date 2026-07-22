@@ -47,7 +47,12 @@ const formModel = reactive({
   photos: [] as UTSJSONObject[],
 })
 
-const formRules = { __$originalPosition: new UTSSourceMapPosition("formRules", "src/sub/uview-ultra/demos/form/form.uvue", 217, 7), 
+const formModel2 = reactive({
+  name: '',
+  detail: ''
+})
+
+const formRules = { __$originalPosition: new UTSSourceMapPosition("formRules", "src/sub/uview-ultra/demos/form/form.uvue", 236, 7), 
   name: [
     {
       required: true,
@@ -97,9 +102,9 @@ function submitForm() {
         title: '验证通过，提交成功！',
         icon: 'success',
       })
-      console.log('提交的数据：', formModel, " at src/sub/uview-ultra/demos/form/form.uvue:267")
+      console.log('提交的数据：', formModel, " at src/sub/uview-ultra/demos/form/form.uvue:286")
     }).catch((err: any | null) => {
-      console.log('验证失败:', err, " at src/sub/uview-ultra/demos/form/form.uvue:269")
+      console.log('验证失败:', err, " at src/sub/uview-ultra/demos/form/form.uvue:288")
       uni.showToast({
         title: '请检查必填项',
         icon: 'error',
@@ -551,22 +556,64 @@ const _component_up_action_sheet = resolveEasyComponent("up-action-sheet",_easyc
                   }))
                 ]),
                 _: 1 /* STABLE */
-              }), 8 /* PROPS */, ["model"]),
-              _cE("view", _uM({ class: "mt-20px flex-row justify-between" }), [
-                _cE("view", _uM({ class: "flex-1 mr-10px" }), [
-                  _cV(_component_up_button, _uM({
-                    type: "primary",
-                    text: "提交表单",
-                    onClick: submitForm
+              }), 8 /* PROPS */, ["model"])
+            ]),
+            _cE("view", _uM({ class: "demo-block mt-12px" }), [
+              _cE("text", _uM({ class: "demo-label" }), "标签上方对齐"),
+              _cV(_component_up_form, _uM({
+                model: formModel2,
+                "label-position": "top",
+                "label-width": "100px"
+              }), _uM({
+                default: withSlotCtx((): any[] => [
+                  _cV(_component_up_form_item, _uM({
+                    label: "活动名称",
+                    prop: "name",
+                    "border-bottom": true
+                  }), _uM({
+                    default: withSlotCtx((): any[] => [
+                      _cV(_component_up_input, _uM({
+                        modelValue: formModel2.name,
+                        "onUpdate:modelValue": $event => {(formModel2.name) = $event},
+                        placeholder: "请输入活动名称",
+                        border: "none"
+                      }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                    ]),
+                    _: 1 /* STABLE */
+                  })),
+                  _cV(_component_up_form_item, _uM({
+                    label: "活动详情",
+                    prop: "detail",
+                    "border-bottom": true
+                  }), _uM({
+                    default: withSlotCtx((): any[] => [
+                      _cV(_component_up_textarea, _uM({
+                        modelValue: formModel2.detail,
+                        "onUpdate:modelValue": $event => {(formModel2.detail) = $event},
+                        placeholder: "请输入活动详情",
+                        border: "none"
+                      }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                    ]),
+                    _: 1 /* STABLE */
                   }))
                 ]),
-                _cE("view", _uM({ class: "flex-1 ml-10px" }), [
-                  _cV(_component_up_button, _uM({
-                    type: "info",
-                    text: "重置表单",
-                    onClick: resetForm
-                  }))
-                ])
+                _: 1 /* STABLE */
+              }), 8 /* PROPS */, ["model"])
+            ]),
+            _cE("view", _uM({ class: "p-16px mt-20px flex-row justify-between" }), [
+              _cE("view", _uM({ class: "flex-1 mr-10px" }), [
+                _cV(_component_up_button, _uM({
+                  type: "primary",
+                  text: "提交表单",
+                  onClick: submitForm
+                }))
+              ]),
+              _cE("view", _uM({ class: "flex-1 ml-10px" }), [
+                _cV(_component_up_button, _uM({
+                  type: "info",
+                  text: "重置表单",
+                  onClick: resetForm
+                }))
               ])
             ]),
             _cV(_component_up_calendar, _uM({
@@ -611,4 +658,4 @@ const _component_up_action_sheet = resolveEasyComponent("up-action-sheet",_easyc
 
 })
 export default __sfc__
-const GenSrcSubUviewUltraDemosFormFormStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["blur", _pS(_uM([["filter", "var(--un-blur) var(--un-brightness) var(--un-contrast) var(--un-drop-shadow) var(--un-grayscale) var(--un-hue-rotate) var(--un-invert) var(--un-opacity) var(--un-saturate) var(--un-sepia)"], ["--un-blur", "blur(8rpx)"]]))], ["flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["justify-between", _pS(_uM([["justifyContent", "space-between"]]))], ["ml-10px", _pS(_uM([["marginLeft", 10]]))], ["mr-10px", _pS(_uM([["marginRight", 10]]))], ["mt-20px", _pS(_uM([["marginTop", 20]]))], ["none", _pS(_uM([["display", "none"]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["w-10px", _pS(_uM([["width", 10]]))], ["section-title", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 8], ["paddingLeft", 16], ["fontSize", 18], ["fontWeight", "bold"], ["color", "#303133"]]))], ["demo-block", _pS(_uM([["marginTop", 0], ["marginRight", 12], ["marginBottom", 12], ["marginLeft", 12], ["paddingTop", 12], ["paddingRight", 16], ["paddingBottom", 12], ["paddingLeft", 16], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8], ["boxShadow", "0 2px 12px rgba(0, 0, 0, 0.05)"]]))]])]
+const GenSrcSubUviewUltraDemosFormFormStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["blur", _pS(_uM([["filter", "var(--un-blur) var(--un-brightness) var(--un-contrast) var(--un-drop-shadow) var(--un-grayscale) var(--un-hue-rotate) var(--un-invert) var(--un-opacity) var(--un-saturate) var(--un-sepia)"], ["--un-blur", "blur(8rpx)"]]))], ["flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["justify-between", _pS(_uM([["justifyContent", "space-between"]]))], ["ml-10px", _pS(_uM([["marginLeft", 10]]))], ["mr-10px", _pS(_uM([["marginRight", 10]]))], ["mt-12px", _pS(_uM([["marginTop", 12]]))], ["mt-20px", _pS(_uM([["marginTop", 20]]))], ["none", _pS(_uM([["display", "none"]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["w-10px", _pS(_uM([["width", 10]]))], ["section-title", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 8], ["paddingLeft", 16], ["fontSize", 18], ["fontWeight", "bold"], ["color", "#303133"]]))], ["demo-block", _pS(_uM([["marginTop", 0], ["marginRight", 12], ["marginBottom", 12], ["marginLeft", 12], ["paddingTop", 12], ["paddingRight", 16], ["paddingBottom", 12], ["paddingLeft", 16], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8], ["boxShadow", "0 2px 12px rgba(0, 0, 0, 0.05)"]]))]])]

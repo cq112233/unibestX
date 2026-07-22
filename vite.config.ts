@@ -45,9 +45,11 @@ export default defineConfig({
         ],
         ['pt-safe', { 'padding-top': 'env(safe-area-inset-top)' }],
         ['pb-safe', { 'padding-bottom': 'env(safe-area-inset-bottom)' }],
-        // uni-app X 不支持 start 值，必须用 flex-start
+        // uni-app X 不支持 start/end 简写，必须用 flex-start/flex-end
         ['justify-start', { 'justify-content': 'flex-start' }],
+        ['justify-end', { 'justify-content': 'flex-end' }],
         ["self-start", { "align-self": "flex-start" }],
+        ["self-end", { "align-self": "flex-end" }],
         ["items-start", { "align-items": "flex-start" }],
         ["items-end", { "align-items": "flex-end" }],
       ],

@@ -48,12 +48,60 @@ const _component_up_avatar = resolveEasyComponent("up-avatar",_easycom_up_avatar
                 ])
               ]),
               _cE("view", _uM({ class: "demo-block mt-12px" }), [
-                _cE("text", _uM({ class: "demo-label" }), "方形头像"),
+                _cE("text", _uM({ class: "demo-label" }), "形状设定"),
                 _cE("view", _uM({ class: "flex-row items-center" }), [
+                  _cV(_component_up_avatar, _uM({
+                    src: "/static/logo.png",
+                    shape: "circle",
+                    size: "40",
+                    class: "mr-10px"
+                  })),
                   _cV(_component_up_avatar, _uM({
                     src: "/static/logo.png",
                     shape: "square",
                     size: "40"
+                  }))
+                ])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "不同尺寸"),
+                _cE("view", _uM({ class: "flex-row items-center" }), [
+                  _cV(_component_up_avatar, _uM({
+                    src: "/static/logo.png",
+                    size: "50",
+                    class: "mr-10px"
+                  })),
+                  _cV(_component_up_avatar, _uM({
+                    src: "/static/logo.png",
+                    size: "40",
+                    class: "mr-10px"
+                  })),
+                  _cV(_component_up_avatar, _uM({
+                    src: "/static/logo.png",
+                    size: "30",
+                    class: "mr-10px"
+                  }))
+                ])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "自定义背景色和图标"),
+                _cE("view", _uM({ class: "flex-row items-center" }), [
+                  _cV(_component_up_avatar, _uM({
+                    icon: "level",
+                    size: "40",
+                    "bg-color": "#fa3534",
+                    class: "mr-10px"
+                  })),
+                  _cV(_component_up_avatar, _uM({
+                    icon: "photo",
+                    size: "40",
+                    "bg-color": "#ff9900",
+                    class: "mr-10px"
+                  })),
+                  _cV(_component_up_avatar, _uM({
+                    text: "张",
+                    size: "40",
+                    "bg-color": "#19be6b"
                   }))
                 ])
               ])

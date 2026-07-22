@@ -4,6 +4,7 @@ import AppKu from '@/App.ku.uvue'
 import LayoutComponent from '@/src/layouts/default.uvue'
 import { ref } from 'vue'
 
+
 const __sfc__ = defineComponent({
   __name: 'textarea',
   setup(__props) {
@@ -11,7 +12,10 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
-const textValue = ref('')
+const textValue1 = ref('')
+const textValue2 = ref('')
+const textValue3 = ref('')
+const textValue4 = ref('')
 
 return (): any | null => {
 
@@ -36,11 +40,38 @@ const _component_up_textarea = resolveEasyComponent("up-textarea",_easycom_up_te
               _cE("view", _uM({ class: "demo-block" }), [
                 _cE("text", _uM({ class: "demo-label" }), "基础用法"),
                 _cV(_component_up_textarea, _uM({
-                  modelValue: textValue.value,
-                  "onUpdate:modelValue": $event => {(textValue).value = $event},
+                  modelValue: textValue1.value,
+                  "onUpdate:modelValue": $event => {(textValue1).value = $event},
                   placeholder: "请输入内容",
                   count: "",
                   maxlength: 100
+                }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "自动增高"),
+                _cV(_component_up_textarea, _uM({
+                  modelValue: textValue2.value,
+                  "onUpdate:modelValue": $event => {(textValue2).value = $event},
+                  placeholder: "输入文字会自动撑开高度",
+                  "auto-height": ""
+                }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "下划线模式"),
+                _cV(_component_up_textarea, _uM({
+                  modelValue: textValue3.value,
+                  "onUpdate:modelValue": $event => {(textValue3).value = $event},
+                  placeholder: "下划线输入",
+                  border: "bottom"
+                }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "禁用状态"),
+                _cV(_component_up_textarea, _uM({
+                  modelValue: textValue4.value,
+                  "onUpdate:modelValue": $event => {(textValue4).value = $event},
+                  placeholder: "禁止输入内容",
+                  disabled: true
                 }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
               ])
             ])
@@ -56,4 +87,4 @@ const _component_up_textarea = resolveEasyComponent("up-textarea",_easycom_up_te
 
 })
 export default __sfc__
-const GenSrcSubUviewUltraDemosTextareaTextareaStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]
+const GenSrcSubUviewUltraDemosTextareaTextareaStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["mt-12px", _pS(_uM([["marginTop", 12]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]

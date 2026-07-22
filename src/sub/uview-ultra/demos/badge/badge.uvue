@@ -10,10 +10,29 @@
           <up-badge type="success" :value="100" max="99"></up-badge>
         </view>
       </view>
+      
       <view class="demo-block mt-12px">
         <text class="demo-label">小圆点</text>
         <view class="flex-row items-center">
           <up-badge type="error" :is-dot="true"></up-badge>
+        </view>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">自定义颜色</text>
+        <view class="flex-row items-center">
+          <up-badge value="新" bg-color="#8a2be2" color="#ffffff" class="mr-20px"></up-badge>
+          <up-badge value="热" bg-color="#ff9900" color="#ffffff" class="mr-20px"></up-badge>
+          <up-badge :is-dot="true" bg-color="#000000" class="mr-20px"></up-badge>
+        </view>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">绝对定位</text>
+        <view class="flex-row items-center">
+          <view class="relative w-40px h-40px bg-[#e5e5e5] rounded-4px">
+            <up-badge type="error" :value="5" absolute :offset="[-10, -10]"></up-badge>
+          </view>
         </view>
       </view>
     </view>

@@ -62,6 +62,31 @@ const _component_up_popup = resolveEasyComponent("up-popup",_easycom_up_popup)
                     onClick: () => {openPopup('bottom')}
                   }), null, 8 /* PROPS */, ["onClick"])
                 ])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "更多方向弹出"),
+                _cE("view", _uM({ class: "flex-row items-center" }), [
+                  _cV(_component_up_button, _uM({
+                    type: "success",
+                    text: "左侧弹出",
+                    size: "mini",
+                    onClick: () => {openPopup('left')}
+                  }), null, 8 /* PROPS */, ["onClick"]),
+                  _cE("view", _uM({ class: "w-10px" })),
+                  _cV(_component_up_button, _uM({
+                    type: "success",
+                    text: "右侧弹出",
+                    size: "mini",
+                    onClick: () => {openPopup('right')}
+                  }), null, 8 /* PROPS */, ["onClick"]),
+                  _cE("view", _uM({ class: "w-10px" })),
+                  _cV(_component_up_button, _uM({
+                    type: "success",
+                    text: "居中弹出",
+                    size: "mini",
+                    onClick: () => {openPopup('center')}
+                  }), null, 8 /* PROPS */, ["onClick"])
+                ])
               ])
             ]),
             _cV(_component_up_popup, _uM({
@@ -90,4 +115,4 @@ const _component_up_popup = resolveEasyComponent("up-popup",_easycom_up_popup)
 
 })
 export default __sfc__
-const GenSrcSubUviewUltraDemosPopupPopupStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["p-30px", _pS(_uM([["paddingTop", 30], ["paddingRight", 30], ["paddingBottom", 30], ["paddingLeft", 30]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["text-__303133_", _pS(_uM([["color", "#303133"]]))], ["text-16px", _pS(_uM([["fontSize", 16]]))], ["w-10px", _pS(_uM([["width", 10]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]
+const GenSrcSubUviewUltraDemosPopupPopupStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["mt-12px", _pS(_uM([["marginTop", 12]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["p-30px", _pS(_uM([["paddingTop", 30], ["paddingRight", 30], ["paddingBottom", 30], ["paddingLeft", 30]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["text-__303133_", _pS(_uM([["color", "#303133"]]))], ["text-16px", _pS(_uM([["fontSize", 16]]))], ["w-10px", _pS(_uM([["width", 10]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]

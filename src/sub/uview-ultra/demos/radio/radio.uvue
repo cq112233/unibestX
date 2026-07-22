@@ -7,7 +7,29 @@
         <up-radio-group v-model="radioValue" @change="radioChange">
           <up-radio name="apple" label="苹果" class="mb-10px mr-20px"></up-radio>
           <up-radio name="banana" label="香蕉" class="mb-10px mr-20px"></up-radio>
-          <up-radio name="orange" label="橙子" class="mb-10px mr-20px" :disabled="true"></up-radio>
+        </up-radio-group>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">禁用状态</text>
+        <up-radio-group v-model="radioValue2">
+          <up-radio name="apple" label="苹果(禁用)" :disabled="true" class="mb-10px mr-20px"></up-radio>
+          <up-radio name="banana" label="香蕉(未禁用)" class="mb-10px mr-20px"></up-radio>
+        </up-radio-group>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">自定义形状与颜色</text>
+        <up-radio-group v-model="radioValue3">
+          <up-radio name="square" label="方形" shape="square" active-color="#fa3534" class="mb-10px mr-20px"></up-radio>
+          <up-radio name="circle" label="圆形" shape="circle" active-color="#ff9900" class="mb-10px mr-20px"></up-radio>
+        </up-radio-group>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">禁止点击标签切换</text>
+        <up-radio-group v-model="radioValue4">
+          <up-radio name="label" label="只能点圈圈" :label-disabled="true" class="mb-10px mr-20px"></up-radio>
         </up-radio-group>
       </view>
     </view>
@@ -16,7 +38,12 @@
 
 <script setup lang="uts">
 import { ref } from 'vue'
+
 const radioValue = ref('apple')
+const radioValue2 = ref('apple')
+const radioValue3 = ref('square')
+const radioValue4 = ref('label')
+
 function radioChange(n: string) {
   console.log('radio change', n)
 }

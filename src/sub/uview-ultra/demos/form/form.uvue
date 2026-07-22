@@ -119,8 +119,21 @@
         </up-form-item>
 
       </up-form>
+    </view>
 
-      <view class="mt-20px flex-row justify-between">
+    <view class="demo-block mt-12px">
+      <text class="demo-label">标签上方对齐</text>
+      <up-form :model="formModel2" label-position="top" label-width="100px">
+        <up-form-item label="活动名称" prop="name" :border-bottom="true">
+          <up-input v-model="formModel2.name" placeholder="请输入活动名称" border="none"></up-input>
+        </up-form-item>
+        <up-form-item label="活动详情" prop="detail" :border-bottom="true">
+          <up-textarea v-model="formModel2.detail" placeholder="请输入活动详情" border="none"></up-textarea>
+        </up-form-item>
+      </up-form>
+    </view>
+
+    <view class="p-16px mt-20px flex-row justify-between">
         <view class="flex-1 mr-10px">
           <up-button type="primary" text="提交表单" @click="submitForm"></up-button>
         </view>
@@ -128,7 +141,6 @@
           <up-button type="info" text="重置表单" @click="resetForm"></up-button>
         </view>
       </view>
-    </view>
 
     <!-- 弹窗选择组件 -->
     <!-- Calendar 日历 -->
@@ -189,6 +201,11 @@ const formModel = reactive({
   satisfaction: 80,
   intro: '',
   photos: [] as UTSJSONObject[],
+})
+
+const formModel2 = reactive({
+  name: '',
+  detail: ''
 })
 
 const formRules = {

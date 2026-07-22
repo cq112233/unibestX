@@ -13,11 +13,39 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
-const datetimeShow = ref(false)
+const dtShow1 = ref(false)
+const dtShow2 = ref(false)
+const dtShow3 = ref(false)
+const dtShow4 = ref(false)
 
-function onDatetimeConfirm(e: UTSJSONObject) {
-  console.log('datetime confirm', e, " at src/sub/uview-ultra/demos/datetime-picker/datetime-picker.uvue:44")
-  datetimeShow.value = false
+function showDt1() {
+  dtShow1.value = true
+}
+function showDt2() {
+  dtShow2.value = true
+}
+function showDt3() {
+  dtShow3.value = true
+}
+function showDt4() {
+  dtShow4.value = true
+}
+
+function onConfirm1(e: UTSJSONObject) {
+  console.log('datetime', e, " at src/sub/uview-ultra/demos/datetime-picker/datetime-picker.uvue:81")
+  dtShow1.value = false
+}
+function onConfirm2(e: UTSJSONObject) {
+  console.log('date', e, " at src/sub/uview-ultra/demos/datetime-picker/datetime-picker.uvue:85")
+  dtShow2.value = false
+}
+function onConfirm3(e: UTSJSONObject) {
+  console.log('year-month', e, " at src/sub/uview-ultra/demos/datetime-picker/datetime-picker.uvue:89")
+  dtShow3.value = false
+}
+function onConfirm4(e: UTSJSONObject) {
+  console.log('time', e, " at src/sub/uview-ultra/demos/datetime-picker/datetime-picker.uvue:93")
+  dtShow4.value = false
 }
 
 return (): any | null => {
@@ -42,22 +70,73 @@ const _component_up_datetime_picker = resolveEasyComponent("up-datetime-picker",
             })),
             _cE("view", _uM({ class: "p-16px" }), [
               _cE("view", _uM({ class: "demo-block" }), [
-                _cE("text", _uM({ class: "demo-label" }), "基础用法"),
+                _cE("text", _uM({ class: "demo-label" }), "完整时间"),
                 _cE("view", _uM({ class: "flex-row items-center" }), [
                   _cV(_component_up_button, _uM({
                     type: "primary",
-                    text: "选择时间",
+                    text: "年月日时分",
                     size: "mini",
-                    onClick: () => {datetimeShow.value = true}
-                  }), null, 8 /* PROPS */, ["onClick"])
+                    onClick: showDt1
+                  }))
+                ])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "仅选日期"),
+                _cE("view", _uM({ class: "flex-row items-center" }), [
+                  _cV(_component_up_button, _uM({
+                    type: "success",
+                    text: "年月日",
+                    size: "mini",
+                    onClick: showDt2
+                  }))
+                ])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "年月选择"),
+                _cE("view", _uM({ class: "flex-row items-center" }), [
+                  _cV(_component_up_button, _uM({
+                    type: "warning",
+                    text: "年月",
+                    size: "mini",
+                    onClick: showDt3
+                  }))
+                ])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "仅选时间"),
+                _cE("view", _uM({ class: "flex-row items-center" }), [
+                  _cV(_component_up_button, _uM({
+                    type: "error",
+                    text: "时分",
+                    size: "mini",
+                    onClick: showDt4
+                  }))
                 ])
               ])
             ]),
             _cV(_component_up_datetime_picker, _uM({
-              show: datetimeShow.value,
+              show: dtShow1.value,
               mode: "datetime",
-              onConfirm: onDatetimeConfirm,
-              onCancel: () => {datetimeShow.value = false}
+              onConfirm: onConfirm1,
+              onCancel: () => {dtShow1.value = false}
+            }), null, 8 /* PROPS */, ["show", "onCancel"]),
+            _cV(_component_up_datetime_picker, _uM({
+              show: dtShow2.value,
+              mode: "date",
+              onConfirm: onConfirm2,
+              onCancel: () => {dtShow2.value = false}
+            }), null, 8 /* PROPS */, ["show", "onCancel"]),
+            _cV(_component_up_datetime_picker, _uM({
+              show: dtShow3.value,
+              mode: "year-month",
+              onConfirm: onConfirm3,
+              onCancel: () => {dtShow3.value = false}
+            }), null, 8 /* PROPS */, ["show", "onCancel"]),
+            _cV(_component_up_datetime_picker, _uM({
+              show: dtShow4.value,
+              mode: "time",
+              onConfirm: onConfirm4,
+              onCancel: () => {dtShow4.value = false}
             }), null, 8 /* PROPS */, ["show", "onCancel"])
           ])
         ]),
@@ -71,4 +150,4 @@ const _component_up_datetime_picker = resolveEasyComponent("up-datetime-picker",
 
 })
 export default __sfc__
-const GenSrcSubUviewUltraDemosDatetimePickerDatetimePickerStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]
+const GenSrcSubUviewUltraDemosDatetimePickerDatetimePickerStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["mt-12px", _pS(_uM([["marginTop", 12]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]

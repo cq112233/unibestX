@@ -467,7 +467,7 @@ export function parseIconName(name: string, prefix: string = ''): ParsedIconName
  * @param options 可选配置项
  * @returns 图标信息对象，包含图标类型、字体信息、Iconify信息或图片路径
  */
-export function useIcon(name: string | Ref<string> | ComputedRef<string>, options: UseIconOptions = {} as UseIconOptions): UseIconReturn {
+export function useIcon(name: string | ComputedRef<string> | Ref<string>, options: UseIconOptions = {} as UseIconOptions): UseIconReturn {
     // 解析图标名称，转换为标准化的图标信息
     const parsed = computed((): ParsedIconName => parseIconName(`${unref(name)}`, options.prefix ?? 'l'));
     // 确定图标的类型（图片、字体图标、Iconify图标或未知类型）

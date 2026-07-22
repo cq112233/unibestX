@@ -4,7 +4,22 @@
     <view class="p-16px">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
-        <up-slider v-model="sliderValue" :min="0" :max="100" :show-value="true"></up-slider>
+        <up-slider v-model="sliderValue1" :min="0" :max="100"></up-slider>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">指定步长</text>
+        <up-slider v-model="sliderValue2" :step="10"></up-slider>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">自定义颜色</text>
+        <up-slider v-model="sliderValue3" active-color="#fa3534" inactive-color="#f56c6c"></up-slider>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">禁用状态</text>
+        <up-slider v-model="sliderValue4" :disabled="true"></up-slider>
       </view>
     </view>
   </view>
@@ -12,7 +27,11 @@
 
 <script setup lang="uts">
 import { ref } from 'vue'
-const sliderValue = ref(50)
+
+const sliderValue1 = ref(30)
+const sliderValue2 = ref(50)
+const sliderValue3 = ref(40)
+const sliderValue4 = ref(60)
 </script>
 
 <style scoped>

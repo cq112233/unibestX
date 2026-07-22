@@ -10,6 +10,18 @@
           <up-button type="warning" text="确认弹窗" size="mini" @click="showConfirmModal"></up-button>
         </view>
       </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">无标题弹窗</text>
+        <view class="flex-row items-center">
+          <up-button type="success" text="无标题" size="mini" @click="showNoTitleModal"></up-button>
+        </view>
+      </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">长内容弹窗</text>
+        <view class="flex-row items-center">
+          <up-button type="error" text="长内容" size="mini" @click="showLongModal"></up-button>
+        </view>
+      </view>
     </view>
     <up-modal
       :show="modalShow"
@@ -41,6 +53,18 @@ function showConfirmModal() {
   modalTitle.value = '确认操作'
   modalContent.value = '确定要执行此操作吗？此操作不可撤销。'
   modalShowCancel.value = true
+  modalShow.value = true
+}
+function showNoTitleModal() {
+  modalTitle.value = ''
+  modalContent.value = '这是一个没有标题的弹窗，显得更加简洁。'
+  modalShowCancel.value = false
+  modalShow.value = true
+}
+function showLongModal() {
+  modalTitle.value = '用户协议'
+  modalContent.value = '1. 这是一个很长很长很长很长很长很长很长很长的内容\n2. 这是一个很长很长很长很长很长很长很长很长的内容'
+  modalShowCancel.value = false
   modalShow.value = true
 }
 function onModalConfirm() {

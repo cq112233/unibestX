@@ -5,24 +5,74 @@
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
         <view class="flex-row items-center">
-          <up-button type="primary" text="打开日历" size="mini" @click="calendarShow = true"></up-button>
-          <text class="text-14px ml-10px">所选日期: {{ selectedDate }}</text>
+          <up-button type="primary" text="单选模式" size="mini" @click="showCalendar1"></up-button>
+        </view>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">多选模式</text>
+        <view class="flex-row items-center">
+          <up-button type="success" text="多选日期" size="mini" @click="showCalendar2"></up-button>
+        </view>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">范围选择</text>
+        <view class="flex-row items-center">
+          <up-button type="warning" text="范围选择" size="mini" @click="showCalendar3"></up-button>
+        </view>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">自定义主题颜色</text>
+        <view class="flex-row items-center">
+          <up-button type="error" text="自定义颜色" size="mini" @click="showCalendar4"></up-button>
         </view>
       </view>
     </view>
-    <up-calendar :show="calendarShow" mode="single" @confirm="onCalendarConfirm" @close="calendarShow = false"></up-calendar>
+    <up-calendar :show="calendarShow1" mode="single" @confirm="onConfirm1" @close="calendarShow1 = false"></up-calendar>
+    <up-calendar :show="calendarShow2" mode="multiple" @confirm="onConfirm2" @close="calendarShow2 = false"></up-calendar>
+    <up-calendar :show="calendarShow3" mode="range" @confirm="onConfirm3" @close="calendarShow3 = false"></up-calendar>
+    <up-calendar :show="calendarShow4" mode="single" color="#fa3534" @confirm="onConfirm4" @close="calendarShow4 = false"></up-calendar>
   </view>
 </template>
 
 <script setup lang="uts">
 import { ref } from 'vue'
 
-const calendarShow = ref(false)
-const selectedDate = ref('')
+const calendarShow1 = ref(false)
+const calendarShow2 = ref(false)
+const calendarShow3 = ref(false)
+const calendarShow4 = ref(false)
 
-function onCalendarConfirm(e: string[]) {
-  selectedDate.value = e.length > 0 ? e[0] : ''
-  calendarShow.value = false
+function showCalendar1() {
+  calendarShow1.value = true
+}
+function showCalendar2() {
+  calendarShow2.value = true
+}
+function showCalendar3() {
+  calendarShow3.value = true
+}
+function showCalendar4() {
+  calendarShow4.value = true
+}
+
+function onConfirm1(e: string[]) {
+  console.log('single', e)
+  calendarShow1.value = false
+}
+function onConfirm2(e: string[]) {
+  console.log('multiple', e)
+  calendarShow2.value = false
+}
+function onConfirm3(e: string[]) {
+  console.log('range', e)
+  calendarShow3.value = false
+}
+function onConfirm4(e: string[]) {
+  console.log('custom color', e)
+  calendarShow4.value = false
 }
 </script>
 

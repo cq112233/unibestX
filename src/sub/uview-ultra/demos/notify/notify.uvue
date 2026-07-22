@@ -10,6 +10,14 @@
           <up-button type="success" text="成功通知" size="mini" @click="showNotify('success')"></up-button>
         </view>
       </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">其他类型</text>
+        <view class="flex-row items-center">
+          <up-button type="warning" text="警告通知" size="mini" @click="showNotify('warning')"></up-button>
+          <view class="w-10px"></view>
+          <up-button type="error" text="错误通知" size="mini" @click="showNotify('error')"></up-button>
+        </view>
+      </view>
     </view>
     <up-notify ref="uNotify"></up-notify>
   </view>

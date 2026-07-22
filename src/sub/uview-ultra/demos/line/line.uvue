@@ -1,0 +1,49 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Line 线条" :auto-back="true" />
+    <view class="p-16px">
+      <view class="demo-block">
+        <text class="demo-label">基础用法</text>
+        <up-line color="#2979ff" length="100%"></up-line>
+      </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">虚线</text>
+        <up-line color="#2979ff" length="100%" dashed></up-line>
+      </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">自定义颜色</text>
+        <up-line color="#fa3534" length="50%"></up-line>
+        <view class="h-10px"></view>
+        <up-line color="#19be6b" length="80%"></up-line>
+      </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">垂直方向</text>
+        <view class="flex-row items-center h-40px">
+          <text>左侧</text>
+          <up-line color="#909399" direction="col" length="20px" margin="0 10px"></up-line>
+          <text>右侧</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+</style>

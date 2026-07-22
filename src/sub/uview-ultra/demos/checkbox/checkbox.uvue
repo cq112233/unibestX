@@ -4,10 +4,32 @@
     <view class="p-16px">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
-        <up-checkbox-group v-model="checkboxValue" @change="checkboxChange">
+        <up-checkbox-group v-model="checkboxValue1" @change="checkboxChange">
           <up-checkbox name="apple" label="苹果" class="mb-10px mr-20px"></up-checkbox>
           <up-checkbox name="banana" label="香蕉" class="mb-10px mr-20px"></up-checkbox>
-          <up-checkbox name="orange" label="橙子" class="mb-10px mr-20px" :disabled="true"></up-checkbox>
+        </up-checkbox-group>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">禁用状态</text>
+        <up-checkbox-group v-model="checkboxValue2">
+          <up-checkbox name="apple" label="苹果(禁用)" :disabled="true" class="mb-10px mr-20px"></up-checkbox>
+          <up-checkbox name="banana" label="香蕉(未禁用)" class="mb-10px mr-20px"></up-checkbox>
+        </up-checkbox-group>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">自定义形状与颜色</text>
+        <up-checkbox-group v-model="checkboxValue3">
+          <up-checkbox name="circle" label="圆形" shape="circle" active-color="#fa3534" class="mb-10px mr-20px"></up-checkbox>
+          <up-checkbox name="square" label="方形" shape="square" active-color="#ff9900" class="mb-10px mr-20px"></up-checkbox>
+        </up-checkbox-group>
+      </view>
+
+      <view class="demo-block mt-12px">
+        <text class="demo-label">禁止点击标签切换</text>
+        <up-checkbox-group v-model="checkboxValue4">
+          <up-checkbox name="label" label="只能点框框" :label-disabled="true" class="mb-10px mr-20px"></up-checkbox>
         </up-checkbox-group>
       </view>
     </view>
@@ -17,7 +39,10 @@
 <script setup lang="uts">
 import { ref } from 'vue'
 
-const checkboxValue = ref(['apple'] as string[])
+const checkboxValue1 = ref(['apple'] as string[])
+const checkboxValue2 = ref(['apple'] as string[])
+const checkboxValue3 = ref(['circle'] as string[])
+const checkboxValue4 = ref([] as string[])
 
 function checkboxChange(n: string[]) {
   console.log('checkbox change', n)
