@@ -19,8 +19,8 @@ const _component_up_qrcode = resolveEasyComponent("up-qrcode",_easycom_up_qrcode
   return _cV(unref(AppKu), null, _uM({
     default: withSlotCtx((): any[] => [
       _cV(unref(LayoutComponent), _uM({
-        "navigation-bar-title-text": 'Qrcode 二维码',
-        "navigation-style": 'custom'
+        "navigation-style": 'custom',
+        "navigation-bar-title-text": 'up-qrcode 二维码'
       }), _uM({
         default: withSlotCtx((): any[] => [
           _cE("view", _uM({ class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }), [

@@ -89,6 +89,21 @@
         <up-cell title="Table 表格" is-link @click="goToDemo('tab' + 'le')">
           <template #icon><up-icon :name="'gr' + 'id'" color="#2979ff" size="20" class="mr-8px"></up-icon></template>
         </up-cell>
+        <up-cell title="LazyLoad 懒加载" is-link @click="goToDemo('lazy-load')">
+          <template #icon><up-icon name="photo" color="#2979ff" size="20" class="mr-8px"></up-icon></template>
+        </up-cell>
+        <up-cell title="Loadmore 加载更多" is-link @click="goToDemo('loadmore')">
+          <template #icon><up-icon name="more-dot-fill" color="#2979ff" size="20" class="mr-8px"></up-icon></template>
+        </up-cell>
+        <up-cell title="Parse 富文本解析" is-link @click="goToDemo('parse')">
+          <template #icon><up-icon name="file-text" color="#2979ff" size="20" class="mr-8px"></up-icon></template>
+        </up-cell>
+        <up-cell title="Qrcode 二维码" is-link @click="goToDemo('qrcode')">
+          <template #icon><up-icon name="scan" color="#2979ff" size="20" class="mr-8px"></up-icon></template>
+        </up-cell>
+        <up-cell title="Waterfall 瀑布流" is-link @click="goToDemo('waterfall')">
+          <template #icon><up-icon :name="'gr' + 'id'" color="#2979ff" size="20" class="mr-8px"></up-icon></template>
+        </up-cell>
       </up-cell-group>
     </view>
 
@@ -144,6 +159,9 @@
         </up-cell>
         <up-cell title="CodeInput 验证码输入" is-link @click="goToDemo('code-input')">
           <template #icon><up-icon name="lock" color="#19be6b" size="20" class="mr-8px"></up-icon></template>
+        </up-cell>
+        <up-cell title="Code 验证码倒计时" is-link @click="goToDemo('code')">
+          <template #icon><up-icon name="clock" color="#19be6b" size="20" class="mr-8px"></up-icon></template>
         </up-cell>
       </up-cell-group>
     </view>
@@ -220,6 +238,12 @@
       <up-cell-group :border="false">
         <up-cell title="Navbar 导航栏" is-link @click="goToDemo('navbar')">
           <template #icon><up-icon name="arrow-left" color="#909399" size="20" class="mr-8px"></up-icon></template>
+        </up-cell>
+        <up-cell title="NavbarMini 迷你导航" is-link @click="goToDemo('navbar-mini')">
+          <template #icon><up-icon name="arrow-left" color="#909399" size="20" class="mr-8px"></up-icon></template>
+        </up-cell>
+        <up-cell title="BackTop 返回顶部" is-link @click="goToDemo('back-top')">
+          <template #icon><up-icon name="arrow-upward" color="#909399" size="20" class="mr-8px"></up-icon></template>
         </up-cell>
         <up-cell title="Tabbar 底部导航" is-link @click="goToDemo('tabbar')">
           <template #icon><up-icon name="list" color="#909399" size="20" class="mr-8px"></up-icon></template>

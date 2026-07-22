@@ -19,8 +19,8 @@ const _component_up_loadmore = resolveEasyComponent("up-loadmore",_easycom_up_lo
   return _cV(unref(AppKu), null, _uM({
     default: withSlotCtx((): any[] => [
       _cV(unref(LayoutComponent), _uM({
-        "navigation-bar-title-text": 'Loadmore 加载更多',
-        "navigation-style": 'custom'
+        "navigation-style": 'custom',
+        "navigation-bar-title-text": 'up-loadmore 加载更多'
       }), _uM({
         default: withSlotCtx((): any[] => [
           _cE("view", _uM({ class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }), [
@@ -30,16 +30,38 @@ const _component_up_loadmore = resolveEasyComponent("up-loadmore",_easycom_up_lo
             })),
             _cE("view", _uM({ class: "p-16px" }), [
               _cE("view", _uM({ class: "demo-block" }), [
-                _cE("text", _uM({ class: "demo-label" }), "加载前"),
+                _cE("text", _uM({ class: "demo-label" }), "基础用法"),
                 _cV(_component_up_loadmore, _uM({ status: "loadmore" }))
               ]),
               _cE("view", _uM({ class: "demo-block mt-12px" }), [
                 _cE("text", _uM({ class: "demo-label" }), "加载中"),
-                _cV(_component_up_loadmore, _uM({ status: "loading" }))
+                _cV(_component_up_loadmore, _uM({
+                  status: "loading",
+                  "loading-text": "正在奋力加载中..."
+                }))
               ]),
               _cE("view", _uM({ class: "demo-block mt-12px" }), [
                 _cE("text", _uM({ class: "demo-label" }), "没有更多了"),
-                _cV(_component_up_loadmore, _uM({ status: "nomore" }))
+                _cV(_component_up_loadmore, _uM({
+                  status: "nomore",
+                  "nomore-text": "我是有底线的"
+                }))
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "显示线条"),
+                _cV(_component_up_loadmore, _uM({
+                  status: "nomore",
+                  line: true
+                }))
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "自定义图标和颜色"),
+                _cV(_component_up_loadmore, _uM({
+                  status: "loading",
+                  "loading-icon": "spinner",
+                  color: "#fa3534",
+                  "icon-color": "#fa3534"
+                }))
               ])
             ])
           ])

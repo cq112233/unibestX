@@ -4,15 +4,21 @@
     <view class="p-16px">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
-        <up-navbar-mini :safe-area-inset-top="false"></up-navbar-mini>
+        <view class="flex-row items-center p-8px">
+          <up-navbar-mini :safe-area-inset-top="false" :fixed="false" bg-color="#3c9cff" icon-color="#ffffff"></up-navbar-mini>
+        </view>
       </view>
       <view class="demo-block mt-12px">
         <text class="demo-label">自定义图标</text>
-        <up-navbar-mini :safe-area-inset-top="false" left-icon="arrow-up" home-url="/pages/index/index"></up-navbar-mini>
+        <view class="flex-row items-center p-8px">
+          <up-navbar-mini :safe-area-inset-top="false" :fixed="false" left-icon="arrow-left" bg-color="#e2e8f0" icon-color="#334155" home-url="/pages/index/index"></up-navbar-mini>
+        </view>
       </view>
       <view class="demo-block mt-12px">
         <text class="demo-label">自定义颜色</text>
-        <up-navbar-mini :safe-area-inset-top="false" bg-color="#fa3534" icon-color="#ffffff"></up-navbar-mini>
+        <view class="flex-row items-center p-8px">
+          <up-navbar-mini :safe-area-inset-top="false" :fixed="false" bg-color="#fa3534" icon-color="#ffffff"></up-navbar-mini>
+        </view>
       </view>
     </view>
   </view>

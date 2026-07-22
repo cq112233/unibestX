@@ -8,6 +8,24 @@
           <up-lazy-load image="https://cdn.uviewui.com/uview/swiper/1.jpg"></up-lazy-load>
         </view>
       </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">图片淡入动画 (is-effect)</text>
+        <view style="height: 200px; width: 100%;">
+          <up-lazy-load image="https://cdn.uviewui.com/uview/swiper/2.jpg" :is-effect="true" duration="300"></up-lazy-load>
+        </view>
+      </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">圆角和特定大小</text>
+        <view style="height: 200px; width: 100%; display: flex; justify-content: center;">
+          <up-lazy-load image="https://cdn.uviewui.com/uview/swiper/3.jpg" border-radius="20" height="150" width="200"></up-lazy-load>
+        </view>
+      </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">加载失败占位图</text>
+        <view style="height: 200px; width: 100%;">
+          <up-lazy-load image="https://error.url/not-found.jpg" error-img="https://cdn.uviewui.com/uview/empty/error.png"></up-lazy-load>
+        </view>
+      </view>
     </view>
   </view>
 </template>

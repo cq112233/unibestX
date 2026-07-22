@@ -103,15 +103,21 @@
 				const style = item['style']
 				if (style == null) return null
 				if (style instanceof UTSJSONObject) return style as UTSJSONObject
-				// 运行时可能是 Map，转为 UTSJSONObject
+				// H5 端可能是普通 JS 对象，尝试直接作为 UTSJSONObject 使用
+				try {
+					const obj = style as UTSJSONObject
+					// 验证是否可用：尝试调用 UTSJSONObject 的方法
+					if (obj != null) return obj
+				} catch (_e1) {}
+				// 运行时可能是 Map（Android 端），转为 UTSJSONObject
 				try {
 					const m = style as Map<string, any>
-					const obj = { __$originalPosition: new UTSSourceMapPosition("obj", "uni_modules/uview-ultra/components/up-swipe-action-item/up-swipe-action-item.uvue", 136, 12), } as UTSJSONObject
+					const obj = { __$originalPosition: new UTSSourceMapPosition("obj", "uni_modules/uview-ultra/components/up-swipe-action-item/up-swipe-action-item.uvue", 142, 12), } as UTSJSONObject
 					m.forEach((value: any, key: string) => {
 						obj[key] = value
 					})
 					return obj
-				} catch (_e) {
+				} catch (_e2) {
 					return null
 				}
 			},
@@ -162,7 +168,7 @@
 						bgColor = bg
 					}
 				}
-				const result = { __$originalPosition: new UTSSourceMapPosition("result", "uni_modules/uview-ultra/components/up-swipe-action-item/up-swipe-action-item.uvue", 192, 11), 
+				const result = { __$originalPosition: new UTSSourceMapPosition("result", "uni_modules/uview-ultra/components/up-swipe-action-item/up-swipe-action-item.uvue", 198, 11), 
 					borderRadius: hasBorderRadius ? style!['borderRadius'] as string : '0',
 					padding: hasBorderRadius ? '0' : '0 15px',
 					width: '100%',

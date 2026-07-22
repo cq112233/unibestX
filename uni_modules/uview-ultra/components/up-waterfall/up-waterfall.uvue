@@ -9,18 +9,11 @@
             class="up-column"
             :style="getColumnStyle(index)"
         >
-            <slot name="column"
-                :colIndex="index" 
-                :colList="column">
+            <slot name="column" :colIndex="index" :colList="column">
+                <view v-for="(item, itemIndex) in column" :key="itemIndex">
+                    <slot :item="item" :itemIndex="itemIndex"></slot>
+                </view>
             </slot>
-            <slot name="left"
-                :colIndex="index" 
-                :leftList="column">
-            </slot>
-            <template v-if="$slots['left'] == null && $slots['column'] == null"
-				v-for="(item, itemIndex) in column" :key="itemIndex">
-                <slot :item="item" :itemIndex="itemIndex"></slot>
-            </template>
         </view>
     </view>
 </template>
@@ -138,13 +131,13 @@
                     const columnGap = 7;
                     // 计算可容纳的列数
                     let columnCount = Math.max(1, Math.floor(this.windowWidth / (this.minColumnWidth + columnGap)));
-                    // @ts-ignore
-					if (columnCount < this.columnsMin as number) {
-                        columnCount = this.columnsMin as number
+                    const minCol = parseInt(this.columnsMin.toString());
+                    if (columnCount < minCol) {
+                        columnCount = minCol;
                     }
                     return columnCount;
                 }
-                return parseInt(this.columns as string) ?? 2;
+                return parseInt(this.columns.toString());
             },
             
             // 窗口大小变化处理函数
@@ -201,24 +194,29 @@
                 
                 // 获取各列当前高度
                 for (let i = 0; i < this.columnList.length; i++) {
-                    // try {
+                    try {
                         // @ts-ignore
 						const rect: NodeInfo = await this.upGetRect(`#up-column-${i}`);
-                        // console.log(`#up-column-${i}`, rect.height)
                         columnHeights[i] = rect.height ?? 0;
-                    // } catch (e) {
-                    //     columnHeights[i] = 0;
-                    // }
+                    } catch (e) {
+                        columnHeights[i] = 0;
+                    }
                 }
                 
                 // 分配新数据到最短的列
                 for (let item of newData) {
-                    const minHeightIndex = columnHeights.indexOf(Math.min(...columnHeights));
-                    // console.log('this.columnList', this.columnList)
+                    let minH = columnHeights[0];
+                    let minHeightIndex = 0;
+                    for (let j = 1; j < columnHeights.length; j++) {
+                        if (columnHeights[j] < minH) {
+                            minH = columnHeights[j];
+                            minHeightIndex = j;
+                        }
+                    }
                     this.columnList[minHeightIndex].push(item);
                     
                     // 获取实际渲染后的元素高度而不是估算
-                    await sleep(this.addTime as number)
+                    await sleep(parseInt(this.addTime.toString()))
 					await nextTick();
 					try {
 					    // @ts-ignore
@@ -337,7 +335,6 @@
         flex: 1;
         flex-direction: column;
         overflow: hidden;
-        height: 100%;
     }
 
     .up-image {

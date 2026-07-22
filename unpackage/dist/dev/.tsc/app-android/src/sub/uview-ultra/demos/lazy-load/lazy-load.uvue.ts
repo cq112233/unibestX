@@ -19,8 +19,8 @@ const _component_up_lazy_load = resolveEasyComponent("up-lazy-load",_easycom_up_
   return _cV(unref(AppKu), null, _uM({
     default: withSlotCtx((): any[] => [
       _cV(unref(LayoutComponent), _uM({
-        "navigation-bar-title-text": 'Lazy Load 懒加载',
-        "navigation-style": 'custom'
+        "navigation-style": 'custom',
+        "navigation-bar-title-text": 'up-lazy-load 懒加载'
       }), _uM({
         default: withSlotCtx((): any[] => [
           _cE("view", _uM({ class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }), [
@@ -36,6 +36,42 @@ const _component_up_lazy_load = resolveEasyComponent("up-lazy-load",_easycom_up_
                 }), [
                   _cV(_component_up_lazy_load, _uM({ image: "https://cdn.uviewui.com/uview/swiper/1.jpg" }))
                 ], 4 /* STYLE */)
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "图片淡入动画 (is-effect)"),
+                _cE("view", _uM({
+                  style: _nS(_uM({"height":"200px","width":"100%"}))
+                }), [
+                  _cV(_component_up_lazy_load, _uM({
+                    image: "https://cdn.uviewui.com/uview/swiper/2.jpg",
+                    "is-effect": true,
+                    duration: "300"
+                  }))
+                ], 4 /* STYLE */)
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "圆角和特定大小"),
+                _cE("view", _uM({
+                  style: _nS(_uM({"height":"200px","width":"100%","display":"flex","justify-content":"center"}))
+                }), [
+                  _cV(_component_up_lazy_load, _uM({
+                    image: "https://cdn.uviewui.com/uview/swiper/3.jpg",
+                    "border-radius": "20",
+                    height: "150",
+                    width: "200"
+                  }))
+                ], 4 /* STYLE */)
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "加载失败占位图"),
+                _cE("view", _uM({
+                  style: _nS(_uM({"height":"200px","width":"100%"}))
+                }), [
+                  _cV(_component_up_lazy_load, _uM({
+                    image: "https://error.url/not-found.jpg",
+                    "error-img": "https://cdn.uviewui.com/uview/empty/error.png"
+                  }))
+                ], 4 /* STYLE */)
               ])
             ])
           ])
@@ -50,4 +86,4 @@ const _component_up_lazy_load = resolveEasyComponent("up-lazy-load",_easycom_up_
 
 })
 export default __sfc__
-const GenSrcSubUviewUltraDemosLazyLoadLazyLoadStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]
+const GenSrcSubUviewUltraDemosLazyLoadLazyLoadStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["mt-12px", _pS(_uM([["marginTop", 12]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]

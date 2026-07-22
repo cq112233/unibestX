@@ -31,7 +31,7 @@ const __sfc__ = defineComponent({
             }
         },
         size: {
-            type: Number,
+            type: [Number, String],
             default: 200
         },
         unit: {
@@ -63,15 +63,15 @@ const __sfc__ = defineComponent({
             default: ''
         },
         iconSize: {
-            type: Number,
+            type: [Number, String],
             default: 40
         },
         lv: {
-            type: Number,
+            type: [Number, String],
             default: 3
         },
         quietZone: {
-            type: Number,
+            type: [Number, String],
             default: 0
         },
         onval: {
@@ -118,7 +118,7 @@ const __sfc__ = defineComponent({
     },
     computed: {
         sizeLocal(): number {
-            return this.size
+            return parseFloat(this.size.toString())
         },
         rootStyle(): UTSJSONObject {
             return {
@@ -134,16 +134,17 @@ const __sfc__ = defineComponent({
             } as UTSJSONObject
         },
         iconStyle(): UTSJSONObject {
-            const size = this.iconSize.toString() + this.unit
+            const iSize = parseFloat(this.iconSize.toString())
+            const size = iSize.toString() + this.unit
             return {
                 width: size,
                 height: size,
-                left: ((this.sizeLocal - this.iconSize) / 2).toString() + this.unit,
-                top: ((this.sizeLocal - this.iconSize) / 2).toString() + this.unit
+                left: ((this.sizeLocal - iSize) / 2).toString() + this.unit,
+                top: ((this.sizeLocal - iSize) / 2).toString() + this.unit
             } as UTSJSONObject
         },
         cellSize(): number {
-            return this.sizeLocal / getQrRenderCountWithQuietZone(this.val, this.lv, this.quietZone)
+            return this.sizeLocal / getQrRenderCountWithQuietZone(this.val, parseFloat(this.lv.toString()), parseFloat(this.quietZone.toString()))
         },
         canvasStyle(): UTSJSONObject {
             return {
@@ -158,10 +159,10 @@ const __sfc__ = defineComponent({
                 this.makeCode()
             }
         },
-        size() { this.makeCode() },
-        background() { this.makeCode() },
-        foreground() { this.makeCode() },
-        pdground() { this.makeCode() }
+        size(n: any) { this.makeCode() },
+        background(n: any) { this.makeCode() },
+        foreground(n: any) { this.makeCode() },
+        pdground(n: any) { this.makeCode() }
     },
     mounted(): void {
         if (this.loadMake) {
@@ -179,7 +180,7 @@ const __sfc__ = defineComponent({
             try {
                 this.loading = true
                 this.error = ''
-                this.cells = createQrCells(this.val, this.foreground, this.background, this.pdground, this.lv, this.quietZone)
+                this.cells = createQrCells(this.val, this.foreground, this.background, this.pdground, parseInt(this.lv.toString()), parseInt(this.quietZone.toString()))
                 this.result = this.val
                 this.loading = false
                 this.$nextTick(() => {
@@ -239,7 +240,7 @@ const __sfc__ = defineComponent({
             }
         },
         emitTempFileFail(options: UTSJSONObject, message: string): void {
-            const payload = { __$originalPosition: new UTSSourceMapPosition("payload", "uni_modules/uview-ultra/components/up-qrcode/up-qrcode.uvue", 268, 19), 
+            const payload = { __$originalPosition: new UTSSourceMapPosition("payload", "uni_modules/uview-ultra/components/up-qrcode/up-qrcode.uvue", 269, 19), 
                 errMsg: message
             } as UTSJSONObject
             const fail = options['fail']
@@ -312,7 +313,7 @@ const __sfc__ = defineComponent({
             context.clearRect(0, 0, drawSize, drawSize)
             context.fillStyle = this.background
             context.fillRect(0, 0, drawSize, drawSize)
-            const count = getQrRenderCountWithQuietZone(this.val, this.lv, this.quietZone)
+            const count = getQrRenderCountWithQuietZone(this.val, parseFloat(this.lv.toString()), parseFloat(this.quietZone.toString()))
             for (let i = 0; i < this.cells.length; i++) {
                 const cell = this.cells[i]
                 if (!cell.getBoolean('dark', false)) {

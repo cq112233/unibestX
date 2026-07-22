@@ -1,0 +1,58 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Waterfall 瀑布流" :auto-back="true" />
+    <view class="p-16px">
+      <view class="demo-block">
+        <text class="demo-label">基础瀑布流 (2列)</text>
+        <up-waterfall v-model="list" :columns="2">
+          <template #column="{ colList }">
+            <view v-for="(item, idx) in (colList as UTSJSONObject[])" :key="idx" class="p-6px">
+              <view class="bg-[#f1f5f9] rounded-8px overflow-hidden p-8px mb-8px">
+                <image
+                  src="/static/logo.png"
+                  mode="aspectFit"
+                  :style="{ width: '100%', height: (item as UTSJSONObject).getString('imgHeight') ?? '100px', borderRadius: '6px', backgroundColor: '#ffffff' }"
+                />
+                <text class="text-14px font-bold text-[#334155] mt-6px">{{ (item as UTSJSONObject).getString('title') }}</text>
+                <text class="text-12px text-[#94a3b8] mt-2px">{{ (item as UTSJSONObject).getString('desc') }}</text>
+                <text class="text-14px text-[#e11d48] mt-4px font-bold">￥{{ (item as UTSJSONObject).getNumber('price') }}</text>
+              </view>
+            </view>
+          </template>
+        </up-waterfall>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue'
+
+const list = ref<UTSJSONObject[]>([
+  { title: 'uview-ultra 核心UI组件', desc: '轻量级UI框架', price: 129, imgHeight: '80px' } as UTSJSONObject,
+  { title: '高性能 UniAppX 跨端开发套件', desc: '支持原生Android/iOS', price: 299, imgHeight: '160px' } as UTSJSONObject,
+  { title: '智能瀑布流弹性排版', desc: '自动适配列高', price: 89, imgHeight: '110px' } as UTSJSONObject,
+  { title: '极速渲染流畅体验', desc: '零延迟丝滑滚动', price: 199, imgHeight: '200px' } as UTSJSONObject,
+  { title: '炫彩主题切换系统', desc: '一键换肤体验', price: 49, imgHeight: '90px' } as UTSJSONObject,
+  { title: '全套内置工程级图标库', desc: '上百款高清矢量图标', price: 159, imgHeight: '140px' } as UTSJSONObject,
+  { title: '响应式页面布局容器', desc: '完美适配屏幕', price: 79, imgHeight: '180px' } as UTSJSONObject,
+  { title: '开箱即用多端示例', desc: '快速构建产品原型', price: 99, imgHeight: '120px' } as UTSJSONObject,
+])
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+</style>

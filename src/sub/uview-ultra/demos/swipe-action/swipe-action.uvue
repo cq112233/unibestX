@@ -4,13 +4,21 @@
     <view class="p-16px">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
-        <up-swipe-action><up-swipe-action-item :options="[{text:'删除', style:{backgroundColor:'#f56c6c'}}]" ><view style="padding:15px;background:#fff;border-radius:5px;">左滑查看操作选项</view></up-swipe-action-item></up-swipe-action>
+        <up-swipe-action>
+          <up-swipe-action-item :options="options1">
+            <view class="p-15px bg-[#fff] rounded-5px">
+              <text>操作选项</text>
+            </view>
+          </up-swipe-action-item>
+        </up-swipe-action>
       </view>
       <view class="demo-block mt-12px">
         <text class="demo-label">多按钮</text>
         <up-swipe-action>
-          <up-swipe-action-item :options="[{text:'置顶', style:{backgroundColor:'#2979ff'} as UTSJSONObject}, {text:'删除', style:{backgroundColor:'#f56c6c'} as UTSJSONObject}]">
-            <view class="p-15px bg-[#fff] border-radius-5px">左滑显示多按钮</view>
+          <up-swipe-action-item :options="options2">
+            <view class="p-15px bg-[#fff] rounded-5px">
+              <text>多按钮操作</text>
+            </view>
           </up-swipe-action-item>
         </up-swipe-action>
       </view>
@@ -19,6 +27,31 @@
 </template>
 
 <script setup lang="uts">
+import { ref } from 'vue'
+
+const options1 = ref<UTSJSONObject[]>([
+  {
+    text: '删除',
+    style: {
+      backgroundColor: '#f56c6c'
+    } as UTSJSONObject
+  } as UTSJSONObject
+])
+
+const options2 = ref<UTSJSONObject[]>([
+  {
+    text: '置顶',
+    style: {
+      backgroundColor: '#2979ff'
+    } as UTSJSONObject
+  } as UTSJSONObject,
+  {
+    text: '删除',
+    style: {
+      backgroundColor: '#f56c6c'
+    } as UTSJSONObject
+  } as UTSJSONObject
+])
 </script>
 
 <style scoped>

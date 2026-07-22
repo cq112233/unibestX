@@ -1,0 +1,59 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Code 验证码倒计时" :auto-back="true" />
+    <view class="p-16px">
+      <view class="demo-block">
+        <text class="demo-label">基础用法</text>
+        <view class="flex-row items-center justify-between mt-10px">
+          <up-code ref="uCodeRef" seconds="60" @change="codeChange"></up-code>
+          <up-button :text="tips" type="primary" size="small" @click="getCode"></up-button>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue'
+
+const uCodeRef = ref<ComponentPublicInstance | null>(null)
+const tips = ref('获取验证码')
+
+function codeChange(text: string) {
+  tips.value = text
+}
+
+function getCode() {
+  if (uCodeRef.value != null) {
+    const codeObj = uCodeRef.value!
+    const canGet = codeObj.$callMethod('canGetCode')
+    if (canGet == true) {
+      uni.showLoading({ title: '正在获取验证码' })
+      setTimeout(() => {
+        uni.hideLoading()
+        uni.showToast({ title: '验证码已发送', icon: 'success' })
+        codeObj.$callMethod('start')
+      }, 1000)
+    } else {
+      uni.showToast({ title: '倒计时中，请稍后再试', icon: 'none' })
+    }
+  }
+}
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+</style>

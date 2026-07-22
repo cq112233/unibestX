@@ -4,13 +4,31 @@
     <view class="p-16px">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
-        <up-parse content="<p>欢迎使用 uview-ultra 富文本解析组件</p><img src='https://cdn.uviewui.com/uview/swiper/2.jpg' />"></up-parse>
+        <up-parse :content="content1"></up-parse>
+      </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">长按可复制 (selectable)</text>
+        <up-parse :content="content2" :selectable="true"></up-parse>
+      </view>
+      <view class="demo-block mt-12px">
+        <text class="demo-label">自定义样式 (tagStyle)</text>
+        <up-parse :content="content3" :tag-style="tagStyle"></up-parse>
       </view>
     </view>
   </view>
 </template>
 
 <script setup lang="uts">
+import { ref } from 'vue'
+
+const content1 = ref(`<p>欢迎使用 uview-ultra 富文本解析组件，这里是一段很长的描述文字，用来测试换行和基础排版能力。</p><img src='https://cdn.uviewui.com/uview/swiper/2.jpg' />`)
+const content2 = ref(`<p>这段文本可以长按被选中和复制，因为开启了 selectable 属性。您可以尝试长按我试试。</p>`)
+const content3 = ref(`<h3>这是一级标题</h3><p>这段文字使用了 tagStyle 设置特定的样式，比如颜色和字号，还有加粗效果。</p>`)
+
+const tagStyle = ref({
+  p: 'color: #606266; font-size: 14px; line-height: 1.8;',
+  h3: 'color: #2979ff; font-weight: bold; margin-bottom: 10px;'
+})
 </script>
 
 <style scoped>
