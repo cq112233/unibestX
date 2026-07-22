@@ -79,6 +79,7 @@ const SrcSubUviewUltraDemosWaterfallWaterfall = () => import("@normalized:N&&&en
 const SrcSubUviewUltraDemosCodeCode = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/sub/uview-ultra/demos/code/code&");
 const SrcSubUviewUltraDemosParseParse = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/sub/uview-ultra/demos/parse/parse&");
 const SrcSubUviewUltraDemosBackTopBackTop = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/sub/uview-ultra/demos/back-top/back-top&");
+const SrcSubUviewUltraDemosMpHtmlMpHtml = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/sub/uview-ultra/demos/mp-html/mp-html&");
 __definePage("src/pages/index/index", SrcPagesIndexIndex);
 __definePage("src/pages/me/me", SrcPagesMeMe);
 __definePage("src/pages/basic/basic", SrcPagesBasicBasic);
@@ -160,4 +161,5 @@ __definePage("src/sub/uview-ultra/demos/waterfall/waterfall", SrcSubUviewUltraDe
 __definePage("src/sub/uview-ultra/demos/code/code", SrcSubUviewUltraDemosCodeCode);
 __definePage("src/sub/uview-ultra/demos/parse/parse", SrcSubUviewUltraDemosParseParse);
 __definePage("src/sub/uview-ultra/demos/back-top/back-top", SrcSubUviewUltraDemosBackTopBackTop);
+__definePage("src/sub/uview-ultra/demos/mp-html/mp-html", SrcSubUviewUltraDemosMpHtmlMpHtml);
 //# sourceMappingURL=pages-json-uts.js.map

@@ -1129,6 +1129,21 @@ const _component_up_cell_group = resolveEasyComponent("up-cell-group",_easycom_u
                       }))
                     ]),
                     _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_up_cell, _uM({
+                    title: "MpHtml 富文本组件",
+                    "is-link": "",
+                    onClick: () => {goToDemo('mp-html')}
+                  }), _uM({
+                    icon: withSlotCtx((): any[] => [
+                      _cV(_component_up_icon, _uM({
+                        name: "file-text",
+                        color: "#909399",
+                        size: "20",
+                        class: "mr-8px"
+                      }))
+                    ]),
+                    _: 1 /* STABLE */
                   }), 8 /* PROPS */, ["onClick"])
                 ]),
                 _: 1 /* STABLE */

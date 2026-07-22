@@ -170,6 +170,7 @@ import GenSrcSubUviewUltraDemosWaterfallWaterfallClass from './src/sub/uview-ult
 import GenSrcSubUviewUltraDemosCodeCodeClass from './src/sub/uview-ultra/demos/code/code.uvue'
 import GenSrcSubUviewUltraDemosParseParseClass from './src/sub/uview-ultra/demos/parse/parse.uvue'
 import GenSrcSubUviewUltraDemosBackTopBackTopClass from './src/sub/uview-ultra/demos/back-top/back-top.uvue'
+import GenSrcSubUviewUltraDemosMpHtmlMpHtmlClass from './src/sub/uview-ultra/demos/mp-html/mp-html.uvue'
 function definePageRoutes() {
 __uniRoutes.push({ path: "src/pages/index/index", component: GenSrcPagesIndexIndexClass, meta: { isQuit: true } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","首页"]]) } as UniPageRoute)
 __uniRoutes.push({ path: "src/pages/me/me", component: GenSrcPagesMeMeClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","我的"]]) } as UniPageRoute)
@@ -252,6 +253,7 @@ __uniRoutes.push({ path: "src/sub/uview-ultra/demos/waterfall/waterfall", compon
 __uniRoutes.push({ path: "src/sub/uview-ultra/demos/code/code", component: GenSrcSubUviewUltraDemosCodeCodeClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-code 验证码倒计时"]]) } as UniPageRoute)
 __uniRoutes.push({ path: "src/sub/uview-ultra/demos/parse/parse", component: GenSrcSubUviewUltraDemosParseParseClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","Parse 富文本解析"],["navigationStyle","custom"]]) } as UniPageRoute)
 __uniRoutes.push({ path: "src/sub/uview-ultra/demos/back-top/back-top", component: GenSrcSubUviewUltraDemosBackTopBackTopClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","Back Top 返回顶部"],["navigationStyle","custom"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/mp-html/mp-html", component: GenSrcSubUviewUltraDemosMpHtmlMpHtmlClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","mp-html 富文本组件"],["navigationStyle","custom"]]) } as UniPageRoute)
 }
 const __uniTabBar: Map<string, any | null> | null = _uM([["custom",true],["color","#999999"],["selectedColor","#1890ff"],["backgroundColor","#F8F8F8"],["list",[_uM([["pagePath","src/pages/index/index"],["text","首页"]]),_uM([["pagePath","src/pages/basic/basic"],["text","基础"]]),_uM([["pagePath","src/pages/function/function"],["text","功能"]]),_uM([["pagePath","src/pages/me/me"],["text","我的"]])]]])
 const __uniLaunchPage: Map<string, any | null> = _uM([["url","src/pages/index/index"],["style",_uM([["navigationStyle","custom"],["navigationBarTitleText","首页"]])]])

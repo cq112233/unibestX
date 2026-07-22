@@ -79,6 +79,7 @@ const SrcSubUviewUltraDemosWaterfallWaterfall = () => import("./src/sub/uview-ul
 const SrcSubUviewUltraDemosCodeCode = () => import("./src/sub/uview-ultra/demos/code/code.js");
 const SrcSubUviewUltraDemosParseParse = () => import("./src/sub/uview-ultra/demos/parse/parse.js");
 const SrcSubUviewUltraDemosBackTopBackTop = () => import("./src/sub/uview-ultra/demos/back-top/back-top.js");
+const SrcSubUviewUltraDemosMpHtmlMpHtml = () => import("./src/sub/uview-ultra/demos/mp-html/mp-html.js");
 __definePage("src/pages/index/index", SrcPagesIndexIndex);
 __definePage("src/pages/me/me", SrcPagesMeMe);
 __definePage("src/pages/basic/basic", SrcPagesBasicBasic);
@@ -160,4 +161,5 @@ __definePage("src/sub/uview-ultra/demos/waterfall/waterfall", SrcSubUviewUltraDe
 __definePage("src/sub/uview-ultra/demos/code/code", SrcSubUviewUltraDemosCodeCode);
 __definePage("src/sub/uview-ultra/demos/parse/parse", SrcSubUviewUltraDemosParseParse);
 __definePage("src/sub/uview-ultra/demos/back-top/back-top", SrcSubUviewUltraDemosBackTopBackTop);
+__definePage("src/sub/uview-ultra/demos/mp-html/mp-html", SrcSubUviewUltraDemosMpHtmlMpHtml);
 //# sourceMappingURL=pages-json-uts.js.map

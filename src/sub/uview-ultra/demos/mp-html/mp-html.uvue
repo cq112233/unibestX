@@ -1,0 +1,126 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="mp-html 富文本组件" :auto-back="true" />
+    <view class="p-16px">
+      <!-- 1. 基础文本与标题 -->
+      <view class="demo-block">
+        <text class="demo-label">基础文本与排版</text>
+        <view class="content-box">
+          <mp-html :content="content1" />
+        </view>
+      </view>
+
+      <!-- 2. 表格解析 -->
+      <view class="demo-block mt-12px">
+        <text class="demo-label">HTML 表格解析 (Table)</text>
+        <view class="content-box">
+          <mp-html :content="contentTable" />
+        </view>
+      </view>
+
+      <!-- 3. 有序/无序列表 -->
+      <view class="demo-block mt-12px">
+        <text class="demo-label">列表解析 (List)</text>
+        <view class="content-box">
+          <mp-html :content="contentList" />
+        </view>
+      </view>
+
+      <!-- 4. 代码块 -->
+      <view class="demo-block mt-12px">
+        <text class="demo-label">代码块解析 (Code)</text>
+        <view class="content-box">
+          <mp-html :content="contentCode" />
+        </view>
+      </view>
+
+      <!-- 5. 链接与图片 -->
+      <view class="demo-block mt-12px">
+        <text class="demo-label">超链接与图片展示</text>
+        <view class="content-box">
+          <mp-html :content="contentMedia" />
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue'
+
+const content1 = ref(`
+  <h2>mp-html 跨端富文本组件</h2>
+  <p>这是一个专门为 <b>uni-app X</b> 打造的高性能原生 HTML 解析器组件，支持多种 HTML 5 常见标签与样式。</p>
+  <hr />
+  <p>支持 <i>斜体</i>、<b>加粗</b>、<u>下划线</u> 以及 <span style="color: #e11d48; font-weight: bold;">自定义颜色文本</span>。</p>
+`)
+
+const contentTable = ref(`
+  <table border="1">
+    <tr>
+      <th>组件名称</th>
+      <th>类型</th>
+      <th>平台支持</th>
+    </tr>
+    <tr>
+      <td>mp-html</td>
+      <td>富文本</td>
+      <td>全端 (Android / iOS / H5)</td>
+    </tr>
+    <tr>
+      <td>up-waterfall</td>
+      <td>瀑布流</td>
+      <td>全端支持</td>
+    </tr>
+  </table>
+`)
+
+const contentList = ref(`
+  <p><b>框架核心优势：</b></p>
+  <ul>
+    <li>原生 Kotlin / Swift 高效渲染</li>
+    <li>无缝嵌入 UniAppX 架构</li>
+    <li>自动适配屏幕尺寸</li>
+  </ul>
+  <p><b>部署步骤：</b></p>
+  <ol>
+    <li>导入 mp-html 插件</li>
+    <li>配置 uni_modules 节点</li>
+    <li>直接使用 &lt;mp-html :content="html" /&gt;</li>
+  </ol>
+`)
+
+const contentCode = ref(`
+  <p>示例代码：</p>
+  <pre><code>const html = '&lt;h1&gt;Hello UniAppX&lt;/h1&gt;'
+const node = parse(html)</code></pre>
+`)
+
+const contentMedia = ref(`
+  <p>访问官方链接：<a href="https://uniapp.dcloud.net.cn/">DCloud 官方文档</a></p>
+  <p>示例图片展示：</p>
+  <img src="/static/logo.png" style="width: 120px; height: 120px;" />
+`)
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
+}
+.content-box {
+  background-color: #f8fafc;
+  padding: 10px;
+  border-radius: 6px;
+}
+</style>

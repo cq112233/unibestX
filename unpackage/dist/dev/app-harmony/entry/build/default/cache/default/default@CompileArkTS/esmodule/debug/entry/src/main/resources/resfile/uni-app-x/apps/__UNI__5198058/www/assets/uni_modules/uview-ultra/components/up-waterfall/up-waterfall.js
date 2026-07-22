@@ -8,65 +8,29 @@ const _sfc_main = defineComponent({
   mixins: [mpMixin, mixin, propsWaterfall],
   data() {
     return {
-      columnList: [[], []],
-      initialized: false,
-      windowWidth: 375,
-      windowHeight: 0,
-      resizeTimer: 0
+      windowWidth: 375
     };
   },
-  watch: {
-    copyFlowList: {
-      handler(nVal, oVal) {
-        if (nVal.length == 0) {
-          this.clear(false);
-        } else {
-          if (this.columnList.length == 1) {
-            this.initColumnList();
-          }
-          this.syncDistribute(nVal);
-        }
-      },
-      immediate: true
-    },
-    columns: {
-      handler() {
-        this.initColumnList();
-        if (this.copyFlowList.length > 0) {
-          this.syncDistribute(this.copyFlowList);
-        }
-      },
-      immediate: false
-    }
-  },
-  created() {
-    this.initColumnList();
-  },
   mounted() {
-    this.initialized = true;
-  },
-  beforeUnmount() {
+    this.windowWidth = uni.getSystemInfoSync().windowWidth;
   },
   computed: {
-    copyFlowList() {
-      if (this.modelValue.length == 0) {
-        return [];
-      } else {
-        return this.cloneData(this.modelValue);
+    // 核心：columnList 完全由 modelValue 派生，纯同步、纯响应式
+    columnList() {
+      const cols = this.getColumnsCount();
+      const result = [];
+      for (let i = 0; i < cols; i++) {
+        result.push([]);
       }
+      for (let i = 0; i < this.modelValue.length; i++) {
+        const colIndex = i % cols;
+        result[colIndex].push(this.modelValue[i]);
+      }
+      return result;
     }
   },
-  emits: ["update:modelValue", "update:value", "after-add-one", "after-add-all"],
+  emits: ["update:modelValue", "update:value"],
   methods: {
-    // 初始化列数据数组
-    initColumnList() {
-      this.windowWidth = uni.getSystemInfoSync().windowWidth;
-      const cols = this.getColumnsCount();
-      this.columnList = [];
-      for (var index = 0; index < cols; index++) {
-        this.columnList.push([]);
-      }
-    },
     // 获取列数
     getColumnsCount() {
       if (this.columns === "auto") {
@@ -88,100 +52,32 @@ const _sfc_main = defineComponent({
       }
       return style;
     },
-    handleWindowResize(res) {
-      const size = res["size"];
-      if (size != null) {
-        const width = size["windowWidth"];
-        if (width != null) {
-          this.windowWidth = parseInt(width.toString());
-        }
-      } else {
-        this.windowWidth = uni.getSystemInfoSync().windowWidth;
-      }
-      const newColumnsCount = this.getColumnsCount();
-      const oldColumnsCount = this.columnList.length;
-      if (newColumnsCount != oldColumnsCount) {
-        this.initColumnList();
-        this.syncDistribute(this.copyFlowList);
-      }
+    // 清空数据
+    clear() {
+      this.$emit("update:modelValue", []);
     },
-    /**
-     * 同步分配数据到各列（核心方法）
-     * 采用纯同步轮询策略，不依赖任何异步 DOM 测量 API，
-     * 确保在 H5 / Android / iOS / 小程序全端正常工作。
-     */
-    syncDistribute(allData) {
-      if (allData.length == 0)
-        return null;
-      const cols = this.columnList.length;
-      for (let i = 0; i < cols; i++) {
-        this.columnList[i] = [];
-      }
-      for (let i = 0; i < allData.length; i++) {
-        const colIndex = i % cols;
-        this.columnList[colIndex].push(allData[i]);
-      }
-      this.$emit("after-add-all", new UTSJSONObject({
-        newData: allData
-      }));
-    },
-    // 复制数据
-    cloneData(data) {
-      return UTS.JSON.parse(UTS.JSON.stringify(data));
-    },
-    // 清空数据列表
-    clear(bak = true) {
-      this.initColumnList();
-      if (bak) {
-        this.$emit("update:modelValue", []);
-      }
-    },
-    // 清除某一条指定的数据
+    // 清除某一条数据
     remove(id = null) {
       if (id == null)
         return null;
-      for (let i = 0; i < this.columnList.length; i++) {
-        const index = this.columnList[i].findIndex((val) => {
-          return val[this.idKey].toString() == id.toString();
-        });
-        if (index != -1) {
-          this.columnList[i].splice(index, 1);
-          break;
-        }
-      }
-      const modelValueIndex = this.modelValue.findIndex((val) => {
-        return val[this.idKey].toString() == id.toString();
+      const idx = this.modelValue.findIndex((val) => {
+        return val[this.idKey] != null && val[this.idKey].toString() == id.toString();
       });
-      if (modelValueIndex != -1) {
-        const newModelValue = this.cloneData(this.modelValue);
-        newModelValue.splice(modelValueIndex, 1);
-        this.$emit("update:modelValue", newModelValue);
+      if (idx != -1) {
+        const newData = UTS.JSON.parse(UTS.JSON.stringify(this.modelValue));
+        newData.splice(idx, 1);
+        this.$emit("update:modelValue", newData);
       }
     },
-    // 修改某条数据的某个属性
+    // 修改某条数据
     modify(id = null, key, value = null) {
-      let found = false;
-      let targetItem = new UTSJSONObject({});
-      for (let i = 0; i < this.columnList.length; i++) {
-        const index = this.columnList[i].findIndex((val) => {
-          return val[this.idKey] != null && val[this.idKey].toString() == id.toString();
-        });
-        if (index != -1) {
-          this.columnList[i][index][key] = value;
-          targetItem = this.columnList[i][index];
-          found = true;
-          break;
-        }
-      }
-      if (found && targetItem != null) {
-        const modelValueIndex = this.modelValue.findIndex((val) => {
-          return val[this.idKey] != null && val[this.idKey].toString() == id.toString();
-        });
-        if (modelValueIndex != -1) {
-          let data = this.cloneData(this.modelValue);
-          data[modelValueIndex][key] = value;
-          this.$emit("update:modelValue", data);
-        }
+      const idx = this.modelValue.findIndex((val) => {
+        return val[this.idKey] != null && val[this.idKey].toString() == id.toString();
+      });
+      if (idx != -1) {
+        const newData = UTS.JSON.parse(UTS.JSON.stringify(this.modelValue));
+        newData[idx][key] = value;
+        this.$emit("update:modelValue", newData);
       }
     }
   }
@@ -192,11 +88,9 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     (openBlock(true), createElementBlock(
       Fragment,
       null,
-      renderList($data.columnList, (column, index) => {
+      renderList($options.columnList, (column, index) => {
         return openBlock(), createElementBlock("view", {
           key: index,
-          ref_for: true,
-          ref: `up-column-${index}`,
           id: `up-column-${index}`,
           class: "up-column",
           style: normalizeStyle($options.getColumnStyle(index))

@@ -1275,6 +1275,22 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                     ]),
                     _: 1
                     /* STABLE */
+                  }),
+                  createVNode(_component_up_cell, {
+                    title: "MpHtml 富文本组件",
+                    "is-link": "",
+                    onClick: _cache[70] || (_cache[70] = ($event) => $setup.goToDemo("mp-html"))
+                  }, {
+                    icon: withCtx(() => [
+                      createVNode(_component_up_icon, {
+                        name: "file-text",
+                        color: "#909399",
+                        size: "20",
+                        class: "mr-8px"
+                      })
+                    ]),
+                    _: 1
+                    /* STABLE */
                   })
                 ]),
                 _: 1
