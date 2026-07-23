@@ -418,9 +418,9 @@ const gap_uvue_vue_type_style_index_1_dataScoped_621i7r949g1ju6biic4_lang = {};
 
 const upSticky_uvue_vue_type_style_index_0_lang = {};
 
-const sticky_uvue_vue_type_style_index_0_dataScoped_57023ec6mg1ju6cg581_lang = {};
+const sticky_uvue_vue_type_style_index_0_dataScoped_m5g23ig0eg1ju6ckutk_lang = {};
 
-const sticky_uvue_vue_type_style_index_1_dataScoped_57023ec6mg1ju6cg581_lang = {};
+const sticky_uvue_vue_type_style_index_1_dataScoped_m5g23ig0eg1ju6ckutk_lang = {};
 
 const upNumberKeyboard_uvue_vue_type_style_index_0_lang = {};
 

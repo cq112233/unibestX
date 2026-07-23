@@ -1,8 +1,8 @@
-const { defineComponent, openBlock, createElementBlock, createElementVNode, normalizeStyle, renderSlot } = globalThis.Vue
+const { defineComponent, openBlock, createElementBlock, normalizeStyle, createElementVNode, renderSlot } = globalThis.Vue
 import { p as propsSticky } from "./props.js";
 import { m as mpMixin } from "../../libs/mixin/mpMixin.js";
 import { m as mixin } from "../../libs/mixin/mixin.js";
-import { j as guid, b as addStyle, d as deepMerge, g as getPx } from "../../libs/function/index.js";
+import { j as guid, d as deepMerge, b as addStyle, g as getPx } from "../../libs/function/index.js";
 import { z as zIndexConfig } from "../../libs/config/zIndex.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
 const _sfc_main = defineComponent({
@@ -26,9 +26,6 @@ const _sfc_main = defineComponent({
     };
   },
   computed: {
-    stickyHeaderStyle() {
-      return addStyle(this.customStyle);
-    },
     style() {
       const style = new UTSJSONObject({});
       if (!this.disabled) {
@@ -137,20 +134,24 @@ const _sfc_main = defineComponent({
 });
 const _style_0 = {};
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return openBlock(), createElementBlock("sticky-header", null, [
-    createElementVNode(
-      "view",
-      {
-        class: "up-sticky",
-        style: normalizeStyle($options.stickyHeaderStyle)
-      },
-      [
+  return openBlock(), createElementBlock(
+    "view",
+    {
+      class: "up-sticky",
+      style: normalizeStyle($options.style)
+    },
+    [
+      createElementVNode("view", {
+        id: $data.elId,
+        style: normalizeStyle($options.stickyContent),
+        class: "up-sticky__content"
+      }, [
         renderSlot(_ctx.$slots, "default")
-      ],
-      4
-      /* STYLE */
-    )
-  ]);
+      ], 12, ["id"])
+    ],
+    4
+    /* STYLE */
+  );
 }
 const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-sticky/up-sticky.uvue"]]);
 export {

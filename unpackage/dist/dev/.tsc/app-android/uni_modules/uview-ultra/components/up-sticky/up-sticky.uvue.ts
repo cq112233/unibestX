@@ -30,11 +30,8 @@
 			}
 		},
 		computed: {
-			stickyHeaderStyle(): any {
-				return addStyle(this.customStyle)
-			},
 			style(): any {
-				const style = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-sticky/up-sticky.uvue", 61, 11), } as UTSJSONObject
+				const style = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-sticky/up-sticky.uvue", 49, 11), } as UTSJSONObject
 				if (!this.disabled) {
 					style['height'] = this.fixed ? (this.height == 'auto' ? 'auto' : this.height + 'px') : 'auto'
 				} else {
@@ -44,7 +41,7 @@
 				return deepMerge(addStyle(this.customStyle), style)
 			},
 			stickyContent(): any {
-				const style = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-sticky/up-sticky.uvue", 71, 11), } as UTSJSONObject
+				const style = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-sticky/up-sticky.uvue", 59, 11), } as UTSJSONObject
 				if (this.fixed) {
 					style['position'] = 'fixed'
 					style['top'] = this.stickyTop + 'px'
@@ -144,14 +141,18 @@ export default __sfc__
 function GenUniModulesUviewUltraComponentsUpStickyUpStickyRender(this: InstanceType<typeof __sfc__>): any | null {
 const _ctx = this
 const _cache = this.$.renderCache
-  return _cE("sticky-header", null, [
+  return _cE("view", _uM({
+    class: "up-sticky",
+    style: _nS(_ctx.style)
+  }), [
     _cE("view", _uM({
-      class: "up-sticky",
-      style: _nS(_ctx.stickyHeaderStyle)
+      id: _ctx.elId,
+      style: _nS(_ctx.stickyContent),
+      class: "up-sticky__content"
     }), [
       renderSlot(_ctx.$slots, "default")
-    ], 4 /* STYLE */)
-  ])
+    ], 12 /* STYLE, PROPS */, ["id"])
+  ], 4 /* STYLE */)
 }
 export type UpStickyComponentPublicInstance = InstanceType<typeof __sfc__>;
 const GenUniModulesUviewUltraComponentsUpStickyUpStickyStyles = []

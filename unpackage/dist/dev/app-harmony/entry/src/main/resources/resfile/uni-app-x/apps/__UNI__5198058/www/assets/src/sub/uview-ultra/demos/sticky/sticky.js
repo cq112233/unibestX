@@ -110,70 +110,62 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                 "auto-back": true
               }),
               createElementVNode(
-                "list-view",
+                "scroll-view",
                 {
                   style: { "flex": "1", "padding": "16px" },
                   "scroll-y": true,
-                  bounces: false,
-                  "show-scrollbar": false,
                   onScroll: $setup.handleScroll
                 },
                 [
                   createCommentVNode(" 提示卡片 "),
-                  createElementVNode("list-item", { type: "1" }, [
-                    createElementVNode("view", { class: "bg-white rounded-8px p-12px mb-12px shadow-xs" }, [
-                      createElementVNode("view", { class: "flex-row items-center mb-10px" }, [
-                        createElementVNode("view", { class: "w-3px h-14px bg-__2979ff_ mr-6px rounded-2px" }),
-                        createElementVNode("text", { class: "text-14px font-bold text-__1e293b_" }, "吸顶效果说明")
-                      ]),
-                      createElementVNode("text", { class: "text-13px text-__64748b_ leading-20px" }, " 向上滑动页面，体验全端兼容（App 原生 / 微信小程序 / H5）的吸顶效果。 ")
-                    ])
+                  createElementVNode("view", { class: "bg-white rounded-8px p-12px mb-12px shadow-xs" }, [
+                    createElementVNode("view", { class: "flex-row items-center mb-10px" }, [
+                      createElementVNode("view", { class: "w-3px h-14px bg-__2979ff_ mr-6px rounded-2px" }),
+                      createElementVNode("text", { class: "text-14px font-bold text-__1e293b_" }, "吸顶效果说明")
+                    ]),
+                    createElementVNode("text", { class: "text-13px text-__64748b_ leading-20px" }, " 向上滑动页面，当下面的操作栏滚动到顶部时，会触发 up-sticky 组件吸顶悬浮固定。 ")
                   ]),
-                  createElementVNode("sticky-section", null, [
-                    createCommentVNode(" 使用全端兼容的 up-sticky 组件 "),
-                    createVNode(_component_up_sticky, {
-                      "offset-top": 0,
-                      "scroll-top": $setup.scrollTop
-                    }, {
-                      default: withCtx(() => [
-                        createElementVNode("view", { class: "bg-__2979ff_ p-12px rounded-8px flex-row items-center justify-between shadow-sm mb-10px" }, [
-                          createElementVNode("text", { class: "text-white font-bold text-14px" }, "📌 悬浮吸顶操作栏"),
-                          createVNode(_component_up_button, {
-                            size: "small",
-                            type: "warning",
-                            text: "立即体验",
-                            class: "w-80px"
-                          })
-                        ])
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    }, 8, ["scroll-top"]),
-                    createCommentVNode(" 吸顶区域下的列表条目 "),
-                    (openBlock(), createElementBlock(
-                      Fragment,
-                      null,
-                      renderList(25, (i) => {
-                        return createElementVNode("list-item", {
-                          key: i,
-                          type: "2"
-                        }, [
-                          createElementVNode("view", { class: "bg-white rounded-8px p-12px mt-10px shadow-xs" }, [
-                            createElementVNode(
-                              "text",
-                              { class: "text-14px font-bold text-__334155_" },
-                              "列表条目 #" + toDisplayString(i),
-                              1
-                              /* TEXT */
-                            ),
-                            createElementVNode("text", { class: "text-12px text-__94a3b8_ mt-4px" }, "向下滑动页面查看吸顶保持效果...")
-                          ])
-                        ]);
-                      }),
-                      64
-                      /* STABLE_FRAGMENT */
-                    ))
-                  ])
+                  createCommentVNode(" 核心示范：使用 up-sticky 组件 "),
+                  createVNode(_component_up_sticky, {
+                    "offset-top": 0,
+                    "scroll-top": $setup.scrollTop
+                  }, {
+                    default: withCtx(() => [
+                      createElementVNode("view", { class: "bg-__2979ff_ p-12px rounded-8px flex-row items-center justify-between shadow-sm mb-10px" }, [
+                        createElementVNode("text", { class: "text-white font-bold text-14px" }, "📌 悬浮吸顶操作栏"),
+                        createVNode(_component_up_button, {
+                          size: "small",
+                          type: "warning",
+                          text: "立即体验",
+                          class: "w-80px"
+                        })
+                      ])
+                    ]),
+                    _: 1
+                    /* STABLE */
+                  }, 8, ["scroll-top"]),
+                  createCommentVNode(" 长列表填充区域 "),
+                  (openBlock(), createElementBlock(
+                    Fragment,
+                    null,
+                    renderList(25, (i) => {
+                      return createElementVNode("view", {
+                        key: i,
+                        class: "bg-white rounded-8px p-12px mt-10px shadow-xs"
+                      }, [
+                        createElementVNode(
+                          "text",
+                          { class: "text-14px font-bold text-__334155_" },
+                          "列表条目 #" + toDisplayString(i),
+                          1
+                          /* TEXT */
+                        ),
+                        createElementVNode("text", { class: "text-12px text-__94a3b8_ mt-4px" }, "向下滑动页面查看吸顶保持效果...")
+                      ]);
+                    }),
+                    64
+                    /* STABLE_FRAGMENT */
+                  ))
                 ],
                 32
                 /* NEED_HYDRATION */
