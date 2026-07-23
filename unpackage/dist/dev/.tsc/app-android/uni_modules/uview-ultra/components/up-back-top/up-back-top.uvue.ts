@@ -1,160 +1,140 @@
-import _easycom_up_icon from '@/uni_modules/uview-ultra/components/up-icon/up-icon.uvue'
-import { computed, watch, ref } from "vue";
+
 	import defProps from './backtop.uts';
-	import { addUnit, addStyle, getPx, deepMerge } from '../../libs/function/index';
-	
-	// 在 defineProps 中直接定义 props，参考 album 组件的实现
-	
-const __sfc__ = defineComponent({
-  __name: 'up-back-top',
-  props: {
-		// 返回顶部的形状，circle-圆形，square-方形
-		mode: {
-			type: String,
-			default: defProps.getString('backtop.mode')
-		},
-		// 自定义图标
-		icon: {
-			type: String,
-			default: defProps.getString('backtop.icon')
-		},
-		// 提示文字
-		text: {
-			type: String,
-			default: defProps.getString('backtop.text')
-		},
-		// 返回顶部滚动时间
-		duration: {
-			type: [String, Number],
-			default: defProps.getNumber('backtop.duration')
-		},
-		// 滚动距离
-		scrollTop: {
-			type: [String, Number],
-			default: defProps.getNumber('backtop.scrollTop')
-		},
-		// 距离顶部多少距离显示，单位px
-		top: {
-			type: [String, Number],
-			default: defProps.getNumber('backtop.top')
-		},
-		// 返回顶部按钮到底部的距离，单位px
-		bottom: {
-			type: [String, Number],
-			default: defProps.getNumber('backtop.bottom')
-		},
-		// 返回顶部按钮到右边的距离，单位px
-		right: {
-			type: [String, Number],
-			default: defProps.getNumber('backtop.right')
-		},
-		// 层级
-		zIndex: {
-			type: [String, Number],
-			default: defProps.getNumber('backtop.zIndex')
-		},
-		// 图标的样式，对象形式
-		iconStyle: {
-			type: Object,
-			default: (): UTSJSONObject => {
-				return defProps.getAny('backtop.iconStyle') as UTSJSONObject ?? {}
+	import { addStyle, deepMerge } from '../../libs/function/index';
+	import { mpMixin } from '../../libs/mixin/mpMixin.uts';
+	import { mixin } from '../../libs/mixin/mixin.uts';
+
+	const __sfc__ = defineComponent({
+		name: 'up-back-top',
+		mixins: [mpMixin, mixin],
+		props: {
+			mode: {
+				type: String,
+				default: 'circle'
+			},
+			icon: {
+				type: String,
+				default: 'arrow-upward'
+			},
+			text: {
+				type: String,
+				default: ''
+			},
+			duration: {
+				type: [String, Number],
+				default: 100
+			},
+			scrollTop: {
+				type: [String, Number],
+				default: 0
+			},
+			top: {
+				type: [String, Number],
+				default: 100
+			},
+			bottom: {
+				type: [String, Number],
+				default: 80
+			},
+			right: {
+				type: [String, Number],
+				default: 20
+			},
+			zIndex: {
+				type: [String, Number],
+				default: 999
+			},
+			iconStyle: {
+				type: Object,
+				default: (): UTSJSONObject => ({})
+			},
+			customStyle: {
+				type: Object,
+				default: (): UTSJSONObject => ({})
 			}
 		},
-		// 定义需要用到的外部样式
-		customStyle: {
-			type: Object,
-			default: (): UTSJSONObject => ({})
-		}
-	},
-  emits: ['click'],
-  setup(__props) {
-const __ins = getCurrentInstance()!;
-const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
-const _cache = __ins.renderCache;
+		emits: ['click'],
+		computed: {
+			show(): boolean {
+				const sVal = (this.scrollTop ?? 0).toString()
+				const tVal = (this.top ?? 100).toString()
+				const sTop = parseFloat(sVal)
+				const targetTop = parseFloat(tVal)
+				if (isNaN(sTop)) return false
+				const threshold = isNaN(targetTop) ? 100 : targetTop
+				return sTop >= threshold
+			},
+			finalStyle(): any {
+				const bStr = (this.bottom ?? 80).toString()
+				const rStr = (this.right ?? 20).toString()
+				const bVal = bStr.includes('px') ? bStr : (bStr + 'px')
+				const rVal = rStr.includes('px') ? rStr : (rStr + 'px')
+				const zVal = parseInt((this.zIndex ?? 999).toString())
 
-	const prop = __props;
-	
-	// 定义 emit
-	function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
-__ins.emit(event, ...do_not_transform_spread)
-}
-	
-	// 计算属性 - 动画组件样式
-	const backTopStyle = computed(() => {
-		const style = {__$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-back-top/up-back-top.uvue", 93, 9),
-			bottom: addUnit(prop.bottom),
-			right: addUnit(prop.right),
-			width: '40px',
-			height: '40px',
-			position: 'fixed',
-			zIndex: parseInt(prop.zIndex.toString()),
-		}
-		return style
-	});
-	
-	// 响应式状态 - 是否显示
-	const show = ref(false);
-	watch((): any => prop.scrollTop, (newVal: any) => {
-		show.value = parseInt(getPx(newVal)) > parseInt(getPx(prop.top.toString()))
-	}, { immediate: true });
-	
-	// 计算属性 - 内容样式
-	const contentStyle = computed(() => {
-		const style = {__$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-back-top/up-back-top.uvue", 112, 9),}
-		let radius = '0px'
-		// 是否圆形
-		if(prop.mode === 'circle') {
-			radius = '100px'
-		} else {
-			radius = '4px'
-		}
-		style['borderRadius'] = radius
-		return deepMerge(style, addStyle(prop.customStyle))
-	});
-	
-	// 方法 - 返回顶部
-	function backToTop(e: any) {
-		uni.pageScrollTo({
-			scrollTop: 0,
-			duration: parseInt(prop.duration.toString()),
-			fail: (_err) => {
-				// 在 scroll-view 内使用时 pageScrollTo 不生效，由外部 @click 事件自行处理滚动
+				const style = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-back-top/up-back-top.uvue", 95, 11), 
+					position: 'fixed',
+					bottom: bVal,
+					right: rVal,
+					width: '44px',
+					height: '44px',
+					zIndex: isNaN(zVal) ? 999 : zVal,
+					display: 'flex',
+					flexDirection: 'column',
+					alignItems: 'center',
+					justifyContent: 'center',
+					backgroundColor: '#ffffff',
+					borderRadius: this.mode === 'circle' ? '100px' : '8px',
+					boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+					borderWidth: '1px',
+					borderStyle: 'solid',
+					borderColor: '#e2e8f0'
+				} as UTSJSONObject
+
+				return deepMerge(style, addStyle(this.customStyle as UTSJSONObject))
 			}
-		});
-		emit('click', e)
-	}
+		},
+		methods: {
+			backToTop(e: any) {
+				uni.pageScrollTo({
+					scrollTop: 0,
+					duration: parseInt(this.duration.toString()),
+					fail: (_: any) => {}
+				});
+				this.$emit('click', e)
+			}
+		}
+	})
 
-return (): any | null => {
-
+export default __sfc__
+function GenUniModulesUviewUltraComponentsUpBackTopUpBackTopRender(this: InstanceType<typeof __sfc__>): any | null {
+const _ctx = this
+const _cache = this.$.renderCache
 const _component_up_icon = resolveEasyComponent("up-icon",_easycom_up_icon)
 
-  return isTrue(show.value)
+  return isTrue(_ctx.show)
     ? _cE("view", _uM({
         key: 0,
-        style: _nS([backTopStyle.value, contentStyle.value]),
+        style: _nS(_ctx.finalStyle),
         class: "up-back-top",
-        onClick: backToTop
+        onClick: _ctx.backToTop
       }), [
-        isTrue(_ctx.$slots['default'] == null && _ctx.$slots['$default'] == null)
-          ? _cE(Fragment, _uM({ key: 0 }), [
-              _cV(_component_up_icon, _uM({
-                name: _ctx.icon,
-                "custom-style": _ctx.iconStyle
-              }), null, 8 /* PROPS */, ["name", "custom-style"]),
-              isTrue(_ctx.text)
-                ? _cE("text", _uM({
-                    key: 0,
-                    class: "up-back-top__text"
-                  }), _tD(_ctx.text), 1 /* TEXT */)
-                : _cC("v-if", true)
-            ], 64 /* STABLE_FRAGMENT */)
-          : renderSlot(_ctx.$slots, "default", _uM({ key: 1 }))
-      ], 4 /* STYLE */)
+        renderSlot(_ctx.$slots, "default", {}, (): any[] => [
+          _cV(_component_up_icon, _uM({
+            name: _ctx.icon,
+            size: "22",
+            color: "#2563eb"
+          }), null, 8 /* PROPS */, ["name"]),
+          _ctx.text != ''
+            ? _cE("text", _uM({
+                key: 0,
+                class: "up-back-top__text"
+              }), _tD(_ctx.text), 1 /* TEXT */)
+            : _cC("v-if", true)
+        ])
+      ], 12 /* STYLE, PROPS */, ["onClick"])
     : _cC("v-if", true)
 }
-}
-
-})
-export default __sfc__
 export type UpBackTopComponentPublicInstance = InstanceType<typeof __sfc__>;
-const GenUniModulesUviewUltraComponentsUpBackTopUpBackTopStyles = [_uM([["u-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-back-top", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["height", "100%"], ["justifyContent", "center"], ["backgroundColor", "#E1E1E1"]]))], ["up-back-top__tips", _pS(_uM([["fontSize", 12], ["transform", "scale(0.8)"]]))]])]
+const GenUniModulesUviewUltraComponentsUpBackTopUpBackTopStyles = [_uM([["up-back-top__text", _pS(_uM([["fontSize", 10], ["color", "#2563eb"], ["marginTop", 2]]))]])]
+
+import _easycom_up_icon from '@/uni_modules/uview-ultra/components/up-icon/up-icon.uvue'
