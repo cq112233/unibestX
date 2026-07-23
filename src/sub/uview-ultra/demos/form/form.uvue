@@ -2,138 +2,140 @@
   <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
     <NavBar title="Form 表单" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
 
-    <view class="demo-block">
-      <up-form
-        ref="uForm"
-        :model="formModel"
-        :rules="formRules"
-        label-width="90px"
-        error-type="toast"
-      >
-        <up-form-item label="姓名" prop="name" :border-bottom="true" required>
-          <up-input v-model="formModel.name" placeholder="请输入姓名" border="none" clearable></up-input>
-        </up-form-item>
+    <view class="p-16px">
+      <view class="demo-block">
+        <text class="demo-label">基础表单示例</text>
+        <up-form
+          ref="uForm"
+          :model="formModel"
+          :rules="formRules"
+          label-width="90px"
+          error-type="toast"
+        >
+          <up-form-item label="姓名" prop="name" :border-bottom="true" required>
+            <up-input v-model="formModel.name" placeholder="请输入姓名" border="none" clearable></up-input>
+          </up-form-item>
 
-        <up-form-item label="性别" prop="gender" :border-bottom="true" @click="genderActionShow = true" required>
-          <up-input
-            v-model="formModel.gender"
-            disabled
-            disabled-color="#ffffff"
-            placeholder="请选择性别"
-            border="none"
-          ></up-input>
-          <template #right>
-            <up-icon name="arrow-right" color="#c0c4cc" size="16"></up-icon>
-          </template>
-        </up-form-item>
+          <up-form-item label="性别" prop="gender" :border-bottom="true" @click="genderActionShow = true" required>
+            <up-input
+              v-model="formModel.gender"
+              disabled
+              disabled-color="#ffffff"
+              placeholder="请选择性别"
+              border="none"
+            ></up-input>
+            <template #right>
+              <up-icon name="arrow-right" color="#c0c4cc" size="16"></up-icon>
+            </template>
+          </up-form-item>
 
-        <up-form-item label="出生日期" prop="birthday" :border-bottom="true" @click="datetimePickerShow = true" required>
-          <up-input
-            v-model="formModel.birthday"
-            disabled
-            disabled-color="#ffffff"
-            placeholder="请选择出生日期"
-            border="none"
-          ></up-input>
-          <template #right>
-            <up-icon name="arrow-right" color="#c0c4cc" size="16"></up-icon>
-          </template>
-        </up-form-item>
+          <up-form-item label="出生日期" prop="birthday" :border-bottom="true" @click="datetimePickerShow = true" required>
+            <up-input
+              v-model="formModel.birthday"
+              disabled
+              disabled-color="#ffffff"
+              placeholder="请选择出生日期"
+              border="none"
+            ></up-input>
+            <template #right>
+              <up-icon name="arrow-right" color="#c0c4cc" size="16"></up-icon>
+            </template>
+          </up-form-item>
 
-        <up-form-item label="国籍" prop="country" :border-bottom="true" @click="pickerShow = true">
-          <up-input
-            v-model="formModel.country"
-            disabled
-            disabled-color="#ffffff"
-            placeholder="请选择国籍"
-            border="none"
-          ></up-input>
-          <template #right>
-            <up-icon name="arrow-right" color="#c0c4cc" size="16"></up-icon>
-          </template>
-        </up-form-item>
+          <up-form-item label="国籍" prop="country" :border-bottom="true" @click="pickerShow = true">
+            <up-input
+              v-model="formModel.country"
+              disabled
+              disabled-color="#ffffff"
+              placeholder="请选择国籍"
+              border="none"
+            ></up-input>
+            <template #right>
+              <up-icon name="arrow-right" color="#c0c4cc" size="16"></up-icon>
+            </template>
+          </up-form-item>
 
-        <up-form-item label="行程时间" prop="stayTime" :border-bottom="true" @click="calendarShow = true">
-          <up-input
-            v-model="formModel.stayTime"
-            disabled
-            disabled-color="#ffffff"
-            placeholder="请选择日期范围"
-            border="none"
-          ></up-input>
-          <template #right>
-            <up-icon name="arrow-right" color="#c0c4cc" size="16"></up-icon>
-          </template>
-        </up-form-item>
+          <up-form-item label="行程时间" prop="stayTime" :border-bottom="true" @click="calendarShow = true">
+            <up-input
+              v-model="formModel.stayTime"
+              disabled
+              disabled-color="#ffffff"
+              placeholder="请选择日期范围"
+              border="none"
+            ></up-input>
+            <template #right>
+              <up-icon name="arrow-right" color="#c0c4cc" size="16"></up-icon>
+            </template>
+          </up-form-item>
 
-        <up-form-item label="水果最爱" prop="fruit" :border-bottom="true">
-          <up-radio-group v-model="formModel.fruit" placement="row">
-            <up-radio name="apple" label="苹果"></up-radio>
-            <view class="w-10px"></view>
-            <up-radio name="banana" label="香蕉"></up-radio>
-            <view class="w-10px"></view>
-            <up-radio name="orange" label="橘子"></up-radio>
-          </up-radio-group>
-        </up-form-item>
+          <up-form-item label="水果最爱" prop="fruit" :border-bottom="true">
+            <up-radio-group v-model="formModel.fruit" placement="row">
+              <up-radio name="apple" label="苹果"></up-radio>
+              <view class="w-10px"></view>
+              <up-radio name="banana" label="香蕉"></up-radio>
+              <view class="w-10px"></view>
+              <up-radio name="orange" label="橘子"></up-radio>
+            </up-radio-group>
+          </up-form-item>
 
-        <up-form-item label="兴趣爱好" prop="hobbies" :border-bottom="true">
-          <up-checkbox-group v-model="formModel.hobbies" placement="row">
-            <up-checkbox name="reading" label="阅读"></up-checkbox>
-            <view class="w-10px"></view>
-            <up-checkbox name="sports" label="运动"></up-checkbox>
-            <view class="w-10px"></view>
-            <up-checkbox name="music" label="音乐"></up-checkbox>
-          </up-checkbox-group>
-        </up-form-item>
+          <up-form-item label="兴趣爱好" prop="hobbies" :border-bottom="true">
+            <up-checkbox-group v-model="formModel.hobbies" placement="row">
+              <up-checkbox name="reading" label="阅读"></up-checkbox>
+              <view class="w-10px"></view>
+              <up-checkbox name="sports" label="运动"></up-checkbox>
+              <view class="w-10px"></view>
+              <up-checkbox name="music" label="音乐"></up-checkbox>
+            </up-checkbox-group>
+          </up-form-item>
 
-        <up-form-item label="通知开关" prop="notification" :border-bottom="true">
-          <up-switch v-model="formModel.notification" active-color="#2979ff"></up-switch>
-        </up-form-item>
+          <up-form-item label="通知开关" prop="notification" :border-bottom="true">
+            <up-switch v-model="formModel.notification" active-color="#2979ff"></up-switch>
+          </up-form-item>
 
-        <up-form-item label="服务评分" prop="rate" :border-bottom="true">
-          <up-rate v-model="formModel.rate" :count="5"></up-rate>
-        </up-form-item>
+          <up-form-item label="服务评分" prop="rate" :border-bottom="true">
+            <up-rate v-model="formModel.rate" :count="5"></up-rate>
+          </up-form-item>
 
-        <up-form-item label="购买数量" prop="count" :border-bottom="true">
-          <up-number-box v-model="formModel.count" :min="1" :max="100"></up-number-box>
-        </up-form-item>
+          <up-form-item label="购买数量" prop="count" :border-bottom="true">
+            <up-number-box v-model="formModel.count" :min="1" :max="100"></up-number-box>
+          </up-form-item>
 
-        <up-form-item label="满意度" prop="satisfaction" :border-bottom="true">
-          <up-slider v-model="formModel.satisfaction" :min="0" :max="100" :show-value="true" style="width: 100%;"></up-slider>
-        </up-form-item>
+          <up-form-item label="满意度" prop="satisfaction" :border-bottom="true">
+            <up-slider v-model="formModel.satisfaction" :min="0" :max="100" :show-value="true" style="width: 100%;"></up-slider>
+          </up-form-item>
 
-        <up-form-item label="个人简介" prop="intro" :border-bottom="true" label-position="top">
-          <up-textarea v-model="formModel.intro" placeholder="请输入个人简介" count :maxlength="100"></up-textarea>
-        </up-form-item>
+          <up-form-item label="个人简介" prop="intro" :border-bottom="true" label-position="top">
+            <up-textarea v-model="formModel.intro" placeholder="请输入个人简介" count :maxlength="100"></up-textarea>
+          </up-form-item>
 
-        <up-form-item label="相关照片" prop="photos" :border-bottom="true" label-position="top">
-          <up-upload
-            :file-list="uploadList"
-            :multiple="true"
-            :max-count="3"
-            width="80px"
-            height="80px"
-            @after-read="onUploadAfterRead"
-            @delete="onUploadDelete"
-          ></up-upload>
-        </up-form-item>
+          <up-form-item label="相关照片" prop="photos" :border-bottom="true" label-position="top">
+            <up-upload
+              :file-list="uploadList"
+              :multiple="true"
+              :max-count="3"
+              width="80px"
+              height="80px"
+              @after-read="onUploadAfterRead"
+              @delete="onUploadDelete"
+            ></up-upload>
+          </up-form-item>
 
-      </up-form>
-    </view>
+        </up-form>
+      </view>
 
-    <view class="demo-block mt-12px">
-      <text class="demo-label">标签上方对齐</text>
-      <up-form :model="formModel2" label-position="top" label-width="100px">
-        <up-form-item label="活动名称" prop="name" :border-bottom="true">
-          <up-input v-model="formModel2.name" placeholder="请输入活动名称" border="none"></up-input>
-        </up-form-item>
-        <up-form-item label="活动详情" prop="detail" :border-bottom="true">
-          <up-textarea v-model="formModel2.detail" placeholder="请输入活动详情" border="none"></up-textarea>
-        </up-form-item>
-      </up-form>
-    </view>
+      <view class="demo-block">
+        <text class="demo-label">标签上方对齐</text>
+        <up-form :model="formModel2" label-position="top" label-width="100px">
+          <up-form-item label="活动名称" prop="name" :border-bottom="true">
+            <up-input v-model="formModel2.name" placeholder="请输入活动名称" border="none"></up-input>
+          </up-form-item>
+          <up-form-item label="活动详情" prop="detail" :border-bottom="true">
+            <up-textarea v-model="formModel2.detail" placeholder="请输入活动详情" border="none"></up-textarea>
+          </up-form-item>
+        </up-form>
+      </view>
 
-    <view class="p-16px mt-20px flex-row justify-between">
+      <view class="mt-20px flex-row justify-between">
         <view class="flex-1 mr-10px">
           <up-button type="primary" text="提交表单" @click="submitForm"></up-button>
         </view>
@@ -141,6 +143,7 @@
           <up-button type="info" text="重置表单" @click="resetForm"></up-button>
         </view>
       </view>
+    </view>
 
     <!-- 弹窗选择组件 -->
     <!-- Calendar 日历 -->
@@ -386,19 +389,19 @@ function onUploadDelete(e: UTSJSONObject): void {
 </script>
 
 <style scoped>
-.section-title {
-  padding: 16px 16px 8px 16px;
-  font-size: 18px;
-  font-weight: bold;
-  color: #303133;
-}
-
 .demo-block {
-  margin: 0 12px 12px 12px;
-  padding: 12px 16px;
+  margin-bottom: 12px;
+  padding: 12px;
   background-color: #ffffff;
   border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left: 3px solid #2979ff;
 }
 
 .w-10px {
