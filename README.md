@@ -80,7 +80,7 @@
 
 * Node >= 22
 * pnpm >= 7.30
-* HBuilderX = 5.0.7（注意：大于 5.0.7 安卓编译有问题，请下载 5.0.7 版本）
+* HBuilderX = 5.0.7
 * Vue Official >= 2.1.10
 * TypeScript >= 5.0
 * JDK >= 17（Android 平台）
