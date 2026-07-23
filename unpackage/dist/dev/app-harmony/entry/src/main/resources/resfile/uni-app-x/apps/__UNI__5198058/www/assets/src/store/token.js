@@ -81,7 +81,8 @@ class ITokenState extends UTS.UTSType {
           accessToken: { type: String, optional: false },
           accessExpiresIn: { type: Number, optional: false },
           refreshToken: { type: String, optional: false },
-          refreshExpiresIn: { type: Number, optional: false }
+          refreshExpiresIn: { type: Number, optional: false },
+          tokenExpireTime: { type: Number, optional: false }
         };
       },
       name: "ITokenState"
@@ -96,6 +97,7 @@ class ITokenState extends UTS.UTSType {
     this.accessExpiresIn = this.__props__.accessExpiresIn;
     this.refreshToken = this.__props__.refreshToken;
     this.refreshExpiresIn = this.__props__.refreshExpiresIn;
+    this.tokenExpireTime = this.__props__.tokenExpireTime;
     delete this.__props__;
   }
 }
@@ -109,7 +111,8 @@ class TokenStore extends PiniaStoreBase {
       accessToken: "",
       accessExpiresIn: 0,
       refreshToken: "",
-      refreshExpiresIn: 0
+      refreshExpiresIn: 0,
+      tokenExpireTime: 0
     }));
     this.bindState(this.state);
   }
@@ -123,6 +126,7 @@ class TokenStore extends PiniaStoreBase {
     this.state.accessExpiresIn = 0;
     this.state.refreshToken = "";
     this.state.refreshExpiresIn = 0;
+    this.state.tokenExpireTime = 0;
   }
   _hydrate(_data) {
     if (_data["token"] != null)
@@ -137,6 +141,8 @@ class TokenStore extends PiniaStoreBase {
       this.state.refreshToken = _data["refreshToken"];
     if (_data["refreshExpiresIn"] != null)
       this.state.refreshExpiresIn = _data["refreshExpiresIn"];
+    if (_data["tokenExpireTime"] != null)
+      this.state.tokenExpireTime = _data["tokenExpireTime"];
   }
   _serialize() {
     return new UTSJSONObject({
@@ -145,7 +151,8 @@ class TokenStore extends PiniaStoreBase {
       accessToken: this.state.accessToken,
       accessExpiresIn: this.state.accessExpiresIn,
       refreshToken: this.state.refreshToken,
-      refreshExpiresIn: this.state.refreshExpiresIn
+      refreshExpiresIn: this.state.refreshExpiresIn,
+      tokenExpireTime: this.state.tokenExpireTime
     });
   }
   // ==========================================
@@ -158,6 +165,7 @@ class TokenStore extends PiniaStoreBase {
     this.state.token = res.token;
     this.state.expiresIn = res.expiresIn;
     const expireTime = Date.now() + res.expiresIn * 1e3;
+    this.state.tokenExpireTime = expireTime;
     uni.setStorageSync("accessTokenExpireTime", expireTime);
   }
   /**
@@ -169,7 +177,9 @@ class TokenStore extends PiniaStoreBase {
     this.state.refreshToken = res.refreshToken;
     this.state.refreshExpiresIn = res.refreshExpiresIn;
     const now = Date.now();
-    uni.setStorageSync("accessTokenExpireTime", now + res.accessExpiresIn * 1e3);
+    const expireTime = now + res.accessExpiresIn * 1e3;
+    this.state.tokenExpireTime = expireTime;
+    uni.setStorageSync("accessTokenExpireTime", expireTime);
     uni.setStorageSync("refreshTokenExpireTime", now + res.refreshExpiresIn * 1e3);
   }
   /**
@@ -194,13 +204,16 @@ class TokenStore extends PiniaStoreBase {
    * 检查 accessToken 是否有效（未过期）
    */
   isTokenValid() {
-    const val = uni.getStorageSync("accessTokenExpireTime");
-    if (val == null || val === "")
-      return false;
-    const num = parseFloat(val.toString());
-    if (isNaN(num))
-      return false;
-    return Date.now() < num;
+    if (this.state.tokenExpireTime <= 0) {
+      const val = uni.getStorageSync("accessTokenExpireTime");
+      if (val != null && val !== "") {
+        const num = parseFloat(val.toString());
+        if (!isNaN(num)) {
+          this.state.tokenExpireTime = num;
+        }
+      }
+    }
+    return this.state.tokenExpireTime > 0 && Date.now() < this.state.tokenExpireTime;
   }
   /**
    * 检查 refreshToken 是否有效（未过期）

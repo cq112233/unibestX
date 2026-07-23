@@ -18,7 +18,7 @@ const _sfc_main = defineComponent({
         right: 0,
         zIndex: this.zIndex,
         bottom: 0,
-        "background-color": `rgba(0, 0, 0, ${this.opacity})`
+        "backgroundColor": `rgba(0, 0, 0, ${this.opacity})`
       });
       return deepMerge(style, addStyle(this.customStyle));
     }

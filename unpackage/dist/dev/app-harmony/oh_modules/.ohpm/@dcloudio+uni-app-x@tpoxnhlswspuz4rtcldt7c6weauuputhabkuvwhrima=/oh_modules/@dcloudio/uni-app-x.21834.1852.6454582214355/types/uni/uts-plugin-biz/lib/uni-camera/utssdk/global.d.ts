@@ -1,0 +1,34 @@
+// 本文件为自动构建生成
+import {
+  CameraContextCameraFrameListenerStartOptions as CameraContextCameraFrameListenerStartOptionsOrigin,
+  CameraContextCameraFrameListenerStopOptions as CameraContextCameraFrameListenerStopOptionsOrigin,
+  CameraContextCameraFrameListener as CameraContextCameraFrameListenerOrigin,
+  CameraContextOnCameraFrame as CameraContextOnCameraFrameOrigin,
+  CameraContextSetZoomOptions as CameraContextSetZoomOptionsOrigin,
+  CameraContextTakePhotoResult as CameraContextTakePhotoResultOrigin,
+  CameraContextTakePhotoOptions as CameraContextTakePhotoOptionsOrigin,
+  CameraContextStartRecordTimeoutResult as CameraContextStartRecordTimeoutResultOrigin,
+  CameraContextStartRecordOptions as CameraContextStartRecordOptionsOrigin,
+  CameraContextStopRecordResult as CameraContextStopRecordResultOrigin,
+  CameraContextStopRecordOptions as CameraContextStopRecordOptionsOrigin,
+  CameraContext as CameraContextOrigin,
+  CreateCameraContext as CreateCameraContextOrigin,
+  Uni as UniOrigin
+} from './interface'
+
+declare global {
+  type CameraContextCameraFrameListenerStartOptions = CameraContextCameraFrameListenerStartOptionsOrigin
+  type CameraContextCameraFrameListenerStopOptions = CameraContextCameraFrameListenerStopOptionsOrigin
+  type CameraContextCameraFrameListener = CameraContextCameraFrameListenerOrigin
+  type CameraContextOnCameraFrame = CameraContextOnCameraFrameOrigin
+  type CameraContextSetZoomOptions = CameraContextSetZoomOptionsOrigin
+  type CameraContextTakePhotoResult = CameraContextTakePhotoResultOrigin
+  type CameraContextTakePhotoOptions = CameraContextTakePhotoOptionsOrigin
+  type CameraContextStartRecordTimeoutResult = CameraContextStartRecordTimeoutResultOrigin
+  type CameraContextStartRecordOptions = CameraContextStartRecordOptionsOrigin
+  type CameraContextStopRecordResult = CameraContextStopRecordResultOrigin
+  type CameraContextStopRecordOptions = CameraContextStopRecordOptionsOrigin
+  type CameraContext = CameraContextOrigin
+  type CreateCameraContext = CreateCameraContextOrigin
+  interface Uni extends UniOrigin { }
+}

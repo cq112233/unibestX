@@ -1,8 +1,8 @@
-const { defineComponent, openBlock, createElementBlock, normalizeStyle, createElementVNode, renderSlot } = globalThis.Vue
+const { defineComponent, openBlock, createElementBlock, createElementVNode, normalizeStyle, renderSlot } = globalThis.Vue
 import { p as propsSticky } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-sticky/props&";
 import { m as mpMixin } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/mixin/mpMixin&";
 import { m as mixin } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/mixin/mixin&";
-import { j as guid, d as deepMerge, b as addStyle, g as getPx } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
+import { g as getPx, d as deepMerge, b as addStyle } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import { z as zIndexConfig } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/config/zIndex&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
 const _sfc_main = defineComponent({
@@ -14,42 +14,35 @@ const _sfc_main = defineComponent({
       default: 0
     }
   },
-  data() {
-    return {
-      stickyTop: 0,
-      elId: guid(),
-      initialTop: 0,
-      left: 0,
-      width: "auto",
-      height: "auto",
-      fixed: false
-    };
-  },
   computed: {
-    style() {
+    paddingArray() {
+      const top = parseFloat(getPx(this.offsetTop)) + parseFloat(getPx(this.customNavHeight));
+      return [top, 0, 0, 0];
+    },
+    contentStyle() {
+      const style = new UTSJSONObject({});
+      if (this.bgColor != "") {
+        style["backgroundColor"] = this.bgColor;
+      }
+      if (this.uZindex > 0) {
+        style["zIndex"] = this.uZindex;
+      }
+      return deepMerge(addStyle(this.customStyle), style);
+    },
+    webMpStyle() {
       const style = new UTSJSONObject({});
       if (!this.disabled) {
-        style["height"] = this.fixed ? this.height == "auto" ? "auto" : this.height + "px" : "auto";
+        style["position"] = "sticky";
+        const top_1 = parseFloat(getPx(this.offsetTop)) + parseFloat(getPx(this.customNavHeight));
+        style["top"] = top_1 + "px";
+        style["zIndex"] = this.uZindex;
       } else {
         style["position"] = "relative";
       }
-      style["backgroundColor"] = this.bgColor;
-      return deepMerge(addStyle(this.customStyle), style);
-    },
-    stickyContent() {
-      const style = new UTSJSONObject({});
-      if (this.fixed) {
-        style["position"] = "fixed";
-        style["top"] = this.stickyTop + "px";
-        style["left"] = this.left + "px";
-        if (this.width != "auto") {
-          style["width"] = this.width + "px";
-        }
-        style["zIndex"] = this.uZindex;
-      } else {
-        style["position"] = "static";
+      if (this.bgColor != "") {
+        style["backgroundColor"] = this.bgColor;
       }
-      return style;
+      return deepMerge(addStyle(this.customStyle), style);
     },
     uZindex() {
       var _a;
@@ -62,96 +55,39 @@ const _sfc_main = defineComponent({
       }
       return (_a = zIndexConfig["sticky"]) !== null && _a !== void 0 ? _a : 999;
     }
-  },
-  mounted() {
-    this.init();
-  },
-  watch: {
-    scrollTop: {
-      handler(nval) {
-        this.checkSticky(parseFloat(getPx(nval)));
-      },
-      immediate: true
-    },
-    offsetTop() {
-      this.getStickyTop();
-    }
-  },
-  methods: {
-    init() {
-      this.getStickyTop();
-      this.initObserveContent();
-    },
-    initObserveContent() {
-      setTimeout(() => {
-        this.upGetRect("#" + this.elId).then((res) => {
-          if (res != null) {
-            if (res.height != null && res.height > 0) {
-              this.height = res.height.toString();
-            }
-            if (res.left != null) {
-              this.left = res.left;
-            }
-            if (res.width != null && res.width > 0) {
-              this.width = res.width.toString();
-            }
-            if (res.top != null && res.top > 0) {
-              this.initialTop = res.top + parseFloat(getPx(this.scrollTop));
-            }
-          }
-        });
-      }, 200);
-    },
-    checkSticky(scrollTop) {
-      if (this.disabled) {
-        if (this.fixed)
-          this.fixed = false;
-        return null;
-      }
-      if (this.initialTop <= 0) {
-        this.upGetRect("#" + this.elId).then((res) => {
-          if (res != null && res.top != null && res.top > 0) {
-            this.initialTop = res.top + scrollTop;
-          }
-        });
-        return null;
-      }
-      const threshold = this.initialTop - this.stickyTop;
-      const shouldFixed = scrollTop >= threshold;
-      if (shouldFixed != this.fixed) {
-        this.fixed = shouldFixed;
-        if (shouldFixed) {
-          this.$emit("fixed", this.index);
-        } else {
-          this.$emit("unfixed", this.index);
-        }
-      }
-    },
-    getStickyTop() {
-      this.stickyTop = parseFloat(getPx(this.offsetTop)) + parseFloat(getPx(this.customNavHeight));
-    }
   }
 });
 const _style_0 = {};
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return openBlock(), createElementBlock(
+  return !_ctx.disabled ? (openBlock(), createElementBlock("sticky-header", {
+    key: 0,
+    padding: $options.paddingArray
+  }, [
+    createElementVNode(
+      "view",
+      {
+        class: "up-sticky",
+        style: normalizeStyle($options.contentStyle)
+      },
+      [
+        renderSlot(_ctx.$slots, "default")
+      ],
+      4
+      /* STYLE */
+    )
+  ], 8, ["padding"])) : (openBlock(), createElementBlock(
     "view",
     {
+      key: 1,
       class: "up-sticky",
-      style: normalizeStyle($options.style)
+      style: normalizeStyle($options.contentStyle)
     },
     [
-      createElementVNode("view", {
-        id: $data.elId,
-        style: normalizeStyle($options.stickyContent),
-        class: "up-sticky__content"
-      }, [
-        renderSlot(_ctx.$slots, "default")
-      ], 12, ["id"])
+      renderSlot(_ctx.$slots, "default")
     ],
     4
     /* STYLE */
-  );
+  ));
 }
 const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-sticky/up-sticky.uvue"]]);
 export {

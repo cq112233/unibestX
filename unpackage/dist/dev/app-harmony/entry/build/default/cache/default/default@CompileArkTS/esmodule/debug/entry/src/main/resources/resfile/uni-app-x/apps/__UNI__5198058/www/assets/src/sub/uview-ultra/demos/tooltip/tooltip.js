@@ -1,7 +1,8 @@
 import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/components/NavBar/NavBar&";
-const { defineComponent, ref, resolveDynamicComponent, openBlock, createBlock, withCtx, createVNode, createElementVNode } = globalThis.Vue
+const { defineComponent, ref, resolveDynamicComponent, openBlock, createBlock, withCtx, createVNode, createElementVNode, createCommentVNode } = globalThis.Vue
 import { A as AppKu, r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { _ as __easycom_1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-tooltip/up-tooltip&";
+import { _ as __easycom_2 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-button/up-button&";
 import { L as LayoutComponent } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/layouts/default&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/systemInfo&";
@@ -63,13 +64,22 @@ import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-line/up-line&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-line/props&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-line/line&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-button/button&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/throttle&";
 const _sfc_main = /* @__PURE__ */ defineComponent({
   __name: "tooltip",
   setup(__props, _a) {
     var __expose = _a.expose;
     __expose();
     const tooltipButtons = ref(["编辑", "删除"]);
-    const __returned__ = { tooltipButtons, get AppKu() {
+    const multiButtons = ref(["转发", "收藏", "删除"]);
+    function handleBtnClick(index) {
+      uni.showToast({
+        title: `点击了第 ${index} 个按钮`,
+        icon: "none"
+      });
+    }
+    const __returned__ = { tooltipButtons, multiButtons, handleBtnClick, get AppKu() {
       return AppKu;
     }, get LayoutComponent() {
       return LayoutComponent;
@@ -78,11 +88,12 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     return __returned__;
   }
 });
-const _style_0 = { "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "flex-row": { "": { "flexDirection": "row" } }, "items-center": { "": { "alignItems": "center" } }, "mt-12px": { "": { "marginTop": 12 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "pb-30px": { "": { "paddingBottom": 30 } }, "w-20px": { "": { "width": 20 } } };
+const _style_0 = { "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "flex": { "": { "display": "flex" } }, "flex-row": { "": { "flexDirection": "row" } }, "flex-wrap": { "": { "flexWrap": "wrap" } }, "items-center": { "": { "alignItems": "center" } }, "mb-8px": { "": { "marginBottom": 8 } }, "mr-12px": { "": { "marginRight": 12 } }, "mr-16px": { "": { "marginRight": 16 } }, "mt-12px": { "": { "marginTop": 12 } }, "none": { "": { "display": "none" } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "pb-30px": { "": { "paddingBottom": 30 } } };
 const _style_1 = { "demo-block": { "": { "marginBottom": 12, "paddingTop": 12, "paddingRight": 12, "paddingBottom": 12, "paddingLeft": 12, "backgroundColor": "#ffffff", "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "demo-label": { "": { "fontSize": 14, "fontWeight": "bold", "color": "#606266", "marginBottom": 10, "paddingLeft": 4, "borderLeftWidth": 3, "borderLeftStyle": "solid", "borderLeftColor": "#2979ff" } } };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_NavBar = resolveEasycom(resolveDynamicComponent("NavBar"), __easycom_0);
   const _component_up_tooltip = resolveEasycom(resolveDynamicComponent("up-tooltip"), __easycom_1);
+  const _component_up_button = resolveEasycom(resolveDynamicComponent("up-button"), __easycom_2);
   return openBlock(), createBlock($setup["AppKu"], null, {
     default: withCtx(() => [
       createVNode($setup["LayoutComponent"], {
@@ -98,29 +109,108 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
               "bg-color": "#ffffff"
             }),
             createElementVNode("view", { class: "p-16px" }, [
+              createCommentVNode(" 基础用法 "),
               createElementVNode("view", { class: "demo-block" }, [
                 createElementVNode("text", { class: "demo-label" }, "基础用法"),
-                createElementVNode("view", { class: "flex-row items-center" }, [
+                createElementVNode("view", { class: "flex flex-row items-center flex-wrap" }, [
+                  createElementVNode("view", { class: "mr-12px mb-8px" }, [
+                    createVNode(_component_up_tooltip, {
+                      text: "长按此处复制文本",
+                      direction: "top"
+                    })
+                  ]),
+                  createElementVNode("view", { class: "mb-8px" }, [
+                    createVNode(_component_up_tooltip, {
+                      text: "长按显示操作",
+                      direction: "top",
+                      "show-copy": false,
+                      buttons: $setup.tooltipButtons,
+                      onClick: $setup.handleBtnClick
+                    }, null, 8, ["buttons"])
+                  ])
+                ])
+              ]),
+              createCommentVNode(" 弹出方向 "),
+              createElementVNode("view", { class: "demo-block mt-12px" }, [
+                createElementVNode("text", { class: "demo-label" }, "弹出方向"),
+                createElementVNode("view", { class: "flex flex-row items-center flex-wrap" }, [
+                  createElementVNode("view", { class: "mr-16px mb-8px" }, [
+                    createVNode(_component_up_tooltip, {
+                      text: "长按文本，上方提示",
+                      direction: "top"
+                    })
+                  ]),
+                  createElementVNode("view", { class: "mb-8px" }, [
+                    createVNode(_component_up_tooltip, {
+                      text: "长按文本，下方提示",
+                      direction: "bottom"
+                    })
+                  ])
+                ])
+              ]),
+              createCommentVNode(" 高亮选中文本背景色 "),
+              createElementVNode("view", { class: "demo-block mt-12px" }, [
+                createElementVNode("text", { class: "demo-label" }, "高亮选中文本背景色"),
+                createElementVNode("view", { class: "flex flex-row items-center" }, [
                   createVNode(_component_up_tooltip, {
-                    text: "长按此处复制文本",
+                    text: "长按文本，显示背景色",
+                    "bg-color": "#d1fae5",
                     direction: "top"
-                  }),
-                  createElementVNode("view", { class: "w-20px" }),
+                  })
+                ])
+              ]),
+              createCommentVNode(" 扩展按钮 "),
+              createElementVNode("view", { class: "demo-block mt-12px" }, [
+                createElementVNode("text", { class: "demo-label" }, "扩展按钮"),
+                createElementVNode("view", { class: "flex flex-row items-center" }, [
                   createVNode(_component_up_tooltip, {
-                    text: "长按显示操作",
-                    direction: "top",
-                    "show-copy": false,
-                    buttons: $setup.tooltipButtons
+                    text: "显示多个扩展按钮",
+                    "show-copy": true,
+                    buttons: $setup.multiButtons,
+                    onClick: $setup.handleBtnClick
                   }, null, 8, ["buttons"])
                 ])
               ]),
+              createCommentVNode(" 自定义触发器 (Slot) "),
               createElementVNode("view", { class: "demo-block mt-12px" }, [
-                createElementVNode("text", { class: "demo-label" }, "弹出方向"),
-                createElementVNode("view", { class: "flex-row items-center" }, [
-                  createVNode(_component_up_tooltip, {
-                    text: "向下弹出",
-                    direction: "bottom"
-                  })
+                createElementVNode("text", { class: "demo-label" }, "自定义触发器 (Slot)"),
+                createElementVNode("view", { class: "flex flex-row items-center" }, [
+                  createElementVNode("view", { class: "mr-16px" }, [
+                    createVNode(_component_up_tooltip, {
+                      "show-copy": false,
+                      buttons: ["设置", "赞"],
+                      direction: "top",
+                      onClick: $setup.handleBtnClick
+                    }, {
+                      default: withCtx(() => [
+                        createVNode(_component_up_button, {
+                          type: "primary",
+                          size: "small",
+                          text: "点击/长按触发"
+                        })
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    })
+                  ]),
+                  createElementVNode("view", null, [
+                    createVNode(_component_up_tooltip, {
+                      "show-copy": true,
+                      buttons: ["自定义操作"],
+                      direction: "bottom",
+                      onClick: $setup.handleBtnClick
+                    }, {
+                      default: withCtx(() => [
+                        createVNode(_component_up_button, {
+                          type: "warning",
+                          size: "small",
+                          text: "下方弹出"
+                        })
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    })
+                  ])
                 ])
               ])
             ])

@@ -1,0 +1,28 @@
+// 本文件为自动构建生成
+import {
+  FacialRecognitionVerifyErrorCode as FacialRecognitionVerifyErrorCodeOrigin,
+  StartFacialRecognitionVerifyScreenOrientation as StartFacialRecognitionVerifyScreenOrientationOrigin,
+  IFacialRecognitionVerifyError as IFacialRecognitionVerifyErrorOrigin,
+  StartFacialRecognitionVerifySuccess as StartFacialRecognitionVerifySuccessOrigin,
+  StartFacialRecognitionVerifySuccessCallback as StartFacialRecognitionVerifySuccessCallbackOrigin,
+  StartFacialRecognitionVerifyFailCallback as StartFacialRecognitionVerifyFailCallbackOrigin,
+  StartFacialRecognitionVerifyCompleteCallback as StartFacialRecognitionVerifyCompleteCallbackOrigin,
+  StartFacialRecognitionVerifyOptions as StartFacialRecognitionVerifyOptionsOrigin,
+  GetFacialRecognitionMetaInfo as GetFacialRecognitionMetaInfoOrigin,
+  StartFacialRecognitionVerify as StartFacialRecognitionVerifyOrigin,
+  Uni as UniOrigin
+} from './interface'
+
+declare global {
+  type FacialRecognitionVerifyErrorCode = FacialRecognitionVerifyErrorCodeOrigin
+  type StartFacialRecognitionVerifyScreenOrientation = StartFacialRecognitionVerifyScreenOrientationOrigin
+  type IFacialRecognitionVerifyError = IFacialRecognitionVerifyErrorOrigin
+  type StartFacialRecognitionVerifySuccess = StartFacialRecognitionVerifySuccessOrigin
+  type StartFacialRecognitionVerifySuccessCallback = StartFacialRecognitionVerifySuccessCallbackOrigin
+  type StartFacialRecognitionVerifyFailCallback = StartFacialRecognitionVerifyFailCallbackOrigin
+  type StartFacialRecognitionVerifyCompleteCallback = StartFacialRecognitionVerifyCompleteCallbackOrigin
+  type StartFacialRecognitionVerifyOptions = StartFacialRecognitionVerifyOptionsOrigin
+  type GetFacialRecognitionMetaInfo = GetFacialRecognitionMetaInfoOrigin
+  type StartFacialRecognitionVerify = StartFacialRecognitionVerifyOrigin
+  interface Uni extends UniOrigin { }
+}
