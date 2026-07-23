@@ -30,8 +30,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
-        a: common_vendor.t(common_vendor.unref(hasLogin) ? "已登录" : "未登录"),
-        b: common_vendor.unref(hasLogin) ? "#10b981" : "#f43f5e",
+        a: common_vendor.t(hasLogin.value ? "已登录" : "未登录"),
+        b: hasLogin.value ? "#10b981" : "#f43f5e",
         c: common_vendor.o(jumpToTest, "f4"),
         d: common_vendor.o(handleLogout, "af"),
         e: common_vendor.gei(_ctx, ""),
