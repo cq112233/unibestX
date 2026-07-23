@@ -1,8 +1,8 @@
-const { defineComponent, openBlock, createElementBlock, createElementVNode, normalizeStyle, renderSlot } = globalThis.Vue
+const { defineComponent, openBlock, createElementBlock, normalizeStyle, createElementVNode, renderSlot } = globalThis.Vue
 import { p as propsSticky } from "./props.js";
 import { m as mpMixin } from "../../libs/mixin/mpMixin.js";
 import { m as mixin } from "../../libs/mixin/mixin.js";
-import { g as getPx, d as deepMerge, b as addStyle } from "../../libs/function/index.js";
+import { j as guid, g as getPx, d as deepMerge, b as addStyle } from "../../libs/function/index.js";
 import { z as zIndexConfig } from "../../libs/config/zIndex.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
 const _sfc_main = defineComponent({
@@ -14,20 +14,21 @@ const _sfc_main = defineComponent({
       default: 0
     }
   },
+  data() {
+    return {
+      elId: "up-sticky-" + guid(),
+      isFixed: false,
+      initialTop: 0,
+      height: 0,
+      left: 0,
+      width: 0,
+      isInit: false
+    };
+  },
   computed: {
     paddingArray() {
       const top = parseFloat(getPx(this.offsetTop)) + parseFloat(getPx(this.customNavHeight));
       return [top, 0, 0, 0];
-    },
-    contentStyle() {
-      const style = new UTSJSONObject({});
-      if (this.bgColor != "") {
-        style["backgroundColor"] = this.bgColor;
-      }
-      if (this.uZindex > 0) {
-        style["zIndex"] = this.uZindex;
-      }
-      return deepMerge(addStyle(this.customStyle), style);
     },
     webMpStyle() {
       const style = new UTSJSONObject({});
@@ -54,19 +55,105 @@ const _sfc_main = defineComponent({
         }
       }
       return (_a = zIndexConfig["sticky"]) !== null && _a !== void 0 ? _a : 999;
+    },
+    stickyTop() {
+      return parseFloat(getPx(this.offsetTop)) + parseFloat(getPx(this.customNavHeight));
+    },
+    wrapperStyle() {
+      const style = new UTSJSONObject({});
+      if (this.isFixed && this.height > 0) {
+        style["height"] = this.height + "px";
+      }
+      return style;
+    },
+    contentStyle() {
+      const style = new UTSJSONObject({});
+      if (!this.disabled && this.isFixed) {
+        style["position"] = "fixed";
+        style["top"] = this.stickyTop + "px";
+        style["left"] = this.left + "px";
+        if (this.width > 0) {
+          style["width"] = this.width + "px";
+        }
+        style["zIndex"] = this.uZindex;
+      } else {
+        style["position"] = "relative";
+      }
+      if (this.bgColor != "") {
+        style["backgroundColor"] = this.bgColor;
+      }
+      return deepMerge(addStyle(this.customStyle), style);
+    }
+  },
+  watch: {
+    scrollTop(val = null) {
+      if (this.disabled)
+        return null;
+      const st = parseFloat(val.toString());
+      this.checkFixed(st);
+    }
+  },
+  mounted() {
+    this.init();
+  },
+  methods: {
+    init() {
+      this.upGetRect("#" + this.elId, false).then((res) => {
+        var _a;
+        if (res.height != null && res.height > 0) {
+          this.height = res.height;
+        }
+        if (res.left != null) {
+          this.left = res.left;
+        }
+        if (res.width != null && res.width > 0) {
+          this.width = res.width;
+        }
+        const currentTop = (_a = res.top) !== null && _a !== void 0 ? _a : 0;
+        const st = parseFloat(this.scrollTop.toString());
+        this.initialTop = currentTop + st;
+        this.isInit = true;
+        this.checkFixed(st);
+      });
+    },
+    checkFixed(st) {
+      if (!this.isInit) {
+        this.init();
+        return null;
+      }
+      const currentY = this.initialTop - st;
+      if (currentY <= this.stickyTop && this.initialTop > 0) {
+        if (!this.isFixed) {
+          this.upGetRect("#" + this.elId, false).then((res) => {
+            if (res.width != null && res.width > 0) {
+              this.width = res.width;
+            }
+            if (res.left != null) {
+              this.left = res.left;
+            }
+            if (res.height != null && res.height > 0) {
+              this.height = res.height;
+            }
+          });
+        }
+        this.isFixed = true;
+      } else {
+        this.isFixed = false;
+      }
     }
   }
 });
-const _style_0 = {};
+const _style_0 = { "up-sticky": { "": { "width": "100%", "boxSizing": "border-box" } }, "up-sticky__content": { "": { "boxSizing": "border-box" } } };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return !_ctx.disabled ? (openBlock(), createElementBlock("sticky-header", {
-    key: 0,
-    padding: $options.paddingArray
+  return openBlock(), createElementBlock("view", {
+    class: "up-sticky",
+    id: $data.elId,
+    style: normalizeStyle($options.wrapperStyle)
   }, [
     createElementVNode(
       "view",
       {
-        class: "up-sticky",
+        class: "up-sticky__content",
         style: normalizeStyle($options.contentStyle)
       },
       [
@@ -75,19 +162,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       4
       /* STYLE */
     )
-  ], 8, ["padding"])) : (openBlock(), createElementBlock(
-    "view",
-    {
-      key: 1,
-      class: "up-sticky",
-      style: normalizeStyle($options.contentStyle)
-    },
-    [
-      renderSlot(_ctx.$slots, "default")
-    ],
-    4
-    /* STYLE */
-  ));
+  ], 12, ["id"]);
 }
 const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-sticky/up-sticky.uvue"]]);
 export {

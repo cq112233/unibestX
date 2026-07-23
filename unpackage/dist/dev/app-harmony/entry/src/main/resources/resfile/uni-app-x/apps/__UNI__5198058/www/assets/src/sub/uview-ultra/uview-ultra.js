@@ -1059,25 +1059,9 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                     /* STABLE */
                   }),
                   createVNode(_component_up_cell, {
-                    title: "Tooltip 长按提示",
-                    "is-link": "",
-                    onClick: _cache[57] || (_cache[57] = ($event) => $setup.goToDemo("tooltip"))
-                  }, {
-                    icon: withCtx(() => [
-                      createVNode(_component_up_icon, {
-                        name: "info-circle",
-                        color: "#ff9900",
-                        size: "20",
-                        class: "mr-8px"
-                      })
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  createVNode(_component_up_cell, {
                     title: "NoNetwork 无网络提示",
                     "is-link": "",
-                    onClick: _cache[58] || (_cache[58] = ($event) => $setup.goToDemo("no-network"))
+                    onClick: _cache[57] || (_cache[57] = ($event) => $setup.goToDemo("no-network"))
                   }, {
                     icon: withCtx(() => [
                       createVNode(_component_up_icon, {
@@ -1093,7 +1077,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                   createVNode(_component_up_cell, {
                     title: "LineProgress 线型进度",
                     "is-link": "",
-                    onClick: _cache[59] || (_cache[59] = ($event) => $setup.goToDemo("line-progress"))
+                    onClick: _cache[58] || (_cache[58] = ($event) => $setup.goToDemo("line-progress"))
                   }, {
                     icon: withCtx(() => [
                       createVNode(_component_up_icon, {
@@ -1109,7 +1093,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                   createVNode(_component_up_cell, {
                     title: "CountDown 倒计时",
                     "is-link": "",
-                    onClick: _cache[60] || (_cache[60] = ($event) => $setup.goToDemo("count-down"))
+                    onClick: _cache[59] || (_cache[59] = ($event) => $setup.goToDemo("count-down"))
                   }, {
                     icon: withCtx(() => [
                       createVNode(_component_up_icon, {
@@ -1125,7 +1109,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                   createVNode(_component_up_cell, {
                     title: "CountTo 数字滚动",
                     "is-link": "",
-                    onClick: _cache[61] || (_cache[61] = ($event) => $setup.goToDemo("count-to"))
+                    onClick: _cache[60] || (_cache[60] = ($event) => $setup.goToDemo("count-to"))
                   }, {
                     icon: withCtx(() => [
                       createVNode(_component_up_icon, {
@@ -1141,7 +1125,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                   createVNode(_component_up_cell, {
                     title: "Copy 文本复制",
                     "is-link": "",
-                    onClick: _cache[62] || (_cache[62] = ($event) => $setup.goToDemo("copy"))
+                    onClick: _cache[61] || (_cache[61] = ($event) => $setup.goToDemo("copy"))
                   }, {
                     icon: withCtx(() => [
                       createVNode(_component_up_icon, {
@@ -1167,7 +1151,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                   createVNode(_component_up_cell, {
                     title: "Navbar 导航栏",
                     "is-link": "",
-                    onClick: _cache[63] || (_cache[63] = ($event) => $setup.goToDemo("navbar"))
+                    onClick: _cache[62] || (_cache[62] = ($event) => $setup.goToDemo("navbar"))
                   }, {
                     icon: withCtx(() => [
                       createVNode(_component_up_icon, {
@@ -1183,7 +1167,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                   createVNode(_component_up_cell, {
                     title: "NavbarMini 迷你导航",
                     "is-link": "",
-                    onClick: _cache[64] || (_cache[64] = ($event) => $setup.goToDemo("navbar-mini"))
+                    onClick: _cache[63] || (_cache[63] = ($event) => $setup.goToDemo("navbar-mini"))
                   }, {
                     icon: withCtx(() => [
                       createVNode(_component_up_icon, {
@@ -1199,7 +1183,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                   createVNode(_component_up_cell, {
                     title: "BackTop 返回顶部",
                     "is-link": "",
-                    onClick: _cache[65] || (_cache[65] = ($event) => $setup.goToDemo("back-top"))
+                    onClick: _cache[64] || (_cache[64] = ($event) => $setup.goToDemo("back-top"))
                   }, {
                     icon: withCtx(() => [
                       createVNode(_component_up_icon, {
@@ -1215,7 +1199,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                   createVNode(_component_up_cell, {
                     title: "Tabbar 底部导航",
                     "is-link": "",
-                    onClick: _cache[66] || (_cache[66] = ($event) => $setup.goToDemo("tabbar"))
+                    onClick: _cache[65] || (_cache[65] = ($event) => $setup.goToDemo("tabbar"))
                   }, {
                     icon: withCtx(() => [
                       createVNode(_component_up_icon, {
@@ -1231,7 +1215,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                   createVNode(_component_up_cell, {
                     title: "Tabs 标签页",
                     "is-link": "",
-                    onClick: _cache[67] || (_cache[67] = ($event) => $setup.goToDemo("tabs"))
+                    onClick: _cache[66] || (_cache[66] = ($event) => $setup.goToDemo("tabs"))
                   }, {
                     icon: withCtx(() => [
                       createVNode(_component_up_icon, {
@@ -1247,7 +1231,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                   createVNode(_component_up_cell, {
                     title: "Subsection 分段器",
                     "is-link": "",
-                    onClick: _cache[68] || (_cache[68] = ($event) => $setup.goToDemo("subsection"))
+                    onClick: _cache[67] || (_cache[67] = ($event) => $setup.goToDemo("subsection"))
                   }, {
                     icon: withCtx(() => [
                       createVNode(_component_up_icon, {
@@ -1263,7 +1247,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                   createVNode(_component_up_cell, {
                     title: "IndexList 索引列表",
                     "is-link": "",
-                    onClick: _cache[69] || (_cache[69] = ($event) => $setup.goToDemo("index-list"))
+                    onClick: _cache[68] || (_cache[68] = ($event) => $setup.goToDemo("index-list"))
                   }, {
                     icon: withCtx(() => [
                       createVNode(_component_up_icon, {
@@ -1279,7 +1263,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                   createVNode(_component_up_cell, {
                     title: "MpHtml 富文本组件",
                     "is-link": "",
-                    onClick: _cache[70] || (_cache[70] = ($event) => $setup.goToDemo("mp-html"))
+                    onClick: _cache[69] || (_cache[69] = ($event) => $setup.goToDemo("mp-html"))
                   }, {
                     icon: withCtx(() => [
                       createVNode(_component_up_icon, {

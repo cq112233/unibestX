@@ -1,11 +1,11 @@
 import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/components/NavBar/NavBar&";
-const { defineComponent, ref, resolveDynamicComponent, openBlock, createBlock, withCtx, createVNode, createElementVNode, normalizeStyle, createCommentVNode, createElementBlock, Fragment, renderList, toDisplayString } = globalThis.Vue
+const { defineComponent, ref, computed, resolveDynamicComponent, openBlock, createBlock, withCtx, createVNode, createElementVNode, normalizeStyle, createCommentVNode, createElementBlock, Fragment, renderList, toDisplayString } = globalThis.Vue
 import { A as AppKu, r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { _ as __easycom_2 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-button/up-button&";
 import { _ as __easycom_2$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-sticky/up-sticky&";
 import { L as LayoutComponent } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/layouts/default&";
+import { s as safeAreaInsets, a as systemInfo } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/systemInfo&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/systemInfo&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-toast/up-toast&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/props&";
@@ -73,10 +73,15 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     __expose();
     const scrollTop = ref(0);
     const windowHeight = ref(uni.getWindowInfo().windowHeight);
+    const navHeight = computed(() => {
+      var _a2, _b, _c, _d;
+      const top = (_d = (_b = (_a2 = safeAreaInsets.value) === null || _a2 === void 0 ? null : _a2.top) !== null && _b !== void 0 ? _b : (_c = systemInfo.value) === null || _c === void 0 ? null : _c.statusBarHeight) !== null && _d !== void 0 ? _d : 0;
+      return top + 44;
+    });
     function handleScroll(e) {
       scrollTop.value = e.detail.scrollTop;
     }
-    const __returned__ = { scrollTop, windowHeight, handleScroll, get AppKu() {
+    const __returned__ = { scrollTop, windowHeight, navHeight, handleScroll, get AppKu() {
       return AppKu;
     }, get LayoutComponent() {
       return LayoutComponent;
@@ -128,6 +133,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                   createCommentVNode(" 核心示范：使用 up-sticky 组件 "),
                   createVNode(_component_up_sticky, {
                     "offset-top": 0,
+                    "custom-nav-height": $setup.navHeight,
                     "scroll-top": $setup.scrollTop
                   }, {
                     default: withCtx(() => [
@@ -143,7 +149,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                     ]),
                     _: 1
                     /* STABLE */
-                  }, 8, ["scroll-top"]),
+                  }, 8, ["custom-nav-height", "scroll-top"]),
                   createCommentVNode(" 长列表填充区域 "),
                   (openBlock(), createElementBlock(
                     Fragment,

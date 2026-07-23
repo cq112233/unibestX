@@ -1,0 +1,319 @@
+import { propsRate } from './props';
+import { mpMixin } from '../../libs/mixin/mpMixin';
+import { mixin } from '../../libs/mixin/mixin';
+import { addUnit, addStyle, guid, sleep, range, os } from '../../libs/function/index';
+/**
+ * rate 评分
+ * @description 该组件一般用于满意度调查，星型评分的场景
+ * @tutorial https://uview-plus.jiangruyi.com/components/rate.html
+ * @property {String | Number}	value			用于v-model双向绑定选中的星星数量 (默认 1 )
+ * @property {String | Number}	count			最多可选的星星数量 （默认 5 ）
+ * @property {Boolean}			disabled		是否禁止用户操作 （默认 false ）
+ * @property {Boolean}			readonly		是否只读 （默认 false ）
+ * @property {String | Number}	size			星星的大小，单位px （默认 18 ）
+ * @property {String}			inactiveColor	未选中星星的颜色 （默认 '#b2b2b2' ）
+ * @property {String}			activeColor		选中的星星颜色 （默认 '#FA3534' ）
+ * @property {String | Number}	gutter			星星之间的距离 （默认 4 ）
+ * @property {String | Number}	minCount		最少选中星星的个数 （默认 1 ）
+ * @property {Boolean}			allowHalf		是否允许半星选择 （默认 false ）
+ * @property {String}			activeIcon		选中时的图标名，只能为uView的内置图标 （默认 'star-fill' ）
+ * @property {String}			inactiveIcon	未选中时的图标名，只能为uView的内置图标 （默认 'star' ）
+ * @property {Boolean}			touchable		是否可以通过滑动手势选择评分 （默认 'true' ）
+ * @property {Object}			customStyle		组件的样式，对象形式
+ * @event {Function} change 选中的星星发生变化时触发
+ * @example <up-rate :count="count" :value="2"></up-rate>
+ */
+const __sfc__ = defineComponent({
+    name: "up-rate",
+    mixins: [mpMixin, mixin, propsRate],
+    data() {
+        return {
+            // 生成一个唯一id，否则一个页面多个评分组件，会造成冲突
+            elId: guid(),
+            elClass: guid(),
+            rateBoxLeft: 0,
+            activeIndex: 0 as number,
+            rateWidth: 0,
+            // 标识是否正在滑动，由于iOS事件上touch比click先触发，导致快速滑动结束后，接着触发click，导致事件混乱而出错
+            moving: false,
+        };
+    },
+    mounted() {
+        const modelVal: number = this.modelValue == null ? 0 : parseFloat(this.modelValue!.toString());
+        const minCount: number = this.minCount == null ? 0 : parseFloat(this.minCount!.toString());
+        const defaultActive = isNaN(minCount) ? 0 : minCount;
+        this.activeIndex = isNaN(modelVal) ? defaultActive : (modelVal == 0 ? defaultActive : modelVal);
+    },
+    watch: {
+        modelValue(val: number) {
+            this.activeIndex = this.normalizeActiveIndex(val);
+        }
+        // activeIndex: 'emitEvent'
+    },
+    emits: ['update:modelValue', 'change'],
+    methods: {
+        addStyle(e: any): any {
+            return addStyle(e);
+        },
+        addUnit(e: any): string {
+            return addUnit(e);
+        },
+        toNumber(value: any, fallback: number = 0): number {
+            if (value == null)
+                return fallback;
+            const num = parseFloat(value.toString());
+            return isNaN(num) ? fallback : num;
+        },
+        getMinCountValue(): number {
+            return this.toNumber(this.minCount, 0);
+        },
+        getCountValue(): number {
+            return this.toNumber(this.count, 0);
+        },
+        normalizeActiveIndex(value: any): number {
+            let normalized = this.toNumber(value, this.getMinCountValue());
+            const minCount = this.getMinCountValue();
+            const count = this.getCountValue();
+            if (normalized < minCount)
+                normalized = minCount;
+            if (count > 0 && normalized > count)
+                normalized = count;
+            return normalized;
+        },
+        getFallbackRateWidth(): number {
+            const size = this.toNumber(this.size, 18);
+            const gutter = this.toNumber(this.gutter, 0);
+            const width = size + gutter;
+            return width > 0 ? width : 18;
+        },
+        ensureRateMetrics(): boolean {
+            if (isNaN(this.rateBoxLeft)) {
+                this.rateBoxLeft = 0;
+            }
+            if (isNaN(this.rateWidth) || this.rateWidth <= 0) {
+                this.rateWidth = this.getFallbackRateWidth();
+                this.getRateIconWrapRect();
+            }
+            return !isNaN(this.rateWidth) && this.rateWidth > 0;
+        },
+        init() {
+            this.activeIndex = this.normalizeActiveIndex(this.modelValue);
+            sleep().then(() => {
+                this.getRateItemRect();
+                this.getRateIconWrapRect();
+            });
+        },
+        // 获取评分组件盒子的布局信息
+        async getRateItemRect(): Promise<void> {
+            await sleep();
+            // @ts-ignore
+            this.upGetRect("#" + this.elId).then((res: NodeInfo) => {
+                const left = res.left ?? NaN;
+                if (!isNaN(left)) {
+                    this.rateBoxLeft = left;
+                }
+            });
+        },
+        // 获取单个星星的尺寸
+        getRateIconWrapRect() {
+            // @ts-ignore
+            this.$uGetRect("." + this.elClass).then((res: NodeInfo) => {
+                const width = res.width ?? NaN;
+                if (!isNaN(width) && width > 0) {
+                    this.rateWidth = width;
+                }
+            });
+        },
+        // 手指滑动
+        touchMove(e: UniTouchEvent) {
+            // 如果禁止通过手动滑动选择，返回
+            if (!isTruthy(this.touchable)) {
+                return;
+            }
+            // @ts-ignore
+            this.preventEvent(e);
+            this.ensureRateMetrics();
+            const x = e.changedTouches[0].pageX;
+            this.getActiveIndex(x);
+        },
+        // 停止滑动
+        touchEnd(e: UniTouchEvent) {
+            // 如果禁止通过手动滑动选择，返回
+            if (!isTruthy(this.touchable)) {
+                return;
+            }
+            // @ts-ignore
+            this.preventEvent(e);
+            this.ensureRateMetrics();
+            const x = e.changedTouches[0].pageX;
+            this.getActiveIndex(x);
+        },
+        // 通过点击，直接选中
+        clickHandler(e: any, index: number) {
+            let ee = e as UniPointerEvent;
+            // ios上，moving状态取消事件触发
+            if (os() === "ios" && this.moving) {
+                return;
+            }
+            // @ts-ignore
+            this.preventEvent(ee);
+            this.ensureRateMetrics();
+            let x = 0;
+            // x = e.changedTouches[0].pageX;
+            x = ee.pageX;
+            this.getActiveIndex(x, true);
+        },
+        // 发出事件
+        emitEvent() {
+            const normalizedValue = this.normalizeActiveIndex(this.activeIndex != null ? this.activeIndex : 0);
+            if (this.activeIndex == null || normalizedValue != this.activeIndex) {
+                this.activeIndex = normalizedValue;
+                return;
+            }
+            // 发出change事件
+            this.$emit("change", normalizedValue);
+            // 同时修改双向绑定的值
+            this.$emit("update:modelValue", normalizedValue);
+        },
+        // 获取当前激活的评分图标
+        getActiveIndex(x: number, isClick = false) {
+            if (isTruthy(this.disabled) || isTruthy(this.readonly)) {
+                return;
+            }
+            if (!this.ensureRateMetrics()) {
+                return;
+            }
+            const count = this.getCountValue();
+            if (count <= 0 || isNaN(x)) {
+                return;
+            }
+            // 判断当前操作的点的x坐标值，是否在允许的边界范围内
+            const allRateWidth = this.rateWidth * count + this.rateBoxLeft;
+            // 如果小于第一个图标的左边界，设置为最小值，如果大于所有图标的宽度，则设置为最大值
+            x = range(this.rateBoxLeft, allRateWidth, x) - this.rateBoxLeft;
+            // 滑动点相对于评分盒子左边的距离
+            const distance = x;
+            // 滑动的距离，相当于多少颗星星
+            let index = 0;
+            // 判断是否允许半星
+            if (isTruthy(this.allowHalf)) {
+                index = Math.floor(distance / this.rateWidth);
+                // 取余，判断小数的区间范围
+                const decimal = distance % this.rateWidth;
+                if (decimal <= this.rateWidth / 2 && decimal > 0) {
+                    index += 0.5;
+                }
+                else if (decimal > this.rateWidth / 2) {
+                    index++;
+                }
+            }
+            else {
+                index = Math.floor(distance / this.rateWidth);
+                // 取余，判断小数的区间范围
+                const decimal = distance % this.rateWidth;
+                // 非半星时，只有超过了图标的一半距离，才认为是选择了这颗星
+                if (isClick) {
+                    if (decimal > 0)
+                        index++;
+                }
+                else {
+                    if (decimal > this.rateWidth / 2)
+                        index++;
+                }
+            }
+            // @ts-ignore
+            this.activeIndex = this.normalizeActiveIndex(Math.min(index, count));
+            // 对最少颗星星的限制
+            if (this.activeIndex < this.getMinCountValue()) {
+                this.activeIndex = this.getMinCountValue();
+            }
+            // 设置延时为了让click事件在touchmove之前触发
+            setTimeout(() => {
+                this.moving = true;
+            }, 10);
+            // 一定时间后，取消标识为移动中状态，是为了让click事件无效
+            setTimeout(() => {
+                this.moving = false;
+            }, 10);
+        },
+    },
+    mounted() {
+        this.init();
+    },
+});
+export default __sfc__;
+function GenUniModulesUviewUltraComponentsUpRateUpRateRender(this: InstanceType<typeof __sfc__>): any | null {
+    const _ctx = this;
+    const _cache = this.$.renderCache;
+    const _component_up_icon = resolveEasyComponent("up-icon", _easycom_up_icon);
+    return _cE("view", _uM({
+        class: "up-rate",
+        id: _ctx.elId,
+        ref: "up-rate",
+        style: _nS([_ctx.addStyle(_ctx.customStyle)])
+    }), [
+        _cE("view", _uM({
+            class: "up-rate__content",
+            onTouchmove: withModifiers(_ctx.touchMove, ["stop"]),
+            onTouchend: withModifiers(_ctx.touchEnd, ["stop"])
+        }), [
+            _cE(Fragment, null, RenderHelpers.renderList(parseInt(_ctx.count.toString()), (item, index, __index, _cached): any => {
+                return _cE("view", _uM({
+                    class: _nC(["up-rate__content__item cursor-pointer", [_ctx.elClass]]),
+                    key: index
+                }), [
+                    _cE("view", _uM({
+                        class: "up-rate__content__item__icon-wrap",
+                        ref_for: true,
+                        ref: "up-rate__content__item__icon-wrap",
+                        onClick: withModifiers(($event: any) => { _ctx.clickHandler($event, index + 1); }, ["stop"])
+                    }), [
+                        _cV(_component_up_icon, _uM({
+                            name: Math.floor(parseFloat(_ctx.activeIndex.toString(10))) > index
+                                ? _ctx.activeIcon
+                                : _ctx.inactiveIcon,
+                            color: isTruthy(_ctx.disabled) ? '#c8c9cc'
+                                : Math.floor(parseFloat(_ctx.activeIndex.toString(10))) > index
+                                    ? (_ctx.activeColor === '#FA3534' ? 'primary' : _ctx.activeColor)
+                                    : _ctx.inactiveColor,
+                            "custom-style": {
+                                padding: `0 ${_ctx.addUnit(parseInt(_ctx.gutter.toString()) / 2)}`,
+                            },
+                            size: _ctx.size
+                        }), null, 8 /* PROPS */, ["name", "color", "custom-style", "size"])
+                    ], 8 /* PROPS */, ["onClick"]),
+                    isTrue(_ctx.allowHalf)
+                        ? _cE("view", _uM({
+                            key: 0,
+                            onClick: withModifiers(($event: any) => { _ctx.clickHandler($event, index + 1); }, ["stop"]),
+                            class: "up-rate__content__item__icon-wrap up-rate__content__item__icon-wrap--half",
+                            style: _nS([_uM({
+                                    width: _ctx.addUnit(_ctx.rateWidth / 2),
+                                })]),
+                            ref_for: true,
+                            ref: "up-rate__content__item__icon-wrap"
+                        }), [
+                            _cV(_component_up_icon, _uM({
+                                name: Math.floor(parseFloat(_ctx.activeIndex.toString(10))) > index
+                                    ? _ctx.activeIcon
+                                    : _ctx.inactiveIcon,
+                                color: isTruthy(_ctx.disabled) ? '#c8c9cc'
+                                    : Math.ceil(parseFloat(_ctx.activeIndex.toString(10))) > index
+                                        ? (_ctx.activeColor === '#FA3534' ? 'primary' : _ctx.activeColor)
+                                        : _ctx.inactiveColor,
+                                "custom-style": {
+                                    padding: `0 ${_ctx.addUnit(parseInt(_ctx.gutter.toString()) / 2)}`
+                                },
+                                size: _ctx.size
+                            }), null, 8 /* PROPS */, ["name", "color", "custom-style", "size"])
+                        ], 12 /* STYLE, PROPS */, ["onClick"])
+                        : _cC("v-if", true)
+                ], 2 /* CLASS */);
+            }), 128 /* KEYED_FRAGMENT */)
+        ], 40 /* PROPS, NEED_HYDRATION */, ["onTouchmove", "onTouchend"])
+    ], 12 /* STYLE, PROPS */, ["id"]);
+}
+export type UpRateComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpRateUpRateStyles = [_uM([["up-rate", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["marginTop", 0], ["marginRight", 0], ["marginBottom", 0], ["marginLeft", 0], ["paddingTop", 0], ["paddingRight", 0], ["paddingBottom", 0], ["paddingLeft", 0]]))], ["up-rate__content", _pS(_uM([["display", "flex"], ["flexDirection", "row"]]))], ["up-rate__content__item", _pS(_uM([["position", "relative"]]))], ["up-rate__content__item__icon-wrap--half", _pS(_uM([["position", "absolute"], ["overflow", "hidden"], ["top", 0], ["left", 0]]))], ["up-icon", _pS(_uM([["boxSizing", "border-box"]]))]])];
+import _easycom_up_icon from '@/uni_modules/uview-ultra/components/up-icon/up-icon.uvue';
+//# sourceMappingURL=up-rate.uvue.map

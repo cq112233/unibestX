@@ -1,11 +1,11 @@
 import { _ as __easycom_0 } from "../../../../components/NavBar/NavBar.js";
-const { defineComponent, ref, resolveDynamicComponent, openBlock, createBlock, withCtx, createVNode, createElementVNode, normalizeStyle, createCommentVNode, createElementBlock, Fragment, renderList, toDisplayString } = globalThis.Vue
+const { defineComponent, ref, computed, resolveDynamicComponent, openBlock, createBlock, withCtx, createVNode, createElementVNode, normalizeStyle, createCommentVNode, createElementBlock, Fragment, renderList, toDisplayString } = globalThis.Vue
 import { A as AppKu, r as resolveEasycom } from "../../../../../App.ku.js";
 import { _ as __easycom_2 } from "../../../../../uni_modules/uview-ultra/components/up-button/up-button.js";
 import { _ as __easycom_2$1 } from "../../../../../uni_modules/uview-ultra/components/up-sticky/up-sticky.js";
 import { L as LayoutComponent } from "../../../../layouts/default.js";
+import { s as safeAreaInsets, a as systemInfo } from "../../../../utils/systemInfo.js";
 import { _ as _export_sfc } from "../../../../../plugin-vue-export-helper.js";
-import "../../../../utils/systemInfo.js";
 import "../../../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
 import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.js";
 import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/props.js";
@@ -73,10 +73,15 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     __expose();
     const scrollTop = ref(0);
     const windowHeight = ref(uni.getWindowInfo().windowHeight);
+    const navHeight = computed(() => {
+      var _a2, _b, _c, _d;
+      const top = (_d = (_b = (_a2 = safeAreaInsets.value) === null || _a2 === void 0 ? null : _a2.top) !== null && _b !== void 0 ? _b : (_c = systemInfo.value) === null || _c === void 0 ? null : _c.statusBarHeight) !== null && _d !== void 0 ? _d : 0;
+      return top + 44;
+    });
     function handleScroll(e) {
       scrollTop.value = e.detail.scrollTop;
     }
-    const __returned__ = { scrollTop, windowHeight, handleScroll, get AppKu() {
+    const __returned__ = { scrollTop, windowHeight, navHeight, handleScroll, get AppKu() {
       return AppKu;
     }, get LayoutComponent() {
       return LayoutComponent;
@@ -128,6 +133,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                   createCommentVNode(" 核心示范：使用 up-sticky 组件 "),
                   createVNode(_component_up_sticky, {
                     "offset-top": 0,
+                    "custom-nav-height": $setup.navHeight,
                     "scroll-top": $setup.scrollTop
                   }, {
                     default: withCtx(() => [
@@ -143,7 +149,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                     ]),
                     _: 1
                     /* STABLE */
-                  }, 8, ["scroll-top"]),
+                  }, 8, ["custom-nav-height", "scroll-top"]),
                   createCommentVNode(" 长列表填充区域 "),
                   (openBlock(), createElementBlock(
                     Fragment,

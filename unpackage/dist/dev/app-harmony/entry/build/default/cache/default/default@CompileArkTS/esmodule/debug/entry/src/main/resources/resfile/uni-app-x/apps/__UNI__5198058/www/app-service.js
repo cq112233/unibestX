@@ -573,7 +573,7 @@ function isConsoleWritable() {
 function initRuntimeSocketService() {
   const hosts = "127.0.0.1,192.168.100.62,198.18.0.1,10.8.0.12";
   const port = "8090";
-  const id = "app-harmony_d1jzPJ";
+  const id = "app-harmony_hsREX7";
   const lazy = typeof swan !== "undefined";
   let restoreError = lazy ? () => {
   } : initOnError();

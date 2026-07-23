@@ -1,0 +1,43 @@
+/**
+ * 登录拦截策略映射
+ */
+export const LOGIN_STRATEGY_MAP = {
+  /** 黑名单策略：默认无需登录，只在特定页面拦截 */
+  DEFAULT_NO_NEED_LOGIN: 0,
+  /** 白名单策略：默认全部拦截，仅在特定免登录页面直接放行 */
+  DEFAULT_NEED_LOGIN: 1,
+}
+
+/**
+ * 选中的全局登录策略（此处默认采用黑名单策略）
+ */
+export const LOGIN_STRATEGY = LOGIN_STRATEGY_MAP.DEFAULT_NO_NEED_LOGIN
+
+/**
+ * 是否启用强制登录策略（白名单策略）
+ */
+export const isNeedLoginMode = LOGIN_STRATEGY == LOGIN_STRATEGY_MAP.DEFAULT_NEED_LOGIN
+
+/**
+ * 登录页面绝对路由路径
+ */
+export const LOGIN_PAGE = '/src/sub/auth/login'
+
+/**
+ * 注册页面绝对路由路径
+ */
+export const REGISTER_PAGE = '/src/sub/auth/register'
+
+/**
+ * 登录相关基础页面路径列表
+ */
+export const LOGIN_PAGE_LIST = [LOGIN_PAGE, REGISTER_PAGE]
+
+/**
+ * 排除在外的页面路径列表：
+ * - 白名单模式下：此列表中的页面可以直接访问，无须登录（如首页、关于页）
+ * - 黑名单模式下：此列表中的页面在未登录时会被强制拦截，并重定向至登录页
+ */
+export const EXCLUDE_LOGIN_PATH_LIST = [
+  '/src/sub/test/test', // 示例值
+]

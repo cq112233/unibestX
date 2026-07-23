@@ -19,7 +19,7 @@
       </view>
 
       <!-- 核心示范：使用 up-sticky 组件 -->
-      <up-sticky :offset-top="0" :scroll-top="scrollTop">
+      <up-sticky :offset-top="0" :custom-nav-height="navHeight" :scroll-top="scrollTop">
         <view class="bg-[#2979ff] p-12px rounded-8px flex-row items-center justify-between shadow-sm mb-10px">
           <text class="text-white font-bold text-14px">📌 悬浮吸顶操作栏</text>
           <up-button size="small" type="warning" text="立即体验" class="w-90px"></up-button>
@@ -40,10 +40,16 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { safeAreaInsets, systemInfo } from '@/src/utils/systemInfo'
 
 const scrollTop = ref(0)
 const windowHeight = ref(uni.getWindowInfo().windowHeight)
+
+const navHeight = computed((): number => {
+  const top = safeAreaInsets.value?.top ?? systemInfo.value?.statusBarHeight ?? 0
+  return top + 44
+})
 
 function handleScroll(e: UniScrollEvent) {
   scrollTop.value = e.detail.scrollTop

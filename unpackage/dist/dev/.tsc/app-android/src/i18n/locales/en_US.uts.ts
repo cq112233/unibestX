@@ -1,0 +1,46 @@
+export default {
+	message: {
+		hello: 'The world says {msg}!',
+		welcome: 'Welcome to use unibestX!',
+		switch_success: 'Switched to English'
+	},
+	tabbar: {
+		home: 'Home',
+		basic: 'Basic',
+		ai: 'AI',
+		function: 'Function',
+		me: 'Me'
+	},
+	basic: {
+		iconDemoTitle: 'Font Icon Demo',
+		svgAuthWarning: 'SVG mode requires authorization & fee',
+		langTitle: 'Language Settings',
+		langPreview: 'Multi-language Preview',
+		themeTitle: 'Theme Settings',
+		themePreview: 'Theme Color Preview',
+		themeButton: 'Theme Button',
+		themeSuccess: 'Theme switched successfully',
+		echartTitle: 'ECharts Chart Demo',
+		echartLine: 'Line Chart',
+		echartBar: 'Bar Chart',
+		echartPie: 'Pie Chart'
+	},
+	function: {
+		sysInfoTitle: 'Device System Info',
+		brand: 'Brand',
+		model: 'Model',
+		system: 'OS',
+		platform: 'Platform',
+		getSysInfoBtn: 'Get System Info',
+		hapticsTitle: 'Haptics & Utilities',
+		vibrateBtn: 'Short Vibration Feedback',
+		vibrateSuccess: 'Vibration triggered',
+		copyBtn: 'Copy Test Text',
+		copySuccess: 'Copied successfully',
+		mediaTitle: 'Camera & Media',
+		choosePhotoBtn: 'Take Photo/Choose Image',
+		scanCodeBtn: 'Scan Code Test',
+		scanResult: 'Scan Result',
+		noData: 'No data'
+	}
+}

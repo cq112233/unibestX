@@ -1,0 +1,300 @@
+
+import { propsText } from './props'
+import { mpMixin } from '../../libs/mixin/mpMixin';
+import { mixin } from '../../libs/mixin/mixin';
+import { buttonMixin } from '../../libs/mixin/button';
+import { openType } from '../../libs/mixin/openType';
+import { addStyle, addUnit, deepMerge } from '../../libs/function/index';
+import { error, priceFormat, timeFormat } from '../../libs/function/index';
+import {
+	func as testFunc,
+	date as testDate,
+	url as testUrl,
+} from '../../libs/function/test';
+/**
+ * Text 文本
+ * @description 此组件集成了文本类在项目中的常用功能，包括状态，拨打电话，格式化日期，*替换，超链接...等功能。 您大可不必在使用特殊文本时自己定义，text组件几乎涵盖您能使用的大部分场景。
+ * @tutorial https://ijry.github.io/uview-plus/components/loading.html
+ * @property {String} 					type		主题颜色
+ * @property {Boolean} 					show		是否显示（默认 true ）
+ * @property {String | Number}			text		显示的值
+ * @property {String}					prefixIcon	前置图标
+ * @property {String} 					suffixIcon	后置图标
+ * @property {String} 					mode		文本处理的匹配模式 text-普通文本，price-价格，phone-手机号，name-姓名，date-日期，link-超链接
+ * @property {String} 					href		mode=link下，配置的链接
+ * @property {String | Function} 		format		格式化规则
+ * @property {Boolean} 					call		mode=phone时，点击文本是否拨打电话（默认 false ）
+ * @property {String} 					openType	小程序的打开方式
+ * @property {Boolean} 					bold		是否粗体，默认normal（默认 false ）
+ * @property {Boolean} 					block		是否块状（默认 false ）
+ * @property {String | Number} 			lines		文本显示的行数，如果设置，超出此行数，将会显示省略号
+ * @property {String} 					color		文本颜色（默认 '#303133' ）
+ * @property {String | Number} 			size		字体大小（默认 15px ）
+ * @property {Object | String} 			iconStyle	图标的样式 （默认 {fontSize: '15px'} ）
+ * @property {String} 					decoration	文字装饰，下划线，中划线等，可选值 none|underline|line-through（默认 'none' ）
+ * @property {Object | String | Number}	margin		外边距，对象、字符串，数值形式均可（默认 0px ）
+ * @property {String | Number} 			lineHeight	文本行高
+ * @property {String} 					align		文本对齐方式，可选值left|center|right（默认 'left' ）
+ * @property {String} 					wordWrap	文字换行，可选值break-word|normal|anywhere（默认 'normal' ）
+ * @event {Function} click  点击触发事件
+ * @example <up-text text="我用十年青春,赴你最后之约"></up-text>
+ */
+const __sfc__ = defineComponent({
+    name: 'up-text',
+
+
+
+
+    mixins: [mpMixin, mixin, propsText],
+
+	emits: ['click'],
+    computed: {
+        valueStyle(): UTSJSONObject {
+            let style = {__$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-text/up-text.uvue", 125, 17),
+                textDecoration: this.decoration,
+                fontWeight: this.bold ? 'bold' : 'normal',
+                wordWrap: this.wordWrap,
+                fontSize: addUnit(this.size)
+            }
+			if (this.type == '') {
+				style['color'] = this.color
+			}
+			if (this.lines != '') {
+				style['lines'] = this.lines
+			}
+			if (this.lineHeight != '') {
+				style['lineHeight'] = addUnit(this.lineHeight)
+			}
+			if (this.block) {
+				style['display'] = 'block'
+			}
+			return deepMerge(style, addStyle(this.customStyle)) as UTSJSONObject
+        },
+        // 经处理后需要显示的值
+        value(): string {
+            let {
+                text,
+                mode,
+                format,
+                href
+            } = this
+
+			// @ts-ignore
+            let textStr = text.toString()
+
+            // 价格类型
+            if (mode === 'price') {
+                // 如果text不为金额进行提示
+                if (!/^\d+(\.\d+)?$/.test(textStr)) {
+                    error('金额模式下，text参数需要为金额格式');
+                }
+                // 进行格式化，判断用户传入的format参数为正则，或者函数，如果没有传入format，则使用默认的金额格式化处理
+                // todo
+				// if (testFunc(format)) {
+                //     // 如果用户传入的是函数，使用函数格式化
+                //     return format(text)
+                // }
+                // 如果format非正则，非函数，则使用默认的金额格式化方法进行操作
+                return priceFormat(textStr, 2)
+            } if (mode === 'date') {
+                // 判断是否合法的日期或者时间戳
+				if (!testDate(textStr)) {
+					error('日期模式下，text参数需要为日期或时间戳格式' + textStr)
+				}
+                // 进行格式化，判断用户传入的format参数为正则，或者函数，如果没有传入format，则使用默认的格式化处理
+                // todo
+                // if (testFunc(format)) {
+                //     // 如果用户传入的是函数，使用函数格式化
+                //     return format(textStr)
+                // }
+				if (format != '') {
+                    // 如果format非正则，非函数，则使用默认的时间格式化方法进行操作
+					// @ts-ignore
+                    return timeFormat(textStr, format.toString())
+                }
+                // 如果没有设置format，则设置为默认的时间格式化形式
+                return timeFormat(textStr, 'yyyy-mm-dd')
+            } if (mode === 'phone') {
+                // 判断是否合法的手机号
+                // !testMobile(text) && error('手机号模式下，text参数需要为手机号码格式')
+                // todo
+                // if (testFunc(format)) {
+                //     // 如果用户传入的是函数，使用函数格式化
+                //     return format(text)
+                // }
+				if (format === 'encrypt') {
+                    // 如果format为encrypt，则将手机号进行星号加密处理
+                    return `${textStr.substring(0, 3)}****${textStr.substring(7)}`
+                }
+                return textStr
+            } if (mode === 'name') {
+                // 判断是否合法的字符粗
+				if (!(typeof (textStr) === 'string')) {
+					error('姓名模式下，text参数需要为字符串格式')
+				}
+                // if (testFunc(format)) {
+                //     // 如果用户传入的是函数，使用函数格式化
+                //     return format(textStr)
+                // }
+				if (format === 'encrypt') {
+                    // 如果format为encrypt，则将姓名进行星号加密处理
+                    return this.formatName(textStr)
+                }
+                return textStr
+            } if (mode === 'link') {
+                // 判断是否合法的字符粗
+				if (!testUrl(href)) {
+					error('超链接模式下，href参数需要为URL格式')
+				}
+                return textStr
+            }
+            return textStr
+        },
+        isMp(): Boolean {
+            let mp = false
+
+
+
+            return mp
+        }
+    },
+    data() {
+        return {}
+    },
+    methods: {
+        addStyle(style: any): any {
+			return addStyle(style)
+		},
+        clickHandler() {
+            // 如果为手机号模式，拨打电话
+            if (this.call && this.mode === 'phone') {
+				// todo
+                // uni.makePhoneCall({
+                //     phoneNumber: this.text
+                // })
+            }
+            this.$emit('click')
+        },
+        // 默认的姓名脱敏规则
+        formatName(name: string): string {
+            let value = ''
+            if (name.length == 2) {
+                value = name.substring(0, 1) + '*'
+            } else if (name.length > 2) {
+                let char = ''
+                for (let i = 0, len = name.length - 2; i < len; i++) {
+                    char += '*'
+                }
+                value = name.substring(0, 1) + char + name.substring(-1, 1)
+            } else {
+                value = name
+            }
+            return value
+        },
+		onGetUserInfo(): void {
+		},
+		onContact(): void {
+		},
+		onGetPhoneNumber(): void {
+		},
+		onError(): void {
+		},
+		onLaunchApp(): void {
+		},
+		onOpenSetting(): void {
+		},
+    }
+})
+
+export default __sfc__
+function GenUniModulesUviewUltraComponentsUpTextUpTextRender(this: InstanceType<typeof __sfc__>): any | null {
+const _ctx = this
+const _cache = this.$.renderCache
+const _component_up_icon = resolveEasyComponent("up-icon",_easycom_up_icon)
+const _component_up_link = resolveEasyComponent("up-link",_easycom_up_link)
+
+  return isTrue(_ctx.show)
+    ? _cE("view", _uM({
+        key: 0,
+        class: _nC(["up-text", [_ctx.customClass]]),
+        style: _nS(_uM({
+            margin: _ctx.margin,
+			justifyContent: _ctx.align === 'left' ? 'flex-start' : _ctx.align === 'center' ? 'center' : 'flex-end'
+        })),
+        onClick: _ctx.clickHandler
+      }), [
+        _ctx.mode === 'price'
+          ? _cE("text", _uM({
+              key: 0,
+              class: _nC(['up-text__price', `up-text__value--${_ctx.type}`]),
+              style: _nS([_ctx.valueStyle])
+            }), "￥", 6 /* CLASS, STYLE */)
+          : _cC("v-if", true),
+        isTrue(_ctx.prefixIcon)
+          ? _cE("view", _uM({
+              key: 1,
+              class: "up-text__prefix-icon"
+            }), [
+              _cV(_component_up_icon, _uM({
+                name: _ctx.prefixIcon,
+                customStyle: _ctx.addStyle(_ctx.iconStyle)
+              }), null, 8 /* PROPS */, ["name", "customStyle"])
+            ])
+          : _cC("v-if", true),
+        _ctx.mode === 'link'
+          ? _cV(_component_up_link, _uM({
+              key: 2,
+              class: _nC(["up-text__value", [`up-text__value--${_ctx.type}`,	`up-line-${_ctx.lines}`]]),
+              style: _nS(_uM({fontWeight: _ctx.valueStyle['fontWeight'], wordWrap: _ctx.valueStyle['wordWrap'], fontSize: _ctx.valueStyle['fontSize']})),
+              text: _ctx.value,
+              href: _ctx.href,
+              underLine: ""
+            }), null, 8 /* PROPS */, ["style", "class", "text", "href"])
+          : isTrue(_ctx.openType != '' && _ctx.isMp)
+            ? _cE("button", _uM({
+                key: 3,
+                class: "up-reset-button up-text__value",
+                style: _nS([_ctx.valueStyle]),
+                "data-index": "index",
+                openType: _ctx.openType,
+                onGetuserinfo: _ctx.onGetUserInfo,
+                onContact: _ctx.onContact,
+                onGetphonenumber: _ctx.onGetPhoneNumber,
+                onError: _ctx.onError,
+                onLaunchapp: _ctx.onLaunchApp,
+                onOpensetting: _ctx.onOpenSetting,
+                lang: _ctx.lang,
+                "session-from": _ctx.sessionFrom,
+                "send-message-title": _ctx.sendMessageTitle,
+                "send-message-path": _ctx.sendMessagePath,
+                "send-message-img": _ctx.sendMessageImg,
+                "show-message-card": _ctx.showMessageCard,
+                "app-parameter": _ctx.appParameter
+              }), _tD(_ctx.value), 45 /* TEXT, STYLE, PROPS, NEED_HYDRATION */, ["openType", "onGetuserinfo", "onContact", "onGetphonenumber", "onError", "onLaunchapp", "onOpensetting", "lang", "session-from", "send-message-title", "send-message-path", "send-message-img", "show-message-card", "app-parameter"])
+            : _cE("text", _uM({
+                key: 4,
+                class: _nC(["up-text__value", [
+                `up-text__value--${_ctx.type}`,
+                `up-line-${_ctx.lines}`
+            ]]),
+                style: _nS([_ctx.valueStyle])
+              }), _tD(_ctx.value), 7 /* TEXT, CLASS, STYLE */),
+        _ctx.suffixIcon != ''
+          ? _cE("view", _uM({
+              key: 5,
+              class: "up-text__suffix-icon"
+            }), [
+              _cV(_component_up_icon, _uM({
+                name: _ctx.suffixIcon,
+                customStyle: _ctx.addStyle(_ctx.iconStyle)
+              }), null, 8 /* PROPS */, ["name", "customStyle"])
+            ])
+          : _cC("v-if", true)
+      ], 14 /* CLASS, STYLE, PROPS */, ["onClick"])
+    : _cC("v-if", true)
+}
+export type UpTextComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpTextUpTextStyles = [_uM([["u-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-text", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["flexWrap", "nowrap"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"]]))], ["up-text__price", _pS(_uM([["fontSize", 14], ["color", "#606266"]]))], ["up-text__value", _pS(_uM([["fontSize", 14], ["color", "#606266"], ["textOverflow", "ellipsis"]]))], ["up-text__value--primary", _pS(_uM([["color", "var(--theme-color, #0957de)"]]))], ["up-text__value--warning", _pS(_uM([["color", "#f9ae3d"]]))], ["up-text__value--success", _pS(_uM([["color", "#5ac725"]]))], ["up-text__value--info", _pS(_uM([["color", "#909399"]]))], ["up-text__value--error", _pS(_uM([["color", "#f56c6c"]]))], ["up-text__value--main", _pS(_uM([["color", "#303133"]]))], ["up-text__value--content", _pS(_uM([["color", "#606266"]]))], ["up-text__value--tips", _pS(_uM([["color", "#909193"]]))], ["up-text__value--light", _pS(_uM([["color", "#c0c4cc"]]))]])]
+
+import _easycom_up_icon from '@/uni_modules/uview-ultra/components/up-icon/up-icon.uvue'
+import _easycom_up_link from '@/uni_modules/uview-ultra/components/up-link/up-link.uvue'
