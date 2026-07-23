@@ -1,0 +1,21 @@
+// 本文件为自动构建生成
+export {
+  UrlCallbackOptions,
+  CreateInterstitialAdOptions,
+  CreateRewardedVideoAdOptions,
+  RewardedVideoAd,
+  InterstitialAd,
+  IVideoAd,
+  IRewardedVideoAd,
+  VideoAdClose,
+  RewardedVideoAdClose,
+  UniAdErrorCode,
+  IUniAdError,
+  UniAdErrorEvent,
+  AdCallBackEvent,
+  AdCloseCallBackEvent,
+  AdErrorCallBackEvent,
+  AdVerifyCallBackEvent,
+  CreateRewardedVideoAd,
+  CreateInterstitialAd,
+} from './interface'

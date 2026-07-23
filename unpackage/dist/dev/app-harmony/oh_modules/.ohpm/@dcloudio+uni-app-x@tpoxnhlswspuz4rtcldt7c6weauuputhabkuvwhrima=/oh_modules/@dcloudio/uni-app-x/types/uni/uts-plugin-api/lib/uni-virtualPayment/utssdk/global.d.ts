@@ -1,0 +1,112 @@
+// 本文件为自动构建生成
+import {
+  RequestVirtualPaymentFailImpl as RequestVirtualPaymentFailImplOrigin,
+  GetVirtualPaymentManager as GetVirtualPaymentManagerOrigin,
+  VirtualPaymentManager as VirtualPaymentManagerOrigin,
+  RequestVirtualPaymentErrorCode as RequestVirtualPaymentErrorCodeOrigin,
+  RequestVirtualPayment as RequestVirtualPaymentOrigin,
+  AppleIAPPromotionalOffer as AppleIAPPromotionalOfferOrigin,
+  AppleIAPTransactionOptions as AppleIAPTransactionOptionsOrigin,
+  GoolgeIapSuccessOptions as GoolgeIapSuccessOptionsOrigin,
+  HuaweiIapSuccessOptions as HuaweiIapSuccessOptionsOrigin,
+  WeixinIapSuccessOptions as WeixinIapSuccessOptionsOrigin,
+  RequestVirtualPaymentSuccess as RequestVirtualPaymentSuccessOrigin,
+  RequestVirtualPaymentSuccessCallback as RequestVirtualPaymentSuccessCallbackOrigin,
+  RequestVirtualPaymentFail as RequestVirtualPaymentFailOrigin,
+  RequestVirtualPaymentFailCallback as RequestVirtualPaymentFailCallbackOrigin,
+  IRequestVirtualPaymentFail as IRequestVirtualPaymentFailOrigin,
+  RequestVirtualPaymentComplete as RequestVirtualPaymentCompleteOrigin,
+  RequestVirtualPaymentCompleteCallback as RequestVirtualPaymentCompleteCallbackOrigin,
+  AppleIAPOptions as AppleIAPOptionsOrigin,
+  GoogleIapOptions as GoogleIapOptionsOrigin,
+  HuaweiIapOptions as HuaweiIapOptionsOrigin,
+  WeixinIapOptions as WeixinIapOptionsOrigin,
+  RequestVirtualPaymentOptions as RequestVirtualPaymentOptionsOrigin,
+  RestoreTransactions as RestoreTransactionsOrigin,
+  AppleIAPRestoreSuccess as AppleIAPRestoreSuccessOrigin,
+  AppleIAPRestoreSuccessCallback as AppleIAPRestoreSuccessCallbackOrigin,
+  AppleIAPRestoreFail as AppleIAPRestoreFailOrigin,
+  AppleIAPRestoreFailCallback as AppleIAPRestoreFailCallbackOrigin,
+  IAppleIAPRestoreFail as IAppleIAPRestoreFailOrigin,
+  AppleIAPRestoreComplete as AppleIAPRestoreCompleteOrigin,
+  AppleIAPRestoreCompleteCallback as AppleIAPRestoreCompleteCallbackOrigin,
+  AppleIAPRestoreErrorCode as AppleIAPRestoreErrorCodeOrigin,
+  AppleIAPRestoreOptions as AppleIAPRestoreOptionsOrigin,
+  GetUnfinishedTransactions as GetUnfinishedTransactionsOrigin,
+  AppleIAPUnfinishedTransactionSuccess as AppleIAPUnfinishedTransactionSuccessOrigin,
+  AppleIAPUnfinishedTransactionSuccessCallback as AppleIAPUnfinishedTransactionSuccessCallbackOrigin,
+  AppleIAPUnfinishedTransactionFail as AppleIAPUnfinishedTransactionFailOrigin,
+  AppleIAPUnfinishedTransactionFailCallback as AppleIAPUnfinishedTransactionFailCallbackOrigin,
+  IAppleIAPUnfinishedTransactionFail as IAppleIAPUnfinishedTransactionFailOrigin,
+  AppleIAPUnfinishedTransactionComplete as AppleIAPUnfinishedTransactionCompleteOrigin,
+  AppleIAPUnfinishedTransactionCompleteCallback as AppleIAPUnfinishedTransactionCompleteCallbackOrigin,
+  AppleIAPUnfinishedTransactionErrorCode as AppleIAPUnfinishedTransactionErrorCodeOrigin,
+  AppleIAPUnfinishedTransactionOptions as AppleIAPUnfinishedTransactionOptionsOrigin,
+  FinishTransaction as FinishTransactionOrigin,
+  AppleIAPFinishTransactionSuccess as AppleIAPFinishTransactionSuccessOrigin,
+  AppleIAPFinishTransactionSuccessCallback as AppleIAPFinishTransactionSuccessCallbackOrigin,
+  AppleIAPFinishTransactionFail as AppleIAPFinishTransactionFailOrigin,
+  AppleIAPFinishTransactionFailCallback as AppleIAPFinishTransactionFailCallbackOrigin,
+  IAppleIAPFinishTransactionFail as IAppleIAPFinishTransactionFailOrigin,
+  AppleIAPFinishTransactionComplete as AppleIAPFinishTransactionCompleteOrigin,
+  AppleIAPFinishTransactionCompleteCallback as AppleIAPFinishTransactionCompleteCallbackOrigin,
+  AppleIAPFinishTransactionFailErrorCode as AppleIAPFinishTransactionFailErrorCodeOrigin,
+  AppleIAPFinishTransactionOptions as AppleIAPFinishTransactionOptionsOrigin,
+  Uni as UniOrigin
+} from './interface'
+
+declare global {
+  type RequestVirtualPaymentFailImpl = RequestVirtualPaymentFailImplOrigin
+  type GetVirtualPaymentManager = GetVirtualPaymentManagerOrigin
+  type VirtualPaymentManager = VirtualPaymentManagerOrigin
+  type RequestVirtualPaymentErrorCode = RequestVirtualPaymentErrorCodeOrigin
+  type RequestVirtualPayment = RequestVirtualPaymentOrigin
+  type AppleIAPPromotionalOffer = AppleIAPPromotionalOfferOrigin
+  type AppleIAPTransactionOptions = AppleIAPTransactionOptionsOrigin
+  type GoolgeIapSuccessOptions = GoolgeIapSuccessOptionsOrigin
+  type HuaweiIapSuccessOptions = HuaweiIapSuccessOptionsOrigin
+  type WeixinIapSuccessOptions = WeixinIapSuccessOptionsOrigin
+  type RequestVirtualPaymentSuccess = RequestVirtualPaymentSuccessOrigin
+  type RequestVirtualPaymentSuccessCallback = RequestVirtualPaymentSuccessCallbackOrigin
+  type RequestVirtualPaymentFail = RequestVirtualPaymentFailOrigin
+  type RequestVirtualPaymentFailCallback = RequestVirtualPaymentFailCallbackOrigin
+  type IRequestVirtualPaymentFail = IRequestVirtualPaymentFailOrigin
+  type RequestVirtualPaymentComplete = RequestVirtualPaymentCompleteOrigin
+  type RequestVirtualPaymentCompleteCallback = RequestVirtualPaymentCompleteCallbackOrigin
+  type AppleIAPOptions = AppleIAPOptionsOrigin
+  type GoogleIapOptions = GoogleIapOptionsOrigin
+  type HuaweiIapOptions = HuaweiIapOptionsOrigin
+  type WeixinIapOptions = WeixinIapOptionsOrigin
+  type RequestVirtualPaymentOptions = RequestVirtualPaymentOptionsOrigin
+  type RestoreTransactions = RestoreTransactionsOrigin
+  type AppleIAPRestoreSuccess = AppleIAPRestoreSuccessOrigin
+  type AppleIAPRestoreSuccessCallback = AppleIAPRestoreSuccessCallbackOrigin
+  type AppleIAPRestoreFail = AppleIAPRestoreFailOrigin
+  type AppleIAPRestoreFailCallback = AppleIAPRestoreFailCallbackOrigin
+  type IAppleIAPRestoreFail = IAppleIAPRestoreFailOrigin
+  type AppleIAPRestoreComplete = AppleIAPRestoreCompleteOrigin
+  type AppleIAPRestoreCompleteCallback = AppleIAPRestoreCompleteCallbackOrigin
+  type AppleIAPRestoreErrorCode = AppleIAPRestoreErrorCodeOrigin
+  type AppleIAPRestoreOptions = AppleIAPRestoreOptionsOrigin
+  type GetUnfinishedTransactions = GetUnfinishedTransactionsOrigin
+  type AppleIAPUnfinishedTransactionSuccess = AppleIAPUnfinishedTransactionSuccessOrigin
+  type AppleIAPUnfinishedTransactionSuccessCallback = AppleIAPUnfinishedTransactionSuccessCallbackOrigin
+  type AppleIAPUnfinishedTransactionFail = AppleIAPUnfinishedTransactionFailOrigin
+  type AppleIAPUnfinishedTransactionFailCallback = AppleIAPUnfinishedTransactionFailCallbackOrigin
+  type IAppleIAPUnfinishedTransactionFail = IAppleIAPUnfinishedTransactionFailOrigin
+  type AppleIAPUnfinishedTransactionComplete = AppleIAPUnfinishedTransactionCompleteOrigin
+  type AppleIAPUnfinishedTransactionCompleteCallback = AppleIAPUnfinishedTransactionCompleteCallbackOrigin
+  type AppleIAPUnfinishedTransactionErrorCode = AppleIAPUnfinishedTransactionErrorCodeOrigin
+  type AppleIAPUnfinishedTransactionOptions = AppleIAPUnfinishedTransactionOptionsOrigin
+  type FinishTransaction = FinishTransactionOrigin
+  type AppleIAPFinishTransactionSuccess = AppleIAPFinishTransactionSuccessOrigin
+  type AppleIAPFinishTransactionSuccessCallback = AppleIAPFinishTransactionSuccessCallbackOrigin
+  type AppleIAPFinishTransactionFail = AppleIAPFinishTransactionFailOrigin
+  type AppleIAPFinishTransactionFailCallback = AppleIAPFinishTransactionFailCallbackOrigin
+  type IAppleIAPFinishTransactionFail = IAppleIAPFinishTransactionFailOrigin
+  type AppleIAPFinishTransactionComplete = AppleIAPFinishTransactionCompleteOrigin
+  type AppleIAPFinishTransactionCompleteCallback = AppleIAPFinishTransactionCompleteCallbackOrigin
+  type AppleIAPFinishTransactionFailErrorCode = AppleIAPFinishTransactionFailErrorCodeOrigin
+  type AppleIAPFinishTransactionOptions = AppleIAPFinishTransactionOptionsOrigin
+  interface Uni extends UniOrigin { }
+}

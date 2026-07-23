@@ -1,0 +1,1051 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ8Simport { _ as __easycom_0 } from "../up-icon/up-icon.js";
+const { defineComponent, getCurrentInstance, ref, watch, computed, onMounted, resolveDynamicComponent, openBlock, createElementBlock, normalizeStyle, createElementVNode, normalizeClass, Fragment, renderList, withModifiers, toDisplayString, createVNode, renderSlot } = globalThis.Vue
+import { r as resolveEasycom } from "../../../../App.ku.js";
+import { a as addUnit, u as upGetRect, e as getWindowInfo } from "../../libs/function/index.js";
+import { d as defProps } from "./dropdown.js";
+import "./types.js";
+import { u as useUltraUI } from "../../libs/composable/useUltraUI.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const _sfc_main = /* @__PURE__ */ defineComponent({
+  ...{
+    name: "up-dropdown"
+  },
+  __name: "up-dropdown",
+  props: {
+    // èœå•æ ‡é¢˜å’Œé€‰é¡¹çš„æ¿€æ´»æ€é¢œè‰²
+    activeColor: {
+      type: String,
+      default: defProps.getString("dropdown.activeColor")
+    },
+    // èœå•æ ‡é¢˜å’Œé€‰é¡¹çš„æœªæ¿€æ´»æ€é¢œè‰²
+    inactiveColor: {
+      type: String,
+      default: defProps.getString("dropdown.inactiveColor")
+    },
+    // ç‚¹å‡»é®ç½©æ˜¯å¦å…³é—­èœå•
+    closeOnClickMask: {
+      type: Boolean,
+      default: defProps.getBoolean("dropdown.closeOnClickMask")
+    },
+    // ç‚¹å‡»å½“å‰æ¿€æ´»é¡¹æ ‡é¢˜æ˜¯å¦å…³é—­èœå•
+    closeOnClickSelf: {
+      type: Boolean,
+      default: defProps.getBoolean("dropdown.closeOnClickSelf")
+    },
+    // è¿‡æ¸¡æ—¶é—´
+    duration: {
+      type: [Number, String],
+      default: defProps.getNumber("dropdown.duration")
+    },
+    // æ ‡é¢˜èœå•çš„é«˜åº¦
+    height: {
+      type: [Number, String],
+      default: defProps.getNumber("dropdown.height")
+    },
+    // æ˜¯å¦æ˜¾ç¤ºä¸‹è¾¹æ¡†
+    borderBottom: {
+      type: Boolean,
+      default: defProps.getBoolean("dropdown.borderBottom")
+    },
+    // æ ‡é¢˜çš„å­—ä½“å¤§å°
+    titleSize: {
+      type: [Number, String],
+      default: defProps.getNumber("dropdown.titleSize")
+    },
+    // ä¸‹æ‹‰å‡ºæ¥çš„å†…å®¹éƒ¨åˆ†çš„åœ†è§’å€¼
+    borderRadius: {
+      type: [Number, String],
+      default: defProps.getNumber("dropdown.borderRadius")
+    },
+    // èœå•å³ä¾§çš„iconå›¾æ ‡
+    menuIcon: {
+      type: String,
+      default: defProps.getString("dropdown.menuIcon")
+    },
+    // èœå•å³ä¾§å›¾æ ‡çš„å¤§å°
+    menuIconSize: {
+      type: [Number, String],
+      default: defProps.getNumber("dropdown.menuIconSize")
+    }
+  },
+  emits: ["open", "close"],
+  setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    const _b = useUltraUI(), children = _b.children, getChildren = _b.getChildren, addChild = _b.addChild;
+    const instance = getCurrentInstance().proxy;
+    const props = __props;
+    const emit = __emit;
+    const showDropdown = ref(true);
+    const menuList = ref([]);
+    const active = ref(false);
+    const current = ref(99999);
+    const contentStyle = ref(new UTSJSONObject({
+      zIndex: -1,
+      opacity: 0
+    }));
+    const highlightIndexList = ref([]);
+    const contentHeight = ref(0);
+    watch(contentHeight, (newVal) => {
+      if (active.value) {
+        contentStyle.value["height"] = newVal + "px";
+      }
+    });
+    const popupStyle = computed(() => {
+      let style = new UTSJSONObject(
+        {}
+        // è¿›è¡ŒYè½´ä½ç§»ï¼Œå±•å¼€çŠ¶æ€æ—¶ï¼Œæ¢å¤åŸä½ã€‚æ”¶é½çŠ¶æ€æ—¶ï¼Œå¾€ä¸Šä½ç§»100%ï¼Œè¿›è¡Œéšè—
+      );
+      style["transform"] = `translateY(${active.value ? "0%" : "-100%"})`;
+      style["transition-duration"] = parseInt(props.duration.toString()) / 1e3 + "s";
+      style["borderRadius"] = `0 0 ${addUnit(props.borderRadius)} ${addUnit(props.borderRadius)}`;
+      return style;
+    });
+    function getWindowInfoWrapper() {
+      return getWindowInfo();
+    }
+    function init() {
+      var _a2;
+      menuList.value = [];
+      if (children.value != null) {
+        (_a2 = children.value) === null || _a2 === void 0 ? null : _a2.map((child) => {
+          child.$callMethod("init");
+        });
+      }
+    }
+    function getContentHeight() {
+      let windowHeight = getWindowInfoWrapper().windowHeight;
+      upGetRect(".up-dropdown__menu", false, instance).then((res) => {
+        if (res.bottom != null) {
+          contentHeight.value = windowHeight - res.bottom;
+        } else {
+          contentHeight.value = windowHeight;
+        }
+      });
+    }
+    function open(index) {
+      getContentHeight();
+      contentStyle.value = new UTSJSONObject({
+        zIndex: 11,
+        height: contentHeight.value + "px",
+        opacity: 1
+      });
+      active.value = true;
+      current.value = index;
+      if (children.value != null) {
+        children.value.map((val, idx) => {
+          if (index == idx) {
+            val.$callMethod("setActive", true);
+          } else {
+            val.$callMethod("setActive", false);
+          }
+        });
+      }
+      emit("open", current.value);
+    }
+    function close() {
+      emit("close", current.value);
+      active.value = false;
+      current.value = 99999;
+      contentStyle.value["zIndex"] = -1;
+      contentStyle.value["opacity"] = 0;
+      setTimeout(() => {
+        contentStyle.value["height"] = 0;
+      }, parseInt(props.duration.toString()));
+    }
+    function menuClick(index) {
+      if (menuList.value[index].disabled)
+        return null;
+      if (index == current.value && props.closeOnClickSelf) {
+        close();
+        setTimeout(() => {
+          if (children.value != null && children.value[index] != null) {
+            children.value[index].$callMethod("setActive", false);
+          }
+        }, parseInt(props.duration.toString()));
+        return null;
+      }
+      open(index);
+    }
+    function maskClick() {
+      if (!props.closeOnClickMask)
+        return null;
+      close();
+    }
+    function highlight(indexParams = null) {
+      if (Array.isArray(indexParams) && indexParams !== null) {
+        highlightIndexList.value = indexParams;
+        return null;
+      }
+      highlightIndexList.value = [];
+      if (indexParams != null) {
+        highlightIndexList.value.push(parseInt(indexParams.toString()));
+      }
+    }
+    const addMenuListItem = (op) => {
+      menuList.value.push(op);
+    };
+    onMounted(() => {
+      getContentHeight();
+    });
+    const getProps = function() {
+      return new UTSJSONObject({
+        activeColor: props.activeColor,
+        inactiveColor: props.inactiveColor,
+        closeOnClickMask: props.closeOnClickMask,
+        closeOnClickSelf: props.closeOnClickSelf,
+        duration: props.duration,
+        height: props.height,
+        borderBottom: props.borderBottom,
+        titleSize: props.titleSize,
+        borderRadius: props.borderRadius,
+        menuIcon: props.menuIcon,
+        menuIconSize: props.menuIconSize
+      });
+    };
+    function getContentTextStyle(item, index) {
+      const style = new UTSJSONObject({});
+      style["fontSize"] = addUnit(props.titleSize);
+      const isActive = index == current.value || highlightIndexList.value.includes(index);
+      if (item.disabled) {
+        style["color"] = "#c0c4cc";
+      } else if (isActive) {
+        if (props.activeColor != "#2979ff") {
+          style["color"] = props.activeColor;
+        }
+      } else {
+        style["color"] = props.inactiveColor;
+      }
+      return style;
+    }
+    __expose({
+      init,
+      close,
+      highlight,
+      getChildren,
+      addChild,
+      children,
+      addMenuListItem,
+      getProps
+    });
+    const __returned__ = { children, getChildren, addChild, instance, props, emit, showDropdown, menuList, active, current, contentStyle, highlightIndexList, contentHeight, popupStyle, getWindowInfoWrapper, init, getContentHeight, open, close, menuClick, maskClick, highlight, addMenuListItem, getProps, getContentTextStyle };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = { "up-dropdown": { "": { "flexGrow": 0, "flexShrink": 0, "flexBasis": "auto", "width": "100%", "position": "relative" } }, "up-dropdown__menu": { "": { "display": "flex", "flexDirection": "row", "position": "relative", "zIndex": 11, "height": "80rpx" } }, "up-dropdown__menu__item": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "up-flex-row": { ".up-dropdown__menu__item ": { "flexDirection": "row" } }, "up-dropdown__menu__item__text": { "": { "fontSize": "28rpx", "color": "#606266" } }, "up-dropdown__menu__item__text--active": { "": { "color": "var(--theme-color, #0957de)" } }, "up-dropdown__menu__item__arrow": { "": { "marginLeft": "6rpx", "transitionProperty": "transform", "transitionDuration": "0.3s", "alignItems": "center", "display": "flex", "flexDirection": "row" } }, "up-dropdown__menu__item__arrow--rotate": { "": { "transform": "rotate(180deg)" } }, "up-dropdown__content": { "": { "borderTopWidth": 0, "borderRightWidth": 0, "borderBottomWidth": 0, "borderLeftWidth": 0, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#0000FF", "borderRightColor": "#0000FF", "borderBottomColor": "#0000FF", "borderLeftColor": "#0000FF", "position": "absolute", "zIndex": 8, "width": "100%", "left": 0, "bottom": 0, "top": "80rpx", "overflow": "hidden" } }, "up-dropdown__content__mask": { "": { "position": "absolute", "zIndex": 9, "backgroundImage": "none", "backgroundColor": "rgba(0,0,0,0.3)", "width": "100%", "left": 0, "top": 0, "bottom": 0 } }, "up-dropdown__content__popup": { "": { "position": "relative", "zIndex": 10, "transitionProperty": "transform", "transitionDuration": "0.3s", "transform": "translate3D(0, -100%, 0)", "overflow": "hidden" } }, "@TRANSITION": { "up-dropdown__menu__item__arrow": { "property": "transform", "duration": "0.3s" }, "up-dropdown__content__popup": { "property": "transform", "duration": "0.3s" } } };
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_icon = resolveEasycom(resolveDynamicComponent("up-icon"), __easycom_0);
+  return openBlock(), createElementBlock(
+    "view",
+    {
+      class: "up-dropdown",
+      style: normalizeStyle({
+        height: $setup.active ? _ctx.$up.addUnit($setup.contentHeight + parseInt($setup.props.height.toString())) : _ctx.$up.addUnit($setup.props.height)
+      })
+    },
+    [
+      createElementVNode(
+        "view",
+        {
+          class: normalizeClass(["up-dropdown__menu", {
+            "u-border-bottom": $setup.props.borderBottom
+          }]),
+          style: normalizeStyle({
+            height: _ctx.$up.addUnit($setup.props.height)
+          })
+        },
+        [
+          (openBlock(true), createElementBlock(
+            Fragment,
+            null,
+            renderList($setup.menuList, (item, index) => {
+              return openBlock(), createElementBlock("view", {
+                class: "up-dropdown__menu__item",
+                key: index,
+                onClick: withModifiers(($event) => $setup.menuClick(index), ["stop"])
+              }, [
+                createElementVNode("view", { class: "up-flex up-flex-row" }, [
+                  createElementVNode(
+                    "text",
+                    {
+                      class: normalizeClass(["up-dropdown__menu__item__text", {
+                        "up-dropdown__menu__item__text--active": (index == $setup.current || $setup.highlightIndexList.includes(index)) && $setup.props.activeColor == "#2979ff"
+                      }]),
+                      style: normalizeStyle([$setup.getContentTextStyle(item, index)])
+                    },
+                    toDisplayString(item["title"]),
+                    7
+                    /* TEXT, CLASS, STYLE */
+                  ),
+                  createElementVNode(
+                    "view",
+                    {
+                      class: normalizeClass(["up-dropdown__menu__item__arrow", {
+                        "up-dropdown__menu__item__arrow--rotate": index == $setup.current
+                      }])
+                    },
+                    [
+                      createVNode(_component_up_icon, {
+                        "custom-style": { display: "flex" },
+                        name: $setup.props.menuIcon,
+                        size: _ctx.$up.addUnit($setup.props.menuIconSize),
+                        color: index == $setup.current || $setup.highlightIndexList.includes(index) ? $setup.props.activeColor == "#2979ff" ? "primary" : $setup.props.activeColor : "#c0c4cc"
+                      }, null, 8, ["name", "size", "color"])
+                    ],
+                    2
+                    /* CLASS */
+                  )
+                ])
+              ], 8, ["onClick"]);
+            }),
+            128
+            /* KEYED_FRAGMENT */
+          ))
+        ],
+        6
+        /* CLASS, STYLE */
+      ),
+      createElementVNode(
+        "view",
+        {
+          class: "up-dropdown__content",
+          style: normalizeStyle([$setup.contentStyle, {
+            top: _ctx.$up.addUnit($setup.props.height),
+            transition: `opacity ${parseInt($setup.props.duration.toString()) / 1e3}s, z-index ${parseInt($setup.props.duration.toString()) / 1e3}s linear`
+          }]),
+          onClick: $setup.maskClick,
+          onTouchmove: _cache[1] || (_cache[1] = withModifiers(() => {
+          }, ["stop", "prevent"]))
+        },
+        [
+          createElementVNode(
+            "view",
+            {
+              onClick: _cache[0] || (_cache[0] = withModifiers(() => {
+              }, ["stop", "prevent"])),
+              class: "up-dropdown__content__popup",
+              style: normalizeStyle([$setup.popupStyle, {}])
+            },
+            [
+              renderSlot(_ctx.$slots, "default")
+            ],
+            4
+            /* STYLE */
+          ),
+          createElementVNode("view", { class: "up-dropdown__content__mask" })
+        ],
+        36
+        /* STYLE, NEED_HYDRATION */
+      )
+    ],
+    4
+    /* STYLE */
+  );
+}
+const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-dropdown/up-dropdown.uvue"]]);
+export {
+  __easycom_2 as _
+};
+//# sourceMappingURL=up-dropdown.js.map
+Â—ÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon.jsÙ /Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku.jsÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsÙÑ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-dropdown/dropdown.jsÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-dropdown/types.jsÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useUltraUI.jsÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙÔ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-dropdown/up-dropdown.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ‘ÔrD’²hostDependencyName®hostModuleNameÙL../../../../../uni_modules/uview-ultra/components/up-dropdown/up-dropdown.js¥entryÃÚ8Simport { _ as __easycom_0 } from "../up-icon/up-icon.js";
+const { defineComponent, getCurrentInstance, ref, watch, computed, onMounted, resolveDynamicComponent, openBlock, createElementBlock, normalizeStyle, createElementVNode, normalizeClass, Fragment, renderList, withModifiers, toDisplayString, createVNode, renderSlot } = globalThis.Vue
+import { r as resolveEasycom } from "../../../../App.ku.js";
+import { a as addUnit, u as upGetRect, e as getWindowInfo } from "../../libs/function/index.js";
+import { d as defProps } from "./dropdown.js";
+import "./types.js";
+import { u as useUltraUI } from "../../libs/composable/useUltraUI.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const _sfc_main = /* @__PURE__ */ defineComponent({
+  ...{
+    name: "up-dropdown"
+  },
+  __name: "up-dropdown",
+  props: {
+    // èœå•æ ‡é¢˜å’Œé€‰é¡¹çš„æ¿€æ´»æ€é¢œè‰²
+    activeColor: {
+      type: String,
+      default: defProps.getString("dropdown.activeColor")
+    },
+    // èœå•æ ‡é¢˜å’Œé€‰é¡¹çš„æœªæ¿€æ´»æ€é¢œè‰²
+    inactiveColor: {
+      type: String,
+      default: defProps.getString("dropdown.inactiveColor")
+    },
+    // ç‚¹å‡»é®ç½©æ˜¯å¦å…³é—­èœå•
+    closeOnClickMask: {
+      type: Boolean,
+      default: defProps.getBoolean("dropdown.closeOnClickMask")
+    },
+    // ç‚¹å‡»å½“å‰æ¿€æ´»é¡¹æ ‡é¢˜æ˜¯å¦å…³é—­èœå•
+    closeOnClickSelf: {
+      type: Boolean,
+      default: defProps.getBoolean("dropdown.closeOnClickSelf")
+    },
+    // è¿‡æ¸¡æ—¶é—´
+    duration: {
+      type: [Number, String],
+      default: defProps.getNumber("dropdown.duration")
+    },
+    // æ ‡é¢˜èœå•çš„é«˜åº¦
+    height: {
+      type: [Number, String],
+      default: defProps.getNumber("dropdown.height")
+    },
+    // æ˜¯å¦æ˜¾ç¤ºä¸‹è¾¹æ¡†
+    borderBottom: {
+      type: Boolean,
+      default: defProps.getBoolean("dropdown.borderBottom")
+    },
+    // æ ‡é¢˜çš„å­—ä½“å¤§å°
+    titleSize: {
+      type: [Number, String],
+      default: defProps.getNumber("dropdown.titleSize")
+    },
+    // ä¸‹æ‹‰å‡ºæ¥çš„å†…å®¹éƒ¨åˆ†çš„åœ†è§’å€¼
+    borderRadius: {
+      type: [Number, String],
+      default: defProps.getNumber("dropdown.borderRadius")
+    },
+    // èœå•å³ä¾§çš„iconå›¾æ ‡
+    menuIcon: {
+      type: String,
+      default: defProps.getString("dropdown.menuIcon")
+    },
+    // èœå•å³ä¾§å›¾æ ‡çš„å¤§å°
+    menuIconSize: {
+      type: [Number, String],
+      default: defProps.getNumber("dropdown.menuIconSize")
+    }
+  },
+  emits: ["open", "close"],
+  setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    const _b = useUltraUI(), children = _b.children, getChildren = _b.getChildren, addChild = _b.addChild;
+    const instance = getCurrentInstance().proxy;
+    const props = __props;
+    const emit = __emit;
+    const showDropdown = ref(true);
+    const menuList = ref([]);
+    const active = ref(false);
+    const current = ref(99999);
+    const contentStyle = ref(new UTSJSONObject({
+      zIndex: -1,
+      opacity: 0
+    }));
+    const highlightIndexList = ref([]);
+    const contentHeight = ref(0);
+    watch(contentHeight, (newVal) => {
+      if (active.value) {
+        contentStyle.value["height"] = newVal + "px";
+      }
+    });
+    const popupStyle = computed(() => {
+      let style = new UTSJSONObject(
+        {}
+        // è¿›è¡ŒYè½´ä½ç§»ï¼Œå±•å¼€çŠ¶æ€æ—¶ï¼Œæ¢å¤åŸä½ã€‚æ”¶é½çŠ¶æ€æ—¶ï¼Œå¾€ä¸Šä½ç§»100%ï¼Œè¿›è¡Œéšè—
+      );
+      style["transform"] = `translateY(${active.value ? "0%" : "-100%"})`;
+      style["transition-duration"] = parseInt(props.duration.toString()) / 1e3 + "s";
+      style["borderRadius"] = `0 0 ${addUnit(props.borderRadius)} ${addUnit(props.borderRadius)}`;
+      return style;
+    });
+    function getWindowInfoWrapper() {
+      return getWindowInfo();
+    }
+    function init() {
+      var _a2;
+      menuList.value = [];
+      if (children.value != null) {
+        (_a2 = children.value) === null || _a2 === void 0 ? null : _a2.map((child) => {
+          child.$callMethod("init");
+        });
+      }
+    }
+    function getContentHeight() {
+      let windowHeight = getWindowInfoWrapper().windowHeight;
+      upGetRect(".up-dropdown__menu", false, instance).then((res) => {
+        if (res.bottom != null) {
+          contentHeight.value = windowHeight - res.bottom;
+        } else {
+          contentHeight.value = windowHeight;
+        }
+      });
+    }
+    function open(index) {
+      getContentHeight();
+      contentStyle.value = new UTSJSONObject({
+        zIndex: 11,
+        height: contentHeight.value + "px",
+        opacity: 1
+      });
+      active.value = true;
+      current.value = index;
+      if (children.value != null) {
+        children.value.map((val, idx) => {
+          if (index == idx) {
+            val.$callMethod("setActive", true);
+          } else {
+            val.$callMethod("setActive", false);
+          }
+        });
+      }
+      emit("open", current.value);
+    }
+    function close() {
+      emit("close", current.value);
+      active.value = false;
+      current.value = 99999;
+      contentStyle.value["zIndex"] = -1;
+      contentStyle.value["opacity"] = 0;
+      setTimeout(() => {
+        contentStyle.value["height"] = 0;
+      }, parseInt(props.duration.toString()));
+    }
+    function menuClick(index) {
+      if (menuList.value[index].disabled)
+        return null;
+      if (index == current.value && props.closeOnClickSelf) {
+        close();
+        setTimeout(() => {
+          if (children.value != null && children.value[index] != null) {
+            children.value[index].$callMethod("setActive", false);
+          }
+        }, parseInt(props.duration.toString()));
+        return null;
+      }
+      open(index);
+    }
+    function maskClick() {
+      if (!props.closeOnClickMask)
+        return null;
+      close();
+    }
+    function highlight(indexParams = null) {
+      if (Array.isArray(indexParams) && indexParams !== null) {
+        highlightIndexList.value = indexParams;
+        return null;
+      }
+      highlightIndexList.value = [];
+      if (indexParams != null) {
+        highlightIndexList.value.push(parseInt(indexParams.toString()));
+      }
+    }
+    const addMenuListItem = (op) => {
+      menuList.value.push(op);
+    };
+    onMounted(() => {
+      getContentHeight();
+    });
+    const getProps = function() {
+      return new UTSJSONObject({
+        activeColor: props.activeColor,
+        inactiveColor: props.inactiveColor,
+        closeOnClickMask: props.closeOnClickMask,
+        closeOnClickSelf: props.closeOnClickSelf,
+        duration: props.duration,
+        height: props.height,
+        borderBottom: props.borderBottom,
+        titleSize: props.titleSize,
+        borderRadius: props.borderRadius,
+        menuIcon: props.menuIcon,
+        menuIconSize: props.menuIconSize
+      });
+    };
+    function getContentTextStyle(item, index) {
+      const style = new UTSJSONObject({});
+      style["fontSize"] = addUnit(props.titleSize);
+      const isActive = index == current.value || highlightIndexList.value.includes(index);
+      if (item.disabled) {
+        style["color"] = "#c0c4cc";
+      } else if (isActive) {
+        if (props.activeColor != "#2979ff") {
+          style["color"] = props.activeColor;
+        }
+      } else {
+        style["color"] = props.inactiveColor;
+      }
+      return style;
+    }
+    __expose({
+      init,
+      close,
+      highlight,
+      getChildren,
+      addChild,
+      children,
+      addMenuListItem,
+      getProps
+    });
+    const __returned__ = { children, getChildren, addChild, instance, props, emit, showDropdown, menuList, active, current, contentStyle, highlightIndexList, contentHeight, popupStyle, getWindowInfoWrapper, init, getContentHeight, open, close, menuClick, maskClick, highlight, addMenuListItem, getProps, getContentTextStyle };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = { "up-dropdown": { "": { "flexGrow": 0, "flexShrink": 0, "flexBasis": "auto", "width": "100%", "position": "relative" } }, "up-dropdown__menu": { "": { "display": "flex", "flexDirection": "row", "position": "relative", "zIndex": 11, "height": "80rpx" } }, "up-dropdown__menu__item": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "up-flex-row": { ".up-dropdown__menu__item ": { "flexDirection": "row" } }, "up-dropdown__menu__item__text": { "": { "fontSize": "28rpx", "color": "#606266" } }, "up-dropdown__menu__item__text--active": { "": { "color": "var(--theme-color, #0957de)" } }, "up-dropdown__menu__item__arrow": { "": { "marginLeft": "6rpx", "transitionProperty": "transform", "transitionDuration": "0.3s", "alignItems": "center", "display": "flex", "flexDirection": "row" } }, "up-dropdown__menu__item__arrow--rotate": { "": { "transform": "rotate(180deg)" } }, "up-dropdown__content": { "": { "borderTopWidth": 0, "borderRightWidth": 0, "borderBottomWidth": 0, "borderLeftWidth": 0, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#0000FF", "borderRightColor": "#0000FF", "borderBottomColor": "#0000FF", "borderLeftColor": "#0000FF", "position": "absolute", "zIndex": 8, "width": "100%", "left": 0, "bottom": 0, "top": "80rpx", "overflow": "hidden" } }, "up-dropdown__content__mask": { "": { "position": "absolute", "zIndex": 9, "backgroundImage": "none", "backgroundColor": "rgba(0,0,0,0.3)", "width": "100%", "left": 0, "top": 0, "bottom": 0 } }, "up-dropdown__content__popup": { "": { "position": "relative", "zIndex": 10, "transitionProperty": "transform", "transitionDuration": "0.3s", "transform": "translate3D(0, -100%, 0)", "overflow": "hidden" } }, "@TRANSITION": { "up-dropdown__menu__item__arrow": { "property": "transform", "duration": "0.3s" }, "up-dropdown__content__popup": { "property": "transform", "duration": "0.3s" } } };
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_icon = resolveEasycom(resolveDynamicComponent("up-icon"), __easycom_0);
+  return openBlock(), createElementBlock(
+    "view",
+    {
+      class: "up-dropdown",
+      style: normalizeStyle({
+        height: $setup.active ? _ctx.$up.addUnit($setup.contentHeight + parseInt($setup.props.height.toString())) : _ctx.$up.addUnit($setup.props.height)
+      })
+    },
+    [
+      createElementVNode(
+        "view",
+        {
+          class: normalizeClass(["up-dropdown__menu", {
+            "u-border-bottom": $setup.props.borderBottom
+          }]),
+          style: normalizeStyle({
+            height: _ctx.$up.addUnit($setup.props.height)
+          })
+        },
+        [
+          (openBlock(true), createElementBlock(
+            Fragment,
+            null,
+            renderList($setup.menuList, (item, index) => {
+              return openBlock(), createElementBlock("view", {
+                class: "up-dropdown__menu__item",
+                key: index,
+                onClick: withModifiers(($event) => $setup.menuClick(index), ["stop"])
+              }, [
+                createElementVNode("view", { class: "up-flex up-flex-row" }, [
+                  createElementVNode(
+                    "text",
+                    {
+                      class: normalizeClass(["up-dropdown__menu__item__text", {
+                        "up-dropdown__menu__item__text--active": (index == $setup.current || $setup.highlightIndexList.includes(index)) && $setup.props.activeColor == "#2979ff"
+                      }]),
+                      style: normalizeStyle([$setup.getContentTextStyle(item, index)])
+                    },
+                    toDisplayString(item["title"]),
+                    7
+                    /* TEXT, CLASS, STYLE */
+                  ),
+                  createElementVNode(
+                    "view",
+                    {
+                      class: normalizeClass(["up-dropdown__menu__item__arrow", {
+                        "up-dropdown__menu__item__arrow--rotate": index == $setup.current
+                      }])
+                    },
+                    [
+                      createVNode(_component_up_icon, {
+                        "custom-style": { display: "flex" },
+                        name: $setup.props.menuIcon,
+                        size: _ctx.$up.addUnit($setup.props.menuIconSize),
+                        color: index == $setup.current || $setup.highlightIndexList.includes(index) ? $setup.props.activeColor == "#2979ff" ? "primary" : $setup.props.activeColor : "#c0c4cc"
+                      }, null, 8, ["name", "size", "color"])
+                    ],
+                    2
+                    /* CLASS */
+                  )
+                ])
+              ], 8, ["onClick"]);
+            }),
+            128
+            /* KEYED_FRAGMENT */
+          ))
+        ],
+        6
+        /* CLASS, STYLE */
+      ),
+      createElementVNode(
+        "view",
+        {
+          class: "up-dropdown__content",
+          style: normalizeStyle([$setup.contentStyle, {
+            top: _ctx.$up.addUnit($setup.props.height),
+            transition: `opacity ${parseInt($setup.props.duration.toString()) / 1e3}s, z-index ${parseInt($setup.props.duration.toString()) / 1e3}s linear`
+          }]),
+          onClick: $setup.maskClick,
+          onTouchmove: _cache[1] || (_cache[1] = withModifiers(() => {
+          }, ["stop", "prevent"]))
+        },
+        [
+          createElementVNode(
+            "view",
+            {
+              onClick: _cache[0] || (_cache[0] = withModifiers(() => {
+              }, ["stop", "prevent"])),
+              class: "up-dropdown__content__popup",
+              style: normalizeStyle([$setup.popupStyle, {}])
+            },
+            [
+              renderSlot(_ctx.$slots, "default")
+            ],
+            4
+            /* STYLE */
+          ),
+          createElementVNode("view", { class: "up-dropdown__content__mask" })
+        ],
+        36
+        /* STYLE, NEED_HYDRATION */
+      )
+    ],
+    4
+    /* STYLE */
+  );
+}
+const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-dropdown/up-dropdown.uvue"]]);
+export {
+  __easycom_2 as _
+};
+//# sourceMappingURL=up-dropdown.js.map
+ÔrE•§version¨mappings¥names§sources®sourcesContentÜ^‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘”  ÌÙ ‘”  ÌÚ ‘”  ÌÛ ‘”  ÌÜ ‘”  Ìİ ‘”  ÌŞ ‘”  Ìß ‘”  Ìà ‘”  Ìá ‘”  Ìâ ‘”  Ìã ‘”  Ìä ‘”  Ìå ‘”  Ìæ ‘”  Ìç ‘”  Ìè ‘”  Ìé ‘”  Ìê ‘”  Ìë ‘”  Ìì ‘”  Ìí ‘”  Ìî ‘”  Ìï ‘”  Ìğ ‘”  Ìñ ‘”  Ìò ‘”  Ìó ‘”  Ìô ‘”  Ìõ ‘”  Ìö ‘”  Ì÷ ‘”  Ìø ‘”  Ìù ‘”  Ìú ‘”  Ìû ‘”  Ìü ‘”  Ìı ‘”  Ìş ‘”  Ìÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘ÙÔ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-dropdown/up-dropdown.js‘Ú8Simport { _ as __easycom_0 } from "../up-icon/up-icon.js";
+const { defineComponent, getCurrentInstance, ref, watch, computed, onMounted, resolveDynamicComponent, openBlock, createElementBlock, normalizeStyle, createElementVNode, normalizeClass, Fragment, renderList, withModifiers, toDisplayString, createVNode, renderSlot } = globalThis.Vue
+import { r as resolveEasycom } from "../../../../App.ku.js";
+import { a as addUnit, u as upGetRect, e as getWindowInfo } from "../../libs/function/index.js";
+import { d as defProps } from "./dropdown.js";
+import "./types.js";
+import { u as useUltraUI } from "../../libs/composable/useUltraUI.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const _sfc_main = /* @__PURE__ */ defineComponent({
+  ...{
+    name: "up-dropdown"
+  },
+  __name: "up-dropdown",
+  props: {
+    // èœå•æ ‡é¢˜å’Œé€‰é¡¹çš„æ¿€æ´»æ€é¢œè‰²
+    activeColor: {
+      type: String,
+      default: defProps.getString("dropdown.activeColor")
+    },
+    // èœå•æ ‡é¢˜å’Œé€‰é¡¹çš„æœªæ¿€æ´»æ€é¢œè‰²
+    inactiveColor: {
+      type: String,
+      default: defProps.getString("dropdown.inactiveColor")
+    },
+    // ç‚¹å‡»é®ç½©æ˜¯å¦å…³é—­èœå•
+    closeOnClickMask: {
+      type: Boolean,
+      default: defProps.getBoolean("dropdown.closeOnClickMask")
+    },
+    // ç‚¹å‡»å½“å‰æ¿€æ´»é¡¹æ ‡é¢˜æ˜¯å¦å…³é—­èœå•
+    closeOnClickSelf: {
+      type: Boolean,
+      default: defProps.getBoolean("dropdown.closeOnClickSelf")
+    },
+    // è¿‡æ¸¡æ—¶é—´
+    duration: {
+      type: [Number, String],
+      default: defProps.getNumber("dropdown.duration")
+    },
+    // æ ‡é¢˜èœå•çš„é«˜åº¦
+    height: {
+      type: [Number, String],
+      default: defProps.getNumber("dropdown.height")
+    },
+    // æ˜¯å¦æ˜¾ç¤ºä¸‹è¾¹æ¡†
+    borderBottom: {
+      type: Boolean,
+      default: defProps.getBoolean("dropdown.borderBottom")
+    },
+    // æ ‡é¢˜çš„å­—ä½“å¤§å°
+    titleSize: {
+      type: [Number, String],
+      default: defProps.getNumber("dropdown.titleSize")
+    },
+    // ä¸‹æ‹‰å‡ºæ¥çš„å†…å®¹éƒ¨åˆ†çš„åœ†è§’å€¼
+    borderRadius: {
+      type: [Number, String],
+      default: defProps.getNumber("dropdown.borderRadius")
+    },
+    // èœå•å³ä¾§çš„iconå›¾æ ‡
+    menuIcon: {
+      type: String,
+      default: defProps.getString("dropdown.menuIcon")
+    },
+    // èœå•å³ä¾§å›¾æ ‡çš„å¤§å°
+    menuIconSize: {
+      type: [Number, String],
+      default: defProps.getNumber("dropdown.menuIconSize")
+    }
+  },
+  emits: ["open", "close"],
+  setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    const _b = useUltraUI(), children = _b.children, getChildren = _b.getChildren, addChild = _b.addChild;
+    const instance = getCurrentInstance().proxy;
+    const props = __props;
+    const emit = __emit;
+    const showDropdown = ref(true);
+    const menuList = ref([]);
+    const active = ref(false);
+    const current = ref(99999);
+    const contentStyle = ref(new UTSJSONObject({
+      zIndex: -1,
+      opacity: 0
+    }));
+    const highlightIndexList = ref([]);
+    const contentHeight = ref(0);
+    watch(contentHeight, (newVal) => {
+      if (active.value) {
+        contentStyle.value["height"] = newVal + "px";
+      }
+    });
+    const popupStyle = computed(() => {
+      let style = new UTSJSONObject(
+        {}
+        // è¿›è¡ŒYè½´ä½ç§»ï¼Œå±•å¼€çŠ¶æ€æ—¶ï¼Œæ¢å¤åŸä½ã€‚æ”¶é½çŠ¶æ€æ—¶ï¼Œå¾€ä¸Šä½ç§»100%ï¼Œè¿›è¡Œéšè—
+      );
+      style["transform"] = `translateY(${active.value ? "0%" : "-100%"})`;
+      style["transition-duration"] = parseInt(props.duration.toString()) / 1e3 + "s";
+      style["borderRadius"] = `0 0 ${addUnit(props.borderRadius)} ${addUnit(props.borderRadius)}`;
+      return style;
+    });
+    function getWindowInfoWrapper() {
+      return getWindowInfo();
+    }
+    function init() {
+      var _a2;
+      menuList.value = [];
+      if (children.value != null) {
+        (_a2 = children.value) === null || _a2 === void 0 ? null : _a2.map((child) => {
+          child.$callMethod("init");
+        });
+      }
+    }
+    function getContentHeight() {
+      let windowHeight = getWindowInfoWrapper().windowHeight;
+      upGetRect(".up-dropdown__menu", false, instance).then((res) => {
+        if (res.bottom != null) {
+          contentHeight.value = windowHeight - res.bottom;
+        } else {
+          contentHeight.value = windowHeight;
+        }
+      });
+    }
+    function open(index) {
+      getContentHeight();
+      contentStyle.value = new UTSJSONObject({
+        zIndex: 11,
+        height: contentHeight.value + "px",
+        opacity: 1
+      });
+      active.value = true;
+      current.value = index;
+      if (children.value != null) {
+        children.value.map((val, idx) => {
+          if (index == idx) {
+            val.$callMethod("setActive", true);
+          } else {
+            val.$callMethod("setActive", false);
+          }
+        });
+      }
+      emit("open", current.value);
+    }
+    function close() {
+      emit("close", current.value);
+      active.value = false;
+      current.value = 99999;
+      contentStyle.value["zIndex"] = -1;
+      contentStyle.value["opacity"] = 0;
+      setTimeout(() => {
+        contentStyle.value["height"] = 0;
+      }, parseInt(props.duration.toString()));
+    }
+    function menuClick(index) {
+      if (menuList.value[index].disabled)
+        return null;
+      if (index == current.value && props.closeOnClickSelf) {
+        close();
+        setTimeout(() => {
+          if (children.value != null && children.value[index] != null) {
+            children.value[index].$callMethod("setActive", false);
+          }
+        }, parseInt(props.duration.toString()));
+        return null;
+      }
+      open(index);
+    }
+    function maskClick() {
+      if (!props.closeOnClickMask)
+        return null;
+      close();
+    }
+    function highlight(indexParams = null) {
+      if (Array.isArray(indexParams) && indexParams !== null) {
+        highlightIndexList.value = indexParams;
+        return null;
+      }
+      highlightIndexList.value = [];
+      if (indexParams != null) {
+        highlightIndexList.value.push(parseInt(indexParams.toString()));
+      }
+    }
+    const addMenuListItem = (op) => {
+      menuList.value.push(op);
+    };
+    onMounted(() => {
+      getContentHeight();
+    });
+    const getProps = function() {
+      return new UTSJSONObject({
+        activeColor: props.activeColor,
+        inactiveColor: props.inactiveColor,
+        closeOnClickMask: props.closeOnClickMask,
+        closeOnClickSelf: props.closeOnClickSelf,
+        duration: props.duration,
+        height: props.height,
+        borderBottom: props.borderBottom,
+        titleSize: props.titleSize,
+        borderRadius: props.borderRadius,
+        menuIcon: props.menuIcon,
+        menuIconSize: props.menuIconSize
+      });
+    };
+    function getContentTextStyle(item, index) {
+      const style = new UTSJSONObject({});
+      style["fontSize"] = addUnit(props.titleSize);
+      const isActive = index == current.value || highlightIndexList.value.includes(index);
+      if (item.disabled) {
+        style["color"] = "#c0c4cc";
+      } else if (isActive) {
+        if (props.activeColor != "#2979ff") {
+          style["color"] = props.activeColor;
+        }
+      } else {
+        style["color"] = props.inactiveColor;
+      }
+      return style;
+    }
+    __expose({
+      init,
+      close,
+      highlight,
+      getChildren,
+      addChild,
+      children,
+      addMenuListItem,
+      getProps
+    });
+    const __returned__ = { children, getChildren, addChild, instance, props, emit, showDropdown, menuList, active, current, contentStyle, highlightIndexList, contentHeight, popupStyle, getWindowInfoWrapper, init, getContentHeight, open, close, menuClick, maskClick, highlight, addMenuListItem, getProps, getContentTextStyle };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = { "up-dropdown": { "": { "flexGrow": 0, "flexShrink": 0, "flexBasis": "auto", "width": "100%", "position": "relative" } }, "up-dropdown__menu": { "": { "display": "flex", "flexDirection": "row", "position": "relative", "zIndex": 11, "height": "80rpx" } }, "up-dropdown__menu__item": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "up-flex-row": { ".up-dropdown__menu__item ": { "flexDirection": "row" } }, "up-dropdown__menu__item__text": { "": { "fontSize": "28rpx", "color": "#606266" } }, "up-dropdown__menu__item__text--active": { "": { "color": "var(--theme-color, #0957de)" } }, "up-dropdown__menu__item__arrow": { "": { "marginLeft": "6rpx", "transitionProperty": "transform", "transitionDuration": "0.3s", "alignItems": "center", "display": "flex", "flexDirection": "row" } }, "up-dropdown__menu__item__arrow--rotate": { "": { "transform": "rotate(180deg)" } }, "up-dropdown__content": { "": { "borderTopWidth": 0, "borderRightWidth": 0, "borderBottomWidth": 0, "borderLeftWidth": 0, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#0000FF", "borderRightColor": "#0000FF", "borderBottomColor": "#0000FF", "borderLeftColor": "#0000FF", "position": "absolute", "zIndex": 8, "width": "100%", "left": 0, "bottom": 0, "top": "80rpx", "overflow": "hidden" } }, "up-dropdown__content__mask": { "": { "position": "absolute", "zIndex": 9, "backgroundImage": "none", "backgroundColor": "rgba(0,0,0,0.3)", "width": "100%", "left": 0, "top": 0, "bottom": 0 } }, "up-dropdown__content__popup": { "": { "position": "relative", "zIndex": 10, "transitionProperty": "transform", "transitionDuration": "0.3s", "transform": "translate3D(0, -100%, 0)", "overflow": "hidden" } }, "@TRANSITION": { "up-dropdown__menu__item__arrow": { "property": "transform", "duration": "0.3s" }, "up-dropdown__content__popup": { "property": "transform", "duration": "0.3s" } } };
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_icon = resolveEasycom(resolveDynamicComponent("up-icon"), __easycom_0);
+  return openBlock(), createElementBlock(
+    "view",
+    {
+      class: "up-dropdown",
+      style: normalizeStyle({
+        height: $setup.active ? _ctx.$up.addUnit($setup.contentHeight + parseInt($setup.props.height.toString())) : _ctx.$up.addUnit($setup.props.height)
+      })
+    },
+    [
+      createElementVNode(
+        "view",
+        {
+          class: normalizeClass(["up-dropdown__menu", {
+            "u-border-bottom": $setup.props.borderBottom
+          }]),
+          style: normalizeStyle({
+            height: _ctx.$up.addUnit($setup.props.height)
+          })
+        },
+        [
+          (openBlock(true), createElementBlock(
+            Fragment,
+            null,
+            renderList($setup.menuList, (item, index) => {
+              return openBlock(), createElementBlock("view", {
+                class: "up-dropdown__menu__item",
+                key: index,
+                onClick: withModifiers(($event) => $setup.menuClick(index), ["stop"])
+              }, [
+                createElementVNode("view", { class: "up-flex up-flex-row" }, [
+                  createElementVNode(
+                    "text",
+                    {
+                      class: normalizeClass(["up-dropdown__menu__item__text", {
+                        "up-dropdown__menu__item__text--active": (index == $setup.current || $setup.highlightIndexList.includes(index)) && $setup.props.activeColor == "#2979ff"
+                      }]),
+                      style: normalizeStyle([$setup.getContentTextStyle(item, index)])
+                    },
+                    toDisplayString(item["title"]),
+                    7
+                    /* TEXT, CLASS, STYLE */
+                  ),
+                  createElementVNode(
+                    "view",
+                    {
+                      class: normalizeClass(["up-dropdown__menu__item__arrow", {
+                        "up-dropdown__menu__item__arrow--rotate": index == $setup.current
+                      }])
+                    },
+                    [
+                      createVNode(_component_up_icon, {
+                        "custom-style": { display: "flex" },
+                        name: $setup.props.menuIcon,
+                        size: _ctx.$up.addUnit($setup.props.menuIconSize),
+                        color: index == $setup.current || $setup.highlightIndexList.includes(index) ? $setup.props.activeColor == "#2979ff" ? "primary" : $setup.props.activeColor : "#c0c4cc"
+                      }, null, 8, ["name", "size", "color"])
+                    ],
+                    2
+                    /* CLASS */
+                  )
+                ])
+              ], 8, ["onClick"]);
+            }),
+            128
+            /* KEYED_FRAGMENT */
+          ))
+        ],
+        6
+        /* CLASS, STYLE */
+      ),
+      createElementVNode(
+        "view",
+        {
+          class: "up-dropdown__content",
+          style: normalizeStyle([$setup.contentStyle, {
+            top: _ctx.$up.addUnit($setup.props.height),
+            transition: `opacity ${parseInt($setup.props.duration.toString()) / 1e3}s, z-index ${parseInt($setup.props.duration.toString()) / 1e3}s linear`
+          }]),
+          onClick: $setup.maskClick,
+          onTouchmove: _cache[1] || (_cache[1] = withModifiers(() => {
+          }, ["stop", "prevent"]))
+        },
+        [
+          createElementVNode(
+            "view",
+            {
+              onClick: _cache[0] || (_cache[0] = withModifiers(() => {
+              }, ["stop", "prevent"])),
+              class: "up-dropdown__content__popup",
+              style: normalizeStyle([$setup.popupStyle, {}])
+            },
+            [
+              renderSlot(_ctx.$slots, "default")
+            ],
+            4
+            /* STYLE */
+          ),
+          createElementVNode("view", { class: "up-dropdown__content__mask" })
+        ],
+        36
+        /* STYLE, NEED_HYDRATION */
+      )
+    ],
+    4
+    /* STYLE */
+  );
+}
+const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-dropdown/up-dropdown.uvue"]]);
+export {
+  __easycom_2 as _
+};
+//# sourceMappingURL=up-dropdown.js.map
+ÔrF—µ../../../../App.ku.jsµ../up-icon/up-icon.js¼../../libs/function/index.jsª./types.jsÙ#../../libs/composable/useUltraUI.jsÙ'../../../../plugin-vue-export-helper.js­./dropdown.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙ /Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku.jsAÃªoh-resolveÂGAÂÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon.jsAÃªoh-resolveÂGAÂÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsAÃªoh-resolveÂGAÂÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-dropdown/types.jsAÃªoh-resolveÂGAÂÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useUltraUI.jsAÃªoh-resolveÂGAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂGAÂÙÑ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-dropdown/dropdown.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ6øÍ7À‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍ7Í7ÔrL”¤type¥start£end¤nameªIdentifierÍ7Í7«__easycom_2LªIdentifierÍ7Í7¡_À—ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration 9‘ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	
+¡_LªIdentifier«__easycom_0ÔrO•¤type¥start£end¥value£raw§Literal!8µ../up-icon/up-icon.js·"../up-icon/up-icon.js"M±ImportDeclarationÍUÍ‘‘N¯ImportSpecifierÍ^ÍqLªIdentifierÍ^Í_¡rLªIdentifierÍcÍq®resolveEasycomO§LiteralÍyÍµ../../../../App.ku.js·"../../../../App.ku.js"M±ImportDeclarationÍ’Íò“N¯ImportSpecifierÍ›Í§LªIdentifierÍ›Íœ¡aLªIdentifierÍ Í§§addUnitN¯ImportSpecifierÍ©Í·LªIdentifierÍ©Íª¡uLªIdentifierÍ®Í·©upGetRectN¯ImportSpecifierÍ¹ÍËLªIdentifierÍ¹Íº¡eLªIdentifierÍ¾ÍË­getWindowInfoO§LiteralÍÓÍñ¼../../libs/function/index.js¾"../../libs/function/index.js"M±ImportDeclarationÍóÍ!‘N¯ImportSpecifierÍüÍ	LªIdentifierÍüÍı¡dLªIdentifierÍÍ	¨defPropsO§LiteralÍÍ ­./dropdown.js¯"./dropdown.js"M±ImportDeclarationÍ"Í6O§LiteralÍ)Í5ª./types.js¬"./types.js"M±ImportDeclarationÍ7Í}‘N¯ImportSpecifierÍ@ÍOLªIdentifierÍ@ÍA¡uLªIdentifierÍEÍOªuseUltraUIO§LiteralÍWÍ|Ù#../../libs/composable/useUltraUI.jsÙ%"../../libs/composable/useUltraUI.js"M±ImportDeclarationÍ~ÍÉ‘N¯ImportSpecifierÍ‡Í—LªIdentifierÍ‡Íˆ¡_LªIdentifierÍŒÍ—«_export_sfcO§LiteralÍŸÍÈÙ'../../../../plugin-vue-export-helper.jsÙ)"../../../../plugin-vue-export-helper.js"

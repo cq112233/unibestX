@@ -1,0 +1,21 @@
+// 本文件为自动构建生成
+export {
+  HideKeyboardSuccess,
+  HideKeyboardFail,
+  HideKeyboardSuccessCallback,
+  HideKeyboardFailCallback,
+  HideKeyboardCompleteCallback,
+  HideKeyboardOptions,
+  OnKeyboardHeightChangeCallback,
+  OnKeyboardHeightChangeCallbackResult,
+  GetSelectedTextRangeOptions,
+  GetSelectedTextRangeSuccessCallback,
+  GetSelectedTextRangeFailCallback,
+  GetSelectedTextRangeCompleteCallback,
+  GetSelectedTextRangeSuccess,
+  GetSelectedTextRangeFail,
+  HideKeyboard,
+  OnKeyboardHeightChange,
+  OffKeyboardHeightChange,
+  GetSelectedTextRange,
+} from './interface'

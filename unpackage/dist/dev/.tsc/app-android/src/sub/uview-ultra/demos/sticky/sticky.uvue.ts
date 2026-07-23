@@ -41,61 +41,52 @@ const _component_up_sticky = resolveEasyComponent("up-sticky",_easycom_up_sticky
               title: "Sticky 吸顶",
               "auto-back": true
             })),
-            _cE("scroll-view", _uM({
+            _cE("list-view", _uM({
               style: _nS(_uM({"flex":"1","padding":"16px"})),
-              "scroll-y": "true",
+              "scroll-y": true,
+              bounces: false,
+              "show-scrollbar": false,
               onScroll: handleScroll
             }), [
-              _cE("view", _uM({
-                style: _nS(_uM({"background-color":"#ffffff","border-radius":"8px","padding":"12px","margin-bottom":"12px"}))
-              }), [
-                _cE("view", _uM({
-                  style: _nS(_uM({"display":"flex","flex-direction":"row","align-items":"center","margin-bottom":"10px"}))
-                }), [
-                  _cE("view", _uM({
-                    style: _nS(_uM({"width":"3px","height":"14px","background-color":"#2979ff","margin-right":"6px","border-radius":"2px"}))
-                  }), null, 4 /* STYLE */),
-                  _cE("text", _uM({
-                    style: _nS(_uM({"font-size":"14px","font-weight":"bold","color":"#1e293b"}))
-                  }), "吸顶效果说明", 4 /* STYLE */)
-                ], 4 /* STYLE */),
-                _cE("text", _uM({
-                  style: _nS(_uM({"font-size":"13px","color":"#64748b","line-height":"20px"}))
-                }), " 请向下滑动页面，当下面的操作栏滚动到顶部时，会触发吸顶悬浮固定在视口顶部。 ", 4 /* STYLE */),
-                _cE("text", _uM({
-                  style: _nS(_uM({"font-size":"12px","color":"#2563eb","margin-top":"6px"}))
-                }), "当前 实时高度: " + _tD(scrollTop.value) + "px", 5 /* TEXT, STYLE */)
-              ], 4 /* STYLE */),
-              _cV(_component_up_sticky, _uM({
-                "offset-top": 0,
-                "scroll-top": scrollTop.value
-              }), _uM({
-                default: withSlotCtx((): any[] => [
-                  _cE("view", _uM({ class: "bg-__2979ff_ p-12px rounded-8px flex-row items-center justify-between shadow-sm" }), [
-                    _cE("text", _uM({ class: "text-white font-bold text-14px" }), "📌 悬浮吸顶操作栏"),
-                    _cV(_component_up_button, _uM({
-                      size: "small",
-                      type: "warning",
-                      text: "立即体验",
-                      class: "w-80px"
-                    }))
+              _cE("list-item", _uM({ type: "1" }), [
+                _cE("view", _uM({ class: "bg-white rounded-8px p-12px mb-12px shadow-xs" }), [
+                  _cE("view", _uM({ class: "flex-row items-center mb-10px" }), [
+                    _cE("view", _uM({ class: "w-3px h-14px bg-__2979ff_ mr-6px rounded-2px" })),
+                    _cE("text", _uM({ class: "text-14px font-bold text-__1e293b_" }), "吸顶效果说明")
+                  ]),
+                  _cE("text", _uM({ class: "text-13px text-__64748b_ leading-20px" }), " 向上滑动页面，体验全端兼容（App 原生 / 微信小程序 / H5）的吸顶效果。 ")
+                ])
+              ]),
+              _cE("sticky-section", null, [
+                _cV(_component_up_sticky, _uM({
+                  "offset-top": 0,
+                  "scroll-top": scrollTop.value
+                }), _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cE("view", _uM({ class: "bg-__2979ff_ p-12px rounded-8px flex-row items-center justify-between shadow-sm mb-10px" }), [
+                      _cE("text", _uM({ class: "text-white font-bold text-14px" }), "📌 悬浮吸顶操作栏"),
+                      _cV(_component_up_button, _uM({
+                        size: "small",
+                        type: "warning",
+                        text: "立即体验",
+                        class: "w-80px"
+                      }))
+                    ])
+                  ]),
+                  _: 1 /* STABLE */
+                }), 8 /* PROPS */, ["scroll-top"]),
+                _cE(Fragment, null, RenderHelpers.renderList(25, (i, __key, __index, _cached): any => {
+                  return _cE("list-item", _uM({
+                    key: i,
+                    type: "2"
+                  }), [
+                    _cE("view", _uM({ class: "bg-white rounded-8px p-12px mt-10px shadow-xs" }), [
+                      _cE("text", _uM({ class: "text-14px font-bold text-__334155_" }), "列表条目 #" + _tD(i), 1 /* TEXT */),
+                      _cE("text", _uM({ class: "text-12px text-__94a3b8_ mt-4px" }), "向下滑动页面查看吸顶保持效果...")
+                    ])
                   ])
-                ]),
-                _: 1 /* STABLE */
-              }), 8 /* PROPS */, ["scroll-top"]),
-              _cE(Fragment, null, RenderHelpers.renderList(20, (i, __key, __index, _cached): any => {
-                return _cE("view", _uM({
-                  key: i,
-                  style: _nS(_uM({"background-color":"#ffffff","border-radius":"8px","padding":"12px","margin-top":"10px"}))
-                }), [
-                  _cE("text", _uM({
-                    style: _nS(_uM({"font-size":"14px","font-weight":"bold","color":"#334155"}))
-                  }), "列表条目 #" + _tD(i), 5 /* TEXT, STYLE */),
-                  _cE("text", _uM({
-                    style: _nS(_uM({"font-size":"12px","color":"#94a3b8","margin-top":"4px"}))
-                  }), "向下滑动页面查看吸顶保持效果...", 4 /* STYLE */)
-                ], 4 /* STYLE */)
-              }), 64 /* STABLE_FRAGMENT */)
+                }), 64 /* STABLE_FRAGMENT */)
+              ])
             ], 36 /* STYLE, NEED_HYDRATION */)
           ], 4 /* STYLE */)
         ]),
@@ -109,4 +100,4 @@ const _component_up_sticky = resolveEasyComponent("up-sticky",_easycom_up_sticky
 
 })
 export default __sfc__
-const GenSrcSubUviewUltraDemosStickyStickyStyles = [_uM([["bg-__2979ff_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#2979ff"]]))], ["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["font-bold", _pS(_uM([["fontWeight", 700]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["justify-between", _pS(_uM([["justifyContent", "space-between"]]))], ["p-12px", _pS(_uM([["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12]]))], ["rounded-8px", _pS(_uM([["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["shadow-sm", _pS(_uM([["boxShadow", "var(--un-inset-shadow,0 0 #0000),var(--un-inset-ring-shadow,0 0 #0000),var(--un-ring-offset-shadow,0 0 #0000),var(--un-ring-shadow,0 0 #0000),var(--un-shadow,0 1rpx 3rpx 0 var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))))"], ["--un-shadow", "0 1rpx 3rpx 0rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1)))"]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))], ["text-white", _pS(_uM([["color", "rgba(255,255,255,var(--un-color-opacity,1))"]]))], ["w-80px", _pS(_uM([["width", 80]]))], ["page-container", _pS(_uM([["display", "flex"], ["flexDirection", "column"]]))]])]
+const GenSrcSubUviewUltraDemosStickyStickyStyles = [_uM([["bg-__2979ff_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#2979ff"]]))], ["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["bg-white", _pS(_uM([["backgroundColor", "rgba(255,255,255,var(--un-bg-opacity,1))"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["font-bold", _pS(_uM([["fontWeight", 700]]))], ["h-14px", _pS(_uM([["height", 14]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["justify-between", _pS(_uM([["justifyContent", "space-between"]]))], ["leading-20px", _pS(_uM([["lineHeight", "20px"]]))], ["mb-10px", _pS(_uM([["marginBottom", 10]]))], ["mb-12px", _pS(_uM([["marginBottom", 12]]))], ["mr-6px", _pS(_uM([["marginRight", 6]]))], ["mt-10px", _pS(_uM([["marginTop", 10]]))], ["mt-4px", _pS(_uM([["marginTop", 4]]))], ["p-12px", _pS(_uM([["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12]]))], ["rounded-2px", _pS(_uM([["borderTopLeftRadius", 2], ["borderTopRightRadius", 2], ["borderBottomRightRadius", 2], ["borderBottomLeftRadius", 2]]))], ["rounded-8px", _pS(_uM([["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["shadow-sm", _pS(_uM([["boxShadow", "var(--un-inset-shadow,0 0 #0000),var(--un-inset-ring-shadow,0 0 #0000),var(--un-ring-offset-shadow,0 0 #0000),var(--un-ring-shadow,0 0 #0000),var(--un-shadow,0 1rpx 3rpx 0 var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))))"], ["--un-shadow", "0 1rpx 3rpx 0rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1)))"]]))], ["shadow-xs", _pS(_uM([["boxShadow", "var(--un-inset-shadow,0 0 #0000),var(--un-inset-ring-shadow,0 0 #0000),var(--un-ring-offset-shadow,0 0 #0000),var(--un-ring-shadow,0 0 #0000),var(--un-shadow,0 1rpx 3rpx 0 var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))))"], ["--un-shadow", "0 1rpx 2rpx 0rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.05)))"]]))], ["text-__1e293b_", _pS(_uM([["color", "#1e293b"]]))], ["text-__334155_", _pS(_uM([["color", "#334155"]]))], ["text-__64748b_", _pS(_uM([["color", "#64748b"]]))], ["text-__94a3b8_", _pS(_uM([["color", "#94a3b8"]]))], ["text-12px", _pS(_uM([["fontSize", 12]]))], ["text-13px", _pS(_uM([["fontSize", 13]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))], ["text-white", _pS(_uM([["color", "rgba(255,255,255,var(--un-color-opacity,1))"]]))], ["w-3px", _pS(_uM([["width", 3]]))], ["w-80px", _pS(_uM([["width", 80]]))], ["page-container", _pS(_uM([["display", "flex"], ["flexDirection", "column"]]))]])]

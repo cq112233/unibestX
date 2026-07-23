@@ -1,0 +1,850 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ5Øimport { _ as __easycom_0 } from "../up-icon/up-icon.js";
+const { defineComponent, ref, computed, resolveDynamicComponent, openBlock, createElementBlock, withModifiers, Fragment, renderList, normalizeClass, createElementVNode, createCommentVNode, toDisplayString, createVNode } = globalThis.Vue
+import { r as resolveEasycom } from "../../../../App.ku.js";
+import "../../libs/composable/useUltraUI.js";
+import { i as randomArray, s as sleep } from "../../libs/function/index.js";
+import { d as defProps } from "./carKeyboard.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const _sfc_main = /* @__PURE__ */ defineComponent({
+  ...{
+    name: "up-car-keyboard"
+  },
+  __name: "up-car-keyboard",
+  props: {
+    // æ˜¯å¦æ‰“ä¹±é”®ç›˜çš„é¡ºåº
+    random: {
+      type: Boolean,
+      default: defProps.getBoolean("carKeyboard.random")
+    },
+    // æ˜¯å¦è‡ªåŠ¨åˆ‡æ¢åˆ°è‹±æ–‡
+    autoChange: {
+      type: Boolean,
+      default: defProps.getBoolean("carKeyboard.autoChange")
+    }
+  },
+  emits: ["change", "backspace"],
+  setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
+    const props = __props;
+    const emit = __emit;
+    const abc = ref(false);
+    const timer = ref(null);
+    const areaList = computed(() => {
+      let data = [
+        "äº¬",
+        "æ²ª",
+        "ç²¤",
+        "æ´¥",
+        "å†€",
+        "è±«",
+        "äº‘",
+        "è¾½",
+        "é»‘",
+        "æ¹˜",
+        "çš–",
+        "é²",
+        "è‹",
+        "æµ™",
+        "èµ£",
+        "é„‚",
+        "æ¡‚",
+        "ç”˜",
+        "æ™‹",
+        "é™•",
+        "è’™",
+        "å‰",
+        "é—½",
+        "è´µ",
+        "æ¸",
+        "å·",
+        "é’",
+        "ç¼",
+        "å®",
+        "æŒ‚",
+        "è—",
+        "æ¸¯",
+        "æ¾³",
+        "æ–°",
+        "ä½¿",
+        "å­¦"
+      ];
+      let tmp = [];
+      if (props.random)
+        data = randomArray(data);
+      tmp.push(data.slice(0, 10));
+      tmp.push(data.slice(10, 20));
+      tmp.push(data.slice(20, 30));
+      tmp.push(data.slice(30, 36));
+      return tmp;
+    });
+    const engKeyBoardList = computed(() => {
+      let data = [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        0,
+        "Q",
+        "W",
+        "E",
+        "R",
+        "T",
+        "Y",
+        "U",
+        "I",
+        "O",
+        "P",
+        "A",
+        "S",
+        "D",
+        "F",
+        "G",
+        "H",
+        "J",
+        "K",
+        "L",
+        "Z",
+        "X",
+        "C",
+        "V",
+        "B",
+        "N",
+        "M"
+      ];
+      let tmp = [];
+      if (props.random)
+        data = randomArray(data);
+      tmp.push(data.slice(0, 10));
+      tmp.push(data.slice(10, 20));
+      tmp.push(data.slice(20, 30));
+      tmp.push(data.slice(30, 36));
+      return tmp;
+    });
+    const carInputClick = (i, j) => {
+      let value = "";
+      if (abc.value) {
+        value = engKeyBoardList.value[i][j];
+      } else {
+        value = areaList.value[i][j];
+      }
+      if (!abc.value && props.autoChange) {
+        sleep(200).then(() => {
+          abc.value = true;
+        });
+      }
+      emit("change", value);
+    };
+    const changeCarInputMode = () => {
+      abc.value = !abc.value;
+    };
+    const backspaceClick = () => {
+      var _a2;
+      emit("backspace");
+      clearInterval((_a2 = timer.value) !== null && _a2 !== void 0 ? _a2 : 0);
+      timer.value = null;
+      timer.value = setInterval(() => {
+        emit("backspace");
+      }, 250);
+    };
+    const clearTimer = () => {
+      var _a2;
+      clearInterval((_a2 = timer.value) !== null && _a2 !== void 0 ? _a2 : 0);
+      timer.value = null;
+    };
+    const noop = () => {
+    };
+    const __returned__ = { props, emit, abc, timer, areaList, engKeyBoardList, carInputClick, changeCarInputMode, backspaceClick, clearTimer, noop };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-keyboard": { "": { "display": "flex", "flexDirection": "column", "justifyContent": "space-around", "backgroundColor": "#e0e4e6", "alignItems": "stretch", "paddingTop": 6, "paddingRight": 0, "paddingBottom": 6, "paddingLeft": 0 } }, "up-keyboard__button": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-keyboard__button__inner-wrapper": { "": { "boxShadow": "0 1px 0px #999992", "marginTop": "8rpx", "marginRight": "5rpx", "marginBottom": "8rpx", "marginLeft": "5rpx", "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "up-keyboard__button__inner-wrapper__inner": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "width": "64rpx", "backgroundColor": "#FFFFFF", "height": "80rpx", "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "up-keyboard__button__inner-wrapper__inner__text": { "": { "fontSize": 16, "color": "#303133" } }, "up-keyboard__button__inner-wrapper__left": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4, "width": "134rpx", "height": "80rpx", "backgroundColor": "#BBBCC6", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "boxShadow": "0 1px 0px #999992" } }, "up-keyboard__button__inner-wrapper__right": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4, "width": "134rpx", "height": "80rpx", "backgroundColor": "#BBBCC6", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "boxShadow": "0 1px 0px #999992" } }, "up-keyboard__button__inner-wrapper__left__line": { "": { "fontSize": 15, "color": "#303133", "marginTop": 0, "marginRight": 1, "marginBottom": 0, "marginLeft": 1 } }, "up-keyboard__button__inner-wrapper__left__lang": { "": { "fontSize": 16, "color": "#303133" } }, "up-keyboard__button__inner-wrapper__left__lang--active": { "": { "color": "var(--theme-color, #0957de)" } }, "up-hover-class": { "": { "backgroundColor": "#BBBCC6" } } };
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_icon = resolveEasycom(resolveDynamicComponent("up-icon"), __easycom_0);
+  return openBlock(), createElementBlock(
+    "view",
+    {
+      class: "up-keyboard",
+      onTouchmove: withModifiers($setup.noop, ["stop", "prevent"])
+    },
+    [
+      (openBlock(true), createElementBlock(
+        Fragment,
+        null,
+        renderList($setup.abc ? $setup.engKeyBoardList : $setup.areaList, (group, i) => {
+          return openBlock(), createElementBlock("view", {
+            key: i,
+            class: normalizeClass(["up-keyboard__button", [i + 1 == 4 ? "up-keyboard__button--center" : ""]]),
+            index: i
+          }, [
+            i == 3 ? (openBlock(), createElementBlock("view", {
+              key: 0,
+              class: "up-keyboard__button__inner-wrapper"
+            }, [
+              createElementVNode("view", {
+                class: "up-keyboard__button__inner-wrapper__left",
+                "hover-class": "up-hover-class",
+                "hover-stay-time": 200,
+                onClick: $setup.changeCarInputMode
+              }, [
+                createElementVNode(
+                  "text",
+                  {
+                    class: normalizeClass(["up-keyboard__button__inner-wrapper__left__lang", [!$setup.abc ? "up-keyboard__button__inner-wrapper__left__lang--active" : ""]])
+                  },
+                  "ä¸­",
+                  2
+                  /* CLASS */
+                ),
+                createElementVNode("text", { class: "up-keyboard__button__inner-wrapper__left__line" }, "/"),
+                createElementVNode(
+                  "text",
+                  {
+                    class: normalizeClass(["up-keyboard__button__inner-wrapper__left__lang", [$setup.abc ? "up-keyboard__button__inner-wrapper__left__lang--active" : ""]])
+                  },
+                  "è‹±",
+                  2
+                  /* CLASS */
+                )
+              ])
+            ])) : createCommentVNode("v-if", true),
+            (openBlock(true), createElementBlock(
+              Fragment,
+              null,
+              renderList(group, (item, j) => {
+                return openBlock(), createElementBlock("view", {
+                  class: "up-keyboard__button__inner-wrapper",
+                  key: j
+                }, [
+                  createElementVNode("view", {
+                    class: "up-keyboard__button__inner-wrapper__inner",
+                    "hover-stay-time": 200,
+                    onClick: ($event) => $setup.carInputClick(i, j),
+                    "hover-class": "up-hover-class"
+                  }, [
+                    createElementVNode(
+                      "text",
+                      { class: "up-keyboard__button__inner-wrapper__inner__text" },
+                      toDisplayString(item),
+                      1
+                      /* TEXT */
+                    )
+                  ], 8, ["onClick"])
+                ]);
+              }),
+              128
+              /* KEYED_FRAGMENT */
+            )),
+            i == 3 ? (openBlock(), createElementBlock(
+              "view",
+              {
+                key: 1,
+                onTouchstart: $setup.backspaceClick,
+                onTouchend: $setup.clearTimer,
+                class: "up-keyboard__button__inner-wrapper"
+              },
+              [
+                createElementVNode("view", {
+                  class: "up-keyboard__button__inner-wrapper__right",
+                  "hover-class": "up-hover-class",
+                  "hover-stay-time": 200
+                }, [
+                  createVNode(_component_up_icon, {
+                    size: "28",
+                    name: "backspace",
+                    color: "#303133"
+                  })
+                ])
+              ],
+              32
+              /* NEED_HYDRATION */
+            )) : createCommentVNode("v-if", true)
+          ], 10, ["index"]);
+        }),
+        128
+        /* KEYED_FRAGMENT */
+      ))
+    ],
+    32
+    /* NEED_HYDRATION */
+  );
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-car-keyboard/up-car-keyboard.uvue"]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-car-keyboard.js.map
+Â–ÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon.jsÙ /Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku.jsÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useUltraUI.jsÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsÙØ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-car-keyboard/carKeyboard.jsÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙÜ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-car-keyboard/up-car-keyboard.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ’ÔrD’²hostDependencyName®hostModuleNameÙT../../../../../uni_modules/uview-ultra/components/up-car-keyboard/up-car-keyboard.js¥entryDÙ%../up-car-keyboard/up-car-keyboard.js¥entryÃÚ5Øimport { _ as __easycom_0 } from "../up-icon/up-icon.js";
+const { defineComponent, ref, computed, resolveDynamicComponent, openBlock, createElementBlock, withModifiers, Fragment, renderList, normalizeClass, createElementVNode, createCommentVNode, toDisplayString, createVNode } = globalThis.Vue
+import { r as resolveEasycom } from "../../../../App.ku.js";
+import "../../libs/composable/useUltraUI.js";
+import { i as randomArray, s as sleep } from "../../libs/function/index.js";
+import { d as defProps } from "./carKeyboard.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const _sfc_main = /* @__PURE__ */ defineComponent({
+  ...{
+    name: "up-car-keyboard"
+  },
+  __name: "up-car-keyboard",
+  props: {
+    // æ˜¯å¦æ‰“ä¹±é”®ç›˜çš„é¡ºåº
+    random: {
+      type: Boolean,
+      default: defProps.getBoolean("carKeyboard.random")
+    },
+    // æ˜¯å¦è‡ªåŠ¨åˆ‡æ¢åˆ°è‹±æ–‡
+    autoChange: {
+      type: Boolean,
+      default: defProps.getBoolean("carKeyboard.autoChange")
+    }
+  },
+  emits: ["change", "backspace"],
+  setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
+    const props = __props;
+    const emit = __emit;
+    const abc = ref(false);
+    const timer = ref(null);
+    const areaList = computed(() => {
+      let data = [
+        "äº¬",
+        "æ²ª",
+        "ç²¤",
+        "æ´¥",
+        "å†€",
+        "è±«",
+        "äº‘",
+        "è¾½",
+        "é»‘",
+        "æ¹˜",
+        "çš–",
+        "é²",
+        "è‹",
+        "æµ™",
+        "èµ£",
+        "é„‚",
+        "æ¡‚",
+        "ç”˜",
+        "æ™‹",
+        "é™•",
+        "è’™",
+        "å‰",
+        "é—½",
+        "è´µ",
+        "æ¸",
+        "å·",
+        "é’",
+        "ç¼",
+        "å®",
+        "æŒ‚",
+        "è—",
+        "æ¸¯",
+        "æ¾³",
+        "æ–°",
+        "ä½¿",
+        "å­¦"
+      ];
+      let tmp = [];
+      if (props.random)
+        data = randomArray(data);
+      tmp.push(data.slice(0, 10));
+      tmp.push(data.slice(10, 20));
+      tmp.push(data.slice(20, 30));
+      tmp.push(data.slice(30, 36));
+      return tmp;
+    });
+    const engKeyBoardList = computed(() => {
+      let data = [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        0,
+        "Q",
+        "W",
+        "E",
+        "R",
+        "T",
+        "Y",
+        "U",
+        "I",
+        "O",
+        "P",
+        "A",
+        "S",
+        "D",
+        "F",
+        "G",
+        "H",
+        "J",
+        "K",
+        "L",
+        "Z",
+        "X",
+        "C",
+        "V",
+        "B",
+        "N",
+        "M"
+      ];
+      let tmp = [];
+      if (props.random)
+        data = randomArray(data);
+      tmp.push(data.slice(0, 10));
+      tmp.push(data.slice(10, 20));
+      tmp.push(data.slice(20, 30));
+      tmp.push(data.slice(30, 36));
+      return tmp;
+    });
+    const carInputClick = (i, j) => {
+      let value = "";
+      if (abc.value) {
+        value = engKeyBoardList.value[i][j];
+      } else {
+        value = areaList.value[i][j];
+      }
+      if (!abc.value && props.autoChange) {
+        sleep(200).then(() => {
+          abc.value = true;
+        });
+      }
+      emit("change", value);
+    };
+    const changeCarInputMode = () => {
+      abc.value = !abc.value;
+    };
+    const backspaceClick = () => {
+      var _a2;
+      emit("backspace");
+      clearInterval((_a2 = timer.value) !== null && _a2 !== void 0 ? _a2 : 0);
+      timer.value = null;
+      timer.value = setInterval(() => {
+        emit("backspace");
+      }, 250);
+    };
+    const clearTimer = () => {
+      var _a2;
+      clearInterval((_a2 = timer.value) !== null && _a2 !== void 0 ? _a2 : 0);
+      timer.value = null;
+    };
+    const noop = () => {
+    };
+    const __returned__ = { props, emit, abc, timer, areaList, engKeyBoardList, carInputClick, changeCarInputMode, backspaceClick, clearTimer, noop };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-keyboard": { "": { "display": "flex", "flexDirection": "column", "justifyContent": "space-around", "backgroundColor": "#e0e4e6", "alignItems": "stretch", "paddingTop": 6, "paddingRight": 0, "paddingBottom": 6, "paddingLeft": 0 } }, "up-keyboard__button": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-keyboard__button__inner-wrapper": { "": { "boxShadow": "0 1px 0px #999992", "marginTop": "8rpx", "marginRight": "5rpx", "marginBottom": "8rpx", "marginLeft": "5rpx", "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "up-keyboard__button__inner-wrapper__inner": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "width": "64rpx", "backgroundColor": "#FFFFFF", "height": "80rpx", "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "up-keyboard__button__inner-wrapper__inner__text": { "": { "fontSize": 16, "color": "#303133" } }, "up-keyboard__button__inner-wrapper__left": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4, "width": "134rpx", "height": "80rpx", "backgroundColor": "#BBBCC6", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "boxShadow": "0 1px 0px #999992" } }, "up-keyboard__button__inner-wrapper__right": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4, "width": "134rpx", "height": "80rpx", "backgroundColor": "#BBBCC6", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "boxShadow": "0 1px 0px #999992" } }, "up-keyboard__button__inner-wrapper__left__line": { "": { "fontSize": 15, "color": "#303133", "marginTop": 0, "marginRight": 1, "marginBottom": 0, "marginLeft": 1 } }, "up-keyboard__button__inner-wrapper__left__lang": { "": { "fontSize": 16, "color": "#303133" } }, "up-keyboard__button__inner-wrapper__left__lang--active": { "": { "color": "var(--theme-color, #0957de)" } }, "up-hover-class": { "": { "backgroundColor": "#BBBCC6" } } };
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_icon = resolveEasycom(resolveDynamicComponent("up-icon"), __easycom_0);
+  return openBlock(), createElementBlock(
+    "view",
+    {
+      class: "up-keyboard",
+      onTouchmove: withModifiers($setup.noop, ["stop", "prevent"])
+    },
+    [
+      (openBlock(true), createElementBlock(
+        Fragment,
+        null,
+        renderList($setup.abc ? $setup.engKeyBoardList : $setup.areaList, (group, i) => {
+          return openBlock(), createElementBlock("view", {
+            key: i,
+            class: normalizeClass(["up-keyboard__button", [i + 1 == 4 ? "up-keyboard__button--center" : ""]]),
+            index: i
+          }, [
+            i == 3 ? (openBlock(), createElementBlock("view", {
+              key: 0,
+              class: "up-keyboard__button__inner-wrapper"
+            }, [
+              createElementVNode("view", {
+                class: "up-keyboard__button__inner-wrapper__left",
+                "hover-class": "up-hover-class",
+                "hover-stay-time": 200,
+                onClick: $setup.changeCarInputMode
+              }, [
+                createElementVNode(
+                  "text",
+                  {
+                    class: normalizeClass(["up-keyboard__button__inner-wrapper__left__lang", [!$setup.abc ? "up-keyboard__button__inner-wrapper__left__lang--active" : ""]])
+                  },
+                  "ä¸­",
+                  2
+                  /* CLASS */
+                ),
+                createElementVNode("text", { class: "up-keyboard__button__inner-wrapper__left__line" }, "/"),
+                createElementVNode(
+                  "text",
+                  {
+                    class: normalizeClass(["up-keyboard__button__inner-wrapper__left__lang", [$setup.abc ? "up-keyboard__button__inner-wrapper__left__lang--active" : ""]])
+                  },
+                  "è‹±",
+                  2
+                  /* CLASS */
+                )
+              ])
+            ])) : createCommentVNode("v-if", true),
+            (openBlock(true), createElementBlock(
+              Fragment,
+              null,
+              renderList(group, (item, j) => {
+                return openBlock(), createElementBlock("view", {
+                  class: "up-keyboard__button__inner-wrapper",
+                  key: j
+                }, [
+                  createElementVNode("view", {
+                    class: "up-keyboard__button__inner-wrapper__inner",
+                    "hover-stay-time": 200,
+                    onClick: ($event) => $setup.carInputClick(i, j),
+                    "hover-class": "up-hover-class"
+                  }, [
+                    createElementVNode(
+                      "text",
+                      { class: "up-keyboard__button__inner-wrapper__inner__text" },
+                      toDisplayString(item),
+                      1
+                      /* TEXT */
+                    )
+                  ], 8, ["onClick"])
+                ]);
+              }),
+              128
+              /* KEYED_FRAGMENT */
+            )),
+            i == 3 ? (openBlock(), createElementBlock(
+              "view",
+              {
+                key: 1,
+                onTouchstart: $setup.backspaceClick,
+                onTouchend: $setup.clearTimer,
+                class: "up-keyboard__button__inner-wrapper"
+              },
+              [
+                createElementVNode("view", {
+                  class: "up-keyboard__button__inner-wrapper__right",
+                  "hover-class": "up-hover-class",
+                  "hover-stay-time": 200
+                }, [
+                  createVNode(_component_up_icon, {
+                    size: "28",
+                    name: "backspace",
+                    color: "#303133"
+                  })
+                ])
+              ],
+              32
+              /* NEED_HYDRATION */
+            )) : createCommentVNode("v-if", true)
+          ], 10, ["index"]);
+        }),
+        128
+        /* KEYED_FRAGMENT */
+      ))
+    ],
+    32
+    /* NEED_HYDRATION */
+  );
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-car-keyboard/up-car-keyboard.uvue"]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-car-keyboard.js.map
+ÔrE•§version¨mappings¥names§sources®sourcesContentÜ‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘”  ÌÙ ‘”  ÌÚ ‘”  ÌÛ ‘”  ÌÜ ‘”  Ìİ ‘”  ÌŞ ‘”  Ìß ‘”  Ìà ‘”  Ìá ‘”  Ìâ ‘”  Ìã ‘”  Ìä ‘”  Ìå ‘”  Ìæ ‘”  Ìç ‘”  Ìè ‘”  Ìé ‘”  Ìê ‘”  Ìë ‘”  Ìì ‘”  Ìí ‘”  Ìî ‘”  Ìï ‘”  Ìğ ‘”  Ìñ ‘”  Ìò ‘”  Ìó ‘”  Ìô ‘”  Ìõ ‘”  Ìö ‘”  Ì÷ ‘”  Ìø ‘”  Ìù ‘”  Ìú ‘”  Ìû ‘”  Ìü ‘”  Ìı ‘”  Ìş ‘”  Ìÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘ÙÜ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-car-keyboard/up-car-keyboard.js‘Ú5Øimport { _ as __easycom_0 } from "../up-icon/up-icon.js";
+const { defineComponent, ref, computed, resolveDynamicComponent, openBlock, createElementBlock, withModifiers, Fragment, renderList, normalizeClass, createElementVNode, createCommentVNode, toDisplayString, createVNode } = globalThis.Vue
+import { r as resolveEasycom } from "../../../../App.ku.js";
+import "../../libs/composable/useUltraUI.js";
+import { i as randomArray, s as sleep } from "../../libs/function/index.js";
+import { d as defProps } from "./carKeyboard.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const _sfc_main = /* @__PURE__ */ defineComponent({
+  ...{
+    name: "up-car-keyboard"
+  },
+  __name: "up-car-keyboard",
+  props: {
+    // æ˜¯å¦æ‰“ä¹±é”®ç›˜çš„é¡ºåº
+    random: {
+      type: Boolean,
+      default: defProps.getBoolean("carKeyboard.random")
+    },
+    // æ˜¯å¦è‡ªåŠ¨åˆ‡æ¢åˆ°è‹±æ–‡
+    autoChange: {
+      type: Boolean,
+      default: defProps.getBoolean("carKeyboard.autoChange")
+    }
+  },
+  emits: ["change", "backspace"],
+  setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
+    const props = __props;
+    const emit = __emit;
+    const abc = ref(false);
+    const timer = ref(null);
+    const areaList = computed(() => {
+      let data = [
+        "äº¬",
+        "æ²ª",
+        "ç²¤",
+        "æ´¥",
+        "å†€",
+        "è±«",
+        "äº‘",
+        "è¾½",
+        "é»‘",
+        "æ¹˜",
+        "çš–",
+        "é²",
+        "è‹",
+        "æµ™",
+        "èµ£",
+        "é„‚",
+        "æ¡‚",
+        "ç”˜",
+        "æ™‹",
+        "é™•",
+        "è’™",
+        "å‰",
+        "é—½",
+        "è´µ",
+        "æ¸",
+        "å·",
+        "é’",
+        "ç¼",
+        "å®",
+        "æŒ‚",
+        "è—",
+        "æ¸¯",
+        "æ¾³",
+        "æ–°",
+        "ä½¿",
+        "å­¦"
+      ];
+      let tmp = [];
+      if (props.random)
+        data = randomArray(data);
+      tmp.push(data.slice(0, 10));
+      tmp.push(data.slice(10, 20));
+      tmp.push(data.slice(20, 30));
+      tmp.push(data.slice(30, 36));
+      return tmp;
+    });
+    const engKeyBoardList = computed(() => {
+      let data = [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        0,
+        "Q",
+        "W",
+        "E",
+        "R",
+        "T",
+        "Y",
+        "U",
+        "I",
+        "O",
+        "P",
+        "A",
+        "S",
+        "D",
+        "F",
+        "G",
+        "H",
+        "J",
+        "K",
+        "L",
+        "Z",
+        "X",
+        "C",
+        "V",
+        "B",
+        "N",
+        "M"
+      ];
+      let tmp = [];
+      if (props.random)
+        data = randomArray(data);
+      tmp.push(data.slice(0, 10));
+      tmp.push(data.slice(10, 20));
+      tmp.push(data.slice(20, 30));
+      tmp.push(data.slice(30, 36));
+      return tmp;
+    });
+    const carInputClick = (i, j) => {
+      let value = "";
+      if (abc.value) {
+        value = engKeyBoardList.value[i][j];
+      } else {
+        value = areaList.value[i][j];
+      }
+      if (!abc.value && props.autoChange) {
+        sleep(200).then(() => {
+          abc.value = true;
+        });
+      }
+      emit("change", value);
+    };
+    const changeCarInputMode = () => {
+      abc.value = !abc.value;
+    };
+    const backspaceClick = () => {
+      var _a2;
+      emit("backspace");
+      clearInterval((_a2 = timer.value) !== null && _a2 !== void 0 ? _a2 : 0);
+      timer.value = null;
+      timer.value = setInterval(() => {
+        emit("backspace");
+      }, 250);
+    };
+    const clearTimer = () => {
+      var _a2;
+      clearInterval((_a2 = timer.value) !== null && _a2 !== void 0 ? _a2 : 0);
+      timer.value = null;
+    };
+    const noop = () => {
+    };
+    const __returned__ = { props, emit, abc, timer, areaList, engKeyBoardList, carInputClick, changeCarInputMode, backspaceClick, clearTimer, noop };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-keyboard": { "": { "display": "flex", "flexDirection": "column", "justifyContent": "space-around", "backgroundColor": "#e0e4e6", "alignItems": "stretch", "paddingTop": 6, "paddingRight": 0, "paddingBottom": 6, "paddingLeft": 0 } }, "up-keyboard__button": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-keyboard__button__inner-wrapper": { "": { "boxShadow": "0 1px 0px #999992", "marginTop": "8rpx", "marginRight": "5rpx", "marginBottom": "8rpx", "marginLeft": "5rpx", "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "up-keyboard__button__inner-wrapper__inner": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "width": "64rpx", "backgroundColor": "#FFFFFF", "height": "80rpx", "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "up-keyboard__button__inner-wrapper__inner__text": { "": { "fontSize": 16, "color": "#303133" } }, "up-keyboard__button__inner-wrapper__left": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4, "width": "134rpx", "height": "80rpx", "backgroundColor": "#BBBCC6", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "boxShadow": "0 1px 0px #999992" } }, "up-keyboard__button__inner-wrapper__right": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4, "width": "134rpx", "height": "80rpx", "backgroundColor": "#BBBCC6", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "boxShadow": "0 1px 0px #999992" } }, "up-keyboard__button__inner-wrapper__left__line": { "": { "fontSize": 15, "color": "#303133", "marginTop": 0, "marginRight": 1, "marginBottom": 0, "marginLeft": 1 } }, "up-keyboard__button__inner-wrapper__left__lang": { "": { "fontSize": 16, "color": "#303133" } }, "up-keyboard__button__inner-wrapper__left__lang--active": { "": { "color": "var(--theme-color, #0957de)" } }, "up-hover-class": { "": { "backgroundColor": "#BBBCC6" } } };
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_icon = resolveEasycom(resolveDynamicComponent("up-icon"), __easycom_0);
+  return openBlock(), createElementBlock(
+    "view",
+    {
+      class: "up-keyboard",
+      onTouchmove: withModifiers($setup.noop, ["stop", "prevent"])
+    },
+    [
+      (openBlock(true), createElementBlock(
+        Fragment,
+        null,
+        renderList($setup.abc ? $setup.engKeyBoardList : $setup.areaList, (group, i) => {
+          return openBlock(), createElementBlock("view", {
+            key: i,
+            class: normalizeClass(["up-keyboard__button", [i + 1 == 4 ? "up-keyboard__button--center" : ""]]),
+            index: i
+          }, [
+            i == 3 ? (openBlock(), createElementBlock("view", {
+              key: 0,
+              class: "up-keyboard__button__inner-wrapper"
+            }, [
+              createElementVNode("view", {
+                class: "up-keyboard__button__inner-wrapper__left",
+                "hover-class": "up-hover-class",
+                "hover-stay-time": 200,
+                onClick: $setup.changeCarInputMode
+              }, [
+                createElementVNode(
+                  "text",
+                  {
+                    class: normalizeClass(["up-keyboard__button__inner-wrapper__left__lang", [!$setup.abc ? "up-keyboard__button__inner-wrapper__left__lang--active" : ""]])
+                  },
+                  "ä¸­",
+                  2
+                  /* CLASS */
+                ),
+                createElementVNode("text", { class: "up-keyboard__button__inner-wrapper__left__line" }, "/"),
+                createElementVNode(
+                  "text",
+                  {
+                    class: normalizeClass(["up-keyboard__button__inner-wrapper__left__lang", [$setup.abc ? "up-keyboard__button__inner-wrapper__left__lang--active" : ""]])
+                  },
+                  "è‹±",
+                  2
+                  /* CLASS */
+                )
+              ])
+            ])) : createCommentVNode("v-if", true),
+            (openBlock(true), createElementBlock(
+              Fragment,
+              null,
+              renderList(group, (item, j) => {
+                return openBlock(), createElementBlock("view", {
+                  class: "up-keyboard__button__inner-wrapper",
+                  key: j
+                }, [
+                  createElementVNode("view", {
+                    class: "up-keyboard__button__inner-wrapper__inner",
+                    "hover-stay-time": 200,
+                    onClick: ($event) => $setup.carInputClick(i, j),
+                    "hover-class": "up-hover-class"
+                  }, [
+                    createElementVNode(
+                      "text",
+                      { class: "up-keyboard__button__inner-wrapper__inner__text" },
+                      toDisplayString(item),
+                      1
+                      /* TEXT */
+                    )
+                  ], 8, ["onClick"])
+                ]);
+              }),
+              128
+              /* KEYED_FRAGMENT */
+            )),
+            i == 3 ? (openBlock(), createElementBlock(
+              "view",
+              {
+                key: 1,
+                onTouchstart: $setup.backspaceClick,
+                onTouchend: $setup.clearTimer,
+                class: "up-keyboard__button__inner-wrapper"
+              },
+              [
+                createElementVNode("view", {
+                  class: "up-keyboard__button__inner-wrapper__right",
+                  "hover-class": "up-hover-class",
+                  "hover-stay-time": 200
+                }, [
+                  createVNode(_component_up_icon, {
+                    size: "28",
+                    name: "backspace",
+                    color: "#303133"
+                  })
+                ])
+              ],
+              32
+              /* NEED_HYDRATION */
+            )) : createCommentVNode("v-if", true)
+          ], 10, ["index"]);
+        }),
+        128
+        /* KEYED_FRAGMENT */
+      ))
+    ],
+    32
+    /* NEED_HYDRATION */
+  );
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-car-keyboard/up-car-keyboard.uvue"]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-car-keyboard.js.map
+ÔrF–µ../../../../App.ku.jsÙ#../../libs/composable/useUltraUI.js¼../../libs/function/index.jsÙ'../../../../plugin-vue-export-helper.js°./carKeyboard.jsµ../up-icon/up-icon.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙ /Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku.jsAÃªoh-resolveÂGAÂÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useUltraUI.jsAÃªoh-resolveÂGAÂÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsAÃªoh-resolveÂGAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂGAÂÙØ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-car-keyboard/carKeyboard.jsAÃªoh-resolveÂGAÂÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ5Í5;À‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍ5(Í58ÔrL”¤type¥start£end¤nameªIdentifierÍ5(Í53«__easycom_1LªIdentifierÍ57Í58¡_À–ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration 9‘ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	
+¡_LªIdentifier«__easycom_0ÔrO•¤type¥start£end¥value£raw§Literal!8µ../up-icon/up-icon.js·"../up-icon/up-icon.js"M±ImportDeclarationÍ'Íc‘N¯ImportSpecifierÍ0ÍCLªIdentifierÍ0Í1¡rLªIdentifierÍ5ÍC®resolveEasycomO§LiteralÍKÍbµ../../../../App.ku.js·"../../../../App.ku.js"M±ImportDeclarationÍdÍ‘O§LiteralÍkÍÙ#../../libs/composable/useUltraUI.jsÙ%"../../libs/composable/useUltraUI.js"M±ImportDeclarationÍ’ÍŞ’N¯ImportSpecifierÍ›Í«LªIdentifierÍ›Íœ¡iLªIdentifierÍ Í««randomArrayN¯ImportSpecifierÍ­Í·LªIdentifierÍ­Í®¡sLªIdentifierÍ²Í·¥sleepO§LiteralÍ¿Íİ¼../../libs/function/index.js¾"../../libs/function/index.js"M±ImportDeclarationÍßÍ‘N¯ImportSpecifierÍèÍõLªIdentifierÍèÍé¡dLªIdentifierÍíÍõ¨defPropsO§LiteralÍıÍ°./carKeyboard.js²"./carKeyboard.js"M±ImportDeclarationÍÍ\‘N¯ImportSpecifierÍÍ*LªIdentifierÍÍ¡_LªIdentifierÍÍ*«_export_sfcO§LiteralÍ2Í[Ù'../../../../plugin-vue-export-helper.jsÙ)"../../../../plugin-vue-export-helper.js"

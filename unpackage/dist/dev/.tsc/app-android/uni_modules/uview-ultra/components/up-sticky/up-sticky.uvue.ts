@@ -3,7 +3,7 @@
 	import { mpMixin } from '../../libs/mixin/mpMixin.uts';
 	import { mixin } from '../../libs/mixin/mixin.uts';
 	import { addStyle, deepMerge, getPx, guid } from '../../libs/function/index.uts';
-	import zIndex from '../../libs/config/zIndex.uts';
+	import zIndexConfig from '../../libs/config/zIndex.uts';
 
 	/**
 	 * sticky 吸顶
@@ -30,8 +30,11 @@
 			}
 		},
 		computed: {
+			stickyHeaderStyle(): any {
+				return addStyle(this.customStyle)
+			},
 			style(): any {
-				const style = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-sticky/up-sticky.uvue", 49, 11), } as UTSJSONObject
+				const style = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-sticky/up-sticky.uvue", 61, 11), } as UTSJSONObject
 				if (!this.disabled) {
 					style['height'] = this.fixed ? (this.height == 'auto' ? 'auto' : this.height + 'px') : 'auto'
 				} else {
@@ -41,20 +44,29 @@
 				return deepMerge(addStyle(this.customStyle), style)
 			},
 			stickyContent(): any {
-				const style = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-sticky/up-sticky.uvue", 59, 11), } as UTSJSONObject
-				style['position'] = this.fixed ? 'fixed' : 'static'
+				const style = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-sticky/up-sticky.uvue", 71, 11), } as UTSJSONObject
 				if (this.fixed) {
+					style['position'] = 'fixed'
 					style['top'] = this.stickyTop + 'px'
 					style['left'] = this.left + 'px'
 					if (this.width != 'auto') {
 						style['width'] = this.width + 'px'
 					}
 					style['zIndex'] = this.uZindex
+				} else {
+					style['position'] = 'static'
 				}
 				return style
 			},
 			uZindex(): number {
-				return this.$props['zIndex'].toString() != '' ? parseInt(this.zIndex.toString()) : (zIndex['sticky'] as number)
+				const zVal = this.$props['zIndex']
+				if (zVal != null && zVal.toString() != '') {
+					const parsed = parseInt(zVal.toString())
+					if (!isNaN(parsed)) {
+						return parsed
+					}
+				}
+				return (zIndexConfig['sticky'] as number ?? 999)
 			}
 		},
 		mounted() {
@@ -80,20 +92,22 @@
 				setTimeout(() => {
 					// @ts-ignore
 					this.upGetRect('#' + this.elId).then((res: NodeInfo) => {
-						if (res.height != null && res.height! > 0) {
-							this.height = res.height!.toString()
-						}
-						if (res.left != null) {
-							this.left = res.left!
-						}
-						if (res.width != null && res.width! > 0) {
-							this.width = res.width!.toString()
-						}
-						if (res.top != null && res.top! > 0) {
-							this.initialTop = res.top!
+						if (res != null) {
+							if (res.height != null && res.height! > 0) {
+								this.height = res.height!.toString()
+							}
+							if (res.left != null) {
+								this.left = res.left!
+							}
+							if (res.width != null && res.width! > 0) {
+								this.width = res.width!.toString()
+							}
+							if (res.top != null && res.top! > 0) {
+								this.initialTop = res.top! + parseFloat(getPx(this.scrollTop))
+							}
 						}
 					})
-				}, 150)
+				}, 200)
 			},
 			checkSticky(scrollTop: number) {
 				if (this.disabled) {
@@ -103,7 +117,7 @@
 				if (this.initialTop <= 0) {
 					// @ts-ignore
 					this.upGetRect('#' + this.elId).then((res: NodeInfo) => {
-						if (res.top != null && res.top! > 0) {
+						if (res != null && res.top != null && res.top! > 0) {
 							this.initialTop = res.top! + scrollTop
 						}
 					})
@@ -130,18 +144,14 @@ export default __sfc__
 function GenUniModulesUviewUltraComponentsUpStickyUpStickyRender(this: InstanceType<typeof __sfc__>): any | null {
 const _ctx = this
 const _cache = this.$.renderCache
-  return _cE("view", _uM({
-    class: "up-sticky",
-    style: _nS(_ctx.style)
-  }), [
+  return _cE("sticky-header", null, [
     _cE("view", _uM({
-      id: _ctx.elId,
-      style: _nS(_ctx.stickyContent),
-      class: "up-sticky__content"
+      class: "up-sticky",
+      style: _nS(_ctx.stickyHeaderStyle)
     }), [
       renderSlot(_ctx.$slots, "default")
-    ], 12 /* STYLE, PROPS */, ["id"])
-  ], 4 /* STYLE */)
+    ], 4 /* STYLE */)
+  ])
 }
 export type UpStickyComponentPublicInstance = InstanceType<typeof __sfc__>;
 const GenUniModulesUviewUltraComponentsUpStickyUpStickyStyles = []

@@ -1,0 +1,427 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚconst { defineComponent, getCurrentInstance, ref, onMounted, watch, onBeforeUnmount, openBlock, createElementBlock, createCommentVNode } = globalThis.Vue
+import { d as defProps } from "./code.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const _sfc_main = /* @__PURE__ */ defineComponent({
+  ...{
+    name: "up-code"
+  },
+  __name: "up-code",
+  props: {
+    // å€’è®¡æ—¶æ€»ç§’æ•°
+    seconds: {
+      type: [String, Number],
+      default: defProps.getNumber("code.seconds")
+    },
+    // å°šæœªå¼€å§‹æ—¶æç¤º
+    startText: {
+      type: String,
+      default: defProps.getString("code.startText")
+    },
+    // æ­£åœ¨å€’è®¡æ—¶ä¸­çš„æç¤º
+    changeText: {
+      type: String,
+      default: defProps.getString("code.changeText")
+    },
+    // å€’è®¡æ—¶ç»“æŸæ—¶çš„æç¤º
+    endText: {
+      type: String,
+      default: defProps.getString("code.endText")
+    },
+    // æ˜¯å¦åœ¨H5åˆ·æ–°æˆ–å„ç«¯è¿”å›å†è¿›å…¥æ—¶ç»§ç»­å€’è®¡æ—¶
+    keepRunning: {
+      type: Boolean,
+      default: defProps.getBoolean("code.keepRunning")
+    },
+    // ä¸ºäº†åŒºåˆ†å¤šä¸ªé¡µé¢ï¼Œæˆ–è€…ä¸€ä¸ªé¡µé¢å¤šä¸ªå€’è®¡æ—¶ç»„ä»¶æœ¬åœ°å­˜å‚¨çš„ç»§ç»­å€’è®¡æ—¶å˜äº†
+    uniqueKey: {
+      type: String,
+      default: defProps.getString("code.uniqueKey")
+    }
+  },
+  emits: ["change", "start", "end"],
+  setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    const props = __props;
+    const emit = __emit;
+    const instance = getCurrentInstance().proxy;
+    const secNum = ref(0);
+    const timer = ref(0);
+    const canGetCodeRef = ref(true);
+    const changeEvent = (text) => {
+      emit("change", text);
+    };
+    const setTimeToStorage = () => {
+      if (!props.keepRunning || timer.value == 0)
+        return null;
+      if (secNum.value > 0 && secNum.value < parseInt(props.seconds.toString())) {
+        let nowTimestamp = Math.floor((/* @__PURE__ */ new Date()).getTime() / 1e3);
+        uni.setStorage({
+          key: props.uniqueKey + "_$upCountDownTimestamp",
+          data: (nowTimestamp + secNum.value).toString()
+        });
+      }
+    };
+    const start = () => {
+      if (timer.value != 0) {
+        clearInterval(timer.value);
+        timer.value = 0;
+      }
+      secNum.value = parseInt(props.seconds.toString());
+      emit("start");
+      canGetCodeRef.value = false;
+      changeEvent(props.changeText.replace(/x|X/, secNum.value.toString()));
+      timer.value = setInterval(() => {
+        if (secNum.value - 1 > 0) {
+          secNum.value--;
+          changeEvent(props.changeText.replace(/x|X/, secNum.value.toString()));
+        } else {
+          secNum.value--;
+          changeEvent(props.endText.toString());
+          clearInterval(timer.value);
+          timer.value = 0;
+          emit("end");
+          canGetCodeRef.value = true;
+        }
+      }, 1e3);
+      setTimeToStorage();
+    };
+    const checkKeepRunning = () => {
+      let lastTimestamp = parseInt(uni.getStorageSync(props.uniqueKey + "_$upCountDownTimestamp").toString());
+      let nowTimestamp = Math.floor((/* @__PURE__ */ new Date()).getTime() / 1e3);
+      if (props.keepRunning && lastTimestamp > 0 && lastTimestamp > nowTimestamp) {
+        secNum.value = lastTimestamp - nowTimestamp;
+        uni.removeStorageSync(props.uniqueKey + "_$upCountDownTimestamp");
+        start();
+      } else {
+        changeEvent(props.startText.toString());
+      }
+    };
+    const reset = () => {
+      canGetCodeRef.value = true;
+      clearInterval(timer.value);
+      secNum.value = parseInt(props.seconds.toString());
+      changeEvent(props.endText.toString());
+    };
+    onMounted(() => {
+      checkKeepRunning();
+    });
+    watch(() => {
+      return props.seconds;
+    }, (newVal = null) => {
+      secNum.value = parseInt(newVal.toString());
+    }, { immediate: true });
+    onBeforeUnmount(() => {
+      setTimeToStorage();
+      clearInterval(timer.value);
+      timer.value = 0;
+    });
+    const canGetCode = function() {
+      return canGetCodeRef.value;
+    };
+    __expose({
+      canGetCode,
+      start,
+      reset
+    });
+    const __returned__ = { props, emit, instance, secNum, timer, canGetCodeRef, changeEvent, setTimeToStorage, start, checkKeepRunning, reset, canGetCode };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } } };
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return openBlock(), createElementBlock("view", { class: "up-code" }, [
+    createCommentVNode(" æ­¤ç»„ä»¶åŠŸèƒ½ç”±jså®Œæˆï¼Œæ— éœ€å†™htmlé€»è¾‘ ")
+  ]);
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-code/up-code.uvue"]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-code.js.map
+Â’ÙÉ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-code/code.jsÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-code/up-code.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ‘ÔrD’²hostDependencyName®hostModuleNameÙD../../../../../uni_modules/uview-ultra/components/up-code/up-code.js¥entryÃÚconst { defineComponent, getCurrentInstance, ref, onMounted, watch, onBeforeUnmount, openBlock, createElementBlock, createCommentVNode } = globalThis.Vue
+import { d as defProps } from "./code.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const _sfc_main = /* @__PURE__ */ defineComponent({
+  ...{
+    name: "up-code"
+  },
+  __name: "up-code",
+  props: {
+    // å€’è®¡æ—¶æ€»ç§’æ•°
+    seconds: {
+      type: [String, Number],
+      default: defProps.getNumber("code.seconds")
+    },
+    // å°šæœªå¼€å§‹æ—¶æç¤º
+    startText: {
+      type: String,
+      default: defProps.getString("code.startText")
+    },
+    // æ­£åœ¨å€’è®¡æ—¶ä¸­çš„æç¤º
+    changeText: {
+      type: String,
+      default: defProps.getString("code.changeText")
+    },
+    // å€’è®¡æ—¶ç»“æŸæ—¶çš„æç¤º
+    endText: {
+      type: String,
+      default: defProps.getString("code.endText")
+    },
+    // æ˜¯å¦åœ¨H5åˆ·æ–°æˆ–å„ç«¯è¿”å›å†è¿›å…¥æ—¶ç»§ç»­å€’è®¡æ—¶
+    keepRunning: {
+      type: Boolean,
+      default: defProps.getBoolean("code.keepRunning")
+    },
+    // ä¸ºäº†åŒºåˆ†å¤šä¸ªé¡µé¢ï¼Œæˆ–è€…ä¸€ä¸ªé¡µé¢å¤šä¸ªå€’è®¡æ—¶ç»„ä»¶æœ¬åœ°å­˜å‚¨çš„ç»§ç»­å€’è®¡æ—¶å˜äº†
+    uniqueKey: {
+      type: String,
+      default: defProps.getString("code.uniqueKey")
+    }
+  },
+  emits: ["change", "start", "end"],
+  setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    const props = __props;
+    const emit = __emit;
+    const instance = getCurrentInstance().proxy;
+    const secNum = ref(0);
+    const timer = ref(0);
+    const canGetCodeRef = ref(true);
+    const changeEvent = (text) => {
+      emit("change", text);
+    };
+    const setTimeToStorage = () => {
+      if (!props.keepRunning || timer.value == 0)
+        return null;
+      if (secNum.value > 0 && secNum.value < parseInt(props.seconds.toString())) {
+        let nowTimestamp = Math.floor((/* @__PURE__ */ new Date()).getTime() / 1e3);
+        uni.setStorage({
+          key: props.uniqueKey + "_$upCountDownTimestamp",
+          data: (nowTimestamp + secNum.value).toString()
+        });
+      }
+    };
+    const start = () => {
+      if (timer.value != 0) {
+        clearInterval(timer.value);
+        timer.value = 0;
+      }
+      secNum.value = parseInt(props.seconds.toString());
+      emit("start");
+      canGetCodeRef.value = false;
+      changeEvent(props.changeText.replace(/x|X/, secNum.value.toString()));
+      timer.value = setInterval(() => {
+        if (secNum.value - 1 > 0) {
+          secNum.value--;
+          changeEvent(props.changeText.replace(/x|X/, secNum.value.toString()));
+        } else {
+          secNum.value--;
+          changeEvent(props.endText.toString());
+          clearInterval(timer.value);
+          timer.value = 0;
+          emit("end");
+          canGetCodeRef.value = true;
+        }
+      }, 1e3);
+      setTimeToStorage();
+    };
+    const checkKeepRunning = () => {
+      let lastTimestamp = parseInt(uni.getStorageSync(props.uniqueKey + "_$upCountDownTimestamp").toString());
+      let nowTimestamp = Math.floor((/* @__PURE__ */ new Date()).getTime() / 1e3);
+      if (props.keepRunning && lastTimestamp > 0 && lastTimestamp > nowTimestamp) {
+        secNum.value = lastTimestamp - nowTimestamp;
+        uni.removeStorageSync(props.uniqueKey + "_$upCountDownTimestamp");
+        start();
+      } else {
+        changeEvent(props.startText.toString());
+      }
+    };
+    const reset = () => {
+      canGetCodeRef.value = true;
+      clearInterval(timer.value);
+      secNum.value = parseInt(props.seconds.toString());
+      changeEvent(props.endText.toString());
+    };
+    onMounted(() => {
+      checkKeepRunning();
+    });
+    watch(() => {
+      return props.seconds;
+    }, (newVal = null) => {
+      secNum.value = parseInt(newVal.toString());
+    }, { immediate: true });
+    onBeforeUnmount(() => {
+      setTimeToStorage();
+      clearInterval(timer.value);
+      timer.value = 0;
+    });
+    const canGetCode = function() {
+      return canGetCodeRef.value;
+    };
+    __expose({
+      canGetCode,
+      start,
+      reset
+    });
+    const __returned__ = { props, emit, instance, secNum, timer, canGetCodeRef, changeEvent, setTimeToStorage, start, checkKeepRunning, reset, canGetCode };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } } };
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return openBlock(), createElementBlock("view", { class: "up-code" }, [
+    createCommentVNode(" æ­¤ç»„ä»¶åŠŸèƒ½ç”±jså®Œæˆï¼Œæ— éœ€å†™htmlé€»è¾‘ ")
+  ]);
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-code/up-code.uvue"]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-code.js.map
+ÔrE•§version¨mappings¥names§sources®sourcesContentÜ ‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘ÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-code/up-code.js‘Úconst { defineComponent, getCurrentInstance, ref, onMounted, watch, onBeforeUnmount, openBlock, createElementBlock, createCommentVNode } = globalThis.Vue
+import { d as defProps } from "./code.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const _sfc_main = /* @__PURE__ */ defineComponent({
+  ...{
+    name: "up-code"
+  },
+  __name: "up-code",
+  props: {
+    // å€’è®¡æ—¶æ€»ç§’æ•°
+    seconds: {
+      type: [String, Number],
+      default: defProps.getNumber("code.seconds")
+    },
+    // å°šæœªå¼€å§‹æ—¶æç¤º
+    startText: {
+      type: String,
+      default: defProps.getString("code.startText")
+    },
+    // æ­£åœ¨å€’è®¡æ—¶ä¸­çš„æç¤º
+    changeText: {
+      type: String,
+      default: defProps.getString("code.changeText")
+    },
+    // å€’è®¡æ—¶ç»“æŸæ—¶çš„æç¤º
+    endText: {
+      type: String,
+      default: defProps.getString("code.endText")
+    },
+    // æ˜¯å¦åœ¨H5åˆ·æ–°æˆ–å„ç«¯è¿”å›å†è¿›å…¥æ—¶ç»§ç»­å€’è®¡æ—¶
+    keepRunning: {
+      type: Boolean,
+      default: defProps.getBoolean("code.keepRunning")
+    },
+    // ä¸ºäº†åŒºåˆ†å¤šä¸ªé¡µé¢ï¼Œæˆ–è€…ä¸€ä¸ªé¡µé¢å¤šä¸ªå€’è®¡æ—¶ç»„ä»¶æœ¬åœ°å­˜å‚¨çš„ç»§ç»­å€’è®¡æ—¶å˜äº†
+    uniqueKey: {
+      type: String,
+      default: defProps.getString("code.uniqueKey")
+    }
+  },
+  emits: ["change", "start", "end"],
+  setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    const props = __props;
+    const emit = __emit;
+    const instance = getCurrentInstance().proxy;
+    const secNum = ref(0);
+    const timer = ref(0);
+    const canGetCodeRef = ref(true);
+    const changeEvent = (text) => {
+      emit("change", text);
+    };
+    const setTimeToStorage = () => {
+      if (!props.keepRunning || timer.value == 0)
+        return null;
+      if (secNum.value > 0 && secNum.value < parseInt(props.seconds.toString())) {
+        let nowTimestamp = Math.floor((/* @__PURE__ */ new Date()).getTime() / 1e3);
+        uni.setStorage({
+          key: props.uniqueKey + "_$upCountDownTimestamp",
+          data: (nowTimestamp + secNum.value).toString()
+        });
+      }
+    };
+    const start = () => {
+      if (timer.value != 0) {
+        clearInterval(timer.value);
+        timer.value = 0;
+      }
+      secNum.value = parseInt(props.seconds.toString());
+      emit("start");
+      canGetCodeRef.value = false;
+      changeEvent(props.changeText.replace(/x|X/, secNum.value.toString()));
+      timer.value = setInterval(() => {
+        if (secNum.value - 1 > 0) {
+          secNum.value--;
+          changeEvent(props.changeText.replace(/x|X/, secNum.value.toString()));
+        } else {
+          secNum.value--;
+          changeEvent(props.endText.toString());
+          clearInterval(timer.value);
+          timer.value = 0;
+          emit("end");
+          canGetCodeRef.value = true;
+        }
+      }, 1e3);
+      setTimeToStorage();
+    };
+    const checkKeepRunning = () => {
+      let lastTimestamp = parseInt(uni.getStorageSync(props.uniqueKey + "_$upCountDownTimestamp").toString());
+      let nowTimestamp = Math.floor((/* @__PURE__ */ new Date()).getTime() / 1e3);
+      if (props.keepRunning && lastTimestamp > 0 && lastTimestamp > nowTimestamp) {
+        secNum.value = lastTimestamp - nowTimestamp;
+        uni.removeStorageSync(props.uniqueKey + "_$upCountDownTimestamp");
+        start();
+      } else {
+        changeEvent(props.startText.toString());
+      }
+    };
+    const reset = () => {
+      canGetCodeRef.value = true;
+      clearInterval(timer.value);
+      secNum.value = parseInt(props.seconds.toString());
+      changeEvent(props.endText.toString());
+    };
+    onMounted(() => {
+      checkKeepRunning();
+    });
+    watch(() => {
+      return props.seconds;
+    }, (newVal = null) => {
+      secNum.value = parseInt(newVal.toString());
+    }, { immediate: true });
+    onBeforeUnmount(() => {
+      setTimeToStorage();
+      clearInterval(timer.value);
+      timer.value = 0;
+    });
+    const canGetCode = function() {
+      return canGetCodeRef.value;
+    };
+    __expose({
+      canGetCode,
+      start,
+      reset
+    });
+    const __returned__ = { props, emit, instance, secNum, timer, canGetCodeRef, changeEvent, setTimeToStorage, start, checkKeepRunning, reset, canGetCode };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } } };
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return openBlock(), createElementBlock("view", { class: "up-code" }, [
+    createCommentVNode(" æ­¤ç»„ä»¶åŠŸèƒ½ç”±jså®Œæˆï¼Œæ— éœ€å†™htmlé€»è¾‘ ")
+  ]);
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-code/up-code.uvue"]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-code.js.map
+ÔrF’©./code.jsÙ'../../../../plugin-vue-export-helper.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙÉ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-code/code.jsAÃªoh-resolveÂGAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍÿÍÀ‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍ
+ÍÔrL”¤type¥start£end¤nameªIdentifierÍ
+Í«__easycom_1LªIdentifierÍÍ¡_À’ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclarationÌšÌÄ‘ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifierÌ£Ì°LªIdentifierÌ£Ì¤¡dLªIdentifierÌ¨Ì°¨defPropsÔrO•¤type¥start£end¥value£raw§LiteralÌ¸ÌÃ©./code.js«"./code.js"M±ImportDeclarationÌÅÍ‘N¯ImportSpecifierÌÎÌŞLªIdentifierÌÎÌÏ¡_LªIdentifierÌÓÌŞ«_export_sfcO§LiteralÌæÍÙ'../../../../plugin-vue-export-helper.jsÙ)"../../../../plugin-vue-export-helper.js"

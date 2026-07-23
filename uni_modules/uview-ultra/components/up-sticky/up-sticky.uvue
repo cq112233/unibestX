@@ -1,4 +1,12 @@
 <template>
+	<!-- #ifdef APP-ANDROID || APP-IOS || APP-HARMONY -->
+	<sticky-header>
+		<view class="up-sticky" :style="stickyHeaderStyle">
+			<slot />
+		</view>
+	</sticky-header>
+	<!-- #endif -->
+	<!-- #ifndef APP-ANDROID || APP-IOS || APP-HARMONY -->
 	<view
 		class="up-sticky"
 		:style="style"
@@ -11,6 +19,7 @@
 			<slot />
 		</view>
 	</view>
+	<!-- #endif -->
 </template>
 
 <script lang="uts">
@@ -18,7 +27,7 @@
 	import { mpMixin } from '../../libs/mixin/mpMixin.uts';
 	import { mixin } from '../../libs/mixin/mixin.uts';
 	import { addStyle, deepMerge, getPx, guid } from '../../libs/function/index.uts';
-	import zIndex from '../../libs/config/zIndex.uts';
+	import zIndexConfig from '../../libs/config/zIndex.uts';
 
 	/**
 	 * sticky 吸顶
@@ -45,6 +54,9 @@
 			}
 		},
 		computed: {
+			stickyHeaderStyle(): any {
+				return addStyle(this.customStyle)
+			},
 			style(): any {
 				const style = {} as UTSJSONObject
 				if (!this.disabled) {
@@ -57,19 +69,28 @@
 			},
 			stickyContent(): any {
 				const style = {} as UTSJSONObject
-				style['position'] = this.fixed ? 'fixed' : 'static'
 				if (this.fixed) {
+					style['position'] = 'fixed'
 					style['top'] = this.stickyTop + 'px'
 					style['left'] = this.left + 'px'
 					if (this.width != 'auto') {
 						style['width'] = this.width + 'px'
 					}
 					style['zIndex'] = this.uZindex
+				} else {
+					style['position'] = 'static'
 				}
 				return style
 			},
 			uZindex(): number {
-				return this.$props['zIndex'].toString() != '' ? parseInt(this.zIndex.toString()) : (zIndex['sticky'] as number)
+				const zVal = this.$props['zIndex']
+				if (zVal != null && zVal.toString() != '') {
+					const parsed = parseInt(zVal.toString())
+					if (!isNaN(parsed)) {
+						return parsed
+					}
+				}
+				return (zIndexConfig['sticky'] as number ?? 999)
 			}
 		},
 		mounted() {
@@ -95,20 +116,22 @@
 				setTimeout(() => {
 					// @ts-ignore
 					this.upGetRect('#' + this.elId).then((res: NodeInfo) => {
-						if (res.height != null && res.height! > 0) {
-							this.height = res.height!.toString()
-						}
-						if (res.left != null) {
-							this.left = res.left!
-						}
-						if (res.width != null && res.width! > 0) {
-							this.width = res.width!.toString()
-						}
-						if (res.top != null && res.top! > 0) {
-							this.initialTop = res.top!
+						if (res != null) {
+							if (res.height != null && res.height! > 0) {
+								this.height = res.height!.toString()
+							}
+							if (res.left != null) {
+								this.left = res.left!
+							}
+							if (res.width != null && res.width! > 0) {
+								this.width = res.width!.toString()
+							}
+							if (res.top != null && res.top! > 0) {
+								this.initialTop = res.top! + parseFloat(getPx(this.scrollTop))
+							}
 						}
 					})
-				}, 150)
+				}, 200)
 			},
 			checkSticky(scrollTop: number) {
 				if (this.disabled) {
@@ -118,7 +141,7 @@
 				if (this.initialTop <= 0) {
 					// @ts-ignore
 					this.upGetRect('#' + this.elId).then((res: NodeInfo) => {
-						if (res.top != null && res.top! > 0) {
+						if (res != null && res.top != null && res.top! > 0) {
 							this.initialTop = res.top! + scrollTop
 						}
 					})
