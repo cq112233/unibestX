@@ -109,7 +109,7 @@
 
 <script>
 import uHeader from './header.uvue'
-import { UPCalendarMonthsItemDate } from './types.uts'
+import { UPCalendarMonthsItemDate, CalendarMonthItem } from './types.uts'
 import uMonth from './month.uvue'
 import { propsCalendar } from './props.uts'
 import util from './util'
@@ -339,7 +339,7 @@ export default {
 			start: 0,
 			inited: false,
 			// 需要显示的月份的数组
-			months: [] as any[],
+			months: [] as Array<CalendarMonthItem>,
 			// 在月份滚动区域中，当前视图中月份的index索引
 			monthIndex: 0,
 			// 月份滚动区域的高度
@@ -461,20 +461,20 @@ export default {
 				// @ts-ignore
 				let monthIndex: number = this.monthIndex as number
 				// @ts-ignore
-				const item = this.months[monthIndex] as any
+				const item = this.months[monthIndex] 
 				return formatMonthTitle(item.year, item.month)
 			} else {
 				return ''
 			}
 		},
-		currentMonths(): any[] {
+		currentMonths(): Array<CalendarMonthItem> {
 			// @ts-ignore
 			if (this.monthSwitch && this.months.length > 0) {
 				// @ts-ignore
-				return [this.months[this.monthIndex] as any]
+				return [this.months[this.monthIndex]]
 			}
 			// @ts-ignore
-			return this.months as any[]
+			return this.months
 		},
 		switchPrevDisabled(): boolean {
 			// @ts-ignore
@@ -619,7 +619,7 @@ export default {
 			)
 			// 先清空数组
 			// @ts-ignore
-			this.months = [] as any[]
+			this.months = [] as Array<CalendarMonthItem>
 			const minDateStr = dayuts(minDate).format('YYYY-MM-DD')
 			const maxDateStr = dayuts(maxDate).format('YYYY-MM-DD')
 			for (let i = 0; i < months; i++) {
@@ -646,7 +646,7 @@ export default {
 					} as UPCalendarMonthsItemDate
 					cdate.push(config)
 				}
-				let md: any = {
+				let md: CalendarMonthItem = {
 					top: 0,
 					date: cdate,
 					// 当前所属的月份

@@ -380,7 +380,7 @@ const _sfc_main = common_vendor.defineComponent({
         this.innerMinDate != "0" && this.innerMinDate != "" && // @ts-ignore
         new Date(this.innerMaxDate).getTime() < new Date(this.innerMinDate).getTime()
       ) {
-        common_vendor.index.__f__("log", "at uni_modules/uview-ultra/components/up-calendar/up-calendar.uvue:569", this.innerMaxDate);
+        common_vendor.index.__f__("log", "at uni_modules/uview-ultra/components/up-calendar/up-calendar.uvue:570", this.innerMaxDate);
         return uni_modules_uviewUltra_libs_function_index.error("maxDate不能小于minDate时间");
       }
       this.listHeight = this.rowHeight * (this.monthSwitch ? 6 : 5) + 30;
@@ -444,7 +444,7 @@ const _sfc_main = common_vendor.defineComponent({
           });
           cdate.push(config);
         }
-        let md = new UTSJSONObject(
+        let md = new uni_modules_uviewUltra_components_upCalendar_types.CalendarMonthItem(
           {
             top: 0,
             date: cdate,
@@ -663,6 +663,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       color: $props.color == "#3c9cff" ? "" : $props.color,
       type: $props.color == "#3c9cff" ? "primary" : "",
       disabled: $options.buttonDisabled,
+      customStyle: "min-width:120px;",
       class: "data-v-cf2b6afc"
     })
   } : {}, {

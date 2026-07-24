@@ -87,7 +87,7 @@
   function initRuntimeSocketService() {
     const hosts = "127.0.0.1,192.168.100.62,198.18.0.1,10.8.0.8";
     const port = "8090";
-    const id = "app-ios_-fUGx3";
+    const id = "app-ios_Qls3ua";
     return Promise.resolve().then(() => {
       return initRuntimeSocket(hosts, port, id).then((socket) => {
         if (socket == null) {
@@ -22014,7 +22014,7 @@
       }
     }
   });
-  const _style_0$2e = { "up-list": { "": { "display": "flex", "flexDirection": "column" } } };
+  const _style_0$2e = { "up-list": { "": { "flexDirection": "column" } } };
   function _sfc_render$2h(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("scroll-view", {
       class: "up-list",
@@ -30839,6 +30839,31 @@
       delete this.__props__;
     }
   }
+  class CalendarMonthItem extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            top: { type: Number, optional: false },
+            year: { type: String, optional: false },
+            month: { type: String, optional: false },
+            date: { type: "Unknown", optional: false }
+          };
+        },
+        name: "CalendarMonthItem"
+      };
+    }
+    constructor(options, metadata = CalendarMonthItem.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.top = this.__props__.top;
+      this.year = this.__props__.year;
+      this.month = this.__props__.month;
+      this.date = this.__props__.date;
+      delete this.__props__;
+    }
+  }
   const defProps$H = new UTSJSONObject({
     // calendar 组件
     calendar: new UTSJSONObject({
@@ -30877,31 +30902,6 @@
     })
   });
   let calendarProp$2 = defProps$H["calendar"];
-  class monthsItem extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            top: { type: Number, optional: false },
-            year: { type: String, optional: false },
-            month: { type: String, optional: false },
-            date: { type: "Unknown", optional: false }
-          };
-        },
-        name: "monthsItem"
-      };
-    }
-    constructor(options, metadata = monthsItem.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.top = this.__props__.top;
-      this.year = this.__props__.year;
-      this.month = this.__props__.month;
-      this.date = this.__props__.date;
-      delete this.__props__;
-    }
-  }
   const _sfc_main$1N = vue.defineComponent({
     name: "up-calendar-month",
     mixins: [mpMixin, mixin],
@@ -31165,7 +31165,7 @@
     },
     emits: ["monthSelected", "updateMonthTop"],
     methods: {
-      getMonthTitle(item = null) {
+      getMonthTitle(item) {
         return formatMonthTitle(item.year, item.month);
       },
       isRangeMiddle(item) {
@@ -32115,7 +32115,7 @@
             });
             cdate.push(config2);
           }
-          let md = new UTSJSONObject(
+          let md = new CalendarMonthItem(
             {
               top: 0,
               date: cdate,

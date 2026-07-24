@@ -1,0 +1,296 @@
+import _easycom_up_icon from '@/uni_modules/uview-ultra/components/up-icon/up-icon.uvue'
+import _easycom_up_line from '@/uni_modules/uview-ultra/components/up-line/up-line.uvue'
+import type { PropType } from 'vue'
+	import { getCurrentInstance, ref, reactive, computed, onMounted, watch } from 'vue'
+	import defProps from './formItem.uts'
+	import propsLine from '../up-line/line.uts'
+	import color from '../../libs/config/color.uts'
+	import { addStyle, addUnit, getProperty, setProperty, error } from '../../libs/function/index.uts'
+	import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'
+	
+const __sfc__ = defineComponent({
+  __name: 'up-form-item',
+
+		name: 'up-form-item'
+	,
+  props: {
+		// input的label提示语
+		label: {
+			type: String,
+			default: defProps.getString('formItem.label')
+		},
+		// 绑定的值
+		prop: {
+			type: String,
+			default: defProps.getString('formItem.prop')
+		},
+		// 绑定的规则
+		rules: {
+			type: [UTSJSONObject, Array],
+			default: defProps.getAny('formItem.rules') as UTSJSONObject
+		},
+		// 是否显示表单域的下划线边框
+		borderBottom: {
+			type: [String, Boolean],
+			default: defProps.getString('formItem.borderBottom')
+		},
+		// label的位置，left-左边，top-上边
+		labelPosition: {
+			type: String,
+			default: defProps.getString('formItem.labelPosition')
+		},
+		// label的宽度，单位px
+		labelWidth: {
+			type: [String, Number],
+			default: defProps.getString('formItem.labelWidth')
+		},
+		// 右侧图标
+		rightIcon: {
+			type: String,
+			default: defProps.getString('formItem.rightIcon')
+		},
+		// 左侧图标
+		leftIcon: {
+			type: String,
+			default: defProps.getString('formItem.leftIcon')
+		},
+		// 是否显示左边的必填星号，只作显示用，具体校验必填的逻辑，请在rules中配置
+		required: {
+			type: Boolean,
+			default: defProps.getBoolean('formItem.required')
+		},
+		leftIconStyle: {
+			type: [String, UTSJSONObject],
+			default: defProps.getString('formItem.leftIconStyle')
+		}
+	},
+  emits: ["click"],
+  setup(__props, __setupCtx: SetupContext) {
+const __expose = __setupCtx.expose
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+	const { parent, parentData, getParentData } = useUltraUI({
+		// 提示文本的位置
+		labelPosition: 'left',
+		// 提示文本对齐方式
+		labelAlign: 'left',
+		// 提示文本的样式
+		labelStyle: {},
+		// 提示文本的宽度
+		labelWidth: 45,
+		// 错误提示方式
+		errorType: 'message',
+		originalModel: {}
+	})
+	const instance = getCurrentInstance()!.proxy!
+	
+	
+	
+	// 定义props
+	const props = __props
+	
+	// 定义emits
+	function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+__ins.emit(event, ...do_not_transform_spread)
+}
+	
+	// 响应式数据
+	const message = ref('')
+	const itemRules = ref<UTSJSONObject[]|UTSJSONObject>({})
+
+	// 获取父组件的参数
+	const updateParentData = () => {
+		getParentData('up-form', instance, false);
+	}
+	
+	// 初始化
+	const init = () => {
+		updateParentData()
+		if (parent.value == null) {
+			error('up-form-item需要结合up-form组件使用')
+		}
+	}
+	
+	// 手动设置校验的规则，如果规则中有函数的话，微信小程序中会过滤掉，所以只能手动调用设置规则
+	const setRules = (rules: UTSJSONObject[]|UTSJSONObject) => {
+		// 判断是否有规则
+		if (Array.isArray(rules)) {
+			if (rules.length == 0) {
+				itemRules.value = {};
+				return
+			};
+		} else {
+			if (UTSJSONObject.keys(rules).length == 0) {
+				itemRules.value = {};
+				return
+			};
+		}
+		
+		itemRules.value = rules;
+	}
+	
+	// 移除up-form-item的校验结果
+	const clearValidate = () => {
+		message.value = ''
+	}
+	
+	// 清空当前的组件的校验结果，并重置为初始值
+	const resetField = () => {
+		// 找到原始值
+		const value = getProperty(parentData.value['originalModel']!, props.prop)
+		// 将up-form的model的prop属性链还原原始值
+		setProperty(parent.value!.$props['model'], props.prop, value)
+		// 移除校验结果
+		message.value = ''
+	}
+	
+	// 点击组件
+	const clickHandler = () => {
+		emit('click')
+	}
+	
+	// 监听规则的变化todo
+		watch((): any => props.rules, (newVal: any) => {
+			setRules(newVal as UTSJSONObject[]|UTSJSONObject);
+		}, { immediate: true })
+	
+	// 在组件挂载后初始化
+	onMounted(() => {
+		init()
+	})
+	
+	
+	const getProps = function(): UTSJSONObject {
+		return {
+			prop: props.prop,
+			rules: itemRules.value,
+			label: props.label,
+			borderBottom: props.borderBottom,
+			labelPosition: props.labelPosition,
+			labelWidth: props.labelWidth,
+			rightIcon: props.rightIcon,
+			leftIcon: props.leftIcon,
+			required: props.required,
+			leftIconStyle: props.leftIconStyle
+		}
+	}
+	const getRefs = function() {
+		return {
+			message: message.value,
+			itemRules: itemRules.value
+		}
+	}
+	
+	const setMessage = function(msg: string) {
+		message.value = msg
+	}
+	
+	// 暴露方法
+	__expose({
+		getProps,
+		getRefs,
+		setMessage
+	})
+
+return (): any | null => {
+
+const _component_up_icon = resolveEasyComponent("up-icon",_easycom_up_icon)
+const _component_up_line = resolveEasyComponent("up-line",_easycom_up_line)
+
+  return _cE("view", _uM({
+    class: _nC(["up-form-item", _uM({'up-form-item--error':(message.value != '' && unref(parentData)['errorType'] == 'message')})])
+  }), [
+    _cE("view", _uM({
+      class: "up-form-item__body",
+      onClick: clickHandler,
+      style: _nS([_ctx.$up.addStyle(_ctx.customStyle), _uM({
+                flexDirection: (_ctx.labelPosition != '' ? _ctx.labelPosition : unref(parentData)['labelPosition']) == 'left' ? 'row' : 'column'
+			})])
+    }), [
+      renderSlot(_ctx.$slots, "label", {}, (): any[] => [
+        isTrue(_ctx.required || _ctx.leftIcon != '' || _ctx.label != '')
+          ? _cE("view", _uM({
+              key: 0,
+              class: "up-form-item__body__left",
+              style: _nS(_uM({
+						width: _ctx.$up.addUnit(_ctx.labelWidth != '' ? _ctx.labelWidth : unref(parentData)['labelWidth']),
+						marginBottom: (_ctx.labelPosition != '' ? _ctx.labelPosition : unref(parentData)['labelPosition']) == 'left' ? 0 : '5px',
+					}))
+            }), [
+              _cE("view", _uM({ class: "up-form-item__body__left__content" }), [
+                isTrue(_ctx.required)
+                  ? _cE("text", _uM({
+                      key: 0,
+                      class: "up-form-item__body__left__content__required"
+                    }), "*")
+                  : _cC("v-if", true),
+                _ctx.leftIcon != ''
+                  ? _cE("view", _uM({
+                      key: 1,
+                      class: "up-form-item__body__left__content__icon"
+                    }), [
+                      _cV(_component_up_icon, _uM({
+                        name: _ctx.leftIcon,
+                        "custom-style": _ctx.leftIconStyle
+                      }), null, 8 /* PROPS */, ["name", "custom-style"])
+                    ])
+                  : _cC("v-if", true),
+                _cE("view", _uM({
+                  class: "up-form-item__body__left__content__label",
+                  style: _nS(_uM({
+								justifyContent: unref(parentData)['labelAlign'] == 'left' ? 'flex-start' : unref(parentData)['labelAlign'] == 'center' ? 'center' : 'flex-end'
+							}))
+                }), [
+                  _cE("text", _uM({
+                    class: "up-form-item__body__left__content__label__text",
+                    style: _nS((unref(parentData)['labelStyle'] ?? _uM<string, any | null>({})) as any)
+                  }), _tD(_ctx.label), 5 /* TEXT, STYLE */)
+                ], 4 /* STYLE */)
+              ])
+            ], 4 /* STYLE */)
+          : _cC("v-if", true)
+      ]),
+      _cE("view", _uM({ class: "up-form-item__body__right" }), [
+        _cE("view", _uM({ class: "up-form-item__body__right__content" }), [
+          _cE("view", _uM({ class: "up-form-item__body__right__content__slot" }), [
+            renderSlot(_ctx.$slots, "default")
+          ]),
+          _ctx.$slots['right'] != null
+            ? _cE("view", _uM({
+                key: 0,
+                class: "item__body__right__content__icon"
+              }), [
+                renderSlot(_ctx.$slots, "right")
+              ])
+            : _cC("v-if", true)
+        ])
+      ])
+    ], 4 /* STYLE */),
+    renderSlot(_ctx.$slots, "error", {}, (): any[] => [
+      isTrue(message.value != '' && unref(parentData)['errorType'] == 'message')
+        ? _cE("text", _uM({
+            key: 0,
+            class: "up-form-item__body__right__message",
+            style: _nS(_uM({
+					marginLeft:  _ctx.$up.addUnit((_ctx.labelPosition ?? unref(parentData)['labelPosition']) == 'top' ? 0 : (_ctx.labelWidth != null ? _ctx.labelWidth : unref(parentData)['labelWidth']))
+				}))
+          }), _tD(message.value), 5 /* TEXT, STYLE */)
+        : _cC("v-if", true)
+    ]),
+    isTrue(_ctx.borderBottom)
+      ? _cV(_component_up_line, _uM({
+          key: 0,
+          color: message.value != '' && unref(parentData)['errorType'] == 'border-bottom' ? unref(color)['error'] : unref(propsLine)['color'],
+          customStyle: `margin-top: ${message.value != '' && unref(parentData)['errorType'] == 'message' ? '5px' : 0}`
+        }), null, 8 /* PROPS */, ["color", "customStyle"])
+      : _cC("v-if", true)
+  ], 2 /* CLASS */)
+}
+}
+
+})
+export default __sfc__
+export type UpFormItemComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpFormItemUpFormItemStyles = [_uM([["up-form-item", _pS(_uM([["display", "flex"], ["flexDirection", "column"]]))], ["up-form-item__body", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["paddingTop", 10], ["paddingRight", 0], ["paddingBottom", 10], ["paddingLeft", 0]]))], ["up-form-item__body__left", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"]]))], ["up-form-item__body__left__content", _pS(_uM([["position", "relative"], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["paddingRight", "10rpx"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["up-form-item__body__left__content__icon", _pS(_uM([["marginRight", "8rpx"]]))], ["up-form-item__body__left__content__required", _pS(_uM([["position", "absolute"], ["left", -9], ["color", "#f56c6c"], ["lineHeight", "20px"], ["fontSize", 20], ["top", 3]]))], ["up-form-item__body__left__content__label", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["up-form-item__body__left__content__label__text", _pS(_uM([["color", "#303133"], ["fontSize", 15]]))], ["up-form-item__body__right", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["up-form-item__body__right__content", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["up-form-item__body__right__content__slot", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"]]))], ["up-form-item__body__right__content__icon", _pS(_uM([["marginLeft", "10rpx"], ["color", "#c0c4cc"], ["fontSize", "30rpx"]]))], ["up-form-item__body__right__message", _pS(_uM([["fontSize", 12], ["lineHeight", "12px"], ["color", "#f56c6c"]]))]])]

@@ -1,0 +1,185 @@
+import _easycom_up_icon from '@/uni_modules/uview-ultra/components/up-icon/up-icon.uvue'
+import type { PropType } from 'vue'
+import { computed, reactive } from 'vue';
+import defProps from './columnNotice';
+import { addUnit, error } from '../../libs/function/index';
+import { array as testArray } from '../../libs/function/test';
+
+// 定义属性
+import { watch } from 'vue';
+
+const __sfc__ = defineComponent({
+  __name: 'up-column-notice',
+  props: {
+    text: {
+		type: Array as PropType<string[]>,
+	    default: () : Array<string> => {
+		    return []
+	    }
+    },
+    icon: {
+        type: String,
+        default: () => defProps.getString('columnNotice.icon')
+    },
+    mode: {
+        type: String,
+        default: () => defProps.getString('columnNotice.mode')
+    },
+    color: {
+        type: String,
+        default: () => defProps.getString('columnNotice.color')
+    },
+    bgColor: {
+        type: String,
+        default: () => defProps.getString('columnNotice.bgColor')
+    },
+    fontSize: {
+        type: [String, Number],
+        default: () => defProps.getNumber('columnNotice.fontSize')
+    },
+    speed: {
+        type: [String, Number],
+        default: () => defProps.getNumber('columnNotice.speed')
+    },
+    step: {
+        type: Boolean,
+        default: () => defProps.getBoolean('columnNotice.step')
+    },
+    duration: {
+        type: [String, Number],
+        default: () => defProps.getNumber('columnNotice.duration')
+    },
+    disableTouch: {
+        type: Boolean,
+        default: () => defProps.getBoolean('columnNotice.disableTouch')
+    }
+},
+  emits: ['click', 'close'],
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+const props = __props;
+
+// 定义事件
+function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+__ins.emit(event, ...do_not_transform_spread)
+}
+
+// 响应式数据
+const index = ref(0)
+
+// 文字内容的样式
+const textStyle = computed(() => {
+    let style = {__$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-column-notice/up-column-notice.uvue", 120, 9),};
+    style['color'] = props.color;
+    style['fontSize'] = addUnit(props.fontSize);
+    return style;
+});
+
+// 垂直或者水平滚动
+const vertical = computed(() => {
+    if (props.mode == 'horizontal') return false;
+    else return true;
+});
+
+// 方法
+const noticeChange = (e: UniSwiperChangeEvent) => {
+    index.value = e.detail.current;
+};
+
+// 点击通告栏
+const clickHandler = () => {
+    emit('click', index.value);
+};
+
+// 点击关闭按钮
+const close = () => {
+    emit('close');
+};
+
+// 监听text的变化
+watch((): string[] => props.text, (newValue: string[]) => {
+    if (!testArray(newValue)) {
+        error('noticebar组件direction为column时，要求text参数为数组形式');
+    }
+}, {
+    immediate: true
+});
+
+return (): any | null => {
+
+const _component_up_icon = resolveEasyComponent("up-icon",_easycom_up_icon)
+
+  return _cE("view", _uM({
+    class: "up-notice",
+    onClick: clickHandler
+  }), [
+    renderSlot(_ctx.$slots, "icon", {}, (): any[] => [
+      isTrue(_ctx.icon)
+        ? _cE("view", _uM({
+            key: 0,
+            class: "up-notice__left-icon"
+          }), [
+            _cV(_component_up_icon, _uM({
+              name: _ctx.icon,
+              color: _ctx.color,
+              size: "19"
+            }), null, 8 /* PROPS */, ["name", "color"])
+          ])
+        : _cC("v-if", true)
+    ]),
+    _cE("swiper", _uM({
+      "disable-touch": _ctx.disableTouch,
+      vertical: _ctx.step ? false : true,
+      circular: "",
+      interval: _ctx.duration,
+      autoplay: true,
+      class: "up-notice__swiper",
+      onChange: noticeChange
+    }), [
+      _cE(Fragment, null, RenderHelpers.renderList(_ctx.text, (item, index, __index, _cached): any => {
+        return _cE("swiper-item", _uM({
+          key: index,
+          class: "up-notice__swiper__item"
+        }), [
+          _cE("text", _uM({
+            class: "up-notice__swiper__item__text up-line-1",
+            style: _nS([textStyle.value])
+          }), _tD(item), 5 /* TEXT, STYLE */)
+        ])
+      }), 128 /* KEYED_FRAGMENT */)
+    ], 40 /* PROPS, NEED_HYDRATION */, ["disable-touch", "vertical", "interval"]),
+    isTrue(['link', 'closable'].includes(_ctx.mode))
+      ? _cE("view", _uM({
+          key: 0,
+          class: "up-notice__right-icon"
+        }), [
+          _ctx.mode === 'link'
+            ? _cV(_component_up_icon, _uM({
+                key: 0,
+                name: "arrow-right",
+                size: 17,
+                color: _ctx.color
+              }), null, 8 /* PROPS */, ["color"])
+            : _cC("v-if", true),
+          _ctx.mode === 'closable'
+            ? _cV(_component_up_icon, _uM({
+                key: 1,
+                name: "close",
+                size: 16,
+                color: _ctx.color,
+                onClick: close
+              }), null, 8 /* PROPS */, ["color"])
+            : _cC("v-if", true)
+        ])
+      : _cC("v-if", true)
+  ])
+}
+}
+
+})
+export default __sfc__
+export type UpColumnNoticeComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpColumnNoticeUpColumnNoticeStyles = [_uM([["u-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-notice", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"]]))], ["up-notice__left-icon", _pS(_uM([["alignItems", "center"], ["marginRight", 5]]))], ["up-notice__right-icon", _pS(_uM([["marginLeft", 5], ["alignItems", "center"]]))], ["up-notice__swiper", _pS(_uM([["height", 16], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["up-notice__swiper__item", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["overflow", "hidden"]]))], ["up-notice__swiper__item__text", _pS(_uM([["fontSize", 14], ["color", "#f9ae3d"]]))]])]

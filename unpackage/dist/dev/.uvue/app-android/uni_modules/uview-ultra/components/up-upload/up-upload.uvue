@@ -1,0 +1,951 @@
+import type { PropType } from 'vue';
+import { chooseFile } from './utils.uts';
+import { mixinUpload } from './mixin.uts';
+import { mpMixin } from '../../libs/mixin/mpMixin.uts';
+import { mixin } from '../../libs/mixin/mixin.uts';
+import { addStyle, addUnit, toast } from '../../libs/function/index.uts';
+import { func as testFunc, promise as testPromise, image as testImage, video as testVideo } from '../../libs/function/test.uts';
+import { t as $t } from '../../libs/i18n/index.uts';
+/**
+ * upload 上传
+ * @description 该组件用于上传图片场景
+ * @tutorial https://uview-plus.jiangruyi.com/components/upload.html
+ * @property {String}			accept				接受的文件类型, 可选值为all media image file video （默认 'image' ）
+ * @property {String | Array}	capture				图片或视频拾取模式，当accept为image类型时设置capture可选额外camera可以直接调起摄像头（默认 ['album', 'camera'] ）
+ * @property {Array}			extension			选择文件的后缀名，暂只支持.zip、.png等，不支持application/msword等值
+ * @property {Boolean}			compressed			当accept为video时生效，是否压缩视频，默认为true（默认 true ）
+ * @property {String}			camera				当accept为video时生效，可选值为back或front（默认 'back' ）
+ * @property {Number}			maxDuration			当accept为video时生效，拍摄视频最长拍摄时间，单位秒（默认 60 ）
+ * @property {String}			uploadIcon			上传区域的图标，只能内置图标（默认 'camera-fill' ）
+ * @property {String}			uploadIconColor		上传区域的图标的字体颜色，只能内置图标（默认 #D3D4D6 ）
+ * @property {Boolean}			useBeforeRead		是否开启文件读取前事件（默认 false ）
+ * @property {Boolean}			previewFullImage	是否显示组件自带的图片预览功能（默认 true ）
+ * @property {String | Number}	maxCount			最大上传数量（默认 52 ）
+ * @property {Boolean}			disabled			是否启用（默认 false ）
+ * @property {String}			imageMode			预览上传的图片时的裁剪模式，和image组件mode属性一致（默认 'aspectFill' ）
+ * @property {String}			name				标识符，可以在回调函数的第二项参数中获取
+ * @property {Array}			sizeType			所选的图片的尺寸, 可选值为original compressed（默认 ['original', 'compressed'] ）
+ * @property {Boolean}			multiple			是否开启图片多选，部分安卓机型不支持 （默认 false ）
+ * @property {Boolean}			deletable			是否展示删除按钮（默认 true ）
+ * @property {String | Number}	maxSize				文件大小限制，单位为byte （默认 Number.MAX_VALUE ）
+ * @property {Array}			fileList			显示已上传的文件列表
+ * @property {String}			uploadText			上传区域的提示文字
+ * @property {String | Number}	width				内部预览图片区域和选择图片按钮的区域宽度（默认 80 ）
+ * @property {String | Number}	height				内部预览图片区域和选择图片按钮的区域高度（默认 80 ）
+ * @property {Object}			customStyle			组件的样式，对象形式
+ * @event {Function} afterRead		读取后的处理函数
+ * @event {Function} beforeRead		读取前的处理函数
+ * @event {Function} oversize		文件超出大小限制
+ * @event {Function} clickPreview	点击预览图片
+ * @event {Function} delete 		删除图片
+ * @example <up-upload :action="action" :fileList="fileList" ></up-upload>
+ */
+import { UPUploadListItem, UPUploadFileChoosed, UPUploadChooseFileOptions } from './types.uts';
+type UPUploadReadCallback = (file: Array<UPUploadFileChoosed | null>, detail: UTSJSONObject) => any;
+function createStringList(values: Array<string> = [] as Array<string>): Array<string> {
+    return values;
+}
+function createCaptureList(): Array<string> {
+    return ['album', 'camera'] as Array<string>;
+}
+function createFileList(): Array<UTSJSONObject> {
+    return [] as Array<UTSJSONObject>;
+}
+function createHeader(): UTSJSONObject {
+    return {} as UTSJSONObject;
+}
+const __sfc__ = defineComponent({
+    name: "up-upload",
+    mixins: [mpMixin, mixin, mixinUpload],
+    props: {
+        accept: {
+            type: String,
+            default: 'image'
+        },
+        extension: {
+            type: Array as PropType<Array<string>>,
+            default(): Array<string> {
+                return createStringList();
+            }
+        },
+        capture: {
+            type: [Array, String],
+            default(): Array<string> {
+                return createCaptureList();
+            }
+        },
+        compressed: {
+            type: Boolean,
+            default: true
+        },
+        camera: {
+            type: String,
+            default: 'back'
+        },
+        maxDuration: {
+            type: Number,
+            default: 60
+        },
+        uploadIcon: {
+            type: String,
+            default: 'camera-fill'
+        },
+        uploadIconColor: {
+            type: String,
+            default: '#D3D4D6'
+        },
+        useBeforeRead: {
+            type: Boolean,
+            default: false
+        },
+        afterRead: {
+            type: Function,
+            default: null
+        },
+        beforeRead: {
+            type: Function,
+            default: null
+        },
+        previewFullImage: {
+            type: Boolean,
+            default: true
+        },
+        maxCount: {
+            type: [String, Number],
+            default: 52
+        },
+        disabled: {
+            type: Boolean,
+            default: false
+        },
+        imageMode: {
+            type: String,
+            default: 'aspectFill'
+        },
+        name: {
+            type: String,
+            default: ''
+        },
+        sizeType: {
+            type: Array as PropType<Array<string>>,
+            default(): Array<string> {
+                return createStringList(['original', 'compressed'] as Array<string>);
+            }
+        },
+        multiple: {
+            type: Boolean,
+            default: false
+        },
+        deletable: {
+            type: Boolean,
+            default: true
+        },
+        maxSize: {
+            type: [String, Number],
+            default: Number.MAX_VALUE
+        },
+        fileList: {
+            type: Array as PropType<Array<UTSJSONObject>>,
+            default(): Array<UTSJSONObject> {
+                return createFileList();
+            }
+        },
+        uploadText: {
+            type: String,
+            default: ''
+        },
+        width: {
+            type: [String, Number],
+            default: 80
+        },
+        height: {
+            type: [String, Number],
+            default: 80
+        },
+        previewImage: {
+            type: Boolean,
+            default: true
+        },
+        autoDelete: {
+            type: Boolean,
+            default: false
+        },
+        autoUpload: {
+            type: Boolean,
+            default: false
+        },
+        autoUploadApi: {
+            type: String,
+            default: ''
+        },
+        autoUploadDriver: {
+            type: String,
+            default: ''
+        },
+        autoUploadAuthUrl: {
+            type: String,
+            default: ''
+        },
+        autoUploadHeader: {
+            type: Object as PropType<UTSJSONObject>,
+            default(): UTSJSONObject {
+                return createHeader();
+            }
+        },
+        getVideoThumb: {
+            type: Boolean,
+            default: false
+        },
+        customAfterAutoUpload: {
+            type: Boolean,
+            default: false
+        },
+        videoPreviewObjectFit: {
+            type: String,
+            default: 'cover'
+        }
+    },
+    data() {
+        return {
+            lists: [] as Array<UPUploadListItem>,
+            isInCount: true,
+            popupShow: false,
+            currentItemIndex: -1
+        };
+    },
+    watch: {
+        // 监听文件列表的变化，重新整理内部数据
+        fileList: {
+            handler() {
+                this.formatFileList();
+            },
+            immediate: true,
+            deep: true,
+        },
+        deletable(newVal) {
+            this.formatFileList();
+        },
+        maxCount(newVal) {
+            this.formatFileList();
+        },
+        accept(newVal) {
+            this.formatFileList();
+        },
+        popupShow(newVal) {
+            if (!isTruthy(newVal)) {
+                this.currentItemIndex = -1;
+            }
+        }
+    },
+    emits: ['error', 'beforeRead', 'oversize', 'afterRead', 'delete', 'clickPreview', 'update:fileList', 'afterAutoUpload'],
+    methods: {
+        t(key: string): string {
+            return $t(key, {} as UTSJSONObject);
+        },
+        addUnit(e: any): string {
+            return addUnit(e);
+        },
+        addStyle(e: any): any {
+            return addStyle(e);
+        },
+        videoErrorCallback() { },
+        loadedVideoMetadata(e: any) {
+            if (this.currentItemIndex < 0) {
+                return;
+            }
+            if (this.autoUploadDriver != 'local') {
+                return;
+            }
+            if (!this.getVideoThumb) {
+                return;
+            }
+            // 截取第一帧作为封面，oss等云存储场景直接使用拼接参数。
+            let w = this.lists[this.currentItemIndex].width;
+            let h = this.lists[this.currentItemIndex].height;
+            const dpr = uni.getSystemInfoSync().pixelRatio;
+            // TODO2026
+            // uni.createSelectorQuery().select('#myVideo').context(res => {
+            // 	console.log('select video', res)
+            // 	const myVideo = res.context
+            // 	uni.createSelectorQuery()
+            // 	  .select('#myCanvas')
+            // 	  .fields({ node: true, size: true })
+            // 	  .exec(([res]) => {
+            // 		console.log('select canvas', res)
+            // 		const ctx1 = res[0].node.getContext('2d')
+            // 		res[0].node.width = w * dpr
+            // 		res[0].node.height = h * dpr
+            // 		// Draw the first frame and export it as an image
+            // 		// myVideo.onPlay(() => {
+            // 			setTimeout(() => {
+            // 				captureFirstFrame()
+            // 			}, 500)
+            // 		// })
+            // 		const captureFirstFrame = () => {
+            // 			ctx1.drawImage(myVideo, 0, 0, w * dpr, h * dpr)
+            // 			wx.canvasToTempFilePath({
+            // 				canvas: res[0].node,
+            // 				success: (result) => {
+            // 					console.log('First frame image path:', result
+            // 						.tempFilePath)
+            // 					// Now you can use the image path (result.tempFilePath)
+            // 					this.fileList['currentItemIndex'].thumb = result.tempFilePath
+            // 				},
+            // 				fail: (err) => {
+            // 					console.error('Failed to export image:', err)
+            // 				}
+            // 			})
+            // 		}
+            // 		// Capture the first frame
+            // 		setInterval(() => {
+            // 			ctx1.drawImage(myVideo, 0, 0, w * dpr, h * dpr);
+            // 		}, 1000 / 24)
+            // 	}).exec()
+            // }).exec()
+        },
+        formatFileList() {
+            let fileList = this.fileList as UTSJSONObject[];
+            // @ts-ignore
+            let maxCount = parseInt(this.maxCount.toString());
+            let lists = [] as UPUploadListItem[];
+            fileList.forEach((item: UTSJSONObject) => {
+                const name = item['name'] != null
+                    ? item['name'] as string
+                    : item['url'] != null ? item['url'] as string : item['thumb'] as string;
+                let tmp = UTSJSONObject.assign(UTSJSONObject.assign({}, item), {
+                    // 如果item.url为本地选择的blob文件的话，无法判断其为video还是image，此处优先通过accept做判断处理
+                    isImage: item['name'] != null ? testImage(item['name'] as string) : (this.accept === 'image' ?? testImage(name)),
+                    isVideo: item['name'] != null ? testVideo(item['name'] as string) : (this.accept === 'video' ?? testVideo(name)),
+                    deletable: typeof item["deletable"] === 'boolean' ? item["deletable"] : this.deletable,
+                });
+                let tmpObj = (UTSAndroid.consoleDebugError(JSON.parse<UPUploadListItem>(JSON.stringify(tmp)), " at uni_modules/uview-ultra/components/up-upload/up-upload.uvue:515"));
+                if (tmpObj != null) {
+                    lists.push(tmpObj!);
+                }
+            });
+            this.lists = lists;
+            this.isInCount = lists.length < maxCount;
+        },
+        // @tap 事件处理器，不接收事件对象参数，内部透传到 chooseFile
+        onChooseTap(): void {
+            this.chooseFile({} as UTSJSONObject);
+        },
+        chooseFile(params: UTSJSONObject): boolean {
+            let maxCount = this.maxCount as number;
+            let multiple = this.multiple;
+            let lists = this.lists;
+            let disabled = this.disabled;
+            // if (disabled) return Promise.reject({});
+            if (disabled)
+                return false;
+            const chooseParams = UTSJSONObject.assign({
+                accept: this.accept,
+                extension: this.extension,
+                multiple: this.multiple,
+                capture: this.capture,
+                compressed: this.compressed,
+                maxDuration: this.maxDuration,
+                sizeType: this.sizeType,
+                camera: this.camera,
+            }, {
+                maxCount: maxCount - lists.length,
+                ...params
+            });
+            let chooseParamsObj = UTSAndroid.consoleDebugError(JSON.parseObject<UPUploadChooseFileOptions>(JSON.stringify(chooseParams)), " at uni_modules/uview-ultra/components/up-upload/up-upload.uvue:547");
+            if (chooseParamsObj != null) {
+                chooseFile(chooseParamsObj).then((res: Array<UPUploadFileChoosed | null>) => {
+                    const result = chooseParams['multiple'] != null && chooseParams['multiple'] != false ? res : res;
+                    this.onBeforeRead(result);
+                });
+            }
+            return true;
+            // return result
+            // .catch((error) => {
+            // 	this.$emit('error', error);
+            // });
+        },
+        // 文件读取之前
+        onBeforeRead(file: Array<UPUploadFileChoosed | null>) {
+            let beforeRead = this.beforeRead;
+            let useBeforeRead = this.useBeforeRead;
+            let res: any = file;
+            // beforeRead是否为一个方法
+            if (beforeRead != null && testFunc(beforeRead)) {
+                // 如果用户定义了此方法，则去执行此方法，并传入读取的文件回调
+                res = (beforeRead as UPUploadReadCallback)(file, this.getDetail(null));
+            }
+            if (useBeforeRead) {
+                this.$emit('beforeRead', UTSJSONObject.assign(UTSJSONObject.assign({
+                    file: this.convertFileToUTSJSON(file)
+                }, this.getDetail(null)), {
+                    callback: (ok: boolean) => {
+                        if (ok) {
+                            this.onAfterRead(file);
+                        }
+                    },
+                }));
+                return;
+            }
+            if (testPromise(res)) {
+                // res.then((data) => this.onAfterRead(data != null ? data : file));
+            }
+            else {
+                if (typeof res == 'boolean' && !(res as boolean)) {
+                    return;
+                }
+                const readFile = (res != null ? res : file) as Array<UPUploadFileChoosed | null>;
+                this.onAfterRead(readFile);
+            }
+        },
+        // 将 UPUploadFileChoosed 数组转换为 UTSJSONObject 数组，用于 emit 到父组件
+        convertFileToUTSJSON(file: Array<UPUploadFileChoosed | null>): Array<UTSJSONObject> {
+            const result: Array<UTSJSONObject> = [];
+            file.forEach((item: UPUploadFileChoosed | null) => {
+                if (item != null) {
+                    const obj = UTSAndroid.consoleDebugError(JSON.parseObject(JSON.stringify(item)), " at uni_modules/uview-ultra/components/up-upload/up-upload.uvue:600");
+                    if (obj != null) {
+                        result.push(obj);
+                    }
+                }
+            });
+            return result;
+        },
+        getDetail(index: number | null = null): UTSJSONObject {
+            const fileList = this.fileList as Array<UTSJSONObject>;
+            return {
+                name: this.name,
+                // @ts-ignore
+                index: index == null ? fileList.length : index,
+            };
+        },
+        async onAfterRead(file: Array<UPUploadFileChoosed | null>): Promise<void> {
+            let maxSize = this.maxSize as number;
+            let afterRead = this.afterRead;
+            const fileList = this.fileList as Array<UTSJSONObject>;
+            // const oversize = Array.isArray(file) ?
+            // 	file.some((item) => item.size > maxSize) :
+            // 	file.size > maxSize;
+            const even = (item: UPUploadFileChoosed | null): boolean => {
+                let tmp: number = (item != null && item.size != null) ? item.size! : 0;
+                return tmp > maxSize;
+            };
+            const oversize = file.some(even);
+            if (oversize) {
+                uni.showToast({
+                    title: $t("up.upload.sizeExceed", {} as UTSJSONObject)
+                });
+                this.$emit('oversize', UTSJSONObject.assign({
+                    file: this.convertFileToUTSJSON(file)
+                }, this.getDetail(null)));
+                return;
+            }
+            // @ts-ignore
+            let len = fileList.length;
+            if (this.autoUpload) {
+                // 当设置 mutiple 为 true 时, file 为数组格式，否则为对象格式
+                let lists = ([] as UPUploadFileChoosed[]).concat(file);
+                // @ts-ignore
+                let fileListLen = fileList.length;
+                lists.map((item: UPUploadFileChoosed) => {
+                    // @ts-ignore
+                    const itemJSON = UTSAndroid.consoleDebugError(JSON.parseObject(JSON.stringify(item)), " at uni_modules/uview-ultra/components/up-upload/up-upload.uvue:646");
+                    if (itemJSON != null) {
+                        fileList.push(UTSJSONObject.assign(itemJSON, {
+                            status: 'uploading',
+                            message: $t("up.upload.uploading", {} as UTSJSONObject),
+                            progress: 0
+                        } as UTSJSONObject));
+                    }
+                });
+                let that = this;
+                this.$emit('update:fileList', fileList);
+                for (let i = 0; i < lists.length; i++) {
+                    let j = i;
+                    let result = '';
+                    switch (this.autoUploadDriver) {
+                        case 'cos': // 腾讯云
+                            break;
+                        case 'kodo': // 七牛云
+                            break;
+                        case 'oss':
+                        case 'upload_oss':
+                            // 阿里云前端直传
+                            // 获取签名
+                            console.log("at uni_modules/uview-ultra/components/up-upload/up-upload.uvue:669");
+                            let formData = { __$originalPosition: new UTSSourceMapPosition("formData", "uni_modules/uview-ultra/components/up-upload/up-upload.uvue", 670, 13), } as UTSJSONObject;
+                            uni.request({
+                                url: this.autoUploadAuthUrl,
+                                method: 'GET',
+                                header: this.autoUploadHeader,
+                                data: {
+                                    filename: lists[j]['name'] as string
+                                },
+                                success: (ret: RequestSuccess<any>) => {
+                                    // console.log(ret);
+                                    let res0 = ret.data as UTSJSONObject;
+                                    if (res0['code'] as number == 200) {
+                                        // 路径 + 文件名 + 扩展名
+                                        // 不传递filename就要拼接key
+                                        // res0.data.params.key = res0.data.params.dir + res0.data.params.uniqidName + fileExt;
+                                        formData = res0!!.getAny('data.params') as UTSJSONObject;
+                                    }
+                                    else {
+                                        uni.showToast({
+                                            title: res0['msg'] as string,
+                                            duration: 1500
+                                        });
+                                        return;
+                                    }
+                                    if (res0!!.getString('data.params.host') != null) {
+                                        var uploadTask = uni.uploadFile({
+                                            url: res0!!.getString('data.params.host') ?? '',
+                                            filePath: lists[j].url,
+                                            name: 'file',
+                                            // fileType: 'video', // 仅支付宝小程序，且必填。
+                                            // header: header,
+                                            formData: formData,
+                                            success: (uploadFileRes: UploadFileSuccess) => {
+                                                let thumb = '';
+                                                let uploadRes = UTSAndroid.consoleDebugError(JSON.parseObject(uploadFileRes.data), " at uni_modules/uview-ultra/components/up-upload/up-upload.uvue:703");
+                                                result = res0!!.getString("data.params.host") + '/' + res0!!.getString("data.params.key");
+                                                if (that.accept === 'video' || testVideo(result)) {
+                                                    thumb = result + '?x-oss-process=video/snapshot,t_10000,m_fast';
+                                                }
+                                                if (that.customAfterAutoUpload) {
+                                                    that.emitAfterAutoUpload(uploadRes, len + j, result, thumb);
+                                                }
+                                                else {
+                                                    that.succcessUpload(len + j, result, thumb);
+                                                }
+                                            }
+                                        });
+                                        uploadTask.onProgressUpdate((res) => {
+                                            that.updateUpload(len + j, {
+                                                progress: res.progress
+                                            });
+                                            // console.log('上传进度' + res.progress);
+                                            // console.log('已经上传的数据长度' + res.totalBytesSent);
+                                            // console.log('预期需要上传的数据总长度' + res.totalBytesExpectedToSend);
+                                        });
+                                    }
+                                }
+                            });
+                            break;
+                        case 'local':
+                        default:
+                            // 服务器本机上传
+                            var uploadTask = uni.uploadFile({
+                                url: this.autoUploadApi,
+                                filePath: lists[j].url,
+                                name: 'file',
+                                // fileType: 'video', // 仅支付宝小程序，且必填。
+                                header: this.autoUploadHeader,
+                                success: (uploadFileRes: UploadFileSuccess) => {
+                                    let res0 = UTSAndroid.consoleDebugError(JSON.parseObject(uploadFileRes.data), " at uni_modules/uview-ultra/components/up-upload/up-upload.uvue:737");
+                                    if (that.customAfterAutoUpload) {
+                                        that.emitAfterAutoUpload(res0, len + j);
+                                    }
+                                    else {
+                                        if (res0!!['code'] as number != 200) {
+                                            uni.showToast({
+                                                title: res0!!['msg'] as string
+                                            });
+                                        }
+                                        else {
+                                            result = res0!!.getString('data.url') ?? '';
+                                            that.succcessUpload(len + j, result);
+                                        }
+                                    }
+                                }
+                            });
+                            uploadTask.onProgressUpdate((res) => {
+                                that.updateUpload(len + j, {
+                                    progress: res.progress
+                                });
+                                // console.log('上传进度' + res.progress);
+                                // console.log('已经上传的数据长度' + res.totalBytesSent);
+                                // console.log('预期需要上传的数据总长度' + res.totalBytesExpectedToSend);
+                            });
+                            break;
+                    }
+                }
+            }
+            else {
+                if (typeof afterRead === 'function') {
+                    ;
+                    (afterRead as UPUploadReadCallback)(file, this.getDetail(null));
+                }
+                this.$emit('afterRead', UTSJSONObject.assign({
+                    file: this.convertFileToUTSJSON(file)
+                }, this.getDetail(null)));
+            }
+        },
+        emitAfterAutoUpload(res: UTSJSONObject | null, index: number, defaultUrl: string = '', defaultThumb: string = '') {
+            const payload = UTSJSONObject.assign(res != null ? res : {} as UTSJSONObject, {
+                url: defaultUrl,
+                thumb: defaultThumb,
+                callback: (r: UTSJSONObject) => {
+                    const url = r.getString('url') ?? defaultUrl;
+                    if (url == '') {
+                        return;
+                    }
+                    const thumb = r.getString('thumb') ?? defaultThumb;
+                    this.succcessUpload(index, url, thumb);
+                }
+            });
+            this.$emit('afterAutoUpload', payload);
+        },
+        updateUpload(index: number, param: UTSJSONObject) {
+            const fileList = this.fileList as Array<UTSJSONObject>;
+            let item = fileList[index];
+            // @ts-ignore
+            fileList.splice(index, 1, {
+                ...item as UTSJSONObject,
+                // 注意这里不判断会出现succcessUpload先执行又被覆盖的问题
+                status: param['progress'] as number == 100 ? 'success' : 'uploading',
+                message: '',
+                progress: param['progress'] as number
+            });
+            this.$emit('update:fileList', fileList);
+        },
+        succcessUpload(index: number, url: string, thumb: string = '') {
+            const fileList = this.fileList as Array<UTSJSONObject>;
+            let item = fileList[index];
+            // @ts-ignore
+            fileList.splice(index, 1, {
+                ...item as UTSJSONObject,
+                status: 'success',
+                message: '',
+                url: url,
+                progress: 100,
+                thumb: thumb
+            });
+            this.$emit('update:fileList', fileList);
+        },
+        deleteItem(index: number) {
+            const fileList = this.fileList as Array<UTSJSONObject>;
+            if (this.autoDelete) {
+                // @ts-ignore
+                fileList.splice(index, 1);
+                this.$emit('update:fileList', fileList);
+            }
+            else {
+                this.$emit('delete', UTSJSONObject.assign(UTSJSONObject.assign({}, this.getDetail(index)), {
+                    file: fileList[index],
+                }));
+            }
+        },
+        // 预览图片
+        onPreviewImage(previewItem: UPUploadListItem, index: number) {
+            if (!previewItem.isImage || !this.previewFullImage)
+                return;
+            let current = 0;
+            const urls = [] as Array<string>;
+            let imageIndex = 0;
+            for (var i = 0; i < this.lists.length; i++) {
+                const item = this.lists[i];
+                if (item.isImage || (item.type != null && item.type === 'image')) {
+                    urls.push(item.url != null ? item.url as string : item.thumb as string);
+                    if (i === index) {
+                        current = imageIndex;
+                    }
+                    imageIndex += 1;
+                }
+            }
+            if (urls.length < 1) {
+                return;
+            }
+            uni.previewImage({
+                urls: urls,
+                current: current,
+                fail() {
+                    toast($t("up.upload.previewImageFail", {} as UTSJSONObject));
+                },
+            });
+        },
+        onPreviewVideo(previewItem: UPUploadListItem, index: number) {
+            if (!this.previewFullImage)
+                return;
+            let current = 0;
+            const sources = [] as Array<UTSJSONObject>;
+            let videoIndex = 0;
+            for (var i = 0; i < this.lists.length; i++) {
+                const item = this.lists[i];
+                if (item.isVideo || (item.type != null && item.type === 'video')) {
+                    // @ts-ignore
+                    sources.push(UTSJSONObject.assign(UTSJSONObject.assign({}, item), {
+                        type: 'video'
+                    }));
+                    if (i === index) {
+                        current = videoIndex;
+                    }
+                    videoIndex += 1;
+                }
+            }
+            if (sources.length < 1) {
+                return;
+            }
+            this.popupShow = true;
+            this.currentItemIndex = index;
+            console.log(this.lists[this.currentItemIndex], " at uni_modules/uview-ultra/components/up-upload/up-upload.uvue:880");
+        },
+        onClickPreview(item: UPUploadListItem, index: number) {
+            if (this.previewFullImage) {
+                switch (item.type) {
+                    case 'image':
+                        this.onPreviewImage(item, index);
+                        break;
+                    case 'video':
+                        this.onPreviewVideo(item, index);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            this.$emit('clickPreview', 
+            // @ts-ignore
+            UTSJSONObject.assign(UTSJSONObject.assign({}, item as UTSJSONObject), this.getDetail(index)));
+        }
+    }
+});
+export default __sfc__;
+function GenUniModulesUviewUltraComponentsUpUploadUpUploadRender(this: InstanceType<typeof __sfc__>): any | null {
+    const _ctx = this;
+    const _cache = this.$.renderCache;
+    const _component_up_icon = resolveEasyComponent("up-icon", _easycom_up_icon);
+    const _component_up_loading_icon = resolveEasyComponent("up-loading-icon", _easycom_up_loading_icon);
+    const _component_up_gap = resolveEasyComponent("up-gap", _easycom_up_gap);
+    const _component_video = resolveComponent("video");
+    const _component_up_popup = resolveEasyComponent("up-popup", _easycom_up_popup);
+    return _cE("view", _uM({
+        class: "up-upload",
+        style: _nS([_ctx.addStyle(_ctx.customStyle)])
+    }), [
+        _cE("view", _uM({ class: "up-upload__wrap" }), [
+            isTrue(_ctx.previewImage)
+                ? _cE(Fragment, _uM({ key: 0 }), RenderHelpers.renderList(_ctx.lists, (item, index, __index, _cached): any => {
+                    return _cE("view", _uM({
+                        class: "up-upload__wrap__preview",
+                        key: index
+                    }), [
+                        isTrue(item.isImage || (item.type != null && item.type === 'image'))
+                            ? _cE("image", _uM({
+                                key: 0,
+                                src: item.thumb != null ? item.thumb : item.url,
+                                mode: _ctx.imageMode,
+                                class: "up-upload__wrap__preview__image",
+                                onClick: () => { _ctx.onClickPreview(item, index); },
+                                style: _nS([_uM({
+                                        width: _ctx.addUnit(_ctx.width),
+                                        height: _ctx.addUnit(_ctx.height)
+                                    })])
+                            }), null, 12 /* STYLE, PROPS */, ["src", "mode", "onClick"])
+                            : isTrue((item.isVideo || (item.type != null && item.type === 'video')) && _ctx.getVideoThumb)
+                                ? _cE("view", _uM({
+                                    key: 1,
+                                    class: "up-upload__wrap__preview__video",
+                                    style: _nS(_uM({
+                                        width: _ctx.addUnit(_ctx.width),
+                                        height: _ctx.addUnit(_ctx.height)
+                                    }))
+                                }), [
+                                    isTrue(item.thumb)
+                                        ? _cE("image", _uM({
+                                            key: 0,
+                                            src: item.thumb,
+                                            mode: _ctx.imageMode,
+                                            class: "up-upload__wrap__preview__image",
+                                            onClick: () => { _ctx.onClickPreview(item, index); },
+                                            style: _nS([_uM({
+                                                    width: _ctx.addUnit(_ctx.width),
+                                                    height: _ctx.addUnit(_ctx.height)
+                                                })])
+                                        }), null, 12 /* STYLE, PROPS */, ["src", "mode", "onClick"])
+                                        : _cV(_component_up_icon, _uM({
+                                            key: 1,
+                                            color: "#80CBF9",
+                                            size: "26",
+                                            name: item.isVideo || (item.type != null && item.type === 'video') ? 'movie' : 'file-text'
+                                        }), null, 8 /* PROPS */, ["name"]),
+                                    item.status === 'success'
+                                        ? _cE("view", _uM({
+                                            key: 2,
+                                            class: "up-upload__wrap__play",
+                                            onClick: () => { _ctx.onClickPreview(item, index); }
+                                        }), [
+                                            renderSlot(_ctx.$slots, "playIcon"),
+                                            _ctx.$slots['playIcon'] == null
+                                                ? _cV(_component_up_icon, _uM({
+                                                    key: 0,
+                                                    class: "up-upload__wrap__play__icon",
+                                                    name: "play-right",
+                                                    size: "22px"
+                                                }))
+                                                : _cC("v-if", true)
+                                        ], 8 /* PROPS */, ["onClick"])
+                                        : _cC("v-if", true)
+                                ], 4 /* STYLE */)
+                                : _cE("view", _uM({
+                                    key: 2,
+                                    class: "up-upload__wrap__preview__other",
+                                    onClick: () => { _ctx.onClickPreview(item, index); },
+                                    style: _nS([_uM({
+                                            width: _ctx.addUnit(_ctx.width),
+                                            height: _ctx.addUnit(_ctx.height)
+                                        })])
+                                }), [
+                                    _cV(_component_up_icon, _uM({
+                                        color: "#80CBF9",
+                                        size: "26",
+                                        name: item.isVideo || (item.type != null && item.type === 'video') ? 'movie' : 'folder'
+                                    }), null, 8 /* PROPS */, ["name"]),
+                                    _cE("text", _uM({ class: "up-upload__wrap__preview__other__text" }), _tD(item.isVideo || (item.type != null && item.type === 'video') ? (item.name != null ? item.name : _ctx.$t("up.common.video")) : item.name != null ? item.name : _ctx.$t("up.common.file")), 1 /* TEXT */)
+                                ], 12 /* STYLE, PROPS */, ["onClick"]),
+                        isTrue(item.status === 'uploading' || item.status === 'failed')
+                            ? _cE("view", _uM({
+                                key: 3,
+                                class: "up-upload__status"
+                            }), [
+                                _cE("view", _uM({ class: "up-upload__status__icon" }), [
+                                    item.status === 'failed'
+                                        ? _cV(_component_up_icon, _uM({
+                                            key: 0,
+                                            name: "close-circle",
+                                            color: "#ffffff",
+                                            size: "25"
+                                        }))
+                                        : _cV(_component_up_loading_icon, _uM({
+                                            key: 1,
+                                            size: "22",
+                                            mode: "circle"
+                                        }))
+                                ]),
+                                isTrue(item.message)
+                                    ? _cE("text", _uM({
+                                        key: 0,
+                                        class: "up-upload__status__message"
+                                    }), _tD(item.message), 1 /* TEXT */)
+                                    : _cC("v-if", true),
+                                _cV(_component_up_gap, _uM({
+                                    class: "up-upload__progress",
+                                    height: "3px",
+                                    style: _nS(_uM({ width: (item.progress ?? 0) + '%' }))
+                                }), null, 8 /* PROPS */, ["style"])
+                            ])
+                            : _cC("v-if", true),
+                        isTrue(item.status !== 'uploading' && (_ctx.deletable || item.deletable))
+                            ? _cE("view", _uM({
+                                key: 4,
+                                class: "up-upload__deletable",
+                                onClick: withModifiers(() => { _ctx.deleteItem(index); }, ["stop"])
+                            }), [
+                                _cE("view", _uM({ class: "up-upload__deletable__icon" }), [
+                                    _cV(_component_up_icon, _uM({
+                                        name: "close",
+                                        color: "#ffffff",
+                                        size: "10"
+                                    }))
+                                ])
+                            ], 8 /* PROPS */, ["onClick"])
+                            : _cC("v-if", true),
+                        renderSlot(_ctx.$slots, "success", {}, (): any[] => [
+                            item.status === 'success'
+                                ? _cE("view", _uM({
+                                    key: 0,
+                                    class: "up-upload__success"
+                                }), [
+                                    _cE("view", _uM({ class: "up-upload__success__icon" }), [
+                                        _cV(_component_up_icon, _uM({
+                                            name: "checkmark",
+                                            color: "#ffffff",
+                                            size: "12"
+                                        }))
+                                    ])
+                                ])
+                                : _cC("v-if", true)
+                        ])
+                    ]);
+                }), 128 /* KEYED_FRAGMENT */)
+                : _cC("v-if", true),
+            isTrue(_ctx.isInCount)
+                ? _cE(Fragment, _uM({ key: 1 }), [
+                    _ctx.$slots['trigger'] != null
+                        ? _cE("view", _uM({
+                            key: 0,
+                            onClick: _ctx.onChooseTap
+                        }), [
+                            renderSlot(_ctx.$slots, "trigger")
+                        ], 8 /* PROPS */, ["onClick"])
+                        : isTrue(_ctx.$slots['trigger'] == null && (_ctx.$slots['default'] != null || _ctx.$slots['$default'] != null))
+                            ? _cE("view", _uM({
+                                key: 1,
+                                onClick: _ctx.onChooseTap
+                            }), [
+                                renderSlot(_ctx.$slots, "default")
+                            ], 8 /* PROPS */, ["onClick"])
+                            : _cE("view", _uM({
+                                key: 2,
+                                class: _nC(["up-upload__button", [_ctx.disabled ? 'up-upload__button--disabled' : '']]),
+                                "hover-class": !_ctx.disabled ? 'up-upload__button--hover' : '',
+                                "hover-stay-time": "150",
+                                onClick: _ctx.onChooseTap,
+                                style: _nS([_uM({
+                                        width: _ctx.addUnit(_ctx.width),
+                                        height: _ctx.addUnit(_ctx.height)
+                                    })])
+                            }), [
+                                _cV(_component_up_icon, _uM({
+                                    name: _ctx.uploadIcon,
+                                    size: "26",
+                                    color: _ctx.uploadIconColor
+                                }), null, 8 /* PROPS */, ["name", "color"]),
+                                isTrue(_ctx.uploadText)
+                                    ? _cE("text", _uM({
+                                        key: 0,
+                                        class: "up-upload__button__text"
+                                    }), _tD(_ctx.uploadText), 1 /* TEXT */)
+                                    : _cC("v-if", true)
+                            ], 14 /* CLASS, STYLE, PROPS */, ["hover-class", "onClick"])
+                ], 64 /* STABLE_FRAGMENT */)
+                : _cC("v-if", true)
+        ]),
+        _cE("canvas", _uM({
+            id: "myCanvas",
+            type: "2d",
+            style: _nS(_uM({ "width": "100px", "height": "150px", "display": "none" }))
+        }), null, 4 /* STYLE */),
+        _cV(_component_up_popup, _uM({
+            mode: "center",
+            show: _ctx.popupShow,
+            "onUpdate:show": ($event: boolean) => { (_ctx.popupShow) = $event; }
+        }), _uM({
+            default: withSlotCtx((): any[] => [
+                isTrue(_ctx.popupShow)
+                    ? _cV(_component_video, _uM({
+                        key: 0,
+                        id: "myVideo",
+                        src: _ctx.currentItemIndex >= 0 ? _ctx.lists[_ctx.currentItemIndex].url : '',
+                        onError: _ctx.videoErrorCallback,
+                        "show-center-play-btn": "",
+                        "object-fit": _ctx.videoPreviewObjectFit,
+                        "show-fullscreen-btn": "true",
+                        "enable-play-gesture": "",
+                        controls: "",
+                        autoplay: true,
+                        "auto-pause-if-open-native": "",
+                        todoloadedmetadata: "loadedVideoMetadata",
+                        "initial-time": 0.1
+                    }), null, 8 /* PROPS */, ["src", "onError", "object-fit"])
+                    : _cC("v-if", true)
+            ]),
+            _: 1 /* STABLE */
+        }), 8 /* PROPS */, ["show", "onUpdate:show"])
+    ], 4 /* STYLE */);
+}
+export type UpUploadComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpUploadUpUploadStyles = [_uM([["up-upload", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["up-upload__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["flexWrap", "wrap"]]))], ["up-upload__wrap__preview", _pS(_uM([["borderTopLeftRadius", 2], ["borderTopRightRadius", 2], ["borderBottomRightRadius", 2], ["borderBottomLeftRadius", 2], ["marginTop", 0], ["marginRight", 8], ["marginBottom", 8], ["marginLeft", 0], ["position", "relative"], ["overflow", "hidden"], ["display", "flex"], ["flexDirection", "row"]]))], ["up-upload__wrap__preview__image", _pS(_uM([["width", 80], ["height", 80]]))], ["up-upload__wrap__preview__video", _pS(_uM([["width", 80], ["height", 80], ["backgroundColor", "#f2f2f2"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["display", "flex"], ["flexDirection", "column"], ["justifyContent", "center"], ["alignItems", "center"]]))], ["up-upload__wrap__preview__other", _pS(_uM([["width", 80], ["height", 80], ["backgroundColor", "#f2f2f2"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["display", "flex"], ["flexDirection", "column"], ["justifyContent", "center"], ["alignItems", "center"]]))], ["up-upload__wrap__preview__video__text", _pS(_uM([["fontSize", 11], ["color", "#909193"], ["marginTop", 2]]))], ["up-upload__wrap__preview__other__text", _pS(_uM([["fontSize", 11], ["color", "#909193"], ["marginTop", 2]]))], ["up-upload__wrap__play", _pS(_uM([["position", "absolute"], ["top", 0], ["left", 0], ["bottom", 0], ["right", 0], ["display", "flex"], ["justifyContent", "center"], ["alignItems", "center"]]))], ["up-upload__wrap__play__icon", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 100], ["borderTopRightRadius", 100], ["borderBottomRightRadius", 100], ["borderBottomLeftRadius", 100], ["opacity", 0.8]]))], ["up-upload__deletable", _pS(_uM([["position", "absolute"], ["top", 0], ["right", 0], ["backgroundColor", "#373737"], ["height", 14], ["width", 14], ["display", "flex"], ["flexDirection", "row"], ["borderBottomLeftRadius", 100], ["alignItems", "center"], ["justifyContent", "center"], ["zIndex", 3]]))], ["up-upload__deletable__icon", _pS(_uM([["position", "absolute"], ["transform", "scale(0.7)"], ["top", 0], ["right", 0]]))], ["up-upload__success", _pS(_uM([["position", "absolute"], ["bottom", 0], ["right", 0], ["display", "flex"], ["flexDirection", "row"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "rgba(0,0,0,0)"], ["borderLeftColor", "rgba(0,0,0,0)"], ["borderBottomColor", "#5ac725"], ["borderRightColor", "#5ac725"], ["borderTopWidth", 9], ["borderRightWidth", 9], ["borderBottomWidth", 9], ["borderLeftWidth", 9], ["alignItems", "center"], ["justifyContent", "center"]]))], ["up-upload__success__icon", _pS(_uM([["position", "absolute"], ["transform", "scale(0.7)"], ["bottom", -10], ["right", -10]]))], ["up-upload__progress", _pS(_uM([["!backgroundColor", "var(--theme-color, #0957de)"], ["position", "absolute"], ["bottom", 0], ["left", 0]]))], ["up-upload__status", _pS(_uM([["position", "absolute"], ["top", 0], ["bottom", 0], ["left", 0], ["right", 0], ["backgroundColor", "rgba(0,0,0,0.5)"], ["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"], ["justifyContent", "center"]]))], ["up-upload__status__icon", _pS(_uM([["position", "relative"], ["zIndex", 1]]))], ["up-upload__status__message", _pS(_uM([["fontSize", 12], ["color", "#FFFFFF"], ["marginTop", 5]]))], ["up-upload__button", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"], ["justifyContent", "center"], ["width", 80], ["height", 80], ["backgroundColor", "#f4f5f7"], ["borderTopLeftRadius", 2], ["borderTopRightRadius", 2], ["borderBottomRightRadius", 2], ["borderBottomLeftRadius", 2], ["marginTop", 0], ["marginRight", 8], ["marginBottom", 8], ["marginLeft", 0], ["boxSizing", "border-box"]]))], ["up-upload__button__text", _pS(_uM([["fontSize", 11], ["color", "#909193"], ["marginTop", 2]]))], ["up-upload__button--hover", _pS(_uM([["backgroundColor", "#e6e7e9"]]))], ["up-upload__button--disabled", _pS(_uM([["opacity", 0.5]]))]])];
+import _easycom_up_icon from '@/uni_modules/uview-ultra/components/up-icon/up-icon.uvue';
+import _easycom_up_loading_icon from '@/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.uvue';
+import _easycom_up_gap from '@/uni_modules/uview-ultra/components/up-gap/up-gap.uvue';
+import _easycom_up_popup from '@/uni_modules/uview-ultra/components/up-popup/up-popup.uvue';
+//# sourceMappingURL=up-upload.uvue.map

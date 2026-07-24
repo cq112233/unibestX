@@ -50,13 +50,7 @@
 	import defProps from './calendar.uts';
 	let calendarProp = defProps['calendar'] as UTSJSONObject;
 	import {dayuts} from '@/uni_modules/lime-dayuts';
-	import { UPCalendarMonthsItemDate } from './types.uts'
-	type monthsItem = {
-	  top: number
-	  year: string 
-	  month: string 
-	  date: Array<UPCalendarMonthsItemDate>
-	}
+	import { UPCalendarMonthsItemDate, CalendarMonthItem } from './types.uts'
 	export default {
 		name: 'up-calendar-month',
 		mixins: [mpMixin, mixin],
@@ -73,7 +67,7 @@
 			},
 			// 月份数据
 			months: {
-				type: Array<monthsItem>,
+				type: Array<CalendarMonthItem>,
 				default: [] as any[]
 			},
 			// 日期选择类型
@@ -158,7 +152,7 @@
 				width: 0,
 				// 当前选中的日期item
 				item: null as UPCalendarMonthsItemDate | null,
-				monthsInner: [] as any[],
+				monthsInner: [] as Array<CalendarMonthItem>,
 				selected: [] as Array<string>
 			}
 		},
@@ -323,7 +317,7 @@
 		},
 		emits: ['monthSelected', 'updateMonthTop'],
 		methods: {
-			getMonthTitle(item: any): string {
+			getMonthTitle(item: CalendarMonthItem): string {
 				return formatMonthTitle(item.year, item.month)
 			},
 			isRangeMiddle(item: UPCalendarMonthsItemDate): boolean {
@@ -382,7 +376,7 @@
 			},
 			getMonthRect() {
 				// 获取每个月份数据的尺寸，用于父组件在scroll-view滚动事件中，监听当前滚动到了第几个月份
-				const promiseAllArr: Array<Promise<NodeInfo>> = this.months.map((item: monthsItem, index):Promise<NodeInfo> => {
+				const promiseAllArr: Array<Promise<NodeInfo>> = this.months.map((item: CalendarMonthItem, index):Promise<NodeInfo> => {
 					return this.getMonthRectByPromise(`up-calendar-month-${index}`)
 				})
 				// 一次性返回

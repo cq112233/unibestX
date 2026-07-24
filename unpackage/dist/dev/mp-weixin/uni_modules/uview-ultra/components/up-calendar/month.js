@@ -12,31 +12,6 @@ require("../../../lime-dayuts/common/use.js");
 require("../../../lime-dayuts/utssdk/interface.js");
 require("./types.js");
 let calendarProp = uni_modules_uviewUltra_components_upCalendar_calendar.defProps["calendar"];
-class monthsItem extends common_vendor.UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          top: { type: Number, optional: false },
-          year: { type: String, optional: false },
-          month: { type: String, optional: false },
-          date: { type: "Unknown", optional: false }
-        };
-      },
-      name: "monthsItem"
-    };
-  }
-  constructor(options, metadata = monthsItem.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.top = this.__props__.top;
-    this.year = this.__props__.year;
-    this.month = this.__props__.month;
-    this.date = this.__props__.date;
-    delete this.__props__;
-  }
-}
 const _sfc_main = common_vendor.defineComponent({
   name: "up-calendar-month",
   mixins: [uni_modules_uviewUltra_libs_mixin_mpMixin.mpMixin, uni_modules_uviewUltra_libs_mixin_mixin.mixin],
@@ -300,7 +275,7 @@ const _sfc_main = common_vendor.defineComponent({
   },
   emits: ["monthSelected", "updateMonthTop"],
   methods: {
-    getMonthTitle(item = null) {
+    getMonthTitle(item) {
       return uni_modules_uviewUltra_libs_i18n_index.formatMonthTitle(item.year, item.month);
     },
     isRangeMiddle(item) {

@@ -1,0 +1,124 @@
+import { mpMixin } from '../../libs/mixin/mpMixin.uts';
+import { mixin } from '../../libs/mixin/mixin.uts';
+import { addUnit, addStyle, sleep, range, upGetRect } from '../../libs/function/index.uts';
+import defProps from './lineProgress.uts';
+let crtProp = defProps['lineProgress'] as UTSJSONObject;
+function normalizeNumber(value: any | null, defaultValue: number = 0): number {
+    if (typeof value === 'number') {
+        return value as number;
+    }
+    if (value == null) {
+        return defaultValue;
+    }
+    const parsed = parseFloat(value.toString());
+    return isNaN(parsed) ? defaultValue : parsed;
+}
+const __sfc__ = defineComponent({
+    name: 'up-line-progress',
+    mixins: [mpMixin, mixin],
+    props: {
+        activeColor: {
+            type: String,
+            default: crtProp['activeColor']
+        },
+        inactiveColor: {
+            type: String,
+            default: crtProp['inactiveColor']
+        },
+        percentage: {
+            type: [String, Number],
+            default: crtProp['percentage']
+        },
+        showText: {
+            type: Boolean,
+            default: crtProp['showText']
+        },
+        height: {
+            type: [String, Number],
+            default: crtProp['height']
+        }
+    },
+    data() {
+        return {
+            lineWidth: '0px'
+        };
+    },
+    watch: {
+        percentage() {
+            this.resizeProgressWidth();
+        },
+        height() {
+            this.resizeProgressWidth();
+        }
+    },
+    computed: {
+        percentageValue(): number {
+            return normalizeNumber(this.percentage, 0);
+        },
+        innerPercentage(): number {
+            return range(0, 100, this.percentageValue);
+        },
+        backgroundStyle(): UTSJSONObject {
+            return {
+                backgroundColor: this.inactiveColor,
+                height: addUnit(this.height)
+            };
+        },
+        progressStyle(): UTSJSONObject {
+            return {
+                width: this.lineWidth,
+                backgroundColor: this.activeColor,
+                height: addUnit(this.height)
+            };
+        }
+    },
+    mounted() {
+        this.init();
+    },
+    methods: {
+        addStyle(e: any): any {
+            return addStyle(e);
+        },
+        init() {
+            sleep(20).then(() => {
+                this.resizeProgressWidth();
+            });
+        },
+        resizeProgressWidth() {
+            upGetRect('.up-line-progress__background', false, this).then((size: NodeInfo) => {
+                const width = size.width != null ? size.width! : 0;
+                this.lineWidth = (width * this.innerPercentage / 100).toString(10) + 'px';
+            });
+        }
+    }
+});
+export default __sfc__;
+function GenUniModulesUviewUltraComponentsUpLineProgressUpLineProgressRender(this: InstanceType<typeof __sfc__>): any | null {
+    const _ctx = this;
+    const _cache = this.$.renderCache;
+    return _cE("view", _uM({
+        class: "up-line-progress",
+        style: _nS([_ctx.addStyle(_ctx.customStyle)])
+    }), [
+        _cE("view", _uM({
+            class: "up-line-progress__background",
+            style: _nS([_ctx.backgroundStyle])
+        }), null, 4 /* STYLE */),
+        _cE("view", _uM({
+            class: "up-line-progress__line",
+            style: _nS([_ctx.progressStyle])
+        }), [
+            renderSlot(_ctx.$slots, "default", {}, (): any[] => [
+                isTrue(_ctx.showText && _ctx.percentageValue >= 10)
+                    ? _cE("text", _uM({
+                        key: 0,
+                        class: "up-line-progress__text"
+                    }), _tD(_ctx.innerPercentage + '%'), 1 /* TEXT */)
+                    : _cC("v-if", true)
+            ])
+        ], 4 /* STYLE */)
+    ], 4 /* STYLE */);
+}
+export type UpLineProgressComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpLineProgressUpLineProgressStyles = [_uM([["u-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-line-progress", _pS(_uM([["alignItems", "stretch"], ["position", "relative"], ["display", "flex"], ["flexDirection", "row"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["overflow", "hidden"], ["borderTopLeftRadius", 100], ["borderTopRightRadius", 100], ["borderBottomRightRadius", 100], ["borderBottomLeftRadius", 100]]))], ["up-line-progress__background", _pS(_uM([["backgroundColor", "#ececec"], ["borderTopLeftRadius", 100], ["borderTopRightRadius", 100], ["borderBottomRightRadius", 100], ["borderBottomLeftRadius", 100], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["up-line-progress__line", _pS(_uM([["position", "absolute"], ["top", 0], ["left", 0], ["bottom", 0], ["alignItems", "center"], ["display", "flex"], ["flexDirection", "row"], ["borderTopLeftRadius", 100], ["borderTopRightRadius", 100], ["borderBottomRightRadius", 100], ["borderBottomLeftRadius", 100], ["transitionProperty", "width"], ["transitionDuration", "0.5s"], ["transitionTimingFunction", "ease"], ["justifyContent", "flex-end"]]))], ["up-line-progress__text", _pS(_uM([["fontSize", 10], ["textAlign", "right"], ["color", "#FFFFFF"], ["marginRight", 5], ["transform", "scale(0.9)"]]))], ["@TRANSITION", _uM([["up-line-progress__line", _uM([["property", "width"], ["duration", "0.5s"], ["timingFunction", "ease"]])]])]])];
+//# sourceMappingURL=up-line-progress.uvue.map
