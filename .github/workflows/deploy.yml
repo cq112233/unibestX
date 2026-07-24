@@ -1,8 +1,11 @@
 name: Deploy Web and Docs to Pages
 
+# 仅 main 分支推送才触发，gh-pages 分支变动完全不会触发任何工作流
 on:
   push:
-    branches: [main]
+    branches: [ main ]
+    branches-ignore:
+      - gh-pages
 
 permissions:
   contents: write
@@ -11,41 +14,45 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout 拉取仓库代码
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup pnpm
+      - name: 安装 pnpm
         uses: pnpm/action-setup@v3
         with:
           version: 9
 
-      - name: Setup Node
+      - name: 配置 Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
 
-      - name: Install dependencies
+      - name: 安装项目依赖
         run: pnpm install
 
-      # 仅打包文档，删掉了H5打包步骤 pnpm run build:h5
-      - name: Build VitePress Docs
+      # 只打包 VitePress 文档，不再执行 H5 打包命令 build:h5
+      - name: 打包文档站点
         run: pnpm run docs:build
 
-      # 整合文件：直接拷贝仓库里已上传完毕的H5打包资源
-      - name: Prepare Deployment Directory
+      # 整合文件：读取仓库内已经上传好的 H5 打包资源 + 刚打包的文档
+      - name: 整理部署目录文件
         run: |
           mkdir -p ./dist_deploy
-          # 读取仓库内已经存在的 unpackage/dist/build/web/ H5文件，不再现场构建
+          # 拷贝本地已提交的H5页面至部署根目录
           cp -r ./unpackage/dist/build/web/* ./dist_deploy/
+          # 文档放到 docs 子文件夹
           mkdir -p ./dist_deploy/docs
           cp -r ./docs/.vitepress/dist/* ./dist_deploy/docs/
+          # 必须创建 .nojekyll 关闭Jekyll渲染，避免下划线静态资源丢失
           touch ./dist_deploy/.nojekyll
 
-      - name: Deploy to gh-pages
+      # 推送静态文件到 gh-pages 分支
+      - name: 部署至 GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist_deploy
+          # 移除 force_orphan: true，防止每次清空分支造成CDN缓存异常
