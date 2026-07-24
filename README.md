@@ -30,9 +30,9 @@
 
 `unibestX` —— 最好的 `uni-app X` 开发模板，由 `uni-app X` + `Vue3` + `UTS` + `Vite5` + `UnoCSS` + `uview-ultra` + `z-paging-x` 构成，使用了下一代 uni-app 原生开发技术栈，通过 `HBuilderX` 运行 `Android`、`iOS`、`鸿蒙`、`H5` 和 `小程序` 等多端平台。
 
-👉 **在线 H5 演示体验**：[https://cq112233.github.io/unibestX/](https://cq112233.github.io/unibestX/) （📱 **手机扫码体验**👇）
+👉 **在线 H5 演示体验**：[http://101.43.51.47:8095/#/](http://101.43.51.47:8095/#/) （📱 **手机扫码体验**👇）
 
-<img src="static/qr-code.png" width="160" alt="H5 演示二维码" />
+<img src="static/qr-code2.png" width="160" alt="H5 演示二维码" />
 
 📖 **官方文档地址**：[https://cq112233.github.io/unibestX/docs/](https://cq112233.github.io/unibestX/docs/)
 🐙 **GitHub 仓库地址**：[https://github.com/cq112233/unibestX](https://github.com/cq112233/unibestX)
