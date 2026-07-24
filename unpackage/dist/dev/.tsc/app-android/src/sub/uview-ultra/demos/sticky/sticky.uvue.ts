@@ -3,7 +3,7 @@ import _easycom_up_button from '@/uni_modules/uview-ultra/components/up-button/u
 import _easycom_up_sticky from '@/uni_modules/uview-ultra/components/up-sticky/up-sticky.uvue'
 import AppKu from '@/App.ku.uvue'
 import LayoutComponent from '@/src/layouts/default.uvue'
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 import { safeAreaInsets, systemInfo } from '@/src/utils/systemInfo'
 
 

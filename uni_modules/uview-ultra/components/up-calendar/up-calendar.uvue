@@ -110,7 +110,7 @@
 import uHeader from './header.uvue'
 import { UPCalendarMonthsItemDate } from './types.uts'
 import uMonth, { monthsItem } from './month.uvue'
-import { propsCalendar } from './props'
+import { propsCalendar } from './props.uts'
 import util from './util'
 import {dayuts} from '@/uni_modules/lime-dayuts';
 import { t as $t } from '../../libs/i18n/index.uts'
@@ -326,6 +326,11 @@ export default {
 		showToday: {
 			type: Boolean,
 			default: calendarProp['showToday']
+		},
+		// 是否为iPhoneX留出底部安全距离
+		safeAreaInsetBottom: {
+			type: Boolean,
+			default: (calendarProp['safeAreaInsetBottom'] ?? true) as boolean
 		}
 	},
 	data() {

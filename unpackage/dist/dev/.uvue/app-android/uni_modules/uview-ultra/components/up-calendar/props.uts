@@ -158,6 +158,11 @@ export const propsCalendar = defineMixin({
         showToday: {
             type: Boolean,
             default: calendarProp['showToday']
+        },
+        // 是否为iPhoneX留出底部安全距离
+        safeAreaInsetBottom: {
+            type: Boolean,
+            default: (calendarProp['safeAreaInsetBottom'] ?? true) as boolean
         }
     }
 });

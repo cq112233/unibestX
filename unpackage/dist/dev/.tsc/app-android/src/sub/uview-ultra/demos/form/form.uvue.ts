@@ -52,7 +52,7 @@ const formModel2 = reactive({
   detail: ''
 })
 
-const formRules = { __$originalPosition: new UTSSourceMapPosition("formRules", "src/sub/uview-ultra/demos/form/form.uvue", 236, 7), 
+const formRules = { __$originalPosition: new UTSSourceMapPosition("formRules", "src/sub/uview-ultra/demos/form/form.uvue", 238, 7), 
   name: [
     {
       required: true,
@@ -102,9 +102,9 @@ function submitForm() {
         title: '验证通过，提交成功！',
         icon: 'success',
       })
-      console.log('提交的数据：', formModel, " at src/sub/uview-ultra/demos/form/form.uvue:286")
+      console.log('提交的数据：', formModel, " at src/sub/uview-ultra/demos/form/form.uvue:288")
     }).catch((err: any | null) => {
-      console.log('验证失败:', err, " at src/sub/uview-ultra/demos/form/form.uvue:288")
+      console.log('验证失败:', err, " at src/sub/uview-ultra/demos/form/form.uvue:290")
       uni.showToast({
         title: '请检查必填项',
         icon: 'error',
@@ -265,355 +265,358 @@ const _component_up_action_sheet = resolveEasyComponent("up-action-sheet",_easyc
               "safe-area-inset-top": true,
               "bg-color": "#ffffff"
             })),
-            _cE("view", _uM({ class: "demo-block" }), [
-              _cV(_component_up_form, _uM({
-                ref_key: "uForm",
-                ref: uForm,
-                model: formModel,
-                rules: formRules,
-                "label-width": "90px",
-                "error-type": "toast"
-              }), _uM({
-                default: withSlotCtx((): any[] => [
-                  _cV(_component_up_form_item, _uM({
-                    label: "姓名",
-                    prop: "name",
-                    "border-bottom": true,
-                    required: ""
-                  }), _uM({
-                    default: withSlotCtx((): any[] => [
-                      _cV(_component_up_input, _uM({
-                        modelValue: formModel.name,
-                        "onUpdate:modelValue": $event => {(formModel.name) = $event},
-                        placeholder: "请输入姓名",
-                        border: "none",
-                        clearable: ""
-                      }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
-                    ]),
-                    _: 1 /* STABLE */
-                  })),
-                  _cV(_component_up_form_item, _uM({
-                    label: "性别",
-                    prop: "gender",
-                    "border-bottom": true,
-                    onClick: () => {genderActionShow.value = true},
-                    required: ""
-                  }), _uM({
-                    right: withSlotCtx((): any[] => [
-                      _cV(_component_up_icon, _uM({
-                        name: "arrow-right",
-                        color: "#c0c4cc",
-                        size: "16"
-                      }))
-                    ]),
-                    default: withSlotCtx((): any[] => [
-                      _cV(_component_up_input, _uM({
-                        modelValue: formModel.gender,
-                        "onUpdate:modelValue": $event => {(formModel.gender) = $event},
-                        disabled: "",
-                        "disabled-color": "#ffffff",
-                        placeholder: "请选择性别",
-                        border: "none"
-                      }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
-                    ]),
-                    _: 1 /* STABLE */
-                  }), 8 /* PROPS */, ["onClick"]),
-                  _cV(_component_up_form_item, _uM({
-                    label: "出生日期",
-                    prop: "birthday",
-                    "border-bottom": true,
-                    onClick: () => {datetimePickerShow.value = true},
-                    required: ""
-                  }), _uM({
-                    right: withSlotCtx((): any[] => [
-                      _cV(_component_up_icon, _uM({
-                        name: "arrow-right",
-                        color: "#c0c4cc",
-                        size: "16"
-                      }))
-                    ]),
-                    default: withSlotCtx((): any[] => [
-                      _cV(_component_up_input, _uM({
-                        modelValue: formModel.birthday,
-                        "onUpdate:modelValue": $event => {(formModel.birthday) = $event},
-                        disabled: "",
-                        "disabled-color": "#ffffff",
-                        placeholder: "请选择出生日期",
-                        border: "none"
-                      }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
-                    ]),
-                    _: 1 /* STABLE */
-                  }), 8 /* PROPS */, ["onClick"]),
-                  _cV(_component_up_form_item, _uM({
-                    label: "国籍",
-                    prop: "country",
-                    "border-bottom": true,
-                    onClick: () => {pickerShow.value = true}
-                  }), _uM({
-                    right: withSlotCtx((): any[] => [
-                      _cV(_component_up_icon, _uM({
-                        name: "arrow-right",
-                        color: "#c0c4cc",
-                        size: "16"
-                      }))
-                    ]),
-                    default: withSlotCtx((): any[] => [
-                      _cV(_component_up_input, _uM({
-                        modelValue: formModel.country,
-                        "onUpdate:modelValue": $event => {(formModel.country) = $event},
-                        disabled: "",
-                        "disabled-color": "#ffffff",
-                        placeholder: "请选择国籍",
-                        border: "none"
-                      }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
-                    ]),
-                    _: 1 /* STABLE */
-                  }), 8 /* PROPS */, ["onClick"]),
-                  _cV(_component_up_form_item, _uM({
-                    label: "行程时间",
-                    prop: "stayTime",
-                    "border-bottom": true,
-                    onClick: () => {calendarShow.value = true}
-                  }), _uM({
-                    right: withSlotCtx((): any[] => [
-                      _cV(_component_up_icon, _uM({
-                        name: "arrow-right",
-                        color: "#c0c4cc",
-                        size: "16"
-                      }))
-                    ]),
-                    default: withSlotCtx((): any[] => [
-                      _cV(_component_up_input, _uM({
-                        modelValue: formModel.stayTime,
-                        "onUpdate:modelValue": $event => {(formModel.stayTime) = $event},
-                        disabled: "",
-                        "disabled-color": "#ffffff",
-                        placeholder: "请选择日期范围",
-                        border: "none"
-                      }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
-                    ]),
-                    _: 1 /* STABLE */
-                  }), 8 /* PROPS */, ["onClick"]),
-                  _cV(_component_up_form_item, _uM({
-                    label: "水果最爱",
-                    prop: "fruit",
-                    "border-bottom": true
-                  }), _uM({
-                    default: withSlotCtx((): any[] => [
-                      _cV(_component_up_radio_group, _uM({
-                        modelValue: formModel.fruit,
-                        "onUpdate:modelValue": $event => {(formModel.fruit) = $event},
-                        placement: "row"
-                      }), _uM({
-                        default: withSlotCtx((): any[] => [
-                          _cV(_component_up_radio, _uM({
-                            name: "apple",
-                            label: "苹果"
-                          })),
-                          _cE("view", _uM({ class: "w-10px" })),
-                          _cV(_component_up_radio, _uM({
-                            name: "banana",
-                            label: "香蕉"
-                          })),
-                          _cE("view", _uM({ class: "w-10px" })),
-                          _cV(_component_up_radio, _uM({
-                            name: "orange",
-                            label: "橘子"
-                          }))
-                        ]),
-                        _: 1 /* STABLE */
-                      }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
-                    ]),
-                    _: 1 /* STABLE */
-                  })),
-                  _cV(_component_up_form_item, _uM({
-                    label: "兴趣爱好",
-                    prop: "hobbies",
-                    "border-bottom": true
-                  }), _uM({
-                    default: withSlotCtx((): any[] => [
-                      _cV(_component_up_checkbox_group, _uM({
-                        modelValue: formModel.hobbies,
-                        "onUpdate:modelValue": $event => {(formModel.hobbies) = $event},
-                        placement: "row"
-                      }), _uM({
-                        default: withSlotCtx((): any[] => [
-                          _cV(_component_up_checkbox, _uM({
-                            name: "reading",
-                            label: "阅读"
-                          })),
-                          _cE("view", _uM({ class: "w-10px" })),
-                          _cV(_component_up_checkbox, _uM({
-                            name: "sports",
-                            label: "运动"
-                          })),
-                          _cE("view", _uM({ class: "w-10px" })),
-                          _cV(_component_up_checkbox, _uM({
-                            name: "music",
-                            label: "音乐"
-                          }))
-                        ]),
-                        _: 1 /* STABLE */
-                      }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
-                    ]),
-                    _: 1 /* STABLE */
-                  })),
-                  _cV(_component_up_form_item, _uM({
-                    label: "通知开关",
-                    prop: "notification",
-                    "border-bottom": true
-                  }), _uM({
-                    default: withSlotCtx((): any[] => [
-                      _cV(_component_up_switch, _uM({
-                        modelValue: formModel.notification,
-                        "onUpdate:modelValue": $event => {(formModel.notification) = $event},
-                        "active-color": "#2979ff"
-                      }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
-                    ]),
-                    _: 1 /* STABLE */
-                  })),
-                  _cV(_component_up_form_item, _uM({
-                    label: "服务评分",
-                    prop: "rate",
-                    "border-bottom": true
-                  }), _uM({
-                    default: withSlotCtx((): any[] => [
-                      _cV(_component_up_rate, _uM({
-                        modelValue: formModel.rate,
-                        "onUpdate:modelValue": $event => {(formModel.rate) = $event},
-                        count: 5
-                      }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
-                    ]),
-                    _: 1 /* STABLE */
-                  })),
-                  _cV(_component_up_form_item, _uM({
-                    label: "购买数量",
-                    prop: "count",
-                    "border-bottom": true
-                  }), _uM({
-                    default: withSlotCtx((): any[] => [
-                      _cV(_component_up_number_box, _uM({
-                        modelValue: formModel.count,
-                        "onUpdate:modelValue": $event => {(formModel.count) = $event},
-                        min: 1,
-                        max: 100
-                      }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
-                    ]),
-                    _: 1 /* STABLE */
-                  })),
-                  _cV(_component_up_form_item, _uM({
-                    label: "满意度",
-                    prop: "satisfaction",
-                    "border-bottom": true
-                  }), _uM({
-                    default: withSlotCtx((): any[] => [
-                      _cV(_component_up_slider, _uM({
-                        modelValue: formModel.satisfaction,
-                        "onUpdate:modelValue": $event => {(formModel.satisfaction) = $event},
-                        min: 0,
-                        max: 100,
-                        "show-value": true,
-                        style: _nS(_uM({"width":"100%"}))
-                      }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue", "style"])
-                    ]),
-                    _: 1 /* STABLE */
-                  })),
-                  _cV(_component_up_form_item, _uM({
-                    label: "个人简介",
-                    prop: "intro",
-                    "border-bottom": true,
-                    "label-position": "top"
-                  }), _uM({
-                    default: withSlotCtx((): any[] => [
-                      _cV(_component_up_textarea, _uM({
-                        modelValue: formModel.intro,
-                        "onUpdate:modelValue": $event => {(formModel.intro) = $event},
-                        placeholder: "请输入个人简介",
-                        count: "",
-                        maxlength: 100
-                      }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
-                    ]),
-                    _: 1 /* STABLE */
-                  })),
-                  _cV(_component_up_form_item, _uM({
-                    label: "相关照片",
-                    prop: "photos",
-                    "border-bottom": true,
-                    "label-position": "top"
-                  }), _uM({
-                    default: withSlotCtx((): any[] => [
-                      _cV(_component_up_upload, _uM({
-                        "file-list": uploadList.value,
-                        multiple: true,
-                        "max-count": 3,
-                        width: "80px",
-                        height: "80px",
-                        onAfterRead: onUploadAfterRead,
-                        onDelete: onUploadDelete
-                      }), null, 8 /* PROPS */, ["file-list"])
-                    ]),
-                    _: 1 /* STABLE */
-                  }))
-                ]),
-                _: 1 /* STABLE */
-              }), 8 /* PROPS */, ["model"])
-            ]),
-            _cE("view", _uM({ class: "demo-block mt-12px" }), [
-              _cE("text", _uM({ class: "demo-label" }), "标签上方对齐"),
-              _cV(_component_up_form, _uM({
-                model: formModel2,
-                "label-position": "top",
-                "label-width": "100px"
-              }), _uM({
-                default: withSlotCtx((): any[] => [
-                  _cV(_component_up_form_item, _uM({
-                    label: "活动名称",
-                    prop: "name",
-                    "border-bottom": true
-                  }), _uM({
-                    default: withSlotCtx((): any[] => [
-                      _cV(_component_up_input, _uM({
-                        modelValue: formModel2.name,
-                        "onUpdate:modelValue": $event => {(formModel2.name) = $event},
-                        placeholder: "请输入活动名称",
-                        border: "none"
-                      }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
-                    ]),
-                    _: 1 /* STABLE */
-                  })),
-                  _cV(_component_up_form_item, _uM({
-                    label: "活动详情",
-                    prop: "detail",
-                    "border-bottom": true
-                  }), _uM({
-                    default: withSlotCtx((): any[] => [
-                      _cV(_component_up_textarea, _uM({
-                        modelValue: formModel2.detail,
-                        "onUpdate:modelValue": $event => {(formModel2.detail) = $event},
-                        placeholder: "请输入活动详情",
-                        border: "none"
-                      }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
-                    ]),
-                    _: 1 /* STABLE */
-                  }))
-                ]),
-                _: 1 /* STABLE */
-              }), 8 /* PROPS */, ["model"])
-            ]),
-            _cE("view", _uM({ class: "p-16px mt-20px flex-row justify-between" }), [
-              _cE("view", _uM({ class: "flex-1 mr-10px" }), [
-                _cV(_component_up_button, _uM({
-                  type: "primary",
-                  text: "提交表单",
-                  onClick: submitForm
-                }))
+            _cE("view", _uM({ class: "p-16px" }), [
+              _cE("view", _uM({ class: "demo-block" }), [
+                _cE("text", _uM({ class: "demo-label" }), "基础表单示例"),
+                _cV(_component_up_form, _uM({
+                  ref_key: "uForm",
+                  ref: uForm,
+                  model: formModel,
+                  rules: formRules,
+                  "label-width": "90px",
+                  "error-type": "toast"
+                }), _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cV(_component_up_form_item, _uM({
+                      label: "姓名",
+                      prop: "name",
+                      "border-bottom": true,
+                      required: ""
+                    }), _uM({
+                      default: withSlotCtx((): any[] => [
+                        _cV(_component_up_input, _uM({
+                          modelValue: formModel.name,
+                          "onUpdate:modelValue": $event => {(formModel.name) = $event},
+                          placeholder: "请输入姓名",
+                          border: "none",
+                          clearable: ""
+                        }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                      ]),
+                      _: 1 /* STABLE */
+                    })),
+                    _cV(_component_up_form_item, _uM({
+                      label: "性别",
+                      prop: "gender",
+                      "border-bottom": true,
+                      onClick: () => {genderActionShow.value = true},
+                      required: ""
+                    }), _uM({
+                      right: withSlotCtx((): any[] => [
+                        _cV(_component_up_icon, _uM({
+                          name: "arrow-right",
+                          color: "#c0c4cc",
+                          size: "16"
+                        }))
+                      ]),
+                      default: withSlotCtx((): any[] => [
+                        _cV(_component_up_input, _uM({
+                          modelValue: formModel.gender,
+                          "onUpdate:modelValue": $event => {(formModel.gender) = $event},
+                          disabled: "",
+                          "disabled-color": "#ffffff",
+                          placeholder: "请选择性别",
+                          border: "none"
+                        }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                      ]),
+                      _: 1 /* STABLE */
+                    }), 8 /* PROPS */, ["onClick"]),
+                    _cV(_component_up_form_item, _uM({
+                      label: "出生日期",
+                      prop: "birthday",
+                      "border-bottom": true,
+                      onClick: () => {datetimePickerShow.value = true},
+                      required: ""
+                    }), _uM({
+                      right: withSlotCtx((): any[] => [
+                        _cV(_component_up_icon, _uM({
+                          name: "arrow-right",
+                          color: "#c0c4cc",
+                          size: "16"
+                        }))
+                      ]),
+                      default: withSlotCtx((): any[] => [
+                        _cV(_component_up_input, _uM({
+                          modelValue: formModel.birthday,
+                          "onUpdate:modelValue": $event => {(formModel.birthday) = $event},
+                          disabled: "",
+                          "disabled-color": "#ffffff",
+                          placeholder: "请选择出生日期",
+                          border: "none"
+                        }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                      ]),
+                      _: 1 /* STABLE */
+                    }), 8 /* PROPS */, ["onClick"]),
+                    _cV(_component_up_form_item, _uM({
+                      label: "国籍",
+                      prop: "country",
+                      "border-bottom": true,
+                      onClick: () => {pickerShow.value = true}
+                    }), _uM({
+                      right: withSlotCtx((): any[] => [
+                        _cV(_component_up_icon, _uM({
+                          name: "arrow-right",
+                          color: "#c0c4cc",
+                          size: "16"
+                        }))
+                      ]),
+                      default: withSlotCtx((): any[] => [
+                        _cV(_component_up_input, _uM({
+                          modelValue: formModel.country,
+                          "onUpdate:modelValue": $event => {(formModel.country) = $event},
+                          disabled: "",
+                          "disabled-color": "#ffffff",
+                          placeholder: "请选择国籍",
+                          border: "none"
+                        }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                      ]),
+                      _: 1 /* STABLE */
+                    }), 8 /* PROPS */, ["onClick"]),
+                    _cV(_component_up_form_item, _uM({
+                      label: "行程时间",
+                      prop: "stayTime",
+                      "border-bottom": true,
+                      onClick: () => {calendarShow.value = true}
+                    }), _uM({
+                      right: withSlotCtx((): any[] => [
+                        _cV(_component_up_icon, _uM({
+                          name: "arrow-right",
+                          color: "#c0c4cc",
+                          size: "16"
+                        }))
+                      ]),
+                      default: withSlotCtx((): any[] => [
+                        _cV(_component_up_input, _uM({
+                          modelValue: formModel.stayTime,
+                          "onUpdate:modelValue": $event => {(formModel.stayTime) = $event},
+                          disabled: "",
+                          "disabled-color": "#ffffff",
+                          placeholder: "请选择日期范围",
+                          border: "none"
+                        }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                      ]),
+                      _: 1 /* STABLE */
+                    }), 8 /* PROPS */, ["onClick"]),
+                    _cV(_component_up_form_item, _uM({
+                      label: "水果最爱",
+                      prop: "fruit",
+                      "border-bottom": true
+                    }), _uM({
+                      default: withSlotCtx((): any[] => [
+                        _cV(_component_up_radio_group, _uM({
+                          modelValue: formModel.fruit,
+                          "onUpdate:modelValue": $event => {(formModel.fruit) = $event},
+                          placement: "row"
+                        }), _uM({
+                          default: withSlotCtx((): any[] => [
+                            _cV(_component_up_radio, _uM({
+                              name: "apple",
+                              label: "苹果"
+                            })),
+                            _cE("view", _uM({ class: "w-10px" })),
+                            _cV(_component_up_radio, _uM({
+                              name: "banana",
+                              label: "香蕉"
+                            })),
+                            _cE("view", _uM({ class: "w-10px" })),
+                            _cV(_component_up_radio, _uM({
+                              name: "orange",
+                              label: "橘子"
+                            }))
+                          ]),
+                          _: 1 /* STABLE */
+                        }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                      ]),
+                      _: 1 /* STABLE */
+                    })),
+                    _cV(_component_up_form_item, _uM({
+                      label: "兴趣爱好",
+                      prop: "hobbies",
+                      "border-bottom": true
+                    }), _uM({
+                      default: withSlotCtx((): any[] => [
+                        _cV(_component_up_checkbox_group, _uM({
+                          modelValue: formModel.hobbies,
+                          "onUpdate:modelValue": $event => {(formModel.hobbies) = $event},
+                          placement: "row"
+                        }), _uM({
+                          default: withSlotCtx((): any[] => [
+                            _cV(_component_up_checkbox, _uM({
+                              name: "reading",
+                              label: "阅读"
+                            })),
+                            _cE("view", _uM({ class: "w-10px" })),
+                            _cV(_component_up_checkbox, _uM({
+                              name: "sports",
+                              label: "运动"
+                            })),
+                            _cE("view", _uM({ class: "w-10px" })),
+                            _cV(_component_up_checkbox, _uM({
+                              name: "music",
+                              label: "音乐"
+                            }))
+                          ]),
+                          _: 1 /* STABLE */
+                        }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                      ]),
+                      _: 1 /* STABLE */
+                    })),
+                    _cV(_component_up_form_item, _uM({
+                      label: "通知开关",
+                      prop: "notification",
+                      "border-bottom": true
+                    }), _uM({
+                      default: withSlotCtx((): any[] => [
+                        _cV(_component_up_switch, _uM({
+                          modelValue: formModel.notification,
+                          "onUpdate:modelValue": $event => {(formModel.notification) = $event},
+                          "active-color": "#2979ff"
+                        }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                      ]),
+                      _: 1 /* STABLE */
+                    })),
+                    _cV(_component_up_form_item, _uM({
+                      label: "服务评分",
+                      prop: "rate",
+                      "border-bottom": true
+                    }), _uM({
+                      default: withSlotCtx((): any[] => [
+                        _cV(_component_up_rate, _uM({
+                          modelValue: formModel.rate,
+                          "onUpdate:modelValue": $event => {(formModel.rate) = $event},
+                          count: 5
+                        }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                      ]),
+                      _: 1 /* STABLE */
+                    })),
+                    _cV(_component_up_form_item, _uM({
+                      label: "购买数量",
+                      prop: "count",
+                      "border-bottom": true
+                    }), _uM({
+                      default: withSlotCtx((): any[] => [
+                        _cV(_component_up_number_box, _uM({
+                          modelValue: formModel.count,
+                          "onUpdate:modelValue": $event => {(formModel.count) = $event},
+                          min: 1,
+                          max: 100
+                        }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                      ]),
+                      _: 1 /* STABLE */
+                    })),
+                    _cV(_component_up_form_item, _uM({
+                      label: "满意度",
+                      prop: "satisfaction",
+                      "border-bottom": true
+                    }), _uM({
+                      default: withSlotCtx((): any[] => [
+                        _cV(_component_up_slider, _uM({
+                          modelValue: formModel.satisfaction,
+                          "onUpdate:modelValue": $event => {(formModel.satisfaction) = $event},
+                          min: 0,
+                          max: 100,
+                          "show-value": true,
+                          style: _nS(_uM({"width":"100%"}))
+                        }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue", "style"])
+                      ]),
+                      _: 1 /* STABLE */
+                    })),
+                    _cV(_component_up_form_item, _uM({
+                      label: "个人简介",
+                      prop: "intro",
+                      "border-bottom": true,
+                      "label-position": "top"
+                    }), _uM({
+                      default: withSlotCtx((): any[] => [
+                        _cV(_component_up_textarea, _uM({
+                          modelValue: formModel.intro,
+                          "onUpdate:modelValue": $event => {(formModel.intro) = $event},
+                          placeholder: "请输入个人简介",
+                          count: "",
+                          maxlength: 100
+                        }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                      ]),
+                      _: 1 /* STABLE */
+                    })),
+                    _cV(_component_up_form_item, _uM({
+                      label: "相关照片",
+                      prop: "photos",
+                      "border-bottom": true,
+                      "label-position": "top"
+                    }), _uM({
+                      default: withSlotCtx((): any[] => [
+                        _cV(_component_up_upload, _uM({
+                          "file-list": uploadList.value,
+                          multiple: true,
+                          "max-count": 3,
+                          width: "80px",
+                          height: "80px",
+                          onAfterRead: onUploadAfterRead,
+                          onDelete: onUploadDelete
+                        }), null, 8 /* PROPS */, ["file-list"])
+                      ]),
+                      _: 1 /* STABLE */
+                    }))
+                  ]),
+                  _: 1 /* STABLE */
+                }), 8 /* PROPS */, ["model"])
               ]),
-              _cE("view", _uM({ class: "flex-1 ml-10px" }), [
-                _cV(_component_up_button, _uM({
-                  type: "info",
-                  text: "重置表单",
-                  onClick: resetForm
-                }))
+              _cE("view", _uM({ class: "demo-block" }), [
+                _cE("text", _uM({ class: "demo-label" }), "标签上方对齐"),
+                _cV(_component_up_form, _uM({
+                  model: formModel2,
+                  "label-position": "top",
+                  "label-width": "100px"
+                }), _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cV(_component_up_form_item, _uM({
+                      label: "活动名称",
+                      prop: "name",
+                      "border-bottom": true
+                    }), _uM({
+                      default: withSlotCtx((): any[] => [
+                        _cV(_component_up_input, _uM({
+                          modelValue: formModel2.name,
+                          "onUpdate:modelValue": $event => {(formModel2.name) = $event},
+                          placeholder: "请输入活动名称",
+                          border: "none"
+                        }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                      ]),
+                      _: 1 /* STABLE */
+                    })),
+                    _cV(_component_up_form_item, _uM({
+                      label: "活动详情",
+                      prop: "detail",
+                      "border-bottom": true
+                    }), _uM({
+                      default: withSlotCtx((): any[] => [
+                        _cV(_component_up_textarea, _uM({
+                          modelValue: formModel2.detail,
+                          "onUpdate:modelValue": $event => {(formModel2.detail) = $event},
+                          placeholder: "请输入活动详情",
+                          border: "none"
+                        }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                      ]),
+                      _: 1 /* STABLE */
+                    }))
+                  ]),
+                  _: 1 /* STABLE */
+                }), 8 /* PROPS */, ["model"])
+              ]),
+              _cE("view", _uM({ class: "mt-20px flex-row justify-between" }), [
+                _cE("view", _uM({ class: "flex-1 mr-10px" }), [
+                  _cV(_component_up_button, _uM({
+                    type: "primary",
+                    text: "提交表单",
+                    onClick: submitForm
+                  }))
+                ]),
+                _cE("view", _uM({ class: "flex-1 ml-10px" }), [
+                  _cV(_component_up_button, _uM({
+                    type: "info",
+                    text: "重置表单",
+                    onClick: resetForm
+                  }))
+                ])
               ])
             ]),
             _cV(_component_up_calendar, _uM({
@@ -658,4 +661,4 @@ const _component_up_action_sheet = resolveEasyComponent("up-action-sheet",_easyc
 
 })
 export default __sfc__
-const GenSrcSubUviewUltraDemosFormFormStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["blur", _pS(_uM([["filter", "var(--un-blur) var(--un-brightness) var(--un-contrast) var(--un-drop-shadow) var(--un-grayscale) var(--un-hue-rotate) var(--un-invert) var(--un-opacity) var(--un-saturate) var(--un-sepia)"], ["--un-blur", "blur(8rpx)"]]))], ["flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["justify-between", _pS(_uM([["justifyContent", "space-between"]]))], ["ml-10px", _pS(_uM([["marginLeft", 10]]))], ["mr-10px", _pS(_uM([["marginRight", 10]]))], ["mt-12px", _pS(_uM([["marginTop", 12]]))], ["mt-20px", _pS(_uM([["marginTop", 20]]))], ["none", _pS(_uM([["display", "none"]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["w-10px", _pS(_uM([["width", 10]]))], ["section-title", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 8], ["paddingLeft", 16], ["fontSize", 18], ["fontWeight", "bold"], ["color", "#303133"]]))], ["demo-block", _pS(_uM([["marginTop", 0], ["marginRight", 12], ["marginBottom", 12], ["marginLeft", 12], ["paddingTop", 12], ["paddingRight", 16], ["paddingBottom", 12], ["paddingLeft", 16], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8], ["boxShadow", "0 2px 12px rgba(0, 0, 0, 0.05)"]]))]])]
+const GenSrcSubUviewUltraDemosFormFormStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["blur", _pS(_uM([["filter", "var(--un-blur) var(--un-brightness) var(--un-contrast) var(--un-drop-shadow) var(--un-grayscale) var(--un-hue-rotate) var(--un-invert) var(--un-opacity) var(--un-saturate) var(--un-sepia)"], ["--un-blur", "blur(8rpx)"]]))], ["flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["justify-between", _pS(_uM([["justifyContent", "space-between"]]))], ["ml-10px", _pS(_uM([["marginLeft", 10]]))], ["mr-10px", _pS(_uM([["marginRight", 10]]))], ["mt-20px", _pS(_uM([["marginTop", 20]]))], ["none", _pS(_uM([["display", "none"]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["w-10px", _pS(_uM([["width", 10]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]

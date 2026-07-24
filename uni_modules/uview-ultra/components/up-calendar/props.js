@@ -165,3 +165,4 @@ export const props = defineMixin({
 		}
     }
 })
+export const propsCalendar = props

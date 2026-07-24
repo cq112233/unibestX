@@ -59,6 +59,8 @@ const _component_up_swiper = resolveEasyComponent("up-swiper",_easycom_up_swiper
                   "key-name": "image",
                   indicator: true,
                   "indicator-mode": "line",
+                  "indicator-active-color": "#2979ff",
+                  "indicator-inactive-color": "rgba(0, 0, 0, 0.15)",
                   circular: true,
                   "previous-margin": 30,
                   "next-margin": 30,

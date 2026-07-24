@@ -42,7 +42,7 @@ return (): any | null => {
         default: withSlotCtx((): any[] => [
           _cE("scroll-view", _uM({
             direction: "vertical",
-            class: "flex-1 bg-__f7fafc_"
+            class: "flex-1"
           }), [
             _cV(unref(UViewUltraDemoCard)),
             _cV(unref(ZPagingDemoCard)),
@@ -66,4 +66,4 @@ return (): any | null => {
 
 })
 export default __sfc__
-const GenSrcPagesBasicBasicStyles = [_uM([["bg-__f7fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f7fafc"]]))], ["flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))]])]
+const GenSrcPagesBasicBasicStyles = [_uM([["flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))]])]

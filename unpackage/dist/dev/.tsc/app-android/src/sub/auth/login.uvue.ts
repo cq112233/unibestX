@@ -30,7 +30,7 @@ onLoad((options: UTSJSONObject | null) => {
 function doLogin() {
   if (tokenStore.hasValidLogin()) {
     if (redirectUrl.value !== '') {
-      const targetUrl = UTSAndroid.consoleDebugError(decodeURIComponent(redirectUrl.value), " at src/sub/auth/login.uvue:67") ?? ''
+      const targetUrl = UTSAndroid.consoleDebugError(decodeURIComponent(redirectUrl.value), " at src/sub/auth/login.uvue:66") ?? ''
       if (isPageTabbar(targetUrl)) {
         setCurIdxByPath(targetUrl)
         uni.switchTab({ url: targetUrl })
@@ -65,7 +65,7 @@ function doLogin() {
 
   setTimeout(() => {
     if (redirectUrl.value !== '') {
-      const targetUrl = UTSAndroid.consoleDebugError(decodeURIComponent(redirectUrl.value), " at src/sub/auth/login.uvue:102") ?? ''
+      const targetUrl = UTSAndroid.consoleDebugError(decodeURIComponent(redirectUrl.value), " at src/sub/auth/login.uvue:101") ?? ''
       if (isPageTabbar(targetUrl)) {
         setCurIdxByPath(targetUrl)
         uni.switchTab({ url: targetUrl })
@@ -86,7 +86,7 @@ return (): any | null => {
     default: withSlotCtx((): any[] => [
       _cV(unref(LayoutComponent), _uM({ "navigation-bar-title-text": '登录' }), _uM({
         default: withSlotCtx((): any[] => [
-          _cE("view", _uM({ class: "flex-1 p-30px items-center justify-center bg-__f8fafc_" }), [
+          _cE("view", _uM({ class: "flex-1 p-30px items-center justify-center" }), [
             _cE("view", _uM({ class: "mb-30px" }), [
               _cE("text", _uM({ class: "text-20px font-bold text-__1e293b_" }), "登录页")
             ]),
@@ -108,4 +108,4 @@ return (): any | null => {
 
 })
 export default __sfc__
-const GenSrcSubAuthLoginStyles = [_uM([["bg-__3b82f6_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#3b82f6"]]))], ["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["flex", _pS(_uM([["display", "flex"]]))], ["flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["font-bold", _pS(_uM([["fontWeight", 700]]))], ["h-44px", _pS(_uM([["height", 44]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["justify-center", _pS(_uM([["justifyContent", "center"]]))], ["mb-30px", _pS(_uM([["marginBottom", 30]]))], ["p-30px", _pS(_uM([["paddingTop", 30], ["paddingRight", 30], ["paddingBottom", 30], ["paddingLeft", 30]]))], ["rounded-8px", _pS(_uM([["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["text-__1e293b_", _pS(_uM([["color", "#1e293b"]]))], ["text-__ffffff_", _pS(_uM([["color", "#ffffff"]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))], ["text-20px", _pS(_uM([["fontSize", 20]]))], ["w-200px", _pS(_uM([["width", 200]]))]])]
+const GenSrcSubAuthLoginStyles = [_uM([["bg-__3b82f6_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#3b82f6"]]))], ["flex", _pS(_uM([["display", "flex"]]))], ["flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["font-bold", _pS(_uM([["fontWeight", 700]]))], ["h-44px", _pS(_uM([["height", 44]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["justify-center", _pS(_uM([["justifyContent", "center"]]))], ["mb-30px", _pS(_uM([["marginBottom", 30]]))], ["p-30px", _pS(_uM([["paddingTop", 30], ["paddingRight", 30], ["paddingBottom", 30], ["paddingLeft", 30]]))], ["rounded-8px", _pS(_uM([["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["text-__1e293b_", _pS(_uM([["color", "#1e293b"]]))], ["text-__ffffff_", _pS(_uM([["color", "#ffffff"]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))], ["text-20px", _pS(_uM([["fontSize", 20]]))], ["w-200px", _pS(_uM([["width", 200]]))]])]

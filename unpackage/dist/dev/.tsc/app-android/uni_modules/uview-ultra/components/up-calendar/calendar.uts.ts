@@ -40,6 +40,7 @@ export default {
 		round: 0,
 		monthNum: 3,
 		monthSwitch: false,
-		showToday: true
+		showToday: true,
+		safeAreaInsetBottom: true
     }
 } as UTSJSONObject

@@ -6,9 +6,9 @@ require('android.content.Context');
 require('android.os.Vibrator');
 require('android.os.VibratorManager');
 
-const NavBar_uvue_vue_type_style_index_0_dataScoped_j97cggp7tg1ju769nji_lang = {};
+const NavBar_uvue_vue_type_style_index_0_dataScoped_75nl5r0alo1ju8v920g_lang = {};
 
-const NavBar_uvue_vue_type_style_index_1_dataScoped_j97cggp7tg1ju769nji_lang = {};
+const NavBar_uvue_vue_type_style_index_1_dataScoped_75nl5r0alo1ju8v920g_lang = {};
 
 const upLoadingIcon_uvue_vue_type_style_index_0_lang = {};
 
@@ -24,33 +24,33 @@ const upToast_uvue_vue_type_style_index_0_lang = {};
 
 const uniIcons_uvue_vue_type_style_index_0_lang = {};
 
-const TabbarItem_uvue_vue_type_style_index_0_dataScoped_6i3h79jdno1ju769oo1_lang = {};
+const TabbarItem_uvue_vue_type_style_index_0_dataScoped_oukk6khnlg1ju8v92uv_lang = {};
 
-const index_uvue_vue_type_style_index_0_dataScoped_kumiino8081ju769o6t_lang = {};
+const index_uvue_vue_type_style_index_0_dataScoped_o08q6pqa7o1ju8v92h7_lang = {};
 
-const index_uvue_vue_type_style_index_0_dataScoped_5fe0qijbio1ju769mla_lang = {};
+const index_uvue_vue_type_style_index_0_dataScoped_t79l3faqh81ju8v91er_lang = {};
 
-const me_uvue_vue_type_style_index_0_dataScoped_f21ce1t5k81ju769mn9_lang = {};
+const me_uvue_vue_type_style_index_0_dataScoped_gmmvpfpblg1ju8v91hj_lang = {};
 
 const lIcon_uvue_vue_type_style_index_0_lang = {};
 
-const Card_uvue_vue_type_style_index_0_dataScoped_ogp0pm9a8g1ju769o78_lang = {};
+const Card_uvue_vue_type_style_index_0_dataScoped_k53961rp3g1ju8v92hb_lang = {};
 
-const IconDemoCard_uvue_vue_type_style_index_0_dataScoped_u15ojrg4281ju769nk1_lang = {};
+const IconDemoCard_uvue_vue_type_style_index_0_dataScoped_bldrvan2v81ju8v921g_lang = {};
 
-const LangSwitchCard_uvue_vue_type_style_index_0_dataScoped_i423hits61ju769nk9_lang = {};
+const LangSwitchCard_uvue_vue_type_style_index_0_dataScoped_la76nonaeg1ju8v9217_lang = {};
 
-const ThemeSwitchCard_uvue_vue_type_style_index_0_dataScoped_7ol0hvjh6o1ju769nkg_lang = {};
+const ThemeSwitchCard_uvue_vue_type_style_index_0_dataScoped_3rm3nbvhv81ju8v9212_lang = {};
 
-const TimeDemoCard_uvue_vue_type_style_index_0_dataScoped_b1bifcktto1ju769nkp_lang = {};
+const TimeDemoCard_uvue_vue_type_style_index_0_dataScoped_vs5jjtl0n81ju8v921p_lang = {};
 
-const RouterDemoCard_uvue_vue_type_style_index_0_dataScoped_gmug2crqno1ju769nl0_lang = {};
+const RouterDemoCard_uvue_vue_type_style_index_0_dataScoped_vk4ummr0pg1ju8v9221_lang = {};
 
-const HttpDemoCard_uvue_vue_type_style_index_0_dataScoped_7l9514s1qg1ju769nla_lang = {};
+const HttpDemoCard_uvue_vue_type_style_index_0_dataScoped_qfiul7okno1ju8v922c_lang = {};
 
-const EchartsDemoCard_uvue_vue_type_style_index_0_dataScoped_j9vtnquj3g1ju769nlj_lang = {};
+const EchartsDemoCard_uvue_vue_type_style_index_0_dataScoped_1ibl5mk9lg1ju8v922l_lang = {};
 
-const SystemInfoDemoCard_uvue_vue_type_style_index_0_dataScoped_lk0l2rf6no1ju769nlr_lang = {};
+const SystemInfoDemoCard_uvue_vue_type_style_index_0_dataScoped_01qv1v0kig1ju8v922t_lang = {};
 
 const zPagingXEmpty_uvue_vue_type_style_index_0_lang = {};
 
@@ -62,31 +62,31 @@ const zPagingLoadMore_uvue_vue_type_style_index_0_lang = {};
 
 const zPagingX_uvue_vue_type_style_index_0_lang = {};
 
-const ZPagingDemoCard_uvue_vue_type_style_index_0_dataScoped_787cqjevn1ju769nm6_lang = {};
+const ZPagingDemoCard_uvue_vue_type_style_index_0_dataScoped_mtcetnen781ju8v9239_lang = {};
 
-const UViewUltraDemoCard_uvue_vue_type_style_index_0_dataScoped_sltrte011ju769nmh_lang = {};
+const UViewUltraDemoCard_uvue_vue_type_style_index_0_dataScoped_35e92te181ju8v923i_lang = {};
 
-const basic_uvue_vue_type_style_index_0_dataScoped_ffoh7i1d91ju769mme_lang = {};
+const basic_uvue_vue_type_style_index_0_dataScoped_g4vvck9ktg1ju8v91gl_lang = {};
 
-const SystemInfoCard_uvue_vue_type_style_index_0_dataScoped_6vk411fcb1ju769nmn_lang = {};
+const SystemInfoCard_uvue_vue_type_style_index_0_dataScoped_fpp1q86ttg1ju8v923p_lang = {};
 
-const HapticsCard_uvue_vue_type_style_index_0_dataScoped_b97tvo611o1ju769nn2_lang = {};
+const HapticsCard_uvue_vue_type_style_index_0_dataScoped_k2hc6gatgo1ju8v923v_lang = {};
 
-const MediaCard_uvue_vue_type_style_index_0_dataScoped_05h2rkjc51ju769nn8_lang = {};
+const MediaCard_uvue_vue_type_style_index_0_dataScoped_gjudum23o1ju8v9246_lang = {};
 
-const function_uvue_vue_type_style_index_0_dataScoped_1drdokqdb1ju769mmn_lang = {};
+const function_uvue_vue_type_style_index_0_dataScoped_0d9o4ahq5g1ju8v91gr_lang = {};
 
-const ai_uvue_vue_type_style_index_0_dataScoped_l8r94mdkog1ju769mnt_lang = {};
+const ai_uvue_vue_type_style_index_0_dataScoped_vtuh2g4a41ju8v91g5_lang = {};
 
-const ai_uvue_vue_type_style_index_1_dataScoped_l8r94mdkog1ju769mnt_lang = {};
+const ai_uvue_vue_type_style_index_1_dataScoped_vtuh2g4a41ju8v91g5_lang = {};
 
-const login_uvue_vue_type_style_index_0_dataScoped_al1o14sa5o1ju769mo9_lang = {};
+const login_uvue_vue_type_style_index_0_dataScoped_bgma6f3v881ju8v91h0_lang = {};
 
-const register_uvue_vue_type_style_index_0_dataScoped_0nspbd5mr1ju769mog_lang = {};
+const register_uvue_vue_type_style_index_0_dataScoped_p2h9ogjos1ju8v91h5_lang = {};
 
-const test_uvue_vue_type_style_index_0_dataScoped_2vhvr3thp81ju769mp8_lang = {};
+const test_uvue_vue_type_style_index_0_dataScoped_irl11rd3qg1ju8v91i8_lang = {};
 
-const paging_uvue_vue_type_style_index_0_dataScoped_9amq6k77b81ju769mor_lang = {};
+const paging_uvue_vue_type_style_index_0_dataScoped_j4vnt85nho1ju8v91kb_lang = {};
 
 const upLine_uvue_vue_type_style_index_0_lang = {};
 
@@ -94,85 +94,85 @@ const upCell_uvue_vue_type_style_index_0_lang = {};
 
 const upCellGroup_uvue_vue_type_style_index_0_lang = {};
 
-const uviewUltra_uvue_vue_type_style_index_0_dataScoped_3h7lqlgokg1ju769mpo_lang = {};
+const uviewUltra_uvue_vue_type_style_index_0_dataScoped_s5locq2o71ju8v91j5_lang = {};
 
-const uviewUltra_uvue_vue_type_style_index_1_dataScoped_3h7lqlgokg1ju769mpo_lang = {};
+const uviewUltra_uvue_vue_type_style_index_1_dataScoped_s5locq2o71ju8v91j5_lang = {};
 
-const uiTest_uvue_vue_type_style_index_0_dataScoped_uq50at5bf1ju769mql_lang = {};
+const uiTest_uvue_vue_type_style_index_0_dataScoped_csmntvqso81ju8v91l9_lang = {};
 
-const icon_uvue_vue_type_style_index_0_dataScoped_j5m13j6seg1ju769mqq_lang = {};
+const icon_uvue_vue_type_style_index_0_dataScoped_t2pvaoijl1ju8v91kv_lang = {};
 
-const icon_uvue_vue_type_style_index_1_dataScoped_j5m13j6seg1ju769mqq_lang = {};
+const icon_uvue_vue_type_style_index_1_dataScoped_t2pvaoijl1ju8v91kv_lang = {};
 
 const upLink_uvue_vue_type_style_index_0_lang = {};
 
 const upText_uvue_vue_type_style_index_0_lang = {};
 
-const text_uvue_vue_type_style_index_0_dataScoped_hvvt21d78g1ju769mr0_lang = {};
+const text_uvue_vue_type_style_index_0_dataScoped_mn1mccvh381ju8v91lf_lang = {};
 
-const text_uvue_vue_type_style_index_1_dataScoped_hvvt21d78g1ju769mr0_lang = {};
+const text_uvue_vue_type_style_index_1_dataScoped_mn1mccvh381ju8v91lf_lang = {};
 
 const upEmpty_uvue_vue_type_style_index_0_lang = {};
 
-const empty_uvue_vue_type_style_index_0_dataScoped_0emtraft981ju769mr6_lang = {};
+const empty_uvue_vue_type_style_index_0_dataScoped_0jnt0uf21g1ju8v91li_lang = {};
 
-const empty_uvue_vue_type_style_index_1_dataScoped_0emtraft981ju769mr6_lang = {};
+const empty_uvue_vue_type_style_index_1_dataScoped_0jnt0uf21g1ju8v91li_lang = {};
 
 const upDivider_uvue_vue_type_style_index_0_lang = {};
 
-const divider_uvue_vue_type_style_index_0_dataScoped_f6in8dg6dg1ju769ms8_lang = {};
+const divider_uvue_vue_type_style_index_0_dataScoped_fd543duvug1ju8v91lv_lang = {};
 
-const divider_uvue_vue_type_style_index_1_dataScoped_f6in8dg6dg1ju769ms8_lang = {};
+const divider_uvue_vue_type_style_index_1_dataScoped_fd543duvug1ju8v91lv_lang = {};
 
-const loadingIcon_uvue_vue_type_style_index_0_dataScoped_dbi7qmagog1ju769msd_lang = {};
+const loadingIcon_uvue_vue_type_style_index_0_dataScoped_ogsd4sd81o1ju8v91m2_lang = {};
 
-const loadingIcon_uvue_vue_type_style_index_1_dataScoped_dbi7qmagog1ju769msd_lang = {};
+const loadingIcon_uvue_vue_type_style_index_1_dataScoped_ogsd4sd81o1ju8v91m2_lang = {};
 
 const upSkeleton_uvue_vue_type_style_index_0_lang = {};
 
-const skeleton_uvue_vue_type_style_index_0_dataScoped_v20gg33ldo1ju769msg_lang = {};
+const skeleton_uvue_vue_type_style_index_0_dataScoped_3upt6qr6k1ju8v91m4_lang = {};
 
-const skeleton_uvue_vue_type_style_index_1_dataScoped_v20gg33ldo1ju769msg_lang = {};
+const skeleton_uvue_vue_type_style_index_1_dataScoped_3upt6qr6k1ju8v91m4_lang = {};
 
 const upCard_uvue_vue_type_style_index_0_lang = {};
 
 const upButton_uvue_vue_type_style_index_0_lang = {};
 
-const card_uvue_vue_type_style_index_0_dataScoped_jn6sonjun1ju769msp_lang = {};
+const card_uvue_vue_type_style_index_0_dataScoped_4vmgskijj1ju8v91ma_lang = {};
 
-const card_uvue_vue_type_style_index_1_dataScoped_jn6sonjun1ju769msp_lang = {};
+const card_uvue_vue_type_style_index_1_dataScoped_4vmgskijj1ju8v91ma_lang = {};
 
 const upList_uvue_vue_type_style_index_0_lang = {};
 
-const list_uvue_vue_type_style_index_0_dataScoped_8e2di4cs0o1ju769mtd_lang = {};
+const list_uvue_vue_type_style_index_0_dataScoped_q4mjggub7g1ju8v91ms_lang = {};
 
-const list_uvue_vue_type_style_index_1_dataScoped_8e2di4cs0o1ju769mtd_lang = {};
+const list_uvue_vue_type_style_index_1_dataScoped_q4mjggub7g1ju8v91ms_lang = {};
 
 const upSwiperIndicator_uvue_vue_type_style_index_0_lang = {};
 
 const upSwiper_uvue_vue_type_style_index_0_lang = {};
 
-const swiper_uvue_vue_type_style_index_0_dataScoped_7atgk62sug1ju769mt7_lang = {};
+const swiper_uvue_vue_type_style_index_0_dataScoped_qurq7uiu381ju8v91mi_lang = {};
 
-const swiper_uvue_vue_type_style_index_1_dataScoped_7atgk62sug1ju769mt7_lang = {};
+const swiper_uvue_vue_type_style_index_1_dataScoped_qurq7uiu381ju8v91mi_lang = {};
 
 const upImage_uvue_vue_type_style_index_0_lang = {};
 
-const image_uvue_vue_type_style_index_0_dataScoped_j88cdqm4881ju769mtr_lang = {};
+const image_uvue_vue_type_style_index_0_dataScoped_uulo3c0eq81ju8v91n5_lang = {};
 
-const image_uvue_vue_type_style_index_1_dataScoped_j88cdqm4881ju769mtr_lang = {};
+const image_uvue_vue_type_style_index_1_dataScoped_uulo3c0eq81ju8v91n5_lang = {};
 
-const transition_uvue_vue_type_style_index_0_dataScoped_kulf718jd81ju769mu2_lang = {};
+const transition_uvue_vue_type_style_index_0_dataScoped_9gskperrs1ju8v91nb_lang = {};
 
-const transition_uvue_vue_type_style_index_1_dataScoped_kulf718jd81ju769mu2_lang = {};
+const transition_uvue_vue_type_style_index_1_dataScoped_9gskperrs1ju8v91nb_lang = {};
 
 const upStepsItem_uvue_vue_type_style_index_0_lang = {};
 
 const upSteps_uvue_vue_type_style_index_0_lang = {};
 
-const steps_uvue_vue_type_style_index_0_dataScoped_rs10ntsta81ju769mue_lang = {};
+const steps_uvue_vue_type_style_index_0_dataScoped_hhetnr00e81ju8v91ng_lang = {};
 
-const steps_uvue_vue_type_style_index_1_dataScoped_rs10ntsta81ju769mue_lang = {};
+const steps_uvue_vue_type_style_index_1_dataScoped_hhetnr00e81ju8v91ng_lang = {};
 
 const upTh_uvue_vue_type_style_index_0_lang = {};
 
@@ -180,9 +180,9 @@ const upTr_uvue_vue_type_style_index_0_lang = {};
 
 const upTd_uvue_vue_type_style_index_0_lang = {};
 
-const table_uvue_vue_type_style_index_0_dataScoped_klnhng145o1ju769mui_lang = {};
+const table_uvue_vue_type_style_index_0_dataScoped_pbomudjec81ju8v91nm_lang = {};
 
-const table_uvue_vue_type_style_index_1_dataScoped_klnhng145o1ju769mui_lang = {};
+const table_uvue_vue_type_style_index_1_dataScoped_pbomudjec81ju8v91nm_lang = {};
 
 const upInput_uvue_vue_type_style_index_0_lang = {};
 
@@ -228,107 +228,107 @@ const upDatetimePicker_uvue_vue_type_style_index_0_lang = {};
 
 const upActionSheet_uvue_vue_type_style_index_0_lang = {};
 
-const form_uvue_vue_type_style_index_0_dataScoped_gl2uughfpg1ju769mva_lang = {};
+const form_uvue_vue_type_style_index_0_dataScoped_acbaj7bam1ju8v91o5_lang = {};
 
-const form_uvue_vue_type_style_index_1_dataScoped_gl2uughfpg1ju769mva_lang = {};
+const form_uvue_vue_type_style_index_1_dataScoped_acbaj7bam1ju8v91o5_lang = {};
 
 const upPagination_uvue_vue_type_style_index_0_lang = {};
 
-const pagination_uvue_vue_type_style_index_0_dataScoped_prd9uiin81ju769n02_lang = {};
+const pagination_uvue_vue_type_style_index_0_dataScoped_uhqslm5nuo1ju8v91oq_lang = {};
 
-const pagination_uvue_vue_type_style_index_1_dataScoped_prd9uiin81ju769n02_lang = {};
+const pagination_uvue_vue_type_style_index_1_dataScoped_uhqslm5nuo1ju8v91oq_lang = {};
 
 const upCodeInput_uvue_vue_type_style_index_0_lang = {};
 
-const codeInput_uvue_vue_type_style_index_0_dataScoped_t2b3f0bvv1ju769n08_lang = {};
+const codeInput_uvue_vue_type_style_index_0_dataScoped_getbvetnt81ju8v91ov_lang = {};
 
-const codeInput_uvue_vue_type_style_index_1_dataScoped_t2b3f0bvv1ju769n08_lang = {};
+const codeInput_uvue_vue_type_style_index_1_dataScoped_getbvetnt81ju8v91ov_lang = {};
 
-const button_uvue_vue_type_style_index_0_dataScoped_lh1gfnbuto1ju769n0g_lang = {};
+const button_uvue_vue_type_style_index_0_dataScoped_15jej1mpt1ju8v91p2_lang = {};
 
-const button_uvue_vue_type_style_index_1_dataScoped_lh1gfnbuto1ju769n0g_lang = {};
+const button_uvue_vue_type_style_index_1_dataScoped_15jej1mpt1ju8v91p2_lang = {};
 
-const input_uvue_vue_type_style_index_0_dataScoped_iolsf7832g1ju769n22_lang = {};
+const input_uvue_vue_type_style_index_0_dataScoped_ccd0e8gsh81ju8v91p8_lang = {};
 
-const input_uvue_vue_type_style_index_1_dataScoped_iolsf7832g1ju769n22_lang = {};
+const input_uvue_vue_type_style_index_1_dataScoped_ccd0e8gsh81ju8v91p8_lang = {};
 
-const checkbox_uvue_vue_type_style_index_0_dataScoped_8qc1afvqno1ju769n2a_lang = {};
+const checkbox_uvue_vue_type_style_index_0_dataScoped_p1gvit3b5o1ju8v91ph_lang = {};
 
-const checkbox_uvue_vue_type_style_index_1_dataScoped_8qc1afvqno1ju769n2a_lang = {};
+const checkbox_uvue_vue_type_style_index_1_dataScoped_p1gvit3b5o1ju8v91ph_lang = {};
 
 const upTag_uvue_vue_type_style_index_0_lang = {};
 
-const tag_uvue_vue_type_style_index_0_dataScoped_ji259q9o981ju769n2v_lang = {};
+const tag_uvue_vue_type_style_index_0_dataScoped_4bdl77nid81ju8v91pl_lang = {};
 
-const tag_uvue_vue_type_style_index_1_dataScoped_ji259q9o981ju769n2v_lang = {};
+const tag_uvue_vue_type_style_index_1_dataScoped_4bdl77nid81ju8v91pl_lang = {};
 
-const radio_uvue_vue_type_style_index_0_dataScoped_t560h5chfg1ju769n3d_lang = {};
+const radio_uvue_vue_type_style_index_0_dataScoped_j7diojrrc81ju8v91pb_lang = {};
 
-const radio_uvue_vue_type_style_index_1_dataScoped_t560h5chfg1ju769n3d_lang = {};
+const radio_uvue_vue_type_style_index_1_dataScoped_j7diojrrc81ju8v91pb_lang = {};
 
-const switch_uvue_vue_type_style_index_0_dataScoped_jaqitnc52g1ju769n3h_lang = {};
+const switch_uvue_vue_type_style_index_0_dataScoped_9ih88mf0581ju8v91pu_lang = {};
 
-const switch_uvue_vue_type_style_index_1_dataScoped_jaqitnc52g1ju769n3h_lang = {};
+const switch_uvue_vue_type_style_index_1_dataScoped_9ih88mf0581ju8v91pu_lang = {};
 
-const rate_uvue_vue_type_style_index_0_dataScoped_utmnov02u81ju769n3q_lang = {};
+const rate_uvue_vue_type_style_index_0_dataScoped_ksd3k0l2qo1ju8v91pq_lang = {};
 
-const rate_uvue_vue_type_style_index_1_dataScoped_utmnov02u81ju769n3q_lang = {};
+const rate_uvue_vue_type_style_index_1_dataScoped_ksd3k0l2qo1ju8v91pq_lang = {};
 
-const numberBox_uvue_vue_type_style_index_0_dataScoped_6nepqs6lc81ju769n4a_lang = {};
+const numberBox_uvue_vue_type_style_index_0_dataScoped_gibrtohbeo1ju8v91qd_lang = {};
 
-const numberBox_uvue_vue_type_style_index_1_dataScoped_6nepqs6lc81ju769n4a_lang = {};
+const numberBox_uvue_vue_type_style_index_1_dataScoped_gibrtohbeo1ju8v91qd_lang = {};
 
-const slider_uvue_vue_type_style_index_0_dataScoped_81u7va6g3g1ju769n50_lang = {};
+const slider_uvue_vue_type_style_index_0_dataScoped_bn5egqvp1ju8v91qg_lang = {};
 
-const slider_uvue_vue_type_style_index_1_dataScoped_81u7va6g3g1ju769n50_lang = {};
+const slider_uvue_vue_type_style_index_1_dataScoped_bn5egqvp1ju8v91qg_lang = {};
 
-const textarea_uvue_vue_type_style_index_0_dataScoped_ps82c6pbf1ju769n5h_lang = {};
+const textarea_uvue_vue_type_style_index_0_dataScoped_h5551lort1ju8v91qk_lang = {};
 
-const textarea_uvue_vue_type_style_index_1_dataScoped_ps82c6pbf1ju769n5h_lang = {};
+const textarea_uvue_vue_type_style_index_1_dataScoped_h5551lort1ju8v91qk_lang = {};
 
-const upload_uvue_vue_type_style_index_0_dataScoped_l0s3nu0fv81ju769n5s_lang = {};
+const upload_uvue_vue_type_style_index_0_dataScoped_d27vkph1c1ju8v91qn_lang = {};
 
-const upload_uvue_vue_type_style_index_1_dataScoped_l0s3nu0fv81ju769n5s_lang = {};
+const upload_uvue_vue_type_style_index_1_dataScoped_d27vkph1c1ju8v91qn_lang = {};
 
-const calendar_uvue_vue_type_style_index_0_dataScoped_tm1pcrhvq1ju769n6l_lang = {};
+const calendar_uvue_vue_type_style_index_0_dataScoped_v8m85nq911ju8v91qt_lang = {};
 
-const calendar_uvue_vue_type_style_index_1_dataScoped_tm1pcrhvq1ju769n6l_lang = {};
+const calendar_uvue_vue_type_style_index_1_dataScoped_v8m85nq911ju8v91qt_lang = {};
 
-const picker_uvue_vue_type_style_index_0_dataScoped_qcqhuntsio1ju769n66_lang = {};
+const picker_uvue_vue_type_style_index_0_dataScoped_hn9bfrb2ng1ju8v91r6_lang = {};
 
-const picker_uvue_vue_type_style_index_1_dataScoped_qcqhuntsio1ju769n66_lang = {};
+const picker_uvue_vue_type_style_index_1_dataScoped_hn9bfrb2ng1ju8v91r6_lang = {};
 
-const datetimePicker_uvue_vue_type_style_index_0_dataScoped_1tlqgc4gn81ju769n6t_lang = {};
+const datetimePicker_uvue_vue_type_style_index_0_dataScoped_kn7mld1lc1ju8v91r1_lang = {};
 
-const datetimePicker_uvue_vue_type_style_index_1_dataScoped_1tlqgc4gn81ju769n6t_lang = {};
+const datetimePicker_uvue_vue_type_style_index_1_dataScoped_kn7mld1lc1ju8v91r1_lang = {};
 
-const actionSheet_uvue_vue_type_style_index_0_dataScoped_uehq3uj9a1ju769n73_lang = {};
+const actionSheet_uvue_vue_type_style_index_0_dataScoped_tsc58reb2o1ju8v91rb_lang = {};
 
-const actionSheet_uvue_vue_type_style_index_1_dataScoped_uehq3uj9a1ju769n73_lang = {};
+const actionSheet_uvue_vue_type_style_index_1_dataScoped_tsc58reb2o1ju8v91rb_lang = {};
 
 const upBadge_uvue_vue_type_style_index_0_lang = {};
 
-const badge_uvue_vue_type_style_index_0_dataScoped_sj4oimnjjg1ju769n7a_lang = {};
+const badge_uvue_vue_type_style_index_0_dataScoped_tnuf6nstsg1ju8v91rf_lang = {};
 
-const badge_uvue_vue_type_style_index_1_dataScoped_sj4oimnjjg1ju769n7a_lang = {};
+const badge_uvue_vue_type_style_index_1_dataScoped_tnuf6nstsg1ju8v91rf_lang = {};
 
 const upAvatar_uvue_vue_type_style_index_0_lang = {};
 
-const avatar_uvue_vue_type_style_index_0_dataScoped_l55a1p2o1g1ju769n7f_lang = {};
+const avatar_uvue_vue_type_style_index_0_dataScoped_m68bcpdr41ju8v91rj_lang = {};
 
-const avatar_uvue_vue_type_style_index_1_dataScoped_l55a1p2o1g1ju769n7f_lang = {};
+const avatar_uvue_vue_type_style_index_1_dataScoped_m68bcpdr41ju8v91rj_lang = {};
 
 const upSearch_uvue_vue_type_style_index_0_lang = {};
 
-const search_uvue_vue_type_style_index_0_dataScoped_q0t7ai2boo1ju769n7i_lang = {};
+const search_uvue_vue_type_style_index_0_dataScoped_umtqhnbfo1ju8v91rl_lang = {};
 
-const search_uvue_vue_type_style_index_1_dataScoped_q0t7ai2boo1ju769n7i_lang = {};
+const search_uvue_vue_type_style_index_1_dataScoped_umtqhnbfo1ju8v91rl_lang = {};
 
 const upAlert_uvue_vue_type_style_index_0_lang = {};
 
-const alert_uvue_vue_type_style_index_0_dataScoped_lukbhl8961ju769n7o_lang = {};
+const alert_uvue_vue_type_style_index_0_dataScoped_juoni03b1ju8v91rr_lang = {};
 
-const alert_uvue_vue_type_style_index_1_dataScoped_lukbhl8961ju769n7o_lang = {};
+const alert_uvue_vue_type_style_index_1_dataScoped_juoni03b1ju8v91rr_lang = {};
 
 const upColumnNotice_uvue_vue_type_style_index_0_lang = {};
 
@@ -336,91 +336,91 @@ const upRowNotice_uvue_vue_type_style_index_0_lang = {};
 
 const upNoticeBar_uvue_vue_type_style_index_0_lang = {};
 
-const noticeBar_uvue_vue_type_style_index_0_dataScoped_f0a220a9f81ju769n7v_lang = {};
+const noticeBar_uvue_vue_type_style_index_0_dataScoped_3sftc8vbn81ju8v91rp_lang = {};
 
-const noticeBar_uvue_vue_type_style_index_1_dataScoped_f0a220a9f81ju769n7v_lang = {};
+const noticeBar_uvue_vue_type_style_index_1_dataScoped_3sftc8vbn81ju8v91rp_lang = {};
 
 const upCollapseItem_uvue_vue_type_style_index_0_lang = {};
 
 const upCollapse_uvue_vue_type_style_index_0_lang = {};
 
-const collapse_uvue_vue_type_style_index_0_dataScoped_q7pt68l48o1ju769n85_lang = {};
+const collapse_uvue_vue_type_style_index_0_dataScoped_7n14tnlpr1ju8v91ru_lang = {};
 
-const collapse_uvue_vue_type_style_index_1_dataScoped_q7pt68l48o1ju769n85_lang = {};
+const collapse_uvue_vue_type_style_index_1_dataScoped_7n14tnlpr1ju8v91ru_lang = {};
 
-const toast_uvue_vue_type_style_index_0_dataScoped_6bs4ceifd1ju769n8d_lang = {};
+const toast_uvue_vue_type_style_index_0_dataScoped_55hhhgitl81ju8v91s2_lang = {};
 
-const toast_uvue_vue_type_style_index_1_dataScoped_6bs4ceifd1ju769n8d_lang = {};
+const toast_uvue_vue_type_style_index_1_dataScoped_55hhhgitl81ju8v91s2_lang = {};
 
 const upNotify_uvue_vue_type_style_index_0_lang = {};
 
-const notify_uvue_vue_type_style_index_0_dataScoped_eutlgfmaug1ju769n8m_lang = {};
+const notify_uvue_vue_type_style_index_0_dataScoped_4gov2dj8m1ju8v91s5_lang = {};
 
-const notify_uvue_vue_type_style_index_1_dataScoped_eutlgfmaug1ju769n8m_lang = {};
+const notify_uvue_vue_type_style_index_1_dataScoped_4gov2dj8m1ju8v91s5_lang = {};
 
 const upLoadingPage_uvue_vue_type_style_index_0_lang = {};
 
-const loadingPage_uvue_vue_type_style_index_0_dataScoped_alc4n0uto81ju769n8q_lang = {};
+const loadingPage_uvue_vue_type_style_index_0_dataScoped_d77mtkv5f1ju8v91s9_lang = {};
 
-const loadingPage_uvue_vue_type_style_index_1_dataScoped_alc4n0uto81ju769n8q_lang = {};
+const loadingPage_uvue_vue_type_style_index_1_dataScoped_d77mtkv5f1ju8v91s9_lang = {};
 
-const overlay_uvue_vue_type_style_index_0_dataScoped_r3ahd7k9uo1ju769n8u_lang = {};
+const overlay_uvue_vue_type_style_index_0_dataScoped_kvemu299ko1ju8v91sc_lang = {};
 
-const overlay_uvue_vue_type_style_index_1_dataScoped_r3ahd7k9uo1ju769n8u_lang = {};
+const overlay_uvue_vue_type_style_index_1_dataScoped_kvemu299ko1ju8v91sc_lang = {};
 
 const upModal_uvue_vue_type_style_index_0_lang = {};
 
-const modal_uvue_vue_type_style_index_0_dataScoped_r2ov0p8a281ju769n98_lang = {};
+const modal_uvue_vue_type_style_index_0_dataScoped_oosm75o3gg1ju8v91sk_lang = {};
 
-const modal_uvue_vue_type_style_index_1_dataScoped_r2ov0p8a281ju769n98_lang = {};
+const modal_uvue_vue_type_style_index_1_dataScoped_oosm75o3gg1ju8v91sk_lang = {};
 
-const popup_uvue_vue_type_style_index_0_dataScoped_bidtmvtldo1ju769n94_lang = {};
+const popup_uvue_vue_type_style_index_0_dataScoped_259av48joo1ju8v91sg_lang = {};
 
-const popup_uvue_vue_type_style_index_1_dataScoped_bidtmvtldo1ju769n94_lang = {};
+const popup_uvue_vue_type_style_index_1_dataScoped_259av48joo1ju8v91sg_lang = {};
 
 const upTooltip_uvue_vue_type_style_index_0_lang = {};
 
-const tooltip_uvue_vue_type_style_index_0_dataScoped_80oqi7q9081ju769n9q_lang = {};
+const tooltip_uvue_vue_type_style_index_0_dataScoped_q2v2kgkcfg1ju8v91ss_lang = {};
 
-const tooltip_uvue_vue_type_style_index_1_dataScoped_80oqi7q9081ju769n9q_lang = {};
+const tooltip_uvue_vue_type_style_index_1_dataScoped_q2v2kgkcfg1ju8v91ss_lang = {};
 
 const upNoNetwork_uvue_vue_type_style_index_0_lang = {};
 
-const noNetwork_uvue_vue_type_style_index_0_dataScoped_3b3v1tb4s1ju769n9v_lang = {};
+const noNetwork_uvue_vue_type_style_index_0_dataScoped_i4of16nblg1ju8v91t0_lang = {};
 
-const noNetwork_uvue_vue_type_style_index_1_dataScoped_3b3v1tb4s1ju769n9v_lang = {};
+const noNetwork_uvue_vue_type_style_index_1_dataScoped_i4of16nblg1ju8v91t0_lang = {};
 
-const copy_uvue_vue_type_style_index_0_dataScoped_hgdqmqetbo1ju769na1_lang = {};
+const copy_uvue_vue_type_style_index_0_dataScoped_b1m7b1otig1ju8v91t2_lang = {};
 
-const copy_uvue_vue_type_style_index_1_dataScoped_hgdqmqetbo1ju769na1_lang = {};
+const copy_uvue_vue_type_style_index_1_dataScoped_b1m7b1otig1ju8v91t2_lang = {};
 
 const upGridItem_uvue_vue_type_style_index_0_lang = {};
 
 const upGrid_uvue_vue_type_style_index_0_lang = {};
 
-const grid_uvue_vue_type_style_index_0_dataScoped_7fl9qts1co1ju769na4_lang = {};
+const grid_uvue_vue_type_style_index_0_dataScoped_ne5p47ulo1ju8v91t4_lang = {};
 
-const grid_uvue_vue_type_style_index_1_dataScoped_7fl9qts1co1ju769na4_lang = {};
+const grid_uvue_vue_type_style_index_1_dataScoped_ne5p47ulo1ju8v91t4_lang = {};
 
-const line_uvue_vue_type_style_index_0_dataScoped_um2rrttra81ju769na7_lang = {};
+const line_uvue_vue_type_style_index_0_dataScoped_o0137vsm2o1ju8v91tb_lang = {};
 
-const line_uvue_vue_type_style_index_1_dataScoped_um2rrttra81ju769na7_lang = {};
+const line_uvue_vue_type_style_index_1_dataScoped_o0137vsm2o1ju8v91tb_lang = {};
 
 const upAlbum_uvue_vue_type_style_index_0_lang = {};
 
-const album_uvue_vue_type_style_index_0_dataScoped_6ehvgf5r781ju769naa_lang = {};
+const album_uvue_vue_type_style_index_0_dataScoped_i9jpra1vj1ju8v91t9_lang = {};
 
-const album_uvue_vue_type_style_index_1_dataScoped_6ehvgf5r781ju769naa_lang = {};
+const album_uvue_vue_type_style_index_1_dataScoped_i9jpra1vj1ju8v91t9_lang = {};
 
-const gap_uvue_vue_type_style_index_0_dataScoped_blskbqg2ho1ju769nae_lang = {};
+const gap_uvue_vue_type_style_index_0_dataScoped_hu98igvfp81ju8v91tk_lang = {};
 
-const gap_uvue_vue_type_style_index_1_dataScoped_blskbqg2ho1ju769nae_lang = {};
+const gap_uvue_vue_type_style_index_1_dataScoped_hu98igvfp81ju8v91tk_lang = {};
 
 const upSticky_uvue_vue_type_style_index_0_lang = {};
 
-const sticky_uvue_vue_type_style_index_0_dataScoped_6nlfrhjq381ju769nap_lang = {};
+const sticky_uvue_vue_type_style_index_0_dataScoped_l0p8clrhd1ju8v91tg_lang = {};
 
-const sticky_uvue_vue_type_style_index_1_dataScoped_6nlfrhjq381ju769nap_lang = {};
+const sticky_uvue_vue_type_style_index_1_dataScoped_l0p8clrhd1ju8v91tg_lang = {};
 
 const upNumberKeyboard_uvue_vue_type_style_index_0_lang = {};
 
@@ -428,67 +428,67 @@ const upCarKeyboard_uvue_vue_type_style_index_0_lang = {};
 
 const upKeyboard_uvue_vue_type_style_index_0_lang = {};
 
-const keyboard_uvue_vue_type_style_index_0_dataScoped_09riuscv11ju769nek_lang = {};
+const keyboard_uvue_vue_type_style_index_0_dataScoped_hpbhk5n38o1ju8v91tq_lang = {};
 
-const keyboard_uvue_vue_type_style_index_1_dataScoped_09riuscv11ju769nek_lang = {};
+const keyboard_uvue_vue_type_style_index_1_dataScoped_hpbhk5n38o1ju8v91tq_lang = {};
 
 const upDropdownItem_uvue_vue_type_style_index_0_lang = {};
 
 const upDropdown_uvue_vue_type_style_index_0_lang = {};
 
-const dropdown_uvue_vue_type_style_index_0_dataScoped_fnsll8vm781ju769nf1_lang = {};
+const dropdown_uvue_vue_type_style_index_0_dataScoped_j8ojjh4fbg1ju8v91tn_lang = {};
 
-const dropdown_uvue_vue_type_style_index_1_dataScoped_fnsll8vm781ju769nf1_lang = {};
+const dropdown_uvue_vue_type_style_index_1_dataScoped_j8ojjh4fbg1ju8v91tn_lang = {};
 
 const upSwipeActionItem_uvue_vue_type_style_index_0_lang = {};
 
-const swipeAction_uvue_vue_type_style_index_0_dataScoped_8mrejtv7u1ju769nfg_lang = {};
+const swipeAction_uvue_vue_type_style_index_0_dataScoped_qk4e2giijg1ju8v91tv_lang = {};
 
-const swipeAction_uvue_vue_type_style_index_1_dataScoped_8mrejtv7u1ju769nfg_lang = {};
+const swipeAction_uvue_vue_type_style_index_1_dataScoped_qk4e2giijg1ju8v91tv_lang = {};
 
 const upLineProgress_uvue_vue_type_style_index_0_lang = {};
 
-const lineProgress_uvue_vue_type_style_index_0_dataScoped_qche6l741o1ju769nfo_lang = {};
+const lineProgress_uvue_vue_type_style_index_0_dataScoped_pn0cni1oa81ju8v91u1_lang = {};
 
-const lineProgress_uvue_vue_type_style_index_1_dataScoped_qche6l741o1ju769nfo_lang = {};
+const lineProgress_uvue_vue_type_style_index_1_dataScoped_pn0cni1oa81ju8v91u1_lang = {};
 
 const upCountDown_uvue_vue_type_style_index_0_lang = {};
 
-const countDown_uvue_vue_type_style_index_0_dataScoped_fg7qt19pkg1ju769nft_lang = {};
+const countDown_uvue_vue_type_style_index_0_dataScoped_nidhlia4r81ju8v91u3_lang = {};
 
-const countDown_uvue_vue_type_style_index_1_dataScoped_fg7qt19pkg1ju769nft_lang = {};
+const countDown_uvue_vue_type_style_index_1_dataScoped_nidhlia4r81ju8v91u3_lang = {};
 
 const upCountTo_uvue_vue_type_style_index_0_lang = {};
 
-const countTo_uvue_vue_type_style_index_0_dataScoped_1f6q9i6j281ju769ng3_lang = {};
+const countTo_uvue_vue_type_style_index_0_dataScoped_jh066f0hl1ju8v91u8_lang = {};
 
-const countTo_uvue_vue_type_style_index_1_dataScoped_1f6q9i6j281ju769ng3_lang = {};
+const countTo_uvue_vue_type_style_index_1_dataScoped_jh066f0hl1ju8v91u8_lang = {};
 
 const upNavbar_uvue_vue_type_style_index_0_lang = {};
 
-const navbar_uvue_vue_type_style_index_0_dataScoped_6o4ri7nngg1ju769ng8_lang = {};
+const navbar_uvue_vue_type_style_index_0_dataScoped_iv9al1iut81ju8v91ub_lang = {};
 
-const navbar_uvue_vue_type_style_index_1_dataScoped_6o4ri7nngg1ju769ng8_lang = {};
+const navbar_uvue_vue_type_style_index_1_dataScoped_iv9al1iut81ju8v91ub_lang = {};
 
 const upTabbarItem_uvue_vue_type_style_index_0_lang = {};
 
 const upTabbar_uvue_vue_type_style_index_0_lang = {};
 
-const tabbar_uvue_vue_type_style_index_0_dataScoped_8vdb1hd0n81ju769ngf_lang = {};
+const tabbar_uvue_vue_type_style_index_0_dataScoped_5u68f5fl81ju8v91u5_lang = {};
 
-const tabbar_uvue_vue_type_style_index_1_dataScoped_8vdb1hd0n81ju769ngf_lang = {};
+const tabbar_uvue_vue_type_style_index_1_dataScoped_5u68f5fl81ju8v91u5_lang = {};
 
 const upTabs_uvue_vue_type_style_index_0_lang = {};
 
-const tabs_uvue_vue_type_style_index_0_dataScoped_jgmtmcune81ju769ngn_lang = {};
+const tabs_uvue_vue_type_style_index_0_dataScoped_fu647iq1ag1ju8v91uh_lang = {};
 
-const tabs_uvue_vue_type_style_index_1_dataScoped_jgmtmcune81ju769ngn_lang = {};
+const tabs_uvue_vue_type_style_index_1_dataScoped_fu647iq1ag1ju8v91uh_lang = {};
 
 const upSubsection_uvue_vue_type_style_index_0_lang = {};
 
-const subsection_uvue_vue_type_style_index_0_dataScoped_gfn35dvgc1ju769ngt_lang = {};
+const subsection_uvue_vue_type_style_index_0_dataScoped_mvdn8dgpog1ju8v91uf_lang = {};
 
-const subsection_uvue_vue_type_style_index_1_dataScoped_gfn35dvgc1ju769ngt_lang = {};
+const subsection_uvue_vue_type_style_index_1_dataScoped_mvdn8dgpog1ju8v91uf_lang = {};
 
 const upIndexAnchor_uvue_vue_type_style_index_0_lang = {};
 
@@ -496,62 +496,62 @@ const upIndexItem_uvue_vue_type_style_index_0_lang = {};
 
 const upIndexList_uvue_vue_type_style_index_0_lang = {};
 
-const indexList_uvue_vue_type_style_index_0_dataScoped_v2jbfsi421ju769nh4_lang = {};
+const indexList_uvue_vue_type_style_index_0_dataScoped_p7iknnd0lo1ju8v91uk_lang = {};
 
-const indexList_uvue_vue_type_style_index_1_dataScoped_v2jbfsi421ju769nh4_lang = {};
+const indexList_uvue_vue_type_style_index_1_dataScoped_p7iknnd0lo1ju8v91uk_lang = {};
 
 const upNavbarMini_uvue_vue_type_style_index_0_lang = {};
 
-const navbarMini_uvue_vue_type_style_index_0_dataScoped_0jts5o37oo1ju769nhc_lang = {};
+const navbarMini_uvue_vue_type_style_index_0_dataScoped_iodvjftfj81ju8v91up_lang = {};
 
-const navbarMini_uvue_vue_type_style_index_1_dataScoped_0jts5o37oo1ju769nhc_lang = {};
+const navbarMini_uvue_vue_type_style_index_1_dataScoped_iodvjftfj81ju8v91up_lang = {};
 
 const upQrcode_uvue_vue_type_style_index_0_lang = {};
 
-const qrcode_uvue_vue_type_style_index_0_dataScoped_7hed3utibo1ju769nhn_lang = {};
+const qrcode_uvue_vue_type_style_index_0_dataScoped_rpd3bnphcg1ju8v91v0_lang = {};
 
-const qrcode_uvue_vue_type_style_index_1_dataScoped_7hed3utibo1ju769nhn_lang = {};
+const qrcode_uvue_vue_type_style_index_1_dataScoped_rpd3bnphcg1ju8v91v0_lang = {};
 
 const upLazyLoad_uvue_vue_type_style_index_0_lang = {};
 
-const lazyLoad_uvue_vue_type_style_index_0_dataScoped_9uethg249g1ju769nhq_lang = {};
+const lazyLoad_uvue_vue_type_style_index_0_dataScoped_btiub5d9n81ju8v91v3_lang = {};
 
-const lazyLoad_uvue_vue_type_style_index_1_dataScoped_9uethg249g1ju769nhq_lang = {};
+const lazyLoad_uvue_vue_type_style_index_1_dataScoped_btiub5d9n81ju8v91v3_lang = {};
 
 const upLoadmore_uvue_vue_type_style_index_0_lang = {};
 
-const loadmore_uvue_vue_type_style_index_0_dataScoped_r1bdiv67kg1ju769ni0_lang = {};
+const loadmore_uvue_vue_type_style_index_0_dataScoped_ebsnibfvo81ju8v91v6_lang = {};
 
-const loadmore_uvue_vue_type_style_index_1_dataScoped_r1bdiv67kg1ju769ni0_lang = {};
+const loadmore_uvue_vue_type_style_index_1_dataScoped_ebsnibfvo81ju8v91v6_lang = {};
 
 const upWaterfall_uvue_vue_type_style_index_0_lang = {};
 
-const waterfall_uvue_vue_type_style_index_0_dataScoped_cqcg8k3k8o1ju769ni6_lang = {};
+const waterfall_uvue_vue_type_style_index_0_dataScoped_pr783ugmh1ju8v91vb_lang = {};
 
-const waterfall_uvue_vue_type_style_index_1_dataScoped_cqcg8k3k8o1ju769ni6_lang = {};
+const waterfall_uvue_vue_type_style_index_1_dataScoped_pr783ugmh1ju8v91vb_lang = {};
 
 const upCode_uvue_vue_type_style_index_0_lang = {};
 
-const code_uvue_vue_type_style_index_0_dataScoped_3579g9rdd81ju769nid_lang = {};
+const code_uvue_vue_type_style_index_0_dataScoped_g3a3lun1ig1ju8v91vg_lang = {};
 
-const code_uvue_vue_type_style_index_1_dataScoped_3579g9rdd81ju769nid_lang = {};
+const code_uvue_vue_type_style_index_1_dataScoped_g3a3lun1ig1ju8v91vg_lang = {};
 
 const upParse_uvue_vue_type_style_index_0_lang = {};
 
-const parse_uvue_vue_type_style_index_0_dataScoped_evu67aqjb1ju769nih_lang = {};
+const parse_uvue_vue_type_style_index_0_dataScoped_galeho4b981ju8v9200_lang = {};
 
-const parse_uvue_vue_type_style_index_1_dataScoped_evu67aqjb1ju769nih_lang = {};
+const parse_uvue_vue_type_style_index_1_dataScoped_galeho4b981ju8v9200_lang = {};
 
 const upBackTop_uvue_vue_type_style_index_0_lang = {};
 
-const backTop_uvue_vue_type_style_index_0_dataScoped_i0ps81gfho1ju769nin_lang = {};
+const backTop_uvue_vue_type_style_index_0_dataScoped_fof20hnu81ju8v91vs_lang = {};
 
-const backTop_uvue_vue_type_style_index_1_dataScoped_i0ps81gfho1ju769nin_lang = {};
+const backTop_uvue_vue_type_style_index_1_dataScoped_fof20hnu81ju8v91vs_lang = {};
 
 const mpHtml_uvue_vue_type_style_index_0_lang = {};
 
-const mpHtml_uvue_vue_type_style_index_0_dataScoped_hsvu29o9s81ju769nis_lang = {};
+const mpHtml_uvue_vue_type_style_index_0_dataScoped_bh87sv2v21ju8v91vl_lang = {};
 
-const mpHtml_uvue_vue_type_style_index_1_dataScoped_hsvu29o9s81ju769nis_lang = {};
+const mpHtml_uvue_vue_type_style_index_1_dataScoped_bh87sv2v21ju8v91vl_lang = {};
 
 const App_uvue_vue_type_style_index_0_lang = {};

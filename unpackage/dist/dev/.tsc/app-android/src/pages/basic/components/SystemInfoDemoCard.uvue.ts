@@ -26,7 +26,7 @@ return (): any | null => {
 
   return _cV(unref(Card), _uM({ title: "系统与安全区域信息" }), _uM({
     default: withSlotCtx((): any[] => [
-      _cE("view", _uM({ class: "bg-__f8fafc_ rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }), [
+      _cE("view", _uM({ class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }), [
         _cE("text", _uM({ class: "text-13px font-bold text-__1e293b_ mb-12px" }), "安全区域内边距 (SafeAreaInsets)"),
         _cE("view", _uM({ class: "flex-row justify-between mb-8px" }), [
           _cE("text", _uM({ class: "text-14px text-__64748b_" }), "Top (顶部距离)"),
@@ -45,7 +45,7 @@ return (): any | null => {
           _cE("text", _uM({ class: "text-14px font-bold text-__334155_" }), _tD(safeAreaRight.value), 1 /* TEXT */)
         ])
       ]),
-      _cE("view", _uM({ class: "bg-__f8fafc_ rounded-12px p-16px border-width-1px border-style-solid border-color-__e2e8f0_" }), [
+      _cE("view", _uM({ class: "rounded-12px p-16px border-width-1px border-style-solid border-color-__e2e8f0_" }), [
         _cE("text", _uM({ class: "text-13px font-bold text-__1e293b_ mb-12px" }), "设备窗口规格 (WindowInfo)"),
         _cE("view", _uM({ class: "flex-row justify-between mb-8px" }), [
           _cE("text", _uM({ class: "text-14px text-__64748b_" }), "屏幕宽度"),
@@ -80,4 +80,4 @@ return (): any | null => {
 
 })
 export default __sfc__
-const GenSrcPagesBasicComponentsSystemInfoDemoCardStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["border-color-__e2e8f0_", _pS(_uM([["borderTopColor", "#e2e8f0"], ["borderRightColor", "#e2e8f0"], ["borderBottomColor", "#e2e8f0"], ["borderLeftColor", "#e2e8f0"]]))], ["border-style-solid", _pS(_uM([["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"]]))], ["border-width-1px", _pS(_uM([["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["font-bold", _pS(_uM([["fontWeight", 700]]))], ["justify-between", _pS(_uM([["justifyContent", "space-between"]]))], ["mb-12px", _pS(_uM([["marginBottom", 12]]))], ["mb-16px", _pS(_uM([["marginBottom", 16]]))], ["mb-8px", _pS(_uM([["marginBottom", 8]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["rounded-12px", _pS(_uM([["borderTopLeftRadius", 12], ["borderTopRightRadius", 12], ["borderBottomRightRadius", 12], ["borderBottomLeftRadius", 12]]))], ["text-__1e293b_", _pS(_uM([["color", "#1e293b"]]))], ["text-__334155_", _pS(_uM([["color", "#334155"]]))], ["text-__64748b_", _pS(_uM([["color", "#64748b"]]))], ["text-13px", _pS(_uM([["fontSize", 13]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))]])]
+const GenSrcPagesBasicComponentsSystemInfoDemoCardStyles = [_uM([["border-color-__e2e8f0_", _pS(_uM([["borderTopColor", "#e2e8f0"], ["borderRightColor", "#e2e8f0"], ["borderBottomColor", "#e2e8f0"], ["borderLeftColor", "#e2e8f0"]]))], ["border-style-solid", _pS(_uM([["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"]]))], ["border-width-1px", _pS(_uM([["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["font-bold", _pS(_uM([["fontWeight", 700]]))], ["justify-between", _pS(_uM([["justifyContent", "space-between"]]))], ["mb-12px", _pS(_uM([["marginBottom", 12]]))], ["mb-16px", _pS(_uM([["marginBottom", 16]]))], ["mb-8px", _pS(_uM([["marginBottom", 8]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["rounded-12px", _pS(_uM([["borderTopLeftRadius", 12], ["borderTopRightRadius", 12], ["borderBottomRightRadius", 12], ["borderBottomLeftRadius", 12]]))], ["text-__1e293b_", _pS(_uM([["color", "#1e293b"]]))], ["text-__334155_", _pS(_uM([["color", "#334155"]]))], ["text-__64748b_", _pS(_uM([["color", "#64748b"]]))], ["text-13px", _pS(_uM([["fontSize", 13]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))]])]
