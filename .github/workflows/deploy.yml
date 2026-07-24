@@ -1,26 +1,51 @@
-name: Deploy to GitHub Pages
+name: Deploy Web and Docs to Pages
 
 on:
   push:
-    branches:
-      - main # 只有在 push 到 main 分支时才触发部署
+    branches: [main]
 
-# 设置 GITHUB_TOKEN 的权限，允许写入仓库内容（用于发布到 gh-pages 分支）
 permissions:
   contents: write
 
 jobs:
   build-and-deploy:
-    concurrency: ci-${{ github.ref }} # 防止并发部署冲突
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout 🛎️
+      - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Deploy to GitHub Pages 🚀
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build VitePress Docs
+        run: pnpm run docs:build
+
+      - name: Build H5 Site
+        run: pnpm run build:h5
+
+      - name: Prepare Deployment Directory
+        run: |
+          mkdir -p ./dist_deploy
+          cp -r ./unpackage/dist/build/web/* ./dist_deploy/
+          mkdir -p ./dist_deploy/docs
+          cp -r ./docs/.vitepress/dist/* ./dist_deploy/docs/
+
+      - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./unpackage/dist/build/web # 部署打包后的 H5 产物目录
-          force_orphan: true # 可选，使 gh-pages 分支的历史记录更干净
+          publish_dir: ./dist_deploy
+          force_orphan: true
