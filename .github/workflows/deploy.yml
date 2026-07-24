@@ -1,50 +1,26 @@
-name: Deploy Web and Docs to Pages
+name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
-    branches-ignore:
-      - gh-pages
+    branches:
+      - main # 只有在 push 到 main 分支时才触发部署
 
+# 设置 GITHUB_TOKEN 的权限，允许写入仓库内容（用于发布到 gh-pages 分支）
 permissions:
   contents: write
 
 jobs:
   build-and-deploy:
+    concurrency: ci-${{ github.ref }} # 防止并发部署冲突
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout 拉取仓库代码
+      - name: Checkout 🛎️
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: 安装 pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9
-
-      - name: 配置 Node.js 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-
-      - name: 安装项目依赖
-        run: pnpm install
-
-      - name: 打包文档站点
-        run: pnpm run docs:build
-
-      - name: 整理部署目录文件
-        run: |
-          mkdir -p ./dist_deploy
-          cp -r ./unpackage/dist/build/web/* ./dist_deploy/
-          mkdir -p ./dist_deploy/docs
-          cp -r ./docs/.vitepress/dist/* ./dist_deploy/docs/
-          touch ./dist_deploy/.nojekyll
-
-      - name: 部署至 GitHub Pages
+      - name: Deploy to GitHub Pages 🚀
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist_deploy
+          publish_dir: ./unpackage/dist/build/web # 部署打包后的 H5 产物目录
+          force_orphan: true # 可选，使 gh-pages 分支的历史记录更干净
