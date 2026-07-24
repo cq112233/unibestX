@@ -1,41 +1,55 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
-    <NavBar title="up-list 列表" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
-    <view class="p-16px">
-      <view class="demo-block">
-        <text class="demo-label">高性能列表</text>
-        <up-list
-          :height="300"
-          :lower-threshold="20"
-          :refresher-enabled="true"
-          :refresher-triggered="listRefreshing"
-          @scrolltolower="onListLoadMore"
-          @refresherrefresh="onListRefresh"
-        >
-          <view v-for="(item, idx) in listItems" :key="idx" class="demo-list-cell">
-            <view class="demo-list-cell-avatar">
-              <up-icon name="account" size="20" color="#ffffff"></up-icon>
+  <view class="page-container bg-[#f8fafc] flex flex-col flex-1 h-full">
+    <NavBar title="up-list 双列表嵌套" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+
+    <!-- 嵌套滚动外层容器 -->
+    <scroll-view type="nested" direction="vertical" class="flex-1 h-0">
+      <!-- 列表 1：nested-scroll-header 1 (调高高度至 380px) -->
+      <nested-scroll-header>
+        <view class="p-12px pb-0">
+          <text class="text-14px font-bold text-[#2979ff] mb-8px">列表 1：动态加载列表 (高度 380px)</text>
+          <up-list
+            :height="580"
+            :lower-threshold="20"
+            :refresher-enabled="true"
+            :refresher-triggered="listRefreshing"
+            class="bg-white rounded-8px shadow-xs"
+            @scrolltolower="onListLoadMore"
+            @refresherrefresh="onListRefresh"
+          >
+            <view v-for="(item, idx) in listItems" :key="idx" class="demo-list-cell">
+              <view class="demo-list-cell-avatar">
+                <up-icon name="account" size="20" color="#ffffff"></up-icon>
+              </view>
+              <view class="demo-list-cell-content">
+                <text class="text-14px font-500 text-[#303133]">{{ item.title as string }}</text>
+                <text class="text-12px text-[#909399] mt-4px">{{ item.desc as string }}</text>
+              </view>
             </view>
-            <view class="demo-list-cell-content">
-              <text class="text-14px font-500 text-[#303133]">{{ item.title as string }}</text>
-              <text class="text-12px text-[#909399] mt-4px">{{ item.desc as string }}</text>
+            <view v-if="listLoading" class="list-loading">
+              <up-loading-icon mode="circle" size="20"></up-loading-icon>
+              <text class="text-12px text-[#909399] ml-8px">加载中...</text>
             </view>
-          </view>
-          <view v-if="listLoading" class="list-loading">
-            <up-loading-icon mode="circle" size="20"></up-loading-icon>
-            <text class="text-12px text-[#909399] ml-8px">加载中...</text>
-          </view>
-        </up-list>
-      </view>
-      <view class="demo-block mt-12px">
-        <text class="demo-label">简单静态列表</text>
-        <up-list :height="200">
-          <view v-for="(item, idx) in 10" :key="idx" class="demo-list-cell">
-            <text class="text-14px font-500 text-[#303133]">静态列表项 {{ item }}</text>
-          </view>
-        </up-list>
-      </view>
-    </view>
+          </up-list>
+        </view>
+      </nested-scroll-header>
+
+      <!-- 列表 2：nested-scroll-header 2 (高度 280px) -->
+      <nested-scroll-header>
+        <view class="p-12px pb-24px">
+          <text class="text-14px font-bold text-[#19be6b] mb-8px">列表 2：静态展示列表 (高度 280px)</text>
+          <up-list :height="280" class="bg-white rounded-8px shadow-xs">
+            <view v-for="(item, idx) in staticListItems" :key="idx" class="demo-list-cell">
+              <view class="w-8px h-8px rounded-4px bg-[#19be6b] mr-10px"></view>
+              <view class="demo-list-cell-content">
+                <text class="text-14px font-500 text-[#303133]">{{ item.title as string }}</text>
+                <text class="text-12px text-[#909399] mt-4px">{{ item.desc as string }}</text>
+              </view>
+            </view>
+          </up-list>
+        </view>
+      </nested-scroll-header>
+    </scroll-view>
   </view>
 </template>
 
@@ -43,19 +57,48 @@
 import { ref } from 'vue'
 
 const listItems = ref([
-  { title: 'List 列表项 01', desc: '这是高性能列表的第一项' },
-  { title: 'List 列表项 02', desc: '支持下拉刷新和滚动加载更多' },
-  { title: 'List 列表项 03', desc: '基于 scroll-view 封装' },
-  { title: 'List 列表项 04', desc: '适用于长列表滚动场景' },
-  { title: 'List 列表项 05', desc: '内置 refresher 下拉刷新能力' },
-  { title: 'List 列表项 06', desc: '支持 scrolltolower 触底加载' },
+  { title: '列表 1 - 项目 01', desc: '支持下拉刷新与触底加载' },
+  { title: '列表 1 - 项目 02', desc: '基于 scroll-view 封装' },
+  { title: '列表 1 - 项目 03', desc: '支持单指内部滚动' },
+  { title: '列表 1 - 项目 04', desc: '支持单指内部滚动' },
+  { title: '列表 1 - 项目 05', desc: '支持单指内部滚动' },
+  { title: '列表 1 - 项目 06', desc: '支持单指内部滚动' },
+  { title: '列表 1 - 项目 07', desc: '支持单指内部滚动' },
+  { title: '列表 1 - 项目 08', desc: '支持单指内部滚动' },
+  { title: '列表 1 - 项目 09', desc: '支持单指内部滚动' },
+  { title: '列表 1 - 项目 10', desc: '支持单指内部滚动' },
+  { title: '列表 1 - 项目 11', desc: '支持单指内部滚动' },
+  { title: '列表 1 - 项目 12', desc: '支持单指内部滚动' },
+  { title: '列表 1 - 项目 13', desc: '支持单指内部滚动' },
+  { title: '列表 1 - 项目 14', desc: '支持单指内部滚动' },
+  { title: '列表 1 - 项目 15', desc: '支持单指内部滚动' },
 ] as UTSJSONObject[])
+
+const staticListItems = ref([
+  { title: '列表 2 - 项目 01', desc: '静态列表第 1 项内容' },
+  { title: '列表 2 - 项目 02', desc: '静态列表第 2 项内容' },
+  { title: '列表 2 - 项目 03', desc: '静态列表第 3 项内容' },
+  { title: '列表 2 - 项目 04', desc: '静态列表第 4 项内容' },
+  { title: '列表 2 - 项目 05', desc: '静态列表第 5 项内容' },
+  { title: '列表 2 - 项目 06', desc: '静态列表第 6 项内容' },
+  { title: '列表 2 - 项目 07', desc: '静态列表第 7 项内容' },
+  { title: '列表 2 - 项目 08', desc: '静态列表第 8 项内容' },
+  { title: '列表 2 - 项目 09', desc: '静态列表第 9 项内容' },
+  { title: '列表 2 - 项目 10', desc: '静态列表第 10 项内容' },
+  { title: '列表 2 - 项目 11', desc: '静态列表第 11 项内容' },
+  { title: '列表 2 - 项目 12', desc: '静态列表第 12 项内容' },
+  { title: '列表 2 - 项目 13', desc: '静态列表第 13 项内容' },
+  { title: '列表 2 - 项目 14', desc: '静态列表第 14 项内容' },
+  { title: '列表 2 - 项目 15', desc: '静态列表第 15 项内容' },
+] as UTSJSONObject[])
+
 const listLoading = ref(false)
 const listRefreshing = ref(false)
 let listLoadCount = 1
 
 function onListLoadMore(): void {
-  if (listLoading.value) return
+  if (listLoading.value)
+    return
   listLoading.value = true
   setTimeout(() => {
     listLoadCount += 1
@@ -82,20 +125,6 @@ function onListRefresh(): void {
 </script>
 
 <style scoped>
-.demo-block {
-  margin-bottom: 12px;
-  padding: 12px;
-  background-color: #ffffff;
-  border-radius: 8px;
-}
-.demo-label {
-  font-size: 14px;
-  font-weight: bold;
-  color: #606266;
-  margin-bottom: 10px;
-  padding-left: 4px;
-  border-left: 3px solid #2979ff;
-}
 .demo-list-cell {
   display: flex;
   flex-direction: row;
