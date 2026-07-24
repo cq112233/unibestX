@@ -18,12 +18,12 @@ const actionSheetShow2 = ref(false)
 const actionSheetShow3 = ref(false)
 const actionList = ref([
   { name: '拍照' },
-  { name: '从相册选择' }
+  { name: '从相册选择' },
 ])
 const actionListComplex = ref([
   { name: '着色选项', color: '#ffaa33' },
   { name: '禁用选项', disabled: true },
-  { name: '带副标题选项', subname: '我是副标题' }
+  { name: '带副标题选项', subname: '我是副标题' },
 ])
 
 function onActionSelect(e: UTSJSONObject) {

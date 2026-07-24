@@ -91,28 +91,30 @@ __ins.emit(event, ...do_not_transform_spread)
 }
 
 // 数据
-const icons = {__$originalPosition: new UTSSourceMapPosition("icons", "uni_modules/uview-ultra/components/up-empty/up-empty.uvue", 113, 7),
-	car: t("up.empty.car", {}),
-	page: t("up.empty.page", {}),
-	search: t("up.empty.search", {}),
-	address: t("up.empty.address", {}),
-	wifi: t("up.empty.wifi", {}),
-	order: t("up.empty.order", {}),
-	coupon: t("up.empty.coupon", {}),
-	favor: t("up.empty.favor", {}),
-	permission: t("up.empty.permission", {}),
-	history: t("up.empty.history", {}),
-	news: t("up.empty.news", {}),
-	message: t("up.empty.message", {}),
-	list: t("up.empty.list", {}),
-	data: t("up.empty.data", {}),
-	comment: t("up.empty.comment", {}),
-}
+const icons = computed(() : UTSJSONObject => {
+	return {
+		car: t("up.empty.car", {}),
+		page: t("up.empty.page", {}),
+		search: t("up.empty.search", {}),
+		address: t("up.empty.address", {}),
+		wifi: t("up.empty.wifi", {}),
+		order: t("up.empty.order", {}),
+		coupon: t("up.empty.coupon", {}),
+		favor: t("up.empty.favor", {}),
+		permission: t("up.empty.permission", {}),
+		history: t("up.empty.history", {}),
+		news: t("up.empty.news", {}),
+		message: t("up.empty.message", {}),
+		list: t("up.empty.list", {}),
+		data: t("up.empty.data", {}),
+		comment: t("up.empty.comment", {}),
+	} as UTSJSONObject
+})
 
 // 计算属性
 // 组件样式
 const emptyStyle = computed(() => {
-	const style = {__$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-empty/up-empty.uvue", 134, 8),}
+	const style = {__$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-empty/up-empty.uvue", 136, 8),}
 	style['marginTop'] = addUnit(props.marginTop)
 	// 合并customStyle样式
 	return style
@@ -120,7 +122,7 @@ const emptyStyle = computed(() => {
 
 // 文本样式
 const textStyle = computed(() => {
-	const style = {__$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-empty/up-empty.uvue", 142, 8),}
+	const style = {__$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-empty/up-empty.uvue", 144, 8),}
 	style['color'] = props.textColor
 	style['fontSize'] = addUnit(props.textSize)
 	return style
@@ -162,7 +164,7 @@ const _component_up_icon = resolveEasyComponent("up-icon",_easycom_up_icon)
         _cE("text", _uM({
           class: "up-empty__text",
           style: _nS([textStyle.value])
-        }), _tD(_ctx.text != '' ? _ctx.text : icons[_ctx.mode]), 5 /* TEXT, STYLE */),
+        }), _tD(_ctx.text != '' ? _ctx.text : icons.value[_ctx.mode]), 5 /* TEXT, STYLE */),
         isTrue(_ctx.$slots['default'] != null || _ctx.$slots['$default'] != null)
           ? _cE("view", _uM({
               key: 2,

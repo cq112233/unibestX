@@ -1,5 +1,5 @@
 <template>
-  <Card title="ECharts 图表示例">
+  <Card :title="$t('basic.echartTitle')">
     <view class="w-full h-260px mt-10px">
       <e-chart ref="echartRef" class="w-full !h-full" @ready="initEchart" />
     </view>
@@ -13,7 +13,7 @@
           <text
             class="text-12px font-bold"
             :class="currentType !== 'line' ? 'text-[#3b82f6]' : 'text-[#ffffff]'"
-          >折线图</text>
+          >{{ $t('basic.echartLine') }}</text>
         </view>
       </view>
       <view class="flex-1 mr-8px">
@@ -25,7 +25,7 @@
           <text
             class="text-12px font-bold"
             :class="currentType !== 'bar' ? 'text-[#10b981]' : 'text-[#ffffff]'"
-          >柱状图</text>
+          >{{ $t('basic.echartBar') }}</text>
         </view>
       </view>
       <view class="flex-1">
@@ -37,7 +37,7 @@
           <text
             class="text-12px font-bold"
             :class="currentType !== 'pie' ? 'text-[#f59e0b]' : 'text-[#ffffff]'"
-          >饼图</text>
+          >{{ $t('basic.echartPie') }}</text>
         </view>
       </view>
     </view>

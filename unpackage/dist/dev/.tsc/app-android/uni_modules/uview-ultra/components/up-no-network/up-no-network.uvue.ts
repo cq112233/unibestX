@@ -3,7 +3,7 @@
 	import { mpMixin } from '../../libs/mixin/mpMixin';
 	import { mixin } from '../../libs/mixin/mixin';
 	import { toast, getDeviceInfo } from '../../libs/function/index';
-	import { t } from '../../libs/i18n'
+	import { t } from '../../libs/i18n/index.uts'
 	/**
 	 * noNetwork 无网络提示
 	 * @description 该组件无需任何配置，引入即可，内部自动处理所有功能和事件。
@@ -44,8 +44,8 @@
 		},
 		emits: ["disconnected", "connected", "retry"],
 		methods: {
-			t(s: string){
-				return t(s)
+			t(s: string): string {
+				return t(s, {} as UTSJSONObject)
 			},
 			retry() {
 				// 重新检查网络
@@ -54,10 +54,10 @@
 						this.networkType = res.networkType
 						this.emitEvent(this.networkType)
 						if (res.networkType == 'none') {
-							toast(t("up.noNetwork.disconnect"))
+							toast(t("up.noNetwork.disconnect", {} as UTSJSONObject))
 							this.isConnected = false
 						} else {
-							toast(t("up.noNetwork.connect"))
+							toast(t("up.noNetwork.connect", {} as UTSJSONObject))
 							this.isConnected = true
 						}
 					}

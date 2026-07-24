@@ -244,9 +244,12 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       formatterFunc = getFormatFunc();
       if (props.mode === "time" || props.mode === "timesecond") {
         const timeArr = value.toString().split(":");
-        values = [formatterFunc("hour", timeArr[0]), formatterFunc("minute", timeArr[1])];
+        const hourVal = timeArr.length > 0 ? timeArr[0] : "00";
+        const minuteVal = timeArr.length > 1 ? timeArr[1] : "00";
+        const secondVal = timeArr.length > 2 ? timeArr[2] : "00";
+        values = [formatterFunc("hour", hourVal), formatterFunc("minute", minuteVal)];
         if (props.mode === "timesecond") {
-          values.push(formatterFunc("second", timeArr[2]));
+          values.push(formatterFunc("second", secondVal));
         }
       } else {
         new Date(value.toString());
@@ -270,8 +273,9 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       }
       let indexs = [];
       columns.value.forEach((column, index) => {
+        const targetVal = index < values.length ? values[index] : "";
         indexs.push(Math.max(0, column.findIndex((item) => {
-          return item === values[index];
+          return item === targetVal;
         })));
       });
       innerDefaultIndex.value = indexs;
@@ -527,9 +531,9 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
           return "";
         }
         const timeArr = value.toString().split(":");
-        let hour = timeArr[0];
-        let minute = timeArr[1];
-        let second = timeArr[2];
+        let hour = timeArr.length > 0 ? timeArr[0] : "00";
+        let minute = timeArr.length > 1 ? timeArr[1] : "00";
+        let second = timeArr.length > 2 ? timeArr[2] : "00";
         const hourNum = parseInt(hour);
         const minuteNum = parseInt(minute);
         hour = padZero(range(props.minHour, props.maxHour, isNaN(hourNum) ? props.minHour : hourNum));
@@ -603,14 +607,19 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     }
     function change(e) {
       let indexs = e["indexs"];
+      if (indexs == null)
+        indexs = [];
       let values = e["values"];
       if (values == null)
         values = [];
       let selectValue = "";
       if (props.mode === "time" || props.mode === "timesecond") {
-        const hourText = safeColumnValue(values, 0, indexs[0], padZero(props.minHour));
-        const minuteText = safeColumnValue(values, 1, indexs[1], padZero(props.minMinute));
-        const secondText = safeColumnValue(values, 2, indexs[2], padZero(props.minSecond));
+        const idx0 = indexs.length > 0 ? indexs[0] : 0;
+        const idx1 = indexs.length > 1 ? indexs[1] : 0;
+        const idx2 = indexs.length > 2 ? indexs[2] : 0;
+        const hourText = safeColumnValue(values, 0, idx0, padZero(props.minHour));
+        const minuteText = safeColumnValue(values, 1, idx1, padZero(props.minMinute));
+        const secondText = safeColumnValue(values, 2, idx2, padZero(props.minSecond));
         let hour = toInt(intercept(hourText), props.minHour);
         let minute = toInt(intercept(minuteText), props.minMinute);
         let second = toInt(intercept(secondText), props.minSecond);
@@ -629,29 +638,35 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         const currentHour = validCurrent.hour();
         const currentMinute = validCurrent.minute();
         const currentSecond = validCurrent.second();
-        const yearText = safeColumnValue(values, 0, indexs[0], currentYear.toString());
-        const monthText = safeColumnValue(values, 1, indexs[1], padZero(currentMonth));
+        const idx0 = indexs.length > 0 ? indexs[0] : 0;
+        const idx1 = indexs.length > 1 ? indexs[1] : 0;
+        const idx2 = indexs.length > 2 ? indexs[2] : 0;
+        const yearText = safeColumnValue(values, 0, idx0, currentYear.toString());
+        const monthText = safeColumnValue(values, 1, idx1, padZero(currentMonth));
         let year = toInt(intercept(yearText, "year"), currentYear);
         let month = toInt(intercept(monthText), currentMonth);
         let hour = 0, minute = 0, second = 0;
         month = range(1, 12, month);
         const maxDate = dayuts(`${year}-${month}`).daysInMonth();
-        const dayText = safeColumnValue(values, 2, indexs[2], padZero(Math.min(currentDate, maxDate)));
+        const dayText = safeColumnValue(values, 2, idx2, padZero(Math.min(currentDate, maxDate)));
         let date = toInt(intercept(dayText), Math.min(currentDate, maxDate));
         if (props.mode === "year-month") {
           date = 1;
         }
         date = range(1, maxDate, date);
         if (props.mode === "datehour" || props.mode === "datetime" || props.mode === "datetimesecond") {
-          const hourText = safeColumnValue(values, 3, indexs[3], padZero(currentHour));
+          const idx3 = indexs.length > 3 ? indexs[3] : 0;
+          const hourText = safeColumnValue(values, 3, idx3, padZero(currentHour));
           hour = range(0, 23, toInt(intercept(hourText), currentHour));
         }
         if (props.mode === "datetime" || props.mode === "datetimesecond") {
-          const minuteText = safeColumnValue(values, 4, indexs[4], padZero(currentMinute));
+          const idx4 = indexs.length > 4 ? indexs[4] : 0;
+          const minuteText = safeColumnValue(values, 4, idx4, padZero(currentMinute));
           minute = range(0, 59, toInt(intercept(minuteText), currentMinute));
         }
         if (props.mode === "datetimesecond") {
-          const secondText = safeColumnValue(values, 5, indexs[5], padZero(currentSecond));
+          const idx5 = indexs.length > 5 ? indexs[5] : 0;
+          const secondText = safeColumnValue(values, 5, idx5, padZero(currentSecond));
           second = range(0, 59, toInt(intercept(secondText), currentSecond));
         }
         selectValue = new Date(year, month - 1, date, hour, minute, second).getTime();

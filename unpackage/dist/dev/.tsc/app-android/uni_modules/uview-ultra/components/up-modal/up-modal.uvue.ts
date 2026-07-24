@@ -3,6 +3,7 @@
 	import { mpMixin } from '../../libs/mixin/mpMixin';
 	import { mixin } from '../../libs/mixin/mixin';
 	import { addUnit } from '../../libs/function/index';
+	import { t } from '../../libs/i18n/index.uts';
 	
 	/**
 	 * Modal 模态框
@@ -47,6 +48,18 @@
 		},
 		emits: ["confirm", "cancel", "close", "update:show", 'cancelOnAsync'],
 		computed: {
+			elCancelText(): string {
+				if (this.cancelText == '取消' || this.cancelText == '') {
+					return t('up_common_cancel', {} as UTSJSONObject)
+				}
+				return this.cancelText
+			},
+			elConfirmText(): string {
+				if (this.confirmText == '确认' || this.confirmText == '确定' || this.confirmText == '') {
+					return t('up_common_confirm', {} as UTSJSONObject)
+				}
+				return this.confirmText
+			},
 			contentStyleCpu(): UTSJSONObject {
 				let style = this.contentStyle as UTSJSONObject;
 				style['paddingTop'] = `${this.title != '' ? 12 : 25}px`
@@ -178,7 +191,7 @@ const _component_up_popup = resolveEasyComponent("up-popup",_easycom_up_popup)
                         style: _nS(_uM({
 								color: _ctx.cancelColor
 							}))
-                      }), _tD(_ctx.cancelText), 5 /* TEXT, STYLE */)
+                      }), _tD(_ctx.elCancelText), 5 /* TEXT, STYLE */)
                     ], 10 /* CLASS, PROPS */, ["onClick"])
                   : _cC("v-if", true),
                 isTrue(_ctx.showConfirmButton && _ctx.showCancelButton)
@@ -203,7 +216,7 @@ const _component_up_popup = resolveEasyComponent("up-popup",_easycom_up_popup)
                             style: _nS(_uM({
 								color: _ctx.confirmColor
 							}))
-                          }), _tD(_ctx.confirmText), 5 /* TEXT, STYLE */)
+                          }), _tD(_ctx.elConfirmText), 5 /* TEXT, STYLE */)
                     ], 10 /* CLASS, PROPS */, ["onClick"])
                   : _cC("v-if", true)
               ], 4 /* STYLE */)

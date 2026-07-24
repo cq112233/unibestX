@@ -1,5 +1,6 @@
 import Card from './Card.uvue'
 import { useAppStore } from '@/src/store/index.uts'
+import { t } from '@/src/utils/i18n'
 
 
 const __sfc__ = defineComponent({
@@ -23,7 +24,7 @@ function changeTheme(color: string) {
   appStore.setTheme(color)
 
   uni.showToast({
-    title: '主题切换成功',
+    title: t('basic.themeSuccess', null),
     icon: 'none',
     duration: 1500,
   })
@@ -31,15 +32,17 @@ function changeTheme(color: string) {
 
 return (): any | null => {
 
-  return _cV(unref(Card), _uM({ title: "主题设置" }), _uM({
+  return _cV(unref(Card), _uM({
+    title: _ctx.$t('basic.themeTitle')
+  }), _uM({
     default: withSlotCtx((): any[] => [
       _cE("view", _uM({ class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_ items-center" }), [
-        _cE("text", _uM({ class: "text-12px text-__94a3b8_ mb-8px" }), "主题色效果预览"),
+        _cE("text", _uM({ class: "text-12px text-__94a3b8_ mb-8px" }), _tD(_ctx.$t('basic.themePreview')), 1 /* TEXT */),
         _cE("view", _uM({
           class: "mt-10px mx-auto w-200px h-44px rounded-8px flex flex-row items-center justify-center",
           style: _nS(_uM({ backgroundColor: unref(appStore).state.theme }))
         }), [
-          _cE("text", _uM({ class: "text-__ffffff_ text-14px" }), "主题按钮")
+          _cE("text", _uM({ class: "text-__ffffff_ text-14px" }), _tD(_ctx.$t('basic.themeButton')), 1 /* TEXT */)
         ], 4 /* STYLE */)
       ]),
       _cE("view", _uM({ class: "flex-row justify-between py-10px" }), [
@@ -66,7 +69,7 @@ return (): any | null => {
       ])
     ]),
     _: 1 /* STABLE */
-  }))
+  }), 8 /* PROPS */, ["title"])
 }
 }
 

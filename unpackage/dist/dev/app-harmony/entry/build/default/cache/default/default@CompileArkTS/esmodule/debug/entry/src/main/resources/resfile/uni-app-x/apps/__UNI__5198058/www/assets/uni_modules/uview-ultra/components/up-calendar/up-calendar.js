@@ -10,13 +10,14 @@ import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5
 import { d as dayuts } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-dayuts/common/index&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-dayuts/common/use&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-dayuts/utssdk/interface&";
-import { t } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/index&";
+import { t, f as formatMonthTitle } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/index&";
 import { m as mpMixin } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/mixin/mpMixin&";
 import { m as mixin } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/mixin/mixin&";
 import { a as addUnit, f as error, h as range, p as padZero } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import { n as number, a as array } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/test&";
 import { d as defProps } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-calendar/calendar&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
+var _a;
 let calendarProp = defProps["calendar"];
 const _sfc_main = defineComponent({
   name: "up-calendar",
@@ -183,6 +184,11 @@ const _sfc_main = defineComponent({
     showToday: {
       type: Boolean,
       default: calendarProp["showToday"]
+    },
+    // 是否为iPhoneX留出底部安全距离
+    safeAreaInsetBottom: {
+      type: Boolean,
+      default: (_a = calendarProp["safeAreaInsetBottom"]) !== null && _a !== void 0 ? _a : true
     }
   },
   data() {
@@ -262,11 +268,41 @@ const _sfc_main = defineComponent({
     selectedChange() {
       return [this.innerMinDate, this.innerMaxDate];
     },
+    elTitle() {
+      if (this.title != "" && this.title != "日期选择") {
+        return this.title;
+      }
+      return t("up.calendar.chooseDates", new UTSJSONObject({}));
+    },
+    elConfirmText() {
+      if (this.confirmText != "" && this.confirmText != "确定") {
+        return this.confirmText;
+      }
+      return t("up.common.confirm", new UTSJSONObject({}));
+    },
+    elConfirmDisabledText() {
+      if (this.confirmDisabledText != "" && this.confirmDisabledText != "确定") {
+        return this.confirmDisabledText;
+      }
+      return t("up.common.confirm", new UTSJSONObject({}));
+    },
+    elStartText() {
+      if (this.startText != "" && this.startText != "开始") {
+        return this.startText;
+      }
+      return t("up.common.start", new UTSJSONObject({}));
+    },
+    elEndText() {
+      if (this.endText != "" && this.endText != "结束") {
+        return this.endText;
+      }
+      return t("up.common.end", new UTSJSONObject({}));
+    },
     subtitle() {
       if (this.months.length > 0) {
         let monthIndex = this.monthIndex;
-        return `${this.months[monthIndex]["year"]}年${// @ts-ignore
-        this.months[monthIndex]["month"]}月`;
+        const item = this.months[monthIndex];
+        return formatMonthTitle(item.year, item.month);
       } else {
         return "";
       }
@@ -347,7 +383,7 @@ const _sfc_main = defineComponent({
         this.innerMinDate != "0" && this.innerMinDate != "" && // @ts-ignore
         new Date(this.innerMaxDate).getTime() < new Date(this.innerMinDate).getTime()
       ) {
-        uni.__f__("log", "at uni_modules/uview-ultra/components/up-calendar/up-calendar.uvue:535", this.innerMaxDate);
+        uni.__f__("log", "at uni_modules/uview-ultra/components/up-calendar/up-calendar.uvue:569", this.innerMaxDate);
         return error("maxDate不能小于minDate时间");
       }
       this.listHeight = this.rowHeight * (this.monthSwitch ? 6 : 5) + 30;
@@ -437,8 +473,8 @@ const _sfc_main = defineComponent({
           selected = dayuts(this.defaultDate[0]).format("YYYY-MM");
         }
       }
-      const index = this.months.findIndex((_a) => {
-        var year = _a.year, month = _a.month;
+      const index = this.months.findIndex((_a2) => {
+        var year = _a2.year, month = _a2.month;
         month = padZero(month);
         return `${year}-${month}` === selected;
       });
@@ -470,8 +506,8 @@ const _sfc_main = defineComponent({
       }
       const targetMonth = dayuts(this.todayDate).format("YYYY-MM");
       if (this.monthSwitch) {
-        const todayMonthIndex = this.months.findIndex((_a) => {
-          var year = _a.year, month = _a.month;
+        const todayMonthIndex = this.months.findIndex((_a2) => {
+          var year = _a2.year, month = _a2.month;
           month = padZero(month);
           return `${year}-${month}` == targetMonth;
         });
@@ -484,8 +520,8 @@ const _sfc_main = defineComponent({
     },
     // 滚动到默认设置的月份
     scrollIntoDefaultMonth(selected) {
-      const _index = this.months.findIndex((_a) => {
-        var year = _a.year, month = _a.month;
+      const _index = this.months.findIndex((_a2) => {
+        var year = _a2.year, month = _a2.month;
         month = padZero(month);
         return `${year}-${month}` === selected;
       });
@@ -533,7 +569,7 @@ const _sfc_main = defineComponent({
     }
   }
 });
-const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-calendar__confirm": { "": { "paddingTop": 7, "paddingRight": 18, "paddingBottom": 7, "paddingLeft": 18 } } };
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-calendar__confirm": { "": { "paddingTop": 12, "paddingRight": 18, "paddingBottom": 16, "paddingLeft": 18 } } };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_uHeader = resolveComponent("uHeader");
   const _component_uMonth = resolveComponent("uMonth");
@@ -545,12 +581,13 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     closeable: "",
     onClose: $options.close,
     round: $props.round,
-    closeOnClickOverlay: $props.closeOnClickOverlay
+    closeOnClickOverlay: $props.closeOnClickOverlay,
+    safeAreaInsetBottom: $props.safeAreaInsetBottom
   }, {
     default: withCtx(() => [
       createElementVNode("view", { class: "up-calendar" }, [
         createVNode(_component_uHeader, {
-          title: $props.title,
+          title: $options.elTitle,
           subtitle: $options.subtitle,
           showSubtitle: $props.showSubtitle,
           showTitle: $props.showTitle,
@@ -583,8 +620,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
             months: $data.months,
             mode: $props.mode,
             maxCount: $props.maxCount,
-            startText: $props.startText,
-            endText: $props.endText,
+            startText: $options.elStartText,
+            endText: $options.elEndText,
             defaultDate: $props.defaultDate,
             minDate: $options.innerMinDate,
             maxDate: $options.innerMaxDate,
@@ -613,8 +650,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
               months: $options.currentMonths,
               mode: $props.mode,
               maxCount: $props.maxCount,
-              startText: $props.startText,
-              endText: $props.endText,
+              startText: $options.elStartText,
+              endText: $options.elEndText,
               defaultDate: $props.defaultDate,
               minDate: $options.innerMinDate,
               maxDate: $options.innerMaxDate,
@@ -637,7 +674,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
           createElementVNode("view", { class: "up-calendar__confirm" }, [
             createVNode(_component_up_button, {
               shape: "circle",
-              text: $options.buttonDisabled ? $props.confirmDisabledText : $props.confirmText,
+              text: $options.buttonDisabled ? $options.elConfirmDisabledText : $options.elConfirmText,
               color: $props.color == "#3c9cff" ? "" : $props.color,
               type: $props.color == "#3c9cff" ? "primary" : "",
               onClick: $options.confirm,
@@ -649,7 +686,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     ]),
     _: 3
     /* FORWARDED */
-  }, 8, ["show", "onClose", "round", "closeOnClickOverlay"]);
+  }, 8, ["show", "onClose", "round", "closeOnClickOverlay", "safeAreaInsetBottom"]);
 }
 const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-calendar/up-calendar.uvue"]]);
 export {

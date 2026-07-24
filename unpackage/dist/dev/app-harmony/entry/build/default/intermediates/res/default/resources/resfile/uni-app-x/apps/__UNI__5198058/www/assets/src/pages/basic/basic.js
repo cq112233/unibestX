@@ -68,6 +68,16 @@ import "../../../uni_modules/lime-i18n/common/warnings.js";
 import "../../../uni_modules/lime-i18n/common/types.js";
 import "../../i18n/locales/zh_CN.js";
 import "../../i18n/locales/en_US.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/index.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hans.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hant.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/en.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/es.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/fr.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/de.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/ko.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/ja.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/ru.js";
 import "../../utils/toast.js";
 import "../../../uni_modules/lime-icon/components/l-icon/l-icon.js";
 import "../../../uni_modules/lime-shared/classNames/index.js";
@@ -150,7 +160,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     return __returned__;
   }
 });
-const _style_0 = { "bg-__f7fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f7fafc" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } } };
+const _style_0 = { "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } } };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return openBlock(), createBlock($setup["AppKu"], null, {
     default: withCtx(() => [
@@ -158,7 +168,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         default: withCtx(() => [
           createElementVNode("scroll-view", {
             direction: "vertical",
-            class: "flex-1 bg-__f7fafc_"
+            class: "flex-1"
           }, [
             createCommentVNode(" uview-ultra 组件库示例 "),
             createVNode($setup["UViewUltraDemoCard"]),

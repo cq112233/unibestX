@@ -193,7 +193,9 @@ return (): any | null => {
 
 const _component_e_chart = resolveEasyComponent("e-chart",_easycom_e_chart)
 
-  return _cV(unref(Card), _uM({ title: "ECharts 图表示例" }), _uM({
+  return _cV(unref(Card), _uM({
+    title: _ctx.$t('basic.echartTitle')
+  }), _uM({
     default: withSlotCtx((): any[] => [
       _cE("view", _uM({ class: "w-full h-260px mt-10px" }), [
         _cV(_component_e_chart, _uM({
@@ -211,7 +213,7 @@ const _component_e_chart = resolveEasyComponent("e-chart",_easycom_e_chart)
           }), [
             _cE("text", _uM({
               class: _nC(["text-12px font-bold", currentType.value !== 'line' ? 'text-__3b82f6_' : 'text-__ffffff_'])
-            }), "折线图", 2 /* CLASS */)
+            }), _tD(_ctx.$t('basic.echartLine')), 3 /* TEXT, CLASS */)
           ], 2 /* CLASS */)
         ]),
         _cE("view", _uM({ class: "flex-1 mr-8px" }), [
@@ -221,7 +223,7 @@ const _component_e_chart = resolveEasyComponent("e-chart",_easycom_e_chart)
           }), [
             _cE("text", _uM({
               class: _nC(["text-12px font-bold", currentType.value !== 'bar' ? 'text-__10b981_' : 'text-__ffffff_'])
-            }), "柱状图", 2 /* CLASS */)
+            }), _tD(_ctx.$t('basic.echartBar')), 3 /* TEXT, CLASS */)
           ], 2 /* CLASS */)
         ]),
         _cE("view", _uM({ class: "flex-1" }), [
@@ -231,13 +233,13 @@ const _component_e_chart = resolveEasyComponent("e-chart",_easycom_e_chart)
           }), [
             _cE("text", _uM({
               class: _nC(["text-12px font-bold", currentType.value !== 'pie' ? 'text-__f59e0b_' : 'text-__ffffff_'])
-            }), "饼图", 2 /* CLASS */)
+            }), _tD(_ctx.$t('basic.echartPie')), 3 /* TEXT, CLASS */)
           ], 2 /* CLASS */)
         ])
       ])
     ]),
     _: 1 /* STABLE */
-  }))
+  }), 8 /* PROPS */, ["title"])
 }
 }
 

@@ -73,6 +73,16 @@ import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-i18n/common/types&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/i18n/locales/zh_CN&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/i18n/locales/en_US&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/index&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/zh-Hans&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/zh-Hant&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/en&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/es&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/fr&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/de&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/ko&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/ja&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/ru&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/toast&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useUltraUI&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-input/input&";
@@ -110,16 +120,6 @@ import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-upload/utils&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-upload/types&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-upload/mixin&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/index&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/zh-Hans&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/zh-Hant&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/en&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/es&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/fr&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/de&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/ko&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/ja&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/ru&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-form/form&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/util/async-validator&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-form/types&";
@@ -217,9 +217,9 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
             title: "验证通过，提交成功！",
             icon: "success"
           });
-          uni.__f__("log", "at src/sub/uview-ultra/demos/form/form.uvue:261", "提交的数据：", formModel);
+          uni.__f__("log", "at src/sub/uview-ultra/demos/form/form.uvue:264", "提交的数据：", formModel);
         }).catch((err = null) => {
-          uni.__f__("log", "at src/sub/uview-ultra/demos/form/form.uvue:263", "验证失败:", err);
+          uni.__f__("log", "at src/sub/uview-ultra/demos/form/form.uvue:266", "验证失败:", err);
           uni.showToast({
             title: "请检查必填项",
             icon: "error"
@@ -329,8 +329,8 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     return __returned__;
   }
 });
-const _style_0 = { "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "blur": { "": { "filter": "var(--un-blur) var(--un-brightness) var(--un-contrast) var(--un-drop-shadow) var(--un-grayscale) var(--un-hue-rotate) var(--un-invert) var(--un-opacity) var(--un-saturate) var(--un-sepia)", "--un-blur": "blur(8rpx)" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-row": { "": { "flexDirection": "row" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "ml-10px": { "": { "marginLeft": 10 } }, "mr-10px": { "": { "marginRight": 10 } }, "mt-12px": { "": { "marginTop": 12 } }, "mt-20px": { "": { "marginTop": 20 } }, "none": { "": { "display": "none" } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "pb-30px": { "": { "paddingBottom": 30 } }, "w-10px": { "": { "width": 10 } } };
-const _style_1 = { "section-title": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 8, "paddingLeft": 16, "fontSize": 18, "fontWeight": "bold", "color": "#303133" } }, "demo-block": { "": { "marginTop": 0, "marginRight": 12, "marginBottom": 12, "marginLeft": 12, "paddingTop": 12, "paddingRight": 16, "paddingBottom": 12, "paddingLeft": 16, "backgroundColor": "#ffffff", "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "boxShadow": "0 2px 12px rgba(0, 0, 0, 0.05)" } }, "w-10px": { "": { "width": 10 } }, "mt-20px": { "": { "marginTop": 20 } }, "mr-10px": { "": { "marginRight": 10 } }, "ml-10px": { "": { "marginLeft": 10 } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } } };
+const _style_0 = { "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "blur": { "": { "filter": "var(--un-blur) var(--un-brightness) var(--un-contrast) var(--un-drop-shadow) var(--un-grayscale) var(--un-hue-rotate) var(--un-invert) var(--un-opacity) var(--un-saturate) var(--un-sepia)", "--un-blur": "blur(8rpx)" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-row": { "": { "flexDirection": "row" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "ml-10px": { "": { "marginLeft": 10 } }, "mr-10px": { "": { "marginRight": 10 } }, "mt-20px": { "": { "marginTop": 20 } }, "none": { "": { "display": "none" } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "pb-30px": { "": { "paddingBottom": 30 } }, "w-10px": { "": { "width": 10 } } };
+const _style_1 = { "demo-block": { "": { "marginBottom": 12, "paddingTop": 12, "paddingRight": 12, "paddingBottom": 12, "paddingLeft": 12, "backgroundColor": "#ffffff", "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "demo-label": { "": { "fontSize": 14, "fontWeight": "bold", "color": "#606266", "marginBottom": 10, "paddingLeft": 4, "borderLeftWidth": 3, "borderLeftStyle": "solid", "borderLeftColor": "#2979ff" } }, "w-10px": { "": { "width": 10 } }, "mt-20px": { "": { "marginTop": 20 } }, "mr-10px": { "": { "marginRight": 10 } }, "ml-10px": { "": { "marginLeft": 10 } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } } };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_NavBar = resolveEasycom(resolveDynamicComponent("NavBar"), __easycom_0);
   const _component_up_input = resolveEasycom(resolveDynamicComponent("up-input"), __easycom_1);
@@ -366,373 +366,376 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
               "safe-area-inset-top": true,
               "bg-color": "#ffffff"
             }),
-            createElementVNode("view", { class: "demo-block" }, [
-              createVNode(_component_up_form, {
-                ref: "uForm",
-                model: $setup.formModel,
-                rules: $setup.formRules,
-                "label-width": "90px",
-                "error-type": "toast"
-              }, {
-                default: withCtx(() => [
-                  createVNode(_component_up_form_item, {
-                    label: "姓名",
-                    prop: "name",
-                    "border-bottom": true,
-                    required: ""
-                  }, {
-                    default: withCtx(() => [
-                      createVNode(_component_up_input, {
-                        modelValue: $setup.formModel.name,
-                        "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.formModel.name = $event),
-                        placeholder: "请输入姓名",
-                        border: "none",
-                        clearable: ""
-                      }, null, 8, ["modelValue"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  createVNode(_component_up_form_item, {
-                    label: "性别",
-                    prop: "gender",
-                    "border-bottom": true,
-                    onClick: _cache[2] || (_cache[2] = ($event) => $setup.genderActionShow = true),
-                    required: ""
-                  }, {
-                    right: withCtx(() => [
-                      createVNode(_component_up_icon, {
-                        name: "arrow-right",
-                        color: "#c0c4cc",
-                        size: "16"
-                      })
-                    ]),
-                    default: withCtx(() => [
-                      createVNode(_component_up_input, {
-                        modelValue: $setup.formModel.gender,
-                        "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.formModel.gender = $event),
-                        disabled: "",
-                        "disabled-color": "#ffffff",
-                        placeholder: "请选择性别",
-                        border: "none"
-                      }, null, 8, ["modelValue"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  createVNode(_component_up_form_item, {
-                    label: "出生日期",
-                    prop: "birthday",
-                    "border-bottom": true,
-                    onClick: _cache[4] || (_cache[4] = ($event) => $setup.datetimePickerShow = true),
-                    required: ""
-                  }, {
-                    right: withCtx(() => [
-                      createVNode(_component_up_icon, {
-                        name: "arrow-right",
-                        color: "#c0c4cc",
-                        size: "16"
-                      })
-                    ]),
-                    default: withCtx(() => [
-                      createVNode(_component_up_input, {
-                        modelValue: $setup.formModel.birthday,
-                        "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => $setup.formModel.birthday = $event),
-                        disabled: "",
-                        "disabled-color": "#ffffff",
-                        placeholder: "请选择出生日期",
-                        border: "none"
-                      }, null, 8, ["modelValue"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  createVNode(_component_up_form_item, {
-                    label: "国籍",
-                    prop: "country",
-                    "border-bottom": true,
-                    onClick: _cache[6] || (_cache[6] = ($event) => $setup.pickerShow = true)
-                  }, {
-                    right: withCtx(() => [
-                      createVNode(_component_up_icon, {
-                        name: "arrow-right",
-                        color: "#c0c4cc",
-                        size: "16"
-                      })
-                    ]),
-                    default: withCtx(() => [
-                      createVNode(_component_up_input, {
-                        modelValue: $setup.formModel.country,
-                        "onUpdate:modelValue": _cache[5] || (_cache[5] = ($event) => $setup.formModel.country = $event),
-                        disabled: "",
-                        "disabled-color": "#ffffff",
-                        placeholder: "请选择国籍",
-                        border: "none"
-                      }, null, 8, ["modelValue"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  createVNode(_component_up_form_item, {
-                    label: "行程时间",
-                    prop: "stayTime",
-                    "border-bottom": true,
-                    onClick: _cache[8] || (_cache[8] = ($event) => $setup.calendarShow = true)
-                  }, {
-                    right: withCtx(() => [
-                      createVNode(_component_up_icon, {
-                        name: "arrow-right",
-                        color: "#c0c4cc",
-                        size: "16"
-                      })
-                    ]),
-                    default: withCtx(() => [
-                      createVNode(_component_up_input, {
-                        modelValue: $setup.formModel.stayTime,
-                        "onUpdate:modelValue": _cache[7] || (_cache[7] = ($event) => $setup.formModel.stayTime = $event),
-                        disabled: "",
-                        "disabled-color": "#ffffff",
-                        placeholder: "请选择日期范围",
-                        border: "none"
-                      }, null, 8, ["modelValue"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  createVNode(_component_up_form_item, {
-                    label: "水果最爱",
-                    prop: "fruit",
-                    "border-bottom": true
-                  }, {
-                    default: withCtx(() => [
-                      createVNode(_component_up_radio_group, {
-                        modelValue: $setup.formModel.fruit,
-                        "onUpdate:modelValue": _cache[9] || (_cache[9] = ($event) => $setup.formModel.fruit = $event),
-                        placement: "row"
-                      }, {
-                        default: withCtx(() => [
-                          createVNode(_component_up_radio, {
-                            name: "apple",
-                            label: "苹果"
-                          }),
-                          createElementVNode("view", { class: "w-10px" }),
-                          createVNode(_component_up_radio, {
-                            name: "banana",
-                            label: "香蕉"
-                          }),
-                          createElementVNode("view", { class: "w-10px" }),
-                          createVNode(_component_up_radio, {
-                            name: "orange",
-                            label: "橘子"
-                          })
-                        ]),
-                        _: 1
-                        /* STABLE */
-                      }, 8, ["modelValue"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  createVNode(_component_up_form_item, {
-                    label: "兴趣爱好",
-                    prop: "hobbies",
-                    "border-bottom": true
-                  }, {
-                    default: withCtx(() => [
-                      createVNode(_component_up_checkbox_group, {
-                        modelValue: $setup.formModel.hobbies,
-                        "onUpdate:modelValue": _cache[10] || (_cache[10] = ($event) => $setup.formModel.hobbies = $event),
-                        placement: "row"
-                      }, {
-                        default: withCtx(() => [
-                          createVNode(_component_up_checkbox, {
-                            name: "reading",
-                            label: "阅读"
-                          }),
-                          createElementVNode("view", { class: "w-10px" }),
-                          createVNode(_component_up_checkbox, {
-                            name: "sports",
-                            label: "运动"
-                          }),
-                          createElementVNode("view", { class: "w-10px" }),
-                          createVNode(_component_up_checkbox, {
-                            name: "music",
-                            label: "音乐"
-                          })
-                        ]),
-                        _: 1
-                        /* STABLE */
-                      }, 8, ["modelValue"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  createVNode(_component_up_form_item, {
-                    label: "通知开关",
-                    prop: "notification",
-                    "border-bottom": true
-                  }, {
-                    default: withCtx(() => [
-                      createVNode(_component_up_switch, {
-                        modelValue: $setup.formModel.notification,
-                        "onUpdate:modelValue": _cache[11] || (_cache[11] = ($event) => $setup.formModel.notification = $event),
-                        "active-color": "#2979ff"
-                      }, null, 8, ["modelValue"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  createVNode(_component_up_form_item, {
-                    label: "服务评分",
-                    prop: "rate",
-                    "border-bottom": true
-                  }, {
-                    default: withCtx(() => [
-                      createVNode(_component_up_rate, {
-                        modelValue: $setup.formModel.rate,
-                        "onUpdate:modelValue": _cache[12] || (_cache[12] = ($event) => $setup.formModel.rate = $event),
-                        count: 5
-                      }, null, 8, ["modelValue"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  createVNode(_component_up_form_item, {
-                    label: "购买数量",
-                    prop: "count",
-                    "border-bottom": true
-                  }, {
-                    default: withCtx(() => [
-                      createVNode(_component_up_number_box, {
-                        modelValue: $setup.formModel.count,
-                        "onUpdate:modelValue": _cache[13] || (_cache[13] = ($event) => $setup.formModel.count = $event),
-                        min: 1,
-                        max: 100
-                      }, null, 8, ["modelValue"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  createVNode(_component_up_form_item, {
-                    label: "满意度",
-                    prop: "satisfaction",
-                    "border-bottom": true
-                  }, {
-                    default: withCtx(() => [
-                      createVNode(_component_up_slider, {
-                        modelValue: $setup.formModel.satisfaction,
-                        "onUpdate:modelValue": _cache[14] || (_cache[14] = ($event) => $setup.formModel.satisfaction = $event),
-                        min: 0,
-                        max: 100,
-                        "show-value": true,
-                        style: { "width": "100%" }
-                      }, null, 8, ["modelValue"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  createVNode(_component_up_form_item, {
-                    label: "个人简介",
-                    prop: "intro",
-                    "border-bottom": true,
-                    "label-position": "top"
-                  }, {
-                    default: withCtx(() => [
-                      createVNode(_component_up_textarea, {
-                        modelValue: $setup.formModel.intro,
-                        "onUpdate:modelValue": _cache[15] || (_cache[15] = ($event) => $setup.formModel.intro = $event),
-                        placeholder: "请输入个人简介",
-                        count: "",
-                        maxlength: 100
-                      }, null, 8, ["modelValue"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  createVNode(_component_up_form_item, {
-                    label: "相关照片",
-                    prop: "photos",
-                    "border-bottom": true,
-                    "label-position": "top"
-                  }, {
-                    default: withCtx(() => [
-                      createVNode(_component_up_upload, {
-                        "file-list": $setup.uploadList,
-                        multiple: true,
-                        "max-count": 3,
-                        width: "80px",
-                        height: "80px",
-                        onAfterRead: $setup.onUploadAfterRead,
-                        onDelete: $setup.onUploadDelete
-                      }, null, 8, ["file-list"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  })
-                ]),
-                _: 1
-                /* STABLE */
-              }, 8, ["model"])
-            ]),
-            createElementVNode("view", { class: "demo-block mt-12px" }, [
-              createElementVNode("text", { class: "demo-label" }, "标签上方对齐"),
-              createVNode(_component_up_form, {
-                model: $setup.formModel2,
-                "label-position": "top",
-                "label-width": "100px"
-              }, {
-                default: withCtx(() => [
-                  createVNode(_component_up_form_item, {
-                    label: "活动名称",
-                    prop: "name",
-                    "border-bottom": true
-                  }, {
-                    default: withCtx(() => [
-                      createVNode(_component_up_input, {
-                        modelValue: $setup.formModel2.name,
-                        "onUpdate:modelValue": _cache[16] || (_cache[16] = ($event) => $setup.formModel2.name = $event),
-                        placeholder: "请输入活动名称",
-                        border: "none"
-                      }, null, 8, ["modelValue"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  createVNode(_component_up_form_item, {
-                    label: "活动详情",
-                    prop: "detail",
-                    "border-bottom": true
-                  }, {
-                    default: withCtx(() => [
-                      createVNode(_component_up_textarea, {
-                        modelValue: $setup.formModel2.detail,
-                        "onUpdate:modelValue": _cache[17] || (_cache[17] = ($event) => $setup.formModel2.detail = $event),
-                        placeholder: "请输入活动详情",
-                        border: "none"
-                      }, null, 8, ["modelValue"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  })
-                ]),
-                _: 1
-                /* STABLE */
-              }, 8, ["model"])
-            ]),
-            createElementVNode("view", { class: "p-16px mt-20px flex-row justify-between" }, [
-              createElementVNode("view", { class: "flex-1 mr-10px" }, [
-                createVNode(_component_up_button, {
-                  type: "primary",
-                  text: "提交表单",
-                  onClick: $setup.submitForm
-                })
+            createElementVNode("view", { class: "p-16px" }, [
+              createElementVNode("view", { class: "demo-block" }, [
+                createElementVNode("text", { class: "demo-label" }, "基础表单示例"),
+                createVNode(_component_up_form, {
+                  ref: "uForm",
+                  model: $setup.formModel,
+                  rules: $setup.formRules,
+                  "label-width": "90px",
+                  "error-type": "toast"
+                }, {
+                  default: withCtx(() => [
+                    createVNode(_component_up_form_item, {
+                      label: "姓名",
+                      prop: "name",
+                      "border-bottom": true,
+                      required: ""
+                    }, {
+                      default: withCtx(() => [
+                        createVNode(_component_up_input, {
+                          modelValue: $setup.formModel.name,
+                          "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.formModel.name = $event),
+                          placeholder: "请输入姓名",
+                          border: "none",
+                          clearable: ""
+                        }, null, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    createVNode(_component_up_form_item, {
+                      label: "性别",
+                      prop: "gender",
+                      "border-bottom": true,
+                      onClick: _cache[2] || (_cache[2] = ($event) => $setup.genderActionShow = true),
+                      required: ""
+                    }, {
+                      right: withCtx(() => [
+                        createVNode(_component_up_icon, {
+                          name: "arrow-right",
+                          color: "#c0c4cc",
+                          size: "16"
+                        })
+                      ]),
+                      default: withCtx(() => [
+                        createVNode(_component_up_input, {
+                          modelValue: $setup.formModel.gender,
+                          "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.formModel.gender = $event),
+                          disabled: "",
+                          "disabled-color": "#ffffff",
+                          placeholder: "请选择性别",
+                          border: "none"
+                        }, null, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    createVNode(_component_up_form_item, {
+                      label: "出生日期",
+                      prop: "birthday",
+                      "border-bottom": true,
+                      onClick: _cache[4] || (_cache[4] = ($event) => $setup.datetimePickerShow = true),
+                      required: ""
+                    }, {
+                      right: withCtx(() => [
+                        createVNode(_component_up_icon, {
+                          name: "arrow-right",
+                          color: "#c0c4cc",
+                          size: "16"
+                        })
+                      ]),
+                      default: withCtx(() => [
+                        createVNode(_component_up_input, {
+                          modelValue: $setup.formModel.birthday,
+                          "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => $setup.formModel.birthday = $event),
+                          disabled: "",
+                          "disabled-color": "#ffffff",
+                          placeholder: "请选择出生日期",
+                          border: "none"
+                        }, null, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    createVNode(_component_up_form_item, {
+                      label: "国籍",
+                      prop: "country",
+                      "border-bottom": true,
+                      onClick: _cache[6] || (_cache[6] = ($event) => $setup.pickerShow = true)
+                    }, {
+                      right: withCtx(() => [
+                        createVNode(_component_up_icon, {
+                          name: "arrow-right",
+                          color: "#c0c4cc",
+                          size: "16"
+                        })
+                      ]),
+                      default: withCtx(() => [
+                        createVNode(_component_up_input, {
+                          modelValue: $setup.formModel.country,
+                          "onUpdate:modelValue": _cache[5] || (_cache[5] = ($event) => $setup.formModel.country = $event),
+                          disabled: "",
+                          "disabled-color": "#ffffff",
+                          placeholder: "请选择国籍",
+                          border: "none"
+                        }, null, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    createVNode(_component_up_form_item, {
+                      label: "行程时间",
+                      prop: "stayTime",
+                      "border-bottom": true,
+                      onClick: _cache[8] || (_cache[8] = ($event) => $setup.calendarShow = true)
+                    }, {
+                      right: withCtx(() => [
+                        createVNode(_component_up_icon, {
+                          name: "arrow-right",
+                          color: "#c0c4cc",
+                          size: "16"
+                        })
+                      ]),
+                      default: withCtx(() => [
+                        createVNode(_component_up_input, {
+                          modelValue: $setup.formModel.stayTime,
+                          "onUpdate:modelValue": _cache[7] || (_cache[7] = ($event) => $setup.formModel.stayTime = $event),
+                          disabled: "",
+                          "disabled-color": "#ffffff",
+                          placeholder: "请选择日期范围",
+                          border: "none"
+                        }, null, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    createVNode(_component_up_form_item, {
+                      label: "水果最爱",
+                      prop: "fruit",
+                      "border-bottom": true
+                    }, {
+                      default: withCtx(() => [
+                        createVNode(_component_up_radio_group, {
+                          modelValue: $setup.formModel.fruit,
+                          "onUpdate:modelValue": _cache[9] || (_cache[9] = ($event) => $setup.formModel.fruit = $event),
+                          placement: "row"
+                        }, {
+                          default: withCtx(() => [
+                            createVNode(_component_up_radio, {
+                              name: "apple",
+                              label: "苹果"
+                            }),
+                            createElementVNode("view", { class: "w-10px" }),
+                            createVNode(_component_up_radio, {
+                              name: "banana",
+                              label: "香蕉"
+                            }),
+                            createElementVNode("view", { class: "w-10px" }),
+                            createVNode(_component_up_radio, {
+                              name: "orange",
+                              label: "橘子"
+                            })
+                          ]),
+                          _: 1
+                          /* STABLE */
+                        }, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    createVNode(_component_up_form_item, {
+                      label: "兴趣爱好",
+                      prop: "hobbies",
+                      "border-bottom": true
+                    }, {
+                      default: withCtx(() => [
+                        createVNode(_component_up_checkbox_group, {
+                          modelValue: $setup.formModel.hobbies,
+                          "onUpdate:modelValue": _cache[10] || (_cache[10] = ($event) => $setup.formModel.hobbies = $event),
+                          placement: "row"
+                        }, {
+                          default: withCtx(() => [
+                            createVNode(_component_up_checkbox, {
+                              name: "reading",
+                              label: "阅读"
+                            }),
+                            createElementVNode("view", { class: "w-10px" }),
+                            createVNode(_component_up_checkbox, {
+                              name: "sports",
+                              label: "运动"
+                            }),
+                            createElementVNode("view", { class: "w-10px" }),
+                            createVNode(_component_up_checkbox, {
+                              name: "music",
+                              label: "音乐"
+                            })
+                          ]),
+                          _: 1
+                          /* STABLE */
+                        }, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    createVNode(_component_up_form_item, {
+                      label: "通知开关",
+                      prop: "notification",
+                      "border-bottom": true
+                    }, {
+                      default: withCtx(() => [
+                        createVNode(_component_up_switch, {
+                          modelValue: $setup.formModel.notification,
+                          "onUpdate:modelValue": _cache[11] || (_cache[11] = ($event) => $setup.formModel.notification = $event),
+                          "active-color": "#2979ff"
+                        }, null, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    createVNode(_component_up_form_item, {
+                      label: "服务评分",
+                      prop: "rate",
+                      "border-bottom": true
+                    }, {
+                      default: withCtx(() => [
+                        createVNode(_component_up_rate, {
+                          modelValue: $setup.formModel.rate,
+                          "onUpdate:modelValue": _cache[12] || (_cache[12] = ($event) => $setup.formModel.rate = $event),
+                          count: 5
+                        }, null, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    createVNode(_component_up_form_item, {
+                      label: "购买数量",
+                      prop: "count",
+                      "border-bottom": true
+                    }, {
+                      default: withCtx(() => [
+                        createVNode(_component_up_number_box, {
+                          modelValue: $setup.formModel.count,
+                          "onUpdate:modelValue": _cache[13] || (_cache[13] = ($event) => $setup.formModel.count = $event),
+                          min: 1,
+                          max: 100
+                        }, null, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    createVNode(_component_up_form_item, {
+                      label: "满意度",
+                      prop: "satisfaction",
+                      "border-bottom": true
+                    }, {
+                      default: withCtx(() => [
+                        createVNode(_component_up_slider, {
+                          modelValue: $setup.formModel.satisfaction,
+                          "onUpdate:modelValue": _cache[14] || (_cache[14] = ($event) => $setup.formModel.satisfaction = $event),
+                          min: 0,
+                          max: 100,
+                          "show-value": true,
+                          style: { "width": "100%" }
+                        }, null, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    createVNode(_component_up_form_item, {
+                      label: "个人简介",
+                      prop: "intro",
+                      "border-bottom": true,
+                      "label-position": "top"
+                    }, {
+                      default: withCtx(() => [
+                        createVNode(_component_up_textarea, {
+                          modelValue: $setup.formModel.intro,
+                          "onUpdate:modelValue": _cache[15] || (_cache[15] = ($event) => $setup.formModel.intro = $event),
+                          placeholder: "请输入个人简介",
+                          count: "",
+                          maxlength: 100
+                        }, null, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    createVNode(_component_up_form_item, {
+                      label: "相关照片",
+                      prop: "photos",
+                      "border-bottom": true,
+                      "label-position": "top"
+                    }, {
+                      default: withCtx(() => [
+                        createVNode(_component_up_upload, {
+                          "file-list": $setup.uploadList,
+                          multiple: true,
+                          "max-count": 3,
+                          width: "80px",
+                          height: "80px",
+                          onAfterRead: $setup.onUploadAfterRead,
+                          onDelete: $setup.onUploadDelete
+                        }, null, 8, ["file-list"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    })
+                  ]),
+                  _: 1
+                  /* STABLE */
+                }, 8, ["model"])
               ]),
-              createElementVNode("view", { class: "flex-1 ml-10px" }, [
-                createVNode(_component_up_button, {
-                  type: "info",
-                  text: "重置表单",
-                  onClick: $setup.resetForm
-                })
+              createElementVNode("view", { class: "demo-block" }, [
+                createElementVNode("text", { class: "demo-label" }, "标签上方对齐"),
+                createVNode(_component_up_form, {
+                  model: $setup.formModel2,
+                  "label-position": "top",
+                  "label-width": "100px"
+                }, {
+                  default: withCtx(() => [
+                    createVNode(_component_up_form_item, {
+                      label: "活动名称",
+                      prop: "name",
+                      "border-bottom": true
+                    }, {
+                      default: withCtx(() => [
+                        createVNode(_component_up_input, {
+                          modelValue: $setup.formModel2.name,
+                          "onUpdate:modelValue": _cache[16] || (_cache[16] = ($event) => $setup.formModel2.name = $event),
+                          placeholder: "请输入活动名称",
+                          border: "none"
+                        }, null, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    createVNode(_component_up_form_item, {
+                      label: "活动详情",
+                      prop: "detail",
+                      "border-bottom": true
+                    }, {
+                      default: withCtx(() => [
+                        createVNode(_component_up_textarea, {
+                          modelValue: $setup.formModel2.detail,
+                          "onUpdate:modelValue": _cache[17] || (_cache[17] = ($event) => $setup.formModel2.detail = $event),
+                          placeholder: "请输入活动详情",
+                          border: "none"
+                        }, null, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    })
+                  ]),
+                  _: 1
+                  /* STABLE */
+                }, 8, ["model"])
+              ]),
+              createElementVNode("view", { class: "mt-20px flex-row justify-between" }, [
+                createElementVNode("view", { class: "flex-1 mr-10px" }, [
+                  createVNode(_component_up_button, {
+                    type: "primary",
+                    text: "提交表单",
+                    onClick: $setup.submitForm
+                  })
+                ]),
+                createElementVNode("view", { class: "flex-1 ml-10px" }, [
+                  createVNode(_component_up_button, {
+                    type: "info",
+                    text: "重置表单",
+                    onClick: $setup.resetForm
+                  })
+                ])
               ])
             ]),
             createCommentVNode(" 弹窗选择组件 "),

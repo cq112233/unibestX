@@ -41,13 +41,13 @@
 			>{{ todayText }}</text>
 		</view>
 		<view class="up-calendar-header__weekdays">
-			<text class="up-calendar-header__weekdays__weekday">一</text>
-			<text class="up-calendar-header__weekdays__weekday">二</text>
-			<text class="up-calendar-header__weekdays__weekday">三</text>
-			<text class="up-calendar-header__weekdays__weekday">四</text>
-			<text class="up-calendar-header__weekdays__weekday">五</text>
-			<text class="up-calendar-header__weekdays__weekday">六</text>
-			<text class="up-calendar-header__weekdays__weekday">日</text>
+			<text class="up-calendar-header__weekdays__weekday">{{ t('up_week_one') }}</text>
+			<text class="up-calendar-header__weekdays__weekday">{{ t('up_week_two') }}</text>
+			<text class="up-calendar-header__weekdays__weekday">{{ t('up_week_three') }}</text>
+			<text class="up-calendar-header__weekdays__weekday">{{ t('up_week_four') }}</text>
+			<text class="up-calendar-header__weekdays__weekday">{{ t('up_week_five') }}</text>
+			<text class="up-calendar-header__weekdays__weekday">{{ t('up_week_six') }}</text>
+			<text class="up-calendar-header__weekdays__weekday">{{ t('up_week_seven') }}</text>
 		</view>
 	</view>
 </template>
@@ -55,6 +55,7 @@
 <script>
 	import { mpMixin } from '../../libs/mixin/mpMixin.js';
 	import { mixin } from '../../libs/mixin/mixin.js';
+	import { t } from '../../libs/i18n/index.js';
 	export default {
 		name: 'up-calendar-header',
 		mixins: [mpMixin, mixin],
@@ -118,6 +119,9 @@
 			}
 		},
 		methods: {
+			t(key) {
+				return t(key)
+			},
 			prev() {
 				if (!this.prevDisabled) {
 					this.$emit('prev')

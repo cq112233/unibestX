@@ -34,7 +34,7 @@ const _sfc_main = defineComponent({
       const style = new UTSJSONObject({});
       if (!this.disabled) {
         style["position"] = "sticky";
-        const top_1 = parseFloat(getPx(this.offsetTop)) + parseFloat(getPx(this.customNavHeight));
+        const top_1 = parseFloat(getPx(this.offsetTop));
         style["top"] = top_1 + "px";
         style["zIndex"] = this.uZindex;
       } else {

@@ -57,6 +57,21 @@ const _component_up_cell_group = resolveEasyComponent("up-cell-group",_easycom_u
               _cV(_component_up_cell_group, _uM({ border: false }), _uM({
                 default: withSlotCtx((): any[] => [
                   _cV(_component_up_cell, _uM({
+                    title: "Button 按钮",
+                    "is-link": "",
+                    onClick: () => {goToDemo('button')}
+                  }), _uM({
+                    icon: withSlotCtx((): any[] => [
+                      _cV(_component_up_icon, _uM({
+                        name: "plus-circle",
+                        color: "#2979ff",
+                        size: "20",
+                        class: "mr-8px"
+                      }))
+                    ]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_up_cell, _uM({
                     title: "Icon 图标",
                     "is-link": "",
                     onClick: () => {goToDemo('icon')}
@@ -139,21 +154,6 @@ const _component_up_cell_group = resolveEasyComponent("up-cell-group",_easycom_u
                     icon: withSlotCtx((): any[] => [
                       _cV(_component_up_icon, _uM({
                         name: "list-dot",
-                        color: "#2979ff",
-                        size: "20",
-                        class: "mr-8px"
-                      }))
-                    ]),
-                    _: 1 /* STABLE */
-                  }), 8 /* PROPS */, ["onClick"]),
-                  _cV(_component_up_cell, _uM({
-                    title: "Button 按钮",
-                    "is-link": "",
-                    onClick: () => {goToDemo('button')}
-                  }), _uM({
-                    icon: withSlotCtx((): any[] => [
-                      _cV(_component_up_icon, _uM({
-                        name: "plus-circle",
                         color: "#2979ff",
                         size: "20",
                         class: "mr-8px"

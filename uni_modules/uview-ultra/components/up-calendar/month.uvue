@@ -3,7 +3,7 @@
 		<view v-for="(item, index) in monthsInner" :key="index" :class="[`up-calendar-month-` + index.toString()]"
 			:ref="`up-calendar-month-` + index.toString()" :id="`month-` + index.toString()">
 			<view v-if="index != 0" class="up-calendar-month__title">
-				<text class="up-calendar-month__title-text">{{ item['year'] }}年{{ item['month'] }}月</text>
+				<text class="up-calendar-month__title-text">{{ getMonthTitle(item) }}</text>
 			</view>
 			<view class="up-calendar-month__days">
 				<view v-if="showMark" class="up-calendar-month__days__month-mark-wrapper">
@@ -44,6 +44,7 @@
 	import { mpMixin } from '../../libs/mixin/mpMixin';
 	import { mixin } from '../../libs/mixin/mixin';
 	import { addUnit, deepClone, toast, sleep, getWindowInfo } from '../../libs/function/index';
+	import { getLocale, formatMonthTitle } from '../../libs/i18n/index.uts';
 	import { colorGradient } from '../../libs/function/colorGradient';
 	import { array as testArray } from '../../libs/function/test';
 	import defProps from './calendar.uts';
@@ -322,6 +323,9 @@
 		},
 		emits: ['monthSelected', 'updateMonthTop'],
 		methods: {
+			getMonthTitle(item: monthsItem): string {
+				return formatMonthTitle(item.year, item.month)
+			},
 			isRangeMiddle(item: UPCalendarMonthsItemDate): boolean {
 				if (this.mode != 'range' || this.selected.length < 2) return false
 				const date = (item['dateStr'] != null ? item['dateStr'] as string : dayuts(item['date']).format("YYYY-MM-DD"))

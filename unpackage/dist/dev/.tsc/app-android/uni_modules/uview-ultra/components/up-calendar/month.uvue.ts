@@ -2,13 +2,14 @@
 	import { mpMixin } from '../../libs/mixin/mpMixin';
 	import { mixin } from '../../libs/mixin/mixin';
 	import { addUnit, deepClone, toast, sleep, getWindowInfo } from '../../libs/function/index';
+	import { getLocale, formatMonthTitle } from '../../libs/i18n/index.uts';
 	import { colorGradient } from '../../libs/function/colorGradient';
 	import { array as testArray } from '../../libs/function/test';
 	import defProps from './calendar.uts';
 	let calendarProp = defProps['calendar'] as UTSJSONObject;
 	import {dayuts} from '@/uni_modules/lime-dayuts';
 	import { UPCalendarMonthsItemDate } from './types.uts'
-	export type monthsItem = { __$originalPosition?: UTSSourceMapPosition<"monthsItem", "uni_modules/uview-ultra/components/up-calendar/month.uvue", 53, 14>;
+	export type monthsItem = { __$originalPosition?: UTSSourceMapPosition<"monthsItem", "uni_modules/uview-ultra/components/up-calendar/month.uvue", 54, 14>;
 	  top: number
 	  year: string 
 	  month: string 
@@ -140,7 +141,7 @@
 			},
 			dayStyle() {
 				return (index1: number, index2: number, item: UPCalendarMonthsItemDate):any => {
-					const style = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-calendar/month.uvue", 185, 12), } as UTSJSONObject
+					const style = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-calendar/month.uvue", 186, 12), } as UTSJSONObject
 					if (item != null) {
 						let week:number = item.week
 						// 得出每个日期的宽度
@@ -160,7 +161,7 @@
 			daySelectStyle() {
 				return (index1: number, index2: number, item: UPCalendarMonthsItemDate) => {
 					let date = (item['dateStr'] != null ? item['dateStr'] as string : dayuts(item['date']).format("YYYY-MM-DD")),
-						style = {__$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-calendar/month.uvue", 205, 7),}
+						style = {__$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-calendar/month.uvue", 206, 7),}
 					// 判断date是否在selected数组中，因为月份可能会需要补0，所以使用dateSame判断，而不用数组的includes判断
 					const sameDate = (element: string): boolean => this.dateSame(element, date)
 					if (this.selected.some(sameDate)) {
@@ -221,7 +222,7 @@
 			textStyle() {
 				return (item: UPCalendarMonthsItemDate) => {
 					const date = (item['dateStr'] != null ? item['dateStr'] as string : dayuts(item['date']).format("YYYY-MM-DD")),
-						style = {__$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-calendar/month.uvue", 266, 7),}
+						style = {__$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-calendar/month.uvue", 267, 7),}
 					// 选中的日期，提示文字设置白色
 					const sameDate = (element: string): boolean => this.dateSame(element, date)
 					if (this.selected.some(sameDate)) {
@@ -280,6 +281,9 @@
 		},
 		emits: ['monthSelected', 'updateMonthTop'],
 		methods: {
+			getMonthTitle(item: monthsItem): string {
+				return formatMonthTitle(item.year, item.month)
+			},
 			isRangeMiddle(item: UPCalendarMonthsItemDate): boolean {
 				if (this.mode != 'range' || this.selected.length < 2) return false
 				const date = (item['dateStr'] != null ? item['dateStr'] as string : dayuts(item['date']).format("YYYY-MM-DD"))
@@ -287,7 +291,7 @@
 				return dayuts(date).isAfter(dayuts(this.selected[0])) && dayuts(date).isBefore(dayuts(this.selected[len]))
 			},
 			rangeBgStyle(item: UPCalendarMonthsItemDate): any {
-				const style = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-calendar/month.uvue", 332, 11), } as UTSJSONObject
+				const style = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-calendar/month.uvue", 336, 11), } as UTSJSONObject
 				if (this.color != '#3c9cff') {
 					style['backgroundColor'] = colorGradient(this.color, '#ffffff', 100)[90]
 					style['opacity'] = 0.7
@@ -504,7 +508,7 @@ const _cache = this.$.renderCache
               key: 0,
               class: "up-calendar-month__title"
             }), [
-              _cE("text", _uM({ class: "up-calendar-month__title-text" }), _tD(item['year']) + "年" + _tD(item['month']) + "月", 1 /* TEXT */)
+              _cE("text", _uM({ class: "up-calendar-month__title-text" }), _tD(_ctx.getMonthTitle(item)), 1 /* TEXT */)
             ])
           : _cC("v-if", true),
         _cE("view", _uM({ class: "up-calendar-month__days" }), [

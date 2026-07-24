@@ -1,5 +1,6 @@
 
 import { d as defProps } from "./calendar.js";
+var _a;
 let calendarProp = defProps["calendar"];
 ({
   props: {
@@ -158,6 +159,11 @@ let calendarProp = defProps["calendar"];
     showToday: {
       type: Boolean,
       default: calendarProp["showToday"]
+    },
+    // 是否为iPhoneX留出底部安全距离
+    safeAreaInsetBottom: {
+      type: Boolean,
+      default: (_a = calendarProp["safeAreaInsetBottom"]) !== null && _a !== void 0 ? _a : true
     }
   }
 });

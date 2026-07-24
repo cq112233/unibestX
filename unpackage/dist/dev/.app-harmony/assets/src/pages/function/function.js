@@ -61,6 +61,16 @@ import "../../../uni_modules/lime-i18n/common/warnings.js";
 import "../../../uni_modules/lime-i18n/common/types.js";
 import "../../i18n/locales/zh_CN.js";
 import "../../i18n/locales/en_US.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/index.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hans.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hant.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/en.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/es.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/fr.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/de.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/ko.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/ja.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/ru.js";
 import "../../utils/toast.js";
 import "../basic/components/Card.js";
 import "@ohos.vibrator";
@@ -90,13 +100,13 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     return __returned__;
   }
 });
-const _style_0 = { "bg-__f7fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f7fafc" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "font-bold": { "": { "fontWeight": 700 } }, "mt-4px": { "": { "marginTop": 4 } }, "pb-10px": { "": { "paddingBottom": 10 } }, "pt-20px": { "": { "paddingTop": 20 } }, "px-16px": { "": { "paddingLeft": 16, "paddingRight": 16 } }, "text-__1a202c_": { "": { "color": "#1a202c" } }, "text-__718096_": { "": { "color": "#718096" } }, "text-13px": { "": { "fontSize": 13 } }, "text-20px": { "": { "fontSize": 20 } } };
+const _style_0 = { "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "font-bold": { "": { "fontWeight": 700 } }, "mt-4px": { "": { "marginTop": 4 } }, "pb-10px": { "": { "paddingBottom": 10 } }, "pt-20px": { "": { "paddingTop": 20 } }, "px-16px": { "": { "paddingLeft": 16, "paddingRight": 16 } }, "text-__1a202c_": { "": { "color": "#1a202c" } }, "text-__718096_": { "": { "color": "#718096" } }, "text-13px": { "": { "fontSize": 13 } }, "text-20px": { "": { "fontSize": 20 } } };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return openBlock(), createBlock($setup["AppKu"], null, {
     default: withCtx(() => [
       createVNode($setup["LayoutComponent"], { "navigation-bar-title-text": "功能" }, {
         default: withCtx(() => [
-          createElementVNode("scroll-view", { class: "flex-1 bg-__f7fafc_" }, [
+          createElementVNode("scroll-view", { class: "flex-1" }, [
             createCommentVNode(" 标题头 "),
             createElementVNode("view", { class: "pt-20px px-16px pb-10px" }, [
               createElementVNode("text", { class: "text-20px font-bold text-__1a202c_" }, "设备系统信息"),

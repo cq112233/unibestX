@@ -10,7 +10,7 @@
 	>
 		<view class="up-calendar">
 			<uHeader
-				:title="title"
+				:title="elTitle"
 				:subtitle="subtitle"
 				:showSubtitle="showSubtitle"
 				:showTitle="showTitle"
@@ -45,8 +45,8 @@
 					:months="months"
 					:mode="mode"
 					:maxCount="maxCount"
-					:startText="startText"
-					:endText="endText"
+					:startText="elStartText"
+					:endText="elEndText"
 					:defaultDate="defaultDate"
 					:minDate="innerMinDate"
 					:maxDate="innerMaxDate"
@@ -75,8 +75,8 @@
 					:months="currentMonths"
 					:mode="mode"
 					:maxCount="maxCount"
-					:startText="startText"
-					:endText="endText"
+					:startText="elStartText"
+					:endText="elEndText"
 					:defaultDate="defaultDate"
 					:minDate="innerMinDate"
 					:maxDate="innerMaxDate"
@@ -97,7 +97,7 @@
 					<up-button
 						shape="circle"
 						:text="
-                            buttonDisabled ? confirmDisabledText : confirmText
+                            buttonDisabled ? elConfirmDisabledText : elConfirmText
                         "
 						:color="color"
 						@click="confirm"
@@ -120,7 +120,7 @@ import { mpMixin } from '../../libs/mixin/mpMixin.js'
 import { mixin } from '../../libs/mixin/mixin.js'
 import { addUnit, range, error, padZero } from '../../libs/function/index.js';
 import test from '../../libs/function/test.js';
-import { t } from '../../libs/i18n/index.js'
+import { t, formatMonthTitle } from '../../libs/i18n/index.js'
 /**
  * Calendar 日历
  * @description  此组件用于单个选择日期，范围选择日期等，日历被包裹在底部弹起的容器中.
@@ -246,12 +246,40 @@ export default {
 		selectedChange() {
 			return [this.innerMinDate, this.innerMaxDate, this.defaultDate]
 		},
+		elTitle() {
+			if (this.title && this.title !== '日期选择') {
+				return this.title
+			}
+			return t('up.calendar.chooseDates')
+		},
+		elConfirmText() {
+			if (this.confirmText && this.confirmText !== '确定') {
+				return this.confirmText
+			}
+			return t('up.common.confirm')
+		},
+		elConfirmDisabledText() {
+			if (this.confirmDisabledText && this.confirmDisabledText !== '确定') {
+				return this.confirmDisabledText
+			}
+			return t('up.common.confirm')
+		},
+		elStartText() {
+			if (this.startText && this.startText !== '开始') {
+				return this.startText
+			}
+			return t('up.common.start')
+		},
+		elEndText() {
+			if (this.endText && this.endText !== '结束') {
+				return this.endText
+			}
+			return t('up.common.end')
+		},
 		subtitle() {
 			// 初始化时，this.months为空数组，所以需要特别判断处理
 			if (this.months.length) {
-				return `${this.months[this.monthIndex].year}年${
-					this.months[this.monthIndex].month
-				}月`
+				return formatMonthTitle(this.months[this.monthIndex].year, this.months[this.monthIndex].month)
 			} else {
 				return ''
 			}

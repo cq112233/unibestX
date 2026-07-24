@@ -31,7 +31,8 @@ const defProps = new UTSJSONObject({
     round: 0,
     monthNum: 3,
     monthSwitch: false,
-    showToday: true
+    showToday: true,
+    safeAreaInsetBottom: true
   })
 });
 export {

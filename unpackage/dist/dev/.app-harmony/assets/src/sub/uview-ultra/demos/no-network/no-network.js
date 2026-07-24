@@ -59,12 +59,6 @@ import "../../../../../uni_modules/lime-i18n/common/warnings.js";
 import "../../../../../uni_modules/lime-i18n/common/types.js";
 import "../../../../i18n/locales/zh_CN.js";
 import "../../../../i18n/locales/en_US.js";
-import "../../../../utils/toast.js";
-import "../../../../../uni_modules/uview-ultra/components/up-button/up-button.js";
-import "../../../../../uni_modules/uview-ultra/components/up-button/button.js";
-import "../../../../../uni_modules/uview-ultra/libs/function/throttle.js";
-import "../../../../../uni_modules/uview-ultra/components/up-no-network/props.js";
-import "../../../../../uni_modules/uview-ultra/components/up-no-network/noNetwork.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/index.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hans.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hant.js";
@@ -75,6 +69,12 @@ import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/de.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ko.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ja.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ru.js";
+import "../../../../utils/toast.js";
+import "../../../../../uni_modules/uview-ultra/components/up-button/up-button.js";
+import "../../../../../uni_modules/uview-ultra/components/up-button/button.js";
+import "../../../../../uni_modules/uview-ultra/libs/function/throttle.js";
+import "../../../../../uni_modules/uview-ultra/components/up-no-network/props.js";
+import "../../../../../uni_modules/uview-ultra/components/up-no-network/noNetwork.js";
 const _sfc_main = /* @__PURE__ */ defineComponent({
   __name: "no-network",
   setup(__props, _a) {

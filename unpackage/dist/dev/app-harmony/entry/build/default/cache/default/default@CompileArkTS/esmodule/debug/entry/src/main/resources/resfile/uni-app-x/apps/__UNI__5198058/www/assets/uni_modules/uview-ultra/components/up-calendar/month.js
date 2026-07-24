@@ -2,6 +2,7 @@ const { defineComponent, openBlock, createElementBlock, Fragment, renderList, no
 import { m as mpMixin } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/mixin/mpMixin&";
 import { m as mixin } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/mixin/mixin&";
 import { a as addUnit, e as getWindowInfo } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
+import { f as formatMonthTitle } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/index&";
 import { c as colorGradient } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/colorGradient&";
 import { a as array } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/test&";
 import { d as defProps } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-calendar/calendar&";
@@ -299,6 +300,9 @@ const _sfc_main = defineComponent({
   },
   emits: ["monthSelected", "updateMonthTop"],
   methods: {
+    getMonthTitle(item) {
+      return formatMonthTitle(item.year, item.month);
+    },
     isRangeMiddle(item) {
       if (this.mode != "range" || this.selected.length < 2)
         return false;
@@ -495,7 +499,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
               createElementVNode(
                 "text",
                 { class: "up-calendar-month__title-text" },
-                toDisplayString(item["year"]) + "年" + toDisplayString(item["month"]) + "月",
+                toDisplayString($options.getMonthTitle(item)),
                 1
                 /* TEXT */
               )

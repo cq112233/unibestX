@@ -17,7 +17,9 @@ const _component_uni_icons = resolveEasyComponent("uni-icons",_easycom_uni_icons
 const _component_l_icon = resolveEasyComponent("l-icon",_easycom_l_icon)
 const _component_up_icon = resolveEasyComponent("up-icon",_easycom_up_icon)
 
-  return _cV(unref(Card), _uM({ title: "字体图标示例" }), _uM({
+  return _cV(unref(Card), _uM({
+    title: _ctx.$t('basic.iconDemoTitle')
+  }), _uM({
     default: withSlotCtx((): any[] => [
       _cE("view", _uM({ class: "flex-row items-center justify-between py-12px border-bottom-width-1px border-bottom-style-solid border-bottom-color-__f1f5f9_" }), [
         _cE("view", _uM({ class: "flex-row items-center" }), [
@@ -39,7 +41,7 @@ const _component_up_icon = resolveEasyComponent("up-icon",_easycom_up_icon)
           _cE("view", _uM({ class: "flex-col" }), [
             _cE("text", _uM({ class: "text-14px text-__475569_ font-medium" }), "lime-icon"),
             _cE("view", _uM({ class: "bg-__fff1f2_ rounded-4px py-2px px-6px mt-4px self-start border-width-1px border-style-solid border-color-__ffe4e6_" }), [
-              _cE("text", _uM({ class: "text-10px text-__f43f5e_" }), "SVG模式需授权收费")
+              _cE("text", _uM({ class: "text-10px text-__f43f5e_" }), _tD(_ctx.$t('basic.svgAuthWarning')), 1 /* TEXT */)
             ])
           ])
         ]),
@@ -68,7 +70,7 @@ const _component_up_icon = resolveEasyComponent("up-icon",_easycom_up_icon)
       ])
     ]),
     _: 1 /* STABLE */
-  }))
+  }), 8 /* PROPS */, ["title"])
 }
 }
 

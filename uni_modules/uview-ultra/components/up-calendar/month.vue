@@ -2,7 +2,7 @@
 	<view class="up-calendar-month-wrapper" ref="up-calendar-month-wrapper">
 		<view v-for="(item, index) in months" :key="index" :class="[`up-calendar-month-${index}`]"
 			:ref="`up-calendar-month-${index}`" :id="`month-${index}`">
-			<text v-if="index !== 0" class="up-calendar-month__title">{{ item.year }}年{{ item.month }}月</text>
+			<text v-if="index !== 0" class="up-calendar-month__title">{{ formatMonthTitle(item.year, item.month) }}</text>
 			<view class="up-calendar-month__days">
 				<view v-if="showMark" class="up-calendar-month__days__month-mark-wrapper">
 					<text class="up-calendar-month__days__month-mark-wrapper__text">{{ item.month }}</text>
@@ -38,6 +38,7 @@
 	import test from '../../libs/function/test.js';
 	import defProps from '../../libs/config/props.js';
 	import dayjs from '../up-datetime-picker/dayjs.esm.min.js';
+	import { formatMonthTitle } from '../../libs/i18n/index.js';
 	export default {
 		name: 'up-calendar-month',
 		mixins: [mpMixin, mixin],
@@ -301,6 +302,9 @@
 			this.init()
 		},
 		methods: {
+			formatMonthTitle(year, month) {
+				return formatMonthTitle(year, month)
+			},
 			init() {
 				// 初始化默认选中
 				this.$emit('monthSelected', this.selected)

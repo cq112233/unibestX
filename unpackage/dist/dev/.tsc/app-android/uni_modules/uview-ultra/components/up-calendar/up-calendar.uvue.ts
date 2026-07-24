@@ -5,7 +5,7 @@ import uMonth, { monthsItem } from './month.uvue'
 import { propsCalendar } from './props.uts'
 import util from './util'
 import {dayuts} from '@/uni_modules/lime-dayuts';
-import { t as $t } from '../../libs/i18n/index.uts'
+import { t as $t, formatMonthTitle } from '../../libs/i18n/index.uts'
 // import Calendar from '../../libs/util/calendar'
 import { mpMixin } from '../../libs/mixin/mpMixin'
 import { mixin } from '../../libs/mixin/mixin'
@@ -315,17 +315,45 @@ const __sfc__ = defineComponent({
 			// @ts-ignore
 			return [this.innerMinDate, this.innerMaxDate]
 		},
-		subtitle() {
+		elTitle(): string {
+			if (this.title != '' && this.title != '日期选择') {
+				return this.title
+			}
+			return $t('up.calendar.chooseDates', {} as UTSJSONObject)
+		},
+		elConfirmText(): string {
+			if (this.confirmText != '' && this.confirmText != '确定') {
+				return this.confirmText
+			}
+			return $t('up.common.confirm', {} as UTSJSONObject)
+		},
+		elConfirmDisabledText(): string {
+			if (this.confirmDisabledText != '' && this.confirmDisabledText != '确定') {
+				return this.confirmDisabledText
+			}
+			return $t('up.common.confirm', {} as UTSJSONObject)
+		},
+		elStartText(): string {
+			if (this.startText != '' && this.startText != '开始') {
+				return this.startText
+			}
+			return $t('up.common.start', {} as UTSJSONObject)
+		},
+		elEndText(): string {
+			if (this.endText != '' && this.endText != '结束') {
+				return this.endText
+			}
+			return $t('up.common.end', {} as UTSJSONObject)
+		},
+		subtitle(): string {
 			// 初始化时，this.months为空数组，所以需要特别判断处理
 			// @ts-ignore
 			if (this.months.length > 0) {
 				// @ts-ignore
 				let monthIndex: number = this.monthIndex as number
 				// @ts-ignore
-				return `${this.months[monthIndex]['year']}年${
-					// @ts-ignore
-					this.months[monthIndex]['month']
-				}月`
+				const item = this.months[monthIndex] as monthsItem
+				return formatMonthTitle(item.year, item.month)
 			} else {
 				return ''
 			}
@@ -430,7 +458,7 @@ const __sfc__ = defineComponent({
 				new Date(this.innerMaxDate).getTime() < new Date(this.innerMinDate).getTime()
 			) {
 				// @ts-ignore
-				console.log(this.innerMaxDate, " at uni_modules/uview-ultra/components/up-calendar/up-calendar.uvue:541")
+				console.log(this.innerMaxDate, " at uni_modules/uview-ultra/components/up-calendar/up-calendar.uvue:569")
 				return error('maxDate不能小于minDate时间')
 			}
 			// 滚动区域的高度
@@ -700,7 +728,7 @@ const _component_up_popup = resolveEasyComponent("up-popup",_easycom_up_popup)
     default: withSlotCtx((): any[] => [
       _cE("view", _uM({ class: "up-calendar" }), [
         _cV(_component_uHeader, _uM({
-          title: _ctx.title,
+          title: _ctx.elTitle,
           subtitle: _ctx.subtitle,
           showSubtitle: _ctx.showSubtitle,
           showTitle: _ctx.showTitle,
@@ -734,8 +762,8 @@ const _component_up_popup = resolveEasyComponent("up-popup",_easycom_up_popup)
                 months: _ctx.months,
                 mode: _ctx.mode,
                 maxCount: _ctx.maxCount,
-                startText: _ctx.startText,
-                endText: _ctx.endText,
+                startText: _ctx.elStartText,
+                endText: _ctx.elEndText,
                 defaultDate: _ctx.defaultDate,
                 minDate: _ctx.innerMinDate,
                 maxDate: _ctx.innerMaxDate,
@@ -762,8 +790,8 @@ const _component_up_popup = resolveEasyComponent("up-popup",_easycom_up_popup)
                 months: _ctx.currentMonths,
                 mode: _ctx.mode,
                 maxCount: _ctx.maxCount,
-                startText: _ctx.startText,
-                endText: _ctx.endText,
+                startText: _ctx.elStartText,
+                endText: _ctx.elEndText,
                 defaultDate: _ctx.defaultDate,
                 minDate: _ctx.innerMinDate,
                 maxDate: _ctx.innerMaxDate,
@@ -785,7 +813,7 @@ const _component_up_popup = resolveEasyComponent("up-popup",_easycom_up_popup)
                 _cV(_component_up_button, _uM({
                   shape: "circle",
                   text: 
-                            _ctx.buttonDisabled ? _ctx.confirmDisabledText : _ctx.confirmText
+                            _ctx.buttonDisabled ? _ctx.elConfirmDisabledText : _ctx.elConfirmText
                         ,
                   color: _ctx.color == '#3c9cff' ? '' : _ctx.color,
                   type: _ctx.color == '#3c9cff' ? 'primary' : '',

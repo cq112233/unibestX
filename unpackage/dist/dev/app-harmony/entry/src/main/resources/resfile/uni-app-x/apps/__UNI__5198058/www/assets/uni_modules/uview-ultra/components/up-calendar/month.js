@@ -2,6 +2,7 @@ const { defineComponent, openBlock, createElementBlock, Fragment, renderList, no
 import { m as mpMixin } from "../../libs/mixin/mpMixin.js";
 import { m as mixin } from "../../libs/mixin/mixin.js";
 import { a as addUnit, e as getWindowInfo } from "../../libs/function/index.js";
+import { f as formatMonthTitle } from "../../libs/i18n/index.js";
 import { c as colorGradient } from "../../libs/function/colorGradient.js";
 import { a as array } from "../../libs/function/test.js";
 import { d as defProps } from "./calendar.js";
@@ -299,6 +300,9 @@ const _sfc_main = defineComponent({
   },
   emits: ["monthSelected", "updateMonthTop"],
   methods: {
+    getMonthTitle(item) {
+      return formatMonthTitle(item.year, item.month);
+    },
     isRangeMiddle(item) {
       if (this.mode != "range" || this.selected.length < 2)
         return false;
@@ -495,7 +499,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
               createElementVNode(
                 "text",
                 { class: "up-calendar-month__title-text" },
-                toDisplayString(item["year"]) + "年" + toDisplayString(item["month"]) + "月",
+                toDisplayString($options.getMonthTitle(item)),
                 1
                 /* TEXT */
               )

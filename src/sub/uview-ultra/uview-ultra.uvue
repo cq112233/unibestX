@@ -22,6 +22,11 @@
     <view class="demo-group-card">
       <text class="group-title">基础与展示组件</text>
       <up-cell-group :border="false">
+        <up-cell title="Button 按钮" is-link @click="goToDemo('button')">
+          <template #icon>
+            <up-icon name="plus-circle" color="#2979ff" size="20" class="mr-8px"></up-icon>
+          </template>
+        </up-cell>
         <up-cell title="Icon 图标" is-link @click="goToDemo('icon')">
           <template #icon>
             <up-icon name="photo" color="#2979ff" size="20" class="mr-8px"></up-icon>
@@ -50,11 +55,6 @@
         <up-cell title="Skeleton 骨架屏" is-link @click="goToDemo('skeleton')">
           <template #icon>
             <up-icon name="list-dot" color="#2979ff" size="20" class="mr-8px"></up-icon>
-          </template>
-        </up-cell>
-        <up-cell title="Button 按钮" is-link @click="goToDemo('button')">
-          <template #icon>
-            <up-icon name="plus-circle" color="#2979ff" size="20" class="mr-8px"></up-icon>
           </template>
         </up-cell>
         <up-cell title="Tag 标签" is-link @click="goToDemo('tag')">

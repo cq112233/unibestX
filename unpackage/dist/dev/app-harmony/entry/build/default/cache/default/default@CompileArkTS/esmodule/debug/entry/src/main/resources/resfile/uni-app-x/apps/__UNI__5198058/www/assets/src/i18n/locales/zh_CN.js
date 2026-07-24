@@ -2,7 +2,7 @@ const zhCN = new UTSJSONObject({
   message: new UTSJSONObject({
     hello: "{msg}，世界！",
     welcome: "欢迎使用 unibestX！",
-    switch_success: "切换为简体中文"
+    switch_success: "应用与组件库已切换为简体中文"
   }),
   tabbar: new UTSJSONObject({
     home: "首页",
@@ -16,10 +16,11 @@ const zhCN = new UTSJSONObject({
     svgAuthWarning: "SVG模式需授权收费",
     langTitle: "语言设置",
     langPreview: "多语言文本预览",
+    uviewPreview: "组件库 (uView-Ultra) 文本预览",
     themeTitle: "主题设置",
     themePreview: "主题色效果预览",
     themeButton: "主题按钮",
-    themeSuccess: "主题切换成功",
+    themeSuccess: "应用与组件库主题色切换成功",
     echartTitle: "ECharts 图表示例",
     echartLine: "折线图",
     echartBar: "柱状图",

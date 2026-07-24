@@ -1,6 +1,6 @@
 <template>
   <!-- 使用封装 of Card 组件 -->
-  <Card title="字体图标示例">
+  <Card :title="$t('basic.iconDemoTitle')">
     <!-- uni-icon 示例 -->
     <view class="flex-row items-center justify-between py-12px border-bottom-width-1px border-bottom-style-solid border-bottom-color-[#f1f5f9]">
       <view class="flex-row items-center">
@@ -20,7 +20,7 @@
         <view class="flex-col">
           <text class="text-14px text-[#475569] font-medium">lime-icon</text>
           <view class="bg-[#fff1f2] rounded-4px py-2px px-6px mt-4px self-start border-width-1px border-style-solid border-color-[#ffe4e6]">
-            <text class="text-10px text-[#f43f5e]">SVG模式需授权收费</text>
+            <text class="text-10px text-[#f43f5e]">{{ $t('basic.svgAuthWarning') }}</text>
           </view>
         </view>
       </view>

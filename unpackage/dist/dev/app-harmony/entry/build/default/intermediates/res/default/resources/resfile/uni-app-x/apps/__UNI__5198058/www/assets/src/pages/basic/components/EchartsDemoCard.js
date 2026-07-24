@@ -1,5 +1,5 @@
 import { _ as __easycom_0 } from "../../../../uni_modules/e-chart/components/e-chart/e-chart.js";
-const { defineComponent, ref, computed, watch, resolveDynamicComponent, openBlock, createBlock, withCtx, createElementVNode, createVNode, normalizeClass } = globalThis.Vue
+const { defineComponent, ref, computed, watch, resolveDynamicComponent, openBlock, createBlock, withCtx, createElementVNode, createVNode, normalizeClass, toDisplayString } = globalThis.Vue
 import { r as resolveEasycom } from "../../../../App.ku.js";
 import { C as Card } from "./Card.js";
 import { a as systemInfo } from "../../../utils/systemInfo.js";
@@ -188,7 +188,9 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
 const _style_0 = { "bg-__10b981_": { "": { "backgroundImage": "none", "backgroundColor": "#10b981" } }, "bg-__3b82f6_": { "": { "backgroundImage": "none", "backgroundColor": "#3b82f6" } }, "bg-__d1fae5_": { "": { "backgroundImage": "none", "backgroundColor": "#d1fae5" } }, "bg-__e0edff_": { "": { "backgroundImage": "none", "backgroundColor": "#e0edff" } }, "bg-__f59e0b_": { "": { "backgroundImage": "none", "backgroundColor": "#f59e0b" } }, "bg-__fef3c7_": { "": { "backgroundImage": "none", "backgroundColor": "#fef3c7" } }, "flex": { "": { "display": "flex" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-260px": { "": { "height": 260 } }, "h-36px": { "": { "height": 36 } }, "i_h-full": { "": { "!height": "100%" } }, "items-center": { "": { "alignItems": "center" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "justify-center": { "": { "justifyContent": "center" } }, "mr-8px": { "": { "marginRight": 8 } }, "mt-10px": { "": { "marginTop": 10 } }, "mt-15px": { "": { "marginTop": 15 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__10b981_": { "": { "color": "#10b981" } }, "text-__3b82f6_": { "": { "color": "#3b82f6" } }, "text-__f59e0b_": { "": { "color": "#f59e0b" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-12px": { "": { "fontSize": 12 } }, "w-full": { "": { "width": "100%" } } };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_e_chart = resolveEasycom(resolveDynamicComponent("e-chart"), __easycom_0);
-  return openBlock(), createBlock($setup["Card"], { title: "ECharts 图表示例" }, {
+  return openBlock(), createBlock($setup["Card"], {
+    title: _ctx.$t("basic.echartTitle")
+  }, {
     default: withCtx(() => [
       createElementVNode("view", { class: "w-full h-260px mt-10px" }, [
         createVNode(
@@ -217,9 +219,9 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                 {
                   class: normalizeClass(["text-12px font-bold", $setup.currentType !== "line" ? "text-__3b82f6_" : "text-__ffffff_"])
                 },
-                "折线图",
-                2
-                /* CLASS */
+                toDisplayString(_ctx.$t("basic.echartLine")),
+                3
+                /* TEXT, CLASS */
               )
             ],
             2
@@ -239,9 +241,9 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                 {
                   class: normalizeClass(["text-12px font-bold", $setup.currentType !== "bar" ? "text-__10b981_" : "text-__ffffff_"])
                 },
-                "柱状图",
-                2
-                /* CLASS */
+                toDisplayString(_ctx.$t("basic.echartBar")),
+                3
+                /* TEXT, CLASS */
               )
             ],
             2
@@ -261,9 +263,9 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                 {
                   class: normalizeClass(["text-12px font-bold", $setup.currentType !== "pie" ? "text-__f59e0b_" : "text-__ffffff_"])
                 },
-                "饼图",
-                2
-                /* CLASS */
+                toDisplayString(_ctx.$t("basic.echartPie")),
+                3
+                /* TEXT, CLASS */
               )
             ],
             2
@@ -274,7 +276,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     ]),
     _: 1
     /* STABLE */
-  });
+  }, 8, ["title"]);
 }
 const EchartsDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/basic/components/EchartsDemoCard.uvue"]]);
 export {

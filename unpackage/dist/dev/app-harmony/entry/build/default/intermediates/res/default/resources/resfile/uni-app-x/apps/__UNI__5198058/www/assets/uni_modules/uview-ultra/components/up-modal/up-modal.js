@@ -7,6 +7,7 @@ import { p as propsModal } from "./props.js";
 import { m as mpMixin } from "../../libs/mixin/mpMixin.js";
 import { m as mixin } from "../../libs/mixin/mixin.js";
 import { a as addUnit } from "../../libs/function/index.js";
+import { t } from "../../libs/i18n/index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
 const _sfc_main = defineComponent({
   name: "up-modal",
@@ -24,6 +25,18 @@ const _sfc_main = defineComponent({
   },
   emits: ["confirm", "cancel", "close", "update:show", "cancelOnAsync"],
   computed: {
+    elCancelText() {
+      if (this.cancelText == "取消" || this.cancelText == "") {
+        return t("up_common_cancel", new UTSJSONObject({}));
+      }
+      return this.cancelText;
+    },
+    elConfirmText() {
+      if (this.confirmText == "确认" || this.confirmText == "确定" || this.confirmText == "") {
+        return t("up_common_confirm", new UTSJSONObject({}));
+      }
+      return this.confirmText;
+    },
     contentStyleCpu() {
       let style = this.contentStyle;
       style["paddingTop"] = `${this.title != "" ? 12 : 25}px`;
@@ -176,7 +189,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                             color: _ctx.cancelColor
                           })
                         },
-                        toDisplayString(_ctx.cancelText),
+                        toDisplayString($options.elCancelText),
                         5
                         /* TEXT, STYLE */
                       )
@@ -207,7 +220,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                             color: _ctx.confirmColor
                           })
                         },
-                        toDisplayString(_ctx.confirmText),
+                        toDisplayString($options.elConfirmText),
                         5
                         /* TEXT, STYLE */
                       ))

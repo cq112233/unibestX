@@ -258,10 +258,13 @@ __ins.emit(event, ...do_not_transform_spread)
 		if (props.mode === 'time' || props.mode === 'timesecond') {
 			// 将time模式的时间用:分隔成数组
 			const timeArr: string[] = value.toString().split(':')
+			const hourVal = timeArr.length > 0 ? timeArr[0] : '00'
+			const minuteVal = timeArr.length > 1 ? timeArr[1] : '00'
+			const secondVal = timeArr.length > 2 ? timeArr[2] : '00'
 			// 使用formatter格式化方法进行管道处理
-			values = [formatterFunc('hour', timeArr[0]), formatterFunc('minute', timeArr[1])]
+			values = [formatterFunc('hour', hourVal), formatterFunc('minute', minuteVal)]
 			if (props.mode === 'timesecond') {
-				values.push(formatterFunc('second', timeArr[2]))
+				values.push(formatterFunc('second', secondVal))
 			}
 		} else {
 			const date = new Date(value.toString())
@@ -288,7 +291,8 @@ __ins.emit(event, ...do_not_transform_spread)
 		// 根据当前各列的所有值，从各列默认值中找到默认值在各列中的索引
 		let indexs: Array<number> = []
 		columns.value.forEach((column: string[], index: number) => {
-			indexs.push(Math.max(0, column.findIndex((item: string) => item === values[index])))
+			const targetVal = index < values.length ? values[index] : ''
+			indexs.push(Math.max(0, column.findIndex((item: string) => item === targetVal)))
 		});
 		// const indexs = this.columns.map((column: any[], index: number): number => {
 		// 	// 通过取大值，可以保证不会出现找不到索引的-1情况
@@ -344,7 +348,7 @@ __ins.emit(event, ...do_not_transform_spread)
 				}
 			}
 		}
-		let result = { __$originalPosition: new UTSSourceMapPosition("result", "uni_modules/uview-ultra/components/up-datetime-picker/up-datetime-picker.uvue", 380, 7), } as UTSJSONObject
+		let result = { __$originalPosition: new UTSSourceMapPosition("result", "uni_modules/uview-ultra/components/up-datetime-picker/up-datetime-picker.uvue", 384, 7), } as UTSJSONObject
 		result[`${type}Year`] = year
 		result[`${type}Month`] = month
 		result[`${type}Date`] = date
@@ -584,9 +588,9 @@ __ins.emit(event, ...do_not_transform_spread)
 				return ''
 			}
 			const timeArr = value.toString().split(':')
-			let hour = timeArr[0]
-			let minute = timeArr[1]
-			let second = timeArr[2]
+			let hour = timeArr.length > 0 ? timeArr[0] : '00'
+			let minute = timeArr.length > 1 ? timeArr[1] : '00'
+			let second = timeArr.length > 2 ? timeArr[2] : '00'
 			// 对时间补零，同时控制在最小值和最大值之间
 			const hourNum = parseInt(hour)
 			const minuteNum = parseInt(minute)
@@ -693,14 +697,18 @@ __ins.emit(event, ...do_not_transform_spread)
 	// }
 	function change(e: UTSJSONObject) {
 		let indexs = e['indexs'] as number[]
+		if (indexs == null) indexs = []
 		let values = e['values'] as Array<any[]>
 		if (values == null) values = []
 		let selectValue: any = ''
 		if(props.mode === 'time' || props.mode === 'timesecond') {
+			const idx0 = indexs.length > 0 ? indexs[0] : 0
+			const idx1 = indexs.length > 1 ? indexs[1] : 0
+			const idx2 = indexs.length > 2 ? indexs[2] : 0
 			// 根据value各列索引，从各列数组中，取出当前时间的选中值
-			const hourText = safeColumnValue(values, 0, indexs[0], padZero(props.minHour))
-			const minuteText = safeColumnValue(values, 1, indexs[1], padZero(props.minMinute))
-			const secondText = safeColumnValue(values, 2, indexs[2], padZero(props.minSecond))
+			const hourText = safeColumnValue(values, 0, idx0, padZero(props.minHour))
+			const minuteText = safeColumnValue(values, 1, idx1, padZero(props.minMinute))
+			const secondText = safeColumnValue(values, 2, idx2, padZero(props.minSecond))
 			let hour = toInt(intercept(hourText), props.minHour)
 			let minute = toInt(intercept(minuteText), props.minMinute)
 			let second = toInt(intercept(secondText), props.minSecond)
@@ -720,8 +728,11 @@ __ins.emit(event, ...do_not_transform_spread)
 			const currentMinute = validCurrent.minute()
 			const currentSecond = validCurrent.second()
 
-			const yearText = safeColumnValue(values, 0, indexs[0], currentYear.toString())
-			const monthText = safeColumnValue(values, 1, indexs[1], padZero(currentMonth))
+			const idx0 = indexs.length > 0 ? indexs[0] : 0
+			const idx1 = indexs.length > 1 ? indexs[1] : 0
+			const idx2 = indexs.length > 2 ? indexs[2] : 0
+			const yearText = safeColumnValue(values, 0, idx0, currentYear.toString())
+			const monthText = safeColumnValue(values, 1, idx1, padZero(currentMonth))
 			// 将选择的值转为数值，比如'03'转为数值的3，'2019'转为数值的2019
 			let year = toInt(intercept(yearText, 'year'), currentYear)
 			let month = toInt(intercept(monthText), currentMonth)
@@ -729,7 +740,7 @@ __ins.emit(event, ...do_not_transform_spread)
 			month = range(1, 12, month)
 			// 此月份的最大天数
 			const maxDate = dayuts(`${year}-${month}`).daysInMonth()
-			const dayText = safeColumnValue(values, 2, indexs[2], padZero(Math.min(currentDate, maxDate)))
+			const dayText = safeColumnValue(values, 2, idx2, padZero(Math.min(currentDate, maxDate)))
 			let date = toInt(intercept(dayText), Math.min(currentDate, maxDate))
 			// year-month模式下，date不会出现在列中，设置为1，为了符合后边需要减1的需求
 			if (props.mode === 'year-month') {
@@ -738,15 +749,18 @@ __ins.emit(event, ...do_not_transform_spread)
 			// 不允许超过maxDate值
 			date = range(1, maxDate, date)
 			if (props.mode === 'datehour' || props.mode === 'datetime' || props.mode === 'datetimesecond') {
-				const hourText = safeColumnValue(values, 3, indexs[3], padZero(currentHour))
+				const idx3 = indexs.length > 3 ? indexs[3] : 0
+				const hourText = safeColumnValue(values, 3, idx3, padZero(currentHour))
 				hour = range(0, 23, toInt(intercept(hourText), currentHour))
 			}
 			if (props.mode === 'datetime' || props.mode === 'datetimesecond') {
-				const minuteText = safeColumnValue(values, 4, indexs[4], padZero(currentMinute))
+				const idx4 = indexs.length > 4 ? indexs[4] : 0
+				const minuteText = safeColumnValue(values, 4, idx4, padZero(currentMinute))
 				minute = range(0, 59, toInt(intercept(minuteText), currentMinute))
 			}
 			if (props.mode === 'datetimesecond') {
-				const secondText = safeColumnValue(values, 5, indexs[5], padZero(currentSecond))
+				const idx5 = indexs.length > 5 ? indexs[5] : 0
+				const secondText = safeColumnValue(values, 5, idx5, padZero(currentSecond))
 				second = range(0, 59, toInt(intercept(secondText), currentSecond))
 			}
 			// 转为时间模式

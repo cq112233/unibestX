@@ -2,12 +2,25 @@ const { defineComponent, openBlock, createElementBlock, withModifiers, createEle
 import { p as propsToolbar } from "./props.js";
 import { m as mpMixin } from "../../libs/mixin/mpMixin.js";
 import { m as mixin } from "../../libs/mixin/mixin.js";
+import { t } from "../../libs/i18n/index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
 const _sfc_main = defineComponent({
   name: "up-toolbar",
   mixins: [mpMixin, mixin, propsToolbar],
   emits: ["confirm", "cancel"],
   computed: {
+    elCancelText() {
+      if (this.cancelText == "取消" || this.cancelText == "") {
+        return t("up_common_cancel", new UTSJSONObject({}));
+      }
+      return this.cancelText;
+    },
+    elConfirmText() {
+      if (this.confirmText == "确认" || this.confirmText == "确定" || this.confirmText == "") {
+        return t("up_common_confirm", new UTSJSONObject({}));
+      }
+      return this.confirmText;
+    },
     elConfirmColor() {
       if (this.confirmColor == "#3c9cff") {
         return "";
@@ -52,7 +65,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                 color: _ctx.cancelColor
               })
             },
-            toDisplayString(_ctx.cancelText),
+            toDisplayString($options.elCancelText),
             5
             /* TEXT, STYLE */
           )
@@ -83,7 +96,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                 color: $options.elConfirmColor
               })
             },
-            toDisplayString(_ctx.confirmText),
+            toDisplayString($options.elConfirmText),
             5
             /* TEXT, STYLE */
           )

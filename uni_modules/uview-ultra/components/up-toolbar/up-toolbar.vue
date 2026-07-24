@@ -17,7 +17,7 @@
 					:style="{
 						color: cancelColor
 					}"
-				>{{ cancelText }}</text>
+				>{{ elCancelText }}</text>
 			</view>
 		</view>
 		<text
@@ -38,7 +38,7 @@
 					:style="{
 					color: confirmColor
 				}"
-				>{{ confirmText }}</text>
+				>{{ elConfirmText }}</text>
 			</view>
 			<template v-else>
 				<slot name="right">
@@ -52,6 +52,7 @@
 	import { props } from './props.js';
 	import { mpMixin } from '../../libs/mixin/mpMixin.js';
 	import { mixin } from '../../libs/mixin/mixin.js';
+	import { t } from '../../libs/i18n/index.js';
 	/**
 	 * Toolbar 工具条
 	 * @description 
@@ -69,6 +70,20 @@
 		name: 'up-toolbar',
 		mixins: [mpMixin, mixin, props],
 		emits: ["confirm", "cancel"],
+		computed: {
+			elCancelText() {
+				if (this.cancelText === '取消' || !this.cancelText) {
+					return t('up_common_cancel')
+				}
+				return this.cancelText
+			},
+			elConfirmText() {
+				if (this.confirmText === '确认' || this.confirmText === '确定' || !this.confirmText) {
+					return t('up_common_confirm')
+				}
+				return this.confirmText
+			}
+		},
 		created() {
 			// console.log(this.$slots)
 		},

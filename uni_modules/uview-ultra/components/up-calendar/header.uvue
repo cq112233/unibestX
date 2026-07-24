@@ -41,13 +41,13 @@
 			>{{ todayText }}</text>
 		</view>
 		<view class="up-calendar-header__weekdays">
-			<text class="up-calendar-header__weekdays__weekday">一</text>
-			<text class="up-calendar-header__weekdays__weekday">二</text>
-			<text class="up-calendar-header__weekdays__weekday">三</text>
-			<text class="up-calendar-header__weekdays__weekday">四</text>
-			<text class="up-calendar-header__weekdays__weekday">五</text>
-			<text class="up-calendar-header__weekdays__weekday">六</text>
-			<text class="up-calendar-header__weekdays__weekday">日</text>
+			<text class="up-calendar-header__weekdays__weekday">{{ t('up_week_one') }}</text>
+			<text class="up-calendar-header__weekdays__weekday">{{ t('up_week_two') }}</text>
+			<text class="up-calendar-header__weekdays__weekday">{{ t('up_week_three') }}</text>
+			<text class="up-calendar-header__weekdays__weekday">{{ t('up_week_four') }}</text>
+			<text class="up-calendar-header__weekdays__weekday">{{ t('up_week_five') }}</text>
+			<text class="up-calendar-header__weekdays__weekday">{{ t('up_week_six') }}</text>
+			<text class="up-calendar-header__weekdays__weekday">{{ t('up_week_seven') }}</text>
 		</view>
 	</view>
 </template>
@@ -55,6 +55,7 @@
 <script>
 	import { mpMixin } from '../../libs/mixin/mpMixin';
 	import { mixin } from '../../libs/mixin/mixin';
+	import { t } from '../../libs/i18n/index.uts';
 	export default {
 		name: 'up-calendar-header',
 		// mixins: [mpMixin, mixin],
@@ -118,6 +119,9 @@
 			}
 		},
 		methods: {
+			t(key: string): string {
+				return t(key, {} as UTSJSONObject)
+			},
 			prev() {
 				if (!this.prevDisabled) {
 					this.$emit('prev')
@@ -143,54 +147,59 @@
 					this.$emit('today')
 				}
 			}
-		},
+		}
 	}
 </script>
 
 <style lang="scss" scoped>
-	@import "../../libs/css/components.scss";
+	@import '../../libs/css/components.scss';
 
 	.up-calendar-header {
-		display: flex;
-		flex-direction: column;
-		padding-bottom: 4px;
 
 		&__title {
 			font-size: 16px;
-			color: $up-main-color;
+			font-weight: bold;
 			text-align: center;
+			color: $up-main-color;
 			height: 42px;
 			line-height: 42px;
-			font-weight: bold;
-		}
-
-		&__subtitle-wrap {
-			@include flex;
-			align-items: center;
-			justify-content: center;
-			height: 40px;
 		}
 
 		&__subtitle {
 			font-size: 14px;
 			color: $up-main-color;
+			height: 40px;
 			text-align: center;
+			line-height: 40px;
 			font-weight: bold;
-			min-width: 120px;
+
+			&-wrap {
+				@include flex;
+				justify-content: center;
+				align-items: center;
+				position: relative;
+			}
 		}
 
 		&__switch {
-			width: 44px;
-			height: 40px;
+			font-size: 16px;
+			color: $up-tips-color;
 			line-height: 40px;
-			text-align: center;
-			color: $up-main-color;
-			font-size: 22px;
-			font-weight: bold;
-			flex-shrink: 0;
+			padding: 0 8px;
 
 			&--disabled {
-				opacity: 0.35;
+				color: $up-light-color;
+			}
+		}
+
+		&__today {
+			position: absolute;
+			right: 15px;
+			font-size: 13px;
+			color: $up-primary;
+
+			&--disabled {
+				color: $up-light-color;
 			}
 		}
 
@@ -204,22 +213,6 @@
 				line-height: 30px;
 				flex: 1;
 				text-align: center;
-			}
-		}
-
-		&__today {
-			margin-left: 4px;
-			height: 28px;
-			line-height: 28px;
-			padding: 0 10px;
-			border-radius: 14px;
-			font-size: 13px;
-			color: $up-primary;
-			border: 1px solid $up-primary;
-			flex-shrink: 0;
-
-			&--disabled {
-				opacity: 0.35;
 			}
 		}
 	}

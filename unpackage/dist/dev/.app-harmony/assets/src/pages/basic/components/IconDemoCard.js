@@ -1,5 +1,5 @@
 import { _ as __easycom_0 } from "../../../../uni_modules/uni-icons/components/uni-icons/uni-icons.js";
-const { defineComponent, resolveDynamicComponent, openBlock, createElementBlock, Fragment, createCommentVNode, createVNode, withCtx, createElementVNode } = globalThis.Vue
+const { defineComponent, resolveDynamicComponent, openBlock, createElementBlock, Fragment, createCommentVNode, createVNode, withCtx, createElementVNode, toDisplayString } = globalThis.Vue
 import { r as resolveEasycom } from "../../../../App.ku.js";
 import { _ as __easycom_1 } from "../../../../uni_modules/lime-icon/components/l-icon/l-icon.js";
 import { _ as __easycom_0$1 } from "../../../../uni_modules/uview-ultra/components/up-icon/up-icon.js";
@@ -27,7 +27,9 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     null,
     [
       createCommentVNode(" 使用封装 of Card 组件 "),
-      createVNode($setup["Card"], { title: "字体图标示例" }, {
+      createVNode($setup["Card"], {
+        title: _ctx.$t("basic.iconDemoTitle")
+      }, {
         default: withCtx(() => [
           createCommentVNode(" uni-icon 示例 "),
           createElementVNode("view", { class: "flex-row items-center justify-between py-12px border-bottom-width-1px border-bottom-style-solid border-bottom-color-__f1f5f9_" }, [
@@ -51,7 +53,13 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
               createElementVNode("view", { class: "flex-col" }, [
                 createElementVNode("text", { class: "text-14px text-__475569_ font-medium" }, "lime-icon"),
                 createElementVNode("view", { class: "bg-__fff1f2_ rounded-4px py-2px px-6px mt-4px self-start border-width-1px border-style-solid border-color-__ffe4e6_" }, [
-                  createElementVNode("text", { class: "text-10px text-__f43f5e_" }, "SVG模式需授权收费")
+                  createElementVNode(
+                    "text",
+                    { class: "text-10px text-__f43f5e_" },
+                    toDisplayString(_ctx.$t("basic.svgAuthWarning")),
+                    1
+                    /* TEXT */
+                  )
                 ])
               ])
             ]),
@@ -82,7 +90,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         ]),
         _: 1
         /* STABLE */
-      })
+      }, 8, ["title"])
     ],
     2112
     /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */

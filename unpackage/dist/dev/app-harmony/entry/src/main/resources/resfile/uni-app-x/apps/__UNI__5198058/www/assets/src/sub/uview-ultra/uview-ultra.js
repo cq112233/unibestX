@@ -58,6 +58,16 @@ import "../../../uni_modules/lime-i18n/common/warnings.js";
 import "../../../uni_modules/lime-i18n/common/types.js";
 import "../../i18n/locales/zh_CN.js";
 import "../../i18n/locales/en_US.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/index.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hans.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hant.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/en.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/es.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/fr.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/de.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/ko.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/ja.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/ru.js";
 import "../../utils/toast.js";
 import "../../../uni_modules/uview-ultra/components/up-icon/icons.js";
 import "../../../uni_modules/uview-ultra/libs/composable/useUltraUI.js";
@@ -127,9 +137,25 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
               createVNode(_component_up_cell_group, { border: false }, {
                 default: withCtx(() => [
                   createVNode(_component_up_cell, {
+                    title: "Button 按钮",
+                    "is-link": "",
+                    onClick: _cache[0] || (_cache[0] = ($event) => $setup.goToDemo("button"))
+                  }, {
+                    icon: withCtx(() => [
+                      createVNode(_component_up_icon, {
+                        name: "plus-circle",
+                        color: "#2979ff",
+                        size: "20",
+                        class: "mr-8px"
+                      })
+                    ]),
+                    _: 1
+                    /* STABLE */
+                  }),
+                  createVNode(_component_up_cell, {
                     title: "Icon 图标",
                     "is-link": "",
-                    onClick: _cache[0] || (_cache[0] = ($event) => $setup.goToDemo("icon"))
+                    onClick: _cache[1] || (_cache[1] = ($event) => $setup.goToDemo("icon"))
                   }, {
                     icon: withCtx(() => [
                       createVNode(_component_up_icon, {
@@ -145,7 +171,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                   createVNode(_component_up_cell, {
                     title: "Text 文本",
                     "is-link": "",
-                    onClick: _cache[1] || (_cache[1] = ($event) => $setup.goToDemo("text"))
+                    onClick: _cache[2] || (_cache[2] = ($event) => $setup.goToDemo("text"))
                   }, {
                     icon: withCtx(() => [
                       createVNode(_component_up_icon, {
@@ -161,7 +187,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                   createVNode(_component_up_cell, {
                     title: "Empty 空白页",
                     "is-link": "",
-                    onClick: _cache[2] || (_cache[2] = ($event) => $setup.goToDemo("empty"))
+                    onClick: _cache[3] || (_cache[3] = ($event) => $setup.goToDemo("empty"))
                   }, {
                     icon: withCtx(() => [
                       createVNode(_component_up_icon, {
@@ -177,7 +203,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                   createVNode(_component_up_cell, {
                     title: "Divider 分割线",
                     "is-link": "",
-                    onClick: _cache[3] || (_cache[3] = ($event) => $setup.goToDemo("divider"))
+                    onClick: _cache[4] || (_cache[4] = ($event) => $setup.goToDemo("divider"))
                   }, {
                     icon: withCtx(() => [
                       createVNode(_component_up_icon, {
@@ -193,7 +219,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                   createVNode(_component_up_cell, {
                     title: "LoadingIcon 加载图标",
                     "is-link": "",
-                    onClick: _cache[4] || (_cache[4] = ($event) => $setup.goToDemo("loading-icon"))
+                    onClick: _cache[5] || (_cache[5] = ($event) => $setup.goToDemo("loading-icon"))
                   }, {
                     icon: withCtx(() => [
                       createVNode(_component_up_icon, {
@@ -209,27 +235,11 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                   createVNode(_component_up_cell, {
                     title: "Skeleton 骨架屏",
                     "is-link": "",
-                    onClick: _cache[5] || (_cache[5] = ($event) => $setup.goToDemo("skeleton"))
+                    onClick: _cache[6] || (_cache[6] = ($event) => $setup.goToDemo("skeleton"))
                   }, {
                     icon: withCtx(() => [
                       createVNode(_component_up_icon, {
                         name: "list-dot",
-                        color: "#2979ff",
-                        size: "20",
-                        class: "mr-8px"
-                      })
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  createVNode(_component_up_cell, {
-                    title: "Button 按钮",
-                    "is-link": "",
-                    onClick: _cache[6] || (_cache[6] = ($event) => $setup.goToDemo("button"))
-                  }, {
-                    icon: withCtx(() => [
-                      createVNode(_component_up_icon, {
-                        name: "plus-circle",
                         color: "#2979ff",
                         size: "20",
                         class: "mr-8px"

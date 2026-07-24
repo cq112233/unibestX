@@ -41,7 +41,7 @@ const _sfc_main = defineComponent({
   emits: ["disconnected", "connected", "retry"],
   methods: {
     t(s) {
-      return t(s);
+      return t(s, new UTSJSONObject({}));
     },
     retry() {
       uni.getNetworkType(new UTSJSONObject({
@@ -49,10 +49,10 @@ const _sfc_main = defineComponent({
           this.networkType = res.networkType;
           this.emitEvent(this.networkType);
           if (res.networkType == "none") {
-            toast(t("up.noNetwork.disconnect"));
+            toast(t("up.noNetwork.disconnect", new UTSJSONObject({})));
             this.isConnected = false;
           } else {
-            toast(t("up.noNetwork.connect"));
+            toast(t("up.noNetwork.connect", new UTSJSONObject({})));
             this.isConnected = true;
           }
         }

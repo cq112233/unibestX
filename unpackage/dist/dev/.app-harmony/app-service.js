@@ -19,6 +19,16 @@ import "./assets/src/store/app.js";
 import "./assets/src/tabbar/store.js";
 import "./assets/src/tabbar/types.js";
 import "./assets/src/tabbar/config.js";
+import "./assets/uni_modules/uview-ultra/libs/i18n/index.js";
+import "./assets/uni_modules/uview-ultra/libs/i18n/locales/zh-Hans.js";
+import "./assets/uni_modules/uview-ultra/libs/i18n/locales/zh-Hant.js";
+import "./assets/uni_modules/uview-ultra/libs/i18n/locales/en.js";
+import "./assets/uni_modules/uview-ultra/libs/i18n/locales/es.js";
+import "./assets/uni_modules/uview-ultra/libs/i18n/locales/fr.js";
+import "./assets/uni_modules/uview-ultra/libs/i18n/locales/de.js";
+import "./assets/uni_modules/uview-ultra/libs/i18n/locales/ko.js";
+import "./assets/uni_modules/uview-ultra/libs/i18n/locales/ja.js";
+import "./assets/uni_modules/uview-ultra/libs/i18n/locales/ru.js";
 import "./assets/uni_modules/lime-i18n/common/index.js";
 import "./assets/uni_modules/lime-i18n/common/composer-class.js";
 import "./assets/uni_modules/e-chart/components/e-chart/uts/WebviewEchart.js";
@@ -571,9 +581,9 @@ function isConsoleWritable() {
   return isWritable;
 }
 function initRuntimeSocketService() {
-  const hosts = "127.0.0.1,192.168.100.62,198.18.0.1,10.8.0.12";
+  const hosts = "127.0.0.1,192.168.100.62,198.18.0.1,10.8.0.8";
   const port = "8090";
-  const id = "app-harmony_hsREX7";
+  const id = "app-harmony_xwmZdh";
   const lazy = typeof swan !== "undefined";
   let restoreError = lazy ? () => {
   } : initOnError();

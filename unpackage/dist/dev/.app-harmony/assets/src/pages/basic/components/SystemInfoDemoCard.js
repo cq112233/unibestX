@@ -50,12 +50,12 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     return __returned__;
   }
 });
-const _style_0 = { "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "justify-between": { "": { "justifyContent": "space-between" } }, "mb-12px": { "": { "marginBottom": 12 } }, "mb-16px": { "": { "marginBottom": 16 } }, "mb-8px": { "": { "marginBottom": 8 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__334155_": { "": { "color": "#334155" } }, "text-__64748b_": { "": { "color": "#64748b" } }, "text-13px": { "": { "fontSize": 13 } }, "text-14px": { "": { "fontSize": 14 } } };
+const _style_0 = { "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "justify-between": { "": { "justifyContent": "space-between" } }, "mb-12px": { "": { "marginBottom": 12 } }, "mb-16px": { "": { "marginBottom": 16 } }, "mb-8px": { "": { "marginBottom": 8 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__334155_": { "": { "color": "#334155" } }, "text-__64748b_": { "": { "color": "#64748b" } }, "text-13px": { "": { "fontSize": 13 } }, "text-14px": { "": { "fontSize": 14 } } };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return openBlock(), createBlock($setup["Card"], { title: "系统与安全区域信息" }, {
     default: withCtx(() => [
       createCommentVNode(" 预览区域：安全区域 Insets "),
-      createElementVNode("view", { class: "bg-__f8fafc_ rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
+      createElementVNode("view", { class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
         createElementVNode("text", { class: "text-13px font-bold text-__1e293b_ mb-12px" }, "安全区域内边距 (SafeAreaInsets)"),
         createElementVNode("view", { class: "flex-row justify-between mb-8px" }, [
           createElementVNode("text", { class: "text-14px text-__64748b_" }, "Top (顶部距离)"),
@@ -99,7 +99,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         ])
       ]),
       createCommentVNode(" 预览区域：系统窗口信息 "),
-      createElementVNode("view", { class: "bg-__f8fafc_ rounded-12px p-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
+      createElementVNode("view", { class: "rounded-12px p-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
         createElementVNode("text", { class: "text-13px font-bold text-__1e293b_ mb-12px" }, "设备窗口规格 (WindowInfo)"),
         createElementVNode("view", { class: "flex-row justify-between mb-8px" }, [
           createElementVNode("text", { class: "text-14px text-__64748b_" }, "屏幕宽度"),

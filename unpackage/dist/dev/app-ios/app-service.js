@@ -1,10 +1,10 @@
 (function(vue) {
   "use strict";
   function currentPageCaptureScreenshot(fullPage, callback) {
-    var _a;
+    var _a2;
     const pages = getCurrentPages();
     const currentPage = pages[pages.length - 1];
-    (_a = currentPage.vm) === null || _a === void 0 ? void 0 : _a.$viewToTempFilePath({
+    (_a2 = currentPage.vm) === null || _a2 === void 0 ? void 0 : _a2.$viewToTempFilePath({
       wholeContent: fullPage,
       overwrite: true,
       success: (res) => {
@@ -85,9 +85,9 @@
     });
   }
   function initRuntimeSocketService() {
-    const hosts = "127.0.0.1,192.168.100.62,198.18.0.1,10.8.0.12";
+    const hosts = "127.0.0.1,192.168.100.62,198.18.0.1,10.8.0.8";
     const port = "8090";
-    const id = "app-ios_ARP8g_";
+    const id = "app-ios_m3Ra-j";
     return Promise.resolve().then(() => {
       return initRuntimeSocket(hosts, port, id).then((socket) => {
         if (socket == null) {
@@ -209,13 +209,13 @@
         default: false
       }
     },
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const props2 = __props;
       const statusBarHeight = vue.computed(() => {
-        var _a2, _b, _c, _d;
-        return (_d = (_b = (_a2 = safeAreaInsets.value) === null || _a2 === void 0 ? null : _a2.top) !== null && _b !== void 0 ? _b : (_c = systemInfo.value) === null || _c === void 0 ? null : _c.statusBarHeight) !== null && _d !== void 0 ? _d : 0;
+        var _a3, _b, _c, _d;
+        return (_d = (_b = (_a3 = safeAreaInsets.value) === null || _a3 === void 0 ? null : _a3.top) !== null && _b !== void 0 ? _b : (_c = systemInfo.value) === null || _c === void 0 ? null : _c.statusBarHeight) !== null && _d !== void 0 ? _d : 0;
       });
       function handleBack() {
         uni.navigateBack(new UTSJSONObject({
@@ -651,7 +651,7 @@
     }
   }
   function iteratorOperation(arr, operation) {
-    const _a = __read(arr), num1 = _a[0], num2 = _a[1], others = _a.slice(2);
+    const _a2 = __read(arr), num1 = _a2[0], num2 = _a2[1], others = _a2.slice(2);
     let res = operation(num1, num2);
     others.forEach((num) => {
       res = operation(res, num);
@@ -662,7 +662,7 @@
     if (nums.length > 2) {
       return iteratorOperation(nums, times);
     }
-    const _a = __read(nums, 2), num1 = _a[0], num2 = _a[1];
+    const _a2 = __read(nums, 2), num1 = _a2[0], num2 = _a2[1];
     const num1Changed = float2Fixed(num1);
     const num2Changed = float2Fixed(num2);
     const baseNum = digitLength(num1) + digitLength(num2);
@@ -674,7 +674,7 @@
     if (nums.length > 2) {
       return iteratorOperation(nums, plus$1);
     }
-    const _a = __read(nums, 2), num1 = _a[0], num2 = _a[1];
+    const _a2 = __read(nums, 2), num1 = _a2[0], num2 = _a2[1];
     const baseNum = Math.pow(10, Math.max(digitLength(num1), digitLength(num2)));
     return (times(num1, baseNum) + times(num2, baseNum)) / baseNum;
   }
@@ -682,7 +682,7 @@
     if (nums.length > 2) {
       return iteratorOperation(nums, minus$1);
     }
-    const _a = __read(nums, 2), num1 = _a[0], num2 = _a[1];
+    const _a2 = __read(nums, 2), num1 = _a2[0], num2 = _a2[1];
     const baseNum = Math.pow(10, Math.max(digitLength(num1), digitLength(num2)));
     return (times(num1, baseNum) - times(num2, baseNum)) / baseNum;
   }
@@ -690,7 +690,7 @@
     if (nums.length > 2) {
       return iteratorOperation(nums, divide$1);
     }
-    const _a = __read(nums, 2), num1 = _a[0], num2 = _a[1];
+    const _a2 = __read(nums, 2), num1 = _a2[0], num2 = _a2[1];
     const num1Changed = float2Fixed(num1);
     const num2Changed = float2Fixed(num2);
     checkBoundary(num1Changed);
@@ -996,7 +996,7 @@
     return "00".concat(str).slice(-2);
   }
   function getProperty(obj2 = null, key2) {
-    var _a, _b;
+    var _a2, _b;
     if (null == obj2) {
       return "";
     }
@@ -1007,7 +1007,7 @@
       const keys = key2.split(".");
       let currentObj = obj2;
       for (let i = 0; i < keys.length; i++) {
-        const value = (_a = currentObj[keys[i]]) !== null && _a !== void 0 ? _a : "";
+        const value = (_a2 = currentObj[keys[i]]) !== null && _a2 !== void 0 ? _a2 : "";
         if (i == keys.length - 1) {
           return value;
         }
@@ -1201,11 +1201,11 @@
        * @returns
        */
       getParentData: function(parentName, refMode = false) {
-        var _a;
+        var _a2;
         let parent = this.getParent(parentName);
         this.parent = parent;
         if (parent != null) {
-          if ((parent === null || parent === void 0 ? null : parent.$data) != null && ((_a = parent === null || parent === void 0 ? null : parent.$data) === null || _a === void 0 ? null : _a["children"]) != null) {
+          if ((parent === null || parent === void 0 ? null : parent.$data) != null && ((_a2 = parent === null || parent === void 0 ? null : parent.$data) === null || _a2 === void 0 ? null : _a2["children"]) != null) {
             if (refMode) {
               parent === null || parent === void 0 ? null : parent.$callMethod("addChildRef", this.$data["refstr"]);
             } else {
@@ -1213,8 +1213,8 @@
             }
           }
           UTSJSONObject.keys(this.parentData).map((key2) => {
-            var _a2, _b, _c, _d, _e, _f;
-            if ((parent === null || parent === void 0 ? null : parent.$props) != null && ((_a2 = parent === null || parent === void 0 ? null : parent.$props) === null || _a2 === void 0 ? null : _a2[key2]) != null) {
+            var _a3, _b, _c, _d, _e, _f;
+            if ((parent === null || parent === void 0 ? null : parent.$props) != null && ((_a3 = parent === null || parent === void 0 ? null : parent.$props) === null || _a3 === void 0 ? null : _a3[key2]) != null) {
               if (((_b = this.parentData) === null || _b === void 0 ? null : _b[key2]) != null) {
                 this.parentData[key2] = (_c = parent === null || parent === void 0 ? null : parent.$props) === null || _c === void 0 ? null : _c[key2];
               }
@@ -2254,8 +2254,8 @@
       }
     },
     emits: ["click"],
-    setup(__props, _a) {
-      var __expose = _a.expose, __emit = _a.emit;
+    setup(__props, _a2) {
+      var __expose = _a2.expose, __emit = _a2.emit;
       __expose();
       const preventEvent = useUltraUI().preventEvent;
       const props2 = __props;
@@ -2405,8 +2405,8 @@
       type: [String, Number],
       default: defProps$1b.getNumber("gap.marginBottom")
     }
-  }, setup(__props, _a) {
-    var __expose = _a.expose;
+  }, setup(__props, _a2) {
+    var __expose = _a2.expose;
     __expose();
     const props2 = __props;
     const gapStyle = vue.computed(() => {
@@ -2494,9 +2494,9 @@
       emits: ["click", "beforeEnter", "enter", "afterEnter", "beforeLeave", "leave", "afterLeave"],
       computed: {
         mergeStyle() {
-          var _a;
+          var _a2;
           const _b = this, viewStyle = _b.viewStyle, customStyle = _b.customStyle;
-          const modeVal = ((_a = this.$props["mode"]) !== null && _a !== void 0 ? _a : "fade").toString();
+          const modeVal = ((_a2 = this.$props["mode"]) !== null && _a2 !== void 0 ? _a2 : "fade").toString();
           const durationVal = this.$props["duration"];
           const duration = durationVal != null ? durationVal.toString() : "0";
           let transitionProp = "all";
@@ -2881,9 +2881,9 @@
         this.clearTimer();
       },
       clearTimer() {
-        var _a;
+        var _a2;
         this.isShow = false;
-        clearTimeout((_a = this.timer) !== null && _a !== void 0 ? _a : 0);
+        clearTimeout((_a2 = this.timer) !== null && _a2 !== void 0 ? _a2 : 0);
         this.timer = null;
       }
     },
@@ -3829,8 +3829,8 @@
         default: false
       }
     },
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const props2 = __props;
       const tabbarItem = vue.computed(() => {
@@ -3952,8 +3952,8 @@
   const TABBAR_CONTAINER_HEIGHT = 80;
   const _sfc_main$36 = /* @__PURE__ */ vue.defineComponent({
     __name: "index",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const safeAreaBottom = vue.computed(() => {
         const insets = safeAreaInsets.value;
@@ -5266,7 +5266,7 @@
     return tokens;
   }
   function compile(tokens, values = null) {
-    var _a;
+    var _a2;
     const compiled = [];
     let index = 0;
     const mode = Array.isArray(values) ? "list" : isObject(values) ? "named" : "unknown";
@@ -5292,7 +5292,7 @@
           break;
         case "named":
           if (mode == "named") {
-            const value = (_a = values[token.value]) !== null && _a !== void 0 ? _a : "";
+            const value = (_a2 = values[token.value]) !== null && _a2 !== void 0 ? _a2 : "";
             compiled.push("".concat(value));
           } else {
             {
@@ -5437,8 +5437,8 @@
     });
   }
   function getLocaleMap(locale2, key2, options, root = null) {
-    var _a;
-    const __messages = UTSJSONObject.assign(new UTSJSONObject({}), (_a = options.getJSON(key2)) !== null && _a !== void 0 ? _a : new UTSJSONObject({}));
+    var _a2;
+    const __messages = UTSJSONObject.assign(new UTSJSONObject({}), (_a2 = options.getJSON(key2)) !== null && _a2 !== void 0 ? _a2 : new UTSJSONObject({}));
     let map2 = /* @__PURE__ */ new Map();
     __messages.toMap().forEach((value = null, key22) => {
       if (UTS.isInstanceOf(value, UTSJSONObject)) {
@@ -5453,8 +5453,8 @@
     return map2;
   }
   function getLocaleTabbarMap(locale2, key2, options) {
-    var _a;
-    const __messages = (_a = options.getJSON(key2)) !== null && _a !== void 0 ? _a : new UTSJSONObject({});
+    var _a2;
+    const __messages = (_a2 = options.getJSON(key2)) !== null && _a2 !== void 0 ? _a2 : new UTSJSONObject({});
     let map2 = /* @__PURE__ */ new Map();
     __messages.toMap().forEach((tabbar = null, key22) => {
       if (Array.isArray(tabbar)) {
@@ -5469,8 +5469,8 @@
     return map2;
   }
   function getModifiers(options) {
-    var _a;
-    const __modifiers = ((_a = options.getJSON("modifiers")) !== null && _a !== void 0 ? _a : new UTSJSONObject({})).toMap();
+    var _a2;
+    const __modifiers = ((_a2 = options.getJSON("modifiers")) !== null && _a2 !== void 0 ? _a2 : new UTSJSONObject({})).toMap();
     const _modifiers = /* @__PURE__ */ new Map();
     __modifiers.forEach((value = null, key2) => {
       if (typeof value == "function") {
@@ -5484,8 +5484,8 @@
     return _modifiers;
   }
   function getPluralizationRules(options) {
-    var _a;
-    const __pluralizationRules = ((_a = options.getJSON("pluralizationRules")) !== null && _a !== void 0 ? _a : new UTSJSONObject({})).toMap();
+    var _a2;
+    const __pluralizationRules = ((_a2 = options.getJSON("pluralizationRules")) !== null && _a2 !== void 0 ? _a2 : new UTSJSONObject({})).toMap();
     const _pluralizationRules = /* @__PURE__ */ new Map();
     __pluralizationRules.forEach((value = null, key2) => {
       if (typeof value == "function") {
@@ -5512,14 +5512,14 @@
      * @param __root 根Composer实例
      */
     constructor(options = new UTSJSONObject({}), __root = null) {
-      var _a, _b;
+      var _a2, _b;
       this._interpolate = null;
       this._link = null;
       this._warnDefault = null;
       this._formatter = getFormatter(options);
       this._modifiers = getModifiers(options);
       this._pluralizationRules = getPluralizationRules(options);
-      const _inheritLocale = (_a = options.getBoolean("inheritLocale")) !== null && _a !== void 0 ? _a : true;
+      const _inheritLocale = (_a2 = options.getBoolean("inheritLocale")) !== null && _a2 !== void 0 ? _a2 : true;
       const useRoot = __root != null && _inheritLocale;
       const __locale = vue.ref(useRoot ? __root.locale.value : (_b = options.getString("locale")) !== null && _b !== void 0 ? _b : DEFAULT_LOCALE);
       const _fallbackLocale = vue.ref(useRoot ? __root.fallbackLocale.value : options.get("fallbackLocale"));
@@ -5544,8 +5544,8 @@
           _fallbackLocale.value = val;
         },
         get: () => {
-          var _a2;
-          return (_a2 = _fallbackLocale.value) !== null && _a2 !== void 0 ? _a2 : false;
+          var _a22;
+          return (_a22 = _fallbackLocale.value) !== null && _a22 !== void 0 ? _a22 : false;
         }
       });
       this.availableLocales = getAllKeys(this.messages.value).sort();
@@ -5578,7 +5578,7 @@
           const linkKeyPrefixMatches = link2.match(linkKeyPrefixMatcher);
           if (linkKeyPrefixMatches == null)
             continue;
-          const _a = __read(linkKeyPrefixMatches, 2), linkPrefix = _a[0], formatterName = _a[1];
+          const _a2 = __read(linkKeyPrefixMatches, 2), linkPrefix = _a2[0], formatterName = _a2[1];
           const linkPlaceholder = link2.replace(linkPrefix, "").replace(bracketsMatcher, "");
           if (visitedLinkStack.includes(linkPlaceholder)) {
             uni.__log__("warn", "at uni_modules/lime-i18n/common/composer-class.uts:396", '发现循环引用。"'.concat(link2, '"已经在link"已经在').concat(visitedLinkStack.reverse().join(" <- "), "链中访问过"));
@@ -5602,9 +5602,9 @@
         return ret;
       };
       this._interpolate = (key2, locale2 = null, values = null, visitedLinkStack, interpolateMode) => {
-        var _a, _b, _c, _d, _e;
+        var _a2, _b, _c, _d, _e;
         const ___locale = locale2 !== null && locale2 !== void 0 ? locale2 : this.locale.value;
-        let ret = (_b = UTSJSONObject.assign(new UTSJSONObject({}), (_a = UTS.mapGet(this.messages.value, ___locale)) !== null && _a !== void 0 ? _a : new UTSJSONObject({}))) === null || _b === void 0 ? null : _b.getString(key2);
+        let ret = (_b = UTSJSONObject.assign(new UTSJSONObject({}), (_a2 = UTS.mapGet(this.messages.value, ___locale)) !== null && _a2 !== void 0 ? _a2 : new UTSJSONObject({}))) === null || _b === void 0 ? null : _b.getString(key2);
         if (this.fallbackLocale.value != false && ret == null) {
           if (typeof this.fallbackLocale.value == "string" && ___locale != this.fallbackLocale.value) {
             ret = (_d = (_c = UTS.mapGet(this.messages.value, this.fallbackLocale.value)) === null || _c === void 0 ? null : _c.getString(key2)) !== null && _d !== void 0 ? _d : ret;
@@ -5749,8 +5749,8 @@
      * @returns 消息对象
      */
     getLocaleMessage(locale2) {
-      var _a;
-      return (_a = UTS.mapGet(this.messages.value, locale2)) !== null && _a !== void 0 ? _a : new UTSJSONObject({});
+      var _a2;
+      return (_a2 = UTS.mapGet(this.messages.value, locale2)) !== null && _a2 !== void 0 ? _a2 : new UTSJSONObject({});
     }
     /**
      * 合并语言消息
@@ -5788,8 +5788,8 @@
      * @returns 格式对象
      */
     getDateTimeFormat(locale2) {
-      var _a;
-      return (_a = UTS.mapGet(this._datetimeFormats.value, locale2)) !== null && _a !== void 0 ? _a : new UTSJSONObject({});
+      var _a2;
+      return (_a2 = UTS.mapGet(this._datetimeFormats.value, locale2)) !== null && _a2 !== void 0 ? _a2 : new UTSJSONObject({});
     }
     /**
      * 合并日期时间格式
@@ -5826,8 +5826,8 @@
      * @returns 格式对象
      */
     getNumberFormat(locale2) {
-      var _a;
-      return (_a = UTS.mapGet(this._numberFormats.value, locale2)) !== null && _a !== void 0 ? _a : new UTSJSONObject({});
+      var _a2;
+      return (_a2 = UTS.mapGet(this._numberFormats.value, locale2)) !== null && _a2 !== void 0 ? _a2 : new UTSJSONObject({});
     }
     /**
      * 合并数字格式
@@ -5864,8 +5864,8 @@
      * @returns TabBar文本数组
      */
     getTabBar(locale2) {
-      var _a;
-      return (_a = UTS.mapGet(this._tabBars.value, locale2)) !== null && _a !== void 0 ? _a : [];
+      var _a2;
+      return (_a2 = UTS.mapGet(this._tabBars.value, locale2)) !== null && _a2 !== void 0 ? _a2 : [];
     }
   }
   function createComposer(options = new UTSJSONObject({}), __root = null) {
@@ -5947,7 +5947,7 @@
     message: new UTSJSONObject({
       hello: "{msg}，世界！",
       welcome: "欢迎使用 unibestX！",
-      switch_success: "切换为简体中文"
+      switch_success: "应用与组件库已切换为简体中文"
     }),
     tabbar: new UTSJSONObject({
       home: "首页",
@@ -5961,10 +5961,11 @@
       svgAuthWarning: "SVG模式需授权收费",
       langTitle: "语言设置",
       langPreview: "多语言文本预览",
+      uviewPreview: "组件库 (uView-Ultra) 文本预览",
       themeTitle: "主题设置",
       themePreview: "主题色效果预览",
       themeButton: "主题按钮",
-      themeSuccess: "主题切换成功",
+      themeSuccess: "应用与组件库主题色切换成功",
       echartTitle: "ECharts 图表示例",
       echartLine: "折线图",
       echartBar: "柱状图",
@@ -5993,7 +5994,7 @@
     message: new UTSJSONObject({
       hello: "The world says {msg}!",
       welcome: "Welcome to use unibestX!",
-      switch_success: "Switched to English"
+      switch_success: "App & Component Library switched to English"
     }),
     tabbar: new UTSJSONObject({
       home: "Home",
@@ -6007,10 +6008,11 @@
       svgAuthWarning: "SVG mode requires authorization & fee",
       langTitle: "Language Settings",
       langPreview: "Multi-language Preview",
+      uviewPreview: "UI Library (uView-Ultra) Preview",
       themeTitle: "Theme Settings",
       themePreview: "Theme Color Preview",
       themeButton: "Theme Button",
-      themeSuccess: "Theme switched successfully",
+      themeSuccess: "App & Component Library theme color updated successfully",
       echartTitle: "ECharts Chart Demo",
       echartLine: "Line Chart",
       echartBar: "Bar Chart",
@@ -6044,6 +6046,881 @@
       "en-US": enUS
     })
   }));
+  const zhHans = new UTSJSONObject({
+    "up_common_cancel": "取消",
+    "up_common_confirm": "确定",
+    "up_common_start": "开始",
+    "up_common_end": "结束",
+    "up_common_stop": "停止",
+    "up_common_copy": "复制",
+    "up_common_none": "暂无",
+    "up_common_tip": "提示",
+    "up_common_success": "成功",
+    "up_common_fail": "失败",
+    "up_common_close": "关闭",
+    "up_common_preview": "预览",
+    "up_common_re-select": "重选",
+    "up_common_rotate": "旋转",
+    "up_common_pleaseChoose": "请选择",
+    "up_common_loading": "加载中",
+    "up_common_loading2": "正在加载",
+    "up_common_inOperation": "操作中",
+    "up_common_settings": "设置",
+    "up_common_retry": "重试",
+    "up_common_search": "搜索",
+    "up_common_more": "更多",
+    "up_common_video": "视频",
+    "up_common_file": "文件",
+    "up_week_one": "一",
+    "up_week_two": "二",
+    "up_week_three": "三",
+    "up_week_four": "四",
+    "up_week_five": "五",
+    "up_week_six": "六",
+    "up_week_seven": "日",
+    "up_barcode_error": "生成条码失败",
+    "up_calendar_chooseDates": "日期选择",
+    "up_calendar_disabled": "该日期已禁用",
+    "up_calendar_daysExceed": "选择天数不能超过{days}天",
+    "up_calendar_today": "今天",
+    "up_cityLocate_locateCity": "定位城市",
+    "up_cityLocate_fail": "定位失败，请点击重试。",
+    "up_cityLocate_locating": "定位中",
+    "up_code_send": "获取验证码",
+    "up_code_resendAfter": "X秒重新获取",
+    "up_code_resend": "重新获取",
+    "up_cropper_emptyWidhtOrHeight": "裁剪框的宽或高没有设置",
+    "up_empty_car": "购物车为空",
+    "up_empty_page": "页面不存在",
+    "up_empty_search": "没有搜索结果",
+    "up_empty_address": "没有收货地址",
+    "up_empty_wifi": "没有WiFi",
+    "up_empty_order": "订单为空",
+    "up_empty_coupon": "没有优惠券",
+    "up_empty_favor": "暂无收藏",
+    "up_empty_permission": "无权限",
+    "up_empty_history": "无历史记录",
+    "up_empty_news": "无新闻列表",
+    "up_empty_message": "消息列表为空",
+    "up_empty_list": "列表为空",
+    "up_empty_data": "数据为空",
+    "up_empty_comment": "暂无评论",
+    "up_link_copyed": "链接已复制，请在浏览器打开",
+    "up_loadmoe_loadmore": "加载更多",
+    "up_loadmoe_nomore": "没有更多了",
+    "up_noNetwork_text": "哎呀，网络信号丢失",
+    "up_noNetwork_pleaseCheck": "请检查网络，或前往",
+    "up_noNetwork_connect": "网络已连接",
+    "up_noNetwork_disconnect": "无网络连接",
+    "up_pagination_previous": "上一页",
+    "up_pagination_next": "下一页",
+    "up_pullRefresh_pull": "下拉刷新",
+    "up_pullRefresh_release": "释放刷新",
+    "up_pullRefresh_refreshing": "正在刷新",
+    "up_readMore_expand": "展开阅读全文",
+    "up_readMore_fold": "收起",
+    "up_search_placeholder": "请输入关键字",
+    "up_signature_penSize": "笔画大小",
+    "up_signature_penColor": "笔画颜色",
+    "up_upload_sizeExceed": "超过大小限制",
+    "up_upload_uploading": "上传中",
+    "up_upload_previewImageFail": "预览图片失败",
+    "up_upload_previewVideoFail": "预览视频失败",
+    "up_goodsSku_stock": "库存",
+    "up_goodsSku_price": "价格",
+    "up_goodsSku_amount": "件",
+    "up_goodsSku_choosed": "已选",
+    "up_goodsSku_buyAmount": "购买数量"
+  });
+  const zhHant = new UTSJSONObject({
+    "up_common_cancel": "取消",
+    "up_common_confirm": "確定",
+    "up_common_start": "開始",
+    "up_common_end": "結束",
+    "up_common_stop": "停止",
+    "up_common_copy": "複製",
+    "up_common_none": "暫無",
+    "up_common_tip": "提示",
+    "up_common_success": "成功",
+    "up_common_fail": "失敗",
+    "up_common_close": "關閉",
+    "up_common_preview": "預覽",
+    "up_common_re-select": "重選",
+    "up_common_rotate": "旋轉",
+    "up_common_pleaseChoose": "請選擇",
+    "up_common_loading": "載入中",
+    "up_common_loading2": "正在載入",
+    "up_common_inOperation": "操作中",
+    "up_common_settings": "設置",
+    "up_common_retry": "重試",
+    "up_common_search": "搜尋",
+    "up_common_more": "更多",
+    "up_common_video": "影片",
+    "up_common_file": "檔案",
+    "up_week_one": "一",
+    "up_week_two": "二",
+    "up_week_three": "三",
+    "up_week_four": "四",
+    "up_week_five": "五",
+    "up_week_six": "六",
+    "up_week_seven": "日",
+    "up_barcode_error": "生成條碼失敗",
+    "up_calendar_chooseDates": "日期選擇",
+    "up_calendar_disabled": "該日期已禁用",
+    "up_calendar_daysExceed": "選擇天數不能超過{days}天",
+    "up_calendar_today": "今天",
+    "up_cityLocate_locateCity": "定位城市",
+    "up_cityLocate_fail": "定位失敗，請點擊重試。",
+    "up_cityLocate_locating": "定位中",
+    "up_code_send": "獲取驗證碼",
+    "up_code_resendAfter": "X秒重新獲取",
+    "up_code_resend": "重新獲取",
+    "up_cropper_emptyWidhtOrHeight": "裁剪框的寬或高沒有設置",
+    "up_empty_car": "購物車為空",
+    "up_empty_page": "頁面不存在",
+    "up_empty_search": "沒有搜尋結果",
+    "up_empty_address": "沒有收貨地址",
+    "up_empty_wifi": "沒有WiFi",
+    "up_empty_order": "訂單為空",
+    "up_empty_coupon": "沒有優惠券",
+    "up_empty_favor": "暫無收藏",
+    "up_empty_permission": "無權限",
+    "up_empty_history": "無歷史記錄",
+    "up_empty_news": "無新聞列表",
+    "up_empty_message": "消息列表為空",
+    "up_empty_list": "列表為空",
+    "up_empty_data": "數據為空",
+    "up_empty_comment": "暫無評論",
+    "up_link_copyed": "鏈接已復制，請在瀏覽器打開",
+    "up_loadmoe_loadmore": "加載更多",
+    "up_loadmoe_nomore": "沒有更多了",
+    "up_noNetwork_text": "哎呀，網絡信號丟失",
+    "up_noNetwork_pleaseCheck": "請檢查網絡，或前往",
+    "up_noNetwork_connect": "網絡已連接",
+    "up_noNetwork_disconnect": "無網絡連接",
+    "up_pagination_previous": "上一頁",
+    "up_pagination_next": "下一頁",
+    "up_pullRefresh_pull": "下拉刷新",
+    "up_pullRefresh_release": "釋放刷新",
+    "up_pullRefresh_refreshing": "正在刷新",
+    "up_readMore_expand": "展開閱讀全文",
+    "up_readMore_fold": "收起",
+    "up_search_placeholder": "請輸入關鍵字",
+    "up_signature_penSize": "筆畫大小",
+    "up_signature_penColor": "筆畫顏色",
+    "up_upload_sizeExceed": "超過大小限制",
+    "up_upload_uploading": "上傳中",
+    "up_upload_previewImageFail": "預覽圖片失敗",
+    "up_upload_previewVideoFail": "預覽視頻失敗",
+    "up_goodsSku_stock": "庫存",
+    "up_goodsSku_price": "價格",
+    "up_goodsSku_amount": "件",
+    "up_goodsSku_choosed": "已選",
+    "up_goodsSku_buyAmount": "購買數量"
+  });
+  const en$1 = new UTSJSONObject({
+    "up_common_cancel": "Cancel",
+    "up_common_confirm": "Confirm",
+    "up_common_start": "Start",
+    "up_common_end": "End",
+    "up_common_stop": "Stop",
+    "up_common_copy": "Copy",
+    "up_common_none": "None",
+    "up_common_tip": "Tip",
+    "up_common_success": "Success",
+    "up_common_fail": "Fail",
+    "up_common_close": "Close",
+    "up_common_preview": "Preview",
+    "up_common_re-select": "Re-select",
+    "up_common_rotate": "Rotate",
+    "up_common_pleaseChoose": "Please choose",
+    "up_common_loading": "Loading",
+    "up_common_loading2": "Loading",
+    "up_common_inOperation": "In operation",
+    "up_common_settings": "Settings",
+    "up_common_retry": "Retry",
+    "up_common_search": "Search",
+    "up_common_more": "More",
+    "up_common_video": "Video",
+    "up_common_file": "File",
+    "up_week_one": "Mon",
+    "up_week_two": "Tue",
+    "up_week_three": "Wed",
+    "up_week_four": "Thu",
+    "up_week_five": "Fri",
+    "up_week_six": "Sat",
+    "up_week_seven": "Sun",
+    "up_barcode_error": "Failed to generate barcode",
+    "up_calendar_chooseDates": "Date selection",
+    "up_calendar_disabled": "This date is disabled",
+    "up_calendar_daysExceed": "The number of selected days cannot exceed {days} days",
+    "up_calendar_today": "Today",
+    "up_cityLocate_locateCity": "Locate city",
+    "up_cityLocate_fail": "Location failed, please click to retry.",
+    "up_cityLocate_locating": "Locating",
+    "up_code_send": "Get verification code",
+    "up_code_resendAfter": "Resend after X seconds",
+    "up_code_resend": "Resend",
+    "up_cropper_emptyWidhtOrHeight": "The width or height of the cropping box is not set",
+    "up_empty_car": "Shopping cart is empty",
+    "up_empty_page": "Page not found",
+    "up_empty_search": "No search results",
+    "up_empty_address": "No shipping address",
+    "up_empty_wifi": "No WiFi",
+    "up_empty_order": "Order is empty",
+    "up_empty_coupon": "No coupons",
+    "up_empty_favor": "No favorites",
+    "up_empty_permission": "No permission",
+    "up_empty_history": "No history",
+    "up_empty_news": "No news list",
+    "up_empty_message": "Message list is empty",
+    "up_empty_list": "List is empty",
+    "up_empty_data": "Data is empty",
+    "up_empty_comment": "No comments",
+    "up_link_copyed": "Link copied, please open in browser",
+    "up_loadmoe_loadmore": "Load more",
+    "up_loadmoe_nomore": "No more",
+    "up_noNetwork_text": "Oops, network signal lost",
+    "up_noNetwork_pleaseCheck": "Please check the network, or go to",
+    "up_noNetwork_connect": "Network connected",
+    "up_noNetwork_disconnect": "No network connection",
+    "up_pagination_previous": "Previous",
+    "up_pagination_next": "Next",
+    "up_pullRefresh_pull": "Pull to refresh",
+    "up_pullRefresh_release": "Release to refresh",
+    "up_pullRefresh_refreshing": "Refreshing",
+    "up_readMore_expand": "Expand to read more",
+    "up_readMore_fold": "Collapse",
+    "up_search_placeholder": "Please enter keywords",
+    "up_signature_penSize": "Stroke size",
+    "up_signature_penColor": "Stroke color",
+    "up_upload_sizeExceed": "Size limit exceeded",
+    "up_upload_uploading": "Uploading",
+    "up_upload_previewImageFail": "Failed to preview image",
+    "up_upload_previewVideoFail": "Failed to preview video",
+    "up_goodsSku_stock": "Stock",
+    "up_goodsSku_price": "Price",
+    "up_goodsSku_amount": "Items",
+    "up_goodsSku_choosed": "Selected",
+    "up_goodsSku_buyAmount": "Quantity"
+  });
+  const es = new UTSJSONObject({
+    "up_common_cancel": "Cancelar",
+    "up_common_confirm": "Confirmar",
+    "up_common_start": "Empezar",
+    "up_common_end": "Finalizar",
+    "up_common_stop": "Detener",
+    "up_common_copy": "Copiar",
+    "up_common_none": "Ninguno",
+    "up_common_tip": "Consejo",
+    "up_common_success": "Éxito",
+    "up_common_fail": "Fallido",
+    "up_common_close": "Cerrar",
+    "up_common_preview": "Vista previa",
+    "up_common_re-select": "Volver a seleccionar",
+    "up_common_rotate": "Rotar",
+    "up_common_pleaseChoose": "Por favor seleccione",
+    "up_common_loading": "Cargando",
+    "up_common_loading2": "Cargando",
+    "up_common_inOperation": "En operación",
+    "up_common_settings": "Configuración",
+    "up_common_retry": "Reintentar",
+    "up_common_search": "Buscar",
+    "up_common_more": "Más",
+    "up_common_video": "Vídeo",
+    "up_common_file": "Archivo",
+    "up_week_one": "Lun",
+    "up_week_two": "Mar",
+    "up_week_three": "Mié",
+    "up_week_four": "Jue",
+    "up_week_five": "Vie",
+    "up_week_six": "Sáb",
+    "up_week_seven": "Dom",
+    "up_barcode_error": "Error al generar el código de barras",
+    "up_calendar_chooseDates": "Selección de fecha",
+    "up_calendar_disabled": "Esta fecha está deshabilitada",
+    "up_calendar_daysExceed": "El número de días seleccionados no puede exceder {days} días",
+    "up_calendar_today": "Hoy",
+    "up_cityLocate_locateCity": "Ubicar ciudad",
+    "up_cityLocate_fail": "Error de ubicación, haga clic para reintentar.",
+    "up_cityLocate_locating": "Ubicando",
+    "up_code_send": "Obtener código de verificación",
+    "up_code_resendAfter": "Reenviar después de X segundos",
+    "up_code_resend": "Reenviar",
+    "up_cropper_emptyWidhtOrHeight": "No se ha establecido el ancho o alto del recorte",
+    "up_empty_car": "Carrito vacío",
+    "up_empty_page": "Página no encontrada",
+    "up_empty_search": "Sin resultados de búsqueda",
+    "up_empty_address": "Sin dirección de envío",
+    "up_empty_wifi": "Sin WiFi",
+    "up_empty_order": "Pedido vacío",
+    "up_empty_coupon": "Sin cupones",
+    "up_empty_favor": "Sin favoritos",
+    "up_empty_permission": "Sin permiso",
+    "up_empty_history": "Sin historial",
+    "up_empty_news": "Sin lista de noticias",
+    "up_empty_message": "Lista de mensajes vacía",
+    "up_empty_list": "Lista vacía",
+    "up_empty_data": "Datos vacíos",
+    "up_empty_comment": "Sin comentarios",
+    "up_link_copyed": "Enlace copiado, por favor abra en el navegador",
+    "up_loadmoe_loadmore": "Cargar más",
+    "up_loadmoe_nomore": "No hay más",
+    "up_noNetwork_text": "¡Ups! Se perdió la señal de red",
+    "up_noNetwork_pleaseCheck": "Por favor revise la red, o vaya a",
+    "up_noNetwork_connect": "Red conectada",
+    "up_noNetwork_disconnect": "Sin conexión de red",
+    "up_pagination_previous": "Anterior",
+    "up_pagination_next": "Siguiente",
+    "up_pullRefresh_pull": "Tire para actualizar",
+    "up_pullRefresh_release": "Suelte para actualizar",
+    "up_pullRefresh_refreshing": "Actualizando",
+    "up_readMore_expand": "Expandir para leer más",
+    "up_readMore_fold": "Colapsar",
+    "up_search_placeholder": "Ingrese palabras clave",
+    "up_signature_penSize": "Tamaño del trazo",
+    "up_signature_penColor": "Color del trazo",
+    "up_upload_sizeExceed": "Límite de tamaño excedido",
+    "up_upload_uploading": "Subiendo",
+    "up_upload_previewImageFail": "Error al previsualizar imagen",
+    "up_upload_previewVideoFail": "Error al previsualizar video",
+    "up_goodsSku_stock": "Inventario",
+    "up_goodsSku_price": "Precio",
+    "up_goodsSku_amount": "Artículos",
+    "up_goodsSku_choosed": "Seleccionado",
+    "up_goodsSku_buyAmount": "Cantidad"
+  });
+  const fr = new UTSJSONObject({
+    "up_common_cancel": "Annuler",
+    "up_common_confirm": "Confirmer",
+    "up_common_start": "Démarrer",
+    "up_common_end": "Terminer",
+    "up_common_stop": "Arrêter",
+    "up_common_copy": "Copier",
+    "up_common_none": "Aucun",
+    "up_common_tip": "Conseil",
+    "up_common_success": "Succès",
+    "up_common_fail": "Échec",
+    "up_common_close": "Fermer",
+    "up_common_preview": "Aperçu",
+    "up_common_re-select": "Resélectionner",
+    "up_common_rotate": "Rotation",
+    "up_common_pleaseChoose": "Veuillez choisir",
+    "up_common_loading": "Chargement",
+    "up_common_loading2": "Chargement en cours",
+    "up_common_inOperation": "En cours d'opération",
+    "up_common_settings": "Paramètres",
+    "up_common_retry": "Réessayer",
+    "up_common_search": "Rechercher",
+    "up_common_more": "Plus",
+    "up_common_video": "Vidéo",
+    "up_common_file": "Fichier",
+    "up_week_one": "Lun",
+    "up_week_two": "Mar",
+    "up_week_three": "Mer",
+    "up_week_four": "Jeu",
+    "up_week_five": "Ven",
+    "up_week_six": "Sam",
+    "up_week_seven": "Dim",
+    "up_barcode_error": "Échec de génération du code-barres",
+    "up_calendar_chooseDates": "Sélection de dates",
+    "up_calendar_disabled": "Cette date est désactivée",
+    "up_calendar_daysExceed": "Le nombre de jours sélectionnés ne peut pas dépasser {days} jours",
+    "up_calendar_today": "Aujourd'hui",
+    "up_cityLocate_locateCity": "Localiser la ville",
+    "up_cityLocate_fail": "Échec de localisation, veuillez cliquer pour réessayer.",
+    "up_cityLocate_locating": "Localisation en cours",
+    "up_code_send": "Obtenir le code de vérification",
+    "up_code_resendAfter": "Renvoyer dans X secondes",
+    "up_code_resend": "Renvoyer",
+    "up_cropper_emptyWidhtOrHeight": "La largeur ou la hauteur de recadrage n'est pas définie",
+    "up_empty_car": "Panier vide",
+    "up_empty_page": "Page introuvable",
+    "up_empty_search": "Aucun résultat de recherche",
+    "up_empty_address": "Aucune adresse de livraison",
+    "up_empty_wifi": "Aucun Wi-Fi",
+    "up_empty_order": "Commande vide",
+    "up_empty_coupon": "Aucun coupon",
+    "up_empty_favor": "Aucun favori",
+    "up_empty_permission": "Aucune autorisation",
+    "up_empty_history": "Aucun historique",
+    "up_empty_news": "Aucune actualité",
+    "up_empty_message": "Liste de messages vide",
+    "up_empty_list": "Liste vide",
+    "up_empty_data": "Données vides",
+    "up_empty_comment": "Aucun commentaire",
+    "up_link_copyed": "Lien copié, veuillez ouvrir dans le navigateur",
+    "up_loadmoe_loadmore": "Charger plus",
+    "up_loadmoe_nomore": "Plus de contenu",
+    "up_noNetwork_text": "Oups, le signal réseau est perdu",
+    "up_noNetwork_pleaseCheck": "Veuillez vérifier le réseau, ou aller à",
+    "up_noNetwork_connect": "Réseau connecté",
+    "up_noNetwork_disconnect": "Aucune connexion réseau",
+    "up_pagination_previous": "Page précédente",
+    "up_pagination_next": "Page suivante",
+    "up_pullRefresh_pull": "Tirer pour actualiser",
+    "up_pullRefresh_release": "Relâcher pour actualiser",
+    "up_pullRefresh_refreshing": "Actualisation en cours",
+    "up_readMore_expand": "Développer pour lire la suite",
+    "up_readMore_fold": "Réduire",
+    "up_search_placeholder": "Veuillez saisir un mot-clé",
+    "up_signature_penSize": "Taille du trait",
+    "up_signature_penColor": "Couleur du trait",
+    "up_upload_sizeExceed": "Dépassement de la limite de taille",
+    "up_upload_uploading": "Téléchargement en cours",
+    "up_upload_previewImageFail": "Échec de l'aperçu de l'image",
+    "up_upload_previewVideoFail": "Échec de l'aperçu de la vidéo",
+    "up_goodsSku_stock": "Stock",
+    "up_goodsSku_price": "Prix",
+    "up_goodsSku_amount": "Pièces",
+    "up_goodsSku_choosed": "Sélectionné",
+    "up_goodsSku_buyAmount": "Quantité"
+  });
+  const de = new UTSJSONObject({
+    "up_common_cancel": "Abbrechen",
+    "up_common_confirm": "Bestätigen",
+    "up_common_start": "Start",
+    "up_common_end": "Ende",
+    "up_common_stop": "Stopp",
+    "up_common_copy": "Kopieren",
+    "up_common_none": "Keine",
+    "up_common_tip": "Tipp",
+    "up_common_success": "Erfolg",
+    "up_common_fail": "Fehlgeschlagen",
+    "up_common_close": "Schließen",
+    "up_common_preview": "Vorschau",
+    "up_common_re-select": "Erneut auswählen",
+    "up_common_rotate": "Drehen",
+    "up_common_pleaseChoose": "Bitte wählen",
+    "up_common_loading": "Wird geladen",
+    "up_common_loading2": "Laden",
+    "up_common_inOperation": "In Bearbeitung",
+    "up_common_settings": "Einstellungen",
+    "up_common_retry": "Wiederholen",
+    "up_common_search": "Suchen",
+    "up_common_more": "Mehr",
+    "up_common_video": "Video",
+    "up_common_file": "Datei",
+    "up_week_one": "Mo",
+    "up_week_two": "Di",
+    "up_week_three": "Mi",
+    "up_week_four": "Do",
+    "up_week_five": "Fr",
+    "up_week_six": "Sa",
+    "up_week_seven": "So",
+    "up_barcode_error": "Barcode konnte nicht generiert werden",
+    "up_calendar_chooseDates": "Datum auswählen",
+    "up_calendar_disabled": "Dieses Datum ist deaktiviert",
+    "up_calendar_daysExceed": "Die Anzahl der ausgewählten Tage darf {days} Tage nicht überschreiten",
+    "up_calendar_today": "Heute",
+    "up_cityLocate_locateCity": "Stadt lokalisieren",
+    "up_cityLocate_fail": "Lokalisierung fehlgeschlagen, bitte klicken Sie, um es erneut zu versuchen.",
+    "up_cityLocate_locating": "Lokalisierung läuft",
+    "up_code_send": "Bestätigungscode erhalten",
+    "up_code_resendAfter": "Nach X Sekunden erneut senden",
+    "up_code_resend": "Erneut senden",
+    "up_cropper_emptyWidhtOrHeight": "Breite oder Höhe des Zuschneidebereichs ist nicht festgelegt",
+    "up_empty_car": "Warenkorb ist leer",
+    "up_empty_page": "Seite nicht gefunden",
+    "up_empty_search": "Keine Suchergebnisse",
+    "up_empty_address": "Keine Lieferadresse",
+    "up_empty_wifi": "Kein WLAN",
+    "up_empty_order": "Bestellung ist leer",
+    "up_empty_coupon": "Keine Coupons",
+    "up_empty_favor": "Keine Favoriten",
+    "up_empty_permission": "Keine Berechtigung",
+    "up_empty_history": "Kein Verlauf",
+    "up_empty_news": "Keine Nachrichtenliste",
+    "up_empty_message": "Nachrichtenliste ist leer",
+    "up_empty_list": "Liste ist leer",
+    "up_empty_data": "Daten sind leer",
+    "up_empty_comment": "Keine Kommentare",
+    "up_link_copyed": "Link kopiert, bitte im Browser öffnen",
+    "up_loadmoe_loadmore": "Mehr laden",
+    "up_loadmoe_nomore": "Keine weiteren Daten",
+    "up_noNetwork_text": "Ups, Netzwerksignal verloren",
+    "up_noNetwork_pleaseCheck": "Bitte überprüfen Sie das Netzwerk oder gehen Sie zu",
+    "up_noNetwork_connect": "Netzwerk verbunden",
+    "up_noNetwork_disconnect": "Keine Netzwerkverbindung",
+    "up_pagination_previous": "Zurück",
+    "up_pagination_next": "Weiter",
+    "up_pullRefresh_pull": "Zum Aktualisieren ziehen",
+    "up_pullRefresh_release": "Loslassen zum Aktualisieren",
+    "up_pullRefresh_refreshing": "Aktualisierung läuft",
+    "up_readMore_expand": "Erweitern, um mehr zu lesen",
+    "up_readMore_fold": "Einklappen",
+    "up_search_placeholder": "Bitte Schlüsselwort eingeben",
+    "up_signature_penSize": "Strichgröße",
+    "up_signature_penColor": "Strichfarbe",
+    "up_upload_sizeExceed": "Größenbegrenzung überschritten",
+    "up_upload_uploading": "Upload läuft",
+    "up_upload_previewImageFail": "Bildvorschau fehlgeschlagen",
+    "up_upload_previewVideoFail": "Videovorschau fehlgeschlagen",
+    "up_goodsSku_stock": "Lagerbestand",
+    "up_goodsSku_price": "Preis",
+    "up_goodsSku_amount": "Artikel",
+    "up_goodsSku_choosed": "Ausgewählt",
+    "up_goodsSku_buyAmount": "Anzahl"
+  });
+  const ko = new UTSJSONObject({
+    "up_common_cancel": "취소",
+    "up_common_confirm": "확인",
+    "up_common_start": "시작",
+    "up_common_end": "종료",
+    "up_common_stop": "중지",
+    "up_common_copy": "복사",
+    "up_common_none": "없음",
+    "up_common_tip": "팁",
+    "up_common_success": "성공",
+    "up_common_fail": "실패",
+    "up_common_close": "닫기",
+    "up_common_preview": "미리보기",
+    "up_common_re-select": "재선택",
+    "up_common_rotate": "회전",
+    "up_common_pleaseChoose": "선택해주세요",
+    "up_common_loading": "로딩 중",
+    "up_common_loading2": "로딩 중",
+    "up_common_inOperation": "작업 중",
+    "up_common_settings": "설정",
+    "up_common_retry": "재시도",
+    "up_common_search": "검색",
+    "up_common_more": "더보기",
+    "up_common_video": "비디오",
+    "up_common_file": "파일",
+    "up_week_one": "월",
+    "up_week_two": "화",
+    "up_week_three": "수",
+    "up_week_four": "목",
+    "up_week_five": "금",
+    "up_week_six": "토",
+    "up_week_seven": "일",
+    "up_barcode_error": "바코드 생성 실패",
+    "up_calendar_chooseDates": "날짜 선택",
+    "up_calendar_disabled": "이 날짜는 비활성화되었습니다",
+    "up_calendar_daysExceed": "선택한 일 수는 {days}일을 초과할 수 없습니다",
+    "up_calendar_today": "오늘",
+    "up_cityLocate_locateCity": "도시 위치 찾기",
+    "up_cityLocate_fail": "위치 찾기 실패, 클릭하여 재시도하세요.",
+    "up_cityLocate_locating": "위치 찾는 중",
+    "up_code_send": "인증번호 받기",
+    "up_code_resendAfter": "X초 후 재전송",
+    "up_code_resend": "재전송",
+    "up_cropper_emptyWidhtOrHeight": "자르기 상자의 너비나 높이가 설정되지 않았습니다",
+    "up_empty_car": "장바구니가 비어 있습니다",
+    "up_empty_page": "페이지를 찾을 수 없습니다",
+    "up_empty_search": "검색 결과가 없습니다",
+    "up_empty_address": "배송 주소가 없습니다",
+    "up_empty_wifi": "Wi-Fi 없음",
+    "up_empty_order": "주문이 비어 있습니다",
+    "up_empty_coupon": "쿠폰이 없습니다",
+    "up_empty_favor": "찜한 항목이 없습니다",
+    "up_empty_permission": "권한이 없습니다",
+    "up_empty_history": "기록이 없습니다",
+    "up_empty_news": "뉴스 목록이 없습니다",
+    "up_empty_message": "메시지 목록이 비어 있습니다",
+    "up_empty_list": "목록이 비어 있습니다",
+    "up_empty_data": "데이터가 없습니다",
+    "up_empty_comment": "댓글이 없습니다",
+    "up_link_copyed": "링크가 복사되었습니다. 브라우저에서 열어주세요",
+    "up_loadmoe_loadmore": "더 불러오기",
+    "up_loadmoe_nomore": "더 이상 없습니다",
+    "up_noNetwork_text": "앗, 네트워크 신호가 사라졌어요",
+    "up_noNetwork_pleaseCheck": "네트워크를 확인하거나 다음으로 이동하세요",
+    "up_noNetwork_connect": "네트워크 연결됨",
+    "up_noNetwork_disconnect": "네트워크 연결 없음",
+    "up_pagination_previous": "이전",
+    "up_pagination_next": "다음",
+    "up_pullRefresh_pull": "당겨서 새로고침",
+    "up_pullRefresh_release": "놓아서 새로고침",
+    "up_pullRefresh_refreshing": "새로고침 중",
+    "up_readMore_expand": "펼쳐서 더 읽기",
+    "up_readMore_fold": "접기",
+    "up_search_placeholder": "키워드를 입력하세요",
+    "up_signature_penSize": "선 굵기",
+    "up_signature_penColor": "선 색상",
+    "up_upload_sizeExceed": "크기 제한 초과",
+    "up_upload_uploading": "업로드 중",
+    "up_upload_previewImageFail": "이미지 미리보기 실패",
+    "up_upload_previewVideoFail": "비디오 미리보기 실패",
+    "up_goodsSku_stock": "재고",
+    "up_goodsSku_price": "가격",
+    "up_goodsSku_amount": "개",
+    "up_goodsSku_choosed": "선택됨",
+    "up_goodsSku_buyAmount": "구매 수량"
+  });
+  const ja = new UTSJSONObject({
+    "up_common_cancel": "キャンセル",
+    "up_common_confirm": "確認",
+    "up_common_start": "開始",
+    "up_common_end": "終了",
+    "up_common_stop": "停止",
+    "up_common_copy": "コピー",
+    "up_common_none": "なし",
+    "up_common_tip": "ヒント",
+    "up_common_success": "成功",
+    "up_common_fail": "失敗",
+    "up_common_close": "閉じる",
+    "up_common_preview": "プレビュー",
+    "up_common_re-select": "再選択",
+    "up_common_rotate": "回転",
+    "up_common_pleaseChoose": "選択してください",
+    "up_common_loading": "読み込み中",
+    "up_common_loading2": "読み込み中",
+    "up_common_inOperation": "操作中",
+    "up_common_settings": "設定",
+    "up_common_retry": "再試行",
+    "up_common_search": "検索",
+    "up_common_more": "もっと",
+    "up_common_video": "ビデオ",
+    "up_common_file": "ファイル",
+    "up_week_one": "月",
+    "up_week_two": "火",
+    "up_week_three": "水",
+    "up_week_four": "木",
+    "up_week_five": "金",
+    "up_week_six": "土",
+    "up_week_seven": "日",
+    "up_barcode_error": "バーコードの生成に失敗しました",
+    "up_calendar_chooseDates": "日付選択",
+    "up_calendar_disabled": "この日付は無効です",
+    "up_calendar_daysExceed": "選択日数は{days}日を超えることはできません",
+    "up_calendar_today": "今日",
+    "up_cityLocate_locateCity": "都市を特定",
+    "up_cityLocate_fail": "位置情報の取得に失敗しました。クリックして再試行してください。",
+    "up_cityLocate_locating": "位置情報を取得中",
+    "up_code_send": "認証コードを取得",
+    "up_code_resendAfter": "X秒後に再送信",
+    "up_code_resend": "再送信",
+    "up_cropper_emptyWidhtOrHeight": "切り抜きボックスの幅または高さが設定されていません",
+    "up_empty_car": "ショッピングカートは空です",
+    "up_empty_page": "ページが見つかりません",
+    "up_empty_search": "検索結果がありません",
+    "up_empty_address": "配送先住所がありません",
+    "up_empty_wifi": "Wi-Fiがありません",
+    "up_empty_order": "注文はありません",
+    "up_empty_coupon": "クーポンがありません",
+    "up_empty_favor": "お気に入りがありません",
+    "up_empty_permission": "権限がありません",
+    "up_empty_history": "履歴がありません",
+    "up_empty_news": "ニュースリストがありません",
+    "up_empty_message": "メッセージリストが空です",
+    "up_empty_list": "リストが空です",
+    "up_empty_data": "データが空です",
+    "up_empty_comment": "コメントがありません",
+    "up_link_copyed": "リンクをコピーしました。ブラウザで開いてください",
+    "up_loadmoe_loadmore": "さらに読み込む",
+    "up_loadmoe_nomore": "これ以上ありません",
+    "up_noNetwork_text": "おっと、ネットワーク信号が失われました",
+    "up_noNetwork_pleaseCheck": "ネットワークを確認するか、",
+    "up_noNetwork_connect": "ネットワーク接続済み",
+    "up_noNetwork_disconnect": "ネットワーク接続なし",
+    "up_pagination_previous": "前へ",
+    "up_pagination_next": "次へ",
+    "up_pullRefresh_pull": "引き下げて更新",
+    "up_pullRefresh_release": "指を離して更新",
+    "up_pullRefresh_refreshing": "更新中",
+    "up_readMore_expand": "続きを読む",
+    "up_readMore_fold": "折りたたむ",
+    "up_search_placeholder": "キーワードを入力してください",
+    "up_signature_penSize": "線の太さ",
+    "up_signature_penColor": "線の色",
+    "up_upload_sizeExceed": "サイズ制限を超えています",
+    "up_upload_uploading": "アップロード中",
+    "up_upload_previewImageFail": "画像のプレビューに失敗しました",
+    "up_upload_previewVideoFail": "動画のプレビューに失敗しました",
+    "up_goodsSku_stock": "在庫",
+    "up_goodsSku_price": "価格",
+    "up_goodsSku_amount": "アイテム",
+    "up_goodsSku_choosed": "選択済み",
+    "up_goodsSku_buyAmount": "購入数量"
+  });
+  const ru = new UTSJSONObject({
+    "up_common_cancel": "Отмена",
+    "up_common_confirm": "Подтвердить",
+    "up_common_start": "Начать",
+    "up_common_end": "Завершить",
+    "up_common_stop": "Остановить",
+    "up_common_copy": "Копировать",
+    "up_common_none": "Нет",
+    "up_common_tip": "Совет",
+    "up_common_success": "Успех",
+    "up_common_fail": "Ошибка",
+    "up_common_close": "Закрыть",
+    "up_common_preview": "Предпросмотр",
+    "up_common_re-select": "Выбрать снова",
+    "up_common_rotate": "Поворот",
+    "up_common_pleaseChoose": "Пожалуйста, выберите",
+    "up_common_loading": "Загрузка",
+    "up_common_loading2": "Загрузка",
+    "up_common_inOperation": "В процессе",
+    "up_common_settings": "Настройки",
+    "up_common_retry": "Повторить",
+    "up_common_search": "Поиск",
+    "up_common_more": "Еще",
+    "up_common_video": "Видео",
+    "up_common_file": "Файл",
+    "up_week_one": "Пн",
+    "up_week_two": "Вт",
+    "up_week_three": "Ср",
+    "up_week_four": "Чт",
+    "up_week_five": "Пт",
+    "up_week_six": "Сб",
+    "up_week_seven": "Вс",
+    "up_barcode_error": "Не удалось сгенерировать штрих-код",
+    "up_calendar_chooseDates": "Выбор даты",
+    "up_calendar_disabled": "Эта дата отключена",
+    "up_calendar_daysExceed": "Количество выбранных дней не может превышать {days} дней",
+    "up_calendar_today": "Сегодня",
+    "up_cityLocate_locateCity": "Определить город",
+    "up_cityLocate_fail": "Ошибка определения местоположения, нажмите, чтобы повторить попытку.",
+    "up_cityLocate_locating": "Определение местоположения",
+    "up_code_send": "Получить код подтверждения",
+    "up_code_resendAfter": "Повторная отправка через X секунд",
+    "up_code_resend": "Повторная отправка",
+    "up_cropper_emptyWidhtOrHeight": "Ширина или высота области обрезки не задана",
+    "up_empty_car": "Корзина пуста",
+    "up_empty_page": "Страница не найдена",
+    "up_empty_search": "Нет результатов поиска",
+    "up_empty_address": "Нет адреса доставки",
+    "up_empty_wifi": "Нет Wi-Fi",
+    "up_empty_order": "Заказ пуст",
+    "up_empty_coupon": "Нет купонов",
+    "up_empty_favor": "Нет избранного",
+    "up_empty_permission": "Нет разрешения",
+    "up_empty_history": "Нет истории",
+    "up_empty_news": "Нет новостей",
+    "up_empty_message": "Список сообщений пуст",
+    "up_empty_list": "Список пуст",
+    "up_empty_data": "Нет данных",
+    "up_empty_comment": "Нет комментариев",
+    "up_link_copyed": "Ссылка скопирована, откройте в браузере",
+    "up_loadmoe_loadmore": "Загрузить еще",
+    "up_loadmoe_nomore": "Больше нет",
+    "up_noNetwork_text": "Упс, потеряно сетевое соединение",
+    "up_noNetwork_pleaseCheck": "Проверьте сеть или перейдите в",
+    "up_noNetwork_connect": "Сеть подключена",
+    "up_noNetwork_disconnect": "Нет сетевого подключения",
+    "up_pagination_previous": "Предыдущая",
+    "up_pagination_next": "Следующая",
+    "up_pullRefresh_pull": "Потяните для обновления",
+    "up_pullRefresh_release": "Отпустите для обновления",
+    "up_pullRefresh_refreshing": "Обновление",
+    "up_readMore_expand": "Развернуть, чтобы прочитать больше",
+    "up_readMore_fold": "Свернуть",
+    "up_search_placeholder": "Введите ключевые слова",
+    "up_signature_penSize": "Размер линии",
+    "up_signature_penColor": "Цвет линии",
+    "up_upload_sizeExceed": "Превышен лимит размера",
+    "up_upload_uploading": "Загрузка",
+    "up_upload_previewImageFail": "Не удалось просмотреть изображение",
+    "up_upload_previewVideoFail": "Не удалось просмотреть видео",
+    "up_goodsSku_stock": "Запас",
+    "up_goodsSku_price": "Цена",
+    "up_goodsSku_amount": "Штуки",
+    "up_goodsSku_choosed": "Выбрано",
+    "up_goodsSku_buyAmount": "Количество"
+  });
+  function normalizeLocale(locale2) {
+    if (locale2 == "" || locale2 == null)
+      return "zh-Hans";
+    let l = locale2.toLowerCase();
+    if (l.includes("zh-tw") || l.includes("zh-hk") || l.includes("zh-hant")) {
+      return "zh-Hant";
+    }
+    if (l.includes("zh")) {
+      return "zh-Hans";
+    }
+    if (l.includes("en")) {
+      return "en";
+    }
+    if (l.includes("es"))
+      return "es";
+    if (l.includes("fr"))
+      return "fr";
+    if (l.includes("de"))
+      return "de";
+    if (l.includes("ko"))
+      return "ko";
+    if (l.includes("ja"))
+      return "ja";
+    if (l.includes("ru"))
+      return "ru";
+    return "zh-Hans";
+  }
+  let settings = vue.reactive(new UTSJSONObject({
+    lang: "zh-Hans",
+    locales: new UTSJSONObject({
+      en: en$1,
+      es,
+      fr,
+      de,
+      ko,
+      ja,
+      ru,
+      "zh-Hant": zhHant,
+      "zh-Hans": zhHans
+    })
+  }));
+  function setLocale(locale2) {
+    settings["lang"] = normalizeLocale(locale2);
+  }
+  function getLocale() {
+    return settings["lang"];
+  }
+  function t$1(value, params = new UTSJSONObject({})) {
+    if (value != "") {
+      let key2 = value.replaceAll(".", "_");
+      let lang = normalizeLocale(settings["lang"]);
+      let locales = settings["locales"];
+      let currentDict = locales[lang];
+      if (currentDict == null) {
+        currentDict = locales["zh-Hans"];
+      }
+      let result = "";
+      if (currentDict != null && currentDict[key2] != null) {
+        result = currentDict[key2].toString();
+      } else if (currentDict != null && currentDict[value] != null) {
+        result = currentDict[value].toString();
+      } else {
+        result = value;
+      }
+      let resultStr = result.toString();
+      if (params != null) {
+        const keys = UTSJSONObject.keys(params);
+        for (let i = 0; i < keys.length; i++) {
+          const k = keys[i];
+          const val = params[k];
+          if (val != null) {
+            resultStr = resultStr.replaceAll("{".concat(k, "}"), val.toString());
+          }
+        }
+      }
+      return resultStr;
+    } else {
+      return value;
+    }
+  }
+  function formatMonthTitle(year = null, month = null) {
+    const y = year != null ? year.toString() : "";
+    const m = month != null ? parseInt(month.toString()) : 0;
+    const lang = normalizeLocale(getLocale());
+    if (lang.startsWith("zh") || lang == "ja") {
+      return "".concat(y, "年").concat(m, "月");
+    } else if (lang == "ko") {
+      return "".concat(y, "년 ").concat(m, "월");
+    } else {
+      const enMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      const monthName = m >= 1 && m <= 12 ? enMonths[m - 1] : m.toString();
+      return "".concat(monthName, " ").concat(y);
+    }
+  }
+  new UTSJSONObject({
+    settings,
+    setLocale,
+    getLocale,
+    formatMonthTitle,
+    t: t$1
+  });
   class IAppState extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -6099,6 +6976,7 @@
       this.bindState(this.state);
       themeColor.value = this.state.theme;
       i18n.global.locale.value = this.state.locale;
+      setLocale(this.state.locale);
     }
     // ==========================================
     // 持久化钩子
@@ -6108,6 +6986,7 @@
       this.state.locale = defaultAppState.locale;
       themeColor.value = defaultAppState.theme;
       i18n.global.locale.value = defaultAppState.locale;
+      setLocale(defaultAppState.locale);
     }
     _hydrate(_data) {
       if (_data["theme"] != null) {
@@ -6119,6 +6998,7 @@
         const localeVal = _data["locale"];
         this.state.locale = localeVal;
         i18n.global.locale.value = localeVal;
+        setLocale(localeVal);
       }
     }
     _serialize() {
@@ -6143,6 +7023,7 @@
     setLocale(locale2) {
       this.state.locale = locale2;
       i18n.global.locale.value = locale2;
+      setLocale(locale2);
     }
   }
   const useAppStore = defineStore("app", () => {
@@ -6162,8 +7043,8 @@
   }
   const _sfc_main$35 = /* @__PURE__ */ vue.defineComponent({
     __name: "App.ku",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const appStore = useAppStore();
       const isCurrentPageTabbar = vue.ref(false);
@@ -6272,8 +7153,8 @@
   }
   const _sfc_main$33 = /* @__PURE__ */ vue.defineComponent({
     __name: "index",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       vue.onBackPress((options) => {
         if (options.from == "backbutton") {
@@ -6407,8 +7288,8 @@
   ];
   const _sfc_main$32 = /* @__PURE__ */ vue.defineComponent({
     __name: "me",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       vue.onBackPress((options) => {
         if (options.from == "backbutton") {
@@ -6600,9 +7481,9 @@
     return result.join(" ");
   }
   function toKebabCase(str) {
-    return str.replace(/^[A-Z]/, (m, _a, _b) => {
+    return str.replace(/^[A-Z]/, (m, _a2, _b) => {
       return m.toLowerCase();
-    }).replace(/[A-Z]/g, (m, _a, _b) => {
+    }).replace(/[A-Z]/g, (m, _a2, _b) => {
       return "-" + m.toLowerCase();
     });
   }
@@ -9516,10 +10397,10 @@
   }
   const loadingFonts = vue.ref([]);
   function registerFontIcon(config2) {
-    var _a;
+    var _a2;
     return __awaiter(this, void 0, void 0, function* () {
       const prefix = config2.prefix, jsonUrl = config2.jsonUrl;
-      const icons2 = (_a = config2.icons) !== null && _a !== void 0 ? _a : {};
+      const icons2 = (_a2 = config2.icons) !== null && _a2 !== void 0 ? _a2 : {};
       fontIconRegistry.set(prefix, config2);
       if (!isNullish(config2.fontUrl)) {
         loadingFonts.value.push(config2);
@@ -9564,11 +10445,11 @@
     });
   }
   function loadAndMergeJson(prefix, jsonUrl) {
-    var _a;
+    var _a2;
     return __awaiter(this, void 0, void 0, function* () {
       try {
         const jsonIcons = yield loadJsonData(jsonUrl);
-        const currentIcons = (_a = iconData.get(prefix)) !== null && _a !== void 0 ? _a : {};
+        const currentIcons = (_a2 = iconData.get(prefix)) !== null && _a2 !== void 0 ? _a2 : {};
         const mergedIcons = Object$1.assign(Object$1.assign({}, currentIcons), jsonIcons);
         iconData.set(prefix, mergedIcons);
         iconDataChangeCount.value++;
@@ -9602,7 +10483,7 @@
       };
     }
     if (name.includes(":")) {
-      const _a = __read(name.split(":"), 2), prefix_1 = _a[0], iconName = _a[1];
+      const _a2 = __read(name.split(":"), 2), prefix_1 = _a2[0], iconName = _a2[1];
       return {
         prefix: prefix_1,
         iconName,
@@ -9623,11 +10504,11 @@
   }
   function useIcon(name, options = {}) {
     const parsed = vue.computed(() => {
-      var _a;
-      return parseIconName("".concat(vue.unref(name)), (_a = options.prefix) !== null && _a !== void 0 ? _a : "l");
+      var _a2;
+      return parseIconName("".concat(vue.unref(name)), (_a2 = options.prefix) !== null && _a2 !== void 0 ? _a2 : "l");
     });
     const type = vue.computed(() => {
-      const _a = parsed.value, prefix = _a.prefix, isImage = _a.isImage, hasPrefix = _a.hasPrefix, isUnicode = _a.isUnicode;
+      const _a2 = parsed.value, prefix = _a2.prefix, isImage = _a2.isImage, hasPrefix = _a2.hasPrefix, isUnicode = _a2.isUnicode;
       if (isUnicode)
         return "font";
       if (isImage)
@@ -9648,14 +10529,14 @@
       return "font";
     });
     const fontIcon = vue.computed(() => {
-      var _a, _b;
+      var _a2, _b;
       iconDataChangeCount.value;
       if (type.value == "font") {
         const _c = parsed.value, prefix = _c.prefix, iconName = _c.iconName, hasPrefix = _c.hasPrefix, isUnicode = _c.isUnicode;
         if (isUnicode) {
           const char = parseUnicode(iconName);
           return {
-            fontFamily: (_a = options.prefix) !== null && _a !== void 0 ? _a : "",
+            fontFamily: (_a2 = options.prefix) !== null && _a2 !== void 0 ? _a2 : "",
             unicode: iconName,
             char,
             className: ""
@@ -9683,7 +10564,7 @@
       return null;
     });
     const iconifyInfo = vue.computed(() => {
-      var _a;
+      var _a2;
       iconDataChangeCount.value;
       if (type.value == "iconify") {
         const _b = parsed.value, prefix = _b.prefix, iconName = _b.iconName, hasPrefix = _b.hasPrefix;
@@ -9708,19 +10589,19 @@
           prefix: targetPrefix,
           apiUrl,
           isLocal,
-          svgContent: isLocal ? "".concat((_a = icons2 === null || icons2 === void 0 ? void 0 : icons2[targetIconName]) !== null && _a !== void 0 ? _a : "") : "",
+          svgContent: isLocal ? "".concat((_a2 = icons2 === null || icons2 === void 0 ? void 0 : icons2[targetIconName]) !== null && _a2 !== void 0 ? _a2 : "") : "",
           iconName: targetIconName
         };
       }
       return null;
     });
     const iconifyUrl = vue.computed(() => {
-      var _a;
+      var _a2;
       const info = iconifyInfo.value;
       if (isNullish(info))
         return null;
       if (info.isLocal && info.svgContent != "") {
-        return (_a = info === null || info === void 0 ? void 0 : info.svgContent) !== null && _a !== void 0 ? _a : "";
+        return (_a2 = info === null || info === void 0 ? void 0 : info.svgContent) !== null && _a2 !== void 0 ? _a2 : "";
       }
       return "".concat(info.apiUrl, "/").concat(info.prefix, "/").concat(info.iconName, ".svg");
     });
@@ -9761,8 +10642,8 @@
     web: { type: Boolean, required: true, default: false },
     lClass: { type: null, required: false },
     lStyle: { type: null, required: false }
-  }, emits: ["click"], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
+  }, emits: ["click"], setup(__props, _a2) {
+    var __expose = _a2.expose, __emit = _a2.emit;
     __expose();
     const props2 = __props;
     const emit = __emit;
@@ -9770,28 +10651,28 @@
       return props2.name;
     }), { prefix: props2.prefix }), type = _b.type, fontIcon = _b.fontIcon, imageUrl = _b.imageUrl, iconifyUrl = _b.iconifyUrl, parsed = _b.parsed;
     const fontLoading = vue.computed(() => {
-      var _a2;
+      var _a3;
       if (type.value == "font") {
-        if (((_a2 = fontIcon.value) === null || _a2 === void 0 ? null : _a2.fontFamily) == "l")
+        if (((_a3 = fontIcon.value) === null || _a3 === void 0 ? null : _a3.fontFamily) == "l")
           return false;
         return loadingFonts.value.some((item) => {
-          var _a3;
-          return item.fontFamily == ((_a3 = fontIcon.value) === null || _a3 === void 0 ? null : _a3.fontFamily);
+          var _a4;
+          return item.fontFamily == ((_a4 = fontIcon.value) === null || _a4 === void 0 ? null : _a4.fontFamily);
         });
       }
       return false;
     });
     const classes = vue.computed(() => {
-      var _a2;
-      const prefix = (_a2 = props2.prefix) !== null && _a2 !== void 0 ? _a2 : "l";
+      var _a3;
+      const prefix = (_a3 = props2.prefix) !== null && _a3 !== void 0 ? _a3 : "l";
       return classNames(type.value == "font" ? prefix : null, props2.lClass);
     });
     const styles = vue.computed(() => {
-      var _a2;
+      var _a3;
       const fontSize = addUnit(props2.size);
       const isFont = type.value == "font";
       return stringifyStyle(new UTSJSONObject({
-        fontFamily: isFont ? (_a2 = fontIcon.value) === null || _a2 === void 0 ? null : _a2.fontFamily : false,
+        fontFamily: isFont ? (_a3 = fontIcon.value) === null || _a3 === void 0 ? null : _a3.fontFamily : false,
         fontSize: isFont ? fontSize : false,
         color: isFont ? props2.color : false,
         width: !isFont ? fontSize : false,
@@ -9807,7 +10688,7 @@
   } }));
   const _style_0$2Y = { "l-icon--font": { "": { "fontFamily": "l", "textAlign": "center" } }, "l-icon--image": { "": { "width": "var(--l-icon-size, 16px)", "height": "var(--l-icon-size, 16px)" } }, "@FONT-FACE": [{ "fontFamily": "l", "src": 'url("/uni_modules/lime-icon/static/app/t4.ttf")' }] };
   function _sfc_render$30(_ctx, _cache, $props, $setup, $data, $options) {
-    var _a, _b;
+    var _a2, _b;
     const _component_l_svg = vue.resolveComponent("l-svg");
     return vue.openBlock(), vue.createElementBlock(
       vue.Fragment,
@@ -9822,7 +10703,7 @@
             style: vue.normalizeStyle($setup.styles),
             onClick: $setup.handleClick
           },
-          vue.toDisplayString((_a = $setup.fontIcon) == null ? void 0 : _a.char),
+          vue.toDisplayString((_a2 = $setup.fontIcon) == null ? void 0 : _a2.char),
           7
           /* TEXT, CLASS, STYLE */
         )) : $setup.type == "image" && (!$setup.parsed.isSvg || $props.color == null) ? (vue.openBlock(), vue.createElementBlock(
@@ -9871,8 +10752,8 @@
         default: "默认标题"
       }
     },
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = {};
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
@@ -9902,8 +10783,8 @@
   const Card = /* @__PURE__ */ _export_sfc(_sfc_main$30, [["render", _sfc_render$2$], ["styles", [_style_0$2X]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/basic/components/Card.uvue"]]);
   const _sfc_main$2$ = /* @__PURE__ */ vue.defineComponent({
     __name: "IconDemoCard",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get Card() {
         return Card;
@@ -9922,7 +10803,9 @@
       null,
       [
         vue.createCommentVNode(" 使用封装 of Card 组件 "),
-        vue.createVNode($setup["Card"], { title: "字体图标示例" }, {
+        vue.createVNode($setup["Card"], {
+          title: _ctx.$t("basic.iconDemoTitle")
+        }, {
           default: vue.withCtx(() => [
             vue.createCommentVNode(" uni-icon 示例 "),
             vue.createElementVNode("view", { class: "flex-row items-center justify-between py-12px border-bottom-width-1px border-bottom-style-solid border-bottom-color-__f1f5f9_" }, [
@@ -9946,7 +10829,13 @@
                 vue.createElementVNode("view", { class: "flex-col" }, [
                   vue.createElementVNode("text", { class: "text-14px text-__475569_ font-medium" }, "lime-icon"),
                   vue.createElementVNode("view", { class: "bg-__fff1f2_ rounded-4px py-2px px-6px mt-4px self-start border-width-1px border-style-solid border-color-__ffe4e6_" }, [
-                    vue.createElementVNode("text", { class: "text-10px text-__f43f5e_" }, "SVG模式需授权收费")
+                    vue.createElementVNode(
+                      "text",
+                      { class: "text-10px text-__f43f5e_" },
+                      vue.toDisplayString(_ctx.$t("basic.svgAuthWarning")),
+                      1
+                      /* TEXT */
+                    )
                   ])
                 ])
               ]),
@@ -9977,14 +10866,14 @@
           ]),
           _: 1
           /* STABLE */
-        })
+        }, 8, ["title"])
       ],
       2112
       /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */
     );
   }
   const IconDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main$2$, [["render", _sfc_render$2_], ["styles", [_style_0$2W]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/basic/components/IconDemoCard.uvue"]]);
-  function t$1(key2, named = null) {
+  function t(key2, named = null) {
     if (named != null) {
       return i18n.global.t(key2, named);
     }
@@ -9992,8 +10881,8 @@
   }
   const _sfc_main$2_ = /* @__PURE__ */ vue.defineComponent({
     __name: "LangSwitchCard",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const appStore = useAppStore();
       const currentLocale = vue.computed(() => {
@@ -10005,22 +10894,38 @@
       const isEnUS = vue.computed(() => {
         return currentLocale.value == "en-US";
       });
+      const uViewChooseDates = vue.computed(() => {
+        currentLocale.value;
+        return t$1("up.calendar.chooseDates", new UTSJSONObject({}));
+      });
+      const uViewConfirm = vue.computed(() => {
+        currentLocale.value;
+        return t$1("up.common.confirm", new UTSJSONObject({}));
+      });
+      const uViewStart = vue.computed(() => {
+        currentLocale.value;
+        return t$1("up.common.start", new UTSJSONObject({}));
+      });
+      const uViewEnd = vue.computed(() => {
+        currentLocale.value;
+        return t$1("up.common.end", new UTSJSONObject({}));
+      });
       function switchLanguage(lang) {
         appStore.setLocale(lang);
         uni.showToast({
-          title: t$1("message.switch_success", null),
+          title: t("message.switch_success", null),
           icon: "none",
           duration: 1500
         });
       }
-      const __returned__ = { appStore, currentLocale, isZhCN, isEnUS, switchLanguage, get Card() {
+      const __returned__ = { appStore, currentLocale, isZhCN, isEnUS, uViewChooseDates, uViewConfirm, uViewStart, uViewEnd, switchLanguage, get Card() {
         return Card;
       } };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  const _style_0$2V = { "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "border-bottom-color-__f1f5f9_": { "": { "borderBottomColor": "#f1f5f9" } }, "border-bottom-style-solid": { "": { "borderBottomStyle": "solid" } }, "border-bottom-width-1px": { "": { "borderBottomWidth": 1 } }, "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "font-medium": { "": { "fontWeight": 500 } }, "items-center": { "": { "alignItems": "center" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "mb-16px": { "": { "marginBottom": 16 } }, "mb-6px": { "": { "marginBottom": 6 } }, "mt-8px": { "": { "marginTop": 8 } }, "none": { "": { "display": "none" } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "py-12px": { "": { "paddingTop": 12, "paddingBottom": 12 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__334155_": { "": { "color": "#334155" } }, "text-__475569_": { "": { "color": "#475569" } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-12px": { "": { "fontSize": 12 } }, "text-14px": { "": { "fontSize": 14 } }, "text-15px": { "": { "fontSize": 15 } }, "text-16px": { "": { "fontSize": 16 } } };
+  const _style_0$2V = { "bg-__ecfdf5_": { "": { "backgroundImage": "none", "backgroundColor": "#ecfdf5" } }, "bg-__eff6ff_": { "": { "backgroundImage": "none", "backgroundColor": "#eff6ff" } }, "bg-__fffbe2_": { "": { "backgroundImage": "none", "backgroundColor": "#fffbe2" } }, "border-bottom-color-__f1f5f9_": { "": { "borderBottomColor": "#f1f5f9" } }, "border-bottom-style-solid": { "": { "borderBottomStyle": "solid" } }, "border-bottom-width-1px": { "": { "borderBottomWidth": 1 } }, "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-top-color-__f1f5f9_": { "": { "borderTopColor": "#f1f5f9" } }, "border-top-style-solid": { "": { "borderTopStyle": "solid" } }, "border-top-width-1px": { "": { "borderTopWidth": 1 } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex-row": { "": { "flexDirection": "row" } }, "flex-wrap": { "": { "flexWrap": "wrap" } }, "font-bold": { "": { "fontWeight": 700 } }, "font-medium": { "": { "fontWeight": 500 } }, "items-center": { "": { "alignItems": "center" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "mb-16px": { "": { "marginBottom": 16 } }, "mb-4px": { "": { "marginBottom": 4 } }, "mb-6px": { "": { "marginBottom": 6 } }, "mr-8px": { "": { "marginRight": 8 } }, "mt-12px": { "": { "marginTop": 12 } }, "mt-8px": { "": { "marginTop": 8 } }, "none": { "": { "display": "none" } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "pt-12px": { "": { "paddingTop": 12 } }, "px-8px": { "": { "paddingLeft": 8, "paddingRight": 8 } }, "py-12px": { "": { "paddingTop": 12, "paddingBottom": 12 } }, "py-4px": { "": { "paddingTop": 4, "paddingBottom": 4 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-4px": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "text-__059669_": { "": { "color": "#059669" } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__2563eb_": { "": { "color": "#2563eb" } }, "text-__334155_": { "": { "color": "#334155" } }, "text-__475569_": { "": { "color": "#475569" } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-__d97706_": { "": { "color": "#d97706" } }, "text-12px": { "": { "fontSize": 12 } }, "text-13px": { "": { "fontSize": 13 } }, "text-14px": { "": { "fontSize": 14 } }, "text-15px": { "": { "fontSize": 15 } }, "text-16px": { "": { "fontSize": 16 } } };
   function _sfc_render$2Z(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_0$8);
     return vue.openBlock(), vue.createBlock($setup["Card"], {
@@ -10028,7 +10933,7 @@
     }, {
       default: vue.withCtx(() => [
         vue.createCommentVNode(" 当前语言预览 "),
-        vue.createElementVNode("view", { class: "bg-__f8fafc_ rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
+        vue.createElementVNode("view", { class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
           vue.createElementVNode(
             "text",
             { class: "text-12px text-__94a3b8_ mb-6px" },
@@ -10049,7 +10954,40 @@
             vue.toDisplayString(_ctx.$t("message.hello", { msg: "hi" })),
             1
             /* TEXT */
-          )
+          ),
+          vue.createCommentVNode(" 组件库多语言同步预览 "),
+          vue.createElementVNode("view", { class: "mt-12px pt-12px border-top-width-1px border-top-style-solid border-top-color-__f1f5f9_" }, [
+            vue.createElementVNode(
+              "text",
+              { class: "text-12px text-__94a3b8_ mb-6px" },
+              vue.toDisplayString(_ctx.$t("basic.uviewPreview")),
+              1
+              /* TEXT */
+            ),
+            vue.createElementVNode("view", { class: "flex-row items-center flex-wrap" }, [
+              vue.createElementVNode(
+                "text",
+                { class: "text-13px text-__2563eb_ bg-__eff6ff_ px-8px py-4px rounded-4px font-medium mr-8px mb-4px" },
+                vue.toDisplayString($setup.uViewChooseDates),
+                1
+                /* TEXT */
+              ),
+              vue.createElementVNode(
+                "text",
+                { class: "text-13px text-__059669_ bg-__ecfdf5_ px-8px py-4px rounded-4px font-medium mr-8px mb-4px" },
+                vue.toDisplayString($setup.uViewConfirm),
+                1
+                /* TEXT */
+              ),
+              vue.createElementVNode(
+                "text",
+                { class: "text-13px text-__d97706_ bg-__fffbe2_ px-8px py-4px rounded-4px font-medium mb-4px" },
+                vue.toDisplayString($setup.uViewStart) + " / " + vue.toDisplayString($setup.uViewEnd),
+                1
+                /* TEXT */
+              )
+            ])
+          ])
         ]),
         vue.createCommentVNode(" 选项列表 "),
         vue.createCommentVNode(" 简体中文 "),
@@ -10094,8 +11032,8 @@
   const LangSwitchCard = /* @__PURE__ */ _export_sfc(_sfc_main$2_, [["render", _sfc_render$2Z], ["styles", [_style_0$2V]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/basic/components/LangSwitchCard.uvue"]]);
   const _sfc_main$2Z = /* @__PURE__ */ vue.defineComponent({
     __name: "ThemeSwitchCard",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const appStore = useAppStore();
       const colorOptions = [
@@ -10108,7 +11046,7 @@
       function changeTheme(color2) {
         appStore.setTheme(color2);
         uni.showToast({
-          title: "主题切换成功",
+          title: t("basic.themeSuccess", null),
           icon: "none",
           duration: 1500
         });
@@ -10120,13 +11058,21 @@
       return __returned__;
     }
   });
-  const _style_0$2U = { "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex": { "": { "display": "flex" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-40px": { "": { "height": 40 } }, "h-44px": { "": { "height": 44 } }, "items-center": { "": { "alignItems": "center" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-16px": { "": { "marginBottom": 16 } }, "mb-8px": { "": { "marginBottom": 8 } }, "mt-10px": { "": { "marginTop": 10 } }, "mx-auto": { "": { "marginLeft": "auto", "marginRight": "auto" } }, "none": { "": { "display": "none" } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "py-10px": { "": { "paddingTop": 10, "paddingBottom": 10 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-20px": { "": { "borderTopLeftRadius": 20, "borderTopRightRadius": 20, "borderBottomRightRadius": 20, "borderBottomLeftRadius": 20 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-12px": { "": { "fontSize": 12 } }, "text-14px": { "": { "fontSize": 14 } }, "text-16px": { "": { "fontSize": 16 } }, "text-white": { "": { "color": "rgba(255,255,255,var(--un-color-opacity,1))" } }, "w-200px": { "": { "width": 200 } }, "w-40px": { "": { "width": 40 } } };
+  const _style_0$2U = { "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex": { "": { "display": "flex" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-40px": { "": { "height": 40 } }, "h-44px": { "": { "height": 44 } }, "items-center": { "": { "alignItems": "center" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-16px": { "": { "marginBottom": 16 } }, "mb-8px": { "": { "marginBottom": 8 } }, "mt-10px": { "": { "marginTop": 10 } }, "mx-auto": { "": { "marginLeft": "auto", "marginRight": "auto" } }, "none": { "": { "display": "none" } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "py-10px": { "": { "paddingTop": 10, "paddingBottom": 10 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-20px": { "": { "borderTopLeftRadius": 20, "borderTopRightRadius": 20, "borderBottomRightRadius": 20, "borderBottomLeftRadius": 20 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-12px": { "": { "fontSize": 12 } }, "text-14px": { "": { "fontSize": 14 } }, "text-16px": { "": { "fontSize": 16 } }, "text-white": { "": { "color": "rgba(255,255,255,var(--un-color-opacity,1))" } }, "w-200px": { "": { "width": 200 } }, "w-40px": { "": { "width": 40 } } };
   function _sfc_render$2Y(_ctx, _cache, $props, $setup, $data, $options) {
-    return vue.openBlock(), vue.createBlock($setup["Card"], { title: "主题设置" }, {
+    return vue.openBlock(), vue.createBlock($setup["Card"], {
+      title: _ctx.$t("basic.themeTitle")
+    }, {
       default: vue.withCtx(() => [
         vue.createCommentVNode(" 预览区域 "),
-        vue.createElementVNode("view", { class: "bg-__f8fafc_ rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_ items-center" }, [
-          vue.createElementVNode("text", { class: "text-12px text-__94a3b8_ mb-8px" }, "主题色效果预览"),
+        vue.createElementVNode("view", { class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_ items-center" }, [
+          vue.createElementVNode(
+            "text",
+            { class: "text-12px text-__94a3b8_ mb-8px" },
+            vue.toDisplayString(_ctx.$t("basic.themePreview")),
+            1
+            /* TEXT */
+          ),
           vue.createElementVNode(
             "view",
             {
@@ -10134,7 +11080,13 @@
               style: vue.normalizeStyle({ backgroundColor: $setup.appStore.state.theme })
             },
             [
-              vue.createElementVNode("text", { class: "text-__ffffff_ text-14px" }, "主题按钮")
+              vue.createElementVNode(
+                "text",
+                { class: "text-__ffffff_ text-14px" },
+                vue.toDisplayString(_ctx.$t("basic.themeButton")),
+                1
+                /* TEXT */
+              )
             ],
             4
             /* STYLE */
@@ -10170,7 +11122,7 @@
       ]),
       _: 1
       /* STABLE */
-    });
+    }, 8, ["title"]);
   }
   const ThemeSwitchCard = /* @__PURE__ */ _export_sfc(_sfc_main$2Z, [["render", _sfc_render$2Y], ["styles", [_style_0$2U]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/basic/components/ThemeSwitchCard.uvue"]]);
   class DayutsConfig extends UTS.UTSType {
@@ -10388,7 +11340,7 @@
     return ["Int8", "UInt8", "Int16", "UInt16", "Int32", "UInt32", "Int64", "UInt64", "Int", "UInt", "Float", "Float16", "Float32", "Float64", "Double", "number"].includes(typeof value);
   }
   function prettyUnit(u) {
-    var _a;
+    var _a2;
     const special = /* @__PURE__ */ new Map([
       ["M", M],
       ["y", Y],
@@ -10401,7 +11353,7 @@
       ["ms", MS],
       ["Q", Q]
     ]);
-    return (_a = special.get(u)) !== null && _a !== void 0 ? _a : "".concat(u).toLowerCase().replace(/s$/, "");
+    return (_a2 = special.get(u)) !== null && _a2 !== void 0 ? _a2 : "".concat(u).toLowerCase().replace(/s$/, "");
   }
   function monthDiff(a, b) {
     if (a.date() < b.date())
@@ -10420,7 +11372,7 @@
   function absFloor(n) {
     return n < 0 ? Math.max(Math.ceil(n), 0) : Math.floor(n);
   }
-  const en$1 = {
+  const en = {
     name: "en",
     /**
      * 星期名称数组。
@@ -10561,7 +11513,7 @@
     lang: "en",
     locales: localesMap
   });
-  localeState.locales.set("en", en$1);
+  localeState.locales.set("en", en);
   localeState.locales.set("zh-cn", locale);
   class DayutsIntl {
     constructor() {
@@ -10630,8 +11582,8 @@
     return null;
   }
   function createDateFromArray(d, offset = 0) {
-    var _a, _b, _c, _e, _f, _g, _h;
-    const year = (_a = tryParseNumberAtIndex(d, 1 - offset)) !== null && _a !== void 0 ? _a : (/* @__PURE__ */ new Date()).getFullYear();
+    var _a2, _b, _c, _e, _f, _g, _h;
+    const year = (_a2 = tryParseNumberAtIndex(d, 1 - offset)) !== null && _a2 !== void 0 ? _a2 : (/* @__PURE__ */ new Date()).getFullYear();
     const month = ((_b = tryParseNumberAtIndex(d, 2 - offset)) !== null && _b !== void 0 ? _b : 1) - 1;
     const day = (_c = tryParseNumberAtIndex(d, 3 - offset)) !== null && _c !== void 0 ? _c : 1;
     const hour = (_e = tryParseNumberAtIndex(d, 4 - offset)) !== null && _e !== void 0 ? _e : 0;
@@ -10671,7 +11623,7 @@
   }
   class Dayuts {
     constructor(cfg) {
-      var _a;
+      var _a2;
       this.valid = true;
       this.$d = /* @__PURE__ */ new Date();
       this.$y = 0;
@@ -10683,7 +11635,7 @@
       this.$s = 0;
       this.$ms = 0;
       this.$u = false;
-      this.$L = (_a = parseLocale(cfg.locale)) !== null && _a !== void 0 ? _a : dayutsIntl.locale;
+      this.$L = (_a2 = parseLocale(cfg.locale)) !== null && _a2 !== void 0 ? _a2 : dayutsIntl.locale;
       this.parse(cfg);
     }
     parse(cfg) {
@@ -10782,7 +11734,7 @@
      * @returns {Dayuts} 返回一个新的Dayuts对象，表示调整后的日期。
      */
     startOf(units, startOf = true) {
-      var _a;
+      var _a2;
       const isStartOf = startOf;
       const unit = prettyUnit(units);
       const instanceFactory = (d, m) => {
@@ -10818,7 +11770,7 @@
       } else if (unit == M) {
         return isStartOf ? instanceFactory(1, $M) : instanceFactory(0, $M + 1);
       } else if (unit == W) {
-        const weekStart = (_a = this.$locale().weekStart) !== null && _a !== void 0 ? _a : 0;
+        const weekStart = (_a2 = this.$locale().weekStart) !== null && _a2 !== void 0 ? _a2 : 0;
         const gap = ($W < weekStart ? $W + 7 : $W) - weekStart;
         return instanceFactory(isStartOf ? $D - gap : $D + (6 - gap), $M);
       } else if (unit == D || unit == DATE) {
@@ -10964,7 +11916,7 @@
      * @returns {Dayuts} 更新的 Dayuts 实例。
      */
     add(number2, units) {
-      var _a;
+      var _a2;
       const unit = prettyUnit(units);
       const instanceFactorySet = (n) => {
         const d = dayuts(this);
@@ -10987,7 +11939,7 @@
         [H, MILLISECONDS_A_HOUR],
         [S, MILLISECONDS_A_SECOND]
       ]);
-      const step = (_a = steps.get(unit)) !== null && _a !== void 0 ? _a : 1;
+      const step = (_a2 = steps.get(unit)) !== null && _a2 !== void 0 ? _a2 : 1;
       const nextTimeStamp = this.$d.getTime() + number2 * step;
       return wrapper(nextTimeStamp, this);
     }
@@ -11011,7 +11963,7 @@
         return INVALID_DATE_STRING;
       const str = formatStr !== null && formatStr !== void 0 ? formatStr : FORMAT_DEFAULT;
       const zoneStr = padZoneStr(this);
-      const _a = this, $H = _a.$H, $m = _a.$m, $M = _a.$M;
+      const _a2 = this, $H = _a2.$H, $m = _a2.$m, $M = _a2.$M;
       const weekdays = locale2.weekdays, months = locale2.months, meridiem = locale2.meridiem;
       function getShort(arr, index, full = [], length = 0) {
         if (arr != null && arr.length >= index) {
@@ -11081,8 +12033,8 @@
         return null;
       };
       return str.replace(REGEX_FORMAT, (match, $1, offset, string2) => {
-        var _a2;
-        return (_a2 = $1 !== null && $1 !== void 0 ? $1 : matches(match)) !== null && _a2 !== void 0 ? _a2 : zoneStr.replace(":", "");
+        var _a3;
+        return (_a3 = $1 !== null && $1 !== void 0 ? $1 : matches(match)) !== null && _a3 !== void 0 ? _a3 : zoneStr.replace(":", "");
       });
     }
     /**
@@ -11223,8 +12175,8 @@
       return input == null ? dayOfYear : this.add(input - dayOfYear, "day");
     }
     fromToBase(input, withoutSuffix, instance, isFrom) {
-      var _a, _b;
-      const relObj = (_a = localeState.locales.get("en")) === null || _a === void 0 ? void 0 : _a.relativeTime;
+      var _a2, _b;
+      const relObj = (_a2 = localeState.locales.get("en")) === null || _a2 === void 0 ? void 0 : _a2.relativeTime;
       const loc = (_b = instance.$locale().relativeTime) !== null && _b !== void 0 ? _b : relObj;
       if (loc == null)
         return "";
@@ -11291,8 +12243,8 @@
   }
   const _sfc_main$2Y = /* @__PURE__ */ vue.defineComponent({
     __name: "TimeDemoCard",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const currentFullTime = vue.ref("");
       let timerId = 0;
@@ -11342,12 +12294,12 @@
       return __returned__;
     }
   });
-  const _style_0$2T = { "bg-__e0edff_": { "": { "backgroundImage": "none", "backgroundColor": "#e0edff" } }, "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-top-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0" } }, "border-top-style-solid": { "": { "borderTopStyle": "solid" } }, "border-top-width-1px": { "": { "borderTopWidth": 1 } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex": { "": { "display": "flex" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "font-medium": { "": { "fontWeight": 500 } }, "h-36px": { "": { "height": 36 } }, "items-center": { "": { "alignItems": "center" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-12px": { "": { "marginBottom": 12 } }, "mb-16px": { "": { "marginBottom": 16 } }, "mb-4px": { "": { "marginBottom": 4 } }, "mb-6px": { "": { "marginBottom": 6 } }, "mb-8px": { "": { "marginBottom": 8 } }, "mr-8px": { "": { "marginRight": 8 } }, "mt-8px": { "": { "marginTop": 8 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "pt-8px": { "": { "paddingTop": 8 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__334155_": { "": { "color": "#334155" } }, "text-__3b82f6_": { "": { "color": "#3b82f6" } }, "text-__64748b_": { "": { "color": "#64748b" } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-__f43f5e_": { "": { "color": "#f43f5e" } }, "text-_var_--theme-color__37c2bc__": { "": { "color": "var(--theme-color,#37c2bc)" } }, "text-12px": { "": { "fontSize": 12 } }, "text-13px": { "": { "fontSize": 13 } }, "text-14px": { "": { "fontSize": 14 } }, "text-16px": { "": { "fontSize": 16 } }, "text-24px": { "": { "fontSize": 24 } }, "w-full": { "": { "width": "100%" } } };
+  const _style_0$2T = { "bg-__e0edff_": { "": { "backgroundImage": "none", "backgroundColor": "#e0edff" } }, "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-top-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0" } }, "border-top-style-solid": { "": { "borderTopStyle": "solid" } }, "border-top-width-1px": { "": { "borderTopWidth": 1 } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex": { "": { "display": "flex" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "font-medium": { "": { "fontWeight": 500 } }, "h-36px": { "": { "height": 36 } }, "items-center": { "": { "alignItems": "center" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-12px": { "": { "marginBottom": 12 } }, "mb-16px": { "": { "marginBottom": 16 } }, "mb-4px": { "": { "marginBottom": 4 } }, "mb-6px": { "": { "marginBottom": 6 } }, "mb-8px": { "": { "marginBottom": 8 } }, "mr-8px": { "": { "marginRight": 8 } }, "mt-8px": { "": { "marginTop": 8 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "pt-8px": { "": { "paddingTop": 8 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__334155_": { "": { "color": "#334155" } }, "text-__3b82f6_": { "": { "color": "#3b82f6" } }, "text-__64748b_": { "": { "color": "#64748b" } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-__f43f5e_": { "": { "color": "#f43f5e" } }, "text-_var_--theme-color__37c2bc__": { "": { "color": "var(--theme-color,#37c2bc)" } }, "text-12px": { "": { "fontSize": 12 } }, "text-13px": { "": { "fontSize": 13 } }, "text-14px": { "": { "fontSize": 14 } }, "text-16px": { "": { "fontSize": 16 } }, "text-24px": { "": { "fontSize": 24 } }, "w-full": { "": { "width": "100%" } } };
   function _sfc_render$2X(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createBlock($setup["Card"], { title: "时间日期操作 (lime-dayuts)" }, {
       default: vue.withCtx(() => [
         vue.createCommentVNode(" 实时时间与自定义格式化展示 "),
-        vue.createElementVNode("view", { class: "bg-__f8fafc_ rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
+        vue.createElementVNode("view", { class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
           vue.createElementVNode("text", { class: "text-13px font-bold text-__1e293b_ mb-8px" }, "实时高精度时钟 (更新于每一百毫秒)"),
           vue.createElementVNode(
             "text",
@@ -11362,7 +12314,7 @@
           vue.createElementVNode("text", { class: "text-12px text-__94a3b8_" }, " 格式模板: YYYY-MM-DD HH:mm:ss.SSS dddd ")
         ]),
         vue.createCommentVNode(" 日期加减偏移计算 "),
-        vue.createElementVNode("view", { class: "bg-__f8fafc_ rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
+        vue.createElementVNode("view", { class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
           vue.createElementVNode("text", { class: "text-13px font-bold text-__1e293b_ mb-12px" }, "日期偏移操作"),
           vue.createElementVNode("view", { class: "flex-row items-center justify-between mb-12px" }, [
             vue.createElementVNode("text", { class: "text-14px text-__64748b_" }, "当前偏移天数:"),
@@ -11420,7 +12372,7 @@
           ])
         ]),
         vue.createCommentVNode(" 快捷日期边界与比较计算 "),
-        vue.createElementVNode("view", { class: "bg-__f8fafc_ rounded-12px p-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
+        vue.createElementVNode("view", { class: "rounded-12px p-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
           vue.createElementVNode("text", { class: "text-13px font-bold text-__1e293b_ mb-12px" }, "常用日期边界与区间计算"),
           vue.createElementVNode("view", { class: "flex-row justify-between mb-8px" }, [
             vue.createElementVNode("text", { class: "text-14px text-__64748b_" }, "本月第一天"),
@@ -11471,8 +12423,8 @@
   const TimeDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main$2Y, [["render", _sfc_render$2X], ["styles", [_style_0$2T]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/basic/components/TimeDemoCard.uvue"]]);
   const _sfc_main$2X = /* @__PURE__ */ vue.defineComponent({
     __name: "RouterDemoCard",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const tokenStore = useTokenStore();
       const userStore = useUserStore();
@@ -11499,12 +12451,12 @@
       return __returned__;
     }
   });
-  const _style_0$2S = { "bg-__3182ce_": { "": { "backgroundImage": "none", "backgroundColor": "#3182ce" } }, "bg-__ef4444_": { "": { "backgroundImage": "none", "backgroundColor": "#ef4444" } }, "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex": { "": { "display": "flex" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-row": { "": { "flexDirection": "row" } }, "h-42px": { "": { "height": 42 } }, "items-center": { "": { "alignItems": "center" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "justify-center": { "": { "justifyContent": "center" } }, "leading-normal": { "": { "lineHeight": "normal" } }, "mb-16px": { "": { "marginBottom": 16 } }, "mb-8px": { "": { "marginBottom": 8 } }, "ml-12px": { "": { "marginLeft": 12 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__64748b_": { "": { "color": "#64748b" } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-12px": { "": { "fontSize": 12 } }, "text-14px": { "": { "fontSize": 14 } } };
+  const _style_0$2S = { "bg-__3182ce_": { "": { "backgroundImage": "none", "backgroundColor": "#3182ce" } }, "bg-__ef4444_": { "": { "backgroundImage": "none", "backgroundColor": "#ef4444" } }, "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex": { "": { "display": "flex" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-row": { "": { "flexDirection": "row" } }, "h-42px": { "": { "height": 42 } }, "items-center": { "": { "alignItems": "center" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "justify-center": { "": { "justifyContent": "center" } }, "leading-normal": { "": { "lineHeight": "normal" } }, "mb-16px": { "": { "marginBottom": 16 } }, "mb-8px": { "": { "marginBottom": 8 } }, "ml-12px": { "": { "marginLeft": 12 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__64748b_": { "": { "color": "#64748b" } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-12px": { "": { "fontSize": 12 } }, "text-14px": { "": { "fontSize": 14 } } };
   function _sfc_render$2W(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createBlock($setup["Card"], { title: "路由拦截与传参测试" }, {
       default: vue.withCtx(() => [
         vue.createCommentVNode(" 状态展示 "),
-        vue.createElementVNode("view", { class: "bg-__f8fafc_ rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
+        vue.createElementVNode("view", { class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
           vue.createElementVNode("view", { class: "flex-row justify-between items-center mb-8px" }, [
             vue.createElementVNode("text", { class: "text-14px text-__64748b_" }, "当前登录状态:"),
             vue.createElementVNode(
@@ -11759,8 +12711,8 @@
             }
           });
         } else if (typeof init == "object") {
-          Object.entries(init).forEach((_a) => {
-            var _b = __read(_a, 2), name = _b[0], value = _b[1];
+          Object.entries(init).forEach((_a2) => {
+            var _b = __read(_a2, 2), name = _b[0], value = _b[1];
             this.append(name, value);
           });
         }
@@ -11779,8 +12731,8 @@
       });
     }
     encode(str) {
-      var _a;
-      return (_a = encodeURIComponent(str)) === null || _a === void 0 ? null : _a.replace(/%20/g, "+").replace(/%21/g, "!").replace(/%27/g, "'").replace(/%28/g, "(").replace(/%29/g, ")").replace(/%2A/g, "*").replace(/%2D/g, "-").replace(/%5F/g, "_").replace(/%2E/g, ".").replace(/%7E/g, "~");
+      var _a2;
+      return (_a2 = encodeURIComponent(str)) === null || _a2 === void 0 ? null : _a2.replace(/%20/g, "+").replace(/%21/g, "!").replace(/%27/g, "'").replace(/%28/g, "(").replace(/%29/g, ")").replace(/%2A/g, "*").replace(/%2D/g, "-").replace(/%5F/g, "_").replace(/%2E/g, ".").replace(/%7E/g, "~");
     }
     decode(str) {
       return decodeURIComponent(str.replace(/\+/g, " "));
@@ -11893,12 +12845,12 @@
   function mergeSearchParams(search2, query) {
     const originalParams = new URLSearchParams(search2);
     const mergedParams = new URLSearchParams();
-    originalParams.entries().forEach((_a) => {
-      var _b = __read(_a, 2), key2 = _b[0], value = _b[1];
+    originalParams.entries().forEach((_a2) => {
+      var _b = __read(_a2, 2), key2 = _b[0], value = _b[1];
       mergedParams.append(key2, value);
     });
-    query.entries().forEach((_a) => {
-      var _b = __read(_a, 2), key2 = _b[0], value = _b[1];
+    query.entries().forEach((_a2) => {
+      var _b = __read(_a2, 2), key2 = _b[0], value = _b[1];
       if (mergedParams.has(key2)) {
         mergedParams.set(key2, value);
       } else {
@@ -11943,7 +12895,7 @@
     };
     const resolve = (data2) => {
       return __awaiter(this, void 0, void 0, function* () {
-        var e_1, _a;
+        var e_1, _a2;
         let _data = data2;
         try {
           for (var handlers_1 = __values(handlers), handlers_1_1 = handlers_1.next(); !handlers_1_1.done; handlers_1_1 = handlers_1.next()) {
@@ -11967,8 +12919,8 @@
           e_1 = { error: e_1_1 };
         } finally {
           try {
-            if (handlers_1_1 && !handlers_1_1.done && (_a = handlers_1.return))
-              _a.call(handlers_1);
+            if (handlers_1_1 && !handlers_1_1.done && (_a2 = handlers_1.return))
+              _a2.call(handlers_1);
           } finally {
             if (e_1)
               throw e_1.error;
@@ -11979,7 +12931,7 @@
     };
     const reject = (error2) => {
       return __awaiter(this, void 0, void 0, function* () {
-        var e_2, _a;
+        var e_2, _a2;
         try {
           for (var handlers_2 = __values(handlers), handlers_2_1 = handlers_2.next(); !handlers_2_1.done; handlers_2_1 = handlers_2.next()) {
             var rejected = handlers_2_1.value.rejected;
@@ -12003,8 +12955,8 @@
           e_2 = { error: e_2_1 };
         } finally {
           try {
-            if (handlers_2_1 && !handlers_2_1.done && (_a = handlers_2.return))
-              _a.call(handlers_2);
+            if (handlers_2_1 && !handlers_2_1.done && (_a2 = handlers_2.return))
+              _a2.call(handlers_2);
           } finally {
             if (e_2)
               throw e_2.error;
@@ -12073,7 +13025,7 @@
         let interceptors = this.interceptors;
         const _config = mergeConfig(this.defaultConfig, config2);
         interceptors.request.resolve(_config).then((config3 = null) => {
-          var _a, _b, _c;
+          var _a2, _b, _c;
           const _d = config3, baseURL = _d.baseURL, params = _d.params, getTask = _d.getTask, url2 = _d.url;
           const mergedUrl = mergeUrl(baseURL, url2, params);
           let task2 = null;
@@ -12084,7 +13036,7 @@
                 url: mergedUrl,
                 header: config3.header,
                 filePath: config3.filePath,
-                timeout: (_a = config3.timeout) !== null && _a !== void 0 ? _a : 12e4,
+                timeout: (_a2 = config3.timeout) !== null && _a2 !== void 0 ? _a2 : 12e4,
                 // enableHttp2: config.enableHttp2,
                 // enableProfile: config.enableProfile,
                 // enableQuic: config.enableQuic,
@@ -12193,7 +13145,7 @@
                 firstIpv4: config3.firstIpv4,
                 enableChunked: config3.enableChunked,
                 success(result) {
-                  const _a2 = result, data3 = _a2.data, statusCode = _a2.statusCode, header = _a2.header, cookies = _a2.cookies;
+                  const _a3 = result, data3 = _a3.data, statusCode = _a3.statusCode, header = _a3.header, cookies = _a3.cookies;
                   const tempFilePath = "";
                   const apFilePath = "";
                   const filePath = "";
@@ -12306,14 +13258,14 @@
   }
   let lastRedirectTime = 0;
   function toLoginPage(options = null) {
-    var _a, _b;
+    var _a2, _b;
     const now = Date.now();
     if (now - lastRedirectTime < 1e3) {
       return null;
     }
     lastRedirectTime = now;
     const opts = options !== null && options !== void 0 ? options : new UTSJSONObject({});
-    const mode = (_a = opts["mode"]) !== null && _a !== void 0 ? _a : "navigateTo";
+    const mode = (_a2 = opts["mode"]) !== null && _a2 !== void 0 ? _a2 : "navigateTo";
     const queryString = (_b = opts["queryString"]) !== null && _b !== void 0 ? _b : "";
     const LOGIN_PAGE2 = "/src/pages/auth/login";
     const url2 = "".concat(LOGIN_PAGE2).concat(queryString);
@@ -12725,8 +13677,8 @@
   }
   const _sfc_main$2W = /* @__PURE__ */ vue.defineComponent({
     __name: "HttpDemoCard",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const mockList = vue.ref([]);
       const loading2 = vue.ref(false);
@@ -12823,12 +13775,12 @@
       return __returned__;
     }
   });
-  const _style_0$2R = { "bg-__10b981_": { "": { "backgroundImage": "none", "backgroundColor": "#10b981" } }, "bg-__3182ce_": { "": { "backgroundImage": "none", "backgroundColor": "#3182ce" } }, "bg-__f1f5f9_": { "": { "backgroundImage": "none", "backgroundColor": "#f1f5f9" } }, "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "bg-__fff5f5_": { "": { "backgroundImage": "none", "backgroundColor": "#fff5f5" } }, "bg-white": { "": { "backgroundColor": "rgba(255,255,255,var(--un-bg-opacity,1))" } }, "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-color-__fecaca_": { "": { "borderTopColor": "#fecaca", "borderRightColor": "#fecaca", "borderBottomColor": "#fecaca", "borderLeftColor": "#fecaca" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex": { "": { "display": "flex" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-28px": { "": { "height": 28 } }, "h-42px": { "": { "height": 42 } }, "items-center": { "": { "alignItems": "center" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "justify-center": { "": { "justifyContent": "center" } }, "leading-20px": { "": { "lineHeight": "20px" } }, "mb-10px": { "": { "marginBottom": 10 } }, "mb-16px": { "": { "marginBottom": 16 } }, "mb-6px": { "": { "marginBottom": 6 } }, "mr-10px": { "": { "marginRight": 10 } }, "mt-6px": { "": { "marginTop": 6 } }, "mt-8px": { "": { "marginTop": 8 } }, "p-10px": { "": { "paddingTop": 10, "paddingRight": 10, "paddingBottom": 10, "paddingLeft": 10 } }, "p-12px": { "": { "paddingTop": 12, "paddingRight": 12, "paddingBottom": 12, "paddingLeft": 12 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "px-12px": { "": { "paddingLeft": 12, "paddingRight": 12 } }, "py-10px": { "": { "paddingTop": 10, "paddingBottom": 10 } }, "rounded-10px": { "": { "borderTopLeftRadius": 10, "borderTopRightRadius": 10, "borderBottomRightRadius": 10, "borderBottomLeftRadius": 10 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-14px": { "": { "borderTopLeftRadius": 14, "borderTopRightRadius": 14, "borderBottomRightRadius": 14, "borderBottomLeftRadius": 14 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__2d3748_": { "": { "color": "#2d3748" } }, "text-__334155_": { "": { "color": "#334155" } }, "text-__475569_": { "": { "color": "#475569" } }, "text-__64748b_": { "": { "color": "#64748b" } }, "text-__ef4444_": { "": { "color": "#ef4444" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-12px": { "": { "fontSize": 12 } }, "text-13px": { "": { "fontSize": 13 } }, "text-14px": { "": { "fontSize": 14 } }, "text-white": { "": { "color": "rgba(255,255,255,var(--un-color-opacity,1))" } }, "w-28px": { "": { "width": 28 } }, "w-full": { "": { "width": "100%" } } };
+  const _style_0$2R = { "bg-__10b981_": { "": { "backgroundImage": "none", "backgroundColor": "#10b981" } }, "bg-__3182ce_": { "": { "backgroundImage": "none", "backgroundColor": "#3182ce" } }, "bg-__f1f5f9_": { "": { "backgroundImage": "none", "backgroundColor": "#f1f5f9" } }, "bg-__fff5f5_": { "": { "backgroundImage": "none", "backgroundColor": "#fff5f5" } }, "bg-white": { "": { "backgroundColor": "rgba(255,255,255,var(--un-bg-opacity,1))" } }, "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-color-__fecaca_": { "": { "borderTopColor": "#fecaca", "borderRightColor": "#fecaca", "borderBottomColor": "#fecaca", "borderLeftColor": "#fecaca" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex": { "": { "display": "flex" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-28px": { "": { "height": 28 } }, "h-42px": { "": { "height": 42 } }, "items-center": { "": { "alignItems": "center" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "justify-center": { "": { "justifyContent": "center" } }, "leading-20px": { "": { "lineHeight": "20px" } }, "mb-10px": { "": { "marginBottom": 10 } }, "mb-16px": { "": { "marginBottom": 16 } }, "mb-6px": { "": { "marginBottom": 6 } }, "mr-10px": { "": { "marginRight": 10 } }, "mt-6px": { "": { "marginTop": 6 } }, "mt-8px": { "": { "marginTop": 8 } }, "p-10px": { "": { "paddingTop": 10, "paddingRight": 10, "paddingBottom": 10, "paddingLeft": 10 } }, "p-12px": { "": { "paddingTop": 12, "paddingRight": 12, "paddingBottom": 12, "paddingLeft": 12 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "px-12px": { "": { "paddingLeft": 12, "paddingRight": 12 } }, "py-10px": { "": { "paddingTop": 10, "paddingBottom": 10 } }, "rounded-10px": { "": { "borderTopLeftRadius": 10, "borderTopRightRadius": 10, "borderBottomRightRadius": 10, "borderBottomLeftRadius": 10 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-14px": { "": { "borderTopLeftRadius": 14, "borderTopRightRadius": 14, "borderBottomRightRadius": 14, "borderBottomLeftRadius": 14 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__2d3748_": { "": { "color": "#2d3748" } }, "text-__334155_": { "": { "color": "#334155" } }, "text-__475569_": { "": { "color": "#475569" } }, "text-__64748b_": { "": { "color": "#64748b" } }, "text-__ef4444_": { "": { "color": "#ef4444" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-12px": { "": { "fontSize": 12 } }, "text-13px": { "": { "fontSize": 13 } }, "text-14px": { "": { "fontSize": 14 } }, "text-white": { "": { "color": "rgba(255,255,255,var(--un-color-opacity,1))" } }, "w-28px": { "": { "width": 28 } }, "w-full": { "": { "width": "100%" } } };
   function _sfc_render$2V(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createBlock($setup["Card"], { title: "HTTP 请求 Demo" }, {
       default: vue.withCtx(() => [
         vue.createCommentVNode(" 说明区域 "),
-        vue.createElementVNode("view", { class: "bg-__f8fafc_ rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
+        vue.createElementVNode("view", { class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
           vue.createElementVNode("text", { class: "text-12px text-__64748b_ leading-20px" }, " 基于 lime-request 封装的 http 请求演示，包含 Mock 数据与真实接口请求两种模式。 ")
         ]),
         vue.createCommentVNode(" Mock 数据区域 "),
@@ -12865,7 +13817,7 @@
           ))
         ]),
         vue.createCommentVNode(" 请求状态展示 "),
-        vue.createElementVNode("view", { class: "bg-__f8fafc_ rounded-10px p-12px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
+        vue.createElementVNode("view", { class: "rounded-10px p-12px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
           vue.createElementVNode("view", { class: "flex-row justify-between items-center mb-6px" }, [
             vue.createElementVNode("text", { class: "text-13px text-__64748b_" }, "接口请求状态:"),
             vue.createElementVNode(
@@ -12954,7 +13906,7 @@
       this.ctx.evalJS("init(".concat(UTS.JSON.stringify(new UTSJSONObject({ theme, opts })), ")"));
     }
     onWebviewMsg(e) {
-      var e_1, _a;
+      var e_1, _a2;
       uni.__log__("log", "at uni_modules/e-chart/components/e-chart/uts/WebviewEchart.uts:20", "onWebviewMsg", e.detail.data);
       try {
         for (var _b = __values(e.detail.data), _c = _b.next(); !_c.done; _c = _b.next()) {
@@ -12975,8 +13927,8 @@
         e_1 = { error: e_1_1 };
       } finally {
         try {
-          if (_c && !_c.done && (_a = _b.return))
-            _a.call(_b);
+          if (_c && !_c.done && (_a2 = _b.return))
+            _a2.call(_b);
         } finally {
           if (e_1)
             throw e_1.error;
@@ -13108,8 +14060,8 @@
       },
       // 设置配置
       setOption(option) {
-        var _a;
-        (_a = this.echartObj) === null || _a === void 0 ? null : _a.setOption(option);
+        var _a2;
+        (_a2 = this.echartObj) === null || _a2 === void 0 ? null : _a2.setOption(option);
       },
       // 获取配置
       getOption() {
@@ -13135,18 +14087,18 @@
       },
       // 宽高变化需重绘 (使用setTimeout,避免$nextTick在某些机型不触发的问题)
       resize() {
-        var _a;
-        (_a = this.echartObj) === null || _a === void 0 ? null : _a.resize();
+        var _a2;
+        (_a2 = this.echartObj) === null || _a2 === void 0 ? null : _a2.resize();
       },
       // canvas转为文件路径
       canvasToTempFilePath() {
         return new Promise((resolve, reject) => {
-          var _a;
+          var _a2;
           const fail = (e) => {
             uni.showModal(new UTSJSONObject({ title: "保存失败", content: UTS.JSON.stringify(e), showCancel: false }));
             reject(e);
           };
-          (_a = this.echartObj) === null || _a === void 0 ? null : _a.canvasToTempFilePath(new UTSJSONObject({
+          (_a2 = this.echartObj) === null || _a2 === void 0 ? null : _a2.canvasToTempFilePath(new UTSJSONObject({
             success: (e) => {
               const base64 = e["base64"];
               const fileSystemManager = uni.getFileSystemManager();
@@ -13169,18 +14121,18 @@
       },
       // 显示进度条
       showLoading(option) {
-        var _a;
-        (_a = this.echartObj) === null || _a === void 0 ? null : _a.showLoading(option);
+        var _a2;
+        (_a2 = this.echartObj) === null || _a2 === void 0 ? null : _a2.showLoading(option);
       },
       // 隐藏进度条
       hideLoading() {
-        var _a;
-        (_a = this.echartObj) === null || _a === void 0 ? null : _a.hideLoading();
+        var _a2;
+        (_a2 = this.echartObj) === null || _a2 === void 0 ? null : _a2.hideLoading();
       },
       // webview消息
       onWebviewMsg(e) {
-        var _a;
-        (_a = this.echartObj) === null || _a === void 0 ? null : _a.onWebviewMsg(e);
+        var _a2;
+        (_a2 = this.echartObj) === null || _a2 === void 0 ? null : _a2.onWebviewMsg(e);
       },
       // webview加载失败的回调
       onWebviewError(e) {
@@ -13207,8 +14159,8 @@
   const gridKey = "grid";
   const _sfc_main$2U = /* @__PURE__ */ vue.defineComponent({
     __name: "EchartsDemoCard",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const echartRef = vue.ref(null);
       const currentType = vue.ref("line");
@@ -13367,8 +14319,8 @@
         }
       }
       const windowWidth = vue.computed(() => {
-        var _a2, _b;
-        return (_b = (_a2 = systemInfo.value) === null || _a2 === void 0 ? null : _a2.windowWidth) !== null && _b !== void 0 ? _b : 0;
+        var _a3, _b;
+        return (_b = (_a3 = systemInfo.value) === null || _a3 === void 0 ? null : _a3.windowWidth) !== null && _b !== void 0 ? _b : 0;
       });
       vue.watch(windowWidth, () => {
         setTimeout(() => {
@@ -13388,7 +14340,9 @@
   const _style_0$2Q = { "bg-__10b981_": { "": { "backgroundImage": "none", "backgroundColor": "#10b981" } }, "bg-__3b82f6_": { "": { "backgroundImage": "none", "backgroundColor": "#3b82f6" } }, "bg-__d1fae5_": { "": { "backgroundImage": "none", "backgroundColor": "#d1fae5" } }, "bg-__e0edff_": { "": { "backgroundImage": "none", "backgroundColor": "#e0edff" } }, "bg-__f59e0b_": { "": { "backgroundImage": "none", "backgroundColor": "#f59e0b" } }, "bg-__fef3c7_": { "": { "backgroundImage": "none", "backgroundColor": "#fef3c7" } }, "flex": { "": { "display": "flex" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-260px": { "": { "height": 260 } }, "h-36px": { "": { "height": 36 } }, "i_h-full": { "": { "!height": "100%" } }, "items-center": { "": { "alignItems": "center" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "justify-center": { "": { "justifyContent": "center" } }, "mr-8px": { "": { "marginRight": 8 } }, "mt-10px": { "": { "marginTop": 10 } }, "mt-15px": { "": { "marginTop": 15 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__10b981_": { "": { "color": "#10b981" } }, "text-__3b82f6_": { "": { "color": "#3b82f6" } }, "text-__f59e0b_": { "": { "color": "#f59e0b" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-12px": { "": { "fontSize": 12 } }, "w-full": { "": { "width": "100%" } } };
   function _sfc_render$2T(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_e_chart = resolveEasycom(vue.resolveDynamicComponent("e-chart"), __easycom_0$7);
-    return vue.openBlock(), vue.createBlock($setup["Card"], { title: "ECharts 图表示例" }, {
+    return vue.openBlock(), vue.createBlock($setup["Card"], {
+      title: _ctx.$t("basic.echartTitle")
+    }, {
       default: vue.withCtx(() => [
         vue.createElementVNode("view", { class: "w-full h-260px mt-10px" }, [
           vue.createVNode(
@@ -13417,9 +14371,9 @@
                   {
                     class: vue.normalizeClass(["text-12px font-bold", $setup.currentType !== "line" ? "text-__3b82f6_" : "text-__ffffff_"])
                   },
-                  "折线图",
-                  2
-                  /* CLASS */
+                  vue.toDisplayString(_ctx.$t("basic.echartLine")),
+                  3
+                  /* TEXT, CLASS */
                 )
               ],
               2
@@ -13439,9 +14393,9 @@
                   {
                     class: vue.normalizeClass(["text-12px font-bold", $setup.currentType !== "bar" ? "text-__10b981_" : "text-__ffffff_"])
                   },
-                  "柱状图",
-                  2
-                  /* CLASS */
+                  vue.toDisplayString(_ctx.$t("basic.echartBar")),
+                  3
+                  /* TEXT, CLASS */
                 )
               ],
               2
@@ -13461,9 +14415,9 @@
                   {
                     class: vue.normalizeClass(["text-12px font-bold", $setup.currentType !== "pie" ? "text-__f59e0b_" : "text-__ffffff_"])
                   },
-                  "饼图",
-                  2
-                  /* CLASS */
+                  vue.toDisplayString(_ctx.$t("basic.echartPie")),
+                  3
+                  /* TEXT, CLASS */
                 )
               ],
               2
@@ -13474,37 +14428,37 @@
       ]),
       _: 1
       /* STABLE */
-    });
+    }, 8, ["title"]);
   }
   const EchartsDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main$2U, [["render", _sfc_render$2T], ["styles", [_style_0$2Q]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/basic/components/EchartsDemoCard.uvue"]]);
   const _sfc_main$2T = /* @__PURE__ */ vue.defineComponent({
     __name: "SystemInfoDemoCard",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const screenWidth = vue.computed(() => {
-        var _a2, _b;
-        return (_b = (_a2 = systemInfo.value) === null || _a2 === void 0 ? null : _a2.screenWidth) !== null && _b !== void 0 ? _b : 0;
+        var _a3, _b;
+        return (_b = (_a3 = systemInfo.value) === null || _a3 === void 0 ? null : _a3.screenWidth) !== null && _b !== void 0 ? _b : 0;
       });
       const screenHeight = vue.computed(() => {
-        var _a2, _b;
-        return (_b = (_a2 = systemInfo.value) === null || _a2 === void 0 ? null : _a2.screenHeight) !== null && _b !== void 0 ? _b : 0;
+        var _a3, _b;
+        return (_b = (_a3 = systemInfo.value) === null || _a3 === void 0 ? null : _a3.screenHeight) !== null && _b !== void 0 ? _b : 0;
       });
       const windowWidth = vue.computed(() => {
-        var _a2, _b;
-        return (_b = (_a2 = systemInfo.value) === null || _a2 === void 0 ? null : _a2.windowWidth) !== null && _b !== void 0 ? _b : 0;
+        var _a3, _b;
+        return (_b = (_a3 = systemInfo.value) === null || _a3 === void 0 ? null : _a3.windowWidth) !== null && _b !== void 0 ? _b : 0;
       });
       const windowHeight = vue.computed(() => {
-        var _a2, _b;
-        return (_b = (_a2 = systemInfo.value) === null || _a2 === void 0 ? null : _a2.windowHeight) !== null && _b !== void 0 ? _b : 0;
+        var _a3, _b;
+        return (_b = (_a3 = systemInfo.value) === null || _a3 === void 0 ? null : _a3.windowHeight) !== null && _b !== void 0 ? _b : 0;
       });
       const statusBarHeight = vue.computed(() => {
-        var _a2, _b;
-        return (_b = (_a2 = systemInfo.value) === null || _a2 === void 0 ? null : _a2.statusBarHeight) !== null && _b !== void 0 ? _b : 0;
+        var _a3, _b;
+        return (_b = (_a3 = systemInfo.value) === null || _a3 === void 0 ? null : _a3.statusBarHeight) !== null && _b !== void 0 ? _b : 0;
       });
       const pixelRatio = vue.computed(() => {
-        var _a2, _b;
-        return (_b = (_a2 = systemInfo.value) === null || _a2 === void 0 ? null : _a2.pixelRatio) !== null && _b !== void 0 ? _b : 1;
+        var _a3, _b;
+        return (_b = (_a3 = systemInfo.value) === null || _a3 === void 0 ? null : _a3.pixelRatio) !== null && _b !== void 0 ? _b : 1;
       });
       const safeAreaTop = vue.computed(() => {
         return safeAreaInsets.value != null ? "".concat(safeAreaInsets.value.top, "px") : "N/A";
@@ -13525,12 +14479,12 @@
       return __returned__;
     }
   });
-  const _style_0$2P = { "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "justify-between": { "": { "justifyContent": "space-between" } }, "mb-12px": { "": { "marginBottom": 12 } }, "mb-16px": { "": { "marginBottom": 16 } }, "mb-8px": { "": { "marginBottom": 8 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__334155_": { "": { "color": "#334155" } }, "text-__64748b_": { "": { "color": "#64748b" } }, "text-13px": { "": { "fontSize": 13 } }, "text-14px": { "": { "fontSize": 14 } } };
+  const _style_0$2P = { "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "justify-between": { "": { "justifyContent": "space-between" } }, "mb-12px": { "": { "marginBottom": 12 } }, "mb-16px": { "": { "marginBottom": 16 } }, "mb-8px": { "": { "marginBottom": 8 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__334155_": { "": { "color": "#334155" } }, "text-__64748b_": { "": { "color": "#64748b" } }, "text-13px": { "": { "fontSize": 13 } }, "text-14px": { "": { "fontSize": 14 } } };
   function _sfc_render$2S(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createBlock($setup["Card"], { title: "系统与安全区域信息" }, {
       default: vue.withCtx(() => [
         vue.createCommentVNode(" 预览区域：安全区域 Insets "),
-        vue.createElementVNode("view", { class: "bg-__f8fafc_ rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
+        vue.createElementVNode("view", { class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
           vue.createElementVNode("text", { class: "text-13px font-bold text-__1e293b_ mb-12px" }, "安全区域内边距 (SafeAreaInsets)"),
           vue.createElementVNode("view", { class: "flex-row justify-between mb-8px" }, [
             vue.createElementVNode("text", { class: "text-14px text-__64748b_" }, "Top (顶部距离)"),
@@ -13574,7 +14528,7 @@
           ])
         ]),
         vue.createCommentVNode(" 预览区域：系统窗口信息 "),
-        vue.createElementVNode("view", { class: "bg-__f8fafc_ rounded-12px p-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
+        vue.createElementVNode("view", { class: "rounded-12px p-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
           vue.createElementVNode("text", { class: "text-13px font-bold text-__1e293b_ mb-12px" }, "设备窗口规格 (WindowInfo)"),
           vue.createElementVNode("view", { class: "flex-row justify-between mb-8px" }, [
             vue.createElementVNode("text", { class: "text-14px text-__64748b_" }, "屏幕宽度"),
@@ -13651,8 +14605,8 @@
   const base64BackToTop = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADIBAMAAABfdrOtAAAAElBMVEVRUVH+/v5HcEyZmZlRUVFRUVGm1ByOAAAABnRSTlPMzADMTZAJBBGsAAAEnElEQVR42t2cS27jMAyGf7/2U+QCQeDsbeQCgZDujaC5/1UmkzaJn+JDFGcw3LdfflKibJkkDnxrL7dbg7sNt6+L4O8OYBM+B0ys+QrGkHZG+OEEQ8g6go8Bx1GIGMdpNOQyIG6XdMgnSPtKhLQDGEZFBgYMkhKFtGBb0EIEjDgFRowoBVaMGAWpMedEfxMiZtwpUsgZCqtlkCNUdpVAWigtCCCDFtLwIWeoreZCWiRYYEKGFEjDg+yRZCUH0iLRAgNyToXUNCRZyMqWhGnUN2IPm3wSlwJ7IUspyCBkIQUZhCykIIeQuRTkEDKXAuM9srrtYbrZN7Y98giZSoFd+t1OxmMITG0dcrSFXFchZ1tIvQZpYWxhBbK3hpQrkMEa0iwh5t4a+QvZvDXyF7J5a+Qv5PPW21/I5623v5DPW29/IaO3Xv5Clrw1y1/Ikrdm+Qs5svw83yNnSJ5BQb4F/F7EIEJSnThGBAXxkFQfLOviQUE8JAUPsosHBfGQfDAtHhREQ1JxIV00KIgmrnRI84S0yAd5BAXxxJUck0f6Qnwr9qmr6xF5xLMjcwn/iudIEAdWnyjkEXlQKZiRVzoqRyLbgeUKKR8Q4alY7cSnoxzSf2ggsqehKr6YVpcXpOd7H93f60cKhOd7Re2LteUF4eLqiVS1mr0ge4io6C2+soaFkJ7MuuuQs1yITEp9hwwKISIpzR2iESKSIoT0rLNwuVHQqoSIpAQJpGce60vIUSdEIuUqgPTsJ5QFZK8UIpBS8iG94GFrDjlrhfCl8CG96Llxmle4kEr6vKWBPIVo9kqDQSRk9/3cWoikcCFPAd33v4dIChPyEvLzBA6RlEYWke4JEUnhKXkLeUEKxRHJFfKCQHGucIW8IdZSRkLeEGMpYyEjiK2UsZARxFTKRMgYYillImQMMZQyFTKB2EmZCplAuFLIHT8TMoWwpQwiIVMIUwqpZP5bp5CCvCTiQKr5f5lCQN+tPCBn2ZvVDFJwIDUP0m1BYAfZYRNSsCB7BqTbhoARePIxtZ9tgwWkoJcwCalmv3MBAemtO4R6dah2HaKQqj8Zvp9sQDjvJ21+SPCBHPJDDk6QITekEV7gqCC19CpKAym9IMfckKv4olMBCeIrWwVEfvkshzQekO9r9P1/ALk+IG1eSPCDiCJfyG+FyU+A6ZCa/piZDinpz7LpkCv5gdkAEshP5emQhv7onw6pGeULyZCSUYiRDAmMkpJkCKs4JhFSq8p8hJBSVbAkhARV6ZUQoisik0FqXTmcDHLVFfbJIEFXoiiCNMpiSxGkVJaNiiBBWQArgTTaUl4JpNQWJUsgQVteXQg+AKkLxQWFGKW+5J2+eVp4S168X3CF1CltCKdTJ8lb84YK2bUBO+wZW0Pqv9nk4tKu49N45NJC5dMM5tLW5tOg59Jq6NM06dL+abFXwr/RkuvTXJwae1abtE/Dt0/ruksTvs84AZ/BCC4jHnyGVfiM3VBQFANEXEah+Ax18RlP4zNox2dkkM/wI58xTn8yDCXGYCDV3W5RGSajtXyGhG1jbpbjzpwGt/0MJft8jqC7iUbQ/QZaxdnKqcIftwAAAABJRU5ErkJggg==";
   const _sfc_main$2S = /* @__PURE__ */ vue.defineComponent({
     __name: "z-paging-loading",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const times2 = vue.ref(0);
       const element = vue.ref(null);
@@ -13899,8 +14853,8 @@
     yesterday: "昨天"
   });
   function updateRefesrherTime(key2) {
-    var _a;
-    const datas = (_a = _getRefesrherTime()) !== null && _a !== void 0 ? _a : new UTSJSONObject({});
+    var _a2;
+    const datas = (_a2 = _getRefesrherTime()) !== null && _a2 !== void 0 ? _a2 : new UTSJSONObject({});
     datas[key2] = getTime();
     uni.setStorageSync(refresherTimeStorageKey, datas);
   }
@@ -14005,8 +14959,8 @@
       type: Number,
       default: 0
     }
-  }, setup(__props, _a) {
-    var __expose = _a.expose;
+  }, setup(__props, _a2) {
+    var __expose = _a2.expose;
     __expose();
     const props2 = __props;
     const base64ArrowImg = vue.ref(base64Arrow);
@@ -14146,8 +15100,8 @@
       type: String,
       default: "加载失败，点击重新加载"
     }
-  }, emits: ["clickMore"], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
+  }, emits: ["clickMore"], setup(__props, _a2) {
+    var __expose = _a2.expose, __emit = _a2.emit;
     __expose();
     const props2 = __props;
     const emit = __emit;
@@ -14254,8 +15208,8 @@
     emptyReloadStyle: {
       type: Object
     }
-  }, emits: ["reload", "viewClick"], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
+  }, emits: ["reload", "viewClick"], setup(__props, _a2) {
+    var __expose = _a2.expose, __emit = _a2.emit;
     __expose();
     const props2 = __props;
     const emit = __emit;
@@ -14659,8 +15613,8 @@
       }
     },
     emits: ["update:modelValue", "refresherStatusChange", "loadMoreStatusChange", "query", "nestedprescroll", "refresherpulling", "refresherrefresh", "refresherrestore", "refresherabort", "onRefresh", "Refresh", "scrolltolower", "scrolltoupper", "scroll", "backToTopClick"],
-    setup(__props, _a) {
-      var __expose = _a.expose, __emit = _a.emit;
+    setup(__props, _a2) {
+      var __expose = _a2.expose, __emit = _a2.emit;
       const props2 = __props;
       const emit = __emit;
       const slots = vue.useSlots();
@@ -15310,8 +16264,8 @@
   }
   const _sfc_main$2N = /* @__PURE__ */ vue.defineComponent({
     __name: "ZPagingDemoCard",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const shouldFail = vue.ref(false);
       const tabList = ["全部", "技术", "设计"];
@@ -15530,8 +16484,8 @@
   const ZPagingDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main$2N, [["render", _sfc_render$2M], ["styles", [_style_0$2J]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/basic/components/ZPagingDemoCard.uvue"]]);
   const _sfc_main$2M = /* @__PURE__ */ vue.defineComponent({
     __name: "UViewUltraDemoCard",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       let isNavigating = false;
       function copyWebsiteUrl() {
@@ -15613,8 +16567,8 @@
   const UViewUltraDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main$2M, [["render", _sfc_render$2L], ["styles", [_style_0$2I]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/basic/components/UViewUltraDemoCard.uvue"]]);
   const _sfc_main$2L = /* @__PURE__ */ vue.defineComponent({
     __name: "basic",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       vue.onBackPress((options) => {
         if (options.from == "backbutton") {
@@ -15654,7 +16608,7 @@
       return __returned__;
     }
   });
-  const _style_0$2H = { "bg-__f7fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f7fafc" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } } };
+  const _style_0$2H = { "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } } };
   function _sfc_render$2K(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createBlock($setup["AppKu"], null, {
       default: vue.withCtx(() => [
@@ -15662,7 +16616,7 @@
           default: vue.withCtx(() => [
             vue.createElementVNode("scroll-view", {
               direction: "vertical",
-              class: "flex-1 bg-__f7fafc_"
+              class: "flex-1"
             }, [
               vue.createCommentVNode(" uview-ultra 组件库示例 "),
               vue.createVNode($setup["UViewUltraDemoCard"]),
@@ -15697,18 +16651,18 @@
   const SrcPagesBasicBasic = /* @__PURE__ */ _export_sfc(_sfc_main$2L, [["render", _sfc_render$2K], ["styles", [_style_0$2H]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/basic/basic.uvue"]]);
   const _sfc_main$2K = /* @__PURE__ */ vue.defineComponent({
     __name: "SystemInfoCard",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const sysBrand = vue.ref("");
       const sysModel = vue.ref("");
       const sysSystem = vue.ref("");
       const sysPlatform = vue.ref("");
       function fetchSystemInfo() {
-        var _a2, _b, _c, _d;
+        var _a3, _b, _c, _d;
         try {
           const info = uni.getSystemInfoSync();
-          sysBrand.value = (_a2 = info.brand) !== null && _a2 !== void 0 ? _a2 : "";
+          sysBrand.value = (_a3 = info.brand) !== null && _a3 !== void 0 ? _a3 : "";
           sysModel.value = (_b = info.model) !== null && _b !== void 0 ? _b : "";
           sysSystem.value = (_c = info.system) !== null && _c !== void 0 ? _c : "";
           sysPlatform.value = (_d = info.uniPlatform) !== null && _d !== void 0 ? _d : "";
@@ -15726,11 +16680,11 @@
       return __returned__;
     }
   });
-  const _style_0$2G = { "bg-__3b82f6_": { "": { "backgroundImage": "none", "backgroundColor": "#3b82f6" } }, "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex": { "": { "display": "flex" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-44px": { "": { "height": 44 } }, "items-center": { "": { "alignItems": "center" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-10px": { "": { "marginBottom": 10 } }, "mb-16px": { "": { "marginBottom": 16 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__2d3748_": { "": { "color": "#2d3748" } }, "text-__718096_": { "": { "color": "#718096" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-14px": { "": { "fontSize": 14 } }, "w-full": { "": { "width": "100%" } } };
+  const _style_0$2G = { "bg-__3b82f6_": { "": { "backgroundImage": "none", "backgroundColor": "#3b82f6" } }, "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex": { "": { "display": "flex" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-44px": { "": { "height": 44 } }, "items-center": { "": { "alignItems": "center" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-10px": { "": { "marginBottom": 10 } }, "mb-16px": { "": { "marginBottom": 16 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__2d3748_": { "": { "color": "#2d3748" } }, "text-__718096_": { "": { "color": "#718096" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-14px": { "": { "fontSize": 14 } }, "w-full": { "": { "width": "100%" } } };
   function _sfc_render$2J(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createBlock($setup["Card"], { title: "设备系统信息" }, {
       default: vue.withCtx(() => [
-        vue.createElementVNode("view", { class: "bg-__f8fafc_ rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
+        vue.createElementVNode("view", { class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
           vue.createElementVNode("view", { class: "flex-row justify-between mb-10px" }, [
             vue.createElementVNode("text", { class: "text-14px text-__718096_" }, "手机品牌"),
             vue.createElementVNode(
@@ -15786,8 +16740,8 @@
   const SystemInfoCard = /* @__PURE__ */ _export_sfc(_sfc_main$2K, [["render", _sfc_render$2J], ["styles", [_style_0$2G]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/function/components/SystemInfoCard.uvue"]]);
   const _sfc_main$2J = /* @__PURE__ */ vue.defineComponent({
     __name: "HapticsCard",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const copyText = vue.ref("Hello unibestX!");
       function vibrationIOS() {
@@ -15816,11 +16770,11 @@
       return __returned__;
     }
   });
-  const _style_0$2F = { "bg-__10b981_": { "": { "backgroundImage": "none", "backgroundColor": "#10b981" } }, "bg-__f59e0b_": { "": { "backgroundImage": "none", "backgroundColor": "#f59e0b" } }, "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "bg-white": { "": { "backgroundColor": "rgba(255,255,255,var(--un-bg-opacity,1))" } }, "border-color-__cbd5e1_": { "": { "borderTopColor": "#cbd5e1", "borderRightColor": "#cbd5e1", "borderBottomColor": "#cbd5e1", "borderLeftColor": "#cbd5e1" } }, "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex": { "": { "display": "flex" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-38px": { "": { "height": 38 } }, "h-44px": { "": { "height": 44 } }, "items-center": { "": { "alignItems": "center" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-12px": { "": { "marginBottom": 12 } }, "mb-16px": { "": { "marginBottom": 16 } }, "mb-8px": { "": { "marginBottom": 8 } }, "none": { "": { "display": "none" } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "px-12px": { "": { "paddingLeft": 12, "paddingRight": 12 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-6px": { "": { "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__334155_": { "": { "color": "#334155" } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-12px": { "": { "fontSize": 12 } }, "text-14px": { "": { "fontSize": 14 } }, "w-full": { "": { "width": "100%" } } };
+  const _style_0$2F = { "bg-__10b981_": { "": { "backgroundImage": "none", "backgroundColor": "#10b981" } }, "bg-__f59e0b_": { "": { "backgroundImage": "none", "backgroundColor": "#f59e0b" } }, "bg-white": { "": { "backgroundColor": "rgba(255,255,255,var(--un-bg-opacity,1))" } }, "border-color-__cbd5e1_": { "": { "borderTopColor": "#cbd5e1", "borderRightColor": "#cbd5e1", "borderBottomColor": "#cbd5e1", "borderLeftColor": "#cbd5e1" } }, "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex": { "": { "display": "flex" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-38px": { "": { "height": 38 } }, "h-44px": { "": { "height": 44 } }, "items-center": { "": { "alignItems": "center" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-12px": { "": { "marginBottom": 12 } }, "mb-16px": { "": { "marginBottom": 16 } }, "mb-8px": { "": { "marginBottom": 8 } }, "none": { "": { "display": "none" } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "px-12px": { "": { "paddingLeft": 12, "paddingRight": 12 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-6px": { "": { "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__334155_": { "": { "color": "#334155" } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-12px": { "": { "fontSize": 12 } }, "text-14px": { "": { "fontSize": 14 } }, "w-full": { "": { "width": "100%" } } };
   function _sfc_render$2I(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createBlock($setup["Card"], { title: "触感与工具" }, {
       default: vue.withCtx(() => [
-        vue.createElementVNode("view", { class: "bg-__f8fafc_ rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
+        vue.createElementVNode("view", { class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
           vue.createElementVNode("text", { class: "text-12px text-__94a3b8_ mb-8px" }, "剪贴板测试文本"),
           vue.withDirectives(vue.createElementVNode(
             "input",
@@ -15856,8 +16810,8 @@
   const HapticsCard = /* @__PURE__ */ _export_sfc(_sfc_main$2J, [["render", _sfc_render$2I], ["styles", [_style_0$2F]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/function/components/HapticsCard.uvue"]]);
   const _sfc_main$2I = /* @__PURE__ */ vue.defineComponent({
     __name: "MediaCard",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const photoUrl = vue.ref("");
       const scanResult = vue.ref("");
@@ -15892,11 +16846,11 @@
       return __returned__;
     }
   });
-  const _style_0$2E = { "bg-__10b981_": { "": { "backgroundImage": "none", "backgroundColor": "#10b981" } }, "bg-__3b82f6_": { "": { "backgroundImage": "none", "backgroundColor": "#3b82f6" } }, "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex": { "": { "display": "flex" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-150px": { "": { "height": 150 } }, "h-44px": { "": { "height": 44 } }, "items-center": { "": { "alignItems": "center" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-12px": { "": { "marginBottom": 12 } }, "mb-16px": { "": { "marginBottom": 16 } }, "mb-8px": { "": { "marginBottom": 8 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__334155_": { "": { "color": "#334155" } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-12px": { "": { "fontSize": 12 } }, "text-14px": { "": { "fontSize": 14 } }, "w-150px": { "": { "width": 150 } }, "w-full": { "": { "width": "100%" } } };
+  const _style_0$2E = { "bg-__10b981_": { "": { "backgroundImage": "none", "backgroundColor": "#10b981" } }, "bg-__3b82f6_": { "": { "backgroundImage": "none", "backgroundColor": "#3b82f6" } }, "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex": { "": { "display": "flex" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-150px": { "": { "height": 150 } }, "h-44px": { "": { "height": 44 } }, "items-center": { "": { "alignItems": "center" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-12px": { "": { "marginBottom": 12 } }, "mb-16px": { "": { "marginBottom": 16 } }, "mb-8px": { "": { "marginBottom": 8 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__334155_": { "": { "color": "#334155" } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-12px": { "": { "fontSize": 12 } }, "text-14px": { "": { "fontSize": 14 } }, "w-150px": { "": { "width": 150 } }, "w-full": { "": { "width": "100%" } } };
   function _sfc_render$2H(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createBlock($setup["Card"], { title: "相机与多媒体" }, {
       default: vue.withCtx(() => [
-        vue.createElementVNode("view", { class: "bg-__f8fafc_ rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_ items-center justify-center" }, [
+        vue.createElementVNode("view", { class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_ items-center justify-center" }, [
           $setup.photoUrl === "" ? (vue.openBlock(), vue.createElementBlock("text", {
             key: 0,
             class: "text-14px text-__94a3b8_"
@@ -15914,7 +16868,7 @@
           vue.createElementVNode("text", { class: "text-__ffffff_ text-14px font-bold" }, "拍摄/选择照片")
         ]),
         vue.createCommentVNode(" 扫码测试 "),
-        vue.createElementVNode("view", { class: "bg-__f8fafc_ rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
+        vue.createElementVNode("view", { class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
           vue.createElementVNode("text", { class: "text-12px text-__94a3b8_ mb-8px" }, "扫码结果"),
           vue.createElementVNode(
             "text",
@@ -15938,8 +16892,8 @@
   const MediaCard = /* @__PURE__ */ _export_sfc(_sfc_main$2I, [["render", _sfc_render$2H], ["styles", [_style_0$2E]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/function/components/MediaCard.uvue"]]);
   const _sfc_main$2H = /* @__PURE__ */ vue.defineComponent({
     __name: "function",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       vue.onBackPress((options) => {
         if (options.from == "backbutton") {
@@ -15962,13 +16916,13 @@
       return __returned__;
     }
   });
-  const _style_0$2D = { "bg-__f7fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f7fafc" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "font-bold": { "": { "fontWeight": 700 } }, "mt-4px": { "": { "marginTop": 4 } }, "pb-10px": { "": { "paddingBottom": 10 } }, "pt-20px": { "": { "paddingTop": 20 } }, "px-16px": { "": { "paddingLeft": 16, "paddingRight": 16 } }, "text-__1a202c_": { "": { "color": "#1a202c" } }, "text-__718096_": { "": { "color": "#718096" } }, "text-13px": { "": { "fontSize": 13 } }, "text-20px": { "": { "fontSize": 20 } } };
+  const _style_0$2D = { "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "font-bold": { "": { "fontWeight": 700 } }, "mt-4px": { "": { "marginTop": 4 } }, "pb-10px": { "": { "paddingBottom": 10 } }, "pt-20px": { "": { "paddingTop": 20 } }, "px-16px": { "": { "paddingLeft": 16, "paddingRight": 16 } }, "text-__1a202c_": { "": { "color": "#1a202c" } }, "text-__718096_": { "": { "color": "#718096" } }, "text-13px": { "": { "fontSize": 13 } }, "text-20px": { "": { "fontSize": 20 } } };
   function _sfc_render$2G(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createBlock($setup["AppKu"], null, {
       default: vue.withCtx(() => [
         vue.createVNode($setup["LayoutComponent"], { "navigation-bar-title-text": "功能" }, {
           default: vue.withCtx(() => [
-            vue.createElementVNode("scroll-view", { class: "flex-1 bg-__f7fafc_" }, [
+            vue.createElementVNode("scroll-view", { class: "flex-1" }, [
               vue.createCommentVNode(" 标题头 "),
               vue.createElementVNode("view", { class: "pt-20px px-16px pb-10px" }, [
                 vue.createElementVNode("text", { class: "text-20px font-bold text-__1a202c_" }, "设备系统信息"),
@@ -16018,8 +16972,8 @@
   }
   const _sfc_main$2G = /* @__PURE__ */ vue.defineComponent({
     __name: "ai",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const messages = vue.ref([]);
       const inputText = vue.ref("");
@@ -16100,7 +17054,7 @@
       return __returned__;
     }
   });
-  const _style_0$2C = { "bg-__10b981_": { "": { "backgroundImage": "none", "backgroundColor": "#10b981" } }, "bg-__2563eb_": { "": { "backgroundImage": "none", "backgroundColor": "#2563eb" } }, "bg-__e2e8f0_": { "": { "backgroundImage": "none", "backgroundColor": "#e2e8f0" } }, "bg-__f1f5f9_": { "": { "backgroundImage": "none", "backgroundColor": "#f1f5f9" } }, "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "bg-white": { "": { "backgroundColor": "rgba(255,255,255,var(--un-bg-opacity,1))" } }, "border": { "": { "borderTopWidth": "var(--un-line-width-default,1px)", "borderRightWidth": "var(--un-line-width-default,1px)", "borderBottomWidth": "var(--un-line-width-default,1px)", "borderLeftWidth": "var(--un-line-width-default,1px)" } }, "border-__e2e8f0_": { "": { "borderTopWidth": "medium", "borderRightWidth": "medium", "borderBottomWidth": "medium", "borderLeftWidth": "medium", "borderTopStyle": "none", "borderRightStyle": "none", "borderBottomStyle": "none", "borderLeftStyle": "none", "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-t": { "": { "borderTopWidth": "var(--un-line-width-default,1px)" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-col": { "": { "flexDirection": "column" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-32px": { "": { "height": 32 } }, "h-36px": { "": { "height": 36 } }, "items-center": { "": { "alignItems": "center" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-15px": { "": { "marginBottom": 15 } }, "ml-10px": { "": { "marginLeft": 10 } }, "ml-4px": { "": { "marginLeft": 4 } }, "ml-8px": { "": { "marginLeft": 8 } }, "mr-10px": { "": { "marginRight": 10 } }, "mr-4px": { "": { "marginRight": 4 } }, "mt-4px": { "": { "marginTop": 4 } }, "p-10px": { "": { "paddingTop": 10, "paddingRight": 10, "paddingBottom": 10, "paddingLeft": 10 } }, "p-12px": { "": { "paddingTop": 12, "paddingRight": 12, "paddingBottom": 12, "paddingLeft": 12 } }, "px-12px": { "": { "paddingLeft": 12, "paddingRight": 12 } }, "px-15px": { "": { "paddingLeft": 15, "paddingRight": 15 } }, "py-10px": { "": { "paddingTop": 10, "paddingBottom": 10 } }, "py-6px": { "": { "paddingTop": 6, "paddingBottom": 6 } }, "rounded-16px": { "": { "borderTopLeftRadius": 16, "borderTopRightRadius": 16, "borderBottomRightRadius": 16, "borderBottomLeftRadius": 16 } }, "rounded-18px": { "": { "borderTopLeftRadius": 18, "borderTopRightRadius": 18, "borderBottomRightRadius": 18, "borderBottomLeftRadius": 18 } }, "rounded-24px": { "": { "borderTopLeftRadius": 24, "borderTopRightRadius": 24, "borderBottomRightRadius": 24, "borderBottomLeftRadius": 24 } }, "rounded-bl-16px": { "": { "borderBottomLeftRadius": 16 } }, "rounded-br-16px": { "": { "borderBottomRightRadius": 16 } }, "rounded-l-16px": { "": { "borderTopLeftRadius": 16, "borderBottomLeftRadius": 16 } }, "rounded-r-16px": { "": { "borderTopRightRadius": 16, "borderBottomRightRadius": 16 } }, "shadow-sm": { "": { "boxShadow": "var(--un-inset-shadow,0 0 #0000),var(--un-inset-ring-shadow,0 0 #0000),var(--un-ring-offset-shadow,0 0 #0000),var(--un-ring-shadow,0 0 #0000),var(--un-shadow,0 1rpx 3rpx 0 var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))))", "--un-shadow": "0 1rpx 3rpx 0rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1)))" } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__64748b_": { "": { "color": "#64748b" } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-10px": { "": { "fontSize": 10 } }, "text-12px": { "": { "fontSize": 12 } }, "text-14px": { "": { "fontSize": 14 } }, "text-white": { "": { "color": "rgba(255,255,255,var(--un-color-opacity,1))" } }, "w-32px": { "": { "width": 32 } }, "w-36px": { "": { "width": 36 } } };
+  const _style_0$2C = { "bg-__10b981_": { "": { "backgroundImage": "none", "backgroundColor": "#10b981" } }, "bg-__2563eb_": { "": { "backgroundImage": "none", "backgroundColor": "#2563eb" } }, "bg-__e2e8f0_": { "": { "backgroundImage": "none", "backgroundColor": "#e2e8f0" } }, "bg-__f1f5f9_": { "": { "backgroundImage": "none", "backgroundColor": "#f1f5f9" } }, "bg-white": { "": { "backgroundColor": "rgba(255,255,255,var(--un-bg-opacity,1))" } }, "border": { "": { "borderTopWidth": "var(--un-line-width-default,1px)", "borderRightWidth": "var(--un-line-width-default,1px)", "borderBottomWidth": "var(--un-line-width-default,1px)", "borderLeftWidth": "var(--un-line-width-default,1px)" } }, "border-__e2e8f0_": { "": { "borderTopWidth": "medium", "borderRightWidth": "medium", "borderBottomWidth": "medium", "borderLeftWidth": "medium", "borderTopStyle": "none", "borderRightStyle": "none", "borderBottomStyle": "none", "borderLeftStyle": "none", "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-t": { "": { "borderTopWidth": "var(--un-line-width-default,1px)" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-col": { "": { "flexDirection": "column" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-32px": { "": { "height": 32 } }, "h-36px": { "": { "height": 36 } }, "items-center": { "": { "alignItems": "center" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-15px": { "": { "marginBottom": 15 } }, "ml-10px": { "": { "marginLeft": 10 } }, "ml-4px": { "": { "marginLeft": 4 } }, "ml-8px": { "": { "marginLeft": 8 } }, "mr-10px": { "": { "marginRight": 10 } }, "mr-4px": { "": { "marginRight": 4 } }, "mt-4px": { "": { "marginTop": 4 } }, "p-10px": { "": { "paddingTop": 10, "paddingRight": 10, "paddingBottom": 10, "paddingLeft": 10 } }, "p-12px": { "": { "paddingTop": 12, "paddingRight": 12, "paddingBottom": 12, "paddingLeft": 12 } }, "px-12px": { "": { "paddingLeft": 12, "paddingRight": 12 } }, "px-15px": { "": { "paddingLeft": 15, "paddingRight": 15 } }, "py-10px": { "": { "paddingTop": 10, "paddingBottom": 10 } }, "py-6px": { "": { "paddingTop": 6, "paddingBottom": 6 } }, "rounded-16px": { "": { "borderTopLeftRadius": 16, "borderTopRightRadius": 16, "borderBottomRightRadius": 16, "borderBottomLeftRadius": 16 } }, "rounded-18px": { "": { "borderTopLeftRadius": 18, "borderTopRightRadius": 18, "borderBottomRightRadius": 18, "borderBottomLeftRadius": 18 } }, "rounded-24px": { "": { "borderTopLeftRadius": 24, "borderTopRightRadius": 24, "borderBottomRightRadius": 24, "borderBottomLeftRadius": 24 } }, "rounded-bl-16px": { "": { "borderBottomLeftRadius": 16 } }, "rounded-br-16px": { "": { "borderBottomRightRadius": 16 } }, "rounded-l-16px": { "": { "borderTopLeftRadius": 16, "borderBottomLeftRadius": 16 } }, "rounded-r-16px": { "": { "borderTopRightRadius": 16, "borderBottomRightRadius": 16 } }, "shadow-sm": { "": { "boxShadow": "var(--un-inset-shadow,0 0 #0000),var(--un-inset-ring-shadow,0 0 #0000),var(--un-ring-offset-shadow,0 0 #0000),var(--un-ring-shadow,0 0 #0000),var(--un-shadow,0 1rpx 3rpx 0 var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))))", "--un-shadow": "0 1rpx 3rpx 0rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1)))" } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__64748b_": { "": { "color": "#64748b" } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-10px": { "": { "fontSize": 10 } }, "text-12px": { "": { "fontSize": 12 } }, "text-14px": { "": { "fontSize": 14 } }, "text-white": { "": { "color": "rgba(255,255,255,var(--un-color-opacity,1))" } }, "w-32px": { "": { "width": 32 } }, "w-36px": { "": { "width": 36 } } };
   const _style_1$18 = { "page-root": { "": { "height": "100%", "display": "flex", "flexDirection": "column" } }, "footer-fixed": { "": { "position": "fixed", "left": 0, "right": 0, "bottom": 0, "zIndex": 100 } }, "msg-row-start": { "": { "display": "flex", "flexDirection": "row", "alignItems": "flex-start" } }, "msg-row-end": { "": { "display": "flex", "flexDirection": "row", "alignItems": "flex-start", "justifyContent": "flex-end" } }, "msg-content-left": { "": { "display": "flex", "flexDirection": "column", "maxWidth": 270 } }, "msg-content-right": { "": { "display": "flex", "flexDirection": "column", "alignItems": "flex-end", "maxWidth": 270 } }, "flex-col": { "": { "display": "flex", "flexDirection": "column" } }, "flex-row": { "": { "display": "flex", "flexDirection": "row" } }, "items-center": { "": { "alignItems": "center" } }, "justify-center": { "": { "justifyContent": "center" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "chat-input": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "height": 36, "backgroundColor": "#f1f5f9", "color": "#1e293b", "fontSize": 14, "borderTopWidth": 0, "borderRightWidth": 0, "borderBottomWidth": 0, "borderLeftWidth": 0 } } };
   function _sfc_render$2F(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_0$8);
@@ -16111,7 +17065,7 @@
           "navigation-bar-title-text": "AI助手"
         }, {
           default: vue.withCtx(() => [
-            vue.createElementVNode("view", { class: "page-root bg-__f8fafc_" }, [
+            vue.createElementVNode("view", { class: "page-root" }, [
               vue.createCommentVNode(" 自定义导航栏 "),
               vue.createVNode($setup["NavBar"], {
                 title: "AI 智能助手",
@@ -16122,8 +17076,7 @@
                 class: "flex-1 px-15px py-10px",
                 "scroll-y": "true",
                 "scroll-top": $setup.scrollTop,
-                "scroll-with-animation": true,
-                style: { "height": "0px" }
+                "scroll-with-animation": true
               }, [
                 (vue.openBlock(true), vue.createElementBlock(
                   vue.Fragment,
@@ -16273,8 +17226,8 @@
   const SrcPagesAiAi = /* @__PURE__ */ _export_sfc(_sfc_main$2G, [["render", _sfc_render$2F], ["styles", [_style_0$2C, _style_1$18]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/ai/ai.uvue"]]);
   const _sfc_main$2F = /* @__PURE__ */ vue.defineComponent({
     __name: "login",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const tokenStore = useTokenStore();
       const userStore = useUserStore();
@@ -16288,10 +17241,10 @@
         }
       });
       function doLogin() {
-        var _a2;
+        var _a3;
         if (tokenStore.hasValidLogin()) {
           if (redirectUrl.value !== "") {
-            const targetUrl = (_a2 = decodeURIComponent(redirectUrl.value)) !== null && _a2 !== void 0 ? _a2 : "";
+            const targetUrl = (_a3 = decodeURIComponent(redirectUrl.value)) !== null && _a3 !== void 0 ? _a3 : "";
             if (isPageTabbar(targetUrl)) {
               setCurIdxByPath(targetUrl);
               uni.switchTab({ url: targetUrl });
@@ -16318,9 +17271,9 @@
           icon: "success"
         });
         setTimeout(() => {
-          var _a3;
+          var _a4;
           if (redirectUrl.value !== "") {
-            const targetUrl = (_a3 = decodeURIComponent(redirectUrl.value)) !== null && _a3 !== void 0 ? _a3 : "";
+            const targetUrl = (_a4 = decodeURIComponent(redirectUrl.value)) !== null && _a4 !== void 0 ? _a4 : "";
             if (isPageTabbar(targetUrl)) {
               setCurIdxByPath(targetUrl);
               uni.switchTab({ url: targetUrl });
@@ -16341,13 +17294,13 @@
       return __returned__;
     }
   });
-  const _style_0$2B = { "bg-__3b82f6_": { "": { "backgroundImage": "none", "backgroundColor": "#3b82f6" } }, "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "flex": { "": { "display": "flex" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-44px": { "": { "height": 44 } }, "items-center": { "": { "alignItems": "center" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-30px": { "": { "marginBottom": 30 } }, "p-30px": { "": { "paddingTop": 30, "paddingRight": 30, "paddingBottom": 30, "paddingLeft": 30 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-14px": { "": { "fontSize": 14 } }, "text-20px": { "": { "fontSize": 20 } }, "w-200px": { "": { "width": 200 } } };
+  const _style_0$2B = { "bg-__3b82f6_": { "": { "backgroundImage": "none", "backgroundColor": "#3b82f6" } }, "flex": { "": { "display": "flex" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-44px": { "": { "height": 44 } }, "items-center": { "": { "alignItems": "center" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-30px": { "": { "marginBottom": 30 } }, "p-30px": { "": { "paddingTop": 30, "paddingRight": 30, "paddingBottom": 30, "paddingLeft": 30 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-14px": { "": { "fontSize": 14 } }, "text-20px": { "": { "fontSize": 20 } }, "w-200px": { "": { "width": 200 } } };
   function _sfc_render$2E(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createBlock($setup["AppKu"], null, {
       default: vue.withCtx(() => [
         vue.createVNode($setup["LayoutComponent"], { "navigation-bar-title-text": "登录" }, {
           default: vue.withCtx(() => [
-            vue.createElementVNode("view", { class: "flex-1 p-30px items-center justify-center bg-__f8fafc_" }, [
+            vue.createElementVNode("view", { class: "flex-1 p-30px items-center justify-center" }, [
               vue.createElementVNode("view", { class: "mb-30px" }, [
                 vue.createElementVNode("text", { class: "text-20px font-bold text-__1e293b_" }, "登录页")
               ]),
@@ -16370,8 +17323,8 @@
   const SrcSubAuthLogin = /* @__PURE__ */ _export_sfc(_sfc_main$2F, [["render", _sfc_render$2E], ["styles", [_style_0$2B]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/auth/login.uvue"]]);
   const _sfc_main$2E = /* @__PURE__ */ vue.defineComponent({
     __name: "register",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       function doRegister() {
         uni.showToast({
@@ -16393,13 +17346,13 @@
       return __returned__;
     }
   });
-  const _style_0$2A = { "bg-__10b981_": { "": { "backgroundImage": "none", "backgroundColor": "#10b981" } }, "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "flex": { "": { "display": "flex" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-44px": { "": { "height": 44 } }, "items-center": { "": { "alignItems": "center" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-30px": { "": { "marginBottom": 30 } }, "p-30px": { "": { "paddingTop": 30, "paddingRight": 30, "paddingBottom": 30, "paddingLeft": 30 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-14px": { "": { "fontSize": 14 } }, "text-20px": { "": { "fontSize": 20 } }, "w-200px": { "": { "width": 200 } } };
+  const _style_0$2A = { "bg-__10b981_": { "": { "backgroundImage": "none", "backgroundColor": "#10b981" } }, "flex": { "": { "display": "flex" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-44px": { "": { "height": 44 } }, "items-center": { "": { "alignItems": "center" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-30px": { "": { "marginBottom": 30 } }, "p-30px": { "": { "paddingTop": 30, "paddingRight": 30, "paddingBottom": 30, "paddingLeft": 30 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-14px": { "": { "fontSize": 14 } }, "text-20px": { "": { "fontSize": 20 } }, "w-200px": { "": { "width": 200 } } };
   function _sfc_render$2D(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createBlock($setup["AppKu"], null, {
       default: vue.withCtx(() => [
         vue.createVNode($setup["LayoutComponent"], { "navigation-bar-title-text": "注册" }, {
           default: vue.withCtx(() => [
-            vue.createElementVNode("view", { class: "flex-1 p-30px items-center justify-center bg-__f8fafc_" }, [
+            vue.createElementVNode("view", { class: "flex-1 p-30px items-center justify-center" }, [
               vue.createElementVNode("view", { class: "mb-30px" }, [
                 vue.createElementVNode("text", { class: "text-20px font-bold text-__1e293b_" }, "注册页")
               ]),
@@ -16422,8 +17375,8 @@
   const SrcSubAuthRegister = /* @__PURE__ */ _export_sfc(_sfc_main$2E, [["render", _sfc_render$2D], ["styles", [_style_0$2A]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/auth/register.uvue"]]);
   const _sfc_main$2D = /* @__PURE__ */ vue.defineComponent({
     __name: "test",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const optionKeys = vue.ref([]);
       const queryOptions = vue.ref(null);
@@ -16548,8 +17501,8 @@
   }
   const _sfc_main$2C = /* @__PURE__ */ vue.defineComponent({
     __name: "paging",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const tabList = ["全部", "技术", "设计", "生活"];
       const tabIndex = vue.ref(0);
@@ -16961,8 +17914,8 @@
       type: Object,
       default: defProps$18.getAny("cell.titleStyle")
     }
-  }, emits: ["click"], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
+  }, emits: ["click"], setup(__props, _a2) {
+    var __expose = _a2.expose, __emit = _a2.emit;
     const props2 = __props;
     const emits = __emit;
     const testEmpty = function(val) {
@@ -17115,8 +18068,8 @@
       type: Boolean,
       default: defProps$17.getBoolean("cellGroup.border")
     }
-  }, setup(__props, _a) {
-    var __expose = _a.expose;
+  }, setup(__props, _a2) {
+    var __expose = _a2.expose;
     __expose();
     const props2 = __props;
     const __returned__ = { props: props2 };
@@ -17159,8 +18112,8 @@
   const __easycom_2$m = /* @__PURE__ */ _export_sfc(_sfc_main$2z, [["render", _sfc_render$2y], ["styles", [_style_0$2v]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-cell-group/up-cell-group.uvue"]]);
   const _sfc_main$2y = /* @__PURE__ */ vue.defineComponent({
     __name: "uview-ultra",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       function goToDemo(page) {
         uni.navigateTo({
@@ -17217,9 +18170,25 @@
                 vue.createVNode(_component_up_cell_group, { border: false }, {
                   default: vue.withCtx(() => [
                     vue.createVNode(_component_up_cell, {
+                      title: "Button 按钮",
+                      "is-link": "",
+                      onClick: _cache[0] || (_cache[0] = ($event) => $setup.goToDemo("button"))
+                    }, {
+                      icon: vue.withCtx(() => [
+                        vue.createVNode(_component_up_icon, {
+                          name: "plus-circle",
+                          color: "#2979ff",
+                          size: "20",
+                          class: "mr-8px"
+                        })
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    vue.createVNode(_component_up_cell, {
                       title: "Icon 图标",
                       "is-link": "",
-                      onClick: _cache[0] || (_cache[0] = ($event) => $setup.goToDemo("icon"))
+                      onClick: _cache[1] || (_cache[1] = ($event) => $setup.goToDemo("icon"))
                     }, {
                       icon: vue.withCtx(() => [
                         vue.createVNode(_component_up_icon, {
@@ -17235,7 +18204,7 @@
                     vue.createVNode(_component_up_cell, {
                       title: "Text 文本",
                       "is-link": "",
-                      onClick: _cache[1] || (_cache[1] = ($event) => $setup.goToDemo("text"))
+                      onClick: _cache[2] || (_cache[2] = ($event) => $setup.goToDemo("text"))
                     }, {
                       icon: vue.withCtx(() => [
                         vue.createVNode(_component_up_icon, {
@@ -17251,7 +18220,7 @@
                     vue.createVNode(_component_up_cell, {
                       title: "Empty 空白页",
                       "is-link": "",
-                      onClick: _cache[2] || (_cache[2] = ($event) => $setup.goToDemo("empty"))
+                      onClick: _cache[3] || (_cache[3] = ($event) => $setup.goToDemo("empty"))
                     }, {
                       icon: vue.withCtx(() => [
                         vue.createVNode(_component_up_icon, {
@@ -17267,7 +18236,7 @@
                     vue.createVNode(_component_up_cell, {
                       title: "Divider 分割线",
                       "is-link": "",
-                      onClick: _cache[3] || (_cache[3] = ($event) => $setup.goToDemo("divider"))
+                      onClick: _cache[4] || (_cache[4] = ($event) => $setup.goToDemo("divider"))
                     }, {
                       icon: vue.withCtx(() => [
                         vue.createVNode(_component_up_icon, {
@@ -17283,7 +18252,7 @@
                     vue.createVNode(_component_up_cell, {
                       title: "LoadingIcon 加载图标",
                       "is-link": "",
-                      onClick: _cache[4] || (_cache[4] = ($event) => $setup.goToDemo("loading-icon"))
+                      onClick: _cache[5] || (_cache[5] = ($event) => $setup.goToDemo("loading-icon"))
                     }, {
                       icon: vue.withCtx(() => [
                         vue.createVNode(_component_up_icon, {
@@ -17299,27 +18268,11 @@
                     vue.createVNode(_component_up_cell, {
                       title: "Skeleton 骨架屏",
                       "is-link": "",
-                      onClick: _cache[5] || (_cache[5] = ($event) => $setup.goToDemo("skeleton"))
+                      onClick: _cache[6] || (_cache[6] = ($event) => $setup.goToDemo("skeleton"))
                     }, {
                       icon: vue.withCtx(() => [
                         vue.createVNode(_component_up_icon, {
                           name: "list-dot",
-                          color: "#2979ff",
-                          size: "20",
-                          class: "mr-8px"
-                        })
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    }),
-                    vue.createVNode(_component_up_cell, {
-                      title: "Button 按钮",
-                      "is-link": "",
-                      onClick: _cache[6] || (_cache[6] = ($event) => $setup.goToDemo("button"))
-                    }, {
-                      icon: vue.withCtx(() => [
-                        vue.createVNode(_component_up_icon, {
-                          name: "plus-circle",
                           color: "#2979ff",
                           size: "20",
                           class: "mr-8px"
@@ -18385,8 +19338,8 @@
   const _imports_0 = "/static/logo.png";
   const _sfc_main$2x = /* @__PURE__ */ vue.defineComponent({
     __name: "uiTest",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const logoSrc = _imports_0;
       const __returned__ = { logoSrc, get AppKu() {
@@ -18446,8 +19399,8 @@
   const SrcSubUiTestUiTest = /* @__PURE__ */ _export_sfc(_sfc_main$2x, [["render", _sfc_render$2w], ["styles", [_style_0$2t]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uiTest/uiTest.uvue"]]);
   const _sfc_main$2w = /* @__PURE__ */ vue.defineComponent({
     __name: "icon",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -18843,7 +19796,7 @@
       },
       // 经处理后需要显示的值
       value() {
-        let _a = this, text2 = _a.text, mode = _a.mode, format = _a.format, href = _a.href;
+        let _a2 = this, text2 = _a2.text, mode = _a2.mode, format = _a2.format, href = _a2.href;
         let textStr = text2.toString();
         if (mode === "price") {
           if (!/^\d+(\.\d+)?$/.test(textStr)) {
@@ -19023,8 +19976,8 @@
   const __easycom_0$5 = /* @__PURE__ */ _export_sfc(_sfc_main$2u, [["render", _sfc_render$2t], ["styles", [_style_0$2q]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-text/up-text.uvue"]]);
   const _sfc_main$2t = /* @__PURE__ */ vue.defineComponent({
     __name: "text",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -19112,816 +20065,6 @@
     });
   }
   const SrcSubUviewUltraDemosTextText = /* @__PURE__ */ _export_sfc(_sfc_main$2t, [["render", _sfc_render$2s], ["styles", [_style_0$2p, _style_1$15]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/text/text.uvue"]]);
-  const zhHans = new UTSJSONObject({
-    "up_common_cancel": "取消",
-    "up_common_confirm": "确定",
-    "up_common_start": "开始",
-    "up_common_end": "结束",
-    "up_common_stop": "停止",
-    "up_common_copy": "复制",
-    "up_common_none": "暂无",
-    "up_common_tip": "提示",
-    "up_common_success": "成功",
-    "up_common_fail": "失败",
-    "up_common_close": "关闭",
-    "up_common_preview": "预览",
-    "up_common_re-select": "重选",
-    "up_common_rotate": "旋转",
-    "up_common_pleaseChoose": "请选择",
-    "up_common_loading": "加载中",
-    "up_common_loading2": "正在加载",
-    "up_common_inOperation": "操作中",
-    "up_common_settings": "设置",
-    "up_common_retry": "重试",
-    "up_common_search": "搜索",
-    "up_common_more": "更多",
-    "up_common_video": "视频",
-    "up_common_file": "文件",
-    "up_week_one": "一",
-    "up_week_two": "二",
-    "up_week_three": "三",
-    "up_week_four": "四",
-    "up_week_five": "五",
-    "up_week_six": "六",
-    "up_week_seven": "日",
-    "up_barcode_error": "生成条码失败",
-    "up_calendar_chooseDates": "日期选择",
-    "up_calendar_disabled": "该日期已禁用",
-    "up_calendar_daysExceed": "选择天数不能超过{days}天",
-    "up_calendar_today": "今天",
-    "up_cityLocate_locateCity": "定位城市",
-    "up_cityLocate_fail": "定位失败，请点击重试。",
-    "up_cityLocate_locating": "定位中",
-    "up_code_send": "获取验证码",
-    "up_code_resendAfter": "X秒重新获取",
-    "up_code_resend": "重新获取",
-    "up_cropper_emptyWidhtOrHeight": "裁剪框的宽或高没有设置",
-    "up_empty_car": "购物车为空",
-    "up_empty_page": "页面不存在",
-    "up_empty_search": "没有搜索结果",
-    "up_empty_address": "没有收货地址",
-    "up_empty_wifi": "没有WiFi",
-    "up_empty_order": "订单为空",
-    "up_empty_coupon": "没有优惠券",
-    "up_empty_favor": "暂无收藏",
-    "up_empty_permission": "无权限",
-    "up_empty_history": "无历史记录",
-    "up_empty_news": "无新闻列表",
-    "up_empty_message": "消息列表为空",
-    "up_empty_list": "列表为空",
-    "up_empty_data": "数据为空",
-    "up_empty_comment": "暂无评论",
-    "up_link_copyed": "链接已复制，请在浏览器打开",
-    "up_loadmoe_loadmore": "加载更多",
-    "up_loadmoe_nomore": "没有更多了",
-    "up_noNetwork_text": "哎呀，网络信号丢失",
-    "up_noNetwork_pleaseCheck": "请检查网络，或前往",
-    "up_noNetwork_connect": "网络已连接",
-    "up_noNetwork_disconnect": "无网络连接",
-    "up_pagination_previous": "上一页",
-    "up_pagination_next": "下一页",
-    "up_pullRefresh_pull": "下拉刷新",
-    "up_pullRefresh_release": "释放刷新",
-    "up_pullRefresh_refreshing": "正在刷新",
-    "up_readMore_expand": "展开阅读全文",
-    "up_readMore_fold": "收起",
-    "up_search_placeholder": "请输入关键字",
-    "up_signature_penSize": "笔画大小",
-    "up_signature_penColor": "笔画颜色",
-    "up_upload_sizeExceed": "超过大小限制",
-    "up_upload_uploading": "上传中",
-    "up_upload_previewImageFail": "预览图片失败",
-    "up_upload_previewVideoFail": "预览视频失败",
-    "up_goodsSku_stock": "库存",
-    "up_goodsSku_price": "价格",
-    "up_goodsSku_amount": "件",
-    "up_goodsSku_choosed": "已选",
-    "up_goodsSku_buyAmount": "购买数量"
-  });
-  const zhHant = new UTSJSONObject({
-    "up_common_cancel": "取消",
-    "up_common_confirm": "確定",
-    "up_common_start": "開始",
-    "up_common_end": "結束",
-    "up_common_stop": "停止",
-    "up_common_copy": "複製",
-    "up_common_none": "暫無",
-    "up_common_tip": "提示",
-    "up_common_success": "成功",
-    "up_common_fail": "失敗",
-    "up_common_close": "關閉",
-    "up_common_preview": "預覽",
-    "up_common_re-select": "重選",
-    "up_common_rotate": "旋轉",
-    "up_common_pleaseChoose": "請選擇",
-    "up_common_loading": "載入中",
-    "up_common_loading2": "正在載入",
-    "up_common_inOperation": "操作中",
-    "up_common_settings": "設置",
-    "up_common_retry": "重試",
-    "up_common_search": "搜尋",
-    "up_common_more": "更多",
-    "up_common_video": "影片",
-    "up_common_file": "檔案",
-    "up_week_one": "一",
-    "up_week_two": "二",
-    "up_week_three": "三",
-    "up_week_four": "四",
-    "up_week_five": "五",
-    "up_week_six": "六",
-    "up_week_seven": "日",
-    "up_barcode_error": "生成條碼失敗",
-    "up_calendar_chooseDates": "日期選擇",
-    "up_calendar_disabled": "該日期已禁用",
-    "up_calendar_daysExceed": "選擇天數不能超過{days}天",
-    "up_calendar_today": "今天",
-    "up_cityLocate_locateCity": "定位城市",
-    "up_cityLocate_fail": "定位失敗，請點擊重試。",
-    "up_cityLocate_locating": "定位中",
-    "up_code_send": "獲取驗證碼",
-    "up_code_resendAfter": "X秒重新獲取",
-    "up_code_resend": "重新獲取",
-    "up_cropper_emptyWidhtOrHeight": "裁剪框的寬或高沒有設置",
-    "up_empty_car": "購物車為空",
-    "up_empty_page": "頁面不存在",
-    "up_empty_search": "沒有搜尋結果",
-    "up_empty_address": "沒有收貨地址",
-    "up_empty_wifi": "沒有WiFi",
-    "up_empty_order": "訂單為空",
-    "up_empty_coupon": "沒有優惠券",
-    "up_empty_favor": "暫無收藏",
-    "up_empty_permission": "無權限",
-    "up_empty_history": "無歷史記錄",
-    "up_empty_news": "無新聞列表",
-    "up_empty_message": "消息列表為空",
-    "up_empty_list": "列表為空",
-    "up_empty_data": "數據為空",
-    "up_empty_comment": "暫無評論",
-    "up_link_copyed": "鏈接已復制，請在瀏覽器打開",
-    "up_loadmoe_loadmore": "加載更多",
-    "up_loadmoe_nomore": "沒有更多了",
-    "up_noNetwork_text": "哎呀，網絡信號丟失",
-    "up_noNetwork_pleaseCheck": "請檢查網絡，或前往",
-    "up_noNetwork_connect": "網絡已連接",
-    "up_noNetwork_disconnect": "無網絡連接",
-    "up_pagination_previous": "上一頁",
-    "up_pagination_next": "下一頁",
-    "up_pullRefresh_pull": "下拉刷新",
-    "up_pullRefresh_release": "釋放刷新",
-    "up_pullRefresh_refreshing": "正在刷新",
-    "up_readMore_expand": "展開閱讀全文",
-    "up_readMore_fold": "收起",
-    "up_search_placeholder": "請輸入關鍵字",
-    "up_signature_penSize": "筆畫大小",
-    "up_signature_penColor": "筆畫顏色",
-    "up_upload_sizeExceed": "超過大小限制",
-    "up_upload_uploading": "上傳中",
-    "up_upload_previewImageFail": "預覽圖片失敗",
-    "up_upload_previewVideoFail": "預覽視頻失敗",
-    "up_goodsSku_stock": "庫存",
-    "up_goodsSku_price": "價格",
-    "up_goodsSku_amount": "件",
-    "up_goodsSku_choosed": "已選",
-    "up_goodsSku_buyAmount": "購買數量"
-  });
-  const en = new UTSJSONObject({
-    "up_common_cancel": "Cancel",
-    "up_common_confirm": "Confirm",
-    "up_common_start": "Start",
-    "up_common_end": "End",
-    "up_common_stop": "Stop",
-    "up_common_copy": "Copy",
-    "up_common_none": "None",
-    "up_common_tip": "Tip",
-    "up_common_success": "Success",
-    "up_common_fail": "Fail",
-    "up_common_close": "Close",
-    "up_common_preview": "Preview",
-    "up_common_re-select": "Re-select",
-    "up_common_rotate": "Rotate",
-    "up_common_pleaseChoose": "Please choose",
-    "up_common_loading": "Loading",
-    "up_common_loading2": "Loading",
-    "up_common_inOperation": "In operation",
-    "up_common_settings": "Settings",
-    "up_common_retry": "Retry",
-    "up_common_search": "Search",
-    "up_common_more": "More",
-    "up_common_video": "Video",
-    "up_common_file": "File",
-    "up_week_one": "Mon",
-    "up_week_two": "Tue",
-    "up_week_three": "Wed",
-    "up_week_four": "Thu",
-    "up_week_five": "Fri",
-    "up_week_six": "Sat",
-    "up_week_seven": "Sun",
-    "up_barcode_error": "Failed to generate barcode",
-    "up_calendar_chooseDates": "Date selection",
-    "up_calendar_disabled": "This date is disabled",
-    "up_calendar_daysExceed": "The number of selected days cannot exceed {days} days",
-    "up_calendar_today": "Today",
-    "up_cityLocate_locateCity": "Locate city",
-    "up_cityLocate_fail": "Location failed, please click to retry.",
-    "up_cityLocate_locating": "Locating",
-    "up_code_send": "Get verification code",
-    "up_code_resendAfter": "Resend after X seconds",
-    "up_code_resend": "Resend",
-    "up_cropper_emptyWidhtOrHeight": "The width or height of the cropping box is not set",
-    "up_empty_car": "Shopping cart is empty",
-    "up_empty_page": "Page not found",
-    "up_empty_search": "No search results",
-    "up_empty_address": "No shipping address",
-    "up_empty_wifi": "No WiFi",
-    "up_empty_order": "Order is empty",
-    "up_empty_coupon": "No coupons",
-    "up_empty_favor": "No favorites",
-    "up_empty_permission": "No permission",
-    "up_empty_history": "No history",
-    "up_empty_news": "No news list",
-    "up_empty_message": "Message list is empty",
-    "up_empty_list": "List is empty",
-    "up_empty_data": "Data is empty",
-    "up_empty_comment": "No comments",
-    "up_link_copyed": "Link copied, please open in browser",
-    "up_loadmoe_loadmore": "Load more",
-    "up_loadmoe_nomore": "No more",
-    "up_noNetwork_text": "Oops, network signal lost",
-    "up_noNetwork_pleaseCheck": "Please check the network, or go to",
-    "up_noNetwork_connect": "Network connected",
-    "up_noNetwork_disconnect": "No network connection",
-    "up_pagination_previous": "Previous",
-    "up_pagination_next": "Next",
-    "up_pullRefresh_pull": "Pull to refresh",
-    "up_pullRefresh_release": "Release to refresh",
-    "up_pullRefresh_refreshing": "Refreshing",
-    "up_readMore_expand": "Expand to read more",
-    "up_readMore_fold": "Collapse",
-    "up_search_placeholder": "Please enter keywords",
-    "up_signature_penSize": "Stroke size",
-    "up_signature_penColor": "Stroke color",
-    "up_upload_sizeExceed": "Size limit exceeded",
-    "up_upload_uploading": "Uploading",
-    "up_upload_previewImageFail": "Failed to preview image",
-    "up_upload_previewVideoFail": "Failed to preview video",
-    "up_goodsSku_stock": "Stock",
-    "up_goodsSku_price": "Price",
-    "up_goodsSku_amount": "Items",
-    "up_goodsSku_choosed": "Selected",
-    "up_goodsSku_buyAmount": "Quantity"
-  });
-  const es = new UTSJSONObject({
-    "up_common_cancel": "Cancelar",
-    "up_common_confirm": "Confirmar",
-    "up_common_start": "Empezar",
-    "up_common_end": "Finalizar",
-    "up_common_stop": "Detener",
-    "up_common_copy": "Copiar",
-    "up_common_none": "Ninguno",
-    "up_common_tip": "Consejo",
-    "up_common_success": "Éxito",
-    "up_common_fail": "Fallido",
-    "up_common_close": "Cerrar",
-    "up_common_preview": "Vista previa",
-    "up_common_re-select": "Volver a seleccionar",
-    "up_common_rotate": "Rotar",
-    "up_common_pleaseChoose": "Por favor seleccione",
-    "up_common_loading": "Cargando",
-    "up_common_loading2": "Cargando",
-    "up_common_inOperation": "En operación",
-    "up_common_settings": "Configuración",
-    "up_common_retry": "Reintentar",
-    "up_common_search": "Buscar",
-    "up_common_more": "Más",
-    "up_common_video": "Vídeo",
-    "up_common_file": "Archivo",
-    "up_week_one": "Lun",
-    "up_week_two": "Mar",
-    "up_week_three": "Mié",
-    "up_week_four": "Jue",
-    "up_week_five": "Vie",
-    "up_week_six": "Sáb",
-    "up_week_seven": "Dom",
-    "up_barcode_error": "Error al generar el código de barras",
-    "up_calendar_chooseDates": "Selección de fecha",
-    "up_calendar_disabled": "Esta fecha está deshabilitada",
-    "up_calendar_daysExceed": "El número de días seleccionados no puede exceder {days} días",
-    "up_calendar_today": "Hoy",
-    "up_cityLocate_locateCity": "Ubicar ciudad",
-    "up_cityLocate_fail": "Error de ubicación, haga clic para reintentar.",
-    "up_cityLocate_locating": "Ubicando",
-    "up_code_send": "Obtener código de verificación",
-    "up_code_resendAfter": "Reenviar después de X segundos",
-    "up_code_resend": "Reenviar",
-    "up_cropper_emptyWidhtOrHeight": "No se ha establecido el ancho o alto del recorte",
-    "up_empty_car": "Carrito vacío",
-    "up_empty_page": "Página no encontrada",
-    "up_empty_search": "Sin resultados de búsqueda",
-    "up_empty_address": "Sin dirección de envío",
-    "up_empty_wifi": "Sin WiFi",
-    "up_empty_order": "Pedido vacío",
-    "up_empty_coupon": "Sin cupones",
-    "up_empty_favor": "Sin favoritos",
-    "up_empty_permission": "Sin permiso",
-    "up_empty_history": "Sin historial",
-    "up_empty_news": "Sin lista de noticias",
-    "up_empty_message": "Lista de mensajes vacía",
-    "up_empty_list": "Lista vacía",
-    "up_empty_data": "Datos vacíos",
-    "up_empty_comment": "Sin comentarios",
-    "up_link_copyed": "Enlace copiado, por favor abra en el navegador",
-    "up_loadmoe_loadmore": "Cargar más",
-    "up_loadmoe_nomore": "No hay más",
-    "up_noNetwork_text": "¡Ups! Se perdió la señal de red",
-    "up_noNetwork_pleaseCheck": "Por favor revise la red, o vaya a",
-    "up_noNetwork_connect": "Red conectada",
-    "up_noNetwork_disconnect": "Sin conexión de red",
-    "up_pagination_previous": "Anterior",
-    "up_pagination_next": "Siguiente",
-    "up_pullRefresh_pull": "Tire para actualizar",
-    "up_pullRefresh_release": "Suelte para actualizar",
-    "up_pullRefresh_refreshing": "Actualizando",
-    "up_readMore_expand": "Expandir para leer más",
-    "up_readMore_fold": "Colapsar",
-    "up_search_placeholder": "Ingrese palabras clave",
-    "up_signature_penSize": "Tamaño del trazo",
-    "up_signature_penColor": "Color del trazo",
-    "up_upload_sizeExceed": "Límite de tamaño excedido",
-    "up_upload_uploading": "Subiendo",
-    "up_upload_previewImageFail": "Error al previsualizar imagen",
-    "up_upload_previewVideoFail": "Error al previsualizar video",
-    "up_goodsSku_stock": "Inventario",
-    "up_goodsSku_price": "Precio",
-    "up_goodsSku_amount": "Artículos",
-    "up_goodsSku_choosed": "Seleccionado",
-    "up_goodsSku_buyAmount": "Cantidad"
-  });
-  const fr = new UTSJSONObject({
-    "up_common_cancel": "Annuler",
-    "up_common_confirm": "Confirmer",
-    "up_common_start": "Démarrer",
-    "up_common_end": "Terminer",
-    "up_common_stop": "Arrêter",
-    "up_common_copy": "Copier",
-    "up_common_none": "Aucun",
-    "up_common_tip": "Conseil",
-    "up_common_success": "Succès",
-    "up_common_fail": "Échec",
-    "up_common_close": "Fermer",
-    "up_common_preview": "Aperçu",
-    "up_common_re-select": "Resélectionner",
-    "up_common_rotate": "Rotation",
-    "up_common_pleaseChoose": "Veuillez choisir",
-    "up_common_loading": "Chargement",
-    "up_common_loading2": "Chargement en cours",
-    "up_common_inOperation": "En cours d'opération",
-    "up_common_settings": "Paramètres",
-    "up_common_retry": "Réessayer",
-    "up_common_search": "Rechercher",
-    "up_common_more": "Plus",
-    "up_common_video": "Vidéo",
-    "up_common_file": "Fichier",
-    "up_week_one": "Lun",
-    "up_week_two": "Mar",
-    "up_week_three": "Mer",
-    "up_week_four": "Jeu",
-    "up_week_five": "Ven",
-    "up_week_six": "Sam",
-    "up_week_seven": "Dim",
-    "up_barcode_error": "Échec de génération du code-barres",
-    "up_calendar_chooseDates": "Sélection de dates",
-    "up_calendar_disabled": "Cette date est désactivée",
-    "up_calendar_daysExceed": "Le nombre de jours sélectionnés ne peut pas dépasser {days} jours",
-    "up_calendar_today": "Aujourd'hui",
-    "up_cityLocate_locateCity": "Localiser la ville",
-    "up_cityLocate_fail": "Échec de localisation, veuillez cliquer pour réessayer.",
-    "up_cityLocate_locating": "Localisation en cours",
-    "up_code_send": "Obtenir le code de vérification",
-    "up_code_resendAfter": "Renvoyer dans X secondes",
-    "up_code_resend": "Renvoyer",
-    "up_cropper_emptyWidhtOrHeight": "La largeur ou la hauteur de recadrage n'est pas définie",
-    "up_empty_car": "Panier vide",
-    "up_empty_page": "Page introuvable",
-    "up_empty_search": "Aucun résultat de recherche",
-    "up_empty_address": "Aucune adresse de livraison",
-    "up_empty_wifi": "Aucun Wi-Fi",
-    "up_empty_order": "Commande vide",
-    "up_empty_coupon": "Aucun coupon",
-    "up_empty_favor": "Aucun favori",
-    "up_empty_permission": "Aucune autorisation",
-    "up_empty_history": "Aucun historique",
-    "up_empty_news": "Aucune actualité",
-    "up_empty_message": "Liste de messages vide",
-    "up_empty_list": "Liste vide",
-    "up_empty_data": "Données vides",
-    "up_empty_comment": "Aucun commentaire",
-    "up_link_copyed": "Lien copié, veuillez ouvrir dans le navigateur",
-    "up_loadmoe_loadmore": "Charger plus",
-    "up_loadmoe_nomore": "Plus de contenu",
-    "up_noNetwork_text": "Oups, le signal réseau est perdu",
-    "up_noNetwork_pleaseCheck": "Veuillez vérifier le réseau, ou aller à",
-    "up_noNetwork_connect": "Réseau connecté",
-    "up_noNetwork_disconnect": "Aucune connexion réseau",
-    "up_pagination_previous": "Page précédente",
-    "up_pagination_next": "Page suivante",
-    "up_pullRefresh_pull": "Tirer pour actualiser",
-    "up_pullRefresh_release": "Relâcher pour actualiser",
-    "up_pullRefresh_refreshing": "Actualisation en cours",
-    "up_readMore_expand": "Développer pour lire la suite",
-    "up_readMore_fold": "Réduire",
-    "up_search_placeholder": "Veuillez saisir un mot-clé",
-    "up_signature_penSize": "Taille du trait",
-    "up_signature_penColor": "Couleur du trait",
-    "up_upload_sizeExceed": "Dépassement de la limite de taille",
-    "up_upload_uploading": "Téléchargement en cours",
-    "up_upload_previewImageFail": "Échec de l'aperçu de l'image",
-    "up_upload_previewVideoFail": "Échec de l'aperçu de la vidéo",
-    "up_goodsSku_stock": "Stock",
-    "up_goodsSku_price": "Prix",
-    "up_goodsSku_amount": "Pièces",
-    "up_goodsSku_choosed": "Sélectionné",
-    "up_goodsSku_buyAmount": "Quantité"
-  });
-  const de = new UTSJSONObject({
-    "up_common_cancel": "Abbrechen",
-    "up_common_confirm": "Bestätigen",
-    "up_common_start": "Start",
-    "up_common_end": "Ende",
-    "up_common_stop": "Stopp",
-    "up_common_copy": "Kopieren",
-    "up_common_none": "Keine",
-    "up_common_tip": "Tipp",
-    "up_common_success": "Erfolg",
-    "up_common_fail": "Fehlgeschlagen",
-    "up_common_close": "Schließen",
-    "up_common_preview": "Vorschau",
-    "up_common_re-select": "Erneut auswählen",
-    "up_common_rotate": "Drehen",
-    "up_common_pleaseChoose": "Bitte wählen",
-    "up_common_loading": "Wird geladen",
-    "up_common_loading2": "Laden",
-    "up_common_inOperation": "In Bearbeitung",
-    "up_common_settings": "Einstellungen",
-    "up_common_retry": "Wiederholen",
-    "up_common_search": "Suchen",
-    "up_common_more": "Mehr",
-    "up_common_video": "Video",
-    "up_common_file": "Datei",
-    "up_week_one": "Mo",
-    "up_week_two": "Di",
-    "up_week_three": "Mi",
-    "up_week_four": "Do",
-    "up_week_five": "Fr",
-    "up_week_six": "Sa",
-    "up_week_seven": "So",
-    "up_barcode_error": "Barcode konnte nicht generiert werden",
-    "up_calendar_chooseDates": "Datum auswählen",
-    "up_calendar_disabled": "Dieses Datum ist deaktiviert",
-    "up_calendar_daysExceed": "Die Anzahl der ausgewählten Tage darf {days} Tage nicht überschreiten",
-    "up_calendar_today": "Heute",
-    "up_cityLocate_locateCity": "Stadt lokalisieren",
-    "up_cityLocate_fail": "Lokalisierung fehlgeschlagen, bitte klicken Sie, um es erneut zu versuchen.",
-    "up_cityLocate_locating": "Lokalisierung läuft",
-    "up_code_send": "Bestätigungscode erhalten",
-    "up_code_resendAfter": "Nach X Sekunden erneut senden",
-    "up_code_resend": "Erneut senden",
-    "up_cropper_emptyWidhtOrHeight": "Breite oder Höhe des Zuschneidebereichs ist nicht festgelegt",
-    "up_empty_car": "Warenkorb ist leer",
-    "up_empty_page": "Seite nicht gefunden",
-    "up_empty_search": "Keine Suchergebnisse",
-    "up_empty_address": "Keine Lieferadresse",
-    "up_empty_wifi": "Kein WLAN",
-    "up_empty_order": "Bestellung ist leer",
-    "up_empty_coupon": "Keine Coupons",
-    "up_empty_favor": "Keine Favoriten",
-    "up_empty_permission": "Keine Berechtigung",
-    "up_empty_history": "Kein Verlauf",
-    "up_empty_news": "Keine Nachrichtenliste",
-    "up_empty_message": "Nachrichtenliste ist leer",
-    "up_empty_list": "Liste ist leer",
-    "up_empty_data": "Daten sind leer",
-    "up_empty_comment": "Keine Kommentare",
-    "up_link_copyed": "Link kopiert, bitte im Browser öffnen",
-    "up_loadmoe_loadmore": "Mehr laden",
-    "up_loadmoe_nomore": "Keine weiteren Daten",
-    "up_noNetwork_text": "Ups, Netzwerksignal verloren",
-    "up_noNetwork_pleaseCheck": "Bitte überprüfen Sie das Netzwerk oder gehen Sie zu",
-    "up_noNetwork_connect": "Netzwerk verbunden",
-    "up_noNetwork_disconnect": "Keine Netzwerkverbindung",
-    "up_pagination_previous": "Zurück",
-    "up_pagination_next": "Weiter",
-    "up_pullRefresh_pull": "Zum Aktualisieren ziehen",
-    "up_pullRefresh_release": "Loslassen zum Aktualisieren",
-    "up_pullRefresh_refreshing": "Aktualisierung läuft",
-    "up_readMore_expand": "Erweitern, um mehr zu lesen",
-    "up_readMore_fold": "Einklappen",
-    "up_search_placeholder": "Bitte Schlüsselwort eingeben",
-    "up_signature_penSize": "Strichgröße",
-    "up_signature_penColor": "Strichfarbe",
-    "up_upload_sizeExceed": "Größenbegrenzung überschritten",
-    "up_upload_uploading": "Upload läuft",
-    "up_upload_previewImageFail": "Bildvorschau fehlgeschlagen",
-    "up_upload_previewVideoFail": "Videovorschau fehlgeschlagen",
-    "up_goodsSku_stock": "Lagerbestand",
-    "up_goodsSku_price": "Preis",
-    "up_goodsSku_amount": "Artikel",
-    "up_goodsSku_choosed": "Ausgewählt",
-    "up_goodsSku_buyAmount": "Anzahl"
-  });
-  const ko = new UTSJSONObject({
-    "up_common_cancel": "취소",
-    "up_common_confirm": "확인",
-    "up_common_start": "시작",
-    "up_common_end": "종료",
-    "up_common_stop": "중지",
-    "up_common_copy": "복사",
-    "up_common_none": "없음",
-    "up_common_tip": "팁",
-    "up_common_success": "성공",
-    "up_common_fail": "실패",
-    "up_common_close": "닫기",
-    "up_common_preview": "미리보기",
-    "up_common_re-select": "재선택",
-    "up_common_rotate": "회전",
-    "up_common_pleaseChoose": "선택해주세요",
-    "up_common_loading": "로딩 중",
-    "up_common_loading2": "로딩 중",
-    "up_common_inOperation": "작업 중",
-    "up_common_settings": "설정",
-    "up_common_retry": "재시도",
-    "up_common_search": "검색",
-    "up_common_more": "더보기",
-    "up_common_video": "비디오",
-    "up_common_file": "파일",
-    "up_week_one": "월",
-    "up_week_two": "화",
-    "up_week_three": "수",
-    "up_week_four": "목",
-    "up_week_five": "금",
-    "up_week_six": "토",
-    "up_week_seven": "일",
-    "up_barcode_error": "바코드 생성 실패",
-    "up_calendar_chooseDates": "날짜 선택",
-    "up_calendar_disabled": "이 날짜는 비활성화되었습니다",
-    "up_calendar_daysExceed": "선택한 일 수는 {days}일을 초과할 수 없습니다",
-    "up_calendar_today": "오늘",
-    "up_cityLocate_locateCity": "도시 위치 찾기",
-    "up_cityLocate_fail": "위치 찾기 실패, 클릭하여 재시도하세요.",
-    "up_cityLocate_locating": "위치 찾는 중",
-    "up_code_send": "인증번호 받기",
-    "up_code_resendAfter": "X초 후 재전송",
-    "up_code_resend": "재전송",
-    "up_cropper_emptyWidhtOrHeight": "자르기 상자의 너비나 높이가 설정되지 않았습니다",
-    "up_empty_car": "장바구니가 비어 있습니다",
-    "up_empty_page": "페이지를 찾을 수 없습니다",
-    "up_empty_search": "검색 결과가 없습니다",
-    "up_empty_address": "배송 주소가 없습니다",
-    "up_empty_wifi": "Wi-Fi 없음",
-    "up_empty_order": "주문이 비어 있습니다",
-    "up_empty_coupon": "쿠폰이 없습니다",
-    "up_empty_favor": "찜한 항목이 없습니다",
-    "up_empty_permission": "권한이 없습니다",
-    "up_empty_history": "기록이 없습니다",
-    "up_empty_news": "뉴스 목록이 없습니다",
-    "up_empty_message": "메시지 목록이 비어 있습니다",
-    "up_empty_list": "목록이 비어 있습니다",
-    "up_empty_data": "데이터가 없습니다",
-    "up_empty_comment": "댓글이 없습니다",
-    "up_link_copyed": "링크가 복사되었습니다. 브라우저에서 열어주세요",
-    "up_loadmoe_loadmore": "더 불러오기",
-    "up_loadmoe_nomore": "더 이상 없습니다",
-    "up_noNetwork_text": "앗, 네트워크 신호가 사라졌어요",
-    "up_noNetwork_pleaseCheck": "네트워크를 확인하거나 다음으로 이동하세요",
-    "up_noNetwork_connect": "네트워크 연결됨",
-    "up_noNetwork_disconnect": "네트워크 연결 없음",
-    "up_pagination_previous": "이전",
-    "up_pagination_next": "다음",
-    "up_pullRefresh_pull": "당겨서 새로고침",
-    "up_pullRefresh_release": "놓아서 새로고침",
-    "up_pullRefresh_refreshing": "새로고침 중",
-    "up_readMore_expand": "펼쳐서 더 읽기",
-    "up_readMore_fold": "접기",
-    "up_search_placeholder": "키워드를 입력하세요",
-    "up_signature_penSize": "선 굵기",
-    "up_signature_penColor": "선 색상",
-    "up_upload_sizeExceed": "크기 제한 초과",
-    "up_upload_uploading": "업로드 중",
-    "up_upload_previewImageFail": "이미지 미리보기 실패",
-    "up_upload_previewVideoFail": "비디오 미리보기 실패",
-    "up_goodsSku_stock": "재고",
-    "up_goodsSku_price": "가격",
-    "up_goodsSku_amount": "개",
-    "up_goodsSku_choosed": "선택됨",
-    "up_goodsSku_buyAmount": "구매 수량"
-  });
-  const ja = new UTSJSONObject({
-    "up_common_cancel": "キャンセル",
-    "up_common_confirm": "確認",
-    "up_common_start": "開始",
-    "up_common_end": "終了",
-    "up_common_stop": "停止",
-    "up_common_copy": "コピー",
-    "up_common_none": "なし",
-    "up_common_tip": "ヒント",
-    "up_common_success": "成功",
-    "up_common_fail": "失敗",
-    "up_common_close": "閉じる",
-    "up_common_preview": "プレビュー",
-    "up_common_re-select": "再選択",
-    "up_common_rotate": "回転",
-    "up_common_pleaseChoose": "選択してください",
-    "up_common_loading": "読み込み中",
-    "up_common_loading2": "読み込み中",
-    "up_common_inOperation": "操作中",
-    "up_common_settings": "設定",
-    "up_common_retry": "再試行",
-    "up_common_search": "検索",
-    "up_common_more": "もっと",
-    "up_common_video": "ビデオ",
-    "up_common_file": "ファイル",
-    "up_week_one": "月",
-    "up_week_two": "火",
-    "up_week_three": "水",
-    "up_week_four": "木",
-    "up_week_five": "金",
-    "up_week_six": "土",
-    "up_week_seven": "日",
-    "up_barcode_error": "バーコードの生成に失敗しました",
-    "up_calendar_chooseDates": "日付選択",
-    "up_calendar_disabled": "この日付は無効です",
-    "up_calendar_daysExceed": "選択日数は{days}日を超えることはできません",
-    "up_calendar_today": "今日",
-    "up_cityLocate_locateCity": "都市を特定",
-    "up_cityLocate_fail": "位置情報の取得に失敗しました。クリックして再試行してください。",
-    "up_cityLocate_locating": "位置情報を取得中",
-    "up_code_send": "認証コードを取得",
-    "up_code_resendAfter": "X秒後に再送信",
-    "up_code_resend": "再送信",
-    "up_cropper_emptyWidhtOrHeight": "切り抜きボックスの幅または高さが設定されていません",
-    "up_empty_car": "ショッピングカートは空です",
-    "up_empty_page": "ページが見つかりません",
-    "up_empty_search": "検索結果がありません",
-    "up_empty_address": "配送先住所がありません",
-    "up_empty_wifi": "Wi-Fiがありません",
-    "up_empty_order": "注文はありません",
-    "up_empty_coupon": "クーポンがありません",
-    "up_empty_favor": "お気に入りがありません",
-    "up_empty_permission": "権限がありません",
-    "up_empty_history": "履歴がありません",
-    "up_empty_news": "ニュースリストがありません",
-    "up_empty_message": "メッセージリストが空です",
-    "up_empty_list": "リストが空です",
-    "up_empty_data": "データが空です",
-    "up_empty_comment": "コメントがありません",
-    "up_link_copyed": "リンクをコピーしました。ブラウザで開いてください",
-    "up_loadmoe_loadmore": "さらに読み込む",
-    "up_loadmoe_nomore": "これ以上ありません",
-    "up_noNetwork_text": "おっと、ネットワーク信号が失われました",
-    "up_noNetwork_pleaseCheck": "ネットワークを確認するか、",
-    "up_noNetwork_connect": "ネットワーク接続済み",
-    "up_noNetwork_disconnect": "ネットワーク接続なし",
-    "up_pagination_previous": "前へ",
-    "up_pagination_next": "次へ",
-    "up_pullRefresh_pull": "引き下げて更新",
-    "up_pullRefresh_release": "指を離して更新",
-    "up_pullRefresh_refreshing": "更新中",
-    "up_readMore_expand": "続きを読む",
-    "up_readMore_fold": "折りたたむ",
-    "up_search_placeholder": "キーワードを入力してください",
-    "up_signature_penSize": "線の太さ",
-    "up_signature_penColor": "線の色",
-    "up_upload_sizeExceed": "サイズ制限を超えています",
-    "up_upload_uploading": "アップロード中",
-    "up_upload_previewImageFail": "画像のプレビューに失敗しました",
-    "up_upload_previewVideoFail": "動画のプレビューに失敗しました",
-    "up_goodsSku_stock": "在庫",
-    "up_goodsSku_price": "価格",
-    "up_goodsSku_amount": "アイテム",
-    "up_goodsSku_choosed": "選択済み",
-    "up_goodsSku_buyAmount": "購入数量"
-  });
-  const ru = new UTSJSONObject({
-    "up_common_cancel": "Отмена",
-    "up_common_confirm": "Подтвердить",
-    "up_common_start": "Начать",
-    "up_common_end": "Завершить",
-    "up_common_stop": "Остановить",
-    "up_common_copy": "Копировать",
-    "up_common_none": "Нет",
-    "up_common_tip": "Совет",
-    "up_common_success": "Успех",
-    "up_common_fail": "Ошибка",
-    "up_common_close": "Закрыть",
-    "up_common_preview": "Предпросмотр",
-    "up_common_re-select": "Выбрать снова",
-    "up_common_rotate": "Поворот",
-    "up_common_pleaseChoose": "Пожалуйста, выберите",
-    "up_common_loading": "Загрузка",
-    "up_common_loading2": "Загрузка",
-    "up_common_inOperation": "В процессе",
-    "up_common_settings": "Настройки",
-    "up_common_retry": "Повторить",
-    "up_common_search": "Поиск",
-    "up_common_more": "Еще",
-    "up_common_video": "Видео",
-    "up_common_file": "Файл",
-    "up_week_one": "Пн",
-    "up_week_two": "Вт",
-    "up_week_three": "Ср",
-    "up_week_four": "Чт",
-    "up_week_five": "Пт",
-    "up_week_six": "Сб",
-    "up_week_seven": "Вс",
-    "up_barcode_error": "Не удалось сгенерировать штрих-код",
-    "up_calendar_chooseDates": "Выбор даты",
-    "up_calendar_disabled": "Эта дата отключена",
-    "up_calendar_daysExceed": "Количество выбранных дней не может превышать {days} дней",
-    "up_calendar_today": "Сегодня",
-    "up_cityLocate_locateCity": "Определить город",
-    "up_cityLocate_fail": "Ошибка определения местоположения, нажмите, чтобы повторить попытку.",
-    "up_cityLocate_locating": "Определение местоположения",
-    "up_code_send": "Получить код подтверждения",
-    "up_code_resendAfter": "Повторная отправка через X секунд",
-    "up_code_resend": "Повторная отправка",
-    "up_cropper_emptyWidhtOrHeight": "Ширина или высота области обрезки не задана",
-    "up_empty_car": "Корзина пуста",
-    "up_empty_page": "Страница не найдена",
-    "up_empty_search": "Нет результатов поиска",
-    "up_empty_address": "Нет адреса доставки",
-    "up_empty_wifi": "Нет Wi-Fi",
-    "up_empty_order": "Заказ пуст",
-    "up_empty_coupon": "Нет купонов",
-    "up_empty_favor": "Нет избранного",
-    "up_empty_permission": "Нет разрешения",
-    "up_empty_history": "Нет истории",
-    "up_empty_news": "Нет новостей",
-    "up_empty_message": "Список сообщений пуст",
-    "up_empty_list": "Список пуст",
-    "up_empty_data": "Нет данных",
-    "up_empty_comment": "Нет комментариев",
-    "up_link_copyed": "Ссылка скопирована, откройте в браузере",
-    "up_loadmoe_loadmore": "Загрузить еще",
-    "up_loadmoe_nomore": "Больше нет",
-    "up_noNetwork_text": "Упс, потеряно сетевое соединение",
-    "up_noNetwork_pleaseCheck": "Проверьте сеть или перейдите в",
-    "up_noNetwork_connect": "Сеть подключена",
-    "up_noNetwork_disconnect": "Нет сетевого подключения",
-    "up_pagination_previous": "Предыдущая",
-    "up_pagination_next": "Следующая",
-    "up_pullRefresh_pull": "Потяните для обновления",
-    "up_pullRefresh_release": "Отпустите для обновления",
-    "up_pullRefresh_refreshing": "Обновление",
-    "up_readMore_expand": "Развернуть, чтобы прочитать больше",
-    "up_readMore_fold": "Свернуть",
-    "up_search_placeholder": "Введите ключевые слова",
-    "up_signature_penSize": "Размер линии",
-    "up_signature_penColor": "Цвет линии",
-    "up_upload_sizeExceed": "Превышен лимит размера",
-    "up_upload_uploading": "Загрузка",
-    "up_upload_previewImageFail": "Не удалось просмотреть изображение",
-    "up_upload_previewVideoFail": "Не удалось просмотреть видео",
-    "up_goodsSku_stock": "Запас",
-    "up_goodsSku_price": "Цена",
-    "up_goodsSku_amount": "Штуки",
-    "up_goodsSku_choosed": "Выбрано",
-    "up_goodsSku_buyAmount": "Количество"
-  });
-  let settings = new UTSJSONObject({
-    // lang: uni.getLocale(),
-    lang: "zh-Hans",
-    locales: new UTSJSONObject({
-      en,
-      es,
-      fr,
-      de,
-      ko,
-      ja,
-      ru,
-      "zh-Hant": zhHant,
-      "zh-Hans": zhHans
-    })
-  });
-  function t(value, params = new UTSJSONObject({})) {
-    if (value != "") {
-      value = value.replaceAll(".", "_");
-      let lang = settings["lang"];
-      let locales = settings["locales"];
-      lang = "zh-Hans";
-      let result = "";
-      if (locales[lang] != null) {
-        result = locales[lang][value].toString();
-      } else {
-        result = value;
-      }
-      let resultStr = result.toString();
-      return resultStr;
-    } else {
-      return value;
-    }
-  }
-  new UTSJSONObject({
-    settings
-  });
   const defProps$14 = new UTSJSONObject({
     empty: new UTSJSONObject({
       icon: "",
@@ -19997,33 +20140,31 @@
     }
     // 自定义样式
     // ...commonProps
-  }, emits: ["click", "close"], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
+  }, emits: ["click", "close"], setup(__props, _a2) {
+    var __expose = _a2.expose, __emit = _a2.emit;
     __expose();
     const instance = vue.getCurrentInstance().proxy;
     const props2 = __props;
     const emit = __emit;
-    const icons2 = new UTSJSONObject(
-      {
-        car: t("up.empty.car", new UTSJSONObject({})),
-        page: t("up.empty.page", new UTSJSONObject({})),
-        search: t("up.empty.search", new UTSJSONObject({})),
-        address: t("up.empty.address", new UTSJSONObject({})),
-        wifi: t("up.empty.wifi", new UTSJSONObject({})),
-        order: t("up.empty.order", new UTSJSONObject({})),
-        coupon: t("up.empty.coupon", new UTSJSONObject({})),
-        favor: t("up.empty.favor", new UTSJSONObject({})),
-        permission: t("up.empty.permission", new UTSJSONObject({})),
-        history: t("up.empty.history", new UTSJSONObject({})),
-        news: t("up.empty.news", new UTSJSONObject({})),
-        message: t("up.empty.message", new UTSJSONObject({})),
-        list: t("up.empty.list", new UTSJSONObject({})),
-        data: t("up.empty.data", new UTSJSONObject({})),
-        comment: t("up.empty.comment", new UTSJSONObject({}))
-      }
-      // 计算属性
-      // 组件样式
-    );
+    const icons2 = vue.computed(() => {
+      return new UTSJSONObject({
+        car: t$1("up.empty.car", new UTSJSONObject({})),
+        page: t$1("up.empty.page", new UTSJSONObject({})),
+        search: t$1("up.empty.search", new UTSJSONObject({})),
+        address: t$1("up.empty.address", new UTSJSONObject({})),
+        wifi: t$1("up.empty.wifi", new UTSJSONObject({})),
+        order: t$1("up.empty.order", new UTSJSONObject({})),
+        coupon: t$1("up.empty.coupon", new UTSJSONObject({})),
+        favor: t$1("up.empty.favor", new UTSJSONObject({})),
+        permission: t$1("up.empty.permission", new UTSJSONObject({})),
+        history: t$1("up.empty.history", new UTSJSONObject({})),
+        news: t$1("up.empty.news", new UTSJSONObject({})),
+        message: t$1("up.empty.message", new UTSJSONObject({})),
+        list: t$1("up.empty.list", new UTSJSONObject({})),
+        data: t$1("up.empty.data", new UTSJSONObject({})),
+        comment: t$1("up.empty.comment", new UTSJSONObject({}))
+      });
+    });
     const emptyStyle = vue.computed(() => {
       const style = new UTSJSONObject({});
       style["marginTop"] = addUnit$1(props2.marginTop);
@@ -20092,8 +20233,8 @@
   const __easycom_1$P = /* @__PURE__ */ _export_sfc(_sfc_main$2s, [["render", _sfc_render$2r], ["styles", [_style_0$2o]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-empty/up-empty.uvue"]]);
   const _sfc_main$2r = /* @__PURE__ */ vue.defineComponent({
     __name: "empty",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -20210,8 +20351,8 @@
       }
     },
     emits: ["click"],
-    setup(__props, _a) {
-      var __expose = _a.expose, __emit = _a.emit;
+    setup(__props, _a2) {
+      var __expose = _a2.expose, __emit = _a2.emit;
       __expose();
       const props2 = __props;
       const emit = __emit;
@@ -20292,8 +20433,8 @@
   const __easycom_1$O = /* @__PURE__ */ _export_sfc(_sfc_main$2q, [["render", _sfc_render$2p], ["styles", [_style_0$2m]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-divider/up-divider.uvue"]]);
   const _sfc_main$2p = /* @__PURE__ */ vue.defineComponent({
     __name: "divider",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -20354,8 +20495,8 @@
   const SrcSubUviewUltraDemosDividerDivider = /* @__PURE__ */ _export_sfc(_sfc_main$2p, [["render", _sfc_render$2o], ["styles", [_style_0$2l, _style_1$13]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/divider/divider.uvue"]]);
   const _sfc_main$2o = /* @__PURE__ */ vue.defineComponent({
     __name: "loading-icon",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -20503,7 +20644,7 @@
     },
     computed: {
       rowsArray() {
-        var _a, _b;
+        var _a2, _b;
         const rows = [];
         for (let i = 0; i < parseInt(this.rows.toString()); i++) {
           let item = new UTSJSONObject(
@@ -20515,7 +20656,7 @@
             if (i === parseInt(this.rows.toString()) - 1) {
               rowWidth = "70%";
             } else {
-              rowWidth = this.rowsWidth[i] != null ? (_a = this.rowsWidth[i]) !== null && _a !== void 0 ? _a : "0px" : i === this.rowsWidth.length ? "70%" : "100%";
+              rowWidth = this.rowsWidth[i] != null ? (_a2 = this.rowsWidth[i]) !== null && _a2 !== void 0 ? _a2 : "0px" : i === this.rowsWidth.length ? "70%" : "100%";
             }
           } else {
             if (i === parseInt(this.rows.toString()) - 1) {
@@ -20651,8 +20792,8 @@
   const __easycom_1$N = /* @__PURE__ */ _export_sfc(_sfc_main$2n, [["render", _sfc_render$2m], ["styles", [_style_0$2j]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-skeleton/up-skeleton.uvue"]]);
   const _sfc_main$2m = /* @__PURE__ */ vue.defineComponent({
     __name: "skeleton",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -20895,8 +21036,8 @@
       type: String,
       default: defProps$11.getString("card.boxShadow")
     }
-  }, emits: ["click", "head-click", "body-click", "foot-click"], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
+  }, emits: ["click", "head-click", "body-click", "foot-click"], setup(__props, _a2) {
+    var __expose = _a2.expose, __emit = _a2.emit;
     __expose();
     const props2 = __props;
     const realThumb = vue.computed(() => {
@@ -20965,7 +21106,7 @@
   } }));
   const _style_0$2h = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-card": { "": { "position": "relative", "overflow": "hidden", "backgroundColor": "#ffffff", "boxSizing": "border-box" } }, "up-card-full": { "": { "!marginLeft": 0, "!marginRight": 0, "width": "100%" } }, "up-card--border": { "": { "borderTopLeftRadius:after": "16rpx", "borderTopRightRadius:after": "16rpx", "borderBottomRightRadius:after": "16rpx", "borderBottomLeftRadius:after": "16rpx" } }, "up-card__head--left": { "": { "color": "#303133" } }, "up-card__head--left__thumb": { "": { "marginRight": "16rpx" } }, "up-card__head--left__title": { "": { "maxWidth": "400rpx" } }, "up-card__head--right": { "": { "color": "#909193", "marginLeft": "16rpx" } }, "up-card__body": { "": { "color": "#606266" } }, "up-card__foot": { "": { "color": "#909193" } } };
   function _sfc_render$2k(_ctx, _cache, $props, $setup, $data, $options) {
-    var _a, _b, _c;
+    var _a2, _b, _c;
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -20985,7 +21126,7 @@
             class: vue.normalizeClass(["up-card__head", {
               "up-border-bottom": $props.headBorderBottom
             }]),
-            style: vue.normalizeStyle([$setup.headPaddingStyle, (_a = $props.headStyle) != null ? _a : {}]),
+            style: vue.normalizeStyle([$setup.headPaddingStyle, (_a2 = $props.headStyle) != null ? _a2 : {}]),
             onClick: $setup.headClick
           },
           [
@@ -21328,8 +21469,8 @@
       }
     },
     emits: ["click", "getphonenumber", "getuserinfo", "error", "opensetting", "launchapp"],
-    setup(__props, _a) {
-      var __expose = _a.expose, __emit = _a.emit;
+    setup(__props, _a2) {
+      var __expose = _a2.expose, __emit = _a2.emit;
       __expose();
       const props2 = __props;
       const emit = __emit;
@@ -21517,8 +21658,8 @@
   const logoImg = "/static/logo.png";
   const _sfc_main$2j = /* @__PURE__ */ vue.defineComponent({
     __name: "card",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { logoImg, get AppKu() {
         return AppKu;
@@ -21908,8 +22049,8 @@
   const __easycom_3$3 = /* @__PURE__ */ _export_sfc(_sfc_main$2i, [["render", _sfc_render$2h], ["styles", [_style_0$2e]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-list/up-list.uvue"]]);
   const _sfc_main$2h = /* @__PURE__ */ vue.defineComponent({
     __name: "list",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const listItems = vue.ref([
         new UTSJSONObject({ title: "List 列表项 01", desc: "这是高性能列表的第一项" }),
@@ -22135,9 +22276,9 @@
     },
     computed: {
       lengthArray() {
-        var _a;
+        var _a2;
         let list = [];
-        const len = (_a = this.$props["length"]) !== null && _a !== void 0 ? _a : 0;
+        const len = (_a2 = this.$props["length"]) !== null && _a2 !== void 0 ? _a2 : 0;
         for (var index = 0; index < len; index++) {
           list.push(index.toString());
         }
@@ -22628,8 +22769,8 @@
   const __easycom_1$K = /* @__PURE__ */ _export_sfc(_sfc_main$2f, [["render", _sfc_render$2e], ["styles", [_style_0$2b]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-swiper/up-swiper.uvue"]]);
   const _sfc_main$2e = /* @__PURE__ */ vue.defineComponent({
     __name: "swiper",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const swiperList = vue.ref([
         new UTSJSONObject({ image: "/static/logo.png", title: "uview-ultra 组件演示" }),
@@ -22686,6 +22827,8 @@
                     "key-name": "image",
                     indicator: true,
                     "indicator-mode": "line",
+                    "indicator-active-color": "#2979ff",
+                    "indicator-inactive-color": "rgba(0, 0, 0, 0.15)",
                     circular: true,
                     "previous-margin": 30,
                     "next-margin": 30,
@@ -22832,8 +22975,8 @@
       }
     },
     emits: ["click", "error", "load"],
-    setup(__props, _a) {
-      var __expose = _a.expose, __emit = _a.emit;
+    setup(__props, _a2) {
+      var __expose = _a2.expose, __emit = _a2.emit;
       const props2 = __props;
       const isError = vue.ref(true);
       const loading2 = vue.ref(true);
@@ -23004,8 +23147,8 @@
   const __easycom_1$J = /* @__PURE__ */ _export_sfc(_sfc_main$2d, [["render", _sfc_render$2c], ["styles", [_style_0$29]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-image/up-image.uvue"]]);
   const _sfc_main$2c = /* @__PURE__ */ vue.defineComponent({
     __name: "image",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -23085,8 +23228,8 @@
   const SrcSubUviewUltraDemosImageImage = /* @__PURE__ */ _export_sfc(_sfc_main$2c, [["render", _sfc_render$2b], ["styles", [_style_0$28, _style_1$Z]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/image/image.uvue"]]);
   const _sfc_main$2b = /* @__PURE__ */ vue.defineComponent({
     __name: "transition",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const transitionShow = vue.ref(true);
       const slideMode = vue.ref("slide-up");
@@ -23475,9 +23618,9 @@
       }
     },
     mounted() {
-      var _a;
+      var _a2;
       if (this.parent != null) {
-        (_a = this.parent) === null || _a === void 0 ? null : _a.$callMethod("updateFromChild");
+        (_a2 = this.parent) === null || _a2 === void 0 ? null : _a2.$callMethod("updateFromChild");
       }
     },
     methods: {
@@ -23766,8 +23909,8 @@
   const __easycom_2$k = /* @__PURE__ */ _export_sfc(_sfc_main$29, [["render", _sfc_render$28], ["styles", [_style_0$25]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-steps/up-steps.uvue"]]);
   const _sfc_main$28 = /* @__PURE__ */ vue.defineComponent({
     __name: "steps",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -23870,8 +24013,8 @@
       type: [String],
       default: defProps$W.getString("th.width")
     }
-  }, setup(__props, _a) {
-    var __expose = _a.expose;
+  }, setup(__props, _a2) {
+    var __expose = _a2.expose;
     __expose();
     const _b = useUltraUI(new UTSJSONObject({
       padding: 0,
@@ -23933,8 +24076,8 @@
   const __easycom_1$H = /* @__PURE__ */ _export_sfc(_sfc_main$27, [["render", _sfc_render$26], ["styles", [_style_0$23]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-th/up-th.uvue"]]);
   const _sfc_main$26 = /* @__PURE__ */ vue.defineComponent(Object.assign({
     name: "up-tr"
-  }, { __name: "up-tr", setup(__props, _a) {
-    var __expose = _a.expose;
+  }, { __name: "up-tr", setup(__props, _a2) {
+    var __expose = _a2.expose;
     __expose();
     const __returned__ = {};
     Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
@@ -23981,8 +24124,8 @@
       type: String,
       default: defProps$V.getString("td.color")
     }
-  }, setup(__props, _a) {
-    var __expose = _a.expose;
+  }, setup(__props, _a2) {
+    var __expose = _a2.expose;
     __expose();
     const _b = useUltraUI(new UTSJSONObject({
       padding: 0,
@@ -24106,8 +24249,8 @@
       type: String,
       default: defProps$U.getString("table.bgColor")
     }
-  }, setup(__props, _a) {
-    var __expose = _a.expose;
+  }, setup(__props, _a2) {
+    var __expose = _a2.expose;
     const instance = vue.getCurrentInstance().proxy;
     const props2 = __props;
     const show = vue.ref(true);
@@ -24173,8 +24316,8 @@
   const __easycom_4 = /* @__PURE__ */ _export_sfc(_sfc_main$24, [["render", _sfc_render$23], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-table/up-table.uvue"]]);
   const _sfc_main$23 = /* @__PURE__ */ vue.defineComponent({
     __name: "table",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -24609,8 +24752,8 @@
       type: Boolean,
       default: defPropsInput.getBoolean("input.ignoreCompositionEvent")
     }
-  }, emits: ["update:modelValue", "focus", "blur", "change", "confirm", "clear", "keyboardheightchange"], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
+  }, emits: ["update:modelValue", "focus", "blur", "change", "confirm", "clear", "keyboardheightchange"], setup(__props, _a2) {
+    var __expose = _a2.expose, __emit = _a2.emit;
     __expose();
     const instance = vue.getCurrentInstance().proxy;
     const props2 = __props;
@@ -24728,15 +24871,15 @@
     };
     const inputNativeRef = vue.ref(null);
     const doFocus = () => {
-      var _a2;
+      var _a3;
       if (inputNativeRef.value != null) {
-        (_a2 = inputNativeRef.value) === null || _a2 === void 0 ? null : _a2.$callMethod("focus");
+        (_a3 = inputNativeRef.value) === null || _a3 === void 0 ? null : _a3.$callMethod("focus");
       }
     };
     const doBlur = () => {
-      var _a2;
+      var _a3;
       if (inputNativeRef.value != null) {
-        (_a2 = inputNativeRef.value) === null || _a2 === void 0 ? null : _a2.$callMethod("blur");
+        (_a3 = inputNativeRef.value) === null || _a3 === void 0 ? null : _a3.$callMethod("blur");
       }
     };
     const setFormatter = (e) => {
@@ -24905,8 +25048,8 @@
       type: [String, UTSJSONObject],
       default: defProps$T.getString("formItem.leftIconStyle")
     }
-  }, emits: ["click"], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
+  }, emits: ["click"], setup(__props, _a2) {
+    var __expose = _a2.expose, __emit = _a2.emit;
     const _b = useUltraUI(new UTSJSONObject({
       // 提示文本的位置
       labelPosition: "left",
@@ -25025,7 +25168,7 @@
           [
             vue.createCommentVNode(' 微信小程序中，将一个参数设置空字符串，结果会变成字符串"true" '),
             vue.renderSlot(_ctx.$slots, "label", {}, () => {
-              var _a;
+              var _a2;
               return [
                 vue.createCommentVNode(" {{required}} "),
                 $props.required || $props.leftIcon != "" || $props.label != "" ? (vue.openBlock(), vue.createElementBlock(
@@ -25068,7 +25211,7 @@
                             "text",
                             {
                               class: "up-form-item__body__left__content__label__text",
-                              style: vue.normalizeStyle((_a = $setup.parentData["labelStyle"]) != null ? _a : {})
+                              style: vue.normalizeStyle((_a2 = $setup.parentData["labelStyle"]) != null ? _a2 : {})
                             },
                             vue.toDisplayString($props.label),
                             5
@@ -25103,7 +25246,7 @@
           /* STYLE */
         ),
         vue.renderSlot(_ctx.$slots, "error", {}, () => {
-          var _a;
+          var _a2;
           return [
             $setup.message != "" && $setup.parentData["errorType"] == "message" ? (vue.openBlock(), vue.createElementBlock(
               "text",
@@ -25111,7 +25254,7 @@
                 key: 0,
                 class: "up-form-item__body__right__message",
                 style: vue.normalizeStyle({
-                  marginLeft: _ctx.$up.addUnit(((_a = $props.labelPosition) != null ? _a : $setup.parentData["labelPosition"]) == "top" ? 0 : $props.labelWidth != null ? $props.labelWidth : $setup.parentData["labelWidth"])
+                  marginLeft: _ctx.$up.addUnit(((_a2 = $props.labelPosition) != null ? _a2 : $setup.parentData["labelPosition"]) == "top" ? 0 : $props.labelWidth != null ? $props.labelWidth : $setup.parentData["labelWidth"])
                 })
               },
               vue.toDisplayString($setup.message),
@@ -25803,8 +25946,8 @@
       type: Boolean,
       default: false
     }
-  }, emits: ["change", "update:checked"], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
+  }, emits: ["change", "update:checked"], setup(__props, _a2) {
+    var __expose = _a2.expose, __emit = _a2.emit;
     const _b = useUltraUI(), parent = _b.parent, parentData = _b.parentData, getParentData = _b.getParentData;
     const instance = vue.getCurrentInstance().proxy;
     const props2 = __props;
@@ -26179,8 +26322,8 @@
       type: Boolean,
       default: defProps$Q.getBoolean("checkboxGroup.borderBottom")
     }
-  }, emits: ["update:modelValue", "change"], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
+  }, emits: ["update:modelValue", "change"], setup(__props, _a2) {
+    var __expose = _a2.expose, __emit = _a2.emit;
     const _b = useUltraUI(), children = _b.children, getChildren = _b.getChildren, addChild = _b.addChild;
     const instance = vue.getCurrentInstance().proxy;
     const props2 = __props;
@@ -26207,9 +26350,9 @@
       return bem("checkbox-group", [props2.placement], []);
     });
     function unCheckedOther(childInstance) {
-      var _a2;
+      var _a3;
       const values = [];
-      (_a2 = children.value) === null || _a2 === void 0 ? null : _a2.map((child) => {
+      (_a3 = children.value) === null || _a3 === void 0 ? null : _a3.map((child) => {
         let istats = child.$callMethod("getInternalState");
         if (istats["name"] != null && istats["isChecked"] != null && istats["isChecked"].toString() == "true") {
           values.push(istats["name"].toString());
@@ -26219,8 +26362,8 @@
       emit("update:modelValue", values);
     }
     vue.watch(parentDataSelf, () => {
-      var _a2;
-      (_a2 = children.value) === null || _a2 === void 0 ? null : _a2.map((child) => {
+      var _a3;
+      (_a3 = children.value) === null || _a3 === void 0 ? null : _a3.map((child) => {
         child === null || child === void 0 ? null : child.$callMethod("init");
       });
     }, { deep: true });
@@ -26728,8 +26871,8 @@
         return __awaiter(this, void 0, void 0, function* () {
           yield sleep$1();
           this.upGetRect("#" + this.elId).then((res) => {
-            var _a;
-            const left = (_a = res.left) !== null && _a !== void 0 ? _a : NaN;
+            var _a2;
+            const left = (_a2 = res.left) !== null && _a2 !== void 0 ? _a2 : NaN;
             if (!isNaN(left)) {
               this.rateBoxLeft = left;
             }
@@ -26739,8 +26882,8 @@
       // 获取单个星星的尺寸
       getRateIconWrapRect() {
         this.$uGetRect("." + this.elClass).then((res) => {
-          var _a;
-          const width = (_a = res.width) !== null && _a !== void 0 ? _a : NaN;
+          var _a2;
+          const width = (_a2 = res.width) !== null && _a2 !== void 0 ? _a2 : NaN;
           if (!isNaN(width) && width > 0) {
             this.rateWidth = width;
           }
@@ -27273,8 +27416,8 @@
       },
       // 清除定时器
       clearTimeout() {
-        var _a;
-        clearTimeout((_a = this.longPressTimer) !== null && _a !== void 0 ? _a : 0);
+        var _a2;
+        clearTimeout((_a2 = this.longPressTimer) !== null && _a2 !== void 0 ? _a2 : 0);
         this.longPressTimer = null;
       }
     }
@@ -27599,8 +27742,8 @@
     mounted() {
       if (!this.useNative) {
         this.upGetRect(".up-slider__base").then((rect) => {
-          var _a, _b;
-          this.sliderRect.width = (_a = rect.width) !== null && _a !== void 0 ? _a : 0;
+          var _a2, _b;
+          this.sliderRect.width = (_a2 = rect.width) !== null && _a2 !== void 0 ? _a2 : 0;
           this.sliderRect.left = (_b = rect.left) !== null && _b !== void 0 ? _b : 0;
           if (this.sliderRect.width == 0) {
             uni.__log__("info", "at uni_modules/uview-ultra/components/up-slider/up-slider.uvue:219", "如在弹窗等元素中使用，请使用v-if来显示滑块，否则无法计算长度。");
@@ -27765,7 +27908,7 @@
   });
   const _style_0$1S = { "up-slider": { "": { "position": "relative", "display": "flex", "flexDirection": "row", "alignItems": "center" } }, "up-slider__native": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-slider-inner": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column", "position": "relative", "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999, "paddingTop": 10, "paddingRight": 18, "paddingBottom": 10, "paddingLeft": 18, "justifyContent": "center", "position:before": "absolute", "right:before": 0, "left:before": 0, "top:before": -8, "bottom:before": -8, "zIndex:before": -1 } }, "up-slider__show-value": { "": { "marginTop": 10, "marginRight": 18, "marginBottom": 10, "marginLeft": 0 } }, "up-slider__show-range-value": { "": { "paddingTop": 2, "fontSize": 12, "lineHeight": "12px", "position": "absolute", "bottom": 0 } }, "up-slider__base": { "": { "backgroundColor": "#ebedf0" } }, "up-slider__gap": { "": { "position": "relative", "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999, "transitionProperty": "width", "transitionDuration": "0.2s", "backgroundColor": "var(--theme-color, #0957de)", "alignSelf": "flex-start" } }, "up-slider__button": { "": { "width": 24, "height": 24, "borderTopLeftRadius": 999, "borderTopRightRadius": 999, "borderBottomRightRadius": 999, "borderBottomLeftRadius": 999, "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#d0d0d0", "borderRightColor": "#d0d0d0", "borderBottomColor": "#d0d0d0", "borderLeftColor": "#d0d0d0", "backgroundColor": "#ffffff" } }, "up-slider__button-wrap": { "": { "position": "absolute" } }, "up-slider--disabled": { "": { "opacity": 0.5 } }, "@TRANSITION": { "up-slider__gap": { "property": "width", "duration": "0.2s" } } };
   function _sfc_render$1U(_ctx, _cache, $props, $setup, $data, $options) {
-    var _a, _b;
+    var _a2, _b;
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -27839,7 +27982,7 @@
                     class: "up-slider__show-range-value",
                     style: vue.normalizeStyle({ left: parseFloat($options.getPx($data.barStyle0.width)) + parseFloat($options.getPx(_ctx.blockSize)) / 2 + "px" })
                   },
-                  vue.toDisplayString((_a = this.rangeValue[0]) != null ? _a : ""),
+                  vue.toDisplayString((_a2 = this.rangeValue[0]) != null ? _a2 : ""),
                   5
                   /* TEXT, STYLE */
                 )) : vue.createCommentVNode("v-if", true),
@@ -28130,7 +28273,7 @@
     computed: {
       // 组件的类名
       textareaClass() {
-        let classes = [], _a = this, border = _a.border, disabled = _a.disabled;
+        let classes = [], _a2 = this, border = _a2.border, disabled = _a2.disabled;
         if (border === "surround") {
           classes = classes.concat(["up-border", "up-textarea--radius"]);
         }
@@ -28775,14 +28918,14 @@
     });
   }
   function formatVideo(res) {
-    var _a, _b;
+    var _a2, _b;
     let tmp = new UTSJSONObject(Object.assign(Object.assign({}, pickExclude(res, ["tempFilePath", "thumbTempFilePath", "errMsg"])), {
       type: "video",
       url: res.tempFilePath,
       // thumb: res.thumbTempFilePath,
       thumb: "",
       size: res.size,
-      width: (_a = res.width) !== null && _a !== void 0 ? _a : 0,
+      width: (_a2 = res.width) !== null && _a2 !== void 0 ? _a2 : 0,
       height: (_b = res.height) !== null && _b !== void 0 ? _b : 0,
       name: UTS.arrayPop(res.tempFilePath.split("/")) + ".mp4"
     }));
@@ -28790,9 +28933,9 @@
       UTS.JSON.parseObject(UTS.JSON.stringify(tmp))
     ];
   }
-  function chooseFile(_a) {
-    var accept = _a.accept, multiple = _a.multiple, capture = _a.capture, compressed = _a.compressed, maxDuration = _a.maxDuration, sizeType = _a.sizeType, camera2 = _a.camera, maxCount = _a.maxCount;
-    _a.extension;
+  function chooseFile(_a2) {
+    var accept = _a2.accept, multiple = _a2.multiple, capture = _a2.capture, compressed = _a2.compressed, maxDuration = _a2.maxDuration, sizeType = _a2.sizeType, camera2 = _a2.camera, maxCount = _a2.maxCount;
+    _a2.extension;
     let captureList = [];
     try {
       captureList = array(capture) ? capture : capture.toString().split(",");
@@ -29044,7 +29187,7 @@
     emits: ["error", "beforeRead", "oversize", "afterRead", "delete", "clickPreview", "update:fileList", "afterAutoUpload"],
     methods: {
       t(key2) {
-        return t(key2, new UTSJSONObject({}));
+        return t$1(key2, new UTSJSONObject({}));
       },
       addUnit(e = null) {
         return addUnit$1(e);
@@ -29073,11 +29216,11 @@
         let maxCount = parseInt(this.maxCount.toString());
         let lists = [];
         fileList.forEach((item) => {
-          var _a, _b;
+          var _a2, _b;
           const name = item["name"] != null ? item["name"] : item["url"] != null ? item["url"] : item["thumb"];
           let tmp = UTSJSONObject.assign(UTSJSONObject.assign(new UTSJSONObject({}), item), new UTSJSONObject({
             // 如果item.url为本地选择的blob文件的话，无法判断其为video还是image，此处优先通过accept做判断处理
-            isImage: item["name"] != null ? image$1(item["name"]) : (_a = this.accept === "image") !== null && _a !== void 0 ? _a : image$1(name),
+            isImage: item["name"] != null ? image$1(item["name"]) : (_a2 = this.accept === "image") !== null && _a2 !== void 0 ? _a2 : image$1(name),
             isVideo: item["name"] != null ? video$1(item["name"]) : (_b = this.accept === "video") !== null && _b !== void 0 ? _b : video$1(name),
             deletable: typeof item.deletable === "boolean" ? item.deletable : this.deletable
           }));
@@ -29182,7 +29325,7 @@
           const oversize = file2.some(even);
           if (oversize) {
             uni.showToast({
-              title: t("up.upload.sizeExceed", new UTSJSONObject({}))
+              title: t$1("up.upload.sizeExceed", new UTSJSONObject({}))
             });
             this.$emit("oversize", UTSJSONObject.assign(new UTSJSONObject({
               file: this.convertFileToUTSJSON(file2)
@@ -29198,7 +29341,7 @@
               if (itemJSON != null) {
                 fileList.push(UTSJSONObject.assign(itemJSON, new UTSJSONObject({
                   status: "uploading",
-                  message: t("up.upload.uploading", new UTSJSONObject({})),
+                  message: t$1("up.upload.uploading", new UTSJSONObject({})),
                   progress: 0
                 })));
               }
@@ -29225,7 +29368,7 @@
                       filename: lists[j]["name"]
                     }),
                     success: (ret) => {
-                      var _a;
+                      var _a2;
                       let res0 = ret.data;
                       if (res0["code"] == 200) {
                         formData = res0.getAny("data.params");
@@ -29238,7 +29381,7 @@
                       }
                       if (res0.getString("data.params.host") != null) {
                         var uploadTask2 = uni.uploadFile({
-                          url: (_a = res0.getString("data.params.host")) !== null && _a !== void 0 ? _a : "",
+                          url: (_a2 = res0.getString("data.params.host")) !== null && _a2 !== void 0 ? _a2 : "",
                           filePath: lists[j].url,
                           name: "file",
                           // fileType: 'video', // 仅支付宝小程序，且必填。
@@ -29276,7 +29419,7 @@
                     // fileType: 'video', // 仅支付宝小程序，且必填。
                     header: this.autoUploadHeader,
                     success: (uploadFileRes) => {
-                      var _a;
+                      var _a2;
                       let res0 = UTS.JSON.parseObject(uploadFileRes.data);
                       if (that.customAfterAutoUpload) {
                         that.emitAfterAutoUpload(res0, len + j);
@@ -29286,7 +29429,7 @@
                             title: res0["msg"]
                           });
                         } else {
-                          result = (_a = res0.getString("data.url")) !== null && _a !== void 0 ? _a : "";
+                          result = (_a2 = res0.getString("data.url")) !== null && _a2 !== void 0 ? _a2 : "";
                           that.succcessUpload(len + j, result);
                         }
                       }
@@ -29315,8 +29458,8 @@
           url: defaultUrl2,
           thumb: defaultThumb,
           callback: (r) => {
-            var _a, _b;
-            const url2 = (_a = r.getString("url")) !== null && _a !== void 0 ? _a : defaultUrl2;
+            var _a2, _b;
+            const url2 = (_a2 = r.getString("url")) !== null && _a2 !== void 0 ? _a2 : defaultUrl2;
             if (url2 == "") {
               return null;
             }
@@ -29378,7 +29521,7 @@
           urls,
           current,
           fail() {
-            toast(t("up.upload.previewImageFail", new UTSJSONObject({})));
+            toast(t$1("up.upload.previewImageFail", new UTSJSONObject({})));
           }
         });
       },
@@ -29439,7 +29582,7 @@
             vue.Fragment,
             { key: 0 },
             vue.renderList($data.lists, (item, index) => {
-              var _a;
+              var _a2;
               return vue.openBlock(), vue.createElementBlock("view", {
                 class: "up-upload__wrap__preview",
                 key: index
@@ -29548,7 +29691,7 @@
                   vue.createVNode(_component_up_gap, {
                     class: "up-upload__progress",
                     height: "3px",
-                    style: vue.normalizeStyle({ width: ((_a = item.progress) != null ? _a : 0) + "%" })
+                    style: vue.normalizeStyle({ width: ((_a2 = item.progress) != null ? _a2 : 0) + "%" })
                   }, null, 8, ["style"])
                 ])) : vue.createCommentVNode("v-if", true),
                 item.status !== "uploading" && ($props.deletable || item.deletable) ? (vue.openBlock(), vue.createElementBlock("view", {
@@ -30108,8 +30251,8 @@
       type: Object,
       default: defProps$I.getArray("form.labelStyle")
     }
-  }, emits: [], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
+  }, emits: [], setup(__props, _a2) {
+    var __expose = _a2.expose, __emit = _a2.emit;
     const _b = useUltraUI(), children = _b.children, getChildren = _b.getChildren, addChild = _b.addChild;
     const instance = vue.getCurrentInstance().proxy;
     const props2 = __props;
@@ -30497,6 +30640,9 @@
       return {};
     },
     methods: {
+      t(key2) {
+        return t$1(key2, new UTSJSONObject({}));
+      },
       prev() {
         if (!this.prevDisabled) {
           this.$emit("prev");
@@ -30524,7 +30670,7 @@
       }
     }
   });
-  const _style_0$1M = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-calendar-header": { "": { "display": "flex", "flexDirection": "column", "paddingBottom": 4 } }, "up-calendar-header__title": { "": { "fontSize": 16, "color": "#303133", "textAlign": "center", "height": 42, "lineHeight": "42px", "fontWeight": "bold" } }, "up-calendar-header__subtitle-wrap": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "height": 40 } }, "up-calendar-header__subtitle": { "": { "fontSize": 14, "color": "#303133", "textAlign": "center", "fontWeight": "bold", "minWidth": 120 } }, "up-calendar-header__switch": { "": { "width": 44, "height": 40, "lineHeight": "40px", "textAlign": "center", "color": "#303133", "fontSize": 22, "fontWeight": "bold", "flexShrink": 0 } }, "up-calendar-header__switch--disabled": { "": { "opacity": 0.35 } }, "up-calendar-header__weekdays": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between" } }, "up-calendar-header__weekdays__weekday": { "": { "fontSize": 13, "color": "#303133", "lineHeight": "30px", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "textAlign": "center" } }, "up-calendar-header__today": { "": { "marginLeft": 4, "height": 28, "lineHeight": "28px", "paddingTop": 0, "paddingRight": 10, "paddingBottom": 0, "paddingLeft": 10, "borderTopLeftRadius": 14, "borderTopRightRadius": 14, "borderBottomRightRadius": 14, "borderBottomLeftRadius": 14, "fontSize": 13, "color": "var(--theme-color, #0957de)", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "var(--theme-color, #0957de)", "borderRightColor": "var(--theme-color, #0957de)", "borderBottomColor": "var(--theme-color, #0957de)", "borderLeftColor": "var(--theme-color, #0957de)", "flexShrink": 0 } }, "up-calendar-header__today--disabled": { "": { "opacity": 0.35 } } };
+  const _style_0$1M = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-calendar-header__title": { "": { "fontSize": 16, "fontWeight": "bold", "textAlign": "center", "color": "#303133", "height": 42, "lineHeight": "42px" } }, "up-calendar-header__subtitle": { "": { "fontSize": 14, "color": "#303133", "height": 40, "textAlign": "center", "lineHeight": "40px", "fontWeight": "bold" } }, "up-calendar-header__subtitle-wrap": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "position": "relative" } }, "up-calendar-header__switch": { "": { "fontSize": 16, "color": "#909193", "lineHeight": "40px", "paddingTop": 0, "paddingRight": 8, "paddingBottom": 0, "paddingLeft": 8 } }, "up-calendar-header__switch--disabled": { "": { "color": "#c0c4cc" } }, "up-calendar-header__today": { "": { "position": "absolute", "right": 15, "fontSize": 13, "color": "var(--theme-color, #0957de)" } }, "up-calendar-header__today--disabled": { "": { "color": "#c0c4cc" } }, "up-calendar-header__weekdays": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "space-between" } }, "up-calendar-header__weekdays__weekday": { "": { "fontSize": 13, "color": "#303133", "lineHeight": "30px", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "textAlign": "center" } } };
   function _sfc_render$1N(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "up-calendar-header up-border-bottom" }, [
       $props.showTitle ? (vue.openBlock(), vue.createElementBlock(
@@ -30605,13 +30751,55 @@
         )) : vue.createCommentVNode("v-if", true)
       ])) : vue.createCommentVNode("v-if", true),
       vue.createElementVNode("view", { class: "up-calendar-header__weekdays" }, [
-        vue.createElementVNode("text", { class: "up-calendar-header__weekdays__weekday" }, "一"),
-        vue.createElementVNode("text", { class: "up-calendar-header__weekdays__weekday" }, "二"),
-        vue.createElementVNode("text", { class: "up-calendar-header__weekdays__weekday" }, "三"),
-        vue.createElementVNode("text", { class: "up-calendar-header__weekdays__weekday" }, "四"),
-        vue.createElementVNode("text", { class: "up-calendar-header__weekdays__weekday" }, "五"),
-        vue.createElementVNode("text", { class: "up-calendar-header__weekdays__weekday" }, "六"),
-        vue.createElementVNode("text", { class: "up-calendar-header__weekdays__weekday" }, "日")
+        vue.createElementVNode(
+          "text",
+          { class: "up-calendar-header__weekdays__weekday" },
+          vue.toDisplayString($options.t("up_week_one")),
+          1
+          /* TEXT */
+        ),
+        vue.createElementVNode(
+          "text",
+          { class: "up-calendar-header__weekdays__weekday" },
+          vue.toDisplayString($options.t("up_week_two")),
+          1
+          /* TEXT */
+        ),
+        vue.createElementVNode(
+          "text",
+          { class: "up-calendar-header__weekdays__weekday" },
+          vue.toDisplayString($options.t("up_week_three")),
+          1
+          /* TEXT */
+        ),
+        vue.createElementVNode(
+          "text",
+          { class: "up-calendar-header__weekdays__weekday" },
+          vue.toDisplayString($options.t("up_week_four")),
+          1
+          /* TEXT */
+        ),
+        vue.createElementVNode(
+          "text",
+          { class: "up-calendar-header__weekdays__weekday" },
+          vue.toDisplayString($options.t("up_week_five")),
+          1
+          /* TEXT */
+        ),
+        vue.createElementVNode(
+          "text",
+          { class: "up-calendar-header__weekdays__weekday" },
+          vue.toDisplayString($options.t("up_week_six")),
+          1
+          /* TEXT */
+        ),
+        vue.createElementVNode(
+          "text",
+          { class: "up-calendar-header__weekdays__weekday" },
+          vue.toDisplayString($options.t("up_week_seven")),
+          1
+          /* TEXT */
+        )
       ])
     ]);
   }
@@ -30684,7 +30872,8 @@
       round: 0,
       monthNum: 3,
       monthSwitch: false,
-      showToday: true
+      showToday: true,
+      safeAreaInsetBottom: true
     })
   });
   let calendarProp$2 = defProps$H["calendar"];
@@ -30976,6 +31165,9 @@
     },
     emits: ["monthSelected", "updateMonthTop"],
     methods: {
+      getMonthTitle(item) {
+        return formatMonthTitle(item.year, item.month);
+      },
       isRangeMiddle(item) {
         if (this.mode != "range" || this.selected.length < 2)
           return false;
@@ -31024,9 +31216,9 @@
       // 获取月份数据区域的宽度，因为nvue不支持百分比，所以无法通过css设置每个日期item的宽度
       getWrapperWidth() {
         this.upGetRect(".up-calendar-month-wrapper", false).then((res) => {
-          var _a;
+          var _a2;
           let size = res;
-          let width = (_a = size.width) !== null && _a !== void 0 ? _a : 0;
+          let width = (_a2 = size.width) !== null && _a2 !== void 0 ? _a2 : 0;
           if (width <= 0) {
             width = getWindowInfo().windowWidth;
           }
@@ -31038,13 +31230,13 @@
           return this.getMonthRectByPromise("up-calendar-month-".concat(index));
         });
         Promise.all(promiseAllArr).then((res) => {
-          var _a;
+          var _a2;
           let sizes = res;
           let height = 1;
           const topArr = [];
           for (let i = 0; i < this.months.length; i++) {
             topArr.push(height);
-            height += (_a = sizes[i].height) !== null && _a !== void 0 ? _a : 0;
+            height += (_a2 = sizes[i].height) !== null && _a2 !== void 0 ? _a2 : 0;
           }
           this.$emit("updateMonthTop", topArr);
         });
@@ -31055,13 +31247,13 @@
       },
       // 点击某一个日期
       clickHandler(index1, index21, item) {
-        var _a;
+        var _a2;
         if (this.readonly) {
           return null;
         }
         this.item = item;
         const date2 = item["dateStr"] != null ? item["dateStr"] : dayuts(item["date"]).format("YYYY-MM-DD");
-        let disabled = (_a = item.disabled) !== null && _a !== void 0 ? _a : false;
+        let disabled = (_a2 = item.disabled) !== null && _a2 !== void 0 ? _a2 : false;
         if (disabled)
           return null;
         let selected = [...this.selected];
@@ -31172,7 +31364,7 @@
                 vue.createElementVNode(
                   "text",
                   { class: "up-calendar-month__title-text" },
-                  vue.toDisplayString(item["year"]) + "年" + vue.toDisplayString(item["month"]) + "月",
+                  vue.toDisplayString($options.getMonthTitle(item)),
                   1
                   /* TEXT */
                 )
@@ -31270,6 +31462,7 @@
     );
   }
   const uMonth = /* @__PURE__ */ _export_sfc(_sfc_main$1N, [["render", _sfc_render$1M], ["styles", [_style_0$1L]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-calendar/month.uvue"]]);
+  var _a$1;
   let calendarProp$1 = defProps$H["calendar"];
   ({
     props: {
@@ -31428,6 +31621,11 @@
       showToday: {
         type: Boolean,
         default: calendarProp$1["showToday"]
+      },
+      // 是否为iPhoneX留出底部安全距离
+      safeAreaInsetBottom: {
+        type: Boolean,
+        default: (_a$1 = calendarProp$1["safeAreaInsetBottom"]) !== null && _a$1 !== void 0 ? _a$1 : true
       }
     }
   });
@@ -31478,7 +31676,7 @@
               return c.date == e.date;
             });
             if (this.lunar) {
-              const _a = this.getLunar(e.date), IDayCn = _a.IDayCn, IMonthCn = _a.IMonthCn;
+              const _a2 = this.getLunar(e.date), IDayCn = _a2.IDayCn, IMonthCn = _a2.IMonthCn;
               e.lunar = IDayCn == "初一" ? IMonthCn : IDayCn;
             }
             return Object.assign(Object.assign({}, e), custom);
@@ -31487,6 +31685,7 @@
       }
     })
   });
+  var _a;
   let calendarProp = defProps$H["calendar"];
   const _sfc_main$1M = vue.defineComponent({
     name: "up-calendar",
@@ -31653,6 +31852,11 @@
       showToday: {
         type: Boolean,
         default: calendarProp["showToday"]
+      },
+      // 是否为iPhoneX留出底部安全距离
+      safeAreaInsetBottom: {
+        type: Boolean,
+        default: (_a = calendarProp["safeAreaInsetBottom"]) !== null && _a !== void 0 ? _a : true
       }
     },
     data() {
@@ -31714,7 +31918,7 @@
         return dayuts().format("YYYY-MM-DD");
       },
       todayText() {
-        return t("up.calendar.today", new UTSJSONObject({}));
+        return t$1("up.calendar.today", new UTSJSONObject({}));
       },
       todayDisabled() {
         let today = dayuts(this.todayDate);
@@ -31732,14 +31936,41 @@
       selectedChange() {
         return [this.innerMinDate, this.innerMaxDate];
       },
+      elTitle() {
+        if (this.title != "" && this.title != "日期选择") {
+          return this.title;
+        }
+        return t$1("up.calendar.chooseDates", new UTSJSONObject({}));
+      },
+      elConfirmText() {
+        if (this.confirmText != "" && this.confirmText != "确定") {
+          return this.confirmText;
+        }
+        return t$1("up.common.confirm", new UTSJSONObject({}));
+      },
+      elConfirmDisabledText() {
+        if (this.confirmDisabledText != "" && this.confirmDisabledText != "确定") {
+          return this.confirmDisabledText;
+        }
+        return t$1("up.common.confirm", new UTSJSONObject({}));
+      },
+      elStartText() {
+        if (this.startText != "" && this.startText != "开始") {
+          return this.startText;
+        }
+        return t$1("up.common.start", new UTSJSONObject({}));
+      },
+      elEndText() {
+        if (this.endText != "" && this.endText != "结束") {
+          return this.endText;
+        }
+        return t$1("up.common.end", new UTSJSONObject({}));
+      },
       subtitle() {
         if (this.months.length > 0) {
           let monthIndex = this.monthIndex;
-          return "".concat(this.months[monthIndex]["year"], "年").concat(
-            // @ts-ignore
-            this.months[monthIndex]["month"],
-            "月"
-          );
+          const item = this.months[monthIndex];
+          return formatMonthTitle(item.year, item.month);
         } else {
           return "";
         }
@@ -31820,7 +32051,7 @@
           this.innerMinDate != "0" && this.innerMinDate != "" && // @ts-ignore
           new Date(this.innerMaxDate).getTime() < new Date(this.innerMinDate).getTime()
         ) {
-          uni.__log__("log", "at uni_modules/uview-ultra/components/up-calendar/up-calendar.uvue:535", this.innerMaxDate);
+          uni.__log__("log", "at uni_modules/uview-ultra/components/up-calendar/up-calendar.uvue:569", this.innerMaxDate);
           return error$1("maxDate不能小于minDate时间");
         }
         this.listHeight = this.rowHeight * (this.monthSwitch ? 6 : 5) + 30;
@@ -31910,8 +32141,8 @@
             selected = dayuts(this.defaultDate[0]).format("YYYY-MM");
           }
         }
-        const index = this.months.findIndex((_a) => {
-          var year = _a.year, month = _a.month;
+        const index = this.months.findIndex((_a2) => {
+          var year = _a2.year, month = _a2.month;
           month = padZero$1(month);
           return "".concat(year, "-").concat(month) === selected;
         });
@@ -31943,8 +32174,8 @@
         }
         const targetMonth = dayuts(this.todayDate).format("YYYY-MM");
         if (this.monthSwitch) {
-          const todayMonthIndex = this.months.findIndex((_a) => {
-            var year = _a.year, month = _a.month;
+          const todayMonthIndex = this.months.findIndex((_a2) => {
+            var year = _a2.year, month = _a2.month;
             month = padZero$1(month);
             return "".concat(year, "-").concat(month) == targetMonth;
           });
@@ -31957,8 +32188,8 @@
       },
       // 滚动到默认设置的月份
       scrollIntoDefaultMonth(selected) {
-        const _index = this.months.findIndex((_a) => {
-          var year = _a.year, month = _a.month;
+        const _index = this.months.findIndex((_a2) => {
+          var year = _a2.year, month = _a2.month;
           month = padZero$1(month);
           return "".concat(year, "-").concat(month) === selected;
         });
@@ -32006,7 +32237,7 @@
       }
     }
   });
-  const _style_0$1K = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-calendar__confirm": { "": { "paddingTop": 7, "paddingRight": 18, "paddingBottom": 7, "paddingLeft": 18 } } };
+  const _style_0$1K = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-calendar__confirm": { "": { "paddingTop": 12, "paddingRight": 18, "paddingBottom": 16, "paddingLeft": 18 } } };
   function _sfc_render$1L(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uHeader = vue.resolveComponent("uHeader");
     const _component_uMonth = vue.resolveComponent("uMonth");
@@ -32018,12 +32249,13 @@
       closeable: "",
       onClose: $options.close,
       round: $props.round,
-      closeOnClickOverlay: $props.closeOnClickOverlay
+      closeOnClickOverlay: $props.closeOnClickOverlay,
+      safeAreaInsetBottom: $props.safeAreaInsetBottom
     }, {
       default: vue.withCtx(() => [
         vue.createElementVNode("view", { class: "up-calendar" }, [
           vue.createVNode(_component_uHeader, {
-            title: $props.title,
+            title: $options.elTitle,
             subtitle: $options.subtitle,
             showSubtitle: $props.showSubtitle,
             showTitle: $props.showTitle,
@@ -32056,8 +32288,8 @@
               months: $data.months,
               mode: $props.mode,
               maxCount: $props.maxCount,
-              startText: $props.startText,
-              endText: $props.endText,
+              startText: $options.elStartText,
+              endText: $options.elEndText,
               defaultDate: $props.defaultDate,
               minDate: $options.innerMinDate,
               maxDate: $options.innerMaxDate,
@@ -32086,8 +32318,8 @@
                 months: $options.currentMonths,
                 mode: $props.mode,
                 maxCount: $props.maxCount,
-                startText: $props.startText,
-                endText: $props.endText,
+                startText: $options.elStartText,
+                endText: $options.elEndText,
                 defaultDate: $props.defaultDate,
                 minDate: $options.innerMinDate,
                 maxDate: $options.innerMaxDate,
@@ -32110,7 +32342,7 @@
             vue.createElementVNode("view", { class: "up-calendar__confirm" }, [
               vue.createVNode(_component_up_button, {
                 shape: "circle",
-                text: $options.buttonDisabled ? $props.confirmDisabledText : $props.confirmText,
+                text: $options.buttonDisabled ? $options.elConfirmDisabledText : $options.elConfirmText,
                 color: $props.color == "#3c9cff" ? "" : $props.color,
                 type: $props.color == "#3c9cff" ? "primary" : "",
                 onClick: $options.confirm,
@@ -32122,7 +32354,7 @@
       ]),
       _: 3
       /* FORWARDED */
-    }, 8, ["show", "onClose", "round", "closeOnClickOverlay"]);
+    }, 8, ["show", "onClose", "round", "closeOnClickOverlay", "safeAreaInsetBottom"]);
   }
   const __easycom_2$e = /* @__PURE__ */ _export_sfc(_sfc_main$1M, [["render", _sfc_render$1L], ["styles", [_style_0$1K]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-calendar/up-calendar.uvue"]]);
   const defProps$G = new UTSJSONObject({
@@ -32181,6 +32413,18 @@
     mixins: [mpMixin, mixin, propsToolbar],
     emits: ["confirm", "cancel"],
     computed: {
+      elCancelText() {
+        if (this.cancelText == "取消" || this.cancelText == "") {
+          return t$1("up_common_cancel", new UTSJSONObject({}));
+        }
+        return this.cancelText;
+      },
+      elConfirmText() {
+        if (this.confirmText == "确认" || this.confirmText == "确定" || this.confirmText == "") {
+          return t$1("up_common_confirm", new UTSJSONObject({}));
+        }
+        return this.confirmText;
+      },
       elConfirmColor() {
         if (this.confirmColor == "#3c9cff") {
           return "";
@@ -32225,7 +32469,7 @@
                   color: _ctx.cancelColor
                 })
               },
-              vue.toDisplayString(_ctx.cancelText),
+              vue.toDisplayString($options.elCancelText),
               5
               /* TEXT, STYLE */
             )
@@ -32256,7 +32500,7 @@
                   color: $options.elConfirmColor
                 })
               },
-              vue.toDisplayString(_ctx.confirmText),
+              vue.toDisplayString($options.elConfirmText),
               5
               /* TEXT, STYLE */
             )
@@ -32886,8 +33130,8 @@
       }
     },
     emits: ["close", "cancel", "confirm", "change", "update:modelValue"],
-    setup(__props, _a) {
-      var __expose = _a.expose, __emit = _a.emit;
+    setup(__props, _a2) {
+      var __expose = _a2.expose, __emit = _a2.emit;
       __expose();
       const props2 = __props;
       const emit = __emit;
@@ -32994,9 +33238,12 @@
         formatterFunc = getFormatFunc();
         if (props2.mode === "time" || props2.mode === "timesecond") {
           const timeArr = value.toString().split(":");
-          values = [formatterFunc("hour", timeArr[0]), formatterFunc("minute", timeArr[1])];
+          const hourVal = timeArr.length > 0 ? timeArr[0] : "00";
+          const minuteVal = timeArr.length > 1 ? timeArr[1] : "00";
+          const secondVal = timeArr.length > 2 ? timeArr[2] : "00";
+          values = [formatterFunc("hour", hourVal), formatterFunc("minute", minuteVal)];
           if (props2.mode === "timesecond") {
-            values.push(formatterFunc("second", timeArr[2]));
+            values.push(formatterFunc("second", secondVal));
           }
         } else {
           new Date(value.toString());
@@ -33020,8 +33267,9 @@
         }
         let indexs = [];
         columns.value.forEach((column, index) => {
+          const targetVal = index < values.length ? values[index] : "";
           indexs.push(Math.max(0, column.findIndex((item) => {
-            return item === values[index];
+            return item === targetVal;
           })));
         });
         innerDefaultIndex.value = indexs;
@@ -33277,9 +33525,9 @@
             return "";
           }
           const timeArr = value.toString().split(":");
-          let hour = timeArr[0];
-          let minute = timeArr[1];
-          let second = timeArr[2];
+          let hour = timeArr.length > 0 ? timeArr[0] : "00";
+          let minute = timeArr.length > 1 ? timeArr[1] : "00";
+          let second = timeArr.length > 2 ? timeArr[2] : "00";
           const hourNum = parseInt(hour);
           const minuteNum = parseInt(minute);
           hour = padZero$1(range(props2.minHour, props2.maxHour, isNaN(hourNum) ? props2.minHour : hourNum));
@@ -33330,7 +33578,7 @@
         }));
       }
       function intercept(e, type = "") {
-        var _a2;
+        var _a3;
         if (e == null) {
           return type != "" ? "0000" : "00";
         }
@@ -33339,7 +33587,7 @@
           if (judge.length > 1) {
             error$1("请勿在过滤或格式化函数时添加数字");
             return "0";
-          } else if (type != "" && ((_a2 = judge[0]) === null || _a2 === void 0 ? null : _a2.length) == 4) {
+          } else if (type != "" && ((_a3 = judge[0]) === null || _a3 === void 0 ? null : _a3.length) == 4) {
             return judge[0].toString();
           } else if (judge[0].length > 2) {
             error$1("请勿在过滤或格式化函数时添加数字");
@@ -33353,14 +33601,19 @@
       }
       function change(e) {
         let indexs = e["indexs"];
+        if (indexs == null)
+          indexs = [];
         let values = e["values"];
         if (values == null)
           values = [];
         let selectValue = "";
         if (props2.mode === "time" || props2.mode === "timesecond") {
-          const hourText = safeColumnValue(values, 0, indexs[0], padZero$1(props2.minHour));
-          const minuteText = safeColumnValue(values, 1, indexs[1], padZero$1(props2.minMinute));
-          const secondText = safeColumnValue(values, 2, indexs[2], padZero$1(props2.minSecond));
+          const idx0 = indexs.length > 0 ? indexs[0] : 0;
+          const idx1 = indexs.length > 1 ? indexs[1] : 0;
+          const idx2 = indexs.length > 2 ? indexs[2] : 0;
+          const hourText = safeColumnValue(values, 0, idx0, padZero$1(props2.minHour));
+          const minuteText = safeColumnValue(values, 1, idx1, padZero$1(props2.minMinute));
+          const secondText = safeColumnValue(values, 2, idx2, padZero$1(props2.minSecond));
           let hour = toInt(intercept(hourText), props2.minHour);
           let minute = toInt(intercept(minuteText), props2.minMinute);
           let second = toInt(intercept(secondText), props2.minSecond);
@@ -33379,29 +33632,35 @@
           const currentHour = validCurrent.hour();
           const currentMinute = validCurrent.minute();
           const currentSecond = validCurrent.second();
-          const yearText = safeColumnValue(values, 0, indexs[0], currentYear.toString());
-          const monthText = safeColumnValue(values, 1, indexs[1], padZero$1(currentMonth));
+          const idx0 = indexs.length > 0 ? indexs[0] : 0;
+          const idx1 = indexs.length > 1 ? indexs[1] : 0;
+          const idx2 = indexs.length > 2 ? indexs[2] : 0;
+          const yearText = safeColumnValue(values, 0, idx0, currentYear.toString());
+          const monthText = safeColumnValue(values, 1, idx1, padZero$1(currentMonth));
           let year = toInt(intercept(yearText, "year"), currentYear);
           let month = toInt(intercept(monthText), currentMonth);
           let hour = 0, minute = 0, second = 0;
           month = range(1, 12, month);
           const maxDate = dayuts("".concat(year, "-").concat(month)).daysInMonth();
-          const dayText = safeColumnValue(values, 2, indexs[2], padZero$1(Math.min(currentDate, maxDate)));
+          const dayText = safeColumnValue(values, 2, idx2, padZero$1(Math.min(currentDate, maxDate)));
           let date2 = toInt(intercept(dayText), Math.min(currentDate, maxDate));
           if (props2.mode === "year-month") {
             date2 = 1;
           }
           date2 = range(1, maxDate, date2);
           if (props2.mode === "datehour" || props2.mode === "datetime" || props2.mode === "datetimesecond") {
-            const hourText = safeColumnValue(values, 3, indexs[3], padZero$1(currentHour));
+            const idx3 = indexs.length > 3 ? indexs[3] : 0;
+            const hourText = safeColumnValue(values, 3, idx3, padZero$1(currentHour));
             hour = range(0, 23, toInt(intercept(hourText), currentHour));
           }
           if (props2.mode === "datetime" || props2.mode === "datetimesecond") {
-            const minuteText = safeColumnValue(values, 4, indexs[4], padZero$1(currentMinute));
+            const idx4 = indexs.length > 4 ? indexs[4] : 0;
+            const minuteText = safeColumnValue(values, 4, idx4, padZero$1(currentMinute));
             minute = range(0, 59, toInt(intercept(minuteText), currentMinute));
           }
           if (props2.mode === "datetimesecond") {
-            const secondText = safeColumnValue(values, 5, indexs[5], padZero$1(currentSecond));
+            const idx5 = indexs.length > 5 ? indexs[5] : 0;
+            const secondText = safeColumnValue(values, 5, idx5, padZero$1(currentSecond));
             second = range(0, 59, toInt(intercept(secondText), currentSecond));
           }
           selectValue = new Date(year, month - 1, date2, hour, minute, second).getTime();
@@ -33767,8 +34026,8 @@
     "error",
     "launchapp",
     "opensetting"
-  ], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
+  ], setup(__props, _a2) {
+    var __expose = _a2.expose, __emit = _a2.emit;
     __expose();
     const _b = useUltraUI(), onComponentDestroy = _b.onComponentDestroy, preventEvent = _b.preventEvent, noop = _b.noop;
     const instance = vue.getCurrentInstance().proxy;
@@ -33975,8 +34234,8 @@
   const __easycom_2$b = /* @__PURE__ */ _export_sfc(_sfc_main$1I, [["render", _sfc_render$1H], ["styles", [_style_0$1G]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-action-sheet/up-action-sheet.uvue"]]);
   const _sfc_main$1H = /* @__PURE__ */ vue.defineComponent({
     __name: "form",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const formModel = vue.reactive(new UTSJSONObject({
         name: "",
@@ -34043,9 +34302,9 @@
               title: "验证通过，提交成功！",
               icon: "success"
             });
-            uni.__log__("log", "at src/sub/uview-ultra/demos/form/form.uvue:261", "提交的数据：", formModel);
+            uni.__log__("log", "at src/sub/uview-ultra/demos/form/form.uvue:264", "提交的数据：", formModel);
           }).catch((err = null) => {
-            uni.__log__("log", "at src/sub/uview-ultra/demos/form/form.uvue:263", "验证失败:", err);
+            uni.__log__("log", "at src/sub/uview-ultra/demos/form/form.uvue:266", "验证失败:", err);
             uni.showToast({
               title: "请检查必填项",
               icon: "error"
@@ -34076,8 +34335,8 @@
         new UTSJSONObject({ name: "保密" })
       ]);
       function onGenderSelect(item) {
-        var _a2;
-        formModel.gender = (_a2 = item.getString("name")) !== null && _a2 !== void 0 ? _a2 : "";
+        var _a3;
+        formModel.gender = (_a3 = item.getString("name")) !== null && _a3 !== void 0 ? _a3 : "";
         genderActionShow.value = false;
         const form2 = uForm.value;
         if (form2 != null) {
@@ -34155,8 +34414,8 @@
       return __returned__;
     }
   });
-  const _style_0$1F = { "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "blur": { "": { "filter": "var(--un-blur) var(--un-brightness) var(--un-contrast) var(--un-drop-shadow) var(--un-grayscale) var(--un-hue-rotate) var(--un-invert) var(--un-opacity) var(--un-saturate) var(--un-sepia)", "--un-blur": "blur(8rpx)" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-row": { "": { "flexDirection": "row" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "ml-10px": { "": { "marginLeft": 10 } }, "mr-10px": { "": { "marginRight": 10 } }, "mt-12px": { "": { "marginTop": 12 } }, "mt-20px": { "": { "marginTop": 20 } }, "none": { "": { "display": "none" } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "pb-30px": { "": { "paddingBottom": 30 } }, "w-10px": { "": { "width": 10 } } };
-  const _style_1$V = { "section-title": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 8, "paddingLeft": 16, "fontSize": 18, "fontWeight": "bold", "color": "#303133" } }, "demo-block": { "": { "marginTop": 0, "marginRight": 12, "marginBottom": 12, "marginLeft": 12, "paddingTop": 12, "paddingRight": 16, "paddingBottom": 12, "paddingLeft": 16, "backgroundColor": "#ffffff", "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "boxShadow": "0 2px 12px rgba(0, 0, 0, 0.05)" } }, "w-10px": { "": { "width": 10 } }, "mt-20px": { "": { "marginTop": 20 } }, "mr-10px": { "": { "marginRight": 10 } }, "ml-10px": { "": { "marginLeft": 10 } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } } };
+  const _style_0$1F = { "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "blur": { "": { "filter": "var(--un-blur) var(--un-brightness) var(--un-contrast) var(--un-drop-shadow) var(--un-grayscale) var(--un-hue-rotate) var(--un-invert) var(--un-opacity) var(--un-saturate) var(--un-sepia)", "--un-blur": "blur(8rpx)" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-row": { "": { "flexDirection": "row" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "ml-10px": { "": { "marginLeft": 10 } }, "mr-10px": { "": { "marginRight": 10 } }, "mt-20px": { "": { "marginTop": 20 } }, "none": { "": { "display": "none" } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "pb-30px": { "": { "paddingBottom": 30 } }, "w-10px": { "": { "width": 10 } } };
+  const _style_1$V = { "demo-block": { "": { "marginBottom": 12, "paddingTop": 12, "paddingRight": 12, "paddingBottom": 12, "paddingLeft": 12, "backgroundColor": "#ffffff", "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "demo-label": { "": { "fontSize": 14, "fontWeight": "bold", "color": "#606266", "marginBottom": 10, "paddingLeft": 4, "borderLeftWidth": 3, "borderLeftStyle": "solid", "borderLeftColor": "#2979ff" } }, "w-10px": { "": { "width": 10 } }, "mt-20px": { "": { "marginTop": 20 } }, "mr-10px": { "": { "marginRight": 10 } }, "ml-10px": { "": { "marginLeft": 10 } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } } };
   function _sfc_render$1G(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_NavBar = resolveEasycom(vue.resolveDynamicComponent("NavBar"), __easycom_0$a);
     const _component_up_input = resolveEasycom(vue.resolveDynamicComponent("up-input"), __easycom_1$G);
@@ -34192,373 +34451,376 @@
                 "safe-area-inset-top": true,
                 "bg-color": "#ffffff"
               }),
-              vue.createElementVNode("view", { class: "demo-block" }, [
-                vue.createVNode(_component_up_form, {
-                  ref: "uForm",
-                  model: $setup.formModel,
-                  rules: $setup.formRules,
-                  "label-width": "90px",
-                  "error-type": "toast"
-                }, {
-                  default: vue.withCtx(() => [
-                    vue.createVNode(_component_up_form_item, {
-                      label: "姓名",
-                      prop: "name",
-                      "border-bottom": true,
-                      required: ""
-                    }, {
-                      default: vue.withCtx(() => [
-                        vue.createVNode(_component_up_input, {
-                          modelValue: $setup.formModel.name,
-                          "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.formModel.name = $event),
-                          placeholder: "请输入姓名",
-                          border: "none",
-                          clearable: ""
-                        }, null, 8, ["modelValue"])
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    }),
-                    vue.createVNode(_component_up_form_item, {
-                      label: "性别",
-                      prop: "gender",
-                      "border-bottom": true,
-                      onClick: _cache[2] || (_cache[2] = ($event) => $setup.genderActionShow = true),
-                      required: ""
-                    }, {
-                      right: vue.withCtx(() => [
-                        vue.createVNode(_component_up_icon, {
-                          name: "arrow-right",
-                          color: "#c0c4cc",
-                          size: "16"
-                        })
-                      ]),
-                      default: vue.withCtx(() => [
-                        vue.createVNode(_component_up_input, {
-                          modelValue: $setup.formModel.gender,
-                          "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.formModel.gender = $event),
-                          disabled: "",
-                          "disabled-color": "#ffffff",
-                          placeholder: "请选择性别",
-                          border: "none"
-                        }, null, 8, ["modelValue"])
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    }),
-                    vue.createVNode(_component_up_form_item, {
-                      label: "出生日期",
-                      prop: "birthday",
-                      "border-bottom": true,
-                      onClick: _cache[4] || (_cache[4] = ($event) => $setup.datetimePickerShow = true),
-                      required: ""
-                    }, {
-                      right: vue.withCtx(() => [
-                        vue.createVNode(_component_up_icon, {
-                          name: "arrow-right",
-                          color: "#c0c4cc",
-                          size: "16"
-                        })
-                      ]),
-                      default: vue.withCtx(() => [
-                        vue.createVNode(_component_up_input, {
-                          modelValue: $setup.formModel.birthday,
-                          "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => $setup.formModel.birthday = $event),
-                          disabled: "",
-                          "disabled-color": "#ffffff",
-                          placeholder: "请选择出生日期",
-                          border: "none"
-                        }, null, 8, ["modelValue"])
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    }),
-                    vue.createVNode(_component_up_form_item, {
-                      label: "国籍",
-                      prop: "country",
-                      "border-bottom": true,
-                      onClick: _cache[6] || (_cache[6] = ($event) => $setup.pickerShow = true)
-                    }, {
-                      right: vue.withCtx(() => [
-                        vue.createVNode(_component_up_icon, {
-                          name: "arrow-right",
-                          color: "#c0c4cc",
-                          size: "16"
-                        })
-                      ]),
-                      default: vue.withCtx(() => [
-                        vue.createVNode(_component_up_input, {
-                          modelValue: $setup.formModel.country,
-                          "onUpdate:modelValue": _cache[5] || (_cache[5] = ($event) => $setup.formModel.country = $event),
-                          disabled: "",
-                          "disabled-color": "#ffffff",
-                          placeholder: "请选择国籍",
-                          border: "none"
-                        }, null, 8, ["modelValue"])
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    }),
-                    vue.createVNode(_component_up_form_item, {
-                      label: "行程时间",
-                      prop: "stayTime",
-                      "border-bottom": true,
-                      onClick: _cache[8] || (_cache[8] = ($event) => $setup.calendarShow = true)
-                    }, {
-                      right: vue.withCtx(() => [
-                        vue.createVNode(_component_up_icon, {
-                          name: "arrow-right",
-                          color: "#c0c4cc",
-                          size: "16"
-                        })
-                      ]),
-                      default: vue.withCtx(() => [
-                        vue.createVNode(_component_up_input, {
-                          modelValue: $setup.formModel.stayTime,
-                          "onUpdate:modelValue": _cache[7] || (_cache[7] = ($event) => $setup.formModel.stayTime = $event),
-                          disabled: "",
-                          "disabled-color": "#ffffff",
-                          placeholder: "请选择日期范围",
-                          border: "none"
-                        }, null, 8, ["modelValue"])
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    }),
-                    vue.createVNode(_component_up_form_item, {
-                      label: "水果最爱",
-                      prop: "fruit",
-                      "border-bottom": true
-                    }, {
-                      default: vue.withCtx(() => [
-                        vue.createVNode(_component_up_radio_group, {
-                          modelValue: $setup.formModel.fruit,
-                          "onUpdate:modelValue": _cache[9] || (_cache[9] = ($event) => $setup.formModel.fruit = $event),
-                          placement: "row"
-                        }, {
-                          default: vue.withCtx(() => [
-                            vue.createVNode(_component_up_radio, {
-                              name: "apple",
-                              label: "苹果"
-                            }),
-                            vue.createElementVNode("view", { class: "w-10px" }),
-                            vue.createVNode(_component_up_radio, {
-                              name: "banana",
-                              label: "香蕉"
-                            }),
-                            vue.createElementVNode("view", { class: "w-10px" }),
-                            vue.createVNode(_component_up_radio, {
-                              name: "orange",
-                              label: "橘子"
-                            })
-                          ]),
-                          _: 1
-                          /* STABLE */
-                        }, 8, ["modelValue"])
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    }),
-                    vue.createVNode(_component_up_form_item, {
-                      label: "兴趣爱好",
-                      prop: "hobbies",
-                      "border-bottom": true
-                    }, {
-                      default: vue.withCtx(() => [
-                        vue.createVNode(_component_up_checkbox_group, {
-                          modelValue: $setup.formModel.hobbies,
-                          "onUpdate:modelValue": _cache[10] || (_cache[10] = ($event) => $setup.formModel.hobbies = $event),
-                          placement: "row"
-                        }, {
-                          default: vue.withCtx(() => [
-                            vue.createVNode(_component_up_checkbox, {
-                              name: "reading",
-                              label: "阅读"
-                            }),
-                            vue.createElementVNode("view", { class: "w-10px" }),
-                            vue.createVNode(_component_up_checkbox, {
-                              name: "sports",
-                              label: "运动"
-                            }),
-                            vue.createElementVNode("view", { class: "w-10px" }),
-                            vue.createVNode(_component_up_checkbox, {
-                              name: "music",
-                              label: "音乐"
-                            })
-                          ]),
-                          _: 1
-                          /* STABLE */
-                        }, 8, ["modelValue"])
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    }),
-                    vue.createVNode(_component_up_form_item, {
-                      label: "通知开关",
-                      prop: "notification",
-                      "border-bottom": true
-                    }, {
-                      default: vue.withCtx(() => [
-                        vue.createVNode(_component_up_switch, {
-                          modelValue: $setup.formModel.notification,
-                          "onUpdate:modelValue": _cache[11] || (_cache[11] = ($event) => $setup.formModel.notification = $event),
-                          "active-color": "#2979ff"
-                        }, null, 8, ["modelValue"])
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    }),
-                    vue.createVNode(_component_up_form_item, {
-                      label: "服务评分",
-                      prop: "rate",
-                      "border-bottom": true
-                    }, {
-                      default: vue.withCtx(() => [
-                        vue.createVNode(_component_up_rate, {
-                          modelValue: $setup.formModel.rate,
-                          "onUpdate:modelValue": _cache[12] || (_cache[12] = ($event) => $setup.formModel.rate = $event),
-                          count: 5
-                        }, null, 8, ["modelValue"])
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    }),
-                    vue.createVNode(_component_up_form_item, {
-                      label: "购买数量",
-                      prop: "count",
-                      "border-bottom": true
-                    }, {
-                      default: vue.withCtx(() => [
-                        vue.createVNode(_component_up_number_box, {
-                          modelValue: $setup.formModel.count,
-                          "onUpdate:modelValue": _cache[13] || (_cache[13] = ($event) => $setup.formModel.count = $event),
-                          min: 1,
-                          max: 100
-                        }, null, 8, ["modelValue"])
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    }),
-                    vue.createVNode(_component_up_form_item, {
-                      label: "满意度",
-                      prop: "satisfaction",
-                      "border-bottom": true
-                    }, {
-                      default: vue.withCtx(() => [
-                        vue.createVNode(_component_up_slider, {
-                          modelValue: $setup.formModel.satisfaction,
-                          "onUpdate:modelValue": _cache[14] || (_cache[14] = ($event) => $setup.formModel.satisfaction = $event),
-                          min: 0,
-                          max: 100,
-                          "show-value": true,
-                          style: { "width": "100%" }
-                        }, null, 8, ["modelValue"])
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    }),
-                    vue.createVNode(_component_up_form_item, {
-                      label: "个人简介",
-                      prop: "intro",
-                      "border-bottom": true,
-                      "label-position": "top"
-                    }, {
-                      default: vue.withCtx(() => [
-                        vue.createVNode(_component_up_textarea, {
-                          modelValue: $setup.formModel.intro,
-                          "onUpdate:modelValue": _cache[15] || (_cache[15] = ($event) => $setup.formModel.intro = $event),
-                          placeholder: "请输入个人简介",
-                          count: "",
-                          maxlength: 100
-                        }, null, 8, ["modelValue"])
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    }),
-                    vue.createVNode(_component_up_form_item, {
-                      label: "相关照片",
-                      prop: "photos",
-                      "border-bottom": true,
-                      "label-position": "top"
-                    }, {
-                      default: vue.withCtx(() => [
-                        vue.createVNode(_component_up_upload, {
-                          "file-list": $setup.uploadList,
-                          multiple: true,
-                          "max-count": 3,
-                          width: "80px",
-                          height: "80px",
-                          onAfterRead: $setup.onUploadAfterRead,
-                          onDelete: $setup.onUploadDelete
-                        }, null, 8, ["file-list"])
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    })
-                  ]),
-                  _: 1
-                  /* STABLE */
-                }, 8, ["model"])
-              ]),
-              vue.createElementVNode("view", { class: "demo-block mt-12px" }, [
-                vue.createElementVNode("text", { class: "demo-label" }, "标签上方对齐"),
-                vue.createVNode(_component_up_form, {
-                  model: $setup.formModel2,
-                  "label-position": "top",
-                  "label-width": "100px"
-                }, {
-                  default: vue.withCtx(() => [
-                    vue.createVNode(_component_up_form_item, {
-                      label: "活动名称",
-                      prop: "name",
-                      "border-bottom": true
-                    }, {
-                      default: vue.withCtx(() => [
-                        vue.createVNode(_component_up_input, {
-                          modelValue: $setup.formModel2.name,
-                          "onUpdate:modelValue": _cache[16] || (_cache[16] = ($event) => $setup.formModel2.name = $event),
-                          placeholder: "请输入活动名称",
-                          border: "none"
-                        }, null, 8, ["modelValue"])
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    }),
-                    vue.createVNode(_component_up_form_item, {
-                      label: "活动详情",
-                      prop: "detail",
-                      "border-bottom": true
-                    }, {
-                      default: vue.withCtx(() => [
-                        vue.createVNode(_component_up_textarea, {
-                          modelValue: $setup.formModel2.detail,
-                          "onUpdate:modelValue": _cache[17] || (_cache[17] = ($event) => $setup.formModel2.detail = $event),
-                          placeholder: "请输入活动详情",
-                          border: "none"
-                        }, null, 8, ["modelValue"])
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    })
-                  ]),
-                  _: 1
-                  /* STABLE */
-                }, 8, ["model"])
-              ]),
-              vue.createElementVNode("view", { class: "p-16px mt-20px flex-row justify-between" }, [
-                vue.createElementVNode("view", { class: "flex-1 mr-10px" }, [
-                  vue.createVNode(_component_up_button, {
-                    type: "primary",
-                    text: "提交表单",
-                    onClick: $setup.submitForm
-                  })
+              vue.createElementVNode("view", { class: "p-16px" }, [
+                vue.createElementVNode("view", { class: "demo-block" }, [
+                  vue.createElementVNode("text", { class: "demo-label" }, "基础表单示例"),
+                  vue.createVNode(_component_up_form, {
+                    ref: "uForm",
+                    model: $setup.formModel,
+                    rules: $setup.formRules,
+                    "label-width": "90px",
+                    "error-type": "toast"
+                  }, {
+                    default: vue.withCtx(() => [
+                      vue.createVNode(_component_up_form_item, {
+                        label: "姓名",
+                        prop: "name",
+                        "border-bottom": true,
+                        required: ""
+                      }, {
+                        default: vue.withCtx(() => [
+                          vue.createVNode(_component_up_input, {
+                            modelValue: $setup.formModel.name,
+                            "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.formModel.name = $event),
+                            placeholder: "请输入姓名",
+                            border: "none",
+                            clearable: ""
+                          }, null, 8, ["modelValue"])
+                        ]),
+                        _: 1
+                        /* STABLE */
+                      }),
+                      vue.createVNode(_component_up_form_item, {
+                        label: "性别",
+                        prop: "gender",
+                        "border-bottom": true,
+                        onClick: _cache[2] || (_cache[2] = ($event) => $setup.genderActionShow = true),
+                        required: ""
+                      }, {
+                        right: vue.withCtx(() => [
+                          vue.createVNode(_component_up_icon, {
+                            name: "arrow-right",
+                            color: "#c0c4cc",
+                            size: "16"
+                          })
+                        ]),
+                        default: vue.withCtx(() => [
+                          vue.createVNode(_component_up_input, {
+                            modelValue: $setup.formModel.gender,
+                            "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.formModel.gender = $event),
+                            disabled: "",
+                            "disabled-color": "#ffffff",
+                            placeholder: "请选择性别",
+                            border: "none"
+                          }, null, 8, ["modelValue"])
+                        ]),
+                        _: 1
+                        /* STABLE */
+                      }),
+                      vue.createVNode(_component_up_form_item, {
+                        label: "出生日期",
+                        prop: "birthday",
+                        "border-bottom": true,
+                        onClick: _cache[4] || (_cache[4] = ($event) => $setup.datetimePickerShow = true),
+                        required: ""
+                      }, {
+                        right: vue.withCtx(() => [
+                          vue.createVNode(_component_up_icon, {
+                            name: "arrow-right",
+                            color: "#c0c4cc",
+                            size: "16"
+                          })
+                        ]),
+                        default: vue.withCtx(() => [
+                          vue.createVNode(_component_up_input, {
+                            modelValue: $setup.formModel.birthday,
+                            "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => $setup.formModel.birthday = $event),
+                            disabled: "",
+                            "disabled-color": "#ffffff",
+                            placeholder: "请选择出生日期",
+                            border: "none"
+                          }, null, 8, ["modelValue"])
+                        ]),
+                        _: 1
+                        /* STABLE */
+                      }),
+                      vue.createVNode(_component_up_form_item, {
+                        label: "国籍",
+                        prop: "country",
+                        "border-bottom": true,
+                        onClick: _cache[6] || (_cache[6] = ($event) => $setup.pickerShow = true)
+                      }, {
+                        right: vue.withCtx(() => [
+                          vue.createVNode(_component_up_icon, {
+                            name: "arrow-right",
+                            color: "#c0c4cc",
+                            size: "16"
+                          })
+                        ]),
+                        default: vue.withCtx(() => [
+                          vue.createVNode(_component_up_input, {
+                            modelValue: $setup.formModel.country,
+                            "onUpdate:modelValue": _cache[5] || (_cache[5] = ($event) => $setup.formModel.country = $event),
+                            disabled: "",
+                            "disabled-color": "#ffffff",
+                            placeholder: "请选择国籍",
+                            border: "none"
+                          }, null, 8, ["modelValue"])
+                        ]),
+                        _: 1
+                        /* STABLE */
+                      }),
+                      vue.createVNode(_component_up_form_item, {
+                        label: "行程时间",
+                        prop: "stayTime",
+                        "border-bottom": true,
+                        onClick: _cache[8] || (_cache[8] = ($event) => $setup.calendarShow = true)
+                      }, {
+                        right: vue.withCtx(() => [
+                          vue.createVNode(_component_up_icon, {
+                            name: "arrow-right",
+                            color: "#c0c4cc",
+                            size: "16"
+                          })
+                        ]),
+                        default: vue.withCtx(() => [
+                          vue.createVNode(_component_up_input, {
+                            modelValue: $setup.formModel.stayTime,
+                            "onUpdate:modelValue": _cache[7] || (_cache[7] = ($event) => $setup.formModel.stayTime = $event),
+                            disabled: "",
+                            "disabled-color": "#ffffff",
+                            placeholder: "请选择日期范围",
+                            border: "none"
+                          }, null, 8, ["modelValue"])
+                        ]),
+                        _: 1
+                        /* STABLE */
+                      }),
+                      vue.createVNode(_component_up_form_item, {
+                        label: "水果最爱",
+                        prop: "fruit",
+                        "border-bottom": true
+                      }, {
+                        default: vue.withCtx(() => [
+                          vue.createVNode(_component_up_radio_group, {
+                            modelValue: $setup.formModel.fruit,
+                            "onUpdate:modelValue": _cache[9] || (_cache[9] = ($event) => $setup.formModel.fruit = $event),
+                            placement: "row"
+                          }, {
+                            default: vue.withCtx(() => [
+                              vue.createVNode(_component_up_radio, {
+                                name: "apple",
+                                label: "苹果"
+                              }),
+                              vue.createElementVNode("view", { class: "w-10px" }),
+                              vue.createVNode(_component_up_radio, {
+                                name: "banana",
+                                label: "香蕉"
+                              }),
+                              vue.createElementVNode("view", { class: "w-10px" }),
+                              vue.createVNode(_component_up_radio, {
+                                name: "orange",
+                                label: "橘子"
+                              })
+                            ]),
+                            _: 1
+                            /* STABLE */
+                          }, 8, ["modelValue"])
+                        ]),
+                        _: 1
+                        /* STABLE */
+                      }),
+                      vue.createVNode(_component_up_form_item, {
+                        label: "兴趣爱好",
+                        prop: "hobbies",
+                        "border-bottom": true
+                      }, {
+                        default: vue.withCtx(() => [
+                          vue.createVNode(_component_up_checkbox_group, {
+                            modelValue: $setup.formModel.hobbies,
+                            "onUpdate:modelValue": _cache[10] || (_cache[10] = ($event) => $setup.formModel.hobbies = $event),
+                            placement: "row"
+                          }, {
+                            default: vue.withCtx(() => [
+                              vue.createVNode(_component_up_checkbox, {
+                                name: "reading",
+                                label: "阅读"
+                              }),
+                              vue.createElementVNode("view", { class: "w-10px" }),
+                              vue.createVNode(_component_up_checkbox, {
+                                name: "sports",
+                                label: "运动"
+                              }),
+                              vue.createElementVNode("view", { class: "w-10px" }),
+                              vue.createVNode(_component_up_checkbox, {
+                                name: "music",
+                                label: "音乐"
+                              })
+                            ]),
+                            _: 1
+                            /* STABLE */
+                          }, 8, ["modelValue"])
+                        ]),
+                        _: 1
+                        /* STABLE */
+                      }),
+                      vue.createVNode(_component_up_form_item, {
+                        label: "通知开关",
+                        prop: "notification",
+                        "border-bottom": true
+                      }, {
+                        default: vue.withCtx(() => [
+                          vue.createVNode(_component_up_switch, {
+                            modelValue: $setup.formModel.notification,
+                            "onUpdate:modelValue": _cache[11] || (_cache[11] = ($event) => $setup.formModel.notification = $event),
+                            "active-color": "#2979ff"
+                          }, null, 8, ["modelValue"])
+                        ]),
+                        _: 1
+                        /* STABLE */
+                      }),
+                      vue.createVNode(_component_up_form_item, {
+                        label: "服务评分",
+                        prop: "rate",
+                        "border-bottom": true
+                      }, {
+                        default: vue.withCtx(() => [
+                          vue.createVNode(_component_up_rate, {
+                            modelValue: $setup.formModel.rate,
+                            "onUpdate:modelValue": _cache[12] || (_cache[12] = ($event) => $setup.formModel.rate = $event),
+                            count: 5
+                          }, null, 8, ["modelValue"])
+                        ]),
+                        _: 1
+                        /* STABLE */
+                      }),
+                      vue.createVNode(_component_up_form_item, {
+                        label: "购买数量",
+                        prop: "count",
+                        "border-bottom": true
+                      }, {
+                        default: vue.withCtx(() => [
+                          vue.createVNode(_component_up_number_box, {
+                            modelValue: $setup.formModel.count,
+                            "onUpdate:modelValue": _cache[13] || (_cache[13] = ($event) => $setup.formModel.count = $event),
+                            min: 1,
+                            max: 100
+                          }, null, 8, ["modelValue"])
+                        ]),
+                        _: 1
+                        /* STABLE */
+                      }),
+                      vue.createVNode(_component_up_form_item, {
+                        label: "满意度",
+                        prop: "satisfaction",
+                        "border-bottom": true
+                      }, {
+                        default: vue.withCtx(() => [
+                          vue.createVNode(_component_up_slider, {
+                            modelValue: $setup.formModel.satisfaction,
+                            "onUpdate:modelValue": _cache[14] || (_cache[14] = ($event) => $setup.formModel.satisfaction = $event),
+                            min: 0,
+                            max: 100,
+                            "show-value": true,
+                            style: { "width": "100%" }
+                          }, null, 8, ["modelValue"])
+                        ]),
+                        _: 1
+                        /* STABLE */
+                      }),
+                      vue.createVNode(_component_up_form_item, {
+                        label: "个人简介",
+                        prop: "intro",
+                        "border-bottom": true,
+                        "label-position": "top"
+                      }, {
+                        default: vue.withCtx(() => [
+                          vue.createVNode(_component_up_textarea, {
+                            modelValue: $setup.formModel.intro,
+                            "onUpdate:modelValue": _cache[15] || (_cache[15] = ($event) => $setup.formModel.intro = $event),
+                            placeholder: "请输入个人简介",
+                            count: "",
+                            maxlength: 100
+                          }, null, 8, ["modelValue"])
+                        ]),
+                        _: 1
+                        /* STABLE */
+                      }),
+                      vue.createVNode(_component_up_form_item, {
+                        label: "相关照片",
+                        prop: "photos",
+                        "border-bottom": true,
+                        "label-position": "top"
+                      }, {
+                        default: vue.withCtx(() => [
+                          vue.createVNode(_component_up_upload, {
+                            "file-list": $setup.uploadList,
+                            multiple: true,
+                            "max-count": 3,
+                            width: "80px",
+                            height: "80px",
+                            onAfterRead: $setup.onUploadAfterRead,
+                            onDelete: $setup.onUploadDelete
+                          }, null, 8, ["file-list"])
+                        ]),
+                        _: 1
+                        /* STABLE */
+                      })
+                    ]),
+                    _: 1
+                    /* STABLE */
+                  }, 8, ["model"])
                 ]),
-                vue.createElementVNode("view", { class: "flex-1 ml-10px" }, [
-                  vue.createVNode(_component_up_button, {
-                    type: "info",
-                    text: "重置表单",
-                    onClick: $setup.resetForm
-                  })
+                vue.createElementVNode("view", { class: "demo-block" }, [
+                  vue.createElementVNode("text", { class: "demo-label" }, "标签上方对齐"),
+                  vue.createVNode(_component_up_form, {
+                    model: $setup.formModel2,
+                    "label-position": "top",
+                    "label-width": "100px"
+                  }, {
+                    default: vue.withCtx(() => [
+                      vue.createVNode(_component_up_form_item, {
+                        label: "活动名称",
+                        prop: "name",
+                        "border-bottom": true
+                      }, {
+                        default: vue.withCtx(() => [
+                          vue.createVNode(_component_up_input, {
+                            modelValue: $setup.formModel2.name,
+                            "onUpdate:modelValue": _cache[16] || (_cache[16] = ($event) => $setup.formModel2.name = $event),
+                            placeholder: "请输入活动名称",
+                            border: "none"
+                          }, null, 8, ["modelValue"])
+                        ]),
+                        _: 1
+                        /* STABLE */
+                      }),
+                      vue.createVNode(_component_up_form_item, {
+                        label: "活动详情",
+                        prop: "detail",
+                        "border-bottom": true
+                      }, {
+                        default: vue.withCtx(() => [
+                          vue.createVNode(_component_up_textarea, {
+                            modelValue: $setup.formModel2.detail,
+                            "onUpdate:modelValue": _cache[17] || (_cache[17] = ($event) => $setup.formModel2.detail = $event),
+                            placeholder: "请输入活动详情",
+                            border: "none"
+                          }, null, 8, ["modelValue"])
+                        ]),
+                        _: 1
+                        /* STABLE */
+                      })
+                    ]),
+                    _: 1
+                    /* STABLE */
+                  }, 8, ["model"])
+                ]),
+                vue.createElementVNode("view", { class: "mt-20px flex-row justify-between" }, [
+                  vue.createElementVNode("view", { class: "flex-1 mr-10px" }, [
+                    vue.createVNode(_component_up_button, {
+                      type: "primary",
+                      text: "提交表单",
+                      onClick: $setup.submitForm
+                    })
+                  ]),
+                  vue.createElementVNode("view", { class: "flex-1 ml-10px" }, [
+                    vue.createVNode(_component_up_button, {
+                      type: "info",
+                      text: "重置表单",
+                      onClick: $setup.resetForm
+                    })
+                  ])
                 ])
               ]),
               vue.createCommentVNode(" 弹窗选择组件 "),
@@ -34841,8 +35103,8 @@
   const __easycom_1$x = /* @__PURE__ */ _export_sfc(_sfc_main$1G, [["render", _sfc_render$1F], ["styles", [_style_0$1E]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-pagination/up-pagination.uvue"]]);
   const _sfc_main$1F = /* @__PURE__ */ vue.defineComponent({
     __name: "pagination",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const paginationCurrentPage = vue.ref(1);
       const paginationPageSize = vue.ref(10);
@@ -35001,8 +35263,8 @@
       }
     },
     emits: ["change", "finish", "update:modelValue"],
-    setup(__props, _a) {
-      var __expose = _a.expose, __emit = _a.emit;
+    setup(__props, _a2) {
+      var __expose = _a2.expose, __emit = _a2.emit;
       __expose();
       const props2 = __props;
       const emit = __emit;
@@ -35202,8 +35464,8 @@
   const __easycom_1$w = /* @__PURE__ */ _export_sfc(_sfc_main$1E, [["render", _sfc_render$1D], ["styles", [_style_0$1C]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-code-input/up-code-input.uvue"]]);
   const _sfc_main$1D = /* @__PURE__ */ vue.defineComponent({
     __name: "code-input",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const codeInputValue1 = vue.ref("");
       const codeInputValue2 = vue.ref("");
@@ -35285,8 +35547,8 @@
   const SrcSubUviewUltraDemosCodeInputCodeInput = /* @__PURE__ */ _export_sfc(_sfc_main$1D, [["render", _sfc_render$1C], ["styles", [_style_0$1B, _style_1$T]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/code-input/code-input.uvue"]]);
   const _sfc_main$1C = /* @__PURE__ */ vue.defineComponent({
     __name: "button",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -35405,8 +35667,8 @@
   const SrcSubUviewUltraDemosButtonButton = /* @__PURE__ */ _export_sfc(_sfc_main$1C, [["render", _sfc_render$1B], ["styles", [_style_0$1A, _style_1$S]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/button/button.uvue"]]);
   const _sfc_main$1B = /* @__PURE__ */ vue.defineComponent({
     __name: "input",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const inputValue = vue.ref("");
       const __returned__ = { inputValue, get AppKu() {
@@ -35470,8 +35732,8 @@
   const SrcSubUviewUltraDemosInputInput = /* @__PURE__ */ _export_sfc(_sfc_main$1B, [["render", _sfc_render$1A], ["styles", [_style_0$1z, _style_1$R]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/input/input.uvue"]]);
   const _sfc_main$1A = /* @__PURE__ */ vue.defineComponent({
     __name: "checkbox",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const checkboxValue1 = vue.ref(["apple"]);
       const checkboxValue2 = vue.ref(["apple"]);
@@ -35875,8 +36137,8 @@
   const __easycom_1$v = /* @__PURE__ */ _export_sfc(_sfc_main$1z, [["render", _sfc_render$1y], ["styles", [_style_0$1x]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-tag/up-tag.uvue"]]);
   const _sfc_main$1y = /* @__PURE__ */ vue.defineComponent({
     __name: "tag",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const showTag = vue.ref(true);
       function closeTag() {
@@ -36026,8 +36288,8 @@
   const SrcSubUviewUltraDemosTagTag = /* @__PURE__ */ _export_sfc(_sfc_main$1y, [["render", _sfc_render$1x], ["styles", [_style_0$1w, _style_1$P]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/tag/tag.uvue"]]);
   const _sfc_main$1x = /* @__PURE__ */ vue.defineComponent({
     __name: "radio",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const radioValue = vue.ref("apple");
       const radioValue2 = vue.ref("apple");
@@ -36170,8 +36432,8 @@
   const SrcSubUviewUltraDemosRadioRadio = /* @__PURE__ */ _export_sfc(_sfc_main$1x, [["render", _sfc_render$1w], ["styles", [_style_0$1v, _style_1$O]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/radio/radio.uvue"]]);
   const _sfc_main$1w = /* @__PURE__ */ vue.defineComponent({
     __name: "switch",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const switchValue1 = vue.ref(true);
       const switchValue2 = vue.ref(true);
@@ -36285,8 +36547,8 @@
   const SrcSubUviewUltraDemosSwitchSwitch = /* @__PURE__ */ _export_sfc(_sfc_main$1w, [["render", _sfc_render$1v], ["styles", [_style_0$1u, _style_1$N]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/switch/switch.uvue"]]);
   const _sfc_main$1v = /* @__PURE__ */ vue.defineComponent({
     __name: "rate",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const rateValue1 = vue.ref(3);
       const rateValue2 = vue.ref(4);
@@ -36382,8 +36644,8 @@
   const SrcSubUviewUltraDemosRateRate = /* @__PURE__ */ _export_sfc(_sfc_main$1v, [["render", _sfc_render$1u], ["styles", [_style_0$1t, _style_1$M]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/rate/rate.uvue"]]);
   const _sfc_main$1u = /* @__PURE__ */ vue.defineComponent({
     __name: "number-box",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const numberValue1 = vue.ref(1);
       const numberValue2 = vue.ref(1);
@@ -36464,8 +36726,8 @@
   const SrcSubUviewUltraDemosNumberBoxNumberBox = /* @__PURE__ */ _export_sfc(_sfc_main$1u, [["render", _sfc_render$1t], ["styles", [_style_0$1s, _style_1$L]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/number-box/number-box.uvue"]]);
   const _sfc_main$1t = /* @__PURE__ */ vue.defineComponent({
     __name: "slider",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const sliderValue1 = vue.ref(30);
       const sliderValue2 = vue.ref(50);
@@ -36548,8 +36810,8 @@
   const SrcSubUviewUltraDemosSliderSlider = /* @__PURE__ */ _export_sfc(_sfc_main$1t, [["render", _sfc_render$1s], ["styles", [_style_0$1r, _style_1$K]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/slider/slider.uvue"]]);
   const _sfc_main$1s = /* @__PURE__ */ vue.defineComponent({
     __name: "textarea",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const textValue1 = vue.ref("");
       const textValue2 = vue.ref("");
@@ -36635,8 +36897,8 @@
   const SrcSubUviewUltraDemosTextareaTextarea = /* @__PURE__ */ _export_sfc(_sfc_main$1s, [["render", _sfc_render$1r], ["styles", [_style_0$1q, _style_1$J]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/textarea/textarea.uvue"]]);
   const _sfc_main$1r = /* @__PURE__ */ vue.defineComponent({
     __name: "upload",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const fileList1 = vue.ref([]);
       const fileList2 = vue.ref([]);
@@ -36748,8 +37010,8 @@
   const SrcSubUviewUltraDemosUploadUpload = /* @__PURE__ */ _export_sfc(_sfc_main$1r, [["render", _sfc_render$1q], ["styles", [_style_0$1p, _style_1$I]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/upload/upload.uvue"]]);
   const _sfc_main$1q = /* @__PURE__ */ vue.defineComponent({
     __name: "calendar",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const calendarShow1 = vue.ref(false);
       const calendarShow2 = vue.ref(false);
@@ -36896,8 +37158,8 @@
   const SrcSubUviewUltraDemosCalendarCalendar = /* @__PURE__ */ _export_sfc(_sfc_main$1q, [["render", _sfc_render$1p], ["styles", [_style_0$1o, _style_1$H]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/calendar/calendar.uvue"]]);
   const _sfc_main$1p = /* @__PURE__ */ vue.defineComponent({
     __name: "picker",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const pickerShow1 = vue.ref(false);
       const pickerShow2 = vue.ref(false);
@@ -37026,8 +37288,8 @@
   const SrcSubUviewUltraDemosPickerPicker = /* @__PURE__ */ _export_sfc(_sfc_main$1p, [["render", _sfc_render$1o], ["styles", [_style_0$1n, _style_1$G]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/picker/picker.uvue"]]);
   const _sfc_main$1o = /* @__PURE__ */ vue.defineComponent({
     __name: "datetime-picker",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const dtShow1 = vue.ref(false);
       const dtShow2 = vue.ref(false);
@@ -37173,8 +37435,8 @@
   const SrcSubUviewUltraDemosDatetimePickerDatetimePicker = /* @__PURE__ */ _export_sfc(_sfc_main$1o, [["render", _sfc_render$1n], ["styles", [_style_0$1m, _style_1$F]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/datetime-picker/datetime-picker.uvue"]]);
   const _sfc_main$1n = /* @__PURE__ */ vue.defineComponent({
     __name: "action-sheet",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const actionSheetShow = vue.ref(false);
       const actionSheetShow2 = vue.ref(false);
@@ -37387,8 +37649,8 @@
       type: Boolean,
       default: badgeProps.getBoolean("badge.absolute")
     }
-  }, setup(__props, _a) {
-    var __expose = _a.expose;
+  }, setup(__props, _a2) {
+    var __expose = _a2.expose;
     __expose();
     const props2 = __props;
     const badgeStyle = vue.computed(() => {
@@ -37457,8 +37719,8 @@
   const __easycom_1$u = /* @__PURE__ */ _export_sfc(_sfc_main$1m, [["render", _sfc_render$1l], ["styles", [_style_0$1k]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-badge/up-badge.uvue"]]);
   const _sfc_main$1l = /* @__PURE__ */ vue.defineComponent({
     __name: "badge",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -37658,8 +37920,8 @@
       type: String,
       default: defProps$A.getString("avatar.name")
     }
-  }, emits: ["click"], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
+  }, emits: ["click"], setup(__props, _a2) {
+    var __expose = _a2.expose, __emit = _a2.emit;
     __expose();
     const props2 = __props;
     const emit = __emit;
@@ -37777,8 +38039,8 @@
   const __easycom_1$t = /* @__PURE__ */ _export_sfc(_sfc_main$1k, [["render", _sfc_render$1j], ["styles", [_style_0$1i]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-avatar/up-avatar.uvue"]]);
   const _sfc_main$1j = /* @__PURE__ */ vue.defineComponent({
     __name: "avatar",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -37900,12 +38162,12 @@
     search: new UTSJSONObject({
       shape: "round",
       bgColor: "#f2f2f2",
-      placeholder: t("up.search.placeholder", new UTSJSONObject({})),
+      placeholder: t$1("up.search.placeholder", new UTSJSONObject({})),
       clearabled: true,
       focus: false,
       showAction: true,
       actionStyle: new UTSJSONObject({}),
-      actionText: t("up.common.search", new UTSJSONObject({})),
+      actionText: t$1("up.common.search", new UTSJSONObject({})),
       inputAlign: "left",
       inputStyle: new UTSJSONObject({}),
       disabled: false,
@@ -38281,8 +38543,8 @@
   const __easycom_1$s = /* @__PURE__ */ _export_sfc(_sfc_main$1i, [["render", _sfc_render$1h], ["styles", [_style_0$1g]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-search/up-search.uvue"]]);
   const _sfc_main$1h = /* @__PURE__ */ vue.defineComponent({
     __name: "search",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const searchValue1 = vue.ref("");
       const searchValue2 = vue.ref("");
@@ -38438,8 +38700,8 @@
       type: String,
       default: defProps$y.getString("alert.title", "")
     }
-  }, emits: ["click"], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
+  }, emits: ["click"], setup(__props, _a2) {
+    var __expose = _a2.expose, __emit = _a2.emit;
     __expose();
     const props2 = __props;
     const emit = __emit;
@@ -38570,8 +38832,8 @@
   const __easycom_1$r = /* @__PURE__ */ _export_sfc(_sfc_main$1g, [["render", _sfc_render$1f], ["styles", [_style_0$1e]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-alert/up-alert.uvue"]]);
   const _sfc_main$1f = /* @__PURE__ */ vue.defineComponent({
     __name: "alert",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -38743,8 +39005,8 @@
       }
     },
     emits: ["click", "close"],
-    setup(__props, _a) {
-      var __expose = _a.expose, __emit = _a.emit;
+    setup(__props, _a2) {
+      var __expose = _a2.expose, __emit = _a2.emit;
       __expose();
       const props2 = __props;
       const emit = __emit;
@@ -38902,9 +39164,9 @@
       }
     },
     emits: ["click", "close"],
-    setup(__props, _a) {
+    setup(__props, _a2) {
       var _b;
-      var __expose = _a.expose, __emit = _a.emit;
+      var __expose = _a2.expose, __emit = _a2.emit;
       __expose();
       const props2 = __props;
       const instance = (_b = vue.getCurrentInstance()) === null || _b === void 0 ? null : _b.proxy;
@@ -38964,7 +39226,7 @@
       }
       const startScroll = () => {
         return __awaiter(this, void 0, void 0, function* () {
-          var _a2, _b2;
+          var _a3, _b2;
           if (animationFrameId.value > 0) {
             clearTimeout(animationFrameId.value);
             animationFrameId.value = 0;
@@ -38972,7 +39234,7 @@
           yield sleep$1(10);
           const textRect = yield upGetRect(".up-notice__content__text", false, instance);
           const containerRect = yield upGetRect(".up-notice__content", false, instance);
-          scrollWidth.value = (_a2 = textRect.width) !== null && _a2 !== void 0 ? _a2 : 0;
+          scrollWidth.value = (_a3 = textRect.width) !== null && _a3 !== void 0 ? _a3 : 0;
           containerWidth.value = (_b2 = containerRect.width) !== null && _b2 !== void 0 ? _b2 : 0;
           currentPosition.value = containerWidth.value;
           startTime.value = 0;
@@ -39265,8 +39527,8 @@
   const __easycom_1$p = /* @__PURE__ */ _export_sfc(_sfc_main$1c, [["render", _sfc_render$1b], ["styles", [_style_0$1a]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-notice-bar/up-notice-bar.uvue"]]);
   const _sfc_main$1b = /* @__PURE__ */ vue.defineComponent({
     __name: "notice-bar",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -39408,8 +39670,8 @@
       type: [Boolean],
       default: defProps$u.getBoolean("collapseItem.showRight")
     }
-  }, setup(__props, _a) {
-    var __expose = _a.expose;
+  }, setup(__props, _a2) {
+    var __expose = _a2.expose;
     const _b = useUltraUI(), parent = _b.parent, parentData = _b.parentData, getParentData = _b.getParentData;
     const instance = vue.getCurrentInstance().proxy;
     const props2 = __props;
@@ -39445,13 +39707,13 @@
       });
     }
     function init() {
-      var _a2;
+      var _a3;
       return __awaiter(this, void 0, void 0, function* () {
         getParentData("up-collapse", instance, false);
         if (parent.value == null) {
           return error$1("up-collapse-item必须要搭配up-collapse组件使用");
         }
-        let value = (_a2 = parentData.value["value"]) !== null && _a2 !== void 0 ? _a2 : "";
+        let value = (_a3 = parentData.value["value"]) !== null && _a3 !== void 0 ? _a3 : "";
         const accordion = parentData.value["accordion"];
         if (accordion != null && accordion) {
           if (array(value)) {
@@ -39614,8 +39876,8 @@
       type: Boolean,
       default: defProps$t.getBoolean("collapse.border")
     }
-  }, emits: ["change", "open", "close"], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
+  }, emits: ["change", "open", "close"], setup(__props, _a2) {
+    var __expose = _a2.expose, __emit = _a2.emit;
     const _b = useUltraUI(), children = _b.children, getChildren = _b.getChildren, addChild = _b.addChild;
     const instance = vue.getCurrentInstance().proxy;
     const props2 = __props;
@@ -39628,15 +39890,15 @@
       });
     });
     const init = function() {
-      var _a2;
-      (_a2 = children.value) === null || _a2 === void 0 ? null : _a2.map((child) => {
+      var _a3;
+      (_a3 = children.value) === null || _a3 === void 0 ? null : _a3.map((child) => {
         child === null || child === void 0 ? null : child.$callMethod("init");
       });
     };
     const onChange = function(target) {
-      var _a2;
+      var _a3;
       const changeArr = [];
-      (_a2 = children.value) === null || _a2 === void 0 ? null : _a2.map((child, index) => {
+      (_a3 = children.value) === null || _a3 === void 0 ? null : _a3.map((child, index) => {
         let childState = child.$callMethod("getInternalState");
         if (props2.accordion) {
           if (child !== target) {
@@ -39688,8 +39950,8 @@
   const __easycom_2$a = /* @__PURE__ */ _export_sfc(_sfc_main$19, [["render", _sfc_render$18], ["styles", [_style_0$17]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-collapse/up-collapse.uvue"]]);
   const _sfc_main$18 = /* @__PURE__ */ vue.defineComponent({
     __name: "collapse",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const collapseValue = vue.ref("1");
       const __returned__ = { collapseValue, get AppKu() {
@@ -39788,8 +40050,8 @@
   const SrcSubUviewUltraDemosCollapseCollapse = /* @__PURE__ */ _export_sfc(_sfc_main$18, [["render", _sfc_render$17], ["styles", [_style_0$16, _style_1$y]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/collapse/collapse.uvue"]]);
   const _sfc_main$17 = /* @__PURE__ */ vue.defineComponent({
     __name: "toast",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const uToast = vue.ref(null);
       function showToast(type) {
@@ -40113,9 +40375,9 @@
         this.clearTimer();
       },
       clearTimer() {
-        var _a;
+        var _a2;
         this.open = false;
-        clearTimeout((_a = this.timer) !== null && _a !== void 0 ? _a : 0);
+        clearTimeout((_a2 = this.timer) !== null && _a2 !== void 0 ? _a2 : 0);
         this.timer = null;
       }
     },
@@ -40134,7 +40396,7 @@
       show: $data.open
     }, {
       default: vue.withCtx(() => {
-        var _a, _b;
+        var _a2, _b;
         return [
           vue.createElementVNode(
             "view",
@@ -40146,13 +40408,13 @@
               $data.tmpConfig["safeAreaInsetTop"] ? (vue.openBlock(), vue.createBlock(_component_up_status_bar, { key: 0 })) : vue.createCommentVNode("v-if", true),
               vue.createElementVNode("view", { class: "up-notify__warpper" }, [
                 vue.renderSlot(_ctx.$slots, "icon", {}, () => {
-                  var _a2;
+                  var _a3;
                   return [
                     ["success", "warning", "error"].includes($data.tmpConfig["type"].toString()) ? (vue.openBlock(), vue.createBlock(_component_up_icon, {
                       key: 0,
                       name: $data.tmpConfig["icon"],
                       color: $data.tmpConfig["color"],
-                      size: 1.3 * parseFloat($options.getPx((_a2 = $data.tmpConfig["fontSize"]) != null ? _a2 : "0").toString()),
+                      size: 1.3 * parseFloat($options.getPx((_a3 = $data.tmpConfig["fontSize"]) != null ? _a3 : "0").toString()),
                       customStyle: { marginRight: "4px" }
                     }, null, 8, ["name", "color", "size"])) : vue.createCommentVNode("v-if", true)
                   ];
@@ -40162,7 +40424,7 @@
                   {
                     class: "up-notify__warpper__text",
                     style: vue.normalizeStyle({
-                      fontSize: $options.addUnit((_a = $data.tmpConfig["fontSize"]) != null ? _a : "0"),
+                      fontSize: $options.addUnit((_a2 = $data.tmpConfig["fontSize"]) != null ? _a2 : "0"),
                       color: (_b = $data.tmpConfig["color"]) != null ? _b : ""
                     })
                   },
@@ -40184,8 +40446,8 @@
   const __easycom_2$9 = /* @__PURE__ */ _export_sfc(_sfc_main$16, [["render", _sfc_render$15], ["styles", [_style_0$14]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-notify/up-notify.uvue"]]);
   const _sfc_main$15 = /* @__PURE__ */ vue.defineComponent({
     __name: "notify",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const uNotify = vue.ref(null);
       function showNotify(type) {
@@ -40438,8 +40700,8 @@
   const __easycom_2$8 = /* @__PURE__ */ _export_sfc(_sfc_main$14, [["render", _sfc_render$13], ["styles", [_style_0$12]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-loading-page/up-loading-page.uvue"]]);
   const _sfc_main$13 = /* @__PURE__ */ vue.defineComponent({
     __name: "loading-page",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const loadingPageShow = vue.ref(false);
       function triggerLoadingPage() {
@@ -40508,8 +40770,8 @@
   const SrcSubUviewUltraDemosLoadingPageLoadingPage = /* @__PURE__ */ _export_sfc(_sfc_main$13, [["render", _sfc_render$12], ["styles", [_style_0$11, _style_1$v]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/loading-page/loading-page.uvue"]]);
   const _sfc_main$12 = /* @__PURE__ */ vue.defineComponent({
     __name: "overlay",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const overlayShow = vue.ref(false);
       const overlayOpacity = vue.ref(0.5);
@@ -40603,8 +40865,8 @@
       show: false,
       title: "",
       content: "",
-      confirmText: t("up.common.confirm", new UTSJSONObject({})),
-      cancelText: t("up.common.cancel", new UTSJSONObject({})),
+      confirmText: t$1("up.common.confirm", new UTSJSONObject({})),
+      cancelText: t$1("up.common.cancel", new UTSJSONObject({})),
       showConfirmButton: true,
       showCancelButton: false,
       confirmColor: "#2979ff",
@@ -40618,7 +40880,7 @@
       confirmButtonShape: "",
       duration: 400,
       contentTextAlign: "left",
-      asyncCloseTip: t("up.common.inOperation", new UTSJSONObject({})) + "...",
+      asyncCloseTip: t$1("up.common.inOperation", new UTSJSONObject({})) + "...",
       asyncCancelClose: false,
       contentStyle: new UTSJSONObject({})
     })
@@ -40749,6 +41011,18 @@
     },
     emits: ["confirm", "cancel", "close", "update:show", "cancelOnAsync"],
     computed: {
+      elCancelText() {
+        if (this.cancelText == "取消" || this.cancelText == "") {
+          return t$1("up_common_cancel", new UTSJSONObject({}));
+        }
+        return this.cancelText;
+      },
+      elConfirmText() {
+        if (this.confirmText == "确认" || this.confirmText == "确定" || this.confirmText == "") {
+          return t$1("up_common_confirm", new UTSJSONObject({}));
+        }
+        return this.confirmText;
+      },
       contentStyleCpu() {
         let style = this.contentStyle;
         style["paddingTop"] = "".concat(this.title != "" ? 12 : 25, "px");
@@ -40901,7 +41175,7 @@
                               color: _ctx.cancelColor
                             })
                           },
-                          vue.toDisplayString(_ctx.cancelText),
+                          vue.toDisplayString($options.elCancelText),
                           5
                           /* TEXT, STYLE */
                         )
@@ -40932,7 +41206,7 @@
                               color: _ctx.confirmColor
                             })
                           },
-                          vue.toDisplayString(_ctx.confirmText),
+                          vue.toDisplayString($options.elConfirmText),
                           5
                           /* TEXT, STYLE */
                         ))
@@ -40960,8 +41234,8 @@
   const __easycom_2$7 = /* @__PURE__ */ _export_sfc(_sfc_main$11, [["render", _sfc_render$10], ["styles", [_style_0$$]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-modal/up-modal.uvue"]]);
   const _sfc_main$10 = /* @__PURE__ */ vue.defineComponent({
     __name: "modal",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const modalShow = vue.ref(false);
       const modalTitle = vue.ref("");
@@ -41091,8 +41365,8 @@
   const SrcSubUviewUltraDemosModalModal = /* @__PURE__ */ _export_sfc(_sfc_main$10, [["render", _sfc_render$$], ["styles", [_style_0$_, _style_1$t]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/modal/modal.uvue"]]);
   const _sfc_main$$ = /* @__PURE__ */ vue.defineComponent({
     __name: "popup",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const popupShow = vue.ref(false);
       const popupMode = vue.ref("bottom");
@@ -41788,8 +42062,8 @@
   const __easycom_1$n = /* @__PURE__ */ _export_sfc(_sfc_main$_, [["render", _sfc_render$Z], ["styles", [_style_0$Y]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-tooltip/up-tooltip.uvue"]]);
   const _sfc_main$Z = /* @__PURE__ */ vue.defineComponent({
     __name: "tooltip",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const tooltipButtons = vue.ref(["编辑", "删除"]);
       const multiButtons = vue.ref(["转发", "收藏", "删除"]);
@@ -41948,9 +42222,9 @@
   const defProps$p = new UTSJSONObject({
     // noNetwork
     noNetwork: new UTSJSONObject({
-      tips: t("up.noNetwork.text"),
+      tips: t$1("up.noNetwork.text", new UTSJSONObject({})),
       zIndex: "",
-      image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEsCAYAAAB5fY51AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAABLKADAAQAAAABAAABLAAAAADYYILnAABAAElEQVR4Ae29CZhkV3kefNeq6m2W7tn3nl0aCbHIAgmQPGB+sLCNzSID9g9PYrAf57d/+4+DiW0cy8QBJ06c2In/PLFDHJ78+MGCGNsYgyxwIwktwEijAc1ohtmnZ+2Z7p5eq6vu9r/vuXWrq25VdVV1V3dXVX9Hmj73nv285963vvOd75yraeIEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQaD8E9PbrkvRopSMwMBBYRs+5O/yJS68cPnzYXel4tFP/jXbqjPRFEAiCQNe6Bw/6gdFn9Oy9Q90LLG2DgBBW2wyldIQIPPPCte2a5q3jtR+4ff/4wuBuXotrDwSEsNpjHKUXQODppy+udYJMEUEZgbd94DvnNwlA7YGAEFZ7jOOK78Xp06eTTkq7sxwQhmXuf/754VXl4iSstRAQwmqt8ZLWlkHg0UcD49qYfUjXfLtMtOZ7npExJu4iqZWLl7DWQUAIq3XGSlpaAYHD77q8xwuCOSUoXw8Sl0eMux977DGzQjES3AIICGG1wCBJEysj8PXnz230XXdr5RQFMYbRvWnv6w8UhMhliyGwYghr4Pjg3oEXL34ey9zyC9tiD2ml5h47dr1LN7S6CMjz/A3PvHh1Z6UyJby5EVgRhKUe7Kz/JU0LfvrJo5f+Y3MPibSuFgQGBgasYSd9l6GDsup0WS/T/9RTp9fXmU2SNwECdQ92E7S57iaMeJnPQLK6ixkDLfjlb7546RfrLkQyNBcC3dsP6oHWMd9G+V3JgwPHh7rnm1/yLQ8CbU9Y33zp0j+nZFUMb/DHmB7+SHGY3LUKAk8cObtD00xlHDrfNge+Z2ozU3c9dvx4Yr5lSL6lR6CtCWvg6OAPw9z538ZhhZRl6XrwhW8du1KX/iNejtwvPQIDR8+vSRqJ/obU7GupjdNdh2gW0ZDypJBFR6BtB2rg2OVtuub9JcmpHIpBoK1xfffLzx4f7C0XL2HNiYDp6bs9z23Ypn1fC1Y/9PCFDc3ZW2lVHIG2JKzTp4Ok7nv/G6Q054MIvda+bNb74pEgKGtwGAdL7pcfAa8vOKEZ2kyjWuLr7uDh+/qvN6o8KWdxEWhLwroyeek/g4zuqwU6kNrhyZcu/UktaSXN8iNwuL9/RuvVXtJ9PbPQ1vhmcP6t9+47u9ByJP/SIdB2hDVw9MJHQFYfrQdCph84evFX68kjaZcPAZJWwjMXRFpJ2zr91tfuvrh8vZCa54NA2xGWrunvmg8QWCJ/N4ir7fCYDxatkOeBB7an501agXbygVdvv9IK/ZQ2FiPQdi9osGbH+zRNf7y4m9Xu9Me7N9nv0HXdr5ZS4psHgXpJC9P/wDRTx0Vn1TxjWG9LGrbaUm/Fi5meSvcrkxf/Cg/ow9XqAUk91v3qHT97r6471dJKfHMi8Oyzgx1Z03t1YAQVT2MwgsC3u+yXHzi0faQ5eyGtqgWBtpOw2Ol9+/TM+sTOn8L08MtzgQCy+tOHXr3jA0JWc6HU/HF5Scssr4jXcYqfP6V/T8iq+ceyWgvbUsKKOn38eJAYyl56TAuCEr2WYei//9Crd/5GlFb81kdASVopSFrerKRlaoZj9HR+700H10+0fg+lB21NWBxe2lhNHsUpDZr27mi4dV379R9+za4/iO7Fbx8ECknLCPTsTDJ17O33bJpqnx6u7J60PWFxeAcCbMV56dJfQKf1bkMLfuGh1+76zMoe9vbuPUnLsb2DtmOe5HSxvXsrvWtLBEhaTx29+Ma27Jx0ShAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQaEsEVoQdVluO3BJ06ptHL34b1XRjp4Ch6Rq24+kmjG4Nwwg+9uA9u/73EjRBqhAEihAoe3xwUQq5WTYEzp0b3ZnV/Ncf6O/9AvY9wlh/6dy3X7ncN512Zw9BVLXjuAP4np44vnQtkZoEgVkEhLBmsWiKqwsXpjbPBOn3gRfenwnc+7GBe+zsjclvonFDS9nA9Iy/u3x9+vAP3735VPk4CRUEFhcBIazFxbfm0k9fHD7k+v4nQFaPQIrx8Gmyx/GJ0J/t7ez7mw0b9MmaC2pQQgh0/ZSm4g5TwueWWtqLt0HuVy4CQljLPPYnB0depTn+b3t+8B4t0AdBUv93h2H9xc6da0aXs2m+r1WQsLRnl7NdUvfKRkAIa5nG//r1oGtsZvjTgev/kqYHF/TA+AXoqv4npJemOEiQU1Eo2l+G0movBK1UBBPU7s9E1+ILAkuNgKwSLjXiqO/khVtvARH8dxDBRkMzPrF/V+9/BlG5y9CUqlXinHv9mRPXtvuus88L9H3JPv2zD2yXExCqAicJBIFWRwAvv3Xqwq0/Pnn+lv/K+ZvfPH3p9p5W75O0fxaBp793ce3AwIDMWmYhafiVgNtwSMsXeHp4eNXJC8Nf0PAdRCiuf/XgrnWUqsqotcvnl9DmRkCdweX4b9N7+m/ih+mbMraLM14yJVwcXItKpT1VRve+ArC3Qqn+3gM7132jKEGZm6tXg86J7OhDfuA/iHwPUpfUZSfu2L59tXxEoQxeyxkEgjKeOnLxHb4RqC+NY5H3+2953d4XlrNN7Vq3ENYij+yZwbG9jpt9GkBPQ5H9zgP9607OVeWp87cOQtn9zwJf+xDMNFfj+jryPqXpxj8c2Nn7P+SXey70lidu4IXzb0DNB4tr9751+HV7zxSHyd1CERDCWiiCc+QPjUCnsaqmZ62O5IN7N/VUNP48ee7mAZDTf4Tt049iUG4Guv4ZfNLos9UIbo7qJWoJEHjy+bP7fNsoOcnW0A0/aacef8PdG28sQTNWTBVCWIs01OfPj66BpfqTmq732UnjgT1bei+Vq4pTv7HM8Ceg2/o1qLQug7T+FaaM3IqTLZdewpoHgYEjV9fphvOj+OShWa5V+CxvZtpzv/LwG/aNl4uXsPoRwI+4uEYjAJ2GmdG8L0FK2mYa+tsrkdXZy+P7x2ZuHdW14P+BLdank9q6Qwd3rf+ckFWjR6Tx5Q2cP58K9Jm3VCIr1ogt48lO237r3//96YofeG18y9q7RFklXITxPXV+5DchKb3ZDMy37Nu5tuxG4R9cHH6b42QfAzlds+3EPXu2rfrBIjRFilwkBIIR7SHoJDurFU89ZOd680Gke6JaWomvjoBIWNUxqivFD87fej0e0n8Fwvr0/t1rnyqX+QfnRz7g+8FX8Rv8vL3auF/IqhxKzR2WCPxXqKeq3krDTdj2ierpJEUtCIgOqxaUakwzNBR0D09yiqePHOjveyOkpxLr9VMXb73V97S/h3nDXx7Y2fdPkAYbncW1IgIDxy5vM7LZt/hgrnLtxyaBrJNxv/72N+6tuNhSLp+EVUZACKsyNnXHvHL+1qcgNf2KbSXu2bt9dcmS9qlzo/fARgcmCtpzB3b1/Vg5QiuslLowENyDWDn8cSjl98PgdBviu03N+rl9/WufLEwr18uDwLdevLTF1YK3xnVZ2HI1bUxrT7z5zTuXdRP78qCyeLUKYTUI25OXbm4JPO00TBj+6I7+db8ZL3ZwMOiYdG4dA1lN9HWte2iuI2NAVPapC8O/CGPR34Ip/AZIbIMo7yX8G9QMbcS09P+2b1vf5XgdrXaPfiYns9oeLLEd8D1/B7Dp0E1jGP042pXQj7RKf546cmGzp+tv1TRf6YQD35/QO3seP3xow5IfC9QqmM23naJ0ny9ysXwgq98BWc0kVhv/Nhalbqe8kd/Fr8MOSEr3zEVWrwyO3I29hl+E9LUHGf+nAXI6sGPdd8uV2YphIKnE5IyL6bLxk7cn3bdkHHefrpvJAExMZ1uBZmqeNzXtfzUzk/m/ens7LjV7Px+8d9e1579/44l0duZtge+Np5zEEw8c2pBu9na3YvtEwmrAqNE8IZvNHsep5//yjl3r/0O8yFOXbv0QCO05gP0JGIL+fjw+uj91YeRh/Dp/PtCDM7Zpfmjvjt6Xo7hW9ycmJjaYduf7Hdf/8HTGfa3rG9rYxLSWnsloPg7fijZV8oFM2Ja2a9t6EJd7bCztvHP7us4rrdD/r3/7ct9I99jEI4cOiQ3dIg2YEFYDgOUJDFj1e8TqX7cT4kImXuQr5279A4DeBEX8ayvprU4N3rovcALot/TH13T0fXDTJn0qXk4r3k9OTm4y7a6PzjjORzOOvn1kbEqbnEprPhRzwAKzwFLHk05hv6Yd6N+o3R6beG50aPSdr3qV6IJKkVp5ITIlXOCYn4Yexr0w/DO6YXymHFlR0e5r7tsM3fxgJbI6fW1ivTeT+SsYmr54cFff+5Cu5X+hb94Merp6/J/PusGvTE6724eGJ7RpSFOkKPCUZvBPBccoHBet3Rwe13rX9tw/PjXzZ5hKvr8SfhWKkeA2REAIa4GD6p0feRdWBnvxjv2PckVhVfBf4A29uG/X2i+Ui2eYn8n8NryuDr3jPfWSFV5k44UT137eshIP2K7/64cObbheqZ6lCp+Ydt8TBO7vTM5od1+/NR4SFVhoLpKKt410lnE8LTMzo3V2dLznxLkhYgQ9obiVjEDln7mVjEodfYcpw+MAsftg/7qSDbAnb97sCSb0Yei2fqOcbovVqKNnNO8HmAE9Cv3Wp+uoWjt27HpXNqH9WTKR+kBHKqEFbvo5y3N/avfu4g23R45f3WGa1k9ZicTd0zPTf/f6O7f8dT311Jp2fHzmgJlI/N70jPPe4bEZ6Kg4qw0lqlrLiNKBiLWerpTW25PUbkPXZViW62ecHz+4d8PXojTirzwEyhq8rTwYFtRjvpX/rlwJ+iSXugPbMuyKBOHo3geRJtuT7PujcmVUCuPJlhnL/9NUqvMD2eyM5sxMaIlE4n7XML907tyNjcxHQjty4sZv66Z1xEok/xNW5n4uZSf+8sT5m++vVO58wkEu5sR09pd9w/rWyET2vReujiqygrSopn/zKZN5qMeirotKeTyolm7p/+X06Wvr51ue5Gt9BISwFjiGsLl6N6SrvylXDNTK70D4mX071pwtF88w6Jd/DG/1E1u26NOV0pQL71y3/8PJVOcHMzPTWkcCH2YGOaTTaS2RTN6f1fQvvvDK1bdnbO2JZCr1SeRfn05Pa1PTU0gXJBKW+ecnzlxvCGndhFQ1NRP8bcY1/vjS9bF1V26MwHwsVKiXa3etYVw1TNhYJ3TDjQCO42jJVMcez7J+t9YyJF37ISCEtahjGjxkGDr2DJZ31D8h5vUQJL5RPkXlUMM07u3qSGidICvkzzuSlmlZb0olrK9hD9v9JCrPC196JoPMAolFg6CV+PPj54YeyWecx8Vk2v1Q0rSfhFT18LnBmzBRyNalp5qrSuq7kiAsh4SFa7oZ9M0wzI+cPHOjZPo9V1kS1z4ICGEt4lhiCvZrSa2jol7qzPXJPk6nIGbVbWfUvcr7hO9MP97ZVXpggOu6ajplYStj7l1XvbRMXbPAbp6HzSSBlkraNknrvfVCcPt2sHYi7f3pTDb47KUbYxuvKqkKpYBXKBnV869c3WgbDEixAck0FGFFfEzJzbIsO9C1TyrcymWWsLZGIHoW2rqTzdo5dXyykz0NC8l779i5vu4zwM+eHVntGP5jqVTq/6AkVc5NZ3wNH2lVxNWZNIukMSjiNd9z0+CHp5DXAdX4SAg203w8GB5IATtODHzdK8C15kEjhXvNS9rWA11dnfcMDY9prscss48RySakrOLWqODCoIKAgkuVgsS0urtD60haeV1YYVbbtjUn6/74HXvW/11huFy3PwKzT1r797Upe3jq4sib9u9Y+wxe+vh7W1N7jx49v6ZzbffnQD4/Cj1Pfjx54XiBls6GVuTUc9mQsOIO9mPQFdkIRlz4fy5JLm2ZMOqTcJaXIqpcqnixVe+rdbZ3dbc2OT0D0wZIibHSksmklslknvx+//q3PiKnXcTQae/b+LPQ3r1t0969cOL6G7o6E09qgZegdMJBpVQ1DbKCpyUt6oPKz/4NEJalCAuZFIuEVBJd+jgLh4rvAiFqUVGkhJZMWFp3Z0obGSu/d5gSnWmavuO6h+/cvYHSobgVgoAYjrb4QPMUiGtj1/79jBMkLBwiTlMASlYzTkhWCJyTrGAyMOFkst/BoYMmuIIyGJYcMXMMdNwHPhYN1qWS1t6ZLGaKZL8yzFXTr15BooLLMugHMBRNKgW+It8y9TEcJGt4rvcRFCCEVQbFdg0Swmrxkb0+cf2XOzq73kgdFieEXF2jdEUJKQH6SVWQrNjtZDKlpTPp38U58iUbthk/Ph7sN6zg/xudSGvD4xkq6otcnnjyF0XRRTflkyC0IIJE1JG0QbqGNpMNp5xFhRTcZDNoj66988SFm5vv3LX+WkGUXLYxAuXnCW3c4XbqGs9hwjv+a9lsuN+ahOJSCoLjNDAFvVUll0p1aNPp6adTweSflEszPO48oFn+4yOTmR+6enOshKyYhzWpf/jDuuf6x2aV/qNRaPG/1d0gUXWCA0uu7GhMmkqmerEc8KOVU0lMuyFQ+Ylut562YX9Sncmf7Ojo3BDZWbGLtMkiUVXSWTFNuMqWuYG530f7+/tnGFboxsfdd9mm8XdDo9O7rg6NFq0CFqZr5DWlK9qV0fZqGvZchSuPlevB2VmG/hOV4yWm3RAQwmrhEcW64qu4ykfJho52Vp3J8quBYQooqWDKADftBd6HD+5efyoKj/zR8ew/hWXY56/cnFh7a3RCTTGjuMX0SVB9qzu1qfQM+jO3dBW1g6uVSHv/qVNX10Vh4rc3AkJYLTy+WA/8ou9kJjo7bOh+DLVFZ64TEbCyBktxI5PJZj56R//Gx+NdH5vM4vuI+p8NXh9LjU1iw3EZhXc8TyPuuV9wDaaCfBjTM06N0hVWQmHBDzvSDZ5tvqYR7ZAymh8BIazmH6OKLbzv0KZvJEz3ZzEFnEolaEtV2XEaCLKadrIz//TQnk1/EU85NuH8th8Yf4j9gMZUOrNkZEVZCnsbtTU9KW18GqcKFyjh420sd2+j33pg3F8uTsLaDwEhrBYf04O7N/2t7/o/C2FoGnsIy/YGlvAwSfCvZzLOe+8oR1ZT3u/5uvHJC9dGtJlMrfqjslXVHwjpat2aLi2rjFFLjUSrFUjlO0juddXSSXx7ICCE1QbjiHO0/hofbPgwpnDTOR2V6hWNQqGUx34890noet5yaO+Gko3Y45PO7/uB/lvnrwxrWdha1absbgxo1FWtwplXqYSJY5Nn5lU3bLHQmGA/yko0plVSSjMjIITVzKNTR9sO7dv8RSeb/T9BWmMkKv4D+YzBXuljV7yxd+zfte6VeHGKrHTz4+cv38JWmyUmKzSGG5z7VndoE7kz3uPtq+Welvhwm39weVjOyaoFsBZPI4TV4gNY2Pw79mz8KyebeRIH+VEZTaX0sf27+v794TKmCxNTzr/2NOPj5wZBVjjdYSklq6jN69dyKuhqmWztivYob+RTSkPbe/xMdlMUJn77IiCE1W5jq+s4dYEO6mzsYAmvi/+CrH7LDYxPcBq4HGTFVcG1ULLT5orS1ULIkoSFI2cMHKG8obiXcteOCAhhtdmo6gaOh4EWWlkyYU9gvHswXfgV19d/7+LVkSWfBrItJJhObL/p7elQR8fUZnEV70XxPc01sM+xrzhU7toRgZIHuh07uZL6xA3LBaYB+Ar8rBsfz34YX1j+D5eu317QNGy2xPquSE4mDuXb2IujY2AgytNE67RiKFshzuwCR5s9ZSMlsK0QEMJqq+GkBKOF5yFzRoidK5BoFCeMjM/8mG+a//Xy0Li55KYLBRiTrGjwOQ1br4VMBQuKVJeQKVPxMLlvPwSEsNpsTEECmBLSgbHUpwD1YGwse59l2p+9fmuig4fiNZIowrqq/6Xeqm9Vh9JbjcOKvqFtACX7gV8kTVZvkaRoRQSEsFpx1OZoM2iKxxuHLtDcsZlgLzYZfv7m7XSv+r7fIm234XSP/8o5ktWqzqSyZr89PoXPYDTYkZvziw0NLluKayoEyq4iNVULpTF1IaDjHHZmoAW4aep9geN8fiLt998cGYdtVp7K6iqzXGJFUCAi7jdkuapsBJKcPBwgyP8YRyV7B04Q3dDbpY3jg6gupoMNla5U41BbUN9n0sr1ScKaHwEhrOYfo7paCAW0WiWknihhW/0Tabf/6tDtxpIVSIhGnz1dSXUkDL8fSHKi4/lWPId9Kp3Vxqegp8J/m9f14D6DQ/nmb281FwgkZ1Dj7bnSSFx7ICCE1R7jmO8FJJr8jCvjeNrIxFjDJBpKVaSlXhwDw384MyucBoLAGEfHI5ptO6n1YAq4FjorH9IWjUOnFlF3pj62aui3whbI33ZGQAir/UY3XCVEvzgdw/8NcSyGUhSlpVWQrFg2p39xp0JYLyIohaXxdZ2FGofG6yi85/QS32F0Asu8URgu1+2JgCjd22xcsVElPC85169Gaa1YTkRWJKpSqooBiQQzONvq9sRULKKxtzzAEJw1api2EFZjoW3K0oSwmnJY5tcoSD09HanEDztubnfO/IopyUWC6sUmZUpW5aSqkgwgK04DxxaZrFivacCaIdAuH9zaM1rSDgloOwSEsNpoSMenvU93dXb+EE5taFivKElRqd67qrNmsqIF+yjMF/i56MV2JqadYKxXMDXM6+4Wu04pf/kQEMJaPuwbWvPticwj4Il/NnTrdl7JrqaDC5wTUle1GmdWWVCw1+JotjA6PgnThsIdQrXknF8arkJi/+R355dbcrUaArU9ha3WqxXW3tHR9C5dN//T9eEJ3aGdUwP7T0V7F86Mr0VW4mF6o2NTS/ilaB2HDmb8wA2+08AuS1FNjIAQVhMPTi1NgwRkGKbxRxMz3uaJSRzVUkumOtLwo6Zc7aOkVdEhynN9NQ1cyuNqeEqD67mX9TXGyxXbJhFthYAQVosP58S0909czfqJqzdGODVqaG/IUbCWr2p0yukfp4FUtDfeir1yl8IPUGjPHFy/fqJyKolpJwSEsFp4NEfT6Z3YBvOp8MvMc0hAi9hHNQ1cBrJil5TUZxhfXsTuSdFNhoAQVpMNSD3NMTzzU1PZYAM/ProYkg3UV5rHT8lXmA7SwnwEq4FLLVkRI04HM+n0LdvzvlEPZpK2tREQwmrR8ZucCd7hePr7rw2N5PfxLUZXON1zHKz4kb0KnIttP6Njk8tyaimbwXPrsW/yq3v3bhoqaJZctjkCQlgtOMCYCnU4GedTI+NpQ32XbxH7QOmKG5nzdIWZJz8HNkKygqI9TmSL2JSiovGVn0A39c8WBcpN2yMghNWCQ4zPc0HRbr6GEs6chJFnmfl3knZO4/hmII1B6fiFG9br0s6qAeXPp2WUrhzHeXH/jr6n5pNf8rQuAkJYLTZ2kK7Wul7w6zeGx9DyUsZovOodOizosTg1TM9k1Wogpa7lIisOF+w48E/7E5B1Y/cgtdizsBKbK6c1tNioT6X9n3MDcyePOo7OoJqrC6S0+ZIYV+GSOHxvc18PJCxXG4ed13I727axqTp9yk9rX1jutkj9S4+ASFhLj/m8axwdDdbgELxfGsLpoZyqVXPVU1QugVJUV0dC27p+FaaBWWxknq6ceAljTNMiAf/BoUMbJpewWqmqSRAQCatJBqKWZpgJ731Zx9pJM4aK0hXe5vlKVFEbKFlxs3PvqpSSqpbzKztRm+gnEkktnU6/2GFMfa4wXK5XDgJCWC0y1iAR6/Z49iOjY7C5qkG6mk+3SFQGlEP8FFdnygrNFqBsn1OxP5+K5pGHbcBhqhT8fqu/v39mHkVIljZAQAirRQYx7Wj3Zj3tddQjVVJ4l50CMjHe8mqOTJCCvmoTyIrENXx7Uinbm4Gs2PZUqkObnp76i0N7N36tWl8kvn0RaGnCGhgILKPn3B3+xKVXDh8+nPseX3sOlpt13+P4uonv71WeDqLr1ampFB8S1JrulNaHc9rTMxltcpofOeWns0rTLkeIZUHRnpm5YibMf7kc9UudzYNAyyrd8ZLpWvfgQT8w+oyevXeo++bBtaEtQd9s1/ffRsV3I6eDJCp+nourgH04UZQnhIYfWm1o8xdUGCU8/E/bil89sH3dlQUVJplbHoGWJaxnXri2HTvd1nEEcCBS3z++MLi75UejQgcmJjL92ax/gNJPo6QekhVXAbdvXI3D+XQ1Bcxiu02zTAEjKFIdHTQS/S8Hd2/4YhQm/spFoCUJ6+mnL651gkwRQRmBt33gO+c3teNQYin/oG6aKX5rcKEukqqoWN+Ij5vy81v8UATDG0WGC21jlJ96K6wKPpWd8H8jChN/ZSPQcoR1+vTppJPS7iw3bIZl7n/++eFV5eJaOczX9Z2YvM1LPxWpocBHKv8qHHdMqSphGUqqahaThfj40ITBcbLnsDj6oXvu2bS4n96JVy73TYtASxHWo48GxrUx+5Cu+XY5RH3PMzLGxF0ktXLxrRoGNVPPfNtOolIrgElLGYH2wbZqcipdIFVFlDbfGhqfj9bskCaHHS/7gTt3r73Y+BqkxFZFoKUI6/C7Lu/Bl1jmlKB8PUhcHjHufuyxx/g5lbZw+BL7bX4EoiZqyS0T0uM0j1+82QSl+ua+bhxj7GjD2LicwWkLzaarigbKsmDJ7gcTmezMBw/t3ixntUfAiK8QaBmzhq8/f26j77pbaxo3w+jetPf1B5D2RE3pmzyR4/nH+Mti4Wx1dUrCHO0lSVGqskFUnakkpn6mhu086jgYHkWTW3Wbo4Tli6L5gqYHE47vfeDufVv+YflaIjU3KwItIWEdO3a9Szc0ElDNDqcLbHjmxas7a87QxAnX9ljfxcr+Mzs29ykpi1O8iJjoR/cm5o7dnUl89LRLW93dyWmVIip+Kp7pmlWqIvQ8Mga9Gslm3Efu3LX+K008HNK0ZUSgplnGMrZPGxgYsIKeXa/TA61jPu0w0+7xBx/cd3M+eZspD0wbDgWm+RXP13cODY/jWGKuGAb48jG+agNpilbqlKZoWDqDY2AyjtNUlupzYZlKpXgaxIVMNv0zd+/d+uxcaSVuZSPQ/IT13TN34QRvZW81n6HSDdMLUqmjh9tgd//Fi8OHEl3JL3Z2dh3MzGA7XU664llVWRz/QhLjNYmsmaWp/DjCjqIDdlaZTOZZ1/A+fGj7hjP5OLkQBMog0NSE9cSRszuswNhdpt31BRnazM3U9IuPHDrUuG+419eChqU+cvzqjp7u5P9KJpMPpqc51Zv9QntLkFQBEqZluVCw/7nhaP9i376+8YIouRQEyiLQtIQ1cPT8GjOw7vE8tyFtxBrb2MBXdh579FF99g0vC0nzB548ebNHT2l/aFmJj1BPBYyav9EFLaQ+jdPAVNL8/pZ13a8qiJLLOhAAjvrTRy/d0enbF+69d0tzHFhWR/vnk7Rple6mp+9uFFkRGF8LVj/08IUN8wGp2fIcPLh+4sCu9R+F3ucj0MLf4vaVVnChqYWmdaQS2jpY2vd0djh86Vqh7c3Yxm8dudTPxaW0lrn7yJEjZW0Tm7HdC2lT0xKW1xecgHE3FDWNcb7uDh6+r/96Y0prjlIO7ur7TOD5b3ayzt9ylY0Gl83qKFXZsCXrXdOlrV3djf2LBr556JOshLDmMWhPPXV6vav5O5jVxYLUhNl3iIbV8yiqpbI0bQcP85C2Xu0l3dczC0XUN4Pzb71339mFltOM+Q/0rzu5f2fvu1zH+QDOt3uZ0pbVRMRFouJK5qqeTkhVqyBdtdUmhGV5JI4cudrpd5kHiyp3tTU/8s6r+4rC2vCmaQmLWJO0Ep65INJK2tbpt75298U2HLuiLh3oX/95L+0/kHUyvwTieiUJHVEimVzy1UKeWMqv2pCoKEVFRNXT1aHawnBx80eAZj7TwcxdAc5Gi5fiaNnNT37nCk4xaV/X1IRF2B94YHt63qQVaCcfePX2K+07fMU9U7qtHev+xE/7r3cc70O+6w1gxuV0dHZiusgvJS/O7IskRXLs6KCxqj+B26t9a3uUREWi4plbQlTFYzXvu+7tB3EIUGel/L6e3TNw5NS8zYAqldss4YvzBC9C7559drAja3qvDoyg6pwCP+KBZaVOPPjazS1vMLpQKE9fuPnawDB+EqehPwzWuAuSl8LPg90WVxhJJPWQCUmPBAWTBEz1TFUGpqO3wYYvIPgr2az35a2b1/50V6f1e1NTlVcvEzB0xRekj67usu5FmS2/crvQcaol/zeeObfTSOj91dIq28PxiaOHDx9quy8LtQxhcZBqIS0Dhkl2l/3yA4e2j1Qb2JUUD1Iyz1waOQib0vsxKXsAFvH3wMB0JySwtZC+DBPTN5BOCEnhrI1BuKe9l6tIzsVCiD6E0DOabrwI2elZ09aP7N3aNxjheXvK+a1OENa0EFYEyYL9rz072Ju03ZpNQKj7Xd899cKhNrA9LASvZTY/s9GcHoK0XsrakLS8UklLxyl+/rj+/Qfu2367sJNyTS7SuZfneO7ffweBGScu3NwAqWgrTvTc5jjBZmw87tMCfRXYKQWOgula4OiBOQUZ7DZuhrAGdQXxV0zPuCaGnkv3VPGHOpPw7+QPR62OM5HhdNddGOeX2kmCbSnC4mDlSStVTFr4eLljdHV+702vWz9R66Cu5HS5h5hmHvz3QiOxwJTRo2BGgY06dm7OVhewYGAY6s75oD+ZDs4JPY9JyqSCQ7ABqftd5VFM3/j2Ja4mtsWpJQSq6ZXu5UZTKeJnsHpohiYPRqBn04nkS2+CQWW59BK2dAjwS0Y4IHDz2ERWG8Gnwm7iK9W3sFmbvrqGPzw6gW8eTmvTM07XmTPX28KYd7EQ3rjnvv1QFHbPt3zT9DcMPHd+13zzN1s+/hC2rKOo7NjeQdsxT5LEWrYjbdLw05eHtwWe9jl0542u62HZHZIVpalY/yIlP5X3MHYddLLZfy4fmYiBhNuB509vw+rG3tKY+kOwGHLi7W/cS91jS7v4s9TSnZHGLx8CICH9lXNDX+zpWfXuycnaBV2e3e567nAm4973qv0bzy1fD5qr5oEB7KXt0u7B3Loh7yhWVfypbOalh9+wr6U3mbfklLC5Hi1pDRE4ef7Wj+EEiZ+amqpvJT2bzWjJRLIPR3n9riA5i4DZg720DSIrlsrvHXSZ9p7ZGlrzSgirNcetqVp9/vz5FJTqj6JRejTdq6eBMzNpHP9s//QrF4bvrydfO6f1JrCX1mvcXlo98Kembjotr3wXwmrnp36J+pYNeh5JdqRem83O77gxkpxtW3bgOZ/g1HKJmt3U1Rw+3D+zrc89aunagnWzpq6PdxujLz388L4F78tdbtCEsJZ7BFq8/sHBoMPX/I9hyrGgnuDUUZzrnnz7yQu3HlxQQW2Ued++fZmJ1e5LoPB5k5ZpWCPXz+08du+99zrtAI0QVjuM4jL2YcIZeh+2+9wF49MFtYJSlgmHE0g/JlLWLJQPg7RmhtyXsJ18eja0tivsXhj6xy9ve/mRR5TRcG2ZmjyViN9NPkDN3Dz1FW5z9XM4i+s1ME1YcFNpUIrVLHzJzHnwjl0bn1twgW1UwPHjxxPXpztejR0HFTc+F3YXRwxdfdM9W08D0zrs4wtLaM5rkbCac1xaolWOvurhZIPIih0OdVm2haNTfqUlAFjCRnJP4HBn+iUqz6tVa2nGpTe/etsP2o2s2G8hrGqjL/FlEQC5GHghfplSUSMdvwaEA/9+4vjpa3c2stx2KIsfUek2dr+EuXNF2xEjSJx98w/tbFt7NiGsdniSl6EPp84O3W/Z1oPzXRms1GRKWdCJdeCIlJ+vlGYlh997r+70+EPH8NHJEtLCauCph+7bmj81ox1xEsJqx1Fdij4Zxi9AT2KSYBrtslgxhOD2gWOyz7AstFzx6zFHj1mGobYUYAgC9cHge3ddK5uhjQKFsNpoMJeqK6+8cm0X6noXiWUxHA8WxAdWNyQM45HFKL8dyiRpueM7jllmMGpnjO+1w9fNaxmXxiogaqlR0jQdAkeOBPjczrnOiQ6jw88ESSOA6KT7iQzOHEvavu1pZsLQg4QPP/DdZG9Xx/vWrOr+mfR03SvtNffdxleAQIgvTzjBT0w409Mpu2faufZy+vDhw5WPMa25dEnYqggIYbXqyNXY7i/jCyvdfmaVb5hdVsLp9LJGp43j1/1A7/RdvdMwPRzEboRnLVHe9vEvL3eXBOB4ZMta22H+TiqV2LJQ26u5u6Bju44Z3J7O/Lvp6cwPmBanOwQ4uNHRTWMK21bSvh1Mm642nTWCtKkH07rnTE72aOO0XZq7bIltVQSEsFp15HLthg5J/+aJE12m3tVjOPYq1/dW4cTjHnwMYhXOce8xDd3y/PJW6OpMdsTRVy4iK/rKMR/jwvz825VIHFzT3fkx13UW/dnhRy3GJyeeHEs7n1XNibUPFvY6vtGDw5vV9w0Vofn81qGhZfDhi3HX8SfQ/3HPMse9CWcCX0gel2OIFJIt+2fRH7qWRaYJG85NxldGzV4tGayFSLQ24+q9ULyu9gJfMU5ELTn6wUISTl03NHz1KzyiJLqmX657OLLdSJgoXTO7cBxyN172blier4YCvBsFdSNXV2dC35tKJrbzfPfFdjwvC/qs9MSMxxNRsSqmT6LhUDQHE+jUBE7UnATXTuLsrRn01K2l/x6+qItiR3TNG8V59KNB0DGSfNXGUXwJY2Gm+osNhpSvEBDCasIHgVLTt75/aQ0MnXpBNb2QgNYEntfr4wu/nBYpKQLtxtdwAh0SBX3VDe7nM/Ha5vf1Fb/CURS2bCTAWWuxR229qRsbQQQbUed61LfW14JVKKsTJ5sk8WUcHbtlNANyTOhgcmAGKH7p3m1FWpqtuZCu+LByVdKHVMjpKEQrBwIW9tnpXOIH+QTDSH/D9f0bmCLewDn1I4HmwtAypPDZ/oe9oXKf/aMPsWxSs/RR13FHrURiZE1gDR86tKHEdCDMKX+XCwEhrOVCvqBeHNaW6ui11/mWDtLQ1kEiWodXE4rwYgepAPssTPCMOjIdAk94TZ8pMZjch8HjDorGFUTUAwlkh64be0A9/ZCatiDZWtOyE7ClQmIdJICJFYhA+TRV4Fo5/QIHiUvrTEbkVRCxiJfsSBbfYk87OTExXxdazY5yUgiRKfpHQ1YSkONmAZY+gV4NIeVFfCXoLNA5h/Plb5LzWAyzF+IVXdNnvO/6GcsyhjC1vmWZ7s2pO3fdOqzriy9asnJxZREoerDLppDAhiIAEtCfO3F5rW0a6z1PX4/nf53nG5RqqrpieSnULEVh8cx4E7ugH78H8tG9eP/24oVezY+pkpA8b/abhPF8le75BqdsXUtaFeaTlTI2IByEoU1l8oq1mkokcZHElIRoWmpejMMCMyCvQXyy7JjjuUcgOl4tLCzCMpTHgFpcgkViX/dH/ax2Szf8m2Yqc/MN+1r7BM/C/rfCtRDWEozSkbMjq7NTY5t13dqE6dhG3wsSqlp+C9DDi0ifLrqmT1f6BgUaPjiHN0lJAGAfvpWcI4XjiHIMF6ocO/EjmMa9HeelQ1LT1PRpoce/sJwOTCQtc+kfGQp6Uxl+9JWtmL+jNEaJ0gKBgbsygR58B4sHfwV5aliVWg3vCHv6ymHcdG868IzrVsK6pnd71+/dsmXxbD3m3/W2ybn0T1/bQFe5I8euX+9ybuqbXMPbDA7ZCKV4uMOecyz+9OfmWvj9x9zEw6JW+JuOX298WhE6qtwLEV3TL1tb/AWj7sqwfqaro/sdmcyM+vBp2XzzDEzaBiQsNH+e+eeTjQ+ohwqnG0BYhfVzNYKrkOmpyauYYH8KvD8G6RPBszrC6Jq+ystl0ghzXEZjR5+O4+iZwTh+eG7Yqa5rq/3hGzzTSkXKn4YgIITVABjBP+ZzP7i8ydasrZCetuCHvIvFRs92SEdlpnCYE2LOQi12OA7RNf1yjrphHIyE9yOXPnfNMDg70DpdTf8DWDKs5rRvMVwChAWrUgh21HzllD0NrigqlxKVC7bKQuOOWeGiuI7OTkhb6T8C/Xw3xkel9cXxj6eIxiY3Hhx3X9dHsWJwDaa3l1+zd9Mt/F4tUk/ijWnP+/DBb8++LWqvnh0c7NDGta0pO7kl6zpb8AJzEUr91kYEFdeBRCt69Nm4+AsSl6jwjVGckY6VwPwUpLhLURx9xliWvxFHi/w+zB0SWCnLsVpxnoXesSI2ngp4zmRJXPgf/0IleGH51R6uwjeX5MR76qtITh7+8N9Cp4GF7Sm8Zl1s35pVXVomm/5c1vG+Wm284njHJeJq44/FjixUAld8w7uijW6+xo3MhW2S6+oIVHumqpewglJ87+LFtcFUcqur+1vxwPcZJqYPMOyhXw6GKI4+4/GwQpjCBhe+6XDIpFb06PM+np5hhS5eXzw9bLJ2pBLGv4Fe36BU4kA6IQGw8MUY6MJywVeqDs54Z69zrWdY7jI3G1ZtUiSV6zzDI3IqLLew/wu9jspl+yywrA1pEed5QceXPT3jBb/DLrA5ua5UHZ/4eMTbFx+fwvE3DJO8fANrjlctL7giJhRx9MrfR89R+VgJ1Y6currONuwd0FNsxwtV02mPlWGLy1TxlPHf6Hh8PH9xesvw9yRM+5PIRT2ZIgVKKZxWUY/PT8aTFPji0i3m4Ed1hDWV/7uY9bNGtiGqAyorJRWSqCgdkrQiR5KddrwPlsq8xfhG6efvx8dvtiQczDdmmPaldDBxSVYeZ3GJXxUMWzxq5d4fPz7Ym7X1HTAL2A7NqtJHEQ3qtCPjw3LoxB/v+OMZ5VVzR5aHWRuErYA+y4uu6fM+Xl9J/lh7bFvbY+vmv0bWos9tsXAWSLIiaSnyApHxJz6SbFSFuXTw8i86r5vVRW1m+6IHmUREAuI0lcREP5q2ztWPrO9/YK54xsXHI56+cePvj3qBfimZNS+J5FWMcrjptThsRd4dPX9+DcwEd5iQphwozfkCwJKaLv9ewHYKeicfSudwShcnJDBBOD3MTwGRO0cqLIj73jQTaejDBYaPHTBgJ/i5+HyYijd95sFhRzkzB7yL2IrCtGwezj9nOQVTUlfPwiicifnu5J0qHHd8mXHIG6ZD7JQqIk9kJK6QwAokMWRUhMaSeJ0vcfaiXNhs7PyuwpYV51Vh+EM/Pu2M9GckpyiOuZm2Wvtom+Y4me8xPbvIIujzPu6Wbvyt1ejL3U7Sv/v754ZHsORwaX3KGdwiJhO5pzY+Mivk/urVq52jTnIXlEc78LKu8qAMx/G8kHhyOicosz0ovM3IrIDKb15HSvDoOoqv+hMLYCOWI8ash0vmufryZVcqLz4u8fym3ov1xT/EVp4UDUTn4/iS0xW+sZTMojASmLqGp64iH4FRXJQ2TKj+lv7JVRTVxwQkm9APyaboGnGMzSVR6VR87ipsVT645ovOzi5tamb6zzB1/nqzjz+s9YetwLioZW5C8jq08K9+1IxS8yQsfF6ap1WL2BK8VOaJc6NbPcPrx7wJ++hmHQUPvOaQgMJ3ETtVlERDP0wVsQ19uPgcLQyt/Dc+p4jlL6k/1xa2qVyh5ApEzEoErm/DsPOTXV3de6anq36roFyRdYWVbVSshHJEMt98saIXfIu9koplYZL6m/hUz7kS/Jt0/PE8+Jj6X/Y6k+fv2tA1BKIvB/OC8WnGAmp5dpqx3XW36fjgYK/upXbhFd+BrRlqn16MfkrspkoC4hnirYjbUVWzs4rHx8uL3cerjwt0TA4RcBcsuX8Rn97q54okVsCKJJ9YkSvy1gJR4aOtnAr6OJP+L13d+BKBKMEzHhAfgDh6yzD+vqHjTDDvYpAxLqwEfVdbE9bpIEi6V27tdLP+LnzPrWS/XrRTnz5d4e79+LNY7r4kP+Z7Jv7z1LyPL0B4Tb+ci9cXLy+eJ54e8Rw//rqqcUR+HOrgYVprJbBl5E2w63oI64J7k8mUDZLGhmAXs19ucVkxP8gKQu4ptCxbMy2TW3KAGI4u1P207ztH3CDx/7bL+Cdse8h1Zy5ev7Dp8uHD7blJuy0J69TV8XW6l92Dl3cbLG6g98idbhDgdANcY1ZY9o2N4mpNr96GRf1Da3Wui0RW69F1bWslvp81LD2xDTOGu9DhQzBc7AcYfYlkAqo6A6ozqHNBYJTESGitTGShsp0qQSxT4AcoPJQw0LBlEPhBFakHDjoLvY+XgVIyg7WK77tG8n9pvpHXBbXL+OMBd7FN6KLu+uf27esbX9RHdIkLbxvCGhgYsDb3v2a7obt7YHakpKmYiqgE2ioqJbzIOszXcSov/DAzRRNehyJKvPx4+igv/ZLKEaCkoZxUFMYXE1I8f7Xyq/UHp9CkAlfbCF3NdlhS7IQguA0N2wiJYy1ktC5IISb1Okr5jSYruy2SGlYkIkKLSC3yy/WrUWGzSnjaTUX/QEhYQuNewLCdwBFKRkpOuAfr4sBnwwfDg6B0MHagORhBHNqHw5WxTwYav6lAt/42MBLfrYZXHO9w3Ftr/B0Hp0pY+tkD29ddAz5ln8NGjddSlNPyhHV8aKjbzAS7Dd3egRcvgRHJWyrHASw9Pyp+vlSxEluH0jWAGQF9VVZMpxHVRZ/xSKQU4PR5Xy0+/sLQZCFS9DN/XKtSeh5WrL2x+sMyZv+W67+vwz5eC7oDx12rm9pakNg639B68XL3Qh+2Bm94DySxHhg0daBHSQhiCbyyyMS9SDi8RhEHyYP1qD9qak0S4VGn5VYrSTRKEkKHWYYiHuQmCYb/YKYLqS+3H5LYckxJmz6qhSYJ5yNgzgtuclESpncBfN8Fj3lgJdCSGpHcGECoxrouMoHjzO+4evLLMB1VKxJV8Wyj8Q80Ix043jnTu32hlTdkh08Yn7UWcnio9Qs3pzZm0lN7LCOxIdIZxbuQ1+lAVFFxJB7aMeUIiPkiPRPjo2v6dPF4FVjHnxi/oQK0Az/bymf5uI7ayGLj6eM63nrbF5VNXzV7nv3HViQL3JAEaSV1z0iBNJIgJBCYkSKJYbdjEiSHw7a0BI5s6QBBbINUswMUsQ6E11UojZGccA9dcZDBdQY+TgyFTgkiEKYyIBvstAQzIRk8cBJ+A2j4gZFDFWAqjAp3V5IhQYYwwUJ57ByS0QINzMYK8FyrRxt3KNbXb2qG/UVNT5wDyCt6/A0boGbdqzPA4tD21SPquWihPy1FWHjQzYs3xnZkM95ePIZd8RccBx1xez/UPowp46I4+uVcLD9/8Plq0Gfy6Jp+uez5uqPyY+UtNN5DuVQc06drpv4bIDXsjtsMpdkOSC79QK4Xog3PzwF4IBNCBiIhpBSpoE8jioqWaM2KCRuOqwLXgIQItKIe0lCYD/lZjoqgGIo0+J++SsmMKA8eqQ21qHuUh2PfzQHN6vgG6vVK8GfmQhcbr3Yff+AEi3rtdCtNF8u/eIWD2ATXx4Mg0XH1Vr/hm7sDQw8PvyvTrriKWocEE0C6oM/kJRJHrAykgj6WGlq+JUifu6YfS6pu4/UVa6AgQcXKi78ApekhcWFBwMstEkTX9MvVHw+Lt2ex+4+Pg62CxgsHEwZbAdgWIJfA+ICkfDRYtyAwWWB7Ay8F8VT/KB0bOJ4Gx/CQfUKSwZGrJJs8iZHYgB0zMB+zk8hopQ8hEcEog2ERASIBAOL5fIrVIKLxXKtzKPZLgZUckvGf+/nH5HsK0+Uz3316zeAjj3D23Lwu90w0ZwNpiZ72UnvwfO/AXIFnXfLBxLOsHn6yiLqmr3oQ04LHX9hq6TFHI6txrlYWkHj98UT1lh8vryR/rIKq6aO204drdP8hRWF3itmLUw42QnW1CSTSA2IAIXkWOBYKLWw8wjVqNkEaFqjFwLQNJhWI4ZiFoiq6QX0SbsEo6HMoWVFCYprwjw6FP65BXCSoXJwiOwpnFK9A6yiWkQhRDwA9XAfpwLS/AqnqSKP7jwapquiznXFXMn6x8Yg/X/HySvLHKqiaPlZfvf0H6BloAM/v3tpzHkJwUx59Uxb4GE5Lfnt2ZGS16SX3+F5mq4llfegtwnaSR6J5EC8hPUV6IDaS6aDnoZ5DpYe6AtdgOr4pyhXLNPH0KKCo/DDP7N+S+mI6qHzbQr7AbdgW+iylWn0l5cf6E29ftfSN6L9lGl04x30tOtMHklmLhxpClW9BL4S1T+i2uNPRp+0FflD0AN9A9LHnmHGBBfJCE3QL9ALiguoJqiu+64gDzWGIIAlhzhaSDsMV/yjJi3BxyY9khP9BXBSzEMY/AFORGMmM1yyKZfmm+ZKuJf4uMHV1THEj+o+S864E7zYd/8Dliqp2MamvPbt9uw4dY/M4DnXTuMuXx/scK9iHLcbryzfKwvOJBSGNPl10Tb8WV0xYyMFymDdXXv46Kq+ueChJQI4WlSUqf8StOf5CNdXqr9afxe8/Gm6AoLAqGKyCGLSG350ACFzKM2FvaeOseEhFOsjItdQ2S6wYYmkOdl2+CfLBvmpIV55vYY2Qn6uAxAWC40zbhxSmWArcQj0TSIiSU37mx0kgVesgLereOSz8E5EWJa6Qzyh1hZEcO7xY4Ct9WLfNvwa+5xA2h6uGP6vMPxMsZ8WNf0Gf+cOCw9usq51a5+kNG9Sn1IjJsjoO0LI7EpVra/vxhPdFs7JyjYriohlbTAKGxO1C6oJEljseOLqmTxfPX66OucJK66OUNzuDjK7p05UIbGwX25I/vrj4BYrnD0uZ/Rtvfzz9fPsPIkgkbL0DZNMFRVEHFEY2ZCBTcwMLdfCsCCVN4SwpE9YG+ARNgD24IDHYSYB1yNCYDkLRFoC8oOUG40AKQx5IYyAmlQ6SF7dDoSof0hbJiApzqLs43aPc5UG+AvVQ/4T7nGQFQiJ5kdbAkmgH2Sz0FaWB4gLrad22v4nmuvPt/yzCc1+V4t0e4z93r8PYwDCvNANxLSthkai0jmCf5+jq6y6Y4SkjTfoKprgWufj9Dg3AozBmiK7pl3H8WDH3u0YfLY6u6c/HVS2vSvsxoygyTF2q/qNenEyjJ5NJPYGPRidME1M1/JYqwyoNq32Ihu4J0z5M+WA2DoqwEI9wfmEaEhQJzPNsKNOh0jJwrfRVJqbnNOrC6IGwQFzgHiKrpCuq2kE+FizrMXWE7IWCEKemg7hSiimOQchNIC3EchqpHlBO95TshQThkwF5TL9k+Mm/MZLGzVo3AlQdLzagDle1vCYd/wU9/5Z5ZcyZPnNow/J8ZHZZCGtsbKw3rdn7nIzTx42o0WfP1cPKuYJ6XPFs5q7p8zmKx5v8cdcxDeMPOR1fj+gh4X10TV/dukiC+nJPeLy8eH1hrtm/UVvpKxcrP2oL/dlcs1eQ9PCeo73wGcp+R2Xyvlp74vH19B9EkoA2CYKUlcQqJCQj6vkoyBjh/IurcJiy4Zxy2FMptRBO7sK3kClR0UYUZAX+wMqfC1ICiYHMYBsKSQsSFKaAUEqZLoiK00ASFsgpN0UEUWE6yOkiiArE6NmUb91OWwAAEuNJREFUszCNxA0c/uBoF04W86YOarWQAYjGmHBBEIkUiXEqib025hNmInWknv6zKo77Sh3/RvcfSx5Xl4O4yr5Y7NxiuEEQFT4uvs8yrF5VvosX28LLS185vsiRHkc9YPiJtrCbJIzHyx3gJdfpl80flZWPR6qIxJghus7xjSqj4E9UNn2VvN76Csqq6XIR+48OYEeGlcAaXhLfQwxNQcgQEI9IErOOxBUuCuDLz9Arm5iyOTaYy7Jty8hAb2VCm43ZmwnwQTbgFpAWyA4SGEKhaMdgYNpngKAcpeMCAfFjYGE4yAqco3RZ0LorUqOkxVkf6AgzvFBPFbISSsOUD+WRrWijpcwbmI4Gomj4yxAIv4bPVU+q9sfxk/EP36UlfP49N3vNWr/m9CZdX/zzjDDofAoW3XHVr9NPHdB8p2+uORl/mjFLUktMbBTtkSJbpLCRxYyD5OpJps/4+DJuvq5IIgoLqfi3pLzcRuloM7QSzKImsBSWG80LVKkxkSvOkFHaCjL5QvrPN9rwvaSVtEg2ICmQCNRQkGjwnlOpNktMxdds+GxcRFrIyCmhTQMEUJjl4qwtzPbAOVC8o0DUZroGiMmBpEUfRBZ4DvRUJC4/1GOpij1ML9XU0PJdFxIZGsOpJkkOQ0YdFh5CPodKl0WfRqQkVUhTIEf1iN4GkdJU4Rx/xsJfHkpfMv4cd+IAUJb1+YdkfSU7NXp6+/bti7qquKiEdfVq0Gl2TO2DonYzAcUTCv0slCB8FuGia/q8j7iAPl30aNIPHVKq55w+00MvjFLo05WmV8H5P9XLzydVF/H0xbGl9UGfjm226B98po2u6fO+0f3H9M7SbT1h+FoS00ybSmm+5/RZHxzbwWvVHtSvNuLRR4BKl0vPtHRhWh1SESUsNBkH0qjvNiAx4MA1JDBc4yBmTPmwJArJCFM+dA1SE5XsmFIqRTzKUrZYkMio78IUkauFoW6Mcbin1GWrOR8nqOEUEUQFmuK3ZdEw6NFg92s9j3XLp0CIsAuS8VdPkcKhCZ9/KAc81x/c3NdzFjy6KHZc0YPNh7VhDg9jYnh4co9n2dvx1nLalys7Rimx2xLGigfEJBQ0Xr149FkBVb04BQiTlPAFbTiDxRGKM1pJf5AgarPKG0sQu413N07hkCANO5m0fSebtCwziW5DqMISHTRMJCDF23inYbmsauNCHq+Vn1ta5dErzKN8psP/RiIXVpAegKJQ30Y06AQSEXdAIpdL0wbTNsLpoSIeCwRJHZYBpTusIFAIlPC0iqL5AxoCcmLPQkkLdITRCc0dSFqQD1A51g4pLOXmhZCwDMO2BpH9q6ZtDoU4oKQIy5yEynFnv+mzw+0+/q3Sf5yT4aYs89zq1alLIK7wYeQANcCpgW5AOaqIARzxcudrXrMTz+cuFAxBI1Rw06eLKz3xsnDikt+Mmr9mWBlXrbySeJAlTt8MXJImXHRNv0zx2GpWZ3r0KKqzXHlRHH26+fQf+mkbg56ADjppUuihMJl7BEhGtmnj+4Phj1lEUAzjaQcgJkzcqPPmlI/yjdJV8Trf/+hbeYyP0uMS0zSVF8SEaSELxkhR6a7IC1IVHkNMBWEkCljxYQ7YXgWKrDCHw2ohJDDKSkr5Tst3TANBp7DdgkTFKSOpxYMtV2i3hXQoJjwbBo3L4oibAajdXmSbCl01PEvi6x3PetMvwfi3cv+xHpPRk8GZvo6Oq5y5FvZlvtfqQZ5v5igfH7iRdHqrn/H24McyEb6ejCUxkCwqEATi8JDNKtWRIxI6wrLj+aOyQgIqLT/KTZ+OLYnCFGHE60PdSgzIgVmcfrbt5evjYkB97VeNyv8plx/UYoChElhYgB7KtD3PAUWRpejIVNzNAjNzyDuYRqnrMF5dIx4CkTrlAJQRps2FhZIX5lqYwfFLOygTBeSmkUhDEgNvIC7MR5ML6JhozoCpn+858G1utbH4j7BRT0Z9VlZzbTyOKJCKeCjkqYbkFBJh+DXCPVcKuXKIFURlm8WBoZSFOBCYmk6i33ioT+Kw1CegEMspcFfe+M8+rRySNum/YUwm9I7TPT04NWOBDg/nwtz16xMbEp3mPswIOuI6G7wBSlynz1pQWZEIP0smIcEEWN3QsfJDn+nj9FFSPh73wilgdE2f+eOumo4pPqWI2kI/LKu4RVXLq7H/kJopRUFhnkj4joNT9KC/BlZgAIVD1I+cwASVUBgCIsF1KEQxJLpGPKHGP5LYrAs5ikREnmJ61KF4K5cG1+REVS6HC1JauGroYYcOrLWUEp6MSF0UpoZgK5hV2dgEzeNLYbMBnRQZEUPnOwGMT6GOp57Kg/0WTCMYjnsQHpDmlJFTR5IcNt/alvV1PdF5NsKcLSpGG03L6QcjnWDpeIXqgFYb//A9wGi1+fMPDeqY7nae6uvT530KKp+JebkhHJyX6Fqz33X83tCgRr1d6gXBH+XnFtEwDmEVMBfAtbK7UvHxVTb1gGLQokbFVBZMDtUJHmT+dsPxmqSRU2nkrxkWxhfbOfEVwLov4sIaonSRr1qZy6vy8xliPbn+qPjYHxSm6mJwdB357DfaVtJ/BMLeW0/ayVQSR6TA5AB7h8kwmFeRrFBUSFYkJk7GsM+F5SuiCQmFBEriCskHYcxfEM9ozBjBS/yaKD//rBzndjD3BHswAcmqwFdhOWGugCw5owwpEt9sxMlVGWQEK4GlcAOi1XAcL6eLICfdcMFmNDnH7xdO/YTCHTkxM2B6EiSPbuXmHrZO5eJy4Iu6lfo2Gu8orFfA+PM9UMjnHpBIx9v+/Q9Wm8nMfcMTE1d7u7vP4Ec6fzy1wqOGP3xI63JHjgT2/rsy/boTbMP0pe78dVUWS5wjK0VUjIqNN3kA62ZYeIcfxofXDFNFUZBTT4W6m71mWBlXrb4yWSoEYWh0jVIUdJEmzA6o18mRDN7dCplCEkK8IiP4WRAU9OO8j5wimZB3SAhKYlJEphLkJCaSEP7PEdxsfVG5UWFxP6qPPngTlvBED6IWLN8dTPmg8ocFPPRXWBdlFWqqCEmLlhAgLRtKdLaAkpQNfRUM6DUQGOUiTimNEaT7FvRVw/F6K91XG4/mHf9KPaovvJ36jzfSS1mpc6mUdhnvhZL4a0GjZsKBKK+n0+kt0AHvztCAsIzjeeAeUKVPF1l101cBWCICxcGmcPalUeHRnyguIsJYej79fFnpKxdjrKhu+spVK69Ke+OW6SXlh7Xk/8b7D5umJKY6nUiQAEmp5ZKoD5Ay8kTFzcAsJIrL+ZREYCWAaU4ubXRNP8wfpuSuGubHMwCJhSuGPCiYJIMw5GV6xkfY0Wd+WoPiBAlEhvnzNluw3SKZYTkQHIQ5J1RQDg7Lw/QQGUIdFp4wcC9KgQ/7KkxjucEHROVmc3ZaCFfEjMxUvlPvBZ0WhT1Q1zG06hQKyGPA9qEh4bPRJuO/0p//WvoPyXpa77BPr9L1mn64QiJRT0vlP3jg1oyn0/th1dnN6VOkQyh8wVRuPpLUH9GHi+sckD4vLaj43NSHLwfv8cKjbGxdgc97JUpFpIRbpovKYHTUltkpHYkyEqNYf1gWfZU+Vn+JiMZERS4qKyTAMv1hmwoItLT/aL6OL9cn8A4mknhDkR5CUuh43ExhAXjnIQVxRQ9UwnU1JM73meHISINzlY/1Ir3jwNQBtui5IpU3K2mFZbEUEhgJiHlZhkqI8rws7hPFxBHlZ5romu1CGRSv2HyQEQiLPkwefJcSk2o0mU+F8Z46KswbKd8qvRUWiq7BsuoYlF/q+Jd839p4/KNnFHhw+Fbc819r/y3dHO7qsk9D2lLPBvEq59SLXC6CYSCq1OTk5F48g+FxLyQSvvyzhFK8taaYL1ACiYdkkSOg/HVO4irmAySLlR8+yHy5wnaWysTF7YmnRxdyecMXFDcxx3KjNCUEGUtb2r4Iixwh5qebxEG58v2Hkh0ERqlLp5kClNLkngLSyF8XExrZi089SYbFm9DRg1FCbEKyoxQE8sqFkTOgTwrDVIPCP/k8qpRcGrxMEXmxnpwjUeXbhjpgA2bBNsp0HPQWOiwNOnddw5YcNIdSFyzTlUKehEbrLDxDNn7osjCXPw5FO22qgPfKHn/pf8XxxxetvSvYlX8BxBVKCdGDmPPDhz0W+Oijjxof//jHt+Hh2oko/qKqFx4l0BJQmQIwS3RNn/fxZXqGFbq4nQzimI9tKFs+S1S1KJ9XoQkEfUQwtKg98fSzefMMwmx5F28/IqK2RLjM2b54/gX0H0v6+IiDZSVgHJogfYWNzDMUpCtsUkKg4pKIUJAsnNTlkjNWzfBCPMOhi8JAiCSqPBmyMFVQ1OdctQwLywNZ5cPCpDl80D6IhjzBASQF0sUeREpSJCyE4ceSpJXbEO2612AHepaTSRn/YrtEAD3n8xV/ntv4+S96nyGRO9gccQZmEPiBK3bRi5kPHcG+v2T32n2+53bxNY8oQyWIB0SR9OmqxMeTh5lm/8azx8srEbCQNSqTpUTX+eagwCiPqiWeQAXO/olHV2tPaYUFjWCxsQJjt7MV564K6iOB2Xj1adNGa3PqDMFl4XwSSnAQCUIibqFPlwtTwbiOkoSR+JvLx3KYv9BXaSrlLyifSegQBNMFTAWhiIeFArRZnoX+8Y2EzKhbnuNlYO9wFpZXkwoH5Kmj/6qOFTz+0n8+Y4Y/2pVIcJqY35+YJ6wjEN33ZzL9kPY3hWjx6Sv+RcByLIQAZZYQJSn2C944FRF/QkvjQ31XZDcV04GVPOGl+WdJEhVGbaNPV3d7Va7ZP83U/1ACgzTjkg4gjUFvHhGWkrPAPnnBLNeFSEKKfAbzOu9yBAUdVj6cZURpZuU3XOUILioD93x2IEnxxFGc9c6M+M93cHSNZVzHquBQDeMn4x898wQ2us7pgGvAbyU8/z5e5EupVEqtJirCgp4KHxVI7sbrQIYKHyKF3+yvIvEEX8FsQNk9qXwgBpgQwNo7p9OKrukzfdzF08+WTmYrV35YF+tU8bEpYImInGtLVH+8PkzZ8iQcVpjrawXCLOHH5uo/9JmWjbXHJMQcNhVW8bOklbsumnJw7Q+cgtVK2mJxAUNNKKncp54KHuzAwnjCE01B1UIHA1A80ik/IkdIfTj6mE8MXh2sSKZhdHUd+IcDykwFLj4eMv7Fv+il75c8/xEmeHaojD+jZ4LgbsPVVvO5iutg4oSAFCCiAqVp/jrUKRU8mzVexsube05ff3tiD0Q1wkP/ojrYgeiaftiheHsjLKL4GrudTxYvb0H9h94bpzeAwCD4cAqJf5SmlBjFH5D8ChVC1Q8KyIkrjtgbE64y4lqtINJHel5Hq4q4ZdsYzsWBWaU+rkFWtFzQbiNNnWciNbT/qD4+Hitq/FdE/3mWzmvQU+W4hZZPenQuRHRNfylcvfVjpUqz0Tj6dNE1/fm4euufTx1z5am3/hr6z6lj9A9ElneKwPJ3IYEVEpqKys0YFeUhoDBP4TV/+bjVIkfqKuu8/ixC/+tqR73111V4DYnrrb+G8a+h1tkk9dY/m7MxV7XUzwdP3ApBgCYG6Co+L6/+kcB4X0g0ERFFzwXjojBc5q8ZhqOKtWEoROmLEwSWBIHowVySyqSS5kIABEYhisRFEov8SgRWGD6K9OMgq8IwBIkTBBYXASGsxcW3pUoHgfF5iIiLPv9x+03kuLxMqaqsUj1KJL4gsFgICGEtFrJtUG6OwDhtJHHhqLOl+dBAG0AnXRAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBIGVhMD/D0fV/fpMMM+gAAAAAElFTkSuQmCC"
+      image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEsCAYAAAB5fY51AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAABLKADAAQAAAABAAABLAAAAADYYILnAABAAElEQVR4Ae29CZhkV3kefNeq6m2W7tn3nl0aCbHIAgmQPGB+sLCNzSID9g9PYrAf57d/+4+DiW0cy8QBJ06c2In/PLFDHJ78+MGCGNsYgyxwIwktwEijAc1ohtmnZ+2Z7p5eq6vu9r/vuXWrq25VdVV1V3dXVX9Hmj73nv285963vvOd75yraeIEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBAFBQBAQBAQBQUAQEAQEAUFAEBAEBIGVhMD/D0fV/fpMMM+gAAAAAElFTkSuQmCC"
     })
   });
   let noNetworkProp = defProps$p["noNetwork"];
@@ -42005,7 +42279,7 @@
     emits: ["disconnected", "connected", "retry"],
     methods: {
       t(s) {
-        return t(s);
+        return t$1(s, new UTSJSONObject({}));
       },
       retry() {
         uni.getNetworkType(new UTSJSONObject({
@@ -42013,10 +42287,10 @@
             this.networkType = res.networkType;
             this.emitEvent(this.networkType);
             if (res.networkType == "none") {
-              toast(t("up.noNetwork.disconnect"));
+              toast(t$1("up.noNetwork.disconnect", new UTSJSONObject({})));
               this.isConnected = false;
             } else {
-              toast(t("up.noNetwork.connect"));
+              toast(t$1("up.noNetwork.connect", new UTSJSONObject({})));
               this.isConnected = true;
             }
           }
@@ -42104,8 +42378,8 @@
   const __easycom_1$m = /* @__PURE__ */ _export_sfc(_sfc_main$Y, [["render", _sfc_render$X], ["styles", [_style_0$W]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-no-network/up-no-network.uvue"]]);
   const _sfc_main$X = /* @__PURE__ */ vue.defineComponent({
     __name: "no-network",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -42161,8 +42435,8 @@
       notice: { type: [String, null], required: false, default: null }
     },
     emits: ["success"],
-    setup(__props, _a) {
-      var __expose = _a.expose, __emit = _a.emit;
+    setup(__props, _a2) {
+      var __expose = _a2.expose, __emit = _a2.emit;
       __expose();
       const props2 = __props;
       const emit = __emit;
@@ -42222,8 +42496,8 @@
   const __easycom_2$6 = /* @__PURE__ */ _export_sfc(_sfc_main$W, [["render", _sfc_render$V], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-copy/up-copy.uvue"]]);
   const _sfc_main$V = /* @__PURE__ */ vue.defineComponent({
     __name: "copy",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       function onCopySuccess() {
         uni.showToast({ title: "复制成功！", icon: "success" });
@@ -42305,8 +42579,8 @@
       type: String,
       default: defProps$o.getString("grid-item.bgColor")
     }
-  }, emits: ["click"], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
+  }, emits: ["click"], setup(__props, _a2) {
+    var __expose = _a2.expose, __emit = _a2.emit;
     const _b = useUltraUI(new UTSJSONObject({
       col: 0,
       border: true,
@@ -42331,9 +42605,9 @@
       return deepMerge(style, addStyle(new UTSJSONObject({})));
     });
     const clickHandler = () => {
-      var _a2, _b2;
+      var _a3, _b2;
       let name = props2.name;
-      let children = (_a2 = parent.value) === null || _a2 === void 0 ? null : _a2.$callMethod("getChildren");
+      let children = (_a3 = parent.value) === null || _a3 === void 0 ? null : _a3.$callMethod("getChildren");
       if (children == null) {
         children = (_b2 = parent.value) === null || _b2 === void 0 ? null : _b2.$data["children"];
       }
@@ -42441,8 +42715,8 @@
       type: String,
       default: defProps$n.getString("grid.align")
     }
-  }, emits: ["click"], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
+  }, emits: ["click"], setup(__props, _a2) {
+    var __expose = _a2.expose, __emit = _a2.emit;
     const _b = useUltraUI(), children = _b.children, getChildren = _b.getChildren, addChild = _b.addChild;
     const instance = vue.getCurrentInstance().proxy;
     const props2 = __props;
@@ -42531,8 +42805,8 @@
   const __easycom_3$1 = /* @__PURE__ */ _export_sfc(_sfc_main$T, [["render", _sfc_render$S], ["styles", [_style_0$S]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-grid/up-grid.uvue"]]);
   const _sfc_main$S = /* @__PURE__ */ vue.defineComponent({
     __name: "grid",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -42611,8 +42885,8 @@
   const SrcSubUviewUltraDemosGridGrid = /* @__PURE__ */ _export_sfc(_sfc_main$S, [["render", _sfc_render$R], ["styles", [_style_0$R, _style_1$o]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/grid/grid.uvue"]]);
   const _sfc_main$R = /* @__PURE__ */ vue.defineComponent({
     __name: "line",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -42798,8 +43072,8 @@
     }
     // ...propsAlbum.props,
     // ...commonProps
-  }, emits: ["preview", "albumWidth"], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
+  }, emits: ["preview", "albumWidth"], setup(__props, _a2) {
+    var __expose = _a2.expose, __emit = _a2.emit;
     __expose();
     const instance = vue.getCurrentInstance().proxy;
     const props2 = __props;
@@ -43012,8 +43286,8 @@
   const __easycom_1$l = /* @__PURE__ */ _export_sfc(_sfc_main$Q, [["render", _sfc_render$P], ["styles", [_style_0$P]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-album/up-album.uvue"]]);
   const _sfc_main$P = /* @__PURE__ */ vue.defineComponent({
     __name: "album",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const albumUrls = vue.ref([
         "https://cdn.uviewui.com/uview/album/1.jpg",
@@ -43087,8 +43361,8 @@
   const SrcSubUviewUltraDemosAlbumAlbum = /* @__PURE__ */ _export_sfc(_sfc_main$P, [["render", _sfc_render$O], ["styles", [_style_0$O, _style_1$m]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/album/album.uvue"]]);
   const _sfc_main$O = /* @__PURE__ */ vue.defineComponent({
     __name: "gap",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -43259,7 +43533,7 @@
         return deepMerge(addStyle(this.customStyle), style);
       },
       uZindex() {
-        var _a;
+        var _a2;
         const zVal = this.$props["zIndex"];
         if (zVal != null && zVal.toString() != "") {
           const parsed = parseInt(zVal.toString());
@@ -43267,7 +43541,7 @@
             return parsed;
           }
         }
-        return (_a = zIndexConfig["sticky"]) !== null && _a !== void 0 ? _a : 999;
+        return (_a2 = zIndexConfig["sticky"]) !== null && _a2 !== void 0 ? _a2 : 999;
       },
       stickyTop() {
         return parseFloat(getPx(this.offsetTop)) + parseFloat(getPx(this.customNavHeight));
@@ -43312,7 +43586,7 @@
     methods: {
       init() {
         this.upGetRect("#" + this.elId, false).then((res) => {
-          var _a;
+          var _a2;
           if (res.height != null && res.height > 0) {
             this.height = res.height;
           }
@@ -43322,7 +43596,7 @@
           if (res.width != null && res.width > 0) {
             this.width = res.width;
           }
-          const currentTop = (_a = res.top) !== null && _a !== void 0 ? _a : 0;
+          const currentTop = (_a2 = res.top) !== null && _a2 !== void 0 ? _a2 : 0;
           const st = parseFloat(this.scrollTop.toString());
           this.initialTop = currentTop + st;
           this.isInit = true;
@@ -43380,14 +43654,14 @@
   const __easycom_2$4 = /* @__PURE__ */ _export_sfc(_sfc_main$N, [["render", _sfc_render$M], ["styles", [_style_0$M]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-sticky/up-sticky.uvue"]]);
   const _sfc_main$M = /* @__PURE__ */ vue.defineComponent({
     __name: "sticky",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const scrollTop = vue.ref(0);
       const windowHeight = vue.ref(uni.getWindowInfo().windowHeight);
       const navHeight = vue.computed(() => {
-        var _a2, _b, _c, _d;
-        const top = (_d = (_b = (_a2 = safeAreaInsets.value) === null || _a2 === void 0 ? null : _a2.top) !== null && _b !== void 0 ? _b : (_c = systemInfo.value) === null || _c === void 0 ? null : _c.statusBarHeight) !== null && _d !== void 0 ? _d : 0;
+        var _a3, _b, _c, _d;
+        const top = (_d = (_b = (_a3 = safeAreaInsets.value) === null || _a3 === void 0 ? null : _a3.top) !== null && _b !== void 0 ? _b : (_c = systemInfo.value) === null || _c === void 0 ? null : _c.statusBarHeight) !== null && _d !== void 0 ? _d : 0;
         return top + 44;
       });
       function handleScroll(e) {
@@ -43590,17 +43864,17 @@
       },
       // 点击退格键
       backspaceClick() {
-        var _a;
+        var _a2;
         this.$emit("backspace");
-        clearInterval((_a = this.timer) !== null && _a !== void 0 ? _a : 0);
+        clearInterval((_a2 = this.timer) !== null && _a2 !== void 0 ? _a2 : 0);
         this.timer = null;
         this.timer = setInterval(() => {
           this.$emit("backspace");
         }, 250);
       },
       clearTimer() {
-        var _a;
-        clearInterval((_a = this.timer) !== null && _a !== void 0 ? _a : 0);
+        var _a2;
+        clearInterval((_a2 = this.timer) !== null && _a2 !== void 0 ? _a2 : 0);
         this.timer = null;
       },
       // 获取键盘显示的内容
@@ -43697,8 +43971,8 @@
       type: Boolean,
       default: defProps$j.getBoolean("carKeyboard.autoChange")
     }
-  }, emits: ["change", "backspace"], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
+  }, emits: ["change", "backspace"], setup(__props, _a2) {
+    var __expose = _a2.expose, __emit = _a2.emit;
     __expose();
     const props2 = __props;
     const emit = __emit;
@@ -43818,17 +44092,17 @@
       abc.value = !abc.value;
     };
     const backspaceClick = () => {
-      var _a2;
+      var _a3;
       emit("backspace");
-      clearInterval((_a2 = timer.value) !== null && _a2 !== void 0 ? _a2 : 0);
+      clearInterval((_a3 = timer.value) !== null && _a3 !== void 0 ? _a3 : 0);
       timer.value = null;
       timer.value = setInterval(() => {
         emit("backspace");
       }, 250);
     };
     const clearTimer = () => {
-      var _a2;
-      clearInterval((_a2 = timer.value) !== null && _a2 !== void 0 ? _a2 : 0);
+      var _a3;
+      clearInterval((_a3 = timer.value) !== null && _a3 !== void 0 ? _a3 : 0);
       timer.value = null;
     };
     const noop = () => {
@@ -44178,8 +44452,8 @@
   const __easycom_1$j = /* @__PURE__ */ _export_sfc(_sfc_main$J, [["render", _sfc_render$I], ["styles", [_style_0$I]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-keyboard/up-keyboard.uvue"]]);
   const _sfc_main$I = /* @__PURE__ */ vue.defineComponent({
     __name: "keyboard",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const showNumber = vue.ref(false);
       const valNumber = vue.ref("");
@@ -44402,8 +44676,8 @@
       type: Boolean,
       default: defProps$h.getBoolean("dropdownItem.closeOnClickOverlay")
     }
-  }, emits: ["update:modelValue", "change"], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
+  }, emits: ["update:modelValue", "change"], setup(__props, _a2) {
+    var __expose = _a2.expose, __emit = _a2.emit;
     const _b = useUltraUI(new UTSJSONObject({
       activeColor: config.getString("color.up-primary"),
       inactiveColor: "#606266"
@@ -44635,8 +44909,8 @@
       type: [Number, String],
       default: defProps$g.getNumber("dropdown.menuIconSize")
     }
-  }, emits: ["open", "close"], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
+  }, emits: ["open", "close"], setup(__props, _a2) {
+    var __expose = _a2.expose, __emit = _a2.emit;
     const _b = useUltraUI(), children = _b.children, getChildren = _b.getChildren, addChild = _b.addChild;
     const instance = vue.getCurrentInstance().proxy;
     const props2 = __props;
@@ -44670,10 +44944,10 @@
       return getWindowInfo();
     }
     function init() {
-      var _a2;
+      var _a3;
       menuList.value = [];
       if (children.value != null) {
-        (_a2 = children.value) === null || _a2 === void 0 ? null : _a2.map((child) => {
+        (_a3 = children.value) === null || _a3 === void 0 ? null : _a3.map((child) => {
           child.$callMethod("init");
         });
       }
@@ -44910,8 +45184,8 @@
   const __easycom_2$3 = /* @__PURE__ */ _export_sfc(_sfc_main$G, [["render", _sfc_render$F], ["styles", [_style_0$F]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-dropdown/up-dropdown.uvue"]]);
   const _sfc_main$F = /* @__PURE__ */ vue.defineComponent({
     __name: "dropdown",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const value1 = vue.ref(1);
       const value2 = vue.ref(2);
@@ -45246,11 +45520,11 @@
         }
       },
       status(newValue, oldValue) {
-        var _a;
+        var _a2;
         if (newValue === "open") {
           this.$emit("update:show", true);
           if (this.parent != null) {
-            (_a = this.parent) === null || _a === void 0 ? null : _a.$callMethod("setOpendItem", 1);
+            (_a2 = this.parent) === null || _a2 === void 0 ? null : _a2.$callMethod("setOpendItem", 1);
           }
         } else {
           this.$emit("update:show", false);
@@ -45436,18 +45710,18 @@
       },
       // 开始触摸
       touchstart(event) {
-        var _a;
+        var _a2;
         this.state["moving"] = true;
         var touches = event.touches;
         this.state["startX"] = touches[0].pageX;
         this.state["startY"] = touches[0].pageY;
         this.getBtnWidth();
         if (this.parent != null) {
-          (_a = this.parent) === null || _a === void 0 ? null : _a.$callMethod("closeOther", this);
+          (_a2 = this.parent) === null || _a2 === void 0 ? null : _a2.$callMethod("closeOther", this);
         }
       },
       touchmove(event) {
-        var _a, _b;
+        var _a2, _b;
         if (this.disabled || this.state["moving"] == null)
           return null;
         var touches = event.touches;
@@ -45464,7 +45738,7 @@
         if (this.status === "open") {
           if (moveX < 0)
             moveX = 0;
-          const btnW = (_a = this.state["buttonsWidth"]) !== null && _a !== void 0 ? _a : 0;
+          const btnW = (_a2 = this.state["buttonsWidth"]) !== null && _a2 !== void 0 ? _a2 : 0;
           if (moveX > btnW)
             moveX = btnW;
           this.moveSwipeAction(0 - btnW + moveX);
@@ -45735,8 +46009,8 @@
   const __easycom_2$2 = /* @__PURE__ */ _export_sfc(_sfc_main$D, [["render", _sfc_render$C], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-swipe-action/up-swipe-action.uvue"]]);
   const _sfc_main$C = /* @__PURE__ */ vue.defineComponent({
     __name: "swipe-action",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const options1 = vue.ref([
         new UTSJSONObject({
@@ -45985,8 +46259,8 @@
   const __easycom_1$g = /* @__PURE__ */ _export_sfc(_sfc_main$B, [["render", _sfc_render$A], ["styles", [_style_0$B]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-line-progress/up-line-progress.uvue"]]);
   const _sfc_main$A = /* @__PURE__ */ vue.defineComponent({
     __name: "line-progress",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -46116,8 +46390,8 @@
       }
     },
     emits: ["finish", "change", "start", "pause", "reset"],
-    setup(__props, _a) {
-      var __expose = _a.expose, __emit = _a.emit;
+    setup(__props, _a2) {
+      var __expose = _a2.expose, __emit = _a2.emit;
       const props2 = __props;
       const emit = __emit;
       const timer = vue.ref(-1);
@@ -46237,8 +46511,8 @@
   const __easycom_1$f = /* @__PURE__ */ _export_sfc(_sfc_main$z, [["render", _sfc_render$y], ["styles", [_style_0$z]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-count-down/up-count-down.uvue"]]);
   const _sfc_main$y = /* @__PURE__ */ vue.defineComponent({
     __name: "count-down",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -46358,8 +46632,8 @@
       }
     },
     emits: ["end"],
-    setup(__props, _a) {
-      var __expose = _a.expose, __emit = _a.emit;
+    setup(__props, _a2) {
+      var __expose = _a2.expose, __emit = _a2.emit;
       const props2 = __props;
       const emit = __emit;
       let localStartVal = vue.ref(0);
@@ -46555,8 +46829,8 @@
   const __easycom_1$e = /* @__PURE__ */ _export_sfc(_sfc_main$x, [["render", _sfc_render$w], ["styles", [_style_0$x]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-count-to/up-count-to.uvue"]]);
   const _sfc_main$w = /* @__PURE__ */ vue.defineComponent({
     __name: "count-to",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -46882,8 +47156,8 @@
   const __easycom_1$d = /* @__PURE__ */ _export_sfc(_sfc_main$v, [["render", _sfc_render$u], ["styles", [_style_0$v]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-navbar/up-navbar.uvue"]]);
   const _sfc_main$u = /* @__PURE__ */ vue.defineComponent({
     __name: "navbar",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -47321,8 +47595,8 @@
             return Promise.resolve(null);
           yield sleep$1(20);
           this.upGetRect(".up-tabbar__content").then((size) => {
-            var _a;
-            this.placeholderHeight = (_a = size.height) !== null && _a !== void 0 ? _a : 50;
+            var _a2;
+            this.placeholderHeight = (_a2 = size.height) !== null && _a2 !== void 0 ? _a2 : 50;
           });
         });
       },
@@ -47369,8 +47643,8 @@
   const __easycom_2$1 = /* @__PURE__ */ _export_sfc(_sfc_main$s, [["render", _sfc_render$r], ["styles", [_style_0$s]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-tabbar/up-tabbar.uvue"]]);
   const _sfc_main$r = /* @__PURE__ */ vue.defineComponent({
     __name: "tabbar",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -47590,8 +47864,8 @@
               this.innerCurrent = newValue;
             }
             this.$nextTick(() => {
-              var _a;
-              const hasRect = this.itemRects.length > 0 && this.itemRects.length === this.list.length && ((_a = this.itemRects[0].width) !== null && _a !== void 0 ? _a : 0) > 0;
+              var _a2;
+              const hasRect = this.itemRects.length > 0 && this.itemRects.length === this.list.length && ((_a2 = this.itemRects[0].width) !== null && _a2 !== void 0 ? _a2 : 0) > 0;
               if (hasRect) {
                 this.setLineLeft();
                 this.setScrollLeft();
@@ -47687,7 +47961,7 @@
         return true;
       },
       setLineLeft() {
-        var _a;
+        var _a2;
         if (this.itemRects.length <= this.innerCurrent) {
           return null;
         }
@@ -47696,11 +47970,11 @@
           return null;
         }
         let lineOffsetLeft = this.itemRects.slice(0, this.innerCurrent).reduce((total, curr) => {
-          var _a2;
-          return total + ((_a2 = curr.width) !== null && _a2 !== void 0 ? _a2 : 0);
+          var _a3;
+          return total + ((_a3 = curr.width) !== null && _a3 !== void 0 ? _a3 : 0);
         }, 0);
         const lineWidth = parseFloat(getPx(this.lineWidth));
-        const tabWidth = (_a = tabItem.width) !== null && _a !== void 0 ? _a : 0;
+        const tabWidth = (_a2 = tabItem.width) !== null && _a2 !== void 0 ? _a2 : 0;
         const offset = tabWidth > 0 ? (tabWidth - lineWidth) / 2 : 0;
         this.lineOffsetLeft = lineOffsetLeft + offset;
         if (this.firstTime) {
@@ -47718,8 +47992,8 @@
           return null;
         this.innerCurrent = index;
         this.$nextTick(() => {
-          var _a;
-          const hasRect = this.itemRects.length > 0 && this.itemRects.length === this.list.length && ((_a = this.itemRects[0].width) !== null && _a !== void 0 ? _a : 0) > 0;
+          var _a2;
+          const hasRect = this.itemRects.length > 0 && this.itemRects.length === this.list.length && ((_a2 = this.itemRects[0].width) !== null && _a2 !== void 0 ? _a2 : 0) > 0;
           if (hasRect) {
             this.setLineLeft();
             this.setScrollLeft();
@@ -47741,7 +48015,7 @@
         });
       },
       setScrollLeft() {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+        var _a2, _b, _c, _d, _e, _f, _g, _h, _j;
         if (this.innerCurrent < 0) {
           this.innerCurrent = 0;
         }
@@ -47753,11 +48027,11 @@
           return null;
         }
         const offsetLeft = this.itemRects.slice(0, this.innerCurrent).reduce((total, curr) => {
-          var _a2;
-          return total + ((_a2 = curr.width) !== null && _a2 !== void 0 ? _a2 : 0);
+          var _a3;
+          return total + ((_a3 = curr.width) !== null && _a3 !== void 0 ? _a3 : 0);
         }, 0);
         const windowWidth = getWindowInfo().windowWidth;
-        let scrollLeft = offsetLeft - (((_b = (_a = this.tabsRect) === null || _a === void 0 ? null : _a.width) !== null && _b !== void 0 ? _b : 0) - ((_c = tabRect.width) !== null && _c !== void 0 ? _c : 0)) / 2 - (windowWidth - ((_e = (_d = this.tabsRect) === null || _d === void 0 ? null : _d.right) !== null && _e !== void 0 ? _e : 0)) / 2 + ((_g = (_f = this.tabsRect) === null || _f === void 0 ? null : _f.left) !== null && _g !== void 0 ? _g : 0) / 2;
+        let scrollLeft = offsetLeft - (((_b = (_a2 = this.tabsRect) === null || _a2 === void 0 ? null : _a2.width) !== null && _b !== void 0 ? _b : 0) - ((_c = tabRect.width) !== null && _c !== void 0 ? _c : 0)) / 2 - (windowWidth - ((_e = (_d = this.tabsRect) === null || _d === void 0 ? null : _d.right) !== null && _e !== void 0 ? _e : 0)) / 2 + ((_g = (_f = this.tabsRect) === null || _f === void 0 ? null : _f.left) !== null && _g !== void 0 ? _g : 0) / 2;
         scrollLeft = Math.min(scrollLeft, this.scrollViewWidth - ((_j = (_h = this.tabsRect) === null || _h === void 0 ? null : _h.width) !== null && _j !== void 0 ? _j : 0));
         this.scrollLeft = Math.max(0, scrollLeft);
       },
@@ -47767,10 +48041,10 @@
           return null;
         }
         Promise.all([this.getTabsRect(), this.getAllItemRect()]).then((res) => {
-          var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+          var _a2, _b, _c, _d, _e, _f, _g, _h, _j;
           let tabsRect = res[0][0];
           let itemRect = res[1];
-          const firstWidth = itemRect.length > 0 && itemRect[0] != null ? (_a = itemRect[0].width) !== null && _a !== void 0 ? _a : 0 : 0;
+          const firstWidth = itemRect.length > 0 && itemRect[0] != null ? (_a2 = itemRect[0].width) !== null && _a2 !== void 0 ? _a2 : 0 : 0;
           let minWidthExpected = 30;
           if (this.list.length > 0) {
             const firstItemName = this.list[0][this.keyName];
@@ -47794,9 +48068,9 @@
           this.itemRects = itemRect;
           this.scrollViewWidth = 0;
           itemRect.map((item, index) => {
-            var _a2;
+            var _a3;
             if (item != null) {
-              this.scrollViewWidth = this.scrollViewWidth + ((_a2 = item.width) !== null && _a2 !== void 0 ? _a2 : 0);
+              this.scrollViewWidth = this.scrollViewWidth + ((_a3 = item.width) !== null && _a3 !== void 0 ? _a3 : 0);
               this.list[index]["rect"] = item;
             }
           });
@@ -47980,8 +48254,8 @@
   const __easycom_1$b = /* @__PURE__ */ _export_sfc(_sfc_main$q, [["render", _sfc_render$p], ["styles", [_style_0$q]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-tabs/up-tabs.uvue"]]);
   const _sfc_main$p = /* @__PURE__ */ vue.defineComponent({
     __name: "tabs",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -48242,7 +48516,7 @@
         return style;
       },
       textStyle(index) {
-        var _a, _b;
+        var _a2, _b;
         const style = new UTSJSONObject({});
         if (this.disabled) {
           style["fontWeight"] = "normal";
@@ -48253,7 +48527,7 @@
         style["fontWeight"] = this.bold && this.innerCurrent === index ? "bold" : "normal";
         style["fontSize"] = addUnit$1(this.fontSize);
         const item = this.list[index];
-        const activeColorTemp = typeof item == "object" && item != null ? (_a = item[this.activeColorKeyName]) !== null && _a !== void 0 ? _a : "" : "";
+        const activeColorTemp = typeof item == "object" && item != null ? (_a2 = item[this.activeColorKeyName]) !== null && _a2 !== void 0 ? _a2 : "" : "";
         const inactiveColorTemp = typeof item === "object" && item != null ? (_b = item[this.inactiveColorKeyName]) !== null && _b !== void 0 ? _b : "" : "";
         if (this.mode === "subsection") {
           style["color"] = this.innerCurrent === index ? activeColorTemp != "" ? activeColorTemp : "#fff" : inactiveColorTemp != "" ? inactiveColorTemp : this.inactiveColor;
@@ -48375,8 +48649,8 @@
   const __easycom_1$a = /* @__PURE__ */ _export_sfc(_sfc_main$o, [["render", _sfc_render$n], ["styles", [_style_0$o]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-subsection/up-subsection.uvue"]]);
   const _sfc_main$n = /* @__PURE__ */ vue.defineComponent({
     __name: "subsection",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -48457,8 +48731,8 @@
       type: [String, Number],
       default: defProps$6.getNumber("indexAnchor.height")
     }
-  }, emits: [], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
+  }, emits: [], setup(__props, _a2) {
+    var __expose = _a2.expose, __emit = _a2.emit;
     __expose();
     const _b = useUltraUI(), parent = _b.parent, parentData = _b.parentData, getParent = _b.getParent;
     const instance = vue.getCurrentInstance().proxy;
@@ -48543,8 +48817,8 @@
       type: [String, Number],
       default: defProps$5.getString("indexItem.text")
     }
-  }, emits: [], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
+  }, emits: [], setup(__props, _a2) {
+    var __expose = _a2.expose, __emit = _a2.emit;
     const _b = useUltraUI(), parent = _b.parent, getParent = _b.getParent, getParentData = _b.getParentData;
     const instance = vue.getCurrentInstance().proxy;
     const props2 = __props;
@@ -48567,8 +48841,8 @@
       }
       sleep$1().then(() => {
         getIndexItemRect().then((size) => {
-          var _a2, _b2;
-          top.value = Math.ceil((_a2 = size.top) !== null && _a2 !== void 0 ? _a2 : 0);
+          var _a3, _b2;
+          top.value = Math.ceil((_a3 = size.top) !== null && _a3 !== void 0 ? _a3 : 0);
           height.value = Math.ceil((_b2 = size.height) !== null && _b2 !== void 0 ? _b2 : 0);
         });
       });
@@ -48676,8 +48950,8 @@
       type: [String],
       default: defProps$4.getString("indexList.itemMargin")
     }
-  }, setup(__props, _a) {
-    var __expose = _a.expose;
+  }, setup(__props, _a2) {
+    var __expose = _a2.expose;
     const _b = useUltraUI(), children = _b.children, addChild = _b.addChild, getChildren = _b.getChildren;
     const instance = vue.getCurrentInstance().proxy;
     const indexList = () => {
@@ -48814,7 +49088,7 @@
     };
     const setValueForTouch = (currentIndex) => {
       return __awaiter(this, void 0, void 0, function* () {
-        var _a2, _b2, _c;
+        var _a3, _b2, _c;
         if (currentIndex !== activeIndex.value) {
           activeIndex.value = currentIndex;
           indicatorText.value = keyVal(uIndexList.value[currentIndex]);
@@ -48823,7 +49097,7 @@
           uni.__log__("log", "at uni_modules/uview-ultra/components/up-index-list/up-index-list.uvue:319", scrollIntoView.value);
           const customNavHeight = props2.customNavHeight;
           const header = yield getHeaderRect();
-          let top_1 = (_a2 = header.height) !== null && _a2 !== void 0 ? _a2 : 0;
+          let top_1 = (_a3 = header.height) !== null && _a3 !== void 0 ? _a3 : 0;
           let childrenItems = children.value.map((item, index) => {
             let itemRefs = item.$callMethod("getRefs");
             const childHeight = itemRefs["height"] + parseFloat(getPx(props2.itemMargin));
@@ -48886,7 +49160,7 @@
     };
     const scrollHandler = (e) => {
       return __awaiter(this, void 0, void 0, function* () {
-        var _a2;
+        var _a3;
         if (touching.value || scrolling.value)
           return Promise.resolve(null);
         scrolling.value = true;
@@ -48897,7 +49171,7 @@
         const len = children.value.length;
         let childrenItems = [];
         const header = yield getHeaderRect();
-        let top = (_a2 = header.height) !== null && _a2 !== void 0 ? _a2 : 0;
+        let top = (_a3 = header.height) !== null && _a3 !== void 0 ? _a3 : 0;
         childrenItems = children.value.map((item, index) => {
           let itemRefs = item.$callMethod("getRefs");
           const childHeight = itemRefs["height"] + parseInt(getPx(props2.itemMargin));
@@ -48966,7 +49240,7 @@
   } }));
   const _style_0$k = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-index-list": { "": { "position": "relative", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column" } }, "up-index-list__letter": { "": { "position": "absolute", "right": 0, "zIndex": 3, "paddingTop": 0, "paddingRight": 6, "paddingBottom": 0, "paddingLeft": 6, "width": 30 } }, "up-index-list__letter__item": { "": { "width": 16, "height": 16, "borderTopLeftRadius": 100, "borderTopRightRadius": 100, "borderBottomRightRadius": 100, "borderBottomLeftRadius": 100, "marginTop": 1, "marginRight": 0, "marginBottom": 1, "marginLeft": 0, "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "up-index-list__letter__item--active": { "": { "backgroundColor": "var(--theme-color, #0957de)" } }, "up-index-list__letter__item__index": { "": { "fontSize": 12, "textAlign": "center", "lineHeight": "12px" } }, "up-index-list__indicator": { "": { "width": 50, "height": 50, "borderTopLeftRadius": 100, "borderTopRightRadius": 100, "borderBottomRightRadius": 0, "borderBottomLeftRadius": 100, "backgroundColor": "#c9c9c9", "transform": "rotate(-45deg)", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "up-index-list__indicator__text": { "": { "fontSize": 28, "lineHeight": "28px", "fontWeight": "bold", "color": "#ffffff", "transform": "rotate(45deg)", "textAlign": "center" } } };
   function _sfc_render$j(_ctx, _cache, $props, $setup, $data, $options) {
-    var _a;
+    var _a2;
     const _component_up_index_anchor = resolveEasycom(vue.resolveDynamicComponent("up-index-anchor"), __easycom_1$9);
     const _component_up_transition = resolveEasycom(vue.resolveDynamicComponent("up-transition"), __easycom_1$U);
     return vue.openBlock(), vue.createElementBlock(
@@ -49017,7 +49291,7 @@
           {
             class: "up-index-list__letter",
             ref: "up-index-list__letter",
-            style: vue.normalizeStyle({ top: _ctx.$up.addUnit((_a = $setup.letterInfo["top"]) != null ? _a : ""), transform: "translateY(-50%)" }),
+            style: vue.normalizeStyle({ top: _ctx.$up.addUnit((_a2 = $setup.letterInfo["top"]) != null ? _a2 : ""), transform: "translateY(-50%)" }),
             onTouchstart: $setup.touchStart,
             onTouchmove: $setup.touchMove,
             onTouchend: $setup.touchEnd,
@@ -49103,8 +49377,8 @@
   const __easycom_3 = /* @__PURE__ */ _export_sfc(_sfc_main$k, [["render", _sfc_render$j], ["styles", [_style_0$k]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-index-list/up-index-list.uvue"]]);
   const _sfc_main$j = /* @__PURE__ */ vue.defineComponent({
     __name: "index-list",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const indexList = vue.ref(["A", "B", "C", "D", "F", "G", "H", "J", "L", "M", "N", "Q", "R", "S", "T", "W", "X", "Y", "Z"]);
       const itemArr = vue.ref([
@@ -49411,8 +49685,8 @@
   const __easycom_1$8 = /* @__PURE__ */ _export_sfc(_sfc_main$i, [["render", _sfc_render$h], ["styles", [_style_0$i]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-navbar-mini/up-navbar-mini.uvue"]]);
   const _sfc_main$h = /* @__PURE__ */ vue.defineComponent({
     __name: "navbar-mini",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -50517,8 +50791,8 @@
   const __easycom_1$7 = /* @__PURE__ */ _export_sfc(_sfc_main$g, [["render", _sfc_render$f], ["styles", [_style_0$g]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-qrcode/up-qrcode.uvue"]]);
   const _sfc_main$f = /* @__PURE__ */ vue.defineComponent({
     __name: "qrcode",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -50644,8 +50918,8 @@
       }
     },
     emits: ["click", "load", "error"],
-    setup(__props, _a) {
-      var __expose = _a.expose, __emit = _a.emit;
+    setup(__props, _a2) {
+      var __expose = _a2.expose, __emit = _a2.emit;
       __expose();
       const props2 = __props;
       const emit = __emit;
@@ -50790,8 +51064,8 @@
   const __easycom_1$6 = /* @__PURE__ */ _export_sfc(_sfc_main$e, [["render", _sfc_render$d], ["styles", [_style_0$e]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-lazy-load/up-lazy-load.uvue"]]);
   const _sfc_main$d = /* @__PURE__ */ vue.defineComponent({
     __name: "lazy-load",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -51107,8 +51381,8 @@
   const __easycom_1$5 = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["render", _sfc_render$b], ["styles", [_style_0$c]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-loadmore/up-loadmore.uvue"]]);
   const _sfc_main$b = /* @__PURE__ */ vue.defineComponent({
     __name: "loadmore",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const __returned__ = { get AppKu() {
         return AppKu;
@@ -51353,8 +51627,8 @@
   const __easycom_1$4 = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["styles", [_style_0$a]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-waterfall/up-waterfall.uvue"]]);
   const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
     __name: "waterfall",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const list = vue.ref([
         new UTSJSONObject({ title: "uview-ultra 核心UI组件", desc: "轻量级UI框架", price: 129, imgHeight: "80px" }),
@@ -51405,7 +51679,7 @@
                         vue.Fragment,
                         null,
                         vue.renderList(colList, (item, idx) => {
-                          var _a;
+                          var _a2;
                           return vue.openBlock(), vue.createElementBlock("view", {
                             key: idx,
                             class: "p-6px"
@@ -51416,7 +51690,7 @@
                                 {
                                   src: _imports_0$1,
                                   mode: "aspectFit",
-                                  style: vue.normalizeStyle({ width: "100%", height: (_a = item.getString("imgHeight")) != null ? _a : "100px", borderRadius: "6px", backgroundColor: "#ffffff" })
+                                  style: vue.normalizeStyle({ width: "100%", height: (_a2 = item.getString("imgHeight")) != null ? _a2 : "100px", borderRadius: "6px", backgroundColor: "#ffffff" })
                                 },
                                 null,
                                 4
@@ -51510,8 +51784,8 @@
       type: String,
       default: defProps.getString("code.uniqueKey")
     }
-  }, emits: ["change", "start", "end"], setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
+  }, emits: ["change", "start", "end"], setup(__props, _a2) {
+    var __expose = _a2.expose, __emit = _a2.emit;
     const props2 = __props;
     const emit = __emit;
     const instance = vue.getCurrentInstance().proxy;
@@ -51607,8 +51881,8 @@
   const __easycom_1$3 = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render$7], ["styles", [_style_0$8]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-code/up-code.uvue"]]);
   const _sfc_main$7 = /* @__PURE__ */ vue.defineComponent({
     __name: "code",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const uCodeRef = vue.ref(null);
       const tips2 = vue.ref("获取验证码");
@@ -52212,8 +52486,8 @@
   const __easycom_1$2 = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$5], ["styles", [_style_0$6]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-parse/up-parse.uvue"]]);
   const _sfc_main$5 = /* @__PURE__ */ vue.defineComponent({
     __name: "parse",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const content1 = vue.ref("<p>欢迎使用 uview-ultra 富文本解析组件，这里是一段很长的描述文字，用来测试换行和基础排版能力。</p><img src='https://cdn.uviewui.com/uview/swiper/2.jpg' />");
       const content2 = vue.ref("<p>这段文本可以长按被选中和复制，因为开启了 selectable 属性。您可以尝试长按我试试。</p>");
@@ -52353,8 +52627,8 @@
     emits: ["click"],
     computed: {
       show() {
-        var _a, _b;
-        const sVal = ((_a = this.scrollTop) !== null && _a !== void 0 ? _a : 0).toString();
+        var _a2, _b;
+        const sVal = ((_a2 = this.scrollTop) !== null && _a2 !== void 0 ? _a2 : 0).toString();
         const tVal = ((_b = this.top) !== null && _b !== void 0 ? _b : 100).toString();
         const sTop = parseFloat(sVal);
         const targetTop = parseFloat(tVal);
@@ -52364,8 +52638,8 @@
         return sTop >= threshold;
       },
       finalStyle() {
-        var _a, _b, _c;
-        const bStr = ((_a = this.bottom) !== null && _a !== void 0 ? _a : 80).toString();
+        var _a2, _b, _c;
+        const bStr = ((_a2 = this.bottom) !== null && _a2 !== void 0 ? _a2 : 80).toString();
         const rStr = ((_b = this.right) !== null && _b !== void 0 ? _b : 20).toString();
         const bVal = bStr.includes("px") ? bStr : bStr + "px";
         const rVal = rStr.includes("px") ? rStr : rStr + "px";
@@ -52440,8 +52714,8 @@
   const __easycom_1$1 = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$3], ["styles", [_style_0$4]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-back-top/up-back-top.uvue"]]);
   const _sfc_main$3 = /* @__PURE__ */ vue.defineComponent({
     __name: "back-top",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const currentScrollTop = vue.ref(0);
       const scrollTop = vue.ref(0);
@@ -52994,9 +53268,9 @@
         return this.cleanText(r);
       },
       flatText(n) {
-        var _a, _b, _c;
+        var _a2, _b, _c;
         if (n.type == "text")
-          return (_a = n.text) !== null && _a !== void 0 ? _a : "";
+          return (_a2 = n.text) !== null && _a2 !== void 0 ? _a2 : "";
         if (n.children == null)
           return (_b = n.text) !== null && _b !== void 0 ? _b : "";
         let t2 = "";
@@ -53035,14 +53309,14 @@
         return "";
       },
       headingStyle(name) {
-        var _a;
+        var _a2;
         const sz = new UTSJSONObject({ h1: "2em", h2: "1.5em", h3: "1.17em", h4: "1em", h5: "0.83em", h6: "0.67em" });
-        return "font-size:" + ((_a = sz[name]) !== null && _a !== void 0 ? _a : "1em") + ";font-weight:bold";
+        return "font-size:" + ((_a2 = sz[name]) !== null && _a2 !== void 0 ? _a2 : "1em") + ";font-weight:bold";
       },
       // ========== 事件 ==========
       onLinkTap(n) {
-        var _a, _b;
-        const href = n.attrs != null ? (_a = n.attrs["href"]) !== null && _a !== void 0 ? _a : "" : "";
+        var _a2, _b;
+        const href = n.attrs != null ? (_a2 = n.attrs["href"]) !== null && _a2 !== void 0 ? _a2 : "" : "";
         this.$emit("linktap", (_b = n.attrs) !== null && _b !== void 0 ? _b : new UTSJSONObject({}));
         if (href.length > 0 && href.includes("://")) {
           uni.setClipboardData({ data: href, success: () => {
@@ -53060,7 +53334,7 @@
         vue.Fragment,
         null,
         vue.renderList($data.localNodes, (n, i) => {
-          var _a, _b, _c, _d, _e, _f, _g;
+          var _a2, _b, _c, _d, _e, _f, _g;
           return vue.openBlock(), vue.createElementBlock(
             vue.Fragment,
             { key: i },
@@ -53076,7 +53350,7 @@
                 /* TEXT */
               )) : n.name == "br" ? (vue.openBlock(), vue.createElementBlock("text", { key: 1 }, "\n")) : n.name == "img" ? (vue.openBlock(), vue.createElementBlock("image", {
                 key: 2,
-                src: n.attrs != null ? (_a = n.attrs["src"]) != null ? _a : "" : "",
+                src: n.attrs != null ? (_a2 = n.attrs["src"]) != null ? _a2 : "" : "",
                 style: { "max-width": "750px" },
                 mode: "widthFix"
               }, null, 8, ["src"])) : n.name == "a" ? (vue.openBlock(), vue.createElementBlock("text", {
@@ -53126,7 +53400,7 @@
                       vue.Fragment,
                       null,
                       vue.renderList((_e = n.children) != null ? _e : [], (row, ri) => {
-                        var _a2;
+                        var _a3;
                         return vue.openBlock(), vue.createElementBlock("view", {
                           key: ri,
                           style: { "display": "flex", "flex-direction": "row" }
@@ -53134,7 +53408,7 @@
                           (vue.openBlock(true), vue.createElementBlock(
                             vue.Fragment,
                             null,
-                            vue.renderList((_a2 = row.children) != null ? _a2 : [], (cell, ci) => {
+                            vue.renderList((_a3 = row.children) != null ? _a3 : [], (cell, ci) => {
                               return vue.openBlock(), vue.createElementBlock(
                                 "view",
                                 {
@@ -53213,7 +53487,7 @@
                       vue.Fragment,
                       null,
                       vue.renderList((_g = n.children) != null ? _g : [], (cn, ci) => {
-                        var _a2, _b2, _c2;
+                        var _a3, _b2, _c2;
                         return vue.openBlock(), vue.createElementBlock(
                           vue.Fragment,
                           { key: ci },
@@ -53229,7 +53503,7 @@
                               /* TEXT */
                             )) : cn.name == "br" ? (vue.openBlock(), vue.createElementBlock("text", { key: 1 }, "\n")) : cn.name == "img" ? (vue.openBlock(), vue.createElementBlock("image", {
                               key: 2,
-                              src: cn.attrs != null ? (_a2 = cn.attrs["src"]) != null ? _a2 : "" : "",
+                              src: cn.attrs != null ? (_a3 = cn.attrs["src"]) != null ? _a3 : "" : "",
                               style: { "max-width": "750px" },
                               mode: "widthFix"
                             }, null, 8, ["src"])) : cn.name == "a" ? (vue.openBlock(), vue.createElementBlock("text", {
@@ -53282,8 +53556,8 @@
   const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["render", _sfc_render$1], ["styles", [_style_0$2]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/mp-html/components/mp-html/mp-html.uvue"]]);
   const _sfc_main$1 = /* @__PURE__ */ vue.defineComponent({
     __name: "mp-html",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       const content1 = vue.ref('\n  <h2>mp-html 跨端富文本组件</h2>\n  <p>这是一个专门为 <b>uni-app X</b> 打造的高性能原生 HTML 解析器组件，支持多种 HTML 5 常见标签与样式。</p>\n  <hr />\n  <p>支持 <i>斜体</i>、<b>加粗</b>、<u>下划线</u> 以及 <span style="color: #e11d48; font-weight: bold;">自定义颜色文本</span>。</p>\n');
       const contentTable = vue.ref('\n  <table border="1">\n    <tr>\n      <th>组件名称</th>\n      <th>类型</th>\n      <th>平台支持</th>\n    </tr>\n    <tr>\n      <td>mp-html</td>\n      <td>富文本</td>\n      <td>全端 (Android / iOS / H5)</td>\n    </tr>\n    <tr>\n      <td>up-waterfall</td>\n      <td>瀑布流</td>\n      <td>全端支持</td>\n    </tr>\n  </table>\n');
@@ -53468,7 +53742,7 @@
     }
   }
   function parseUrlToObj(url2) {
-    var _a;
+    var _a2;
     const parts = url2.split("?");
     const path = parts[0];
     const query = /* @__PURE__ */ new Map();
@@ -53481,7 +53755,7 @@
           const key2 = pair[0];
           let value = pair[1];
           if (value.indexOf("%") >= 0) {
-            value = (_a = decodeURIComponent(value)) !== null && _a !== void 0 ? _a : "";
+            value = (_a2 = decodeURIComponent(value)) !== null && _a2 !== void 0 ? _a2 : "";
           }
           query.set(key2, value);
         } else if (pair.length > 0) {
@@ -53692,8 +53966,8 @@
   });
   const _sfc_main = /* @__PURE__ */ vue.defineComponent({
     __name: "App",
-    setup(__props, _a) {
-      var __expose = _a.expose;
+    setup(__props, _a2) {
+      var __expose = _a2.expose;
       __expose();
       vue.onLaunch(() => {
         loadFont();
@@ -53707,7 +53981,7 @@
       return __returned__;
     }
   });
-  const _style_0 = { "u-line-1": { "": { "overflow": "hidden" } }, "up-line-1": { "": { "overflow": "hidden" } }, "u-line-2": { "": { "overflow": "hidden" } }, "up-line-2": { "": { "overflow": "hidden" } }, "u-line-3": { "": { "overflow": "hidden" } }, "up-line-3": { "": { "overflow": "hidden" } }, "u-line-4": { "": { "overflow": "hidden" } }, "up-line-4": { "": { "overflow": "hidden" } }, "u-line-5": { "": { "overflow": "hidden" } }, "up-line-5": { "": { "overflow": "hidden" } }, "u-border": { "": { "!borderTopWidth": 0.5, "!borderRightWidth": 0.5, "!borderBottomWidth": 0.5, "!borderLeftWidth": 0.5, "!borderTopColor": "#dadbde", "!borderRightColor": "#dadbde", "!borderBottomColor": "#dadbde", "!borderLeftColor": "#dadbde", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "up-border": { "": { "!borderTopWidth": 0.5, "!borderRightWidth": 0.5, "!borderBottomWidth": 0.5, "!borderLeftWidth": 0.5, "!borderTopColor": "#dadbde", "!borderRightColor": "#dadbde", "!borderBottomColor": "#dadbde", "!borderLeftColor": "#dadbde", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "u-border-top": { "": { "!borderTopWidth": 0.5, "!borderTopColor": "#dadbde", "!borderRightColor": "#dadbde", "!borderBottomColor": "#dadbde", "!borderLeftColor": "#dadbde", "borderTopStyle": "solid" } }, "up-border-top": { "": { "!borderTopWidth": 0.5, "!borderTopColor": "#dadbde", "!borderRightColor": "#dadbde", "!borderBottomColor": "#dadbde", "!borderLeftColor": "#dadbde", "borderTopStyle": "solid" } }, "u-border-left": { "": { "!borderLeftWidth": 0.5, "!borderTopColor": "#dadbde", "!borderRightColor": "#dadbde", "!borderBottomColor": "#dadbde", "!borderLeftColor": "#dadbde", "borderLeftStyle": "solid" } }, "up-border-left": { "": { "!borderLeftWidth": 0.5, "!borderTopColor": "#dadbde", "!borderRightColor": "#dadbde", "!borderBottomColor": "#dadbde", "!borderLeftColor": "#dadbde", "borderLeftStyle": "solid" } }, "u-border-right": { "": { "!borderRightWidth": 0.5, "!borderTopColor": "#dadbde", "!borderRightColor": "#dadbde", "!borderBottomColor": "#dadbde", "!borderLeftColor": "#dadbde", "borderRightStyle": "solid" } }, "up-border-right": { "": { "!borderRightWidth": 0.5, "!borderTopColor": "#dadbde", "!borderRightColor": "#dadbde", "!borderBottomColor": "#dadbde", "!borderLeftColor": "#dadbde", "borderRightStyle": "solid" } }, "u-border-bottom": { "": { "!borderBottomWidth": 0.5, "!borderTopColor": "#dadbde", "!borderRightColor": "#dadbde", "!borderBottomColor": "#dadbde", "!borderLeftColor": "#dadbde", "borderBottomStyle": "solid" } }, "up-border-bottom": { "": { "!borderBottomWidth": 0.5, "!borderTopColor": "#dadbde", "!borderRightColor": "#dadbde", "!borderBottomColor": "#dadbde", "!borderLeftColor": "#dadbde", "borderBottomStyle": "solid" } }, "u-border-top-bottom": { "": { "!borderTopWidth": 0.5, "!borderBottomWidth": 0.5, "!borderTopColor": "#dadbde", "!borderRightColor": "#dadbde", "!borderBottomColor": "#dadbde", "!borderLeftColor": "#dadbde", "borderTopStyle": "solid", "borderBottomStyle": "solid" } }, "up-border-top-bottom": { "": { "!borderTopWidth": 0.5, "!borderBottomWidth": 0.5, "!borderTopColor": "#dadbde", "!borderRightColor": "#dadbde", "!borderBottomColor": "#dadbde", "!borderLeftColor": "#dadbde", "borderTopStyle": "solid", "borderBottomStyle": "solid" } }, "u-reset-button": { "": { "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "backgroundColor": "rgba(0,0,0,0)", "borderTopWidth::after": "medium", "borderRightWidth::after": "medium", "borderBottomWidth::after": "medium", "borderLeftWidth::after": "medium", "borderTopStyle::after": "none", "borderRightStyle::after": "none", "borderBottomStyle::after": "none", "borderLeftStyle::after": "none", "borderTopColor::after": "#000000", "borderRightColor::after": "#000000", "borderBottomColor::after": "#000000", "borderLeftColor::after": "#000000" } }, "up-reset-button": { "": { "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "backgroundColor": "rgba(0,0,0,0)", "borderTopWidth::after::after": "medium", "borderRightWidth::after::after": "medium", "borderBottomWidth::after::after": "medium", "borderLeftWidth::after::after": "medium", "borderTopStyle::after::after": "none", "borderRightStyle::after::after": "none", "borderBottomStyle::after::after": "none", "borderLeftStyle::after::after": "none", "borderTopColor::after::after": "#000000", "borderRightColor::after::after": "#000000", "borderBottomColor::after::after": "#000000", "borderLeftColor::after::after": "#000000" } }, "u-hover-class": { "": { "opacity": 0.7 } }, "up-hover-class": { "": { "opacity": 0.7 } }, "u-flex": { "": { "display": "flex", "flexDirection": "row" }, ".u-flex-reverse": { "flexDirection": "row-reverse" } }, "u-flex-row": { "": { "display": "flex", "flexDirection": "row" }, ".u-flex-reverse": { "flexDirection": "row-reverse" } }, "u-flex-x": { "": { "display": "flex", "flexDirection": "row" }, ".u-flex-reverse": { "flexDirection": "row-reverse" } }, "up-flex": { "": { "display": "flex", "flexDirection": "row" }, ".up-flex-reverse": { "flexDirection": "row-reverse" } }, "up-flex-row": { "": { "display": "flex", "flexDirection": "row" }, ".up-flex-reverse": { "flexDirection": "row-reverse" } }, "up-flex-x": { "": { "display": "flex", "flexDirection": "row" }, ".up-flex-reverse": { "flexDirection": "row-reverse" } }, "u-flex-y": { "": { "display": "flex", "flexDirection": "column" }, ".u-flex-reverse": { "flexDirection": "column-reverse" } }, "u-flex-column": { "": { "display": "flex", "flexDirection": "column" }, ".u-flex-reverse": { "flexDirection": "column-reverse" } }, "up-flex-y": { "": { "display": "flex", "flexDirection": "column" }, ".up-flex-reverse": { "flexDirection": "column-reverse" } }, "up-flex-column": { "": { "display": "flex", "flexDirection": "column" }, ".up-flex-reverse": { "flexDirection": "column-reverse" } }, "u-flex-x-center": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "center" } }, "up-flex-x-center": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "center" } }, "u-flex-xy-center": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "up-flex-xy-center": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "u-flex-y-center": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center" } }, "up-flex-y-center": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center" } }, "u-flex-x-left": { "": { "display": "flex", "flexDirection": "row" } }, "up-flex-x-left": { "": { "display": "flex", "flexDirection": "row" } }, "u-flex-x-reverse": { "": { "flexDirection": "row-reverse" } }, "u-flex-row-reverse": { "": { "flexDirection": "row-reverse" } }, "up-flex-x-reverse": { "": { "flexDirection": "row-reverse" } }, "up-flex-row-reverse": { "": { "flexDirection": "row-reverse" } }, "u-flex-y-reverse": { "": { "flexDirection": "column-reverse" } }, "u-flex-column-reverse": { "": { "flexDirection": "column-reverse" } }, "up-flex-y-reverse": { "": { "flexDirection": "column-reverse" } }, "up-flex-column-reverse": { "": { "flexDirection": "column-reverse" } }, "u-flex-fill": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "auto" } }, "u-flex-fillp": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "auto" } }, "u-margin-top-auto": { "": { "!marginTop": "auto" } }, "u-m-t-auto": { "": { "!marginTop": "auto" } }, "up-margin-top-auto": { "": { "!marginTop": "auto" } }, "up-m-t-auto": { "": { "!marginTop": "auto" } }, "u-margin-right-auto": { "": { "!marginRight": "auto" } }, "u-m-r-auto": { "": { "!marginRight": "auto" } }, "up-margin-right-auto": { "": { "!marginRight": "auto" } }, "up-m-r-auto": { "": { "!marginRight": "auto" } }, "u-margin-bottom-auto": { "": { "!marginBottom": "auto" } }, "u-m-b-auto": { "": { "!marginBottom": "auto" } }, "up-margin-bottom-auto": { "": { "!marginBottom": "auto" } }, "up-m-b-auto": { "": { "!marginBottom": "auto" } }, "u-margin-left-auto": { "": { "!marginLeft": "auto" } }, "u-m-l-auto": { "": { "!marginLeft": "auto" } }, "up-margin-left-auto": { "": { "!marginLeft": "auto" } }, "up-m-l-auto": { "": { "!marginLeft": "auto" } }, "u-margin-center-auto": { "": { "!marginLeft": "auto", "!marginRight": "auto" } }, "u-m-c-auto": { "": { "!marginLeft": "auto", "!marginRight": "auto" } }, "up-margin-center-auto": { "": { "!marginLeft": "auto", "!marginRight": "auto" } }, "up-m-c-auto": { "": { "!marginLeft": "auto", "!marginRight": "auto" } }, "u-margin-middle-auto": { "": { "!marginTop": "auto", "!marginBottom": "auto" } }, "u-m-m-auto": { "": { "!marginTop": "auto", "!marginBottom": "auto" } }, "up-margin-middle-auto": { "": { "!marginTop": "auto", "!marginBottom": "auto" } }, "up-m-m-auto": { "": { "!marginTop": "auto", "!marginBottom": "auto" } }, "u-flex-wrap": { "": { "flexWrap": "wrap" } }, "up-flex-wrap": { "": { "flexWrap": "wrap" } }, "u-flex-wrap-reverse": { "": { "flexWrap": "wrap-reverse" } }, "up-flex-wrap-reverse": { "": { "flexWrap": "wrap-reverse" } }, "u-flex-start": { "": { "justifyContent": "flex-start" } }, "up-flex-start": { "": { "justifyContent": "flex-start" } }, "u-flex-center": { "": { "justifyContent": "center" } }, "up-flex-center": { "": { "justifyContent": "center" } }, "u-flex-end": { "": { "justifyContent": "flex-end" } }, "up-flex-end": { "": { "justifyContent": "flex-end" } }, "u-flex-between": { "": { "justifyContent": "space-between" } }, "up-flex-between": { "": { "justifyContent": "space-between" } }, "u-flex-around": { "": { "justifyContent": "space-around" } }, "up-flex-around": { "": { "justifyContent": "space-around" } }, "u-flex-items-start": { "": { "alignItems": "flex-start" } }, "up-flex-items-start": { "": { "alignItems": "flex-start" } }, "u-flex-items-center": { "": { "alignItems": "center" } }, "up-flex-items-center": { "": { "alignItems": "center" } }, "u-flex-items-end": { "": { "alignItems": "flex-end" } }, "up-flex-items-end": { "": { "alignItems": "flex-end" } }, "u-flex-items-stretch": { "": { "alignItems": "stretch" } }, "up-flex-items-stretch": { "": { "alignItems": "stretch" } }, "u-flex-self-start": { "": { "alignSelf": "flex-start" } }, "up-flex-self-start": { "": { "alignSelf": "flex-start" } }, "u-flex-self-center": { "": { "alignSelf": "center" } }, "up-flex-self-center": { "": { "alignSelf": "center" } }, "u-flex-self-end": { "": { "alignSelf": "flex-end" } }, "up-flex-self-end": { "": { "alignSelf": "flex-end" } }, "u-flex-self-stretch": { "": { "alignSelf": "stretch" } }, "up-flex-self-stretch": { "": { "alignSelf": "stretch" } }, "u-flex-content-start": { "": { "alignContent": "flex-start" } }, "up-flex-content-start": { "": { "alignContent": "flex-start" } }, "u-flex-content-center": { "": { "alignContent": "center" } }, "up-flex-content-center": { "": { "alignContent": "center" } }, "u-flex-content-end": { "": { "alignContent": "flex-end" } }, "up-flex-content-end": { "": { "alignContent": "flex-end" } }, "u-flex-content-between": { "": { "alignContent": "space-between" } }, "up-flex-content-between": { "": { "alignContent": "space-between" } }, "u-flex-content-around": { "": { "alignContent": "space-around" } }, "up-flex-content-around": { "": { "alignContent": "space-around" } }, "u-flex-middle": { "": { "justifyContent": "center", "alignItems": "center", "alignSelf": "center", "alignContent": "center" } }, "up-flex-middle": { "": { "justifyContent": "center", "alignItems": "center", "alignSelf": "center", "alignContent": "center" } }, "u-flex-grow": { "": { "flexGrow": 1 } }, "up-flex-grow": { "": { "flexGrow": 1 } }, "u-flex-shrink": { "": { "flexShrink": 1 } }, "up-flex-shrink": { "": { "flexShrink": 1 } }, "u-margin-0": { "": { "!marginTop": "0rpx", "!marginRight": "0rpx", "!marginBottom": "0rpx", "!marginLeft": "0rpx" } }, "u-m-0": { "": { "!marginTop": "0rpx", "!marginRight": "0rpx", "!marginBottom": "0rpx", "!marginLeft": "0rpx" } }, "up-margin-0": { "": { "!marginTop": "0rpx", "!marginRight": "0rpx", "!marginBottom": "0rpx", "!marginLeft": "0rpx" } }, "up-m-0": { "": { "!marginTop": "0rpx", "!marginRight": "0rpx", "!marginBottom": "0rpx", "!marginLeft": "0rpx" } }, "u-padding-0": { "": { "!paddingTop": "0rpx", "!paddingRight": "0rpx", "!paddingBottom": "0rpx", "!paddingLeft": "0rpx" } }, "u-p-0": { "": { "!paddingTop": "0rpx", "!paddingRight": "0rpx", "!paddingBottom": "0rpx", "!paddingLeft": "0rpx" } }, "up-padding-0": { "": { "!paddingTop": "0rpx", "!paddingRight": "0rpx", "!paddingBottom": "0rpx", "!paddingLeft": "0rpx" } }, "up-p-0": { "": { "!paddingTop": "0rpx", "!paddingRight": "0rpx", "!paddingBottom": "0rpx", "!paddingLeft": "0rpx" } }, "u-m-l-0": { "": { "!marginLeft": "0rpx" } }, "up-m-l-0": { "": { "!marginLeft": "0rpx" } }, "u-p-l-0": { "": { "!paddingLeft": "0rpx" } }, "up-p-l-0": { "": { "!paddingLeft": "0rpx" } }, "u-margin-left-0": { "": { "!marginLeft": "0rpx" } }, "up-margin-left-0": { "": { "!marginLeft": "0rpx" } }, "u-padding-left-0": { "": { "!paddingLeft": "0rpx" } }, "up-padding-left-0": { "": { "!paddingLeft": "0rpx" } }, "u-m-t-0": { "": { "!marginTop": "0rpx" } }, "up-m-t-0": { "": { "!marginTop": "0rpx" } }, "u-p-t-0": { "": { "!paddingTop": "0rpx" } }, "up-p-t-0": { "": { "!paddingTop": "0rpx" } }, "u-margin-top-0": { "": { "!marginTop": "0rpx" } }, "up-margin-top-0": { "": { "!marginTop": "0rpx" } }, "u-padding-top-0": { "": { "!paddingTop": "0rpx" } }, "up-padding-top-0": { "": { "!paddingTop": "0rpx" } }, "u-m-r-0": { "": { "!marginRight": "0rpx" } }, "up-m-r-0": { "": { "!marginRight": "0rpx" } }, "u-p-r-0": { "": { "!paddingRight": "0rpx" } }, "up-p-r-0": { "": { "!paddingRight": "0rpx" } }, "u-margin-right-0": { "": { "!marginRight": "0rpx" } }, "up-margin-right-0": { "": { "!marginRight": "0rpx" } }, "u-padding-right-0": { "": { "!paddingRight": "0rpx" } }, "up-padding-right-0": { "": { "!paddingRight": "0rpx" } }, "u-m-b-0": { "": { "!marginBottom": "0rpx" } }, "up-m-b-0": { "": { "!marginBottom": "0rpx" } }, "u-p-b-0": { "": { "!paddingBottom": "0rpx" } }, "up-p-b-0": { "": { "!paddingBottom": "0rpx" } }, "u-margin-bottom-0": { "": { "!marginBottom": "0rpx" } }, "up-margin-bottom-0": { "": { "!marginBottom": "0rpx" } }, "u-padding-bottom-0": { "": { "!paddingBottom": "0rpx" } }, "up-padding-bottom-0": { "": { "!paddingBottom": "0rpx" } }, "u-margin-2": { "": { "!marginTop": "2rpx", "!marginRight": "2rpx", "!marginBottom": "2rpx", "!marginLeft": "2rpx" } }, "u-m-2": { "": { "!marginTop": "2rpx", "!marginRight": "2rpx", "!marginBottom": "2rpx", "!marginLeft": "2rpx" } }, "up-margin-2": { "": { "!marginTop": "2rpx", "!marginRight": "2rpx", "!marginBottom": "2rpx", "!marginLeft": "2rpx" } }, "up-m-2": { "": { "!marginTop": "2rpx", "!marginRight": "2rpx", "!marginBottom": "2rpx", "!marginLeft": "2rpx" } }, "u-padding-2": { "": { "!paddingTop": "2rpx", "!paddingRight": "2rpx", "!paddingBottom": "2rpx", "!paddingLeft": "2rpx" } }, "u-p-2": { "": { "!paddingTop": "2rpx", "!paddingRight": "2rpx", "!paddingBottom": "2rpx", "!paddingLeft": "2rpx" } }, "up-padding-2": { "": { "!paddingTop": "2rpx", "!paddingRight": "2rpx", "!paddingBottom": "2rpx", "!paddingLeft": "2rpx" } }, "up-p-2": { "": { "!paddingTop": "2rpx", "!paddingRight": "2rpx", "!paddingBottom": "2rpx", "!paddingLeft": "2rpx" } }, "u-m-l-2": { "": { "!marginLeft": "2rpx" } }, "up-m-l-2": { "": { "!marginLeft": "2rpx" } }, "u-p-l-2": { "": { "!paddingLeft": "2rpx" } }, "up-p-l-2": { "": { "!paddingLeft": "2rpx" } }, "u-margin-left-2": { "": { "!marginLeft": "2rpx" } }, "up-margin-left-2": { "": { "!marginLeft": "2rpx" } }, "u-padding-left-2": { "": { "!paddingLeft": "2rpx" } }, "up-padding-left-2": { "": { "!paddingLeft": "2rpx" } }, "u-m-t-2": { "": { "!marginTop": "2rpx" } }, "up-m-t-2": { "": { "!marginTop": "2rpx" } }, "u-p-t-2": { "": { "!paddingTop": "2rpx" } }, "up-p-t-2": { "": { "!paddingTop": "2rpx" } }, "u-margin-top-2": { "": { "!marginTop": "2rpx" } }, "up-margin-top-2": { "": { "!marginTop": "2rpx" } }, "u-padding-top-2": { "": { "!paddingTop": "2rpx" } }, "up-padding-top-2": { "": { "!paddingTop": "2rpx" } }, "u-m-r-2": { "": { "!marginRight": "2rpx" } }, "up-m-r-2": { "": { "!marginRight": "2rpx" } }, "u-p-r-2": { "": { "!paddingRight": "2rpx" } }, "up-p-r-2": { "": { "!paddingRight": "2rpx" } }, "u-margin-right-2": { "": { "!marginRight": "2rpx" } }, "up-margin-right-2": { "": { "!marginRight": "2rpx" } }, "u-padding-right-2": { "": { "!paddingRight": "2rpx" } }, "up-padding-right-2": { "": { "!paddingRight": "2rpx" } }, "u-m-b-2": { "": { "!marginBottom": "2rpx" } }, "up-m-b-2": { "": { "!marginBottom": "2rpx" } }, "u-p-b-2": { "": { "!paddingBottom": "2rpx" } }, "up-p-b-2": { "": { "!paddingBottom": "2rpx" } }, "u-margin-bottom-2": { "": { "!marginBottom": "2rpx" } }, "up-margin-bottom-2": { "": { "!marginBottom": "2rpx" } }, "u-padding-bottom-2": { "": { "!paddingBottom": "2rpx" } }, "up-padding-bottom-2": { "": { "!paddingBottom": "2rpx" } }, "u-margin-4": { "": { "!marginTop": "4rpx", "!marginRight": "4rpx", "!marginBottom": "4rpx", "!marginLeft": "4rpx" } }, "u-m-4": { "": { "!marginTop": "4rpx", "!marginRight": "4rpx", "!marginBottom": "4rpx", "!marginLeft": "4rpx" } }, "up-margin-4": { "": { "!marginTop": "4rpx", "!marginRight": "4rpx", "!marginBottom": "4rpx", "!marginLeft": "4rpx" } }, "up-m-4": { "": { "!marginTop": "4rpx", "!marginRight": "4rpx", "!marginBottom": "4rpx", "!marginLeft": "4rpx" } }, "u-padding-4": { "": { "!paddingTop": "4rpx", "!paddingRight": "4rpx", "!paddingBottom": "4rpx", "!paddingLeft": "4rpx" } }, "u-p-4": { "": { "!paddingTop": "4rpx", "!paddingRight": "4rpx", "!paddingBottom": "4rpx", "!paddingLeft": "4rpx" } }, "up-padding-4": { "": { "!paddingTop": "4rpx", "!paddingRight": "4rpx", "!paddingBottom": "4rpx", "!paddingLeft": "4rpx" } }, "up-p-4": { "": { "!paddingTop": "4rpx", "!paddingRight": "4rpx", "!paddingBottom": "4rpx", "!paddingLeft": "4rpx" } }, "u-m-l-4": { "": { "!marginLeft": "4rpx" } }, "up-m-l-4": { "": { "!marginLeft": "4rpx" } }, "u-p-l-4": { "": { "!paddingLeft": "4rpx" } }, "up-p-l-4": { "": { "!paddingLeft": "4rpx" } }, "u-margin-left-4": { "": { "!marginLeft": "4rpx" } }, "up-margin-left-4": { "": { "!marginLeft": "4rpx" } }, "u-padding-left-4": { "": { "!paddingLeft": "4rpx" } }, "up-padding-left-4": { "": { "!paddingLeft": "4rpx" } }, "u-m-t-4": { "": { "!marginTop": "4rpx" } }, "up-m-t-4": { "": { "!marginTop": "4rpx" } }, "u-p-t-4": { "": { "!paddingTop": "4rpx" } }, "up-p-t-4": { "": { "!paddingTop": "4rpx" } }, "u-margin-top-4": { "": { "!marginTop": "4rpx" } }, "up-margin-top-4": { "": { "!marginTop": "4rpx" } }, "u-padding-top-4": { "": { "!paddingTop": "4rpx" } }, "up-padding-top-4": { "": { "!paddingTop": "4rpx" } }, "u-m-r-4": { "": { "!marginRight": "4rpx" } }, "up-m-r-4": { "": { "!marginRight": "4rpx" } }, "u-p-r-4": { "": { "!paddingRight": "4rpx" } }, "up-p-r-4": { "": { "!paddingRight": "4rpx" } }, "u-margin-right-4": { "": { "!marginRight": "4rpx" } }, "up-margin-right-4": { "": { "!marginRight": "4rpx" } }, "u-padding-right-4": { "": { "!paddingRight": "4rpx" } }, "up-padding-right-4": { "": { "!paddingRight": "4rpx" } }, "u-m-b-4": { "": { "!marginBottom": "4rpx" } }, "up-m-b-4": { "": { "!marginBottom": "4rpx" } }, "u-p-b-4": { "": { "!paddingBottom": "4rpx" } }, "up-p-b-4": { "": { "!paddingBottom": "4rpx" } }, "u-margin-bottom-4": { "": { "!marginBottom": "4rpx" } }, "up-margin-bottom-4": { "": { "!marginBottom": "4rpx" } }, "u-padding-bottom-4": { "": { "!paddingBottom": "4rpx" } }, "up-padding-bottom-4": { "": { "!paddingBottom": "4rpx" } }, "u-margin-5": { "": { "!marginTop": "5rpx", "!marginRight": "5rpx", "!marginBottom": "5rpx", "!marginLeft": "5rpx" } }, "u-m-5": { "": { "!marginTop": "5rpx", "!marginRight": "5rpx", "!marginBottom": "5rpx", "!marginLeft": "5rpx" } }, "up-margin-5": { "": { "!marginTop": "5rpx", "!marginRight": "5rpx", "!marginBottom": "5rpx", "!marginLeft": "5rpx" } }, "up-m-5": { "": { "!marginTop": "5rpx", "!marginRight": "5rpx", "!marginBottom": "5rpx", "!marginLeft": "5rpx" } }, "u-padding-5": { "": { "!paddingTop": "5rpx", "!paddingRight": "5rpx", "!paddingBottom": "5rpx", "!paddingLeft": "5rpx" } }, "u-p-5": { "": { "!paddingTop": "5rpx", "!paddingRight": "5rpx", "!paddingBottom": "5rpx", "!paddingLeft": "5rpx" } }, "up-padding-5": { "": { "!paddingTop": "5rpx", "!paddingRight": "5rpx", "!paddingBottom": "5rpx", "!paddingLeft": "5rpx" } }, "up-p-5": { "": { "!paddingTop": "5rpx", "!paddingRight": "5rpx", "!paddingBottom": "5rpx", "!paddingLeft": "5rpx" } }, "u-m-l-5": { "": { "!marginLeft": "5rpx" } }, "up-m-l-5": { "": { "!marginLeft": "5rpx" } }, "u-p-l-5": { "": { "!paddingLeft": "5rpx" } }, "up-p-l-5": { "": { "!paddingLeft": "5rpx" } }, "u-margin-left-5": { "": { "!marginLeft": "5rpx" } }, "up-margin-left-5": { "": { "!marginLeft": "5rpx" } }, "u-padding-left-5": { "": { "!paddingLeft": "5rpx" } }, "up-padding-left-5": { "": { "!paddingLeft": "5rpx" } }, "u-m-t-5": { "": { "!marginTop": "5rpx" } }, "up-m-t-5": { "": { "!marginTop": "5rpx" } }, "u-p-t-5": { "": { "!paddingTop": "5rpx" } }, "up-p-t-5": { "": { "!paddingTop": "5rpx" } }, "u-margin-top-5": { "": { "!marginTop": "5rpx" } }, "up-margin-top-5": { "": { "!marginTop": "5rpx" } }, "u-padding-top-5": { "": { "!paddingTop": "5rpx" } }, "up-padding-top-5": { "": { "!paddingTop": "5rpx" } }, "u-m-r-5": { "": { "!marginRight": "5rpx" } }, "up-m-r-5": { "": { "!marginRight": "5rpx" } }, "u-p-r-5": { "": { "!paddingRight": "5rpx" } }, "up-p-r-5": { "": { "!paddingRight": "5rpx" } }, "u-margin-right-5": { "": { "!marginRight": "5rpx" } }, "up-margin-right-5": { "": { "!marginRight": "5rpx" } }, "u-padding-right-5": { "": { "!paddingRight": "5rpx" } }, "up-padding-right-5": { "": { "!paddingRight": "5rpx" } }, "u-m-b-5": { "": { "!marginBottom": "5rpx" } }, "up-m-b-5": { "": { "!marginBottom": "5rpx" } }, "u-p-b-5": { "": { "!paddingBottom": "5rpx" } }, "up-p-b-5": { "": { "!paddingBottom": "5rpx" } }, "u-margin-bottom-5": { "": { "!marginBottom": "5rpx" } }, "up-margin-bottom-5": { "": { "!marginBottom": "5rpx" } }, "u-padding-bottom-5": { "": { "!paddingBottom": "5rpx" } }, "up-padding-bottom-5": { "": { "!paddingBottom": "5rpx" } }, "u-margin-6": { "": { "!marginTop": "6rpx", "!marginRight": "6rpx", "!marginBottom": "6rpx", "!marginLeft": "6rpx" } }, "u-m-6": { "": { "!marginTop": "6rpx", "!marginRight": "6rpx", "!marginBottom": "6rpx", "!marginLeft": "6rpx" } }, "up-margin-6": { "": { "!marginTop": "6rpx", "!marginRight": "6rpx", "!marginBottom": "6rpx", "!marginLeft": "6rpx" } }, "up-m-6": { "": { "!marginTop": "6rpx", "!marginRight": "6rpx", "!marginBottom": "6rpx", "!marginLeft": "6rpx" } }, "u-padding-6": { "": { "!paddingTop": "6rpx", "!paddingRight": "6rpx", "!paddingBottom": "6rpx", "!paddingLeft": "6rpx" } }, "u-p-6": { "": { "!paddingTop": "6rpx", "!paddingRight": "6rpx", "!paddingBottom": "6rpx", "!paddingLeft": "6rpx" } }, "up-padding-6": { "": { "!paddingTop": "6rpx", "!paddingRight": "6rpx", "!paddingBottom": "6rpx", "!paddingLeft": "6rpx" } }, "up-p-6": { "": { "!paddingTop": "6rpx", "!paddingRight": "6rpx", "!paddingBottom": "6rpx", "!paddingLeft": "6rpx" } }, "u-m-l-6": { "": { "!marginLeft": "6rpx" } }, "up-m-l-6": { "": { "!marginLeft": "6rpx" } }, "u-p-l-6": { "": { "!paddingLeft": "6rpx" } }, "up-p-l-6": { "": { "!paddingLeft": "6rpx" } }, "u-margin-left-6": { "": { "!marginLeft": "6rpx" } }, "up-margin-left-6": { "": { "!marginLeft": "6rpx" } }, "u-padding-left-6": { "": { "!paddingLeft": "6rpx" } }, "up-padding-left-6": { "": { "!paddingLeft": "6rpx" } }, "u-m-t-6": { "": { "!marginTop": "6rpx" } }, "up-m-t-6": { "": { "!marginTop": "6rpx" } }, "u-p-t-6": { "": { "!paddingTop": "6rpx" } }, "up-p-t-6": { "": { "!paddingTop": "6rpx" } }, "u-margin-top-6": { "": { "!marginTop": "6rpx" } }, "up-margin-top-6": { "": { "!marginTop": "6rpx" } }, "u-padding-top-6": { "": { "!paddingTop": "6rpx" } }, "up-padding-top-6": { "": { "!paddingTop": "6rpx" } }, "u-m-r-6": { "": { "!marginRight": "6rpx" } }, "up-m-r-6": { "": { "!marginRight": "6rpx" } }, "u-p-r-6": { "": { "!paddingRight": "6rpx" } }, "up-p-r-6": { "": { "!paddingRight": "6rpx" } }, "u-margin-right-6": { "": { "!marginRight": "6rpx" } }, "up-margin-right-6": { "": { "!marginRight": "6rpx" } }, "u-padding-right-6": { "": { "!paddingRight": "6rpx" } }, "up-padding-right-6": { "": { "!paddingRight": "6rpx" } }, "u-m-b-6": { "": { "!marginBottom": "6rpx" } }, "up-m-b-6": { "": { "!marginBottom": "6rpx" } }, "u-p-b-6": { "": { "!paddingBottom": "6rpx" } }, "up-p-b-6": { "": { "!paddingBottom": "6rpx" } }, "u-margin-bottom-6": { "": { "!marginBottom": "6rpx" } }, "up-margin-bottom-6": { "": { "!marginBottom": "6rpx" } }, "u-padding-bottom-6": { "": { "!paddingBottom": "6rpx" } }, "up-padding-bottom-6": { "": { "!paddingBottom": "6rpx" } }, "u-margin-8": { "": { "!marginTop": "8rpx", "!marginRight": "8rpx", "!marginBottom": "8rpx", "!marginLeft": "8rpx" } }, "u-m-8": { "": { "!marginTop": "8rpx", "!marginRight": "8rpx", "!marginBottom": "8rpx", "!marginLeft": "8rpx" } }, "up-margin-8": { "": { "!marginTop": "8rpx", "!marginRight": "8rpx", "!marginBottom": "8rpx", "!marginLeft": "8rpx" } }, "up-m-8": { "": { "!marginTop": "8rpx", "!marginRight": "8rpx", "!marginBottom": "8rpx", "!marginLeft": "8rpx" } }, "u-padding-8": { "": { "!paddingTop": "8rpx", "!paddingRight": "8rpx", "!paddingBottom": "8rpx", "!paddingLeft": "8rpx" } }, "u-p-8": { "": { "!paddingTop": "8rpx", "!paddingRight": "8rpx", "!paddingBottom": "8rpx", "!paddingLeft": "8rpx" } }, "up-padding-8": { "": { "!paddingTop": "8rpx", "!paddingRight": "8rpx", "!paddingBottom": "8rpx", "!paddingLeft": "8rpx" } }, "up-p-8": { "": { "!paddingTop": "8rpx", "!paddingRight": "8rpx", "!paddingBottom": "8rpx", "!paddingLeft": "8rpx" } }, "u-m-l-8": { "": { "!marginLeft": "8rpx" } }, "up-m-l-8": { "": { "!marginLeft": "8rpx" } }, "u-p-l-8": { "": { "!paddingLeft": "8rpx" } }, "up-p-l-8": { "": { "!paddingLeft": "8rpx" } }, "u-margin-left-8": { "": { "!marginLeft": "8rpx" } }, "up-margin-left-8": { "": { "!marginLeft": "8rpx" } }, "u-padding-left-8": { "": { "!paddingLeft": "8rpx" } }, "up-padding-left-8": { "": { "!paddingLeft": "8rpx" } }, "u-m-t-8": { "": { "!marginTop": "8rpx" } }, "up-m-t-8": { "": { "!marginTop": "8rpx" } }, "u-p-t-8": { "": { "!paddingTop": "8rpx" } }, "up-p-t-8": { "": { "!paddingTop": "8rpx" } }, "u-margin-top-8": { "": { "!marginTop": "8rpx" } }, "up-margin-top-8": { "": { "!marginTop": "8rpx" } }, "u-padding-top-8": { "": { "!paddingTop": "8rpx" } }, "up-padding-top-8": { "": { "!paddingTop": "8rpx" } }, "u-m-r-8": { "": { "!marginRight": "8rpx" } }, "up-m-r-8": { "": { "!marginRight": "8rpx" } }, "u-p-r-8": { "": { "!paddingRight": "8rpx" } }, "up-p-r-8": { "": { "!paddingRight": "8rpx" } }, "u-margin-right-8": { "": { "!marginRight": "8rpx" } }, "up-margin-right-8": { "": { "!marginRight": "8rpx" } }, "u-padding-right-8": { "": { "!paddingRight": "8rpx" } }, "up-padding-right-8": { "": { "!paddingRight": "8rpx" } }, "u-m-b-8": { "": { "!marginBottom": "8rpx" } }, "up-m-b-8": { "": { "!marginBottom": "8rpx" } }, "u-p-b-8": { "": { "!paddingBottom": "8rpx" } }, "up-p-b-8": { "": { "!paddingBottom": "8rpx" } }, "u-margin-bottom-8": { "": { "!marginBottom": "8rpx" } }, "up-margin-bottom-8": { "": { "!marginBottom": "8rpx" } }, "u-padding-bottom-8": { "": { "!paddingBottom": "8rpx" } }, "up-padding-bottom-8": { "": { "!paddingBottom": "8rpx" } }, "u-margin-10": { "": { "!marginTop": "10rpx", "!marginRight": "10rpx", "!marginBottom": "10rpx", "!marginLeft": "10rpx" } }, "u-m-10": { "": { "!marginTop": "10rpx", "!marginRight": "10rpx", "!marginBottom": "10rpx", "!marginLeft": "10rpx" } }, "up-margin-10": { "": { "!marginTop": "10rpx", "!marginRight": "10rpx", "!marginBottom": "10rpx", "!marginLeft": "10rpx" } }, "up-m-10": { "": { "!marginTop": "10rpx", "!marginRight": "10rpx", "!marginBottom": "10rpx", "!marginLeft": "10rpx" } }, "u-padding-10": { "": { "!paddingTop": "10rpx", "!paddingRight": "10rpx", "!paddingBottom": "10rpx", "!paddingLeft": "10rpx" } }, "u-p-10": { "": { "!paddingTop": "10rpx", "!paddingRight": "10rpx", "!paddingBottom": "10rpx", "!paddingLeft": "10rpx" } }, "up-padding-10": { "": { "!paddingTop": "10rpx", "!paddingRight": "10rpx", "!paddingBottom": "10rpx", "!paddingLeft": "10rpx" } }, "up-p-10": { "": { "!paddingTop": "10rpx", "!paddingRight": "10rpx", "!paddingBottom": "10rpx", "!paddingLeft": "10rpx" } }, "u-m-l-10": { "": { "!marginLeft": "10rpx" } }, "up-m-l-10": { "": { "!marginLeft": "10rpx" } }, "u-p-l-10": { "": { "!paddingLeft": "10rpx" } }, "up-p-l-10": { "": { "!paddingLeft": "10rpx" } }, "u-margin-left-10": { "": { "!marginLeft": "10rpx" } }, "up-margin-left-10": { "": { "!marginLeft": "10rpx" } }, "u-padding-left-10": { "": { "!paddingLeft": "10rpx" } }, "up-padding-left-10": { "": { "!paddingLeft": "10rpx" } }, "u-m-t-10": { "": { "!marginTop": "10rpx" } }, "up-m-t-10": { "": { "!marginTop": "10rpx" } }, "u-p-t-10": { "": { "!paddingTop": "10rpx" } }, "up-p-t-10": { "": { "!paddingTop": "10rpx" } }, "u-margin-top-10": { "": { "!marginTop": "10rpx" } }, "up-margin-top-10": { "": { "!marginTop": "10rpx" } }, "u-padding-top-10": { "": { "!paddingTop": "10rpx" } }, "up-padding-top-10": { "": { "!paddingTop": "10rpx" } }, "u-m-r-10": { "": { "!marginRight": "10rpx" } }, "up-m-r-10": { "": { "!marginRight": "10rpx" } }, "u-p-r-10": { "": { "!paddingRight": "10rpx" } }, "up-p-r-10": { "": { "!paddingRight": "10rpx" } }, "u-margin-right-10": { "": { "!marginRight": "10rpx" } }, "up-margin-right-10": { "": { "!marginRight": "10rpx" } }, "u-padding-right-10": { "": { "!paddingRight": "10rpx" } }, "up-padding-right-10": { "": { "!paddingRight": "10rpx" } }, "u-m-b-10": { "": { "!marginBottom": "10rpx" } }, "up-m-b-10": { "": { "!marginBottom": "10rpx" } }, "u-p-b-10": { "": { "!paddingBottom": "10rpx" } }, "up-p-b-10": { "": { "!paddingBottom": "10rpx" } }, "u-margin-bottom-10": { "": { "!marginBottom": "10rpx" } }, "up-margin-bottom-10": { "": { "!marginBottom": "10rpx" } }, "u-padding-bottom-10": { "": { "!paddingBottom": "10rpx" } }, "up-padding-bottom-10": { "": { "!paddingBottom": "10rpx" } }, "u-margin-12": { "": { "!marginTop": "12rpx", "!marginRight": "12rpx", "!marginBottom": "12rpx", "!marginLeft": "12rpx" } }, "u-m-12": { "": { "!marginTop": "12rpx", "!marginRight": "12rpx", "!marginBottom": "12rpx", "!marginLeft": "12rpx" } }, "up-margin-12": { "": { "!marginTop": "12rpx", "!marginRight": "12rpx", "!marginBottom": "12rpx", "!marginLeft": "12rpx" } }, "up-m-12": { "": { "!marginTop": "12rpx", "!marginRight": "12rpx", "!marginBottom": "12rpx", "!marginLeft": "12rpx" } }, "u-padding-12": { "": { "!paddingTop": "12rpx", "!paddingRight": "12rpx", "!paddingBottom": "12rpx", "!paddingLeft": "12rpx" } }, "u-p-12": { "": { "!paddingTop": "12rpx", "!paddingRight": "12rpx", "!paddingBottom": "12rpx", "!paddingLeft": "12rpx" } }, "up-padding-12": { "": { "!paddingTop": "12rpx", "!paddingRight": "12rpx", "!paddingBottom": "12rpx", "!paddingLeft": "12rpx" } }, "up-p-12": { "": { "!paddingTop": "12rpx", "!paddingRight": "12rpx", "!paddingBottom": "12rpx", "!paddingLeft": "12rpx" } }, "u-m-l-12": { "": { "!marginLeft": "12rpx" } }, "up-m-l-12": { "": { "!marginLeft": "12rpx" } }, "u-p-l-12": { "": { "!paddingLeft": "12rpx" } }, "up-p-l-12": { "": { "!paddingLeft": "12rpx" } }, "u-margin-left-12": { "": { "!marginLeft": "12rpx" } }, "up-margin-left-12": { "": { "!marginLeft": "12rpx" } }, "u-padding-left-12": { "": { "!paddingLeft": "12rpx" } }, "up-padding-left-12": { "": { "!paddingLeft": "12rpx" } }, "u-m-t-12": { "": { "!marginTop": "12rpx" } }, "up-m-t-12": { "": { "!marginTop": "12rpx" } }, "u-p-t-12": { "": { "!paddingTop": "12rpx" } }, "up-p-t-12": { "": { "!paddingTop": "12rpx" } }, "u-margin-top-12": { "": { "!marginTop": "12rpx" } }, "up-margin-top-12": { "": { "!marginTop": "12rpx" } }, "u-padding-top-12": { "": { "!paddingTop": "12rpx" } }, "up-padding-top-12": { "": { "!paddingTop": "12rpx" } }, "u-m-r-12": { "": { "!marginRight": "12rpx" } }, "up-m-r-12": { "": { "!marginRight": "12rpx" } }, "u-p-r-12": { "": { "!paddingRight": "12rpx" } }, "up-p-r-12": { "": { "!paddingRight": "12rpx" } }, "u-margin-right-12": { "": { "!marginRight": "12rpx" } }, "up-margin-right-12": { "": { "!marginRight": "12rpx" } }, "u-padding-right-12": { "": { "!paddingRight": "12rpx" } }, "up-padding-right-12": { "": { "!paddingRight": "12rpx" } }, "u-m-b-12": { "": { "!marginBottom": "12rpx" } }, "up-m-b-12": { "": { "!marginBottom": "12rpx" } }, "u-p-b-12": { "": { "!paddingBottom": "12rpx" } }, "up-p-b-12": { "": { "!paddingBottom": "12rpx" } }, "u-margin-bottom-12": { "": { "!marginBottom": "12rpx" } }, "up-margin-bottom-12": { "": { "!marginBottom": "12rpx" } }, "u-padding-bottom-12": { "": { "!paddingBottom": "12rpx" } }, "up-padding-bottom-12": { "": { "!paddingBottom": "12rpx" } }, "u-margin-14": { "": { "!marginTop": "14rpx", "!marginRight": "14rpx", "!marginBottom": "14rpx", "!marginLeft": "14rpx" } }, "u-m-14": { "": { "!marginTop": "14rpx", "!marginRight": "14rpx", "!marginBottom": "14rpx", "!marginLeft": "14rpx" } }, "up-margin-14": { "": { "!marginTop": "14rpx", "!marginRight": "14rpx", "!marginBottom": "14rpx", "!marginLeft": "14rpx" } }, "up-m-14": { "": { "!marginTop": "14rpx", "!marginRight": "14rpx", "!marginBottom": "14rpx", "!marginLeft": "14rpx" } }, "u-padding-14": { "": { "!paddingTop": "14rpx", "!paddingRight": "14rpx", "!paddingBottom": "14rpx", "!paddingLeft": "14rpx" } }, "u-p-14": { "": { "!paddingTop": "14rpx", "!paddingRight": "14rpx", "!paddingBottom": "14rpx", "!paddingLeft": "14rpx" } }, "up-padding-14": { "": { "!paddingTop": "14rpx", "!paddingRight": "14rpx", "!paddingBottom": "14rpx", "!paddingLeft": "14rpx" } }, "up-p-14": { "": { "!paddingTop": "14rpx", "!paddingRight": "14rpx", "!paddingBottom": "14rpx", "!paddingLeft": "14rpx" } }, "u-m-l-14": { "": { "!marginLeft": "14rpx" } }, "up-m-l-14": { "": { "!marginLeft": "14rpx" } }, "u-p-l-14": { "": { "!paddingLeft": "14rpx" } }, "up-p-l-14": { "": { "!paddingLeft": "14rpx" } }, "u-margin-left-14": { "": { "!marginLeft": "14rpx" } }, "up-margin-left-14": { "": { "!marginLeft": "14rpx" } }, "u-padding-left-14": { "": { "!paddingLeft": "14rpx" } }, "up-padding-left-14": { "": { "!paddingLeft": "14rpx" } }, "u-m-t-14": { "": { "!marginTop": "14rpx" } }, "up-m-t-14": { "": { "!marginTop": "14rpx" } }, "u-p-t-14": { "": { "!paddingTop": "14rpx" } }, "up-p-t-14": { "": { "!paddingTop": "14rpx" } }, "u-margin-top-14": { "": { "!marginTop": "14rpx" } }, "up-margin-top-14": { "": { "!marginTop": "14rpx" } }, "u-padding-top-14": { "": { "!paddingTop": "14rpx" } }, "up-padding-top-14": { "": { "!paddingTop": "14rpx" } }, "u-m-r-14": { "": { "!marginRight": "14rpx" } }, "up-m-r-14": { "": { "!marginRight": "14rpx" } }, "u-p-r-14": { "": { "!paddingRight": "14rpx" } }, "up-p-r-14": { "": { "!paddingRight": "14rpx" } }, "u-margin-right-14": { "": { "!marginRight": "14rpx" } }, "up-margin-right-14": { "": { "!marginRight": "14rpx" } }, "u-padding-right-14": { "": { "!paddingRight": "14rpx" } }, "up-padding-right-14": { "": { "!paddingRight": "14rpx" } }, "u-m-b-14": { "": { "!marginBottom": "14rpx" } }, "up-m-b-14": { "": { "!marginBottom": "14rpx" } }, "u-p-b-14": { "": { "!paddingBottom": "14rpx" } }, "up-p-b-14": { "": { "!paddingBottom": "14rpx" } }, "u-margin-bottom-14": { "": { "!marginBottom": "14rpx" } }, "up-margin-bottom-14": { "": { "!marginBottom": "14rpx" } }, "u-padding-bottom-14": { "": { "!paddingBottom": "14rpx" } }, "up-padding-bottom-14": { "": { "!paddingBottom": "14rpx" } }, "u-margin-15": { "": { "!marginTop": "15rpx", "!marginRight": "15rpx", "!marginBottom": "15rpx", "!marginLeft": "15rpx" } }, "u-m-15": { "": { "!marginTop": "15rpx", "!marginRight": "15rpx", "!marginBottom": "15rpx", "!marginLeft": "15rpx" } }, "up-margin-15": { "": { "!marginTop": "15rpx", "!marginRight": "15rpx", "!marginBottom": "15rpx", "!marginLeft": "15rpx" } }, "up-m-15": { "": { "!marginTop": "15rpx", "!marginRight": "15rpx", "!marginBottom": "15rpx", "!marginLeft": "15rpx" } }, "u-padding-15": { "": { "!paddingTop": "15rpx", "!paddingRight": "15rpx", "!paddingBottom": "15rpx", "!paddingLeft": "15rpx" } }, "u-p-15": { "": { "!paddingTop": "15rpx", "!paddingRight": "15rpx", "!paddingBottom": "15rpx", "!paddingLeft": "15rpx" } }, "up-padding-15": { "": { "!paddingTop": "15rpx", "!paddingRight": "15rpx", "!paddingBottom": "15rpx", "!paddingLeft": "15rpx" } }, "up-p-15": { "": { "!paddingTop": "15rpx", "!paddingRight": "15rpx", "!paddingBottom": "15rpx", "!paddingLeft": "15rpx" } }, "u-m-l-15": { "": { "!marginLeft": "15rpx" } }, "up-m-l-15": { "": { "!marginLeft": "15rpx" } }, "u-p-l-15": { "": { "!paddingLeft": "15rpx" } }, "up-p-l-15": { "": { "!paddingLeft": "15rpx" } }, "u-margin-left-15": { "": { "!marginLeft": "15rpx" } }, "up-margin-left-15": { "": { "!marginLeft": "15rpx" } }, "u-padding-left-15": { "": { "!paddingLeft": "15rpx" } }, "up-padding-left-15": { "": { "!paddingLeft": "15rpx" } }, "u-m-t-15": { "": { "!marginTop": "15rpx" } }, "up-m-t-15": { "": { "!marginTop": "15rpx" } }, "u-p-t-15": { "": { "!paddingTop": "15rpx" } }, "up-p-t-15": { "": { "!paddingTop": "15rpx" } }, "u-margin-top-15": { "": { "!marginTop": "15rpx" } }, "up-margin-top-15": { "": { "!marginTop": "15rpx" } }, "u-padding-top-15": { "": { "!paddingTop": "15rpx" } }, "up-padding-top-15": { "": { "!paddingTop": "15rpx" } }, "u-m-r-15": { "": { "!marginRight": "15rpx" } }, "up-m-r-15": { "": { "!marginRight": "15rpx" } }, "u-p-r-15": { "": { "!paddingRight": "15rpx" } }, "up-p-r-15": { "": { "!paddingRight": "15rpx" } }, "u-margin-right-15": { "": { "!marginRight": "15rpx" } }, "up-margin-right-15": { "": { "!marginRight": "15rpx" } }, "u-padding-right-15": { "": { "!paddingRight": "15rpx" } }, "up-padding-right-15": { "": { "!paddingRight": "15rpx" } }, "u-m-b-15": { "": { "!marginBottom": "15rpx" } }, "up-m-b-15": { "": { "!marginBottom": "15rpx" } }, "u-p-b-15": { "": { "!paddingBottom": "15rpx" } }, "up-p-b-15": { "": { "!paddingBottom": "15rpx" } }, "u-margin-bottom-15": { "": { "!marginBottom": "15rpx" } }, "up-margin-bottom-15": { "": { "!marginBottom": "15rpx" } }, "u-padding-bottom-15": { "": { "!paddingBottom": "15rpx" } }, "up-padding-bottom-15": { "": { "!paddingBottom": "15rpx" } }, "u-margin-16": { "": { "!marginTop": "16rpx", "!marginRight": "16rpx", "!marginBottom": "16rpx", "!marginLeft": "16rpx" } }, "u-m-16": { "": { "!marginTop": "16rpx", "!marginRight": "16rpx", "!marginBottom": "16rpx", "!marginLeft": "16rpx" } }, "up-margin-16": { "": { "!marginTop": "16rpx", "!marginRight": "16rpx", "!marginBottom": "16rpx", "!marginLeft": "16rpx" } }, "up-m-16": { "": { "!marginTop": "16rpx", "!marginRight": "16rpx", "!marginBottom": "16rpx", "!marginLeft": "16rpx" } }, "u-padding-16": { "": { "!paddingTop": "16rpx", "!paddingRight": "16rpx", "!paddingBottom": "16rpx", "!paddingLeft": "16rpx" } }, "u-p-16": { "": { "!paddingTop": "16rpx", "!paddingRight": "16rpx", "!paddingBottom": "16rpx", "!paddingLeft": "16rpx" } }, "up-padding-16": { "": { "!paddingTop": "16rpx", "!paddingRight": "16rpx", "!paddingBottom": "16rpx", "!paddingLeft": "16rpx" } }, "up-p-16": { "": { "!paddingTop": "16rpx", "!paddingRight": "16rpx", "!paddingBottom": "16rpx", "!paddingLeft": "16rpx" } }, "u-m-l-16": { "": { "!marginLeft": "16rpx" } }, "up-m-l-16": { "": { "!marginLeft": "16rpx" } }, "u-p-l-16": { "": { "!paddingLeft": "16rpx" } }, "up-p-l-16": { "": { "!paddingLeft": "16rpx" } }, "u-margin-left-16": { "": { "!marginLeft": "16rpx" } }, "up-margin-left-16": { "": { "!marginLeft": "16rpx" } }, "u-padding-left-16": { "": { "!paddingLeft": "16rpx" } }, "up-padding-left-16": { "": { "!paddingLeft": "16rpx" } }, "u-m-t-16": { "": { "!marginTop": "16rpx" } }, "up-m-t-16": { "": { "!marginTop": "16rpx" } }, "u-p-t-16": { "": { "!paddingTop": "16rpx" } }, "up-p-t-16": { "": { "!paddingTop": "16rpx" } }, "u-margin-top-16": { "": { "!marginTop": "16rpx" } }, "up-margin-top-16": { "": { "!marginTop": "16rpx" } }, "u-padding-top-16": { "": { "!paddingTop": "16rpx" } }, "up-padding-top-16": { "": { "!paddingTop": "16rpx" } }, "u-m-r-16": { "": { "!marginRight": "16rpx" } }, "up-m-r-16": { "": { "!marginRight": "16rpx" } }, "u-p-r-16": { "": { "!paddingRight": "16rpx" } }, "up-p-r-16": { "": { "!paddingRight": "16rpx" } }, "u-margin-right-16": { "": { "!marginRight": "16rpx" } }, "up-margin-right-16": { "": { "!marginRight": "16rpx" } }, "u-padding-right-16": { "": { "!paddingRight": "16rpx" } }, "up-padding-right-16": { "": { "!paddingRight": "16rpx" } }, "u-m-b-16": { "": { "!marginBottom": "16rpx" } }, "up-m-b-16": { "": { "!marginBottom": "16rpx" } }, "u-p-b-16": { "": { "!paddingBottom": "16rpx" } }, "up-p-b-16": { "": { "!paddingBottom": "16rpx" } }, "u-margin-bottom-16": { "": { "!marginBottom": "16rpx" } }, "up-margin-bottom-16": { "": { "!marginBottom": "16rpx" } }, "u-padding-bottom-16": { "": { "!paddingBottom": "16rpx" } }, "up-padding-bottom-16": { "": { "!paddingBottom": "16rpx" } }, "u-margin-18": { "": { "!marginTop": "18rpx", "!marginRight": "18rpx", "!marginBottom": "18rpx", "!marginLeft": "18rpx" } }, "u-m-18": { "": { "!marginTop": "18rpx", "!marginRight": "18rpx", "!marginBottom": "18rpx", "!marginLeft": "18rpx" } }, "up-margin-18": { "": { "!marginTop": "18rpx", "!marginRight": "18rpx", "!marginBottom": "18rpx", "!marginLeft": "18rpx" } }, "up-m-18": { "": { "!marginTop": "18rpx", "!marginRight": "18rpx", "!marginBottom": "18rpx", "!marginLeft": "18rpx" } }, "u-padding-18": { "": { "!paddingTop": "18rpx", "!paddingRight": "18rpx", "!paddingBottom": "18rpx", "!paddingLeft": "18rpx" } }, "u-p-18": { "": { "!paddingTop": "18rpx", "!paddingRight": "18rpx", "!paddingBottom": "18rpx", "!paddingLeft": "18rpx" } }, "up-padding-18": { "": { "!paddingTop": "18rpx", "!paddingRight": "18rpx", "!paddingBottom": "18rpx", "!paddingLeft": "18rpx" } }, "up-p-18": { "": { "!paddingTop": "18rpx", "!paddingRight": "18rpx", "!paddingBottom": "18rpx", "!paddingLeft": "18rpx" } }, "u-m-l-18": { "": { "!marginLeft": "18rpx" } }, "up-m-l-18": { "": { "!marginLeft": "18rpx" } }, "u-p-l-18": { "": { "!paddingLeft": "18rpx" } }, "up-p-l-18": { "": { "!paddingLeft": "18rpx" } }, "u-margin-left-18": { "": { "!marginLeft": "18rpx" } }, "up-margin-left-18": { "": { "!marginLeft": "18rpx" } }, "u-padding-left-18": { "": { "!paddingLeft": "18rpx" } }, "up-padding-left-18": { "": { "!paddingLeft": "18rpx" } }, "u-m-t-18": { "": { "!marginTop": "18rpx" } }, "up-m-t-18": { "": { "!marginTop": "18rpx" } }, "u-p-t-18": { "": { "!paddingTop": "18rpx" } }, "up-p-t-18": { "": { "!paddingTop": "18rpx" } }, "u-margin-top-18": { "": { "!marginTop": "18rpx" } }, "up-margin-top-18": { "": { "!marginTop": "18rpx" } }, "u-padding-top-18": { "": { "!paddingTop": "18rpx" } }, "up-padding-top-18": { "": { "!paddingTop": "18rpx" } }, "u-m-r-18": { "": { "!marginRight": "18rpx" } }, "up-m-r-18": { "": { "!marginRight": "18rpx" } }, "u-p-r-18": { "": { "!paddingRight": "18rpx" } }, "up-p-r-18": { "": { "!paddingRight": "18rpx" } }, "u-margin-right-18": { "": { "!marginRight": "18rpx" } }, "up-margin-right-18": { "": { "!marginRight": "18rpx" } }, "u-padding-right-18": { "": { "!paddingRight": "18rpx" } }, "up-padding-right-18": { "": { "!paddingRight": "18rpx" } }, "u-m-b-18": { "": { "!marginBottom": "18rpx" } }, "up-m-b-18": { "": { "!marginBottom": "18rpx" } }, "u-p-b-18": { "": { "!paddingBottom": "18rpx" } }, "up-p-b-18": { "": { "!paddingBottom": "18rpx" } }, "u-margin-bottom-18": { "": { "!marginBottom": "18rpx" } }, "up-margin-bottom-18": { "": { "!marginBottom": "18rpx" } }, "u-padding-bottom-18": { "": { "!paddingBottom": "18rpx" } }, "up-padding-bottom-18": { "": { "!paddingBottom": "18rpx" } }, "u-margin-20": { "": { "!marginTop": "20rpx", "!marginRight": "20rpx", "!marginBottom": "20rpx", "!marginLeft": "20rpx" } }, "u-m-20": { "": { "!marginTop": "20rpx", "!marginRight": "20rpx", "!marginBottom": "20rpx", "!marginLeft": "20rpx" } }, "up-margin-20": { "": { "!marginTop": "20rpx", "!marginRight": "20rpx", "!marginBottom": "20rpx", "!marginLeft": "20rpx" } }, "up-m-20": { "": { "!marginTop": "20rpx", "!marginRight": "20rpx", "!marginBottom": "20rpx", "!marginLeft": "20rpx" } }, "u-padding-20": { "": { "!paddingTop": "20rpx", "!paddingRight": "20rpx", "!paddingBottom": "20rpx", "!paddingLeft": "20rpx" } }, "u-p-20": { "": { "!paddingTop": "20rpx", "!paddingRight": "20rpx", "!paddingBottom": "20rpx", "!paddingLeft": "20rpx" } }, "up-padding-20": { "": { "!paddingTop": "20rpx", "!paddingRight": "20rpx", "!paddingBottom": "20rpx", "!paddingLeft": "20rpx" } }, "up-p-20": { "": { "!paddingTop": "20rpx", "!paddingRight": "20rpx", "!paddingBottom": "20rpx", "!paddingLeft": "20rpx" } }, "u-m-l-20": { "": { "!marginLeft": "20rpx" } }, "up-m-l-20": { "": { "!marginLeft": "20rpx" } }, "u-p-l-20": { "": { "!paddingLeft": "20rpx" } }, "up-p-l-20": { "": { "!paddingLeft": "20rpx" } }, "u-margin-left-20": { "": { "!marginLeft": "20rpx" } }, "up-margin-left-20": { "": { "!marginLeft": "20rpx" } }, "u-padding-left-20": { "": { "!paddingLeft": "20rpx" } }, "up-padding-left-20": { "": { "!paddingLeft": "20rpx" } }, "u-m-t-20": { "": { "!marginTop": "20rpx" } }, "up-m-t-20": { "": { "!marginTop": "20rpx" } }, "u-p-t-20": { "": { "!paddingTop": "20rpx" } }, "up-p-t-20": { "": { "!paddingTop": "20rpx" } }, "u-margin-top-20": { "": { "!marginTop": "20rpx" } }, "up-margin-top-20": { "": { "!marginTop": "20rpx" } }, "u-padding-top-20": { "": { "!paddingTop": "20rpx" } }, "up-padding-top-20": { "": { "!paddingTop": "20rpx" } }, "u-m-r-20": { "": { "!marginRight": "20rpx" } }, "up-m-r-20": { "": { "!marginRight": "20rpx" } }, "u-p-r-20": { "": { "!paddingRight": "20rpx" } }, "up-p-r-20": { "": { "!paddingRight": "20rpx" } }, "u-margin-right-20": { "": { "!marginRight": "20rpx" } }, "up-margin-right-20": { "": { "!marginRight": "20rpx" } }, "u-padding-right-20": { "": { "!paddingRight": "20rpx" } }, "up-padding-right-20": { "": { "!paddingRight": "20rpx" } }, "u-m-b-20": { "": { "!marginBottom": "20rpx" } }, "up-m-b-20": { "": { "!marginBottom": "20rpx" } }, "u-p-b-20": { "": { "!paddingBottom": "20rpx" } }, "up-p-b-20": { "": { "!paddingBottom": "20rpx" } }, "u-margin-bottom-20": { "": { "!marginBottom": "20rpx" } }, "up-margin-bottom-20": { "": { "!marginBottom": "20rpx" } }, "u-padding-bottom-20": { "": { "!paddingBottom": "20rpx" } }, "up-padding-bottom-20": { "": { "!paddingBottom": "20rpx" } }, "u-margin-22": { "": { "!marginTop": "22rpx", "!marginRight": "22rpx", "!marginBottom": "22rpx", "!marginLeft": "22rpx" } }, "u-m-22": { "": { "!marginTop": "22rpx", "!marginRight": "22rpx", "!marginBottom": "22rpx", "!marginLeft": "22rpx" } }, "up-margin-22": { "": { "!marginTop": "22rpx", "!marginRight": "22rpx", "!marginBottom": "22rpx", "!marginLeft": "22rpx" } }, "up-m-22": { "": { "!marginTop": "22rpx", "!marginRight": "22rpx", "!marginBottom": "22rpx", "!marginLeft": "22rpx" } }, "u-padding-22": { "": { "!paddingTop": "22rpx", "!paddingRight": "22rpx", "!paddingBottom": "22rpx", "!paddingLeft": "22rpx" } }, "u-p-22": { "": { "!paddingTop": "22rpx", "!paddingRight": "22rpx", "!paddingBottom": "22rpx", "!paddingLeft": "22rpx" } }, "up-padding-22": { "": { "!paddingTop": "22rpx", "!paddingRight": "22rpx", "!paddingBottom": "22rpx", "!paddingLeft": "22rpx" } }, "up-p-22": { "": { "!paddingTop": "22rpx", "!paddingRight": "22rpx", "!paddingBottom": "22rpx", "!paddingLeft": "22rpx" } }, "u-m-l-22": { "": { "!marginLeft": "22rpx" } }, "up-m-l-22": { "": { "!marginLeft": "22rpx" } }, "u-p-l-22": { "": { "!paddingLeft": "22rpx" } }, "up-p-l-22": { "": { "!paddingLeft": "22rpx" } }, "u-margin-left-22": { "": { "!marginLeft": "22rpx" } }, "up-margin-left-22": { "": { "!marginLeft": "22rpx" } }, "u-padding-left-22": { "": { "!paddingLeft": "22rpx" } }, "up-padding-left-22": { "": { "!paddingLeft": "22rpx" } }, "u-m-t-22": { "": { "!marginTop": "22rpx" } }, "up-m-t-22": { "": { "!marginTop": "22rpx" } }, "u-p-t-22": { "": { "!paddingTop": "22rpx" } }, "up-p-t-22": { "": { "!paddingTop": "22rpx" } }, "u-margin-top-22": { "": { "!marginTop": "22rpx" } }, "up-margin-top-22": { "": { "!marginTop": "22rpx" } }, "u-padding-top-22": { "": { "!paddingTop": "22rpx" } }, "up-padding-top-22": { "": { "!paddingTop": "22rpx" } }, "u-m-r-22": { "": { "!marginRight": "22rpx" } }, "up-m-r-22": { "": { "!marginRight": "22rpx" } }, "u-p-r-22": { "": { "!paddingRight": "22rpx" } }, "up-p-r-22": { "": { "!paddingRight": "22rpx" } }, "u-margin-right-22": { "": { "!marginRight": "22rpx" } }, "up-margin-right-22": { "": { "!marginRight": "22rpx" } }, "u-padding-right-22": { "": { "!paddingRight": "22rpx" } }, "up-padding-right-22": { "": { "!paddingRight": "22rpx" } }, "u-m-b-22": { "": { "!marginBottom": "22rpx" } }, "up-m-b-22": { "": { "!marginBottom": "22rpx" } }, "u-p-b-22": { "": { "!paddingBottom": "22rpx" } }, "up-p-b-22": { "": { "!paddingBottom": "22rpx" } }, "u-margin-bottom-22": { "": { "!marginBottom": "22rpx" } }, "up-margin-bottom-22": { "": { "!marginBottom": "22rpx" } }, "u-padding-bottom-22": { "": { "!paddingBottom": "22rpx" } }, "up-padding-bottom-22": { "": { "!paddingBottom": "22rpx" } }, "u-margin-24": { "": { "!marginTop": "24rpx", "!marginRight": "24rpx", "!marginBottom": "24rpx", "!marginLeft": "24rpx" } }, "u-m-24": { "": { "!marginTop": "24rpx", "!marginRight": "24rpx", "!marginBottom": "24rpx", "!marginLeft": "24rpx" } }, "up-margin-24": { "": { "!marginTop": "24rpx", "!marginRight": "24rpx", "!marginBottom": "24rpx", "!marginLeft": "24rpx" } }, "up-m-24": { "": { "!marginTop": "24rpx", "!marginRight": "24rpx", "!marginBottom": "24rpx", "!marginLeft": "24rpx" } }, "u-padding-24": { "": { "!paddingTop": "24rpx", "!paddingRight": "24rpx", "!paddingBottom": "24rpx", "!paddingLeft": "24rpx" } }, "u-p-24": { "": { "!paddingTop": "24rpx", "!paddingRight": "24rpx", "!paddingBottom": "24rpx", "!paddingLeft": "24rpx" } }, "up-padding-24": { "": { "!paddingTop": "24rpx", "!paddingRight": "24rpx", "!paddingBottom": "24rpx", "!paddingLeft": "24rpx" } }, "up-p-24": { "": { "!paddingTop": "24rpx", "!paddingRight": "24rpx", "!paddingBottom": "24rpx", "!paddingLeft": "24rpx" } }, "u-m-l-24": { "": { "!marginLeft": "24rpx" } }, "up-m-l-24": { "": { "!marginLeft": "24rpx" } }, "u-p-l-24": { "": { "!paddingLeft": "24rpx" } }, "up-p-l-24": { "": { "!paddingLeft": "24rpx" } }, "u-margin-left-24": { "": { "!marginLeft": "24rpx" } }, "up-margin-left-24": { "": { "!marginLeft": "24rpx" } }, "u-padding-left-24": { "": { "!paddingLeft": "24rpx" } }, "up-padding-left-24": { "": { "!paddingLeft": "24rpx" } }, "u-m-t-24": { "": { "!marginTop": "24rpx" } }, "up-m-t-24": { "": { "!marginTop": "24rpx" } }, "u-p-t-24": { "": { "!paddingTop": "24rpx" } }, "up-p-t-24": { "": { "!paddingTop": "24rpx" } }, "u-margin-top-24": { "": { "!marginTop": "24rpx" } }, "up-margin-top-24": { "": { "!marginTop": "24rpx" } }, "u-padding-top-24": { "": { "!paddingTop": "24rpx" } }, "up-padding-top-24": { "": { "!paddingTop": "24rpx" } }, "u-m-r-24": { "": { "!marginRight": "24rpx" } }, "up-m-r-24": { "": { "!marginRight": "24rpx" } }, "u-p-r-24": { "": { "!paddingRight": "24rpx" } }, "up-p-r-24": { "": { "!paddingRight": "24rpx" } }, "u-margin-right-24": { "": { "!marginRight": "24rpx" } }, "up-margin-right-24": { "": { "!marginRight": "24rpx" } }, "u-padding-right-24": { "": { "!paddingRight": "24rpx" } }, "up-padding-right-24": { "": { "!paddingRight": "24rpx" } }, "u-m-b-24": { "": { "!marginBottom": "24rpx" } }, "up-m-b-24": { "": { "!marginBottom": "24rpx" } }, "u-p-b-24": { "": { "!paddingBottom": "24rpx" } }, "up-p-b-24": { "": { "!paddingBottom": "24rpx" } }, "u-margin-bottom-24": { "": { "!marginBottom": "24rpx" } }, "up-margin-bottom-24": { "": { "!marginBottom": "24rpx" } }, "u-padding-bottom-24": { "": { "!paddingBottom": "24rpx" } }, "up-padding-bottom-24": { "": { "!paddingBottom": "24rpx" } }, "u-margin-25": { "": { "!marginTop": "25rpx", "!marginRight": "25rpx", "!marginBottom": "25rpx", "!marginLeft": "25rpx" } }, "u-m-25": { "": { "!marginTop": "25rpx", "!marginRight": "25rpx", "!marginBottom": "25rpx", "!marginLeft": "25rpx" } }, "up-margin-25": { "": { "!marginTop": "25rpx", "!marginRight": "25rpx", "!marginBottom": "25rpx", "!marginLeft": "25rpx" } }, "up-m-25": { "": { "!marginTop": "25rpx", "!marginRight": "25rpx", "!marginBottom": "25rpx", "!marginLeft": "25rpx" } }, "u-padding-25": { "": { "!paddingTop": "25rpx", "!paddingRight": "25rpx", "!paddingBottom": "25rpx", "!paddingLeft": "25rpx" } }, "u-p-25": { "": { "!paddingTop": "25rpx", "!paddingRight": "25rpx", "!paddingBottom": "25rpx", "!paddingLeft": "25rpx" } }, "up-padding-25": { "": { "!paddingTop": "25rpx", "!paddingRight": "25rpx", "!paddingBottom": "25rpx", "!paddingLeft": "25rpx" } }, "up-p-25": { "": { "!paddingTop": "25rpx", "!paddingRight": "25rpx", "!paddingBottom": "25rpx", "!paddingLeft": "25rpx" } }, "u-m-l-25": { "": { "!marginLeft": "25rpx" } }, "up-m-l-25": { "": { "!marginLeft": "25rpx" } }, "u-p-l-25": { "": { "!paddingLeft": "25rpx" } }, "up-p-l-25": { "": { "!paddingLeft": "25rpx" } }, "u-margin-left-25": { "": { "!marginLeft": "25rpx" } }, "up-margin-left-25": { "": { "!marginLeft": "25rpx" } }, "u-padding-left-25": { "": { "!paddingLeft": "25rpx" } }, "up-padding-left-25": { "": { "!paddingLeft": "25rpx" } }, "u-m-t-25": { "": { "!marginTop": "25rpx" } }, "up-m-t-25": { "": { "!marginTop": "25rpx" } }, "u-p-t-25": { "": { "!paddingTop": "25rpx" } }, "up-p-t-25": { "": { "!paddingTop": "25rpx" } }, "u-margin-top-25": { "": { "!marginTop": "25rpx" } }, "up-margin-top-25": { "": { "!marginTop": "25rpx" } }, "u-padding-top-25": { "": { "!paddingTop": "25rpx" } }, "up-padding-top-25": { "": { "!paddingTop": "25rpx" } }, "u-m-r-25": { "": { "!marginRight": "25rpx" } }, "up-m-r-25": { "": { "!marginRight": "25rpx" } }, "u-p-r-25": { "": { "!paddingRight": "25rpx" } }, "up-p-r-25": { "": { "!paddingRight": "25rpx" } }, "u-margin-right-25": { "": { "!marginRight": "25rpx" } }, "up-margin-right-25": { "": { "!marginRight": "25rpx" } }, "u-padding-right-25": { "": { "!paddingRight": "25rpx" } }, "up-padding-right-25": { "": { "!paddingRight": "25rpx" } }, "u-m-b-25": { "": { "!marginBottom": "25rpx" } }, "up-m-b-25": { "": { "!marginBottom": "25rpx" } }, "u-p-b-25": { "": { "!paddingBottom": "25rpx" } }, "up-p-b-25": { "": { "!paddingBottom": "25rpx" } }, "u-margin-bottom-25": { "": { "!marginBottom": "25rpx" } }, "up-margin-bottom-25": { "": { "!marginBottom": "25rpx" } }, "u-padding-bottom-25": { "": { "!paddingBottom": "25rpx" } }, "up-padding-bottom-25": { "": { "!paddingBottom": "25rpx" } }, "u-margin-26": { "": { "!marginTop": "26rpx", "!marginRight": "26rpx", "!marginBottom": "26rpx", "!marginLeft": "26rpx" } }, "u-m-26": { "": { "!marginTop": "26rpx", "!marginRight": "26rpx", "!marginBottom": "26rpx", "!marginLeft": "26rpx" } }, "up-margin-26": { "": { "!marginTop": "26rpx", "!marginRight": "26rpx", "!marginBottom": "26rpx", "!marginLeft": "26rpx" } }, "up-m-26": { "": { "!marginTop": "26rpx", "!marginRight": "26rpx", "!marginBottom": "26rpx", "!marginLeft": "26rpx" } }, "u-padding-26": { "": { "!paddingTop": "26rpx", "!paddingRight": "26rpx", "!paddingBottom": "26rpx", "!paddingLeft": "26rpx" } }, "u-p-26": { "": { "!paddingTop": "26rpx", "!paddingRight": "26rpx", "!paddingBottom": "26rpx", "!paddingLeft": "26rpx" } }, "up-padding-26": { "": { "!paddingTop": "26rpx", "!paddingRight": "26rpx", "!paddingBottom": "26rpx", "!paddingLeft": "26rpx" } }, "up-p-26": { "": { "!paddingTop": "26rpx", "!paddingRight": "26rpx", "!paddingBottom": "26rpx", "!paddingLeft": "26rpx" } }, "u-m-l-26": { "": { "!marginLeft": "26rpx" } }, "up-m-l-26": { "": { "!marginLeft": "26rpx" } }, "u-p-l-26": { "": { "!paddingLeft": "26rpx" } }, "up-p-l-26": { "": { "!paddingLeft": "26rpx" } }, "u-margin-left-26": { "": { "!marginLeft": "26rpx" } }, "up-margin-left-26": { "": { "!marginLeft": "26rpx" } }, "u-padding-left-26": { "": { "!paddingLeft": "26rpx" } }, "up-padding-left-26": { "": { "!paddingLeft": "26rpx" } }, "u-m-t-26": { "": { "!marginTop": "26rpx" } }, "up-m-t-26": { "": { "!marginTop": "26rpx" } }, "u-p-t-26": { "": { "!paddingTop": "26rpx" } }, "up-p-t-26": { "": { "!paddingTop": "26rpx" } }, "u-margin-top-26": { "": { "!marginTop": "26rpx" } }, "up-margin-top-26": { "": { "!marginTop": "26rpx" } }, "u-padding-top-26": { "": { "!paddingTop": "26rpx" } }, "up-padding-top-26": { "": { "!paddingTop": "26rpx" } }, "u-m-r-26": { "": { "!marginRight": "26rpx" } }, "up-m-r-26": { "": { "!marginRight": "26rpx" } }, "u-p-r-26": { "": { "!paddingRight": "26rpx" } }, "up-p-r-26": { "": { "!paddingRight": "26rpx" } }, "u-margin-right-26": { "": { "!marginRight": "26rpx" } }, "up-margin-right-26": { "": { "!marginRight": "26rpx" } }, "u-padding-right-26": { "": { "!paddingRight": "26rpx" } }, "up-padding-right-26": { "": { "!paddingRight": "26rpx" } }, "u-m-b-26": { "": { "!marginBottom": "26rpx" } }, "up-m-b-26": { "": { "!marginBottom": "26rpx" } }, "u-p-b-26": { "": { "!paddingBottom": "26rpx" } }, "up-p-b-26": { "": { "!paddingBottom": "26rpx" } }, "u-margin-bottom-26": { "": { "!marginBottom": "26rpx" } }, "up-margin-bottom-26": { "": { "!marginBottom": "26rpx" } }, "u-padding-bottom-26": { "": { "!paddingBottom": "26rpx" } }, "up-padding-bottom-26": { "": { "!paddingBottom": "26rpx" } }, "u-margin-28": { "": { "!marginTop": "28rpx", "!marginRight": "28rpx", "!marginBottom": "28rpx", "!marginLeft": "28rpx" } }, "u-m-28": { "": { "!marginTop": "28rpx", "!marginRight": "28rpx", "!marginBottom": "28rpx", "!marginLeft": "28rpx" } }, "up-margin-28": { "": { "!marginTop": "28rpx", "!marginRight": "28rpx", "!marginBottom": "28rpx", "!marginLeft": "28rpx" } }, "up-m-28": { "": { "!marginTop": "28rpx", "!marginRight": "28rpx", "!marginBottom": "28rpx", "!marginLeft": "28rpx" } }, "u-padding-28": { "": { "!paddingTop": "28rpx", "!paddingRight": "28rpx", "!paddingBottom": "28rpx", "!paddingLeft": "28rpx" } }, "u-p-28": { "": { "!paddingTop": "28rpx", "!paddingRight": "28rpx", "!paddingBottom": "28rpx", "!paddingLeft": "28rpx" } }, "up-padding-28": { "": { "!paddingTop": "28rpx", "!paddingRight": "28rpx", "!paddingBottom": "28rpx", "!paddingLeft": "28rpx" } }, "up-p-28": { "": { "!paddingTop": "28rpx", "!paddingRight": "28rpx", "!paddingBottom": "28rpx", "!paddingLeft": "28rpx" } }, "u-m-l-28": { "": { "!marginLeft": "28rpx" } }, "up-m-l-28": { "": { "!marginLeft": "28rpx" } }, "u-p-l-28": { "": { "!paddingLeft": "28rpx" } }, "up-p-l-28": { "": { "!paddingLeft": "28rpx" } }, "u-margin-left-28": { "": { "!marginLeft": "28rpx" } }, "up-margin-left-28": { "": { "!marginLeft": "28rpx" } }, "u-padding-left-28": { "": { "!paddingLeft": "28rpx" } }, "up-padding-left-28": { "": { "!paddingLeft": "28rpx" } }, "u-m-t-28": { "": { "!marginTop": "28rpx" } }, "up-m-t-28": { "": { "!marginTop": "28rpx" } }, "u-p-t-28": { "": { "!paddingTop": "28rpx" } }, "up-p-t-28": { "": { "!paddingTop": "28rpx" } }, "u-margin-top-28": { "": { "!marginTop": "28rpx" } }, "up-margin-top-28": { "": { "!marginTop": "28rpx" } }, "u-padding-top-28": { "": { "!paddingTop": "28rpx" } }, "up-padding-top-28": { "": { "!paddingTop": "28rpx" } }, "u-m-r-28": { "": { "!marginRight": "28rpx" } }, "up-m-r-28": { "": { "!marginRight": "28rpx" } }, "u-p-r-28": { "": { "!paddingRight": "28rpx" } }, "up-p-r-28": { "": { "!paddingRight": "28rpx" } }, "u-margin-right-28": { "": { "!marginRight": "28rpx" } }, "up-margin-right-28": { "": { "!marginRight": "28rpx" } }, "u-padding-right-28": { "": { "!paddingRight": "28rpx" } }, "up-padding-right-28": { "": { "!paddingRight": "28rpx" } }, "u-m-b-28": { "": { "!marginBottom": "28rpx" } }, "up-m-b-28": { "": { "!marginBottom": "28rpx" } }, "u-p-b-28": { "": { "!paddingBottom": "28rpx" } }, "up-p-b-28": { "": { "!paddingBottom": "28rpx" } }, "u-margin-bottom-28": { "": { "!marginBottom": "28rpx" } }, "up-margin-bottom-28": { "": { "!marginBottom": "28rpx" } }, "u-padding-bottom-28": { "": { "!paddingBottom": "28rpx" } }, "up-padding-bottom-28": { "": { "!paddingBottom": "28rpx" } }, "u-margin-30": { "": { "!marginTop": "30rpx", "!marginRight": "30rpx", "!marginBottom": "30rpx", "!marginLeft": "30rpx" } }, "u-m-30": { "": { "!marginTop": "30rpx", "!marginRight": "30rpx", "!marginBottom": "30rpx", "!marginLeft": "30rpx" } }, "up-margin-30": { "": { "!marginTop": "30rpx", "!marginRight": "30rpx", "!marginBottom": "30rpx", "!marginLeft": "30rpx" } }, "up-m-30": { "": { "!marginTop": "30rpx", "!marginRight": "30rpx", "!marginBottom": "30rpx", "!marginLeft": "30rpx" } }, "u-padding-30": { "": { "!paddingTop": "30rpx", "!paddingRight": "30rpx", "!paddingBottom": "30rpx", "!paddingLeft": "30rpx" } }, "u-p-30": { "": { "!paddingTop": "30rpx", "!paddingRight": "30rpx", "!paddingBottom": "30rpx", "!paddingLeft": "30rpx" } }, "up-padding-30": { "": { "!paddingTop": "30rpx", "!paddingRight": "30rpx", "!paddingBottom": "30rpx", "!paddingLeft": "30rpx" } }, "up-p-30": { "": { "!paddingTop": "30rpx", "!paddingRight": "30rpx", "!paddingBottom": "30rpx", "!paddingLeft": "30rpx" } }, "u-m-l-30": { "": { "!marginLeft": "30rpx" } }, "up-m-l-30": { "": { "!marginLeft": "30rpx" } }, "u-p-l-30": { "": { "!paddingLeft": "30rpx" } }, "up-p-l-30": { "": { "!paddingLeft": "30rpx" } }, "u-margin-left-30": { "": { "!marginLeft": "30rpx" } }, "up-margin-left-30": { "": { "!marginLeft": "30rpx" } }, "u-padding-left-30": { "": { "!paddingLeft": "30rpx" } }, "up-padding-left-30": { "": { "!paddingLeft": "30rpx" } }, "u-m-t-30": { "": { "!marginTop": "30rpx" } }, "up-m-t-30": { "": { "!marginTop": "30rpx" } }, "u-p-t-30": { "": { "!paddingTop": "30rpx" } }, "up-p-t-30": { "": { "!paddingTop": "30rpx" } }, "u-margin-top-30": { "": { "!marginTop": "30rpx" } }, "up-margin-top-30": { "": { "!marginTop": "30rpx" } }, "u-padding-top-30": { "": { "!paddingTop": "30rpx" } }, "up-padding-top-30": { "": { "!paddingTop": "30rpx" } }, "u-m-r-30": { "": { "!marginRight": "30rpx" } }, "up-m-r-30": { "": { "!marginRight": "30rpx" } }, "u-p-r-30": { "": { "!paddingRight": "30rpx" } }, "up-p-r-30": { "": { "!paddingRight": "30rpx" } }, "u-margin-right-30": { "": { "!marginRight": "30rpx" } }, "up-margin-right-30": { "": { "!marginRight": "30rpx" } }, "u-padding-right-30": { "": { "!paddingRight": "30rpx" } }, "up-padding-right-30": { "": { "!paddingRight": "30rpx" } }, "u-m-b-30": { "": { "!marginBottom": "30rpx" } }, "up-m-b-30": { "": { "!marginBottom": "30rpx" } }, "u-p-b-30": { "": { "!paddingBottom": "30rpx" } }, "up-p-b-30": { "": { "!paddingBottom": "30rpx" } }, "u-margin-bottom-30": { "": { "!marginBottom": "30rpx" } }, "up-margin-bottom-30": { "": { "!marginBottom": "30rpx" } }, "u-padding-bottom-30": { "": { "!paddingBottom": "30rpx" } }, "up-padding-bottom-30": { "": { "!paddingBottom": "30rpx" } }, "u-margin-32": { "": { "!marginTop": "32rpx", "!marginRight": "32rpx", "!marginBottom": "32rpx", "!marginLeft": "32rpx" } }, "u-m-32": { "": { "!marginTop": "32rpx", "!marginRight": "32rpx", "!marginBottom": "32rpx", "!marginLeft": "32rpx" } }, "up-margin-32": { "": { "!marginTop": "32rpx", "!marginRight": "32rpx", "!marginBottom": "32rpx", "!marginLeft": "32rpx" } }, "up-m-32": { "": { "!marginTop": "32rpx", "!marginRight": "32rpx", "!marginBottom": "32rpx", "!marginLeft": "32rpx" } }, "u-padding-32": { "": { "!paddingTop": "32rpx", "!paddingRight": "32rpx", "!paddingBottom": "32rpx", "!paddingLeft": "32rpx" } }, "u-p-32": { "": { "!paddingTop": "32rpx", "!paddingRight": "32rpx", "!paddingBottom": "32rpx", "!paddingLeft": "32rpx" } }, "up-padding-32": { "": { "!paddingTop": "32rpx", "!paddingRight": "32rpx", "!paddingBottom": "32rpx", "!paddingLeft": "32rpx" } }, "up-p-32": { "": { "!paddingTop": "32rpx", "!paddingRight": "32rpx", "!paddingBottom": "32rpx", "!paddingLeft": "32rpx" } }, "u-m-l-32": { "": { "!marginLeft": "32rpx" } }, "up-m-l-32": { "": { "!marginLeft": "32rpx" } }, "u-p-l-32": { "": { "!paddingLeft": "32rpx" } }, "up-p-l-32": { "": { "!paddingLeft": "32rpx" } }, "u-margin-left-32": { "": { "!marginLeft": "32rpx" } }, "up-margin-left-32": { "": { "!marginLeft": "32rpx" } }, "u-padding-left-32": { "": { "!paddingLeft": "32rpx" } }, "up-padding-left-32": { "": { "!paddingLeft": "32rpx" } }, "u-m-t-32": { "": { "!marginTop": "32rpx" } }, "up-m-t-32": { "": { "!marginTop": "32rpx" } }, "u-p-t-32": { "": { "!paddingTop": "32rpx" } }, "up-p-t-32": { "": { "!paddingTop": "32rpx" } }, "u-margin-top-32": { "": { "!marginTop": "32rpx" } }, "up-margin-top-32": { "": { "!marginTop": "32rpx" } }, "u-padding-top-32": { "": { "!paddingTop": "32rpx" } }, "up-padding-top-32": { "": { "!paddingTop": "32rpx" } }, "u-m-r-32": { "": { "!marginRight": "32rpx" } }, "up-m-r-32": { "": { "!marginRight": "32rpx" } }, "u-p-r-32": { "": { "!paddingRight": "32rpx" } }, "up-p-r-32": { "": { "!paddingRight": "32rpx" } }, "u-margin-right-32": { "": { "!marginRight": "32rpx" } }, "up-margin-right-32": { "": { "!marginRight": "32rpx" } }, "u-padding-right-32": { "": { "!paddingRight": "32rpx" } }, "up-padding-right-32": { "": { "!paddingRight": "32rpx" } }, "u-m-b-32": { "": { "!marginBottom": "32rpx" } }, "up-m-b-32": { "": { "!marginBottom": "32rpx" } }, "u-p-b-32": { "": { "!paddingBottom": "32rpx" } }, "up-p-b-32": { "": { "!paddingBottom": "32rpx" } }, "u-margin-bottom-32": { "": { "!marginBottom": "32rpx" } }, "up-margin-bottom-32": { "": { "!marginBottom": "32rpx" } }, "u-padding-bottom-32": { "": { "!paddingBottom": "32rpx" } }, "up-padding-bottom-32": { "": { "!paddingBottom": "32rpx" } }, "u-margin-34": { "": { "!marginTop": "34rpx", "!marginRight": "34rpx", "!marginBottom": "34rpx", "!marginLeft": "34rpx" } }, "u-m-34": { "": { "!marginTop": "34rpx", "!marginRight": "34rpx", "!marginBottom": "34rpx", "!marginLeft": "34rpx" } }, "up-margin-34": { "": { "!marginTop": "34rpx", "!marginRight": "34rpx", "!marginBottom": "34rpx", "!marginLeft": "34rpx" } }, "up-m-34": { "": { "!marginTop": "34rpx", "!marginRight": "34rpx", "!marginBottom": "34rpx", "!marginLeft": "34rpx" } }, "u-padding-34": { "": { "!paddingTop": "34rpx", "!paddingRight": "34rpx", "!paddingBottom": "34rpx", "!paddingLeft": "34rpx" } }, "u-p-34": { "": { "!paddingTop": "34rpx", "!paddingRight": "34rpx", "!paddingBottom": "34rpx", "!paddingLeft": "34rpx" } }, "up-padding-34": { "": { "!paddingTop": "34rpx", "!paddingRight": "34rpx", "!paddingBottom": "34rpx", "!paddingLeft": "34rpx" } }, "up-p-34": { "": { "!paddingTop": "34rpx", "!paddingRight": "34rpx", "!paddingBottom": "34rpx", "!paddingLeft": "34rpx" } }, "u-m-l-34": { "": { "!marginLeft": "34rpx" } }, "up-m-l-34": { "": { "!marginLeft": "34rpx" } }, "u-p-l-34": { "": { "!paddingLeft": "34rpx" } }, "up-p-l-34": { "": { "!paddingLeft": "34rpx" } }, "u-margin-left-34": { "": { "!marginLeft": "34rpx" } }, "up-margin-left-34": { "": { "!marginLeft": "34rpx" } }, "u-padding-left-34": { "": { "!paddingLeft": "34rpx" } }, "up-padding-left-34": { "": { "!paddingLeft": "34rpx" } }, "u-m-t-34": { "": { "!marginTop": "34rpx" } }, "up-m-t-34": { "": { "!marginTop": "34rpx" } }, "u-p-t-34": { "": { "!paddingTop": "34rpx" } }, "up-p-t-34": { "": { "!paddingTop": "34rpx" } }, "u-margin-top-34": { "": { "!marginTop": "34rpx" } }, "up-margin-top-34": { "": { "!marginTop": "34rpx" } }, "u-padding-top-34": { "": { "!paddingTop": "34rpx" } }, "up-padding-top-34": { "": { "!paddingTop": "34rpx" } }, "u-m-r-34": { "": { "!marginRight": "34rpx" } }, "up-m-r-34": { "": { "!marginRight": "34rpx" } }, "u-p-r-34": { "": { "!paddingRight": "34rpx" } }, "up-p-r-34": { "": { "!paddingRight": "34rpx" } }, "u-margin-right-34": { "": { "!marginRight": "34rpx" } }, "up-margin-right-34": { "": { "!marginRight": "34rpx" } }, "u-padding-right-34": { "": { "!paddingRight": "34rpx" } }, "up-padding-right-34": { "": { "!paddingRight": "34rpx" } }, "u-m-b-34": { "": { "!marginBottom": "34rpx" } }, "up-m-b-34": { "": { "!marginBottom": "34rpx" } }, "u-p-b-34": { "": { "!paddingBottom": "34rpx" } }, "up-p-b-34": { "": { "!paddingBottom": "34rpx" } }, "u-margin-bottom-34": { "": { "!marginBottom": "34rpx" } }, "up-margin-bottom-34": { "": { "!marginBottom": "34rpx" } }, "u-padding-bottom-34": { "": { "!paddingBottom": "34rpx" } }, "up-padding-bottom-34": { "": { "!paddingBottom": "34rpx" } }, "u-margin-35": { "": { "!marginTop": "35rpx", "!marginRight": "35rpx", "!marginBottom": "35rpx", "!marginLeft": "35rpx" } }, "u-m-35": { "": { "!marginTop": "35rpx", "!marginRight": "35rpx", "!marginBottom": "35rpx", "!marginLeft": "35rpx" } }, "up-margin-35": { "": { "!marginTop": "35rpx", "!marginRight": "35rpx", "!marginBottom": "35rpx", "!marginLeft": "35rpx" } }, "up-m-35": { "": { "!marginTop": "35rpx", "!marginRight": "35rpx", "!marginBottom": "35rpx", "!marginLeft": "35rpx" } }, "u-padding-35": { "": { "!paddingTop": "35rpx", "!paddingRight": "35rpx", "!paddingBottom": "35rpx", "!paddingLeft": "35rpx" } }, "u-p-35": { "": { "!paddingTop": "35rpx", "!paddingRight": "35rpx", "!paddingBottom": "35rpx", "!paddingLeft": "35rpx" } }, "up-padding-35": { "": { "!paddingTop": "35rpx", "!paddingRight": "35rpx", "!paddingBottom": "35rpx", "!paddingLeft": "35rpx" } }, "up-p-35": { "": { "!paddingTop": "35rpx", "!paddingRight": "35rpx", "!paddingBottom": "35rpx", "!paddingLeft": "35rpx" } }, "u-m-l-35": { "": { "!marginLeft": "35rpx" } }, "up-m-l-35": { "": { "!marginLeft": "35rpx" } }, "u-p-l-35": { "": { "!paddingLeft": "35rpx" } }, "up-p-l-35": { "": { "!paddingLeft": "35rpx" } }, "u-margin-left-35": { "": { "!marginLeft": "35rpx" } }, "up-margin-left-35": { "": { "!marginLeft": "35rpx" } }, "u-padding-left-35": { "": { "!paddingLeft": "35rpx" } }, "up-padding-left-35": { "": { "!paddingLeft": "35rpx" } }, "u-m-t-35": { "": { "!marginTop": "35rpx" } }, "up-m-t-35": { "": { "!marginTop": "35rpx" } }, "u-p-t-35": { "": { "!paddingTop": "35rpx" } }, "up-p-t-35": { "": { "!paddingTop": "35rpx" } }, "u-margin-top-35": { "": { "!marginTop": "35rpx" } }, "up-margin-top-35": { "": { "!marginTop": "35rpx" } }, "u-padding-top-35": { "": { "!paddingTop": "35rpx" } }, "up-padding-top-35": { "": { "!paddingTop": "35rpx" } }, "u-m-r-35": { "": { "!marginRight": "35rpx" } }, "up-m-r-35": { "": { "!marginRight": "35rpx" } }, "u-p-r-35": { "": { "!paddingRight": "35rpx" } }, "up-p-r-35": { "": { "!paddingRight": "35rpx" } }, "u-margin-right-35": { "": { "!marginRight": "35rpx" } }, "up-margin-right-35": { "": { "!marginRight": "35rpx" } }, "u-padding-right-35": { "": { "!paddingRight": "35rpx" } }, "up-padding-right-35": { "": { "!paddingRight": "35rpx" } }, "u-m-b-35": { "": { "!marginBottom": "35rpx" } }, "up-m-b-35": { "": { "!marginBottom": "35rpx" } }, "u-p-b-35": { "": { "!paddingBottom": "35rpx" } }, "up-p-b-35": { "": { "!paddingBottom": "35rpx" } }, "u-margin-bottom-35": { "": { "!marginBottom": "35rpx" } }, "up-margin-bottom-35": { "": { "!marginBottom": "35rpx" } }, "u-padding-bottom-35": { "": { "!paddingBottom": "35rpx" } }, "up-padding-bottom-35": { "": { "!paddingBottom": "35rpx" } }, "u-margin-36": { "": { "!marginTop": "36rpx", "!marginRight": "36rpx", "!marginBottom": "36rpx", "!marginLeft": "36rpx" } }, "u-m-36": { "": { "!marginTop": "36rpx", "!marginRight": "36rpx", "!marginBottom": "36rpx", "!marginLeft": "36rpx" } }, "up-margin-36": { "": { "!marginTop": "36rpx", "!marginRight": "36rpx", "!marginBottom": "36rpx", "!marginLeft": "36rpx" } }, "up-m-36": { "": { "!marginTop": "36rpx", "!marginRight": "36rpx", "!marginBottom": "36rpx", "!marginLeft": "36rpx" } }, "u-padding-36": { "": { "!paddingTop": "36rpx", "!paddingRight": "36rpx", "!paddingBottom": "36rpx", "!paddingLeft": "36rpx" } }, "u-p-36": { "": { "!paddingTop": "36rpx", "!paddingRight": "36rpx", "!paddingBottom": "36rpx", "!paddingLeft": "36rpx" } }, "up-padding-36": { "": { "!paddingTop": "36rpx", "!paddingRight": "36rpx", "!paddingBottom": "36rpx", "!paddingLeft": "36rpx" } }, "up-p-36": { "": { "!paddingTop": "36rpx", "!paddingRight": "36rpx", "!paddingBottom": "36rpx", "!paddingLeft": "36rpx" } }, "u-m-l-36": { "": { "!marginLeft": "36rpx" } }, "up-m-l-36": { "": { "!marginLeft": "36rpx" } }, "u-p-l-36": { "": { "!paddingLeft": "36rpx" } }, "up-p-l-36": { "": { "!paddingLeft": "36rpx" } }, "u-margin-left-36": { "": { "!marginLeft": "36rpx" } }, "up-margin-left-36": { "": { "!marginLeft": "36rpx" } }, "u-padding-left-36": { "": { "!paddingLeft": "36rpx" } }, "up-padding-left-36": { "": { "!paddingLeft": "36rpx" } }, "u-m-t-36": { "": { "!marginTop": "36rpx" } }, "up-m-t-36": { "": { "!marginTop": "36rpx" } }, "u-p-t-36": { "": { "!paddingTop": "36rpx" } }, "up-p-t-36": { "": { "!paddingTop": "36rpx" } }, "u-margin-top-36": { "": { "!marginTop": "36rpx" } }, "up-margin-top-36": { "": { "!marginTop": "36rpx" } }, "u-padding-top-36": { "": { "!paddingTop": "36rpx" } }, "up-padding-top-36": { "": { "!paddingTop": "36rpx" } }, "u-m-r-36": { "": { "!marginRight": "36rpx" } }, "up-m-r-36": { "": { "!marginRight": "36rpx" } }, "u-p-r-36": { "": { "!paddingRight": "36rpx" } }, "up-p-r-36": { "": { "!paddingRight": "36rpx" } }, "u-margin-right-36": { "": { "!marginRight": "36rpx" } }, "up-margin-right-36": { "": { "!marginRight": "36rpx" } }, "u-padding-right-36": { "": { "!paddingRight": "36rpx" } }, "up-padding-right-36": { "": { "!paddingRight": "36rpx" } }, "u-m-b-36": { "": { "!marginBottom": "36rpx" } }, "up-m-b-36": { "": { "!marginBottom": "36rpx" } }, "u-p-b-36": { "": { "!paddingBottom": "36rpx" } }, "up-p-b-36": { "": { "!paddingBottom": "36rpx" } }, "u-margin-bottom-36": { "": { "!marginBottom": "36rpx" } }, "up-margin-bottom-36": { "": { "!marginBottom": "36rpx" } }, "u-padding-bottom-36": { "": { "!paddingBottom": "36rpx" } }, "up-padding-bottom-36": { "": { "!paddingBottom": "36rpx" } }, "u-margin-38": { "": { "!marginTop": "38rpx", "!marginRight": "38rpx", "!marginBottom": "38rpx", "!marginLeft": "38rpx" } }, "u-m-38": { "": { "!marginTop": "38rpx", "!marginRight": "38rpx", "!marginBottom": "38rpx", "!marginLeft": "38rpx" } }, "up-margin-38": { "": { "!marginTop": "38rpx", "!marginRight": "38rpx", "!marginBottom": "38rpx", "!marginLeft": "38rpx" } }, "up-m-38": { "": { "!marginTop": "38rpx", "!marginRight": "38rpx", "!marginBottom": "38rpx", "!marginLeft": "38rpx" } }, "u-padding-38": { "": { "!paddingTop": "38rpx", "!paddingRight": "38rpx", "!paddingBottom": "38rpx", "!paddingLeft": "38rpx" } }, "u-p-38": { "": { "!paddingTop": "38rpx", "!paddingRight": "38rpx", "!paddingBottom": "38rpx", "!paddingLeft": "38rpx" } }, "up-padding-38": { "": { "!paddingTop": "38rpx", "!paddingRight": "38rpx", "!paddingBottom": "38rpx", "!paddingLeft": "38rpx" } }, "up-p-38": { "": { "!paddingTop": "38rpx", "!paddingRight": "38rpx", "!paddingBottom": "38rpx", "!paddingLeft": "38rpx" } }, "u-m-l-38": { "": { "!marginLeft": "38rpx" } }, "up-m-l-38": { "": { "!marginLeft": "38rpx" } }, "u-p-l-38": { "": { "!paddingLeft": "38rpx" } }, "up-p-l-38": { "": { "!paddingLeft": "38rpx" } }, "u-margin-left-38": { "": { "!marginLeft": "38rpx" } }, "up-margin-left-38": { "": { "!marginLeft": "38rpx" } }, "u-padding-left-38": { "": { "!paddingLeft": "38rpx" } }, "up-padding-left-38": { "": { "!paddingLeft": "38rpx" } }, "u-m-t-38": { "": { "!marginTop": "38rpx" } }, "up-m-t-38": { "": { "!marginTop": "38rpx" } }, "u-p-t-38": { "": { "!paddingTop": "38rpx" } }, "up-p-t-38": { "": { "!paddingTop": "38rpx" } }, "u-margin-top-38": { "": { "!marginTop": "38rpx" } }, "up-margin-top-38": { "": { "!marginTop": "38rpx" } }, "u-padding-top-38": { "": { "!paddingTop": "38rpx" } }, "up-padding-top-38": { "": { "!paddingTop": "38rpx" } }, "u-m-r-38": { "": { "!marginRight": "38rpx" } }, "up-m-r-38": { "": { "!marginRight": "38rpx" } }, "u-p-r-38": { "": { "!paddingRight": "38rpx" } }, "up-p-r-38": { "": { "!paddingRight": "38rpx" } }, "u-margin-right-38": { "": { "!marginRight": "38rpx" } }, "up-margin-right-38": { "": { "!marginRight": "38rpx" } }, "u-padding-right-38": { "": { "!paddingRight": "38rpx" } }, "up-padding-right-38": { "": { "!paddingRight": "38rpx" } }, "u-m-b-38": { "": { "!marginBottom": "38rpx" } }, "up-m-b-38": { "": { "!marginBottom": "38rpx" } }, "u-p-b-38": { "": { "!paddingBottom": "38rpx" } }, "up-p-b-38": { "": { "!paddingBottom": "38rpx" } }, "u-margin-bottom-38": { "": { "!marginBottom": "38rpx" } }, "up-margin-bottom-38": { "": { "!marginBottom": "38rpx" } }, "u-padding-bottom-38": { "": { "!paddingBottom": "38rpx" } }, "up-padding-bottom-38": { "": { "!paddingBottom": "38rpx" } }, "u-margin-40": { "": { "!marginTop": "40rpx", "!marginRight": "40rpx", "!marginBottom": "40rpx", "!marginLeft": "40rpx" } }, "u-m-40": { "": { "!marginTop": "40rpx", "!marginRight": "40rpx", "!marginBottom": "40rpx", "!marginLeft": "40rpx" } }, "up-margin-40": { "": { "!marginTop": "40rpx", "!marginRight": "40rpx", "!marginBottom": "40rpx", "!marginLeft": "40rpx" } }, "up-m-40": { "": { "!marginTop": "40rpx", "!marginRight": "40rpx", "!marginBottom": "40rpx", "!marginLeft": "40rpx" } }, "u-padding-40": { "": { "!paddingTop": "40rpx", "!paddingRight": "40rpx", "!paddingBottom": "40rpx", "!paddingLeft": "40rpx" } }, "u-p-40": { "": { "!paddingTop": "40rpx", "!paddingRight": "40rpx", "!paddingBottom": "40rpx", "!paddingLeft": "40rpx" } }, "up-padding-40": { "": { "!paddingTop": "40rpx", "!paddingRight": "40rpx", "!paddingBottom": "40rpx", "!paddingLeft": "40rpx" } }, "up-p-40": { "": { "!paddingTop": "40rpx", "!paddingRight": "40rpx", "!paddingBottom": "40rpx", "!paddingLeft": "40rpx" } }, "u-m-l-40": { "": { "!marginLeft": "40rpx" } }, "up-m-l-40": { "": { "!marginLeft": "40rpx" } }, "u-p-l-40": { "": { "!paddingLeft": "40rpx" } }, "up-p-l-40": { "": { "!paddingLeft": "40rpx" } }, "u-margin-left-40": { "": { "!marginLeft": "40rpx" } }, "up-margin-left-40": { "": { "!marginLeft": "40rpx" } }, "u-padding-left-40": { "": { "!paddingLeft": "40rpx" } }, "up-padding-left-40": { "": { "!paddingLeft": "40rpx" } }, "u-m-t-40": { "": { "!marginTop": "40rpx" } }, "up-m-t-40": { "": { "!marginTop": "40rpx" } }, "u-p-t-40": { "": { "!paddingTop": "40rpx" } }, "up-p-t-40": { "": { "!paddingTop": "40rpx" } }, "u-margin-top-40": { "": { "!marginTop": "40rpx" } }, "up-margin-top-40": { "": { "!marginTop": "40rpx" } }, "u-padding-top-40": { "": { "!paddingTop": "40rpx" } }, "up-padding-top-40": { "": { "!paddingTop": "40rpx" } }, "u-m-r-40": { "": { "!marginRight": "40rpx" } }, "up-m-r-40": { "": { "!marginRight": "40rpx" } }, "u-p-r-40": { "": { "!paddingRight": "40rpx" } }, "up-p-r-40": { "": { "!paddingRight": "40rpx" } }, "u-margin-right-40": { "": { "!marginRight": "40rpx" } }, "up-margin-right-40": { "": { "!marginRight": "40rpx" } }, "u-padding-right-40": { "": { "!paddingRight": "40rpx" } }, "up-padding-right-40": { "": { "!paddingRight": "40rpx" } }, "u-m-b-40": { "": { "!marginBottom": "40rpx" } }, "up-m-b-40": { "": { "!marginBottom": "40rpx" } }, "u-p-b-40": { "": { "!paddingBottom": "40rpx" } }, "up-p-b-40": { "": { "!paddingBottom": "40rpx" } }, "u-margin-bottom-40": { "": { "!marginBottom": "40rpx" } }, "up-margin-bottom-40": { "": { "!marginBottom": "40rpx" } }, "u-padding-bottom-40": { "": { "!paddingBottom": "40rpx" } }, "up-padding-bottom-40": { "": { "!paddingBottom": "40rpx" } }, "u-margin-42": { "": { "!marginTop": "42rpx", "!marginRight": "42rpx", "!marginBottom": "42rpx", "!marginLeft": "42rpx" } }, "u-m-42": { "": { "!marginTop": "42rpx", "!marginRight": "42rpx", "!marginBottom": "42rpx", "!marginLeft": "42rpx" } }, "up-margin-42": { "": { "!marginTop": "42rpx", "!marginRight": "42rpx", "!marginBottom": "42rpx", "!marginLeft": "42rpx" } }, "up-m-42": { "": { "!marginTop": "42rpx", "!marginRight": "42rpx", "!marginBottom": "42rpx", "!marginLeft": "42rpx" } }, "u-padding-42": { "": { "!paddingTop": "42rpx", "!paddingRight": "42rpx", "!paddingBottom": "42rpx", "!paddingLeft": "42rpx" } }, "u-p-42": { "": { "!paddingTop": "42rpx", "!paddingRight": "42rpx", "!paddingBottom": "42rpx", "!paddingLeft": "42rpx" } }, "up-padding-42": { "": { "!paddingTop": "42rpx", "!paddingRight": "42rpx", "!paddingBottom": "42rpx", "!paddingLeft": "42rpx" } }, "up-p-42": { "": { "!paddingTop": "42rpx", "!paddingRight": "42rpx", "!paddingBottom": "42rpx", "!paddingLeft": "42rpx" } }, "u-m-l-42": { "": { "!marginLeft": "42rpx" } }, "up-m-l-42": { "": { "!marginLeft": "42rpx" } }, "u-p-l-42": { "": { "!paddingLeft": "42rpx" } }, "up-p-l-42": { "": { "!paddingLeft": "42rpx" } }, "u-margin-left-42": { "": { "!marginLeft": "42rpx" } }, "up-margin-left-42": { "": { "!marginLeft": "42rpx" } }, "u-padding-left-42": { "": { "!paddingLeft": "42rpx" } }, "up-padding-left-42": { "": { "!paddingLeft": "42rpx" } }, "u-m-t-42": { "": { "!marginTop": "42rpx" } }, "up-m-t-42": { "": { "!marginTop": "42rpx" } }, "u-p-t-42": { "": { "!paddingTop": "42rpx" } }, "up-p-t-42": { "": { "!paddingTop": "42rpx" } }, "u-margin-top-42": { "": { "!marginTop": "42rpx" } }, "up-margin-top-42": { "": { "!marginTop": "42rpx" } }, "u-padding-top-42": { "": { "!paddingTop": "42rpx" } }, "up-padding-top-42": { "": { "!paddingTop": "42rpx" } }, "u-m-r-42": { "": { "!marginRight": "42rpx" } }, "up-m-r-42": { "": { "!marginRight": "42rpx" } }, "u-p-r-42": { "": { "!paddingRight": "42rpx" } }, "up-p-r-42": { "": { "!paddingRight": "42rpx" } }, "u-margin-right-42": { "": { "!marginRight": "42rpx" } }, "up-margin-right-42": { "": { "!marginRight": "42rpx" } }, "u-padding-right-42": { "": { "!paddingRight": "42rpx" } }, "up-padding-right-42": { "": { "!paddingRight": "42rpx" } }, "u-m-b-42": { "": { "!marginBottom": "42rpx" } }, "up-m-b-42": { "": { "!marginBottom": "42rpx" } }, "u-p-b-42": { "": { "!paddingBottom": "42rpx" } }, "up-p-b-42": { "": { "!paddingBottom": "42rpx" } }, "u-margin-bottom-42": { "": { "!marginBottom": "42rpx" } }, "up-margin-bottom-42": { "": { "!marginBottom": "42rpx" } }, "u-padding-bottom-42": { "": { "!paddingBottom": "42rpx" } }, "up-padding-bottom-42": { "": { "!paddingBottom": "42rpx" } }, "u-margin-44": { "": { "!marginTop": "44rpx", "!marginRight": "44rpx", "!marginBottom": "44rpx", "!marginLeft": "44rpx" } }, "u-m-44": { "": { "!marginTop": "44rpx", "!marginRight": "44rpx", "!marginBottom": "44rpx", "!marginLeft": "44rpx" } }, "up-margin-44": { "": { "!marginTop": "44rpx", "!marginRight": "44rpx", "!marginBottom": "44rpx", "!marginLeft": "44rpx" } }, "up-m-44": { "": { "!marginTop": "44rpx", "!marginRight": "44rpx", "!marginBottom": "44rpx", "!marginLeft": "44rpx" } }, "u-padding-44": { "": { "!paddingTop": "44rpx", "!paddingRight": "44rpx", "!paddingBottom": "44rpx", "!paddingLeft": "44rpx" } }, "u-p-44": { "": { "!paddingTop": "44rpx", "!paddingRight": "44rpx", "!paddingBottom": "44rpx", "!paddingLeft": "44rpx" } }, "up-padding-44": { "": { "!paddingTop": "44rpx", "!paddingRight": "44rpx", "!paddingBottom": "44rpx", "!paddingLeft": "44rpx" } }, "up-p-44": { "": { "!paddingTop": "44rpx", "!paddingRight": "44rpx", "!paddingBottom": "44rpx", "!paddingLeft": "44rpx" } }, "u-m-l-44": { "": { "!marginLeft": "44rpx" } }, "up-m-l-44": { "": { "!marginLeft": "44rpx" } }, "u-p-l-44": { "": { "!paddingLeft": "44rpx" } }, "up-p-l-44": { "": { "!paddingLeft": "44rpx" } }, "u-margin-left-44": { "": { "!marginLeft": "44rpx" } }, "up-margin-left-44": { "": { "!marginLeft": "44rpx" } }, "u-padding-left-44": { "": { "!paddingLeft": "44rpx" } }, "up-padding-left-44": { "": { "!paddingLeft": "44rpx" } }, "u-m-t-44": { "": { "!marginTop": "44rpx" } }, "up-m-t-44": { "": { "!marginTop": "44rpx" } }, "u-p-t-44": { "": { "!paddingTop": "44rpx" } }, "up-p-t-44": { "": { "!paddingTop": "44rpx" } }, "u-margin-top-44": { "": { "!marginTop": "44rpx" } }, "up-margin-top-44": { "": { "!marginTop": "44rpx" } }, "u-padding-top-44": { "": { "!paddingTop": "44rpx" } }, "up-padding-top-44": { "": { "!paddingTop": "44rpx" } }, "u-m-r-44": { "": { "!marginRight": "44rpx" } }, "up-m-r-44": { "": { "!marginRight": "44rpx" } }, "u-p-r-44": { "": { "!paddingRight": "44rpx" } }, "up-p-r-44": { "": { "!paddingRight": "44rpx" } }, "u-margin-right-44": { "": { "!marginRight": "44rpx" } }, "up-margin-right-44": { "": { "!marginRight": "44rpx" } }, "u-padding-right-44": { "": { "!paddingRight": "44rpx" } }, "up-padding-right-44": { "": { "!paddingRight": "44rpx" } }, "u-m-b-44": { "": { "!marginBottom": "44rpx" } }, "up-m-b-44": { "": { "!marginBottom": "44rpx" } }, "u-p-b-44": { "": { "!paddingBottom": "44rpx" } }, "up-p-b-44": { "": { "!paddingBottom": "44rpx" } }, "u-margin-bottom-44": { "": { "!marginBottom": "44rpx" } }, "up-margin-bottom-44": { "": { "!marginBottom": "44rpx" } }, "u-padding-bottom-44": { "": { "!paddingBottom": "44rpx" } }, "up-padding-bottom-44": { "": { "!paddingBottom": "44rpx" } }, "u-margin-45": { "": { "!marginTop": "45rpx", "!marginRight": "45rpx", "!marginBottom": "45rpx", "!marginLeft": "45rpx" } }, "u-m-45": { "": { "!marginTop": "45rpx", "!marginRight": "45rpx", "!marginBottom": "45rpx", "!marginLeft": "45rpx" } }, "up-margin-45": { "": { "!marginTop": "45rpx", "!marginRight": "45rpx", "!marginBottom": "45rpx", "!marginLeft": "45rpx" } }, "up-m-45": { "": { "!marginTop": "45rpx", "!marginRight": "45rpx", "!marginBottom": "45rpx", "!marginLeft": "45rpx" } }, "u-padding-45": { "": { "!paddingTop": "45rpx", "!paddingRight": "45rpx", "!paddingBottom": "45rpx", "!paddingLeft": "45rpx" } }, "u-p-45": { "": { "!paddingTop": "45rpx", "!paddingRight": "45rpx", "!paddingBottom": "45rpx", "!paddingLeft": "45rpx" } }, "up-padding-45": { "": { "!paddingTop": "45rpx", "!paddingRight": "45rpx", "!paddingBottom": "45rpx", "!paddingLeft": "45rpx" } }, "up-p-45": { "": { "!paddingTop": "45rpx", "!paddingRight": "45rpx", "!paddingBottom": "45rpx", "!paddingLeft": "45rpx" } }, "u-m-l-45": { "": { "!marginLeft": "45rpx" } }, "up-m-l-45": { "": { "!marginLeft": "45rpx" } }, "u-p-l-45": { "": { "!paddingLeft": "45rpx" } }, "up-p-l-45": { "": { "!paddingLeft": "45rpx" } }, "u-margin-left-45": { "": { "!marginLeft": "45rpx" } }, "up-margin-left-45": { "": { "!marginLeft": "45rpx" } }, "u-padding-left-45": { "": { "!paddingLeft": "45rpx" } }, "up-padding-left-45": { "": { "!paddingLeft": "45rpx" } }, "u-m-t-45": { "": { "!marginTop": "45rpx" } }, "up-m-t-45": { "": { "!marginTop": "45rpx" } }, "u-p-t-45": { "": { "!paddingTop": "45rpx" } }, "up-p-t-45": { "": { "!paddingTop": "45rpx" } }, "u-margin-top-45": { "": { "!marginTop": "45rpx" } }, "up-margin-top-45": { "": { "!marginTop": "45rpx" } }, "u-padding-top-45": { "": { "!paddingTop": "45rpx" } }, "up-padding-top-45": { "": { "!paddingTop": "45rpx" } }, "u-m-r-45": { "": { "!marginRight": "45rpx" } }, "up-m-r-45": { "": { "!marginRight": "45rpx" } }, "u-p-r-45": { "": { "!paddingRight": "45rpx" } }, "up-p-r-45": { "": { "!paddingRight": "45rpx" } }, "u-margin-right-45": { "": { "!marginRight": "45rpx" } }, "up-margin-right-45": { "": { "!marginRight": "45rpx" } }, "u-padding-right-45": { "": { "!paddingRight": "45rpx" } }, "up-padding-right-45": { "": { "!paddingRight": "45rpx" } }, "u-m-b-45": { "": { "!marginBottom": "45rpx" } }, "up-m-b-45": { "": { "!marginBottom": "45rpx" } }, "u-p-b-45": { "": { "!paddingBottom": "45rpx" } }, "up-p-b-45": { "": { "!paddingBottom": "45rpx" } }, "u-margin-bottom-45": { "": { "!marginBottom": "45rpx" } }, "up-margin-bottom-45": { "": { "!marginBottom": "45rpx" } }, "u-padding-bottom-45": { "": { "!paddingBottom": "45rpx" } }, "up-padding-bottom-45": { "": { "!paddingBottom": "45rpx" } }, "u-margin-46": { "": { "!marginTop": "46rpx", "!marginRight": "46rpx", "!marginBottom": "46rpx", "!marginLeft": "46rpx" } }, "u-m-46": { "": { "!marginTop": "46rpx", "!marginRight": "46rpx", "!marginBottom": "46rpx", "!marginLeft": "46rpx" } }, "up-margin-46": { "": { "!marginTop": "46rpx", "!marginRight": "46rpx", "!marginBottom": "46rpx", "!marginLeft": "46rpx" } }, "up-m-46": { "": { "!marginTop": "46rpx", "!marginRight": "46rpx", "!marginBottom": "46rpx", "!marginLeft": "46rpx" } }, "u-padding-46": { "": { "!paddingTop": "46rpx", "!paddingRight": "46rpx", "!paddingBottom": "46rpx", "!paddingLeft": "46rpx" } }, "u-p-46": { "": { "!paddingTop": "46rpx", "!paddingRight": "46rpx", "!paddingBottom": "46rpx", "!paddingLeft": "46rpx" } }, "up-padding-46": { "": { "!paddingTop": "46rpx", "!paddingRight": "46rpx", "!paddingBottom": "46rpx", "!paddingLeft": "46rpx" } }, "up-p-46": { "": { "!paddingTop": "46rpx", "!paddingRight": "46rpx", "!paddingBottom": "46rpx", "!paddingLeft": "46rpx" } }, "u-m-l-46": { "": { "!marginLeft": "46rpx" } }, "up-m-l-46": { "": { "!marginLeft": "46rpx" } }, "u-p-l-46": { "": { "!paddingLeft": "46rpx" } }, "up-p-l-46": { "": { "!paddingLeft": "46rpx" } }, "u-margin-left-46": { "": { "!marginLeft": "46rpx" } }, "up-margin-left-46": { "": { "!marginLeft": "46rpx" } }, "u-padding-left-46": { "": { "!paddingLeft": "46rpx" } }, "up-padding-left-46": { "": { "!paddingLeft": "46rpx" } }, "u-m-t-46": { "": { "!marginTop": "46rpx" } }, "up-m-t-46": { "": { "!marginTop": "46rpx" } }, "u-p-t-46": { "": { "!paddingTop": "46rpx" } }, "up-p-t-46": { "": { "!paddingTop": "46rpx" } }, "u-margin-top-46": { "": { "!marginTop": "46rpx" } }, "up-margin-top-46": { "": { "!marginTop": "46rpx" } }, "u-padding-top-46": { "": { "!paddingTop": "46rpx" } }, "up-padding-top-46": { "": { "!paddingTop": "46rpx" } }, "u-m-r-46": { "": { "!marginRight": "46rpx" } }, "up-m-r-46": { "": { "!marginRight": "46rpx" } }, "u-p-r-46": { "": { "!paddingRight": "46rpx" } }, "up-p-r-46": { "": { "!paddingRight": "46rpx" } }, "u-margin-right-46": { "": { "!marginRight": "46rpx" } }, "up-margin-right-46": { "": { "!marginRight": "46rpx" } }, "u-padding-right-46": { "": { "!paddingRight": "46rpx" } }, "up-padding-right-46": { "": { "!paddingRight": "46rpx" } }, "u-m-b-46": { "": { "!marginBottom": "46rpx" } }, "up-m-b-46": { "": { "!marginBottom": "46rpx" } }, "u-p-b-46": { "": { "!paddingBottom": "46rpx" } }, "up-p-b-46": { "": { "!paddingBottom": "46rpx" } }, "u-margin-bottom-46": { "": { "!marginBottom": "46rpx" } }, "up-margin-bottom-46": { "": { "!marginBottom": "46rpx" } }, "u-padding-bottom-46": { "": { "!paddingBottom": "46rpx" } }, "up-padding-bottom-46": { "": { "!paddingBottom": "46rpx" } }, "u-margin-48": { "": { "!marginTop": "48rpx", "!marginRight": "48rpx", "!marginBottom": "48rpx", "!marginLeft": "48rpx" } }, "u-m-48": { "": { "!marginTop": "48rpx", "!marginRight": "48rpx", "!marginBottom": "48rpx", "!marginLeft": "48rpx" } }, "up-margin-48": { "": { "!marginTop": "48rpx", "!marginRight": "48rpx", "!marginBottom": "48rpx", "!marginLeft": "48rpx" } }, "up-m-48": { "": { "!marginTop": "48rpx", "!marginRight": "48rpx", "!marginBottom": "48rpx", "!marginLeft": "48rpx" } }, "u-padding-48": { "": { "!paddingTop": "48rpx", "!paddingRight": "48rpx", "!paddingBottom": "48rpx", "!paddingLeft": "48rpx" } }, "u-p-48": { "": { "!paddingTop": "48rpx", "!paddingRight": "48rpx", "!paddingBottom": "48rpx", "!paddingLeft": "48rpx" } }, "up-padding-48": { "": { "!paddingTop": "48rpx", "!paddingRight": "48rpx", "!paddingBottom": "48rpx", "!paddingLeft": "48rpx" } }, "up-p-48": { "": { "!paddingTop": "48rpx", "!paddingRight": "48rpx", "!paddingBottom": "48rpx", "!paddingLeft": "48rpx" } }, "u-m-l-48": { "": { "!marginLeft": "48rpx" } }, "up-m-l-48": { "": { "!marginLeft": "48rpx" } }, "u-p-l-48": { "": { "!paddingLeft": "48rpx" } }, "up-p-l-48": { "": { "!paddingLeft": "48rpx" } }, "u-margin-left-48": { "": { "!marginLeft": "48rpx" } }, "up-margin-left-48": { "": { "!marginLeft": "48rpx" } }, "u-padding-left-48": { "": { "!paddingLeft": "48rpx" } }, "up-padding-left-48": { "": { "!paddingLeft": "48rpx" } }, "u-m-t-48": { "": { "!marginTop": "48rpx" } }, "up-m-t-48": { "": { "!marginTop": "48rpx" } }, "u-p-t-48": { "": { "!paddingTop": "48rpx" } }, "up-p-t-48": { "": { "!paddingTop": "48rpx" } }, "u-margin-top-48": { "": { "!marginTop": "48rpx" } }, "up-margin-top-48": { "": { "!marginTop": "48rpx" } }, "u-padding-top-48": { "": { "!paddingTop": "48rpx" } }, "up-padding-top-48": { "": { "!paddingTop": "48rpx" } }, "u-m-r-48": { "": { "!marginRight": "48rpx" } }, "up-m-r-48": { "": { "!marginRight": "48rpx" } }, "u-p-r-48": { "": { "!paddingRight": "48rpx" } }, "up-p-r-48": { "": { "!paddingRight": "48rpx" } }, "u-margin-right-48": { "": { "!marginRight": "48rpx" } }, "up-margin-right-48": { "": { "!marginRight": "48rpx" } }, "u-padding-right-48": { "": { "!paddingRight": "48rpx" } }, "up-padding-right-48": { "": { "!paddingRight": "48rpx" } }, "u-m-b-48": { "": { "!marginBottom": "48rpx" } }, "up-m-b-48": { "": { "!marginBottom": "48rpx" } }, "u-p-b-48": { "": { "!paddingBottom": "48rpx" } }, "up-p-b-48": { "": { "!paddingBottom": "48rpx" } }, "u-margin-bottom-48": { "": { "!marginBottom": "48rpx" } }, "up-margin-bottom-48": { "": { "!marginBottom": "48rpx" } }, "u-padding-bottom-48": { "": { "!paddingBottom": "48rpx" } }, "up-padding-bottom-48": { "": { "!paddingBottom": "48rpx" } }, "u-margin-50": { "": { "!marginTop": "50rpx", "!marginRight": "50rpx", "!marginBottom": "50rpx", "!marginLeft": "50rpx" } }, "u-m-50": { "": { "!marginTop": "50rpx", "!marginRight": "50rpx", "!marginBottom": "50rpx", "!marginLeft": "50rpx" } }, "up-margin-50": { "": { "!marginTop": "50rpx", "!marginRight": "50rpx", "!marginBottom": "50rpx", "!marginLeft": "50rpx" } }, "up-m-50": { "": { "!marginTop": "50rpx", "!marginRight": "50rpx", "!marginBottom": "50rpx", "!marginLeft": "50rpx" } }, "u-padding-50": { "": { "!paddingTop": "50rpx", "!paddingRight": "50rpx", "!paddingBottom": "50rpx", "!paddingLeft": "50rpx" } }, "u-p-50": { "": { "!paddingTop": "50rpx", "!paddingRight": "50rpx", "!paddingBottom": "50rpx", "!paddingLeft": "50rpx" } }, "up-padding-50": { "": { "!paddingTop": "50rpx", "!paddingRight": "50rpx", "!paddingBottom": "50rpx", "!paddingLeft": "50rpx" } }, "up-p-50": { "": { "!paddingTop": "50rpx", "!paddingRight": "50rpx", "!paddingBottom": "50rpx", "!paddingLeft": "50rpx" } }, "u-m-l-50": { "": { "!marginLeft": "50rpx" } }, "up-m-l-50": { "": { "!marginLeft": "50rpx" } }, "u-p-l-50": { "": { "!paddingLeft": "50rpx" } }, "up-p-l-50": { "": { "!paddingLeft": "50rpx" } }, "u-margin-left-50": { "": { "!marginLeft": "50rpx" } }, "up-margin-left-50": { "": { "!marginLeft": "50rpx" } }, "u-padding-left-50": { "": { "!paddingLeft": "50rpx" } }, "up-padding-left-50": { "": { "!paddingLeft": "50rpx" } }, "u-m-t-50": { "": { "!marginTop": "50rpx" } }, "up-m-t-50": { "": { "!marginTop": "50rpx" } }, "u-p-t-50": { "": { "!paddingTop": "50rpx" } }, "up-p-t-50": { "": { "!paddingTop": "50rpx" } }, "u-margin-top-50": { "": { "!marginTop": "50rpx" } }, "up-margin-top-50": { "": { "!marginTop": "50rpx" } }, "u-padding-top-50": { "": { "!paddingTop": "50rpx" } }, "up-padding-top-50": { "": { "!paddingTop": "50rpx" } }, "u-m-r-50": { "": { "!marginRight": "50rpx" } }, "up-m-r-50": { "": { "!marginRight": "50rpx" } }, "u-p-r-50": { "": { "!paddingRight": "50rpx" } }, "up-p-r-50": { "": { "!paddingRight": "50rpx" } }, "u-margin-right-50": { "": { "!marginRight": "50rpx" } }, "up-margin-right-50": { "": { "!marginRight": "50rpx" } }, "u-padding-right-50": { "": { "!paddingRight": "50rpx" } }, "up-padding-right-50": { "": { "!paddingRight": "50rpx" } }, "u-m-b-50": { "": { "!marginBottom": "50rpx" } }, "up-m-b-50": { "": { "!marginBottom": "50rpx" } }, "u-p-b-50": { "": { "!paddingBottom": "50rpx" } }, "up-p-b-50": { "": { "!paddingBottom": "50rpx" } }, "u-margin-bottom-50": { "": { "!marginBottom": "50rpx" } }, "up-margin-bottom-50": { "": { "!marginBottom": "50rpx" } }, "u-padding-bottom-50": { "": { "!paddingBottom": "50rpx" } }, "up-padding-bottom-50": { "": { "!paddingBottom": "50rpx" } }, "u-margin-52": { "": { "!marginTop": "52rpx", "!marginRight": "52rpx", "!marginBottom": "52rpx", "!marginLeft": "52rpx" } }, "u-m-52": { "": { "!marginTop": "52rpx", "!marginRight": "52rpx", "!marginBottom": "52rpx", "!marginLeft": "52rpx" } }, "up-margin-52": { "": { "!marginTop": "52rpx", "!marginRight": "52rpx", "!marginBottom": "52rpx", "!marginLeft": "52rpx" } }, "up-m-52": { "": { "!marginTop": "52rpx", "!marginRight": "52rpx", "!marginBottom": "52rpx", "!marginLeft": "52rpx" } }, "u-padding-52": { "": { "!paddingTop": "52rpx", "!paddingRight": "52rpx", "!paddingBottom": "52rpx", "!paddingLeft": "52rpx" } }, "u-p-52": { "": { "!paddingTop": "52rpx", "!paddingRight": "52rpx", "!paddingBottom": "52rpx", "!paddingLeft": "52rpx" } }, "up-padding-52": { "": { "!paddingTop": "52rpx", "!paddingRight": "52rpx", "!paddingBottom": "52rpx", "!paddingLeft": "52rpx" } }, "up-p-52": { "": { "!paddingTop": "52rpx", "!paddingRight": "52rpx", "!paddingBottom": "52rpx", "!paddingLeft": "52rpx" } }, "u-m-l-52": { "": { "!marginLeft": "52rpx" } }, "up-m-l-52": { "": { "!marginLeft": "52rpx" } }, "u-p-l-52": { "": { "!paddingLeft": "52rpx" } }, "up-p-l-52": { "": { "!paddingLeft": "52rpx" } }, "u-margin-left-52": { "": { "!marginLeft": "52rpx" } }, "up-margin-left-52": { "": { "!marginLeft": "52rpx" } }, "u-padding-left-52": { "": { "!paddingLeft": "52rpx" } }, "up-padding-left-52": { "": { "!paddingLeft": "52rpx" } }, "u-m-t-52": { "": { "!marginTop": "52rpx" } }, "up-m-t-52": { "": { "!marginTop": "52rpx" } }, "u-p-t-52": { "": { "!paddingTop": "52rpx" } }, "up-p-t-52": { "": { "!paddingTop": "52rpx" } }, "u-margin-top-52": { "": { "!marginTop": "52rpx" } }, "up-margin-top-52": { "": { "!marginTop": "52rpx" } }, "u-padding-top-52": { "": { "!paddingTop": "52rpx" } }, "up-padding-top-52": { "": { "!paddingTop": "52rpx" } }, "u-m-r-52": { "": { "!marginRight": "52rpx" } }, "up-m-r-52": { "": { "!marginRight": "52rpx" } }, "u-p-r-52": { "": { "!paddingRight": "52rpx" } }, "up-p-r-52": { "": { "!paddingRight": "52rpx" } }, "u-margin-right-52": { "": { "!marginRight": "52rpx" } }, "up-margin-right-52": { "": { "!marginRight": "52rpx" } }, "u-padding-right-52": { "": { "!paddingRight": "52rpx" } }, "up-padding-right-52": { "": { "!paddingRight": "52rpx" } }, "u-m-b-52": { "": { "!marginBottom": "52rpx" } }, "up-m-b-52": { "": { "!marginBottom": "52rpx" } }, "u-p-b-52": { "": { "!paddingBottom": "52rpx" } }, "up-p-b-52": { "": { "!paddingBottom": "52rpx" } }, "u-margin-bottom-52": { "": { "!marginBottom": "52rpx" } }, "up-margin-bottom-52": { "": { "!marginBottom": "52rpx" } }, "u-padding-bottom-52": { "": { "!paddingBottom": "52rpx" } }, "up-padding-bottom-52": { "": { "!paddingBottom": "52rpx" } }, "u-margin-54": { "": { "!marginTop": "54rpx", "!marginRight": "54rpx", "!marginBottom": "54rpx", "!marginLeft": "54rpx" } }, "u-m-54": { "": { "!marginTop": "54rpx", "!marginRight": "54rpx", "!marginBottom": "54rpx", "!marginLeft": "54rpx" } }, "up-margin-54": { "": { "!marginTop": "54rpx", "!marginRight": "54rpx", "!marginBottom": "54rpx", "!marginLeft": "54rpx" } }, "up-m-54": { "": { "!marginTop": "54rpx", "!marginRight": "54rpx", "!marginBottom": "54rpx", "!marginLeft": "54rpx" } }, "u-padding-54": { "": { "!paddingTop": "54rpx", "!paddingRight": "54rpx", "!paddingBottom": "54rpx", "!paddingLeft": "54rpx" } }, "u-p-54": { "": { "!paddingTop": "54rpx", "!paddingRight": "54rpx", "!paddingBottom": "54rpx", "!paddingLeft": "54rpx" } }, "up-padding-54": { "": { "!paddingTop": "54rpx", "!paddingRight": "54rpx", "!paddingBottom": "54rpx", "!paddingLeft": "54rpx" } }, "up-p-54": { "": { "!paddingTop": "54rpx", "!paddingRight": "54rpx", "!paddingBottom": "54rpx", "!paddingLeft": "54rpx" } }, "u-m-l-54": { "": { "!marginLeft": "54rpx" } }, "up-m-l-54": { "": { "!marginLeft": "54rpx" } }, "u-p-l-54": { "": { "!paddingLeft": "54rpx" } }, "up-p-l-54": { "": { "!paddingLeft": "54rpx" } }, "u-margin-left-54": { "": { "!marginLeft": "54rpx" } }, "up-margin-left-54": { "": { "!marginLeft": "54rpx" } }, "u-padding-left-54": { "": { "!paddingLeft": "54rpx" } }, "up-padding-left-54": { "": { "!paddingLeft": "54rpx" } }, "u-m-t-54": { "": { "!marginTop": "54rpx" } }, "up-m-t-54": { "": { "!marginTop": "54rpx" } }, "u-p-t-54": { "": { "!paddingTop": "54rpx" } }, "up-p-t-54": { "": { "!paddingTop": "54rpx" } }, "u-margin-top-54": { "": { "!marginTop": "54rpx" } }, "up-margin-top-54": { "": { "!marginTop": "54rpx" } }, "u-padding-top-54": { "": { "!paddingTop": "54rpx" } }, "up-padding-top-54": { "": { "!paddingTop": "54rpx" } }, "u-m-r-54": { "": { "!marginRight": "54rpx" } }, "up-m-r-54": { "": { "!marginRight": "54rpx" } }, "u-p-r-54": { "": { "!paddingRight": "54rpx" } }, "up-p-r-54": { "": { "!paddingRight": "54rpx" } }, "u-margin-right-54": { "": { "!marginRight": "54rpx" } }, "up-margin-right-54": { "": { "!marginRight": "54rpx" } }, "u-padding-right-54": { "": { "!paddingRight": "54rpx" } }, "up-padding-right-54": { "": { "!paddingRight": "54rpx" } }, "u-m-b-54": { "": { "!marginBottom": "54rpx" } }, "up-m-b-54": { "": { "!marginBottom": "54rpx" } }, "u-p-b-54": { "": { "!paddingBottom": "54rpx" } }, "up-p-b-54": { "": { "!paddingBottom": "54rpx" } }, "u-margin-bottom-54": { "": { "!marginBottom": "54rpx" } }, "up-margin-bottom-54": { "": { "!marginBottom": "54rpx" } }, "u-padding-bottom-54": { "": { "!paddingBottom": "54rpx" } }, "up-padding-bottom-54": { "": { "!paddingBottom": "54rpx" } }, "u-margin-55": { "": { "!marginTop": "55rpx", "!marginRight": "55rpx", "!marginBottom": "55rpx", "!marginLeft": "55rpx" } }, "u-m-55": { "": { "!marginTop": "55rpx", "!marginRight": "55rpx", "!marginBottom": "55rpx", "!marginLeft": "55rpx" } }, "up-margin-55": { "": { "!marginTop": "55rpx", "!marginRight": "55rpx", "!marginBottom": "55rpx", "!marginLeft": "55rpx" } }, "up-m-55": { "": { "!marginTop": "55rpx", "!marginRight": "55rpx", "!marginBottom": "55rpx", "!marginLeft": "55rpx" } }, "u-padding-55": { "": { "!paddingTop": "55rpx", "!paddingRight": "55rpx", "!paddingBottom": "55rpx", "!paddingLeft": "55rpx" } }, "u-p-55": { "": { "!paddingTop": "55rpx", "!paddingRight": "55rpx", "!paddingBottom": "55rpx", "!paddingLeft": "55rpx" } }, "up-padding-55": { "": { "!paddingTop": "55rpx", "!paddingRight": "55rpx", "!paddingBottom": "55rpx", "!paddingLeft": "55rpx" } }, "up-p-55": { "": { "!paddingTop": "55rpx", "!paddingRight": "55rpx", "!paddingBottom": "55rpx", "!paddingLeft": "55rpx" } }, "u-m-l-55": { "": { "!marginLeft": "55rpx" } }, "up-m-l-55": { "": { "!marginLeft": "55rpx" } }, "u-p-l-55": { "": { "!paddingLeft": "55rpx" } }, "up-p-l-55": { "": { "!paddingLeft": "55rpx" } }, "u-margin-left-55": { "": { "!marginLeft": "55rpx" } }, "up-margin-left-55": { "": { "!marginLeft": "55rpx" } }, "u-padding-left-55": { "": { "!paddingLeft": "55rpx" } }, "up-padding-left-55": { "": { "!paddingLeft": "55rpx" } }, "u-m-t-55": { "": { "!marginTop": "55rpx" } }, "up-m-t-55": { "": { "!marginTop": "55rpx" } }, "u-p-t-55": { "": { "!paddingTop": "55rpx" } }, "up-p-t-55": { "": { "!paddingTop": "55rpx" } }, "u-margin-top-55": { "": { "!marginTop": "55rpx" } }, "up-margin-top-55": { "": { "!marginTop": "55rpx" } }, "u-padding-top-55": { "": { "!paddingTop": "55rpx" } }, "up-padding-top-55": { "": { "!paddingTop": "55rpx" } }, "u-m-r-55": { "": { "!marginRight": "55rpx" } }, "up-m-r-55": { "": { "!marginRight": "55rpx" } }, "u-p-r-55": { "": { "!paddingRight": "55rpx" } }, "up-p-r-55": { "": { "!paddingRight": "55rpx" } }, "u-margin-right-55": { "": { "!marginRight": "55rpx" } }, "up-margin-right-55": { "": { "!marginRight": "55rpx" } }, "u-padding-right-55": { "": { "!paddingRight": "55rpx" } }, "up-padding-right-55": { "": { "!paddingRight": "55rpx" } }, "u-m-b-55": { "": { "!marginBottom": "55rpx" } }, "up-m-b-55": { "": { "!marginBottom": "55rpx" } }, "u-p-b-55": { "": { "!paddingBottom": "55rpx" } }, "up-p-b-55": { "": { "!paddingBottom": "55rpx" } }, "u-margin-bottom-55": { "": { "!marginBottom": "55rpx" } }, "up-margin-bottom-55": { "": { "!marginBottom": "55rpx" } }, "u-padding-bottom-55": { "": { "!paddingBottom": "55rpx" } }, "up-padding-bottom-55": { "": { "!paddingBottom": "55rpx" } }, "u-margin-56": { "": { "!marginTop": "56rpx", "!marginRight": "56rpx", "!marginBottom": "56rpx", "!marginLeft": "56rpx" } }, "u-m-56": { "": { "!marginTop": "56rpx", "!marginRight": "56rpx", "!marginBottom": "56rpx", "!marginLeft": "56rpx" } }, "up-margin-56": { "": { "!marginTop": "56rpx", "!marginRight": "56rpx", "!marginBottom": "56rpx", "!marginLeft": "56rpx" } }, "up-m-56": { "": { "!marginTop": "56rpx", "!marginRight": "56rpx", "!marginBottom": "56rpx", "!marginLeft": "56rpx" } }, "u-padding-56": { "": { "!paddingTop": "56rpx", "!paddingRight": "56rpx", "!paddingBottom": "56rpx", "!paddingLeft": "56rpx" } }, "u-p-56": { "": { "!paddingTop": "56rpx", "!paddingRight": "56rpx", "!paddingBottom": "56rpx", "!paddingLeft": "56rpx" } }, "up-padding-56": { "": { "!paddingTop": "56rpx", "!paddingRight": "56rpx", "!paddingBottom": "56rpx", "!paddingLeft": "56rpx" } }, "up-p-56": { "": { "!paddingTop": "56rpx", "!paddingRight": "56rpx", "!paddingBottom": "56rpx", "!paddingLeft": "56rpx" } }, "u-m-l-56": { "": { "!marginLeft": "56rpx" } }, "up-m-l-56": { "": { "!marginLeft": "56rpx" } }, "u-p-l-56": { "": { "!paddingLeft": "56rpx" } }, "up-p-l-56": { "": { "!paddingLeft": "56rpx" } }, "u-margin-left-56": { "": { "!marginLeft": "56rpx" } }, "up-margin-left-56": { "": { "!marginLeft": "56rpx" } }, "u-padding-left-56": { "": { "!paddingLeft": "56rpx" } }, "up-padding-left-56": { "": { "!paddingLeft": "56rpx" } }, "u-m-t-56": { "": { "!marginTop": "56rpx" } }, "up-m-t-56": { "": { "!marginTop": "56rpx" } }, "u-p-t-56": { "": { "!paddingTop": "56rpx" } }, "up-p-t-56": { "": { "!paddingTop": "56rpx" } }, "u-margin-top-56": { "": { "!marginTop": "56rpx" } }, "up-margin-top-56": { "": { "!marginTop": "56rpx" } }, "u-padding-top-56": { "": { "!paddingTop": "56rpx" } }, "up-padding-top-56": { "": { "!paddingTop": "56rpx" } }, "u-m-r-56": { "": { "!marginRight": "56rpx" } }, "up-m-r-56": { "": { "!marginRight": "56rpx" } }, "u-p-r-56": { "": { "!paddingRight": "56rpx" } }, "up-p-r-56": { "": { "!paddingRight": "56rpx" } }, "u-margin-right-56": { "": { "!marginRight": "56rpx" } }, "up-margin-right-56": { "": { "!marginRight": "56rpx" } }, "u-padding-right-56": { "": { "!paddingRight": "56rpx" } }, "up-padding-right-56": { "": { "!paddingRight": "56rpx" } }, "u-m-b-56": { "": { "!marginBottom": "56rpx" } }, "up-m-b-56": { "": { "!marginBottom": "56rpx" } }, "u-p-b-56": { "": { "!paddingBottom": "56rpx" } }, "up-p-b-56": { "": { "!paddingBottom": "56rpx" } }, "u-margin-bottom-56": { "": { "!marginBottom": "56rpx" } }, "up-margin-bottom-56": { "": { "!marginBottom": "56rpx" } }, "u-padding-bottom-56": { "": { "!paddingBottom": "56rpx" } }, "up-padding-bottom-56": { "": { "!paddingBottom": "56rpx" } }, "u-margin-58": { "": { "!marginTop": "58rpx", "!marginRight": "58rpx", "!marginBottom": "58rpx", "!marginLeft": "58rpx" } }, "u-m-58": { "": { "!marginTop": "58rpx", "!marginRight": "58rpx", "!marginBottom": "58rpx", "!marginLeft": "58rpx" } }, "up-margin-58": { "": { "!marginTop": "58rpx", "!marginRight": "58rpx", "!marginBottom": "58rpx", "!marginLeft": "58rpx" } }, "up-m-58": { "": { "!marginTop": "58rpx", "!marginRight": "58rpx", "!marginBottom": "58rpx", "!marginLeft": "58rpx" } }, "u-padding-58": { "": { "!paddingTop": "58rpx", "!paddingRight": "58rpx", "!paddingBottom": "58rpx", "!paddingLeft": "58rpx" } }, "u-p-58": { "": { "!paddingTop": "58rpx", "!paddingRight": "58rpx", "!paddingBottom": "58rpx", "!paddingLeft": "58rpx" } }, "up-padding-58": { "": { "!paddingTop": "58rpx", "!paddingRight": "58rpx", "!paddingBottom": "58rpx", "!paddingLeft": "58rpx" } }, "up-p-58": { "": { "!paddingTop": "58rpx", "!paddingRight": "58rpx", "!paddingBottom": "58rpx", "!paddingLeft": "58rpx" } }, "u-m-l-58": { "": { "!marginLeft": "58rpx" } }, "up-m-l-58": { "": { "!marginLeft": "58rpx" } }, "u-p-l-58": { "": { "!paddingLeft": "58rpx" } }, "up-p-l-58": { "": { "!paddingLeft": "58rpx" } }, "u-margin-left-58": { "": { "!marginLeft": "58rpx" } }, "up-margin-left-58": { "": { "!marginLeft": "58rpx" } }, "u-padding-left-58": { "": { "!paddingLeft": "58rpx" } }, "up-padding-left-58": { "": { "!paddingLeft": "58rpx" } }, "u-m-t-58": { "": { "!marginTop": "58rpx" } }, "up-m-t-58": { "": { "!marginTop": "58rpx" } }, "u-p-t-58": { "": { "!paddingTop": "58rpx" } }, "up-p-t-58": { "": { "!paddingTop": "58rpx" } }, "u-margin-top-58": { "": { "!marginTop": "58rpx" } }, "up-margin-top-58": { "": { "!marginTop": "58rpx" } }, "u-padding-top-58": { "": { "!paddingTop": "58rpx" } }, "up-padding-top-58": { "": { "!paddingTop": "58rpx" } }, "u-m-r-58": { "": { "!marginRight": "58rpx" } }, "up-m-r-58": { "": { "!marginRight": "58rpx" } }, "u-p-r-58": { "": { "!paddingRight": "58rpx" } }, "up-p-r-58": { "": { "!paddingRight": "58rpx" } }, "u-margin-right-58": { "": { "!marginRight": "58rpx" } }, "up-margin-right-58": { "": { "!marginRight": "58rpx" } }, "u-padding-right-58": { "": { "!paddingRight": "58rpx" } }, "up-padding-right-58": { "": { "!paddingRight": "58rpx" } }, "u-m-b-58": { "": { "!marginBottom": "58rpx" } }, "up-m-b-58": { "": { "!marginBottom": "58rpx" } }, "u-p-b-58": { "": { "!paddingBottom": "58rpx" } }, "up-p-b-58": { "": { "!paddingBottom": "58rpx" } }, "u-margin-bottom-58": { "": { "!marginBottom": "58rpx" } }, "up-margin-bottom-58": { "": { "!marginBottom": "58rpx" } }, "u-padding-bottom-58": { "": { "!paddingBottom": "58rpx" } }, "up-padding-bottom-58": { "": { "!paddingBottom": "58rpx" } }, "u-margin-60": { "": { "!marginTop": "60rpx", "!marginRight": "60rpx", "!marginBottom": "60rpx", "!marginLeft": "60rpx" } }, "u-m-60": { "": { "!marginTop": "60rpx", "!marginRight": "60rpx", "!marginBottom": "60rpx", "!marginLeft": "60rpx" } }, "up-margin-60": { "": { "!marginTop": "60rpx", "!marginRight": "60rpx", "!marginBottom": "60rpx", "!marginLeft": "60rpx" } }, "up-m-60": { "": { "!marginTop": "60rpx", "!marginRight": "60rpx", "!marginBottom": "60rpx", "!marginLeft": "60rpx" } }, "u-padding-60": { "": { "!paddingTop": "60rpx", "!paddingRight": "60rpx", "!paddingBottom": "60rpx", "!paddingLeft": "60rpx" } }, "u-p-60": { "": { "!paddingTop": "60rpx", "!paddingRight": "60rpx", "!paddingBottom": "60rpx", "!paddingLeft": "60rpx" } }, "up-padding-60": { "": { "!paddingTop": "60rpx", "!paddingRight": "60rpx", "!paddingBottom": "60rpx", "!paddingLeft": "60rpx" } }, "up-p-60": { "": { "!paddingTop": "60rpx", "!paddingRight": "60rpx", "!paddingBottom": "60rpx", "!paddingLeft": "60rpx" } }, "u-m-l-60": { "": { "!marginLeft": "60rpx" } }, "up-m-l-60": { "": { "!marginLeft": "60rpx" } }, "u-p-l-60": { "": { "!paddingLeft": "60rpx" } }, "up-p-l-60": { "": { "!paddingLeft": "60rpx" } }, "u-margin-left-60": { "": { "!marginLeft": "60rpx" } }, "up-margin-left-60": { "": { "!marginLeft": "60rpx" } }, "u-padding-left-60": { "": { "!paddingLeft": "60rpx" } }, "up-padding-left-60": { "": { "!paddingLeft": "60rpx" } }, "u-m-t-60": { "": { "!marginTop": "60rpx" } }, "up-m-t-60": { "": { "!marginTop": "60rpx" } }, "u-p-t-60": { "": { "!paddingTop": "60rpx" } }, "up-p-t-60": { "": { "!paddingTop": "60rpx" } }, "u-margin-top-60": { "": { "!marginTop": "60rpx" } }, "up-margin-top-60": { "": { "!marginTop": "60rpx" } }, "u-padding-top-60": { "": { "!paddingTop": "60rpx" } }, "up-padding-top-60": { "": { "!paddingTop": "60rpx" } }, "u-m-r-60": { "": { "!marginRight": "60rpx" } }, "up-m-r-60": { "": { "!marginRight": "60rpx" } }, "u-p-r-60": { "": { "!paddingRight": "60rpx" } }, "up-p-r-60": { "": { "!paddingRight": "60rpx" } }, "u-margin-right-60": { "": { "!marginRight": "60rpx" } }, "up-margin-right-60": { "": { "!marginRight": "60rpx" } }, "u-padding-right-60": { "": { "!paddingRight": "60rpx" } }, "up-padding-right-60": { "": { "!paddingRight": "60rpx" } }, "u-m-b-60": { "": { "!marginBottom": "60rpx" } }, "up-m-b-60": { "": { "!marginBottom": "60rpx" } }, "u-p-b-60": { "": { "!paddingBottom": "60rpx" } }, "up-p-b-60": { "": { "!paddingBottom": "60rpx" } }, "u-margin-bottom-60": { "": { "!marginBottom": "60rpx" } }, "up-margin-bottom-60": { "": { "!marginBottom": "60rpx" } }, "u-padding-bottom-60": { "": { "!paddingBottom": "60rpx" } }, "up-padding-bottom-60": { "": { "!paddingBottom": "60rpx" } }, "u-margin-62": { "": { "!marginTop": "62rpx", "!marginRight": "62rpx", "!marginBottom": "62rpx", "!marginLeft": "62rpx" } }, "u-m-62": { "": { "!marginTop": "62rpx", "!marginRight": "62rpx", "!marginBottom": "62rpx", "!marginLeft": "62rpx" } }, "up-margin-62": { "": { "!marginTop": "62rpx", "!marginRight": "62rpx", "!marginBottom": "62rpx", "!marginLeft": "62rpx" } }, "up-m-62": { "": { "!marginTop": "62rpx", "!marginRight": "62rpx", "!marginBottom": "62rpx", "!marginLeft": "62rpx" } }, "u-padding-62": { "": { "!paddingTop": "62rpx", "!paddingRight": "62rpx", "!paddingBottom": "62rpx", "!paddingLeft": "62rpx" } }, "u-p-62": { "": { "!paddingTop": "62rpx", "!paddingRight": "62rpx", "!paddingBottom": "62rpx", "!paddingLeft": "62rpx" } }, "up-padding-62": { "": { "!paddingTop": "62rpx", "!paddingRight": "62rpx", "!paddingBottom": "62rpx", "!paddingLeft": "62rpx" } }, "up-p-62": { "": { "!paddingTop": "62rpx", "!paddingRight": "62rpx", "!paddingBottom": "62rpx", "!paddingLeft": "62rpx" } }, "u-m-l-62": { "": { "!marginLeft": "62rpx" } }, "up-m-l-62": { "": { "!marginLeft": "62rpx" } }, "u-p-l-62": { "": { "!paddingLeft": "62rpx" } }, "up-p-l-62": { "": { "!paddingLeft": "62rpx" } }, "u-margin-left-62": { "": { "!marginLeft": "62rpx" } }, "up-margin-left-62": { "": { "!marginLeft": "62rpx" } }, "u-padding-left-62": { "": { "!paddingLeft": "62rpx" } }, "up-padding-left-62": { "": { "!paddingLeft": "62rpx" } }, "u-m-t-62": { "": { "!marginTop": "62rpx" } }, "up-m-t-62": { "": { "!marginTop": "62rpx" } }, "u-p-t-62": { "": { "!paddingTop": "62rpx" } }, "up-p-t-62": { "": { "!paddingTop": "62rpx" } }, "u-margin-top-62": { "": { "!marginTop": "62rpx" } }, "up-margin-top-62": { "": { "!marginTop": "62rpx" } }, "u-padding-top-62": { "": { "!paddingTop": "62rpx" } }, "up-padding-top-62": { "": { "!paddingTop": "62rpx" } }, "u-m-r-62": { "": { "!marginRight": "62rpx" } }, "up-m-r-62": { "": { "!marginRight": "62rpx" } }, "u-p-r-62": { "": { "!paddingRight": "62rpx" } }, "up-p-r-62": { "": { "!paddingRight": "62rpx" } }, "u-margin-right-62": { "": { "!marginRight": "62rpx" } }, "up-margin-right-62": { "": { "!marginRight": "62rpx" } }, "u-padding-right-62": { "": { "!paddingRight": "62rpx" } }, "up-padding-right-62": { "": { "!paddingRight": "62rpx" } }, "u-m-b-62": { "": { "!marginBottom": "62rpx" } }, "up-m-b-62": { "": { "!marginBottom": "62rpx" } }, "u-p-b-62": { "": { "!paddingBottom": "62rpx" } }, "up-p-b-62": { "": { "!paddingBottom": "62rpx" } }, "u-margin-bottom-62": { "": { "!marginBottom": "62rpx" } }, "up-margin-bottom-62": { "": { "!marginBottom": "62rpx" } }, "u-padding-bottom-62": { "": { "!paddingBottom": "62rpx" } }, "up-padding-bottom-62": { "": { "!paddingBottom": "62rpx" } }, "u-margin-64": { "": { "!marginTop": "64rpx", "!marginRight": "64rpx", "!marginBottom": "64rpx", "!marginLeft": "64rpx" } }, "u-m-64": { "": { "!marginTop": "64rpx", "!marginRight": "64rpx", "!marginBottom": "64rpx", "!marginLeft": "64rpx" } }, "up-margin-64": { "": { "!marginTop": "64rpx", "!marginRight": "64rpx", "!marginBottom": "64rpx", "!marginLeft": "64rpx" } }, "up-m-64": { "": { "!marginTop": "64rpx", "!marginRight": "64rpx", "!marginBottom": "64rpx", "!marginLeft": "64rpx" } }, "u-padding-64": { "": { "!paddingTop": "64rpx", "!paddingRight": "64rpx", "!paddingBottom": "64rpx", "!paddingLeft": "64rpx" } }, "u-p-64": { "": { "!paddingTop": "64rpx", "!paddingRight": "64rpx", "!paddingBottom": "64rpx", "!paddingLeft": "64rpx" } }, "up-padding-64": { "": { "!paddingTop": "64rpx", "!paddingRight": "64rpx", "!paddingBottom": "64rpx", "!paddingLeft": "64rpx" } }, "up-p-64": { "": { "!paddingTop": "64rpx", "!paddingRight": "64rpx", "!paddingBottom": "64rpx", "!paddingLeft": "64rpx" } }, "u-m-l-64": { "": { "!marginLeft": "64rpx" } }, "up-m-l-64": { "": { "!marginLeft": "64rpx" } }, "u-p-l-64": { "": { "!paddingLeft": "64rpx" } }, "up-p-l-64": { "": { "!paddingLeft": "64rpx" } }, "u-margin-left-64": { "": { "!marginLeft": "64rpx" } }, "up-margin-left-64": { "": { "!marginLeft": "64rpx" } }, "u-padding-left-64": { "": { "!paddingLeft": "64rpx" } }, "up-padding-left-64": { "": { "!paddingLeft": "64rpx" } }, "u-m-t-64": { "": { "!marginTop": "64rpx" } }, "up-m-t-64": { "": { "!marginTop": "64rpx" } }, "u-p-t-64": { "": { "!paddingTop": "64rpx" } }, "up-p-t-64": { "": { "!paddingTop": "64rpx" } }, "u-margin-top-64": { "": { "!marginTop": "64rpx" } }, "up-margin-top-64": { "": { "!marginTop": "64rpx" } }, "u-padding-top-64": { "": { "!paddingTop": "64rpx" } }, "up-padding-top-64": { "": { "!paddingTop": "64rpx" } }, "u-m-r-64": { "": { "!marginRight": "64rpx" } }, "up-m-r-64": { "": { "!marginRight": "64rpx" } }, "u-p-r-64": { "": { "!paddingRight": "64rpx" } }, "up-p-r-64": { "": { "!paddingRight": "64rpx" } }, "u-margin-right-64": { "": { "!marginRight": "64rpx" } }, "up-margin-right-64": { "": { "!marginRight": "64rpx" } }, "u-padding-right-64": { "": { "!paddingRight": "64rpx" } }, "up-padding-right-64": { "": { "!paddingRight": "64rpx" } }, "u-m-b-64": { "": { "!marginBottom": "64rpx" } }, "up-m-b-64": { "": { "!marginBottom": "64rpx" } }, "u-p-b-64": { "": { "!paddingBottom": "64rpx" } }, "up-p-b-64": { "": { "!paddingBottom": "64rpx" } }, "u-margin-bottom-64": { "": { "!marginBottom": "64rpx" } }, "up-margin-bottom-64": { "": { "!marginBottom": "64rpx" } }, "u-padding-bottom-64": { "": { "!paddingBottom": "64rpx" } }, "up-padding-bottom-64": { "": { "!paddingBottom": "64rpx" } }, "u-margin-65": { "": { "!marginTop": "65rpx", "!marginRight": "65rpx", "!marginBottom": "65rpx", "!marginLeft": "65rpx" } }, "u-m-65": { "": { "!marginTop": "65rpx", "!marginRight": "65rpx", "!marginBottom": "65rpx", "!marginLeft": "65rpx" } }, "up-margin-65": { "": { "!marginTop": "65rpx", "!marginRight": "65rpx", "!marginBottom": "65rpx", "!marginLeft": "65rpx" } }, "up-m-65": { "": { "!marginTop": "65rpx", "!marginRight": "65rpx", "!marginBottom": "65rpx", "!marginLeft": "65rpx" } }, "u-padding-65": { "": { "!paddingTop": "65rpx", "!paddingRight": "65rpx", "!paddingBottom": "65rpx", "!paddingLeft": "65rpx" } }, "u-p-65": { "": { "!paddingTop": "65rpx", "!paddingRight": "65rpx", "!paddingBottom": "65rpx", "!paddingLeft": "65rpx" } }, "up-padding-65": { "": { "!paddingTop": "65rpx", "!paddingRight": "65rpx", "!paddingBottom": "65rpx", "!paddingLeft": "65rpx" } }, "up-p-65": { "": { "!paddingTop": "65rpx", "!paddingRight": "65rpx", "!paddingBottom": "65rpx", "!paddingLeft": "65rpx" } }, "u-m-l-65": { "": { "!marginLeft": "65rpx" } }, "up-m-l-65": { "": { "!marginLeft": "65rpx" } }, "u-p-l-65": { "": { "!paddingLeft": "65rpx" } }, "up-p-l-65": { "": { "!paddingLeft": "65rpx" } }, "u-margin-left-65": { "": { "!marginLeft": "65rpx" } }, "up-margin-left-65": { "": { "!marginLeft": "65rpx" } }, "u-padding-left-65": { "": { "!paddingLeft": "65rpx" } }, "up-padding-left-65": { "": { "!paddingLeft": "65rpx" } }, "u-m-t-65": { "": { "!marginTop": "65rpx" } }, "up-m-t-65": { "": { "!marginTop": "65rpx" } }, "u-p-t-65": { "": { "!paddingTop": "65rpx" } }, "up-p-t-65": { "": { "!paddingTop": "65rpx" } }, "u-margin-top-65": { "": { "!marginTop": "65rpx" } }, "up-margin-top-65": { "": { "!marginTop": "65rpx" } }, "u-padding-top-65": { "": { "!paddingTop": "65rpx" } }, "up-padding-top-65": { "": { "!paddingTop": "65rpx" } }, "u-m-r-65": { "": { "!marginRight": "65rpx" } }, "up-m-r-65": { "": { "!marginRight": "65rpx" } }, "u-p-r-65": { "": { "!paddingRight": "65rpx" } }, "up-p-r-65": { "": { "!paddingRight": "65rpx" } }, "u-margin-right-65": { "": { "!marginRight": "65rpx" } }, "up-margin-right-65": { "": { "!marginRight": "65rpx" } }, "u-padding-right-65": { "": { "!paddingRight": "65rpx" } }, "up-padding-right-65": { "": { "!paddingRight": "65rpx" } }, "u-m-b-65": { "": { "!marginBottom": "65rpx" } }, "up-m-b-65": { "": { "!marginBottom": "65rpx" } }, "u-p-b-65": { "": { "!paddingBottom": "65rpx" } }, "up-p-b-65": { "": { "!paddingBottom": "65rpx" } }, "u-margin-bottom-65": { "": { "!marginBottom": "65rpx" } }, "up-margin-bottom-65": { "": { "!marginBottom": "65rpx" } }, "u-padding-bottom-65": { "": { "!paddingBottom": "65rpx" } }, "up-padding-bottom-65": { "": { "!paddingBottom": "65rpx" } }, "u-margin-66": { "": { "!marginTop": "66rpx", "!marginRight": "66rpx", "!marginBottom": "66rpx", "!marginLeft": "66rpx" } }, "u-m-66": { "": { "!marginTop": "66rpx", "!marginRight": "66rpx", "!marginBottom": "66rpx", "!marginLeft": "66rpx" } }, "up-margin-66": { "": { "!marginTop": "66rpx", "!marginRight": "66rpx", "!marginBottom": "66rpx", "!marginLeft": "66rpx" } }, "up-m-66": { "": { "!marginTop": "66rpx", "!marginRight": "66rpx", "!marginBottom": "66rpx", "!marginLeft": "66rpx" } }, "u-padding-66": { "": { "!paddingTop": "66rpx", "!paddingRight": "66rpx", "!paddingBottom": "66rpx", "!paddingLeft": "66rpx" } }, "u-p-66": { "": { "!paddingTop": "66rpx", "!paddingRight": "66rpx", "!paddingBottom": "66rpx", "!paddingLeft": "66rpx" } }, "up-padding-66": { "": { "!paddingTop": "66rpx", "!paddingRight": "66rpx", "!paddingBottom": "66rpx", "!paddingLeft": "66rpx" } }, "up-p-66": { "": { "!paddingTop": "66rpx", "!paddingRight": "66rpx", "!paddingBottom": "66rpx", "!paddingLeft": "66rpx" } }, "u-m-l-66": { "": { "!marginLeft": "66rpx" } }, "up-m-l-66": { "": { "!marginLeft": "66rpx" } }, "u-p-l-66": { "": { "!paddingLeft": "66rpx" } }, "up-p-l-66": { "": { "!paddingLeft": "66rpx" } }, "u-margin-left-66": { "": { "!marginLeft": "66rpx" } }, "up-margin-left-66": { "": { "!marginLeft": "66rpx" } }, "u-padding-left-66": { "": { "!paddingLeft": "66rpx" } }, "up-padding-left-66": { "": { "!paddingLeft": "66rpx" } }, "u-m-t-66": { "": { "!marginTop": "66rpx" } }, "up-m-t-66": { "": { "!marginTop": "66rpx" } }, "u-p-t-66": { "": { "!paddingTop": "66rpx" } }, "up-p-t-66": { "": { "!paddingTop": "66rpx" } }, "u-margin-top-66": { "": { "!marginTop": "66rpx" } }, "up-margin-top-66": { "": { "!marginTop": "66rpx" } }, "u-padding-top-66": { "": { "!paddingTop": "66rpx" } }, "up-padding-top-66": { "": { "!paddingTop": "66rpx" } }, "u-m-r-66": { "": { "!marginRight": "66rpx" } }, "up-m-r-66": { "": { "!marginRight": "66rpx" } }, "u-p-r-66": { "": { "!paddingRight": "66rpx" } }, "up-p-r-66": { "": { "!paddingRight": "66rpx" } }, "u-margin-right-66": { "": { "!marginRight": "66rpx" } }, "up-margin-right-66": { "": { "!marginRight": "66rpx" } }, "u-padding-right-66": { "": { "!paddingRight": "66rpx" } }, "up-padding-right-66": { "": { "!paddingRight": "66rpx" } }, "u-m-b-66": { "": { "!marginBottom": "66rpx" } }, "up-m-b-66": { "": { "!marginBottom": "66rpx" } }, "u-p-b-66": { "": { "!paddingBottom": "66rpx" } }, "up-p-b-66": { "": { "!paddingBottom": "66rpx" } }, "u-margin-bottom-66": { "": { "!marginBottom": "66rpx" } }, "up-margin-bottom-66": { "": { "!marginBottom": "66rpx" } }, "u-padding-bottom-66": { "": { "!paddingBottom": "66rpx" } }, "up-padding-bottom-66": { "": { "!paddingBottom": "66rpx" } }, "u-margin-68": { "": { "!marginTop": "68rpx", "!marginRight": "68rpx", "!marginBottom": "68rpx", "!marginLeft": "68rpx" } }, "u-m-68": { "": { "!marginTop": "68rpx", "!marginRight": "68rpx", "!marginBottom": "68rpx", "!marginLeft": "68rpx" } }, "up-margin-68": { "": { "!marginTop": "68rpx", "!marginRight": "68rpx", "!marginBottom": "68rpx", "!marginLeft": "68rpx" } }, "up-m-68": { "": { "!marginTop": "68rpx", "!marginRight": "68rpx", "!marginBottom": "68rpx", "!marginLeft": "68rpx" } }, "u-padding-68": { "": { "!paddingTop": "68rpx", "!paddingRight": "68rpx", "!paddingBottom": "68rpx", "!paddingLeft": "68rpx" } }, "u-p-68": { "": { "!paddingTop": "68rpx", "!paddingRight": "68rpx", "!paddingBottom": "68rpx", "!paddingLeft": "68rpx" } }, "up-padding-68": { "": { "!paddingTop": "68rpx", "!paddingRight": "68rpx", "!paddingBottom": "68rpx", "!paddingLeft": "68rpx" } }, "up-p-68": { "": { "!paddingTop": "68rpx", "!paddingRight": "68rpx", "!paddingBottom": "68rpx", "!paddingLeft": "68rpx" } }, "u-m-l-68": { "": { "!marginLeft": "68rpx" } }, "up-m-l-68": { "": { "!marginLeft": "68rpx" } }, "u-p-l-68": { "": { "!paddingLeft": "68rpx" } }, "up-p-l-68": { "": { "!paddingLeft": "68rpx" } }, "u-margin-left-68": { "": { "!marginLeft": "68rpx" } }, "up-margin-left-68": { "": { "!marginLeft": "68rpx" } }, "u-padding-left-68": { "": { "!paddingLeft": "68rpx" } }, "up-padding-left-68": { "": { "!paddingLeft": "68rpx" } }, "u-m-t-68": { "": { "!marginTop": "68rpx" } }, "up-m-t-68": { "": { "!marginTop": "68rpx" } }, "u-p-t-68": { "": { "!paddingTop": "68rpx" } }, "up-p-t-68": { "": { "!paddingTop": "68rpx" } }, "u-margin-top-68": { "": { "!marginTop": "68rpx" } }, "up-margin-top-68": { "": { "!marginTop": "68rpx" } }, "u-padding-top-68": { "": { "!paddingTop": "68rpx" } }, "up-padding-top-68": { "": { "!paddingTop": "68rpx" } }, "u-m-r-68": { "": { "!marginRight": "68rpx" } }, "up-m-r-68": { "": { "!marginRight": "68rpx" } }, "u-p-r-68": { "": { "!paddingRight": "68rpx" } }, "up-p-r-68": { "": { "!paddingRight": "68rpx" } }, "u-margin-right-68": { "": { "!marginRight": "68rpx" } }, "up-margin-right-68": { "": { "!marginRight": "68rpx" } }, "u-padding-right-68": { "": { "!paddingRight": "68rpx" } }, "up-padding-right-68": { "": { "!paddingRight": "68rpx" } }, "u-m-b-68": { "": { "!marginBottom": "68rpx" } }, "up-m-b-68": { "": { "!marginBottom": "68rpx" } }, "u-p-b-68": { "": { "!paddingBottom": "68rpx" } }, "up-p-b-68": { "": { "!paddingBottom": "68rpx" } }, "u-margin-bottom-68": { "": { "!marginBottom": "68rpx" } }, "up-margin-bottom-68": { "": { "!marginBottom": "68rpx" } }, "u-padding-bottom-68": { "": { "!paddingBottom": "68rpx" } }, "up-padding-bottom-68": { "": { "!paddingBottom": "68rpx" } }, "u-margin-70": { "": { "!marginTop": "70rpx", "!marginRight": "70rpx", "!marginBottom": "70rpx", "!marginLeft": "70rpx" } }, "u-m-70": { "": { "!marginTop": "70rpx", "!marginRight": "70rpx", "!marginBottom": "70rpx", "!marginLeft": "70rpx" } }, "up-margin-70": { "": { "!marginTop": "70rpx", "!marginRight": "70rpx", "!marginBottom": "70rpx", "!marginLeft": "70rpx" } }, "up-m-70": { "": { "!marginTop": "70rpx", "!marginRight": "70rpx", "!marginBottom": "70rpx", "!marginLeft": "70rpx" } }, "u-padding-70": { "": { "!paddingTop": "70rpx", "!paddingRight": "70rpx", "!paddingBottom": "70rpx", "!paddingLeft": "70rpx" } }, "u-p-70": { "": { "!paddingTop": "70rpx", "!paddingRight": "70rpx", "!paddingBottom": "70rpx", "!paddingLeft": "70rpx" } }, "up-padding-70": { "": { "!paddingTop": "70rpx", "!paddingRight": "70rpx", "!paddingBottom": "70rpx", "!paddingLeft": "70rpx" } }, "up-p-70": { "": { "!paddingTop": "70rpx", "!paddingRight": "70rpx", "!paddingBottom": "70rpx", "!paddingLeft": "70rpx" } }, "u-m-l-70": { "": { "!marginLeft": "70rpx" } }, "up-m-l-70": { "": { "!marginLeft": "70rpx" } }, "u-p-l-70": { "": { "!paddingLeft": "70rpx" } }, "up-p-l-70": { "": { "!paddingLeft": "70rpx" } }, "u-margin-left-70": { "": { "!marginLeft": "70rpx" } }, "up-margin-left-70": { "": { "!marginLeft": "70rpx" } }, "u-padding-left-70": { "": { "!paddingLeft": "70rpx" } }, "up-padding-left-70": { "": { "!paddingLeft": "70rpx" } }, "u-m-t-70": { "": { "!marginTop": "70rpx" } }, "up-m-t-70": { "": { "!marginTop": "70rpx" } }, "u-p-t-70": { "": { "!paddingTop": "70rpx" } }, "up-p-t-70": { "": { "!paddingTop": "70rpx" } }, "u-margin-top-70": { "": { "!marginTop": "70rpx" } }, "up-margin-top-70": { "": { "!marginTop": "70rpx" } }, "u-padding-top-70": { "": { "!paddingTop": "70rpx" } }, "up-padding-top-70": { "": { "!paddingTop": "70rpx" } }, "u-m-r-70": { "": { "!marginRight": "70rpx" } }, "up-m-r-70": { "": { "!marginRight": "70rpx" } }, "u-p-r-70": { "": { "!paddingRight": "70rpx" } }, "up-p-r-70": { "": { "!paddingRight": "70rpx" } }, "u-margin-right-70": { "": { "!marginRight": "70rpx" } }, "up-margin-right-70": { "": { "!marginRight": "70rpx" } }, "u-padding-right-70": { "": { "!paddingRight": "70rpx" } }, "up-padding-right-70": { "": { "!paddingRight": "70rpx" } }, "u-m-b-70": { "": { "!marginBottom": "70rpx" } }, "up-m-b-70": { "": { "!marginBottom": "70rpx" } }, "u-p-b-70": { "": { "!paddingBottom": "70rpx" } }, "up-p-b-70": { "": { "!paddingBottom": "70rpx" } }, "u-margin-bottom-70": { "": { "!marginBottom": "70rpx" } }, "up-margin-bottom-70": { "": { "!marginBottom": "70rpx" } }, "u-padding-bottom-70": { "": { "!paddingBottom": "70rpx" } }, "up-padding-bottom-70": { "": { "!paddingBottom": "70rpx" } }, "u-margin-72": { "": { "!marginTop": "72rpx", "!marginRight": "72rpx", "!marginBottom": "72rpx", "!marginLeft": "72rpx" } }, "u-m-72": { "": { "!marginTop": "72rpx", "!marginRight": "72rpx", "!marginBottom": "72rpx", "!marginLeft": "72rpx" } }, "up-margin-72": { "": { "!marginTop": "72rpx", "!marginRight": "72rpx", "!marginBottom": "72rpx", "!marginLeft": "72rpx" } }, "up-m-72": { "": { "!marginTop": "72rpx", "!marginRight": "72rpx", "!marginBottom": "72rpx", "!marginLeft": "72rpx" } }, "u-padding-72": { "": { "!paddingTop": "72rpx", "!paddingRight": "72rpx", "!paddingBottom": "72rpx", "!paddingLeft": "72rpx" } }, "u-p-72": { "": { "!paddingTop": "72rpx", "!paddingRight": "72rpx", "!paddingBottom": "72rpx", "!paddingLeft": "72rpx" } }, "up-padding-72": { "": { "!paddingTop": "72rpx", "!paddingRight": "72rpx", "!paddingBottom": "72rpx", "!paddingLeft": "72rpx" } }, "up-p-72": { "": { "!paddingTop": "72rpx", "!paddingRight": "72rpx", "!paddingBottom": "72rpx", "!paddingLeft": "72rpx" } }, "u-m-l-72": { "": { "!marginLeft": "72rpx" } }, "up-m-l-72": { "": { "!marginLeft": "72rpx" } }, "u-p-l-72": { "": { "!paddingLeft": "72rpx" } }, "up-p-l-72": { "": { "!paddingLeft": "72rpx" } }, "u-margin-left-72": { "": { "!marginLeft": "72rpx" } }, "up-margin-left-72": { "": { "!marginLeft": "72rpx" } }, "u-padding-left-72": { "": { "!paddingLeft": "72rpx" } }, "up-padding-left-72": { "": { "!paddingLeft": "72rpx" } }, "u-m-t-72": { "": { "!marginTop": "72rpx" } }, "up-m-t-72": { "": { "!marginTop": "72rpx" } }, "u-p-t-72": { "": { "!paddingTop": "72rpx" } }, "up-p-t-72": { "": { "!paddingTop": "72rpx" } }, "u-margin-top-72": { "": { "!marginTop": "72rpx" } }, "up-margin-top-72": { "": { "!marginTop": "72rpx" } }, "u-padding-top-72": { "": { "!paddingTop": "72rpx" } }, "up-padding-top-72": { "": { "!paddingTop": "72rpx" } }, "u-m-r-72": { "": { "!marginRight": "72rpx" } }, "up-m-r-72": { "": { "!marginRight": "72rpx" } }, "u-p-r-72": { "": { "!paddingRight": "72rpx" } }, "up-p-r-72": { "": { "!paddingRight": "72rpx" } }, "u-margin-right-72": { "": { "!marginRight": "72rpx" } }, "up-margin-right-72": { "": { "!marginRight": "72rpx" } }, "u-padding-right-72": { "": { "!paddingRight": "72rpx" } }, "up-padding-right-72": { "": { "!paddingRight": "72rpx" } }, "u-m-b-72": { "": { "!marginBottom": "72rpx" } }, "up-m-b-72": { "": { "!marginBottom": "72rpx" } }, "u-p-b-72": { "": { "!paddingBottom": "72rpx" } }, "up-p-b-72": { "": { "!paddingBottom": "72rpx" } }, "u-margin-bottom-72": { "": { "!marginBottom": "72rpx" } }, "up-margin-bottom-72": { "": { "!marginBottom": "72rpx" } }, "u-padding-bottom-72": { "": { "!paddingBottom": "72rpx" } }, "up-padding-bottom-72": { "": { "!paddingBottom": "72rpx" } }, "u-margin-74": { "": { "!marginTop": "74rpx", "!marginRight": "74rpx", "!marginBottom": "74rpx", "!marginLeft": "74rpx" } }, "u-m-74": { "": { "!marginTop": "74rpx", "!marginRight": "74rpx", "!marginBottom": "74rpx", "!marginLeft": "74rpx" } }, "up-margin-74": { "": { "!marginTop": "74rpx", "!marginRight": "74rpx", "!marginBottom": "74rpx", "!marginLeft": "74rpx" } }, "up-m-74": { "": { "!marginTop": "74rpx", "!marginRight": "74rpx", "!marginBottom": "74rpx", "!marginLeft": "74rpx" } }, "u-padding-74": { "": { "!paddingTop": "74rpx", "!paddingRight": "74rpx", "!paddingBottom": "74rpx", "!paddingLeft": "74rpx" } }, "u-p-74": { "": { "!paddingTop": "74rpx", "!paddingRight": "74rpx", "!paddingBottom": "74rpx", "!paddingLeft": "74rpx" } }, "up-padding-74": { "": { "!paddingTop": "74rpx", "!paddingRight": "74rpx", "!paddingBottom": "74rpx", "!paddingLeft": "74rpx" } }, "up-p-74": { "": { "!paddingTop": "74rpx", "!paddingRight": "74rpx", "!paddingBottom": "74rpx", "!paddingLeft": "74rpx" } }, "u-m-l-74": { "": { "!marginLeft": "74rpx" } }, "up-m-l-74": { "": { "!marginLeft": "74rpx" } }, "u-p-l-74": { "": { "!paddingLeft": "74rpx" } }, "up-p-l-74": { "": { "!paddingLeft": "74rpx" } }, "u-margin-left-74": { "": { "!marginLeft": "74rpx" } }, "up-margin-left-74": { "": { "!marginLeft": "74rpx" } }, "u-padding-left-74": { "": { "!paddingLeft": "74rpx" } }, "up-padding-left-74": { "": { "!paddingLeft": "74rpx" } }, "u-m-t-74": { "": { "!marginTop": "74rpx" } }, "up-m-t-74": { "": { "!marginTop": "74rpx" } }, "u-p-t-74": { "": { "!paddingTop": "74rpx" } }, "up-p-t-74": { "": { "!paddingTop": "74rpx" } }, "u-margin-top-74": { "": { "!marginTop": "74rpx" } }, "up-margin-top-74": { "": { "!marginTop": "74rpx" } }, "u-padding-top-74": { "": { "!paddingTop": "74rpx" } }, "up-padding-top-74": { "": { "!paddingTop": "74rpx" } }, "u-m-r-74": { "": { "!marginRight": "74rpx" } }, "up-m-r-74": { "": { "!marginRight": "74rpx" } }, "u-p-r-74": { "": { "!paddingRight": "74rpx" } }, "up-p-r-74": { "": { "!paddingRight": "74rpx" } }, "u-margin-right-74": { "": { "!marginRight": "74rpx" } }, "up-margin-right-74": { "": { "!marginRight": "74rpx" } }, "u-padding-right-74": { "": { "!paddingRight": "74rpx" } }, "up-padding-right-74": { "": { "!paddingRight": "74rpx" } }, "u-m-b-74": { "": { "!marginBottom": "74rpx" } }, "up-m-b-74": { "": { "!marginBottom": "74rpx" } }, "u-p-b-74": { "": { "!paddingBottom": "74rpx" } }, "up-p-b-74": { "": { "!paddingBottom": "74rpx" } }, "u-margin-bottom-74": { "": { "!marginBottom": "74rpx" } }, "up-margin-bottom-74": { "": { "!marginBottom": "74rpx" } }, "u-padding-bottom-74": { "": { "!paddingBottom": "74rpx" } }, "up-padding-bottom-74": { "": { "!paddingBottom": "74rpx" } }, "u-margin-75": { "": { "!marginTop": "75rpx", "!marginRight": "75rpx", "!marginBottom": "75rpx", "!marginLeft": "75rpx" } }, "u-m-75": { "": { "!marginTop": "75rpx", "!marginRight": "75rpx", "!marginBottom": "75rpx", "!marginLeft": "75rpx" } }, "up-margin-75": { "": { "!marginTop": "75rpx", "!marginRight": "75rpx", "!marginBottom": "75rpx", "!marginLeft": "75rpx" } }, "up-m-75": { "": { "!marginTop": "75rpx", "!marginRight": "75rpx", "!marginBottom": "75rpx", "!marginLeft": "75rpx" } }, "u-padding-75": { "": { "!paddingTop": "75rpx", "!paddingRight": "75rpx", "!paddingBottom": "75rpx", "!paddingLeft": "75rpx" } }, "u-p-75": { "": { "!paddingTop": "75rpx", "!paddingRight": "75rpx", "!paddingBottom": "75rpx", "!paddingLeft": "75rpx" } }, "up-padding-75": { "": { "!paddingTop": "75rpx", "!paddingRight": "75rpx", "!paddingBottom": "75rpx", "!paddingLeft": "75rpx" } }, "up-p-75": { "": { "!paddingTop": "75rpx", "!paddingRight": "75rpx", "!paddingBottom": "75rpx", "!paddingLeft": "75rpx" } }, "u-m-l-75": { "": { "!marginLeft": "75rpx" } }, "up-m-l-75": { "": { "!marginLeft": "75rpx" } }, "u-p-l-75": { "": { "!paddingLeft": "75rpx" } }, "up-p-l-75": { "": { "!paddingLeft": "75rpx" } }, "u-margin-left-75": { "": { "!marginLeft": "75rpx" } }, "up-margin-left-75": { "": { "!marginLeft": "75rpx" } }, "u-padding-left-75": { "": { "!paddingLeft": "75rpx" } }, "up-padding-left-75": { "": { "!paddingLeft": "75rpx" } }, "u-m-t-75": { "": { "!marginTop": "75rpx" } }, "up-m-t-75": { "": { "!marginTop": "75rpx" } }, "u-p-t-75": { "": { "!paddingTop": "75rpx" } }, "up-p-t-75": { "": { "!paddingTop": "75rpx" } }, "u-margin-top-75": { "": { "!marginTop": "75rpx" } }, "up-margin-top-75": { "": { "!marginTop": "75rpx" } }, "u-padding-top-75": { "": { "!paddingTop": "75rpx" } }, "up-padding-top-75": { "": { "!paddingTop": "75rpx" } }, "u-m-r-75": { "": { "!marginRight": "75rpx" } }, "up-m-r-75": { "": { "!marginRight": "75rpx" } }, "u-p-r-75": { "": { "!paddingRight": "75rpx" } }, "up-p-r-75": { "": { "!paddingRight": "75rpx" } }, "u-margin-right-75": { "": { "!marginRight": "75rpx" } }, "up-margin-right-75": { "": { "!marginRight": "75rpx" } }, "u-padding-right-75": { "": { "!paddingRight": "75rpx" } }, "up-padding-right-75": { "": { "!paddingRight": "75rpx" } }, "u-m-b-75": { "": { "!marginBottom": "75rpx" } }, "up-m-b-75": { "": { "!marginBottom": "75rpx" } }, "u-p-b-75": { "": { "!paddingBottom": "75rpx" } }, "up-p-b-75": { "": { "!paddingBottom": "75rpx" } }, "u-margin-bottom-75": { "": { "!marginBottom": "75rpx" } }, "up-margin-bottom-75": { "": { "!marginBottom": "75rpx" } }, "u-padding-bottom-75": { "": { "!paddingBottom": "75rpx" } }, "up-padding-bottom-75": { "": { "!paddingBottom": "75rpx" } }, "u-margin-76": { "": { "!marginTop": "76rpx", "!marginRight": "76rpx", "!marginBottom": "76rpx", "!marginLeft": "76rpx" } }, "u-m-76": { "": { "!marginTop": "76rpx", "!marginRight": "76rpx", "!marginBottom": "76rpx", "!marginLeft": "76rpx" } }, "up-margin-76": { "": { "!marginTop": "76rpx", "!marginRight": "76rpx", "!marginBottom": "76rpx", "!marginLeft": "76rpx" } }, "up-m-76": { "": { "!marginTop": "76rpx", "!marginRight": "76rpx", "!marginBottom": "76rpx", "!marginLeft": "76rpx" } }, "u-padding-76": { "": { "!paddingTop": "76rpx", "!paddingRight": "76rpx", "!paddingBottom": "76rpx", "!paddingLeft": "76rpx" } }, "u-p-76": { "": { "!paddingTop": "76rpx", "!paddingRight": "76rpx", "!paddingBottom": "76rpx", "!paddingLeft": "76rpx" } }, "up-padding-76": { "": { "!paddingTop": "76rpx", "!paddingRight": "76rpx", "!paddingBottom": "76rpx", "!paddingLeft": "76rpx" } }, "up-p-76": { "": { "!paddingTop": "76rpx", "!paddingRight": "76rpx", "!paddingBottom": "76rpx", "!paddingLeft": "76rpx" } }, "u-m-l-76": { "": { "!marginLeft": "76rpx" } }, "up-m-l-76": { "": { "!marginLeft": "76rpx" } }, "u-p-l-76": { "": { "!paddingLeft": "76rpx" } }, "up-p-l-76": { "": { "!paddingLeft": "76rpx" } }, "u-margin-left-76": { "": { "!marginLeft": "76rpx" } }, "up-margin-left-76": { "": { "!marginLeft": "76rpx" } }, "u-padding-left-76": { "": { "!paddingLeft": "76rpx" } }, "up-padding-left-76": { "": { "!paddingLeft": "76rpx" } }, "u-m-t-76": { "": { "!marginTop": "76rpx" } }, "up-m-t-76": { "": { "!marginTop": "76rpx" } }, "u-p-t-76": { "": { "!paddingTop": "76rpx" } }, "up-p-t-76": { "": { "!paddingTop": "76rpx" } }, "u-margin-top-76": { "": { "!marginTop": "76rpx" } }, "up-margin-top-76": { "": { "!marginTop": "76rpx" } }, "u-padding-top-76": { "": { "!paddingTop": "76rpx" } }, "up-padding-top-76": { "": { "!paddingTop": "76rpx" } }, "u-m-r-76": { "": { "!marginRight": "76rpx" } }, "up-m-r-76": { "": { "!marginRight": "76rpx" } }, "u-p-r-76": { "": { "!paddingRight": "76rpx" } }, "up-p-r-76": { "": { "!paddingRight": "76rpx" } }, "u-margin-right-76": { "": { "!marginRight": "76rpx" } }, "up-margin-right-76": { "": { "!marginRight": "76rpx" } }, "u-padding-right-76": { "": { "!paddingRight": "76rpx" } }, "up-padding-right-76": { "": { "!paddingRight": "76rpx" } }, "u-m-b-76": { "": { "!marginBottom": "76rpx" } }, "up-m-b-76": { "": { "!marginBottom": "76rpx" } }, "u-p-b-76": { "": { "!paddingBottom": "76rpx" } }, "up-p-b-76": { "": { "!paddingBottom": "76rpx" } }, "u-margin-bottom-76": { "": { "!marginBottom": "76rpx" } }, "up-margin-bottom-76": { "": { "!marginBottom": "76rpx" } }, "u-padding-bottom-76": { "": { "!paddingBottom": "76rpx" } }, "up-padding-bottom-76": { "": { "!paddingBottom": "76rpx" } }, "u-margin-78": { "": { "!marginTop": "78rpx", "!marginRight": "78rpx", "!marginBottom": "78rpx", "!marginLeft": "78rpx" } }, "u-m-78": { "": { "!marginTop": "78rpx", "!marginRight": "78rpx", "!marginBottom": "78rpx", "!marginLeft": "78rpx" } }, "up-margin-78": { "": { "!marginTop": "78rpx", "!marginRight": "78rpx", "!marginBottom": "78rpx", "!marginLeft": "78rpx" } }, "up-m-78": { "": { "!marginTop": "78rpx", "!marginRight": "78rpx", "!marginBottom": "78rpx", "!marginLeft": "78rpx" } }, "u-padding-78": { "": { "!paddingTop": "78rpx", "!paddingRight": "78rpx", "!paddingBottom": "78rpx", "!paddingLeft": "78rpx" } }, "u-p-78": { "": { "!paddingTop": "78rpx", "!paddingRight": "78rpx", "!paddingBottom": "78rpx", "!paddingLeft": "78rpx" } }, "up-padding-78": { "": { "!paddingTop": "78rpx", "!paddingRight": "78rpx", "!paddingBottom": "78rpx", "!paddingLeft": "78rpx" } }, "up-p-78": { "": { "!paddingTop": "78rpx", "!paddingRight": "78rpx", "!paddingBottom": "78rpx", "!paddingLeft": "78rpx" } }, "u-m-l-78": { "": { "!marginLeft": "78rpx" } }, "up-m-l-78": { "": { "!marginLeft": "78rpx" } }, "u-p-l-78": { "": { "!paddingLeft": "78rpx" } }, "up-p-l-78": { "": { "!paddingLeft": "78rpx" } }, "u-margin-left-78": { "": { "!marginLeft": "78rpx" } }, "up-margin-left-78": { "": { "!marginLeft": "78rpx" } }, "u-padding-left-78": { "": { "!paddingLeft": "78rpx" } }, "up-padding-left-78": { "": { "!paddingLeft": "78rpx" } }, "u-m-t-78": { "": { "!marginTop": "78rpx" } }, "up-m-t-78": { "": { "!marginTop": "78rpx" } }, "u-p-t-78": { "": { "!paddingTop": "78rpx" } }, "up-p-t-78": { "": { "!paddingTop": "78rpx" } }, "u-margin-top-78": { "": { "!marginTop": "78rpx" } }, "up-margin-top-78": { "": { "!marginTop": "78rpx" } }, "u-padding-top-78": { "": { "!paddingTop": "78rpx" } }, "up-padding-top-78": { "": { "!paddingTop": "78rpx" } }, "u-m-r-78": { "": { "!marginRight": "78rpx" } }, "up-m-r-78": { "": { "!marginRight": "78rpx" } }, "u-p-r-78": { "": { "!paddingRight": "78rpx" } }, "up-p-r-78": { "": { "!paddingRight": "78rpx" } }, "u-margin-right-78": { "": { "!marginRight": "78rpx" } }, "up-margin-right-78": { "": { "!marginRight": "78rpx" } }, "u-padding-right-78": { "": { "!paddingRight": "78rpx" } }, "up-padding-right-78": { "": { "!paddingRight": "78rpx" } }, "u-m-b-78": { "": { "!marginBottom": "78rpx" } }, "up-m-b-78": { "": { "!marginBottom": "78rpx" } }, "u-p-b-78": { "": { "!paddingBottom": "78rpx" } }, "up-p-b-78": { "": { "!paddingBottom": "78rpx" } }, "u-margin-bottom-78": { "": { "!marginBottom": "78rpx" } }, "up-margin-bottom-78": { "": { "!marginBottom": "78rpx" } }, "u-padding-bottom-78": { "": { "!paddingBottom": "78rpx" } }, "up-padding-bottom-78": { "": { "!paddingBottom": "78rpx" } }, "u-margin-80": { "": { "!marginTop": "80rpx", "!marginRight": "80rpx", "!marginBottom": "80rpx", "!marginLeft": "80rpx" } }, "u-m-80": { "": { "!marginTop": "80rpx", "!marginRight": "80rpx", "!marginBottom": "80rpx", "!marginLeft": "80rpx" } }, "up-margin-80": { "": { "!marginTop": "80rpx", "!marginRight": "80rpx", "!marginBottom": "80rpx", "!marginLeft": "80rpx" } }, "up-m-80": { "": { "!marginTop": "80rpx", "!marginRight": "80rpx", "!marginBottom": "80rpx", "!marginLeft": "80rpx" } }, "u-padding-80": { "": { "!paddingTop": "80rpx", "!paddingRight": "80rpx", "!paddingBottom": "80rpx", "!paddingLeft": "80rpx" } }, "u-p-80": { "": { "!paddingTop": "80rpx", "!paddingRight": "80rpx", "!paddingBottom": "80rpx", "!paddingLeft": "80rpx" } }, "up-padding-80": { "": { "!paddingTop": "80rpx", "!paddingRight": "80rpx", "!paddingBottom": "80rpx", "!paddingLeft": "80rpx" } }, "up-p-80": { "": { "!paddingTop": "80rpx", "!paddingRight": "80rpx", "!paddingBottom": "80rpx", "!paddingLeft": "80rpx" } }, "u-m-l-80": { "": { "!marginLeft": "80rpx" } }, "up-m-l-80": { "": { "!marginLeft": "80rpx" } }, "u-p-l-80": { "": { "!paddingLeft": "80rpx" } }, "up-p-l-80": { "": { "!paddingLeft": "80rpx" } }, "u-margin-left-80": { "": { "!marginLeft": "80rpx" } }, "up-margin-left-80": { "": { "!marginLeft": "80rpx" } }, "u-padding-left-80": { "": { "!paddingLeft": "80rpx" } }, "up-padding-left-80": { "": { "!paddingLeft": "80rpx" } }, "u-m-t-80": { "": { "!marginTop": "80rpx" } }, "up-m-t-80": { "": { "!marginTop": "80rpx" } }, "u-p-t-80": { "": { "!paddingTop": "80rpx" } }, "up-p-t-80": { "": { "!paddingTop": "80rpx" } }, "u-margin-top-80": { "": { "!marginTop": "80rpx" } }, "up-margin-top-80": { "": { "!marginTop": "80rpx" } }, "u-padding-top-80": { "": { "!paddingTop": "80rpx" } }, "up-padding-top-80": { "": { "!paddingTop": "80rpx" } }, "u-m-r-80": { "": { "!marginRight": "80rpx" } }, "up-m-r-80": { "": { "!marginRight": "80rpx" } }, "u-p-r-80": { "": { "!paddingRight": "80rpx" } }, "up-p-r-80": { "": { "!paddingRight": "80rpx" } }, "u-margin-right-80": { "": { "!marginRight": "80rpx" } }, "up-margin-right-80": { "": { "!marginRight": "80rpx" } }, "u-padding-right-80": { "": { "!paddingRight": "80rpx" } }, "up-padding-right-80": { "": { "!paddingRight": "80rpx" } }, "u-m-b-80": { "": { "!marginBottom": "80rpx" } }, "up-m-b-80": { "": { "!marginBottom": "80rpx" } }, "u-p-b-80": { "": { "!paddingBottom": "80rpx" } }, "up-p-b-80": { "": { "!paddingBottom": "80rpx" } }, "u-margin-bottom-80": { "": { "!marginBottom": "80rpx" } }, "up-margin-bottom-80": { "": { "!marginBottom": "80rpx" } }, "u-padding-bottom-80": { "": { "!paddingBottom": "80rpx" } }, "up-padding-bottom-80": { "": { "!paddingBottom": "80rpx" } }, "u-primary-light": { "": { "color": "#ecf5ff" } }, "u-warning-light": { "": { "color": "#fdf6ec" } }, "u-success-light": { "": { "color": "#f5fff0" } }, "u-error-light": { "": { "color": "#fef0f0" } }, "u-info-light": { "": { "color": "#f4f4f5" } }, "u-primary-light-bg": { "": { "backgroundColor": "#ecf5ff" } }, "u-warning-light-bg": { "": { "backgroundColor": "#fdf6ec" } }, "u-success-light-bg": { "": { "backgroundColor": "#f5fff0" } }, "u-error-light-bg": { "": { "backgroundColor": "#fef0f0" } }, "u-info-light-bg": { "": { "backgroundColor": "#f4f4f5" } }, "u-primary-dark": { "": { "color": "#398ade" } }, "u-warning-dark": { "": { "color": "#f1a532" } }, "u-success-dark": { "": { "color": "#53c21d" } }, "u-error-dark": { "": { "color": "#e45656" } }, "u-info-dark": { "": { "color": "#767a82" } }, "u-primary-dark-bg": { "": { "backgroundColor": "#398ade" } }, "u-warning-dark-bg": { "": { "backgroundColor": "#f1a532" } }, "u-success-dark-bg": { "": { "backgroundColor": "#53c21d" } }, "u-error-dark-bg": { "": { "backgroundColor": "#e45656" } }, "u-info-dark-bg": { "": { "backgroundColor": "#767a82" } }, "u-primary-disabled": { "": { "color": "#9acafc" } }, "u-warning-disabled": { "": { "color": "#f9d39b" } }, "u-success-disabled": { "": { "color": "#a9e08f" } }, "u-error-disabled": { "": { "color": "#f7b2b2" } }, "u-info-disabled": { "": { "color": "#c4c6c9" } }, "u-primary": { "": { "color": "var(--theme-color, #0957de)" } }, "u-warning": { "": { "color": "#f9ae3d" } }, "u-success": { "": { "color": "#5ac725" } }, "u-error": { "": { "color": "#f56c6c" } }, "u-info": { "": { "color": "#909399" } }, "u-primary-bg": { "": { "backgroundColor": "var(--theme-color, #0957de)" } }, "u-warning-bg": { "": { "backgroundColor": "#f9ae3d" } }, "u-success-bg": { "": { "backgroundColor": "#5ac725" } }, "u-error-bg": { "": { "backgroundColor": "#f56c6c" } }, "u-info-bg": { "": { "backgroundColor": "#909399" } }, "u-main-color": { "": { "color": "#303133" } }, "u-content-color": { "": { "color": "#606266" } }, "u-tips-color": { "": { "color": "#909193" } }, "u-light-color": { "": { "color": "#c0c4cc" } }, "up-primary-light": { "": { "color": "#ecf5ff" } }, "up-warning-light": { "": { "color": "#fdf6ec" } }, "up-success-light": { "": { "color": "#f5fff0" } }, "up-error-light": { "": { "color": "#fef0f0" } }, "up-info-light": { "": { "color": "#f4f4f5" } }, "up-primary-light-bg": { "": { "backgroundColor": "#ecf5ff" } }, "up-warning-light-bg": { "": { "backgroundColor": "#fdf6ec" } }, "up-success-light-bg": { "": { "backgroundColor": "#f5fff0" } }, "up-error-light-bg": { "": { "backgroundColor": "#fef0f0" } }, "up-info-light-bg": { "": { "backgroundColor": "#f4f4f5" } }, "up-primary-dark": { "": { "color": "#398ade" } }, "up-warning-dark": { "": { "color": "#f1a532" } }, "up-success-dark": { "": { "color": "#53c21d" } }, "up-error-dark": { "": { "color": "#e45656" } }, "up-info-dark": { "": { "color": "#767a82" } }, "up-primary-dark-bg": { "": { "backgroundColor": "#398ade" } }, "up-warning-dark-bg": { "": { "backgroundColor": "#f1a532" } }, "up-success-dark-bg": { "": { "backgroundColor": "#53c21d" } }, "up-error-dark-bg": { "": { "backgroundColor": "#e45656" } }, "up-info-dark-bg": { "": { "backgroundColor": "#767a82" } }, "up-primary-disabled": { "": { "color": "#9acafc" } }, "up-warning-disabled": { "": { "color": "#f9d39b" } }, "up-success-disabled": { "": { "color": "#a9e08f" } }, "up-error-disabled": { "": { "color": "#f7b2b2" } }, "up-info-disabled": { "": { "color": "#c4c6c9" } }, "up-primary": { "": { "color": "var(--theme-color, #0957de)" } }, "up-warning": { "": { "color": "#f9ae3d" } }, "up-success": { "": { "color": "#5ac725" } }, "up-error": { "": { "color": "#f56c6c" } }, "up-info": { "": { "color": "#909399" } }, "up-primary-bg": { "": { "backgroundColor": "var(--theme-color, #0957de)" } }, "up-warning-bg": { "": { "backgroundColor": "#f9ae3d" } }, "up-success-bg": { "": { "backgroundColor": "#5ac725" } }, "up-error-bg": { "": { "backgroundColor": "#f56c6c" } }, "up-info-bg": { "": { "backgroundColor": "#909399" } }, "up-main-color": { "": { "color": "#303133" } }, "up-content-color": { "": { "color": "#606266" } }, "up-tips-color": { "": { "color": "#909193" } }, "up-light-color": { "": { "color": "#c0c4cc" } }, "u-safe-area-inset-top": { "": { "paddingTop": "var(--uni-safe-area-inset-top)" } }, "up-safe-area-inset-top": { "": { "paddingTop": "var(--uni-safe-area-inset-top)" } }, "u-safe-area-inset-right": { "": { "paddingRight": "var(--uni-safe-area-inset-right)" } }, "up-safe-area-inset-right": { "": { "paddingRight": "var(--uni-safe-area-inset-right)" } }, "u-safe-area-inset-bottom": { "": { "paddingBottom": "var(--uni-safe-area-inset-bottom)" } }, "up-safe-area-inset-bottom": { "": { "paddingBottom": "var(--uni-safe-area-inset-bottom)" } }, "u-safe-area-inset-left": { "": { "paddingLeft": "var(--uni-safe-area-inset-left)" } }, "up-safe-area-inset-left": { "": { "paddingLeft": "var(--uni-safe-area-inset-left)" } }, "test": { "": { "paddingTop": 4, "color": "#FF0000" } }, "page": { "": { "--theme-color": "#37c2bc" } }, "absolute": { "": { "position": "absolute" } }, "bg-__0f172a_": { "": { "backgroundImage": "none", "backgroundColor": "#0f172a" } }, "bg-__10b981_": { "": { "backgroundImage": "none", "backgroundColor": "#10b981" } }, "bg-__19be6b_": { "": { "backgroundImage": "none", "backgroundColor": "#19be6b" } }, "bg-__2563eb_": { "": { "backgroundImage": "none", "backgroundColor": "#2563eb" } }, "bg-__2979ff_": { "": { "backgroundImage": "none", "backgroundColor": "#2979ff" } }, "bg-__3182ce_": { "": { "backgroundImage": "none", "backgroundColor": "#3182ce" } }, "bg-__3b82f6_": { "": { "backgroundImage": "none", "backgroundColor": "#3b82f6" } }, "bg-__a855f7_": { "": { "backgroundImage": "none", "backgroundColor": "#a855f7" } }, "bg-__d1fae5_": { "": { "backgroundImage": "none", "backgroundColor": "#d1fae5" } }, "bg-__e0edff_": { "": { "backgroundImage": "none", "backgroundColor": "#e0edff" } }, "bg-__e2e8f0_": { "": { "backgroundImage": "none", "backgroundColor": "#e2e8f0" } }, "bg-__e5e5e5_": { "": { "backgroundImage": "none", "backgroundColor": "#e5e5e5" } }, "bg-__ef4444_": { "": { "backgroundImage": "none", "backgroundColor": "#ef4444" } }, "bg-__f1f5f9_": { "": { "backgroundImage": "none", "backgroundColor": "#f1f5f9" } }, "bg-__f56c6c_": { "": { "backgroundImage": "none", "backgroundColor": "#f56c6c" } }, "bg-__f59e0b_": { "": { "backgroundImage": "none", "backgroundColor": "#f59e0b" } }, "bg-__f7fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f7fafc" } }, "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "bg-__fee2e2_": { "": { "backgroundImage": "none", "backgroundColor": "#fee2e2" } }, "bg-__fef3c7_": { "": { "backgroundImage": "none", "backgroundColor": "#fef3c7" } }, "bg-__fff_": { "": { "backgroundImage": "none", "backgroundColor": "#ffffff" } }, "bg-__fff1f2_": { "": { "backgroundImage": "none", "backgroundColor": "#fff1f2" } }, "bg-__fff5f5_": { "": { "backgroundImage": "none", "backgroundColor": "#fff5f5" } }, "bg-white": { "": { "backgroundColor": "rgba(255, 255, 255, var(--un-bg-opacity, 1))" } }, "blur": { "": { "filter": "var(--un-blur) var(--un-brightness) var(--un-contrast) var(--un-drop-shadow) var(--un-grayscale) var(--un-hue-rotate) var(--un-invert) var(--un-opacity) var(--un-saturate) var(--un-sepia)", "--un-blur": "blur(8rpx)" } }, "border": { "": { "borderTopWidth": "var(--un-line-width-default, 1px)", "borderRightWidth": "var(--un-line-width-default, 1px)", "borderBottomWidth": "var(--un-line-width-default, 1px)", "borderLeftWidth": "var(--un-line-width-default, 1px)" } }, "border-__e2e8f0_": { "": { "borderTopWidth": "medium", "borderRightWidth": "medium", "borderBottomWidth": "medium", "borderLeftWidth": "medium", "borderTopStyle": "none", "borderRightStyle": "none", "borderBottomStyle": "none", "borderLeftStyle": "none", "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-bottom-color-__f1f5f9_": { "": { "borderBottomColor": "#f1f5f9" } }, "border-bottom-color-__f8fafc_": { "": { "borderBottomColor": "#f8fafc" } }, "border-bottom-style-solid": { "": { "borderBottomStyle": "solid" } }, "border-bottom-width-0px": { "": { "borderBottomWidth": 0 } }, "border-bottom-width-1px": { "": { "borderBottomWidth": 1 } }, "border-color-__a7f3d0_": { "": { "borderTopColor": "#a7f3d0", "borderRightColor": "#a7f3d0", "borderBottomColor": "#a7f3d0", "borderLeftColor": "#a7f3d0" } }, "border-color-__bfdbfe_": { "": { "borderTopColor": "#bfdbfe", "borderRightColor": "#bfdbfe", "borderBottomColor": "#bfdbfe", "borderLeftColor": "#bfdbfe" } }, "border-color-__cbd5e1_": { "": { "borderTopColor": "#cbd5e1", "borderRightColor": "#cbd5e1", "borderBottomColor": "#cbd5e1", "borderLeftColor": "#cbd5e1" } }, "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-color-__edf2f7_": { "": { "borderTopColor": "#edf2f7", "borderRightColor": "#edf2f7", "borderBottomColor": "#edf2f7", "borderLeftColor": "#edf2f7" } }, "border-color-__eee_": { "": { "borderTopColor": "#eeeeee", "borderRightColor": "#eeeeee", "borderBottomColor": "#eeeeee", "borderLeftColor": "#eeeeee" } }, "border-color-__f1f5f9_": { "": { "borderTopColor": "#f1f5f9", "borderRightColor": "#f1f5f9", "borderBottomColor": "#f1f5f9", "borderLeftColor": "#f1f5f9" } }, "border-color-__fde68a_": { "": { "borderTopColor": "#fde68a", "borderRightColor": "#fde68a", "borderBottomColor": "#fde68a", "borderLeftColor": "#fde68a" } }, "border-color-__fecaca_": { "": { "borderTopColor": "#fecaca", "borderRightColor": "#fecaca", "borderBottomColor": "#fecaca", "borderLeftColor": "#fecaca" } }, "border-color-__ffe4e6_": { "": { "borderTopColor": "#ffe4e6", "borderRightColor": "#ffe4e6", "borderBottomColor": "#ffe4e6", "borderLeftColor": "#ffe4e6" } }, "border-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-t": { "": { "borderTopWidth": "var(--un-line-width-default, 1px)" } }, "border-top-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0" } }, "border-top-color-__f1f5f9_": { "": { "borderTopColor": "#f1f5f9" } }, "border-top-color-__f8fafc_": { "": { "borderTopColor": "#f8fafc" } }, "border-top-style-solid": { "": { "borderTopStyle": "solid" } }, "border-top-width-1px": { "": { "borderTopWidth": 1 } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "border-width-3px": { "": { "borderTopWidth": 3, "borderRightWidth": 3, "borderBottomWidth": 3, "borderLeftWidth": 3 } }, "fixed": { "": { "position": "fixed" } }, "flex": { "": { "display": "flex" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-col": { "": { "flexDirection": "column" } }, "flex-column": { "": { "flexDirection": "column" } }, "flex-row": { "": { "flexDirection": "row" } }, "flex-wrap": { "": { "flexWrap": "wrap" } }, "font-500": { "": { "fontWeight": 500 } }, "font-bold": { "": { "fontWeight": 700 } }, "font-medium": { "": { "fontWeight": 500 } }, "font-semibold": { "": { "fontWeight": 600 } }, "h-10px": { "": { "height": 10 } }, "h-14px": { "": { "height": 14 } }, "h-150px": { "": { "height": 150 } }, "h-16px": { "": { "height": 16 } }, "h-180px": { "": { "height": 180 } }, "h-260px": { "": { "height": 260 } }, "h-28px": { "": { "height": 28 } }, "h-32px": { "": { "height": 32 } }, "h-36px": { "": { "height": 36 } }, "h-38px": { "": { "height": 38 } }, "h-40px": { "": { "height": 40 } }, "h-42px": { "": { "height": 42 } }, "h-44px": { "": { "height": 44 } }, "h-48px": { "": { "height": 48 } }, "h-6px": { "": { "height": 6 } }, "h-90px": { "": { "height": 90 } }, "h-full": { "": { "height": "100%" } }, "i_h-full": { "": { "!height": "100%" } }, "items-center": { "": { "alignItems": "center" } }, "justify-around": { "": { "justifyContent": "space-around" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "justify-center": { "": { "justifyContent": "center" } }, "justify-end": { "": { "justifyContent": "flex-end" } }, "leading-16px": { "": { "lineHeight": "16px" } }, "leading-18px": { "": { "lineHeight": "18px" } }, "leading-20px": { "": { "lineHeight": "20px" } }, "leading-24px": { "": { "lineHeight": "24px" } }, "leading-normal": { "": { "lineHeight": "normal" } }, "m-16px": { "": { "marginTop": 16, "marginRight": 16, "marginBottom": 16, "marginLeft": 16 } }, "mb-10px": { "": { "marginBottom": 10 } }, "mb-12px": { "": { "marginBottom": 12 } }, "mb-15px": { "": { "marginBottom": 15 } }, "mb-16px": { "": { "marginBottom": 16 } }, "mb-20px": { "": { "marginBottom": 20 } }, "mb-24px": { "": { "marginBottom": 24 } }, "mb-30px": { "": { "marginBottom": 30 } }, "mb-4px": { "": { "marginBottom": 4 } }, "mb-6px": { "": { "marginBottom": 6 } }, "mb-8px": { "": { "marginBottom": 8 } }, "ml-10px": { "": { "marginLeft": 10 } }, "ml-12px": { "": { "marginLeft": 12 } }, "ml-4px": { "": { "marginLeft": 4 } }, "ml-8px": { "": { "marginLeft": 8 } }, "mr-10px": { "": { "marginRight": 10 } }, "mr-12px": { "": { "marginRight": 12 } }, "mr-15px": { "": { "marginRight": 15 } }, "mr-16px": { "": { "marginRight": 16 } }, "mr-20px": { "": { "marginRight": 20 } }, "mr-4px": { "": { "marginRight": 4 } }, "mr-6px": { "": { "marginRight": 6 } }, "mr-8px": { "": { "marginRight": 8 } }, "mt-10px": { "": { "marginTop": 10 } }, "mt-12px": { "": { "marginTop": 12 } }, "mt-15px": { "": { "marginTop": 15 } }, "mt-20px": { "": { "marginTop": 20 } }, "mt-2px": { "": { "marginTop": 2 } }, "mt-4px": { "": { "marginTop": 4 } }, "mt-6px": { "": { "marginTop": 6 } }, "mt-8px": { "": { "marginTop": 8 } }, "mx-12px": { "": { "marginLeft": 12, "marginRight": 12 } }, "mx-16px": { "": { "marginLeft": 16, "marginRight": 16 } }, "mx-auto": { "": { "marginLeft": "auto", "marginRight": "auto" } }, "my-10px": { "": { "marginTop": 10, "marginBottom": 10 } }, "my-20px": { "": { "marginTop": 20, "marginBottom": 20 } }, "my-8px": { "": { "marginTop": 8, "marginBottom": 8 } }, "none": { "": { "display": "none" } }, "overflow-hidden": { "": { "overflow": "hidden" } }, "p-10px": { "": { "paddingTop": 10, "paddingRight": 10, "paddingBottom": 10, "paddingLeft": 10 } }, "p-12px": { "": { "paddingTop": 12, "paddingRight": 12, "paddingBottom": 12, "paddingLeft": 12 } }, "p-15px": { "": { "paddingTop": 15, "paddingRight": 15, "paddingBottom": 15, "paddingLeft": 15 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "p-20px": { "": { "paddingTop": 20, "paddingRight": 20, "paddingBottom": 20, "paddingLeft": 20 } }, "p-2px": { "": { "paddingTop": 2, "paddingRight": 2, "paddingBottom": 2, "paddingLeft": 2 } }, "p-30px": { "": { "paddingTop": 30, "paddingRight": 30, "paddingBottom": 30, "paddingLeft": 30 } }, "p-4px": { "": { "paddingTop": 4, "paddingRight": 4, "paddingBottom": 4, "paddingLeft": 4 } }, "p-5px": { "": { "paddingTop": 5, "paddingRight": 5, "paddingBottom": 5, "paddingLeft": 5 } }, "p-6px": { "": { "paddingTop": 6, "paddingRight": 6, "paddingBottom": 6, "paddingLeft": 6 } }, "p-8px": { "": { "paddingTop": 8, "paddingRight": 8, "paddingBottom": 8, "paddingLeft": 8 } }, "pb-10px": { "": { "paddingBottom": 10 } }, "pb-30px": { "": { "paddingBottom": 30 } }, "pb-8px": { "": { "paddingBottom": 8 } }, "pt-20px": { "": { "paddingTop": 20 } }, "pt-4px": { "": { "paddingTop": 4 } }, "pt-8px": { "": { "paddingTop": 8 } }, "px-10px": { "": { "paddingLeft": 10, "paddingRight": 10 } }, "px-12px": { "": { "paddingLeft": 12, "paddingRight": 12 } }, "px-15px": { "": { "paddingLeft": 15, "paddingRight": 15 } }, "px-16px": { "": { "paddingLeft": 16, "paddingRight": 16 } }, "px-20px": { "": { "paddingLeft": 20, "paddingRight": 20 } }, "px-6px": { "": { "paddingLeft": 6, "paddingRight": 6 } }, "px-8px": { "": { "paddingLeft": 8, "paddingRight": 8 } }, "py-10px": { "": { "paddingTop": 10, "paddingBottom": 10 } }, "py-12px": { "": { "paddingTop": 12, "paddingBottom": 12 } }, "py-24px": { "": { "paddingTop": 24, "paddingBottom": 24 } }, "py-2px": { "": { "paddingTop": 2, "paddingBottom": 2 } }, "py-30px": { "": { "paddingTop": 30, "paddingBottom": 30 } }, "py-3px": { "": { "paddingTop": 3, "paddingBottom": 3 } }, "py-4px": { "": { "paddingTop": 4, "paddingBottom": 4 } }, "py-6px": { "": { "paddingTop": 6, "paddingBottom": 6 } }, "py-8px": { "": { "paddingTop": 8, "paddingBottom": 8 } }, "relative": { "": { "position": "relative" } }, "rounded-10px": { "": { "borderTopLeftRadius": 10, "borderTopRightRadius": 10, "borderBottomRightRadius": 10, "borderBottomLeftRadius": 10 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-14px": { "": { "borderTopLeftRadius": 14, "borderTopRightRadius": 14, "borderBottomRightRadius": 14, "borderBottomLeftRadius": 14 } }, "rounded-16px": { "": { "borderTopLeftRadius": 16, "borderTopRightRadius": 16, "borderBottomRightRadius": 16, "borderBottomLeftRadius": 16 } }, "rounded-18px": { "": { "borderTopLeftRadius": 18, "borderTopRightRadius": 18, "borderBottomRightRadius": 18, "borderBottomLeftRadius": 18 } }, "rounded-20px": { "": { "borderTopLeftRadius": 20, "borderTopRightRadius": 20, "borderBottomRightRadius": 20, "borderBottomLeftRadius": 20 } }, "rounded-24px": { "": { "borderTopLeftRadius": 24, "borderTopRightRadius": 24, "borderBottomRightRadius": 24, "borderBottomLeftRadius": 24 } }, "rounded-2px": { "": { "borderTopLeftRadius": 2, "borderTopRightRadius": 2, "borderBottomRightRadius": 2, "borderBottomLeftRadius": 2 } }, "rounded-3px": { "": { "borderTopLeftRadius": 3, "borderTopRightRadius": 3, "borderBottomRightRadius": 3, "borderBottomLeftRadius": 3 } }, "rounded-45px": { "": { "borderTopLeftRadius": 45, "borderTopRightRadius": 45, "borderBottomRightRadius": 45, "borderBottomLeftRadius": 45 } }, "rounded-4px": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "rounded-5px": { "": { "borderTopLeftRadius": 5, "borderTopRightRadius": 5, "borderBottomRightRadius": 5, "borderBottomLeftRadius": 5 } }, "rounded-6px": { "": { "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "rounded-bl-16px": { "": { "borderBottomLeftRadius": 16 } }, "rounded-br-16px": { "": { "borderBottomRightRadius": 16 } }, "rounded-l-16px": { "": { "borderTopLeftRadius": 16, "borderBottomLeftRadius": 16 } }, "rounded-lg": { "": { "borderTopLeftRadius": "var(--un-radius-lg-default, 8rpx)", "borderTopRightRadius": "var(--un-radius-lg-default, 8rpx)", "borderBottomRightRadius": "var(--un-radius-lg-default, 8rpx)", "borderBottomLeftRadius": "var(--un-radius-lg-default, 8rpx)" } }, "rounded-md": { "": { "borderTopLeftRadius": "var(--un-radius-md-default, 6rpx)", "borderTopRightRadius": "var(--un-radius-md-default, 6rpx)", "borderBottomRightRadius": "var(--un-radius-md-default, 6rpx)", "borderBottomLeftRadius": "var(--un-radius-md-default, 6rpx)" } }, "rounded-r-16px": { "": { "borderTopRightRadius": 16, "borderBottomRightRadius": 16 } }, "self-start": { "": { "alignSelf": "flex-start" } }, "shadow-sm": { "": { "boxShadow": "var(--un-inset-shadow, 0 0 #0000), var(--un-inset-ring-shadow, 0 0 #0000), var(--un-ring-offset-shadow, 0 0 #0000), var(--un-ring-shadow, 0 0 #0000), var(--un-shadow, 0 1rpx 3rpx 0 var(--un-shadow-color, rgba(0, 0, 0, var(--un-shadow-opacity, 0.1))), 0 1rpx 2rpx -1rpx var(--un-shadow-color, rgba(0, 0, 0, var(--un-shadow-opacity, 0.1))))", "--un-shadow": "0 1rpx 3rpx 0rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1)))" } }, "shadow-xs": { "": { "boxShadow": "var(--un-inset-shadow, 0 0 #0000), var(--un-inset-ring-shadow, 0 0 #0000), var(--un-ring-offset-shadow, 0 0 #0000), var(--un-ring-shadow, 0 0 #0000), var(--un-shadow, 0 1rpx 3rpx 0 var(--un-shadow-color, rgba(0, 0, 0, var(--un-shadow-opacity, 0.1))), 0 1rpx 2rpx -1rpx var(--un-shadow-color, rgba(0, 0, 0, var(--un-shadow-opacity, 0.1))))", "--un-shadow": "0 1rpx 2rpx 0rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.05)))" } }, "text-__059669_": { "": { "color": "#059669" } }, "text-__065f46_": { "": { "color": "#065f46" } }, "text-__10b981_": { "": { "color": "#10b981" } }, "text-__1a202c_": { "": { "color": "#1a202c" } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__2563eb_": { "": { "color": "#2563eb" } }, "text-__2979ff_": { "": { "color": "#2979ff" } }, "text-__2d3748_": { "": { "color": "#2d3748" } }, "text-__303133_": { "": { "color": "#303133" } }, "text-__333_": { "": { "color": "#333333" } }, "text-__334155_": { "": { "color": "#334155" } }, "text-__38bdf8_": { "": { "color": "#38bdf8" } }, "text-__3b82f6_": { "": { "color": "#3b82f6" } }, "text-__475569_": { "": { "color": "#475569" } }, "text-__606266_": { "": { "color": "#606266" } }, "text-__64748b_": { "": { "color": "#64748b" } }, "text-__718096_": { "": { "color": "#718096" } }, "text-__909399_": { "": { "color": "#909399" } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-__d97706_": { "": { "color": "#d97706" } }, "text-__dc2626_": { "": { "color": "#dc2626" } }, "text-__e11d48_": { "": { "color": "#e11d48" } }, "text-__ef4444_": { "": { "color": "#ef4444" } }, "text-__f43f5e_": { "": { "color": "#f43f5e" } }, "text-__f59e0b_": { "": { "color": "#f59e0b" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-_var_--theme-color__37c2bc__": { "": { "color": "var(--theme-color, #37c2bc)" } }, "text-10px": { "": { "fontSize": 10 } }, "text-11px": { "": { "fontSize": 11 } }, "text-12px": { "": { "fontSize": 12 } }, "text-13px": { "": { "fontSize": 13 } }, "text-14px": { "": { "fontSize": 14 } }, "text-15px": { "": { "fontSize": 15 } }, "text-16px": { "": { "fontSize": 16 } }, "text-18px": { "": { "fontSize": 18 } }, "text-20px": { "": { "fontSize": 20 } }, "text-24px": { "": { "fontSize": 24 } }, "text-center": { "": { "textAlign": "center" } }, "text-white": { "": { "color": "rgba(255, 255, 255, var(--un-color-opacity, 1))" } }, "transition": { "": { "transitionProperty": "all", "transitionDuration": "0.3s" } }, "underline": { "": { "textDecorationLine": "underline" } }, "w-10px": { "": { "width": 10 } }, "w-150px": { "": { "width": 150 } }, "w-15px": { "": { "width": 15 } }, "w-200px": { "": { "width": 200 } }, "w-28px": { "": { "width": 28 } }, "w-32px": { "": { "width": 32 } }, "w-36px": { "": { "width": 36 } }, "w-3px": { "": { "width": 3 } }, "w-40px": { "": { "width": 40 } }, "w-4px": { "": { "width": 4 } }, "w-6px": { "": { "width": 6 } }, "w-90px": { "": { "width": 90 } }, "w-full": { "": { "width": "100%" } }, "@TRANSITION": { "transition": { "property": "all", "duration": "0.3s" } } };
+  const _style_0 = { "u-line-1": { "": { "overflow": "hidden" } }, "up-line-1": { "": { "overflow": "hidden" } }, "u-line-2": { "": { "overflow": "hidden" } }, "up-line-2": { "": { "overflow": "hidden" } }, "u-line-3": { "": { "overflow": "hidden" } }, "up-line-3": { "": { "overflow": "hidden" } }, "u-line-4": { "": { "overflow": "hidden" } }, "up-line-4": { "": { "overflow": "hidden" } }, "u-line-5": { "": { "overflow": "hidden" } }, "up-line-5": { "": { "overflow": "hidden" } }, "u-border": { "": { "!borderTopWidth": 0.5, "!borderRightWidth": 0.5, "!borderBottomWidth": 0.5, "!borderLeftWidth": 0.5, "!borderTopColor": "#dadbde", "!borderRightColor": "#dadbde", "!borderBottomColor": "#dadbde", "!borderLeftColor": "#dadbde", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "up-border": { "": { "!borderTopWidth": 0.5, "!borderRightWidth": 0.5, "!borderBottomWidth": 0.5, "!borderLeftWidth": 0.5, "!borderTopColor": "#dadbde", "!borderRightColor": "#dadbde", "!borderBottomColor": "#dadbde", "!borderLeftColor": "#dadbde", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "u-border-top": { "": { "!borderTopWidth": 0.5, "!borderTopColor": "#dadbde", "!borderRightColor": "#dadbde", "!borderBottomColor": "#dadbde", "!borderLeftColor": "#dadbde", "borderTopStyle": "solid" } }, "up-border-top": { "": { "!borderTopWidth": 0.5, "!borderTopColor": "#dadbde", "!borderRightColor": "#dadbde", "!borderBottomColor": "#dadbde", "!borderLeftColor": "#dadbde", "borderTopStyle": "solid" } }, "u-border-left": { "": { "!borderLeftWidth": 0.5, "!borderTopColor": "#dadbde", "!borderRightColor": "#dadbde", "!borderBottomColor": "#dadbde", "!borderLeftColor": "#dadbde", "borderLeftStyle": "solid" } }, "up-border-left": { "": { "!borderLeftWidth": 0.5, "!borderTopColor": "#dadbde", "!borderRightColor": "#dadbde", "!borderBottomColor": "#dadbde", "!borderLeftColor": "#dadbde", "borderLeftStyle": "solid" } }, "u-border-right": { "": { "!borderRightWidth": 0.5, "!borderTopColor": "#dadbde", "!borderRightColor": "#dadbde", "!borderBottomColor": "#dadbde", "!borderLeftColor": "#dadbde", "borderRightStyle": "solid" } }, "up-border-right": { "": { "!borderRightWidth": 0.5, "!borderTopColor": "#dadbde", "!borderRightColor": "#dadbde", "!borderBottomColor": "#dadbde", "!borderLeftColor": "#dadbde", "borderRightStyle": "solid" } }, "u-border-bottom": { "": { "!borderBottomWidth": 0.5, "!borderTopColor": "#dadbde", "!borderRightColor": "#dadbde", "!borderBottomColor": "#dadbde", "!borderLeftColor": "#dadbde", "borderBottomStyle": "solid" } }, "up-border-bottom": { "": { "!borderBottomWidth": 0.5, "!borderTopColor": "#dadbde", "!borderRightColor": "#dadbde", "!borderBottomColor": "#dadbde", "!borderLeftColor": "#dadbde", "borderBottomStyle": "solid" } }, "u-border-top-bottom": { "": { "!borderTopWidth": 0.5, "!borderBottomWidth": 0.5, "!borderTopColor": "#dadbde", "!borderRightColor": "#dadbde", "!borderBottomColor": "#dadbde", "!borderLeftColor": "#dadbde", "borderTopStyle": "solid", "borderBottomStyle": "solid" } }, "up-border-top-bottom": { "": { "!borderTopWidth": 0.5, "!borderBottomWidth": 0.5, "!borderTopColor": "#dadbde", "!borderRightColor": "#dadbde", "!borderBottomColor": "#dadbde", "!borderLeftColor": "#dadbde", "borderTopStyle": "solid", "borderBottomStyle": "solid" } }, "u-reset-button": { "": { "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "backgroundColor": "rgba(0,0,0,0)", "borderTopWidth::after": "medium", "borderRightWidth::after": "medium", "borderBottomWidth::after": "medium", "borderLeftWidth::after": "medium", "borderTopStyle::after": "none", "borderRightStyle::after": "none", "borderBottomStyle::after": "none", "borderLeftStyle::after": "none", "borderTopColor::after": "#000000", "borderRightColor::after": "#000000", "borderBottomColor::after": "#000000", "borderLeftColor::after": "#000000" } }, "up-reset-button": { "": { "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "backgroundColor": "rgba(0,0,0,0)", "borderTopWidth::after::after": "medium", "borderRightWidth::after::after": "medium", "borderBottomWidth::after::after": "medium", "borderLeftWidth::after::after": "medium", "borderTopStyle::after::after": "none", "borderRightStyle::after::after": "none", "borderBottomStyle::after::after": "none", "borderLeftStyle::after::after": "none", "borderTopColor::after::after": "#000000", "borderRightColor::after::after": "#000000", "borderBottomColor::after::after": "#000000", "borderLeftColor::after::after": "#000000" } }, "u-hover-class": { "": { "opacity": 0.7 } }, "up-hover-class": { "": { "opacity": 0.7 } }, "u-flex": { "": { "display": "flex", "flexDirection": "row" }, ".u-flex-reverse": { "flexDirection": "row-reverse" } }, "u-flex-row": { "": { "display": "flex", "flexDirection": "row" }, ".u-flex-reverse": { "flexDirection": "row-reverse" } }, "u-flex-x": { "": { "display": "flex", "flexDirection": "row" }, ".u-flex-reverse": { "flexDirection": "row-reverse" } }, "up-flex": { "": { "display": "flex", "flexDirection": "row" }, ".up-flex-reverse": { "flexDirection": "row-reverse" } }, "up-flex-row": { "": { "display": "flex", "flexDirection": "row" }, ".up-flex-reverse": { "flexDirection": "row-reverse" } }, "up-flex-x": { "": { "display": "flex", "flexDirection": "row" }, ".up-flex-reverse": { "flexDirection": "row-reverse" } }, "u-flex-y": { "": { "display": "flex", "flexDirection": "column" }, ".u-flex-reverse": { "flexDirection": "column-reverse" } }, "u-flex-column": { "": { "display": "flex", "flexDirection": "column" }, ".u-flex-reverse": { "flexDirection": "column-reverse" } }, "up-flex-y": { "": { "display": "flex", "flexDirection": "column" }, ".up-flex-reverse": { "flexDirection": "column-reverse" } }, "up-flex-column": { "": { "display": "flex", "flexDirection": "column" }, ".up-flex-reverse": { "flexDirection": "column-reverse" } }, "u-flex-x-center": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "center" } }, "up-flex-x-center": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "center" } }, "u-flex-xy-center": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "up-flex-xy-center": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "u-flex-y-center": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center" } }, "up-flex-y-center": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center" } }, "u-flex-x-left": { "": { "display": "flex", "flexDirection": "row" } }, "up-flex-x-left": { "": { "display": "flex", "flexDirection": "row" } }, "u-flex-x-reverse": { "": { "flexDirection": "row-reverse" } }, "u-flex-row-reverse": { "": { "flexDirection": "row-reverse" } }, "up-flex-x-reverse": { "": { "flexDirection": "row-reverse" } }, "up-flex-row-reverse": { "": { "flexDirection": "row-reverse" } }, "u-flex-y-reverse": { "": { "flexDirection": "column-reverse" } }, "u-flex-column-reverse": { "": { "flexDirection": "column-reverse" } }, "up-flex-y-reverse": { "": { "flexDirection": "column-reverse" } }, "up-flex-column-reverse": { "": { "flexDirection": "column-reverse" } }, "u-flex-fill": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "auto" } }, "u-flex-fillp": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "auto" } }, "u-margin-top-auto": { "": { "!marginTop": "auto" } }, "u-m-t-auto": { "": { "!marginTop": "auto" } }, "up-margin-top-auto": { "": { "!marginTop": "auto" } }, "up-m-t-auto": { "": { "!marginTop": "auto" } }, "u-margin-right-auto": { "": { "!marginRight": "auto" } }, "u-m-r-auto": { "": { "!marginRight": "auto" } }, "up-margin-right-auto": { "": { "!marginRight": "auto" } }, "up-m-r-auto": { "": { "!marginRight": "auto" } }, "u-margin-bottom-auto": { "": { "!marginBottom": "auto" } }, "u-m-b-auto": { "": { "!marginBottom": "auto" } }, "up-margin-bottom-auto": { "": { "!marginBottom": "auto" } }, "up-m-b-auto": { "": { "!marginBottom": "auto" } }, "u-margin-left-auto": { "": { "!marginLeft": "auto" } }, "u-m-l-auto": { "": { "!marginLeft": "auto" } }, "up-margin-left-auto": { "": { "!marginLeft": "auto" } }, "up-m-l-auto": { "": { "!marginLeft": "auto" } }, "u-margin-center-auto": { "": { "!marginLeft": "auto", "!marginRight": "auto" } }, "u-m-c-auto": { "": { "!marginLeft": "auto", "!marginRight": "auto" } }, "up-margin-center-auto": { "": { "!marginLeft": "auto", "!marginRight": "auto" } }, "up-m-c-auto": { "": { "!marginLeft": "auto", "!marginRight": "auto" } }, "u-margin-middle-auto": { "": { "!marginTop": "auto", "!marginBottom": "auto" } }, "u-m-m-auto": { "": { "!marginTop": "auto", "!marginBottom": "auto" } }, "up-margin-middle-auto": { "": { "!marginTop": "auto", "!marginBottom": "auto" } }, "up-m-m-auto": { "": { "!marginTop": "auto", "!marginBottom": "auto" } }, "u-flex-wrap": { "": { "flexWrap": "wrap" } }, "up-flex-wrap": { "": { "flexWrap": "wrap" } }, "u-flex-wrap-reverse": { "": { "flexWrap": "wrap-reverse" } }, "up-flex-wrap-reverse": { "": { "flexWrap": "wrap-reverse" } }, "u-flex-start": { "": { "justifyContent": "flex-start" } }, "up-flex-start": { "": { "justifyContent": "flex-start" } }, "u-flex-center": { "": { "justifyContent": "center" } }, "up-flex-center": { "": { "justifyContent": "center" } }, "u-flex-end": { "": { "justifyContent": "flex-end" } }, "up-flex-end": { "": { "justifyContent": "flex-end" } }, "u-flex-between": { "": { "justifyContent": "space-between" } }, "up-flex-between": { "": { "justifyContent": "space-between" } }, "u-flex-around": { "": { "justifyContent": "space-around" } }, "up-flex-around": { "": { "justifyContent": "space-around" } }, "u-flex-items-start": { "": { "alignItems": "flex-start" } }, "up-flex-items-start": { "": { "alignItems": "flex-start" } }, "u-flex-items-center": { "": { "alignItems": "center" } }, "up-flex-items-center": { "": { "alignItems": "center" } }, "u-flex-items-end": { "": { "alignItems": "flex-end" } }, "up-flex-items-end": { "": { "alignItems": "flex-end" } }, "u-flex-items-stretch": { "": { "alignItems": "stretch" } }, "up-flex-items-stretch": { "": { "alignItems": "stretch" } }, "u-flex-self-start": { "": { "alignSelf": "flex-start" } }, "up-flex-self-start": { "": { "alignSelf": "flex-start" } }, "u-flex-self-center": { "": { "alignSelf": "center" } }, "up-flex-self-center": { "": { "alignSelf": "center" } }, "u-flex-self-end": { "": { "alignSelf": "flex-end" } }, "up-flex-self-end": { "": { "alignSelf": "flex-end" } }, "u-flex-self-stretch": { "": { "alignSelf": "stretch" } }, "up-flex-self-stretch": { "": { "alignSelf": "stretch" } }, "u-flex-content-start": { "": { "alignContent": "flex-start" } }, "up-flex-content-start": { "": { "alignContent": "flex-start" } }, "u-flex-content-center": { "": { "alignContent": "center" } }, "up-flex-content-center": { "": { "alignContent": "center" } }, "u-flex-content-end": { "": { "alignContent": "flex-end" } }, "up-flex-content-end": { "": { "alignContent": "flex-end" } }, "u-flex-content-between": { "": { "alignContent": "space-between" } }, "up-flex-content-between": { "": { "alignContent": "space-between" } }, "u-flex-content-around": { "": { "alignContent": "space-around" } }, "up-flex-content-around": { "": { "alignContent": "space-around" } }, "u-flex-middle": { "": { "justifyContent": "center", "alignItems": "center", "alignSelf": "center", "alignContent": "center" } }, "up-flex-middle": { "": { "justifyContent": "center", "alignItems": "center", "alignSelf": "center", "alignContent": "center" } }, "u-flex-grow": { "": { "flexGrow": 1 } }, "up-flex-grow": { "": { "flexGrow": 1 } }, "u-flex-shrink": { "": { "flexShrink": 1 } }, "up-flex-shrink": { "": { "flexShrink": 1 } }, "u-margin-0": { "": { "!marginTop": "0rpx", "!marginRight": "0rpx", "!marginBottom": "0rpx", "!marginLeft": "0rpx" } }, "u-m-0": { "": { "!marginTop": "0rpx", "!marginRight": "0rpx", "!marginBottom": "0rpx", "!marginLeft": "0rpx" } }, "up-margin-0": { "": { "!marginTop": "0rpx", "!marginRight": "0rpx", "!marginBottom": "0rpx", "!marginLeft": "0rpx" } }, "up-m-0": { "": { "!marginTop": "0rpx", "!marginRight": "0rpx", "!marginBottom": "0rpx", "!marginLeft": "0rpx" } }, "u-padding-0": { "": { "!paddingTop": "0rpx", "!paddingRight": "0rpx", "!paddingBottom": "0rpx", "!paddingLeft": "0rpx" } }, "u-p-0": { "": { "!paddingTop": "0rpx", "!paddingRight": "0rpx", "!paddingBottom": "0rpx", "!paddingLeft": "0rpx" } }, "up-padding-0": { "": { "!paddingTop": "0rpx", "!paddingRight": "0rpx", "!paddingBottom": "0rpx", "!paddingLeft": "0rpx" } }, "up-p-0": { "": { "!paddingTop": "0rpx", "!paddingRight": "0rpx", "!paddingBottom": "0rpx", "!paddingLeft": "0rpx" } }, "u-m-l-0": { "": { "!marginLeft": "0rpx" } }, "up-m-l-0": { "": { "!marginLeft": "0rpx" } }, "u-p-l-0": { "": { "!paddingLeft": "0rpx" } }, "up-p-l-0": { "": { "!paddingLeft": "0rpx" } }, "u-margin-left-0": { "": { "!marginLeft": "0rpx" } }, "up-margin-left-0": { "": { "!marginLeft": "0rpx" } }, "u-padding-left-0": { "": { "!paddingLeft": "0rpx" } }, "up-padding-left-0": { "": { "!paddingLeft": "0rpx" } }, "u-m-t-0": { "": { "!marginTop": "0rpx" } }, "up-m-t-0": { "": { "!marginTop": "0rpx" } }, "u-p-t-0": { "": { "!paddingTop": "0rpx" } }, "up-p-t-0": { "": { "!paddingTop": "0rpx" } }, "u-margin-top-0": { "": { "!marginTop": "0rpx" } }, "up-margin-top-0": { "": { "!marginTop": "0rpx" } }, "u-padding-top-0": { "": { "!paddingTop": "0rpx" } }, "up-padding-top-0": { "": { "!paddingTop": "0rpx" } }, "u-m-r-0": { "": { "!marginRight": "0rpx" } }, "up-m-r-0": { "": { "!marginRight": "0rpx" } }, "u-p-r-0": { "": { "!paddingRight": "0rpx" } }, "up-p-r-0": { "": { "!paddingRight": "0rpx" } }, "u-margin-right-0": { "": { "!marginRight": "0rpx" } }, "up-margin-right-0": { "": { "!marginRight": "0rpx" } }, "u-padding-right-0": { "": { "!paddingRight": "0rpx" } }, "up-padding-right-0": { "": { "!paddingRight": "0rpx" } }, "u-m-b-0": { "": { "!marginBottom": "0rpx" } }, "up-m-b-0": { "": { "!marginBottom": "0rpx" } }, "u-p-b-0": { "": { "!paddingBottom": "0rpx" } }, "up-p-b-0": { "": { "!paddingBottom": "0rpx" } }, "u-margin-bottom-0": { "": { "!marginBottom": "0rpx" } }, "up-margin-bottom-0": { "": { "!marginBottom": "0rpx" } }, "u-padding-bottom-0": { "": { "!paddingBottom": "0rpx" } }, "up-padding-bottom-0": { "": { "!paddingBottom": "0rpx" } }, "u-margin-2": { "": { "!marginTop": "2rpx", "!marginRight": "2rpx", "!marginBottom": "2rpx", "!marginLeft": "2rpx" } }, "u-m-2": { "": { "!marginTop": "2rpx", "!marginRight": "2rpx", "!marginBottom": "2rpx", "!marginLeft": "2rpx" } }, "up-margin-2": { "": { "!marginTop": "2rpx", "!marginRight": "2rpx", "!marginBottom": "2rpx", "!marginLeft": "2rpx" } }, "up-m-2": { "": { "!marginTop": "2rpx", "!marginRight": "2rpx", "!marginBottom": "2rpx", "!marginLeft": "2rpx" } }, "u-padding-2": { "": { "!paddingTop": "2rpx", "!paddingRight": "2rpx", "!paddingBottom": "2rpx", "!paddingLeft": "2rpx" } }, "u-p-2": { "": { "!paddingTop": "2rpx", "!paddingRight": "2rpx", "!paddingBottom": "2rpx", "!paddingLeft": "2rpx" } }, "up-padding-2": { "": { "!paddingTop": "2rpx", "!paddingRight": "2rpx", "!paddingBottom": "2rpx", "!paddingLeft": "2rpx" } }, "up-p-2": { "": { "!paddingTop": "2rpx", "!paddingRight": "2rpx", "!paddingBottom": "2rpx", "!paddingLeft": "2rpx" } }, "u-m-l-2": { "": { "!marginLeft": "2rpx" } }, "up-m-l-2": { "": { "!marginLeft": "2rpx" } }, "u-p-l-2": { "": { "!paddingLeft": "2rpx" } }, "up-p-l-2": { "": { "!paddingLeft": "2rpx" } }, "u-margin-left-2": { "": { "!marginLeft": "2rpx" } }, "up-margin-left-2": { "": { "!marginLeft": "2rpx" } }, "u-padding-left-2": { "": { "!paddingLeft": "2rpx" } }, "up-padding-left-2": { "": { "!paddingLeft": "2rpx" } }, "u-m-t-2": { "": { "!marginTop": "2rpx" } }, "up-m-t-2": { "": { "!marginTop": "2rpx" } }, "u-p-t-2": { "": { "!paddingTop": "2rpx" } }, "up-p-t-2": { "": { "!paddingTop": "2rpx" } }, "u-margin-top-2": { "": { "!marginTop": "2rpx" } }, "up-margin-top-2": { "": { "!marginTop": "2rpx" } }, "u-padding-top-2": { "": { "!paddingTop": "2rpx" } }, "up-padding-top-2": { "": { "!paddingTop": "2rpx" } }, "u-m-r-2": { "": { "!marginRight": "2rpx" } }, "up-m-r-2": { "": { "!marginRight": "2rpx" } }, "u-p-r-2": { "": { "!paddingRight": "2rpx" } }, "up-p-r-2": { "": { "!paddingRight": "2rpx" } }, "u-margin-right-2": { "": { "!marginRight": "2rpx" } }, "up-margin-right-2": { "": { "!marginRight": "2rpx" } }, "u-padding-right-2": { "": { "!paddingRight": "2rpx" } }, "up-padding-right-2": { "": { "!paddingRight": "2rpx" } }, "u-m-b-2": { "": { "!marginBottom": "2rpx" } }, "up-m-b-2": { "": { "!marginBottom": "2rpx" } }, "u-p-b-2": { "": { "!paddingBottom": "2rpx" } }, "up-p-b-2": { "": { "!paddingBottom": "2rpx" } }, "u-margin-bottom-2": { "": { "!marginBottom": "2rpx" } }, "up-margin-bottom-2": { "": { "!marginBottom": "2rpx" } }, "u-padding-bottom-2": { "": { "!paddingBottom": "2rpx" } }, "up-padding-bottom-2": { "": { "!paddingBottom": "2rpx" } }, "u-margin-4": { "": { "!marginTop": "4rpx", "!marginRight": "4rpx", "!marginBottom": "4rpx", "!marginLeft": "4rpx" } }, "u-m-4": { "": { "!marginTop": "4rpx", "!marginRight": "4rpx", "!marginBottom": "4rpx", "!marginLeft": "4rpx" } }, "up-margin-4": { "": { "!marginTop": "4rpx", "!marginRight": "4rpx", "!marginBottom": "4rpx", "!marginLeft": "4rpx" } }, "up-m-4": { "": { "!marginTop": "4rpx", "!marginRight": "4rpx", "!marginBottom": "4rpx", "!marginLeft": "4rpx" } }, "u-padding-4": { "": { "!paddingTop": "4rpx", "!paddingRight": "4rpx", "!paddingBottom": "4rpx", "!paddingLeft": "4rpx" } }, "u-p-4": { "": { "!paddingTop": "4rpx", "!paddingRight": "4rpx", "!paddingBottom": "4rpx", "!paddingLeft": "4rpx" } }, "up-padding-4": { "": { "!paddingTop": "4rpx", "!paddingRight": "4rpx", "!paddingBottom": "4rpx", "!paddingLeft": "4rpx" } }, "up-p-4": { "": { "!paddingTop": "4rpx", "!paddingRight": "4rpx", "!paddingBottom": "4rpx", "!paddingLeft": "4rpx" } }, "u-m-l-4": { "": { "!marginLeft": "4rpx" } }, "up-m-l-4": { "": { "!marginLeft": "4rpx" } }, "u-p-l-4": { "": { "!paddingLeft": "4rpx" } }, "up-p-l-4": { "": { "!paddingLeft": "4rpx" } }, "u-margin-left-4": { "": { "!marginLeft": "4rpx" } }, "up-margin-left-4": { "": { "!marginLeft": "4rpx" } }, "u-padding-left-4": { "": { "!paddingLeft": "4rpx" } }, "up-padding-left-4": { "": { "!paddingLeft": "4rpx" } }, "u-m-t-4": { "": { "!marginTop": "4rpx" } }, "up-m-t-4": { "": { "!marginTop": "4rpx" } }, "u-p-t-4": { "": { "!paddingTop": "4rpx" } }, "up-p-t-4": { "": { "!paddingTop": "4rpx" } }, "u-margin-top-4": { "": { "!marginTop": "4rpx" } }, "up-margin-top-4": { "": { "!marginTop": "4rpx" } }, "u-padding-top-4": { "": { "!paddingTop": "4rpx" } }, "up-padding-top-4": { "": { "!paddingTop": "4rpx" } }, "u-m-r-4": { "": { "!marginRight": "4rpx" } }, "up-m-r-4": { "": { "!marginRight": "4rpx" } }, "u-p-r-4": { "": { "!paddingRight": "4rpx" } }, "up-p-r-4": { "": { "!paddingRight": "4rpx" } }, "u-margin-right-4": { "": { "!marginRight": "4rpx" } }, "up-margin-right-4": { "": { "!marginRight": "4rpx" } }, "u-padding-right-4": { "": { "!paddingRight": "4rpx" } }, "up-padding-right-4": { "": { "!paddingRight": "4rpx" } }, "u-m-b-4": { "": { "!marginBottom": "4rpx" } }, "up-m-b-4": { "": { "!marginBottom": "4rpx" } }, "u-p-b-4": { "": { "!paddingBottom": "4rpx" } }, "up-p-b-4": { "": { "!paddingBottom": "4rpx" } }, "u-margin-bottom-4": { "": { "!marginBottom": "4rpx" } }, "up-margin-bottom-4": { "": { "!marginBottom": "4rpx" } }, "u-padding-bottom-4": { "": { "!paddingBottom": "4rpx" } }, "up-padding-bottom-4": { "": { "!paddingBottom": "4rpx" } }, "u-margin-5": { "": { "!marginTop": "5rpx", "!marginRight": "5rpx", "!marginBottom": "5rpx", "!marginLeft": "5rpx" } }, "u-m-5": { "": { "!marginTop": "5rpx", "!marginRight": "5rpx", "!marginBottom": "5rpx", "!marginLeft": "5rpx" } }, "up-margin-5": { "": { "!marginTop": "5rpx", "!marginRight": "5rpx", "!marginBottom": "5rpx", "!marginLeft": "5rpx" } }, "up-m-5": { "": { "!marginTop": "5rpx", "!marginRight": "5rpx", "!marginBottom": "5rpx", "!marginLeft": "5rpx" } }, "u-padding-5": { "": { "!paddingTop": "5rpx", "!paddingRight": "5rpx", "!paddingBottom": "5rpx", "!paddingLeft": "5rpx" } }, "u-p-5": { "": { "!paddingTop": "5rpx", "!paddingRight": "5rpx", "!paddingBottom": "5rpx", "!paddingLeft": "5rpx" } }, "up-padding-5": { "": { "!paddingTop": "5rpx", "!paddingRight": "5rpx", "!paddingBottom": "5rpx", "!paddingLeft": "5rpx" } }, "up-p-5": { "": { "!paddingTop": "5rpx", "!paddingRight": "5rpx", "!paddingBottom": "5rpx", "!paddingLeft": "5rpx" } }, "u-m-l-5": { "": { "!marginLeft": "5rpx" } }, "up-m-l-5": { "": { "!marginLeft": "5rpx" } }, "u-p-l-5": { "": { "!paddingLeft": "5rpx" } }, "up-p-l-5": { "": { "!paddingLeft": "5rpx" } }, "u-margin-left-5": { "": { "!marginLeft": "5rpx" } }, "up-margin-left-5": { "": { "!marginLeft": "5rpx" } }, "u-padding-left-5": { "": { "!paddingLeft": "5rpx" } }, "up-padding-left-5": { "": { "!paddingLeft": "5rpx" } }, "u-m-t-5": { "": { "!marginTop": "5rpx" } }, "up-m-t-5": { "": { "!marginTop": "5rpx" } }, "u-p-t-5": { "": { "!paddingTop": "5rpx" } }, "up-p-t-5": { "": { "!paddingTop": "5rpx" } }, "u-margin-top-5": { "": { "!marginTop": "5rpx" } }, "up-margin-top-5": { "": { "!marginTop": "5rpx" } }, "u-padding-top-5": { "": { "!paddingTop": "5rpx" } }, "up-padding-top-5": { "": { "!paddingTop": "5rpx" } }, "u-m-r-5": { "": { "!marginRight": "5rpx" } }, "up-m-r-5": { "": { "!marginRight": "5rpx" } }, "u-p-r-5": { "": { "!paddingRight": "5rpx" } }, "up-p-r-5": { "": { "!paddingRight": "5rpx" } }, "u-margin-right-5": { "": { "!marginRight": "5rpx" } }, "up-margin-right-5": { "": { "!marginRight": "5rpx" } }, "u-padding-right-5": { "": { "!paddingRight": "5rpx" } }, "up-padding-right-5": { "": { "!paddingRight": "5rpx" } }, "u-m-b-5": { "": { "!marginBottom": "5rpx" } }, "up-m-b-5": { "": { "!marginBottom": "5rpx" } }, "u-p-b-5": { "": { "!paddingBottom": "5rpx" } }, "up-p-b-5": { "": { "!paddingBottom": "5rpx" } }, "u-margin-bottom-5": { "": { "!marginBottom": "5rpx" } }, "up-margin-bottom-5": { "": { "!marginBottom": "5rpx" } }, "u-padding-bottom-5": { "": { "!paddingBottom": "5rpx" } }, "up-padding-bottom-5": { "": { "!paddingBottom": "5rpx" } }, "u-margin-6": { "": { "!marginTop": "6rpx", "!marginRight": "6rpx", "!marginBottom": "6rpx", "!marginLeft": "6rpx" } }, "u-m-6": { "": { "!marginTop": "6rpx", "!marginRight": "6rpx", "!marginBottom": "6rpx", "!marginLeft": "6rpx" } }, "up-margin-6": { "": { "!marginTop": "6rpx", "!marginRight": "6rpx", "!marginBottom": "6rpx", "!marginLeft": "6rpx" } }, "up-m-6": { "": { "!marginTop": "6rpx", "!marginRight": "6rpx", "!marginBottom": "6rpx", "!marginLeft": "6rpx" } }, "u-padding-6": { "": { "!paddingTop": "6rpx", "!paddingRight": "6rpx", "!paddingBottom": "6rpx", "!paddingLeft": "6rpx" } }, "u-p-6": { "": { "!paddingTop": "6rpx", "!paddingRight": "6rpx", "!paddingBottom": "6rpx", "!paddingLeft": "6rpx" } }, "up-padding-6": { "": { "!paddingTop": "6rpx", "!paddingRight": "6rpx", "!paddingBottom": "6rpx", "!paddingLeft": "6rpx" } }, "up-p-6": { "": { "!paddingTop": "6rpx", "!paddingRight": "6rpx", "!paddingBottom": "6rpx", "!paddingLeft": "6rpx" } }, "u-m-l-6": { "": { "!marginLeft": "6rpx" } }, "up-m-l-6": { "": { "!marginLeft": "6rpx" } }, "u-p-l-6": { "": { "!paddingLeft": "6rpx" } }, "up-p-l-6": { "": { "!paddingLeft": "6rpx" } }, "u-margin-left-6": { "": { "!marginLeft": "6rpx" } }, "up-margin-left-6": { "": { "!marginLeft": "6rpx" } }, "u-padding-left-6": { "": { "!paddingLeft": "6rpx" } }, "up-padding-left-6": { "": { "!paddingLeft": "6rpx" } }, "u-m-t-6": { "": { "!marginTop": "6rpx" } }, "up-m-t-6": { "": { "!marginTop": "6rpx" } }, "u-p-t-6": { "": { "!paddingTop": "6rpx" } }, "up-p-t-6": { "": { "!paddingTop": "6rpx" } }, "u-margin-top-6": { "": { "!marginTop": "6rpx" } }, "up-margin-top-6": { "": { "!marginTop": "6rpx" } }, "u-padding-top-6": { "": { "!paddingTop": "6rpx" } }, "up-padding-top-6": { "": { "!paddingTop": "6rpx" } }, "u-m-r-6": { "": { "!marginRight": "6rpx" } }, "up-m-r-6": { "": { "!marginRight": "6rpx" } }, "u-p-r-6": { "": { "!paddingRight": "6rpx" } }, "up-p-r-6": { "": { "!paddingRight": "6rpx" } }, "u-margin-right-6": { "": { "!marginRight": "6rpx" } }, "up-margin-right-6": { "": { "!marginRight": "6rpx" } }, "u-padding-right-6": { "": { "!paddingRight": "6rpx" } }, "up-padding-right-6": { "": { "!paddingRight": "6rpx" } }, "u-m-b-6": { "": { "!marginBottom": "6rpx" } }, "up-m-b-6": { "": { "!marginBottom": "6rpx" } }, "u-p-b-6": { "": { "!paddingBottom": "6rpx" } }, "up-p-b-6": { "": { "!paddingBottom": "6rpx" } }, "u-margin-bottom-6": { "": { "!marginBottom": "6rpx" } }, "up-margin-bottom-6": { "": { "!marginBottom": "6rpx" } }, "u-padding-bottom-6": { "": { "!paddingBottom": "6rpx" } }, "up-padding-bottom-6": { "": { "!paddingBottom": "6rpx" } }, "u-margin-8": { "": { "!marginTop": "8rpx", "!marginRight": "8rpx", "!marginBottom": "8rpx", "!marginLeft": "8rpx" } }, "u-m-8": { "": { "!marginTop": "8rpx", "!marginRight": "8rpx", "!marginBottom": "8rpx", "!marginLeft": "8rpx" } }, "up-margin-8": { "": { "!marginTop": "8rpx", "!marginRight": "8rpx", "!marginBottom": "8rpx", "!marginLeft": "8rpx" } }, "up-m-8": { "": { "!marginTop": "8rpx", "!marginRight": "8rpx", "!marginBottom": "8rpx", "!marginLeft": "8rpx" } }, "u-padding-8": { "": { "!paddingTop": "8rpx", "!paddingRight": "8rpx", "!paddingBottom": "8rpx", "!paddingLeft": "8rpx" } }, "u-p-8": { "": { "!paddingTop": "8rpx", "!paddingRight": "8rpx", "!paddingBottom": "8rpx", "!paddingLeft": "8rpx" } }, "up-padding-8": { "": { "!paddingTop": "8rpx", "!paddingRight": "8rpx", "!paddingBottom": "8rpx", "!paddingLeft": "8rpx" } }, "up-p-8": { "": { "!paddingTop": "8rpx", "!paddingRight": "8rpx", "!paddingBottom": "8rpx", "!paddingLeft": "8rpx" } }, "u-m-l-8": { "": { "!marginLeft": "8rpx" } }, "up-m-l-8": { "": { "!marginLeft": "8rpx" } }, "u-p-l-8": { "": { "!paddingLeft": "8rpx" } }, "up-p-l-8": { "": { "!paddingLeft": "8rpx" } }, "u-margin-left-8": { "": { "!marginLeft": "8rpx" } }, "up-margin-left-8": { "": { "!marginLeft": "8rpx" } }, "u-padding-left-8": { "": { "!paddingLeft": "8rpx" } }, "up-padding-left-8": { "": { "!paddingLeft": "8rpx" } }, "u-m-t-8": { "": { "!marginTop": "8rpx" } }, "up-m-t-8": { "": { "!marginTop": "8rpx" } }, "u-p-t-8": { "": { "!paddingTop": "8rpx" } }, "up-p-t-8": { "": { "!paddingTop": "8rpx" } }, "u-margin-top-8": { "": { "!marginTop": "8rpx" } }, "up-margin-top-8": { "": { "!marginTop": "8rpx" } }, "u-padding-top-8": { "": { "!paddingTop": "8rpx" } }, "up-padding-top-8": { "": { "!paddingTop": "8rpx" } }, "u-m-r-8": { "": { "!marginRight": "8rpx" } }, "up-m-r-8": { "": { "!marginRight": "8rpx" } }, "u-p-r-8": { "": { "!paddingRight": "8rpx" } }, "up-p-r-8": { "": { "!paddingRight": "8rpx" } }, "u-margin-right-8": { "": { "!marginRight": "8rpx" } }, "up-margin-right-8": { "": { "!marginRight": "8rpx" } }, "u-padding-right-8": { "": { "!paddingRight": "8rpx" } }, "up-padding-right-8": { "": { "!paddingRight": "8rpx" } }, "u-m-b-8": { "": { "!marginBottom": "8rpx" } }, "up-m-b-8": { "": { "!marginBottom": "8rpx" } }, "u-p-b-8": { "": { "!paddingBottom": "8rpx" } }, "up-p-b-8": { "": { "!paddingBottom": "8rpx" } }, "u-margin-bottom-8": { "": { "!marginBottom": "8rpx" } }, "up-margin-bottom-8": { "": { "!marginBottom": "8rpx" } }, "u-padding-bottom-8": { "": { "!paddingBottom": "8rpx" } }, "up-padding-bottom-8": { "": { "!paddingBottom": "8rpx" } }, "u-margin-10": { "": { "!marginTop": "10rpx", "!marginRight": "10rpx", "!marginBottom": "10rpx", "!marginLeft": "10rpx" } }, "u-m-10": { "": { "!marginTop": "10rpx", "!marginRight": "10rpx", "!marginBottom": "10rpx", "!marginLeft": "10rpx" } }, "up-margin-10": { "": { "!marginTop": "10rpx", "!marginRight": "10rpx", "!marginBottom": "10rpx", "!marginLeft": "10rpx" } }, "up-m-10": { "": { "!marginTop": "10rpx", "!marginRight": "10rpx", "!marginBottom": "10rpx", "!marginLeft": "10rpx" } }, "u-padding-10": { "": { "!paddingTop": "10rpx", "!paddingRight": "10rpx", "!paddingBottom": "10rpx", "!paddingLeft": "10rpx" } }, "u-p-10": { "": { "!paddingTop": "10rpx", "!paddingRight": "10rpx", "!paddingBottom": "10rpx", "!paddingLeft": "10rpx" } }, "up-padding-10": { "": { "!paddingTop": "10rpx", "!paddingRight": "10rpx", "!paddingBottom": "10rpx", "!paddingLeft": "10rpx" } }, "up-p-10": { "": { "!paddingTop": "10rpx", "!paddingRight": "10rpx", "!paddingBottom": "10rpx", "!paddingLeft": "10rpx" } }, "u-m-l-10": { "": { "!marginLeft": "10rpx" } }, "up-m-l-10": { "": { "!marginLeft": "10rpx" } }, "u-p-l-10": { "": { "!paddingLeft": "10rpx" } }, "up-p-l-10": { "": { "!paddingLeft": "10rpx" } }, "u-margin-left-10": { "": { "!marginLeft": "10rpx" } }, "up-margin-left-10": { "": { "!marginLeft": "10rpx" } }, "u-padding-left-10": { "": { "!paddingLeft": "10rpx" } }, "up-padding-left-10": { "": { "!paddingLeft": "10rpx" } }, "u-m-t-10": { "": { "!marginTop": "10rpx" } }, "up-m-t-10": { "": { "!marginTop": "10rpx" } }, "u-p-t-10": { "": { "!paddingTop": "10rpx" } }, "up-p-t-10": { "": { "!paddingTop": "10rpx" } }, "u-margin-top-10": { "": { "!marginTop": "10rpx" } }, "up-margin-top-10": { "": { "!marginTop": "10rpx" } }, "u-padding-top-10": { "": { "!paddingTop": "10rpx" } }, "up-padding-top-10": { "": { "!paddingTop": "10rpx" } }, "u-m-r-10": { "": { "!marginRight": "10rpx" } }, "up-m-r-10": { "": { "!marginRight": "10rpx" } }, "u-p-r-10": { "": { "!paddingRight": "10rpx" } }, "up-p-r-10": { "": { "!paddingRight": "10rpx" } }, "u-margin-right-10": { "": { "!marginRight": "10rpx" } }, "up-margin-right-10": { "": { "!marginRight": "10rpx" } }, "u-padding-right-10": { "": { "!paddingRight": "10rpx" } }, "up-padding-right-10": { "": { "!paddingRight": "10rpx" } }, "u-m-b-10": { "": { "!marginBottom": "10rpx" } }, "up-m-b-10": { "": { "!marginBottom": "10rpx" } }, "u-p-b-10": { "": { "!paddingBottom": "10rpx" } }, "up-p-b-10": { "": { "!paddingBottom": "10rpx" } }, "u-margin-bottom-10": { "": { "!marginBottom": "10rpx" } }, "up-margin-bottom-10": { "": { "!marginBottom": "10rpx" } }, "u-padding-bottom-10": { "": { "!paddingBottom": "10rpx" } }, "up-padding-bottom-10": { "": { "!paddingBottom": "10rpx" } }, "u-margin-12": { "": { "!marginTop": "12rpx", "!marginRight": "12rpx", "!marginBottom": "12rpx", "!marginLeft": "12rpx" } }, "u-m-12": { "": { "!marginTop": "12rpx", "!marginRight": "12rpx", "!marginBottom": "12rpx", "!marginLeft": "12rpx" } }, "up-margin-12": { "": { "!marginTop": "12rpx", "!marginRight": "12rpx", "!marginBottom": "12rpx", "!marginLeft": "12rpx" } }, "up-m-12": { "": { "!marginTop": "12rpx", "!marginRight": "12rpx", "!marginBottom": "12rpx", "!marginLeft": "12rpx" } }, "u-padding-12": { "": { "!paddingTop": "12rpx", "!paddingRight": "12rpx", "!paddingBottom": "12rpx", "!paddingLeft": "12rpx" } }, "u-p-12": { "": { "!paddingTop": "12rpx", "!paddingRight": "12rpx", "!paddingBottom": "12rpx", "!paddingLeft": "12rpx" } }, "up-padding-12": { "": { "!paddingTop": "12rpx", "!paddingRight": "12rpx", "!paddingBottom": "12rpx", "!paddingLeft": "12rpx" } }, "up-p-12": { "": { "!paddingTop": "12rpx", "!paddingRight": "12rpx", "!paddingBottom": "12rpx", "!paddingLeft": "12rpx" } }, "u-m-l-12": { "": { "!marginLeft": "12rpx" } }, "up-m-l-12": { "": { "!marginLeft": "12rpx" } }, "u-p-l-12": { "": { "!paddingLeft": "12rpx" } }, "up-p-l-12": { "": { "!paddingLeft": "12rpx" } }, "u-margin-left-12": { "": { "!marginLeft": "12rpx" } }, "up-margin-left-12": { "": { "!marginLeft": "12rpx" } }, "u-padding-left-12": { "": { "!paddingLeft": "12rpx" } }, "up-padding-left-12": { "": { "!paddingLeft": "12rpx" } }, "u-m-t-12": { "": { "!marginTop": "12rpx" } }, "up-m-t-12": { "": { "!marginTop": "12rpx" } }, "u-p-t-12": { "": { "!paddingTop": "12rpx" } }, "up-p-t-12": { "": { "!paddingTop": "12rpx" } }, "u-margin-top-12": { "": { "!marginTop": "12rpx" } }, "up-margin-top-12": { "": { "!marginTop": "12rpx" } }, "u-padding-top-12": { "": { "!paddingTop": "12rpx" } }, "up-padding-top-12": { "": { "!paddingTop": "12rpx" } }, "u-m-r-12": { "": { "!marginRight": "12rpx" } }, "up-m-r-12": { "": { "!marginRight": "12rpx" } }, "u-p-r-12": { "": { "!paddingRight": "12rpx" } }, "up-p-r-12": { "": { "!paddingRight": "12rpx" } }, "u-margin-right-12": { "": { "!marginRight": "12rpx" } }, "up-margin-right-12": { "": { "!marginRight": "12rpx" } }, "u-padding-right-12": { "": { "!paddingRight": "12rpx" } }, "up-padding-right-12": { "": { "!paddingRight": "12rpx" } }, "u-m-b-12": { "": { "!marginBottom": "12rpx" } }, "up-m-b-12": { "": { "!marginBottom": "12rpx" } }, "u-p-b-12": { "": { "!paddingBottom": "12rpx" } }, "up-p-b-12": { "": { "!paddingBottom": "12rpx" } }, "u-margin-bottom-12": { "": { "!marginBottom": "12rpx" } }, "up-margin-bottom-12": { "": { "!marginBottom": "12rpx" } }, "u-padding-bottom-12": { "": { "!paddingBottom": "12rpx" } }, "up-padding-bottom-12": { "": { "!paddingBottom": "12rpx" } }, "u-margin-14": { "": { "!marginTop": "14rpx", "!marginRight": "14rpx", "!marginBottom": "14rpx", "!marginLeft": "14rpx" } }, "u-m-14": { "": { "!marginTop": "14rpx", "!marginRight": "14rpx", "!marginBottom": "14rpx", "!marginLeft": "14rpx" } }, "up-margin-14": { "": { "!marginTop": "14rpx", "!marginRight": "14rpx", "!marginBottom": "14rpx", "!marginLeft": "14rpx" } }, "up-m-14": { "": { "!marginTop": "14rpx", "!marginRight": "14rpx", "!marginBottom": "14rpx", "!marginLeft": "14rpx" } }, "u-padding-14": { "": { "!paddingTop": "14rpx", "!paddingRight": "14rpx", "!paddingBottom": "14rpx", "!paddingLeft": "14rpx" } }, "u-p-14": { "": { "!paddingTop": "14rpx", "!paddingRight": "14rpx", "!paddingBottom": "14rpx", "!paddingLeft": "14rpx" } }, "up-padding-14": { "": { "!paddingTop": "14rpx", "!paddingRight": "14rpx", "!paddingBottom": "14rpx", "!paddingLeft": "14rpx" } }, "up-p-14": { "": { "!paddingTop": "14rpx", "!paddingRight": "14rpx", "!paddingBottom": "14rpx", "!paddingLeft": "14rpx" } }, "u-m-l-14": { "": { "!marginLeft": "14rpx" } }, "up-m-l-14": { "": { "!marginLeft": "14rpx" } }, "u-p-l-14": { "": { "!paddingLeft": "14rpx" } }, "up-p-l-14": { "": { "!paddingLeft": "14rpx" } }, "u-margin-left-14": { "": { "!marginLeft": "14rpx" } }, "up-margin-left-14": { "": { "!marginLeft": "14rpx" } }, "u-padding-left-14": { "": { "!paddingLeft": "14rpx" } }, "up-padding-left-14": { "": { "!paddingLeft": "14rpx" } }, "u-m-t-14": { "": { "!marginTop": "14rpx" } }, "up-m-t-14": { "": { "!marginTop": "14rpx" } }, "u-p-t-14": { "": { "!paddingTop": "14rpx" } }, "up-p-t-14": { "": { "!paddingTop": "14rpx" } }, "u-margin-top-14": { "": { "!marginTop": "14rpx" } }, "up-margin-top-14": { "": { "!marginTop": "14rpx" } }, "u-padding-top-14": { "": { "!paddingTop": "14rpx" } }, "up-padding-top-14": { "": { "!paddingTop": "14rpx" } }, "u-m-r-14": { "": { "!marginRight": "14rpx" } }, "up-m-r-14": { "": { "!marginRight": "14rpx" } }, "u-p-r-14": { "": { "!paddingRight": "14rpx" } }, "up-p-r-14": { "": { "!paddingRight": "14rpx" } }, "u-margin-right-14": { "": { "!marginRight": "14rpx" } }, "up-margin-right-14": { "": { "!marginRight": "14rpx" } }, "u-padding-right-14": { "": { "!paddingRight": "14rpx" } }, "up-padding-right-14": { "": { "!paddingRight": "14rpx" } }, "u-m-b-14": { "": { "!marginBottom": "14rpx" } }, "up-m-b-14": { "": { "!marginBottom": "14rpx" } }, "u-p-b-14": { "": { "!paddingBottom": "14rpx" } }, "up-p-b-14": { "": { "!paddingBottom": "14rpx" } }, "u-margin-bottom-14": { "": { "!marginBottom": "14rpx" } }, "up-margin-bottom-14": { "": { "!marginBottom": "14rpx" } }, "u-padding-bottom-14": { "": { "!paddingBottom": "14rpx" } }, "up-padding-bottom-14": { "": { "!paddingBottom": "14rpx" } }, "u-margin-15": { "": { "!marginTop": "15rpx", "!marginRight": "15rpx", "!marginBottom": "15rpx", "!marginLeft": "15rpx" } }, "u-m-15": { "": { "!marginTop": "15rpx", "!marginRight": "15rpx", "!marginBottom": "15rpx", "!marginLeft": "15rpx" } }, "up-margin-15": { "": { "!marginTop": "15rpx", "!marginRight": "15rpx", "!marginBottom": "15rpx", "!marginLeft": "15rpx" } }, "up-m-15": { "": { "!marginTop": "15rpx", "!marginRight": "15rpx", "!marginBottom": "15rpx", "!marginLeft": "15rpx" } }, "u-padding-15": { "": { "!paddingTop": "15rpx", "!paddingRight": "15rpx", "!paddingBottom": "15rpx", "!paddingLeft": "15rpx" } }, "u-p-15": { "": { "!paddingTop": "15rpx", "!paddingRight": "15rpx", "!paddingBottom": "15rpx", "!paddingLeft": "15rpx" } }, "up-padding-15": { "": { "!paddingTop": "15rpx", "!paddingRight": "15rpx", "!paddingBottom": "15rpx", "!paddingLeft": "15rpx" } }, "up-p-15": { "": { "!paddingTop": "15rpx", "!paddingRight": "15rpx", "!paddingBottom": "15rpx", "!paddingLeft": "15rpx" } }, "u-m-l-15": { "": { "!marginLeft": "15rpx" } }, "up-m-l-15": { "": { "!marginLeft": "15rpx" } }, "u-p-l-15": { "": { "!paddingLeft": "15rpx" } }, "up-p-l-15": { "": { "!paddingLeft": "15rpx" } }, "u-margin-left-15": { "": { "!marginLeft": "15rpx" } }, "up-margin-left-15": { "": { "!marginLeft": "15rpx" } }, "u-padding-left-15": { "": { "!paddingLeft": "15rpx" } }, "up-padding-left-15": { "": { "!paddingLeft": "15rpx" } }, "u-m-t-15": { "": { "!marginTop": "15rpx" } }, "up-m-t-15": { "": { "!marginTop": "15rpx" } }, "u-p-t-15": { "": { "!paddingTop": "15rpx" } }, "up-p-t-15": { "": { "!paddingTop": "15rpx" } }, "u-margin-top-15": { "": { "!marginTop": "15rpx" } }, "up-margin-top-15": { "": { "!marginTop": "15rpx" } }, "u-padding-top-15": { "": { "!paddingTop": "15rpx" } }, "up-padding-top-15": { "": { "!paddingTop": "15rpx" } }, "u-m-r-15": { "": { "!marginRight": "15rpx" } }, "up-m-r-15": { "": { "!marginRight": "15rpx" } }, "u-p-r-15": { "": { "!paddingRight": "15rpx" } }, "up-p-r-15": { "": { "!paddingRight": "15rpx" } }, "u-margin-right-15": { "": { "!marginRight": "15rpx" } }, "up-margin-right-15": { "": { "!marginRight": "15rpx" } }, "u-padding-right-15": { "": { "!paddingRight": "15rpx" } }, "up-padding-right-15": { "": { "!paddingRight": "15rpx" } }, "u-m-b-15": { "": { "!marginBottom": "15rpx" } }, "up-m-b-15": { "": { "!marginBottom": "15rpx" } }, "u-p-b-15": { "": { "!paddingBottom": "15rpx" } }, "up-p-b-15": { "": { "!paddingBottom": "15rpx" } }, "u-margin-bottom-15": { "": { "!marginBottom": "15rpx" } }, "up-margin-bottom-15": { "": { "!marginBottom": "15rpx" } }, "u-padding-bottom-15": { "": { "!paddingBottom": "15rpx" } }, "up-padding-bottom-15": { "": { "!paddingBottom": "15rpx" } }, "u-margin-16": { "": { "!marginTop": "16rpx", "!marginRight": "16rpx", "!marginBottom": "16rpx", "!marginLeft": "16rpx" } }, "u-m-16": { "": { "!marginTop": "16rpx", "!marginRight": "16rpx", "!marginBottom": "16rpx", "!marginLeft": "16rpx" } }, "up-margin-16": { "": { "!marginTop": "16rpx", "!marginRight": "16rpx", "!marginBottom": "16rpx", "!marginLeft": "16rpx" } }, "up-m-16": { "": { "!marginTop": "16rpx", "!marginRight": "16rpx", "!marginBottom": "16rpx", "!marginLeft": "16rpx" } }, "u-padding-16": { "": { "!paddingTop": "16rpx", "!paddingRight": "16rpx", "!paddingBottom": "16rpx", "!paddingLeft": "16rpx" } }, "u-p-16": { "": { "!paddingTop": "16rpx", "!paddingRight": "16rpx", "!paddingBottom": "16rpx", "!paddingLeft": "16rpx" } }, "up-padding-16": { "": { "!paddingTop": "16rpx", "!paddingRight": "16rpx", "!paddingBottom": "16rpx", "!paddingLeft": "16rpx" } }, "up-p-16": { "": { "!paddingTop": "16rpx", "!paddingRight": "16rpx", "!paddingBottom": "16rpx", "!paddingLeft": "16rpx" } }, "u-m-l-16": { "": { "!marginLeft": "16rpx" } }, "up-m-l-16": { "": { "!marginLeft": "16rpx" } }, "u-p-l-16": { "": { "!paddingLeft": "16rpx" } }, "up-p-l-16": { "": { "!paddingLeft": "16rpx" } }, "u-margin-left-16": { "": { "!marginLeft": "16rpx" } }, "up-margin-left-16": { "": { "!marginLeft": "16rpx" } }, "u-padding-left-16": { "": { "!paddingLeft": "16rpx" } }, "up-padding-left-16": { "": { "!paddingLeft": "16rpx" } }, "u-m-t-16": { "": { "!marginTop": "16rpx" } }, "up-m-t-16": { "": { "!marginTop": "16rpx" } }, "u-p-t-16": { "": { "!paddingTop": "16rpx" } }, "up-p-t-16": { "": { "!paddingTop": "16rpx" } }, "u-margin-top-16": { "": { "!marginTop": "16rpx" } }, "up-margin-top-16": { "": { "!marginTop": "16rpx" } }, "u-padding-top-16": { "": { "!paddingTop": "16rpx" } }, "up-padding-top-16": { "": { "!paddingTop": "16rpx" } }, "u-m-r-16": { "": { "!marginRight": "16rpx" } }, "up-m-r-16": { "": { "!marginRight": "16rpx" } }, "u-p-r-16": { "": { "!paddingRight": "16rpx" } }, "up-p-r-16": { "": { "!paddingRight": "16rpx" } }, "u-margin-right-16": { "": { "!marginRight": "16rpx" } }, "up-margin-right-16": { "": { "!marginRight": "16rpx" } }, "u-padding-right-16": { "": { "!paddingRight": "16rpx" } }, "up-padding-right-16": { "": { "!paddingRight": "16rpx" } }, "u-m-b-16": { "": { "!marginBottom": "16rpx" } }, "up-m-b-16": { "": { "!marginBottom": "16rpx" } }, "u-p-b-16": { "": { "!paddingBottom": "16rpx" } }, "up-p-b-16": { "": { "!paddingBottom": "16rpx" } }, "u-margin-bottom-16": { "": { "!marginBottom": "16rpx" } }, "up-margin-bottom-16": { "": { "!marginBottom": "16rpx" } }, "u-padding-bottom-16": { "": { "!paddingBottom": "16rpx" } }, "up-padding-bottom-16": { "": { "!paddingBottom": "16rpx" } }, "u-margin-18": { "": { "!marginTop": "18rpx", "!marginRight": "18rpx", "!marginBottom": "18rpx", "!marginLeft": "18rpx" } }, "u-m-18": { "": { "!marginTop": "18rpx", "!marginRight": "18rpx", "!marginBottom": "18rpx", "!marginLeft": "18rpx" } }, "up-margin-18": { "": { "!marginTop": "18rpx", "!marginRight": "18rpx", "!marginBottom": "18rpx", "!marginLeft": "18rpx" } }, "up-m-18": { "": { "!marginTop": "18rpx", "!marginRight": "18rpx", "!marginBottom": "18rpx", "!marginLeft": "18rpx" } }, "u-padding-18": { "": { "!paddingTop": "18rpx", "!paddingRight": "18rpx", "!paddingBottom": "18rpx", "!paddingLeft": "18rpx" } }, "u-p-18": { "": { "!paddingTop": "18rpx", "!paddingRight": "18rpx", "!paddingBottom": "18rpx", "!paddingLeft": "18rpx" } }, "up-padding-18": { "": { "!paddingTop": "18rpx", "!paddingRight": "18rpx", "!paddingBottom": "18rpx", "!paddingLeft": "18rpx" } }, "up-p-18": { "": { "!paddingTop": "18rpx", "!paddingRight": "18rpx", "!paddingBottom": "18rpx", "!paddingLeft": "18rpx" } }, "u-m-l-18": { "": { "!marginLeft": "18rpx" } }, "up-m-l-18": { "": { "!marginLeft": "18rpx" } }, "u-p-l-18": { "": { "!paddingLeft": "18rpx" } }, "up-p-l-18": { "": { "!paddingLeft": "18rpx" } }, "u-margin-left-18": { "": { "!marginLeft": "18rpx" } }, "up-margin-left-18": { "": { "!marginLeft": "18rpx" } }, "u-padding-left-18": { "": { "!paddingLeft": "18rpx" } }, "up-padding-left-18": { "": { "!paddingLeft": "18rpx" } }, "u-m-t-18": { "": { "!marginTop": "18rpx" } }, "up-m-t-18": { "": { "!marginTop": "18rpx" } }, "u-p-t-18": { "": { "!paddingTop": "18rpx" } }, "up-p-t-18": { "": { "!paddingTop": "18rpx" } }, "u-margin-top-18": { "": { "!marginTop": "18rpx" } }, "up-margin-top-18": { "": { "!marginTop": "18rpx" } }, "u-padding-top-18": { "": { "!paddingTop": "18rpx" } }, "up-padding-top-18": { "": { "!paddingTop": "18rpx" } }, "u-m-r-18": { "": { "!marginRight": "18rpx" } }, "up-m-r-18": { "": { "!marginRight": "18rpx" } }, "u-p-r-18": { "": { "!paddingRight": "18rpx" } }, "up-p-r-18": { "": { "!paddingRight": "18rpx" } }, "u-margin-right-18": { "": { "!marginRight": "18rpx" } }, "up-margin-right-18": { "": { "!marginRight": "18rpx" } }, "u-padding-right-18": { "": { "!paddingRight": "18rpx" } }, "up-padding-right-18": { "": { "!paddingRight": "18rpx" } }, "u-m-b-18": { "": { "!marginBottom": "18rpx" } }, "up-m-b-18": { "": { "!marginBottom": "18rpx" } }, "u-p-b-18": { "": { "!paddingBottom": "18rpx" } }, "up-p-b-18": { "": { "!paddingBottom": "18rpx" } }, "u-margin-bottom-18": { "": { "!marginBottom": "18rpx" } }, "up-margin-bottom-18": { "": { "!marginBottom": "18rpx" } }, "u-padding-bottom-18": { "": { "!paddingBottom": "18rpx" } }, "up-padding-bottom-18": { "": { "!paddingBottom": "18rpx" } }, "u-margin-20": { "": { "!marginTop": "20rpx", "!marginRight": "20rpx", "!marginBottom": "20rpx", "!marginLeft": "20rpx" } }, "u-m-20": { "": { "!marginTop": "20rpx", "!marginRight": "20rpx", "!marginBottom": "20rpx", "!marginLeft": "20rpx" } }, "up-margin-20": { "": { "!marginTop": "20rpx", "!marginRight": "20rpx", "!marginBottom": "20rpx", "!marginLeft": "20rpx" } }, "up-m-20": { "": { "!marginTop": "20rpx", "!marginRight": "20rpx", "!marginBottom": "20rpx", "!marginLeft": "20rpx" } }, "u-padding-20": { "": { "!paddingTop": "20rpx", "!paddingRight": "20rpx", "!paddingBottom": "20rpx", "!paddingLeft": "20rpx" } }, "u-p-20": { "": { "!paddingTop": "20rpx", "!paddingRight": "20rpx", "!paddingBottom": "20rpx", "!paddingLeft": "20rpx" } }, "up-padding-20": { "": { "!paddingTop": "20rpx", "!paddingRight": "20rpx", "!paddingBottom": "20rpx", "!paddingLeft": "20rpx" } }, "up-p-20": { "": { "!paddingTop": "20rpx", "!paddingRight": "20rpx", "!paddingBottom": "20rpx", "!paddingLeft": "20rpx" } }, "u-m-l-20": { "": { "!marginLeft": "20rpx" } }, "up-m-l-20": { "": { "!marginLeft": "20rpx" } }, "u-p-l-20": { "": { "!paddingLeft": "20rpx" } }, "up-p-l-20": { "": { "!paddingLeft": "20rpx" } }, "u-margin-left-20": { "": { "!marginLeft": "20rpx" } }, "up-margin-left-20": { "": { "!marginLeft": "20rpx" } }, "u-padding-left-20": { "": { "!paddingLeft": "20rpx" } }, "up-padding-left-20": { "": { "!paddingLeft": "20rpx" } }, "u-m-t-20": { "": { "!marginTop": "20rpx" } }, "up-m-t-20": { "": { "!marginTop": "20rpx" } }, "u-p-t-20": { "": { "!paddingTop": "20rpx" } }, "up-p-t-20": { "": { "!paddingTop": "20rpx" } }, "u-margin-top-20": { "": { "!marginTop": "20rpx" } }, "up-margin-top-20": { "": { "!marginTop": "20rpx" } }, "u-padding-top-20": { "": { "!paddingTop": "20rpx" } }, "up-padding-top-20": { "": { "!paddingTop": "20rpx" } }, "u-m-r-20": { "": { "!marginRight": "20rpx" } }, "up-m-r-20": { "": { "!marginRight": "20rpx" } }, "u-p-r-20": { "": { "!paddingRight": "20rpx" } }, "up-p-r-20": { "": { "!paddingRight": "20rpx" } }, "u-margin-right-20": { "": { "!marginRight": "20rpx" } }, "up-margin-right-20": { "": { "!marginRight": "20rpx" } }, "u-padding-right-20": { "": { "!paddingRight": "20rpx" } }, "up-padding-right-20": { "": { "!paddingRight": "20rpx" } }, "u-m-b-20": { "": { "!marginBottom": "20rpx" } }, "up-m-b-20": { "": { "!marginBottom": "20rpx" } }, "u-p-b-20": { "": { "!paddingBottom": "20rpx" } }, "up-p-b-20": { "": { "!paddingBottom": "20rpx" } }, "u-margin-bottom-20": { "": { "!marginBottom": "20rpx" } }, "up-margin-bottom-20": { "": { "!marginBottom": "20rpx" } }, "u-padding-bottom-20": { "": { "!paddingBottom": "20rpx" } }, "up-padding-bottom-20": { "": { "!paddingBottom": "20rpx" } }, "u-margin-22": { "": { "!marginTop": "22rpx", "!marginRight": "22rpx", "!marginBottom": "22rpx", "!marginLeft": "22rpx" } }, "u-m-22": { "": { "!marginTop": "22rpx", "!marginRight": "22rpx", "!marginBottom": "22rpx", "!marginLeft": "22rpx" } }, "up-margin-22": { "": { "!marginTop": "22rpx", "!marginRight": "22rpx", "!marginBottom": "22rpx", "!marginLeft": "22rpx" } }, "up-m-22": { "": { "!marginTop": "22rpx", "!marginRight": "22rpx", "!marginBottom": "22rpx", "!marginLeft": "22rpx" } }, "u-padding-22": { "": { "!paddingTop": "22rpx", "!paddingRight": "22rpx", "!paddingBottom": "22rpx", "!paddingLeft": "22rpx" } }, "u-p-22": { "": { "!paddingTop": "22rpx", "!paddingRight": "22rpx", "!paddingBottom": "22rpx", "!paddingLeft": "22rpx" } }, "up-padding-22": { "": { "!paddingTop": "22rpx", "!paddingRight": "22rpx", "!paddingBottom": "22rpx", "!paddingLeft": "22rpx" } }, "up-p-22": { "": { "!paddingTop": "22rpx", "!paddingRight": "22rpx", "!paddingBottom": "22rpx", "!paddingLeft": "22rpx" } }, "u-m-l-22": { "": { "!marginLeft": "22rpx" } }, "up-m-l-22": { "": { "!marginLeft": "22rpx" } }, "u-p-l-22": { "": { "!paddingLeft": "22rpx" } }, "up-p-l-22": { "": { "!paddingLeft": "22rpx" } }, "u-margin-left-22": { "": { "!marginLeft": "22rpx" } }, "up-margin-left-22": { "": { "!marginLeft": "22rpx" } }, "u-padding-left-22": { "": { "!paddingLeft": "22rpx" } }, "up-padding-left-22": { "": { "!paddingLeft": "22rpx" } }, "u-m-t-22": { "": { "!marginTop": "22rpx" } }, "up-m-t-22": { "": { "!marginTop": "22rpx" } }, "u-p-t-22": { "": { "!paddingTop": "22rpx" } }, "up-p-t-22": { "": { "!paddingTop": "22rpx" } }, "u-margin-top-22": { "": { "!marginTop": "22rpx" } }, "up-margin-top-22": { "": { "!marginTop": "22rpx" } }, "u-padding-top-22": { "": { "!paddingTop": "22rpx" } }, "up-padding-top-22": { "": { "!paddingTop": "22rpx" } }, "u-m-r-22": { "": { "!marginRight": "22rpx" } }, "up-m-r-22": { "": { "!marginRight": "22rpx" } }, "u-p-r-22": { "": { "!paddingRight": "22rpx" } }, "up-p-r-22": { "": { "!paddingRight": "22rpx" } }, "u-margin-right-22": { "": { "!marginRight": "22rpx" } }, "up-margin-right-22": { "": { "!marginRight": "22rpx" } }, "u-padding-right-22": { "": { "!paddingRight": "22rpx" } }, "up-padding-right-22": { "": { "!paddingRight": "22rpx" } }, "u-m-b-22": { "": { "!marginBottom": "22rpx" } }, "up-m-b-22": { "": { "!marginBottom": "22rpx" } }, "u-p-b-22": { "": { "!paddingBottom": "22rpx" } }, "up-p-b-22": { "": { "!paddingBottom": "22rpx" } }, "u-margin-bottom-22": { "": { "!marginBottom": "22rpx" } }, "up-margin-bottom-22": { "": { "!marginBottom": "22rpx" } }, "u-padding-bottom-22": { "": { "!paddingBottom": "22rpx" } }, "up-padding-bottom-22": { "": { "!paddingBottom": "22rpx" } }, "u-margin-24": { "": { "!marginTop": "24rpx", "!marginRight": "24rpx", "!marginBottom": "24rpx", "!marginLeft": "24rpx" } }, "u-m-24": { "": { "!marginTop": "24rpx", "!marginRight": "24rpx", "!marginBottom": "24rpx", "!marginLeft": "24rpx" } }, "up-margin-24": { "": { "!marginTop": "24rpx", "!marginRight": "24rpx", "!marginBottom": "24rpx", "!marginLeft": "24rpx" } }, "up-m-24": { "": { "!marginTop": "24rpx", "!marginRight": "24rpx", "!marginBottom": "24rpx", "!marginLeft": "24rpx" } }, "u-padding-24": { "": { "!paddingTop": "24rpx", "!paddingRight": "24rpx", "!paddingBottom": "24rpx", "!paddingLeft": "24rpx" } }, "u-p-24": { "": { "!paddingTop": "24rpx", "!paddingRight": "24rpx", "!paddingBottom": "24rpx", "!paddingLeft": "24rpx" } }, "up-padding-24": { "": { "!paddingTop": "24rpx", "!paddingRight": "24rpx", "!paddingBottom": "24rpx", "!paddingLeft": "24rpx" } }, "up-p-24": { "": { "!paddingTop": "24rpx", "!paddingRight": "24rpx", "!paddingBottom": "24rpx", "!paddingLeft": "24rpx" } }, "u-m-l-24": { "": { "!marginLeft": "24rpx" } }, "up-m-l-24": { "": { "!marginLeft": "24rpx" } }, "u-p-l-24": { "": { "!paddingLeft": "24rpx" } }, "up-p-l-24": { "": { "!paddingLeft": "24rpx" } }, "u-margin-left-24": { "": { "!marginLeft": "24rpx" } }, "up-margin-left-24": { "": { "!marginLeft": "24rpx" } }, "u-padding-left-24": { "": { "!paddingLeft": "24rpx" } }, "up-padding-left-24": { "": { "!paddingLeft": "24rpx" } }, "u-m-t-24": { "": { "!marginTop": "24rpx" } }, "up-m-t-24": { "": { "!marginTop": "24rpx" } }, "u-p-t-24": { "": { "!paddingTop": "24rpx" } }, "up-p-t-24": { "": { "!paddingTop": "24rpx" } }, "u-margin-top-24": { "": { "!marginTop": "24rpx" } }, "up-margin-top-24": { "": { "!marginTop": "24rpx" } }, "u-padding-top-24": { "": { "!paddingTop": "24rpx" } }, "up-padding-top-24": { "": { "!paddingTop": "24rpx" } }, "u-m-r-24": { "": { "!marginRight": "24rpx" } }, "up-m-r-24": { "": { "!marginRight": "24rpx" } }, "u-p-r-24": { "": { "!paddingRight": "24rpx" } }, "up-p-r-24": { "": { "!paddingRight": "24rpx" } }, "u-margin-right-24": { "": { "!marginRight": "24rpx" } }, "up-margin-right-24": { "": { "!marginRight": "24rpx" } }, "u-padding-right-24": { "": { "!paddingRight": "24rpx" } }, "up-padding-right-24": { "": { "!paddingRight": "24rpx" } }, "u-m-b-24": { "": { "!marginBottom": "24rpx" } }, "up-m-b-24": { "": { "!marginBottom": "24rpx" } }, "u-p-b-24": { "": { "!paddingBottom": "24rpx" } }, "up-p-b-24": { "": { "!paddingBottom": "24rpx" } }, "u-margin-bottom-24": { "": { "!marginBottom": "24rpx" } }, "up-margin-bottom-24": { "": { "!marginBottom": "24rpx" } }, "u-padding-bottom-24": { "": { "!paddingBottom": "24rpx" } }, "up-padding-bottom-24": { "": { "!paddingBottom": "24rpx" } }, "u-margin-25": { "": { "!marginTop": "25rpx", "!marginRight": "25rpx", "!marginBottom": "25rpx", "!marginLeft": "25rpx" } }, "u-m-25": { "": { "!marginTop": "25rpx", "!marginRight": "25rpx", "!marginBottom": "25rpx", "!marginLeft": "25rpx" } }, "up-margin-25": { "": { "!marginTop": "25rpx", "!marginRight": "25rpx", "!marginBottom": "25rpx", "!marginLeft": "25rpx" } }, "up-m-25": { "": { "!marginTop": "25rpx", "!marginRight": "25rpx", "!marginBottom": "25rpx", "!marginLeft": "25rpx" } }, "u-padding-25": { "": { "!paddingTop": "25rpx", "!paddingRight": "25rpx", "!paddingBottom": "25rpx", "!paddingLeft": "25rpx" } }, "u-p-25": { "": { "!paddingTop": "25rpx", "!paddingRight": "25rpx", "!paddingBottom": "25rpx", "!paddingLeft": "25rpx" } }, "up-padding-25": { "": { "!paddingTop": "25rpx", "!paddingRight": "25rpx", "!paddingBottom": "25rpx", "!paddingLeft": "25rpx" } }, "up-p-25": { "": { "!paddingTop": "25rpx", "!paddingRight": "25rpx", "!paddingBottom": "25rpx", "!paddingLeft": "25rpx" } }, "u-m-l-25": { "": { "!marginLeft": "25rpx" } }, "up-m-l-25": { "": { "!marginLeft": "25rpx" } }, "u-p-l-25": { "": { "!paddingLeft": "25rpx" } }, "up-p-l-25": { "": { "!paddingLeft": "25rpx" } }, "u-margin-left-25": { "": { "!marginLeft": "25rpx" } }, "up-margin-left-25": { "": { "!marginLeft": "25rpx" } }, "u-padding-left-25": { "": { "!paddingLeft": "25rpx" } }, "up-padding-left-25": { "": { "!paddingLeft": "25rpx" } }, "u-m-t-25": { "": { "!marginTop": "25rpx" } }, "up-m-t-25": { "": { "!marginTop": "25rpx" } }, "u-p-t-25": { "": { "!paddingTop": "25rpx" } }, "up-p-t-25": { "": { "!paddingTop": "25rpx" } }, "u-margin-top-25": { "": { "!marginTop": "25rpx" } }, "up-margin-top-25": { "": { "!marginTop": "25rpx" } }, "u-padding-top-25": { "": { "!paddingTop": "25rpx" } }, "up-padding-top-25": { "": { "!paddingTop": "25rpx" } }, "u-m-r-25": { "": { "!marginRight": "25rpx" } }, "up-m-r-25": { "": { "!marginRight": "25rpx" } }, "u-p-r-25": { "": { "!paddingRight": "25rpx" } }, "up-p-r-25": { "": { "!paddingRight": "25rpx" } }, "u-margin-right-25": { "": { "!marginRight": "25rpx" } }, "up-margin-right-25": { "": { "!marginRight": "25rpx" } }, "u-padding-right-25": { "": { "!paddingRight": "25rpx" } }, "up-padding-right-25": { "": { "!paddingRight": "25rpx" } }, "u-m-b-25": { "": { "!marginBottom": "25rpx" } }, "up-m-b-25": { "": { "!marginBottom": "25rpx" } }, "u-p-b-25": { "": { "!paddingBottom": "25rpx" } }, "up-p-b-25": { "": { "!paddingBottom": "25rpx" } }, "u-margin-bottom-25": { "": { "!marginBottom": "25rpx" } }, "up-margin-bottom-25": { "": { "!marginBottom": "25rpx" } }, "u-padding-bottom-25": { "": { "!paddingBottom": "25rpx" } }, "up-padding-bottom-25": { "": { "!paddingBottom": "25rpx" } }, "u-margin-26": { "": { "!marginTop": "26rpx", "!marginRight": "26rpx", "!marginBottom": "26rpx", "!marginLeft": "26rpx" } }, "u-m-26": { "": { "!marginTop": "26rpx", "!marginRight": "26rpx", "!marginBottom": "26rpx", "!marginLeft": "26rpx" } }, "up-margin-26": { "": { "!marginTop": "26rpx", "!marginRight": "26rpx", "!marginBottom": "26rpx", "!marginLeft": "26rpx" } }, "up-m-26": { "": { "!marginTop": "26rpx", "!marginRight": "26rpx", "!marginBottom": "26rpx", "!marginLeft": "26rpx" } }, "u-padding-26": { "": { "!paddingTop": "26rpx", "!paddingRight": "26rpx", "!paddingBottom": "26rpx", "!paddingLeft": "26rpx" } }, "u-p-26": { "": { "!paddingTop": "26rpx", "!paddingRight": "26rpx", "!paddingBottom": "26rpx", "!paddingLeft": "26rpx" } }, "up-padding-26": { "": { "!paddingTop": "26rpx", "!paddingRight": "26rpx", "!paddingBottom": "26rpx", "!paddingLeft": "26rpx" } }, "up-p-26": { "": { "!paddingTop": "26rpx", "!paddingRight": "26rpx", "!paddingBottom": "26rpx", "!paddingLeft": "26rpx" } }, "u-m-l-26": { "": { "!marginLeft": "26rpx" } }, "up-m-l-26": { "": { "!marginLeft": "26rpx" } }, "u-p-l-26": { "": { "!paddingLeft": "26rpx" } }, "up-p-l-26": { "": { "!paddingLeft": "26rpx" } }, "u-margin-left-26": { "": { "!marginLeft": "26rpx" } }, "up-margin-left-26": { "": { "!marginLeft": "26rpx" } }, "u-padding-left-26": { "": { "!paddingLeft": "26rpx" } }, "up-padding-left-26": { "": { "!paddingLeft": "26rpx" } }, "u-m-t-26": { "": { "!marginTop": "26rpx" } }, "up-m-t-26": { "": { "!marginTop": "26rpx" } }, "u-p-t-26": { "": { "!paddingTop": "26rpx" } }, "up-p-t-26": { "": { "!paddingTop": "26rpx" } }, "u-margin-top-26": { "": { "!marginTop": "26rpx" } }, "up-margin-top-26": { "": { "!marginTop": "26rpx" } }, "u-padding-top-26": { "": { "!paddingTop": "26rpx" } }, "up-padding-top-26": { "": { "!paddingTop": "26rpx" } }, "u-m-r-26": { "": { "!marginRight": "26rpx" } }, "up-m-r-26": { "": { "!marginRight": "26rpx" } }, "u-p-r-26": { "": { "!paddingRight": "26rpx" } }, "up-p-r-26": { "": { "!paddingRight": "26rpx" } }, "u-margin-right-26": { "": { "!marginRight": "26rpx" } }, "up-margin-right-26": { "": { "!marginRight": "26rpx" } }, "u-padding-right-26": { "": { "!paddingRight": "26rpx" } }, "up-padding-right-26": { "": { "!paddingRight": "26rpx" } }, "u-m-b-26": { "": { "!marginBottom": "26rpx" } }, "up-m-b-26": { "": { "!marginBottom": "26rpx" } }, "u-p-b-26": { "": { "!paddingBottom": "26rpx" } }, "up-p-b-26": { "": { "!paddingBottom": "26rpx" } }, "u-margin-bottom-26": { "": { "!marginBottom": "26rpx" } }, "up-margin-bottom-26": { "": { "!marginBottom": "26rpx" } }, "u-padding-bottom-26": { "": { "!paddingBottom": "26rpx" } }, "up-padding-bottom-26": { "": { "!paddingBottom": "26rpx" } }, "u-margin-28": { "": { "!marginTop": "28rpx", "!marginRight": "28rpx", "!marginBottom": "28rpx", "!marginLeft": "28rpx" } }, "u-m-28": { "": { "!marginTop": "28rpx", "!marginRight": "28rpx", "!marginBottom": "28rpx", "!marginLeft": "28rpx" } }, "up-margin-28": { "": { "!marginTop": "28rpx", "!marginRight": "28rpx", "!marginBottom": "28rpx", "!marginLeft": "28rpx" } }, "up-m-28": { "": { "!marginTop": "28rpx", "!marginRight": "28rpx", "!marginBottom": "28rpx", "!marginLeft": "28rpx" } }, "u-padding-28": { "": { "!paddingTop": "28rpx", "!paddingRight": "28rpx", "!paddingBottom": "28rpx", "!paddingLeft": "28rpx" } }, "u-p-28": { "": { "!paddingTop": "28rpx", "!paddingRight": "28rpx", "!paddingBottom": "28rpx", "!paddingLeft": "28rpx" } }, "up-padding-28": { "": { "!paddingTop": "28rpx", "!paddingRight": "28rpx", "!paddingBottom": "28rpx", "!paddingLeft": "28rpx" } }, "up-p-28": { "": { "!paddingTop": "28rpx", "!paddingRight": "28rpx", "!paddingBottom": "28rpx", "!paddingLeft": "28rpx" } }, "u-m-l-28": { "": { "!marginLeft": "28rpx" } }, "up-m-l-28": { "": { "!marginLeft": "28rpx" } }, "u-p-l-28": { "": { "!paddingLeft": "28rpx" } }, "up-p-l-28": { "": { "!paddingLeft": "28rpx" } }, "u-margin-left-28": { "": { "!marginLeft": "28rpx" } }, "up-margin-left-28": { "": { "!marginLeft": "28rpx" } }, "u-padding-left-28": { "": { "!paddingLeft": "28rpx" } }, "up-padding-left-28": { "": { "!paddingLeft": "28rpx" } }, "u-m-t-28": { "": { "!marginTop": "28rpx" } }, "up-m-t-28": { "": { "!marginTop": "28rpx" } }, "u-p-t-28": { "": { "!paddingTop": "28rpx" } }, "up-p-t-28": { "": { "!paddingTop": "28rpx" } }, "u-margin-top-28": { "": { "!marginTop": "28rpx" } }, "up-margin-top-28": { "": { "!marginTop": "28rpx" } }, "u-padding-top-28": { "": { "!paddingTop": "28rpx" } }, "up-padding-top-28": { "": { "!paddingTop": "28rpx" } }, "u-m-r-28": { "": { "!marginRight": "28rpx" } }, "up-m-r-28": { "": { "!marginRight": "28rpx" } }, "u-p-r-28": { "": { "!paddingRight": "28rpx" } }, "up-p-r-28": { "": { "!paddingRight": "28rpx" } }, "u-margin-right-28": { "": { "!marginRight": "28rpx" } }, "up-margin-right-28": { "": { "!marginRight": "28rpx" } }, "u-padding-right-28": { "": { "!paddingRight": "28rpx" } }, "up-padding-right-28": { "": { "!paddingRight": "28rpx" } }, "u-m-b-28": { "": { "!marginBottom": "28rpx" } }, "up-m-b-28": { "": { "!marginBottom": "28rpx" } }, "u-p-b-28": { "": { "!paddingBottom": "28rpx" } }, "up-p-b-28": { "": { "!paddingBottom": "28rpx" } }, "u-margin-bottom-28": { "": { "!marginBottom": "28rpx" } }, "up-margin-bottom-28": { "": { "!marginBottom": "28rpx" } }, "u-padding-bottom-28": { "": { "!paddingBottom": "28rpx" } }, "up-padding-bottom-28": { "": { "!paddingBottom": "28rpx" } }, "u-margin-30": { "": { "!marginTop": "30rpx", "!marginRight": "30rpx", "!marginBottom": "30rpx", "!marginLeft": "30rpx" } }, "u-m-30": { "": { "!marginTop": "30rpx", "!marginRight": "30rpx", "!marginBottom": "30rpx", "!marginLeft": "30rpx" } }, "up-margin-30": { "": { "!marginTop": "30rpx", "!marginRight": "30rpx", "!marginBottom": "30rpx", "!marginLeft": "30rpx" } }, "up-m-30": { "": { "!marginTop": "30rpx", "!marginRight": "30rpx", "!marginBottom": "30rpx", "!marginLeft": "30rpx" } }, "u-padding-30": { "": { "!paddingTop": "30rpx", "!paddingRight": "30rpx", "!paddingBottom": "30rpx", "!paddingLeft": "30rpx" } }, "u-p-30": { "": { "!paddingTop": "30rpx", "!paddingRight": "30rpx", "!paddingBottom": "30rpx", "!paddingLeft": "30rpx" } }, "up-padding-30": { "": { "!paddingTop": "30rpx", "!paddingRight": "30rpx", "!paddingBottom": "30rpx", "!paddingLeft": "30rpx" } }, "up-p-30": { "": { "!paddingTop": "30rpx", "!paddingRight": "30rpx", "!paddingBottom": "30rpx", "!paddingLeft": "30rpx" } }, "u-m-l-30": { "": { "!marginLeft": "30rpx" } }, "up-m-l-30": { "": { "!marginLeft": "30rpx" } }, "u-p-l-30": { "": { "!paddingLeft": "30rpx" } }, "up-p-l-30": { "": { "!paddingLeft": "30rpx" } }, "u-margin-left-30": { "": { "!marginLeft": "30rpx" } }, "up-margin-left-30": { "": { "!marginLeft": "30rpx" } }, "u-padding-left-30": { "": { "!paddingLeft": "30rpx" } }, "up-padding-left-30": { "": { "!paddingLeft": "30rpx" } }, "u-m-t-30": { "": { "!marginTop": "30rpx" } }, "up-m-t-30": { "": { "!marginTop": "30rpx" } }, "u-p-t-30": { "": { "!paddingTop": "30rpx" } }, "up-p-t-30": { "": { "!paddingTop": "30rpx" } }, "u-margin-top-30": { "": { "!marginTop": "30rpx" } }, "up-margin-top-30": { "": { "!marginTop": "30rpx" } }, "u-padding-top-30": { "": { "!paddingTop": "30rpx" } }, "up-padding-top-30": { "": { "!paddingTop": "30rpx" } }, "u-m-r-30": { "": { "!marginRight": "30rpx" } }, "up-m-r-30": { "": { "!marginRight": "30rpx" } }, "u-p-r-30": { "": { "!paddingRight": "30rpx" } }, "up-p-r-30": { "": { "!paddingRight": "30rpx" } }, "u-margin-right-30": { "": { "!marginRight": "30rpx" } }, "up-margin-right-30": { "": { "!marginRight": "30rpx" } }, "u-padding-right-30": { "": { "!paddingRight": "30rpx" } }, "up-padding-right-30": { "": { "!paddingRight": "30rpx" } }, "u-m-b-30": { "": { "!marginBottom": "30rpx" } }, "up-m-b-30": { "": { "!marginBottom": "30rpx" } }, "u-p-b-30": { "": { "!paddingBottom": "30rpx" } }, "up-p-b-30": { "": { "!paddingBottom": "30rpx" } }, "u-margin-bottom-30": { "": { "!marginBottom": "30rpx" } }, "up-margin-bottom-30": { "": { "!marginBottom": "30rpx" } }, "u-padding-bottom-30": { "": { "!paddingBottom": "30rpx" } }, "up-padding-bottom-30": { "": { "!paddingBottom": "30rpx" } }, "u-margin-32": { "": { "!marginTop": "32rpx", "!marginRight": "32rpx", "!marginBottom": "32rpx", "!marginLeft": "32rpx" } }, "u-m-32": { "": { "!marginTop": "32rpx", "!marginRight": "32rpx", "!marginBottom": "32rpx", "!marginLeft": "32rpx" } }, "up-margin-32": { "": { "!marginTop": "32rpx", "!marginRight": "32rpx", "!marginBottom": "32rpx", "!marginLeft": "32rpx" } }, "up-m-32": { "": { "!marginTop": "32rpx", "!marginRight": "32rpx", "!marginBottom": "32rpx", "!marginLeft": "32rpx" } }, "u-padding-32": { "": { "!paddingTop": "32rpx", "!paddingRight": "32rpx", "!paddingBottom": "32rpx", "!paddingLeft": "32rpx" } }, "u-p-32": { "": { "!paddingTop": "32rpx", "!paddingRight": "32rpx", "!paddingBottom": "32rpx", "!paddingLeft": "32rpx" } }, "up-padding-32": { "": { "!paddingTop": "32rpx", "!paddingRight": "32rpx", "!paddingBottom": "32rpx", "!paddingLeft": "32rpx" } }, "up-p-32": { "": { "!paddingTop": "32rpx", "!paddingRight": "32rpx", "!paddingBottom": "32rpx", "!paddingLeft": "32rpx" } }, "u-m-l-32": { "": { "!marginLeft": "32rpx" } }, "up-m-l-32": { "": { "!marginLeft": "32rpx" } }, "u-p-l-32": { "": { "!paddingLeft": "32rpx" } }, "up-p-l-32": { "": { "!paddingLeft": "32rpx" } }, "u-margin-left-32": { "": { "!marginLeft": "32rpx" } }, "up-margin-left-32": { "": { "!marginLeft": "32rpx" } }, "u-padding-left-32": { "": { "!paddingLeft": "32rpx" } }, "up-padding-left-32": { "": { "!paddingLeft": "32rpx" } }, "u-m-t-32": { "": { "!marginTop": "32rpx" } }, "up-m-t-32": { "": { "!marginTop": "32rpx" } }, "u-p-t-32": { "": { "!paddingTop": "32rpx" } }, "up-p-t-32": { "": { "!paddingTop": "32rpx" } }, "u-margin-top-32": { "": { "!marginTop": "32rpx" } }, "up-margin-top-32": { "": { "!marginTop": "32rpx" } }, "u-padding-top-32": { "": { "!paddingTop": "32rpx" } }, "up-padding-top-32": { "": { "!paddingTop": "32rpx" } }, "u-m-r-32": { "": { "!marginRight": "32rpx" } }, "up-m-r-32": { "": { "!marginRight": "32rpx" } }, "u-p-r-32": { "": { "!paddingRight": "32rpx" } }, "up-p-r-32": { "": { "!paddingRight": "32rpx" } }, "u-margin-right-32": { "": { "!marginRight": "32rpx" } }, "up-margin-right-32": { "": { "!marginRight": "32rpx" } }, "u-padding-right-32": { "": { "!paddingRight": "32rpx" } }, "up-padding-right-32": { "": { "!paddingRight": "32rpx" } }, "u-m-b-32": { "": { "!marginBottom": "32rpx" } }, "up-m-b-32": { "": { "!marginBottom": "32rpx" } }, "u-p-b-32": { "": { "!paddingBottom": "32rpx" } }, "up-p-b-32": { "": { "!paddingBottom": "32rpx" } }, "u-margin-bottom-32": { "": { "!marginBottom": "32rpx" } }, "up-margin-bottom-32": { "": { "!marginBottom": "32rpx" } }, "u-padding-bottom-32": { "": { "!paddingBottom": "32rpx" } }, "up-padding-bottom-32": { "": { "!paddingBottom": "32rpx" } }, "u-margin-34": { "": { "!marginTop": "34rpx", "!marginRight": "34rpx", "!marginBottom": "34rpx", "!marginLeft": "34rpx" } }, "u-m-34": { "": { "!marginTop": "34rpx", "!marginRight": "34rpx", "!marginBottom": "34rpx", "!marginLeft": "34rpx" } }, "up-margin-34": { "": { "!marginTop": "34rpx", "!marginRight": "34rpx", "!marginBottom": "34rpx", "!marginLeft": "34rpx" } }, "up-m-34": { "": { "!marginTop": "34rpx", "!marginRight": "34rpx", "!marginBottom": "34rpx", "!marginLeft": "34rpx" } }, "u-padding-34": { "": { "!paddingTop": "34rpx", "!paddingRight": "34rpx", "!paddingBottom": "34rpx", "!paddingLeft": "34rpx" } }, "u-p-34": { "": { "!paddingTop": "34rpx", "!paddingRight": "34rpx", "!paddingBottom": "34rpx", "!paddingLeft": "34rpx" } }, "up-padding-34": { "": { "!paddingTop": "34rpx", "!paddingRight": "34rpx", "!paddingBottom": "34rpx", "!paddingLeft": "34rpx" } }, "up-p-34": { "": { "!paddingTop": "34rpx", "!paddingRight": "34rpx", "!paddingBottom": "34rpx", "!paddingLeft": "34rpx" } }, "u-m-l-34": { "": { "!marginLeft": "34rpx" } }, "up-m-l-34": { "": { "!marginLeft": "34rpx" } }, "u-p-l-34": { "": { "!paddingLeft": "34rpx" } }, "up-p-l-34": { "": { "!paddingLeft": "34rpx" } }, "u-margin-left-34": { "": { "!marginLeft": "34rpx" } }, "up-margin-left-34": { "": { "!marginLeft": "34rpx" } }, "u-padding-left-34": { "": { "!paddingLeft": "34rpx" } }, "up-padding-left-34": { "": { "!paddingLeft": "34rpx" } }, "u-m-t-34": { "": { "!marginTop": "34rpx" } }, "up-m-t-34": { "": { "!marginTop": "34rpx" } }, "u-p-t-34": { "": { "!paddingTop": "34rpx" } }, "up-p-t-34": { "": { "!paddingTop": "34rpx" } }, "u-margin-top-34": { "": { "!marginTop": "34rpx" } }, "up-margin-top-34": { "": { "!marginTop": "34rpx" } }, "u-padding-top-34": { "": { "!paddingTop": "34rpx" } }, "up-padding-top-34": { "": { "!paddingTop": "34rpx" } }, "u-m-r-34": { "": { "!marginRight": "34rpx" } }, "up-m-r-34": { "": { "!marginRight": "34rpx" } }, "u-p-r-34": { "": { "!paddingRight": "34rpx" } }, "up-p-r-34": { "": { "!paddingRight": "34rpx" } }, "u-margin-right-34": { "": { "!marginRight": "34rpx" } }, "up-margin-right-34": { "": { "!marginRight": "34rpx" } }, "u-padding-right-34": { "": { "!paddingRight": "34rpx" } }, "up-padding-right-34": { "": { "!paddingRight": "34rpx" } }, "u-m-b-34": { "": { "!marginBottom": "34rpx" } }, "up-m-b-34": { "": { "!marginBottom": "34rpx" } }, "u-p-b-34": { "": { "!paddingBottom": "34rpx" } }, "up-p-b-34": { "": { "!paddingBottom": "34rpx" } }, "u-margin-bottom-34": { "": { "!marginBottom": "34rpx" } }, "up-margin-bottom-34": { "": { "!marginBottom": "34rpx" } }, "u-padding-bottom-34": { "": { "!paddingBottom": "34rpx" } }, "up-padding-bottom-34": { "": { "!paddingBottom": "34rpx" } }, "u-margin-35": { "": { "!marginTop": "35rpx", "!marginRight": "35rpx", "!marginBottom": "35rpx", "!marginLeft": "35rpx" } }, "u-m-35": { "": { "!marginTop": "35rpx", "!marginRight": "35rpx", "!marginBottom": "35rpx", "!marginLeft": "35rpx" } }, "up-margin-35": { "": { "!marginTop": "35rpx", "!marginRight": "35rpx", "!marginBottom": "35rpx", "!marginLeft": "35rpx" } }, "up-m-35": { "": { "!marginTop": "35rpx", "!marginRight": "35rpx", "!marginBottom": "35rpx", "!marginLeft": "35rpx" } }, "u-padding-35": { "": { "!paddingTop": "35rpx", "!paddingRight": "35rpx", "!paddingBottom": "35rpx", "!paddingLeft": "35rpx" } }, "u-p-35": { "": { "!paddingTop": "35rpx", "!paddingRight": "35rpx", "!paddingBottom": "35rpx", "!paddingLeft": "35rpx" } }, "up-padding-35": { "": { "!paddingTop": "35rpx", "!paddingRight": "35rpx", "!paddingBottom": "35rpx", "!paddingLeft": "35rpx" } }, "up-p-35": { "": { "!paddingTop": "35rpx", "!paddingRight": "35rpx", "!paddingBottom": "35rpx", "!paddingLeft": "35rpx" } }, "u-m-l-35": { "": { "!marginLeft": "35rpx" } }, "up-m-l-35": { "": { "!marginLeft": "35rpx" } }, "u-p-l-35": { "": { "!paddingLeft": "35rpx" } }, "up-p-l-35": { "": { "!paddingLeft": "35rpx" } }, "u-margin-left-35": { "": { "!marginLeft": "35rpx" } }, "up-margin-left-35": { "": { "!marginLeft": "35rpx" } }, "u-padding-left-35": { "": { "!paddingLeft": "35rpx" } }, "up-padding-left-35": { "": { "!paddingLeft": "35rpx" } }, "u-m-t-35": { "": { "!marginTop": "35rpx" } }, "up-m-t-35": { "": { "!marginTop": "35rpx" } }, "u-p-t-35": { "": { "!paddingTop": "35rpx" } }, "up-p-t-35": { "": { "!paddingTop": "35rpx" } }, "u-margin-top-35": { "": { "!marginTop": "35rpx" } }, "up-margin-top-35": { "": { "!marginTop": "35rpx" } }, "u-padding-top-35": { "": { "!paddingTop": "35rpx" } }, "up-padding-top-35": { "": { "!paddingTop": "35rpx" } }, "u-m-r-35": { "": { "!marginRight": "35rpx" } }, "up-m-r-35": { "": { "!marginRight": "35rpx" } }, "u-p-r-35": { "": { "!paddingRight": "35rpx" } }, "up-p-r-35": { "": { "!paddingRight": "35rpx" } }, "u-margin-right-35": { "": { "!marginRight": "35rpx" } }, "up-margin-right-35": { "": { "!marginRight": "35rpx" } }, "u-padding-right-35": { "": { "!paddingRight": "35rpx" } }, "up-padding-right-35": { "": { "!paddingRight": "35rpx" } }, "u-m-b-35": { "": { "!marginBottom": "35rpx" } }, "up-m-b-35": { "": { "!marginBottom": "35rpx" } }, "u-p-b-35": { "": { "!paddingBottom": "35rpx" } }, "up-p-b-35": { "": { "!paddingBottom": "35rpx" } }, "u-margin-bottom-35": { "": { "!marginBottom": "35rpx" } }, "up-margin-bottom-35": { "": { "!marginBottom": "35rpx" } }, "u-padding-bottom-35": { "": { "!paddingBottom": "35rpx" } }, "up-padding-bottom-35": { "": { "!paddingBottom": "35rpx" } }, "u-margin-36": { "": { "!marginTop": "36rpx", "!marginRight": "36rpx", "!marginBottom": "36rpx", "!marginLeft": "36rpx" } }, "u-m-36": { "": { "!marginTop": "36rpx", "!marginRight": "36rpx", "!marginBottom": "36rpx", "!marginLeft": "36rpx" } }, "up-margin-36": { "": { "!marginTop": "36rpx", "!marginRight": "36rpx", "!marginBottom": "36rpx", "!marginLeft": "36rpx" } }, "up-m-36": { "": { "!marginTop": "36rpx", "!marginRight": "36rpx", "!marginBottom": "36rpx", "!marginLeft": "36rpx" } }, "u-padding-36": { "": { "!paddingTop": "36rpx", "!paddingRight": "36rpx", "!paddingBottom": "36rpx", "!paddingLeft": "36rpx" } }, "u-p-36": { "": { "!paddingTop": "36rpx", "!paddingRight": "36rpx", "!paddingBottom": "36rpx", "!paddingLeft": "36rpx" } }, "up-padding-36": { "": { "!paddingTop": "36rpx", "!paddingRight": "36rpx", "!paddingBottom": "36rpx", "!paddingLeft": "36rpx" } }, "up-p-36": { "": { "!paddingTop": "36rpx", "!paddingRight": "36rpx", "!paddingBottom": "36rpx", "!paddingLeft": "36rpx" } }, "u-m-l-36": { "": { "!marginLeft": "36rpx" } }, "up-m-l-36": { "": { "!marginLeft": "36rpx" } }, "u-p-l-36": { "": { "!paddingLeft": "36rpx" } }, "up-p-l-36": { "": { "!paddingLeft": "36rpx" } }, "u-margin-left-36": { "": { "!marginLeft": "36rpx" } }, "up-margin-left-36": { "": { "!marginLeft": "36rpx" } }, "u-padding-left-36": { "": { "!paddingLeft": "36rpx" } }, "up-padding-left-36": { "": { "!paddingLeft": "36rpx" } }, "u-m-t-36": { "": { "!marginTop": "36rpx" } }, "up-m-t-36": { "": { "!marginTop": "36rpx" } }, "u-p-t-36": { "": { "!paddingTop": "36rpx" } }, "up-p-t-36": { "": { "!paddingTop": "36rpx" } }, "u-margin-top-36": { "": { "!marginTop": "36rpx" } }, "up-margin-top-36": { "": { "!marginTop": "36rpx" } }, "u-padding-top-36": { "": { "!paddingTop": "36rpx" } }, "up-padding-top-36": { "": { "!paddingTop": "36rpx" } }, "u-m-r-36": { "": { "!marginRight": "36rpx" } }, "up-m-r-36": { "": { "!marginRight": "36rpx" } }, "u-p-r-36": { "": { "!paddingRight": "36rpx" } }, "up-p-r-36": { "": { "!paddingRight": "36rpx" } }, "u-margin-right-36": { "": { "!marginRight": "36rpx" } }, "up-margin-right-36": { "": { "!marginRight": "36rpx" } }, "u-padding-right-36": { "": { "!paddingRight": "36rpx" } }, "up-padding-right-36": { "": { "!paddingRight": "36rpx" } }, "u-m-b-36": { "": { "!marginBottom": "36rpx" } }, "up-m-b-36": { "": { "!marginBottom": "36rpx" } }, "u-p-b-36": { "": { "!paddingBottom": "36rpx" } }, "up-p-b-36": { "": { "!paddingBottom": "36rpx" } }, "u-margin-bottom-36": { "": { "!marginBottom": "36rpx" } }, "up-margin-bottom-36": { "": { "!marginBottom": "36rpx" } }, "u-padding-bottom-36": { "": { "!paddingBottom": "36rpx" } }, "up-padding-bottom-36": { "": { "!paddingBottom": "36rpx" } }, "u-margin-38": { "": { "!marginTop": "38rpx", "!marginRight": "38rpx", "!marginBottom": "38rpx", "!marginLeft": "38rpx" } }, "u-m-38": { "": { "!marginTop": "38rpx", "!marginRight": "38rpx", "!marginBottom": "38rpx", "!marginLeft": "38rpx" } }, "up-margin-38": { "": { "!marginTop": "38rpx", "!marginRight": "38rpx", "!marginBottom": "38rpx", "!marginLeft": "38rpx" } }, "up-m-38": { "": { "!marginTop": "38rpx", "!marginRight": "38rpx", "!marginBottom": "38rpx", "!marginLeft": "38rpx" } }, "u-padding-38": { "": { "!paddingTop": "38rpx", "!paddingRight": "38rpx", "!paddingBottom": "38rpx", "!paddingLeft": "38rpx" } }, "u-p-38": { "": { "!paddingTop": "38rpx", "!paddingRight": "38rpx", "!paddingBottom": "38rpx", "!paddingLeft": "38rpx" } }, "up-padding-38": { "": { "!paddingTop": "38rpx", "!paddingRight": "38rpx", "!paddingBottom": "38rpx", "!paddingLeft": "38rpx" } }, "up-p-38": { "": { "!paddingTop": "38rpx", "!paddingRight": "38rpx", "!paddingBottom": "38rpx", "!paddingLeft": "38rpx" } }, "u-m-l-38": { "": { "!marginLeft": "38rpx" } }, "up-m-l-38": { "": { "!marginLeft": "38rpx" } }, "u-p-l-38": { "": { "!paddingLeft": "38rpx" } }, "up-p-l-38": { "": { "!paddingLeft": "38rpx" } }, "u-margin-left-38": { "": { "!marginLeft": "38rpx" } }, "up-margin-left-38": { "": { "!marginLeft": "38rpx" } }, "u-padding-left-38": { "": { "!paddingLeft": "38rpx" } }, "up-padding-left-38": { "": { "!paddingLeft": "38rpx" } }, "u-m-t-38": { "": { "!marginTop": "38rpx" } }, "up-m-t-38": { "": { "!marginTop": "38rpx" } }, "u-p-t-38": { "": { "!paddingTop": "38rpx" } }, "up-p-t-38": { "": { "!paddingTop": "38rpx" } }, "u-margin-top-38": { "": { "!marginTop": "38rpx" } }, "up-margin-top-38": { "": { "!marginTop": "38rpx" } }, "u-padding-top-38": { "": { "!paddingTop": "38rpx" } }, "up-padding-top-38": { "": { "!paddingTop": "38rpx" } }, "u-m-r-38": { "": { "!marginRight": "38rpx" } }, "up-m-r-38": { "": { "!marginRight": "38rpx" } }, "u-p-r-38": { "": { "!paddingRight": "38rpx" } }, "up-p-r-38": { "": { "!paddingRight": "38rpx" } }, "u-margin-right-38": { "": { "!marginRight": "38rpx" } }, "up-margin-right-38": { "": { "!marginRight": "38rpx" } }, "u-padding-right-38": { "": { "!paddingRight": "38rpx" } }, "up-padding-right-38": { "": { "!paddingRight": "38rpx" } }, "u-m-b-38": { "": { "!marginBottom": "38rpx" } }, "up-m-b-38": { "": { "!marginBottom": "38rpx" } }, "u-p-b-38": { "": { "!paddingBottom": "38rpx" } }, "up-p-b-38": { "": { "!paddingBottom": "38rpx" } }, "u-margin-bottom-38": { "": { "!marginBottom": "38rpx" } }, "up-margin-bottom-38": { "": { "!marginBottom": "38rpx" } }, "u-padding-bottom-38": { "": { "!paddingBottom": "38rpx" } }, "up-padding-bottom-38": { "": { "!paddingBottom": "38rpx" } }, "u-margin-40": { "": { "!marginTop": "40rpx", "!marginRight": "40rpx", "!marginBottom": "40rpx", "!marginLeft": "40rpx" } }, "u-m-40": { "": { "!marginTop": "40rpx", "!marginRight": "40rpx", "!marginBottom": "40rpx", "!marginLeft": "40rpx" } }, "up-margin-40": { "": { "!marginTop": "40rpx", "!marginRight": "40rpx", "!marginBottom": "40rpx", "!marginLeft": "40rpx" } }, "up-m-40": { "": { "!marginTop": "40rpx", "!marginRight": "40rpx", "!marginBottom": "40rpx", "!marginLeft": "40rpx" } }, "u-padding-40": { "": { "!paddingTop": "40rpx", "!paddingRight": "40rpx", "!paddingBottom": "40rpx", "!paddingLeft": "40rpx" } }, "u-p-40": { "": { "!paddingTop": "40rpx", "!paddingRight": "40rpx", "!paddingBottom": "40rpx", "!paddingLeft": "40rpx" } }, "up-padding-40": { "": { "!paddingTop": "40rpx", "!paddingRight": "40rpx", "!paddingBottom": "40rpx", "!paddingLeft": "40rpx" } }, "up-p-40": { "": { "!paddingTop": "40rpx", "!paddingRight": "40rpx", "!paddingBottom": "40rpx", "!paddingLeft": "40rpx" } }, "u-m-l-40": { "": { "!marginLeft": "40rpx" } }, "up-m-l-40": { "": { "!marginLeft": "40rpx" } }, "u-p-l-40": { "": { "!paddingLeft": "40rpx" } }, "up-p-l-40": { "": { "!paddingLeft": "40rpx" } }, "u-margin-left-40": { "": { "!marginLeft": "40rpx" } }, "up-margin-left-40": { "": { "!marginLeft": "40rpx" } }, "u-padding-left-40": { "": { "!paddingLeft": "40rpx" } }, "up-padding-left-40": { "": { "!paddingLeft": "40rpx" } }, "u-m-t-40": { "": { "!marginTop": "40rpx" } }, "up-m-t-40": { "": { "!marginTop": "40rpx" } }, "u-p-t-40": { "": { "!paddingTop": "40rpx" } }, "up-p-t-40": { "": { "!paddingTop": "40rpx" } }, "u-margin-top-40": { "": { "!marginTop": "40rpx" } }, "up-margin-top-40": { "": { "!marginTop": "40rpx" } }, "u-padding-top-40": { "": { "!paddingTop": "40rpx" } }, "up-padding-top-40": { "": { "!paddingTop": "40rpx" } }, "u-m-r-40": { "": { "!marginRight": "40rpx" } }, "up-m-r-40": { "": { "!marginRight": "40rpx" } }, "u-p-r-40": { "": { "!paddingRight": "40rpx" } }, "up-p-r-40": { "": { "!paddingRight": "40rpx" } }, "u-margin-right-40": { "": { "!marginRight": "40rpx" } }, "up-margin-right-40": { "": { "!marginRight": "40rpx" } }, "u-padding-right-40": { "": { "!paddingRight": "40rpx" } }, "up-padding-right-40": { "": { "!paddingRight": "40rpx" } }, "u-m-b-40": { "": { "!marginBottom": "40rpx" } }, "up-m-b-40": { "": { "!marginBottom": "40rpx" } }, "u-p-b-40": { "": { "!paddingBottom": "40rpx" } }, "up-p-b-40": { "": { "!paddingBottom": "40rpx" } }, "u-margin-bottom-40": { "": { "!marginBottom": "40rpx" } }, "up-margin-bottom-40": { "": { "!marginBottom": "40rpx" } }, "u-padding-bottom-40": { "": { "!paddingBottom": "40rpx" } }, "up-padding-bottom-40": { "": { "!paddingBottom": "40rpx" } }, "u-margin-42": { "": { "!marginTop": "42rpx", "!marginRight": "42rpx", "!marginBottom": "42rpx", "!marginLeft": "42rpx" } }, "u-m-42": { "": { "!marginTop": "42rpx", "!marginRight": "42rpx", "!marginBottom": "42rpx", "!marginLeft": "42rpx" } }, "up-margin-42": { "": { "!marginTop": "42rpx", "!marginRight": "42rpx", "!marginBottom": "42rpx", "!marginLeft": "42rpx" } }, "up-m-42": { "": { "!marginTop": "42rpx", "!marginRight": "42rpx", "!marginBottom": "42rpx", "!marginLeft": "42rpx" } }, "u-padding-42": { "": { "!paddingTop": "42rpx", "!paddingRight": "42rpx", "!paddingBottom": "42rpx", "!paddingLeft": "42rpx" } }, "u-p-42": { "": { "!paddingTop": "42rpx", "!paddingRight": "42rpx", "!paddingBottom": "42rpx", "!paddingLeft": "42rpx" } }, "up-padding-42": { "": { "!paddingTop": "42rpx", "!paddingRight": "42rpx", "!paddingBottom": "42rpx", "!paddingLeft": "42rpx" } }, "up-p-42": { "": { "!paddingTop": "42rpx", "!paddingRight": "42rpx", "!paddingBottom": "42rpx", "!paddingLeft": "42rpx" } }, "u-m-l-42": { "": { "!marginLeft": "42rpx" } }, "up-m-l-42": { "": { "!marginLeft": "42rpx" } }, "u-p-l-42": { "": { "!paddingLeft": "42rpx" } }, "up-p-l-42": { "": { "!paddingLeft": "42rpx" } }, "u-margin-left-42": { "": { "!marginLeft": "42rpx" } }, "up-margin-left-42": { "": { "!marginLeft": "42rpx" } }, "u-padding-left-42": { "": { "!paddingLeft": "42rpx" } }, "up-padding-left-42": { "": { "!paddingLeft": "42rpx" } }, "u-m-t-42": { "": { "!marginTop": "42rpx" } }, "up-m-t-42": { "": { "!marginTop": "42rpx" } }, "u-p-t-42": { "": { "!paddingTop": "42rpx" } }, "up-p-t-42": { "": { "!paddingTop": "42rpx" } }, "u-margin-top-42": { "": { "!marginTop": "42rpx" } }, "up-margin-top-42": { "": { "!marginTop": "42rpx" } }, "u-padding-top-42": { "": { "!paddingTop": "42rpx" } }, "up-padding-top-42": { "": { "!paddingTop": "42rpx" } }, "u-m-r-42": { "": { "!marginRight": "42rpx" } }, "up-m-r-42": { "": { "!marginRight": "42rpx" } }, "u-p-r-42": { "": { "!paddingRight": "42rpx" } }, "up-p-r-42": { "": { "!paddingRight": "42rpx" } }, "u-margin-right-42": { "": { "!marginRight": "42rpx" } }, "up-margin-right-42": { "": { "!marginRight": "42rpx" } }, "u-padding-right-42": { "": { "!paddingRight": "42rpx" } }, "up-padding-right-42": { "": { "!paddingRight": "42rpx" } }, "u-m-b-42": { "": { "!marginBottom": "42rpx" } }, "up-m-b-42": { "": { "!marginBottom": "42rpx" } }, "u-p-b-42": { "": { "!paddingBottom": "42rpx" } }, "up-p-b-42": { "": { "!paddingBottom": "42rpx" } }, "u-margin-bottom-42": { "": { "!marginBottom": "42rpx" } }, "up-margin-bottom-42": { "": { "!marginBottom": "42rpx" } }, "u-padding-bottom-42": { "": { "!paddingBottom": "42rpx" } }, "up-padding-bottom-42": { "": { "!paddingBottom": "42rpx" } }, "u-margin-44": { "": { "!marginTop": "44rpx", "!marginRight": "44rpx", "!marginBottom": "44rpx", "!marginLeft": "44rpx" } }, "u-m-44": { "": { "!marginTop": "44rpx", "!marginRight": "44rpx", "!marginBottom": "44rpx", "!marginLeft": "44rpx" } }, "up-margin-44": { "": { "!marginTop": "44rpx", "!marginRight": "44rpx", "!marginBottom": "44rpx", "!marginLeft": "44rpx" } }, "up-m-44": { "": { "!marginTop": "44rpx", "!marginRight": "44rpx", "!marginBottom": "44rpx", "!marginLeft": "44rpx" } }, "u-padding-44": { "": { "!paddingTop": "44rpx", "!paddingRight": "44rpx", "!paddingBottom": "44rpx", "!paddingLeft": "44rpx" } }, "u-p-44": { "": { "!paddingTop": "44rpx", "!paddingRight": "44rpx", "!paddingBottom": "44rpx", "!paddingLeft": "44rpx" } }, "up-padding-44": { "": { "!paddingTop": "44rpx", "!paddingRight": "44rpx", "!paddingBottom": "44rpx", "!paddingLeft": "44rpx" } }, "up-p-44": { "": { "!paddingTop": "44rpx", "!paddingRight": "44rpx", "!paddingBottom": "44rpx", "!paddingLeft": "44rpx" } }, "u-m-l-44": { "": { "!marginLeft": "44rpx" } }, "up-m-l-44": { "": { "!marginLeft": "44rpx" } }, "u-p-l-44": { "": { "!paddingLeft": "44rpx" } }, "up-p-l-44": { "": { "!paddingLeft": "44rpx" } }, "u-margin-left-44": { "": { "!marginLeft": "44rpx" } }, "up-margin-left-44": { "": { "!marginLeft": "44rpx" } }, "u-padding-left-44": { "": { "!paddingLeft": "44rpx" } }, "up-padding-left-44": { "": { "!paddingLeft": "44rpx" } }, "u-m-t-44": { "": { "!marginTop": "44rpx" } }, "up-m-t-44": { "": { "!marginTop": "44rpx" } }, "u-p-t-44": { "": { "!paddingTop": "44rpx" } }, "up-p-t-44": { "": { "!paddingTop": "44rpx" } }, "u-margin-top-44": { "": { "!marginTop": "44rpx" } }, "up-margin-top-44": { "": { "!marginTop": "44rpx" } }, "u-padding-top-44": { "": { "!paddingTop": "44rpx" } }, "up-padding-top-44": { "": { "!paddingTop": "44rpx" } }, "u-m-r-44": { "": { "!marginRight": "44rpx" } }, "up-m-r-44": { "": { "!marginRight": "44rpx" } }, "u-p-r-44": { "": { "!paddingRight": "44rpx" } }, "up-p-r-44": { "": { "!paddingRight": "44rpx" } }, "u-margin-right-44": { "": { "!marginRight": "44rpx" } }, "up-margin-right-44": { "": { "!marginRight": "44rpx" } }, "u-padding-right-44": { "": { "!paddingRight": "44rpx" } }, "up-padding-right-44": { "": { "!paddingRight": "44rpx" } }, "u-m-b-44": { "": { "!marginBottom": "44rpx" } }, "up-m-b-44": { "": { "!marginBottom": "44rpx" } }, "u-p-b-44": { "": { "!paddingBottom": "44rpx" } }, "up-p-b-44": { "": { "!paddingBottom": "44rpx" } }, "u-margin-bottom-44": { "": { "!marginBottom": "44rpx" } }, "up-margin-bottom-44": { "": { "!marginBottom": "44rpx" } }, "u-padding-bottom-44": { "": { "!paddingBottom": "44rpx" } }, "up-padding-bottom-44": { "": { "!paddingBottom": "44rpx" } }, "u-margin-45": { "": { "!marginTop": "45rpx", "!marginRight": "45rpx", "!marginBottom": "45rpx", "!marginLeft": "45rpx" } }, "u-m-45": { "": { "!marginTop": "45rpx", "!marginRight": "45rpx", "!marginBottom": "45rpx", "!marginLeft": "45rpx" } }, "up-margin-45": { "": { "!marginTop": "45rpx", "!marginRight": "45rpx", "!marginBottom": "45rpx", "!marginLeft": "45rpx" } }, "up-m-45": { "": { "!marginTop": "45rpx", "!marginRight": "45rpx", "!marginBottom": "45rpx", "!marginLeft": "45rpx" } }, "u-padding-45": { "": { "!paddingTop": "45rpx", "!paddingRight": "45rpx", "!paddingBottom": "45rpx", "!paddingLeft": "45rpx" } }, "u-p-45": { "": { "!paddingTop": "45rpx", "!paddingRight": "45rpx", "!paddingBottom": "45rpx", "!paddingLeft": "45rpx" } }, "up-padding-45": { "": { "!paddingTop": "45rpx", "!paddingRight": "45rpx", "!paddingBottom": "45rpx", "!paddingLeft": "45rpx" } }, "up-p-45": { "": { "!paddingTop": "45rpx", "!paddingRight": "45rpx", "!paddingBottom": "45rpx", "!paddingLeft": "45rpx" } }, "u-m-l-45": { "": { "!marginLeft": "45rpx" } }, "up-m-l-45": { "": { "!marginLeft": "45rpx" } }, "u-p-l-45": { "": { "!paddingLeft": "45rpx" } }, "up-p-l-45": { "": { "!paddingLeft": "45rpx" } }, "u-margin-left-45": { "": { "!marginLeft": "45rpx" } }, "up-margin-left-45": { "": { "!marginLeft": "45rpx" } }, "u-padding-left-45": { "": { "!paddingLeft": "45rpx" } }, "up-padding-left-45": { "": { "!paddingLeft": "45rpx" } }, "u-m-t-45": { "": { "!marginTop": "45rpx" } }, "up-m-t-45": { "": { "!marginTop": "45rpx" } }, "u-p-t-45": { "": { "!paddingTop": "45rpx" } }, "up-p-t-45": { "": { "!paddingTop": "45rpx" } }, "u-margin-top-45": { "": { "!marginTop": "45rpx" } }, "up-margin-top-45": { "": { "!marginTop": "45rpx" } }, "u-padding-top-45": { "": { "!paddingTop": "45rpx" } }, "up-padding-top-45": { "": { "!paddingTop": "45rpx" } }, "u-m-r-45": { "": { "!marginRight": "45rpx" } }, "up-m-r-45": { "": { "!marginRight": "45rpx" } }, "u-p-r-45": { "": { "!paddingRight": "45rpx" } }, "up-p-r-45": { "": { "!paddingRight": "45rpx" } }, "u-margin-right-45": { "": { "!marginRight": "45rpx" } }, "up-margin-right-45": { "": { "!marginRight": "45rpx" } }, "u-padding-right-45": { "": { "!paddingRight": "45rpx" } }, "up-padding-right-45": { "": { "!paddingRight": "45rpx" } }, "u-m-b-45": { "": { "!marginBottom": "45rpx" } }, "up-m-b-45": { "": { "!marginBottom": "45rpx" } }, "u-p-b-45": { "": { "!paddingBottom": "45rpx" } }, "up-p-b-45": { "": { "!paddingBottom": "45rpx" } }, "u-margin-bottom-45": { "": { "!marginBottom": "45rpx" } }, "up-margin-bottom-45": { "": { "!marginBottom": "45rpx" } }, "u-padding-bottom-45": { "": { "!paddingBottom": "45rpx" } }, "up-padding-bottom-45": { "": { "!paddingBottom": "45rpx" } }, "u-margin-46": { "": { "!marginTop": "46rpx", "!marginRight": "46rpx", "!marginBottom": "46rpx", "!marginLeft": "46rpx" } }, "u-m-46": { "": { "!marginTop": "46rpx", "!marginRight": "46rpx", "!marginBottom": "46rpx", "!marginLeft": "46rpx" } }, "up-margin-46": { "": { "!marginTop": "46rpx", "!marginRight": "46rpx", "!marginBottom": "46rpx", "!marginLeft": "46rpx" } }, "up-m-46": { "": { "!marginTop": "46rpx", "!marginRight": "46rpx", "!marginBottom": "46rpx", "!marginLeft": "46rpx" } }, "u-padding-46": { "": { "!paddingTop": "46rpx", "!paddingRight": "46rpx", "!paddingBottom": "46rpx", "!paddingLeft": "46rpx" } }, "u-p-46": { "": { "!paddingTop": "46rpx", "!paddingRight": "46rpx", "!paddingBottom": "46rpx", "!paddingLeft": "46rpx" } }, "up-padding-46": { "": { "!paddingTop": "46rpx", "!paddingRight": "46rpx", "!paddingBottom": "46rpx", "!paddingLeft": "46rpx" } }, "up-p-46": { "": { "!paddingTop": "46rpx", "!paddingRight": "46rpx", "!paddingBottom": "46rpx", "!paddingLeft": "46rpx" } }, "u-m-l-46": { "": { "!marginLeft": "46rpx" } }, "up-m-l-46": { "": { "!marginLeft": "46rpx" } }, "u-p-l-46": { "": { "!paddingLeft": "46rpx" } }, "up-p-l-46": { "": { "!paddingLeft": "46rpx" } }, "u-margin-left-46": { "": { "!marginLeft": "46rpx" } }, "up-margin-left-46": { "": { "!marginLeft": "46rpx" } }, "u-padding-left-46": { "": { "!paddingLeft": "46rpx" } }, "up-padding-left-46": { "": { "!paddingLeft": "46rpx" } }, "u-m-t-46": { "": { "!marginTop": "46rpx" } }, "up-m-t-46": { "": { "!marginTop": "46rpx" } }, "u-p-t-46": { "": { "!paddingTop": "46rpx" } }, "up-p-t-46": { "": { "!paddingTop": "46rpx" } }, "u-margin-top-46": { "": { "!marginTop": "46rpx" } }, "up-margin-top-46": { "": { "!marginTop": "46rpx" } }, "u-padding-top-46": { "": { "!paddingTop": "46rpx" } }, "up-padding-top-46": { "": { "!paddingTop": "46rpx" } }, "u-m-r-46": { "": { "!marginRight": "46rpx" } }, "up-m-r-46": { "": { "!marginRight": "46rpx" } }, "u-p-r-46": { "": { "!paddingRight": "46rpx" } }, "up-p-r-46": { "": { "!paddingRight": "46rpx" } }, "u-margin-right-46": { "": { "!marginRight": "46rpx" } }, "up-margin-right-46": { "": { "!marginRight": "46rpx" } }, "u-padding-right-46": { "": { "!paddingRight": "46rpx" } }, "up-padding-right-46": { "": { "!paddingRight": "46rpx" } }, "u-m-b-46": { "": { "!marginBottom": "46rpx" } }, "up-m-b-46": { "": { "!marginBottom": "46rpx" } }, "u-p-b-46": { "": { "!paddingBottom": "46rpx" } }, "up-p-b-46": { "": { "!paddingBottom": "46rpx" } }, "u-margin-bottom-46": { "": { "!marginBottom": "46rpx" } }, "up-margin-bottom-46": { "": { "!marginBottom": "46rpx" } }, "u-padding-bottom-46": { "": { "!paddingBottom": "46rpx" } }, "up-padding-bottom-46": { "": { "!paddingBottom": "46rpx" } }, "u-margin-48": { "": { "!marginTop": "48rpx", "!marginRight": "48rpx", "!marginBottom": "48rpx", "!marginLeft": "48rpx" } }, "u-m-48": { "": { "!marginTop": "48rpx", "!marginRight": "48rpx", "!marginBottom": "48rpx", "!marginLeft": "48rpx" } }, "up-margin-48": { "": { "!marginTop": "48rpx", "!marginRight": "48rpx", "!marginBottom": "48rpx", "!marginLeft": "48rpx" } }, "up-m-48": { "": { "!marginTop": "48rpx", "!marginRight": "48rpx", "!marginBottom": "48rpx", "!marginLeft": "48rpx" } }, "u-padding-48": { "": { "!paddingTop": "48rpx", "!paddingRight": "48rpx", "!paddingBottom": "48rpx", "!paddingLeft": "48rpx" } }, "u-p-48": { "": { "!paddingTop": "48rpx", "!paddingRight": "48rpx", "!paddingBottom": "48rpx", "!paddingLeft": "48rpx" } }, "up-padding-48": { "": { "!paddingTop": "48rpx", "!paddingRight": "48rpx", "!paddingBottom": "48rpx", "!paddingLeft": "48rpx" } }, "up-p-48": { "": { "!paddingTop": "48rpx", "!paddingRight": "48rpx", "!paddingBottom": "48rpx", "!paddingLeft": "48rpx" } }, "u-m-l-48": { "": { "!marginLeft": "48rpx" } }, "up-m-l-48": { "": { "!marginLeft": "48rpx" } }, "u-p-l-48": { "": { "!paddingLeft": "48rpx" } }, "up-p-l-48": { "": { "!paddingLeft": "48rpx" } }, "u-margin-left-48": { "": { "!marginLeft": "48rpx" } }, "up-margin-left-48": { "": { "!marginLeft": "48rpx" } }, "u-padding-left-48": { "": { "!paddingLeft": "48rpx" } }, "up-padding-left-48": { "": { "!paddingLeft": "48rpx" } }, "u-m-t-48": { "": { "!marginTop": "48rpx" } }, "up-m-t-48": { "": { "!marginTop": "48rpx" } }, "u-p-t-48": { "": { "!paddingTop": "48rpx" } }, "up-p-t-48": { "": { "!paddingTop": "48rpx" } }, "u-margin-top-48": { "": { "!marginTop": "48rpx" } }, "up-margin-top-48": { "": { "!marginTop": "48rpx" } }, "u-padding-top-48": { "": { "!paddingTop": "48rpx" } }, "up-padding-top-48": { "": { "!paddingTop": "48rpx" } }, "u-m-r-48": { "": { "!marginRight": "48rpx" } }, "up-m-r-48": { "": { "!marginRight": "48rpx" } }, "u-p-r-48": { "": { "!paddingRight": "48rpx" } }, "up-p-r-48": { "": { "!paddingRight": "48rpx" } }, "u-margin-right-48": { "": { "!marginRight": "48rpx" } }, "up-margin-right-48": { "": { "!marginRight": "48rpx" } }, "u-padding-right-48": { "": { "!paddingRight": "48rpx" } }, "up-padding-right-48": { "": { "!paddingRight": "48rpx" } }, "u-m-b-48": { "": { "!marginBottom": "48rpx" } }, "up-m-b-48": { "": { "!marginBottom": "48rpx" } }, "u-p-b-48": { "": { "!paddingBottom": "48rpx" } }, "up-p-b-48": { "": { "!paddingBottom": "48rpx" } }, "u-margin-bottom-48": { "": { "!marginBottom": "48rpx" } }, "up-margin-bottom-48": { "": { "!marginBottom": "48rpx" } }, "u-padding-bottom-48": { "": { "!paddingBottom": "48rpx" } }, "up-padding-bottom-48": { "": { "!paddingBottom": "48rpx" } }, "u-margin-50": { "": { "!marginTop": "50rpx", "!marginRight": "50rpx", "!marginBottom": "50rpx", "!marginLeft": "50rpx" } }, "u-m-50": { "": { "!marginTop": "50rpx", "!marginRight": "50rpx", "!marginBottom": "50rpx", "!marginLeft": "50rpx" } }, "up-margin-50": { "": { "!marginTop": "50rpx", "!marginRight": "50rpx", "!marginBottom": "50rpx", "!marginLeft": "50rpx" } }, "up-m-50": { "": { "!marginTop": "50rpx", "!marginRight": "50rpx", "!marginBottom": "50rpx", "!marginLeft": "50rpx" } }, "u-padding-50": { "": { "!paddingTop": "50rpx", "!paddingRight": "50rpx", "!paddingBottom": "50rpx", "!paddingLeft": "50rpx" } }, "u-p-50": { "": { "!paddingTop": "50rpx", "!paddingRight": "50rpx", "!paddingBottom": "50rpx", "!paddingLeft": "50rpx" } }, "up-padding-50": { "": { "!paddingTop": "50rpx", "!paddingRight": "50rpx", "!paddingBottom": "50rpx", "!paddingLeft": "50rpx" } }, "up-p-50": { "": { "!paddingTop": "50rpx", "!paddingRight": "50rpx", "!paddingBottom": "50rpx", "!paddingLeft": "50rpx" } }, "u-m-l-50": { "": { "!marginLeft": "50rpx" } }, "up-m-l-50": { "": { "!marginLeft": "50rpx" } }, "u-p-l-50": { "": { "!paddingLeft": "50rpx" } }, "up-p-l-50": { "": { "!paddingLeft": "50rpx" } }, "u-margin-left-50": { "": { "!marginLeft": "50rpx" } }, "up-margin-left-50": { "": { "!marginLeft": "50rpx" } }, "u-padding-left-50": { "": { "!paddingLeft": "50rpx" } }, "up-padding-left-50": { "": { "!paddingLeft": "50rpx" } }, "u-m-t-50": { "": { "!marginTop": "50rpx" } }, "up-m-t-50": { "": { "!marginTop": "50rpx" } }, "u-p-t-50": { "": { "!paddingTop": "50rpx" } }, "up-p-t-50": { "": { "!paddingTop": "50rpx" } }, "u-margin-top-50": { "": { "!marginTop": "50rpx" } }, "up-margin-top-50": { "": { "!marginTop": "50rpx" } }, "u-padding-top-50": { "": { "!paddingTop": "50rpx" } }, "up-padding-top-50": { "": { "!paddingTop": "50rpx" } }, "u-m-r-50": { "": { "!marginRight": "50rpx" } }, "up-m-r-50": { "": { "!marginRight": "50rpx" } }, "u-p-r-50": { "": { "!paddingRight": "50rpx" } }, "up-p-r-50": { "": { "!paddingRight": "50rpx" } }, "u-margin-right-50": { "": { "!marginRight": "50rpx" } }, "up-margin-right-50": { "": { "!marginRight": "50rpx" } }, "u-padding-right-50": { "": { "!paddingRight": "50rpx" } }, "up-padding-right-50": { "": { "!paddingRight": "50rpx" } }, "u-m-b-50": { "": { "!marginBottom": "50rpx" } }, "up-m-b-50": { "": { "!marginBottom": "50rpx" } }, "u-p-b-50": { "": { "!paddingBottom": "50rpx" } }, "up-p-b-50": { "": { "!paddingBottom": "50rpx" } }, "u-margin-bottom-50": { "": { "!marginBottom": "50rpx" } }, "up-margin-bottom-50": { "": { "!marginBottom": "50rpx" } }, "u-padding-bottom-50": { "": { "!paddingBottom": "50rpx" } }, "up-padding-bottom-50": { "": { "!paddingBottom": "50rpx" } }, "u-margin-52": { "": { "!marginTop": "52rpx", "!marginRight": "52rpx", "!marginBottom": "52rpx", "!marginLeft": "52rpx" } }, "u-m-52": { "": { "!marginTop": "52rpx", "!marginRight": "52rpx", "!marginBottom": "52rpx", "!marginLeft": "52rpx" } }, "up-margin-52": { "": { "!marginTop": "52rpx", "!marginRight": "52rpx", "!marginBottom": "52rpx", "!marginLeft": "52rpx" } }, "up-m-52": { "": { "!marginTop": "52rpx", "!marginRight": "52rpx", "!marginBottom": "52rpx", "!marginLeft": "52rpx" } }, "u-padding-52": { "": { "!paddingTop": "52rpx", "!paddingRight": "52rpx", "!paddingBottom": "52rpx", "!paddingLeft": "52rpx" } }, "u-p-52": { "": { "!paddingTop": "52rpx", "!paddingRight": "52rpx", "!paddingBottom": "52rpx", "!paddingLeft": "52rpx" } }, "up-padding-52": { "": { "!paddingTop": "52rpx", "!paddingRight": "52rpx", "!paddingBottom": "52rpx", "!paddingLeft": "52rpx" } }, "up-p-52": { "": { "!paddingTop": "52rpx", "!paddingRight": "52rpx", "!paddingBottom": "52rpx", "!paddingLeft": "52rpx" } }, "u-m-l-52": { "": { "!marginLeft": "52rpx" } }, "up-m-l-52": { "": { "!marginLeft": "52rpx" } }, "u-p-l-52": { "": { "!paddingLeft": "52rpx" } }, "up-p-l-52": { "": { "!paddingLeft": "52rpx" } }, "u-margin-left-52": { "": { "!marginLeft": "52rpx" } }, "up-margin-left-52": { "": { "!marginLeft": "52rpx" } }, "u-padding-left-52": { "": { "!paddingLeft": "52rpx" } }, "up-padding-left-52": { "": { "!paddingLeft": "52rpx" } }, "u-m-t-52": { "": { "!marginTop": "52rpx" } }, "up-m-t-52": { "": { "!marginTop": "52rpx" } }, "u-p-t-52": { "": { "!paddingTop": "52rpx" } }, "up-p-t-52": { "": { "!paddingTop": "52rpx" } }, "u-margin-top-52": { "": { "!marginTop": "52rpx" } }, "up-margin-top-52": { "": { "!marginTop": "52rpx" } }, "u-padding-top-52": { "": { "!paddingTop": "52rpx" } }, "up-padding-top-52": { "": { "!paddingTop": "52rpx" } }, "u-m-r-52": { "": { "!marginRight": "52rpx" } }, "up-m-r-52": { "": { "!marginRight": "52rpx" } }, "u-p-r-52": { "": { "!paddingRight": "52rpx" } }, "up-p-r-52": { "": { "!paddingRight": "52rpx" } }, "u-margin-right-52": { "": { "!marginRight": "52rpx" } }, "up-margin-right-52": { "": { "!marginRight": "52rpx" } }, "u-padding-right-52": { "": { "!paddingRight": "52rpx" } }, "up-padding-right-52": { "": { "!paddingRight": "52rpx" } }, "u-m-b-52": { "": { "!marginBottom": "52rpx" } }, "up-m-b-52": { "": { "!marginBottom": "52rpx" } }, "u-p-b-52": { "": { "!paddingBottom": "52rpx" } }, "up-p-b-52": { "": { "!paddingBottom": "52rpx" } }, "u-margin-bottom-52": { "": { "!marginBottom": "52rpx" } }, "up-margin-bottom-52": { "": { "!marginBottom": "52rpx" } }, "u-padding-bottom-52": { "": { "!paddingBottom": "52rpx" } }, "up-padding-bottom-52": { "": { "!paddingBottom": "52rpx" } }, "u-margin-54": { "": { "!marginTop": "54rpx", "!marginRight": "54rpx", "!marginBottom": "54rpx", "!marginLeft": "54rpx" } }, "u-m-54": { "": { "!marginTop": "54rpx", "!marginRight": "54rpx", "!marginBottom": "54rpx", "!marginLeft": "54rpx" } }, "up-margin-54": { "": { "!marginTop": "54rpx", "!marginRight": "54rpx", "!marginBottom": "54rpx", "!marginLeft": "54rpx" } }, "up-m-54": { "": { "!marginTop": "54rpx", "!marginRight": "54rpx", "!marginBottom": "54rpx", "!marginLeft": "54rpx" } }, "u-padding-54": { "": { "!paddingTop": "54rpx", "!paddingRight": "54rpx", "!paddingBottom": "54rpx", "!paddingLeft": "54rpx" } }, "u-p-54": { "": { "!paddingTop": "54rpx", "!paddingRight": "54rpx", "!paddingBottom": "54rpx", "!paddingLeft": "54rpx" } }, "up-padding-54": { "": { "!paddingTop": "54rpx", "!paddingRight": "54rpx", "!paddingBottom": "54rpx", "!paddingLeft": "54rpx" } }, "up-p-54": { "": { "!paddingTop": "54rpx", "!paddingRight": "54rpx", "!paddingBottom": "54rpx", "!paddingLeft": "54rpx" } }, "u-m-l-54": { "": { "!marginLeft": "54rpx" } }, "up-m-l-54": { "": { "!marginLeft": "54rpx" } }, "u-p-l-54": { "": { "!paddingLeft": "54rpx" } }, "up-p-l-54": { "": { "!paddingLeft": "54rpx" } }, "u-margin-left-54": { "": { "!marginLeft": "54rpx" } }, "up-margin-left-54": { "": { "!marginLeft": "54rpx" } }, "u-padding-left-54": { "": { "!paddingLeft": "54rpx" } }, "up-padding-left-54": { "": { "!paddingLeft": "54rpx" } }, "u-m-t-54": { "": { "!marginTop": "54rpx" } }, "up-m-t-54": { "": { "!marginTop": "54rpx" } }, "u-p-t-54": { "": { "!paddingTop": "54rpx" } }, "up-p-t-54": { "": { "!paddingTop": "54rpx" } }, "u-margin-top-54": { "": { "!marginTop": "54rpx" } }, "up-margin-top-54": { "": { "!marginTop": "54rpx" } }, "u-padding-top-54": { "": { "!paddingTop": "54rpx" } }, "up-padding-top-54": { "": { "!paddingTop": "54rpx" } }, "u-m-r-54": { "": { "!marginRight": "54rpx" } }, "up-m-r-54": { "": { "!marginRight": "54rpx" } }, "u-p-r-54": { "": { "!paddingRight": "54rpx" } }, "up-p-r-54": { "": { "!paddingRight": "54rpx" } }, "u-margin-right-54": { "": { "!marginRight": "54rpx" } }, "up-margin-right-54": { "": { "!marginRight": "54rpx" } }, "u-padding-right-54": { "": { "!paddingRight": "54rpx" } }, "up-padding-right-54": { "": { "!paddingRight": "54rpx" } }, "u-m-b-54": { "": { "!marginBottom": "54rpx" } }, "up-m-b-54": { "": { "!marginBottom": "54rpx" } }, "u-p-b-54": { "": { "!paddingBottom": "54rpx" } }, "up-p-b-54": { "": { "!paddingBottom": "54rpx" } }, "u-margin-bottom-54": { "": { "!marginBottom": "54rpx" } }, "up-margin-bottom-54": { "": { "!marginBottom": "54rpx" } }, "u-padding-bottom-54": { "": { "!paddingBottom": "54rpx" } }, "up-padding-bottom-54": { "": { "!paddingBottom": "54rpx" } }, "u-margin-55": { "": { "!marginTop": "55rpx", "!marginRight": "55rpx", "!marginBottom": "55rpx", "!marginLeft": "55rpx" } }, "u-m-55": { "": { "!marginTop": "55rpx", "!marginRight": "55rpx", "!marginBottom": "55rpx", "!marginLeft": "55rpx" } }, "up-margin-55": { "": { "!marginTop": "55rpx", "!marginRight": "55rpx", "!marginBottom": "55rpx", "!marginLeft": "55rpx" } }, "up-m-55": { "": { "!marginTop": "55rpx", "!marginRight": "55rpx", "!marginBottom": "55rpx", "!marginLeft": "55rpx" } }, "u-padding-55": { "": { "!paddingTop": "55rpx", "!paddingRight": "55rpx", "!paddingBottom": "55rpx", "!paddingLeft": "55rpx" } }, "u-p-55": { "": { "!paddingTop": "55rpx", "!paddingRight": "55rpx", "!paddingBottom": "55rpx", "!paddingLeft": "55rpx" } }, "up-padding-55": { "": { "!paddingTop": "55rpx", "!paddingRight": "55rpx", "!paddingBottom": "55rpx", "!paddingLeft": "55rpx" } }, "up-p-55": { "": { "!paddingTop": "55rpx", "!paddingRight": "55rpx", "!paddingBottom": "55rpx", "!paddingLeft": "55rpx" } }, "u-m-l-55": { "": { "!marginLeft": "55rpx" } }, "up-m-l-55": { "": { "!marginLeft": "55rpx" } }, "u-p-l-55": { "": { "!paddingLeft": "55rpx" } }, "up-p-l-55": { "": { "!paddingLeft": "55rpx" } }, "u-margin-left-55": { "": { "!marginLeft": "55rpx" } }, "up-margin-left-55": { "": { "!marginLeft": "55rpx" } }, "u-padding-left-55": { "": { "!paddingLeft": "55rpx" } }, "up-padding-left-55": { "": { "!paddingLeft": "55rpx" } }, "u-m-t-55": { "": { "!marginTop": "55rpx" } }, "up-m-t-55": { "": { "!marginTop": "55rpx" } }, "u-p-t-55": { "": { "!paddingTop": "55rpx" } }, "up-p-t-55": { "": { "!paddingTop": "55rpx" } }, "u-margin-top-55": { "": { "!marginTop": "55rpx" } }, "up-margin-top-55": { "": { "!marginTop": "55rpx" } }, "u-padding-top-55": { "": { "!paddingTop": "55rpx" } }, "up-padding-top-55": { "": { "!paddingTop": "55rpx" } }, "u-m-r-55": { "": { "!marginRight": "55rpx" } }, "up-m-r-55": { "": { "!marginRight": "55rpx" } }, "u-p-r-55": { "": { "!paddingRight": "55rpx" } }, "up-p-r-55": { "": { "!paddingRight": "55rpx" } }, "u-margin-right-55": { "": { "!marginRight": "55rpx" } }, "up-margin-right-55": { "": { "!marginRight": "55rpx" } }, "u-padding-right-55": { "": { "!paddingRight": "55rpx" } }, "up-padding-right-55": { "": { "!paddingRight": "55rpx" } }, "u-m-b-55": { "": { "!marginBottom": "55rpx" } }, "up-m-b-55": { "": { "!marginBottom": "55rpx" } }, "u-p-b-55": { "": { "!paddingBottom": "55rpx" } }, "up-p-b-55": { "": { "!paddingBottom": "55rpx" } }, "u-margin-bottom-55": { "": { "!marginBottom": "55rpx" } }, "up-margin-bottom-55": { "": { "!marginBottom": "55rpx" } }, "u-padding-bottom-55": { "": { "!paddingBottom": "55rpx" } }, "up-padding-bottom-55": { "": { "!paddingBottom": "55rpx" } }, "u-margin-56": { "": { "!marginTop": "56rpx", "!marginRight": "56rpx", "!marginBottom": "56rpx", "!marginLeft": "56rpx" } }, "u-m-56": { "": { "!marginTop": "56rpx", "!marginRight": "56rpx", "!marginBottom": "56rpx", "!marginLeft": "56rpx" } }, "up-margin-56": { "": { "!marginTop": "56rpx", "!marginRight": "56rpx", "!marginBottom": "56rpx", "!marginLeft": "56rpx" } }, "up-m-56": { "": { "!marginTop": "56rpx", "!marginRight": "56rpx", "!marginBottom": "56rpx", "!marginLeft": "56rpx" } }, "u-padding-56": { "": { "!paddingTop": "56rpx", "!paddingRight": "56rpx", "!paddingBottom": "56rpx", "!paddingLeft": "56rpx" } }, "u-p-56": { "": { "!paddingTop": "56rpx", "!paddingRight": "56rpx", "!paddingBottom": "56rpx", "!paddingLeft": "56rpx" } }, "up-padding-56": { "": { "!paddingTop": "56rpx", "!paddingRight": "56rpx", "!paddingBottom": "56rpx", "!paddingLeft": "56rpx" } }, "up-p-56": { "": { "!paddingTop": "56rpx", "!paddingRight": "56rpx", "!paddingBottom": "56rpx", "!paddingLeft": "56rpx" } }, "u-m-l-56": { "": { "!marginLeft": "56rpx" } }, "up-m-l-56": { "": { "!marginLeft": "56rpx" } }, "u-p-l-56": { "": { "!paddingLeft": "56rpx" } }, "up-p-l-56": { "": { "!paddingLeft": "56rpx" } }, "u-margin-left-56": { "": { "!marginLeft": "56rpx" } }, "up-margin-left-56": { "": { "!marginLeft": "56rpx" } }, "u-padding-left-56": { "": { "!paddingLeft": "56rpx" } }, "up-padding-left-56": { "": { "!paddingLeft": "56rpx" } }, "u-m-t-56": { "": { "!marginTop": "56rpx" } }, "up-m-t-56": { "": { "!marginTop": "56rpx" } }, "u-p-t-56": { "": { "!paddingTop": "56rpx" } }, "up-p-t-56": { "": { "!paddingTop": "56rpx" } }, "u-margin-top-56": { "": { "!marginTop": "56rpx" } }, "up-margin-top-56": { "": { "!marginTop": "56rpx" } }, "u-padding-top-56": { "": { "!paddingTop": "56rpx" } }, "up-padding-top-56": { "": { "!paddingTop": "56rpx" } }, "u-m-r-56": { "": { "!marginRight": "56rpx" } }, "up-m-r-56": { "": { "!marginRight": "56rpx" } }, "u-p-r-56": { "": { "!paddingRight": "56rpx" } }, "up-p-r-56": { "": { "!paddingRight": "56rpx" } }, "u-margin-right-56": { "": { "!marginRight": "56rpx" } }, "up-margin-right-56": { "": { "!marginRight": "56rpx" } }, "u-padding-right-56": { "": { "!paddingRight": "56rpx" } }, "up-padding-right-56": { "": { "!paddingRight": "56rpx" } }, "u-m-b-56": { "": { "!marginBottom": "56rpx" } }, "up-m-b-56": { "": { "!marginBottom": "56rpx" } }, "u-p-b-56": { "": { "!paddingBottom": "56rpx" } }, "up-p-b-56": { "": { "!paddingBottom": "56rpx" } }, "u-margin-bottom-56": { "": { "!marginBottom": "56rpx" } }, "up-margin-bottom-56": { "": { "!marginBottom": "56rpx" } }, "u-padding-bottom-56": { "": { "!paddingBottom": "56rpx" } }, "up-padding-bottom-56": { "": { "!paddingBottom": "56rpx" } }, "u-margin-58": { "": { "!marginTop": "58rpx", "!marginRight": "58rpx", "!marginBottom": "58rpx", "!marginLeft": "58rpx" } }, "u-m-58": { "": { "!marginTop": "58rpx", "!marginRight": "58rpx", "!marginBottom": "58rpx", "!marginLeft": "58rpx" } }, "up-margin-58": { "": { "!marginTop": "58rpx", "!marginRight": "58rpx", "!marginBottom": "58rpx", "!marginLeft": "58rpx" } }, "up-m-58": { "": { "!marginTop": "58rpx", "!marginRight": "58rpx", "!marginBottom": "58rpx", "!marginLeft": "58rpx" } }, "u-padding-58": { "": { "!paddingTop": "58rpx", "!paddingRight": "58rpx", "!paddingBottom": "58rpx", "!paddingLeft": "58rpx" } }, "u-p-58": { "": { "!paddingTop": "58rpx", "!paddingRight": "58rpx", "!paddingBottom": "58rpx", "!paddingLeft": "58rpx" } }, "up-padding-58": { "": { "!paddingTop": "58rpx", "!paddingRight": "58rpx", "!paddingBottom": "58rpx", "!paddingLeft": "58rpx" } }, "up-p-58": { "": { "!paddingTop": "58rpx", "!paddingRight": "58rpx", "!paddingBottom": "58rpx", "!paddingLeft": "58rpx" } }, "u-m-l-58": { "": { "!marginLeft": "58rpx" } }, "up-m-l-58": { "": { "!marginLeft": "58rpx" } }, "u-p-l-58": { "": { "!paddingLeft": "58rpx" } }, "up-p-l-58": { "": { "!paddingLeft": "58rpx" } }, "u-margin-left-58": { "": { "!marginLeft": "58rpx" } }, "up-margin-left-58": { "": { "!marginLeft": "58rpx" } }, "u-padding-left-58": { "": { "!paddingLeft": "58rpx" } }, "up-padding-left-58": { "": { "!paddingLeft": "58rpx" } }, "u-m-t-58": { "": { "!marginTop": "58rpx" } }, "up-m-t-58": { "": { "!marginTop": "58rpx" } }, "u-p-t-58": { "": { "!paddingTop": "58rpx" } }, "up-p-t-58": { "": { "!paddingTop": "58rpx" } }, "u-margin-top-58": { "": { "!marginTop": "58rpx" } }, "up-margin-top-58": { "": { "!marginTop": "58rpx" } }, "u-padding-top-58": { "": { "!paddingTop": "58rpx" } }, "up-padding-top-58": { "": { "!paddingTop": "58rpx" } }, "u-m-r-58": { "": { "!marginRight": "58rpx" } }, "up-m-r-58": { "": { "!marginRight": "58rpx" } }, "u-p-r-58": { "": { "!paddingRight": "58rpx" } }, "up-p-r-58": { "": { "!paddingRight": "58rpx" } }, "u-margin-right-58": { "": { "!marginRight": "58rpx" } }, "up-margin-right-58": { "": { "!marginRight": "58rpx" } }, "u-padding-right-58": { "": { "!paddingRight": "58rpx" } }, "up-padding-right-58": { "": { "!paddingRight": "58rpx" } }, "u-m-b-58": { "": { "!marginBottom": "58rpx" } }, "up-m-b-58": { "": { "!marginBottom": "58rpx" } }, "u-p-b-58": { "": { "!paddingBottom": "58rpx" } }, "up-p-b-58": { "": { "!paddingBottom": "58rpx" } }, "u-margin-bottom-58": { "": { "!marginBottom": "58rpx" } }, "up-margin-bottom-58": { "": { "!marginBottom": "58rpx" } }, "u-padding-bottom-58": { "": { "!paddingBottom": "58rpx" } }, "up-padding-bottom-58": { "": { "!paddingBottom": "58rpx" } }, "u-margin-60": { "": { "!marginTop": "60rpx", "!marginRight": "60rpx", "!marginBottom": "60rpx", "!marginLeft": "60rpx" } }, "u-m-60": { "": { "!marginTop": "60rpx", "!marginRight": "60rpx", "!marginBottom": "60rpx", "!marginLeft": "60rpx" } }, "up-margin-60": { "": { "!marginTop": "60rpx", "!marginRight": "60rpx", "!marginBottom": "60rpx", "!marginLeft": "60rpx" } }, "up-m-60": { "": { "!marginTop": "60rpx", "!marginRight": "60rpx", "!marginBottom": "60rpx", "!marginLeft": "60rpx" } }, "u-padding-60": { "": { "!paddingTop": "60rpx", "!paddingRight": "60rpx", "!paddingBottom": "60rpx", "!paddingLeft": "60rpx" } }, "u-p-60": { "": { "!paddingTop": "60rpx", "!paddingRight": "60rpx", "!paddingBottom": "60rpx", "!paddingLeft": "60rpx" } }, "up-padding-60": { "": { "!paddingTop": "60rpx", "!paddingRight": "60rpx", "!paddingBottom": "60rpx", "!paddingLeft": "60rpx" } }, "up-p-60": { "": { "!paddingTop": "60rpx", "!paddingRight": "60rpx", "!paddingBottom": "60rpx", "!paddingLeft": "60rpx" } }, "u-m-l-60": { "": { "!marginLeft": "60rpx" } }, "up-m-l-60": { "": { "!marginLeft": "60rpx" } }, "u-p-l-60": { "": { "!paddingLeft": "60rpx" } }, "up-p-l-60": { "": { "!paddingLeft": "60rpx" } }, "u-margin-left-60": { "": { "!marginLeft": "60rpx" } }, "up-margin-left-60": { "": { "!marginLeft": "60rpx" } }, "u-padding-left-60": { "": { "!paddingLeft": "60rpx" } }, "up-padding-left-60": { "": { "!paddingLeft": "60rpx" } }, "u-m-t-60": { "": { "!marginTop": "60rpx" } }, "up-m-t-60": { "": { "!marginTop": "60rpx" } }, "u-p-t-60": { "": { "!paddingTop": "60rpx" } }, "up-p-t-60": { "": { "!paddingTop": "60rpx" } }, "u-margin-top-60": { "": { "!marginTop": "60rpx" } }, "up-margin-top-60": { "": { "!marginTop": "60rpx" } }, "u-padding-top-60": { "": { "!paddingTop": "60rpx" } }, "up-padding-top-60": { "": { "!paddingTop": "60rpx" } }, "u-m-r-60": { "": { "!marginRight": "60rpx" } }, "up-m-r-60": { "": { "!marginRight": "60rpx" } }, "u-p-r-60": { "": { "!paddingRight": "60rpx" } }, "up-p-r-60": { "": { "!paddingRight": "60rpx" } }, "u-margin-right-60": { "": { "!marginRight": "60rpx" } }, "up-margin-right-60": { "": { "!marginRight": "60rpx" } }, "u-padding-right-60": { "": { "!paddingRight": "60rpx" } }, "up-padding-right-60": { "": { "!paddingRight": "60rpx" } }, "u-m-b-60": { "": { "!marginBottom": "60rpx" } }, "up-m-b-60": { "": { "!marginBottom": "60rpx" } }, "u-p-b-60": { "": { "!paddingBottom": "60rpx" } }, "up-p-b-60": { "": { "!paddingBottom": "60rpx" } }, "u-margin-bottom-60": { "": { "!marginBottom": "60rpx" } }, "up-margin-bottom-60": { "": { "!marginBottom": "60rpx" } }, "u-padding-bottom-60": { "": { "!paddingBottom": "60rpx" } }, "up-padding-bottom-60": { "": { "!paddingBottom": "60rpx" } }, "u-margin-62": { "": { "!marginTop": "62rpx", "!marginRight": "62rpx", "!marginBottom": "62rpx", "!marginLeft": "62rpx" } }, "u-m-62": { "": { "!marginTop": "62rpx", "!marginRight": "62rpx", "!marginBottom": "62rpx", "!marginLeft": "62rpx" } }, "up-margin-62": { "": { "!marginTop": "62rpx", "!marginRight": "62rpx", "!marginBottom": "62rpx", "!marginLeft": "62rpx" } }, "up-m-62": { "": { "!marginTop": "62rpx", "!marginRight": "62rpx", "!marginBottom": "62rpx", "!marginLeft": "62rpx" } }, "u-padding-62": { "": { "!paddingTop": "62rpx", "!paddingRight": "62rpx", "!paddingBottom": "62rpx", "!paddingLeft": "62rpx" } }, "u-p-62": { "": { "!paddingTop": "62rpx", "!paddingRight": "62rpx", "!paddingBottom": "62rpx", "!paddingLeft": "62rpx" } }, "up-padding-62": { "": { "!paddingTop": "62rpx", "!paddingRight": "62rpx", "!paddingBottom": "62rpx", "!paddingLeft": "62rpx" } }, "up-p-62": { "": { "!paddingTop": "62rpx", "!paddingRight": "62rpx", "!paddingBottom": "62rpx", "!paddingLeft": "62rpx" } }, "u-m-l-62": { "": { "!marginLeft": "62rpx" } }, "up-m-l-62": { "": { "!marginLeft": "62rpx" } }, "u-p-l-62": { "": { "!paddingLeft": "62rpx" } }, "up-p-l-62": { "": { "!paddingLeft": "62rpx" } }, "u-margin-left-62": { "": { "!marginLeft": "62rpx" } }, "up-margin-left-62": { "": { "!marginLeft": "62rpx" } }, "u-padding-left-62": { "": { "!paddingLeft": "62rpx" } }, "up-padding-left-62": { "": { "!paddingLeft": "62rpx" } }, "u-m-t-62": { "": { "!marginTop": "62rpx" } }, "up-m-t-62": { "": { "!marginTop": "62rpx" } }, "u-p-t-62": { "": { "!paddingTop": "62rpx" } }, "up-p-t-62": { "": { "!paddingTop": "62rpx" } }, "u-margin-top-62": { "": { "!marginTop": "62rpx" } }, "up-margin-top-62": { "": { "!marginTop": "62rpx" } }, "u-padding-top-62": { "": { "!paddingTop": "62rpx" } }, "up-padding-top-62": { "": { "!paddingTop": "62rpx" } }, "u-m-r-62": { "": { "!marginRight": "62rpx" } }, "up-m-r-62": { "": { "!marginRight": "62rpx" } }, "u-p-r-62": { "": { "!paddingRight": "62rpx" } }, "up-p-r-62": { "": { "!paddingRight": "62rpx" } }, "u-margin-right-62": { "": { "!marginRight": "62rpx" } }, "up-margin-right-62": { "": { "!marginRight": "62rpx" } }, "u-padding-right-62": { "": { "!paddingRight": "62rpx" } }, "up-padding-right-62": { "": { "!paddingRight": "62rpx" } }, "u-m-b-62": { "": { "!marginBottom": "62rpx" } }, "up-m-b-62": { "": { "!marginBottom": "62rpx" } }, "u-p-b-62": { "": { "!paddingBottom": "62rpx" } }, "up-p-b-62": { "": { "!paddingBottom": "62rpx" } }, "u-margin-bottom-62": { "": { "!marginBottom": "62rpx" } }, "up-margin-bottom-62": { "": { "!marginBottom": "62rpx" } }, "u-padding-bottom-62": { "": { "!paddingBottom": "62rpx" } }, "up-padding-bottom-62": { "": { "!paddingBottom": "62rpx" } }, "u-margin-64": { "": { "!marginTop": "64rpx", "!marginRight": "64rpx", "!marginBottom": "64rpx", "!marginLeft": "64rpx" } }, "u-m-64": { "": { "!marginTop": "64rpx", "!marginRight": "64rpx", "!marginBottom": "64rpx", "!marginLeft": "64rpx" } }, "up-margin-64": { "": { "!marginTop": "64rpx", "!marginRight": "64rpx", "!marginBottom": "64rpx", "!marginLeft": "64rpx" } }, "up-m-64": { "": { "!marginTop": "64rpx", "!marginRight": "64rpx", "!marginBottom": "64rpx", "!marginLeft": "64rpx" } }, "u-padding-64": { "": { "!paddingTop": "64rpx", "!paddingRight": "64rpx", "!paddingBottom": "64rpx", "!paddingLeft": "64rpx" } }, "u-p-64": { "": { "!paddingTop": "64rpx", "!paddingRight": "64rpx", "!paddingBottom": "64rpx", "!paddingLeft": "64rpx" } }, "up-padding-64": { "": { "!paddingTop": "64rpx", "!paddingRight": "64rpx", "!paddingBottom": "64rpx", "!paddingLeft": "64rpx" } }, "up-p-64": { "": { "!paddingTop": "64rpx", "!paddingRight": "64rpx", "!paddingBottom": "64rpx", "!paddingLeft": "64rpx" } }, "u-m-l-64": { "": { "!marginLeft": "64rpx" } }, "up-m-l-64": { "": { "!marginLeft": "64rpx" } }, "u-p-l-64": { "": { "!paddingLeft": "64rpx" } }, "up-p-l-64": { "": { "!paddingLeft": "64rpx" } }, "u-margin-left-64": { "": { "!marginLeft": "64rpx" } }, "up-margin-left-64": { "": { "!marginLeft": "64rpx" } }, "u-padding-left-64": { "": { "!paddingLeft": "64rpx" } }, "up-padding-left-64": { "": { "!paddingLeft": "64rpx" } }, "u-m-t-64": { "": { "!marginTop": "64rpx" } }, "up-m-t-64": { "": { "!marginTop": "64rpx" } }, "u-p-t-64": { "": { "!paddingTop": "64rpx" } }, "up-p-t-64": { "": { "!paddingTop": "64rpx" } }, "u-margin-top-64": { "": { "!marginTop": "64rpx" } }, "up-margin-top-64": { "": { "!marginTop": "64rpx" } }, "u-padding-top-64": { "": { "!paddingTop": "64rpx" } }, "up-padding-top-64": { "": { "!paddingTop": "64rpx" } }, "u-m-r-64": { "": { "!marginRight": "64rpx" } }, "up-m-r-64": { "": { "!marginRight": "64rpx" } }, "u-p-r-64": { "": { "!paddingRight": "64rpx" } }, "up-p-r-64": { "": { "!paddingRight": "64rpx" } }, "u-margin-right-64": { "": { "!marginRight": "64rpx" } }, "up-margin-right-64": { "": { "!marginRight": "64rpx" } }, "u-padding-right-64": { "": { "!paddingRight": "64rpx" } }, "up-padding-right-64": { "": { "!paddingRight": "64rpx" } }, "u-m-b-64": { "": { "!marginBottom": "64rpx" } }, "up-m-b-64": { "": { "!marginBottom": "64rpx" } }, "u-p-b-64": { "": { "!paddingBottom": "64rpx" } }, "up-p-b-64": { "": { "!paddingBottom": "64rpx" } }, "u-margin-bottom-64": { "": { "!marginBottom": "64rpx" } }, "up-margin-bottom-64": { "": { "!marginBottom": "64rpx" } }, "u-padding-bottom-64": { "": { "!paddingBottom": "64rpx" } }, "up-padding-bottom-64": { "": { "!paddingBottom": "64rpx" } }, "u-margin-65": { "": { "!marginTop": "65rpx", "!marginRight": "65rpx", "!marginBottom": "65rpx", "!marginLeft": "65rpx" } }, "u-m-65": { "": { "!marginTop": "65rpx", "!marginRight": "65rpx", "!marginBottom": "65rpx", "!marginLeft": "65rpx" } }, "up-margin-65": { "": { "!marginTop": "65rpx", "!marginRight": "65rpx", "!marginBottom": "65rpx", "!marginLeft": "65rpx" } }, "up-m-65": { "": { "!marginTop": "65rpx", "!marginRight": "65rpx", "!marginBottom": "65rpx", "!marginLeft": "65rpx" } }, "u-padding-65": { "": { "!paddingTop": "65rpx", "!paddingRight": "65rpx", "!paddingBottom": "65rpx", "!paddingLeft": "65rpx" } }, "u-p-65": { "": { "!paddingTop": "65rpx", "!paddingRight": "65rpx", "!paddingBottom": "65rpx", "!paddingLeft": "65rpx" } }, "up-padding-65": { "": { "!paddingTop": "65rpx", "!paddingRight": "65rpx", "!paddingBottom": "65rpx", "!paddingLeft": "65rpx" } }, "up-p-65": { "": { "!paddingTop": "65rpx", "!paddingRight": "65rpx", "!paddingBottom": "65rpx", "!paddingLeft": "65rpx" } }, "u-m-l-65": { "": { "!marginLeft": "65rpx" } }, "up-m-l-65": { "": { "!marginLeft": "65rpx" } }, "u-p-l-65": { "": { "!paddingLeft": "65rpx" } }, "up-p-l-65": { "": { "!paddingLeft": "65rpx" } }, "u-margin-left-65": { "": { "!marginLeft": "65rpx" } }, "up-margin-left-65": { "": { "!marginLeft": "65rpx" } }, "u-padding-left-65": { "": { "!paddingLeft": "65rpx" } }, "up-padding-left-65": { "": { "!paddingLeft": "65rpx" } }, "u-m-t-65": { "": { "!marginTop": "65rpx" } }, "up-m-t-65": { "": { "!marginTop": "65rpx" } }, "u-p-t-65": { "": { "!paddingTop": "65rpx" } }, "up-p-t-65": { "": { "!paddingTop": "65rpx" } }, "u-margin-top-65": { "": { "!marginTop": "65rpx" } }, "up-margin-top-65": { "": { "!marginTop": "65rpx" } }, "u-padding-top-65": { "": { "!paddingTop": "65rpx" } }, "up-padding-top-65": { "": { "!paddingTop": "65rpx" } }, "u-m-r-65": { "": { "!marginRight": "65rpx" } }, "up-m-r-65": { "": { "!marginRight": "65rpx" } }, "u-p-r-65": { "": { "!paddingRight": "65rpx" } }, "up-p-r-65": { "": { "!paddingRight": "65rpx" } }, "u-margin-right-65": { "": { "!marginRight": "65rpx" } }, "up-margin-right-65": { "": { "!marginRight": "65rpx" } }, "u-padding-right-65": { "": { "!paddingRight": "65rpx" } }, "up-padding-right-65": { "": { "!paddingRight": "65rpx" } }, "u-m-b-65": { "": { "!marginBottom": "65rpx" } }, "up-m-b-65": { "": { "!marginBottom": "65rpx" } }, "u-p-b-65": { "": { "!paddingBottom": "65rpx" } }, "up-p-b-65": { "": { "!paddingBottom": "65rpx" } }, "u-margin-bottom-65": { "": { "!marginBottom": "65rpx" } }, "up-margin-bottom-65": { "": { "!marginBottom": "65rpx" } }, "u-padding-bottom-65": { "": { "!paddingBottom": "65rpx" } }, "up-padding-bottom-65": { "": { "!paddingBottom": "65rpx" } }, "u-margin-66": { "": { "!marginTop": "66rpx", "!marginRight": "66rpx", "!marginBottom": "66rpx", "!marginLeft": "66rpx" } }, "u-m-66": { "": { "!marginTop": "66rpx", "!marginRight": "66rpx", "!marginBottom": "66rpx", "!marginLeft": "66rpx" } }, "up-margin-66": { "": { "!marginTop": "66rpx", "!marginRight": "66rpx", "!marginBottom": "66rpx", "!marginLeft": "66rpx" } }, "up-m-66": { "": { "!marginTop": "66rpx", "!marginRight": "66rpx", "!marginBottom": "66rpx", "!marginLeft": "66rpx" } }, "u-padding-66": { "": { "!paddingTop": "66rpx", "!paddingRight": "66rpx", "!paddingBottom": "66rpx", "!paddingLeft": "66rpx" } }, "u-p-66": { "": { "!paddingTop": "66rpx", "!paddingRight": "66rpx", "!paddingBottom": "66rpx", "!paddingLeft": "66rpx" } }, "up-padding-66": { "": { "!paddingTop": "66rpx", "!paddingRight": "66rpx", "!paddingBottom": "66rpx", "!paddingLeft": "66rpx" } }, "up-p-66": { "": { "!paddingTop": "66rpx", "!paddingRight": "66rpx", "!paddingBottom": "66rpx", "!paddingLeft": "66rpx" } }, "u-m-l-66": { "": { "!marginLeft": "66rpx" } }, "up-m-l-66": { "": { "!marginLeft": "66rpx" } }, "u-p-l-66": { "": { "!paddingLeft": "66rpx" } }, "up-p-l-66": { "": { "!paddingLeft": "66rpx" } }, "u-margin-left-66": { "": { "!marginLeft": "66rpx" } }, "up-margin-left-66": { "": { "!marginLeft": "66rpx" } }, "u-padding-left-66": { "": { "!paddingLeft": "66rpx" } }, "up-padding-left-66": { "": { "!paddingLeft": "66rpx" } }, "u-m-t-66": { "": { "!marginTop": "66rpx" } }, "up-m-t-66": { "": { "!marginTop": "66rpx" } }, "u-p-t-66": { "": { "!paddingTop": "66rpx" } }, "up-p-t-66": { "": { "!paddingTop": "66rpx" } }, "u-margin-top-66": { "": { "!marginTop": "66rpx" } }, "up-margin-top-66": { "": { "!marginTop": "66rpx" } }, "u-padding-top-66": { "": { "!paddingTop": "66rpx" } }, "up-padding-top-66": { "": { "!paddingTop": "66rpx" } }, "u-m-r-66": { "": { "!marginRight": "66rpx" } }, "up-m-r-66": { "": { "!marginRight": "66rpx" } }, "u-p-r-66": { "": { "!paddingRight": "66rpx" } }, "up-p-r-66": { "": { "!paddingRight": "66rpx" } }, "u-margin-right-66": { "": { "!marginRight": "66rpx" } }, "up-margin-right-66": { "": { "!marginRight": "66rpx" } }, "u-padding-right-66": { "": { "!paddingRight": "66rpx" } }, "up-padding-right-66": { "": { "!paddingRight": "66rpx" } }, "u-m-b-66": { "": { "!marginBottom": "66rpx" } }, "up-m-b-66": { "": { "!marginBottom": "66rpx" } }, "u-p-b-66": { "": { "!paddingBottom": "66rpx" } }, "up-p-b-66": { "": { "!paddingBottom": "66rpx" } }, "u-margin-bottom-66": { "": { "!marginBottom": "66rpx" } }, "up-margin-bottom-66": { "": { "!marginBottom": "66rpx" } }, "u-padding-bottom-66": { "": { "!paddingBottom": "66rpx" } }, "up-padding-bottom-66": { "": { "!paddingBottom": "66rpx" } }, "u-margin-68": { "": { "!marginTop": "68rpx", "!marginRight": "68rpx", "!marginBottom": "68rpx", "!marginLeft": "68rpx" } }, "u-m-68": { "": { "!marginTop": "68rpx", "!marginRight": "68rpx", "!marginBottom": "68rpx", "!marginLeft": "68rpx" } }, "up-margin-68": { "": { "!marginTop": "68rpx", "!marginRight": "68rpx", "!marginBottom": "68rpx", "!marginLeft": "68rpx" } }, "up-m-68": { "": { "!marginTop": "68rpx", "!marginRight": "68rpx", "!marginBottom": "68rpx", "!marginLeft": "68rpx" } }, "u-padding-68": { "": { "!paddingTop": "68rpx", "!paddingRight": "68rpx", "!paddingBottom": "68rpx", "!paddingLeft": "68rpx" } }, "u-p-68": { "": { "!paddingTop": "68rpx", "!paddingRight": "68rpx", "!paddingBottom": "68rpx", "!paddingLeft": "68rpx" } }, "up-padding-68": { "": { "!paddingTop": "68rpx", "!paddingRight": "68rpx", "!paddingBottom": "68rpx", "!paddingLeft": "68rpx" } }, "up-p-68": { "": { "!paddingTop": "68rpx", "!paddingRight": "68rpx", "!paddingBottom": "68rpx", "!paddingLeft": "68rpx" } }, "u-m-l-68": { "": { "!marginLeft": "68rpx" } }, "up-m-l-68": { "": { "!marginLeft": "68rpx" } }, "u-p-l-68": { "": { "!paddingLeft": "68rpx" } }, "up-p-l-68": { "": { "!paddingLeft": "68rpx" } }, "u-margin-left-68": { "": { "!marginLeft": "68rpx" } }, "up-margin-left-68": { "": { "!marginLeft": "68rpx" } }, "u-padding-left-68": { "": { "!paddingLeft": "68rpx" } }, "up-padding-left-68": { "": { "!paddingLeft": "68rpx" } }, "u-m-t-68": { "": { "!marginTop": "68rpx" } }, "up-m-t-68": { "": { "!marginTop": "68rpx" } }, "u-p-t-68": { "": { "!paddingTop": "68rpx" } }, "up-p-t-68": { "": { "!paddingTop": "68rpx" } }, "u-margin-top-68": { "": { "!marginTop": "68rpx" } }, "up-margin-top-68": { "": { "!marginTop": "68rpx" } }, "u-padding-top-68": { "": { "!paddingTop": "68rpx" } }, "up-padding-top-68": { "": { "!paddingTop": "68rpx" } }, "u-m-r-68": { "": { "!marginRight": "68rpx" } }, "up-m-r-68": { "": { "!marginRight": "68rpx" } }, "u-p-r-68": { "": { "!paddingRight": "68rpx" } }, "up-p-r-68": { "": { "!paddingRight": "68rpx" } }, "u-margin-right-68": { "": { "!marginRight": "68rpx" } }, "up-margin-right-68": { "": { "!marginRight": "68rpx" } }, "u-padding-right-68": { "": { "!paddingRight": "68rpx" } }, "up-padding-right-68": { "": { "!paddingRight": "68rpx" } }, "u-m-b-68": { "": { "!marginBottom": "68rpx" } }, "up-m-b-68": { "": { "!marginBottom": "68rpx" } }, "u-p-b-68": { "": { "!paddingBottom": "68rpx" } }, "up-p-b-68": { "": { "!paddingBottom": "68rpx" } }, "u-margin-bottom-68": { "": { "!marginBottom": "68rpx" } }, "up-margin-bottom-68": { "": { "!marginBottom": "68rpx" } }, "u-padding-bottom-68": { "": { "!paddingBottom": "68rpx" } }, "up-padding-bottom-68": { "": { "!paddingBottom": "68rpx" } }, "u-margin-70": { "": { "!marginTop": "70rpx", "!marginRight": "70rpx", "!marginBottom": "70rpx", "!marginLeft": "70rpx" } }, "u-m-70": { "": { "!marginTop": "70rpx", "!marginRight": "70rpx", "!marginBottom": "70rpx", "!marginLeft": "70rpx" } }, "up-margin-70": { "": { "!marginTop": "70rpx", "!marginRight": "70rpx", "!marginBottom": "70rpx", "!marginLeft": "70rpx" } }, "up-m-70": { "": { "!marginTop": "70rpx", "!marginRight": "70rpx", "!marginBottom": "70rpx", "!marginLeft": "70rpx" } }, "u-padding-70": { "": { "!paddingTop": "70rpx", "!paddingRight": "70rpx", "!paddingBottom": "70rpx", "!paddingLeft": "70rpx" } }, "u-p-70": { "": { "!paddingTop": "70rpx", "!paddingRight": "70rpx", "!paddingBottom": "70rpx", "!paddingLeft": "70rpx" } }, "up-padding-70": { "": { "!paddingTop": "70rpx", "!paddingRight": "70rpx", "!paddingBottom": "70rpx", "!paddingLeft": "70rpx" } }, "up-p-70": { "": { "!paddingTop": "70rpx", "!paddingRight": "70rpx", "!paddingBottom": "70rpx", "!paddingLeft": "70rpx" } }, "u-m-l-70": { "": { "!marginLeft": "70rpx" } }, "up-m-l-70": { "": { "!marginLeft": "70rpx" } }, "u-p-l-70": { "": { "!paddingLeft": "70rpx" } }, "up-p-l-70": { "": { "!paddingLeft": "70rpx" } }, "u-margin-left-70": { "": { "!marginLeft": "70rpx" } }, "up-margin-left-70": { "": { "!marginLeft": "70rpx" } }, "u-padding-left-70": { "": { "!paddingLeft": "70rpx" } }, "up-padding-left-70": { "": { "!paddingLeft": "70rpx" } }, "u-m-t-70": { "": { "!marginTop": "70rpx" } }, "up-m-t-70": { "": { "!marginTop": "70rpx" } }, "u-p-t-70": { "": { "!paddingTop": "70rpx" } }, "up-p-t-70": { "": { "!paddingTop": "70rpx" } }, "u-margin-top-70": { "": { "!marginTop": "70rpx" } }, "up-margin-top-70": { "": { "!marginTop": "70rpx" } }, "u-padding-top-70": { "": { "!paddingTop": "70rpx" } }, "up-padding-top-70": { "": { "!paddingTop": "70rpx" } }, "u-m-r-70": { "": { "!marginRight": "70rpx" } }, "up-m-r-70": { "": { "!marginRight": "70rpx" } }, "u-p-r-70": { "": { "!paddingRight": "70rpx" } }, "up-p-r-70": { "": { "!paddingRight": "70rpx" } }, "u-margin-right-70": { "": { "!marginRight": "70rpx" } }, "up-margin-right-70": { "": { "!marginRight": "70rpx" } }, "u-padding-right-70": { "": { "!paddingRight": "70rpx" } }, "up-padding-right-70": { "": { "!paddingRight": "70rpx" } }, "u-m-b-70": { "": { "!marginBottom": "70rpx" } }, "up-m-b-70": { "": { "!marginBottom": "70rpx" } }, "u-p-b-70": { "": { "!paddingBottom": "70rpx" } }, "up-p-b-70": { "": { "!paddingBottom": "70rpx" } }, "u-margin-bottom-70": { "": { "!marginBottom": "70rpx" } }, "up-margin-bottom-70": { "": { "!marginBottom": "70rpx" } }, "u-padding-bottom-70": { "": { "!paddingBottom": "70rpx" } }, "up-padding-bottom-70": { "": { "!paddingBottom": "70rpx" } }, "u-margin-72": { "": { "!marginTop": "72rpx", "!marginRight": "72rpx", "!marginBottom": "72rpx", "!marginLeft": "72rpx" } }, "u-m-72": { "": { "!marginTop": "72rpx", "!marginRight": "72rpx", "!marginBottom": "72rpx", "!marginLeft": "72rpx" } }, "up-margin-72": { "": { "!marginTop": "72rpx", "!marginRight": "72rpx", "!marginBottom": "72rpx", "!marginLeft": "72rpx" } }, "up-m-72": { "": { "!marginTop": "72rpx", "!marginRight": "72rpx", "!marginBottom": "72rpx", "!marginLeft": "72rpx" } }, "u-padding-72": { "": { "!paddingTop": "72rpx", "!paddingRight": "72rpx", "!paddingBottom": "72rpx", "!paddingLeft": "72rpx" } }, "u-p-72": { "": { "!paddingTop": "72rpx", "!paddingRight": "72rpx", "!paddingBottom": "72rpx", "!paddingLeft": "72rpx" } }, "up-padding-72": { "": { "!paddingTop": "72rpx", "!paddingRight": "72rpx", "!paddingBottom": "72rpx", "!paddingLeft": "72rpx" } }, "up-p-72": { "": { "!paddingTop": "72rpx", "!paddingRight": "72rpx", "!paddingBottom": "72rpx", "!paddingLeft": "72rpx" } }, "u-m-l-72": { "": { "!marginLeft": "72rpx" } }, "up-m-l-72": { "": { "!marginLeft": "72rpx" } }, "u-p-l-72": { "": { "!paddingLeft": "72rpx" } }, "up-p-l-72": { "": { "!paddingLeft": "72rpx" } }, "u-margin-left-72": { "": { "!marginLeft": "72rpx" } }, "up-margin-left-72": { "": { "!marginLeft": "72rpx" } }, "u-padding-left-72": { "": { "!paddingLeft": "72rpx" } }, "up-padding-left-72": { "": { "!paddingLeft": "72rpx" } }, "u-m-t-72": { "": { "!marginTop": "72rpx" } }, "up-m-t-72": { "": { "!marginTop": "72rpx" } }, "u-p-t-72": { "": { "!paddingTop": "72rpx" } }, "up-p-t-72": { "": { "!paddingTop": "72rpx" } }, "u-margin-top-72": { "": { "!marginTop": "72rpx" } }, "up-margin-top-72": { "": { "!marginTop": "72rpx" } }, "u-padding-top-72": { "": { "!paddingTop": "72rpx" } }, "up-padding-top-72": { "": { "!paddingTop": "72rpx" } }, "u-m-r-72": { "": { "!marginRight": "72rpx" } }, "up-m-r-72": { "": { "!marginRight": "72rpx" } }, "u-p-r-72": { "": { "!paddingRight": "72rpx" } }, "up-p-r-72": { "": { "!paddingRight": "72rpx" } }, "u-margin-right-72": { "": { "!marginRight": "72rpx" } }, "up-margin-right-72": { "": { "!marginRight": "72rpx" } }, "u-padding-right-72": { "": { "!paddingRight": "72rpx" } }, "up-padding-right-72": { "": { "!paddingRight": "72rpx" } }, "u-m-b-72": { "": { "!marginBottom": "72rpx" } }, "up-m-b-72": { "": { "!marginBottom": "72rpx" } }, "u-p-b-72": { "": { "!paddingBottom": "72rpx" } }, "up-p-b-72": { "": { "!paddingBottom": "72rpx" } }, "u-margin-bottom-72": { "": { "!marginBottom": "72rpx" } }, "up-margin-bottom-72": { "": { "!marginBottom": "72rpx" } }, "u-padding-bottom-72": { "": { "!paddingBottom": "72rpx" } }, "up-padding-bottom-72": { "": { "!paddingBottom": "72rpx" } }, "u-margin-74": { "": { "!marginTop": "74rpx", "!marginRight": "74rpx", "!marginBottom": "74rpx", "!marginLeft": "74rpx" } }, "u-m-74": { "": { "!marginTop": "74rpx", "!marginRight": "74rpx", "!marginBottom": "74rpx", "!marginLeft": "74rpx" } }, "up-margin-74": { "": { "!marginTop": "74rpx", "!marginRight": "74rpx", "!marginBottom": "74rpx", "!marginLeft": "74rpx" } }, "up-m-74": { "": { "!marginTop": "74rpx", "!marginRight": "74rpx", "!marginBottom": "74rpx", "!marginLeft": "74rpx" } }, "u-padding-74": { "": { "!paddingTop": "74rpx", "!paddingRight": "74rpx", "!paddingBottom": "74rpx", "!paddingLeft": "74rpx" } }, "u-p-74": { "": { "!paddingTop": "74rpx", "!paddingRight": "74rpx", "!paddingBottom": "74rpx", "!paddingLeft": "74rpx" } }, "up-padding-74": { "": { "!paddingTop": "74rpx", "!paddingRight": "74rpx", "!paddingBottom": "74rpx", "!paddingLeft": "74rpx" } }, "up-p-74": { "": { "!paddingTop": "74rpx", "!paddingRight": "74rpx", "!paddingBottom": "74rpx", "!paddingLeft": "74rpx" } }, "u-m-l-74": { "": { "!marginLeft": "74rpx" } }, "up-m-l-74": { "": { "!marginLeft": "74rpx" } }, "u-p-l-74": { "": { "!paddingLeft": "74rpx" } }, "up-p-l-74": { "": { "!paddingLeft": "74rpx" } }, "u-margin-left-74": { "": { "!marginLeft": "74rpx" } }, "up-margin-left-74": { "": { "!marginLeft": "74rpx" } }, "u-padding-left-74": { "": { "!paddingLeft": "74rpx" } }, "up-padding-left-74": { "": { "!paddingLeft": "74rpx" } }, "u-m-t-74": { "": { "!marginTop": "74rpx" } }, "up-m-t-74": { "": { "!marginTop": "74rpx" } }, "u-p-t-74": { "": { "!paddingTop": "74rpx" } }, "up-p-t-74": { "": { "!paddingTop": "74rpx" } }, "u-margin-top-74": { "": { "!marginTop": "74rpx" } }, "up-margin-top-74": { "": { "!marginTop": "74rpx" } }, "u-padding-top-74": { "": { "!paddingTop": "74rpx" } }, "up-padding-top-74": { "": { "!paddingTop": "74rpx" } }, "u-m-r-74": { "": { "!marginRight": "74rpx" } }, "up-m-r-74": { "": { "!marginRight": "74rpx" } }, "u-p-r-74": { "": { "!paddingRight": "74rpx" } }, "up-p-r-74": { "": { "!paddingRight": "74rpx" } }, "u-margin-right-74": { "": { "!marginRight": "74rpx" } }, "up-margin-right-74": { "": { "!marginRight": "74rpx" } }, "u-padding-right-74": { "": { "!paddingRight": "74rpx" } }, "up-padding-right-74": { "": { "!paddingRight": "74rpx" } }, "u-m-b-74": { "": { "!marginBottom": "74rpx" } }, "up-m-b-74": { "": { "!marginBottom": "74rpx" } }, "u-p-b-74": { "": { "!paddingBottom": "74rpx" } }, "up-p-b-74": { "": { "!paddingBottom": "74rpx" } }, "u-margin-bottom-74": { "": { "!marginBottom": "74rpx" } }, "up-margin-bottom-74": { "": { "!marginBottom": "74rpx" } }, "u-padding-bottom-74": { "": { "!paddingBottom": "74rpx" } }, "up-padding-bottom-74": { "": { "!paddingBottom": "74rpx" } }, "u-margin-75": { "": { "!marginTop": "75rpx", "!marginRight": "75rpx", "!marginBottom": "75rpx", "!marginLeft": "75rpx" } }, "u-m-75": { "": { "!marginTop": "75rpx", "!marginRight": "75rpx", "!marginBottom": "75rpx", "!marginLeft": "75rpx" } }, "up-margin-75": { "": { "!marginTop": "75rpx", "!marginRight": "75rpx", "!marginBottom": "75rpx", "!marginLeft": "75rpx" } }, "up-m-75": { "": { "!marginTop": "75rpx", "!marginRight": "75rpx", "!marginBottom": "75rpx", "!marginLeft": "75rpx" } }, "u-padding-75": { "": { "!paddingTop": "75rpx", "!paddingRight": "75rpx", "!paddingBottom": "75rpx", "!paddingLeft": "75rpx" } }, "u-p-75": { "": { "!paddingTop": "75rpx", "!paddingRight": "75rpx", "!paddingBottom": "75rpx", "!paddingLeft": "75rpx" } }, "up-padding-75": { "": { "!paddingTop": "75rpx", "!paddingRight": "75rpx", "!paddingBottom": "75rpx", "!paddingLeft": "75rpx" } }, "up-p-75": { "": { "!paddingTop": "75rpx", "!paddingRight": "75rpx", "!paddingBottom": "75rpx", "!paddingLeft": "75rpx" } }, "u-m-l-75": { "": { "!marginLeft": "75rpx" } }, "up-m-l-75": { "": { "!marginLeft": "75rpx" } }, "u-p-l-75": { "": { "!paddingLeft": "75rpx" } }, "up-p-l-75": { "": { "!paddingLeft": "75rpx" } }, "u-margin-left-75": { "": { "!marginLeft": "75rpx" } }, "up-margin-left-75": { "": { "!marginLeft": "75rpx" } }, "u-padding-left-75": { "": { "!paddingLeft": "75rpx" } }, "up-padding-left-75": { "": { "!paddingLeft": "75rpx" } }, "u-m-t-75": { "": { "!marginTop": "75rpx" } }, "up-m-t-75": { "": { "!marginTop": "75rpx" } }, "u-p-t-75": { "": { "!paddingTop": "75rpx" } }, "up-p-t-75": { "": { "!paddingTop": "75rpx" } }, "u-margin-top-75": { "": { "!marginTop": "75rpx" } }, "up-margin-top-75": { "": { "!marginTop": "75rpx" } }, "u-padding-top-75": { "": { "!paddingTop": "75rpx" } }, "up-padding-top-75": { "": { "!paddingTop": "75rpx" } }, "u-m-r-75": { "": { "!marginRight": "75rpx" } }, "up-m-r-75": { "": { "!marginRight": "75rpx" } }, "u-p-r-75": { "": { "!paddingRight": "75rpx" } }, "up-p-r-75": { "": { "!paddingRight": "75rpx" } }, "u-margin-right-75": { "": { "!marginRight": "75rpx" } }, "up-margin-right-75": { "": { "!marginRight": "75rpx" } }, "u-padding-right-75": { "": { "!paddingRight": "75rpx" } }, "up-padding-right-75": { "": { "!paddingRight": "75rpx" } }, "u-m-b-75": { "": { "!marginBottom": "75rpx" } }, "up-m-b-75": { "": { "!marginBottom": "75rpx" } }, "u-p-b-75": { "": { "!paddingBottom": "75rpx" } }, "up-p-b-75": { "": { "!paddingBottom": "75rpx" } }, "u-margin-bottom-75": { "": { "!marginBottom": "75rpx" } }, "up-margin-bottom-75": { "": { "!marginBottom": "75rpx" } }, "u-padding-bottom-75": { "": { "!paddingBottom": "75rpx" } }, "up-padding-bottom-75": { "": { "!paddingBottom": "75rpx" } }, "u-margin-76": { "": { "!marginTop": "76rpx", "!marginRight": "76rpx", "!marginBottom": "76rpx", "!marginLeft": "76rpx" } }, "u-m-76": { "": { "!marginTop": "76rpx", "!marginRight": "76rpx", "!marginBottom": "76rpx", "!marginLeft": "76rpx" } }, "up-margin-76": { "": { "!marginTop": "76rpx", "!marginRight": "76rpx", "!marginBottom": "76rpx", "!marginLeft": "76rpx" } }, "up-m-76": { "": { "!marginTop": "76rpx", "!marginRight": "76rpx", "!marginBottom": "76rpx", "!marginLeft": "76rpx" } }, "u-padding-76": { "": { "!paddingTop": "76rpx", "!paddingRight": "76rpx", "!paddingBottom": "76rpx", "!paddingLeft": "76rpx" } }, "u-p-76": { "": { "!paddingTop": "76rpx", "!paddingRight": "76rpx", "!paddingBottom": "76rpx", "!paddingLeft": "76rpx" } }, "up-padding-76": { "": { "!paddingTop": "76rpx", "!paddingRight": "76rpx", "!paddingBottom": "76rpx", "!paddingLeft": "76rpx" } }, "up-p-76": { "": { "!paddingTop": "76rpx", "!paddingRight": "76rpx", "!paddingBottom": "76rpx", "!paddingLeft": "76rpx" } }, "u-m-l-76": { "": { "!marginLeft": "76rpx" } }, "up-m-l-76": { "": { "!marginLeft": "76rpx" } }, "u-p-l-76": { "": { "!paddingLeft": "76rpx" } }, "up-p-l-76": { "": { "!paddingLeft": "76rpx" } }, "u-margin-left-76": { "": { "!marginLeft": "76rpx" } }, "up-margin-left-76": { "": { "!marginLeft": "76rpx" } }, "u-padding-left-76": { "": { "!paddingLeft": "76rpx" } }, "up-padding-left-76": { "": { "!paddingLeft": "76rpx" } }, "u-m-t-76": { "": { "!marginTop": "76rpx" } }, "up-m-t-76": { "": { "!marginTop": "76rpx" } }, "u-p-t-76": { "": { "!paddingTop": "76rpx" } }, "up-p-t-76": { "": { "!paddingTop": "76rpx" } }, "u-margin-top-76": { "": { "!marginTop": "76rpx" } }, "up-margin-top-76": { "": { "!marginTop": "76rpx" } }, "u-padding-top-76": { "": { "!paddingTop": "76rpx" } }, "up-padding-top-76": { "": { "!paddingTop": "76rpx" } }, "u-m-r-76": { "": { "!marginRight": "76rpx" } }, "up-m-r-76": { "": { "!marginRight": "76rpx" } }, "u-p-r-76": { "": { "!paddingRight": "76rpx" } }, "up-p-r-76": { "": { "!paddingRight": "76rpx" } }, "u-margin-right-76": { "": { "!marginRight": "76rpx" } }, "up-margin-right-76": { "": { "!marginRight": "76rpx" } }, "u-padding-right-76": { "": { "!paddingRight": "76rpx" } }, "up-padding-right-76": { "": { "!paddingRight": "76rpx" } }, "u-m-b-76": { "": { "!marginBottom": "76rpx" } }, "up-m-b-76": { "": { "!marginBottom": "76rpx" } }, "u-p-b-76": { "": { "!paddingBottom": "76rpx" } }, "up-p-b-76": { "": { "!paddingBottom": "76rpx" } }, "u-margin-bottom-76": { "": { "!marginBottom": "76rpx" } }, "up-margin-bottom-76": { "": { "!marginBottom": "76rpx" } }, "u-padding-bottom-76": { "": { "!paddingBottom": "76rpx" } }, "up-padding-bottom-76": { "": { "!paddingBottom": "76rpx" } }, "u-margin-78": { "": { "!marginTop": "78rpx", "!marginRight": "78rpx", "!marginBottom": "78rpx", "!marginLeft": "78rpx" } }, "u-m-78": { "": { "!marginTop": "78rpx", "!marginRight": "78rpx", "!marginBottom": "78rpx", "!marginLeft": "78rpx" } }, "up-margin-78": { "": { "!marginTop": "78rpx", "!marginRight": "78rpx", "!marginBottom": "78rpx", "!marginLeft": "78rpx" } }, "up-m-78": { "": { "!marginTop": "78rpx", "!marginRight": "78rpx", "!marginBottom": "78rpx", "!marginLeft": "78rpx" } }, "u-padding-78": { "": { "!paddingTop": "78rpx", "!paddingRight": "78rpx", "!paddingBottom": "78rpx", "!paddingLeft": "78rpx" } }, "u-p-78": { "": { "!paddingTop": "78rpx", "!paddingRight": "78rpx", "!paddingBottom": "78rpx", "!paddingLeft": "78rpx" } }, "up-padding-78": { "": { "!paddingTop": "78rpx", "!paddingRight": "78rpx", "!paddingBottom": "78rpx", "!paddingLeft": "78rpx" } }, "up-p-78": { "": { "!paddingTop": "78rpx", "!paddingRight": "78rpx", "!paddingBottom": "78rpx", "!paddingLeft": "78rpx" } }, "u-m-l-78": { "": { "!marginLeft": "78rpx" } }, "up-m-l-78": { "": { "!marginLeft": "78rpx" } }, "u-p-l-78": { "": { "!paddingLeft": "78rpx" } }, "up-p-l-78": { "": { "!paddingLeft": "78rpx" } }, "u-margin-left-78": { "": { "!marginLeft": "78rpx" } }, "up-margin-left-78": { "": { "!marginLeft": "78rpx" } }, "u-padding-left-78": { "": { "!paddingLeft": "78rpx" } }, "up-padding-left-78": { "": { "!paddingLeft": "78rpx" } }, "u-m-t-78": { "": { "!marginTop": "78rpx" } }, "up-m-t-78": { "": { "!marginTop": "78rpx" } }, "u-p-t-78": { "": { "!paddingTop": "78rpx" } }, "up-p-t-78": { "": { "!paddingTop": "78rpx" } }, "u-margin-top-78": { "": { "!marginTop": "78rpx" } }, "up-margin-top-78": { "": { "!marginTop": "78rpx" } }, "u-padding-top-78": { "": { "!paddingTop": "78rpx" } }, "up-padding-top-78": { "": { "!paddingTop": "78rpx" } }, "u-m-r-78": { "": { "!marginRight": "78rpx" } }, "up-m-r-78": { "": { "!marginRight": "78rpx" } }, "u-p-r-78": { "": { "!paddingRight": "78rpx" } }, "up-p-r-78": { "": { "!paddingRight": "78rpx" } }, "u-margin-right-78": { "": { "!marginRight": "78rpx" } }, "up-margin-right-78": { "": { "!marginRight": "78rpx" } }, "u-padding-right-78": { "": { "!paddingRight": "78rpx" } }, "up-padding-right-78": { "": { "!paddingRight": "78rpx" } }, "u-m-b-78": { "": { "!marginBottom": "78rpx" } }, "up-m-b-78": { "": { "!marginBottom": "78rpx" } }, "u-p-b-78": { "": { "!paddingBottom": "78rpx" } }, "up-p-b-78": { "": { "!paddingBottom": "78rpx" } }, "u-margin-bottom-78": { "": { "!marginBottom": "78rpx" } }, "up-margin-bottom-78": { "": { "!marginBottom": "78rpx" } }, "u-padding-bottom-78": { "": { "!paddingBottom": "78rpx" } }, "up-padding-bottom-78": { "": { "!paddingBottom": "78rpx" } }, "u-margin-80": { "": { "!marginTop": "80rpx", "!marginRight": "80rpx", "!marginBottom": "80rpx", "!marginLeft": "80rpx" } }, "u-m-80": { "": { "!marginTop": "80rpx", "!marginRight": "80rpx", "!marginBottom": "80rpx", "!marginLeft": "80rpx" } }, "up-margin-80": { "": { "!marginTop": "80rpx", "!marginRight": "80rpx", "!marginBottom": "80rpx", "!marginLeft": "80rpx" } }, "up-m-80": { "": { "!marginTop": "80rpx", "!marginRight": "80rpx", "!marginBottom": "80rpx", "!marginLeft": "80rpx" } }, "u-padding-80": { "": { "!paddingTop": "80rpx", "!paddingRight": "80rpx", "!paddingBottom": "80rpx", "!paddingLeft": "80rpx" } }, "u-p-80": { "": { "!paddingTop": "80rpx", "!paddingRight": "80rpx", "!paddingBottom": "80rpx", "!paddingLeft": "80rpx" } }, "up-padding-80": { "": { "!paddingTop": "80rpx", "!paddingRight": "80rpx", "!paddingBottom": "80rpx", "!paddingLeft": "80rpx" } }, "up-p-80": { "": { "!paddingTop": "80rpx", "!paddingRight": "80rpx", "!paddingBottom": "80rpx", "!paddingLeft": "80rpx" } }, "u-m-l-80": { "": { "!marginLeft": "80rpx" } }, "up-m-l-80": { "": { "!marginLeft": "80rpx" } }, "u-p-l-80": { "": { "!paddingLeft": "80rpx" } }, "up-p-l-80": { "": { "!paddingLeft": "80rpx" } }, "u-margin-left-80": { "": { "!marginLeft": "80rpx" } }, "up-margin-left-80": { "": { "!marginLeft": "80rpx" } }, "u-padding-left-80": { "": { "!paddingLeft": "80rpx" } }, "up-padding-left-80": { "": { "!paddingLeft": "80rpx" } }, "u-m-t-80": { "": { "!marginTop": "80rpx" } }, "up-m-t-80": { "": { "!marginTop": "80rpx" } }, "u-p-t-80": { "": { "!paddingTop": "80rpx" } }, "up-p-t-80": { "": { "!paddingTop": "80rpx" } }, "u-margin-top-80": { "": { "!marginTop": "80rpx" } }, "up-margin-top-80": { "": { "!marginTop": "80rpx" } }, "u-padding-top-80": { "": { "!paddingTop": "80rpx" } }, "up-padding-top-80": { "": { "!paddingTop": "80rpx" } }, "u-m-r-80": { "": { "!marginRight": "80rpx" } }, "up-m-r-80": { "": { "!marginRight": "80rpx" } }, "u-p-r-80": { "": { "!paddingRight": "80rpx" } }, "up-p-r-80": { "": { "!paddingRight": "80rpx" } }, "u-margin-right-80": { "": { "!marginRight": "80rpx" } }, "up-margin-right-80": { "": { "!marginRight": "80rpx" } }, "u-padding-right-80": { "": { "!paddingRight": "80rpx" } }, "up-padding-right-80": { "": { "!paddingRight": "80rpx" } }, "u-m-b-80": { "": { "!marginBottom": "80rpx" } }, "up-m-b-80": { "": { "!marginBottom": "80rpx" } }, "u-p-b-80": { "": { "!paddingBottom": "80rpx" } }, "up-p-b-80": { "": { "!paddingBottom": "80rpx" } }, "u-margin-bottom-80": { "": { "!marginBottom": "80rpx" } }, "up-margin-bottom-80": { "": { "!marginBottom": "80rpx" } }, "u-padding-bottom-80": { "": { "!paddingBottom": "80rpx" } }, "up-padding-bottom-80": { "": { "!paddingBottom": "80rpx" } }, "u-primary-light": { "": { "color": "#ecf5ff" } }, "u-warning-light": { "": { "color": "#fdf6ec" } }, "u-success-light": { "": { "color": "#f5fff0" } }, "u-error-light": { "": { "color": "#fef0f0" } }, "u-info-light": { "": { "color": "#f4f4f5" } }, "u-primary-light-bg": { "": { "backgroundColor": "#ecf5ff" } }, "u-warning-light-bg": { "": { "backgroundColor": "#fdf6ec" } }, "u-success-light-bg": { "": { "backgroundColor": "#f5fff0" } }, "u-error-light-bg": { "": { "backgroundColor": "#fef0f0" } }, "u-info-light-bg": { "": { "backgroundColor": "#f4f4f5" } }, "u-primary-dark": { "": { "color": "#398ade" } }, "u-warning-dark": { "": { "color": "#f1a532" } }, "u-success-dark": { "": { "color": "#53c21d" } }, "u-error-dark": { "": { "color": "#e45656" } }, "u-info-dark": { "": { "color": "#767a82" } }, "u-primary-dark-bg": { "": { "backgroundColor": "#398ade" } }, "u-warning-dark-bg": { "": { "backgroundColor": "#f1a532" } }, "u-success-dark-bg": { "": { "backgroundColor": "#53c21d" } }, "u-error-dark-bg": { "": { "backgroundColor": "#e45656" } }, "u-info-dark-bg": { "": { "backgroundColor": "#767a82" } }, "u-primary-disabled": { "": { "color": "#9acafc" } }, "u-warning-disabled": { "": { "color": "#f9d39b" } }, "u-success-disabled": { "": { "color": "#a9e08f" } }, "u-error-disabled": { "": { "color": "#f7b2b2" } }, "u-info-disabled": { "": { "color": "#c4c6c9" } }, "u-primary": { "": { "color": "var(--theme-color, #0957de)" } }, "u-warning": { "": { "color": "#f9ae3d" } }, "u-success": { "": { "color": "#5ac725" } }, "u-error": { "": { "color": "#f56c6c" } }, "u-info": { "": { "color": "#909399" } }, "u-primary-bg": { "": { "backgroundColor": "var(--theme-color, #0957de)" } }, "u-warning-bg": { "": { "backgroundColor": "#f9ae3d" } }, "u-success-bg": { "": { "backgroundColor": "#5ac725" } }, "u-error-bg": { "": { "backgroundColor": "#f56c6c" } }, "u-info-bg": { "": { "backgroundColor": "#909399" } }, "u-main-color": { "": { "color": "#303133" } }, "u-content-color": { "": { "color": "#606266" } }, "u-tips-color": { "": { "color": "#909193" } }, "u-light-color": { "": { "color": "#c0c4cc" } }, "up-primary-light": { "": { "color": "#ecf5ff" } }, "up-warning-light": { "": { "color": "#fdf6ec" } }, "up-success-light": { "": { "color": "#f5fff0" } }, "up-error-light": { "": { "color": "#fef0f0" } }, "up-info-light": { "": { "color": "#f4f4f5" } }, "up-primary-light-bg": { "": { "backgroundColor": "#ecf5ff" } }, "up-warning-light-bg": { "": { "backgroundColor": "#fdf6ec" } }, "up-success-light-bg": { "": { "backgroundColor": "#f5fff0" } }, "up-error-light-bg": { "": { "backgroundColor": "#fef0f0" } }, "up-info-light-bg": { "": { "backgroundColor": "#f4f4f5" } }, "up-primary-dark": { "": { "color": "#398ade" } }, "up-warning-dark": { "": { "color": "#f1a532" } }, "up-success-dark": { "": { "color": "#53c21d" } }, "up-error-dark": { "": { "color": "#e45656" } }, "up-info-dark": { "": { "color": "#767a82" } }, "up-primary-dark-bg": { "": { "backgroundColor": "#398ade" } }, "up-warning-dark-bg": { "": { "backgroundColor": "#f1a532" } }, "up-success-dark-bg": { "": { "backgroundColor": "#53c21d" } }, "up-error-dark-bg": { "": { "backgroundColor": "#e45656" } }, "up-info-dark-bg": { "": { "backgroundColor": "#767a82" } }, "up-primary-disabled": { "": { "color": "#9acafc" } }, "up-warning-disabled": { "": { "color": "#f9d39b" } }, "up-success-disabled": { "": { "color": "#a9e08f" } }, "up-error-disabled": { "": { "color": "#f7b2b2" } }, "up-info-disabled": { "": { "color": "#c4c6c9" } }, "up-primary": { "": { "color": "var(--theme-color, #0957de)" } }, "up-warning": { "": { "color": "#f9ae3d" } }, "up-success": { "": { "color": "#5ac725" } }, "up-error": { "": { "color": "#f56c6c" } }, "up-info": { "": { "color": "#909399" } }, "up-primary-bg": { "": { "backgroundColor": "var(--theme-color, #0957de)" } }, "up-warning-bg": { "": { "backgroundColor": "#f9ae3d" } }, "up-success-bg": { "": { "backgroundColor": "#5ac725" } }, "up-error-bg": { "": { "backgroundColor": "#f56c6c" } }, "up-info-bg": { "": { "backgroundColor": "#909399" } }, "up-main-color": { "": { "color": "#303133" } }, "up-content-color": { "": { "color": "#606266" } }, "up-tips-color": { "": { "color": "#909193" } }, "up-light-color": { "": { "color": "#c0c4cc" } }, "u-safe-area-inset-top": { "": { "paddingTop": "var(--uni-safe-area-inset-top)" } }, "up-safe-area-inset-top": { "": { "paddingTop": "var(--uni-safe-area-inset-top)" } }, "u-safe-area-inset-right": { "": { "paddingRight": "var(--uni-safe-area-inset-right)" } }, "up-safe-area-inset-right": { "": { "paddingRight": "var(--uni-safe-area-inset-right)" } }, "u-safe-area-inset-bottom": { "": { "paddingBottom": "var(--uni-safe-area-inset-bottom)" } }, "up-safe-area-inset-bottom": { "": { "paddingBottom": "var(--uni-safe-area-inset-bottom)" } }, "u-safe-area-inset-left": { "": { "paddingLeft": "var(--uni-safe-area-inset-left)" } }, "up-safe-area-inset-left": { "": { "paddingLeft": "var(--uni-safe-area-inset-left)" } }, "test": { "": { "paddingTop": 4, "color": "#FF0000" } }, "page": { "": { "--theme-color": "#37c2bc" } }, "absolute": { "": { "position": "absolute" } }, "bg-__0f172a_": { "": { "backgroundImage": "none", "backgroundColor": "#0f172a" } }, "bg-__10b981_": { "": { "backgroundImage": "none", "backgroundColor": "#10b981" } }, "bg-__19be6b_": { "": { "backgroundImage": "none", "backgroundColor": "#19be6b" } }, "bg-__2563eb_": { "": { "backgroundImage": "none", "backgroundColor": "#2563eb" } }, "bg-__2979ff_": { "": { "backgroundImage": "none", "backgroundColor": "#2979ff" } }, "bg-__3b82f6_": { "": { "backgroundImage": "none", "backgroundColor": "#3b82f6" } }, "bg-__d1fae5_": { "": { "backgroundImage": "none", "backgroundColor": "#d1fae5" } }, "bg-__e2e8f0_": { "": { "backgroundImage": "none", "backgroundColor": "#e2e8f0" } }, "bg-__e5e5e5_": { "": { "backgroundImage": "none", "backgroundColor": "#e5e5e5" } }, "bg-__ef4444_": { "": { "backgroundImage": "none", "backgroundColor": "#ef4444" } }, "bg-__f1f5f9_": { "": { "backgroundImage": "none", "backgroundColor": "#f1f5f9" } }, "bg-__f56c6c_": { "": { "backgroundImage": "none", "backgroundColor": "#f56c6c" } }, "bg-__f59e0b_": { "": { "backgroundImage": "none", "backgroundColor": "#f59e0b" } }, "bg-__f7fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f7fafc" } }, "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "bg-__fff_": { "": { "backgroundImage": "none", "backgroundColor": "#ffffff" } }, "bg-white": { "": { "backgroundColor": "rgba(255, 255, 255, var(--un-bg-opacity, 1))" } }, "blur": { "": { "filter": "var(--un-blur) var(--un-brightness) var(--un-contrast) var(--un-drop-shadow) var(--un-grayscale) var(--un-hue-rotate) var(--un-invert) var(--un-opacity) var(--un-saturate) var(--un-sepia)", "--un-blur": "blur(8rpx)" } }, "border": { "": { "borderTopWidth": "var(--un-line-width-default, 1px)", "borderRightWidth": "var(--un-line-width-default, 1px)", "borderBottomWidth": "var(--un-line-width-default, 1px)", "borderLeftWidth": "var(--un-line-width-default, 1px)" } }, "border-__e2e8f0_": { "": { "borderTopWidth": "medium", "borderRightWidth": "medium", "borderBottomWidth": "medium", "borderLeftWidth": "medium", "borderTopStyle": "none", "borderRightStyle": "none", "borderBottomStyle": "none", "borderLeftStyle": "none", "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-bottom-color-__f1f5f9_": { "": { "borderBottomColor": "#f1f5f9" } }, "border-bottom-color-__f8fafc_": { "": { "borderBottomColor": "#f8fafc" } }, "border-bottom-style-solid": { "": { "borderBottomStyle": "solid" } }, "border-bottom-width-1px": { "": { "borderBottomWidth": 1 } }, "border-color-__cbd5e1_": { "": { "borderTopColor": "#cbd5e1", "borderRightColor": "#cbd5e1", "borderBottomColor": "#cbd5e1", "borderLeftColor": "#cbd5e1" } }, "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-color-__edf2f7_": { "": { "borderTopColor": "#edf2f7", "borderRightColor": "#edf2f7", "borderBottomColor": "#edf2f7", "borderLeftColor": "#edf2f7" } }, "border-color-__eee_": { "": { "borderTopColor": "#eeeeee", "borderRightColor": "#eeeeee", "borderBottomColor": "#eeeeee", "borderLeftColor": "#eeeeee" } }, "border-color-__f1f5f9_": { "": { "borderTopColor": "#f1f5f9", "borderRightColor": "#f1f5f9", "borderBottomColor": "#f1f5f9", "borderLeftColor": "#f1f5f9" } }, "border-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-t": { "": { "borderTopWidth": "var(--un-line-width-default, 1px)" } }, "border-top-color-__f1f5f9_": { "": { "borderTopColor": "#f1f5f9" } }, "border-top-color-__f8fafc_": { "": { "borderTopColor": "#f8fafc" } }, "border-top-style-solid": { "": { "borderTopStyle": "solid" } }, "border-top-width-1px": { "": { "borderTopWidth": 1 } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "border-width-3px": { "": { "borderTopWidth": 3, "borderRightWidth": 3, "borderBottomWidth": 3, "borderLeftWidth": 3 } }, "fixed": { "": { "position": "fixed" } }, "flex": { "": { "display": "flex" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-col": { "": { "flexDirection": "column" } }, "flex-column": { "": { "flexDirection": "column" } }, "flex-row": { "": { "flexDirection": "row" } }, "flex-wrap": { "": { "flexWrap": "wrap" } }, "font-500": { "": { "fontWeight": 500 } }, "font-bold": { "": { "fontWeight": 700 } }, "font-medium": { "": { "fontWeight": 500 } }, "font-semibold": { "": { "fontWeight": 600 } }, "h-100px": { "": { "height": 100 } }, "h-10px": { "": { "height": 10 } }, "h-14px": { "": { "height": 14 } }, "h-150px": { "": { "height": 150 } }, "h-180px": { "": { "height": 180 } }, "h-32px": { "": { "height": 32 } }, "h-36px": { "": { "height": 36 } }, "h-38px": { "": { "height": 38 } }, "h-40px": { "": { "height": 40 } }, "h-44px": { "": { "height": 44 } }, "h-48px": { "": { "height": 48 } }, "h-90px": { "": { "height": 90 } }, "h-full": { "": { "height": "100%" } }, "items-center": { "": { "alignItems": "center" } }, "justify-around": { "": { "justifyContent": "space-around" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "justify-center": { "": { "justifyContent": "center" } }, "justify-end": { "": { "justifyContent": "flex-end" } }, "leading-18px": { "": { "lineHeight": "18px" } }, "leading-20px": { "": { "lineHeight": "20px" } }, "leading-24px": { "": { "lineHeight": "24px" } }, "m-auto": { "": { "marginTop": "auto", "marginRight": "auto", "marginBottom": "auto", "marginLeft": "auto" } }, "mb-10px": { "": { "marginBottom": 10 } }, "mb-12px": { "": { "marginBottom": 12 } }, "mb-15px": { "": { "marginBottom": 15 } }, "mb-16px": { "": { "marginBottom": 16 } }, "mb-20px": { "": { "marginBottom": 20 } }, "mb-24px": { "": { "marginBottom": 24 } }, "mb-30px": { "": { "marginBottom": 30 } }, "mb-4px": { "": { "marginBottom": 4 } }, "mb-6px": { "": { "marginBottom": 6 } }, "mb-8px": { "": { "marginBottom": 8 } }, "ml-10px": { "": { "marginLeft": 10 } }, "ml-4px": { "": { "marginLeft": 4 } }, "ml-8px": { "": { "marginLeft": 8 } }, "mr-10px": { "": { "marginRight": 10 } }, "mr-12px": { "": { "marginRight": 12 } }, "mr-15px": { "": { "marginRight": 15 } }, "mr-16px": { "": { "marginRight": 16 } }, "mr-20px": { "": { "marginRight": 20 } }, "mr-4px": { "": { "marginRight": 4 } }, "mr-6px": { "": { "marginRight": 6 } }, "mr-8px": { "": { "marginRight": 8 } }, "mt-10px": { "": { "marginTop": 10 } }, "mt-12px": { "": { "marginTop": 12 } }, "mt-15px": { "": { "marginTop": 15 } }, "mt-20px": { "": { "marginTop": 20 } }, "mt-2px": { "": { "marginTop": 2 } }, "mt-4px": { "": { "marginTop": 4 } }, "mt-6px": { "": { "marginTop": 6 } }, "mx-12px": { "": { "marginLeft": 12, "marginRight": 12 } }, "mx-16px": { "": { "marginLeft": 16, "marginRight": 16 } }, "mx-30px": { "": { "marginLeft": 30, "marginRight": 30 } }, "mx-auto": { "": { "marginLeft": "auto", "marginRight": "auto" } }, "my-10px": { "": { "marginTop": 10, "marginBottom": 10 } }, "my-20px": { "": { "marginTop": 20, "marginBottom": 20 } }, "my-8px": { "": { "marginTop": 8, "marginBottom": 8 } }, "none": { "": { "display": "none" } }, "overflow-hidden": { "": { "overflow": "hidden" } }, "p-10px": { "": { "paddingTop": 10, "paddingRight": 10, "paddingBottom": 10, "paddingLeft": 10 } }, "p-12px": { "": { "paddingTop": 12, "paddingRight": 12, "paddingBottom": 12, "paddingLeft": 12 } }, "p-15px": { "": { "paddingTop": 15, "paddingRight": 15, "paddingBottom": 15, "paddingLeft": 15 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "p-20px": { "": { "paddingTop": 20, "paddingRight": 20, "paddingBottom": 20, "paddingLeft": 20 } }, "p-30px": { "": { "paddingTop": 30, "paddingRight": 30, "paddingBottom": 30, "paddingLeft": 30 } }, "p-4px": { "": { "paddingTop": 4, "paddingRight": 4, "paddingBottom": 4, "paddingLeft": 4 } }, "p-5px": { "": { "paddingTop": 5, "paddingRight": 5, "paddingBottom": 5, "paddingLeft": 5 } }, "p-6px": { "": { "paddingTop": 6, "paddingRight": 6, "paddingBottom": 6, "paddingLeft": 6 } }, "p-8px": { "": { "paddingTop": 8, "paddingRight": 8, "paddingBottom": 8, "paddingLeft": 8 } }, "pb-10px": { "": { "paddingBottom": 10 } }, "pb-20px": { "": { "paddingBottom": 20 } }, "pb-30px": { "": { "paddingBottom": 30 } }, "pb-8px": { "": { "paddingBottom": 8 } }, "pt-20px": { "": { "paddingTop": 20 } }, "pt-4px": { "": { "paddingTop": 4 } }, "pt-8px": { "": { "paddingTop": 8 } }, "px-12px": { "": { "paddingLeft": 12, "paddingRight": 12 } }, "px-15px": { "": { "paddingLeft": 15, "paddingRight": 15 } }, "px-16px": { "": { "paddingLeft": 16, "paddingRight": 16 } }, "px-20px": { "": { "paddingLeft": 20, "paddingRight": 20 } }, "px-30px": { "": { "paddingLeft": 30, "paddingRight": 30 } }, "px-8px": { "": { "paddingLeft": 8, "paddingRight": 8 } }, "py-10px": { "": { "paddingTop": 10, "paddingBottom": 10 } }, "py-12px": { "": { "paddingTop": 12, "paddingBottom": 12 } }, "py-15px": { "": { "paddingTop": 15, "paddingBottom": 15 } }, "py-24px": { "": { "paddingTop": 24, "paddingBottom": 24 } }, "py-2px": { "": { "paddingTop": 2, "paddingBottom": 2 } }, "py-30px": { "": { "paddingTop": 30, "paddingBottom": 30 } }, "py-4px": { "": { "paddingTop": 4, "paddingBottom": 4 } }, "py-6px": { "": { "paddingTop": 6, "paddingBottom": 6 } }, "py-8px": { "": { "paddingTop": 8, "paddingBottom": 8 } }, "relative": { "": { "position": "relative" } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-16px": { "": { "borderTopLeftRadius": 16, "borderTopRightRadius": 16, "borderBottomRightRadius": 16, "borderBottomLeftRadius": 16 } }, "rounded-18px": { "": { "borderTopLeftRadius": 18, "borderTopRightRadius": 18, "borderBottomRightRadius": 18, "borderBottomLeftRadius": 18 } }, "rounded-20px": { "": { "borderTopLeftRadius": 20, "borderTopRightRadius": 20, "borderBottomRightRadius": 20, "borderBottomLeftRadius": 20 } }, "rounded-24px": { "": { "borderTopLeftRadius": 24, "borderTopRightRadius": 24, "borderBottomRightRadius": 24, "borderBottomLeftRadius": 24 } }, "rounded-2px": { "": { "borderTopLeftRadius": 2, "borderTopRightRadius": 2, "borderBottomRightRadius": 2, "borderBottomLeftRadius": 2 } }, "rounded-45px": { "": { "borderTopLeftRadius": 45, "borderTopRightRadius": 45, "borderBottomRightRadius": 45, "borderBottomLeftRadius": 45 } }, "rounded-4px": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "rounded-5px": { "": { "borderTopLeftRadius": 5, "borderTopRightRadius": 5, "borderBottomRightRadius": 5, "borderBottomLeftRadius": 5 } }, "rounded-6px": { "": { "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "rounded-bl-16px": { "": { "borderBottomLeftRadius": 16 } }, "rounded-br-16px": { "": { "borderBottomRightRadius": 16 } }, "rounded-l-16px": { "": { "borderTopLeftRadius": 16, "borderBottomLeftRadius": 16 } }, "rounded-lg": { "": { "borderTopLeftRadius": "var(--un-radius-lg-default, 8rpx)", "borderTopRightRadius": "var(--un-radius-lg-default, 8rpx)", "borderBottomRightRadius": "var(--un-radius-lg-default, 8rpx)", "borderBottomLeftRadius": "var(--un-radius-lg-default, 8rpx)" } }, "rounded-md": { "": { "borderTopLeftRadius": "var(--un-radius-md-default, 6rpx)", "borderTopRightRadius": "var(--un-radius-md-default, 6rpx)", "borderBottomRightRadius": "var(--un-radius-md-default, 6rpx)", "borderBottomLeftRadius": "var(--un-radius-md-default, 6rpx)" } }, "rounded-r-16px": { "": { "borderTopRightRadius": 16, "borderBottomRightRadius": 16 } }, "shadow-sm": { "": { "boxShadow": "var(--un-inset-shadow, 0 0 #0000), var(--un-inset-ring-shadow, 0 0 #0000), var(--un-ring-offset-shadow, 0 0 #0000), var(--un-ring-shadow, 0 0 #0000), var(--un-shadow, 0 1rpx 3rpx 0 var(--un-shadow-color, rgba(0, 0, 0, var(--un-shadow-opacity, 0.1))), 0 1rpx 2rpx -1rpx var(--un-shadow-color, rgba(0, 0, 0, var(--un-shadow-opacity, 0.1))))", "--un-shadow": "0 1rpx 3rpx 0rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1)))" } }, "shadow-xs": { "": { "boxShadow": "var(--un-inset-shadow, 0 0 #0000), var(--un-inset-ring-shadow, 0 0 #0000), var(--un-ring-offset-shadow, 0 0 #0000), var(--un-ring-shadow, 0 0 #0000), var(--un-shadow, 0 1rpx 3rpx 0 var(--un-shadow-color, rgba(0, 0, 0, var(--un-shadow-opacity, 0.1))), 0 1rpx 2rpx -1rpx var(--un-shadow-color, rgba(0, 0, 0, var(--un-shadow-opacity, 0.1))))", "--un-shadow": "0 1rpx 2rpx 0rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.05)))" } }, "text-__065f46_": { "": { "color": "#065f46" } }, "text-__1a202c_": { "": { "color": "#1a202c" } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__2563eb_": { "": { "color": "#2563eb" } }, "text-__2979ff_": { "": { "color": "#2979ff" } }, "text-__2d3748_": { "": { "color": "#2d3748" } }, "text-__303133_": { "": { "color": "#303133" } }, "text-__333_": { "": { "color": "#333333" } }, "text-__334155_": { "": { "color": "#334155" } }, "text-__38bdf8_": { "": { "color": "#38bdf8" } }, "text-__475569_": { "": { "color": "#475569" } }, "text-__606266_": { "": { "color": "#606266" } }, "text-__64748b_": { "": { "color": "#64748b" } }, "text-__718096_": { "": { "color": "#718096" } }, "text-__909399_": { "": { "color": "#909399" } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-__d14328_": { "": { "color": "#d14328" } }, "text-__e11d48_": { "": { "color": "#e11d48" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-10px": { "": { "fontSize": 10 } }, "text-11px": { "": { "fontSize": 11 } }, "text-12px": { "": { "fontSize": 12 } }, "text-13px": { "": { "fontSize": 13 } }, "text-14px": { "": { "fontSize": 14 } }, "text-15px": { "": { "fontSize": 15 } }, "text-16px": { "": { "fontSize": 16 } }, "text-18px": { "": { "fontSize": 18 } }, "text-20px": { "": { "fontSize": 20 } }, "text-25px": { "": { "fontSize": 25 } }, "text-32px": { "": { "fontSize": 32 } }, "text-center": { "": { "textAlign": "center" } }, "text-white": { "": { "color": "rgba(255, 255, 255, var(--un-color-opacity, 1))" } }, "transition": { "": { "transitionProperty": "all", "transitionDuration": "0.3s" } }, "w-100px": { "": { "width": 100 } }, "w-10px": { "": { "width": 10 } }, "w-150px": { "": { "width": 150 } }, "w-15px": { "": { "width": 15 } }, "w-200px": { "": { "width": 200 } }, "w-32px": { "": { "width": 32 } }, "w-36px": { "": { "width": 36 } }, "w-3px": { "": { "width": 3 } }, "w-40px": { "": { "width": 40 } }, "w-90px": { "": { "width": 90 } }, "w-full": { "": { "width": "100%" } }, "@TRANSITION": { "transition": { "property": "all", "duration": "0.3s" } } };
   const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/App.uvue"]]);
   const __global__ = typeof globalThis === "undefined" ? Function("return this")() : globalThis;
   __global__.__uniX = true;

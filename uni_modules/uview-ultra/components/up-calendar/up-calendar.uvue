@@ -10,7 +10,7 @@
 	>
 		<view class="up-calendar">
 			<uHeader
-				:title="title"
+				:title="elTitle"
 				:subtitle="subtitle"
 				:showSubtitle="showSubtitle"
 				:showTitle="showTitle"
@@ -43,8 +43,8 @@
 					:months="months"
 					:mode="mode"
 					:maxCount="maxCount"
-					:startText="startText"
-					:endText="endText"
+					:startText="elStartText"
+					:endText="elEndText"
 					:defaultDate="defaultDate"
 					:minDate="innerMinDate"
 					:maxDate="innerMaxDate"
@@ -71,8 +71,8 @@
 					:months="currentMonths"
 					:mode="mode"
 					:maxCount="maxCount"
-					:startText="startText"
-					:endText="endText"
+					:startText="elStartText"
+					:endText="elEndText"
 					:defaultDate="defaultDate"
 					:minDate="innerMinDate"
 					:maxDate="innerMaxDate"
@@ -93,7 +93,7 @@
 					<up-button
 						shape="circle"
 						:text="
-                            buttonDisabled ? confirmDisabledText : confirmText
+                            buttonDisabled ? elConfirmDisabledText : elConfirmText
                         "
 						:color="color == '#3c9cff' ? '' : color"
 						:type="color == '#3c9cff' ? 'primary' : ''"
@@ -113,7 +113,7 @@ import uMonth, { monthsItem } from './month.uvue'
 import { propsCalendar } from './props.uts'
 import util from './util'
 import {dayuts} from '@/uni_modules/lime-dayuts';
-import { t as $t } from '../../libs/i18n/index.uts'
+import { t as $t, formatMonthTitle } from '../../libs/i18n/index.uts'
 // import Calendar from '../../libs/util/calendar'
 import { mpMixin } from '../../libs/mixin/mpMixin'
 import { mixin } from '../../libs/mixin/mixin'
@@ -423,17 +423,45 @@ export default {
 			// @ts-ignore
 			return [this.innerMinDate, this.innerMaxDate]
 		},
-		subtitle() {
+		elTitle(): string {
+			if (this.title != '' && this.title != '日期选择') {
+				return this.title
+			}
+			return $t('up.calendar.chooseDates', {} as UTSJSONObject)
+		},
+		elConfirmText(): string {
+			if (this.confirmText != '' && this.confirmText != '确定') {
+				return this.confirmText
+			}
+			return $t('up.common.confirm', {} as UTSJSONObject)
+		},
+		elConfirmDisabledText(): string {
+			if (this.confirmDisabledText != '' && this.confirmDisabledText != '确定') {
+				return this.confirmDisabledText
+			}
+			return $t('up.common.confirm', {} as UTSJSONObject)
+		},
+		elStartText(): string {
+			if (this.startText != '' && this.startText != '开始') {
+				return this.startText
+			}
+			return $t('up.common.start', {} as UTSJSONObject)
+		},
+		elEndText(): string {
+			if (this.endText != '' && this.endText != '结束') {
+				return this.endText
+			}
+			return $t('up.common.end', {} as UTSJSONObject)
+		},
+		subtitle(): string {
 			// 初始化时，this.months为空数组，所以需要特别判断处理
 			// @ts-ignore
 			if (this.months.length > 0) {
 				// @ts-ignore
 				let monthIndex: number = this.monthIndex as number
 				// @ts-ignore
-				return `${this.months[monthIndex]['year']}年${
-					// @ts-ignore
-					this.months[monthIndex]['month']
-				}月`
+				const item = this.months[monthIndex] as monthsItem
+				return formatMonthTitle(item.year, item.month)
 			} else {
 				return ''
 			}

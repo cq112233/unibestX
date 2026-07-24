@@ -61,7 +61,7 @@
 							:style="{
 								color: cancelColor
 							}"
-						>{{ cancelText }}</text>
+						>{{ elCancelText }}</text>
 					</view>
 					<up-line
 						direction="column"
@@ -82,22 +82,23 @@
 							:style="{
 								color: confirmColor
 							}"
-						>{{ confirmText }}</text>
+						>{{ elConfirmText }}</text>
 					</view>
 				</view>
 			</template>
 		</view>
 		<template #bottom>
-			<slot name="popupBottom"></slot>
+			<slot name="bottom"></slot>
 		</template>
 	</up-popup>
 </template>
 
 <script>
-	import { props } from './props';
-	import { mpMixin } from '../../libs/mixin/mpMixin';
-	import { mixin } from '../../libs/mixin/mixin';
-	import { addUnit } from '../../libs/function/index';
+	import { props } from './props.js';
+	import { mpMixin } from '../../libs/mixin/mpMixin.js';
+	import { mixin } from '../../libs/mixin/mixin.js';
+	import { addUnit } from '../../libs/function/index.js';
+	import { t } from '../../libs/i18n/index.js';
 	/**
 	 * Modal 模态框
 	 * @description 弹出模态框，常用于消息提示、消息确认、在当前页面内完成特定的交互操作。
@@ -141,6 +142,18 @@
 		},
 		emits: ["confirm", "cancel", "close", "update:show", 'cancelOnAsync'],
 		computed: {
+			elCancelText() {
+				if (this.cancelText === '取消' || !this.cancelText) {
+					return t('up_common_cancel')
+				}
+				return this.cancelText
+			},
+			elConfirmText() {
+				if (this.confirmText === '确认' || this.confirmText === '确定' || !this.confirmText) {
+					return t('up_common_confirm')
+				}
+				return this.confirmText
+			},
 			contentStyleCpu() {
 				let style = this.contentStyle;
 				style.paddingTop = `${this.title ? 12 : 25}px`

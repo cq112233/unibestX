@@ -58,6 +58,16 @@ import "../../../uni_modules/lime-i18n/common/warnings.js";
 import "../../../uni_modules/lime-i18n/common/types.js";
 import "../../i18n/locales/zh_CN.js";
 import "../../i18n/locales/en_US.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/index.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hans.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hant.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/en.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/es.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/fr.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/de.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/ko.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/ja.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/ru.js";
 import "../../utils/toast.js";
 const _sfc_main = /* @__PURE__ */ defineComponent({
   __name: "register",
@@ -84,13 +94,13 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     return __returned__;
   }
 });
-const _style_0 = { "bg-__10b981_": { "": { "backgroundImage": "none", "backgroundColor": "#10b981" } }, "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "flex": { "": { "display": "flex" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-44px": { "": { "height": 44 } }, "items-center": { "": { "alignItems": "center" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-30px": { "": { "marginBottom": 30 } }, "p-30px": { "": { "paddingTop": 30, "paddingRight": 30, "paddingBottom": 30, "paddingLeft": 30 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-14px": { "": { "fontSize": 14 } }, "text-20px": { "": { "fontSize": 20 } }, "w-200px": { "": { "width": 200 } } };
+const _style_0 = { "bg-__10b981_": { "": { "backgroundImage": "none", "backgroundColor": "#10b981" } }, "flex": { "": { "display": "flex" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-44px": { "": { "height": 44 } }, "items-center": { "": { "alignItems": "center" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-30px": { "": { "marginBottom": 30 } }, "p-30px": { "": { "paddingTop": 30, "paddingRight": 30, "paddingBottom": 30, "paddingLeft": 30 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-14px": { "": { "fontSize": 14 } }, "text-20px": { "": { "fontSize": 20 } }, "w-200px": { "": { "width": 200 } } };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return openBlock(), createBlock($setup["AppKu"], null, {
     default: withCtx(() => [
       createVNode($setup["LayoutComponent"], { "navigation-bar-title-text": "注册" }, {
         default: withCtx(() => [
-          createElementVNode("view", { class: "flex-1 p-30px items-center justify-center bg-__f8fafc_" }, [
+          createElementVNode("view", { class: "flex-1 p-30px items-center justify-center" }, [
             createElementVNode("view", { class: "mb-30px" }, [
               createElementVNode("text", { class: "text-20px font-bold text-__1e293b_" }, "注册页")
             ]),

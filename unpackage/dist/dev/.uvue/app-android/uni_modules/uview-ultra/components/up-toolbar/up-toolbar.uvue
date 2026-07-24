@@ -1,6 +1,7 @@
 import { propsToolbar } from './props';
 import { mpMixin } from '../../libs/mixin/mpMixin';
 import { mixin } from '../../libs/mixin/mixin';
+import { t } from '../../libs/i18n/index.uts';
 /**
  * Toolbar 工具条
  * @description
@@ -19,6 +20,18 @@ const __sfc__ = defineComponent({
     mixins: [mpMixin, mixin, propsToolbar],
     emits: ["confirm", "cancel"],
     computed: {
+        elCancelText(): string {
+            if (this.cancelText == '取消' || this.cancelText == '') {
+                return t('up_common_cancel', {} as UTSJSONObject);
+            }
+            return this.cancelText;
+        },
+        elConfirmText(): string {
+            if (this.confirmText == '确认' || this.confirmText == '确定' || this.confirmText == '') {
+                return t('up_common_confirm', {} as UTSJSONObject);
+            }
+            return this.confirmText;
+        },
         elConfirmColor(): string {
             // 默认色时不设置内联样式，让 SCSS 中 $up-primary CSS变量生效
             if (this.confirmColor == '#3c9cff') {
@@ -62,7 +75,7 @@ function GenUniModulesUviewUltraComponentsUpToolbarUpToolbarRender(this: Instanc
                         style: _nS(_uM({
                             color: _ctx.cancelColor
                         }))
-                    }), _tD(_ctx.cancelText), 13 /* TEXT, STYLE, PROPS */, ["onClick"])
+                    }), _tD(_ctx.elCancelText), 13 /* TEXT, STYLE, PROPS */, ["onClick"])
                 ])
             ]),
             isTrue(_ctx.title)
@@ -84,7 +97,7 @@ function GenUniModulesUviewUltraComponentsUpToolbarUpToolbarRender(this: Instanc
                             style: _nS(_uM({
                                 color: _ctx.elConfirmColor
                             }))
-                        }), _tD(_ctx.confirmText), 13 /* TEXT, STYLE, PROPS */, ["onClick"])
+                        }), _tD(_ctx.elConfirmText), 13 /* TEXT, STYLE, PROPS */, ["onClick"])
                     ])
                     : renderSlot(_ctx.$slots, "right", _uM({ key: 1 }))
             ])

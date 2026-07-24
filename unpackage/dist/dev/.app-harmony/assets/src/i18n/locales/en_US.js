@@ -2,7 +2,7 @@ const enUS = new UTSJSONObject({
   message: new UTSJSONObject({
     hello: "The world says {msg}!",
     welcome: "Welcome to use unibestX!",
-    switch_success: "Switched to English"
+    switch_success: "App & Component Library switched to English"
   }),
   tabbar: new UTSJSONObject({
     home: "Home",
@@ -16,10 +16,11 @@ const enUS = new UTSJSONObject({
     svgAuthWarning: "SVG mode requires authorization & fee",
     langTitle: "Language Settings",
     langPreview: "Multi-language Preview",
+    uviewPreview: "UI Library (uView-Ultra) Preview",
     themeTitle: "Theme Settings",
     themePreview: "Theme Color Preview",
     themeButton: "Theme Button",
-    themeSuccess: "Theme switched successfully",
+    themeSuccess: "App & Component Library theme color updated successfully",
     echartTitle: "ECharts Chart Demo",
     echartLine: "Line Chart",
     echartBar: "Bar Chart",

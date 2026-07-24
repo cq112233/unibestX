@@ -59,6 +59,16 @@ import "../../../../../uni_modules/lime-i18n/common/warnings.js";
 import "../../../../../uni_modules/lime-i18n/common/types.js";
 import "../../../../i18n/locales/zh_CN.js";
 import "../../../../i18n/locales/en_US.js";
+import "../../../../../uni_modules/uview-ultra/libs/i18n/index.js";
+import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hans.js";
+import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hant.js";
+import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/en.js";
+import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/es.js";
+import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/fr.js";
+import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/de.js";
+import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ko.js";
+import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ja.js";
+import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ru.js";
 import "../../../../utils/toast.js";
 import "../../../../../uni_modules/uview-ultra/components/up-swiper-indicator/up-swiper-indicator.js";
 import "../../../../../uni_modules/uview-ultra/components/up-swiper-indicator/props.js";
@@ -125,6 +135,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                   "key-name": "image",
                   indicator: true,
                   "indicator-mode": "line",
+                  "indicator-active-color": "#2979ff",
+                  "indicator-inactive-color": "rgba(0, 0, 0, 0.15)",
                   circular: true,
                   "previous-margin": 30,
                   "next-margin": 30,

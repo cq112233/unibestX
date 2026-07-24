@@ -78,8 +78,8 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     const instance = getCurrentInstance().proxy;
     const props = __props;
     const emit = __emit;
-    const icons = new UTSJSONObject(
-      {
+    const icons = computed(() => {
+      return new UTSJSONObject({
         car: t("up.empty.car", new UTSJSONObject({})),
         page: t("up.empty.page", new UTSJSONObject({})),
         search: t("up.empty.search", new UTSJSONObject({})),
@@ -95,10 +95,8 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         list: t("up.empty.list", new UTSJSONObject({})),
         data: t("up.empty.data", new UTSJSONObject({})),
         comment: t("up.empty.comment", new UTSJSONObject({}))
-      }
-      // 计算属性
-      // 组件样式
-    );
+      });
+    });
     const emptyStyle = computed(() => {
       const style = new UTSJSONObject({});
       style["marginTop"] = addUnit(props.marginTop);
