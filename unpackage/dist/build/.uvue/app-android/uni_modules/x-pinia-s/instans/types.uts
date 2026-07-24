@@ -1,0 +1,116 @@
+/**
+ * x-pinia-s 类型定义
+ *
+ * UTS 严格类型版 Pinia for uni-app-x（class extends 风格）
+ *
+ * @author tmui4x
+ * @copyright https://tmui.design
+ */
+// ============ 基础类型 ============
+/** 取消订阅函数 */
+export type UnsubscribeFn = () => void;
+/** 状态变更类型 */
+export type SubscriptionMutationType = 'direct' | 'patch object' | 'patch function' | 'reset';
+/** 状态变更信息（$subscribe 回调参数） */
+export type SubscriptionMutation = {
+    /** 变更类型 */
+    type: SubscriptionMutationType;
+    /** 触发变更的 store id */
+    storeId: string;
+    /** 当 type 为 patch object 时为传入的 partial 对象 */
+    payload: UTSJSONObject | null;
+    /** 变更发生的时间戳 */
+    timestamp: number;
+};
+/** 状态订阅回调 */
+export type StateSubscriptionCallback = (mutation: SubscriptionMutation, state: UTSJSONObject) => void;
+/** Action 调用信息（$onAction 回调参数） */
+export type ActionContext = {
+    /** action 名 */
+    name: string;
+    /** 所属 store id */
+    storeId: string;
+    /** 调用参数 */
+    args: Array<any>;
+};
+/** action 完成后回调 */
+export type AfterActionCallback = (result: any) => void;
+/** action 异常回调 */
+export type OnErrorActionCallback = (error: any) => void;
+/** Action 订阅回调 */
+export type ActionSubscriptionCallback = (ctx: ActionContext, after: (cb: AfterActionCallback) => void, onError: (cb: OnErrorActionCallback) => void) => void;
+// ============ Pinia 插件 ============
+/**
+ * Pinia 插件上下文。
+ *
+ * `store` / `state` 字段都用 `any` —— UTS 名义类型系统下，用户的 reactive state
+ * 是 ReactiveObject 强类型 class（不是 UTSJSONObject），无法 cast。
+ * 插件需要 store 的方法时，在插件文件中 `import { PiniaStoreBase }` 然后 cast。
+ * 插件需要序列化 state 时，调用 `(ctx.store as any as PiniaStoreBase)._serialize()`。
+ */
+export type PiniaPluginContext = {
+    /** Pinia 实例 */
+    pinia: IPinia;
+    /** 当前 store id */
+    storeId: string;
+    /** 当前 store 实例（实际类型为 PiniaStoreBase 子类，按 any 暴露） */
+    store: any;
+    /** 当前 store 的 state 引用（用户 reactive 对象，按 any 暴露） */
+    state: any;
+};
+/**
+ * Pinia 插件类型。
+ *
+ * 与原版 Pinia 不同：UTS 严格类型不允许向 class 实例动态注入属性，
+ * 因此插件**不能返回扩展对象**。插件应通过 `ctx.store.$subscribe` / `ctx.store.$onAction`
+ * 等 hook 完成所有逻辑（监听、记录、持久化等）。
+ */
+export type PiniaPlugin = (ctx: PiniaPluginContext) => void;
+// ============ Pinia 实例 ============
+/**
+ * Pinia 实例接口。
+ *
+ * `_stores` 字段类型为 `Map<string, any>` —— 同样为避免循环依赖；
+ * 实际存储的是 PiniaStoreBase 的子类实例。
+ *
+ * 重要：install / use 必须用「方法语法」而非「字段语法」声明。
+ * UTS 转 Kotlin 后，字段语法 `install : (...) => void` 会被当成 property（需用字段初始化器实现），
+ * 方法语法 `install(...) : void` 才会被当成可 override 的 method。
+ */
+export interface IPinia {
+    /** 全部 store 状态合集（id -> state），供持久化等场景使用 */
+    state: UTSJSONObject;
+    /** 内部：已实例化的 store 集合（值为 PiniaStoreBase 子类实例） */
+    _stores: Map<string, any>;
+    /** 内部：插件列表 */
+    _plugins: Array<PiniaPlugin>;
+    /**
+     * 内部：Pinia 顶层 effect 作用域。
+     * 在 `createPinia()` 中创建（必须在 main.uts 顶层调用，确保 currentScope 为 null
+     * 时创建出一个不依附任何组件的顶层 scope）。
+     * 每个 store 创建时通过 `_e.run(() => effectScope())` 创建子 scope —— 子 scope 嵌套在
+     * Pinia 顶层 scope 下，不会被外层组件 scope 捕获；组件销毁不影响 store 内的 effects。
+     */
+    _e: EffectScope;
+    /** Vue 插件 install 方法（app.use(pinia) 时调用） */
+    install(app: VueApp): void;
+    /** 注册插件，返回自身以便链式调用 */
+    use(plugin: PiniaPlugin): IPinia;
+}
+// ============ 持久化插件 ============
+/** 持久化序列化器 */
+export type PersistSerializer = {
+    serialize: (state: UTSJSONObject) => string;
+    deserialize: (raw: string) => UTSJSONObject;
+};
+/** 持久化插件配置 */
+export type PersistOptions = {
+    /** 自定义 storage key 前缀，默认 'pinia:' */
+    keyPrefix: string;
+    /** 是否仅持久化指定的 store id（白名单），为 null 表示全部持久化 */
+    includeStores: Array<string> | null;
+    /** 黑名单 store id（优先级高于 includeStores） */
+    excludeStores: Array<string>;
+    /** 自定义序列化器，为 null 时使用 JSON */
+    serializer: PersistSerializer | null;
+};

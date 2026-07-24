@@ -1,0 +1,140 @@
+
+import { propsLoadmore } from './props.uts'
+import { mpMixin } from '../../libs/mixin/mpMixin.uts'
+import { mixin } from '../../libs/mixin/mixin.uts'
+import { addUnit, addStyle } from '../../libs/function/index.uts'
+
+/**
+ * loadmore 加载更多
+ * @description 此组件一般用于标识页面底部加载数据时的状态。
+ * @tutorial https://ijry.github.io/uview-plus/components/loadMore.html
+ * @property {String}			status			组件状态（默认 'loadmore' ）
+ * @property {String}			bgColor			组件背景颜色，在页面是非白色时会用到（默认 'transparent' ）
+ * @property {Boolean}			icon			加载中时是否显示图标（默认 true ）
+ * @property {String | Number}	fontSize		字体大小（默认 14 ）
+ * @property {String | Number}	iconSize		图标大小（默认 17 ）
+ * @property {String}			color			字体颜色（默认 '#606266' ）
+ * @property {String}			loadingIcon		加载图标（默认 'circle' ）
+ * @property {String}			loadmoreText	加载前的提示语（默认 '加载更多' ）
+ * @property {String}			loadingText		加载中提示语（默认 '正在加载...' ）
+ * @property {String}			nomoreText		没有更多的提示语（默认 '没有更多了' ）
+ * @property {Boolean}			isDot			到上一个相邻元素的距离 （默认 false ）
+ * @property {String}			iconColor		加载中图标的颜色 （默认 '#b7b7b7' ）
+ * @property {String}			lineColor		线条颜色（默认 #E6E8EB ）
+ * @property {String | Number}	marginTop		上边距 （默认 10 ）
+ * @property {String | Number}	marginBottom	下边距 （默认 10 ）
+ * @property {String | Number}	height			高度，单位px （默认 'auto' ）
+ * @property {Boolean}			line			是否显示左边分割线  （默认 false ）
+ * @property {Boolean}			dashed		    // 是否虚线，true-虚线，false-实线  （默认 false ）
+ * @event {Function} loadmore status为loadmore时，点击组件会发出此事件
+ * @example <up-loadmore :status="status" icon-type="iconType" load-text="loadText" />
+ */
+const __sfc__ = defineComponent({
+	name: "up-loadmore",
+	mixins: [mpMixin, mixin, propsLoadmore],
+	data() {
+		return {
+			// 粗点
+			dotText: "●"
+		}
+	},
+	computed: {
+		// 加载的文字显示的样式
+		loadTextStyle() {
+			return {
+				color: this.color,
+				fontSize: addUnit(this.fontSize),
+				// lineHeight: addUnit(this.fontSize),
+				backgroundColor: this.bgColor,
+			}
+		},
+		// 显示的提示文字
+		showText() {
+			let text = '';
+			if (this.status == 'loadmore') text = this.loadmoreText
+			else if (this.status == 'loading') text = this.loadingText
+			else if (this.status == 'nomore' && this.isDot) text = this.dotText;
+			else text = this.nomoreText;
+			return text;
+		}
+	},
+	emits: ["loadmore"],
+	methods: {
+		addStyle(e: any) {
+			return addStyle(e)
+		},
+		addUnit(e: any) {
+			return addUnit(e)
+		},
+		loadMore() {
+			// 只有在"加载更多"的状态下才发送点击事件，内容不满一屏时无法触发底部上拉事件，所以需要点击来触发
+			if (this.status == 'loadmore') this.$emit('loadmore');
+		}
+	}
+})
+
+export default __sfc__
+function GenUniModulesUviewUltraComponentsUpLoadmoreUpLoadmoreRender(this: InstanceType<typeof __sfc__>): any | null {
+const _ctx = this
+const _cache = this.$.renderCache
+const _component_up_line = resolveEasyComponent("up-line",_easycom_up_line)
+const _component_up_loading_icon = resolveEasyComponent("up-loading-icon",_easycom_up_loading_icon)
+
+  return _cE("view", _uM({
+    class: "up-loadmore",
+    style: _nS([
+			_ctx.addStyle(_ctx.customStyle),
+			_uM({
+				backgroundColor: _ctx.bgColor,
+				marginBottom: _ctx.addUnit(_ctx.marginBottom),
+				marginTop: _ctx.addUnit(_ctx.marginTop),
+				height: _ctx.addUnit(_ctx.height),
+			}),
+		])
+  }), [
+    isTrue(_ctx.line)
+      ? _cV(_component_up_line, _uM({
+          key: 0,
+          length: "140rpx",
+          color: _ctx.lineColor,
+          hairline: false,
+          dashed: _ctx.dashed
+        }), null, 8 /* PROPS */, ["color", "dashed"])
+      : _cC("v-if", true),
+    _cE("view", _uM({
+      class: _nC([_ctx.status == 'loadmore' || _ctx.status == 'nomore' ? 'up-more' : '', "up-loadmore__content"])
+    }), [
+      isTrue(_ctx.status === 'loading' && _ctx.icon)
+        ? _cE("view", _uM({
+            key: 0,
+            class: "up-loadmore__content__icon-wrap"
+          }), [
+            _cV(_component_up_loading_icon, _uM({
+              color: _ctx.iconColor,
+              size: _ctx.iconSize,
+              mode: _ctx.loadingIcon
+            }), null, 8 /* PROPS */, ["color", "size", "mode"])
+          ])
+        : _cC("v-if", true),
+      _cE("text", _uM({
+        class: _nC(["up-line-11", [(_ctx.status == 'nomore' && _ctx.isDot == true) ? 'up-loadmore__content__dot-text' : 'up-loadmore__content__text']]),
+        style: _nS([_ctx.loadTextStyle]),
+        onClick: _ctx.loadMore
+      }), _tD(_ctx.showText), 15 /* TEXT, CLASS, STYLE, PROPS */, ["onClick"])
+    ], 2 /* CLASS */),
+    isTrue(_ctx.line)
+      ? _cV(_component_up_line, _uM({
+          key: 1,
+          length: "140rpx",
+          color: _ctx.lineColor,
+          hairline: false,
+          dashed: _ctx.dashed
+        }), null, 8 /* PROPS */, ["color", "dashed"])
+      : _cC("v-if", true)
+  ], 4 /* STYLE */)
+}
+export type UpLoadmoreComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpLoadmoreUpLoadmoreStyles = [_uM([["u-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-loadmore", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["up-loadmore__content", _pS(_uM([["marginTop", 0], ["marginRight", 15], ["marginBottom", 0], ["marginLeft", 15], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"]]))], ["up-loadmore__content__icon-wrap", _pS(_uM([["marginRight", 8]]))], ["up-loadmore__content__text", _pS(_uM([["fontSize", 14], ["color", "#606266"]]))], ["up-loadmore__content__dot-text", _pS(_uM([["fontSize", 15], ["color", "#909193"]]))]])]
+
+import _easycom_up_line from '@/uni_modules/uview-ultra/components/up-line/up-line.uvue'
+import _easycom_up_loading_icon from '@/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.uvue'

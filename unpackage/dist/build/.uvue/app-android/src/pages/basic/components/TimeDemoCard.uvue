@@ -1,0 +1,138 @@
+import Card from './Card.uvue';
+import { dayuts } from '@/uni_modules/lime-dayuts';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+// 实时时间状态
+const __sfc__ = defineComponent({
+    __name: 'TimeDemoCard',
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        const currentFullTime = ref('');
+        let timerId = 0;
+        // 偏移时间计算
+        const offsetDays = ref(0);
+        // 实时时钟更新
+        function updateClock() {
+            currentFullTime.value = dayuts().format('YYYY-MM-DD HH:mm:ss.SSS dddd');
+        }
+        // 偏移量调节
+        function adjustOffset(days: number) {
+            offsetDays.value += days;
+        }
+        // 计算属性：目标偏移时间
+        const targetOffsetTime = computed((): string => {
+            return dayuts().add(offsetDays.value, 'day').format('YYYY-MM-DD HH:mm:ss');
+        });
+        // 计算属性：本月首日
+        const startOfMonth = computed((): string => {
+            return dayuts().startOf('month').format('YYYY-MM-DD');
+        });
+        // 计算属性：本月尾日
+        const endOfMonth = computed((): string => {
+            return dayuts().endOf('month').format('YYYY-MM-DD');
+        });
+        // 计算属性：是否为闰年
+        const isLeapYear = computed((): boolean => {
+            return dayuts().isLeapYear();
+        });
+        // 计算属性：距离今年底的天数
+        const daysToYearEnd = computed((): number => {
+            const endOfYear = dayuts().endOf('year');
+            const diffVal = endOfYear.diff(dayuts(), 'day');
+            return Math.ceil(diffVal);
+        });
+        onMounted(() => {
+            updateClock();
+            timerId = setInterval(() => {
+                updateClock();
+            }, 100);
+        });
+        onUnmounted(() => {
+            if (timerId != 0) {
+                clearInterval(timerId);
+            }
+        });
+        return (): any | null => {
+            return _cV(unref(Card), _uM({ title: "时间日期操作 (lime-dayuts)" }), _uM({
+                default: withSlotCtx((): any[] => [
+                    _cE("view", _uM({ class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }), [
+                        _cE("text", _uM({ class: "text-13px font-bold text-__1e293b_ mb-8px" }), "实时高精度时钟 (更新于每一百毫秒)"),
+                        _cE("text", _uM({
+                            class: "text-24px font-bold text-_var_--theme-color__37c2bc__ mb-6px",
+                            style: _nS(_uM({ "font-family": "monospace" }))
+                        }), _tD(currentFullTime.value), 5 /* TEXT, STYLE */),
+                        _cE("text", _uM({ class: "text-12px text-__94a3b8_" }), " 格式模板: YYYY-MM-DD HH:mm:ss.SSS dddd ")
+                    ]),
+                    _cE("view", _uM({ class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }), [
+                        _cE("text", _uM({ class: "text-13px font-bold text-__1e293b_ mb-12px" }), "日期偏移操作"),
+                        _cE("view", _uM({ class: "flex-row items-center justify-between mb-12px" }), [
+                            _cE("text", _uM({ class: "text-14px text-__64748b_" }), "当前偏移天数:"),
+                            _cE("text", _uM({ class: "text-16px font-bold text-__334155_" }), _tD(offsetDays.value > 0 ? '+' : '') + _tD(offsetDays.value) + " 天", 1 /* TEXT */)
+                        ]),
+                        _cE("view", _uM({ class: "flex-row justify-between mb-12px" }), [
+                            _cE("view", _uM({ class: "flex-1 mr-8px" }), [
+                                _cE("view", _uM({
+                                    class: "w-full h-36px rounded-8px bg-__e0edff_ flex flex-row items-center justify-center",
+                                    onClick: () => { adjustOffset(-7); }
+                                }), [
+                                    _cE("text", _uM({ class: "text-__3b82f6_ text-12px font-bold" }), "-7 天")
+                                ], 8 /* PROPS */, ["onClick"])
+                            ]),
+                            _cE("view", _uM({ class: "flex-1 mr-8px" }), [
+                                _cE("view", _uM({
+                                    class: "w-full h-36px rounded-8px bg-__e0edff_ flex flex-row items-center justify-center",
+                                    onClick: () => { adjustOffset(-1); }
+                                }), [
+                                    _cE("text", _uM({ class: "text-__3b82f6_ text-12px font-bold" }), "-1 天")
+                                ], 8 /* PROPS */, ["onClick"])
+                            ]),
+                            _cE("view", _uM({ class: "flex-1 mr-8px" }), [
+                                _cE("view", _uM({
+                                    class: "w-full h-36px rounded-8px bg-__e0edff_ flex flex-row items-center justify-center",
+                                    onClick: () => { adjustOffset(1); }
+                                }), [
+                                    _cE("text", _uM({ class: "text-__3b82f6_ text-12px font-bold" }), "+1 天")
+                                ], 8 /* PROPS */, ["onClick"])
+                            ]),
+                            _cE("view", _uM({ class: "flex-1" }), [
+                                _cE("view", _uM({
+                                    class: "w-full h-36px rounded-8px bg-__e0edff_ flex flex-row items-center justify-center",
+                                    onClick: () => { adjustOffset(7); }
+                                }), [
+                                    _cE("text", _uM({ class: "text-__3b82f6_ text-12px font-bold" }), "+7 天")
+                                ], 8 /* PROPS */, ["onClick"])
+                            ])
+                        ]),
+                        _cE("view", _uM({ class: "border-top-width-1px border-top-style-solid border-top-color-__e2e8f0_ pt-8px mt-8px" }), [
+                            _cE("text", _uM({ class: "text-12px text-__94a3b8_ mb-4px" }), "计算得到的目标时间:"),
+                            _cE("text", _uM({ class: "text-14px font-bold text-__334155_" }), _tD(targetOffsetTime.value), 1 /* TEXT */)
+                        ])
+                    ]),
+                    _cE("view", _uM({ class: "rounded-12px p-16px border-width-1px border-style-solid border-color-__e2e8f0_" }), [
+                        _cE("text", _uM({ class: "text-13px font-bold text-__1e293b_ mb-12px" }), "常用日期边界与区间计算"),
+                        _cE("view", _uM({ class: "flex-row justify-between mb-8px" }), [
+                            _cE("text", _uM({ class: "text-14px text-__64748b_" }), "本月第一天"),
+                            _cE("text", _uM({ class: "text-14px font-medium text-__334155_" }), _tD(startOfMonth.value), 1 /* TEXT */)
+                        ]),
+                        _cE("view", _uM({ class: "flex-row justify-between mb-8px" }), [
+                            _cE("text", _uM({ class: "text-14px text-__64748b_" }), "本月最后一天"),
+                            _cE("text", _uM({ class: "text-14px font-medium text-__334155_" }), _tD(endOfMonth.value), 1 /* TEXT */)
+                        ]),
+                        _cE("view", _uM({ class: "flex-row justify-between mb-8px" }), [
+                            _cE("text", _uM({ class: "text-14px text-__64748b_" }), "今年天数"),
+                            _cE("text", _uM({ class: "text-14px font-medium text-__334155_" }), _tD(isLeapYear.value ? '366天 (闰年)' : '365天 (平年)'), 1 /* TEXT */)
+                        ]),
+                        _cE("view", _uM({ class: "flex-row justify-between" }), [
+                            _cE("text", _uM({ class: "text-14px text-__64748b_" }), "距离今年底倒计时"),
+                            _cE("text", _uM({ class: "text-14px font-bold text-__f43f5e_" }), _tD(daysToYearEnd.value) + " 天", 1 /* TEXT */)
+                        ])
+                    ])
+                ]),
+                _: 1 /* STABLE */
+            }));
+        };
+    }
+});
+export default __sfc__;
+const GenSrcPagesBasicComponentsTimeDemoCardStyles = [_uM([["bg-__e0edff_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#e0edff"]]))], ["border-color-__e2e8f0_", _pS(_uM([["borderTopColor", "#e2e8f0"], ["borderRightColor", "#e2e8f0"], ["borderBottomColor", "#e2e8f0"], ["borderLeftColor", "#e2e8f0"]]))], ["border-style-solid", _pS(_uM([["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"]]))], ["border-top-color-__e2e8f0_", _pS(_uM([["borderTopColor", "#e2e8f0"]]))], ["border-top-style-solid", _pS(_uM([["borderTopStyle", "solid"]]))], ["border-top-width-1px", _pS(_uM([["borderTopWidth", 1]]))], ["border-width-1px", _pS(_uM([["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1]]))], ["flex", _pS(_uM([["display", "flex"]]))], ["flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["font-bold", _pS(_uM([["fontWeight", 700]]))], ["font-medium", _pS(_uM([["fontWeight", 500]]))], ["h-36px", _pS(_uM([["height", 36]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["justify-between", _pS(_uM([["justifyContent", "space-between"]]))], ["justify-center", _pS(_uM([["justifyContent", "center"]]))], ["mb-12px", _pS(_uM([["marginBottom", 12]]))], ["mb-16px", _pS(_uM([["marginBottom", 16]]))], ["mb-4px", _pS(_uM([["marginBottom", 4]]))], ["mb-6px", _pS(_uM([["marginBottom", 6]]))], ["mb-8px", _pS(_uM([["marginBottom", 8]]))], ["mr-8px", _pS(_uM([["marginRight", 8]]))], ["mt-8px", _pS(_uM([["marginTop", 8]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pt-8px", _pS(_uM([["paddingTop", 8]]))], ["rounded-12px", _pS(_uM([["borderTopLeftRadius", 12], ["borderTopRightRadius", 12], ["borderBottomRightRadius", 12], ["borderBottomLeftRadius", 12]]))], ["rounded-8px", _pS(_uM([["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["text-__1e293b_", _pS(_uM([["color", "#1e293b"]]))], ["text-__334155_", _pS(_uM([["color", "#334155"]]))], ["text-__3b82f6_", _pS(_uM([["color", "#3b82f6"]]))], ["text-__64748b_", _pS(_uM([["color", "#64748b"]]))], ["text-__94a3b8_", _pS(_uM([["color", "#94a3b8"]]))], ["text-__f43f5e_", _pS(_uM([["color", "#f43f5e"]]))], ["text-_var_--theme-color__37c2bc__", _pS(_uM([["color", "var(--theme-color,#37c2bc)"]]))], ["text-12px", _pS(_uM([["fontSize", 12]]))], ["text-13px", _pS(_uM([["fontSize", 13]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))], ["text-16px", _pS(_uM([["fontSize", 16]]))], ["text-24px", _pS(_uM([["fontSize", 24]]))], ["w-full", _pS(_uM([["width", "100%"]]))]])];

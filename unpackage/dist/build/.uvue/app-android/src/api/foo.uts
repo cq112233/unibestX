@@ -1,0 +1,83 @@
+import { http, API_DOMAINS } from '../http/request';
+import type { LimeRequestConfig } from '@/uni_modules/lime-request';
+// ==========================================
+// 类型定义
+// ==========================================
+export type IFoo = {
+    id: any;
+    name: string;
+};
+export type IFooList = {
+    list: IFoo[];
+    total: number;
+    page: number;
+    pageSize: number;
+};
+// ==========================================
+// Mock 数据
+// ==========================================
+const MOCK_FOO_LIST: IFoo[] = [
+    { id: 1, name: 'unix' } as IFoo,
+    { id: 2, name: 'UnibestX' } as IFoo,
+    { id: 3, name: 'lime-request' } as IFoo,
+];
+// ==========================================
+// API 函数
+// ==========================================
+/**
+ * 获取 Foo 列表（使用 mock 数据）
+ */
+export function getFooList(params: UTSJSONObject | null = null): Promise<IFoo[]> {
+    return Promise.resolve(MOCK_FOO_LIST);
+}
+/**
+ * 获取单个 Foo（使用 mock 数据）
+ */
+export function getFooById(id: number): Promise<IFoo | null> {
+    const found = MOCK_FOO_LIST.find((item: IFoo): boolean => item.id === id);
+    return Promise.resolve(found ?? null);
+}
+/**
+ * GET 请求示例 —— 对应 foo-alova.ts 中的 foo() 函数
+ * 使用次要域名（SECONDARY），参考 API_DOMAINS 配置
+ */
+export function foo(): Promise<IFoo> {
+    const res = http.get<IFoo>('/foo', {
+        params: {
+            name: 'unix',
+            page: 1,
+            pageSize: 10,
+        } as UTSJSONObject,
+        baseURL: API_DOMAINS.SECONDARY,
+        extra: {
+            ignoreAuth: true, // 此接口不需要鉴权
+        } as UTSJSONObject,
+    } as LimeRequestConfig);
+    // console.log(333)
+    console.log(res, 'res112233');
+    return res;
+    // return new Promise((resolve)=>{
+    // 	resolve({
+    // 	  id:1,
+    // 			name:'cq'
+    // 	})
+    // }) 
+}
+/**
+ * POST 请求示例 —— 新建一个 Foo
+ */
+export function createFoo(data: IFoo): Promise<IFoo> {
+    return http.post<IFoo>('/foo', data);
+}
+/**
+ * PUT 请求示例 —— 更新一个 Foo
+ */
+export function updateFoo(id: number, data: IFoo): Promise<IFoo> {
+    return http.put<IFoo>(`/foo/${id}`, data);
+}
+/**
+ * DELETE 请求示例 —— 删除一个 Foo
+ */
+export function deleteFoo(id: number): Promise<any> {
+    return http.delete<any>(`/foo/${id}`);
+}

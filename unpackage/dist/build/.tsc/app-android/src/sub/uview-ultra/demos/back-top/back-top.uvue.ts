@@ -1,0 +1,92 @@
+import _easycom_NavBar from '@/src/components/NavBar/NavBar.uvue'
+import _easycom_up_back_top from '@/uni_modules/uview-ultra/components/up-back-top/up-back-top.uvue'
+import AppKu from '@/App.ku.uvue'
+import LayoutComponent from '@/src/layouts/default.uvue'
+import { ref } from 'vue'
+
+
+const __sfc__ = defineComponent({
+  __name: 'back-top',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+const currentScrollTop = ref(0)
+const scrollTop = ref(0)
+const windowHeight = ref(uni.getWindowInfo().windowHeight)
+
+function handleScroll(e: UniScrollEvent) {
+  currentScrollTop.value = e.detail.scrollTop
+  scrollTop.value = e.detail.scrollTop
+}
+
+function scrollToTop() {
+  scrollTop.value = 0
+  currentScrollTop.value = 0
+}
+
+return (): any | null => {
+
+const _component_NavBar = resolveEasyComponent("NavBar",_easycom_NavBar)
+const _component_up_back_top = resolveEasyComponent("up-back-top",_easycom_up_back_top)
+
+  return _cV(unref(AppKu), null, _uM({
+    default: withSlotCtx((): any[] => [
+      _cV(unref(LayoutComponent), _uM({
+        "navigation-bar-title-text": 'Back Top 返回顶部',
+        "navigation-style": 'custom'
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({
+            class: "page-container bg-__f8fafc_ flex flex-col",
+            style: _nS(_uM({ height: `${windowHeight.value}px` }))
+          }), [
+            _cV(_component_NavBar, _uM({
+              title: "Back Top 返回顶部",
+              "auto-back": true
+            })),
+            _cE("scroll-view", _uM({
+              class: "flex-1 p-16px",
+              "scroll-y": "true",
+              "scroll-top": scrollTop.value,
+              onScroll: handleScroll
+            }), [
+              _cE("view", _uM({ class: "bg-white rounded-8px p-12px mb-12px shadow-xs" }), [
+                _cE("view", _uM({ class: "flex-row items-center mb-10px" }), [
+                  _cE("view", _uM({ class: "w-3px h-14px bg-__2979ff_ mr-6px rounded-2px" })),
+                  _cE("text", _uM({ class: "text-14px font-bold text-__1e293b_" }), "返回顶部说明")
+                ]),
+                _cE("text", _uM({ class: "text-13px text-__64748b_ leading-20px" }), " 请向下滑动页面（超过 100px），右下角会自动浮现返回顶部按钮，点击后平滑一键置顶。 "),
+                _cE("text", _uM({ class: "text-12px text-__2563eb_ mt-6px" }), "当前 实时高度: " + _tD(currentScrollTop.value) + "px", 1 /* TEXT */)
+              ]),
+              _cE(Fragment, null, RenderHelpers.renderList(20, (i, __key, __index, _cached): any => {
+                return _cE("view", _uM({
+                  key: i,
+                  class: "bg-white rounded-8px p-12px mt-10px shadow-xs"
+                }), [
+                  _cE("text", _uM({ class: "text-14px font-bold text-__334155_" }), "长列表测试卡片 #" + _tD(i), 1 /* TEXT */),
+                  _cE("text", _uM({ class: "text-12px text-__94a3b8_ mt-4px" }), "向下滚动触发右下角返回顶部悬浮图标...")
+                ])
+              }), 64 /* STABLE_FRAGMENT */)
+            ], 40 /* PROPS, NEED_HYDRATION */, ["scroll-top"]),
+            _cV(_component_up_back_top, _uM({
+              "scroll-top": currentScrollTop.value,
+              top: 100,
+              bottom: 80,
+              right: 20,
+              onClick: scrollToTop
+            }), null, 8 /* PROPS */, ["scroll-top"])
+          ], 4 /* STYLE */)
+        ]),
+        _: 1 /* STABLE */
+      }))
+    ]),
+    _: 1 /* STABLE */
+  }))
+}
+}
+
+})
+export default __sfc__
+const GenSrcSubUviewUltraDemosBackTopBackTopStyles = [_uM([["bg-__2979ff_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#2979ff"]]))], ["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["bg-white", _pS(_uM([["backgroundColor", "rgba(255,255,255,var(--un-bg-opacity,1))"]]))], ["flex", _pS(_uM([["display", "flex"]]))], ["flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["flex-col", _pS(_uM([["flexDirection", "column"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["font-bold", _pS(_uM([["fontWeight", 700]]))], ["h-14px", _pS(_uM([["height", 14]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["leading-20px", _pS(_uM([["lineHeight", "20px"]]))], ["mb-10px", _pS(_uM([["marginBottom", 10]]))], ["mb-12px", _pS(_uM([["marginBottom", 12]]))], ["mr-6px", _pS(_uM([["marginRight", 6]]))], ["mt-10px", _pS(_uM([["marginTop", 10]]))], ["mt-4px", _pS(_uM([["marginTop", 4]]))], ["mt-6px", _pS(_uM([["marginTop", 6]]))], ["p-12px", _pS(_uM([["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["rounded-2px", _pS(_uM([["borderTopLeftRadius", 2], ["borderTopRightRadius", 2], ["borderBottomRightRadius", 2], ["borderBottomLeftRadius", 2]]))], ["rounded-8px", _pS(_uM([["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["shadow-xs", _pS(_uM([["boxShadow", "var(--un-inset-shadow,0 0 #0000),var(--un-inset-ring-shadow,0 0 #0000),var(--un-ring-offset-shadow,0 0 #0000),var(--un-ring-shadow,0 0 #0000),var(--un-shadow,0 1rpx 3rpx 0 var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))))"], ["--un-shadow", "0 1rpx 2rpx 0rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.05)))"]]))], ["text-__1e293b_", _pS(_uM([["color", "#1e293b"]]))], ["text-__2563eb_", _pS(_uM([["color", "#2563eb"]]))], ["text-__334155_", _pS(_uM([["color", "#334155"]]))], ["text-__64748b_", _pS(_uM([["color", "#64748b"]]))], ["text-__94a3b8_", _pS(_uM([["color", "#94a3b8"]]))], ["text-12px", _pS(_uM([["fontSize", 12]]))], ["text-13px", _pS(_uM([["fontSize", 13]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))], ["w-3px", _pS(_uM([["width", 3]]))], ["page-container", _pS(_uM([["display", "flex"], ["flexDirection", "column"]]))]])]

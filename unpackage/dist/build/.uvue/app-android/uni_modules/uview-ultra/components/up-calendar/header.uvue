@@ -1,0 +1,160 @@
+import { mpMixin } from '../../libs/mixin/mpMixin';
+import { mixin } from '../../libs/mixin/mixin';
+import { t } from '../../libs/i18n/index.uts';
+const __sfc__ = defineComponent({
+    name: 'up-calendar-header',
+    // mixins: [mpMixin, mixin],
+    props: {
+        // 标题
+        title: {
+            type: String,
+            default: ''
+        },
+        // 副标题
+        subtitle: {
+            type: String,
+            default: ''
+        },
+        // 是否显示标题
+        showTitle: {
+            type: Boolean,
+            default: true
+        },
+        // 是否显示副标题
+        showSubtitle: {
+            type: Boolean,
+            default: true
+        },
+        showSwitch: {
+            type: Boolean,
+            default: false
+        },
+        prevDisabled: {
+            type: Boolean,
+            default: false
+        },
+        nextDisabled: {
+            type: Boolean,
+            default: false
+        },
+        prevYearDisabled: {
+            type: Boolean,
+            default: false
+        },
+        nextYearDisabled: {
+            type: Boolean,
+            default: false
+        },
+        showToday: {
+            type: Boolean,
+            default: true
+        },
+        todayText: {
+            type: String,
+            default: '今天'
+        },
+        todayDisabled: {
+            type: Boolean,
+            default: false
+        },
+    },
+    data() {
+        return {};
+    },
+    methods: {
+        t(key: string): string {
+            return t(key, {} as UTSJSONObject);
+        },
+        prev() {
+            if (!this.prevDisabled) {
+                this.$emit('prev');
+            }
+        },
+        next() {
+            if (!this.nextDisabled) {
+                this.$emit('next');
+            }
+        },
+        prevYear() {
+            if (!this.prevYearDisabled) {
+                this.$emit('prevYear');
+            }
+        },
+        nextYear() {
+            if (!this.nextYearDisabled) {
+                this.$emit('nextYear');
+            }
+        },
+        today() {
+            if (!this.todayDisabled) {
+                this.$emit('today');
+            }
+        }
+    }
+});
+export default __sfc__;
+function GenUniModulesUviewUltraComponentsUpCalendarHeaderRender(this: InstanceType<typeof __sfc__>): any | null {
+    const _ctx = this;
+    const _cache = this.$.renderCache;
+    return _cE("view", _uM({ class: "up-calendar-header up-border-bottom" }), [
+        isTrue(_ctx.showTitle)
+            ? _cE("text", _uM({
+                key: 0,
+                class: "up-calendar-header__title"
+            }), _tD(_ctx.title), 1 /* TEXT */)
+            : _cC("v-if", true),
+        isTrue(_ctx.showSubtitle)
+            ? _cE("view", _uM({
+                key: 1,
+                class: "up-calendar-header__subtitle-wrap"
+            }), [
+                isTrue(_ctx.showSwitch)
+                    ? _cE("text", _uM({
+                        key: 0,
+                        class: _nC(["up-calendar-header__switch", _uM({ 'up-calendar-header__switch--disabled': _ctx.prevYearDisabled })]),
+                        onClick: _ctx.prevYear
+                    }), "«", 10 /* CLASS, PROPS */, ["onClick"])
+                    : _cC("v-if", true),
+                isTrue(_ctx.showSwitch)
+                    ? _cE("text", _uM({
+                        key: 1,
+                        class: _nC(["up-calendar-header__switch", _uM({ 'up-calendar-header__switch--disabled': _ctx.prevDisabled })]),
+                        onClick: _ctx.prev
+                    }), "‹", 10 /* CLASS, PROPS */, ["onClick"])
+                    : _cC("v-if", true),
+                _cE("text", _uM({ class: "up-calendar-header__subtitle" }), _tD(_ctx.subtitle), 1 /* TEXT */),
+                isTrue(_ctx.showSwitch)
+                    ? _cE("text", _uM({
+                        key: 2,
+                        class: _nC(["up-calendar-header__switch", _uM({ 'up-calendar-header__switch--disabled': _ctx.nextDisabled })]),
+                        onClick: _ctx.next
+                    }), "›", 10 /* CLASS, PROPS */, ["onClick"])
+                    : _cC("v-if", true),
+                isTrue(_ctx.showSwitch)
+                    ? _cE("text", _uM({
+                        key: 3,
+                        class: _nC(["up-calendar-header__switch", _uM({ 'up-calendar-header__switch--disabled': _ctx.nextYearDisabled })]),
+                        onClick: _ctx.nextYear
+                    }), "»", 10 /* CLASS, PROPS */, ["onClick"])
+                    : _cC("v-if", true),
+                isTrue(_ctx.showToday)
+                    ? _cE("text", _uM({
+                        key: 4,
+                        class: _nC(["up-calendar-header__today", _uM({ 'up-calendar-header__today--disabled': _ctx.todayDisabled })]),
+                        onClick: _ctx.today
+                    }), _tD(_ctx.todayText), 11 /* TEXT, CLASS, PROPS */, ["onClick"])
+                    : _cC("v-if", true)
+            ])
+            : _cC("v-if", true),
+        _cE("view", _uM({ class: "up-calendar-header__weekdays" }), [
+            _cE("text", _uM({ class: "up-calendar-header__weekdays__weekday" }), _tD(_ctx.t('up_week_one')), 1 /* TEXT */),
+            _cE("text", _uM({ class: "up-calendar-header__weekdays__weekday" }), _tD(_ctx.t('up_week_two')), 1 /* TEXT */),
+            _cE("text", _uM({ class: "up-calendar-header__weekdays__weekday" }), _tD(_ctx.t('up_week_three')), 1 /* TEXT */),
+            _cE("text", _uM({ class: "up-calendar-header__weekdays__weekday" }), _tD(_ctx.t('up_week_four')), 1 /* TEXT */),
+            _cE("text", _uM({ class: "up-calendar-header__weekdays__weekday" }), _tD(_ctx.t('up_week_five')), 1 /* TEXT */),
+            _cE("text", _uM({ class: "up-calendar-header__weekdays__weekday" }), _tD(_ctx.t('up_week_six')), 1 /* TEXT */),
+            _cE("text", _uM({ class: "up-calendar-header__weekdays__weekday" }), _tD(_ctx.t('up_week_seven')), 1 /* TEXT */)
+        ])
+    ]);
+}
+const GenUniModulesUviewUltraComponentsUpCalendarHeaderStyles = [_uM([["u-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-calendar-header__title", _pS(_uM([["fontSize", 16], ["fontWeight", "bold"], ["textAlign", "center"], ["color", "#303133"], ["height", 42], ["lineHeight", "42px"]]))], ["up-calendar-header__subtitle", _pS(_uM([["fontSize", 14], ["color", "#303133"], ["height", 40], ["textAlign", "center"], ["lineHeight", "40px"], ["fontWeight", "bold"]]))], ["up-calendar-header__subtitle-wrap", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["position", "relative"]]))], ["up-calendar-header__switch", _pS(_uM([["fontSize", 16], ["color", "#909193"], ["lineHeight", "40px"], ["paddingTop", 0], ["paddingRight", 8], ["paddingBottom", 0], ["paddingLeft", 8]]))], ["up-calendar-header__switch--disabled", _pS(_uM([["color", "#c0c4cc"]]))], ["up-calendar-header__today", _pS(_uM([["position", "absolute"], ["right", 15], ["fontSize", 13], ["color", "var(--theme-color, #0957de)"]]))], ["up-calendar-header__today--disabled", _pS(_uM([["color", "#c0c4cc"]]))], ["up-calendar-header__weekdays", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"]]))], ["up-calendar-header__weekdays__weekday", _pS(_uM([["fontSize", 13], ["color", "#303133"], ["lineHeight", "30px"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["textAlign", "center"]]))]])];

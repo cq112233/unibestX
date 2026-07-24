@@ -1,0 +1,109 @@
+import _easycom_uni_icons from '@/uni_modules/uni-icons/components/uni-icons/uni-icons.uvue';
+import Card from './Card.uvue';
+import { useAppStore } from '@/src/store/index.uts';
+import { t } from '@/src/utils/i18n';
+import { t as uViewT } from '@/uni_modules/uview-ultra/libs/i18n/index.uts';
+const __sfc__ = defineComponent({
+    __name: 'LangSwitchCard',
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        const appStore = useAppStore();
+        // 使用 computed 响应式获取当前 i18n 对象的语言环境
+        const currentLocale = computed((): string => {
+            return appStore.state.locale;
+        });
+        const isZhCN = computed((): boolean => {
+            return currentLocale.value == 'zh-CN';
+        });
+        const isEnUS = computed((): boolean => {
+            return currentLocale.value == 'en-US';
+        });
+        const uViewChooseDates = computed((): string => {
+            const dummy = currentLocale.value;
+            return uViewT('up.calendar.chooseDates', {} as UTSJSONObject);
+        });
+        const uViewConfirm = computed((): string => {
+            const dummy = currentLocale.value;
+            return uViewT('up.common.confirm', {} as UTSJSONObject);
+        });
+        const uViewStart = computed((): string => {
+            const dummy = currentLocale.value;
+            return uViewT('up.common.start', {} as UTSJSONObject);
+        });
+        const uViewEnd = computed((): string => {
+            const dummy = currentLocale.value;
+            return uViewT('up.common.end', {} as UTSJSONObject);
+        });
+        function switchLanguage(lang: string) {
+            appStore.setLocale(lang);
+            uni.showToast({
+                title: t('message.switch_success', null),
+                icon: 'none',
+                duration: 1500,
+            });
+        }
+        return (): any | null => {
+            const _component_uni_icons = resolveEasyComponent("uni-icons", _easycom_uni_icons);
+            return _cV(unref(Card), _uM({
+                title: _ctx.$t('basic.langTitle')
+            }), _uM({
+                default: withSlotCtx((): any[] => [
+                    _cE("view", _uM({ class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }), [
+                        _cE("text", _uM({ class: "text-12px text-__94a3b8_ mb-6px" }), _tD(_ctx.$t('basic.langPreview')), 1 /* TEXT */),
+                        _cE("text", _uM({ class: "text-16px font-bold text-__1e293b_" }), _tD(_ctx.$t('message.welcome')), 1 /* TEXT */),
+                        _cE("text", _uM({ class: "text-14px text-__475569_ mt-8px" }), _tD(_ctx.$t('message.hello', { msg: 'hi' })), 1 /* TEXT */),
+                        _cE("view", _uM({ class: "mt-12px pt-12px border-top-width-1px border-top-style-solid border-top-color-__f1f5f9_" }), [
+                            _cE("text", _uM({ class: "text-12px text-__94a3b8_ mb-6px" }), _tD(_ctx.$t('basic.uviewPreview')), 1 /* TEXT */),
+                            _cE("view", _uM({ class: "flex-row items-center flex-wrap" }), [
+                                _cE("text", _uM({ class: "text-13px text-__2563eb_ bg-__eff6ff_ px-8px py-4px rounded-4px font-medium mr-8px mb-4px" }), _tD(unref(uViewChooseDates)), 1 /* TEXT */),
+                                _cE("text", _uM({ class: "text-13px text-__059669_ bg-__ecfdf5_ px-8px py-4px rounded-4px font-medium mr-8px mb-4px" }), _tD(unref(uViewConfirm)), 1 /* TEXT */),
+                                _cE("text", _uM({ class: "text-13px text-__d97706_ bg-__fffbe2_ px-8px py-4px rounded-4px font-medium mb-4px" }), _tD(unref(uViewStart)) + " / " + _tD(unref(uViewEnd)), 1 /* TEXT */)
+                            ])
+                        ])
+                    ]),
+                    _cE("view", _uM({
+                        class: "flex-row items-center justify-between py-12px border-bottom-width-1px border-bottom-style-solid border-bottom-color-__f1f5f9_",
+                        onClick: () => { switchLanguage('zh-CN'); }
+                    }), [
+                        _cE("view", _uM({ class: "flex-row items-center" }), [
+                            _cE("text", _uM({ class: "text-15px text-__334155_ font-medium" }), "简体中文")
+                        ]),
+                        _cE("view", _uM({ class: "flex-row items-center" }), [
+                            isTrue(unref(isZhCN))
+                                ? _cV(_component_uni_icons, _uM({
+                                    key: 0,
+                                    type: "checkmarkempty",
+                                    size: "20",
+                                    style: _nS(_uM({ "color": "#3b82f6" }))
+                                }), null, 8 /* PROPS */, ["style"])
+                                : _cC("v-if", true)
+                        ])
+                    ], 8 /* PROPS */, ["onClick"]),
+                    _cE("view", _uM({
+                        class: "flex-row items-center justify-between py-12px",
+                        onClick: () => { switchLanguage('en-US'); }
+                    }), [
+                        _cE("view", _uM({ class: "flex-row items-center" }), [
+                            _cE("text", _uM({ class: "text-15px text-__334155_ font-medium" }), "English")
+                        ]),
+                        _cE("view", _uM({ class: "flex-row items-center" }), [
+                            isTrue(unref(isEnUS))
+                                ? _cV(_component_uni_icons, _uM({
+                                    key: 0,
+                                    type: "checkmarkempty",
+                                    size: "20",
+                                    style: _nS(_uM({ "color": "#3b82f6" }))
+                                }), null, 8 /* PROPS */, ["style"])
+                                : _cC("v-if", true)
+                        ])
+                    ], 8 /* PROPS */, ["onClick"])
+                ]),
+                _: 1 /* STABLE */
+            }), 8 /* PROPS */, ["title"]);
+        };
+    }
+});
+export default __sfc__;
+const GenSrcPagesBasicComponentsLangSwitchCardStyles = [_uM([["bg-__ecfdf5_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#ecfdf5"]]))], ["bg-__eff6ff_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#eff6ff"]]))], ["bg-__fffbe2_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#fffbe2"]]))], ["border-bottom-color-__f1f5f9_", _pS(_uM([["borderBottomColor", "#f1f5f9"]]))], ["border-bottom-style-solid", _pS(_uM([["borderBottomStyle", "solid"]]))], ["border-bottom-width-1px", _pS(_uM([["borderBottomWidth", 1]]))], ["border-color-__e2e8f0_", _pS(_uM([["borderTopColor", "#e2e8f0"], ["borderRightColor", "#e2e8f0"], ["borderBottomColor", "#e2e8f0"], ["borderLeftColor", "#e2e8f0"]]))], ["border-style-solid", _pS(_uM([["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"]]))], ["border-top-color-__f1f5f9_", _pS(_uM([["borderTopColor", "#f1f5f9"]]))], ["border-top-style-solid", _pS(_uM([["borderTopStyle", "solid"]]))], ["border-top-width-1px", _pS(_uM([["borderTopWidth", 1]]))], ["border-width-1px", _pS(_uM([["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["flex-wrap", _pS(_uM([["flexWrap", "wrap"]]))], ["font-bold", _pS(_uM([["fontWeight", 700]]))], ["font-medium", _pS(_uM([["fontWeight", 500]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["justify-between", _pS(_uM([["justifyContent", "space-between"]]))], ["mb-16px", _pS(_uM([["marginBottom", 16]]))], ["mb-4px", _pS(_uM([["marginBottom", 4]]))], ["mb-6px", _pS(_uM([["marginBottom", 6]]))], ["mr-8px", _pS(_uM([["marginRight", 8]]))], ["mt-12px", _pS(_uM([["marginTop", 12]]))], ["mt-8px", _pS(_uM([["marginTop", 8]]))], ["none", _pS(_uM([["display", "none"]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pt-12px", _pS(_uM([["paddingTop", 12]]))], ["px-8px", _pS(_uM([["paddingLeft", 8], ["paddingRight", 8]]))], ["py-12px", _pS(_uM([["paddingTop", 12], ["paddingBottom", 12]]))], ["py-4px", _pS(_uM([["paddingTop", 4], ["paddingBottom", 4]]))], ["rounded-12px", _pS(_uM([["borderTopLeftRadius", 12], ["borderTopRightRadius", 12], ["borderBottomRightRadius", 12], ["borderBottomLeftRadius", 12]]))], ["rounded-4px", _pS(_uM([["borderTopLeftRadius", 4], ["borderTopRightRadius", 4], ["borderBottomRightRadius", 4], ["borderBottomLeftRadius", 4]]))], ["text-__059669_", _pS(_uM([["color", "#059669"]]))], ["text-__1e293b_", _pS(_uM([["color", "#1e293b"]]))], ["text-__2563eb_", _pS(_uM([["color", "#2563eb"]]))], ["text-__334155_", _pS(_uM([["color", "#334155"]]))], ["text-__475569_", _pS(_uM([["color", "#475569"]]))], ["text-__94a3b8_", _pS(_uM([["color", "#94a3b8"]]))], ["text-__d97706_", _pS(_uM([["color", "#d97706"]]))], ["text-12px", _pS(_uM([["fontSize", 12]]))], ["text-13px", _pS(_uM([["fontSize", 13]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))], ["text-15px", _pS(_uM([["fontSize", 15]]))], ["text-16px", _pS(_uM([["fontSize", 16]]))]])];

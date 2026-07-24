@@ -1,0 +1,35 @@
+/*
+ * @Author       : jry
+ * @Description  :
+ * @version      : 4.0
+ * @Date         : 2024-04-22 16:44:21
+ * @LastAuthor   : jry
+ * @lastTime     : 2021-08-23 20:53:09
+ * @FilePath     : /uview-ultra/libs/config/props/cell.js
+ */
+export default {
+	// cell组件的props
+	cell: {
+		customClass: '',
+		title: '',
+		label: '',
+		value: '',
+		icon: '',
+		disabled: false,
+		border: true,
+		center: false,
+		url: '',
+		linkType: 'navigateTo',
+		clickable: false,
+		isLink: false,
+		required: false,
+		arrowDirection: '',
+		iconStyle: {},
+		rightIconStyle: {},
+		rightIcon: 'arrow-right',
+		titleStyle: {},
+		size: '',
+		stop: true,
+		name: ''
+	}
+} as UTSJSONObject

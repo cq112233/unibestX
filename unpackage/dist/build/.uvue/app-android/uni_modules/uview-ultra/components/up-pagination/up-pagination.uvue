@@ -1,0 +1,200 @@
+const __sfc__ = defineComponent({
+    name: 'up-pagination',
+    props: {
+        currentPage: {
+            type: Number,
+            default: 1
+        },
+        pageSize: {
+            type: Number,
+            default: 10
+        },
+        total: {
+            type: Number,
+            default: 0
+        },
+        prevText: {
+            type: String,
+            default: ''
+        },
+        nextText: {
+            type: String,
+            default: ''
+        },
+        buttonBgColor: {
+            type: String,
+            default: '#f5f7fa'
+        },
+        buttonBorderColor: {
+            type: String,
+            default: '#dcdfe6'
+        },
+        layout: {
+            type: String,
+            default: 'prev, pager, next, total'
+        },
+        hideOnSinglePage: {
+            type: Boolean,
+            default: false
+        }
+    },
+    emits: ['update:currentPage', 'update:pageSize', 'current-change', 'size-change'],
+    computed: {
+        totalPages(): number {
+            const t = parseFloat(this.total.toString(10));
+            const p = parseFloat(this.pageSize.toString(10));
+            let pages = Math.ceil(t / p);
+            if (pages < 1)
+                pages = 1;
+            return pages;
+        },
+        shouldShow(): boolean {
+            if (this.hideOnSinglePage && this.totalPages <= 1) {
+                return false;
+            }
+            return true;
+        },
+        showPager(): boolean {
+            if (this.layout == null)
+                return false;
+            return this.layout.indexOf('pager') > -1;
+        },
+        showTotal(): boolean {
+            if (this.layout == null)
+                return false;
+            return this.layout.indexOf('total') > -1;
+        },
+        currentPageStr(): string {
+            return this.currentPage.toString(10);
+        },
+        displayedPages(): Array<string> {
+            const total = this.totalPages;
+            const current = this.currentPage;
+            const pages = [] as Array<string>;
+            if (total <= 4) {
+                for (let i = 1; i <= total; i++) {
+                    pages.push(i.toString(10));
+                }
+                return pages;
+            }
+            if (current <= 2) {
+                for (let i = 1; i <= 4; i++) {
+                    pages.push(i.toString(10));
+                }
+                pages.push('...');
+                pages.push(total.toString(10));
+                return pages;
+            }
+            if (current >= total - 1) {
+                pages.push('1');
+                pages.push('...');
+                for (let i = total - 3; i <= total; i++) {
+                    pages.push(i.toString(10));
+                }
+                return pages;
+            }
+            pages.push('1');
+            pages.push('...');
+            pages.push((current - 1).toString(10));
+            pages.push(current.toString(10));
+            pages.push((current + 1).toString(10));
+            pages.push('...');
+            pages.push(total.toString(10));
+            return pages;
+        }
+    },
+    methods: {
+        prev() {
+            if (this.currentPage > 1) {
+                this.emitChange(this.currentPage - 1);
+            }
+        },
+        next() {
+            if (this.currentPage < this.totalPages) {
+                this.emitChange(this.currentPage + 1);
+            }
+        },
+        goTo(page: string) {
+            if (page == '...' || page == this.currentPage.toString(10)) {
+                return;
+            }
+            const num = parseInt(page);
+            if (!isNaN(num)) {
+                this.emitChange(num);
+            }
+        },
+        emitChange(page: number) {
+            this.$emit('update:currentPage', page);
+            this.$emit('current-change', page);
+        }
+    }
+});
+export default __sfc__;
+function GenUniModulesUviewUltraComponentsUpPaginationUpPaginationRender(this: InstanceType<typeof __sfc__>): any | null {
+    const _ctx = this;
+    const _cache = this.$.renderCache;
+    const _component_up_icon = resolveEasyComponent("up-icon", _easycom_up_icon);
+    return isTrue(_ctx.shouldShow)
+        ? _cE("view", _uM({
+            key: 0,
+            class: "up-pagination"
+        }), [
+            _cE("view", _uM({
+                class: _nC(["up-pagination-btn", _uM({ 'btn-disabled': _ctx.currentPage <= 1 })]),
+                style: _nS(_uM({ backgroundColor: _ctx.buttonBgColor, borderColor: _ctx.buttonBorderColor })),
+                onClick: _ctx.prev
+            }), [
+                _ctx.prevText != ''
+                    ? _cE("text", _uM({
+                        key: 0,
+                        class: "up-pagination-text"
+                    }), _tD(_ctx.prevText), 1 /* TEXT */)
+                    : _cV(_component_up_icon, _uM({
+                        key: 1,
+                        name: "arrow-left",
+                        size: "14"
+                    }))
+            ], 14 /* CLASS, STYLE, PROPS */, ["onClick"]),
+            isTrue(_ctx.showPager)
+                ? _cE(Fragment, _uM({ key: 0 }), RenderHelpers.renderList(_ctx.displayedPages, (page, index, __index, _cached): any => {
+                    return _cE("view", _uM({
+                        key: index,
+                        class: _nC(["up-pagination-item", _uM({ 'item-active': page == _ctx.currentPageStr })]),
+                        onClick: () => { _ctx.goTo(page); }
+                    }), [
+                        _cE("text", _uM({
+                            class: _nC(["up-pagination-text", _uM({ 'text-active': page == _ctx.currentPageStr })])
+                        }), _tD(page), 3 /* TEXT, CLASS */)
+                    ], 10 /* CLASS, PROPS */, ["onClick"]);
+                }), 128 /* KEYED_FRAGMENT */)
+                : _cC("v-if", true),
+            isTrue(_ctx.showTotal)
+                ? _cE("view", _uM({
+                    key: 1,
+                    class: "up-pagination-total"
+                }), [
+                    _cE("text", _uM({ class: "up-pagination-text" }), "共 " + _tD(_ctx.total) + " 条", 1 /* TEXT */)
+                ])
+                : _cC("v-if", true),
+            _cE("view", _uM({
+                class: _nC(["up-pagination-btn", _uM({ 'btn-disabled': _ctx.currentPage >= _ctx.totalPages })]),
+                style: _nS(_uM({ backgroundColor: _ctx.buttonBgColor, borderColor: _ctx.buttonBorderColor })),
+                onClick: _ctx.next
+            }), [
+                _ctx.nextText != ''
+                    ? _cE("text", _uM({
+                        key: 0,
+                        class: "up-pagination-text"
+                    }), _tD(_ctx.nextText), 1 /* TEXT */)
+                    : _cV(_component_up_icon, _uM({
+                        key: 1,
+                        name: "arrow-right",
+                        size: "14"
+                    }))
+            ], 14 /* CLASS, STYLE, PROPS */, ["onClick"])
+        ])
+        : _cC("v-if", true);
+}
+export type UpPaginationComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpPaginationUpPaginationStyles = [_uM([["u-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-pagination", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["flexWrap", "wrap"], ["width", "100%"], ["minHeight", 30]]))], ["up-pagination-text", _pS(_uM([["fontSize", 14], ["color", "#606266"]]))], ["text-active", _pS(_uM([["color", "#ffffff"]]))], ["up-pagination-total", _pS(_uM([["marginTop", 0], ["marginRight", 10], ["marginBottom", 0], ["marginLeft", 10], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"]]))], ["up-pagination-btn", _pS(_uM([["marginTop", 0], ["marginRight", 3], ["marginBottom", 0], ["marginLeft", 3], ["paddingTop", 0], ["paddingRight", 8], ["paddingBottom", 0], ["paddingLeft", 8], ["height", 30], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#dcdfe6"], ["borderRightColor", "#dcdfe6"], ["borderBottomColor", "#dcdfe6"], ["borderLeftColor", "#dcdfe6"], ["borderTopLeftRadius", 4], ["borderTopRightRadius", 4], ["borderBottomRightRadius", 4], ["borderBottomLeftRadius", 4], ["backgroundColor", "#f5f7fa"], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"]]))], ["btn-disabled", _pS(_uM([["opacity", 0.5]]))], ["up-pagination-item", _pS(_uM([["marginTop", 0], ["marginRight", 2], ["marginBottom", 0], ["marginLeft", 2], ["paddingTop", 0], ["paddingRight", 8], ["paddingBottom", 0], ["paddingLeft", 8], ["height", 30], ["borderTopLeftRadius", 4], ["borderTopRightRadius", 4], ["borderBottomRightRadius", 4], ["borderBottomLeftRadius", 4], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"]]))], ["item-active", _pS(_uM([["backgroundColor", "var(--theme-color, #0957de)"]]))]])];
+import _easycom_up_icon from '@/uni_modules/uview-ultra/components/up-icon/up-icon.uvue';

@@ -1,0 +1,45 @@
+/*
+ * @Author       : jry
+ * @Description  :
+ * @version      : 4.0
+ * @Date         : 2024-04-22 16:44:21
+ * @LastAuthor   : jry
+ * @lastTime     : 2024-08-28 12:27:20
+ * @FilePath     : /uview-ultra/libs/config/props/datetime-picker.uts
+ */
+export default {
+    // datetimePicker组件
+    datetimePicker: {
+        hasInput: false,
+        placeholder: '请选择',
+        format: '',
+        show: false,
+        popupMode: 'bottom',
+        showToolbar: true,
+        toolbarRightSlot: false,
+        value: '',
+        modelValue: '',
+        title: '',
+        mode: 'datetime',
+        maxDate: new Date(new Date().getFullYear() + 10, 0, 1).getTime(),
+        minDate: new Date(new Date().getFullYear() - 10, 0, 1).getTime(),
+        minHour: 0,
+        maxHour: 23,
+        minMinute: 0,
+        maxMinute: 59,
+        minSecond: 0,
+        maxSecond: 59,
+        filter: null,
+        formatter: null,
+        loading: false,
+        itemHeight: 44,
+        cancelText: '取消',
+        confirmText: '确认',
+        cancelColor: '#909193',
+        confirmColor: '#3c9cff',
+        visibleItemCount: 5,
+        closeOnClickOverlay: false,
+        defaultIndex: [] as number[],
+        pageInline: false
+    }
+} as UTSJSONObject;

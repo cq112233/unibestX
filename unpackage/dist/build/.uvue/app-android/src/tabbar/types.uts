@@ -1,0 +1,19 @@
+/** badge 类型：数字或小红点 */
+export type CustomTabBarItemBadge = number | 'dot';
+/** 自定义 tabbar 单项配置 */
+export type CustomTabBarItem = {
+    /** 显示文本 */
+    text: string;
+    /** 页面路径（不带前导 /） */
+    pagePath: string;
+    /** 图标类型，uni-app x 推荐使用 image */
+    iconType: string;
+    /** 图标路径（image 模式下为图片路径） */
+    icon: string;
+    /** 高亮图标路径 */
+    iconActive: string;
+    /** badge */
+    badge: CustomTabBarItemBadge | null;
+    /** 是否是中间鼓包 tabbarItem */
+    isBulge: boolean;
+};

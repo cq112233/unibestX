@@ -1,0 +1,185 @@
+import { propsSwitch } from './props';
+import { mpMixin } from '../../libs/mixin/mpMixin';
+import { mixin } from '../../libs/mixin/mixin';
+import { addStyle, getPx, addUnit, error } from '../../libs/function/index';
+import { UPCommonStyle } from '../../types/common';
+/**
+ * switch 开关选择器
+ * @description 选择开关一般用于只有两个选择，且只能选其一的场景。
+ * @tutorial https://uview-plus.jiangruyi.com/components/switch.html
+ * @property {Boolean}						loading			是否处于加载中（默认 false ）
+ * @property {Boolean}						disabled		是否禁用（默认 false ）
+ * @property {String | Number}				size			开关尺寸，单位px （默认 25 ）
+ * @property {String}						activeColor		打开时的背景色 （默认 '#2979ff' ）
+ * @property {String} 						inactiveColor	关闭时的背景色 （默认 '#ffffff' ）
+ * @property {Boolean | String | Number}	value			通过v-model双向绑定的值 （默认 false ）
+ * @property {Boolean | String | Number}	activeValue		打开选择器时通过change事件发出的值 （默认 true ）
+ * @property {Boolean | String | Number}	inactiveValue	关闭选择器时通过change事件发出的值 （默认 false ）
+ * @property {Boolean}						asyncChange		是否开启异步变更，开启后需要手动控制输入值 （默认 false ）
+ * @property {String | Number}				space			圆点与外边框的距离 （默认 0 ）
+ * @property {Object}						customStyle		定义需要用到的外部样式
+ *
+ * @event {Function} change 在switch打开或关闭时触发
+ * @example <up-switch v-model="checked" active-color="red" inactive-color="#eee"></up-switch>
+ */
+const __sfc__ = defineComponent({
+    name: "up-switch",
+    mixins: [mpMixin, mixin, propsSwitch],
+    watch: {
+        modelValue: {
+            immediate: true,
+            handler(n) {
+                if (n !== this.inactiveValue && n !== this.activeValue) {
+                    error('v-model绑定的值必须为inactiveValue、activeValue二者之一');
+                }
+            }
+        }
+    },
+    data() {
+        return {
+            bgColor: '#ffffff'
+        };
+    },
+    computed: {
+        switchClass(): string {
+            let classes = ['up-switch', 'cursor-pointer'];
+            if (isTruthy(this.disabled)) {
+                classes.push('up-switch--disabled');
+            }
+            if (this.isActive) {
+                classes.push('up-switch--on');
+            }
+            else {
+                classes.push('up-switch--off');
+            }
+            return classes.join(' ');
+        },
+        isActive(): boolean {
+            return this.modelValue === this.activeValue;
+        },
+        switchStyle(): UTSJSONObject {
+            let style = {} as UTSJSONObject;
+            // 仅当 size 不是默认值 25 时，才把 width 和 height 写入内联样式中，避免内联属性污染
+            if (this.size.toString() != '25') {
+                // @ts-ignore
+                style['width'] = addUnit(parseInt(this.size.toString()) * 2 + 2);
+                // @ts-ignore
+                style['height'] = addUnit(parseInt(this.size.toString()) + 2);
+            }
+            // 开启和关闭时，内联更改 borderColor 以绕开原生平台的背景穿透限制。开启时为透明，关闭时恢复为默认灰色
+            if (this.isActive) {
+                style['borderColor'] = 'rgba(0, 0, 0, 0)';
+            }
+            else {
+                if (this.customInactiveColor) {
+                    style['borderColor'] = 'rgba(0, 0, 0, 0)';
+                }
+                else {
+                    style['borderColor'] = 'rgba(0, 0, 0, 0.12)';
+                }
+            }
+            return style;
+        },
+        bgActiveStyle(): UTSJSONObject {
+            let style = {} as UTSJSONObject;
+            // @ts-ignore
+            style['width'] = addUnit(parseInt(this.size.toString()) * 2 + 2);
+            // @ts-ignore
+            style['height'] = addUnit(parseInt(this.size.toString()) + 2);
+            if (this.activeColor != '#2979ff') {
+                style['backgroundColor'] = this.activeColor;
+            }
+            return style;
+        },
+        nodeStyle(): UTSJSONObject {
+            let style = {} as UTSJSONObject;
+            // 如果自定义非激活颜色，将node圆点的尺寸减少两个像素，让其与外边框距离更大一点
+            // @ts-ignore
+            style['width'] = addUnit(parseInt(this.size.toString()) - parseInt(this.space.toString()));
+            // @ts-ignore
+            style['height'] = addUnit(parseInt(this.size.toString()) - parseInt(this.space.toString()));
+            const translateX = this.isActive ? addUnit(this.space) : addUnit(this.size);
+            style['transform'] = `translateX(-${translateX})`;
+            return style;
+        },
+        bgStyle(): UTSJSONObject {
+            let style = {} as UTSJSONObject;
+            // 这里宽度设置为 parseInt(size) * 2，刚好填满容器内部宽度，防止关闭时两侧露出绿色背景
+            // @ts-ignore
+            style['width'] = addUnit(parseInt(this.size.toString()) * 2);
+            // @ts-ignore
+            style['height'] = addUnit(parseInt(this.size.toString()));
+            style['backgroundColor'] = this.inactiveColor;
+            // 打开时，让此元素收缩，否则反之
+            style['transform'] = `scale(${this.isActive ? 0 : 1})`;
+            return style;
+        },
+        customInactiveColor(): boolean {
+            // 之所以需要判断是否自定义了“非激活”颜色，是为了让node圆点离外边框更宽一点的距离
+            return this.inactiveColor !== '#fff' && this.inactiveColor !== '#ffffff';
+        }
+    },
+    emits: ['update:modelValue', 'change'],
+    methods: {
+        getPx(e: any): string {
+            return getPx(e);
+        },
+        addStyle(e: any): any {
+            return addStyle(e);
+        },
+        clickHandler() {
+            if (!isTruthy(this.disabled) && !isTruthy(this.loading)) {
+                const oldValue = this.isActive ? this.inactiveValue : this.activeValue;
+                if (!isTruthy(this.asyncChange)) {
+                    this.$emit("update:modelValue", oldValue);
+                }
+                // 放到下一个生命周期，因为双向绑定的value修改父组件状态需要时间，且是异步的
+                this.$nextTick(() => {
+                    this.$emit('change', oldValue);
+                });
+            }
+        }
+    }
+});
+export default __sfc__;
+function GenUniModulesUviewUltraComponentsUpSwitchUpSwitchRender(this: InstanceType<typeof __sfc__>): any | null {
+    const _ctx = this;
+    const _cache = this.$.renderCache;
+    const _component_up_loading_icon = resolveEasyComponent("up-loading-icon", _easycom_up_loading_icon);
+    return _cE("view", _uM({
+        class: _nC(_ctx.switchClass),
+        style: _nS([_ctx.switchStyle, _ctx.addStyle(_ctx.customStyle)]),
+        onClick: _ctx.clickHandler
+    }), [
+        isTrue(_ctx.isActive)
+            ? _cE("view", _uM({
+                key: 0,
+                class: "up-switch__bg-active",
+                style: _nS([_ctx.bgActiveStyle])
+            }), null, 4 /* STYLE */)
+            : _cC("v-if", true),
+        isTrue(!_ctx.isActive)
+            ? _cE("view", _uM({
+                key: 1,
+                class: "up-switch__bg",
+                style: _nS([_ctx.bgStyle])
+            }), null, 4 /* STYLE */)
+            : _cC("v-if", true),
+        _cE("view", _uM({
+            class: _nC(["up-switch__node", [_ctx.modelValue == _ctx.activeValue ? 'up-switch__node--on' : '']]),
+            style: _nS([_ctx.nodeStyle]),
+            ref: "up-switch__node"
+        }), [
+            _cV(_component_up_loading_icon, _uM({
+                show: _ctx.loading,
+                mode: "circle",
+                timingFunction: "linear",
+                color: _ctx.modelValue == _ctx.activeValue ? _ctx.activeColor : '#AAABAD',
+                size: parseInt(_ctx.getPx(_ctx.size)) * 0.6
+            }), null, 8 /* PROPS */, ["show", "color", "size"])
+        ], 6 /* CLASS, STYLE */)
+    ], 14 /* CLASS, STYLE, PROPS */, ["onClick"]);
+}
+export type UpSwitchComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpSwitchUpSwitchStyles = [_uM([["up-switch", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["position", "relative"], ["backgroundColor", "rgba(0,0,0,0)"], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopLeftRadius", 100], ["borderTopRightRadius", 100], ["borderBottomRightRadius", 100], ["borderBottomLeftRadius", 100], ["transitionProperty", "backgroundColor"], ["transitionDuration", "0.4s"], ["borderTopColor", "rgba(0,0,0,0.12)"], ["borderRightColor", "rgba(0,0,0,0.12)"], ["borderBottomColor", "rgba(0,0,0,0.12)"], ["borderLeftColor", "rgba(0,0,0,0.12)"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["justifyContent", "flex-end"], ["alignItems", "center"], ["overflow", "hidden"], ["width", 52], ["height", 27]]))], ["up-switch__bg-active", _pS(_uM([["position", "absolute"], ["top", -1], ["left", -1], ["borderTopLeftRadius", 100], ["borderTopRightRadius", 100], ["borderBottomRightRadius", 100], ["borderBottomLeftRadius", 100], ["backgroundColor", "var(--theme-color, #0957de)"], ["width", 52], ["height", 27]]))], ["up-switch__node", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["borderTopLeftRadius", 100], ["borderTopRightRadius", 100], ["borderBottomRightRadius", 100], ["borderBottomLeftRadius", 100], ["backgroundColor", "#ffffff"], ["boxShadow", "1px 1px 1px 0 rgba(0, 0, 0, 0.25)"], ["transitionProperty", "transform"], ["transitionDuration", "0.4s"], ["transitionTimingFunction", "cubic-bezier(0.3,1.05,0.4,1.05)"]]))], ["up-switch__bg", _pS(_uM([["position", "absolute"], ["borderTopLeftRadius", 0], ["borderTopRightRadius", 100], ["borderBottomRightRadius", 100], ["borderBottomLeftRadius", 0], ["backgroundColor", "#FFFFFF"], ["transitionProperty", "transform"], ["transitionDuration", "0.4s"], ["transitionTimingFunction", "ease"]]))], ["up-switch--disabled", _pS(_uM([["opacity", 0.6]]))], ["@TRANSITION", _uM([["up-switch", _uM([["property", "backgroundColor"], ["duration", "0.4s"]])], ["up-switch__node", _uM([["property", "transform"], ["duration", "0.4s"], ["timingFunction", "cubic-bezier(0.3,1.05,0.4,1.05)"]])], ["up-switch__bg", _uM([["property", "transform"], ["duration", "0.4s"], ["timingFunction", "ease"]])]])]])];
+import _easycom_up_loading_icon from '@/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.uvue';

@@ -1,0 +1,99 @@
+import { defineStore, PiniaStoreBase } from '@/uni_modules/x-pinia-s';
+import { themeColor } from '@/src/tabbar/store';
+import i18n from '@/src/i18n/index.uts';
+import { setLocale as setUViewLocale } from '@/uni_modules/uview-ultra/libs/i18n/index.uts';
+// ==========================================
+// 类型定义
+// ==========================================
+export type IAppState = {
+    theme: string;
+    locale: string;
+};
+function getSystemLocale(): string {
+    try {
+        const sysInfo = uni.getSystemInfoSync();
+        const appLang = sysInfo.appLanguage;
+        if (appLang != null && appLang.toLowerCase().includes('zh')) {
+            return 'zh-CN';
+        }
+        if (appLang != null && appLang.toLowerCase().includes('en')) {
+            return 'en-US';
+        }
+    }
+    catch (e: any) {
+        // ignore
+    }
+    return 'zh-CN';
+}
+const defaultAppState: IAppState = {
+    theme: '#37c2bc',
+    locale: getSystemLocale(),
+};
+// ==========================================
+// Store 实现
+// ==========================================
+export class AppStore extends PiniaStoreBase {
+    // 1. 响应式状态
+    state: IAppState = reactive<IAppState>({
+        theme: '#37c2bc',
+        locale: getSystemLocale(),
+    } as IAppState);
+    // 2. constructor
+    constructor() {
+        super();
+        this.bindState(this.state);
+        // 从持久化或默认状态中同步一次到全局
+        themeColor.value = this.state.theme;
+        // 同步语言到 i18n
+        i18n.global.locale.value = this.state.locale;
+        setUViewLocale(this.state.locale);
+    }
+    // ==========================================
+    // 持久化钩子
+    // ==========================================
+    override _doReset(): void {
+        this.state.theme = defaultAppState.theme;
+        this.state.locale = defaultAppState.locale;
+        themeColor.value = defaultAppState.theme;
+        i18n.global.locale.value = defaultAppState.locale;
+        setUViewLocale(defaultAppState.locale);
+    }
+    override _hydrate(_data: UTSJSONObject): void {
+        if (_data['theme'] != null) {
+            const colorVal = _data['theme'] as string;
+            this.state.theme = colorVal;
+            themeColor.value = colorVal;
+        }
+        if (_data['locale'] != null) {
+            const localeVal = _data['locale'] as string;
+            this.state.locale = localeVal;
+            i18n.global.locale.value = localeVal;
+            setUViewLocale(localeVal);
+        }
+    }
+    override _serialize(): UTSJSONObject {
+        return {
+            theme: this.state.theme,
+            locale: this.state.locale,
+        } as UTSJSONObject;
+    }
+    // ==========================================
+    // Actions
+    // ==========================================
+    /**
+     * 设置主题色
+     */
+    setTheme(theme: string): void {
+        this.state.theme = theme;
+        themeColor.value = theme;
+    }
+    /**
+     * 设置语言
+     */
+    setLocale(locale: string): void {
+        this.state.locale = locale;
+        i18n.global.locale.value = locale;
+        setUViewLocale(locale);
+    }
+}
+export const useAppStore = defineStore<AppStore>('app', (): AppStore => new AppStore());

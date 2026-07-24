@@ -1,0 +1,111 @@
+import _easycom_NavBar from '@/src/components/NavBar/NavBar.uvue';
+import AppKu from '@/App.ku.uvue';
+import LayoutComponent from '@/src/layouts/default.uvue';
+import { handleBackPressExit } from '../../utils/backPress.uts';
+const __sfc__ = defineComponent({
+    __name: 'index',
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        onBackPress((options: OnBackPressOptions): boolean => {
+            if (options.from == 'backbutton') {
+                return handleBackPressExit();
+            }
+            return false;
+        });
+        const themeSwitchVal = ref(true);
+        const themeSwitchVal2 = ref(false);
+        const checkboxValue = ref(['apple'] as string[]);
+        const radioValue = ref('male');
+        const sliderValue = ref(30);
+        const rateValue = ref(3);
+        const isBg = ref(true);
+        function switchBg() {
+            isBg.value = !isBg.value;
+        }
+        function goToUiTest() {
+            uni.navigateTo({
+                url: '/src/sub/uiTest/uiTest',
+            });
+        }
+        return (): any | null => {
+            const _component_NavBar = resolveEasyComponent("NavBar", _easycom_NavBar);
+            return _cV(unref(AppKu), null, _uM({
+                default: withSlotCtx((): any[] => [
+                    _cV(unref(LayoutComponent), _uM({
+                        "navigation-style": 'custom',
+                        "navigation-bar-title-text": '首页'
+                    }), _uM({
+                        default: withSlotCtx((): any[] => [
+                            _cE("view", null, [
+                                _cV(_component_NavBar, _uM({
+                                    title: "首页",
+                                    "show-back": false
+                                })),
+                                _cE("view", _uM({ class: "content-container pb-20px" }), [
+                                    _cE("image", _uM({
+                                        class: "w-100px h-100px mx-auto mt-20px rounded-20px",
+                                        src: "/static/logo.png"
+                                    })),
+                                    _cE("text", _uM({ class: "text-32px text-bold mx-auto mt-10px text-__d14328_" }), " unibestX "),
+                                    _cE("text", _uM({ class: "text-center text-25px mt-10px" }), " 最好用的 uni-appX 开发模板 "),
+                                    _cE("text", _uM({ class: "mt-10px m-auto px-30px text-justify text-16px text-bold" }), " 　　unibestX 是一个集成了多种工具与技术的 uni-appX 开发模板，由 uni-appX + Vue3 + Ts + UnoCss + VSCode 构建，模板具有代码提示、自动格式化、统一配置、代码片段等功能，并内置了许多常用的基本组件和基本功能，让你编写 uni-appX 拥有 best 体验。 "),
+                                    _cE("view", _uM({
+                                        class: "mt-15px mx-30px px-20px py-15px rounded-12px",
+                                        style: _nS(_uM({ "background-color": "rgba(55, 194, 188, 0.08)" }))
+                                    }), [
+                                        _cE("text", _uM({
+                                            class: "text-14px",
+                                            style: _nS(_uM({ "color": "#666", "line-height": "26px" }))
+                                        }), " 🧩 UI 组件库 — 集成 uview-ultra 组件库，按钮、标签、弹窗等开箱即用 ", 4 /* STYLE */),
+                                        _cE("text", _uM({
+                                            class: "text-14px",
+                                            style: _nS(_uM({ "color": "#666", "line-height": "26px" }))
+                                        }), " 📱 系统信息 — 获取安全区域、屏幕尺寸、设备像素比等系统参数 ", 4 /* STYLE */),
+                                        _cE("text", _uM({
+                                            class: "text-14px",
+                                            style: _nS(_uM({ "color": "#666", "line-height": "26px" }))
+                                        }), " 🎨 图标字体 — 支持 uni-icon、lime-icon、up-icon 三套图标方案 ", 4 /* STYLE */),
+                                        _cE("text", _uM({
+                                            class: "text-14px",
+                                            style: _nS(_uM({ "color": "#666", "line-height": "26px" }))
+                                        }), " 🌐 多语言切换 — 内置 i18n 国际化方案，中英文一键切换 ", 4 /* STYLE */),
+                                        _cE("text", _uM({
+                                            class: "text-14px",
+                                            style: _nS(_uM({ "color": "#666", "line-height": "26px" }))
+                                        }), " 🎭 主题换色 — 五种预设主题色，原生与组件同步生效 ", 4 /* STYLE */),
+                                        _cE("text", _uM({
+                                            class: "text-14px",
+                                            style: _nS(_uM({ "color": "#666", "line-height": "26px" }))
+                                        }), " 🕐 日期时间 — 基于 lime-dayuts，实时时钟、日期偏移、月份边界等 ", 4 /* STYLE */),
+                                        _cE("text", _uM({
+                                            class: "text-14px",
+                                            style: _nS(_uM({ "color": "#666", "line-height": "26px" }))
+                                        }), " 🔀 路由拦截 — 登录鉴权路由守卫，未登录自动跳转登录页 ", 4 /* STYLE */),
+                                        _cE("text", _uM({
+                                            class: "text-14px",
+                                            style: _nS(_uM({ "color": "#666", "line-height": "26px" }))
+                                        }), " 🌐 网络请求 — 封装 lime-request，Mock 数据与真实接口演示 ", 4 /* STYLE */),
+                                        _cE("text", _uM({
+                                            class: "text-14px",
+                                            style: _nS(_uM({ "color": "#666", "line-height": "26px" }))
+                                        }), " 📊 图表渲染 — ECharts 图表集成，折线图、柱状图、饼图自适应 ", 4 /* STYLE */),
+                                        _cE("text", _uM({
+                                            class: "text-14px",
+                                            style: _nS(_uM({ "color": "#666", "line-height": "26px" }))
+                                        }), " 📋 分页列表 — z-paging-x 分页加载，Tab 筛选、错误模拟、空数据 ", 4 /* STYLE */)
+                                    ], 4 /* STYLE */)
+                                ])
+                            ])
+                        ]),
+                        _: 1 /* STABLE */
+                    }))
+                ]),
+                _: 1 /* STABLE */
+            }));
+        };
+    }
+});
+export default __sfc__;
+const GenSrcPagesIndexIndexStyles = [_uM([["h-100px", _pS(_uM([["height", 100]]))], ["m-auto", _pS(_uM([["marginTop", "auto"], ["marginRight", "auto"], ["marginBottom", "auto"], ["marginLeft", "auto"]]))], ["mt-10px", _pS(_uM([["marginTop", 10]]))], ["mt-15px", _pS(_uM([["marginTop", 15]]))], ["mt-20px", _pS(_uM([["marginTop", 20]]))], ["mx-30px", _pS(_uM([["marginLeft", 30], ["marginRight", 30]]))], ["mx-auto", _pS(_uM([["marginLeft", "auto"], ["marginRight", "auto"]]))], ["pb-20px", _pS(_uM([["paddingBottom", 20]]))], ["px-20px", _pS(_uM([["paddingLeft", 20], ["paddingRight", 20]]))], ["px-30px", _pS(_uM([["paddingLeft", 30], ["paddingRight", 30]]))], ["py-15px", _pS(_uM([["paddingTop", 15], ["paddingBottom", 15]]))], ["rounded-12px", _pS(_uM([["borderTopLeftRadius", 12], ["borderTopRightRadius", 12], ["borderBottomRightRadius", 12], ["borderBottomLeftRadius", 12]]))], ["rounded-20px", _pS(_uM([["borderTopLeftRadius", 20], ["borderTopRightRadius", 20], ["borderBottomRightRadius", 20], ["borderBottomLeftRadius", 20]]))], ["text-__d14328_", _pS(_uM([["color", "#d14328"]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))], ["text-16px", _pS(_uM([["fontSize", 16]]))], ["text-25px", _pS(_uM([["fontSize", 25]]))], ["text-32px", _pS(_uM([["fontSize", 32]]))], ["text-center", _pS(_uM([["textAlign", "center"]]))], ["w-100px", _pS(_uM([["width", 100]]))]])];

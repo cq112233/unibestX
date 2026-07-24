@@ -1,0 +1,194 @@
+import { propsTabbarItem } from './props.uts';
+import { mpMixin } from '../../libs/mixin/mpMixin.uts';
+import { mixin } from '../../libs/mixin/mixin.uts';
+import { addStyle, error } from '../../libs/function/index.uts';
+import { nextTick } from 'vue';
+/**
+ * TabbarItem 底部导航栏子组件
+ * @description 此组件提供了自定义tabbar的能力。
+ * @tutorial https://uview-plus.jiangruyi.com/components/tabbar.html
+ * @property {String | Number}	name		item标签的名称，作为与up-tabbar的value参数匹配的标识符
+ * @property {String}			icon		uView内置图标或者绝对路径的图片
+ * @property {String | Number}	badge		右上角的角标提示信息
+ * @property {Boolean}			dot			是否显示圆点，将会覆盖badge参数（默认 false ）
+ * @property {String}			text		描述文本
+ * @property {Object | String}	badgeStyle	控制徽标的位置，对象或者字符串形式，可以设置top和right属性（默认 'top: 6px;right:2px;' ）
+ * @property {Object}			customStyle	定义需要用到的外部样式
+ *
+ * @example <up-tabbar :value="value2" :placeholder="false" @change="name => value2 = name" :fixed="false" :safeAreaInsetBottom="false"><up-tabbar-item text="首页" icon="home" dot ></up-tabbar-item></up-tabbar>
+ */
+const __sfc__ = defineComponent({
+    name: 'up-tabbar-item',
+    mixins: [mpMixin, mixin, propsTabbarItem],
+    data() {
+        return {
+            isActive: false,
+            routeSyncTimer: 0 as number,
+            routeSyncLast: '',
+            parentData: {
+                value: null as string | number | null,
+                activeColor: '',
+                inactiveColor: ''
+            }
+        };
+    },
+    //  微信小程序中 options 选项
+    options: {
+        virtualHost: true //将自定义节点设置成虚拟的，更加接近Vue组件的表现。我们不希望自定义组件的这个节点本身可以设置样式、响应 flex 布局等
+    },
+    computed: {
+        // 计算是否为中间按钮
+        isMidButton(): boolean {
+            return this.mode === 'midButton';
+        }
+    },
+    created() {
+        this.init();
+    },
+    mounted() {
+        this.startRouteSync();
+    },
+    beforeUnmount() {
+        this.clearRouteSync();
+    },
+    emits: ["click", "change"],
+    methods: {
+        addStyle(val: any): any {
+            return addStyle(val);
+        },
+        clearRouteSync() {
+            if (this.routeSyncTimer != null) {
+                clearInterval(this.routeSyncTimer);
+                this.routeSyncTimer = 0;
+            }
+        },
+        getCurrentRoutePath(): string {
+            // @ts-ignore
+            const pages = getCurrentPages();
+            if (pages == null || pages.length == 0)
+                return '';
+            const currentPage = pages[pages.length - 1];
+            // @ts-ignore
+            const route = (currentPage != null && currentPage.route != null) ? currentPage.route.toString() : '';
+            if (route == '')
+                return '';
+            return route.startsWith('/') ? route : `/${route}`;
+        },
+        normalizeRoutePath(path: string): string {
+            return path.replace(/^[#\\/]+/, '');
+        },
+        syncActiveByRouteOrValue() {
+            this.updateParentData();
+            // @ts-ignore
+            const index = this.getChildIndex(this);
+            const name = this.name != null ? this.name! : index;
+            const routePath = this.getCurrentRoutePath();
+            if (typeof name === 'string' && routePath != '') {
+                const isRouteMatch = this.normalizeRoutePath(name as string) == this.normalizeRoutePath(routePath);
+                if (isRouteMatch) {
+                    this.isActive = true;
+                    return;
+                }
+            }
+            this.isActive = name === this.parentData['value'];
+        },
+        startRouteSync() {
+            this.clearRouteSync();
+            if (!(typeof this.name === 'string' && (this.name as string).indexOf('/') > -1))
+                return;
+            this.routeSyncLast = this.getCurrentRoutePath();
+            this.routeSyncTimer = setInterval(() => {
+                const current = this.getCurrentRoutePath();
+                if (current != this.routeSyncLast) {
+                    this.routeSyncLast = current;
+                    this.syncActiveByRouteOrValue();
+                }
+            }, 200) as number;
+        },
+        init() {
+            if (this.parent == null) {
+                error('up-tabbar-item必须搭配up-tabbar组件使用');
+            }
+            this.syncActiveByRouteOrValue();
+        },
+        updateParentData() {
+            // 此方法在mixin中
+            // @ts-ignore
+            this.getParentData('up-tabbar');
+        },
+        // 此方法将会被父组件up-tabbar调用
+        updateFromParent() {
+            // 重新初始化
+            this.init();
+        },
+        clickHandler() {
+            nextTick(() => {
+                // @ts-ignore
+                const index = this.getChildIndex(this);
+                const name = this.name != null ? this.name! : index;
+                // 点击的item为非激活的item才发出change事件
+                // @ts-ignore
+                if (this.parent != null && name.toString() != this.parent!.$props['value'].toString()) {
+                    // @ts-ignore
+                    this.parent!.$emit('change', name);
+                }
+                this.$emit('click', name);
+            });
+        }
+    },
+});
+export default __sfc__;
+function GenUniModulesUviewUltraComponentsUpTabbarItemUpTabbarItemRender(this: InstanceType<typeof __sfc__>): any | null {
+    const _ctx = this;
+    const _cache = this.$.renderCache;
+    const _component_up_icon = resolveEasyComponent("up-icon", _easycom_up_icon);
+    const _component_up_badge = resolveEasyComponent("up-badge", _easycom_up_badge);
+    return _cE("view", _uM({
+        class: _nC(["up-tabbar-item", [_ctx.isMidButton ? 'up-tabbar-item--mid-button' : '']]),
+        style: _nS([_ctx.addStyle(_ctx.customStyle)]),
+        onClick: _ctx.clickHandler
+    }), [
+        _cE("view", _uM({
+            class: _nC(["up-tabbar-item__icon", [_ctx.isMidButton ? 'up-tabbar-item__icon--mid-button' : '']])
+        }), [
+            isTrue(_ctx.isMidButton)
+                ? _cE("view", _uM({
+                    key: 0,
+                    class: "up-tabbar-item--mid-button-cover"
+                }))
+                : _cC("v-if", true),
+            isTrue(_ctx.icon)
+                ? _cV(_component_up_icon, _uM({
+                    key: 1,
+                    name: _ctx.icon,
+                    color: _ctx.isActive ? _ctx.parentData['activeColor'] : _ctx.parentData['inactiveColor'],
+                    size: _ctx.isMidButton ? 26 : 20
+                }), null, 8 /* PROPS */, ["name", "color", "size"])
+                : _cE(Fragment, _uM({ key: 2 }), [
+                    isTrue(_ctx.isActive)
+                        ? renderSlot(_ctx.$slots, "active-icon", _uM({ key: 0 }))
+                        : renderSlot(_ctx.$slots, "inactive-icon", _uM({ key: 1 }))
+                ], 64 /* STABLE_FRAGMENT */),
+            _cV(_component_up_badge, _uM({
+                absolute: "",
+                offset: [0, isTruthy(_ctx.dot) ? '34rpx' : (_ctx.badge != null && parseInt(_ctx.badge!.toString()) > 9 ? '14rpx' : '20rpx')],
+                customStyle: _ctx.badgeStyle,
+                isDot: _ctx.dot,
+                value: _ctx.badge != null ? (isTruthy(_ctx.dot) ? 1 : _ctx.badge) : 0,
+                show: isTruthy(_ctx.dot) ? true : (_ctx.badge != null ? parseInt(_ctx.badge!.toString()) > 0 : false)
+            }), null, 8 /* PROPS */, ["offset", "customStyle", "isDot", "value", "show"])
+        ], 2 /* CLASS */),
+        renderSlot(_ctx.$slots, "text", {}, (): any[] => [
+            _cE("text", _uM({
+                class: "up-tabbar-item__text",
+                style: _nS(_uM({
+                    color: _ctx.isActive ? _ctx.parentData['activeColor'] : _ctx.parentData['inactiveColor']
+                }))
+            }), _tD(_ctx.text), 5 /* TEXT, STYLE */)
+        ])
+    ], 14 /* CLASS, STYLE, PROPS */, ["onClick"]);
+}
+export type UpTabbarItemComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpTabbarItemUpTabbarItemStyles = [_uM([["u-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabbar-item", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"], ["justifyContent", "center"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"], ["height", 50]]))], ["up-tabbar-item__icon", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["position", "relative"], ["width", "150rpx"], ["justifyContent", "center"]]))], ["up-tabbar-item__text", _pS(_uM([["marginTop", 2], ["fontSize", 12], ["color", "#606266"]]))], ["up-tabbar-item--mid-button", _pS(_uM([["transform", "translateY(-10px)"]]))], ["up-tabbar-item--mid-button-cover", _pS(_uM([["backgroundColor", "#ffffff"], ["position", "absolute"], ["top", 22], ["left", -10], ["width", 90], ["bottom", 0]]))], ["up-tabbar-item__icon--mid-button", _pS(_uM([["width", 70], ["height", 70], ["borderTopLeftRadius", 100], ["borderTopRightRadius", 100], ["borderBottomRightRadius", 100], ["borderBottomLeftRadius", 100], ["backgroundColor", "#ffffff"], ["boxShadow", "0 0 10px rgba(0, 0, 0, 0.1)"], ["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"]]))]])];
+import _easycom_up_icon from '@/uni_modules/uview-ultra/components/up-icon/up-icon.uvue';
+import _easycom_up_badge from '@/uni_modules/uview-ultra/components/up-badge/up-badge.uvue';

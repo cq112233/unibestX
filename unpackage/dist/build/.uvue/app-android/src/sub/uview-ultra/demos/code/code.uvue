@@ -1,0 +1,81 @@
+import _easycom_NavBar from '@/src/components/NavBar/NavBar.uvue';
+import _easycom_up_code from '@/uni_modules/uview-ultra/components/up-code/up-code.uvue';
+import _easycom_up_button from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue';
+import AppKu from '@/App.ku.uvue';
+import LayoutComponent from '@/src/layouts/default.uvue';
+import { ref } from 'vue';
+const __sfc__ = defineComponent({
+    __name: 'code',
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        const uCodeRef = ref<ComponentPublicInstance | null>(null);
+        const tips = ref('获取验证码');
+        function codeChange(text: string) {
+            tips.value = text;
+        }
+        function getCode() {
+            if (uCodeRef.value != null) {
+                const codeObj = uCodeRef.value!;
+                const canGet = codeObj.$callMethod('canGetCode');
+                if (canGet == true) {
+                    uni.showLoading({ title: '正在获取验证码' });
+                    setTimeout(() => {
+                        uni.hideLoading();
+                        uni.showToast({ title: '验证码已发送', icon: 'success' });
+                        codeObj.$callMethod('start');
+                    }, 1000);
+                }
+                else {
+                    uni.showToast({ title: '倒计时中，请稍后再试', icon: 'none' });
+                }
+            }
+        }
+        return (): any | null => {
+            const _component_NavBar = resolveEasyComponent("NavBar", _easycom_NavBar);
+            const _component_up_code = resolveEasyComponent("up-code", _easycom_up_code);
+            const _component_up_button = resolveEasyComponent("up-button", _easycom_up_button);
+            return _cV(unref(AppKu), null, _uM({
+                default: withSlotCtx((): any[] => [
+                    _cV(unref(LayoutComponent), _uM({
+                        "navigation-style": 'custom',
+                        "navigation-bar-title-text": 'up-code 验证码倒计时'
+                    }), _uM({
+                        default: withSlotCtx((): any[] => [
+                            _cE("view", _uM({ class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }), [
+                                _cV(_component_NavBar, _uM({
+                                    title: "Code 验证码倒计时",
+                                    "auto-back": true
+                                })),
+                                _cE("view", _uM({ class: "p-16px" }), [
+                                    _cE("view", _uM({ class: "demo-block" }), [
+                                        _cE("text", _uM({ class: "demo-label" }), "基础用法"),
+                                        _cE("view", _uM({ class: "flex-row items-center justify-between mt-10px" }), [
+                                            _cV(_component_up_code, _uM({
+                                                ref_key: "uCodeRef",
+                                                ref: uCodeRef,
+                                                seconds: "60",
+                                                onChange: codeChange
+                                            }), null, 512 /* NEED_PATCH */),
+                                            _cV(_component_up_button, _uM({
+                                                text: tips.value,
+                                                type: "primary",
+                                                size: "small",
+                                                onClick: getCode
+                                            }), null, 8 /* PROPS */, ["text"])
+                                        ])
+                                    ])
+                                ])
+                            ])
+                        ]),
+                        _: 1 /* STABLE */
+                    }))
+                ]),
+                _: 1 /* STABLE */
+            }));
+        };
+    }
+});
+export default __sfc__;
+const GenSrcSubUviewUltraDemosCodeCodeStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["justify-between", _pS(_uM([["justifyContent", "space-between"]]))], ["mt-10px", _pS(_uM([["marginTop", 10]]))], ["none", _pS(_uM([["display", "none"]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])];

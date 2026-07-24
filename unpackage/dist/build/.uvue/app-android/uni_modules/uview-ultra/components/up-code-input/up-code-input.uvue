@@ -1,0 +1,280 @@
+import type { PropType } from 'vue';
+import { ref, computed, watch, nextTick, onBeforeUnmount } from 'vue';
+import defProps from './codeInput.uts';
+import { addUnit, getPx } from '../../libs/function/index';
+// props
+const __sfc__ = defineComponent({
+    __name: 'up-code-input',
+    props: {
+        // 键盘弹起时，是否自动上推页面
+        adjustPosition: {
+            type: Boolean,
+            default: defProps.getBoolean('codeInput.adjustPosition')
+        },
+        // 最大输入长度
+        maxlength: {
+            type: [String, Number],
+            default: defProps.getNumber('codeInput.maxlength')
+        },
+        // 是否用圆点填充
+        dot: {
+            type: Boolean,
+            default: defProps.getBoolean('codeInput.dot')
+        },
+        // 显示模式，box-盒子模式，line-底部横线模式
+        mode: {
+            type: String,
+            default: defProps.getString('codeInput.mode')
+        },
+        // 是否细边框
+        hairline: {
+            type: Boolean,
+            default: defProps.getBoolean('codeInput.hairline')
+        },
+        // 字符间的距离
+        space: {
+            type: [String, Number],
+            default: defProps.getNumber('codeInput.space')
+        },
+        // 预置值
+        modelValue: {
+            type: [String, Number],
+            default: defProps.getString('codeInput.value')
+        },
+        // 是否自动获取焦点
+        focus: {
+            type: Boolean,
+            default: defProps.getBoolean('codeInput.focus')
+        },
+        // 字体是否加粗
+        bold: {
+            type: Boolean,
+            default: defProps.getBoolean('codeInput.bold')
+        },
+        // 字体颜色
+        color: {
+            type: String,
+            default: defProps.getString('codeInput.color')
+        },
+        // 字体大小
+        fontSize: {
+            type: [String, Number],
+            default: defProps.getNumber('codeInput.fontSize')
+        },
+        // 输入框的大小，宽等于高
+        size: {
+            type: [String, Number],
+            default: defProps.getNumber('codeInput.size')
+        },
+        // 是否隐藏原生键盘，如果想用自定义键盘的话，需设置此参数为true
+        disabledKeyboard: {
+            type: Boolean,
+            default: defProps.getBoolean('codeInput.disabledKeyboard')
+        },
+        // 边框和线条颜色
+        borderColor: {
+            type: String,
+            default: defProps.getString('codeInput.borderColor')
+        },
+        // 是否禁止输入"."符号
+        disabledDot: {
+            type: Boolean,
+            default: defProps.getBoolean('codeInput.disabledDot')
+        }
+    },
+    emits: ['change', 'finish', 'update:modelValue'],
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        const props = __props;
+        // 定义事件
+        function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+            __ins.emit(event, ...do_not_transform_spread);
+        }
+        // 响应式数据
+        const inputValue = ref('');
+        const isFocus = ref(false);
+        const timer = ref(0);
+        const cursorOpacity = ref(1);
+        // 根据长度，循环输入框的个数，因为头条小程序数值不能用于v-for
+        const codeLength = computed((): string[] => {
+            let list: Array<string> = [];
+            // @ts-ignore
+            for (var index = 0; index < (props.maxlength as number); index++) {
+                list.push('');
+            }
+            return list;
+        });
+        // 将输入的值，转为数组，给item历遍时，根据当前的索引显示数组的元素
+        const codeArray = computed((): string[] => {
+            return inputValue.value.split('');
+        });
+        const inputLength = computed((): number => {
+            const length = inputValue.value.length;
+            return Math.min(length, codeLength.value.length);
+        });
+        // 下划线模式下，横线的样式
+        const lineStyle = computed((): UTSJSONObject => {
+            const style = {} as UTSJSONObject;
+            style['height'] = props.hairline ? '2px' : '4px';
+            style['width'] = addUnit(props.size);
+            // 线条模式下，背景色即为边框颜色
+            style['backgroundColor'] = props.borderColor;
+            return style;
+        });
+        // 监听输入框的值发生变化
+        const inputHandler = (e: UniInputEvent) => {
+            const value = e.detail.value;
+            inputValue.value = value;
+            // 是否允许输入"."符号
+            if (props.disabledDot) {
+                nextTick(() => {
+                    inputValue.value = value.replace('.', '');
+                });
+            }
+            // 未达到maxlength之前，发送change事件，达到后发送finish事件
+            emit('change', value);
+            // 修改通过v-model双向绑定的值
+            emit("update:modelValue", value);
+            // 达到用户指定输入长度时，发出完成事件
+            if (value.length >= (props.maxlength as number)) {
+                emit('finish', value);
+            }
+        };
+        const getCodeValue = (index: number): string => {
+            if (index < codeArray.value.length) {
+                return codeArray.value[index];
+            }
+            return '';
+        };
+        const clearCursorTimer = () => {
+            if (timer.value > 0) {
+                clearInterval(timer.value);
+                timer.value = 0;
+            }
+        };
+        const startCursorTimer = () => {
+            clearCursorTimer();
+            cursorOpacity.value = 1;
+            timer.value = setInterval(() => {
+                cursorOpacity.value = cursorOpacity.value == 1 ? 0 : 1;
+            }, 600);
+        };
+        // 根据索引获取对应项的样式
+        const itemStyle = (index: number): any => {
+            const style = {
+                width: addUnit(props.size),
+                height: addUnit(props.size)
+            } as UTSJSONObject;
+            // 盒子模式下，需要额外进行处理
+            if (props.mode == 'box') {
+                // 设置盒子的边框，如果是细边框，则设置为0.5px宽度
+                style['border'] = `${props.hairline ? 0.5 : 1}px solid ${props.borderColor}`;
+                // 如果盒子间距为0的话
+                if (getPx(props.space) == '0') {
+                    // 给第一和最后一个盒子设置圆角
+                    if (index == 0) {
+                        style['borderTopLeftRadius'] = '3px';
+                        style['borderBottomLeftRadius'] = '3px';
+                    }
+                    if (index == codeLength.value.length - 1) {
+                        style['borderTopRightRadius'] = '3px';
+                        style['borderBottomRightRadius'] = '3px';
+                    }
+                    // 最后一个盒子的右边框需要保留
+                    if (index != codeLength.value.length - 1) {
+                        style['borderRight'] = 'none';
+                    }
+                }
+            }
+            if (index != codeLength.value.length - 1) {
+                // 设置验证码字符之间的距离，通过margin-right设置，最后一个字符，无需右边框
+                style['marginRight'] = addUnit(props.space);
+            }
+            else {
+                // 最后一个盒子的有边框需要保留
+                style['marginRight'] = '0px';
+            }
+            return style;
+        };
+        // 初始化焦点状态
+        isFocus.value = props.focus;
+        if (isFocus.value) {
+            startCursorTimer();
+        }
+        watch((): string | number => props.modelValue, (val: string | number) => {
+            // 转为字符串，超出部分截掉
+            inputValue.value = (val.toString()).substring(0, props.maxlength as number);
+        }, { immediate: true });
+        watch(isFocus, (val: boolean) => {
+            if (val) {
+                startCursorTimer();
+            }
+            else {
+                clearCursorTimer();
+                cursorOpacity.value = 1;
+            }
+        });
+        onBeforeUnmount(() => {
+            clearCursorTimer();
+        });
+        return (): any | null => {
+            return _cE("view", _uM({ class: "up-code-input" }), [
+                _cE(Fragment, null, RenderHelpers.renderList(codeLength.value, (item, index, __index, _cached): any => {
+                    return _cE("view", _uM({
+                        class: "up-code-input__item",
+                        style: _nS([itemStyle(index)]),
+                        key: index
+                    }), [
+                        isTrue(_ctx.dot && codeArray.value.length > index)
+                            ? _cE("view", _uM({
+                                key: 0,
+                                class: "up-code-input__item__dot"
+                            }))
+                            : _cE("text", _uM({
+                                key: 1,
+                                style: _nS(_uM({
+                                    fontSize: _ctx.$upAddUnit(_ctx.fontSize),
+                                    fontWeight: _ctx.bold ? 'bold' : 'normal',
+                                    color: _ctx.color
+                                }))
+                            }), _tD(getCodeValue(index)), 5 /* TEXT, STYLE */),
+                        _ctx.mode == 'line'
+                            ? _cE("view", _uM({
+                                key: 2,
+                                class: "up-code-input__item__line",
+                                style: _nS([lineStyle.value])
+                            }), null, 4 /* STYLE */)
+                            : _cC("v-if", true),
+                        isTrue(isFocus.value && inputLength.value === index)
+                            ? _cE("view", _uM({
+                                key: 3,
+                                style: _nS(_uM({ backgroundColor: _ctx.color, opacity: cursorOpacity.value })),
+                                class: "up-code-input__item__cursor"
+                            }), null, 4 /* STYLE */)
+                            : _cC("v-if", true)
+                    ], 4 /* STYLE */);
+                }), 128 /* KEYED_FRAGMENT */),
+                _cE("input", _uM({
+                    disabled: _ctx.disabledKeyboard,
+                    type: "number",
+                    focus: _ctx.focus,
+                    value: inputValue.value,
+                    maxlength: _ctx.maxlength,
+                    adjustPosition: _ctx.adjustPosition,
+                    class: "up-code-input__input",
+                    onInput: inputHandler,
+                    style: _nS(_uM({
+                        height: _ctx.$upAddUnit(_ctx.size)
+                    })),
+                    onFocus: () => { isFocus.value = true; },
+                    onBlur: () => { isFocus.value = false; }
+                }), null, 44 /* STYLE, PROPS, NEED_HYDRATION */, ["disabled", "focus", "value", "maxlength", "adjustPosition", "onFocus", "onBlur"])
+            ]);
+        };
+    }
+});
+export default __sfc__;
+export type UpCodeInputComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpCodeInputUpCodeInputStyles = [_uM([["u-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-code-input", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["position", "relative"], ["overflow", "hidden"]]))], ["up-code-input__item", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["position", "relative"]]))], ["up-code-input__item__text", _pS(_uM([["fontSize", 15], ["color", "#606266"]]))], ["up-code-input__item__dot", _pS(_uM([["width", 7], ["height", 7], ["borderTopLeftRadius", 100], ["borderTopRightRadius", 100], ["borderBottomRightRadius", 100], ["borderBottomLeftRadius", 100], ["backgroundColor", "#606266"]]))], ["up-code-input__item__line", _pS(_uM([["position", "absolute"], ["bottom", 0], ["height", 4], ["borderTopLeftRadius", 100], ["borderTopRightRadius", 100], ["borderBottomRightRadius", 100], ["borderBottomLeftRadius", 100], ["width", 40], ["backgroundColor", "#606266"]]))], ["up-code-input__item__cursor", _pS(_uM([["position", "absolute"], ["top", "50%"], ["left", "50%"], ["opacity", 1], ["transform", "translate(-50%, -50%)"], ["width", 1], ["height", 20]]))], ["up-code-input__input", _pS(_uM([["position", "absolute"], ["left", "-750rpx"], ["width", "1500rpx"], ["top", 0], ["backgroundColor", "rgba(0,0,0,0)"], ["textAlign", "left"]]))]])];

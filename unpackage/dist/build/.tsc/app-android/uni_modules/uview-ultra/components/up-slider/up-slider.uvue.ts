@@ -1,0 +1,513 @@
+
+	import { propsSlider } from './props';
+	import { mpMixin } from '../../libs/mixin/mpMixin';
+	import { mixin } from '../../libs/mixin/mixin';
+	import { addStyle, getPx, sleep } from '../../libs/function/index'
+	/**
+	 * slider 滑块选择器
+	 * @tutorial https://uview-plus.jiangruyi.com/components/slider.html
+	 * @property {Number | String} value 滑块默认值（默认0）
+	 * @property {Number | String} min 最小值（默认0）
+	 * @property {Number | String} max 最大值（默认100）
+	 * @property {Number | String} step 步长（默认1）
+	 * @property {Number | String} blockWidth 滑块宽度，高等于宽（30）
+	 * @property {Number | String} height 滑块条高度，单位rpx（默认6）
+	 * @property {String} inactiveColor 底部条背景颜色（默认#c0c4cc）
+	 * @property {String} activeColor 底部选择部分的背景颜色（默认#2979ff）
+	 * @property {String} blockColor 滑块颜色（默认#ffffff）
+	 * @property {Object} blockStyle 给滑块自定义样式，对象形式
+	 * @property {Boolean} disabled 是否禁用滑块(默认为false)
+	 * @event {Function} changing 正在滑动中
+	 * @event {Function} change 滑动结束
+	 * @example <up-slider v-model="value" />
+	 */
+	type barStyleType = {
+		width : string,
+		transition ?: string
+	}
+	type sliderRectType = {
+		left: number,
+		width : number
+	}
+	const __sfc__ = defineComponent({
+		name: 'up-slider',
+		mixins: [mpMixin, mixin, propsSlider],
+		emits: ["start", "changing", "change", "update:modelValue"],
+		data() {
+			return {
+				startX: 0,
+				status: 'end',
+				newValue: 0,
+				distanceX: 0,
+				startValue0: 0,
+				startValue: 0,
+				barStyle0: {
+					width: '0px'
+				} as barStyleType,
+				barStyle: {
+					width: '0px',
+					transition: ''
+				} as barStyleType,
+				sliderRect: {
+					left: 0,
+					width: 0
+				} as sliderRectType
+			};
+		},
+		watch: {
+
+			modelValue(n: number) {
+				// 只有在非滑动状态时，才可以通过value更新滑块值，这里监听，是为了让用户触发
+				if (this.status == 'end') {
+					const $crtFmtValue = this.updateValue(this.modelValue, false);
+					this.$emit('change', $crtFmtValue);
+				}
+			},
+
+
+
+
+
+
+
+
+
+
+			rangeValue:{
+            	handler(n: Array<number>){
+					if (this.status == 'end') {
+						this.updateValue(n[0], false, 0);
+						this.updateValue(n[1], false, 1);
+						this.$emit('change', n);
+					}
+            	},
+            	deep:true
+        	}
+		},
+		created() {
+		},
+		computed: {
+			innerStyleCpu(): UTSJSONObject {
+				let style: UTSJSONObject = this.innerStyle;
+
+				style['height'] = (this.isRange && this.showValue)
+					? (parseFloat(getPx(this.blockSize)) + 24).toString() + 'px'
+					: (getPx(this.blockSize)) + 'px';
+				return style;
+			},
+			blockStyleCpu(): UTSJSONObject {
+				let style = {} as UTSJSONObject;
+				const blockStyle = this.blockStyle;
+				if (blockStyle != null) {
+
+					UTSJSONObject.assign(style, blockStyle);
+
+
+
+
+				}
+				style['height'] = this.getPx(this.blockSize, true);
+				style['width'] = this.getPx(this.blockSize, true);
+				style['backgroundColor'] = this.blockColor;
+				return style;
+			},
+			gapStyleCpu(): UTSJSONObject {
+				let style = {} as UTSJSONObject;
+				style['width'] = this.barStyle.width;
+				style['transition'] = this.barStyle.transition;
+				style['height'] = this.height;
+				style['marginTop'] = '-' + this.height;
+				if (this.activeColor !== '#2979ff') {
+					style['backgroundColor'] = this.activeColor;
+				}
+				return style;
+			}
+		},
+		mounted() {
+			// 获取滑块条的尺寸信息
+			if (!this.useNative) {
+				// @ts-ignore
+				this.upGetRect('.up-slider__base').then((rect: NodeInfo) => {
+					this.sliderRect.width = rect.width ?? 0;
+					this.sliderRect.left = rect.left ?? 0;
+					// console.log('sliderRect', this.sliderRect)
+					if (this.sliderRect.width == 0) {
+						console.info('如在弹窗等元素中使用，请使用v-if来显示滑块，否则无法计算长度。')
+					}
+					this.init()
+				});
+			}
+		},
+		methods: {
+			addStyle(e: any) {
+				return addStyle(e)
+			},
+			getPx(e: any, s: boolean = false): string {
+				return getPx(e, s)
+			},
+			init() {
+				if (this.isRange) {
+					// @ts-ignore
+					this.updateValue(parseFloat(this.rangeValue[0].toString()), false, 0);
+					// @ts-ignore
+					this.updateValue(parseFloat(this.rangeValue[1].toString()), false, 1);
+				} else {
+
+					this.updateValue(this.modelValue, false);
+
+
+
+
+				}
+			},
+			// native拖动过程中触发
+			changingHandler(e: UniSliderChangeEvent) {
+				const {
+					value
+				} = e.detail
+				// 更新v-model的值
+
+                this.$emit("update:modelValue", value);
+
+
+
+
+				// 触发事件
+				this.$emit('changing', value)
+			},
+			// native滑动结束时触发
+			changeHandler(e: UniSliderChangeEvent) {
+				const {
+					value
+				} = e.detail
+				// 更新v-model的值
+
+                this.$emit("update:modelValue", value);
+
+
+
+
+				// 触发事件
+				this.$emit('change', value);
+			},
+			onTouchStart(e: any, index = 1) {
+				let event = e as UniTouchEvent
+				if (this.disabled) return;
+				this.startX = 0;
+				// 触摸点集
+				let touches = event.touches[0];
+				// 触摸点到屏幕左边的距离
+				this.startX = touches.clientX;
+				// 此处的this.modelValue虽为props值，但是通过$emit('update:modelValue')进行了修改
+				if (this.isRange) {
+					// @ts-ignore
+					this.startValue0 = this.format(parseFloat(this.rangeValue[0].toString()), 0);
+					// @ts-ignore
+					this.startValue = this.format(parseFloat(this.rangeValue[1].toString()), 1);
+				} else {
+
+					this.startValue = this.format(this.modelValue);
+
+
+
+
+				}
+				// 标示当前的状态为开始触摸滑动
+				this.status = 'start';
+
+				let clientX = 0;
+				clientX = touches.clientX;
+
+
+
+				this.distanceX = clientX - this.sliderRect.left;
+				// 获得移动距离对整个滑块的值，此为带有多位小数的值，不能用此更新视图
+				// 否则造成通信阻塞，需要每改变一个step值时修改一次视图
+				// @ts-ignore
+				this.newValue = ((this.distanceX / this.sliderRect.width) * (parseFloat(this.max.toString()) - parseFloat(this.min.toString()))) + parseFloat(this.min.toString());
+				this.status = 'moving';
+				// 发出moving事件
+				let $crtFmtValue = this.updateValue(this.newValue, true, index);
+				this.$emit('changing', $crtFmtValue);
+			},
+			onTouchMove(e: any, index = 1) {
+				let event = e as UniTouchEvent
+				if (this.disabled) return;
+				// 连续触摸的过程会一直触发本方法，但只有手指触发且移动了才被认为是拖动了，才发出事件
+				// 触摸后第一次移动已经将status设置为moving状态，故触摸第二次移动不会触发本事件
+				if (this.status == 'start') this.$emit('start');
+				let touches = event.touches[0];
+				// console.log('touchs', touches)
+				// 滑块的左边不一定跟屏幕左边接壤，所以需要减去最外层父元素的左边值
+				let clientX = 0;
+				clientX = touches.clientX;
+
+
+
+				this.distanceX = clientX - this.sliderRect.left;
+				// 获得移动距离对整个滑块的值，此为带有多位小数的值，不能用此更新视图
+				// 否则造成通信阻塞，需要每改变一个step值时修改一次视图
+				// @ts-ignore
+				this.newValue = ((this.distanceX / this.sliderRect.width) * (parseFloat(this.max.toString()) - parseFloat(this.min.toString()))) + parseFloat(this.min.toString());
+				this.status = 'moving';
+				// 发出moving事件
+				let crtFmtValue = this.updateValue(this.newValue, true, index);
+				this.$emit('changing', crtFmtValue);
+			},
+			onTouchEnd(e: any, index = 1) {
+				let event = e as UniTouchEvent
+				if (this.disabled) return;
+				if (this.status === 'moving') {
+					let $crtFmtValue = this.updateValue(this.newValue, false, index);
+					this.$emit('change', $crtFmtValue);
+				}
+				this.status = 'end';
+			},
+			onTouchStart2(e: any, index = 1) {
+				let event = e as UniTouchEvent
+				if (!this.isRange) {
+					// this.onChangeStart(event, index);
+				}
+			},
+			onTouchMove2(e: any, index = 1) {
+				let event = e as UniTouchEvent
+				if (!this.isRange) {
+					// this.onTouchMove(event, index);
+				}
+			},
+			onTouchEnd2(e: any, index = 1) {
+				let event = e as UniTouchEvent
+				if (!this.isRange) {
+					// this.onTouchEnd(event, index);
+				}
+			},
+			onClick(event: UniPointerEvent) {
+				// if (this.isRange) return;
+				if (this.disabled) return;
+				// 直接点击滑块的情况，计算方式与onTouchMove方法相同
+				// console.log('click', event)
+				// nvue下暂时无法获取坐标
+				let clientX = event.x - this.sliderRect.left
+				// @ts-ignore
+				this.newValue = ((clientX / this.sliderRect.width) * (parseFloat(this.max.toString()) - parseFloat(this.min.toString()))) + parseFloat(this.min.toString());
+				this.updateValue(this.newValue, false, 1);
+			},
+			updateValue(value: number, drag: boolean, index = 1): Array<number> | number {
+				// 去掉小数部分，同时也是对step步进的处理
+				let valueFormat: number = this.format(value, index);
+				// 不允许滑动的值超过max最大值
+				// @ts-ignore
+				if(valueFormat > parseFloat(this.max.toString())) {
+					// @ts-ignore
+					valueFormat = parseFloat(this.max.toString())
+				}
+				// 设置移动的距离，不能用百分比，因为NVUE不支持。
+				// @ts-ignore
+				let width = Math.min((valueFormat - parseFloat(this.min.toString())) / (parseFloat(this.max.toString()) - parseFloat(this.min.toString())) * this.sliderRect.width, this.sliderRect.width)
+				let barStyle = {
+					width: width.toString() + 'px'
+				} as barStyleType;
+				// 移动期间无需过渡动画
+				if (drag == true) {
+					barStyle['transition'] = 'none';
+				} else {
+					// 非移动期间，删掉对过渡为空的声明，让css中的声明起效
+					barStyle['transition'] = '';
+				}
+				// 修改value值
+				if (this.isRange) {
+					// @ts-ignore
+					this.rangeValue[index] = valueFormat;
+					this.$emit("update:modelValue", this.rangeValue);
+				} else {
+
+					this.$emit("update:modelValue", valueFormat);
+
+
+
+
+				}
+
+				switch (index) {
+					case 0:
+						this.barStyle0.width = barStyle.width;
+						break;
+					case 1:
+						this.barStyle.width = barStyle.width;
+						break;
+					default:
+						break;
+				}
+				if (this.isRange) {
+					return this.rangeValue
+				} else {
+					return valueFormat
+				}
+				return valueFormat
+			},
+			format(value: number, index = 1): number {
+				// 将小数变成整数，为了减少对视图的更新，造成视图层与逻辑层的阻塞
+				if (this.isRange) {
+					switch (index) {
+						case 0:
+							return Math.round(
+								// @ts-ignore
+								Math.max(parseFloat(this.min.toString()), Math.min(value, parseFloat(this.rangeValue[1].toString())- parseFloat(this.step.toString()), parseFloat(this.max.toString())))
+								// @ts-ignore
+								/ parseFloat(this.step.toString())
+								// @ts-ignore
+							) * parseInt(this.step.toString());
+							break;
+						case 1:
+							return Math.round(
+								// @ts-ignore
+								Math.max(parseFloat(this.min.toString()), parseFloat(this.rangeValue[0].toString()) + parseFloat(this.step.toString()), Math.min(value, parseFloat(this.max.toString())))
+								// @ts-ignore
+								/ parseFloat(this.step.toString())
+								// @ts-ignore
+							) * parseFloat(this.step.toString());
+							break;
+						default:
+							break;
+					}
+				} else {
+					return Math.round(
+						// @ts-ignore
+						Math.max(parseFloat(this.min.toString()), Math.min(value, parseFloat(this.max.toString())))
+						// @ts-ignore
+						/ parseFloat(this.step.toString())
+					// @ts-ignore
+					) * parseFloat(this.step.toString());
+				}
+				return 0
+			}
+		}
+	})
+
+export default __sfc__
+function GenUniModulesUviewUltraComponentsUpSliderUpSliderRender(this: InstanceType<typeof __sfc__>): any | null {
+const _ctx = this
+const _cache = this.$.renderCache
+const _component_slider = resolveComponent("slider")
+
+  return _cE("view", _uM({
+    class: "up-slider",
+    style: _nS(_ctx.addStyle(_ctx.customStyle))
+  }), [
+    isTrue(!_ctx.useNative || _ctx.isRange)
+      ? _cE(Fragment, _uM({ key: 0 }), [
+          _cE("view", _uM({
+            ref: "up-slider-inner",
+            class: _nC(["up-slider-inner", [_ctx.disabled ? 'up-slider--disabled' : '']]),
+            onClick: _ctx.onClick,
+            "on:onTouchStart": ($event: any) => {_ctx.onTouchStart2($event, 1)},
+            onTouchmove: ($event: any) => {_ctx.onTouchMove2($event, 1)},
+            onTouchend: ($event: any) => {_ctx.onTouchEnd2($event, 1)},
+            onTouchcancel: ($event: any) => {_ctx.onTouchEnd2($event, 1)},
+            style: _nS(_ctx.innerStyleCpu)
+          }), [
+            _cE("view", _uM({
+              ref: "up-slider__base",
+              class: "up-slider__base",
+              style: _nS(_uM({
+						height: _ctx.height,
+						backgroundColor: _ctx.inactiveColor
+					}))
+            }), null, 4 /* STYLE */),
+            _cE("view", _uM({
+              onClick: _ctx.onClick,
+              class: "up-slider__gap",
+              style: _nS(_ctx.gapStyleCpu)
+            }), null, 12 /* STYLE, PROPS */, ["onClick"]),
+            isTrue(_ctx.isRange)
+              ? _cE("view", _uM({
+                  key: 0,
+                  class: "up-slider__gap up-slider__gap-0",
+                  style: _nS(_uM({
+						width: _ctx.barStyle0.width,
+						transition: _ctx.barStyle0.transition,
+						height: _ctx.height,
+						marginTop: '-' + _ctx.height,
+						backgroundColor: _ctx.inactiveColor
+					}))
+                }), null, 4 /* STYLE */)
+              : _cC("v-if", true),
+            isTrue(_ctx.isRange && _ctx.showValue)
+              ? _cE("text", _uM({
+                  key: 1,
+                  class: "up-slider__show-range-value",
+                  style: _nS(_uM({left: (parseFloat(_ctx.getPx(_ctx.barStyle0.width)) + parseFloat(_ctx.getPx(_ctx.blockSize))/2) + 'px'}))
+                }), _tD(this.rangeValue[0] ?? ''), 5 /* TEXT, STYLE */)
+              : _cC("v-if", true),
+            isTrue(_ctx.isRange && _ctx.showValue)
+              ? _cE("text", _uM({
+                  key: 2,
+                  class: "up-slider__show-range-value",
+                  style: _nS(_uM({left: (parseFloat(_ctx.getPx(_ctx.barStyle.width)) + parseFloat(_ctx.getPx(_ctx.blockSize))/2) + 'px'}))
+                }), _tD(this.rangeValue[1] ?? ''), 5 /* TEXT, STYLE */)
+              : _cC("v-if", true),
+            isTrue(_ctx.isRange)
+              ? _cE("view", _uM({
+                  key: 3,
+                  class: "up-slider__button-wrap up-slider__button-wrap-0",
+                  onTouchstart: ($event: any) => {_ctx.onTouchStart($event, 0)},
+                  onTouchmove: ($event: any) => {_ctx.onTouchMove($event, 0)},
+                  onTouchend: ($event: any) => {_ctx.onTouchEnd($event, 0)},
+                  onTouchcancel: ($event: any) => {_ctx.onTouchEnd($event, 0)},
+                  style: _nS(_uM({left: (parseFloat(_ctx.getPx(_ctx.barStyle0.width)) + parseFloat(_ctx.getPx(_ctx.blockSize))/2).toString() + 'px'}))
+                }), [
+                  isTrue(_ctx.$slots['min'] != null || _ctx.$slots['$min'] != null)
+                    ? renderSlot(_ctx.$slots, "min", _uM({ key: 0 }))
+                    : _cE("view", _uM({
+                        key: 1,
+                        class: "up-slider__button",
+                        style: _nS(_ctx.blockStyleCpu)
+                      }), null, 4 /* STYLE */)
+                ], 44 /* STYLE, PROPS, NEED_HYDRATION */, ["onTouchstart", "onTouchmove", "onTouchend", "onTouchcancel"])
+              : _cC("v-if", true),
+            _cE("view", _uM({
+              class: "up-slider__button-wrap",
+              onTouchstart: ($event: any) => {_ctx.onTouchStart($event)},
+              onTouchmove: ($event: any) => {_ctx.onTouchMove($event)},
+              onTouchend: ($event: any) => {_ctx.onTouchEnd($event)},
+              onTouchcancel: ($event: any) => {_ctx.onTouchEnd($event)},
+              style: _nS(_uM({left: (parseFloat(_ctx.getPx(_ctx.barStyle.width)) + parseFloat(_ctx.getPx(_ctx.blockSize))/2) + 'px'}))
+            }), [
+              isTrue(_ctx.isRange && (_ctx.$slots['max'] != null || _ctx.$slots['$max'] != null))
+                ? renderSlot(_ctx.$slots, "max", _uM({ key: 0 }))
+                : isTrue(_ctx.$slots['default'] != null || _ctx.$slots['$default'] != null)
+                  ? renderSlot(_ctx.$slots, "default", _uM({ key: 1 }))
+                  : _cE("view", _uM({
+                      key: 2,
+                      class: "up-slider__button",
+                      style: _nS(_ctx.blockStyleCpu)
+                    }), null, 4 /* STYLE */)
+            ], 44 /* STYLE, PROPS, NEED_HYDRATION */, ["onTouchstart", "onTouchmove", "onTouchend", "onTouchcancel"])
+          ], 46 /* CLASS, STYLE, PROPS, NEED_HYDRATION */, ["onClick", "on:onTouchStart", "onTouchmove", "onTouchend", "onTouchcancel"]),
+          isTrue(_ctx.showValue && !_ctx.isRange)
+            ? _cE("view", _uM({
+                key: 0,
+                class: "up-slider__show-value"
+              }), _tD(_ctx.modelValue), 1 /* TEXT */)
+            : _cC("v-if", true)
+        ], 64 /* STABLE_FRAGMENT */)
+      : _cV(_component_slider, _uM({
+          key: 1,
+          class: "up-slider__native",
+          min: _ctx.min,
+          max: _ctx.max,
+          step: _ctx.step,
+          value: _ctx.modelValue,
+          activeColor: _ctx.activeColor,
+          backgroundColor: _ctx.inactiveColor,
+          blockSize: _ctx.getPx(_ctx.blockSize),
+          blockColor: _ctx.blockColor,
+          showValue: _ctx.showValue,
+          disabled: _ctx.disabled,
+          onChanging: _ctx.changingHandler,
+          onChange: _ctx.changeHandler
+        }), null, 8 /* PROPS */, ["min", "max", "step", "value", "activeColor", "backgroundColor", "blockSize", "blockColor", "showValue", "disabled", "onChanging", "onChange"])
+  ], 4 /* STYLE */)
+}
+export type UpSliderComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpSliderUpSliderStyles = [_uM([["up-slider", _pS(_uM([["position", "relative"], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"]]))], ["up-slider__native", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["up-slider-inner", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["display", "flex"], ["flexDirection", "column"], ["position", "relative"], ["borderTopLeftRadius", 999], ["borderTopRightRadius", 999], ["borderBottomRightRadius", 999], ["borderBottomLeftRadius", 999], ["paddingTop", 10], ["paddingRight", 18], ["paddingBottom", 10], ["paddingLeft", 18], ["justifyContent", "center"], ["position:before", "absolute"], ["right:before", 0], ["left:before", 0], ["top:before", -8], ["bottom:before", -8], ["zIndex:before", -1]]))], ["up-slider__show-value", _pS(_uM([["marginTop", 10], ["marginRight", 18], ["marginBottom", 10], ["marginLeft", 0]]))], ["up-slider__show-range-value", _pS(_uM([["paddingTop", 2], ["fontSize", 12], ["lineHeight", "12px"], ["position", "absolute"], ["bottom", 0]]))], ["up-slider__base", _pS(_uM([["backgroundColor", "#ebedf0"]]))], ["up-slider__gap", _pS(_uM([["position", "relative"], ["borderTopLeftRadius", 999], ["borderTopRightRadius", 999], ["borderBottomRightRadius", 999], ["borderBottomLeftRadius", 999], ["transitionProperty", "width"], ["transitionDuration", "0.2s"], ["backgroundColor", "var(--theme-color, #0957de)"], ["alignSelf", "flex-start"]]))], ["up-slider__button", _pS(_uM([["width", 24], ["height", 24], ["borderTopLeftRadius", 999], ["borderTopRightRadius", 999], ["borderBottomRightRadius", 999], ["borderBottomLeftRadius", 999], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#d0d0d0"], ["borderRightColor", "#d0d0d0"], ["borderBottomColor", "#d0d0d0"], ["borderLeftColor", "#d0d0d0"], ["backgroundColor", "#ffffff"]]))], ["up-slider__button-wrap", _pS(_uM([["position", "absolute"]]))], ["up-slider--disabled", _pS(_uM([["opacity", 0.5]]))], ["@TRANSITION", _uM([["up-slider__gap", _uM([["property", "width"], ["duration", "0.2s"]])]])]])]

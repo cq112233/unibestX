@@ -1,0 +1,93 @@
+
+	import { propsSwiperIndicator } from './props.uts';
+	import { mpMixin } from '../../libs/mixin/mpMixin.uts';
+	import { mixin } from '../../libs/mixin/mixin.uts';
+	import { addUnit } from '../../libs/function/index.uts';
+	/**
+	 * SwiperIndicator 轮播图指示器
+	 * @description 该组件一般用于导航轮播，广告展示等场景,可开箱即用，
+	 * @tutorial https://uview-plus.jiangruyi.com/components/swiper.html
+	 * @property {String | Number}	length					轮播的长度（默认 0 ）
+	 * @property {String | Number}	current					当前处于活动状态的轮播的索引（默认 0 ）
+	 * @property {String}			indicatorActiveColor	指示器非激活颜色
+	 * @property {String}			indicatorInactiveColor	指示器的激活颜色
+	 * @property {String}			indicatorMode			指示器模式（默认 'line' ）
+	 * @example	<up-swiper :list="list4" indicator keyName="url" :autoplay="false"></up-swiper>
+	 */
+	const __sfc__ = defineComponent({
+		name: 'up-swiper-indicator',
+		mixins: [mpMixin, mixin, propsSwiperIndicator],
+		data() {
+			return {
+				lineWidth: 22
+			}
+		},
+		computed: {
+			lengthArray(): Array<string> {
+				let list: Array<string> = []
+				const len = (this.$props['length'] ?? 0) as number
+				for (var index = 0; index < len; index++) {
+					list.push(index.toString())
+				}
+				return list
+			},
+			// 指示器为线型的样式
+			lineStyle(): any {
+				let style = {}
+				style['width'] = addUnit(this.lineWidth)
+				style['transform'] = `translateX(${ addUnit(this.current as number * this.lineWidth) })`
+				style['backgroundColor'] = this.indicatorActiveColor
+				return style
+			}
+		},
+		methods: {
+			addUnit(val: any): string {
+				return addUnit(val)
+			},
+			// 指示器为点型的样式
+			dotStyle(index: number): any {
+				let style = {}
+				style['backgroundColor'] = index === this.current ? this.indicatorActiveColor : this.indicatorInactiveColor
+				return style
+			}
+		}
+	})
+
+export default __sfc__
+function GenUniModulesUviewUltraComponentsUpSwiperIndicatorUpSwiperIndicatorRender(this: InstanceType<typeof __sfc__>): any | null {
+const _ctx = this
+const _cache = this.$.renderCache
+  return _cE("view", _uM({ class: "up-swiper-indicator" }), [
+    _ctx.indicatorMode === 'line'
+      ? _cE("view", _uM({
+          key: 0,
+          class: _nC(["up-swiper-indicator__wrapper", [`up-swiper-indicator__wrapper--${_ctx.indicatorMode}`]]),
+          style: _nS(_uM({
+				width: _ctx.addUnit(_ctx.lineWidth * (_ctx.length as number)),
+				backgroundColor: _ctx.indicatorInactiveColor
+			}))
+        }), [
+          _cE("view", _uM({
+            class: "up-swiper-indicator__wrapper--line__bar",
+            style: _nS([_ctx.lineStyle])
+          }), null, 4 /* STYLE */)
+        ], 6 /* CLASS, STYLE */)
+      : _cC("v-if", true),
+    _ctx.indicatorMode === 'dot'
+      ? _cE("view", _uM({
+          key: 1,
+          class: "up-swiper-indicator__wrapper"
+        }), [
+          _cE(Fragment, null, RenderHelpers.renderList(_ctx.lengthArray, (item, index, __index, _cached): any => {
+            return _cE("view", _uM({
+              class: _nC(["up-swiper-indicator__wrapper__dot", [index === (_ctx.current as number) ? 'up-swiper-indicator__wrapper__dot--active' : '']]),
+              key: index,
+              style: _nS([_ctx.dotStyle(index)])
+            }), null, 6 /* CLASS, STYLE */)
+          }), 128 /* KEYED_FRAGMENT */)
+        ])
+      : _cC("v-if", true)
+  ])
+}
+export type UpSwiperIndicatorComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpSwiperIndicatorUpSwiperIndicatorStyles = [_uM([["u-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-swiper-indicator__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "row"]]))], ["up-swiper-indicator__wrapper--line", _pS(_uM([["borderTopLeftRadius", 100], ["borderTopRightRadius", 100], ["borderBottomRightRadius", 100], ["borderBottomLeftRadius", 100], ["height", 4]]))], ["up-swiper-indicator__wrapper--line__bar", _pS(_uM([["width", 22], ["height", 4], ["borderTopLeftRadius", 100], ["borderTopRightRadius", 100], ["borderBottomRightRadius", 100], ["borderBottomLeftRadius", 100], ["backgroundColor", "#FFFFFF"], ["transitionProperty", "transform"], ["transitionDuration", "0.3s"]]))], ["up-swiper-indicator__wrapper__dot", _pS(_uM([["width", 5], ["height", 5], ["borderTopLeftRadius", 100], ["borderTopRightRadius", 100], ["borderBottomRightRadius", 100], ["borderBottomLeftRadius", 100], ["marginTop", 0], ["marginRight", 4], ["marginBottom", 0], ["marginLeft", 4]]))], ["up-swiper-indicator__wrapper__dot--active", _pS(_uM([["width", 12]]))], ["@TRANSITION", _uM([["up-swiper-indicator__wrapper--line__bar", _uM([["property", "transform"], ["duration", "0.3s"]])]])]])]

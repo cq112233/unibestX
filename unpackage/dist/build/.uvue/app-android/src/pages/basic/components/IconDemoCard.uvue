@@ -1,0 +1,73 @@
+import _easycom_uni_icons from '@/uni_modules/uni-icons/components/uni-icons/uni-icons.uvue';
+import _easycom_l_icon from '@/uni_modules/lime-icon/components/l-icon/l-icon.uvue';
+import _easycom_up_icon from '@/uni_modules/uview-ultra/components/up-icon/up-icon.uvue';
+import Card from './Card.uvue';
+const __sfc__ = defineComponent({
+    __name: 'IconDemoCard',
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        return (): any | null => {
+            const _component_uni_icons = resolveEasyComponent("uni-icons", _easycom_uni_icons);
+            const _component_l_icon = resolveEasyComponent("l-icon", _easycom_l_icon);
+            const _component_up_icon = resolveEasyComponent("up-icon", _easycom_up_icon);
+            return _cV(unref(Card), _uM({
+                title: _ctx.$t('basic.iconDemoTitle')
+            }), _uM({
+                default: withSlotCtx((): any[] => [
+                    _cE("view", _uM({ class: "flex-row items-center justify-between py-12px border-bottom-width-1px border-bottom-style-solid border-bottom-color-__f1f5f9_" }), [
+                        _cE("view", _uM({ class: "flex-row items-center" }), [
+                            _cE("view", _uM({ class: "w-6px h-6px rounded-3px bg-__3b82f6_ mr-8px" })),
+                            _cE("text", _uM({ class: "text-14px text-__475569_ font-medium" }), "uni-icon")
+                        ]),
+                        _cE("view", _uM({ class: "flex-row items-center" }), [
+                            _cV(_component_uni_icons, _uM({
+                                type: "contact",
+                                size: "26",
+                                style: _nS(_uM({ "color": "#3b82f6", "margin-right": "8px" }))
+                            }), null, 8 /* PROPS */, ["style"]),
+                            _cE("text", _uM({ class: "text-12px text-__94a3b8_" }), "contact")
+                        ])
+                    ]),
+                    _cE("view", _uM({ class: "flex-row items-center justify-between py-12px" }), [
+                        _cE("view", _uM({ class: "flex-row items-center" }), [
+                            _cE("view", _uM({ class: "w-6px h-6px rounded-3px bg-__10b981_ mr-8px" })),
+                            _cE("view", _uM({ class: "flex-col" }), [
+                                _cE("text", _uM({ class: "text-14px text-__475569_ font-medium" }), "lime-icon"),
+                                _cE("view", _uM({ class: "bg-__fff1f2_ rounded-4px py-2px px-6px mt-4px self-start border-width-1px border-style-solid border-color-__ffe4e6_" }), [
+                                    _cE("text", _uM({ class: "text-10px text-__f43f5e_" }), _tD(_ctx.$t('basic.svgAuthWarning')), 1 /* TEXT */)
+                                ])
+                            ])
+                        ]),
+                        _cE("view", _uM({ class: "flex-row items-center" }), [
+                            _cV(_component_l_icon, _uM({
+                                name: "circle",
+                                size: "24",
+                                style: _nS(_uM({ "color": "#10b981", "margin-right": "8px" }))
+                            }), null, 8 /* PROPS */, ["style"]),
+                            _cE("text", _uM({ class: "text-12px text-__94a3b8_" }), "circle")
+                        ])
+                    ]),
+                    _cE("view", _uM({ class: "flex-row items-center justify-between py-12px border-top-width-1px border-top-style-solid border-top-color-__f1f5f9_" }), [
+                        _cE("view", _uM({ class: "flex-row items-center" }), [
+                            _cE("view", _uM({ class: "w-6px h-6px rounded-3px bg-__a855f7_ mr-8px" })),
+                            _cE("text", _uM({ class: "text-14px text-__475569_ font-medium" }), "up-icon (uview-ultra)")
+                        ]),
+                        _cE("view", _uM({ class: "flex-row items-center" }), [
+                            _cV(_component_up_icon, _uM({
+                                name: "setting",
+                                size: "24",
+                                style: _nS(_uM({ "color": "#a855f7", "margin-right": "8px" }))
+                            }), null, 8 /* PROPS */, ["style"]),
+                            _cE("text", _uM({ class: "text-12px text-__94a3b8_" }), "setting")
+                        ])
+                    ])
+                ]),
+                _: 1 /* STABLE */
+            }), 8 /* PROPS */, ["title"]);
+        };
+    }
+});
+export default __sfc__;
+const GenSrcPagesBasicComponentsIconDemoCardStyles = [_uM([["bg-__10b981_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#10b981"]]))], ["bg-__3b82f6_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#3b82f6"]]))], ["bg-__a855f7_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#a855f7"]]))], ["bg-__fff1f2_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#fff1f2"]]))], ["border-bottom-color-__f1f5f9_", _pS(_uM([["borderBottomColor", "#f1f5f9"]]))], ["border-bottom-style-solid", _pS(_uM([["borderBottomStyle", "solid"]]))], ["border-bottom-width-1px", _pS(_uM([["borderBottomWidth", 1]]))], ["border-color-__ffe4e6_", _pS(_uM([["borderTopColor", "#ffe4e6"], ["borderRightColor", "#ffe4e6"], ["borderBottomColor", "#ffe4e6"], ["borderLeftColor", "#ffe4e6"]]))], ["border-style-solid", _pS(_uM([["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"]]))], ["border-top-color-__f1f5f9_", _pS(_uM([["borderTopColor", "#f1f5f9"]]))], ["border-top-style-solid", _pS(_uM([["borderTopStyle", "solid"]]))], ["border-top-width-1px", _pS(_uM([["borderTopWidth", 1]]))], ["border-width-1px", _pS(_uM([["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1]]))], ["flex-col", _pS(_uM([["flexDirection", "column"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["font-medium", _pS(_uM([["fontWeight", 500]]))], ["h-6px", _pS(_uM([["height", 6]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["justify-between", _pS(_uM([["justifyContent", "space-between"]]))], ["mr-8px", _pS(_uM([["marginRight", 8]]))], ["mt-4px", _pS(_uM([["marginTop", 4]]))], ["px-6px", _pS(_uM([["paddingLeft", 6], ["paddingRight", 6]]))], ["py-12px", _pS(_uM([["paddingTop", 12], ["paddingBottom", 12]]))], ["py-2px", _pS(_uM([["paddingTop", 2], ["paddingBottom", 2]]))], ["rounded-3px", _pS(_uM([["borderTopLeftRadius", 3], ["borderTopRightRadius", 3], ["borderBottomRightRadius", 3], ["borderBottomLeftRadius", 3]]))], ["rounded-4px", _pS(_uM([["borderTopLeftRadius", 4], ["borderTopRightRadius", 4], ["borderBottomRightRadius", 4], ["borderBottomLeftRadius", 4]]))], ["self-start", _pS(_uM([["alignSelf", "flex-start"]]))], ["text-__475569_", _pS(_uM([["color", "#475569"]]))], ["text-__94a3b8_", _pS(_uM([["color", "#94a3b8"]]))], ["text-__f43f5e_", _pS(_uM([["color", "#f43f5e"]]))], ["text-10px", _pS(_uM([["fontSize", 10]]))], ["text-12px", _pS(_uM([["fontSize", 12]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))], ["w-6px", _pS(_uM([["width", 6]]))]])];

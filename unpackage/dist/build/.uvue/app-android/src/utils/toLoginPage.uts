@@ -1,0 +1,31 @@
+let lastRedirectTime = 0;
+/**
+ * 跳转到登录页面，带防抖与节流保护，避免并发请求时重复打开多个登录页。
+ * 使用 getString() 代替括号访问，避免 UTS110111120 (any 在条件中不被认为是 boolean)
+ */
+export function toLoginPage(options: UTSJSONObject | null = null) {
+    const now = Date.now();
+    if (now - lastRedirectTime < 1000) {
+        return;
+    }
+    lastRedirectTime = now;
+    const opts = options ?? ({} as UTSJSONObject);
+    const mode = opts['mode'] as string | null ?? 'navigateTo';
+    const queryString = opts['queryString'] as string | null ?? '';
+    const LOGIN_PAGE = '/src/pages/auth/login';
+    const url = `${LOGIN_PAGE}${queryString}`;
+    const pages = getCurrentPages();
+    if (pages.length > 0) {
+        const currentRoute = pages[pages.length - 1].route;
+        const currentPath = currentRoute.startsWith('/') ? currentRoute : `/${currentRoute}`;
+        if (currentPath === LOGIN_PAGE) {
+            return;
+        }
+    }
+    if (mode === 'navigateTo') {
+        uni.navigateTo({ url });
+    }
+    else {
+        uni.reLaunch({ url });
+    }
+}
