@@ -426,7 +426,7 @@ by ZXLee
      */
     listIs: {
       type: String,
-      default: gc<string>('list-is', 'list-view'),
+      default: gc<string>('list-is', 'scroll-view'),
     },
     /**
      * @description list的id
@@ -454,19 +454,19 @@ by ZXLee
     },
     /**
      * @description (子元素中使用)子元素是否开启嵌套滚动，将滚动事件与父元素协商处理
-     * @default false
+     * @default true
      */
     customNestedScroll: {
       type: Boolean,
-      default: gc<boolean>('custom-nested-scroll', false),
+      default: gc<boolean>('custom-nested-scroll', true),
     },
     /**
      * @description (仅listIs = scroll-view有效，父元素中使用)是否与子元素开启滚动协商
-     * @default false
+     * @default true
      */
     startNestedScroll: {
       type: Boolean,
-      default: gc<boolean>('start-nested-scroll', false),
+      default: gc<boolean>('start-nested-scroll', true),
     },
     /**
      * @description (仅listIs = scroll-view有效)嵌套滚动子元素的id属性，不支持ref，scroll-view惯性滚动时会让对应id元素视图进行滚动，子元素滚动时会触发scroll-view的nestedprescroll事件，嵌套子元素需要设置custom-nested-scroll = true
@@ -822,9 +822,9 @@ by ZXLee
     queryFrom.value = Enum.QueryFrom.Refresh;
     _emitQuery(props.defaultPageNo, targetTotal);
   }
-  // (仅listIs = scroll-view有效)子元素开始滚动时触发, return ture表示与子元素开启滚动协商
+  // (仅listIs = scroll-view有效)子元素开始滚动时触发, return true表示与子元素开启滚动协商
   const _onStartNestedScroll = (_: StartNestedScrollEvent): boolean => {
-    return props.startNestedScroll;
+    return true;
   }
   // (仅listIs = scroll-view有效)子元素滚动时触发，可执行event.consumed(x,y)告知子元素deltaX、deltaY各消耗多少。子元素将执行差值后的deltaX、deltaY滚动距离
   const _onNestedPreScroll = (event: NestedPreScrollEvent) => {

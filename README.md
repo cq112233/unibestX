@@ -23,6 +23,11 @@
 >
 > 本项目开发版本是 HBuilderX 5.15。建议使用 HBuilderX 5.15 及以上版本进行开发。
 
+> ⚠️ **三方组件库与插件修改说明**
+>
+> 本项目内置的 **`z-paging-x`** 分页组件（如 [z-paging-x.uvue](file:///Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/z-paging-x/components/z-paging-x/z-paging-x.uvue)）以及 **`uview-ultra`** 组件库均已由作者进行了**深度定制修改与修复**，专门用于兼容 `uni-app X` 各端平台（特别针对 Android 原生嵌套手势协商、`type="nested"` 架构支持以及各端 CSS 解析限制等进行了优化）。
+> **提示**：请勿直接从官方插件市场重新下载覆盖。若从官方重新下载安装，可能会导致多端兼容性与手势机制失效，届时请务必重新测试与调试！
+
 `unibestX` —— 最好的 `uni-app X` 开发模板，由 `uni-app X` + `Vue3` + `UTS` + `Vite5` + `UnoCSS` + `uview-ultra` + `z-paging-x` 构成，使用了下一代 uni-app 原生开发技术栈，通过 `HBuilderX` 运行 `Android`、`iOS`、`鸿蒙`、`H5` 和 `小程序` 等多端平台。
 
 👉 **在线 H5 演示体验**：[https://cq112233.github.io/unibestX/](https://cq112233.github.io/unibestX/) （📱 **手机扫码体验**👇）
@@ -50,7 +55,7 @@
 * 💪 **Vue3 + Vite5** — 最新前端技术栈，开发体验极佳
 * 🎨 **UnoCSS** — 原子化 CSS 引擎，高效编写样式
 * 📦 **uview-ultra** — 专为 uni-app X 打造的 UI 组件库（本项目使用的为自行修复过的版本，深度修复了大量的 bug 与兼容性问题，如针对 uni-app X 原生平台暂不支持 `gap`、`display: grid` 等 CSS 属性的限制，重构并修复了 `up-box`、`up-sticky`、`up-tooltip` 等核心组件，保障原生端的流畅体验）
-* 📜 **z-paging-x** — 强大的分页列表组件
+* 📜 **z-paging-x** — 强大的分页列表组件（本项目已对 [z-paging-x.uvue](file:///Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/z-paging-x/components/z-paging-x/z-paging-x.uvue) 底层 Android 嵌套手势协商、Flex 布局及 `type="nested"` 架构进行了深度兼容修改与适配）
 * 🔧 **Pinia 持久化** — 状态管理 + 本地持久化，开箱即用
 * 🌐 **i18n 多语言** — 内置中英文切换，支持自动检测系统语言
 * 🛡️ **路由守卫** — 黑名单/白名单策略，灵活的登录拦截
