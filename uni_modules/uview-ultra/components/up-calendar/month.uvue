@@ -74,7 +74,7 @@
 			// 月份数据
 			months: {
 				type: Array<monthsItem>,
-				default: [] as Array<monthsItem>
+				default: [] as any[]
 			},
 			// 日期选择类型
 			mode: {
@@ -158,7 +158,7 @@
 				width: 0,
 				// 当前选中的日期item
 				item: null as UPCalendarMonthsItemDate | null,
-				monthsInner: [] as Array<monthsItem>,
+				monthsInner: [] as any[],
 				selected: [] as Array<string>
 			}
 		},
@@ -323,7 +323,7 @@
 		},
 		emits: ['monthSelected', 'updateMonthTop'],
 		methods: {
-			getMonthTitle(item: monthsItem): string {
+			getMonthTitle(item: any): string {
 				return formatMonthTitle(item.year, item.month)
 			},
 			isRangeMiddle(item: UPCalendarMonthsItemDate): boolean {

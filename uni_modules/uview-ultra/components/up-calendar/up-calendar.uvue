@@ -109,7 +109,7 @@
 <script>
 import uHeader from './header.uvue'
 import { UPCalendarMonthsItemDate } from './types.uts'
-import uMonth, { monthsItem } from './month.uvue'
+import uMonth from './month.uvue'
 import { propsCalendar } from './props.uts'
 import util from './util'
 import {dayuts} from '@/uni_modules/lime-dayuts';
@@ -338,7 +338,7 @@ export default {
 			start: 0,
 			inited: false,
 			// 需要显示的月份的数组
-			months: [] as monthsItem[],
+			months: [] as any[],
 			// 在月份滚动区域中，当前视图中月份的index索引
 			monthIndex: 0,
 			// 月份滚动区域的高度
@@ -460,20 +460,20 @@ export default {
 				// @ts-ignore
 				let monthIndex: number = this.monthIndex as number
 				// @ts-ignore
-				const item = this.months[monthIndex] as monthsItem
+				const item = this.months[monthIndex] as any
 				return formatMonthTitle(item.year, item.month)
 			} else {
 				return ''
 			}
 		},
-		currentMonths(): Array<monthsItem> {
+		currentMonths(): any[] {
 			// @ts-ignore
 			if (this.monthSwitch && this.months.length > 0) {
 				// @ts-ignore
-				return [this.months[this.monthIndex] as monthsItem]
+				return [this.months[this.monthIndex] as any]
 			}
 			// @ts-ignore
-			return this.months as Array<monthsItem>
+			return this.months as any[]
 		},
 		switchPrevDisabled(): boolean {
 			// @ts-ignore
@@ -618,7 +618,7 @@ export default {
 			)
 			// 先清空数组
 			// @ts-ignore
-			this.months = [] as monthsItem[]
+			this.months = [] as any[]
 			const minDateStr = dayuts(minDate).format('YYYY-MM-DD')
 			const maxDateStr = dayuts(maxDate).format('YYYY-MM-DD')
 			for (let i = 0; i < months; i++) {
@@ -645,7 +645,7 @@ export default {
 					} as UPCalendarMonthsItemDate
 					cdate.push(config)
 				}
-				let md:monthsItem = {
+				let md: any = {
 					top: 0,
 					date: cdate,
 					// 当前所属的月份
