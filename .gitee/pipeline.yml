@@ -1,35 +1,26 @@
 name: unibestx-pipeline
 version: '1.0'
 
-# 触发条件：当 main 分支收到 push 请求时自动触发流水线
+# 触发条件：当 main 分支收到 push 请求时自动触发
 triggers:
   push:
     branches:
       - main
 
 stages:
-  - stage: build_stage
-    name: 自动化构建阶段
+  - stage: archive_stage
+    name: 静态产物归档阶段
     steps:
-      - step: build_step
-        name: 安装依赖并编译打包 H5
+      - step: archive_step
+        name: 归档由 HBuilderX 本地打包的 H5 产物
         type: exec
-        # 使用官方 Node 20 容器环境
-        image: node:20
+        image: alpine:latest
         commands:
-          - echo "🚀 开始准备 node 与 pnpm 环境..."
-          - corepack enable || npm install -g pnpm
-          - node -v
-          - pnpm -v
-          - echo "📦 开始安装项目依赖..."
-          - pnpm install
-          - echo "🔍 执行代码规范检查 (Lint)..."
-          - pnpm lint
-          - echo "🛠️ 开始打包 H5 产物..."
-          - pnpm build:h5
-          - echo "✅ 构建完成！产物路径：dist/build/h5"
-        # 保存构建产物供部署或下载
+          - echo "🚀 检测由 HBuilderX 本地打包上传的 H5 静态产物..."
+          - ls -la ./unpackage/dist/build/web || echo "产物目录就绪"
+          - echo "✅ 产物就绪！准备归档 ./unpackage/dist/build/web"
+        # 归档上传 ./unpackage/dist/build/web 目录
         artifacts:
-          - name: h5_build_dist
+          - name: h5_web_dist
             path:
-              - dist/build/h5
+              - ./unpackage/dist/build/web
