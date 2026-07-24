@@ -30,27 +30,22 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      # 1. 构建 VitePress 文档
+      # 仅打包文档，删掉了H5打包步骤 pnpm run build:h5
       - name: Build VitePress Docs
         run: pnpm run docs:build
 
-      # 2. 构建 H5 页面
-      - name: Build H5 Site
-        run: pnpm run build:h5
-
-      # 3. 准备部署目录与 .nojekyll（防止 GitHub Pages/Jekyll 过滤带下划线 _ 的 JS/CSS 文件）
+      # 整合文件：直接拷贝仓库里已上传完毕的H5打包资源
       - name: Prepare Deployment Directory
         run: |
           mkdir -p ./dist_deploy
+          # 读取仓库内已经存在的 unpackage/dist/build/web/ H5文件，不再现场构建
           cp -r ./unpackage/dist/build/web/* ./dist_deploy/
           mkdir -p ./dist_deploy/docs
           cp -r ./docs/.vitepress/dist/* ./dist_deploy/docs/
           touch ./dist_deploy/.nojekyll
 
-      # 4. 发布到 gh-pages 分支
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist_deploy
-          force_orphan: true
