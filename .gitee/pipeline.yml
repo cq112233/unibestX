@@ -1,0 +1,35 @@
+name: unibestx-pipeline
+version: '1.0'
+
+# 触发条件：当 main 分支收到 push 请求时自动触发流水线
+triggers:
+  push:
+    branches:
+      - main
+
+stages:
+  - stage: build_stage
+    name: 自动化构建阶段
+    steps:
+      - step: build_step
+        name: 安装依赖并编译打包 H5
+        type: exec
+        # 使用官方 Node 20 容器环境
+        image: node:20
+        commands:
+          - echo "🚀 开始准备 node 与 pnpm 环境..."
+          - corepack enable || npm install -g pnpm
+          - node -v
+          - pnpm -v
+          - echo "📦 开始安装项目依赖..."
+          - pnpm install
+          - echo "🔍 执行代码规范检查 (Lint)..."
+          - pnpm lint
+          - echo "🛠️ 开始打包 H5 产物..."
+          - pnpm build:h5
+          - echo "✅ 构建完成！产物路径：dist/build/h5"
+        # 保存构建产物供部署或下载
+        artifacts:
+          - name: h5_build_dist
+            path:
+              - dist/build/h5
