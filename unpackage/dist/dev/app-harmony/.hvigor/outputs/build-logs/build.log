@@ -778,3 +778,136 @@ Error Message: Schema validate failed, at file: /Users/chenqi/Documents/chenqi-f
 [2026-07-24T11:51:50.121] [DEBUG] debug-file - session manager: send message to worker process.
 [2026-07-24T11:51:50.121] [DEBUG] debug-file - watch worker: worker id should be larger than 0. Nothing will be sent to any worker thread.
 [2026-07-24T11:51:50.122] [DEBUG] debug-file - watch worker: worker id should be larger than 0. Nothing will be sent to any worker thread.
+[2026-07-24T11:52:20.064] [DEBUG] debug-file - env: nodejsVersion=v18.20.1
+[2026-07-24T11:52:20.076] [DEBUG] debug-file - env: daemon=true
+[2026-07-24T11:52:20.065] [DEBUG] debug-file - env: hvigor-config.json5 content = {
+  modelVersion: '5.0.0',
+  dependencies: {},
+  execution: {},
+  logging: {},
+  debugging: {},
+  nodeOptions: {}
+}
+[2026-07-24T11:52:20.356] [DEBUG] debug-file - hvigor java daemon: Starting java daemon. jvmXmxValue=512m, jarPath=/Applications/DevEco-Studio.app/Contents/tools/hvigor/hvigor/lib/hvigor-java-daemon.jar
+[2026-07-24T11:52:20.357] [DEBUG] debug-file - hvigor java daemon: Read cache file, 
+    port=45052, pid=11299, sessionId exists=true
+[2026-07-24T11:52:20.357] [DEBUG] debug-file - hvigor java daemon: Killing existing java daemon by pid=11299
+[2026-07-24T11:52:20.375] [DEBUG] debug-file - hvigor java daemon: tryConnect success
+[2026-07-24T11:52:20.385] [DEBUG] debug-file - session manager: set active socket. socketId=X8ssNeaxbfPt8r8oAAAB
+[2026-07-24T11:52:20.623] [DEBUG] debug-file - watch worker: worker id should be larger than 0. Nothing will be sent to any worker thread.
+[2026-07-24T11:52:20.628] [DEBUG] debug-file - Since there is no instance or instance is terminated, create a new worker pool.
+[2026-07-24T11:52:20.628] [DEBUG] debug-file - Worker pool is initialized with config:  {
+  minPoolNum: 2,
+  maxPoolNum: undefined,
+  maxCoreSize: undefined,
+  cacheCapacity: undefined,
+  cacheTtl: undefined
+}
+[2026-07-24T11:52:20.629] [DEBUG] debug-file - Create  resident worker with id: 0.
+[2026-07-24T11:52:20.630] [DEBUG] debug-file - Create  resident worker with id: 1.
+[2026-07-24T11:52:20.631] [DEBUG] debug-file - Workers' log level updated to INFO
+[2026-07-24T11:52:20.634] [DEBUG] debug-file - Hvigor init with startParameters:{
+  hvigorfileTypeCheck: false,
+  parallelExecution: true,
+  incrementalExecution: true,
+  printStackTrace: false,
+  daemon: true,
+  analyze: 0,
+  logLevel: Level { level: 20000, levelStr: 'INFO', colour: 'green' },
+  optimizationStrategy: 'memory',
+  hotCompile: undefined,
+  hotReloadBuild: undefined,
+  customizedParam: undefined
+}
+[2026-07-24T11:52:20.644] [DEBUG] debug-file - Cache service initialization finished in 10 ms 
+[2026-07-24T11:52:20.649] [DEBUG] debug-file - hvigorfile, resolving /Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/hvigorfile.ts
+[2026-07-24T11:52:21.393] [DEBUG] debug-file - hvigorfile, require result:  { default: { plugins: [] } }
+[2026-07-24T11:52:21.393] [DEBUG] debug-file - hvigorfile, binding system plugins null
+[2026-07-24T11:52:21.394] [DEBUG] debug-file - Starting plugin build process
+[2026-07-24T11:52:21.394] [DEBUG] debug-file - App plugin prepare start...
+[2026-07-24T11:52:21.394] [DEBUG] debug-file - App plugin prepare end...
+[2026-07-24T11:52:21.394] [DEBUG] debug-file - App plugin creating...
+[2026-07-24T11:52:21.550] [DEBUG] debug-file - hvigor build process will be closed with an error.
+[2026-07-24T11:52:21.584] [ERROR] debug-file - [31m00303038 Configuration Error
+Error Message: Schema validate failed, at file: /Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/build-profile.json5
+
+* Try the following:
+  > Please check the following fields. 
+ {
+  instancePath: 'modules[0].targets[0].applyToProducts',
+  keyword: 'minItems',
+  params: { limit: 1 },
+  message: 'must NOT have fewer than 1 items',
+  location: '/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/build-profile.json5:9:29'
+} 
+
+[39m
+
+[31m* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --debug option to get more log output.
+
+[2026-07-24T11:52:21.586] [DEBUG] debug-file - ERROR: stacktrace = AdaptorError: [31m00303038 Configuration Error
+Error Message: Schema validate failed, at file: /Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/build-profile.json5
+
+* Try the following:
+  > Please check the following fields. 
+ {
+  instancePath: 'modules[0].targets[0].applyToProducts',
+  keyword: 'minItems',
+  params: { limit: 1 },
+  message: 'must NOT have fewer than 1 items',
+  location: '/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/build-profile.json5:9:29'
+} 
+
+[39m
+    at OhosLogger.printErrorExit (/Applications/DevEco-Studio.app/Contents/tools/hvigor/hvigor/src/base/log/hvigor-log.js:1:5087)
+    at ValidateUtil.doSchemaCheck (/Applications/DevEco-Studio.app/Contents/tools/hvigor/hvigor-ohos-plugin/src/utils/validate/validate-util.js:1:8177)
+    at ValidateUtil.submitSchemaCheckWork (/Applications/DevEco-Studio.app/Contents/tools/hvigor/hvigor-ohos-plugin/src/utils/validate/validate-util.js:1:7013)
+    at ProjectModelImpl.projectBuildProfileCheck (/Applications/DevEco-Studio.app/Contents/tools/hvigor/hvigor-ohos-plugin/src/model/project/core-project-model-impl.js:1:9382)
+    at new CoreProjectModelImpl (/Applications/DevEco-Studio.app/Contents/tools/hvigor/hvigor-ohos-plugin/src/model/project/core-project-model-impl.js:1:2677)
+    at new ProjectModelImpl (/Applications/DevEco-Studio.app/Contents/tools/hvigor/hvigor-ohos-plugin/src/model/project/project-model-impl.js:1:596)
+    at new AppPlugin (/Applications/DevEco-Studio.app/Contents/tools/hvigor/hvigor-ohos-plugin/src/plugin/app-plugin.js:1:514)
+    at StageInitializationStrategy.createAppPlugin (/Applications/DevEco-Studio.app/Contents/tools/hvigor/hvigor-ohos-plugin/src/plugin/strategy/stage-init-strategy.js:1:949)
+    at AppPluginBuilder.createPlugin (/Applications/DevEco-Studio.app/Contents/tools/hvigor/hvigor-ohos-plugin/src/plugin/builder/app-plugin-builder.js:1:1610)
+    at AppPluginBuilder.build (/Applications/DevEco-Studio.app/Contents/tools/hvigor/hvigor-ohos-plugin/src/plugin/builder/abstract-plugin-builder.js:1:756)
+[2026-07-24T11:52:21.586] [ERROR] debug-file - AdaptorError: [31m00303038 Configuration Error
+Error Message: Schema validate failed, at file: /Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/build-profile.json5
+
+* Try the following:
+  > Please check the following fields. 
+ {
+  instancePath: 'modules[0].targets[0].applyToProducts',
+  keyword: 'minItems',
+  params: { limit: 1 },
+  message: 'must NOT have fewer than 1 items',
+  location: '/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/build-profile.json5:9:29'
+} 
+
+[39m
+    at OhosLogger.printErrorExit (/Applications/DevEco-Studio.app/Contents/tools/hvigor/hvigor/src/base/log/hvigor-log.js:1:5087)
+    at ValidateUtil.doSchemaCheck (/Applications/DevEco-Studio.app/Contents/tools/hvigor/hvigor-ohos-plugin/src/utils/validate/validate-util.js:1:8177)
+    at ValidateUtil.submitSchemaCheckWork (/Applications/DevEco-Studio.app/Contents/tools/hvigor/hvigor-ohos-plugin/src/utils/validate/validate-util.js:1:7013)
+    at ProjectModelImpl.projectBuildProfileCheck (/Applications/DevEco-Studio.app/Contents/tools/hvigor/hvigor-ohos-plugin/src/model/project/core-project-model-impl.js:1:9382)
+    at new CoreProjectModelImpl (/Applications/DevEco-Studio.app/Contents/tools/hvigor/hvigor-ohos-plugin/src/model/project/core-project-model-impl.js:1:2677)
+    at new ProjectModelImpl (/Applications/DevEco-Studio.app/Contents/tools/hvigor/hvigor-ohos-plugin/src/model/project/project-model-impl.js:1:596)
+    at new AppPlugin (/Applications/DevEco-Studio.app/Contents/tools/hvigor/hvigor-ohos-plugin/src/plugin/app-plugin.js:1:514)
+    at StageInitializationStrategy.createAppPlugin (/Applications/DevEco-Studio.app/Contents/tools/hvigor/hvigor-ohos-plugin/src/plugin/strategy/stage-init-strategy.js:1:949)
+    at AppPluginBuilder.createPlugin (/Applications/DevEco-Studio.app/Contents/tools/hvigor/hvigor-ohos-plugin/src/plugin/builder/app-plugin-builder.js:1:1610)
+    at AppPluginBuilder.build (/Applications/DevEco-Studio.app/Contents/tools/hvigor/hvigor-ohos-plugin/src/plugin/builder/abstract-plugin-builder.js:1:756)
+[2026-07-24T11:52:21.590] [ERROR] debug-file - BUILD FAILED in 957 ms 
+[2026-07-24T11:52:21.635] [DEBUG] debug-file - Cleanup worker 0.
+[2026-07-24T11:52:21.635] [DEBUG] debug-file - Worker 0 has been cleaned up.
+[2026-07-24T11:52:21.635] [DEBUG] debug-file - Current idle worker size: 1.
+[2026-07-24T11:52:21.635] [DEBUG] debug-file - Current resident worker size: 2.
+[2026-07-24T11:52:21.635] [DEBUG] debug-file - Cleanup worker 1.
+[2026-07-24T11:52:21.635] [DEBUG] debug-file - Worker 1 has been cleaned up.
+[2026-07-24T11:52:21.635] [DEBUG] debug-file - Current idle worker size: 0.
+[2026-07-24T11:52:21.635] [DEBUG] debug-file - Current resident worker size: 2.
+[2026-07-24T11:52:21.643] [DEBUG] debug-file - session manager: send message to worker process.
+[2026-07-24T11:52:21.643] [DEBUG] debug-file - session manager: send message to worker process.
+[2026-07-24T11:52:21.647] [DEBUG] debug-file - hvigor build process will be closed.
+[2026-07-24T11:52:21.649] [DEBUG] debug-file - watch worker: worker id should be larger than 0. Nothing will be sent to any worker thread.
+[2026-07-24T11:52:21.649] [DEBUG] debug-file - watch worker: worker id should be larger than 0. Nothing will be sent to any worker thread.
+[2026-07-24T11:52:21.653] [DEBUG] debug-file - worker[1] exits with exit code 1.
+[2026-07-24T11:52:21.654] [DEBUG] debug-file - worker[0] exits with exit code 1.
