@@ -1,40 +1,38 @@
 <template>
   <view class="flex-1 flex-col h-full bg-[#f8fafc]">
-    <!-- 嵌套滚动外层容器 -->
-    <scroll-view type="nested" direction="vertical" class="flex-1 h-0">
-      <nested-scroll-header>
-        <view class="flex-col">
-          <!-- uview-ultra 组件库示例 -->
-          <UViewUltraDemoCard />
+    <!-- 基础滚动外层容器 -->
+    <scroll-view direction="vertical" class="flex-1 h-0" style="height: 100%;">
+      <view class="flex-col">
+        <!-- uview-ultra 组件库示例 -->
+        <UViewUltraDemoCard />
 
-          <!-- 数据分页列表示例组件 (z-paging-x) -->
-          <ZPagingDemoCard />
+        <!-- 数据分页列表示例组件 (z-paging-x) -->
+        <ZPagingDemoCard />
 
-          <!-- 系统与安全区域信息组件 -->
-          <SystemInfoDemoCard />
+        <!-- 系统与安全区域信息组件 -->
+        <SystemInfoDemoCard />
 
-          <!-- 使用封装的图标示例组件 -->
-          <IconDemoCard />
+        <!-- 使用封装的图标示例组件 -->
+        <IconDemoCard />
 
-          <!-- 使用封装的多语言切换组件 -->
-          <LangSwitchCard />
+        <!-- 使用封装的多语言切换组件 -->
+        <LangSwitchCard />
 
-          <!-- 使用封装的主题切换组件 -->
-          <ThemeSwitchCard />
+        <!-- 使用封装的主题切换组件 -->
+        <ThemeSwitchCard />
 
-          <!-- 时间日期操作 (lime-dayuts) 演示组件 -->
-          <TimeDemoCard />
+        <!-- 时间日期操作 (lime-dayuts) 演示组件 -->
+        <TimeDemoCard />
 
-          <!-- 使用路由拦截与传参演示组件 -->
-          <RouterDemoCard />
+        <!-- 使用路由拦截与传参演示组件 -->
+        <RouterDemoCard />
 
-          <!-- HTTP 请求 Demo 组件 -->
-          <HttpDemoCard />
+        <!-- HTTP 请求 Demo 组件 -->
+        <HttpDemoCard />
 
-          <!-- ECharts 图表示例组件 -->
-          <EchartsDemoCard />
-        </view>
-      </nested-scroll-header>
+        <!-- ECharts 图表示例组件 -->
+        <EchartsDemoCard />
+      </view>
     </scroll-view>
   </view>
 </template>

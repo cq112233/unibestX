@@ -99,12 +99,16 @@ export default {
       }
 
       const echartDom = document.getElementById(this.canvasId);
+      if (echartDom == null) return null;
       
       this.echartObj = echarts.init(echartDom, this.theme); 
       
       this.setOption(option);
       
-      this.echartCanvas = echartDom.getElementsByTagName('canvas')[0];  // 必须先setOption,再获取canvas,否则是空白的canvas
+      const canvases = echartDom.getElementsByTagName('canvas');
+      if (canvases && canvases.length > 0) {
+        this.echartCanvas = canvases[0];
+      }
 
       return { echartCanvas: this.echartCanvas, echartObj: this.echartObj, canvasId: this.canvasId, width: echartDom.clientWidth, height: echartDom.clientHeight }
     },
