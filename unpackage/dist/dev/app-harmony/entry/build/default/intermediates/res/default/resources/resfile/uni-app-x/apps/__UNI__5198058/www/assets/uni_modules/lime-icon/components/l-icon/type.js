@@ -1,2 +1,0 @@
-
-//# sourceMappingURL=type.js.map
