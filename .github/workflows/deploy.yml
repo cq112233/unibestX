@@ -18,6 +18,23 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
 
+      - name: Setup pnpm 📦
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node 🟢
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies 🛠️
+        run: pnpm install
+
+      - name: Build H5 🏗️
+        run: pnpm run build:h5
+
       - name: Deploy to GitHub Pages 🚀
         uses: peaceiris/actions-gh-pages@v4
         with:

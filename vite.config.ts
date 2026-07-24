@@ -9,6 +9,7 @@ import { uniEasycomPlugin } from '@dcloudio/uni-cli-shared/dist/vite/plugins/eas
 import { UNI_EASYCOM_EXCLUDE } from '@dcloudio/uni-cli-shared'
 
 export default defineConfig({
+  base: './',
   resolve: {
     alias: [
       { find: /^vue$/, replacement: '@dcloudio/uni-h5-vue' },
