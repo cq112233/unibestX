@@ -1,0 +1,90 @@
+import _easycom_up_toast from '@/uni_modules/uview-ultra/components/up-toast/up-toast.uvue'
+import Tabbar from '@/src/tabbar/index.uvue'
+import { useAppStore } from '@/src/store'
+import { isPageTabbar, syncCurIdxByCurrentPage } from '@/src/tabbar/store'
+import { registerToast, unregisterToast } from '@/src/utils/toast'
+import type { ComponentPublicInstance } from 'vue'
+import { onBeforeMount, onMounted, onUnmounted, ref } from 'vue'
+
+// 激活应用状态管理 Store
+
+const __sfc__ = defineComponent({
+  __name: 'App.ku',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+const appStore = useAppStore()
+
+// 控制当前页面是否需要显示底部导航栏
+const isCurrentPageTabbar = ref(false)
+// 挂载全局 Toast 组件的 DOM/组件实例引用
+const uToastRef = ref<ComponentPublicInstance | null>(null)
+
+// 页面显示钩子：解析当前路由，动态控制导航栏显示及同步选中索引
+onBeforeMount(() => {
+  const pages = getCurrentPages()
+  if (pages.length > 0) {
+    const route = pages[pages.length - 1].route
+    if (route != null && route.length > 0) {
+      const path = route.startsWith('/') ? route : `/${route}`
+      const isTabbar = isPageTabbar(path)
+      isCurrentPageTabbar.value = isTabbar
+      // 如果是 Tabbar 路由，同步底部导航的激活索引
+      if (isTabbar) {
+        syncCurIdxByCurrentPage()
+      }
+    }
+  }
+  // 注册全局 Toast 组件引用，供 HTTP 或工具类直接调用
+  if (uToastRef.value != null) {
+    registerToast(uToastRef.value!)
+  }
+})
+
+// 组件挂载钩子：注册全局 Toast
+onMounted(() => {
+  // 注册 Toast 实例
+  if (uToastRef.value != null) {
+    registerToast(uToastRef.value!)
+  }
+})
+
+// 组件销毁钩子：反注册 Toast 以释放内存防内存泄漏
+onUnmounted(() => {
+  // 卸载 Toast 实例
+  if (uToastRef.value != null) {
+    unregisterToast(uToastRef.value!)
+  }
+})
+
+return (): any | null => {
+
+const _component_up_toast = resolveEasyComponent("up-toast",_easycom_up_toast)
+
+  return _cE("view", _uM({
+    class: "flex flex-col flex-1 h-full",
+    style: _nS(_uM({ '--theme-color': unref(appStore).state.theme, 'backgroundColor': '#f8f8f8' }))
+  }), [
+    _cE("scroll-view", _uM({
+      direction: "vertical",
+      class: "flex-1 h-0",
+      style: _nS(_uM({ backgroundColor: '#f8f8f8' }))
+    }), [
+      renderSlot(_ctx.$slots, "default")
+    ], 4 /* STYLE */),
+    isTrue(isCurrentPageTabbar.value)
+      ? _cV(unref(Tabbar), _uM({ key: 0 }))
+      : _cC("v-if", true),
+    _cV(_component_up_toast, _uM({
+      ref_key: "uToastRef",
+      ref: uToastRef
+    }), null, 512 /* NEED_PATCH */)
+  ], 4 /* STYLE */)
+}
+}
+
+})
+export default __sfc__
+const GenAppkuStyles = []

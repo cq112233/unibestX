@@ -1,0 +1,480 @@
+
+	import { UPSwipeActionItemOption } from './types'
+	import { touchMixin } from '../../libs/mixin/touch'
+	import { propsSwipeActionItem } from './props';
+	import { mpMixin } from '../../libs/mixin/mpMixin';
+	import { mixin } from '../../libs/mixin/mixin';
+	import { addUnit, getPx, sleep } from '../../libs/function/index';
+	// import other from './other';
+
+	/**
+	 * SwipeActionItem 滑动单元格子组件
+	 * @description 该组件一般用于左滑唤出操作菜单的场景，用的最多的是左滑删除操作
+	 * @tutorial https://uview-plus.jiangruyi.com/components/swipeAction.html
+	 * @property {Boolean}			show			控制打开或者关闭（默认 false ）
+	 * @property {String | Number}	index			标识符，如果是v-for，可用index索引
+	 * @property {Boolean}			disabled		是否禁用（默认 false ）
+	 * @property {Boolean}			autoClose		是否自动关闭其他swipe按钮组（默认 true ）
+	 * @property {Number}			threshold		滑动距离阈值，只有大于此值，才被认为是要打开菜单（默认 30 ）
+	 * @property {Array}			options			右侧按钮内容
+	 * @property {String | Number}	duration		动画过渡时间，单位ms（默认 350 ）
+	 * @event {Function(index)}	open	组件打开时触发
+	 * @event {Function(index)}	close	组件关闭时触发
+	 * @example	<up-swipe-action><up-swipe-action-item :options="options1" ></up-swipe-action-item></up-swipe-action>
+	 */
+	const __sfc__ = defineComponent({
+		name: 'up-swipe-action-item',
+		emits: ['click', 'update:show'],
+		mixins: [
+			mpMixin,
+			mixin,
+			touchMixin,
+			propsSwipeActionItem
+		],
+		data() {
+			return {
+				// 按钮的尺寸信息
+				size: {},
+				// 父组件up-swipe-action的参数
+				parentData: {
+					autoClose: true,
+				},
+				// 当前状态，open-打开，close-关闭
+				status: '',
+				sliderStyle: {},
+				state: {
+					moving: false,
+					startX: 0,
+					startY: 0,
+					buttonsWidth: 0
+				}
+			}
+		},
+		watch: {
+			// 由于wxs无法直接读取外部的值，需要在外部值变化时，重新执行赋值逻辑
+			// wxsInit(newValue, oldValue) {
+			// 	this.queryRect()
+			// },
+			show(newValue) {
+				if (newValue) {
+					this.status = 'open'
+				} else {
+					this.status = 'close'
+				}
+			},
+			status(newValue: string, oldValue: string) {
+				if (newValue === 'open') {
+					this.$emit('update:show', true)
+					if (this.parent != null) {
+						this.parent?.$callMethod('setOpendItem', 1)
+					}
+				} else {
+					this.$emit('update:show', false)
+				}
+				if (this.disabled) return
+				// 打开或关闭单元格
+				if (newValue === 'close' && oldValue === 'open') {
+					this.closeSwipeAction()
+				} else if(newValue === 'open' && oldValue === 'close') {
+					this.openSwipeAction()
+				}
+			},
+			options() {
+				this.getBtnWidth()
+			}
+		},
+		computed: {
+			// wxsInit() {
+			// 	return [this.disabled, this.autoClose, this.threshold, this.options, this.duration]
+			// }
+		},
+		mounted() {
+			this.init()
+			sleep(100).then(() => {
+				this.getBtnWidth()
+			})
+		},
+		beforeUnmount() {
+			this.closeHandler()
+		},
+		methods: {
+			// 安全获取 option 的 style 对象
+			getOptionStyle(item: UTSJSONObject): UTSJSONObject | null {
+				const style = item['style']
+				if (style == null) return null
+				if (style instanceof UTSJSONObject) return style as UTSJSONObject
+				// H5 端可能是普通 JS 对象，尝试直接作为 UTSJSONObject 使用
+				try {
+					const obj = style as UTSJSONObject
+					// 验证是否可用：尝试调用 UTSJSONObject 的方法
+					if (obj != null) return obj
+				} catch (_e1) {}
+				// 运行时可能是 Map（Android 端），转为 UTSJSONObject
+				try {
+					const m = style as Map<string, any>
+					const obj = { __$originalPosition: new UTSSourceMapPosition("obj", "uni_modules/uview-ultra/components/up-swipe-action-item/up-swipe-action-item.uvue", 142, 12), } as UTSJSONObject
+					m.forEach((value: any, key: string) => {
+						obj[key] = value
+					})
+					return obj
+				} catch (_e2) {
+					return null
+				}
+			},
+			// 安全获取 style 中的某个属性
+			getOptionStyleProp(item: UTSJSONObject, prop: string, defaultVal: string): string {
+				const style = this.getOptionStyle(item)
+				if (style != null && style[prop] != null) {
+					return style[prop] as string
+				}
+				return defaultVal
+			},
+			// 外层按钮样式
+			getButtonStyle(item: UTSJSONObject): any {
+				const style = this.getOptionStyle(item)
+				const hasBorderRadius = style != null && style['borderRadius'] != null
+				
+				// 计算明确的宽度，防止在鸿蒙等平台上因弹性计算折叠
+				let widthStr = '80px'
+				if (style != null && style['width'] != null) {
+					widthStr = style['width'] as string
+				} else {
+					let baseWidth = 30 // padding
+					if (item['text'] != null) {
+						baseWidth += (item['text'] as string).length * 15
+					}
+					if (item['icon'] != null) {
+						baseWidth += 20
+					}
+					widthStr = Math.max(80, baseWidth) + 'px'
+				}
+				
+				return {
+					alignItems: hasBorderRadius ? 'center' : 'stretch',
+					width: widthStr,
+					flexShrink: 0
+				}
+			},
+			// 内层 wrapper 样式
+			getWrapperStyle(item: UTSJSONObject): any {
+				const style = this.getOptionStyle(item)
+				const hasBorderRadius = style != null && style['borderRadius'] != null
+				let bgColor = '#C7C6CD'
+				if (style != null && style['backgroundColor'] != null) {
+					const bg = style['backgroundColor'] as string
+					if (bg == 'primary') {
+						bgColor = ''
+					} else {
+						bgColor = bg
+					}
+				}
+				const result = { __$originalPosition: new UTSSourceMapPosition("result", "uni_modules/uview-ultra/components/up-swipe-action-item/up-swipe-action-item.uvue", 198, 11), 
+					borderRadius: hasBorderRadius ? style!['borderRadius'] as string : '0',
+					padding: hasBorderRadius ? '0' : '0 15px',
+					width: '100%',
+					height: '100%'
+				} as UTSJSONObject
+				if (bgColor != '') {
+					result['backgroundColor'] = bgColor
+				}
+				// 合并原始 style 属性
+				if (style != null) {
+					style.toMap().forEach((value: any | null, key: string) => {
+						if (key != 'backgroundColor') {
+							result[key] = value
+						}
+					})
+				}
+				return result
+			},
+			// 文字样式
+			getTextStyle(item: UTSJSONObject): any {
+				const style = this.getOptionStyle(item)
+				return {
+					color: style != null && style['color'] != null ? style['color'] as string : '#ffffff',
+					fontSize: style != null && style['fontSize'] != null ? style['fontSize'] as string : '16px',
+					lineHeight: style != null && style['fontSize'] != null ? style['fontSize'] as string : '16px',
+				}
+			},
+			// 图标尺寸
+			getOptionIconSize(item: UTSJSONObject): any {
+				if (item['iconSize'] != null) {
+					return addUnit(item['iconSize'])
+				}
+				const style = this.getOptionStyle(item)
+				if (style != null && style['fontSize'] != null) {
+					return addUnit(style['fontSize'])
+				}
+				return 17
+			},
+			addUnit(e: any) {
+				return addUnit(e)
+			},
+			getPx(e: any, s: boolean = false): string {
+				return getPx(e, s)
+			},
+			init() {
+				// 初始化父组件数据
+				this.updateParentData()
+				sleep().then(() => {
+					this.queryRect()
+				})
+			},
+			updateParentData() {
+				// 此方法在mixin中
+				this.getParentData('up-swipe-action')
+			},
+			// 查询节点
+			queryRect() {
+				// this.upGetRects('.up-swipe-action-item__right__button').then(buttons => {
+				// 	this.size = {
+				// 		buttons,
+				// 		show: this.show,
+				// 		disabled: this.disabled,
+				// 		threshold: this.threshold,
+				// 		duration: this.duration
+				// 	}
+				// })
+			},
+			// 按钮被点击
+			buttonClickHandler(item: any, index: number) {
+				let ret = this.$emit('click', {
+					index,
+					name: this.name
+				}, () => {
+				})
+				if (this.closeOnClick) {
+					this.closeHandler()
+				}
+			},
+			clickHandler() {
+			},
+			closeHandler() {
+				this.closeSwipeAction()
+			},
+			setStatus(status: string) {
+				this.status = status
+			},
+			getBtnWidth() {
+				let view = uni.createSelectorQuery().in(this).select(".up-swipe-action-item__right");
+				view.fields({
+					size: true,
+					scrollOffset: true
+					} as NodeField, (data: any) => {
+						this.state['buttonsWidth'] = (data as NodeInfo).width
+						// console.log("得到节点信息" + JSON.stringify(data));
+				}).exec();
+			},
+			// 开始触摸
+			touchstart(event: UniTouchEvent) {
+				// console.log(event)
+				// 标识当前为滑动中状态
+				this.state['moving'] = true
+				// 记录触摸开始点的坐标值
+				var touches = event.touches
+				this.state['startX'] = touches[0].pageX
+				this.state['startY'] = touches[0].pageY
+				
+				// 每次触碰时重新获取按钮宽度，确保边界值完全正确
+				this.getBtnWidth()
+				
+				// 关闭其它
+				if (this.parent != null) {
+					this.parent?.$callMethod('closeOther', this)
+				}
+			},
+			touchmove(event: UniTouchEvent) {
+			    // console.log(event)
+				if (this.disabled || this.state['moving'] == null) return
+				var touches = event.touches
+				var pageX = touches[0].pageX
+				var pageY = touches[0].pageY
+				var moveX = pageX - this.state['startX'] as number
+				var moveY = pageY - this.state['startY'] as number
+			
+				// 移动的X轴距离大于Y轴距离，也即终点与起点位置连线，与X轴夹角小于45度时，禁止页面滚动
+				if (Math.abs(moveX) > Math.abs(moveY) || Math.abs(moveX) > this.threshold) {
+					event.preventDefault()
+					event.stopPropagation()
+				}
+				// 如果移动的X轴距离小于Y轴距离，也即终点位置与起点位置连线，与Y轴夹角小于45度时，认为是页面上下滑动，而不是左右滑动单元格
+				if (Math.abs(moveX) < Math.abs(moveY)) return
+			
+				// 限制右滑的距离，不允许内容部分往右偏移，右滑会导致X轴偏移值大于0，以此做判断
+				// 此处不能直接return，因为滑动过程中会缺失某些关键点坐标，会导致错乱，最好的办法就是
+				// 在超出后，设置为0
+				if (this.status === 'open') {
+					// 在开启状态下，向左滑动，需忽略
+					if (moveX < 0) moveX = 0
+					// 想要收起菜单，最大能移动的距离为按钮的总宽度
+					const btnW = (this.state['buttonsWidth'] ?? 0) as number
+					if (moveX > btnW) moveX = btnW
+					// 如果是已经打开了的状态，向左滑动时，移动收起菜单
+					this.moveSwipeAction(0 - btnW + moveX)
+				} else {
+					// 关闭状态下，右滑动需忽略
+					if (moveX > 0) moveX = 0
+					// 滑动的距离不允许超过所有按钮的总宽度，此时只能是左滑，最终设置按钮的总宽度，同时为负数
+					const btnW = (this.state['buttonsWidth'] ?? 0) as number
+					if (Math.abs(moveX) > btnW) moveX = 0 - btnW
+					// 只要是在滑过程中，就不断移动单元格内容部分，从而使隐藏的菜单显示出来
+					this.moveSwipeAction(moveX)
+				}
+			},
+			touchend(event: UniTouchEvent) {
+			    // console.log(event)
+				if (this.state['moving'] == false || this.disabled) return
+				this.state['moving'] = false
+				var touches: UniTouch = event.changedTouches[0] as UniTouch
+				var pageX = touches.pageX
+				var pageY = touches.pageY
+				var moveX = pageX - this.state['startX'] as number
+				if (this.status === 'open') {
+					// 在展开的状态下，继续左滑，无需操作
+					if (moveX < 0) return
+					// 在开启状态下，点击一下内容区域，moveX为0，也即没有进行移动，这时执行收起菜单逻辑
+					if (moveX === 0) {
+						return this.closeSwipeAction()
+					}
+					// 在开启状态下，滑动距离小于阈值，则默认为不关闭，同时恢复原来的打开状态
+					if (Math.abs(moveX) < this.threshold) {
+						this.openSwipeAction()
+					} else {
+						// 如果滑动距离大于阈值，则执行收起逻辑
+						this.closeSwipeAction()
+					}
+				} else {
+					// 在关闭的状态下，右滑，无需操作
+					if (moveX > 0) return
+					// 理由同上
+					if (Math.abs(moveX) < this.threshold) {
+						this.closeSwipeAction()
+					} else {
+						this.openSwipeAction()
+					}
+				}
+			},
+			touchcancel(event: UniTouchEvent) {
+				if (this.state['moving'] == false || this.disabled) return
+				this.state['moving'] = false
+				if (this.status === 'open') {
+					this.openSwipeAction()
+				} else {
+					this.closeSwipeAction()
+				}
+			},
+			// 一次性展开滑动菜单
+			openSwipeAction() {
+				// 处理duration单位问题
+				var duration = this.getDuration(this.duration)
+				// 展开过程中，是向左移动，所以X的偏移应该为负值
+				var buttonsWidth = 0 - this.state['buttonsWidth'] as number
+				this.sliderStyle = {
+					'transition': 'transform ' + duration,
+					'transform': 'translateX(' + buttonsWidth + 'px)',
+					'-webkit-transform': 'translateX(' + buttonsWidth + 'px)',
+				}
+				this.setStatus('open')
+			},
+			// 一次性收起滑动菜单
+			closeSwipeAction() {
+				// 处理duration单位问题
+				var duration = this.getDuration(this.duration)
+				this.sliderStyle = {
+					'transition': 'transform ' + duration,
+					'transform': 'translateX(0px)'
+				}
+				// 设置各个隐藏的按钮为收起的状态
+				// for (var i = this.state.buttonsWidth - 1; i >= 0; i--) {
+				// 	buttons[i].setStyle({
+				// 		'transition': 'transform ' + duration,
+				// 		'transform': 'translateX(0px)',
+				// 		'-webkit-transform': 'translateX(0px)'
+				// 	})
+				// }
+				this.setStatus('close')
+			},
+			// 移动滑动选择器内容区域，同时显示出其隐藏的菜单
+			moveSwipeAction(moveX: number) {
+				// 设置菜单内容部分的偏移
+				this.sliderStyle = {
+					'transition': 'none',
+					transform: 'translateX(' + moveX + 'px)',
+					'-webkit-transform': 'translateX(' + moveX + 'px)'
+				}
+			},
+			// 获取过渡时间
+			getDuration(value: any): string {
+				if (value.toString().indexOf('s') >= 0) return value as string
+				return parseInt(value.toString()) > 30 ? value.toString() + 'ms' : value.toString() + 's'
+			}
+		},
+	})
+
+export default __sfc__
+function GenUniModulesUviewUltraComponentsUpSwipeActionItemUpSwipeActionItemRender(this: InstanceType<typeof __sfc__>): any | null {
+const _ctx = this
+const _cache = this.$.renderCache
+const _component_up_icon = resolveEasyComponent("up-icon",_easycom_up_icon)
+
+  return _cE("view", _uM({
+    class: "up-swipe-action-item",
+    ref: "up-swipe-action-item"
+  }), [
+    _cE("view", _uM({ class: "up-swipe-action-item__right" }), [
+      renderSlot(_ctx.$slots, "button", {}, (): any[] => [
+        _cE(Fragment, null, RenderHelpers.renderList(_ctx.options, (item, index, __index, _cached): any => {
+          return _cE("view", _uM({
+            key: index,
+            class: "up-swipe-action-item__right__button",
+            ref_for: true,
+            ref: `up-swipe-action-item__right__button-${index}`,
+            style: _nS([_ctx.getButtonStyle(item)]),
+            onClick: () => {_ctx.buttonClickHandler(item, index)}
+          }), [
+            _cE("view", _uM({
+              class: _nC(["up-swipe-action-item__right__button__wrapper", _uM({
+						'up-swipe-action-item__right__button__wrapper--primary': _ctx.getOptionStyleProp(item, 'backgroundColor', '') == 'primary'
+					})]),
+              style: _nS([_ctx.getWrapperStyle(item)])
+            }), [
+              isTrue(item['icon'])
+                ? _cV(_component_up_icon, _uM({
+                    key: 0,
+                    name: item['icon'],
+                    color: _ctx.getOptionStyleProp(item, 'color', '#ffffff'),
+                    size: _ctx.getOptionIconSize(item),
+                    customStyle: {
+								marginRight: item['text'] != null ? '2px' : 0
+							}
+                  }), null, 8 /* PROPS */, ["name", "color", "size", "customStyle"])
+                : _cC("v-if", true),
+              isTrue(item['text'])
+                ? _cE("text", _uM({
+                    key: 1,
+                    class: "up-swipe-action-item__right__button__wrapper__text up-line-1",
+                    style: _nS([_ctx.getTextStyle(item)])
+                  }), _tD(item['text']), 5 /* TEXT, STYLE */)
+                : _cC("v-if", true)
+            ], 6 /* CLASS, STYLE */)
+          ], 12 /* STYLE, PROPS */, ["onClick"])
+        }), 128 /* KEYED_FRAGMENT */)
+      ])
+    ]),
+    _cE("view", _uM({
+      class: "up-swipe-action-item__content",
+      onClick: _ctx.clickHandler,
+      onTouchstart: _ctx.touchstart,
+      onTouchmove: _ctx.touchmove,
+      onTouchend: _ctx.touchend,
+      onTouchcancel: _ctx.touchcancel,
+      style: _nS(_ctx.sliderStyle)
+    }), [
+      renderSlot(_ctx.$slots, "default")
+    ], 44 /* STYLE, PROPS, NEED_HYDRATION */, ["onClick", "onTouchstart", "onTouchmove", "onTouchend", "onTouchcancel"])
+  ], 512 /* NEED_PATCH */)
+}
+export type UpSwipeActionItemComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpSwipeActionItemUpSwipeActionItemStyles = [_uM([["up-swipe-action-item", _pS(_uM([["position", "relative"], ["overflow", "hidden"], ["display", "flex"], ["flexDirection", "column"]]))], ["up-swipe-action-item__content", _pS(_uM([["transform", "translateX(0px)"], ["backgroundColor", "#FFFFFF"], ["zIndex", 10], ["width", "100%"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["up-swipe-action-item__right", _pS(_uM([["position", "absolute"], ["top", 0], ["bottom", 0], ["right", 0], ["display", "flex"], ["flexDirection", "row"], ["zIndex", 1]]))], ["up-swipe-action-item__right__button", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["overflow", "hidden"], ["alignItems", "center"]]))], ["up-swipe-action-item__right__button__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["paddingTop", 0], ["paddingRight", 15], ["paddingBottom", 0], ["paddingLeft", 15]]))], ["up-swipe-action-item__right__button__wrapper--primary", _pS(_uM([["backgroundColor", "var(--theme-color, #0957de)"]]))], ["up-swipe-action-item__right__button__wrapper__text", _pS(_uM([["color", "#FFFFFF"], ["fontSize", 15], ["textAlign", "center"]]))]])]
+
+import _easycom_up_icon from '@/uni_modules/uview-ultra/components/up-icon/up-icon.uvue'

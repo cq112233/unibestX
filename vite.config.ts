@@ -28,7 +28,7 @@ export default defineConfig({
   },
   plugins: [
     // 手动补充 easycom 插件（仅在 Web/H5 平台生效，避免影响 App 原生编译）
-    (process.env.UNI_PLATFORM === 'web' || process.env.UNI_PLATFORM === 'h5') 
+    (process.env.UNI_PLATFORM === 'web' || process.env.UNI_PLATFORM === 'h5' || !process.env.UNI_PLATFORM) 
       ? uniEasycomPlugin({ exclude: UNI_EASYCOM_EXCLUDE }) 
       : null,
     uniLayoutsPlugin(), // 仿照 vite-plugin-uni-layouts 的跨端 Layout 布局插件

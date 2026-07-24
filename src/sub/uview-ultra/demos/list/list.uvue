@@ -1,55 +1,50 @@
 <template>
-  <view class="page-container bg-[#f8fafc] flex flex-col flex-1 h-full">
-    <NavBar title="up-list 双列表嵌套" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px flex flex-col">
+    <NavBar title="up-list 双列表" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
 
-    <!-- 嵌套滚动外层容器 -->
-    <scroll-view type="nested" direction="vertical" class="flex-1 h-0">
-      <!-- 列表 1：nested-scroll-header 1 (调高高度至 380px) -->
-      <nested-scroll-header>
-        <view class="p-12px pb-0">
-          <text class="text-14px font-bold text-[#2979ff] mb-8px">列表 1：动态加载列表 (高度 380px)</text>
-          <up-list
-            :height="380"
-            :lower-threshold="20"
-            :refresher-enabled="true"
-            :refresher-triggered="listRefreshing"
-            class="bg-white rounded-8px shadow-xs"
-            @scrolltolower="onListLoadMore"
-            @refresherrefresh="onListRefresh"
-          >
-            <view v-for="(item, idx) in listItems" :key="idx" class="demo-list-cell">
-              <view class="demo-list-cell-avatar">
-                <up-icon name="account" size="20" color="#ffffff"></up-icon>
-              </view>
-              <view class="demo-list-cell-content">
-                <text class="text-14px font-500 text-[#303133]">{{ item.title as string }}</text>
-                <text class="text-12px text-[#909399] mt-4px">{{ item.desc as string }}</text>
-              </view>
+    <view class="p-12px flex-1">
+      <!-- 列表 1：高度 380px -->
+      <view class="mb-16px">
+        <text class="text-14px font-bold text-[#2979ff] mb-8px">列表 1：动态加载列表 (高度 380px)</text>
+        <up-list
+          :height="380"
+          :lower-threshold="20"
+          :refresher-enabled="true"
+          :refresher-triggered="listRefreshing"
+          class="bg-white rounded-8px shadow-xs"
+          @scrolltolower="onListLoadMore"
+          @refresherrefresh="onListRefresh"
+        >
+          <view v-for="(item, idx) in listItems" :key="idx" class="demo-list-cell">
+            <view class="demo-list-cell-avatar">
+              <up-icon name="account" size="20" color="#ffffff"></up-icon>
             </view>
-            <view v-if="listLoading" class="list-loading">
-              <up-loading-icon mode="circle" size="20"></up-loading-icon>
-              <text class="text-12px text-[#909399] ml-8px">加载中...</text>
+            <view class="demo-list-cell-content">
+              <text class="text-14px font-500 text-[#303133]">{{ item.title as string }}</text>
+              <text class="text-12px text-[#909399] mt-4px">{{ item.desc as string }}</text>
             </view>
-          </up-list>
-        </view>
-      </nested-scroll-header>
+          </view>
+          <view v-if="listLoading" class="list-loading">
+            <up-loading-icon mode="circle" size="20"></up-loading-icon>
+            <text class="text-12px text-[#909399] ml-8px">加载中...</text>
+          </view>
+        </up-list>
+      </view>
 
-      <!-- 列表 2：nested-scroll-header 2 (高度 280px) -->
-      <nested-scroll-header>
-        <view class="p-12px pb-24px">
-          <text class="text-14px font-bold text-[#19be6b] mb-8px">列表 2：静态展示列表 (高度 280px)</text>
-          <up-list :height="280" class="bg-white rounded-8px shadow-xs">
-            <view v-for="(item, idx) in staticListItems" :key="idx" class="demo-list-cell">
-              <view class="w-8px h-8px rounded-4px bg-[#19be6b] mr-10px"></view>
-              <view class="demo-list-cell-content">
-                <text class="text-14px font-500 text-[#303133]">{{ item.title as string }}</text>
-                <text class="text-12px text-[#909399] mt-4px">{{ item.desc as string }}</text>
-              </view>
+      <!-- 列表 2：高度 280px -->
+      <view>
+        <text class="text-14px font-bold text-[#19be6b] mb-8px">列表 2：静态展示列表 (高度 280px)</text>
+        <up-list :height="280" class="bg-white rounded-8px shadow-xs">
+          <view v-for="(item, idx) in staticListItems" :key="idx" class="demo-list-cell">
+            <view class="w-8px h-8px rounded-4px bg-[#19be6b] mr-10px"></view>
+            <view class="demo-list-cell-content">
+              <text class="text-14px font-500 text-[#303133]">{{ item.title as string }}</text>
+              <text class="text-12px text-[#909399] mt-4px">{{ item.desc as string }}</text>
             </view>
-          </up-list>
-        </view>
-      </nested-scroll-header>
-    </scroll-view>
+          </view>
+        </up-list>
+      </view>
+    </view>
   </view>
 </template>
 

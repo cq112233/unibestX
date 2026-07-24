@@ -1,0 +1,121 @@
+import { reactive } from 'vue';
+import zhHans from './locales/zh-Hans.uts';
+import zhHant from './locales/zh-Hant.uts';
+import en from './locales/en.uts';
+import es from './locales/es.uts';
+import fr from './locales/fr.uts';
+import de from './locales/de.uts';
+import ko from './locales/ko.uts';
+import ja from './locales/ja.uts';
+import ru from './locales/ru.uts';
+export function normalizeLocale(locale: string): string {
+    if (locale == '' || locale == null)
+        return 'zh-Hans';
+    let l = locale.toLowerCase();
+    if (l.includes('zh-tw') || l.includes('zh-hk') || l.includes('zh-hant')) {
+        return 'zh-Hant';
+    }
+    if (l.includes('zh')) {
+        return 'zh-Hans';
+    }
+    if (l.includes('en')) {
+        return 'en';
+    }
+    if (l.includes('es'))
+        return 'es';
+    if (l.includes('fr'))
+        return 'fr';
+    if (l.includes('de'))
+        return 'de';
+    if (l.includes('ko'))
+        return 'ko';
+    if (l.includes('ja'))
+        return 'ja';
+    if (l.includes('ru'))
+        return 'ru';
+    return 'zh-Hans';
+}
+let settings = reactive({
+    lang: 'zh-Hans',
+    locales: {
+        en,
+        es,
+        fr,
+        de,
+        ko,
+        ja,
+        ru,
+        'zh-Hant': zhHant,
+        'zh-Hans': zhHans
+    } as UTSJSONObject
+}) as UTSJSONObject;
+export function setLocale(locale: string) {
+    settings['lang'] = normalizeLocale(locale);
+}
+export function getLocale(): string {
+    return settings['lang'] as string;
+}
+/**
+ * 多语言方法
+ */
+export function t(value: string, params: UTSJSONObject = {} as UTSJSONObject): string {
+    if (value != '') {
+        let key = value.replaceAll('.', '_');
+        let lang = normalizeLocale(settings['lang'] as string);
+        let locales = settings['locales'] as UTSJSONObject;
+        let currentDict = locales[lang] as UTSJSONObject | null;
+        if (currentDict == null) {
+            currentDict = locales['zh-Hans'] as UTSJSONObject | null;
+        }
+        let result = '';
+        if (currentDict != null && currentDict[key] != null) {
+            result = currentDict[key].toString();
+        }
+        else if (currentDict != null && currentDict[value] != null) {
+            result = currentDict[value].toString();
+        }
+        else {
+            result = value;
+        }
+        // 替换 {xxx} 变量
+        let resultStr = result.toString();
+        if (params != null) {
+            const keys = UTSJSONObject.keys(params);
+            for (let i = 0; i < keys.length; i++) {
+                const k = keys[i];
+                const val = params[k];
+                if (val != null) {
+                    resultStr = resultStr.replaceAll(`{${k}}`, val.toString());
+                }
+            }
+        }
+        return resultStr;
+    }
+    else {
+        return value;
+    }
+}
+export function formatMonthTitle(year: any, month: any): string {
+    const y = year != null ? year.toString() : '';
+    const m = month != null ? parseInt(month.toString()) : 0;
+    const lang = normalizeLocale(getLocale());
+    if (lang.startsWith('zh') || lang == 'ja') {
+        return `${y}年${m}月`;
+    }
+    else if (lang == 'ko') {
+        return `${y}년 ${m}월`;
+    }
+    else {
+        const enMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        const monthName = (m >= 1 && m <= 12) ? enMonths[m - 1] : m.toString(10);
+        return `${monthName} ${y}`;
+    }
+}
+export default {
+    settings: settings,
+    setLocale: setLocale,
+    getLocale: getLocale,
+    formatMonthTitle: formatMonthTitle,
+    t: t
+} as UTSJSONObject;
+//# sourceMappingURL=index.uts.map

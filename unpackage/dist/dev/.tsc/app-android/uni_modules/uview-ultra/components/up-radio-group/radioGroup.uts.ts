@@ -1,0 +1,30 @@
+/*
+ * @Author       : jry
+ * @Description  :
+ * @version      : 4.0
+ * @Date         : 2024-08-30 23:26:58
+ * @LastAuthor   : jry
+ * @lastTime     : 2024-08-30 23:26:58
+ * @FilePath     : /uview-ultra/libs/config/props/radioGroup
+ */
+export default {
+    // radio-group组件
+    radioGroup: {
+        value: '',
+        disabled: false,
+        shape: 'circle',
+        activeColor: '#2979ff',
+        inactiveColor: '#c8c9cc',
+        name: '',
+        size: 18,
+        placement: 'row',
+        label: '',
+        labelColor: '#303133',
+        labelSize: 14,
+        labelDisabled: false,
+        iconColor: '#ffffff',
+        iconSize: 12,
+        borderBottom: false,
+        iconPlacement: 'left'
+    }
+} as UTSJSONObject

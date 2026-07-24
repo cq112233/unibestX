@@ -1,0 +1,189 @@
+import _easycom_NavBar from '@/src/components/NavBar/NavBar.uvue'
+import _easycom_up_icon from '@/uni_modules/uview-ultra/components/up-icon/up-icon.uvue'
+import _easycom_up_loading_icon from '@/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.uvue'
+import _easycom_up_list from '@/uni_modules/uview-ultra/components/up-list/up-list.uvue'
+import AppKu from '@/App.ku.uvue'
+import LayoutComponent from '@/src/layouts/default.uvue'
+import { ref } from 'vue'
+
+
+const __sfc__ = defineComponent({
+  __name: 'list',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+const listItems = ref([
+  { title: '列表 1 - 项目 01', desc: '支持下拉刷新与触底加载' },
+  { title: '列表 1 - 项目 02', desc: '基于 scroll-view 封装' },
+  { title: '列表 1 - 项目 03', desc: '支持单指内部滚动' },
+  { title: '列表 1 - 项目 04', desc: '支持单指内部滚动' },
+  { title: '列表 1 - 项目 05', desc: '支持单指内部滚动' },
+  { title: '列表 1 - 项目 06', desc: '支持单指内部滚动' },
+  { title: '列表 1 - 项目 07', desc: '支持单指内部滚动' },
+  { title: '列表 1 - 项目 08', desc: '支持单指内部滚动' },
+  { title: '列表 1 - 项目 09', desc: '支持单指内部滚动' },
+  { title: '列表 1 - 项目 10', desc: '支持单指内部滚动' },
+  { title: '列表 1 - 项目 11', desc: '支持单指内部滚动' },
+  { title: '列表 1 - 项目 12', desc: '支持单指内部滚动' },
+  { title: '列表 1 - 项目 13', desc: '支持单指内部滚动' },
+  { title: '列表 1 - 项目 14', desc: '支持单指内部滚动' },
+  { title: '列表 1 - 项目 15', desc: '支持单指内部滚动' },
+] as UTSJSONObject[])
+
+const staticListItems = ref([
+  { title: '列表 2 - 项目 01', desc: '静态列表第 1 项内容' },
+  { title: '列表 2 - 项目 02', desc: '静态列表第 2 项内容' },
+  { title: '列表 2 - 项目 03', desc: '静态列表第 3 项内容' },
+  { title: '列表 2 - 项目 04', desc: '静态列表第 4 项内容' },
+  { title: '列表 2 - 项目 05', desc: '静态列表第 5 项内容' },
+  { title: '列表 2 - 项目 06', desc: '静态列表第 6 项内容' },
+  { title: '列表 2 - 项目 07', desc: '静态列表第 7 项内容' },
+  { title: '列表 2 - 项目 08', desc: '静态列表第 8 项内容' },
+  { title: '列表 2 - 项目 09', desc: '静态列表第 9 项内容' },
+  { title: '列表 2 - 项目 10', desc: '静态列表第 10 项内容' },
+  { title: '列表 2 - 项目 11', desc: '静态列表第 11 项内容' },
+  { title: '列表 2 - 项目 12', desc: '静态列表第 12 项内容' },
+  { title: '列表 2 - 项目 13', desc: '静态列表第 13 项内容' },
+  { title: '列表 2 - 项目 14', desc: '静态列表第 14 项内容' },
+  { title: '列表 2 - 项目 15', desc: '静态列表第 15 项内容' },
+] as UTSJSONObject[])
+
+const listLoading = ref(false)
+const listRefreshing = ref(false)
+let listLoadCount = 1
+
+function onListLoadMore(): void {
+  if (listLoading.value)
+    return
+  listLoading.value = true
+  setTimeout(() => {
+    listLoadCount += 1
+    const newItems: UTSJSONObject[] = []
+    for (let i = 1; i <= 3; i++) {
+      newItems.push({
+        title: `加载项 ${listLoadCount}-${i}`,
+        desc: `这是第 ${listLoadCount} 批加载的第 ${i} 条数据`,
+      } as UTSJSONObject)
+    }
+    listItems.value = listItems.value.concat(newItems)
+    listLoading.value = false
+    uni.showToast({ title: `加载了 ${newItems.length} 条`, icon: 'none', duration: 1500 })
+  }, 1000)
+}
+
+function onListRefresh(): void {
+  listRefreshing.value = true
+  setTimeout(() => {
+    listRefreshing.value = false
+    uni.showToast({ title: '刷新完成', icon: 'none', duration: 1500 })
+  }, 1500)
+}
+
+return (): any | null => {
+
+const _component_NavBar = resolveEasyComponent("NavBar",_easycom_NavBar)
+const _component_up_icon = resolveEasyComponent("up-icon",_easycom_up_icon)
+const _component_up_loading_icon = resolveEasyComponent("up-loading-icon",_easycom_up_loading_icon)
+const _component_up_list = resolveEasyComponent("up-list",_easycom_up_list)
+
+  return _cV(unref(AppKu), null, _uM({
+    default: withSlotCtx((): any[] => [
+      _cV(unref(LayoutComponent), _uM({
+        "navigation-style": 'custom',
+        "navigation-bar-title-text": 'up-list 列表',
+        "disable-scroll": true
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({ class: "page-container bg-__f8fafc_ min-h-screen pb-30px flex flex-col" }), [
+            _cV(_component_NavBar, _uM({
+              title: "up-list 双列表",
+              "auto-back": true,
+              "safe-area-inset-top": true,
+              "bg-color": "#ffffff"
+            })),
+            _cE("view", _uM({ class: "p-12px flex-1" }), [
+              _cE("view", _uM({ class: "mb-16px" }), [
+                _cE("text", _uM({ class: "text-14px font-bold text-__2979ff_ mb-8px" }), "列表 1：动态加载列表 (高度 380px)"),
+                _cV(_component_up_list, _uM({
+                  height: 380,
+                  "lower-threshold": 20,
+                  "refresher-enabled": true,
+                  "refresher-triggered": listRefreshing.value,
+                  class: "bg-white rounded-8px shadow-xs",
+                  onScrolltolower: onListLoadMore,
+                  onRefresherrefresh: onListRefresh
+                }), _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cE(Fragment, null, RenderHelpers.renderList(listItems.value, (item, idx, __index, _cached): any => {
+                      return _cE("view", _uM({
+                        key: idx,
+                        class: "demo-list-cell"
+                      }), [
+                        _cE("view", _uM({ class: "demo-list-cell-avatar" }), [
+                          _cV(_component_up_icon, _uM({
+                            name: "account",
+                            size: "20",
+                            color: "#ffffff"
+                          }))
+                        ]),
+                        _cE("view", _uM({ class: "demo-list-cell-content" }), [
+                          _cE("text", _uM({ class: "text-14px font-500 text-__303133_" }), _tD(item.title as string), 1 /* TEXT */),
+                          _cE("text", _uM({ class: "text-12px text-__909399_ mt-4px" }), _tD(item.desc as string), 1 /* TEXT */)
+                        ])
+                      ])
+                    }), 128 /* KEYED_FRAGMENT */),
+                    isTrue(listLoading.value)
+                      ? _cE("view", _uM({
+                          key: 0,
+                          class: "list-loading"
+                        }), [
+                          _cV(_component_up_loading_icon, _uM({
+                            mode: "circle",
+                            size: "20"
+                          })),
+                          _cE("text", _uM({ class: "text-12px text-__909399_ ml-8px" }), "加载中...")
+                        ])
+                      : _cC("v-if", true)
+                  ]),
+                  _: 1 /* STABLE */
+                }), 8 /* PROPS */, ["refresher-triggered"])
+              ]),
+              _cE("view", null, [
+                _cE("text", _uM({ class: "text-14px font-bold text-__19be6b_ mb-8px" }), "列表 2：静态展示列表 (高度 280px)"),
+                _cV(_component_up_list, _uM({
+                  height: 280,
+                  class: "bg-white rounded-8px shadow-xs"
+                }), _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cE(Fragment, null, RenderHelpers.renderList(staticListItems.value, (item, idx, __index, _cached): any => {
+                      return _cE("view", _uM({
+                        key: idx,
+                        class: "demo-list-cell"
+                      }), [
+                        _cE("view", _uM({ class: "w-8px h-8px rounded-4px bg-__19be6b_ mr-10px" })),
+                        _cE("view", _uM({ class: "demo-list-cell-content" }), [
+                          _cE("text", _uM({ class: "text-14px font-500 text-__303133_" }), _tD(item.title as string), 1 /* TEXT */),
+                          _cE("text", _uM({ class: "text-12px text-__909399_ mt-4px" }), _tD(item.desc as string), 1 /* TEXT */)
+                        ])
+                      ])
+                    }), 128 /* KEYED_FRAGMENT */)
+                  ]),
+                  _: 1 /* STABLE */
+                }))
+              ])
+            ])
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }))
+    ]),
+    _: 1 /* STABLE */
+  }))
+}
+}
+
+})
+export default __sfc__
+const GenSrcSubUviewUltraDemosListListStyles = [_uM([["bg-__19be6b_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#19be6b"]]))], ["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["bg-white", _pS(_uM([["backgroundColor", "rgba(255,255,255,var(--un-bg-opacity,1))"]]))], ["flex", _pS(_uM([["display", "flex"]]))], ["flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["flex-col", _pS(_uM([["flexDirection", "column"]]))], ["font-500", _pS(_uM([["fontWeight", 500]]))], ["font-bold", _pS(_uM([["fontWeight", 700]]))], ["h-8px", _pS(_uM([["height", 8]]))], ["mb-16px", _pS(_uM([["marginBottom", 16]]))], ["mb-8px", _pS(_uM([["marginBottom", 8]]))], ["ml-8px", _pS(_uM([["marginLeft", 8]]))], ["mr-10px", _pS(_uM([["marginRight", 10]]))], ["mt-4px", _pS(_uM([["marginTop", 4]]))], ["none", _pS(_uM([["display", "none"]]))], ["p-12px", _pS(_uM([["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["rounded-4px", _pS(_uM([["borderTopLeftRadius", 4], ["borderTopRightRadius", 4], ["borderBottomRightRadius", 4], ["borderBottomLeftRadius", 4]]))], ["rounded-8px", _pS(_uM([["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["shadow-xs", _pS(_uM([["boxShadow", "var(--un-inset-shadow,0 0 #0000),var(--un-inset-ring-shadow,0 0 #0000),var(--un-ring-offset-shadow,0 0 #0000),var(--un-ring-shadow,0 0 #0000),var(--un-shadow,0 1rpx 3rpx 0 var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))))"], ["--un-shadow", "0 1rpx 2rpx 0rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.05)))"]]))], ["text-__19be6b_", _pS(_uM([["color", "#19be6b"]]))], ["text-__2979ff_", _pS(_uM([["color", "#2979ff"]]))], ["text-__303133_", _pS(_uM([["color", "#303133"]]))], ["text-__909399_", _pS(_uM([["color", "#909399"]]))], ["text-12px", _pS(_uM([["fontSize", 12]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))], ["w-8px", _pS(_uM([["width", 8]]))], ["demo-list-cell", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16], ["backgroundColor", "#ffffff"], ["borderBottomWidth", 1], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f5f5f5"]]))], ["demo-list-cell-avatar", _pS(_uM([["width", 40], ["height", 40], ["borderTopLeftRadius", 4], ["borderTopRightRadius", 4], ["borderBottomRightRadius", 4], ["borderBottomLeftRadius", 4], ["marginRight", 12], ["backgroundColor", "#2979ff"], ["display", "flex"], ["justifyContent", "center"], ["alignItems", "center"]]))], ["demo-list-cell-content", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["list-loading", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["paddingTop", 15], ["paddingRight", 0], ["paddingBottom", 15], ["paddingLeft", 0]]))]])]

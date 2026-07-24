@@ -1,0 +1,277 @@
+import '/Applications/HBuilderX 2.app/Contents/HBuilderX/plugins/uniapp-cli-vite/node_modules/@dcloudio/uni-console/src/runtime/app/index.ts';import App from './App.uvue' // 导入应用根组件 App.uvue
+import { createSSRApp } from 'vue' // 导入 Vue 的 SSR 应用创建方法
+import pinia from './src/store'  // 导入 Pinia 状态管理实例（在 App-Android 平台上强制进行顶层定义约束）
+import i18n from './src/i18n' // 导入 i18n 国际化配置实例
+import ultraUI from '@/uni_modules/uview-ultra/index.uts' // 导入 uview-ultra 跨端 UI 组件库
+import { installRouteInterceptor } from './src/router/interceptor' // 导入全局路由拦截器安装函数
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * 创建应用实例的入口函数
+ */
+export function createApp() {
+	// 安装全局路由拦截器
+	installRouteInterceptor()
+
+	// 创建 Vue 应用程序实例，传入根组件 App
+	const app = createSSRApp(App)
+
+	// 注册 Pinia 状态管理
+	app.use(pinia)
+
+	// 可选配置：将 pinia 实例挂载到 Vue 全局属性中，以便于在 Options API 模板中使用 this.$pinia 访问
+	app.config.globalProperties.$pinia = pinia
+
+	// 注册 i18n 国际化插件
+	app.use(i18n)
+
+	// 注册 uview-ultra UI 组件库并传入自定义初始化配置项
+	app.use(ultraUI, () => {
+		return {
+			options: {
+				config: {
+					// 开启只加载一次字体图标的优化，避免重复加载
+					loadFontOnce: true
+				}
+			}
+		}
+	})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	// 返回创建好的应用实例对象，供系统挂载运行
+	return {
+		app
+	}
+}
+
+export function main(app: IApp) {
+    definePageRoutes();
+    defineAppConfig();
+    (createApp()['app'] as VueApp).mount(app, GenUniApp());
+}
+
+export class UniAppConfig extends io.dcloud.uniapp.appframe.AppConfig {
+    override name: string = "unibestX"
+    override appid: string = "__UNI__5198058"
+    override versionName: string = "1.0.0"
+    override versionCode: string = "100"
+    override uniCompilerVersion: string = "5.15"
+    
+    constructor() { super() }
+}
+
+import GenSrcPagesIndexIndexClass from './src/pages/index/index.uvue'
+import GenSrcPagesMeMeClass from './src/pages/me/me.uvue'
+import GenSrcPagesBasicBasicClass from './src/pages/basic/basic.uvue'
+import GenSrcPagesFunctionFunctionClass from './src/pages/function/function.uvue'
+import GenSrcPagesAiAiClass from './src/pages/ai/ai.uvue'
+import GenSrcSubAuthLoginClass from './src/sub/auth/login.uvue'
+import GenSrcSubAuthRegisterClass from './src/sub/auth/register.uvue'
+import GenSrcSubTestTestClass from './src/sub/test/test.uvue'
+import GenSrcSubPagingPagingClass from './src/sub/paging/paging.uvue'
+import GenSrcSubUviewUltraUviewUltraClass from './src/sub/uview-ultra/uview-ultra.uvue'
+import GenSrcSubUiTestUiTestClass from './src/sub/uiTest/uiTest.uvue'
+import GenSrcSubUviewUltraDemosIconIconClass from './src/sub/uview-ultra/demos/icon/icon.uvue'
+import GenSrcSubUviewUltraDemosTextTextClass from './src/sub/uview-ultra/demos/text/text.uvue'
+import GenSrcSubUviewUltraDemosEmptyEmptyClass from './src/sub/uview-ultra/demos/empty/empty.uvue'
+import GenSrcSubUviewUltraDemosDividerDividerClass from './src/sub/uview-ultra/demos/divider/divider.uvue'
+import GenSrcSubUviewUltraDemosLoadingIconLoadingIconClass from './src/sub/uview-ultra/demos/loading-icon/loading-icon.uvue'
+import GenSrcSubUviewUltraDemosSkeletonSkeletonClass from './src/sub/uview-ultra/demos/skeleton/skeleton.uvue'
+import GenSrcSubUviewUltraDemosCardCardClass from './src/sub/uview-ultra/demos/card/card.uvue'
+import GenSrcSubUviewUltraDemosListListClass from './src/sub/uview-ultra/demos/list/list.uvue'
+import GenSrcSubUviewUltraDemosSwiperSwiperClass from './src/sub/uview-ultra/demos/swiper/swiper.uvue'
+import GenSrcSubUviewUltraDemosImageImageClass from './src/sub/uview-ultra/demos/image/image.uvue'
+import GenSrcSubUviewUltraDemosTransitionTransitionClass from './src/sub/uview-ultra/demos/transition/transition.uvue'
+import GenSrcSubUviewUltraDemosStepsStepsClass from './src/sub/uview-ultra/demos/steps/steps.uvue'
+import GenSrcSubUviewUltraDemosTableTableClass from './src/sub/uview-ultra/demos/table/table.uvue'
+import GenSrcSubUviewUltraDemosFormFormClass from './src/sub/uview-ultra/demos/form/form.uvue'
+import GenSrcSubUviewUltraDemosPaginationPaginationClass from './src/sub/uview-ultra/demos/pagination/pagination.uvue'
+import GenSrcSubUviewUltraDemosCodeInputCodeInputClass from './src/sub/uview-ultra/demos/code-input/code-input.uvue'
+import GenSrcSubUviewUltraDemosButtonButtonClass from './src/sub/uview-ultra/demos/button/button.uvue'
+import GenSrcSubUviewUltraDemosInputInputClass from './src/sub/uview-ultra/demos/input/input.uvue'
+import GenSrcSubUviewUltraDemosCheckboxCheckboxClass from './src/sub/uview-ultra/demos/checkbox/checkbox.uvue'
+import GenSrcSubUviewUltraDemosTagTagClass from './src/sub/uview-ultra/demos/tag/tag.uvue'
+import GenSrcSubUviewUltraDemosRadioRadioClass from './src/sub/uview-ultra/demos/radio/radio.uvue'
+import GenSrcSubUviewUltraDemosSwitchSwitchClass from './src/sub/uview-ultra/demos/switch/switch.uvue'
+import GenSrcSubUviewUltraDemosRateRateClass from './src/sub/uview-ultra/demos/rate/rate.uvue'
+import GenSrcSubUviewUltraDemosNumberBoxNumberBoxClass from './src/sub/uview-ultra/demos/number-box/number-box.uvue'
+import GenSrcSubUviewUltraDemosSliderSliderClass from './src/sub/uview-ultra/demos/slider/slider.uvue'
+import GenSrcSubUviewUltraDemosTextareaTextareaClass from './src/sub/uview-ultra/demos/textarea/textarea.uvue'
+import GenSrcSubUviewUltraDemosUploadUploadClass from './src/sub/uview-ultra/demos/upload/upload.uvue'
+import GenSrcSubUviewUltraDemosCalendarCalendarClass from './src/sub/uview-ultra/demos/calendar/calendar.uvue'
+import GenSrcSubUviewUltraDemosPickerPickerClass from './src/sub/uview-ultra/demos/picker/picker.uvue'
+import GenSrcSubUviewUltraDemosDatetimePickerDatetimePickerClass from './src/sub/uview-ultra/demos/datetime-picker/datetime-picker.uvue'
+import GenSrcSubUviewUltraDemosActionSheetActionSheetClass from './src/sub/uview-ultra/demos/action-sheet/action-sheet.uvue'
+import GenSrcSubUviewUltraDemosBadgeBadgeClass from './src/sub/uview-ultra/demos/badge/badge.uvue'
+import GenSrcSubUviewUltraDemosAvatarAvatarClass from './src/sub/uview-ultra/demos/avatar/avatar.uvue'
+import GenSrcSubUviewUltraDemosSearchSearchClass from './src/sub/uview-ultra/demos/search/search.uvue'
+import GenSrcSubUviewUltraDemosAlertAlertClass from './src/sub/uview-ultra/demos/alert/alert.uvue'
+import GenSrcSubUviewUltraDemosNoticeBarNoticeBarClass from './src/sub/uview-ultra/demos/notice-bar/notice-bar.uvue'
+import GenSrcSubUviewUltraDemosCollapseCollapseClass from './src/sub/uview-ultra/demos/collapse/collapse.uvue'
+import GenSrcSubUviewUltraDemosToastToastClass from './src/sub/uview-ultra/demos/toast/toast.uvue'
+import GenSrcSubUviewUltraDemosNotifyNotifyClass from './src/sub/uview-ultra/demos/notify/notify.uvue'
+import GenSrcSubUviewUltraDemosLoadingPageLoadingPageClass from './src/sub/uview-ultra/demos/loading-page/loading-page.uvue'
+import GenSrcSubUviewUltraDemosOverlayOverlayClass from './src/sub/uview-ultra/demos/overlay/overlay.uvue'
+import GenSrcSubUviewUltraDemosModalModalClass from './src/sub/uview-ultra/demos/modal/modal.uvue'
+import GenSrcSubUviewUltraDemosPopupPopupClass from './src/sub/uview-ultra/demos/popup/popup.uvue'
+import GenSrcSubUviewUltraDemosTooltipTooltipClass from './src/sub/uview-ultra/demos/tooltip/tooltip.uvue'
+import GenSrcSubUviewUltraDemosNoNetworkNoNetworkClass from './src/sub/uview-ultra/demos/no-network/no-network.uvue'
+import GenSrcSubUviewUltraDemosCopyCopyClass from './src/sub/uview-ultra/demos/copy/copy.uvue'
+import GenSrcSubUviewUltraDemosGridGridClass from './src/sub/uview-ultra/demos/grid/grid.uvue'
+import GenSrcSubUviewUltraDemosLineLineClass from './src/sub/uview-ultra/demos/line/line.uvue'
+import GenSrcSubUviewUltraDemosAlbumAlbumClass from './src/sub/uview-ultra/demos/album/album.uvue'
+import GenSrcSubUviewUltraDemosGapGapClass from './src/sub/uview-ultra/demos/gap/gap.uvue'
+import GenSrcSubUviewUltraDemosStickyStickyClass from './src/sub/uview-ultra/demos/sticky/sticky.uvue'
+import GenSrcSubUviewUltraDemosKeyboardKeyboardClass from './src/sub/uview-ultra/demos/keyboard/keyboard.uvue'
+import GenSrcSubUviewUltraDemosDropdownDropdownClass from './src/sub/uview-ultra/demos/dropdown/dropdown.uvue'
+import GenSrcSubUviewUltraDemosSwipeActionSwipeActionClass from './src/sub/uview-ultra/demos/swipe-action/swipe-action.uvue'
+import GenSrcSubUviewUltraDemosLineProgressLineProgressClass from './src/sub/uview-ultra/demos/line-progress/line-progress.uvue'
+import GenSrcSubUviewUltraDemosCountDownCountDownClass from './src/sub/uview-ultra/demos/count-down/count-down.uvue'
+import GenSrcSubUviewUltraDemosCountToCountToClass from './src/sub/uview-ultra/demos/count-to/count-to.uvue'
+import GenSrcSubUviewUltraDemosNavbarNavbarClass from './src/sub/uview-ultra/demos/navbar/navbar.uvue'
+import GenSrcSubUviewUltraDemosTabbarTabbarClass from './src/sub/uview-ultra/demos/tabbar/tabbar.uvue'
+import GenSrcSubUviewUltraDemosTabsTabsClass from './src/sub/uview-ultra/demos/tabs/tabs.uvue'
+import GenSrcSubUviewUltraDemosSubsectionSubsectionClass from './src/sub/uview-ultra/demos/subsection/subsection.uvue'
+import GenSrcSubUviewUltraDemosIndexListIndexListClass from './src/sub/uview-ultra/demos/index-list/index-list.uvue'
+import GenSrcSubUviewUltraDemosNavbarMiniNavbarMiniClass from './src/sub/uview-ultra/demos/navbar-mini/navbar-mini.uvue'
+import GenSrcSubUviewUltraDemosQrcodeQrcodeClass from './src/sub/uview-ultra/demos/qrcode/qrcode.uvue'
+import GenSrcSubUviewUltraDemosLazyLoadLazyLoadClass from './src/sub/uview-ultra/demos/lazy-load/lazy-load.uvue'
+import GenSrcSubUviewUltraDemosLoadmoreLoadmoreClass from './src/sub/uview-ultra/demos/loadmore/loadmore.uvue'
+import GenSrcSubUviewUltraDemosWaterfallWaterfallClass from './src/sub/uview-ultra/demos/waterfall/waterfall.uvue'
+import GenSrcSubUviewUltraDemosCodeCodeClass from './src/sub/uview-ultra/demos/code/code.uvue'
+import GenSrcSubUviewUltraDemosParseParseClass from './src/sub/uview-ultra/demos/parse/parse.uvue'
+import GenSrcSubUviewUltraDemosBackTopBackTopClass from './src/sub/uview-ultra/demos/back-top/back-top.uvue'
+import GenSrcSubUviewUltraDemosMpHtmlMpHtmlClass from './src/sub/uview-ultra/demos/mp-html/mp-html.uvue'
+function definePageRoutes() {
+__uniRoutes.push({ path: "src/pages/index/index", component: GenSrcPagesIndexIndexClass, meta: { isQuit: true } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","首页"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/pages/me/me", component: GenSrcPagesMeMeClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","我的"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/pages/basic/basic", component: GenSrcPagesBasicBasicClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","基础"],["disableScroll",true]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/pages/function/function", component: GenSrcPagesFunctionFunctionClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","功能"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/pages/ai/ai", component: GenSrcPagesAiAiClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","AI助手"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/auth/login", component: GenSrcSubAuthLoginClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","登录"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/auth/register", component: GenSrcSubAuthRegisterClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","注册"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/test/test", component: GenSrcSubTestTestClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","测试"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/paging/paging", component: GenSrcSubPagingPagingClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","分页加载"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/uview-ultra", component: GenSrcSubUviewUltraUviewUltraClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","uview-ultra 示例"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uiTest/uiTest", component: GenSrcSubUiTestUiTestClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","UI 测试"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/icon/icon", component: GenSrcSubUviewUltraDemosIconIconClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-icon 图标"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/text/text", component: GenSrcSubUviewUltraDemosTextTextClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-text 文本"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/empty/empty", component: GenSrcSubUviewUltraDemosEmptyEmptyClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-empty 空白页"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/divider/divider", component: GenSrcSubUviewUltraDemosDividerDividerClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-divider 分割线"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/loading-icon/loading-icon", component: GenSrcSubUviewUltraDemosLoadingIconLoadingIconClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-loading-icon 加载图标"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/skeleton/skeleton", component: GenSrcSubUviewUltraDemosSkeletonSkeletonClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-skeleton 骨架屏"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/card/card", component: GenSrcSubUviewUltraDemosCardCardClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-card 卡片"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/list/list", component: GenSrcSubUviewUltraDemosListListClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-list 列表"],["disableScroll",true]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/swiper/swiper", component: GenSrcSubUviewUltraDemosSwiperSwiperClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-swiper 轮播图"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/image/image", component: GenSrcSubUviewUltraDemosImageImageClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-image 图片"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/transition/transition", component: GenSrcSubUviewUltraDemosTransitionTransitionClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-transition 动画"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/steps/steps", component: GenSrcSubUviewUltraDemosStepsStepsClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-steps 步骤条"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/table/table", component: GenSrcSubUviewUltraDemosTableTableClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-table 表格"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/form/form", component: GenSrcSubUviewUltraDemosFormFormClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-form 表单"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/pagination/pagination", component: GenSrcSubUviewUltraDemosPaginationPaginationClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-pagination 分页器"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/code-input/code-input", component: GenSrcSubUviewUltraDemosCodeInputCodeInputClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-code-input 验证码"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/button/button", component: GenSrcSubUviewUltraDemosButtonButtonClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-button 按钮"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/input/input", component: GenSrcSubUviewUltraDemosInputInputClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-input 输入框"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/checkbox/checkbox", component: GenSrcSubUviewUltraDemosCheckboxCheckboxClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-checkbox 复选框"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/tag/tag", component: GenSrcSubUviewUltraDemosTagTagClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-tag 标签"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/radio/radio", component: GenSrcSubUviewUltraDemosRadioRadioClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-radio 单选框"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/switch/switch", component: GenSrcSubUviewUltraDemosSwitchSwitchClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-switch 开关"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/rate/rate", component: GenSrcSubUviewUltraDemosRateRateClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-rate 评分"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/number-box/number-box", component: GenSrcSubUviewUltraDemosNumberBoxNumberBoxClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-number-box 步进器"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/slider/slider", component: GenSrcSubUviewUltraDemosSliderSliderClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-slider 滑块"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/textarea/textarea", component: GenSrcSubUviewUltraDemosTextareaTextareaClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-textarea 多行文本"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/upload/upload", component: GenSrcSubUviewUltraDemosUploadUploadClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-upload 上传"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/calendar/calendar", component: GenSrcSubUviewUltraDemosCalendarCalendarClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-calendar 日历"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/picker/picker", component: GenSrcSubUviewUltraDemosPickerPickerClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-picker 选择器"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/datetime-picker/datetime-picker", component: GenSrcSubUviewUltraDemosDatetimePickerDatetimePickerClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-datetime-picker 时间选择"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/action-sheet/action-sheet", component: GenSrcSubUviewUltraDemosActionSheetActionSheetClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-action-sheet 动作面板"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/badge/badge", component: GenSrcSubUviewUltraDemosBadgeBadgeClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-badge 徽标"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/avatar/avatar", component: GenSrcSubUviewUltraDemosAvatarAvatarClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-avatar 头像"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/search/search", component: GenSrcSubUviewUltraDemosSearchSearchClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-search 搜索"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/alert/alert", component: GenSrcSubUviewUltraDemosAlertAlertClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-alert 警告提示"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/notice-bar/notice-bar", component: GenSrcSubUviewUltraDemosNoticeBarNoticeBarClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-notice-bar 通知"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/collapse/collapse", component: GenSrcSubUviewUltraDemosCollapseCollapseClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-collapse 折叠面板"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/toast/toast", component: GenSrcSubUviewUltraDemosToastToastClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-toast 消息提示"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/notify/notify", component: GenSrcSubUviewUltraDemosNotifyNotifyClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-notify 消息通知"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/loading-page/loading-page", component: GenSrcSubUviewUltraDemosLoadingPageLoadingPageClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-loading-page 加载页"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/overlay/overlay", component: GenSrcSubUviewUltraDemosOverlayOverlayClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-overlay 遮罩层"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/modal/modal", component: GenSrcSubUviewUltraDemosModalModalClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-modal 模态框"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/popup/popup", component: GenSrcSubUviewUltraDemosPopupPopupClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-popup 弹出层"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/tooltip/tooltip", component: GenSrcSubUviewUltraDemosTooltipTooltipClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-tooltip 长按提示"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/no-network/no-network", component: GenSrcSubUviewUltraDemosNoNetworkNoNetworkClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-no-network 无网络"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/copy/copy", component: GenSrcSubUviewUltraDemosCopyCopyClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-copy 文本复制"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/grid/grid", component: GenSrcSubUviewUltraDemosGridGridClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-grid 宫格"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/line/line", component: GenSrcSubUviewUltraDemosLineLineClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-line 线条"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/album/album", component: GenSrcSubUviewUltraDemosAlbumAlbumClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-album 相册"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/gap/gap", component: GenSrcSubUviewUltraDemosGapGapClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-gap 间隔槽"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/sticky/sticky", component: GenSrcSubUviewUltraDemosStickyStickyClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-sticky 吸顶"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/keyboard/keyboard", component: GenSrcSubUviewUltraDemosKeyboardKeyboardClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-keyboard 键盘"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/dropdown/dropdown", component: GenSrcSubUviewUltraDemosDropdownDropdownClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-dropdown 下拉菜单"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/swipe-action/swipe-action", component: GenSrcSubUviewUltraDemosSwipeActionSwipeActionClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-swipe-action 滑动操作"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/line-progress/line-progress", component: GenSrcSubUviewUltraDemosLineProgressLineProgressClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-line-progress 线型进度条"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/count-down/count-down", component: GenSrcSubUviewUltraDemosCountDownCountDownClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-count-down 倒计时"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/count-to/count-to", component: GenSrcSubUviewUltraDemosCountToCountToClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-count-to 数字滚动"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/navbar/navbar", component: GenSrcSubUviewUltraDemosNavbarNavbarClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-navbar 导航栏"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/tabbar/tabbar", component: GenSrcSubUviewUltraDemosTabbarTabbarClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-tabbar 底部导航"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/tabs/tabs", component: GenSrcSubUviewUltraDemosTabsTabsClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-tabs 标签页"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/subsection/subsection", component: GenSrcSubUviewUltraDemosSubsectionSubsectionClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-subsection 分段器"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/index-list/index-list", component: GenSrcSubUviewUltraDemosIndexListIndexListClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-index-list 索引列表"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/navbar-mini/navbar-mini", component: GenSrcSubUviewUltraDemosNavbarMiniNavbarMiniClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-navbar-mini 迷你导航栏"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/qrcode/qrcode", component: GenSrcSubUviewUltraDemosQrcodeQrcodeClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-qrcode 二维码"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/lazy-load/lazy-load", component: GenSrcSubUviewUltraDemosLazyLoadLazyLoadClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-lazy-load 懒加载"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/loadmore/loadmore", component: GenSrcSubUviewUltraDemosLoadmoreLoadmoreClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-loadmore 加载更多"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/waterfall/waterfall", component: GenSrcSubUviewUltraDemosWaterfallWaterfallClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-waterfall 瀑布流"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/code/code", component: GenSrcSubUviewUltraDemosCodeCodeClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationStyle","custom"],["navigationBarTitleText","up-code 验证码倒计时"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/parse/parse", component: GenSrcSubUviewUltraDemosParseParseClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","Parse 富文本解析"],["navigationStyle","custom"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/back-top/back-top", component: GenSrcSubUviewUltraDemosBackTopBackTopClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","Back Top 返回顶部"],["navigationStyle","custom"]]) } as UniPageRoute)
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/mp-html/mp-html", component: GenSrcSubUviewUltraDemosMpHtmlMpHtmlClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText","mp-html 富文本组件"],["navigationStyle","custom"]]) } as UniPageRoute)
+}
+const __uniTabBar: Map<string, any | null> | null = _uM([["custom",true],["color","#999999"],["selectedColor","#1890ff"],["backgroundColor","#F8F8F8"],["list",[_uM([["pagePath","src/pages/index/index"],["text","首页"]]),_uM([["pagePath","src/pages/basic/basic"],["text","基础"]]),_uM([["pagePath","src/pages/function/function"],["text","功能"]]),_uM([["pagePath","src/pages/me/me"],["text","我的"]])]]])
+const __uniLaunchPage: Map<string, any | null> = _uM([["url","src/pages/index/index"],["style",_uM([["navigationStyle","custom"],["navigationBarTitleText","首页"]])]])
+function defineAppConfig(){
+  __uniConfig.entryPagePath = '/src/pages/index/index'
+  __uniConfig.globalStyle = _uM([["navigationBarTextStyle","black"],["navigationBarTitleText","uni-app x"],["navigationBarBackgroundColor","#ffffff"],["backgroundColor","#F8F8F8"]])
+  __uniConfig.getTabBarConfig = ():Map<string, any> | null =>  _uM([["custom",true],["color","#999999"],["selectedColor","#1890ff"],["backgroundColor","#F8F8F8"],["list",[_uM([["pagePath","src/pages/index/index"],["text","首页"]]),_uM([["pagePath","src/pages/basic/basic"],["text","基础"]]),_uM([["pagePath","src/pages/function/function"],["text","功能"]]),_uM([["pagePath","src/pages/me/me"],["text","我的"]])]]])
+  __uniConfig.tabBar = __uniConfig.getTabBarConfig()
+  __uniConfig.conditionUrl = ''
+  __uniConfig.uniIdRouter = new Map()
+  
+  __uniConfig.ready = true
+}
