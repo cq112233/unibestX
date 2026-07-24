@@ -6,6 +6,7 @@
 		@close="close"
 		:round="round"
 		:closeOnClickOverlay="closeOnClickOverlay"
+		:safeAreaInsetBottom="safeAreaInsetBottom"
 	>
 		<view class="up-calendar">
 			<uHeader
@@ -558,7 +559,7 @@ export default {
 
 .up-calendar {
 	&__confirm {
-		padding: 7px 18px;
+		padding: 12px 18px 16px 18px;
 	}
 }
 </style>
