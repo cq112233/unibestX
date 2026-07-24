@@ -1,6 +1,5 @@
 name: Deploy Web and Docs to Pages
 
-# 仅 main 分支推送才触发，gh-pages 分支变动完全不会触发任何工作流
 on:
   push:
     branches: [ main ]
@@ -33,26 +32,19 @@ jobs:
       - name: 安装项目依赖
         run: pnpm install
 
-      # 只打包 VitePress 文档，不再执行 H5 打包命令 build:h5
       - name: 打包文档站点
         run: pnpm run docs:build
 
-      # 整合文件：读取仓库内已经上传好的 H5 打包资源 + 刚打包的文档
       - name: 整理部署目录文件
         run: |
           mkdir -p ./dist_deploy
-          # 拷贝本地已提交的H5页面至部署根目录
           cp -r ./unpackage/dist/build/web/* ./dist_deploy/
-          # 文档放到 docs 子文件夹
           mkdir -p ./dist_deploy/docs
           cp -r ./docs/.vitepress/dist/* ./dist_deploy/docs/
-          # 必须创建 .nojekyll 关闭Jekyll渲染，避免下划线静态资源丢失
           touch ./dist_deploy/.nojekyll
 
-      # 推送静态文件到 gh-pages 分支
       - name: 部署至 GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist_deploy
-          # 移除 force_orphan: true，防止每次清空分支造成CDN缓存异常
