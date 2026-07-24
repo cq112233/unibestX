@@ -1,0 +1,170 @@
+import { UTSObject, defineSyncApi } from "@normalized:N&&&@dcloudio/uni-app-framework/index&1.0.0";
+import abilityAccessCtrl from "@ohos:abilityAccessCtrl";
+import bundleManager from "@ohos:bundle.bundleManager";
+import notificationManager from "@ohos:notificationManager";
+type GetAppAuthorizeSetting = () => GetAppAuthorizeSettingResult;
+class GetAppAuthorizeSettingResult extends UTSObject {
+    albumAuthorized!: 'authorized' | 'denied' | 'not determined' | 'config error';
+    bluetoothAuthorized!: 'authorized' | 'denied' | 'not determined' | 'config error';
+    cameraAuthorized!: 'authorized' | 'denied' | 'not determined' | 'config error';
+    locationAuthorized!: 'authorized' | 'denied' | 'not determined' | 'config error';
+    locationAccuracy: 'reduced' | 'full' | 'unsupported' | null = null;
+    locationReducedAccuracy: boolean | null = null;
+    microphoneAuthorized!: 'authorized' | 'denied' | 'not determined' | 'config error';
+    notificationAuthorized!: 'authorized' | 'denied' | 'not determined' | 'config error';
+    notificationAlertAuthorized: 'authorized' | 'denied' | 'not determined' | 'config error' | null = null;
+    notificationBadgeAuthorized: 'authorized' | 'denied' | 'not determined' | 'config error' | null = null;
+    notificationSoundAuthorized: 'authorized' | 'denied' | 'not determined' | 'config error' | null = null;
+    phoneCalendarAuthorized: 'authorized' | 'denied' | 'not determined' | 'config error' | null = null;
+    readPhoneCalendarAuthorized: 'authorized' | 'denied' | 'not determined' | 'config error' | null = null;
+    writePhoneCalendarAuthorized: 'authorized' | 'denied' | 'not determined' | null = null;
+    pasteboardAuthorized: 'authorized' | 'denied' | 'not determined' | null = null;
+}
+const AUTHORIZED = 'authorized';
+const DENIED = 'denied';
+const NOT_DETERMINED = 'not determined';
+type LocationAccuracy = 'reduced' | 'full' | 'unsupported';
+class AppAuthorizeSetting {
+    albumAuthorized: string = NOT_DETERMINED;
+    bluetoothAuthorized: string = NOT_DETERMINED;
+    cameraAuthorized: string = NOT_DETERMINED;
+    locationAuthorized: string = NOT_DETERMINED;
+    locationAccuracy: LocationAccuracy = 'unsupported';
+    microphoneAuthorized: string = NOT_DETERMINED;
+    notificationAuthorized: string = NOT_DETERMINED;
+    notificationAlertAuthorized: string = NOT_DETERMINED;
+    notificationBadgeAuthorized: string = NOT_DETERMINED;
+    notificationSoundAuthorized: string = NOT_DETERMINED;
+    phoneCalendarAuthorized: string = NOT_DETERMINED;
+    readPhoneCalendarAuthorized: string = NOT_DETERMINED;
+    writePhoneCalendarAuthorized: string = NOT_DETERMINED;
+    pasteboardAuthorized: string = NOT_DETERMINED;
+}
+class GetAppAuthorizeSettingImpl {
+    accessTokenId: number;
+    atManager: abilityAccessCtrl.AtManager;
+    appAuthorizeSetting: AppAuthorizeSetting;
+    constructor(accessTokenId: number, atManager: abilityAccessCtrl.AtManager, appAuthorizeSetting: AppAuthorizeSetting) {
+        this.accessTokenId = accessTokenId;
+        this.atManager = atManager;
+        this.appAuthorizeSetting = appAuthorizeSetting;
+        this.getAlbumAuthorizeSetting();
+        this.getBlueToothAuthorizeSetting();
+        this.getCameraAuthorizeSetting();
+        this.getLocationAuthorizeSetting();
+        this.getMicrophoneAuthorizeSetting();
+        this.getNotificationAuthorizeSetting();
+        this.getPhoneCalendarAuthorizeSetting();
+        this.getPasteboardAuthorizedSetting();
+    }
+    getAlbumAuthorizeSetting() {
+        const grantStatus = this.atManager.checkAccessTokenSync(this.accessTokenId, 'ohos.permission.READ_IMAGEVIDEO');
+        if (grantStatus === abilityAccessCtrl.GrantStatus.PERMISSION_DENIED) {
+            this.appAuthorizeSetting.albumAuthorized = DENIED;
+        }
+        if (grantStatus === abilityAccessCtrl.GrantStatus.PERMISSION_GRANTED) {
+            this.appAuthorizeSetting.albumAuthorized = AUTHORIZED;
+        }
+    }
+    getBlueToothAuthorizeSetting() {
+        const grantStatus = this.atManager.checkAccessTokenSync(this.accessTokenId, 'ohos.permission.ACCESS_BLUETOOTH');
+        if (grantStatus === abilityAccessCtrl.GrantStatus.PERMISSION_DENIED) {
+            this.appAuthorizeSetting.bluetoothAuthorized = DENIED;
+        }
+        if (grantStatus === abilityAccessCtrl.GrantStatus.PERMISSION_GRANTED) {
+            this.appAuthorizeSetting.bluetoothAuthorized = AUTHORIZED;
+        }
+    }
+    getCameraAuthorizeSetting() {
+        const grantStatus = this.atManager.checkAccessTokenSync(this.accessTokenId, 'ohos.permission.CAMERA');
+        if (grantStatus === abilityAccessCtrl.GrantStatus.PERMISSION_DENIED) {
+            this.appAuthorizeSetting.cameraAuthorized = DENIED;
+        }
+        if (grantStatus === abilityAccessCtrl.GrantStatus.PERMISSION_GRANTED) {
+            this.appAuthorizeSetting.cameraAuthorized = AUTHORIZED;
+        }
+    }
+    getLocationAuthorizeSetting() {
+        const locationGrantStatus = this.atManager.checkAccessTokenSync(this.accessTokenId, 'ohos.permission.LOCATION');
+        const grantStatus = this.atManager.checkAccessTokenSync(this.accessTokenId, 'ohos.permission.APPROXIMATELY_LOCATION');
+        if (grantStatus === abilityAccessCtrl.GrantStatus.PERMISSION_DENIED) {
+            this.appAuthorizeSetting.locationAuthorized = DENIED;
+            this.appAuthorizeSetting.locationAccuracy = 'unsupported';
+        }
+        if (grantStatus === abilityAccessCtrl.GrantStatus.PERMISSION_GRANTED) {
+            this.appAuthorizeSetting.locationAuthorized = AUTHORIZED;
+            if (locationGrantStatus === abilityAccessCtrl.GrantStatus.PERMISSION_GRANTED) {
+                this.appAuthorizeSetting.locationAccuracy = 'full';
+            }
+            else {
+                this.appAuthorizeSetting.locationAccuracy = 'reduced';
+            }
+        }
+    }
+    getMicrophoneAuthorizeSetting() {
+        const grantStatus = this.atManager.checkAccessTokenSync(this.accessTokenId, 'ohos.permission.MICROPHONE');
+        if (grantStatus === abilityAccessCtrl.GrantStatus.PERMISSION_DENIED) {
+            this.appAuthorizeSetting.microphoneAuthorized = DENIED;
+        }
+        if (grantStatus === abilityAccessCtrl.GrantStatus.PERMISSION_GRANTED) {
+            this.appAuthorizeSetting.microphoneAuthorized = AUTHORIZED;
+        }
+    }
+    getNotificationAuthorizeSetting() {
+        try {
+            const isNotificationEnabled = notificationManager.isNotificationEnabledSync();
+            if (isNotificationEnabled) {
+                this.appAuthorizeSetting.notificationAuthorized = DENIED;
+            }
+            if (isNotificationEnabled) {
+                this.appAuthorizeSetting.notificationAuthorized = AUTHORIZED;
+            }
+        }
+        catch (error) {
+            this.appAuthorizeSetting.notificationAuthorized = DENIED;
+        }
+    }
+    getPhoneCalendarAuthorizeSetting() {
+        let write = false;
+        let read = false;
+        const grantStatus = this.atManager.checkAccessTokenSync(this.accessTokenId, 'ohos.permission.WRITE_CALENDAR');
+        if (grantStatus === abilityAccessCtrl.GrantStatus.PERMISSION_DENIED) {
+            this.appAuthorizeSetting.writePhoneCalendarAuthorized = DENIED;
+        }
+        if (grantStatus === abilityAccessCtrl.GrantStatus.PERMISSION_GRANTED) {
+            this.appAuthorizeSetting.writePhoneCalendarAuthorized = AUTHORIZED;
+            write = true;
+        }
+        const readGrantStatus = this.atManager.checkAccessTokenSync(this.accessTokenId, 'ohos.permission.READ_CALENDAR');
+        if (readGrantStatus === abilityAccessCtrl.GrantStatus.PERMISSION_DENIED) {
+            this.appAuthorizeSetting.readPhoneCalendarAuthorized = DENIED;
+        }
+        if (readGrantStatus === abilityAccessCtrl.GrantStatus.PERMISSION_GRANTED) {
+            this.appAuthorizeSetting.readPhoneCalendarAuthorized = AUTHORIZED;
+            read = true;
+        }
+        if (write && read) {
+            this.appAuthorizeSetting.phoneCalendarAuthorized = AUTHORIZED;
+        }
+        else {
+            this.appAuthorizeSetting.phoneCalendarAuthorized = DENIED;
+        }
+    }
+    getPasteboardAuthorizedSetting() {
+        const grantStatus = this.atManager.checkAccessTokenSync(this.accessTokenId, 'ohos.permission.READ_PASTEBOARD');
+        if (grantStatus === abilityAccessCtrl.GrantStatus.PERMISSION_DENIED) {
+            this.appAuthorizeSetting.pasteboardAuthorized = DENIED;
+        }
+        if (grantStatus === abilityAccessCtrl.GrantStatus.PERMISSION_GRANTED) {
+            this.appAuthorizeSetting.pasteboardAuthorized = AUTHORIZED;
+        }
+    }
+}
+const getAppAuthorizeSetting: GetAppAuthorizeSetting = defineSyncApi<GetAppAuthorizeSettingResult>('getAppAuthorizeSetting', (): GetAppAuthorizeSettingResult => {
+    const bundleInfoWithApplication = bundleManager.getBundleInfoForSelfSync(bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION);
+    const appAuthorizeSettingImpl = new GetAppAuthorizeSettingImpl(bundleInfoWithApplication.appInfo.accessTokenId, abilityAccessCtrl.createAtManager(), new AppAuthorizeSetting());
+    return appAuthorizeSettingImpl.appAuthorizeSetting as GetAppAuthorizeSettingResult;
+}) as GetAppAuthorizeSetting;
+export { GetAppAuthorizeSettingResult as GetAppAuthorizeSettingResult };
+export type { GetAppAuthorizeSetting as GetAppAuthorizeSetting };
+export { getAppAuthorizeSetting as getAppAuthorizeSetting };

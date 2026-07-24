@@ -1,0 +1,68 @@
+// 本文件为自动构建生成
+import {
+  SetNavigationBarColorErrorCode as SetNavigationBarColorErrorCodeOrigin,
+  SetNavigationBarColorFail as SetNavigationBarColorFailOrigin,
+  SetNavigationBarColorOptions as SetNavigationBarColorOptionsOrigin,
+  SetNavigationBarColorSuccess as SetNavigationBarColorSuccessOrigin,
+  SetNavigationBarColorSuccessCallback as SetNavigationBarColorSuccessCallbackOrigin,
+  SetNavigationBarColorFailCallback as SetNavigationBarColorFailCallbackOrigin,
+  SetNavigationBarColorComplete as SetNavigationBarColorCompleteOrigin,
+  SetNavigationBarColorCompleteCallback as SetNavigationBarColorCompleteCallbackOrigin,
+  SetNavigationBarColor as SetNavigationBarColorOrigin,
+  SetNavigationBarTitleErrorCode as SetNavigationBarTitleErrorCodeOrigin,
+  SetNavigationBarTitleFail as SetNavigationBarTitleFailOrigin,
+  SetNavigationBarTitleOptions as SetNavigationBarTitleOptionsOrigin,
+  SetNavigationBarTitleSuccess as SetNavigationBarTitleSuccessOrigin,
+  SetNavigationBarTitleSuccessCallback as SetNavigationBarTitleSuccessCallbackOrigin,
+  SetNavigationBarTitleFailCallback as SetNavigationBarTitleFailCallbackOrigin,
+  SetNavigationBarTitleComplete as SetNavigationBarTitleCompleteOrigin,
+  SetNavigationBarTitleCompleteCallback as SetNavigationBarTitleCompleteCallbackOrigin,
+  SetNavigationBarTitle as SetNavigationBarTitleOrigin,
+  ShowNavigationBarLoadingSuccess as ShowNavigationBarLoadingSuccessOrigin,
+  ShowNavigationBarLoadingSuccessCallback as ShowNavigationBarLoadingSuccessCallbackOrigin,
+  ShowNavigationBarLoadingFail as ShowNavigationBarLoadingFailOrigin,
+  ShowNavigationBarLoadingFailCallback as ShowNavigationBarLoadingFailCallbackOrigin,
+  ShowNavigationBarLoadingOptions as ShowNavigationBarLoadingOptionsOrigin,
+  ShowNavigationBarLoading as ShowNavigationBarLoadingOrigin,
+  HideNavigationBarLoadingSuccess as HideNavigationBarLoadingSuccessOrigin,
+  HideNavigationBarLoadingSuccessCallback as HideNavigationBarLoadingSuccessCallbackOrigin,
+  HideNavigationBarLoadingFail as HideNavigationBarLoadingFailOrigin,
+  HideNavigationBarLoadingFailCallback as HideNavigationBarLoadingFailCallbackOrigin,
+  HideNavigationBarLoadingOptions as HideNavigationBarLoadingOptionsOrigin,
+  HideNavigationBarLoading as HideNavigationBarLoadingOrigin,
+  Uni as UniOrigin
+} from './interface'
+
+declare global {
+  type SetNavigationBarColorErrorCode = SetNavigationBarColorErrorCodeOrigin
+  type SetNavigationBarColorFail = SetNavigationBarColorFailOrigin
+  type SetNavigationBarColorOptions = SetNavigationBarColorOptionsOrigin
+  type SetNavigationBarColorSuccess = SetNavigationBarColorSuccessOrigin
+  type SetNavigationBarColorSuccessCallback = SetNavigationBarColorSuccessCallbackOrigin
+  type SetNavigationBarColorFailCallback = SetNavigationBarColorFailCallbackOrigin
+  type SetNavigationBarColorComplete = SetNavigationBarColorCompleteOrigin
+  type SetNavigationBarColorCompleteCallback = SetNavigationBarColorCompleteCallbackOrigin
+  type SetNavigationBarColor = SetNavigationBarColorOrigin
+  type SetNavigationBarTitleErrorCode = SetNavigationBarTitleErrorCodeOrigin
+  type SetNavigationBarTitleFail = SetNavigationBarTitleFailOrigin
+  type SetNavigationBarTitleOptions = SetNavigationBarTitleOptionsOrigin
+  type SetNavigationBarTitleSuccess = SetNavigationBarTitleSuccessOrigin
+  type SetNavigationBarTitleSuccessCallback = SetNavigationBarTitleSuccessCallbackOrigin
+  type SetNavigationBarTitleFailCallback = SetNavigationBarTitleFailCallbackOrigin
+  type SetNavigationBarTitleComplete = SetNavigationBarTitleCompleteOrigin
+  type SetNavigationBarTitleCompleteCallback = SetNavigationBarTitleCompleteCallbackOrigin
+  type SetNavigationBarTitle = SetNavigationBarTitleOrigin
+  type ShowNavigationBarLoadingSuccess = ShowNavigationBarLoadingSuccessOrigin
+  type ShowNavigationBarLoadingSuccessCallback = ShowNavigationBarLoadingSuccessCallbackOrigin
+  type ShowNavigationBarLoadingFail = ShowNavigationBarLoadingFailOrigin
+  type ShowNavigationBarLoadingFailCallback = ShowNavigationBarLoadingFailCallbackOrigin
+  type ShowNavigationBarLoadingOptions = ShowNavigationBarLoadingOptionsOrigin
+  type ShowNavigationBarLoading = ShowNavigationBarLoadingOrigin
+  type HideNavigationBarLoadingSuccess = HideNavigationBarLoadingSuccessOrigin
+  type HideNavigationBarLoadingSuccessCallback = HideNavigationBarLoadingSuccessCallbackOrigin
+  type HideNavigationBarLoadingFail = HideNavigationBarLoadingFailOrigin
+  type HideNavigationBarLoadingFailCallback = HideNavigationBarLoadingFailCallbackOrigin
+  type HideNavigationBarLoadingOptions = HideNavigationBarLoadingOptionsOrigin
+  type HideNavigationBarLoading = HideNavigationBarLoadingOrigin
+  interface Uni extends UniOrigin { }
+}

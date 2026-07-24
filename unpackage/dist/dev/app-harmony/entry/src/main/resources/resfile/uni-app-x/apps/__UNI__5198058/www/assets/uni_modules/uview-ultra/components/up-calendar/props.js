@@ -1,0 +1,170 @@
+
+import { d as defProps } from "./calendar.js";
+var _a;
+let calendarProp = defProps["calendar"];
+({
+  props: {
+    // 日历顶部标题
+    title: {
+      type: String,
+      default: calendarProp["title"]
+    },
+    // 是否显示标题
+    showTitle: {
+      type: Boolean,
+      default: calendarProp["showTitle"]
+    },
+    // 是否显示副标题
+    showSubtitle: {
+      type: Boolean,
+      default: calendarProp["showSubtitle"]
+    },
+    // 日期类型选择，single-选择单个日期，multiple-可以选择多个日期，range-选择日期范围
+    mode: {
+      type: String,
+      default: calendarProp["mode"]
+    },
+    // mode=range时，第一个日期底部的提示文字
+    startText: {
+      type: String,
+      default: calendarProp["startText"]
+    },
+    // mode=range时，最后一个日期底部的提示文字
+    endText: {
+      type: String,
+      default: calendarProp["endText"]
+    },
+    // 自定义列表
+    customList: {
+      type: Array,
+      default: calendarProp["customList"]
+    },
+    // 主题色，对底部按钮和选中日期有效
+    color: {
+      type: String,
+      default: calendarProp["color"]
+    },
+    // 最小的可选日期
+    minDate: {
+      type: [String, Number],
+      default: calendarProp["minDate"]
+    },
+    // 最大可选日期
+    maxDate: {
+      type: [String, Number],
+      default: calendarProp["maxDate"]
+    },
+    // 默认选中的日期，mode为multiple或range是必须为数组格式
+    defaultDate: {
+      // type: [Array, String, Date, null],
+      type: Array,
+      default: calendarProp["defaultDate"]
+    },
+    // mode=multiple时，最多可选多少个日期
+    maxCount: {
+      type: [String, Number],
+      default: calendarProp["maxCount"]
+    },
+    // 日期行高
+    rowHeight: {
+      type: [String, Number],
+      default: calendarProp["rowHeight"]
+    },
+    // 日期格式化函数
+    formatter: {
+      type: [Function, null],
+      default: calendarProp["formatter"]
+    },
+    // 是否显示农历
+    showLunar: {
+      type: Boolean,
+      default: calendarProp["showLunar"]
+    },
+    // 是否显示月份背景色
+    showMark: {
+      type: Boolean,
+      default: calendarProp["showMark"]
+    },
+    // 确定按钮的文字
+    confirmText: {
+      type: String,
+      default: calendarProp["confirmText"]
+    },
+    // 确认按钮处于禁用状态时的文字
+    confirmDisabledText: {
+      type: String,
+      default: calendarProp["confirmDisabledText"]
+    },
+    // 是否显示日历弹窗
+    show: {
+      type: Boolean,
+      default: calendarProp["show"]
+    },
+    // 是否允许点击遮罩关闭日历
+    closeOnClickOverlay: {
+      type: Boolean,
+      default: calendarProp["closeOnClickOverlay"]
+    },
+    // 是否为只读状态，只读状态下禁止选择日期
+    readonly: {
+      type: Boolean,
+      default: calendarProp["readonly"]
+    },
+    // 	是否展示确认按钮
+    showConfirm: {
+      type: Boolean,
+      default: calendarProp["showConfirm"]
+    },
+    // 日期区间最多可选天数，默认无限制，mode = range时有效
+    maxRange: {
+      type: [Number, String],
+      default: calendarProp["maxRange"]
+    },
+    // 范围选择超过最多可选天数时的提示文案，mode = range时有效
+    rangePrompt: {
+      type: String,
+      default: calendarProp["rangePrompt"]
+    },
+    // 范围选择超过最多可选天数时，是否展示提示文案，mode = range时有效
+    showRangePrompt: {
+      type: Boolean,
+      default: calendarProp["showRangePrompt"]
+    },
+    // 是否允许日期范围的起止时间为同一天，mode = range时有效
+    allowSameDay: {
+      type: Boolean,
+      default: calendarProp["allowSameDay"]
+    },
+    // 区间模式下确认返回值格式，all-返回区间内所有日期，boundary-仅返回起止日期
+    rangeResultMode: {
+      type: String,
+      default: calendarProp["rangeResultMode"]
+    },
+    // 圆角值
+    round: {
+      type: [Boolean, String, Number],
+      default: calendarProp["round"]
+    },
+    // 最多展示月份数量
+    monthNum: {
+      type: [Number, String],
+      default: 3
+    },
+    // 是否启用非滚动的单月切换模式
+    monthSwitch: {
+      type: Boolean,
+      default: calendarProp["monthSwitch"]
+    },
+    // 是否显示今天按钮
+    showToday: {
+      type: Boolean,
+      default: calendarProp["showToday"]
+    },
+    // 是否为iPhoneX留出底部安全距离
+    safeAreaInsetBottom: {
+      type: Boolean,
+      default: (_a = calendarProp["safeAreaInsetBottom"]) !== null && _a !== void 0 ? _a : true
+    }
+  }
+});
+//# sourceMappingURL=props.js.map
