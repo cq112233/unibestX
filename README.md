@@ -158,13 +158,15 @@
 
 ### 1. 克隆项目
 
-- **GitHub 方式**：
+* **GitHub 方式**：
+
   ```bash
   git clone https://github.com/cq112233/unibestX.git
   cd unibestX
   ```
 
-- **Gitee 方式（国内加速推荐）**：
+* **Gitee 方式（国内加速推荐）**：
+
   ```bash
   git clone https://gitee.com/htwoO-cq/uni-best-x.git
   cd uni-best-x
