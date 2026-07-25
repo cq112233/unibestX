@@ -5,51 +5,42 @@
     <scroll-view type="nested" direction="vertical" class="flex-1">
       <nested-scroll-header>
         <view class="p-12px pb-0">
-          <!-- 列表 1：头部动态列表 (高度 240px) -->
-          <view class="mb-16px">
-            <text class="text-14px font-bold text-[#2979ff] mb-8px">列表 1：头部动态列表 (高度 240px)</text>
-            <up-list
-              :height="240"
-              :lower-threshold="20"
-              :refresher-enabled="true"
-              :refresher-triggered="listRefreshing"
-              class="bg-white rounded-8px shadow-xs"
-              @scrolltolower="onListLoadMore"
-              @refresherrefresh="onListRefresh"
-            >
-              <view v-for="(item, idx) in listItems" :key="idx" class="demo-list-cell">
-                <view class="demo-list-cell-avatar">
-                  <up-icon name="account" size="20" color="#ffffff"></up-icon>
-                </view>
-                <view class="demo-list-cell-content">
-                  <text class="text-14px font-500 text-[#303133]">{{ item.title as string }}</text>
-                  <text class="text-12px text-[#909399] mt-4px">{{ item.desc as string }}</text>
-                </view>
-              </view>
-              <view v-if="listLoading" class="list-loading">
-                <up-loading-icon mode="circle" size="20"></up-loading-icon>
-                <text class="text-12px text-[#909399] ml-8px">加载中...</text>
-              </view>
-            </up-list>
+          <view class="bg-white p-16px rounded-8px shadow-xs mb-12px">
+            <text class="text-15px font-bold text-[#303133]">Nested Scroll 嵌套滚动</text>
+            <text class="text-13px text-[#606266] mt-6px">
+              顶部卡片位于 nested-scroll-header 标签中，向上滑动时头部卡片随手势向上收起；下方列表放置在 nested-scroll-body 中，支持自由独立滚动与触底加载。
+            </text>
           </view>
         </view>
       </nested-scroll-header>
 
-      <nested-scroll-header>
-        <view class="p-12px pt-0">
-          <!-- 列表 2：静态展示列表 (高度 280px) -->
-          <text class="text-14px font-bold text-[#19be6b] mb-8px">列表 2：静态展示列表 (高度 280px)</text>
-          <up-list :height="280" class="bg-white rounded-8px shadow-xs">
-            <view v-for="(item, idx) in staticListItems" :key="idx" class="demo-list-cell">
-              <view class="w-8px h-8px rounded-4px bg-[#19be6b] mr-10px"></view>
+      <nested-scroll-body>
+        <view class="p-12px pt-0 flex-1">
+          <text class="text-14px font-bold text-[#2979ff] mb-8px">动态加载列表 (支持内部滚动)</text>
+          <up-list
+            :lower-threshold="20"
+            :refresher-enabled="true"
+            :refresher-triggered="listRefreshing"
+            class="bg-white rounded-8px shadow-xs flex-1"
+            @scrolltolower="onListLoadMore"
+            @refresherrefresh="onListRefresh"
+          >
+            <view v-for="(item, idx) in listItems" :key="idx" class="demo-list-cell">
+              <view class="demo-list-cell-avatar">
+                <up-icon name="account" size="20" color="#ffffff"></up-icon>
+              </view>
               <view class="demo-list-cell-content">
                 <text class="text-14px font-500 text-[#303133]">{{ item.title as string }}</text>
                 <text class="text-12px text-[#909399] mt-4px">{{ item.desc as string }}</text>
               </view>
             </view>
+            <view v-if="listLoading" class="list-loading">
+              <up-loading-icon mode="circle" size="20"></up-loading-icon>
+              <text class="text-12px text-[#909399] ml-8px">加载中...</text>
+            </view>
           </up-list>
         </view>
-      </nested-scroll-header>
+      </nested-scroll-body>
     </scroll-view>
   </view>
 </template>
