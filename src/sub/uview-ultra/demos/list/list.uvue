@@ -35,11 +35,11 @@
         </view>
       </nested-scroll-header>
 
-      <nested-scroll-body>
-        <view class="p-12px pt-0 flex-1">
-          <!-- 列表 2：嵌套主列表 -->
-          <text class="text-14px font-bold text-[#19be6b] mb-8px">列表 2：嵌套主列表 (支持联动滚动)</text>
-          <up-list class="bg-white rounded-8px shadow-xs flex-1">
+      <nested-scroll-header>
+        <view class="p-12px pt-0">
+          <!-- 列表 2：静态展示列表 (高度 280px) -->
+          <text class="text-14px font-bold text-[#19be6b] mb-8px">列表 2：静态展示列表 (高度 280px)</text>
+          <up-list :height="280" class="bg-white rounded-8px shadow-xs">
             <view v-for="(item, idx) in staticListItems" :key="idx" class="demo-list-cell">
               <view class="w-8px h-8px rounded-4px bg-[#19be6b] mr-10px"></view>
               <view class="demo-list-cell-content">
@@ -49,7 +49,7 @@
             </view>
           </up-list>
         </view>
-      </nested-scroll-body>
+      </nested-scroll-header>
     </scroll-view>
   </view>
 </template>
