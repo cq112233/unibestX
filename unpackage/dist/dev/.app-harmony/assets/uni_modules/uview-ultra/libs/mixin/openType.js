@@ -1,2 +1,0 @@
-
-//# sourceMappingURL=openType.js.map
