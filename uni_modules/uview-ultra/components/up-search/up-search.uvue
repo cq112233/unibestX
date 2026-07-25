@@ -275,10 +275,6 @@ $up-search-action-active-width: 40px !default;
 $up-search-action-margin-left: 5px !default;
 
 /* #ifdef H5 */
-// iOS15在H5下，hx的某些版本，input type=search时，会多了一个搜索图标，进行移除
-[type="search"]::-webkit-search-decoration {
-    display: none;
-}
 /* #endif */
 
 .up-search {
@@ -351,11 +347,9 @@ $up-search-action-margin-left: 5px !default;
 	}
 
 	&__reverse &__content__icon {
-		// order: 3;
 	}
 
 	&__reverse &__content__close {
-		// order: 2;
 	}
 }
 </style>

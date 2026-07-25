@@ -188,7 +188,6 @@
 		/* #endif */
 		position: relative;
 		
-		// 将容器背景色设为透明，避免关闭时背景色穿透边框露出主题色
 		background-color: rgba(0, 0, 0, 0);
 		
 		border-width: 1px;
@@ -198,11 +197,7 @@
 		border-style: solid;
 		justify-content: flex-end;
 		align-items: center;
-		// 由于weex为阿里逗着玩的KPI项目，导致bug奇多，这必须要写这一行，
-		// 否则在iOS上，点击页面任意地方，都会触发switch的点击事件
 		overflow: hidden;
-
-		// 默认 size = 25 时的宽高，使默认时容器内联样式完全为空，支持纯 Class 变色
 		width: 52px;
 		height: 27px;
 
@@ -212,7 +207,6 @@
 			left: -1px;
 			border-radius: 100px;
 			background-color: $up-primary;
-			// 默认 size = 25 时的宽高（加2px以完全覆盖容器和边框）
 			width: 52px;
 			height: 27px;
 		}

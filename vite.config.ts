@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import uni from '@dcloudio/vite-plugin-uni'
+import path, { dirname, resolve } from 'node:path'
 // import { unovite } from './js_sdk/a-hua-unocss'
 import uniLayoutsPlugin from './plugins/uni-layouts-plugin'
 import autoRootPlugin from './plugins/root-plugin'
@@ -8,7 +9,6 @@ import autoRootPlugin from './plugins/root-plugin'
 import { uniEasycomPlugin } from '@dcloudio/uni-cli-shared/dist/vite/plugins/easycom.js'
 import { UNI_EASYCOM_EXCLUDE } from '@dcloudio/uni-cli-shared'
 
-import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { uniAppX } from 'weapp-tailwindcss/presets'
 import { WeappTailwindcss } from 'weapp-tailwindcss/vite'
@@ -41,13 +41,16 @@ export default defineConfig({
     uniLayoutsPlugin(), // 仿照 vite-plugin-uni-layouts 的跨端 Layout 布局插件
     autoRootPlugin(), // 自动给页面套上 App.ku.uvue 根包裹组件
     uni(),
-    WeappTailwindcss(
-      uniAppX({
+    WeappTailwindcss({
+      // 基础uniAppX预设配置
+      ...uniAppX({
         base: projectRoot,
         cssEntries: [resolve(projectRoot, 'main.css')],
         rem2rpx: true,
+        // 遇到uvue不兼容语法仅警告，不中断编译
+        uvueUnsupported: 'warn',
       }),
-    ),
+    }),
     // unovite({
     //   blocklist: ['table', 'grid', 'block', 'inline', 'inline-block'],
     //   rules: [
