@@ -41,16 +41,15 @@ export default defineConfig({
     uniLayoutsPlugin(), // 仿照 vite-plugin-uni-layouts 的跨端 Layout 布局插件
     autoRootPlugin(), // 自动给页面套上 App.ku.uvue 根包裹组件
     uni(),
-    WeappTailwindcss({
-      // 基础uniAppX预设配置
-      ...uniAppX({
+    WeappTailwindcss(
+      uniAppX({
         base: projectRoot,
         cssEntries: [resolve(projectRoot, 'main.css')],
         rem2rpx: true,
         // 遇到uvue不兼容语法仅警告，不中断编译
         uvueUnsupported: 'warn',
       }),
-    }),
+    ),
     // unovite({
     //   blocklist: ['table', 'grid', 'block', 'inline', 'inline-block'],
     //   rules: [
