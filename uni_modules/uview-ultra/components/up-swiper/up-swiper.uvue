@@ -27,8 +27,6 @@
 			:autoplay="autoplay"
 			:current="current"
 			:vertical="vertical"
-			:previous-margin="addUnit(previousMargin)"
-			:next-margin="addUnit(nextMargin)"
 		>
 			<swiper-item
 				class="up-swiper__wrapper__item"
@@ -78,7 +76,7 @@
 		<view class="up-swiper__indicator" :style="[addStyle(indicatorStyle)]">
 			<slot name="indicator">
 				<up-swiper-indicator
-					v-if="!loading && indicator"
+					v-if="!loading && indicator && !showTitle"
 					:indicatorActiveColor="indicatorActiveColor"
 					:indicatorInactiveColor="indicatorInactiveColor"
 					:length="list.length"
@@ -91,7 +89,6 @@
 </template>
 
 <script lang="uts">
-	import upSwiperIndicator from '../up-swiper-indicator/up-swiper-indicator.uvue';
 	import { propsSwiper } from './props.uts';
 	import { mpMixin } from '../../libs/mixin/mpMixin.uts';
 	import { mixin } from '../../libs/mixin/mixin.uts';
@@ -132,9 +129,6 @@
 	 */
 	export default {
 		name: 'up-swiper',
-		components: {
-			'up-swiper-indicator': upSwiperIndicator
-		},
 		mixins: [mpMixin, mixin, propsSwiper],
 		data() {
 			return {
