@@ -1,0 +1,483 @@
+
+
+
+
+
+
+
+
+
+import WebviewEchart from './uts/WebviewEchart.uts';
+import { getRandomId, addUnitRpx } from './uts/util.uts';
+
+
+/**
+ * Echarts图表组件 (适配uni-app x)
+ * @description 对Apache ECharts做uni-app的适配, 支持ECharts官方所有图表在各类小程序和APP使用
+ * @property {Object} width 宽度 (支持格式: 600, "600rpx", "300px", "50vh", "100%", 其中数字默认rpx单位)
+ * @property {Object} height 高度 (支持格式同width, 默认600rpx)
+ * @property {Boolean} disableScroll 在图表区域内触摸移动时,是否禁止页面滚动 (默认false)
+ * @property {String} theme 主题风格: 默认'light', 暗黑'dark' (非响应式,如需动态切换请参考示例)
+ */
+const __sfc__ = defineComponent({
+  name: 'e-chart',
+  emits: ['ready'],
+  props: {
+    width: {
+      type: [Number, String],
+      default: '100%',
+    },
+    height: {
+      type: [Number, String],
+      default: 600,
+    },
+    disableScroll: Boolean,
+    theme: String,
+  },
+  data() {
+    return {
+
+      echartObj: null as WebviewEchart | null,
+
+      canvasId: getRandomId()
+    };
+  },
+  computed: {
+    canvasStyle() {
+      return `width:${addUnitRpx(this.width)};height:${addUnitRpx(this.height)}`
+    },
+  },
+  watch: {
+    width(){
+      this.resize()
+    },
+    height(){
+      this.resize()
+    }
+  },
+  mounted() {
+    // 支付宝小程序需在onReady回调函数中获取canvas实例 https://opendocs.alipay.com/mini/component/canvas?pathHash=d0b85da4
+
+    this.onCanvasReady();
+
+  },
+  methods: {
+    // 通知外部可初始化echarts实例 (vue3抖音小程序在页面的onMounted中echartRef.value没值, 而在ready回调中则有值)
+    onCanvasReady() {
+      this.$emit('ready')
+    },
+
+    // 外部通过ref初始化, 因为uni-app不支持props传递function属性
+    async init(option: UTSJSONObject) {
+
+
+
+
+
+
+
+
+
+      return this.initAPP(option) as UTSJSONObject;
+
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    initAPP(option: UTSJSONObject){
+      const id = this.canvasId as string;
+      const ctx = uni.createWebviewContext(id, this);
+      if(ctx == null){
+          console.error('初始化echart的webview失败', " at uni_modules/e-chart/components/e-chart/e-chart.uvue:176")
+          return null;
+      }
+      this.echartObj = new WebviewEchart(ctx);
+	  this.echartObj.init(this.theme);
+      this.setOption(option);
+      return { echartObj: this.echartObj }
+    },
+
+
+    // 获取echart实例
+    getEchartObj() {
+
+      return this.echartObj as WebviewEchart;
+
+
+
+
+    },
+	
+    // 设置配置
+    setOption(option: UTSJSONObject) {
+      this.echartObj?.setOption(option);
+    },
+	
+    // 获取配置
+    getOption() {
+		return new Promise<UTSJSONObject>(resolve=>{
+
+			this.echartObj!.getOption(resolve);
+
+			
+
+
+
+			
+		})
+    },
+	
+    // 获取宽度
+    getWidth() {
+		return new Promise<number>(resolve=>{
+
+			this.echartObj!.getWidth((e: UTSJSONObject)=>{
+				resolve(e['width'] as number)
+			});
+
+			
+
+
+
+			
+		})
+    },
+	
+    // 获取宽度
+    getHeight() {
+		return new Promise<number>(resolve=>{
+
+			this.echartObj!.getHeight((e: UTSJSONObject)=>{
+				resolve(e['height'] as number)
+			});
+
+			
+
+
+
+			
+		})
+    },
+	
+    // 宽高变化需重绘 (使用setTimeout,避免$nextTick在某些机型不触发的问题)
+    resize() {
+
+      this.echartObj?.resize();
+
+      
+
+
+
+
+
+
+
+
+
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // canvas转为文件路径
+    canvasToTempFilePath() {
+      return new Promise<string>((resolve, reject) => {
+        const fail = (e: UTSJSONObject) => {
+          uni.showModal({ title: '保存失败', content: JSON.stringify(e), showCancel: false });
+          reject(e);
+        };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+        this.echartObj?.canvasToTempFilePath({
+            success: (e: UTSJSONObject) => {
+                const base64 = e['base64'] as string;
+                const fileSystemManager = uni.getFileSystemManager()
+                const filePath = `${uni.env.USER_DATA_PATH}/${Date.now()}.png`;
+                fileSystemManager.writeFile({
+                  filePath,
+                  encoding: "base64",
+                  data: base64.replace('data:image/png;base64,', ''),
+                  success: (res) => {
+                    resolve(filePath);
+                  },
+				  fail: (err) => {
+					fail(err as UTSJSONObject)
+				  }
+                } as WriteFileOptions)
+            }, 
+            fail
+        });
+
+      });
+    },
+	
+	// 显示进度条
+	showLoading(option: UTSJSONObject){
+	  this.echartObj?.showLoading(option)
+	},
+	
+	// 隐藏进度条
+	hideLoading(){
+	  this.echartObj?.hideLoading()
+	},
+
+
+   // webview消息
+   onWebviewMsg(e: UniWebViewMessageEvent){
+     this.echartObj?.onWebviewMsg(e)
+   },
+   // webview加载失败的回调
+   onWebviewError(e: UniWebViewErrorEvent){
+     console.error('onWebviewError:', e, " at uni_modules/e-chart/components/e-chart/e-chart.uvue:457")
+   }
+
+  },
+});
+
+export default __sfc__
+function GenUniModulesEChartComponentsEChartEChartRender(this: InstanceType<typeof __sfc__>): any | null {
+const _ctx = this
+const _cache = this.$.renderCache
+const _component_web_view = resolveComponent("web-view")
+
+  return _cV(_component_web_view, _uM({
+    id: _ctx.canvasId,
+    style: _nS(_ctx.canvasStyle),
+    bounces: false,
+    horizontalScrollBarAccess: false,
+    verticalScrollBarAccess: false,
+    "webview-styles": {progress: false},
+    src: "/uni_modules/e-chart/static/app/webview.html",
+    onLoad: _ctx.onCanvasReady,
+    onError: _ctx.onWebviewError,
+    onMessage: _ctx.onWebviewMsg
+  }), null, 8 /* PROPS */, ["id", "style", "onLoad", "onError", "onMessage"])
+}
+export type EChartComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesEChartComponentsEChartEChartStyles = []
