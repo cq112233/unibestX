@@ -28,8 +28,8 @@
 			:current="current"
 			:currentItemId="currentItemId"
 			:vertical="vertical"
-			:previousMargin="addUnit(previousMargin)"
-			:nextMargin="addUnit(nextMargin)"
+			:previous-margin="addUnit(previousMargin)"
+			:next-margin="addUnit(nextMargin)"
 			:acceleration="acceleration"
 			:displayMultipleItems="list.length > 0 ? displayMultipleItems : 0"
 			:easingFunction="easingFunction"
@@ -81,7 +81,7 @@
 		<view class="up-swiper__indicator" :style="[addStyle(indicatorStyle)]">
 			<slot name="indicator">
 				<up-swiper-indicator
-					v-if="!loading && indicator && !showTitle"
+					v-if="!loading && indicator"
 					:indicatorActiveColor="indicatorActiveColor"
 					:indicatorInactiveColor="indicatorInactiveColor"
 					:length="list.length"
@@ -93,6 +93,7 @@
 	</view>
 </template>
 <script>
+	import upSwiperIndicator from '../up-swiper-indicator/up-swiper-indicator.vue';
 	import { props } from './props.js';
 	import { mpMixin } from '../../libs/mixin/mpMixin';
 	import { mixin } from '../../libs/mixin/mixin';
@@ -132,6 +133,9 @@
 	 */
 	export default {
 		name: 'up-swiper',
+		components: {
+			'up-swiper-indicator': upSwiperIndicator
+		},
 		mixins: [mpMixin, mixin, props],
 		data() {
 			return {

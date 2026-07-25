@@ -5,7 +5,7 @@
 			v-if="indicatorMode === 'line'"
 			:class="[`up-swiper-indicator__wrapper--${indicatorMode}`]"
 			:style="{
-				width: addUnit(lineWidth * length),
+				width: addUnit(lineWidth * (parseInt(length) || 0)),
 				backgroundColor: indicatorInactiveColor
 			}"
 		>
@@ -20,9 +20,9 @@
 		>
 			<view
 				class="up-swiper-indicator__wrapper__dot"
-				v-for="(item, index) in length"
+				v-for="(item, index) in (parseInt(length) || 0)"
 				:key="index"
-				:class="[index === current && 'up-swiper-indicator__wrapper__dot--active']"
+				:class="[index === (parseInt(current) || 0) && 'up-swiper-indicator__wrapper__dot--active']"
 				:style="[dotStyle(index)]"
 			>
 			</view>
@@ -35,17 +35,7 @@
 	import { mpMixin } from '../../libs/mixin/mpMixin';
 	import { mixin } from '../../libs/mixin/mixin';
 	import { addUnit } from '../../libs/function/index';
-	/**
-	 * SwiperIndicator 轮播图指示器
-	 * @description 该组件一般用于导航轮播，广告展示等场景,可开箱即用，
-	 * @tutorial https://uview-plus.jiangruyi.com/components/swiper.html
-	 * @property {String | Number}	length					轮播的长度（默认 0 ）
-	 * @property {String | Number}	current					当前处于活动状态的轮播的索引（默认 0 ）
-	 * @property {String}			indicatorActiveColor	指示器非激活颜色
-	 * @property {String}			indicatorInactiveColor	指示器的激活颜色
-	 * @property {String}			indicatorMode			指示器模式（默认 'line' ）
-	 * @example	<up-swiper :list="list4" indicator keyName="url" :autoplay="false"></up-swiper>
-	 */
+
 	export default {
 		name: 'up-swiper-indicator',
 		mixins: [mpMixin, mixin, props],
@@ -58,8 +48,9 @@
 			// 指示器为线型的样式
 			lineStyle() {
 				let style = {}
+				const curr = parseInt(this.current) || 0
 				style.width = addUnit(this.lineWidth)
-				style.transform = `translateX(${ addUnit(this.current * this.lineWidth) })`
+				style.transform = `translateX(${ addUnit(curr * this.lineWidth) })`
 				style.backgroundColor = this.indicatorActiveColor
 				return style
 			},
@@ -67,7 +58,8 @@
 			dotStyle() {
 				return index => {
 					let style = {}
-					style.backgroundColor = index === this.current ? this.indicatorActiveColor : this.indicatorInactiveColor
+					const curr = parseInt(this.current) || 0
+					style.backgroundColor = index === curr ? this.indicatorActiveColor : this.indicatorInactiveColor
 					return style
 				}
 			}
