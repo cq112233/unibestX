@@ -6,7 +6,7 @@ import LayoutComponent from '@/src/layouts/default.uvue'
 import { ref } from 'vue'
 
 // 声明 ArticleItem 类型（使用 type 别名符合 UTS 强类型规范）
-type ArticleItem = { __$originalPosition?: UTSSourceMapPosition<"ArticleItem", "src/sub/paging/paging.uvue", 123, 6>;
+type ArticleItem = { __$originalPosition?: UTSSourceMapPosition<"ArticleItem", "src/sub/paging/paging.uvue", 76, 6>;
   id: number
   title: string
   summary: string
@@ -126,13 +126,13 @@ const _component_z_paging_x = resolveEasyComponent("z-paging-x",_easycom_z_pagin
         "navigation-bar-title-text": '分页加载'
       }), _uM({
         default: withSlotCtx((): any[] => [
-          _cE("view", _uM({ class: "flex flex-col flex-1 h-full bg-__f7fafc_" }), [
+          _cE("view", _uM({ class: "flex flex-col flex-1 h-full bg-_b_hf7fafc_B" }), [
             _cV(_component_NavBar, _uM({
               title: "分页加载 (z-paging-x)",
               "show-back": true
             })),
-            _cE("view", _uM({ class: "bg-white py-12px px-16px border-bottom-width-1px border-bottom-style-solid border-bottom-color-__f1f5f9_" }), [
-              _cE("view", _uM({ class: "flex-row bg-__f1f5f9_ rounded-12px p-4px" }), [
+            _cE("view", _uM({ class: "bg-white py-12px px-16px border-bottom-width-1px border-bottom-style-solid border-bottom-color-_b_hf1f5f9_B" }), [
+              _cE("view", _uM({ class: "flex-row bg-_b_hf1f5f9_B rounded-12px p-4px" }), [
                 _cE(Fragment, null, RenderHelpers.renderList(tabList, (tab, index, __index, _cached): any => {
                   return _cE("view", _uM({
                     key: index,
@@ -162,7 +162,7 @@ const _component_z_paging_x = resolveEasyComponent("z-paging-x",_easycom_z_pagin
                   return _cE("list-item", _uM({
                     key: item.id
                   }), [
-                    _cE("view", _uM({ class: "mx-16px my-8px p-16px bg-white rounded-12px border-width-1px border-style-solid border-color-__edf2f7_ shadow-sm" }), [
+                    _cE("view", _uM({ class: "mx-16px my-8px p-16px bg-white rounded-12px border-width-1px border-style-solid border-color-_b_hedf2f7_B shadow-sm" }), [
                       _cE("view", _uM({ class: "flex-row justify-between items-center mb-8px" }), [
                         _cE("view", _uM({
                           style: _nS(_uM({ backgroundColor: item.tagBgColor, padding: '2px 8px', borderRadius: '6px' }))
@@ -171,13 +171,13 @@ const _component_z_paging_x = resolveEasyComponent("z-paging-x",_easycom_z_pagin
                             style: _nS(_uM({ color: item.tagColor, fontSize: '10px', fontWeight: 'bold' }))
                           }), _tD(item.tag), 5 /* TEXT, STYLE */)
                         ], 4 /* STYLE */),
-                        _cE("text", _uM({ class: "text-12px text-__94a3b8_" }), "#" + _tD(item.id), 1 /* TEXT */)
+                        _cE("text", _uM({ class: "text-12px text-_b_h94a3b8_B" }), "#" + _tD(item.id), 1 /* TEXT */)
                       ]),
-                      _cE("text", _uM({ class: "text-15px font-bold text-__1e293b_ mb-6px" }), _tD(item.title), 1 /* TEXT */),
-                      _cE("text", _uM({ class: "text-13px text-__64748b_ leading-18px mb-12px" }), _tD(item.summary), 1 /* TEXT */),
-                      _cE("view", _uM({ class: "flex-row justify-between items-center border-top-width-1px border-top-style-solid border-top-color-__f8fafc_ pt-8px" }), [
-                        _cE("text", _uM({ class: "text-12px text-__475569_ font-medium" }), _tD(item.author), 1 /* TEXT */),
-                        _cE("text", _uM({ class: "text-11px text-__94a3b8_" }), _tD(item.createTime), 1 /* TEXT */)
+                      _cE("text", _uM({ class: "text-15px font-bold text-_b_h1e293b_B mb-6px" }), _tD(item.title), 1 /* TEXT */),
+                      _cE("text", _uM({ class: "text-13px text-_b_h64748b_B leading-18px mb-12px" }), _tD(item.summary), 1 /* TEXT */),
+                      _cE("view", _uM({ class: "flex-row justify-between items-center border-top-width-1px border-top-style-solid border-top-color-_b_hf8fafc_B pt-8px" }), [
+                        _cE("text", _uM({ class: "text-12px text-_b_h475569_B font-medium" }), _tD(item.author), 1 /* TEXT */),
+                        _cE("text", _uM({ class: "text-11px text-_b_h94a3b8_B" }), _tD(item.createTime), 1 /* TEXT */)
                       ])
                     ])
                   ])
@@ -197,4 +197,4 @@ const _component_z_paging_x = resolveEasyComponent("z-paging-x",_easycom_z_pagin
 
 })
 export default __sfc__
-const GenSrcSubPagingPagingStyles = [_uM([["bg-__f1f5f9_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f1f5f9"]]))], ["bg-__f7fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f7fafc"]]))], ["bg-white", _pS(_uM([["backgroundColor", "rgba(255,255,255,var(--un-bg-opacity,1))"]]))], ["border-bottom-color-__f1f5f9_", _pS(_uM([["borderBottomColor", "#f1f5f9"]]))], ["border-bottom-style-solid", _pS(_uM([["borderBottomStyle", "solid"]]))], ["border-bottom-width-1px", _pS(_uM([["borderBottomWidth", 1]]))], ["border-color-__edf2f7_", _pS(_uM([["borderTopColor", "#edf2f7"], ["borderRightColor", "#edf2f7"], ["borderBottomColor", "#edf2f7"], ["borderLeftColor", "#edf2f7"]]))], ["border-style-solid", _pS(_uM([["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"]]))], ["border-top-color-__f8fafc_", _pS(_uM([["borderTopColor", "#f8fafc"]]))], ["border-top-style-solid", _pS(_uM([["borderTopStyle", "solid"]]))], ["border-top-width-1px", _pS(_uM([["borderTopWidth", 1]]))], ["border-width-1px", _pS(_uM([["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1]]))], ["flex", _pS(_uM([["display", "flex"]]))], ["flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["flex-col", _pS(_uM([["flexDirection", "column"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["font-bold", _pS(_uM([["fontWeight", 700]]))], ["font-medium", _pS(_uM([["fontWeight", 500]]))], ["h-full", _pS(_uM([["height", "100%"]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["justify-between", _pS(_uM([["justifyContent", "space-between"]]))], ["justify-center", _pS(_uM([["justifyContent", "center"]]))], ["leading-18px", _pS(_uM([["lineHeight", "18px"]]))], ["mb-12px", _pS(_uM([["marginBottom", 12]]))], ["mb-6px", _pS(_uM([["marginBottom", 6]]))], ["mb-8px", _pS(_uM([["marginBottom", 8]]))], ["mx-16px", _pS(_uM([["marginLeft", 16], ["marginRight", 16]]))], ["my-8px", _pS(_uM([["marginTop", 8], ["marginBottom", 8]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["p-4px", _pS(_uM([["paddingTop", 4], ["paddingRight", 4], ["paddingBottom", 4], ["paddingLeft", 4]]))], ["pt-8px", _pS(_uM([["paddingTop", 8]]))], ["px-16px", _pS(_uM([["paddingLeft", 16], ["paddingRight", 16]]))], ["py-12px", _pS(_uM([["paddingTop", 12], ["paddingBottom", 12]]))], ["py-8px", _pS(_uM([["paddingTop", 8], ["paddingBottom", 8]]))], ["rounded-12px", _pS(_uM([["borderTopLeftRadius", 12], ["borderTopRightRadius", 12], ["borderBottomRightRadius", 12], ["borderBottomLeftRadius", 12]]))], ["rounded-8px", _pS(_uM([["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["shadow-sm", _pS(_uM([["boxShadow", "var(--un-inset-shadow,0 0 #0000),var(--un-inset-ring-shadow,0 0 #0000),var(--un-ring-offset-shadow,0 0 #0000),var(--un-ring-shadow,0 0 #0000),var(--un-shadow,0 1rpx 3rpx 0 var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))))"], ["--un-shadow", "0 1rpx 3rpx 0rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1)))"]]))], ["text-__1e293b_", _pS(_uM([["color", "#1e293b"]]))], ["text-__475569_", _pS(_uM([["color", "#475569"]]))], ["text-__64748b_", _pS(_uM([["color", "#64748b"]]))], ["text-__94a3b8_", _pS(_uM([["color", "#94a3b8"]]))], ["text-11px", _pS(_uM([["fontSize", 11]]))], ["text-12px", _pS(_uM([["fontSize", 12]]))], ["text-13px", _pS(_uM([["fontSize", 13]]))], ["text-15px", _pS(_uM([["fontSize", 15]]))]])]
+const GenSrcSubPagingPagingStyles = [_uM([["flex", _pS(_uM([["display", "flex"]]))], ["flex-col", _pS(_uM([["flexDirection", "column"]]))], ["flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["h-full", _pS(_uM([["height", "100%"]]))], ["bg-white", _pS(_uM([["backgroundColor", "#ffffff"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["bg-_b_hf1f5f9_B", _pS(_uM([["backgroundColor", "#f1f5f9"]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["justify-center", _pS(_uM([["justifyContent", "center"]]))], ["font-bold", _pS(_uM([["--tw-font-weight", "700"], ["fontWeight", 700]]))], ["shadow-sm", _pS(_uM([["--tw-shadow", "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)"], ["boxShadow", "var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow)"]]))], ["justify-between", _pS(_uM([["justifyContent", "space-between"]]))], ["text-_b_h94a3b8_B", _pS(_uM([["color", "#94a3b8"]]))], ["text-_b_h1e293b_B", _pS(_uM([["color", "#1e293b"]]))], ["text-_b_h64748b_B", _pS(_uM([["color", "#64748b"]]))], ["text-_b_h475569_B", _pS(_uM([["color", "#475569"]]))], ["font-medium", _pS(_uM([["--tw-font-weight", "500"], ["fontWeight", 500]]))]])]

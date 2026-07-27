@@ -36,7 +36,7 @@ const _component_up_button = resolveEasyComponent("up-button",_easycom_up_button
         "navigation-bar-title-text": 'up-tooltip 长按提示'
       }), _uM({
         default: withSlotCtx((): any[] => [
-          _cE("view", _uM({ class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }), [
+          _cE("view", _uM({ class: "page-container bg-_b_hf8fafc_B min-h-screen pb-30px" }), [
             _cV(_component_NavBar, _uM({
               title: "up-tooltip 长按提示",
               "auto-back": true,
@@ -154,4 +154,4 @@ const _component_up_button = resolveEasyComponent("up-button",_easycom_up_button
 
 })
 export default __sfc__
-const GenSrcSubUviewUltraDemosTooltipTooltipStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["flex", _pS(_uM([["display", "flex"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["flex-wrap", _pS(_uM([["flexWrap", "wrap"]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["mb-8px", _pS(_uM([["marginBottom", 8]]))], ["mr-12px", _pS(_uM([["marginRight", 12]]))], ["mr-16px", _pS(_uM([["marginRight", 16]]))], ["mt-12px", _pS(_uM([["marginTop", 12]]))], ["none", _pS(_uM([["display", "none"]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]
+const GenSrcSubUviewUltraDemosTooltipTooltipStyles = [_uM([["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]

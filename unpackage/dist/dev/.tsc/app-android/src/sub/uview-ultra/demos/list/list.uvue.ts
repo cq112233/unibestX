@@ -96,7 +96,7 @@ const _component_up_list = resolveEasyComponent("up-list",_easycom_up_list)
         "disable-scroll": true
       }), _uM({
         default: withSlotCtx((): any[] => [
-          _cE("view", _uM({ class: "page-container bg-__f8fafc_ flex flex-col flex-1 h-full" }), [
+          _cE("view", _uM({ class: "page-container bg-_b_hf8fafc_B flex flex-col flex-1 h-full" }), [
             _cV(_component_NavBar, _uM({
               title: "up-list 双列表嵌套",
               "auto-back": true,
@@ -110,7 +110,7 @@ const _component_up_list = resolveEasyComponent("up-list",_easycom_up_list)
             }), [
               _cE("nested-scroll-header", null, [
                 _cE("view", _uM({ class: "p-12px pb-0" }), [
-                  _cE("text", _uM({ class: "text-14px font-bold text-__2979ff_ mb-8px" }), "列表 1：动态加载列表 (高度 380px)"),
+                  _cE("text", _uM({ class: "text-14px font-bold text-_b_h2979ff_B mb-8px" }), "列表 1：动态加载列表 (高度 380px)"),
                   _cV(_component_up_list, _uM({
                     height: 580,
                     "lower-threshold": 20,
@@ -134,8 +134,8 @@ const _component_up_list = resolveEasyComponent("up-list",_easycom_up_list)
                             }))
                           ]),
                           _cE("view", _uM({ class: "demo-list-cell-content" }), [
-                            _cE("text", _uM({ class: "text-14px font-500 text-__303133_" }), _tD(item.title as string), 1 /* TEXT */),
-                            _cE("text", _uM({ class: "text-12px text-__909399_ mt-4px" }), _tD(item.desc as string), 1 /* TEXT */)
+                            _cE("text", _uM({ class: "text-14px font-500 text-_b_h303133_B" }), _tD(item.title as string), 1 /* TEXT */),
+                            _cE("text", _uM({ class: "text-12px text-_b_h909399_B mt-4px" }), _tD(item.desc as string), 1 /* TEXT */)
                           ])
                         ])
                       }), 128 /* KEYED_FRAGMENT */),
@@ -148,7 +148,7 @@ const _component_up_list = resolveEasyComponent("up-list",_easycom_up_list)
                               mode: "circle",
                               size: "20"
                             })),
-                            _cE("text", _uM({ class: "text-12px text-__909399_ ml-8px" }), "加载中...")
+                            _cE("text", _uM({ class: "text-12px text-_b_h909399_B ml-8px" }), "加载中...")
                           ])
                         : _cC("v-if", true)
                     ]),
@@ -158,7 +158,7 @@ const _component_up_list = resolveEasyComponent("up-list",_easycom_up_list)
               ]),
               _cE("nested-scroll-header", null, [
                 _cE("view", _uM({ class: "p-12px pb-24px" }), [
-                  _cE("text", _uM({ class: "text-14px font-bold text-__19be6b_ mb-8px" }), "列表 2：静态展示列表 (高度 280px)"),
+                  _cE("text", _uM({ class: "text-14px font-bold text-_b_h19be6b_B mb-8px" }), "列表 2：静态展示列表 (高度 280px)"),
                   _cV(_component_up_list, _uM({
                     height: 280,
                     class: "bg-white rounded-8px shadow-xs"
@@ -169,10 +169,10 @@ const _component_up_list = resolveEasyComponent("up-list",_easycom_up_list)
                           key: idx,
                           class: "demo-list-cell"
                         }), [
-                          _cE("view", _uM({ class: "w-8px h-8px rounded-4px bg-__19be6b_ mr-10px" })),
+                          _cE("view", _uM({ class: "w-8px h-8px rounded-4px bg-_b_h19be6b_B mr-10px" })),
                           _cE("view", _uM({ class: "demo-list-cell-content" }), [
-                            _cE("text", _uM({ class: "text-14px font-500 text-__303133_" }), _tD(item.title as string), 1 /* TEXT */),
-                            _cE("text", _uM({ class: "text-12px text-__909399_ mt-4px" }), _tD(item.desc as string), 1 /* TEXT */)
+                            _cE("text", _uM({ class: "text-14px font-500 text-_b_h303133_B" }), _tD(item.title as string), 1 /* TEXT */),
+                            _cE("text", _uM({ class: "text-12px text-_b_h909399_B mt-4px" }), _tD(item.desc as string), 1 /* TEXT */)
                           ])
                         ])
                       }), 128 /* KEYED_FRAGMENT */)
@@ -194,4 +194,4 @@ const _component_up_list = resolveEasyComponent("up-list",_easycom_up_list)
 
 })
 export default __sfc__
-const GenSrcSubUviewUltraDemosListListStyles = [_uM([["bg-__19be6b_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#19be6b"]]))], ["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["bg-white", _pS(_uM([["backgroundColor", "rgba(255,255,255,var(--un-bg-opacity,1))"]]))], ["flex", _pS(_uM([["display", "flex"]]))], ["flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["flex-col", _pS(_uM([["flexDirection", "column"]]))], ["font-500", _pS(_uM([["fontWeight", 500]]))], ["font-bold", _pS(_uM([["fontWeight", 700]]))], ["h-0", _pS(_uM([["height", 0]]))], ["h-8px", _pS(_uM([["height", 8]]))], ["h-full", _pS(_uM([["height", "100%"]]))], ["mb-8px", _pS(_uM([["marginBottom", 8]]))], ["ml-8px", _pS(_uM([["marginLeft", 8]]))], ["mr-10px", _pS(_uM([["marginRight", 10]]))], ["mt-4px", _pS(_uM([["marginTop", 4]]))], ["none", _pS(_uM([["display", "none"]]))], ["p-12px", _pS(_uM([["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12]]))], ["pb-0", _pS(_uM([["paddingBottom", 0]]))], ["pb-24px", _pS(_uM([["paddingBottom", 24]]))], ["rounded-4px", _pS(_uM([["borderTopLeftRadius", 4], ["borderTopRightRadius", 4], ["borderBottomRightRadius", 4], ["borderBottomLeftRadius", 4]]))], ["rounded-8px", _pS(_uM([["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["shadow-xs", _pS(_uM([["boxShadow", "var(--un-inset-shadow,0 0 #0000),var(--un-inset-ring-shadow,0 0 #0000),var(--un-ring-offset-shadow,0 0 #0000),var(--un-ring-shadow,0 0 #0000),var(--un-shadow,0 1rpx 3rpx 0 var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))))"], ["--un-shadow", "0 1rpx 2rpx 0rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.05)))"]]))], ["text-__19be6b_", _pS(_uM([["color", "#19be6b"]]))], ["text-__2979ff_", _pS(_uM([["color", "#2979ff"]]))], ["text-__303133_", _pS(_uM([["color", "#303133"]]))], ["text-__909399_", _pS(_uM([["color", "#909399"]]))], ["text-12px", _pS(_uM([["fontSize", 12]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))], ["w-8px", _pS(_uM([["width", 8]]))], ["demo-list-cell", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16], ["backgroundColor", "#ffffff"], ["borderBottomWidth", 1], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f5f5f5"]]))], ["demo-list-cell-avatar", _pS(_uM([["width", 40], ["height", 40], ["borderTopLeftRadius", 4], ["borderTopRightRadius", 4], ["borderBottomRightRadius", 4], ["borderBottomLeftRadius", 4], ["marginRight", 12], ["backgroundColor", "#2979ff"], ["display", "flex"], ["justifyContent", "center"], ["alignItems", "center"]]))], ["demo-list-cell-content", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["list-loading", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["paddingTop", 15], ["paddingRight", 0], ["paddingBottom", 15], ["paddingLeft", 0]]))]])]
+const GenSrcSubUviewUltraDemosListListStyles = [_uM([["demo-list-cell", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16], ["backgroundColor", "#ffffff"], ["borderBottomWidth", 1], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f5f5f5"]]))], ["demo-list-cell-avatar", _pS(_uM([["width", 40], ["height", 40], ["borderTopLeftRadius", 4], ["borderTopRightRadius", 4], ["borderBottomRightRadius", 4], ["borderBottomLeftRadius", 4], ["marginRight", 12], ["backgroundColor", "#2979ff"], ["display", "flex"], ["justifyContent", "center"], ["alignItems", "center"]]))], ["demo-list-cell-content", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["list-loading", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["paddingTop", 15], ["paddingRight", 0], ["paddingBottom", 15], ["paddingLeft", 0]]))]])]

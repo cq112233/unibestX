@@ -28,7 +28,7 @@ const _component_up_collapse = resolveEasyComponent("up-collapse",_easycom_up_co
         "navigation-bar-title-text": 'up-collapse 折叠面板'
       }), _uM({
         default: withSlotCtx((): any[] => [
-          _cE("view", _uM({ class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }), [
+          _cE("view", _uM({ class: "page-container bg-_b_hf8fafc_B min-h-screen pb-30px" }), [
             _cV(_component_NavBar, _uM({
               title: "up-collapse 折叠面板",
               "auto-back": true,
@@ -96,4 +96,4 @@ const _component_up_collapse = resolveEasyComponent("up-collapse",_easycom_up_co
 
 })
 export default __sfc__
-const GenSrcSubUviewUltraDemosCollapseCollapseStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["mt-12px", _pS(_uM([["marginTop", 12]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))], ["collapse-text", _pS(_uM([["fontSize", 13], ["color", "#909399"], ["lineHeight", "20px"]]))]])]
+const GenSrcSubUviewUltraDemosCollapseCollapseStyles = [_uM([["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))], ["collapse-text", _pS(_uM([["fontSize", 13], ["color", "#909399"], ["lineHeight", "20px"]]))]])]

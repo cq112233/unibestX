@@ -26,50 +26,50 @@ return (): any | null => {
 
   return _cV(unref(Card), _uM({ title: "系统与安全区域信息" }), _uM({
     default: withSlotCtx((): any[] => [
-      _cE("view", _uM({ class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }), [
-        _cE("text", _uM({ class: "text-13px font-bold text-__1e293b_ mb-12px" }), "安全区域内边距 (SafeAreaInsets)"),
-        _cE("view", _uM({ class: "flex-row justify-between mb-8px" }), [
-          _cE("text", _uM({ class: "text-14px text-__64748b_" }), "Top (顶部距离)"),
-          _cE("text", _uM({ class: "text-14px font-bold text-__334155_" }), _tD(safeAreaTop.value), 1 /* TEXT */)
+      _cE("view", _uM({ class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]" }), [
+        _cE("text", _uM({ class: "text-13px wtu-ok6xoz-0 wtu-sgmw91-1 mb-12px" }), "安全区域内边距 (SafeAreaInsets)"),
+        _cE("view", _uM({ class: "wtu-lbcsyi-2 wtu-1htvnc1-3 mb-8px" }), [
+          _cE("text", _uM({ class: "text-14px wtu-1thuw5y-4" }), "Top (顶部距离)"),
+          _cE("text", _uM({ class: "text-14px wtu-ok6xoz-0 wtu-1sdp0je-5" }), _tD(safeAreaTop.value), 1 /* TEXT */)
         ]),
-        _cE("view", _uM({ class: "flex-row justify-between mb-8px" }), [
-          _cE("text", _uM({ class: "text-14px text-__64748b_" }), "Bottom (底部距离)"),
-          _cE("text", _uM({ class: "text-14px font-bold text-__334155_" }), _tD(safeAreaBottom.value), 1 /* TEXT */)
+        _cE("view", _uM({ class: "wtu-lbcsyi-2 wtu-1htvnc1-3 mb-8px" }), [
+          _cE("text", _uM({ class: "text-14px wtu-1thuw5y-4" }), "Bottom (底部距离)"),
+          _cE("text", _uM({ class: "text-14px wtu-ok6xoz-0 wtu-1sdp0je-5" }), _tD(safeAreaBottom.value), 1 /* TEXT */)
         ]),
-        _cE("view", _uM({ class: "flex-row justify-between mb-8px" }), [
-          _cE("text", _uM({ class: "text-14px text-__64748b_" }), "Left (左侧距离)"),
-          _cE("text", _uM({ class: "text-14px font-bold text-__334155_" }), _tD(safeAreaLeft.value), 1 /* TEXT */)
+        _cE("view", _uM({ class: "wtu-lbcsyi-2 wtu-1htvnc1-3 mb-8px" }), [
+          _cE("text", _uM({ class: "text-14px wtu-1thuw5y-4" }), "Left (左侧距离)"),
+          _cE("text", _uM({ class: "text-14px wtu-ok6xoz-0 wtu-1sdp0je-5" }), _tD(safeAreaLeft.value), 1 /* TEXT */)
         ]),
-        _cE("view", _uM({ class: "flex-row justify-between" }), [
-          _cE("text", _uM({ class: "text-14px text-__64748b_" }), "Right (右侧距离)"),
-          _cE("text", _uM({ class: "text-14px font-bold text-__334155_" }), _tD(safeAreaRight.value), 1 /* TEXT */)
+        _cE("view", _uM({ class: "wtu-lbcsyi-2 wtu-1htvnc1-3" }), [
+          _cE("text", _uM({ class: "text-14px wtu-1thuw5y-4" }), "Right (右侧距离)"),
+          _cE("text", _uM({ class: "text-14px wtu-ok6xoz-0 wtu-1sdp0je-5" }), _tD(safeAreaRight.value), 1 /* TEXT */)
         ])
       ]),
-      _cE("view", _uM({ class: "rounded-12px p-16px border-width-1px border-style-solid border-color-__e2e8f0_" }), [
-        _cE("text", _uM({ class: "text-13px font-bold text-__1e293b_ mb-12px" }), "设备窗口规格 (WindowInfo)"),
-        _cE("view", _uM({ class: "flex-row justify-between mb-8px" }), [
-          _cE("text", _uM({ class: "text-14px text-__64748b_" }), "屏幕宽度"),
-          _cE("text", _uM({ class: "text-14px font-bold text-__334155_" }), _tD(screenWidth.value) + " px", 1 /* TEXT */)
+      _cE("view", _uM({ class: "rounded-12px p-16px border-width-1px border-style-solid border-color-[#e2e8f0]" }), [
+        _cE("text", _uM({ class: "text-13px wtu-ok6xoz-0 wtu-sgmw91-1 mb-12px" }), "设备窗口规格 (WindowInfo)"),
+        _cE("view", _uM({ class: "wtu-lbcsyi-2 wtu-1htvnc1-3 mb-8px" }), [
+          _cE("text", _uM({ class: "text-14px wtu-1thuw5y-4" }), "屏幕宽度"),
+          _cE("text", _uM({ class: "text-14px wtu-ok6xoz-0 wtu-1sdp0je-5" }), _tD(screenWidth.value) + " px", 1 /* TEXT */)
         ]),
-        _cE("view", _uM({ class: "flex-row justify-between mb-8px" }), [
-          _cE("text", _uM({ class: "text-14px text-__64748b_" }), "屏幕高度"),
-          _cE("text", _uM({ class: "text-14px font-bold text-__334155_" }), _tD(screenHeight.value) + " px", 1 /* TEXT */)
+        _cE("view", _uM({ class: "wtu-lbcsyi-2 wtu-1htvnc1-3 mb-8px" }), [
+          _cE("text", _uM({ class: "text-14px wtu-1thuw5y-4" }), "屏幕高度"),
+          _cE("text", _uM({ class: "text-14px wtu-ok6xoz-0 wtu-1sdp0je-5" }), _tD(screenHeight.value) + " px", 1 /* TEXT */)
         ]),
-        _cE("view", _uM({ class: "flex-row justify-between mb-8px" }), [
-          _cE("text", _uM({ class: "text-14px text-__64748b_" }), "可用窗口宽度"),
-          _cE("text", _uM({ class: "text-14px font-bold text-__334155_" }), _tD(windowWidth.value) + " px", 1 /* TEXT */)
+        _cE("view", _uM({ class: "wtu-lbcsyi-2 wtu-1htvnc1-3 mb-8px" }), [
+          _cE("text", _uM({ class: "text-14px wtu-1thuw5y-4" }), "可用窗口宽度"),
+          _cE("text", _uM({ class: "text-14px wtu-ok6xoz-0 wtu-1sdp0je-5" }), _tD(windowWidth.value) + " px", 1 /* TEXT */)
         ]),
-        _cE("view", _uM({ class: "flex-row justify-between mb-8px" }), [
-          _cE("text", _uM({ class: "text-14px text-__64748b_" }), "可用窗口高度"),
-          _cE("text", _uM({ class: "text-14px font-bold text-__334155_" }), _tD(windowHeight.value) + " px", 1 /* TEXT */)
+        _cE("view", _uM({ class: "wtu-lbcsyi-2 wtu-1htvnc1-3 mb-8px" }), [
+          _cE("text", _uM({ class: "text-14px wtu-1thuw5y-4" }), "可用窗口高度"),
+          _cE("text", _uM({ class: "text-14px wtu-ok6xoz-0 wtu-1sdp0je-5" }), _tD(windowHeight.value) + " px", 1 /* TEXT */)
         ]),
-        _cE("view", _uM({ class: "flex-row justify-between mb-8px" }), [
-          _cE("text", _uM({ class: "text-14px text-__64748b_" }), "状态栏高度 (statusBarHeight)"),
-          _cE("text", _uM({ class: "text-14px font-bold text-__334155_" }), _tD(statusBarHeight.value) + " px", 1 /* TEXT */)
+        _cE("view", _uM({ class: "wtu-lbcsyi-2 wtu-1htvnc1-3 mb-8px" }), [
+          _cE("text", _uM({ class: "text-14px wtu-1thuw5y-4" }), "状态栏高度 (statusBarHeight)"),
+          _cE("text", _uM({ class: "text-14px wtu-ok6xoz-0 wtu-1sdp0je-5" }), _tD(statusBarHeight.value) + " px", 1 /* TEXT */)
         ]),
-        _cE("view", _uM({ class: "flex-row justify-between" }), [
-          _cE("text", _uM({ class: "text-14px text-__64748b_" }), "设备像素比 (pixelRatio)"),
-          _cE("text", _uM({ class: "text-14px font-bold text-__334155_" }), _tD(pixelRatio.value), 1 /* TEXT */)
+        _cE("view", _uM({ class: "wtu-lbcsyi-2 wtu-1htvnc1-3" }), [
+          _cE("text", _uM({ class: "text-14px wtu-1thuw5y-4" }), "设备像素比 (pixelRatio)"),
+          _cE("text", _uM({ class: "text-14px wtu-ok6xoz-0 wtu-1sdp0je-5" }), _tD(pixelRatio.value), 1 /* TEXT */)
         ])
       ])
     ]),
@@ -80,4 +80,4 @@ return (): any | null => {
 
 })
 export default __sfc__
-const GenSrcPagesBasicComponentsSystemInfoDemoCardStyles = [_uM([["border-color-__e2e8f0_", _pS(_uM([["borderTopColor", "#e2e8f0"], ["borderRightColor", "#e2e8f0"], ["borderBottomColor", "#e2e8f0"], ["borderLeftColor", "#e2e8f0"]]))], ["border-style-solid", _pS(_uM([["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"]]))], ["border-width-1px", _pS(_uM([["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["font-bold", _pS(_uM([["fontWeight", 700]]))], ["justify-between", _pS(_uM([["justifyContent", "space-between"]]))], ["mb-12px", _pS(_uM([["marginBottom", 12]]))], ["mb-16px", _pS(_uM([["marginBottom", 16]]))], ["mb-8px", _pS(_uM([["marginBottom", 8]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["rounded-12px", _pS(_uM([["borderTopLeftRadius", 12], ["borderTopRightRadius", 12], ["borderBottomRightRadius", 12], ["borderBottomLeftRadius", 12]]))], ["text-__1e293b_", _pS(_uM([["color", "#1e293b"]]))], ["text-__334155_", _pS(_uM([["color", "#334155"]]))], ["text-__64748b_", _pS(_uM([["color", "#64748b"]]))], ["text-13px", _pS(_uM([["fontSize", 13]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))]])]
+const GenSrcPagesBasicComponentsSystemInfoDemoCardStyles = [_uM([["font-bold", _pS(_uM([["--tw-font-weight", "700"], ["fontWeight", 700]]))], ["wtu-ok6xoz-0", _pS(_uM([["--tw-font-weight", "700"], ["fontWeight", 700]]))], ["wtu-sgmw91-1", _pS(_uM([["color", "#1e293b"]]))], ["wtu-lbcsyi-2", _pS(_uM([["flexDirection", "row"]]))], ["wtu-1htvnc1-3", _pS(_uM([["justifyContent", "space-between"]]))], ["wtu-1thuw5y-4", _pS(_uM([["color", "#64748b"]]))], ["wtu-1sdp0je-5", _pS(_uM([["color", "#334155"]]))]])]

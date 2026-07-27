@@ -81,7 +81,7 @@ async function loadMockData() {
     // toastSuccess(`加载了 ${list.length} 条数据`)
   }
   catch (err) {
-    console.error('loadMockData error:', err, " at src/pages/basic/components/HttpDemoCard.uvue:183")
+    console.error('loadMockData error:', err, " at src/pages/basic/components/HttpDemoCard.uvue:135")
   }
 }
 
@@ -101,7 +101,7 @@ async function fetchRealApi() {
     requestStatus.value = 'success'
   }
   catch (err) {
-    console.log(err, 'err', " at src/pages/basic/components/HttpDemoCard.uvue:203")
+    console.log(err, 'err', " at src/pages/basic/components/HttpDemoCard.uvue:155")
     requestStatus.value = 'error'
     let errStr = ''
     if (err !== null) {
@@ -122,26 +122,26 @@ return (): any | null => {
 
   return _cV(unref(Card), _uM({ title: "HTTP 请求 Demo" }), _uM({
     default: withSlotCtx((): any[] => [
-      _cE("view", _uM({ class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }), [
-        _cE("text", _uM({ class: "text-12px text-__64748b_ leading-20px" }), " 基于 lime-request 封装的 http 请求演示，包含 Mock 数据与真实接口请求两种模式。 ")
+      _cE("view", _uM({ class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]" }), [
+        _cE("text", _uM({ class: "text-12px wtu-pryky7-0 leading-20px" }), " 基于 lime-request 封装的 http 请求演示，包含 Mock 数据与真实接口请求两种模式。 ")
       ]),
       _cE("view", _uM({ class: "mb-16px" }), [
-        _cE("text", _uM({ class: "text-14px font-bold text-__2d3748_ mb-10px" }), "Mock 数据列表（ID 为任意类型）"),
+        _cE("text", _uM({ class: "text-14px wtu-1gyo9ug-1 wtu-1e7koem-2 mb-10px" }), "Mock 数据列表（ID 为任意类型）"),
         _cE(Fragment, null, RenderHelpers.renderList(mockList.value, (item, index, __index, _cached): any => {
           return _cE("view", _uM({
             key: index,
-            class: "flex-row items-center py-10px px-12px bg-__f1f5f9_ rounded-8px mt-8px"
+            class: "wtu-1p3s0p7-3 wtu-or3po3-4 py-10px px-12px wtu-1y83w1l-5 rounded-8px mt-8px"
           }), [
-            _cE("view", _uM({ class: "w-28px h-28px rounded-14px bg-__3182ce_ justify-center items-center mr-10px" }), [
-              _cE("text", _uM({ class: "text-12px text-white font-bold" }), _tD(item.id), 1 /* TEXT */)
+            _cE("view", _uM({ class: "w-28px h-28px rounded-14px wtu-1i8kliw-6 wtu-ijj99f-7 wtu-or3po3-4 mr-10px" }), [
+              _cE("text", _uM({ class: "text-12px wtu-155p5he-8 wtu-1gyo9ug-1" }), _tD(item.id), 1 /* TEXT */)
             ]),
-            _cE("text", _uM({ class: "text-14px text-__334155_" }), _tD(item.name), 1 /* TEXT */)
+            _cE("text", _uM({ class: "text-14px wtu-xg97j7-9" }), _tD(item.name), 1 /* TEXT */)
           ])
         }), 128 /* KEYED_FRAGMENT */)
       ]),
-      _cE("view", _uM({ class: "rounded-10px p-12px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }), [
-        _cE("view", _uM({ class: "flex-row justify-between items-center mb-6px" }), [
-          _cE("text", _uM({ class: "text-13px text-__64748b_" }), "接口请求状态:"),
+      _cE("view", _uM({ class: "rounded-10px p-12px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]" }), [
+        _cE("view", _uM({ class: "wtu-1p3s0p7-3 wtu-ok6iny-a wtu-or3po3-4 mb-6px" }), [
+          _cE("text", _uM({ class: "text-13px wtu-pryky7-0" }), "接口请求状态:"),
           _cE("view", _uM({
             style: _nS(_uM({ paddingLeft: '8px', paddingRight: '8px', paddingTop: '2px', paddingBottom: '2px', borderRadius: 10, backgroundColor: statusBgColor.value }))
           }), [
@@ -153,35 +153,35 @@ return (): any | null => {
         isTrue(hasResponseData.value)
           ? _cE("view", _uM({
               key: 0,
-              class: "bg-white rounded-8px p-10px border-width-1px border-style-solid border-color-__e2e8f0_"
+              class: "wtu-kp3eq2-b rounded-8px p-10px border-width-1px border-style-solid border-color-[#e2e8f0]"
             }), [
-              _cE("text", _uM({ class: "text-12px text-__475569_" }), _tD(responseText.value), 1 /* TEXT */)
+              _cE("text", _uM({ class: "text-12px wtu-s98mzw-c" }), _tD(responseText.value), 1 /* TEXT */)
             ])
           : _cC("v-if", true),
         isTrue(hasErrorMsg.value)
           ? _cE("view", _uM({
               key: 1,
-              class: "bg-__fff5f5_ rounded-8px p-10px border-width-1px border-style-solid border-color-__fecaca_ mt-6px"
+              class: "wtu-snsrpe-d rounded-8px p-10px border-width-1px border-style-solid border-color-[#fecaca] mt-6px"
             }), [
-              _cE("text", _uM({ class: "text-12px text-__ef4444_" }), "错误：" + _tD(errorMsg.value), 1 /* TEXT */)
+              _cE("text", _uM({ class: "text-12px wtu-bquocn-e" }), "错误：" + _tD(errorMsg.value), 1 /* TEXT */)
             ])
           : _cC("v-if", true)
       ]),
-      _cE("view", _uM({ class: "flex-row" }), [
-        _cE("view", _uM({ class: "flex-1 mr-10px" }), [
+      _cE("view", _uM({ class: "wtu-1p3s0p7-3" }), [
+        _cE("view", _uM({ class: "wtu-wy44gc-f mr-10px" }), [
           _cE("view", _uM({
-            class: "bg-__3182ce_ rounded-8px h-42px w-full flex flex-row items-center justify-center",
+            class: "wtu-1i8kliw-6 rounded-8px h-42px wtu-1mbx3i8-g wtu-io2yyi-h wtu-1p3s0p7-3 wtu-or3po3-4 wtu-ijj99f-7",
             onClick: loadMockData
           }), [
-            _cE("text", _uM({ class: "text-__ffffff_ text-14px" }), "加载 Mock 数据")
+            _cE("text", _uM({ class: "wtu-1tndks6-i text-14px" }), "加载 Mock 数据")
           ])
         ]),
-        _cE("view", _uM({ class: "flex-1" }), [
+        _cE("view", _uM({ class: "wtu-wy44gc-f" }), [
           _cE("view", _uM({
-            class: "bg-__10b981_ rounded-8px h-42px w-full flex flex-row items-center justify-center",
+            class: "wtu-1dwvvaj-j rounded-8px h-42px wtu-1mbx3i8-g wtu-io2yyi-h wtu-1p3s0p7-3 wtu-or3po3-4 wtu-ijj99f-7",
             onClick: fetchRealApi
           }), [
-            _cE("text", _uM({ class: "text-__ffffff_ text-14px" }), _tD(loading.value ? '请求中...' : '真实 API 请求'), 1 /* TEXT */)
+            _cE("text", _uM({ class: "wtu-1tndks6-i text-14px" }), _tD(loading.value ? '请求中...' : '真实 API 请求'), 1 /* TEXT */)
           ])
         ])
       ])
@@ -193,4 +193,4 @@ return (): any | null => {
 
 })
 export default __sfc__
-const GenSrcPagesBasicComponentsHttpDemoCardStyles = [_uM([["bg-__10b981_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#10b981"]]))], ["bg-__3182ce_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#3182ce"]]))], ["bg-__f1f5f9_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f1f5f9"]]))], ["bg-__fff5f5_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#fff5f5"]]))], ["bg-white", _pS(_uM([["backgroundColor", "rgba(255,255,255,var(--un-bg-opacity,1))"]]))], ["border-color-__e2e8f0_", _pS(_uM([["borderTopColor", "#e2e8f0"], ["borderRightColor", "#e2e8f0"], ["borderBottomColor", "#e2e8f0"], ["borderLeftColor", "#e2e8f0"]]))], ["border-color-__fecaca_", _pS(_uM([["borderTopColor", "#fecaca"], ["borderRightColor", "#fecaca"], ["borderBottomColor", "#fecaca"], ["borderLeftColor", "#fecaca"]]))], ["border-style-solid", _pS(_uM([["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"]]))], ["border-width-1px", _pS(_uM([["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1]]))], ["flex", _pS(_uM([["display", "flex"]]))], ["flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["font-bold", _pS(_uM([["fontWeight", 700]]))], ["h-28px", _pS(_uM([["height", 28]]))], ["h-42px", _pS(_uM([["height", 42]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["justify-between", _pS(_uM([["justifyContent", "space-between"]]))], ["justify-center", _pS(_uM([["justifyContent", "center"]]))], ["leading-20px", _pS(_uM([["lineHeight", "20px"]]))], ["mb-10px", _pS(_uM([["marginBottom", 10]]))], ["mb-16px", _pS(_uM([["marginBottom", 16]]))], ["mb-6px", _pS(_uM([["marginBottom", 6]]))], ["mr-10px", _pS(_uM([["marginRight", 10]]))], ["mt-6px", _pS(_uM([["marginTop", 6]]))], ["mt-8px", _pS(_uM([["marginTop", 8]]))], ["p-10px", _pS(_uM([["paddingTop", 10], ["paddingRight", 10], ["paddingBottom", 10], ["paddingLeft", 10]]))], ["p-12px", _pS(_uM([["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["px-12px", _pS(_uM([["paddingLeft", 12], ["paddingRight", 12]]))], ["py-10px", _pS(_uM([["paddingTop", 10], ["paddingBottom", 10]]))], ["rounded-10px", _pS(_uM([["borderTopLeftRadius", 10], ["borderTopRightRadius", 10], ["borderBottomRightRadius", 10], ["borderBottomLeftRadius", 10]]))], ["rounded-12px", _pS(_uM([["borderTopLeftRadius", 12], ["borderTopRightRadius", 12], ["borderBottomRightRadius", 12], ["borderBottomLeftRadius", 12]]))], ["rounded-14px", _pS(_uM([["borderTopLeftRadius", 14], ["borderTopRightRadius", 14], ["borderBottomRightRadius", 14], ["borderBottomLeftRadius", 14]]))], ["rounded-8px", _pS(_uM([["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["text-__2d3748_", _pS(_uM([["color", "#2d3748"]]))], ["text-__334155_", _pS(_uM([["color", "#334155"]]))], ["text-__475569_", _pS(_uM([["color", "#475569"]]))], ["text-__64748b_", _pS(_uM([["color", "#64748b"]]))], ["text-__ef4444_", _pS(_uM([["color", "#ef4444"]]))], ["text-__ffffff_", _pS(_uM([["color", "#ffffff"]]))], ["text-12px", _pS(_uM([["fontSize", 12]]))], ["text-13px", _pS(_uM([["fontSize", 13]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))], ["text-white", _pS(_uM([["color", "rgba(255,255,255,var(--un-color-opacity,1))"]]))], ["w-28px", _pS(_uM([["width", 28]]))], ["w-full", _pS(_uM([["width", "100%"]]))]])]
+const GenSrcPagesBasicComponentsHttpDemoCardStyles = [_uM([["font-bold", _pS(_uM([["--tw-font-weight", "700"], ["fontWeight", 700]]))], ["wtu-pryky7-0", _pS(_uM([["color", "#64748b"]]))], ["wtu-1gyo9ug-1", _pS(_uM([["--tw-font-weight", "700"], ["fontWeight", 700]]))], ["wtu-1e7koem-2", _pS(_uM([["color", "#2d3748"]]))], ["wtu-1p3s0p7-3", _pS(_uM([["flexDirection", "row"]]))], ["wtu-or3po3-4", _pS(_uM([["alignItems", "center"]]))], ["wtu-1y83w1l-5", _pS(_uM([["backgroundColor", "#f1f5f9"]]))], ["wtu-1i8kliw-6", _pS(_uM([["backgroundColor", "#3182ce"]]))], ["wtu-ijj99f-7", _pS(_uM([["justifyContent", "center"]]))], ["wtu-155p5he-8", _pS(_uM([["color", "#ffffff"]]))], ["wtu-xg97j7-9", _pS(_uM([["color", "#334155"]]))], ["wtu-ok6iny-a", _pS(_uM([["justifyContent", "space-between"]]))], ["wtu-kp3eq2-b", _pS(_uM([["backgroundColor", "#ffffff"]]))], ["wtu-s98mzw-c", _pS(_uM([["color", "#475569"]]))], ["wtu-snsrpe-d", _pS(_uM([["backgroundColor", "#fff5f5"]]))], ["wtu-bquocn-e", _pS(_uM([["color", "#ef4444"]]))], ["wtu-wy44gc-f", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["wtu-1mbx3i8-g", _pS(_uM([["width", "100%"]]))], ["wtu-io2yyi-h", _pS(_uM([["display", "flex"]]))], ["wtu-1tndks6-i", _pS(_uM([["color", "#ffffff"]]))], ["wtu-1dwvvaj-j", _pS(_uM([["backgroundColor", "#10b981"]]))]])]

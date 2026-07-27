@@ -65,27 +65,27 @@ const _component_uni_icons = resolveEasyComponent("uni-icons",_easycom_uni_icons
     title: _ctx.$t('basic.langTitle')
   }), _uM({
     default: withSlotCtx((): any[] => [
-      _cE("view", _uM({ class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }), [
-        _cE("text", _uM({ class: "text-12px text-__94a3b8_ mb-6px" }), _tD(_ctx.$t('basic.langPreview')), 1 /* TEXT */),
-        _cE("text", _uM({ class: "text-16px font-bold text-__1e293b_" }), _tD(_ctx.$t('message.welcome')), 1 /* TEXT */),
-        _cE("text", _uM({ class: "text-14px text-__475569_ mt-8px" }), _tD(_ctx.$t('message.hello', { msg: 'hi' })), 1 /* TEXT */),
-        _cE("view", _uM({ class: "mt-12px pt-12px border-top-width-1px border-top-style-solid border-top-color-__f1f5f9_" }), [
-          _cE("text", _uM({ class: "text-12px text-__94a3b8_ mb-6px" }), _tD(_ctx.$t('basic.uviewPreview')), 1 /* TEXT */),
-          _cE("view", _uM({ class: "flex-row items-center flex-wrap" }), [
-            _cE("text", _uM({ class: "text-13px text-__2563eb_ bg-__eff6ff_ px-8px py-4px rounded-4px font-medium mr-8px mb-4px" }), _tD(unref(uViewChooseDates)), 1 /* TEXT */),
-            _cE("text", _uM({ class: "text-13px text-__059669_ bg-__ecfdf5_ px-8px py-4px rounded-4px font-medium mr-8px mb-4px" }), _tD(unref(uViewConfirm)), 1 /* TEXT */),
-            _cE("text", _uM({ class: "text-13px text-__d97706_ bg-__fffbe2_ px-8px py-4px rounded-4px font-medium mb-4px" }), _tD(unref(uViewStart)) + " / " + _tD(unref(uViewEnd)), 1 /* TEXT */)
+      _cE("view", _uM({ class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]" }), [
+        _cE("text", _uM({ class: "text-12px wtu-9qob8-0 mb-6px" }), _tD(_ctx.$t('basic.langPreview')), 1 /* TEXT */),
+        _cE("text", _uM({ class: "text-16px wtu-tg5bk5-1 wtu-uqoqln-2" }), _tD(_ctx.$t('message.welcome')), 1 /* TEXT */),
+        _cE("text", _uM({ class: "text-14px wtu-apgfmb-3 mt-8px" }), _tD(_ctx.$t('message.hello', { msg: 'hi' })), 1 /* TEXT */),
+        _cE("view", _uM({ class: "mt-12px pt-12px border-top-width-1px border-top-style-solid border-top-color-[#f1f5f9]" }), [
+          _cE("text", _uM({ class: "text-12px wtu-9qob8-0 mb-6px" }), _tD(_ctx.$t('basic.uviewPreview')), 1 /* TEXT */),
+          _cE("view", _uM({ class: "wtu-1xpqddw-4 wtu-1t7tavk-5 wtu-uadth0-6" }), [
+            _cE("text", _uM({ class: "text-13px wtu-zus43i-7 wtu-grn2i8-8 px-8px py-4px rounded-4px wtu-re8qpd-9 mr-8px mb-4px" }), _tD(unref(uViewChooseDates)), 1 /* TEXT */),
+            _cE("text", _uM({ class: "text-13px wtu-6g0b4e-a wtu-en5wvg-b px-8px py-4px rounded-4px wtu-re8qpd-9 mr-8px mb-4px" }), _tD(unref(uViewConfirm)), 1 /* TEXT */),
+            _cE("text", _uM({ class: "text-13px wtu-ky8bvg-c wtu-14ion4g-d px-8px py-4px rounded-4px wtu-re8qpd-9 mb-4px" }), _tD(unref(uViewStart)) + " / " + _tD(unref(uViewEnd)), 1 /* TEXT */)
           ])
         ])
       ]),
       _cE("view", _uM({
-        class: "flex-row items-center justify-between py-12px border-bottom-width-1px border-bottom-style-solid border-bottom-color-__f1f5f9_",
+        class: "wtu-1xpqddw-4 wtu-1t7tavk-5 wtu-1fek2j3-e py-12px border-bottom-width-1px border-bottom-style-solid border-bottom-color-[#f1f5f9]",
         onClick: () => {switchLanguage('zh-CN')}
       }), [
-        _cE("view", _uM({ class: "flex-row items-center" }), [
-          _cE("text", _uM({ class: "text-15px text-__334155_ font-medium" }), "简体中文")
+        _cE("view", _uM({ class: "wtu-1xpqddw-4 wtu-1t7tavk-5" }), [
+          _cE("text", _uM({ class: "text-15px wtu-1au22ic-f wtu-re8qpd-9" }), "简体中文")
         ]),
-        _cE("view", _uM({ class: "flex-row items-center" }), [
+        _cE("view", _uM({ class: "wtu-1xpqddw-4 wtu-1t7tavk-5" }), [
           isTrue(unref(isZhCN))
             ? _cV(_component_uni_icons, _uM({
                 key: 0,
@@ -97,13 +97,13 @@ const _component_uni_icons = resolveEasyComponent("uni-icons",_easycom_uni_icons
         ])
       ], 8 /* PROPS */, ["onClick"]),
       _cE("view", _uM({
-        class: "flex-row items-center justify-between py-12px",
+        class: "wtu-1xpqddw-4 wtu-1t7tavk-5 wtu-1fek2j3-e py-12px",
         onClick: () => {switchLanguage('en-US')}
       }), [
-        _cE("view", _uM({ class: "flex-row items-center" }), [
-          _cE("text", _uM({ class: "text-15px text-__334155_ font-medium" }), "English")
+        _cE("view", _uM({ class: "wtu-1xpqddw-4 wtu-1t7tavk-5" }), [
+          _cE("text", _uM({ class: "text-15px wtu-1au22ic-f wtu-re8qpd-9" }), "English")
         ]),
-        _cE("view", _uM({ class: "flex-row items-center" }), [
+        _cE("view", _uM({ class: "wtu-1xpqddw-4 wtu-1t7tavk-5" }), [
           isTrue(unref(isEnUS))
             ? _cV(_component_uni_icons, _uM({
                 key: 0,
@@ -122,4 +122,4 @@ const _component_uni_icons = resolveEasyComponent("uni-icons",_easycom_uni_icons
 
 })
 export default __sfc__
-const GenSrcPagesBasicComponentsLangSwitchCardStyles = [_uM([["bg-__ecfdf5_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#ecfdf5"]]))], ["bg-__eff6ff_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#eff6ff"]]))], ["bg-__fffbe2_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#fffbe2"]]))], ["border-bottom-color-__f1f5f9_", _pS(_uM([["borderBottomColor", "#f1f5f9"]]))], ["border-bottom-style-solid", _pS(_uM([["borderBottomStyle", "solid"]]))], ["border-bottom-width-1px", _pS(_uM([["borderBottomWidth", 1]]))], ["border-color-__e2e8f0_", _pS(_uM([["borderTopColor", "#e2e8f0"], ["borderRightColor", "#e2e8f0"], ["borderBottomColor", "#e2e8f0"], ["borderLeftColor", "#e2e8f0"]]))], ["border-style-solid", _pS(_uM([["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"]]))], ["border-top-color-__f1f5f9_", _pS(_uM([["borderTopColor", "#f1f5f9"]]))], ["border-top-style-solid", _pS(_uM([["borderTopStyle", "solid"]]))], ["border-top-width-1px", _pS(_uM([["borderTopWidth", 1]]))], ["border-width-1px", _pS(_uM([["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["flex-wrap", _pS(_uM([["flexWrap", "wrap"]]))], ["font-bold", _pS(_uM([["fontWeight", 700]]))], ["font-medium", _pS(_uM([["fontWeight", 500]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["justify-between", _pS(_uM([["justifyContent", "space-between"]]))], ["mb-16px", _pS(_uM([["marginBottom", 16]]))], ["mb-4px", _pS(_uM([["marginBottom", 4]]))], ["mb-6px", _pS(_uM([["marginBottom", 6]]))], ["mr-8px", _pS(_uM([["marginRight", 8]]))], ["mt-12px", _pS(_uM([["marginTop", 12]]))], ["mt-8px", _pS(_uM([["marginTop", 8]]))], ["none", _pS(_uM([["display", "none"]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pt-12px", _pS(_uM([["paddingTop", 12]]))], ["px-8px", _pS(_uM([["paddingLeft", 8], ["paddingRight", 8]]))], ["py-12px", _pS(_uM([["paddingTop", 12], ["paddingBottom", 12]]))], ["py-4px", _pS(_uM([["paddingTop", 4], ["paddingBottom", 4]]))], ["rounded-12px", _pS(_uM([["borderTopLeftRadius", 12], ["borderTopRightRadius", 12], ["borderBottomRightRadius", 12], ["borderBottomLeftRadius", 12]]))], ["rounded-4px", _pS(_uM([["borderTopLeftRadius", 4], ["borderTopRightRadius", 4], ["borderBottomRightRadius", 4], ["borderBottomLeftRadius", 4]]))], ["text-__059669_", _pS(_uM([["color", "#059669"]]))], ["text-__1e293b_", _pS(_uM([["color", "#1e293b"]]))], ["text-__2563eb_", _pS(_uM([["color", "#2563eb"]]))], ["text-__334155_", _pS(_uM([["color", "#334155"]]))], ["text-__475569_", _pS(_uM([["color", "#475569"]]))], ["text-__94a3b8_", _pS(_uM([["color", "#94a3b8"]]))], ["text-__d97706_", _pS(_uM([["color", "#d97706"]]))], ["text-12px", _pS(_uM([["fontSize", 12]]))], ["text-13px", _pS(_uM([["fontSize", 13]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))], ["text-15px", _pS(_uM([["fontSize", 15]]))], ["text-16px", _pS(_uM([["fontSize", 16]]))]])]
+const GenSrcPagesBasicComponentsLangSwitchCardStyles = [_uM([["font-bold", _pS(_uM([["--tw-font-weight", "700"], ["fontWeight", 700]]))], ["font-medium", _pS(_uM([["--tw-font-weight", "500"], ["fontWeight", 500]]))], ["wtu-9qob8-0", _pS(_uM([["color", "#94a3b8"]]))], ["wtu-tg5bk5-1", _pS(_uM([["--tw-font-weight", "700"], ["fontWeight", 700]]))], ["wtu-uqoqln-2", _pS(_uM([["color", "#1e293b"]]))], ["wtu-apgfmb-3", _pS(_uM([["color", "#475569"]]))], ["wtu-1xpqddw-4", _pS(_uM([["flexDirection", "row"]]))], ["wtu-1t7tavk-5", _pS(_uM([["alignItems", "center"]]))], ["wtu-uadth0-6", _pS(_uM([["flexWrap", "wrap"]]))], ["wtu-zus43i-7", _pS(_uM([["color", "#2563eb"]]))], ["wtu-grn2i8-8", _pS(_uM([["backgroundColor", "#eff6ff"]]))], ["wtu-re8qpd-9", _pS(_uM([["--tw-font-weight", "500"], ["fontWeight", 500]]))], ["wtu-6g0b4e-a", _pS(_uM([["color", "#059669"]]))], ["wtu-en5wvg-b", _pS(_uM([["backgroundColor", "#ecfdf5"]]))], ["wtu-ky8bvg-c", _pS(_uM([["color", "#d97706"]]))], ["wtu-14ion4g-d", _pS(_uM([["backgroundColor", "#fffbe2"]]))], ["wtu-1fek2j3-e", _pS(_uM([["justifyContent", "space-between"]]))], ["wtu-1au22ic-f", _pS(_uM([["color", "#334155"]]))]])]

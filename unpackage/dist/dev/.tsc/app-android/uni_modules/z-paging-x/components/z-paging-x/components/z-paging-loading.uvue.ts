@@ -17,7 +17,7 @@ const _cache = __ins.renderCache;
   const doRotate = () => {
     if (element.value !== null) {
       times.value = times.value + 1;
-      element.value!.style.setProperty('transform', 'rotate(' + times.value * 360 + 'deg)');
+      element.value!.style.setProperty('wtu-1du5xyf-0', 'rotate(' + times.value * 360 + 'deg)');
       element.value!.style.setProperty('transition-duration', '1000ms');
     }
   }
@@ -44,4 +44,4 @@ return (): any | null => {
 
 })
 export default __sfc__
-const GenUniModulesZPagingXComponentsZPagingXComponentsZPagingLoadingStyles = [_uM([["zpx-loading-img", _pS(_uM([["width", "34rpx"], ["height", "34rpx"], ["transitionDuration", "2000ms"], ["transitionProperty", "transform"], ["transitionTimingFunction", "linear"], ["transform", "rotate(0deg)"]]))], ["@TRANSITION", _uM([["zpx-loading-img", _uM([["duration", "2000ms"], ["property", "transform"], ["timingFunction", "linear"]])]])]])]
+const GenUniModulesZPagingXComponentsZPagingXComponentsZPagingLoadingStyles = [_uM([["zpx-loading-img", _pS(_uM([["width", "34rpx"], ["height", "34rpx"], ["transitionDuration", "2000ms"], ["transitionProperty", "transform"], ["transitionTimingFunction", "linear"], ["WebkitTransform", "rotate(0deg)"], ["transform", "rotate(0deg)"]]))], ["wtu-1du5xyf-0", _pS(_uM([["WebkitTransform", ""], ["transform", ""]]))], ["@TRANSITION", _uM([["zpx-loading-img", _uM([["duration", "2000ms"], ["property", "transform"], ["timingFunction", "linear"]])]])]])]

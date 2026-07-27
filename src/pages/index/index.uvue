@@ -1,8 +1,9 @@
-<script lang="uts">
+<script setup lang="uts">
 import WeappTailwindcss from '../../components/WeappTailwindcss.uvue'
 import BindClass from '../../components/BindClass.uvue'
+import TButton from '../../components/t-button/t-button.uvue'
 
-const buttonColors = [
+const buttonColors: Array<string> = [
   'bg-[#000]',
   'bg-[#111]',
   'bg-[#222]',
@@ -21,38 +22,31 @@ const buttonColors = [
   'bg-[#fff]',
 ]
 
-export default {
-  styleIsolation: 'app',
-  components: {
-    BindClass,
-    WeappTailwindcss,
-  },
-  data() {
-    return {
-      globalNum: 0,
-    }
-  },
-  computed: {
-    buttonClass(): string {
-      return buttonColors[this.globalNum % buttonColors.length]
-    },
-    templateCorpusDynamicClass(): string {
-      return 'template-corpus-dynamic bg-[#68c828] text-[100px] w-[323px] h-[45px]'
-    },
-  },
-  methods: {
-    setGlobalNum(num: number) {
-      this.globalNum = num
-    },
-  },
-  onLoad() {
-    console.log('欢迎使用 weapp-tailwindcss 模板')
-  },
+const globalNum = ref(0)
+
+const buttonClass = computed((): string => {
+  const index: number = globalNum.value % buttonColors.length
+  return buttonColors[index]
+})
+
+const templateCorpusDynamicClass = computed((): string => {
+  return 'template-corpus-dynamic bg-[#68c828] text-[100px] w-[323px] h-[45px]'
+})
+
+function setGlobalNum(num: number): void {
+  globalNum.value = num
 }
+
+onLoad((): void => {
+  console.log('欢迎使用 weapp-tailwindcss 模板')
+})
 </script>
 
 <template>
   <view class="content">
+    <up-button type="primary">
+      按钮
+    </up-button>
     <WeappTailwindcss />
     <BindClass />
     <view class="w-full bg-[#164e63] p-[12px] issue-1002-probe">

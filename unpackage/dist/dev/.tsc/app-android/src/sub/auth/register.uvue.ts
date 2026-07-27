@@ -32,13 +32,13 @@ return (): any | null => {
         default: withSlotCtx((): any[] => [
           _cE("view", _uM({ class: "flex-1 p-30px items-center justify-center" }), [
             _cE("view", _uM({ class: "mb-30px" }), [
-              _cE("text", _uM({ class: "text-20px font-bold text-__1e293b_" }), "注册页")
+              _cE("text", _uM({ class: "text-20px font-bold text-_b_h1e293b_B" }), "注册页")
             ]),
             _cE("view", _uM({
-              class: "w-200px h-44px rounded-8px bg-__10b981_ flex flex-row items-center justify-center",
+              class: "w-200px h-44px rounded-8px bg-_b_h10b981_B flex flex-row items-center justify-center",
               onClick: doRegister
             }), [
-              _cE("text", _uM({ class: "text-__ffffff_ text-14px font-bold" }), "点击模拟注册")
+              _cE("text", _uM({ class: "text-_b_hffffff_B text-14px font-bold" }), "点击模拟注册")
             ])
           ])
         ]),
@@ -52,4 +52,4 @@ return (): any | null => {
 
 })
 export default __sfc__
-const GenSrcSubAuthRegisterStyles = [_uM([["bg-__10b981_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#10b981"]]))], ["flex", _pS(_uM([["display", "flex"]]))], ["flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["font-bold", _pS(_uM([["fontWeight", 700]]))], ["h-44px", _pS(_uM([["height", 44]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["justify-center", _pS(_uM([["justifyContent", "center"]]))], ["mb-30px", _pS(_uM([["marginBottom", 30]]))], ["p-30px", _pS(_uM([["paddingTop", 30], ["paddingRight", 30], ["paddingBottom", 30], ["paddingLeft", 30]]))], ["rounded-8px", _pS(_uM([["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["text-__1e293b_", _pS(_uM([["color", "#1e293b"]]))], ["text-__ffffff_", _pS(_uM([["color", "#ffffff"]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))], ["text-20px", _pS(_uM([["fontSize", 20]]))], ["w-200px", _pS(_uM([["width", 200]]))]])]
+const GenSrcSubAuthRegisterStyles = [_uM([["flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["justify-center", _pS(_uM([["justifyContent", "center"]]))], ["font-bold", _pS(_uM([["--tw-font-weight", "700"], ["fontWeight", 700]]))], ["text-_b_h1e293b_B", _pS(_uM([["color", "#1e293b"]]))], ["bg-_b_h10b981_B", _pS(_uM([["backgroundColor", "#10b981"]]))], ["flex", _pS(_uM([["display", "flex"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["text-_b_hffffff_B", _pS(_uM([["color", "#ffffff"]]))]])]

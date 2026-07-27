@@ -23,7 +23,7 @@ const _component_up_badge = resolveEasyComponent("up-badge",_easycom_up_badge)
         "navigation-bar-title-text": 'up-badge 徽标'
       }), _uM({
         default: withSlotCtx((): any[] => [
-          _cE("view", _uM({ class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }), [
+          _cE("view", _uM({ class: "page-container bg-_b_hf8fafc_B min-h-screen pb-30px" }), [
             _cV(_component_NavBar, _uM({
               title: "up-badge 徽标",
               "auto-back": true,
@@ -85,7 +85,7 @@ const _component_up_badge = resolveEasyComponent("up-badge",_easycom_up_badge)
               _cE("view", _uM({ class: "demo-block mt-12px" }), [
                 _cE("text", _uM({ class: "demo-label" }), "绝对定位"),
                 _cE("view", _uM({ class: "flex-row items-center" }), [
-                  _cE("view", _uM({ class: "relative w-40px h-40px bg-__e5e5e5_ rounded-4px" }), [
+                  _cE("view", _uM({ class: "relative w-40px h-40px bg-_b_he5e5e5_B rounded-4px" }), [
                     _cV(_component_up_badge, _uM({
                       type: "error",
                       value: 5,
@@ -108,4 +108,4 @@ const _component_up_badge = resolveEasyComponent("up-badge",_easycom_up_badge)
 
 })
 export default __sfc__
-const GenSrcSubUviewUltraDemosBadgeBadgeStyles = [_uM([["absolute", _pS(_uM([["position", "absolute"]]))], ["bg-__e5e5e5_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#e5e5e5"]]))], ["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["h-40px", _pS(_uM([["height", 40]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["mr-20px", _pS(_uM([["marginRight", 20]]))], ["mt-12px", _pS(_uM([["marginTop", 12]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["relative", _pS(_uM([["position", "relative"]]))], ["rounded-4px", _pS(_uM([["borderTopLeftRadius", 4], ["borderTopRightRadius", 4], ["borderBottomRightRadius", 4], ["borderBottomLeftRadius", 4]]))], ["w-40px", _pS(_uM([["width", 40]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]
+const GenSrcSubUviewUltraDemosBadgeBadgeStyles = [_uM([["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]

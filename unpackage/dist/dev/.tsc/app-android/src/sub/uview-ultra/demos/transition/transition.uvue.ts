@@ -39,7 +39,7 @@ const _component_up_button = resolveEasyComponent("up-button",_easycom_up_button
         "navigation-bar-title-text": 'up-transition 动画'
       }), _uM({
         default: withSlotCtx((): any[] => [
-          _cE("view", _uM({ class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }), [
+          _cE("view", _uM({ class: "page-container bg-_b_hf8fafc_B min-h-screen pb-30px" }), [
             _cV(_component_NavBar, _uM({
               title: "Transition 动画",
               "auto-back": true,
@@ -79,7 +79,7 @@ const _component_up_button = resolveEasyComponent("up-button",_easycom_up_button
                     mode: "zoom"
                   }), _uM({
                     default: withSlotCtx((): any[] => [
-                      _cE("view", _uM({ class: "transition-demo-box bg-__19be6b_" }), [
+                      _cE("view", _uM({ class: "transition-demo-box bg-_b_h19be6b_B" }), [
                         _cE("text", _uM({ class: "text-14px text-white font-500" }), "zoom 缩放")
                       ])
                     ]),
@@ -95,7 +95,7 @@ const _component_up_button = resolveEasyComponent("up-button",_easycom_up_button
                     mode: slideMode.value
                   }), _uM({
                     default: withSlotCtx((): any[] => [
-                      _cE("view", _uM({ class: "transition-demo-box bg-__f56c6c_" }), [
+                      _cE("view", _uM({ class: "transition-demo-box bg-_b_hf56c6c_B" }), [
                         _cE("text", _uM({ class: "text-14px text-white font-500" }), "slide 滑动")
                       ])
                     ]),
@@ -146,4 +146,4 @@ const _component_up_button = resolveEasyComponent("up-button",_easycom_up_button
 
 })
 export default __sfc__
-const GenSrcSubUviewUltraDemosTransitionTransitionStyles = [_uM([["bg-__19be6b_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#19be6b"]]))], ["bg-__f56c6c_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f56c6c"]]))], ["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["font-500", _pS(_uM([["fontWeight", 500]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["justify-around", _pS(_uM([["justifyContent", "space-around"]]))], ["mt-10px", _pS(_uM([["marginTop", 10]]))], ["mt-12px", _pS(_uM([["marginTop", 12]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))], ["text-white", _pS(_uM([["color", "rgba(255,255,255,var(--un-color-opacity,1))"]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))], ["transition-demo-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"], ["justifyContent", "center"], ["paddingTop", 20], ["paddingRight", 0], ["paddingBottom", 20], ["paddingLeft", 0]]))], ["transition-demo-box", _pS(_uM([["width", 120], ["height", 120], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8], ["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"], ["marginBottom", 15]]))], ["transition-demo-blue", _pS(_uM([["backgroundColor", "#2979ff"]]))]])]
+const GenSrcSubUviewUltraDemosTransitionTransitionStyles = [_uM([["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))], ["transition-demo-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"], ["justifyContent", "center"], ["paddingTop", 20], ["paddingRight", 0], ["paddingBottom", 20], ["paddingLeft", 0]]))], ["transition-demo-box", _pS(_uM([["width", 120], ["height", 120], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8], ["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"], ["marginBottom", 15]]))], ["transition-demo-blue", _pS(_uM([["backgroundColor", "#2979ff"]]))]])]

@@ -130,4 +130,4 @@ const _component_l_svg = resolveComponent("l-svg")
 })
 export default __sfc__
 export type LIconComponentPublicInstance = InstanceType<typeof __sfc__>;
-const GenUniModulesLimeIconComponentsLIconLIconStyles = [_uM([["l-icon--font", _pS(_uM([["fontFamily", "l"], ["textAlign", "center"]]))], ["l-icon--image", _pS(_uM([["width", "var(--l-icon-size, 16px)"], ["height", "var(--l-icon-size, 16px)"]]))], ["@FONT-FACE", _uM([["0", _uM([["fontFamily", "l"], ["src", "url(\"/uni_modules/lime-icon/static/app/t4.ttf\")"]])]])]])]
+const GenUniModulesLimeIconComponentsLIconLIconStyles = [_uM([["l-icon--font", _pS(_uM([["fontFamily", "l"], ["textAlign", "center"]]))], ["l-icon--image", _pS(_uM([["width", "var(--l-icon-size)"], ["height", "var(--l-icon-size)"]]))], ["@FONT-FACE", _uM([["0", _uM([["fontFamily", "l"], ["src", "url(\"/uni_modules/lime-icon/static/app/t4.ttf\")"]])]])]])]

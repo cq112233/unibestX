@@ -15,7 +15,7 @@ const echartRef = ref<ComponentPublicInstance | null>(null)
 const currentType = ref('line')
 const gridKey = 'gr' + 'id'
 
-const lineOption = { __$originalPosition: new UTSSourceMapPosition("lineOption", "src/pages/basic/components/EchartsDemoCard.uvue", 84, 7), 
+const lineOption = { __$originalPosition: new UTSSourceMapPosition("lineOption", "src/pages/basic/components/EchartsDemoCard.uvue", 56, 7), 
   title: {
     text: '访问趋势 (折线图)',
     textStyle: {
@@ -76,7 +76,7 @@ const lineOption = { __$originalPosition: new UTSSourceMapPosition("lineOption",
   }],
 } as UTSJSONObject
 
-const barOption = { __$originalPosition: new UTSSourceMapPosition("barOption", "src/pages/basic/components/EchartsDemoCard.uvue", 145, 7), 
+const barOption = { __$originalPosition: new UTSSourceMapPosition("barOption", "src/pages/basic/components/EchartsDemoCard.uvue", 117, 7), 
   title: {
     text: '访问分布 (柱状图)',
     textStyle: {
@@ -123,7 +123,7 @@ const barOption = { __$originalPosition: new UTSSourceMapPosition("barOption", "
   }],
 } as UTSJSONObject
 
-const pieOption = { __$originalPosition: new UTSSourceMapPosition("pieOption", "src/pages/basic/components/EchartsDemoCard.uvue", 192, 7), 
+const pieOption = { __$originalPosition: new UTSSourceMapPosition("pieOption", "src/pages/basic/components/EchartsDemoCard.uvue", 164, 7), 
   title: {
     text: '访问来源 (饼图)',
     textStyle: {
@@ -184,7 +184,7 @@ watch(windowWidth, () => {
   setTimeout(() => {
     if (echartRef.value != null) {
       const chart = echartRef.value as ComponentPublicInstance
-      chart.$callMethod('resize')
+      chart.$callMethod('wtu-pwzd85-j')
     }
   }, 100)
 })
@@ -197,42 +197,42 @@ const _component_e_chart = resolveEasyComponent("e-chart",_easycom_e_chart)
     title: _ctx.$t('basic.echartTitle')
   }), _uM({
     default: withSlotCtx((): any[] => [
-      _cE("view", _uM({ class: "w-full h-260px mt-10px" }), [
+      _cE("view", _uM({ class: "wtu-jt2kws-0 h-260px mt-10px" }), [
         _cV(_component_e_chart, _uM({
           ref_key: "echartRef",
           ref: echartRef,
-          class: "w-full i_h-full",
+          class: "wtu-jt2kws-0 wtu-r3lygi-1",
           onReady: initEchart
         }), null, 512 /* NEED_PATCH */)
       ]),
-      _cE("view", _uM({ class: "flex-row justify-between mt-15px" }), [
-        _cE("view", _uM({ class: "flex-1 mr-8px" }), [
+      _cE("view", _uM({ class: "wtu-1cgo7o7-2 wtu-yw6ev6-3 mt-15px" }), [
+        _cE("view", _uM({ class: "wtu-1ic66jc-4 mr-8px" }), [
           _cE("view", _uM({
-            class: _nC(["w-full h-36px rounded-8px flex flex-row items-center justify-center", currentType.value !== 'line' ? 'bg-__e0edff_' : 'bg-__3b82f6_']),
+            class: _nC(["wtu-jt2kws-0 h-36px rounded-8px wtu-gka6r2-5 wtu-1cgo7o7-2 wtu-15mb7nz-6 wtu-1rqhojj-7", currentType.value !== 'line' ? 'wtu-15vl6hy-8' : 'wtu-jq7tyz-9']),
             onClick: changeToLine
           }), [
             _cE("text", _uM({
-              class: _nC(["text-12px font-bold", currentType.value !== 'line' ? 'text-__3b82f6_' : 'text-__ffffff_'])
+              class: _nC(["text-12px wtu-16hwtho-a", currentType.value !== 'line' ? 'wtu-1qm4myr-b' : 'wtu-qcdy5m-c'])
             }), _tD(_ctx.$t('basic.echartLine')), 3 /* TEXT, CLASS */)
           ], 2 /* CLASS */)
         ]),
-        _cE("view", _uM({ class: "flex-1 mr-8px" }), [
+        _cE("view", _uM({ class: "wtu-1ic66jc-4 mr-8px" }), [
           _cE("view", _uM({
-            class: _nC(["w-full h-36px rounded-8px flex flex-row items-center justify-center", currentType.value !== 'bar' ? 'bg-__d1fae5_' : 'bg-__10b981_']),
+            class: _nC(["wtu-jt2kws-0 h-36px rounded-8px wtu-gka6r2-5 wtu-1cgo7o7-2 wtu-15mb7nz-6 wtu-1rqhojj-7", currentType.value !== 'bar' ? 'wtu-1bvelj2-d' : 'wtu-t6nyan-e']),
             onClick: changeToBar
           }), [
             _cE("text", _uM({
-              class: _nC(["text-12px font-bold", currentType.value !== 'bar' ? 'text-__10b981_' : 'text-__ffffff_'])
+              class: _nC(["text-12px wtu-16hwtho-a", currentType.value !== 'bar' ? 'wtu-1icmodz-f' : 'wtu-qcdy5m-c'])
             }), _tD(_ctx.$t('basic.echartBar')), 3 /* TEXT, CLASS */)
           ], 2 /* CLASS */)
         ]),
-        _cE("view", _uM({ class: "flex-1" }), [
+        _cE("view", _uM({ class: "wtu-1ic66jc-4" }), [
           _cE("view", _uM({
-            class: _nC(["w-full h-36px rounded-8px flex flex-row items-center justify-center", currentType.value !== 'pie' ? 'bg-__fef3c7_' : 'bg-__f59e0b_']),
+            class: _nC(["wtu-jt2kws-0 h-36px rounded-8px wtu-gka6r2-5 wtu-1cgo7o7-2 wtu-15mb7nz-6 wtu-1rqhojj-7", currentType.value !== 'pie' ? 'wtu-1kp3vbu-g' : 'wtu-rl5n1d-h']),
             onClick: changeToPie
           }), [
             _cE("text", _uM({
-              class: _nC(["text-12px font-bold", currentType.value !== 'pie' ? 'text-__f59e0b_' : 'text-__ffffff_'])
+              class: _nC(["text-12px wtu-16hwtho-a", currentType.value !== 'pie' ? 'wtu-co0z8p-i' : 'wtu-qcdy5m-c'])
             }), _tD(_ctx.$t('basic.echartPie')), 3 /* TEXT, CLASS */)
           ], 2 /* CLASS */)
         ])
@@ -245,4 +245,4 @@ const _component_e_chart = resolveEasyComponent("e-chart",_easycom_e_chart)
 
 })
 export default __sfc__
-const GenSrcPagesBasicComponentsEchartsDemoCardStyles = [_uM([["bg-__10b981_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#10b981"]]))], ["bg-__3b82f6_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#3b82f6"]]))], ["bg-__d1fae5_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#d1fae5"]]))], ["bg-__e0edff_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#e0edff"]]))], ["bg-__f59e0b_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f59e0b"]]))], ["bg-__fef3c7_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#fef3c7"]]))], ["flex", _pS(_uM([["display", "flex"]]))], ["flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["font-bold", _pS(_uM([["fontWeight", 700]]))], ["h-260px", _pS(_uM([["height", 260]]))], ["h-36px", _pS(_uM([["height", 36]]))], ["i_h-full", _pS(_uM([["!height", "100%"]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["justify-between", _pS(_uM([["justifyContent", "space-between"]]))], ["justify-center", _pS(_uM([["justifyContent", "center"]]))], ["mr-8px", _pS(_uM([["marginRight", 8]]))], ["mt-10px", _pS(_uM([["marginTop", 10]]))], ["mt-15px", _pS(_uM([["marginTop", 15]]))], ["rounded-8px", _pS(_uM([["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["text-__10b981_", _pS(_uM([["color", "#10b981"]]))], ["text-__3b82f6_", _pS(_uM([["color", "#3b82f6"]]))], ["text-__f59e0b_", _pS(_uM([["color", "#f59e0b"]]))], ["text-__ffffff_", _pS(_uM([["color", "#ffffff"]]))], ["text-12px", _pS(_uM([["fontSize", 12]]))], ["w-full", _pS(_uM([["width", "100%"]]))]])]
+const GenSrcPagesBasicComponentsEchartsDemoCardStyles = [_uM([["font-bold", _pS(_uM([["--tw-font-weight", "700"], ["fontWeight", 700]]))], ["wtu-jt2kws-0", _pS(_uM([["width", "100%"]]))], ["wtu-r3lygi-1", _pS(_uM([["!height", "100%"]]))], ["wtu-1cgo7o7-2", _pS(_uM([["flexDirection", "row"]]))], ["wtu-yw6ev6-3", _pS(_uM([["justifyContent", "space-between"]]))], ["wtu-1ic66jc-4", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["wtu-gka6r2-5", _pS(_uM([["display", "flex"]]))], ["wtu-15mb7nz-6", _pS(_uM([["alignItems", "center"]]))], ["wtu-1rqhojj-7", _pS(_uM([["justifyContent", "center"]]))], ["wtu-15vl6hy-8", _pS(_uM([["backgroundColor", "#e0edff"]]))], ["wtu-jq7tyz-9", _pS(_uM([["backgroundColor", "#3b82f6"]]))], ["wtu-16hwtho-a", _pS(_uM([["--tw-font-weight", "700"], ["fontWeight", 700]]))], ["wtu-1qm4myr-b", _pS(_uM([["color", "#3b82f6"]]))], ["wtu-qcdy5m-c", _pS(_uM([["color", "#ffffff"]]))], ["wtu-1bvelj2-d", _pS(_uM([["backgroundColor", "#d1fae5"]]))], ["wtu-t6nyan-e", _pS(_uM([["backgroundColor", "#10b981"]]))], ["wtu-1icmodz-f", _pS(_uM([["color", "#10b981"]]))], ["wtu-1kp3vbu-g", _pS(_uM([["backgroundColor", "#fef3c7"]]))], ["wtu-rl5n1d-h", _pS(_uM([["backgroundColor", "#f59e0b"]]))], ["wtu-co0z8p-i", _pS(_uM([["color", "#f59e0b"]]))], ["wtu-pwzd85-j", _pS(_uM([["resize", "both"]]))]])]

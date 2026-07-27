@@ -35,7 +35,7 @@ const _component_up_waterfall = resolveEasyComponent("up-waterfall",_easycom_up_
         "navigation-bar-title-text": 'up-waterfall 瀑布流'
       }), _uM({
         default: withSlotCtx((): any[] => [
-          _cE("view", _uM({ class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }), [
+          _cE("view", _uM({ class: "page-container bg-[#f8fafc] min-h-screen pb-30px" }), [
             _cV(_component_NavBar, _uM({
               title: "Waterfall 瀑布流",
               "auto-back": true
@@ -56,15 +56,15 @@ const _component_up_waterfall = resolveEasyComponent("up-waterfall",_easycom_up_
                         key: idx,
                         class: "p-6px"
                       }), [
-                        _cE("view", _uM({ class: "bg-__f1f5f9_ rounded-8px overflow-hidden p-8px mb-8px" }), [
+                        _cE("view", _uM({ class: "bg-[#f1f5f9] rounded-8px overflow-hidden p-8px mb-8px" }), [
                           _cE("image", _uM({
                             src: "/static/logo.png",
                             mode: "aspectFit",
                             style: _nS(_uM({ width: '100%', height: (item as UTSJSONObject).getString('imgHeight') ?? '100px', borderRadius: '6px', backgroundColor: '#ffffff' }))
                           }), null, 4 /* STYLE */),
-                          _cE("text", _uM({ class: "text-14px font-bold text-__334155_ mt-6px" }), _tD((item as UTSJSONObject).getString('title')), 1 /* TEXT */),
-                          _cE("text", _uM({ class: "text-12px text-__94a3b8_ mt-2px" }), _tD((item as UTSJSONObject).getString('desc')), 1 /* TEXT */),
-                          _cE("text", _uM({ class: "text-14px text-__e11d48_ mt-4px font-bold" }), "￥" + _tD((item as UTSJSONObject).getNumber('price')), 1 /* TEXT */)
+                          _cE("text", _uM({ class: "text-14px font-bold text-[#334155] mt-6px" }), _tD((item as UTSJSONObject).getString('title')), 1 /* TEXT */),
+                          _cE("text", _uM({ class: "text-12px text-[#94a3b8] mt-2px" }), _tD((item as UTSJSONObject).getString('desc')), 1 /* TEXT */),
+                          _cE("text", _uM({ class: "text-14px text-[#e11d48] mt-4px font-bold" }), "￥" + _tD((item as UTSJSONObject).getNumber('price')), 1 /* TEXT */)
                         ])
                       ])
                     }), 128 /* KEYED_FRAGMENT */)
@@ -85,4 +85,4 @@ const _component_up_waterfall = resolveEasyComponent("up-waterfall",_easycom_up_
 
 })
 export default __sfc__
-const GenSrcSubUviewUltraDemosWaterfallWaterfallStyles = [_uM([["bg-__f1f5f9_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f1f5f9"]]))], ["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["font-bold", _pS(_uM([["fontWeight", 700]]))], ["mb-8px", _pS(_uM([["marginBottom", 8]]))], ["mt-2px", _pS(_uM([["marginTop", 2]]))], ["mt-4px", _pS(_uM([["marginTop", 4]]))], ["mt-6px", _pS(_uM([["marginTop", 6]]))], ["overflow-hidden", _pS(_uM([["overflow", "hidden"]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["p-6px", _pS(_uM([["paddingTop", 6], ["paddingRight", 6], ["paddingBottom", 6], ["paddingLeft", 6]]))], ["p-8px", _pS(_uM([["paddingTop", 8], ["paddingRight", 8], ["paddingBottom", 8], ["paddingLeft", 8]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["rounded-8px", _pS(_uM([["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["text-__334155_", _pS(_uM([["color", "#334155"]]))], ["text-__94a3b8_", _pS(_uM([["color", "#94a3b8"]]))], ["text-__e11d48_", _pS(_uM([["color", "#e11d48"]]))], ["text-12px", _pS(_uM([["fontSize", 12]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]
+const GenSrcSubUviewUltraDemosWaterfallWaterfallStyles = [_uM([["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]

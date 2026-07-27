@@ -50,7 +50,7 @@ const _component_up_swipe_action = resolveEasyComponent("up-swipe-action",_easyc
         "navigation-bar-title-text": 'up-swipe-action 滑动操作'
       }), _uM({
         default: withSlotCtx((): any[] => [
-          _cE("view", _uM({ class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }), [
+          _cE("view", _uM({ class: "page-container bg-_b_hf8fafc_B min-h-screen pb-30px" }), [
             _cV(_component_NavBar, _uM({
               title: "SwipeAction 滑动操作",
               "auto-back": true
@@ -62,7 +62,7 @@ const _component_up_swipe_action = resolveEasyComponent("up-swipe-action",_easyc
                   default: withSlotCtx((): any[] => [
                     _cV(_component_up_swipe_action_item, _uM({ options: options1.value }), _uM({
                       default: withSlotCtx((): any[] => [
-                        _cE("view", _uM({ class: "p-15px bg-__fff_ rounded-5px" }), [
+                        _cE("view", _uM({ class: "p-15px bg-_b_hfff_B rounded-5px" }), [
                           _cE("text", null, "操作选项")
                         ])
                       ]),
@@ -78,7 +78,7 @@ const _component_up_swipe_action = resolveEasyComponent("up-swipe-action",_easyc
                   default: withSlotCtx((): any[] => [
                     _cV(_component_up_swipe_action_item, _uM({ options: options2.value }), _uM({
                       default: withSlotCtx((): any[] => [
-                        _cE("view", _uM({ class: "p-15px bg-__fff_ rounded-5px" }), [
+                        _cE("view", _uM({ class: "p-15px bg-_b_hfff_B rounded-5px" }), [
                           _cE("text", null, "多按钮操作")
                         ])
                       ]),
@@ -101,4 +101,4 @@ const _component_up_swipe_action = resolveEasyComponent("up-swipe-action",_easyc
 
 })
 export default __sfc__
-const GenSrcSubUviewUltraDemosSwipeActionSwipeActionStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["bg-__fff_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#ffffff"]]))], ["mt-12px", _pS(_uM([["marginTop", 12]]))], ["p-15px", _pS(_uM([["paddingTop", 15], ["paddingRight", 15], ["paddingBottom", 15], ["paddingLeft", 15]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["rounded-5px", _pS(_uM([["borderTopLeftRadius", 5], ["borderTopRightRadius", 5], ["borderBottomRightRadius", 5], ["borderBottomLeftRadius", 5]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]
+const GenSrcSubUviewUltraDemosSwipeActionSwipeActionStyles = [_uM([["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]

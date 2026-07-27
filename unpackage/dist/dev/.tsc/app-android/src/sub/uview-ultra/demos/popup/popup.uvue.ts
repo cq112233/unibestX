@@ -37,7 +37,7 @@ const _component_up_popup = resolveEasyComponent("up-popup",_easycom_up_popup)
         "navigation-bar-title-text": 'up-popup 弹出层'
       }), _uM({
         default: withSlotCtx((): any[] => [
-          _cE("view", _uM({ class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }), [
+          _cE("view", _uM({ class: "page-container bg-_b_hf8fafc_B min-h-screen pb-30px" }), [
             _cV(_component_NavBar, _uM({
               title: "up-popup 弹出层",
               "auto-back": true,
@@ -98,7 +98,7 @@ const _component_up_popup = resolveEasyComponent("up-popup",_easycom_up_popup)
             }), _uM({
               default: withSlotCtx((): any[] => [
                 _cE("view", _uM({ class: "p-30px items-center" }), [
-                  _cE("text", _uM({ class: "text-16px text-__303133_" }), _tD(popupMode.value) + " 弹出层内容", 1 /* TEXT */)
+                  _cE("text", _uM({ class: "text-16px text-_b_h303133_B" }), _tD(popupMode.value) + " 弹出层内容", 1 /* TEXT */)
                 ])
               ]),
               _: 1 /* STABLE */
@@ -115,4 +115,4 @@ const _component_up_popup = resolveEasyComponent("up-popup",_easycom_up_popup)
 
 })
 export default __sfc__
-const GenSrcSubUviewUltraDemosPopupPopupStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["mt-12px", _pS(_uM([["marginTop", 12]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["p-30px", _pS(_uM([["paddingTop", 30], ["paddingRight", 30], ["paddingBottom", 30], ["paddingLeft", 30]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["text-__303133_", _pS(_uM([["color", "#303133"]]))], ["text-16px", _pS(_uM([["fontSize", 16]]))], ["w-10px", _pS(_uM([["width", 10]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]
+const GenSrcSubUviewUltraDemosPopupPopupStyles = [_uM([["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]

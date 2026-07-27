@@ -87,4 +87,4 @@ const _component_up_toast = resolveEasyComponent("up-toast",_easycom_up_toast)
 
 })
 export default __sfc__
-const GenAppkuStyles = []
+const GenAppkuStyles = [_uM([["flex", _pS(_uM([["display", "flex"]]))], ["flex-col", _pS(_uM([["flexDirection", "column"]]))], ["flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["h-full", _pS(_uM([["height", "100%"]]))], ["h-0", _pS(_uM([["height", 0]]))]])]

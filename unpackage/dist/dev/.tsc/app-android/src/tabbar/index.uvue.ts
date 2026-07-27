@@ -55,7 +55,7 @@ onMounted(() => {
 
   uni.hideTabBar({
     fail: (err: any) => {
-      console.log('hideTabBar fail: ', err, " at src/tabbar/index.uvue:54")
+      console.log('hideTabBar fail: ', err, " at src/tabbar/index.uvue:51")
     },
   })
 

@@ -77,4 +77,4 @@ return (): any | null => {
 })
 export default __sfc__
 export type UpThComponentPublicInstance = InstanceType<typeof __sfc__>;
-const GenUniModulesUviewUltraComponentsUpThUpThStyles = [_uM([["up-th", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["justifyContent", "center"], ["backgroundColor", "#f5f6f8"]]))], ["up-th__text", _uM([[".up-th ", _uM([["fontSize", 14], ["color", "#303133"], ["fontWeight", "bold"]])]])]])]
+const GenUniModulesUviewUltraComponentsUpThUpThStyles = [_uM([["up-th", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["justifyContent", "center"], ["backgroundColor", "#f5f6f8"]]))]])]

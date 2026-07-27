@@ -63,7 +63,7 @@ const _cache = __ins.renderCache;
 			let style: UTSJSONObject = {__$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-td/up-td.uvue", 63, 8),}
 			let styleText: UTSJSONObject = {__$originalPosition: new UTSSourceMapPosition("styleText", "uni_modules/uview-ultra/components/up-td/up-td.uvue", 64, 8),}
 			let parentProps = parent.value.$callMethod('getProps') as UTSJSONObject
-			if (props.width != "auto") style['flex'] = `0 0 ${props.width}`
+			if (props.width != "auto") style['wtu-18qkpno-0'] = `0 0 ${props.width}`
 			styleText['textAlign'] = parentProps.getString('align')
 			styleText['fontSize'] = addUnit(parentProps.getString('fontSize'))
 			style['padding'] = parentProps.getString('padding')
@@ -107,4 +107,4 @@ return (): any | null => {
 })
 export default __sfc__
 export type UpTdComponentPublicInstance = InstanceType<typeof __sfc__>;
-const GenUniModulesUviewUltraComponentsUpTdUpTdStyles = [_uM([["up-td", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["justifyContent", "center"], ["alignSelf", "stretch"], ["boxSizing", "border-box"], ["height", "100%"]]))], ["up-td__text", _uM([[".up-td ", _uM([["fontSize", 14], ["color", "#606266"]])]])]])]
+const GenUniModulesUviewUltraComponentsUpTdUpTdStyles = [_uM([["up-td", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["justifyContent", "center"], ["alignSelf", "stretch"], ["boxSizing", "border-box"], ["height", "100%"]]))], ["wtu-18qkpno-0", _pS(_uM([["display", "flex"]]))]])]

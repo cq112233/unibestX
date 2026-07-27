@@ -388,8 +388,8 @@ const __sfc__ = defineComponent({
             // 展开过程中，是向左移动，所以X的偏移应该为负值
             var buttonsWidth = 0 - this.state['buttonsWidth'] as number;
             this.sliderStyle = {
-                'transition': 'transform ' + duration,
-                'transform': 'translateX(' + buttonsWidth + 'px)',
+                'transition': 'wtu-8adrbp-0 ' + duration,
+                'wtu-8adrbp-0': 'translateX(' + buttonsWidth + 'px)',
                 '-webkit-transform': 'translateX(' + buttonsWidth + 'px)',
             };
             this.setStatus('open');
@@ -399,8 +399,8 @@ const __sfc__ = defineComponent({
             // 处理duration单位问题
             var duration = this.getDuration(this.duration);
             this.sliderStyle = {
-                'transition': 'transform ' + duration,
-                'transform': 'translateX(0px)'
+                'transition': 'wtu-8adrbp-0 ' + duration,
+                'wtu-8adrbp-0': 'translateX(0px)'
             };
             // 设置各个隐藏的按钮为收起的状态
             // for (var i = this.state.buttonsWidth - 1; i >= 0; i--) {
@@ -492,6 +492,6 @@ function GenUniModulesUviewUltraComponentsUpSwipeActionItemUpSwipeActionItemRend
     ], 512 /* NEED_PATCH */);
 }
 export type UpSwipeActionItemComponentPublicInstance = InstanceType<typeof __sfc__>;
-const GenUniModulesUviewUltraComponentsUpSwipeActionItemUpSwipeActionItemStyles = [_uM([["up-swipe-action-item", _pS(_uM([["position", "relative"], ["overflow", "hidden"], ["display", "flex"], ["flexDirection", "column"]]))], ["up-swipe-action-item__content", _pS(_uM([["transform", "translateX(0px)"], ["backgroundColor", "#FFFFFF"], ["zIndex", 10], ["width", "100%"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["up-swipe-action-item__right", _pS(_uM([["position", "absolute"], ["top", 0], ["bottom", 0], ["right", 0], ["display", "flex"], ["flexDirection", "row"], ["zIndex", 1]]))], ["up-swipe-action-item__right__button", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["overflow", "hidden"], ["alignItems", "center"]]))], ["up-swipe-action-item__right__button__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["paddingTop", 0], ["paddingRight", 15], ["paddingBottom", 0], ["paddingLeft", 15]]))], ["up-swipe-action-item__right__button__wrapper--primary", _pS(_uM([["backgroundColor", "var(--theme-color, #0957de)"]]))], ["up-swipe-action-item__right__button__wrapper__text", _pS(_uM([["color", "#FFFFFF"], ["fontSize", 15], ["textAlign", "center"]]))]])];
+const GenUniModulesUviewUltraComponentsUpSwipeActionItemUpSwipeActionItemStyles = [_uM([["up-swipe-action-item", _pS(_uM([["position", "relative"], ["overflow", "hidden"], ["display", "flex"], ["flexDirection", "column"]]))], ["up-swipe-action-item__content", _pS(_uM([["WebkitTransform", "translateX(0px)"], ["transform", "translateX(0px)"], ["backgroundColor", "#FFFFFF"], ["zIndex", 10], ["width", "100%"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["up-swipe-action-item__right", _pS(_uM([["position", "absolute"], ["top", 0], ["bottom", 0], ["right", 0], ["display", "flex"], ["flexDirection", "row"], ["zIndex", 1]]))], ["up-swipe-action-item__right__button", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["overflow", "hidden"], ["alignItems", "center"]]))], ["up-swipe-action-item__right__button__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["paddingTop", 0], ["paddingRight", 15], ["paddingBottom", 0], ["paddingLeft", 15]]))], ["up-swipe-action-item__right__button__wrapper--primary", _pS(_uM([["backgroundColor", "var(--theme-color)"]]))], ["up-swipe-action-item__right__button__wrapper__text", _pS(_uM([["color", "#FFFFFF"], ["fontSize", 15], ["textAlign", "center"]]))], ["wtu-8adrbp-0", _pS(_uM([["WebkitTransform", ""], ["transform", ""]]))]])];
 import _easycom_up_icon from '@/uni_modules/uview-ultra/components/up-icon/up-icon.uvue';
 //# sourceMappingURL=up-swipe-action-item.uvue.map

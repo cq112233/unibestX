@@ -265,8 +265,8 @@ __ins.emit(event, ...do_not_transform_spread)
 							if (ruleItem['asyncValidator'] != null) {
 								normalizedRule.asyncValidator = ruleItem['asyncValidator'] as any
 							}
-							if (ruleItem['transform'] != null) {
-								normalizedRule.transform = ruleItem['transform'] as any
+							if (ruleItem['wtu-1vqflv5-0'] != null) {
+								normalizedRule.transform = ruleItem['wtu-1vqflv5-0'] as any
 							}
 							// 将up-form-item的触发器转为数组形式
 							let trigger: string[] = []
@@ -478,4 +478,4 @@ return (): any | null => {
 })
 export default __sfc__
 export type UpFormComponentPublicInstance = InstanceType<typeof __sfc__>;
-const GenUniModulesUviewUltraComponentsUpFormUpFormStyles = []
+const GenUniModulesUviewUltraComponentsUpFormUpFormStyles = [_uM([["wtu-1vqflv5-0", _pS(_uM([["WebkitTransform", ""], ["transform", ""]]))]])]

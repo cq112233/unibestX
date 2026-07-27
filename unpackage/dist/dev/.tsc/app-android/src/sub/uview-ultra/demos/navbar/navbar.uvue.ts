@@ -25,7 +25,7 @@ const _component_up_icon = resolveEasyComponent("up-icon",_easycom_up_icon)
         "navigation-bar-title-text": 'up-navbar 导航栏'
       }), _uM({
         default: withSlotCtx((): any[] => [
-          _cE("view", _uM({ class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }), [
+          _cE("view", _uM({ class: "page-container bg-[#f8fafc] min-h-screen pb-30px" }), [
             _cV(_component_NavBar, _uM({
               title: "Navbar 导航栏",
               "auto-back": true
@@ -33,7 +33,7 @@ const _component_up_icon = resolveEasyComponent("up-icon",_easycom_up_icon)
             _cE("view", _uM({ class: "p-16px" }), [
               _cE("view", _uM({ class: "demo-block" }), [
                 _cE("text", _uM({ class: "demo-label" }), "基础用法"),
-                _cE("view", _uM({ class: "overflow-hidden rounded-md border-width-1px border-color-__eee_ border-solid" }), [
+                _cE("view", _uM({ class: "overflow-hidden rounded-md border-width-1px border-color-[#eee] border-solid" }), [
                   _cV(_component_up_navbar, _uM({
                     title: "自定义标题",
                     "safe-area-inset-top": false,
@@ -45,7 +45,7 @@ const _component_up_icon = resolveEasyComponent("up-icon",_easycom_up_icon)
               ]),
               _cE("view", _uM({ class: "demo-block mt-12px" }), [
                 _cE("text", _uM({ class: "demo-label" }), "自定义插槽"),
-                _cE("view", _uM({ class: "overflow-hidden rounded-md border-width-1px border-color-__eee_ border-solid" }), [
+                _cE("view", _uM({ class: "overflow-hidden rounded-md border-width-1px border-color-[#eee] border-solid" }), [
                   _cV(_component_up_navbar, _uM({
                     "safe-area-inset-top": false,
                     fixed: false,
@@ -84,4 +84,4 @@ const _component_up_icon = resolveEasyComponent("up-icon",_easycom_up_icon)
 
 })
 export default __sfc__
-const GenSrcSubUviewUltraDemosNavbarNavbarStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["border-color-__eee_", _pS(_uM([["borderTopColor", "#eeeeee"], ["borderRightColor", "#eeeeee"], ["borderBottomColor", "#eeeeee"], ["borderLeftColor", "#eeeeee"]]))], ["border-solid", _pS(_uM([["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"]]))], ["border-width-1px", _pS(_uM([["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1]]))], ["mt-12px", _pS(_uM([["marginTop", 12]]))], ["overflow-hidden", _pS(_uM([["overflow", "hidden"]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["rounded-md", _pS(_uM([["borderTopLeftRadius", "var(--un-radius-md-default,6rpx)"], ["borderTopRightRadius", "var(--un-radius-md-default,6rpx)"], ["borderBottomRightRadius", "var(--un-radius-md-default,6rpx)"], ["borderBottomLeftRadius", "var(--un-radius-md-default,6rpx)"]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]
+const GenSrcSubUviewUltraDemosNavbarNavbarStyles = [_uM([["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]

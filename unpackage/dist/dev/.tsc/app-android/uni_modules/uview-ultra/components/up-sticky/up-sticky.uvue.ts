@@ -77,7 +77,7 @@
 			contentStyle(): any {
 				const style = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-sticky/up-sticky.uvue", 96, 11), } as UTSJSONObject
 				if (!this.disabled && this.isFixed) {
-					style['position'] = 'fixed'
+					style['position'] = 'wtu-12xpv87-0'
 					style['top'] = this.stickyTop + 'px'
 					style['left'] = this.left + 'px'
 					if (this.width > 0) {
@@ -171,4 +171,4 @@ const _cache = this.$.renderCache
   ], 12 /* STYLE, PROPS */, ["id"])
 }
 export type UpStickyComponentPublicInstance = InstanceType<typeof __sfc__>;
-const GenUniModulesUviewUltraComponentsUpStickyUpStickyStyles = [_uM([["up-sticky", _pS(_uM([["width", "100%"], ["boxSizing", "border-box"]]))], ["up-sticky__content", _pS(_uM([["boxSizing", "border-box"]]))]])]
+const GenUniModulesUviewUltraComponentsUpStickyUpStickyStyles = [_uM([["up-sticky", _pS(_uM([["width", "100%"], ["boxSizing", "border-box"]]))], ["up-sticky__content", _pS(_uM([["boxSizing", "border-box"]]))], ["wtu-12xpv87-0", _pS(_uM([["position", "fixed"]]))]])]

@@ -43,13 +43,13 @@ return (): any | null => {
         "disable-scroll": true
       }), _uM({
         default: withSlotCtx((): any[] => [
-          _cE("view", _uM({ class: "flex-1 flex-col h-full bg-__f8fafc_" }), [
+          _cE("view", _uM({ class: "wtu-r5udxa-0 wtu-18katrf-1 wtu-8wx7kp-2 wtu-11hwj0-3" }), [
             _cE("scroll-view", _uM({
               direction: "vertical",
-              class: "flex-1 h-0",
+              class: "wtu-r5udxa-0 wtu-jnvqjw-4",
               style: _nS(_uM({"height":"100%"}))
             }), [
-              _cE("view", _uM({ class: "flex-col" }), [
+              _cE("view", _uM({ class: "wtu-18katrf-1" }), [
                 _cV(unref(UViewUltraDemoCard)),
                 _cV(unref(ZPagingDemoCard)),
                 _cV(unref(SystemInfoDemoCard)),
@@ -74,4 +74,4 @@ return (): any | null => {
 
 })
 export default __sfc__
-const GenSrcPagesBasicBasicStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["flex-col", _pS(_uM([["flexDirection", "column"]]))], ["h-0", _pS(_uM([["height", 0]]))], ["h-full", _pS(_uM([["height", "100%"]]))]])]
+const GenSrcPagesBasicBasicStyles = [_uM([["wtu-r5udxa-0", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["wtu-18katrf-1", _pS(_uM([["flexDirection", "column"]]))], ["wtu-8wx7kp-2", _pS(_uM([["height", "100%"]]))], ["wtu-11hwj0-3", _pS(_uM([["backgroundColor", "#f8fafc"]]))], ["wtu-jnvqjw-4", _pS(_uM([["height", 0]]))]])]

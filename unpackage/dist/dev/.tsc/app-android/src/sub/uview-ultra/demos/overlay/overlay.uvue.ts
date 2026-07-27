@@ -31,7 +31,7 @@ const _component_up_overlay = resolveEasyComponent("up-overlay",_easycom_up_over
         "navigation-bar-title-text": 'up-overlay 遮罩层'
       }), _uM({
         default: withSlotCtx((): any[] => [
-          _cE("view", _uM({ class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }), [
+          _cE("view", _uM({ class: "page-container bg-_b_hf8fafc_B min-h-screen pb-30px" }), [
             _cV(_component_NavBar, _uM({
               title: "up-overlay 遮罩层",
               "auto-back": true,
@@ -70,7 +70,7 @@ const _component_up_overlay = resolveEasyComponent("up-overlay",_easycom_up_over
                     onClick: withModifiers(() => {}, ["stop"])
                   }), [
                     _cV(_component_up_loading_icon, _uM({ mode: "circle" })),
-                    _cE("text", _uM({ class: "text-14px text-__303133_ mt-10px" }), "加载中，点击遮罩关闭")
+                    _cE("text", _uM({ class: "text-14px text-_b_h303133_B mt-10px" }), "加载中，点击遮罩关闭")
                   ], 8 /* PROPS */, ["onClick"])
                 ])
               ]),
@@ -88,4 +88,4 @@ const _component_up_overlay = resolveEasyComponent("up-overlay",_easycom_up_over
 
 })
 export default __sfc__
-const GenSrcSubUviewUltraDemosOverlayOverlayStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["bg-white", _pS(_uM([["backgroundColor", "rgba(255,255,255,var(--un-bg-opacity,1))"]]))], ["flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["justify-center", _pS(_uM([["justifyContent", "center"]]))], ["mt-10px", _pS(_uM([["marginTop", 10]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["p-20px", _pS(_uM([["paddingTop", 20], ["paddingRight", 20], ["paddingBottom", 20], ["paddingLeft", 20]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["rounded-8px", _pS(_uM([["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["text-__303133_", _pS(_uM([["color", "#303133"]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))], ["w-10px", _pS(_uM([["width", 10]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]
+const GenSrcSubUviewUltraDemosOverlayOverlayStyles = [_uM([["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]
