@@ -465,7 +465,6 @@
 		&__icon-wrap {
 			/* #ifndef APP */
 			box-sizing: border-box;
-			// nvue下，border-color过渡有问题
 			transition-property: border-color, background-color, color;
 			transition-duration: 0.2s;
 			/* #endif */
@@ -478,7 +477,6 @@
 			border-style: solid;
 
 			/* #ifdef MP-TOUTIAO */
-			// 头条小程序兼容性问题，需要设置行高为0，否则图标偏下
 			&__icon {
 				line-height: $up-checkbox-icon-wrap-icon-line-height;
 			}
@@ -514,7 +512,6 @@
 		}
 
 		&__label {
-			// word-wrap: break-word;
 			margin-left: $up-checkbox-label-margin-left;
 			margin-right: $up-checkbox-label-margin-right;
 			color: $up-checkbox-label-color;

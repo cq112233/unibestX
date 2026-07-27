@@ -234,7 +234,6 @@
 		flex-direction: row;
 		align-items: center;
 		justify-content: center;
-		// color: $up-loading-icon-color;
 
 		&__text {
 			margin-left: $up-loading-icon-text-margin-left;
@@ -248,9 +247,6 @@
 			height: $up-loading-height;
 			position: relative;
 			box-sizing: border-box;
-			// max-width: $up-loading-max-width;
-			// max-height: $up-loading-max-height;
-			// animation: up-rotate 1s linear infinite;
 		}
 
 		&__spinner--semicircle {
@@ -281,17 +277,10 @@
 		}
 	}
 
-	// :host {
-	// 	font-size: $up-loading-icon-host-font-size;
-	// 	line-height: $up-loading-icon-host-line-height;
-	// }
 
 	.up-loading-icon {
 		&__spinner--spinner {
-			// todo2026 wait uni-app-x
-			// #ifndef APP
 			animation-timing-function: steps(12)
-			// #endif
 		}
 
 		&__text:empty {
@@ -305,31 +294,20 @@
 
 		&__dot {
 			position: absolute;
-			// top: $up-loading-icon-dot-top;
-			// left: $up-loading-icon-dot-left;
 			width: $up-loading-icon-dot-width;
 			height: $up-loading-icon-dot-height;
 
-			//&:before {
 				width: $up-loading-icon-dot-before-width;
 				height: $up-loading-icon-dot-before-height;
-				// margin: $up-loading-icon-dot-before-margin;
 				background-color: $up-loading-icon-dot-before-background-color;
 				border-radius: $up-loading-icon-dot-before-border-radius;
-			//}
 		}
 	}
 
 	$radius: v-bind(size)px;
 	@for $i from 1 through 12 {
-		// .up-loading-icon__dot:nth-of-type(#{$i}) {
-		// 	transform: rotate(($i + 2) * 30deg);
-		// 	opacity: 1 - 0.0625 * ($i - 1);
-		// }
 	}
 
-	// todo2026 wait uni-app-x
-	// #ifndef APP
 	@keyframes up-rotate {
 		0% {
 			transform: rotate(0deg)
@@ -339,5 +317,4 @@
 			transform: rotate(1turn)
 		}
 	}
-	// #endif
 </style>
