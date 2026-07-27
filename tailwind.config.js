@@ -1,4 +1,10 @@
-// import darkMode from '../dark-mode.cjs'
+const darkMode = [
+  'variant',
+  [
+    '&.theme-dark',
+    '.theme-dark &',
+  ],
+]
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -11,7 +17,7 @@ export default {
     '!./uni_modules/**/*',
     '!./unpackage/**/*',
   ],
-  // darkMode,
+  darkMode,
   theme: {
     extend: {
       colors: {
