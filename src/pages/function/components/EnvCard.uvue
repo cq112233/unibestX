@@ -1,0 +1,154 @@
+<template>
+  <Card title="环境变量">
+    <!-- 当前环境信息 -->
+    <view class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
+      <view class="flex-row justify-between mb-10px">
+        <text class="text-14px text-[#718096]">编译环境</text>
+        <text class="text-14px font-bold text-[#2d3748]">{{ systemEnvLabel }}</text>
+      </view>
+      <view class="flex-row justify-between mb-10px">
+        <text class="text-14px text-[#718096]">当前环境</text>
+        <text class="text-14px font-bold" :style="{ color: envColor }">{{ currentEnvLabel }}</text>
+      </view>
+      <view class="flex-row justify-between mb-10px">
+        <text class="text-14px text-[#718096]">接口地址</text>
+        <text class="text-12px text-[#64748b] flex-1 ml-8px text-right">{{ envConfig.baseURL }}</text>
+      </view>
+      <view class="flex-row justify-between">
+        <text class="text-14px text-[#718096]">是否已覆盖</text>
+        <text class="text-14px font-bold text-[#2d3748]">{{ isOverridden ? '是' : '否' }}</text>
+      </view>
+    </view>
+
+    <!-- 环境切换 -->
+    <view class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
+      <text class="text-12px text-[#94a3b8] mb-12px">切换环境（仅当前运行生效）</text>
+      <view class="flex-row mt-12px">
+        <view
+          v-for="(item, _index) in envTypeItems"
+          :key="item.type"
+          class="flex-1 h-38px rounded-8px flex flex-row items-center justify-center ml-5px mr-5px"
+          :style="{ backgroundColor: item.bgColor }"
+          @click="switchEnv(item.type)"
+        >
+          <text
+            class="text-14px font-bold"
+            :style="{ color: item.textColor }"
+          >{{ item.label }}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 重置按钮 -->
+    <view class="w-full h-44px rounded-8px bg-[#64748b] flex flex-row items-center justify-center" @click="handleReset">
+      <text class="text-[#ffffff] text-14px font-bold">重置为系统默认</text>
+    </view>
+  </Card>
+</template>
+
+<script setup lang="uts">
+import Card from '../../basic/components/Card.uvue'
+import { computed, ref } from 'vue'
+import {
+  getCurrentEnv,
+  getEnvConfigFor,
+  getEnvLabel,
+  getSystemEnv,
+  resetEnv,
+  setCurrentEnv,
+} from '@/src/utils/env.uts'
+import type { EnvType } from '@/src/utils/env.uts'
+
+const COLOR_DEV: string = '#10b981'
+const COLOR_TEST: string = '#f59e0b'
+const COLOR_PROD: string = '#ef4444'
+const COLOR_BG: string = '#e2e8f0'
+const COLOR_WHITE: string = '#ffffff'
+const COLOR_DARK: string = '#475569'
+
+const systemEnv: EnvType = getSystemEnv()
+
+const systemEnvLabel = computed((): string => {
+  return systemEnv === 'development' ? '开发' : '生产'
+})
+
+// 当前环境（响应式，切换后可驱动 UI 更新）
+const currentEnv = ref<EnvType>(getCurrentEnv())
+
+const isOverridden = computed((): boolean => {
+  return currentEnv.value !== systemEnv
+})
+
+const currentEnvLabel = computed((): string => {
+  return getEnvLabel(currentEnv.value)
+})
+
+const envColor = computed((): string => {
+  if (currentEnv.value === 'development') {
+    return COLOR_DEV
+  }
+  if (currentEnv.value === 'test') {
+    return COLOR_TEST
+  }
+  return COLOR_PROD
+})
+
+const envConfig = computed(() => {
+  return getEnvConfigFor(currentEnv.value)
+})
+
+// 预计算按钮数据（避免模板中调用函数，避免 UTSJSONObject 对象字面量）
+const envTypeItems = computed(() => {
+  const types: EnvType[] = ['development', 'test', 'production']
+  const result: UTSJSONObject[] = []
+  for (let i = 0; i < types.length; i++) {
+    const type = types[i]
+    const isActive = currentEnv.value === type
+    let bgColor = COLOR_BG
+    if (isActive) {
+      if (type === 'development') {
+        bgColor = COLOR_DEV
+      } else if (type === 'test') {
+        bgColor = COLOR_TEST
+      } else {
+        bgColor = COLOR_PROD
+      }
+    }
+    const item = new UTSJSONObject()
+    // eslint-disable-next-line dot-notation
+    item['type'] = type
+    // eslint-disable-next-line dot-notation
+    item['label'] = getEnvLabel(type)
+    // eslint-disable-next-line dot-notation
+    item['bgColor'] = bgColor
+    // eslint-disable-next-line dot-notation
+    item['textColor'] = isActive ? COLOR_WHITE : COLOR_DARK
+    result.push(item)
+  }
+  return result
+})
+
+function switchEnv(type: EnvType) {
+  setCurrentEnv(type)
+  currentEnv.value = type
+  const label = getEnvLabel(type)
+  uni.showToast({
+    title: `已切换至${label}环境`,
+    icon: 'none',
+    duration: 1500,
+  })
+}
+
+function handleReset() {
+  resetEnv()
+  currentEnv.value = systemEnv
+  uni.showToast({
+    title: '已重置为系统默认环境',
+    icon: 'none',
+    duration: 1500,
+  })
+}
+</script>
+
+<style>
+</style>

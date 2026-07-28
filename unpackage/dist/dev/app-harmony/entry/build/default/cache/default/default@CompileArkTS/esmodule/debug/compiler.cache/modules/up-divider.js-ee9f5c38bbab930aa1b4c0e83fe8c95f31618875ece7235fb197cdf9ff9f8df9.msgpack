@@ -1,0 +1,408 @@
+‘r@ü™assertions§code¥customTransformCache¨dependencies¢id§meta±moduleSideEffects¨originalCode±originalSourcemap´resolvedIdsÆsourcemapChainµsyntheticNamedExportsµtransformDependenciesÆtransformFiles®cacheAst‘rAê⁄¨import { _ as __easycom_0 } from "../up-line/up-line.js";
+const { defineComponent, computed, resolveDynamicComponent, openBlock, createElementBlock, normalizeStyle, createVNode, toDisplayString, createCommentVNode } = globalThis.Vue
+import { r as resolveEasycom } from "../../../../App.ku.js";
+import { d as defProps } from "./divider.js";
+import { a as addUnit } from "../../libs/function/index.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const _sfc_main = /* @__PURE__ */ defineComponent({
+  __name: "up-divider",
+  props: {
+    // ÊòØÂê¶ËôöÁ∫ø
+    dashed: {
+      type: Boolean,
+      default: defProps.getBoolean("divider.dashed")
+    },
+    // ÊòØÂê¶ÁªÜÁ∫ø
+    hairline: {
+      type: Boolean,
+      default: defProps.getBoolean("divider.hairline")
+    },
+    // ÊòØÂê¶‰ª•ÁÇπÊõø‰ª£ÊñáÂ≠óÔºå‰ºòÂÖà‰∫étextÂ≠óÊÆµËµ∑‰ΩúÁî®
+    dot: {
+      type: Boolean,
+      default: defProps.getBoolean("divider.dot")
+    },
+    // ÂÜÖÂÆπÊñáÊú¨ÁöÑ‰ΩçÁΩÆÔºåleft-Â∑¶ËæπÔºåcenter-‰∏≠Èó¥Ôºåright-Âè≥Ëæπ
+    textPosition: {
+      type: String,
+      default: defProps.getString("divider.textPosition")
+    },
+    // ÊñáÊú¨ÂÜÖÂÆπ
+    text: {
+      type: [String, Number],
+      default: defProps.getString("divider.text")
+    },
+    // ÊñáÊú¨Â§ßÂ∞è
+    textSize: {
+      type: [String, Number],
+      default: defProps.getNumber("divider.textSize")
+    },
+    // ÊñáÊú¨È¢úËâ≤
+    textColor: {
+      type: String,
+      default: defProps.getString("divider.textColor")
+    },
+    // Á∫øÊù°È¢úËâ≤
+    lineColor: {
+      type: String,
+      default: defProps.getString("divider.lineColor")
+    }
+  },
+  emits: ["click"],
+  setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
+    const props = __props;
+    const emit = __emit;
+    const textStyle = computed(() => {
+      const style = new UTSJSONObject({});
+      style["fontSize"] = addUnit(props.textSize);
+      style["color"] = props.textColor;
+      return style;
+    });
+    const leftLineStyle = computed(() => {
+      const style = new UTSJSONObject({});
+      if (props.textPosition === "left") {
+        style["width"] = "80rpx";
+      } else {
+        style["flex"] = 1;
+      }
+      return style;
+    });
+    const rightLineStyle = computed(() => {
+      const style = new UTSJSONObject({});
+      if (props.textPosition === "right") {
+        style["width"] = "80rpx";
+      } else {
+        style["flex"] = 1;
+      }
+      return style;
+    });
+    const clickHandler = () => {
+      emit("click");
+    };
+    const __returned__ = { props, emit, textStyle, leftLineStyle, rightLineStyle, clickHandler };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-divider": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": 15, "marginRight": 0, "marginBottom": 15, "marginLeft": 0 } }, "up-divider__text": { "": { "marginTop": 0, "marginRight": 15, "marginBottom": 0, "marginLeft": 15 } }, "up-divider__dot": { "": { "fontSize": 12, "marginTop": 0, "marginRight": 12, "marginBottom": 0, "marginLeft": 12, "color": "#c0c4cc" } } };
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_line = resolveEasycom(resolveDynamicComponent("up-line"), __easycom_0);
+  return openBlock(), createElementBlock(
+    "view",
+    {
+      class: "up-divider",
+      style: normalizeStyle([_ctx.$up.addStyle(_ctx.customStyle)]),
+      onClick: $setup.clickHandler
+    },
+    [
+      createVNode(_component_up_line, {
+        color: $props.lineColor,
+        customStyle: $setup.leftLineStyle,
+        hairline: $props.hairline,
+        dashed: $props.dashed
+      }, null, 8, ["color", "customStyle", "hairline", "dashed"]),
+      $props.dot ? (openBlock(), createElementBlock("text", {
+        key: 0,
+        class: "up-divider__dot"
+      }, "‚óè")) : $props.text ? (openBlock(), createElementBlock(
+        "text",
+        {
+          key: 1,
+          class: "up-divider__text",
+          style: normalizeStyle([$setup.textStyle])
+        },
+        toDisplayString($props.text),
+        5
+        /* TEXT, STYLE */
+      )) : createCommentVNode("v-if", true),
+      createVNode(_component_up_line, {
+        color: $props.lineColor,
+        customStyle: $setup.rightLineStyle,
+        hairline: $props.hairline,
+        dashed: $props.dashed
+      }, null, 8, ["color", "customStyle", "hairline", "dashed"])
+    ],
+    4
+    /* STYLE */
+  );
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-divider/up-divider.uvue"]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-divider.js.map
+¬ïŸÃ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-line/up-line.jsŸ†/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku.jsŸœ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-divider/divider.jsŸ≈/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsŸ≤/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsŸ“/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-divider/up-divider.js‘rBõ™moduleName±isLocalDependencyØisNodeEntryFileßpkgPath±belongProjectPathßpkgName™pkgVersion±dependencyPkgInfo∞belongModulePath®commonjsØhostModulesInfo•entry√¬ŸR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryŸL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony•entry•1.0.0‘  ŸR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry‘rCíØhasNamedExports™isCommonJS√¬ë‘rDí≤hostDependencyNameÆhostModuleNameŸJ../../../../../uni_modules/uview-ultra/components/up-divider/up-divider.js•entry√⁄¨import { _ as __easycom_0 } from "../up-line/up-line.js";
+const { defineComponent, computed, resolveDynamicComponent, openBlock, createElementBlock, normalizeStyle, createVNode, toDisplayString, createCommentVNode } = globalThis.Vue
+import { r as resolveEasycom } from "../../../../App.ku.js";
+import { d as defProps } from "./divider.js";
+import { a as addUnit } from "../../libs/function/index.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const _sfc_main = /* @__PURE__ */ defineComponent({
+  __name: "up-divider",
+  props: {
+    // ÊòØÂê¶ËôöÁ∫ø
+    dashed: {
+      type: Boolean,
+      default: defProps.getBoolean("divider.dashed")
+    },
+    // ÊòØÂê¶ÁªÜÁ∫ø
+    hairline: {
+      type: Boolean,
+      default: defProps.getBoolean("divider.hairline")
+    },
+    // ÊòØÂê¶‰ª•ÁÇπÊõø‰ª£ÊñáÂ≠óÔºå‰ºòÂÖà‰∫étextÂ≠óÊÆµËµ∑‰ΩúÁî®
+    dot: {
+      type: Boolean,
+      default: defProps.getBoolean("divider.dot")
+    },
+    // ÂÜÖÂÆπÊñáÊú¨ÁöÑ‰ΩçÁΩÆÔºåleft-Â∑¶ËæπÔºåcenter-‰∏≠Èó¥Ôºåright-Âè≥Ëæπ
+    textPosition: {
+      type: String,
+      default: defProps.getString("divider.textPosition")
+    },
+    // ÊñáÊú¨ÂÜÖÂÆπ
+    text: {
+      type: [String, Number],
+      default: defProps.getString("divider.text")
+    },
+    // ÊñáÊú¨Â§ßÂ∞è
+    textSize: {
+      type: [String, Number],
+      default: defProps.getNumber("divider.textSize")
+    },
+    // ÊñáÊú¨È¢úËâ≤
+    textColor: {
+      type: String,
+      default: defProps.getString("divider.textColor")
+    },
+    // Á∫øÊù°È¢úËâ≤
+    lineColor: {
+      type: String,
+      default: defProps.getString("divider.lineColor")
+    }
+  },
+  emits: ["click"],
+  setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
+    const props = __props;
+    const emit = __emit;
+    const textStyle = computed(() => {
+      const style = new UTSJSONObject({});
+      style["fontSize"] = addUnit(props.textSize);
+      style["color"] = props.textColor;
+      return style;
+    });
+    const leftLineStyle = computed(() => {
+      const style = new UTSJSONObject({});
+      if (props.textPosition === "left") {
+        style["width"] = "80rpx";
+      } else {
+        style["flex"] = 1;
+      }
+      return style;
+    });
+    const rightLineStyle = computed(() => {
+      const style = new UTSJSONObject({});
+      if (props.textPosition === "right") {
+        style["width"] = "80rpx";
+      } else {
+        style["flex"] = 1;
+      }
+      return style;
+    });
+    const clickHandler = () => {
+      emit("click");
+    };
+    const __returned__ = { props, emit, textStyle, leftLineStyle, rightLineStyle, clickHandler };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-divider": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": 15, "marginRight": 0, "marginBottom": 15, "marginLeft": 0 } }, "up-divider__text": { "": { "marginTop": 0, "marginRight": 15, "marginBottom": 0, "marginLeft": 15 } }, "up-divider__dot": { "": { "fontSize": 12, "marginTop": 0, "marginRight": 12, "marginBottom": 0, "marginLeft": 12, "color": "#c0c4cc" } } };
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_line = resolveEasycom(resolveDynamicComponent("up-line"), __easycom_0);
+  return openBlock(), createElementBlock(
+    "view",
+    {
+      class: "up-divider",
+      style: normalizeStyle([_ctx.$up.addStyle(_ctx.customStyle)]),
+      onClick: $setup.clickHandler
+    },
+    [
+      createVNode(_component_up_line, {
+        color: $props.lineColor,
+        customStyle: $setup.leftLineStyle,
+        hairline: $props.hairline,
+        dashed: $props.dashed
+      }, null, 8, ["color", "customStyle", "hairline", "dashed"]),
+      $props.dot ? (openBlock(), createElementBlock("text", {
+        key: 0,
+        class: "up-divider__dot"
+      }, "‚óè")) : $props.text ? (openBlock(), createElementBlock(
+        "text",
+        {
+          key: 1,
+          class: "up-divider__text",
+          style: normalizeStyle([$setup.textStyle])
+        },
+        toDisplayString($props.text),
+        5
+        /* TEXT, STYLE */
+      )) : createCommentVNode("v-if", true),
+      createVNode(_component_up_line, {
+        color: $props.lineColor,
+        customStyle: $setup.rightLineStyle,
+        hairline: $props.hairline,
+        dashed: $props.dashed
+      }, null, 8, ["color", "customStyle", "hairline", "dashed"])
+    ],
+    4
+    /* STYLE */
+  );
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-divider/up-divider.uvue"]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-divider.js.map
+‘rEïßversion®mappings•namesßsourcesÆsourcesContent‹ àëî    ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî  	 ëî  
+ ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî    ëî  ! ëî  " ëî  # ëî  $ ëî  % ëî  & ëî  ' ëî  ( ëî  ) ëî  * ëî  + ëî  , ëî  - ëî  . ëî  / ëî  0 ëî  1 ëî  2 ëî  3 ëî  4 ëî  5 ëî  6 ëî  7 ëî  8 ëî  9 ëî  : ëî  ; ëî  < ëî  = ëî  > ëî  ? ëî  Ã@ ëî  ÃA ëî  ÃB ëî  ÃC ëî  ÃD ëî  ÃE ëî  ÃF ëî  ÃG ëî  ÃH ëî  ÃI ëî  ÃJ ëî  ÃK ëî  ÃL ëî  ÃM ëî  ÃN ëî  ÃO ëî  ÃP ëî  ÃQ ëî  ÃR ëî  ÃS ëî  ÃT ëî  ÃU ëî  ÃV ëî  ÃW ëî  ÃX ëî  ÃY ëî  ÃZ ëî  Ã[ ëî  Ã\ ëî  Ã] ëî  Ã^ ëî  Ã_ ëî  Ã` ëî  Ãa ëî  Ãb ëî  Ãc ëî  Ãd ëî  Ãe ëî  Ãf ëî  Ãg ëî  Ãh ëî  Ãi ëî  Ãj ëî  Ãk ëî  Ãl ëî  Ãm ëî  Ãn ëî  Ão ëî  Ãp ëî  Ãq ëî  Ãr ëî  Ãs ëî  Ãt ëî  Ãu ëî  Ãv ëî  Ãw ëî  Ãx ëî  Ãy ëî  Ãz ëî  Ã{ ëî  Ã| ëî  Ã} ëî  Ã~ ëî  Ã ëî  ÃÄ ëî  ÃÅ ëî  ÃÇ ëî  ÃÉ ëî  ÃÑ ëî  ÃÖ ëî  ÃÜ êêëŸ“/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-divider/up-divider.jsë⁄¨import { _ as __easycom_0 } from "../up-line/up-line.js";
+const { defineComponent, computed, resolveDynamicComponent, openBlock, createElementBlock, normalizeStyle, createVNode, toDisplayString, createCommentVNode } = globalThis.Vue
+import { r as resolveEasycom } from "../../../../App.ku.js";
+import { d as defProps } from "./divider.js";
+import { a as addUnit } from "../../libs/function/index.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const _sfc_main = /* @__PURE__ */ defineComponent({
+  __name: "up-divider",
+  props: {
+    // ÊòØÂê¶ËôöÁ∫ø
+    dashed: {
+      type: Boolean,
+      default: defProps.getBoolean("divider.dashed")
+    },
+    // ÊòØÂê¶ÁªÜÁ∫ø
+    hairline: {
+      type: Boolean,
+      default: defProps.getBoolean("divider.hairline")
+    },
+    // ÊòØÂê¶‰ª•ÁÇπÊõø‰ª£ÊñáÂ≠óÔºå‰ºòÂÖà‰∫étextÂ≠óÊÆµËµ∑‰ΩúÁî®
+    dot: {
+      type: Boolean,
+      default: defProps.getBoolean("divider.dot")
+    },
+    // ÂÜÖÂÆπÊñáÊú¨ÁöÑ‰ΩçÁΩÆÔºåleft-Â∑¶ËæπÔºåcenter-‰∏≠Èó¥Ôºåright-Âè≥Ëæπ
+    textPosition: {
+      type: String,
+      default: defProps.getString("divider.textPosition")
+    },
+    // ÊñáÊú¨ÂÜÖÂÆπ
+    text: {
+      type: [String, Number],
+      default: defProps.getString("divider.text")
+    },
+    // ÊñáÊú¨Â§ßÂ∞è
+    textSize: {
+      type: [String, Number],
+      default: defProps.getNumber("divider.textSize")
+    },
+    // ÊñáÊú¨È¢úËâ≤
+    textColor: {
+      type: String,
+      default: defProps.getString("divider.textColor")
+    },
+    // Á∫øÊù°È¢úËâ≤
+    lineColor: {
+      type: String,
+      default: defProps.getString("divider.lineColor")
+    }
+  },
+  emits: ["click"],
+  setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
+    const props = __props;
+    const emit = __emit;
+    const textStyle = computed(() => {
+      const style = new UTSJSONObject({});
+      style["fontSize"] = addUnit(props.textSize);
+      style["color"] = props.textColor;
+      return style;
+    });
+    const leftLineStyle = computed(() => {
+      const style = new UTSJSONObject({});
+      if (props.textPosition === "left") {
+        style["width"] = "80rpx";
+      } else {
+        style["flex"] = 1;
+      }
+      return style;
+    });
+    const rightLineStyle = computed(() => {
+      const style = new UTSJSONObject({});
+      if (props.textPosition === "right") {
+        style["width"] = "80rpx";
+      } else {
+        style["flex"] = 1;
+      }
+      return style;
+    });
+    const clickHandler = () => {
+      emit("click");
+    };
+    const __returned__ = { props, emit, textStyle, leftLineStyle, rightLineStyle, clickHandler };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-divider": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": 15, "marginRight": 0, "marginBottom": 15, "marginLeft": 0 } }, "up-divider__text": { "": { "marginTop": 0, "marginRight": 15, "marginBottom": 0, "marginLeft": 15 } }, "up-divider__dot": { "": { "fontSize": 12, "marginTop": 0, "marginRight": 12, "marginBottom": 0, "marginLeft": 12, "color": "#c0c4cc" } } };
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_line = resolveEasycom(resolveDynamicComponent("up-line"), __easycom_0);
+  return openBlock(), createElementBlock(
+    "view",
+    {
+      class: "up-divider",
+      style: normalizeStyle([_ctx.$up.addStyle(_ctx.customStyle)]),
+      onClick: $setup.clickHandler
+    },
+    [
+      createVNode(_component_up_line, {
+        color: $props.lineColor,
+        customStyle: $setup.leftLineStyle,
+        hairline: $props.hairline,
+        dashed: $props.dashed
+      }, null, 8, ["color", "customStyle", "hairline", "dashed"]),
+      $props.dot ? (openBlock(), createElementBlock("text", {
+        key: 0,
+        class: "up-divider__dot"
+      }, "‚óè")) : $props.text ? (openBlock(), createElementBlock(
+        "text",
+        {
+          key: 1,
+          class: "up-divider__text",
+          style: normalizeStyle([$setup.textStyle])
+        },
+        toDisplayString($props.text),
+        5
+        /* TEXT, STYLE */
+      )) : createCommentVNode("v-if", true),
+      createVNode(_component_up_line, {
+        color: $props.lineColor,
+        customStyle: $setup.rightLineStyle,
+        hairline: $props.hairline,
+        dashed: $props.dashed
+      }, null, 8, ["color", "customStyle", "hairline", "dashed"])
+    ],
+    4
+    /* STYLE */
+  );
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-divider/up-divider.uvue"]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-divider.js.map
+‘rFïµ../../../../App.ku.jsµ../up-line/up-line.jsŸ'../../../../plugin-vue-export-helper.js¨./divider.jsº../../libs/function/index.js‘rGó™assertions®external¢id§meta±moduleSideEffects™resolvedByµsyntheticNamedExportsA¬Ÿ†/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku.jsA√™oh-resolve¬GA¬ŸÃ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-line/up-line.jsA√™oh-resolve¬GA¬Ÿ≤/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsA√™oh-resolve¬GA¬Ÿœ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-divider/divider.jsA√™oh-resolve¬GA¬Ÿ≈/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsA√™oh-resolve¬ë‘rHíßmissing¶plugin√¶genAbc¬ê‘  ‘rIî≤dynamicImportCacheπexportAllDeclarationCacheªexportNamedDeclarationCache´importCacheêêë‘rJñ§type•start£end´declaration™specifiers¶source∂ExportNamedDeclarationÕÚÕ¿ë‘rKï§type•start£end•local®exportedØExportSpecifierÕ˝Õ‘rLî§type•start£end§name™IdentifierÕ˝Õ´__easycom_1L™IdentifierÕÕ°_¿ï‘rMï§type•start£end™specifiers¶source±ImportDeclaration 9ë‘rNï§type•start£end®imported•localØImportSpecifier	L™Identifier	
+°_L™Identifier´__easycom_0‘rOï§type•start£end•value£rawßLiteral!8µ../up-line/up-line.js∑"../up-line/up-line.js"M±ImportDeclarationÃÈÕ%ëNØImportSpecifierÃÚÕL™IdentifierÃÚÃÛ°rL™IdentifierÃ˜ÕÆresolveEasycomOßLiteralÕÕ$µ../../../../App.ku.js∑"../../../../App.ku.js"M±ImportDeclarationÕ&ÕSëNØImportSpecifierÕ/Õ<L™IdentifierÕ/Õ0°dL™IdentifierÕ4Õ<®defPropsOßLiteralÕDÕR¨./divider.jsÆ"./divider.js"M±ImportDeclarationÕTÕêëNØImportSpecifierÕ]ÕiL™IdentifierÕ]Õ^°aL™IdentifierÕbÕißaddUnitOßLiteralÕqÕèº../../libs/function/index.jsæ"../../libs/function/index.js"M±ImportDeclarationÕëÕ‹ëNØImportSpecifierÕöÕ™L™IdentifierÕöÕõ°_L™IdentifierÕüÕ™´_export_sfcOßLiteralÕ≤Õ€Ÿ'../../../../plugin-vue-export-helper.jsŸ)"../../../../plugin-vue-export-helper.js"

@@ -1,5 +1,6 @@
 import AppKu from '@/App.ku.uvue'
 import LayoutComponent from '@/src/layouts/default.uvue'
+import EnvCard from './components/EnvCard.uvue'
 import SystemInfoCard from './components/SystemInfoCard.uvue'
 import HapticsCard from './components/HapticsCard.uvue'
 import MediaCard from './components/MediaCard.uvue'
@@ -33,6 +34,7 @@ return (): any | null => {
               _cE("text", _uM({ class: "text-20px font-bold text-__1a202c_" }), "设备系统信息"),
               _cE("text", _uM({ class: "text-13px text-__718096_ mt-4px" }), "演示 iOS/Android 原生设备 API 调用与状态读取")
             ]),
+            _cV(unref(EnvCard)),
             _cV(unref(SystemInfoCard)),
             _cV(unref(HapticsCard)),
             _cV(unref(MediaCard))

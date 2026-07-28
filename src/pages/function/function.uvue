@@ -6,6 +6,9 @@
       <text class="text-13px text-[#718096] mt-4px">演示 iOS/Android 原生设备 API 调用与状态读取</text>
     </view>
 
+    <!-- 环境变量卡片 -->
+    <EnvCard />
+
     <!-- 系统信息卡片 -->
     <SystemInfoCard />
 
@@ -18,6 +21,7 @@
 </template>
 
 <script setup lang="uts">
+import EnvCard from './components/EnvCard.uvue'
 import SystemInfoCard from './components/SystemInfoCard.uvue'
 import HapticsCard from './components/HapticsCard.uvue'
 import MediaCard from './components/MediaCard.uvue'

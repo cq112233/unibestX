@@ -1,0 +1,933 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ7‰import { UniCustomEvent, UniCustomEventOptions } from './UniCustomEvent';
+import { UniElementImpl } from './UniElement';
+import { typeNode } from "@ohos.arkui.node";
+import { formatColor, formatLength } from '../helper';
+import { NativeMap as Map } from './NativeMap';
+import { UniCssFlexEdge } from 'dcloudlayout';
+import { callObject } from '../helper';
+const EASING_FUNCTION_TYPES = new Map([
+    ['default', Curve.Ease],
+    ['linear', Curve.Linear],
+    ['easeInCubic', Curve.EaseIn],
+    ['easeOutCubic', Curve.EaseOut],
+    ['easeInOutCubic', Curve.EaseInOut],
+]);
+let hasInitHeight = false;
+export class UniSwiperElementImpl extends UniElementImpl {
+    static get defaultStyle() {
+        const baseDefaultStyle = super.defaultStyle;
+        const defaultStyle = new Map(baseDefaultStyle);
+        defaultStyle.set('height', ['150px', true]);
+        return defaultStyle;
+    }
+    initClass() {
+        this.styleCache = {
+            padding: {
+                top: 0,
+                right: 0,
+                bottom: 0,
+                left: 0
+            },
+            borderWidth: {
+                top: 0,
+                bottom: 0
+            }
+        };
+    }
+    constructor() {
+        super();
+        this.controller = new SwiperController();
+        this.showIndicator = false;
+        this.indicatorStyle = Indicator.dot().color('rgba(0, 0, 0, 0.3)').selectedColor('#000000');
+        this.duration = 500;
+        this.touching = false;
+        this.touchEndTimer = -1;
+        this.preventTouchMove = false;
+        this.vertical = false;
+        this.interval = 5000;
+        this.autoPlay = false;
+        this.loop = false;
+        this.currentIndex = 0;
+        this.isAppear = false;
+        this.lastTouchEvent = null;
+        this.needPreventTouchMoveNodes = ['SLIDER'];
+        this.needDisableSwipe = false;
+        this.maxChildHeight = -1;
+        this.hasOwnHeight = false;
+        this.hasInitHeight = false;
+        const swiper = this.frameNode;
+        swiper.initialize(this.controller);
+        // æ”¯æŒå­ç»„ä»¶ preventDefault é˜»æ­¢ swiper æ»‘åŠ¨è¡Œä¸º
+        this.addEventListener('touchstart', (event) => {
+            this.lastTouchEvent = event;
+        });
+        this.addEventListener('_touchstartStopPropagation', (event) => {
+            this.lastTouchEvent = event.uniEvent;
+        });
+        this.addEventListener('touchmove', (event) => {
+            this.lastTouchEvent = event;
+        });
+        this.addEventListener('_touchmoveStopPropagation', (event) => {
+            this.lastTouchEvent = event.uniEvent;
+        });
+        try {
+            callObject(swiper.attribute, swiper.attribute, 'onContentWillScroll', [() => {
+                    return !this.lastTouchEvent.defaultPrevented;
+                }]);
+        }
+        catch (e) {
+            console.error('onContentWillScroll error:', e.message);
+        }
+        swiper.attribute.onChange((index) => {
+            this.handleAutoPlayNotLoopBehavior(index);
+        });
+        swiper.attribute.onAppear(() => {
+            this.isAppear = true;
+            if (!this.hasOwnHeight) {
+                // å¦‚æœ swiper æœªä¸»åŠ¨è®¾ç½®é«˜åº¦ï¼Œæµ‹é‡å­å…ƒç´ ï¼Œå–æœ€é«˜çš„é‚£ä¸ªå­å…ƒç´ çš„é«˜åº¦ä½œä¸º swiper çš„é«˜åº¦
+                let maxChildHeight = -1;
+                this.children.forEach(child => {
+                    if (child.tagName === 'SWIPER-ITEM') {
+                        const childHeight = child.layoutNode.getLayoutHeight() +
+                            parseFloat(this.styleCache.padding.top) +
+                            parseFloat(this.styleCache.padding.bottom) + this.styleCache.borderWidth.top +
+                            this.styleCache.borderWidth.bottom;
+                        if (childHeight > maxChildHeight) {
+                            maxChildHeight = childHeight;
+                        }
+                    }
+                });
+                if (maxChildHeight > 0) {
+                    this.maxChildHeight = maxChildHeight;
+                    this.parseStyle('height', maxChildHeight);
+                }
+            }
+        });
+        // æŸäº›å­ç»„ä»¶æœ‰æ»‘åŠ¨äº¤äº’ï¼Œæ­¤æ—¶éœ€è¦é˜»æ­¢ swiper æ»‘åŠ¨è¡Œä¸º
+        this.addEventListener('touchmove', (event) => {
+            if (!this.preventTouchMove && event.target && this.needPreventTouchMoveNodes.includes(event.target.nodeName)) {
+                this.preventTouchMove = true;
+                swiper.attribute.disableSwipe(true);
+            }
+        });
+        this.addEventListener('touchend', () => {
+            this.preventTouchMove = false;
+            if (!this.needDisableSwipe) {
+                swiper.attribute.disableSwipe(false);
+            }
+        });
+    }
+    createFrameNode() {
+        const swiper = typeNode.createNode(this.app.context, 'Swiper');
+        swiper.attribute.indicator(false);
+        swiper.attribute.curve(Curve.Linear);
+        swiper.attribute.loop(false);
+        swiper.attribute.interval(this.interval);
+        swiper.attribute.onGestureSwipe(() => {
+            this.touching = true;
+            clearTimeout(this.touchEndTimer);
+            this.touchEndTimer = setTimeout(() => {
+                this.touching = false;
+            }, this.duration);
+        });
+        return swiper;
+    }
+    parseStyle(key, value) {
+        value = this.normalizeStyleValue(key, value);
+        switch (key) {
+            case 'height':
+                // è®°å½•æ˜¯å¦å·²åˆå§‹åŒ–é»˜è®¤é«˜åº¦
+                if (!hasInitHeight && value === '150px') {
+                    hasInitHeight = true;
+                }
+                else if (hasInitHeight && value !== this.maxChildHeight) {
+                    // è®°å½•æ˜¯å¦æœ‰ä¸»åŠ¨è®¾ç½®é«˜åº¦
+                    this.hasOwnHeight = true;
+                }
+                return super.parseStyle(key, value);
+            default:
+                return super.parseStyle(key, value);
+        }
+    }
+    updateNativeAttribute(key, value) {
+        switch (key) {
+            case 'indicatorDots': {
+                this.showIndicator = value;
+                this.frameNode.attribute.indicator(this.showIndicator ? this.indicatorStyle : false);
+                break;
+            }
+            case 'indicatorColor': {
+                formatColor(value, color => {
+                    this.indicatorStyle.color(color);
+                });
+                this.showIndicator && this.frameNode.attribute.indicator(this.indicatorStyle);
+                break;
+            }
+            case 'indicatorActiveColor': {
+                formatColor(value, color => {
+                    this.indicatorStyle.selectedColor(color);
+                });
+                this.showIndicator && this.frameNode.attribute.indicator(this.indicatorStyle);
+                break;
+            }
+            case 'autoplay': {
+                this.autoPlay = value;
+                this.frameNode.attribute.autoPlay(this.autoPlay);
+                break;
+            }
+            case 'current': {
+                if (value !== this.currentIndex) {
+                    this.currentIndex = value;
+                    this.handleIndexChange();
+                }
+                break;
+            }
+            case 'currentItemId': {
+                const index = this.children.findIndex(child => child['itemId'] === value);
+                if (index !== -1) {
+                    this.currentIndex = index;
+                    this.handleIndexChange();
+                }
+                break;
+            }
+            case 'interval': {
+                this.interval = value;
+                this.frameNode.attribute.interval(this.interval);
+                break;
+            }
+            case 'duration': {
+                this.duration = value;
+                this.frameNode.attribute.duration(value);
+                break;
+            }
+            case 'circular': {
+                this.loop = value;
+                this.frameNode.attribute.loop(this.loop);
+                break;
+            }
+            case 'rebound': {
+                this.frameNode.attribute.effectMode(value ? EdgeEffect.Spring : EdgeEffect.None);
+                break;
+            }
+            case 'vertical': {
+                this.vertical = value;
+                this.frameNode.attribute.vertical(this.vertical);
+                break;
+            }
+            case 'disableTouch': {
+                this.needDisableSwipe = value;
+                this.frameNode.attribute.disableSwipe(this.needDisableSwipe);
+                break;
+            }
+            case 'previousMargin': {
+                formatLength(value, val => {
+                    this.frameNode.attribute.prevMargin(val);
+                });
+                break;
+            }
+            case 'nextMargin': {
+                formatLength(value, val => {
+                    this.frameNode.attribute.nextMargin(val);
+                });
+                break;
+            }
+            case 'displayMultipleItems': {
+                this.frameNode.attribute.displayCount(value);
+                break;
+            }
+            case 'easingFunction': {
+                const type = EASING_FUNCTION_TYPES.get(value);
+                if (type) {
+                    this.frameNode.attribute.curve(type);
+                }
+            }
+        }
+    }
+    handleIndexChange() {
+        if (this.isAppear) {
+            this.controller.changeIndex(this.currentIndex, true);
+        }
+        else {
+            this.frameNode.attribute.index(this.currentIndex);
+        }
+    }
+    getSpecifiedIndexSwiperItemId(index) {
+        return this.children.filter(child => child.tagName === 'SWIPER-ITEM')[index]?.['itemId'] || '';
+    }
+    // æ‹‰é½ autoPlay:true, loop:false ä¸å…¶ä»–ç«¯ä¸€è‡´
+    handleAutoPlayNotLoopBehavior(index) {
+        if (this.autoPlay && !this.loop && index === this.children.length - 1) {
+            const timer = setTimeout(() => {
+                this.currentIndex = 0;
+                this.controller.changeIndex(this.currentIndex, true);
+                clearTimeout(timer);
+            }, this.interval - this.duration);
+        }
+    }
+    initNativeEvent(type) {
+        switch (type) {
+            case 'change': {
+                this.frameNode.attribute.onChange((index) => {
+                    this.handleAutoPlayNotLoopBehavior(index);
+                    this.currentIndex = index;
+                    this.dispatchEvent(new UniCustomEvent('change', new UniCustomEventOptions({
+                        current: this.currentIndex,
+                        currentItemId: this.getSpecifiedIndexSwiperItemId(index),
+                        source: this.touching ? 'touch' : 'autoplay'
+                    })));
+                });
+                break;
+            }
+            case 'animationfinish': {
+                this.frameNode.attribute.onAnimationEnd((index) => {
+                    this.dispatchEvent(new UniCustomEvent('animationfinish', new UniCustomEventOptions({
+                        current: index,
+                        currentItemId: this.getSpecifiedIndexSwiperItemId(index),
+                        source: this.touching ? 'touch' : 'autoplay'
+                    })));
+                });
+                break;
+            }
+            case 'transition': {
+                this.frameNode.attribute.onContentDidScroll((selectedIndex, index, position, mainAxisLength) => {
+                    if (selectedIndex === index) {
+                        const space = -position * mainAxisLength;
+                        const res = { dx: 0, dy: 0 };
+                        if (this.vertical) {
+                            res.dy = space;
+                        }
+                        else {
+                            res.dx = space;
+                        }
+                        this.dispatchEvent(new UniCustomEvent('transition', new UniCustomEventOptions(res)));
+                    }
+                });
+                break;
+            }
+            default:
+                super.initNativeEvent(type);
+                break;
+        }
+    }
+    deleteNativeEvent(type, res) {
+        switch (type) {
+            case 'change': {
+                this.frameNode.attribute.onChange(null);
+                return true;
+            }
+            case 'animationfinish': {
+                this.frameNode.attribute.onAnimationEnd(null);
+                return true;
+            }
+            case 'transition': {
+                this.frameNode?.attribute.onContentDidScroll(null);
+                return true;
+            }
+            default:
+                return super.deleteNativeEvent(type, res);
+        }
+    }
+    dispose() {
+        this.lastTouchEvent = null;
+        this.frameNode?.attribute.onGestureSwipe(undefined)
+            .onChange(undefined)
+            .onAnimationEnd(undefined)
+            .onContentDidScroll(undefined)
+            .onAppear(undefined);
+        // ä½¿ç”¨ callObject é¿å…ä½ç‰ˆæœ¬ç¼–è¯‘å™¨æŠ¥é”™
+        try {
+            callObject(this.frameNode.attribute, this.frameNode.attribute, 'onContentWillScroll', []);
+        }
+        catch (e) {
+            console.error('remove onContentWillScroll:', e.message);
+        }
+        this.frameNode?.dispose();
+        super.dispose();
+    }
+    checkLayout() {
+        super.checkLayout();
+        const layoutNode = this.layoutNode;
+        this.styleCache.borderWidth.top = layoutNode.getLayoutBorder(UniCssFlexEdge.Top);
+        this.styleCache.borderWidth.bottom = layoutNode.getLayoutBorder(UniCssFlexEdge.Bottom);
+        this.styleCache.padding.top = layoutNode.getLayoutPadding(UniCssFlexEdge.Top);
+        this.styleCache.padding.bottom = layoutNode.getLayoutPadding(UniCssFlexEdge.Bottom);
+    }
+    getHarmonyController() {
+        return this.controller;
+    }
+}
+//# sourceMappingURL=UniSwiperElement.js.mapÂ–Ùø/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@+e4e+u3lgwkkbkugmqvy0h1itp5flbzgksxgew+shz8=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/UniCustomEvent.tsÙõ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@+e4e+u3lgwkkbkugmqvy0h1itp5flbzgksxgew+shz8=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/UniElement.etsÙm hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.arkui.node.d.tsÙó/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@+e4e+u3lgwkkbkugmqvy0h1itp5flbzgksxgew+shz8=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/helper/index.etsÙó/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@+e4e+u3lgwkkbkugmqvy0h1itp5flbzgksxgew+shz8=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/NativeMap.tsÙ¹/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/dcloudlayout@o4tfyyku4j+xy1uhhxsidhq7z+e20ujbdzeiurzgnfy=/oh_modules/dcloudlayout/Index.etsÙû/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@+e4e+u3lgwkkbkugmqvy0h1itp5flbzgksxgew+shz8=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/UniSwiperElement.etsÔrB˜±isLocalDependency¯isNodeEntryFile§pkgPath§pkgNameªpkgVersion±belongProjectPath±dependencyPkgInfo¬shouldEmitJsÂÂÙâ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@+e4e+u3lgwkkbkugmqvy0h1itp5flbzgksxgew+shz8=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime½@dcloudio/uni-runtime-harmony¥1.0.0ÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmonyÔrC’§pkgNameªpkgVersion½@dcloudio/uni-runtime-harmony¥1.0.0ÃÃÚ3‡import { UniSwiperElement as IUniSwiperElement, UniSwiperTransitionEventDetail } from '@dcloudio/uni-app-x/types/native'
+import { UniCustomEvent, UniCustomEventOptions } from './UniCustomEvent'
+import { UniElementImpl } from './UniElement'
+import { typeNode } from '@kit.ArkUI'
+import { formatColor, formatLength } from '../helper'
+import { NativeMap as Map } from './NativeMap'
+import { ModifyEvent, InternalUniEvent } from './UniEvent'
+import { UniTouchEvent } from './UniTouchEvent'
+import { UniCssFlexEdge } from 'dcloudlayout'
+import { callObject } from '../helper'
+import { deviceInfo } from '@kit.BasicServicesKit';
+
+const EASING_FUNCTION_TYPES = new Map<string, Curve>([
+  ['default', Curve.Ease],
+  ['linear', Curve.Linear],
+  ['easeInCubic', Curve.EaseIn],
+  ['easeOutCubic', Curve.EaseOut],
+  ['easeInOutCubic', Curve.EaseInOut],
+])
+
+interface ChangeEventDetail {
+  current: number
+  currentItemId?: string
+  source: 'autoplay' | 'touch'
+}
+
+interface BorderWidth {
+  top: number,
+  bottom: number
+}
+
+interface StyleCache {
+  padding: Padding
+  borderWidth: BorderWidth
+}
+
+let hasInitHeight = false
+
+export class UniSwiperElementImpl
+  extends UniElementImpl<typeNode.Swiper>
+implements IUniSwiperElement {
+  private controller: SwiperController = new SwiperController()
+  private showIndicator: boolean = false
+  private indicatorStyle: DotIndicator = Indicator.dot().color('rgba(0, 0, 0, 0.3)').selectedColor('#000000')
+  private duration: number = 500
+  private touching: boolean = false
+  private touchEndTimer: number = -1
+  private preventTouchMove: boolean = false
+  private vertical: boolean = false
+  private interval: number = 5000
+  private autoPlay: boolean = false
+  private loop: boolean = false
+  private currentIndex: number = 0
+  private isAppear: boolean = false
+  protected lastTouchEvent: UniTouchEvent | null = null
+  private needPreventTouchMoveNodes = ['SLIDER']
+  private styleCache!: StyleCache
+  private needDisableSwipe: boolean = false
+  protected maxChildHeight: number = -1
+  protected hasOwnHeight: boolean = false
+  protected hasInitHeight: boolean = false
+
+  static override get defaultStyle() {
+    const baseDefaultStyle = super.defaultStyle as Map<string, [string] | [string, boolean]>
+    const defaultStyle = new Map(baseDefaultStyle)
+
+    defaultStyle.set('height', ['150px', true])
+    return defaultStyle
+  }
+
+  protected override initClass(): void {
+    this.styleCache = {
+      padding: {
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0
+      },
+      borderWidth: {
+        top: 0,
+        bottom: 0
+      }
+    }
+  }
+
+  constructor() {
+    super()
+    const swiper = this.frameNode
+    swiper.initialize(this.controller)
+
+    // æ”¯æŒå­ç»„ä»¶ preventDefault é˜»æ­¢ swiper æ»‘åŠ¨è¡Œä¸º
+    this.addEventListener('touchstart', (event: UniTouchEvent) => {
+      this.lastTouchEvent = event
+    })
+
+    this.addEventListener('_touchstartStopPropagation', (event: ModifyEvent) => {
+      this.lastTouchEvent = event.uniEvent as UniTouchEvent
+    })
+
+    this.addEventListener('touchmove', (event: UniTouchEvent) => {
+      this.lastTouchEvent = event
+    })
+
+    this.addEventListener('_touchmoveStopPropagation', (event: ModifyEvent) => {
+      this.lastTouchEvent = event.uniEvent as UniTouchEvent
+    })
+    try {
+      callObject(swiper.attribute, swiper.attribute, 'onContentWillScroll', [() => {
+        return !(this.lastTouchEvent as Object as InternalUniEvent).defaultPrevented
+      }])
+    } catch (e) {
+      console.error('onContentWillScroll error:', e.message)
+    }
+    swiper.attribute.onChange((index: number) => {
+      this.handleAutoPlayNotLoopBehavior(index)
+    })
+    swiper.attribute.onAppear(() => {
+      this.isAppear = true
+      if (!this.hasOwnHeight) {
+        // å¦‚æœ swiper æœªä¸»åŠ¨è®¾ç½®é«˜åº¦ï¼Œæµ‹é‡å­å…ƒç´ ï¼Œå–æœ€é«˜çš„é‚£ä¸ªå­å…ƒç´ çš„é«˜åº¦ä½œä¸º swiper çš„é«˜åº¦
+        let maxChildHeight = -1
+        this.children.forEach(child => {
+          if (child.tagName === 'SWIPER-ITEM') {
+            const childHeight =
+              (child as UniElementImpl).layoutNode.getLayoutHeight() +
+              parseFloat(this.styleCache.padding.top as string) +
+              parseFloat(this.styleCache.padding.bottom as string) + this.styleCache.borderWidth.top +
+              this.styleCache.borderWidth.bottom
+            if (childHeight > maxChildHeight) {
+              maxChildHeight = childHeight
+            }
+          }
+        })
+        if (maxChildHeight > 0) {
+          this.maxChildHeight = maxChildHeight
+          this.parseStyle('height', maxChildHeight)
+        }
+      }
+    })
+
+    // æŸäº›å­ç»„ä»¶æœ‰æ»‘åŠ¨äº¤äº’ï¼Œæ­¤æ—¶éœ€è¦é˜»æ­¢ swiper æ»‘åŠ¨è¡Œä¸º
+    this.addEventListener('touchmove', (event: UniTouchEvent) => {
+      if (!this.preventTouchMove && event.target && this.needPreventTouchMoveNodes.includes(event.target.nodeName)) {
+        this.preventTouchMove = true
+        swiper.attribute.disableSwipe(true)
+      }
+    })
+    this.addEventListener('touchend', () => {
+      this.preventTouchMove = false
+      if (!this.needDisableSwipe) {
+        swiper.attribute.disableSwipe(false)
+      }
+    })
+  }
+
+  protected override createFrameNode(): typeNode.Swiper {
+    const swiper = typeNode.createNode(this.app.context, 'Swiper')
+
+    swiper.attribute.indicator(false)
+    swiper.attribute.curve(Curve.Linear)
+    swiper.attribute.loop(false)
+    swiper.attribute.interval(this.interval)
+    swiper.attribute.onGestureSwipe(() => {
+      this.touching = true
+      clearTimeout(this.touchEndTimer)
+      this.touchEndTimer = setTimeout(() => {
+        this.touching = false
+      }, this.duration)
+    })
+    return swiper
+  }
+
+  override parseStyle(key: string, value: Object): boolean {
+    value = this.normalizeStyleValue(key, value)
+    switch (key) {
+      case 'height':
+        // è®°å½•æ˜¯å¦å·²åˆå§‹åŒ–é»˜è®¤é«˜åº¦
+        if (!hasInitHeight && value === '150px') {
+          hasInitHeight = true
+        } else if (hasInitHeight && value !== this.maxChildHeight) {
+          // è®°å½•æ˜¯å¦æœ‰ä¸»åŠ¨è®¾ç½®é«˜åº¦
+          this.hasOwnHeight = true
+        }
+        return super.parseStyle(key, value)
+      default:
+        return super.parseStyle(key, value)
+    }
+  }
+
+  override updateNativeAttribute(key: string, value: ESObject): void {
+    switch (key) {
+      case 'indicatorDots': {
+        this.showIndicator = value as boolean
+        this.frameNode.attribute.indicator(this.showIndicator ? this.indicatorStyle : false)
+        break
+      }
+      case 'indicatorColor': {
+        formatColor(value as string, color => {
+          this.indicatorStyle.color(color)
+        })
+        this.showIndicator && this.frameNode.attribute.indicator(this.indicatorStyle)
+        break
+      }
+      case 'indicatorActiveColor': {
+        formatColor(value as string, color => {
+          this.indicatorStyle.selectedColor(color)
+        })
+        this.showIndicator && this.frameNode.attribute.indicator(this.indicatorStyle)
+        break
+      }
+      case 'autoplay': {
+        this.autoPlay = value as boolean
+        this.frameNode.attribute.autoPlay(this.autoPlay)
+        break
+      }
+      case 'current': {
+        if (value !== this.currentIndex) {
+          this.currentIndex = value as number
+          this.handleIndexChange()
+        }
+        break
+      }
+      case 'currentItemId': {
+        const index = this.children.findIndex(child => child['itemId'] === value)
+        if (index !== -1) {
+          this.currentIndex = index
+          this.handleIndexChange()
+        }
+        break
+      }
+      case 'interval': {
+        this.interval = value as number
+        this.frameNode.attribute.interval(this.interval)
+        break
+      }
+      case 'duration': {
+        this.duration = value as number
+        this.frameNode.attribute.duration(value as number)
+        break
+      }
+      case 'circular': {
+        this.loop = value as boolean
+        this.frameNode.attribute.loop(this.loop)
+        break
+      }
+      case 'rebound': {
+        this.frameNode.attribute.effectMode(value as boolean ? EdgeEffect.Spring : EdgeEffect.None)
+        break
+      }
+      case 'vertical': {
+        this.vertical = value as boolean
+        this.frameNode.attribute.vertical(this.vertical)
+        break
+      }
+      case 'disableTouch': {
+        this.needDisableSwipe = value as boolean
+        this.frameNode.attribute.disableSwipe(this.needDisableSwipe)
+        break
+      }
+      case 'previousMargin': {
+        formatLength(value as string, val => {
+          this.frameNode.attribute.prevMargin(val)
+        })
+        break
+      }
+      case 'nextMargin': {
+        formatLength(value as string, val => {
+          this.frameNode.attribute.nextMargin(val)
+        })
+        break
+      }
+      case 'displayMultipleItems': {
+        this.frameNode.attribute.displayCount(value as number)
+        break
+      }
+      case 'easingFunction': {
+        const type = EASING_FUNCTION_TYPES.get(value)
+        if (type) {
+          this.frameNode.attribute.curve(type)
+        }
+      }
+    }
+  }
+
+  protected handleIndexChange() {
+    if (this.isAppear) {
+      this.controller.changeIndex(this.currentIndex, true)
+    } else {
+      this.frameNode.attribute.index(this.currentIndex)
+    }
+  }
+
+  protected getSpecifiedIndexSwiperItemId(index: number): string {
+    return this.children.filter(child => child.tagName === 'SWIPER-ITEM')[index]?.['itemId'] || ''
+  }
+
+  // æ‹‰é½ autoPlay:true, loop:false ä¸å…¶ä»–ç«¯ä¸€è‡´
+  protected handleAutoPlayNotLoopBehavior(index: number) {
+    if (this.autoPlay && !this.loop && index === this.children.length - 1) {
+      const timer = setTimeout(() => {
+        this.currentIndex = 0
+        this.controller.changeIndex(this.currentIndex, true)
+        clearTimeout(timer)
+      }, this.interval - this.duration)
+    }
+  }
+
+  protected override initNativeEvent(type: string): void | Object {
+    switch (type) {
+      case 'change': {
+        this.frameNode.attribute.onChange((index: number) => {
+          this.handleAutoPlayNotLoopBehavior(index)
+          this.currentIndex = index
+          this.dispatchEvent(new UniCustomEvent('change', new UniCustomEventOptions<ChangeEventDetail>({
+            current: this.currentIndex,
+            currentItemId: this.getSpecifiedIndexSwiperItemId(index),
+            source: this.touching ? 'touch' : 'autoplay'
+          })))
+        })
+        break
+      }
+      case 'animationfinish': {
+        this.frameNode.attribute.onAnimationEnd((index: number) => {
+          this.dispatchEvent(new UniCustomEvent('animationfinish', new UniCustomEventOptions<ChangeEventDetail>({
+            current: index,
+            currentItemId: this.getSpecifiedIndexSwiperItemId(index),
+            source: this.touching ? 'touch' : 'autoplay'
+          })))
+        })
+        break
+      }
+      case 'transition': {
+        this.frameNode.attribute.onContentDidScroll((selectedIndex: number, index: number, position: number,
+          mainAxisLength: number) => {
+          if (selectedIndex === index) {
+            const space = -position * mainAxisLength
+            const res = { dx: 0, dy: 0 } as UniSwiperTransitionEventDetail
+            if (this.vertical) {
+              res.dy = space
+            } else {
+              res.dx = space
+            }
+            this.dispatchEvent(new UniCustomEvent('transition',
+              new UniCustomEventOptions<UniSwiperTransitionEventDetail>(res)))
+          }
+        })
+        break
+      }
+      default:
+        super.initNativeEvent(type)
+        break
+    }
+  }
+
+  protected override deleteNativeEvent(type: string, res: void | Object): boolean {
+    switch (type) {
+      case 'change': {
+        this.frameNode!.attribute.onChange(null)
+        return true
+      }
+      case 'animationfinish': {
+        this.frameNode!.attribute.onAnimationEnd(null)
+        return true
+      }
+      case 'transition': {
+        this.frameNode?.attribute.onContentDidScroll(null)
+        return true
+      }
+      default:
+        return super.deleteNativeEvent(type, res)
+    }
+  }
+
+  override dispose(): void {
+    this.lastTouchEvent = null
+    this.frameNode?.attribute.onGestureSwipe(undefined)
+      .onChange(undefined)
+      .onAnimationEnd(undefined)
+      .onContentDidScroll(undefined)
+      .onAppear(undefined)
+    // ä½¿ç”¨ callObject é¿å…ä½ç‰ˆæœ¬ç¼–è¯‘å™¨æŠ¥é”™
+    try {
+      callObject(this.frameNode.attribute, this.frameNode.attribute, 'onContentWillScroll', [])
+    } catch (e) {
+      console.error('remove onContentWillScroll:', e.message)
+    }
+    this.frameNode?.dispose()
+    super.dispose()
+  }
+
+  override checkLayout() {
+    super.checkLayout()
+    const layoutNode = this.layoutNode
+    this.styleCache.borderWidth.top = layoutNode.getLayoutBorder(UniCssFlexEdge.Top)
+    this.styleCache.borderWidth.bottom = layoutNode.getLayoutBorder(UniCssFlexEdge.Bottom)
+    this.styleCache.padding.top = layoutNode.getLayoutPadding(UniCssFlexEdge.Top)
+    this.styleCache.padding.bottom = layoutNode.getLayoutPadding(UniCssFlexEdge.Bottom)
+  }
+
+  override getHarmonyController<T extends SwiperController>(): T {
+    return this.controller as T
+  }
+}
+ÀÔrD–°@ohos.arkui.node¬./UniElement°./UniCustomEvent«./NativeMap©../helper¬dcloudlayoutÔrE—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÃÙm hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.arkui.node.d.tsAÃªoh-resolveÂEAÂÙõ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@+e4e+u3lgwkkbkugmqvy0h1itp5flbzgksxgew+shz8=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/UniElement.etsAÃªoh-resolveÂEAÂÙø/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@+e4e+u3lgwkkbkugmqvy0h1itp5flbzgksxgew+shz8=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/UniCustomEvent.tsAÃªoh-resolveÂEAÂÙó/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@+e4e+u3lgwkkbkugmqvy0h1itp5flbzgksxgew+shz8=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/NativeMap.tsAÃªoh-resolveÂEAÂÙó/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@+e4e+u3lgwkkbkugmqvy0h1itp5flbzgksxgew+shz8=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/helper/index.etsAÃªoh-resolveÂEAÂÙ¹/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/dcloudlayout@o4tfyyku4j+xy1uhhxsidhq7z+e20ujbdzeiurzgnfy=/oh_modules/dcloudlayout/Index.etsAÃªoh-resolveÂ“ÔrF–§version¤fileªsourceRoot§sources¥names¨mappings³UniSwiperElement.js ‘´UniSwiperElement.etsÜfš”   ” ”	 	” ” ”. .”0 0”6 6”ÌH ÌH”ÌI ÌH˜”   ” ”	 	” ” ” ”- -”. -˜”   ” 	”	 	” ” ” ”+ %”, %š”   ” ”	 	” ” ”" "”$ $”* *”5 5”6 5š”   ” ”	 	” ” ” ” ”! !”. .”/ .˜”   ” ”	 	” ” ” ”- -”. -˜”  	 ” 	”	 		” 	” 	” 	”& 	&”' 	&—”   ” ” ” ”" "”% %”& 5˜” ” ” ” ” ” ” ” ˜” ” ” ” ” ” ” ” ˜” ” ” ” ” ” ”  ”! ˜” ” ” ” ” ” ”"  ”# !˜” ” ” ” ” ” ”& $”' %“” ” ” –”  $ ” $” $” $” $” $–”  & ” &” &”! '”* '
+”8 ')”” >”
+ >” >” >"˜” ?” ?
+” ?”! ?”& ?"”' ?#”3 ?Ì\”4 ?Ì\š” Ì@” Ì@
+” Ì@” Ì@”! Ì@”$ Ì@ ”% Ì@!”5 Ì@1”6 Ì@2”7 Ì@2” ÌB” ÌB” ÌB” ÌB” ÌB”! ÌB”# ÌB”$ ÌB ”+ ÌB'”- ÌB)”1 ÌB-”2 ÌB.”3 ÌB/”4 ÌB/”” ÌC” ÌC” ÌC” ÌC’” ÌD” ÌD’” ÌF” ÌF•” ÌG” ÌG” ÌG	” ÌG” ÌG“” ÌH” ÌH” ÌH”” ÌI” ÌI” ÌI” ÌI”” ÌJ” ÌJ” ÌJ” ÌJ”” ÌK” ÌK” ÌK” ÌK”” ÌL” ÌL” ÌL” ÌL‘” ÌM“” ÌN” ÌN” ÌN”” ÌO” ÌO” ÌO” ÌO”” ÌP” ÌP” ÌP” ÌP‘” ÌQ’”	 ÌR”
+ ÌR’” ÌS” ÌS‘” ÌU”” ÌV” ÌV	” ÌV” ÌV—” )
+” )” ))” )-”. )=”0 )?”1 )?•” *
+” *” *#”" *(”# *(Ü ” +
+” +” +)”' +2”( +3”+ +6”- +8”. +9”3 +>”4 +?”ÌH +ÌS”ÌI +ÌT”ÌJ +ÌU”ÌW +Ìb”ÌX +Ìc”Ìa +Ìl”Ìb +Ìm”Ìc +Ìm•” ,
+” ,” ,” , ” , •” -
+” -” -” -#” -#–” .
+” .” ."” .#” .$”  .$•” /
+” /”  /&”% /+”& /+•” 0
+” 0” 0” 0#” 0#•” 1
+” 1” 1” 1!” 1!•” 2
+” 2” 2” 2#” 2#•” 3
+” 3” 3” 3” 3•” 4
+” 4” 4!” 4"” 4"•” 5
+” 5” 5” 5#” 5#•” 6” 6” 63”" 67”# 67—” 7
+”& 7#”) 7&”* 7'”2 7/”3 70”4 70•” 9
+” 9”  9&”% 9+”& 9+–” :” :” :%” :&”  :'”! :'•” ;” ;” ;$”! ;)”" ;)•” <” <” <%”" <*”# <*˜” ÌW” ÌW
+” ÌW” ÌW” ÌW” ÌW”% ÌW!”& ÌW!š” ÌX” ÌX
+” ÌX” ÌX” ÌX” ÌX” ÌX”) ÌX%”* ÌX&”+ ÌX&’” ÌZ”. ÌZ*›” Ì[” Ì[” Ì[	” Ì[” Ì[”* Ì[&”, Ì[(”- Ì[)”2 Ì[=”4 Ì[?”6 Ì[ÌA—” Ì\” Ì\
+” Ì\” Ì\”" Ì\”' Ì\!”( Ì\!”” Ì]”	 Ì]”
+ Ì]” Ì]›” Ì_” Ì_” Ì_	” Ì_” Ì_”: Ì_6”< Ì_8”= Ì_9”ÌB Ì_ÌK”ÌD Ì_ÌM”ÌF Ì_ÌO™” Ì`” Ì`
+” Ì`” Ì`”" Ì`”' Ì`!”( Ì`"”0 Ì`;”1 Ì`;”” Ìa”	 Ìa”
+ Ìa” Ìa›” Ìc” Ìc” Ìc	” Ìc” Ìc”) Ìc%”+ Ìc'”, Ìc(”1 Ìc<”3 Ìc>”5 ÌcÌ@—” Ìd” Ìd
+” Ìd” Ìd”" Ìd”' Ìd!”( Ìd!”” Ìe”	 Ìe”
+ Ìe” Ìe›” Ìg” Ìg” Ìg	” Ìg” Ìg”9 Ìg5”; Ìg7”< Ìg8”ÌA ÌgÌJ”ÌC ÌgÌL”ÌE ÌgÌN™” Ìh” Ìh
+” Ìh” Ìh”" Ìh”' Ìh!”( Ìh"”0 Ìh;”1 Ìh;”” Ìi”	 Ìi”
+ Ìi” Ìi’” Ìj” ÌjÜ ” Ìk” Ìk” Ìk” Ìk” Ìk”' Ìk!”) Ìk#”/ Ìk)”0 Ìk*”9 Ìk3”; Ìk5”ÌP ÌkÌJ”ÌR ÌkÌL”ÌS ÌkÌM”ÌV ÌkÌP”ÌX ÌkÌR™” Ìl” Ìl” Ìl”  Ìl”! Ìl”/ ÌlÌC”0 ÌlÌD”Ì@ ÌlÌT”ÌA ÌlÌT•” Ìm” Ìm” Ìm” Ìm	” Ìm	‘”	 Ìn”” Ìn” Ìn” Ìn” Ìnœ” Ìo” Ìo” Ìo” Ìo” Ìo”6 Ìo0”8 Ìo2”9 Ìo3”: Ìo4”ÌA Ìo;”ÌB Ìo<”ÌC Ìo<‘”	 Ìp›” Ìq” Ìq
+” Ìq” Ìq” Ìq”! Ìq”" Ìq”# Ìq”( Ìq,”* Ìq.”, Ìq0˜” Ìr” Ìr
+” Ìr”. Ìr(”/ Ìr)”4 Ìr.”5 Ìr/”6 Ìr/”” Ìs”	 Ìs”
+ Ìs” Ìs™” Ìt” Ìt
+” Ìt” Ìt” Ìt”! Ìt”" Ìt”% Ìt!”' Ìt#—” Ìu” Ìu
+” Ìu” Ìu” Ìu”  Ìu”! Ìu—” Ìv” Ìv
+” Ìv” Ìv” Ìv”" Ìv”$ Ìv’” Ìw”ÌD Ìw<—” Ìx” Ìx”" Ìx”% Ìx”& Ìx”' Ìx”( Ìxš” Ìy” Ìy” Ìy” Ìy” Ìy”% Ìy”& Ìy”+ Ìy#”, Ìy$”. Ìy&˜” Ìz
+” Ìz” Ìz” Ìz”% Ìz”* Ìz ”7 Ìz-”9 Ìz/š” Ì{” Ì{”) Ì{”, Ì|”1 Ì|'”2 Ì|(”< Ì|2”= Ì|3”ÌL Ì|ÌB”ÌN Ì|ÌD›” Ì}”& Ì}”' Ì}”+ Ì}”, Ì}”6 Ì}(”7 Ì})”> Ì}0”? Ì}1”ÌB Ì}>”ÌC Ì}?Ü ” Ì~”& Ì~”' Ì~”+ Ì~”, Ì~”6 Ì~(”7 Ì~)”> Ì~0”? Ì~1”ÌE Ì~ÌA”ÌF Ì~ÌB”ÌI Ì~ÌE”ÌM Ì~ÌI”ÌN Ì~ÌJ”ÌX Ì~ÌT”ÌY Ì~ÌU”Ìd Ì~Ì`”Ìe Ì~Ìa”Ìh Ì~Ìd™” Ì”  Ì”! Ì”+ Ì”, Ì”7 Ì)”8 Ì*”> Ì0”? Ì0–” Ì€” Ì€”' Ì€”* Ì€”8 Ì€,”: Ì€.•” Ì”* Ì”- Ì”8 Ì*”9 Ì*‘” Ì‚‘” Ìƒ”” Ì„” Ì„	” Ì„
+” Ì„
+–” Ì…” Ì…”" Ì…”% Ì…”& Ì…”( Ì… —” Ì†
+” Ì†” Ì†”' Ì†”* Ì† ”8 Ì†.”9 Ì†.š” Ì‡
+” Ì‡” Ì‡”# Ì‡”$ Ì‡”, Ì‡"”. Ì‡$”< Ì‡2”= Ì‡3”> Ì‡3‘” Ìˆ	‘” Ì‰”” ÌŠ”	 ÌŠ”
+ ÌŠ” ÌŠ’” ÌŒ”( ÌŒ$›” Ì” Ì” Ì	” Ì” Ì”) Ì%”+ Ì'”, Ì(”1 Ì<”3 Ì>”5 ÌÌ@Ü ” Ì” Ì
+” Ì” Ì” Ì”& Ì ”* Ì$”/ Ì)”0 Ì*”6 Ì0”: Ì4”> Ì8”? Ì9”ÌX ÌÌR”ÌY ÌÌS”Ìa ÌÌ[”Ìb ÌÌ\”Ìg ÌÌa”Ìh ÌÌb”Ìn ÌÌh”Ìo ÌÌi”Ìw ÌÌq”Ìx ÌÌr”Ìz ÌÌt—” Ì” Ì” Ì”% Ì”( Ì ”, Ì$”- Ì$š” Ì” Ì” Ì”  Ì”! Ì”- Ì%”. Ì&”2 Ì*”3 Ì+”4 Ì+‘” Ì‘”” Ì’”	 Ì’”
+ Ì’” Ì’™” Ì“” Ì“” Ì“	” Ì“” Ì“”( Ì“$”* Ì“&”- Ì“)”/ Ì“+—” Ì”” Ì”
+” Ì””! Ì””$ Ì””) Ì”#”* Ì”#—” Ì•” Ì•
+” Ì•” Ì•” Ì•”& Ì• ”( Ì•"š” Ì–” Ì–” Ì–”  Ì–”! Ì–”- Ì–%”. Ì–&”3 Ì–+”4 Ì–,”5 Ì–,‘” Ì—”” Ì˜”	 Ì˜”
+ Ì˜” Ì˜’” Ì™” Ì™’” Ì›” Ì›$Ü ” Ìœ” Ìœ
+” Ìœ” Ìœ” Ìœ”  Ìœ”* Ìœ&”+ Ìœ'”/ Ìœ+”0 Ìœ,”3 Ìœ/”4 Ìœ0”; Ìœ7”= Ìœ9”ÌE ÌœÌA”ÌF ÌœÌB”ÌG ÌœÌBš” Ì” Ì
+” Ì” Ì” Ì”" Ì”# Ì”( Ì$”) Ì%”* Ì%œ” ÌŸ” ÌŸ
+” ÌŸ” ÌŸ” ÌŸ” ÌŸ” ÌŸ”$ ÌŸ ”% ÌŸ!”+ ÌŸ'”, ÌŸ(”- ÌŸ(š” Ì ” Ì 
+” Ì ” Ì ” Ì ” Ì ” Ì ”# Ì ”$ Ì  ”% Ì  œ” Ì¡” Ì¡
+” Ì¡” Ì¡” Ì¡”! Ì¡”" Ì¡”& Ì¡"”' Ì¡#”/ Ì¡+”0 Ì¡,”1 Ì¡,™” Ì¢” Ì¢
+” Ì¢” Ì¢” Ì¢”' Ì¢#”( Ì¢$”+ Ì¢'”- Ì¢)—” Ì£” Ì£
+” Ì£” Ì£” Ì£”  Ì£”! Ì£˜” Ì¤” Ì¤” Ì¤” Ì¤” Ì¤”+ Ì¤%”, Ì¤&”- Ì¤&™” Ì¥” Ì¥
+” Ì¥” Ì¥”! Ì¥”+ Ì¥%”, Ì¥&”/ Ì¥)”1 Ì¥+—” Ì¦” Ì¦” Ì¦” Ì¦”  Ì¦”% Ì¦”& Ì¦˜” Ì§” Ì§” Ì§	” Ì§” Ì§” Ì§” Ì§” Ì§”” Ì¨”	 Ì¨”
+ Ì¨” Ì¨”” Ì©” Ì©” Ì©” Ì©’” Ìª” Ìª–” Ì¬” Ì¬” Ì¬” Ì¬!” Ì¬#” Ì¬0œ” Ì­” Ì­	” Ì­” Ì­” Ì­”( Ì­$”) Ì­%”, Ì­(”. Ì­*”3 Ì­/”4 Ì­0”5 Ì­0”” Ì®” Ì®” Ì®” Ì®“” Ì¯” Ì¯” Ì¯’” Ì°” Ì°™” Ì±” Ì±” Ì±”" Ì±”& Ì±”+ Ì±#”0 Ì±(”7 Ì±/”9 Ì±1•” Ì²
+”! Ì²”$ Ì²”( Ì²”) Ì²‘” Ì³	š” Ì³” Ì³”& Ì³ ”* Ì³$”/ Ì³)”4 Ì³.”8 Ì³2”9 Ì³3”ÌG Ì³ÌA”ÌI Ì³ÌC’” Ì´
+”" Ì´—” Ìµ
+” Ìµ” Ìµ”% Ìµ”( Ìµ”, Ìµ"”- Ìµ"‘” Ì¶	›” Ì·” Ì·” Ì·” Ì·”' Ì·”( Ì· ”+ Ì·#”- Ì·%”2 Ì·*”3 Ì·+”4 Ì·+‘” Ì¸›” Ì¹” Ì¹” Ì¹” Ì¹”' Ì¹”( Ì¹ ”+ Ì¹#”- Ì¹%”2 Ì¹*”3 Ì¹+”4 Ì¹+‘”	 Ìº’” Ì»” Ì»–” Ì½” Ì½ ” Ì½!” Ì½,” Ì½.”$ Ì½=”” Ì¾” Ì¾” Ì¾” Ì¾•” Ì¿” Ì¿”  Ì¿”! Ì¿”" Ì¿—” ÌÀ” ÌÀ” ÌÀ”" ÌÀ”% ÌÀ”* ÌÀ-”+ ÌÀ-Ü ” ÌÁ” ÌÁ” ÌÁ” ÌÁ” ÌÁ”( ÌÁ ”) ÌÁ!”2 ÌÁ*”3 ÌÁ+”7 ÌÁ/”8 ÌÁ0”ÌE ÌÁ=”ÌF ÌÁ>”ÌG ÌÁ?”ÌH ÌÁÌ@”ÌL ÌÁÌD”ÌM ÌÁÌE”Ì[ ÌÁÌS”Ì\ ÌÁÌT”Ì] ÌÁÌU”Ì^ ÌÁÌV”Ìc ÌÁÌ[”Ìd ÌÁÌ\”Ìe ÌÁÌ\’” ÌÂ” ÌÂ‘” ÌÃ•” ÌÄ” ÌÄ”! ÌÄ”" ÌÄ”# ÌÄ˜” ÌÅ” ÌÅ” ÌÅ”! ÌÅ#”# ÌÅ%”( ÌÅ*”) ÌÅ+”+ ÌÅ-š” ÌÆ
+” ÌÆ” ÌÆ”' ÌÆ”( ÌÆ”- ÌÆ#”. ÌÆ$”3 ÌÆ)”4 ÌÆ*”5 ÌÆ*”” ÌÇ” ÌÇ	” ÌÇ
+” ÌÇ
+Ü ” ÌÈ” ÌÈ” ÌÈ”" ÌÈ”& ÌÈ”* ÌÈ"”+ ÌÈ#”4 ÌÈ,”5 ÌÈ-”> ÌÈ6”? ÌÈ7”ÌH ÌÈÌ@”ÌI ÌÈÌA”ÌM ÌÈÌE”ÌN ÌÈÌF”Ì\ ÌÈÌT”Ì] ÌÈÌU”Ì^ ÌÈÌU’” ÌÉ” ÌÉ‘” ÌÊ•” ÌË” ÌË”' ÌË!”( ÌË"”) ÌË#˜” ÌÌ” ÌÌ” ÌÌ”! ÌÌ#”# ÌÌ%”( ÌÌ*”) ÌÌ+”+ ÌÌ-š” ÌÍ
+” ÌÍ” ÌÍ”' ÌÍ”( ÌÍ”5 ÌÍ+”6 ÌÍ,”; ÌÍ1”< ÌÍ2”= ÌÍ2”” ÌÎ” ÌÎ	” ÌÎ
+” ÌÎ
+Ü ” ÌÏ” ÌÏ” ÌÏ”" ÌÏ”& ÌÏ”* ÌÏ"”+ ÌÏ#”4 ÌÏ,”5 ÌÏ-”> ÌÏ6”? ÌÏ7”ÌH ÌÏÌ@”ÌI ÌÏÌA”ÌM ÌÏÌE”ÌN ÌÏÌF”Ì\ ÌÏÌT”Ì] ÌÏÌU”Ì^ ÌÏÌU’” ÌĞ” ÌĞ‘” ÌÑ•” ÌÒ” ÌÒ” ÌÒ” ÌÒ” ÌÒ—” ÌÓ” ÌÓ” ÌÓ” ÌÓ”  ÌÓ”% ÌÓ(”& ÌÓ(” ÌÔ” ÌÔ” ÌÔ” ÌÔ” ÌÔ”( ÌÔ ”) ÌÔ!”1 ÌÔ)”2 ÌÔ*”6 ÌÔ.”7 ÌÔ/”? ÌÔ7”Ì@ ÌÔ8”ÌA ÌÔ8’” ÌÕ” ÌÕ‘” ÌÖ•” Ì×” Ì×” Ì×” Ì×” Ì×˜” ÌØ” ÌØ” ÌØ” ÌØ”" ÌØ”# ÌØ”/ ÌØ'”1 ÌØ)—” ÌÙ
+” ÌÙ” ÌÙ”% ÌÙ”( ÌÙ”- ÌÙ-”. ÌÙ-–” ÌÚ
+” ÌÚ” ÌÚ”* ÌÚ ”, ÌÚ"”- ÌÚ"‘” ÌÛ	’” ÌÜ” ÌÜ‘” Ìİ•” ÌŞ” ÌŞ”  ÌŞ”! ÌŞ”" ÌŞÜ ” Ìß” Ìß” Ìß” Ìß”" Ìß”# Ìß”+ Ìß#”, Ìß$”5 Ìß-”6 Ìß.”; Ìß3”< Ìß4”> Ìß6”? Ìß7”ÌD Ìß<”ÌE Ìß=”ÌM ÌßÌE”ÌN ÌßÌF”ÌS ÌßÌK”ÌX ÌßÌP”ÌY ÌßÌQ”ÌZ ÌßÌQ—” Ìà” Ìà” Ìà” Ìà” Ìà”  Ìà”" Ìà—” Ìá
+” Ìá” Ìá”% Ìá”( Ìá”- Ìá#”. Ìá#–” Ìâ
+” Ìâ” Ìâ”* Ìâ ”, Ìâ"”- Ìâ"‘” Ìã	’” Ìä” Ìä‘” Ìå•” Ìæ” Ìæ” Ìæ” Ìæ” Ìæ—” Ìç” Ìç” Ìç” Ìç”  Ìç”% Ìç'”& Ìç'” Ìè” Ìè” Ìè” Ìè” Ìè”( Ìè ”) Ìè!”1 Ìè)”2 Ìè*”6 Ìè.”7 Ìè/”? Ìè7”Ì@ Ìè8”ÌA Ìè8’” Ìé” Ìé‘” Ìê•” Ìë” Ìë” Ìë” Ìë” Ìë—” Ìì” Ìì” Ìì” Ìì”  Ìì”% Ìì'”& Ìì'œ” Ìí” Ìí” Ìí” Ìí” Ìí”( Ìí ”) Ìí!”1 Ìí)”2 Ìí*”7 Ìí9”8 Ìí:”9 Ìí:’” Ìî” Ìî‘” Ìï•” Ìğ” Ìğ” Ìğ” Ìğ” Ìğ—” Ìñ” Ìñ” Ìñ” Ìñ” Ìñ”! Ìñ$”" Ìñ$” Ìò” Ìò” Ìò” Ìò” Ìò”( Ìò ”) Ìò!”- Ìò%”. Ìò&”2 Ìò*”3 Ìò+”7 Ìò/”8 Ìò0”9 Ìò0’” Ìó” Ìó‘” Ìô•” Ìõ” Ìõ” Ìõ” Ìõ” ÌõÜ ” Ìö” Ìö” Ìö” Ìö” Ìö”( Ìö ”) Ìö!”3 Ìö+”4 Ìö,”9 Ìö<”: Ìö=”; Ìö>”< Ìö?”ÌF ÌöÌI”ÌG ÌöÌJ”ÌM ÌöÌP”ÌN ÌöÌQ”ÌO ÌöÌR”ÌP ÌöÌS”ÌZ ÌöÌ]”Ì[ ÌöÌ^”Ì_ ÌöÌb”Ì` ÌöÌc”Ìa ÌöÌc’” Ì÷” Ì÷‘” Ìø•” Ìù” Ìù” Ìù” Ìù” Ìù—” Ìú” Ìú” Ìú” Ìú”  Ìú”% Ìú(”& Ìú(” Ìû” Ìû” Ìû” Ìû” Ìû”( Ìû ”) Ìû!”1 Ìû)”2 Ìû*”6 Ìû.”7 Ìû/”? Ìû7”Ì@ Ìû8”ÌA Ìû8’” Ìü” Ìü‘” Ìı•” Ìş” Ìş” Ìş”  Ìş”! Ìş—” Ìÿ” Ìÿ” Ìÿ”% Ìÿ”( Ìÿ ”- Ìÿ0”. Ìÿ0” Í ” Í ” Í ” Í ” Í ”( Í  ”) Í !”5 Í -”6 Í .”: Í 2”; Í 3”ÌK Í ÌC”ÌL Í ÌD”ÌM Í ÌD’” Í” Í‘” Í•” Í” Í”! Í”" Í”# Í˜” Í” Í” Í”" Í$”$ Í&”' Í)”( Í*”* Í,œ” Í
+” Í” Í”" Í”# Í”, Í"”- Í#”7 Í-”8 Í.”; Í1”< Í2”= Í2”” Í” Í	” Í
+” Í
+’” Í” Í‘” Í•” Í	” Í	” Í	” Í	” Í	˜” Í
+” Í
+” Í
+”" Í
+$”$ Í
+&”' Í
+)”( Í
+*”* Í
+,œ” Í
+” Í” Í”" Í”# Í”, Í"”- Í#”7 Í-”8 Í.”; Í1”< Í2”= Í2”” Í” Í	” Í
+” Í
+’” Í” Í‘” Í•” Í” Í”' Í!”( Í"”) Í#œ” Í” Í” Í” Í” Í”( Í ”) Í!”5 Í-”6 Í.”; Í=”< Í>”= Í>’” Í” Í‘” Í•” Í” Í”! Í”" Í”# Í›” Í” Í” Í” Í”2 Í*”3 Í+”6 Í.”7 Í/”< Í4”= Í5”> Í5”” Í” Í” Í” Íœ” Í
+” Í” Í”" Í”# Í”, Í"”- Í#”2 Í(”3 Í)”7 Í-”8 Í.”9 Í.‘” Í	‘” Í‘”	 Í’” Í” Í’” Í” Í–” Í” Í” Í” Í” Í” Í” Í” Í
+” Í” Í” Í”' Í!”( Í"”, Í&”- Í'”9 Í3”; Í5”? Í9”Ì@ Í:”ÌA Í:‘”	 Í‘” Í” Í ” Í 
+” Í ” Í ” Í ”$ Í ”% Í ”* Í $”+ Í %”/ Í )”0 Í *”< Í 6”= Í 7”> Í 7‘”	 Í!’” Í"” Í"”” Í$”! Í$)”" Í$*”' Í$7Ü ” Í%” Í%” Í%” Í%” Í%” Í%”# Í%”$ Í% ”) Í%%”* Í%&”, Í%(”- Í%)”2 Í%.”3 Í%/”: Í%6”? Í%;”ÌL Í%ÌH”ÌM Í%ÌI”ÌN Í%ÌJ”ÌS Í%ÌO”ÌT Í%ÌP”ÌV Í%ÌR”ÌW Í%ÌS”Ì_ Í%Ì[”Ì` Í%Ì\”Ìd Í%Ì`”Ìf Í%Ìb”Ìg Í%Ìb’” Í&” Í&’” Í(”* Í((”” Í)”! Í))”" Í)*”' Í)7Ü ” Í*” Í*” Í*” Í*” Í*” Í*” Í*”" Í*”# Í*”' Í*#”+ Í*'”0 Í*,”5 Í*1”9 Í*5”: Í*6”ÌB Í*>”ÌC Í*?”ÌI Í*ÌE”ÌL Í*ÌH”ÌM Í*ÌI”ÌO Í*ÌK˜” Í+” Í+” Í+” Í+”$ Í+”% Í+”( Í+"”* Í+$—” Í,” Í,” Í,”! Í,”$ Í,”% Í,”& Í,” Í-” Í-” Í-” Í-”  Í-”+ Í-#”, Í-$”0 Í-(”1 Í-)”= Í-5”? Í-7”ÌC Í-;”ÌD Í-<”ÌE Í-<–” Í.” Í.” Í.”" Í.”# Í.”$ Í.œ” Í/” Í/” Í/	” Í/” Í/” Í/” Í/”# Í/”$ Í/”, Í/&”- Í/'”. Í/'‘”	 Í0’” Í1” Í1”” Í3” Í3$” Í3%” Í31”” Í4” Í4” Í4” Í4•” Í5” Í5” Í5” Í5” Í5” Í6” Í6” Í6” Í6” Í6”( Í6 ”) Í6!”1 Í6)”2 Í6*”3 Í6+”8 Í68”: Í6:”< Í6<˜” Í7
+” Í7” Í7”6 Í7,”7 Í7-”< Í72”= Í73”> Í73—” Í8
+” Í8” Í8”% Í8”( Í8”- Í8#”. Í8#” Í9
+” Í9” Í9”& Í9”' Í9”+ Í9!”9 Í9/”: Í90”ÌB Í98”ÌD Í9:”ÌH Í9>”Ì] Í9ÌS”Ì^ Í9Ìg–” Í:” Í:”! Í:”% Í:”& Í:”2 Í:&™” Í;”% Í;”' Í;”+ Í;”, Í; ”ÌI Í;=”ÌJ Í;>”ÌO Í;ÌC”ÌP Í;ÌD” Í<” Í<”  Í<”$ Í<”% Í<”- Í<!”. Í<"”/ Í<#”0 Í<$”7 Í<+”8 Í<,”9 Í<-”: Í<.”ÌD Í<8•” Í=” Í=” Í=” Í=” Í=”” Í>” Í>	” Í>
+” Í>
+’” Í?” Í?‘” Í@•” ÍA” ÍA”" ÍA”# ÍA”$ ÍA” ÍB” ÍB” ÍB” ÍB” ÍB”( ÍB ”) ÍB!”7 ÍB/”8 ÍB0”9 ÍB1”> ÍB>”Ì@ ÍBÌ@”ÌB ÍBÌB” ÍC
+” ÍC” ÍC”& ÍC”' ÍC”+ ÍC!”9 ÍC/”: ÍC0”ÌK ÍCÌA”ÌM ÍCÌC”ÌQ ÍCÌG”Ìf ÍCÌ\”Ìg ÍCÌp”” ÍD” ÍD”! ÍD”& ÍD™” ÍE”% ÍE”' ÍE”+ ÍE”, ÍE ”ÌI ÍE=”ÌJ ÍE>”ÌO ÍEÌC”ÌP ÍEÌD” ÍF” ÍF”  ÍF”$ ÍF”% ÍF”- ÍF!”. ÍF"”/ ÍF#”0 ÍF$”7 ÍF+”8 ÍF,”9 ÍF-”: ÍF.”ÌD ÍF8•” ÍG” ÍG” ÍG” ÍG” ÍG”” ÍH” ÍH	” ÍH
+” ÍH
+’” ÍI” ÍI‘” ÍJ•” ÍK” ÍK” ÍK” ÍK” ÍKÜ ” ÍL” ÍL” ÍL” ÍL” ÍL”( ÍL ”) ÍL!”; ÍL3”< ÍL4”= ÍL5”ÌJ ÍLÌJ”ÌL ÍLÌL”ÌQ ÍLÌY”ÌS ÍLÌ[”Ì[ ÍLÌk”Ì] ÍM
+”Ìk ÍM ”Ìm ÍM"”Ìo ÍM$–” ÍN
+” ÍN”% ÍN”* ÍN ”/ ÍN%”1 ÍN'™” ÍO” ÍO”# ÍO”& ÍO”' ÍO”/ ÍO#”2 ÍO&”Ì@ ÍO4”ÌA ÍO4” ÍP” ÍP”! ÍP”$ ÍP”& ÍP”( ÍP”* ÍP”+ ÍP”- ÍP!”/ ÍP#”1 ÍP%”2 ÍP&”4 ÍPÌJ”5 ÍPÌJ–” ÍQ” ÍQ”  ÍQ”! ÍQ”) ÍQ”+ ÍQ—” ÍR” ÍR”  ÍR”" ÍR”% ÍR”* ÍR”+ ÍR‘” ÍS‘” ÍS—” ÍT” ÍT”  ÍT”" ÍT”% ÍT”* ÍT”+ ÍT‘” ÍUÜ ” ÍV” ÍV” ÍV”* ÍV”+ ÍV”/ ÍV#”= ÍV1”> ÍV2”ÌJ ÍV>”ÌL ÍW”ÌP ÍW”Ìe ÍW'”Ìf ÍWÌH”Ìi ÍWÌK”Ìj ÍWÌL”Ìk ÍWÌM”Ìl ÍWÌN”Ìm ÍWÌN‘” ÍX”” ÍY” ÍY	” ÍY
+” ÍY
+’” ÍZ” ÍZ‘” Í[‘” Í\˜” Í]” Í]” Í]”% Í]”& Í]”* Í]"”+ Í]#”, Í]#’” Í^” Í^‘”	 Í_’” Í`” Í`–” Íb” Íb&” Íb'” Íb3” Íb5” ÍbÌG”” Íc” Íc” Íc” Íc•” Íd” Íd” Íd” Íd” Ídœ” Íe” Íe” Íe” Íe” Íe”( Íe!”) Íe"”1 Íe*”2 Íe+”6 Íe/”7 Íe0”8 Íe0”” Íf” Íf” Íf” Íf‘” Íg•” Íh” Íh”" Íh”# Íh”$ Íhœ” Íi” Íi” Íi” Íi” Íi”( Íi!”) Íi"”7 Íi0”8 Íi1”< Íi5”= Íi6”> Íi6”” Íj” Íj” Íj” Íj‘” Ík•” Íl” Íl” Íl” Íl” Ílœ” Ím” Ím” Ím” Ím”  Ím”) Ím!”* Ím"”< Ím4”= Ím5”ÌA Ím9”ÌB Ím:”ÌC Ím:”” Ín” Ín” Ín” Ín‘” Ío‘” Íp›” Íq” Íq” Íq” Íq”. Íq&”/ Íq'”3 Íq+”5 Íq-”8 Íq0”9 Íq1”: Íq1‘”	 Ír’” Ís” Ís’” Íu” Íu—” Ív” Ív” Ív	” Ív” Ív”" Ív”# Ív›” Íw” Íw” Íw	” Íw” Íw”! Íw”" Íw”0 Íw,”1 Íw-”: Íw6”; Íw7•” Íx” Íx” Íx” Íx”  Íx•” Íy” Íy” Íy”% Íy”& Íy •” Íz” Íz”  Íz”) Íz#”* Íz$–” Í{” Í{” Í{” Í{”  Í{”! Í{’” Í|”# Í|’” Í}” Í}Ü ” Í~” Í~” Í~” Í~” Í~”% Í~”& Í~ ”/ Í~)”1 Í~+”5 Í~/”6 Í~0”? Í~9”Ì@ Í~:”ÌI Í~ÌC”ÌK Í~ÌE”Ì` Í~ÌZ”Ìb Í~Ì\”Ìd Í~Ì^”Ìe Í~Ì_”Ìf Í~Ì_‘”	 Í”” Í” Í” Í” Íœ” Í€” Í€” Í€” Í€” Í€”7 Í€1”9 Í€3”: Í€4”; Í€5”ÌB Í€<”ÌC Í€=”ÌD Í€=‘”	 Í˜” Í‚” Í‚” Í‚	” Í‚” Í‚” Í‚”! Í‚”" Í‚–” Íƒ” Íƒ	” Íƒ
+” Íƒ” Íƒ” Íƒ’” Í„” Í„’” Í†” Í†–” Í‡” Í‡	” Í‡
+” Í‡” Í‡” Í‡˜” Íˆ” Íˆ
+” Íˆ” Íˆ” Íˆ”  Íˆ”* Íˆ&”+ Íˆ&Ü ” Í‰” Í‰” Í‰	” Í‰” Í‰”# Í‰”$ Í‰ ”' Í‰#”* Í‰&”4 Í‰0”5 Í‰1”ÌD Í‰Ì@”ÌE Í‰ÌA”ÌS Í‰ÌO”ÌT Í‰ÌP”ÌW Í‰ÌS”ÌX Í‰ÌT”ÌY Í‰ÌTÜ ” ÍŠ” ÍŠ” ÍŠ	” ÍŠ” ÍŠ”# ÍŠ”$ ÍŠ ”* ÍŠ&”- ÍŠ)”7 ÍŠ3”8 ÍŠ4”ÌG ÍŠÌC”ÌH ÍŠÌD”ÌV ÍŠÌR”ÌW ÍŠÌS”Ì] ÍŠÌY”Ì^ ÍŠÌZ”Ì_ ÍŠÌZÜ ” Í‹” Í‹” Í‹	” Í‹” Í‹” Í‹”  Í‹”# Í‹”& Í‹"”0 Í‹,”1 Í‹-”ÌA Í‹=”ÌB Í‹>”ÌP Í‹ÌL”ÌQ Í‹ÌM”ÌT Í‹ÌP”ÌU Í‹ÌQ”ÌV Í‹ÌQÜ ” ÍŒ” ÍŒ” ÍŒ	” ÍŒ” ÍŒ” ÍŒ”  ÍŒ”& ÍŒ"”) ÍŒ%”3 ÍŒ/”4 ÍŒ0”ÌD ÍŒÌ@”ÌE ÍŒÌA”ÌS ÍŒÌO”ÌT ÍŒÌP”ÌZ ÍŒÌV”Ì[ ÍŒÌW”Ì\ ÍŒÌW’” Í” Í’” Í” Í–” Í” Í” Í” Í” Í” Í’” Í‘” Í‘‘” Í’ÔrG–§version¤file§sources®sourcesContent¥names¨mappingsÀ‘À‘ÀÜg‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘”  ÌÙ ‘”  ÌÚ ‘”  ÌÛ ‘”  ÌÜ ‘”  Ìİ ‘”  ÌŞ ‘”  Ìß ‘”  Ìà ‘”  Ìá ‘”  Ìâ ‘”  Ìã ‘”  Ìä ‘”  Ìå ‘”  Ìæ ‘”  Ìç ‘”  Ìè ‘”  Ìé ‘”  Ìê ‘”  Ìë ‘”  Ìì ‘”  Ìí ‘”  Ìî ‘”  Ìï ‘”  Ìğ ‘”  Ìñ ‘”  Ìò ‘”  Ìó ‘”  Ìô ‘”  Ìõ ‘”  Ìö ‘”  Ì÷ ‘”  Ìø ‘”  Ìù ‘”  Ìú ‘”  Ìû ‘”  Ìü ‘”  Ìı ‘”  Ìş ‘”  Ìÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍfÍ6ƒÔrK–¤type¥start£end¢idªsuperClass¤body°ClassDeclarationÍmÍ6ƒÔrL”¤type¥start£end¤nameªIdentifierÍsÍ‡´UniSwiperElementImplLªIdentifierÍÍ®UniElementImplÔrM”¤type¥start£end¤body©ClassBodyÍŸÍ6ƒÔrN˜¤type¥start£end¦static¨computed£key¤kind¥value°MethodDefinitionÍ¦Í‹ÃÂLªIdentifierÍ±Í½¬defaultStyle£getÔrO™¤type¥start£end¢idªexpression©generator¥async¦params¤body²FunctionExpressionÍ½Í‹ÀÂÂÂM®BlockStatementÍÀÍ‹”ÔrP•¤type¥start£end¬declarations¤kind³VariableDeclarationÍËÍ÷‘ÔrQ•¤type¥start£end¢id¤init²VariableDeclaratorÍÑÍöLªIdentifierÍÑÍá°baseDefaultStyleÔrR—¤type¥start£end¦object¨property¨computed¨optional°MemberExpressionÍäÍöÔrS“¤type¥start£end¥SuperÍäÍéLªIdentifierÍêÍö¬defaultStyleÂÂ¥constP³VariableDeclarationÍÍ0‘Q²VariableDeclaratorÍÍ/LªIdentifierÍÍ¬defaultStyleÔrT•¤type¥start£end¦callee©arguments­NewExpressionÍÍ/LªIdentifierÍÍ£Map‘LªIdentifierÍÍ.°baseDefaultStyle¥constÔrU”¤type¥start£endªexpression³ExpressionStatementÍ:ÍfÔrV–¤type¥start£end¦callee©arguments¨optional®CallExpressionÍ:ÍeR°MemberExpressionÍ:ÍJLªIdentifierÍ:ÍF¬defaultStyleLªIdentifierÍGÍJ£setÂÂ’ÔrW•¤type¥start£end¥value£raw§LiteralÍKÍS¦height¨'height'ÔrX”¤type¥start£end¨elements¯ArrayExpressionÍUÍd’W§LiteralÍVÍ]¥150px§'150px'W§LiteralÍ_ÍcÃ¤trueÂÔrY”¤type¥start£end¨argument¯ReturnStatementÍpÍ„LªIdentifierÍwÍƒ¬defaultStyleN°MethodDefinitionÍ‘Í¾ÂÂLªIdentifierÍ‘Íš©initClass¦methodO²FunctionExpressionÍšÍ¾ÀÂÂÂM®BlockStatementÍÍ¾‘U³ExpressionStatementÍ¨Í·ÔrZ–¤type¥start£end¨operator¤left¥right´AssignmentExpressionÍ¨Í¶¡=R°MemberExpressionÍ¨Í·S®ThisExpressionÍ¨Í¬LªIdentifierÍ­Í·ªstyleCacheÂÂÔr[”¤type¥start£endªproperties°ObjectExpressionÍºÍ¶’Ôr\™¤type¥start£end¦method©shorthand¨computed£key¥value¤kind¨PropertyÍÉÍKÂÂÂLªIdentifierÍÉÍĞ§padding[°ObjectExpressionÍÒÍK”\¨PropertyÍåÍëÂÂÂLªIdentifierÍåÍè£topW§LiteralÍêÍë ¡0¤init\¨PropertyÍşÍÂÂÂLªIdentifierÍşÍ¥rightW§LiteralÍÍ ¡0¤init\¨PropertyÍÍ"ÂÂÂLªIdentifierÍÍ¦bottomW§LiteralÍ!Í" ¡0¤init\¨PropertyÍ5Í<ÂÂÂLªIdentifierÍ5Í9¤leftW§LiteralÍ;Í< ¡0¤init¤init\¨PropertyÍZÍ«ÂÂÂLªIdentifierÍZÍe«borderWidth[°ObjectExpressionÍgÍ«’\¨PropertyÍzÍ€ÂÂÂLªIdentifierÍzÍ}£topW§LiteralÍÍ€ ¡0¤init\¨PropertyÍ“ÍœÂÂÂLªIdentifierÍ“Í™¦bottomW§LiteralÍ›Íœ ¡0¤init¤initN°MethodDefinitionÍÄÍhÂÂLªIdentifierÍÄÍÏ«constructor«constructorO²FunctionExpressionÍÏÍhÀÂÂÂM®BlockStatementÍÒÍhÜ U³ExpressionStatementÍİÍåV®CallExpressionÍİÍäS¥SuperÍİÍâÂU³ExpressionStatementÍïÍZ´AssignmentExpressionÍïÍ¡=R°MemberExpressionÍïÍşS®ThisExpressionÍïÍóLªIdentifierÍôÍşªcontrollerÂÂT­NewExpressionÍÍLªIdentifierÍÍ°SwiperControllerU³ExpressionStatementÍ"Í=Z´AssignmentExpressionÍ"Í<¡=R°MemberExpressionÍ"Í4S®ThisExpressionÍ"Í&LªIdentifierÍ'Í4­showIndicatorÂÂW§LiteralÍ7Í<Â¥falseU³ExpressionStatementÍGÍ¢Z´AssignmentExpressionÍGÍ¡¡=R°MemberExpressionÍGÍZS®ThisExpressionÍGÍKLªIdentifierÍLÍZ®indicatorStyleÂÂV®CallExpressionÍ]Í¡R°MemberExpressionÍ]Í–V®CallExpressionÍ]ÍˆR°MemberExpressionÍ]ÍrV®CallExpressionÍ]ÍlR°MemberExpressionÍ]ÍjLªIdentifierÍ]Íf©IndicatorLªIdentifierÍgÍj£dotÂÂÂLªIdentifierÍmÍr¥colorÂÂ‘W§LiteralÍsÍ‡²rgba(0, 0, 0, 0.3)´'rgba(0, 0, 0, 0.3)'ÂLªIdentifierÍ‰Í–­selectedColorÂÂ‘W§LiteralÍ—Í §#000000©'#000000'ÂU³ExpressionStatementÍ¬ÍÀZ´AssignmentExpressionÍ¬Í¿¡=R°MemberExpressionÍ¬Í¹S®ThisExpressionÍ¬Í°LªIdentifierÍ±Í¹¨durationÂÂW§LiteralÍ¼Í¿Íô£500U³ExpressionStatementÍÊÍàZ´AssignmentExpressionÍÊÍß¡=R°MemberExpressionÍÊÍ×S®ThisExpressionÍÊÍÎLªIdentifierÍÏÍ×¨touchingÂÂW§LiteralÍÚÍßÂ¥falseU³ExpressionStatementÍêÍZ´AssignmentExpressionÍêÍ¡=R°MemberExpressionÍêÍüS®ThisExpressionÍêÍîLªIdentifierÍïÍü­touchEndTimerÂÂÔr]–¤type¥start£end¨operator¦prefix¨argument¯UnaryExpressionÍÿÍ¡-ÃW§LiteralÍ Í¡1U³ExpressionStatementÍÍ*Z´AssignmentExpressionÍÍ)¡=R°MemberExpressionÍÍ!S®ThisExpressionÍÍLªIdentifierÍÍ!°preventTouchMoveÂÂW§LiteralÍ$Í)Â¥falseU³ExpressionStatementÍ4ÍJZ´AssignmentExpressionÍ4ÍI¡=R°MemberExpressionÍ4ÍAS®ThisExpressionÍ4Í8LªIdentifierÍ9ÍA¨verticalÂÂW§LiteralÍDÍIÂ¥falseU³ExpressionStatementÍTÍiZ´AssignmentExpressionÍTÍh¡=R°MemberExpressionÍTÍaS®ThisExpressionÍTÍXLªIdentifierÍYÍa¨intervalÂÂW§LiteralÍdÍhÍˆ¤5000U³ExpressionStatementÍsÍ‰Z´AssignmentExpressionÍsÍˆ¡=R°MemberExpressionÍsÍ€S®ThisExpressionÍsÍwLªIdentifierÍxÍ€¨autoPlayÂÂW§LiteralÍƒÍˆÂ¥falseU³ExpressionStatementÍ“Í¥Z´AssignmentExpressionÍ“Í¤¡=R°MemberExpressionÍ“ÍœS®ThisExpressionÍ“Í—LªIdentifierÍ˜Íœ¤loopÂÂW§LiteralÍŸÍ¤Â¥falseU³ExpressionStatementÍ¯ÍÅZ´AssignmentExpressionÍ¯ÍÄ¡=R°MemberExpressionÍ¯ÍÀS®ThisExpressionÍ¯Í³LªIdentifierÍ´ÍÀ¬currentIndexÂÂW§LiteralÍÃÍÄ ¡0U³ExpressionStatementÍÏÍåZ´AssignmentExpressionÍÏÍä¡=R°MemberExpressionÍÏÍÜS®ThisExpressionÍÏÍÓLªIdentifierÍÔÍÜ¨isAppearÂÂW§LiteralÍßÍäÂ¥falseU³ExpressionStatementÍïÍ
+Z´AssignmentExpressionÍïÍ	¡=R°MemberExpressionÍïÍS®ThisExpressionÍïÍóLªIdentifierÍôÍ®lastTouchEventÂÂW§LiteralÍÍ	À¤nullU³ExpressionStatementÍÍ@Z´AssignmentExpressionÍÍ?¡=R°MemberExpressionÍÍ2S®ThisExpressionÍÍLªIdentifierÍÍ2¹needPreventTouchMoveNodesÂÂX¯ArrayExpressionÍ5Í?‘W§LiteralÍ6Í>¦SLIDER¨'SLIDER'U³ExpressionStatementÍJÍhZ´AssignmentExpressionÍJÍg¡=R°MemberExpressionÍJÍ_S®ThisExpressionÍJÍNLªIdentifierÍOÍ_°needDisableSwipeÂÂW§LiteralÍbÍgÂ¥falseU³ExpressionStatementÍrÍ‹Z´AssignmentExpressionÍrÍŠ¡=R°MemberExpressionÍrÍ…S®ThisExpressionÍrÍvLªIdentifierÍwÍ…®maxChildHeightÂÂ]¯UnaryExpressionÍˆÍŠ¡-ÃW§LiteralÍ‰ÍŠ¡1U³ExpressionStatementÍ•Í¯Z´AssignmentExpressionÍ•Í®¡=R°MemberExpressionÍ•Í¦S®ThisExpressionÍ•Í™LªIdentifierÍšÍ¦¬hasOwnHeightÂÂW§LiteralÍ©Í®Â¥falseU³ExpressionStatementÍ¹ÍÔZ´AssignmentExpressionÍ¹ÍÓ¡=R°MemberExpressionÍ¹ÍËS®ThisExpressionÍ¹Í½LªIdentifierÍ¾ÍË­hasInitHeightÂÂW§LiteralÍÎÍÓÂ¥falseP³VariableDeclarationÍŞÍü‘Q²VariableDeclaratorÍäÍûLªIdentifierÍäÍê¦swiperR°MemberExpressionÍíÍûS®ThisExpressionÍíÍñLªIdentifierÍòÍû©frameNodeÂÂ¥constU³ExpressionStatementÍÍ)V®CallExpressionÍÍ(R°MemberExpressionÍÍLªIdentifierÍÍ¦swiperLªIdentifierÍÍªinitializeÂÂ‘R°MemberExpressionÍÍ'S®ThisExpressionÍÍLªIdentifierÍÍ'ªcontrollerÂÂÂU³ExpressionStatementÍcÍÊV®CallExpressionÍcÍÉR°MemberExpressionÍcÍxS®ThisExpressionÍcÍgLªIdentifierÍhÍx°addEventListenerÂÂ’W§LiteralÍyÍ…ªtouchstart¬'touchstart'O·ArrowFunctionExpressionÍ‡ÍÈÀÂÂÂ‘LªIdentifierÍˆÍ¥eventM®BlockStatementÍ’ÍÈ‘U³ExpressionStatementÍ¡Í½Z´AssignmentExpressionÍ¡Í¼¡=R°MemberExpressionÍ¡Í´S®ThisExpressionÍ¡Í¥LªIdentifierÍ¦Í´®lastTouchEventÂÂLªIdentifierÍ·Í¼¥eventÂU³ExpressionStatementÍÔÍ	TV®CallExpressionÍÔÍ	SR°MemberExpressionÍÔÍéS®ThisExpressionÍÔÍØLªIdentifierÍÙÍé°addEventListenerÂÂ’W§LiteralÍêÍ	º_touchstartStopPropagation¼'_touchstartStopPropagation'O·ArrowFunctionExpressionÍ	Í	RÀÂÂÂ‘LªIdentifierÍ		Í	¥eventM®BlockStatementÍ	Í	R‘U³ExpressionStatementÍ	"Í	GZ´AssignmentExpressionÍ	"Í	F¡=R°MemberExpressionÍ	"Í	5S®ThisExpressionÍ	"Í	&LªIdentifierÍ	'Í	5®lastTouchEventÂÂR°MemberExpressionÍ	8Í	FLªIdentifierÍ	8Í	=¥eventLªIdentifierÍ	>Í	F¨uniEventÂÂÂU³ExpressionStatementÍ	^Í	ÄV®CallExpressionÍ	^Í	ÃR°MemberExpressionÍ	^Í	sS®ThisExpressionÍ	^Í	bLªIdentifierÍ	cÍ	s°addEventListenerÂÂ’W§LiteralÍ	tÍ	©touchmove«'touchmove'O·ArrowFunctionExpressionÍ	Í	ÂÀÂÂÂ‘LªIdentifierÍ	‚Í	‡¥eventM®BlockStatementÍ	ŒÍ	Â‘U³ExpressionStatementÍ	›Í	·Z´AssignmentExpressionÍ	›Í	¶¡=R°MemberExpressionÍ	›Í	®S®ThisExpressionÍ	›Í	ŸLªIdentifierÍ	 Í	®®lastTouchEventÂÂLªIdentifierÍ	±Í	¶¥eventÂU³ExpressionStatementÍ	ÎÍ
+MV®CallExpressionÍ	ÎÍ
+LR°MemberExpressionÍ	ÎÍ	ãS®ThisExpressionÍ	ÎÍ	ÒLªIdentifierÍ	ÓÍ	ã°addEventListenerÂÂ’W§LiteralÍ	äÍ	ÿ¹_touchmoveStopPropagation»'_touchmoveStopPropagation'O·ArrowFunctionExpressionÍ
+Í
+KÀÂÂÂ‘LªIdentifierÍ
+Í
+¥eventM®BlockStatementÍ
+Í
+K‘U³ExpressionStatementÍ
+Í
+@Z´AssignmentExpressionÍ
+Í
+?¡=R°MemberExpressionÍ
+Í
+.S®ThisExpressionÍ
+Í
+LªIdentifierÍ
+ Í
+.®lastTouchEventÂÂR°MemberExpressionÍ
+1Í
+?LªIdentifierÍ
+1Í
+6¥eventLªIdentifierÍ
+7Í
+?¨uniEventÂÂÂÔr^–¤type¥start£end¥block§handler©finalizer¬TryStatementÍ
+WÍM®BlockStatementÍ
+[Í‘U³ExpressionStatementÍ
+jÍV®CallExpressionÍ
+jÍLªIdentifierÍ
+jÍ
+tªcallObject”R°MemberExpressionÍ
+uÍ
+…LªIdentifierÍ
+uÍ
+{¦swiperLªIdentifierÍ
+|Í
+…©attributeÂÂR°MemberExpressionÍ
+‡Í
+—LªIdentifierÍ
+‡Í
+¦swiperLªIdentifierÍ
+Í
+—©attributeÂÂW§LiteralÍ
+™Í
+®³onContentWillScrollµ'onContentWillScroll'X¯ArrayExpressionÍ
+°Í‘O·ArrowFunctionExpressionÍ
+±ÍÀÂÂÂM®BlockStatementÍ
+·Í‘Y¯ReturnStatementÍ
+ÎÍ
+û]¯UnaryExpressionÍ
+ÕÍ
+ú¡!ÃR°MemberExpressionÍ
+ÖÍ
+úR°MemberExpressionÍ
+ÖÍ
+éS®ThisExpressionÍ
+ÖÍ
+ÚLªIdentifierÍ
+ÛÍ
+é®lastTouchEventÂÂLªIdentifierÍ
+êÍ
+ú°defaultPreventedÂÂÂÔr_•¤type¥start£end¥param¤body«CatchClauseÍ&ÍLªIdentifierÍ-Í.¡eM®BlockStatementÍ0Í‘U³ExpressionStatementÍ?ÍvV®CallExpressionÍ?ÍuR°MemberExpressionÍ?ÍLLªIdentifierÍ?ÍF§consoleLªIdentifierÍGÍL¥errorÂÂ’W§LiteralÍMÍiºonContentWillScroll error:¼'onContentWillScroll error:'R°MemberExpressionÍkÍtLªIdentifierÍkÍl¡eLªIdentifierÍmÍt§messageÂÂÂÀU³ExpressionStatementÍ‹ÍöV®CallExpressionÍ‹ÍõR°MemberExpressionÍ‹Í¤R°MemberExpressionÍ‹Í›LªIdentifierÍ‹Í‘¦swiperLªIdentifierÍ’Í›©attributeÂÂLªIdentifierÍœÍ¤¨onChangeÂÂ‘O·ArrowFunctionExpressionÍ¥ÍôÀÂÂÂ‘LªIdentifierÍ¦Í«¥indexM®BlockStatementÍ°Íô‘U³ExpressionStatementÍ¿ÍéV®CallExpressionÍ¿ÍèR°MemberExpressionÍ¿ÍáS®ThisExpressionÍ¿ÍÃLªIdentifierÍÄÍá½handleAutoPlayNotLoopBehaviorÂÂ‘LªIdentifierÍâÍç¥indexÂÂU³ExpressionStatementÍ Í#V®CallExpressionÍ Í"R°MemberExpressionÍ ÍR°MemberExpressionÍ ÍLªIdentifierÍ Í¦swiperLªIdentifierÍÍ©attributeÂÂLªIdentifierÍÍ¨onAppearÂÂ‘O·ArrowFunctionExpressionÍÍ!ÀÂÂÂM®BlockStatementÍ Í!’U³ExpressionStatementÍ/ÍDZ´AssignmentExpressionÍ/ÍC¡=R°MemberExpressionÍ/Í<S®ThisExpressionÍ/Í3LªIdentifierÍ4Í<¨isAppearÂÂW§LiteralÍ?ÍCÃ¤trueÔr`–¤type¥start£end¤testªconsequent©alternate«IfStatementÍRÍ]¯UnaryExpressionÍVÍh¡!ÃR°MemberExpressionÍWÍhS®ThisExpressionÍWÍ[LªIdentifierÍ\Íh¬hasOwnHeightÂÂM®BlockStatementÍjÍ“P³VariableDeclarationÍÃÍÛ‘Q²VariableDeclaratorÍÇÍÚLªIdentifierÍÇÍÕ®maxChildHeight]¯UnaryExpressionÍØÍÚ¡-ÃW§LiteralÍÙÍÚ¡1£letU³ExpressionStatementÍíÍNV®CallExpressionÍíÍMR°MemberExpressionÍíÍR°MemberExpressionÍíÍúS®ThisExpressionÍíÍñLªIdentifierÍòÍú¨childrenÂÂLªIdentifierÍûÍ§forEachÂÂ‘O·ArrowFunctionExpressionÍÍLÀÂÂÂ‘LªIdentifierÍÍ¥childM®BlockStatementÍÍL‘`«IfStatementÍ#Í9Ôra–¤type¥start£end¤left¨operator¥right°BinaryExpressionÍ'ÍFR°MemberExpressionÍ'Í4LªIdentifierÍ'Í,¥childLªIdentifierÍ-Í4§tagNameÂÂ£===W§LiteralÍ9ÍF«SWIPER-ITEM­'SWIPER-ITEM'M®BlockStatementÍHÍ9’P³VariableDeclarationÍcÍ‘Q²VariableDeclaratorÍiÍLªIdentifierÍiÍt«childHeighta°BinaryExpressionÍwÍa°BinaryExpressionÍwÍLa°BinaryExpressionÍwÍ*a°BinaryExpressionÍwÍàV®CallExpressionÍwÍ™R°MemberExpressionÍwÍ—R°MemberExpressionÍwÍ‡LªIdentifierÍwÍ|¥childLªIdentifierÍ}Í‡ªlayoutNodeÂÂLªIdentifierÍˆÍ—¯getLayoutHeightÂÂÂ¡+V®CallExpressionÍ¹ÍàLªIdentifierÍ¹ÍÃªparseFloat‘R°MemberExpressionÍÄÍßR°MemberExpressionÍÄÍÛR°MemberExpressionÍÄÍÓS®ThisExpressionÍÄÍÈLªIdentifierÍÉÍÓªstyleCacheÂÂLªIdentifierÍÔÍÛ§paddingÂÂLªIdentifierÍÜÍß£topÂÂÂ¡+V®CallExpressionÍ Í*LªIdentifierÍ Í
+ªparseFloat‘R°MemberExpressionÍÍ)R°MemberExpressionÍÍ"R°MemberExpressionÍÍS®ThisExpressionÍÍLªIdentifierÍÍªstyleCacheÂÂLªIdentifierÍÍ"§paddingÂÂLªIdentifierÍ#Í)¦bottomÂÂÂ¡+R°MemberExpressionÍ-ÍLR°MemberExpressionÍ-ÍHR°MemberExpressionÍ-Í<S®ThisExpressionÍ-Í1LªIdentifierÍ2Í<ªstyleCacheÂÂLªIdentifierÍ=ÍH«borderWidthÂÂLªIdentifierÍIÍL£topÂÂ¡+R°MemberExpressionÍlÍR°MemberExpressionÍlÍ‡R°MemberExpressionÍlÍ{S®ThisExpressionÍlÍpLªIdentifierÍqÍ{ªstyleCacheÂÂLªIdentifierÍ|Í‡«borderWidthÂÂLªIdentifierÍˆÍ¦bottomÂÂ¥const`«IfStatementÍ©Í"a°BinaryExpressionÍ­ÍÉLªIdentifierÍ­Í¸«childHeight¡>LªIdentifierÍ»ÍÉ®maxChildHeightM®BlockStatementÍËÍ"‘U³ExpressionStatementÍêÍZ´AssignmentExpressionÍêÍ¡=LªIdentifierÍêÍø®maxChildHeightLªIdentifierÍûÍ«childHeightÀÀÂ`«IfStatementÍ`Ía°BinaryExpressionÍdÍvLªIdentifierÍdÍr®maxChildHeight¡>W§LiteralÍuÍv ¡0M®BlockStatementÍxÍ’U³ExpressionStatementÍÍ´Z´AssignmentExpressionÍÍ³¡=R°MemberExpressionÍÍ¢S®ThisExpressionÍÍ“LªIdentifierÍ”Í¢®maxChildHeightÂÂLªIdentifierÍ¥Í³®maxChildHeightU³ExpressionStatementÍÊÍôV®CallExpressionÍÊÍóR°MemberExpressionÍÊÍÙS®ThisExpressionÍÊÍÎLªIdentifierÍÏÍÙªparseStyleÂÂ’W§LiteralÍÚÍâ¦height¨'height'LªIdentifierÍäÍò®maxChildHeightÂÀÀÂU³ExpressionStatementÍWÍ„V®CallExpressionÍWÍƒR°MemberExpressionÍWÍlS®ThisExpressionÍWÍ[LªIdentifierÍ\Íl°addEventListenerÂÂ’W§LiteralÍmÍx©touchmove«'touchmove'O·ArrowFunctionExpressionÍzÍ‚ÀÂÂÂ‘LªIdentifierÍ{Í€¥eventM®BlockStatementÍ…Í‚‘`«IfStatementÍ”Íwa±LogicalExpressionÍ˜Í a±LogicalExpressionÍ˜Í¾]¯UnaryExpressionÍ˜Í®¡!ÃR°MemberExpressionÍ™Í®S®ThisExpressionÍ™ÍLªIdentifierÍÍ®°preventTouchMoveÂÂ¢&&R°MemberExpressionÍ²Í¾LªIdentifierÍ²Í·¥eventLªIdentifierÍ¸Í¾¦targetÂÂ¢&&V®CallExpressionÍÂÍ R°MemberExpressionÍÂÍéR°MemberExpressionÍÂÍàS®ThisExpressionÍÂÍÆLªIdentifierÍÇÍà¹needPreventTouchMoveNodesÂÂLªIdentifierÍáÍé¨includesÂÂ‘R°MemberExpressionÍêÍÿR°MemberExpressionÍêÍöLªIdentifierÍêÍï¥eventLªIdentifierÍğÍö¦targetÂÂLªIdentifierÍ÷Íÿ¨nodeNameÂÂÂM®BlockStatementÍÍw’U³ExpressionStatementÍÍ2Z´AssignmentExpressionÍÍ1¡=R°MemberExpressionÍÍ*S®ThisExpressionÍÍLªIdentifierÍÍ*°preventTouchMoveÂÂW§LiteralÍ-Í1Ã¤trueU³ExpressionStatementÍDÍhV®CallExpressionÍDÍgR°MemberExpressionÍDÍaR°MemberExpressionÍDÍTLªIdentifierÍDÍJ¦swiperLªIdentifierÍKÍT©attributeÂÂLªIdentifierÍUÍa¬disableSwipeÂÂ‘W§LiteralÍbÍfÃ¤trueÂÀÂU³ExpressionStatementÍÍaV®CallExpressionÍÍ`R°MemberExpressionÍÍ£S®ThisExpressionÍÍ’LªIdentifierÍ“Í£°addEventListenerÂÂ’W§LiteralÍ¤Í®¨touchendª'touchend'O·ArrowFunctionExpressionÍ°Í_ÀÂÂÂM®BlockStatementÍ¶Í_’U³ExpressionStatementÍÅÍãZ´AssignmentExpressionÍÅÍâ¡=R°MemberExpressionÍÅÍÚS®ThisExpressionÍÅÍÉLªIdentifierÍÊÍÚ°preventTouchMoveÂÂW§LiteralÍİÍâÂ¥false`«IfStatementÍñÍT]¯UnaryExpressionÍõÍ¡!ÃR°MemberExpressionÍöÍS®ThisExpressionÍöÍúLªIdentifierÍûÍ°needDisableSwipeÂÂM®BlockStatementÍÍT‘U³ExpressionStatementÍ ÍEV®CallExpressionÍ ÍDR°MemberExpressionÍ Í=R°MemberExpressionÍ Í0LªIdentifierÍ Í&¦swiperLªIdentifierÍ'Í0©attributeÂÂLªIdentifierÍ1Í=¬disableSwipeÂÂ‘W§LiteralÍ>ÍCÂ¥falseÂÀÂN°MethodDefinitionÍnÍ«ÂÂLªIdentifierÍnÍ}¯createFrameNode¦methodO²FunctionExpressionÍ}Í«ÀÂÂÂM®BlockStatementÍ€Í«—P³VariableDeclarationÍ‹ÍÊ‘Q²VariableDeclaratorÍ‘ÍÉLªIdentifierÍ‘Í—¦swiperV®CallExpressionÍšÍÉR°MemberExpressionÍšÍ­LªIdentifierÍšÍ¢¨typeNodeLªIdentifierÍ£Í­ªcreateNodeÂÂ’R°MemberExpressionÍ®Í¾R°MemberExpressionÍ®Í¶S®ThisExpressionÍ®Í²LªIdentifierÍ³Í¶£appÂÂLªIdentifierÍ·Í¾§contextÂÂW§LiteralÍÀÍÈ¦Swiper¨'Swiper'Â¥constU³ExpressionStatementÍÔÍöV®CallExpressionÍÔÍõR°MemberExpressionÍÔÍîR°MemberExpressionÍÔÍäLªIdentifierÍÔÍÚ¦swiperLªIdentifierÍÛÍä©attributeÂÂLªIdentifierÍåÍî©indicatorÂÂ‘W§LiteralÍïÍôÂ¥falseÂU³ExpressionStatementÍ Í%V®CallExpressionÍ Í$R°MemberExpressionÍ ÍR°MemberExpressionÍ ÍLªIdentifierÍ Í¦swiperLªIdentifierÍÍ©attributeÂÂLªIdentifierÍÍ¥curveÂÂ‘R°MemberExpressionÍÍ#LªIdentifierÍÍ¥CurveLªIdentifierÍÍ#¦LinearÂÂÂU³ExpressionStatementÍ/ÍLV®CallExpressionÍ/ÍKR°MemberExpressionÍ/ÍDR°MemberExpressionÍ/Í?LªIdentifierÍ/Í5¦swiperLªIdentifierÍ6Í?©attributeÂÂLªIdentifierÍ@ÍD¤loopÂÂ‘W§LiteralÍEÍJÂ¥falseÂU³ExpressionStatementÍVÍV®CallExpressionÍVÍ~R°MemberExpressionÍVÍoR°MemberExpressionÍVÍfLªIdentifierÍVÍ\¦swiperLªIdentifierÍ]Íf©attributeÂÂLªIdentifierÍgÍo¨intervalÂÂ‘R°MemberExpressionÍpÍ}S®ThisExpressionÍpÍtLªIdentifierÍuÍ}¨intervalÂÂÂU³ExpressionStatementÍ‰ÍŒV®CallExpressionÍ‰Í‹R°MemberExpressionÍ‰Í¨R°MemberExpressionÍ‰Í™LªIdentifierÍ‰Í¦swiperLªIdentifierÍÍ™©attributeÂÂLªIdentifierÍšÍ¨®onGestureSwipeÂÂ‘O·ArrowFunctionExpressionÍ©ÍŠÀÂÂÂM®BlockStatementÍ¯ÍŠ“U³ExpressionStatementÍ¾ÍÓZ´AssignmentExpressionÍ¾ÍÒ¡=R°MemberExpressionÍ¾ÍËS®ThisExpressionÍ¾ÍÂLªIdentifierÍÃÍË¨touchingÂÂW§LiteralÍÎÍÒÃ¤trueU³ExpressionStatementÍáÍV®CallExpressionÍáÍLªIdentifierÍáÍí¬clearTimeout‘R°MemberExpressionÍîÍ S®ThisExpressionÍîÍòLªIdentifierÍóÍ ­touchEndTimerÂÂÂU³ExpressionStatementÍÍZ´AssignmentExpressionÍÍ~¡=R°MemberExpressionÍÍ"S®ThisExpressionÍÍLªIdentifierÍÍ"­touchEndTimerÂÂV®CallExpressionÍ%Í~LªIdentifierÍ%Í/ªsetTimeout’O·ArrowFunctionExpressionÍ0ÍnÀÂÂÂM®BlockStatementÍ6Ín‘U³ExpressionStatementÍIÍ_Z´AssignmentExpressionÍIÍ^¡=R°MemberExpressionÍIÍVS®ThisExpressionÍIÍMLªIdentifierÍNÍV¨touchingÂÂW§LiteralÍYÍ^Â¥falseR°MemberExpressionÍpÍ}S®ThisExpressionÍpÍtLªIdentifierÍuÍ}¨durationÂÂÂÂY¯ReturnStatementÍ–Í¤LªIdentifierÍÍ£¦swiperN°MethodDefinitionÍ±ÍÂÂLªIdentifierÍ±Í»ªparseStyle¦methodO²FunctionExpressionÍ»ÍÀÂÂÂ’LªIdentifierÍ¼Í¿£keyLªIdentifierÍÁÍÆ¥valueM®BlockStatementÍÈÍ’U³ExpressionStatementÍÓÍ Z´AssignmentExpressionÍÓÍÿ¡=LªIdentifierÍÓÍØ¥valueV®CallExpressionÍÛÍÿR°MemberExpressionÍÛÍóS®ThisExpressionÍÛÍßLªIdentifierÍàÍó³normalizeStyleValueÂÂ’LªIdentifierÍôÍ÷£keyLªIdentifierÍùÍş¥valueÂÔrb•¤type¥start£end¬discriminant¥cases¯SwitchStatementÍ
+ÍLªIdentifierÍÍ£key’Ôrc•¤type¥start£endªconsequent¤testªSwitchCaseÍ&Í·’`«IfStatementÍgÍa±LogicalExpressionÍkÍ]¯UnaryExpressionÍkÍy¡!ÃLªIdentifierÍlÍy­hasInitHeight¢&&a°BinaryExpressionÍ}ÍLªIdentifierÍ}Í‚¥value£===W§LiteralÍ‡Í¥150px§'150px'M®BlockStatementÍÍÏ‘U³ExpressionStatementÍ§Í¼Z´AssignmentExpressionÍ§Í»¡=LªIdentifierÍ§Í´­hasInitHeightW§LiteralÍ·Í»Ã¤true`«IfStatementÍæÍa±LogicalExpressionÍêÍLªIdentifierÍêÍ÷­hasInitHeight¢&&a°BinaryExpressionÍûÍLªIdentifierÍûÍ ¥value£!==R°MemberExpressionÍÍS®ThisExpressionÍÍ	LªIdentifierÍ
+Í®maxChildHeightÂÂM®BlockStatementÍÍ‘U³ExpressionStatementÍUÍnZ´AssignmentExpressionÍUÍm¡=R°MemberExpressionÍUÍfS®ThisExpressionÍUÍYLªIdentifierÍZÍf¬hasOwnHeightÂÂW§LiteralÍiÍmÃ¤trueÀY¯ReturnStatementÍ“Í·V®CallExpressionÍšÍ¶R°MemberExpressionÍšÍªS¥SuperÍšÍŸLªIdentifierÍ ÍªªparseStyleÂÂ’LªIdentifierÍ«Í®£keyLªIdentifierÍ°Íµ¥valueÂW§LiteralÍ+Í3¦height¨'height'cªSwitchCaseÍÅÍ‘Y¯ReturnStatementÍßÍV®CallExpressionÍæÍR°MemberExpressionÍæÍöS¥SuperÍæÍëLªIdentifierÍìÍöªparseStyleÂÂ’LªIdentifierÍ÷Íú£keyLªIdentifierÍüÍ¥valueÂÀN°MethodDefinitionÍÍ$¶ÂÂLªIdentifierÍÍ0µupdateNativeAttribute¦methodO²FunctionExpressionÍ0Í$¶ÀÂÂÂ’LªIdentifierÍ1Í4£keyLªIdentifierÍ6Í;¥valueM®BlockStatementÍ=Í$¶‘b¯SwitchStatementÍHÍ$¯LªIdentifierÍPÍS£keyÜ cªSwitchCaseÍdÍ6‘M®BlockStatementÍzÍ6“U³ExpressionStatementÍÍ¨Z´AssignmentExpressionÍÍ§¡=R°MemberExpressionÍÍŸS®ThisExpressionÍÍ‘LªIdentifierÍ’ÍŸ­showIndicatorÂÂLªIdentifierÍ¢Í§¥valueU³ExpressionStatementÍºÍV®CallExpressionÍºÍR°MemberExpressionÍºÍÜR°MemberExpressionÍºÍÒR°MemberExpressionÍºÍÈS®ThisExpressionÍºÍ¾LªIdentifierÍ¿ÍÈ©frameNodeÂÂLªIdentifierÍÉÍÒ©attributeÂÂLªIdentifierÍÓÍÜ©indicatorÂÂ‘`µConditionalExpressionÍİÍR°MemberExpressionÍİÍïS®ThisExpressionÍİÍáLªIdentifierÍâÍï­showIndicatorÂÂR°MemberExpressionÍòÍS®ThisExpressionÍòÍöLªIdentifierÍ÷Í®indicatorStyleÂÂW§LiteralÍÍÂ¥falseÂÔrd”¤type¥start£end¥label®BreakStatementÍ!Í'ÀW§LiteralÍiÍx­indicatorDots¯'indicatorDots'cªSwitchCaseÍDÍ^‘M®BlockStatementÍ[Í^“U³ExpressionStatementÍnÍ×V®CallExpressionÍnÍÖLªIdentifierÍnÍy«formatColor’LªIdentifierÍzÍ¥valueO·ArrowFunctionExpressionÍÍÕÀÂÂÂ‘LªIdentifierÍÍ†¥colorM®BlockStatementÍŠÍÕ‘U³ExpressionStatementÍ¡ÍÂV®CallExpressionÍ¡ÍÁR°MemberExpressionÍ¡ÍºR°MemberExpressionÍ¡Í´S®ThisExpressionÍ¡Í¥LªIdentifierÍ¦Í´®indicatorStyleÂÂLªIdentifierÍµÍº¥colorÂÂ‘LªIdentifierÍ»ÍÀ¥colorÂÂU³ExpressionStatementÍéÍ7a±LogicalExpressionÍéÍ6R°MemberExpressionÍéÍûS®ThisExpressionÍéÍíLªIdentifierÍîÍû­showIndicatorÂÂ¢&&V®CallExpressionÍÿÍ6R°MemberExpressionÍÿÍ!R°MemberExpressionÍÿÍR°MemberExpressionÍÿÍS®ThisExpressionÍÿÍLªIdentifierÍÍ©frameNodeÂÂLªIdentifierÍÍ©attributeÂÂLªIdentifierÍÍ!©indicatorÂÂ‘R°MemberExpressionÍ"Í5S®ThisExpressionÍ"Í&LªIdentifierÍ'Í5®indicatorStyleÂÂÂd®BreakStatementÍIÍOÀW§LiteralÍIÍY®indicatorColor°'indicatorColor'cªSwitchCaseÍlÍ”‘M®BlockStatementÍ‰Í”“U³ExpressionStatementÍœÍV®CallExpressionÍœÍLªIdentifierÍœÍ§«formatColor’LªIdentifierÍ¨Í­¥valueO·ArrowFunctionExpressionÍ¯ÍÀÂÂÂ‘LªIdentifierÍ¯Í´¥colorM®BlockStatementÍ¸Í‘U³ExpressionStatementÍÏÍøV®CallExpressionÍÏÍ÷R°MemberExpressionÍÏÍğR°MemberExpressionÍÏÍâS®ThisExpressionÍÏÍÓLªIdentifierÍÔÍâ®indicatorStyleÂÂLªIdentifierÍãÍğ­selectedColorÂÂ‘LªIdentifierÍñÍö¥colorÂÂU³ExpressionStatementÍÍma±LogicalExpressionÍÍlR°MemberExpressionÍÍ1S®ThisExpressionÍÍ#LªIdentifierÍ$Í1­showIndicatorÂÂ¢&&V®CallExpressionÍ5ÍlR°MemberExpressionÍ5ÍWR°MemberExpressionÍ5ÍMR°MemberExpressionÍ5ÍCS®ThisExpressionÍ5Í9LªIdentifierÍ:ÍC©frameNodeÂÂLªIdentifierÍDÍM©attributeÂÂLªIdentifierÍNÍW©indicatorÂÂ‘R°MemberExpressionÍXÍkS®ThisExpressionÍXÍ\LªIdentifierÍ]Ík®indicatorStyleÂÂÂd®BreakStatementÍÍ…ÀW§LiteralÍqÍ‡´indicatorActiveColor¶'indicatorActiveColor'cªSwitchCaseÍ¢ÍF‘M®BlockStatementÍ³ÍF“U³ExpressionStatementÍÆÍÜZ´AssignmentExpressionÍÆÍÛ¡=R°MemberExpressionÍÆÍÓS®ThisExpressionÍÆÍÊLªIdentifierÍËÍÓ¨autoPlayÂÂLªIdentifierÍÖÍÛ¥valueU³ExpressionStatementÍîÍV®CallExpressionÍîÍR°MemberExpressionÍîÍR°MemberExpressionÍîÍR°MemberExpressionÍîÍüS®ThisExpressionÍîÍòLªIdentifierÍóÍü©frameNodeÂÂLªIdentifierÍıÍ©attributeÂÂLªIdentifierÍÍ¨autoPlayÂÂ‘R°MemberExpressionÍÍS®ThisExpressionÍÍLªIdentifierÍÍ¨autoPlayÂÂÂd®BreakStatementÍ1Í7ÀW§LiteralÍ§Í±¨autoplayª'autoplay'cªSwitchCaseÍTÍ2‘M®BlockStatementÍdÍ2’`«IfStatementÍwÍa°BinaryExpressionÍ{Í–LªIdentifierÍ{Í€¥value£!==R°MemberExpressionÍ…Í–S®ThisExpressionÍ…Í‰LªIdentifierÍŠÍ–¬currentIndexÂÂM®BlockStatementÍ˜Í’U³ExpressionStatementÍ¯ÍÉZ´AssignmentExpressionÍ¯ÍÈ¡=R°MemberExpressionÍ¯ÍÀS®ThisExpressionÍ¯Í³LªIdentifierÍ´ÍÀ¬currentIndexÂÂLªIdentifierÍÃÍÈ¥valueU³ExpressionStatementÍßÍøV®CallExpressionÍßÍ÷R°MemberExpressionÍßÍõS®ThisExpressionÍßÍãLªIdentifierÍäÍõ±handleIndexChangeÂÂÂÀd®BreakStatementÍÍ#ÀW§LiteralÍYÍb§current©'current'cªSwitchCaseÍ@Íq‘M®BlockStatementÍVÍq“P³VariableDeclarationÍiÍ³‘Q²VariableDeclaratorÍoÍ²LªIdentifierÍoÍt¥indexV®CallExpressionÍwÍ²R°MemberExpressionÍwÍR°MemberExpressionÍwÍ„S®ThisExpressionÍwÍ{LªIdentifierÍ|Í„¨childrenÂÂLªIdentifierÍ…Í©findIndexÂÂ‘O·ArrowFunctionExpressionÍÍ±ÀÃÂÂ‘LªIdentifierÍÍ”¥childa°BinaryExpressionÍ˜Í±R°MemberExpressionÍ˜Í§LªIdentifierÍ˜Í¥childW§LiteralÍÍ¦¦itemId¨'itemId'ÃÂ£===LªIdentifierÍ¬Í±¥valueÂ¥const`«IfStatementÍÅÍJa°BinaryExpressionÍÉÍÕLªIdentifierÍÉÍÎ¥index£!==]¯UnaryExpressionÍÓÍÕ¡-ÃW§LiteralÍÔÍÕ¡1M®BlockStatementÍ×ÍJ’U³ExpressionStatementÍîÍZ´AssignmentExpressionÍîÍ¡=R°MemberExpressionÍîÍÿS®ThisExpressionÍîÍòLªIdentifierÍóÍÿ¬currentIndexÂÂLªIdentifierÍÍ¥indexU³ExpressionStatementÍÍ7V®CallExpressionÍÍ6R°MemberExpressionÍÍ4S®ThisExpressionÍÍ"LªIdentifierÍ#Í4±handleIndexChangeÂÂÂÀd®BreakStatementÍ\ÍbÀW§LiteralÍEÍT­currentItemId¯'currentItemId'cªSwitchCaseÍÍ#‘M®BlockStatementÍÍ#“U³ExpressionStatementÍ£Í¹Z´AssignmentExpressionÍ£Í¸¡=R°MemberExpressionÍ£Í°S®ThisExpressionÍ£Í§LªIdentifierÍ¨Í°¨intervalÂÂLªIdentifierÍ³Í¸¥valueU³ExpressionStatementÍËÍüV®CallExpressionÍËÍûR°MemberExpressionÍËÍìR°MemberExpressionÍËÍãR°MemberExpressionÍËÍÙS®ThisExpressionÍËÍÏLªIdentifierÍĞÍÙ©frameNodeÂÂLªIdentifierÍÚÍã©attributeÂÂLªIdentifierÍäÍì¨intervalÂÂ‘R°MemberExpressionÍíÍúS®ThisExpressionÍíÍñLªIdentifierÍòÍú¨intervalÂÂÂd®BreakStatementÍÍÀW§LiteralÍ„Í¨intervalª'interval'cªSwitchCaseÍ1ÍÍ‘M®BlockStatementÍBÍÍ“U³ExpressionStatementÍUÍkZ´AssignmentExpressionÍUÍj¡=R°MemberExpressionÍUÍbS®ThisExpressionÍUÍYLªIdentifierÍZÍb¨durationÂÂLªIdentifierÍeÍj¥valueU³ExpressionStatementÍ}Í¦V®CallExpressionÍ}Í¥R°MemberExpressionÍ}ÍR°MemberExpressionÍ}Í•R°MemberExpressionÍ}Í‹S®ThisExpressionÍ}ÍLªIdentifierÍ‚Í‹©frameNodeÂÂLªIdentifierÍŒÍ•©attributeÂÂLªIdentifierÍ–Í¨durationÂÂ‘LªIdentifierÍŸÍ¤¥valueÂd®BreakStatementÍ¸Í¾ÀW§LiteralÍ6Í@¨durationª'duration'cªSwitchCaseÍÛÍs‘M®BlockStatementÍìÍs“U³ExpressionStatementÍÿÍZ´AssignmentExpressionÍÿÍ¡=R°MemberExpressionÍÿÍS®ThisExpressionÍÿÍLªIdentifierÍÍ¤loopÂÂLªIdentifierÍÍ¥valueU³ExpressionStatementÍ#ÍLV®CallExpressionÍ#ÍKR°MemberExpressionÍ#Í@R°MemberExpressionÍ#Í;R°MemberExpressionÍ#Í1S®ThisExpressionÍ#Í'LªIdentifierÍ(Í1©frameNodeÂÂLªIdentifierÍ2Í;©attributeÂÂLªIdentifierÍ<Í@¤loopÂÂ‘R°MemberExpressionÍAÍJS®ThisExpressionÍAÍELªIdentifierÍFÍJ¤loopÂÂÂd®BreakStatementÍ^ÍdÀW§LiteralÍàÍê¨circularª'circular'cªSwitchCaseÍÍ ‘M®BlockStatementÍ‘Í ’U³ExpressionStatementÍ¤ÍõV®CallExpressionÍ¤ÍôR°MemberExpressionÍ¤ÍÇR°MemberExpressionÍ¤Í¼R°MemberExpressionÍ¤Í²S®ThisExpressionÍ¤Í¨LªIdentifierÍ©Í²©frameNodeÂÂLªIdentifierÍ³Í¼©attributeÂÂLªIdentifierÍ½ÍÇªeffectModeÂÂ‘`µConditionalExpressionÍÈÍóLªIdentifierÍÈÍÍ¥valueR°MemberExpressionÍĞÍáLªIdentifierÍĞÍÚªEdgeEffectLªIdentifierÍÛÍá¦SpringÂÂR°MemberExpressionÍäÍóLªIdentifierÍäÍîªEdgeEffectLªIdentifierÍïÍó¤NoneÂÂÂd®BreakStatementÍ Í ÀW§LiteralÍ†Í§rebound©'rebound'cªSwitchCaseÍ *Í Î‘M®BlockStatementÍ ;Í Î“U³ExpressionStatementÍ NÍ dZ´AssignmentExpressionÍ NÍ c¡=R°MemberExpressionÍ NÍ [S®ThisExpressionÍ NÍ RLªIdentifierÍ SÍ [¨verticalÂÂLªIdentifierÍ ^Í c¥valueU³ExpressionStatementÍ vÍ §V®CallExpressionÍ vÍ ¦R°MemberExpressionÍ vÍ —R°MemberExpressionÍ vÍ R°MemberExpressionÍ vÍ „S®ThisExpressionÍ vÍ zLªIdentifierÍ {Í „©frameNodeÂÂLªIdentifierÍ …Í ©attributeÂÂLªIdentifierÍ Í —¨verticalÂÂ‘R°MemberExpressionÍ ˜Í ¥S®ThisExpressionÍ ˜Í œLªIdentifierÍ Í ¥¨verticalÂÂÂd®BreakStatementÍ ¹Í ¿ÀW§LiteralÍ /Í 9¨verticalª'vertical'cªSwitchCaseÍ ÜÍ!˜‘M®BlockStatementÍ ñÍ!˜“U³ExpressionStatementÍ!Í!"Z´AssignmentExpressionÍ!Í!!¡=R°MemberExpressionÍ!Í!S®ThisExpressionÍ!Í!LªIdentifierÍ!	Í!°needDisableSwipeÂÂLªIdentifierÍ!Í!!¥valueU³ExpressionStatementÍ!4Í!qV®CallExpressionÍ!4Í!pR°MemberExpressionÍ!4Í!YR°MemberExpressionÍ!4Í!LR°MemberExpressionÍ!4Í!BS®ThisExpressionÍ!4Í!8LªIdentifierÍ!9Í!B©frameNodeÂÂLªIdentifierÍ!CÍ!L©attributeÂÂLªIdentifierÍ!MÍ!Y¬disableSwipeÂÂ‘R°MemberExpressionÍ!ZÍ!oS®ThisExpressionÍ!ZÍ!^LªIdentifierÍ!_Í!o°needDisableSwipeÂÂÂd®BreakStatementÍ!ƒÍ!‰ÀW§LiteralÍ áÍ ï¬disableTouch®'disableTouch'cªSwitchCaseÍ!¦Í"g‘M®BlockStatementÍ!½Í"g’U³ExpressionStatementÍ!ĞÍ"@V®CallExpressionÍ!ĞÍ"?LªIdentifierÍ!ĞÍ!Ü¬formatLength’LªIdentifierÍ!İÍ!â¥valueO·ArrowFunctionExpressionÍ!äÍ">ÀÂÂÂ‘LªIdentifierÍ!äÍ!ç£valM®BlockStatementÍ!ëÍ">‘U³ExpressionStatementÍ"Í"+V®CallExpressionÍ"Í"*R°MemberExpressionÍ"Í"%R°MemberExpressionÍ"Í"R°MemberExpressionÍ"Í"S®ThisExpressionÍ"Í"LªIdentifierÍ"Í"©frameNodeÂÂLªIdentifierÍ"Í"©attributeÂÂLªIdentifierÍ"Í"%ªprevMarginÂÂ‘LªIdentifierÍ"&Í")£valÂÂd®BreakStatementÍ"RÍ"XÀW§LiteralÍ!«Í!»®previousMargin°'previousMargin'cªSwitchCaseÍ"uÍ#2‘M®BlockStatementÍ"ˆÍ#2’U³ExpressionStatementÍ"›Í#V®CallExpressionÍ"›Í#
+LªIdentifierÍ"›Í"§¬formatLength’LªIdentifierÍ"¨Í"­¥valueO·ArrowFunctionExpressionÍ"¯Í#	ÀÂÂÂ‘LªIdentifierÍ"¯Í"²£valM®BlockStatementÍ"¶Í#	‘U³ExpressionStatementÍ"ÍÍ"öV®CallExpressionÍ"ÍÍ"õR°MemberExpressionÍ"ÍÍ"ğR°MemberExpressionÍ"ÍÍ"åR°MemberExpressionÍ"ÍÍ"ÛS®ThisExpressionÍ"ÍÍ"ÑLªIdentifierÍ"ÒÍ"Û©frameNodeÂÂLªIdentifierÍ"ÜÍ"å©attributeÂÂLªIdentifierÍ"æÍ"ğªnextMarginÂÂ‘LªIdentifierÍ"ñÍ"ô£valÂÂd®BreakStatementÍ#Í##ÀW§LiteralÍ"zÍ"†ªnextMargin¬'nextMargin'cªSwitchCaseÍ#@Í#Ä‘M®BlockStatementÍ#]Í#Ä’U³ExpressionStatementÍ#pÍ#V®CallExpressionÍ#pÍ#œR°MemberExpressionÍ#pÍ#•R°MemberExpressionÍ#pÍ#ˆR°MemberExpressionÍ#pÍ#~S®ThisExpressionÍ#pÍ#tLªIdentifierÍ#uÍ#~©frameNodeÂÂLªIdentifierÍ#Í#ˆ©attributeÂÂLªIdentifierÍ#‰Í#•¬displayCountÂÂ‘LªIdentifierÍ#–Í#›¥valueÂd®BreakStatementÍ#¯Í#µÀW§LiteralÍ#EÍ#[´displayMultipleItems¶'displayMultipleItems'cªSwitchCaseÍ#ÒÍ$¤‘M®BlockStatementÍ#éÍ$¤’P³VariableDeclarationÍ#üÍ$*‘Q²VariableDeclaratorÍ$Í$)LªIdentifierÍ$Í$¤typeV®CallExpressionÍ$	Í$)R°MemberExpressionÍ$	Í$"LªIdentifierÍ$	Í$µEASING_FUNCTION_TYPESLªIdentifierÍ$Í$"£getÂÂ‘LªIdentifierÍ$#Í$(¥valueÂ¥const`«IfStatementÍ$<Í$•LªIdentifierÍ$@Í$D¤typeM®BlockStatementÍ$FÍ$•‘U³ExpressionStatementÍ$]Í$‚V®CallExpressionÍ$]Í$R°MemberExpressionÍ$]Í${R°MemberExpressionÍ$]Í$uR°MemberExpressionÍ$]Í$kS®ThisExpressionÍ$]Í$aLªIdentifierÍ$bÍ$k©frameNodeÂÂLªIdentifierÍ$lÍ$u©attributeÂÂLªIdentifierÍ$vÍ${¥curveÂÂ‘LªIdentifierÍ$|Í$€¤typeÂÀW§LiteralÍ#×Í#ç®easingFunction°'easingFunction'N°MethodDefinitionÍ$¼Í%ŸÂÂLªIdentifierÍ$¼Í$Í±handleIndexChange¦methodO²FunctionExpressionÍ$ÍÍ%ŸÀÂÂÂM®BlockStatementÍ$ĞÍ%Ÿ‘`«IfStatementÍ$ÛÍ%˜R°MemberExpressionÍ$ßÍ$ìS®ThisExpressionÍ$ßÍ$ãLªIdentifierÍ$äÍ$ì¨isAppearÂÂM®BlockStatementÍ$îÍ%=‘U³ExpressionStatementÍ$ıÍ%2V®CallExpressionÍ$ıÍ%1R°MemberExpressionÍ$ıÍ%R°MemberExpressionÍ$ıÍ%S®ThisExpressionÍ$ıÍ%LªIdentifierÍ%Í%ªcontrollerÂÂLªIdentifierÍ%Í%«changeIndexÂÂ’R°MemberExpressionÍ%Í%*S®ThisExpressionÍ%Í%LªIdentifierÍ%Í%*¬currentIndexÂÂW§LiteralÍ%,Í%0Ã¤trueÂM®BlockStatementÍ%LÍ%˜‘U³ExpressionStatementÍ%[Í%V®CallExpressionÍ%[Í%ŒR°MemberExpressionÍ%[Í%yR°MemberExpressionÍ%[Í%sR°MemberExpressionÍ%[Í%iS®ThisExpressionÍ%[Í%_LªIdentifierÍ%`Í%i©frameNodeÂÂLªIdentifierÍ%jÍ%s©attributeÂÂLªIdentifierÍ%tÍ%y¥indexÂÂ‘R°MemberExpressionÍ%zÍ%‹S®ThisExpressionÍ%zÍ%~LªIdentifierÍ%Í%‹¬currentIndexÂÂÂN°MethodDefinitionÍ%¥Í&;ÂÂLªIdentifierÍ%¥Í%Â½getSpecifiedIndexSwiperItemId¦methodO²FunctionExpressionÍ%ÂÍ&;ÀÂÂÂ‘LªIdentifierÍ%ÃÍ%È¥indexM®BlockStatementÍ%ÊÍ&;‘Y¯ReturnStatementÍ%ÕÍ&4a±LogicalExpressionÍ%ÜÍ&3U¯ChainExpressionÍ%ÜÍ&-R°MemberExpressionÍ%ÜÍ&-R°MemberExpressionÍ%ÜÍ&!V®CallExpressionÍ%ÜÍ&R°MemberExpressionÍ%ÜÍ%ğR°MemberExpressionÍ%ÜÍ%éS®ThisExpressionÍ%ÜÍ%àLªIdentifierÍ%áÍ%é¨childrenÂÂLªIdentifierÍ%êÍ%ğ¦filterÂÂ‘O·ArrowFunctionExpressionÍ%ñÍ&ÀÃÂÂ‘LªIdentifierÍ%ñÍ%ö¥childa°BinaryExpressionÍ%úÍ&R°MemberExpressionÍ%úÍ&LªIdentifierÍ%úÍ%ÿ¥childLªIdentifierÍ& Í&§tagNameÂÂ£===W§LiteralÍ&Í&«SWIPER-ITEM­'SWIPER-ITEM'ÂLªIdentifierÍ&Í& ¥indexÃÂW§LiteralÍ&$Í&,¦itemId¨'itemId'ÃÃ¢||W§LiteralÍ&1Í&3 ¢''N°MethodDefinitionÍ&mÍ'êÂÂLªIdentifierÍ&mÍ&Š½handleAutoPlayNotLoopBehavior¦methodO²FunctionExpressionÍ&ŠÍ'êÀÂÂÂ‘LªIdentifierÍ&‹Í&¥indexM®BlockStatementÍ&’Í'ê‘`«IfStatementÍ&Í'ãa±LogicalExpressionÍ&¡Í&âa±LogicalExpressionÍ&¡Í&¼R°MemberExpressionÍ&¡Í&®S®ThisExpressionÍ&¡Í&¥LªIdentifierÍ&¦Í&®¨autoPlayÂÂ¢&&]¯UnaryExpressionÍ&²Í&¼¡!ÃR°MemberExpressionÍ&³Í&¼S®ThisExpressionÍ&³Í&·LªIdentifierÍ&¸Í&¼¤loopÂÂ¢&&a°BinaryExpressionÍ&ÀÍ&âLªIdentifierÍ&ÀÍ&Å¥index£===a°BinaryExpressionÍ&ÊÍ&âR°MemberExpressionÍ&ÊÍ&ŞR°MemberExpressionÍ&ÊÍ&×S®ThisExpressionÍ&ÊÍ&ÎLªIdentifierÍ&ÏÍ&×¨childrenÂÂLªIdentifierÍ&ØÍ&Ş¦lengthÂÂ¡-W§LiteralÍ&áÍ&â¡1M®BlockStatementÍ&äÍ'ã‘P³VariableDeclarationÍ&óÍ'Ø‘Q²VariableDeclaratorÍ&ùÍ'×LªIdentifierÍ&ùÍ&ş¥timerV®CallExpressionÍ'Í'×LªIdentifierÍ'Í'ªsetTimeout’O·ArrowFunctionExpressionÍ'Í'·ÀÂÂÂM®BlockStatementÍ'Í'·“U³ExpressionStatementÍ'%Í';Z´AssignmentExpressionÍ'%Í':¡=R°MemberExpressionÍ'%Í'6S®ThisExpressionÍ'%Í')LªIdentifierÍ'*Í'6¬currentIndexÂÂW§LiteralÍ'9Í': ¡0U³ExpressionStatementÍ'MÍ'‚V®CallExpressionÍ'MÍ'R°MemberExpressionÍ'MÍ'hR°MemberExpressionÍ'MÍ'\S®ThisExpressionÍ'MÍ'QLªIdentifierÍ'RÍ'\ªcontrollerÂÂLªIdentifierÍ']Í'h«changeIndexÂÂ’R°MemberExpressionÍ'iÍ'zS®ThisExpressionÍ'iÍ'mLªIdentifierÍ'nÍ'z¬currentIndexÂÂW§LiteralÍ'|Í'€Ã¤trueÂU³ExpressionStatementÍ'”Í'¨V®CallExpressionÍ'”Í'§LªIdentifierÍ'”Í' ¬clearTimeout‘LªIdentifierÍ'¡Í'¦¥timerÂa°BinaryExpressionÍ'¹Í'ÖR°MemberExpressionÍ'¹Í'ÆS®ThisExpressionÍ'¹Í'½LªIdentifierÍ'¾Í'Æ¨intervalÂÂ¡-R°MemberExpressionÍ'ÉÍ'ÖS®ThisExpressionÍ'ÉÍ'ÍLªIdentifierÍ'ÎÍ'Ö¨durationÂÂÂ¥constÀN°MethodDefinitionÍ'ğÍ/µÂÂLªIdentifierÍ'ğÍ'ÿ¯initNativeEvent¦methodO²FunctionExpressionÍ'ÿÍ/µÀÂÂÂ‘LªIdentifierÍ( Í(¤typeM®BlockStatementÍ(Í/µ‘b¯SwitchStatementÍ(Í/®LªIdentifierÍ(Í(¤type”cªSwitchCaseÍ(.Í*t‘M®BlockStatementÍ(=Í*t’U³ExpressionStatementÍ(PÍ*MV®CallExpressionÍ(PÍ*LR°MemberExpressionÍ(PÍ(qR°MemberExpressionÍ(PÍ(hR°MemberExpressionÍ(PÍ(^S®ThisExpressionÍ(PÍ(TLªIdentifierÍ(UÍ(^©frameNodeÂÂLªIdentifierÍ(_Í(h©attributeÂÂLªIdentifierÍ(iÍ(q¨onChangeÂÂ‘O·ArrowFunctionExpressionÍ(rÍ*KÀÂÂÂ‘LªIdentifierÍ(sÍ(x¥indexM®BlockStatementÍ(}Í*K“U³ExpressionStatementÍ(”Í(¾V®CallExpressionÍ(”Í(½R°MemberExpressionÍ(”Í(¶S®ThisExpressionÍ(”Í(˜LªIdentifierÍ(™Í(¶½handleAutoPlayNotLoopBehaviorÂÂ‘LªIdentifierÍ(·Í(¼¥indexÂU³ExpressionStatementÍ(ÔÍ(îZ´AssignmentExpressionÍ(ÔÍ(í¡=R°MemberExpressionÍ(ÔÍ(åS®ThisExpressionÍ(ÔÍ(ØLªIdentifierÍ(ÙÍ(å¬currentIndexÂÂLªIdentifierÍ(èÍ(í¥indexU³ExpressionStatementÍ)Í*8V®CallExpressionÍ)Í*7R°MemberExpressionÍ)Í)S®ThisExpressionÍ)Í)LªIdentifierÍ)	Í)­dispatchEventÂÂ‘T­NewExpressionÍ)Í*6LªIdentifierÍ)Í))®UniCustomEvent’W§LiteralÍ)*Í)2¦change¨'change'T­NewExpressionÍ)4Í*5LªIdentifierÍ)8Í)MµUniCustomEventOptions‘[°ObjectExpressionÍ)NÍ*4“\¨PropertyÍ)iÍ)ƒÂÂÂLªIdentifierÍ)iÍ)p§currentR°MemberExpressionÍ)rÍ)ƒS®ThisExpressionÍ)rÍ)vLªIdentifierÍ)wÍ)ƒ¬currentIndexÂÂ¤init\¨PropertyÍ)Í)ÖÂÂÂLªIdentifierÍ)Í)«­currentItemIdV®CallExpressionÍ)­Í)ÖR°MemberExpressionÍ)­Í)ÏS®ThisExpressionÍ)­Í)±LªIdentifierÍ)²Í)Ï½getSpecifiedIndexSwiperItemIdÂÂ‘LªIdentifierÍ)ĞÍ)Õ¥indexÂ¤init\¨PropertyÍ)ñÍ*ÂÂÂLªIdentifierÍ)ñÍ)÷¦source`µConditionalExpressionÍ)ùÍ*R°MemberExpressionÍ)ùÍ*S®ThisExpressionÍ)ùÍ)ıLªIdentifierÍ)şÍ*¨touchingÂÂW§LiteralÍ*	Í*¥touch§'touch'W§LiteralÍ*Í*¨autoplayª'autoplay'¤initÂÂd®BreakStatementÍ*_Í*eÀW§LiteralÍ(3Í(;¦change¨'change'cªSwitchCaseÍ*‚Í,d‘M®BlockStatementÍ*šÍ,d’U³ExpressionStatementÍ*­Í,=V®CallExpressionÍ*­Í,<R°MemberExpressionÍ*­Í*ÔR°MemberExpressionÍ*­Í*ÅR°MemberExpressionÍ*­Í*»S®ThisExpressionÍ*­Í*±LªIdentifierÍ*²Í*»©frameNodeÂÂLªIdentifierÍ*¼Í*Å©attributeÂÂLªIdentifierÍ*ÆÍ*Ô®onAnimationEndÂÂ‘O·ArrowFunctionExpressionÍ*ÕÍ,;ÀÂÂÂ‘LªIdentifierÍ*ÖÍ*Û¥indexM®BlockStatementÍ*àÍ,;‘U³ExpressionStatementÍ*÷Í,(V®CallExpressionÍ*÷Í,'R°MemberExpressionÍ*÷Í+	S®ThisExpressionÍ*÷Í*ûLªIdentifierÍ*üÍ+	­dispatchEventÂÂ‘T­NewExpressionÍ+
+Í,&LªIdentifierÍ+Í+®UniCustomEvent’W§LiteralÍ+Í+.¯animationfinish±'animationfinish'T­NewExpressionÍ+0Í,%LªIdentifierÍ+4Í+IµUniCustomEventOptions‘[°ObjectExpressionÍ+JÍ,$“\¨PropertyÍ+eÍ+sÂÂÂLªIdentifierÍ+eÍ+l§currentLªIdentifierÍ+nÍ+s¥index¤init\¨PropertyÍ+Í+ÆÂÂÂLªIdentifierÍ+Í+›­currentItemIdV®CallExpressionÍ+Í+ÆR°MemberExpressionÍ+Í+¿S®ThisExpressionÍ+Í+¡LªIdentifierÍ+¢Í+¿½getSpecifiedIndexSwiperItemIdÂÂ‘LªIdentifierÍ+ÀÍ+Å¥indexÂ¤init\¨PropertyÍ+áÍ,ÂÂÂLªIdentifierÍ+áÍ+ç¦source`µConditionalExpressionÍ+éÍ,R°MemberExpressionÍ+éÍ+öS®ThisExpressionÍ+éÍ+íLªIdentifierÍ+îÍ+ö¨touchingÂÂW§LiteralÍ+ùÍ, ¥touch§'touch'W§LiteralÍ,Í,¨autoplayª'autoplay'¤initÂÂd®BreakStatementÍ,OÍ,UÀW§LiteralÍ*‡Í*˜¯animationfinish±'animationfinish'cªSwitchCaseÍ,rÍ/G‘M®BlockStatementÍ,…Í/G’U³ExpressionStatementÍ,˜Í/ V®CallExpressionÍ,˜Í/R°MemberExpressionÍ,˜Í,ÃR°MemberExpressionÍ,˜Í,°R°MemberExpressionÍ,˜Í,¦S®ThisExpressionÍ,˜Í,œLªIdentifierÍ,Í,¦©frameNodeÂÂLªIdentifierÍ,§Í,°©attributeÂÂLªIdentifierÍ,±Í,Ã²onContentDidScrollÂÂ‘O·ArrowFunctionExpressionÍ,ÄÍ/ÀÂÂÂ”LªIdentifierÍ,ÅÍ,Ò­selectedIndexLªIdentifierÍ,ÔÍ,Ù¥indexLªIdentifierÍ,ÛÍ,ã¨positionLªIdentifierÍ,åÍ,ó®mainAxisLengthM®BlockStatementÍ,øÍ/‘`«IfStatementÍ-Í/a°BinaryExpressionÍ-Í-*LªIdentifierÍ-Í- ­selectedIndex£===LªIdentifierÍ-%Í-*¥indexM®BlockStatementÍ-,Í/”P³VariableDeclarationÍ-GÍ-p‘Q²VariableDeclaratorÍ-MÍ-oLªIdentifierÍ-MÍ-R¥spacea°BinaryExpressionÍ-UÍ-o]¯UnaryExpressionÍ-UÍ-^¡-ÃLªIdentifierÍ-VÍ-^¨position¡*LªIdentifierÍ-aÍ-o®mainAxisLength¥constP³VariableDeclarationÍ-ŠÍ-§‘Q²VariableDeclaratorÍ-Í-¦LªIdentifierÍ-Í-“£res[°ObjectExpressionÍ-–Í-¦’\¨PropertyÍ-˜Í-ÂÂÂLªIdentifierÍ-˜Í-š¢dxW§LiteralÍ-œÍ- ¡0¤init\¨PropertyÍ-ŸÍ-¤ÂÂÂLªIdentifierÍ-ŸÍ-¡¢dyW§LiteralÍ-£Í-¤ ¡0¤init¥const`«IfStatementÍ-ÁÍ.…R°MemberExpressionÍ-ÅÍ-ÒS®ThisExpressionÍ-ÅÍ-ÉLªIdentifierÍ-ÊÍ-Ò¨verticalÂÂM®BlockStatementÍ-ÔÍ.‘U³ExpressionStatementÍ-óÍ.Z´AssignmentExpressionÍ-óÍ.¡=R°MemberExpressionÍ-óÍ-ùLªIdentifierÍ-óÍ-ö£resLªIdentifierÍ-÷Í-ù¢dyÂÂLªIdentifierÍ-üÍ.¥spaceM®BlockStatementÍ.<Í.…‘U³ExpressionStatementÍ.[Í.jZ´AssignmentExpressionÍ.[Í.i¡=R°MemberExpressionÍ.[Í.aLªIdentifierÍ.[Í.^£resLªIdentifierÍ._Í.a¢dxÂÂLªIdentifierÍ.dÍ.i¥spaceU³ExpressionStatementÍ.ŸÍ.ôV®CallExpressionÍ.ŸÍ.óR°MemberExpressionÍ.ŸÍ.±S®ThisExpressionÍ.ŸÍ.£LªIdentifierÍ.¤Í.±­dispatchEventÂÂ‘T­NewExpressionÍ.²Í.òLªIdentifierÍ.¶Í.Ä®UniCustomEvent’W§LiteralÍ.ÅÍ.Ñªtransition¬'transition'T­NewExpressionÍ.ÓÍ.ñLªIdentifierÍ.×Í.ìµUniCustomEventOptions‘LªIdentifierÍ.íÍ.ğ£resÂÀÂd®BreakStatementÍ/2Í/8ÀW§LiteralÍ,wÍ,ƒªtransition¬'transition'cªSwitchCaseÍ/UÍ/£’U³ExpressionStatementÍ/oÍ/‹V®CallExpressionÍ/oÍ/ŠR°MemberExpressionÍ/oÍ/„S¥SuperÍ/oÍ/tLªIdentifierÍ/uÍ/„¯initNativeEventÂÂ‘LªIdentifierÍ/…Í/‰¤typeÂd®BreakStatementÍ/Í/£ÀÀN°MethodDefinitionÍ/»Í2ÂÂLªIdentifierÍ/»Í/Ì±deleteNativeEvent¦methodO²FunctionExpressionÍ/ÌÍ2ÀÂÂÂ’LªIdentifierÍ/ÍÍ/Ñ¤typeLªIdentifierÍ/ÓÍ/Ö£resM®BlockStatementÍ/ØÍ2‘b¯SwitchStatementÍ/ãÍ1üLªIdentifierÍ/ëÍ/ï¤type”cªSwitchCaseÍ0 Í0w‘M®BlockStatementÍ0Í0w’U³ExpressionStatementÍ0"Í0JV®CallExpressionÍ0"Í0IR°MemberExpressionÍ0"Í0CR°MemberExpressionÍ0"Í0:R°MemberExpressionÍ0"Í00S®ThisExpressionÍ0"Í0&LªIdentifierÍ0'Í00©frameNodeÂÂLªIdentifierÍ01Í0:©attributeÂÂLªIdentifierÍ0;Í0C¨onChangeÂÂ‘W§LiteralÍ0DÍ0HÀ¤nullÂY¯ReturnStatementÍ0\Í0hW§LiteralÍ0cÍ0gÃ¤trueW§LiteralÍ0Í0¦change¨'change'cªSwitchCaseÍ0…Í1‘M®BlockStatementÍ0Í1’U³ExpressionStatementÍ0°Í0ŞV®CallExpressionÍ0°Í0İR°MemberExpressionÍ0°Í0×R°MemberExpressionÍ0°Í0ÈR°MemberExpressionÍ0°Í0¾S®ThisExpressionÍ0°Í0´LªIdentifierÍ0µÍ0¾©frameNodeÂÂLªIdentifierÍ0¿Í0È©attributeÂÂLªIdentifierÍ0ÉÍ0×®onAnimationEndÂÂ‘W§LiteralÍ0ØÍ0ÜÀ¤nullÂY¯ReturnStatementÍ0ğÍ0üW§LiteralÍ0÷Í0ûÃ¤trueW§LiteralÍ0ŠÍ0›¯animationfinish±'animationfinish'cªSwitchCaseÍ1Í1Ÿ‘M®BlockStatementÍ1,Í1Ÿ’U³ExpressionStatementÍ1?Í1rU¯ChainExpressionÍ1?Í1qV®CallExpressionÍ1?Í1qR°MemberExpressionÍ1?Í1kR°MemberExpressionÍ1?Í1XR°MemberExpressionÍ1?Í1MS®ThisExpressionÍ1?Í1CLªIdentifierÍ1DÍ1M©frameNodeÂÂLªIdentifierÍ1OÍ1X©attributeÂÃLªIdentifierÍ1YÍ1k²onContentDidScrollÂÂ‘W§LiteralÍ1lÍ1pÀ¤nullÂY¯ReturnStatementÍ1„Í1W§LiteralÍ1‹Í1Ã¤trueW§LiteralÍ1Í1*ªtransition¬'transition'cªSwitchCaseÍ1­Í1ñ‘Y¯ReturnStatementÍ1ÇÍ1ñV®CallExpressionÍ1ÎÍ1ğR°MemberExpressionÍ1ÎÍ1åS¥SuperÍ1ÎÍ1ÓLªIdentifierÍ1ÔÍ1å±deleteNativeEventÂÂ’LªIdentifierÍ1æÍ1ê¤typeLªIdentifierÍ1ìÍ1ï£resÂÀN°MethodDefinitionÍ2	Í4aÂÂLªIdentifierÍ2	Í2§dispose¦methodO²FunctionExpressionÍ2Í4aÀÂÂÂM®BlockStatementÍ2Í4a•U³ExpressionStatementÍ2Í29Z´AssignmentExpressionÍ2Í28¡=R°MemberExpressionÍ2Í21S®ThisExpressionÍ2Í2"LªIdentifierÍ2#Í21®lastTouchEventÂÂW§LiteralÍ24Í28À¤nullU³ExpressionStatementÍ2CÍ3U¯ChainExpressionÍ2CÍ3V®CallExpressionÍ2CÍ3R°MemberExpressionÍ2CÍ3V®CallExpressionÍ2CÍ2ìR°MemberExpressionÍ2CÍ2áV®CallExpressionÍ2CÍ2ÀR°MemberExpressionÍ2CÍ2µV®CallExpressionÍ2CÍ2˜R°MemberExpressionÍ2CÍ2V®CallExpressionÍ2CÍ2vR°MemberExpressionÍ2CÍ2kR°MemberExpressionÍ2CÍ2\R°MemberExpressionÍ2CÍ2QS®ThisExpressionÍ2CÍ2GLªIdentifierÍ2HÍ2Q©frameNodeÂÂLªIdentifierÍ2SÍ2\©attributeÂÃLªIdentifierÍ2]Í2k®onGestureSwipeÂÂ‘LªIdentifierÍ2lÍ2u©undefinedÂLªIdentifierÍ2…Í2¨onChangeÂÂ‘LªIdentifierÍ2Í2—©undefinedÂLªIdentifierÍ2§Í2µ®onAnimationEndÂÂ‘LªIdentifierÍ2¶Í2¿©undefinedÂLªIdentifierÍ2ÏÍ2á²onContentDidScrollÂÂ‘LªIdentifierÍ2âÍ2ë©undefinedÂLªIdentifierÍ2ûÍ3¨onAppearÂÂ‘LªIdentifierÍ3Í3©undefinedÂ^¬TryStatementÍ3>Í4M®BlockStatementÍ3BÍ3¶‘U³ExpressionStatementÍ3QÍ3«V®CallExpressionÍ3QÍ3ªLªIdentifierÍ3QÍ3[ªcallObject”R°MemberExpressionÍ3\Í3tR°MemberExpressionÍ3\Í3jS®ThisExpressionÍ3\Í3`LªIdentifierÍ3aÍ3j©frameNodeÂÂLªIdentifierÍ3kÍ3t©attributeÂÂR°MemberExpressionÍ3vÍ3R°MemberExpressionÍ3vÍ3„S®ThisExpressionÍ3vÍ3zLªIdentifierÍ3{Í3„©frameNodeÂÂLªIdentifierÍ3…Í3©attributeÂÂW§LiteralÍ3Í3¥³onContentWillScrollµ'onContentWillScroll'X¯ArrayExpressionÍ3§Í3©Â_«CatchClauseÍ3ÀÍ4LªIdentifierÍ3ÇÍ3È¡eM®BlockStatementÍ3ÊÍ4‘U³ExpressionStatementÍ3ÙÍ4V®CallExpressionÍ3ÙÍ4R°MemberExpressionÍ3ÙÍ3æLªIdentifierÍ3ÙÍ3à§consoleLªIdentifierÍ3áÍ3æ¥errorÂÂ’W§LiteralÍ3çÍ4»remove onContentWillScroll:½'remove onContentWillScroll:'R°MemberExpressionÍ4Í4LªIdentifierÍ4Í4¡eLªIdentifierÍ4Í4§messageÂÂÂÀU³ExpressionStatementÍ4&Í4@U¯ChainExpressionÍ4&Í4?V®CallExpressionÍ4&Í4?R°MemberExpressionÍ4&Í4=R°MemberExpressionÍ4&Í44S®ThisExpressionÍ4&Í4*LªIdentifierÍ4+Í44©frameNodeÂÂLªIdentifierÍ46Í4=§disposeÂÃÂU³ExpressionStatementÍ4JÍ4ZV®CallExpressionÍ4JÍ4YR°MemberExpressionÍ4JÍ4WS¥SuperÍ4JÍ4OLªIdentifierÍ4PÍ4W§disposeÂÂÂN°MethodDefinitionÍ4gÍ6:ÂÂLªIdentifierÍ4gÍ4r«checkLayout¦methodO²FunctionExpressionÍ4rÍ6:ÀÂÂÂM®BlockStatementÍ4uÍ6:–U³ExpressionStatementÍ4€Í4”V®CallExpressionÍ4€Í4“R°MemberExpressionÍ4€Í4‘S¥SuperÍ4€Í4…LªIdentifierÍ4†Í4‘«checkLayoutÂÂÂP³VariableDeclarationÍ4Í4Á‘Q²VariableDeclaratorÍ4¤Í4ÀLªIdentifierÍ4¤Í4®ªlayoutNodeR°MemberExpressionÍ4±Í4ÀS®ThisExpressionÍ4±Í4µLªIdentifierÍ4¶Í4ÀªlayoutNodeÂÂ¥constU³ExpressionStatementÍ4ËÍ5Z´AssignmentExpressionÍ4ËÍ5¡=R°MemberExpressionÍ4ËÍ4êR°MemberExpressionÍ4ËÍ4æR°MemberExpressionÍ4ËÍ4ÚS®ThisExpressionÍ4ËÍ4ÏLªIdentifierÍ4ĞÍ4ÚªstyleCacheÂÂLªIdentifierÍ4ÛÍ4æ«borderWidthÂÂLªIdentifierÍ4çÍ4ê£topÂÂV®CallExpressionÍ4íÍ5R°MemberExpressionÍ4íÍ5LªIdentifierÍ4íÍ4÷ªlayoutNodeLªIdentifierÍ4øÍ5¯getLayoutBorderÂÂ‘R°MemberExpressionÍ5Í5LªIdentifierÍ5Í5®UniCssFlexEdgeLªIdentifierÍ5Í5£TopÂÂÂU³ExpressionStatementÍ5&Í5}Z´AssignmentExpressionÍ5&Í5|¡=R°MemberExpressionÍ5&Í5HR°MemberExpressionÍ5&Í5AR°MemberExpressionÍ5&Í55S®ThisExpressionÍ5&Í5*LªIdentifierÍ5+Í55ªstyleCacheÂÂLªIdentifierÍ56Í5A«borderWidthÂÂLªIdentifierÍ5BÍ5H¦bottomÂÂV®CallExpressionÍ5KÍ5|R°MemberExpressionÍ5KÍ5eLªIdentifierÍ5KÍ5UªlayoutNodeLªIdentifierÍ5VÍ5e¯getLayoutBorderÂÂ‘R°MemberExpressionÍ5fÍ5{LªIdentifierÍ5fÍ5t®UniCssFlexEdgeLªIdentifierÍ5uÍ5{¦BottomÂÂÂU³ExpressionStatementÍ5‡Í5ÕZ´AssignmentExpressionÍ5‡Í5Ô¡=R°MemberExpressionÍ5‡Í5¢R°MemberExpressionÍ5‡Í5R°MemberExpressionÍ5‡Í5–S®ThisExpressionÍ5‡Í5‹LªIdentifierÍ5ŒÍ5–ªstyleCacheÂÂLªIdentifierÍ5—Í5§paddingÂÂLªIdentifierÍ5ŸÍ5¢£topÂÂV®CallExpressionÍ5¥Í5ÔR°MemberExpressionÍ5¥Í5ÀLªIdentifierÍ5¥Í5¯ªlayoutNodeLªIdentifierÍ5°Í5À°getLayoutPaddingÂÂ‘R°MemberExpressionÍ5ÁÍ5ÓLªIdentifierÍ5ÁÍ5Ï®UniCssFlexEdgeLªIdentifierÍ5ĞÍ5Ó£TopÂÂÂU³ExpressionStatementÍ5ßÍ63Z´AssignmentExpressionÍ5ßÍ62¡=R°MemberExpressionÍ5ßÍ5ıR°MemberExpressionÍ5ßÍ5öR°MemberExpressionÍ5ßÍ5îS®ThisExpressionÍ5ßÍ5ãLªIdentifierÍ5äÍ5îªstyleCacheÂÂLªIdentifierÍ5ïÍ5ö§paddingÂÂLªIdentifierÍ5÷Í5ı¦bottomÂÂV®CallExpressionÍ6 Í62R°MemberExpressionÍ6 Í6LªIdentifierÍ6 Í6
+ªlayoutNodeLªIdentifierÍ6Í6°getLayoutPaddingÂÂ‘R°MemberExpressionÍ6Í61LªIdentifierÍ6Í6*®UniCssFlexEdgeLªIdentifierÍ6+Í61¦BottomÂÂÂN°MethodDefinitionÍ6@Í6€ÂÂLªIdentifierÍ6@Í6T´getHarmonyController¦methodO²FunctionExpressionÍ6TÍ6€ÀÂÂÂM®BlockStatementÍ6WÍ6€‘Y¯ReturnStatementÍ6bÍ6yR°MemberExpressionÍ6iÍ6xS®ThisExpressionÍ6iÍ6mLªIdentifierÍ6nÍ6xªcontrollerÂÂÀ—Ôre•¤type¥start£endªspecifiers¦source±ImportDeclaration ÌI’Ôrf•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	®UniCustomEventLªIdentifier	®UniCustomEventf¯ImportSpecifier.LªIdentifier.µUniCustomEventOptionsLªIdentifier.µUniCustomEventOptionsW§Literal6ÌH°./UniCustomEvent²'./UniCustomEvent'e±ImportDeclarationÌKÌy‘f¯ImportSpecifierÌTÌbLªIdentifierÌTÌb®UniElementImplLªIdentifierÌTÌb®UniElementImplW§LiteralÌjÌx¬./UniElement®'./UniElement'e±ImportDeclarationÌ{Ì§‘f¯ImportSpecifierÌ„ÌŒLªIdentifierÌ„ÌŒ¨typeNodeLªIdentifierÌ„ÌŒ¨typeNodeW§LiteralÌ”Ì¦°@ohos.arkui.node²"@ohos.arkui.node"e±ImportDeclarationÌ©Ìß’f¯ImportSpecifierÌ²Ì½LªIdentifierÌ²Ì½«formatColorLªIdentifierÌ²Ì½«formatColorf¯ImportSpecifierÌ¿ÌËLªIdentifierÌ¿ÌË¬formatLengthLªIdentifierÌ¿ÌË¬formatLengthW§LiteralÌÓÌŞ©../helper«'../helper'e±ImportDeclarationÌáÍ‘f¯ImportSpecifierÌêÌúLªIdentifierÌêÌó©NativeMapLªIdentifierÌ÷Ìú£MapW§LiteralÍÍ«./NativeMap­'./NativeMap'e±ImportDeclarationÍÍ@‘f¯ImportSpecifierÍÍ)LªIdentifierÍÍ)®UniCssFlexEdgeLªIdentifierÍÍ)®UniCssFlexEdgeW§LiteralÍ1Í?¬dcloudlayout®'dcloudlayout'e±ImportDeclarationÍBÍi‘f¯ImportSpecifierÍKÍULªIdentifierÍKÍUªcallObjectLªIdentifierÍKÍUªcallObjectW§LiteralÍ]Íh©../helper«'../helper'

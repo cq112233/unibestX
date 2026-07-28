@@ -1,0 +1,32 @@
+import { UniTabsElement as IUniTabsElement, UniElement as IUniElement } from '@dcloudio/uni-app-x/types/native';
+import { UniElementImpl } from './UniElement';
+export declare class UniTabsElementImpl extends UniElementImpl implements IUniTabsElement {
+    isTabBarVisible: boolean;
+    currentItemId: string | null;
+    private container;
+    private items;
+    private tabBar;
+    private tabBarList;
+    private tabBarStyle;
+    private requestFullscreenRestore;
+    constructor();
+    protected createFrameNode(): FrameNode | null;
+    appendItem(pageId: string): void;
+    appendItem(itemElement: IUniElement): void;
+    initTabBar(tabBar: Map<string, Object>): void;
+    appendCustomTabBar(tabBar: IUniElement, direction: string): void;
+    switchSelect(pageId: string, index: number): void;
+    hideTabBar(op: Map<string, Object>): void;
+    showTabBar(op: Map<string, Object>): void;
+    setTabBarBadge(op: Map<string, Object>): void;
+    removeTabBarBadge(op: Map<string, Object>): void;
+    showTabBarRedDot(op: Map<string, Object>): void;
+    hideTabBarRedDot(op: Map<string, Object>): void;
+    setTabBarItem(op: Map<string, Object>): void;
+    setTabBarStyle(tabBar: Map<string, Object>): void;
+    getTabBarHeight(): number;
+    private initTabBarListAndMidButton;
+    private checkIndex;
+    requestFullscreen(): void;
+    exitFullscreen(): void;
+}

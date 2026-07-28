@@ -1,0 +1,579 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ+Pimport { _ as __easycom_0 } from "../up-icon/up-icon.js";
+const { defineComponent, nextTick, resolveDynamicComponent, openBlock, createElementBlock, normalizeClass, normalizeStyle, createElementVNode, createCommentVNode, createBlock, Fragment, renderSlot, createVNode, toDisplayString } = globalThis.Vue
+import { r as resolveEasycom } from "../../../../App.ku.js";
+import { _ as __easycom_1$1 } from "../up-badge/up-badge.js";
+import { p as propsTabbarItem } from "./props.js";
+import { m as mpMixin } from "../../libs/mixin/mpMixin.js";
+import { m as mixin } from "../../libs/mixin/mixin.js";
+import { b as addStyle, f as error } from "../../libs/function/index.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const _sfc_main = defineComponent({
+  name: "up-tabbar-item",
+  mixins: [mpMixin, mixin, propsTabbarItem],
+  data() {
+    return {
+      isActive: false,
+      routeSyncTimer: 0,
+      routeSyncLast: "",
+      parentData: new UTSJSONObject({
+        value: null,
+        activeColor: "",
+        inactiveColor: ""
+      })
+    };
+  },
+  //  å¾®ä¿¡å°ç¨‹åºä¸­ options é€‰é¡¹
+  options: {
+    virtualHost: true
+    //å°†è‡ªå®šä¹‰èŠ‚ç‚¹è®¾ç½®æˆè™šæ‹Ÿçš„ï¼Œæ›´åŠ æ¥è¿‘Vueç»„ä»¶çš„è¡¨ç°ã€‚æˆ‘ä»¬ä¸å¸Œæœ›è‡ªå®šä¹‰ç»„ä»¶çš„è¿™ä¸ªèŠ‚ç‚¹æœ¬èº«å¯ä»¥è®¾ç½®æ ·å¼ã€å“åº” flex å¸ƒå±€ç­‰
+  },
+  computed: {
+    // è®¡ç®—æ˜¯å¦ä¸ºä¸­é—´æŒ‰é’®
+    isMidButton() {
+      return this.mode === "midButton";
+    }
+  },
+  created() {
+    this.init();
+  },
+  mounted() {
+    this.startRouteSync();
+  },
+  beforeUnmount() {
+    this.clearRouteSync();
+  },
+  emits: ["click", "change"],
+  methods: {
+    addStyle(val = null) {
+      return addStyle(val);
+    },
+    clearRouteSync() {
+      if (this.routeSyncTimer != null) {
+        clearInterval(this.routeSyncTimer);
+        this.routeSyncTimer = 0;
+      }
+    },
+    getCurrentRoutePath() {
+      const pages = getCurrentPages();
+      if (pages == null || pages.length == 0)
+        return "";
+      const currentPage = pages[pages.length - 1];
+      const route = currentPage != null && currentPage.route != null ? currentPage.route.toString() : "";
+      if (route == "")
+        return "";
+      return route.startsWith("/") ? route : `/${route}`;
+    },
+    normalizeRoutePath(path) {
+      return path.replace(/^[#\\/]+/, "");
+    },
+    syncActiveByRouteOrValue() {
+      this.updateParentData();
+      const index = this.getChildIndex(this);
+      const name = this.name != null ? this.name : index;
+      const routePath = this.getCurrentRoutePath();
+      if (typeof name === "string" && routePath != "") {
+        const isRouteMatch = this.normalizeRoutePath(name) == this.normalizeRoutePath(routePath);
+        if (isRouteMatch) {
+          this.isActive = true;
+          return null;
+        }
+      }
+      this.isActive = name === this.parentData["value"];
+    },
+    startRouteSync() {
+      this.clearRouteSync();
+      if (!(typeof this.name === "string" && this.name.indexOf("/") > -1))
+        return null;
+      this.routeSyncLast = this.getCurrentRoutePath();
+      this.routeSyncTimer = setInterval(() => {
+        const current = this.getCurrentRoutePath();
+        if (current != this.routeSyncLast) {
+          this.routeSyncLast = current;
+          this.syncActiveByRouteOrValue();
+        }
+      }, 200);
+    },
+    init() {
+      if (this.parent == null) {
+        error("up-tabbar-itemå¿…é¡»æ­é…up-tabbarç»„ä»¶ä½¿ç”¨");
+      }
+      this.syncActiveByRouteOrValue();
+    },
+    updateParentData() {
+      this.getParentData("up-tabbar");
+    },
+    // æ­¤æ–¹æ³•å°†ä¼šè¢«çˆ¶ç»„ä»¶up-tabbarè°ƒç”¨
+    updateFromParent() {
+      this.init();
+    },
+    clickHandler() {
+      nextTick(() => {
+        const index = this.getChildIndex(this);
+        const name = this.name != null ? this.name : index;
+        if (this.parent != null && name.toString() != this.parent.$props["value"].toString()) {
+          this.parent.$emit("change", name);
+        }
+        this.$emit("click", name);
+      });
+    }
+  }
+});
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabbar-item": { "": { "display": "flex", "flexDirection": "column", "alignItems": "center", "justifyContent": "center", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "height": 50 } }, "up-tabbar-item__icon": { "": { "display": "flex", "flexDirection": "row", "position": "relative", "width": "150rpx", "justifyContent": "center" } }, "up-tabbar-item__text": { "": { "marginTop": 2, "fontSize": 12, "color": "#606266" } }, "up-tabbar-item--mid-button": { "": { "transform": "translateY(-10px)" } }, "up-tabbar-item--mid-button-cover": { "": { "backgroundColor": "#ffffff", "position": "absolute", "top": 22, "left": -10, "width": 90, "bottom": 0 } }, "up-tabbar-item__icon--mid-button": { "": { "width": 70, "height": 70, "borderTopLeftRadius": 100, "borderTopRightRadius": 100, "borderBottomRightRadius": 100, "borderBottomLeftRadius": 100, "backgroundColor": "#ffffff", "boxShadow": "0 0 10px rgba(0, 0, 0, 0.1)", "display": "flex", "alignItems": "center", "justifyContent": "center" } } };
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_icon = resolveEasycom(resolveDynamicComponent("up-icon"), __easycom_0);
+  const _component_up_badge = resolveEasycom(resolveDynamicComponent("up-badge"), __easycom_1$1);
+  return openBlock(), createElementBlock(
+    "view",
+    {
+      class: normalizeClass(["up-tabbar-item", [$options.isMidButton ? "up-tabbar-item--mid-button" : ""]]),
+      style: normalizeStyle([$options.addStyle(_ctx.customStyle)]),
+      onClick: _cache[0] || (_cache[0] = (...args) => $options.clickHandler && $options.clickHandler(...args))
+    },
+    [
+      createElementVNode(
+        "view",
+        {
+          class: normalizeClass(["up-tabbar-item__icon", [$options.isMidButton ? "up-tabbar-item__icon--mid-button" : ""]])
+        },
+        [
+          $options.isMidButton ? (openBlock(), createElementBlock("view", {
+            key: 0,
+            class: "up-tabbar-item--mid-button-cover"
+          })) : createCommentVNode("v-if", true),
+          _ctx.icon ? (openBlock(), createBlock(_component_up_icon, {
+            key: 1,
+            name: _ctx.icon,
+            color: $data.isActive ? $data.parentData["activeColor"] : $data.parentData["inactiveColor"],
+            size: $options.isMidButton ? 26 : 20
+          }, null, 8, ["name", "color", "size"])) : (openBlock(), createElementBlock(
+            Fragment,
+            { key: 2 },
+            [
+              $data.isActive ? renderSlot(_ctx.$slots, "active-icon", { key: 0 }) : renderSlot(_ctx.$slots, "inactive-icon", { key: 1 })
+            ],
+            64
+            /* STABLE_FRAGMENT */
+          )),
+          createVNode(_component_up_badge, {
+            absolute: "",
+            offset: [0, _ctx.dot ? "34rpx" : _ctx.badge != null && parseInt(_ctx.badge.toString()) > 9 ? "14rpx" : "20rpx"],
+            customStyle: _ctx.badgeStyle,
+            isDot: _ctx.dot,
+            value: _ctx.badge != null ? _ctx.dot ? 1 : _ctx.badge : 0,
+            show: _ctx.dot ? true : _ctx.badge != null ? parseInt(_ctx.badge.toString()) > 0 : false
+          }, null, 8, ["offset", "customStyle", "isDot", "value", "show"])
+        ],
+        2
+        /* CLASS */
+      ),
+      renderSlot(_ctx.$slots, "text", {}, () => [
+        createElementVNode(
+          "text",
+          {
+            class: "up-tabbar-item__text",
+            style: normalizeStyle({
+              color: $data.isActive ? $data.parentData["activeColor"] : $data.parentData["inactiveColor"]
+            })
+          },
+          toDisplayString(_ctx.text),
+          5
+          /* TEXT, STYLE */
+        )
+      ])
+    ],
+    6
+    /* CLASS, STYLE */
+  );
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-tabbar-item/up-tabbar-item.uvue"]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-tabbar-item.js.map
+Â˜ÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon.jsÙ /Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku.jsÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-badge/up-badge.jsÙÑ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-tabbar-item/props.jsÙÄ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/mixin/mpMixin.jsÙÂ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/mixin/mixin.jsÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-tabbar-item/up-tabbar-item.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ‘ÔrD’²hostDependencyName®hostModuleNameÙR../../../../../uni_modules/uview-ultra/components/up-tabbar-item/up-tabbar-item.js¥entryÃÚ+Pimport { _ as __easycom_0 } from "../up-icon/up-icon.js";
+const { defineComponent, nextTick, resolveDynamicComponent, openBlock, createElementBlock, normalizeClass, normalizeStyle, createElementVNode, createCommentVNode, createBlock, Fragment, renderSlot, createVNode, toDisplayString } = globalThis.Vue
+import { r as resolveEasycom } from "../../../../App.ku.js";
+import { _ as __easycom_1$1 } from "../up-badge/up-badge.js";
+import { p as propsTabbarItem } from "./props.js";
+import { m as mpMixin } from "../../libs/mixin/mpMixin.js";
+import { m as mixin } from "../../libs/mixin/mixin.js";
+import { b as addStyle, f as error } from "../../libs/function/index.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const _sfc_main = defineComponent({
+  name: "up-tabbar-item",
+  mixins: [mpMixin, mixin, propsTabbarItem],
+  data() {
+    return {
+      isActive: false,
+      routeSyncTimer: 0,
+      routeSyncLast: "",
+      parentData: new UTSJSONObject({
+        value: null,
+        activeColor: "",
+        inactiveColor: ""
+      })
+    };
+  },
+  //  å¾®ä¿¡å°ç¨‹åºä¸­ options é€‰é¡¹
+  options: {
+    virtualHost: true
+    //å°†è‡ªå®šä¹‰èŠ‚ç‚¹è®¾ç½®æˆè™šæ‹Ÿçš„ï¼Œæ›´åŠ æ¥è¿‘Vueç»„ä»¶çš„è¡¨ç°ã€‚æˆ‘ä»¬ä¸å¸Œæœ›è‡ªå®šä¹‰ç»„ä»¶çš„è¿™ä¸ªèŠ‚ç‚¹æœ¬èº«å¯ä»¥è®¾ç½®æ ·å¼ã€å“åº” flex å¸ƒå±€ç­‰
+  },
+  computed: {
+    // è®¡ç®—æ˜¯å¦ä¸ºä¸­é—´æŒ‰é’®
+    isMidButton() {
+      return this.mode === "midButton";
+    }
+  },
+  created() {
+    this.init();
+  },
+  mounted() {
+    this.startRouteSync();
+  },
+  beforeUnmount() {
+    this.clearRouteSync();
+  },
+  emits: ["click", "change"],
+  methods: {
+    addStyle(val = null) {
+      return addStyle(val);
+    },
+    clearRouteSync() {
+      if (this.routeSyncTimer != null) {
+        clearInterval(this.routeSyncTimer);
+        this.routeSyncTimer = 0;
+      }
+    },
+    getCurrentRoutePath() {
+      const pages = getCurrentPages();
+      if (pages == null || pages.length == 0)
+        return "";
+      const currentPage = pages[pages.length - 1];
+      const route = currentPage != null && currentPage.route != null ? currentPage.route.toString() : "";
+      if (route == "")
+        return "";
+      return route.startsWith("/") ? route : `/${route}`;
+    },
+    normalizeRoutePath(path) {
+      return path.replace(/^[#\\/]+/, "");
+    },
+    syncActiveByRouteOrValue() {
+      this.updateParentData();
+      const index = this.getChildIndex(this);
+      const name = this.name != null ? this.name : index;
+      const routePath = this.getCurrentRoutePath();
+      if (typeof name === "string" && routePath != "") {
+        const isRouteMatch = this.normalizeRoutePath(name) == this.normalizeRoutePath(routePath);
+        if (isRouteMatch) {
+          this.isActive = true;
+          return null;
+        }
+      }
+      this.isActive = name === this.parentData["value"];
+    },
+    startRouteSync() {
+      this.clearRouteSync();
+      if (!(typeof this.name === "string" && this.name.indexOf("/") > -1))
+        return null;
+      this.routeSyncLast = this.getCurrentRoutePath();
+      this.routeSyncTimer = setInterval(() => {
+        const current = this.getCurrentRoutePath();
+        if (current != this.routeSyncLast) {
+          this.routeSyncLast = current;
+          this.syncActiveByRouteOrValue();
+        }
+      }, 200);
+    },
+    init() {
+      if (this.parent == null) {
+        error("up-tabbar-itemå¿…é¡»æ­é…up-tabbarç»„ä»¶ä½¿ç”¨");
+      }
+      this.syncActiveByRouteOrValue();
+    },
+    updateParentData() {
+      this.getParentData("up-tabbar");
+    },
+    // æ­¤æ–¹æ³•å°†ä¼šè¢«çˆ¶ç»„ä»¶up-tabbarè°ƒç”¨
+    updateFromParent() {
+      this.init();
+    },
+    clickHandler() {
+      nextTick(() => {
+        const index = this.getChildIndex(this);
+        const name = this.name != null ? this.name : index;
+        if (this.parent != null && name.toString() != this.parent.$props["value"].toString()) {
+          this.parent.$emit("change", name);
+        }
+        this.$emit("click", name);
+      });
+    }
+  }
+});
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabbar-item": { "": { "display": "flex", "flexDirection": "column", "alignItems": "center", "justifyContent": "center", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "height": 50 } }, "up-tabbar-item__icon": { "": { "display": "flex", "flexDirection": "row", "position": "relative", "width": "150rpx", "justifyContent": "center" } }, "up-tabbar-item__text": { "": { "marginTop": 2, "fontSize": 12, "color": "#606266" } }, "up-tabbar-item--mid-button": { "": { "transform": "translateY(-10px)" } }, "up-tabbar-item--mid-button-cover": { "": { "backgroundColor": "#ffffff", "position": "absolute", "top": 22, "left": -10, "width": 90, "bottom": 0 } }, "up-tabbar-item__icon--mid-button": { "": { "width": 70, "height": 70, "borderTopLeftRadius": 100, "borderTopRightRadius": 100, "borderBottomRightRadius": 100, "borderBottomLeftRadius": 100, "backgroundColor": "#ffffff", "boxShadow": "0 0 10px rgba(0, 0, 0, 0.1)", "display": "flex", "alignItems": "center", "justifyContent": "center" } } };
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_icon = resolveEasycom(resolveDynamicComponent("up-icon"), __easycom_0);
+  const _component_up_badge = resolveEasycom(resolveDynamicComponent("up-badge"), __easycom_1$1);
+  return openBlock(), createElementBlock(
+    "view",
+    {
+      class: normalizeClass(["up-tabbar-item", [$options.isMidButton ? "up-tabbar-item--mid-button" : ""]]),
+      style: normalizeStyle([$options.addStyle(_ctx.customStyle)]),
+      onClick: _cache[0] || (_cache[0] = (...args) => $options.clickHandler && $options.clickHandler(...args))
+    },
+    [
+      createElementVNode(
+        "view",
+        {
+          class: normalizeClass(["up-tabbar-item__icon", [$options.isMidButton ? "up-tabbar-item__icon--mid-button" : ""]])
+        },
+        [
+          $options.isMidButton ? (openBlock(), createElementBlock("view", {
+            key: 0,
+            class: "up-tabbar-item--mid-button-cover"
+          })) : createCommentVNode("v-if", true),
+          _ctx.icon ? (openBlock(), createBlock(_component_up_icon, {
+            key: 1,
+            name: _ctx.icon,
+            color: $data.isActive ? $data.parentData["activeColor"] : $data.parentData["inactiveColor"],
+            size: $options.isMidButton ? 26 : 20
+          }, null, 8, ["name", "color", "size"])) : (openBlock(), createElementBlock(
+            Fragment,
+            { key: 2 },
+            [
+              $data.isActive ? renderSlot(_ctx.$slots, "active-icon", { key: 0 }) : renderSlot(_ctx.$slots, "inactive-icon", { key: 1 })
+            ],
+            64
+            /* STABLE_FRAGMENT */
+          )),
+          createVNode(_component_up_badge, {
+            absolute: "",
+            offset: [0, _ctx.dot ? "34rpx" : _ctx.badge != null && parseInt(_ctx.badge.toString()) > 9 ? "14rpx" : "20rpx"],
+            customStyle: _ctx.badgeStyle,
+            isDot: _ctx.dot,
+            value: _ctx.badge != null ? _ctx.dot ? 1 : _ctx.badge : 0,
+            show: _ctx.dot ? true : _ctx.badge != null ? parseInt(_ctx.badge.toString()) > 0 : false
+          }, null, 8, ["offset", "customStyle", "isDot", "value", "show"])
+        ],
+        2
+        /* CLASS */
+      ),
+      renderSlot(_ctx.$slots, "text", {}, () => [
+        createElementVNode(
+          "text",
+          {
+            class: "up-tabbar-item__text",
+            style: normalizeStyle({
+              color: $data.isActive ? $data.parentData["activeColor"] : $data.parentData["inactiveColor"]
+            })
+          },
+          toDisplayString(_ctx.text),
+          5
+          /* TEXT, STYLE */
+        )
+      ])
+    ],
+    6
+    /* CLASS, STYLE */
+  );
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-tabbar-item/up-tabbar-item.uvue"]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-tabbar-item.js.map
+ÔrE•§version¨mappings¥names§sources®sourcesContentÜ Á‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘ÙÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-tabbar-item/up-tabbar-item.js‘Ú+Pimport { _ as __easycom_0 } from "../up-icon/up-icon.js";
+const { defineComponent, nextTick, resolveDynamicComponent, openBlock, createElementBlock, normalizeClass, normalizeStyle, createElementVNode, createCommentVNode, createBlock, Fragment, renderSlot, createVNode, toDisplayString } = globalThis.Vue
+import { r as resolveEasycom } from "../../../../App.ku.js";
+import { _ as __easycom_1$1 } from "../up-badge/up-badge.js";
+import { p as propsTabbarItem } from "./props.js";
+import { m as mpMixin } from "../../libs/mixin/mpMixin.js";
+import { m as mixin } from "../../libs/mixin/mixin.js";
+import { b as addStyle, f as error } from "../../libs/function/index.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const _sfc_main = defineComponent({
+  name: "up-tabbar-item",
+  mixins: [mpMixin, mixin, propsTabbarItem],
+  data() {
+    return {
+      isActive: false,
+      routeSyncTimer: 0,
+      routeSyncLast: "",
+      parentData: new UTSJSONObject({
+        value: null,
+        activeColor: "",
+        inactiveColor: ""
+      })
+    };
+  },
+  //  å¾®ä¿¡å°ç¨‹åºä¸­ options é€‰é¡¹
+  options: {
+    virtualHost: true
+    //å°†è‡ªå®šä¹‰èŠ‚ç‚¹è®¾ç½®æˆè™šæ‹Ÿçš„ï¼Œæ›´åŠ æ¥è¿‘Vueç»„ä»¶çš„è¡¨ç°ã€‚æˆ‘ä»¬ä¸å¸Œæœ›è‡ªå®šä¹‰ç»„ä»¶çš„è¿™ä¸ªèŠ‚ç‚¹æœ¬èº«å¯ä»¥è®¾ç½®æ ·å¼ã€å“åº” flex å¸ƒå±€ç­‰
+  },
+  computed: {
+    // è®¡ç®—æ˜¯å¦ä¸ºä¸­é—´æŒ‰é’®
+    isMidButton() {
+      return this.mode === "midButton";
+    }
+  },
+  created() {
+    this.init();
+  },
+  mounted() {
+    this.startRouteSync();
+  },
+  beforeUnmount() {
+    this.clearRouteSync();
+  },
+  emits: ["click", "change"],
+  methods: {
+    addStyle(val = null) {
+      return addStyle(val);
+    },
+    clearRouteSync() {
+      if (this.routeSyncTimer != null) {
+        clearInterval(this.routeSyncTimer);
+        this.routeSyncTimer = 0;
+      }
+    },
+    getCurrentRoutePath() {
+      const pages = getCurrentPages();
+      if (pages == null || pages.length == 0)
+        return "";
+      const currentPage = pages[pages.length - 1];
+      const route = currentPage != null && currentPage.route != null ? currentPage.route.toString() : "";
+      if (route == "")
+        return "";
+      return route.startsWith("/") ? route : `/${route}`;
+    },
+    normalizeRoutePath(path) {
+      return path.replace(/^[#\\/]+/, "");
+    },
+    syncActiveByRouteOrValue() {
+      this.updateParentData();
+      const index = this.getChildIndex(this);
+      const name = this.name != null ? this.name : index;
+      const routePath = this.getCurrentRoutePath();
+      if (typeof name === "string" && routePath != "") {
+        const isRouteMatch = this.normalizeRoutePath(name) == this.normalizeRoutePath(routePath);
+        if (isRouteMatch) {
+          this.isActive = true;
+          return null;
+        }
+      }
+      this.isActive = name === this.parentData["value"];
+    },
+    startRouteSync() {
+      this.clearRouteSync();
+      if (!(typeof this.name === "string" && this.name.indexOf("/") > -1))
+        return null;
+      this.routeSyncLast = this.getCurrentRoutePath();
+      this.routeSyncTimer = setInterval(() => {
+        const current = this.getCurrentRoutePath();
+        if (current != this.routeSyncLast) {
+          this.routeSyncLast = current;
+          this.syncActiveByRouteOrValue();
+        }
+      }, 200);
+    },
+    init() {
+      if (this.parent == null) {
+        error("up-tabbar-itemå¿…é¡»æ­é…up-tabbarç»„ä»¶ä½¿ç”¨");
+      }
+      this.syncActiveByRouteOrValue();
+    },
+    updateParentData() {
+      this.getParentData("up-tabbar");
+    },
+    // æ­¤æ–¹æ³•å°†ä¼šè¢«çˆ¶ç»„ä»¶up-tabbarè°ƒç”¨
+    updateFromParent() {
+      this.init();
+    },
+    clickHandler() {
+      nextTick(() => {
+        const index = this.getChildIndex(this);
+        const name = this.name != null ? this.name : index;
+        if (this.parent != null && name.toString() != this.parent.$props["value"].toString()) {
+          this.parent.$emit("change", name);
+        }
+        this.$emit("click", name);
+      });
+    }
+  }
+});
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabbar-item": { "": { "display": "flex", "flexDirection": "column", "alignItems": "center", "justifyContent": "center", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%", "height": 50 } }, "up-tabbar-item__icon": { "": { "display": "flex", "flexDirection": "row", "position": "relative", "width": "150rpx", "justifyContent": "center" } }, "up-tabbar-item__text": { "": { "marginTop": 2, "fontSize": 12, "color": "#606266" } }, "up-tabbar-item--mid-button": { "": { "transform": "translateY(-10px)" } }, "up-tabbar-item--mid-button-cover": { "": { "backgroundColor": "#ffffff", "position": "absolute", "top": 22, "left": -10, "width": 90, "bottom": 0 } }, "up-tabbar-item__icon--mid-button": { "": { "width": 70, "height": 70, "borderTopLeftRadius": 100, "borderTopRightRadius": 100, "borderBottomRightRadius": 100, "borderBottomLeftRadius": 100, "backgroundColor": "#ffffff", "boxShadow": "0 0 10px rgba(0, 0, 0, 0.1)", "display": "flex", "alignItems": "center", "justifyContent": "center" } } };
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_icon = resolveEasycom(resolveDynamicComponent("up-icon"), __easycom_0);
+  const _component_up_badge = resolveEasycom(resolveDynamicComponent("up-badge"), __easycom_1$1);
+  return openBlock(), createElementBlock(
+    "view",
+    {
+      class: normalizeClass(["up-tabbar-item", [$options.isMidButton ? "up-tabbar-item--mid-button" : ""]]),
+      style: normalizeStyle([$options.addStyle(_ctx.customStyle)]),
+      onClick: _cache[0] || (_cache[0] = (...args) => $options.clickHandler && $options.clickHandler(...args))
+    },
+    [
+      createElementVNode(
+        "view",
+        {
+          class: normalizeClass(["up-tabbar-item__icon", [$options.isMidButton ? "up-tabbar-item__icon--mid-button" : ""]])
+        },
+        [
+          $options.isMidButton ? (openBlock(), createElementBlock("view", {
+            key: 0,
+            class: "up-tabbar-item--mid-button-cover"
+          })) : createCommentVNode("v-if", true),
+          _ctx.icon ? (openBlock(), createBlock(_component_up_icon, {
+            key: 1,
+            name: _ctx.icon,
+            color: $data.isActive ? $data.parentData["activeColor"] : $data.parentData["inactiveColor"],
+            size: $options.isMidButton ? 26 : 20
+          }, null, 8, ["name", "color", "size"])) : (openBlock(), createElementBlock(
+            Fragment,
+            { key: 2 },
+            [
+              $data.isActive ? renderSlot(_ctx.$slots, "active-icon", { key: 0 }) : renderSlot(_ctx.$slots, "inactive-icon", { key: 1 })
+            ],
+            64
+            /* STABLE_FRAGMENT */
+          )),
+          createVNode(_component_up_badge, {
+            absolute: "",
+            offset: [0, _ctx.dot ? "34rpx" : _ctx.badge != null && parseInt(_ctx.badge.toString()) > 9 ? "14rpx" : "20rpx"],
+            customStyle: _ctx.badgeStyle,
+            isDot: _ctx.dot,
+            value: _ctx.badge != null ? _ctx.dot ? 1 : _ctx.badge : 0,
+            show: _ctx.dot ? true : _ctx.badge != null ? parseInt(_ctx.badge.toString()) > 0 : false
+          }, null, 8, ["offset", "customStyle", "isDot", "value", "show"])
+        ],
+        2
+        /* CLASS */
+      ),
+      renderSlot(_ctx.$slots, "text", {}, () => [
+        createElementVNode(
+          "text",
+          {
+            class: "up-tabbar-item__text",
+            style: normalizeStyle({
+              color: $data.isActive ? $data.parentData["activeColor"] : $data.parentData["inactiveColor"]
+            })
+          },
+          toDisplayString(_ctx.text),
+          5
+          /* TEXT, STYLE */
+        )
+      ])
+    ],
+    6
+    /* CLASS, STYLE */
+  );
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-tabbar-item/up-tabbar-item.uvue"]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-tabbar-item.js.map
+ÔrF˜µ../../../../App.ku.jsµ../up-icon/up-icon.js»../../libs/mixin/mpMixin.js¹../../libs/mixin/mixin.jsª./props.js·../up-badge/up-badge.js¼../../libs/function/index.jsÙ'../../../../plugin-vue-export-helper.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙ /Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku.jsAÃªoh-resolveÂGAÂÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon.jsAÃªoh-resolveÂGAÂÙÄ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/mixin/mpMixin.jsAÃªoh-resolveÂGAÂÙÂ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/mixin/mixin.jsAÃªoh-resolveÂGAÂÙÑ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-tabbar-item/props.jsAÃªoh-resolveÂGAÂÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-badge/up-badge.jsAÃªoh-resolveÂGAÂÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsAÃªoh-resolveÂGAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ*VÍ*tÀ‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍ*aÍ*qÔrL”¤type¥start£end¤nameªIdentifierÍ*aÍ*l«__easycom_1LªIdentifierÍ*pÍ*q¡_À˜ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration 9‘ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	
+¡_LªIdentifier«__easycom_0ÔrO•¤type¥start£end¥value£raw§Literal!8µ../up-icon/up-icon.js·"../up-icon/up-icon.js"M±ImportDeclarationÍ0Íl‘N¯ImportSpecifierÍ9ÍLLªIdentifierÍ9Í:¡rLªIdentifierÍ>ÍL®resolveEasycomO§LiteralÍTÍkµ../../../../App.ku.js·"../../../../App.ku.js"M±ImportDeclarationÍmÍª‘N¯ImportSpecifierÍvÍˆLªIdentifierÍvÍw¡_LªIdentifierÍ{Íˆ­__easycom_1$1O§LiteralÍÍ©·../up-badge/up-badge.js¹"../up-badge/up-badge.js"M±ImportDeclarationÍ«Íİ‘N¯ImportSpecifierÍ´ÍÈLªIdentifierÍ´Íµ¡pLªIdentifierÍ¹ÍÈ¯propsTabbarItemO§LiteralÍĞÍÜª./props.js¬"./props.js"M±ImportDeclarationÍŞÍ‘N¯ImportSpecifierÍçÍóLªIdentifierÍçÍè¡mLªIdentifierÍìÍó§mpMixinO§LiteralÍûÍ»../../libs/mixin/mpMixin.js½"../../libs/mixin/mpMixin.js"M±ImportDeclarationÍÍQ‘N¯ImportSpecifierÍ#Í-LªIdentifierÍ#Í$¡mLªIdentifierÍ(Í-¥mixinO§LiteralÍ5ÍP¹../../libs/mixin/mixin.js»"../../libs/mixin/mixin.js"M±ImportDeclarationÍRÍ›’N¯ImportSpecifierÍ[ÍhLªIdentifierÍ[Í\¡bLªIdentifierÍ`Íh¨addStyleN¯ImportSpecifierÍjÍtLªIdentifierÍjÍk¡fLªIdentifierÍoÍt¥errorO§LiteralÍ|Íš¼../../libs/function/index.js¾"../../libs/function/index.js"M±ImportDeclarationÍœÍç‘N¯ImportSpecifierÍ¥ÍµLªIdentifierÍ¥Í¦¡_LªIdentifierÍªÍµ«_export_sfcO§LiteralÍ½ÍæÙ'../../../../plugin-vue-export-helper.jsÙ)"../../../../plugin-vue-export-helper.js"
