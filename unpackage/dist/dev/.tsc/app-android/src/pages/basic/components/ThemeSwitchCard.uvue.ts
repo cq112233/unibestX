@@ -12,6 +12,10 @@ const _cache = __ins.renderCache;
 
 const appStore = useAppStore()
 
+const currentTheme = computed((): string => {
+  return appStore.state.theme
+})
+
 const colorOptions = [
   '#37c2bc',
   '#0957DE',
@@ -40,7 +44,7 @@ return (): any | null => {
         _cE("text", _uM({ class: "text-12px text-__94a3b8_ mb-8px" }), _tD(_ctx.$t('basic.themePreview')), 1 /* TEXT */),
         _cE("view", _uM({
           class: "mt-10px mx-auto w-200px h-44px rounded-8px flex flex-row items-center justify-center",
-          style: _nS(_uM({ backgroundColor: unref(appStore).state.theme }))
+          style: _nS(_uM({ backgroundColor: unref(currentTheme) }))
         }), [
           _cE("text", _uM({ class: "text-__ffffff_ text-14px" }), _tD(_ctx.$t('basic.themeButton')), 1 /* TEXT */)
         ], 4 /* STYLE */)
@@ -52,13 +56,13 @@ return (): any | null => {
             class: "w-40px h-40px rounded-20px items-center justify-center",
             style: _nS(_uM({
           backgroundColor: item,
-          borderWidth: unref(appStore).state.theme === item ? '3px' : '0px',
+          borderWidth: unref(currentTheme) == item ? '3px' : '0px',
           borderStyle: 'solid',
           borderColor: '#1e293b'
         })),
             onClick: () => {changeTheme(item)}
           }), [
-            unref(appStore).state.theme === item
+            unref(currentTheme) == item
               ? _cE("text", _uM({
                   key: 0,
                   class: "text-16px text-white font-bold"

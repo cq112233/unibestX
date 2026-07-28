@@ -6,7 +6,7 @@
 
       <view
         class="mt-10px mx-auto w-200px h-44px rounded-8px flex flex-row items-center justify-center"
-        :style="{ backgroundColor: appStore.state.theme }"
+        :style="{ backgroundColor: currentTheme }"
       >
         <text class="text-[#ffffff] text-14px">{{ $t('basic.themeButton') }}</text>
       </view>
@@ -20,14 +20,14 @@
         class="w-40px h-40px rounded-20px items-center justify-center"
         :style="{
           backgroundColor: item,
-          borderWidth: appStore.state.theme === item ? '3px' : '0px',
+          borderWidth: currentTheme == item ? '3px' : '0px',
           borderStyle: 'solid',
           borderColor: '#1e293b'
         }"
         @click="changeTheme(item)"
       >
         <text
-          v-if="appStore.state.theme === item"
+          v-if="currentTheme == item"
           class="text-16px text-white font-bold"
         >✓</text>
       </view>
@@ -41,6 +41,10 @@ import { useAppStore } from '@/src/store/index.uts'
 import { t } from '@/src/utils/i18n'
 
 const appStore = useAppStore()
+
+const currentTheme = computed((): string => {
+  return appStore.state.theme
+})
 
 const colorOptions = [
   '#37c2bc',
