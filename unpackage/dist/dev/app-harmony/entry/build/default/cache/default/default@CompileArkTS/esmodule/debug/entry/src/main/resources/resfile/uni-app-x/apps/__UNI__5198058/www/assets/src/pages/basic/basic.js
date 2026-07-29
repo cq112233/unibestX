@@ -1,6 +1,7 @@
 const { defineComponent, onBackPress, onResize, openBlock, createBlock, withCtx, createVNode, createElementVNode, createCommentVNode } = globalThis.Vue
 import { A as AppKu } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { L as LayoutComponent } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/layouts/default&";
+import { P as PropsDemoCard } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/PropsDemoCard&";
 import { I as IconDemoCard } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/IconDemoCard&";
 import { L as LangSwitchCard } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/LangSwitchCard&";
 import { T as ThemeSwitchCard } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/ThemeSwitchCard&";
@@ -8,6 +9,7 @@ import { T as TimeDemoCard } from "@normalized:N&&&entry/src/main/resources/resf
 import { R as RouterDemoCard } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/RouterDemoCard&";
 import { H as HttpDemoCard } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/HttpDemoCard&";
 import { E as EchartsDemoCard } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/EchartsDemoCard&";
+import { S as SignatureCard } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/SignatureCard&";
 import { S as SystemInfoDemoCard } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/SystemInfoDemoCard&";
 import { Z as ZPagingDemoCard } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/ZPagingDemoCard&";
 import { U as UViewUltraDemoCard } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/UViewUltraDemoCard&";
@@ -79,6 +81,8 @@ import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/ja&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/ru&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/toast&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/Card&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/ChildDemoBox&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-icon/components/l-icon/l-icon&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-shared/classNames/index&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-shared/stringifyStyle/index&";
@@ -88,7 +92,6 @@ import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-shared/isString/index&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-shared/isDef/index&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-icon/index&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/Card&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/i18n&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-dayuts/common/index&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-dayuts/utssdk/interface&";
@@ -108,6 +111,9 @@ import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/http/tools/enum&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/e-chart/components/e-chart/e-chart&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/e-chart/components/e-chart/uts/util&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-signature/components/l-signature/l-signature&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-signature/components/l-signature/signature&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-signature/index&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/z-paging-x/components/z-paging-x/z-paging-x&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/z-paging-x/components/z-paging-x/components/z-paging-refresher&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/z-paging-x/components/z-paging-x/static/index&";
@@ -135,6 +141,8 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       return AppKu;
     }, get LayoutComponent() {
       return LayoutComponent;
+    }, get PropsDemoCard() {
+      return PropsDemoCard;
     }, get IconDemoCard() {
       return IconDemoCard;
     }, get LangSwitchCard() {
@@ -149,6 +157,8 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       return HttpDemoCard;
     }, get EchartsDemoCard() {
       return EchartsDemoCard;
+    }, get SignatureCard() {
+      return SignatureCard;
     }, get SystemInfoDemoCard() {
       return SystemInfoDemoCard;
     }, get ZPagingDemoCard() {
@@ -179,6 +189,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
               createElementVNode("view", { class: "flex-col" }, [
                 createCommentVNode(" uview-ultra 组件库示例 "),
                 createVNode($setup["UViewUltraDemoCard"]),
+                createCommentVNode(" 父子组件传参 & 具名插槽演示组件 "),
+                createVNode($setup["PropsDemoCard"]),
                 createCommentVNode(" 数据分页列表示例组件 (z-paging-x) "),
                 createVNode($setup["ZPagingDemoCard"]),
                 createCommentVNode(" 系统与安全区域信息组件 "),
@@ -196,7 +208,9 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                 createCommentVNode(" HTTP 请求 Demo 组件 "),
                 createVNode($setup["HttpDemoCard"]),
                 createCommentVNode(" ECharts 图表示例组件 "),
-                createVNode($setup["EchartsDemoCard"])
+                createVNode($setup["EchartsDemoCard"]),
+                createCommentVNode(" 签名板 lime-signature 示例组件 "),
+                createVNode($setup["SignatureCard"])
               ])
             ])
           ])

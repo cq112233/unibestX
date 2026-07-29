@@ -1,6 +1,7 @@
 const { defineComponent, onBackPress, onResize, openBlock, createBlock, withCtx, createVNode, createElementVNode, createCommentVNode } = globalThis.Vue
 import { A as AppKu } from "../../../App.ku.js";
 import { L as LayoutComponent } from "../../layouts/default.js";
+import { P as PropsDemoCard } from "./components/PropsDemoCard.js";
 import { I as IconDemoCard } from "./components/IconDemoCard.js";
 import { L as LangSwitchCard } from "./components/LangSwitchCard.js";
 import { T as ThemeSwitchCard } from "./components/ThemeSwitchCard.js";
@@ -8,6 +9,7 @@ import { T as TimeDemoCard } from "./components/TimeDemoCard.js";
 import { R as RouterDemoCard } from "./components/RouterDemoCard.js";
 import { H as HttpDemoCard } from "./components/HttpDemoCard.js";
 import { E as EchartsDemoCard } from "./components/EchartsDemoCard.js";
+import { S as SignatureCard } from "./components/SignatureCard.js";
 import { S as SystemInfoDemoCard } from "./components/SystemInfoDemoCard.js";
 import { Z as ZPagingDemoCard } from "./components/ZPagingDemoCard.js";
 import { U as UViewUltraDemoCard } from "./components/UViewUltraDemoCard.js";
@@ -79,6 +81,8 @@ import "../../../uni_modules/uview-ultra/libs/i18n/locales/ko.js";
 import "../../../uni_modules/uview-ultra/libs/i18n/locales/ja.js";
 import "../../../uni_modules/uview-ultra/libs/i18n/locales/ru.js";
 import "../../utils/toast.js";
+import "./components/Card.js";
+import "./components/ChildDemoBox.js";
 import "../../../uni_modules/lime-icon/components/l-icon/l-icon.js";
 import "../../../uni_modules/lime-shared/classNames/index.js";
 import "../../../uni_modules/lime-shared/stringifyStyle/index.js";
@@ -88,7 +92,6 @@ import "../../../uni_modules/lime-shared/isNumber/index.js";
 import "../../../uni_modules/lime-shared/isString/index.js";
 import "../../../uni_modules/lime-shared/isDef/index.js";
 import "../../../uni_modules/lime-icon/index.js";
-import "./components/Card.js";
 import "../../utils/i18n.js";
 import "../../../uni_modules/lime-dayuts/common/index.js";
 import "../../../uni_modules/lime-dayuts/utssdk/interface.js";
@@ -108,6 +111,9 @@ import "../../utils/toLoginPage.js";
 import "../../http/tools/enum.js";
 import "../../../uni_modules/e-chart/components/e-chart/e-chart.js";
 import "../../../uni_modules/e-chart/components/e-chart/uts/util.js";
+import "../../../uni_modules/lime-signature/components/l-signature/l-signature.js";
+import "../../../uni_modules/lime-signature/components/l-signature/signature.js";
+import "../../../uni_modules/lime-signature/index.js";
 import "../../../uni_modules/z-paging-x/components/z-paging-x/z-paging-x.js";
 import "../../../uni_modules/z-paging-x/components/z-paging-x/components/z-paging-refresher.js";
 import "../../../uni_modules/z-paging-x/components/z-paging-x/static/index.js";
@@ -135,6 +141,8 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       return AppKu;
     }, get LayoutComponent() {
       return LayoutComponent;
+    }, get PropsDemoCard() {
+      return PropsDemoCard;
     }, get IconDemoCard() {
       return IconDemoCard;
     }, get LangSwitchCard() {
@@ -149,6 +157,8 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       return HttpDemoCard;
     }, get EchartsDemoCard() {
       return EchartsDemoCard;
+    }, get SignatureCard() {
+      return SignatureCard;
     }, get SystemInfoDemoCard() {
       return SystemInfoDemoCard;
     }, get ZPagingDemoCard() {
@@ -179,6 +189,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
               createElementVNode("view", { class: "flex-col" }, [
                 createCommentVNode(" uview-ultra 组件库示例 "),
                 createVNode($setup["UViewUltraDemoCard"]),
+                createCommentVNode(" 父子组件传参 & 具名插槽演示组件 "),
+                createVNode($setup["PropsDemoCard"]),
                 createCommentVNode(" 数据分页列表示例组件 (z-paging-x) "),
                 createVNode($setup["ZPagingDemoCard"]),
                 createCommentVNode(" 系统与安全区域信息组件 "),
@@ -196,7 +208,9 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                 createCommentVNode(" HTTP 请求 Demo 组件 "),
                 createVNode($setup["HttpDemoCard"]),
                 createCommentVNode(" ECharts 图表示例组件 "),
-                createVNode($setup["EchartsDemoCard"])
+                createVNode($setup["EchartsDemoCard"]),
+                createCommentVNode(" 签名板 lime-signature 示例组件 "),
+                createVNode($setup["SignatureCard"])
               ])
             ])
           ])

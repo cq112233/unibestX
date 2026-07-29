@@ -1,4 +1,4 @@
-const { defineComponent, computed, ref, openBlock, createBlock, withCtx, createCommentVNode, createElementVNode, toDisplayString, normalizeStyle, createElementBlock, Fragment, renderList } = globalThis.Vue
+const { defineComponent, computed, ref, openBlock, createBlock, withCtx, createCommentVNode, createElementVNode, toDisplayString, normalizeStyle } = globalThis.Vue
 import { C as Card } from "../../basic/components/Card.js";
 import { g as getCurrentEnv, a as getEnvLabel, b as getEnvConfigFor, c as getSystemEnv, s as setCurrentEnv, r as resetEnv } from "../../../utils/env.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
@@ -36,35 +36,29 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     const envConfig = computed(() => {
       return getEnvConfigFor(currentEnv.value);
     });
-    const envTypeItems = computed(() => {
-      const types = ["development", "test", "production"];
-      const result = [];
-      for (let i = 0; i < types.length; i++) {
-        const type = types[i];
-        const isActive = currentEnv.value === type;
-        let bgColor = COLOR_BG;
-        if (isActive) {
-          if (type === "development") {
-            bgColor = COLOR_DEV;
-          } else if (type === "test") {
-            bgColor = COLOR_TEST;
-          } else {
-            bgColor = COLOR_PROD;
-          }
-        }
-        const item = new UTSJSONObject();
-        item["type"] = type;
-        item["label"] = getEnvLabel(type);
-        item["bgColor"] = bgColor;
-        item["textColor"] = isActive ? COLOR_WHITE : COLOR_DARK;
-        result.push(item);
-      }
-      return result;
+    const devBtnBg = computed(() => {
+      return currentEnv.value === "development" ? COLOR_DEV : COLOR_BG;
+    });
+    const devBtnText = computed(() => {
+      return currentEnv.value === "development" ? COLOR_WHITE : COLOR_DARK;
+    });
+    const testBtnBg = computed(() => {
+      return currentEnv.value === "test" ? COLOR_TEST : COLOR_BG;
+    });
+    const testBtnText = computed(() => {
+      return currentEnv.value === "test" ? COLOR_WHITE : COLOR_DARK;
+    });
+    const prodBtnBg = computed(() => {
+      return currentEnv.value === "production" ? COLOR_PROD : COLOR_BG;
+    });
+    const prodBtnText = computed(() => {
+      return currentEnv.value === "production" ? COLOR_WHITE : COLOR_DARK;
     });
     function switchEnv(type) {
-      setCurrentEnv(type);
-      currentEnv.value = type;
-      const label = getEnvLabel(type);
+      const env = type;
+      setCurrentEnv(env);
+      currentEnv.value = env;
+      const label = getEnvLabel(env);
       uni.showToast({
         title: `已切换至${label}环境`,
         icon: "none",
@@ -80,7 +74,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         duration: 1500
       });
     }
-    const __returned__ = { COLOR_DEV, COLOR_TEST, COLOR_PROD, COLOR_BG, COLOR_WHITE, COLOR_DARK, systemEnv, systemEnvLabel, currentEnv, isOverridden, currentEnvLabel, envColor, envConfig, envTypeItems, switchEnv, handleReset, get Card() {
+    const __returned__ = { COLOR_DEV, COLOR_TEST, COLOR_PROD, COLOR_BG, COLOR_WHITE, COLOR_DARK, systemEnv, systemEnvLabel, currentEnv, isOverridden, currentEnvLabel, envColor, envConfig, devBtnBg, devBtnText, testBtnBg, testBtnText, prodBtnBg, prodBtnText, switchEnv, handleReset, get Card() {
       return Card;
     } };
     Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
@@ -141,31 +135,75 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       createElementVNode("view", { class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
         createElementVNode("text", { class: "text-12px text-__94a3b8_ mb-12px" }, "切换环境（仅当前运行生效）"),
         createElementVNode("view", { class: "flex-row mt-12px" }, [
-          (openBlock(true), createElementBlock(
-            Fragment,
-            null,
-            renderList($setup.envTypeItems, (item, _index) => {
-              return openBlock(), createElementBlock("view", {
-                key: item.type,
-                class: "flex-1 h-38px rounded-8px flex flex-row items-center justify-center ml-5px mr-5px",
-                style: normalizeStyle({ backgroundColor: item.bgColor }),
-                onClick: ($event) => $setup.switchEnv(item.type)
-              }, [
-                createElementVNode(
-                  "text",
-                  {
-                    class: "text-14px font-bold",
-                    style: normalizeStyle({ color: item.textColor })
-                  },
-                  toDisplayString(item.label),
-                  5
-                  /* TEXT, STYLE */
-                )
-              ], 12, ["onClick"]);
-            }),
-            128
-            /* KEYED_FRAGMENT */
-          ))
+          createCommentVNode(" 开发 "),
+          createElementVNode(
+            "view",
+            {
+              class: "flex-1 h-38px rounded-8px flex flex-row items-center justify-center ml-5px mr-5px",
+              style: normalizeStyle({ backgroundColor: $setup.devBtnBg }),
+              onClick: _cache[0] || (_cache[0] = ($event) => $setup.switchEnv("development"))
+            },
+            [
+              createElementVNode(
+                "text",
+                {
+                  class: "text-14px font-bold",
+                  style: normalizeStyle({ color: $setup.devBtnText })
+                },
+                "开发",
+                4
+                /* STYLE */
+              )
+            ],
+            4
+            /* STYLE */
+          ),
+          createCommentVNode(" 测试 "),
+          createElementVNode(
+            "view",
+            {
+              class: "flex-1 h-38px rounded-8px flex flex-row items-center justify-center ml-5px mr-5px",
+              style: normalizeStyle({ backgroundColor: $setup.testBtnBg }),
+              onClick: _cache[1] || (_cache[1] = ($event) => $setup.switchEnv("test"))
+            },
+            [
+              createElementVNode(
+                "text",
+                {
+                  class: "text-14px font-bold",
+                  style: normalizeStyle({ color: $setup.testBtnText })
+                },
+                "测试",
+                4
+                /* STYLE */
+              )
+            ],
+            4
+            /* STYLE */
+          ),
+          createCommentVNode(" 生产 "),
+          createElementVNode(
+            "view",
+            {
+              class: "flex-1 h-38px rounded-8px flex flex-row items-center justify-center ml-5px mr-5px",
+              style: normalizeStyle({ backgroundColor: $setup.prodBtnBg }),
+              onClick: _cache[2] || (_cache[2] = ($event) => $setup.switchEnv("production"))
+            },
+            [
+              createElementVNode(
+                "text",
+                {
+                  class: "text-14px font-bold",
+                  style: normalizeStyle({ color: $setup.prodBtnText })
+                },
+                "生产",
+                4
+                /* STYLE */
+              )
+            ],
+            4
+            /* STYLE */
+          )
         ])
       ]),
       createCommentVNode(" 重置按钮 "),
