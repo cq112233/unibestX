@@ -15,14 +15,14 @@
     <!-- 操作按钮 -->
     <view class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
       <text class="text-12px text-[#94a3b8] mb-12px">画板操作</text>
-      <view class="flex-row gap-10px mb-12px">
-        <view class="flex-1 h-36px rounded-8px bg-[#10b981] flex flex-row items-center justify-center" @click="onAction('save')">
+      <view class="flex-row mb-12px justify-between">
+        <view class="flex-1 h-36px rounded-8px bg-[#10b981] flex flex-row items-center justify-center mr-6px" @click="onAction('save')">
           <text class="text-[#ffffff] text-13px font-bold">保存图片</text>
         </view>
-        <view class="flex-1 h-36px rounded-8px bg-[#f59e0b] flex flex-row items-center justify-center" @click="onAction('undo')">
+        <view class="flex-1 h-36px rounded-8px bg-[#f59e0b] flex flex-row items-center justify-center mr-6px" @click="onAction('undo')">
           <text class="text-[#ffffff] text-13px font-bold">撤销</text>
         </view>
-        <view class="flex-1 h-36px rounded-8px bg-[#3b82f6] flex flex-row items-center justify-center" @click="onAction('redo')">
+        <view class="flex-1 h-36px rounded-8px bg-[#3b82f6] flex flex-row items-center justify-center mr-6px" @click="onAction('redo')">
           <text class="text-[#ffffff] text-13px font-bold">重做</text>
         </view>
         <view class="flex-1 h-36px rounded-8px bg-[#ef4444] flex flex-row items-center justify-center" @click="onAction('clear')">
@@ -39,7 +39,7 @@
         <text class="text-13px text-[#475569]">画笔颜色</text>
         <view class="flex-row">
           <view
-            v-for="(clr, _i) in colorList"
+            v-for="clr in colorList"
             :key="clr"
             class="w-28px h-28px rounded-14px ml-6px border-width-2px border-style-solid items-center justify-center"
             :style="{
@@ -56,11 +56,12 @@
         <text class="text-13px text-[#475569]">画笔粗细</text>
         <text class="text-12px text-[#94a3b8]">{{ penSize }}px</text>
       </view>
-      <view class="flex-row gap-6px mb-12px">
+      <view class="flex-row mb-12px">
         <view
           v-for="(sz, _j) in penSizeOptions"
           :key="sz"
           class="flex-1 h-32px rounded-6px flex flex-row items-center justify-center"
+          :class="_j < penSizeOptions.length - 1 ? 'mr-6px' : ''"
           :style="{ backgroundColor: penSize === sz ? '#3b82f6' : '#e2e8f0' }"
           @click="penSize = sz"
         >
