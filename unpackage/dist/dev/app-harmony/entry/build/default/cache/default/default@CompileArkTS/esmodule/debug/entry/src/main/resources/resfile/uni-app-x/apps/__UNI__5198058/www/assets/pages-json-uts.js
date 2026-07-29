@@ -1,6 +1,4 @@
 const SrcPagesIndexIndex = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/index/index&");
-const SrcPagesAA = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/a/a&");
-const SrcPagesAB = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/a/b&");
 const SrcPagesAiAi = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/ai/ai&");
 const SrcPagesBasicBasic = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/basic&");
 const SrcPagesFunctionFunction = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/function/function&");
@@ -84,8 +82,6 @@ const SrcSubUviewUltraDemosParseParse = () => import("@normalized:N&&&entry/src/
 const SrcSubUviewUltraDemosBackTopBackTop = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/sub/uview-ultra/demos/back-top/back-top&");
 const SrcSubUviewUltraDemosMpHtmlMpHtml = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/sub/uview-ultra/demos/mp-html/mp-html&");
 __definePage("src/pages/index/index", SrcPagesIndexIndex);
-__definePage("src/pages/a/a", SrcPagesAA);
-__definePage("src/pages/a/b", SrcPagesAB);
 __definePage("src/pages/ai/ai", SrcPagesAiAi);
 __definePage("src/pages/basic/basic", SrcPagesBasicBasic);
 __definePage("src/pages/function/function", SrcPagesFunctionFunction);
