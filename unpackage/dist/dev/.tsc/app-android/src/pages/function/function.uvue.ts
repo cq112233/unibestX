@@ -6,7 +6,6 @@ import HapticsCard from './components/HapticsCard.uvue'
 import MediaCard from './components/MediaCard.uvue'
 import { handleBackPressExit } from '@/src/utils/backPress'
 
-
 const __sfc__ = defineComponent({
   __name: 'function',
   setup(__props) {

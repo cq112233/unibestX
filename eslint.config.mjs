@@ -17,6 +17,8 @@ const composer = uniHelper({
     // 插件生成的文件
     'src/pages.json',
     'src/manifest.json',
+    // pages.json 字段顺序由 vite-plugin-uni-pages 控制，不要排序
+    'pages.json',
     // 忽略自动生成文件
     'src/service/**',
   ],

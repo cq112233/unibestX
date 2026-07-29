@@ -99,9 +99,9 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       return UTS.JSON.stringify(info, null, 2);
     });
     onShow(() => {
-      uni.__f__("log", "at src/pages/me/me.uvue:82", "All storage keys:", uni.getStorageInfoSync().keys);
-      uni.__f__("log", "at src/pages/me/me.uvue:83", "pinia:token:", uni.getStorageSync("pinia:token"));
-      uni.__f__("log", "at src/pages/me/me.uvue:84", "pinia:user:", uni.getStorageSync("pinia:user"));
+      uni.__f__("log", "at src/pages/me/me.uvue:88", "All storage keys:", uni.getStorageInfoSync().keys);
+      uni.__f__("log", "at src/pages/me/me.uvue:89", "pinia:token:", uni.getStorageSync("pinia:token"));
+      uni.__f__("log", "at src/pages/me/me.uvue:90", "pinia:user:", uni.getStorageSync("pinia:user"));
     });
     function handleLogin() {
       uni.navigateTo({

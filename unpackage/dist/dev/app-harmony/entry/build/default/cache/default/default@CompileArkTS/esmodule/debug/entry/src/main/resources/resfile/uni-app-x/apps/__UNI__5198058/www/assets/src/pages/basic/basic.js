@@ -8,6 +8,7 @@ import { T as TimeDemoCard } from "@normalized:N&&&entry/src/main/resources/resf
 import { R as RouterDemoCard } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/RouterDemoCard&";
 import { H as HttpDemoCard } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/HttpDemoCard&";
 import { E as EchartsDemoCard } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/EchartsDemoCard&";
+import { S as SignatureCard } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/SignatureCard&";
 import { S as SystemInfoDemoCard } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/SystemInfoDemoCard&";
 import { Z as ZPagingDemoCard } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/ZPagingDemoCard&";
 import { U as UViewUltraDemoCard } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/UViewUltraDemoCard&";
@@ -108,6 +109,9 @@ import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/http/tools/enum&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/e-chart/components/e-chart/e-chart&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/e-chart/components/e-chart/uts/util&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-signature/components/l-signature/l-signature&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-signature/components/l-signature/signature&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-signature/index&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/z-paging-x/components/z-paging-x/z-paging-x&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/z-paging-x/components/z-paging-x/components/z-paging-refresher&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/z-paging-x/components/z-paging-x/static/index&";
@@ -149,6 +153,8 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       return HttpDemoCard;
     }, get EchartsDemoCard() {
       return EchartsDemoCard;
+    }, get SignatureCard() {
+      return SignatureCard;
     }, get SystemInfoDemoCard() {
       return SystemInfoDemoCard;
     }, get ZPagingDemoCard() {
@@ -196,7 +202,9 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                 createCommentVNode(" HTTP 请求 Demo 组件 "),
                 createVNode($setup["HttpDemoCard"]),
                 createCommentVNode(" ECharts 图表示例组件 "),
-                createVNode($setup["EchartsDemoCard"])
+                createVNode($setup["EchartsDemoCard"]),
+                createCommentVNode(" 签名板 lime-signature 示例组件 "),
+                createVNode($setup["SignatureCard"])
               ])
             ])
           ])

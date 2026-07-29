@@ -57,6 +57,14 @@
 <script setup lang="uts">
 import { handleBackPressExit } from '../../utils/backPress.uts'
 
+definePage({
+  type: 'home',
+  style: {
+    navigationStyle: 'custom',
+    navigationBarTitleText: '首页',
+  },
+})
+
 onBackPress((options: OnBackPressOptions): boolean => {
   // #ifdef APP
   if (options.from == 'backbutton') {

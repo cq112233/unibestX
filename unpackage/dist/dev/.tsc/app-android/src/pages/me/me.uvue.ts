@@ -5,7 +5,6 @@ import { LOGIN_PAGE } from '../../router/config'
 import { handleBackPressExit } from '@/src/utils/backPress'
 import { setCurIdxByPath } from '@/src/tabbar/store'
 
-
 const __sfc__ = defineComponent({
   __name: 'me',
   setup(__props) {
@@ -35,7 +34,7 @@ const avatarUrl = computed((): string => {
 
 // 序列化用户信息为 JSON
 const userInfoJson = computed((): string => {
-  const info = {__$originalPosition: new UTSSourceMapPosition("info", "src/pages/me/me.uvue", 142, 9),
+  const info = {__$originalPosition: new UTSSourceMapPosition("info", "src/pages/me/me.uvue", 141, 9),
     userId: userStore.state.userInfo.userId,
     username: userStore.state.userInfo.username,
     nickname: userStore.state.userInfo.nickname,
@@ -45,9 +44,9 @@ const userInfoJson = computed((): string => {
 })
 
 onShow(() => {
-  console.log('All storage keys:', uni.getStorageInfoSync().keys, " at src/pages/me/me.uvue:152")
-  console.log('pinia:token:', uni.getStorageSync('pinia:token'), " at src/pages/me/me.uvue:153")
-  console.log('pinia:user:', uni.getStorageSync('pinia:user'), " at src/pages/me/me.uvue:154")
+  console.log('All storage keys:', uni.getStorageInfoSync().keys, " at src/pages/me/me.uvue:151")
+  console.log('pinia:token:', uni.getStorageSync('pinia:token'), " at src/pages/me/me.uvue:152")
+  console.log('pinia:user:', uni.getStorageSync('pinia:user'), " at src/pages/me/me.uvue:153")
 })
 
 // 登录

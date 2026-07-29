@@ -4,7 +4,8 @@ function GenSrcLayoutsDefaultRender(this: InstanceType<typeof __sfc__>): any | n
 const _ctx = this
 const _cache = this.$.renderCache
   return _cE("view", null, [
-    renderSlot(_ctx.$slots, "default")
+    renderSlot(_ctx.$slots, "default"),
+    " 111222 "
   ])
 }
 const GenSrcLayoutsDefaultStyles = []

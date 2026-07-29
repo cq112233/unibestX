@@ -1,8 +1,8 @@
 const SrcPagesIndexIndex = () => import("./src/pages/index/index.js");
-const SrcPagesMeMe = () => import("./src/pages/me/me.js");
+const SrcPagesAiAi = () => import("./src/pages/ai/ai.js");
 const SrcPagesBasicBasic = () => import("./src/pages/basic/basic.js");
 const SrcPagesFunctionFunction = () => import("./src/pages/function/function.js");
-const SrcPagesAiAi = () => import("./src/pages/ai/ai.js");
+const SrcPagesMeMe = () => import("./src/pages/me/me.js");
 const SrcSubAuthLogin = () => import("./src/sub/auth/login.js");
 const SrcSubAuthRegister = () => import("./src/sub/auth/register.js");
 const SrcSubTestTest = () => import("./src/sub/test/test.js");
@@ -82,10 +82,10 @@ const SrcSubUviewUltraDemosParseParse = () => import("./src/sub/uview-ultra/demo
 const SrcSubUviewUltraDemosBackTopBackTop = () => import("./src/sub/uview-ultra/demos/back-top/back-top.js");
 const SrcSubUviewUltraDemosMpHtmlMpHtml = () => import("./src/sub/uview-ultra/demos/mp-html/mp-html.js");
 __definePage("src/pages/index/index", SrcPagesIndexIndex);
-__definePage("src/pages/me/me", SrcPagesMeMe);
+__definePage("src/pages/ai/ai", SrcPagesAiAi);
 __definePage("src/pages/basic/basic", SrcPagesBasicBasic);
 __definePage("src/pages/function/function", SrcPagesFunctionFunction);
-__definePage("src/pages/ai/ai", SrcPagesAiAi);
+__definePage("src/pages/me/me", SrcPagesMeMe);
 __definePage("src/sub/auth/login", SrcSubAuthLogin);
 __definePage("src/sub/auth/register", SrcSubAuthRegister);
 __definePage("src/sub/test/test", SrcSubTestTest);

@@ -1,8 +1,10 @@
 const SrcPagesIndexIndex = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/index/index&");
-const SrcPagesMeMe = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/me/me&");
+const SrcPagesAA = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/a/a&");
+const SrcPagesAB = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/a/b&");
+const SrcPagesAiAi = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/ai/ai&");
 const SrcPagesBasicBasic = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/basic&");
 const SrcPagesFunctionFunction = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/function/function&");
-const SrcPagesAiAi = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/ai/ai&");
+const SrcPagesMeMe = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/me/me&");
 const SrcSubAuthLogin = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/sub/auth/login&");
 const SrcSubAuthRegister = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/sub/auth/register&");
 const SrcSubTestTest = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/sub/test/test&");
@@ -82,10 +84,12 @@ const SrcSubUviewUltraDemosParseParse = () => import("@normalized:N&&&entry/src/
 const SrcSubUviewUltraDemosBackTopBackTop = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/sub/uview-ultra/demos/back-top/back-top&");
 const SrcSubUviewUltraDemosMpHtmlMpHtml = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/sub/uview-ultra/demos/mp-html/mp-html&");
 __definePage("src/pages/index/index", SrcPagesIndexIndex);
-__definePage("src/pages/me/me", SrcPagesMeMe);
+__definePage("src/pages/a/a", SrcPagesAA);
+__definePage("src/pages/a/b", SrcPagesAB);
+__definePage("src/pages/ai/ai", SrcPagesAiAi);
 __definePage("src/pages/basic/basic", SrcPagesBasicBasic);
 __definePage("src/pages/function/function", SrcPagesFunctionFunction);
-__definePage("src/pages/ai/ai", SrcPagesAiAi);
+__definePage("src/pages/me/me", SrcPagesMeMe);
 __definePage("src/sub/auth/login", SrcSubAuthLogin);
 __definePage("src/sub/auth/register", SrcSubAuthRegister);
 __definePage("src/sub/test/test", SrcSubTestTest);

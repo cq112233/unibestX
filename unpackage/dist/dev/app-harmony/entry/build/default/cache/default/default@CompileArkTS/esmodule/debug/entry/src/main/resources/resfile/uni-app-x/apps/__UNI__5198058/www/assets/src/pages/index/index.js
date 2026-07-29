@@ -112,6 +112,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return openBlock(), createBlock($setup["AppKu"], null, {
     default: withCtx(() => [
       createVNode($setup["LayoutComponent"], {
+        type: "home",
         "navigation-style": "custom",
         "navigation-bar-title-text": "首页"
       }, {

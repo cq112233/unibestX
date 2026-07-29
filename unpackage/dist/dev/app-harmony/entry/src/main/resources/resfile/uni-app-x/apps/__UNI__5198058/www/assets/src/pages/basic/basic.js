@@ -8,6 +8,7 @@ import { T as TimeDemoCard } from "./components/TimeDemoCard.js";
 import { R as RouterDemoCard } from "./components/RouterDemoCard.js";
 import { H as HttpDemoCard } from "./components/HttpDemoCard.js";
 import { E as EchartsDemoCard } from "./components/EchartsDemoCard.js";
+import { S as SignatureCard } from "./components/SignatureCard.js";
 import { S as SystemInfoDemoCard } from "./components/SystemInfoDemoCard.js";
 import { Z as ZPagingDemoCard } from "./components/ZPagingDemoCard.js";
 import { U as UViewUltraDemoCard } from "./components/UViewUltraDemoCard.js";
@@ -108,6 +109,9 @@ import "../../utils/toLoginPage.js";
 import "../../http/tools/enum.js";
 import "../../../uni_modules/e-chart/components/e-chart/e-chart.js";
 import "../../../uni_modules/e-chart/components/e-chart/uts/util.js";
+import "../../../uni_modules/lime-signature/components/l-signature/l-signature.js";
+import "../../../uni_modules/lime-signature/components/l-signature/signature.js";
+import "../../../uni_modules/lime-signature/index.js";
 import "../../../uni_modules/z-paging-x/components/z-paging-x/z-paging-x.js";
 import "../../../uni_modules/z-paging-x/components/z-paging-x/components/z-paging-refresher.js";
 import "../../../uni_modules/z-paging-x/components/z-paging-x/static/index.js";
@@ -149,6 +153,8 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       return HttpDemoCard;
     }, get EchartsDemoCard() {
       return EchartsDemoCard;
+    }, get SignatureCard() {
+      return SignatureCard;
     }, get SystemInfoDemoCard() {
       return SystemInfoDemoCard;
     }, get ZPagingDemoCard() {
@@ -196,7 +202,9 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
                 createCommentVNode(" HTTP 请求 Demo 组件 "),
                 createVNode($setup["HttpDemoCard"]),
                 createCommentVNode(" ECharts 图表示例组件 "),
-                createVNode($setup["EchartsDemoCard"])
+                createVNode($setup["EchartsDemoCard"]),
+                createCommentVNode(" 签名板 lime-signature 示例组件 "),
+                createVNode($setup["SignatureCard"])
               ])
             ])
           ])

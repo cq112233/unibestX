@@ -1,4 +1,3 @@
-import _easycom_NavBar from '@/src/components/NavBar/NavBar.uvue';
 import AppKu from '@/App.ku.uvue';
 import LayoutComponent from '@/src/layouts/default.uvue';
 import { handleBackPressExit } from '../../utils/backPress.uts';
@@ -30,7 +29,6 @@ const __sfc__ = defineComponent({
             });
         }
         return (): any | null => {
-            const _component_NavBar = resolveEasyComponent("NavBar", _easycom_NavBar);
             return _cV(unref(AppKu), null, _uM({
                 default: withSlotCtx((): any[] => [
                     _cV(unref(LayoutComponent), _uM({
@@ -39,10 +37,6 @@ const __sfc__ = defineComponent({
                     }), _uM({
                         default: withSlotCtx((): any[] => [
                             _cE("view", null, [
-                                _cV(_component_NavBar, _uM({
-                                    title: "首页",
-                                    "show-back": false
-                                })),
                                 _cE("view", _uM({ class: "content-container pb-20px" }), [
                                     _cE("image", _uM({
                                         class: "w-100px h-100px mx-auto mt-20px rounded-20px",

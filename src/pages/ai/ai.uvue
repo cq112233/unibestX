@@ -77,6 +77,13 @@
 import NavBar from '@/src/components/NavBar/NavBar.uvue'
 import { safeAreaInsets } from '@/src/utils/systemInfo'
 
+definePage({
+  style: {
+    navigationStyle: 'custom',
+    navigationBarTitleText: 'AI助手',
+  },
+})
+
 type ChatMessage = {
   id: string
   sender: string

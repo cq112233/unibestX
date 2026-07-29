@@ -5,8 +5,7 @@ import LayoutComponent from '@/src/layouts/default.uvue'
 /* eslint-disable ts/consistent-type-definitions */
 import NavBar from '@/src/components/NavBar/NavBar.uvue'
 import { safeAreaInsets } from '@/src/utils/systemInfo'
-
-type ChatMessage = { __$originalPosition?: UTSSourceMapPosition<"ChatMessage", "src/pages/ai/ai.uvue", 138, 6>;
+type ChatMessage = { __$originalPosition?: UTSSourceMapPosition<"ChatMessage", "src/pages/ai/ai.uvue", 137, 6>;
   id: string
   sender: string
   content: string

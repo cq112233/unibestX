@@ -14,7 +14,6 @@ import UViewUltraDemoCard from './components/UViewUltraDemoCard.uvue'
 import { updateSystemInfo } from '@/src/utils/systemInfo'
 import { handleBackPressExit } from '@/src/utils/backPress'
 
-
 const __sfc__ = defineComponent({
   __name: 'basic',
   setup(__props) {
@@ -40,6 +39,7 @@ return (): any | null => {
   return _cV(unref(AppKu), null, _uM({
     default: withSlotCtx((): any[] => [
       _cV(unref(LayoutComponent), _uM({
+        type: 'home',
         "navigation-bar-title-text": '基础',
         "disable-scroll": true
       }), _uM({
