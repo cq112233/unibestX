@@ -1,0 +1,539 @@
+<template>
+	<view class="l-signature" ref="signatureRef" :style="[drawableStyle]">
+		<!-- #ifdef APP-ANDROID || APP-IOS -->
+		<view class="l-signature-landscape" ref="signatureLandscapeRef" v-if="landscape"
+			:style="[landscapeStyle]">
+			<image class="l-signature-image" :style="[landscapeImageStyle]" :src="url"></image>
+		</view>
+		<!-- #endif -->
+		<!-- #ifdef APP-HARMONY -->
+		<canvas ref="signatureCanvasRef"  class="l-signature__canvas"></canvas>
+		<!-- #endif -->
+		<!-- #ifndef APP -->
+		<canvas id="l-signature" class="l-signature__canvas" @touchstart="touchstart" @touchmove.stop="touchmove"
+			@touchend="touchend">
+		</canvas>
+		<!-- #endif -->
+	</view>
+</template>
+<script lang="uts" setup>
+	// @ts-nocheck
+	/**
+	 * Signature 电子签名板组件
+	 * @description 用于实现手写签名功能，支持多种画笔设置和手势控制
+	 * <br>插件类型：LSignatureComponentPublicInstance 
+	 * @tutorial https://ext.dcloud.net.cn/plugin?name=lime-signature
+	 * 
+	 * @property {string} styles 画布容器样式
+	 * @property {string} penColor 画笔颜色
+	 * @property {number} penSize 画笔基础粗细
+	 * @property {string} backgroundColor 画布背景色
+	 * @property {boolean} openSmooth 启用笔迹平滑
+	 * @property {number} minLineWidth 最小笔触宽度
+	 * @property {number} maxLineWidth 最大笔触宽度
+	 * @property {number} minSpeed 最小绘制速度（像素/秒）
+	 * @property {number} maxWidthDiffRate 宽度变化率限制
+	 * @property {number} maxHistoryLength 撤销历史记录数
+	 * @property {boolean} disableScroll 禁止滚动穿透
+	 * @property {boolean} disabled 禁用签名板
+	 * @property {boolean} landscape 横屏模式
+	 * @event {Function} change 绘制内容变化时触发
+	 */
+	
+	// #ifdef APP
+	import { Signature } from './signature.uts'
+	// #endif
+	// #ifndef APP
+	import { Signature } from './signature.js'
+	import { wrapEvent, getRect } from './utils'
+	// #endif
+	import { LimeSignatureToTempFilePathOptions, LimeSignatureToFileSuccess, LimeSignatureOptions } from '../../index.uts'
+	// type SignatureToFileSuccessCallback = (res : UTSJSONObject) => void
+	// type SignatureToFileFailCallback = (res : TakeSnapshotFail) => void
+	// type SignatureToFileCompleteCallback = (res : any) => void
+
+	
+	const emit = defineEmits(['change'])
+	const props = defineProps({
+		styles: {
+			type: String,
+			default: ''
+		},
+		penColor: {
+			type: String,
+			default: 'black'
+		},
+		penSize: {
+			type: Number,
+			default: 2
+		},
+		backgroundColor: {
+			type: String,
+			default: ''
+		},
+		openSmooth: {
+			type: Boolean,
+			default: false
+		},
+		minLineWidth: {
+			type: Number,
+			default: 2
+		},
+		maxLineWidth: {
+			type: Number,
+			default: 6
+		},
+		minSpeed: {
+			type: Number,
+			default: 1.5
+		},
+		maxWidthDiffRate: {
+			type: Number,
+			default: 20
+		},
+		maxHistoryLength: {
+			type: Number,
+			default: 20
+		},
+		disableScroll: {
+			type: Boolean,
+			default: true
+		},
+		disabled: {
+			type: Boolean,
+			default: false
+		},
+		landscape: {
+			type: Boolean,
+			default: false
+		},
+	})
+
+	const drawableStyle = computed<string>(() : string => {
+		let style : string = ''
+
+		if (props.backgroundColor != '') {
+			style += `background-color: ${props.backgroundColor};`
+		}
+		if (props.styles != '') {
+			style += props.styles
+		}
+		return style
+	})
+
+	const signatureRef = ref<UniElement | null>(null)
+	const signatureCanvasRef = ref<UniElement | null>(null)
+	let signatureLandscapeRef = ref<UniElement | null>(null)
+	let landscapeStyle = ref<Map<string, string>>(new Map())
+	let landscapeImageStyle = ref<Map<string, string>>(new Map())
+	let isCanvasEmpty = true
+	let signature : Signature | null = null
+	let url = ref('')
+	// 检查并触发事件的方法
+	const checkAndEmitEmptyStatus = () => {
+		// #ifndef APP
+		// @ts-ignore
+		const isEmpty = signature?.isEmpty() ?? true
+		// #endif
+		// #ifdef APP
+		// @ts-ignore
+		const isEmpty = signature?.isEmpty ?? true
+		// #endif
+		if (isEmpty != isCanvasEmpty) {
+			isCanvasEmpty = isEmpty
+			emit('change', isCanvasEmpty)
+		}
+	}
+	
+	// #ifndef APP
+	let canvas : HTMLCanvasElement | null = null;
+	let rect: DOMRect|null = null
+	const getTouch = (event : UniTouchEvent) => {
+		const touch = event.touches.length ? event.touches[0] : event.changedTouches[0];
+		
+		return {
+			points: [
+				{
+					// @ts-ignore
+					x: touch.clientX -  rect?.left ?? 0,
+					// @ts-ignore
+					y: touch.clientY - rect?.top ?? 0
+				}
+			]
+		}
+	}
+
+	let touchstart = async (e : UniTouchEvent) => {
+		// #ifndef WEB
+		rect = await getRect('.l-signature', {context: instance})
+		signature!.canvas.emit('touchstart', getTouch(e))
+		// #endif
+	}
+	let touchmove = (e : UniTouchEvent) => {
+		// #ifndef WEB
+		signature!.canvas.emit('touchmove', getTouch(e))
+		// #endif
+	}
+	let touchend = (e : UniTouchEvent) => {
+		// #ifndef WEB
+		signature!.canvas.emit('touchend', getTouch(e))
+		// #endif
+		 setTimeout(() => {
+		 	checkAndEmitEmptyStatus()
+		 }, 0);  // 绘制结束时检查
+	}
+	// #endif
+
+	const clear = () => {
+		signature?.clear()
+		checkAndEmitEmptyStatus()  // 状态检查
+	}
+	const redo = () => {
+		signature?.redo()
+		checkAndEmitEmptyStatus()  // 状态检查
+	}
+	const undo = () => {
+		signature?.undo()
+		checkAndEmitEmptyStatus()  // 状态检查
+	}
+	const canvasToTempFilePath = (options : LimeSignatureToTempFilePathOptions) => {
+		const success = options.success // as SignatureToFileSuccessCallback | null
+		const fail = options.fail // as SignatureToFileFailCallback | null
+		const complete = options.complete// as SignatureToFileCompleteCallback | null
+		const format = options.format ?? 'png'
+		// #ifdef APP-ANDROID || APP-IOS
+		signatureRef.value?.takeSnapshot({
+			format,
+			success: (res) => {
+				if (props.landscape) {
+					url.value = res.tempFilePath;
+					signatureLandscapeRef.value?.getBoundingClientRectAsync()?.then(rect=>{
+						setTimeout(() => {
+							signatureLandscapeRef.value?.takeSnapshot({
+								format,
+								success: (res2) => {
+									success?.({
+										tempFilePath: res2.tempFilePath,
+										isEmpty: signature?.isEmpty ?? false
+									} as LimeSignatureToFileSuccess)
+								}
+							})
+						}, 300)
+					})
+				} else {
+					success?.({
+						tempFilePath: res.tempFilePath,
+						isEmpty: signature?.isEmpty ?? false
+					} as LimeSignatureToFileSuccess)
+				}
+			},
+			fail: (res) => {
+				fail?.(res)
+			},
+			complete: (res) => {
+				complete?.(res)
+			}
+		} as TakeSnapshotOptions)
+		// #endif
+		// #ifdef APP-HARMONY
+		const image = signatureCanvasRef.value!.toDataURL()
+		success?.({
+			tempFilePath: image,
+			isEmpty: signature?.isEmpty ?? false
+		} as LimeSignatureToFileSuccess)
+		
+		// #endif
+		// #ifndef APP
+		// @ts-ignore
+		const { backgroundColor, backgroundImage, landscape, boundingBox } = props
+		const { quality = 1 } = options
+		const flag = landscape || backgroundColor || boundingBox
+		const type = `image/${format}`.replace(/jpg/, 'jpeg');
+		const image = canvas?.toDataURL(!flag && type, !flag && quality)
+
+		if (flag) {
+			// @ts-ignore
+			// #ifdef WEB
+			const offCanvas = document.createElement('canvas')
+			// #endif
+			// #ifndef WEB
+			const offCanvas = uni.createOffscreenCanvas({ type: '2d' });
+			// #endif
+			// @ts-ignore
+			const pixelRatio = signature?.canvas.get('pixelRatio')
+			// @ts-ignore
+			let width = signature?.canvas.get('width')
+			// @ts-ignore
+			let height = signature?.canvas.get('height')
+			let x = 0
+			let y = 0
+			// @ts-ignore
+			const next = () => {
+				const size = [width, height]
+				if (landscape) {
+					size.reverse()
+				}
+				offCanvas.width = size[0] * pixelRatio
+				offCanvas.height = size[1] * pixelRatio
+				const param = [x, y, width, height, 0, 0, width, height].map(item => item * pixelRatio)
+				const context = offCanvas.getContext('2d')
+				if (landscape) {
+					context.translate(0, width * pixelRatio)
+					context.rotate(-Math.PI / 2)
+				}
+				if (backgroundColor) {
+					context.fillStyle = backgroundColor
+					context.fillRect(0, 0, width * pixelRatio, height * pixelRatio)
+				}
+				const drawImage = () => {
+					// @ts-ignore
+					// context.drawImage(image, ...param)//signature?.canvas!.get('el')
+					// #ifndef WEB
+					const img = offCanvas.createImage()
+					// #endif
+					// #ifdef WEB
+					const img = new Image()
+					// #endif
+					img.onload = ()=> {
+						context.drawImage(img, ...param)//signature?.canvas!.get('el')
+						success?.({
+							tempFilePath: offCanvas.toDataURL(type, quality),
+							// @ts-ignore
+							isEmpty: signature?.isEmpty() ?? false
+						} as LimeSignatureToFileSuccess)
+					}
+					// @ts-ignore
+					img.onerror = ()=> {
+						success?.({
+							tempFilePath: image,
+							// @ts-ignore
+							isEmpty: signature?.isEmpty() ?? false
+						} as LimeSignatureToFileSuccess)
+					}
+					img.src = image
+					// #ifdef WEB
+					offCanvas.remove()
+					// #endif
+				}
+				if (backgroundImage) {
+					const img = new Image();
+					img.onload = () => {
+						context.drawImage(img, ...param)
+						drawImage()
+					}
+					img.src = backgroundImage
+				}
+				if (!backgroundImage) {
+					drawImage()
+				}
+			}
+			if (boundingBox) {
+				// @ts-ignore
+				const res = signature?.getContentBoundingBox()
+				width = res.width
+				height = res.height
+				x = res.startX
+				y = res.startY
+				next()
+			} else {
+				next()
+			}
+		} else {
+			success?.({
+				tempFilePath: image,
+				// @ts-ignore
+				isEmpty: signature?.isEmpty() ?? false
+			} as LimeSignatureToFileSuccess)
+		}
+		// #endif
+	}
+
+	defineExpose({
+		clear,
+		redo,
+		undo,
+		canvasToTempFilePath,
+	})
+
+	// #ifndef APP
+	// #ifdef WEB
+	let _touchstart, _touchmove, _touchend
+	// #endif
+	const instance = getCurrentInstance()!.proxy!;
+	uni.createCanvasContextAsync({
+		id: 'l-signature',
+		component: instance,
+		success: (context : CanvasContext) => {
+			const canvasContext = context.getContext('2d')!;
+			canvas = canvasContext.canvas;
+
+			// 处理高清屏逻辑
+			const dpr = uni.getDeviceInfo().devicePixelRatio ?? 1;
+			canvas.width = canvas.offsetWidth * dpr;
+			canvas.height = canvas.offsetHeight * dpr;
+			canvasContext.scale(dpr, dpr); // 仅需调用一次，当调用 reset 方法后需要再次 scale
+			signature = new Signature({
+				// @ts-ignore
+				context: canvasContext,
+				width: canvas.offsetWidth,
+				height: canvas.offsetHeight,
+				canvas: context,
+				pixelRatio: 1,
+			})
+			// signature = new Signature({el: canvas})
+			watchEffect(() => {
+				const options : LimeSignatureOptions = {
+					penColor: props.penColor,
+					openSmooth: props.openSmooth,
+					disableScroll: props.disableScroll,
+					disabled: props.disabled,
+					penSize: props.penSize,
+					minLineWidth: props.minLineWidth,
+					maxLineWidth: props.maxLineWidth,
+					minSpeed: props.minSpeed,
+					maxWidthDiffRate: props.maxWidthDiffRate,
+					maxHistoryLength: props.maxHistoryLength
+				}
+				// @ts-ignore
+				signature?.pen.setOption(options)
+			})
+			// #ifdef WEB
+			let isTouch = false
+			_touchstart = (event : UniMouseEvent) => {
+				isTouch = true
+				const rect = canvas?.getBoundingClientRect()
+				// @ts-ignore
+				signature!.canvas.emit('touchstart', {
+					points: [
+						{
+							x: event.clientX - rect.left,
+							y: event.clientY - rect.top
+						}
+					]
+				})
+			}
+			_touchmove = (event : UniMouseEvent) => {
+				if (!isTouch) return
+				const rect = canvas?.getBoundingClientRect()
+				// @ts-ignore
+				signature!.canvas.emit('touchmove', {
+					points: [
+						{
+							x: event.clientX - rect.left,
+							y: event.clientY - rect.top
+						}
+					]
+				})
+			}
+			_touchend = (event : UniMouseEvent) => {
+				isTouch = false
+				const rect = canvas?.getBoundingClientRect();
+				// @ts-ignore
+				signature!.canvas.emit('touchend', {
+					points: [
+						{
+							x: event.clientX - rect.left,
+							y: event.clientY - rect.top
+						}
+					]
+				})
+				setTimeout(function() {
+					checkAndEmitEmptyStatus()
+				}, 0);  // 绘制结束时检查
+			}
+			canvas?.addEventListener('mousedown', _touchstart)
+			canvas?.addEventListener('mousemove', _touchmove)
+			canvas?.addEventListener('mouseup', _touchend)
+			// canvas?.addEventListener('mouseleave', _touchend)
+			// #endif
+		}
+	})
+	// #endif
+
+	onMounted(() => {
+		nextTick(() => {
+			setTimeout(()=>{
+				const width = signatureRef.value?.offsetWidth
+				const height = signatureRef.value?.offsetHeight
+				// #ifdef APP
+				landscapeStyle.value.set('width', `${height}px`)
+				landscapeStyle.value.set('height', `${width}px`)
+				landscapeImageStyle.value.set('width', `${width}px`)
+				landscapeImageStyle.value.set('height', `${height}px`)
+				landscapeImageStyle.value.set('transform', `rotate(-90deg) translateX(-${width}px)`)
+				// #ifdef APP-ANDROID || APP-IOS
+				signature = new Signature(signatureRef.value!)
+				// #endif
+				// #ifndef APP-ANDROID || APP-IOS
+				signature = new Signature(signatureCanvasRef.value!)
+				// #endif
+				watchEffect(() => {
+					const options : LimeSignatureOptions = {
+						penColor: props.penColor,
+						openSmooth: props.openSmooth,
+						disableScroll: props.disableScroll,
+						disabled: props.disabled,
+						penSize: props.penSize,
+						minLineWidth: props.minLineWidth,
+						maxLineWidth: props.maxLineWidth,
+						minSpeed: props.minSpeed,
+						maxWidthDiffRate: props.maxWidthDiffRate,
+						maxHistoryLength: props.maxHistoryLength
+					}
+					// #ifdef APP
+					signature?.setOption(options)
+					signature?.onChange((_isEmpty: boolean)=>{
+						checkAndEmitEmptyStatus()
+					})
+					// #endif
+				})
+				// #endif
+			},300)
+			
+		})
+	})
+
+	onUnmounted(() => {
+		// #ifdef WEB
+		canvas?.removeEventListener('mousedown', _touchstart)
+		canvas?.removeEventListener('mousemove', _touchmove)
+		canvas?.removeEventListener('mouseup', _touchend)
+		// canvas?.removeEventListener('mouseleave', touchend)
+		canvas?.remove()
+		// #endif
+
+	})
+</script>
+<style lang="scss">
+	/* #ifndef APP */
+	:host {
+		display: flex;
+		height: 100%;
+	}
+	/* #endif */
+	.l-signature {
+		flex: 1;
+		/* #ifndef APP */
+		width: 100%;
+		height: 100%;
+		/* #endif */
+		&__canvas {
+			width: 100%;
+			height: 100%;
+		}
+
+		&-landscape {
+			position: absolute;
+			pointer-events: none;
+			overflow: visible;
+			left: 99.9%;
+			// top: 50%;
+			// background-color: rgba(0, 0, 0, 0.1);
+		}
+
+		&-image {
+			transform-origin: 0% 0%;
+			// background-color: rgba(100, 0, 0, 0.5);
+		}
+	}
+</style>

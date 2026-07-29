@@ -7,6 +7,7 @@ import TimeDemoCard from './components/TimeDemoCard.uvue'
 import RouterDemoCard from './components/RouterDemoCard.uvue'
 import HttpDemoCard from './components/HttpDemoCard.uvue'
 import EchartsDemoCard from './components/EchartsDemoCard.uvue'
+import SignatureCard from './components/SignatureCard.uvue'
 import SystemInfoDemoCard from './components/SystemInfoDemoCard.uvue'
 import ZPagingDemoCard from './components/ZPagingDemoCard.uvue'
 import UViewUltraDemoCard from './components/UViewUltraDemoCard.uvue'
@@ -59,7 +60,8 @@ return (): any | null => {
                 _cV(unref(TimeDemoCard)),
                 _cV(unref(RouterDemoCard)),
                 _cV(unref(HttpDemoCard)),
-                _cV(unref(EchartsDemoCard))
+                _cV(unref(EchartsDemoCard)),
+                _cV(unref(SignatureCard))
               ])
             ], 4 /* STYLE */)
           ])

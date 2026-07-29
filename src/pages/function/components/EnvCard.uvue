@@ -24,17 +24,29 @@
     <view class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
       <text class="text-12px text-[#94a3b8] mb-12px">切换环境（仅当前运行生效）</text>
       <view class="flex-row mt-12px">
+        <!-- 开发 -->
         <view
-          v-for="(item, _index) in envTypeItems"
-          :key="item.type"
           class="flex-1 h-38px rounded-8px flex flex-row items-center justify-center ml-5px mr-5px"
-          :style="{ backgroundColor: item.bgColor }"
-          @click="switchEnv(item.type)"
+          :style="{ backgroundColor: devBtnBg }"
+          @click="switchEnv('development')"
         >
-          <text
-            class="text-14px font-bold"
-            :style="{ color: item.textColor }"
-          >{{ item.label }}</text>
+          <text class="text-14px font-bold" :style="{ color: devBtnText }">开发</text>
+        </view>
+        <!-- 测试 -->
+        <view
+          class="flex-1 h-38px rounded-8px flex flex-row items-center justify-center ml-5px mr-5px"
+          :style="{ backgroundColor: testBtnBg }"
+          @click="switchEnv('test')"
+        >
+          <text class="text-14px font-bold" :style="{ color: testBtnText }">测试</text>
+        </view>
+        <!-- 生产 -->
+        <view
+          class="flex-1 h-38px rounded-8px flex flex-row items-center justify-center ml-5px mr-5px"
+          :style="{ backgroundColor: prodBtnBg }"
+          @click="switchEnv('production')"
+        >
+          <text class="text-14px font-bold" :style="{ color: prodBtnText }">生产</text>
         </view>
       </view>
     </view>
@@ -97,41 +109,31 @@ const envConfig = computed(() => {
   return getEnvConfigFor(currentEnv.value)
 })
 
-// 预计算按钮数据（避免模板中调用函数，避免 UTSJSONObject 对象字面量）
-const envTypeItems = computed(() => {
-  const types: EnvType[] = ['development', 'test', 'production']
-  const result: UTSJSONObject[] = []
-  for (let i = 0; i < types.length; i++) {
-    const type = types[i]
-    const isActive = currentEnv.value === type
-    let bgColor = COLOR_BG
-    if (isActive) {
-      if (type === 'development') {
-        bgColor = COLOR_DEV
-      } else if (type === 'test') {
-        bgColor = COLOR_TEST
-      } else {
-        bgColor = COLOR_PROD
-      }
-    }
-    const item = new UTSJSONObject()
-    // eslint-disable-next-line dot-notation
-    item['type'] = type
-    // eslint-disable-next-line dot-notation
-    item['label'] = getEnvLabel(type)
-    // eslint-disable-next-line dot-notation
-    item['bgColor'] = bgColor
-    // eslint-disable-next-line dot-notation
-    item['textColor'] = isActive ? COLOR_WHITE : COLOR_DARK
-    result.push(item)
-  }
-  return result
+// 按钮颜色 computed（避免模板中三元运算类型问题）
+const devBtnBg = computed((): string => {
+  return currentEnv.value === 'development' ? COLOR_DEV : COLOR_BG
+})
+const devBtnText = computed((): string => {
+  return currentEnv.value === 'development' ? COLOR_WHITE : COLOR_DARK
+})
+const testBtnBg = computed((): string => {
+  return currentEnv.value === 'test' ? COLOR_TEST : COLOR_BG
+})
+const testBtnText = computed((): string => {
+  return currentEnv.value === 'test' ? COLOR_WHITE : COLOR_DARK
+})
+const prodBtnBg = computed((): string => {
+  return currentEnv.value === 'production' ? COLOR_PROD : COLOR_BG
+})
+const prodBtnText = computed((): string => {
+  return currentEnv.value === 'production' ? COLOR_WHITE : COLOR_DARK
 })
 
-function switchEnv(type: EnvType) {
-  setCurrentEnv(type)
-  currentEnv.value = type
-  const label = getEnvLabel(type)
+function switchEnv(type: string) {
+  const env = type as EnvType
+  setCurrentEnv(env)
+  currentEnv.value = env
+  const label = getEnvLabel(env)
   uni.showToast({
     title: `已切换至${label}环境`,
     icon: 'none',

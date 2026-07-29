@@ -1,0 +1,57 @@
+<template>
+	<view style="height: 950rpx;">
+		<l-signature ref="signature" landscape :pen-color="penColor" :pen-size="10" @change="change"></l-signature>
+	</view>
+	<image style="width: 750rpx; position: absolute; left: 10px;" :src="url" v-if="url" mode="widthFix"></image>
+	<!-- <view style="height: 200rpx; overflow: visible;"></view> -->
+	<view style="padding:16px">
+		<button type="primary" style="margin-bottom:10px" @click="clear">清空</button>
+		<button type="primary" style="margin-bottom:10px" @click="undo">撤消</button>
+		<button type="primary" style="margin-bottom:10px" @click="redo">恢复</button>
+		<button type="primary" style="margin-bottom:10px" @click="save">生成</button>
+	</view>
+</template>
+<script lang="uts">
+	import type {LimeSignatureToTempFilePathOptions, LimeSignatureToFileSuccess} from '@/uni_modules/lime-signature'
+	export default {
+		data() {
+			return {
+				penColor: 'red',
+				url: ''
+			}
+		},
+		methods: {
+			change(isEmpty:boolean) {
+				console.log('isEmpty:::', isEmpty)
+			},
+			clear() {
+				const signature = this.$refs['signature'] as LSignatureComponentPublicInstance
+				signature.clear()
+			},
+			undo() {
+				const signature = this.$refs['signature'] as LSignatureComponentPublicInstance
+				signature.undo()
+			},
+			redo() {
+				const signature = this.$refs['signature'] as LSignatureComponentPublicInstance
+				signature.redo()
+			},
+			save() {
+				const signature = this.$refs['signature'] as LSignatureComponentPublicInstance
+				signature.canvasToTempFilePath({
+					success: (res : LimeSignatureToFileSuccess) : void => {
+						// console.log('isEmpty', res.isEmpty)
+						this.url = res.tempFilePath
+					}
+				} as LimeSignatureToTempFilePathOptions)
+			}
+		},
+		mounted() {
+			setTimeout(() => {
+				this.penColor = 'blue'
+			}, 2000)
+		}
+	}
+</script>
+<style>
+</style>
