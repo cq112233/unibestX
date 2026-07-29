@@ -5,7 +5,8 @@ import LayoutComponent from '@/src/layouts/default.uvue'
 /* eslint-disable ts/consistent-type-definitions */
 import NavBar from '@/src/components/NavBar/NavBar.uvue'
 import { safeAreaInsets } from '@/src/utils/systemInfo'
-type ChatMessage = { __$originalPosition?: UTSSourceMapPosition<"ChatMessage", "src/pages/ai/ai.uvue", 137, 6>;
+
+type ChatMessage = { __$originalPosition?: UTSSourceMapPosition<"ChatMessage", "src/pages/ai/ai.uvue", 145, 6>;
   id: string
   sender: string
   content: string
@@ -19,6 +20,13 @@ const __sfc__ = defineComponent({
 const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
+
+definePage({
+  style: {
+    navigationStyle: 'custom',
+    navigationBarTitleText: 'AI助手',
+  },
+})
 
 const messages = ref<ChatMessage[]>([])
 const inputText = ref<string>('')

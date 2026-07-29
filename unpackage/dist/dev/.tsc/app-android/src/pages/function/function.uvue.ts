@@ -6,12 +6,19 @@ import HapticsCard from './components/HapticsCard.uvue'
 import MediaCard from './components/MediaCard.uvue'
 import { handleBackPressExit } from '@/src/utils/backPress'
 
+
 const __sfc__ = defineComponent({
   __name: 'function',
   setup(__props) {
 const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
+
+definePage({
+  style: {
+    navigationBarTitleText: '功能',
+  },
+})
 
 onBackPress((options: OnBackPressOptions): boolean => {
 

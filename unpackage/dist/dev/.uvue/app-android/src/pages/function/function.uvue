@@ -11,6 +11,11 @@ const __sfc__ = defineComponent({
         const __ins = getCurrentInstance()!;
         const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
         const _cache = __ins.renderCache;
+        definePage({
+            style: {
+                navigationBarTitleText: '功能',
+            },
+        });
         onBackPress((options: OnBackPressOptions): boolean => {
             if (options.from == 'backbutton') {
                 return handleBackPressExit();
