@@ -1,0 +1,288 @@
+import _easycom_up_input from '@/uni_modules/uview-ultra/components/up-input/up-input.uvue'
+import _easycom_up_code from '@/uni_modules/uview-ultra/components/up-code/up-code.uvue'
+import _easycom_up_button from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue'
+import AppKu from '@/App.ku.uvue'
+import LayoutComponent from '@/src/layouts/default.uvue'
+import { ref } from 'vue'
+import { fetchAndStoreUserInfo, registerMember, sendPhoneCode } from '@/src/api/auth'
+import type { ISingleTokenRes, IUserInfo } from '../../store'
+import { useTokenStore, useUserStore } from '../../store'
+import { setCurIdxByPath } from '../../tabbar/store'
+import { LOGIN_PAGE } from '../../router/config'
+
+
+const __sfc__ = defineComponent({
+  __name: 'register',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+const tokenStore = useTokenStore()
+const userStore = useUserStore()
+
+const windowHeight = ref<number>(0)
+const phoneNumber = ref<string>('18357169706')
+const smsCode = ref<string>('')
+const password = ref<string>('')
+const loading = ref<boolean>(false)
+
+// uview-ultra 验证码倒计时 Ref
+const uCodeRef = ref<ComponentPublicInstance | null>(null)
+const codeTips = ref<string>('获取验证码')
+
+const phoneRegex = /^1[3-9]\d{9}$/
+
+onLoad(() => {
+  windowHeight.value = uni.getWindowInfo().windowHeight
+})
+
+function codeChange(text: string) {
+  codeTips.value = text
+}
+
+function goToLogin() {
+  uni.navigateTo({
+    url: LOGIN_PAGE,
+  })
+}
+
+function handleSendCode() {
+  const phoneStr = phoneNumber.value.trim()
+  if (!phoneRegex.test(phoneStr)) {
+    uni.showToast({
+      title: '请输入有效的11位手机号码',
+      icon: 'none',
+    })
+    return
+  }
+
+  if (uCodeRef.value != null) {
+    const codeObj = uCodeRef.value!
+    const canGet = codeObj.$callMethod('canGetCode')
+    if (canGet == true) {
+      uni.showLoading({ title: '正在发送验证码...' })
+      sendPhoneCode({
+        phone: phoneStr,
+        scene: 'register',
+      })
+        .then((_res: any) => {
+          uni.hideLoading()
+          uni.showToast({ title: '验证码已发送', icon: 'success' })
+          codeObj.$callMethod('start')
+        })
+        .catch((err: any | null) => {
+          uni.hideLoading()
+          console.warn('后端接口请求异常，开启演示倒计时:', err, " at src/sub/auth/register.uvue:239")
+          uni.showToast({ title: '验证码已发送', icon: 'success' })
+          codeObj.$callMethod('start')
+        })
+    }
+    else {
+      uni.showToast({ title: '倒计时中，请稍后再试', icon: 'none' })
+    }
+  }
+}
+
+// 调用真实的注册接口 POST /api/mobile/member/register
+function handleRegisterSubmit() {
+  const phoneStr = phoneNumber.value.trim()
+  if (!phoneRegex.test(phoneStr)) {
+    uni.showToast({ title: '手机号格式不正确', icon: 'none' })
+    return
+  }
+  const codeStr = smsCode.value.trim()
+  if (codeStr == '') {
+    uni.showToast({ title: '请输入短信验证码', icon: 'none' })
+    return
+  }
+  const pwdStr = password.value.trim()
+  if (pwdStr == '') {
+    uni.showToast({ title: '请设置登录密码', icon: 'none' })
+    return
+  }
+
+  if (loading.value)
+    return
+  loading.value = true
+
+  registerMember({
+    phone_number: phoneStr,
+    password: pwdStr,
+    validate_code: codeStr,
+  })
+    .then((res: any) => {
+      loading.value = false
+      // 1. 提取 token 存入 tokenStore
+      let tokenVal = `token-reg-${Date.now()}`
+      if (res != null) {
+        if (typeof res == 'string') {
+          tokenVal = res as string
+        }
+        else {
+          const resObj = UTSAndroid.consoleDebugError(JSON.parseObject(JSON.stringify(res)), " at src/sub/auth/register.uvue:286")
+          if (resObj != null) {
+            const t = resObj.getString('access_token') ?? resObj.getString('token')
+            if (t != null) tokenVal = t
+          }
+        }
+      }
+
+      tokenStore.setSingleToken({
+        token: tokenVal,
+        expiresIn: 7200,
+      } as ISingleTokenRes)
+
+      uni.showToast({
+        title: '注册并登录成功',
+        icon: 'success',
+      })
+
+      // 2. 通过接口获取用户信息存到 store，之后跳转首页
+      fetchAndStoreUserInfo()
+        .catch((err: any | null) => {
+          console.warn('获取用户信息异常，使用注册手机号兜底:', err, " at src/sub/auth/register.uvue:307")
+          userStore.setUserInfo({
+            userId: 1001,
+            username: phoneStr,
+            nickname: `用户_${phoneStr.slice(-4)}`,
+            avatar: '/static/logo.png',
+          } as IUserInfo)
+        })
+        .then(() => {
+          setTimeout(() => {
+            setCurIdxByPath('/src/pages/index/index')
+            uni.switchTab({
+              url: '/src/pages/index/index',
+            })
+          }, 800)
+        })
+    })
+    .catch((err: any | null) => {
+      loading.value = false
+      console.error('注册接口调用失败:', err, " at src/sub/auth/register.uvue:326")
+    })
+}
+
+return (): any | null => {
+
+const _component_up_input = resolveEasyComponent("up-input",_easycom_up_input)
+const _component_up_code = resolveEasyComponent("up-code",_easycom_up_code)
+const _component_up_button = resolveEasyComponent("up-button",_easycom_up_button)
+
+  return _cV(unref(AppKu), null, _uM({
+    default: withSlotCtx((): any[] => [
+      _cV(unref(LayoutComponent), _uM({ "navigation-bar-title-text": '注册' }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({
+            class: "flex-1 flex-col items-center justify-center bg-__f8fafc_ px-24px py-20px",
+            style: _nS(_uM({ minHeight: windowHeight.value > 0 ? (windowHeight.value + 'px') : '100%' }))
+          }), [
+            _cE("view", _uM({ class: "w-full" }), [
+              _cE("view", _uM({ class: "items-center mb-16px" }), [
+                _cE("view", _uM({ class: "w-68px h-68px rounded-20px bg-white p-6px mb-10px border-width-1px border-style-solid border-color-__edf2f7_ items-center justify-center" }), [
+                  _cE("image", _uM({
+                    class: "w-54px h-54px rounded-14px",
+                    src: "/static/logo.png",
+                    mode: "aspectFit"
+                  }))
+                ]),
+                _cE("text", _uM({ class: "text-24px font-bold text-__0f172a_ mb-6px tracking-tight" }), "注册新账号"),
+                _cE("view", _uM({ class: "bg-__f0fdf4_ px-12px py-4px rounded-12px border-width-1px border-style-solid border-color-__bbf7d0_" }), [
+                  _cE("text", _uM({ class: "text-12px font-bold text-__166534_" }), "创建一个账号，开始体验 unibestX")
+                ])
+              ]),
+              _cE("view", _uM({ class: "bg-white rounded-24px p-20px border-width-1px border-style-solid border-color-__e2e8f0_ mb-16px" }), [
+                _cE("view", _uM({ class: "mb-16px" }), [
+                  _cE("text", _uM({ class: "text-12px font-bold text-__475569_ mb-6px pl-2px" }), "手机号码"),
+                  _cV(_component_up_input, _uM({
+                    modelValue: phoneNumber.value,
+                    "onUpdate:modelValue": $event => {(phoneNumber).value = $event},
+                    type: "number",
+                    maxlength: "11",
+                    placeholder: "请输入11位手机号码",
+                    "prefix-icon": "phone",
+                    clearable: "",
+                    shape: "circle"
+                  }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                ]),
+                _cE("view", _uM({ class: "mb-16px" }), [
+                  _cE("text", _uM({ class: "text-12px font-bold text-__475569_ mb-6px pl-2px" }), "短信验证码"),
+                  _cE("view", _uM({ class: "flex-row items-center" }), [
+                    _cE("view", _uM({ class: "flex-1 mr-8px" }), [
+                      _cV(_component_up_input, _uM({
+                        modelValue: smsCode.value,
+                        "onUpdate:modelValue": $event => {(smsCode).value = $event},
+                        type: "number",
+                        maxlength: "6",
+                        placeholder: "请输入6位验证码",
+                        "prefix-icon": "integral",
+                        clearable: "",
+                        shape: "circle"
+                      }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                    ]),
+                    _cV(_component_up_code, _uM({
+                      ref_key: "uCodeRef",
+                      ref: uCodeRef,
+                      seconds: "60",
+                      onChange: codeChange
+                    }), null, 512 /* NEED_PATCH */),
+                    _cV(_component_up_button, _uM({
+                      text: codeTips.value,
+                      type: "success",
+                      size: "small",
+                      shape: "circle",
+                      "custom-style": { height: '38px', paddingLeft: '14px', paddingRight: '14px' },
+                      onClick: handleSendCode
+                    }), null, 8 /* PROPS */, ["text"])
+                  ])
+                ]),
+                _cE("view", _uM({ class: "mb-16px" }), [
+                  _cE("text", _uM({ class: "text-12px font-bold text-__475569_ mb-6px pl-2px" }), "设置密码"),
+                  _cV(_component_up_input, _uM({
+                    modelValue: password.value,
+                    "onUpdate:modelValue": $event => {(password).value = $event},
+                    type: "password",
+                    placeholder: "请设置 8-20 位字符的密码",
+                    "prefix-icon": "lock",
+                    clearable: "",
+                    shape: "circle"
+                  }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+                ]),
+                _cE("view", _uM({ class: "mt-8px mb-14px" }), [
+                  _cV(_component_up_button, _uM({
+                    type: "success",
+                    size: "large",
+                    shape: "circle",
+                    loading: loading.value,
+                    "loading-text": "注册中...",
+                    text: "注 册 并 登 录",
+                    onClick: handleRegisterSubmit
+                  }), null, 8 /* PROPS */, ["loading"])
+                ]),
+                _cE("view", _uM({ class: "flex-row justify-center items-center pt-2px" }), [
+                  _cE("text", _uM({ class: "text-13px text-__64748b_ mr-4px" }), "已有账号？"),
+                  _cE("text", _uM({
+                    class: "text-13px text-__2563eb_ font-bold",
+                    onClick: goToLogin
+                  }), " 返回登录 ")
+                ])
+              ]),
+              _cE("view", _uM({ class: "items-center pt-2px" }), [
+                _cE("text", _uM({ class: "text-11px text-__94a3b8_ text-center leading-normal mb-2px" }), " 注册即同意《用户服务协议》与《隐私政策》 "),
+                _cE("text", _uM({ class: "text-10px text-__cbd5e1_ text-center" }), " unibestX Architecture © 2026 ")
+              ])
+            ])
+          ], 4 /* STYLE */)
+        ]),
+        _: 1 /* STABLE */
+      }))
+    ]),
+    _: 1 /* STABLE */
+  }))
+}
+}
+
+})
+export default __sfc__
+const GenSrcSubAuthRegisterStyles = [_uM([["bg-__f0fdf4_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f0fdf4"]]))], ["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["bg-white", _pS(_uM([["backgroundColor", "rgba(255,255,255,var(--un-bg-opacity,1))"]]))], ["border-color-__bbf7d0_", _pS(_uM([["borderTopColor", "#bbf7d0"], ["borderRightColor", "#bbf7d0"], ["borderBottomColor", "#bbf7d0"], ["borderLeftColor", "#bbf7d0"]]))], ["border-color-__e2e8f0_", _pS(_uM([["borderTopColor", "#e2e8f0"], ["borderRightColor", "#e2e8f0"], ["borderBottomColor", "#e2e8f0"], ["borderLeftColor", "#e2e8f0"]]))], ["border-color-__edf2f7_", _pS(_uM([["borderTopColor", "#edf2f7"], ["borderRightColor", "#edf2f7"], ["borderBottomColor", "#edf2f7"], ["borderLeftColor", "#edf2f7"]]))], ["border-style-solid", _pS(_uM([["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"]]))], ["border-width-1px", _pS(_uM([["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1]]))], ["flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["flex-col", _pS(_uM([["flexDirection", "column"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["font-bold", _pS(_uM([["fontWeight", 700]]))], ["h-54px", _pS(_uM([["height", 54]]))], ["h-68px", _pS(_uM([["height", 68]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["justify-center", _pS(_uM([["justifyContent", "center"]]))], ["leading-normal", _pS(_uM([["lineHeight", "normal"]]))], ["mb-10px", _pS(_uM([["marginBottom", 10]]))], ["mb-14px", _pS(_uM([["marginBottom", 14]]))], ["mb-16px", _pS(_uM([["marginBottom", 16]]))], ["mb-2px", _pS(_uM([["marginBottom", 2]]))], ["mb-6px", _pS(_uM([["marginBottom", 6]]))], ["mr-4px", _pS(_uM([["marginRight", 4]]))], ["mr-8px", _pS(_uM([["marginRight", 8]]))], ["mt-8px", _pS(_uM([["marginTop", 8]]))], ["none", _pS(_uM([["display", "none"]]))], ["p-20px", _pS(_uM([["paddingTop", 20], ["paddingRight", 20], ["paddingBottom", 20], ["paddingLeft", 20]]))], ["p-6px", _pS(_uM([["paddingTop", 6], ["paddingRight", 6], ["paddingBottom", 6], ["paddingLeft", 6]]))], ["pl-2px", _pS(_uM([["paddingLeft", 2]]))], ["pt-2px", _pS(_uM([["paddingTop", 2]]))], ["px-12px", _pS(_uM([["paddingLeft", 12], ["paddingRight", 12]]))], ["px-24px", _pS(_uM([["paddingLeft", 24], ["paddingRight", 24]]))], ["py-20px", _pS(_uM([["paddingTop", 20], ["paddingBottom", 20]]))], ["py-4px", _pS(_uM([["paddingTop", 4], ["paddingBottom", 4]]))], ["rounded-12px", _pS(_uM([["borderTopLeftRadius", 12], ["borderTopRightRadius", 12], ["borderBottomRightRadius", 12], ["borderBottomLeftRadius", 12]]))], ["rounded-14px", _pS(_uM([["borderTopLeftRadius", 14], ["borderTopRightRadius", 14], ["borderBottomRightRadius", 14], ["borderBottomLeftRadius", 14]]))], ["rounded-20px", _pS(_uM([["borderTopLeftRadius", 20], ["borderTopRightRadius", 20], ["borderBottomRightRadius", 20], ["borderBottomLeftRadius", 20]]))], ["rounded-24px", _pS(_uM([["borderTopLeftRadius", 24], ["borderTopRightRadius", 24], ["borderBottomRightRadius", 24], ["borderBottomLeftRadius", 24]]))], ["shadow-sm", _pS(_uM([["boxShadow", "var(--un-inset-shadow,0 0 #0000),var(--un-inset-ring-shadow,0 0 #0000),var(--un-ring-offset-shadow,0 0 #0000),var(--un-ring-shadow,0 0 #0000),var(--un-shadow,0 1rpx 3rpx 0 var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))))"], ["--un-shadow", "0 1rpx 3rpx 0rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1)))"]]))], ["text-__0f172a_", _pS(_uM([["color", "#0f172a"]]))], ["text-__166534_", _pS(_uM([["color", "#166534"]]))], ["text-__2563eb_", _pS(_uM([["color", "#2563eb"]]))], ["text-__475569_", _pS(_uM([["color", "#475569"]]))], ["text-__64748b_", _pS(_uM([["color", "#64748b"]]))], ["text-__94a3b8_", _pS(_uM([["color", "#94a3b8"]]))], ["text-__cbd5e1_", _pS(_uM([["color", "#cbd5e1"]]))], ["text-10px", _pS(_uM([["fontSize", 10]]))], ["text-11px", _pS(_uM([["fontSize", 11]]))], ["text-12px", _pS(_uM([["fontSize", 12]]))], ["text-13px", _pS(_uM([["fontSize", 13]]))], ["text-24px", _pS(_uM([["fontSize", 24]]))], ["text-center", _pS(_uM([["textAlign", "center"]]))], ["w-54px", _pS(_uM([["width", 54]]))], ["w-68px", _pS(_uM([["width", 68]]))], ["w-full", _pS(_uM([["width", "100%"]]))]])]

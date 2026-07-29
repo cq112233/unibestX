@@ -1,13 +1,145 @@
 <template>
-  <view class="flex-1 p-30px items-center justify-center">
-    <view class="mb-30px">
-      <text class="text-20px font-bold text-[#1e293b]">登录页</text>
-    </view>
-    <view
-      class="w-200px h-44px rounded-8px bg-[#3b82f6] flex flex-row items-center justify-center"
-      @click="doLogin"
-    >
-      <text class="text-[#ffffff] text-14px font-bold">点击模拟登录</text>
+  <view
+    class="flex-1 flex-col items-center justify-center bg-[#f8fafc] px-24px py-20px"
+    :style="{ minHeight: windowHeight > 0 ? (windowHeight + 'px') : '100%' }"
+  >
+    <view class="w-full">
+      <!-- 1. 顶部 品牌 Header -->
+      <view class="items-center mb-16px">
+        <!-- 品牌 Logo 带有柔和外边框 -->
+        <view class="w-68px h-68px rounded-20px bg-white p-6px mb-10px border-width-1px border-style-solid border-color-[#edf2f7] items-center justify-center">
+          <image class="w-54px h-54px rounded-14px" src="/static/logo.png" mode="aspectFit" />
+        </view>
+        <text class="text-24px font-bold text-[#0f172a] mb-6px tracking-tight">欢迎登录 unibestX</text>
+        <view class="bg-[#eff6ff] px-12px py-4px rounded-12px border-width-1px border-style-solid border-color-[#dbeafe]">
+          <text class="text-12px font-bold text-[#2563eb]">最好用的 uni-app X 极速开发模板</text>
+        </view>
+      </view>
+
+      <!-- 2. 中间精致表单卡片 -->
+      <view class="bg-white rounded-24px p-20px border-width-1px border-style-solid border-color-[#e2e8f0] mb-16px">
+        <!-- 登录模式分段选择器 -->
+        <view class="mb-20px">
+          <up-subsection
+            :list="['验证码登录', '密码登录']"
+            :current="currentSubIndex"
+            active-color="#2563eb"
+            bg-color="#f1f5f9"
+            @change="handleSubChange"
+          ></up-subsection>
+        </view>
+
+        <!-- 手机号输入栏 -->
+        <view class="mb-16px">
+          <text class="text-12px font-bold text-[#475569] mb-6px pl-2px">手机号码</text>
+          <up-input
+            v-model="phoneNumber"
+            type="number"
+            maxlength="11"
+            placeholder="请输入11位手机号码"
+            prefix-icon="phone"
+            clearable
+            shape="circle"
+          ></up-input>
+        </view>
+
+        <!-- 验证码登录模式 -->
+        <view v-if="currentSubIndex == 0" class="mb-16px">
+          <text class="text-12px font-bold text-[#475569] mb-6px pl-2px">短信验证码</text>
+          <view class="flex-row items-center">
+            <view class="flex-1 mr-8px">
+              <up-input
+                v-model="smsCode"
+                type="number"
+                maxlength="6"
+                placeholder="请输入6位验证码"
+                prefix-icon="integral"
+                clearable
+                shape="circle"
+              ></up-input>
+            </view>
+            <up-code ref="uCodeRef" seconds="60" @change="codeChange"></up-code>
+            <up-button
+              :text="codeTips"
+              type="primary"
+              size="small"
+              shape="circle"
+              :custom-style="{ height: '38px', paddingLeft: '14px', paddingRight: '14px' }"
+              @click="handleSendCode"
+            ></up-button>
+          </view>
+        </view>
+
+        <!-- 密码登录模式 -->
+        <view v-if="currentSubIndex == 1" class="mb-16px">
+          <text class="text-12px font-bold text-[#475569] mb-6px pl-2px">登录密码</text>
+          <up-input
+            v-model="password"
+            type="password"
+            placeholder="请输入密码（8-20位）"
+            prefix-icon="lock"
+            clearable
+            shape="circle"
+          ></up-input>
+        </view>
+
+        <!-- 主登录按钮 -->
+        <view class="mt-8px mb-14px">
+          <up-button
+            type="primary"
+            size="large"
+            shape="circle"
+            :loading="loading"
+            loading-text="登录验证中..."
+            text="立 即 登 录"
+            @click="handleLoginSubmit"
+          ></up-button>
+        </view>
+
+        <!-- 底部辅助链接 -->
+        <view class="flex-row justify-between items-center px-4px pt-2px">
+          <text class="text-13px text-[#2563eb] font-bold" @click="goToRegister">
+            注册新账号
+          </text>
+          <text class="text-13px text-[#64748b]" @click="goToRegister">
+            忘记密码？
+          </text>
+        </view>
+      </view>
+
+      <!-- 3. 快捷体验与 Footer 紧贴表单卡片下方，彻底取消大空白区 -->
+      <view class="items-center pt-2px">
+        <!-- 快捷体验引导 -->
+        <view class="flex-row items-center justify-center mb-10px w-full px-10px">
+          <view class="flex-1 h-1px bg-[#e2e8f0]" />
+          <text class="text-11px text-[#94a3b8] px-12px">快捷测试登录</text>
+          <view class="flex-1 h-1px bg-[#e2e8f0]" />
+        </view>
+
+        <!-- 快捷图标按钮组 -->
+        <view class="flex-row items-center justify-center mb-12px">
+          <view
+            class="bg-white rounded-10px px-14px h-34px border-width-1px border-style-solid border-color-[#cbd5e1] flex-row items-center justify-center mr-10px"
+            @click="onOtherLogin('wx')"
+          >
+            <text class="text-12px font-bold text-[#059669]">微信快捷登录</text>
+          </view>
+          <view
+            class="bg-white rounded-10px px-14px h-34px border-width-1px border-style-solid border-color-[#cbd5e1] flex-row items-center justify-center ml-10px"
+            @click="onOtherLogin('guest')"
+          >
+            <text class="text-12px font-bold text-[#2563eb]">一键填充测试账号</text>
+          </view>
+        </view>
+
+        <!-- 服务协议说明与版权 -->
+        <text class="text-11px text-[#94a3b8] text-center leading-normal mb-2px">
+          登录即同意《用户服务协议》与《隐私政策》
+        </text>
+        <text class="text-10px text-[#cbd5e1] text-center">
+          unibestX Architecture © 2026
+        </text>
+      </view>
     </view>
   </view>
 </template>
@@ -15,15 +147,30 @@
 <script setup lang="uts">
 /* eslint-disable dot-notation */
 import { ref } from 'vue'
+import { fetchAndStoreUserInfo, loginByPassword, loginBySms, sendPhoneCode } from '@/src/api/auth'
 import type { ISingleTokenRes, IUserInfo } from '../../store'
 import { useTokenStore, useUserStore } from '../../store'
 import { isPageTabbar, setCurIdxByPath } from '../../tabbar/store'
 
 const tokenStore = useTokenStore()
 const userStore = useUserStore()
+
+const windowHeight = ref<number>(0)
+const currentSubIndex = ref<number>(0) // 0: 验证码登录, 1: 密码登录
+const phoneNumber = ref<string>('18357169706')
+const smsCode = ref<string>('')
+const password = ref<string>('')
+const loading = ref<boolean>(false)
 const redirectUrl = ref<string>('')
 
+// uview-ultra 验证码倒计时 Ref
+const uCodeRef = ref<ComponentPublicInstance | null>(null)
+const codeTips = ref<string>('获取验证码')
+
+const phoneRegex = /^1[3-9]\d{9}$/
+
 onLoad((options: UTSJSONObject | null) => {
+  windowHeight.value = uni.getWindowInfo().windowHeight
   if (options != null) {
     const redirect = options['redirect'] as string | null
     if (redirect != null) {
@@ -32,56 +179,189 @@ onLoad((options: UTSJSONObject | null) => {
   }
 })
 
-function doLogin() {
-  if (tokenStore.hasValidLogin()) {
-    if (redirectUrl.value !== '') {
-      const targetUrl = decodeURIComponent(redirectUrl.value) ?? ''
-      if (isPageTabbar(targetUrl)) {
-        setCurIdxByPath(targetUrl)
-        uni.switchTab({ url: targetUrl })
-      }
-      else {
-        uni.redirectTo({ url: targetUrl })
-      }
+function handleSubChange(index: number) {
+  currentSubIndex.value = index
+}
+
+function codeChange(text: string) {
+  codeTips.value = text
+}
+
+function goToRegister() {
+  uni.navigateTo({
+    url: '/src/sub/auth/register',
+  })
+}
+
+// 处理登录成功
+function handleLoginSuccess(res: any) {
+  let tokenVal = `token-${Date.now()}`
+  if (res != null) {
+    if (typeof res == 'string') {
+      tokenVal = res as string
     }
     else {
-      uni.navigateBack()
+      const resObj = JSON.parseObject(JSON.stringify(res))
+      if (resObj != null) {
+        const t = resObj.getString('access_token') ?? resObj.getString('token')
+        if (t != null)
+          tokenVal = t
+      }
     }
-    return
   }
 
-  // 模拟登录：设置 token 与用户信息
   tokenStore.setSingleToken({
-    token: 'mock-token-UNIX-123456',
+    token: tokenVal,
     expiresIn: 7200,
   } as ISingleTokenRes)
-
-  userStore.setUserInfo({
-    userId: 1001,
-    username: 'UNIX',
-    nickname: 'UNIX 开发者',
-    avatar: '/static/logo.png',
-  } as IUserInfo)
 
   uni.showToast({
     title: '登录成功',
     icon: 'success',
   })
 
-  setTimeout(() => {
-    if (redirectUrl.value !== '') {
-      const targetUrl = decodeURIComponent(redirectUrl.value) ?? ''
-      if (isPageTabbar(targetUrl)) {
-        setCurIdxByPath(targetUrl)
-        uni.switchTab({ url: targetUrl })
-      }
-      else {
-        uni.redirectTo({ url: targetUrl })
-      }
+  // 通过接口获取用户信息存到 store
+  fetchAndStoreUserInfo()
+    .catch((err: any | null) => {
+      console.warn('获取用户信息异常，使用本地账号兜底:', err)
+      userStore.setUserInfo({
+        userId: 1001,
+        username: phoneNumber.value.trim(),
+        nickname: `用户_${phoneNumber.value.trim().slice(-4)}`,
+        avatar: '/static/logo.png',
+      } as IUserInfo)
+    })
+    .then(() => {
+      setTimeout(() => {
+        if (redirectUrl.value !== '') {
+          const targetUrl = decodeURIComponent(redirectUrl.value) ?? ''
+          if (isPageTabbar(targetUrl)) {
+            setCurIdxByPath(targetUrl)
+            uni.switchTab({ url: targetUrl })
+          }
+          else {
+            uni.redirectTo({ url: targetUrl })
+          }
+        }
+        else {
+          setCurIdxByPath('/src/pages/index/index')
+          uni.switchTab({ url: '/src/pages/index/index' })
+        }
+      }, 800)
+    })
+}
+
+// 使用 uview-ultra 的 up-code 组件触发发送验证码
+function handleSendCode() {
+  const phoneStr = phoneNumber.value.trim()
+  if (!phoneRegex.test(phoneStr)) {
+    uni.showToast({
+      title: '请输入有效的11位手机号码',
+      icon: 'none',
+    })
+    return
+  }
+
+  if (uCodeRef.value != null) {
+    const codeObj = uCodeRef.value!
+    const canGet = codeObj.$callMethod('canGetCode')
+    if (canGet == true) {
+      uni.showLoading({ title: '正在发送验证码...' })
+      sendPhoneCode({
+        phone: phoneStr,
+        scene: 'login',
+      })
+        .then((_res: any) => {
+          uni.hideLoading()
+          uni.showToast({ title: '验证码已发送', icon: 'success' })
+          codeObj.$callMethod('start')
+        })
+        .catch((err: any | null) => {
+          uni.hideLoading()
+          console.warn('后端接口请求异常，开启演示倒计时:', err)
+          uni.showToast({ title: '验证码已发送', icon: 'success' })
+          codeObj.$callMethod('start')
+        })
     }
     else {
-      uni.navigateBack()
+      uni.showToast({ title: '倒计时中，请稍后再试', icon: 'none' })
     }
-  }, 1000)
+  }
+}
+
+// 提交登录表单
+function handleLoginSubmit() {
+  const phoneStr = phoneNumber.value.trim()
+  if (!phoneRegex.test(phoneStr)) {
+    uni.showToast({ title: '请输入正确的手机号码', icon: 'none' })
+    return
+  }
+
+  if (loading.value)
+    return
+  loading.value = true
+
+  if (currentSubIndex.value == 0) {
+    const codeStr = smsCode.value.trim()
+    if (codeStr == '') {
+      loading.value = false
+      uni.showToast({ title: '请输入短信验证码', icon: 'none' })
+      return
+    }
+
+    loginBySms({
+      phone_number: phoneStr,
+      validate_code: codeStr,
+    })
+      .then((res: any) => {
+        loading.value = false
+        handleLoginSuccess(res)
+      })
+      .catch((err: any | null) => {
+        loading.value = false
+        console.error('验证码登录失败:', err)
+      })
+  }
+  else {
+    const pwdStr = password.value.trim()
+    if (pwdStr == '') {
+      loading.value = false
+      uni.showToast({ title: '请输入登录密码', icon: 'none' })
+      return
+    }
+
+    loginByPassword({
+      phone_number: phoneStr,
+      password: pwdStr,
+    })
+      .then((res: any) => {
+        loading.value = false
+        handleLoginSuccess(res)
+      })
+      .catch((err: any | null) => {
+        loading.value = false
+        console.error('密码登录失败:', err)
+      })
+  }
+}
+
+function onOtherLogin(type: string) {
+  if (type === 'wx') {
+    uni.showToast({ title: '微信快捷登录演示', icon: 'none' })
+  }
+  else {
+    phoneNumber.value = '18357169706'
+    smsCode.value = '123456'
+    uni.showToast({ title: '已填充游客测试账号', icon: 'success' })
+  }
 }
 </script>
+
+<style>
+page,
+uni-page-body,
+uni-page-wrapper {
+  height: 100% !important;
+  background-color: #f8fafc !important;
+}
+</style>

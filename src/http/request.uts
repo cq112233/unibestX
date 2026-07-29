@@ -72,6 +72,8 @@ requestInstance.interceptors.request.use(
       if (token === '') {
         throw new Error('[请求错误]：未登录')
       }
+      const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`
+      header['Authorization'] = authHeader
       header['token'] = token
     }
 
@@ -129,7 +131,7 @@ requestInstance.interceptors.response.use(
 
       if (code !== null) {
         const codeVal = code as number
-        if (codeVal !== ResultEnum.Success0 && codeVal !== ResultEnum.Success200) {
+        if (codeVal !== ResultEnum.Success0 && codeVal !== ResultEnum.Success200 && codeVal !== ResultEnum.Success10000) {
           let toastEnabled = true
           if (extra !== null) {
             const toastVal = (extra as UTSJSONObject).getBoolean('toast')
@@ -188,9 +190,12 @@ export class HttpClient {
               throw new Error('响应 data 字段无法解析为指定的类型，请检查数据结构是否匹配。数据：' + innerStr)
             }
           }
-          // 如果外层有 code 但没有 data 字段，或者 data 为 null
-          // 有些接口可能只返回 code 和 msg，不返回 data。此时如果 T 是 any 可以，否则应该报错
-          throw new Error('响应结构包含 code，但 data 字段为空')
+          // 如果外层有 code 且 code 正常，但 data 字段为空/null，则返回外层包装对象或空值
+          const rawStr = JSON.stringify(rawData)
+          const parsedRaw = JSON.parse<T>(rawStr)
+          if (parsedRaw !== null) {
+            return parsedRaw as T
+          }
         }
       }
 

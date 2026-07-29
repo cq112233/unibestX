@@ -1,4 +1,6 @@
 import { useTokenStore } from '../store/token'
+import { useUserStore } from '../store/user'
+import { fetchAndStoreUserInfo } from '../api/auth'
 import { tabbarList, isPageTabbar, setCurIdxByPath } from '../tabbar/store'
 import { EXCLUDE_LOGIN_PATH_LIST, isNeedLoginMode, LOGIN_PAGE } from './config'
 
@@ -118,6 +120,12 @@ function doIntercept(url: string): boolean {
   console.log('doIntercept login status - hasLogin:', hasLogin)
 
   if (hasLogin) {
+    // 拦截校验 Token：已登录但 store 中尚无用户信息时，通过接口获取用户信息存到 userStore
+    const userStore = useUserStore()
+    if (userStore.state.userInfo.userId <= 0) {
+      fetchAndStoreUserInfo().catch((_err: any | null) => {})
+    }
+
     // 已经登录的情况下，如果目标不是登录页直接放行
     if (path !== LOGIN_PAGE) {
       return true

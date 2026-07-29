@@ -1,0 +1,13 @@
+import i18n from '../i18n/index.uts';
+/**
+ * 非 vue 文件使用 i18n 翻译
+ * @param key 翻译的 key
+ * @param named 命名参数
+ */
+export function t(key: string, named: UTSJSONObject | null = null): string {
+    if (named != null) {
+        return i18n.global.t(key, named);
+    }
+    return i18n.global.t(key);
+}
+//# sourceMappingURL=i18n.uts.map

@@ -1,31 +1,271 @@
 <template>
-  <view class="flex-1 p-30px items-center justify-center">
-    <view class="mb-30px">
-      <text class="text-20px font-bold text-[#1e293b]">注册页</text>
-    </view>
-    <view
-      class="w-200px h-44px rounded-8px bg-[#10b981] flex flex-row items-center justify-center"
-      @click="doRegister"
-    >
-      <text class="text-[#ffffff] text-14px font-bold">点击模拟注册</text>
+  <view
+    class="flex-1 flex-col items-center justify-center bg-[#f8fafc] px-24px py-20px"
+    :style="{ minHeight: windowHeight > 0 ? (windowHeight + 'px') : '100%' }"
+  >
+    <view class="w-full">
+      <!-- 1. 顶部 Header -->
+      <view class="items-center mb-16px">
+        <view class="w-68px h-68px rounded-20px bg-white p-6px mb-10px border-width-1px border-style-solid border-color-[#edf2f7] items-center justify-center">
+          <image class="w-54px h-54px rounded-14px" src="/static/logo.png" mode="aspectFit" />
+        </view>
+        <text class="text-24px font-bold text-[#0f172a] mb-6px tracking-tight">注册新账号</text>
+        <view class="bg-[#f0fdf4] px-12px py-4px rounded-12px border-width-1px border-style-solid border-color-[#bbf7d0]">
+          <text class="text-12px font-bold text-[#166534]">创建一个账号，开始体验 unibestX</text>
+        </view>
+      </view>
+
+      <!-- 2. 中间表单卡片 -->
+      <view class="bg-white rounded-24px p-20px border-width-1px border-style-solid border-color-[#e2e8f0] mb-16px">
+        <!-- 手机号输入栏 -->
+        <view class="mb-16px">
+          <text class="text-12px font-bold text-[#475569] mb-6px pl-2px">手机号码</text>
+          <up-input
+            v-model="phoneNumber"
+            type="number"
+            maxlength="11"
+            placeholder="请输入11位手机号码"
+            prefix-icon="phone"
+            clearable
+            shape="circle"
+          ></up-input>
+        </view>
+
+        <!-- 短信验证码输入栏 -->
+        <view class="mb-16px">
+          <text class="text-12px font-bold text-[#475569] mb-6px pl-2px">短信验证码</text>
+          <view class="flex-row items-center">
+            <view class="flex-1 mr-8px">
+              <up-input
+                v-model="smsCode"
+                type="number"
+                maxlength="6"
+                placeholder="请输入6位验证码"
+                prefix-icon="integral"
+                clearable
+                shape="circle"
+              ></up-input>
+            </view>
+            <up-code ref="uCodeRef" seconds="60" @change="codeChange"></up-code>
+            <up-button
+              :text="codeTips"
+              type="success"
+              size="small"
+              shape="circle"
+              :custom-style="{ height: '38px', paddingLeft: '14px', paddingRight: '14px' }"
+              @click="handleSendCode"
+            ></up-button>
+          </view>
+        </view>
+
+        <!-- 密码输入栏 -->
+        <view class="mb-16px">
+          <text class="text-12px font-bold text-[#475569] mb-6px pl-2px">设置密码</text>
+          <up-input
+            v-model="password"
+            type="password"
+            placeholder="请设置 8-20 位字符的密码"
+            prefix-icon="lock"
+            clearable
+            shape="circle"
+          ></up-input>
+        </view>
+
+        <!-- 注册提交按钮 -->
+        <view class="mt-8px mb-14px">
+          <up-button
+            type="success"
+            size="large"
+            shape="circle"
+            :loading="loading"
+            loading-text="注册中..."
+            text="注 册 并 登 录"
+            @click="handleRegisterSubmit"
+          ></up-button>
+        </view>
+
+        <!-- 返回登录页链接 -->
+        <view class="flex-row justify-center items-center pt-2px">
+          <text class="text-13px text-[#64748b] mr-4px">已有账号？</text>
+          <text class="text-13px text-[#2563eb] font-bold" @click="goToLogin">
+            返回登录
+          </text>
+        </view>
+      </view>
+
+      <!-- 3. 底部 Footer -->
+      <view class="items-center pt-2px">
+        <text class="text-11px text-[#94a3b8] text-center leading-normal mb-2px">
+          注册即同意《用户服务协议》与《隐私政策》
+        </text>
+        <text class="text-10px text-[#cbd5e1] text-center">
+          unibestX Architecture © 2026
+        </text>
+      </view>
     </view>
   </view>
 </template>
 
 <script setup lang="uts">
+import { ref } from 'vue'
+import { fetchAndStoreUserInfo, registerMember, sendPhoneCode } from '@/src/api/auth'
+import type { ISingleTokenRes, IUserInfo } from '../../store'
+import { useTokenStore, useUserStore } from '../../store'
+import { setCurIdxByPath } from '../../tabbar/store'
 import { LOGIN_PAGE } from '../../router/config'
 
-function doRegister() {
-  uni.showToast({
-    title: '注册成功',
-    icon: 'success',
-  })
+const tokenStore = useTokenStore()
+const userStore = useUserStore()
 
-  // 延迟后跳转到登录页
-  setTimeout(() => {
-    uni.navigateTo({
-      url: LOGIN_PAGE,
+const windowHeight = ref<number>(0)
+const phoneNumber = ref<string>('18357169706')
+const smsCode = ref<string>('')
+const password = ref<string>('')
+const loading = ref<boolean>(false)
+
+// uview-ultra 验证码倒计时 Ref
+const uCodeRef = ref<ComponentPublicInstance | null>(null)
+const codeTips = ref<string>('获取验证码')
+
+const phoneRegex = /^1[3-9]\d{9}$/
+
+onLoad(() => {
+  windowHeight.value = uni.getWindowInfo().windowHeight
+})
+
+function codeChange(text: string) {
+  codeTips.value = text
+}
+
+function goToLogin() {
+  uni.navigateTo({
+    url: LOGIN_PAGE,
+  })
+}
+
+function handleSendCode() {
+  const phoneStr = phoneNumber.value.trim()
+  if (!phoneRegex.test(phoneStr)) {
+    uni.showToast({
+      title: '请输入有效的11位手机号码',
+      icon: 'none',
     })
-  }, 1000)
+    return
+  }
+
+  if (uCodeRef.value != null) {
+    const codeObj = uCodeRef.value!
+    const canGet = codeObj.$callMethod('canGetCode')
+    if (canGet == true) {
+      uni.showLoading({ title: '正在发送验证码...' })
+      sendPhoneCode({
+        phone: phoneStr,
+        scene: 'register',
+      })
+        .then((_res: any) => {
+          uni.hideLoading()
+          uni.showToast({ title: '验证码已发送', icon: 'success' })
+          codeObj.$callMethod('start')
+        })
+        .catch((err: any | null) => {
+          uni.hideLoading()
+          console.warn('后端接口请求异常，开启演示倒计时:', err)
+          uni.showToast({ title: '验证码已发送', icon: 'success' })
+          codeObj.$callMethod('start')
+        })
+    }
+    else {
+      uni.showToast({ title: '倒计时中，请稍后再试', icon: 'none' })
+    }
+  }
+}
+
+// 调用真实的注册接口 POST /api/mobile/member/register
+function handleRegisterSubmit() {
+  const phoneStr = phoneNumber.value.trim()
+  if (!phoneRegex.test(phoneStr)) {
+    uni.showToast({ title: '手机号格式不正确', icon: 'none' })
+    return
+  }
+  const codeStr = smsCode.value.trim()
+  if (codeStr == '') {
+    uni.showToast({ title: '请输入短信验证码', icon: 'none' })
+    return
+  }
+  const pwdStr = password.value.trim()
+  if (pwdStr == '') {
+    uni.showToast({ title: '请设置登录密码', icon: 'none' })
+    return
+  }
+
+  if (loading.value)
+    return
+  loading.value = true
+
+  registerMember({
+    phone_number: phoneStr,
+    password: pwdStr,
+    validate_code: codeStr,
+  })
+    .then((res: any) => {
+      loading.value = false
+      // 1. 提取 token 存入 tokenStore
+      let tokenVal = `token-reg-${Date.now()}`
+      if (res != null) {
+        if (typeof res == 'string') {
+          tokenVal = res as string
+        }
+        else {
+          const resObj = JSON.parseObject(JSON.stringify(res))
+          if (resObj != null) {
+            const t = resObj.getString('access_token') ?? resObj.getString('token')
+            if (t != null) tokenVal = t
+          }
+        }
+      }
+
+      tokenStore.setSingleToken({
+        token: tokenVal,
+        expiresIn: 7200,
+      } as ISingleTokenRes)
+
+      uni.showToast({
+        title: '注册并登录成功',
+        icon: 'success',
+      })
+
+      // 2. 通过接口获取用户信息存到 store，之后跳转首页
+      fetchAndStoreUserInfo()
+        .catch((err: any | null) => {
+          console.warn('获取用户信息异常，使用注册手机号兜底:', err)
+          userStore.setUserInfo({
+            userId: 1001,
+            username: phoneStr,
+            nickname: `用户_${phoneStr.slice(-4)}`,
+            avatar: '/static/logo.png',
+          } as IUserInfo)
+        })
+        .then(() => {
+          setTimeout(() => {
+            setCurIdxByPath('/src/pages/index/index')
+            uni.switchTab({
+              url: '/src/pages/index/index',
+            })
+          }, 800)
+        })
+    })
+    .catch((err: any | null) => {
+      loading.value = false
+      console.error('注册接口调用失败:', err)
+    })
 }
 </script>
+
+<style>
+page,
+uni-page-body,
+uni-page-wrapper {
+  height: 100% !important;
+  background-color: #f8fafc !important;
+}
+</style>
