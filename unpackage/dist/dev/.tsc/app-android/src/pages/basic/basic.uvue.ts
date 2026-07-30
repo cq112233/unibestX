@@ -45,7 +45,7 @@ return (): any | null => {
         "disable-scroll": true
       }), _uM({
         default: withSlotCtx((): any[] => [
-          _cE("view", _uM({ class: "flex-1 flex-col h-full bg-__f8fafc_" }), [
+          _cE("view", _uM({ class: "flex-1 flex-col" }), [
             _cE("scroll-view", _uM({
               direction: "vertical",
               class: "flex-1 h-0",

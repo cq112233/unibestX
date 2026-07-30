@@ -235,7 +235,7 @@ const __uniTabBar: Map<string, any | null> | null = _uM([["custom",true],["color
 const __uniLaunchPage: Map<string, any | null> = _uM([["url","src/pages/index/index"],["style",_uM([["navigationStyle","custom"],["navigationBarTitleText","首页"]])]])
 function defineAppConfig(){
   __uniConfig.entryPagePath = '/src/pages/index/index'
-  __uniConfig.globalStyle = _uM([["navigationBarTextStyle","black"],["navigationBarTitleText","uni-app x"],["navigationBarBackgroundColor","#ffffff"],["backgroundColor","#F8F8F8"]])
+  __uniConfig.globalStyle = _uM([["navigationBarTextStyle","black"],["navigationBarTitleText","uni-app x"],["navigationBarBackgroundColor","#ffffff"],["backgroundColor","#F8F8F8"],["backgroundColorContent","#F8F8F8"]])
   __uniConfig.getTabBarConfig = ():Map<string, any> | null =>  _uM([["custom",true],["color","#999999"],["selectedColor","#1890ff"],["backgroundColor","#F8F8F8"],["list",[_uM([["pagePath","src/pages/index/index"],["text","首页"]]),_uM([["pagePath","src/pages/basic/basic"],["text","基础"]]),_uM([["pagePath","src/pages/function/function"],["text","功能"]]),_uM([["pagePath","src/pages/me/me"],["text","我的"]])]]])
   __uniConfig.tabBar = __uniConfig.getTabBarConfig()
   __uniConfig.conditionUrl = ''

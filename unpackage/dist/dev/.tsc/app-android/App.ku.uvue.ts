@@ -65,15 +65,14 @@ const _component_up_toast = resolveEasyComponent("up-toast",_easycom_up_toast)
 
   return _cE("view", _uM({
     class: "flex flex-col flex-1 h-full",
-    style: _nS(_uM({ '--theme-color': unref(appStore).state.theme, 'backgroundColor': '#f8f8f8' }))
+    style: _nS(_uM({ '--theme-color': unref(appStore).state.theme }))
   }), [
     _cE("scroll-view", _uM({
       direction: "vertical",
-      class: "flex-1 h-0",
-      style: _nS(_uM({ backgroundColor: '#f8f8f8' }))
+      class: "flex-1 h-0"
     }), [
       renderSlot(_ctx.$slots, "default")
-    ], 4 /* STYLE */),
+    ]),
     isTrue(isCurrentPageTabbar.value)
       ? _cV(unref(Tabbar), _uM({ key: 0 }))
       : _cC("v-if", true),
