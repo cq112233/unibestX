@@ -30,7 +30,7 @@ const buttonClass = computed((): string => {
 })
 
 const templateCorpusDynamicClass = computed((): string => {
-  return 'template-corpus-dynamic bg-[#68c828] text-[100px] w-[323px] h-[45px]'
+  return 'template-corpus-dynamic bg-[#68c828] text-slate-700 text-[26px] w-[323px] h-[45px] leading-[45px] px-3'
 })
 
 function setGlobalNum(num: number): void {
@@ -45,7 +45,7 @@ onLoad((): void => {
 <template>
   <view class="content">
     <up-button type="primary">
-      按钮
+      按钮11133
     </up-button>
     <WeappTailwindcss />
     <BindClass />
@@ -108,8 +108,6 @@ onLoad((): void => {
 </template>
 
 <style lang="scss" scoped>
-@reference "../../../main.css";
-
 .content {
   @apply flex flex-col items-center py-4;
 }

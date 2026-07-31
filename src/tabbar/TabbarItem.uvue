@@ -74,7 +74,7 @@ function getBadgeText(): string {
   <view v-else class="tabbar-item-inner">
     <!-- 图片图标 -->
     <image
-      v-if="tabbarItem.iconType === 'image'"
+      v-if="tabbarItem.iconType == 'image'"
       :src="getIcon()"
       mode="scaleToFill"
       class="icon-normal"
@@ -82,14 +82,13 @@ function getBadgeText(): string {
 
     <!-- uni-icons 字体图标 -->
     <view
-      v-if="tabbarItem.iconType === 'icon'"
-      class="icon-normal"
-      style="align-items: center; justify-content: center;"
+      v-if="tabbarItem.iconType == 'icon'"
+      class="icon-normal icon-container"
     >
       <uni-icons
         :type="getIcon()"
         size="24"
-        :style="{ color: getActiveColor() }"
+        :color="getActiveColor()"
       ></uni-icons>
     </view>
 
@@ -108,6 +107,8 @@ function getBadgeText(): string {
 
 <style>
 .tabbar-item-inner {
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
@@ -115,6 +116,11 @@ function getBadgeText(): string {
 .icon-normal {
   width: 24px;
   height: 24px;
+}
+.icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .tabbar-text {
   font-size: 10px;
@@ -139,6 +145,7 @@ function getBadgeText(): string {
   padding-right: 4px;
   border-radius: 16px;
   background-color: #f56c6c;
+  display: flex;
   align-items: center;
   justify-content: center;
 }
@@ -153,6 +160,7 @@ function getBadgeText(): string {
   position: relative;
   width: 100%;
   height: 80px;
+  display: flex;
   align-items: center;
 }
 .bulge-btn {
@@ -165,6 +173,7 @@ function getBadgeText(): string {
   border-width: 1px;
   border-style: solid;
   border-color: rgba(255, 255, 255, 0.5);
+  display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0px 3px 8px rgba(37, 99, 235, 0.25);
