@@ -55,16 +55,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: common_vendor.t(offsetDays.value),
         d: common_vendor.o(($event) => {
           return adjustOffset(-7);
-        }, "96"),
+        }, "ab"),
         e: common_vendor.o(($event) => {
           return adjustOffset(-1);
-        }, "1d"),
+        }, "1e"),
         f: common_vendor.o(($event) => {
           return adjustOffset(1);
-        }, "b1"),
+        }, "e5"),
         g: common_vendor.o(($event) => {
           return adjustOffset(7);
-        }, "86"),
+        }, "4f"),
         h: common_vendor.t(targetOffsetTime.value),
         i: common_vendor.t(startOfMonth.value),
         j: common_vendor.t(endOfMonth.value),
@@ -73,7 +73,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         m: common_vendor.gei(_ctx, ""),
         n: common_vendor.p({
           title: "时间日期操作 (lime-dayuts)",
-          id: common_vendor.gei(_ctx, "")
+          id: common_vendor.gei(_ctx, ""),
+          class: "data-v-69f41023"
         }),
         o: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
@@ -81,5 +82,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-wx.createComponent(_sfc_main);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-69f41023"]]);
+wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/src/pages/basic/components/TimeDemoCard.js.map

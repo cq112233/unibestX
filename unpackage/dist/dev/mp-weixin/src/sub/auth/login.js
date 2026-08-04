@@ -71,7 +71,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
-        a: common_vendor.o(doLogin, "ec"),
+        a: common_vendor.o(doLogin, "c4"),
         b: common_vendor.p({
           ["navigation-bar-title-text"]: "登录"
         }),

@@ -1,4 +1,3 @@
-:host{display:flex;flex-direction:column}
 /**
  * 这里是uni-app内置的常用样式变量
  *
@@ -56,13 +55,16 @@
 }
 .up-dropdown__menu__item__arrow.data-v-252960e7 {
   margin-left: 6rpx;
+  transition: -webkit-transform 0.3s;
   transition: transform 0.3s;
+  transition: transform 0.3s, -webkit-transform 0.3s;
   align-items: center;
   display: flex;
   flex-direction: row;
 }
 .up-dropdown__menu__item__arrow--rotate.data-v-252960e7 {
-  transform: rotate(180deg);
+  -webkit-transform: rotate(180deg);
+          transform: rotate(180deg);
 }
 .up-dropdown__content.data-v-252960e7 {
   border: 0px solid blue;
@@ -86,7 +88,10 @@
 .up-dropdown__content__popup.data-v-252960e7 {
   position: relative;
   z-index: 10;
+  transition: -webkit-transform 0.3s;
   transition: transform 0.3s;
-  transform: translate3D(0, -100%, 0);
+  transition: transform 0.3s, -webkit-transform 0.3s;
+  -webkit-transform: translate3D(0, -100%, 0);
+          transform: translate3D(0, -100%, 0);
   overflow: hidden;
 }

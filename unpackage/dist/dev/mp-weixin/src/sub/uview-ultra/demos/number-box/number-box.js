@@ -31,14 +31,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: common_vendor.o(($event) => {
           return numberValue1.value = $event;
-        }, "75"),
+        }, "28"),
         c: common_vendor.p({
           modelValue: numberValue1.value,
           class: "data-v-f55e146d"
         }),
         d: common_vendor.o(($event) => {
           return numberValue2.value = $event;
-        }, "6f"),
+        }, "49"),
         e: common_vendor.p({
           step: 2,
           modelValue: numberValue2.value,
@@ -46,7 +46,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         f: common_vendor.o(($event) => {
           return numberValue3.value = $event;
-        }, "f8"),
+        }, "e8"),
         g: common_vendor.p({
           min: 5,
           max: 10,
@@ -55,7 +55,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         h: common_vendor.o(($event) => {
           return numberValue4.value = $event;
-        }, "a4"),
+        }, "e7"),
         i: common_vendor.p({
           disabled: true,
           modelValue: numberValue4.value,

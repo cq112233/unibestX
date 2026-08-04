@@ -60,7 +60,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         k: common_vendor.gei(_ctx, ""),
         l: common_vendor.p({
           title: "系统与安全区域信息",
-          id: common_vendor.gei(_ctx, "")
+          id: common_vendor.gei(_ctx, ""),
+          class: "data-v-e2d7109b"
         }),
         m: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
@@ -68,5 +69,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-wx.createComponent(_sfc_main);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-e2d7109b"]]);
+wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/src/pages/basic/components/SystemInfoDemoCard.js.map

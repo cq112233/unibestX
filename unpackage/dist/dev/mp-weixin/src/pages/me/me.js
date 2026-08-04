@@ -74,13 +74,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         d: common_vendor.t(common_vendor.unref(userStore).state.userInfo.nickname)
       } : {}, {
         e: common_vendor.t(common_vendor.unref(tokenStore).hasValidLogin() ? "已登录" : "未登录"),
-        f: common_vendor.n(common_vendor.unref(tokenStore).hasValidLogin() ? "bg-[#d1fae5] text-[#065f46]" : "bg-[#f1f5f9] text-[#64748b]"),
+        f: common_vendor.n(common_vendor.unref(tokenStore).hasValidLogin() ? "bg-_b_hd1fae5_B text-_b_h065f46_B" : "bg-_b_hf1f5f9_B text-_b_h64748b_B"),
         g: common_vendor.t(common_vendor.unref(userInfoJson)),
         h: common_vendor.unref(tokenStore).hasValidLogin()
       }, common_vendor.unref(tokenStore).hasValidLogin() ? {
-        i: common_vendor.o(handleLogout, "11")
+        i: common_vendor.o(handleLogout, "d4")
       } : {
-        j: common_vendor.o(handleLogin, "94")
+        j: common_vendor.o(handleLogin, "f2")
       }, {
         k: common_vendor.p({
           ["navigation-bar-title-text"]: "我的"

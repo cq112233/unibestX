@@ -40,7 +40,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           direction: "top",
           class: "data-v-065444fb"
         }),
-        c: common_vendor.o(handleBtnClick, "2c"),
+        c: common_vendor.o(handleBtnClick, "74"),
         d: common_vendor.p({
           text: "长按显示操作",
           direction: "top",
@@ -64,7 +64,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           direction: "top",
           class: "data-v-065444fb"
         }),
-        h: common_vendor.o(handleBtnClick, "30"),
+        h: common_vendor.o(handleBtnClick, "e2"),
         i: common_vendor.p({
           text: "显示多个扩展按钮",
           ["show-copy"]: true,
@@ -77,7 +77,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           text: "点击/长按触发",
           class: "data-v-065444fb"
         }),
-        k: common_vendor.o(handleBtnClick, "9a"),
+        k: common_vendor.o(handleBtnClick, "24"),
         l: common_vendor.p({
           ["show-copy"]: false,
           buttons: ["设置", "赞"],
@@ -90,7 +90,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           text: "下方弹出",
           class: "data-v-065444fb"
         }),
-        n: common_vendor.o(handleBtnClick, "28"),
+        n: common_vendor.o(handleBtnClick, "82"),
         o: common_vendor.p({
           ["show-copy"]: true,
           buttons: ["自定义操作"],

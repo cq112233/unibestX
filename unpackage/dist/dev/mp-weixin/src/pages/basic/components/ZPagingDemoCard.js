@@ -115,8 +115,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
-        a: common_vendor.o(triggerError, "04"),
-        b: common_vendor.o(triggerClear, "69"),
+        a: common_vendor.o(triggerError, "4d"),
+        b: common_vendor.o(triggerClear, "0b"),
         c: common_vendor.f(tabList, (tab, index, i0) => {
           return {
             a: common_vendor.t(tab),
@@ -139,11 +139,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             g: item.id
           };
         }),
-        e: common_vendor.sr(pagingX, "fb8e0b6c-1,fb8e0b6c-0", {
+        e: common_vendor.sr(pagingX, "ab14133f-1,ab14133f-0", {
           "k": "pagingX"
         }),
-        f: common_vendor.o(onUpdateModelValue, "80"),
-        g: common_vendor.o(onQuery, "91"),
+        f: common_vendor.o(onUpdateModelValue, "be"),
+        g: common_vendor.o(onQuery, "8f"),
         h: common_vendor.p({
           ["list-is"]: "scroll-view",
           ["model-value"]: dataList.value,
@@ -156,12 +156,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             borderBottomRightRadius: "12px",
             backgroundColor: "#f8fafc"
           },
-          class: "r"
+          class: "r data-v-ab14133f"
         }),
         i: common_vendor.gei(_ctx, ""),
         j: common_vendor.p({
           title: "数据分页列表 (z-paging-x)",
-          id: common_vendor.gei(_ctx, "")
+          id: common_vendor.gei(_ctx, ""),
+          class: "data-v-ab14133f"
         }),
         k: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
@@ -169,5 +170,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-wx.createComponent(_sfc_main);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-ab14133f"]]);
+wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/src/pages/basic/components/ZPagingDemoCard.js.map

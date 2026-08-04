@@ -47,7 +47,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         e: common_vendor.gei(_ctx, ""),
         f: common_vendor.p({
           title: _ctx.$t("basic.themeTitle"),
-          id: common_vendor.gei(_ctx, "")
+          id: common_vendor.gei(_ctx, ""),
+          class: "data-v-6f3d2a74"
         }),
         g: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
@@ -55,5 +56,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-wx.createComponent(_sfc_main);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-6f3d2a74"]]);
+wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/src/pages/basic/components/ThemeSwitchCard.js.map

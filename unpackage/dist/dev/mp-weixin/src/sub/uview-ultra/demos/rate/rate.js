@@ -32,7 +32,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: common_vendor.o(($event) => {
           return rateValue1.value = $event;
-        }, "f0"),
+        }, "cb"),
         c: common_vendor.p({
           count: 5,
           modelValue: rateValue1.value,
@@ -40,7 +40,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         d: common_vendor.o(($event) => {
           return rateValue2.value = $event;
-        }, "25"),
+        }, "73"),
         e: common_vendor.p({
           count: 5,
           ["active-icon"]: "heart-fill",
@@ -51,7 +51,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         f: common_vendor.o(($event) => {
           return rateValue3.value = $event;
-        }, "2c"),
+        }, "33"),
         g: common_vendor.p({
           count: 5,
           ["allow-half"]: true,
@@ -60,7 +60,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         h: common_vendor.o(($event) => {
           return rateValue4.value = $event;
-        }, "ca"),
+        }, "b6"),
         i: common_vendor.p({
           count: 5,
           readonly: true,
@@ -69,7 +69,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         j: common_vendor.o(($event) => {
           return rateValue5.value = $event;
-        }, "60"),
+        }, "51"),
         k: common_vendor.p({
           count: 5,
           disabled: true,

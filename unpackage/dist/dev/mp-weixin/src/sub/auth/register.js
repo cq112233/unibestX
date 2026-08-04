@@ -23,7 +23,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
-        a: common_vendor.o(doRegister, "39"),
+        a: common_vendor.o(doRegister, "fd"),
         b: common_vendor.p({
           ["navigation-bar-title-text"]: "注册"
         }),

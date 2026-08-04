@@ -17,22 +17,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "index",
   setup(__props) {
     const buttonColors = [
-      "bg-[#000]",
-      "bg-[#111]",
-      "bg-[#222]",
-      "bg-[#333]",
-      "bg-[#444]",
-      "bg-[#555]",
-      "bg-[#666]",
-      "bg-[#777]",
-      "bg-[#888]",
-      "bg-[#999]",
-      "bg-[#aaa]",
-      "bg-[#bbb]",
-      "bg-[#ccc]",
-      "bg-[#ddd]",
-      "bg-[#eee]",
-      "bg-[#fff]"
+      "bg-_b_h000_B",
+      "bg-_b_h111_B",
+      "bg-_b_h222_B",
+      "bg-_b_h333_B",
+      "bg-_b_h444_B",
+      "bg-_b_h555_B",
+      "bg-_b_h666_B",
+      "bg-_b_h777_B",
+      "bg-_b_h888_B",
+      "bg-_b_h999_B",
+      "bg-_b_haaa_B",
+      "bg-_b_hbbb_B",
+      "bg-_b_hccc_B",
+      "bg-_b_hddd_B",
+      "bg-_b_heee_B",
+      "bg-_b_hfff_B"
     ];
     const globalNum = common_vendor.ref(0);
     const buttonClass = common_vendor.computed(() => {
@@ -40,7 +40,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return buttonColors[index];
     });
     const templateCorpusDynamicClass = common_vendor.computed(() => {
-      return "template-corpus-dynamic bg-[#68c828] text-[100px] w-[323px] h-[45px]";
+      return "template-corpus-dynamic bg-_b_h68c828_B text-slate-700 text-_b26px_B w-_b323px_B h-_b45px_B leading-_b45px_B px-3";
     });
     function setGlobalNum(num) {
       globalNum.value = num;
@@ -66,10 +66,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         f: common_vendor.n(common_vendor.unref(buttonClass)),
         g: common_vendor.o(($event) => {
           return setGlobalNum(common_vendor.unref(globalNum) + 1);
-        }, "d7"),
+        }, "c6"),
         h: common_vendor.p({
-          ["t-class"]: "bg-[#0977ee] text-[31rpx]",
-          ["t-class-content"]: "px-[29rpx]",
+          ["t-class"]: "bg-_b_h0977ee_B text-_b31rpx_B",
+          ["t-class-content"]: "px-_b29rpx_B",
           class: "data-v-55cb847e"
         }),
         i: common_vendor.p({

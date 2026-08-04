@@ -150,8 +150,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         d: common_vendor.sr(pagingX, "0ef71e88-3,0ef71e88-1", {
           "k": "pagingX"
         }),
-        e: common_vendor.o(onUpdateModelValue, "2e"),
-        f: common_vendor.o(onQuery, "c0"),
+        e: common_vendor.o(onUpdateModelValue, "60"),
+        f: common_vendor.o(onQuery, "6a"),
         g: common_vendor.p({
           ["model-value"]: dataList.value,
           ["default-page-size"]: 10,

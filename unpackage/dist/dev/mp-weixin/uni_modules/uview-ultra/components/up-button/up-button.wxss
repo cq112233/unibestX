@@ -1,4 +1,3 @@
-:host{display:flex;flex-direction:column}
 /**
  * 这里是uni-app内置的常用样式变量
  *
@@ -161,13 +160,14 @@
 .up-button--hairline.data-v-0816b018 {
   border-width: 0.5px !important;
 }
-.up-button.data-v-0816b018:before {
+.up-button.data-v-0816b018::before {
   position: absolute;
   top: 50%;
   left: 50%;
   width: 100%;
   height: 100%;
-  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
   opacity: 0;
   background-color: #000 !important;
   border-color: #000 !important;
@@ -175,7 +175,7 @@
 .up-button__button--active.data-v-0816b018 {
   opacity: 0.2 !important;
 }
-.up-button__button--active.data-v-0816b018:before {
+.up-button__button--active.data-v-0816b018::before {
   opacity: 0.15;
 }
 .up-button__loading-text.data-v-0816b018 {

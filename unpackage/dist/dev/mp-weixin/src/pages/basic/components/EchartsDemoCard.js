@@ -185,29 +185,30 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
-        a: common_vendor.sr(echartRef, "3d774314-1,3d774314-0", {
+        a: common_vendor.sr(echartRef, "41b6edc5-1,41b6edc5-0", {
           "k": "echartRef"
         }),
-        b: common_vendor.o(initEchart, "32"),
+        b: common_vendor.o(initEchart, "60"),
         c: common_vendor.p({
-          class: "w-full !h-full r"
+          class: "wtu-jt2kws-0 wtu-1gaqnlv-1 r data-v-41b6edc5"
         }),
         d: common_vendor.t(_ctx.$t("basic.echartLine")),
-        e: common_vendor.n(currentType.value !== "line" ? "text-[#3b82f6]" : "text-[#ffffff]"),
-        f: common_vendor.n(currentType.value !== "line" ? "bg-[#e0edff]" : "bg-[#3b82f6]"),
-        g: common_vendor.o(changeToLine, "fb"),
+        e: common_vendor.n(currentType.value !== "line" ? "wtu-1qm4myr-b" : "wtu-qcdy5m-c"),
+        f: common_vendor.n(currentType.value !== "line" ? "wtu-15vl6hy-8" : "wtu-jq7tyz-9"),
+        g: common_vendor.o(changeToLine, "54"),
         h: common_vendor.t(_ctx.$t("basic.echartBar")),
-        i: common_vendor.n(currentType.value !== "bar" ? "text-[#10b981]" : "text-[#ffffff]"),
-        j: common_vendor.n(currentType.value !== "bar" ? "bg-[#d1fae5]" : "bg-[#10b981]"),
-        k: common_vendor.o(changeToBar, "28"),
+        i: common_vendor.n(currentType.value !== "bar" ? "wtu-1icmodz-f" : "wtu-qcdy5m-c"),
+        j: common_vendor.n(currentType.value !== "bar" ? "wtu-1bvelj2-d" : "wtu-t6nyan-e"),
+        k: common_vendor.o(changeToBar, "fb"),
         l: common_vendor.t(_ctx.$t("basic.echartPie")),
-        m: common_vendor.n(currentType.value !== "pie" ? "text-[#f59e0b]" : "text-[#ffffff]"),
-        n: common_vendor.n(currentType.value !== "pie" ? "bg-[#fef3c7]" : "bg-[#f59e0b]"),
-        o: common_vendor.o(changeToPie, "08"),
+        m: common_vendor.n(currentType.value !== "pie" ? "wtu-co0z8p-i" : "wtu-qcdy5m-c"),
+        n: common_vendor.n(currentType.value !== "pie" ? "wtu-1kp3vbu-g" : "wtu-rl5n1d-h"),
+        o: common_vendor.o(changeToPie, "ea"),
         p: common_vendor.gei(_ctx, ""),
         q: common_vendor.p({
           title: _ctx.$t("basic.echartTitle"),
-          id: common_vendor.gei(_ctx, "")
+          id: common_vendor.gei(_ctx, ""),
+          class: "data-v-41b6edc5"
         }),
         r: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
@@ -215,5 +216,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-wx.createComponent(_sfc_main);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-41b6edc5"]]);
+wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/src/pages/basic/components/EchartsDemoCard.js.map
