@@ -7,9 +7,7 @@ import { computed, ref, watch, onMounted } from 'vue'
 	
 const __sfc__ = defineComponent({
   __name: 'up-dropdown',
-
-		name: 'up-dropdown'
-	,
+name: 'up-dropdown',
   props: {
 		// 菜单标题和选项的激活态颜色
 		activeColor: {

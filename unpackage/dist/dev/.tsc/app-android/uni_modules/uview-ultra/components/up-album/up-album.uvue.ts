@@ -10,10 +10,8 @@ import imageProps from '../up-image/image.uts'
 
 const __sfc__ = defineComponent({
   __name: 'up-album',
-
 //   ...mpSharedMpOptions,
-  name: 'up-album'
-,
+  name: 'up-album',
   props: {
 	// 图片地址，Array<String>|Array<Object>形式
 	urls: {

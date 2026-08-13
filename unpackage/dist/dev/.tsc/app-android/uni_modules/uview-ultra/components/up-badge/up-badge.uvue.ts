@@ -29,9 +29,7 @@ import type { PropType } from 'vue'
 	
 const __sfc__ = defineComponent({
   __name: 'up-badge',
-
-	  name: 'up-badge'
-	,
+name: 'up-badge',
   props: {
 		// 是否显示圆点
 		isDot: {

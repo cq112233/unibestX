@@ -14,9 +14,7 @@ import type { PropType } from 'vue'
 	
 const __sfc__ = defineComponent({
   __name: 'up-index-list',
-
-		name: 'up-index-list'
-	,
+name: 'up-index-list',
   props: {
 		inactiveColor: {
 			type: String,

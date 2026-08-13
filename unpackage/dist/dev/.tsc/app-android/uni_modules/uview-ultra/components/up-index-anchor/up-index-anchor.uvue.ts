@@ -6,9 +6,7 @@ import { computed, onMounted, getCurrentInstance} from 'vue'
 	
 const __sfc__ = defineComponent({
   __name: 'up-index-anchor',
-
-		name: 'up-index-anchor'
-	,
+name: 'up-index-anchor',
   props: {
 		text: {
 			type: [String, Number],

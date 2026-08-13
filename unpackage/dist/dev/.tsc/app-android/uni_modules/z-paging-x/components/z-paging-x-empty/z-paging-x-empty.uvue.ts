@@ -4,9 +4,7 @@ import { computed } from 'vue'
   
 const __sfc__ = defineComponent({
   __name: 'z-paging-x-empty',
-
-    name: 'z-paging-x-empty'
-  ,
+name: 'z-paging-x-empty',
   props: {
     // 空数据描述文字
     emptyText: {

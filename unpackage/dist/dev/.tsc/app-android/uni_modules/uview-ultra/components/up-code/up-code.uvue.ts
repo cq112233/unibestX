@@ -6,9 +6,7 @@ import { ref, getCurrentInstance } from 'vue'
 	
 const __sfc__ = defineComponent({
   __name: 'up-code',
-
-		name: "up-code"
-	,
+name: "up-code",
   props: {
 		// 倒计时总秒数
 		seconds: {

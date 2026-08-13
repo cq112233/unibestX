@@ -9,9 +9,7 @@ import defProps from './carKeyboard.uts'
 
 const __sfc__ = defineComponent({
   __name: 'up-car-keyboard',
-
-  name: "up-car-keyboard"
-,
+name: "up-car-keyboard",
   props: {
   // 是否打乱键盘的顺序
   random: {

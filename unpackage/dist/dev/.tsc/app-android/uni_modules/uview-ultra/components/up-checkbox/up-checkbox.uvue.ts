@@ -7,9 +7,7 @@ import { computed, ref, watch, onMounted } from 'vue'
 	
 const __sfc__ = defineComponent({
   __name: 'up-checkbox',
-
-		name: 'up-checkbox'
-	,
+name: 'up-checkbox',
   props: {
 		// checkbox组件的标示符
 		name: {

@@ -5,9 +5,7 @@ import { ref, onMounted, getCurrentInstance } from 'vue'
 	
 const __sfc__ = defineComponent({
   __name: 'up-index-item',
-
-		name: 'up-index-item'
-	,
+name: 'up-index-item',
   props: {
 		text: {
 			type: [String, Number],

@@ -1,7 +1,7 @@
 import _easycom_uni_icons from '@/uni_modules/uni-icons/components/uni-icons/uni-icons.uvue'
 import Card from './Card.uvue'
 import { useAppStore } from '@/src/store/index.uts'
-import { t } from '@/src/utils/i18n'
+import { setTabbarItem, t } from '@/src/utils/i18n'
 import { t as uViewT } from '@/uni_modules/uview-ultra/libs/i18n/index.uts'
 
 
@@ -49,6 +49,7 @@ const uViewEnd = computed((): string => {
 
 function switchLanguage(lang: string) {
   appStore.setLocale(lang)
+  setTabbarItem()
 
   uni.showToast({
     title: t('message.switch_success', null),

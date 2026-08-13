@@ -5,10 +5,8 @@ import { computed, ref, watch } from 'vue'
 	
 const __sfc__ = defineComponent({
   __name: 'up-checkbox-group',
-
-		//...mpSharedMpOptions,
-		name: 'up-checkbox-group'
-	,
+//...mpSharedMpOptions,
+		name: 'up-checkbox-group',
   props: {
 		// 标识符 
 		name: {

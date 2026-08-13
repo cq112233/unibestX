@@ -8,10 +8,8 @@ import defProps from './avatar'
 
 const __sfc__ = defineComponent({
   __name: 'up-avatar',
-
-  //...mpSharedMpOptions,
-  name: 'up-avatar'
-,
+//...mpSharedMpOptions,
+  name: 'up-avatar',
   props: {
     // 头像图片路径(不能为相对路径)
     src: {

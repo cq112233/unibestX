@@ -8,9 +8,7 @@ import defProps from './input.uts'
 
 const __sfc__ = defineComponent({
   __name: 'up-input',
-
-  name: 'up-input'
-,
+name: 'up-input',
   props: {
     // 绑定的值
     modelValue: {

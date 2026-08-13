@@ -58,7 +58,7 @@ export class UniAppConfig extends io.dcloud.uniapp.appframe.AppConfig {
     override appid: string = "__UNI__5198058"
     override versionName: string = "1.0.0"
     override versionCode: string = "100"
-    override uniCompilerVersion: string = "5.15"
+    override uniCompilerVersion: string = "5.23"
     
     constructor() { super() }
 }

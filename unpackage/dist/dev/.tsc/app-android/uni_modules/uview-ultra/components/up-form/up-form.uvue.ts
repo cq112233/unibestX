@@ -15,9 +15,7 @@ import type { PropType } from 'vue'
 	
 const __sfc__ = defineComponent({
   __name: 'up-form',
-
-		name: "up-form"
-	,
+name: "up-form",
   props: {
 		// 当前form的需要验证字段的集合
 		model: {

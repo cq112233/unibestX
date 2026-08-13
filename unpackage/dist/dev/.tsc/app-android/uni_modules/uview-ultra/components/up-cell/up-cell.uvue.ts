@@ -8,9 +8,7 @@ import { computed } from 'vue'
 	
 const __sfc__ = defineComponent({
   __name: 'up-cell',
-
-		name: "up-cell"
-	,
+name: "up-cell",
   props: {
 		title: {
 			type: String,

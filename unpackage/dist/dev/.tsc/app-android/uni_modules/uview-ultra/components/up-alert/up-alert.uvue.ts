@@ -9,10 +9,8 @@ import defProps from './alert'
 
 const __sfc__ = defineComponent({
   __name: 'up-alert',
-
-  //...mpSharedMpOptions,
-  name: 'up-alert'
-,
+//...mpSharedMpOptions,
+  name: 'up-alert',
   props: {
     // 主题，success/warning/info/error
     type: {

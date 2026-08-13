@@ -7,10 +7,8 @@ import { addUnit } from '../../libs/function/index'
 
 const __sfc__ = defineComponent({
   __name: 'up-gap',
-
-  // ...mpSharedMpOptions,
-  name: 'up-gap'
-,
+// ...mpSharedMpOptions,
+  name: 'up-gap',
   props: {
 	// 背景颜色（默认 'transparent' ）
 	bgColor: {

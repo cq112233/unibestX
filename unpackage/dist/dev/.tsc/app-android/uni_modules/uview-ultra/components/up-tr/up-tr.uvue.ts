@@ -6,9 +6,7 @@ import { propsTr } from './props'
 	
 const __sfc__ = defineComponent({
   __name: 'up-tr',
-
-	  name: 'up-tr'
-	,
+name: 'up-tr',
   setup(__props) {
 const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;

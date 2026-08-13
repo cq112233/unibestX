@@ -10,12 +10,10 @@ import config from '../../libs/config/config'
 	
 const __sfc__ = defineComponent({
   __name: 'up-dropdown-item',
-
-		name: 'up-dropdown-item',
+name: 'up-dropdown-item',
 		options: {
             styleIsolation: 'shared',
-        }
-	,
+        },
   props: {
 
 		// 当前选中项的value值

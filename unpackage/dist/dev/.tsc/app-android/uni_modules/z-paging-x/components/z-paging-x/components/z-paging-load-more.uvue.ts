@@ -5,9 +5,7 @@ import { computed } from 'vue'
   
 const __sfc__ = defineComponent({
   __name: 'z-paging-load-more',
-
-    name: 'z-paging-load-more'
-  ,
+name: 'z-paging-load-more',
   props: {
     // 下拉刷新状态
     status: {

@@ -8,9 +8,7 @@ import defProps from './card.uts'
 
 const __sfc__ = defineComponent({
   __name: 'up-card',
-
-  name: 'up-card'
-,
+name: 'up-card',
   props: {
   // 与屏幕两侧是否留空隙
   full: {

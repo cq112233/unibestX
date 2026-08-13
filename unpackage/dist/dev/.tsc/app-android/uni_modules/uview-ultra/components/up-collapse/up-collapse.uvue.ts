@@ -5,9 +5,7 @@ import { watch } from 'vue'
 	
 const __sfc__ = defineComponent({
   __name: 'up-collapse',
-
-		name: "up-collapse"
-	,
+name: "up-collapse",
   props: {
 		value: {
 			type: [String, Number, Array],

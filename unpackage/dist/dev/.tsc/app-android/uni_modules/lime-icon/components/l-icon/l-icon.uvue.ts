@@ -7,16 +7,14 @@ import { classNames } from '@/uni_modules/lime-shared/classNames'
 	
 const __sfc__ = defineComponent({
   __name: 'l-icon',
-
-		styleIsolation: 'app-shared',
+styleIsolation: 'app-shared',
 		inheritAttrs: true,
 		externalClasses: ['l-class'],
 		options: {
 
 			virtualHost: true,
 
-		}
-	,
+		},
   __props: IconProps,
   props: {
     name: { type: String, required: true, default: '' },

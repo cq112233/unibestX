@@ -7,9 +7,7 @@ import type { PropType } from 'vue';
 	
 const __sfc__ = defineComponent({
   __name: 'up-grid',
-
-		name: 'up-grid'
-	,
+name: 'up-grid',
   props: {
 		col: {
 			type: [String, Number],

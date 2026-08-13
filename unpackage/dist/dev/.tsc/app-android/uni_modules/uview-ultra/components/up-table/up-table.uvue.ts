@@ -4,9 +4,7 @@ import { ref, watch, computed, getCurrentInstance } from 'vue'
 	
 const __sfc__ = defineComponent({
   __name: 'up-table',
-
-	  name: 'up-table'
-	,
+name: 'up-table',
   props: {
 		borderColor: {
 			type: String,

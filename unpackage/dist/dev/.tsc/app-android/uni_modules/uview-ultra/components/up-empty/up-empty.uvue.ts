@@ -9,9 +9,7 @@ import defProps from './empty.uts'
 
 const __sfc__ = defineComponent({
   __name: 'up-empty',
-
-	name: "up-empty"
-,
+name: "up-empty",
   props: {
 	// 内置图标名称，或图片路径，建议绝对路径
 	icon: {

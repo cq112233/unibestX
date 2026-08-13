@@ -101,9 +101,17 @@
   "i18n-ally.localesPaths": [
     "src/i18n/locales"
   ],
+  "i18n-ally.pathMatcher": "{locale}.json",
   "i18n-ally.keystyle": "nested",
   "i18n-ally.sourceLanguage": "zh-CN",
   "i18n-ally.displayLanguage": "zh-CN",
+  "i18n-ally.include": [
+    "src/**/*.uvue",
+    "src/**/*.uts",
+    "src/**/*.vue",
+    "src/**/*.ts",
+    "src/**/*.js"
+  ],
   "i18n-ally.enabledFrameworks": [
     "vue",
     "vue-sfc"
@@ -114,7 +122,8 @@
     "json"
   ],
   "i18n-ally.parsers.extendFileExtensions": {
-    "uts": "ts"
+    "uts": "ts",
+    "uvue": "vue"
   },
   "i18n-ally.parsers.typescript.compilerOptions": {
     "module": "commonjs",

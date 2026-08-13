@@ -4,9 +4,7 @@ import defProps from './cellGroup'
 	
 const __sfc__ = defineComponent({
   __name: 'up-cell-group',
-
-		name: "up-cell-group"
-	,
+name: "up-cell-group",
   props: {
 		title: {
 			type: String,

@@ -16,10 +16,8 @@ import defProps from './actionSheet.uts'
 
 const __sfc__ = defineComponent({
   __name: 'up-action-sheet',
-
-  // ...mpSharedMpOptions,
-  name: 'up-action-sheet'
-,
+// ...mpSharedMpOptions,
+  name: 'up-action-sheet',
   props: {
 	// 操作菜单是否展示 （默认false）
 	show: {

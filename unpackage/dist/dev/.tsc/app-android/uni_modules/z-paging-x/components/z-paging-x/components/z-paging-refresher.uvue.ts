@@ -7,9 +7,7 @@ import { ref, computed } from 'vue'
   
 const __sfc__ = defineComponent({
   __name: 'z-paging-refresher',
-
-    name: 'z-paging-refresher'
-  ,
+name: 'z-paging-refresher',
   props: {
     // 下拉刷新状态
     status: {

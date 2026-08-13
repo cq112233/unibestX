@@ -10,9 +10,7 @@ import type { PropType } from 'vue'
 	
 const __sfc__ = defineComponent({
   __name: 'up-form-item',
-
-		name: 'up-form-item'
-	,
+name: 'up-form-item',
   props: {
 		// input的label提示语
 		label: {

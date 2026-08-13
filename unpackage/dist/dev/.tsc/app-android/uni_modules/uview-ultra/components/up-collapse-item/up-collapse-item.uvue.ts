@@ -9,9 +9,7 @@ import { nextTick, ref, watch, computed } from 'vue'
 	
 const __sfc__ = defineComponent({
   __name: 'up-collapse-item',
-
-		name: "up-collapse-item"
-	,
+name: "up-collapse-item",
   props: {
 		title: {
 			type: [String],
