@@ -3,16 +3,28 @@
   "version": "1.0.0",
   "description": "unibestX - 最好的 uni-app X 开发框架",
   "scripts": {
-    "dev": "UNI_INPUT_DIR=. uni",
-    "dev:h5": "UNI_INPUT_DIR=. uni",
-    "dev:mp-weixin": "UNI_INPUT_DIR=. uni -p mp-weixin",
+    "dev:web": "uni-launch web",
+    "dev:app-android": "uni-launch app-android",
+    "dev:app-ios": "uni-launch app-ios",
+    "dev:app-harmony": "uni-launch app-harmony",
+    "dev:mp-weixin": "uni-launch mp-weixin",
+    "dev:mp-alipay": "uni-launch mp-alipay",
+    "dev:mp-baidu": "uni-launch mp-baidu",
+    "dev:mp-toutiao": "uni-launch mp-toutiao",
+    "dev:mp-qq": "uni-launch mp-qq",
+    "dev:mp-360": "uni-launch mp-360",
+    "dev:mp-kuaishou": "uni-launch mp-kuaishou",
+    "dev:mp-lark": "uni-launch mp-lark",
+    "dev:mp-jd": "uni-launch mp-jd",
+    "dev:quickapp-huawei": "uni-launch quickapp-webview-huawei",
+    "dev:quickapp-union": "uni-launch quickapp-webview-union",
     "build": "UNI_INPUT_DIR=. uni build",
     "build:h5": "UNI_INPUT_DIR=. uni build",
     "build:mp-weixin": "UNI_INPUT_DIR=. uni build -p mp-weixin",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "predeploy": "pnpm build:h5",
-    "deploy": "gh-pages -d unpackage/dist/build/web",
+    "deploy": "gh-pages -d dist/build/h5",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"
@@ -23,9 +35,11 @@
     "@dcloudio/uni-components": "3.0.0-4070620250821001",
     "@dcloudio/vite-plugin-uni": "3.0.0-4070620250821001",
     "vite": "5.2.8",
-    "vue": "^3.5.13"
+    "vue": "^3.5.13",
+    "crypto-js": "^4.2.0"
   },
   "devDependencies": {
+    "@dcloudio/hbuilderx-cli": "^1.2.0",
     "@dcloudio/types": "^3.4.31",
     "@uni-helper/eslint-config": "0.5.0",
     "@uni-helper/uni-app-types": "^1.0.1",
@@ -34,7 +48,8 @@
     "gh-pages": "^6.3.0",
     "sass": "^1.63.2",
     "sass-loader": "10.4.1",
-    "vitepress": "^1.6.4"
+    "vitepress": "^1.6.4",
+    "@types/crypto-js": "^4.2.2"
   },
   "pnpm": {
     "overrides": {

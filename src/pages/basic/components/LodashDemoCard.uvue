@@ -1,0 +1,239 @@
+<template>
+  <Card title="Lodash 工具库 (iRainna-lodash)">
+    <!-- 1. 数组处理演示 (chunk, uniq, shuffle) -->
+    <view class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
+      <text class="text-13px font-bold text-[#1e293b] mb-8px">1. 数组切片去重与随机打乱 (chunk, uniq, shuffle)</text>
+
+      <view class="mb-8px">
+        <text class="text-12px text-[#64748b]">原始数组 (带重复元素):</text>
+        <text class="result-text text-13px font-medium text-[#334155] mt-2px" style="font-family: monospace;">
+          {{ JSON.stringify(rawArray) }}
+        </text>
+      </view>
+
+      <view class="mb-8px">
+        <text class="text-12px text-[#64748b]">_.uniq 去重结果:</text>
+        <text class="result-text text-13px font-bold text-[#059669] mt-2px" style="font-family: monospace;">
+          {{ JSON.stringify(uniqArray) }}
+        </text>
+      </view>
+
+      <view class="mb-12px">
+        <text class="text-12px text-[#64748b]">_.chunk 切片结果 (每组 3 个):</text>
+        <text class="result-text text-12px font-medium text-[#3b82f6] mt-2px" style="font-family: monospace;">
+          {{ chunkedArray }}
+        </text>
+      </view>
+
+      <view class="w-full h-36px rounded-8px bg-[#f1f5f9] flex flex-row items-center justify-center" @click="handleShuffle">
+        <text class="text-13px font-bold text-[#475569]">点击使用 _.shuffle 打乱数组</text>
+      </view>
+    </view>
+
+    <!-- 2. 对象深拷贝与安全取值 (get, cloneDeep) -->
+    <view class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
+      <text class="text-13px font-bold text-[#1e293b] mb-8px">2. 对象深拷贝与安全取值 (get, cloneDeep)</text>
+
+      <view class="mb-8px">
+        <text class="text-12px text-[#64748b]">_.get(obj, 'user.info.name', '未找到'):</text>
+        <text class="result-text text-13px font-bold text-[#3b82f6] mt-2px" style="font-family: monospace;">
+          "{{ getNameResult }}"
+        </text>
+      </view>
+
+      <view class="mb-8px">
+        <text class="text-12px text-[#64748b]">_.get(obj, 'user.invalid.path', '安全兜底值'):</text>
+        <text class="result-text text-13px font-bold text-[#d97706] mt-2px" style="font-family: monospace;">
+          "{{ getFallbackResult }}"
+        </text>
+      </view>
+
+      <view class="border-top-width-1px border-top-style-solid border-top-color-[#e2e8f0] pt-8px mt-8px mb-8px">
+        <text class="text-12px text-[#64748b] mb-4px">深拷贝防污染对比 (点击修改深拷贝副本的值):</text>
+        <view class="flex-row justify-between mb-4px">
+          <text class="text-12px text-[#475569]">原对象 age:</text>
+          <text class="text-12px font-bold text-[#334155]">{{ rawObjAge }}</text>
+        </view>
+        <view class="flex-row justify-between mb-8px">
+          <text class="text-12px text-[#475569]">副本对象 age:</text>
+          <text class="text-12px font-bold text-[#ec4899]">{{ clonedObjAge }}</text>
+        </view>
+        <view class="w-full h-36px rounded-8px bg-[#fce7f3] flex flex-row items-center justify-center" @click="mutateClonedObj">
+          <text class="text-13px font-bold text-[#be185d]">修改副本 age (+1)</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 3. 字符串与格式化 (camelCase, kebabCase, capitalize) -->
+    <view class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
+      <text class="text-13px font-bold text-[#1e293b] mb-8px">3. 字符串修饰与格式化 (camelCase, kebabCase)</text>
+
+      <view class="mb-12px">
+        <text class="text-12px text-[#64748b] mb-4px">输入文本:</text>
+        <input v-model="inputText" class="w-full h-36px px-12px rounded-6px border-width-1px border-style-solid border-color-[#cbd5e1] text-13px text-[#1e293b]" placeholder="请输入待转换文本" />
+      </view>
+
+      <view class="mb-8px">
+        <text class="text-12px text-[#64748b]">_.camelCase (驼峰):</text>
+        <text class="result-text text-13px font-bold text-[#8b5cf6] mt-2px" style="font-family: monospace;">{{ camelCaseResult }}</text>
+      </view>
+
+      <view class="mb-8px">
+        <text class="text-12px text-[#64748b]">_.kebabCase (短横线):</text>
+        <text class="result-text text-13px font-bold text-[#06b6d4] mt-2px" style="font-family: monospace;">{{ kebabCaseResult }}</text>
+      </view>
+
+      <view class="mb-6px">
+        <text class="text-12px text-[#64748b]">_.capitalize (首字母大写):</text>
+        <text class="result-text text-13px font-bold text-[#10b981] mt-2px" style="font-family: monospace;">{{ capitalizeResult }}</text>
+      </view>
+    </view>
+
+    <!-- 4. 函数防抖与常用工具 (debounce, random) -->
+    <view class="rounded-12px p-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
+      <text class="text-13px font-bold text-[#1e293b] mb-8px">4. 防抖函数与随机数 (debounce, random)</text>
+
+      <view class="flex-row items-center justify-between mb-12px">
+        <view class="flex-col">
+          <text class="text-12px text-[#64748b]">防抖点击触发次数 (400ms):</text>
+          <text class="text-12px text-[#94a3b8]">连击时仅在停止 400ms 后加 1</text>
+        </view>
+        <text class="text-20px font-bold text-[#f59e0b]">{{ debouncedCount }}</text>
+      </view>
+
+      <view class="w-full h-36px rounded-8px bg-[#fef3c7] flex flex-row items-center justify-center mb-12px" @click="handleDebounceClick">
+        <text class="text-13px font-bold text-[#b45309]">快速连击测试防抖</text>
+      </view>
+
+      <view class="border-top-width-1px border-top-style-solid border-top-color-[#e2e8f0] pt-8px flex-row items-center justify-between">
+        <text class="text-12px text-[#64748b]">_.random(1, 100) 随机数:</text>
+        <view class="flex-row items-center">
+          <text class="text-14px font-bold text-[#6366f1] mr-12px">{{ randomValue }}</text>
+          <view class="px-8px py-4px rounded-4px bg-[#e0e7ff]" @click="generateRandom">
+            <text class="text-11px font-bold text-[#4338ca]">重新生成</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </Card>
+</template>
+
+<script setup lang="uts">
+import Card from './Card.uvue'
+import { camelCase, capitalize, chunk, cloneDeep, debounce, get, kebabCase, random, shuffle, uniq } from '@/uni_modules/iRainna-lodash'
+import { computed, ref } from 'vue'
+
+// ==========================================
+// 1. 数组处理状态 (Array Operations)
+// ==========================================
+const rawArray = ref<number[]>([1, 2, 2, 3, 4, 4, 5, 6, 7, 8])
+
+// 使用 uniq 对数组进行去重
+const uniqArray = computed((): number[] => {
+  return uniq(rawArray.value as any[]) as number[]
+})
+
+// 使用 chunk 对去重后的数组按照指定大小进行切片分组
+const chunkedArray = computed((): string => {
+  const result = chunk(uniqArray.value as any[], 3)
+  return JSON.stringify(result)
+})
+
+// 使用 shuffle 随机打乱数组顺序
+function handleShuffle() {
+  rawArray.value = shuffle(rawArray.value as any[]) as number[]
+}
+
+// ==========================================
+// 2. 对象深拷贝与安全取值状态 (Object & Deep Clone)
+// ==========================================
+// 说明：UTS 的 get/cloneDeep 基于 UTSJSONObject 实现（UTS 中只能枚举 JSON 对象），
+// 因此这里使用 UTSJSONObject 演示，而非 UTS 强类型对象
+const rawObj: UTSJSONObject = {
+  user: {
+    info: {
+      name: 'UniAppX Developer',
+      age: 25
+    }
+  }
+}
+
+// 使用 get 链式安全取值 (避免空指针/未定义路径崩溃)
+const getNameResult = computed((): string => {
+  return get(rawObj, 'user.info.name', '未找到') as string
+})
+
+// 使用 get 对不存在的路径进行兜底取值
+const getFallbackResult = computed((): string => {
+  return get(rawObj, 'user.invalid.path', '兜底结果: 未查找到路径') as string
+})
+
+// 使用 cloneDeep 对对象进行深度拷贝测试
+const clonedObj = ref<UTSJSONObject>(cloneDeep(rawObj) as UTSJSONObject)
+const rawObjAge = ref<number>(get(rawObj, 'user.info.age', 0) as number)
+const clonedObjAge = computed((): number => {
+  return get(clonedObj.value, 'user.info.age', 0) as number
+})
+
+// 修改深拷贝副本的属性值，验证原对象属性未受到修改污染
+function mutateClonedObj() {
+  /* eslint-disable dot-notation */
+  const user = clonedObj.value['user'] as UTSJSONObject
+  const info = user['info'] as UTSJSONObject
+  const currentAge = (info['age'] as number) + 1
+  info['age'] = currentAge
+  /* eslint-enable dot-notation */
+}
+
+// ==========================================
+// 3. 字符串格式化状态 (String Operations)
+// ==========================================
+const inputText = ref('hello_world lodash-demo-test')
+
+// 使用 camelCase 转为驼峰命名
+const camelCaseResult = computed((): string => {
+  return camelCase(inputText.value) as string
+})
+
+// 使用 kebabCase 转为短横线命名
+const kebabCaseResult = computed((): string => {
+  return kebabCase(inputText.value) as string
+})
+
+// 使用 capitalize 转为首字母大写
+const capitalizeResult = computed((): string => {
+  return capitalize(inputText.value) as string
+})
+
+// ==========================================
+// 4. 防抖与随机数状态 (Debounce & Utilities)
+// ==========================================
+const debouncedCount = ref(0)
+const randomValue = ref<number>(random(1, 100) as number)
+
+// 递增计数回调
+function incrementCount() {
+  debouncedCount.value += 1
+}
+
+// 使用 debounce 包装防抖函数 (间隔 400 毫秒)
+const debouncedIncrement = debounce(incrementCount, 400) as () => void
+
+// 点击防抖测试按钮
+function handleDebounceClick() {
+  debouncedIncrement()
+}
+
+// 重新生成随机数
+function generateRandom() {
+  randomValue.value = random(1, 100) as number
+}
+</script>
+
+<style scoped>
+/* #ifdef H5 || MP-WEIXIN */
+.result-text {
+  word-break: break-all;
+}
+/* #endif */
+</style>
