@@ -1,0 +1,46 @@
+let firstBackTime = 0
+
+/**
+ * 退出应用辅助函数。
+ * Android: 先 finishAffinity() 播放退出动画，延迟后 System.exit(0) 彻底杀进程，
+ * 确保下次启动是干净冷启动，避免 re-entry 时 setupRenderEffect NPE。
+ */
+export function handleBackPressExit() : boolean {
+  const now = Date.now()
+  if (firstBackTime == 0 || now - firstBackTime > 2000) {
+    firstBackTime = now
+    uni.showToast({
+      title: '再按一次退出应用',
+      position: 'bottom',
+    })
+    setTimeout(() => {
+      if (firstBackTime == now) {
+        firstBackTime = 0
+      }
+    }, 2000)
+    return true
+  }
+
+  // 2秒内再次触发，退出应用
+
+  try {
+    const activity = UTSAndroid.getUniActivity()
+    if (activity != null) {
+      // 先关闭 Activity（带退出动画）
+      activity.finishAffinity()
+    }
+    // 等退出动画播放完毕后，强制杀进程确保彻底退出
+    setTimeout(() => {
+      java.lang.System.exit(0)
+    }, 500)
+  } catch (_e) {
+    java.lang.System.exit(0)
+  }
+
+
+
+
+
+
+  return false
+}

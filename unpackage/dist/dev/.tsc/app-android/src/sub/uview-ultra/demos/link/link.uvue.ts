@@ -1,0 +1,69 @@
+import _easycom_NavBar from '@/src/components/NavBar/NavBar.uvue'
+import _easycom_up_link from '@/uni_modules/uview-ultra/components/up-link/up-link.uvue'
+import AppKu from '@/App.ku.uvue'
+import LayoutComponent from '@/src/layouts/default.uvue'
+
+const __sfc__ = defineComponent({
+  __name: 'link',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+
+return (): any | null => {
+
+const _component_NavBar = resolveEasyComponent("NavBar",_easycom_NavBar)
+const _component_up_link = resolveEasyComponent("up-link",_easycom_up_link)
+
+  return _cV(unref(AppKu), null, _uM({
+    default: withSlotCtx((): any[] => [
+      _cV(unref(LayoutComponent), _uM({
+        "navigation-style": 'custom',
+        "navigation-bar-title-text": 'up-link 超链接'
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({ class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }), [
+            _cV(_component_NavBar, _uM({
+              title: "Link 超链接",
+              "auto-back": true
+            })),
+            _cE("view", _uM({ class: "p-16px" }), [
+              _cE("view", _uM({ class: "demo-block" }), [
+                _cE("text", _uM({ class: "demo-label" }), "基本使用"),
+                _cV(_component_up_link, _uM({
+                  href: "https://uniapp.dcloud.io/",
+                  text: "打开 uni-app 官网"
+                }))
+              ]),
+              _cE("view", _uM({ class: "demo-block" }), [
+                _cE("text", _uM({ class: "demo-label" }), "显示下划线"),
+                _cV(_component_up_link, _uM({
+                  href: "https://uview-plus.jiangruyi.com/",
+                  text: "带下划线的超链接",
+                  "under-line": true
+                }))
+              ]),
+              _cE("view", _uM({ class: "demo-block" }), [
+                _cE("text", _uM({ class: "demo-label" }), "自定义颜色与大小"),
+                _cV(_component_up_link, _uM({
+                  href: "https://github.com",
+                  text: "自定义绿色 16px",
+                  color: "#19be6b",
+                  "font-size": "16"
+                }))
+              ])
+            ])
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }))
+    ]),
+    _: 1 /* STABLE */
+  }))
+}
+}
+
+})
+export default __sfc__
+const GenSrcSubUviewUltraDemosLinkLinkStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "#2979ff"]]))]])]

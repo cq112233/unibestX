@@ -30,6 +30,9 @@ importers:
       '@dcloudio/vite-plugin-uni':
         specifier: 3.0.0-4070620250821001
         version: 3.0.0-4070620250821001(@vueuse/core@12.8.2(typescript@6.0.3))(postcss@8.5.15)(rollup@4.60.4)(vite@5.2.8(@types/node@25.9.1)(sass@1.63.2)(terser@5.48.0))(vue@3.5.35(typescript@6.0.3))
+      crypto-js:
+        specifier: ^4.2.0
+        version: 4.2.0
       vite:
         specifier: 5.2.8
         version: 5.2.8(@types/node@25.9.1)(sass@1.63.2)(terser@5.48.0)
@@ -37,9 +40,15 @@ importers:
         specifier: ^3.5.13
         version: 3.5.35(typescript@6.0.3)
     devDependencies:
+      '@dcloudio/hbuilderx-cli':
+        specifier: ^1.2.0
+        version: 1.2.0
       '@dcloudio/types':
         specifier: ^3.4.31
         version: 3.4.31
+      '@types/crypto-js':
+        specifier: ^4.2.2
+        version: 4.2.2
       '@uni-helper/eslint-config':
         specifier: 0.5.0
         version: 0.5.0(@antfu/eslint-config@5.4.1(@typescript-eslint/rule-tester@8.60.0(eslint@9.39.4)(typescript@6.0.3))(@typescript-eslint/typescript-estree@8.60.1(typescript@6.0.3))(@typescript-eslint/utils@8.60.1(eslint@9.39.4)(typescript@6.0.3))(@vue/compiler-sfc@3.5.35)(eslint-plugin-format@1.5.0(eslint@9.39.4))(eslint@9.39.4)(typescript@6.0.3))(eslint@9.39.4)
@@ -730,6 +739,11 @@ packages:
 
   '@clack/prompts@0.11.0':
     resolution: {integrity: sha512-pMN5FcrEw9hUkZA4f+zLlzivQSeQf5dRGJjSUbvVYDLvpKCdQx5OaknvKzgbtXOizhP+SJJJjqEbOe55uKKfAw==}
+
+  '@dcloudio/hbuilderx-cli@1.2.0':
+    resolution: {integrity: sha512-ANkrsPBLplAp+SOToGeqFcWD7O+P8gAj+MO+/LlD6PBIzDgLUU5TSJC3gM2lGg8r+foRF5gPX2i2zKHXej9qcQ==}
+    engines: {node: '>=12.0.0'}
+    hasBin: true
 
   '@dcloudio/types@3.4.31':
     resolution: {integrity: sha512-YAqOfJpcAwMs4Fagv2oP+iRHSCJOJoN8JUYyoRD6gwfANhsI9QaYj4/j22FzSopfHkqjX50B7YkG/VRAyz9OnA==}
@@ -1553,6 +1567,9 @@ packages:
     peerDependencies:
       eslint: ^9.0.0 || ^10.0.0
 
+  '@types/crypto-js@4.2.2':
+    resolution: {integrity: sha512-sDOLlVbHhXpAUAL0YHDUUwDZf3iN4Bwi4W6a0W0b+QcAezUbRtH4FVb+9J4h+XFPW7l/gQ9F8qC7P+Ec4k8QVQ==}
+
   '@types/debug@4.1.13':
     resolution: {integrity: sha512-KSVgmQmzMwPlmtljOomayoR89W4FynCAi3E8PPs7vmDVPe84hT+vGPKkJfThkmXs0x0jAaa9U8uW8bbfyS2fWw==}
 
@@ -2226,6 +2243,10 @@ packages:
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
     engines: {node: '>= 8'}
+
+  crypto-js@4.2.0:
+    resolution: {integrity: sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==}
+    deprecated: Active development of CryptoJS has been discontinued. This library is no longer maintained.
 
   cssesc@3.0.0:
     resolution: {integrity: sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==}
@@ -5038,6 +5059,8 @@ snapshots:
       picocolors: 1.1.1
       sisteransi: 1.0.5
 
+  '@dcloudio/hbuilderx-cli@1.2.0': {}
+
   '@dcloudio/types@3.4.31': {}
 
   '@dcloudio/uni-app@3.0.0-4070620250821001(@dcloudio/types@3.4.31)(@vueuse/core@12.8.2(typescript@6.0.3))(postcss@8.5.15)(rollup@4.60.4)(vue@3.5.35(typescript@6.0.3))':
@@ -5839,6 +5862,8 @@ snapshots:
       estraverse: 5.3.0
       picomatch: 4.0.4
 
+  '@types/crypto-js@4.2.2': {}
+
   '@types/debug@4.1.13':
     dependencies:
       '@types/ms': 2.1.0
@@ -6611,6 +6636,8 @@ snapshots:
       path-key: 3.1.1
       shebang-command: 2.0.0
       which: 2.0.2
+
+  crypto-js@4.2.0: {}
 
   cssesc@3.0.0: {}
 
