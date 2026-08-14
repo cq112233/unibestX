@@ -19,9 +19,11 @@
 
 </div>
 
-> 💡 **HBuilderX 版本建议**
+> 💡 **HBuilderX 版本建议与下载**
 >
-> 本项目开发版本是 HBuilderX 5.15。建议使用 HBuilderX 5.15 及以上版本进行开发。
+> 本项目推荐开发版本为 **HBuilderX 5.15**，升级版本可能会出现各种兼容性问题。
+>
+> 📥 **HBuilderX 5.15 下载地址**：[https://wwbsy.lanzoue.com/b01eupb32d](https://wwbsy.lanzoue.com/b01eupb32d) （密码：`4xdv`）
 
 > ⚠️ **三方组件库与插件修改说明**
 >
@@ -95,7 +97,7 @@
 
 * Node >= 22
 * pnpm >= 7.30
-* HBuilderX = 5.0.7
+* HBuilderX = 5.15（升级版本可能会出现各种问题）
 * Vue Official >= 2.1.10
 * TypeScript >= 5.0
 * JDK >= 17（Android 平台）
@@ -105,67 +107,83 @@
 
 ## 📁 项目结构
 
-    unibestX/
-    ├── plugins/               # Vite 插件（布局、根组件注入）
-    │   ├── uni-layouts-plugin.ts
-    │   └── root-plugin.ts
-    ├── src/
-    │   ├── api/               # API 请求函数
-    │   ├── components/        # 公共组件
-    │   │   ├── NavBar/        #   导航栏组件
-    │   │   ├── MySteps/       #   步骤条组件
-    │   │   ├── MySubsection/  #   分段器组件
-    │   │   └── MyTabs/        #   标签页组件
-    │   ├── http/              # HTTP 请求封装
-    │   │   ├── request.uts    #   HttpClient 类
-    │   │   ├── types.uts      #   响应类型定义
-    │   │   └── tools/enum.uts #   状态码枚举
-    │   ├── i18n/              # 国际化
-    │   │   ├── index.uts      #   i18n 实例
-    │   │   └── locales/       #   语言包（zh-CN / en-US）
-    │   ├── layouts/           # 页面布局
-    │   │   └── default.uvue   #   默认布局
-    │   ├── pages/             # 主页面（TabBar 页）
-    │   │   ├── index/         #   首页
-    │   │   ├── basic/         #   基础组件展示
-    │   │   ├── function/      #   原生能力展示
-    │   │   ├── ai/            #   AI 助手（Mock）
-    │   │   └── me/            #   个人中心
-    │   ├── router/            # 路由配置
-    │   │   ├── config.uts     #   登录策略配置
-    │   │   └── interceptor.uts#   全局路由拦截
-    │   ├── store/             # Pinia 状态管理
-    │   │   ├── index.uts      #   Pinia 实例 + 持久化插件
-    │   │   ├── app.uts        #   应用状态（主题/语言）
-    │   │   ├── token.uts      #   Token 状态（单/双 Token）
-    │   │   └── user.uts       #   用户信息
-    │   ├── style/             # 全局样式
-    │   ├── sub/               # 分包页面
-    │   │   ├── auth/          #   登录/注册
-    │   │   ├── test/          #   URL 参数测试
-    │   │   ├── paging/        #   分页列表演示
-    │   │   └── uview-ultra/   #   UI 组件展示
-    │   ├── tabbar/            # 自定义 TabBar
-    │   │   ├── index.uvue     #   TabBar 容器
-    │   │   ├── TabbarItem.uvue#   TabBar 项
-    │   │   ├── config.uts     #   TabBar 配置
-    │   │   ├── store.uts      #   TabBar 状态
-    │   │   └── types.uts      #   类型定义
-    │   └── utils/             # 工具函数
-    │       ├── backPress.uts  #   双击退出
-    │       ├── i18n.uts       #   i18n 辅助
-    │       ├── systemInfo.uts #   屏幕信息
-    │       ├── toLoginPage.uts#   登录跳转
-    │       └── toast.uts      #   全局 Toast
-    ├── uni_modules/           # uni-app 插件市场模块
-    ├── js_sdk/                # JS SDK（UnoCSS 等）
-    ├── App.ku.uvue            # 全局根组件（主题/TabBar/Toast）
-    ├── main.uts               # 应用入口
-    ├── pages.json             # 页面路由配置
-    ├── manifest.json          # 应用配置清单
-    ├── vite.config.ts         # Vite 构建配置
-    ├── uni.scss               # 全局 SCSS 变量
-    └── tsconfig.json          # TypeScript 配置
+```text
+unibestX/
+├── plugins/                  # Vite 构建插件
+│   ├── uni-layouts-plugin.ts #   自动布局插件（仿 vite-plugin-uni-layouts）
+│   └── root-plugin.ts        #   自动包裹 App.ku.uvue 根组件插件
+├── src/
+│   ├── api/                  # API 请求模块（foo.uts, user.uts, auth.uts 等）
+│   ├── assets/               # 静态资源（图标、图片等）
+│   ├── components/           # 公共业务组件
+│   │   ├── NavBar/           #   自定义导航栏
+│   │   ├── MySteps/          #   步骤条组件
+│   │   ├── MySubsection/     #   分段器组件
+│   │   ├── MyTabs/           #   标签页组件
+│   │   └── PrivacyPopup/     #   隐私协议弹窗
+│   ├── http/                 # HTTP 客户端封装（基于 lime-request）
+│   │   ├── request.uts       #   HttpClient 核心类与拦截器
+│   │   ├── types.uts         #   HTTP 响应与请求类型定义
+│   │   └── tools/enum.uts    #   HTTP 状态码与业务枚举
+│   ├── i18n/                 # 国际化多语言
+│   │   ├── index.uts         #   i18n 实例与响应式切换
+│   │   └── locales/          #   中英文语言包（zh-Hans / en）
+│   ├── layouts/              # 页面布局模板
+│   │   └── default.uvue      #   默认根布局
+│   ├── pages/                # 主包页面（TabBar 页面）
+│   │   ├── index/            #   首页（概览、常用入口）
+│   │   ├── basic/            #   基础组件与工具演示（Crypto、Lodash、HTTP、Dayuts 等）
+│   │   ├── function/         #   原生能力展示（设备、系统信息、扫码等）
+│   │   ├── ai/               #   AI 助手对话演示
+│   │   └── me/               #   个人中心与系统设置
+│   ├── router/               # 路由守卫与导航控制
+│   │   ├── config.uts        #   页面登录白名单/黑名单策略
+│   │   └── interceptor.uts   #   全局路由跳转拦截器
+│   ├── store/                # Pinia 状态管理
+│   │   ├── index.uts         #   Pinia 实例与本地持久化插件
+│   │   ├── app.uts           #   应用全局状态（主题、语言等）
+│   │   ├── token.uts         #   Token 鉴权状态（单/双 Token 自动续期）
+│   │   └── user.uts          #   当前登录用户信息
+│   ├── style/                # 全局样式（UnoCSS、变量等）
+│   ├── sub/                  # 应用分包页面（按需加载）
+│   │   ├── auth/             #   登录、注册、找回密码
+│   │   ├── paging/           #   z-paging-x 分页列表各种场景演示
+│   │   ├── test/             #   页面间参数传递测试
+│   │   ├── uiTest/           #   UI 测试与排版页面
+│   │   └── uview-ultra/      #   uview-ultra 组件库示例
+│   ├── tabbar/               # 自定义 TabBar
+│   │   ├── index.uvue        #   TabBar 底部容器
+│   │   ├── TabbarItem.uvue   #   单个 Tab 项与角标
+│   │   ├── config.uts        #   TabBar 图标与路由配置
+│   │   ├── store.uts         #   TabBar 选中状态管理
+│   │   └── types.uts         #   TabBar 类型定义
+│   ├── types/                # 全局 TypeScript / UTS 类型定义
+│   └── utils/                # 全局工具函数
+│       ├── toast.uts         #   全局 Toast 轻提示
+│       ├── systemInfo.uts    #   屏幕与系统信息获取
+│       ├── backPress.uts     #   Android 物理返回键双击退出
+│       ├── env.uts           #   多环境配置管理
+│       ├── toLoginPage.uts   #   跳转登录页逻辑封装
+│       └── i18n.uts          #   多语言辅助工具
+├── uni_modules/              # uni-app 扩展插件模块
+│   ├── unix-crypto/          #   全端跨平台加密解密库（AES/DES/RSA/MD5/SHA/HMAC/Base64/UUID）
+│   ├── uview-ultra/          #   针对 uni-app X 深度优化适配的 UI 组件库
+│   ├── z-paging-x/           #   针对 uni-app X 深度优化适配的分页组件
+│   ├── iRainna-lodash/       #   UTS 版 Lodash 工具库
+│   ├── lime-request/         #   HTTP 请求核心库
+│   ├── lime-signature/       #   手写签名板组件
+│   ├── e-chart/              #   ECharts 图表适配组件
+│   └── ...                   #   其他官方/三方 uni_modules
+├── js_sdk/                   # JS / UTS SDK 资源（a-hua-unocss 等）
+├── docs/                     # VitePress 项目文档源码
+├── App.ku.uvue               # 全局根包裹组件（动态主题注入、全局 Toast 容器）
+├── main.uts                  # 应用主入口文件
+├── pages.json                # 页面路由表、分包与 easycom 配置
+├── manifest.json             # 应用配置清单（多端 AppID、权限、原生模块配置）
+├── vite.config.ts            # Vite 构建配置（UnoCSS 规则与自定义插件）
+├── uni.scss                  # 全局 SCSS 变量与主题注入
+└── tsconfig.json             # TypeScript / UTS 编译配置文件
+```
 
 ## 📂 快速开始
 

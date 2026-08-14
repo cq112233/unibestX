@@ -8,9 +8,11 @@
 
 * **Node.js**: `>= 22`
 * **包管理器**: `pnpm >= 7.30`
-* **IDE**: `HBuilderX = 5.0.7` 
+* **IDE**: `HBuilderX = 5.15`
   > [!WARNING] 注意
-  > 目前大于 5.0.7 的版本在安卓编译上存在一些问题，强烈建议下载并使用 5.0.7 版本。
+  > 升级版本可能会出现各种问题，强烈建议下载并使用 5.15 版本。
+  >
+  > 📥 **HBuilderX 5.15 下载地址**：[https://wwbsy.lanzoue.com/b01eupb32d](https://wwbsy.lanzoue.com/b01eupb32d) （密码：`4xdv`）
 * **Vue Official**: `>= 2.1.10`
 * **TypeScript**: `>= 5.0`
 * **特定平台依赖**:
