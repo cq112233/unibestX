@@ -28,7 +28,7 @@ unibestX/
 ├── src/
 │   ├── api/                  # 业务模块 API 请求函数（foo.uts, user.uts, auth.uts 等）
 │   ├── assets/               # 静态资源（图标、图片）
-│   ├── components/           # 公共业务组件（NavBar, Steps, Tabs, 隐私弹窗等）
+│   ├── components/           # 公共业务组件（NavBar 自定义通用导航栏）
 │   ├── http/                 # HTTP 客户端封装（基于 lime-request，拦截器与错误处理）
 │   ├── i18n/                 # 国际化多语言配置（zh-Hans / en 语言包）
 │   ├── layouts/              # 页面布局模板（如 default.uvue）

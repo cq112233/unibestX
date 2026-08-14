@@ -116,11 +116,7 @@ unibestX/
 │   ├── api/                  # API 请求模块（foo.uts, user.uts, auth.uts 等）
 │   ├── assets/               # 静态资源（图标、图片等）
 │   ├── components/           # 公共业务组件
-│   │   ├── NavBar/           #   自定义导航栏
-│   │   ├── MySteps/          #   步骤条组件
-│   │   ├── MySubsection/     #   分段器组件
-│   │   ├── MyTabs/           #   标签页组件
-│   │   └── PrivacyPopup/     #   隐私协议弹窗
+│   │   └── NavBar/           #   自定义通用导航栏组件（NavBar.uvue）
 │   ├── http/                 # HTTP 客户端封装（基于 lime-request）
 │   │   ├── request.uts       #   HttpClient 核心类与拦截器
 │   │   ├── types.uts         #   HTTP 响应与请求类型定义
