@@ -38,109 +38,94 @@
 	</view>
 </template>
 
-<script lang="uts">
-import { mpMixin } from '../../libs/mixin/mpMixin';
-import { mixin } from '../../libs/mixin/mixin';
-import { propsNumberKeyboard } from "./props";
-import { randomArray } from '../../libs/function/index';
+<script setup lang="uts">
+import { ref, computed } from 'vue'
+import { randomArray } from '../../libs/function/index'
 
-/**
- * up-number-keyboard 数字键盘组件
- * @description 数字键盘组件，用于输入数字或身份证号码等场景
- * @tutorial https://www.uviewui.com/components/numberKeyboard.html
- * @property {String} mode = [number|card]  键盘的类型，number-数字键盘，card-身份证键盘
- * @property {Boolean} dotDisabled = [true|false] 是否禁用小数点，默认为 true
- * @property {Boolean} random = [true|false] 是否打乱键盘按键的顺序，默认为 false
- * @event {Function} change 点击键盘按键时触发，返回按键值
- * @event {Function} backspace 点击退格键时触发
- * @example <up-number-keyboard :mode="mode" :dot-disabled="dotDisabled" @change="onChange" @backspace="onBackspace" />
- */
-export default {
-	name: 'up-number-keyboard',
-	mixins: [mpMixin, mixin, propsNumberKeyboard],
-	emits: ["change", "backspace"],
-	data() {
-		return {
-			backspace: 'backspace', // 退格键内容
-			dot: '.', // 点
-			timer: null as number|null, // 长按多次删除的事件监听
-			cardX: 'X' // 身份证的X符号
-		};
+defineOptions({
+	name: 'up-number-keyboard'
+})
+
+const props = defineProps({
+	mode: {
+		type: String,
+		default: 'number'
 	},
-	computed: {
-		// 键盘需要显示的内容
-		numList(): Array<string|number> {
-			let tmp: Array<string|number> = [];
-			if (this.dotDisabled && this.mode == 'number') {
-				if (!this.random) {
-					return [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
-				} else {
-					return randomArray([1, 2, 3, 4, 5, 6, 7, 8, 9, 0]);
-				}
-			} else if (!this.dotDisabled && this.mode == 'number') {
-				if (!this.random) {
-					return [1, 2, 3, 4, 5, 6, 7, 8, 9, this.dot, 0];
-				} else {
-					return randomArray([1, 2, 3, 4, 5, 6, 7, 8, 9, this.dot, 0]);
-				}
-			} else if (this.mode == 'card') {
-				if (!this.random) {
-					return [1, 2, 3, 4, 5, 6, 7, 8, 9, this.cardX, 0];
-				} else {
-					return randomArray([1, 2, 3, 4, 5, 6, 7, 8, 9, this.cardX, 0]);
-				}
-			}
-			return tmp;
+	dotDisabled: {
+		type: Boolean,
+		default: true
+	},
+	random: {
+		type: Boolean,
+		default: false
+	}
+})
+
+const emit = defineEmits(["change", "backspace"])
+
+const dot = '.'
+const cardX = 'X'
+let timer: number | null = null
+
+function noop() {}
+
+const numList = computed<Array<string | number>>(() => {
+	let tmp: Array<string | number> = []
+	if (props.dotDisabled && props.mode == 'number') {
+		if (!props.random) {
+			return [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
+		} else {
+			return randomArray([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])
 		}
-	},
-	created() {
-	},
-	methods: {
-		// 是否让按键显示灰色，只在非乱序&&数字键盘&&且允许点按键的时候
-		btnBgGray(index: number): boolean {
-			//return (index: number): boolean => {
-				if (!this.random && index == 9 && (this.mode != 'number' || (this.mode == 'number' && !this.dotDisabled))) {
-					return true;
-				} else {
-					return false;
-				}
-			//};
-		},
-		// 按键的样式，在非乱序&&数字键盘&&不显示点按钮时，index为9时，按键占位两个空间
-		itemStyle(index: number): any {
-			//return (index: number): UTSJSONObject => {
-				let style = {} as UTSJSONObject;
-				if (this.mode == 'number' && this.dotDisabled && index == 9) {
-					style['width'] = '464rpx';
-				}
-				return style;
-			//};
-		},
-		// 点击退格键
-		backspaceClick(): void {
-			this.$emit('backspace');
-			clearInterval(this.timer ?? 0); //再次清空定时器，防止重复注册定时器
-			this.timer = null;
-			this.timer = setInterval(() => {
-				this.$emit('backspace');
-			}, 250);
-		},
-		
-		clearTimer(): void {
-			clearInterval(this.timer ?? 0);
-			this.timer = null;
-		},
-		
-		// 获取键盘显示的内容
-		keyboardClick(val: any): void {
-			// 允许键盘显示点模式和触发非点按键时，将内容转为数字类型
-			if (!this.dotDisabled && val != this.dot && val != this.cardX) {
-				val = parseInt(val.toString());
-			}
-			this.$emit('change', val);
+	} else if (!props.dotDisabled && props.mode == 'number') {
+		if (!props.random) {
+			return [1, 2, 3, 4, 5, 6, 7, 8, 9, dot, 0]
+		} else {
+			return randomArray([1, 2, 3, 4, 5, 6, 7, 8, 9, dot, 0])
+		}
+	} else if (props.mode == 'card') {
+		if (!props.random) {
+			return [1, 2, 3, 4, 5, 6, 7, 8, 9, cardX, 0]
+		} else {
+			return randomArray([1, 2, 3, 4, 5, 6, 7, 8, 9, cardX, 0])
 		}
 	}
-};
+	return tmp
+})
+
+function itemStyle(index: number): UTSJSONObject {
+	let style = {} as UTSJSONObject
+	if (props.mode == 'number' && props.dotDisabled && index == 9) {
+		style['width'] = '464rpx'
+	}
+	return style
+}
+
+function backspaceClick(): void {
+	emit('backspace')
+	if (timer != null) {
+		clearInterval(timer!)
+		timer = null
+	}
+	timer = setInterval(() => {
+		emit('backspace')
+	}, 250)
+}
+
+function clearTimer(): void {
+	if (timer != null) {
+		clearInterval(timer!)
+		timer = null
+	}
+}
+
+function keyboardClick(val: any): void {
+	let res = val
+	if (!props.dotDisabled && val != dot && val != cardX) {
+		res = parseInt(val.toString())
+	}
+	emit('change', res)
+}
 </script>
 
 <style lang="scss" scoped>

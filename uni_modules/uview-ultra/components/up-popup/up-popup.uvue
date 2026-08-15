@@ -1,5 +1,5 @@
 <template>
-	<view class="up-popup"  :class="[customClass]">
+	<view class="up-popup" :class="[customClass]">
 		<up-overlay
 			:show="show && !pageInline"
 			@click="overlayClick"
@@ -45,200 +45,194 @@
 	</view>
 </template>
 
-<script lang="uts">
-	import { propsPopup } from './props';
-	import { mpMixin } from '../../libs/mixin/mpMixin';
-	import { mixin } from '../../libs/mixin/mixin';
-	import { addUnit, addStyle, deepMerge, sleep } from '../../libs/function/index';
-	/**
-	 * popup 弹窗
-	 * @description 弹出层容器，用于展示弹窗、信息提示等内容，支持上、下、左、右和中部弹出。组件只提供容器，内部内容由用户自定义
-	 * @tutorial https://ijry.github.io/uview-plus/components/popup.html
-	 * @property {Boolean}			show				是否展示弹窗 (默认 false )
-	 * @property {Boolean}			overlay				是否显示遮罩 （默认 true ）
-	 * @property {String}			mode				弹出方向（默认 'bottom' ）
-	 * @property {String | Number}	duration			动画时长，单位ms （默认 300 ）
-	 * @property {String | Number}	overlayDuration		遮罩层动画时长，单位ms （默认 350 ）
-	 * @property {Boolean}			closeable			是否显示关闭图标（默认 false ）
-	 * @property {Object | String}	overlayStyle		自定义遮罩的样式
-	 * @property {String | Number}	overlayOpacity		遮罩透明度，0-1之间（默认 0.5）
-	 * @property {Boolean}			closeOnClickOverlay	点击遮罩是否关闭弹窗 （默认  true ）
-	 * @property {String | Number}	zIndex				层级 （默认 10075 ）
-	 * @property {Boolean}			safeAreaInsetBottom	是否为iPhoneX留出底部安全距离 （默认 true ）
-	 * @property {Boolean}			safeAreaInsetTop	是否留出顶部安全距离（状态栏高度） （默认 false ）
-	 * @property {String}			closeIconPos		自定义关闭图标位置（默认 'top-right' ）
-	 * @property {String | Number}	round				圆角值（默认 0）
-	 * @property {Boolean}			zoom				当mode=center时 是否开启缩放（默认 true ）
-	 * @property {Object}			customStyle			组件的样式，对象形式
-	 * @event {Function} open 弹出层打开
-	 * @event {Function} close 弹出层收起
-	 * @example <up-popup v-model="show"><text>出淤泥而不染，濯清涟而不妖</text></up-popup>
-	 */
-	export default {
-		name: 'up-popup',
-		mixins: [mpMixin, mixin, propsPopup],
-		data() {
-			return {
-				overlayDuration: 0
-			}
-		},
-		created() {
-			// @ts-ignore
-			this.overlayDuration = parseInt(this.duration!!.toString()) + 50
-		},
-		watch: {
-			show(newValue, oldValue) {
-				if (newValue == true) {
-					// #ifdef MP-WEIXIN
-					// const children = this.$children
-					// this.retryComputedComponentRect(children)
-					// #endif
-				}
-			}
-		},
-		computed: {
-			transitionStyle():any {
-				const style = {
-					display: 'flex',
-				}
-				if (!this.pageInline) {
-					// @ts-ignore
-					style['zIndex'] = parseInt(this.zIndex!!.toString()) + 1
-					style['position'] = 'fixed'
-				}
-				style[this.mode] = 0
-				if (this.mode === 'left') {
-					return deepMerge(style, {
-						bottom: 0,
-						top: 0,
-					})
-				} else if (this.mode === 'right') {
-					return deepMerge(style, {
-						bottom: 0,
-						top: 0,
-					})
-				} else if (this.mode === 'top') {
-					return deepMerge(style, {
-						left: 0,
-						right: 0
-					})
-				} else if (this.mode === 'bottom') {
-					return deepMerge(style, {
-						left: 0,
-						right: 0,
-					})
-				} else if (this.mode === 'center') {
-					return deepMerge(style, {
-						alignItems: 'center',
-						'justify-content': 'center',
-						top: 0,
-						left: 0,
-						right: 0,
-						bottom: 0
-					})
-				}
-				return {}
-			},
-			contentStyle(): any {
-				const style = {}
-				// 通过设备信息的safeAreaInsets值来判断是否需要预留顶部状态栏和底部安全局的位置
-				// 不使用css方案，是因为nvue不支持css的iPhoneX安全区查询属性
-				const {
-					safeAreaInsets
-				} = uni.getWindowInfo()
-				
-				if (this.mode !== 'center') {
-					style['flex'] = 1
-				}
-				// 背景色，一般用于设置为transparent，去除默认的白色背景
-				if (this.bgColor != '') {
-					style['backgroundColor'] = this.bgColor
-				}
-				if(this.round != '') {
-					const value = addUnit(this.round)
-					if(this.mode === 'top') {
-						style['borderBottomLeftRadius'] = value
-						style['borderBottomRightRadius'] = value
-					} else if(this.mode === 'bottom') {
-						style['borderTopLeftRadius'] = value
-						style['borderTopRightRadius'] = value
-					} else if(this.mode === 'center') {
-						style['borderRadius'] = value
-					} 
-				}
-				return deepMerge(style, addStyle(this.customStyle))
-			},
-			position(): string {
-				if (this.mode === 'center') {
-					return this.zoom ? 'fade-zoom' : 'fade'
-				}
-				if (this.mode === 'left') {
-					return 'slide-left'
-				}
-				if (this.mode === 'right') {
-					return 'slide-right'
-				}
-				if (this.mode === 'bottom') {
-					return 'slide-up'
-				}
-				if (this.mode === 'top') {
-					return 'slide-down'
-				}
-				return ''
-			},
-		},
-		emits: ["open", "close", "click", "update:show"],
-		methods: {
-			// 点击遮罩
-			overlayClick(): void {
-				if (this.closeOnClickOverlay) {
-					this.$emit('update:show', false)
-					this.$emit('close')
-				}
-			},
-			close(e: any): void {
-				this.$emit('update:show', false)
-				this.$emit('close')
-			},
-			afterEnter(): void {
-				this.$emit('open')
-			},
-			clickHandler(): void {
-				// 由于中部弹出时，其up-transition占据了整个页面相当于遮罩，此时需要发出遮罩点击事件，是否无法通过点击遮罩关闭弹窗
-				if(this.mode === 'center') {
-					this.overlayClick()
-				}
-				this.$emit('click')
-			},
-			// #ifdef MP-WEIXIN
-			// retryComputedComponentRect(children: any): void {
-			// 	// 组件内部需要计算节点的组件
-			// 	const names = ['up-calendar-month', 'up-album', 'up-collapse-item', 'up-dropdown', 'up-index-item', 'up-index-list',
-			// 		'up-line-progress', 'up-list-item', 'up-rate', 'up-read-more', 'up-row', 'up-row-notice', 'up-scroll-list',
-			// 		'up-skeleton', 'up-slider', 'up-steps-item', 'up-sticky', 'up-subsection', 'up-swipe-action-item', 'up-tabbar',
-			// 		'up-tabs', 'up-tooltip'
-			// 	]
-			// 	// 历遍所有的子组件节点
-			// 	for (let i = 0; i < children.length; i++) {
-			// 		const child = children[i]
-			// 		// 拿到子组件的子组件
-			// 		const grandChild = child.$children
-			// 		// 判断如果在需要重新初始化的组件数组中名中，并且存在init方法的话，则执行
-			// 		if (names.includes(child.$options.name) && typeof child?.init === 'function') {
-			// 			// 需要进行一定的延时，因为初始化页面需要时间
-			// 			sleep(50).then(() => {
-			// 				child.init()
-			// 			})
-			// 		}
-			// 		// 如果子组件还有孙组件，进行递归历遍
-			// 		if (grandChild.length) {
-			// 			this.retryComputedComponentRect(grandChild)
-			// 		}
-			// 	}
-			// }
-			// #endif
-		}
-	}
+<script setup lang="uts">
+import { computed, ref } from 'vue'
+import defProps from './popup'
+import { addUnit, addStyle, deepMerge } from '../../libs/function/index'
+
+defineOptions({
+  name: 'up-popup'
+})
+
+const props = defineProps({
+  show: {
+    type: Boolean,
+    default: false
+  },
+  overlay: {
+    type: Boolean,
+    default: true
+  },
+  mode: {
+    type: String,
+    default: 'bottom'
+  },
+  duration: {
+    type: [String, Number],
+    default: 300
+  },
+  closeable: {
+    type: Boolean,
+    default: false
+  },
+  overlayStyle: {
+    type: [Object, String],
+    default: () => ({})
+  },
+  closeOnClickOverlay: {
+    type: Boolean,
+    default: true
+  },
+  zIndex: {
+    type: [String, Number],
+    default: 10075
+  },
+  safeAreaInsetBottom: {
+    type: Boolean,
+    default: true
+  },
+  safeAreaInsetTop: {
+    type: Boolean,
+    default: false
+  },
+  closeIconPos: {
+    type: String,
+    default: 'top-right'
+  },
+  round: {
+    type: [Boolean, String, Number],
+    default: 0
+  },
+  zoom: {
+    type: Boolean,
+    default: true
+  },
+  bgColor: {
+    type: String,
+    default: ''
+  },
+  overlayOpacity: {
+    type: [Number, String],
+    default: 0.5
+  },
+  pageInline: {
+    type: Boolean,
+    default: false
+  },
+  customClass: {
+    type: String,
+    default: ''
+  },
+  customStyle: {
+    type: Object,
+    default: () => ({})
+  }
+})
+
+const emit = defineEmits(['open', 'close', 'click', 'update:show'])
+
+const overlayDuration = computed<number>(() => {
+  return parseInt(props.duration.toString()) + 50
+})
+
+const position = computed<string>(() => {
+  if (props.mode === 'center') {
+    return props.zoom ? 'fade-zoom' : 'fade'
+  }
+  if (props.mode === 'left') {
+    return 'slide-left'
+  }
+  if (props.mode === 'right') {
+    return 'slide-right'
+  }
+  if (props.mode === 'bottom') {
+    return 'slide-up'
+  }
+  if (props.mode === 'top') {
+    return 'slide-down'
+  }
+  return ''
+})
+
+const transitionStyle = computed<UTSJSONObject>(() => {
+  const style = {
+    display: 'flex',
+  } as UTSJSONObject
+  if (!props.pageInline) {
+    style['zIndex'] = parseInt(props.zIndex.toString()) + 1
+    style['position'] = 'fixed'
+  }
+  style[props.mode] = 0
+  if (props.mode === 'left' || props.mode === 'right') {
+    return deepMerge(style, {
+      bottom: 0,
+      top: 0,
+    }) as UTSJSONObject
+  } else if (props.mode === 'top' || props.mode === 'bottom') {
+    return deepMerge(style, {
+      left: 0,
+      right: 0,
+    }) as UTSJSONObject
+  } else if (props.mode === 'center') {
+    return deepMerge(style, {
+      alignItems: 'center',
+      'justify-content': 'center',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0
+    }) as UTSJSONObject
+  }
+  return style
+})
+
+const contentStyle = computed<UTSJSONObject>(() => {
+  const style = {} as UTSJSONObject
+  if (props.mode !== 'center') {
+    style['flex'] = 1
+  }
+  if (props.bgColor != '') {
+    style['backgroundColor'] = props.bgColor
+  }
+  if (props.round.toString() != '' && props.round != false) {
+    const value = addUnit(props.round)
+    if (props.mode === 'top') {
+      style['borderBottomLeftRadius'] = value
+      style['borderBottomRightRadius'] = value
+    } else if (props.mode === 'bottom') {
+      style['borderTopLeftRadius'] = value
+      style['borderTopRightRadius'] = value
+    } else if (props.mode === 'center') {
+      style['borderRadius'] = value
+    }
+  }
+  return deepMerge(style, addStyle(props.customStyle)) as UTSJSONObject
+})
+
+function noop() {}
+
+function overlayClick(): void {
+  if (props.closeOnClickOverlay) {
+    emit('update:show', false)
+    emit('close')
+  }
+}
+
+function close(): void {
+  emit('update:show', false)
+  emit('close')
+}
+
+function afterEnter(): void {
+  emit('open')
+}
+
+function clickHandler(): void {
+  if (props.mode === 'center') {
+    overlayClick()
+  }
+  emit('click')
+}
 </script>
 
 <style lang="scss" scoped>

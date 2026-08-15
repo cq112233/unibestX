@@ -2,7 +2,7 @@
 	<view class="up-dropdown-item" v-if="active"
 		@touchmove.stop.prevent="() => {}"@tap.stop.prevent="() => {}">
 		<template v-if="$slots['default'] == null && $slots['$default'] == null">
-			<view class="up-dropdown-item__scroll" scroll-y="false" :style="{
+			<view class="up-dropdown-item__scroll" :style="{
 				height: $up.addUnit(props.height)
 			}">
 				<view class="up-dropdown-item__options">

@@ -1,33 +1,32 @@
 <template>
-	<view class="up-steps-item" ref="up-steps-item" :class="[`up-steps-item--${parentData['direction']}`]" :style="itemWidthStyle">
+	<view class="up-steps-item" :class="[`up-steps-item--${direction}`]" :style="itemWidthStyle">
 		<view class="up-steps-item__line"
 			:class="[
-				`up-steps-item__line--${parentData['direction']}`,
-				(index < parseInt(parentData['current'].toString()) && parentData['activeColor'] == '#3c9cff') ? 'up-steps-item__line--active' : ''
+				`up-steps-item__line--${direction}`,
+				(stepIndex < currentStep && activeColor == '#3c9cff') ? 'up-steps-item__line--active' : ''
 			]" :style="lineStyle"></view>
 		<view class="up-steps-item__line"
 			:class="[
-				`up-steps-item__line--${parentData['direction']}`,
-				((index - 1) < parseInt(parentData['current'].toString()) && parentData['activeColor'] == '#3c9cff') ? 'up-steps-item__line--active' : ''
+				`up-steps-item__line--${direction}`,
+				((stepIndex - 1) < currentStep && activeColor == '#3c9cff') ? 'up-steps-item__line--active' : ''
 			]" :style="lineStyle2"></view>
 		<view class="up-steps-item__wrapper"
-			:class="[`up-steps-item__wrapper--${parentData['direction']}`,
-				(parentData['dot'] != null && parentData['dot'] as boolean) ? `up-steps-item__wrapper--${parentData['direction']}--dot` : '']"
+			:class="[`up-steps-item__wrapper--${direction}`,
+				isDot ? `up-steps-item__wrapper--${direction}--dot` : '']"
 			:style="itemStyleInner">
 			<slot name="icon">
 				<view class="up-steps-item__wrapper__dot"
-					v-if="(parentData['dot'] != null && parentData['dot'] as boolean)"
+					v-if="isDot"
 					:class="[
 						(statusClass === 'finish' || statusClass === 'process') ? 'up-steps-item__wrapper__dot--active' : ''
 					]"
 					:style="dotStyle">
-
 				</view>
 				<view class="up-steps-item__wrapper__icon"
-					v-else-if="parentData['activeIcon'] != '' || parentData['inactiveIcon'] != ''">
-					<up-icon :name="index <= parseInt(parentData['current'].toString()) ? parentData['activeIcon'] : parentData['inactiveIcon']"
+					v-else-if="activeIcon != '' || inactiveIcon != ''">
+					<up-icon :name="stepIndex <= currentStep ? activeIcon : inactiveIcon"
 						:size="iconSize"
-						:color="index <= parseInt(parentData['current'].toString()) ? (parentData['activeColor'] == '#3c9cff' ? 'primary' : parentData['activeColor']) : parentData['inactiveColor']">
+						:color="stepIndex <= currentStep ? (activeColor == '#3c9cff' ? 'primary' : activeColor) : inactiveColor">
 					</up-icon>
 				</view>
 				<view v-else
@@ -43,307 +42,257 @@
 						:class="[
 							statusClass === 'process' ? 'up-steps-item__wrapper__circle__text--active' : ''
 						]"
-						:style="circleTextStyle">{{ index + 1}}</text>
-					<up-icon v-else :color="statusClass === 'error' ? 'error' : (parentData['activeColor'] == '#3c9cff' ? 'primary' : parentData['activeColor'])" size="12"
+						:style="circleTextStyle">{{ stepIndex + 1 }}</text>
+					<up-icon v-else :color="statusClass === 'error' ? 'error' : (activeColor == '#3c9cff' ? 'primary' : activeColor)" size="12"
 						:name="statusClass === 'error' ? 'close' : 'checkmark'"></up-icon>
 				</view>
 			</slot>
 		</view>
-		<view class="up-steps-item__content" :class="[`up-steps-item__content--${parentData['direction']}`,
-			parseInt(parentData['current'].toString()) == index ? 'up-steps-item__content--current' : '']"
+		<view class="up-steps-item__content" :class="[`up-steps-item__content--${direction}`,
+			currentStep == stepIndex ? 'up-steps-item__content--current' : '']"
 			:style="contentStyle">
-			<slot name="content" :index="index">
+			<slot name="content" :index="stepIndex">
 			</slot>
 			<template v-if="$slots['content'] == null">
 				<view class="up-steps-item__content__title">
 					<slot name="title">
 					</slot>
-					<up-text v-if="$slots['title'] == null" :text="title" lineHeight="20px"
-						:color="parseInt(parentData['current'].toString()) == index ? (parentData['activeColor'] == '#3c9cff' ? '' : (parentData['activeColor'] as string)) : (parentData['inactiveColor'] as string)"
-						:type="parseInt(parentData['current'].toString()) == index && parentData['activeColor'] == '#3c9cff' ? 'primary' : 'default'"
-						:size="parseInt(parentData['current'].toString()) == index ? 14 : 13"></up-text>
+					<up-text v-if="$slots['title'] == null" :text="title.toString()" lineHeight="20px"
+						:color="currentStep == stepIndex ? (activeColor == '#3c9cff' ? '' : activeColor) : inactiveColor"
+						:type="currentStep == stepIndex && activeColor == '#3c9cff' ? 'primary' : 'default'"
+						:size="currentStep == stepIndex ? 14 : 13"></up-text>
 				</view>
 				<view class="up-steps-item__content__desc">
 					<slot name="desc">
 					</slot>
 					<up-text v-if="$slots['desc'] == null"
-						:text="desc" type="tips" size="12"></up-text>
+						:text="desc.toString()" type="tips" size="12"></up-text>
 				</view>
 			</template>
 		</view>
 	</view>
 </template>
 
-<script lang="uts">
-	import { propsStepsItem } from './props';
-	import { mpMixin } from '../../libs/mixin/mpMixin';
-	import { mixin } from '../../libs/mixin/mixin';
-	import { sleep, error } from '../../libs/function/index';
-	import color from '../../libs/config/color';
-	/**
-	 * StepsItem 步骤条的子组件
-	 * @description 本组件需要和up-steps配合使用
-	 * @tutorial https://uview-plus.jiangruyi.com/components/steps.html
-	 * @property {String}			title			标题文字
-	 * @property {String}			current			描述文本
-	 * @property {String | Number}	iconSize		图标大小  (默认 17 )
-	 * @property {Boolean}			error			当前步骤是否处于失败状态  (默认 false )
-	 * @example <up-steps current="0"><up-steps-item title="已出库" desc="10:35" ></up-steps-item></up-steps>
-	 */
-	export default {
-		name: 'up-steps-item',
-		mixins: [mpMixin, mixin, propsStepsItem],
-		data() {
-			return {
-				index: 0,
-				childLength: 0,
-				showLine: false,
-				parentData: {
-					direction: 'row',
-					current: 0,
-					activeColor: '',
-					inactiveColor: '',
-					activeIcon: '',
-					inactiveIcon: '',
-					dot: false
-				} as UTSJSONObject
-			}
-		},
-		watch: {
-			parentData() {
-			}
-		},
-		created() {
-			this.init()
-		},
-		computed: {
-			itemWidthStyle(): any {
-				const style = {}
-				// @ts-ignore
-				if (this.parentData['direction'].toString() === 'row' && this.childLength > 0) {
-					// @ts-ignore
-					style['width'] = (100.0 / this.childLength).toString() + '%'
-				}
-				return style
-			},
-			lineStyle2() {
-				const style = {}
-				// @ts-ignore
-				if (this.parentData['direction'].toString() === 'row') {
-					if (this.index == 0) {
-						style['display'] = 'none'
-					} else {
-						style['left'] = '0px'
-						style['right'] = '50%'
-						style['width'] = 'auto'
-					}
-				} else {
-					if (this.index == 0) {
-						style['display'] = 'none'
-					} else {
-						style['top'] = '0px'
-						style['bottom'] = '50%'
-						style['left'] = '10px'
-						style['height'] = 'auto'
-						style['width'] = '1px'
-					}
-				}
+<script setup lang="uts">
+import { computed, inject, ref, onMounted } from 'vue'
+import color from '../../libs/config/color'
 
-				// 左半段连接线：从上一步连接到当前步骤，应检查当前步骤的 error 状态
-				// @ts-ignore
-				if (this.error as boolean) {
-					style['backgroundColor'] = color['error']
-				} else if ((this.index - 1) < parseInt(this.parentData['current'].toString())) {
-					// @ts-ignore
-					if (this.parentData['activeColor'] != '#3c9cff') {
-						style['backgroundColor'] = this.parentData['activeColor']
-					}
-				} else {
-					style['backgroundColor'] = this.parentData['inactiveColor']
-				}
-				return style
-			},
-			lineStyle() {
-				const style = {}
-				// @ts-ignore
-				if (this.parentData['direction'].toString() === 'row') {
-					if (this.index == this.childLength - 1) {
-						style['display'] = 'none'
-					} else {
-						style['left'] = '50%'
-						style['right'] = '0px'
-						style['width'] = 'auto'
-					}
-				} else {
-					if (this.index == this.childLength - 1) {
-						style['display'] = 'none'
-					} else {
-						style['top'] = '50%'
-						style['bottom'] = '0px'
-						style['left'] = '10px'
-						style['height'] = 'auto'
-						style['width'] = '1px'
-					}
-				}
-				
-				const parent = this.parent
-				if (parent != null) {
-					const children = parent.$data['children'] as ComponentPublicInstance[] | null
-					if (children != null && this.index + 1 < children.length) {
-						const nextChild = children[this.index + 1]
-						if (nextChild != null && nextChild.$props['error'] as boolean) {
-							style['backgroundColor'] = color['error']
-						} else if (this.index < parseInt(this.parentData['current'].toString())) {
-							if (this.parentData['activeColor'] != '#3c9cff') {
-								style['backgroundColor'] = this.parentData['activeColor']
-							}
-						} else {
-							style['backgroundColor'] = this.parentData['inactiveColor']
-						}
-					}
-				}
-				return style
-			},
-			dotStyle(): any {
-				const style = {} as UTSJSONObject
-				const activeColor = this.parentData['activeColor'] as string
-				if (this.statusClass === 'finish' || this.statusClass === 'process') {
-					if (activeColor != '#3c9cff') {
-						style['backgroundColor'] = activeColor
-					}
-				} else {
-					style['backgroundColor'] = this.parentData['inactiveColor']
-				}
-				return style
-			},
-			circleStyle(): any {
-				const style = {} as UTSJSONObject
-				const activeColor = this.parentData['activeColor'] as string
-				const inactiveColor = this.parentData['inactiveColor'] as string
-				
-				if (activeColor != '#3c9cff' || inactiveColor != '#969799') {
-					if (this.statusClass === 'process') {
-						style['backgroundColor'] = activeColor
-						style['borderColor'] = activeColor
-					} else if (this.statusClass === 'finish') {
-						style['backgroundColor'] = 'rgba(0, 0, 0, 0)'
-						style['borderColor'] = activeColor
-					} else if (this.statusClass === 'wait') {
-						style['backgroundColor'] = 'rgba(0, 0, 0, 0)'
-						style['borderColor'] = inactiveColor
-					} else if (this.statusClass === 'error') {
-						style['backgroundColor'] = 'rgba(0, 0, 0, 0)'
-						style['borderColor'] = color['error']
-					}
-				}
-				return style
-			},
-			circleTextStyle(): any {
-				const style = {} as UTSJSONObject
-				const activeColor = this.parentData['activeColor'] as string
-				const inactiveColor = this.parentData['inactiveColor'] as string
-				if (activeColor != '#3c9cff' || inactiveColor != '#969799') {
-					if (this.statusClass === 'process') {
-						style['color'] = '#ffffff'
-					} else {
-						style['color'] = inactiveColor
-					}
-				}
-				return style
-			},
-			itemStyleInner(): any {
-				return {
-					// @ts-ignore
-					...this.itemStyle
-				}
-			},
-			statusClass() {
-				let index = this.index
-				// @ts-ignore
-				let error = this.error
-				// @ts-ignore
-				let current = parseInt(this.parentData['current'].toString())
-				if (current == index) {
-					return error == true ? 'error' : 'process'
-				} else if (error) {
-					return 'error'
-				} else if (current > index) {
-					return 'finish'
-				} else {
-					return 'wait'
-				}
-			},
-			statusColor() {
-				let colorTmp = '#f1f1f1'
-				switch (this.statusClass) {
-					case 'finish':
-						colorTmp = this.parentData['activeColor'] as string
-						break
-					case 'error':
-						colorTmp = color['error'] as string
-						break
-					case 'process':
-						colorTmp = this.parentData['dot'] as boolean ? this.parentData['activeColor'] as string : 'transparent'
-						break
-					default:
-						colorTmp = this.parentData['inactiveColor'] as string
-						break
-				}
-				return colorTmp
-			},
-			contentStyle(): any {
-				const style = {}
-				// @ts-ignore
-				if (this.parentData['direction'].toString() === 'column') {
-					// @ts-ignore
-					style['marginLeft'] = this.parentData['dot'].toString() == 'true' ? '2px' : '6px'
-					// @ts-ignore
-					style['marginTop'] = this.parentData['dot'].toString() == 'true' ? '0px' : '6px'
-				} else {
-					// @ts-ignore
-					style['marginTop'] = this.parentData['dot'].toString() == 'true' ? '2px' : '6px'
-					// @ts-ignore
-					style['marginLeft'] = this.parentData['dot'].toString() == 'true' ? '2px' : '6px'
-				}
+defineOptions({
+  name: 'up-steps-item'
+})
 
-				return style
-			}
-		},
-		mounted() {
-			const parent = this.parent
-			if (parent != null) {
-				parent.$callMethod('updateFromChild')
-			}
-		},
-		methods: {
-			init() {
-				// 初始化数据
-				this.updateParentData()
-				const parent = this.parent
-				if (parent == null) {
-					return error('up-steps-item必须要搭配up-steps组件使用')
-				}
-				const children = parent.$data['children'] as ComponentPublicInstance[] | null
-				if (children != null) {
-					children.forEach((child: ComponentPublicInstance, index: number) => {
-						if (child == this) {
-							this.index = index
-						}
-					})
-					this.childLength = children.length
-				}
-			},
-			updateParentData() {
-				// 此方法在mixin中
-				// @ts-ignore
-				this.getParentData('up-steps')
-			},
-			// 父组件数据发生变化
-			updateFromParent() {
-				this.init()
-			}
-		}
-	}
+const props = defineProps({
+  title: {
+    type: [String, Number],
+    default: ''
+  },
+  desc: {
+    type: [String, Number],
+    default: ''
+  },
+  iconSize: {
+    type: [String, Number],
+    default: 17
+  },
+  error: {
+    type: Boolean,
+    default: false
+  },
+  index: {
+    type: [Number, String, null],
+    default: null
+  },
+  itemStyle: {
+    type: Object,
+    default: () => ({})
+  }
+})
+
+const parentProps = inject<any | null>('upStepsProps', null)
+const registerStep = inject<(() => number) | null>('upStepsRegister', null)
+const totalSteps = inject<any | null>('upStepsItemCount', null)
+
+const internalIndex = ref<number>(0)
+
+onMounted(() => {
+  if (props.index != null) {
+    internalIndex.value = parseInt(props.index!.toString())
+  } else if (registerStep != null) {
+    internalIndex.value = registerStep()
+  }
+})
+
+const stepIndex = computed<number>(() => {
+  if (props.index != null) return parseInt(props.index!.toString())
+  return internalIndex.value
+})
+
+const childLength = computed<number>(() => {
+  return totalSteps?.value ?? 0
+})
+
+const direction = computed<string>(() => {
+  return parentProps?.direction ?? 'row'
+})
+
+const currentStep = computed<number>(() => {
+  return parseInt((parentProps?.current ?? 0).toString())
+})
+
+const activeColor = computed<string>(() => {
+  return parentProps?.activeColor ?? '#3c9cff'
+})
+
+const inactiveColor = computed<string>(() => {
+  return parentProps?.inactiveColor ?? '#969799'
+})
+
+const activeIcon = computed<string>(() => {
+  return parentProps?.activeIcon ?? ''
+})
+
+const inactiveIcon = computed<string>(() => {
+  return parentProps?.inactiveIcon ?? ''
+})
+
+const isDot = computed<boolean>(() => {
+  return parentProps?.dot ?? false
+})
+
+const statusClass = computed<string>(() => {
+  if (props.error) return 'error'
+  if (stepIndex.value < currentStep.value) return 'finish'
+  if (stepIndex.value === currentStep.value) return 'process'
+  return 'wait'
+})
+
+const itemWidthStyle = computed<UTSJSONObject>(() => {
+  const style = {} as UTSJSONObject
+  if (direction.value === 'row' && childLength.value > 0) {
+    style['width'] = (100.0 / childLength.value).toString() + '%'
+  }
+  return style
+})
+
+const itemStyleInner = computed<UTSJSONObject>(() => {
+  const style = (props.itemStyle ?? {}) as UTSJSONObject
+  return style
+})
+
+const contentStyle = computed<UTSJSONObject>(() => {
+  const style = {} as UTSJSONObject
+  return style
+})
+
+const lineStyle2 = computed<UTSJSONObject>(() => {
+  const style = {} as UTSJSONObject
+  if (direction.value === 'row') {
+    if (stepIndex.value == 0) {
+      style['display'] = 'none'
+    } else {
+      style['left'] = '0px'
+      style['right'] = '50%'
+      style['width'] = 'auto'
+    }
+  } else {
+    if (stepIndex.value == 0) {
+      style['display'] = 'none'
+    } else {
+      style['top'] = '0px'
+      style['bottom'] = '50%'
+      style['left'] = '10px'
+      style['height'] = 'auto'
+      style['width'] = '1px'
+    }
+  }
+
+  if (props.error) {
+    style['backgroundColor'] = color['error']
+  } else if ((stepIndex.value - 1) < currentStep.value) {
+    if (activeColor.value != '#3c9cff') {
+      style['backgroundColor'] = activeColor.value
+    }
+  } else {
+    style['backgroundColor'] = inactiveColor.value
+  }
+  return style
+})
+
+const lineStyle = computed<UTSJSONObject>(() => {
+  const style = {} as UTSJSONObject
+  if (direction.value === 'row') {
+    if (childLength.value > 0 && stepIndex.value == childLength.value - 1) {
+      style['display'] = 'none'
+    } else {
+      style['left'] = '50%'
+      style['right'] = '0px'
+      style['width'] = 'auto'
+    }
+  } else {
+    if (childLength.value > 0 && stepIndex.value == childLength.value - 1) {
+      style['display'] = 'none'
+    } else {
+      style['top'] = '50%'
+      style['bottom'] = '0px'
+      style['left'] = '10px'
+      style['height'] = 'auto'
+      style['width'] = '1px'
+    }
+  }
+
+  if (stepIndex.value < currentStep.value) {
+    if (activeColor.value != '#3c9cff') {
+      style['backgroundColor'] = activeColor.value
+    }
+  } else {
+    style['backgroundColor'] = inactiveColor.value
+  }
+  return style
+})
+
+const dotStyle = computed<UTSJSONObject>(() => {
+  const style = {} as UTSJSONObject
+  if (statusClass.value === 'finish' || statusClass.value === 'process') {
+    if (activeColor.value != '#3c9cff') {
+      style['backgroundColor'] = activeColor.value
+    }
+  } else {
+    style['backgroundColor'] = inactiveColor.value
+  }
+  return style
+})
+
+const circleStyle = computed<UTSJSONObject>(() => {
+  const style = {} as UTSJSONObject
+  if (activeColor.value != '#3c9cff' || inactiveColor.value != '#969799') {
+    if (statusClass.value === 'process') {
+      style['backgroundColor'] = activeColor.value
+      style['borderColor'] = activeColor.value
+    } else if (statusClass.value === 'finish') {
+      style['backgroundColor'] = 'rgba(0, 0, 0, 0)'
+      style['borderColor'] = activeColor.value
+    } else if (statusClass.value === 'wait') {
+      style['backgroundColor'] = 'rgba(0, 0, 0, 0)'
+      style['borderColor'] = inactiveColor.value
+    } else if (statusClass.value === 'error') {
+      style['backgroundColor'] = 'rgba(0, 0, 0, 0)'
+      style['borderColor'] = color['error']
+    }
+  }
+  return style
+})
+
+const circleTextStyle = computed<UTSJSONObject>(() => {
+  const style = {} as UTSJSONObject
+  if (activeColor.value != '#3c9cff' || inactiveColor.value != '#969799') {
+    if (statusClass.value === 'process') {
+      style['color'] = '#ffffff'
+    } else {
+      style['color'] = inactiveColor.value
+    }
+  }
+  return style
+})
 </script>
 
 <style lang="scss" scoped>
@@ -352,18 +301,19 @@
 	.up-steps-item {
 		flex: 1;
 		@include flex;
+		position: relative;
 
 		&--row {
 			flex-direction: column;
 			align-items: center;
-			position: relative;
+			justify-content: center;
 		}
 
 		&--column {
-			position: relative;
+			flex-direction: row;
 			flex-direction: row;
 			justify-content: flex-start;
-			padding-bottom: 5px;
+			min-height: 50px;
 		}
 
 		&__wrapper {
@@ -372,11 +322,10 @@
 			align-items: center;
 			position: relative;
 			background-color: #fff;
-			border-radius: 50px;
 
 			&--column {
 				width: 20px;
-				height: 20px;
+				height: 32px;
 
 				&--dot {
 					height: 20px;
@@ -385,8 +334,8 @@
 			}
 
 			&--row {
-				width: 20px;
-				height: 20px;
+				height: 32px;
+				width: 32px;
 
 				&--dot {
 					width: 20px;
@@ -397,43 +346,27 @@
 			&__circle {
 				width: 20px;
 				height: 20px;
+				/* #ifndef APP-NVUE */
 				box-sizing: border-box;
-				flex-shrink: 0;
+				/* #endif */
+				flex-direction: row;
 				border-radius: 100px;
 				border-width: 1px;
+				border-color: $up-tips-color;
 				border-style: solid;
 				@include flex(row);
 				align-items: center;
 				justify-content: center;
-
-				&--wait {
-					border-color: $up-tips-color;
-					background-color: transparent;
-				}
-
-				&--active {
-					background-color: $up-primary;
-					border-color: $up-primary;
-				}
-
-				&--finish {
-					border-color: $up-primary;
-					background-color: transparent;
-				}
-
-				&--error {
-					border-color: $up-error;
-					background-color: transparent;
-				}
+				transition: background-color 0.3s;
 
 				&__text {
 					color: $up-tips-color;
 					font-size: 11px;
+					@include flex(row);
+					align-items: center;
+					justify-content: center;
 					text-align: center;
-
-					&--active {
-						color: #ffffff;
-					}
+					line-height: 11px;
 				}
 			}
 
@@ -442,10 +375,6 @@
 				height: 10px;
 				border-radius: 100px;
 				background-color: $up-content-color;
-
-				&--active {
-					background-color: $up-primary;
-				}
 			}
 		}
 
@@ -453,15 +382,10 @@
 			@include flex;
 			flex: 1;
 
-			&__title {
-				// #ifdef H5
-				cursor: pointer;
-				// #endif
-			}
-
 			&--row {
 				flex-direction: column;
 				align-items: center;
+				text-align: center;
 			}
 
 			&--column {
@@ -472,14 +396,10 @@
 
 		&__line {
 			position: absolute;
-			background-color: $up-tips-color;
-
-			&--active {
-				background-color: $up-primary;
-			}
+			background: $up-tips-color;
 
 			&--row {
-				top: 10px;
+				top: 16px;
 				height: 1px;
 			}
 

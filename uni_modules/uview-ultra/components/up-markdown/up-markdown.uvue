@@ -8,7 +8,8 @@
   </view>
 </template>
 
-<script lang="uts">
+<script setup lang="uts">
+import { ref, computed, watch } from 'vue'
 import { useMarked } from '../../libs/marked-uts/common/marked'
 
 const marked = useMarked()
@@ -16,6 +17,19 @@ const marked = useMarked()
 async function renderMarkdown(content: string): Promise<string> {
   const parsed = await marked.parse(content, null) as string
   return parsed
+}
+
+function addLineNumbers(code: string): string {
+  const lines = code.split('\n')
+  let result = ''
+  let lineNumber = 1
+  for (let i = 0; i < lines.length; i++) {
+    if (i == lines.length - 1 && lines[i].length == 0) continue
+    if (result.length > 0) result += '\n'
+    result += lineNumber.toString() + '  ' + lines[i]
+    lineNumber++
+  }
+  return result
 }
 
 function addLineNumbersToCodeBlocks(html: string): string {
@@ -38,19 +52,6 @@ function addLineNumbersToCodeBlocks(html: string): string {
     result += addLineNumbers(html.substring(codeStart + 1, codeEnd))
     result += closeCode
     index = codeEnd + closeCode.length
-  }
-  return result
-}
-
-function addLineNumbers(code: string): string {
-  const lines = code.split('\n')
-  let result = ''
-  let lineNumber = 1
-  for (let i = 0; i < lines.length; i++) {
-    if (i == lines.length - 1 && lines[i].length == 0) continue
-    if (result.length > 0) result += '\n'
-    result += lineNumber.toString() + '  ' + lines[i]
-    lineNumber++
   }
   return result
 }
@@ -86,91 +87,64 @@ function styleMap(theme: string): UTSJSONObject {
   } as UTSJSONObject
 }
 
-export default {
-  name: 'up-markdown',
-  props: {
-    // markdown内容
-    content: {
-      type: String,
-      default: ''
-    },
-    // 是否启用图片预览
-    previewImg: {
-      type: Boolean,
-      default: true
-    },
-    // 是否显示代码块行号
-    showLineNumber: {
-      type: Boolean,
-      default: false
-    },
-    // 主题样式 'light' | 'dark'
-    theme: {
-      type: String,
-      default: 'light'
-    }
-  },
-  data() {
-    return {
-      parsedContent: ''
-    };
-  },
-  computed: {
-    markdownStyle(): string {
-      if (this.theme == 'dark') {
-        return 'background-color:#1e1e1e;color:#cccccc'
-      }
-      return ''
-    },
-    markdownTagStyle(): UTSJSONObject {
-      return styleMap(this.theme)
-    }
-  },
-  watch: {
-    content: {
-      handler(newVal: string) {
-        this.parseMarkdown(newVal);
-      },
-      immediate: true
-    }
-  },
-  methods: {
-    // 解析markdown内容
-    async parseMarkdown(content: string): Promise<void> {
-      if (content.length == 0) {
-        this.parsedContent = '';
-        return;
-      }
+defineOptions({
+  name: 'up-markdown'
+})
 
-      let parsed = await renderMarkdown(content)
-      if (this.showLineNumber) {
-        parsed = addLineNumbersToCodeBlocks(parsed)
-      }
-      this.parsedContent = parsed;
-    }
+const props = defineProps({
+  content: {
+    type: String,
+    default: ''
+  },
+  previewImg: {
+    type: Boolean,
+    default: true
+  },
+  showLineNumber: {
+    type: Boolean,
+    default: false
+  },
+  theme: {
+    type: String,
+    default: 'light'
   }
-};
+})
+
+const parsedContent = ref<string>('')
+
+const markdownStyle = computed<string>(() => {
+  if (props.theme == 'dark') {
+    return 'background-color:#1e1e1e;color:#cccccc'
+  }
+  return ''
+})
+
+const markdownTagStyle = computed<UTSJSONObject>(() => {
+  return styleMap(props.theme)
+})
+
+async function parseMarkdown(text: string): Promise<void> {
+  if (text.length == 0) {
+    parsedContent.value = ''
+    return
+  }
+
+  let parsed = await renderMarkdown(text)
+  if (props.showLineNumber) {
+    parsed = addLineNumbersToCodeBlocks(parsed)
+  }
+  parsedContent.value = parsed
+}
+
+watch(() => props.content, (newVal: string) => {
+  parseMarkdown(newVal)
+}, { immediate: true })
 </script>
 
 <style lang="scss" scoped>
 .up-markdown {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   font-size: 16px;
   line-height: 1.6;
-  color: #333;
   padding: 16px;
-  
-  /* 标题样式 */
-/* 段落样式 */
-/* 链接样式 */
-/* 列表样式 */
-/* 引用样式 */
-/* 代码样式 */
-/* 表格样式 */
-/* 图片样式 */
-/* 分割线样式 */
-/* 深色主题 */
 }
-
-/* 代码块行号样式 */
 </style>

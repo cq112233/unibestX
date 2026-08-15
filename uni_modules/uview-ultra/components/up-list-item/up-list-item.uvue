@@ -2,116 +2,33 @@
 	<view
 		class="up-list-item"
 		:ref="refstr"
-		fref="`up-list-item-${anchor}`"
 		:class="[`up-list-item-${refstr}`]"
 	>
 		<slot />
 	</view>
 </template>
 
-<script lang="uts">
-	import { propsListItem } from './props.uts';
-	import { mpMixin } from '../../libs/mixin/mpMixin.uts';
-	import { mixin } from '../../libs/mixin/mixin.uts';
-	import { getWindowInfo, guid } from '../../libs/function/index.uts';
-	/**
-	 * List 列表
-	 * @description 该组件为高性能列表组件
-	 * @tutorial https://uview-plus.jiangruyi.com/components/list.html
-	 * @property {String | Number}	anchor	用于滚动到指定item
-	 * @example <up-list-item v-for="(item, index) in indexList" :key="index" ></up-list-item>
-	 */
-	export default {
-		name: 'up-list-item',
-		mixins: [mpMixin, mixin, propsListItem],
-		data() {
-			return {
-				// 节点信息
-				rect: {} as NodeInfo,
-				index: 0,
-				refstr: guid(),
-				show: true,
-				sys: getWindowInfo() as GetWindowInfoResult
-			}
-		},
-		computed: {
+<script setup lang="uts">
+import { ref } from 'vue'
+import { guid } from '../../libs/function/index.uts'
 
-		},
-		watch: {
-			// 'uList.innerScrollTop'(n) {
-			// 	const preLoadScreen = this.uList.preLoadScreen
-			// 	const windowHeight = this.sys.windowHeight
-			// 	if(n <= windowHeight * preLoadScreen) {
-			// 		this.parent.updateOffsetFromChild(0)
-			// 	} else if (this.rect.top <= n - windowHeight * preLoadScreen) {
-			// 		this.parent.updateOffsetFromChild(this.rect.top)
-			// 	}
-			// }
-		},
-		created() {
-		},
-		mounted() {
-			this.init()
-		},
-		methods: {
-			init() {
-				// 初始化数据
-				this.updateParentData()
-				const parent = this.parent as ComponentPublicInstance | null
-				if (parent != null) {
-					this.index = (parent.$data['childrenRefs'] as string[]).indexOf(this.refstr)
-					this.resize()
-				}
-			},
-			updateParentData(): void {
-				// 此方法在mixin中
-				// @ts-ignore
-				this.getParentData('up-list', true)
-				// @ts-ignore
-				this.getParentData('up-list', false)
-			},
-			resize() {
-				// console.log("*******", `up-list-item-${this.anchor}`)
-				this.queryRect(`up-list-item-${this.refstr}`).then((size: NodeInfo) => {
-					if (this.index > 0) {
-						const parentIns = this.parent as ComponentPublicInstance | null
-						if (parentIns != null) {
-							const children = parentIns.$data['children'] as ComponentPublicInstance[] | null
-							if (children == null) return
-							const lastChild = children[this.index - 1]
-							if (lastChild == null) {
-								return
-							}
-							this.rect = size
-							const preLoadScreen = parseFloat(parentIns.$props['preLoadScreen'] != null ? parentIns.$props['preLoadScreen'].toString() : '0')
-							const windowHeight = this.sys.windowHeight
-							if (lastChild != null) {
-								this.rect.top = ((lastChild.$data['rect']as NodeInfo).top ?? 0)
-									+ ((lastChild.$data['rect'] as NodeInfo).height ?? 0)
-							}
-							let innerScrollTop = parentIns?.$data['innerScrollTop'] as string
-							if ((size.top ?? 0) >= parseFloat(innerScrollTop ?? '0') + (1 + preLoadScreen) * windowHeight) {
-								this.show = false
-							}
-						}
-					} else {
-						console.log('index == 0')
-					}
-				})
-			},
-			// 查询元素尺寸
-			queryRect(el: string): Promise<NodeInfo> {
-				return new Promise((resolve) => {
-					// @ts-ignore
-					this.upGetRect(`.${el}`).then((size: NodeInfo) => {
-						resolve(size)
-					})
-				})
-			}
-		}
+defineOptions({
+	name: 'up-list-item'
+})
+
+const props = defineProps({
+	anchor: {
+		type: [String, Number],
+		default: ''
+	},
+	customStyle: {
+		type: Object,
+		default: () => ({})
 	}
+})
+
+const refstr = ref<string>(guid())
 </script>
 
 <style lang="scss" scoped>
-	.up-list-item {}
 </style>

@@ -42,8 +42,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           };
         }),
         d: scrollTop.value,
-        e: common_vendor.o(handleScroll, "9a"),
-        f: common_vendor.o(scrollToTop, "d4"),
+        e: common_vendor.o(handleScroll, "04"),
+        f: common_vendor.o(scrollToTop, "52"),
         g: common_vendor.p({
           ["scroll-top"]: currentScrollTop.value,
           top: 100,

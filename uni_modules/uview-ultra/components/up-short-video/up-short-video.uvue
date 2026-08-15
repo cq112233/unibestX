@@ -157,8 +157,8 @@
 	</view>
 </template>
 
-<script lang="uts">
-import type { PropType } from 'vue'
+<script setup lang="uts">
+import { ref, computed, watch, nextTick, getCurrentInstance } from 'vue'
 
 function createTabsList(): Array<UTSJSONObject> {
 	const tabs = [] as Array<UTSJSONObject>
@@ -212,7 +212,7 @@ function copyVideoList(list: Array<UTSJSONObject>): Array<UTSJSONObject> {
 
 function normalizeNumber(value: any | null, defaultValue: number = 0): number {
 	if (typeof value === 'number') {
-		return value
+		return value as number
 	}
 	if (value == null) {
 		return defaultValue
@@ -227,220 +227,248 @@ function stringValue(value: any | null): string {
 
 function booleanValue(value: any | null): boolean {
 	if (typeof value === 'boolean') {
-		return value
+		return value as boolean
 	}
 	return value != null && value.toString() == 'true'
 }
 
-export default {
-	name: 'up-short-video',
-	props: {
-		tabsList: {
-			type: Array as PropType<Array<UTSJSONObject>>,
-			default(): Array<UTSJSONObject> {
-				return createTabsList()
-			}
-		},
-		videoList: {
-			type: Array as PropType<Array<UTSJSONObject>>,
-			default(): Array<UTSJSONObject> {
-				return createVideoList()
-			}
-		},
-		currentTab: {
-			type: Number,
-			default: 0
-		},
-		currentVideo: {
-			type: Number,
-			default: 0
-		}
+defineOptions({
+	name: 'up-short-video'
+})
+
+const props = defineProps({
+	tabsList: {
+		type: Array as PropType<Array<UTSJSONObject>>,
+		default: () => createTabsList()
 	},
-	emits: [
-		'tabChange',
-		'videoChange',
-		'like',
-		'comment',
-		'share',
-		'collect',
-		'progressChanging',
-		'progressChange',
-		'videoPlay',
-		'videoPause',
-		'videoEnded',
-		'timeUpdate',
-		'loadedMetadata',
-		'goNext'
-	],
-	data() {
-		return {
-			internalVideoList: createVideoList() as Array<UTSJSONObject>,
-			showSpeedSheet: false,
-			currentSpeedVideoIndex: 0,
-			speedOptions: createSpeedOptions()
-		}
+	videoList: {
+		type: Array as PropType<Array<UTSJSONObject>>,
+		default: () => createVideoList()
 	},
-	computed: {
-		videoItems(): Array<UTSJSONObject> {
-			return this.internalVideoList as Array<UTSJSONObject>
-		},
-		currentProgress(): number {
-			const item = this.getVideoItem(this.currentVideo)
-			if (item == null) {
-				return 0
-			}
-			return normalizeNumber(item['progress'], 0)
-		}
+	currentTab: {
+		type: Number,
+		default: 0
 	},
-	watch: {
-		videoList: {
-			handler(newVal: Array<UTSJSONObject>) {
-				this.syncVideoList(newVal)
-			},
-			immediate: true
-		}
-	},
-	methods: {
-		syncVideoList(list: Array<UTSJSONObject>): void {
-			this.internalVideoList = copyVideoList(list)
-		},
-		getVideoItem(index: number): UTSJSONObject | null {
-			const list = this.videoItems
-			if (index < 0 || index >= list.length) {
-				return null
-			}
-			return list[index]
-		},
-		getVideoId(index: number): string {
-			return `video-${index}`
-		},
-		getPlaybackRate(item: UTSJSONObject): number {
-			return normalizeNumber(item['playbackRate'], 1)
-		},
-		getVideoUrl(item: UTSJSONObject): string {
-			return stringValue(item['videoUrl'])
-		},
-		getAuthor(item: UTSJSONObject): UTSJSONObject {
-			const author = item['author'] as UTSJSONObject | null
-			return author == null ? ({} as UTSJSONObject) : author
-		},
-		getAuthorAvatar(item: UTSJSONObject): string {
-			return stringValue(this.getAuthor(item)['avatar'])
-		},
-		getAuthorName(item: UTSJSONObject): string {
-			return stringValue(this.getAuthor(item)['name'])
-		},
-		getAuthorDesc(item: UTSJSONObject): string {
-			return stringValue(this.getAuthor(item)['desc'])
-		},
-		isLiked(item: UTSJSONObject): boolean {
-			return booleanValue(item['isLiked'])
-		},
-		isCollected(item: UTSJSONObject): boolean {
-			return booleanValue(item['isCollected'])
-		},
-		getCountText(item: UTSJSONObject, key: string): string {
-			return stringValue(item[key])
-		},
-		updateVideoItemValue(index: number, key: string, value: any): void {
-			const item = this.getVideoItem(index)
-			if (item == null) {
-				return
-			}
-			item[key] = value
-		},
-		getEventNumber(detail: UTSJSONObject, key: string, defaultValue: number = 0): number {
-			return normalizeNumber(detail[key], defaultValue)
-		},
-		handleTabChange(index: number): void {
-			this.$emit('tabChange', index)
-		},
-		handleSwiperChange(e: UniCustomEvent<UTSJSONObject>): void {
-			const currentIndex = this.getEventNumber(e.detail, 'current', 0)
-			this.pauseCurrentVideo()
-			this.$nextTick(() => {
-				this.playVideo(currentIndex)
-			})
-			this.$emit('videoChange', currentIndex)
-		},
-		handleLike(item: UTSJSONObject, index: number): void {
-			this.$emit('like', { item: item, index: index } as UTSJSONObject)
-		},
-		handleComment(item: UTSJSONObject, index: number): void {
-			this.$emit('comment', { item: item, index: index } as UTSJSONObject)
-		},
-		handleShare(item: UTSJSONObject, index: number): void {
-			this.$emit('share', { item: item, index: index } as UTSJSONObject)
-		},
-		handleCollect(item: UTSJSONObject, index: number): void {
-			this.$emit('collect', { item: item, index: index } as UTSJSONObject)
-		},
-		onProgressChanging(value: UniCustomEvent<UTSJSONObject>): void {
-			const progress = this.getEventNumber(value.detail, 'value', 0)
-			this.updateVideoItemValue(this.currentVideo, 'progressValue', progress)
-			this.$emit('progressChanging', {
-				progress: progress,
-				index: this.currentVideo
-			} as UTSJSONObject)
-		},
-		onProgressChange(value: UniCustomEvent<UTSJSONObject>): void {
-			const progress = this.getEventNumber(value.detail, 'value', 0)
-			this.updateVideoItemValue(this.currentVideo, 'progressValue', progress)
-			this.$emit('progressChange', {
-				progress: progress,
-				index: this.currentVideo
-			} as UTSJSONObject)
-		},
-		showSpeedOptions(index: number): void {
-			this.currentSpeedVideoIndex = index
-			this.showSpeedSheet = true
-		},
-		selectSpeed(action: UTSJSONObject): void {
-			const videoContext = uni.createVideoContext(this.getVideoId(this.currentSpeedVideoIndex), this)
-			const speed = normalizeNumber(action['value'], 1)
-			if (videoContext != null) {
-				videoContext.playbackRate(speed)
-			}
-			this.updateVideoItemValue(this.currentSpeedVideoIndex, 'playbackRate', speed)
-			this.showSpeedSheet = false
-		},
-		playVideo(index: number): void {
-			const videoContext = uni.createVideoContext(this.getVideoId(index), this)
-			if (videoContext != null) {
-				videoContext.play()
-			}
-		},
-		pauseCurrentVideo(): void {
-			const videoContext = uni.createVideoContext(this.getVideoId(this.currentVideo), this)
-			if (videoContext != null) {
-				videoContext.pause()
-			}
-		},
-		onVideoPlay(e: UniEvent): void {
-			this.$emit('videoPlay', { index: this.currentVideo, event: e } as UTSJSONObject)
-		},
-		onVideoPause(e: UniEvent): void {
-			this.$emit('videoPause', { index: this.currentVideo, event: e } as UTSJSONObject)
-		},
-		onVideoEnded(e: UniEvent): void {
-			this.$emit('videoEnded', { index: this.currentVideo, event: e } as UTSJSONObject)
-		},
-		onTimeUpdate(e: UniCustomEvent<UTSJSONObject>): void {
-			const currentTime = this.getEventNumber(e.detail, 'currentTime', 0)
-			const duration = this.getEventNumber(e.detail, 'duration', 0)
-			if (duration > 0) {
-				this.updateVideoItemValue(this.currentVideo, 'progress', currentTime / duration * 100)
-			}
-			this.$emit('timeUpdate', { index: this.currentVideo, event: e } as UTSJSONObject)
-		},
-		onLoadedMetadata(e: UniEvent): void {
-			this.$emit('loadedMetadata', { index: this.currentVideo, event: e } as UTSJSONObject)
-		},
-		goNext(): void {
-			this.$emit('goNext')
-		}
+	currentVideo: {
+		type: Number,
+		default: 0
+	}
+})
+
+const emit = defineEmits([
+	'tabChange',
+	'videoChange',
+	'like',
+	'comment',
+	'share',
+	'collect',
+	'progressChanging',
+	'progressChange',
+	'videoPlay',
+	'videoPause',
+	'videoEnded',
+	'timeUpdate',
+	'loadedMetadata',
+	'goNext'
+])
+const instance = getCurrentInstance()
+
+const internalVideoList = ref<Array<UTSJSONObject>>(createVideoList())
+const showSpeedSheet = ref<boolean>(false)
+const currentSpeedVideoIndex = ref<number>(0)
+const speedOptions = ref<Array<UTSJSONObject>>(createSpeedOptions())
+
+const videoItems = computed<Array<UTSJSONObject>>(() => {
+	return internalVideoList.value
+})
+
+function getVideoItem(index: number): UTSJSONObject | null {
+	const list = videoItems.value
+	if (index < 0 || index >= list.length) {
+		return null
+	}
+	return list[index]
+}
+
+const currentProgress = computed<number>(() => {
+	const item = getVideoItem(props.currentVideo)
+	if (item == null) {
+		return 0
+	}
+	return normalizeNumber(item['progress'], 0)
+})
+
+function syncVideoList(list: Array<UTSJSONObject>): void {
+	internalVideoList.value = copyVideoList(list)
+}
+
+function getVideoId(index: number): string {
+	return `video-${index}`
+}
+
+function getPlaybackRate(item: UTSJSONObject): number {
+	return normalizeNumber(item['playbackRate'], 1)
+}
+
+function getVideoUrl(item: UTSJSONObject): string {
+	return stringValue(item['videoUrl'])
+}
+
+function getAuthor(item: UTSJSONObject): UTSJSONObject {
+	const author = item['author'] as UTSJSONObject | null
+	return author == null ? ({} as UTSJSONObject) : author
+}
+
+function getAuthorAvatar(item: UTSJSONObject): string {
+	return stringValue(getAuthor(item)['avatar'])
+}
+
+function getAuthorName(item: UTSJSONObject): string {
+	return stringValue(getAuthor(item)['name'])
+}
+
+function getAuthorDesc(item: UTSJSONObject): string {
+	return stringValue(getAuthor(item)['desc'])
+}
+
+function isLiked(item: UTSJSONObject): boolean {
+	return booleanValue(item['isLiked'])
+}
+
+function isCollected(item: UTSJSONObject): boolean {
+	return booleanValue(item['isCollected'])
+}
+
+function getCountText(item: UTSJSONObject, key: string): string {
+	return stringValue(item[key])
+}
+
+function updateVideoItemValue(index: number, key: string, value: any): void {
+	const item = getVideoItem(index)
+	if (item == null) {
+		return
+	}
+	item[key] = value
+}
+
+function getEventNumber(detail: UTSJSONObject, key: string, defaultValue: number = 0): number {
+	return normalizeNumber(detail[key], defaultValue)
+}
+
+function handleTabChange(index: number): void {
+	emit('tabChange', index)
+}
+
+function playVideo(index: number): void {
+	const videoContext = uni.createVideoContext(getVideoId(index), instance?.proxy)
+	if (videoContext != null) {
+		videoContext.play()
 	}
 }
+
+function pauseCurrentVideo(): void {
+	const videoContext = uni.createVideoContext(getVideoId(props.currentVideo), instance?.proxy)
+	if (videoContext != null) {
+		videoContext.pause()
+	}
+}
+
+function handleSwiperChange(e: UniCustomEvent<UTSJSONObject>): void {
+	const curIndex = getEventNumber(e.detail, 'current', 0)
+	pauseCurrentVideo()
+	nextTick(() => {
+		playVideo(curIndex)
+	})
+	emit('videoChange', curIndex)
+}
+
+function handleLike(item: UTSJSONObject, index: number): void {
+	emit('like', { item: item, index: index } as UTSJSONObject)
+}
+
+function handleComment(item: UTSJSONObject, index: number): void {
+	emit('comment', { item: item, index: index } as UTSJSONObject)
+}
+
+function handleShare(item: UTSJSONObject, index: number): void {
+	emit('share', { item: item, index: index } as UTSJSONObject)
+}
+
+function handleCollect(item: UTSJSONObject, index: number): void {
+	emit('collect', { item: item, index: index } as UTSJSONObject)
+}
+
+function onProgressChanging(value: UniCustomEvent<UTSJSONObject>): void {
+	const progress = getEventNumber(value.detail, 'value', 0)
+	updateVideoItemValue(props.currentVideo, 'progressValue', progress)
+	emit('progressChanging', {
+		progress: progress,
+		index: props.currentVideo
+	} as UTSJSONObject)
+}
+
+function onProgressChange(value: UniCustomEvent<UTSJSONObject>): void {
+	const progress = getEventNumber(value.detail, 'value', 0)
+	updateVideoItemValue(props.currentVideo, 'progressValue', progress)
+	emit('progressChange', {
+		progress: progress,
+		index: props.currentVideo
+	} as UTSJSONObject)
+}
+
+function showSpeedOptions(index: number): void {
+	currentSpeedVideoIndex.value = index
+	showSpeedSheet.value = true
+}
+
+function selectSpeed(action: UTSJSONObject): void {
+	const videoContext = uni.createVideoContext(getVideoId(currentSpeedVideoIndex.value), instance?.proxy)
+	const speed = normalizeNumber(action['value'], 1)
+	if (videoContext != null) {
+		videoContext.playbackRate(speed)
+	}
+	updateVideoItemValue(currentSpeedVideoIndex.value, 'playbackRate', speed)
+	showSpeedSheet.value = false
+}
+
+function onVideoPlay(e: UniEvent): void {
+	emit('videoPlay', { index: props.currentVideo, event: e } as UTSJSONObject)
+}
+
+function onVideoPause(e: UniEvent): void {
+	emit('videoPause', { index: props.currentVideo, event: e } as UTSJSONObject)
+}
+
+function onVideoEnded(e: UniEvent): void {
+	emit('videoEnded', { index: props.currentVideo, event: e } as UTSJSONObject)
+}
+
+function onTimeUpdate(e: UniCustomEvent<UTSJSONObject>): void {
+	const currentTime = getEventNumber(e.detail, 'currentTime', 0)
+	const duration = getEventNumber(e.detail, 'duration', 0)
+	if (duration > 0) {
+		updateVideoItemValue(props.currentVideo, 'progress', currentTime / duration * 100)
+	}
+	emit('timeUpdate', { index: props.currentVideo, event: e } as UTSJSONObject)
+}
+
+function onLoadedMetadata(e: UniEvent): void {
+	emit('loadedMetadata', { index: props.currentVideo, event: e } as UTSJSONObject)
+}
+
+function goNext(): void {
+	emit('goNext')
+}
+
+watch(() => props.videoList, (newVal: Array<UTSJSONObject>) => {
+	syncVideoList(newVal)
+}, { immediate: true })
+
+defineExpose({
+	playVideo,
+	pauseCurrentVideo,
+	showSpeedOptions
+})
 </script>
 
 <style lang="scss" scoped>
@@ -469,7 +497,6 @@ export default {
 				display: flex;
 				align-items: center;
 				justify-content: center;
-				color: #fff;
 			}
 			
 			&__tabs {
@@ -529,16 +556,16 @@ export default {
 				}
 
                 &__name {
-						color: #eee;
-						font-size: 16px;
-						font-weight: bold;
-						margin-bottom: 5px;
-					}
-					
-					&__desc {
-						color: rgba(255, 255, 255, 0.8);
-						font-size: 14px;
-					}
+					color: #eee;
+					font-size: 16px;
+					font-weight: bold;
+					margin-bottom: 5px;
+				}
+				
+				&__desc {
+					color: rgba(255, 255, 255, 0.8);
+					font-size: 14px;
+				}
 				
 				&__follow {
 					margin-left: 15px;
@@ -559,7 +586,6 @@ export default {
 					flex-direction: column;
 					align-items: center;
 					margin-bottom: 20px;
-					color: #fff;
 				}
 				
 				&__text {

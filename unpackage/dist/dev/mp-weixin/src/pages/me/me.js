@@ -78,9 +78,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         g: common_vendor.t(common_vendor.unref(userInfoJson)),
         h: common_vendor.unref(tokenStore).hasValidLogin()
       }, common_vendor.unref(tokenStore).hasValidLogin() ? {
-        i: common_vendor.o(handleLogout, "11")
+        i: common_vendor.o(handleLogout, "e9")
       } : {
-        j: common_vendor.o(handleLogin, "94")
+        j: common_vendor.o(handleLogin, "c9")
       }, {
         k: common_vendor.p({
           ["navigation-bar-title-text"]: "我的"

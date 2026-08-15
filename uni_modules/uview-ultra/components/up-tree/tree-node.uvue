@@ -1,29 +1,26 @@
-﻿<template>
+<template>
   <view class="up-tree-node" :style="{ paddingLeft: depth * 20 + 'px' }">
     <view class="up-tree-node-content" @click="toggle">
-      <!-- <text v-if="hasChildren" class="up-tree-node-toggle">
-        {{ node.expanded ? '鈻? : '鈻? }}
-      </text> -->
       <up-icon v-if="hasChildren" class="up-tree-node-toggle"
        :name="isExpanded ? 'arrow-down-fill' : 'play-right-fill'" size="12" />
       <up-checkbox
         v-if="showCheckbox"
         usedAlone
         :size="12"
-        :checked="node.checked"
+        :checked="node['checked'] == true"
         @change="toggleCheck"
         style="margin-right: 10px;"
       />
       <slot :nodeData="node" :level="depth + 1">
-        {{ node[props.label] }}
+        <text>{{ node[props['label'] ?? 'label'] }}</text>
       </slot>
     </view>
     <view v-if="hasChildren && isExpanded"
       class="up-tree-node-children"
       :style="{ paddingLeft: (depth + 1) * 20 + 'px' }">
       <tree-node
-        v-for="child in node[props.children]"
-        :key="child[props.nodeKey]"
+        v-for="child in (node[childrenKey] as UTSJSONObject[])"
+        :key="child[props['nodeKey'] ?? 'id']"
         :node="child"
         :props="props"
         :show-checkbox="showCheckbox"
@@ -40,115 +37,101 @@
   </view>
 </template>
 
-<script lang="uts">
-function valueToString(value: any): string {
-  return value == null ? '' : value.toString();
+<script setup lang="uts">
+import { computed } from 'vue'
+
+function valueToString(value: any | null): string {
+  return value == null ? '' : value.toString()
 }
 
-export default {
-  name: 'tree-node',
+defineOptions({
+  name: 'tree-node'
+})
+
+const props = defineProps({
+  node: {
+    type: Object as PropType<UTSJSONObject>,
+    required: true
+  },
   props: {
-    node: {
-      type: Object,
-      required: true
-    },
-    props: {
-      type: Object,
-      required: true
-    },
-    showCheckbox: {
-      type: Boolean,
-      default: false
-    },
-    checkStrictly: {
-      type: Boolean,
-      default: false
-    },
-    expandOnClickNode: {
-      type: Boolean,
-      default: true
-    },
-    depth: {
-      type: Number,
-      default: 0
-    }
+    type: Object as PropType<UTSJSONObject>,
+    required: true
   },
-  computed: {
-    childrenKey(): string {
-      const props = this.props as UTSJSONObject;
-      const childrenKey = props['children'];
-      return valueToString(childrenKey) == '' ? 'children' : valueToString(childrenKey);
-    },
-    hasChildren(): boolean {
-      const node = this.node as UTSJSONObject;
-      const children = node[this.childrenKey] as UTSJSONObject[] | null;
-      return Array.isArray(children) && children.length > 0;
-    },
-    isExpanded(): boolean {
-      const node = this.node as UTSJSONObject;
-      const expanded = node['expanded'];
-      if (expanded == null) {
-        return false;
-      }
-      return expanded as boolean;
-    }
+  showCheckbox: {
+    type: Boolean,
+    default: false
   },
-  emits: ['node-click', 'check-change'],
-  methods: {
-    toggle(): void {
-      const node = this.node as UTSJSONObject;
-      if (this.expandOnClickNode && this.hasChildren) {
-        const expanded = node['expanded'];
-        node['expanded'] = expanded == null ? true : !(expanded as boolean);
-      }
-      this.$emit('node-click', node);
-    },
-    toggleCheck(checked: boolean): void {
-      const node = this.node as UTSJSONObject;
-      node['checked'] = checked;
-      if (!this.checkStrictly) {
-        this.updateChildCheckStatus(node, checked);
-        this.updateParentCheckStatus();
-      }
-      this.$emit('check-change', node);
-    },
-    updateChildCheckStatus(node: UTSJSONObject, checked: boolean): void {
-      const children = node[this.childrenKey] as UTSJSONObject[] | null;
-      if (!Array.isArray(children) || children.length == 0) {
-        return;
-      }
-      for (let i = 0; i < children.length; i++) {
-        const child = children[i] as UTSJSONObject;
-        child['checked'] = checked;
-        this.updateChildCheckStatus(child, checked);
-      }
-    },
-    updateParentCheckStatus(): void {
-      let parent = this.$parent as ComponentPublicInstance | null;
-      while (parent != null) {
-        const parentNode = parent.$props['node'] as UTSJSONObject | null;
-        if (parentNode == null) {
-          break;
-        }
-        const children = parentNode[this.childrenKey] as UTSJSONObject[] | null;
-        if (!Array.isArray(children) || children.length == 0) {
-          parentNode['checked'] = false;
-        } else {
-          let allChecked = true;
-          for (let i = 0; i < children.length; i++) {
-            const child = children[i] as UTSJSONObject;
-            if (child['checked'] != true) {
-              allChecked = false;
-              break;
-            }
-          }
-          parentNode['checked'] = allChecked;
-        }
-        parent = parent.$parent as ComponentPublicInstance | null;
-      }
-    }
+  checkStrictly: {
+    type: Boolean,
+    default: false
+  },
+  expandOnClickNode: {
+    type: Boolean,
+    default: true
+  },
+  depth: {
+    type: Number,
+    default: 0
   }
-};
+})
+
+const emit = defineEmits(['node-click', 'check-change'])
+
+const childrenKey = computed<string>(() => {
+  const p = props.props
+  const ck = p['children']
+  return valueToString(ck) == '' ? 'children' : valueToString(ck)
+})
+
+const hasChildren = computed<boolean>(() => {
+  const n = props.node
+  const children = n[childrenKey.value] as UTSJSONObject[] | null
+  return Array.isArray(children) && children.length > 0
+})
+
+const isExpanded = computed<boolean>(() => {
+  const n = props.node
+  const expanded = n['expanded']
+  if (expanded == null) {
+    return false
+  }
+  return expanded as boolean
+})
+
+function toggle(): void {
+  const n = props.node
+  if (props.expandOnClickNode && hasChildren.value) {
+    const expanded = n['expanded']
+    n['expanded'] = expanded == null ? true : !(expanded as boolean)
+  }
+  emit('node-click', n)
+}
+
+function updateChildCheckStatus(n: UTSJSONObject, checked: boolean): void {
+  const children = n[childrenKey.value] as UTSJSONObject[] | null
+  if (!Array.isArray(children) || children.length == 0) {
+    return
+  }
+  for (let i = 0; i < children.length; i++) {
+    const child = children[i] as UTSJSONObject
+    child['checked'] = checked
+    updateChildCheckStatus(child, checked)
+  }
+}
+
+function toggleCheck(checked: boolean): void {
+  const n = props.node
+  n['checked'] = checked
+  if (!props.checkStrictly) {
+    updateChildCheckStatus(n, checked)
+  }
+  emit('check-change', n)
+}
+
+defineExpose({
+  toggle,
+  toggleCheck
+})
 </script>
 
 <style scoped>
@@ -162,5 +145,3 @@ export default {
   margin-right: 5px;
 }
 </style>
-
-

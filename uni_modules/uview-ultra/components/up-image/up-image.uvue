@@ -1,54 +1,48 @@
 <template>
 	<view
-		mode="fade"
-		:show="show"
-		:duration="fade ? 1000 : 0"
+		class="up-image"
+		@tap="onClick"
+		:style="[wrapStyle, backgroundStyle, mergedCustomStyle]"
 	>
+		<image
+			:src="realSrc"
+			:mode="mode"
+			@error="onErrorHandler"
+			@load="onLoadHandler"
+			:lazy-load="lazyLoad"
+			class="up-image__image"
+			:style="imageStyle"
+		></image>
 		<view
-			class="up-image"
-			@tap="onClick"
-			:style="[wrapStyle, backgroundStyle, mergedCustomStyle]"
+			v-if="showLoading && loading"
+			class="up-image__loading"
+			:style="loadingStyle"
 		>
-			<image
-				:src="realSrc"
-				:mode="mode"
-				@error="onErrorHandler"
-				@load="onLoadHandler"
-				:lazy-load="lazyLoad"
-				class="up-image__image"
-				:style="imageStyle"
-			></image>
-			<view
-				v-if="showLoading && loading"
-				class="up-image__loading"
-				:style="loadingStyle"
-			>
-				<slot name="loading">
-					<up-icon
-						:name="loadingIcon"
-						:width="width"
-						:height="height"
-					></up-icon>
-				</slot>
-			</view>
-			<view
-				v-if="showError && isError && !loading"
-				class="up-image__error"
-				:style="errorStyle"
-			>
-				<slot name="error">
-					<up-icon
-						:name="errorIcon"
-						:width="width"
-						:height="height"
-					></up-icon>
-				</slot>
-			</view>
+			<slot name="loading">
+				<up-icon
+					:name="loadingIcon"
+					:width="width"
+					:height="height"
+				></up-icon>
+			</slot>
+		</view>
+		<view
+			v-if="showError && isError && !loading"
+			class="up-image__error"
+			:style="errorStyle"
+		>
+			<slot name="error">
+				<up-icon
+					:name="errorIcon"
+					:width="width"
+					:height="height"
+				></up-icon>
+			</slot>
 		</view>
 	</view>
 </template>
 
-<script setup>
+<script setup lang="uts">
 	import { nextTick, ref, computed, onMounted, watch } from 'vue'
 	import { addUnit, addStyle, deepMerge } from '../../libs/function/index'
 	import defProps from './image'

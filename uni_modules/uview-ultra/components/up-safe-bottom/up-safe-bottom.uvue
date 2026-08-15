@@ -1,53 +1,30 @@
 <template>
 	<view
-		class="up-safe-bottom"
+		class="up-safe-bottom up-safe-area-inset-bottom"
 		:style="[style]"
-		:class="[!isNvue ? 'up-safe-area-inset-bottom': '']"
 	>
 	</view>
 </template>
 
-<script lang="uts">
-	import { propsSafeBottom } from "./props";
-	import { mpMixin } from '../../libs/mixin/mpMixin';
-	import { mixin } from '../../libs/mixin/mixin';
-	import { addStyle, deepMerge, addUnit, sys } from '../../libs/function/index';
-	/**
-	 * SafeBottom 底部安全区
-	 * @description 这个适配，主要是针对IPhone X等一些底部带指示条的机型，指示条的操作区域与页面底部存在重合，容易导致用户误操作，因此我们需要针对这些机型进行底部安全区适配。
-	 * @tutorial https://ijry.github.io/uview-plus/components/safeAreaInset.html
-	 * @property {type}		prop_name
-	 * @property {Object}	customStyle	定义需要用到的外部样式
-	 *
-	 * @event {Function()}
-	 * @example <up-safe-bottom></up-safe-bottom>
-	 */
-	export default {
-		name: "up-safe-bottom",
-		mixins: [mpMixin, mixin, propsSafeBottom],
-		data() {
-			return {
-				safeAreaBottomHeight: 0,
-				isNvue: false,
-			};
-		},
-		computed: {
-			style(): any {
-				const style = {};
-				// #ifdef APP-NVUE || MP-TOUTIAO
-				// nvue下，高度使用js计算填充
-				style['height'] = addUnit(uni.getWindowInfo().safeAreaInsets.bottom, 'px');
-				// #endif
-				return deepMerge(style, addStyle(this.customStyle));
-			},
-		},
-		mounted() {
-			// #ifdef APP-NVUE
-			// 标识为是否nvue
-			this.isNvue = true;
-			// #endif
-		},
-	};
+<script setup lang="uts">
+import { computed } from 'vue'
+import { addStyle, deepMerge, addUnit } from '../../libs/function/index'
+
+defineOptions({
+  name: 'up-safe-bottom'
+})
+
+const props = defineProps({
+  customStyle: {
+    type: Object,
+    default: () => ({})
+  }
+})
+
+const style = computed<UTSJSONObject>(() => {
+  const s = {} as UTSJSONObject
+  return deepMerge(s, addStyle(props.customStyle))
+})
 </script>
 
 <style lang="scss" scoped>

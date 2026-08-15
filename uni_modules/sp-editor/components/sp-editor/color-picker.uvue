@@ -91,7 +91,9 @@
   </view>
 </template>
 
-<script lang="uts">
+<script setup lang="uts">
+import { ref, watch, nextTick, getCurrentInstance, onMounted } from 'vue'
+
 type RgbColor = {
   r: number,
   g: number,
@@ -110,361 +112,370 @@ type SiteItem = {
   left: number
 }
 
-export default {
-  name: 'color-picker',
-  props: {
-    color: {
-      type: Object,
-      default: (): RgbColor => {
-        return {
-          r: 0,
-          g: 0,
-          b: 0,
-          a: 0
-        } as RgbColor
-      }
-    },
-    spareColor: {
-      type: Array,
-      default(): Array<RgbColor> {
-        return [] as Array<RgbColor>
-      }
-    }
-  },
-  data() {
-    return {
-      show: false,
-      active: false,
-      rgba: {
+defineOptions({
+  name: 'color-picker'
+})
+
+const props = defineProps({
+  color: {
+    type: Object as PropType<RgbColor>,
+    default: (): RgbColor => {
+      return {
         r: 0,
         g: 0,
         b: 0,
-        a: 1
-      } as RgbColor,
-      hsb: {
-        h: 0,
-        s: 0,
-        b: 0
-      } as HsbColor,
-      site: [
-        { top: 0, left: 0 } as SiteItem,
-        { top: 0, left: 0 } as SiteItem,
-        { top: 0, left: 0 } as SiteItem
-      ] as Array<SiteItem>,
-      index: 0,
-      bgcolor: {
-        r: 255,
-        g: 0,
-        b: 0,
-        a: 1
-      } as RgbColor,
-      hex: '#000000',
-      mode: true,
-      colorList: [
-        { r: 244, g: 67, b: 54, a: 1 } as RgbColor,
-        { r: 233, g: 30, b: 99, a: 1 } as RgbColor,
-        { r: 156, g: 39, b: 176, a: 1 } as RgbColor,
-        { r: 103, g: 58, b: 183, a: 1 } as RgbColor,
-        { r: 63, g: 81, b: 181, a: 1 } as RgbColor,
-        { r: 33, g: 150, b: 243, a: 1 } as RgbColor,
-        { r: 3, g: 169, b: 244, a: 1 } as RgbColor,
-        { r: 0, g: 188, b: 212, a: 1 } as RgbColor,
-        { r: 0, g: 150, b: 136, a: 1 } as RgbColor,
-        { r: 76, g: 175, b: 80, a: 1 } as RgbColor,
-        { r: 139, g: 195, b: 74, a: 1 } as RgbColor,
-        { r: 205, g: 220, b: 57, a: 1 } as RgbColor,
-        { r: 255, g: 235, b: 59, a: 1 } as RgbColor,
-        { r: 255, g: 193, b: 7, a: 1 } as RgbColor,
-        { r: 255, g: 152, b: 0, a: 1 } as RgbColor,
-        { r: 255, g: 87, b: 34, a: 1 } as RgbColor,
-        { r: 121, g: 85, b: 72, a: 1 } as RgbColor,
-        { r: 158, g: 158, b: 158, a: 1 } as RgbColor,
-        { r: 0, g: 0, b: 0, a: 0.5 } as RgbColor,
-        { r: 0, g: 0, b: 0, a: 0 } as RgbColor
-      ] as Array<RgbColor>,
-      position: [] as Array<any>,
-      moveX: 0,
-      moveY: 0
-    }
-  },
-  created() {
-    this.ready()
-  },
-  methods: {
-    ready() {
-      this.rgba = this.color as RgbColor
-      const spareList = this.spareColor as Array<RgbColor>
-      if (spareList.length != 0) {
-        this.colorList = spareList
-      }
-    },
-    init() {
-      this.hsb = this.rgbToHsb(this.rgba)
-      this.setValue(this.rgba)
-    },
-    moveHandle() {},
-    open() {
-      this.show = true
-      this.$nextTick(() => {
-        this.init()
-        setTimeout(() => {
-          this.active = true
-          setTimeout(() => {
-            this.getSelectorQuery()
-          }, 350)
-        }, 50)
-      })
-    },
-    close() {
-      this.active = false
-      this.$nextTick(() => {
-        setTimeout(() => {
-          this.show = false
-        }, 500)
-      })
-    },
-    confirm() {
-      this.close()
-      this.$emit('confirm', {
-        rgba: this.rgba,
-        hex: this.hex
-      } as UTSJSONObject)
-    },
-    select() {
-      this.mode = !this.mode
-    },
-    selectColor(item: RgbColor) {
-      this.setColorBySelect(item)
-    },
-    touchstart(e: UniTouchEvent, index: number) {
-      if (e.touches.length > 0) {
-        const touch = e.touches[0]
-        this.moveX = touch.clientX
-        this.moveY = touch.clientY
-        this.setPosition(this.moveX, this.moveY, index)
-      }
-    },
-    touchmove(e: UniTouchEvent, index: number) {
-      if (e.touches.length > 0) {
-        const touch = e.touches[0]
-        this.moveX = touch.clientX
-        this.moveY = touch.clientY
-        this.setPosition(this.moveX, this.moveY, index)
-      }
-    },
-    touchend(e: UniTouchEvent, index: number) {},
-    setPosition(x: number, y: number, index: number) {
-      this.index = index
-      if (this.position.length > index) {
-        const pos = this.position[index] as UTSJSONObject
-        const top = pos['top'] as number
-        const left = pos['left'] as number
-        const width = pos['width'] as number
-        const height = pos['height'] as number
-
-        this.site[index].left = Math.max(0, Math.min(Math.round(x - left), width))
-        if (index == 0) {
-          this.site[index].top = Math.max(0, Math.min(Math.round(y - top), height))
-          this.hsb.s = Math.round((100 * this.site[index].left) / width)
-          this.hsb.b = Math.round(100 - (100 * this.site[index].top) / height)
-          this.setColor()
-          this.setValue(this.rgba)
-        } else {
-          this.setControl(index, this.site[index].left)
-        }
-      }
-    },
-    setColor() {
-      const rgb = this.HSBToRGB(this.hsb)
-      this.rgba.r = rgb.r
-      this.rgba.g = rgb.g
-      this.rgba.b = rgb.b
-    },
-    setValue(rgb: RgbColor) {
-      this.hex = '#' + this.rgbToHex(rgb)
-    },
-    setControl(index: number, x: number) {
-      if (this.position.length > index) {
-        const pos = this.position[index] as UTSJSONObject
-        const width = pos['width'] as number
-
-        if (index == 1) {
-          this.hsb.h = Math.round((360 * x) / width)
-          this.bgcolor = this.HSBToRGB({
-            h: this.hsb.h,
-            s: 100,
-            b: 100
-          } as HsbColor)
-          this.setColor()
-        } else {
-          this.rgba.a = parseFloat((x / width).toFixed(1))
-        }
-        this.setValue(this.rgba)
-      }
-    },
-    rgbToHex(rgb: RgbColor): string {
-      const rHex = rgb.r.toString(16)
-      const gHex = rgb.g.toString(16)
-      const bHex = rgb.b.toString(16)
-      const hexList = [
-        rHex.length == 1 ? '0' + rHex : rHex,
-        gHex.length == 1 ? '0' + gHex : gHex,
-        bHex.length == 1 ? '0' + bHex : bHex
-      ] as Array<string>
-      return hexList.join('')
-    },
-    setColorBySelect(getrgb: RgbColor) {
-      this.rgba = {
-        r: getrgb.r,
-        g: getrgb.g,
-        b: getrgb.b,
-        a: getrgb.a
-      } as RgbColor
-      this.hsb = this.rgbToHsb(this.rgba)
-      this.changeViewByHsb()
-    },
-    changeViewByHsb() {
-      if (this.position.length >= 3) {
-        const a = this.position[0] as UTSJSONObject
-        const b = this.position[1] as UTSJSONObject
-        const c = this.position[2] as UTSJSONObject
-        
-        const aWidth = a['width'] as number
-        const aHeight = a['height'] as number
-        const bWidth = b['width'] as number
-        const cWidth = c['width'] as number
-
-        this.site[0].left = Math.round((this.hsb.s * aWidth) / 100)
-        this.site[0].top = Math.round(((100 - this.hsb.b) * aHeight) / 100)
-        
-        this.setColor()
-        this.setValue(this.rgba)
-        this.bgcolor = this.HSBToRGB({
-          h: this.hsb.h,
-          s: 100,
-          b: 100
-        } as HsbColor)
-
-        this.site[1].left = Math.round((this.hsb.h / 360) * bWidth)
-        this.site[2].left = Math.round(this.rgba.a * cWidth)
-      }
-    },
-    HSBToRGB(hsb: HsbColor): RgbColor {
-      let r = 0
-      let g = 0
-      let b = 0
-      let h = Math.round(hsb.h)
-      let s = Math.round((hsb.s * 255) / 100)
-      let v = Math.round((hsb.b * 255) / 100)
-      if (s == 0) {
-        r = v
-        g = v
-        b = v
-      } else {
-        let t1 = v
-        let t2 = Math.round(((255 - s) * v) / 255)
-        let t3 = Math.round(((t1 - t2) * (h % 60)) / 60)
-        if (h == 360) h = 0
-        if (h < 60) {
-          r = t1
-          b = t2
-          g = t2 + t3
-        } else if (h < 120) {
-          g = t1
-          b = t2
-          r = t1 - t3
-        } else if (h < 180) {
-          g = t1
-          r = t2
-          b = t2 + t3
-        } else if (h < 240) {
-          b = t1
-          r = t2
-          g = t1 - t3
-        } else if (h < 300) {
-          b = t1
-          g = t2
-          r = t2 + t3
-        } else if (h < 360) {
-          r = t1
-          g = t2
-          b = t1 - t3
-        } else {
-          r = 0
-          g = 0
-          b = 0
-        }
-      }
-      return {
-        r: Math.round(r),
-        g: Math.round(g),
-        b: Math.round(b),
-        a: 1
-      } as RgbColor
-    },
-    rgbToHsb(rgb: RgbColor): HsbColor {
-      const hsb = {
-        h: 0,
-        s: 0,
-        b: 0
-      } as HsbColor
-      const min = Math.min(rgb.r, rgb.g, rgb.b)
-      const max = Math.max(rgb.r, rgb.g, rgb.b)
-      const delta = max - min
-      hsb.b = max
-      hsb.s = max != 0 ? Math.round((255 * delta) / max) : 0
-      if (hsb.s != 0) {
-        if (rgb.r == max) hsb.h = Math.round((rgb.g - rgb.b) / delta)
-        else if (rgb.g == max) hsb.h = Math.round(2 + (rgb.b - rgb.r) / delta)
-        else hsb.h = Math.round(4 + (rgb.r - rgb.g) / delta)
-      } else hsb.h = -1
-      hsb.h *= 60
-      if (hsb.h < 0) hsb.h = 0
-      hsb.s *= 100 / 255
-      hsb.b *= 100 / 255
-      return hsb
-    },
-    getSelectorQuery() {
-      const instance = this
-      uni.createSelectorQuery()
-        .in(instance)
-        .selectAll('.boxs')
-        .boundingClientRect()
-        .exec((res: Array<any>) => {
-          if (res.length == 0 || res[0] == null) return
-          const data = res[0] as Array<any>
-          if (data.length == 0) {
-            setTimeout(() => {
-              instance.getSelectorQuery()
-            }, 20)
-            return
-          }
-          instance.position = data
-          instance.setColorBySelect(instance.rgba)
-        })
-    },
-    hex2Rgb(hexColor: string, alpha: number = 1): RgbColor {
-      const color = hexColor.slice(1)
-      const r = parseInt(color.slice(0, 2), 16)
-      const g = parseInt(color.slice(2, 4), 16)
-      const b = parseInt(color.slice(4, 6), 16)
-      return {
-        r: r,
-        g: g,
-        b: b,
-        a: alpha
+        a: 0
       } as RgbColor
     }
   },
-  watch: {
-    spareColor(newVal: Array<RgbColor>) {
-      this.colorList = newVal
-    },
-    color(newVal: RgbColor) {
-      this.ready()
+  spareColor: {
+    type: Array as PropType<Array<RgbColor>>,
+    default: () => [] as Array<RgbColor>
+  }
+})
+
+const emit = defineEmits(['confirm'])
+const instance = getCurrentInstance()
+
+const show = ref<boolean>(false)
+const active = ref<boolean>(false)
+const rgba = ref<RgbColor>({ r: 0, g: 0, b: 0, a: 1 } as RgbColor)
+const hsb = ref<HsbColor>({ h: 0, s: 0, b: 0 } as HsbColor)
+const site = ref<Array<SiteItem>>([
+  { top: 0, left: 0 } as SiteItem,
+  { top: 0, left: 0 } as SiteItem,
+  { top: 0, left: 0 } as SiteItem
+])
+const index = ref<number>(0)
+const bgcolor = ref<RgbColor>({ r: 255, g: 0, b: 0, a: 1 } as RgbColor)
+const hex = ref<string>('#000000')
+const mode = ref<boolean>(true)
+const colorList = ref<Array<RgbColor>>([
+  { r: 244, g: 67, b: 54, a: 1 } as RgbColor,
+  { r: 233, g: 30, b: 99, a: 1 } as RgbColor,
+  { r: 156, g: 39, b: 176, a: 1 } as RgbColor,
+  { r: 103, g: 58, b: 183, a: 1 } as RgbColor,
+  { r: 63, g: 81, b: 181, a: 1 } as RgbColor,
+  { r: 33, g: 150, b: 243, a: 1 } as RgbColor,
+  { r: 3, g: 169, b: 244, a: 1 } as RgbColor,
+  { r: 0, g: 188, b: 212, a: 1 } as RgbColor,
+  { r: 0, g: 150, b: 136, a: 1 } as RgbColor,
+  { r: 76, g: 175, b: 80, a: 1 } as RgbColor,
+  { r: 139, g: 195, b: 74, a: 1 } as RgbColor,
+  { r: 205, g: 220, b: 57, a: 1 } as RgbColor,
+  { r: 255, g: 235, b: 59, a: 1 } as RgbColor,
+  { r: 255, g: 193, b: 7, a: 1 } as RgbColor,
+  { r: 255, g: 152, b: 0, a: 1 } as RgbColor,
+  { r: 255, g: 87, b: 34, a: 1 } as RgbColor,
+  { r: 121, g: 85, b: 72, a: 1 } as RgbColor,
+  { r: 158, g: 158, b: 158, a: 1 } as RgbColor,
+  { r: 0, g: 0, b: 0, a: 0.5 } as RgbColor,
+  { r: 0, g: 0, b: 0, a: 0 } as RgbColor
+])
+let position: Array<any> = []
+let moveX: number = 0
+let moveY: number = 0
+
+function rgbToHex(rgbVal: RgbColor): string {
+  const rHex = rgbVal.r.toString(16)
+  const gHex = rgbVal.g.toString(16)
+  const bHex = rgbVal.b.toString(16)
+  const hexList = [
+    rHex.length == 1 ? '0' + rHex : rHex,
+    gHex.length == 1 ? '0' + gHex : gHex,
+    bHex.length == 1 ? '0' + bHex : bHex
+  ] as Array<string>
+  return hexList.join('')
+}
+
+function setValue(rgbVal: RgbColor) {
+  hex.value = '#' + rgbToHex(rgbVal)
+}
+
+function HSBToRGB(hsbVal: HsbColor): RgbColor {
+  let r = 0
+  let g = 0
+  let b = 0
+  let h = Math.round(hsbVal.h)
+  let s = Math.round((hsbVal.s * 255) / 100)
+  let v = Math.round((hsbVal.b * 255) / 100)
+  if (s == 0) {
+    r = v
+    g = v
+    b = v
+  } else {
+    let t1 = v
+    let t2 = Math.round(((255 - s) * v) / 255)
+    let t3 = Math.round(((t1 - t2) * (h % 60)) / 60)
+    if (h == 360) h = 0
+    if (h < 60) {
+      r = t1
+      b = t2
+      g = t2 + t3
+    } else if (h < 120) {
+      g = t1
+      b = t2
+      r = t1 - t3
+    } else if (h < 180) {
+      g = t1
+      r = t2
+      b = t2 + t3
+    } else if (h < 240) {
+      b = t1
+      r = t2
+      g = t1 - t3
+    } else if (h < 300) {
+      b = t1
+      g = t2
+      r = t2 + t3
+    } else if (h < 360) {
+      r = t1
+      g = t2
+      b = t1 - t3
+    } else {
+      r = 0
+      g = 0
+      b = 0
+    }
+  }
+  return {
+    r: Math.round(r),
+    g: Math.round(g),
+    b: Math.round(b),
+    a: 1
+  } as RgbColor
+}
+
+function rgbToHsb(rgbVal: RgbColor): HsbColor {
+  const hsbVal = {
+    h: 0,
+    s: 0,
+    b: 0
+  } as HsbColor
+  const min = Math.min(rgbVal.r, rgbVal.g, rgbVal.b)
+  const max = Math.max(rgbVal.r, rgbVal.g, rgbVal.b)
+  const delta = max - min
+  hsbVal.b = max
+  hsbVal.s = max != 0 ? Math.round((255 * delta) / max) : 0
+  if (hsbVal.s != 0) {
+    if (rgbVal.r == max) hsbVal.h = Math.round((rgbVal.g - rgbVal.b) / delta)
+    else if (rgbVal.g == max) hsbVal.h = Math.round(2 + (rgbVal.b - rgbVal.r) / delta)
+    else hsbVal.h = Math.round(4 + (rgbVal.r - rgbVal.g) / delta)
+  } else hsbVal.h = -1
+  hsbVal.h *= 60
+  if (hsbVal.h < 0) hsbVal.h = 0
+  hsbVal.s *= 100 / 255
+  hsbVal.b *= 100 / 255
+  return hsbVal
+}
+
+function setColor() {
+  const rgbVal = HSBToRGB(hsb.value)
+  rgba.value.r = rgbVal.r
+  rgba.value.g = rgbVal.g
+  rgba.value.b = rgbVal.b
+}
+
+function changeViewByHsb() {
+  if (position.length >= 3) {
+    const a = position[0] as UTSJSONObject
+    const b = position[1] as UTSJSONObject
+    const c = position[2] as UTSJSONObject
+    
+    const aWidth = a['width'] as number
+    const aHeight = a['height'] as number
+    const bWidth = b['width'] as number
+    const cWidth = c['width'] as number
+
+    site.value[0].left = Math.round((hsb.value.s * aWidth) / 100)
+    site.value[0].top = Math.round(((100 - hsb.value.b) * aHeight) / 100)
+    
+    setColor()
+    setValue(rgba.value)
+    bgcolor.value = HSBToRGB({
+      h: hsb.value.h,
+      s: 100,
+      b: 100
+    } as HsbColor)
+
+    site.value[1].left = Math.round((hsb.value.h / 360) * bWidth)
+    site.value[2].left = Math.round(rgba.value.a * cWidth)
+  }
+}
+
+function setColorBySelect(getrgb: RgbColor) {
+  rgba.value = {
+    r: getrgb.r,
+    g: getrgb.g,
+    b: getrgb.b,
+    a: getrgb.a
+  } as RgbColor
+  hsb.value = rgbToHsb(rgba.value)
+  changeViewByHsb()
+}
+
+function getSelectorQuery() {
+  uni.createSelectorQuery()
+    .in(instance?.proxy)
+    .selectAll('.boxs')
+    .boundingClientRect()
+    .exec((res: Array<any>) => {
+      if (res.length == 0 || res[0] == null) return
+      const data = res[0] as Array<any>
+      if (data.length == 0) {
+        setTimeout(() => {
+          getSelectorQuery()
+        }, 20)
+        return
+      }
+      position = data
+      setColorBySelect(rgba.value)
+    })
+}
+
+function ready() {
+  rgba.value = props.color
+  const spareList = props.spareColor
+  if (spareList.length != 0) {
+    colorList.value = spareList
+  }
+}
+
+function init() {
+  hsb.value = rgbToHsb(rgba.value)
+  setValue(rgba.value)
+}
+
+function moveHandle() {}
+
+function open() {
+  show.value = true
+  nextTick(() => {
+    init()
+    setTimeout(() => {
+      active.value = true
+      setTimeout(() => {
+        getSelectorQuery()
+      }, 350)
+    }, 50)
+  })
+}
+
+function close() {
+  active.value = false
+  nextTick(() => {
+    setTimeout(() => {
+      show.value = false
+    }, 500)
+  })
+}
+
+function confirm() {
+  close()
+  emit('confirm', {
+    rgba: rgba.value,
+    hex: hex.value
+  } as UTSJSONObject)
+}
+
+function select() {
+  mode.value = !mode.value
+}
+
+function selectColor(item: RgbColor) {
+  setColorBySelect(item)
+}
+
+function setControl(idx: number, x: number) {
+  if (position.length > idx) {
+    const pos = position[idx] as UTSJSONObject
+    const width = pos['width'] as number
+
+    if (idx == 1) {
+      hsb.value.h = Math.round((360 * x) / width)
+      bgcolor.value = HSBToRGB({
+        h: hsb.value.h,
+        s: 100,
+        b: 100
+      } as HsbColor)
+      setColor()
+    } else {
+      rgba.value.a = parseFloat((x / width).toFixed(1))
+    }
+    setValue(rgba.value)
+  }
+}
+
+function setPosition(x: number, y: number, idx: number) {
+  index.value = idx
+  if (position.length > idx) {
+    const pos = position[idx] as UTSJSONObject
+    const top = pos['top'] as number
+    const left = pos['left'] as number
+    const width = pos['width'] as number
+    const height = pos['height'] as number
+
+    site.value[idx].left = Math.max(0, Math.min(Math.round(x - left), width))
+    if (idx == 0) {
+      site.value[idx].top = Math.max(0, Math.min(Math.round(y - top), height))
+      hsb.value.s = Math.round((100 * site.value[idx].left) / width)
+      hsb.value.b = Math.round(100 - (100 * site.value[idx].top) / height)
+      setColor()
+      setValue(rgba.value)
+    } else {
+      setControl(idx, site.value[idx].left)
     }
   }
 }
+
+function touchstart(e: UniTouchEvent, idx: number) {
+  if (e.touches.length > 0) {
+    const touch = e.touches[0]
+    moveX = touch.clientX
+    moveY = touch.clientY
+    setPosition(moveX, moveY, idx)
+  }
+}
+
+function touchmove(e: UniTouchEvent, idx: number) {
+  if (e.touches.length > 0) {
+    const touch = e.touches[0]
+    moveX = touch.clientX
+    moveY = touch.clientY
+    setPosition(moveX, moveY, idx)
+  }
+}
+
+function touchend(e: UniTouchEvent, idx: number) {}
+
+function hex2Rgb(hexColor: string, alpha: number = 1): RgbColor {
+  const clr = hexColor.slice(1)
+  const r = parseInt(clr.slice(0, 2), 16)
+  const g = parseInt(clr.slice(2, 4), 16)
+  const b = parseInt(clr.slice(4, 6), 16)
+  return {
+    r: r,
+    g: g,
+    b: b,
+    a: alpha
+  } as RgbColor
+}
+
+ready()
+
+watch(() => props.spareColor, (newVal: Array<RgbColor>) => {
+  colorList.value = newVal
+})
+
+watch(() => props.color, () => {
+  ready()
+})
+
+defineExpose({
+  open,
+  close,
+  hex2Rgb
+})
 </script>
 
 <style>
@@ -525,9 +536,8 @@ export default {
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.6);
-  z-index: -1;
-  transition: all 0.3s;
   opacity: 0;
+  transition: all 0.3s;
 }
 
 .t-mask.active {
@@ -560,8 +570,6 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  width: 100%;
-  height: 400upx;
   background: linear-gradient(to top, #000, rgba(0, 0, 0, 0));
 }
 
@@ -570,8 +578,8 @@ export default {
   bottom: -8px;
   left: -8px;
   z-index: 2;
-  width: 15px;
-  height: 15px;
+  width: 14px;
+  height: 14px;
   border: 1px #fff solid;
   border-radius: 50%;
 }
@@ -590,15 +598,16 @@ export default {
 }
 
 .t-control__color {
-  flex-shrink: 0;
-  width: 100upx;
-  height: 100upx;
+  width: 65upx;
+  height: 65upx;
   border-radius: 50%;
   background-color: #fff;
   background-image: linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%, #eee),
     linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%, #eee);
   background-size: 36upx 36upx;
-  background-position: 0 0, 18upx 18upx;
+  background-position:
+    0 0,
+    18upx 18upx;
   border: 1px #eee solid;
   overflow: hidden;
 }
@@ -612,7 +621,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  width: 100%;
+  width: 610upx;
   padding: 0 30upx;
 }
 
@@ -624,7 +633,9 @@ export default {
   background-image: linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%, #eee),
     linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%, #eee);
   background-size: 32upx 32upx;
-  background-position: 0 0, 16upx 16upx;
+  background-position:
+    0 0,
+    16upx 16upx;
 }
 
 .t-hue {
@@ -641,7 +652,6 @@ export default {
 
 .t-circle {
   position: absolute;
-  /* right: -10px; */
   top: -2px;
   width: 20px;
   height: 20px;
@@ -652,7 +662,7 @@ export default {
 }
 
 .t-result__box {
-  margin-top: 20upx;
+  margin-top: 30upx;
   padding: 10upx;
   width: 100%;
   display: flex;
@@ -682,7 +692,8 @@ export default {
 .t-result__box-text {
   margin-top: 10upx;
   font-size: 28upx;
-  line-height: 2;
+  line-height: 1;
+  color: #999;
 }
 
 .t-select {
@@ -706,8 +717,7 @@ export default {
 .t-alternative {
   display: flex;
   flex-wrap: wrap;
-  /* justify-content: space-between; */
-  width: 100%;
+  /* width: 100%; */
   padding-right: 10upx;
   box-sizing: border-box;
 }
@@ -715,26 +725,22 @@ export default {
 .t-alternative__item {
   margin-left: 12upx;
   margin-top: 10upx;
-  width: 50upx;
-  height: 50upx;
-  border-radius: 10upx;
+  width: 60upx;
+  height: 60upx;
+  border-radius: 50%;
   background-color: #fff;
   background-image: linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%, #eee),
     linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%, #eee);
   background-size: 36upx 36upx;
-  background-position: 0 0, 18upx 18upx;
+  background-position:
+    0 0,
+    18upx 18upx;
   border: 1px #eee solid;
   overflow: hidden;
 }
 
 .t-alternative__item-content {
-  width: 50upx;
-  height: 50upx;
-  background: rgba(255, 0, 0, 0.5);
-}
-
-.t-alternative__item:active {
-  transition: all 0.3s;
-  transform: scale(1.1);
+  width: 100%;
+  height: 100%;
 }
 </style>

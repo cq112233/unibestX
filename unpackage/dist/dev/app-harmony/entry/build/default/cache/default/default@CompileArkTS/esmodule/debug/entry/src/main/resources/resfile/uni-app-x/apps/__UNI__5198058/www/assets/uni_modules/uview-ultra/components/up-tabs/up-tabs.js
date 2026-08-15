@@ -1,0 +1,521 @@
+import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
+import { _ as __easycom_1$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-badge/up-badge&";
+import { b as badgeProps } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-badge/badge&";
+import { a as addUnit, b as addStyle, d as deepMerge, g as getPx, e as getWindowInfo, u as upGetRect, s as sleep } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
+import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedDataStyle: _setSharedDataStyle, unref: _unref, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataSlot: _createSharedDataSlot, setSharedDataAttr: _setSharedDataAttr, toSharedDataScrollViewDirection: _toSharedDataScrollViewDirection, toSharedDataNumber: _toSharedDataNumber, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, setSharedData: _setSharedData, toDisplayString: _toDisplayString, setSharedDataClass: _setSharedDataClass, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, setSharedDataEvent: _setSharedDataEvent, setSharedDataTemplateRef: _setSharedDataTemplateRef, createSharedDataFor: _createSharedDataFor } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpTabsUpTabs";
+const { ref, computed, watch, onMounted, getCurrentInstance, nextTick } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  ...{
+    name: "up-tabs"
+  },
+  __dynamicSharedData: true,
+  __hash: "758acef0",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-tabs/up-tabs.uvue",
+  __name: "up-tabs",
+  props: {
+    duration: {
+      type: Number,
+      default: 200
+    },
+    list: {
+      type: Array,
+      default: () => {
+        return [];
+      }
+    },
+    lineColor: {
+      type: String,
+      default: "#3c9cff"
+    },
+    activeStyle: {
+      type: [String, Object],
+      default: () => {
+        return new UTSJSONObject({
+          color: "#303133"
+        });
+      }
+    },
+    inactiveStyle: {
+      type: [String, Object],
+      default: () => {
+        return new UTSJSONObject({
+          color: "#606266"
+        });
+      }
+    },
+    lineWidth: {
+      type: [String, Number],
+      default: "20px"
+    },
+    lineHeight: {
+      type: [String, Number],
+      default: "3px"
+    },
+    lineBgSize: {
+      type: String,
+      default: "cover"
+    },
+    itemStyle: {
+      type: [String, Object],
+      default: () => {
+        return new UTSJSONObject({
+          height: "44px"
+        });
+      }
+    },
+    scrollable: {
+      type: Boolean,
+      default: true
+    },
+    current: {
+      type: [Number, String],
+      default: 0
+    },
+    keyName: {
+      type: String,
+      default: "name"
+    },
+    iconStyle: {
+      type: [String, Object],
+      default: () => {
+        return new UTSJSONObject({});
+      }
+    },
+    height: {
+      type: [String, Number],
+      default: "44px"
+    }
+  },
+  emits: ["click", "longPress", "change", "update:current"],
+  setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit, $slots = _a.slots;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpTabsUpTabsSharedData", sharedDataClassId: 0 })));
+    const props = __props;
+    const emit = __emit;
+    const instance = getCurrentInstance();
+    const firstTime = ref(true);
+    const scrollLeft = ref(0);
+    const scrollViewWidth = ref(0);
+    const lineOffsetLeft = ref(0);
+    const tabsRect = ref({
+      left: 0,
+      right: 0
+    });
+    const innerCurrent = ref(0);
+    const retryCount = ref(0);
+    const itemRects = ref([]);
+    const propsBadge = computed(() => {
+      return badgeProps["badge"];
+    });
+    const lineStyle = computed(() => {
+      const style = new UTSJSONObject({});
+      style["width"] = addUnit(props.lineWidth);
+      style["transform"] = "translateX(" + lineOffsetLeft.value + "px)";
+      style["transitionDuration"] = `${firstTime.value ? 0 : props.duration}ms`;
+      style["height"] = addUnit(props.lineHeight);
+      style["backgroundSize"] = props.lineBgSize;
+      if (props.lineColor != "#3c9cff") {
+        style["backgroundColor"] = props.lineColor;
+      }
+      return style;
+    });
+    function getShowValue(itemObj) {
+      if (itemObj["badge"] != null) {
+        let itemObjBadge = itemObj["badge"];
+        if (itemObjBadge["show"] != null && itemObjBadge["show"] || itemObjBadge["isDot"] != null && itemObjBadge["isDot"] || itemObjBadge["value"] != null) {
+          return true;
+        }
+      }
+      return false;
+    }
+    function getBadgePropValue(itemObj, name) {
+      if (itemObj != null && itemObj["badge"] != null) {
+        let itemObjBadge = itemObj["badge"];
+        if (itemObjBadge != null && itemObjBadge[name] != null) {
+          return itemObjBadge[name] != null ? itemObjBadge[name] : "";
+        } else {
+          return propsBadge.value != null && propsBadge.value[name] != null ? propsBadge.value[name] : "";
+        }
+      }
+      return "";
+    }
+    function textStyle(index) {
+      const style = new UTSJSONObject({});
+      const customeStyle = index == innerCurrent.value ? addStyle(props.activeStyle) : addStyle(props.inactiveStyle);
+      if (props.list[index]["disabled"] != null && props.list[index]["disabled"]) {
+        style["color"] = "#c8c9cc";
+      }
+      return deepMerge(customeStyle, style);
+    }
+    function isListEqual(list1, list2) {
+      if (list1.length != list2.length) {
+        return false;
+      }
+      for (let i = 0; i < list1.length; i++) {
+        const item1 = list1[i];
+        const item2 = list2[i];
+        if (item1[props.keyName] != item2[props.keyName]) {
+          return false;
+        }
+      }
+      return true;
+    }
+    function setLineLeft() {
+      var _a2;
+      if (itemRects.value.length <= innerCurrent.value) {
+        return null;
+      }
+      const tabItem = itemRects.value[innerCurrent.value];
+      if (tabItem == null) {
+        return null;
+      }
+      let totalOffset = itemRects.value.slice(0, innerCurrent.value).reduce((total, curr) => {
+        var _a3;
+        return total + ((_a3 = curr.width) !== null && _a3 !== void 0 ? _a3 : 0);
+      }, 0);
+      const lineWidthVal = parseFloat(getPx(props.lineWidth));
+      const tabWidth = (_a2 = tabItem.width) !== null && _a2 !== void 0 ? _a2 : 0;
+      const offset = tabWidth > 0 ? (tabWidth - lineWidthVal) / 2 : 0;
+      lineOffsetLeft.value = totalOffset + offset;
+      if (firstTime.value) {
+        setTimeout(() => {
+          firstTime.value = false;
+        }, 30);
+      }
+    }
+    function setScrollLeft() {
+      var _a2, _b, _c, _d, _e, _f, _g, _h, _j;
+      if (innerCurrent.value < 0) {
+        innerCurrent.value = 0;
+      }
+      if (itemRects.value.length <= innerCurrent.value) {
+        return null;
+      }
+      const tabRect = itemRects.value[innerCurrent.value];
+      if (tabRect == null) {
+        return null;
+      }
+      const offsetLeft = itemRects.value.slice(0, innerCurrent.value).reduce((total, curr) => {
+        var _a3;
+        return total + ((_a3 = curr.width) !== null && _a3 !== void 0 ? _a3 : 0);
+      }, 0);
+      const windowWidth = getWindowInfo().windowWidth;
+      let nextScrollLeft = offsetLeft - (((_b = (_a2 = tabsRect.value) === null || _a2 === void 0 ? null : _a2.width) !== null && _b !== void 0 ? _b : 0) - ((_c = tabRect.width) !== null && _c !== void 0 ? _c : 0)) / 2 - (windowWidth - ((_e = (_d = tabsRect.value) === null || _d === void 0 ? null : _d.right) !== null && _e !== void 0 ? _e : 0)) / 2 + ((_g = (_f = tabsRect.value) === null || _f === void 0 ? null : _f.left) !== null && _g !== void 0 ? _g : 0) / 2;
+      nextScrollLeft = Math.min(nextScrollLeft, scrollViewWidth.value - ((_j = (_h = tabsRect.value) === null || _h === void 0 ? null : _h.width) !== null && _j !== void 0 ? _j : 0));
+      scrollLeft.value = Math.max(0, nextScrollLeft);
+    }
+    function clickHandler(item = null, index) {
+      emit("click", new UTSJSONObject({
+        ...item,
+        index
+      }), index);
+      if (item["disabled"] != null && item["disabled"])
+        return null;
+      if (innerCurrent.value == index)
+        return null;
+      innerCurrent.value = index;
+      nextTick(() => {
+        var _a2;
+        const hasRect = itemRects.value.length > 0 && itemRects.value.length === props.list.length && ((_a2 = itemRects.value[0].width) !== null && _a2 !== void 0 ? _a2 : 0) > 0;
+        if (hasRect) {
+          setLineLeft();
+          setScrollLeft();
+        } else {
+          resize();
+        }
+      });
+      emit("update:current", index);
+      emit("change", new UTSJSONObject({
+        ...item,
+        index
+      }), index);
+    }
+    function longPressHandler(item, index) {
+      emit("longPress", new UTSJSONObject({
+        ...item,
+        index
+      }));
+    }
+    function resize() {
+      if (props.list.length == 0) {
+        return null;
+      }
+      Promise.all([getTabsRect(), getAllItemRect()]).then((res) => {
+        var _a2, _b, _c, _d, _e, _f, _g, _h, _j;
+        let tRect = res[0][0];
+        let iRect = res[1];
+        const firstWidth = iRect.length > 0 && iRect[0] != null ? (_a2 = iRect[0].width) !== null && _a2 !== void 0 ? _a2 : 0 : 0;
+        let minWidthExpected = 30;
+        if (props.list.length > 0) {
+          const firstItemName = props.list[0][props.keyName];
+          if (firstItemName != null) {
+            const nameStr = firstItemName.toString();
+            minWidthExpected = nameStr.length * 12 + 20;
+          }
+        }
+        if (firstWidth < minWidthExpected && retryCount.value < 5) {
+          retryCount.value++;
+          setTimeout(() => {
+            resize();
+          }, 50);
+          return null;
+        }
+        if (((_b = tRect.left) !== null && _b !== void 0 ? _b : 0) > ((_c = tRect.width) !== null && _c !== void 0 ? _c : 0)) {
+          tRect.right = ((_d = tRect.right) !== null && _d !== void 0 ? _d : 0) - Math.floor(((_e = tRect === null || tRect === void 0 ? null : tRect.left) !== null && _e !== void 0 ? _e : 0) / ((_f = tRect === null || tRect === void 0 ? null : tRect.width) !== null && _f !== void 0 ? _f : 0)) * ((_g = tRect === null || tRect === void 0 ? null : tRect.width) !== null && _g !== void 0 ? _g : 0);
+          tRect.left = ((_h = tRect.left) !== null && _h !== void 0 ? _h : 0) % ((_j = tRect.width) !== null && _j !== void 0 ? _j : 1);
+        }
+        tabsRect.value = tRect;
+        itemRects.value = iRect;
+        scrollViewWidth.value = 0;
+        iRect.map((item, index) => {
+          var _a3;
+          if (item != null) {
+            scrollViewWidth.value = scrollViewWidth.value + ((_a3 = item.width) !== null && _a3 !== void 0 ? _a3 : 0);
+          }
+        });
+        setLineLeft();
+        setScrollLeft();
+      });
+    }
+    function getTabsRect() {
+      return new Promise((resolve) => {
+        upGetRect(".up-tabs__wrapper__scroll-view", false, instance === null || instance === void 0 ? null : instance.proxy).then((size) => {
+          resolve([size]);
+        });
+      });
+    }
+    function getAllItemRect() {
+      return new Promise((resolve) => {
+        const promiseAllArr = props.list.map((item, index) => {
+          return upGetRect(`.up-tabs__wrapper__nav__item-${index}`, false, instance === null || instance === void 0 ? null : instance.proxy);
+        });
+        Promise.all(promiseAllArr).then((sizes) => {
+          return resolve(sizes);
+        });
+      });
+    }
+    function init() {
+      retryCount.value = 0;
+      sleep(30).then(() => {
+        resize();
+      });
+    }
+    watch(() => {
+      return props.current;
+    }, (newValue = null) => {
+      let num = typeof newValue == "string" ? parseInt(newValue.toString()) : newValue;
+      if (num != innerCurrent.value) {
+        innerCurrent.value = num;
+        nextTick(() => {
+          var _a2;
+          const hasRect = itemRects.value.length > 0 && itemRects.value.length === props.list.length && ((_a2 = itemRects.value[0].width) !== null && _a2 !== void 0 ? _a2 : 0) > 0;
+          if (hasRect) {
+            setLineLeft();
+            setScrollLeft();
+          } else {
+            resize();
+          }
+        });
+      }
+    }, { immediate: true });
+    watch(() => {
+      return props.list;
+    }, (newValue, oldValue = null) => {
+      if (oldValue != null && isListEqual(newValue, oldValue)) {
+        return null;
+      }
+      nextTick(() => {
+        resize();
+      });
+    });
+    onMounted(() => {
+      init();
+    });
+    __expose({
+      init,
+      resize
+    });
+    return () => {
+      "raw js";
+      const _setTemplateRef = _createSharedDataTemplateRefSetter();
+      const _component_up_icon = __easycom_0;
+      const _component_up_badge = __easycom_1$1;
+      _renderSharedDataEffect(() => {
+        return _setSharedDataStyle(__sharedData, 4, { height: _unref(addUnit)(__props.height) });
+      });
+      _createSharedDataSlot("left", null, null);
+      _renderSharedDataEffect(() => {
+        const __height_addUnit_height = { height: _unref(addUnit)(__props.height) };
+        _setSharedDataAttr(__sharedData, 5, _toSharedDataScrollViewDirection(__props.scrollable ? "horizontal" : "none"));
+        _setSharedDataAttr(__sharedData, 6, _toSharedDataNumber(scrollLeft.value));
+        _setSharedDataStyle(__sharedData, 7, __height_addUnit_height);
+        _setSharedDataStyle(__sharedData, 8, __height_addUnit_height);
+      });
+      _createSharedDataFor(_setSharedDataScoped(__sharedData, 0, _createSharedDataVFor(__sharedDataScope, () => {
+        return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
+      })), () => {
+        return __props.list;
+      }, (__sharedData_VFor0, _for_item0, _for_key0) => {
+        _renderSharedDataEffect(() => {
+          const _index = _for_key0.value;
+          const _item = _for_item0.value;
+          const _item_disabled = _item["disabled"];
+          _setSharedDataClass(__sharedData_VFor0, 15, ["up-tabs__wrapper__nav__item", [
+            `up-tabs__wrapper__nav__item-${_index}`,
+            _item_disabled != null && _item_disabled ? "up-tabs__wrapper__nav__item--disabled" : "",
+            innerCurrent.value == _index ? "up-tabs__wrapper__nav__item-active" : ""
+          ]]);
+          _setSharedDataStyle(__sharedData_VFor0, 16, [_unref(addStyle)(__props.itemStyle), { flex: __props.scrollable ? "none" : "1" }]);
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData_VFor0, 1, _toSharedDataBoolean($slots["icon"]));
+        }, () => {
+          _createSharedDataSlot("icon", {
+            item: () => {
+              return _for_item0.value;
+            },
+            keyName: () => {
+              return __props.keyName;
+            },
+            index: () => {
+              return _for_key0.value;
+            }
+          }, (data) => {
+            return _setSharedData(__sharedData_VFor0, 2, data);
+          });
+        }, () => {
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData_VFor0, 3, _toSharedDataBoolean(_for_item0.value["icon"] != null));
+          }, () => {
+            const n9 = _createSharedDataComponentWithFallback(_component_up_icon, "536b0b17-" + _for_key0.value, {
+              name: () => {
+                return _for_item0.value["icon"];
+              },
+              customStyle: () => {
+                return _unref(addStyle)(__props.iconStyle);
+              }
+            });
+            _setSharedData(__sharedData_VFor0, 4, n9?.sharedData);
+          });
+        }, 261);
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData_VFor0, 5, _toSharedDataBoolean($slots["content"] != null));
+        }, () => {
+          _createSharedDataSlot("content", {
+            item: () => {
+              return _for_item0.value;
+            },
+            keyName: () => {
+              return __props.keyName;
+            },
+            index: () => {
+              return _for_key0.value;
+            }
+          }, (data) => {
+            return _setSharedData(__sharedData_VFor0, 6, data);
+          });
+        }, () => {
+          return _createSharedDataIf(() => {
+            return _setSharedData(__sharedData_VFor0, 7, _toSharedDataBoolean($slots["content"] == null && ($slots["default"] != null || $slots["$default"] != null)));
+          }, () => {
+            _createSharedDataSlot("default", {
+              item: () => {
+                return _for_item0.value;
+              },
+              keyName: () => {
+                return __props.keyName;
+              },
+              index: () => {
+                return _for_key0.value;
+              }
+            }, (data) => {
+              return _setSharedData(__sharedData_VFor0, 8, data);
+            });
+          }, () => {
+            _renderSharedDataEffect(() => {
+              const _item = _for_item0.value;
+              const _item_disabled = _item["disabled"];
+              _setSharedDataClass(__sharedData_VFor0, 9, [[_item_disabled != null && _item_disabled ? "up-tabs__wrapper__nav__item__text--disabled" : ""], "up-tabs__wrapper__nav__item__text"]);
+              _setSharedDataStyle(__sharedData_VFor0, 10, [textStyle(_for_key0.value)]);
+              _setSharedData(__sharedData_VFor0, 11, _toDisplayString(_item[__props.keyName]));
+            });
+          }, 1029);
+        }, 773);
+        const n18 = _createSharedDataComponentWithFallback(_component_up_badge, "536b74aa-" + _for_key0.value, {
+          show: () => {
+            return getShowValue(_for_item0.value);
+          },
+          isDot: () => {
+            return getBadgePropValue(_for_item0.value, "isDot");
+          },
+          value: () => {
+            return getBadgePropValue(_for_item0.value, "value");
+          },
+          max: () => {
+            return getBadgePropValue(_for_item0.value, "max");
+          },
+          type: () => {
+            return getBadgePropValue(_for_item0.value, "type");
+          },
+          showZero: () => {
+            return getBadgePropValue(_for_item0.value, "showZero");
+          },
+          bgColor: () => {
+            return getBadgePropValue(_for_item0.value, "bgColor");
+          },
+          color: () => {
+            return getBadgePropValue(_for_item0.value, "color");
+          },
+          shape: () => {
+            return getBadgePropValue(_for_item0.value, "shape");
+          },
+          numberType: () => {
+            return getBadgePropValue(_for_item0.value, "numberType");
+          },
+          inverted: () => {
+            return getBadgePropValue(_for_item0.value, "inverted");
+          },
+          customStyle: "margin-left: 4px;"
+        });
+        _setSharedData(__sharedData_VFor0, 12, n18?.sharedData);
+        _setSharedDataEvent(__sharedData_VFor0, 13, () => {
+          return clickHandler(_for_item0.value, _for_key0.value);
+        });
+        _setSharedDataEvent(__sharedData_VFor0, 14, () => {
+          return longPressHandler(_for_item0.value, _for_key0.value);
+        });
+        _setSharedDataTemplateRef(__sharedData_VFor0, 17, (n19) => {
+          _setTemplateRef(n19, `up-tabs__wrapper__nav__item-${_for_key0.value}`, true);
+        });
+        return null;
+      }, (__sharedData_VFor0, item, index) => {
+        return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
+      });
+      _setSharedDataTemplateRef(__sharedData, 1, (n20) => {
+        _setTemplateRef(n20, "up-tabs__wrapper__nav__line");
+      });
+      _setSharedDataTemplateRef(__sharedData, 2, (n21) => {
+        _setTemplateRef(n21, "up-tabs__wrapper__nav");
+      });
+      _setSharedDataTemplateRef(__sharedData, 3, (n22) => {
+        _setTemplateRef(n22, "up-tabs__wrapper__scroll-view");
+      });
+      _renderSharedDataEffect(() => {
+        return _setSharedDataStyle(__sharedData, 9, lineStyle.value);
+      });
+      _createSharedDataSlot("right", null, null);
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-tabs.js.map

@@ -17,90 +17,96 @@
 	></up-code-input>
 </template>
 
-<script lang="uts">
-function stringValue(value: any | null): string {
-	return value == null ? '' : value.toString()
+<script setup lang="uts">
+import { computed } from 'vue'
+
+defineOptions({
+	name: 'up-message-input'
+})
+
+const props = defineProps({
+	maxlength: {
+		type: [Number, String],
+		default: 4
+	},
+	dotFill: {
+		type: Boolean,
+		default: false
+	},
+	mode: {
+		type: String,
+		default: 'box'
+	},
+	modelValue: {
+		type: [String, Number],
+		default: ''
+	},
+	value: {
+		type: [String, Number],
+		default: ''
+	},
+	breathe: {
+		type: Boolean,
+		default: true
+	},
+	focus: {
+		type: Boolean,
+		default: false
+	},
+	bold: {
+		type: Boolean,
+		default: false
+	},
+	fontSize: {
+		type: [String, Number],
+		default: 60
+	},
+	activeColor: {
+		type: String,
+		default: '#2979ff'
+	},
+	inactiveColor: {
+		type: String,
+		default: '#606266'
+	},
+	width: {
+		type: [Number, String],
+		default: '80'
+	},
+	disabledKeyboard: {
+		type: Boolean,
+		default: false
+	}
+})
+
+const emit = defineEmits(['change', 'finish', 'update:modelValue'])
+
+function stringValue(val: any | null): string {
+	return val == null ? '' : val.toString()
 }
 
-export default {
-	name: 'up-message-input',
-	props: {
-		maxlength: {
-			type: [Number, String],
-			default: 4
-		},
-		dotFill: {
-			type: Boolean,
-			default: false
-		},
-		mode: {
-			type: String,
-			default: 'box'
-		},
-		modelValue: {
-			type: [String, Number],
-			default: ''
-		},
-		value: {
-			type: [String, Number],
-			default: ''
-		},
-		breathe: {
-			type: Boolean,
-			default: true
-		},
-		focus: {
-			type: Boolean,
-			default: false
-		},
-		bold: {
-			type: Boolean,
-			default: false
-		},
-		fontSize: {
-			type: [String, Number],
-			default: 60
-		},
-		activeColor: {
-			type: String,
-			default: '#2979ff'
-		},
-		inactiveColor: {
-			type: String,
-			default: '#606266'
-		},
-		width: {
-			type: [Number, String],
-			default: '80'
-		},
-		disabledKeyboard: {
-			type: Boolean,
-			default: false
-		}
-	},
-	emits: ['change', 'finish', 'update:modelValue'],
-	computed: {
-		currentValue(): string {
-			const modelText = stringValue(this.modelValue)
-			return modelText.length > 0 ? modelText : stringValue(this.value)
-		},
-		codeInputMode(): string {
-			return this.mode == 'box' ? 'box' : 'line'
-		},
-		activeBorderColor(): string {
-			return this.mode == 'box' ? this.activeColor : this.inactiveColor
-		}
-	},
-	methods: {
-		onChange(value: string): void {
-			this.$emit('change', value)
-		},
-		onFinish(value: string): void {
-			this.$emit('finish', value)
-		},
-		onModelValueUpdate(value: string): void {
-			this.$emit('update:modelValue', value)
-		}
-	}
+const currentValue = computed<string>(() => {
+	const modelText = stringValue(props.modelValue)
+	return modelText.length > 0 ? modelText : stringValue(props.value)
+})
+
+const codeInputMode = computed<string>(() => {
+	return props.mode == 'box' ? 'box' : 'line'
+})
+
+const activeBorderColor = computed<string>(() => {
+	return props.mode == 'box' ? props.activeColor : props.inactiveColor
+})
+
+function onChange(val: string): void {
+	emit('change', val)
+}
+
+function onFinish(val: string): void {
+	emit('finish', val)
+}
+
+function onModelValueUpdate(val: string): void {
+	emit('update:modelValue', val)
 }
 </script>

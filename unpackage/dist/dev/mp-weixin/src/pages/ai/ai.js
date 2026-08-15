@@ -132,17 +132,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, common_vendor.unref(isTyping) ? {} : {}, {
         d: `${common_vendor.unref(safeAreaBottom) + 70}px`,
         e: common_vendor.unref(scrollTop),
-        f: common_vendor.o(sendMessage, "a4"),
+        f: common_vendor.o(sendMessage, "93"),
         g: common_vendor.unref(inputText),
         h: common_vendor.o(($event) => {
           return common_vendor.isRef(inputText) ? inputText.value = $event.detail.value : null;
-        }, "f2"),
+        }, "1c"),
         i: common_vendor.p({
           type: "paperplane-filled",
           size: "18",
           color: "#ffffff"
         }),
-        j: common_vendor.o(sendMessage, "b0"),
+        j: common_vendor.o(sendMessage, "38"),
         k: `${common_vendor.unref(safeAreaBottom) + 10}px`,
         l: common_vendor.p({
           ["navigation-style"]: "custom",

@@ -3,9 +3,8 @@
 	    class="up-radio cursor-pointer"
 		@tap.stop="wrapperClickHandler"
 	    :style="[radioStyle]"
-	    :class="['up-radio-label--' + (parentData['iconPlacement'] != null ? parentData['iconPlacement'].toString() : 'left'),
-			(parentData['borderBottom'] != null && parentData['borderBottom'].toString() == 'true' && parentData['placement'] != null && parentData['placement'].toString() == 'column')
-			? 'up-border-bottom' : '']"
+	    :class="['up-radio-label--' + elIconPlacement,
+			(elBorderBottom && elPlacement == 'column') ? 'up-border-bottom' : '']"
 	>
 		<view
 		    class="up-radio__icon-wrap cursor-pointer"
@@ -35,289 +34,257 @@
 	</view>
 </template>
 
-<script lang="uts">
-	import { propsRadio } from './props';
-	import { mpMixin } from '../../libs/mixin/mpMixin';
-	import { mixin } from '../../libs/mixin/mixin';
-	import { addUnit, addStyle, os, deepMerge, formValidate, error } from '../../libs/function/index';
-	/**
-	 * radio 单选框
-	 * @author jry ijry@qq.com
-	 * @description 单选框用于有一个选择，用户只能选择其中一个的场景。搭配up-radio-group使用
-	 * @tutorial https://ijry.github.io/uview-plus/components/radio.html
-	 * @property {String | Number}	name			radio的名称
-	 * @property {String}			shape			形状，square为方形，circle为圆型
-	 * @property {Boolean}			disabled		是否禁用
-	 * @property {String | Boolean}	labelDisabled	是否禁止点击提示语选中单选框
-	 * @property {String}			activeColor		选中时的颜色，如设置parent的active-color将失效
-	 * @property {String}			inactiveColor	未选中的颜色
-	 * @property {String | Number}	iconSize		图标大小，单位px
-	 * @property {String | Number}	labelSize		label字体大小，单位px
-	 * @property {String | Number}	label			label提示文字，因为nvue下，直接slot进来的文字，由于特殊的结构，无法修改样式
-	 * @property {String | Number}	size			整体的大小
-	 * @property {String}			iconColor		图标颜色
-	 * @property {String}			labelColor		label的颜色
-	 * @property {Object}			customStyle		组件的样式，对象形式
-	 * 
-	 * @event {Function} change 某个radio状态发生变化时触发(选中状态)
-	 * @example <up-radio :labelDisabled="false">门掩黄昏，无计留春住</up-radio>
-	 */
-	export default {
-		name: "up-radio",
-		mixins: [mpMixin, mixin, propsRadio],
-		data() {
-			return {
-				checked: false,
-				// 当你看到这段代码的时候，
-				// 父组件的默认值，因为头条小程序不支持在computed中使用this.parent.shape的形式
-				// 故只能使用如此方法
-				parentData: {
-					iconSize: '12px',
-					labelDisabled: false,
-					labelColor: '',
-					labelSize: '',
-					disabled: false,
-					shape: '',
-					activeColor: '',
-					inactiveColor: '',
-					size: '18px',
-					value: '',
-					modelValue: '',
-					iconColor: '',
-					placement: 'row',
-					borderBottom: false,
-					iconPlacement: 'left'
-				} as UTSJSONObject
-			}
-		},
-		computed: {
-			// 是否禁用，如果父组件up-raios-group禁用的话，将会忽略子组件的配置
-			elDisabled(): boolean {
-				const disabledVal = this.disabled
-				if (disabledVal != null) {
-					const disabledStr = disabledVal.toString()
-					if (disabledStr != '') {
-						return disabledStr == 'true'
-					}
-				}
-				return this.parentData['disabled'] != null ? this.parentData['disabled'] as boolean : false
-			},
-			// 是否禁用label点击
-			elLabelDisabled(): boolean {
-				const labelDisabledVal = this.labelDisabled
-				if (labelDisabledVal != null) {
-					const labelDisabledStr = labelDisabledVal.toString()
-					if (labelDisabledStr != '') {
-						return labelDisabledStr == 'true'
-					}
-				}
-				return this.parentData['labelDisabled'] != null ? this.parentData['labelDisabled'] as boolean : false
-			},
-			// 组件尺寸，对应size的值，默认值为21px
-			elSize(): string {
-				const sizeVal = this.size
-				if (sizeVal != null && sizeVal.toString() != '') {
-					return sizeVal.toString()
-				}
-				const parentSizeVal = this.parentData['size']
-				if (parentSizeVal != null && parentSizeVal.toString() != '') {
-					return parentSizeVal.toString()
-				}
-				return '21px'
-			},
-			// 组件的勾选图标的尺寸，默认12px
-			elIconSize(): string {
-				const iconSizeVal = this.iconSize
-				if (iconSizeVal != null && iconSizeVal.toString() != '') {
-					return iconSizeVal.toString()
-				}
-				const parentIconSizeVal = this.parentData['iconSize']
-				if (parentIconSizeVal != null && parentIconSizeVal.toString() != '') {
-					return parentIconSizeVal.toString()
-				}
-				return '12px'
-			},
-			// 组件选中激活时的颜色
-			elActiveColor(): string {
-				const activeColorVal = this.activeColor
-				if (activeColorVal != null && activeColorVal.toString() != '') {
-					return activeColorVal.toString()
-				}
-				const parentActiveColorVal = this.parentData['activeColor']
-				if (parentActiveColorVal != null && parentActiveColorVal.toString() != '') {
-					return parentActiveColorVal.toString()
-				}
-				return '#2979ff'
-			},
-			// 组件选未中激活时的颜色
-			elInactiveColor(): string {
-				const inactiveColorVal = this.inactiveColor
-				if (inactiveColorVal != null && inactiveColorVal.toString() != '') {
-					return inactiveColorVal.toString()
-				}
-				const parentInactiveColorVal = this.parentData['inactiveColor']
-				if (parentInactiveColorVal != null && parentInactiveColorVal.toString() != '') {
-					return parentInactiveColorVal.toString()
-				}
-				return '#c8c9cc'
-			},
-			// label的颜色
-			elLabelColor(): string {
-				const labelColorVal = this.labelColor
-				if (labelColorVal != null && labelColorVal.toString() != '') {
-					return labelColorVal.toString()
-				}
-				const parentLabelColorVal = this.parentData['labelColor']
-				if (parentLabelColorVal != null && parentLabelColorVal.toString() != '') {
-					return parentLabelColorVal.toString()
-				}
-				return '#606266'
-			},
-			// 组件的形状
-			elShape(): string {
-				const shapeVal = this.shape
-				if (shapeVal != null && shapeVal.toString() != '') {
-					return shapeVal.toString()
-				}
-				const parentShapeVal = this.parentData['shape']
-				if (parentShapeVal != null && parentShapeVal.toString() != '') {
-					return parentShapeVal.toString()
-				}
-				return 'circle'
-			},
-			// label大小
-			elLabelSize(): string {
-				const labelSizeVal = this.labelSize
-				if (labelSizeVal != null && labelSizeVal.toString() != '') {
-					return addUnit(labelSizeVal)
-				}
-				const parentLabelSizeVal = this.parentData['labelSize']
-				if (parentLabelSizeVal != null && parentLabelSizeVal.toString() != '') {
-					return addUnit(parentLabelSizeVal)
-				}
-				return addUnit('15')
-			},
-			elIconColor(): string {
-				const iconColorVal = this.iconColor
-				let iconColorStr = ''
-				if (iconColorVal != null && iconColorVal.toString() != '') {
-					iconColorStr = iconColorVal.toString()
-				} else {
-					const parentIconColorVal = this.parentData['iconColor']
-					if (parentIconColorVal != null && parentIconColorVal.toString() != '') {
-						iconColorStr = parentIconColorVal.toString()
-					} else {
-						iconColorStr = '#ffffff'
-					}
-				}
-				if (this.elDisabled) {
-					return this.checked ? this.elInactiveColor : 'transparent'
-				} else {
-					return this.checked ? iconColorStr : 'transparent'
-				}
-			},
-			iconClasses(): string {
-				let classes: string[] = []
-				classes.push('up-radio__icon-wrap--' + this.elShape)
-				if (this.elDisabled) {
-					classes.push('up-radio__icon-wrap--disabled')
-				}
-				if (this.checked && this.elDisabled) {
-					classes.push('up-radio__icon-wrap--disabled--checked')
-				}
-				if (this.checked && !this.elDisabled && this.elActiveColor == '#2979ff') {
-					classes.push('up-radio__icon-wrap--active')
-				}
-				return classes.join(' ')
-			},
-			iconWrapStyle(): UTSJSONObject {
-				const style = {} as UTSJSONObject
-				if (this.checked && !this.elDisabled) {
-					if (this.elActiveColor != '#2979ff') {
-						style['backgroundColor'] = this.elActiveColor
-						style['borderColor'] = this.elActiveColor
-					}
-				} else {
-					style['backgroundColor'] = '#ffffff'
-					style['borderColor'] = this.elInactiveColor
-				}
-				style['width'] = addUnit(this.elSize)
-				style['height'] = addUnit(this.elSize)
-				if (this.parentData['iconPlacement'] != null && this.parentData['iconPlacement'].toString() == 'right') {
-					style['marginRight'] = 0
-				}
-				return style
-			},
-			radioStyle(): UTSJSONObject {
-				const style = {} as UTSJSONObject
-				if (this.parentData['borderBottom'] != null && this.parentData['borderBottom'].toString() == 'true' && this.parentData['placement'] != null && this.parentData['placement'].toString() == 'row') {
-					error('检测到您将borderBottom设置为true，需要同时将up-radio-group的placement设置为column才有效')
-				}
-				if (this.parentData['borderBottom'] != null && this.parentData['borderBottom'].toString() == 'true' && this.parentData['placement'] != null && this.parentData['placement'].toString() == 'column') {
-					style['paddingBottom'] = os() == 'ios' ? '12px' : '8px'
-				}
-				return deepMerge(style, addStyle(this.customStyle))
-			}
-		},
-		mounted() {
-			this.init()
-		},
-		emits: ["change"],
-		methods: {
-			init(): void {
-				this.updateParentData()
-				if (this.parent == null) {
-					error('up-radio必须搭配up-radio-group组件使用')
-				}
-				const modelValueVal = this.parentData['modelValue']
-				if (modelValueVal != null && this.name != null) {
-					this.checked = this.name.toString() == modelValueVal.toString()
-				} else {
-					this.checked = false
-				}
-			},
-			updateParentData(): void {
-				// @ts-ignore
-				this.getParentData('up-radio-group')
-			},
-			// 点击图标
-			iconClickHandler(e: UniEvent): void {
-				this.preventEvent(e)
-				if (!this.elDisabled) {
-					this.setRadioCheckedStatus()
-				}
-			},
-			// 横向两端排列时，点击组件即可触发选中事件
-			wrapperClickHandler(e: UniEvent): void {
-				if (this.parentData['iconPlacement'] != null && this.parentData['iconPlacement'].toString() == 'right') {
-					this.iconClickHandler(e)
-				}
-			},
-			// 点击label
-			labelClickHandler(e: UniEvent): void {
-				this.preventEvent(e)
-				if (!this.elLabelDisabled && !this.elDisabled) {
-					this.setRadioCheckedStatus()
-				}
-			},
-			emitEvent(): void {
-				if (!this.checked) {
-					this.$emit('change', this.name)
-					this.$nextTick(() => {
-						formValidate(this, 'change')
-					})
-				}
-			},
-			// 改变组件选中状态
-			setRadioCheckedStatus(): void {
-				this.emitEvent()
-				this.checked = true
-				if (this.$parent != null) {
-					this.$parent!.$callMethod('unCheckedOther', this)
-				}
-			}
+<script setup lang="uts">
+import { computed, inject, getCurrentInstance, nextTick } from 'vue'
+import { addUnit, addStyle, os, deepMerge, formValidate } from '../../libs/function/index'
+
+defineOptions({
+	name: 'up-radio'
+})
+
+const props = defineProps({
+	name: {
+		type: [String, Number, Boolean],
+		default: ''
+	},
+	shape: {
+		type: String,
+		default: ''
+	},
+	disabled: {
+		type: Boolean,
+		default: false
+	},
+	labelDisabled: {
+		type: Boolean,
+		default: false
+	},
+	activeColor: {
+		type: String,
+		default: ''
+	},
+	inactiveColor: {
+		type: String,
+		default: ''
+	},
+	iconSize: {
+		type: [String, Number],
+		default: ''
+	},
+	labelSize: {
+		type: [String, Number],
+		default: ''
+	},
+	label: {
+		type: [String, Number],
+		default: ''
+	},
+	size: {
+		type: [String, Number],
+		default: ''
+	},
+	iconColor: {
+		type: String,
+		default: ''
+	},
+	labelColor: {
+		type: String,
+		default: ''
+	},
+	customStyle: {
+		type: Object,
+		default: () => ({})
+	}
+})
+
+const emit = defineEmits(['change'])
+const instance = getCurrentInstance()
+const parentGroup = inject<any>('upRadioGroup', null)
+
+const checked = computed<boolean>(() => {
+	if (parentGroup != null && parentGroup.props != null) {
+		const groupVal = parentGroup.props.modelValue
+		if (groupVal != null && props.name != null) {
+			return groupVal.toString() == props.name.toString()
 		}
 	}
+	return false
+})
+
+const elDisabled = computed<boolean>(() => {
+	if (props.disabled) return true
+	if (parentGroup != null && parentGroup.props != null) {
+		return parentGroup.props.disabled ?? false
+	}
+	return false
+})
+
+const elLabelDisabled = computed<boolean>(() => {
+	if (props.labelDisabled) return true
+	if (parentGroup != null && parentGroup.props != null) {
+		return parentGroup.props.labelDisabled ?? false
+	}
+	return false
+})
+
+const elSize = computed<string>(() => {
+	if (props.size != '') return addUnit(props.size)
+	if (parentGroup != null && parentGroup.props != null && parentGroup.props.size != '') {
+		return addUnit(parentGroup.props.size)
+	}
+	return '21px'
+})
+
+const elIconSize = computed<string>(() => {
+	if (props.iconSize != '') return addUnit(props.iconSize)
+	if (parentGroup != null && parentGroup.props != null && parentGroup.props.iconSize != '') {
+		return addUnit(parentGroup.props.iconSize)
+	}
+	return '12px'
+})
+
+const elActiveColor = computed<string>(() => {
+	if (props.activeColor != '') return props.activeColor
+	if (parentGroup != null && parentGroup.props != null && parentGroup.props.activeColor != '') {
+		return parentGroup.props.activeColor
+	}
+	return '#2979ff'
+})
+
+const elInactiveColor = computed<string>(() => {
+	if (props.inactiveColor != '') return props.inactiveColor
+	if (parentGroup != null && parentGroup.props != null && parentGroup.props.inactiveColor != '') {
+		return parentGroup.props.inactiveColor
+	}
+	return '#c8c9cc'
+})
+
+const elLabelColor = computed<string>(() => {
+	if (props.labelColor != '') return props.labelColor
+	if (parentGroup != null && parentGroup.props != null && parentGroup.props.labelColor != '') {
+		return parentGroup.props.labelColor
+	}
+	return '#606266'
+})
+
+const elShape = computed<string>(() => {
+	if (props.shape != '') return props.shape
+	if (parentGroup != null && parentGroup.props != null && parentGroup.props.shape != '') {
+		return parentGroup.props.shape
+	}
+	return 'circle'
+})
+
+const elLabelSize = computed<string>(() => {
+	if (props.labelSize != '') return addUnit(props.labelSize)
+	if (parentGroup != null && parentGroup.props != null && parentGroup.props.labelSize != '') {
+		return addUnit(parentGroup.props.labelSize)
+	}
+	return '15px'
+})
+
+const elIconColor = computed<string>(() => {
+	let iconColorStr = '#ffffff'
+	if (props.iconColor != '') {
+		iconColorStr = props.iconColor
+	} else if (parentGroup != null && parentGroup.props != null && parentGroup.props.iconColor != '') {
+		iconColorStr = parentGroup.props.iconColor
+	}
+	if (elDisabled.value) {
+		return checked.value ? elInactiveColor.value : 'transparent'
+	}
+	return checked.value ? iconColorStr : 'transparent'
+})
+
+const elIconPlacement = computed<string>(() => {
+	if (parentGroup != null && parentGroup.props != null && parentGroup.props.iconPlacement != '') {
+		return parentGroup.props.iconPlacement
+	}
+	return 'left'
+})
+
+const elBorderBottom = computed<boolean>(() => {
+	if (parentGroup != null && parentGroup.props != null) {
+		return parentGroup.props.borderBottom ?? false
+	}
+	return false
+})
+
+const elPlacement = computed<string>(() => {
+	if (parentGroup != null && parentGroup.props != null) {
+		return parentGroup.props.placement ?? 'row'
+	}
+	return 'row'
+})
+
+const iconClasses = computed<string>(() => {
+	let classes = ['up-radio__icon-wrap--' + elShape.value]
+	if (elDisabled.value) {
+		classes.push('up-radio__icon-wrap--disabled')
+	}
+	if (checked.value && elDisabled.value) {
+		classes.push('up-radio__icon-wrap--disabled--checked')
+	}
+	if (checked.value && !elDisabled.value && elActiveColor.value == '#2979ff') {
+		classes.push('up-radio__icon-wrap--active')
+	}
+	return classes.join(' ')
+})
+
+const iconWrapStyle = computed<UTSJSONObject>(() => {
+	const style = {} as UTSJSONObject
+	if (checked.value && !elDisabled.value) {
+		if (elActiveColor.value != '#2979ff') {
+			style['backgroundColor'] = elActiveColor.value
+			style['borderColor'] = elActiveColor.value
+		}
+	} else {
+		style['backgroundColor'] = '#ffffff'
+		style['borderColor'] = elInactiveColor.value
+	}
+	style['width'] = elSize.value
+	style['height'] = elSize.value
+	if (elIconPlacement.value == 'right') {
+		style['marginRight'] = 0
+	}
+	return style
+})
+
+const radioStyle = computed<UTSJSONObject>(() => {
+	const style = {} as UTSJSONObject
+	if (elBorderBottom.value && elPlacement.value == 'column') {
+		style['paddingBottom'] = os() == 'ios' ? '12px' : '8px'
+	}
+	return deepMerge(style, addStyle(props.customStyle)) as UTSJSONObject
+})
+
+function setRadioCheckedStatus(): void {
+	if (parentGroup != null) {
+		parentGroup.onRadioSelected(props.name)
+	}
+	emit('change', props.name)
+	nextTick(() => {
+		formValidate(instance?.proxy, 'change')
+	})
+}
+
+function iconClickHandler(e: UniEvent): void {
+	if (!elDisabled.value) {
+		setRadioCheckedStatus()
+	}
+}
+
+function wrapperClickHandler(e: UniEvent): void {
+	if (elIconPlacement.value == 'right') {
+		iconClickHandler(e)
+	}
+}
+
+function labelClickHandler(e: UniEvent): void {
+	if (!elLabelDisabled.value && !elDisabled.value) {
+		setRadioCheckedStatus()
+	}
+}
 </script>
 
 <style lang="scss" scoped>
@@ -351,63 +318,59 @@
 		&-label--left {
 			flex-direction: row
 		}
-
+		
 		&-label--right {
 			flex-direction: row-reverse;
 			justify-content: space-between
 		}
-
+		
 		&__icon-wrap {
-			/* #ifndef APP */
 			box-sizing: border-box;
-			// nvue下，border-color过渡有问题
 			transition-property: border-color, background-color, color;
 			transition-duration: 0.2s;
-			/* #endif */
+			color: #606266;
 			@include flex;
 			align-items: center;
 			justify-content: center;
+			color: transparent;
+			text-align: center;
 			margin-right: $up-radio-wrap-margin-right;
+	
+			font-size: $up-radio-wrap-font-size;
 			border-width: $up-radio-wrap-border-width;
 			border-color: $up-radio-wrap-border-color;
 			border-style: solid;
-
-			/* #ifdef MP-TOUTIAO */
-			// 头条小程序兼容性问题，需要设置行高为0，否则图标偏下
-			&__icon {
-				line-height: $up-radio-line-height;
-			}
-			/* #endif */
-
+			
 			&--circle {
 				border-radius: $up-radio-circle-border-radius;
 			}
-
+			
 			&--square {
 				border-radius: $up-radio-square-border-radius;
 			}
-
+			
 			&--checked {
+				color: $up-radio-checked-color;
 				background-color: $up-radio-checked-background-color;
 				border-color: $up-radio-checked-border-color;
 			}
-
-			&--active {
-				background-color: $up-primary;
-				border-color: $up-primary;
-			}
-
+			
 			&--disabled {
 				background-color: $up-radio-disabled-background-color !important;
 			}
+			
+			&--disabled--checked {
+				color: $up-radio-disabled--checked-color !important;
+			}
 		}
-
+		
 		&__label {
+			word-break: break-word;
 			margin-left: $up-radio-label-margin-left;
 			margin-right: $up-radio-label-margin-right;
 			color: $up-radio-label-color;
 			font-size: $up-radio-label-font-size;
-
+			
 			&--disabled {
 				color: $up-radio-label-disabled-color;
 			}

@@ -3,7 +3,7 @@
 		:hover-class="(!disabled && (clickable || isLink)) ? 'up-cell--clickable' : ''" :hover-stay-time="250"
 		@tap="clickHandler">
 		<view class="up-cell__body"
-			aclass="[ center && 'up-cell--center', size === 'large' && 'up-cell__body--large']">
+			:class="[ center && 'up-cell--center', size === 'large' && 'up-cell__body--large']">
 			<view class="up-cell__body__content">
 				<view class="up-cell__left-icon-wrap"
 					v-if="$slots['icon'] != null || icon != ''">
@@ -18,12 +18,12 @@
 					</slot>
 					<text v-else class="up-cell__title-text"
 						:style="[titleTextStyle]"
-						aclass="[disabled && 'up-cell--disabled', size === 'large' && 'up-cell__title-text--large']">
+						:class="[disabled && 'up-cell--disabled', size === 'large' && 'up-cell__title-text--large']">
 						{{ title }}
 					</text>
 					<slot name="label">
 						<text class="up-cell__label" v-if="label"
-							aclass="[disabled && 'up-cell--disabled', size === 'large' && 'up-cell__label--large']">
+							:class="[disabled && 'up-cell--disabled', size === 'large' && 'up-cell__label--large']">
 							{{ label }}
 							</text>
 					</slot>
@@ -31,7 +31,7 @@
 			</view>
 			<slot name="value">
 				<text class="up-cell__value"
-					aclass="[disabled && 'up-cell--disabled', size === 'large' && 'up-cell__value--large']"
+					:class="[disabled && 'up-cell--disabled', size === 'large' && 'up-cell__value--large']"
 					v-if="testEmpty(value) == false">{{ value }}</text>
 			</slot>
 			<view class="up-cell__right-icon-wrap"
@@ -53,7 +53,7 @@
 	</view>
 </template>
 
-<script setup lang="ts">
+<script setup lang="uts">
 	import { computed } from 'vue'
 	import defProps from './cell'
 	import { addStyle } from '../../libs/function/index'

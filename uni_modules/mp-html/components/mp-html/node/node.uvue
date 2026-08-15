@@ -4,8 +4,7 @@
     <text
       v-if="n.type == 'text'"
       :user-select="(opts['selectable'] as boolean) == true"
-      :decode="true"
-      :style="n.attrs != null ? (n.attrs['style'] as string) ?? '' : ''"
+      :style="n.attrs != null ? (n.attrs!['style'] as string) ?? '' : ''"
       class="_textNode"
     >{{ n.text }}</text>
 
@@ -41,11 +40,6 @@
       class="_video"
     />
 
-    <!-- ==================== 音频 ==================== -->
-    <!-- #ifndef APP-PLUS -->
-    <!-- uni-app X 部分平台可能不支持 audio 组件，降级为不渲染 -->
-    <!-- #endif -->
-
     <!-- ==================== 链接 ==================== -->
     <view
       v-else-if="n.name == 'a'"
@@ -62,7 +56,7 @@
       <text v-else>{{ getNodeText(n) }}</text>
     </view>
 
-    <!-- ==================== 块级节点：div, p, section, header, footer, article, aside, nav, main, figure, figcaption, details, summary, blockquote, address ==================== -->
+    <!-- ==================== 块级节点 ==================== -->
     <view
       v-else-if="isBlockContainer(n)"
       :style="(n.attrs != null ? (n.attrs!['style'] as string) ?? '' : '') + (n.f != null ? n.f! : '')"
@@ -143,7 +137,7 @@
       </view>
     </view>
 
-    <!-- ==================== 列表项（嵌套在其他容器中时） ==================== -->
+    <!-- ==================== 列表项 ==================== -->
     <view
       v-else-if="n.name == 'li'"
       :style="(n.attrs != null ? (n.attrs!['style'] as string) ?? '' : '')"
@@ -158,12 +152,11 @@
       <text v-else>{{ getNodeText(n) }}</text>
     </view>
 
-    <!-- ==================== 行内元素：span, b, strong, i, em, u, ins, del, s, strike, sub, sup, code, mark, small, big, label, q, abbr, cite ==================== -->
+    <!-- ==================== 行内元素 ==================== -->
     <text
       v-else-if="isInlineElement(n)"
       :style="getInlineStyle(n)"
       :user-select="(opts['selectable'] as boolean) == true"
-      :decode="true"
     >{{ getNodeText(n) }}</text>
 
     <!-- ==================== pre / code 块 ==================== -->
@@ -174,7 +167,6 @@
     >
       <text
         :user-select="(opts['selectable'] as boolean) == true"
-        :decode="true"
         style="font-family:monospace;white-space:pre"
       >{{ getNodeText(n) }}</text>
     </view>
@@ -203,8 +195,8 @@
   </template>
 </template>
 
-<script lang="uts">
-import { Parser, windowWidth } from '../parser.uts'
+<script setup lang="uts">
+import { ref, watch } from 'vue'
 import type { HtmlNode } from '../parser.uts'
 
 // 块级容器标签集合
@@ -253,287 +245,253 @@ INLINE_STYLE.set('mark', 'background-color:yellow')
 INLINE_STYLE.set('abbr', 'text-decoration:underline dotted')
 INLINE_STYLE.set('cite', 'font-style:italic')
 
-export default {
-  name: 'node',
-  props: {
-    childs: {
-      type: Array as any,
-      default: (): HtmlNode[] => [] as HtmlNode[],
-    },
-    opts: {
-      type: Object as any,
-      default: (): UTSJSONObject => ({} as UTSJSONObject),
-    },
-    rootRef: {
-      type: Object as any,
-      default: null,
-    },
+defineOptions({
+  name: 'node'
+})
+
+const props = defineProps({
+  childs: {
+    type: Array as PropType<HtmlNode[]>,
+    default: (): HtmlNode[] => [] as HtmlNode[]
   },
-  data() {
-    return {
-      localChilds: [] as HtmlNode[],
-    }
+  opts: {
+    type: Object as PropType<UTSJSONObject>,
+    default: (): UTSJSONObject => ({} as UTSJSONObject)
   },
-  watch: {
-    childs: {
-      handler(nodes: HtmlNode[]) {
-        // 保持长度一致，避免 Vue 列表渲染问题
-        const result: HtmlNode[] = []
-        for (let i = 0; i < nodes.length; i++) {
-          result.push(nodes[i])
-        }
-        this.localChilds = result
-      },
-      immediate: true,
-    },
-  },
-  methods: {
-    // ========== 判断方法 ==========
+  rootRef: {
+    type: Object as any,
+    default: null
+  }
+})
 
-    isBlockContainer(n: HtmlNode): boolean {
-      const name = n.name ?? ''
-      return BLOCK_CONTAINERS.has(name)
-    },
+const localChilds = ref<HtmlNode[]>([])
 
-    isHeading(n: HtmlNode): boolean {
-      return HEADINGS.has(n.name ?? '')
-    },
-
-    isInlineElement(n: HtmlNode): boolean {
-      return INLINE_ELEMENTS.has(n.name ?? '')
-    },
-
-    // ========== 样式构建 ==========
-
-    getImgSrc(n: HtmlNode): string {
-      if (n.attrs == null) return ''
-      return (n.attrs!['src'] as string) ?? ''
-    },
-
-    buildImgStyle(n: HtmlNode): string {
-      const attrs = n.attrs
-      let style = attrs != null ? ((attrs!['style'] as string) ?? '') : ''
-      style = 'max-width:750px;' + style
-      if (n.w != null) {
-        // 宽高都有，设置具体高度
-      }
-      return style
-    },
-
-    getImgMode(n: HtmlNode): string {
-      if (n.h == null && n.w == null) return 'widthFix'
-      if (n.h == null) return 'widthFix'
-      if (n.w == null) return 'heightFix'
-      if (n.m != null) return n.m!
-      return 'scaleToFill'
-    },
-
-    buildLinkStyle(n: HtmlNode): string {
-      let style = 'display:inline;'
-      if (n.attrs != null) {
-        style += ((n.attrs!['style'] as string) ?? '')
-      }
-      return style
-    },
-
-    getHeadingStyle(n: HtmlNode): string {
-      let style = 'display:block;'
-      const fontSize = HEADING_SIZES.get(n.name ?? '') ?? '1em'
-      style += 'font-size:' + fontSize + ';font-weight:bold;'
-      if (n.attrs != null) {
-        style += ((n.attrs!['style'] as string) ?? '')
-      }
-      return style
-    },
-
-    getHeadingTextStyle(n: HtmlNode): string {
-      const fontSize = HEADING_SIZES.get(n.name ?? '') ?? '1em'
-      return 'font-size:' + fontSize + ';font-weight:bold'
-    },
-
-    getInlineStyle(n: HtmlNode): string {
-      const base = INLINE_STYLE.get(n.name ?? '') ?? ''
-      let style = base
-      if (n.attrs != null) {
-        const attrStyle = (n.attrs!['style'] as string) ?? ''
-        if (attrStyle.length > 0) {
-          style = style.length > 0 ? style + ';' + attrStyle : attrStyle
-        }
-      }
-      return style
-    },
-
-    getRowStyle(row: HtmlNode): string {
-      let style = 'display:flex;flex-direction:row;'
-      if (row.attrs != null) {
-        style += ((row.attrs!['style'] as string) ?? '')
-      }
-      if (row.name == 'thead') {
-        style += ';font-weight:bold;background-color:#f5f5f5'
-      }
-      return style
-    },
-
-    getCellStyle(cell: HtmlNode): string {
-      let style = 'flex:1;padding:8px;'
-      if (cell.attrs != null) {
-        style += ((cell.attrs!['style'] as string) ?? '')
-      }
-      if (cell.name == 'th') {
-        style += ';font-weight:bold;text-align:center;background-color:#f5f5f5'
-      }
-      // border
-      style += ';border-width:1px;border-color:#e5e5e5;border-style:solid'
-      return style
-    },
-
-    getMediaSrc(n: HtmlNode, sourceIndex: number): string {
-      if (n.src != null && n.src!.length > sourceIndex) {
-        return n.src![sourceIndex]
-      }
-      if (n.attrs != null) {
-        return (n.attrs!['src'] as string) ?? ''
-      }
-      return ''
-    },
-
-    // ========== 文本提取 ==========
-
-    getNodeText(n: HtmlNode): string {
-      if (n.type == 'text') {
-        return n.text ?? ''
-      }
-      if (n.children != null && n.children!.length > 0) {
-        let text = ''
-        for (let i = 0; i < n.children!.length; i++) {
-          const child = n.children![i]
-          if (child.type == 'text') {
-            text += child.text ?? ''
-          } else if (child.children != null) {
-            text += this.getNodeText(child)
-          }
-        }
-        return text
-      }
-      return n.text ?? ''
-    },
-
-    // ========== 事件处理 ==========
-
-    onImgTap(n: HtmlNode, i: number): void {
-      if (n.a != null) {
-        // 图片在链接内，触发链接跳转
-        this.onLinkTap({ attrs: n.a } as HtmlNode)
-        return
-      }
-      const attrs = n.attrs
-      if (attrs != null && attrs['ignore'] == 'T') return
-
-      // 通知根组件
-      const root = this.rootRef as ComponentPublicInstance | null
-      if (root != null) {
-        root.$callMethod('handleImgTap', attrs ?? {} as UTSJSONObject)
-      }
-
-      // 预览图片
-      if ((this.opts['previewImg'] as boolean) == true) {
-        const imgList = (root as any)?.imgList as string[] | null
-        if (imgList != null && attrs != null) {
-          const current = parseInt((attrs['i'] as string) ?? '0')
-          uni.previewImage({
-            current: isNaN(current) ? 0 : current,
-            urls: imgList,
-          })
-        }
-      }
-    },
-
-    onImgLoad(n: HtmlNode, i: number): void {
-      // 图片加载完成，通知根组件更新计数
-      const root = this.rootRef as ComponentPublicInstance | null
-      if (root != null) {
-        root.$callMethod('handleImgLoad', n, i)
-      }
-    },
-
-    onImgError(n: HtmlNode, i: number): void {
-      const root = this.rootRef as ComponentPublicInstance | null
-      if (root != null) {
-        root.$callMethod('handleMediaError', 'img', n.attrs ?? {} as UTSJSONObject)
-      }
-      // 如果有错误占位图，显示
-      const errorImg = this.opts['errorImg'] as string
-      if (errorImg != null && errorImg.length > 0 && n.attrs != null) {
-        n.attrs!['src'] = errorImg
-      }
-    },
-
-    onLinkTap(n: HtmlNode): void {
-      const attrs = n.attrs ?? ({} as UTSJSONObject)
-      const href = (attrs['href'] as string) ?? ''
-
-      const root = this.rootRef as ComponentPublicInstance | null
-      if (root != null) {
-        root.$callMethod('handleLinkTap', attrs)
-      }
-
-      if (href.length > 0) {
-        if (href.charAt(0) == '#') {
-          // 锚点跳转
-          if (root != null) {
-            root.$callMethod('navigateTo', href.substring(1), 0)
-          }
-        } else if (href.includes('://')) {
-          // 外部链接
-          // #ifdef H5
-          // window.open(href) - H5 only
-          // #endif
-          uni.setClipboardData({
-            data: href,
-            success: () => {
-              uni.showToast({ title: '链接已复制', icon: 'none' })
-            },
-          })
-        } else {
-          // 内部页面跳转
-          uni.navigateTo({
-            url: href,
-            fail: () => {
-              uni.switchTab({ url: href })
-            },
-          })
-        }
-      }
-    },
-
-    onPlay(n: HtmlNode): void {
-      const root = this.rootRef as ComponentPublicInstance | null
-      if (root != null) {
-        root.$callMethod('handlePlay', n)
-      }
-    },
-
-    onMediaError(n: HtmlNode, i: number, sourceName: string): void {
-      const root = this.rootRef as ComponentPublicInstance | null
-      if (root != null) {
-        root.$callMethod('handleMediaError', sourceName, n.attrs ?? {} as UTSJSONObject)
-      }
-    },
-  },
+function isBlockContainer(n: HtmlNode): boolean {
+  const name = n.name ?? ''
+  return BLOCK_CONTAINERS.has(name)
 }
+
+function isHeading(n: HtmlNode): boolean {
+  return HEADINGS.has(n.name ?? '')
+}
+
+function isInlineElement(n: HtmlNode): boolean {
+  return INLINE_ELEMENTS.has(n.name ?? '')
+}
+
+function getImgSrc(n: HtmlNode): string {
+  if (n.attrs == null) return ''
+  return (n.attrs!['src'] as string) ?? ''
+}
+
+function buildImgStyle(n: HtmlNode): string {
+  const attrs = n.attrs
+  let style = attrs != null ? ((attrs!['style'] as string) ?? '') : ''
+  style = 'max-width:750px;' + style
+  return style
+}
+
+function getImgMode(n: HtmlNode): string {
+  if (n.h == null && n.w == null) return 'widthFix'
+  if (n.h == null) return 'widthFix'
+  if (n.w == null) return 'heightFix'
+  if (n.m != null) return n.m!
+  return 'scaleToFill'
+}
+
+function buildLinkStyle(n: HtmlNode): string {
+  let style = 'display:inline;'
+  if (n.attrs != null) {
+    style += ((n.attrs!['style'] as string) ?? '')
+  }
+  return style
+}
+
+function getHeadingStyle(n: HtmlNode): string {
+  let style = 'display:block;'
+  const fontSize = HEADING_SIZES.get(n.name ?? '') ?? '1em'
+  style += 'font-size:' + fontSize + ';font-weight:bold;'
+  if (n.attrs != null) {
+    style += ((n.attrs!['style'] as string) ?? '')
+  }
+  return style
+}
+
+function getHeadingTextStyle(n: HtmlNode): string {
+  const fontSize = HEADING_SIZES.get(n.name ?? '') ?? '1em'
+  return 'font-size:' + fontSize + ';font-weight:bold'
+}
+
+function getInlineStyle(n: HtmlNode): string {
+  const base = INLINE_STYLE.get(n.name ?? '') ?? ''
+  let style = base
+  if (n.attrs != null) {
+    const attrStyle = (n.attrs!['style'] as string) ?? ''
+    if (attrStyle.length > 0) {
+      style = style.length > 0 ? style + ';' + attrStyle : attrStyle
+    }
+  }
+  return style
+}
+
+function getRowStyle(row: HtmlNode): string {
+  let style = 'display:flex;flex-direction:row;'
+  if (row.attrs != null) {
+    style += ((row.attrs!['style'] as string) ?? '')
+  }
+  if (row.name == 'thead') {
+    style += ';font-weight:bold;background-color:#f5f5f5'
+  }
+  return style
+}
+
+function getCellStyle(cell: HtmlNode): string {
+  let style = 'flex:1;padding:8px;'
+  if (cell.attrs != null) {
+    style += ((cell.attrs!['style'] as string) ?? '')
+  }
+  if (cell.name == 'th') {
+    style += ';font-weight:bold;text-align:center;background-color:#f5f5f5'
+  }
+  style += ';border-width:1px;border-color:#e5e5e5;border-style:solid'
+  return style
+}
+
+function getMediaSrc(n: HtmlNode, sourceIndex: number): string {
+  if (n.src != null && n.src!.length > sourceIndex) {
+    return n.src![sourceIndex]
+  }
+  if (n.attrs != null) {
+    return (n.attrs!['src'] as string) ?? ''
+  }
+  return ''
+}
+
+function getNodeText(n: HtmlNode): string {
+  if (n.type == 'text') {
+    return n.text ?? ''
+  }
+  if (n.children != null && n.children!.length > 0) {
+    let text = ''
+    for (let i = 0; i < n.children!.length; i++) {
+      const child = n.children![i]
+      if (child.type == 'text') {
+        text += child.text ?? ''
+      } else if (child.children != null) {
+        text += getNodeText(child)
+      }
+    }
+    return text
+  }
+  return n.text ?? ''
+}
+
+function onLinkTap(n: HtmlNode): void {
+  const attrs = n.attrs ?? ({} as UTSJSONObject)
+  const href = (attrs['href'] as string) ?? ''
+
+  const root = props.rootRef as ComponentPublicInstance | null
+  if (root != null) {
+    root.$callMethod('handleLinkTap', attrs)
+  }
+
+  if (href.length > 0) {
+    if (href.charAt(0) == '#') {
+      if (root != null) {
+        root.$callMethod('navigateTo', href.substring(1), 0)
+      }
+    } else if (href.includes('://')) {
+      uni.setClipboardData({
+        data: href,
+        success: () => {
+          uni.showToast({ title: '链接已复制', icon: 'none' })
+        }
+      })
+    } else {
+      uni.navigateTo({
+        url: href,
+        fail: () => {
+          uni.switchTab({ url: href })
+        }
+      })
+    }
+  }
+}
+
+function onImgTap(n: HtmlNode, i: number): void {
+  if (n.a != null) {
+    onLinkTap({ attrs: n.a } as HtmlNode)
+    return
+  }
+  const attrs = n.attrs
+  if (attrs != null && attrs['ignore'] == 'T') return
+
+  const root = props.rootRef as ComponentPublicInstance | null
+  if (root != null) {
+    root.$callMethod('handleImgTap', attrs ?? {} as UTSJSONObject)
+  }
+
+  if ((props.opts['previewImg'] as boolean) == true) {
+    const imgList = (root as any)?.imgList as string[] | null
+    if (imgList != null && attrs != null) {
+      const current = parseInt((attrs['i'] as string) ?? '0')
+      uni.previewImage({
+        current: isNaN(current) ? 0 : current,
+        urls: imgList
+      })
+    }
+  }
+}
+
+function onImgLoad(n: HtmlNode, i: number): void {
+  const root = props.rootRef as ComponentPublicInstance | null
+  if (root != null) {
+    root.$callMethod('handleImgLoad', n, i)
+  }
+}
+
+function onImgError(n: HtmlNode, i: number): void {
+  const root = props.rootRef as ComponentPublicInstance | null
+  if (root != null) {
+    root.$callMethod('handleMediaError', 'img', n.attrs ?? {} as UTSJSONObject)
+  }
+  const errorImg = props.opts['errorImg'] as string
+  if (errorImg != null && errorImg.length > 0 && n.attrs != null) {
+    n.attrs!['src'] = errorImg
+  }
+}
+
+function onPlay(n: HtmlNode): void {
+  const root = props.rootRef as ComponentPublicInstance | null
+  if (root != null) {
+    root.$callMethod('handlePlay', n)
+  }
+}
+
+function onMediaError(n: HtmlNode, i: number, sourceName: string): void {
+  const root = props.rootRef as ComponentPublicInstance | null
+  if (root != null) {
+    root.$callMethod('handleMediaError', sourceName, n.attrs ?? {} as UTSJSONObject)
+  }
+}
+
+watch(() => props.childs, (nodes: HtmlNode[]) => {
+  const result: HtmlNode[] = []
+  for (let i = 0; i < nodes.length; i++) {
+    result.push(nodes[i])
+  }
+  localChilds.value = result
+}, { immediate: true })
 </script>
 
 <style>
 ._textNode {
-  /* 文本节点默认样式由行内 style 控制 */
 }
 
 ._br {
-  /* 换行 */
 }
 
 ._img {
-  /* 图片默认样式由 buildImgStyle 控制 */
 }
 
 ._video {
@@ -568,7 +526,6 @@ export default {
 }
 
 ._list {
-  /* 列表容器 */
 }
 
 ._listItem {

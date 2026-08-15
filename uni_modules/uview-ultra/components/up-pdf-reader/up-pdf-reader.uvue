@@ -8,73 +8,61 @@
 	</view>
 </template>
 
-<script lang="uts">
-	/**
-	 * pdfReader PDF阅读器
-	 * @description 基于pdf.js的PDF阅读器组件
-	 * @tutorial https://uview-plus.jiangruyi.com/components/pdfReader.html
-	 * @property {String}			src				PDF文件地址
-	 * @property {String}	        height			组件高度，默认为'700px'
-	 * @property {String}			pdfjsDomain		pdfjs资源域名，默认为'https://uview-plus.jiangruyi.com/h5'
-	 * @example <up-pdf-reader src="https://example.com/file.pdf"></up-pdf-reader>
-	 */
-	export default {
-		name: 'up-pdf-reader',
-		props: {
-			src: {
-				type: String,
-				default: ''
-			},
-			height: {
-				type: String,
-				default: '500px'
-			},
-			baseUrl: {
-				type: String,
-				default: 'https://uview-plus.jiangruyi.com/h5'
-			}
-		},
-        data() {
-            return {
-                baseUrlInner: 'https://uview-plus.jiangruyi.com/h5',
-                viewerUrl: ''
-            }
-        },
-		computed: {
-			readerStyle(): UTSJSONObject {
-				const style = {} as UTSJSONObject
-				style['height'] = this.height
-				return style
-			},
-			webViewStyle(): UTSJSONObject {
-				const style = {} as UTSJSONObject
-				style['width'] = '750rpx'
-				style['height'] = this.height
-				return style
-			}
-		},
-        watch: {
-            baseUrl(val: string) {
-                this.baseUrlInner = val;
-                this.updateViewerUrl()
-            },
-            src(val: string) {
-                this.updateViewerUrl()
-            }
-        },
-        mounted() {
-            if (this.baseUrl.length > 0) {
-                this.baseUrlInner = this.baseUrl;
-            }
-            this.updateViewerUrl()
-		},
-		methods: {
-			updateViewerUrl(): void {
-				const base = this.baseUrlInner.length > 0 ? this.baseUrlInner : 'https://uview-plus.jiangruyi.com/h5'
-				this.viewerUrl = base + '/static/pdfjs/web/viewer.html?file=' + encodeURIComponent(this.src);
-			}
-		}
+<script setup lang="uts">
+import { ref, computed, watch, onMounted } from 'vue'
+
+defineOptions({
+	name: 'up-pdf-reader'
+})
+
+const props = defineProps({
+	src: {
+		type: String,
+		default: ''
+	},
+	height: {
+		type: String,
+		default: '500px'
+	},
+	baseUrl: {
+		type: String,
+		default: 'https://uview-plus.jiangruyi.com/h5'
 	}
+})
+
+const baseUrlInner = ref<string>(props.baseUrl.length > 0 ? props.baseUrl : 'https://uview-plus.jiangruyi.com/h5')
+const viewerUrl = ref<string>('')
+
+const readerStyle = computed<UTSJSONObject>(() => {
+	const style = {} as UTSJSONObject
+	style['height'] = props.height
+	return style
+})
+
+const webViewStyle = computed<UTSJSONObject>(() => {
+	const style = {} as UTSJSONObject
+	style['width'] = '750rpx'
+	style['height'] = props.height
+	return style
+})
+
+function updateViewerUrl(): void {
+	const base = baseUrlInner.value.length > 0 ? baseUrlInner.value : 'https://uview-plus.jiangruyi.com/h5'
+	viewerUrl.value = base + '/static/pdfjs/web/viewer.html?file=' + encodeURIComponent(props.src)
+}
+
+watch(() => props.baseUrl, (val: string) => {
+	baseUrlInner.value = val
+	updateViewerUrl()
+})
+
+watch(() => props.src, () => {
+	updateViewerUrl()
+})
+
+onMounted(() => {
+	updateViewerUrl()
+})
 </script>
 
 <style lang="scss" scoped>	

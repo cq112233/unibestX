@@ -121,7 +121,9 @@
 	</view>
 </template>
 
-<script lang="uts">
+<script setup lang="uts">
+import { ref, computed, watch, onMounted, getCurrentInstance } from 'vue'
+
 type Point = {
 	x: number,
 	y: number
@@ -192,6 +194,16 @@ function rgbToHsl(r: number, g: number, b: number): UTSJSONObject {
 	} as UTSJSONObject
 }
 
+function hueToRgb(p: number, q: number, t: number): number {
+	let value = t
+	if (value < 0) value += 1
+	if (value > 1) value -= 1
+	if (value < 1 / 6) return p + (q - p) * 6 * value
+	if (value < 1 / 2) return q
+	if (value < 2 / 3) return p + (q - p) * (2 / 3 - value) * 6
+	return p
+}
+
 function hslToRgba(hue: number, saturation: number, lightness: number, alpha: number): string {
 	let h = hue / 360
 	let s = saturation / 100
@@ -207,16 +219,6 @@ function hslToRgba(hue: number, saturation: number, lightness: number, alpha: nu
 		b = hueToRgb(p, q, h - 1 / 3)
 	}
 	return 'rgba(' + round255(r).toString() + ', ' + round255(g).toString() + ', ' + round255(b).toString() + ', ' + alpha.toFixed(2) + ')'
-}
-
-function hueToRgb(p: number, q: number, t: number): number {
-	let value = t
-	if (value < 0) value += 1
-	if (value > 1) value -= 1
-	if (value < 1 / 6) return p + (q - p) * 6 * value
-	if (value < 1 / 2) return q
-	if (value < 2 / 3) return p + (q - p) * (2 / 3 - value) * 6
-	return p
 }
 
 function parseSolidColorToState(color: string): UTSJSONObject {
@@ -249,416 +251,460 @@ function createGradientColor(color: string, percent: number): GradientColor {
 	} as GradientColor
 }
 
-export default {
-	name: 'up-color-picker',
-	props: {
-		modelValue: {
-			type: String,
-			default: '#ff0000'
-		},
-		commonColors: {
-			type: Array,
-			default(): Array<string> {
-				return [] as Array<string>
-			}
-		}
+defineOptions({
+	name: 'up-color-picker'
+})
+
+const props = defineProps({
+	modelValue: {
+		type: String,
+		default: '#ff0000'
 	},
-	emits: ['update:modelValue', 'confirm', 'close'],
-	data() {
-		return {
-			show: false,
-			colorTypeIndex: 0,
-			hue: 0,
-			saturation: 100,
-			lightness: 50,
-			alpha: 1,
-			saturationPosition: { x: 150, y: 0 } as Point,
-			huePosition: 0,
-			alphaPosition: 300,
-			gradientColors: [
-				createGradientColor('#ff0000', 0),
-				createGradientColor('#0000ff', 1)
-			] as Array<GradientColor>,
-			currentDirectionValue: 'to right',
-			currentColor: '#ff0000',
-			draggingPointerIndex: -1,
-			directionPointer: { x: 40, y: 20 } as Point,
-			editingGradientIndex: -1,
-			previewType: 'solid'
-		}
-	},
-	computed: {
-		normalizedCommonColors(): Array<string> {
-			const colors = this.commonColors as Array<string> | null
-			if (colors != null && colors.length > 0) {
-				return colors
+	commonColors: {
+		type: Array as PropType<Array<string>>,
+		default: () => [] as Array<string>
+	}
+})
+
+const emit = defineEmits(['update:modelValue', 'confirm', 'close'])
+const instance = getCurrentInstance()
+
+const show = ref<boolean>(false)
+const colorTypeIndex = ref<number>(0)
+const hue = ref<number>(0)
+const saturation = ref<number>(100)
+const lightness = ref<number>(50)
+const alpha = ref<number>(1)
+const saturationPosition = ref<Point>({ x: 150, y: 0 } as Point)
+const huePosition = ref<number>(0)
+const alphaPosition = ref<number>(300)
+const gradientColors = ref<Array<GradientColor>>([
+	createGradientColor('#ff0000', 0),
+	createGradientColor('#0000ff', 1)
+] as Array<GradientColor>)
+const currentDirectionValue = ref<string>('to right')
+const currentColor = ref<string>('#ff0000')
+const draggingPointerIndex = ref<number>(-1)
+const directionPointer = ref<Point>({ x: 40, y: 20 } as Point)
+const editingGradientIndex = ref<number>(-1)
+const previewType = ref<string>('solid')
+
+const normalizedCommonColors = computed<Array<string>>(() => {
+	const colors = props.commonColors
+	if (colors.length > 0) {
+		return colors
+	}
+	return defaultColors()
+})
+
+const triggerStyle = computed<UTSJSONObject>(() => {
+	return {
+		backgroundColor: props.modelValue
+	} as UTSJSONObject
+})
+
+function gradientStyleText(): string {
+	let colors = ''
+	const gColors = gradientColors.value
+	for (let i = 0; i < gColors.length; i++) {
+		if (i > 0) colors += ', '
+		colors += gColors[i].color + ' ' + Math.round(gColors[i].percent * 100).toString() + '%'
+	}
+	return 'linear-gradient(' + currentDirectionValue.value + ', ' + colors + ')'
+}
+
+const displayColor = computed<string>(() => {
+	if (previewType.value == 'gradient') {
+		return gradientStyleText()
+	}
+	if (previewType.value == 'gradient-point' && editingGradientIndex.value >= 0 && editingGradientIndex.value < gradientColors.value.length) {
+		return gradientColors.value[editingGradientIndex.value].color
+	}
+	return currentColor.value
+})
+
+const previewStyle = computed<UTSJSONObject>(() => {
+	return {
+		background: displayColor.value,
+		backgroundColor: displayColor.value
+	} as UTSJSONObject
+})
+
+const saturationStyle = computed<UTSJSONObject>(() => {
+	return {
+		backgroundColor: 'hsl(' + hue.value.toString() + ', 100%, 50%)'
+	} as UTSJSONObject
+})
+
+const saturationPointerStyle = computed<UTSJSONObject>(() => {
+	return {
+		left: saturationPosition.value.x.toString() + 'px',
+		top: saturationPosition.value.y.toString() + 'px'
+	} as UTSJSONObject
+})
+
+const huePointerStyle = computed<UTSJSONObject>(() => {
+	return {
+		left: huePosition.value.toString() + 'px'
+	} as UTSJSONObject
+})
+
+const alphaPointerStyle = computed<UTSJSONObject>(() => {
+	return {
+		left: alphaPosition.value.toString() + 'px'
+	} as UTSJSONObject
+})
+
+const gradientTrackStyle = computed<UTSJSONObject>(() => {
+	return {
+		background: gradientStyleText()
+	} as UTSJSONObject
+})
+
+const directionPointerStyle = computed<UTSJSONObject>(() => {
+	return {
+		left: directionPointer.value.x.toString() + 'px',
+		top: directionPointer.value.y.toString() + 'px'
+	} as UTSJSONObject
+})
+
+function getGradientPointerStyle(item: GradientColor): UTSJSONObject {
+	return {
+		left: (item.percent * 300).toString() + 'px'
+	} as UTSJSONObject
+}
+
+function getGradientPointerInnerStyle(item: GradientColor): UTSJSONObject {
+	return {
+		backgroundColor: item.color
+	} as UTSJSONObject
+}
+
+function getColorStyle(color: string): UTSJSONObject {
+	return {
+		backgroundColor: color
+	} as UTSJSONObject
+}
+
+function parseSolidColor(color: string): void {
+	const state = parseSolidColorToState(color)
+	hue.value = state['h'] as number
+	saturation.value = state['s'] as number
+	lightness.value = state['l'] as number
+	alpha.value = 1
+	huePosition.value = hue.value / 360 * 300
+	saturationPosition.value = {
+		x: saturation.value / 100 * 300,
+		y: (100 - lightness.value) / 100 * 150
+	} as Point
+	alphaPosition.value = 300
+	currentColor.value = color
+}
+
+function parseGradientColor(gradient: string): void {
+	currentColor.value = gradient
+	const colors = [] as Array<GradientColor>
+	const firstHash = gradient.indexOf('#')
+	if (firstHash >= 0 && gradient.length >= firstHash + 7) {
+		colors.push(createGradientColor(gradient.substring(firstHash, firstHash + 7), 0))
+	}
+	const secondHash = gradient.indexOf('#', firstHash + 1)
+	if (secondHash >= 0 && gradient.length >= secondHash + 7) {
+		colors.push(createGradientColor(gradient.substring(secondHash, secondHash + 7), 1))
+	}
+	if (colors.length >= 2) {
+		gradientColors.value = colors
+	}
+}
+
+function getDirectionAngle(direction: string): number {
+	if (direction == 'to bottom') return 90
+	if (direction == 'to left') return 180
+	if (direction == 'to top') return 270
+	if (direction == 'to bottom right') return 45
+	if (direction == 'to bottom left') return 135
+	return 0
+}
+
+function setDirectionPointerByAngle(angle: number): void {
+	const radius = 20
+	const radian = angle * Math.PI / 180
+	directionPointer.value = {
+		x: radius * Math.cos(radian) + 20,
+		y: radius * Math.sin(radian) + 20
+	} as Point
+}
+
+function initColor(color: string): void {
+	if (color.includes('linear-gradient')) {
+		colorTypeIndex.value = 1
+		parseGradientColor(color)
+		previewType.value = 'gradient'
+	} else {
+		colorTypeIndex.value = 0
+		parseSolidColor(color)
+		previewType.value = 'solid'
+	}
+	setDirectionPointerByAngle(getDirectionAngle(currentDirectionValue.value))
+}
+
+function open(): void {
+	initColor(props.modelValue)
+	show.value = true
+}
+
+function close(): void {
+	show.value = false
+	emit('close')
+}
+
+function confirm(): void {
+	const color = colorTypeIndex.value == 1 ? gradientStyleText() : currentColor.value
+	emit('update:modelValue', color)
+	emit('confirm', color)
+	show.value = false
+	editingGradientIndex.value = -1
+	previewType.value = colorTypeIndex.value == 0 ? 'solid' : 'gradient'
+	emit('close')
+}
+
+function changeColorType(index: number): void {
+	colorTypeIndex.value = index
+	previewType.value = index == 0 ? 'solid' : 'gradient'
+	if (index == 0 && currentColor.value.includes('linear-gradient')) {
+		currentColor.value = gradientColors.value[0].color
+		parseSolidColor(currentColor.value)
+	}
+}
+
+function selectCommonColor(color: string): void {
+	if (colorTypeIndex.value == 1 && editingGradientIndex.value >= 0 && editingGradientIndex.value < gradientColors.value.length) {
+		gradientColors.value[editingGradientIndex.value].color = color
+		currentColor.value = color
+		previewType.value = 'gradient-point'
+	} else {
+		parseSolidColor(color)
+		previewType.value = 'solid'
+	}
+}
+
+function openColorPickerForGradient(index: number): void {
+	if (index < 0 || index >= gradientColors.value.length) return
+	editingGradientIndex.value = index
+	currentColor.value = gradientColors.value[index].color
+	parseSolidColor(currentColor.value)
+	colorTypeIndex.value = 1
+	previewType.value = 'gradient-point'
+}
+
+function sortGradientColors(): void {
+	const gColors = gradientColors.value
+	for (let i = 0; i < gColors.length - 1; i++) {
+		for (let j = i + 1; j < gColors.length; j++) {
+			if (gColors[i].percent > gColors[j].percent) {
+				const temp = gColors[i]
+				gColors[i] = gColors[j]
+				gColors[j] = temp
 			}
-			return defaultColors()
-		},
-		triggerStyle(): UTSJSONObject {
-			return {
-				backgroundColor: this.modelValue
-			} as UTSJSONObject
-		},
-		displayColor(): string {
-			if (this.previewType == 'gradient') {
-				return this.gradientStyleText()
-			}
-			if (this.previewType == 'gradient-point' && this.editingGradientIndex >= 0 && this.editingGradientIndex < this.gradientColors.length) {
-				return this.gradientColors[this.editingGradientIndex].color
-			}
-			return this.currentColor
-		},
-		previewStyle(): UTSJSONObject {
-			return {
-				background: this.displayColor,
-				backgroundColor: this.displayColor
-			} as UTSJSONObject
-		},
-		saturationStyle(): UTSJSONObject {
-			return {
-				backgroundColor: 'hsl(' + this.hue.toString() + ', 100%, 50%)'
-			} as UTSJSONObject
-		},
-		saturationPointerStyle(): UTSJSONObject {
-			return {
-				left: this.saturationPosition.x.toString() + 'px',
-				top: this.saturationPosition.y.toString() + 'px'
-			} as UTSJSONObject
-		},
-		huePointerStyle(): UTSJSONObject {
-			return {
-				left: this.huePosition.toString() + 'px'
-			} as UTSJSONObject
-		},
-		alphaPointerStyle(): UTSJSONObject {
-			return {
-				left: this.alphaPosition.toString() + 'px'
-			} as UTSJSONObject
-		},
-		gradientTrackStyle(): UTSJSONObject {
-			return {
-				background: this.gradientStyleText()
-			} as UTSJSONObject
-		},
-		directionPointerStyle(): UTSJSONObject {
-			return {
-				left: this.directionPointer.x.toString() + 'px',
-				top: this.directionPointer.y.toString() + 'px'
-			} as UTSJSONObject
-		}
-	},
-	watch: {
-		modelValue(newVal: string) {
-			if (!this.show) {
-				this.initColor(newVal)
-			}
-		}
-	},
-	mounted(): void {
-		this.initColor(this.modelValue)
-	},
-	methods: {
-		open(): void {
-			this.initColor(this.modelValue)
-			this.show = true
-		},
-		close(): void {
-			this.show = false
-			this.$emit('close')
-		},
-		confirm(): void {
-			const color = this.colorTypeIndex == 1 ? this.gradientStyleText() : this.currentColor
-			this.$emit('update:modelValue', color)
-			this.$emit('confirm', color)
-			this.show = false
-			this.editingGradientIndex = -1
-			this.previewType = this.colorTypeIndex == 0 ? 'solid' : 'gradient'
-			this.$emit('close')
-		},
-		initColor(color: string): void {
-			if (color.includes('linear-gradient')) {
-				this.colorTypeIndex = 1
-				this.parseGradientColor(color)
-				this.previewType = 'gradient'
-			} else {
-				this.colorTypeIndex = 0
-				this.parseSolidColor(color)
-				this.previewType = 'solid'
-			}
-			this.setDirectionPointerByAngle(this.getDirectionAngle(this.currentDirectionValue))
-		},
-		parseSolidColor(color: string): void {
-			const state = parseSolidColorToState(color)
-			this.hue = state['h'] as number
-			this.saturation = state['s'] as number
-			this.lightness = state['l'] as number
-			this.alpha = 1
-			this.huePosition = this.hue / 360 * 300
-			this.saturationPosition = {
-				x: this.saturation / 100 * 300,
-				y: (100 - this.lightness) / 100 * 150
-			} as Point
-			this.alphaPosition = 300
-			this.currentColor = color
-		},
-		parseGradientColor(gradient: string): void {
-			this.currentColor = gradient
-			const colors = [] as Array<GradientColor>
-			const firstHash = gradient.indexOf('#')
-			if (firstHash >= 0 && gradient.length >= firstHash + 7) {
-				colors.push(createGradientColor(gradient.substring(firstHash, firstHash + 7), 0))
-			}
-			const secondHash = gradient.indexOf('#', firstHash + 1)
-			if (secondHash >= 0 && gradient.length >= secondHash + 7) {
-				colors.push(createGradientColor(gradient.substring(secondHash, secondHash + 7), 1))
-			}
-			if (colors.length >= 2) {
-				this.gradientColors = colors
-			}
-		},
-		changeColorType(index: number): void {
-			this.colorTypeIndex = index
-			this.previewType = index == 0 ? 'solid' : 'gradient'
-			if (index == 0 && this.currentColor.includes('linear-gradient')) {
-				this.currentColor = this.gradientColors[0].color
-				this.parseSolidColor(this.currentColor)
-			}
-		},
-		gradientStyleText(): string {
-			let colors = ''
-			for (let i = 0; i < this.gradientColors.length; i++) {
-				if (i > 0) colors += ', '
-				colors += this.gradientColors[i].color + ' ' + Math.round(this.gradientColors[i].percent * 100).toString() + '%'
-			}
-			return 'linear-gradient(' + this.currentDirectionValue + ', ' + colors + ')'
-		},
-		getGradientPointerStyle(item: GradientColor): UTSJSONObject {
-			return {
-				left: (item.percent * 300).toString() + 'px'
-			} as UTSJSONObject
-		},
-		getGradientPointerInnerStyle(item: GradientColor): UTSJSONObject {
-			return {
-				backgroundColor: item.color
-			} as UTSJSONObject
-		},
-		selectCommonColor(color: string): void {
-			if (this.colorTypeIndex == 1 && this.editingGradientIndex >= 0 && this.editingGradientIndex < this.gradientColors.length) {
-				this.gradientColors[this.editingGradientIndex].color = color
-				this.currentColor = color
-				this.previewType = 'gradient-point'
-			} else {
-				this.parseSolidColor(color)
-				this.previewType = 'solid'
-			}
-		},
-		getColorStyle(color: string): UTSJSONObject {
-			return {
-				backgroundColor: color
-			} as UTSJSONObject
-		},
-		openColorPickerForGradient(index: number): void {
-			if (index < 0 || index >= this.gradientColors.length) return
-			this.editingGradientIndex = index
-			this.currentColor = this.gradientColors[index].color
-			this.parseSolidColor(this.currentColor)
-			this.colorTypeIndex = 1
-			this.previewType = 'gradient-point'
-		},
-		addGradientColor(): void {
-			if (this.gradientColors.length >= 5) return
-			this.gradientColors.push(createGradientColor(this.currentColor, 1))
-			this.sortGradientColors()
-		},
-		removeEditingGradientColor(): void {
-			if (this.gradientColors.length <= 2) return
-			if (this.editingGradientIndex < 0 || this.editingGradientIndex >= this.gradientColors.length) return
-			this.gradientColors.splice(this.editingGradientIndex, 1)
-			this.editingGradientIndex = -1
-			this.previewType = 'gradient'
-		},
-		onPointerTouchStart(index: number): void {
-			this.draggingPointerIndex = index
-			this.editingGradientIndex = index
-			this.currentColor = this.gradientColors[index].color
-			this.previewType = 'gradient-point'
-		},
-		onPointerTouchMove(e: UniTouchEvent): void {
-			if (this.draggingPointerIndex < 0 || this.draggingPointerIndex >= this.gradientColors.length) return
-			const touch = touchPoint(e)
-			if (touch == null) return
-			this.updateTrackPercent(touch.clientX)
-		},
-		onPointerTouchEnd(): void {
-			this.draggingPointerIndex = -1
-		},
-		updateTrackPercent(clientX: number): void {
-			uni.createSelectorQuery()
-				.in(this)
-				.select('.up-color-picker__gradient-track')
-				.boundingClientRect()
-				.exec((res: Array<any>) => {
-					if (res.length == 0 || res[0] == null) return
-					const rect = res[0] as UTSJSONObject
-					const left = rect['left'] as number
-					const width = rect['width'] as number
-					const percent = clamp((clientX - left) / width, 0, 1)
-					this.gradientColors[this.draggingPointerIndex].percent = percent
-					this.sortGradientColors()
-				})
-		},
-		sortGradientColors(): void {
-			for (let i = 0; i < this.gradientColors.length - 1; i++) {
-				for (let j = i + 1; j < this.gradientColors.length; j++) {
-					if (this.gradientColors[i].percent > this.gradientColors[j].percent) {
-						const temp = this.gradientColors[i]
-						this.gradientColors[i] = this.gradientColors[j]
-						this.gradientColors[j] = temp
-					}
-				}
-			}
-		},
-		onSaturationTouchStart(e: UniTouchEvent): void { this.updateSaturationPosition(e) },
-		onSaturationTouchMove(e: UniTouchEvent): void { this.updateSaturationPosition(e) },
-		onSaturationTouchEnd(e: UniTouchEvent): void { this.updateSaturationPosition(e) },
-		onHueTouchStart(e: UniTouchEvent): void { this.updateHuePosition(e) },
-		onHueTouchMove(e: UniTouchEvent): void { this.updateHuePosition(e) },
-		onHueTouchEnd(e: UniTouchEvent): void { this.updateHuePosition(e) },
-		onAlphaTouchStart(e: UniTouchEvent): void { this.updateAlphaPosition(e) },
-		onAlphaTouchMove(e: UniTouchEvent): void { this.updateAlphaPosition(e) },
-		onAlphaTouchEnd(e: UniTouchEvent): void { this.updateAlphaPosition(e) },
-		updateSaturationPosition(e: UniTouchEvent): void {
-			const touch = touchPoint(e)
-			if (touch == null) return
-			uni.createSelectorQuery()
-				.in(this)
-				.select('.up-color-picker__saturation')
-				.boundingClientRect()
-				.exec((res: Array<any>) => {
-					if (res.length == 0 || res[0] == null) return
-					const rect = res[0] as UTSJSONObject
-					const left = rect['left'] as number
-					const top = rect['top'] as number
-					const width = rect['width'] as number
-					const height = rect['height'] as number
-					const x = clamp(touch.clientX - left, 0, width)
-					const y = clamp(touch.clientY - top, 0, height)
-					this.saturationPosition = { x, y } as Point
-					this.saturation = x / width * 100
-					this.lightness = 100 - y / height * 100
-					this.updateSolidColor()
-				})
-		},
-		updateHuePosition(e: UniTouchEvent): void {
-			const touch = touchPoint(e)
-			if (touch == null) return
-			uni.createSelectorQuery()
-				.in(this)
-				.select('.up-color-picker__hue')
-				.boundingClientRect()
-				.exec((res: Array<any>) => {
-					if (res.length == 0 || res[0] == null) return
-					const rect = res[0] as UTSJSONObject
-					const left = rect['left'] as number
-					const width = rect['width'] as number
-					const x = clamp(touch.clientX - left, 0, width)
-					this.huePosition = x
-					this.hue = Math.round(x / width * 360)
-					this.updateSolidColor()
-				})
-		},
-		updateAlphaPosition(e: UniTouchEvent): void {
-			const touch = touchPoint(e)
-			if (touch == null) return
-			uni.createSelectorQuery()
-				.in(this)
-				.select('.up-color-picker__alpha')
-				.boundingClientRect()
-				.exec((res: Array<any>) => {
-					if (res.length == 0 || res[0] == null) return
-					const rect = res[0] as UTSJSONObject
-					const left = rect['left'] as number
-					const width = rect['width'] as number
-					const x = clamp(touch.clientX - left, 0, width)
-					this.alphaPosition = x
-					this.alpha = x / width
-					this.updateSolidColor()
-				})
-		},
-		updateSolidColor(): void {
-			const color = hslToRgba(this.hue, this.saturation, this.lightness, this.alpha)
-			if (this.colorTypeIndex == 1 && this.editingGradientIndex >= 0 && this.editingGradientIndex < this.gradientColors.length) {
-				this.gradientColors[this.editingGradientIndex].color = color
-				this.currentColor = color
-				this.previewType = 'gradient-point'
-			} else {
-				this.currentColor = color
-				this.previewType = 'solid'
-			}
-		},
-		onDirectionTouchStart(e: UniTouchEvent): void { this.updateDirection(e) },
-		onDirectionTouchMove(e: UniTouchEvent): void { this.updateDirection(e) },
-		onDirectionTouchEnd(e: UniTouchEvent): void { this.updateDirection(e) },
-		updateDirection(e: UniTouchEvent): void {
-			const touch = touchPoint(e)
-			if (touch == null) return
-			uni.createSelectorQuery()
-				.in(this)
-				.select('.up-color-picker__direction-circle')
-				.boundingClientRect()
-				.exec((res: Array<any>) => {
-					if (res.length == 0 || res[0] == null) return
-					const rect = res[0] as UTSJSONObject
-					const left = rect['left'] as number
-					const top = rect['top'] as number
-					const width = rect['width'] as number
-					const height = rect['height'] as number
-					const centerX = left + width / 2
-					const centerY = top + height / 2
-					const x = touch.clientX - centerX
-					const y = touch.clientY - centerY
-					const distance = Math.sqrt(x * x + y * y)
-					const radius = width / 2
-					const ratio = distance > radius ? radius / distance : 1
-					this.directionPointer = {
-						x: x * ratio + width / 2,
-						y: y * ratio + height / 2
-					} as Point
-					let angle = Math.atan2(y, x) * 180 / Math.PI
-					if (angle < 0) angle += 360
-					this.updateGradientDirection(angle)
-				})
-		},
-		updateGradientDirection(angle: number): void {
-			if (angle >= 315 || angle < 45) {
-				this.currentDirectionValue = 'to right'
-			} else if (angle >= 45 && angle < 135) {
-				this.currentDirectionValue = 'to bottom'
-			} else if (angle >= 135 && angle < 225) {
-				this.currentDirectionValue = 'to left'
-			} else {
-				this.currentDirectionValue = 'to top'
-			}
-		},
-		getDirectionAngle(direction: string): number {
-			if (direction == 'to bottom') return 90
-			if (direction == 'to left') return 180
-			if (direction == 'to top') return 270
-			if (direction == 'to bottom right') return 45
-			if (direction == 'to bottom left') return 135
-			return 0
-		},
-		setDirectionPointerByAngle(angle: number): void {
-			const radius = 20
-			const radian = angle * Math.PI / 180
-			this.directionPointer = {
-				x: radius * Math.cos(radian) + 20,
-				y: radius * Math.sin(radian) + 20
-			} as Point
 		}
 	}
 }
+
+function addGradientColor(): void {
+	if (gradientColors.value.length >= 5) return
+	gradientColors.value.push(createGradientColor(currentColor.value, 1))
+	sortGradientColors()
+}
+
+function removeEditingGradientColor(): void {
+	if (gradientColors.value.length <= 2) return
+	if (editingGradientIndex.value < 0 || editingGradientIndex.value >= gradientColors.value.length) return
+	gradientColors.value.splice(editingGradientIndex.value, 1)
+	editingGradientIndex.value = -1
+	previewType.value = 'gradient'
+}
+
+function updateTrackPercent(clientX: number): void {
+	uni.createSelectorQuery()
+		.in(instance?.proxy)
+		.select('.up-color-picker__gradient-track')
+		.boundingClientRect()
+		.exec((res: Array<any>) => {
+			if (res.length == 0 || res[0] == null) return
+			const rect = res[0] as UTSJSONObject
+			const left = rect['left'] as number
+			const width = rect['width'] as number
+			const percent = clamp((clientX - left) / width, 0, 1)
+			gradientColors.value[draggingPointerIndex.value].percent = percent
+			sortGradientColors()
+		})
+}
+
+function onPointerTouchStart(index: number): void {
+	draggingPointerIndex.value = index
+	editingGradientIndex.value = index
+	currentColor.value = gradientColors.value[index].color
+	previewType.value = 'gradient-point'
+}
+
+function onPointerTouchMove(e: UniTouchEvent): void {
+	if (draggingPointerIndex.value < 0 || draggingPointerIndex.value >= gradientColors.value.length) return
+	const touch = touchPoint(e)
+	if (touch == null) return
+	updateTrackPercent(touch.clientX)
+}
+
+function onPointerTouchEnd(): void {
+	draggingPointerIndex.value = -1
+}
+
+function updateSolidColor(): void {
+	const color = hslToRgba(hue.value, saturation.value, lightness.value, alpha.value)
+	if (colorTypeIndex.value == 1 && editingGradientIndex.value >= 0 && editingGradientIndex.value < gradientColors.value.length) {
+		gradientColors.value[editingGradientIndex.value].color = color
+		currentColor.value = color
+		previewType.value = 'gradient-point'
+	} else {
+		currentColor.value = color
+		previewType.value = 'solid'
+	}
+}
+
+function updateSaturationPosition(e: UniTouchEvent): void {
+	const touch = touchPoint(e)
+	if (touch == null) return
+	uni.createSelectorQuery()
+		.in(instance?.proxy)
+		.select('.up-color-picker__saturation')
+		.boundingClientRect()
+		.exec((res: Array<any>) => {
+			if (res.length == 0 || res[0] == null) return
+			const rect = res[0] as UTSJSONObject
+			const left = rect['left'] as number
+			const top = rect['top'] as number
+			const width = rect['width'] as number
+			const height = rect['height'] as number
+			const x = clamp(touch.clientX - left, 0, width)
+			const y = clamp(touch.clientY - top, 0, height)
+			saturationPosition.value = { x, y } as Point
+			saturation.value = x / width * 100
+			lightness.value = 100 - y / height * 100
+			updateSolidColor()
+		})
+}
+
+function onSaturationTouchStart(e: UniTouchEvent): void { updateSaturationPosition(e) }
+function onSaturationTouchMove(e: UniTouchEvent): void { updateSaturationPosition(e) }
+function onSaturationTouchEnd(e: UniTouchEvent): void { updateSaturationPosition(e) }
+
+function updateHuePosition(e: UniTouchEvent): void {
+	const touch = touchPoint(e)
+	if (touch == null) return
+	uni.createSelectorQuery()
+		.in(instance?.proxy)
+		.select('.up-color-picker__hue')
+		.boundingClientRect()
+		.exec((res: Array<any>) => {
+			if (res.length == 0 || res[0] == null) return
+			const rect = res[0] as UTSJSONObject
+			const left = rect['left'] as number
+			const width = rect['width'] as number
+			const x = clamp(touch.clientX - left, 0, width)
+			huePosition.value = x
+			hue.value = Math.round(x / width * 360)
+			updateSolidColor()
+		})
+}
+
+function onHueTouchStart(e: UniTouchEvent): void { updateHuePosition(e) }
+function onHueTouchMove(e: UniTouchEvent): void { updateHuePosition(e) }
+function onHueTouchEnd(e: UniTouchEvent): void { updateHuePosition(e) }
+
+function updateAlphaPosition(e: UniTouchEvent): void {
+	const touch = touchPoint(e)
+	if (touch == null) return
+	uni.createSelectorQuery()
+		.in(instance?.proxy)
+		.select('.up-color-picker__alpha')
+		.boundingClientRect()
+		.exec((res: Array<any>) => {
+			if (res.length == 0 || res[0] == null) return
+			const rect = res[0] as UTSJSONObject
+			const left = rect['left'] as number
+			const width = rect['width'] as number
+			const x = clamp(touch.clientX - left, 0, width)
+			alphaPosition.value = x
+			alpha.value = x / width
+			updateSolidColor()
+		})
+}
+
+function onAlphaTouchStart(e: UniTouchEvent): void { updateAlphaPosition(e) }
+function onAlphaTouchMove(e: UniTouchEvent): void { updateAlphaPosition(e) }
+function onAlphaTouchEnd(e: UniTouchEvent): void { updateAlphaPosition(e) }
+
+function updateGradientDirection(angle: number): void {
+	if (angle >= 315 || angle < 45) {
+		currentDirectionValue.value = 'to right'
+	} else if (angle >= 45 && angle < 135) {
+		currentDirectionValue.value = 'to bottom'
+	} else if (angle >= 135 && angle < 225) {
+		currentDirectionValue.value = 'to left'
+	} else {
+		currentDirectionValue.value = 'to top'
+	}
+}
+
+function updateDirection(e: UniTouchEvent): void {
+	const touch = touchPoint(e)
+	if (touch == null) return
+	uni.createSelectorQuery()
+		.in(instance?.proxy)
+		.select('.up-color-picker__direction-circle')
+		.boundingClientRect()
+		.exec((res: Array<any>) => {
+			if (res.length == 0 || res[0] == null) return
+			const rect = res[0] as UTSJSONObject
+			const left = rect['left'] as number
+			const top = rect['top'] as number
+			const width = rect['width'] as number
+			const height = rect['height'] as number
+			const centerX = left + width / 2
+			const centerY = top + height / 2
+			const x = touch.clientX - centerX
+			const y = touch.clientY - centerY
+			const distance = Math.sqrt(x * x + y * y)
+			const radius = width / 2
+			const ratio = distance > radius ? radius / distance : 1
+			directionPointer.value = {
+				x: x * ratio + width / 2,
+				y: y * ratio + height / 2
+			} as Point
+			let angle = Math.atan2(y, x) * 180 / Math.PI
+			if (angle < 0) angle += 360
+			updateGradientDirection(angle)
+		})
+}
+
+function onDirectionTouchStart(e: UniTouchEvent): void { updateDirection(e) }
+function onDirectionTouchMove(e: UniTouchEvent): void { updateDirection(e) }
+function onDirectionTouchEnd(e: UniTouchEvent): void { updateDirection(e) }
+
+watch(() => props.modelValue, (newVal: string) => {
+	if (!show.value) {
+		initColor(newVal)
+	}
+})
+
+onMounted(() => {
+	initColor(props.modelValue)
+})
+
+defineExpose({
+	open,
+	close,
+	confirm
+})
 </script>
 
 <style lang="scss" scoped>
@@ -666,7 +712,9 @@ export default {
 	width: 32px;
 	height: 32px;
 	border-radius: 4px;
-	border: 1px solid #e5e5e5;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #e5e5e5;
 }
 
 .up-color-picker__content {
@@ -690,7 +738,9 @@ export default {
 	display: flex;
 	flex-direction: row;
 	margin-bottom: 18px;
-	border: 1px solid #e5e5e5;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #e5e5e5;
 	border-radius: 6px;
 	overflow: hidden;
 }
@@ -737,7 +787,9 @@ export default {
 	width: 20px;
 	height: 20px;
 	border-radius: 10px;
-	border: 2px solid #ffffff;
+	border-width: 2px;
+	border-style: solid;
+	border-color: #ffffff;
 	box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
 }
 
@@ -771,7 +823,9 @@ export default {
 	border-radius: 20px;
 	background-color: #f5f7fa;
 	position: relative;
-	border: 2px solid #eeeeee;
+	border-width: 2px;
+	border-style: solid;
+	border-color: #eeeeee;
 }
 
 .up-color-picker__direction-pointer {
@@ -779,7 +833,9 @@ export default {
 	width: 8px;
 	height: 8px;
 	background-color: #ffffff;
-	border: 2px solid #333333;
+	border-width: 2px;
+	border-style: solid;
+	border-color: #333333;
 	border-radius: 4px;
 	transform: translate(-4px, -4px);
 }
@@ -819,7 +875,9 @@ export default {
 	position: absolute;
 	width: 12px;
 	height: 12px;
-	border: 2px solid #ffffff;
+	border-width: 2px;
+	border-style: solid;
+	border-color: #ffffff;
 	border-radius: 6px;
 	transform: translate(-6px, -6px);
 	box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
@@ -862,7 +920,9 @@ export default {
 	width: 4px;
 	height: 16px;
 	background-color: #ffffff;
-	border: 1px solid #cccccc;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #cccccc;
 	border-radius: 2px;
 	transform: translateX(-2px);
 	top: -2px;
@@ -891,7 +951,9 @@ export default {
 	border-radius: 12px;
 	margin-right: 10px;
 	margin-bottom: 10px;
-	border: 1px solid #eeeeee;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #eeeeee;
 }
 
 .up-color-picker__footer {
@@ -909,7 +971,9 @@ export default {
 	width: 40px;
 	height: 40px;
 	border-radius: 4px;
-	border: 1px solid #eeeeee;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #eeeeee;
 	margin-right: 10px;
 }
 

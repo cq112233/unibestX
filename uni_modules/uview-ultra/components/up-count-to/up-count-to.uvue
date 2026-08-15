@@ -2,7 +2,7 @@
 	<text
 		class="up-count-num"
 		:style="{
-			fontSize: $up.addUnit(fontSize),
+			fontSize: addUnit(fontSize),
 			fontWeight: bold ? 'bold' : 'normal',
 			color: color
 		}"
@@ -38,47 +38,47 @@ import defProps from './countTo';
 const props = defineProps({
 	startVal: {
 		type: [String, Number],
-		default: defProps.getNumber('countTo.startVal')
+		default: 0
 	},
 	endVal: {
 		type: [String, Number],
-		default: defProps.getNumber('countTo.endVal')
+		default: 0
 	},
 	duration: {
 		type: [String, Number],
-		default: defProps.getNumber('countTo.duration')
+		default: 2000
 	},
 	autoplay: {
 		type: Boolean,
-		default: defProps.getBoolean('countTo.autoplay')
+		default: true
 	},
 	decimals: {
 		type: [String, Number],
-		default: defProps.getNumber('countTo.decimals')
+		default: 0
 	},
 	useEasing: {
 		type: Boolean,
-		default: defProps.getBoolean('countTo.useEasing')
+		default: true
 	},
 	decimal: {
 		type: String,
-		default: defProps.getString('countTo.decimal')
+		default: '.'
 	},
 	color: {
 		type: String,
-		default: defProps.getString('countTo.color')
+		default: '#606266'
 	},
 	fontSize: {
 		type: [String, Number],
-		default: defProps.getNumber('countTo.fontSize')
+		default: 22
 	},
 	bold: {
 		type: Boolean,
-		default: defProps.getBoolean('countTo.bold')
+		default: false
 	},
 	separator: {
 		type: String,
-		default: defProps.getString('countTo.separator')
+		default: ''
 	}
 });
 

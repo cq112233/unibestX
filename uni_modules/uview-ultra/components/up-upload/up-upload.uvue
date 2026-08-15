@@ -110,12 +110,6 @@
 							class="up-upload__success"
 							v-if="item.status === 'success'"
 						>
-							<!-- #ifdef APP-NVUE -->
-							<image
-								:src="successIcon"
-								class="up-upload__success__icon"
-							></image>
-							<!-- #endif -->
 							<view class="up-upload__success__icon">
 								<up-icon
 									name="checkmark"
@@ -158,14 +152,12 @@
 					    :color="uploadIconColor"
 					></up-icon>
 					<text
-					    v-if="uploadText"
+					    v-if="uploadText != ''"
 					    class="up-upload__button__text"
 					>{{ uploadText }}</text>
 				</view>
 			</template>
 		</view>
-		<canvas id="myCanvas" type="2d"
-			style="width: 100px; height: 150px;display: none;"></canvas>
 		<up-popup
 			mode="center"
 			v-model:show="popupShow">
@@ -175,741 +167,391 @@
 				:object-fit='videoPreviewObjectFit' show-fullscreen-btn='true'
 				enable-play-gesture controls
 				:autoplay="true" auto-pause-if-open-native
-				todoloadedmetadata="loadedVideoMetadata"
 				:initial-time='0.1'>
 			</video>
 		</up-popup>
 	</view>
 </template>
 
-<script lang="uts">
-	import type { PropType } from 'vue';
-	import {
-		chooseFile
-	} from './utils.uts';
-	import { mixinUpload } from './mixin.uts';
-	import { mpMixin } from '../../libs/mixin/mpMixin.uts';
-	import { mixin } from '../../libs/mixin/mixin.uts';
-	import { addStyle, addUnit, toast } from '../../libs/function/index.uts';
-	import { func as testFunc, promise as testPromise,
-		image as testImage, video as testVideo } from '../../libs/function/test.uts';
-	import { t as $t } from '../../libs/i18n/index.uts'
-	/**
-	 * upload 上传
-	 * @description 该组件用于上传图片场景
-	 * @tutorial https://uview-plus.jiangruyi.com/components/upload.html
-	 * @property {String}			accept				接受的文件类型, 可选值为all media image file video （默认 'image' ）
-	 * @property {String | Array}	capture				图片或视频拾取模式，当accept为image类型时设置capture可选额外camera可以直接调起摄像头（默认 ['album', 'camera'] ）
-	 * @property {Array}			extension			选择文件的后缀名，暂只支持.zip、.png等，不支持application/msword等值
-	 * @property {Boolean}			compressed			当accept为video时生效，是否压缩视频，默认为true（默认 true ）
-	 * @property {String}			camera				当accept为video时生效，可选值为back或front（默认 'back' ）
-	 * @property {Number}			maxDuration			当accept为video时生效，拍摄视频最长拍摄时间，单位秒（默认 60 ）
-	 * @property {String}			uploadIcon			上传区域的图标，只能内置图标（默认 'camera-fill' ）
-	 * @property {String}			uploadIconColor		上传区域的图标的字体颜色，只能内置图标（默认 #D3D4D6 ）
-	 * @property {Boolean}			useBeforeRead		是否开启文件读取前事件（默认 false ）
-	 * @property {Boolean}			previewFullImage	是否显示组件自带的图片预览功能（默认 true ）
-	 * @property {String | Number}	maxCount			最大上传数量（默认 52 ）
-	 * @property {Boolean}			disabled			是否启用（默认 false ）
-	 * @property {String}			imageMode			预览上传的图片时的裁剪模式，和image组件mode属性一致（默认 'aspectFill' ）
-	 * @property {String}			name				标识符，可以在回调函数的第二项参数中获取
-	 * @property {Array}			sizeType			所选的图片的尺寸, 可选值为original compressed（默认 ['original', 'compressed'] ）
-	 * @property {Boolean}			multiple			是否开启图片多选，部分安卓机型不支持 （默认 false ）
-	 * @property {Boolean}			deletable			是否展示删除按钮（默认 true ）
-	 * @property {String | Number}	maxSize				文件大小限制，单位为byte （默认 Number.MAX_VALUE ）
-	 * @property {Array}			fileList			显示已上传的文件列表
-	 * @property {String}			uploadText			上传区域的提示文字
-	 * @property {String | Number}	width				内部预览图片区域和选择图片按钮的区域宽度（默认 80 ）
-	 * @property {String | Number}	height				内部预览图片区域和选择图片按钮的区域高度（默认 80 ）
-	 * @property {Object}			customStyle			组件的样式，对象形式
-	 * @event {Function} afterRead		读取后的处理函数
-	 * @event {Function} beforeRead		读取前的处理函数
-	 * @event {Function} oversize		文件超出大小限制
-	 * @event {Function} clickPreview	点击预览图片
-	 * @event {Function} delete 		删除图片
-	 * @example <up-upload :action="action" :fileList="fileList" ></up-upload>
-	 */
-	import { UPUploadListItem, UPUploadFileChoosed, UPUploadChooseFileOptions } from './types.uts'
-	type UPUploadReadCallback = (file: Array<UPUploadFileChoosed | null>, detail: UTSJSONObject) => any
-	function createStringList(values: Array<string> = [] as Array<string>): Array<string> {
-		return values
-	}
-	function createCaptureList(): Array<string> {
-		return ['album', 'camera'] as Array<string>
-	}
-	function createFileList(): Array<UTSJSONObject> {
-		return [] as Array<UTSJSONObject>
-	}
-	function createHeader(): UTSJSONObject {
-		return {} as UTSJSONObject
-	}
-	export default {
-		name: "up-upload",
-		mixins: [mpMixin, mixin, mixinUpload],
-		props: {
-			accept: {
-				type: String,
-				default: 'image'
-			},
-			extension: {
-				type: Array as PropType<Array<string>>,
-				default(): Array<string> {
-					return createStringList()
-				}
-			},
-			capture: {
-				type: [Array, String],
-				default(): Array<string> {
-					return createCaptureList()
-				}
-			},
-			compressed: {
-				type: Boolean,
-				default: true
-			},
-			camera: {
-				type: String,
-				default: 'back'
-			},
-			maxDuration: {
-				type: Number,
-				default: 60
-			},
-			uploadIcon: {
-				type: String,
-				default: 'camera-fill'
-			},
-			uploadIconColor: {
-				type: String,
-				default: '#D3D4D6'
-			},
-			useBeforeRead: {
-				type: Boolean,
-				default: false
-			},
-			afterRead: {
-				type: Function,
-				default: null
-			},
-			beforeRead: {
-				type: Function,
-				default: null
-			},
-			previewFullImage: {
-				type: Boolean,
-				default: true
-			},
-			maxCount: {
-				type: [String, Number],
-				default: 52
-			},
-			disabled: {
-				type: Boolean,
-				default: false
-			},
-			imageMode: {
-				type: String,
-				default: 'aspectFill'
-			},
-			name: {
-				type: String,
-				default: ''
-			},
-			sizeType: {
-				type: Array as PropType<Array<string>>,
-				default(): Array<string> {
-					return createStringList(['original', 'compressed'] as Array<string>)
-				}
-			},
-			multiple: {
-				type: Boolean,
-				default: false
-			},
-			deletable: {
-				type: Boolean,
-				default: true
-			},
-			maxSize: {
-				type: [String, Number],
-				default: Number.MAX_VALUE
-			},
-			fileList: {
-				type: Array as PropType<Array<UTSJSONObject>>,
-				default(): Array<UTSJSONObject> {
-					return createFileList()
-				}
-			},
-			uploadText: {
-				type: String,
-				default: ''
-			},
-			width: {
-				type: [String, Number],
-				default: 80
-			},
-			height: {
-				type: [String, Number],
-				default: 80
-			},
-			previewImage: {
-				type: Boolean,
-				default: true
-			},
-			autoDelete: {
-				type: Boolean,
-				default: false
-			},
-			autoUpload: {
-				type: Boolean,
-				default: false
-			},
-			autoUploadApi: {
-				type: String,
-				default: ''
-			},
-			autoUploadDriver: {
-				type: String,
-				default: ''
-			},
-			autoUploadAuthUrl: {
-				type: String,
-				default: ''
-			},
-			autoUploadHeader: {
-				type: Object as PropType<UTSJSONObject>,
-				default(): UTSJSONObject {
-					return createHeader()
-				}
-			},
-			getVideoThumb: {
-				type: Boolean,
-				default: false
-			},
-			customAfterAutoUpload: {
-				type: Boolean,
-				default: false
-			},
-			videoPreviewObjectFit: {
-				type: String,
-				default: 'cover'
-			}
-		},
-		data() {
-			return {
-				// #ifdef APP-NVUE
-				successIcon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAKKADAAQAAAABAAAAKAAAAAB65masAAACP0lEQVRYCc3YXygsURwH8K/dpcWyG3LF5u/6/+dKVylSypuUl6uUPMifKMWL8oKEB1EUT1KeUPdR3uTNUsSLxb2udG/cbvInNuvf2rVnazZ/ZndmZ87snjM1Z+Z3zpzfp9+Z5mEAhlvjRtZgCKs+gnPAOcAkkMOR4jEHfItjDvgRxxSQD8cM0BuOCaAvXNCBQrigAsXgggYUiwsK0B9cwIH+4gIKlIILGFAqLiBAOTjFgXJxigJp4BQD0sIpAqSJow6kjSNAFTnRaHJwLenD6Mud52VQAcrBfTd2oyq+HtGaGGWAcnAVcXWoM3bCZrdi+ncPfaAcXE5UKVpdW/vitGPqqAtn98d0gXJwX7Qp6MmegUYVhvmTIezdmHlxJCjpHRTCFerLkRRu4k0aqdajN3sWOo0BK//msHa+xDuPC/oNFMKRhTtM4xjIX0SCNpXL4+7VIaHuyiWEp2L7ahWLf8fejfPdqPmC3mJicORZUp1CQzm+GiphvljGk+PBvWRbxii+xVTj5M6CiZ/tsDufvaXyxEUDxeLIyvu3m0iOyEFWVAkydcVYdyFrE9tQk9iMq6f/GNlvwt3LjQfh60LUrw9/cFyyMJUW/XkLSNMV4Mi6C5ML+ui4x5ClAX9sB9w0wV6wglJwJCv5fOxcr6EstgbGiEw4XcfUry4cWrcEUW8n+ARKxXEJHhw2WG43UKSvwI/TSZgvl7kh0b3XLZaLEy0QmMgLZAVH7J+ALOE+AVnDvQOyiPMAWcW5gSzjCPAV+78S5WE0GrQAAAAASUVORK5CYII=',
-				// #endif
-				lists: [] as Array<UPUploadListItem>,
-				isInCount: true,
-				popupShow: false,
-				currentItemIndex: -1
-			}
-		},
-		watch: {
-			// 监听文件列表的变化，重新整理内部数据
-			fileList: {
-				handler() {
-					this.formatFileList()
-				},
-				immediate: true,
-				deep: true,
-			},
-			deletable(newVal) {
-				this.formatFileList()
-			},
-			maxCount(newVal) {
-				this.formatFileList()
-			},
-			accept(newVal) {
-				this.formatFileList()
-			},
-			popupShow(newVal) {
-				if (!newVal) {
-					this.currentItemIndex = -1;
-				}
-			}
-		},
-		// #ifdef VUE3
-		emits: ['error', 'beforeRead', 'oversize', 'afterRead', 'delete', 'clickPreview', 'update:fileList', 'afterAutoUpload'],
-		// #endif
-		methods: {
-			t(key: string) {
-				return $t(key, {} as UTSJSONObject)
-			},
-			addUnit(e: any) {
-				return addUnit(e)
-			},
-			addStyle(e: any) {
-				return addStyle(e)
-			},
-			videoErrorCallback() {},
-			loadedVideoMetadata(e: any) {
-				if (this.currentItemIndex < 0) {
-					return;
-				}
-				if (this.autoUploadDriver != 'local') {
-					return;
-				}
-				if (!this.getVideoThumb) {
-					return;
-				}
-				// 截取第一帧作为封面，oss等云存储场景直接使用拼接参数。
-				let w = this.lists[this.currentItemIndex].width;
-				let h = this.lists[this.currentItemIndex].height;
-				const dpr = uni.getSystemInfoSync().pixelRatio;
-				// TODO2026
-				// uni.createSelectorQuery().select('#myVideo').context(res => {
-				// 	console.log('select video', res)
-				// 	const myVideo = res.context
-				// 	uni.createSelectorQuery()
-				// 	  .select('#myCanvas')
-				// 	  .fields({ node: true, size: true })
-				// 	  .exec(([res]) => {
-				// 		console.log('select canvas', res)
-				// 		const ctx1 = res[0].node.getContext('2d')
-				// 		res[0].node.width = w * dpr
-				// 		res[0].node.height = h * dpr
-				// 		// Draw the first frame and export it as an image
-				// 		// myVideo.onPlay(() => {
-				// 			setTimeout(() => {
-				// 				captureFirstFrame()
-				// 			}, 500)
-				// 		// })
-				// 		const captureFirstFrame = () => {
-				// 			ctx1.drawImage(myVideo, 0, 0, w * dpr, h * dpr)
-				// 			wx.canvasToTempFilePath({
-				// 				canvas: res[0].node,
-				// 				success: (result) => {
-				// 					console.log('First frame image path:', result
-				// 						.tempFilePath)
-				// 					// Now you can use the image path (result.tempFilePath)
-				// 					this.fileList['currentItemIndex'].thumb = result.tempFilePath
-				// 				},
-				// 				fail: (err) => {
-				// 					console.error('Failed to export image:', err)
-				// 				}
-				// 			})
-				// 		}
+<script setup lang="uts">
+import { ref, watch } from 'vue'
+import { chooseFile } from './utils.uts'
+import { addStyle, addUnit, toast } from '../../libs/function/index.uts'
+import { func as testFunc, promise as testPromise, image as testImage, video as testVideo } from '../../libs/function/test.uts'
+import { t as $t } from '../../libs/i18n/index.uts'
+import { UPUploadListItem, UPUploadFileChoosed, UPUploadChooseFileOptions } from './types.uts'
 
-				// 		// Capture the first frame
-				// 		setInterval(() => {
-				// 			ctx1.drawImage(myVideo, 0, 0, w * dpr, h * dpr);
-				// 		}, 1000 / 24)
-				// 	}).exec()
-				// }).exec()
-			},
-			formatFileList() {
-				let fileList = this.fileList as UTSJSONObject[]
-				// @ts-ignore
-				let maxCount = parseInt(this.maxCount.toString())
-				let lists = [] as UPUploadListItem[]
-				fileList.forEach((item: UTSJSONObject) => {
-					const name = item['name'] != null
-						? item['name'] as string
-						: item['url'] != null ? item['url'] as string : item['thumb'] as string
-					let tmp = UTSJSONObject.assign(UTSJSONObject.assign({}, item), {
-						// 如果item.url为本地选择的blob文件的话，无法判断其为video还是image，此处优先通过accept做判断处理
-						isImage: item['name'] != null ? testImage(item['name'] as string) : (this.accept === 'image' ?? testImage(name)),
-						isVideo: item['name'] != null ? testVideo(item['name'] as string) : (this.accept === 'video' ?? testVideo(name)),
-						deletable: typeof item.deletable === 'boolean' ? item.deletable : this.deletable,
-					})
-					let tmpObj = (JSON.parse<UPUploadListItem>(JSON.stringify(tmp)))
-					if (tmpObj != null) {
-						lists.push(tmpObj!)
-					}
-				})
-				this.lists = lists
-				this.isInCount = lists.length < maxCount
-			},
-			// @tap 事件处理器，不接收事件对象参数，内部透传到 chooseFile
-			onChooseTap(): void {
-				this.chooseFile({} as UTSJSONObject)
-			},
-			chooseFile(params: UTSJSONObject): boolean {
-				let maxCount = this.maxCount as number
-				let multiple = this.multiple
-				let lists = this.lists
-				let disabled = this.disabled
-				// if (disabled) return Promise.reject({});
-				if (disabled) return false
-				const chooseParams = UTSJSONObject.assign({
-					accept: this.accept,
-					extension: this.extension,
-					multiple: this.multiple,
-					capture: this.capture,
-					compressed: this.compressed,
-					maxDuration: this.maxDuration,
-					sizeType: this.sizeType,
-					camera: this.camera,
-				}, {
-					maxCount: maxCount - lists.length,
-					...params
-				})
-				let chooseParamsObj = JSON.parseObject<UPUploadChooseFileOptions>(JSON.stringify(chooseParams))
-				if (chooseParamsObj != null) {
-					chooseFile(chooseParamsObj).then((res: Array<UPUploadFileChoosed|null>) => {
-						const result = chooseParams['multiple'] != null && chooseParams['multiple'] != false ? res : res
-						this.onBeforeRead(result);
-					})
-				}
-				return true
-				// return result
-				// .catch((error) => {
-				// 	this.$emit('error', error);
-				// });
-			},
-			// 文件读取之前
-			onBeforeRead(file: Array<UPUploadFileChoosed|null>) {
-				let beforeRead = this.beforeRead
-				let useBeforeRead = this.useBeforeRead
-				let res: any = file
-				// beforeRead是否为一个方法
-				if (beforeRead != null && testFunc(beforeRead)) {
-					// 如果用户定义了此方法，则去执行此方法，并传入读取的文件回调
-					res = (beforeRead as UPUploadReadCallback)(file, this.getDetail(null));
-				}
-				if (useBeforeRead) {
-					this.$emit(
-						'beforeRead',
-						UTSJSONObject.assign(UTSJSONObject.assign({
-							file: this.convertFileToUTSJSON(file)
-						}, this.getDetail(null)), {
-							callback: (ok: boolean) => {
-								if (ok) {
-									this.onAfterRead(file)
-								}
-							},
-						})
-					);
-					return
-				}
-				if (testPromise(res)) {
-					// res.then((data) => this.onAfterRead(data != null ? data : file));
-				} else {
-					if (typeof res == 'boolean' && !(res as boolean)) {
-						return
-					}
-					const readFile = (res != null ? res : file) as Array<UPUploadFileChoosed | null>
-					this.onAfterRead(readFile);
-				}
-			},
-			// 将 UPUploadFileChoosed 数组转换为 UTSJSONObject 数组，用于 emit 到父组件
-			convertFileToUTSJSON(file: Array<UPUploadFileChoosed | null>): Array<UTSJSONObject> {
-				const result: Array<UTSJSONObject> = []
-				file.forEach((item: UPUploadFileChoosed | null) => {
-					if (item != null) {
-						const obj = JSON.parseObject(JSON.stringify(item))
-						if (obj != null) {
-							result.push(obj)
-						}
-					}
-				})
-				return result
-			},
-			getDetail(index: number|null = null) {
-				const fileList = this.fileList as Array<UTSJSONObject>
-				return {
-					name: this.name,
-					// @ts-ignore
-					index: index == null ? fileList.length : index,
-				};
-			},
-			async onAfterRead(file: Array<UPUploadFileChoosed|null>) {
-				let maxSize = this.maxSize as number
-				let afterRead = this.afterRead
-				const fileList = this.fileList as Array<UTSJSONObject>
-				// const oversize = Array.isArray(file) ?
-				// 	file.some((item) => item.size > maxSize) :
-				// 	file.size > maxSize;
-				const even = (item: UPUploadFileChoosed|null): boolean => {
-					let tmp:number = (item != null && item.size != null) ? item.size : 0
-					return tmp > maxSize
-				}
-				const oversize = file.some(even)
-				if (oversize) {
-					uni.showToast({
-						title: $t("up.upload.sizeExceed", {} as UTSJSONObject)
-					})
-					this.$emit('oversize', UTSJSONObject.assign({
-						file: this.convertFileToUTSJSON(file)
-					}, this.getDetail(null)));
-					return;
-				}
-				// @ts-ignore
-				let len = fileList.length;
-				if (this.autoUpload) {
-					// 当设置 mutiple 为 true 时, file 为数组格式，否则为对象格式
-					let lists = ([] as UPUploadFileChoosed[]).concat(file);
-					// @ts-ignore
-					let fileListLen = fileList.length;
-					lists.map((item: UPUploadFileChoosed) => {
-						// @ts-ignore
-						const itemJSON = JSON.parseObject(JSON.stringify(item))
-						if (itemJSON != null) {
-							fileList.push(UTSJSONObject.assign(itemJSON, {
-								status: 'uploading',
-								message: $t("up.upload.uploading", {} as UTSJSONObject),
-								progress: 0
-							} as UTSJSONObject));
-						}
-					});
-					let that = this;
-					this.$emit('update:fileList', fileList);
-					for (let i = 0; i < lists.length; i++) {
-						let j = i;
-						let result = '';
-						switch(this.autoUploadDriver) {
-							case 'cos': // 腾讯云
-								break;
-							case 'kodo': // 七牛云
-								break;
-							case 'oss':
-							case 'upload_oss':
-								// 阿里云前端直传
-								// 获取签名
-								console.log()
-								let formData = {};
-								uni.request({
-									url: this.autoUploadAuthUrl,
-									method: 'GET',
-									header: this.autoUploadHeader,
-									data: {
-										filename: lists[j]['name'] as string
-									},
-									success: (ret: RequestSuccess<any>) => {
-										// console.log(ret);
-										let res0 = ret.data as UTSJSONObject;
-										if (res0['code'] as number == 200) {
-											// 路径 + 文件名 + 扩展名
-											// 不传递filename就要拼接key
-											// res0.data.params.key = res0.data.params.dir + res0.data.params.uniqidName + fileExt;
-											formData = res0!!.getAny('data.params') as UTSJSONObject;
-										} else {
-											uni.showToast({
-												title: res0['msg'] as string,
-												duration: 1500
-											});
-											return;
-										}
-										if (res0!!.getString('data.params.host') != null) {
-											var uploadTask = uni.uploadFile({
-												url: res0!!.getString('data.params.host') ?? '',
-												filePath: lists[j].url,
-												name: 'file',
-												// fileType: 'video', // 仅支付宝小程序，且必填。
-												// header: header,
-												formData: formData,
-												success: (uploadFileRes: UploadFileSuccess) => {
-													let thumb = '';
-													let uploadRes = JSON.parseObject(uploadFileRes.data);
-													result = res0!!.getString("data.params.host") + '/' + res0!!.getString("data.params.key");
-													if (that.accept === 'video' || testVideo(result)) {
-														thumb = result + '?x-oss-process=video/snapshot,t_10000,m_fast';
-													}
-													if (that.customAfterAutoUpload) {
-														that.emitAfterAutoUpload(uploadRes, len + j, result, thumb)
-													} else {
-														that.succcessUpload(len + j, result, thumb);
-													}
-												}
-											});
-											uploadTask.onProgressUpdate((res) => {
-												that.updateUpload(len + j, {
-													progress: res.progress
-												});
-												// console.log('上传进度' + res.progress);
-												// console.log('已经上传的数据长度' + res.totalBytesSent);
-												// console.log('预期需要上传的数据总长度' + res.totalBytesExpectedToSend);
-											});
-										}
-									}
-								})
-								break;
-							case 'local':
-							default:
-								// 服务器本机上传
-								var uploadTask = uni.uploadFile({
-									url: this.autoUploadApi,
-									filePath: lists[j].url,
-									name: 'file',
-									// fileType: 'video', // 仅支付宝小程序，且必填。
-									header: this.autoUploadHeader,
-									success: (uploadFileRes: UploadFileSuccess) => {
-										let res0 = JSON.parseObject(uploadFileRes.data);
-										if (that.customAfterAutoUpload) {
-											that.emitAfterAutoUpload(res0, len + j)
-										} else {
-											if (res0!!['code'] as number != 200) {
-												uni.showToast({
-													title: res0!!['msg'] as string
-												});
-											} else {
-												result = res0!!.getString('data.url') ?? '';
-												that.succcessUpload(len + j, result);
-											}
-										}
-									}
-								});
-								uploadTask.onProgressUpdate((res) => {
-									that.updateUpload(len + j, {
-										progress: res.progress
-									});
-									// console.log('上传进度' + res.progress);
-									// console.log('已经上传的数据长度' + res.totalBytesSent);
-									// console.log('预期需要上传的数据总长度' + res.totalBytesExpectedToSend);
-								});
-								break;
-						}
-					}
-				} else {
-					if (typeof afterRead === 'function') {
-						;(afterRead as UPUploadReadCallback)(file, this.getDetail(null));
-					}
-					this.$emit('afterRead', UTSJSONObject.assign({
-						file: this.convertFileToUTSJSON(file)
-					}, this.getDetail(null)));
-				}
-			},
-			emitAfterAutoUpload(res: UTSJSONObject | null, index: number, defaultUrl: string = '', defaultThumb: string = '') {
-				const payload = UTSJSONObject.assign(res != null ? res : {} as UTSJSONObject, {
-					url: defaultUrl,
-					thumb: defaultThumb,
-					callback: (r: UTSJSONObject) => {
-						const url = r.getString('url') ?? defaultUrl
-						if (url == '') {
-							return
-						}
-						const thumb = r.getString('thumb') ?? defaultThumb
-						this.succcessUpload(index, url, thumb)
-					}
-				})
-				this.$emit('afterAutoUpload', payload)
-			},
-			updateUpload(index: number, param: UTSJSONObject) {
-				const fileList = this.fileList as Array<UTSJSONObject>
-				let item = fileList[index];
-				// @ts-ignore
-				fileList.splice(index, 1, {
-					...item as UTSJSONObject,
-					// 注意这里不判断会出现succcessUpload先执行又被覆盖的问题
-					status: param['progress'] as number == 100 ? 'success' : 'uploading',
-					message: '',
-					progress: param['progress'] as number
-				});
-				this.$emit('update:fileList', fileList);
-			},
-			succcessUpload(index: number, url: string, thumb: string = '') {
-				const fileList = this.fileList as Array<UTSJSONObject>
-				let item = fileList[index];
-				// @ts-ignore
-				fileList.splice(index, 1, {
-					...item as UTSJSONObject,
-					status: 'success',
-					message: '',
-					url: url,
-					progress: 100,
-					thumb: thumb
-				});
-				this.$emit('update:fileList', fileList);
-			},
-			deleteItem(index: number) {
-				const fileList = this.fileList as Array<UTSJSONObject>
-				if (this.autoDelete) {
-					// @ts-ignore
-					fileList.splice(index, 1);
-					this.$emit('update:fileList', fileList);
-				} else {
-					this.$emit(
-						'delete',
-						UTSJSONObject.assign(UTSJSONObject.assign({}, this.getDetail(index)), {
-							file: fileList[index],
-						})
-					);
-				}
-			},
-			// 预览图片
-			onPreviewImage(previewItem: UPUploadListItem, index: number) {
-				if (!previewItem.isImage || !this.previewFullImage) return
-                let current = 0;
-                const urls = [] as Array<string>;
-                let imageIndex = 0;
-                for (var i = 0; i < this.lists.length; i++) {
-                    const item = this.lists[i];
-                    if (item.isImage || (item.type != null && item.type === 'image')) {
-                        urls.push(item.url != null ? item.url as string : item.thumb as string);
-                        if (i === index) {
-                            current = imageIndex;
-                        }
-                        imageIndex += 1;
-                    }
-                }
-                if (urls.length < 1) {
-                    return;
-                }
-				uni.previewImage({
-                    urls: urls,
-                    current: current,
-					fail() {
-						toast($t("up.upload.previewImageFail", {} as UTSJSONObject))
-					},
-				});
-			},
-			onPreviewVideo(previewItem: UPUploadListItem, index: number) {
-				if (!this.previewFullImage) return;
-                let current = 0;
-                const sources = [] as Array<UTSJSONObject>;
-                let videoIndex = 0;
-                for (var i = 0; i < this.lists.length; i++) {
-                    const item = this.lists[i];
-                    if (item.isVideo || (item.type != null && item.type === 'video')) {
-                        // @ts-ignore
-						sources.push(UTSJSONObject.assign(UTSJSONObject.assign({}, item), {
-                            type: 'video'
-                        }));
-                        if (i === index) {
-                            current = videoIndex;
-                        }
-                        videoIndex += 1;
-                    }
-                }
-                if (sources.length < 1) {
-                    return;
-                }
-				// #ifndef MP-WEIXIN
-				this.popupShow = true;
-				this.currentItemIndex = index;
-				console.log(this.lists[this.currentItemIndex])
-				// #endif
-				// #ifdef MP-WEIXIN
-				wx.previewMedia({
-					sources: sources,
-					current: current,
-					fail() {
-						toast(t("up.upload.previewVideoFail"))
-					},
-				});
-				// #endif
-			},
-			onClickPreview(item: UPUploadListItem, index: number) {
-				if (this.previewFullImage) {
-					switch (item.type) {
-						case 'image':
-							this.onPreviewImage(item, index);
-							break;
-						case 'video':
-							this.onPreviewVideo(item, index);
-							break;
-						default:
-							break;
-					}
-				}
-				this.$emit(
-					'clickPreview',
-					// @ts-ignore
-					UTSJSONObject.assign(UTSJSONObject.assign({}, item as UTSJSONObject), this.getDetail(index))
-				);
+type UPUploadReadCallback = (file: Array<UPUploadFileChoosed | null>, detail: UTSJSONObject) => any
+
+defineOptions({
+	name: "up-upload"
+})
+
+const props = defineProps({
+	accept: {
+		type: String,
+		default: 'image'
+	},
+	extension: {
+		type: Array as PropType<Array<string>>,
+		default: () => [] as Array<string>
+	},
+	capture: {
+		type: [Array, String],
+		default: () => ['album', 'camera'] as Array<string>
+	},
+	compressed: {
+		type: Boolean,
+		default: true
+	},
+	camera: {
+		type: String,
+		default: 'back'
+	},
+	maxDuration: {
+		type: Number,
+		default: 60
+	},
+	uploadIcon: {
+		type: String,
+		default: 'camera-fill'
+	},
+	uploadIconColor: {
+		type: String,
+		default: '#D3D4D6'
+	},
+	useBeforeRead: {
+		type: Boolean,
+		default: false
+	},
+	afterRead: {
+		type: Function,
+		default: null
+	},
+	beforeRead: {
+		type: Function,
+		default: null
+	},
+	previewFullImage: {
+		type: Boolean,
+		default: true
+	},
+	maxCount: {
+		type: [String, Number],
+		default: 52
+	},
+	disabled: {
+		type: Boolean,
+		default: false
+	},
+	imageMode: {
+		type: String,
+		default: 'aspectFill'
+	},
+	name: {
+		type: String,
+		default: ''
+	},
+	sizeType: {
+		type: Array as PropType<Array<string>>,
+		default: () => ['original', 'compressed'] as Array<string>
+	},
+	multiple: {
+		type: Boolean,
+		default: false
+	},
+	deletable: {
+		type: Boolean,
+		default: true
+	},
+	maxSize: {
+		type: [String, Number],
+		default: Number.MAX_VALUE
+	},
+	fileList: {
+		type: Array as PropType<Array<UTSJSONObject>>,
+		default: () => [] as Array<UTSJSONObject>
+	},
+	uploadText: {
+		type: String,
+		default: ''
+	},
+	width: {
+		type: [String, Number],
+		default: 80
+	},
+	height: {
+		type: [String, Number],
+		default: 80
+	},
+	previewImage: {
+		type: Boolean,
+		default: true
+	},
+	autoDelete: {
+		type: Boolean,
+		default: false
+	},
+	autoUpload: {
+		type: Boolean,
+		default: false
+	},
+	autoUploadApi: {
+		type: String,
+		default: ''
+	},
+	autoUploadDriver: {
+		type: String,
+		default: ''
+	},
+	autoUploadAuthUrl: {
+		type: String,
+		default: ''
+	},
+	autoUploadHeader: {
+		type: Object as PropType<UTSJSONObject>,
+		default: () => ({}) as UTSJSONObject
+	},
+	getVideoThumb: {
+		type: Boolean,
+		default: false
+	},
+	customAfterAutoUpload: {
+		type: Boolean,
+		default: false
+	},
+	videoPreviewObjectFit: {
+		type: String,
+		default: 'cover'
+	},
+	customStyle: {
+		type: Object,
+		default: () => ({})
+	}
+})
+
+const emit = defineEmits(['error', 'beforeRead', 'oversize', 'afterRead', 'delete', 'clickPreview', 'update:fileList', 'afterAutoUpload'])
+
+const lists = ref<Array<UPUploadListItem>>([])
+const isInCount = ref<boolean>(true)
+const popupShow = ref<boolean>(false)
+const currentItemIndex = ref<number>(-1)
+
+function formatFileList() {
+	let fileList = props.fileList as UTSJSONObject[]
+	let maxCount = parseInt(props.maxCount.toString())
+	let resLists = [] as UPUploadListItem[]
+	fileList.forEach((item: UTSJSONObject) => {
+		const name = item['name'] != null
+			? item['name'] as string
+			: item['url'] != null ? item['url'] as string : item['thumb'] as string
+		let tmp = UTSJSONObject.assign(UTSJSONObject.assign({}, item), {
+			isImage: item['name'] != null ? testImage(item['name'] as string) : (props.accept === 'image' ?? testImage(name)),
+			isVideo: item['name'] != null ? testVideo(item['name'] as string) : (props.accept === 'video' ?? testVideo(name)),
+			deletable: typeof item.deletable === 'boolean' ? item.deletable : props.deletable,
+		})
+		let tmpObj = (JSON.parse<UPUploadListItem>(JSON.stringify(tmp)))
+		if (tmpObj != null) {
+			resLists.push(tmpObj!)
+		}
+	})
+	lists.value = resLists
+	isInCount.value = resLists.length < maxCount
+}
+
+watch(() => props.fileList, () => {
+	formatFileList()
+}, { immediate: true, deep: true })
+
+watch(() => props.deletable, () => {
+	formatFileList()
+})
+
+watch(() => props.maxCount, () => {
+	formatFileList()
+})
+
+watch(() => props.accept, () => {
+	formatFileList()
+})
+
+watch(popupShow, (newVal: boolean) => {
+	if (!newVal) {
+		currentItemIndex.value = -1
+	}
+})
+
+function videoErrorCallback() {}
+
+function onChooseTap(): void {
+	chooseFileAction({} as UTSJSONObject)
+}
+
+function chooseFileAction(params: UTSJSONObject): boolean {
+	let maxCount = parseInt(props.maxCount.toString())
+	let disabled = props.disabled
+	if (disabled) return false
+	const chooseParams = UTSJSONObject.assign({
+		accept: props.accept,
+		extension: props.extension,
+		multiple: props.multiple,
+		capture: props.capture,
+		compressed: props.compressed,
+		maxDuration: props.maxDuration,
+		sizeType: props.sizeType,
+		camera: props.camera,
+	}, {
+		maxCount: maxCount - lists.value.length,
+		...params
+	})
+	let chooseParamsObj = JSON.parseObject<UPUploadChooseFileOptions>(JSON.stringify(chooseParams))
+	if (chooseParamsObj != null) {
+		chooseFile(chooseParamsObj).then((res: Array<UPUploadFileChoosed|null>) => {
+			onBeforeRead(res)
+		})
+	}
+	return true
+}
+
+function convertFileToUTSJSON(file: Array<UPUploadFileChoosed | null>): Array<UTSJSONObject> {
+	const result: Array<UTSJSONObject> = []
+	file.forEach((item: UPUploadFileChoosed | null) => {
+		if (item != null) {
+			const obj = JSON.parseObject(JSON.stringify(item))
+			if (obj != null) {
+				result.push(obj)
 			}
 		}
+	})
+	return result
+}
+
+function getDetail(index: number | null = null): UTSJSONObject {
+	return {
+		name: props.name,
+		index: index == null ? props.fileList.length : index,
+	} as UTSJSONObject
+}
+
+function onBeforeRead(file: Array<UPUploadFileChoosed | null>) {
+	let beforeRead = props.beforeRead
+	let useBeforeRead = props.useBeforeRead
+	let res: any = file
+	if (beforeRead != null && testFunc(beforeRead)) {
+		res = (beforeRead as UPUploadReadCallback)(file, getDetail(null))
 	}
+	if (useBeforeRead) {
+		emit(
+			'beforeRead',
+			UTSJSONObject.assign(UTSJSONObject.assign({
+				file: convertFileToUTSJSON(file)
+			}, getDetail(null)), {
+				callback: (ok: boolean) => {
+					if (ok) {
+						onAfterRead(file)
+					}
+				},
+			})
+		)
+		return
+	}
+	if (typeof res == 'boolean' && !(res as boolean)) {
+		return
+	}
+	const readFile = (res != null ? res : file) as Array<UPUploadFileChoosed | null>
+	onAfterRead(readFile)
+}
+
+function onAfterRead(file: Array<UPUploadFileChoosed | null>) {
+	let maxSize = parseFloat(props.maxSize.toString())
+	let afterRead = props.afterRead
+	const currentFileList = [...props.fileList]
+	const even = (item: UPUploadFileChoosed | null): boolean => {
+		let tmp: number = (item != null && item.size != null) ? item.size : 0
+		return tmp > maxSize
+	}
+	const oversize = file.some(even)
+	if (oversize) {
+		toast($t("up.upload.sizeExceed", {} as UTSJSONObject))
+		emit('oversize', UTSJSONObject.assign({
+			file: convertFileToUTSJSON(file)
+		}, getDetail(null)))
+		return
+	}
+	if (typeof afterRead === 'function') {
+		;(afterRead as UPUploadReadCallback)(file, getDetail(null))
+	}
+	emit('afterRead', UTSJSONObject.assign({
+		file: convertFileToUTSJSON(file)
+	}, getDetail(null)))
+}
+
+function deleteItem(index: number) {
+	const currentFileList = [...props.fileList]
+	if (props.autoDelete) {
+		currentFileList.splice(index, 1)
+		emit('update:fileList', currentFileList)
+	} else {
+		emit(
+			'delete',
+			UTSJSONObject.assign(UTSJSONObject.assign({}, getDetail(index)), {
+				file: currentFileList[index],
+			})
+		)
+	}
+}
+
+function onPreviewImage(previewItem: UPUploadListItem, index: number) {
+	if (!previewItem.isImage || !props.previewFullImage) return
+	let current = 0
+	const urls = [] as Array<string>
+	let imageIndex = 0
+	for (let i = 0; i < lists.value.length; i++) {
+		const item = lists.value[i]
+		if (item.isImage || (item.type != null && item.type === 'image')) {
+			urls.push(item.url != null ? item.url as string : item.thumb as string)
+			if (i === index) {
+				current = imageIndex
+			}
+			imageIndex += 1
+		}
+	}
+	if (urls.length < 1) {
+		return
+	}
+	uni.previewImage({
+		urls: urls,
+		current: current,
+		fail() {
+			toast($t("up.upload.previewImageFail", {} as UTSJSONObject))
+		},
+	})
+}
+
+function onPreviewVideo(previewItem: UPUploadListItem, index: number) {
+	if (!props.previewFullImage) return
+	popupShow.value = true
+	currentItemIndex.value = index
+}
+
+function onClickPreview(item: UPUploadListItem, index: number) {
+	if (props.previewFullImage) {
+		switch (item.type) {
+			case 'image':
+				onPreviewImage(item, index)
+				break
+			case 'video':
+				onPreviewVideo(item, index)
+				break
+			default:
+				break
+		}
+	}
+	emit(
+		'clickPreview',
+		UTSJSONObject.assign(UTSJSONObject.assign({}, item as UTSJSONObject), getDetail(index))
+	)
+}
 </script>
 
 <style lang="scss" scoped>
@@ -972,7 +614,6 @@
 		&__wrap {
 			@include flex;
 			flex-wrap: wrap;
-			// flex: 1;
 
 			&__preview {
 				border-radius: $up-upload-preview-border-radius;
@@ -1050,8 +691,6 @@
 			bottom: $up-upload-success-bottom;
 			right: $up-upload-success-right;
 			@include flex;
-			// 由于weex(nvue)为阿里巴巴的KPI(部门业绩考核)的laji产物，不支持css绘制三角形
-			// 所以在nvue下使用图片，非nvue下使用css实现
 			border-style: $up-upload-success-border-style;
 			border-top-color: $up-upload-success-border-top-color;
 			border-left-color: $up-upload-success-border-left-color;
@@ -1066,10 +705,6 @@
 				transform: scale(0.7);
 				bottom: $up-upload-success-icon-bottom;
 				right: $up-upload-success-icon-right;
-				/* #ifdef APP-NVUE */
-				width: $up-upload-icon-width;
-				height: $up-upload-icon-height;
-				/* #endif */
 			}
 		}
 		&__progress {

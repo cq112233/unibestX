@@ -1,0 +1,163 @@
+<template>
+	<view class="up-section" :style="[addStyle(customStyle)]">
+		<view class="up-section__content" @tap="clickHandler">
+			<view
+				v-if="showLine"
+				class="up-section__content__line"
+				:style="[lineStyle]"
+			></view>
+			<text
+				class="up-section__content__title"
+				:style="[titleStyle]"
+			>{{ title }}</text>
+		</view>
+		<view
+			v-if="right"
+			class="up-section__right"
+			@tap="rightClickHandler"
+		>
+			<slot name="right">
+				<text
+					v-if="subTitle != ''"
+					class="up-section__right__text"
+					:style="[subTitleStyle]"
+				>{{ subTitle }}</text>
+				<up-icon
+					v-if="arrow"
+					name="arrow-right"
+					:color="subColor"
+					size="12"
+				></up-icon>
+			</slot>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+import { addStyle, addUnit } from '../../libs/function/index.uts'
+
+defineOptions({
+	name: 'up-section'
+})
+
+const props = defineProps({
+	title: {
+		type: String,
+		default: ''
+	},
+	subTitle: {
+		type: String,
+		default: ''
+	},
+	right: {
+		type: Boolean,
+		default: true
+	},
+	fontSize: {
+		type: [String, Number],
+		default: 15
+	},
+	bold: {
+		type: Boolean,
+		default: true
+	},
+	color: {
+		type: String,
+		default: '#303133'
+	},
+	subColor: {
+		type: String,
+		default: '#909399'
+	},
+	showLine: {
+		type: Boolean,
+		default: true
+	},
+	lineColor: {
+		type: String,
+		default: ''
+	},
+	arrow: {
+		type: Boolean,
+		default: true
+	},
+	customStyle: {
+		type: Object,
+		default: () : UTSJSONObject => ({})
+	}
+})
+
+const emit = defineEmits(['click', 'rightClick'])
+
+const lineStyle = computed<UTSJSONObject>(() => {
+	const style = {} as UTSJSONObject
+	if (props.lineColor != '') {
+		style['backgroundColor'] = props.lineColor
+	}
+	return style
+})
+
+const titleStyle = computed<UTSJSONObject>(() => {
+	const style = {} as UTSJSONObject
+	style['fontSize'] = addUnit(props.fontSize)
+	style['color'] = props.color
+	if (props.bold) {
+		style['fontWeight'] = 'bold'
+	}
+	return style
+})
+
+const subTitleStyle = computed<UTSJSONObject>(() => {
+	const style = {} as UTSJSONObject
+	style['color'] = props.subColor
+	return style
+})
+
+function clickHandler() {
+	emit('click')
+}
+
+function rightClickHandler() {
+	emit('rightClick')
+}
+</script>
+
+<style lang="scss" scoped>
+.up-section {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+
+	&__content {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+
+		&__line {
+			width: 4px;
+			height: 16px;
+			background-color: var(--up-primary, #2979ff);
+			border-radius: 10px;
+			margin-right: 6px;
+		}
+
+		&__title {
+			line-height: 16px;
+		}
+	}
+
+	&__right {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+
+		&__text {
+			font-size: 12px;
+			margin-right: 4px;
+		}
+	}
+}
+</style>

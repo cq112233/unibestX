@@ -22,7 +22,7 @@
 		</view>
 		<text
 			class="up-toolbar__title up-line-1"
-			v-if="title"
+			v-if="title != ''"
 		>{{ title }}</text>
 		<view
 			class="up-toolbar__right"
@@ -48,63 +48,77 @@
 	</view>
 </template>
 
-<script lang="uts">
-	import { propsToolbar } from './props';
-	import { mpMixin } from '../../libs/mixin/mpMixin';
-	import { mixin } from '../../libs/mixin/mixin';
-	import { t } from '../../libs/i18n/index.uts';
-	/**
-	 * Toolbar 工具条
-	 * @description 
-	 * @tutorial https://ijry.github.io/uview-plus/components/toolbar.html
-	 * @property {Boolean}	show			是否展示工具条（默认 true ）
-	 * @property {String}	cancelText		取消按钮的文字（默认 '取消' ）
-	 * @property {String}	confirmText		确认按钮的文字（默认 '确认' ）
-	 * @property {String}	cancelColor		取消按钮的颜色（默认 '#909193' ）
-	 * @property {String}	confirmColor	确认按钮的颜色（默认 '#3c9cff' ）
-	 * @property {String}	title			标题文字
-	 * @event {Function} 
-	 * @example 
-	 */
-	export default {
-		name: 'up-toolbar',
-		mixins: [mpMixin, mixin, propsToolbar],
-		emits: ["confirm", "cancel"],
-		computed: {
-			elCancelText(): string {
-				if (this.cancelText == '取消' || this.cancelText == '') {
-					return t('up_common_cancel', {} as UTSJSONObject)
-				}
-				return this.cancelText
-			},
-			elConfirmText(): string {
-				if (this.confirmText == '确认' || this.confirmText == '确定' || this.confirmText == '') {
-					return t('up_common_confirm', {} as UTSJSONObject)
-				}
-				return this.confirmText
-			},
-			elConfirmColor(): string {
-				// 默认色时不设置内联样式，让 SCSS 中 $up-primary CSS变量生效
-				if (this.confirmColor == '#3c9cff') {
-					return ''
-				}
-				return this.confirmColor
-			}
-		},
-		created() {
-			// console.log(this.$slots)
-		},
-		methods: {
-			// 点击取消按钮
-			cancel(): void {
-				this.$emit('cancel')
-			},
-			// 点击确定按钮
-			confirm(): void {
-				this.$emit('confirm')
-			}
-		},
-	}
+<script setup lang="uts">
+import { computed } from 'vue'
+import { t } from '../../libs/i18n/index.uts'
+
+defineOptions({
+  name: 'up-toolbar'
+})
+
+const props = defineProps({
+  show: {
+    type: Boolean,
+    default: true
+  },
+  cancelText: {
+    type: String,
+    default: '取消'
+  },
+  confirmText: {
+    type: String,
+    default: '确认'
+  },
+  cancelColor: {
+    type: String,
+    default: '#909193'
+  },
+  confirmColor: {
+    type: String,
+    default: '#3c9cff'
+  },
+  title: {
+    type: String,
+    default: ''
+  },
+  rightSlot: {
+    type: Boolean,
+    default: false
+  }
+})
+
+const emit = defineEmits(['confirm', 'cancel'])
+
+const elCancelText = computed<string>(() => {
+  if (props.cancelText == '取消' || props.cancelText == '') {
+    return t('up_common_cancel', {} as UTSJSONObject)
+  }
+  return props.cancelText
+})
+
+const elConfirmText = computed<string>(() => {
+  if (props.confirmText == '确认' || props.confirmText == '确定' || props.confirmText == '') {
+    return t('up_common_confirm', {} as UTSJSONObject)
+  }
+  return props.confirmText
+})
+
+const elConfirmColor = computed<string>(() => {
+  if (props.confirmColor == '#3c9cff') {
+    return ''
+  }
+  return props.confirmColor
+})
+
+function noop() {}
+
+function cancel(): void {
+  emit('cancel')
+}
+
+function confirm(): void {
+  emit('confirm')
+}
 </script>
 
 <style lang="scss" scoped>

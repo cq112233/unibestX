@@ -12,14 +12,14 @@
 					>{{ getIconCharacter('icon-header') }}</text>
 					<template #content>
 						<view class="fab-tools">
-							<view v-for="item in fabTools.header" :key="item.value" class="fab-sub-item">
+							<view v-for="item in (fabTools['header'] as Array<UTSJSONObject>)" :key="item['value']" class="fab-sub-item">
 								<text
-									v-if="toolbarList.includes(item.name)"
+									v-if="toolbarList.includes(item['name'] as string)"
 									class="sp-editor-icon"
-									:class="formats['header'] == item.value ? 'ql-active' : ''"
-									:title="item.title"
-									@click.stop="formatFabSub('header', item.value)"
-								>{{ getIconCharacter(item.icon) }}</text>
+									:class="formats['header'] == item['value'] ? 'ql-active' : ''"
+									:title="item['title'] as string"
+									@click.stop="formatFabSub('header', item['value'])"
+								>{{ getIconCharacter(item['icon'] as string) }}</text>
 							</view>
 						</view>
 					</template>
@@ -73,14 +73,14 @@
 					>{{ getIconCharacter('icon-zuoyouduiqi') }}</text>
 					<template #content>
 						<view class="fab-tools">
-							<view v-for="item in fabTools.align" :key="item.value" class="fab-sub-item">
+							<view v-for="item in (fabTools['align'] as Array<UTSJSONObject>)" :key="item['value']" class="fab-sub-item">
 								<text
-									v-if="toolbarList.includes(item.name)"
+									v-if="toolbarList.includes(item['name'] as string)"
 									class="sp-editor-icon"
-									:class="formats['align'] == item.value ? 'ql-active' : ''"
-									:title="item.title"
-									@click.stop="formatFabSub('align', item.value)"
-								>{{ getIconCharacter(item.icon) }}</text>
+									:class="formats['align'] == item['value'] ? 'ql-active' : ''"
+									:title="item['title'] as string"
+									@click.stop="formatFabSub('align', item['value'])"
+								>{{ getIconCharacter(item['icon'] as string) }}</text>
 							</view>
 						</view>
 					</template>
@@ -98,14 +98,14 @@
 					>{{ getIconCharacter('icon-line-height') }}</text>
 					<template #content>
 						<view class="fab-tools">
-							<view v-for="item in fabTools.lineHeight" :key="item.value" class="fab-sub-item">
+							<view v-for="item in (fabTools['lineHeight'] as Array<UTSJSONObject>)" :key="item['value']" class="fab-sub-item">
 								<text
 									class="fab-sub"
-									:class="formats['lineHeight'] == item.value ? 'ql-active' : ''"
-									:title="item.title"
-									@click.stop="formatFabSub('lineHeight', item.value)"
+									:class="formats['lineHeight'] == item['value'] ? 'ql-active' : ''"
+									:title="item['title'] as string"
+									@click.stop="formatFabSub('lineHeight', item['value'])"
 								>
-									{{ item.name }}
+									{{ item['name'] }}
 								</text>
 							</view>
 						</view>
@@ -124,14 +124,14 @@
 					>{{ getIconCharacter('icon-Character-Spacing') }}</text>
 					<template #content>
 						<view class="fab-tools">
-							<view v-for="item in fabTools.space" :key="item.value" class="fab-sub-item">
+							<view v-for="item in (fabTools['space'] as Array<UTSJSONObject>)" :key="item['value']" class="fab-sub-item">
 								<text
 									class="fab-sub"
-									:class="formats['letterSpacing'] == item.value ? 'ql-active' : ''"
-									:title="item.title"
-									@click.stop="formatFabSub('letterSpacing', item.value)"
+									:class="formats['letterSpacing'] == item['value'] ? 'ql-active' : ''"
+									:title="item['title'] as string"
+									@click.stop="formatFabSub('letterSpacing', item['value'])"
 								>
-									{{ item.name }}
+									{{ item['name'] }}
 								</text>
 							</view>
 						</view>
@@ -150,14 +150,14 @@
 					>{{ getIconCharacter('icon-722bianjiqi_duanqianju') }}</text>
 					<template #content>
 						<view class="fab-tools">
-							<view v-for="item in fabTools.space" :key="item.value" class="fab-sub-item">
+							<view v-for="item in (fabTools['space'] as Array<UTSJSONObject>)" :key="item['value']" class="fab-sub-item">
 								<text
 									class="fab-sub"
-									:class="formats['marginTop'] == item.value ? 'ql-active' : ''"
-									:title="item.title"
-									@click.stop="formatFabSub('marginTop', item.value)"
+									:class="formats['marginTop'] == item['value'] ? 'ql-active' : ''"
+									:title="item['title'] as string"
+									@click.stop="formatFabSub('marginTop', item['value'])"
 								>
-									{{ item.name }}
+									{{ item['name'] }}
 								</text>
 							</view>
 						</view>
@@ -176,14 +176,14 @@
 					>{{ getIconCharacter('icon-723bianjiqi_duanhouju') }}</text>
 					<template #content>
 						<view class="fab-tools">
-							<view v-for="item in fabTools.space" :key="item.value" class="fab-sub-item">
+							<view v-for="item in (fabTools['space'] as Array<UTSJSONObject>)" :key="item['value']" class="fab-sub-item">
 								<text
 									class="fab-sub"
-									:class="formats['marginBottom'] == item.value ? 'ql-active' : ''"
-									:title="item.title"
-									@click.stop="formatFabSub('marginBottom', item.value)"
+									:class="formats['marginBottom'] == item['value'] ? 'ql-active' : ''"
+									:title="item['title'] as string"
+									@click.stop="formatFabSub('marginBottom', item['value'])"
 								>
-									{{ item.name }}
+									{{ item['name'] }}
 								</text>
 							</view>
 						</view>
@@ -202,14 +202,14 @@
 					>{{ getIconCharacter('icon-font') }}</text>
 					<template #content>
 						<view class="fab-tools">
-							<view v-for="item in fabTools.fontFamily" :key="item.value" class="fab-sub-item">
+							<view v-for="item in (fabTools['fontFamily'] as Array<UTSJSONObject>)" :key="item['value']" class="fab-sub-item">
 								<text
 									class="fab-sub"
-									:class="formats['fontFamily'] == item.value ? 'ql-active' : ''"
-									:title="item.title"
-									@click.stop="formatFabSub('fontFamily', item.value)"
+									:class="formats['fontFamily'] == item['value'] ? 'ql-active' : ''"
+									:title="item['title'] as string"
+									@click.stop="formatFabSub('fontFamily', item['value'])"
 								>
-									{{ item.name }}
+									{{ item['name'] }}
 								</text>
 							</view>
 						</view>
@@ -228,14 +228,14 @@
 					>{{ getIconCharacter('icon-fontsize') }}</text>
 					<template #content>
 						<view class="fab-tools">
-							<view v-for="item in fabTools.fontSize" :key="item.value" class="fab-sub-item">
+							<view v-for="item in (fabTools['fontSize'] as Array<UTSJSONObject>)" :key="item['value']" class="fab-sub-item">
 								<text
 									class="fab-sub"
-									:class="formats['fontSize'] == item.value ? 'ql-active' : ''"
-									:title="item.title"
-									@click.stop="formatFabSub('fontSize', item.value)"
+									:class="formats['fontSize'] == item['value'] ? 'ql-active' : ''"
+									:title="item['title'] as string"
+									@click.stop="formatFabSub('fontSize', item['value'])"
 								>
-									{{ item.name }}
+									{{ item['name'] }}
 								</text>
 							</view>
 						</view>
@@ -400,7 +400,8 @@
 	</view>
 </template>
 
-<script lang="uts">
+<script setup lang="uts">
+import { ref, watch, getCurrentInstance } from 'vue'
 import ColorPicker from './color-picker.uvue'
 import LinkEdit from './link-edit.uvue'
 import FabTool from './fab-tool.uvue'
@@ -413,399 +414,403 @@ type RgbColor = {
   a: number
 }
 
-export default {
-	name: 'sp-editor',
-	components: {
-		ColorPicker,
-		LinkEdit,
-		FabTool
-	},
-	props: {
-		// 编辑器id可传入，以便循环组件使用，防止id重复
-		editorId: {
-			type: String,
-			default: 'editor'
-		},
-		placeholder: {
-			type: String,
-			default: '写点什么吧 ~'
-		},
-		// 是否只读
-		readOnly: {
-			type: Boolean,
-			default: false
-		},
-		// 最大字数限制，-1不限
-		maxlength: {
-			type: Number,
-			default: -1
-		},
-		// 工具栏配置
-		toolbarConfig: {
-			type: Object,
-			default: (): UTSJSONObject => {
-				return {
-					keys: [] as Array<string>, // 要显示的工具，优先级最大
-					excludeKeys: [] as Array<string>, // 除这些指定的工具外，其他都显示
-					iconSize: '18px', // 工具栏字体大小
-					iconColumns: 10 // 工具栏列数
-				} as UTSJSONObject
-			}
-		}
-	},
-	watch: {
-		toolbarConfig: {
-			deep: true,
-			immediate: true,
-			handler(newToolbar: UTSJSONObject) {
-				const keys = newToolbar['keys'] as Array<string> | null
-				const excludeKeys = newToolbar['excludeKeys'] as Array<string> | null
-				const iconSize = newToolbar['iconSize'] as string | null
-				const iconColumns = newToolbar['iconColumns'] as number | null
+defineOptions({
+	name: 'sp-editor'
+})
 
-				if (keys != null && keys.length > 0) {
-					this.toolbarList = keys
-				} else {
-					if (excludeKeys != null && excludeKeys.length > 0) {
-						this.toolbarList = this.toolbarAllList.filter((item: string): boolean => !excludeKeys.includes(item))
-					} else {
-						this.toolbarList = this.toolbarAllList
-					}
-				}
-				this.iconSize = iconSize != null ? iconSize : '18px'
-				this.iconColumns = iconColumns != null ? iconColumns : 10
-			}
-		}
+const props = defineProps({
+	editorId: {
+		type: String,
+		default: 'editor'
 	},
-	data() {
-		return {
-			formats: {} as UTSJSONObject,
-			curFab: '', // 当前悬浮工具栏
-			fabXY: {} as UTSJSONObject,
-			textColor: '',
-			backgroundColor: '',
-			curColor: '',
-			defaultColor: { r: 0, g: 0, b: 0, a: 1 } as RgbColor, // 调色板默认颜色
-			iconSize: '20px', // 工具栏图标字体大小
-			iconColumns: 10, // 工具栏列数
-			toolbarList: [] as Array<string>,
-			toolbarAllList: [
-				'header', // 标题
-				'H1', // 一级标题
-				'H2', // 二级标题
-				'H3', // 三级标题
-				'H4', // 四级标题
-				'H5', // 五级标题
-				'H6', // 六级标题
-				'bold', // 加粗
-				'italic', // 斜体
-				'underline', // 下划线
-				'strike', // 删除线
-				'align', // 对齐方式
-				'alignLeft', // 左对齐
-				'alignCenter', // 居中对齐
-				'alignRight', // 右对齐
-				'alignJustify', // 两端对齐
-				'lineHeight', // 行间距
-				'letterSpacing', // 字间距
-				'marginTop', // 段前距
-				'marginBottom', // 段后距
-				'fontFamily', // 字体
-				'fontSize', // 字号
-				'color', // 文字颜色
-				'backgroundColor', // 背景颜色
-				'date', // 日期
-				'listCheck', // 待办
-				'listOrdered', // 有序列表
-				'listBullet', // 无序列表
-				'indentInc', // 增加缩进
-				'indentDec', // 减少缩进
-				'divider', // 分割线
-				'scriptSub', // 下标
-				'scriptSuper', // 上标
-				'direction', // 文本方向
-				'image', // 图片
-				'video', // 视频
-				'link', // 超链接
-				'undo', // 撤销
-				'redo', // 重做
-				'removeFormat', // 清除格式
-				'clear', // 清空
-				'export' // 导出
-			] as Array<string>,
-			fabTools: {
-				header: [
-					{ title: '一级标题', name: 'H1', value: 1, icon: 'icon-format-header-1' },
-					{ title: '二级标题', name: 'H2', value: 2, icon: 'icon-format-header-2' },
-					{ title: '三级标题', name: 'H3', value: 3, icon: 'icon-format-header-3' },
-					{ title: '四级标题', name: 'H4', value: 4, icon: 'icon-format-header-4' },
-					{ title: '五级标题', name: 'H5', value: 5, icon: 'icon-format-header-5' },
-					{ title: '六级标题', name: 'H6', value: 6, icon: 'icon-format-header-6' }
-				],
-				fontFamily: [
-					{ title: '宋体', name: '宋', value: '宋体', icon: '' },
-					{ title: '黑体', name: '黑', value: '黑体', icon: '' },
-					{ title: '楷体', name: '楷', value: '楷体', icon: '' },
-					{ title: '仿宋', name: '仿', value: '仿宋', icon: '' },
-					{ title: '华文隶书', name: '隶', value: 'STLiti', icon: '' },
-					{ title: '华文行楷', name: '行', value: 'STXingkai', icon: '' },
-					{ title: '幼圆', name: '圆', value: 'YouYuan', icon: '' }
-				],
-				fontSize: [
-					{ title: '12', name: '12', value: '12px', icon: '' },
-					{ title: '14', name: '14', value: '14px', icon: '' },
-					{ title: '16', name: '16', value: '16px', icon: '' },
-					{ title: '18', name: '18', value: '18px', icon: '' },
-					{ title: '20', name: '20', value: '20px', icon: '' },
-					{ title: '22', name: '22', value: '22px', icon: '' },
-					{ title: '24', name: '24', value: '24px', icon: '' }
-				],
-				align: [
-					{ title: '左对齐', name: 'alignLeft', value: 'left', icon: 'icon-zuoduiqi' },
-					{ title: '居中对齐', name: 'alignCenter', value: 'center', icon: 'icon-juzhongduiqi' },
-					{ title: '右对齐', name: 'alignRight', value: 'right', icon: 'icon-youduiqi' },
-					{ title: '两端对齐', name: 'alignJustify', value: 'justify', icon: 'icon-zuoyouduiqi' }
-				],
-				lineHeight: [
-					{ title: '1倍', name: '1', value: '1', icon: '' },
-					{ title: '1.5倍', name: '1.5', value: '1.5', icon: '' },
-					{ title: '2倍', name: '2', value: '2', icon: '' },
-					{ title: '2.5倍', name: '2.5', value: '2.5', icon: '' },
-					{ title: '3倍', name: '3', value: '3', icon: '' }
-				],
-				// 字间距/段前距/段后距
-				space: [
-					{ title: '0.5倍', name: '0.5', value: '0.5em', icon: '' },
-					{ title: '1倍', name: '1', value: '1em', icon: '' },
-					{ title: '1.5倍', name: '1.5', value: '1.5em', icon: '' },
-					{ title: '2倍', name: '2', value: '2em', icon: '' },
-					{ title: '2.5倍', name: '2.5', value: '2.5em', icon: '' },
-					{ title: '3倍', name: '3', value: '3em', icon: '' }
-				]
-			} as UTSJSONObject,
-			editorCtx: null as any
-		}
+	placeholder: {
+		type: String,
+		default: '写点什么吧 ~'
 	},
-	methods: {
-		getIconCharacter(name: string): string {
-			return getIconCharacter(name)
-		},
-		onEditorReady() {
-			const instance = this
-			uni.createSelectorQuery()
-				.in(instance)
-				.select('#' + this.editorId)
-				.context((res) => {
-					if (res != null) {
-						instance.editorCtx = res.context
-						instance.$emit('init', instance.editorCtx, instance.editorId)
-					}
-				})
-				.exec()
-		},
-		undo() {
-			if (this.editorCtx != null) {
-				this.editorCtx.undo()
-			}
-		},
-		redo() {
-			if (this.editorCtx != null) {
-				this.editorCtx.redo()
-			}
-		},
-		formatIcon(name: string, value: any) {
-			if (this.editorCtx == null) return
-			if (name == 'color' || name == 'backgroundColor') {
-				this.curColor = name
-				this.showPicker()
-			} else {
-				this.editorCtx.format(name, value)
-			}
-		},
-		// 悬浮工具点击
-		fabTap(fabType: string) {
-			if (this.curFab != fabType) {
-				this.curFab = fabType
-			} else {
-				this.curFab = ''
-			}
-		},
-		// 悬浮工具子集点击
-		formatFabSub(name: string, value: any) {
-			this.formatIcon(name, value)
-			this.fabTap(name)
-		},
-		showPicker() {
-			const picker = this.$refs['colorPickerRef'] as any
-			if (picker == null) return
+	readOnly: {
+		type: Boolean,
+		default: false
+	},
+	maxlength: {
+		type: Number,
+		default: -1
+	},
+	toolbarConfig: {
+		type: Object as PropType<UTSJSONObject>,
+		default: (): UTSJSONObject => {
+			return {
+				keys: [] as Array<string>,
+				excludeKeys: [] as Array<string>,
+				iconSize: '18px',
+				iconColumns: 10
+			} as UTSJSONObject
+		}
+	}
+})
 
-			if (this.curColor == 'color') {
-				this.defaultColor = this.textColor != ''
-					? picker.hex2Rgb(this.textColor)
-					: { r: 0, g: 0, b: 0, a: 1 } as RgbColor
-			} else if (this.curColor == 'backgroundColor') {
-				this.defaultColor = this.backgroundColor != ''
-					? picker.hex2Rgb(this.backgroundColor)
-					: { r: 0, g: 0, b: 0, a: 0 } as RgbColor
-			}
-			picker.open()
-		},
-		confirmColor(e: UTSJSONObject) {
-			const hex = e['hex'] as string
-			if (this.curColor == 'color') {
-				this.textColor = hex
-				if (this.editorCtx != null) {
-					this.editorCtx.format('color', this.textColor)
-				}
-			} else if (this.curColor == 'backgroundColor') {
-				this.backgroundColor = hex
-				if (this.editorCtx != null) {
-					this.editorCtx.format('backgroundColor', this.backgroundColor)
-				}
-			}
-		},
-		onStatusChange(e: any) {
-			const detail = e.detail as UTSJSONObject
-			const color = detail['color'] as string | null
-			const backgroundColor = detail['backgroundColor'] as string | null
-			if (color != null) {
-				this.textColor = color
-			}
-			if (backgroundColor != null) {
-				this.backgroundColor = backgroundColor
-			}
-			this.formats = detail
-		},
-		insertDivider() {
-			if (this.editorCtx != null) {
-				this.editorCtx.insertDivider()
-			}
-		},
-		clear() {
-			uni.showModal({
-				title: '清空编辑器',
-				content: '确定清空编辑器吗？',
-				success: (res) => {
-					if (res.confirm && this.editorCtx != null) {
-						this.editorCtx.clear()
-					}
-				}
-			})
-		},
-		removeFormat() {
-			uni.showModal({
-				title: '文本格式化',
-				content: '确定要清除所选择部分文本块格式吗？',
-				showCancel: true,
-				success: (res) => {
-					if (res.confirm && this.editorCtx != null) {
-						this.editorCtx.removeFormat()
-					}
-				}
-			})
-		},
-		insertDate() {
-			const date = new Date()
-			const formatDate = date.getFullYear().toString() + '/' + (date.getMonth() + 1).toString() + '/' + date.getDate().toString()
-			if (this.editorCtx != null) {
-				this.editorCtx.insertText({ text: formatDate })
-			}
-		},
-		insertLink() {
-			const linkEdit = this.$refs['linkEditRef'] as any
-			if (linkEdit != null) {
-				linkEdit.open()
-			}
-		},
-		confirmLink(e: UTSJSONObject) {
-			const linkEdit = this.$refs['linkEditRef'] as any
-			if (linkEdit != null) {
-				linkEdit.close()
-			}
-			const instance = this
-			addLink(this.editorCtx, e, () => {
-				// 修复添加超链接后，不触发input更新当前最新内容的bug，这里做一下手动更新
-				if (instance.editorCtx != null) {
-					instance.editorCtx.getContents({
-						success: (res: any) => {
-							const resObj = res as UTSJSONObject
-							const html = resObj['html'] as string
-							const text = resObj['text'] as string
-							instance.$emit('input', { html: html, text: text } as UTSJSONObject, instance.editorId)
-						}
-					})
-				}
-			})
-			this.$emit('addLink', e, this.editorId)
-		},
-		insertImage() {
-			const instance = this
-			uni.chooseImage({
-				success: (res) => {
-					const tempFiles = res.tempFiles
-					instance.$emit('upinImage', tempFiles, instance.editorCtx, instance.editorId)
-				},
-				fail: () => {
-					uni.showToast({
-						title: '未授权访问相册权限，请授权后使用',
-						icon: 'none'
-					})
-				}
-			})
-		},
-		insertVideo() {
-			const instance = this
-			uni.chooseVideo({
-				sourceType: ['camera', 'album'],
-				success: (res) => {
-					const tempFilePath = res.tempFilePath
-					instance.$emit('upinVideo', tempFilePath, instance.editorCtx, instance.editorId)
-				},
-				fail: () => {
-					uni.showToast({
-						title: '未授权访问媒体权限，请授权后使用',
-						icon: 'none'
-					})
-				}
-			})
-		},
-		onEditorInput(e: any) {
-			const detail = e.detail as UTSJSONObject
-			const html = detail['html'] as string
-			const text = detail['text'] as string
-			// 识别到标识立即return
-			if (text.indexOf(linkFlag) != -1) return
+const emit = defineEmits(['init', 'confirm', 'input', 'overMax', 'exportHtml', 'addLink', 'upinImage', 'upinVideo'])
+const instance = getCurrentInstance()
 
-			const maxlength = parseInt(this.maxlength.toString())
-			const textStr = text.replace(/[ \t\r\n]/g, '')
-			if (textStr.length > maxlength && maxlength != -1) {
-				uni.showModal({
-					content: '超过' + maxlength.toString() + '字数啦~',
-					confirmText: '确定',
-					showCancel: false,
-					success: () => {
-						this.$emit('overMax', { html, text } as UTSJSONObject, this.editorId)
-					}
-				})
-			} else {
-				this.$emit('input', { html, text } as UTSJSONObject, this.editorId)
+const formats = ref<UTSJSONObject>({} as UTSJSONObject)
+const curFab = ref<string>('')
+const textColor = ref<string>('')
+const backgroundColor = ref<string>('')
+const curColor = ref<string>('')
+const defaultColor = ref<RgbColor>({ r: 0, g: 0, b: 0, a: 1 } as RgbColor)
+const iconSize = ref<string>('20px')
+const iconColumns = ref<number>(10)
+const toolbarList = ref<Array<string>>([] as Array<string>)
+
+const colorPickerRef = ref<any | null>(null)
+const linkEditRef = ref<any | null>(null)
+let editorCtx: any | null = null
+
+const toolbarAllList = [
+	'header',
+	'H1',
+	'H2',
+	'H3',
+	'H4',
+	'H5',
+	'H6',
+	'bold',
+	'italic',
+	'underline',
+	'strike',
+	'align',
+	'alignLeft',
+	'alignCenter',
+	'alignRight',
+	'alignJustify',
+	'lineHeight',
+	'letterSpacing',
+	'marginTop',
+	'marginBottom',
+	'fontFamily',
+	'fontSize',
+	'color',
+	'backgroundColor',
+	'date',
+	'listCheck',
+	'listOrdered',
+	'listBullet',
+	'indentInc',
+	'indentDec',
+	'divider',
+	'scriptSub',
+	'scriptSuper',
+	'direction',
+	'image',
+	'video',
+	'link',
+	'undo',
+	'redo',
+	'removeFormat',
+	'clear',
+	'export'
+] as Array<string>
+
+const fabTools = {
+	header: [
+		{ title: '一级标题', name: 'H1', value: 1, icon: 'icon-format-header-1' },
+		{ title: '二级标题', name: 'H2', value: 2, icon: 'icon-format-header-2' },
+		{ title: '三级标题', name: 'H3', value: 3, icon: 'icon-format-header-3' },
+		{ title: '四级标题', name: 'H4', value: 4, icon: 'icon-format-header-4' },
+		{ title: '五级标题', name: 'H5', value: 5, icon: 'icon-format-header-5' },
+		{ title: '六级标题', name: 'H6', value: 6, icon: 'icon-format-header-6' }
+	],
+	fontFamily: [
+		{ title: '宋体', name: '宋', value: '宋体', icon: '' },
+		{ title: '黑体', name: '黑', value: '黑体', icon: '' },
+		{ title: '楷体', name: '楷', value: '楷体', icon: '' },
+		{ title: '仿宋', name: '仿', value: '仿宋', icon: '' },
+		{ title: '华文隶书', name: '隶', value: 'STLiti', icon: '' },
+		{ title: '华文行楷', name: '行', value: 'STXingkai', icon: '' },
+		{ title: '幼圆', name: '圆', value: 'YouYuan', icon: '' }
+	],
+	fontSize: [
+		{ title: '12', name: '12', value: '12px', icon: '' },
+		{ title: '14', name: '14', value: '14px', icon: '' },
+		{ title: '16', name: '16', value: '16px', icon: '' },
+		{ title: '18', name: '18', value: '18px', icon: '' },
+		{ title: '20', name: '20', value: '20px', icon: '' },
+		{ title: '22', name: '22', value: '22px', icon: '' },
+		{ title: '24', name: '24', value: '24px', icon: '' }
+	],
+	align: [
+		{ title: '左对齐', name: 'alignLeft', value: 'left', icon: 'icon-zuoduiqi' },
+		{ title: '居中对齐', name: 'alignCenter', value: 'center', icon: 'icon-juzhongduiqi' },
+		{ title: '右对齐', name: 'alignRight', value: 'right', icon: 'icon-youduiqi' },
+		{ title: '两端对齐', name: 'alignJustify', value: 'justify', icon: 'icon-zuoyouduiqi' }
+	],
+	lineHeight: [
+		{ title: '1倍', name: '1', value: '1', icon: '' },
+		{ title: '1.5倍', name: '1.5', value: '1.5', icon: '' },
+		{ title: '2倍', name: '2', value: '2', icon: '' },
+		{ title: '2.5倍', name: '2.5', value: '2.5', icon: '' },
+		{ title: '3倍', name: '3', value: '3', icon: '' }
+	],
+	space: [
+		{ title: '0.5倍', name: '0.5', value: '0.5em', icon: '' },
+		{ title: '1倍', name: '1', value: '1em', icon: '' },
+		{ title: '1.5倍', name: '1.5', value: '1.5em', icon: '' },
+		{ title: '2倍', name: '2', value: '2em', icon: '' },
+		{ title: '2.5倍', name: '2.5', value: '2.5em', icon: '' },
+		{ title: '3倍', name: '3', value: '3em', icon: '' }
+	]
+} as UTSJSONObject
+
+function onEditorReady() {
+	uni.createSelectorQuery()
+		.in(instance?.proxy)
+		.select('#' + props.editorId)
+		.context((res) => {
+			if (res != null) {
+				editorCtx = res.context
+				emit('init', editorCtx, props.editorId)
 			}
-		},
-		// 导出
-		exportHtml() {
-			if (this.editorCtx != null) {
-				this.editorCtx.getContents({
-					success: (res: any) => {
-						const resObj = res as UTSJSONObject
-						const html = resObj['html'] as string
-						this.$emit('exportHtml', html, this.editorId)
-					}
-				})
-			}
-		},
-		eLongpress() {}
+		})
+		.exec()
+}
+
+function undo() {
+	if (editorCtx != null) {
+		editorCtx.undo()
 	}
 }
+
+function redo() {
+	if (editorCtx != null) {
+		editorCtx.redo()
+	}
+}
+
+function showPicker() {
+	const picker = colorPickerRef.value as any | null
+	if (picker == null) return
+
+	if (curColor.value == 'color') {
+		defaultColor.value = textColor.value != ''
+			? picker.hex2Rgb(textColor.value)
+			: ({ r: 0, g: 0, b: 0, a: 1 } as RgbColor)
+	} else if (curColor.value == 'backgroundColor') {
+		defaultColor.value = backgroundColor.value != ''
+			? picker.hex2Rgb(backgroundColor.value)
+			: ({ r: 0, g: 0, b: 0, a: 0 } as RgbColor)
+	}
+	picker.open()
+}
+
+function formatIcon(name: string, value: any) {
+	if (editorCtx == null) return
+	if (name == 'color' || name == 'backgroundColor') {
+		curColor.value = name
+		showPicker()
+	} else {
+		editorCtx.format(name, value)
+	}
+}
+
+function fabTap(fabType: string) {
+	if (curFab.value != fabType) {
+		curFab.value = fabType
+	} else {
+		curFab.value = ''
+	}
+}
+
+function formatFabSub(name: string, value: any) {
+	formatIcon(name, value)
+	fabTap(name)
+}
+
+function confirmColor(e: UTSJSONObject) {
+	const hex = e['hex'] as string
+	if (curColor.value == 'color') {
+		textColor.value = hex
+		if (editorCtx != null) {
+			editorCtx.format('color', textColor.value)
+		}
+	} else if (curColor.value == 'backgroundColor') {
+		backgroundColor.value = hex
+		if (editorCtx != null) {
+			editorCtx.format('backgroundColor', backgroundColor.value)
+		}
+	}
+}
+
+function onStatusChange(e: any) {
+	const detail = e.detail as UTSJSONObject
+	const color = detail['color'] as string | null
+	const bg = detail['backgroundColor'] as string | null
+	if (color != null) {
+		textColor.value = color
+	}
+	if (bg != null) {
+		backgroundColor.value = bg
+	}
+	formats.value = detail
+}
+
+function insertDivider() {
+	if (editorCtx != null) {
+		editorCtx.insertDivider()
+	}
+}
+
+function clear() {
+	uni.showModal({
+		title: '清空编辑器',
+		content: '确定清空编辑器吗？',
+		success: (res) => {
+			if (res.confirm && editorCtx != null) {
+				editorCtx.clear()
+			}
+		}
+	})
+}
+
+function removeFormat() {
+	uni.showModal({
+		title: '文本格式化',
+		content: '确定要清除所选择部分文本块格式吗？',
+		showCancel: true,
+		success: (res) => {
+			if (res.confirm && editorCtx != null) {
+				editorCtx.removeFormat()
+			}
+		}
+	})
+}
+
+function insertDate() {
+	const date = new Date()
+	const formatDate = date.getFullYear().toString() + '/' + (date.getMonth() + 1).toString() + '/' + date.getDate().toString()
+	if (editorCtx != null) {
+		editorCtx.insertText({ text: formatDate })
+	}
+}
+
+function insertLink() {
+	const linkEdit = linkEditRef.value as any | null
+	if (linkEdit != null) {
+		linkEdit.open()
+	}
+}
+
+function confirmLink(e: UTSJSONObject) {
+	const linkEdit = linkEditRef.value as any | null
+	if (linkEdit != null) {
+		linkEdit.close()
+	}
+	addLink(editorCtx, e, () => {
+		if (editorCtx != null) {
+			editorCtx.getContents({
+				success: (res: any) => {
+					const resObj = res as UTSJSONObject
+					const html = resObj['html'] as string
+					const text = resObj['text'] as string
+					emit('input', { html: html, text: text } as UTSJSONObject, props.editorId)
+				}
+			})
+		}
+	})
+	emit('addLink', e, props.editorId)
+}
+
+function insertImage() {
+	uni.chooseImage({
+		success: (res) => {
+			const tempFiles = res.tempFiles
+			emit('upinImage', tempFiles, editorCtx, props.editorId)
+		},
+		fail: () => {
+			uni.showToast({
+				title: '未授权访问相册权限，请授权后使用',
+				icon: 'none'
+			})
+		}
+	})
+}
+
+function insertVideo() {
+	uni.chooseVideo({
+		sourceType: ['camera', 'album'],
+		success: (res) => {
+			const tempFilePath = res.tempFilePath
+			emit('upinVideo', tempFilePath, editorCtx, props.editorId)
+		},
+		fail: () => {
+			uni.showToast({
+				title: '未授权访问媒体权限，请授权后使用',
+				icon: 'none'
+			})
+		}
+	})
+}
+
+function onEditorInput(e: any) {
+	const detail = e.detail as UTSJSONObject
+	const html = detail['html'] as string
+	const text = detail['text'] as string
+	if (text.indexOf(linkFlag) != -1) return
+
+	const maxlen = parseInt(props.maxlength.toString())
+	const textStr = text.replace(/[ \t\r\n]/g, '')
+	if (textStr.length > maxlen && maxlen != -1) {
+		uni.showModal({
+			content: '超过' + maxlen.toString() + '字数啦~',
+			confirmText: '确定',
+			showCancel: false,
+			success: () => {
+				emit('overMax', { html, text } as UTSJSONObject, props.editorId)
+			}
+		})
+	} else {
+		emit('input', { html, text } as UTSJSONObject, props.editorId)
+	}
+}
+
+function exportHtml() {
+	if (editorCtx != null) {
+		editorCtx.getContents({
+			success: (res: any) => {
+				const resObj = res as UTSJSONObject
+				const html = resObj['html'] as string
+				emit('exportHtml', html, props.editorId)
+			}
+		})
+	}
+}
+
+function eLongpress() {}
+
+watch(() => props.toolbarConfig, (newToolbar: UTSJSONObject) => {
+	const keys = newToolbar['keys'] as Array<string> | null
+	const excludeKeys = newToolbar['excludeKeys'] as Array<string> | null
+	const iSize = newToolbar['iconSize'] as string | null
+	const iColumns = newToolbar['iconColumns'] as number | null
+
+	if (keys != null && keys.length > 0) {
+		toolbarList.value = keys
+	} else {
+		if (excludeKeys != null && excludeKeys.length > 0) {
+			toolbarList.value = toolbarAllList.filter((item: string): boolean => !excludeKeys.includes(item))
+		} else {
+			toolbarList.value = toolbarAllList
+		}
+	}
+	iconSize.value = iSize != null ? iSize : '18px'
+	iconColumns.value = iColumns != null ? iColumns : 10
+}, { deep: true, immediate: true })
+
+defineExpose({
+	undo,
+	redo,
+	exportHtml,
+	clear,
+	removeFormat
+})
 </script>
 
 <style lang="scss">

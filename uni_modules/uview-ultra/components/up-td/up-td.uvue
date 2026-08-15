@@ -9,9 +9,8 @@
 
 <script setup lang="uts">
 	import { ref, onMounted, getCurrentInstance } from 'vue'
-	import defProps from './td.uts'
 	import { addUnit } from '../../libs/function/index'
-	import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'
+	import { useUltraUI } from '../../libs/composable/useUltraUI'
 	const { parent, getParent } = useUltraUI({
 		padding: 0,
 		align: '',
@@ -20,46 +19,39 @@
 	})
 	const instance = getCurrentInstance()!.proxy!
 	
-	// options
 	defineOptions({
 	  name: 'up-td'
 	})
 	
-	// props
 	const props = defineProps({
-		// 宽度，百分比或者具体带单位的值，如30%， 200rpx等，一般使用百分比
 		width: {
 			type: [String],
-			default: defProps.getString('td.width')
+			default: 'auto'
 		},
 		textAlign: {
 			type: String,
-			default: defProps.getString('td.textAlign')
+			default: ''
 		},
 		fontSize: {
 			type: String,
-			default: defProps.getString('td.fontSize')
+			default: ''
 		},
 		borderColor: {
 			type: String,
-			default: defProps.getString('td.borderColor')
+			default: ''
 		},
 		color: {
 			type: String,
-			default: defProps.getString('td.color')
+			default: ''
 		}
 	})
 	
 	const tdStyle = ref<UTSJSONObject>({})
-	
 	const tdTextStyle = ref<UTSJSONObject>({})
 	
-	// 在组件挂载后设置样式
 	onMounted(() => {
-		// 获取父组件up-table
 		getParent('up-table', instance)
 		if (parent.value != null) {
-			// 将父组件的相关参数，合并到本组件
 			let style: UTSJSONObject = {}
 			let styleText: UTSJSONObject = {}
 			let parentProps = parent.value.$callMethod('getProps') as UTSJSONObject
@@ -97,7 +89,8 @@
 		align-self: stretch;
 		box-sizing: border-box;
 		height: 100%;
-		.up-td__text {
+
+		&__text {
 			font-size: 14px;
 			color: $up-content-color;
 		}
