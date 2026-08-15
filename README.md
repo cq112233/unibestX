@@ -25,6 +25,14 @@
 >
 > 📥 **HBuilderX 5.15 下载地址**：[https://wwbsy.lanzoue.com/b01eupb32d](https://wwbsy.lanzoue.com/b01eupb32d) （密码：`4xdv`）
 
+> 🚀 **Vapor Mode 尝鲜分支（`vopar`）已发布**
+>
+> 本项目现已新增 **`vopar`** 体验分支，探索 Vue 3 Vapor 模式（无虚拟 DOM 高性能原生渲染）的前沿特性。
+> 欢迎大家切换至 `vopar` 分支尝鲜体验：
+> ```bash
+> git checkout vopar
+> ```
+
 > ⚠️ **三方组件库与插件修改说明**
 >
 > 本项目内置的 **`z-paging-x`** 分页组件（如 [z-paging-x.uvue](file:///Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/z-paging-x/components/z-paging-x/z-paging-x.uvue)）以及 **`uview-ultra`** 组件库均已由作者进行了**深度定制修改与修复**，专门用于兼容 `uni-app X` 各端平台（特别针对 Android 原生嵌套手势协商、`type="nested"` 架构支持以及各端 CSS 解析限制等进行了优化）。
@@ -183,20 +191,29 @@ unibestX/
 
 ## 📂 快速开始
 
-### 1. 克隆项目
+### 1. 克隆项目与分支选择
 
-* **GitHub 方式**：
+* **主分支（main）**：
 
   ```bash
+  # GitHub
   git clone https://github.com/cq112233/unibestX.git
   cd unibestX
-  ```
 
-* **Gitee 方式（国内加速推荐）**：
-
-  ```bash
+  # Gitee（国内加速推荐）
   git clone https://gitee.com/htwoO-cq/uni-best-x.git
   cd uni-best-x
+  ```
+
+* **Vapor 尝鲜体验分支（vopar）**：
+
+  ```bash
+  # 直接克隆 vopar 分支
+  git clone -b vopar https://github.com/cq112233/unibestX.git
+  cd unibestX
+
+  # 或在已有项目中切换到 vopar 分支
+  git checkout vopar
   ```
 
 ### 2. 安装依赖

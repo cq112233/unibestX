@@ -49,8 +49,14 @@
 			if (props.width != '') style.flex = `0 0 ${props.width}`
 			styleText['textAlign'] = parentProps.getString('align')
 			style['padding'] = parentProps.getString('padding')
-			style['borderBottom'] = `solid 1px `+ parentProps.getString('borderColor')
-			style['borderRight'] = `solid 1px ` + parentProps.getString('borderColor')
+			let border = parentProps.getBoolean('border') ?? true
+			if (border) {
+				style['borderBottom'] = `solid 1px `+ parentProps.getString('borderColor')
+				style['borderRight'] = `solid 1px ` + parentProps.getString('borderColor')
+			} else {
+				style['borderBottom'] = 'none'
+				style['borderRight'] = 'none'
+			}
 			style = deepMerge(style, parentProps.getAny('thStyle') as UTSJSONObject)
 			thStyle.value = style
 			thTextStyle.value = styleText

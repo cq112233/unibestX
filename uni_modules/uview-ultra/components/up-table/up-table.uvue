@@ -19,6 +19,10 @@
 	
 	// props
 	const props = defineProps({
+		border: {
+			type: Boolean,
+			default: defProps.getBoolean('table.border') ?? true
+		},
 		borderColor: {
 			type: String,
 			default: defProps.getString('table.borderColor')
@@ -60,8 +64,13 @@
 	
 	const tableStyle = computed(() => {
 		let style = {}
-		style['borderLeft'] = `solid 1px ${props.borderColor}`
-		style['borderTop'] = `solid 1px ${props.borderColor}`
+		if (props.border) {
+			style['borderLeft'] = `solid 1px ${props.borderColor}`
+			style['borderTop'] = `solid 1px ${props.borderColor}`
+		} else {
+			style['borderLeft'] = 'none'
+			style['borderTop'] = 'none'
+		}
 		style['backgroundColor'] = props.bgColor
 		return style
 	})
@@ -74,8 +83,11 @@
 		}, 0)
 	}
 	
-	// 监听align和borderColor的变化
-	// 注意：在组合式API中，我们需要使用watch来监听props的变化
+	// 监听border、align和borderColor的变化
+	watch((): boolean => props.border, () => {
+		change()
+	})
+
 	watch(():string => props.align, () => {
 		change()
 	})
@@ -86,6 +98,7 @@
 	
 	const getProps = function(): UTSJSONObject {
 		return {
+			border: props.border,
 			borderColor: props.borderColor,
 			align: props.align,
 			padding: props.padding,

@@ -43,8 +43,14 @@
 				if (this.width) style.flex = `0 0 ${this.width}`;
 				style.textAlign = this.parent.align;
 				style.padding = this.parent.padding;
-				style.borderBottom = `solid 1px ${this.parent.borderColor}`;
-				style.borderRight = `solid 1px ${this.parent.borderColor}`;
+				let border = this.parent.border ?? true;
+				if (border) {
+					style.borderBottom = `solid 1px ${this.parent.borderColor}`;
+					style.borderRight = `solid 1px ${this.parent.borderColor}`;
+				} else {
+					style.borderBottom = 'none';
+					style.borderRight = 'none';
+				}
 				Object.assign(style, this.parent.thStyle);
 				this.thStyle = style;
 			}

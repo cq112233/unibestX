@@ -67,8 +67,14 @@
 			styleText['textAlign'] = parentProps.getString('align')
 			styleText['fontSize'] = addUnit(parentProps.getString('fontSize'))
 			style['padding'] = parentProps.getString('padding')
-			style['borderBottom'] = `solid 1px `+ parentProps.getString('borderColor')
-			style['borderRight'] = `solid 1px `+ parentProps.getString('borderColor')
+			let border = parentProps.getBoolean('border') ?? true
+			if (border) {
+				style['borderBottom'] = `solid 1px `+ parentProps.getString('borderColor')
+				style['borderRight'] = `solid 1px `+ parentProps.getString('borderColor')
+			} else {
+				style['borderBottom'] = 'none'
+				style['borderRight'] = 'none'
+			}
 			styleText['color'] = parentProps.getString('color')
 			if (props.textAlign != '') {
 				styleText['textAlign'] = props.textAlign

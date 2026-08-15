@@ -29,6 +29,10 @@
 		name: 'up-table',
 		mixins: [mpMixin, mixin, props],
 		props: {
+			border: {
+				type: Boolean,
+				default: true
+			},
 			borderColor: {
 				type: String,
 				default: '#e4e7ed'
@@ -71,6 +75,9 @@
 			}
 		},
 		watch: {
+			border() {
+				this.change();
+			},
 			align() {
 				this.change();
 			},
@@ -81,9 +88,14 @@
 		computed: {
 			tableStyle() {
 				let style = {};
-				style.borderLeft = `solid 1px ${this.borderColor}`;
-				style.borderTop = `solid 1px ${this.borderColor}`;
-				style.backgroundColor = this.bgColor;;
+				if (this.border) {
+					style.borderLeft = `solid 1px ${this.borderColor}`;
+					style.borderTop = `solid 1px ${this.borderColor}`;
+				} else {
+					style.borderLeft = 'none';
+					style.borderTop = 'none';
+				}
+				style.backgroundColor = this.bgColor;
 				return style;
 			}
 		},

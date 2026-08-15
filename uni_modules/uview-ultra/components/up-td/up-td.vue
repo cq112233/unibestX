@@ -62,8 +62,14 @@
 				style.textAlign = this.parent.align;
 				style.fontSize = addUnit(this.parent.fontSize);
 				style.padding = this.parent.padding;
-				style.borderBottom = `solid 1px ${this.parent.borderColor}`;
-				style.borderRight = `solid 1px ${this.parent.borderColor}`;
+				let border = this.parent.border ?? true;
+				if (border) {
+					style.borderBottom = `solid 1px ${this.parent.borderColor}`;
+					style.borderRight = `solid 1px ${this.parent.borderColor}`;
+				} else {
+					style.borderBottom = 'none';
+					style.borderRight = 'none';
+				}
 				style.color = this.parent.color;
 				if (this.textAlign != '') {
 					style.textAlign = this.textAlign;

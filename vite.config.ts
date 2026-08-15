@@ -12,9 +12,11 @@ import { UNI_EASYCOM_EXCLUDE } from '@dcloudio/uni-cli-shared'
 export default defineConfig({
   base: './',
   resolve: {
-    alias: [
-      { find: /^vue$/, replacement: '@dcloudio/uni-h5-vue' },
-    ],
+    alias: (process.env.UNI_PLATFORM === 'web' || process.env.UNI_PLATFORM === 'h5')
+      ? [
+          { find: /^vue$/, replacement: '@dcloudio/uni-h5-vue' },
+        ]
+      : [],
   },
   define: {
     __X_STYLE_ISOLATION__: false,
