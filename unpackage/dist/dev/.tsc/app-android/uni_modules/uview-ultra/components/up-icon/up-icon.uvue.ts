@@ -1,0 +1,225 @@
+import icons from './icons.uts'
+	import { addUnit, addStyle } from '../../libs/function/index'
+	import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'
+	import config from '../../libs/config/config';
+	import defProps from './icon'
+	import { computed } from 'vue'
+	
+const __sfc__ = defineComponent({
+  __name: 'up-icon',
+  props: {
+		// 图标类名
+		name: {
+			type: String,
+			default: () => defProps.getString('icon.name')
+		},
+		// 图标颜色，可接受主题色
+		color: {
+			type: String,
+			default: () => defProps.getString('icon.color')
+		},
+		// 字体大小，单位px
+		size: {
+			type: [String, Number],
+			default: () => defProps.getString('icon.size')
+		},
+		// 是否显示粗体
+		bold: {
+			type: Boolean,
+			default: () => defProps.getBoolean('icon.bold')
+		},
+		// 点击图标的时候传递事件出去的index（用于区分点击了哪一个）
+		index: {
+			type: [String],
+			default: () => defProps.getString('icon.index')
+		},
+		// 触摸图标时的类名
+		hoverClass: {
+			type: String,
+			default: () => defProps.getString('icon.hoverClass')
+		},
+		// 自定义扩展前缀，方便用户扩展自己的图标库
+		customPrefix: {
+			type: String,
+			default: () => defProps.getString('icon.customPrefix')
+		},
+		// 图标右边或者下面的文字
+		label: {
+			type: [String],
+			default: () => defProps.getString('icon.label')
+		},
+		// label的位置，只能右边或者下边
+		labelPos: {
+			type: String,
+			default: () => defProps.getString('icon.labelPos')
+		},
+		// label的大小
+		labelSize: {
+			type: [String, Number],
+			default: () => defProps.getString('icon.labelSize')
+		},
+		// label的颜色
+		labelColor: {
+			type: String,
+			default: () => defProps.getString('icon.labelColor')
+		},
+		// label与图标的距离
+		space: {
+			type: [String, Number],
+			default: () => defProps.getString('icon.space')
+		},
+		// 图片的mode
+		imgMode: {
+			type: String,
+			default: () => defProps.getString('icon.imgMode')
+		},
+		// 用于显示图片小图标时，图片的宽度
+		width: {
+			type: [String, Number],
+			default: () => defProps.getString('icon.width')
+		},
+		// 用于显示图片小图标时，图片的高度
+		height: {
+			type: [String, Number],
+			default: () => defProps.getString('icon.height')
+		},
+		// 用于解决某些情况下，让图标垂直居中的用途
+		top: {
+			type: [String, Number],
+			default: () => defProps.getString('icon.top')
+		},
+		// 是否阻止事件传播
+		stop: {
+			type: Boolean,
+			default: () => defProps.getBoolean('icon.stop')
+		}
+	},
+  emits: ['click'],
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+	const { preventEvent } = useUltraUI()
+	
+	// 定义props
+	const props = __props
+	
+	function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+__ins.emit(event, ...do_not_transform_spread)
+}
+	
+	// 计算属性
+	const uClasses = computed(() => {
+		let classes: Array<string> = []
+		classes.push(props.customPrefix + '-' + props.name)
+		// uview-plus的自定义图标类名为up-iconfont
+		if (props.customPrefix == 'upicon') {
+			classes.push('up-iconfont')
+		} else {
+			// 不能缺少这一步，否则自定义图标会无效
+			classes.push(props.customPrefix)
+		}
+		// 主题色，通过类配置。
+		let types: Array<string>|null = config.getArray('type') as Array<string>
+		if (props.color.toString() != '' && types != null
+			&& types?.includes(props.color.toString()) as boolean
+		) classes.push('up-icon__icon--' + props.color.toString())
+		// 阿里，头条，百度小程序通过数组绑定类名时，无法直接使用[a, b, c]的形式，否则无法识别
+		// 故需将其拆成一个字符串的形式，通过空格隔开各个类名
+		return classes.join(' ')
+	})
+	
+	const iconStyle = computed(() => {
+		let style = {__$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-icon/up-icon.uvue", 159, 7),
+			fontSize: addUnit(props.size.toString()),
+			lineHeight: addUnit(props.size.toString()),
+			fontWeight: (props.bold as boolean) ? 'bold' : 'normal',
+			// 某些特殊情况需要设置一个到顶部的距离，才能更好的垂直居中
+			top: addUnit(props.top)
+		}
+		// 非主题色值时，才当作颜色值
+		let types: Array<string>|null = config.getArray('type') as Array<string>
+		if (props.color.toString() != '' && types != null && !types.includes(props.color.toString())) {
+			style['color'] = props.color.toString()
+		}
+
+		return style
+	})
+	
+	// 判断传入的name属性，是否图片路径，只要带有"/"均认为是图片形式
+	const isImg = computed(() => {
+		return props.name.toString().indexOf('/') != -1
+	})
+	
+	const imgStyle = computed(() => {
+		let style = {__$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-icon/up-icon.uvue", 181, 7),}
+		// 如果设置width和height属性，则优先使用，否则使用size属性
+		style['width'] = props.width != '' ? addUnit(props.width) : addUnit(props.size!!.toString())
+		style['height'] = props.height != '' ? addUnit(props.height) : addUnit(props.size!!.toString())
+		return style
+	})
+	
+	// 通过图标名，查找对应的图标
+	const icon = computed(() => {
+		// 使用自定义图标的时候页面上会把name属性也展示出来，所以在这里处理一下
+		if (props.customPrefix !== "upicon") return "";
+		// 如果内置的图标中找不到对应的图标，就直接返回name值，因为用户可能传入的是unicode代码
+		if (icons['upicon-' + props.name] != null) {
+			return icons['upicon-' + props.name] as string
+		} else {
+			return props.name.toString()
+		}
+	})
+	
+	// 方法
+	function clickHandler(e: UniPointerEvent) {
+		emit('click', props.index)
+		// 是否阻止事件冒泡
+		if (props.stop as boolean) {
+			preventEvent(e)
+		}
+	}
+
+return (): any | null => {
+
+  return _cE("view", _uM({
+    class: _nC(["up-icon", ['up-icon--' + _ctx.labelPos]]),
+    onClick: clickHandler
+  }), [
+    isTrue(isImg.value)
+      ? _cE("image", _uM({
+          key: 0,
+          class: "up-icon__img",
+          src: _ctx.name,
+          mode: _ctx.imgMode != '' ? _ctx.imgMode : 'aspectFit',
+          style: _nS([imgStyle.value, _ctx.$up.addStyle(_ctx.customStyle)])
+        }), null, 12 /* STYLE, PROPS */, ["src", "mode"])
+      : _cE("text", _uM({
+          key: 1,
+          class: _nC(["up-icon__icon", uClasses.value]),
+          style: _nS([iconStyle.value, _ctx.$up.addStyle(_ctx.customStyle)]),
+          "hover-class": _ctx.hoverClass
+        }), _tD(icon.value), 15 /* TEXT, CLASS, STYLE, PROPS */, ["hover-class"]),
+    _ctx.label !== ''
+      ? _cE("text", _uM({
+          key: 2,
+          class: "up-icon__label",
+          style: _nS(_uM({
+			color: _ctx.labelColor,
+			fontSize: _ctx.$up.addUnit(_ctx.labelSize),
+			marginLeft: _ctx.labelPos == 'right' ? _ctx.$up.addUnit(_ctx.space) : 0,
+			marginTop: _ctx.labelPos == 'bottom' ? _ctx.$up.addUnit(_ctx.space) : 0,
+			marginRight: _ctx.labelPos == 'left' ? _ctx.$up.addUnit(_ctx.space) : 0,
+			marginBottom: _ctx.labelPos == 'top' ? _ctx.$up.addUnit(_ctx.space) : 0,
+		}))
+        }), _tD(_ctx.label), 5 /* TEXT, STYLE */)
+      : _cC("v-if", true)
+  ], 2 /* CLASS */)
+}
+}
+
+})
+export default __sfc__
+export type UpIconComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpIconUpIconStyles = [_uM([["u-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-icon", _pS(_uM([["display", "flex"], ["alignItems", "center"]]))], ["up-icon--left", _pS(_uM([["flexDirection", "row-reverse"], ["alignItems", "center"]]))], ["up-icon--right", _pS(_uM([["flexDirection", "row"], ["alignItems", "center"]]))], ["up-icon--top", _pS(_uM([["flexDirection", "column-reverse"], ["justifyContent", "center"]]))], ["up-icon--bottom", _pS(_uM([["flexDirection", "column"], ["justifyContent", "center"]]))], ["up-icon__icon", _pS(_uM([["fontFamily", "iconfont"], ["position", "relative"]]))], ["up-icon__icon--primary", _pS(_uM([["color", "var(--theme-color, #0957de)"]]))], ["up-icon__icon--success", _pS(_uM([["color", "#5ac725"]]))], ["up-icon__icon--error", _pS(_uM([["color", "#f56c6c"]]))], ["up-icon__icon--warning", _pS(_uM([["color", "#f9ae3d"]]))], ["up-icon__icon--info", _pS(_uM([["color", "#909399"]]))], ["up-icon__label", _pS(_uM([["lineHeight", 1]]))], ["@FONT-FACE", _uM([["0", _uM([["fontFamily", "iconfont"], ["src", "url(\"/assets/iconfont.4bc8cc97.ttf\")"]])]])]])]

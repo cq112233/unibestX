@@ -186,24 +186,20 @@
 					}
 				}
 				
-				// @ts-ignore
-				if (this.parent != null
-				// @ts-ignore
-					&& this.parent.$data['children'] != null
-					// @ts-ignore
-					&& this.index + 1 < (this.parent.$data['children'] as ComponentPublicInstance[]).length) {
-					// @ts-ignore
-					const nextChild = (this.parent.$data['children'] as ComponentPublicInstance[])[this.index + 1];
-					// @ts-ignore
-					if (nextChild != null && nextChild.$props['error'] as boolean) {
-						style['backgroundColor'] = color['error']
-						// @ts-ignore
-					} else if (this.index < parseInt(this.parentData['current'].toString())) {
-						if (this.parentData['activeColor'] != '#3c9cff') {
-							style['backgroundColor'] = this.parentData['activeColor']
+				const parent = this.parent
+				if (parent != null) {
+					const children = parent.$data['children'] as ComponentPublicInstance[] | null
+					if (children != null && this.index + 1 < children.length) {
+						const nextChild = children[this.index + 1]
+						if (nextChild != null && nextChild.$props['error'] as boolean) {
+							style['backgroundColor'] = color['error']
+						} else if (this.index < parseInt(this.parentData['current'].toString())) {
+							if (this.parentData['activeColor'] != '#3c9cff') {
+								style['backgroundColor'] = this.parentData['activeColor']
+							}
+						} else {
+							style['backgroundColor'] = this.parentData['inactiveColor']
 						}
-					} else {
-						style['backgroundColor'] = this.parentData['inactiveColor']
 					}
 				}
 				return style
@@ -314,28 +310,28 @@
 			}
 		},
 		mounted() {
-			// @ts-ignore
-			if (this.parent != null) {
-				// @ts-ignore
-				this.parent?.$callMethod('updateFromChild')
+			const parent = this.parent
+			if (parent != null) {
+				parent.$callMethod('updateFromChild')
 			}
 		},
 		methods: {
 			init() {
 				// 初始化数据
 				this.updateParentData()
-				// @ts-ignore
-				if (this.parent == null) {
+				const parent = this.parent
+				if (parent == null) {
 					return error('up-steps-item必须要搭配up-steps组件使用')
 				}
-				// @ts-ignore
-				(this.parent.$data['children'] as ComponentPublicInstance[]).forEach((child: ComponentPublicInstance, index: number) => {
-					if (child == this) {
-						this.index = index
-					}
-				})
-				// @ts-ignore
-				this.childLength = (this.parent.$data['children'] as ComponentPublicInstance[]).length
+				const children = parent.$data['children'] as ComponentPublicInstance[] | null
+				if (children != null) {
+					children.forEach((child: ComponentPublicInstance, index: number) => {
+						if (child == this) {
+							this.index = index
+						}
+					})
+					this.childLength = children.length
+				}
 			},
 			updateParentData() {
 				// 此方法在mixin中

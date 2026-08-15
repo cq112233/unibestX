@@ -1,0 +1,71 @@
+/*
+ * @Author       : jry
+ * @Description  : uview-plus component's props mixin file
+ * @version      : 4.0
+ * @Date         : 2024-04-22 16:44:21
+ * @LastAuthor   : jry
+ * @lastTime     : 2024-08-28 12:27:20
+ */
+import { defineMixin } from '../../libs/vue.uts'
+import defProps from './loadingIcon.uts'
+let crtProp = defProps['loadingIcon'] as UTSJSONObject
+
+export const propsLoadicon = defineMixin({
+    props: {
+        // 是否显示组件
+        show: {
+            type: Boolean,
+            default: crtProp['show']
+        },
+        // 颜色
+        color: {
+            type: String,
+            default: crtProp['color']
+        },
+        // 提示文字颜色
+        textColor: {
+            type: String,
+            default: crtProp['textColor']
+        },
+        // 文字和图标是否垂直排列
+        vertical: {
+            type: Boolean,
+            default: crtProp['vertical']
+        },
+        // 模式选择，circle-圆形，spinner-花朵形，semicircle-半圆形
+        mode: {
+            type: String,
+            default: crtProp['mode']
+        },
+        // 图标大小，单位默认px
+        size: {
+            type: [String, Number],
+            default: crtProp['size']
+        },
+        // 文字大小
+        textSize: {
+            type: [String, Number],
+            default: crtProp['textSize']
+        },
+        // 文字内容
+        text: {
+            type: [String, Number],
+            default: crtProp['text']
+        },
+        // 动画模式
+        timingFunction: {
+            type: String,
+            default: crtProp['timingFunction']
+        },
+        // 动画执行周期时间
+        duration: {
+            type: [String, Number],
+            default: crtProp['duration']
+        },
+        // mode=circle时的暗边颜色
+        inactiveColor: {
+            type: String,
+            default: crtProp['inactiveColor']
+        }
+    }
+})

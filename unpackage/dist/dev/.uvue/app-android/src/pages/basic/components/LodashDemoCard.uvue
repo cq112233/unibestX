@@ -1,0 +1,234 @@
+import Card from './Card.uvue';
+import { camelCase, capitalize, chunk, cloneDeep, debounce, get, kebabCase, random, shuffle, uniq } from '@/uni_modules/iRainna-lodash';
+import { computed, ref } from 'vue';
+// ==========================================
+// 1. 数组处理状态 (Array Operations)
+// ==========================================
+const __sfc__ = defineComponent({
+    __name: 'LodashDemoCard',
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        const rawArray = ref<number[]>([1, 2, 2, 3, 4, 4, 5, 6, 7, 8]);
+        // 使用 uniq 对数组进行去重
+        const uniqArray = computed((): number[] => {
+            return uniq(rawArray.value as any[]) as number[];
+        });
+        // 使用 chunk 对去重后的数组按照指定大小进行切片分组
+        const chunkedArray = computed((): string => {
+            const result = chunk(uniqArray.value as any[], 3);
+            return JSON.stringify(result);
+        });
+        // 使用 shuffle 随机打乱数组顺序
+        function handleShuffle() {
+            rawArray.value = shuffle(rawArray.value as any[]) as number[];
+        }
+        // ==========================================
+        // 2. 对象深拷贝与安全取值状态 (Object & Deep Clone)
+        // ==========================================
+        // 说明：UTS 的 get/cloneDeep 基于 UTSJSONObject 实现（UTS 中只能枚举 JSON 对象），
+        // 因此这里使用 UTSJSONObject 演示，而非 UTS 强类型对象
+        const rawObj: UTSJSONObject = { __$originalPosition: new UTSSourceMapPosition("rawObj", "src/pages/basic/components/LodashDemoCard.uvue", 214, 7),
+            user: {
+                info: {
+                    name: 'UniAppX Developer',
+                    age: 25
+                }
+            }
+        };
+        // 使用 get 链式安全取值 (避免空指针/未定义路径崩溃)
+        const getNameResult = computed((): string => {
+            return get(rawObj, 'user.info.name', '未找到') as string;
+        });
+        // 使用 get 对不存在的路径进行兜底取值
+        const getFallbackResult = computed((): string => {
+            return get(rawObj, 'user.invalid.path', '兜底结果: 未查找到路径') as string;
+        });
+        // 使用 cloneDeep 对对象进行深度拷贝测试
+        const clonedObj = ref<UTSJSONObject>(cloneDeep(rawObj) as UTSJSONObject);
+        const rawObjAge = ref<number>(get(rawObj, 'user.info.age', 0) as number);
+        const clonedObjAge = computed((): number => {
+            return get(clonedObj.value, 'user.info.age', 0) as number;
+        });
+        // 修改深拷贝副本的属性值，验证原对象属性未受到修改污染
+        function mutateClonedObj() {
+            /* eslint-disable dot-notation */
+            const user = clonedObj.value['user'] as UTSJSONObject;
+            const info = user['info'] as UTSJSONObject;
+            const currentAge = (info['age'] as number) + 1;
+            info['age'] = currentAge;
+            /* eslint-enable dot-notation */
+        }
+        // ==========================================
+        // 3. 字符串格式化状态 (String Operations)
+        // ==========================================
+        const inputText = ref('hello_world lodash-demo-test');
+        // 使用 camelCase 转为驼峰命名
+        const camelCaseResult = computed((): string => {
+            return camelCase(inputText.value) as string;
+        });
+        // 使用 kebabCase 转为短横线命名
+        const kebabCaseResult = computed((): string => {
+            return kebabCase(inputText.value) as string;
+        });
+        // 使用 capitalize 转为首字母大写
+        const capitalizeResult = computed((): string => {
+            return capitalize(inputText.value) as string;
+        });
+        // ==========================================
+        // 4. 防抖与随机数状态 (Debounce & Utilities)
+        // ==========================================
+        const debouncedCount = ref(0);
+        const randomValue = ref<number>(random(1, 100) as number);
+        // 递增计数回调
+        function incrementCount() {
+            debouncedCount.value += 1;
+        }
+        // 使用 debounce 包装防抖函数 (间隔 400 毫秒)
+        const debouncedIncrement = debounce(incrementCount, 400) as () => void;
+        // 点击防抖测试按钮
+        function handleDebounceClick() {
+            debouncedIncrement();
+        }
+        // 重新生成随机数
+        function generateRandom() {
+            randomValue.value = random(1, 100) as number;
+        }
+        return (): any | null => {
+            return _cV(unref(Card), _uM({ title: "Lodash 工具库 (iRainna-lodash)" }), _uM({
+                default: withSlotCtx((): any[] => [
+                    _cE("view", _uM({ class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }), [
+                        _cE("text", _uM({ class: "text-13px font-bold text-__1e293b_ mb-8px" }), "1. 数组切片去重与随机打乱 (chunk, uniq, shuffle)"),
+                        _cE("view", _uM({ class: "mb-8px" }), [
+                            _cE("text", _uM({ class: "text-12px text-__64748b_" }), "原始数组 (带重复元素):"),
+                            _cE("text", _uM({
+                                class: "result-text text-13px font-medium text-__334155_ mt-2px",
+                                style: _nS(_uM({ "font-family": "monospace" }))
+                            }), _tD(JSON.stringify(rawArray.value)), 5 /* TEXT, STYLE */)
+                        ]),
+                        _cE("view", _uM({ class: "mb-8px" }), [
+                            _cE("text", _uM({ class: "text-12px text-__64748b_" }), "_.uniq 去重结果:"),
+                            _cE("text", _uM({
+                                class: "result-text text-13px font-bold text-__059669_ mt-2px",
+                                style: _nS(_uM({ "font-family": "monospace" }))
+                            }), _tD(JSON.stringify(uniqArray.value)), 5 /* TEXT, STYLE */)
+                        ]),
+                        _cE("view", _uM({ class: "mb-12px" }), [
+                            _cE("text", _uM({ class: "text-12px text-__64748b_" }), "_.chunk 切片结果 (每组 3 个):"),
+                            _cE("text", _uM({
+                                class: "result-text text-12px font-medium text-__3b82f6_ mt-2px",
+                                style: _nS(_uM({ "font-family": "monospace" }))
+                            }), _tD(chunkedArray.value), 5 /* TEXT, STYLE */)
+                        ]),
+                        _cE("view", _uM({
+                            class: "w-full h-36px rounded-8px bg-__f1f5f9_ flex flex-row items-center justify-center",
+                            onClick: handleShuffle
+                        }), [
+                            _cE("text", _uM({ class: "text-13px font-bold text-__475569_" }), "点击使用 _.shuffle 打乱数组")
+                        ])
+                    ]),
+                    _cE("view", _uM({ class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }), [
+                        _cE("text", _uM({ class: "text-13px font-bold text-__1e293b_ mb-8px" }), "2. 对象深拷贝与安全取值 (get, cloneDeep)"),
+                        _cE("view", _uM({ class: "mb-8px" }), [
+                            _cE("text", _uM({ class: "text-12px text-__64748b_" }), "_.get(obj, 'user.info.name', '未找到'):"),
+                            _cE("text", _uM({
+                                class: "result-text text-13px font-bold text-__3b82f6_ mt-2px",
+                                style: _nS(_uM({ "font-family": "monospace" }))
+                            }), " \"" + _tD(getNameResult.value) + "\" ", 5 /* TEXT, STYLE */)
+                        ]),
+                        _cE("view", _uM({ class: "mb-8px" }), [
+                            _cE("text", _uM({ class: "text-12px text-__64748b_" }), "_.get(obj, 'user.invalid.path', '安全兜底值'):"),
+                            _cE("text", _uM({
+                                class: "result-text text-13px font-bold text-__d97706_ mt-2px",
+                                style: _nS(_uM({ "font-family": "monospace" }))
+                            }), " \"" + _tD(getFallbackResult.value) + "\" ", 5 /* TEXT, STYLE */)
+                        ]),
+                        _cE("view", _uM({ class: "border-top-width-1px border-top-style-solid border-top-color-__e2e8f0_ pt-8px mt-8px mb-8px" }), [
+                            _cE("text", _uM({ class: "text-12px text-__64748b_ mb-4px" }), "深拷贝防污染对比 (点击修改深拷贝副本的值):"),
+                            _cE("view", _uM({ class: "flex-row justify-between mb-4px" }), [
+                                _cE("text", _uM({ class: "text-12px text-__475569_" }), "原对象 age:"),
+                                _cE("text", _uM({ class: "text-12px font-bold text-__334155_" }), _tD(rawObjAge.value), 1 /* TEXT */)
+                            ]),
+                            _cE("view", _uM({ class: "flex-row justify-between mb-8px" }), [
+                                _cE("text", _uM({ class: "text-12px text-__475569_" }), "副本对象 age:"),
+                                _cE("text", _uM({ class: "text-12px font-bold text-__ec4899_" }), _tD(clonedObjAge.value), 1 /* TEXT */)
+                            ]),
+                            _cE("view", _uM({
+                                class: "w-full h-36px rounded-8px bg-__fce7f3_ flex flex-row items-center justify-center",
+                                onClick: mutateClonedObj
+                            }), [
+                                _cE("text", _uM({ class: "text-13px font-bold text-__be185d_" }), "修改副本 age (+1)")
+                            ])
+                        ])
+                    ]),
+                    _cE("view", _uM({ class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }), [
+                        _cE("text", _uM({ class: "text-13px font-bold text-__1e293b_ mb-8px" }), "3. 字符串修饰与格式化 (camelCase, kebabCase)"),
+                        _cE("view", _uM({ class: "mb-12px" }), [
+                            _cE("text", _uM({ class: "text-12px text-__64748b_ mb-4px" }), "输入文本:"),
+                            _cE("input", _uM({
+                                modelValue: inputText.value,
+                                onInput: ($event: UniInputEvent) => { (inputText).value = $event.detail.value; },
+                                class: "w-full h-36px px-12px rounded-6px border-width-1px border-style-solid border-color-__cbd5e1_ text-13px text-__1e293b_",
+                                placeholder: "请输入待转换文本"
+                            }), null, 40 /* PROPS, NEED_HYDRATION */, ["modelValue", "onInput"])
+                        ]),
+                        _cE("view", _uM({ class: "mb-8px" }), [
+                            _cE("text", _uM({ class: "text-12px text-__64748b_" }), "_.camelCase (驼峰):"),
+                            _cE("text", _uM({
+                                class: "result-text text-13px font-bold text-__8b5cf6_ mt-2px",
+                                style: _nS(_uM({ "font-family": "monospace" }))
+                            }), _tD(camelCaseResult.value), 5 /* TEXT, STYLE */)
+                        ]),
+                        _cE("view", _uM({ class: "mb-8px" }), [
+                            _cE("text", _uM({ class: "text-12px text-__64748b_" }), "_.kebabCase (短横线):"),
+                            _cE("text", _uM({
+                                class: "result-text text-13px font-bold text-__06b6d4_ mt-2px",
+                                style: _nS(_uM({ "font-family": "monospace" }))
+                            }), _tD(kebabCaseResult.value), 5 /* TEXT, STYLE */)
+                        ]),
+                        _cE("view", _uM({ class: "mb-6px" }), [
+                            _cE("text", _uM({ class: "text-12px text-__64748b_" }), "_.capitalize (首字母大写):"),
+                            _cE("text", _uM({
+                                class: "result-text text-13px font-bold text-__10b981_ mt-2px",
+                                style: _nS(_uM({ "font-family": "monospace" }))
+                            }), _tD(capitalizeResult.value), 5 /* TEXT, STYLE */)
+                        ])
+                    ]),
+                    _cE("view", _uM({ class: "rounded-12px p-16px border-width-1px border-style-solid border-color-__e2e8f0_" }), [
+                        _cE("text", _uM({ class: "text-13px font-bold text-__1e293b_ mb-8px" }), "4. 防抖函数与随机数 (debounce, random)"),
+                        _cE("view", _uM({ class: "flex-row items-center justify-between mb-12px" }), [
+                            _cE("view", _uM({ class: "flex-col" }), [
+                                _cE("text", _uM({ class: "text-12px text-__64748b_" }), "防抖点击触发次数 (400ms):"),
+                                _cE("text", _uM({ class: "text-12px text-__94a3b8_" }), "连击时仅在停止 400ms 后加 1")
+                            ]),
+                            _cE("text", _uM({ class: "text-20px font-bold text-__f59e0b_" }), _tD(debouncedCount.value), 1 /* TEXT */)
+                        ]),
+                        _cE("view", _uM({
+                            class: "w-full h-36px rounded-8px bg-__fef3c7_ flex flex-row items-center justify-center mb-12px",
+                            onClick: handleDebounceClick
+                        }), [
+                            _cE("text", _uM({ class: "text-13px font-bold text-__b45309_" }), "快速连击测试防抖")
+                        ]),
+                        _cE("view", _uM({ class: "border-top-width-1px border-top-style-solid border-top-color-__e2e8f0_ pt-8px flex-row items-center justify-between" }), [
+                            _cE("text", _uM({ class: "text-12px text-__64748b_" }), "_.random(1, 100) 随机数:"),
+                            _cE("view", _uM({ class: "flex-row items-center" }), [
+                                _cE("text", _uM({ class: "text-14px font-bold text-__6366f1_ mr-12px" }), _tD(randomValue.value), 1 /* TEXT */),
+                                _cE("view", _uM({
+                                    class: "px-8px py-4px rounded-4px bg-__e0e7ff_",
+                                    onClick: generateRandom
+                                }), [
+                                    _cE("text", _uM({ class: "text-11px font-bold text-__4338ca_" }), "重新生成")
+                                ])
+                            ])
+                        ])
+                    ])
+                ]),
+                _: 1 /* STABLE */
+            }));
+        };
+    }
+});
+export default __sfc__;
+const GenSrcPagesBasicComponentsLodashDemoCardStyles = [_uM([["bg-__e0e7ff_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#e0e7ff"]]))], ["bg-__f1f5f9_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f1f5f9"]]))], ["bg-__fce7f3_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#fce7f3"]]))], ["bg-__fef3c7_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#fef3c7"]]))], ["border-color-__cbd5e1_", _pS(_uM([["borderTopColor", "#cbd5e1"], ["borderRightColor", "#cbd5e1"], ["borderBottomColor", "#cbd5e1"], ["borderLeftColor", "#cbd5e1"]]))], ["border-color-__e2e8f0_", _pS(_uM([["borderTopColor", "#e2e8f0"], ["borderRightColor", "#e2e8f0"], ["borderBottomColor", "#e2e8f0"], ["borderLeftColor", "#e2e8f0"]]))], ["border-style-solid", _pS(_uM([["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"]]))], ["border-top-color-__e2e8f0_", _pS(_uM([["borderTopColor", "#e2e8f0"]]))], ["border-top-style-solid", _pS(_uM([["borderTopStyle", "solid"]]))], ["border-top-width-1px", _pS(_uM([["borderTopWidth", 1]]))], ["border-width-1px", _pS(_uM([["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1]]))], ["flex", _pS(_uM([["display", "flex"]]))], ["flex-col", _pS(_uM([["flexDirection", "column"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["font-bold", _pS(_uM([["fontWeight", 700]]))], ["font-medium", _pS(_uM([["fontWeight", 500]]))], ["h-36px", _pS(_uM([["height", 36]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["justify-between", _pS(_uM([["justifyContent", "space-between"]]))], ["justify-center", _pS(_uM([["justifyContent", "center"]]))], ["mb-12px", _pS(_uM([["marginBottom", 12]]))], ["mb-16px", _pS(_uM([["marginBottom", 16]]))], ["mb-4px", _pS(_uM([["marginBottom", 4]]))], ["mb-6px", _pS(_uM([["marginBottom", 6]]))], ["mb-8px", _pS(_uM([["marginBottom", 8]]))], ["mr-12px", _pS(_uM([["marginRight", 12]]))], ["mt-2px", _pS(_uM([["marginTop", 2]]))], ["mt-8px", _pS(_uM([["marginTop", 8]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pt-8px", _pS(_uM([["paddingTop", 8]]))], ["px-12px", _pS(_uM([["paddingLeft", 12], ["paddingRight", 12]]))], ["px-8px", _pS(_uM([["paddingLeft", 8], ["paddingRight", 8]]))], ["py-4px", _pS(_uM([["paddingTop", 4], ["paddingBottom", 4]]))], ["rounded-12px", _pS(_uM([["borderTopLeftRadius", 12], ["borderTopRightRadius", 12], ["borderBottomRightRadius", 12], ["borderBottomLeftRadius", 12]]))], ["rounded-4px", _pS(_uM([["borderTopLeftRadius", 4], ["borderTopRightRadius", 4], ["borderBottomRightRadius", 4], ["borderBottomLeftRadius", 4]]))], ["rounded-6px", _pS(_uM([["borderTopLeftRadius", 6], ["borderTopRightRadius", 6], ["borderBottomRightRadius", 6], ["borderBottomLeftRadius", 6]]))], ["rounded-8px", _pS(_uM([["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["text-__059669_", _pS(_uM([["color", "#059669"]]))], ["text-__06b6d4_", _pS(_uM([["color", "#06b6d4"]]))], ["text-__10b981_", _pS(_uM([["color", "#10b981"]]))], ["text-__1e293b_", _pS(_uM([["color", "#1e293b"]]))], ["text-__334155_", _pS(_uM([["color", "#334155"]]))], ["text-__3b82f6_", _pS(_uM([["color", "#3b82f6"]]))], ["text-__4338ca_", _pS(_uM([["color", "#4338ca"]]))], ["text-__475569_", _pS(_uM([["color", "#475569"]]))], ["text-__6366f1_", _pS(_uM([["color", "#6366f1"]]))], ["text-__64748b_", _pS(_uM([["color", "#64748b"]]))], ["text-__8b5cf6_", _pS(_uM([["color", "#8b5cf6"]]))], ["text-__94a3b8_", _pS(_uM([["color", "#94a3b8"]]))], ["text-__b45309_", _pS(_uM([["color", "#b45309"]]))], ["text-__be185d_", _pS(_uM([["color", "#be185d"]]))], ["text-__d97706_", _pS(_uM([["color", "#d97706"]]))], ["text-__ec4899_", _pS(_uM([["color", "#ec4899"]]))], ["text-__f59e0b_", _pS(_uM([["color", "#f59e0b"]]))], ["text-11px", _pS(_uM([["fontSize", 11]]))], ["text-12px", _pS(_uM([["fontSize", 12]]))], ["text-13px", _pS(_uM([["fontSize", 13]]))], ["text-14px", _pS(_uM([["fontSize", 14]]))], ["text-20px", _pS(_uM([["fontSize", 20]]))], ["w-full", _pS(_uM([["width", "100%"]]))]])];
+//# sourceMappingURL=LodashDemoCard.uvue.map

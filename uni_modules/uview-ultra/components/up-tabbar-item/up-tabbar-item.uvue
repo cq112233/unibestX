@@ -139,11 +139,14 @@
 						return
 					}
 				}
-				this.isActive = name === this.parentData['value']
+				this.isActive = name == this.parentData['value']
 			},
 			startRouteSync() {
 				this.clearRouteSync()
-				if (!(typeof this.name === 'string' && this.name.indexOf('/') > -1)) return
+				const nameVal = this.name
+				if (nameVal == null) return
+				const nameStr = nameVal.toString()
+				if (!nameStr.includes('/')) return
 				this.routeSyncLast = this.getCurrentRoutePath()
 				this.routeSyncTimer = setInterval(() => {
 					const current = this.getCurrentRoutePath()
@@ -154,7 +157,8 @@
 				}, 200) as number
 			},
 			init() {
-				if (this.parent == null) {
+				const parent = this.parent
+				if (parent == null) {
 					error('up-tabbar-item必须搭配up-tabbar组件使用')
 				}
 				this.syncActiveByRouteOrValue()
@@ -175,10 +179,9 @@
 					const index = this.getChildIndex(this)
 					const name = this.name != null ? this.name : index
 					// 点击的item为非激活的item才发出change事件
-					// @ts-ignore
-					if (this.parent != null && name.toString() != this.parent.$props['value'].toString()) {
-						// @ts-ignore
-						this.parent.$emit('change', name)
+					const parent = this.parent as ComponentPublicInstance | null
+					if (parent != null && name.toString() != parent.$props['value'].toString()) {
+						parent.$emit('change', name)
 					}
 					this.$emit('click', name)
 				})

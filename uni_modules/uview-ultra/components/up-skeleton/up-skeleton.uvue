@@ -89,43 +89,39 @@
 		computed: {
 			rowsArray(): Array<UTSJSONObject> {
 				const rows: Array<UTSJSONObject> = []
-				// @ts-ignore
-				for (let i = 0; i < parseInt(this.rows.toString()); i++) {
+				const rowCount = parseInt(this.rows.toString())
+				const rWidth = this.rowsWidth
+				const rHeight = this.rowsHeight
+				for (let i = 0; i < rowCount; i++) {
 					let item: UTSJSONObject = {}
 					// 需要预防超出数组边界的情况
 					let rowWidth: string | number = ''
-					if (this.rowsWidth instanceof Array) {
-						// 数组形式
-						// @ts-ignore
-						if (i === parseInt(this.rows.toString()) - 1) {
+					if (rWidth instanceof Array) {
+						const rWidthArr = rWidth as Array<any>
+						if (i == rowCount - 1) {
 							rowWidth = '70%'
 						} else {
-							rowWidth = this.rowsWidth[i] != null ? this.rowsWidth[i]??'0px'
-								// @ts-ignore
-								:  (i === this.rowsWidth.length ? '70%' : '100%')
+							rowWidth = rWidthArr[i] != null ? (rWidthArr[i] ?? '0px') : (i == rWidthArr.length ? '70%' : '100%')
 						}
 					} else {
 						// 非数组形式
-						// @ts-ignore
-						if (i === parseInt(this.rows.toString()) - 1) {
+						if (i == rowCount - 1) {
 							rowWidth = '70%'
 						} else {
-							// @ts-ignore
-							rowWidth = this.rowsWidth.toString()
+							rowWidth = rWidth != null ? rWidth.toString() : ''
 						}
 					}
 					
 					let rowHeight: string | number = ''
-					if (this.rowsHeight instanceof Array) {
-						// @ts-ignore
-						rowHeight = this.rowsHeight[i] != null ? this.rowsHeight[i]??'0px' : '18px'
+					if (rHeight instanceof Array) {
+						const rHeightArr = rHeight as Array<any>
+						rowHeight = rHeightArr[i] != null ? (rHeightArr[i] ?? '0px') : '18px'
 					} else {
-						// @ts-ignore
-						rowHeight = this.rowsHeight.toString()
+						rowHeight = rHeight != null ? rHeight.toString() : ''
 					}
 					
 					// 如果有title占位图，第一个段落占位图的外边距需要大一些，如果没有title占位图，第一个段落占位图则无需外边距
-					// 之所以需要这么做，是因为weex的无能，以提升性能为借口不支持css的一些伪类
+					// 之配置
 					if (!this.title && i == 0) {
 						item['marginTop'] = '0px'
 					} else if (this.title && i == 0) {

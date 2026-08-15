@@ -57,15 +57,9 @@
 			init() {
 				// 初始化数据
 				this.updateParentData()
-				if (this.parent != null) {
-					this.index = ((this.parent as ComponentPublicInstance)!!.$data['childrenRefs'] as string[]).indexOf(this.refstr)
-					// console.log('*****', this.index, '*****')
-					// let childs: ComponentPublicInstance[] = this.parent.$data['children'] as ComponentPublicInstance[]
-					// childs.forEach(function(child: ComponentPublicInstance, index: number) {
-					// 	if(child == this) {
-					// 		this.index = index
-					// 	}
-					// });
+				const parent = this.parent as ComponentPublicInstance | null
+				if (parent != null) {
+					this.index = (parent.$data['childrenRefs'] as string[]).indexOf(this.refstr)
 					this.resize()
 				}
 			},
@@ -80,9 +74,11 @@
 				// console.log("*******", `up-list-item-${this.anchor}`)
 				this.queryRect(`up-list-item-${this.refstr}`).then((size: NodeInfo) => {
 					if (this.index > 0) {
-						if (this.parent != null) {
-							let parentIns = this.parent as ComponentPublicInstance
-							const lastChild = (parentIns!!.$data['children'] as ComponentPublicInstance[])[this.index - 1]
+						const parentIns = this.parent as ComponentPublicInstance | null
+						if (parentIns != null) {
+							const children = parentIns.$data['children'] as ComponentPublicInstance[] | null
+							if (children == null) return
+							const lastChild = children[this.index - 1]
 							if (lastChild == null) {
 								return
 							}

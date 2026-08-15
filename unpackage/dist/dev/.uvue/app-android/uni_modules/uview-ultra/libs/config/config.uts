@@ -1,0 +1,41 @@
+function __uts_large_default_export_prop_fill_fill_1(__obj: UTSJSONObject): void {
+    __obj["up-primary"] = '#2979ff';
+    __obj["up-warning"] = '#ff9900';
+    __obj["up-success"] = '#19be6b';
+    __obj["up-error"] = '#fa3534';
+    __obj["up-info"] = '#909399';
+    __obj["up-main-color"] = '#303133';
+    __obj["up-content-color"] = '#606266';
+    __obj["up-tips-color"] = '#909399';
+    __obj["up-light-color"] = '#c0c4cc';
+}
+function __uts_large_default_export_prop_build_0(): UTSJSONObject {
+    const __obj = {} as UTSJSONObject;
+    __uts_large_default_export_prop_fill_fill_1(__obj);
+    return __obj;
+}
+function __uts_large_default_export_fill_fill_3(__obj: UTSJSONObject): void {
+    __obj["v"] = '4';
+    __obj["version"] = '4';
+    __obj["type"] = [
+        'primary',
+        'success',
+        'info',
+        'error',
+        'warning'
+    ];
+    __obj["color"] = __uts_large_default_export_prop_build_0();
+    __obj["unit"] = 'px';
+}
+function __uts_large_default_export_build_2(): UTSJSONObject {
+    const __obj = {} as UTSJSONObject;
+    __uts_large_default_export_fill_fill_3(__obj);
+    return __obj;
+}
+let version = '4';
+// 开发环境才提示，生产环境不会提示
+// if (process.env.NODE_ENV === 'development') {
+// 	__f__('log','at uni_modules/uview-ultra/libs/config/config.uts:5',`\n %c uview-plus V${version} %c https://ijry.github.io/uview-plus/ \n\n`, 'color: #ffffff; background: #3c9cff; padding:5px 0;', 'color: #3c9cff;background: #ffffff; padding:5px 0;');
+// }
+export default __uts_large_default_export_build_2();
+//# sourceMappingURL=config.uts.map
