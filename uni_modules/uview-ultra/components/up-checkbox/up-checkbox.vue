@@ -302,8 +302,8 @@
 	$up-checkbox-icon-wrap-circle-border-radius:100% !default;
 	$up-checkbox-icon-wrap-square-border-radius:3px !default;
 	$up-checkbox-icon-wrap-checked-color:#fff !default;
-	$up-checkbox-icon-wrap-checked-background-color:red !default;
-	$up-checkbox-icon-wrap-checked-border-color:#2979ff !default;
+	$up-checkbox-icon-wrap-checked-background-color: $up-primary !default;
+	$up-checkbox-icon-wrap-checked-border-color: $up-primary !default;
 	$up-checkbox-icon-wrap-disabled-background-color:#ebedf0 !default;
 	$up-checkbox-icon-wrap-disabled-checked-color:#c8c9cc !default;
 	$up-checkbox-label-margin-left:5px !default;

@@ -12,7 +12,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     name: "up-picker"
   },
   __dynamicSharedData: true,
-  __hash: "3b98a1d2",
+  __hash: "79efea8b",
   __className,
   __filename: "uni_modules/uview-ultra/components/up-picker/up-picker.uvue",
   __name: "up-picker",
@@ -490,7 +490,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
           _createSharedDataIf(() => {
             return _setSharedData(__sharedData, 6, _toSharedDataBoolean(__props.loading));
           }, () => {
-            const n29 = _createSharedDataComponentWithFallback(_component_up_loading_icon, "0be3ab2a", { mode: "circle" });
+            const n29 = _createSharedDataComponentWithFallback(_component_up_loading_icon, "0be3ab2e", { mode: "circle" });
             _setSharedData(__sharedData, 7, n29?.sharedData);
           });
         })

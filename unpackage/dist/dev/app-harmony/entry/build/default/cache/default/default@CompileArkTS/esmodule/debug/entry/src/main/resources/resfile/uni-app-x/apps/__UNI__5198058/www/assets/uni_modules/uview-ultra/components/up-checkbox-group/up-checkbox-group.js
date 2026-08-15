@@ -34,7 +34,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     },
     activeColor: {
       type: String,
-      default: "#2979ff"
+      default: ""
     },
     inactiveColor: {
       type: String,

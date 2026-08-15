@@ -265,8 +265,8 @@
 	$up-radio-circle-border-radius:100% !default;
 	$up-radio-square-border-radius:3px !default;
 	$up-radio-checked-color:#fff !default;
-	$up-radio-checked-background-color:red !default;
-	$up-radio-checked-border-color: #2979ff !default;
+	$up-radio-checked-background-color: $up-primary !default;
+	$up-radio-checked-border-color: $up-primary !default;
 	$up-radio-disabled-background-color:#ebedf0 !default;
 	$up-radio-disabled--checked-color:#c8c9cc !default;
 	$up-radio-label-margin-left: 5px !default;

@@ -64,7 +64,7 @@
               v-for="(column, colIndex) in innerColumns"
               :key="colIndex"
               class="up-picker__column"
-              :scroll-y="true"
+              direction="vertical"
               :scroll-top="columnScrollTops[colIndex]"
               :show-scrollbar="false"
               @scroll="onColumnScroll($event, colIndex)"
