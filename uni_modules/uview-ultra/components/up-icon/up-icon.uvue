@@ -9,13 +9,13 @@
 		    v-if="isImg"
 		    :src="name"
 		    :mode="imgMode != '' ? imgMode : 'aspectFit'"
-		    :style="[imgStyle, $up.addStyle(customStyle)]"
+		    :style="[imgStyle, addStyle(customStyle)]"
 		></image>
 		<text
 		    v-else
 		    class="up-icon__icon"
 		    :class="uClasses"
-		    :style="[iconStyle, $up.addStyle(customStyle)]"
+		    :style="[iconStyle, addStyle(customStyle)]"
 		    :hover-class="hoverClass"
 		>{{icon}}</text>
 		<!-- 这里进行空字符串判断，如果仅仅是v-if="label"，可能会出现传递0的时候，结果也无法显示 -->
@@ -24,11 +24,11 @@
 		    class="up-icon__label"
 		    :style="{
 			color: labelColor,
-			fontSize: $up.addUnit(labelSize),
-			marginLeft: labelPos == 'right' ? $up.addUnit(space) : 0,
-			marginTop: labelPos == 'bottom' ? $up.addUnit(space) : 0,
-			marginRight: labelPos == 'left' ? $up.addUnit(space) : 0,
-			marginBottom: labelPos == 'top' ? $up.addUnit(space) : 0,
+			fontSize: addUnit(labelSize),
+			marginLeft: labelPos == 'right' ? addUnit(space) : 0,
+			marginTop: labelPos == 'bottom' ? addUnit(space) : 0,
+			marginRight: labelPos == 'left' ? addUnit(space) : 0,
+			marginBottom: labelPos == 'top' ? addUnit(space) : 0,
 		}"
 		>{{ label }}</text>
 	</view>
@@ -45,6 +45,14 @@
 	
 	// 定义props
 	const props = defineProps({
+		customStyle: {
+			type: [Object, String],
+			default: () => ({})
+		},
+		customClass: {
+			type: String,
+			default: ''
+		},
 		// 图标类名
 		name: {
 			type: String,

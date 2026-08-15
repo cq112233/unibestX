@@ -30,7 +30,7 @@
 		<view
 			class="up-index-list__letter"
 			ref="up-index-list__letter"
-			:style="{top: $up.addUnit(letterInfo['top'] ?? '') , transform: 'translateY(-50%)'}"
+			:style="{top: addUnit(letterInfo['top'] ?? '') , transform: 'translateY(-50%)'}"
 			@touchstart="touchStart"
 			@touchmove="touchMove"
 			@touchend="touchEnd"
@@ -55,8 +55,8 @@
 			:customStyle="{
 				position: 'absolute',
 				right: '30px',
-				top: $up.addUnit(indicatorTop, 'px'),
-				width: $up.addUnit(indicatorHeight + 10),
+				top: addUnit(indicatorTop, 'px'),
+				width: addUnit(indicatorHeight + 10),
 				zIndex: 3
 			}"
 		>
@@ -64,8 +64,8 @@
 				class="up-index-list__indicator"
 				:class="['up-index-list__indicator--show']"
 				:style="{
-					height: $up.addUnit(indicatorHeight),
-					width: $up.addUnit(indicatorHeight)
+					height: addUnit(indicatorHeight),
+					width: addUnit(indicatorHeight)
 				}"
 			>
 				<text class="up-index-list__indicator__text">

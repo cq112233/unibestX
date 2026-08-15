@@ -1,7 +1,7 @@
 <template>
 	<view
 	    class="up-empty"
-	    :style="[emptyStyle, $up.addStyle(customStyle)]"
+	    :style="[emptyStyle, addStyle(customStyle)]"
 	    v-if="show"
 	>
 		<up-icon
@@ -14,8 +14,8 @@
 		<image
 		    v-else
 		    :style="{
-				width: $up.addUnit(width),
-				height: $up.addUnit(height),
+				width: addUnit(width),
+				height: addUnit(height),
 			}"
 		    :src="icon"
 		    mode="widthFix"
@@ -47,6 +47,14 @@ defineOptions({
 
 // props
 const props = defineProps({
+	customStyle: {
+		type: [Object, String],
+		default: () => ({})
+	},
+	customClass: {
+		type: String,
+		default: ''
+	},
 	// 内置图标名称，或图片路径，建议绝对路径
 	icon: {
 		type: String,

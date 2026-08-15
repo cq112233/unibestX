@@ -36,11 +36,9 @@
 </template>
 
 <script setup lang="uts">
-	import { computed, ref, watch, onMounted, getCurrentInstance } from 'vue'
+	import { computed, ref, watch, onMounted, getCurrentInstance, provide } from 'vue'
 	import { addUnit, getWindowInfo, upGetRect } from '../../libs/function/index.uts';
-	import { UPDropdownMenu} from './types.uts';
-	import { useUltraUI } from '../../libs/composable/useUltraUI'
-	const { children, getChildren, addChild } = useUltraUI()
+	import { UPDropdownMenu } from './types.uts';
 	const instance = getCurrentInstance()!.proxy!
 	
 	defineOptions({
@@ -110,10 +108,9 @@
 	const emit = defineEmits(['open', 'close']);
 	
 	// 定义响应式数据
-	const showDropdown = ref(true);
 	const menuList = ref([] as Array<UPDropdownMenu>);
 	const active = ref(false);
-	const current = ref(99999 as number);
+	const current = ref(-1 as number);
 	const contentStyle = ref<UTSJSONObject>({
 		zIndex: -1,
 		opacity: 0
@@ -136,23 +133,10 @@
 		return style
 	})
 
-	function getWindowInfoWrapper() {
-		return getWindowInfo();
-	}
-	
-	function init() {
-		menuList.value = [];
-		if (children.value != null) {
-			children.value?.map((child: ComponentPublicInstance) => {
-				child.$callMethod('init');
-			});
-		}
-	}
-	
 	function getContentHeight() {
-		let windowHeight = getWindowInfoWrapper().windowHeight;
+		let windowHeight = getWindowInfo().windowHeight;
 		upGetRect('.up-dropdown__menu', false, instance).then((res) => {
-			if (res.bottom != null) {
+			if (res.bottom != null && res.bottom! > 0) {
 				contentHeight.value = windowHeight - res.bottom!;
 			} else {
 				contentHeight.value = windowHeight;
@@ -169,22 +153,13 @@
 		};
 		active.value = true;
 		current.value = index;
-		if (children.value != null) {
-			children.value!.map((val: ComponentPublicInstance, idx: number) => {
-				if (index == idx) {
-					val.$callMethod('setActive', true)
-				} else {
-					val.$callMethod('setActive', false)
-				}
-			});
-		}
 		emit('open', current.value);
 	}
 	
 	function close() {
 		emit('close', current.value);
 		active.value = false;
-		current.value = 99999;
+		current.value = -1;
 		contentStyle.value['zIndex'] = -1;
 		contentStyle.value['opacity'] = 0;
 		setTimeout(() => {
@@ -193,14 +168,10 @@
 	}
 	
 	function menuClick(index: number) {
+		if (index < 0 || index >= menuList.value.length) return;
 		if (menuList.value[index].disabled) return;
 		if (index == current.value && props.closeOnClickSelf) {
 			close();
-			setTimeout(() => {
-				if (children.value != null && children.value![index] != null) {
-					children.value![index].$callMethod('setActive', false);
-				}
-			}, parseInt(props.duration.toString()));
 			return;
 		}
 		open(index);
@@ -239,30 +210,36 @@
 		return style;
 	}
 	
-	function addMenuListItem(item: UPDropdownMenu) {
+	function registerItem(item: UPDropdownMenu): number {
+		const idx = menuList.value.length;
 		menuList.value.push(item);
+		return idx;
+	}
+
+	function updateItemTitle(idx: number, title: string) {
+		if (idx >= 0 && idx < menuList.value.length) {
+			menuList.value[idx].title = title;
+		}
 	}
 	
-	function getProps(): UTSJSONObject {
-		return {
-			activeColor: props.activeColor
-		} as UTSJSONObject;
-	}
-	
+	provide('upDropdown', {
+		props,
+		current,
+		active,
+		registerItem,
+		updateItemTitle,
+		close
+	});
+
 	onMounted(() => {
 		getContentHeight();
 	});
 	
 	defineExpose({
-		init,
 		highlight,
 		close,
 		open,
-		getContentHeight,
-		addChild,
-		children,
-		addMenuListItem,
-		getProps
+		getContentHeight
 	});
 </script>
 

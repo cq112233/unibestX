@@ -14,9 +14,7 @@
 				<text
 					class="up-toolbar__wrapper__cancel"
 					@tap="cancel"
-					:style="{
-						color: cancelColor
-					}"
+					:style="cancelStyle"
 				>{{ elCancelText }}</text>
 			</view>
 		</view>
@@ -35,9 +33,7 @@
 				<text
 					class="up-toolbar__wrapper__confirm"
 					@tap="confirm"
-					:style="{
-						color: elConfirmColor
-					}"
+					:style="confirmStyle"
 				>{{ elConfirmText }}</text>
 			</view>
 			<template v-else>
@@ -103,11 +99,20 @@ const elConfirmText = computed<string>(() => {
   return props.confirmText
 })
 
-const elConfirmColor = computed<string>(() => {
-  if (props.confirmColor == '#3c9cff') {
-    return ''
+const cancelStyle = computed<UTSJSONObject>(() => {
+  let style = {} as UTSJSONObject
+  if (props.cancelColor != '') {
+    style['color'] = props.cancelColor
   }
-  return props.confirmColor
+  return style
+})
+
+const confirmStyle = computed<UTSJSONObject>(() => {
+  let style = {} as UTSJSONObject
+  if (props.confirmColor != '' && props.confirmColor != '#3c9cff') {
+    style['color'] = props.confirmColor
+  }
+  return style
 })
 
 function noop() {}

@@ -34,9 +34,9 @@
 				<slot name="toolbar-bottom"></slot>
 				<picker-view
 					class="up-picker__view"
-					:indicatorStyle="`height: ${addUnit(itemHeight)}`"
+					:indicator-style="`height: ${addUnit(itemHeight)};`"
 					:value="innerIndex"
-					:immediateChange="immediateChange"
+					:immediate-change="immediateChange"
 					:style="{
 						height: pickerViewHeight
 					}"
@@ -48,18 +48,22 @@
 						class="up-picker__view__column"
 					>
 						<view
-							v-if="testArray(item)"
 							class="up-picker__view__column__item up-line-1"
 							v-for="(item1 , index1) in item"
 							:key="index1"
 							:style="{
-								height: addUnit(itemHeight)
+								height: addUnit(itemHeight),
+								justifyContent: 'center',
+								alignItems: 'center'
 							}"
 						>
 							<text class="up-picker__view__column__item__text"
 								:style="{
 									lineHeight: addUnit(itemHeight),
-									fontWeight: (innerIndex.length - 1 >= index && index1 === innerIndex[index]) ? 'bold' : 'normal',
+									fontSize: '16px',
+									textAlign: 'center',
+									color: '#303133',
+									fontWeight: (innerIndex.length - 1 >= index && index1 == innerIndex[index]) ? 'bold' : 'normal',
 								}">
 								{{ getItemText(item1) }}
 							</text>
@@ -189,6 +193,12 @@ watch(() => props.columns, (n: Array<Array<any>>) => {
 	setColumns(n)
 }, { immediate: true, deep: true })
 
+watch(() => props.show, (val: boolean) => {
+	if (val) {
+		setColumns(props.columns)
+	}
+})
+
 const pickerViewHeight = computed<string>(() => {
 	let tmp = parseInt(props.visibleItemCount.toString()) * parseInt(props.itemHeight.toString())
 	return addUnit(tmp)
@@ -316,7 +326,15 @@ function changeHandler(e: UniPickerViewChangeEvent): void {
 }
 
 function setIndexs(index: number[] | null, shouldSetLast: boolean): void {
-	innerIndex.value = index != null ? [...index] : []
+	if (index != null && index.length > 0) {
+		innerIndex.value = [...index]
+	} else {
+		let newIndexes: number[] = []
+		for (let i = 0; i < innerColumns.value.length; i++) {
+			newIndexes.push(0)
+		}
+		innerIndex.value = newIndexes
+	}
 	if (shouldSetLast) {
 		setLastIndex(innerIndex.value)
 	}
@@ -344,9 +362,18 @@ function getColumnValues(colIdx: number): Array<any> {
 
 function setColumns(cols: Array<Array<any>>): void {
 	innerColumns.value = cols
-	if (innerIndex.value.length == 0) {
-		innerIndex.value = new Array(cols.length).fill(0)
+	let newIndexes: number[] = []
+	for (let i = 0; i < cols.length; i++) {
+		if (props.defaultIndex.length > i) {
+			newIndexes.push(props.defaultIndex[i])
+		} else if (innerIndex.value.length > i) {
+			newIndexes.push(innerIndex.value[i])
+		} else {
+			newIndexes.push(0)
+		}
 	}
+	innerIndex.value = newIndexes
+	setLastIndex(newIndexes)
 }
 
 function getIndexs(): number[] {

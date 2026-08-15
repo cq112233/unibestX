@@ -3,7 +3,7 @@
 		<view
 			class="up-form-item__body"
 			@tap="clickHandler"
-			:style="[$up.addStyle(customStyle), {
+			:style="[addStyle(customStyle), {
                 flexDirection: (labelPosition != '' ? labelPosition : parentData['labelPosition']) == 'left' ? 'row' : 'column'
 			}]"
 		>
@@ -14,7 +14,7 @@
 					class="up-form-item__body__left"
 					v-if="required || leftIcon != '' || label != ''"
 					:style="{
-						width: $up.addUnit(labelWidth != '' ? labelWidth : parentData['labelWidth']),
+						width: addUnit(labelWidth != '' ? labelWidth : parentData['labelWidth']),
 						marginBottom: (labelPosition != '' ? labelPosition : parentData['labelPosition']) == 'left' ? 0 : '5px',
 					}"
 				>
@@ -67,7 +67,7 @@
 				v-if="message != '' && parentData['errorType'] == 'message'"
 				class="up-form-item__body__right__message"
 				:style="{
-					marginLeft:  $up.addUnit((labelPosition ?? parentData['labelPosition']) == 'top' ? 0 : (labelWidth != null ? labelWidth : parentData['labelWidth']))
+					marginLeft:  addUnit((labelPosition ?? parentData['labelPosition']) == 'top' ? 0 : (labelWidth != null ? labelWidth : parentData['labelWidth']))
 				}"
 			>{{ message }}</text>
 		</slot>
@@ -108,6 +108,14 @@
 	
 	// 定义props
 	const props = defineProps({
+		customStyle: {
+			type: [Object, String],
+			default: () => ({})
+		},
+		customClass: {
+			type: String,
+			default: ''
+		},
 		// input的label提示语
 		label: {
 			type: String,

@@ -1,5 +1,5 @@
 <template>
-	<view class="up-cell" :class="[customClass]" :style="[$up.addStyle(customStyle)]"
+	<view class="up-cell" :class="[customClass]" :style="[addStyle(customStyle)]"
 		:hover-class="(!disabled && (clickable || isLink)) ? 'up-cell--clickable' : ''" :hover-stay-time="250"
 		@tap="clickHandler">
 		<view class="up-cell__body"
@@ -60,6 +60,14 @@
 	import { empty as _testEmpty } from '../../libs/function/test'
 	// props
 	const props = defineProps({
+		customStyle: {
+			type: [Object, String],
+			default: () => ({})
+		},
+		customClass: {
+			type: String,
+			default: ''
+		},
 		title: {
 			type: String,
 			default: defProps.getString('cell.title')

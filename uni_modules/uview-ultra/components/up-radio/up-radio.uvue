@@ -234,10 +234,11 @@ const iconClasses = computed<string>(() => {
 const iconWrapStyle = computed<UTSJSONObject>(() => {
 	const style = {} as UTSJSONObject
 	if (checked.value && !elDisabled.value) {
-		if (elActiveColor.value != '#2979ff') {
-			style['backgroundColor'] = elActiveColor.value
-			style['borderColor'] = elActiveColor.value
-		}
+		style['backgroundColor'] = elActiveColor.value
+		style['borderColor'] = elActiveColor.value
+	} else if (checked.value && elDisabled.value) {
+		style['backgroundColor'] = '#ebedf0'
+		style['borderColor'] = '#c8c9cc'
 	} else {
 		style['backgroundColor'] = '#ffffff'
 		style['borderColor'] = elInactiveColor.value
@@ -275,8 +276,8 @@ function iconClickHandler(e: UniEvent): void {
 }
 
 function wrapperClickHandler(e: UniEvent): void {
-	if (elIconPlacement.value == 'right') {
-		iconClickHandler(e)
+	if (!elLabelDisabled.value && !elDisabled.value) {
+		setRadioCheckedStatus()
 	}
 }
 

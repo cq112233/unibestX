@@ -4,14 +4,14 @@
 		:class="{ 'up-index-anchor--sticky': parentSticky }"
 		:ref="`up-index-anchor-${textName}`"
 	    :style="{
-			height: $up.addUnit(height),
+			height: addUnit(height),
 			backgroundColor: bgColor
 		}"
 	>
 		<text
 		    class="up-index-anchor__text"
 		    :style="{
-				fontSize: $up.addUnit(size),
+				fontSize: addUnit(size),
 				color: color
 			}"
 		>{{ textName }}</text>

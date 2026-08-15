@@ -27,7 +27,7 @@
                         {
                             width: imageWidth,
                             height: imageHeight,
-                            borderRadius: shape == 'circle' ? '10000px' : $upAddUnit(radius)
+                            borderRadius: shape == 'circle' ? '10000px' : addUnit(radius)
                         }
                     ]"
                 ></image>
@@ -40,7 +40,7 @@
                     "
                     class="up-album__row__wrapper__text"
                     :style="{
-					    borderRadius: shape == 'circle' ? '50%' : $upAddUnit(radius),
+					    borderRadius: shape == 'circle' ? '50%' : addUnit(radius),
 				    }"
                 >
                     <up-text
@@ -75,6 +75,14 @@ defineOptions({
 
 // props
 const props = defineProps({
+	customStyle: {
+		type: [Object, String],
+		default: () => ({})
+	},
+	customClass: {
+		type: String,
+		default: ''
+	},
 	// 图片地址，Array<String>|Array<Object>形式
 	urls: {
 	    type: Array as PropType<any[]>,

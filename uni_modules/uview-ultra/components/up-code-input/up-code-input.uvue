@@ -13,7 +13,7 @@
 			<text
 				v-else
 				:style="{
-					fontSize: $upAddUnit(fontSize),
+					fontSize: addUnit(fontSize),
 					fontWeight: bold ? 'bold' : 'normal',
 					color: color
 				}"
@@ -36,7 +36,7 @@
 			class="up-code-input__input"
 			@input="inputHandler"
 			:style="{
-				height: $upAddUnit(size)
+				height: addUnit(size)
 			}"
 			@focus="isFocus = true"
 			@blur="isFocus = false"
@@ -52,6 +52,14 @@
 	
 	// props
 	const props = defineProps({
+		customStyle: {
+			type: [Object, String],
+			default: () => ({})
+		},
+		customClass: {
+			type: String,
+			default: ''
+		},
 		// 键盘弹起时，是否自动上推页面
 		adjustPosition: {
 			type: Boolean,

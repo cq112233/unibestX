@@ -1,6 +1,7 @@
 <script setup lang="uts">
 import type { CustomTabBarItem } from './types'
 import { curIdx, themeColor } from './store'
+import { $t } from '@/src/utils/i18n'
 
 const props = defineProps({
   item: {
@@ -63,45 +64,47 @@ function getBadgeText(): string {
 </script>
 
 <template>
-  <!-- 鼓包项：用绝对定位让按鈕居中突出在 tabbar 顶部边缘 -->
-  <view v-if="props.isBulge" class="bulge-item">
-    <view class="bulge-btn">
-      <text class="ai-btn-text">AI</text>
-    </view>
-  </view>
-
-  <!-- 普通项 -->
-  <view v-else class="tabbar-item-inner">
-    <!-- 图片图标 -->
-    <image
-      v-if="tabbarItem.iconType === 'image'"
-      :src="getIcon()"
-      mode="scaleToFill"
-      class="icon-normal"
-    />
-
-    <!-- uni-icons 字体图标 -->
-    <view
-      v-if="tabbarItem.iconType === 'icon'"
-      class="icon-normal"
-      style="align-items: center; justify-content: center;"
-    >
-      <uni-icons
-        :type="getIcon()"
-        :size="24"
-        :color="getActiveColor()"
-      ></uni-icons>
+  <view class="tabbar-item-wrapper" style="width: 100%; height: 100%; align-items: center; justify-content: center;">
+    <!-- 鼓包项：用绝对定位让按鈕居中突出在 tabbar 顶部边缘 -->
+    <view v-if="props.isBulge" class="bulge-item">
+      <view class="bulge-btn">
+        <text class="ai-btn-text">AI</text>
+      </view>
     </view>
 
-    <!-- 文本（包含 i18n 翻译，支持动态语言切换） -->
-    <text class="tabbar-text" :style="{ color: getActiveColor() }">{{ $t(tabbarItem.text) }}</text>
+    <!-- 普通项 -->
+    <view v-else class="tabbar-item-inner">
+      <!-- 图片图标 -->
+      <image
+        v-if="tabbarItem.iconType === 'image'"
+        :src="getIcon()"
+        mode="scaleToFill"
+        class="icon-normal"
+      />
 
-    <!-- 角标：小红点 -->
-    <view v-if="isDotBadge()" class="badge-dot" />
+      <!-- uni-icons 字体图标 -->
+      <view
+        v-if="tabbarItem.iconType === 'icon'"
+        class="icon-normal"
+        style="align-items: center; justify-content: center;"
+      >
+        <uni-icons
+          :type="getIcon()"
+          :size="24"
+          :color="getActiveColor()"
+        ></uni-icons>
+      </view>
 
-    <!-- 角标：数字 -->
-    <view v-if="isNumberBadge()" class="badge-count">
-      <text class="badge-count-text">{{ getBadgeText() }}</text>
+      <!-- 文本（包含 i18n 翻译，支持动态语言切换） -->
+      <text class="tabbar-text" :style="{ color: getActiveColor() }">{{ $t(tabbarItem.text) }}</text>
+
+      <!-- 角标：小红点 -->
+      <view v-if="isDotBadge()" class="badge-dot" />
+
+      <!-- 角标：数字 -->
+      <view v-if="isNumberBadge()" class="badge-count">
+        <text class="badge-count-text">{{ getBadgeText() }}</text>
+      </view>
     </view>
   </view>
 </template>

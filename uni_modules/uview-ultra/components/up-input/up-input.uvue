@@ -1,5 +1,5 @@
 <template>
-    <view class="up-input" :class="inputClass" :style="[wrapperStyle, $up.addStyle(customStyle)]">
+    <view class="up-input" :class="inputClass" :style="[wrapperStyle, addStyle(customStyle)]">
         <view class="up-input__content">
             <view
                 class="up-input__content__prefix-icon"
@@ -91,6 +91,14 @@ defineOptions({
 
 // props
 const props = defineProps({
+    customStyle: {
+        type: [Object, String],
+        default: () => ({})
+    },
+    customClass: {
+        type: String,
+        default: ''
+    },
     // 绑定的值
     modelValue: {
         type: [String, Number],

@@ -19,6 +19,18 @@
 	
 	// props
 	const props = defineProps({
+		customStyle: {
+			type: [Object, String],
+			default: () => ({})
+		},
+		customClass: {
+			type: String,
+			default: ''
+		},
+		border: {
+			type: Boolean,
+			default: true
+		},
 		borderColor: {
 			type: String,
 			default: defProps.getString('table.borderColor')
@@ -60,8 +72,10 @@
 	
 	const tableStyle = computed(() => {
 		let style = {}
-		style['borderLeft'] = `solid 1px ${props.borderColor}`
-		style['borderTop'] = `solid 1px ${props.borderColor}`
+		if (props.border) {
+			style['borderLeft'] = `solid 1px ${props.borderColor}`
+			style['borderTop'] = `solid 1px ${props.borderColor}`
+		}
 		style['backgroundColor'] = props.bgColor
 		return style
 	})
@@ -86,6 +100,7 @@
 	
 	const getProps = function(): UTSJSONObject {
 		return {
+			border: props.border,
 			borderColor: props.borderColor,
 			align: props.align,
 			padding: props.padding,

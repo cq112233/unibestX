@@ -1,7 +1,7 @@
 <template>
 	<view
 	    class="up-divider"
-	    :style="[$up.addStyle(customStyle)]"
+	    :style="[addStyle(customStyle)]"
 		@tap="clickHandler"
 	>
 		<up-line
@@ -34,6 +34,14 @@
 	import { addStyle, addUnit } from '../../libs/function/index.uts'
 	
 	const props = defineProps({
+		customStyle: {
+			type: [Object, String],
+			default: () => ({})
+		},
+		customClass: {
+			type: String,
+			default: ''
+		},
 		// 是否虚线
 		dashed: {
 			type: Boolean,
