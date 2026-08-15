@@ -1,7 +1,6 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
 const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
-const uni_modules_uviewUltra_components_upDropdown_dropdown = require("./dropdown.js");
 require("./types.js");
 const uni_modules_uviewUltra_libs_composable_useUltraUI = require("../../libs/composable/useUltraUI.js");
 if (!Array) {
@@ -18,61 +17,63 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   // 菜单标题和选项的激活态颜色
   activeColor: {
     type: String,
-    default: uni_modules_uviewUltra_components_upDropdown_dropdown.defProps.getString("dropdown.activeColor")
+    default: "#2979ff"
   },
   // 菜单标题和选项的未激活态颜色
   inactiveColor: {
     type: String,
-    default: uni_modules_uviewUltra_components_upDropdown_dropdown.defProps.getString("dropdown.inactiveColor")
+    default: "#606266"
   },
   // 点击遮罩是否关闭菜单
   closeOnClickMask: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upDropdown_dropdown.defProps.getBoolean("dropdown.closeOnClickMask")
+    default: true
   },
   // 点击当前激活项标题是否关闭菜单
   closeOnClickSelf: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upDropdown_dropdown.defProps.getBoolean("dropdown.closeOnClickSelf")
+    default: true
   },
   // 过渡时间
   duration: {
     type: [Number, String],
-    default: uni_modules_uviewUltra_components_upDropdown_dropdown.defProps.getNumber("dropdown.duration")
+    default: 300
   },
   // 标题菜单的高度
   height: {
     type: [Number, String],
-    default: uni_modules_uviewUltra_components_upDropdown_dropdown.defProps.getNumber("dropdown.height")
+    default: 40
   },
   // 是否显示下边框
   borderBottom: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upDropdown_dropdown.defProps.getBoolean("dropdown.borderBottom")
+    default: false
   },
   // 标题的字体大小
   titleSize: {
     type: [Number, String],
-    default: uni_modules_uviewUltra_components_upDropdown_dropdown.defProps.getNumber("dropdown.titleSize")
+    default: 14
   },
   // 下拉出来的内容部分的圆角值
   borderRadius: {
     type: [Number, String],
-    default: uni_modules_uviewUltra_components_upDropdown_dropdown.defProps.getNumber("dropdown.borderRadius")
+    default: 0
   },
   // 菜单右侧的icon图标
   menuIcon: {
     type: String,
-    default: uni_modules_uviewUltra_components_upDropdown_dropdown.defProps.getString("dropdown.menuIcon")
+    default: "arrow-down"
   },
   // 菜单右侧图标的大小
   menuIconSize: {
     type: [Number, String],
-    default: uni_modules_uviewUltra_components_upDropdown_dropdown.defProps.getNumber("dropdown.menuIconSize")
+    default: 14
   }
 }, emits: ["open", "close"], setup(__props, _a) {
   var __expose = _a.expose, __emit = _a.emit;
-  const _b = uni_modules_uviewUltra_libs_composable_useUltraUI.useUltraUI(), children = _b.children, getChildren = _b.getChildren, addChild = _b.addChild;
+  const _b = uni_modules_uviewUltra_libs_composable_useUltraUI.useUltraUI(), children = _b.children;
+  _b.getChildren;
+  const addChild = _b.addChild;
   const instance = common_vendor.getCurrentInstance().proxy;
   const props = __props;
   const emit = __emit;
@@ -92,10 +93,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     }
   });
   const popupStyle = common_vendor.computed(() => {
-    let style = new common_vendor.UTSJSONObject(
-      {}
-      // 进行Y轴位移，展开状态时，恢复原位。收齐状态时，往上位移100%，进行隐藏
-    );
+    let style = new common_vendor.UTSJSONObject({});
     style["transform"] = `translateY(${active.value ? "0%" : "-100%"})`;
     style["transition-duration"] = parseInt(props.duration.toString()) / 1e3 + "s";
     style["borderRadius"] = `0 0 ${uni_modules_uviewUltra_libs_function_index.addUnit(props.borderRadius)} ${uni_modules_uviewUltra_libs_function_index.addUnit(props.borderRadius)}`;
@@ -172,57 +170,49 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       return null;
     close();
   }
-  function highlight(indexParams = null) {
-    if (Array.isArray(indexParams) && indexParams !== null) {
-      highlightIndexList.value = indexParams;
-      return null;
-    }
-    highlightIndexList.value = [];
-    if (indexParams != null) {
-      highlightIndexList.value.push(parseInt(indexParams.toString()));
+  function highlight(index = null) {
+    if (index != null) {
+      let indexOf = highlightIndexList.value.indexOf(index);
+      if (indexOf === -1) {
+        highlightIndexList.value.push(index);
+      }
+    } else {
+      highlightIndexList.value = [];
     }
   }
-  const addMenuListItem = (op) => {
-    menuList.value.push(op);
-  };
-  common_vendor.onMounted(() => {
-    getContentHeight();
-  });
-  const getProps = function() {
-    return new common_vendor.UTSJSONObject({
-      activeColor: props.activeColor,
-      inactiveColor: props.inactiveColor,
-      closeOnClickMask: props.closeOnClickMask,
-      closeOnClickSelf: props.closeOnClickSelf,
-      duration: props.duration,
-      height: props.height,
-      borderBottom: props.borderBottom,
-      titleSize: props.titleSize,
-      borderRadius: props.borderRadius,
-      menuIcon: props.menuIcon,
-      menuIconSize: props.menuIconSize
-    });
-  };
   function getContentTextStyle(item, index) {
-    const style = new common_vendor.UTSJSONObject({});
-    style["fontSize"] = uni_modules_uviewUltra_libs_function_index.addUnit(props.titleSize);
-    const isActive = index == current.value || highlightIndexList.value.includes(index);
-    if (item.disabled) {
-      style["color"] = "#c0c4cc";
-    } else if (isActive) {
+    let style = new common_vendor.UTSJSONObject({});
+    if (index == current.value || highlightIndexList.value.includes(index)) {
       if (props.activeColor != "#2979ff") {
         style["color"] = props.activeColor;
       }
     } else {
-      style["color"] = props.inactiveColor;
+      if (props.inactiveColor != "#606266") {
+        style["color"] = props.inactiveColor;
+      }
+    }
+    if (props.titleSize != 14) {
+      style["fontSize"] = uni_modules_uviewUltra_libs_function_index.addUnit(props.titleSize);
     }
     return style;
   }
+  function addMenuListItem(item) {
+    menuList.value.push(item);
+  }
+  function getProps() {
+    return new common_vendor.UTSJSONObject({
+      activeColor: props.activeColor
+    });
+  }
+  common_vendor.onMounted(() => {
+    getContentHeight();
+  });
   __expose({
     init,
-    close,
     highlight,
-    getChildren,
+    close,
+    open,
+    getContentHeight,
     addChild,
     children,
     addMenuListItem,
@@ -242,7 +232,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
               display: "flex"
             },
             name: props.menuIcon,
-            size: _ctx.$up.addUnit(props.menuIconSize),
+            size: common_vendor.unref(uni_modules_uviewUltra_libs_function_index.addUnit)(props.menuIconSize),
             color: index == current.value || highlightIndexList.value.includes(index) ? props.activeColor == "#2979ff" ? "primary" : props.activeColor : "#c0c4cc",
             class: "data-v-252960e7"
           }),
@@ -253,29 +243,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
           }, index)
         };
       }),
-      b: _ctx.$up.addUnit(props.height),
+      b: common_vendor.unref(uni_modules_uviewUltra_libs_function_index.addUnit)(props.height),
       c: props.borderBottom ? 1 : "",
       d: common_vendor.o(() => {
-      }, "0a"),
+      }, "9e"),
       e: common_vendor.s(popupStyle.value),
-      f: common_vendor.s({}),
-      g: common_vendor.s(contentStyle.value),
-      h: common_vendor.s({
-        top: _ctx.$up.addUnit(props.height),
+      f: common_vendor.s(contentStyle.value),
+      g: common_vendor.s({
+        top: common_vendor.unref(uni_modules_uviewUltra_libs_function_index.addUnit)(props.height),
         transition: `opacity ${parseInt(props.duration.toString()) / 1e3}s, z-index ${parseInt(props.duration.toString()) / 1e3}s linear`
       }),
-      i: common_vendor.o(maskClick, "db"),
-      j: common_vendor.o(() => {
-      }, "37"),
-      k: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-      l: common_vendor.s({
-        height: active.value ? _ctx.$up.addUnit(contentHeight.value + parseInt(props.height.toString())) : _ctx.$up.addUnit(props.height)
+      h: common_vendor.o(maskClick, "83"),
+      i: common_vendor.o(() => {
+      }, "1e"),
+      j: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+      k: common_vendor.s({
+        height: active.value ? common_vendor.unref(uni_modules_uviewUltra_libs_function_index.addUnit)(contentHeight.value + parseInt(props.height.toString())) : common_vendor.unref(uni_modules_uviewUltra_libs_function_index.addUnit)(props.height)
       }),
-      m: common_vendor.s({
+      l: common_vendor.s({
         "--status-bar-height": `${_ctx.u_s_b_h}px`,
         "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
       }),
-      n: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+      m: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
     };
     return __returned__;
   };

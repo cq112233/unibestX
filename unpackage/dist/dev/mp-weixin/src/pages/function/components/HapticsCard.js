@@ -9,9 +9,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   setup(__props) {
     const copyText = common_vendor.ref("Hello unibestX!");
     function triggerVibration() {
-      common_vendor.index.showToast({
-        title: "当前环境不支持震动",
-        icon: "none"
+      common_vendor.index.vibrateShort({
+        success: () => {
+          common_vendor.index.showToast({ title: "已触发短震动", icon: "none" });
+        },
+        fail: () => {
+          common_vendor.index.showToast({ title: "震动触发失败", icon: "none" });
+        }
       });
     }
     function handleCopy() {

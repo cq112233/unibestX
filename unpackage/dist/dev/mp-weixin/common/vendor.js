@@ -5806,24 +5806,6 @@ function createVueApp(rootComponent, rootProps = null) {
   };
   return app;
 }
-function useCssVars(getter) {
-  const instance = getCurrentInstance();
-  if (!instance) {
-    warn(`useCssVars is called without current active component instance.`);
-    return;
-  }
-  initCssVarsRender(instance, getter);
-}
-function initCssVarsRender(instance, getter) {
-  instance.ctx.__cssVars = () => {
-    const vars = getter(instance.proxy);
-    const cssVars = {};
-    for (const key in vars) {
-      cssVars[`--${key}`] = vars[key];
-    }
-    return cssVars;
-  };
-}
 function injectLifecycleHook(name, hook, publicThis, instance) {
   if (isFunction(hook)) {
     injectHook(name, hook.bind(publicThis), instance);
@@ -17112,6 +17094,7 @@ exports.f = f;
 exports.gei = gei;
 exports.getCurrentInstance = getCurrentInstance;
 exports.index = index;
+exports.inject = inject;
 exports.isReactive = isReactive;
 exports.isRef = isRef;
 exports.n = n;
@@ -17129,6 +17112,7 @@ exports.onResize = onResize;
 exports.onShow = onShow;
 exports.onUnmounted = onUnmounted;
 exports.p = p;
+exports.provide = provide;
 exports.pvhc = pvhc;
 exports.r = r;
 exports.reactive = reactive;
@@ -17140,7 +17124,6 @@ exports.sr = sr;
 exports.t = t;
 exports.toRaw = toRaw;
 exports.unref = unref;
-exports.useCssVars = useCssVars;
 exports.useSlots = useSlots;
 exports.w = w;
 exports.watch = watch;

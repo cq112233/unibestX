@@ -1,8 +1,5 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const uni_modules_uviewUltra_components_upSlider_props = require("./props.js");
-const uni_modules_uviewUltra_libs_mixin_mpMixin = require("../../libs/mixin/mpMixin.js");
-const uni_modules_uviewUltra_libs_mixin_mixin = require("../../libs/mixin/mixin.js");
 const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
 class barStyleType extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -46,332 +43,397 @@ class sliderRectType extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
-const _sfc_main = common_vendor.defineComponent({
-  name: "up-slider",
-  mixins: [uni_modules_uviewUltra_libs_mixin_mpMixin.mpMixin, uni_modules_uviewUltra_libs_mixin_mixin.mixin, uni_modules_uviewUltra_components_upSlider_props.propsSlider],
-  emits: ["start", "changing", "change", "update:modelValue"],
-  data() {
-    return {
-      startX: 0,
-      status: "end",
-      newValue: 0,
-      distanceX: 0,
-      startValue0: 0,
-      startValue: 0,
-      barStyle0: new barStyleType({
-        transition: null,
-        width: "0px"
-      }),
-      barStyle: new barStyleType({
-        width: "0px",
-        transition: ""
-      }),
-      sliderRect: new sliderRectType({
-        left: 0,
-        width: 0
-      })
-    };
+const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
+  name: "up-slider"
+}, { __name: "up-slider", props: {
+  min: {
+    type: [Number, String],
+    default: 0
   },
-  watch: {
-    modelValue(n) {
-      if (this.status == "end") {
-        const $crtFmtValue = this.updateValue(this.modelValue, false);
-        this.$emit("change", $crtFmtValue);
-      }
-    },
-    rangeValue: {
-      handler(n) {
-        if (this.status == "end") {
-          this.updateValue(n[0], false, 0);
-          this.updateValue(n[1], false, 1);
-          this.$emit("change", n);
-        }
-      },
-      deep: true
+  max: {
+    type: [Number, String],
+    default: 100
+  },
+  step: {
+    type: [Number, String],
+    default: 1
+  },
+  modelValue: {
+    type: [Number],
+    default: 0
+  },
+  isRange: {
+    type: Boolean,
+    default: false
+  },
+  rangeValue: {
+    type: Array,
+    default: () => {
+      return [0, 0];
     }
   },
-  created() {
+  activeColor: {
+    type: String,
+    default: "#2979ff"
   },
-  computed: {
-    innerStyleCpu() {
-      let style = this.innerStyle;
-      style["height"] = this.isRange && this.showValue ? (parseFloat(uni_modules_uviewUltra_libs_function_index.getPx(this.blockSize)) + 24).toString() + "px" : uni_modules_uviewUltra_libs_function_index.getPx(this.blockSize) + "px";
-      return style;
-    },
-    blockStyleCpu() {
-      let style = new common_vendor.UTSJSONObject({});
-      const blockStyle = this.blockStyle;
-      if (blockStyle != null) {
-        Object.assign(style, blockStyle);
-      }
-      style["height"] = this.getPx(this.blockSize, true);
-      style["width"] = this.getPx(this.blockSize, true);
-      style["backgroundColor"] = this.blockColor;
-      return style;
-    },
-    gapStyleCpu() {
-      let style = new common_vendor.UTSJSONObject({});
-      style["width"] = this.barStyle.width;
-      style["transition"] = this.barStyle.transition;
-      style["height"] = this.height;
-      style["marginTop"] = "-" + this.height;
-      if (this.activeColor !== "#2979ff") {
-        style["backgroundColor"] = this.activeColor;
-      }
-      return style;
+  inactiveColor: {
+    type: String,
+    default: "#c0c4cc"
+  },
+  blockSize: {
+    type: [Number, String],
+    default: 30
+  },
+  blockColor: {
+    type: String,
+    default: "#ffffff"
+  },
+  blockStyle: {
+    type: Object,
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
     }
   },
-  mounted() {
-    if (!this.useNative) {
-      this.upGetRect(".up-slider__base").then((rect) => {
-        var _a, _b;
-        this.sliderRect.width = (_a = rect.width) !== null && _a !== void 0 ? _a : 0;
-        this.sliderRect.left = (_b = rect.left) !== null && _b !== void 0 ? _b : 0;
-        if (this.sliderRect.width == 0) {
-          common_vendor.index.__f__("info", "at uni_modules/uview-ultra/components/up-slider/up-slider.uvue:219", "如在弹窗等元素中使用，请使用v-if来显示滑块，否则无法计算长度。");
-        }
-        this.init();
-      });
+  disabled: {
+    type: Boolean,
+    default: false
+  },
+  height: {
+    type: [Number, String],
+    default: "6rpx"
+  },
+  showValue: {
+    type: Boolean,
+    default: false
+  },
+  useNative: {
+    type: Boolean,
+    default: false
+  },
+  innerStyle: {
+    type: Object,
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
     }
   },
-  methods: {
-    addStyle(e = null) {
-      return uni_modules_uviewUltra_libs_function_index.addStyle(e);
-    },
-    getPx(e = null, s = false) {
-      return uni_modules_uviewUltra_libs_function_index.getPx(e, s);
-    },
-    init() {
-      if (this.isRange) {
-        this.updateValue(parseFloat(this.rangeValue[0].toString()), false, 0);
-        this.updateValue(parseFloat(this.rangeValue[1].toString()), false, 1);
-      } else {
-        this.updateValue(this.modelValue, false);
-      }
-    },
-    // native拖动过程中触发
-    changingHandler(e) {
-      const value = e.detail.value;
-      this.$emit("update:modelValue", value);
-      this.$emit("changing", value);
-    },
-    // native滑动结束时触发
-    changeHandler(e) {
-      const value = e.detail.value;
-      this.$emit("update:modelValue", value);
-      this.$emit("change", value);
-    },
-    onTouchStart(e = null, index = 1) {
-      let event = e;
-      if (this.disabled)
-        return null;
-      this.startX = 0;
-      let touches = event.touches[0];
-      this.startX = touches.clientX;
-      if (this.isRange) {
-        this.startValue0 = this.format(parseFloat(this.rangeValue[0].toString()), 0);
-        this.startValue = this.format(parseFloat(this.rangeValue[1].toString()), 1);
-      } else {
-        this.startValue = this.format(this.modelValue);
-      }
-      this.status = "start";
-      let clientX = 0;
-      clientX = touches.clientX;
-      this.distanceX = clientX - this.sliderRect.left;
-      this.newValue = this.distanceX / this.sliderRect.width * (parseFloat(this.max.toString()) - parseFloat(this.min.toString())) + parseFloat(this.min.toString());
-      this.status = "moving";
-      let $crtFmtValue = this.updateValue(this.newValue, true, index);
-      this.$emit("changing", $crtFmtValue);
-    },
-    onTouchMove(e = null, index = 1) {
-      let event = e;
-      if (this.disabled)
-        return null;
-      if (this.status == "start")
-        this.$emit("start");
-      let touches = event.touches[0];
-      let clientX = 0;
-      clientX = touches.clientX;
-      this.distanceX = clientX - this.sliderRect.left;
-      this.newValue = this.distanceX / this.sliderRect.width * (parseFloat(this.max.toString()) - parseFloat(this.min.toString())) + parseFloat(this.min.toString());
-      this.status = "moving";
-      let crtFmtValue = this.updateValue(this.newValue, true, index);
-      this.$emit("changing", crtFmtValue);
-    },
-    onTouchEnd(e = null, index = 1) {
-      if (this.disabled)
-        return null;
-      if (this.status === "moving") {
-        let $crtFmtValue = this.updateValue(this.newValue, false, index);
-        this.$emit("change", $crtFmtValue);
-      }
-      this.status = "end";
-    },
-    onTouchStart2(e = null, index = 1) {
-      if (!this.isRange)
-        ;
-    },
-    onTouchMove2(e = null, index = 1) {
-      if (!this.isRange)
-        ;
-    },
-    onTouchEnd2(e = null, index = 1) {
-      if (!this.isRange)
-        ;
-    },
-    onClick(event) {
-      if (this.disabled)
-        return null;
-      let clientX = event.x - this.sliderRect.left;
-      this.newValue = clientX / this.sliderRect.width * (parseFloat(this.max.toString()) - parseFloat(this.min.toString())) + parseFloat(this.min.toString());
-      this.updateValue(this.newValue, false, 1);
-    },
-    updateValue(value, drag, index = 1) {
-      let valueFormat = this.format(value, index);
-      if (valueFormat > parseFloat(this.max.toString())) {
-        valueFormat = parseFloat(this.max.toString());
-      }
-      let width = Math.min((valueFormat - parseFloat(this.min.toString())) / (parseFloat(this.max.toString()) - parseFloat(this.min.toString())) * this.sliderRect.width, this.sliderRect.width);
-      let barStyle = new barStyleType({
-        transition: null,
-        width: width.toString() + "px"
-      });
-      if (drag == true) {
-        barStyle["transition"] = "none";
-      } else {
-        barStyle["transition"] = "";
-      }
-      if (this.isRange) {
-        this.rangeValue[index] = valueFormat;
-        this.$emit("update:modelValue", this.rangeValue);
-      } else {
-        this.$emit("update:modelValue", valueFormat);
-      }
-      switch (index) {
-        case 0:
-          this.barStyle0.width = barStyle.width;
-          break;
-        case 1:
-          this.barStyle.width = barStyle.width;
-          break;
-      }
-      if (this.isRange) {
-        return this.rangeValue;
-      } else {
-        return valueFormat;
-      }
-    },
-    format(value, index = 1) {
-      if (this.isRange) {
-        switch (index) {
-          case 0:
-            return Math.round(
-              // @ts-ignore
-              Math.max(parseFloat(this.min.toString()), Math.min(value, parseFloat(this.rangeValue[1].toString()) - parseFloat(this.step.toString()), parseFloat(this.max.toString()))) / parseFloat(this.step.toString())
-              // @ts-ignore
-            ) * parseInt(this.step.toString());
-          case 1:
-            return Math.round(
-              // @ts-ignore
-              Math.max(parseFloat(this.min.toString()), parseFloat(this.rangeValue[0].toString()) + parseFloat(this.step.toString()), Math.min(value, parseFloat(this.max.toString()))) / parseFloat(this.step.toString())
-              // @ts-ignore
-            ) * parseFloat(this.step.toString());
-        }
-      } else {
-        return Math.round(
-          // @ts-ignore
-          Math.max(parseFloat(this.min.toString()), Math.min(value, parseFloat(this.max.toString()))) / parseFloat(this.step.toString())
-          // @ts-ignore
-        ) * parseFloat(this.step.toString());
-      }
-      return 0;
+  customStyle: {
+    type: Object,
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
     }
   }
-});
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  "raw js";
-  return common_vendor.e({
-    a: !_ctx.useNative || _ctx.isRange
-  }, !_ctx.useNative || _ctx.isRange ? common_vendor.e({
-    b: common_vendor.sei("r0-66aa6fc7", "view", "up-slider__base"),
-    c: _ctx.height,
-    d: _ctx.inactiveColor,
-    e: common_vendor.o((...args) => $options.onClick && $options.onClick(...args), "9d"),
-    f: common_vendor.s($options.gapStyleCpu),
-    g: _ctx.isRange
-  }, _ctx.isRange ? {
-    h: $data.barStyle0.width,
-    i: $data.barStyle0.transition,
-    j: _ctx.height,
-    k: "-" + _ctx.height,
-    l: _ctx.inactiveColor
-  } : {}, {
-    m: _ctx.isRange && _ctx.showValue
-  }, _ctx.isRange && _ctx.showValue ? {
-    n: common_vendor.t(this.rangeValue[0] ?? ""),
-    o: parseFloat($options.getPx($data.barStyle0.width)) + parseFloat($options.getPx(_ctx.blockSize)) / 2 + "px"
-  } : {}, {
-    p: _ctx.isRange && _ctx.showValue
-  }, _ctx.isRange && _ctx.showValue ? {
-    q: common_vendor.t(this.rangeValue[1] ?? ""),
-    r: parseFloat($options.getPx($data.barStyle.width)) + parseFloat($options.getPx(_ctx.blockSize)) / 2 + "px"
-  } : {}, {
-    s: _ctx.isRange
-  }, _ctx.isRange ? common_vendor.e({
-    t: _ctx.$slots["min"] != null || _ctx.$slots["$min"] != null
-  }, _ctx.$slots["min"] != null || _ctx.$slots["$min"] != null ? {} : {
-    v: common_vendor.s($options.blockStyleCpu)
-  }, {
-    w: common_vendor.o(($event) => $options.onTouchStart($event, 0), "67"),
-    x: common_vendor.o(($event) => $options.onTouchMove($event, 0), "95"),
-    y: common_vendor.o(($event) => $options.onTouchEnd($event, 0), "57"),
-    z: common_vendor.o(($event) => $options.onTouchEnd($event, 0), "01"),
-    A: (parseFloat($options.getPx($data.barStyle0.width)) + parseFloat($options.getPx(_ctx.blockSize)) / 2).toString() + "px"
-  }) : {}, {
-    B: _ctx.isRange && (_ctx.$slots["max"] != null || _ctx.$slots["$max"] != null)
-  }, _ctx.isRange && (_ctx.$slots["max"] != null || _ctx.$slots["$max"] != null) ? {} : _ctx.$slots["default"] != null || _ctx.$slots["$default"] != null ? {} : {
-    D: common_vendor.s($options.blockStyleCpu)
-  }, {
-    C: _ctx.$slots["default"] != null || _ctx.$slots["$default"] != null,
-    E: common_vendor.o(($event) => $options.onTouchStart($event), "9b"),
-    F: common_vendor.o(($event) => $options.onTouchMove($event), "d5"),
-    G: common_vendor.o(($event) => $options.onTouchEnd($event), "14"),
-    H: common_vendor.o(($event) => $options.onTouchEnd($event), "aa"),
-    I: parseFloat($options.getPx($data.barStyle.width)) + parseFloat($options.getPx(_ctx.blockSize)) / 2 + "px",
-    J: common_vendor.sei("r1-66aa6fc7", "view", "up-slider-inner"),
-    K: common_vendor.o((...args) => $options.onClick && $options.onClick(...args), "75"),
-    L: common_vendor.o(($event) => $options.onTouchStart2($event, 1), "ce"),
-    M: common_vendor.o(($event) => $options.onTouchMove2($event, 1), "37"),
-    N: common_vendor.o(($event) => $options.onTouchEnd2($event, 1), "9f"),
-    O: common_vendor.o(($event) => $options.onTouchEnd2($event, 1), "5c"),
-    P: common_vendor.n(_ctx.disabled ? "up-slider--disabled" : ""),
-    Q: common_vendor.s($options.innerStyleCpu),
-    R: _ctx.showValue && !_ctx.isRange
-  }, _ctx.showValue && !_ctx.isRange ? {
-    S: common_vendor.t(_ctx.modelValue)
-  } : {}) : {
-    T: _ctx.min,
-    U: _ctx.max,
-    V: _ctx.step,
-    W: _ctx.modelValue,
-    X: _ctx.activeColor,
-    Y: _ctx.inactiveColor,
-    Z: $options.getPx(_ctx.blockSize),
-    aa: _ctx.blockColor,
-    ab: _ctx.showValue,
-    ac: _ctx.disabled,
-    ad: common_vendor.o((...args) => $options.changingHandler && $options.changingHandler(...args), "f6"),
-    ae: common_vendor.o((...args) => $options.changeHandler && $options.changeHandler(...args), "dd")
-  }, {
-    af: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    ag: common_vendor.s($options.addStyle(_ctx.customStyle)),
-    ah: common_vendor.s({
-      "--status-bar-height": `${_ctx.u_s_b_h}px`,
-      "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
-    }),
-    ai: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+}, emits: ["start", "changing", "change", "update:modelValue"], setup(__props, _a) {
+  var __emit = _a.emit;
+  const props = __props;
+  const emit = __emit;
+  const instance = common_vendor.getCurrentInstance();
+  const startX = common_vendor.ref(0);
+  const status = common_vendor.ref("end");
+  const newValue = common_vendor.ref(0);
+  const distanceX = common_vendor.ref(0);
+  const startValue0 = common_vendor.ref(0);
+  const startValue = common_vendor.ref(0);
+  const barStyle0 = common_vendor.ref(new barStyleType({
+    transition: null,
+    width: "0px"
+  }));
+  const barStyle = common_vendor.ref(new barStyleType({
+    width: "0px",
+    transition: ""
+  }));
+  const sliderRect = common_vendor.ref(new sliderRectType({
+    left: 0,
+    width: 0
+  }));
+  const innerStyleCpu = common_vendor.computed(() => {
+    var _a2;
+    const style = (_a2 = props.innerStyle) !== null && _a2 !== void 0 ? _a2 : new common_vendor.UTSJSONObject({});
+    style["height"] = props.isRange && props.showValue ? (parseFloat(uni_modules_uviewUltra_libs_function_index.getPx(props.blockSize)) + 24).toString() + "px" : uni_modules_uviewUltra_libs_function_index.getPx(props.blockSize) + "px";
+    return style;
   });
-}
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-66aa6fc7"]]);
+  const blockStyleCpu = common_vendor.computed(() => {
+    const style = new common_vendor.UTSJSONObject({});
+    if (props.blockStyle != null) {
+      common_vendor.UTSJSONObject.assign(style, props.blockStyle);
+    }
+    style["height"] = uni_modules_uviewUltra_libs_function_index.getPx(props.blockSize, true);
+    style["width"] = uni_modules_uviewUltra_libs_function_index.getPx(props.blockSize, true);
+    style["backgroundColor"] = props.blockColor;
+    return style;
+  });
+  const gapStyleCpu = common_vendor.computed(() => {
+    var _a2;
+    const style = new common_vendor.UTSJSONObject({});
+    style["width"] = barStyle.value.width;
+    style["transition"] = (_a2 = barStyle.value.transition) !== null && _a2 !== void 0 ? _a2 : "";
+    style["height"] = props.height;
+    style["marginTop"] = "-" + props.height;
+    if (props.activeColor !== "#2979ff") {
+      style["backgroundColor"] = props.activeColor;
+    }
+    return style;
+  });
+  function format(value, index = 1) {
+    const minVal = parseFloat(props.min.toString());
+    const maxVal = parseFloat(props.max.toString());
+    const stepVal = parseFloat(props.step.toString());
+    if (props.isRange) {
+      switch (index) {
+        case 0:
+          return Math.round(Math.max(minVal, Math.min(value, parseFloat(props.rangeValue[1].toString()) - stepVal, maxVal)) / stepVal) * stepVal;
+        case 1:
+          return Math.round(Math.max(minVal, parseFloat(props.rangeValue[0].toString()) + stepVal, Math.min(value, maxVal)) / stepVal) * stepVal;
+      }
+    } else {
+      return Math.round(Math.max(minVal, Math.min(value, maxVal)) / stepVal) * stepVal;
+    }
+    return 0;
+  }
+  function updateValue(value, drag, index = 1) {
+    let valueFormat = format(value, index);
+    const maxVal = parseFloat(props.max.toString());
+    const minVal = parseFloat(props.min.toString());
+    if (valueFormat > maxVal) {
+      valueFormat = maxVal;
+    }
+    const width = Math.min((valueFormat - minVal) / (maxVal - minVal) * sliderRect.value.width, sliderRect.value.width);
+    const bStyle = new barStyleType({
+      width: width.toString() + "px",
+      transition: drag ? "none" : ""
+    });
+    if (props.isRange) {
+      props.rangeValue[index] = valueFormat;
+      emit("update:modelValue", props.rangeValue);
+    } else {
+      emit("update:modelValue", valueFormat);
+    }
+    switch (index) {
+      case 0:
+        barStyle0.value.width = bStyle.width;
+        break;
+      case 1:
+        barStyle.value.width = bStyle.width;
+        break;
+    }
+    return props.isRange ? props.rangeValue : valueFormat;
+  }
+  function init() {
+    if (props.isRange) {
+      updateValue(parseFloat(props.rangeValue[0].toString()), false, 0);
+      updateValue(parseFloat(props.rangeValue[1].toString()), false, 1);
+    } else {
+      updateValue(props.modelValue, false, 1);
+    }
+  }
+  function changingHandler(e) {
+    const value = e.detail.value;
+    emit("update:modelValue", value);
+    emit("changing", value);
+  }
+  function changeHandler(e) {
+    const value = e.detail.value;
+    emit("update:modelValue", value);
+    emit("change", value);
+  }
+  function onTouchStart(e = null, index = 1) {
+    const event = e;
+    if (props.disabled)
+      return null;
+    startX.value = 0;
+    const touches = event.touches[0];
+    startX.value = touches.clientX;
+    if (props.isRange) {
+      startValue0.value = format(parseFloat(props.rangeValue[0].toString()), 0);
+      startValue.value = format(parseFloat(props.rangeValue[1].toString()), 1);
+    } else {
+      startValue.value = format(props.modelValue);
+    }
+    status.value = "start";
+    let clientX = touches.clientX;
+    distanceX.value = clientX - sliderRect.value.left;
+    const minVal = parseFloat(props.min.toString());
+    const maxVal = parseFloat(props.max.toString());
+    newValue.value = distanceX.value / sliderRect.value.width * (maxVal - minVal) + minVal;
+    status.value = "moving";
+    const crtFmt = updateValue(newValue.value, true, index);
+    emit("changing", crtFmt);
+  }
+  function onTouchMove(e = null, index = 1) {
+    const event = e;
+    if (props.disabled)
+      return null;
+    if (status.value == "start")
+      emit("start");
+    const touches = event.touches[0];
+    let clientX = touches.clientX;
+    distanceX.value = clientX - sliderRect.value.left;
+    const minVal = parseFloat(props.min.toString());
+    const maxVal = parseFloat(props.max.toString());
+    newValue.value = distanceX.value / sliderRect.value.width * (maxVal - minVal) + minVal;
+    status.value = "moving";
+    const crtFmt = updateValue(newValue.value, true, index);
+    emit("changing", crtFmt);
+  }
+  function onTouchEnd(e = null, index = 1) {
+    if (props.disabled)
+      return null;
+    if (status.value === "moving") {
+      const crtFmt = updateValue(newValue.value, false, index);
+      emit("change", crtFmt);
+    }
+    status.value = "end";
+  }
+  function onTouchStart2(e = null, index = 1) {
+  }
+  function onTouchMove2(e = null, index = 1) {
+  }
+  function onTouchEnd2(e = null, index = 1) {
+  }
+  function onClick(event) {
+    if (props.disabled)
+      return null;
+    const clientX = event.x - sliderRect.value.left;
+    const minVal = parseFloat(props.min.toString());
+    const maxVal = parseFloat(props.max.toString());
+    newValue.value = clientX / sliderRect.value.width * (maxVal - minVal) + minVal;
+    updateValue(newValue.value, false, 1);
+  }
+  common_vendor.watch(() => {
+    return props.modelValue;
+  }, (n) => {
+    if (status.value == "end") {
+      const crtFmt = updateValue(props.modelValue, false, 1);
+      emit("change", crtFmt);
+    }
+  });
+  common_vendor.watch(() => {
+    return props.rangeValue;
+  }, (n) => {
+    if (status.value == "end") {
+      updateValue(n[0], false, 0);
+      updateValue(n[1], false, 1);
+      emit("change", n);
+    }
+  }, { deep: true });
+  common_vendor.onMounted(() => {
+    if (!props.useNative) {
+      uni_modules_uviewUltra_libs_function_index.upGetRect(".up-slider__base", false, instance === null || instance === void 0 ? null : instance.proxy).then((rect) => {
+        var _a2, _b;
+        sliderRect.value.width = (_a2 = rect.width) !== null && _a2 !== void 0 ? _a2 : 0;
+        sliderRect.value.left = (_b = rect.left) !== null && _b !== void 0 ? _b : 0;
+        init();
+      });
+    }
+  });
+  return (_ctx, _cache) => {
+    "raw js";
+    const __returned__ = common_vendor.e({
+      a: !__props.useNative || __props.isRange
+    }, !__props.useNative || __props.isRange ? common_vendor.e({
+      b: __props.height,
+      c: __props.inactiveColor,
+      d: common_vendor.o(onClick, "d5"),
+      e: common_vendor.s(gapStyleCpu.value),
+      f: __props.isRange
+    }, __props.isRange ? {
+      g: barStyle0.value.width,
+      h: barStyle0.value.transition,
+      i: __props.height,
+      j: "-" + __props.height,
+      k: __props.inactiveColor
+    } : {}, {
+      l: __props.isRange && __props.showValue
+    }, __props.isRange && __props.showValue ? {
+      m: common_vendor.t(__props.rangeValue[0] ?? ""),
+      n: parseFloat(common_vendor.unref(uni_modules_uviewUltra_libs_function_index.getPx)(barStyle0.value.width)) + parseFloat(common_vendor.unref(uni_modules_uviewUltra_libs_function_index.getPx)(__props.blockSize)) / 2 + "px"
+    } : {}, {
+      o: __props.isRange && __props.showValue
+    }, __props.isRange && __props.showValue ? {
+      p: common_vendor.t(__props.rangeValue[1] ?? ""),
+      q: parseFloat(common_vendor.unref(uni_modules_uviewUltra_libs_function_index.getPx)(barStyle.value.width)) + parseFloat(common_vendor.unref(uni_modules_uviewUltra_libs_function_index.getPx)(__props.blockSize)) / 2 + "px"
+    } : {}, {
+      r: __props.isRange
+    }, __props.isRange ? common_vendor.e({
+      s: _ctx.$slots["min"] != null
+    }, _ctx.$slots["min"] != null ? {} : {
+      t: common_vendor.s(blockStyleCpu.value)
+    }, {
+      v: common_vendor.o(($event) => {
+        return onTouchStart($event, 0);
+      }, "ef"),
+      w: common_vendor.o(($event) => {
+        return onTouchMove($event, 0);
+      }, "3a"),
+      x: common_vendor.o(($event) => {
+        return onTouchEnd($event, 0);
+      }, "13"),
+      y: common_vendor.o(($event) => {
+        return onTouchEnd($event, 0);
+      }, "e9"),
+      z: (parseFloat(common_vendor.unref(uni_modules_uviewUltra_libs_function_index.getPx)(barStyle0.value.width)) + parseFloat(common_vendor.unref(uni_modules_uviewUltra_libs_function_index.getPx)(__props.blockSize)) / 2).toString() + "px"
+    }) : {}, {
+      A: __props.isRange && _ctx.$slots["max"] != null
+    }, __props.isRange && _ctx.$slots["max"] != null ? {} : _ctx.$slots["default"] != null ? {} : {
+      C: common_vendor.s(blockStyleCpu.value)
+    }, {
+      B: _ctx.$slots["default"] != null,
+      D: common_vendor.o(($event) => {
+        return onTouchStart($event, 1);
+      }, "e8"),
+      E: common_vendor.o(($event) => {
+        return onTouchMove($event, 1);
+      }, "14"),
+      F: common_vendor.o(($event) => {
+        return onTouchEnd($event, 1);
+      }, "c8"),
+      G: common_vendor.o(($event) => {
+        return onTouchEnd($event, 1);
+      }, "35"),
+      H: parseFloat(common_vendor.unref(uni_modules_uviewUltra_libs_function_index.getPx)(barStyle.value.width)) + parseFloat(common_vendor.unref(uni_modules_uviewUltra_libs_function_index.getPx)(__props.blockSize)) / 2 + "px",
+      I: common_vendor.sei("r0-66aa6fc7", "view", "upSliderInnerRef"),
+      J: common_vendor.o(onClick, "6e"),
+      K: common_vendor.o(($event) => {
+        return onTouchStart2($event, 1);
+      }, "5d"),
+      L: common_vendor.o(($event) => {
+        return onTouchMove2($event, 1);
+      }, "f7"),
+      M: common_vendor.o(($event) => {
+        return onTouchEnd2($event, 1);
+      }, "87"),
+      N: common_vendor.o(($event) => {
+        return onTouchEnd2($event, 1);
+      }, "17"),
+      O: common_vendor.n(__props.disabled ? "up-slider--disabled" : ""),
+      P: common_vendor.s(innerStyleCpu.value),
+      Q: __props.showValue && !__props.isRange
+    }, __props.showValue && !__props.isRange ? {
+      R: common_vendor.t(__props.modelValue)
+    } : {}) : {
+      S: parseFloat(__props.min.toString()),
+      T: parseFloat(__props.max.toString()),
+      U: parseFloat(__props.step.toString()),
+      V: parseFloat(__props.modelValue.toString()),
+      W: __props.activeColor,
+      X: __props.inactiveColor,
+      Y: parseFloat(common_vendor.unref(uni_modules_uviewUltra_libs_function_index.getPx)(__props.blockSize)),
+      Z: __props.blockColor,
+      aa: __props.showValue,
+      ab: __props.disabled,
+      ac: common_vendor.o(changingHandler, "d3"),
+      ad: common_vendor.o(changeHandler, "dc")
+    }, {
+      ae: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+      af: common_vendor.s(common_vendor.unref(uni_modules_uviewUltra_libs_function_index.addStyle)(__props.customStyle)),
+      ag: common_vendor.s({
+        "--status-bar-height": `${_ctx.u_s_b_h}px`,
+        "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
+      }),
+      ah: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+    });
+    return __returned__;
+  };
+} }));
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-66aa6fc7"]]);
 wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-ultra/components/up-slider/up-slider.js.map

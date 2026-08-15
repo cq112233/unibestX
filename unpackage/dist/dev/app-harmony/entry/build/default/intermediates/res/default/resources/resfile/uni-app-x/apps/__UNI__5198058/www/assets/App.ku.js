@@ -10,7 +10,7 @@ const __className = "GenAppku";
 const { onBeforeMount, onMounted, onUnmounted, ref } = globalThis.Vue;
 const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   __dynamicSharedData: true,
-  __hash: "870a60c8",
+  __hash: "431927db",
   __className,
   __filename: "App.ku.uvue",
   __name: "App.ku",
@@ -58,10 +58,10 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       _createSharedDataIf(() => {
         return _setSharedData(__sharedData, 0, _toSharedDataBoolean(isCurrentPageTabbar.value));
       }, () => {
-        const n4 = _createSharedDataComponent(Tabbar, "ca371930");
+        const n4 = _createSharedDataComponent(Tabbar, "ca37207e");
         _setSharedData(__sharedData, 1, n4.sharedData);
       });
-      const n5 = _createSharedDataComponentWithFallback(_component_up_toast, "ca371230");
+      const n5 = _createSharedDataComponentWithFallback(_component_up_toast, "ca3719a8");
       _setSharedData(__sharedData, 2, n5?.sharedData);
       _setTemplateRef(n5, uToastRef, null, "uToastRef");
       return __sharedData;

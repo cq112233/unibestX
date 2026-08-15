@@ -32,15 +32,15 @@
 						></up-icon>
 					</view>
 				</slot>
-				<text
-					class="up-tag__text"
-					:style="[textColor]"
-					:class="[`up-tag__text--${type}`, plain ? `up-tag__text--${type}--plain` : '', `up-tag__text--${size}`]"
-				>
-					<slot>
+				<slot>
+					<text
+						class="up-tag__text"
+						:style="[textColor]"
+						:class="[`up-tag__text--${type}`, plain ? `up-tag__text--${type}--plain` : '', `up-tag__text--${size}`]"
+					>
 						{{ text }}
-					</slot>
-				</text>
+					</text>
+				</slot>
 			</view>
 			<view
 				class="up-tag__close"

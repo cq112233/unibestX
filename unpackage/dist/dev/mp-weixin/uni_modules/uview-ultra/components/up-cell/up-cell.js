@@ -132,21 +132,27 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       d: _ctx.$slots["title"] != null && __props.title == ""
     }, _ctx.$slots["title"] != null && __props.title == "" ? {} : {
       e: common_vendor.t(__props.title),
-      f: common_vendor.s(titleTextStyle.value)
+      f: common_vendor.s(titleTextStyle.value),
+      g: common_vendor.n(__props.disabled && "up-cell--disabled"),
+      h: common_vendor.n(__props.size === "large" && "up-cell__title-text--large")
     }, {
-      g: __props.label
+      i: __props.label
     }, __props.label ? {
-      h: common_vendor.t(__props.label)
+      j: common_vendor.t(__props.label),
+      k: common_vendor.n(__props.disabled && "up-cell--disabled"),
+      l: common_vendor.n(__props.size === "large" && "up-cell__label--large")
     } : {}, {
-      i: testEmpty(__props.value) == false
+      m: testEmpty(__props.value) == false
     }, testEmpty(__props.value) == false ? {
-      j: common_vendor.t(__props.value)
+      n: common_vendor.t(__props.value),
+      o: common_vendor.n(__props.disabled && "up-cell--disabled"),
+      p: common_vendor.n(__props.size === "large" && "up-cell__value--large")
     } : {}, {
-      k: _ctx.$slots["right-icon"] != null || __props.isLink
+      q: _ctx.$slots["right-icon"] != null || __props.isLink
     }, _ctx.$slots["right-icon"] != null || __props.isLink ? common_vendor.e({
-      l: __props.rightIcon
+      r: __props.rightIcon
     }, __props.rightIcon ? {
-      m: common_vendor.p({
+      s: common_vendor.p({
         name: __props.rightIcon,
         ["custom-style"]: __props.rightIconStyle,
         color: __props.disabled ? "#c8c9cc" : "info",
@@ -154,28 +160,30 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
         class: "data-v-7b2bd41d"
       })
     } : {}, {
-      n: common_vendor.n(`up-cell__right-icon-wrap--${__props.arrowDirection}`)
+      t: common_vendor.n(`up-cell__right-icon-wrap--${__props.arrowDirection}`)
     }) : {}, {
-      o: _ctx.$slots["righticon"] != null
+      v: _ctx.$slots["righticon"] != null
     }, _ctx.$slots["righticon"] != null ? {
-      p: common_vendor.n(`up-cell__right-icon-wrap--${__props.arrowDirection}`)
+      w: common_vendor.n(`up-cell__right-icon-wrap--${__props.arrowDirection}`)
     } : {}, {
-      q: __props.border
+      x: common_vendor.n(__props.center && "up-cell--center"),
+      y: common_vendor.n(__props.size === "large" && "up-cell__body--large"),
+      z: __props.border
     }, __props.border ? {
-      r: common_vendor.p({
+      A: common_vendor.p({
         class: "data-v-7b2bd41d"
       })
     } : {}, {
-      s: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-      t: common_vendor.n(_ctx.customClass),
-      v: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
-      w: common_vendor.s(_ctx.$up.addStyle(_ctx.customStyle)),
-      x: common_vendor.s({
+      B: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+      C: common_vendor.n(_ctx.customClass),
+      D: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+      E: common_vendor.s(_ctx.$up.addStyle(_ctx.customStyle)),
+      F: common_vendor.s({
         "--status-bar-height": `${_ctx.u_s_b_h}px`,
         "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
       }),
-      y: !__props.disabled && (__props.clickable || __props.isLink) ? "up-cell--clickable" : "",
-      z: common_vendor.o(clickHandler, "d9")
+      G: !__props.disabled && (__props.clickable || __props.isLink) ? "up-cell--clickable" : "",
+      H: common_vendor.o(clickHandler, "d9")
     });
     return __returned__;
   };

@@ -11,7 +11,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     name: "up-tag"
   },
   __dynamicSharedData: true,
-  __hash: "15421bde",
+  __hash: "a471025e",
   __className,
   __filename: "uni_modules/uview-ultra/components/up-tag/up-tag.uvue",
   __name: "up-tag",
@@ -134,7 +134,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       "raw js";
       const _component_up_icon = __easycom_0;
       const _component_up_transition = __easycom_1$1;
-      const n20 = _createSharedDataComponentWithFallback(
+      const n19 = _createSharedDataComponentWithFallback(
         _component_up_transition,
         "5a09e631",
         {
@@ -150,8 +150,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
               const _plain = __props.plain;
               const _type = __props.type;
               const _closable = __props.closable;
-              _setSharedDataClass(__sharedData, 13, ["up-tag", [`up-tag--${__props.shape}`, !_plain ? `up-tag--${_type}` : "", _plain ? `up-tag--${_type}--plain` : "", `up-tag--${__props.size}`, _plain && __props.plainFill ? `up-tag--${_type}--plain--fill` : ""]]);
-              _setSharedDataStyle(__sharedData, 14, [{
+              _setSharedDataClass(__sharedData, 15, ["up-tag", [`up-tag--${__props.shape}`, !_plain ? `up-tag--${_type}` : "", _plain ? `up-tag--${_type}--plain` : "", `up-tag--${__props.size}`, _plain && __props.plainFill ? `up-tag--${_type}--plain--fill` : ""]]);
+              _setSharedDataStyle(__sharedData, 16, [{
                 marginRight: _closable ? "10px" : 0,
                 marginTop: _closable ? "10px" : 0
               }, style.value]);
@@ -183,17 +183,15 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
                 }, 261);
               }, null, 129);
             });
-            _renderSharedDataEffect(() => {
-              const _type = __props.type;
-              _setSharedDataClass(__sharedData, 15, ["up-tag__text", [`up-tag__text--${_type}`, __props.plain ? `up-tag__text--${_type}--plain` : "", `up-tag__text--${__props.size}`]]);
-              _setSharedDataStyle(__sharedData, 16, [textColor.value]);
-            });
             _createSharedDataSlot("default", null, null, () => {
               _renderSharedDataEffect(() => {
-                return _setSharedData(__sharedData, 11, _toDisplayString(__props.text));
+                const _type = __props.type;
+                _setSharedDataClass(__sharedData, 11, ["up-tag__text", [`up-tag__text--${_type}`, __props.plain ? `up-tag__text--${_type}--plain` : "", `up-tag__text--${__props.size}`]]);
+                _setSharedDataStyle(__sharedData, 12, [textColor.value]);
+                _setSharedData(__sharedData, 13, _toDisplayString(__props.text));
               });
             });
-            _setSharedDataEvent(__sharedData, 12, clickHandler);
+            _setSharedDataEvent(__sharedData, 14, clickHandler);
             _createSharedDataIf(() => {
               return _setSharedData(__sharedData, 1, _toSharedDataBoolean(__props.closable));
             }, () => {
@@ -201,14 +199,14 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
                 _setSharedDataClass(__sharedData, 4, ["up-tag__close", [`up-tag__close--${__props.size}`]]);
                 _setSharedDataStyle(__sharedData, 5, { backgroundColor: __props.closeColor });
               });
-              const n17 = _createSharedDataComponentWithFallback(_component_up_icon, "340a2430", {
+              const n16 = _createSharedDataComponentWithFallback(_component_up_icon, "340a23fe", {
                 name: "close",
                 size: () => {
                   return closeSize.value;
                 },
                 color: "#ffffff"
               });
-              _setSharedData(__sharedData, 2, n17?.sharedData);
+              _setSharedData(__sharedData, 2, n16?.sharedData);
               _setSharedDataEvent(__sharedData, 3, closeHandler);
             });
           })
@@ -216,7 +214,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         1
         /* SINGLE_ROOT */
       );
-      _setSharedData(__sharedData, 0, n20?.sharedData);
+      _setSharedData(__sharedData, 0, n19?.sharedData);
       return __sharedData;
     };
   }

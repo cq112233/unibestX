@@ -1,56 +1,54 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
 require("../../libs/mixin/mixin.js");
-require("../../libs/function/test.js");
-require("../../libs/function/digit.js");
-require("../../libs/config/config.js");
-const uni_modules_uviewUltra_components_upCountTo_countTo = require("./countTo.js");
+const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
+require("./countTo.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "up-count-to",
   props: {
     startVal: {
       type: [String, Number],
-      default: uni_modules_uviewUltra_components_upCountTo_countTo.defProps.getNumber("countTo.startVal")
+      default: 0
     },
     endVal: {
       type: [String, Number],
-      default: uni_modules_uviewUltra_components_upCountTo_countTo.defProps.getNumber("countTo.endVal")
+      default: 0
     },
     duration: {
       type: [String, Number],
-      default: uni_modules_uviewUltra_components_upCountTo_countTo.defProps.getNumber("countTo.duration")
+      default: 2e3
     },
     autoplay: {
       type: Boolean,
-      default: uni_modules_uviewUltra_components_upCountTo_countTo.defProps.getBoolean("countTo.autoplay")
+      default: true
     },
     decimals: {
       type: [String, Number],
-      default: uni_modules_uviewUltra_components_upCountTo_countTo.defProps.getNumber("countTo.decimals")
+      default: 0
     },
     useEasing: {
       type: Boolean,
-      default: uni_modules_uviewUltra_components_upCountTo_countTo.defProps.getBoolean("countTo.useEasing")
+      default: true
     },
     decimal: {
       type: String,
-      default: uni_modules_uviewUltra_components_upCountTo_countTo.defProps.getString("countTo.decimal")
+      default: "."
     },
     color: {
       type: String,
-      default: uni_modules_uviewUltra_components_upCountTo_countTo.defProps.getString("countTo.color")
+      default: "#606266"
     },
     fontSize: {
       type: [String, Number],
-      default: uni_modules_uviewUltra_components_upCountTo_countTo.defProps.getNumber("countTo.fontSize")
+      default: 22
     },
     bold: {
       type: Boolean,
-      default: uni_modules_uviewUltra_components_upCountTo_countTo.defProps.getBoolean("countTo.bold")
+      default: false
     },
     separator: {
       type: String,
-      default: uni_modules_uviewUltra_components_upCountTo_countTo.defProps.getString("countTo.separator")
+      default: ""
     }
   },
   emits: ["end"],
@@ -168,7 +166,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         a: common_vendor.t(common_vendor.unref(displayValue)),
         b: common_vendor.sei(common_vendor.gei(_ctx, ""), "text"),
         c: common_vendor.s({
-          fontSize: _ctx.$up.addUnit(__props.fontSize),
+          fontSize: common_vendor.unref(uni_modules_uviewUltra_libs_function_index.addUnit)(__props.fontSize),
           fontWeight: __props.bold ? "bold" : "normal",
           color: __props.color
         }),

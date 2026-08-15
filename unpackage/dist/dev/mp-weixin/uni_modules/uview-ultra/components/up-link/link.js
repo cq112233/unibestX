@@ -1,7 +1,7 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
 const uni_modules_uviewUltra_libs_config_config = require("../../libs/config/config.js");
-const defProps = new common_vendor.UTSJSONObject({
+new common_vendor.UTSJSONObject({
   // link超链接组件props参数
   link: new common_vendor.UTSJSONObject({
     color: uni_modules_uviewUltra_libs_config_config.config.getString("color.up-primary"),
@@ -13,5 +13,4 @@ const defProps = new common_vendor.UTSJSONObject({
     text: ""
   })
 });
-exports.defProps = defProps;
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-ultra/components/up-link/link.js.map

@@ -282,6 +282,8 @@ function padZero(value = null) {
   let str = value.toString();
   return `00${str}`.slice(-2);
 }
+function formValidate(instance = null, event = null) {
+}
 function getProperty(obj = null, key) {
   var _a, _b;
   if (null == obj) {
@@ -358,6 +360,7 @@ exports.bem = bem;
 exports.deepClone = deepClone;
 exports.deepMerge = deepMerge;
 exports.error = error;
+exports.formValidate = formValidate;
 exports.getDeviceInfo = getDeviceInfo;
 exports.getParentFunc = getParentFunc;
 exports.getProperty = getProperty;

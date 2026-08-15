@@ -217,8 +217,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const __returned__ = common_vendor.e({
         a: realSrc.value,
         b: __props.mode,
-        c: common_vendor.o(onErrorHandler, "28"),
-        d: common_vendor.o(onLoadHandler, "1b"),
+        c: common_vendor.o(onErrorHandler, "91"),
+        d: common_vendor.o(onLoadHandler, "cc"),
         e: __props.lazyLoad,
         f: common_vendor.s(imageStyle.value),
         g: __props.showLoading && loading.value
@@ -241,16 +241,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         l: common_vendor.s(errorStyle.value)
       } : {}, {
-        m: common_vendor.o(onClick, "4c"),
-        n: common_vendor.s(wrapStyle.value),
-        o: common_vendor.s(backgroundStyle.value),
-        p: common_vendor.s(mergedCustomStyle.value),
-        q: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        r: show.value,
-        s: __props.fade ? 1e3 : 0,
-        t: `${_ctx.u_s_b_h}px`,
-        v: `${_ctx.u_s_a_i_b}px`,
-        w: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        m: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        n: common_vendor.o(onClick, "cb"),
+        o: common_vendor.s(wrapStyle.value),
+        p: common_vendor.s(backgroundStyle.value),
+        q: common_vendor.s(mergedCustomStyle.value),
+        r: common_vendor.s({
+          "--status-bar-height": `${_ctx.u_s_b_h}px`,
+          "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
+        }),
+        s: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

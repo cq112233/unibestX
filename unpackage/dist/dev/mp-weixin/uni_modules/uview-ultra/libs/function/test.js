@@ -73,13 +73,6 @@ function object(value = null) {
 function func(value = null) {
   return typeof value === "function";
 }
-function promise(value = null) {
-  return common_vendor.UTS.isInstanceOf(
-    value,
-    Promise
-    // return object(value) && func(value.then) && func(value.catch)
-  );
-}
 function image(value) {
   const newValue = value.split("?")[0];
   const IMAGE_REGEXP = /\.(jpeg|jpg|gif|png|svg|webp|jfif|bmp|dpg)/i;
@@ -127,7 +120,6 @@ exports.func = func;
 exports.image = image;
 exports.number = number;
 exports.object = object;
-exports.promise = promise;
 exports.string = string;
 exports.url = url;
 exports.video = video;

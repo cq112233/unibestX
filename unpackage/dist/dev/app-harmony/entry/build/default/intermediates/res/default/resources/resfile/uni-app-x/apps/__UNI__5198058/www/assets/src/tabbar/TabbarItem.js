@@ -9,7 +9,7 @@ const { computed } = globalThis.Vue;
 const inactiveColor = "#999999";
 const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   __dynamicSharedData: true,
-  __hash: "0e504102",
+  __hash: "ade453ea",
   __className,
   __filename: "src/tabbar/TabbarItem.uvue",
   __name: "TabbarItem",
@@ -82,9 +82,9 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
             type: () => {
               return getIcon();
             },
-            size: "24",
-            style: () => {
-              return { color: getActiveColor() };
+            size: 24,
+            color: () => {
+              return getActiveColor();
             }
           });
           _setSharedData(__sharedData, 4, n11?.sharedData);

@@ -1,6 +1,6 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const defProps = new common_vendor.UTSJSONObject({
+new common_vendor.UTSJSONObject({
   // popup组件
   popup: new common_vendor.UTSJSONObject({
     show: false,
@@ -21,5 +21,4 @@ const defProps = new common_vendor.UTSJSONObject({
     pageInline: false
   })
 });
-exports.defProps = defProps;
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-ultra/components/up-popup/popup.js.map

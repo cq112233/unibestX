@@ -1,687 +1,566 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
 const uni_modules_uviewUltra_components_upCalendar_types = require("./types.js");
-require("./props.js");
-require("./util.js");
 const uni_modules_limeDayuts_common_index = require("../../../lime-dayuts/common/index.js");
 require("../../../lime-dayuts/common/use.js");
 require("../../../lime-dayuts/utssdk/interface.js");
 const uni_modules_uviewUltra_libs_i18n_index = require("../../libs/i18n/index.js");
-const uni_modules_uviewUltra_libs_mixin_mpMixin = require("../../libs/mixin/mpMixin.js");
-const uni_modules_uviewUltra_libs_mixin_mixin = require("../../libs/mixin/mixin.js");
 const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
 const uni_modules_uviewUltra_libs_function_test = require("../../libs/function/test.js");
-const uni_modules_uviewUltra_components_upCalendar_calendar = require("./calendar.js");
-var _a;
-const uHeader = () => "./header.js";
-const uMonth = () => "./month.js";
-let calendarProp = uni_modules_uviewUltra_components_upCalendar_calendar.defProps["calendar"];
-const _sfc_main = common_vendor.defineComponent({
-  name: "up-calendar",
-  mixins: [uni_modules_uviewUltra_libs_mixin_mpMixin.mpMixin, uni_modules_uviewUltra_libs_mixin_mixin.mixin],
-  // mixins: [mpMixin, mixin, propsCalendar],
-  components: {
-    uHeader,
-    uMonth
-  },
-  props: {
-    // 日历顶部标题
-    title: {
-      type: String,
-      default: calendarProp["title"]
-    },
-    // 是否显示标题
-    showTitle: {
-      type: Boolean,
-      default: calendarProp["showTitle"]
-    },
-    // 是否显示副标题
-    showSubtitle: {
-      type: Boolean,
-      default: calendarProp["showSubtitle"]
-    },
-    // 日期类型选择，single-选择单个日期，multiple-可以选择多个日期，range-选择日期范围
-    mode: {
-      type: String,
-      default: calendarProp["mode"]
-    },
-    // mode=range时，第一个日期底部的提示文字
-    startText: {
-      type: String,
-      default: calendarProp["startText"]
-    },
-    // mode=range时，最后一个日期底部的提示文字
-    endText: {
-      type: String,
-      default: calendarProp["endText"]
-    },
-    // 自定义列表
-    customList: {
-      type: Array,
-      default: calendarProp["customList"]
-    },
-    // 主题色，对底部按钮和选中日期有效
-    color: {
-      type: String,
-      default: calendarProp["color"]
-    },
-    // 最小的可选日期
-    minDate: {
-      type: [String, Number],
-      default: calendarProp["minDate"]
-    },
-    // 最大可选日期
-    maxDate: {
-      type: [String, Number],
-      default: calendarProp["maxDate"]
-    },
-    // 默认选中的日期，mode为multiple或range是必须为数组格式
-    // @ts-ignore
-    defaultDate: {
-      type: [Array, String, Date, null],
-      default: calendarProp["defaultDate"]
-    },
-    // mode=multiple时，最多可选多少个日期
-    maxCount: {
-      type: [String, Number],
-      default: calendarProp["maxCount"]
-    },
-    // 日期行高
-    rowHeight: {
-      type: [String, Number],
-      default: calendarProp["rowHeight"]
-    },
-    // 日期格式化函数
-    // @ts-ignore
-    formatter: {
-      type: [Function, null],
-      default: calendarProp["formatter"]
-    },
-    // 是否显示农历
-    showLunar: {
-      type: Boolean,
-      default: calendarProp["showLunar"]
-    },
-    // 是否显示月份背景色
-    showMark: {
-      type: Boolean,
-      default: calendarProp["showMark"]
-    },
-    // 确定按钮的文字
-    confirmText: {
-      type: String,
-      default: calendarProp["confirmText"]
-    },
-    // 确认按钮处于禁用状态时的文字
-    confirmDisabledText: {
-      type: String,
-      default: calendarProp["confirmDisabledText"]
-    },
-    // 是否显示日历弹窗
-    show: {
-      type: Boolean,
-      default: calendarProp["show"]
-    },
-    // 是否允许点击遮罩关闭日历
-    closeOnClickOverlay: {
-      type: Boolean,
-      default: calendarProp["closeOnClickOverlay"]
-    },
-    // 是否为只读状态，只读状态下禁止选择日期
-    readonly: {
-      type: Boolean,
-      default: calendarProp["readonly"]
-    },
-    // 	是否展示确认按钮
-    showConfirm: {
-      type: Boolean,
-      default: calendarProp["showConfirm"]
-    },
-    // 日期区间最多可选天数，默认无限制，mode = range时有效
-    maxRange: {
-      type: [Number, String],
-      default: calendarProp["maxRange"]
-    },
-    // 范围选择超过最多可选天数时的提示文案，mode = range时有效
-    rangePrompt: {
-      type: String,
-      default: calendarProp["rangePrompt"]
-    },
-    // 范围选择超过最多可选天数时，是否展示提示文案，mode = range时有效
-    showRangePrompt: {
-      type: Boolean,
-      default: calendarProp["showRangePrompt"]
-    },
-    // 是否允许日期范围的起止时间为同一天，mode = range时有效
-    allowSameDay: {
-      type: Boolean,
-      default: calendarProp["allowSameDay"]
-    },
-    // 区间模式下确认返回值格式，all-返回区间内所有日期，boundary-仅返回起止日期
-    rangeResultMode: {
-      type: String,
-      default: calendarProp["rangeResultMode"]
-    },
-    // 圆角值
-    round: {
-      type: [Boolean, String, Number],
-      default: calendarProp["round"]
-    },
-    // 最多展示月份数量
-    monthNum: {
-      type: [Number, String],
-      default: 3
-    },
-    // 是否启用非滚动的单月切换模式
-    monthSwitch: {
-      type: Boolean,
-      default: calendarProp["monthSwitch"]
-    },
-    // 是否显示今天按钮
-    showToday: {
-      type: Boolean,
-      default: calendarProp["showToday"]
-    },
-    // 是否为iPhoneX留出底部安全距离
-    safeAreaInsetBottom: {
-      type: Boolean,
-      default: (_a = calendarProp["safeAreaInsetBottom"]) !== null && _a !== void 0 ? _a : true
-    }
-  },
-  data() {
-    return {
-      start: 0,
-      inited: false,
-      // 需要显示的月份的数组
-      months: [],
-      // 在月份滚动区域中，当前视图中月份的index索引
-      monthIndex: 0,
-      // 月份滚动区域的高度
-      listHeight: 0,
-      // month组件中选择的日期数组
-      selected: [],
-      scrollIntoView: "",
-      scrollIntoViewScroll: "",
-      scrollTop: 0,
-      // 过滤处理方法
-      innerFormatter: (value) => {
-        return value;
-      }
-    };
-  },
-  watch: {
-    defaultDate: new common_vendor.UTSJSONObject({
-      handler() {
-        if (this.inited)
-          this.setMonth();
-      }
-    }),
-    // @ts-ignore
-    selectedChange: new common_vendor.UTSJSONObject({
-      handler() {
-        if (this.inited)
-          this.setMonth();
-      }
-    }),
-    // 打开弹窗时，设置月份数据
-    show: new common_vendor.UTSJSONObject({
-      immediate: true,
-      handler(nval = null) {
-        if (nval) {
-          this.init();
-        } else {
-          this.scrollIntoView = "";
-        }
-      }
-    })
-  },
-  computed: {
-    // 由于maxDate和minDate可以为字符串(2021-10-10)，或者数值(时间戳)，但是dayuts如果接受字符串形式的时间戳会有问题，这里进行处理
-    innerMaxDate() {
-      return uni_modules_uviewUltra_libs_function_test.number(this.maxDate) ? this.maxDate.toString() : this.maxDate.toString();
-    },
-    innerMinDate() {
-      return uni_modules_uviewUltra_libs_function_test.number(this.minDate) ? this.minDate.toString() : this.minDate.toString();
-    },
-    todayDate() {
-      return uni_modules_limeDayuts_common_index.dayuts().format("YYYY-MM-DD");
-    },
-    todayText() {
-      return uni_modules_uviewUltra_libs_i18n_index.t("up.calendar.today", new common_vendor.UTSJSONObject({}));
-    },
-    todayDisabled() {
-      let today = uni_modules_limeDayuts_common_index.dayuts(this.todayDate);
-      let innerMinDate = this.innerMinDate;
-      let innerMaxDate = this.innerMaxDate;
-      if (innerMinDate != "" && innerMinDate != "0" && today.isBefore(uni_modules_limeDayuts_common_index.dayuts(innerMinDate), "day")) {
-        return true;
-      }
-      if (innerMaxDate != "" && innerMaxDate != "0" && today.isAfter(uni_modules_limeDayuts_common_index.dayuts(innerMaxDate), "day")) {
-        return true;
-      }
-      return false;
-    },
-    // 多个条件的变化，会引起选中日期的变化，这里统一管理监听
-    selectedChange() {
-      return [this.innerMinDate, this.innerMaxDate];
-    },
-    elTitle() {
-      if (this.title != "" && this.title != "日期选择") {
-        return this.title;
-      }
-      return uni_modules_uviewUltra_libs_i18n_index.t("up.calendar.chooseDates", new common_vendor.UTSJSONObject({}));
-    },
-    elConfirmText() {
-      if (this.confirmText != "" && this.confirmText != "确定") {
-        return this.confirmText;
-      }
-      return uni_modules_uviewUltra_libs_i18n_index.t("up.common.confirm", new common_vendor.UTSJSONObject({}));
-    },
-    elConfirmDisabledText() {
-      if (this.confirmDisabledText != "" && this.confirmDisabledText != "确定") {
-        return this.confirmDisabledText;
-      }
-      return uni_modules_uviewUltra_libs_i18n_index.t("up.common.confirm", new common_vendor.UTSJSONObject({}));
-    },
-    elStartText() {
-      if (this.startText != "" && this.startText != "开始") {
-        return this.startText;
-      }
-      return uni_modules_uviewUltra_libs_i18n_index.t("up.common.start", new common_vendor.UTSJSONObject({}));
-    },
-    elEndText() {
-      if (this.endText != "" && this.endText != "结束") {
-        return this.endText;
-      }
-      return uni_modules_uviewUltra_libs_i18n_index.t("up.common.end", new common_vendor.UTSJSONObject({}));
-    },
-    subtitle() {
-      if (this.months.length > 0) {
-        let monthIndex = this.monthIndex;
-        const item = this.months[monthIndex];
-        return uni_modules_uviewUltra_libs_i18n_index.formatMonthTitle(item.year, item.month);
-      } else {
-        return "";
-      }
-    },
-    currentMonths() {
-      if (this.monthSwitch && this.months.length > 0) {
-        return [this.months[this.monthIndex]];
-      }
-      return this.months;
-    },
-    switchPrevDisabled() {
-      return this.monthIndex <= 0;
-    },
-    switchNextDisabled() {
-      return this.monthIndex >= this.months.length - 1;
-    },
-    switchPrevYearDisabled() {
-      return this.monthIndex - 12 < 0;
-    },
-    switchNextYearDisabled() {
-      return this.monthIndex + 12 > this.months.length - 1;
-    },
-    buttonDisabled() {
-      if (this.mode === "range") {
-        if (this.selected.length <= 1) {
-          return true;
-        } else {
-          return false;
-        }
-      } else {
-        return false;
-      }
-    }
-  },
-  mounted() {
-    this.start = Date.now();
-  },
-  emits: ["confirm", "close"],
-  methods: {
-    addUnit(e = null) {
-      return uni_modules_uviewUltra_libs_function_index.addUnit(e);
-    },
-    getConfirmValue(selected = null) {
-      const sel = selected !== null && selected !== void 0 ? selected : this.selected;
-      if (this.mode == "range" && this.rangeResultMode == "boundary" && sel.length >= 2) {
-        let len = sel.length - 1;
-        return [sel[0], sel[len]];
-      }
-      return sel;
-    },
-    // 在微信小程序中，不支持将函数当做props参数，故只能通过ref形式调用
-    setFormatter(e) {
-      this.innerFormatter = e;
-    },
-    // month组件内部选择日期后，通过事件通知给父组件
-    monthSelectedM(e, scene) {
-      this.selected = e;
-      if (!this.showConfirm) {
-        if (
-          // @ts-ignore
-          this.mode === "multiple" || // @ts-ignore
-          this.mode === "single" || // @ts-ignore
-          this.mode === "range" && this.selected.length >= 2
-        ) {
-          if (scene === "init") {
-            return null;
-          }
-          if (scene === "tap") {
-            this.$emit("confirm", this.getConfirmValue());
-          }
-        }
-      }
-    },
-    init() {
-      if (
-        // @ts-ignore
-        this.innerMaxDate != "0" && this.innerMaxDate != "" && // @ts-ignore
-        this.innerMinDate != "0" && this.innerMinDate != "" && // @ts-ignore
-        new Date(this.innerMaxDate).getTime() < new Date(this.innerMinDate).getTime()
-      ) {
-        common_vendor.index.__f__("log", "at uni_modules/uview-ultra/components/up-calendar/up-calendar.uvue:570", this.innerMaxDate);
-        return uni_modules_uviewUltra_libs_function_index.error("maxDate不能小于minDate时间");
-      }
-      this.listHeight = this.rowHeight * (this.monthSwitch ? 6 : 5) + 30;
-      this.setMonth();
-      this.inited = true;
-    },
-    close() {
-      this.$emit("close");
-    },
-    // 点击确定按钮
-    confirm() {
-      if (!this.buttonDisabled) {
-        this.$emit("confirm", this.getConfirmValue());
-      }
-    },
-    // 获得两个日期之间的月份数
-    getMonths(minDate = null, maxDate = null) {
-      const minYear = uni_modules_limeDayuts_common_index.dayuts(minDate).year();
-      const minMonth = uni_modules_limeDayuts_common_index.dayuts(minDate).month() + 1;
-      const maxYear = uni_modules_limeDayuts_common_index.dayuts(maxDate).year();
-      const maxMonth = uni_modules_limeDayuts_common_index.dayuts(maxDate).month() + 1;
-      return (maxYear - minYear) * 12 + (maxMonth - minMonth) + 1;
-    },
-    // 设置月份数据
-    setMonth() {
-      const minDate = this.innerMinDate != "" && this.innerMinDate != "0" ? this.innerMinDate : uni_modules_limeDayuts_common_index.dayuts().valueOf();
-      const maxDate = (
-        // @ts-ignore
-        this.innerMaxDate != "" && this.innerMaxDate != "0" ? this.innerMaxDate : uni_modules_limeDayuts_common_index.dayuts(minDate).add(this.monthNum - 1, "month").valueOf()
-      );
-      const months = uni_modules_uviewUltra_libs_function_index.range(
-        1,
-        // @ts-ignore
-        this.monthNum,
-        this.getMonths(minDate, maxDate)
-      );
-      this.months = [];
-      const minDateStr = uni_modules_limeDayuts_common_index.dayuts(minDate).format("YYYY-MM-DD");
-      const maxDateStr = uni_modules_limeDayuts_common_index.dayuts(maxDate).format("YYYY-MM-DD");
-      for (let i = 0; i < months; i++) {
-        const monthBase = uni_modules_limeDayuts_common_index.dayuts(minDate).add(i, "month");
-        const daysInMonth = monthBase.daysInMonth();
-        const monthValue = monthBase.month() + 1;
-        const yearValue = monthBase.year();
-        let cdate = [];
-        for (let day = 1; day <= daysInMonth; day++) {
-          const dayBase = monthBase.date(day);
-          const date = dayBase.format("YYYY-MM-DD");
-          const week = dayBase.day();
-          let bottomInfo = "";
-          let config = new uni_modules_uviewUltra_components_upCalendar_types.UPCalendarMonthsItemDate({
-            selected: null,
-            day: day.toString(),
-            week,
-            disabled: date < minDateStr || date > maxDateStr,
-            date: new Date(date),
-            dateStr: date,
-            bottomInfo,
-            dot: false,
-            month: monthValue
-          });
-          cdate.push(config);
-        }
-        let md = new uni_modules_uviewUltra_components_upCalendar_types.CalendarMonthItem(
-          {
-            top: 0,
-            date: cdate,
-            // 当前所属的月份
-            month: monthValue.toString(),
-            // 当前年份
-            year: yearValue.toString()
-          }
-          // @ts-ignore
-        );
-        this.months.push(md);
-      }
-      if (this.monthSwitch) {
-        this.monthIndex = this.getDefaultMonthIndex();
-      }
-    },
-    getDefaultMonthIndex() {
-      let selected = uni_modules_limeDayuts_common_index.dayuts().format("YYYY-MM");
-      if (this.defaultDate != null) {
-        if (!uni_modules_uviewUltra_libs_function_test.array(this.defaultDate)) {
-          selected = uni_modules_limeDayuts_common_index.dayuts(this.defaultDate).format("YYYY-MM");
-        } else if (this.defaultDate.length > 0) {
-          selected = uni_modules_limeDayuts_common_index.dayuts(this.defaultDate[0]).format("YYYY-MM");
-        }
-      }
-      const index = this.months.findIndex((_a2) => {
-        var year = _a2.year, month = _a2.month;
-        month = uni_modules_uviewUltra_libs_function_index.padZero(month);
-        return `${year}-${month}` === selected;
-      });
-      return index == -1 ? 0 : index;
-    },
-    prevMonth() {
-      if (!this.switchPrevDisabled) {
-        this.monthIndex -= 1;
-      }
-    },
-    nextMonth() {
-      if (!this.switchNextDisabled) {
-        this.monthIndex += 1;
-      }
-    },
-    prevYear() {
-      if (!this.switchPrevYearDisabled) {
-        this.monthIndex -= 12;
-      }
-    },
-    nextYear() {
-      if (!this.switchNextYearDisabled) {
-        this.monthIndex += 12;
-      }
-    },
-    jumpToToday() {
-      if (this.todayDisabled) {
-        return null;
-      }
-      const targetMonth = uni_modules_limeDayuts_common_index.dayuts(this.todayDate).format("YYYY-MM");
-      if (this.monthSwitch) {
-        const todayMonthIndex = this.months.findIndex((_a2) => {
-          var year = _a2.year, month = _a2.month;
-          month = uni_modules_uviewUltra_libs_function_index.padZero(month);
-          return `${year}-${month}` == targetMonth;
-        });
-        if (todayMonthIndex != -1) {
-          this.monthIndex = todayMonthIndex;
-        }
-        return null;
-      }
-      this.scrollIntoDefaultMonth(targetMonth);
-    },
-    // 滚动到默认设置的月份
-    scrollIntoDefaultMonth(selected) {
-      const _index = this.months.findIndex((_a2) => {
-        var year = _a2.year, month = _a2.month;
-        month = uni_modules_uviewUltra_libs_function_index.padZero(month);
-        return `${year}-${month}` === selected;
-      });
-      if (_index != -1) {
-        this.scrollTop = this.months[_index].top || 0;
-      }
-    },
-    // scroll-view滚动监听
-    onScroll(event) {
-      const scrollTop = Math.max(0, event.detail.scrollTop);
-      for (let i = 0; i < this.months.length; i++) {
-        if (scrollTop >= (this.months[i].top > 0 ? this.months[i].top : this.listHeight)) {
-          this.monthIndex = i;
-          this.scrollIntoViewScroll = `month-${i}`;
-        }
-      }
-    },
-    // 更新月份的top值
-    onUpdateMonthTopM(topArr) {
-      if (this.monthSwitch) {
-        return null;
-      }
-      this.updateMonthTopM(topArr);
-    },
-    updateMonthTopM(topArr) {
-      topArr.map((item, index) => {
-        this.months[index]["top"] = item;
-      });
-      if (this.defaultDate == null) {
-        const select = uni_modules_limeDayuts_common_index.dayuts().format("YYYY-MM");
-        this.scrollIntoDefaultMonth(select);
-        return null;
-      }
-      let selected = uni_modules_limeDayuts_common_index.dayuts().format("YYYY-MM");
-      if (!uni_modules_uviewUltra_libs_function_test.array(this.defaultDate)) {
-        selected = uni_modules_limeDayuts_common_index.dayuts(this.defaultDate).format("YYYY-MM");
-      } else {
-        selected = uni_modules_limeDayuts_common_index.dayuts(this.defaultDate[0]).format("YYYY-MM");
-      }
-      this.scrollIntoDefaultMonth(selected);
-    }
-  }
-});
 if (!Array) {
-  const _component_uHeader = common_vendor.resolveComponent("uHeader");
-  const _component_uMonth = common_vendor.resolveComponent("uMonth");
-  const _easycom_up_button2 = common_vendor.resolveComponent("up-button");
-  const _easycom_up_popup2 = common_vendor.resolveComponent("up-popup");
-  (_component_uHeader + _component_uMonth + _easycom_up_button2 + _easycom_up_popup2)();
+  const _easycom_up_button_1 = common_vendor.resolveComponent("up-button");
+  const _easycom_up_popup_1 = common_vendor.resolveComponent("up-popup");
+  (_easycom_up_button_1 + _easycom_up_popup_1)();
 }
 const _easycom_up_button = () => "../up-button/up-button.js";
 const _easycom_up_popup = () => "../up-popup/up-popup.js";
 if (!Math) {
-  (_easycom_up_button + _easycom_up_popup)();
+  (common_vendor.unref(uHeader) + common_vendor.unref(uMonth) + _easycom_up_button + _easycom_up_popup)();
 }
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  "raw js";
-  return common_vendor.e({
-    a: common_vendor.o($options.prevMonth, "bc"),
-    b: common_vendor.o($options.nextMonth, "ab"),
-    c: common_vendor.o($options.prevYear, "b0"),
-    d: common_vendor.o($options.nextYear, "41"),
-    e: common_vendor.o($options.jumpToToday, "b9"),
-    f: common_vendor.p({
-      title: $options.elTitle,
-      subtitle: $options.subtitle,
-      showSubtitle: $props.showSubtitle,
-      showTitle: $props.showTitle,
-      showSwitch: $props.monthSwitch,
-      showToday: $props.showToday,
-      todayText: $options.todayText,
-      todayDisabled: $options.todayDisabled,
-      prevDisabled: $options.switchPrevDisabled,
-      nextDisabled: $options.switchNextDisabled,
-      prevYearDisabled: $options.switchPrevYearDisabled,
-      nextYearDisabled: $options.switchNextYearDisabled,
-      class: "data-v-cf2b6afc"
-    }),
-    g: !$props.monthSwitch
-  }, !$props.monthSwitch ? {
-    h: common_vendor.sr("month", "cf2b6afc-2,cf2b6afc-0"),
-    i: common_vendor.o($options.monthSelectedM, "0d"),
-    j: common_vendor.o($options.onUpdateMonthTopM, "05"),
-    k: common_vendor.p({
-      color: $props.color,
-      rowHeight: $props.rowHeight,
-      showMark: $props.showMark,
-      months: $data.months,
-      mode: $props.mode,
-      maxCount: $props.maxCount,
-      startText: $options.elStartText,
-      endText: $options.elEndText,
-      defaultDate: $props.defaultDate,
-      minDate: $options.innerMinDate,
-      maxDate: $options.innerMaxDate,
-      maxMonth: $props.monthNum,
-      readonly: $props.readonly,
-      maxRange: $props.maxRange,
-      rangePrompt: $props.rangePrompt,
-      showRangePrompt: $props.showRangePrompt,
-      allowSameDay: $props.allowSameDay,
-      todayDate: $options.todayDate,
-      class: "r data-v-cf2b6afc"
-    }),
-    l: $options.addUnit($data.listHeight),
-    m: common_vendor.o((...args) => $options.onScroll && $options.onScroll(...args), "05"),
-    n: $data.scrollTop,
-    o: $data.scrollIntoView
-  } : {
-    p: common_vendor.sr("month", "cf2b6afc-3,cf2b6afc-0"),
-    q: common_vendor.o($options.monthSelectedM, "45"),
-    r: common_vendor.o($options.onUpdateMonthTopM, "67"),
-    s: common_vendor.p({
-      color: $props.color,
-      rowHeight: $props.rowHeight,
-      showMark: $props.showMark,
-      months: $options.currentMonths,
-      mode: $props.mode,
-      maxCount: $props.maxCount,
-      startText: $options.elStartText,
-      endText: $options.elEndText,
-      defaultDate: $props.defaultDate,
-      minDate: $options.innerMinDate,
-      maxDate: $options.innerMaxDate,
-      maxMonth: $props.monthNum,
-      readonly: $props.readonly,
-      maxRange: $props.maxRange,
-      rangePrompt: $props.rangePrompt,
-      showRangePrompt: $props.showRangePrompt,
-      allowSameDay: $props.allowSameDay,
-      todayDate: $options.todayDate,
-      class: "r data-v-cf2b6afc"
-    }),
-    t: $options.addUnit($data.listHeight)
-  }, {
-    v: $props.showConfirm
-  }, $props.showConfirm ? {
-    w: common_vendor.o($options.confirm, "1a"),
-    x: common_vendor.p({
-      shape: "circle",
-      text: $options.buttonDisabled ? $options.elConfirmDisabledText : $options.elConfirmText,
-      color: $props.color == "#3c9cff" ? "" : $props.color,
-      type: $props.color == "#3c9cff" ? "primary" : "",
-      disabled: $options.buttonDisabled,
-      customStyle: "min-width:120px;",
-      class: "data-v-cf2b6afc"
-    })
-  } : {}, {
-    y: common_vendor.gei(_ctx, ""),
-    z: common_vendor.o($options.close, "0c"),
-    A: common_vendor.p({
-      show: $props.show,
-      mode: "bottom",
-      closeable: true,
-      round: $props.round,
-      closeOnClickOverlay: $props.closeOnClickOverlay,
-      safeAreaInsetBottom: $props.safeAreaInsetBottom,
-      id: common_vendor.gei(_ctx, ""),
-      class: "data-v-cf2b6afc"
-    }),
-    B: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+const uHeader = () => "./header.js";
+const uMonth = () => "./month.js";
+const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
+  name: "up-calendar"
+}, { __name: "up-calendar", props: {
+  title: {
+    type: String,
+    default: ""
+  },
+  showTitle: {
+    type: Boolean,
+    default: true
+  },
+  showSubtitle: {
+    type: Boolean,
+    default: true
+  },
+  mode: {
+    type: String,
+    default: "single"
+  },
+  startText: {
+    type: String,
+    default: "开始"
+  },
+  endText: {
+    type: String,
+    default: "结束"
+  },
+  customList: {
+    type: Array,
+    default: () => {
+      return [];
+    }
+  },
+  color: {
+    type: String,
+    default: "#3c9cff"
+  },
+  minDate: {
+    type: [String, Number],
+    default: 0
+  },
+  maxDate: {
+    type: [String, Number],
+    default: 0
+  },
+  defaultDate: {
+    type: [Array, String, Date],
+    default: null
+  },
+  maxCount: {
+    type: [String, Number],
+    default: 999
+  },
+  rowHeight: {
+    type: [String, Number],
+    default: 56
+  },
+  formatter: {
+    type: Function,
+    default: null
+  },
+  showLunar: {
+    type: Boolean,
+    default: false
+  },
+  showMark: {
+    type: Boolean,
+    default: true
+  },
+  confirmText: {
+    type: String,
+    default: "确定"
+  },
+  confirmDisabledText: {
+    type: String,
+    default: "确定"
+  },
+  show: {
+    type: Boolean,
+    default: false
+  },
+  closeOnClickOverlay: {
+    type: Boolean,
+    default: false
+  },
+  readonly: {
+    type: Boolean,
+    default: false
+  },
+  showConfirm: {
+    type: Boolean,
+    default: true
+  },
+  maxRange: {
+    type: [Number, String],
+    default: 365
+  },
+  rangePrompt: {
+    type: String,
+    default: ""
+  },
+  showRangePrompt: {
+    type: Boolean,
+    default: true
+  },
+  allowSameDay: {
+    type: Boolean,
+    default: false
+  },
+  rangeResultMode: {
+    type: String,
+    default: "all"
+  },
+  round: {
+    type: [Boolean, String, Number],
+    default: 0
+  },
+  monthNum: {
+    type: [Number, String],
+    default: 3
+  },
+  monthSwitch: {
+    type: Boolean,
+    default: false
+  },
+  showToday: {
+    type: Boolean,
+    default: true
+  },
+  safeAreaInsetBottom: {
+    type: Boolean,
+    default: true
+  }
+}, emits: ["confirm", "close"], setup(__props, _a) {
+  var __expose = _a.expose, __emit = _a.emit;
+  const props = __props;
+  const emit = __emit;
+  const inited = common_vendor.ref(false);
+  const months = common_vendor.ref([]);
+  const monthIndex = common_vendor.ref(0);
+  const listHeight = common_vendor.ref(0);
+  const selected = common_vendor.ref([]);
+  const scrollIntoView = common_vendor.ref("");
+  const scrollTop = common_vendor.ref(0);
+  const innerMaxDate = common_vendor.computed(() => {
+    return props.maxDate.toString();
   });
-}
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-cf2b6afc"]]);
+  const innerMinDate = common_vendor.computed(() => {
+    return props.minDate.toString();
+  });
+  const todayDate = common_vendor.computed(() => {
+    return uni_modules_limeDayuts_common_index.dayuts().format("YYYY-MM-DD");
+  });
+  const todayText = common_vendor.computed(() => {
+    return uni_modules_uviewUltra_libs_i18n_index.t("up.calendar.today", new common_vendor.UTSJSONObject({}));
+  });
+  const todayDisabled = common_vendor.computed(() => {
+    let today = uni_modules_limeDayuts_common_index.dayuts(todayDate.value);
+    let minD = innerMinDate.value;
+    let maxD = innerMaxDate.value;
+    if (minD != "" && minD != "0" && today.isBefore(uni_modules_limeDayuts_common_index.dayuts(minD), "day")) {
+      return true;
+    }
+    if (maxD != "" && maxD != "0" && today.isAfter(uni_modules_limeDayuts_common_index.dayuts(maxD), "day")) {
+      return true;
+    }
+    return false;
+  });
+  const elTitle = common_vendor.computed(() => {
+    if (props.title != "" && props.title != "日期选择") {
+      return props.title;
+    }
+    return uni_modules_uviewUltra_libs_i18n_index.t("up.calendar.chooseDates", new common_vendor.UTSJSONObject({}));
+  });
+  const elConfirmText = common_vendor.computed(() => {
+    if (props.confirmText != "" && props.confirmText != "确定") {
+      return props.confirmText;
+    }
+    return uni_modules_uviewUltra_libs_i18n_index.t("up.common.confirm", new common_vendor.UTSJSONObject({}));
+  });
+  const elConfirmDisabledText = common_vendor.computed(() => {
+    if (props.confirmDisabledText != "" && props.confirmDisabledText != "确定") {
+      return props.confirmDisabledText;
+    }
+    return uni_modules_uviewUltra_libs_i18n_index.t("up.common.confirm", new common_vendor.UTSJSONObject({}));
+  });
+  const elStartText = common_vendor.computed(() => {
+    if (props.startText != "" && props.startText != "开始") {
+      return props.startText;
+    }
+    return uni_modules_uviewUltra_libs_i18n_index.t("up.common.start", new common_vendor.UTSJSONObject({}));
+  });
+  const elEndText = common_vendor.computed(() => {
+    if (props.endText != "" && props.endText != "结束") {
+      return props.endText;
+    }
+    return uni_modules_uviewUltra_libs_i18n_index.t("up.common.end", new common_vendor.UTSJSONObject({}));
+  });
+  const subtitle = common_vendor.computed(() => {
+    if (months.value.length > 0) {
+      const item = months.value[monthIndex.value];
+      return uni_modules_uviewUltra_libs_i18n_index.formatMonthTitle(item.year, item.month);
+    }
+    return "";
+  });
+  const currentMonths = common_vendor.computed(() => {
+    if (props.monthSwitch && months.value.length > 0) {
+      return [months.value[monthIndex.value]];
+    }
+    return months.value;
+  });
+  const switchPrevDisabled = common_vendor.computed(() => {
+    return monthIndex.value <= 0;
+  });
+  const switchNextDisabled = common_vendor.computed(() => {
+    return monthIndex.value >= months.value.length - 1;
+  });
+  const switchPrevYearDisabled = common_vendor.computed(() => {
+    return monthIndex.value - 12 < 0;
+  });
+  const switchNextYearDisabled = common_vendor.computed(() => {
+    return monthIndex.value + 12 > months.value.length - 1;
+  });
+  const buttonDisabled = common_vendor.computed(() => {
+    if (props.mode === "range") {
+      return selected.value.length <= 1;
+    }
+    return false;
+  });
+  function getConfirmValue(selParam = null) {
+    const sel = selParam !== null && selParam !== void 0 ? selParam : selected.value;
+    if (props.mode == "range" && props.rangeResultMode == "boundary" && sel.length >= 2) {
+      let len = sel.length - 1;
+      return [sel[0], sel[len]];
+    }
+    return sel;
+  }
+  function monthSelectedM(e, scene) {
+    selected.value = e;
+    if (!props.showConfirm) {
+      if (props.mode === "multiple" || props.mode === "single" || props.mode === "range" && selected.value.length >= 2) {
+        if (scene === "tap") {
+          emit("confirm", getConfirmValue());
+        }
+      }
+    }
+  }
+  function getMonths(minD = null, maxD = null) {
+    const minYear = uni_modules_limeDayuts_common_index.dayuts(minD).year();
+    const minMonth = uni_modules_limeDayuts_common_index.dayuts(minD).month() + 1;
+    const maxYear = uni_modules_limeDayuts_common_index.dayuts(maxD).year();
+    const maxMonth = uni_modules_limeDayuts_common_index.dayuts(maxD).month() + 1;
+    return (maxYear - minYear) * 12 + (maxMonth - minMonth) + 1;
+  }
+  function setMonth() {
+    const minD = innerMinDate.value != "" && innerMinDate.value != "0" ? innerMinDate.value : uni_modules_limeDayuts_common_index.dayuts().valueOf();
+    const maxD = innerMaxDate.value != "" && innerMaxDate.value != "0" ? innerMaxDate.value : uni_modules_limeDayuts_common_index.dayuts(minD).add(parseInt(props.monthNum.toString()) - 1, "month").valueOf();
+    const monthCount = uni_modules_uviewUltra_libs_function_index.range(1, parseInt(props.monthNum.toString()), getMonths(minD, maxD));
+    let newMonths = [];
+    const minDateStr = uni_modules_limeDayuts_common_index.dayuts(minD).format("YYYY-MM-DD");
+    const maxDateStr = uni_modules_limeDayuts_common_index.dayuts(maxD).format("YYYY-MM-DD");
+    for (let i = 0; i < monthCount; i++) {
+      const monthBase = uni_modules_limeDayuts_common_index.dayuts(minD).add(i, "month");
+      const daysInMonth = monthBase.daysInMonth();
+      const monthValue = monthBase.month() + 1;
+      const yearValue = monthBase.year();
+      let cdate = [];
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dayBase = monthBase.date(day);
+        const date = dayBase.format("YYYY-MM-DD");
+        const week = dayBase.day();
+        let config = new uni_modules_uviewUltra_components_upCalendar_types.UPCalendarMonthsItemDate({
+          selected: null,
+          day: day.toString(),
+          week,
+          disabled: date < minDateStr || date > maxDateStr,
+          date: new Date(date),
+          dateStr: date,
+          bottomInfo: "",
+          dot: false,
+          month: monthValue
+        });
+        cdate.push(config);
+      }
+      let md = new uni_modules_uviewUltra_components_upCalendar_types.CalendarMonthItem({
+        top: 0,
+        date: cdate,
+        month: monthValue.toString(),
+        year: yearValue.toString()
+      });
+      newMonths.push(md);
+    }
+    months.value = newMonths;
+    if (props.monthSwitch) {
+      monthIndex.value = getDefaultMonthIndex();
+    }
+  }
+  function getDefaultMonthIndex() {
+    let sel = uni_modules_limeDayuts_common_index.dayuts().format("YYYY-MM");
+    if (props.defaultDate != null) {
+      if (!uni_modules_uviewUltra_libs_function_test.array(props.defaultDate)) {
+        sel = uni_modules_limeDayuts_common_index.dayuts(props.defaultDate).format("YYYY-MM");
+      } else if (props.defaultDate.length > 0) {
+        sel = uni_modules_limeDayuts_common_index.dayuts(props.defaultDate[0]).format("YYYY-MM");
+      }
+    }
+    const idx = months.value.findIndex((_a2) => {
+      var year = _a2.year, month = _a2.month;
+      month = uni_modules_uviewUltra_libs_function_index.padZero(month);
+      return `${year}-${month}` === sel;
+    });
+    return idx == -1 ? 0 : idx;
+  }
+  function init() {
+    listHeight.value = parseInt(props.rowHeight.toString()) * (props.monthSwitch ? 6 : 5) + 30;
+    setMonth();
+    inited.value = true;
+  }
+  function close() {
+    emit("close");
+  }
+  function confirm() {
+    if (!buttonDisabled.value) {
+      emit("confirm", getConfirmValue());
+    }
+  }
+  function prevMonth() {
+    if (!switchPrevDisabled.value) {
+      monthIndex.value -= 1;
+    }
+  }
+  function nextMonth() {
+    if (!switchNextDisabled.value) {
+      monthIndex.value += 1;
+    }
+  }
+  function prevYear() {
+    if (!switchPrevYearDisabled.value) {
+      monthIndex.value -= 12;
+    }
+  }
+  function nextYear() {
+    if (!switchNextYearDisabled.value) {
+      monthIndex.value += 12;
+    }
+  }
+  function jumpToToday() {
+    if (todayDisabled.value)
+      return null;
+    const targetMonth = uni_modules_limeDayuts_common_index.dayuts(todayDate.value).format("YYYY-MM");
+    if (props.monthSwitch) {
+      const todayMonthIdx = months.value.findIndex((_a2) => {
+        var year = _a2.year, month = _a2.month;
+        month = uni_modules_uviewUltra_libs_function_index.padZero(month);
+        return `${year}-${month}` == targetMonth;
+      });
+      if (todayMonthIdx != -1) {
+        monthIndex.value = todayMonthIdx;
+      }
+      return null;
+    }
+    scrollIntoDefaultMonth(targetMonth);
+  }
+  function scrollIntoDefaultMonth(selMonth) {
+    const _index = months.value.findIndex((_a2) => {
+      var year = _a2.year, month = _a2.month;
+      month = uni_modules_uviewUltra_libs_function_index.padZero(month);
+      return `${year}-${month}` === selMonth;
+    });
+    if (_index != -1) {
+      common_vendor.nextTick$1(() => {
+        scrollIntoView.value = "";
+        scrollIntoView.value = `month-${_index}`;
+      });
+    }
+  }
+  function onScroll(event) {
+    const curScrollTop = Math.max(0, event.detail.scrollTop);
+    for (let i = 0; i < months.value.length; i++) {
+      if (curScrollTop >= (months.value[i].top > 0 ? months.value[i].top : listHeight.value)) {
+        monthIndex.value = i;
+      }
+    }
+  }
+  function onUpdateMonthTopM(topArr) {
+    if (props.monthSwitch)
+      return null;
+    updateMonthTopM(topArr);
+  }
+  function updateMonthTopM(topArr) {
+    topArr.map((item, index) => {
+      if (index < months.value.length) {
+        months.value[index].top = item;
+      }
+    });
+    if (props.defaultDate == null) {
+      const sel_1 = uni_modules_limeDayuts_common_index.dayuts().format("YYYY-MM");
+      scrollIntoDefaultMonth(sel_1);
+      return null;
+    }
+    let sel = uni_modules_limeDayuts_common_index.dayuts().format("YYYY-MM");
+    if (!uni_modules_uviewUltra_libs_function_test.array(props.defaultDate)) {
+      sel = uni_modules_limeDayuts_common_index.dayuts(props.defaultDate).format("YYYY-MM");
+    } else {
+      sel = uni_modules_limeDayuts_common_index.dayuts(props.defaultDate[0]).format("YYYY-MM");
+    }
+    scrollIntoDefaultMonth(sel);
+  }
+  common_vendor.watch(() => {
+    return props.show;
+  }, (nval) => {
+    if (nval) {
+      init();
+    } else {
+      scrollIntoView.value = "";
+    }
+  }, { immediate: true });
+  common_vendor.watch(() => {
+    return [props.defaultDate, innerMinDate.value, innerMaxDate.value];
+  }, () => {
+    if (inited.value)
+      setMonth();
+  });
+  common_vendor.onMounted(() => {
+    init();
+  });
+  __expose({
+    init,
+    setMonth,
+    confirm,
+    close
+  });
+  return (_ctx, _cache) => {
+    "raw js";
+    const __returned__ = common_vendor.e({
+      a: common_vendor.o(prevMonth, "e7"),
+      b: common_vendor.o(nextMonth, "f3"),
+      c: common_vendor.o(prevYear, "11"),
+      d: common_vendor.o(nextYear, "2d"),
+      e: common_vendor.o(jumpToToday, "c0"),
+      f: common_vendor.p({
+        title: elTitle.value,
+        subtitle: subtitle.value,
+        showSubtitle: __props.showSubtitle,
+        showTitle: __props.showTitle,
+        showSwitch: __props.monthSwitch,
+        showToday: __props.showToday,
+        todayText: todayText.value,
+        todayDisabled: todayDisabled.value,
+        prevDisabled: switchPrevDisabled.value,
+        nextDisabled: switchNextDisabled.value,
+        prevYearDisabled: switchPrevYearDisabled.value,
+        nextYearDisabled: switchNextYearDisabled.value,
+        class: "data-v-cf2b6afc"
+      }),
+      g: !__props.monthSwitch
+    }, !__props.monthSwitch ? {
+      h: common_vendor.sr("month", "cf2b6afc-2,cf2b6afc-0"),
+      i: common_vendor.o(monthSelectedM, "6d"),
+      j: common_vendor.o(onUpdateMonthTopM, "84"),
+      k: common_vendor.p({
+        color: __props.color,
+        rowHeight: __props.rowHeight,
+        showMark: __props.showMark,
+        months: months.value,
+        mode: __props.mode,
+        maxCount: __props.maxCount,
+        startText: elStartText.value,
+        endText: elEndText.value,
+        defaultDate: __props.defaultDate,
+        minDate: innerMinDate.value,
+        maxDate: innerMaxDate.value,
+        maxMonth: __props.monthNum,
+        readonly: __props.readonly,
+        maxRange: __props.maxRange,
+        rangePrompt: __props.rangePrompt,
+        showRangePrompt: __props.showRangePrompt,
+        allowSameDay: __props.allowSameDay,
+        todayDate: todayDate.value,
+        class: "r data-v-cf2b6afc"
+      }),
+      l: common_vendor.unref(uni_modules_uviewUltra_libs_function_index.addUnit)(listHeight.value),
+      m: common_vendor.o(onScroll, "c6"),
+      n: scrollTop.value,
+      o: scrollIntoView.value
+    } : {
+      p: common_vendor.sr("month", "cf2b6afc-3,cf2b6afc-0"),
+      q: common_vendor.o(monthSelectedM, "40"),
+      r: common_vendor.o(onUpdateMonthTopM, "c7"),
+      s: common_vendor.p({
+        color: __props.color,
+        rowHeight: __props.rowHeight,
+        showMark: __props.showMark,
+        months: currentMonths.value,
+        mode: __props.mode,
+        maxCount: __props.maxCount,
+        startText: elStartText.value,
+        endText: elEndText.value,
+        defaultDate: __props.defaultDate,
+        minDate: innerMinDate.value,
+        maxDate: innerMaxDate.value,
+        maxMonth: __props.monthNum,
+        readonly: __props.readonly,
+        maxRange: __props.maxRange,
+        rangePrompt: __props.rangePrompt,
+        showRangePrompt: __props.showRangePrompt,
+        allowSameDay: __props.allowSameDay,
+        todayDate: todayDate.value,
+        class: "r data-v-cf2b6afc"
+      }),
+      t: common_vendor.unref(uni_modules_uviewUltra_libs_function_index.addUnit)(listHeight.value)
+    }, {
+      v: __props.showConfirm
+    }, __props.showConfirm ? {
+      w: common_vendor.o(confirm, "ff"),
+      x: common_vendor.p({
+        shape: "circle",
+        text: buttonDisabled.value ? elConfirmDisabledText.value : elConfirmText.value,
+        color: __props.color == "#3c9cff" ? "" : __props.color,
+        type: __props.color == "#3c9cff" ? "primary" : "",
+        disabled: buttonDisabled.value,
+        customStyle: "min-width:120px;",
+        class: "data-v-cf2b6afc"
+      })
+    } : {}, {
+      y: common_vendor.gei(_ctx, ""),
+      z: common_vendor.o(close, "a4"),
+      A: common_vendor.p({
+        show: __props.show,
+        mode: "bottom",
+        closeable: true,
+        round: __props.round,
+        closeOnClickOverlay: __props.closeOnClickOverlay,
+        safeAreaInsetBottom: __props.safeAreaInsetBottom,
+        id: common_vendor.gei(_ctx, ""),
+        class: "data-v-cf2b6afc"
+      }),
+      B: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+    });
+    return __returned__;
+  };
+} }));
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-cf2b6afc"]]);
 wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-ultra/components/up-calendar/up-calendar.js.map

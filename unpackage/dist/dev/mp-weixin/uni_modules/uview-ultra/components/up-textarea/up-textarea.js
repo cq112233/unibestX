@@ -1,157 +1,219 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const uni_modules_uviewUltra_components_upTextarea_props = require("./props.js");
-const uni_modules_uviewUltra_libs_mixin_mpMixin = require("../../libs/mixin/mpMixin.js");
-const uni_modules_uviewUltra_libs_mixin_mixin = require("../../libs/mixin/mixin.js");
 const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
-const defaultFormat = function(value) {
-  return value;
-};
-const _sfc_main = common_vendor.defineComponent({
-  name: "up-textarea",
-  mixins: [uni_modules_uviewUltra_libs_mixin_mpMixin.mpMixin, uni_modules_uviewUltra_libs_mixin_mixin.mixin, uni_modules_uviewUltra_components_upTextarea_props.propsTextarea],
-  data() {
-    return {
-      // 输入框的值
-      innerValue: "",
-      // 是否处于获得焦点状态
-      focused: false,
-      // value是否第一次变化，在watch中，由于加入immediate属性，会在第一次触发，此时不应该认为value发生了变化
-      firstChange: true,
-      // value绑定值的变化是由内部还是外部引起的
-      changeFromInner: false,
-      // 过滤处理方法
-      innerFormatter: defaultFormat
-    };
+const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
+  name: "up-textarea"
+}, { __name: "up-textarea", props: {
+  modelValue: {
+    type: String,
+    default: ""
   },
-  created() {
+  placeholder: {
+    type: String,
+    default: ""
   },
-  watch: {
-    modelValue: {
-      immediate: true,
-      handler(newVal, oldVal) {
-        this.innerValue = newVal;
-        this.firstChange = false;
-        this.changeFromInner = false;
-      }
-    }
+  placeholderClass: {
+    type: String,
+    default: "textarea-placeholder"
   },
-  computed: {
-    // 组件的类名
-    textareaClass() {
-      let classes = [], _a = this, border = _a.border, disabled = _a.disabled;
-      if (border === "surround") {
-        classes = classes.concat(["up-border", "up-textarea--radius"]);
-      }
-      if (border === "bottom") {
-        classes = classes.concat([
-          "up-border-bottom",
-          "up-textarea--no-radius"
-        ]);
-      }
-      if (disabled) {
-        classes.push("up-textarea--disabled");
-      }
-      return classes.join(" ");
-    },
-    // 组件的样式
-    textareaStyle() {
-      const style = new common_vendor.UTSJSONObject({});
-      return uni_modules_uviewUltra_libs_function_index.deepMerge(style, uni_modules_uviewUltra_libs_function_index.addStyle(this.customStyle));
-    }
+  placeholderStyle: {
+    type: [String, Object],
+    default: "color: #c0c4cc"
   },
-  emits: ["update:modelValue", "linechange", "focus", "blur", "change", "confirm", "keyboardheightchange"],
-  methods: {
-    addStyle(style = null) {
-      return uni_modules_uviewUltra_libs_function_index.addStyle(style);
-    },
-    addUnit(str = null) {
-      return uni_modules_uviewUltra_libs_function_index.addUnit(str);
-    },
-    // 在微信小程序中，不支持将函数当做props参数，故只能通过ref形式调用
-    setFormatter(e) {
-      this.innerFormatter = e;
-    },
-    onFocus(e) {
-      this.$emit("focus", e);
-    },
-    onBlur(e) {
-      this.$emit("blur", e);
-    },
-    onLinechange(e) {
-      this.$emit("linechange", e);
-    },
-    onInput(e) {
-      let value = e.detail.value;
-      const formatValue = value;
-      this.innerValue = value;
-      this.$nextTick(() => {
-        this.innerValue = formatValue;
-        this.valueChange();
-      });
-    },
-    // 内容发生变化，进行处理
-    valueChange() {
-      const value = this.innerValue;
-      this.$nextTick(() => {
-        this.$emit("update:modelValue", value);
-        this.changeFromInner = true;
-        this.$emit("change", value);
-      });
-    },
-    onConfirm(e) {
-      this.$emit("confirm", e);
-    },
-    onKeyboardheightchange(e) {
-      this.$emit("keyboardheightchange", e);
+  height: {
+    type: [String, Number],
+    default: 70
+  },
+  confirmType: {
+    type: String,
+    default: "done"
+  },
+  disabled: {
+    type: Boolean,
+    default: false
+  },
+  count: {
+    type: Boolean,
+    default: false
+  },
+  focus: {
+    type: Boolean,
+    default: false
+  },
+  autoHeight: {
+    type: Boolean,
+    default: false
+  },
+  fixed: {
+    type: Boolean,
+    default: false
+  },
+  cursorSpacing: {
+    type: Number,
+    default: 0
+  },
+  cursor: {
+    type: [String, Number],
+    default: -1
+  },
+  showConfirmBar: {
+    type: Boolean,
+    default: true
+  },
+  selectionStart: {
+    type: Number,
+    default: -1
+  },
+  selectionEnd: {
+    type: Number,
+    default: -1
+  },
+  adjustPosition: {
+    type: Boolean,
+    default: true
+  },
+  disableDefaultPadding: {
+    type: Boolean,
+    default: false
+  },
+  holdKeyboard: {
+    type: Boolean,
+    default: false
+  },
+  maxlength: {
+    type: [String, Number],
+    default: 140
+  },
+  border: {
+    type: String,
+    default: "surround"
+  },
+  ignoreCompositionEvent: {
+    type: Boolean,
+    default: true
+  },
+  customStyle: {
+    type: Object,
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
     }
   }
-});
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  "raw js";
-  return common_vendor.e({
-    a: $data.innerValue,
-    b: $options.addUnit(_ctx.height),
-    c: _ctx.placeholder,
-    d: $options.addStyle(_ctx.placeholderStyle),
-    e: _ctx.placeholderClass,
-    f: _ctx.disabled,
-    g: _ctx.focus,
-    h: _ctx.autoHeight,
-    i: _ctx.fixed,
-    j: _ctx.cursorSpacing,
-    k: _ctx.cursor,
-    l: _ctx.showConfirmBar,
-    m: _ctx.selectionStart,
-    n: _ctx.selectionEnd,
-    o: _ctx.adjustPosition,
-    p: _ctx.disableDefaultPadding,
-    q: _ctx.holdKeyboard,
-    r: _ctx.maxlength,
-    s: _ctx.confirmType,
-    t: _ctx.ignoreCompositionEvent,
-    v: common_vendor.o((...args) => $options.onFocus && $options.onFocus(...args), "e3"),
-    w: common_vendor.o((...args) => $options.onBlur && $options.onBlur(...args), "06"),
-    x: common_vendor.o((...args) => $options.onLinechange && $options.onLinechange(...args), "c0"),
-    y: common_vendor.o((...args) => $options.onInput && $options.onInput(...args), "67"),
-    z: common_vendor.o((...args) => $options.onConfirm && $options.onConfirm(...args), "e3"),
-    A: common_vendor.o((...args) => $options.onKeyboardheightchange && $options.onKeyboardheightchange(...args), "be"),
-    B: _ctx.count
-  }, _ctx.count ? {
-    C: common_vendor.t($data.innerValue.length),
-    D: common_vendor.t(_ctx.maxlength),
-    E: _ctx.disabled ? "transparent" : "#fff"
-  } : {}, {
-    F: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    G: common_vendor.n($options.textareaClass),
-    H: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
-    I: common_vendor.s($options.textareaStyle),
-    J: common_vendor.s({
-      "--status-bar-height": `${_ctx.u_s_b_h}px`,
-      "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
-    })
+}, emits: ["update:modelValue", "linechange", "focus", "blur", "change", "confirm", "keyboardheightchange"], setup(__props, _a) {
+  var __emit = _a.emit;
+  const props = __props;
+  const emit = __emit;
+  const instance = common_vendor.getCurrentInstance();
+  const innerValue = common_vendor.ref("");
+  const changeFromInner = common_vendor.ref(false);
+  common_vendor.watch(() => {
+    return props.modelValue;
+  }, (newVal) => {
+    innerValue.value = newVal;
+    changeFromInner.value = false;
+  }, { immediate: true });
+  const placeholderStyleStr = common_vendor.computed(() => {
+    if (typeof props.placeholderStyle === "string") {
+      return props.placeholderStyle;
+    }
+    return "";
   });
-}
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-d6d71d4f"]]);
+  const textareaClass = common_vendor.computed(() => {
+    let classes = ["up-textarea"];
+    if (props.border === "surround") {
+      classes.push("up-border");
+      classes.push("up-textarea--radius");
+    } else if (props.border === "bottom") {
+      classes.push("up-border-bottom");
+      classes.push("up-textarea--no-radius");
+    }
+    if (props.disabled) {
+      classes.push("up-textarea--disabled");
+    }
+    return classes.join(" ");
+  });
+  const textareaStyle = common_vendor.computed(() => {
+    const style = new common_vendor.UTSJSONObject({});
+    return uni_modules_uviewUltra_libs_function_index.deepMerge(style, uni_modules_uviewUltra_libs_function_index.addStyle(props.customStyle));
+  });
+  function onFocus(e) {
+    emit("focus", e);
+  }
+  function onBlur(e) {
+    emit("blur", e);
+    uni_modules_uviewUltra_libs_function_index.formValidate(instance === null || instance === void 0 ? null : instance.proxy, "blur");
+  }
+  function onLinechange(e) {
+    emit("linechange", e);
+  }
+  function valueChange() {
+    const value = innerValue.value;
+    common_vendor.nextTick$1(() => {
+      emit("update:modelValue", value);
+      changeFromInner.value = true;
+      emit("change", value);
+      uni_modules_uviewUltra_libs_function_index.formValidate(instance === null || instance === void 0 ? null : instance.proxy, "change");
+    });
+  }
+  function onInput(e) {
+    let value = e.detail.value;
+    innerValue.value = value;
+    common_vendor.nextTick$1(() => {
+      valueChange();
+    });
+  }
+  function onConfirm(e) {
+    emit("confirm", e);
+  }
+  function onKeyboardheightchange(e) {
+    emit("keyboardheightchange", e);
+  }
+  return (_ctx, _cache) => {
+    "raw js";
+    const __returned__ = common_vendor.e({
+      a: innerValue.value,
+      b: common_vendor.unref(uni_modules_uviewUltra_libs_function_index.addUnit)(__props.height),
+      c: __props.placeholder,
+      d: placeholderStyleStr.value,
+      e: __props.placeholderClass,
+      f: __props.disabled,
+      g: __props.focus,
+      h: __props.autoHeight,
+      i: __props.fixed,
+      j: __props.cursorSpacing,
+      k: __props.cursor,
+      l: __props.showConfirmBar,
+      m: __props.selectionStart,
+      n: __props.selectionEnd,
+      o: __props.adjustPosition,
+      p: __props.disableDefaultPadding,
+      q: __props.holdKeyboard,
+      r: __props.maxlength,
+      s: __props.confirmType,
+      t: __props.ignoreCompositionEvent,
+      v: common_vendor.o(onFocus, "0c"),
+      w: common_vendor.o(onBlur, "13"),
+      x: common_vendor.o(onLinechange, "87"),
+      y: common_vendor.o(onInput, "2f"),
+      z: common_vendor.o(onConfirm, "85"),
+      A: common_vendor.o(onKeyboardheightchange, "e7"),
+      B: __props.count
+    }, __props.count ? {
+      C: common_vendor.t(innerValue.value.length),
+      D: common_vendor.t(__props.maxlength),
+      E: __props.disabled ? "transparent" : "#fff"
+    } : {}, {
+      F: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+      G: common_vendor.n(textareaClass.value),
+      H: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+      I: common_vendor.s(textareaStyle.value),
+      J: common_vendor.s({
+        "--status-bar-height": `${_ctx.u_s_b_h}px`,
+        "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
+      })
+    });
+    return __returned__;
+  };
+} }));
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-d6d71d4f"]]);
 wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-ultra/components/up-textarea/up-textarea.js.map

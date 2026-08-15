@@ -2,6 +2,7 @@
 
 .border{border-width:var(--un-line-width-default,1px)}
 .fixed{position:fixed}
+.none{display:none}
 
 
 .navbar-container {
@@ -47,8 +48,12 @@
 .back-arrow {
   width: 10px;
   height: 10px;
-  border-left: 2px solid #1e293b;
-  border-bottom: 2px solid #1e293b;
+  border-left-width: 2px;
+  border-left-style: solid;
+  border-left-color: #1e293b;
+  border-bottom-width: 2px;
+  border-bottom-style: solid;
+  border-bottom-color: #1e293b;
   transform: rotate(45deg);
 }
 .navbar-title {
@@ -65,8 +70,7 @@
   font-size: 16px;
   font-weight: 700;
   text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
+  lines: 1;
 }
 .navbar-right {
   position: absolute;

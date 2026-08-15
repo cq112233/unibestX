@@ -1,144 +1,123 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-require("../../libs/composable/useUltraUI.js");
 const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
-const uni_modules_uviewUltra_components_upCard_card = require("./card.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   name: "up-card"
 }, { __name: "up-card", props: {
-  // 与屏幕两侧是否留空隙
   full: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upCard_card.defProps.getBoolean("card.full")
+    default: false
   },
-  // 标题
   title: {
     type: String,
-    default: uni_modules_uviewUltra_components_upCard_card.defProps.getString("card.title")
+    default: ""
   },
-  // 标题颜色
   titleColor: {
     type: String,
-    default: uni_modules_uviewUltra_components_upCard_card.defProps.getString("card.titleColor")
+    default: "#303133"
   },
-  // 标题字体大小
   titleSize: {
     type: [Number, String],
-    default: uni_modules_uviewUltra_components_upCard_card.defProps.getString("card.titleSize")
+    default: 15
   },
-  // 副标题
   subTitle: {
     type: String,
-    default: uni_modules_uviewUltra_components_upCard_card.defProps.getString("card.subTitle")
+    default: ""
   },
-  // 副标题颜色
   subTitleColor: {
     type: String,
-    default: uni_modules_uviewUltra_components_upCard_card.defProps.getString("card.subTitleColor")
+    default: "#909193"
   },
-  // 副标题字体大小
   subTitleSize: {
     type: [Number, String],
-    default: uni_modules_uviewUltra_components_upCard_card.defProps.getBoolean("card.subTitleSize")
+    default: 12
   },
-  // 是否显示外部边框，只对full=false时有效(卡片与边框有空隙时)
   border: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upCard_card.defProps.getBoolean("card.border")
+    default: true
   },
-  // 用于标识点击了第几个
   index: {
     type: [Number, String, Object],
-    default: uni_modules_uviewUltra_components_upCard_card.defProps.getString("card.index")
+    default: ""
   },
-  // 用于隔开上下左右的边距，带单位的写法，如："30px 30px"，"20px 20px 30px 30px"
   margin: {
     type: String,
-    default: uni_modules_uviewUltra_components_upCard_card.defProps.getString("card.margin")
+    default: "15px"
   },
-  // card卡片的圆角
   borderRadius: {
     type: [Number, String],
-    default: uni_modules_uviewUltra_components_upCard_card.defProps.getString("card.borderRadius")
+    default: 8
   },
-  // 头部自定义样式，对象形式
   headStyle: {
     type: Object,
-    default: uni_modules_uviewUltra_components_upCard_card.defProps.getAny("card.headStyle")
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
+    }
   },
-  // 主体自定义样式，对象形式
   bodyStyle: {
     type: Object,
-    default: uni_modules_uviewUltra_components_upCard_card.defProps.getAny("card.bodyStyle")
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
+    }
   },
-  // 底部自定义样式，对象形式
   footStyle: {
     type: Object,
-    default: uni_modules_uviewUltra_components_upCard_card.defProps.getAny("card.footStyle")
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
+    }
   },
-  // 头部是否下边框
   headBorderBottom: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upCard_card.defProps.getBoolean("card.headBorderBottom")
+    default: true
   },
-  // 底部是否有上边框
   footBorderTop: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upCard_card.defProps.getBoolean("card.footBorderTop")
+    default: true
   },
-  // 标题左边的缩略图
   thumb: {
     type: String,
-    default: uni_modules_uviewUltra_components_upCard_card.defProps.getString("card.thumb")
+    default: ""
   },
-  // 缩略图宽高
   thumbWidth: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upCard_card.defProps.getString("card.thumbWidth")
+    default: 30
   },
-  // 缩略图是否为圆形
   thumbCircle: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upCard_card.defProps.getBoolean("card.thumbCircle")
+    default: false
   },
-  // 给head，body，foot的内边距
   padding: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upCard_card.defProps.getString("card.padding")
+    default: 15
   },
   paddingHead: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upCard_card.defProps.getString("card.paddingHead")
+    default: ""
   },
   paddingBody: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upCard_card.defProps.getString("card.paddingBody")
+    default: ""
   },
   paddingFoot: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upCard_card.defProps.getString("card.paddingFoot")
+    default: ""
   },
-  // 是否显示头部
   showHead: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upCard_card.defProps.getBoolean("card.showHead")
+    default: true
   },
-  // 是否显示尾部
   showFoot: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upCard_card.defProps.getBoolean("card.showFoot")
+    default: true
   },
-  // 卡片外围阴影，字符串形式
   boxShadow: {
     type: String,
-    default: uni_modules_uviewUltra_components_upCard_card.defProps.getString("card.boxShadow")
+    default: "none"
   }
 }, emits: ["click", "head-click", "body-click", "foot-click"], setup(__props, _a) {
   var __emit = _a.emit;
   const props = __props;
   const realThumb = common_vendor.computed(() => {
-    if (props.thumb == "")
-      return "";
     return props.thumb;
   });
   const hasBorderRadius = common_vendor.computed(() => {

@@ -1,6 +1,5 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const uni_modules_uviewUltra_components_upCollapseItem_collapseItem = require("./collapseItem.js");
 const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
 const uni_modules_uviewUltra_libs_function_test = require("../../libs/function/test.js");
 const uni_modules_uviewUltra_libs_composable_useUltraUI = require("../../libs/composable/useUltraUI.js");
@@ -20,52 +19,52 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   name: "up-collapse-item"
 }, { __name: "up-collapse-item", props: {
   title: {
-    type: [String],
-    default: uni_modules_uviewUltra_components_upCollapseItem_collapseItem.defProps.getString("collapseItem.title")
+    type: String,
+    default: ""
   },
   value: {
-    type: [String],
-    default: uni_modules_uviewUltra_components_upCollapseItem_collapseItem.defProps.getString("collapseItem.value")
+    type: String,
+    default: ""
   },
   label: {
-    type: [String],
-    default: uni_modules_uviewUltra_components_upCollapseItem_collapseItem.defProps.getString("collapseItem.label")
+    type: String,
+    default: ""
   },
   disabled: {
-    type: [Boolean],
-    default: uni_modules_uviewUltra_components_upCollapseItem_collapseItem.defProps.getBoolean("collapseItem.disabled")
+    type: Boolean,
+    default: false
   },
   isLink: {
-    type: [Boolean],
-    default: uni_modules_uviewUltra_components_upCollapseItem_collapseItem.defProps.getBoolean("collapseItem.isLink")
+    type: Boolean,
+    default: true
   },
   clickable: {
-    type: [Boolean],
-    default: uni_modules_uviewUltra_components_upCollapseItem_collapseItem.defProps.getBoolean("collapseItem.clickable")
+    type: Boolean,
+    default: true
   },
   border: {
-    type: [Boolean],
-    default: uni_modules_uviewUltra_components_upCollapseItem_collapseItem.defProps.getBoolean("collapseItem.border")
+    type: Boolean,
+    default: true
   },
   align: {
-    type: [String],
-    default: uni_modules_uviewUltra_components_upCollapseItem_collapseItem.defProps.getString("collapseItem.align")
+    type: String,
+    default: "left"
   },
   name: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upCollapseItem_collapseItem.defProps.getString("collapseItem.name")
+    default: ""
   },
   icon: {
-    type: [String],
-    default: uni_modules_uviewUltra_components_upCollapseItem_collapseItem.defProps.getString("collapseItem.icon")
+    type: String,
+    default: ""
   },
   duration: {
     type: [Number, String],
-    default: uni_modules_uviewUltra_components_upCollapseItem_collapseItem.defProps.getNumber("collapseItem.duration")
+    default: 300
   },
   showRight: {
-    type: [Boolean],
-    default: uni_modules_uviewUltra_components_upCollapseItem_collapseItem.defProps.getBoolean("collapseItem.showRight")
+    type: Boolean,
+    default: true
   }
 }, setup(__props, _a) {
   var __expose = _a.expose;
@@ -75,7 +74,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   const timer = common_vendor.ref(0);
   const elId = common_vendor.ref(uni_modules_uviewUltra_libs_function_index.guid());
   const height = common_vendor.ref(0);
-  const animationData = common_vendor.ref(new common_vendor.UTSJSONObject({}));
   const expanded = common_vendor.ref(false);
   const showBorder = common_vendor.ref(false);
   const animating = common_vendor.ref(false);
@@ -97,7 +95,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     return common_vendor.__awaiter(this, void 0, void 0, function* () {
       expanded.value = expandedFrom;
       const rect = yield uni_modules_uviewUltra_libs_function_index.upGetRect(`#${elId.value}`, false, instance);
-      height.value = expanded.value ? rect.height == null ? 0 : rect.height : 0;
+      height.value = expanded.value ? rect.height == null ? "auto" : rect.height : 0;
       animating.value = true;
       yield uni_modules_uviewUltra_libs_function_index.sleep(parseInt(props.duration.toString()));
       animating.value = false;
@@ -119,7 +117,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
         expanded.value = props.name.toString() == value.toString();
       } else {
         if (!uni_modules_uviewUltra_libs_function_test.array(value) && value != "") {
-          common_vendor.index.__f__("log", "at uni_modules/uview-ultra/components/up-collapse-item/up-collapse-item.uvue:197", "#", value, "#");
           return uni_modules_uviewUltra_libs_function_index.error("非手风琴模式下，up-collapse组件的value参数必须为数组");
         }
         if (value == "") {
@@ -140,8 +137,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       return null;
     if (parent.value != null) {
       parent.value.$callMethod("onChange", instance);
-    } else {
-      common_vendor.index.__f__("error", "at uni_modules/uview-ultra/components/up-collapse-item/up-collapse-item.uvue:220", "parent is null");
     }
   };
   common_vendor.onMounted(() => {
@@ -167,11 +162,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     } : {}, {
       c: _ctx.$slots["icon"] != null && __props.icon != ""
     }, _ctx.$slots["icon"] != null && __props.icon != "" ? {
-      d: common_vendor.p({
-        size: 22,
-        name: __props.icon,
-        class: "data-v-369bd0e4"
-      })
+      d: common_vendor.t(__props.icon)
     } : {}, {
       e: _ctx.$slots["value"] != null && __props.value != ""
     }, _ctx.$slots["value"] != null && __props.value != "" ? {
@@ -187,7 +178,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
         class: "data-v-369bd0e4"
       })
     } : {}) : {}, {
-      j: common_vendor.o(clickHandler, "8b"),
+      j: common_vendor.o(clickHandler, "11"),
       k: common_vendor.p({
         title: titleCpu.value,
         value: __props.value,
@@ -195,26 +186,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
         icon: __props.icon,
         isLink: __props.isLink,
         clickable: __props.clickable,
-        border: common_vendor.unref(parentData)["border"] != null && common_vendor.unref(parentData)["border"] && showBorder.value,
-        arrowDirection: expanded.value ? "up" : "down",
-        disabled: __props.disabled,
+        border: __props.border && showBorder.value,
+        customStyle: {
+          padding: "10px 0"
+        },
         class: "data-v-369bd0e4"
       }),
       l: common_vendor.sei(elId.value !== "" ? elId.value : "r0-369bd0e4", "view", elId.value),
       m: elId.value,
-      n: common_vendor.sei("r1-369bd0e4", "view", "animation"),
-      o: _ctx.$up.addUnit(height.value),
-      p: animationData.value,
-      q: common_vendor.unref(parentData)["border"]
-    }, common_vendor.unref(parentData)["border"] ? {
-      r: common_vendor.p({
+      n: common_vendor.unref(uni_modules_uviewUltra_libs_function_index.addUnit)(height.value),
+      o: common_vendor.unref(parentData)["border"] != null && common_vendor.unref(parentData)["border"]
+    }, common_vendor.unref(parentData)["border"] != null && common_vendor.unref(parentData)["border"] ? {
+      p: common_vendor.p({
         class: "data-v-369bd0e4"
       })
     } : {}, {
-      s: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-      t: `${_ctx.u_s_b_h}px`,
-      v: `${_ctx.u_s_a_i_b}px`,
-      w: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+      q: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+      r: `${_ctx.u_s_b_h}px`,
+      s: `${_ctx.u_s_a_i_b}px`,
+      t: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
     });
     return __returned__;
   };

@@ -13,7 +13,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     name: "up-button"
   },
   __dynamicSharedData: true,
-  __hash: "c6fd82ee",
+  __hash: "4635bf34",
   __className,
   __filename: "uni_modules/uview-ultra/components/up-button/up-button.uvue",
   __name: "up-button",
@@ -288,7 +288,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         _createSharedDataIf(() => {
           return _setSharedData(__sharedData, 4, _toSharedDataBoolean(__props.icon != ""));
         }, () => {
-          const n7 = _createSharedDataComponentWithFallback(_component_up_icon, "64251ab2", {
+          const n7 = _createSharedDataComponentWithFallback(_component_up_icon, "64251a92", {
             name: () => {
               return __props.icon;
             },
@@ -309,7 +309,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
           });
         });
       }, 266);
-      const n11 = _createSharedDataComponentWithFallback(_component_button, "207beea4", {
+      const n11 = _createSharedDataComponentWithFallback(_component_button, "207bee27", {
         "hover-start-time": () => {
           return __props.hoverStartTime;
         },

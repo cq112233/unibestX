@@ -1,7 +1,7 @@
 import { f as fontData } from "./uniicons_file.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
 const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toDisplayString: _toDisplayString, createSharedDataSlot: _createSharedDataSlot } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataStyle: _setSharedDataStyle, setSharedData: _setSharedData, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect } = globalThis.Vue;
 const __className = "GenUniModulesUniIconsComponentsUniIconsUniIcons";
 const { computed } = globalThis.Vue;
 const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
@@ -9,7 +9,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     name: "uni-icons"
   },
   __dynamicSharedData: true,
-  __hash: "5c2c8563",
+  __hash: "bd952b70",
   __className,
   __filename: "uni_modules/uni-icons/components/uni-icons/uni-icons.uvue",
   __name: "uni-icons",
@@ -64,12 +64,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     return () => {
       "raw js";
       _renderSharedDataEffect(() => {
-        return _setSharedDataStyle(__sharedData, 1, styleObj.value);
-      });
-      _createSharedDataSlot("default", null, null, () => {
-        _renderSharedDataEffect(() => {
-          return _setSharedData(__sharedData, 0, _toDisplayString(unicode.value));
-        });
+        _setSharedDataStyle(__sharedData, 0, styleObj.value);
+        _setSharedData(__sharedData, 1, _toDisplayString(unicode.value));
       });
       return __sharedData;
     };

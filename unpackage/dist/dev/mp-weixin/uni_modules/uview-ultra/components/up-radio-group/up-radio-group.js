@@ -1,74 +1,109 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const uni_modules_uviewUltra_components_upRadioGroup_props = require("./props.js");
-const uni_modules_uviewUltra_libs_mixin_mpMixin = require("../../libs/mixin/mpMixin.js");
-const uni_modules_uviewUltra_libs_mixin_mixin = require("../../libs/mixin/mixin.js");
 const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
-const _sfc_main = common_vendor.defineComponent({
-  name: "up-radio-group",
-  mixins: [uni_modules_uviewUltra_libs_mixin_mpMixin.mpMixin, uni_modules_uviewUltra_libs_mixin_mixin.mixin, uni_modules_uviewUltra_components_upRadioGroup_props.propsRadioGroup],
-  computed: {
-    // 这里computed的变量，都是子组件up-radio需要用到的，由于头条小程序的兼容性差异，子组件无法实时监听父组件参数的变化
-    // 所以需要手动通知子组件，这里返回一个parentData变量，供watch监听，在其中去通知每一个子组件重新从父组件(up-radio-group)
-    // 拉取父组件新的变化后的参数
-    parentChangeData() {
-      return [
-        this.modelValue,
-        this.disabled,
-        this.inactiveColor,
-        this.activeColor,
-        this.size,
-        this.labelDisabled,
-        this.shape,
-        this.iconSize,
-        this.borderBottom,
-        this.placement
-      ];
-    },
-    bemClass() {
-      return uni_modules_uviewUltra_libs_function_index.bem("radio-group", [this.placement], []);
-    }
+const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
+  name: "up-radio-group"
+}, { __name: "up-radio-group", props: {
+  modelValue: {
+    type: [String, Number, Boolean],
+    default: ""
   },
-  watch: {
-    // 当父组件需要子组件需要共享的参数发生了变化，手动通知子组件
-    parentChangeData() {
-      this.children.forEach((child) => {
-        child.$callMethod("init");
-      });
-    }
+  disabled: {
+    type: Boolean,
+    default: false
   },
-  data() {
-    return {
-      children: []
-    };
+  shape: {
+    type: String,
+    default: "circle"
   },
-  created() {
+  activeColor: {
+    type: String,
+    default: "#2979ff"
   },
-  emits: ["update:modelValue", "change"],
-  methods: {
-    // 将其他的radio设置为未选中的状态
-    unCheckedOther(childInstance) {
-      this.children.map((child) => {
-        if (childInstance !== child) {
-          child.$data["checked"] = false;
-        }
-      });
-      const name = childInstance.$props["name"];
-      this.$emit("update:modelValue", name);
-      this.$emit("change", name);
+  inactiveColor: {
+    type: String,
+    default: "#c8c9cc"
+  },
+  name: {
+    type: String,
+    default: ""
+  },
+  size: {
+    type: [String, Number],
+    default: 18
+  },
+  placement: {
+    type: String,
+    default: "row"
+  },
+  label: {
+    type: String,
+    default: ""
+  },
+  labelColor: {
+    type: String,
+    default: "#303133"
+  },
+  labelSize: {
+    type: [String, Number],
+    default: 14
+  },
+  labelDisabled: {
+    type: Boolean,
+    default: false
+  },
+  iconColor: {
+    type: String,
+    default: "#ffffff"
+  },
+  iconSize: {
+    type: [String, Number],
+    default: 12
+  },
+  borderBottom: {
+    type: Boolean,
+    default: false
+  },
+  iconPlacement: {
+    type: String,
+    default: "left"
+  },
+  customStyle: {
+    type: Object,
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
     }
   }
-});
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  "raw js";
-  return {
-    a: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    b: common_vendor.n($options.bemClass),
-    c: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
-    d: `${_ctx.u_s_b_h}px`,
-    e: `${_ctx.u_s_a_i_b}px`
+}, emits: ["update:modelValue", "change"], setup(__props, _a) {
+  var __emit = _a.emit;
+  const props = __props;
+  const emit = __emit;
+  const bemClass = common_vendor.computed(() => {
+    return uni_modules_uviewUltra_libs_function_index.bem("radio-group", [props.placement], []);
+  });
+  function onRadioSelected(val = null) {
+    emit("update:modelValue", val);
+    emit("change", val);
+  }
+  common_vendor.provide("upRadioGroup", new common_vendor.UTSJSONObject({
+    props,
+    onRadioSelected
+  }));
+  return (_ctx, _cache) => {
+    "raw js";
+    const __returned__ = {
+      a: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+      b: common_vendor.n(bemClass.value),
+      c: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+      d: common_vendor.s(common_vendor.unref(uni_modules_uviewUltra_libs_function_index.addStyle)(__props.customStyle)),
+      e: common_vendor.s({
+        "--status-bar-height": `${_ctx.u_s_b_h}px`,
+        "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
+      })
+    };
+    return __returned__;
   };
-}
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-4a896d15"]]);
+} }));
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-4a896d15"]]);
 wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-ultra/components/up-radio-group/up-radio-group.js.map

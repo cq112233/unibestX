@@ -1,8 +1,8 @@
 <template>
 	<view class="up-td" :style="[tdStyle]">
-		<text class="up-td__text" :style="[tdTextStyle]">
-			<slot></slot>
-		</text>
+		<slot>
+			<text class="up-td__text" :style="[tdTextStyle]"></text>
+		</slot>
 		<slot name="content"></slot>
 	</view>
 </template>

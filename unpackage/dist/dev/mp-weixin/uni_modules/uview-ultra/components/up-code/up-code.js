@@ -1,38 +1,38 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const uni_modules_uviewUltra_components_upCode_code = require("./code.js");
+require("./code.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   name: "up-code"
 }, { __name: "up-code", props: {
   // 倒计时总秒数
   seconds: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upCode_code.defProps.getNumber("code.seconds")
+    default: 60
   },
   // 尚未开始时提示
   startText: {
     type: String,
-    default: uni_modules_uviewUltra_components_upCode_code.defProps.getString("code.startText")
+    default: "获取验证码"
   },
   // 正在倒计时中的提示
   changeText: {
     type: String,
-    default: uni_modules_uviewUltra_components_upCode_code.defProps.getString("code.changeText")
+    default: "X秒重新获取"
   },
   // 倒计时结束时的提示
   endText: {
     type: String,
-    default: uni_modules_uviewUltra_components_upCode_code.defProps.getString("code.endText")
+    default: "重新获取"
   },
   // 是否在H5刷新或各端返回再进入时继续倒计时
   keepRunning: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upCode_code.defProps.getBoolean("code.keepRunning")
+    default: false
   },
   // 为了区分多个页面，或者一个页面多个倒计时组件本地存储的继续倒计时变了
   uniqueKey: {
     type: String,
-    default: uni_modules_uviewUltra_components_upCode_code.defProps.getString("code.uniqueKey")
+    default: ""
   }
 }, emits: ["change", "start", "end"], setup(__props, _a) {
   var __expose = _a.expose, __emit = _a.emit;

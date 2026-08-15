@@ -1,31 +1,29 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const uni_modules_uviewUltra_components_upTd_td = require("./td.js");
 const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
 const uni_modules_uviewUltra_libs_composable_useUltraUI = require("../../libs/composable/useUltraUI.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   name: "up-td"
 }, { __name: "up-td", props: {
-  // 宽度，百分比或者具体带单位的值，如30%， 200rpx等，一般使用百分比
   width: {
     type: [String],
-    default: uni_modules_uviewUltra_components_upTd_td.defProps.getString("td.width")
+    default: "auto"
   },
   textAlign: {
     type: String,
-    default: uni_modules_uviewUltra_components_upTd_td.defProps.getString("td.textAlign")
+    default: ""
   },
   fontSize: {
     type: String,
-    default: uni_modules_uviewUltra_components_upTd_td.defProps.getString("td.fontSize")
+    default: ""
   },
   borderColor: {
     type: String,
-    default: uni_modules_uviewUltra_components_upTd_td.defProps.getString("td.borderColor")
+    default: ""
   },
   color: {
     type: String,
-    default: uni_modules_uviewUltra_components_upTd_td.defProps.getString("td.color")
+    default: ""
   }
 }, setup(__props) {
   const _a = uni_modules_uviewUltra_libs_composable_useUltraUI.useUltraUI(new common_vendor.UTSJSONObject({

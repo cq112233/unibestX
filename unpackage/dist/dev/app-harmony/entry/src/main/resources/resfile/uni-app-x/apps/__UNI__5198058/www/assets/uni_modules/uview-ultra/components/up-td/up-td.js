@@ -10,7 +10,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     name: "up-td"
   },
   __dynamicSharedData: true,
-  __hash: "944b9e9a",
+  __hash: "724771a6",
   __className,
   __filename: "uni_modules/uview-ultra/components/up-td/up-td.uvue",
   __name: "up-td",
@@ -82,10 +82,13 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     return () => {
       "raw js";
       _renderSharedDataEffect(() => {
-        _setSharedDataStyle(__sharedData, 0, [tdStyle.value]);
-        _setSharedDataStyle(__sharedData, 1, [tdTextStyle.value]);
+        return _setSharedDataStyle(__sharedData, 1, [tdStyle.value]);
       });
-      _createSharedDataSlot("default", null, null);
+      _createSharedDataSlot("default", null, null, () => {
+        _renderSharedDataEffect(() => {
+          return _setSharedDataStyle(__sharedData, 0, [tdTextStyle.value]);
+        });
+      });
       _createSharedDataSlot("content", null, null);
       return __sharedData;
     };

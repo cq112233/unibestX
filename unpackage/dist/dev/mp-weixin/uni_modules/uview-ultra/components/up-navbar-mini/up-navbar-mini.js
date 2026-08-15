@@ -1,53 +1,11 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const uni_modules_uviewUltra_components_upNavbarMini_props = require("./props.js");
-const uni_modules_uviewUltra_libs_mixin_mpMixin = require("../../libs/mixin/mpMixin.js");
-const uni_modules_uviewUltra_libs_mixin_mixin = require("../../libs/mixin/mixin.js");
 const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
-const _sfc_main = common_vendor.defineComponent({
-  name: "up-navbar-mini",
-  mixins: [uni_modules_uviewUltra_libs_mixin_mpMixin.mpMixin, uni_modules_uviewUltra_libs_mixin_mixin.mixin, uni_modules_uviewUltra_components_upNavbarMini_props.propsNavbarMini],
-  data() {
-    return {};
-  },
-  computed: {
-    contentStyle() {
-      return new common_vendor.UTSJSONObject({
-        height: uni_modules_uviewUltra_libs_function_index.addUnit(this.height),
-        backgroundColor: this.bgColor
-      });
-    }
-  },
-  emits: ["leftClick", "homeClick"],
-  methods: {
-    addStyle(val = null) {
-      return uni_modules_uviewUltra_libs_function_index.addStyle(val);
-    },
-    addUnit(val = null) {
-      return uni_modules_uviewUltra_libs_function_index.addUnit(val);
-    },
-    getPx(val = null) {
-      return uni_modules_uviewUltra_libs_function_index.getPx(val);
-    },
-    // 点击左侧区域
-    leftClick() {
-      this.$emit("leftClick");
-      if (this.autoBack) {
-        common_vendor.index.navigateBack();
-      }
-    },
-    homeClick() {
-      if (this.homeUrl != "") {
-        common_vendor.index.reLaunch({ url: this.homeUrl });
-      }
-    }
-  }
-});
 if (!Array) {
-  const _easycom_up_status_bar2 = common_vendor.resolveComponent("up-status-bar");
-  const _easycom_up_icon2 = common_vendor.resolveComponent("up-icon");
-  const _easycom_up_line2 = common_vendor.resolveComponent("up-line");
-  (_easycom_up_status_bar2 + _easycom_up_icon2 + _easycom_up_line2)();
+  const _easycom_up_status_bar_1 = common_vendor.resolveComponent("up-status-bar");
+  const _easycom_up_icon_1 = common_vendor.resolveComponent("up-icon");
+  const _easycom_up_line_1 = common_vendor.resolveComponent("up-line");
+  (_easycom_up_status_bar_1 + _easycom_up_icon_1 + _easycom_up_line_1)();
 }
 const _easycom_up_status_bar = () => "../up-status-bar/up-status-bar.js";
 const _easycom_up_icon = () => "../up-icon/up-icon.js";
@@ -55,44 +13,115 @@ const _easycom_up_line = () => "../up-line/up-line.js";
 if (!Math) {
   (_easycom_up_status_bar + _easycom_up_icon + _easycom_up_line)();
 }
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  "raw js";
-  return common_vendor.e({
-    a: _ctx.safeAreaInsetTop
-  }, _ctx.safeAreaInsetTop ? {
-    b: common_vendor.p({
-      class: "data-v-d5a87088"
-    })
-  } : {}, {
-    c: common_vendor.p({
-      name: _ctx.leftIcon,
-      size: _ctx.iconSize,
-      color: _ctx.iconColor,
-      class: "data-v-d5a87088"
-    }),
-    d: common_vendor.o((...args) => $options.leftClick && $options.leftClick(...args), "e5"),
-    e: common_vendor.p({
-      direction: "col",
-      color: "#fff",
-      length: "16px",
-      class: "data-v-d5a87088"
-    }),
-    f: common_vendor.p({
-      name: "home",
-      size: _ctx.iconSize,
-      color: _ctx.iconColor,
-      class: "data-v-d5a87088"
-    }),
-    g: common_vendor.o((...args) => $options.homeClick && $options.homeClick(...args), "9c"),
-    h: common_vendor.s($options.contentStyle),
-    i: common_vendor.n(_ctx.fixed ? "up-navbar-mini--fixed" : ""),
-    j: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    k: common_vendor.n(_ctx.customClass),
-    l: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
-    m: `${_ctx.u_s_b_h}px`,
-    n: `${_ctx.u_s_a_i_b}px`
+const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
+  name: "up-navbar-mini"
+}, { __name: "up-navbar-mini", props: {
+  safeAreaInsetTop: {
+    type: Boolean,
+    default: true
+  },
+  placeholder: {
+    type: Boolean,
+    default: false
+  },
+  fixed: {
+    type: Boolean,
+    default: false
+  },
+  leftIcon: {
+    type: String,
+    default: "arrow-left"
+  },
+  bgColor: {
+    type: String,
+    default: "#ffffff"
+  },
+  height: {
+    type: [String, Number],
+    default: "44px"
+  },
+  iconSize: {
+    type: [String, Number],
+    default: "20px"
+  },
+  iconColor: {
+    type: String,
+    default: "#303133"
+  },
+  autoBack: {
+    type: Boolean,
+    default: false
+  },
+  homeUrl: {
+    type: String,
+    default: ""
+  },
+  customClass: {
+    type: String,
+    default: ""
+  }
+}, emits: ["leftClick", "homeClick"], setup(__props, _a) {
+  var __emit = _a.emit;
+  const props = __props;
+  const emit = __emit;
+  const contentStyle = common_vendor.computed(() => {
+    return new common_vendor.UTSJSONObject({
+      height: uni_modules_uviewUltra_libs_function_index.addUnit(props.height),
+      backgroundColor: props.bgColor
+    });
   });
-}
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-d5a87088"]]);
+  function leftClick() {
+    emit("leftClick");
+    if (props.autoBack) {
+      common_vendor.index.navigateBack();
+    }
+  }
+  function homeClick() {
+    emit("homeClick");
+    if (props.homeUrl != "") {
+      common_vendor.index.reLaunch({ url: props.homeUrl });
+    }
+  }
+  return (_ctx, _cache) => {
+    "raw js";
+    const __returned__ = common_vendor.e({
+      a: __props.safeAreaInsetTop
+    }, __props.safeAreaInsetTop ? {
+      b: common_vendor.p({
+        class: "data-v-d5a87088"
+      })
+    } : {}, {
+      c: common_vendor.p({
+        name: __props.leftIcon,
+        size: __props.iconSize,
+        color: __props.iconColor,
+        class: "data-v-d5a87088"
+      }),
+      d: common_vendor.o(leftClick, "4d"),
+      e: common_vendor.p({
+        direction: "col",
+        color: "#fff",
+        length: "16px",
+        class: "data-v-d5a87088"
+      }),
+      f: common_vendor.p({
+        name: "home",
+        size: __props.iconSize,
+        color: __props.iconColor,
+        class: "data-v-d5a87088"
+      }),
+      g: common_vendor.o(homeClick, "cf"),
+      h: common_vendor.s(contentStyle.value),
+      i: common_vendor.n(__props.fixed ? "up-navbar-mini--fixed" : ""),
+      j: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+      k: common_vendor.n(__props.customClass),
+      l: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+      m: `${_ctx.u_s_b_h}px`,
+      n: `${_ctx.u_s_a_i_b}px`
+    });
+    return __returned__;
+  };
+} }));
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-d5a87088"]]);
 wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-ultra/components/up-navbar-mini/up-navbar-mini.js.map

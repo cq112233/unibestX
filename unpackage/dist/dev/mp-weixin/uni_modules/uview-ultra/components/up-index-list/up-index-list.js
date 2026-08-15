@@ -362,7 +362,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       e: common_vendor.sei("r0-12381c23", "scroll-view", "up-index-list__scroll-view"),
       f: scrollTop.value,
       g: scrollIntoView.value,
-      h: common_vendor.o(scrollHandler, "fb"),
+      h: common_vendor.o(scrollHandler, "31"),
       i: common_vendor.f(uIndexList.value, (item, index, i0) => {
         return {
           a: common_vendor.t(keyVal(item)),
@@ -374,10 +374,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       }),
       j: common_vendor.sei("r1-12381c23", "view", "up-index-list__letter"),
       k: _ctx.$up.addUnit(letterInfo.value["top"] ?? ""),
-      l: common_vendor.o(touchStart, "6d"),
-      m: common_vendor.o(touchMove, "8b"),
-      n: common_vendor.o(touchEnd, "9b"),
-      o: common_vendor.o(touchEnd, "bb"),
+      l: common_vendor.o(touchStart, "f2"),
+      m: common_vendor.o(touchMove, "23"),
+      n: common_vendor.o(touchEnd, "fb"),
+      o: common_vendor.o(touchEnd, "35"),
       p: common_vendor.t(activeIndex.value >= 0 ? keyVal(uIndexList.value[activeIndex.value]) : ""),
       q: _ctx.$up.addUnit(indicatorHeight.value),
       r: _ctx.$up.addUnit(indicatorHeight.value),

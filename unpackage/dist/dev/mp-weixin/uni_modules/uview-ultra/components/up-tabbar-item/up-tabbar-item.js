@@ -1,175 +1,122 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const uni_modules_uviewUltra_components_upTabbarItem_props = require("./props.js");
-const uni_modules_uviewUltra_libs_mixin_mpMixin = require("../../libs/mixin/mpMixin.js");
-const uni_modules_uviewUltra_libs_mixin_mixin = require("../../libs/mixin/mixin.js");
 const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
-const _sfc_main = common_vendor.defineComponent({
-  name: "up-tabbar-item",
-  mixins: [uni_modules_uviewUltra_libs_mixin_mpMixin.mpMixin, uni_modules_uviewUltra_libs_mixin_mixin.mixin, uni_modules_uviewUltra_components_upTabbarItem_props.propsTabbarItem],
-  data() {
-    return {
-      isActive: false,
-      routeSyncTimer: 0,
-      routeSyncLast: "",
-      parentData: new common_vendor.UTSJSONObject({
-        value: null,
-        activeColor: "",
-        inactiveColor: ""
-      })
-    };
-  },
-  //  微信小程序中 options 选项
-  options: {
-    virtualHost: true
-    //将自定义节点设置成虚拟的，更加接近Vue组件的表现。我们不希望自定义组件的这个节点本身可以设置样式、响应 flex 布局等
-  },
-  computed: {
-    // 计算是否为中间按钮
-    isMidButton() {
-      return this.mode === "midButton";
-    }
-  },
-  created() {
-    this.init();
-  },
-  mounted() {
-    this.startRouteSync();
-  },
-  beforeUnmount() {
-    this.clearRouteSync();
-  },
-  emits: ["click", "change"],
-  methods: {
-    addStyle(val = null) {
-      return uni_modules_uviewUltra_libs_function_index.addStyle(val);
-    },
-    clearRouteSync() {
-      if (this.routeSyncTimer != null) {
-        clearInterval(this.routeSyncTimer);
-        this.routeSyncTimer = 0;
-      }
-    },
-    getCurrentRoutePath() {
-      const pages = getCurrentPages();
-      if (pages == null || pages.length == 0)
-        return "";
-      const currentPage = pages[pages.length - 1];
-      const route = currentPage != null && currentPage.route != null ? currentPage.route.toString() : "";
-      if (route == "")
-        return "";
-      return route.startsWith("/") ? route : `/${route}`;
-    },
-    normalizeRoutePath(path) {
-      return path.replace(/^[#\\/]+/, "");
-    },
-    syncActiveByRouteOrValue() {
-      this.updateParentData();
-      const index = this.getChildIndex(this);
-      const name = this.name != null ? this.name : index;
-      const routePath = this.getCurrentRoutePath();
-      if (typeof name === "string" && routePath != "") {
-        const isRouteMatch = this.normalizeRoutePath(name) == this.normalizeRoutePath(routePath);
-        if (isRouteMatch) {
-          this.isActive = true;
-          return null;
-        }
-      }
-      this.isActive = name == this.parentData["value"];
-    },
-    startRouteSync() {
-      this.clearRouteSync();
-      const nameVal = this.name;
-      if (nameVal == null)
-        return null;
-      const nameStr = nameVal.toString();
-      if (!nameStr.includes("/"))
-        return null;
-      this.routeSyncLast = this.getCurrentRoutePath();
-      this.routeSyncTimer = setInterval(() => {
-        const current = this.getCurrentRoutePath();
-        if (current != this.routeSyncLast) {
-          this.routeSyncLast = current;
-          this.syncActiveByRouteOrValue();
-        }
-      }, 200);
-    },
-    init() {
-      const parent = this.parent;
-      if (parent == null) {
-        uni_modules_uviewUltra_libs_function_index.error("up-tabbar-item必须搭配up-tabbar组件使用");
-      }
-      this.syncActiveByRouteOrValue();
-    },
-    updateParentData() {
-      this.getParentData("up-tabbar");
-    },
-    // 此方法将会被父组件up-tabbar调用
-    updateFromParent() {
-      this.init();
-    },
-    clickHandler() {
-      common_vendor.nextTick$1(() => {
-        const index = this.getChildIndex(this);
-        const name = this.name != null ? this.name : index;
-        const parent = this.parent;
-        if (parent != null && name.toString() != parent.$props["value"].toString()) {
-          parent.$emit("change", name);
-        }
-        this.$emit("click", name);
-      });
-    }
-  }
-});
 if (!Array) {
-  const _easycom_up_icon2 = common_vendor.resolveComponent("up-icon");
-  const _easycom_up_badge2 = common_vendor.resolveComponent("up-badge");
-  (_easycom_up_icon2 + _easycom_up_badge2)();
+  const _easycom_up_icon_1 = common_vendor.resolveComponent("up-icon");
+  const _easycom_up_badge_1 = common_vendor.resolveComponent("up-badge");
+  (_easycom_up_icon_1 + _easycom_up_badge_1)();
 }
 const _easycom_up_icon = () => "../up-icon/up-icon.js";
 const _easycom_up_badge = () => "../up-badge/up-badge.js";
 if (!Math) {
   (_easycom_up_icon + _easycom_up_badge)();
 }
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  "raw js";
-  return common_vendor.e({
-    a: $options.isMidButton
-  }, $options.isMidButton ? {} : {}, {
-    b: _ctx.icon
-  }, _ctx.icon ? {
-    c: common_vendor.p({
-      name: _ctx.icon,
-      color: $data.isActive ? $data.parentData["activeColor"] : $data.parentData["inactiveColor"],
-      size: $options.isMidButton ? 26 : 20,
-      class: "data-v-dff5b91d"
-    })
-  } : common_vendor.e({
-    d: $data.isActive
-  }, $data.isActive ? {} : {}), {
-    e: common_vendor.p({
-      absolute: true,
-      offset: [0, _ctx.dot ? "34rpx" : _ctx.badge != null && parseInt(_ctx.badge.toString()) > 9 ? "14rpx" : "20rpx"],
-      customStyle: _ctx.badgeStyle,
-      isDot: _ctx.dot,
-      value: _ctx.badge != null ? _ctx.dot ? 1 : _ctx.badge : 0,
-      show: _ctx.dot ? true : _ctx.badge != null ? parseInt(_ctx.badge.toString()) > 0 : false,
-      class: "data-v-dff5b91d"
-    }),
-    f: common_vendor.n($options.isMidButton ? "up-tabbar-item__icon--mid-button" : ""),
-    g: common_vendor.t(_ctx.text),
-    h: $data.isActive ? $data.parentData["activeColor"] : $data.parentData["inactiveColor"],
-    i: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    j: common_vendor.s($options.addStyle(_ctx.customStyle)),
-    k: common_vendor.s({
-      "--status-bar-height": `${_ctx.u_s_b_h}px`,
-      "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
-    }),
-    l: common_vendor.n($options.isMidButton ? "up-tabbar-item--mid-button" : ""),
-    m: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
-    n: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args), "f0")
+const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
+  name: "up-tabbar-item"
+}, { __name: "up-tabbar-item", props: {
+  name: {
+    type: [String, Number, null],
+    default: null
+  },
+  icon: {
+    type: String,
+    default: ""
+  },
+  badge: {
+    type: [String, Number, null],
+    default: null
+  },
+  dot: {
+    type: Boolean,
+    default: false
+  },
+  text: {
+    type: String,
+    default: ""
+  },
+  badgeStyle: {
+    type: [Object, String],
+    default: "top: 6px;right:2px;"
+  },
+  mode: {
+    type: String,
+    default: ""
+  },
+  customStyle: {
+    type: Object,
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
+    }
+  }
+}, emits: ["click"], setup(__props, _a) {
+  var __emit = _a.emit;
+  const props = __props;
+  const emit = __emit;
+  const parentProps = common_vendor.inject("upTabbarProps", null);
+  const parentChange = common_vendor.inject("upTabbarChange", null);
+  const isMidButton = common_vendor.computed(() => {
+    return props.mode === "midButton";
   });
-}
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-dff5b91d"]]);
+  const isActive = common_vendor.computed(() => {
+    if (parentProps == null || props.name == null)
+      return false;
+    return parentProps.value == props.name;
+  });
+  const activeColor = common_vendor.computed(() => {
+    var _a2;
+    return (_a2 = parentProps === null || parentProps === void 0 ? null : parentProps.activeColor) !== null && _a2 !== void 0 ? _a2 : "#1989fa";
+  });
+  const inactiveColor = common_vendor.computed(() => {
+    var _a2;
+    return (_a2 = parentProps === null || parentProps === void 0 ? null : parentProps.inactiveColor) !== null && _a2 !== void 0 ? _a2 : "#7d7e80";
+  });
+  function clickHandler() {
+    if (props.name != null && parentChange != null) {
+      parentChange(props.name);
+    }
+    emit("click", props.name);
+  }
+  return (_ctx, _cache) => {
+    "raw js";
+    const __returned__ = common_vendor.e({
+      a: isMidButton.value
+    }, isMidButton.value ? {} : {}, {
+      b: __props.icon != ""
+    }, __props.icon != "" ? {
+      c: common_vendor.p({
+        name: __props.icon,
+        color: isActive.value ? activeColor.value : inactiveColor.value,
+        size: isMidButton.value ? 26 : 20,
+        class: "data-v-dff5b91d"
+      })
+    } : common_vendor.e({
+      d: isActive.value
+    }, isActive.value ? {} : {}), {
+      e: common_vendor.p({
+        absolute: true,
+        offset: [0, __props.dot ? "34rpx" : __props.badge != null && parseInt(__props.badge.toString()) > 9 ? "14rpx" : "20rpx"],
+        customStyle: __props.badgeStyle,
+        isDot: __props.dot,
+        value: __props.badge != null ? __props.dot ? 1 : __props.badge : 0,
+        show: __props.dot ? true : __props.badge != null ? parseInt(__props.badge.toString()) > 0 : false,
+        class: "data-v-dff5b91d"
+      }),
+      f: common_vendor.n(isMidButton.value ? "up-tabbar-item__icon--mid-button" : ""),
+      g: common_vendor.t(__props.text),
+      h: isActive.value ? activeColor.value : inactiveColor.value,
+      i: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+      j: common_vendor.s(common_vendor.unref(uni_modules_uviewUltra_libs_function_index.addStyle)(__props.customStyle)),
+      k: common_vendor.s({
+        "--status-bar-height": `${_ctx.u_s_b_h}px`,
+        "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
+      }),
+      l: common_vendor.n(isMidButton.value ? "up-tabbar-item--mid-button" : ""),
+      m: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+      n: common_vendor.o(clickHandler, "a0")
+    });
+    return __returned__;
+  };
+} }));
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-dff5b91d"]]);
 wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-ultra/components/up-tabbar-item/up-tabbar-item.js.map

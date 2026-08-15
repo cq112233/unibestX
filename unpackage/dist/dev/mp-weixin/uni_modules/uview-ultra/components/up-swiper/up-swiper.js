@@ -1,6 +1,6 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const uni_modules_uviewUltra_components_upSwiper_swiper = require("./swiper.js");
+require("./swiper.js");
 const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
 const uni_modules_uviewUltra_libs_function_test = require("../../libs/function/test.js");
 if (!Array) {
@@ -19,104 +19,104 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   list: {
     type: Array,
     default: () => {
-      return uni_modules_uviewUltra_components_upSwiper_swiper.defProps["swiper"]["list"];
+      return [];
     }
   },
   indicator: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upSwiper_swiper.defProps["swiper"]["indicator"]
+    default: false
   },
   indicatorActiveColor: {
     type: String,
-    default: uni_modules_uviewUltra_components_upSwiper_swiper.defProps["swiper"]["indicatorActiveColor"]
+    default: "#FFFFFF"
   },
   indicatorInactiveColor: {
     type: String,
-    default: uni_modules_uviewUltra_components_upSwiper_swiper.defProps["swiper"]["indicatorInactiveColor"]
+    default: "rgba(255, 255, 255, 0.35)"
   },
   indicatorStyle: {
     type: [String, Object],
-    default: uni_modules_uviewUltra_components_upSwiper_swiper.defProps["swiper"]["indicatorStyle"]
+    default: ""
   },
   indicatorMode: {
     type: String,
-    default: uni_modules_uviewUltra_components_upSwiper_swiper.defProps["swiper"]["indicatorMode"]
+    default: "line"
   },
   autoplay: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upSwiper_swiper.defProps["swiper"]["autoplay"]
+    default: true
   },
   current: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upSwiper_swiper.defProps["swiper"]["current"]
+    default: 0
   },
   currentItemId: {
     type: String,
-    default: uni_modules_uviewUltra_components_upSwiper_swiper.defProps["swiper"]["currentItemId"]
+    default: ""
   },
   interval: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upSwiper_swiper.defProps["swiper"]["interval"]
+    default: 3e3
   },
   duration: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upSwiper_swiper.defProps["swiper"]["duration"]
+    default: 300
   },
   circular: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upSwiper_swiper.defProps["swiper"]["circular"]
+    default: false
   },
   vertical: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upSwiper_swiper.defProps["swiper"]["vertical"]
+    default: false
   },
   previousMargin: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upSwiper_swiper.defProps["swiper"]["previousMargin"]
+    default: 0
   },
   nextMargin: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upSwiper_swiper.defProps["swiper"]["nextMargin"]
+    default: 0
   },
   acceleration: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upSwiper_swiper.defProps["swiper"]["acceleration"]
+    default: false
   },
   displayMultipleItems: {
     type: Number,
-    default: uni_modules_uviewUltra_components_upSwiper_swiper.defProps["swiper"]["displayMultipleItems"]
+    default: 1
   },
   easingFunction: {
     type: String,
-    default: uni_modules_uviewUltra_components_upSwiper_swiper.defProps["swiper"]["easingFunction"]
+    default: "default"
   },
   keyName: {
     type: String,
-    default: uni_modules_uviewUltra_components_upSwiper_swiper.defProps["swiper"]["keyName"]
+    default: "url"
   },
   imgMode: {
     type: String,
-    default: uni_modules_uviewUltra_components_upSwiper_swiper.defProps["swiper"]["imgMode"]
+    default: "aspectFill"
   },
   height: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upSwiper_swiper.defProps["swiper"]["height"]
+    default: 130
   },
   bgColor: {
     type: String,
-    default: uni_modules_uviewUltra_components_upSwiper_swiper.defProps["swiper"]["bgColor"]
+    default: "#f3f4f6"
   },
   radius: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upSwiper_swiper.defProps["swiper"]["radius"]
+    default: 4
   },
   loading: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upSwiper_swiper.defProps["swiper"]["loading"]
+    default: false
   },
   showTitle: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upSwiper_swiper.defProps["swiper"]["showTitle"]
+    default: false
   }
 }, emits: ["click", "change", "update:current"], setup(__props, _a) {
   var __emit = _a.emit;

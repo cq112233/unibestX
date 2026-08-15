@@ -6,7 +6,7 @@ const __className = "GenSrcComponentsNavBarNavBar";
 const { computed } = globalThis.Vue;
 const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   __dynamicSharedData: true,
-  __hash: "8698ac0e",
+  __hash: "e004eef8",
   __className,
   __filename: "src/components/NavBar/NavBar.uvue",
   __name: "NavBar",
@@ -23,10 +23,6 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       type: String,
       default: "#ffffff"
     },
-    showBack: {
-      type: Boolean,
-      default: true
-    },
     fixed: {
       type: Boolean,
       default: true
@@ -35,35 +31,52 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       type: Boolean,
       default: true
     },
+    showBack: {
+      type: Boolean,
+      default: true
+    },
     border: {
       type: Boolean,
-      default: false
+      default: true
     }
   },
   setup(__props) {
     const __sharedDataScope = _useSharedDataScope();
     const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenSrcComponentsNavBarNavBarSharedData", sharedDataClassId: 0 })));
     const statusBarHeight = computed(() => {
-      var _a, _b, _c, _d;
-      return (_d = (_b = (_a = safeAreaInsets.value) === null || _a === void 0 ? null : _a.top) !== null && _b !== void 0 ? _b : (_c = systemInfo.value) === null || _c === void 0 ? null : _c.statusBarHeight) !== null && _d !== void 0 ? _d : 0;
+      const insets = safeAreaInsets.value;
+      if (insets != null && insets.top > 0) {
+        return insets.top;
+      }
+      const info = systemInfo.value;
+      if (info != null && info.statusBarHeight > 0) {
+        return info.statusBarHeight;
+      }
+      return 0;
     });
     function handleBack() {
-      uni.navigateBack(new UTSJSONObject({
-        success() {
-          uni.__f__("log", "at src/components/NavBar/NavBar.uvue:86", "返回成功");
-        },
-        fail() {
-          uni.switchTab({
-            url: "/src/pages/index/index"
-          });
-        }
-      }));
+      const pages = getCurrentPages();
+      if (pages.length > 1) {
+        uni.navigateBack(new UTSJSONObject({
+          delta: 1
+        }));
+      } else {
+        uni.reLaunch({
+          url: "/src/pages/index/index"
+        });
+      }
     }
     return () => {
       "raw js";
       _renderSharedDataEffect(() => {
+        const _border = __props.border;
         _setSharedDataClass(__sharedData, 7, __props.fixed ? "navbar-container navbar-fixed" : "navbar-container");
-        _setSharedDataStyle(__sharedData, 8, { backgroundColor: __props.bgColor, borderBottom: __props.border ? "1px solid #e2e8f0" : "none" });
+        _setSharedDataStyle(__sharedData, 8, {
+          backgroundColor: __props.bgColor,
+          borderBottomWidth: _border ? "1px" : "0px",
+          borderBottomStyle: _border ? "solid" : "none",
+          borderBottomColor: _border ? "#e2e8f0" : "transparent"
+        });
         _setSharedDataStyle(__sharedData, 9, { height: `${statusBarHeight.value}px` });
       });
       _createSharedDataSlot("left", null, null, () => {
@@ -71,7 +84,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
           return _setSharedData(__sharedData, 2, _toSharedDataBoolean(__props.showBack));
         }, () => {
           _renderSharedDataEffect(() => {
-            return _setSharedDataStyle(__sharedData, 3, { borderColor: __props.titleColor });
+            const _titleColor = __props.titleColor;
+            _setSharedDataStyle(__sharedData, 3, { borderLeftColor: _titleColor, borderBottomColor: _titleColor });
           });
         });
       });

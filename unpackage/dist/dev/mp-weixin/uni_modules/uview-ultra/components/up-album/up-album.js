@@ -205,7 +205,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   const imageHeight = common_vendor.computed(() => {
     return uni_modules_uviewUltra_libs_function_index.addUnit(props.urls.length == 1 ? singleHeight.value : props.multipleSize, props.unit);
   });
-  const albumWidth = common_vendor.computed(() => {
+  common_vendor.computed(() => {
     let width = 0;
     if (props.urls.length == 1) {
       width = singleWidth.value;
@@ -275,12 +275,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
         height: imageHeight.value,
         borderRadius: __props.shape == "circle" ? "10000px" : _ctx.$upAddUnit(__props.radius)
       }),
-      d: albumWidth.value,
-      e: __props.autoWrap ? "wrap" : "nowrap",
-      f: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-      g: `${_ctx.u_s_b_h}px`,
-      h: `${_ctx.u_s_a_i_b}px`,
-      i: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+      d: __props.autoWrap ? "wrap" : "nowrap",
+      e: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+      f: `${_ctx.u_s_b_h}px`,
+      g: `${_ctx.u_s_a_i_b}px`,
+      h: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
     };
     return __returned__;
   };

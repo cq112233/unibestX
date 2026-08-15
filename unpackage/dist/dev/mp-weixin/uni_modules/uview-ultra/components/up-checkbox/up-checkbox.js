@@ -1,9 +1,6 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-require("../../libs/function/test.js");
 const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
-const uni_modules_uviewUltra_components_upCheckbox_checkbox = require("./checkbox.js");
-const uni_modules_uviewUltra_libs_composable_useUltraUI = require("../../libs/composable/useUltraUI.js");
 if (!Array) {
   const _easycom_up_icon_1 = common_vendor.resolveComponent("up-icon");
   _easycom_up_icon_1();
@@ -15,154 +12,195 @@ if (!Math) {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   name: "up-checkbox"
 }, { __name: "up-checkbox", props: {
-  // checkbox组件的标示符
   name: {
     type: [String, Number, Boolean],
-    default: uni_modules_uviewUltra_components_upCheckbox_checkbox.defProps.getAny("checkbox.name")
+    default: ""
   },
-  // 形状，square为方形，circle为圆型
   shape: {
     type: String,
-    default: uni_modules_uviewUltra_components_upCheckbox_checkbox.defProps.getString("checkbox.shape")
+    default: ""
   },
-  // 整体的大小
   size: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upCheckbox_checkbox.defProps.getAny("checkbox.size")
+    default: ""
   },
-  // 是否默认选中
   checked: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upCheckbox_checkbox.defProps.getBoolean("checkbox.checked")
+    default: false
   },
-  // 是否禁用
   disabled: {
-    type: [String, Boolean],
-    default: uni_modules_uviewUltra_components_upCheckbox_checkbox.defProps.getAny("checkbox.disabled")
+    type: Boolean,
+    default: false
   },
-  // 选中状态下的颜色，如设置此值，将会覆盖parent的activeColor值
   activeColor: {
     type: String,
-    default: uni_modules_uviewUltra_components_upCheckbox_checkbox.defProps.getString("checkbox.activeColor")
+    default: ""
   },
-  // 未选中的颜色
   inactiveColor: {
     type: String,
-    default: uni_modules_uviewUltra_components_upCheckbox_checkbox.defProps.getString("checkbox.inactiveColor")
+    default: ""
   },
-  // 图标的大小，单位px
   iconSize: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upCheckbox_checkbox.defProps.getAny("checkbox.iconSize")
+    default: ""
   },
-  // 图标颜色
   iconColor: {
     type: String,
-    default: uni_modules_uviewUltra_components_upCheckbox_checkbox.defProps.getString("checkbox.iconColor")
+    default: ""
   },
-  // label提示文字，因为nvue下，直接slot进来的文字，由于特殊的结构，无法修改样式
   label: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upCheckbox_checkbox.defProps.getAny("checkbox.label")
+    default: ""
   },
-  // label的颜色
   labelColor: {
     type: String,
-    default: uni_modules_uviewUltra_components_upCheckbox_checkbox.defProps.getString("checkbox.labelColor")
+    default: ""
   },
-  // label的字体大小，px单位
   labelSize: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upCheckbox_checkbox.defProps.getAny("checkbox.labelSize")
+    default: ""
   },
-  // 是否禁止点击提示语选中复选框
   labelDisabled: {
-    type: [String, Boolean],
-    default: uni_modules_uviewUltra_components_upCheckbox_checkbox.defProps.getAny("checkbox.labelDisabled")
+    type: Boolean,
+    default: false
   },
-  // 定义需要用到的外部样式
   customStyle: {
     type: Object,
     default: () => {
       return new common_vendor.UTSJSONObject({});
     }
   },
-  // 是否独立使用
   usedAlone: {
     type: Boolean,
     default: false
   }
 }, emits: ["change", "update:checked"], setup(__props, _a) {
-  var __expose = _a.expose, __emit = _a.emit;
-  const _b = uni_modules_uviewUltra_libs_composable_useUltraUI.useUltraUI(), parent = _b.parent, parentData = _b.parentData, getParentData = _b.getParentData;
-  const instance = common_vendor.getCurrentInstance().proxy;
+  var __emit = _a.emit;
   const props = __props;
   const emit = __emit;
-  const isChecked = common_vendor.ref(false);
-  const elDisabled = common_vendor.computed(() => {
-    let disabledVal = props.disabled;
-    if (disabledVal != null && disabledVal.toString() != "") {
-      return disabledVal.toString() == "true";
-    } else {
-      return parentData.value["disabled"] != null ? parentData.value["disabled"] : false;
+  const instance = common_vendor.getCurrentInstance();
+  const parentGroup = common_vendor.inject("upCheckboxGroup", null);
+  const localChecked = common_vendor.ref(props.checked);
+  common_vendor.watch(() => {
+    return props.checked;
+  }, (val) => {
+    localChecked.value = val;
+  });
+  const isChecked = common_vendor.computed(() => {
+    if (props.usedAlone || parentGroup == null || parentGroup.props == null) {
+      return localChecked.value;
     }
+    const groupVal = parentGroup.props.modelValue;
+    if (groupVal != null && props.name != null) {
+      return groupVal.some((element = null) => {
+        return element.toString() == props.name.toString();
+      });
+    }
+    return false;
+  });
+  const elDisabled = common_vendor.computed(() => {
+    var _a2;
+    if (props.disabled)
+      return true;
+    if (!props.usedAlone && parentGroup != null && parentGroup.props != null) {
+      return (_a2 = parentGroup.props.disabled) !== null && _a2 !== void 0 ? _a2 : false;
+    }
+    return false;
   });
   const elLabelDisabled = common_vendor.computed(() => {
-    let labelDisabledVal = props.labelDisabled;
-    if (labelDisabledVal != null && labelDisabledVal.toString() != "") {
-      return labelDisabledVal.toString() == "true";
-    } else {
-      return parentData.value["labelDisabled"] != null ? parentData.value["labelDisabled"] : false;
+    var _a2;
+    if (props.labelDisabled)
+      return true;
+    if (!props.usedAlone && parentGroup != null && parentGroup.props != null) {
+      return (_a2 = parentGroup.props.labelDisabled) !== null && _a2 !== void 0 ? _a2 : false;
     }
+    return false;
   });
   const elSize = common_vendor.computed(() => {
-    return props.size.toString() != "" ? props.size.toString() : parentData.value["size"] != null ? parentData.value["size"].toString() : "21";
+    if (props.size != "")
+      return uni_modules_uviewUltra_libs_function_index.addUnit(props.size);
+    if (!props.usedAlone && parentGroup != null && parentGroup.props != null && parentGroup.props.size != "") {
+      return uni_modules_uviewUltra_libs_function_index.addUnit(parentGroup.props.size);
+    }
+    return "21px";
   });
   const elIconSize = common_vendor.computed(() => {
-    return props.iconSize.toString() != "" ? props.iconSize.toString() : parentData.value["iconSize"] != null ? parentData.value["iconSize"].toString() : "12";
+    if (props.iconSize != "")
+      return uni_modules_uviewUltra_libs_function_index.addUnit(props.iconSize);
+    if (!props.usedAlone && parentGroup != null && parentGroup.props != null && parentGroup.props.iconSize != "") {
+      return uni_modules_uviewUltra_libs_function_index.addUnit(parentGroup.props.iconSize);
+    }
+    return "12px";
   });
   const elActiveColor = common_vendor.computed(() => {
-    const activeColorProp = props.activeColor;
-    if (activeColorProp != null && activeColorProp.toString() != "") {
-      return activeColorProp.toString();
-    }
-    const parentActiveColor = parentData.value["activeColor"];
-    if (parentActiveColor != null && parentActiveColor.toString() != "") {
-      return parentActiveColor.toString();
+    if (props.activeColor != "")
+      return props.activeColor;
+    if (!props.usedAlone && parentGroup != null && parentGroup.props != null && parentGroup.props.activeColor != "") {
+      return parentGroup.props.activeColor;
     }
     return "#2979ff";
   });
   const elInactiveColor = common_vendor.computed(() => {
-    const inactiveColorProp = props.inactiveColor;
-    if (inactiveColorProp != null && inactiveColorProp.toString() != "") {
-      return inactiveColorProp.toString();
-    }
-    const parentInactiveColor = parentData.value["inactiveColor"];
-    if (parentInactiveColor != null && parentInactiveColor.toString() != "") {
-      return parentInactiveColor.toString();
+    if (props.inactiveColor != "")
+      return props.inactiveColor;
+    if (!props.usedAlone && parentGroup != null && parentGroup.props != null && parentGroup.props.inactiveColor != "") {
+      return parentGroup.props.inactiveColor;
     }
     return "#c8c9cc";
   });
   const elLabelColor = common_vendor.computed(() => {
-    return props.labelColor != null ? props.labelColor.toString() : parentData.value["labelColor"] != null ? parentData.value["labelColor"].toString() : "#606266";
+    if (props.labelColor != "")
+      return props.labelColor;
+    if (!props.usedAlone && parentGroup != null && parentGroup.props != null && parentGroup.props.labelColor != "") {
+      return parentGroup.props.labelColor;
+    }
+    return "#606266";
   });
   const elShape = common_vendor.computed(() => {
-    return props.shape != null ? props.shape.toString() : parentData.value["shape"] != null ? parentData.value["shape"].toString() : "circle";
+    if (props.shape != "")
+      return props.shape;
+    if (!props.usedAlone && parentGroup != null && parentGroup.props != null && parentGroup.props.shape != "") {
+      return parentGroup.props.shape;
+    }
+    return "circle";
   });
   const elLabelSize = common_vendor.computed(() => {
-    return uni_modules_uviewUltra_libs_function_index.addUnit(props.labelSize != null ? props.labelSize.toString() : parentData.value["labelSize"] != null ? parentData.value["labelSize"].toString() : "15");
+    if (props.labelSize != "")
+      return uni_modules_uviewUltra_libs_function_index.addUnit(props.labelSize);
+    if (!props.usedAlone && parentGroup != null && parentGroup.props != null && parentGroup.props.labelSize != "") {
+      return uni_modules_uviewUltra_libs_function_index.addUnit(parentGroup.props.labelSize);
+    }
+    return "15px";
   });
   const elIconColor = common_vendor.computed(() => {
-    const iconColor = props.iconColor.toString() != "" ? props.iconColor.toString() : parentData.value["iconColor"] != null ? parentData.value["iconColor"].toString() : "#ffffff";
+    const iconColor = props.iconColor != "" ? props.iconColor : !props.usedAlone && parentGroup != null && parentGroup.props != null && parentGroup.props.iconColor != "" ? parentGroup.props.iconColor : "#ffffff";
     if (elDisabled.value) {
       return isChecked.value ? elInactiveColor.value : "transparent";
-    } else {
-      return isChecked.value ? iconColor : "transparent";
     }
+    return isChecked.value ? iconColor : "transparent";
+  });
+  const elIconPlacement = common_vendor.computed(() => {
+    if (!props.usedAlone && parentGroup != null && parentGroup.props != null && parentGroup.props.iconPlacement != "") {
+      return parentGroup.props.iconPlacement;
+    }
+    return "left";
+  });
+  const elBorderBottom = common_vendor.computed(() => {
+    var _a2;
+    if (!props.usedAlone && parentGroup != null && parentGroup.props != null) {
+      return (_a2 = parentGroup.props.borderBottom) !== null && _a2 !== void 0 ? _a2 : false;
+    }
+    return false;
+  });
+  const elPlacement = common_vendor.computed(() => {
+    var _a2;
+    if (!props.usedAlone && parentGroup != null && parentGroup.props != null) {
+      return (_a2 = parentGroup.props.placement) !== null && _a2 !== void 0 ? _a2 : "row";
+    }
+    return "row";
   });
   const iconClasses = common_vendor.computed(() => {
-    let classes = [];
-    classes.push("up-checkbox__icon-wrap--" + elShape.value.toString());
+    let classes = ["up-checkbox__icon-wrap--" + elShape.value];
     if (elDisabled.value) {
       classes.push("up-checkbox__icon-wrap--disabled");
     }
@@ -172,9 +210,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     if (isChecked.value && !elDisabled.value && elActiveColor.value == "#2979ff") {
       classes.push("up-checkbox__icon-wrap--active");
     }
-    let classStr = "";
-    classStr = classes.join(" ");
-    return classStr;
+    return classes.join(" ");
   });
   const iconWrapStyle = common_vendor.computed(() => {
     const style = new common_vendor.UTSJSONObject({});
@@ -187,123 +223,46 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       style["backgroundColor"] = "#ffffff";
       style["borderColor"] = elInactiveColor.value;
     }
-    style["width"] = uni_modules_uviewUltra_libs_function_index.addUnit(elSize.value);
-    style["height"] = uni_modules_uviewUltra_libs_function_index.addUnit(elSize.value);
-    if (!props.usedAlone && parentData.value != null && parentData.value["iconPlacement"] != null) {
-      if (parentData.value["iconPlacement"].toString() == "right") {
-        style["marginRight"] = 0;
-      }
+    style["width"] = elSize.value;
+    style["height"] = elSize.value;
+    if (elIconPlacement.value == "right") {
+      style["marginRight"] = 0;
     }
     return style;
   });
   const checkboxStyle = common_vendor.computed(() => {
     const style = new common_vendor.UTSJSONObject({});
-    if (!props.usedAlone && parentData.value != null && parentData.value["borderBottom"] != null) {
-      if (parentData.value["borderBottom"].toString() == "true" && parentData.value["placement"] == "row") {
-        uni_modules_uviewUltra_libs_function_index.error("检测到您将borderBottom设置为true，需要同时将up-checkbox-group的placement设置为column才有效");
-      }
-      if (parentData.value["borderBottom"].toString() == "true" && parentData.value["placement"] == "column") {
-        style["paddingBottom"] = "8px";
-      }
+    if (elBorderBottom.value && elPlacement.value == "column") {
+      style["paddingBottom"] = "8px";
     }
     return uni_modules_uviewUltra_libs_function_index.deepMerge(style, uni_modules_uviewUltra_libs_function_index.addStyle(props.customStyle));
   });
-  const init = function() {
-    if (!props.usedAlone) {
-      parentData.value = new common_vendor.UTSJSONObject({
-        iconSize: 12,
-        labelDisabled: null,
-        disabled: null,
-        shape: "square",
-        activeColor: null,
-        inactiveColor: null,
-        size: 18,
-        modelValue: null,
-        iconColor: null,
-        placement: "row",
-        borderBottom: false,
-        iconPlacement: "left"
-      });
-      getParentData("up-checkbox-group", instance, false);
-      if (parent.value == null) {
-        uni_modules_uviewUltra_libs_function_index.error("up-checkbox必须搭配up-checkbox-group组件使用");
-      }
-      const value = parentData.value["modelValue"];
-      if (props.checked) {
-        isChecked.value = true;
-      } else if (value != null) {
-        const valueTmp = value;
-        if (valueTmp != null) {
-          const even = (element = null) => {
-            return element.toString() == props.name.toString();
-          };
-          isChecked.value = valueTmp.some(even);
-        }
-      }
+  function setCheckboxCheckedStatus() {
+    if (props.usedAlone || parentGroup == null) {
+      localChecked.value = !localChecked.value;
+      emit("change", localChecked.value);
+      emit("update:checked", localChecked.value);
     } else {
-      if (props.checked) {
-        isChecked.value = true;
-      }
+      parentGroup.onCheckboxToggle(props.name);
+      emit("change", !isChecked.value);
     }
-  };
-  function emitEvent() {
-    emit("change", isChecked.value);
-    if (props.usedAlone) {
-      emit("update:checked", isChecked.value);
-    }
-    setTimeout(() => {
-    }, 10);
-  }
-  function setRadioCheckedStatus() {
-    isChecked.value = !isChecked.value;
-    emitEvent();
-    if (!props.usedAlone && parent.value != null) {
-      parent.value.$callMethod("unCheckedOther", instance);
-    }
+    common_vendor.nextTick$1(() => {
+      uni_modules_uviewUltra_libs_function_index.formValidate(instance === null || instance === void 0 ? null : instance.proxy, "change");
+    });
   }
   function iconClickHandler(e) {
-    e.stopPropagation();
     if (!elDisabled.value) {
-      setRadioCheckedStatus();
+      setCheckboxCheckedStatus();
     }
   }
   function wrapperClickHandler(e) {
-    if (!props.usedAlone && parentData.value != null && parentData.value["iconPlacement"] != null) {
-      if (parentData.value["iconPlacement"].toString() == "right") {
-        iconClickHandler(e);
-      } else {
-        iconClickHandler(e);
-      }
-    } else {
-      iconClickHandler(e);
-    }
+    iconClickHandler();
   }
   function labelClickHandler(e) {
-    e.stopPropagation();
     if (!elLabelDisabled.value && !elDisabled.value) {
-      setRadioCheckedStatus();
+      setCheckboxCheckedStatus();
     }
   }
-  common_vendor.watch(() => {
-    return props.checked;
-  }, (newVal) => {
-    if (newVal != isChecked.value) {
-      isChecked.value = newVal;
-    }
-  });
-  common_vendor.onMounted(() => {
-    init();
-  });
-  const getInternalState = () => {
-    return new common_vendor.UTSJSONObject({
-      name: props.name,
-      isChecked: isChecked.value
-    });
-  };
-  __expose({
-    init,
-    getInternalState
-  });
   return (_ctx, _cache) => {
     "raw js";
     const __returned__ = {
@@ -313,7 +272,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
         color: elIconColor.value,
         class: "up-checkbox__icon-wrap__icon data-v-819863e8"
       }),
-      b: common_vendor.o(iconClickHandler, "87"),
+      b: common_vendor.o(iconClickHandler, "61"),
       c: common_vendor.n(iconClasses.value),
       d: common_vendor.s(iconWrapStyle.value),
       e: common_vendor.t(__props.label),
@@ -332,8 +291,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
         "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
       }),
       n: common_vendor.o(wrapperClickHandler, "78"),
-      o: common_vendor.n(`up-checkbox-label--` + (common_vendor.unref(parentData)["iconPlacement"] != null ? common_vendor.unref(parentData)["iconPlacement"].toString() : "")),
-      p: common_vendor.n(common_vendor.unref(parentData)["borderBottom"] != false && common_vendor.unref(parentData)["placement"] != null && common_vendor.unref(parentData)["placement"].toString() == "column" ? "up-border-bottom" : ""),
+      o: common_vendor.n(`up-checkbox-label--` + elIconPlacement.value),
+      p: common_vendor.n(elBorderBottom.value && elPlacement.value == "column" ? "up-border-bottom" : ""),
       q: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
     };
     return __returned__;

@@ -13,8 +13,7 @@
 		    <text
 		        class="up-button__text up-button__loading-text"
 		        :style="[{ fontSize: textSize + 'px', color: textColorCom }]"
-		        >{{ loadingText != '' ? loadingText : text }}</text
-		    >
+		    >{{ loadingText != '' ? loadingText : text }}</text>
 		</template>
 		<template v-else>
 		    <up-icon
@@ -28,9 +27,7 @@
 		        <text
 		            class="up-button__text"
 		            :style="[{ fontSize: textSize + 'px', color: textColorCom }]"
-		            >
-		            {{ text }}
-		        </text>
+		        >{{ text }}</text>
 		    </slot>
 		</template>
 		<button

@@ -1,155 +1,114 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const uni_modules_uviewUltra_components_upCheckboxGroup_checkboxGroup = require("./checkboxGroup.js");
 const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
-const uni_modules_uviewUltra_libs_composable_useUltraUI = require("../../libs/composable/useUltraUI.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
-  //...mpSharedMpOptions,
   name: "up-checkbox-group"
 }, { __name: "up-checkbox-group", props: {
-  // 标识符 
   name: {
     type: String,
-    default: uni_modules_uviewUltra_components_upCheckboxGroup_checkboxGroup.defProps.getString("checkboxGroup.name")
+    default: ""
   },
-  // 绑定的值
   modelValue: {
     type: Array,
     default: () => {
-      return uni_modules_uviewUltra_components_upCheckboxGroup_checkboxGroup.defProps.getArray("checkboxGroup.value");
+      return [];
     }
   },
-  // 形状，circle-圆形，square-方形
   shape: {
     type: String,
-    default: uni_modules_uviewUltra_components_upCheckboxGroup_checkboxGroup.defProps.getString("checkboxGroup.shape")
+    default: "circle"
   },
-  // 是否禁用全部checkbox
   disabled: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upCheckboxGroup_checkboxGroup.defProps.getBoolean("checkboxGroup.disabled")
+    default: false
   },
-  // 选中状态下的颜色，如设置此值，将会覆盖parent的activeColor值
   activeColor: {
     type: String,
-    default: uni_modules_uviewUltra_components_upCheckboxGroup_checkboxGroup.defProps.getString("checkboxGroup.activeColor")
+    default: "#2979ff"
   },
-  // 未选中的颜色
   inactiveColor: {
     type: String,
-    default: uni_modules_uviewUltra_components_upCheckboxGroup_checkboxGroup.defProps.getString("checkboxGroup.inactiveColor")
+    default: "#c8c9cc"
   },
-  // 整个组件的尺寸 单位px
   size: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upCheckboxGroup_checkboxGroup.defProps.getNumber("checkboxGroup.size")
+    default: 18
   },
-  // 布局方式，row-横向，column-纵向
   placement: {
     type: String,
-    default: uni_modules_uviewUltra_components_upCheckboxGroup_checkboxGroup.defProps.getString("checkboxGroup.placement")
+    default: "row"
   },
-  // label的字体大小，px单位
   labelSize: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upCheckboxGroup_checkboxGroup.defProps.getNumber("checkboxGroup.labelSize")
+    default: 14
   },
-  // label的字体颜色
   labelColor: {
     type: String,
-    default: uni_modules_uviewUltra_components_upCheckboxGroup_checkboxGroup.defProps.getString("checkboxGroup.labelColor")
+    default: "#303133"
   },
-  // 是否禁止点击文本操作
   labelDisabled: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upCheckboxGroup_checkboxGroup.defProps.getBoolean("checkboxGroup.labelDisabled")
+    default: false
   },
-  // 图标颜色
   iconColor: {
     type: String,
-    default: uni_modules_uviewUltra_components_upCheckboxGroup_checkboxGroup.defProps.getString("checkboxGroup.iconColor")
+    default: "#ffffff"
   },
-  // 图标的大小，单位px
   iconSize: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upCheckboxGroup_checkboxGroup.defProps.getNumber("checkboxGroup.iconSize")
+    default: 12
   },
-  // 勾选图标的对齐方式，left-左边，right-右边
   iconPlacement: {
     type: String,
-    default: uni_modules_uviewUltra_components_upCheckboxGroup_checkboxGroup.defProps.getString("checkboxGroup.iconPlacement")
+    default: "left"
   },
-  // placement为row时，是否显示下边框
   borderBottom: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upCheckboxGroup_checkboxGroup.defProps.getBoolean("checkboxGroup.borderBottom")
+    default: false
+  },
+  customStyle: {
+    type: Object,
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
+    }
   }
 }, emits: ["update:modelValue", "change"], setup(__props, _a) {
-  var __expose = _a.expose, __emit = _a.emit;
-  const _b = uni_modules_uviewUltra_libs_composable_useUltraUI.useUltraUI(), children = _b.children, getChildren = _b.getChildren, addChild = _b.addChild;
-  common_vendor.getCurrentInstance().proxy;
+  var __emit = _a.emit;
   const props = __props;
   const emit = __emit;
-  const parentDataSelf = common_vendor.computed(() => {
-    return new common_vendor.UTSJSONObject({
-      modelValue: props.modelValue,
-      disabled: props.disabled,
-      inactiveColor: props.inactiveColor,
-      activeColor: props.activeColor,
-      size: props.size,
-      labelColor: props.labelColor,
-      labelDisabled: props.labelDisabled,
-      labelSize: props.labelSize,
-      shape: props.shape,
-      iconColor: props.iconColor,
-      iconSize: props.iconSize,
-      iconPlacement: props.iconPlacement,
-      borderBottom: props.borderBottom,
-      placement: props.placement
-    });
-  });
+  const instance = common_vendor.getCurrentInstance();
   const bemClass = common_vendor.computed(() => {
     return uni_modules_uviewUltra_libs_function_index.bem("checkbox-group", [props.placement], []);
   });
-  function unCheckedOther(childInstance) {
-    var _a2;
-    const values = [];
-    (_a2 = children.value) === null || _a2 === void 0 ? null : _a2.map((child) => {
-      let istats = child.$callMethod("getInternalState");
-      if (istats["name"] != null && istats["isChecked"] != null && istats["isChecked"].toString() == "true") {
-        values.push(istats["name"].toString());
-      }
+  function onCheckboxToggle(name = null) {
+    const currentList = [...props.modelValue];
+    const idx = currentList.findIndex((item = null) => {
+      return item.toString() == name.toString();
     });
-    emit("change", values, childInstance.$callMethod("getInternalState"));
-    emit("update:modelValue", values);
+    if (idx > -1) {
+      currentList.splice(idx, 1);
+    } else {
+      currentList.push(name);
+    }
+    emit("update:modelValue", currentList);
+    emit("change", currentList);
+    uni_modules_uviewUltra_libs_function_index.formValidate(instance === null || instance === void 0 ? null : instance.proxy, "change");
   }
-  common_vendor.watch(parentDataSelf, () => {
-    var _a2;
-    (_a2 = children.value) === null || _a2 === void 0 ? null : _a2.map((child) => {
-      child === null || child === void 0 ? null : child.$callMethod("init");
-    });
-  }, { deep: true });
-  const getProps = function() {
-    return parentDataSelf.value;
-  };
-  const getRefs = function() {
-    return new common_vendor.UTSJSONObject({});
-  };
-  __expose({
-    unCheckedOther,
-    getChildren,
-    addChild,
-    getProps,
-    getRefs
-  });
+  common_vendor.provide("upCheckboxGroup", new common_vendor.UTSJSONObject({
+    props,
+    onCheckboxToggle
+  }));
   return (_ctx, _cache) => {
     "raw js";
     const __returned__ = {
       a: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
       b: common_vendor.n(bemClass.value),
       c: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
-      d: `${_ctx.u_s_b_h}px`,
-      e: `${_ctx.u_s_a_i_b}px`
+      d: common_vendor.s(common_vendor.unref(uni_modules_uviewUltra_libs_function_index.addStyle)(__props.customStyle)),
+      e: common_vendor.s({
+        "--status-bar-height": `${_ctx.u_s_b_h}px`,
+        "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
+      })
     };
     return __returned__;
   };

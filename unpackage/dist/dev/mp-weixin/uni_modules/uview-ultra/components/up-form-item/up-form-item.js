@@ -185,7 +185,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       q: __props.borderBottom
     }, __props.borderBottom ? {
       r: common_vendor.p({
-        color: message.value != "" && common_vendor.unref(parentData)["errorType"] == "border-bottom" ? common_vendor.unref(uni_modules_uviewUltra_libs_config_color.color)["error"] : common_vendor.unref(uni_modules_uviewUltra_components_upLine_line.defProps)["color"],
+        color: message.value != "" && common_vendor.unref(parentData)["errorType"] == "border-bottom" ? common_vendor.unref(uni_modules_uviewUltra_libs_config_color.color)["error"] : common_vendor.unref(uni_modules_uviewUltra_components_upLine_line.propsLine)["color"],
         customStyle: `margin-top: ${message.value != "" && common_vendor.unref(parentData)["errorType"] == "message" ? "5px" : 0}`,
         class: "data-v-dec42e4c"
       })

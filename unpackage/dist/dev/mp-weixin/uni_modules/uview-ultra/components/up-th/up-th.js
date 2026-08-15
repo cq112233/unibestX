@@ -1,15 +1,13 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const uni_modules_uviewUltra_components_upTh_th = require("./th.js");
 const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
 const uni_modules_uviewUltra_libs_composable_useUltraUI = require("../../libs/composable/useUltraUI.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   name: "up-th"
 }, { __name: "up-th", props: {
-  // 宽度，百分比或者具体带单位的值，如30%， 200rpx等，一般使用百分比
   width: {
     type: [String],
-    default: uni_modules_uviewUltra_components_upTh_th.defProps.getString("th.width")
+    default: ""
   }
 }, setup(__props) {
   const _a = uni_modules_uviewUltra_libs_composable_useUltraUI.useUltraUI(new common_vendor.UTSJSONObject({
@@ -29,7 +27,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       let styleText = new common_vendor.UTSJSONObject({});
       let parentProps = parent.value.$callMethod("getProps");
       if (props.width != "")
-        style.flex = `0 0 ${props.width}`;
+        style["flex"] = `0 0 ${props.width}`;
       styleText["textAlign"] = parentProps.getString("align");
       style["padding"] = parentProps.getString("padding");
       style["borderBottom"] = `solid 1px ` + parentProps.getString("borderColor");

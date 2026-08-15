@@ -73,25 +73,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {}, {
         f: common_vendor.unref(tabbarItem).iconType === "icon"
       }, common_vendor.unref(tabbarItem).iconType === "icon" ? {
-        g: getActiveColor(),
-        h: common_vendor.p({
+        g: common_vendor.p({
           type: getIcon(),
-          size: "24",
-          style: common_vendor.normalizeStyle({
-            color: getActiveColor()
-          })
+          size: 24,
+          color: getActiveColor()
         })
       } : {}, {
-        i: common_vendor.t(_ctx.$t(common_vendor.unref(tabbarItem).text)),
-        j: getActiveColor(),
-        k: isDotBadge()
+        h: common_vendor.t(_ctx.$t(common_vendor.unref(tabbarItem).text)),
+        i: getActiveColor(),
+        j: isDotBadge()
       }, isDotBadge() ? {} : {}, {
-        l: isNumberBadge()
+        k: isNumberBadge()
       }, isNumberBadge() ? {
-        m: common_vendor.t(getBadgeText())
+        l: common_vendor.t(getBadgeText())
       } : {}, {
-        n: `${_ctx.u_s_b_h}px`,
-        o: `${_ctx.u_s_a_i_b}px`
+        m: `${_ctx.u_s_b_h}px`,
+        n: `${_ctx.u_s_a_i_b}px`
       }));
       return __returned__;
     };
