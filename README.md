@@ -64,6 +64,19 @@
 
 ***
 
+## 📦 推荐的 UI 组件库
+
+`unibestX` 内置了深度修复过的 `uview-ultra`，同时社区中还有许多优秀的 uni-app X 组件库可供选择，你可以根据项目需求灵活选用：
+
+| 组件库 | 简介 | 官网地址 |
+| :--- | :--- | :--- |
+| **uview-ultra** | 专为 uni-app X 打造的 UI 组件库，覆盖组件全面，本项目已内置并进行了深度适配修复。 | [https://uview-ultra.lingyun.net/](https://uview-ultra.lingyun.net/) |
+| **Rice UI** | 轻量、高性能的 uni-app X 组件库，设计风格简洁现代，支持蒸汽模式（Vapor）。 | [https://riceui.cn/](https://riceui.cn/) |
+| **TMUI** | 功能丰富、高度可定制的企业级组件库，提供完善的业务组件和主题系统。 | [https://tmui.design/](https://tmui.design/) |
+| **Lime UI** | 社区活跃的 uni-app X 组件库，组件风格清新，覆盖常用移动端场景。 | [https://limex.qcoon.cn/](https://limex.qcoon.cn/) |
+
+> 💡 **选型建议**：如果你希望开箱即用且与项目模板深度集成，推荐继续使用内置的 `uview-ultra`；如果需要更轻量的风格或特定组件，可以按需引入 Rice UI、TMUI 或 Lime UI。多个组件库可以混用，但请注意控制包体积。
+
 ## ✨ 特性
 
 * 🚀 **uni-app X** — 基于 UTS 语言的原生渲染，性能远超 WebView 方案
