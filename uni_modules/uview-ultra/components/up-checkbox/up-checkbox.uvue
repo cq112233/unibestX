@@ -163,7 +163,7 @@ const elActiveColor = computed((): string => {
 	if (!props.usedAlone && parentGroup != null && parentGroup.props != null && parentGroup.props.activeColor != '') {
 		return parentGroup.props.activeColor
 	}
-	return '#2979ff'
+	return ''
 })
 
 const elInactiveColor = computed((): string => {
@@ -239,8 +239,8 @@ const iconClasses = computed((): string => {
 	if (isChecked.value && elDisabled.value) {
 		classes.push('up-checkbox__icon-wrap--disabled--checked')
 	}
-	if (isChecked.value && !elDisabled.value && elActiveColor.value == '#2979ff') {
-		classes.push('up-checkbox__icon-wrap--active')
+	if (isChecked.value && !elDisabled.value) {
+		classes.push('up-checkbox__icon-wrap--checked')
 	}
 	return classes.join(' ')
 })
@@ -248,8 +248,10 @@ const iconClasses = computed((): string => {
 const iconWrapStyle = computed((): UTSJSONObject => {
 	const style = {} as UTSJSONObject
 	if (isChecked.value && !elDisabled.value) {
-		style['backgroundColor'] = elActiveColor.value
-		style['borderColor'] = elActiveColor.value
+		if (elActiveColor.value != '') {
+			style['backgroundColor'] = elActiveColor.value
+			style['borderColor'] = elActiveColor.value
+		}
 	} else if (isChecked.value && elDisabled.value) {
 		style['backgroundColor'] = '#ebedf0'
 		style['borderColor'] = '#c8c9cc'

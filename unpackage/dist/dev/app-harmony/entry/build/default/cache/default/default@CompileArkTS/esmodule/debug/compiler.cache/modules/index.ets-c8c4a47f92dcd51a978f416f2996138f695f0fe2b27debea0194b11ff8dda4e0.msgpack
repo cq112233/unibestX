@@ -1,0 +1,241 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ
+Øimport { UTSObject, UTS, UniError, defineAsyncApi, getUniProvider } from "@dcloudio/uni-app-framework";
+const RequestPaymentUniErrorSubject = 'uni-requestPayment';
+class RequestPaymentSuccess extends UTSObject {
+    constructor() {
+        super(...arguments);
+        this.data = null;
+    }
+}
+class RequestPaymentOptions extends UTSObject {
+    constructor() {
+        super(...arguments);
+        this.success = null;
+        this.fail = null;
+        this.complete = null;
+    }
+}
+const RequestPaymentUniErrors = new Map([
+    [
+        700600,
+        'The payment result is unknown (it may have been successfully paid). Please check the payment status of the order in the merchant order list.'
+    ],
+    [
+        701100,
+        'Order payment failure.'
+    ],
+    [
+        701110,
+        'Repeat the request.'
+    ],
+    [
+        700601,
+        'The user canceled midway.'
+    ],
+    [
+        700602,
+        'Network connection error.'
+    ],
+    [
+        700603,
+        'Payment result unknown (may have been successfully paid), please check the payment status of the order in the merchant order list.'
+    ],
+    [
+        700607,
+        'Payment not completed.'
+    ],
+    [
+        700608,
+        'Parameter error.'
+    ],
+    [
+        700000,
+        'Other payment errors.'
+    ],
+    [
+        700604,
+        'Wechat is not installed.'
+    ],
+    [
+        700605,
+        'Failed to get provider.'
+    ],
+    [
+        700800,
+        'URL Scheme is not configured.'
+    ],
+    [
+        700801,
+        'Universal Link is not configured.'
+    ]
+]);
+class RequestPaymentFailImpl__1 extends UniError {
+    constructor(errCode) {
+        super();
+        this.errSubject = RequestPaymentUniErrorSubject;
+        this.errCode = errCode;
+        this.errMsg = UTS.mapGet(RequestPaymentUniErrors, errCode) ?? "";
+    }
+}
+const API_REQUEST_PAYMENT = 'requestPayment';
+const requestPayment = defineAsyncApi(API_REQUEST_PAYMENT, (options, exec) => {
+    const provider = getUniProvider('payment', options.provider);
+    if (!provider) {
+        exec.reject('Provider not found.');
+        return;
+    }
+    provider.requestPayment({
+        orderInfo: options.orderInfo,
+        success: (result) => {
+            exec.resolve(result);
+        },
+        fail: (error) => {
+            const errMsg = UTS.mapGet(RequestPaymentUniErrors, error.errCode) ?? "";
+            exec.reject(errMsg, {
+                errCode: error.errCode
+            });
+        }
+    });
+});
+export { RequestPaymentOptions as RequestPaymentOptions, RequestPaymentSuccess as RequestPaymentSuccess };
+export { requestPayment as requestPayment };
+//# sourceMappingURL=index.js.mapÂ‘Ùî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework/index.etsÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-payment/utssdk/app-harmony/index.etsÔrB˜±isLocalDependency¯isNodeEntryFile§pkgPath§pkgNameªpkgVersion±belongProjectPath±dependencyPkgInfo¬shouldEmitJsÂÂÙâ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules¹@dcloudio/uni-app-modules¥1.0.0ÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmonyÔrC’§pkgNameªpkgVersion¹@dcloudio/uni-app-modules¥1.0.0ÃÃÚimport { UniProvider, UTSObject, IUniError, UTS, UniError, defineAsyncApi, ApiExecutor, getUniProvider, ApiError } from "@dcloudio/uni-app-framework";
+type RequestPaymentFailImpl = RequestPaymentFailImpl__1;
+const RequestPaymentUniErrorSubject = 'uni-requestPayment';
+interface UniPaymentProvider extends UniProvider {
+    requestPayment(options: RequestPaymentOptions): void;
+}
+type RequestPaymentErrorCode = 700600 | 701100 | 701110 | 700601 | 700602 | 700603 | 700000 | 700604 | 700605 | 700607 | 700608 | 700800 | 700801;
+type RequestPayment = (options: RequestPaymentOptions) => void;
+class RequestPaymentSuccess extends UTSObject {
+    data: object | null = null;
+}
+type RequestPaymentSuccessCallback = (result: RequestPaymentSuccess) => void;
+type RequestPaymentFail = IRequestPaymentFail;
+type RequestPaymentFailCallback = (result: RequestPaymentFail) => void;
+type RequestPaymentComplete = Object;
+interface IRequestPaymentFail extends IUniError {
+    errCode: RequestPaymentErrorCode;
+}
+type RequestPaymentCompleteCallback = (result: RequestPaymentComplete) => void;
+class RequestPaymentOptions extends UTSObject {
+    provider!: string;
+    orderInfo!: string;
+    success: RequestPaymentSuccessCallback | null = null;
+    fail: RequestPaymentFailCallback | null = null;
+    complete: RequestPaymentCompleteCallback | null = null;
+}
+const RequestPaymentUniErrors: Map<RequestPaymentErrorCode, string> = new Map([
+    [
+        700600,
+        'The payment result is unknown (it may have been successfully paid). Please check the payment status of the order in the merchant order list.'
+    ],
+    [
+        701100,
+        'Order payment failure.'
+    ],
+    [
+        701110,
+        'Repeat the request.'
+    ],
+    [
+        700601,
+        'The user canceled midway.'
+    ],
+    [
+        700602,
+        'Network connection error.'
+    ],
+    [
+        700603,
+        'Payment result unknown (may have been successfully paid), please check the payment status of the order in the merchant order list.'
+    ],
+    [
+        700607,
+        'Payment not completed.'
+    ],
+    [
+        700608,
+        'Parameter error.'
+    ],
+    [
+        700000,
+        'Other payment errors.'
+    ],
+    [
+        700604,
+        'Wechat is not installed.'
+    ],
+    [
+        700605,
+        'Failed to get provider.'
+    ],
+    [
+        700800,
+        'URL Scheme is not configured.'
+    ],
+    [
+        700801,
+        'Universal Link is not configured.'
+    ]
+]);
+class RequestPaymentFailImpl__1 extends UniError implements IRequestPaymentFail {
+    errCode: RequestPaymentErrorCode;
+    constructor(errCode: RequestPaymentErrorCode){
+        super();
+        this.errSubject = RequestPaymentUniErrorSubject;
+        this.errCode = errCode;
+        this.errMsg = UTS.mapGet(RequestPaymentUniErrors, errCode) ?? "";
+    }
+}
+const API_REQUEST_PAYMENT = 'requestPayment';
+const requestPayment: RequestPayment = defineAsyncApi<RequestPaymentOptions, RequestPaymentSuccess>(API_REQUEST_PAYMENT, (options: RequestPaymentOptions, exec: ApiExecutor<RequestPaymentSuccess>): void =>{
+    const provider = getUniProvider<UniPaymentProvider>('payment', options.provider);
+    if (!provider) {
+        exec.reject('Provider not found.');
+        return;
+    }
+    provider.requestPayment({
+        orderInfo: options.orderInfo,
+        success: (result: RequestPaymentSuccess)=>{
+            exec.resolve(result);
+        },
+        fail: (error: RequestPaymentFail)=>{
+            const errMsg = UTS.mapGet(RequestPaymentUniErrors, error.errCode) ?? "";
+            exec.reject(errMsg, {
+                errCode: error.errCode
+            } as ApiError);
+        }
+    } as RequestPaymentOptions);
+}) as RequestPayment;
+export { IRequestPaymentFail as IRequestPaymentFail, RequestPayment as RequestPayment, RequestPaymentComplete as RequestPaymentComplete, RequestPaymentCompleteCallback as RequestPaymentCompleteCallback, RequestPaymentErrorCode as RequestPaymentErrorCode, RequestPaymentFail as RequestPaymentFail, RequestPaymentFailCallback as RequestPaymentFailCallback, RequestPaymentFailImpl as RequestPaymentFailImpl, RequestPaymentOptions as RequestPaymentOptions, RequestPaymentSuccess as RequestPaymentSuccess, RequestPaymentSuccessCallback as RequestPaymentSuccessCallback, UniPaymentProvider as UniPaymentProvider };
+export { requestPayment as requestPayment };
+ÀÔrD‘»@dcloudio/uni-app-frameworkÔrE—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework/index.etsAÃªoh-resolveÂ“ÔrF–§version¤fileªsourceRoot§sources¥names¨mappings¨index.js ‘©index.etsÜ dÜ ”    ”  ”	  ”  ”  ,”  /”  1”!  9”#  ;”1  ÌI”3  ÌX”ÌA  Ìf”ÌC  Ìr”ÌI  Ìx”Ìf  Ì•”Ìg  Ì––”   ” ”# #”& &”: :”; ;•”   ” ” ”$ $”- -‘”  •” 	” 	” 	” 	” 	’” 
+ ” 
+‘” 
+•”   ” ” ”$ $”- -‘”  •” ” ” 4” 8” 9•” ” ” .” 2” 3•” ” ” 6” :” ;’”  ” ‘” —”   ” ” ”  ÌF”$ ÌJ”' ÌM”( ÌN‘” ’” ” ’” ”Ì– Ì–‘” ‘” ’”  ”  ’” !”  ! ‘” "‘” #’” $” $’” %” %‘” &‘” '’” (” (’” )”# )#‘” *‘” +’” ,” ,’” -”# -#‘” .‘” /’” 0” 0’” 1”ÌŒ 1ÌŒ‘” 2‘” 3’” 4” 4’” 5”  5 ‘” 6‘” 7’” 8” 8’” 9” 9‘” :‘” ;’” <” <’” =” =‘” >‘” ?’” Ì@” Ì@’” ÌA”" ÌA"‘” ÌB‘” ÌC’” ÌD” ÌD’” ÌE”! ÌE!‘” ÌF‘” ÌG’” ÌH” ÌH’” ÌI”' ÌI'‘” ÌJ‘” ÌK’” ÌL” ÌL’” ÌM”+ ÌM+‘” ÌN“” ÌO” ÌO” ÌO•”  ÌP ” ÌP” ÌP ”( ÌP(”0 ÌP0“” ÌR” ÌR” ÌR0”” ÌS” ÌS” ÌS” ÌS—” ÌT” ÌT” ÌT” ÌT” ÌT”7 ÌT7”8 ÌT8—” ÌU” ÌU” ÌU” ÌU” ÌU” ÌU” ÌUÜ ” ÌV” ÌV” ÌV” ÌV” ÌV” ÌV” ÌV”  ÌV ”! ÌV!”8 ÌV8”: ÌV:”ÌA ÌVÌA”ÌB ÌVÌB”ÌF ÌVÌF”ÌH ÌVÌH”ÌI ÌVÌI’” ÌW” ÌW‘” ÌX–”  ÌY ” ÌY” ÌY” ÌY”, ÌY,”- ÌY-”  ÌZ ” ÌZ” ÌZ” ÌZ'”% ÌZ5”& ÌZÌd”9 ÌZÌw”; ÌZÌy”< ÌZÌz”ÌC ÌZÌ˜”ÌE ÌZÌš”ÌI ÌZÌÂ”ÌK ÌZÌÊ”ÌM ÌZÌÌ” Ì[”
+ Ì[
+” Ì[” Ì[”# Ì[#”$ Ì[8”- Ì[ÌA”/ Ì[ÌC”6 Ì[ÌJ”7 Ì[ÌK”? Ì[ÌS”Ì@ Ì[ÌT”ÌA Ì[ÌU•” Ì\” Ì\”	 Ì\	” Ì\” Ì\˜” Ì]” Ì]” Ì]” Ì]” Ì]”) Ì])”* Ì]*”+ Ì]+’” Ì^” Ì^‘” Ì_•” Ì`” Ì`” Ì`” Ì`” Ì`–” Ìa” Ìa” Ìa” Ìa” Ìa”$ Ìa$—” Ìb” Ìb” Ìb” Ìb” Ìb/” Ìb0” Ìb2˜” Ìc” Ìc” Ìc” Ìc” Ìc” Ìc”  Ìc ”! Ìc!’” Ìd”	 Ìd	—” Ìe” Ìe” Ìe” Ìe” Ìe(” Ìe)” Ìe+Ü ” Ìf” Ìf” Ìf” Ìf” Ìf” Ìf”% Ìf%”& Ìf&”= Ìf=”? Ìf?”ÌD ÌfÌD”ÌE ÌfÌE”ÌL ÌfÌL”ÌM ÌfÌM”ÌQ ÌfÌQ”ÌS ÌfÌS”ÌT ÌfÌT—” Ìg” Ìg” Ìg” Ìg” Ìg” Ìg”  Ìg –” Ìh” Ìh” Ìh” Ìh” Ìh”& Ìh&“” Ìi” Ìi” Ìi’” Ìj”	 Ìj	“” Ìk” Ìk” Ìk ””  Ìl ” Ìl” Ìl” Ìlœ”  Ìm ” Ìm”	 ÌmÍ•” ÌmÍª”" ÌmÍ®”7 ÌmÍÃ”9 ÌmÍÅ”ÌN ÌmÍÚ”ÌR ÌmÍŞ”Ìg ÌmÍó”Ìi ÌmÍ_”Ìj ÌmÍ`˜”  Ìn ” Ìn”	 Ìn	” Ìn” Ìn”) Ìn)”+ Ìn+”, Ìn,ÔrG–§version¤file§sources®sourcesContent¥names¨mappingsÀ‘À‘ÀÜ e‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache’ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ
+Í
+‡À’ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍ
+&Í
+TÔrL”¤type¥start£end¤nameªIdentifierÍ
+&Í
+;µRequestPaymentOptionsLªIdentifierÍ
+?Í
+TµRequestPaymentOptionsK¯ExportSpecifierÍ
+VÍ
+„LªIdentifierÍ
+VÍ
+kµRequestPaymentSuccessLªIdentifierÍ
+oÍ
+„µRequestPaymentSuccessÀJ¶ExportNamedDeclarationÍ
+‰Í
+µÀ‘K¯ExportSpecifierÍ
+’Í
+²LªIdentifierÍ
+’Í
+ ®requestPaymentLªIdentifierÍ
+¤Í
+²®requestPaymentÀ‘ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration Ìg•ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	©UTSObjectLªIdentifier	©UTSObjectN¯ImportSpecifierLªIdentifier£UTSLªIdentifier£UTSN¯ImportSpecifier!LªIdentifier!¨UniErrorLªIdentifier!¨UniErrorN¯ImportSpecifier#1LªIdentifier#1®defineAsyncApiLªIdentifier#1®defineAsyncApiN¯ImportSpecifier3ÌALªIdentifier3ÌA®getUniProviderLªIdentifier3ÌA®getUniProviderÔrO•¤type¥start£end¥value£raw§LiteralÌIÌf»@dcloudio/uni-app-framework½"@dcloudio/uni-app-framework"

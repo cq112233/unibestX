@@ -1,0 +1,6 @@
+export * from './uts-plugin-api'
+export * from './uts-plugin-biz'
+export * from './uts-plugin-component'
+export * from './uts-plugin-extend'
+export * from './uni-map-tencent-global'
+export * from './uni-camera-global'

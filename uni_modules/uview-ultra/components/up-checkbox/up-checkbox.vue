@@ -110,7 +110,7 @@
 			},
 			// 组件选中激活时的颜色
 			elActiveColor() {
-				return this.activeColor ? this.activeColor : (this.parentData.activeColor ? this.parentData.activeColor : '#2979ff');
+				return this.activeColor ? this.activeColor : (this.parentData.activeColor ? this.parentData.activeColor : '');
 			},
 			// 组件选未中激活时的颜色
 			elInactiveColor() {
@@ -151,6 +151,9 @@
 				if (this.isChecked && this.elDisabled) {
 					classes.push('up-checkbox__icon-wrap--disabled--checked')
 				}
+				if (this.isChecked && !this.elDisabled) {
+					classes.push('up-checkbox__icon-wrap--checked')
+				}
 				// 支付宝，头条小程序无法动态绑定一个数组类名，否则解析出来的结果会带有","，而导致失效
 				// #ifdef MP-ALIPAY || MP-TOUTIAO
 				classes = classes.join(' ')
@@ -160,8 +163,18 @@
 			iconWrapStyle() {
 				// checkbox的整体样式
 				const style = {}
-				style.backgroundColor = this.isChecked && !this.elDisabled ? this.elActiveColor : '#ffffff'
-				style.borderColor = this.isChecked && !this.elDisabled ? this.elActiveColor : this.elInactiveColor
+				if (this.isChecked && !this.elDisabled) {
+					if (this.elActiveColor) {
+						style.backgroundColor = this.elActiveColor
+						style.borderColor = this.elActiveColor
+					}
+				} else if (this.isChecked && this.elDisabled) {
+					style.backgroundColor = '#ebedf0'
+					style.borderColor = '#c8c9cc'
+				} else {
+					style.backgroundColor = '#ffffff'
+					style.borderColor = this.elInactiveColor
+				}
 				style.width = addUnit(this.elSize)
 				style.height = addUnit(this.elSize)
 				// 如果是图标在右边的话，移除它的右边距

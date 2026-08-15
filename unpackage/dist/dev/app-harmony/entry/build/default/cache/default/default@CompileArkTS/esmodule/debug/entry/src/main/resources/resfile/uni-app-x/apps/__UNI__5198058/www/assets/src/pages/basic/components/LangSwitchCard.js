@@ -1,0 +1,119 @@
+import { _ as __easycom_1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uni-icons/components/uni-icons/uni-icons&";
+import { C as Card } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/Card&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/index&";
+import { $ as $t, s as setTabbarItem, t as t$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/i18n&";
+import { t } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/index&";
+import { u as useAppStore } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/app&";
+import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, unref: _unref, setSharedData: _setSharedData, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, setSharedDataEvent: _setSharedDataEvent, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
+const __className = "GenSrcPagesBasicComponentsLangSwitchCard";
+const { computed } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  __dynamicSharedData: true,
+  __hash: "82fbcbcc",
+  __className,
+  __filename: "src/pages/basic/components/LangSwitchCard.uvue",
+  __name: "LangSwitchCard",
+  setup(__props) {
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenSrcPagesBasicComponentsLangSwitchCardSharedData", sharedDataClassId: 0 })));
+    const appStore = useAppStore();
+    const currentLocale = computed(() => {
+      return appStore.state.locale;
+    });
+    const isZhCN = computed(() => {
+      return currentLocale.value == "zh-CN";
+    });
+    const isEnUS = computed(() => {
+      return currentLocale.value == "en-US";
+    });
+    const uViewChooseDates = computed(() => {
+      currentLocale.value;
+      return t("up.calendar.chooseDates", new UTSJSONObject({}));
+    });
+    const uViewConfirm = computed(() => {
+      currentLocale.value;
+      return t("up.common.confirm", new UTSJSONObject({}));
+    });
+    const uViewStart = computed(() => {
+      currentLocale.value;
+      return t("up.common.start", new UTSJSONObject({}));
+    });
+    const uViewEnd = computed(() => {
+      currentLocale.value;
+      return t("up.common.end", new UTSJSONObject({}));
+    });
+    function switchLanguage(lang) {
+      appStore.setLocale(lang);
+      setTabbarItem();
+      uni.showToast({
+        title: t$1("message.switch_success", null),
+        icon: "none",
+        duration: 1500
+      });
+    }
+    return () => {
+      "raw js";
+      const _component_uni_icons = __easycom_1;
+      const n24 = _createSharedDataComponent(
+        Card,
+        "2b814c75",
+        { title: () => {
+          return _unref($t)("basic.langTitle");
+        } },
+        {
+          "default": _withSharedDataVaporCtx(() => {
+            _renderSharedDataEffect(() => {
+              const _$t = _unref($t);
+              _setSharedData(__sharedData, 7, _toDisplayString(_$t("basic.langPreview")));
+              _setSharedData(__sharedData, 8, _toDisplayString(_$t("message.welcome")));
+              _setSharedData(__sharedData, 9, _toDisplayString(_$t("message.hello", { msg: "hi" })));
+              _setSharedData(__sharedData, 10, _toDisplayString(_$t("basic.uviewPreview")));
+              _setSharedData(__sharedData, 11, _toDisplayString(_unref(uViewChooseDates)));
+              _setSharedData(__sharedData, 12, _toDisplayString(_unref(uViewConfirm)));
+              _setSharedData(__sharedData, 13, _toDisplayString(_unref(uViewStart)));
+              _setSharedData(__sharedData, 14, _toDisplayString(_unref(uViewEnd)));
+            });
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData, 1, _toSharedDataBoolean(_unref(isZhCN)));
+            }, () => {
+              const n14 = _createSharedDataComponentWithFallback(_component_uni_icons, "88bf6880", {
+                type: "checkmarkempty",
+                size: "20",
+                style: "color: #3b82f6;"
+              });
+              _setSharedData(__sharedData, 2, n14?.sharedData);
+            });
+            _setSharedDataEvent(__sharedData, 5, () => {
+              return switchLanguage("zh-CN");
+            });
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData, 3, _toSharedDataBoolean(_unref(isEnUS)));
+            }, () => {
+              const n21 = _createSharedDataComponentWithFallback(_component_uni_icons, "88beac8c", {
+                type: "checkmarkempty",
+                size: "20",
+                style: "color: #3b82f6;"
+              });
+              _setSharedData(__sharedData, 4, n21?.sharedData);
+            });
+            _setSharedDataEvent(__sharedData, 6, () => {
+              return switchLanguage("en-US");
+            });
+          })
+        },
+        1
+        /* SINGLE_ROOT */
+      );
+      _setSharedData(__sharedData, 0, n24.sharedData);
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {};
+const LangSwitchCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+export {
+  LangSwitchCard as L
+};
+//# sourceMappingURL=LangSwitchCard.js.map
