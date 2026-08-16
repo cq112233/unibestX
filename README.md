@@ -21,30 +21,25 @@
 
 > 💡 **HBuilderX 版本建议与下载**
 >
-> 本项目目前在 **HBuilderX 5.15 ~ 5.24** 版本均可稳定运行：
-> - **HBuilderX 5.15**：经典稳定版本（注：5.15 版本不支持全部的 Vapor 蒸汽模式特性）；
-> - **HBuilderX 5.24**：若需要体验完整的 **Vapor 蒸汽模式**（无虚拟 DOM 高性能渲染），推荐使用 5.24 或更高版本。
+> - **强烈推荐 HBuilderX 5.24**：可完整体验与使用 **Vapor 蒸汽模式**（无虚拟 DOM 高性能原生渲染）；
+> - **若不使用 Vapor 模式（采用传统 VDOM 模式）**：使用 **HBuilderX 5.15 及之后版本** 均可稳定运行。
 >
 > 📥 **HBuilderX 5.15 下载地址**：[https://wwbsy.lanzoue.com/b01eupb32d](https://wwbsy.lanzoue.com/b01eupb32d) （密码：`4xdv`）
 
-> 🌟 **推荐分支：`uniX-rice-ui`（完美支持 Vapor 蒸汽模式与 VDOM 切换）**
+> ⚡ **渲染模式与 UI 组件库重要说明**
 >
-> 本项目现已推出 **`uniX-rice-ui`** 分支，集成由 Rice UI 官方支持的组件库，**完美支持 Vapor（蒸汽模式）与 VDOM 模式自由无缝切换**，全端原生渲染性能极佳。
-> 欢迎大家切换至 `uniX-rice-ui` 分支体验：
+> 1. 🚀 **main 分支全面兼容 Vapor 模式与 VDOM 模式（默认 Vapor 模式）**：
+>    - `main` 分支现已全面兼通 Vue3 **Vapor 模式**（蒸汽模式，无虚拟 DOM 高性能原生渲染）与传统 **VDOM 模式**；
+>    - 默认采用 **Vapor 模式**，开发者可在 `manifest.json` 中按需自由切换模式。
+> 2. 📦 **关于 uview-ultra 组件库**：
+>    - `main` 分支内置了深度修复版的 `uview-ultra`，已全面适配多端与 Vapor/VDOM 模式，常用基础功能**基本够用**；
+>    - 因个人精力有限，作者后续将**不再对 uview-ultra 进行维护与定制更新**。
+> 3. 🌟 **推荐分支：`uniX-rice-ui`（有团队持续维护）**：
+>    - 如需长期维护、享受官方团队持续迭代更新的 UI 组件库，强烈推荐切换使用 **`uniX-rice-ui`** 分支（集成 Rice UI 官方支持，团队持续更新，完美支持 Vapor 与 VDOM 模式）。
 >
 > ```bash
+> # 切换至 uniX-rice-ui 分支
 > git checkout uniX-rice-ui
-> ```
->
-> ⚠️ **关于 uview-ultra 的后续维护说明**：
-> 因个人精力有限，作者后续将**不再维护与更新**本地定制修改版 `uview-ultra` 组件。强烈推荐大家在新项目或长期项目中优先选用由官方团队持续迭代维护的 **`uniX-rice-ui`** 分支！
-
-> 🚀 **Vapor Mode 尝鲜分支（`vopar`）**
->
-> 早期建立的 Vapor 体验分支，欢迎切换探索：
->
-> ```bash
-> git checkout vopar
 > ```
 
 > ⚠️ **三方组件库与插件修改说明**
@@ -82,24 +77,24 @@
 
 `unibestX` 提供了多分支与多种 UI 组件库选择，你可以根据项目架构与需求灵活选用：
 
-| 组件库 | 简介 | 推荐分支 / 官网地址 |
-| :--- | :--- | :--- |
-| **Rice UI（强烈推荐）** | 专为 uni-app X 打造的现代 UI 组件库，**完美支持 Vapor 蒸汽模式与 VDOM 模式无缝切换**，由 Rice UI 官方团队持续维护与技术支持。 | **`uniX-rice-ui` 分支** / [https://riceui.cn/](https://riceui.cn/) |
-| **uview-ultra** | 专为 uni-app X 打造的 UI 库，本项目 main 分支内置了历史修复版。（*注：因个人精力有限，作者后续不再维护与更新本地修改版 uview-ultra*） | [https://uview-ultra.lingyun.net/](https://uview-ultra.lingyun.net/) |
-| **TMUI** | 功能丰富、高度可定制的企业级组件库，提供完善的业务组件和主题系统。 | [https://tmui.design/](https://tmui.design/) |
-| **Lime UI** | 社区活跃的 uni-app X 组件库，组件风格清新，覆盖常用移动端场景。 | [https://limex.qcoon.cn/](https://limex.qcoon.cn/) |
+| 组件库 | 简介 | 推荐分支 / 官网地址 | 维护状态 |
+| :--- | :--- | :--- | :--- |
+| **Rice UI（强烈推荐）** | 专为 uni-app X 打造的现代 UI 组件库，**完美支持 Vapor 蒸汽模式与 VDOM 模式无缝切换**，由 Rice UI 官方团队持续维护与技术支持。 | **`uniX-rice-ui` 分支** / [https://riceui.cn/](https://riceui.cn/) | 团队持续维护与迭代 |
+| **uview-ultra** | 专为 uni-app X 打造的 UI 库，本项目 main 分支内置了深度修复版，已全面兼容 Vapor/VDOM 模式，基础功能基本够用。 | **`main` 分支** / [https://uview-ultra.lingyun.net/](https://uview-ultra.lingyun.net/) | 已停止后续维护与定制 |
+| **TMUI** | 功能丰富、高度可定制的企业级组件库，提供完善的业务组件和主题系统。 | [https://tmui.design/](https://tmui.design/) | 社区维护 |
+| **Lime UI** | 社区活跃的 uni-app X 组件库，组件风格清新，覆盖常用移动端场景。 | [https://limex.qcoon.cn/](https://limex.qcoon.cn/) | 社区维护 |
 
-> 💡 **选型建议**：
+> 💡 **选型与分支建议**：
 >
-> 1. **强烈推荐使用 `uniX-rice-ui` 分支**：由 Rice UI 官方提供技术支持，对 uni-app X 最新特性及 **Vapor 蒸汽模式** 提供了原生级的完美适配与支持；
-> 2. **关于 uview-ultra 的维护声明**：由于个人精力有限，本项目后续将**不再维护本地定制版 `uview-ultra`** 组件库，建议新开项目或追求长期稳定性的开发者全面选用 **`uniX-rice-ui`** 分支。
+> 1. **主分支（`main`）**：全面兼容 **Vapor 模式** 与 **VDOM 模式**（**默认开启 Vapor 模式**）。内置了作者深度修复的 `uview-ultra` 组件库，常用基础组件功能完备、**基本够用**。但由于个人精力有限，作者后续将**不再对其进行维护与后续定制**。
+> 2. **`uniX-rice-ui` 分支（强烈推荐）**：集成了由 **Rice UI 官方团队持续维护** 的组件库，同样完美支持 Vapor 和 VDOM 模式。若有新项目或需要长期维护支持，强烈建议选用 **`uniX-rice-ui`** 分支。
 
 ## ✨ 特性
 
-* 🚀 **uni-app X** — 基于 UTS 语言的原生渲染，性能远超 WebView 方案
+* 🚀 **uni-app X (Vapor & VDOM 全面兼容)** — 默认启用 Vapor 蒸汽模式（无虚拟 DOM 高性能原生渲染），同时完美兼容传统 VDOM 模式自由切换
 * 💪 **Vue3 + Vite5** — 最新前端技术栈，开发体验极佳
 * 🎨 **UnoCSS** — 原子化 CSS 引擎，高效编写样式
-* 📦 **uview-ultra** — 专为 uni-app X 打造的 UI 组件库（本项目使用的为自行修复过的版本，深度修复了大量的 bug 与兼容性问题，如针对 uni-app X 原生平台暂不支持 `gap`、`display: grid` 等 CSS 属性的限制，重构并修复了 `up-box`、`up-sticky`、`up-tooltip` 等核心组件，保障原生端的流畅体验）
+* 📦 **uview-ultra** — 专为 uni-app X 打造的 UI 组件库（内置深度修复版，已全面兼容 Vapor 与 VDOM 模式，常用基础功能完备，基本够用；后续不再单独维护与定制）
 * 📜 **z-paging-x** — 强大的分页列表组件（本项目已对 [z-paging-x.uvue](file:///Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/z-paging-x/components/z-paging-x/z-paging-x.uvue) 底层 Android 嵌套手势协商、Flex 布局及 `type="nested"` 架构进行了深度兼容修改与适配）
 * 🔧 **Pinia 持久化** — 状态管理 + 本地持久化，开箱即用
 * 🌐 **i18n 多语言** — 内置中英文切换，支持自动检测系统语言
@@ -135,7 +130,7 @@
 
 * Node >= 22
 * pnpm >= 7.30
-* HBuilderX = 5.15（升级版本可能会出现各种问题）
+* HBuilderX >= 5.15（强烈推荐 **HBuilderX 5.24** 体验 Vapor 蒸汽模式；若不使用 Vapor 模式，使用 5.15 及之后版本均可）
 * Vue Official >= 2.1.10
 * TypeScript >= 5.0
 * JDK >= 17（Android 平台）
@@ -223,18 +218,8 @@ unibestX/
 
 ### 1. 克隆项目与分支选择
 
-* **Rice UI 官方支持分支（推荐，完美支持 Vapor & VDOM 自由切换）**：
-
-  ```bash
-  # 直接克隆 uniX-rice-ui 分支
-  git clone -b uniX-rice-ui https://github.com/cq112233/unibestX.git
-  cd unibestX
-
-  # 或在已有项目中切换到 uniX-rice-ui 分支
-  git checkout uniX-rice-ui
-  ```
-
-* **主分支（main，内置历史修改版 uview-ultra）**：
+* **主分支（main，默认 Vapor 模式，全面兼通 Vapor & VDOM）**：
+  > 内置深度修复与 Vapor/VDOM 兼容的 `uview-ultra`，基础功能完备基本够用（后续不再维护定制）。
 
   ```bash
   # GitHub
@@ -246,15 +231,16 @@ unibestX/
   cd uni-best-x
   ```
 
-* **Vapor 尝鲜体验分支（vopar）**：
+* **Rice UI 官方支持分支（推荐，团队持续维护，`uniX-rice-ui`）**：
+  > 集成由 Rice UI 官方团队持续维护的组件库，完美支持 Vapor & VDOM 模式自由切换，推荐新项目或需长期维护的项目选用。
 
   ```bash
-  # 直接克隆 vopar 分支
-  git clone -b vopar https://github.com/cq112233/unibestX.git
+  # 直接克隆 uniX-rice-ui 分支
+  git clone -b uniX-rice-ui https://github.com/cq112233/unibestX.git
   cd unibestX
 
-  # 或在已有项目中切换到 vopar 分支
-  git checkout vopar
+  # 或在已有项目中切换到 uniX-rice-ui 分支
+  git checkout uniX-rice-ui
   ```
 
 ### 2. 安装依赖
@@ -288,6 +274,21 @@ pnpm install
 * **微信小程序**：在 HBuilderX 中选择 `发行 → 小程序-微信`，然后通过微信开发者工具上传。
 
 ## 🧩 核心功能说明
+
+### Vapor 蒸汽模式与 VDOM 模式切换
+
+本项目 `main` 分支全面兼通 **Vapor 模式** 与 **VDOM 模式**，**默认开启 Vapor 模式** 以获得极致的原生无虚拟 DOM 性能。
+
+你可以通过修改根目录下的 `manifest.json` 随时切换模式：
+
+```json
+{
+  "uni-app-x": {
+    "styleIsolationVersion": "2",
+    "vapor": true // true 为 Vapor 蒸汽模式 (默认)；false 为传统 VDOM 模式
+  }
+}
+```
 
 ### 自定义 TabBar
 
@@ -346,12 +347,12 @@ pnpm install
 
 | 类别      | 技术                    | 说明                                     |
 | ------- | --------------------- | -------------------------------------- |
-| 框架      | uni-app X             | 下一代 uni-app，原生渲染                       |
+| 框架      | uni-app X (Vapor / VDOM) | 下一代 uni-app，默认 Vapor 模式原生渲染，全面兼容 VDOM |
 | 语言      | UTS                   | uni-app Type Script，编译为原生 Kotlin/Swift |
 | 前端框架    | Vue 3                 | Composition API                        |
 | 构建工具    | Vite 5                | 极速开发体验                                 |
 | CSS 引擎  | UnoCSS                | 原子化 CSS，自定义规则                          |
-| UI 组件库  | uview-ultra           | uni-app X 专用 UI 库（本项目使用的为自行修复过的版本，已深度重构修复原生 `gap`/`grid` 限制下的多端兼容问题，如 `up-sticky`、`up-box` 等） |
+| UI 组件库  | uview-ultra           | uni-app X 专用 UI 库（内置深度修复版，全面兼容 Vapor/VDOM 模式，基础功能完备基本够用；后续不再维护定制） |
 | 分页组件    | z-paging-x            | 强大的下拉刷新 + 分页加载                         |
 | 状态管理    | x-pinia-s (Pinia)     | uni-app X 版 Pinia                      |
 | HTTP 请求 | lime-request          | uni-app X 兼容请求库                        |
