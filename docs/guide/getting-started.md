@@ -22,14 +22,33 @@
 
 ## 📂 快速开始
 
-### 1. 克隆项目
+### 1. 创建 / 克隆项目
 
-将项目克隆到本地计算机：
+* **方式一：通过 `degit` 快速创建（推荐，无历史提交记录）**：
 
-```bash
-git clone https://github.com/cq112233/unibestX.git
-cd unibestX
-```
+  ```bash
+  # 主分支（main，默认 VDOM 模式，全面兼通 VDOM & Vapor）
+  npx degit cq112233/unibestX my-project
+
+  # Rice UI 官方支持分支（强烈推荐，团队持续维护，支持 VDOM & Vapor 模式）
+  npx degit cq112233/unibestX#uniX-rice-ui my-project
+  ```
+
+* **方式二：通过 `git clone` 克隆**：
+
+  ```bash
+  # GitHub
+  git clone https://github.com/cq112233/unibestX.git
+  cd unibestX
+
+  # Gitee（国内加速推荐）
+  git clone https://gitee.com/htwoO-cq/uni-best-x.git
+  cd uni-best-x
+
+  # 或克隆 Rice UI 官方支持分支（推荐）
+  git clone -b uniX-rice-ui https://github.com/cq112233/unibestX.git
+  cd unibestX
+  ```
 
 ### 2. 安装依赖
 
@@ -39,26 +58,60 @@ cd unibestX
 pnpm install
 ```
 
-### 3. 打开项目
+### 3. 运行项目（支持热更新）
 
-使用 **HBuilderX** 打开克隆下来的项目根目录。
+项目支持 **命令行 (CLI)** 与 **HBuilderX 图形界面** 两种开发运行方式：
 
-## 📦 运行项目（支持热更新）
+#### 🖥️ 方式一：命令行 CLI 运行
 
-在 HBuilderX 的顶部菜单栏中，您可以选择不同的平台来启动运行：
+```bash
+# 运行到 H5 / Web 端
+pnpm dev:web
 
-* **Android 平台**：选择 `运行` → `运行到手机或模拟器`，然后选择目标安卓设备。
-* **iOS 平台**：选择 `运行` → `运行到手机或模拟器`，选择 iOS 设备。
-* **鸿蒙平台**：选择 `运行` → `运行到手机或模拟器`，选择鸿蒙设备。
-* **H5 平台**：选择 `运行` → `运行到浏览器`。
-* **微信小程序**：选择 `运行` → `运行到小程序模拟器` → `微信开发者工具`。
+# 运行到 Android 原生端
+pnpm dev:app-android
 
-## 🔗 发布构建
+# 运行到 iOS 原生端（需 macOS + Xcode 环境）
+pnpm dev:app-ios
+
+# 运行到 鸿蒙原生端（需 DevEco Studio 环境）
+pnpm dev:app-harmony
+
+# 运行到 微信小程序
+pnpm dev:mp-weixin
+
+# 运行到 支付宝小程序
+pnpm dev:mp-alipay
+```
+
+#### 🛠️ 方式二：HBuilderX 图形化运行
+
+使用 **HBuilderX** 打开克隆下来的项目根目录，在顶部菜单栏中选择：
+
+* **Android 平台**：选择 `运行 → 运行到手机或模拟器`，然后选择目标安卓设备。
+* **iOS 平台**：选择 `运行 → 运行到手机或模拟器`，选择 iOS 设备。
+* **鸿蒙平台**：选择 `运行 → 运行到手机或模拟器`，选择鸿蒙设备。
+* **H5 平台**：选择 `运行 → 运行到浏览器`。
+* **微信小程序**：选择 `运行 → 运行到小程序模拟器 → 微信开发者工具`。
+
+### 4. 发布构建
 
 完成开发后，您可以通过以下方式打包发布：
 
-* **Android 平台**：选择 `发行` → `原生App-云打包` 或 `原生App-本地打包`。
-* **iOS 平台**：选择 `发行` → `原生App-云打包`（需 Apple 开发者证书）。
-* **鸿蒙平台**：选择 `发行` → `原生App-鸿蒙`。
-* **H5 平台**：选择 `发行` → `网站-H5手机版`，打包后的文件将生成在 `dist/build/h5` 目录下。
-* **微信小程序**：选择 `发行` → `小程序-微信`，然后通过微信开发者工具上传代码。
+#### 🖥️ 命令行打包构建
+
+```bash
+# 打包构建 H5
+pnpm build:h5
+
+# 打包构建 微信小程序
+pnpm build:mp-weixin
+```
+
+#### 🛠️ HBuilderX 发行打包
+
+* **Android 平台**：选择 `发行 → 原生App-云打包` 或 `原生App-本地打包`。
+* **iOS 平台**：选择 `发行 → 原生App-云打包`（需 Apple 开发者证书）。
+* **鸿蒙平台**：选择 `发行 → 原生App-鸿蒙`。
+* **H5 平台**：选择 `发行 → 网站-H5手机版`，打包后的文件将生成在 `dist/build/h5` 目录下。
+* **微信小程序**：选择 `发行 → 小程序-微信`，然后通过微信开发者工具上传代码。
