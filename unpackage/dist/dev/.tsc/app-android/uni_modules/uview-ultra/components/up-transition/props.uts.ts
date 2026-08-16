@@ -1,0 +1,36 @@
+/*
+ * @Author       : jry
+ * @Description  : uview-plus component's props mixin file
+ * @version      : 4.0
+ * @Date         : 2024-04-22 16:44:21
+ * @LastAuthor   : jry
+ * @lastTime     : 2024-08-28 12:27:20
+ */
+import { defineMixin } from '../../libs/vue'
+import defProps from './transition.uts'
+let crtProp = defProps['transition'] as UTSJSONObject
+
+export const propsTransition = defineMixin({
+    props: {
+        // 是否展示组件
+        show: {
+            type: Boolean,
+            default: crtProp['show']
+        },
+        // 使用的动画模式
+        mode: {
+            type: String,
+            default: crtProp['mode']
+        },
+        // 动画的执行时间，单位ms
+        duration: {
+            type: [Number, String],
+            default: crtProp['duration']
+        },
+        // 使用的动画过渡函数
+        timingFunction: {
+            type: String,
+            default: crtProp['timingFunction']
+        }
+    }
+})

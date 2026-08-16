@@ -1,0 +1,325 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚÙimport { camelize, hyphenate } from '../helper/utils';
+import { NativeMap } from './NativeMap';
+function getDatasetKey(key) {
+    return camelize(key.substring(5));
+}
+const ignoreKeys = ['class'];
+// TODO æš‚æ—¶å¿½ç•¥ forEach ç­‰æ–¹æ³•å’Œ dataset çš„å…³è”
+export class NamedNodeMap extends NativeMap {
+    // ets ç±»å‹é—®é¢˜ï¼Œä½¿ç”¨ UniElementImpl ä¼šæŠ¥é”™
+    constructor(element) {
+        super();
+        this.element = element;
+    }
+    set(key, value) {
+        let oldValue;
+        let newKey = undefined;
+        if (value === undefined) {
+            value = null;
+        }
+        if (this.element && key.startsWith('data-')) {
+            oldValue = this.element.dataset.get(getDatasetKey(key));
+            this.element.dataset.set(getDatasetKey(key), value);
+        }
+        else {
+            newKey = camelize(key);
+            oldValue = this.get(newKey);
+            if (oldValue !== value) {
+                super.set(newKey, value);
+                if (!ignoreKeys.includes(newKey)) {
+                    this.updateNativeNodeAttr(newKey, value);
+                }
+            }
+        }
+        this.attributeChangedCallback(key, oldValue, value, newKey);
+        return this;
+    }
+    get(key) {
+        if (this.element && key.startsWith('data-')) {
+            return this.element.dataset.get(getDatasetKey(key));
+        }
+        return super.get(camelize(key));
+    }
+    has(key) {
+        if (this.element && key.startsWith('data-')) {
+            return this.element.dataset.has(getDatasetKey(key));
+        }
+        return super.has(camelize(key));
+    }
+    delete(key) {
+        let res = false;
+        if (this.element && key.startsWith('data-')) {
+            const oldVal = this.element.dataset.get(getDatasetKey(key));
+            res = this.element.dataset.delete(getDatasetKey(key));
+            if (res) {
+                this.attributeChangedCallback(key, oldVal, null);
+            }
+        }
+        else {
+            const newKey = camelize(key);
+            if (this.has(newKey)) {
+                const oldVal = this.get(newKey);
+                res = super.delete(newKey);
+                if (!ignoreKeys.includes(newKey)) {
+                    // TODO æš‚æ—¶è®¾ç½®åˆå§‹å€¼ä¸ºç©ºå­—ç¬¦ä¸²
+                    this.updateNativeNodeAttr(newKey, '');
+                }
+                this.attributeChangedCallback(key, oldVal, null, newKey);
+            }
+        }
+        return res;
+    }
+    updateNativeNodeAttr(key, val) {
+        this.element?.updateNativeAttribute(key, val);
+    }
+    /**
+     * @internal
+     */
+    attributeChangedCallback(name, oldValue, newValue, camelizeName) {
+        const element = this.element;
+        const options = element?._options;
+        if (options) {
+            const observedAttributes = options.observedAttributes;
+            if (observedAttributes && observedAttributes.length) {
+                const names = [name];
+                // æ—  camelizeName ç›´æ¥å¿½ç•¥è½¬æ¢
+                if (camelizeName) {
+                    if (camelizeName !== name) {
+                        names.push(camelizeName);
+                    }
+                    else {
+                        const hyphenateName = hyphenate(name);
+                        if (hyphenateName !== name) {
+                            names.push(hyphenateName);
+                        }
+                    }
+                }
+                names.forEach((name) => {
+                    if (observedAttributes.includes(name)) {
+                        const customElement = element;
+                        customElement.attributeChangedCallback?.(name, oldValue, newValue);
+                    }
+                });
+            }
+        }
+    }
+    /**
+     * @internal
+     */
+    dispose() {
+        this.element = undefined;
+    }
+}
+export function toNativeNodeAttr(map) {
+    throw new Error('Not implemented');
+}
+//# sourceMappingURL=NamedNodeMap.js.mapÂ’Ùò/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/helper/utils.tsÙó/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/NativeMap.tsÙö/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/NamedNodeMap.tsÔrB˜±isLocalDependency¯isNodeEntryFile§pkgPath§pkgNameªpkgVersion±belongProjectPath±dependencyPkgInfo¬shouldEmitJsÂÂÙâ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime½@dcloudio/uni-runtime-harmony¥1.0.0ÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmonyÔrC’§pkgNameªpkgVersion½@dcloudio/uni-runtime-harmony¥1.0.0ÃÃÚLimport { ElementOptions } from './BuiltInElement'
+import { camelize, hyphenate } from '../helper/utils'
+import { UniCustomElement, CustomElementOptions } from './CustomElement'
+import { NativeMap } from './NativeMap'
+
+function getDatasetKey(key: string) {
+  return camelize(key.substring(5))
+}
+
+const ignoreKeys = ['class']
+
+export interface NamedNodeElement {
+  _options?: ElementOptions
+  dataset: Map<string, Object>
+
+  updateNativeAttribute(key: string, value: ESObject): void
+}
+
+// TODO æš‚æ—¶å¿½ç•¥ forEach ç­‰æ–¹æ³•å’Œ dataset çš„å…³è”
+export class NamedNodeMap extends NativeMap<string, ESObject> {
+  private element?: NamedNodeElement
+
+  // ets ç±»å‹é—®é¢˜ï¼Œä½¿ç”¨ UniElementImpl ä¼šæŠ¥é”™
+  constructor(element: NamedNodeElement) {
+    super()
+    this.element = element
+  }
+
+  set(key: string, value: ESObject): ESObject {
+    let oldValue: ESObject
+    let newKey: string | undefined = undefined
+    if (value === undefined) {
+      value = null
+    }
+    if (this.element && key.startsWith('data-')) {
+      oldValue = this.element.dataset.get(getDatasetKey(key))
+      this.element.dataset.set(getDatasetKey(key), value)
+    } else {
+      newKey = camelize(key)
+      oldValue = this.get(newKey) as Object
+      if (oldValue !== value) {
+        super.set(newKey, value)
+        if (!ignoreKeys.includes(newKey)) {
+          this.updateNativeNodeAttr(newKey, value)
+        }
+      }
+    }
+    this.attributeChangedCallback(key, oldValue, value, newKey)
+    return this
+  }
+
+  get(key: string): ESObject {
+    if (this.element && key.startsWith('data-')) {
+      return this.element.dataset.get(getDatasetKey(key))
+    }
+    return super.get(camelize(key))
+  }
+
+  has(key: string): boolean {
+    if (this.element && key.startsWith('data-')) {
+      return this.element.dataset.has(getDatasetKey(key))
+    }
+    return super.has(camelize(key))
+  }
+
+  delete(key: string): boolean {
+    let res = false
+    if (this.element && key.startsWith('data-')) {
+      const oldVal = this.element.dataset.get(getDatasetKey(key))
+      res = this.element.dataset.delete(getDatasetKey(key))
+      if (res) {
+        this.attributeChangedCallback(key, oldVal, null)
+      }
+    } else {
+      const newKey = camelize(key)
+      if (this.has(newKey)) {
+        const oldVal = this.get(newKey) as Object
+        res = super.delete(newKey)
+        if (!ignoreKeys.includes(newKey)) {
+          // TODO æš‚æ—¶è®¾ç½®åˆå§‹å€¼ä¸ºç©ºå­—ç¬¦ä¸²
+          this.updateNativeNodeAttr(newKey, '')
+        }
+        this.attributeChangedCallback(key, oldVal, null, newKey)
+      }
+    }
+    return res
+  }
+
+  private updateNativeNodeAttr(key: string, val: ESObject) {
+    this.element?.updateNativeAttribute(key, val)
+  }
+
+  /**
+   * @internal
+   */
+  attributeChangedCallback(
+    name: string,
+    oldValue: Object | null,
+    newValue: Object | null,
+    camelizeName?: string
+  ) {
+    const element = this.element
+    const options = element?._options as CustomElementOptions
+    if (options) {
+      const observedAttributes = options.observedAttributes
+      if (observedAttributes && observedAttributes.length) {
+        const names = [name]
+        // æ—  camelizeName ç›´æ¥å¿½ç•¥è½¬æ¢
+        if (camelizeName) {
+          if (camelizeName !== name) {
+            names.push(camelizeName)
+          } else {
+            const hyphenateName = hyphenate(name)
+            if (hyphenateName !== name) {
+              names.push(hyphenateName)
+            }
+          }
+        }
+        names.forEach((name) => {
+          if (observedAttributes.includes(name)) {
+            const customElement = element as UniCustomElement
+            customElement.attributeChangedCallback?.(name, oldValue, newValue)
+          }
+        })
+      }
+    }
+  }
+
+  /**
+   * @internal
+   */
+  dispose() {
+    this.element = undefined
+  }
+}
+
+export function toNativeNodeAttr(map: NamedNodeMap) {
+  throw new Error('Not implemented')
+}
+ÀÔrD’¯../helper/utils«./NativeMapÔrE—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙò/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/helper/utils.tsAÃªoh-resolveÂEAÂÙó/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/NativeMap.tsAÃªoh-resolveÂ“ÔrF–§version¤fileªsourceRoot§sources¥names¨mappings¯NamedNodeMap.js ‘¯NamedNodeMap.tsÜ sš”   ” ”	 	” ” ” ” ”$ $”5 5”6 5˜”   ” ”	 	” ” ” ”' '”( '•”   ”	 	” ” ” "œ” ” 	” ” ” ” ”! ”"  ”# !”$ "”% #”& #’”   ” ˜”  	 ” 	” 	” 	” 	” 	” 	” 	’”   ”% %–”   ” ” ” ”" "”+ =’” ”% #“” ” ” '”” ” 	” ” —” ” ” 	” ” ” ” ’” ” –” ” ” ” ” ” "”” ” ” ” –” ” ” ” %” .” .–” ” ” ” ” ”! •”  ”  ”  ”  ”  ‘”	 !” "” "” "” "” "” "” "”  "”* "&”+ "'”2 ".”3 "/”5 "1Ü ” #” #” #” #” #”# #”$ #”+ #%”, #&”/ #)”0 #*”= #7”> #8”ÌA #;”ÌB #<”ÌC #=”ÌD #=Ü ” $” $
+” $” $” $”  $”! $”$ $”% $”2 $,”3 $-”6 $0”7 $1”9 $3”> $8”? $9”Ì@ $9‘”	 %‘” %˜” &” &” &” &” &”! &”" &”# &š” '” '” '” '” '” '”  '”& ' ”' '+”( '+–” (” (
+” (” (”" (”$ (š” )” )” )” )” )”  )”" )”' )”( ) ”) ) š” *” *” *” *”  *”( * ”) *!”/ *'”0 *(”2 **š” +
+” +” +”- +#”. +$”4 +*”6 +,”; +1”< +2”= +2‘” ,	‘” -‘”	 .” /” /” /	”% /!”& /"”) /%”+ /'”3 //”5 /1”: /6”< /8”ÌB />”ÌC /?”ÌD /?”” 0” 0” 0” 0’” 1” 1”” 3” 3” 3” 3” 4” 4” 4” 4” 4” 4” 4”  4”* 4&”+ 4'”2 4.”3 4/”5 41Ü ” 5” 5” 5” 5” 5”  5”' 5!”( 5"”+ 5%”, 5&”9 53”: 54”= 57”> 58”? 59”Ì@ 59‘”	 6œ” 7” 7” 7” 7” 7” 7”! 7”" 7”% 7!”& 7"”' 7#”( 7#’” 8” 8”” :” :” :” :” ;” ;” ;” ;” ;” ;” ;”  ;”* ;&”+ ;'”2 ;.”3 ;/”5 ;1Ü ” <” <” <” <” <”  <”' <!”( <"”+ <%”, <&”9 <3”: <4”= <7”> <8”? <9”Ì@ <9‘”	 =œ” >” >” >” >” >” >”! >”" >”% >!”& >"”' >#”( >#’” ?” ?”” ÌA”
+ ÌA” ÌA	” ÌA–” ÌB” ÌB” ÌB” ÌB” ÌB” ÌB” ÌC” ÌC” ÌC” ÌC” ÌC” ÌC” ÌC”  ÌC”* ÌC&”+ ÌC'”2 ÌC.”3 ÌC/”5 ÌC1Ü ” ÌD” ÌD” ÌD” ÌD” ÌD”  ÌD”' ÌD!”( ÌD"”/ ÌD)”0 ÌD*”3 ÌD-”4 ÌD.”ÌA ÌD;”ÌB ÌD<”ÌE ÌD?”ÌF ÌDÌ@”ÌG ÌDÌA”ÌH ÌDÌAÜ ” ÌE” ÌE	” ÌE” ÌE” ÌE” ÌE” ÌE”& ÌE ”' ÌE!”- ÌE'”. ÌE(”; ÌE5”< ÌE6”? ÌE9”Ì@ ÌE:”ÌA ÌE;”ÌB ÌE;”” ÌF” ÌF
+” ÌF” ÌFœ” ÌG” ÌG” ÌG”- ÌG%”. ÌG&”1 ÌG)”3 ÌG+”9 ÌG1”; ÌG3”? ÌG7”Ì@ ÌG8”ÌA ÌG8‘” ÌH‘”	 ÌI‘” ÌI™” ÌJ” ÌJ” ÌJ” ÌJ”# ÌJ”$ ÌJ”' ÌJ!”( ÌJ"”) ÌJ"™” ÌK” ÌK
+” ÌK” ÌK” ÌK” ÌK” ÌK”  ÌK”" ÌK›” ÌL” ÌL” ÌL” ÌL”# ÌL”$ ÌL”' ÌL”( ÌL ”. ÌL&”/ ÌL1”0 ÌL1š” ÌM” ÌM” ÌM” ÌM” ÌM”" ÌM”# ÌM”) ÌM!”* ÌM"”+ ÌM"š” ÌN” ÌN” ÌN” ÌN”  ÌN”( ÌN ”) ÌN!”/ ÌN'”0 ÌN(”2 ÌN*’” ÌO
+”( ÌOš” ÌP
+” ÌP” ÌP”- ÌP#”. ÌP$”4 ÌP*”6 ÌP,”8 ÌP.”9 ÌP/”: ÌP/‘” ÌQ	” ÌR” ÌR” ÌR”- ÌR%”. ÌR&”1 ÌR)”3 ÌR+”9 ÌR1”; ÌR3”? ÌR7”ÌA ÌR9”ÌG ÌR?”ÌH ÌRÌ@”ÌI ÌRÌ@‘” ÌS‘”	 ÌT”” ÌU” ÌU” ÌU” ÌU’” ÌV” ÌV–” ÌX
+” ÌX” ÌX” ÌX*” ÌX,”! ÌX9œ” ÌY” ÌY” ÌY	” ÌY” ÌY”+ ÌY'”, ÌY(”/ ÌY+”1 ÌY-”4 ÌY0”5 ÌY1”6 ÌY1’” ÌZ” ÌZ‘” Ì\‘” Ì^š” Ì_” Ì_” Ì`”! Ì`”# Ìa”+ Ìa”- Ìb”5 Ìb”7 Ìc”ÌC Ìc˜” Ìe” Ìe
+” Ìe” Ìe” Ìe” Ìe”$ Ìe ”% Ìe ˜” Ìf” Ìf
+” Ìf” Ìf” Ìf”! Ìf”) Ìf=”* Ìf=”” Ìg” Ìg” Ìg” Ìg˜” Ìh” Ìh”$ Ìh”' Ìh!”. Ìh(”/ Ìh)”ÌA Ìh;”ÌB Ìh;˜” Ìi” Ìi
+”" Ìi”& Ìi ”8 Ìi2”9 Ìi3”? Ìi9”ÌA Ìi;˜” Ìj” Ìj” Ìj” Ìj” Ìj”# Ìj”$ Ìj”% Ìj’” Ìk”( Ìk ”” Ìl” Ìl”  Ìl”" Ìl–” Ìm
+” Ìm”$ Ìm”) Ìm”- Ìm#”/ Ìm%˜” Ìn” Ìn” Ìn”" Ìn”# Ìn”/ Ìn#”0 Ìn$”1 Ìn$‘” Ìo‘” Ìo™” Ìp” Ìp”+ Ìp”. Ìp"”7 Ìp+”8 Ìp,”< Ìp0”= Ìp1”> Ìp1–” Ìq” Ìq”) Ìq”. Ìq"”2 Ìq&”4 Ìq(˜” Ìr”! Ìr”" Ìr”& Ìr”' Ìr”4 Ìr&”5 Ìr'”6 Ìr'‘” Ìs‘” Ìt‘” Ìu	™” Ìv” Ìv” Ìv” Ìv” Ìv” Ìv”# Ìv”% Ìv”' Ìv™” Ìw
+” Ìw”* Ìw ”+ Ìw!”3 Ìw)”4 Ìw*”8 Ìw.”9 Ìw/”; Ìw1–” Ìx” Ìx”+ Ìx”. Ìx"”5 Ìx=”6 Ìx=” Ìy”% Ìy”& Ìy”> Ìy2”Ì@ Ìy4”ÌA Ìy5”ÌE Ìy9”ÌG Ìy;”ÌO ÌyÌC”ÌQ ÌyÌE”ÌY ÌyÌM”ÌZ ÌyÌN”Ì[ ÌyÌN‘” Ìz”” Ì{” Ì{	” Ì{
+” Ì{
+‘” Ì|‘”	 Ì}’” Ì~” Ì~‘” Ì€‘” Ì‚’” Ìƒ” Ìƒ	—” Ì„” Ì„” Ì„	” Ì„” Ì„”  Ì„”! Ì„’” Ì…” Ì…‘” Ì†–”  Ìˆ ” Ìˆ” Ìˆ”  Ìˆ ”! Ìˆ!”$ Ìˆ2˜” Ì‰”
+ Ì‰” Ì‰” Ì‰” Ì‰”% Ì‰#”& Ì‰$”' Ì‰$’”  ÌŠ ” ÌŠÔrG–§version¤file§sources®sourcesContent¥names¨mappingsÀ‘À‘ÀÜ t‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache’ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÌòÍ
+ÔrK–¤type¥start£end¢idªsuperClass¤body°ClassDeclarationÌùÍ
+ÔrL”¤type¥start£end¤nameªIdentifierÌÿÍ¬NamedNodeMapLªIdentifierÍÍ©NativeMapÔrM”¤type¥start£end¤body©ClassBodyÍÍ
+˜ÔrN˜¤type¥start£end¦static¨computed£key¤kind¥value°MethodDefinitionÍLÍœÂÂLªIdentifierÍLÍW«constructor«constructorÔrO™¤type¥start£end¢idªexpression©generator¥async¦params¤body²FunctionExpressionÍWÍœÀÂÂÂ‘LªIdentifierÍXÍ_§elementM®BlockStatementÍaÍœ’ÔrP”¤type¥start£endªexpression³ExpressionStatementÍlÍtÔrQ–¤type¥start£end¦callee©arguments¨optional®CallExpressionÍlÍsÔrR“¤type¥start£end¥SuperÍlÍqÂP³ExpressionStatementÍ~Í•ÔrS–¤type¥start£end¨operator¤left¥right´AssignmentExpressionÍ~Í”¡=ÔrT—¤type¥start£end¦object¨property¨computed¨optional°MemberExpressionÍ~ÍŠR®ThisExpressionÍ~Í‚LªIdentifierÍƒÍŠ§elementÂÂLªIdentifierÍÍ”§elementN°MethodDefinitionÍ¢ÍµÂÂLªIdentifierÍ¢Í¥£set¦methodO²FunctionExpressionÍ¥ÍµÀÂÂÂ’LªIdentifierÍ¦Í©£keyLªIdentifierÍ«Í°¥valueM®BlockStatementÍ²Íµ–ÔrU•¤type¥start£end¬declarations¤kind³VariableDeclarationÍ½ÍÊ‘ÔrV•¤type¥start£end¢id¤init²VariableDeclaratorÍÁÍÉLªIdentifierÍÁÍÉ¨oldValueÀ£letU³VariableDeclarationÍÔÍë‘V²VariableDeclaratorÍØÍêLªIdentifierÍØÍŞ¦newKeyLªIdentifierÍáÍê©undefined£letÔrW–¤type¥start£end¤testªconsequent©alternate«IfStatementÍõÍ5ÔrX–¤type¥start£end¤left¨operator¥right°BinaryExpressionÍùÍLªIdentifierÍùÍş¥value£===LªIdentifierÍÍ©undefinedM®BlockStatementÍÍ5‘P³ExpressionStatementÍÍ*S´AssignmentExpressionÍÍ)¡=LªIdentifierÍÍ"¥valueÔrY•¤type¥start£end¥value£raw§LiteralÍ%Í)À¤nullÀW«IfStatementÍ?ÍRX±LogicalExpressionÍCÍjT°MemberExpressionÍCÍOR®ThisExpressionÍCÍGLªIdentifierÍHÍO§elementÂÂ¢&&Q®CallExpressionÍSÍjT°MemberExpressionÍSÍaLªIdentifierÍSÍV£keyLªIdentifierÍWÍaªstartsWithÂÂ‘Y§LiteralÍbÍi¥data-§'data-'ÂM®BlockStatementÍlÍ ’P³ExpressionStatementÍ{Í³S´AssignmentExpressionÍ{Í²¡=LªIdentifierÍ{Íƒ¨oldValueQ®CallExpressionÍ†Í²T°MemberExpressionÍ†ÍT°MemberExpressionÍ†ÍšT°MemberExpressionÍ†Í’R®ThisExpressionÍ†ÍŠLªIdentifierÍ‹Í’§elementÂÂLªIdentifierÍ“Íš§datasetÂÂLªIdentifierÍ›Í£getÂÂ‘Q®CallExpressionÍŸÍ±LªIdentifierÍŸÍ¬­getDatasetKey‘LªIdentifierÍ­Í°£keyÂÂP³ExpressionStatementÍÁÍõQ®CallExpressionÍÁÍôT°MemberExpressionÍÁÍÙT°MemberExpressionÍÁÍÕT°MemberExpressionÍÁÍÍR®ThisExpressionÍÁÍÅLªIdentifierÍÆÍÍ§elementÂÂLªIdentifierÍÎÍÕ§datasetÂÂLªIdentifierÍÖÍÙ£setÂÂ’Q®CallExpressionÍÚÍìLªIdentifierÍÚÍç­getDatasetKey‘LªIdentifierÍèÍë£keyÂLªIdentifierÍîÍó¥valueÂM®BlockStatementÍÍR“P³ExpressionStatementÍÍ5S´AssignmentExpressionÍÍ4¡=LªIdentifierÍÍ$¦newKeyQ®CallExpressionÍ'Í4LªIdentifierÍ'Í/¨camelize‘LªIdentifierÍ0Í3£keyÂP³ExpressionStatementÍCÍ_S´AssignmentExpressionÍCÍ^¡=LªIdentifierÍCÍK¨oldValueQ®CallExpressionÍNÍ^T°MemberExpressionÍNÍVR®ThisExpressionÍNÍRLªIdentifierÍSÍV£getÂÂ‘LªIdentifierÍWÍ]¦newKeyÂW«IfStatementÍmÍGX°BinaryExpressionÍqÍƒLªIdentifierÍqÍy¨oldValue£!==LªIdentifierÍ~Íƒ¥valueM®BlockStatementÍ…ÍG’P³ExpressionStatementÍ˜Í±Q®CallExpressionÍ˜Í°T°MemberExpressionÍ˜Í¡R¥SuperÍ˜ÍLªIdentifierÍÍ¡£setÂÂ’LªIdentifierÍ¢Í¨¦newKeyLªIdentifierÍªÍ¯¥valueÂW«IfStatementÍÃÍ8ÔrZ–¤type¥start£end¨operator¦prefix¨argument¯UnaryExpressionÍÇÍã¡!ÃQ®CallExpressionÍÈÍãT°MemberExpressionÍÈÍÛLªIdentifierÍÈÍÒªignoreKeysLªIdentifierÍÓÍÛ¨includesÂÂ‘LªIdentifierÍÜÍâ¦newKeyÂM®BlockStatementÍåÍ8‘P³ExpressionStatementÍüÍ%Q®CallExpressionÍüÍ$T°MemberExpressionÍüÍR®ThisExpressionÍüÍ LªIdentifierÍÍ´updateNativeNodeAttrÂÂ’LªIdentifierÍÍ¦newKeyLªIdentifierÍÍ#¥valueÂÀÀP³ExpressionStatementÍ\Í˜Q®CallExpressionÍ\Í—T°MemberExpressionÍ\ÍyR®ThisExpressionÍ\Í`LªIdentifierÍaÍy¸attributeChangedCallbackÂÂ”LªIdentifierÍzÍ}£keyLªIdentifierÍÍ‡¨oldValueLªIdentifierÍ‰Í¥valueLªIdentifierÍÍ–¦newKeyÂÔr[”¤type¥start£end¨argument¯ReturnStatementÍ¢Í®R®ThisExpressionÍ©Í­N°MethodDefinitionÍ»Í{ÂÂLªIdentifierÍ»Í¾£get¦methodO²FunctionExpressionÍ¾Í{ÀÂÂÂ‘LªIdentifierÍ¿ÍÂ£keyM®BlockStatementÍÄÍ{’W«IfStatementÍÏÍJX±LogicalExpressionÍÓÍúT°MemberExpressionÍÓÍßR®ThisExpressionÍÓÍ×LªIdentifierÍØÍß§elementÂÂ¢&&Q®CallExpressionÍãÍúT°MemberExpressionÍãÍñLªIdentifierÍãÍæ£keyLªIdentifierÍçÍñªstartsWithÂÂ‘Y§LiteralÍòÍù¥data-§'data-'ÂM®BlockStatementÍüÍJ‘[¯ReturnStatementÍÍ?Q®CallExpressionÍÍ>T°MemberExpressionÍÍ*T°MemberExpressionÍÍ&T°MemberExpressionÍÍR®ThisExpressionÍÍLªIdentifierÍÍ§elementÂÂLªIdentifierÍÍ&§datasetÂÂLªIdentifierÍ'Í*£getÂÂ‘Q®CallExpressionÍ+Í=LªIdentifierÍ+Í8­getDatasetKey‘LªIdentifierÍ9Í<£keyÂÂÀ[¯ReturnStatementÍTÍtQ®CallExpressionÍ[ÍsT°MemberExpressionÍ[ÍdR¥SuperÍ[Í`LªIdentifierÍaÍd£getÂÂ‘Q®CallExpressionÍeÍrLªIdentifierÍeÍm¨camelize‘LªIdentifierÍnÍq£keyÂÂN°MethodDefinitionÍÍAÂÂLªIdentifierÍÍ„£has¦methodO²FunctionExpressionÍ„ÍAÀÂÂÂ‘LªIdentifierÍ…Íˆ£keyM®BlockStatementÍŠÍA’W«IfStatementÍ•ÍX±LogicalExpressionÍ™ÍÀT°MemberExpressionÍ™Í¥R®ThisExpressionÍ™ÍLªIdentifierÍÍ¥§elementÂÂ¢&&Q®CallExpressionÍ©ÍÀT°MemberExpressionÍ©Í·LªIdentifierÍ©Í¬£keyLªIdentifierÍ­Í·ªstartsWithÂÂ‘Y§LiteralÍ¸Í¿¥data-§'data-'ÂM®BlockStatementÍÂÍ‘[¯ReturnStatementÍÑÍQ®CallExpressionÍØÍT°MemberExpressionÍØÍğT°MemberExpressionÍØÍìT°MemberExpressionÍØÍäR®ThisExpressionÍØÍÜLªIdentifierÍİÍä§elementÂÂLªIdentifierÍåÍì§datasetÂÂLªIdentifierÍíÍğ£hasÂÂ‘Q®CallExpressionÍñÍLªIdentifierÍñÍş­getDatasetKey‘LªIdentifierÍÿÍ£keyÂÂÀ[¯ReturnStatementÍÍ:Q®CallExpressionÍ!Í9T°MemberExpressionÍ!Í*R¥SuperÍ!Í&LªIdentifierÍ'Í*£hasÂÂ‘Q®CallExpressionÍ+Í8LªIdentifierÍ+Í3¨camelize‘LªIdentifierÍ4Í7£keyÂÂN°MethodDefinitionÍGÍ	—ÂÂLªIdentifierÍGÍM¦delete¦methodO²FunctionExpressionÍMÍ	—ÀÂÂÂ‘LªIdentifierÍNÍQ£keyM®BlockStatementÍSÍ	—“U³VariableDeclarationÍ^Ín‘V²VariableDeclaratorÍbÍmLªIdentifierÍbÍe£resY§LiteralÍhÍmÂ¥false£letW«IfStatementÍxÍ	{X±LogicalExpressionÍ|Í£T°MemberExpressionÍ|ÍˆR®ThisExpressionÍ|Í€LªIdentifierÍÍˆ§elementÂÂ¢&&Q®CallExpressionÍŒÍ£T°MemberExpressionÍŒÍšLªIdentifierÍŒÍ£keyLªIdentifierÍÍšªstartsWithÂÂ‘Y§LiteralÍ›Í¢¥data-§'data-'ÂM®BlockStatementÍ¥Í©“U³VariableDeclarationÍ´Íğ‘V²VariableDeclaratorÍºÍïLªIdentifierÍºÍÀ¦oldValQ®CallExpressionÍÃÍïT°MemberExpressionÍÃÍÛT°MemberExpressionÍÃÍ×T°MemberExpressionÍÃÍÏR®ThisExpressionÍÃÍÇLªIdentifierÍÈÍÏ§elementÂÂLªIdentifierÍĞÍ×§datasetÂÂLªIdentifierÍØÍÛ£getÂÂ‘Q®CallExpressionÍÜÍîLªIdentifierÍÜÍé­getDatasetKey‘LªIdentifierÍêÍí£keyÂÂ¥constP³ExpressionStatementÍşÍ4S´AssignmentExpressionÍşÍ3¡=LªIdentifierÍşÍ£resQ®CallExpressionÍÍ3T°MemberExpressionÍÍT°MemberExpressionÍÍT°MemberExpressionÍÍR®ThisExpressionÍÍLªIdentifierÍ	Í§elementÂÂLªIdentifierÍÍ§datasetÂÂLªIdentifierÍÍ¦deleteÂÂ‘Q®CallExpressionÍ Í2LªIdentifierÍ Í-­getDatasetKey‘LªIdentifierÍ.Í1£keyÂÂW«IfStatementÍBÍLªIdentifierÍFÍI£resM®BlockStatementÍKÍ‘P³ExpressionStatementÍ^ÍQ®CallExpressionÍ^ÍT°MemberExpressionÍ^Í{R®ThisExpressionÍ^ÍbLªIdentifierÍcÍ{¸attributeChangedCallbackÂÂ“LªIdentifierÍ|Í£keyLªIdentifierÍÍ‡¦oldValY§LiteralÍ‰ÍÀ¤nullÂÀM®BlockStatementÍ¸Í	{’U³VariableDeclarationÍÇÍä‘V²VariableDeclaratorÍÍÍãLªIdentifierÍÍÍÓ¦newKeyQ®CallExpressionÍÖÍãLªIdentifierÍÖÍŞ¨camelize‘LªIdentifierÍßÍâ£keyÂ¥constW«IfStatementÍòÍ	pQ®CallExpressionÍöÍT°MemberExpressionÍöÍşR®ThisExpressionÍöÍúLªIdentifierÍûÍş£hasÂÂ‘LªIdentifierÍÿÍ¦newKeyÂM®BlockStatementÍÍ	p”U³VariableDeclarationÍÍ;‘V²VariableDeclaratorÍ!Í:LªIdentifierÍ!Í'¦oldValQ®CallExpressionÍ*Í:T°MemberExpressionÍ*Í2R®ThisExpressionÍ*Í.LªIdentifierÍ/Í2£getÂÂ‘LªIdentifierÍ3Í9¦newKeyÂ¥constP³ExpressionStatementÍMÍhS´AssignmentExpressionÍMÍg¡=LªIdentifierÍMÍP£resQ®CallExpressionÍSÍgT°MemberExpressionÍSÍ_R¥SuperÍSÍXLªIdentifierÍYÍ_¦deleteÂÂ‘LªIdentifierÍ`Íf¦newKeyÂW«IfStatementÍzÍ	Z¯UnaryExpressionÍ~Íš¡!ÃQ®CallExpressionÍÍšT°MemberExpressionÍÍ’LªIdentifierÍÍ‰ªignoreKeysLªIdentifierÍŠÍ’¨includesÂÂ‘LªIdentifierÍ“Í™¦newKeyÂM®BlockStatementÍœÍ	‘P³ExpressionStatementÍİÍ	Q®CallExpressionÍİÍ	T°MemberExpressionÍİÍöR®ThisExpressionÍİÍáLªIdentifierÍâÍö´updateNativeNodeAttrÂÂ’LªIdentifierÍ÷Íı¦newKeyY§LiteralÍÿÍ	 ¢''ÂÀP³ExpressionStatementÍ	(Í	aQ®CallExpressionÍ	(Í	`T°MemberExpressionÍ	(Í	ER®ThisExpressionÍ	(Í	,LªIdentifierÍ	-Í	E¸attributeChangedCallbackÂÂ”LªIdentifierÍ	FÍ	I£keyLªIdentifierÍ	KÍ	Q¦oldValY§LiteralÍ	SÍ	WÀ¤nullLªIdentifierÍ	YÍ	_¦newKeyÂÀ[¯ReturnStatementÍ	…Í	LªIdentifierÍ	ŒÍ	£resN°MethodDefinitionÍ	Í	üÂÂLªIdentifierÍ	Í	±´updateNativeNodeAttr¦methodO²FunctionExpressionÍ	±Í	üÀÂÂÂ’LªIdentifierÍ	²Í	µ£keyLªIdentifierÍ	·Í	º£valM®BlockStatementÍ	¼Í	ü‘P³ExpressionStatementÍ	ÇÍ	õP¯ChainExpressionÍ	ÇÍ	ôQ®CallExpressionÍ	ÇÍ	ôT°MemberExpressionÍ	ÇÍ	êT°MemberExpressionÍ	ÇÍ	ÓR®ThisExpressionÍ	ÇÍ	ËLªIdentifierÍ	ÌÍ	Ó§elementÂÂLªIdentifierÍ	ÕÍ	êµupdateNativeAttributeÂÃ’LªIdentifierÍ	ëÍ	î£keyLªIdentifierÍ	ğÍ	ó£valÂN°MethodDefinitionÍ
+&Í¨ÂÂLªIdentifierÍ
+&Í
+>¸attributeChangedCallback¦methodO²FunctionExpressionÍ
+>Í¨ÀÂÂÂ”LªIdentifierÍ
+?Í
+C¤nameLªIdentifierÍ
+EÍ
+M¨oldValueLªIdentifierÍ
+OÍ
+W¨newValueLªIdentifierÍ
+YÍ
+e¬camelizeNameM®BlockStatementÍ
+gÍ¨“U³VariableDeclarationÍ
+rÍ
+‘V²VariableDeclaratorÍ
+xÍ
+LªIdentifierÍ
+xÍ
+§elementT°MemberExpressionÍ
+‚Í
+R®ThisExpressionÍ
+‚Í
+†LªIdentifierÍ
+‡Í
+§elementÂÂ¥constU³VariableDeclarationÍ
+™Í
+»‘V²VariableDeclaratorÍ
+ŸÍ
+ºLªIdentifierÍ
+ŸÍ
+¦§optionsP¯ChainExpressionÍ
+©Í
+ºT°MemberExpressionÍ
+©Í
+ºLªIdentifierÍ
+©Í
+°§elementLªIdentifierÍ
+²Í
+º¨_optionsÂÃ¥constW«IfStatementÍ
+ÅÍ¡LªIdentifierÍ
+ÉÍ
+Ğ§optionsM®BlockStatementÍ
+ÒÍ¡’U³VariableDeclarationÍ
+áÍ‘V²VariableDeclaratorÍ
+çÍLªIdentifierÍ
+çÍ
+ù²observedAttributesT°MemberExpressionÍ
+üÍLªIdentifierÍ
+üÍ§optionsLªIdentifierÍÍ²observedAttributesÂÂ¥constW«IfStatementÍ%Í–X±LogicalExpressionÍ)ÍXLªIdentifierÍ)Í;²observedAttributes¢&&T°MemberExpressionÍ?ÍXLªIdentifierÍ?ÍQ²observedAttributesLªIdentifierÍRÍX¦lengthÂÂM®BlockStatementÍZÍ–“U³VariableDeclarationÍmÍ‚‘V²VariableDeclaratorÍsÍLªIdentifierÍsÍx¥namesÔr\”¤type¥start£end¨elements¯ArrayExpressionÍ{Í‘LªIdentifierÍ|Í€¤name¥constW«IfStatementÍ¾Í]LªIdentifierÍÂÍÎ¬camelizeNameM®BlockStatementÍĞÍ]‘W«IfStatementÍçÍJX°BinaryExpressionÍëÍ LªIdentifierÍëÍ÷¬camelizeName£!==LªIdentifierÍüÍ ¤nameM®BlockStatementÍÍM‘P³ExpressionStatementÍÍ6Q®CallExpressionÍÍ5T°MemberExpressionÍÍ'LªIdentifierÍÍ"¥namesLªIdentifierÍ#Í'¤pushÂÂ‘LªIdentifierÍ(Í4¬camelizeNameÂM®BlockStatementÍhÍJ’U³VariableDeclarationÍƒÍ©‘V²VariableDeclaratorÍ‰Í¨LªIdentifierÍ‰Í–­hyphenateNameQ®CallExpressionÍ™Í¨LªIdentifierÍ™Í¢©hyphenate‘LªIdentifierÍ£Í§¤nameÂ¥constW«IfStatementÍÃÍ3X°BinaryExpressionÍÇÍİLªIdentifierÍÇÍÔ­hyphenateName£!==LªIdentifierÍÙÍİ¤nameM®BlockStatementÍßÍ3‘P³ExpressionStatementÍşÍQ®CallExpressionÍşÍT°MemberExpressionÍşÍLªIdentifierÍşÍ¥namesLªIdentifierÍÍ¤pushÂÂ‘LªIdentifierÍ	Í­hyphenateNameÂÀÀP³ExpressionStatementÍoÍ‡Q®CallExpressionÍoÍ†T°MemberExpressionÍoÍ|LªIdentifierÍoÍt¥namesLªIdentifierÍuÍ|§forEachÂÂ‘O·ArrowFunctionExpressionÍ}Í…ÀÂÂÂ‘LªIdentifierÍ~Í‚¤nameM®BlockStatementÍ‡Í…‘W«IfStatementÍÍrQ®CallExpressionÍ¢ÍÃT°MemberExpressionÍ¢Í½LªIdentifierÍ¢Í´²observedAttributesLªIdentifierÍµÍ½¨includesÂÂ‘LªIdentifierÍ¾ÍÂ¤nameÂM®BlockStatementÍÅÍr’U³VariableDeclarationÍàÍş‘V²VariableDeclaratorÍæÍıLªIdentifierÍæÍó­customElementLªIdentifierÍöÍı§element¥constP³ExpressionStatementÍÍ[P¯ChainExpressionÍÍZQ®CallExpressionÍÍZT°MemberExpressionÍÍ>LªIdentifierÍÍ%­customElementLªIdentifierÍ&Í>¸attributeChangedCallbackÂÂ“LªIdentifierÍAÍE¤nameLªIdentifierÍGÍO¨oldValueLªIdentifierÍQÍY¨newValueÃÀÂÀÀN°MethodDefinitionÍÒÍÂÂLªIdentifierÍÒÍÙ§dispose¦methodO²FunctionExpressionÍÙÍÀÂÂÂM®BlockStatementÍÜÍ‘P³ExpressionStatementÍçÍ S´AssignmentExpressionÍçÍÿ¡=T°MemberExpressionÍçÍóR®ThisExpressionÍçÍëLªIdentifierÍìÍó§elementÂÂLªIdentifierÍöÍÿ©undefinedÀJ¶ExportNamedDeclarationÍÍ_O³FunctionDeclarationÍÍ_LªIdentifierÍÍ,°toNativeNodeAttrÂÂÂ‘LªIdentifierÍ-Í0£mapM®BlockStatementÍ2Í_‘[®ThrowStatementÍ9Í\Ôr]•¤type¥start£end¦callee©arguments­NewExpressionÍ?Í[LªIdentifierÍCÍH¥Error‘Y§LiteralÍIÍZ¯Not implemented±'Not implemented'À’Ôr^•¤type¥start£endªspecifiers¦source±ImportDeclaration 6’Ôr_•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	¨camelizeLªIdentifier	¨camelize_¯ImportSpecifierLªIdentifier©hyphenateLªIdentifier©hyphenateY§Literal$5¯../helper/utils±'../helper/utils'^±ImportDeclaration8Ì`‘_¯ImportSpecifierÌAÌJLªIdentifierÌAÌJ©NativeMapLªIdentifierÌAÌJ©NativeMapY§LiteralÌRÌ_«./NativeMap­'./NativeMap'

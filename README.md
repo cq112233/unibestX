@@ -21,14 +21,15 @@
 
 > 💡 **HBuilderX 版本建议与下载**
 >
-> 本项目推荐开发版本为 **HBuilderX 5.15**，升级版本可能会出现各种兼容性问题。
+> 本项目目前在 **HBuilderX 5.15 ~ 5.24** 版本均可稳定运行：
+> - **HBuilderX 5.15**：经典稳定版本（注：5.15 版本不支持全部的 Vapor 蒸汽模式特性）；
+> - **HBuilderX 5.24**：若需要体验完整的 **Vapor 蒸汽模式**（无虚拟 DOM 高性能渲染），推荐使用 5.24 或更高版本。
 >
 > 📥 **HBuilderX 5.15 下载地址**：[https://wwbsy.lanzoue.com/b01eupb32d](https://wwbsy.lanzoue.com/b01eupb32d) （密码：`4xdv`）
 
 > 🌟 **推荐分支：`uniX-rice-ui`（完美支持 Vapor 蒸汽模式与 VDOM 切换）**
 >
 > 本项目现已推出 **`uniX-rice-ui`** 分支，集成由 Rice UI 官方支持的组件库，**完美支持 Vapor（蒸汽模式）与 VDOM 模式自由无缝切换**，全端原生渲染性能极佳。
->
 > 欢迎大家切换至 `uniX-rice-ui` 分支体验：
 >
 > ```bash
@@ -112,7 +113,7 @@
 
 | Android | iOS | 鸿蒙 | H5 | 微信小程序 |
 | ------- | --- | -- | -- | ----- |
-| √       | √   | √  | √  | √     |
+| √ | √ | √ | √ | √ |
 
 > 注意：uni-app X 目前兼容以上 5 个端平台。
 

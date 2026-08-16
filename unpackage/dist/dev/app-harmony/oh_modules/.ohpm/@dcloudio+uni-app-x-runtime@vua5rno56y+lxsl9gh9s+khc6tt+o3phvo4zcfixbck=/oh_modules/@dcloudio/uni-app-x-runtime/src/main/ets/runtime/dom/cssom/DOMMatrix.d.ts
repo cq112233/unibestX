@@ -1,0 +1,64 @@
+import { DOMMatrix as IDOMMatrix, DOMMatrixInit, DOMPointInit as IDOMPointInit, DOMPoint as IDOMPoint } from './types';
+import matrix4 from '@ohos.matrix4';
+export declare function createDOMMatrixFormMatrix4(matrix: matrix4.Matrix4Transit): IDOMMatrix;
+export declare class DOMMatrix implements IDOMMatrix {
+    /**
+     * @internal
+     */
+    _matrix: matrix4.Matrix4Transit;
+    constructor(...args: number[]);
+    flipX(): IDOMMatrix;
+    flipY(): IDOMMatrix;
+    inverse(): IDOMMatrix;
+    invertSelf(): IDOMMatrix;
+    multiply(other?: DOMMatrixInit | undefined): IDOMMatrix;
+    rotate(rotX?: number | undefined, rotY?: number | undefined, rotZ?: number | undefined): IDOMMatrix;
+    multiplySelf(matrix: IDOMMatrix): IDOMMatrix;
+    preMultiplySelf(other?: DOMMatrixInit | undefined): IDOMMatrix;
+    rotateAxisAngle(x?: number | undefined, y?: number | undefined, z?: number | undefined, angle?: number | undefined): IDOMMatrix;
+    rotateFromVector(x?: number | undefined, y?: number | undefined): IDOMMatrix;
+    rotateAxisAngleSelf(x?: number | undefined, y?: number | undefined, z?: number | undefined, angle?: number | undefined): IDOMMatrix;
+    rotateFromVectorSelf(x?: number | undefined, y?: number | undefined): IDOMMatrix;
+    rotateSelf(rotX?: number | undefined, rotY?: number | undefined, rotZ?: number | undefined): IDOMMatrix;
+    scale(scaleX?: number | undefined, scaleY?: number | undefined, scaleZ?: number | undefined, originX?: number | undefined, originY?: number | undefined, originZ?: number | undefined): IDOMMatrix;
+    scale3d(scale?: number | undefined, originX?: number | undefined, originY?: number | undefined, originZ?: number | undefined): IDOMMatrix;
+    scale3dSelf(scale?: number | undefined, originX?: number | undefined, originY?: number | undefined, originZ?: number | undefined): IDOMMatrix;
+    scaleNonUniform(scaleX?: number | undefined, scaleY?: number | undefined): IDOMMatrix;
+    scaleSelf(scaleX?: number | undefined, scaleY?: number | undefined, scaleZ?: number | undefined, originX?: number | undefined, originY?: number | undefined, originZ?: number | undefined): IDOMMatrix;
+    setMatrixValue(transformList: string): IDOMMatrix;
+    skewX(sx?: number | undefined): IDOMMatrix;
+    skewY(sy?: number | undefined): IDOMMatrix;
+    skewXSelf(sx?: number | undefined): IDOMMatrix;
+    skewYSelf(sy?: number | undefined): IDOMMatrix;
+    transformPoint(point?: IDOMPointInit | undefined): IDOMPoint;
+    translate(tx?: number | undefined, ty?: number | undefined, tz?: number | undefined): IDOMMatrix;
+    translateSelf(tx?: number | undefined, ty?: number | undefined, tz?: number | undefined): IDOMMatrix;
+    toFloat32Array(): Float32Array;
+    toFloat64Array(): Float64Array;
+    toJSON(): any;
+    get a(): number;
+    get b(): number;
+    get c(): number;
+    get d(): number;
+    get e(): number;
+    get f(): number;
+    get is2D(): boolean;
+    get isIdentity(): boolean;
+    get m11(): number;
+    get m12(): number;
+    get m13(): number;
+    get m14(): number;
+    get m21(): number;
+    get m22(): number;
+    get m23(): number;
+    get m24(): number;
+    get m31(): number;
+    get m32(): number;
+    get m33(): number;
+    get m34(): number;
+    get m41(): number;
+    get m42(): number;
+    get m43(): number;
+    get m44(): number;
+    toString(): string;
+}

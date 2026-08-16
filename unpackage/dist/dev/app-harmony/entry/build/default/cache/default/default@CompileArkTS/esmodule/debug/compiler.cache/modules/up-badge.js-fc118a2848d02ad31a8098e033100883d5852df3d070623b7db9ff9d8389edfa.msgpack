@@ -1,0 +1,480 @@
+‘r@ü™assertions§code¥customTransformCache¨dependencies¢id§meta±moduleSideEffects¨originalCode±originalSourcemap´resolvedIdsÆsourcemapChainµsyntheticNamedExportsµtransformDependenciesÆtransformFiles®cacheAst‘rAê⁄'~import { a as addUnit } from "../../libs/function/index.js";
+import { b as badgeProps } from "./badge.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineComponent: _defineComponent } = globalThis.Vue;
+const { computed } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineComponent({
+  ...{
+    name: "up-badge"
+  },
+  __name: "up-badge",
+  props: {
+    // ÊòØÂê¶ÊòæÁ§∫ÂúÜÁÇπ
+    isDot: {
+      type: Boolean,
+      default: badgeProps.getBoolean("badge.isDot")
+    },
+    // ÊòæÁ§∫ÁöÑÂÜÖÂÆπ
+    value: {
+      type: [Number, String],
+      default: badgeProps.getString("badge.value")
+    },
+    // ÊòæÁ§∫ÁöÑÂÜÖÂÆπ
+    modelValue: {
+      type: [Number, String],
+      default: badgeProps.getString("badge.modelValue")
+    },
+    // ÊòØÂê¶ÊòæÁ§∫
+    show: {
+      type: Boolean,
+      default: badgeProps.getBoolean("badge.show")
+    },
+    // ÊúÄÂ§ßÂÄºÔºåË∂ÖËøáÊúÄÂ§ßÂÄº‰ºöÊòæÁ§∫ '{max}+'
+    max: {
+      type: [Number, String],
+      default: badgeProps.getNumber("badge.max")
+    },
+    // ‰∏ªÈ¢òÁ±ªÂûãÔºåerror|warning|success|primary
+    type: {
+      type: String,
+      default: badgeProps.getString("badge.type")
+    },
+    // ÂΩìÊï∞ÂÄº‰∏∫ 0 Êó∂ÔºåÊòØÂê¶Â±ïÁ§∫ Badge
+    showZero: {
+      type: Boolean,
+      default: badgeProps.getBoolean("badge.showZero")
+    },
+    // ËÉåÊôØÈ¢úËâ≤Ôºå‰ºòÂÖàÁ∫ßÊØîtypeÈ´òÔºåÂ¶ÇËÆæÁΩÆÔºåtypeÂèÇÊï∞‰ºöÂ§±Êïà
+    bgColor: {
+      type: String,
+      default: badgeProps.getString("badge.bgColor")
+    },
+    // Â≠ó‰ΩìÈ¢úËâ≤
+    color: {
+      type: String,
+      default: badgeProps.getString("badge.color")
+    },
+    // ÂæΩÊ†áÂΩ¢Áä∂Ôºåcircle-ÂõõËßíÂùá‰∏∫ÂúÜËßíÔºåhorn-Â∑¶‰∏ãËßí‰∏∫Áõ¥Ëßí
+    shape: {
+      type: String,
+      default: badgeProps.getString("badge.shape")
+    },
+    // ËÆæÁΩÆÊï∞Â≠óÁöÑÊòæÁ§∫ÊñπÂºèÔºåoverflow|ellipsis|limit
+    // overflow‰ºöÊ†πÊçÆmaxÂ≠óÊÆµÂà§Êñ≠ÔºåË∂ÖÂá∫ÊòæÁ§∫`${max}+`
+    // ellipsis‰ºöÊ†πÊçÆmaxÂà§Êñ≠ÔºåË∂ÖÂá∫ÊòæÁ§∫`${max}...`
+    // limit‰ºö‰æùÊçÆ1000‰Ωú‰∏∫Âà§Êñ≠Êù°‰ª∂ÔºåË∂ÖÂá∫1000ÔºåÊòæÁ§∫`${value/1000}K`ÔºåÊØîÂ¶Ç2.2k„ÄÅ3.34wÔºåÊúÄÂ§ö‰øùÁïô2‰ΩçÂ∞èÊï∞
+    numberType: {
+      type: String,
+      default: badgeProps.getString("badge.numberType")
+    },
+    // ËÆæÁΩÆbadgeÁöÑ‰ΩçÁΩÆÂÅèÁßªÔºåÊ†ºÂºè‰∏∫ [x, y]Ôºå‰πüÂç≥ËÆæÁΩÆÁöÑ‰∏∫topÂíårightÁöÑÂÄºÔºåabsolute‰∏∫trueÊó∂ÊúâÊïà
+    offset: {
+      type: Array,
+      default: badgeProps.getArray("badge.offset")
+    },
+    // ÊòØÂê¶ÂèçËΩ¨ËÉåÊôØÂíåÂ≠ó‰ΩìÈ¢úËâ≤
+    inverted: {
+      type: Boolean,
+      default: badgeProps.getBoolean("badge.inverted")
+    },
+    // ÊòØÂê¶ÁªùÂØπÂÆö‰Ωç
+    absolute: {
+      type: Boolean,
+      default: badgeProps.getBoolean("badge.absolute")
+    }
+  },
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
+    const props = __props;
+    const badgeStyle = computed(() => {
+      const style = new UTSJSONObject({});
+      if (props.color != "") {
+        style["color"] = props.color;
+      }
+      if (props.bgColor != "" && !props.inverted) {
+        style["backgroundColor"] = props.bgColor;
+      }
+      if (props.absolute) {
+        style["position"] = "absolute";
+        let offsetArray = props.offset;
+        if (offsetArray.length > 0) {
+          const top_1 = offsetArray[0];
+          style["top"] = addUnit(top_1);
+          if (offsetArray.length == 2) {
+            style["right"] = addUnit(offsetArray[1]);
+          } else {
+            style["right"] = addUnit(top_1);
+          }
+        }
+      }
+      return style;
+    });
+    const showValue = computed(() => {
+      let valueReturn = "";
+      switch (props.numberType.toString()) {
+        case "overflow":
+          valueReturn = parseInt(props.value.toString()) > parseInt(props.max.toString()) ? props.max.toString() + "+" : props.value.toString();
+          break;
+        case "ellipsis":
+          valueReturn = parseInt(props.value.toString()) > parseInt(props.max.toString()) ? "..." : props.value.toString();
+          break;
+        case "limit":
+          valueReturn = parseInt(props.value.toString()) > 999 ? parseInt(props.value.toString()) >= 9999 ? (Math.floor(parseInt(props.value.toString()) / 1e4 * 100) / 100).toString() + "w" : (Math.floor(parseInt(props.value.toString()) / 1e3 * 100) / 100).toString() + "k" : props.value.toString();
+          break;
+        default:
+          valueReturn = props.value.toString();
+      }
+      return valueReturn;
+    });
+    const __returned__ = { props, badgeStyle, showValue };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-badge": { "": { "borderTopRightRadius": 100, "borderTopLeftRadius": 100, "borderBottomLeftRadius": 100, "borderBottomRightRadius": 100, "lineHeight": "11px", "textAlign": "center", "fontSize": 11, "color": "#FFFFFF" } }, "up-badge--dot": { "": { "height": 8, "width": 8 } }, "up-badge--inverted": { "": { "fontSize": 13 } }, "up-badge--not-dot": { "": { "paddingTop": 2, "paddingRight": 5, "paddingBottom": 2, "paddingLeft": 5 } }, "up-badge--horn": { "": { "borderBottomLeftRadius": 0 } }, "up-badge--primary": { "": { "backgroundColor": "var(--theme-color, #0957de)" } }, "up-badge--primary--inverted": { "": { "color": "var(--theme-color, #0957de)" } }, "up-badge--error": { "": { "backgroundColor": "#f56c6c" } }, "up-badge--error--inverted": { "": { "color": "#f56c6c" } }, "up-badge--success": { "": { "backgroundColor": "#5ac725" } }, "up-badge--success--inverted": { "": { "color": "#5ac725" } }, "up-badge--info": { "": { "backgroundColor": "#909399" } }, "up-badge--info--inverted": { "": { "color": "#909399" } }, "up-badge--warning": { "": { "backgroundColor": "#f9ae3d" } }, "up-badge--warning--inverted": { "": { "color": "#f9ae3d" } } };
+const { toDisplayString: _toDisplayString, normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return $props.show && ((parseInt($props.value.toString()) == 0 ? $props.showZero : true) || $props.isDot) ? (_openBlock(), _createElementBlock(
+    "text",
+    {
+      key: 0,
+      class: _normalizeClass(["up-badge", [
+        $props.isDot ? "up-badge--dot" : "up-badge--not-dot",
+        $props.inverted ? "up-badge--inverted" : "",
+        $props.shape === "horn" ? "up-badge--horn" : "",
+        $props.inverted ? `up-badge--${$props.type}--inverted` : `up-badge--${$props.type}`
+      ]]),
+      style: _normalizeStyle([_ctx.$upAddStyle(_ctx.customStyle), $setup.badgeStyle])
+    },
+    _toDisplayString($props.isDot ? "" : $setup.showValue),
+    7
+    /* TEXT, CLASS, STYLE */
+  )) : _createCommentVNode("v-if", true);
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-badge/up-badge.uvue"]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-badge.js.map
+¬ìŸ≈/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsŸÀ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-badge/badge.jsŸ≤/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsŸŒ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-badge/up-badge.js‘rBõ™moduleName±isLocalDependencyØisNodeEntryFileßpkgPath±belongProjectPathßpkgName™pkgVersion±dependencyPkgInfo∞belongModulePath®commonjsØhostModulesInfo•entry√¬ŸR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryŸL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony•entry•1.0.0‘  ŸR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry‘rCíØhasNamedExports™isCommonJS√¬í‘rDí≤hostDependencyNameÆhostModuleNameŸF../../../../../uni_modules/uview-ultra/components/up-badge/up-badge.js•entryD∑../up-badge/up-badge.js•entry√⁄'~import { a as addUnit } from "../../libs/function/index.js";
+import { b as badgeProps } from "./badge.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineComponent: _defineComponent } = globalThis.Vue;
+const { computed } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineComponent({
+  ...{
+    name: "up-badge"
+  },
+  __name: "up-badge",
+  props: {
+    // ÊòØÂê¶ÊòæÁ§∫ÂúÜÁÇπ
+    isDot: {
+      type: Boolean,
+      default: badgeProps.getBoolean("badge.isDot")
+    },
+    // ÊòæÁ§∫ÁöÑÂÜÖÂÆπ
+    value: {
+      type: [Number, String],
+      default: badgeProps.getString("badge.value")
+    },
+    // ÊòæÁ§∫ÁöÑÂÜÖÂÆπ
+    modelValue: {
+      type: [Number, String],
+      default: badgeProps.getString("badge.modelValue")
+    },
+    // ÊòØÂê¶ÊòæÁ§∫
+    show: {
+      type: Boolean,
+      default: badgeProps.getBoolean("badge.show")
+    },
+    // ÊúÄÂ§ßÂÄºÔºåË∂ÖËøáÊúÄÂ§ßÂÄº‰ºöÊòæÁ§∫ '{max}+'
+    max: {
+      type: [Number, String],
+      default: badgeProps.getNumber("badge.max")
+    },
+    // ‰∏ªÈ¢òÁ±ªÂûãÔºåerror|warning|success|primary
+    type: {
+      type: String,
+      default: badgeProps.getString("badge.type")
+    },
+    // ÂΩìÊï∞ÂÄº‰∏∫ 0 Êó∂ÔºåÊòØÂê¶Â±ïÁ§∫ Badge
+    showZero: {
+      type: Boolean,
+      default: badgeProps.getBoolean("badge.showZero")
+    },
+    // ËÉåÊôØÈ¢úËâ≤Ôºå‰ºòÂÖàÁ∫ßÊØîtypeÈ´òÔºåÂ¶ÇËÆæÁΩÆÔºåtypeÂèÇÊï∞‰ºöÂ§±Êïà
+    bgColor: {
+      type: String,
+      default: badgeProps.getString("badge.bgColor")
+    },
+    // Â≠ó‰ΩìÈ¢úËâ≤
+    color: {
+      type: String,
+      default: badgeProps.getString("badge.color")
+    },
+    // ÂæΩÊ†áÂΩ¢Áä∂Ôºåcircle-ÂõõËßíÂùá‰∏∫ÂúÜËßíÔºåhorn-Â∑¶‰∏ãËßí‰∏∫Áõ¥Ëßí
+    shape: {
+      type: String,
+      default: badgeProps.getString("badge.shape")
+    },
+    // ËÆæÁΩÆÊï∞Â≠óÁöÑÊòæÁ§∫ÊñπÂºèÔºåoverflow|ellipsis|limit
+    // overflow‰ºöÊ†πÊçÆmaxÂ≠óÊÆµÂà§Êñ≠ÔºåË∂ÖÂá∫ÊòæÁ§∫`${max}+`
+    // ellipsis‰ºöÊ†πÊçÆmaxÂà§Êñ≠ÔºåË∂ÖÂá∫ÊòæÁ§∫`${max}...`
+    // limit‰ºö‰æùÊçÆ1000‰Ωú‰∏∫Âà§Êñ≠Êù°‰ª∂ÔºåË∂ÖÂá∫1000ÔºåÊòæÁ§∫`${value/1000}K`ÔºåÊØîÂ¶Ç2.2k„ÄÅ3.34wÔºåÊúÄÂ§ö‰øùÁïô2‰ΩçÂ∞èÊï∞
+    numberType: {
+      type: String,
+      default: badgeProps.getString("badge.numberType")
+    },
+    // ËÆæÁΩÆbadgeÁöÑ‰ΩçÁΩÆÂÅèÁßªÔºåÊ†ºÂºè‰∏∫ [x, y]Ôºå‰πüÂç≥ËÆæÁΩÆÁöÑ‰∏∫topÂíårightÁöÑÂÄºÔºåabsolute‰∏∫trueÊó∂ÊúâÊïà
+    offset: {
+      type: Array,
+      default: badgeProps.getArray("badge.offset")
+    },
+    // ÊòØÂê¶ÂèçËΩ¨ËÉåÊôØÂíåÂ≠ó‰ΩìÈ¢úËâ≤
+    inverted: {
+      type: Boolean,
+      default: badgeProps.getBoolean("badge.inverted")
+    },
+    // ÊòØÂê¶ÁªùÂØπÂÆö‰Ωç
+    absolute: {
+      type: Boolean,
+      default: badgeProps.getBoolean("badge.absolute")
+    }
+  },
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
+    const props = __props;
+    const badgeStyle = computed(() => {
+      const style = new UTSJSONObject({});
+      if (props.color != "") {
+        style["color"] = props.color;
+      }
+      if (props.bgColor != "" && !props.inverted) {
+        style["backgroundColor"] = props.bgColor;
+      }
+      if (props.absolute) {
+        style["position"] = "absolute";
+        let offsetArray = props.offset;
+        if (offsetArray.length > 0) {
+          const top_1 = offsetArray[0];
+          style["top"] = addUnit(top_1);
+          if (offsetArray.length == 2) {
+            style["right"] = addUnit(offsetArray[1]);
+          } else {
+            style["right"] = addUnit(top_1);
+          }
+        }
+      }
+      return style;
+    });
+    const showValue = computed(() => {
+      let valueReturn = "";
+      switch (props.numberType.toString()) {
+        case "overflow":
+          valueReturn = parseInt(props.value.toString()) > parseInt(props.max.toString()) ? props.max.toString() + "+" : props.value.toString();
+          break;
+        case "ellipsis":
+          valueReturn = parseInt(props.value.toString()) > parseInt(props.max.toString()) ? "..." : props.value.toString();
+          break;
+        case "limit":
+          valueReturn = parseInt(props.value.toString()) > 999 ? parseInt(props.value.toString()) >= 9999 ? (Math.floor(parseInt(props.value.toString()) / 1e4 * 100) / 100).toString() + "w" : (Math.floor(parseInt(props.value.toString()) / 1e3 * 100) / 100).toString() + "k" : props.value.toString();
+          break;
+        default:
+          valueReturn = props.value.toString();
+      }
+      return valueReturn;
+    });
+    const __returned__ = { props, badgeStyle, showValue };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-badge": { "": { "borderTopRightRadius": 100, "borderTopLeftRadius": 100, "borderBottomLeftRadius": 100, "borderBottomRightRadius": 100, "lineHeight": "11px", "textAlign": "center", "fontSize": 11, "color": "#FFFFFF" } }, "up-badge--dot": { "": { "height": 8, "width": 8 } }, "up-badge--inverted": { "": { "fontSize": 13 } }, "up-badge--not-dot": { "": { "paddingTop": 2, "paddingRight": 5, "paddingBottom": 2, "paddingLeft": 5 } }, "up-badge--horn": { "": { "borderBottomLeftRadius": 0 } }, "up-badge--primary": { "": { "backgroundColor": "var(--theme-color, #0957de)" } }, "up-badge--primary--inverted": { "": { "color": "var(--theme-color, #0957de)" } }, "up-badge--error": { "": { "backgroundColor": "#f56c6c" } }, "up-badge--error--inverted": { "": { "color": "#f56c6c" } }, "up-badge--success": { "": { "backgroundColor": "#5ac725" } }, "up-badge--success--inverted": { "": { "color": "#5ac725" } }, "up-badge--info": { "": { "backgroundColor": "#909399" } }, "up-badge--info--inverted": { "": { "color": "#909399" } }, "up-badge--warning": { "": { "backgroundColor": "#f9ae3d" } }, "up-badge--warning--inverted": { "": { "color": "#f9ae3d" } } };
+const { toDisplayString: _toDisplayString, normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return $props.show && ((parseInt($props.value.toString()) == 0 ? $props.showZero : true) || $props.isDot) ? (_openBlock(), _createElementBlock(
+    "text",
+    {
+      key: 0,
+      class: _normalizeClass(["up-badge", [
+        $props.isDot ? "up-badge--dot" : "up-badge--not-dot",
+        $props.inverted ? "up-badge--inverted" : "",
+        $props.shape === "horn" ? "up-badge--horn" : "",
+        $props.inverted ? `up-badge--${$props.type}--inverted` : `up-badge--${$props.type}`
+      ]]),
+      style: _normalizeStyle([_ctx.$upAddStyle(_ctx.customStyle), $setup.badgeStyle])
+    },
+    _toDisplayString($props.isDot ? "" : $setup.showValue),
+    7
+    /* TEXT, CLASS, STYLE */
+  )) : _createCommentVNode("v-if", true);
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-badge/up-badge.uvue"]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-badge.js.map
+‘rEïßversion®mappings•namesßsourcesÆsourcesContent‹ †ëî    ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî  	 ëî  
+ ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî    ëî  ! ëî  " ëî  # ëî  $ ëî  % ëî  & ëî  ' ëî  ( ëî  ) ëî  * ëî  + ëî  , ëî  - ëî  . ëî  / ëî  0 ëî  1 ëî  2 ëî  3 ëî  4 ëî  5 ëî  6 ëî  7 ëî  8 ëî  9 ëî  : ëî  ; ëî  < ëî  = ëî  > ëî  ? ëî  Ã@ ëî  ÃA ëî  ÃB ëî  ÃC ëî  ÃD ëî  ÃE ëî  ÃF ëî  ÃG ëî  ÃH ëî  ÃI ëî  ÃJ ëî  ÃK ëî  ÃL ëî  ÃM ëî  ÃN ëî  ÃO ëî  ÃP ëî  ÃQ ëî  ÃR ëî  ÃS ëî  ÃT ëî  ÃU ëî  ÃV ëî  ÃW ëî  ÃX ëî  ÃY ëî  ÃZ ëî  Ã[ ëî  Ã\ ëî  Ã] ëî  Ã^ ëî  Ã_ ëî  Ã` ëî  Ãa ëî  Ãb ëî  Ãc ëî  Ãd ëî  Ãe ëî  Ãf ëî  Ãg ëî  Ãh ëî  Ãi ëî  Ãj ëî  Ãk ëî  Ãl ëî  Ãm ëî  Ãn ëî  Ão ëî  Ãp ëî  Ãq ëî  Ãr ëî  Ãs ëî  Ãt ëî  Ãu ëî  Ãv ëî  Ãw ëî  Ãx ëî  Ãy ëî  Ãz ëî  Ã{ ëî  Ã| ëî  Ã} ëî  Ã~ ëî  Ã ëî  ÃÄ ëî  ÃÅ ëî  ÃÇ ëî  ÃÉ ëî  ÃÑ ëî  ÃÖ ëî  ÃÜ ëî  Ãá ëî  Ãà ëî  Ãâ ëî  Ãä ëî  Ãã ëî  Ãå ëî  Ãç ëî  Ãé ëî  Ãè ëî  Ãê ëî  Ãë ëî  Ãí ëî  Ãì ëî  Ãî ëî  Ãï ëî  Ãñ ëî  Ãó ëî  Ãò ëî  Ãô ëî  Ãö ëî  Ãõ ëî  Ãú ëî  Ãù ëî  Ãû êêëŸŒ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-badge/up-badge.jsë⁄'~import { a as addUnit } from "../../libs/function/index.js";
+import { b as badgeProps } from "./badge.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineComponent: _defineComponent } = globalThis.Vue;
+const { computed } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineComponent({
+  ...{
+    name: "up-badge"
+  },
+  __name: "up-badge",
+  props: {
+    // ÊòØÂê¶ÊòæÁ§∫ÂúÜÁÇπ
+    isDot: {
+      type: Boolean,
+      default: badgeProps.getBoolean("badge.isDot")
+    },
+    // ÊòæÁ§∫ÁöÑÂÜÖÂÆπ
+    value: {
+      type: [Number, String],
+      default: badgeProps.getString("badge.value")
+    },
+    // ÊòæÁ§∫ÁöÑÂÜÖÂÆπ
+    modelValue: {
+      type: [Number, String],
+      default: badgeProps.getString("badge.modelValue")
+    },
+    // ÊòØÂê¶ÊòæÁ§∫
+    show: {
+      type: Boolean,
+      default: badgeProps.getBoolean("badge.show")
+    },
+    // ÊúÄÂ§ßÂÄºÔºåË∂ÖËøáÊúÄÂ§ßÂÄº‰ºöÊòæÁ§∫ '{max}+'
+    max: {
+      type: [Number, String],
+      default: badgeProps.getNumber("badge.max")
+    },
+    // ‰∏ªÈ¢òÁ±ªÂûãÔºåerror|warning|success|primary
+    type: {
+      type: String,
+      default: badgeProps.getString("badge.type")
+    },
+    // ÂΩìÊï∞ÂÄº‰∏∫ 0 Êó∂ÔºåÊòØÂê¶Â±ïÁ§∫ Badge
+    showZero: {
+      type: Boolean,
+      default: badgeProps.getBoolean("badge.showZero")
+    },
+    // ËÉåÊôØÈ¢úËâ≤Ôºå‰ºòÂÖàÁ∫ßÊØîtypeÈ´òÔºåÂ¶ÇËÆæÁΩÆÔºåtypeÂèÇÊï∞‰ºöÂ§±Êïà
+    bgColor: {
+      type: String,
+      default: badgeProps.getString("badge.bgColor")
+    },
+    // Â≠ó‰ΩìÈ¢úËâ≤
+    color: {
+      type: String,
+      default: badgeProps.getString("badge.color")
+    },
+    // ÂæΩÊ†áÂΩ¢Áä∂Ôºåcircle-ÂõõËßíÂùá‰∏∫ÂúÜËßíÔºåhorn-Â∑¶‰∏ãËßí‰∏∫Áõ¥Ëßí
+    shape: {
+      type: String,
+      default: badgeProps.getString("badge.shape")
+    },
+    // ËÆæÁΩÆÊï∞Â≠óÁöÑÊòæÁ§∫ÊñπÂºèÔºåoverflow|ellipsis|limit
+    // overflow‰ºöÊ†πÊçÆmaxÂ≠óÊÆµÂà§Êñ≠ÔºåË∂ÖÂá∫ÊòæÁ§∫`${max}+`
+    // ellipsis‰ºöÊ†πÊçÆmaxÂà§Êñ≠ÔºåË∂ÖÂá∫ÊòæÁ§∫`${max}...`
+    // limit‰ºö‰æùÊçÆ1000‰Ωú‰∏∫Âà§Êñ≠Êù°‰ª∂ÔºåË∂ÖÂá∫1000ÔºåÊòæÁ§∫`${value/1000}K`ÔºåÊØîÂ¶Ç2.2k„ÄÅ3.34wÔºåÊúÄÂ§ö‰øùÁïô2‰ΩçÂ∞èÊï∞
+    numberType: {
+      type: String,
+      default: badgeProps.getString("badge.numberType")
+    },
+    // ËÆæÁΩÆbadgeÁöÑ‰ΩçÁΩÆÂÅèÁßªÔºåÊ†ºÂºè‰∏∫ [x, y]Ôºå‰πüÂç≥ËÆæÁΩÆÁöÑ‰∏∫topÂíårightÁöÑÂÄºÔºåabsolute‰∏∫trueÊó∂ÊúâÊïà
+    offset: {
+      type: Array,
+      default: badgeProps.getArray("badge.offset")
+    },
+    // ÊòØÂê¶ÂèçËΩ¨ËÉåÊôØÂíåÂ≠ó‰ΩìÈ¢úËâ≤
+    inverted: {
+      type: Boolean,
+      default: badgeProps.getBoolean("badge.inverted")
+    },
+    // ÊòØÂê¶ÁªùÂØπÂÆö‰Ωç
+    absolute: {
+      type: Boolean,
+      default: badgeProps.getBoolean("badge.absolute")
+    }
+  },
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
+    const props = __props;
+    const badgeStyle = computed(() => {
+      const style = new UTSJSONObject({});
+      if (props.color != "") {
+        style["color"] = props.color;
+      }
+      if (props.bgColor != "" && !props.inverted) {
+        style["backgroundColor"] = props.bgColor;
+      }
+      if (props.absolute) {
+        style["position"] = "absolute";
+        let offsetArray = props.offset;
+        if (offsetArray.length > 0) {
+          const top_1 = offsetArray[0];
+          style["top"] = addUnit(top_1);
+          if (offsetArray.length == 2) {
+            style["right"] = addUnit(offsetArray[1]);
+          } else {
+            style["right"] = addUnit(top_1);
+          }
+        }
+      }
+      return style;
+    });
+    const showValue = computed(() => {
+      let valueReturn = "";
+      switch (props.numberType.toString()) {
+        case "overflow":
+          valueReturn = parseInt(props.value.toString()) > parseInt(props.max.toString()) ? props.max.toString() + "+" : props.value.toString();
+          break;
+        case "ellipsis":
+          valueReturn = parseInt(props.value.toString()) > parseInt(props.max.toString()) ? "..." : props.value.toString();
+          break;
+        case "limit":
+          valueReturn = parseInt(props.value.toString()) > 999 ? parseInt(props.value.toString()) >= 9999 ? (Math.floor(parseInt(props.value.toString()) / 1e4 * 100) / 100).toString() + "w" : (Math.floor(parseInt(props.value.toString()) / 1e3 * 100) / 100).toString() + "k" : props.value.toString();
+          break;
+        default:
+          valueReturn = props.value.toString();
+      }
+      return valueReturn;
+    });
+    const __returned__ = { props, badgeStyle, showValue };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-badge": { "": { "borderTopRightRadius": 100, "borderTopLeftRadius": 100, "borderBottomLeftRadius": 100, "borderBottomRightRadius": 100, "lineHeight": "11px", "textAlign": "center", "fontSize": 11, "color": "#FFFFFF" } }, "up-badge--dot": { "": { "height": 8, "width": 8 } }, "up-badge--inverted": { "": { "fontSize": 13 } }, "up-badge--not-dot": { "": { "paddingTop": 2, "paddingRight": 5, "paddingBottom": 2, "paddingLeft": 5 } }, "up-badge--horn": { "": { "borderBottomLeftRadius": 0 } }, "up-badge--primary": { "": { "backgroundColor": "var(--theme-color, #0957de)" } }, "up-badge--primary--inverted": { "": { "color": "var(--theme-color, #0957de)" } }, "up-badge--error": { "": { "backgroundColor": "#f56c6c" } }, "up-badge--error--inverted": { "": { "color": "#f56c6c" } }, "up-badge--success": { "": { "backgroundColor": "#5ac725" } }, "up-badge--success--inverted": { "": { "color": "#5ac725" } }, "up-badge--info": { "": { "backgroundColor": "#909399" } }, "up-badge--info--inverted": { "": { "color": "#909399" } }, "up-badge--warning": { "": { "backgroundColor": "#f9ae3d" } }, "up-badge--warning--inverted": { "": { "color": "#f9ae3d" } } };
+const { toDisplayString: _toDisplayString, normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return $props.show && ((parseInt($props.value.toString()) == 0 ? $props.showZero : true) || $props.isDot) ? (_openBlock(), _createElementBlock(
+    "text",
+    {
+      key: 0,
+      class: _normalizeClass(["up-badge", [
+        $props.isDot ? "up-badge--dot" : "up-badge--not-dot",
+        $props.inverted ? "up-badge--inverted" : "",
+        $props.shape === "horn" ? "up-badge--horn" : "",
+        $props.inverted ? `up-badge--${$props.type}--inverted` : `up-badge--${$props.type}`
+      ]]),
+      style: _normalizeStyle([_ctx.$upAddStyle(_ctx.customStyle), $setup.badgeStyle])
+    },
+    _toDisplayString($props.isDot ? "" : $setup.showValue),
+    7
+    /* TEXT, CLASS, STYLE */
+  )) : _createCommentVNode("v-if", true);
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-badge/up-badge.uvue"]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-badge.js.map
+‘rFìŸ'../../../../plugin-vue-export-helper.jsº../../libs/function/index.js™./badge.js‘rGó™assertions®external¢id§meta±moduleSideEffects™resolvedByµsyntheticNamedExportsA¬Ÿ≤/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsA√™oh-resolve¬GA¬Ÿ≈/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsA√™oh-resolve¬GA¬ŸÀ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-badge/badge.jsA√™oh-resolve¬ë‘rHíßmissing¶plugin√¶genAbc¬ê‘  ‘rIî≤dynamicImportCacheπexportAllDeclarationCacheªexportNamedDeclarationCache´importCacheêêë‘rJñ§type•start£end´declaration™specifiers¶source∂ExportNamedDeclarationÕ%ºÕ%⁄¿ë‘rKï§type•start£end•local®exportedØExportSpecifierÕ%«Õ%◊‘rLî§type•start£end§name™IdentifierÕ%«Õ%“´__easycom_1L™IdentifierÕ%÷Õ%◊°_¿ì‘rMï§type•start£end™specifiers¶source±ImportDeclaration <ë‘rNï§type•start£end®imported•localØImportSpecifier	L™Identifier	
+°aL™IdentifierßaddUnit‘rOï§type•start£end•value£rawßLiteral;º../../libs/function/index.jsæ"../../libs/function/index.js"M±ImportDeclaration=ÃjëNØImportSpecifierÃFÃUL™IdentifierÃFÃG°bL™IdentifierÃKÃU™badgePropsOßLiteralÃ]Ãi™./badge.js¨"./badge.js"M±ImportDeclarationÃkÃ∂ëNØImportSpecifierÃtÃÑL™IdentifierÃtÃu°_L™IdentifierÃyÃÑ´_export_sfcOßLiteralÃåÃµŸ'../../../../plugin-vue-export-helper.jsŸ)"../../../../plugin-vue-export-helper.js"

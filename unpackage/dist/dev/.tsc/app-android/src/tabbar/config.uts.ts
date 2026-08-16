@@ -1,0 +1,55 @@
+import type { CustomTabBarItem } from './types'
+
+/**
+ * 自定义 tabbar 列表配置
+ * pagePath 需要与 pages.json 中的 path 一致
+ * text 使用 i18n key 以支持动态语言切换
+ * iconType 改为 'icon' 以使用 uni-icons 字体图标
+ */
+export const customTabbarList : CustomTabBarItem[] = [
+  {
+    text: 'tabbar.home',
+    pagePath: 'src/pages/index/index',
+    iconType: 'icon',
+    icon: 'home',
+    iconActive: 'home-filled',
+    badge: null,
+    isBulge: false,
+  },
+  {
+    text: 'tabbar.basic',
+    pagePath: 'src/pages/basic/basic',
+    iconType: 'icon',
+    icon: 'tune',
+    iconActive: 'tune-filled',
+    badge: null,
+    isBulge: false,
+  },
+  {
+    text: 'tabbar.ai',
+    pagePath: '',
+    iconType: 'icon',
+    icon: 'chatboxes',
+    iconActive: 'chatboxes-filled',
+    badge: null,
+    isBulge: true,
+  },
+  {
+    text: 'tabbar.function',
+    pagePath: 'src/pages/function/function',
+    iconType: 'icon',
+    icon: 'gear',
+    iconActive: 'gear-filled',
+    badge: null,
+    isBulge: false,
+  },
+  {
+    text: 'tabbar.me',
+    pagePath: 'src/pages/me/me',
+    iconType: 'icon',
+    icon: 'person',
+    iconActive: 'person-filled',
+    badge: null,
+    isBulge: false,
+  },
+]

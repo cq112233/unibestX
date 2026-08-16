@@ -1,0 +1,80 @@
+// 本文件为自动构建生成
+import {
+  LegacySaveFileSuccess as LegacySaveFileSuccessOrigin,
+  LegacySaveFileSuccessCallback as LegacySaveFileSuccessCallbackOrigin,
+  LegacySaveFileFail as LegacySaveFileFailOrigin,
+  LegacySaveFileFailCallback as LegacySaveFileFailCallbackOrigin,
+  LegacySaveFileCompleteCallback as LegacySaveFileCompleteCallbackOrigin,
+  LegacySaveFileOptions as LegacySaveFileOptionsOrigin,
+  LegacyGetFileInfoSuccess as LegacyGetFileInfoSuccessOrigin,
+  LegacyGetFileInfoSuccessCallback as LegacyGetFileInfoSuccessCallbackOrigin,
+  LegacyGetFileInfoFail as LegacyGetFileInfoFailOrigin,
+  LegacyGetFileInfoFailCallback as LegacyGetFileInfoFailCallbackOrigin,
+  LegacyGetFileInfoCompleteCallback as LegacyGetFileInfoCompleteCallbackOrigin,
+  LegacyGetFileInfoOptions as LegacyGetFileInfoOptionsOrigin,
+  LegacyGetSavedFileInfoSuccess as LegacyGetSavedFileInfoSuccessOrigin,
+  LegacyGetSavedFileInfoSuccessCallback as LegacyGetSavedFileInfoSuccessCallbackOrigin,
+  LegacyGetSavedFileInfoFail as LegacyGetSavedFileInfoFailOrigin,
+  LegacyGetSavedFileInfoFailCallback as LegacyGetSavedFileInfoFailCallbackOrigin,
+  LegacyGetSavedFileInfoCompleteCallback as LegacyGetSavedFileInfoCompleteCallbackOrigin,
+  LegacyGetSavedFileInfoOptions as LegacyGetSavedFileInfoOptionsOrigin,
+  LegacyRemoveSavedFileSuccess as LegacyRemoveSavedFileSuccessOrigin,
+  LegacyRemoveSavedFileSuccessCallback as LegacyRemoveSavedFileSuccessCallbackOrigin,
+  LegacyRemoveSavedFileFail as LegacyRemoveSavedFileFailOrigin,
+  LegacyRemoveSavedFileFailCallback as LegacyRemoveSavedFileFailCallbackOrigin,
+  LegacyRemoveSavedFileCompleteCallback as LegacyRemoveSavedFileCompleteCallbackOrigin,
+  LegacyRemoveSavedFileOptions as LegacyRemoveSavedFileOptionsOrigin,
+  LegacySavedFileListItem as LegacySavedFileListItemOrigin,
+  LegacyGetSavedFileListSuccess as LegacyGetSavedFileListSuccessOrigin,
+  LegacyGetSavedFileListSuccessCallback as LegacyGetSavedFileListSuccessCallbackOrigin,
+  LegacyGetSavedFileListFail as LegacyGetSavedFileListFailOrigin,
+  LegacyGetSavedFileListFailCallback as LegacyGetSavedFileListFailCallbackOrigin,
+  LegacyGetSavedFileListCompleteCallback as LegacyGetSavedFileListCompleteCallbackOrigin,
+  LegacyGetSavedFileListOptions as LegacyGetSavedFileListOptionsOrigin,
+  SaveFile as SaveFileOrigin,
+  GetFileInfo as GetFileInfoOrigin,
+  GetSavedFileInfo as GetSavedFileInfoOrigin,
+  RemoveSavedFile as RemoveSavedFileOrigin,
+  GetSavedFileList as GetSavedFileListOrigin,
+  Uni as UniOrigin
+} from './interface'
+
+declare global {
+  type LegacySaveFileSuccess = LegacySaveFileSuccessOrigin
+  type LegacySaveFileSuccessCallback = LegacySaveFileSuccessCallbackOrigin
+  type LegacySaveFileFail = LegacySaveFileFailOrigin
+  type LegacySaveFileFailCallback = LegacySaveFileFailCallbackOrigin
+  type LegacySaveFileCompleteCallback = LegacySaveFileCompleteCallbackOrigin
+  type LegacySaveFileOptions = LegacySaveFileOptionsOrigin
+  type LegacyGetFileInfoSuccess = LegacyGetFileInfoSuccessOrigin
+  type LegacyGetFileInfoSuccessCallback = LegacyGetFileInfoSuccessCallbackOrigin
+  type LegacyGetFileInfoFail = LegacyGetFileInfoFailOrigin
+  type LegacyGetFileInfoFailCallback = LegacyGetFileInfoFailCallbackOrigin
+  type LegacyGetFileInfoCompleteCallback = LegacyGetFileInfoCompleteCallbackOrigin
+  type LegacyGetFileInfoOptions = LegacyGetFileInfoOptionsOrigin
+  type LegacyGetSavedFileInfoSuccess = LegacyGetSavedFileInfoSuccessOrigin
+  type LegacyGetSavedFileInfoSuccessCallback = LegacyGetSavedFileInfoSuccessCallbackOrigin
+  type LegacyGetSavedFileInfoFail = LegacyGetSavedFileInfoFailOrigin
+  type LegacyGetSavedFileInfoFailCallback = LegacyGetSavedFileInfoFailCallbackOrigin
+  type LegacyGetSavedFileInfoCompleteCallback = LegacyGetSavedFileInfoCompleteCallbackOrigin
+  type LegacyGetSavedFileInfoOptions = LegacyGetSavedFileInfoOptionsOrigin
+  type LegacyRemoveSavedFileSuccess = LegacyRemoveSavedFileSuccessOrigin
+  type LegacyRemoveSavedFileSuccessCallback = LegacyRemoveSavedFileSuccessCallbackOrigin
+  type LegacyRemoveSavedFileFail = LegacyRemoveSavedFileFailOrigin
+  type LegacyRemoveSavedFileFailCallback = LegacyRemoveSavedFileFailCallbackOrigin
+  type LegacyRemoveSavedFileCompleteCallback = LegacyRemoveSavedFileCompleteCallbackOrigin
+  type LegacyRemoveSavedFileOptions = LegacyRemoveSavedFileOptionsOrigin
+  type LegacySavedFileListItem = LegacySavedFileListItemOrigin
+  type LegacyGetSavedFileListSuccess = LegacyGetSavedFileListSuccessOrigin
+  type LegacyGetSavedFileListSuccessCallback = LegacyGetSavedFileListSuccessCallbackOrigin
+  type LegacyGetSavedFileListFail = LegacyGetSavedFileListFailOrigin
+  type LegacyGetSavedFileListFailCallback = LegacyGetSavedFileListFailCallbackOrigin
+  type LegacyGetSavedFileListCompleteCallback = LegacyGetSavedFileListCompleteCallbackOrigin
+  type LegacyGetSavedFileListOptions = LegacyGetSavedFileListOptionsOrigin
+  type SaveFile = SaveFileOrigin
+  type GetFileInfo = GetFileInfoOrigin
+  type GetSavedFileInfo = GetSavedFileInfoOrigin
+  type RemoveSavedFile = RemoveSavedFileOrigin
+  type GetSavedFileList = GetSavedFileListOrigin
+  interface Uni extends UniOrigin { }
+}

@@ -1,0 +1,420 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ$Àimport { C as Card } from "./Card.js";
+import { C as ChildDemoBox } from "./ChildDemoBox.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineComponent: _defineComponent } = globalThis.Vue;
+const { ref } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineComponent({
+  __name: "PropsDemoCard",
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
+    const parentCount = ref(10);
+    const childMessage = ref("æš‚æ— å­ç»„ä»¶æ¶ˆæ¯");
+    const tagList = ref(["å“åº”å¼ Props ä¼ é€’", "Emits äº‹ä»¶ç›‘å¬ä¸å›ä¼ ", "å…·å Header/Footer æ’æ§½", "å…·å Slot ä½œç”¨åŸŸä¼ å‚"]);
+    function onChildAdd(delta) {
+      parentCount.value += delta;
+    }
+    function onChildReset() {
+      parentCount.value = 0;
+      childMessage.value = "å·²è¢«å­ç»„ä»¶é‡ç½®ä¸º 0";
+    }
+    function onChildSendMsg(msg) {
+      childMessage.value = msg;
+    }
+    function addFiveFromParent() {
+      parentCount.value += 5;
+    }
+    function resetParent() {
+      parentCount.value = 10;
+      childMessage.value = "å·²é‡ç½®ä¸ºåˆå§‹çŠ¶æ€";
+    }
+    const __returned__ = { parentCount, childMessage, tagList, onChildAdd, onChildReset, onChildSendMsg, addFiveFromParent, resetParent, get Card() {
+      return Card;
+    }, get ChildDemoBox() {
+      return ChildDemoBox;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = { "bg-__2563eb_": { "": { "backgroundImage": "none", "backgroundColor": "#2563eb" } }, "bg-__64748b_": { "": { "backgroundImage": "none", "backgroundColor": "#64748b" } }, "bg-__dbeafe_": { "": { "backgroundImage": "none", "backgroundColor": "#dbeafe" } }, "bg-__eff6ff_": { "": { "backgroundImage": "none", "backgroundColor": "#eff6ff" } }, "bg-__f0fdf4_": { "": { "backgroundImage": "none", "backgroundColor": "#f0fdf4" } }, "border-color-__bbf7d0_": { "": { "borderTopColor": "#bbf7d0", "borderRightColor": "#bbf7d0", "borderBottomColor": "#bbf7d0", "borderLeftColor": "#bbf7d0" } }, "border-color-__bfdbfe_": { "": { "borderTopColor": "#bfdbfe", "borderRightColor": "#bfdbfe", "borderBottomColor": "#bfdbfe", "borderLeftColor": "#bfdbfe" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "font-medium": { "": { "fontWeight": 500 } }, "h-30px": { "": { "height": 30 } }, "items-center": { "": { "alignItems": "center" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-10px": { "": { "marginBottom": 10 } }, "mb-14px": { "": { "marginBottom": 14 } }, "mb-4px": { "": { "marginBottom": 4 } }, "mb-6px": { "": { "marginBottom": 6 } }, "ml-6px": { "": { "marginLeft": 6 } }, "ml-auto": { "": { "marginLeft": "auto" } }, "mr-6px": { "": { "marginRight": 6 } }, "mr-8px": { "": { "marginRight": 8 } }, "p-14px": { "": { "paddingTop": 14, "paddingRight": 14, "paddingBottom": 14, "paddingLeft": 14 } }, "p-8px": { "": { "paddingTop": 8, "paddingRight": 8, "paddingBottom": 8, "paddingLeft": 8 } }, "px-10px": { "": { "paddingLeft": 10, "paddingRight": 10 } }, "px-6px": { "": { "paddingLeft": 6, "paddingRight": 6 } }, "py-2px": { "": { "paddingTop": 2, "paddingBottom": 2 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-4px": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "rounded-6px": { "": { "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6 } }, "text-__059669_": { "": { "color": "#059669" } }, "text-__10b981_": { "": { "color": "#10b981" } }, "text-__15803d_": { "": { "color": "#15803d" } }, "text-__166534_": { "": { "color": "#166534" } }, "text-__1d4ed8_": { "": { "color": "#1d4ed8" } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__1e40af_": { "": { "color": "#1e40af" } }, "text-__22c55e_": { "": { "color": "#22c55e" } }, "text-__3b82f6_": { "": { "color": "#3b82f6" } }, "text-__64748b_": { "": { "color": "#64748b" } }, "text-10px": { "": { "fontSize": 10 } }, "text-11px": { "": { "fontSize": 11 } }, "text-12px": { "": { "fontSize": 12 } }, "text-14px": { "": { "fontSize": 14 } }, "text-white": { "": { "color": "rgba(255,255,255,var(--un-color-opacity,1))" } } };
+const { createElementVNode: _createElementVNode, toDisplayString: _toDisplayString, withCtx: _withCtx, createVNode: _createVNode, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createBlock($setup["Card"], { title: "çˆ¶å­ç»„ä»¶ä¼ å‚ & å…·åæ’æ§½æ¼”ç¤º" }, {
+    default: _withCtx(() => [
+      _createElementVNode("view", { class: "bg-__eff6ff_ rounded-12px p-14px mb-14px border-width-1px border-style-solid border-color-__bfdbfe_" }, [
+        _createElementVNode("text", { class: "text-14px font-bold text-__1e40af_ mb-6px" }, "ğŸ‘¨â€ğŸ‘©â€ğŸ‘§ çˆ¶ç»„ä»¶çŠ¶æ€ç®¡ç†é¢æ¿"),
+        _createElementVNode("view", { class: "flex-row items-center mb-4px" }, [
+          _createElementVNode("text", { class: "text-12px text-__3b82f6_" }, "çˆ¶ç»„ä»¶ Count å˜é‡: "),
+          _createElementVNode(
+            "text",
+            { class: "text-14px font-bold text-__1d4ed8_ ml-6px" },
+            _toDisplayString($setup.parentCount),
+            1
+            /* TEXT */
+          )
+        ]),
+        _createElementVNode("view", { class: "flex-row items-center mb-10px" }, [
+          _createElementVNode("text", { class: "text-12px text-__3b82f6_" }, "æ¥æ”¶åˆ°çš„å­ç»„ä»¶æ¶ˆæ¯: "),
+          _createElementVNode(
+            "text",
+            { class: "text-12px font-bold text-__059669_ ml-6px" },
+            _toDisplayString($setup.childMessage),
+            1
+            /* TEXT */
+          )
+        ]),
+        _createElementVNode("view", { class: "flex-row items-center" }, [
+          _createElementVNode("view", {
+            class: "bg-__2563eb_ rounded-6px px-10px h-30px flex-row items-center justify-center mr-8px",
+            onClick: $setup.addFiveFromParent
+          }, [
+            _createElementVNode("text", { class: "text-white text-12px" }, "çˆ¶ç»„ä»¶ç›´æ¥ Count + 5")
+          ]),
+          _createElementVNode("view", {
+            class: "bg-__64748b_ rounded-6px px-10px h-30px flex-row items-center justify-center",
+            onClick: $setup.resetParent
+          }, [
+            _createElementVNode("text", { class: "text-white text-12px" }, "çˆ¶ç»„ä»¶é‡ç½®çŠ¶æ€")
+          ])
+        ])
+      ]),
+      _createVNode($setup["ChildDemoBox"], {
+        title: "ç»„ä»¶é€šä¿¡æ¼”ç¤ºå­èŠ‚ç‚¹",
+        count: $setup.parentCount,
+        tags: $setup.tagList,
+        onAdd: $setup.onChildAdd,
+        onReset: $setup.onChildReset,
+        onSendMsg: $setup.onChildSendMsg
+      }, {
+        header: _withCtx(() => [
+          _createElementVNode("view", { class: "flex-row items-center justify-between" }, [
+            _createElementVNode("text", { class: "text-14px font-bold text-__1e293b_" }, "ğŸ·ï¸ çˆ¶ç»„ä»¶å¡«å…¥çš„å…·å Header æ’æ§½"),
+            _createElementVNode("text", { class: "text-11px text-__3b82f6_ bg-__dbeafe_ px-6px py-2px rounded-4px" }, "è‡ªå®šä¹‰ Header")
+          ])
+        ]),
+        itemSlot: _withCtx(({ item, index }) => [
+          _createElementVNode("view", { class: "flex-row items-center bg-__f0fdf4_ rounded-6px p-8px border-width-1px border-style-solid border-color-__bbf7d0_" }, [
+            _createElementVNode(
+              "text",
+              { class: "text-11px font-bold text-__15803d_ mr-6px" },
+              "#" + _toDisplayString(index + 1),
+              1
+              /* TEXT */
+            ),
+            _createElementVNode(
+              "text",
+              { class: "text-12px text-__166534_ font-medium" },
+              _toDisplayString(item),
+              1
+              /* TEXT */
+            ),
+            _createElementVNode(
+              "text",
+              { class: "text-10px text-__22c55e_ ml-auto" },
+              "å…·åSlotä¼ å‚: " + _toDisplayString(item),
+              1
+              /* TEXT */
+            )
+          ])
+        ]),
+        footer: _withCtx(() => [
+          _createElementVNode("view", { class: "flex-row items-center justify-between" }, [
+            _createElementVNode("text", { class: "text-11px text-__64748b_" }, "ğŸ“Œ çˆ¶ç»„ä»¶å¡«å…¥çš„å…·å Footer æ’æ§½"),
+            _createElementVNode("text", { class: "text-11px text-__10b981_" }, "åŒå‘é€šä¿¡éªŒè¯æˆåŠŸ")
+          ])
+        ]),
+        _: 1
+        /* STABLE */
+      }, 8, ["count", "tags"])
+    ]),
+    _: 1
+    /* STABLE */
+  });
+}
+const PropsDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/basic/components/PropsDemoCard.uvue"]]);
+export {
+  PropsDemoCard as P
+};
+//# sourceMappingURL=PropsDemoCard.js.map
+Â“Ù¹/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/Card.jsÙÁ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/ChildDemoBox.jsÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙÂ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/PropsDemoCard.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ‘ÔrD’²hostDependencyName®hostModuleName½./components/PropsDemoCard.js¥entryÃÚ$Àimport { C as Card } from "./Card.js";
+import { C as ChildDemoBox } from "./ChildDemoBox.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineComponent: _defineComponent } = globalThis.Vue;
+const { ref } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineComponent({
+  __name: "PropsDemoCard",
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
+    const parentCount = ref(10);
+    const childMessage = ref("æš‚æ— å­ç»„ä»¶æ¶ˆæ¯");
+    const tagList = ref(["å“åº”å¼ Props ä¼ é€’", "Emits äº‹ä»¶ç›‘å¬ä¸å›ä¼ ", "å…·å Header/Footer æ’æ§½", "å…·å Slot ä½œç”¨åŸŸä¼ å‚"]);
+    function onChildAdd(delta) {
+      parentCount.value += delta;
+    }
+    function onChildReset() {
+      parentCount.value = 0;
+      childMessage.value = "å·²è¢«å­ç»„ä»¶é‡ç½®ä¸º 0";
+    }
+    function onChildSendMsg(msg) {
+      childMessage.value = msg;
+    }
+    function addFiveFromParent() {
+      parentCount.value += 5;
+    }
+    function resetParent() {
+      parentCount.value = 10;
+      childMessage.value = "å·²é‡ç½®ä¸ºåˆå§‹çŠ¶æ€";
+    }
+    const __returned__ = { parentCount, childMessage, tagList, onChildAdd, onChildReset, onChildSendMsg, addFiveFromParent, resetParent, get Card() {
+      return Card;
+    }, get ChildDemoBox() {
+      return ChildDemoBox;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = { "bg-__2563eb_": { "": { "backgroundImage": "none", "backgroundColor": "#2563eb" } }, "bg-__64748b_": { "": { "backgroundImage": "none", "backgroundColor": "#64748b" } }, "bg-__dbeafe_": { "": { "backgroundImage": "none", "backgroundColor": "#dbeafe" } }, "bg-__eff6ff_": { "": { "backgroundImage": "none", "backgroundColor": "#eff6ff" } }, "bg-__f0fdf4_": { "": { "backgroundImage": "none", "backgroundColor": "#f0fdf4" } }, "border-color-__bbf7d0_": { "": { "borderTopColor": "#bbf7d0", "borderRightColor": "#bbf7d0", "borderBottomColor": "#bbf7d0", "borderLeftColor": "#bbf7d0" } }, "border-color-__bfdbfe_": { "": { "borderTopColor": "#bfdbfe", "borderRightColor": "#bfdbfe", "borderBottomColor": "#bfdbfe", "borderLeftColor": "#bfdbfe" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "font-medium": { "": { "fontWeight": 500 } }, "h-30px": { "": { "height": 30 } }, "items-center": { "": { "alignItems": "center" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-10px": { "": { "marginBottom": 10 } }, "mb-14px": { "": { "marginBottom": 14 } }, "mb-4px": { "": { "marginBottom": 4 } }, "mb-6px": { "": { "marginBottom": 6 } }, "ml-6px": { "": { "marginLeft": 6 } }, "ml-auto": { "": { "marginLeft": "auto" } }, "mr-6px": { "": { "marginRight": 6 } }, "mr-8px": { "": { "marginRight": 8 } }, "p-14px": { "": { "paddingTop": 14, "paddingRight": 14, "paddingBottom": 14, "paddingLeft": 14 } }, "p-8px": { "": { "paddingTop": 8, "paddingRight": 8, "paddingBottom": 8, "paddingLeft": 8 } }, "px-10px": { "": { "paddingLeft": 10, "paddingRight": 10 } }, "px-6px": { "": { "paddingLeft": 6, "paddingRight": 6 } }, "py-2px": { "": { "paddingTop": 2, "paddingBottom": 2 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-4px": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "rounded-6px": { "": { "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6 } }, "text-__059669_": { "": { "color": "#059669" } }, "text-__10b981_": { "": { "color": "#10b981" } }, "text-__15803d_": { "": { "color": "#15803d" } }, "text-__166534_": { "": { "color": "#166534" } }, "text-__1d4ed8_": { "": { "color": "#1d4ed8" } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__1e40af_": { "": { "color": "#1e40af" } }, "text-__22c55e_": { "": { "color": "#22c55e" } }, "text-__3b82f6_": { "": { "color": "#3b82f6" } }, "text-__64748b_": { "": { "color": "#64748b" } }, "text-10px": { "": { "fontSize": 10 } }, "text-11px": { "": { "fontSize": 11 } }, "text-12px": { "": { "fontSize": 12 } }, "text-14px": { "": { "fontSize": 14 } }, "text-white": { "": { "color": "rgba(255,255,255,var(--un-color-opacity,1))" } } };
+const { createElementVNode: _createElementVNode, toDisplayString: _toDisplayString, withCtx: _withCtx, createVNode: _createVNode, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createBlock($setup["Card"], { title: "çˆ¶å­ç»„ä»¶ä¼ å‚ & å…·åæ’æ§½æ¼”ç¤º" }, {
+    default: _withCtx(() => [
+      _createElementVNode("view", { class: "bg-__eff6ff_ rounded-12px p-14px mb-14px border-width-1px border-style-solid border-color-__bfdbfe_" }, [
+        _createElementVNode("text", { class: "text-14px font-bold text-__1e40af_ mb-6px" }, "ğŸ‘¨â€ğŸ‘©â€ğŸ‘§ çˆ¶ç»„ä»¶çŠ¶æ€ç®¡ç†é¢æ¿"),
+        _createElementVNode("view", { class: "flex-row items-center mb-4px" }, [
+          _createElementVNode("text", { class: "text-12px text-__3b82f6_" }, "çˆ¶ç»„ä»¶ Count å˜é‡: "),
+          _createElementVNode(
+            "text",
+            { class: "text-14px font-bold text-__1d4ed8_ ml-6px" },
+            _toDisplayString($setup.parentCount),
+            1
+            /* TEXT */
+          )
+        ]),
+        _createElementVNode("view", { class: "flex-row items-center mb-10px" }, [
+          _createElementVNode("text", { class: "text-12px text-__3b82f6_" }, "æ¥æ”¶åˆ°çš„å­ç»„ä»¶æ¶ˆæ¯: "),
+          _createElementVNode(
+            "text",
+            { class: "text-12px font-bold text-__059669_ ml-6px" },
+            _toDisplayString($setup.childMessage),
+            1
+            /* TEXT */
+          )
+        ]),
+        _createElementVNode("view", { class: "flex-row items-center" }, [
+          _createElementVNode("view", {
+            class: "bg-__2563eb_ rounded-6px px-10px h-30px flex-row items-center justify-center mr-8px",
+            onClick: $setup.addFiveFromParent
+          }, [
+            _createElementVNode("text", { class: "text-white text-12px" }, "çˆ¶ç»„ä»¶ç›´æ¥ Count + 5")
+          ]),
+          _createElementVNode("view", {
+            class: "bg-__64748b_ rounded-6px px-10px h-30px flex-row items-center justify-center",
+            onClick: $setup.resetParent
+          }, [
+            _createElementVNode("text", { class: "text-white text-12px" }, "çˆ¶ç»„ä»¶é‡ç½®çŠ¶æ€")
+          ])
+        ])
+      ]),
+      _createVNode($setup["ChildDemoBox"], {
+        title: "ç»„ä»¶é€šä¿¡æ¼”ç¤ºå­èŠ‚ç‚¹",
+        count: $setup.parentCount,
+        tags: $setup.tagList,
+        onAdd: $setup.onChildAdd,
+        onReset: $setup.onChildReset,
+        onSendMsg: $setup.onChildSendMsg
+      }, {
+        header: _withCtx(() => [
+          _createElementVNode("view", { class: "flex-row items-center justify-between" }, [
+            _createElementVNode("text", { class: "text-14px font-bold text-__1e293b_" }, "ğŸ·ï¸ çˆ¶ç»„ä»¶å¡«å…¥çš„å…·å Header æ’æ§½"),
+            _createElementVNode("text", { class: "text-11px text-__3b82f6_ bg-__dbeafe_ px-6px py-2px rounded-4px" }, "è‡ªå®šä¹‰ Header")
+          ])
+        ]),
+        itemSlot: _withCtx(({ item, index }) => [
+          _createElementVNode("view", { class: "flex-row items-center bg-__f0fdf4_ rounded-6px p-8px border-width-1px border-style-solid border-color-__bbf7d0_" }, [
+            _createElementVNode(
+              "text",
+              { class: "text-11px font-bold text-__15803d_ mr-6px" },
+              "#" + _toDisplayString(index + 1),
+              1
+              /* TEXT */
+            ),
+            _createElementVNode(
+              "text",
+              { class: "text-12px text-__166534_ font-medium" },
+              _toDisplayString(item),
+              1
+              /* TEXT */
+            ),
+            _createElementVNode(
+              "text",
+              { class: "text-10px text-__22c55e_ ml-auto" },
+              "å…·åSlotä¼ å‚: " + _toDisplayString(item),
+              1
+              /* TEXT */
+            )
+          ])
+        ]),
+        footer: _withCtx(() => [
+          _createElementVNode("view", { class: "flex-row items-center justify-between" }, [
+            _createElementVNode("text", { class: "text-11px text-__64748b_" }, "ğŸ“Œ çˆ¶ç»„ä»¶å¡«å…¥çš„å…·å Footer æ’æ§½"),
+            _createElementVNode("text", { class: "text-11px text-__10b981_" }, "åŒå‘é€šä¿¡éªŒè¯æˆåŠŸ")
+          ])
+        ]),
+        _: 1
+        /* STABLE */
+      }, 8, ["count", "tags"])
+    ]),
+    _: 1
+    /* STABLE */
+  });
+}
+const PropsDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/basic/components/PropsDemoCard.uvue"]]);
+export {
+  PropsDemoCard as P
+};
+//# sourceMappingURL=PropsDemoCard.js.map
+ÔrE•§version¨mappings¥names§sources®sourcesContentÜ Œ‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘ÙÂ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/PropsDemoCard.js‘Ú$Àimport { C as Card } from "./Card.js";
+import { C as ChildDemoBox } from "./ChildDemoBox.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineComponent: _defineComponent } = globalThis.Vue;
+const { ref } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineComponent({
+  __name: "PropsDemoCard",
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
+    const parentCount = ref(10);
+    const childMessage = ref("æš‚æ— å­ç»„ä»¶æ¶ˆæ¯");
+    const tagList = ref(["å“åº”å¼ Props ä¼ é€’", "Emits äº‹ä»¶ç›‘å¬ä¸å›ä¼ ", "å…·å Header/Footer æ’æ§½", "å…·å Slot ä½œç”¨åŸŸä¼ å‚"]);
+    function onChildAdd(delta) {
+      parentCount.value += delta;
+    }
+    function onChildReset() {
+      parentCount.value = 0;
+      childMessage.value = "å·²è¢«å­ç»„ä»¶é‡ç½®ä¸º 0";
+    }
+    function onChildSendMsg(msg) {
+      childMessage.value = msg;
+    }
+    function addFiveFromParent() {
+      parentCount.value += 5;
+    }
+    function resetParent() {
+      parentCount.value = 10;
+      childMessage.value = "å·²é‡ç½®ä¸ºåˆå§‹çŠ¶æ€";
+    }
+    const __returned__ = { parentCount, childMessage, tagList, onChildAdd, onChildReset, onChildSendMsg, addFiveFromParent, resetParent, get Card() {
+      return Card;
+    }, get ChildDemoBox() {
+      return ChildDemoBox;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = { "bg-__2563eb_": { "": { "backgroundImage": "none", "backgroundColor": "#2563eb" } }, "bg-__64748b_": { "": { "backgroundImage": "none", "backgroundColor": "#64748b" } }, "bg-__dbeafe_": { "": { "backgroundImage": "none", "backgroundColor": "#dbeafe" } }, "bg-__eff6ff_": { "": { "backgroundImage": "none", "backgroundColor": "#eff6ff" } }, "bg-__f0fdf4_": { "": { "backgroundImage": "none", "backgroundColor": "#f0fdf4" } }, "border-color-__bbf7d0_": { "": { "borderTopColor": "#bbf7d0", "borderRightColor": "#bbf7d0", "borderBottomColor": "#bbf7d0", "borderLeftColor": "#bbf7d0" } }, "border-color-__bfdbfe_": { "": { "borderTopColor": "#bfdbfe", "borderRightColor": "#bfdbfe", "borderBottomColor": "#bfdbfe", "borderLeftColor": "#bfdbfe" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "font-medium": { "": { "fontWeight": 500 } }, "h-30px": { "": { "height": 30 } }, "items-center": { "": { "alignItems": "center" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-10px": { "": { "marginBottom": 10 } }, "mb-14px": { "": { "marginBottom": 14 } }, "mb-4px": { "": { "marginBottom": 4 } }, "mb-6px": { "": { "marginBottom": 6 } }, "ml-6px": { "": { "marginLeft": 6 } }, "ml-auto": { "": { "marginLeft": "auto" } }, "mr-6px": { "": { "marginRight": 6 } }, "mr-8px": { "": { "marginRight": 8 } }, "p-14px": { "": { "paddingTop": 14, "paddingRight": 14, "paddingBottom": 14, "paddingLeft": 14 } }, "p-8px": { "": { "paddingTop": 8, "paddingRight": 8, "paddingBottom": 8, "paddingLeft": 8 } }, "px-10px": { "": { "paddingLeft": 10, "paddingRight": 10 } }, "px-6px": { "": { "paddingLeft": 6, "paddingRight": 6 } }, "py-2px": { "": { "paddingTop": 2, "paddingBottom": 2 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-4px": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "rounded-6px": { "": { "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6 } }, "text-__059669_": { "": { "color": "#059669" } }, "text-__10b981_": { "": { "color": "#10b981" } }, "text-__15803d_": { "": { "color": "#15803d" } }, "text-__166534_": { "": { "color": "#166534" } }, "text-__1d4ed8_": { "": { "color": "#1d4ed8" } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__1e40af_": { "": { "color": "#1e40af" } }, "text-__22c55e_": { "": { "color": "#22c55e" } }, "text-__3b82f6_": { "": { "color": "#3b82f6" } }, "text-__64748b_": { "": { "color": "#64748b" } }, "text-10px": { "": { "fontSize": 10 } }, "text-11px": { "": { "fontSize": 11 } }, "text-12px": { "": { "fontSize": 12 } }, "text-14px": { "": { "fontSize": 14 } }, "text-white": { "": { "color": "rgba(255,255,255,var(--un-color-opacity,1))" } } };
+const { createElementVNode: _createElementVNode, toDisplayString: _toDisplayString, withCtx: _withCtx, createVNode: _createVNode, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createBlock($setup["Card"], { title: "çˆ¶å­ç»„ä»¶ä¼ å‚ & å…·åæ’æ§½æ¼”ç¤º" }, {
+    default: _withCtx(() => [
+      _createElementVNode("view", { class: "bg-__eff6ff_ rounded-12px p-14px mb-14px border-width-1px border-style-solid border-color-__bfdbfe_" }, [
+        _createElementVNode("text", { class: "text-14px font-bold text-__1e40af_ mb-6px" }, "ğŸ‘¨â€ğŸ‘©â€ğŸ‘§ çˆ¶ç»„ä»¶çŠ¶æ€ç®¡ç†é¢æ¿"),
+        _createElementVNode("view", { class: "flex-row items-center mb-4px" }, [
+          _createElementVNode("text", { class: "text-12px text-__3b82f6_" }, "çˆ¶ç»„ä»¶ Count å˜é‡: "),
+          _createElementVNode(
+            "text",
+            { class: "text-14px font-bold text-__1d4ed8_ ml-6px" },
+            _toDisplayString($setup.parentCount),
+            1
+            /* TEXT */
+          )
+        ]),
+        _createElementVNode("view", { class: "flex-row items-center mb-10px" }, [
+          _createElementVNode("text", { class: "text-12px text-__3b82f6_" }, "æ¥æ”¶åˆ°çš„å­ç»„ä»¶æ¶ˆæ¯: "),
+          _createElementVNode(
+            "text",
+            { class: "text-12px font-bold text-__059669_ ml-6px" },
+            _toDisplayString($setup.childMessage),
+            1
+            /* TEXT */
+          )
+        ]),
+        _createElementVNode("view", { class: "flex-row items-center" }, [
+          _createElementVNode("view", {
+            class: "bg-__2563eb_ rounded-6px px-10px h-30px flex-row items-center justify-center mr-8px",
+            onClick: $setup.addFiveFromParent
+          }, [
+            _createElementVNode("text", { class: "text-white text-12px" }, "çˆ¶ç»„ä»¶ç›´æ¥ Count + 5")
+          ]),
+          _createElementVNode("view", {
+            class: "bg-__64748b_ rounded-6px px-10px h-30px flex-row items-center justify-center",
+            onClick: $setup.resetParent
+          }, [
+            _createElementVNode("text", { class: "text-white text-12px" }, "çˆ¶ç»„ä»¶é‡ç½®çŠ¶æ€")
+          ])
+        ])
+      ]),
+      _createVNode($setup["ChildDemoBox"], {
+        title: "ç»„ä»¶é€šä¿¡æ¼”ç¤ºå­èŠ‚ç‚¹",
+        count: $setup.parentCount,
+        tags: $setup.tagList,
+        onAdd: $setup.onChildAdd,
+        onReset: $setup.onChildReset,
+        onSendMsg: $setup.onChildSendMsg
+      }, {
+        header: _withCtx(() => [
+          _createElementVNode("view", { class: "flex-row items-center justify-between" }, [
+            _createElementVNode("text", { class: "text-14px font-bold text-__1e293b_" }, "ğŸ·ï¸ çˆ¶ç»„ä»¶å¡«å…¥çš„å…·å Header æ’æ§½"),
+            _createElementVNode("text", { class: "text-11px text-__3b82f6_ bg-__dbeafe_ px-6px py-2px rounded-4px" }, "è‡ªå®šä¹‰ Header")
+          ])
+        ]),
+        itemSlot: _withCtx(({ item, index }) => [
+          _createElementVNode("view", { class: "flex-row items-center bg-__f0fdf4_ rounded-6px p-8px border-width-1px border-style-solid border-color-__bbf7d0_" }, [
+            _createElementVNode(
+              "text",
+              { class: "text-11px font-bold text-__15803d_ mr-6px" },
+              "#" + _toDisplayString(index + 1),
+              1
+              /* TEXT */
+            ),
+            _createElementVNode(
+              "text",
+              { class: "text-12px text-__166534_ font-medium" },
+              _toDisplayString(item),
+              1
+              /* TEXT */
+            ),
+            _createElementVNode(
+              "text",
+              { class: "text-10px text-__22c55e_ ml-auto" },
+              "å…·åSlotä¼ å‚: " + _toDisplayString(item),
+              1
+              /* TEXT */
+            )
+          ])
+        ]),
+        footer: _withCtx(() => [
+          _createElementVNode("view", { class: "flex-row items-center justify-between" }, [
+            _createElementVNode("text", { class: "text-11px text-__64748b_" }, "ğŸ“Œ çˆ¶ç»„ä»¶å¡«å…¥çš„å…·å Footer æ’æ§½"),
+            _createElementVNode("text", { class: "text-11px text-__10b981_" }, "åŒå‘é€šä¿¡éªŒè¯æˆåŠŸ")
+          ])
+        ]),
+        _: 1
+        /* STABLE */
+      }, 8, ["count", "tags"])
+    ]),
+    _: 1
+    /* STABLE */
+  });
+}
+const PropsDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/basic/components/PropsDemoCard.uvue"]]);
+export {
+  PropsDemoCard as P
+};
+//# sourceMappingURL=PropsDemoCard.js.map
+ÔrF“©./Card.jsÙ'../../../../plugin-vue-export-helper.js±./ChildDemoBox.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙ¹/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/Card.jsAÃªoh-resolveÂGAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂGAÂÙÁ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/ChildDemoBox.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ#SÍ#sÀ‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍ#^Í#pÔrL”¤type¥start£end¤nameªIdentifierÍ#^Í#k­PropsDemoCardLªIdentifierÍ#oÍ#p¡PÀ“ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration &‘ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	
+¡CLªIdentifier¤CardÔrO•¤type¥start£end¥value£raw§Literal%©./Card.js«"./Card.js"M±ImportDeclaration'Ì]‘N¯ImportSpecifier0ÌALªIdentifier01¡CLªIdentifier5ÌA¬ChildDemoBoxO§LiteralÌIÌ\±./ChildDemoBox.js³"./ChildDemoBox.js"M±ImportDeclarationÌ^Ì©‘N¯ImportSpecifierÌgÌwLªIdentifierÌgÌh¡_LªIdentifierÌlÌw«_export_sfcO§LiteralÌÌ¨Ù'../../../../plugin-vue-export-helper.jsÙ)"../../../../plugin-vue-export-helper.js"
