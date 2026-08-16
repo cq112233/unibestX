@@ -52,103 +52,99 @@
 	</view>
 </template>
 
-<script lang="uts">
-	import { mpMixin } from '../../libs/mixin/mpMixin';
-	import { mixin } from '../../libs/mixin/mixin';
-	import { t } from '../../libs/i18n/index.uts';
-	export default {
-		name: 'up-calendar-header',
-		// mixins: [mpMixin, mixin],
-		props: {
-			// 标题
-			title: {
-				type: String,
-				default: ''
-			},
-			// 副标题
-			subtitle: {
-				type: String,
-				default: ''
-			},
-			// 是否显示标题
-			showTitle: {
-				type: Boolean,
-				default: true
-			},
-			// 是否显示副标题
-			showSubtitle: {
-				type: Boolean,
-				default: true
-			},
-			showSwitch: {
-				type: Boolean,
-				default: false
-			},
-			prevDisabled: {
-				type: Boolean,
-				default: false
-			},
-			nextDisabled: {
-				type: Boolean,
-				default: false
-			},
-			prevYearDisabled: {
-				type: Boolean,
-				default: false
-			},
-			nextYearDisabled: {
-				type: Boolean,
-				default: false
-			},
-			showToday: {
-				type: Boolean,
-				default: true
-			},
-			todayText: {
-				type: String,
-				default: '今天'
-			},
-			todayDisabled: {
-				type: Boolean,
-				default: false
-			},
-		},
-		data() {
-			return {
+<script setup lang="uts">
+import { t as i18nT } from '../../libs/i18n/index.uts'
 
-			}
-		},
-		methods: {
-			t(key: string): string {
-				return t(key, {} as UTSJSONObject)
-			},
-			prev() {
-				if (!this.prevDisabled) {
-					this.$emit('prev')
-				}
-			},
-			next() {
-				if (!this.nextDisabled) {
-					this.$emit('next')
-				}
-			},
-			prevYear() {
-				if (!this.prevYearDisabled) {
-					this.$emit('prevYear')
-				}
-			},
-			nextYear() {
-				if (!this.nextYearDisabled) {
-					this.$emit('nextYear')
-				}
-			},
-			today() {
-				if (!this.todayDisabled) {
-					this.$emit('today')
-				}
-			}
-		}
+defineOptions({
+	name: 'up-calendar-header'
+})
+
+const props = defineProps({
+	title: {
+		type: String,
+		default: ''
+	},
+	subtitle: {
+		type: String,
+		default: ''
+	},
+	showTitle: {
+		type: Boolean,
+		default: true
+	},
+	showSubtitle: {
+		type: Boolean,
+		default: true
+	},
+	showSwitch: {
+		type: Boolean,
+		default: false
+	},
+	prevDisabled: {
+		type: Boolean,
+		default: false
+	},
+	nextDisabled: {
+		type: Boolean,
+		default: false
+	},
+	prevYearDisabled: {
+		type: Boolean,
+		default: false
+	},
+	nextYearDisabled: {
+		type: Boolean,
+		default: false
+	},
+	showToday: {
+		type: Boolean,
+		default: true
+	},
+	todayText: {
+		type: String,
+		default: '今天'
+	},
+	todayDisabled: {
+		type: Boolean,
+		default: false
 	}
+})
+
+const emit = defineEmits(['prev', 'next', 'prevYear', 'nextYear', 'today'])
+
+function t(key: string): string {
+	return i18nT(key, {} as UTSJSONObject)
+}
+
+function prev() {
+	if (!props.prevDisabled) {
+		emit('prev')
+	}
+}
+
+function next() {
+	if (!props.nextDisabled) {
+		emit('next')
+	}
+}
+
+function prevYear() {
+	if (!props.prevYearDisabled) {
+		emit('prevYear')
+	}
+}
+
+function nextYear() {
+	if (!props.nextYearDisabled) {
+		emit('nextYear')
+	}
+}
+
+function today() {
+	if (!props.todayDisabled) {
+		emit('today')
+	}
+}
 </script>
 
 <style lang="scss" scoped>

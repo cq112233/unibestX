@@ -1,14 +1,14 @@
 <template>
-  <Card :title="$t('basic.themeTitle')">
+  <Card :title="themeTitle">
     <!-- 预览区域 -->
     <view class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0] items-center">
-      <text class="text-12px text-[#94a3b8] mb-8px">{{ $t('basic.themePreview') }}</text>
+      <text class="text-12px text-[#94a3b8] mb-8px">{{ themePreview }}</text>
 
       <view
         class="mt-10px mx-auto w-200px h-44px rounded-8px flex flex-row items-center justify-center"
         :style="{ backgroundColor: currentTheme }"
       >
-        <text class="text-[#ffffff] text-14px">{{ $t('basic.themeButton') }}</text>
+        <text class="text-[#ffffff] text-14px">{{ themeButton }}</text>
       </view>
     </view>
 
@@ -39,10 +39,15 @@
 
 <script setup lang="uts">
 import Card from './Card.uvue'
+import { computed } from 'vue'
 import { useAppStore } from '@/src/store/index.uts'
-import { t } from '@/src/utils/i18n'
+import { $t } from '@/src/utils/i18n'
 
 const appStore = useAppStore()
+
+const themeTitle = computed((): string => $t('basic.themeTitle'))
+const themePreview = computed((): string => $t('basic.themePreview'))
+const themeButton = computed((): string => $t('basic.themeButton'))
 
 const currentTheme = computed((): string => {
   return appStore.state.theme
@@ -60,7 +65,7 @@ function changeTheme(color: string) {
   appStore.setTheme(color)
 
   uni.showToast({
-    title: t('basic.themeSuccess', null),
+    title: $t('basic.themeSuccess'),
     icon: 'none',
     duration: 1500,
   })

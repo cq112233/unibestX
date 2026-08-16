@@ -1,23 +1,22 @@
 <template>
     <view
         class="up-subsection"
-        ref="up-subsection"
+        ref="upSubsectionRef"
         :class="[`up-subsection--${mode}`]"
-        :style="[addStyle(customStyle), wrapperStyle]"
+        :style="computedRootStyle"
     >
         <view
             class="up-subsection__bar cursor-pointer"
-            ref="up-subsection__bar"
             :style="barStyle"
         >
             <view
                 class="up-subsection__bar__inner"
                 :class="{
-					'up-subsection--button__bar': mode === 'button',
-					'up-subsection__bar__inner--button': mode === 'button',
-					'up-subsection__bar--first': (innerCurrent == 0 && mode === 'subsection'),
-					'up-subsection__bar--center': (innerCurrent > 0 && innerCurrent < list.length - 1 && mode === 'subsection'),
-					'up-subsection__bar--last': (innerCurrent == list.length - 1 && mode === 'subsection')
+					'up-subsection--button__bar': mode == 'button',
+					'up-subsection__bar__inner--button': mode == 'button',
+					'up-subsection__bar--first': (innerCurrent == 0 && mode == 'subsection'),
+					'up-subsection__bar--center': (innerCurrent > 0 && innerCurrent < list.length - 1 && mode == 'subsection'),
+					'up-subsection__bar--last': (innerCurrent == list.length - 1 && mode == 'subsection')
 				}"
                 :style="innerBarStyle"
             ></view>
@@ -32,8 +31,7 @@
 	                index == list.length - 1 ? 'up-subsection__item--last' : '',
 					disabled ? 'up-subsection__item--disabled' : ''
 	            ]"
-            :ref="`up-subsection__item--${index.toString()}`"
-            :style="[itemStyle(index)]"
+            :style="itemStyle(index)"
             @tap="clickHandler(index)"
             v-for="(item, index) in list"
             :key="index"
@@ -43,9 +41,9 @@
 					    class="up-subsection__item__text"
 						:class="[
 							disabled ? 'up-subsection__item__text--disabled' : '',
-							(innerCurrent == index && mode === 'button' && activeColor == '#3c9cff') ? 'up-subsection__item__text--active' : ''
+							(innerCurrent == index && mode == 'button' && activeColor == '#3c9cff') ? 'up-subsection__item__text--active' : ''
 						]"
-					    :style="[textStyle(index)]"
+					    :style="textStyle(index)"
 					    >{{ getText(item) }}</text
 					>
 				</slot>
@@ -53,221 +51,239 @@
     </view>
 </template>
 
-<script lang="uts">
-import { subsectionProps } from "./props";
-import { mpMixin } from '../../libs/mixin/mpMixin';
-import { mixin } from '../../libs/mixin/mixin';
-import { addStyle, addUnit, sleep } from '../../libs/function/index';
-/**
- * Subsection 分段器
- * @description 该分段器一般用于用户从几个选项中选择某一个的场景
- * @tutorial https://ijry.github.io/uview-plus/components/subsection.html
- * @property {Array}			list			tab的数据
- * @property {String ｜ Number}	current			当前活动的tab的index（默认 0 ）
- * @property {String}			activeColor		激活时的颜色（默认 '#3c9cff' ）
- * @property {String}			inactiveColor	未激活时的颜色（默认 '#303133' ）
- * @property {String}			mode			模式选择，mode=button为按钮形式，mode=subsection时为分段模式（默认 'button' ）
- * @property {String ｜ Number}	fontSize		字体大小，单位px（默认 12px ）
- * @property {Boolean}			bold			激活选项的字体是否加粗（默认 true ）
- * @property {String}			bgColor			组件背景颜色，mode为button时有效（默认 '#eeeeef' ）
- * @property {Object}			customStyle		定义需要用到的外部样式
- * @property {String}	        keyName	        从`list`元素对象中读取的键名（默认 'name' ）
- *
- * @event {Function} change		分段器选项发生改变时触发  回调 index：选项的index索引值，从0开始
- * @example <up-subsection :list="list" :current="curNow" @change="sectionChange"></up-subsection>
- */
-export default {
-    name: "up-subsection",
-    mixins: [
-		mpMixin, mixin,
-		subsectionProps
-	],
-    data() {
-        return {
-            innerCurrent: 0,
-            componentWidth: 0,
-            firstTime: true,
-            windowResizeCallback: {}
-        };
-    },
-    watch: {
-        list() {
-            this.init();
-        },
-        current: {
-            immediate: true,
-            handler(n: string | number) {
-				let nn = parseInt(n.toString())
-                if (nn !== this.innerCurrent) {
-                    this.innerCurrent = nn
-                }
-            },
-        },
-    },
-    computed: {
-        wrapperStyle() {
-            const style = {};
-            // button模式时，设置背景色
-            if (this.mode === "button") {
-                style['backgroundColor'] = this.bgColor;
-            }
-            return style;
-        },
-        // 滑块的样式
-        barStyle(): any {
-            const style = {};
-            if (this.componentWidth > 0) {
-                const itemWidth = this.componentWidth / this.list.length;
-                style['width'] = itemWidth.toString() + 'px';
-                style['transform'] = `translateX(${this.innerCurrent * itemWidth}px)`;
-            } else {
-                if (this.list.length > 0) {
-                    style['width'] = (100.0 / this.list.length).toString() + '%';
-                }
-                style['transform'] = `translateX(${this.innerCurrent * 100}%)`;
-            }
-            if (this.firstTime) {
-                style['transitionDuration'] = '0ms';
-            } else {
-                style['transitionDuration'] = '300ms';
-            }
-            style['left'] = '0px';
-            style['top'] = '0px';
-            style['bottom'] = '0px';
-            return style;
-        },
-        innerBarStyle(): any {
-            const style = {};
-            if (this.mode === "subsection") {
-                if (this.activeColor != '#3c9cff') {
-                    style['backgroundColor'] = this.activeColor;
-                }
-            }
-            return style;
-        }
-    },
-    mounted() {
-        this.init();
-        // this.windowResizeCallback = (res) => {
-        //     this.init();
-        // }
-        // uni.onWindowResize(this.windowResizeCallback)
-    },
-    beforeUnmount() {
-        // uni.offWindowResize(this.windowResizeCallback)
-    },
-	emits: ["change"],
-    methods: {
-        addStyle(e: any) {
-        	return addStyle(e);
-        },
-        addUnit(e: any) {
-        	return addUnit(e);
-        },
-        init() {
-			// @ts-ignore
-            this.innerCurrent = parseInt(this.current.toString())
-            this.$nextTick(() => {
-                this.resize()
-            })
-        },
-        resize() {
-            this.getWrapperRect().then((rect: NodeInfo | null) => {
-                if (rect != null && rect.width != null && rect.width! > 0) {
-                    this.componentWidth = rect.width!
-                    if (this.firstTime) {
-                        this.$nextTick(() => {
-                            setTimeout(() => {
-                                this.firstTime = false
-                            }, 50)
-                        })
-                    }
-                }
-            })
-        },
-        getWrapperRect(): Promise<NodeInfo | null> {
-            return new Promise((resolve) => {
-                uni.createSelectorQuery()
-                    .in(this)
-                    .select('.up-subsection')
-                    .boundingClientRect()
-                    .exec((rect) => {
-                        if (rect != null && rect.length > 0) {
-                            resolve(rect[0] as NodeInfo);
-                        } else {
-                            resolve(null);
-                        }
-                    })
-            })
-        },
-		itemStyle(index: number) {
-			const style = {};
-			if (this.mode === "subsection") {
-				// 设置border的样式
-				if (this.activeColor != '#3c9cff') {
-					style['borderColor'] = this.activeColor;
-				}
-				style['borderWidth'] = "1px";
-				style['borderStyle'] = "solid";
-			}
-			return style;
-		},
-		textStyle(index: number) {
-			const style = {};
-			if (this.disabled) {
-				style['fontWeight'] = 'normal';
-				style['fontSize'] = addUnit(this.fontSize);
-				style['color'] = '#c8c9cc';
-				return style;
-			}
-			style['fontWeight'] =
-				this.bold && this.innerCurrent === index ? "bold" : "normal";
-			style['fontSize'] = addUnit(this.fontSize);
-			const item = this.list[index];
-			const activeColorTemp =
-				typeof item == 'object' && item != null
-					? (((item as UTSJSONObject)[this.activeColorKeyName] ?? '') as string)
-					: '';
-			const inactiveColorTemp =
-				typeof item === 'object' && item != null
-					? (((item as UTSJSONObject)[this.inactiveColorKeyName] ?? '') as string)
-					: '';
-			// subsection模式下，激活时默认为白色的文字
-			if (this.mode === "subsection") {
-				style['color'] =
-					this.innerCurrent === index ? (activeColorTemp != '' ? activeColorTemp : "#fff") : (inactiveColorTemp != '' ? inactiveColorTemp : this.inactiveColor);
-			} else {
-				// button模式下，激活时文字颜色默认为activeColor
-				const c = activeColorTemp != '' ? activeColorTemp : this.activeColor;
-				if (this.innerCurrent == index) {
-					if (c != '#3c9cff') {
-						style['color'] = c;
-					}
-				} else {
-					style['color'] = inactiveColorTemp != '' ? inactiveColorTemp : this.inactiveColor;
-				}
-			}
-			return style;
-		},
-		// 判断展示文本
-		getText(item: any|null): string|null {
-			if (typeof item === 'string') {
-				return item;
-			} else if (typeof item === 'object') {
-				let temp = JSON.parse(JSON.stringify(item)) as UTSJSONObject;
-				return temp.getString(this.keyName);
-			} else {
-				return "error";
-			}
-		},
+<script setup lang="uts">
+import { computed, ref, watch, onMounted, nextTick, getCurrentInstance } from 'vue'
+import { addStyle, addUnit, sleep, deepMerge } from '../../libs/function/index.uts'
 
-	        clickHandler(index: number) {
-				if (this.disabled) return
-	            this.innerCurrent = index
-	            this.$emit("change", index);
-	        }
-    },
-};
+defineOptions({
+  name: 'up-subsection'
+})
+
+const props = defineProps({
+  list: {
+    type: Array as PropType<Array<any>>,
+    default: () => [] as Array<any>
+  },
+  current: {
+    type: [String, Number],
+    default: 0
+  },
+  activeColor: {
+    type: String,
+    default: '#3c9cff'
+  },
+  inactiveColor: {
+    type: String,
+    default: '#303133'
+  },
+  mode: {
+    type: String,
+    default: 'button'
+  },
+  fontSize: {
+    type: [String, Number],
+    default: 12
+  },
+  bold: {
+    type: Boolean,
+    default: true
+  },
+  bgColor: {
+    type: String,
+    default: '#eeeeef'
+  },
+  keyName: {
+    type: String,
+    default: 'name'
+  },
+  activeColorKeyName: {
+    type: String,
+    default: 'activeColor'
+  },
+  inactiveColorKeyName: {
+    type: String,
+    default: 'inactiveColor'
+  },
+  disabled: {
+    type: Boolean,
+    default: false
+  },
+  customStyle: {
+    type: Object,
+    default: () => ({})
+  }
+})
+
+const emit = defineEmits(['change'])
+const instance = getCurrentInstance()
+
+const innerCurrent = ref<number>(parseInt(props.current.toString()))
+const componentWidth = ref<number>(0)
+const firstTime = ref<boolean>(true)
+
+watch((): any => props.current, (n: any) => {
+  const nn = parseInt(n.toString())
+  if (nn != innerCurrent.value) {
+    innerCurrent.value = nn
+  }
+})
+
+watch((): Array<any> => props.list, () => {
+  init()
+})
+
+const wrapperStyle = computed<UTSJSONObject>(() => {
+  const style = {} as UTSJSONObject
+  if (props.mode == 'button') {
+    style['backgroundColor'] = props.bgColor
+  }
+  return style
+})
+
+const computedRootStyle = computed((): UTSJSONObject => {
+  const custom = addStyle(props.customStyle) as UTSJSONObject
+  const wrapper = wrapperStyle.value
+  return deepMerge(wrapper, custom) as UTSJSONObject
+})
+
+const barStyle = computed<UTSJSONObject>(() => {
+  const style = {} as UTSJSONObject
+  if (componentWidth.value > 0) {
+    const itemWidth = componentWidth.value / props.list.length
+    style['width'] = itemWidth.toString() + 'px'
+    style['transform'] = `translateX(${innerCurrent.value * itemWidth}px)`
+  } else {
+    if (props.list.length > 0) {
+      style['width'] = (100.0 / props.list.length).toString() + '%'
+    }
+    style['transform'] = `translateX(${innerCurrent.value * 100}%)`
+  }
+  if (firstTime.value) {
+    style['transitionDuration'] = '0ms'
+  } else {
+    style['transitionDuration'] = '300ms'
+  }
+  style['left'] = '0px'
+  style['top'] = '0px'
+  style['bottom'] = '0px'
+  return style
+})
+
+const innerBarStyle = computed<UTSJSONObject>(() => {
+  const style = {} as UTSJSONObject
+  if (props.mode === 'subsection') {
+    if (props.activeColor != '#3c9cff') {
+      style['backgroundColor'] = props.activeColor
+    }
+  }
+  return style
+})
+
+function getWrapperRect(): Promise<NodeInfo | null> {
+  return new Promise((resolve) => {
+    uni.createSelectorQuery()
+      .in(instance?.proxy)
+      .select('.up-subsection')
+      .boundingClientRect()
+      .exec((rect) => {
+        if (rect != null && rect.length > 0) {
+          resolve(rect[0] as NodeInfo)
+        } else {
+          resolve(null)
+        }
+      })
+  })
+}
+
+function resize() {
+  getWrapperRect().then((rect: NodeInfo | null) => {
+    if (rect != null && rect.width != null && rect.width! > 0) {
+      componentWidth.value = rect.width!
+      if (firstTime.value) {
+        nextTick(() => {
+          setTimeout(() => {
+            firstTime.value = false
+          }, 50)
+        })
+      }
+    }
+  })
+}
+
+function init() {
+  innerCurrent.value = parseInt(props.current.toString())
+  nextTick(() => {
+    resize()
+  })
+}
+
+function itemStyle(index: number): UTSJSONObject {
+  const style = {} as UTSJSONObject
+  if (props.mode === 'subsection') {
+    if (props.activeColor != '#3c9cff') {
+      style['borderColor'] = props.activeColor
+    }
+    style['borderWidth'] = '1px'
+    style['borderStyle'] = 'solid'
+  }
+  return style
+}
+
+function textStyle(index: number): UTSJSONObject {
+  const style = {} as UTSJSONObject
+  if (props.disabled) {
+    style['fontWeight'] = 'normal'
+    style['fontSize'] = addUnit(props.fontSize)
+    style['color'] = '#c8c9cc'
+    return style
+  }
+  style['fontWeight'] = props.bold && innerCurrent.value === index ? 'bold' : 'normal'
+  style['fontSize'] = addUnit(props.fontSize)
+  const item = props.list[index]
+  const activeColorTemp =
+    typeof item == 'object' && item != null
+      ? (((item as UTSJSONObject)[props.activeColorKeyName] ?? '') as string)
+      : ''
+  const inactiveColorTemp =
+    typeof item === 'object' && item != null
+      ? (((item as UTSJSONObject)[props.inactiveColorKeyName] ?? '') as string)
+      : ''
+  if (props.mode === 'subsection') {
+    style['color'] =
+      innerCurrent.value === index ? (activeColorTemp != '' ? activeColorTemp : '#fff') : (inactiveColorTemp != '' ? inactiveColorTemp : props.inactiveColor)
+  } else {
+    const c = activeColorTemp != '' ? activeColorTemp : props.activeColor
+    if (innerCurrent.value == index) {
+      if (c != '#3c9cff') {
+        style['color'] = c
+      }
+    } else {
+      style['color'] = inactiveColorTemp != '' ? inactiveColorTemp : props.inactiveColor
+    }
+  }
+  return style
+}
+
+function getText(item: any | null): string | null {
+  if (typeof item === 'string') {
+    return item as string
+  } else if (typeof item === 'object' && item != null) {
+    let temp = JSON.parse(JSON.stringify(item)) as UTSJSONObject
+    return temp.getString(props.keyName)
+  } else {
+    return 'error'
+  }
+}
+
+function clickHandler(index: number) {
+  if (props.disabled) return
+  innerCurrent.value = index
+  emit('change', index)
+}
+
+onMounted(() => {
+  init()
+})
 </script>
 
 <style lang="scss" scoped>
@@ -278,110 +294,98 @@ export default {
     position: relative;
     overflow: hidden;
 	width: 100%;
-	box-sizing: border-box;
+    box-sizing: border-box;
 
     &--button {
-        height: 34px;
-        background-color: rgb(238, 238, 239);
+        height: 32px;
+        background-color: #eeeeef;
         padding: 3px;
-        border-radius: 4px;
+        border-radius: 3px;
         align-items: stretch;
 
         &__bar {
             background-color: #ffffff;
-            border-radius: 4px !important;
+            border-radius: 3px !important;
         }
     }
 
     &--subsection {
-        height: 32px;
+        height: 30px;
     }
 
     &__bar {
         position: absolute;
-        left: 0;
         transition-property: transform, color;
         transition-duration: 0.3s;
         transition-timing-function: ease-in-out;
-        display: flex;
-        flex-direction: row;
-        align-items: stretch;
-
-        &__inner {
-            flex: 1;
-            align-self: stretch;
-            background-color: $up-primary;
-
-            &--button {
-                margin: 3px;
-                background-color: #ffffff;
-            }
-        }
 
         &--first {
-            border-top-left-radius: 4px;
-            border-bottom-left-radius: 4px;
-            border-top-right-radius: 0px;
-            border-bottom-right-radius: 0px;
+            border-top-left-radius: 3px;
+            border-bottom-left-radius: 3px;
         }
 
         &--center {
             border-top-left-radius: 0px;
             border-bottom-left-radius: 0px;
-            border-top-right-radius: 0px;
-            border-bottom-right-radius: 0px;
         }
 
         &--last {
-            border-top-left-radius: 0px;
-            border-bottom-left-radius: 0px;
-            border-top-right-radius: 4px;
-            border-bottom-right-radius: 4px;
+            border-top-right-radius: 3px;
+            border-bottom-right-radius: 3px;
+        }
+
+        &__inner {
+            height: 100%;
+            background-color: $up-primary;
+
+            &--button {
+                border-radius: 3px !important;
+                background-color: #ffffff;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            }
         }
     }
 
     &__item {
         @include flex;
         flex: 1;
-        justify-content: center;
+        text-align: center;
+        font-size: 12px;
+        height: 100%;
         align-items: center;
-        // vue环境下，需要设置相对定位，因为滑块为绝对定位，item需要在滑块的上面
+        justify-content: center;
         position: relative;
-        border-color: $up-primary;
 
         &--no-border-right {
             border-right-width: 0 !important;
         }
 
         &--first {
-            border-top-left-radius: 4px;
-            border-bottom-left-radius: 4px;
+            border-top-left-radius: 3px;
+            border-bottom-left-radius: 3px;
         }
 
         &--last {
-            border-top-right-radius: 4px;
-            border-bottom-right-radius: 4px;
-        }
-
-        &--disabled {
+            border-top-right-radius: 3px;
+            border-bottom-right-radius: 3px;
         }
 
         &__text {
             font-size: 12px;
-            line-height: 14px;
-            // @include flex;
-            // align-items: center;
+            line-height: 12px;
+            @include flex;
+            align-items: center;
             transition-property: color;
             transition-duration: 0.3s;
-
-            &--disabled {
-                color: #c8c9cc !important;
-            }
 
             &--active {
                 color: $up-primary;
             }
+
+            &--disabled {
+                color: #c8c9cc;
+            }
         }
     }
-	}
+}
 </style>

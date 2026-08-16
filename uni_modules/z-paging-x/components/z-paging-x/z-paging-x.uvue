@@ -33,42 +33,43 @@ by ZXLee
       <!-- 这里微信小程序不支持component，但是如果直接使用list-item在web中无法显示下拉刷新，因此需要分开处理 -->
       <!-- #ifdef WEB -->
       <component :is="listItemIs" slot="refresher">
-      <!-- #endif -->
-      <!-- #ifndef WEB -->
-      <list-item slot="refresher">
-      <!-- #endif -->
         <view ref="zpxListRefresher" class="zpx-list-refresher" :style="{ width: contentWidth + 'px' }">
           <slot v-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
           <z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :complete-text="refresherCompleteText" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp"/>
         </view>
-      <!-- #ifdef WEB -->
       </component>
       <!-- #endif -->
       <!-- #ifndef WEB -->
+      <list-item slot="refresher">
+        <view ref="zpxListRefresher" class="zpx-list-refresher" :style="{ width: contentWidth + 'px' }">
+          <slot v-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
+          <z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :complete-text="refresherCompleteText" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp"/>
+        </view>
       </list-item>
       <!-- #endif -->
 
       <!-- #ifdef WEB -->
       <component :is="listItemIs" :class="showEmpty ? 'zpx-flex1' : ''">
-      <!-- #endif -->
-      <!-- #ifndef WEB -->
-      <list-item :class="showEmpty ? 'zpx-flex1' : ''">
-      <!-- #endif -->
         <template v-if="showEmpty">
           <slot v-if="$slots['empty']" :isLoadFailed="isLoadFailed" name="empty" />
           <z-paging-x-empty v-else :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
         </template>
         <slot v-if="showLoading" name="loading" />
-      <!-- #ifdef WEB -->
       </component>
       <!-- #endif -->
       <!-- #ifndef WEB -->
+      <list-item :class="showEmpty ? 'zpx-flex1' : ''">
+        <template v-if="showEmpty">
+          <slot v-if="$slots['empty']" :isLoadFailed="isLoadFailed" name="empty" />
+          <z-paging-x-empty v-else :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
+        </template>
+        <slot v-if="showLoading" name="loading" />
       </list-item>
       <!-- #endif -->
     </list-view>
     <scroll-view v-else ref="zpxList" class="zpx-list-view zpx-flex1"
-    :id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="customNestedScroll" :refresher-background="refresherBackground"
-    :rebound="rebound" :scroll-top="scrollTop" :show-scrollbar="showScrollbar" :scroll-with-animation="finalScrollWithAnimation"
+    :id="listId" direction="vertical" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :refresher-background="refresherBackground"
+    :scroll-top="scrollTop" :show-scrollbar="showScrollbar" :scroll-with-animation="finalScrollWithAnimation"
     @refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @refresherrestore="_onRefresherrestore" @refresherabort="_onRefresherabort" @scrolltolower="_onScrolltolower" @scrolltoupper="_onScrolltoupper" @scroll="_onScroll"
     @startnestedscroll="_onStartNestedScroll" @nestedprescroll="_onNestedPreScroll">
       <slot />
@@ -78,21 +79,20 @@ by ZXLee
           <z-paging-load-more v-else :status="loadMoreStatus" :default-text="loadMoreDefaultText" :loading-text="loadMoreLoadingText" :no-more-text="loadMoreNoMoreText" :fail-text="loadMoreFailText" @clickMore="_handleLoadMore"/>
         </template>
       </view>
-      <!-- 这里微信小程序不支持component，但是如果直接使用view在web中无法显示下拉刷新，因此需要分开处理 -->
       <!-- #ifdef WEB -->
       <component :is="listItemIs" slot="refresher">
-      <!-- #endif -->
-      <!-- #ifndef WEB -->
-      <view slot="refresher">
-      <!-- #endif -->
         <view ref="zpxListRefresher" class="zpx-list-refresher" :style="{ width: contentWidth + 'px' }">
           <slot v-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
           <z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :complete-text="refresherCompleteText" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp"/>
         </view>
-      <!-- #ifdef WEB -->
       </component>
       <!-- #endif -->
       <!-- #ifndef WEB -->
+      <view slot="refresher">
+        <view ref="zpxListRefresher" class="zpx-list-refresher" :style="{ width: contentWidth + 'px' }">
+          <slot v-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
+          <z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :complete-text="refresherCompleteText" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp"/>
+        </view>
       </view>
       <!-- #endif -->
       <view :class="showEmpty ? 'zpx-flex1' : ''">

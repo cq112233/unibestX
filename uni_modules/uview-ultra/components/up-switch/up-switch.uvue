@@ -1,196 +1,202 @@
 <template>
 	<view
 	    :class="switchClass"
-	    :style="[switchStyle, addStyle(customStyle)]"
+	    :style="mergedSwitchStyle"
 	    @tap="clickHandler"
 	>
 		<view
 			class="up-switch__bg-active"
-			:style="[bgActiveStyle]"
+			:style="bgActiveStyle"
 			v-if="isActive"
 		>
 		</view>
 		<view
 		    class="up-switch__bg"
-		    :style="[bgStyle]"
+		    :style="bgStyle"
 			v-if="!isActive"
 		>
 		</view>
 		<view
 		    class="up-switch__node"
 			:class="[modelValue == activeValue ? 'up-switch__node--on' : '']"
-		    :style="[nodeStyle]"
-		    ref="up-switch__node"
+		    :style="nodeStyle"
 		>
 			<up-loading-icon
 			    :show="loading"
 			    mode="circle"
 			    timingFunction='linear'
-				:color="modelValue == activeValue ? activeColor : '#AAABAD'"
-			    :size="parseInt(getPx(size)) * 0.6"
+				:color="loadingColor"
+			    :size="loadingIconSize"
 			/>
 		</view>
 	</view>
 </template>
 
-<script lang="uts">
-	import { propsSwitch } from './props';
-	import { mpMixin } from '../../libs/mixin/mpMixin';
-	import { mixin } from '../../libs/mixin/mixin';
-	import { addStyle, getPx, addUnit, error } from '../../libs/function/index';
-	import { UPCommonStyle } from '../../types/common'
-	/**
-	 * switch 开关选择器
-	 * @description 选择开关一般用于只有两个选择，且只能选其一的场景。
-	 * @tutorial https://uview-plus.jiangruyi.com/components/switch.html
-	 * @property {Boolean}						loading			是否处于加载中（默认 false ）
-	 * @property {Boolean}						disabled		是否禁用（默认 false ）
-	 * @property {String | Number}				size			开关尺寸，单位px （默认 25 ）
-	 * @property {String}						activeColor		打开时的背景色 （默认 '#2979ff' ）
-	 * @property {String} 						inactiveColor	关闭时的背景色 （默认 '#ffffff' ）
-	 * @property {Boolean | String | Number}	value			通过v-model双向绑定的值 （默认 false ）
-	 * @property {Boolean | String | Number}	activeValue		打开选择器时通过change事件发出的值 （默认 true ）
-	 * @property {Boolean | String | Number}	inactiveValue	关闭选择器时通过change事件发出的值 （默认 false ）
-	 * @property {Boolean}						asyncChange		是否开启异步变更，开启后需要手动控制输入值 （默认 false ）
-	 * @property {String | Number}				space			圆点与外边框的距离 （默认 0 ）
-	 * @property {Object}						customStyle		定义需要用到的外部样式
-	 *
-	 * @event {Function} change 在switch打开或关闭时触发
-	 * @example <up-switch v-model="checked" active-color="red" inactive-color="#eee"></up-switch>
-	 */
-	export default {
-		name: "up-switch",
-		mixins: [mpMixin, mixin, propsSwitch],
-		watch: {
-			modelValue: {
-				immediate: true,
-				handler(n) {
-					if(n !== this.inactiveValue && n !== this.activeValue) {
-						error('v-model绑定的值必须为inactiveValue、activeValue二者之一')
-					}
-				}
-			}
-		},
-		data() {
-			return {
-				bgColor: '#ffffff'
-			}
-		},
-		computed: {
-			switchClass(): string {
-				let classes = ['up-switch', 'cursor-pointer']
-				if (this.disabled) {
-					classes.push('up-switch--disabled')
-				}
-				if (this.isActive) {
-					classes.push('up-switch--on')
-				} else {
-					classes.push('up-switch--off')
-				}
-				return classes.join(' ')
-			},
-			isActive(){
-				return this.modelValue === this.activeValue;
-			},
-			switchStyle(): UTSJSONObject {
-				let style = {}
-				
-				// 仅当 size 不是默认值 25 时，才把 width 和 height 写入内联样式中，避免内联属性污染
-				if (this.size.toString() != '25') {
-					// @ts-ignore
-					style['width'] = addUnit(parseInt(this.size.toString()) * 2 + 2)
-					// @ts-ignore
-					style['height'] = addUnit(parseInt(this.size.toString()) + 2)
-				}
-				
-				// 开启和关闭时，内联更改 borderColor 以绕开原生平台的背景穿透限制。开启时为透明，关闭时恢复为默认灰色
-				if (this.isActive) {
-					style['borderColor'] = 'rgba(0, 0, 0, 0)'
-				} else {
-					if (this.customInactiveColor) {
-						style['borderColor'] = 'rgba(0, 0, 0, 0)'
-					} else {
-						style['borderColor'] = 'rgba(0, 0, 0, 0.12)'
-					}
-				}
-				
-				return style;
-			},
-			bgActiveStyle(): UTSJSONObject {
-				let style = {}
-				// @ts-ignore
-				style['width'] = addUnit(parseInt(this.size.toString()) * 2 + 2)
-				// @ts-ignore
-				style['height'] = addUnit(parseInt(this.size.toString()) + 2)
-				if (this.activeColor != '#2979ff') {
-					style['backgroundColor'] = this.activeColor
-				}
-				return style;
-			},
-			nodeStyle(): UTSJSONObject {
-				let style = {}
-				// 如果自定义非激活颜色，将node圆点的尺寸减少两个像素，让其与外边框距离更大一点
-				// @ts-ignore
-				style['width'] = addUnit(parseInt(this.size.toString()) - parseInt(this.space.toString()))
-				// @ts-ignore
-				style['height'] = addUnit(parseInt(this.size.toString()) - parseInt(this.space.toString()))
-				const translateX = this.isActive ? addUnit(this.space) : addUnit(this.size);
-				style['transform'] = `translateX(-${translateX})`
-				return style
-			},
-			bgStyle(): UTSJSONObject {
-				let style = {}
-				// 这里宽度设置为 parseInt(size) * 2，刚好填满容器内部宽度，防止关闭时两侧露出绿色背景
-				// @ts-ignore
-				style['width'] = addUnit(parseInt(this.size.toString()) * 2)
-				// @ts-ignore
-				style['height'] = addUnit(parseInt(this.size.toString()))
-				style['backgroundColor'] = this.inactiveColor
-				// 打开时，让此元素收缩，否则反之
-				style['transform'] = `scale(${this.isActive ? 0 : 1})`
-				return style
-			},
-			customInactiveColor(): boolean {
-				// 之所以需要判断是否自定义了“非激活”颜色，是为了让node圆点离外边框更宽一点的距离
-				return this.inactiveColor !== '#fff' && this.inactiveColor !== '#ffffff'
-			}
-		},
-		emits: ['update:modelValue', 'change'],
-		methods: {
-			getPx(e: any) {
-				return getPx(e);
-			},
-			addStyle(e: any): any {
-				return addStyle(e)
-			},
-			clickHandler() {
-				if (!this.disabled && !this.loading) {
-					const oldValue = this.isActive ? this.inactiveValue : this.activeValue
-					if(!this.asyncChange) {
-						this.$emit("update:modelValue", oldValue);
-					}
-					// 放到下一个生命周期，因为双向绑定的value修改父组件状态需要时间，且是异步的
-					this.$nextTick(() => {
-						this.$emit('change', oldValue)
-					})
-				}
-			}
-		}
-	};
+<script setup lang="uts">
+import { computed, nextTick } from 'vue'
+import { addStyle, getPx, addUnit, deepMerge } from '../../libs/function/index.uts'
+
+defineOptions({
+  name: 'up-switch'
+})
+
+const props = defineProps({
+  loading: {
+    type: Boolean,
+    default: false
+  },
+  disabled: {
+    type: Boolean,
+    default: false
+  },
+  size: {
+    type: [String, Number],
+    default: 25
+  },
+  activeColor: {
+    type: String,
+    default: '#2979ff'
+  },
+  inactiveColor: {
+    type: String,
+    default: '#ffffff'
+  },
+  modelValue: {
+    type: [Boolean, String, Number],
+    default: false
+  },
+  activeValue: {
+    type: [Boolean, String, Number],
+    default: true
+  },
+  inactiveValue: {
+    type: [Boolean, String, Number],
+    default: false
+  },
+  asyncChange: {
+    type: Boolean,
+    default: false
+  },
+  space: {
+    type: [String, Number],
+    default: 0
+  },
+  customStyle: {
+    type: Object,
+    default: () => ({})
+  }
+})
+
+const emit = defineEmits(['update:modelValue', 'change'])
+
+const isActive = computed<boolean>(() => {
+  return props.modelValue == props.activeValue
+})
+
+const customInactiveColor = computed<boolean>(() => {
+  return props.inactiveColor != '#fff' && props.inactiveColor != '#ffffff'
+})
+
+const loadingIconSize = computed((): number => {
+  return parseInt(getPx(props.size)) * 0.6
+})
+
+const loadingColor = computed((): string => {
+  if (isActive.value) {
+    if (props.activeColor != '' && props.activeColor != '#2979ff') {
+      return props.activeColor
+    }
+    return 'var(--theme-color, #2979ff)'
+  }
+  return '#AAABAD'
+})
+
+const switchClass = computed<string>(() => {
+  let classes = ['up-switch', 'cursor-pointer']
+  if (props.disabled) {
+    classes.push('up-switch--disabled')
+  }
+  if (isActive.value) {
+    classes.push('up-switch--on')
+  } else {
+    classes.push('up-switch--off')
+  }
+  return classes.join(' ')
+})
+
+const switchStyle = computed<UTSJSONObject>(() => {
+  let style = {} as UTSJSONObject
+  if (props.size.toString() != '25') {
+    style['width'] = addUnit(parseInt(props.size.toString()) * 2 + 2)
+    style['height'] = addUnit(parseInt(props.size.toString()) + 2)
+  }
+  if (isActive.value) {
+    style['borderColor'] = 'rgba(0, 0, 0, 0)'
+  } else {
+    if (customInactiveColor.value) {
+      style['borderColor'] = 'rgba(0, 0, 0, 0)'
+    } else {
+      style['borderColor'] = 'rgba(0, 0, 0, 0.12)'
+    }
+  }
+  return style
+})
+
+const mergedSwitchStyle = computed((): UTSJSONObject => {
+  return deepMerge(switchStyle.value, addStyle(props.customStyle)) as UTSJSONObject
+})
+
+const bgActiveStyle = computed<UTSJSONObject>(() => {
+  let style = {} as UTSJSONObject
+  style['width'] = addUnit(parseInt(props.size.toString()) * 2 + 2)
+  style['height'] = addUnit(parseInt(props.size.toString()) + 2)
+  if (props.activeColor != '#2979ff') {
+    style['backgroundColor'] = props.activeColor
+  }
+  return style
+})
+
+const nodeStyle = computed<UTSJSONObject>(() => {
+  let style = {} as UTSJSONObject
+  const sizeVal = parseInt(props.size.toString())
+  const spaceVal = parseInt(props.space.toString())
+  style['width'] = addUnit(sizeVal - spaceVal)
+  style['height'] = addUnit(sizeVal - spaceVal)
+  const translateX = isActive.value ? addUnit(props.space) : addUnit(props.size)
+  style['transform'] = `translateX(-${translateX})`
+  return style
+})
+
+const bgStyle = computed<UTSJSONObject>(() => {
+  let style = {} as UTSJSONObject
+  style['width'] = addUnit(parseInt(props.size.toString()) * 2)
+  style['height'] = addUnit(parseInt(props.size.toString()))
+  style['backgroundColor'] = props.inactiveColor
+  style['transform'] = `scale(${isActive.value ? 0 : 1})`
+  return style
+})
+
+function clickHandler() {
+  if (!props.disabled && !props.loading) {
+    const oldValue = isActive.value ? props.inactiveValue : props.activeValue
+    if (!props.asyncChange) {
+      emit('update:modelValue', oldValue)
+    }
+    nextTick(() => {
+      emit('change', oldValue)
+    })
+  }
+}
 </script>
 
 <style lang="scss" scoped>
-
 	.up-switch {
 		@include flex(row);
 		/* #ifndef APP */
 		box-sizing: border-box;
 		/* #endif */
 		position: relative;
-		
-		// 将容器背景色设为透明，避免关闭时背景色穿透边框露出主题色
 		background-color: rgba(0, 0, 0, 0);
-		
 		border-width: 1px;
 		border-radius: 100px;
 		transition: background-color 0.4s;
@@ -198,11 +204,8 @@
 		border-style: solid;
 		justify-content: flex-end;
 		align-items: center;
-		// 由于weex为阿里逗着玩的KPI项目，导致bug奇多，这必须要写这一行，
-		// 否则在iOS上，点击页面任意地方，都会触发switch的点击事件
 		overflow: hidden;
 
-		// 默认 size = 25 时的宽高，使默认时容器内联样式完全为空，支持纯 Class 变色
 		width: 52px;
 		height: 27px;
 
@@ -212,7 +215,6 @@
 			left: -1px;
 			border-radius: 100px;
 			background-color: $up-primary;
-			// 默认 size = 25 时的宽高（加2px以完全覆盖容器和边框）
 			width: 52px;
 			height: 27px;
 		}

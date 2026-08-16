@@ -1,5 +1,5 @@
 <template>
-  <view class="flex flex-col items-center px-16px py-24px flex-1">
+  <view class="flex flex-col items-center px-16px py-24px pb-100px">
     <!-- 头部卡片：用户头像及状态 -->
     <view class="w-full bg-white rounded-12px px-20px py-30px mb-20px flex flex-col items-center">
       <image class="w-90px h-90px rounded-45px mb-16px border-width-3px border-color-[#f1f5f9] border-solid" :src="avatarUrl" />
@@ -24,7 +24,7 @@
       <view class="border-bottom-width-1px border-bottom-style-solid border-bottom-color-[#f1f5f9] pb-8px mb-12px flex flex-row">
         <text class="text-15px font-semibold text-[#334155]">用户信息 (JSON)</text>
       </view>
-      <scroll-view class="bg-[#0f172a] rounded-8px p-12px h-180px" scroll-y="true">
+      <scroll-view class="bg-[#0f172a] rounded-8px p-12px h-180px" direction="vertical">
         <text class="text-13px text-[#38bdf8] leading-20px" style="font-family: monospace;">{{ userInfoJson }}</text>
       </scroll-view>
     </view>

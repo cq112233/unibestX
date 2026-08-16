@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<view class="up-select">
 		<view :class="['up-select__content', disabled ? 'disabled' : '']">
 			<view class="up-select__label" @click="openSelect">
@@ -35,268 +35,247 @@
 	</view>
 </template>
 
-<script lang="uts">
-import type { PropType } from 'vue';
-import { mpMixin } from '../../libs/mixin/mpMixin.uts';
-import { mixin } from '../../libs/mixin/mixin.uts';
-import { getWindowInfo } from '../../libs/function/index.uts';
+<script setup lang="uts">
+import { ref, computed, onMounted, getCurrentInstance, nextTick } from 'vue'
+import { getWindowInfo, upGetRect } from '../../libs/function/index'
 
-function createOptions(): UTSJSONObject[] {
-	return [] as UTSJSONObject[];
-}
+defineOptions({
+	name: 'up-select'
+})
 
-function createEmptyObject(): UTSJSONObject {
-	return {} as UTSJSONObject;
-}
-
-function valueToString(value: any | null): string {
-	return value == null ? '' : value.toString();
-}
-
-function normalizeNumber(value: any | null, fallback: number = 0): number {
-	if (typeof value === 'number') {
-		return value;
+const props = defineProps({
+	maxHeight: {
+		type: String,
+		default: '90vh'
+	},
+	overlay: {
+		type: Boolean,
+		default: true
+	},
+	overlayOpacity: {
+		type: Number,
+		default: 0.01
+	},
+	overlayStyle: {
+		type: Object,
+		default: () => ({})
+	},
+	duration: {
+		type: Number,
+		default: 300
+	},
+	label: {
+		type: String,
+		default: '选项'
+	},
+	options: {
+		type: Array as PropType<UTSJSONObject[]>,
+		default: () => [] as UTSJSONObject[]
+	},
+	keyName: {
+		type: String,
+		default: 'id'
+	},
+	labelName: {
+		type: String,
+		default: 'name'
+	},
+	showOptionsLabel: {
+		type: Boolean,
+		default: false
+	},
+	current: {
+		type: [String, Number],
+		default: ''
+	},
+	zIndex: {
+		type: Number,
+		default: 11000
+	},
+	itemColor: {
+		type: String,
+		default: '#333333'
+	},
+	iconColor: {
+		type: String,
+		default: ''
+	},
+	iconSize: {
+		type: String,
+		default: '13px'
+	},
+	disabled: {
+		type: Boolean,
+		default: false
 	}
-	if (value == null) {
-		return fallback;
-	}
-	const parsed = parseFloat(value.toString());
-	return isNaN(parsed) ? fallback : parsed;
+})
+
+const emit = defineEmits(['update:current', 'select'])
+const instance = getCurrentInstance()
+
+function noop() {}
+
+function valueToString(val: any | null): string {
+	return val == null ? '' : val.toString()
 }
 
-export default {
-	name: 'up-select',
-	mixins: [mpMixin, mixin],
-	emits: ['update:current', 'select'],
-	props: {
-		maxHeight: {
-			type: String,
-			default: '90vh'
-		},
-		overlay: {
-			type: Boolean,
-			default: true
-		},
-		overlayOpacity: {
-			type: Number,
-			default: 0.01
-		},
-		overlayStyle: {
-			type: Object as PropType<UTSJSONObject>,
-			default(): UTSJSONObject {
-				return createEmptyObject();
-			}
-		},
-		duration: {
-			type: Number,
-			default: 300
-		},
-		label: {
-			type: String,
-			default: '选项'
-		},
-		options: {
-			type: Array as PropType<UTSJSONObject[]>,
-			default(): UTSJSONObject[] {
-				return createOptions();
-			}
-		},
-		keyName: {
-			type: String,
-			default: 'id'
-		},
-		labelName: {
-			type: String,
-			default: 'name'
-		},
-		showOptionsLabel: {
-			type: Boolean,
-			default: false
-		},
-		current: {
-			type: [String, Number],
-			default: ''
-		},
-		zIndex: {
-			type: Number,
-			default: 11000
-		},
-		itemColor: {
-			type: String,
-			default: '#333333'
-		},
-		iconColor: {
-			type: String,
-			default: ''
-		},
-		iconSize: {
-			type: String,
-			default: '13px'
-		},
-		disabled: {
-			type: Boolean,
-			default: false
-		}
-	},
-	data() {
-		return {
-			isOpen: false,
-			optionsWrapLeft: 'auto',
-			optionsWrapRight: 'auto',
-			optionsWrapTop: '0px',
-			optionsWrapMinWidth: '100px',
-			optionsWrapMaxHeight: '90vh'
-		}
-	},
-	mounted() {
-		if (this.maxHeight != null && this.maxHeight != '') {
-			this.optionsWrapMaxHeight = this.maxHeight
-		}
-	},
-	computed: {
-		currentLabel(): string {
-			const options = this.options as UTSJSONObject[];
-			for (let i = 0; i < options.length; i++) {
-				const item = options[i] as UTSJSONObject;
-				if (valueToString(item[this.keyName]) == valueToString(this.current)) {
-					return valueToString(item[this.labelName]);
-				}
-			}
-			return '';
-		},
-		optionsWrapStyle(): UTSJSONObject {
-			return {
-				overflowY: 'auto',
-				position: 'fixed',
-				zIndex: this.zIndex + 1,
-				left: this.optionsWrapLeft,
-				right: this.optionsWrapRight,
-				top: this.optionsWrapTop,
-				minWidth: this.optionsWrapMinWidth,
-				maxHeight: this.optionsWrapMaxHeight
-			} as UTSJSONObject
-		}
-	},
-	methods: {
-		getOptionClass(item: UTSJSONObject): string {
-			return valueToString(item[this.keyName]) == valueToString(this.current) ? 'active' : ''
-		},
-		getOptionLabel(item: UTSJSONObject): string {
-			return valueToString(item[this.labelName])
-		},
-		openSelect(): void {
-			if (this.disabled) {
-				return;
-			}
-			this.isOpen = true;
-			this.$nextTick(() => {
-				if (this.isOpen) {
-					this.adjustOptionsWrapPosition();
-				}
-			});
-		},
-		closeSelect(): void {
-			this.isOpen = false;
-		},
-		overlayClick(): void {
-			this.isOpen = false;
-		},
-		selectItem(item: UTSJSONObject): void {
-			this.isOpen = false;
-			this.$emit('update:current', item[this.keyName]);
-			this.$emit('select', item);
-		},
-		adjustOptionsWrapPosition(): void {
-			const wi = getWindowInfo();
-			const windowWidth = wi.windowWidth;
-			const windowHeight = wi.windowHeight;
-			this.$uGetRect('.up-select__label').then((rect: NodeInfo) => {
-				const left = normalizeNumber(rect.left, 0);
-				const top = normalizeNumber(rect.top, 0);
-				const width = Math.max(100, normalizeNumber(rect.width, 100));
-				const height = normalizeNumber(rect.height, 0);
-				const dropdownTop = top + height;
-				const availableHeight = Math.max(80, windowHeight - dropdownTop - 8);
-				this.optionsWrapTop = dropdownTop.toString() + 'px';
-				this.optionsWrapMinWidth = width.toString() + 'px';
-				this.optionsWrapMaxHeight = availableHeight.toString() + 'px';
-				if (left + width > windowWidth) {
-					this.optionsWrapLeft = 'auto';
-					this.optionsWrapRight = '0px';
-				} else {
-					this.optionsWrapLeft = left.toString() + 'px';
-					this.optionsWrapRight = 'auto';
-				}
-			});
+function normalizeNumber(val: any | null, fallback: number = 0): number {
+	if (typeof val === 'number') {
+		return val as number
+	}
+	if (val == null) {
+		return fallback
+	}
+	const parsed = parseFloat(val.toString())
+	return isNaN(parsed) ? fallback : parsed
+}
+
+const isOpen = ref<boolean>(false)
+const optionsWrapLeft = ref<string>('auto')
+const optionsWrapRight = ref<string>('auto')
+const optionsWrapTop = ref<string>('0px')
+const optionsWrapMinWidth = ref<string>('100px')
+const optionsWrapMaxHeight = ref<string>('90vh')
+
+onMounted(() => {
+	if (props.maxHeight != null && props.maxHeight != '') {
+		optionsWrapMaxHeight.value = props.maxHeight
+	}
+})
+
+const currentLabel = computed<string>(() => {
+	const opts = props.options
+	for (let i = 0; i < opts.length; i++) {
+		const item = opts[i]
+		if (valueToString(item[props.keyName]) == valueToString(props.current)) {
+			return valueToString(item[props.labelName])
 		}
 	}
+	return ''
+})
+
+const optionsWrapStyle = computed<UTSJSONObject>(() => {
+	return {
+		overflowY: 'auto',
+		position: 'fixed',
+		zIndex: props.zIndex + 1,
+		left: optionsWrapLeft.value,
+		right: optionsWrapRight.value,
+		top: optionsWrapTop.value,
+		minWidth: optionsWrapMinWidth.value,
+		maxHeight: optionsWrapMaxHeight.value
+	} as UTSJSONObject
+})
+
+function getOptionClass(item: UTSJSONObject): string {
+	return valueToString(item[props.keyName]) == valueToString(props.current) ? 'active' : ''
 }
+
+function getOptionLabel(item: UTSJSONObject): string {
+	return valueToString(item[props.labelName])
+}
+
+function adjustOptionsWrapPosition(): void {
+	const wi = getWindowInfo()
+	const windowWidth = wi.windowWidth
+	const windowHeight = wi.windowHeight
+	upGetRect('.up-select__label', false, instance?.proxy).then((rect: NodeInfo) => {
+		const left = normalizeNumber(rect.left, 0)
+		const top = normalizeNumber(rect.top, 0)
+		const width = Math.max(100, normalizeNumber(rect.width, 100))
+		const height = normalizeNumber(rect.height, 0)
+		const dropdownTop = top + height
+		const availableHeight = Math.max(80, windowHeight - dropdownTop - 8)
+		optionsWrapTop.value = dropdownTop.toString() + 'px'
+		optionsWrapMinWidth.value = width.toString() + 'px'
+		optionsWrapMaxHeight.value = availableHeight.toString() + 'px'
+		if (left + width > windowWidth) {
+			optionsWrapLeft.value = 'auto'
+			optionsWrapRight.value = '0px'
+		} else {
+			optionsWrapLeft.value = left.toString() + 'px'
+			optionsWrapRight.value = 'auto'
+		}
+	})
+}
+
+function openSelect(): void {
+	if (props.disabled) return
+	isOpen.value = true
+	nextTick(() => {
+		if (isOpen.value) {
+			adjustOptionsWrapPosition()
+		}
+	})
+}
+
+function closeSelect(): void {
+	isOpen.value = false
+}
+
+function overlayClick(): void {
+	isOpen.value = false
+}
+
+function selectItem(item: UTSJSONObject): void {
+	isOpen.value = false
+	emit('update:current', item[props.keyName])
+	emit('select', item)
+}
+
+defineExpose({
+	open: openSelect,
+	close: closeSelect
+})
 </script>
 
 <style lang="scss" scoped>
 	.up-select__content {
 		position: relative;
+	}
 
-		.up-select__label {
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-			justify-content: space-between;
+	.up-select__label {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		/* #ifdef H5 */
+		cursor: pointer;
+		/* #endif */
+	}
 
-			/* #ifdef H5 */
-			&:hover {
-				cursor: pointer;
-			}
+	.up-select__text {
+		margin-right: 2px;
+	}
 
-			/* #endif */
-		}
+	.disabled {
+		opacity: 0.6;
+		pointer-events: none;
+	}
 
-		.up-select__text {
-			margin-right: 2px;
-		}
+	.up-select__options__wrap {
+		position: fixed;
+		top: 0;
+		left: 0;
+	}
 
-		&.disabled {
-			opacity: 0.6;
-			pointer-events: none;
-		}
+	.up-select__options {
+		min-width: 100px;
+		box-sizing: border-box;
+		border-radius: 4px;
+		border-width: 1px;
+		border-style: solid;
+		border-color: #f1f1f1;
+		background-color: #fff;
+	}
 
-		.up-select__options__wrap {
-			position: fixed;
-			top: 0;
-			left: 0;
-		}
-
-		.up-select__options {
-			min-width: 100px;
-			box-sizing: border-box;
-			border-radius: 4px;
-			border: 1px solid #f1f1f1;
-			background-color: #fff;
-
-			.up-select__options_item {
-				padding: 10px 12px;
-				box-sizing: border-box;
-				width: 100%;
-				height: 100%;
-
-				&:hover {
-					background-color: #f7f7f7;
-				}
-
-				/* #ifdef H5 */
-				&:hover {
-					cursor: pointer;
-				}
-
-				.up-select__item_text {
-					&:hover {
-						cursor: pointer;
-					}
-				}
-
-				/* #endif */
-			}
-		}
+	.up-select__options_item {
+		padding: 10px 12px;
+		box-sizing: border-box;
+		width: 100%;
+		height: 100%;
+		/* #ifdef H5 */
+		cursor: pointer;
+		/* #endif */
 	}
 </style>
-

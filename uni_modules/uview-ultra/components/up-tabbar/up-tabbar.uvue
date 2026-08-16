@@ -2,10 +2,9 @@
 	<view class="up-tabbar">
 		<view
 		    class="up-tabbar__content"
-		    ref="up-tabbar__content"
 		    @touchmove.stop.prevent="noop"
 		    :class="[border ? 'up-border-top' : '', fixed ? 'up-tabbar--fixed' : '']"
-		    :style="[tabbarStyle]"
+		    :style="tabbarStyle"
 		>
 			<view class="up-tabbar__content__item-wrapper">
 				<slot />
@@ -14,7 +13,7 @@
 		</view>
 		<view
 		    class="up-tabbar__placeholder"
-			v-if="placeholder"
+			v-if="placeholder && fixed"
 		    :style="{
 				height: placeholderHeight + 'px',
 			}"
@@ -22,118 +21,144 @@
 	</view>
 </template>
 
-<script lang="uts">
-	import { propsTabbar } from './props.uts';
-	import { mpMixin } from '../../libs/mixin/mpMixin.uts';
-	import { mixin } from '../../libs/mixin/mixin.uts';
-	import { addStyle, deepMerge, sleep } from '../../libs/function/index.uts';
-	import { nextTick } from 'vue';
-	
-	/**
-	 * Tabbar 底部导航栏
-	 * @description 此组件提供了自定义tabbar的能力。
-	 * @tutorial https://uview-plus.jiangruyi.com/components/tabbar.html
-	 * @property {String | Number}	value				当前匹配项的name
-	 * @property {Boolean}			safeAreaInsetBottom	是否为iPhoneX留出底部安全距离（默认 true ）
-	 * @property {Boolean}			border				是否显示上方边框（默认 true ）
-	 * @property {String | Number}	zIndex				元素层级z-index（默认 1 ）
-	 * @property {String}			activeColor			选中标签的颜色（默认 '#1989fa' ）
-	 * @property {String}			inactiveColor		未选中标签的颜色（默认 '#7d7e80' ）
-	 * @property {Boolean}			fixed				是否固定在底部（默认 true ）
-	 * @property {Boolean}			placeholder			fixed定位固定在底部时，是否生成一个等高元素防止塌陷（默认 true ）
-	 * @property {String}			backgroundColor		背景色（默认 '#ffffff' ）
-	 * @property {Object}			customStyle			定义需要用到的外部样式
-	 * 
-	 * @example <up-tabbar :value="value2" :placeholder="false" @change="name => value2 = name" :fixed="false" :safeAreaInsetBottom="false"><up-tabbar-item text="首页" icon="home" dot ></up-tabbar-item></up-tabbar>
-	 */
-	export default {
-		name: 'up-tabbar',
-		mixins: [mpMixin, mixin, propsTabbar],
-		data() {
-			return {
-				placeholderHeight: 0
-			}
-		},
-		emits: ['change'],
-		computed: {
-			tabbarStyle(): any {
-				const style = {
-					zIndex: this.zIndex
-				}
-				if (this.borderColor != '') {
-					style['borderColor'] = this.borderColor + ' !important'
-				}
-				if (this.backgroundColor != '') {
-					style['backgroundColor'] = this.backgroundColor
-				}
-				// 合并来自父组件的customStyle样式
-				return deepMerge(style, addStyle(this.customStyle))
-			},
-			// 监听多个参数的变化，通过在computed执行对应的操作
-			updateChild(): Array<any | null> {
-				return [this.value, this.activeColor, this.inactiveColor]
-			},
-			updatePlaceholder(): any[] {
-				return [this.fixed, this.placeholder]
-			}
-		},
-		watch: {
-			updateChild() {
-				// 如果updateChildren中的元素发生了变化，则执行子元素初始化操作
-				this.updateChildren()
-			},
-			updatePlaceholder() {
-				// 如果fixed，placeholder等参数发生变化，重新计算占位元素的高度
-				this.setPlaceholderHeight()
-			}
-		},
-		created() {
-			// this.children = []
-		},
-		mounted() {
-			this.setPlaceholderHeight()
-		},
-		methods: {
-			updateChildren() {
-				// 如果存在子元素，则执行子元素的updateFromParent进行更新数据
-				// @ts-ignore
-				if(this.children.length > 0) {
-					// @ts-ignore
-					this.children.map((child: ComponentPublicInstance) => {
-						child?.$callMethod('updateFromParent')
-					})
-				}
-			},
-			// 设置用于防止塌陷元素的高度
-			async setPlaceholderHeight() {
-				if (!this.fixed || !this.placeholder) return
-				// 延时一定时间
-				await sleep(20)
-				// @ts-ignore
-				this.upGetRect('.up-tabbar__content').then((size: NodeInfo) => {
-					// 修复IOS safearea bottom 未填充高度
-					this.placeholderHeight = size.height ?? 50
-				})
-			},
-			noop() {}
-		}
-	}
+<script setup lang="uts">
+import { computed, ref, watch, provide, onMounted, getCurrentInstance } from 'vue'
+import { addStyle, deepMerge, sleep, upGetRect } from '../../libs/function/index.uts'
+
+defineOptions({
+  name: 'up-tabbar'
+})
+
+const props = defineProps({
+  value: {
+    type: [String, Number, null],
+    default: null
+  },
+  safeAreaInsetBottom: {
+    type: Boolean,
+    default: true
+  },
+  border: {
+    type: Boolean,
+    default: true
+  },
+  borderColor: {
+    type: String,
+    default: ''
+  },
+  zIndex: {
+    type: [String, Number],
+    default: 1
+  },
+  activeColor: {
+    type: String,
+    default: '#1989fa'
+  },
+  inactiveColor: {
+    type: String,
+    default: '#7d7e80'
+  },
+  fixed: {
+    type: Boolean,
+    default: true
+  },
+  placeholder: {
+    type: Boolean,
+    default: true
+  },
+  backgroundColor: {
+    type: String,
+    default: '#ffffff'
+  },
+  customStyle: {
+    type: Object,
+    default: () => ({})
+  }
+})
+
+const emit = defineEmits(['change', 'update:value'])
+const instance = getCurrentInstance()
+const placeholderHeight = ref<number>(0)
+
+const tabbarStyle = computed<UTSJSONObject>(() => {
+  const style = {
+    zIndex: props.zIndex
+  } as UTSJSONObject
+  if (props.borderColor != '') {
+    style['borderColor'] = props.borderColor + ' !important'
+  }
+  if (props.backgroundColor != '') {
+    style['backgroundColor'] = props.backgroundColor
+  }
+  return deepMerge(style, addStyle(props.customStyle)) as UTSJSONObject
+})
+
+const parentState = computed((): UTSJSONObject => {
+  return {
+    value: props.value,
+    activeColor: props.activeColor,
+    inactiveColor: props.inactiveColor,
+    safeAreaInsetBottom: props.safeAreaInsetBottom,
+    border: props.border,
+    borderColor: props.borderColor,
+    zIndex: props.zIndex,
+    fixed: props.fixed,
+    placeholder: props.placeholder,
+    backgroundColor: props.backgroundColor,
+  } as UTSJSONObject
+})
+
+const itemCount = ref<number>(0)
+const registerTabbarItem = (): number => {
+  const currentIndex = itemCount.value
+  itemCount.value = itemCount.value + 1
+  return currentIndex
+}
+
+provide('upTabbarProps', parentState)
+provide('upTabbarRegister', registerTabbarItem)
+provide('upTabbarChange', (name: any) => {
+  emit('update:value', name)
+  emit('change', name)
+})
+
+async function setPlaceholderHeight() {
+  if (!props.fixed || !props.placeholder) return
+  await sleep(20)
+  upGetRect('.up-tabbar__content', false, instance?.proxy).then((size: NodeInfo) => {
+    placeholderHeight.value = size.height ?? 50
+  })
+}
+
+function noop() {}
+
+watch((): Array<any | null> => [props.fixed, props.placeholder] as Array<any | null>, () => {
+  setPlaceholderHeight()
+})
+
+onMounted(() => {
+  setPlaceholderHeight()
+})
 </script>
 
 <style lang="scss" scoped>
 	@import '../../libs/css/components.scss';
 
 	.up-tabbar {
-		@include flex(column);
+		display: flex;
+		flex-direction: column;
 		width: 100%;
 
 		&__content {
-			@include flex(column);
+			display: flex;
+			flex-direction: column;
 			background-color: #fff;
+			width: 100%;
 
 			&__item-wrapper {
 				height: 50px;
-				@include flex(row);
+				display: flex;
+				flex-direction: row;
 				justify-content: space-around;
 				align-items: stretch;
 				width: 100%;

@@ -10,10 +10,7 @@
 			    class="up-skeleton__wrapper__avatar"
 			    v-if="avatar"
 			    :class="[`up-skeleton__wrapper__avatar--${avatarShape}`, animate ? 'animate' : '']"
-			    :style="{
-						height: addUnit(avatarSize),
-						width: addUnit(avatarSize)
-					}"
+			    :style="avatarStyle"
 			></view>
 			<view
 			    class="up-skeleton__wrapper__content"
@@ -23,10 +20,7 @@
 				<view
 				    class="up-skeleton__wrapper__content__title"
 				    v-if="title"
-				    :style="{
-							width: uTitleWidth,
-							height: addUnit(titleHeight),
-						}"
+				    :style="titleStyle"
 				    :class="[animate ? 'animate' : '']"
 				></view>
 				<view
@@ -34,11 +28,7 @@
 				    :class="[animate ? 'animate' : '']"
 				    v-for="(item, index) in rowsArray"
 				    :key="index"
-				    :style="{
-							 width: item['width'],
-							 height: item['height'],
-							 marginTop: item['marginTop']
-						}"
+				    :style="getRowStyle(item)"
 				>
 		
 				</view>
@@ -48,118 +38,142 @@
 	</view>
 </template>
 
-<script lang="uts">
-	import { propsSkeleton } from './props';
-	import { mpMixin } from '../../libs/mixin/mpMixin';
-	import { mixin } from '../../libs/mixin/mixin';
-	import { addUnit, sleep } from '../../libs/function/index';
-	
-	/**
-	 * Skeleton 骨架屏
-	 * @description 骨架屏一般用于页面在请求远程数据尚未完成时，页面用灰色块预显示本来的页面结构，给用户更好的体验。
-	 * @tutorial https://uview-plus.jiangruyi.com/components/skeleton.html
-	 * @property {Boolean}					loading		是否显示骨架占位图，设置为false将会展示子组件内容 (默认 true )
-	 * @property {Boolean}					animate		是否开启动画效果 (默认 true )
-	 * @property {String | Number}			rows		段落占位图行数 (默认 0 )
-	 * @property {String | Number | Array}	rowsWidth	段落占位图的宽度，可以为百分比，数值，带单位字符串等，可通过数组传入指定每个段落行的宽度 (默认 '100%' )
-	 * @property {String | Number | Array}	rowsHeight	段落的高度 (默认 18 )
-	 * @property {Boolean}					title		是否展示标题占位图 (默认 true )
-	 * @property {String | Number}			titleWidth	标题的宽度 (默认 '50%' )
-	 * @property {String | Number}			titleHeight	标题的高度 (默认 18 )
-	 * @property {Boolean}					avatar		是否展示头像占位图 (默认 false )
-	 * @property {String | Number}			avatarSize	头像占位图大小 (默认 32 )
-	 * @property {String}					avatarShape	头像占位图的形状，circle-圆形，square-方形 (默认 'circle' )
-	 * @example <up-search placeholder="日照香炉生紫烟" v-model="keyword"></up-search>
-	 */
-	export default {
-		name: 'up-skeleton',
-		mixins: [mpMixin, mixin, propsSkeleton],
-		data() {
-			return {
-				width: 0
-			}
-		},
-		watch: {
-			loading: {
-				handler: function() {
-					this.getComponentWidth()
-				}
-			}
-		},
-		computed: {
-			rowsArray(): Array<UTSJSONObject> {
-				const rows: Array<UTSJSONObject> = []
-				const rowCount = parseInt(this.rows.toString())
-				const rWidth = this.rowsWidth
-				const rHeight = this.rowsHeight
-				for (let i = 0; i < rowCount; i++) {
-					let item: UTSJSONObject = {}
-					// 需要预防超出数组边界的情况
-					let rowWidth: string | number = ''
-					if (rWidth instanceof Array) {
-						const rWidthArr = rWidth as Array<any>
-						if (i == rowCount - 1) {
-							rowWidth = '70%'
-						} else {
-							rowWidth = rWidthArr[i] != null ? (rWidthArr[i] ?? '0px') : (i == rWidthArr.length ? '70%' : '100%')
-						}
-					} else {
-						// 非数组形式
-						if (i == rowCount - 1) {
-							rowWidth = '70%'
-						} else {
-							rowWidth = rWidth != null ? rWidth.toString() : ''
-						}
-					}
-					
-					let rowHeight: string | number = ''
-					if (rHeight instanceof Array) {
-						const rHeightArr = rHeight as Array<any>
-						rowHeight = rHeightArr[i] != null ? (rHeightArr[i] ?? '0px') : '18px'
-					} else {
-						rowHeight = rHeight != null ? rHeight.toString() : ''
-					}
-					
-					// 如果有title占位图，第一个段落占位图的外边距需要大一些，如果没有title占位图，第一个段落占位图则无需外边距
-					// 之配置
-					if (!this.title && i == 0) {
-						item['marginTop'] = '0px'
-					} else if (this.title && i == 0) {
-						item['marginTop'] = '20px'
-					} else {
-						item['marginTop'] = '12px'
-					}
+<script setup lang="uts">
+import { computed, onMounted } from 'vue'
+import { addUnit, sleep } from '../../libs/function/index.uts'
 
-					item['width'] = addUnit(rowWidth)
-					item['height'] = addUnit(rowHeight)
-					rows.push(item)
-				}
-				return rows
-			},
-			uTitleWidth(): string {
-				let tWidth = '0px'
-				tWidth = addUnit(this.titleWidth)
-				return addUnit(tWidth)
-			}
-		},
-		mounted() {
-			this.init()
-		},
-		methods: {
-			addUnit(e: any): string {
-				return addUnit(e)
-			},
-			init() {
-				this.getComponentWidth()
-			},
-			// 获取组件的宽度
-			async getComponentWidth() {
-				// 延时一定时间，以获取dom尺寸
-				await sleep(20)
-				// 这里需要模拟 $uGetRect 方法
-			}
-		}
-	}
+defineOptions({
+  name: 'up-skeleton'
+})
+
+const props = defineProps({
+  loading: {
+    type: Boolean,
+    default: true
+  },
+  animate: {
+    type: Boolean,
+    default: true
+  },
+  rows: {
+    type: [String, Number],
+    default: 0
+  },
+  rowsWidth: {
+    type: [String, Number, Array],
+    default: '100%'
+  },
+  rowsHeight: {
+    type: [String, Number, Array],
+    default: 18
+  },
+  title: {
+    type: Boolean,
+    default: true
+  },
+  titleWidth: {
+    type: [String, Number],
+    default: '50%'
+  },
+  titleHeight: {
+    type: [String, Number],
+    default: 18
+  },
+  avatar: {
+    type: Boolean,
+    default: false
+  },
+  avatarSize: {
+    type: [String, Number],
+    default: 32
+  },
+  avatarShape: {
+    type: String,
+    default: 'circle'
+  }
+})
+
+const rowsArray = computed<Array<UTSJSONObject>>(() => {
+  const rows: Array<UTSJSONObject> = []
+  const rowCount = parseInt(props.rows.toString())
+  const rWidth = props.rowsWidth
+  const rHeight = props.rowsHeight
+  for (let i = 0; i < rowCount; i++) {
+    let item: UTSJSONObject = {}
+    let rowWidth: string | number = ''
+    if (rWidth instanceof Array) {
+      const rWidthArr = rWidth as Array<any>
+      if (i == rowCount - 1) {
+        rowWidth = '70%'
+      } else {
+        rowWidth = rWidthArr[i] != null ? (rWidthArr[i] ?? '0px') : (i == rWidthArr.length ? '70%' : '100%')
+      }
+    } else {
+      if (i == rowCount - 1) {
+        rowWidth = '70%'
+      } else {
+        rowWidth = rWidth != null ? rWidth.toString() : ''
+      }
+    }
+    
+    let rowHeight: string | number = ''
+    if (rHeight instanceof Array) {
+      const rHeightArr = rHeight as Array<any>
+      rowHeight = rHeightArr[i] != null ? (rHeightArr[i] ?? '0px') : '18px'
+    } else {
+      rowHeight = rHeight != null ? rHeight.toString() : ''
+    }
+    
+    if (!props.title && i == 0) {
+      item['marginTop'] = '0px'
+    } else if (props.title && i == 0) {
+      item['marginTop'] = '20px'
+    } else {
+      item['marginTop'] = '12px'
+    }
+
+    item['width'] = addUnit(rowWidth)
+    item['height'] = addUnit(rowHeight)
+    rows.push(item)
+  }
+  return rows
+})
+
+const uTitleWidth = computed<string>(() => {
+  let tWidth = '0px'
+  tWidth = addUnit(props.titleWidth)
+  return addUnit(tWidth)
+})
+
+const avatarStyle = computed((): UTSJSONObject => {
+  return {
+    height: addUnit(props.avatarSize),
+    width: addUnit(props.avatarSize)
+  } as UTSJSONObject
+})
+
+const titleStyle = computed((): UTSJSONObject => {
+  return {
+    width: uTitleWidth.value,
+    height: addUnit(props.titleHeight)
+  } as UTSJSONObject
+})
+
+function getRowStyle(item: UTSJSONObject): UTSJSONObject {
+  return {
+    width: item['width'],
+    height: item['height'],
+    marginTop: item['marginTop']
+  } as UTSJSONObject
+}
+
+async function getComponentWidth() {
+  await sleep(20)
+}
+
+onMounted(() => {
+  getComponentWidth()
+})
 </script>
 
 <style lang="scss" scoped>

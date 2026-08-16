@@ -40,10 +40,10 @@
 						:style="getAreaItemStyle()"
 					>
 						<view class="up-padding-10 up-bg-gray" style="height: 100%;">
-							<scroll-view :scroll-y="true" style="height: 100%;">
+							<scroll-view direction="vertical" style="height: 100%;">
 								<up-cell-group v-if="canShowLevel(levelIndex)">
 									<up-cell
-										v-for="(item,index) in levelData"
+										v-for="(item, index) in levelData"
 										:key="index"
 										:title="getItemLabel(item)"
 										:arrow="false"
@@ -76,7 +76,8 @@
 	</up-popup>
 </template>
 
-<script lang="uts">
+<script setup lang="uts">
+import { ref, computed, watch, onMounted } from 'vue'
 import { t } from '../../libs/i18n'
 
 function toText(value: any | null): string {
@@ -91,263 +92,274 @@ function emptyObjectList(): Array<UTSJSONObject> {
 	return [] as Array<UTSJSONObject>
 }
 
-export default {
-	name: 'up-cascader',
-	props: {
-		show: {
-			type: Boolean,
-			default: false
-		},
-		data: {
-			type: Array,
-			default() {
-				return []
-			}
-		},
-		modelValue: {
-			type: Array,
-			default() {
-				return []
-			}
-		},
-		valueKey: {
-			type: String,
-			default: 'value'
-		},
-		labelKey: {
-			type: String,
-			default: 'label'
-		},
-		childrenKey: {
-			type: String,
-			default: 'children'
-		},
-		maskCloseAble: {
-			type: Boolean,
-			default: true
-		},
-		zIndex: {
-			type: [String, Number],
-			default: 0
-		},
-		autoClose: {
-			type: Boolean,
-			default: false
-		},
-		headerDirection: {
-			type: String,
-			default: 'row'
-		},
-		optionsCols: {
-			type: Number,
-			default: 2
-		},
-		closeable: {
-			type: Boolean,
-			default: true
-		}
+defineOptions({
+	name: 'up-cascader'
+})
+
+const props = defineProps({
+	show: {
+		type: Boolean,
+		default: false
 	},
-	emits: ['update:modelValue', 'update:show', 'change', 'confirm', 'cancel'],
-	data() {
-		return {
-			levelList: [] as Array<Array<UTSJSONObject>>,
-			selectedValueIndexs: [] as Array<number>,
-			tabsIndex: 0,
-			popupShow: false,
-			confirmValues: [] as Array<any>
-		}
+	data: {
+		type: Array as PropType<Array<UTSJSONObject>>,
+		default: () => [] as Array<UTSJSONObject>
 	},
-	watch: {
-		data: {
-			handler() {
-				this.initLevelList()
-				this.setDefaultValue()
-			},
-			immediate: true
-		},
-		show() {
-			this.popupShow = this.show
-		},
-		modelValue: {
-			handler() {
-				this.setDefaultValue()
-			},
-			immediate: true
-		}
+	modelValue: {
+		type: Array as PropType<Array<any>>,
+		default: () => [] as Array<any>
 	},
-	computed: {
-		isChange(): boolean {
-			return this.tabsIndex > 1
-		},
-		levelWrapStyle(): string {
-			if (this.optionsCols == 2 && this.isChange) {
-				return 'transform: translateX(-33.3333333%)'
-			}
-			return ''
-		},
-		cancelText(): string {
-			return t('up.common.cancel')
-		},
-		confirmText(): string {
-			return t('up.common.confirm')
-		},
-		placeholderText(): string {
-			return t('up.common.pleaseChoose')
-		},
-		genTabsList(): Array<UTSJSONObject> {
-			const tabsList = [] as Array<UTSJSONObject>
-			tabsList.push({ name: this.placeholderText } as UTSJSONObject)
-			for (let i = 0; i < this.selectedValueIndexs.length; i++) {
-				if (i >= this.levelList.length) break
-				const selectedIndex = this.selectedValueIndexs[i]
-				const levelData = this.levelList[i]
-				if (selectedIndex < 0 || selectedIndex >= levelData.length) continue
-				const selectedItem = levelData[selectedIndex]
-				tabsList[i] = { name: this.getItemLabel(selectedItem) } as UTSJSONObject
-				const children = this.getChildren(selectedItem)
-				if (i == this.selectedValueIndexs.length - 1 && children.length > 0) {
-					tabsList.push({ name: this.placeholderText } as UTSJSONObject)
-				}
-			}
-			return tabsList
-		},
-		uZIndex(): number {
-			if (typeof this.zIndex == 'number' && this.zIndex > 0) {
-				return this.zIndex
-			}
-			const parsed = parseInt(toText(this.zIndex))
-			return isNaN(parsed) || parsed <= 0 ? 1075 : parsed
-		}
+	valueKey: {
+		type: String,
+		default: 'value'
 	},
-	methods: {
-		t,
-		getAreaItemStyle(): string {
-			return this.optionsCols == 2 ? 'width:33.33333%' : 'width:750rpx'
-		},
-		getDataList(): Array<UTSJSONObject> {
-			return this.data as Array<UTSJSONObject>
-		},
-		getChildren(item: UTSJSONObject): Array<UTSJSONObject> {
-			const children = item[this.childrenKey]
-			if (children == null) return emptyObjectList()
-			return children as Array<UTSJSONObject>
-		},
-		getItemLabel(item: UTSJSONObject): string {
-			return toText(item[this.labelKey])
-		},
-		getItemValue(item: UTSJSONObject): any | null {
-			return item[this.valueKey]
-		},
-		getTabName(item: UTSJSONObject): string {
-			return toText(item['name'])
-		},
-		isSelected(levelIndex: number, index: number): boolean {
-			if (levelIndex < 0 || levelIndex >= this.selectedValueIndexs.length) return false
-			return this.selectedValueIndexs[levelIndex] == index
-		},
-		canShowLevel(levelIndex: number): boolean {
-			return levelIndex == 0 || this.selectedValueIndexs.length >= levelIndex
-		},
-		getSelectedValues(): Array<any> {
-			const result = [] as Array<any>
-			for (let i = 0; i < this.selectedValueIndexs.length; i++) {
-				if (i >= this.levelList.length) break
-				const selectedIndex = this.selectedValueIndexs[i]
-				const levelData = this.levelList[i]
-				if (selectedIndex < 0 || selectedIndex >= levelData.length) continue
-				const value = this.getItemValue(levelData[selectedIndex])
-				if (value != null) result.push(value)
-			}
-			return result
-		},
-		initLevelList(): void {
-			const list = this.getDataList()
-			this.levelList = list.length > 0 ? [list] as Array<Array<UTSJSONObject>> : [] as Array<Array<UTSJSONObject>>
-			this.selectedValueIndexs = [] as Array<number>
-			this.tabsIndex = 0
-			this.confirmValues = [] as Array<any>
-		},
-		setDefaultValue(): void {
-			const values = this.modelValue as Array<any>
-			const root = this.getDataList()
-			this.selectedValueIndexs = [] as Array<number>
-			this.levelList = root.length > 0 ? [root] as Array<Array<UTSJSONObject>> : [] as Array<Array<UTSJSONObject>>
-			if (values.length == 0 || root.length == 0) {
-				this.confirmValues = [] as Array<any>
-				this.tabsIndex = 0
-				return
-			}
-			let currentLevelData = root
-			for (let i = 0; i < values.length; i++) {
-				if (i >= this.levelList.length) {
-					this.levelList.push(currentLevelData)
-				} else {
-					this.levelList[i] = currentLevelData
-				}
-				const index = this.findValueIndex(currentLevelData, values[i])
-				if (index == -1) break
-				this.selectedValueIndexs.push(index)
-				const children = this.getChildren(currentLevelData[index])
-				if (children.length == 0) break
-				currentLevelData = children
-				if (i < values.length - 1) {
-					this.levelList.push(children)
-				}
-			}
-			this.confirmValues = this.getSelectedValues()
-			this.tabsIndex = this.selectedValueIndexs.length > 0 ? this.selectedValueIndexs.length - 1 : 0
-		},
-		findValueIndex(list: Array<UTSJSONObject>, value: any | null): number {
-			for (let i = 0; i < list.length; i++) {
-				if (sameValue(this.getItemValue(list[i]), value)) return i
-			}
-			return -1
-		},
-		close(): void {
-			this.$emit('cancel')
-			this.$emit('update:show', false)
-		},
-		tabsChange(item: UTSJSONObject): void {
-			const index = parseInt(toText(item['index']))
-			if (!isNaN(index)) {
-				this.tabsIndex = index
-			}
-		},
-		levelChange(levelIndex: number, index: number): void {
-			if (levelIndex < 0 || levelIndex >= this.levelList.length) return
-			const levelData = this.levelList[levelIndex]
-			if (index < 0 || index >= levelData.length) return
-			this.selectedValueIndexs.splice(levelIndex)
-			this.selectedValueIndexs.push(index)
-			this.levelList.splice(levelIndex + 1)
-			const currentItem = levelData[index]
-			const children = this.getChildren(currentItem)
-			if (children.length > 0) {
-				this.levelList.push(children)
-				this.tabsIndex = levelIndex + 1
-				this.confirmValues = this.getSelectedValues()
-				this.$emit('change', this.confirmValues)
-				return
-			}
-			this.tabsIndex = levelIndex
-			this.confirmValues = this.getSelectedValues()
-			this.$emit('change', this.confirmValues)
-			if (this.autoClose) {
-				this.handleConfirm()
-			}
-		},
-		handleCancel(): void {
-			this.close()
-		},
-		handleConfirm(): void {
-			const values = this.confirmValues.length > 0 ? this.confirmValues : this.getSelectedValues()
-			this.confirmValues = values
-			this.$emit('update:modelValue', values)
-			this.$emit('confirm', values)
-			this.$emit('update:show', false)
+	labelKey: {
+		type: String,
+		default: 'label'
+	},
+	childrenKey: {
+		type: String,
+		default: 'children'
+	},
+	maskCloseAble: {
+		type: Boolean,
+		default: true
+	},
+	zIndex: {
+		type: [String, Number],
+		default: 0
+	},
+	autoClose: {
+		type: Boolean,
+		default: false
+	},
+	headerDirection: {
+		type: String,
+		default: 'row'
+	},
+	optionsCols: {
+		type: Number,
+		default: 2
+	},
+	closeable: {
+		type: Boolean,
+		default: true
+	}
+})
+
+const emit = defineEmits(['update:modelValue', 'update:show', 'change', 'confirm', 'cancel'])
+
+const levelList = ref<Array<Array<UTSJSONObject>>>([])
+const selectedValueIndexs = ref<Array<number>>([])
+const tabsIndex = ref<number>(0)
+const popupShow = ref<boolean>(props.show)
+const confirmValues = ref<Array<any>>([])
+
+const isChange = computed<boolean>(() => {
+	return tabsIndex.value > 1
+})
+
+const levelWrapStyle = computed<string>(() => {
+	if (props.optionsCols == 2 && isChange.value) {
+		return 'transform: translateX(-33.3333333%)'
+	}
+	return ''
+})
+
+const cancelText = computed<string>(() => {
+	return t('up.common.cancel')
+})
+
+const confirmText = computed<string>(() => {
+	return t('up.common.confirm')
+})
+
+const placeholderText = computed<string>(() => {
+	return t('up.common.pleaseChoose')
+})
+
+const uZIndex = computed<number>(() => {
+	if (typeof props.zIndex == 'number' && (props.zIndex as number) > 0) {
+		return props.zIndex as number
+	}
+	const parsed = parseInt(toText(props.zIndex))
+	return isNaN(parsed) || parsed <= 0 ? 1075 : parsed
+})
+
+function getAreaItemStyle(): string {
+	return props.optionsCols == 2 ? 'width:33.33333%' : 'width:750rpx'
+}
+
+function getDataList(): Array<UTSJSONObject> {
+	return props.data
+}
+
+function getChildren(item: UTSJSONObject): Array<UTSJSONObject> {
+	const children = item[props.childrenKey]
+	if (children == null) return emptyObjectList()
+	return children as Array<UTSJSONObject>
+}
+
+function getItemLabel(item: UTSJSONObject): string {
+	return toText(item[props.labelKey])
+}
+
+function getItemValue(item: UTSJSONObject): any | null {
+	return item[props.valueKey]
+}
+
+function getTabName(item: UTSJSONObject): string {
+	return toText(item['name'])
+}
+
+function isSelected(levelIndex: number, index: number): boolean {
+	if (levelIndex < 0 || levelIndex >= selectedValueIndexs.value.length) return false
+	return selectedValueIndexs.value[levelIndex] == index
+}
+
+function canShowLevel(levelIndex: number): boolean {
+	return levelIndex == 0 || selectedValueIndexs.value.length >= levelIndex
+}
+
+const genTabsList = computed<Array<UTSJSONObject>>(() => {
+	const tabsList = [] as Array<UTSJSONObject>
+	tabsList.push({ name: placeholderText.value } as UTSJSONObject)
+	for (let i = 0; i < selectedValueIndexs.value.length; i++) {
+		if (i >= levelList.value.length) break
+		const selectedIndex = selectedValueIndexs.value[i]
+		const levelData = levelList.value[i]
+		if (selectedIndex < 0 || selectedIndex >= levelData.length) continue
+		const selectedItem = levelData[selectedIndex]
+		tabsList[i] = { name: getItemLabel(selectedItem) } as UTSJSONObject
+		const children = getChildren(selectedItem)
+		if (i == selectedValueIndexs.value.length - 1 && children.length > 0) {
+			tabsList.push({ name: placeholderText.value } as UTSJSONObject)
 		}
 	}
+	return tabsList
+})
+
+function getSelectedValues(): Array<any> {
+	const result = [] as Array<any>
+	for (let i = 0; i < selectedValueIndexs.value.length; i++) {
+		if (i >= levelList.value.length) break
+		const selectedIndex = selectedValueIndexs.value[i]
+		const levelData = levelList.value[i]
+		if (selectedIndex < 0 || selectedIndex >= levelData.length) continue
+		const val = getItemValue(levelData[selectedIndex])
+		if (val != null) result.push(val)
+	}
+	return result
 }
+
+function findValueIndex(list: Array<UTSJSONObject>, val: any | null): number {
+	for (let i = 0; i < list.length; i++) {
+		if (sameValue(getItemValue(list[i]), val)) return i
+	}
+	return -1
+}
+
+function initLevelList(): void {
+	const list = getDataList()
+	levelList.value = list.length > 0 ? [list] as Array<Array<UTSJSONObject>> : [] as Array<Array<UTSJSONObject>>
+	selectedValueIndexs.value = [] as Array<number>
+	tabsIndex.value = 0
+	confirmValues.value = [] as Array<any>
+}
+
+function setDefaultValue(): void {
+	const values = props.modelValue
+	const root = getDataList()
+	selectedValueIndexs.value = [] as Array<number>
+	levelList.value = root.length > 0 ? [root] as Array<Array<UTSJSONObject>> : [] as Array<Array<UTSJSONObject>>
+	if (values.length == 0 || root.length == 0) {
+		confirmValues.value = [] as Array<any>
+		tabsIndex.value = 0
+		return
+	}
+	let currentLevelData = root
+	for (let i = 0; i < values.length; i++) {
+		if (i >= levelList.value.length) {
+			levelList.value.push(currentLevelData)
+		} else {
+			levelList.value[i] = currentLevelData
+		}
+		const index = findValueIndex(currentLevelData, values[i])
+		if (index == -1) break
+		selectedValueIndexs.value.push(index)
+		const children = getChildren(currentLevelData[index])
+		if (children.length == 0) break
+		currentLevelData = children
+		if (i < values.length - 1) {
+			levelList.value.push(children)
+		}
+	}
+	confirmValues.value = getSelectedValues()
+	tabsIndex.value = selectedValueIndexs.value.length > 0 ? selectedValueIndexs.value.length - 1 : 0
+}
+
+function close(): void {
+	emit('cancel')
+	emit('update:show', false)
+	popupShow.value = false
+}
+
+function tabsChange(item: UTSJSONObject): void {
+	const index = parseInt(toText(item['index']))
+	if (!isNaN(index)) {
+		tabsIndex.value = index
+	}
+}
+
+function handleConfirm(): void {
+	const values = confirmValues.value.length > 0 ? confirmValues.value : getSelectedValues()
+	confirmValues.value = values
+	emit('update:modelValue', values)
+	emit('confirm', values)
+	emit('update:show', false)
+	popupShow.value = false
+}
+
+function levelChange(levelIndex: number, index: number): void {
+	if (levelIndex < 0 || levelIndex >= levelList.value.length) return
+	const levelData = levelList.value[levelIndex]
+	if (index < 0 || index >= levelData.length) return
+	selectedValueIndexs.value.splice(levelIndex)
+	selectedValueIndexs.value.push(index)
+	levelList.value.splice(levelIndex + 1)
+	const currentItem = levelData[index]
+	const children = getChildren(currentItem)
+	if (children.length > 0) {
+		levelList.value.push(children)
+		tabsIndex.value = levelIndex + 1
+		confirmValues.value = getSelectedValues()
+		emit('change', confirmValues.value)
+		return
+	}
+	tabsIndex.value = levelIndex
+	confirmValues.value = getSelectedValues()
+	emit('change', confirmValues.value)
+	if (props.autoClose) {
+		handleConfirm()
+	}
+}
+
+function handleCancel(): void {
+	close()
+}
+
+watch(() => props.data, () => {
+	initLevelList()
+	setDefaultValue()
+}, { deep: true, immediate: true })
+
+watch(() => props.show, (newVal: boolean) => {
+	popupShow.value = newVal
+})
+
+watch(() => props.modelValue, () => {
+	setDefaultValue()
+}, { deep: true, immediate: true })
 </script>
 
 <style lang="scss">
@@ -368,6 +380,8 @@ export default {
 }
 
 .up-cascader-action {
-	border-top: 1px solid #eee;
+	border-top-width: 1px;
+	border-top-style: solid;
+	border-top-color: #eee;
 }
 </style>

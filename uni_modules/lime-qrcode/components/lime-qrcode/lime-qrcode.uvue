@@ -52,46 +52,45 @@
 	</view>
 	
 </template>
-<script lang="uts">
-	// import {ComponentPublicInstance} from 'vue'
-	export default {
-		name: 'lime-qrcode',
-		data() {
-			return {
-				text: 'qcoon.com.cn',
-				image: '',
-				index: 0,
-				levels: ['L', 'M', 'Q', 'H']
-			}
-		},
-		methods:{ 
-			success(src: string) {
-				console.log(`src`, src)
-			},
-			update() {
-				this.text =  `qcoon.cn?v=${Math.random()}`
-			},
-			onToggle() {
-				this.index++
-				this.index = this.index % this.levels.length
-			},
-			onClick() {
-				const el:LQrcodeComponentPublicInstance = this.$refs['qrcodeRef'] as LQrcodeComponentPublicInstance 
-				el.canvasToTempFilePath({
-					success:(res: TakeSnapshotSuccess)=>{
-						this.image = res.tempFilePath
-					}
-				})
-			}
-		},
-		mounted() {
-			
+<script setup lang="uts">
+	import { ref } from 'vue'
+
+	defineOptions({
+		name: 'lime-qrcode'
+	})
+
+	const text = ref<string>('qcoon.com.cn')
+	const image = ref<string>('')
+	const index = ref<number>(0)
+	const levels = ref<string[]>(['L', 'M', 'Q', 'H'])
+	const qrcodeRef = ref<any | null>(null)
+
+	function success(src: string) {
+		console.log('src', src)
+	}
+
+	function update() {
+		text.value = `qcoon.cn?v=${Math.random()}`
+	}
+
+	function onToggle() {
+		index.value++
+		index.value = index.value % levels.value.length
+	}
+
+	function onClick() {
+		const el = qrcodeRef.value as any | null
+		if (el != null) {
+			el.canvasToTempFilePath({
+				success: (res: TakeSnapshotSuccess) => {
+					image.value = res.tempFilePath
+				}
+			})
 		}
 	}
 </script>
 <style lang="scss">
 	$card-bg-color: var(--doc-card-bg-color, white);
-	// $page-bg-color: var(--doc-page-bg-color, #f5f5f5);
 	$title-color: var(--doc-title-color, #000000E6);
 	$summary-color: var(--doc-summary-color, #00000099);
 	
@@ -101,7 +100,6 @@
 		&.card{
 			background-color: $card-bg-color;
 			transition-property: background-color;
-			// transition-duration: 300ms;
 			padding: 30rpx;
 			margin-bottom: 20rpx;
 		}
@@ -137,10 +135,6 @@
 		&__body {
 			margin: 16px 0;
 			overflow: visible;
-			.demo-block {
-				// margin-top: 0px;
-				margin: 0;
-			}
 		}
 	}
 </style>

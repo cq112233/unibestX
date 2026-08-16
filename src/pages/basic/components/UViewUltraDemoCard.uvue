@@ -39,8 +39,6 @@
 <script setup lang="uts">
 import Card from './Card.uvue'
 
-let isNavigating = false
-
 function copyWebsiteUrl() {
   uni.setClipboardData({
     data: 'https://uview-ultra.lingyun.net/',
@@ -54,16 +52,10 @@ function copyWebsiteUrl() {
 }
 
 function navigateToShowcase() {
-  if (isNavigating) {
-    return
-  }
-  isNavigating = true
   uni.navigateTo({
     url: '/src/sub/uview-ultra/uview-ultra',
-    complete: () => {
-      setTimeout(() => {
-        isNavigating = false
-      }, 500)
+    fail: (err) => {
+      console.error('navigateToShowcase fail:', err)
     },
   })
 }

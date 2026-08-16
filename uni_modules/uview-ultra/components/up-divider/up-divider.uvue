@@ -1,7 +1,7 @@
 <template>
 	<view
 	    class="up-divider"
-	    :style="[$up.addStyle(customStyle)]"
+	    :style="customDividerStyle"
 		@tap="clickHandler"
 	>
 		<up-line
@@ -17,7 +17,7 @@
 		<text
 		    v-else-if="text"
 		    class="up-divider__text"
-		    :style="[textStyle]"
+		    :style="textStyle"
 		>{{text}}</text>
 		<up-line
 		    :color="lineColor"
@@ -34,6 +34,14 @@
 	import { addStyle, addUnit } from '../../libs/function/index.uts'
 	
 	const props = defineProps({
+		customStyle: {
+			type: [Object, String],
+			default: () => ({})
+		},
+		customClass: {
+			type: String,
+			default: ''
+		},
 		// 是否虚线
 		dashed: {
 			type: Boolean,
@@ -83,6 +91,10 @@
 		style['fontSize'] = addUnit(props.textSize);
 		style['color'] = props.textColor;
 		return style;
+	});
+
+	const customDividerStyle = computed((): UTSJSONObject => {
+		return addStyle(props.customStyle) as UTSJSONObject
 	});
 	
 	// 左边线条的的样式

@@ -3,7 +3,6 @@
 		<view class="up-action-sheet-data__trigger">
 			<slot name="trigger"></slot>
 			<up-input
-				v-if="!hasTrigger"
 				:model-value="current"
 				disabled
 				disabled-color="#ffffff"
@@ -23,87 +22,71 @@
 	</view>
 </template>
 
-<script lang="uts">
+<script setup lang="uts">
+import { ref, watch } from 'vue'
+
+defineOptions({
+	name: 'up-action-sheet-data'
+})
+
+const props = defineProps({
+	modelValue: {
+		type: [String, Number],
+		default: ''
+	},
+	title: {
+		type: String,
+		default: ''
+	},
+	description: {
+		type: String,
+		default: ''
+	},
+	options: {
+		type: Array as PropType<Array<UTSJSONObject>>,
+		default: () => [] as Array<UTSJSONObject>
+	},
+	valueKey: {
+		type: String,
+		default: 'value'
+	},
+	labelKey: {
+		type: String,
+		default: 'name'
+	}
+})
+
+const emit = defineEmits(['update:modelValue'])
+
+const show = ref<boolean>(false)
+const current = ref<string>('')
+
 function stringValue(value: any | null): string {
 	return value == null ? '' : value.toString()
 }
 
-export default {
-	name: 'up-action-sheet-data',
-	props: {
-		modelValue: {
-			type: [String, Number],
-			default: ''
-		},
-		title: {
-			type: String,
-			default: ''
-		},
-		description: {
-			type: String,
-			default: ''
-		},
-		options: {
-			type: Array,
-			default(): Array<UTSJSONObject> {
-				return [] as Array<UTSJSONObject>
-			}
-		},
-		valueKey: {
-			type: String,
-			default: 'value'
-		},
-		labelKey: {
-			type: String,
-			default: 'name'
-		}
-	},
-	emits: ['update:modelValue'],
-	data() {
-		return {
-			show: false,
-			current: ''
-		}
-	},
-	computed: {
-		hasTrigger(): boolean {
-			return this.$slots['trigger'] != null
-		}
-	},
-	watch: {
-		modelValue: {
-			handler() {
-				this.syncCurrent()
-			},
-			immediate: true
-		},
-		options: {
-			handler() {
-				this.syncCurrent()
-			},
-			immediate: true
-		}
-	},
-	methods: {
-		syncCurrent(): void {
-			const list = this.options as Array<UTSJSONObject>
-			const model = stringValue(this.modelValue)
-			this.current = ''
-			for (let i = 0; i < list.length; i++) {
-				const item = list[i]
-				if (stringValue(item[this.valueKey]) == model) {
-					this.current = stringValue(item[this.labelKey])
-					return
-				}
-			}
-		},
-		select(item: UTSJSONObject): void {
-			this.show = false
-			this.$emit('update:modelValue', item[this.valueKey])
-			this.current = stringValue(item[this.labelKey])
+function syncCurrent(): void {
+	const list = props.options
+	const model = stringValue(props.modelValue)
+	current.value = ''
+	for (let i = 0; i < list.length; i++) {
+		const item = list[i]
+		if (stringValue(item[props.valueKey]) == model) {
+			current.value = stringValue(item[props.labelKey])
+			return
 		}
 	}
 }
+
+function select(item: UTSJSONObject): void {
+	show.value = false
+	emit('update:modelValue', item[props.valueKey])
+	current.value = stringValue(item[props.labelKey])
+}
+
+watch((): Array<any | null> => [props.modelValue, props.options] as Array<any | null>, () => {
+	syncCurrent()
+}, { immediate: true, deep: true })
 </script>
 
 <style lang="scss" scoped>

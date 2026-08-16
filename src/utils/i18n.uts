@@ -2,7 +2,7 @@ import i18n from '../i18n/index.uts'
 import { tabbarList } from '../tabbar/store.uts'
 
 /**
- * 非 vue / uvue 文件使用 i18n 翻译
+ * 通用 i18n 翻译函数
  * @param key 翻译的 key
  * @param named 命名参数
  */
@@ -11,6 +11,10 @@ export function t(key : string, named : UTSJSONObject | null = null) : string {
     return i18n.global.t(key, named)
   }
   return i18n.global.t(key)
+}
+
+export function $t(key : string, named : UTSJSONObject | null = null) : string {
+  return t(key, named)
 }
 
 /**
@@ -23,7 +27,7 @@ export function getI18nText(key : string) : string {
   if (cleanKey.startsWith('%') && cleanKey.endsWith('%') && cleanKey.length > 2) {
     cleanKey = cleanKey.substring(1, cleanKey.length - 1)
   }
-  return t(cleanKey, null)
+  return i18n.global.t(cleanKey)
 }
 
 /**

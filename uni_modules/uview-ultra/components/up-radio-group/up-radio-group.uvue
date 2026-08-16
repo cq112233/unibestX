@@ -7,87 +7,156 @@
 	</view>
 </template>
 
-<script lang="uts">
-	import { propsRadioGroup } from './props';
-	import { mpMixin } from '../../libs/mixin/mpMixin';
-	import { mixin } from '../../libs/mixin/mixin';
-	import { bem } from '../../libs/function/index';
-	/**
-	 * radioRroup 单选框父组件
-	 * @author jry ijry@qq.com
-	 * @description 单选框用于有一个选择，用户只能选择其中一个的场景。搭配up-radio使用
-	 * @tutorial https://ijry.github.io/uview-plus/components/radio.html
-	 * @property {String | Number | Boolean}	value 			绑定的值
-	 * @property {Boolean}						disabled		是否禁用所有radio（默认 false ）
-	 * @property {String}						shape			外观形状，shape-方形，circle-圆形(默认 circle )
-	 * @property {String}						activeColor		选中时的颜色，应用到所有子Radio组件（默认 '#2979ff' ）
-	 * @property {String}						inactiveColor	未选中的颜色 (默认 '#c8c9cc' )
-	 * @property {String}						name			标识符
-	 * @property {String | Number}				size			组件整体的大小，单位px（默认 18 ）
-	 * @property {String}						placement		布局方式，row-横向，column-纵向 （默认 'row' ）
-	 * @property {String}						label			文本
-	 * @property {String}						labelColor		label的颜色 （默认 '#303133' ）
-	 * @property {String | Number}				labelSize		label的字体大小，px单位 （默认 14 ）
-	 * @property {Boolean}						labelDisabled	是否禁止点击文本操作checkbox(默认 false )
-	 * @property {String}						iconColor		图标颜色 （默认 '#ffffff' ）
-	 * @property {String | Number}				iconSize		图标的大小，单位px （默认 12 ）
-	 * @property {Boolean}						borderBottom	placement为row时，是否显示下边框 （默认 false ）
-	 * @property {String}						iconPlacement	图标与文字的对齐方式 （默认 'left' ）
-     * @property {Object}						customStyle		组件的样式，对象形式
-	 * @event {Function} change 任一个radio状态发生变化时触发
-	 * @example <up-radio-group v-model="value"></up-radio-group>
-	 */
-	export default {
-		name: 'up-radio-group',
-		mixins: [mpMixin, mixin, propsRadioGroup],
-		computed: {
-			// 这里computed的变量，都是子组件up-radio需要用到的，由于头条小程序的兼容性差异，子组件无法实时监听父组件参数的变化
-			// 所以需要手动通知子组件，这里返回一个parentData变量，供watch监听，在其中去通知每一个子组件重新从父组件(up-radio-group)
-			// 拉取父组件新的变化后的参数
-			parentChangeData(): any {
-                return [this.modelValue, this.disabled, this.inactiveColor, this.activeColor, this.size, this.labelDisabled, this.shape,
-					this.iconSize, this.borderBottom, this.placement
-				]
-			},
-			bemClass(): any {
-				return bem('radio-group', [this.placement], [])
-			},
+<script setup lang="uts">
+	import { computed, provide, getCurrentInstance } from 'vue'
+	import type { ComputedRef } from 'vue'
+	import defProps from './radioGroup.uts'
+	import { bem } from '../../libs/function/index'
+	import { useUltraUI } from '../../libs/composable/useUltraUI'
+	
+	const { getChildren, addChild } = useUltraUI()
+	const instance = getCurrentInstance()?.proxy
+	
+	defineOptions({
+		name: 'up-radio-group'
+	})
+	
+	const props = defineProps({
+		// 标识符 
+		name: {
+			type: String,
+			default: defProps.getString('radioGroup.name')
 		},
-		watch: {
-			// 当父组件需要子组件需要共享的参数发生了变化，手动通知子组件
-			parentChangeData() {
-				this.children.forEach(child => {
-					child.$callMethod('init')
-				})
-			},
+		// 绑定的值
+		modelValue: {
+			type: [String, Number, Boolean],
+			default: defProps.getString('radioGroup.value')
 		},
-		data() {
-			return {
-				children: [] as Array<ComponentPublicInstance>
-			}
+		// 形状，circle-圆形，square-方形
+		shape: {
+			type: String,
+			default: defProps.getString('radioGroup.shape')
 		},
-		created() {
+		// 是否禁用全部radio
+		disabled: {
+			type: Boolean,
+			default: defProps.getBoolean('radioGroup.disabled')
 		},
-		// #ifdef VUE3
-		emits: ['update:modelValue', 'change'],
-    	// #endif
-		methods: {
-			// 将其他的radio设置为未选中的状态
-			unCheckedOther(childInstance: ComponentPublicInstance) {
-				this.children.map(child => {
-					// 所有子radio中，被操作组件实例的checked的值无需修改
-					if (childInstance !== child) {
-						child.$data['checked'] = false
-					}
-				})
-				const name = childInstance.$props['name']
-				// 通过emit事件，设置父组件通过v-model双向绑定的值
-                this.$emit("update:modelValue", name);
-				// 发出事件
-				this.$emit('change', name)
-			},
+		// 选中状态下的颜色，如设置此值，将会覆盖parent的activeColor值
+		activeColor: {
+			type: String,
+			default: defProps.getString('radioGroup.activeColor')
+		},
+		// 未选中的颜色
+		inactiveColor: {
+			type: String,
+			default: defProps.getString('radioGroup.inactiveColor')
+		},
+		// 整个组件的尺寸 单位px
+		size: {
+			type: [String, Number],
+			default: defProps.getNumber('radioGroup.size')
+		},
+		// 布局方式，row-横向，column-纵向
+		placement: {
+			type: String,
+			default: defProps.getString('radioGroup.placement')
+		},
+		// label的字体大小，px单位
+		labelSize: {
+			type: [String, Number],
+			default: defProps.getNumber('radioGroup.labelSize')
+		},
+		// label的字体颜色
+		labelColor: {
+			type: String,
+			default: defProps.getString('radioGroup.labelColor')
+		},
+		// 是否禁止点击文本操作
+		labelDisabled: {
+			type: Boolean,
+			default: defProps.getBoolean('radioGroup.labelDisabled')
+		},
+		// 图标颜色
+		iconColor: {
+			type: String,
+			default: defProps.getString('radioGroup.iconColor')
+		},
+		// 图标的大小，单位px
+		iconSize: {
+			type: [String, Number],
+			default: defProps.getNumber('radioGroup.iconSize')
+		},
+		// 勾选图标的对齐方式，left-左边，right-右边
+		iconPlacement: {
+			type: String,
+			default: defProps.getString('radioGroup.iconPlacement')
+		},
+		// placement为column时，是否显示下边框
+		borderBottom: {
+			type: Boolean,
+			default: defProps.getBoolean('radioGroup.borderBottom')
+		}
+	})
+	
+	const emit = defineEmits(['update:modelValue', 'change'])
+	
+	const parentDataSelf = computed((): UTSJSONObject => {
+		return {
+			modelValue: props.modelValue,
+			disabled: props.disabled,
+			inactiveColor: props.inactiveColor,
+			activeColor: props.activeColor,
+			size: props.size,
+			labelColor: props.labelColor,
+			labelDisabled: props.labelDisabled,
+			labelSize: props.labelSize,
+			shape: props.shape,
+			iconColor: props.iconColor,
+			iconSize: props.iconSize,
+			iconPlacement: props.iconPlacement,
+			borderBottom: props.borderBottom,
+			placement: props.placement
+		} as UTSJSONObject
+	})
+	
+	const bemClass = computed(() => {
+		return bem('radio-group', [props.placement], [])
+	})
+	
+	function onRadioChange(name: any | null) {
+		if (name != null) {
+			emit('update:modelValue', name!)
+			emit('change', name!)
+		} else {
+			emit('update:modelValue', '')
+			emit('change', '')
 		}
 	}
+	
+	provide('upRadioGroupProps', parentDataSelf)
+	provide('upRadioGroupChange', onRadioChange)
+	
+	// 兼容通过 $callMethod 或 children 调用的老方法
+	function unCheckedOther(childInstance: ComponentPublicInstance) {
+		const name = childInstance.$props['name']
+		onRadioChange(name)
+	}
+	
+	const getProps = function(): UTSJSONObject {
+		return parentDataSelf.value
+	}
+	const getRefs = function(): UTSJSONObject {
+		return {} as UTSJSONObject
+	}
+	
+	defineExpose({
+		unCheckedOther,
+		getChildren,
+		addChild,
+		getProps,
+		getRefs
+	})
 </script>
 
 <style lang="scss" scoped>

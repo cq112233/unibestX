@@ -11,7 +11,7 @@
     </view>
 </template>
 
-<script setup>
+<script setup lang="uts">
 import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { addUnit, guid } from '../../libs/function/index.uts'
 
@@ -272,8 +272,8 @@ onMounted(() => {
     }
 
     .up-lazy-item {
-        // 骗系统开启硬件加速
-        transform: transition3d(0, 0, 0);
+        // 开启硬件加速
+        transform: translate3d(0, 0, 0);
         display: flex;
         width: 100%;
     }

@@ -3,9 +3,7 @@
 	    class="up-radio cursor-pointer"
 		@tap.stop="wrapperClickHandler"
 	    :style="[radioStyle]"
-	    :class="['up-radio-label--' + (parentData['iconPlacement'] != null ? parentData['iconPlacement'].toString() : 'left'),
-			(parentData['borderBottom'] != null && parentData['borderBottom'].toString() == 'true' && parentData['placement'] != null && parentData['placement'].toString() == 'column')
-			? 'up-border-bottom' : '']"
+	    :class="[iconPlacementClass, borderBottomClass]"
 	>
 		<view
 		    class="up-radio__icon-wrap cursor-pointer"
@@ -22,302 +20,400 @@
 				/>
 			</slot>
 		</view>
-		<text
-			class="up-radio__label"
-			:class="[elDisabled ? 'up-radio__label--disabled' : '']"
-		    @tap.stop="labelClickHandler"
-		    :style="{
-				color: elDisabled ? elInactiveColor : elLabelColor,
-				fontSize: elLabelSize,
-				lineHeight: elLabelSize
-			}"
-		>{{label}}</text>
+		<slot name="label" :label="label" :elDisabled="elDisabled">
+			<text
+				class="up-radio__label"
+				:class="[elDisabled ? 'up-radio__label--disabled' : '']"
+				@tap.stop="labelClickHandler"
+				:style="{
+					color: elDisabled ? elInactiveColor : elLabelColor,
+					fontSize: elLabelSize,
+					lineHeight: elLabelSize
+				}"
+			>{{label}}</text>
+		</slot>
 	</view>
 </template>
 
-<script lang="uts">
-	import { propsRadio } from './props';
-	import { mpMixin } from '../../libs/mixin/mpMixin';
-	import { mixin } from '../../libs/mixin/mixin';
-	import { addUnit, addStyle, os, deepMerge, formValidate, error } from '../../libs/function/index';
-	/**
-	 * radio 单选框
-	 * @author jry ijry@qq.com
-	 * @description 单选框用于有一个选择，用户只能选择其中一个的场景。搭配up-radio-group使用
-	 * @tutorial https://ijry.github.io/uview-plus/components/radio.html
-	 * @property {String | Number}	name			radio的名称
-	 * @property {String}			shape			形状，square为方形，circle为圆型
-	 * @property {Boolean}			disabled		是否禁用
-	 * @property {String | Boolean}	labelDisabled	是否禁止点击提示语选中单选框
-	 * @property {String}			activeColor		选中时的颜色，如设置parent的active-color将失效
-	 * @property {String}			inactiveColor	未选中的颜色
-	 * @property {String | Number}	iconSize		图标大小，单位px
-	 * @property {String | Number}	labelSize		label字体大小，单位px
-	 * @property {String | Number}	label			label提示文字，因为nvue下，直接slot进来的文字，由于特殊的结构，无法修改样式
-	 * @property {String | Number}	size			整体的大小
-	 * @property {String}			iconColor		图标颜色
-	 * @property {String}			labelColor		label的颜色
-	 * @property {Object}			customStyle		组件的样式，对象形式
-	 * 
-	 * @event {Function} change 某个radio状态发生变化时触发(选中状态)
-	 * @example <up-radio :labelDisabled="false">门掩黄昏，无计留春住</up-radio>
-	 */
-	export default {
-		name: "up-radio",
-		mixins: [mpMixin, mixin, propsRadio],
-		data() {
-			return {
-				checked: false,
-				// 当你看到这段代码的时候，
-				// 父组件的默认值，因为头条小程序不支持在computed中使用this.parent.shape的形式
-				// 故只能使用如此方法
-				parentData: {
-					iconSize: '12px',
-					labelDisabled: false,
-					labelColor: '',
-					labelSize: '',
-					disabled: false,
-					shape: '',
-					activeColor: '',
-					inactiveColor: '',
-					size: '18px',
-					value: '',
-					modelValue: '',
-					iconColor: '',
-					placement: 'row',
-					borderBottom: false,
-					iconPlacement: 'left'
-				} as UTSJSONObject
+<script setup lang="uts">
+	import { computed, inject, ref, getCurrentInstance } from 'vue'
+	import type { ComputedRef } from 'vue'
+	import defProps from './radio.uts'
+	import { addUnit, addStyle, os, deepMerge, formValidate, error } from '../../libs/function/index'
+
+	const instance = getCurrentInstance()?.proxy
+
+	defineOptions({
+		name: "up-radio"
+	})
+
+	const props = defineProps({
+		// radio的名称
+		name: {
+			type: [String, Number, Boolean],
+			default: defProps.getString('radio.name')
+		},
+		// 形状，square为方形，circle为圆型
+		shape: {
+			type: String,
+			default: defProps.getString('radio.shape')
+		},
+		// 是否禁用
+		disabled: {
+			type: [String, Boolean],
+			default: defProps.getString('radio.disabled')
+		},
+		// 是否禁止点击提示语选中单选框
+		labelDisabled: {
+			type: [String, Boolean],
+			default: defProps.getString('radio.labelDisabled')
+		},
+		// 选中状态下的颜色，如设置此值，将会覆盖parent的activeColor值
+		activeColor: {
+			type: String,
+			default: defProps.getString('radio.activeColor')
+		},
+		// 未选中的颜色
+		inactiveColor: {
+			type: String,
+			default: defProps.getString('radio.inactiveColor')
+		},
+		// 图标的大小，单位px
+		iconSize: {
+			type: [String, Number],
+			default: defProps.getString('radio.iconSize')
+		},
+		// label的字体大小，px单位
+		labelSize: {
+			type: [String, Number],
+			default: defProps.getString('radio.labelSize')
+		},
+		// label提示文字，因为nvue下，直接slot进来的文字，由于特殊的结构，无法修改样式
+		label: {
+			type: [String, Number],
+			default: defProps.getString('radio.label')
+		},
+		// 整体的大小
+		size: {
+			type: [String, Number],
+			default: defProps.getString('radio.size')
+		},
+		// 图标颜色
+		iconColor: {
+			type: String,
+			default: defProps.getString('radio.iconColor')
+		},
+		// label的颜色
+		labelColor: {
+			type: String,
+			default: defProps.getString('radio.labelColor')
+		},
+		// 定义需要用到的外部样式
+		customStyle: {
+			type: Object,
+			default: () => ({})
+		},
+		// 是否独立使用
+		usedAlone: {
+			type: Boolean,
+			default: false
+		}
+	})
+
+	const emit = defineEmits(['change', 'update:checked'])
+
+	const parentProps = inject<ComputedRef<UTSJSONObject> | null>('upRadioGroupProps', null)
+	const parentChange = inject<((name: any | null) => void) | null>('upRadioGroupChange', null)
+
+	const selfChecked = ref<boolean>(false)
+
+	const isChecked = computed((): boolean => {
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const parentVal = parentProps!.value['modelValue']
+			if (parentVal != null && props.name != null) {
+				return parentVal.toString() == props.name!.toString()
 			}
-		},
-		computed: {
-			// 是否禁用，如果父组件up-raios-group禁用的话，将会忽略子组件的配置
-			elDisabled(): boolean {
-				const disabledVal = this.disabled
-				if (disabledVal != null) {
-					const disabledStr = disabledVal.toString()
-					if (disabledStr != '') {
-						return disabledStr == 'true'
-					}
-				}
-				return this.parentData['disabled'] != null ? this.parentData['disabled'] as boolean : false
-			},
-			// 是否禁用label点击
-			elLabelDisabled(): boolean {
-				const labelDisabledVal = this.labelDisabled
-				if (labelDisabledVal != null) {
-					const labelDisabledStr = labelDisabledVal.toString()
-					if (labelDisabledStr != '') {
-						return labelDisabledStr == 'true'
-					}
-				}
-				return this.parentData['labelDisabled'] != null ? this.parentData['labelDisabled'] as boolean : false
-			},
-			// 组件尺寸，对应size的值，默认值为21px
-			elSize(): string {
-				const sizeVal = this.size
-				if (sizeVal != null && sizeVal.toString() != '') {
-					return sizeVal.toString()
-				}
-				const parentSizeVal = this.parentData['size']
-				if (parentSizeVal != null && parentSizeVal.toString() != '') {
-					return parentSizeVal.toString()
-				}
-				return '21px'
-			},
-			// 组件的勾选图标的尺寸，默认12px
-			elIconSize(): string {
-				const iconSizeVal = this.iconSize
-				if (iconSizeVal != null && iconSizeVal.toString() != '') {
-					return iconSizeVal.toString()
-				}
-				const parentIconSizeVal = this.parentData['iconSize']
-				if (parentIconSizeVal != null && parentIconSizeVal.toString() != '') {
-					return parentIconSizeVal.toString()
-				}
-				return '12px'
-			},
-			// 组件选中激活时的颜色
-			elActiveColor(): string {
-				const activeColorVal = this.activeColor
-				if (activeColorVal != null && activeColorVal.toString() != '') {
-					return activeColorVal.toString()
-				}
-				const parentActiveColorVal = this.parentData['activeColor']
-				if (parentActiveColorVal != null && parentActiveColorVal.toString() != '') {
-					return parentActiveColorVal.toString()
-				}
-				return '#2979ff'
-			},
-			// 组件选未中激活时的颜色
-			elInactiveColor(): string {
-				const inactiveColorVal = this.inactiveColor
-				if (inactiveColorVal != null && inactiveColorVal.toString() != '') {
-					return inactiveColorVal.toString()
-				}
-				const parentInactiveColorVal = this.parentData['inactiveColor']
-				if (parentInactiveColorVal != null && parentInactiveColorVal.toString() != '') {
-					return parentInactiveColorVal.toString()
-				}
-				return '#c8c9cc'
-			},
-			// label的颜色
-			elLabelColor(): string {
-				const labelColorVal = this.labelColor
-				if (labelColorVal != null && labelColorVal.toString() != '') {
-					return labelColorVal.toString()
-				}
-				const parentLabelColorVal = this.parentData['labelColor']
-				if (parentLabelColorVal != null && parentLabelColorVal.toString() != '') {
-					return parentLabelColorVal.toString()
-				}
-				return '#606266'
-			},
-			// 组件的形状
-			elShape(): string {
-				const shapeVal = this.shape
-				if (shapeVal != null && shapeVal.toString() != '') {
-					return shapeVal.toString()
-				}
-				const parentShapeVal = this.parentData['shape']
-				if (parentShapeVal != null && parentShapeVal.toString() != '') {
-					return parentShapeVal.toString()
-				}
-				return 'circle'
-			},
-			// label大小
-			elLabelSize(): string {
-				const labelSizeVal = this.labelSize
-				if (labelSizeVal != null && labelSizeVal.toString() != '') {
-					return addUnit(labelSizeVal)
-				}
-				const parentLabelSizeVal = this.parentData['labelSize']
-				if (parentLabelSizeVal != null && parentLabelSizeVal.toString() != '') {
-					return addUnit(parentLabelSizeVal)
-				}
-				return addUnit('15')
-			},
-			elIconColor(): string {
-				const iconColorVal = this.iconColor
-				let iconColorStr = ''
-				if (iconColorVal != null && iconColorVal.toString() != '') {
-					iconColorStr = iconColorVal.toString()
-				} else {
-					const parentIconColorVal = this.parentData['iconColor']
-					if (parentIconColorVal != null && parentIconColorVal.toString() != '') {
-						iconColorStr = parentIconColorVal.toString()
-					} else {
-						iconColorStr = '#ffffff'
-					}
-				}
-				if (this.elDisabled) {
-					return this.checked ? this.elInactiveColor : 'transparent'
-				} else {
-					return this.checked ? iconColorStr : 'transparent'
-				}
-			},
-			iconClasses(): string {
-				let classes: string[] = []
-				classes.push('up-radio__icon-wrap--' + this.elShape)
-				if (this.elDisabled) {
-					classes.push('up-radio__icon-wrap--disabled')
-				}
-				if (this.checked && this.elDisabled) {
-					classes.push('up-radio__icon-wrap--disabled--checked')
-				}
-				if (this.checked && !this.elDisabled && this.elActiveColor == '#2979ff') {
-					classes.push('up-radio__icon-wrap--active')
-				}
-				return classes.join(' ')
-			},
-			iconWrapStyle(): UTSJSONObject {
-				const style = {} as UTSJSONObject
-				if (this.checked && !this.elDisabled) {
-					if (this.elActiveColor != '#2979ff') {
-						style['backgroundColor'] = this.elActiveColor
-						style['borderColor'] = this.elActiveColor
-					}
-				} else {
-					style['backgroundColor'] = '#ffffff'
-					style['borderColor'] = this.elInactiveColor
-				}
-				style['width'] = addUnit(this.elSize)
-				style['height'] = addUnit(this.elSize)
-				if (this.parentData['iconPlacement'] != null && this.parentData['iconPlacement'].toString() == 'right') {
-					style['marginRight'] = 0
-				}
-				return style
-			},
-			radioStyle(): UTSJSONObject {
-				const style = {} as UTSJSONObject
-				if (this.parentData['borderBottom'] != null && this.parentData['borderBottom'].toString() == 'true' && this.parentData['placement'] != null && this.parentData['placement'].toString() == 'row') {
-					error('检测到您将borderBottom设置为true，需要同时将up-radio-group的placement设置为column才有效')
-				}
-				if (this.parentData['borderBottom'] != null && this.parentData['borderBottom'].toString() == 'true' && this.parentData['placement'] != null && this.parentData['placement'].toString() == 'column') {
-					style['paddingBottom'] = os() == 'ios' ? '12px' : '8px'
-				}
-				return deepMerge(style, addStyle(this.customStyle))
+			return false
+		}
+		return selfChecked.value
+	})
+
+	const elDisabled = computed((): boolean => {
+		const disabledVal = props.disabled
+		if (disabledVal != null && disabledVal.toString() != '') {
+			return disabledVal.toString() == 'true'
+		}
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const parentDisabled = parentProps!.value['disabled']
+			if (parentDisabled != null) {
+				return parentDisabled as boolean
 			}
-		},
-		mounted() {
-			this.init()
-		},
-		emits: ["change"],
-		methods: {
-			init(): void {
-				this.updateParentData()
-				if (this.parent == null) {
-					error('up-radio必须搭配up-radio-group组件使用')
+		}
+		return false
+	})
+
+	const elLabelDisabled = computed((): boolean => {
+		const labelDisabledVal = props.labelDisabled
+		if (labelDisabledVal != null && labelDisabledVal.toString() != '') {
+			return labelDisabledVal.toString() == 'true'
+		}
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const parentLabelDisabled = parentProps!.value['labelDisabled']
+			if (parentLabelDisabled != null) {
+				return parentLabelDisabled as boolean
+			}
+		}
+		return false
+	})
+
+	const elSize = computed((): string => {
+		const sizeVal = props.size
+		if (sizeVal != null && sizeVal.toString() != '') {
+			return sizeVal.toString()
+		}
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const parentSize = parentProps!.value['size']
+			if (parentSize != null && parentSize.toString() != '') {
+				return parentSize.toString()
+			}
+		}
+		return '21'
+	})
+
+	const elIconSize = computed((): string => {
+		const iconSizeVal = props.iconSize
+		if (iconSizeVal != null && iconSizeVal.toString() != '') {
+			return iconSizeVal.toString()
+		}
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const parentIconSize = parentProps!.value['iconSize']
+			if (parentIconSize != null && parentIconSize.toString() != '') {
+				return parentIconSize.toString()
+			}
+		}
+		return '12'
+	})
+
+	const elActiveColor = computed((): string => {
+		const activeColorVal = props.activeColor
+		if (activeColorVal != null && activeColorVal.toString() != '') {
+			return activeColorVal.toString()
+		}
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const parentActiveColor = parentProps!.value['activeColor']
+			if (parentActiveColor != null && parentActiveColor.toString() != '') {
+				return parentActiveColor.toString()
+			}
+		}
+		return '#2979ff'
+	})
+
+	const elInactiveColor = computed((): string => {
+		const inactiveColorVal = props.inactiveColor
+		if (inactiveColorVal != null && inactiveColorVal.toString() != '') {
+			return inactiveColorVal.toString()
+		}
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const parentInactiveColor = parentProps!.value['inactiveColor']
+			if (parentInactiveColor != null && parentInactiveColor.toString() != '') {
+				return parentInactiveColor.toString()
+			}
+		}
+		return '#c8c9cc'
+	})
+
+	const elLabelColor = computed((): string => {
+		const labelColorVal = props.labelColor
+		if (labelColorVal != null && labelColorVal.toString() != '') {
+			return labelColorVal.toString()
+		}
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const parentLabelColor = parentProps!.value['labelColor']
+			if (parentLabelColor != null && parentLabelColor.toString() != '') {
+				return parentLabelColor.toString()
+			}
+		}
+		return '#606266'
+	})
+
+	const elShape = computed((): string => {
+		const shapeVal = props.shape
+		if (shapeVal != null && shapeVal.toString() != '') {
+			return shapeVal.toString()
+		}
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const parentShape = parentProps!.value['shape']
+			if (parentShape != null && parentShape.toString() != '') {
+				return parentShape.toString()
+			}
+		}
+		return 'circle'
+	})
+
+	const elLabelSize = computed((): string => {
+		const labelSizeVal = props.labelSize
+		if (labelSizeVal != null && labelSizeVal.toString() != '') {
+			return addUnit(labelSizeVal)
+		}
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const parentLabelSize = parentProps!.value['labelSize']
+			if (parentLabelSize != null && parentLabelSize.toString() != '') {
+				return addUnit(parentLabelSize)
+			}
+		}
+		return addUnit('15')
+	})
+
+	const elIconColor = computed((): string => {
+		let iconColorStr = '#ffffff'
+		const iconColorVal = props.iconColor
+		if (iconColorVal != null && iconColorVal.toString() != '') {
+			iconColorStr = iconColorVal.toString()
+		} else if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const parentIconColor = parentProps!.value['iconColor']
+			if (parentIconColor != null && parentIconColor.toString() != '') {
+				iconColorStr = parentIconColor.toString()
+			}
+		}
+		if (elDisabled.value) {
+			return isChecked.value ? elInactiveColor.value : 'transparent'
+		} else {
+			return isChecked.value ? iconColorStr : 'transparent'
+		}
+	})
+
+	const iconClasses = computed((): string => {
+		let classes: string[] = []
+		classes.push('up-radio__icon-wrap--' + elShape.value)
+		if (elDisabled.value) {
+			classes.push('up-radio__icon-wrap--disabled')
+		}
+		if (isChecked.value && elDisabled.value) {
+			classes.push('up-radio__icon-wrap--disabled--checked')
+		}
+		if (isChecked.value && !elDisabled.value && elActiveColor.value == '#2979ff') {
+			classes.push('up-radio__icon-wrap--active')
+		}
+		return classes.join(' ')
+	})
+
+	const iconWrapStyle = computed((): UTSJSONObject => {
+		const style = {} as UTSJSONObject
+		if (isChecked.value && !elDisabled.value) {
+			if (elActiveColor.value != '#2979ff') {
+				style['backgroundColor'] = elActiveColor.value
+				style['borderColor'] = elActiveColor.value
+			}
+		} else {
+			style['backgroundColor'] = '#ffffff'
+			style['borderColor'] = elInactiveColor.value
+		}
+		style['width'] = addUnit(elSize.value)
+		style['height'] = addUnit(elSize.value)
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const parentPlacement = parentProps!.value['iconPlacement']
+			if (parentPlacement != null && parentPlacement.toString() == 'right') {
+				style['marginRight'] = 0
+			}
+		}
+		return style
+	})
+
+	const radioStyle = computed((): UTSJSONObject => {
+		const style = {} as UTSJSONObject
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const borderBottom = parentProps!.value['borderBottom']
+			const placement = parentProps!.value['placement']
+			if (borderBottom != null && borderBottom.toString() == 'true' && placement != null && placement.toString() == 'row') {
+				error('检测到您将borderBottom设置为true，需要同时将up-radio-group的placement设置为column才有效')
+			}
+			if (borderBottom != null && borderBottom.toString() == 'true' && placement != null && placement.toString() == 'column') {
+				style['paddingBottom'] = os() == 'ios' ? '12px' : '8px'
+			}
+		}
+		return deepMerge(style, addStyle(props.customStyle)) as UTSJSONObject
+	})
+
+	const iconPlacementClass = computed((): string => {
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const p = parentProps!.value['iconPlacement']
+			if (p != null && p.toString() != '') {
+				return 'up-radio-label--' + p.toString()
+			}
+		}
+		return 'up-radio-label--left'
+	})
+
+	const borderBottomClass = computed((): string => {
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const borderBottom = parentProps!.value['borderBottom']
+			const placement = parentProps!.value['placement']
+			if (borderBottom != null && borderBottom.toString() == 'true' && placement != null && placement.toString() == 'column') {
+				return 'up-border-bottom'
+			}
+		}
+		return ''
+	})
+
+	function emitEvent() {
+		if (!isChecked.value) {
+			emit('change', props.name)
+			if (props.usedAlone) {
+				emit('update:checked', true)
+			}
+			setTimeout(() => {
+				if (instance != null) {
+					formValidate(instance!, 'change')
 				}
-				const modelValueVal = this.parentData['modelValue']
-				if (modelValueVal != null && this.name != null) {
-					this.checked = this.name.toString() == modelValueVal.toString()
-				} else {
-					this.checked = false
-				}
-			},
-			updateParentData(): void {
-				// @ts-ignore
-				this.getParentData('up-radio-group')
-			},
-			// 点击图标
-			iconClickHandler(e: UniEvent): void {
-				this.preventEvent(e)
-				if (!this.elDisabled) {
-					this.setRadioCheckedStatus()
-				}
-			},
-			// 横向两端排列时，点击组件即可触发选中事件
-			wrapperClickHandler(e: UniEvent): void {
-				if (this.parentData['iconPlacement'] != null && this.parentData['iconPlacement'].toString() == 'right') {
-					this.iconClickHandler(e)
-				}
-			},
-			// 点击label
-			labelClickHandler(e: UniEvent): void {
-				this.preventEvent(e)
-				if (!this.elLabelDisabled && !this.elDisabled) {
-					this.setRadioCheckedStatus()
-				}
-			},
-			emitEvent(): void {
-				if (!this.checked) {
-					this.$emit('change', this.name)
-					this.$nextTick(() => {
-						formValidate(this, 'change')
-					})
-				}
-			},
-			// 改变组件选中状态
-			setRadioCheckedStatus(): void {
-				this.emitEvent()
-				this.checked = true
-				if (this.$parent != null) {
-					this.$parent!.$callMethod('unCheckedOther', this)
-				}
+			}, 10)
+		}
+	}
+
+	function setRadioCheckedStatus() {
+		emitEvent()
+		if (!props.usedAlone && parentChange != null) {
+			parentChange(props.name)
+		} else {
+			selfChecked.value = true
+		}
+	}
+
+	function iconClickHandler(e: UniEvent) {
+		e.stopPropagation()
+		if (!elDisabled.value) {
+			setRadioCheckedStatus()
+		}
+	}
+
+	function wrapperClickHandler(e: UniEvent) {
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const p = parentProps!.value['iconPlacement']
+			if (p != null && p.toString() == 'right') {
+				iconClickHandler(e)
+				return
 			}
 		}
 	}
+
+	function labelClickHandler(e: UniEvent) {
+		e.stopPropagation()
+		if (!elLabelDisabled.value && !elDisabled.value) {
+			setRadioCheckedStatus()
+		}
+	}
+
+	const init = function() {}
+	const getInternalState = (): UTSJSONObject => {
+		return {
+			name: props.name,
+			isChecked: isChecked.value
+		} as UTSJSONObject
+	}
+
+	defineExpose({
+		init,
+		getInternalState
+	})
 </script>
 
 <style lang="scss" scoped>
@@ -349,12 +445,12 @@
 		margin-top: 5px;
 		
 		&-label--left {
-			flex-direction: row
+			flex-direction: row;
 		}
 
 		&-label--right {
 			flex-direction: row-reverse;
-			justify-content: space-between
+			justify-content: space-between;
 		}
 
 		&__icon-wrap {

@@ -42,137 +42,147 @@
   </view>
 </template>
 
-<script lang="uts">
-export default {
-  name: 'up-pagination',
-  props: {
-    currentPage: {
-      type: Number,
-      default: 1
-    },
-    pageSize: {
-      type: Number,
-      default: 10
-    },
-    total: {
-      type: Number,
-      default: 0
-    },
-    prevText: {
-      type: String,
-      default: ''
-    },
-    nextText: {
-      type: String,
-      default: ''
-    },
-    buttonBgColor: {
-      type: String,
-      default: '#f5f7fa'
-    },
-    buttonBorderColor: {
-      type: String,
-      default: '#dcdfe6'
-    },
-    layout: {
-      type: String,
-      default: 'prev, pager, next, total'
-    },
-    hideOnSinglePage: {
-      type: Boolean,
-      default: false
-    }
+<script setup lang="uts">
+import { computed } from 'vue'
+
+defineOptions({
+  name: 'up-pagination'
+})
+
+const props = defineProps({
+  currentPage: {
+    type: Number,
+    default: 1
   },
-  emits: ['update:currentPage', 'update:pageSize', 'current-change', 'size-change'],
-  computed: {
-    totalPages(): number {
-      const t = parseFloat(this.total.toString())
-      const p = parseFloat(this.pageSize.toString())
-      let pages = Math.ceil(t / p)
-      if (pages < 1) pages = 1
-      return pages
-    },
-    shouldShow(): boolean {
-      if (this.hideOnSinglePage && this.totalPages <= 1) {
-        return false
-      }
-      return true
-    },
-    showPager(): boolean {
-      if (this.layout == null) return false
-      return this.layout.indexOf('pager') > -1
-    },
-    showTotal(): boolean {
-      if (this.layout == null) return false
-      return this.layout.indexOf('total') > -1
-    },
-    currentPageStr(): string {
-      return this.currentPage.toString()
-    },
-    displayedPages(): Array<string> {
-      const total = this.totalPages
-      const current = this.currentPage
-      const pages = [] as Array<string>
-
-      if (total <= 4) {
-        for (let i = 1; i <= total; i++) {
-          pages.push(i.toString())
-        }
-        return pages
-      }
-
-      if (current <= 2) {
-        for (let i = 1; i <= 4; i++) {
-          pages.push(i.toString())
-        }
-        pages.push('...')
-        pages.push(total.toString())
-        return pages
-      }
-
-      if (current >= total - 1) {
-        pages.push('1')
-        pages.push('...')
-        for (let i = total - 3; i <= total; i++) {
-          pages.push(i.toString())
-        }
-        return pages
-      }
-
-      pages.push('1')
-      pages.push('...')
-      pages.push((current - 1).toString())
-      pages.push(current.toString())
-      pages.push((current + 1).toString())
-      pages.push('...')
-      pages.push(total.toString())
-      return pages
-    }
+  pageSize: {
+    type: Number,
+    default: 10
   },
-  methods: {
-    prev() {
-      if (this.currentPage > 1) {
-        this.emitChange(this.currentPage - 1)
-      }
-    },
-    next() {
-      if (this.currentPage < this.totalPages) {
-        this.emitChange(this.currentPage + 1)
-      }
-    },
-    goTo(page: string) {
-      if (page == '...' || page == this.currentPage.toString()) {
-        return
-      }
-      const num = parseInt(page)
-      if (!isNaN(num)) {
-        this.emitChange(num)
-      }
-    },
-    emitChange(page: number) {
-      this.$emit('update:currentPage', page)
-      this.$emit('current-change', page)
+  total: {
+    type: Number,
+    default: 0
+  },
+  prevText: {
+    type: String,
+    default: ''
+  },
+  nextText: {
+    type: String,
+    default: ''
+  },
+  buttonBgColor: {
+    type: String,
+    default: '#f5f7fa'
+  },
+  buttonBorderColor: {
+    type: String,
+    default: '#dcdfe6'
+  },
+  layout: {
+    type: String,
+    default: 'prev, pager, next, total'
+  },
+  hideOnSinglePage: {
+    type: Boolean,
+    default: false
+  }
+})
+
+const emit = defineEmits(['update:currentPage', 'update:pageSize', 'current-change', 'size-change'])
+
+const totalPages = computed<number>(() => {
+  const t = parseFloat(props.total.toString())
+  const p = parseFloat(props.pageSize.toString())
+  let pages = Math.ceil(t / p)
+  if (pages < 1) pages = 1
+  return pages
+})
+
+const shouldShow = computed<boolean>(() => {
+  if (props.hideOnSinglePage && totalPages.value <= 1) {
+    return false
+  }
+  return true
+})
+
+const showPager = computed<boolean>(() => {
+  if (props.layout == null) return false
+  return props.layout.indexOf('pager') > -1
+})
+
+const showTotal = computed<boolean>(() => {
+  if (props.layout == null) return false
+  return props.layout.indexOf('total') > -1
+})
+
+const currentPageStr = computed<string>(() => {
+  return props.currentPage.toString()
+})
+
+const displayedPages = computed<Array<string>>(() => {
+  const total = totalPages.value
+  const current = props.currentPage
+  const pages = [] as Array<string>
+
+  if (total <= 4) {
+    for (let i = 1; i <= total; i++) {
+      pages.push(i.toString())
     }
+    return pages
+  }
+
+  if (current <= 2) {
+    for (let i = 1; i <= 4; i++) {
+      pages.push(i.toString())
+    }
+    pages.push('...')
+    pages.push(total.toString())
+    return pages
+  }
+
+  if (current >= total - 1) {
+    pages.push('1')
+    pages.push('...')
+    for (let i = total - 3; i <= total; i++) {
+      pages.push(i.toString())
+    }
+    return pages
+  }
+
+  pages.push('1')
+  pages.push('...')
+  pages.push((current - 1).toString())
+  pages.push(current.toString())
+  pages.push((current + 1).toString())
+  pages.push('...')
+  pages.push(total.toString())
+  return pages
+})
+
+function emitChange(page: number) {
+  emit('update:currentPage', page)
+  emit('current-change', page)
+}
+
+function prev() {
+  if (props.currentPage > 1) {
+    emitChange(props.currentPage - 1)
+  }
+}
+
+function next() {
+  if (props.currentPage < totalPages.value) {
+    emitChange(props.currentPage + 1)
+  }
+}
+
+function goTo(page: string) {
+  if (page == '...' || page == props.currentPage.toString()) {
+    return
+  }
+  const num = parseInt(page)
+  if (!isNaN(num)) {
+    emitChange(num)
   }
 }
 </script>
@@ -209,7 +219,9 @@ export default {
   margin: 0 3px;
   padding: 0 8px;
   height: 30px;
-  border: 1px solid #dcdfe6;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #dcdfe6;
   border-radius: 4px;
   background-color: #f5f7fa;
   display: flex;

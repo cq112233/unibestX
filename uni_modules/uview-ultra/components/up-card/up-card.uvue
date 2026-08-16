@@ -64,151 +64,121 @@
 </template>
 
 <script setup lang="uts">
-import type { PropType } from 'vue'
 import { computed } from 'vue'
-import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'
 import { addUnit, getPx } from '../../libs/function/index'
-import defProps from './card.uts'
 
-// options
 defineOptions({
   name: 'up-card'
 })
 
-// props
 const props = defineProps({
-  // 与屏幕两侧是否留空隙
   full: {
     type: Boolean,
-    default: defProps.getBoolean('card.full')
+    default: false
   },
-  // 标题
   title: {
     type: String,
-    default: defProps.getString('card.title')
+    default: ''
   },
-  // 标题颜色
   titleColor: {
     type: String,
-    default: defProps.getString('card.titleColor')
+    default: '#303133'
   },
-  // 标题字体大小
   titleSize: {
     type: [Number, String],
-    default: defProps.getString('card.titleSize')
+    default: 15
   },
-  // 副标题
   subTitle: {
     type: String,
-    default: defProps.getString('card.subTitle')
+    default: ''
   },
-  // 副标题颜色
   subTitleColor: {
     type: String,
-    default: defProps.getString('card.subTitleColor')
+    default: '#909193'
   },
-  // 副标题字体大小
   subTitleSize: {
     type: [Number, String],
-    default: defProps.getBoolean('card.subTitleSize')
+    default: 12
   },
-  // 是否显示外部边框，只对full=false时有效(卡片与边框有空隙时)
   border: {
     type: Boolean,
-    default: defProps.getBoolean('card.border')
+    default: true
   },
-  // 用于标识点击了第几个
   index: {
     type: [Number, String, Object],
-    default: defProps.getString('card.index')
+    default: ''
   },
-  // 用于隔开上下左右的边距，带单位的写法，如："30px 30px"，"20px 20px 30px 30px"
   margin: {
     type: String,
-    default: defProps.getString('card.margin')
+    default: '15px'
   },
-  // card卡片的圆角
   borderRadius: {
     type: [Number, String],
-    default: defProps.getString('card.borderRadius')
+    default: 8
   },
-  // 头部自定义样式，对象形式
   headStyle: {
     type: Object,
-    default: defProps.getAny('card.headStyle') as UTSJSONObject
+    default: () => ({})
   },
-  // 主体自定义样式，对象形式
   bodyStyle: {
     type: Object,
-    default: defProps.getAny('card.bodyStyle') as UTSJSONObject
+    default: () => ({})
   },
-  // 底部自定义样式，对象形式
   footStyle: {
     type: Object,
-    default: defProps.getAny('card.footStyle') as UTSJSONObject
+    default: () => ({})
   },
-  // 头部是否下边框
   headBorderBottom: {
     type: Boolean,
-    default: defProps.getBoolean('card.headBorderBottom')
+    default: true
   },
-  // 底部是否有上边框
   footBorderTop: {
     type: Boolean,
-    default: defProps.getBoolean('card.footBorderTop')
+    default: true
   },
-  // 标题左边的缩略图
   thumb: {
     type: String,
-    default: defProps.getString('card.thumb')
+    default: ''
   },
-  // 缩略图宽高
   thumbWidth: {
     type: [String, Number],
-    default: defProps.getString('card.thumbWidth')
+    default: 30
   },
-  // 缩略图是否为圆形
   thumbCircle: {
     type: Boolean,
-    default: defProps.getBoolean('card.thumbCircle')
+    default: false
   },
-  // 给head，body，foot的内边距
   padding: {
     type: [String, Number],
-    default: defProps.getString('card.padding')
+    default: 15
   },
   paddingHead: {
     type: [String, Number],
-    default: defProps.getString('card.paddingHead')
+    default: ''
   },
   paddingBody: {
     type: [String, Number],
-    default: defProps.getString('card.paddingBody')
+    default: ''
   },
   paddingFoot: {
     type: [String, Number],
-    default: defProps.getString('card.paddingFoot')
+    default: ''
   },
-  // 是否显示头部
   showHead: {
     type: Boolean,
-    default: defProps.getBoolean('card.showHead')
+    default: true
   },
-  // 是否显示尾部
   showFoot: {
     type: Boolean,
-    default: defProps.getBoolean('card.showFoot')
+    default: true
   },
-  // 卡片外围阴影，字符串形式
   boxShadow: {
     type: String,
-    default: defProps.getString('card.boxShadow')
+    default: 'none'
   }
 })
 
-// ==================== computed ====================
 const realThumb = computed((): string => {
-  if (props.thumb == '') return ''
   return props.thumb
 })
 
@@ -262,24 +232,22 @@ const footPaddingStyle = computed((): UTSJSONObject => {
   return { padding: addUnit(padVal) } as UTSJSONObject
 })
 
-// 定义事件
 const emit = defineEmits(['click', 'head-click', 'body-click', 'foot-click'])
 
-// 方法
 const click = () => {
-  emit('click', props.index);
+  emit('click', props.index)
 }
 
 const headClick = () => {
-  emit('head-click', props.index);
+  emit('head-click', props.index)
 }
 
 const bodyClick = () => {
-  emit('body-click', props.index);
+  emit('body-click', props.index)
 }
 
 const footClick = () => {
-  emit('foot-click', props.index);
+  emit('foot-click', props.index)
 }
 </script>
 
@@ -294,15 +262,16 @@ const footClick = () => {
 	box-sizing: border-box;
 	
 	&-full {
-		// 如果是与屏幕之间不留空隙，应该设置左右边距为0
 		margin-left: 0 !important;
 		margin-right: 0 !important;
 		width: 100%;
 	}
 	
+	/* #ifndef UNI-APP-X */
 	&--border:after {
 		border-radius: 16rpx;
 	}
+	/* #endif */
 
 	&__head {
 		&--left {

@@ -31,10 +31,12 @@ export function handleBackPressExit() : boolean {
     }
     // 等退出动画播放完毕后，强制杀进程确保彻底退出
     setTimeout(() => {
+      // #ifdef APP-ANDROID
       java.lang.System.exit(0)
+      // #endif
     }, 500)
   } catch (_e) {
-    java.lang.System.exit(0)
+    uni.exit()
   }
   // #endif
 

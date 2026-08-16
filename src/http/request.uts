@@ -164,10 +164,6 @@ requestInstance.interceptors.response.use(
 //    Android 端泛型方法需要 inline + reified 注解
 // ==========================================
 export class HttpClient {
-  // #ifdef APP-ANDROID
-  @UTSAndroid.keyword("inline")
-  @UTSAndroid.keyword("reified")
-  // #endif
   request<T>(config: LimeRequestConfig): Promise<T> {
     return requestInstance.request<any>(config).then((res: LimeRequestResponse<any>): T => {
       const rawData = res.data
@@ -181,7 +177,7 @@ export class HttpClient {
           const innerData = obj.get('data')
           if (innerData !== null) {
             const innerStr = JSON.stringify(innerData)
-            const parsedData = JSON.parse<T>(innerStr)
+            const parsedData = JSON.parse(innerStr)
             if (parsedData !== null) {
               return parsedData as T
             } else {
@@ -196,7 +192,7 @@ export class HttpClient {
 
       // 如果没有 code，说明不是外层包装格式
       const rawStr = JSON.stringify(rawData)
-      const parsedRaw = JSON.parse<T>(rawStr)
+      const parsedRaw = JSON.parse(rawStr)
       if (parsedRaw !== null) {
         return parsedRaw as T
       }
@@ -206,10 +202,6 @@ export class HttpClient {
     })
   }
 
-  // #ifdef APP-ANDROID
-  @UTSAndroid.keyword("inline")
-  @UTSAndroid.keyword("reified")
-  // #endif
   get<T>(url: string, config: LimeRequestConfig | null = null): Promise<T> {
     const _config = (config ?? {}) as LimeRequestConfig
     _config.url = url
@@ -217,10 +209,6 @@ export class HttpClient {
     return this.request<T>(_config)
   }
 
-  // #ifdef APP-ANDROID
-  @UTSAndroid.keyword("inline")
-  @UTSAndroid.keyword("reified")
-  // #endif
   post<T>(url: string, data: any | null = null, config: LimeRequestConfig | null = null): Promise<T> {
     const _config = (config ?? {}) as LimeRequestConfig
     _config.url = url
@@ -229,10 +217,6 @@ export class HttpClient {
     return this.request<T>(_config)
   }
 
-  // #ifdef APP-ANDROID
-  @UTSAndroid.keyword("inline")
-  @UTSAndroid.keyword("reified")
-  // #endif
   put<T>(url: string, data: any | null = null, config: LimeRequestConfig | null = null): Promise<T> {
     const _config = (config ?? {}) as LimeRequestConfig
     _config.url = url
@@ -241,10 +225,6 @@ export class HttpClient {
     return this.request<T>(_config)
   }
 
-  // #ifdef APP-ANDROID
-  @UTSAndroid.keyword("inline")
-  @UTSAndroid.keyword("reified")
-  // #endif
   delete<T>(url: string, data: any | null = null, config: LimeRequestConfig | null = null): Promise<T> {
     const _config = (config ?? {}) as LimeRequestConfig
     _config.url = url

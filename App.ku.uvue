@@ -1,14 +1,8 @@
 <template>
   <!-- 应用全局骨架与皮肤容器，通过 CSS 变量绑定响应式主题色 -->
   <view class="flex flex-col flex-1" style="flex: 1;" :style="{ '--theme-color': appStore.state.theme }">
-    <!-- 主滚动区域，包裹子页面插槽内容 -->
-    <scroll-view
-      direction="vertical"
-      :scroll-y="true"
-      class="flex-1"
-      style="flex: 1;"
-      :show-scrollbar="false"
-    >
+    <!-- 页面内容滚动容器 -->
+    <scroll-view direction="vertical" class="flex-1" style="flex: 1;">
       <slot></slot>
     </scroll-view>
     <!-- 仅在当前页面为底部 Tabbar 页面时渲染自定义导航栏 -->

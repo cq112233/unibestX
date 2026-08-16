@@ -2,7 +2,7 @@
 	<view
 	    class="up-row"
 		ref="up-row"
-	    :style="[rowStyle, $upAddStyle(props.customStyle)]"
+	    :style="mergedRowStyle"
 	    @tap="clickHandler"
 	>
 		<slot />
@@ -38,6 +38,10 @@
 		align: {
 		    type: String,
 		    default: defProps.getNumber('row.align')
+		},
+		customStyle: {
+			type: Object,
+			default: () => ({})
 		}
 	})
 	
@@ -69,6 +73,12 @@
 			style['marginRight'] = addUnit((0-parseInt(props.gutter.toString()))/2)
 		}
 		return style
+	})
+
+	const mergedRowStyle = computed((): UTSJSONObject => {
+		const custom = addStyle(props.customStyle) as UTSJSONObject
+		const row = rowStyle.value as UTSJSONObject
+		return deepMerge(row, custom) as UTSJSONObject
 	})
 	
 	const clickHandler = (e: any): void => {
