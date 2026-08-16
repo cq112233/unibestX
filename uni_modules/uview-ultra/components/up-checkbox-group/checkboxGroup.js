@@ -14,7 +14,7 @@ export default {
         value: [],
         shape: 'square',
         disabled: false,
-        activeColor: '',
+        activeColor: '#2979ff',
         inactiveColor: '#c8c9cc',
         size: 18,
         placement: 'row',

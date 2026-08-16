@@ -5,7 +5,7 @@
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
         <view class="flex-row items-center">
-          <up-switch v-model="switchValue1" active-color="#2979ff"></up-switch>
+          <up-switch v-model="switchValue1"></up-switch>
           <text class="text-14px ml-10px">{{ switchValue1 ? '已开启' : '已关闭' }}</text>
         </view>
       </view>
@@ -65,6 +65,8 @@ const switchValue5 = ref(true)
   color: #606266;
   margin-bottom: 10px;
   padding-left: 4px;
-  border-left: 3px solid #2979ff;
+  border-left-width: 3px;
+  border-left-style: solid;
+  border-left-color: var(--theme-color, #2979ff);
 }
 </style>

@@ -106,9 +106,17 @@ const spinnerItemsStyle = ref<UTSJSONObject[]>([
 let animationFrame: number = 0
 
 const otherBorderColor = computed<string>(() => {
-  const lightColor = colorGradient(props.color, '#ffffff', 100)[80]
+  if (props.inactiveColor != '') {
+    return props.inactiveColor
+  }
   if (props.mode == 'circle') {
-    return props.inactiveColor != '' ? props.inactiveColor : lightColor
+    if (props.color.startsWith('#')) {
+      const gradient = colorGradient(props.color, '#ffffff', 100)
+      if (gradient.length > 80) {
+        return gradient[80]
+      }
+    }
+    return '#e5e5e5'
   } else {
     return 'transparent'
   }

@@ -1,294 +1,0 @@
-Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ9export class UniEvent {
-    get [Symbol.toStringTag]() {
-        return 'UniEvent';
-    }
-    get bubbles() {
-        return this._bubbles;
-    }
-    set bubbles(value) {
-    }
-    get cancelable() {
-        return this._cancelable;
-    }
-    set cancelable(value) {
-    }
-    constructor(type, eventInit) {
-        this.__v_skip = true;
-        this.timeStamp = Date.now();
-        this._bubbles = false;
-        this._cancelable = false;
-        // æš‚æ—¶ä½¿ç”¨å±æ€§å£°æ˜ï¼Œç”¨äºå†…éƒ¨é‡å†™
-        this.stopPropagation = () => {
-        };
-        this.preventDefault = () => {
-        };
-        this.type = type;
-        if (eventInit) {
-            this._bubbles = !!eventInit.bubbles;
-            this._cancelable = !!eventInit.cancelable;
-        }
-    }
-}
-const ComponentDefault = new Map([
-    ['SCROLL-VIEW', ['touchmove']],
-    ['LIST-VIEW', ['touchmove']],
-    ['WATERFLOW', ['touchmove']],
-    ['SWIPER', ['touchstart', 'touchmove']]
-]);
-export class ModifyEvent extends UniEvent {
-    constructor(type, uniEvent) {
-        super(type, {
-            bubbles: false
-        });
-        this.uniEvent = uniEvent;
-    }
-}
-function dispatchPreventDefaultEvent(element, uniEvent) {
-    const type = uniEvent.type;
-    const nodeName = element.nodeName;
-    if (!ComponentDefault.has(nodeName)) {
-        return;
-    }
-    const eventNames = ComponentDefault.get(nodeName);
-    if (!eventNames.includes(type)) {
-        return;
-    }
-    const preventDefaultEventName = '_' + type + 'PreventDefault';
-    element.dispatchEvent(preventDefaultEventName, new ModifyEvent(preventDefaultEventName, uniEvent));
-}
-function dispatchStopPropagationEvent(element, uniEvent) {
-    const type = uniEvent.type;
-    const nodeName = element.nodeName;
-    if (!ComponentDefault.has(nodeName)) {
-        return;
-    }
-    const eventNames = ComponentDefault.get(nodeName);
-    if (!eventNames.includes(type)) {
-        return;
-    }
-    const stopPropagationEventName = '_' + type + 'StopPropagation';
-    element.dispatchEvent(stopPropagationEventName, new ModifyEvent(stopPropagationEventName, uniEvent));
-}
-function preventDefault(uniEvent, nativeEvent) {
-    const e = uniEvent;
-    e.defaultPrevented = true;
-    if (uniEvent.currentTarget) {
-        let element = uniEvent.currentTarget;
-        while (element) {
-            dispatchPreventDefaultEvent(element, uniEvent);
-            element = element.parentElement;
-        }
-    }
-    try {
-        nativeEvent.preventDefault();
-    }
-    catch (e) {
-        // Error: Component does not support prevent function
-        // console.warn(e)
-    }
-}
-function stopPropagation(uniEvent, nativeEvent) {
-    if (uniEvent.currentTarget) {
-        let element = uniEvent.currentTarget;
-        while (element) {
-            dispatchStopPropagationEvent(element, uniEvent);
-            element = element.parentElement;
-        }
-    }
-    nativeEvent.stopPropagation();
-}
-export function useNativeStopPropagation(uniEvent, nativeEvent) {
-    uniEvent.stopPropagation = () => {
-        stopPropagation(uniEvent, nativeEvent);
-    };
-}
-export function useNativePreventDefault(uniEvent, nativeEvent) {
-    uniEvent.preventDefault = () => {
-        preventDefault(uniEvent, nativeEvent);
-    };
-}
-//# sourceMappingURL=UniEvent.js.mapÂÙò/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/UniEvent.tsÔrB˜±isLocalDependency¯isNodeEntryFile§pkgPath§pkgNameªpkgVersion±belongProjectPath±dependencyPkgInfo¬shouldEmitJsÂÂÙâ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime½@dcloudio/uni-runtime-harmony¥1.0.0ÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmonyÔrC’§pkgNameªpkgVersion½@dcloudio/uni-runtime-harmony¥1.0.0ÃÃÚimport { Event as IUniEvent } from '@dcloudio/uni-app-x/types/native'
-import { UniElement } from '@dcloudio/uni-app-x/types/native'
-
-export type EventInit = { bubbles?: boolean; cancelable?: boolean }
-
-export class UniEvent implements IUniEvent {
-  __v_skip: boolean = true
-
-  get [Symbol.toStringTag]() {
-    return 'UniEvent'
-  }
-
-  type: string
-  target?: UniElement | null | undefined
-  currentTarget?: UniElement | null | undefined
-  timeStamp: number = Date.now()
-  private _bubbles: boolean = false
-
-  get bubbles() {
-    return this._bubbles
-  }
-
-  set bubbles(value) {
-  }
-
-  private _cancelable: boolean = false
-
-  get cancelable() {
-    return this._cancelable
-  }
-
-  set cancelable(value) {
-  }
-
-  constructor(
-    type: string,
-    eventInit?: EventInit,
-  ) {
-    this.type = type
-    if (eventInit) {
-      this._bubbles = !!eventInit.bubbles
-      this._cancelable = !!eventInit.cancelable
-    }
-  }
-
-  // æš‚æ—¶ä½¿ç”¨å±æ€§å£°æ˜ï¼Œç”¨äºå†…éƒ¨é‡å†™
-  stopPropagation: () => void = () => {
-  }
-  preventDefault: () => void = () => {
-  }
-}
-
-export interface InternalUniEvent {
-  defaultPrevented: boolean
-}
-
-interface NativeStopPropagationEvent {
-  stopPropagation(): void
-}
-
-interface NativePreventDefaultEvent {
-  preventDefault(): void
-}
-
-const ComponentDefault = new Map<string, string[]>([
-  ['SCROLL-VIEW', ['touchmove']],
-  ['LIST-VIEW', ['touchmove']],
-  ['WATERFLOW', ['touchmove']],
-  ['SWIPER', ['touchstart', 'touchmove']]
-])
-
-export class ModifyEvent extends UniEvent {
-  uniEvent: UniEvent
-  constructor(type:string, uniEvent: UniEvent) {
-    super(type, {
-      bubbles: false
-    })
-    this.uniEvent = uniEvent
-  }
-}
-
-function dispatchPreventDefaultEvent(element: UniElement, uniEvent: UniEvent) {
-  const type = uniEvent.type
-  const nodeName = element.nodeName
-  if (!ComponentDefault.has(nodeName)) {
-    return
-  }
-  const eventNames = ComponentDefault.get(nodeName)!
-  if (!eventNames.includes(type)) {
-    return
-  }
-  const preventDefaultEventName = '_' + type + 'PreventDefault'
-  element.dispatchEvent(
-    preventDefaultEventName,
-    new ModifyEvent(preventDefaultEventName, uniEvent)
-  )
-}
-
-function dispatchStopPropagationEvent(element: UniElement, uniEvent: UniEvent) {
-  const type = uniEvent.type
-  const nodeName = element.nodeName
-  if (!ComponentDefault.has(nodeName)) {
-    return
-  }
-  const eventNames = ComponentDefault.get(nodeName)!
-  if (!eventNames.includes(type)) {
-    return
-  }
-  const stopPropagationEventName = '_' + type + 'StopPropagation'
-  element.dispatchEvent(
-    stopPropagationEventName,
-    new ModifyEvent(stopPropagationEventName, uniEvent)
-  )
-}
-
-function preventDefault(uniEvent: UniEvent, nativeEvent: NativePreventDefaultEvent) {
-  const e = uniEvent as unknown as InternalUniEvent
-  e.defaultPrevented = true
-  if(uniEvent.currentTarget) {
-    let element: UniElement = uniEvent.currentTarget
-    while (element) {
-      dispatchPreventDefaultEvent(element, uniEvent)
-      element = element.parentElement
-    }
-  }
-  try {
-    nativeEvent.preventDefault()
-  } catch (e) {
-    // Error: Component does not support prevent function
-    // console.warn(e)
-  }
-}
-
-function stopPropagation(uniEvent: UniEvent, nativeEvent: NativeStopPropagationEvent) {
-  if(uniEvent.currentTarget) {
-    let element: UniElement = uniEvent.currentTarget
-    while (element) {
-      dispatchStopPropagationEvent(element, uniEvent)
-      element = element.parentElement
-    }
-  }
-  nativeEvent.stopPropagation()
-}
-
-export function useNativeStopPropagation(uniEvent: UniEvent, nativeEvent: NativeStopPropagationEvent) {
-  uniEvent.stopPropagation = () => {
-    stopPropagation(uniEvent, nativeEvent)
-  }
-}
-
-export function useNativePreventDefault(uniEvent: UniEvent, nativeEvent: NativePreventDefaultEvent) {
-  uniEvent.preventDefault = () => {
-    preventDefault(uniEvent, nativeEvent)
-  }
-}
-ÀA“ÔrD–§version¤fileªsourceRoot§sources¥names¨mappings«UniEvent.js ‘«UniEvent.tsÜ m””   ” ” ” —” ” ”	 ” ” ” ” ”” 	” 	” 	” 	’” 
-” 
-“” ” ” –” ” ” ” ” ” ’” ” •” ” ” ” ” ’” ” “” ” ” –” ” ” ” ” ”  ’” ” •” ” ” ” ” ’”  ”  •” "” #” #” $” $•” ” 
-” ” ” ˜” ” ” ” ” ”! ”#  ”$  •” 
-” ” ” #” #•” 
-” ” !”  &”! &’” -” -•” .” .” . ”" .#”$ .%“” /”	 /”
- /•” 0” 0” 0”! 0"”# 0$“” 1”	 1”
- 1—” &” &” &	” &” &” &” &”” '” '” '” '›” (” (
-” (” (” (” (” (”' (!”( ("”/ ()”0 ()›” )” )
-” )” )” )”  )”! )”* )$”+ )%”5 )/”6 )/‘”	 *’” +” +‘” 2—”  Ì@ ” Ì@” Ì@” Ì@” Ì@”  Ì@ ”! Ì@3˜” ÌA” ÌA” ÌA” ÌA” ÌA”  ÌA”! ÌA”" ÌA ˜” ÌB” ÌB” ÌB” ÌB” ÌB” ÌB” ÌB”  ÌB˜” ÌC” ÌC” ÌC” ÌC” ÌC” ÌC” ÌC”  ÌCš” ÌD” ÌD” ÌD” ÌD” ÌD” ÌD” ÌD”) ÌD'”* ÌD(”+ ÌD)“” ÌE” ÌE” ÌE–”  ÌG ” ÌG” ÌG” ÌG”! ÌG!”) ÌG)•” ÌI” ÌI” ÌI” ÌI” ÌI-•” ÌJ” ÌJ	” ÌJ
-” ÌJ” ÌJ”” ÌK” ÌK” ÌK” ÌK“”	 ÌL”
- ÌL” ÌL—” ÌM” ÌM” ÌM	” ÌM” ÌM”  ÌM”! ÌM’” ÌN” ÌN‘” ÌO—”  ÌQ ”	 ÌQ	”$ ÌQ$”% ÌQ%”, ÌQ8”. ÌQ:”6 ÌQÌL˜” ÌR”
- ÌR” ÌR” ÌR” ÌR” ÌR” ÌR” ÌR˜” ÌS”
- ÌS” ÌS” ÌS” ÌS” ÌS”% ÌS#”& ÌS#š” ÌT” ÌT”	 ÌT” ÌT” ÌT” ÌT” ÌT”& ÌT$”' ÌT%”) ÌT'’” ÌU” ÌU
-‘” ÌV›” ÌW”
- ÌW” ÌW” ÌW”' ÌW%”( ÌW&”+ ÌW)”, ÌW*”4 ÌW2”5 ÌW4”6 ÌW4š” ÌX” ÌX”	 ÌX” ÌX” ÌX” ÌX” ÌX”! ÌX”" ÌX ”$ ÌX"’” ÌY” ÌY
-‘” ÌZš” Ì[”
- Ì[”! Ì[”$ Ì["”' Ì[%”* Ì[(”. Ì[,”1 Ì[/”ÌA Ì[?”ÌB Ì[?Ü ” Ì\” Ì\	” Ì\
-” Ì\” Ì]”1 Ì]”3 Ì^”7 Ì^”ÌB Ì^”ÌC Ì^”ÌZ Ì^+”Ì\ Ì^-”Ìd Ì^5”Ìe Ì^6”Ìf Ì_”Ìg Ì_’”  Ì` ” Ì`—”  Ìb ”	 Ìb	”% Ìb%”& Ìb&”- Ìb9”/ Ìb;”7 ÌbÌM˜” Ìc”
- Ìc” Ìc” Ìc” Ìc” Ìc” Ìc” Ìc˜” Ìd”
- Ìd” Ìd” Ìd” Ìd” Ìd”% Ìd#”& Ìd#š” Ìe” Ìe”	 Ìe” Ìe” Ìe” Ìe” Ìe”& Ìe$”' Ìe%”) Ìe'’” Ìf” Ìf
-‘” Ìg›” Ìh”
- Ìh” Ìh” Ìh”' Ìh%”( Ìh&”+ Ìh)”, Ìh*”4 Ìh2”5 Ìh4”6 Ìh4š” Ìi” Ìi”	 Ìi” Ìi” Ìi” Ìi” Ìi”! Ìi”" Ìi ”$ Ìi"’” Ìj” Ìj
-‘” Ìkš” Ìl”
- Ìl”" Ìl ”% Ìl#”( Ìl&”+ Ìl)”/ Ìl-”2 Ìl0”ÌC ÌlÌA”ÌD ÌlÌAÜ ” Ìm” Ìm	” Ìm
-” Ìm” Ìn”2 Ìn”4 Ìo”8 Ìo”ÌC Ìo”ÌD Ìo”Ì\ Ìo,”Ì^ Ìo.”Ìf Ìo6”Ìg Ìo7”Ìh Ìp”Ìi Ìp’”  Ìq ” Ìq—”  Ìs ”	 Ìs	” Ìs” Ìs”  Ìs*”" Ìs,”- ÌsÌR–” Ìt”
- Ìt” Ìt	” Ìt” Ìt3” Ìt3—” Ìu” Ìu” Ìu” Ìu” Ìu” Ìu” Ìu–” Ìv” Ìv” Ìv” Ìv” Ìv”  Ìv˜” Ìw” Ìw” Ìw” Ìw” Ìw&” Ìw'”, Ìw4”- Ìw4”” Ìx” Ìx” Ìx” Ìx˜” Ìy”' Ìy!”( Ìy"”/ Ìy)”1 Ìy+”9 Ìy3”: Ìy4”; Ìy4—” Ìz” Ìz” Ìz” Ìz” Ìz”+ Ìz%”, Ìz%‘”	 Ì{‘” Ì|’” Ì}” Ì}–” Ì~” Ì~” Ì~”" Ì~”$ Ì~ ”% Ì~ ‘” Ì”” Ì” Ì” Ì” Ì’” Ì€”= Ì€9’” Ì” Ì‘” Ì‚’”  Ìƒ ” Ìƒ—”  Ì… ”	 Ì…	” Ì…” Ì…”! Ì…+”# Ì…-”. Ì…ÌT–” Ì†” Ì†” Ì†” Ì†” Ì†”  Ì†˜” Ì‡” Ì‡” Ì‡” Ì‡” Ì‡&” Ì‡'”, Ì‡4”- Ì‡4”” Ìˆ” Ìˆ” Ìˆ” Ìˆ˜” Ì‰”( Ì‰"”) Ì‰#”0 Ì‰*”2 Ì‰,”: Ì‰4”; Ì‰5”< Ì‰5—” ÌŠ” ÌŠ” ÌŠ” ÌŠ” ÌŠ”+ ÌŠ%”, ÌŠ%‘”	 Ì‹‘” ÌŒ–” Ì” Ì” Ì” Ì”! Ì”" Ì’”  Ì ” Ì˜”  Ì ” Ì” Ì”( Ì(”) Ì)”1 Ì;”3 Ì=”> ÌÌd—” Ì‘” Ì‘
-” Ì‘” Ì‘” Ì‘”" Ì‘ ”$ Ì‘"˜” Ì’” Ì’” Ì’”  Ì’”" Ì’”- Ì’)”. Ì’*”/ Ì’*“” Ì“” Ì“” Ì“’”  Ì” ” Ì”˜”  Ì– ” Ì–” Ì–”' Ì–'”( Ì–(”0 Ì–:”2 Ì–<”= Ì–Ìb—” Ì—” Ì—
-” Ì—” Ì—” Ì—”! Ì—”# Ì—!˜” Ì˜” Ì˜” Ì˜” Ì˜”! Ì˜”, Ì˜(”- Ì˜)”. Ì˜)“” Ì™” Ì™” Ì™’”  Ìš ” ÌšÔrE–§version¤file§sources®sourcesContent¥names¨mappingsÀ‘À‘ÀÜ n‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
- ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ÔrF’§missing¦pluginÃ¦genAbcÂÔ  ÔrG”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache”ÔrH–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclaration Í ÔrI–¤type¥start£end¢idªsuperClass¤body°ClassDeclarationÍ ÔrJ”¤type¥start£end¤nameªIdentifier¨UniEventÀÔrK”¤type¥start£end¤body©ClassBodyÍ –ÔrL˜¤type¥start£end¦static¨computed£key¤kind¥value°MethodDefinitionÌ\ÂÃÔrM—¤type¥start£end¦object¨property¨computed¨optional°MemberExpression"4JªIdentifier"(¦SymbolJªIdentifier)4«toStringTagÂÂ£getÔrN™¤type¥start£end¢idªexpression©generator¥async¦params¤body²FunctionExpression5Ì\ÀÂÂÂK®BlockStatement8Ì\‘ÔrO”¤type¥start£end¨argument¯ReturnStatementÌCÌUÔrP•¤type¥start£end¥value£raw§LiteralÌJÌT¨UniEventª'UniEvent'L°MethodDefinitionÌbÌ—ÂÂJªIdentifierÌfÌm§bubbles£getN²FunctionExpressionÌmÌ—ÀÂÂÂK®BlockStatementÌpÌ—‘O¯ReturnStatementÌ{ÌM°MemberExpressionÌ‚ÌÔrQ“¤type¥start£end®ThisExpressionÌ‚Ì†JªIdentifierÌ‡Ì¨_bubblesÂÂL°MethodDefinitionÌÌ¸ÂÂJªIdentifierÌ¡Ì¨§bubbles£setN²FunctionExpressionÌ¨Ì¸ÀÂÂÂ‘JªIdentifierÌ©Ì®¥valueK®BlockStatementÌ°Ì¸L°MethodDefinitionÌ¾ÌùÂÂJªIdentifierÌÂÌÌªcancelable£getN²FunctionExpressionÌÌÌùÀÂÂÂK®BlockStatementÌÏÌù‘O¯ReturnStatementÌÚÌòM°MemberExpressionÌáÌñQ®ThisExpressionÌáÌåJªIdentifierÌæÌñ«_cancelableÂÂL°MethodDefinitionÌÿÍÂÂJªIdentifierÍÍªcancelable£setN²FunctionExpressionÍÍÀÂÂÂ‘JªIdentifierÍÍ¥valueK®BlockStatementÍÍL°MethodDefinitionÍ#ÍıÂÂJªIdentifierÍ#Í.«constructor«constructorN²FunctionExpressionÍ.ÍıÀÂÂÂ’JªIdentifierÍ/Í3¤typeJªIdentifierÍ5Í>©eventInitK®BlockStatementÍ@Íı˜ÔrR”¤type¥start£endªexpression³ExpressionStatementÍKÍ`ÔrS–¤type¥start£end¨operator¤left¥right´AssignmentExpressionÍKÍ_¡=M°MemberExpressionÍKÍXQ®ThisExpressionÍKÍOJªIdentifierÍPÍX¨__v_skipÂÂP§LiteralÍ[Í_Ã¤trueR³ExpressionStatementÍjÍ†S´AssignmentExpressionÍjÍ…¡=M°MemberExpressionÍjÍxQ®ThisExpressionÍjÍnJªIdentifierÍoÍx©timeStampÂÂÔrT–¤type¥start£end¦callee©arguments¨optional®CallExpressionÍ{Í…M°MemberExpressionÍ{ÍƒJªIdentifierÍ{Í¤DateJªIdentifierÍ€Íƒ£nowÂÂÂR³ExpressionStatementÍÍ¦S´AssignmentExpressionÍÍ¥¡=M°MemberExpressionÍÍQ®ThisExpressionÍÍ”JªIdentifierÍ•Í¨_bubblesÂÂP§LiteralÍ Í¥Â¥falseR³ExpressionStatementÍ°ÍÉS´AssignmentExpressionÍ°ÍÈ¡=M°MemberExpressionÍ°ÍÀQ®ThisExpressionÍ°Í´JªIdentifierÍµÍÀ«_cancelableÂÂP§LiteralÍÃÍÈÂ¥falseR³ExpressionStatementÍïÍS´AssignmentExpressionÍïÍ¡=M°MemberExpressionÍïÍQ®ThisExpressionÍïÍóJªIdentifierÍôÍ¯stopPropagationÂÂN·ArrowFunctionExpressionÍÍÀÂÂÂK®BlockStatementÍÍR³ExpressionStatementÍ#ÍLS´AssignmentExpressionÍ#ÍK¡=M°MemberExpressionÍ#Í6Q®ThisExpressionÍ#Í'JªIdentifierÍ(Í6®preventDefaultÂÂN·ArrowFunctionExpressionÍ9ÍKÀÂÂÂK®BlockStatementÍ?ÍKR³ExpressionStatementÍVÍgS´AssignmentExpressionÍVÍf¡=M°MemberExpressionÍVÍ_Q®ThisExpressionÍVÍZJªIdentifierÍ[Í_¤typeÂÂJªIdentifierÍbÍf¤typeÔrU–¤type¥start£end¤testªconsequent©alternate«IfStatementÍqÍöJªIdentifierÍuÍ~©eventInitK®BlockStatementÍ€Íö’R³ExpressionStatementÍÍ³S´AssignmentExpressionÍÍ²¡=M°MemberExpressionÍÍœQ®ThisExpressionÍÍ“JªIdentifierÍ”Íœ¨_bubblesÂÂÔrV–¤type¥start£end¨operator¦prefix¨argument¯UnaryExpressionÍŸÍ²¡!ÃV¯UnaryExpressionÍ Í²¡!ÃM°MemberExpressionÍ¡Í²JªIdentifierÍ¡Íª©eventInitJªIdentifierÍ«Í²§bubblesÂÂR³ExpressionStatementÍÁÍëS´AssignmentExpressionÍÁÍê¡=M°MemberExpressionÍÁÍÑQ®ThisExpressionÍÁÍÅJªIdentifierÍÆÍÑ«_cancelableÂÂV¯UnaryExpressionÍÔÍê¡!ÃV¯UnaryExpressionÍÕÍê¡!ÃM°MemberExpressionÍÖÍêJªIdentifierÍÖÍß©eventInitJªIdentifierÍàÍêªcancelableÂÂÀÀH¶ExportNamedDeclarationÍÃÍ~I°ClassDeclarationÍÊÍ~JªIdentifierÍĞÍÛ«ModifyEventJªIdentifierÍäÍì¨UniEventK©ClassBodyÍíÍ~‘L°MethodDefinitionÍôÍ{ÂÂJªIdentifierÍôÍÿ«constructor«constructorN²FunctionExpressionÍÿÍ{ÀÂÂÂ’JªIdentifierÍ Í¤typeJªIdentifierÍÍ¨uniEventK®BlockStatementÍÍ{’R³ExpressionStatementÍÍQT®CallExpressionÍÍPQ¥SuperÍÍ ’JªIdentifierÍ!Í%¤typeÔrW”¤type¥start£endªproperties°ObjectExpressionÍ'ÍO‘ÔrX™¤type¥start£end¦method©shorthand¨computed£key¥value¤kind¨PropertyÍ6ÍDÂÂÂJªIdentifierÍ6Í=§bubblesP§LiteralÍ?ÍDÂ¥false¤initÂR³ExpressionStatementÍ[ÍtS´AssignmentExpressionÍ[Ís¡=M°MemberExpressionÍ[ÍhQ®ThisExpressionÍ[Í_JªIdentifierÍ`Íh¨uniEventÂÂJªIdentifierÍkÍs¨uniEventÀH¶ExportNamedDeclarationÍ¬ÍQN³FunctionDeclarationÍ³ÍQJªIdentifierÍ¼ÍÔ¸useNativeStopPropagationÂÂÂ’JªIdentifierÍÕÍİ¨uniEventJªIdentifierÍßÍê«nativeEventK®BlockStatementÍìÍQ‘R³ExpressionStatementÍóÍNS´AssignmentExpressionÍóÍM¡=M°MemberExpressionÍóÍJªIdentifierÍóÍû¨uniEventJªIdentifierÍüÍ¯stopPropagationÂÂN·ArrowFunctionExpressionÍÍMÀÂÂÂK®BlockStatementÍÍM‘R³ExpressionStatementÍÍFT®CallExpressionÍÍEJªIdentifierÍÍ.¯stopPropagation’JªIdentifierÍ/Í7¨uniEventJªIdentifierÍ9ÍD«nativeEventÂÀH¶ExportNamedDeclarationÍSÍõN³FunctionDeclarationÍZÍõJªIdentifierÍcÍz·useNativePreventDefaultÂÂÂ’JªIdentifierÍ{Íƒ¨uniEventJªIdentifierÍ…Í«nativeEventK®BlockStatementÍ’Íõ‘R³ExpressionStatementÍ™ÍòS´AssignmentExpressionÍ™Íñ¡=M°MemberExpressionÍ™Í°JªIdentifierÍ™Í¡¨uniEventJªIdentifierÍ¢Í°®preventDefaultÂÂN·ArrowFunctionExpressionÍ³ÍñÀÂÂÂK®BlockStatementÍ¹Íñ‘R³ExpressionStatementÍÄÍêT®CallExpressionÍÄÍéJªIdentifierÍÄÍÒ®preventDefault’JªIdentifierÍÓÍÛ¨uniEventJªIdentifierÍİÍè«nativeEventÂÀ

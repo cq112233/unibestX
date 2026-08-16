@@ -1,16 +1,15 @@
 <template>
 	<view
 	    class="up-checkbox cursor-pointer"
-	    :style="checkboxStyle"
+	    :style="[checkboxStyle]"
 	    @tap.stop="wrapperClickHandler"
-	    :class="[`up-checkbox-label--` + elIconPlacement,
-			(elBorderBottom && elPlacement == 'column') ? 'up-border-bottom' : '']"
+	    :class="[iconPlacementClass, borderBottomClass]"
 	>
 		<view
 		    class="up-checkbox__icon-wrap cursor-pointer"
 		    @tap.stop="iconClickHandler"
 		    :class="iconClasses"
-		    :style="iconWrapStyle"
+		    :style="[iconWrapStyle]"
 		>
 			<slot name="icon">
 				<up-icon
@@ -35,286 +34,432 @@
 </template>
 
 <script setup lang="uts">
-import { computed, ref, watch, inject, getCurrentInstance, nextTick } from 'vue'
-import { addStyle, addUnit, deepMerge, formValidate } from '../../libs/function/index'
-
-defineOptions({
-	name: 'up-checkbox'
-})
-
-const props = defineProps({
-	name: {
-		type: [String, Number, Boolean],
-		default: ''
-	},
-	shape: {
-		type: String,
-		default: ''
-	},
-	size: {
-		type: [String, Number],
-		default: ''
-	},
-	checked: {
-		type: Boolean,
-		default: false
-	},
-	disabled: {
-		type: Boolean,
-		default: false
-	},
-	activeColor: {
-		type: String,
-		default: ''
-	},
-	inactiveColor: {
-		type: String,
-		default: ''
-	},
-	iconSize: {
-		type: [String, Number],
-		default: ''
-	},
-	iconColor: {
-		type: String,
-		default: ''
-	},
-	label: {
-		type: [String, Number],
-		default: ''
-	},
-	labelColor: {
-		type: String,
-		default: ''
-	},
-	labelSize: {
-		type: [String, Number],
-		default: ''
-	},
-	labelDisabled: {
-		type: Boolean,
-		default: false
-	},
-	customStyle: {
-		type: Object,
-		default: () => ({})
-	},
-	usedAlone: {
-		type: Boolean,
-		default: false
-	}
-})
-
-const emit = defineEmits(['change', 'update:checked'])
-const instance = getCurrentInstance()
-const parentProps = inject<ComputedRef<UTSJSONObject> | null>('upCheckboxGroupProps', null)
-const parentToggle = inject<((name: any) => void) | null>('upCheckboxGroupToggle', null)
-
-const localChecked = ref<boolean>(props.checked)
-
-watch((): boolean => props.checked, (val: boolean) => {
-	localChecked.value = val
-})
-
-const parentGroupProps = computed((): UTSJSONObject | null => {
-	if (props.usedAlone || parentProps == null) return null
-	return parentProps!.value
-})
-
-const isChecked = computed<boolean>(() => {
-	if (props.usedAlone || parentGroupProps.value == null) {
-		return localChecked.value
-	}
-	const groupVal = parentGroupProps.value!['modelValue'] as Array<any> | null
-	if (groupVal != null && props.name != null) {
-		return groupVal.some((element: any): boolean => element.toString() == props.name.toString())
-	}
-	return false
-})
-
-const elDisabled = computed((): boolean => {
-	if (props.disabled) return true
-	if (!props.usedAlone && parentGroupProps.value != null) {
-		return (parentGroupProps.value!['disabled'] as boolean | null) ?? false
-	}
-	return false
-})
-
-const elLabelDisabled = computed((): boolean => {
-	if (props.labelDisabled) return true
-	if (!props.usedAlone && parentGroupProps.value != null) {
-		return (parentGroupProps.value!['labelDisabled'] as boolean | null) ?? false
-	}
-	return false
-})
-
-const elSize = computed((): string => {
-	if (props.size != '') return addUnit(props.size)
-	if (!props.usedAlone && parentGroupProps.value != null && (parentGroupProps.value!['size'] ?? '') != '') {
-		return addUnit(parentGroupProps.value!['size']!)
-	}
-	return '21px'
-})
-
-const elIconSize = computed((): string => {
-	if (props.iconSize != '') return addUnit(props.iconSize)
-	if (!props.usedAlone && parentGroupProps.value != null && (parentGroupProps.value!['iconSize'] ?? '') != '') {
-		return addUnit(parentGroupProps.value!['iconSize']!)
-	}
-	return '12px'
-})
-
-const elActiveColor = computed((): string => {
-	if (props.activeColor != '') return props.activeColor
-	if (parentGroupProps.value != null && (parentGroupProps.value!['activeColor'] ?? '') != '') {
-		return (parentGroupProps.value!['activeColor'] as string)
-	}
-	return ''
-})
-
-const elInactiveColor = computed((): string => {
-	if (props.inactiveColor != '') return props.inactiveColor
-	if (parentGroupProps.value != null && (parentGroupProps.value!['inactiveColor'] ?? '') != '') {
-		return (parentGroupProps.value!['inactiveColor'] as string)
-	}
-	return '#c8c9cc'
-})
-
-const elLabelColor = computed((): string => {
-	if (props.labelColor != '') return props.labelColor
-	if (parentGroupProps.value != null && (parentGroupProps.value!['labelColor'] ?? '') != '') {
-		return (parentGroupProps.value!['labelColor'] as string)
-	}
-	return '#606266'
-})
-
-const elShape = computed((): string => {
-	if (props.shape != '') return props.shape
-	if (parentGroupProps.value != null && (parentGroupProps.value!['shape'] ?? '') != '') {
-		return (parentGroupProps.value!['shape'] as string)
-	}
-	return 'circle'
-})
-
-const elLabelSize = computed((): string => {
-	if (props.labelSize != '') return addUnit(props.labelSize)
-	if (parentGroupProps.value != null && (parentGroupProps.value!['labelSize'] ?? '') != '') {
-		return addUnit(parentGroupProps.value!['labelSize']!)
-	}
-	return '15px'
-})
-
-const elIconColor = computed((): string => {
-	const parentColor = parentGroupProps.value != null ? (parentGroupProps.value!['iconColor'] as string | null) : null
-	const iconColor = props.iconColor != ''
-		? props.iconColor
-		: (parentColor != null && parentColor != ''
-			? parentColor
-			: '#ffffff')
-	if (elDisabled.value) {
-		return isChecked.value ? elInactiveColor.value : 'transparent'
-	}
-	return isChecked.value ? iconColor : 'transparent'
-})
-
-const elIconPlacement = computed((): string => {
-	if (parentGroupProps.value != null && (parentGroupProps.value!['iconPlacement'] ?? '') != '') {
-		return (parentGroupProps.value!['iconPlacement'] as string)
-	}
-	return 'left'
-})
-
-const elBorderBottom = computed((): boolean => {
-	if (parentGroupProps.value != null) {
-		return (parentGroupProps.value!['borderBottom'] as boolean | null) ?? false
-	}
-	return false
-})
-
-const elPlacement = computed((): string => {
-	if (parentGroupProps.value != null) {
-		return (parentGroupProps.value!['placement'] as string | null) ?? 'row'
-	}
-	return 'row'
-})
-
-const iconClasses = computed((): string => {
-	let classes = ['up-checkbox__icon-wrap--' + elShape.value]
-	if (elDisabled.value) {
-		classes.push('up-checkbox__icon-wrap--disabled')
-	}
-	if (isChecked.value && elDisabled.value) {
-		classes.push('up-checkbox__icon-wrap--disabled--checked')
-	}
-	if (isChecked.value && !elDisabled.value) {
-		classes.push('up-checkbox__icon-wrap--checked')
-	} else if (!isChecked.value && !elDisabled.value) {
-		classes.push('up-checkbox__icon-wrap--unchecked')
-	}
-	return classes.join(' ')
-})
-
-const iconWrapStyle = computed((): UTSJSONObject => {
-	const style = {} as UTSJSONObject
-	if (isChecked.value && !elDisabled.value) {
-		if (elActiveColor.value != '') {
-			style['backgroundColor'] = elActiveColor.value
-			style['borderColor'] = elActiveColor.value
-		}
-	} else if (!isChecked.value && !elDisabled.value) {
-		if (elInactiveColor.value != '' && elInactiveColor.value != '#c8c9cc') {
-			style['borderColor'] = elInactiveColor.value
-		}
-	}
-	if (elSize.value != '') {
-		style['width'] = elSize.value
-		style['height'] = elSize.value
-	}
-	if (elIconPlacement.value == 'right') {
-		style['marginRight'] = 0
-	}
-	return style
-})
-
-const checkboxStyle = computed((): UTSJSONObject => {
-	const style = {} as UTSJSONObject
-	if (elBorderBottom.value && elPlacement.value == 'column') {
-		style['paddingBottom'] = '8px'
-	}
-	return deepMerge(style, addStyle(props.customStyle)) as UTSJSONObject
-})
-
-function setCheckboxCheckedStatus() {
-	if (props.usedAlone || parentToggle == null) {
-		localChecked.value = !localChecked.value
-		emit('change', localChecked.value)
-		emit('update:checked', localChecked.value)
-	} else {
-		parentToggle!(props.name)
-		emit('change', !isChecked.value)
-	}
-	nextTick(() => {
-		if (instance?.proxy != null) {
-			formValidate(instance!.proxy!, 'change')
+	import { computed, ref, watch, onMounted, inject, getCurrentInstance } from 'vue'
+	import type { ComputedRef } from 'vue'
+	import { addStyle, addUnit, deepMerge, formValidate, error } from '../../libs/function/index'
+	import defProps from './checkbox.uts'
+	import { useUltraUI } from '../../libs/composable/useUltraUI'
+	const { parent, parentData, getParentData } = useUltraUI()
+	const instance = getCurrentInstance()?.proxy
+	
+	defineOptions({
+		name: 'up-checkbox'
+	})
+	
+	// 定义 props
+	const props = defineProps({
+		// checkbox组件的标示符
+		name: {
+			type: [String, Number, Boolean],
+			default: defProps.getAny('checkbox.name')
+		},
+		// 形状，square为方形，circle为圆型
+		shape: {
+			type: String,
+			default: defProps.getString('checkbox.shape')
+		},
+		// 整体的大小
+		size: {
+			type: [String, Number],
+			default: defProps.getAny('checkbox.size')
+		},
+		// 是否默认选中
+		checked: {
+			type: Boolean,
+			default: defProps.getBoolean('checkbox.checked')
+		},
+		// 是否禁用
+		disabled: {
+			type: [String, Boolean],
+			default: defProps.getAny('checkbox.disabled')
+		},
+		// 选中状态下的颜色，如设置此值，将会覆盖parent的activeColor值
+		activeColor: {
+			type: String,
+			default: defProps.getString('checkbox.activeColor')
+		},
+		// 未选中的颜色
+		inactiveColor: {
+			type: String,
+			default: defProps.getString('checkbox.inactiveColor')
+		},
+		// 图标的大小，单位px
+		iconSize: {
+			type: [String, Number],
+			default: defProps.getAny('checkbox.iconSize')
+		},
+		// 图标颜色
+		iconColor: {
+			type: String,
+			default: defProps.getString('checkbox.iconColor')
+		},
+		// label提示文字，因为nvue下，直接slot进来的文字，由于特殊的结构，无法修改样式
+		label: {
+			type: [String, Number],
+			default: defProps.getAny('checkbox.label')
+		},
+		// label的颜色
+		labelColor: {
+			type: String,
+			default: defProps.getString('checkbox.labelColor')
+		},
+		// label的字体大小，px单位
+		labelSize: {
+			type: [String, Number],
+			default: defProps.getAny('checkbox.labelSize')
+		},
+		// 是否禁止点击提示语选中复选框
+		labelDisabled: {
+			type: [String, Boolean],
+			default: defProps.getAny('checkbox.labelDisabled')
+		},
+		// 定义需要用到的外部样式
+		customStyle: {
+			type: Object,
+			default: () => ({})
+		},
+		// 是否独立使用
+		usedAlone: {
+			type: Boolean,
+			default: false
 		}
 	})
-}
+	
+	// 定义 emit
+	const emit = defineEmits(['change', 'update:checked'])
+	
+	const injectedParentProps = inject<ComputedRef<UTSJSONObject> | null>('upCheckboxGroupProps', null)
+	const injectedParentToggle = inject<((name: string, checked: boolean) => void) | null>('upCheckboxGroupToggle', null)
 
-function iconClickHandler(e: UniEvent) {
-	if (!elDisabled.value) {
-		setCheckboxCheckedStatus()
+	// 获取父组件属性的统一工具方法
+	function getParentVal(key: string): any | null {
+		if (!props.usedAlone) {
+			if (injectedParentProps != null && injectedParentProps!.value != null) {
+				const obj = injectedParentProps!.value
+				if (obj != null && obj[key] != null) {
+					return obj[key]
+				}
+			}
+			if (parentData.value != null && parentData.value[key] != null) {
+				return parentData.value[key]
+			}
+		}
+		return null
 	}
-}
 
-function wrapperClickHandler(e: UniEvent) {
-	iconClickHandler(e)
-}
+	// 定义响应式数据
+	const selfChecked = ref(props.checked)
 
-function labelClickHandler(e: UniEvent) {
-	if (!elLabelDisabled.value && !elDisabled.value) {
-		setCheckboxCheckedStatus()
+	const isChecked = computed((): boolean => {
+		if (!props.usedAlone) {
+			const val = getParentVal('modelValue')
+			if (val != null) {
+				const arr = val as any[]
+				if (props.name != null) {
+					for (let i = 0; i < arr.length; i++) {
+						if (arr[i] != null && arr[i].toString() == props.name!.toString()) {
+							return true
+						}
+					}
+				}
+				return false
+			}
+		}
+		return selfChecked.value
+	})
+	
+	// 是否禁用，如果父组件up-checkbox-group禁用的话，将会忽略子组件的配置
+	const elDisabled = computed((): boolean => {
+		let disabledVal = props.disabled
+		if (disabledVal != null && disabledVal.toString() != '') {
+			return disabledVal.toString() == 'true'
+		}
+		const p = getParentVal('disabled')
+		if (p != null) {
+			return p as boolean
+		}
+		return false
+	})
+	
+	// 是否禁用label点击
+	const elLabelDisabled = computed((): boolean => {
+		let labelDisabledVal = props.labelDisabled
+		if (labelDisabledVal != null && labelDisabledVal.toString() != '') {
+			return labelDisabledVal.toString() == 'true'
+		}
+		const p = getParentVal('labelDisabled')
+		if (p != null) {
+			return p as boolean
+		}
+		return false
+	})
+	
+	// 组件尺寸，对应size的值，默认值为21px
+	const elSize = computed((): string => {
+		if (props.size != null && props.size!.toString() != '') {
+			return props.size!.toString()
+		}
+		const p = getParentVal('size')
+		if (p != null && p.toString() != '') {
+			return p.toString()
+		}
+		return '21'
+	})
+	
+	// 组件的勾选图标的尺寸，默认12px
+	const elIconSize = computed((): string => {
+		if (props.iconSize != null && props.iconSize!.toString() != '') {
+			return props.iconSize!.toString()
+		}
+		const p = getParentVal('iconSize')
+		if (p != null && p.toString() != '') {
+			return p.toString()
+		}
+		return '12'
+	})
+	
+	// 组件选中激活时的颜色
+	const elActiveColor = computed((): string => {
+		const activeColorProp = props.activeColor
+		if (activeColorProp != null && activeColorProp.toString() != '') {
+			return activeColorProp.toString()
+		}
+		const p = getParentVal('activeColor')
+		if (p != null && p.toString() != '') {
+			return p.toString()
+		}
+		return '#2979ff'
+	})
+	
+	// 组件选未中激活时的颜色
+	const elInactiveColor = computed((): string => {
+		const inactiveColorProp = props.inactiveColor
+		if (inactiveColorProp != null && inactiveColorProp.toString() != '') {
+			return inactiveColorProp.toString()
+		}
+		const p = getParentVal('inactiveColor')
+		if (p != null && p.toString() != '') {
+			return p.toString()
+		}
+		return '#c8c9cc'
+	})
+	
+	// label的颜色
+	const elLabelColor = computed((): string => {
+		if (props.labelColor != null && props.labelColor.toString() != '') {
+			return props.labelColor.toString()
+		}
+		const p = getParentVal('labelColor')
+		if (p != null && p.toString() != '') {
+			return p.toString()
+		}
+		return '#606266'
+	})
+	
+	// 组件的形状
+	const elShape = computed((): string => {
+		if (props.shape != null && props.shape.toString() != '') {
+			return props.shape.toString()
+		}
+		const p = getParentVal('shape')
+		if (p != null && p.toString() != '') {
+			return p.toString()
+		}
+		return 'circle'
+	})
+	
+	// label大小
+	const elLabelSize = computed((): string => {
+		if (props.labelSize != null && props.labelSize!.toString() != '') {
+			return addUnit(props.labelSize!.toString())
+		}
+		const p = getParentVal('labelSize')
+		if (p != null && p.toString() != '') {
+			return addUnit(p.toString())
+		}
+		return addUnit('15')
+	})
+	
+	const elIconColor = computed((): string => {
+		let iconColor = '#ffffff'
+		if (props.iconColor.toString() != '') {
+			iconColor = props.iconColor.toString()
+		} else {
+			const p = getParentVal('iconColor')
+			if (p != null && p.toString() != '') {
+				iconColor = p.toString()
+			}
+		}
+		// 图标的颜色
+		if (elDisabled.value) {
+			// disabled状态下，已勾选的checkbox图标改为elInactiveColor
+			return isChecked.value ? elInactiveColor.value : 'transparent'
+		} else {
+			return isChecked.value ? iconColor : 'transparent'
+		}
+	})
+	
+	const iconClasses = computed((): string => {
+		let classes = [] as Array<string>
+		// 组件的形状
+		classes.push('up-checkbox__icon-wrap--' + elShape.value.toString())
+		if (elDisabled.value) {
+			classes.push('up-checkbox__icon-wrap--disabled')
+		}
+		if (isChecked.value && elDisabled.value) {
+			classes.push('up-checkbox__icon-wrap--disabled--checked')
+		}
+		if (isChecked.value && !elDisabled.value && elActiveColor.value == '#2979ff') {
+			classes.push('up-checkbox__icon-wrap--active')
+		}
+		return classes.join(' ')
+	})
+	
+	const iconWrapStyle = computed((): any => {
+		// checkbox的整体样式
+		const style = {} as UTSJSONObject
+		if (isChecked.value && !elDisabled.value) {
+			if (elActiveColor.value != '#2979ff') {
+				style['backgroundColor'] = elActiveColor.value
+				style['borderColor'] = elActiveColor.value
+			}
+		} else {
+			style['backgroundColor'] = '#ffffff'
+			style['borderColor'] = elInactiveColor.value
+		}
+		style['width'] = addUnit(elSize.value)
+		style['height'] = addUnit(elSize.value)
+		const iconPlacement = getParentVal('iconPlacement')
+		if (iconPlacement != null && iconPlacement.toString() == 'right') {
+			style['marginRight'] = 0
+		}
+		return style
+	})
+	
+	const checkboxStyle = computed((): any => {
+		const style = {} as UTSJSONObject
+		const borderBottom = getParentVal('borderBottom')
+		const placement = getParentVal('placement')
+		if (borderBottom != null && borderBottom.toString() == 'true' && placement != null && placement.toString() == 'row') {
+			error('检测到您将borderBottom设置为true，需要同时将up-checkbox-group的placement设置为column才有效')
+		}
+		if (borderBottom != null && borderBottom.toString() == 'true' && placement != null && placement.toString() == 'column') {
+			style['paddingBottom'] = '8px'
+		}
+		return deepMerge(style, addStyle(props.customStyle))
+	})
+
+	const iconPlacementClass = computed((): string => {
+		const p = getParentVal('iconPlacement')
+		if (p != null && p.toString() != '') {
+			return 'up-checkbox-label--' + p.toString()
+		}
+		return 'up-checkbox-label--left'
+	})
+
+	const borderBottomClass = computed((): string => {
+		const borderBottom = getParentVal('borderBottom')
+		const placement = getParentVal('placement')
+		if (borderBottom != null && borderBottom.toString() == 'true' && placement != null && placement.toString() == 'column') {
+			return 'up-border-bottom'
+		}
+		return ''
+	})
+	
+	// 初始化
+	const init = function() {
+		if (!props.usedAlone && injectedParentProps == null) {
+			parentData.value = {
+				iconSize: 12,
+				labelDisabled: null,
+				disabled: null,
+				shape: 'square',
+				activeColor: null,
+				inactiveColor: null,
+				size: 18,
+				modelValue: null,
+				iconColor: null,
+				placement: 'row',
+				borderBottom: false,
+				iconPlacement: 'left'
+			}
+			if (instance != null) {
+				getParentData('up-checkbox-group', instance!, false)
+			}
+		}
+		if (props.checked) {
+			selfChecked.value = true
+		}
 	}
-}
+	
+	// 改变组件选中状态
+	function setRadioCheckedStatus() {
+		const targetChecked = !isChecked.value
+		if (!props.usedAlone && injectedParentToggle != null) {
+			injectedParentToggle(props.name != null ? props.name!.toString() : '', targetChecked)
+		} else {
+			selfChecked.value = targetChecked
+			if (!props.usedAlone && parent.value != null && instance != null) {
+				parent.value?.$callMethod('unCheckedOther', instance!)
+			}
+		}
+		emit('change', targetChecked)
+		if (props.usedAlone) {
+			emit('update:checked', targetChecked)
+		}
+		setTimeout(() => {
+			if (instance != null) {
+				formValidate(instance!, 'change')
+			}
+		}, 10)
+	}
+	
+	// 点击图标
+	function iconClickHandler(e: UniEvent) {
+		e.stopPropagation()
+		if (!elDisabled.value) {
+			setRadioCheckedStatus()
+		}
+	}
+	
+	// 横向两端排列时，点击组件即可触发选中事件
+	function wrapperClickHandler(e: UniEvent) {
+		const iconPlacement = getParentVal('iconPlacement')
+		if (iconPlacement != null && iconPlacement.toString() == 'right') {
+			iconClickHandler(e)
+		}
+	}
+	
+	// 点击label
+	function labelClickHandler(e: UniEvent) {
+		e.stopPropagation()
+		if (!elLabelDisabled.value && !elDisabled.value) {
+			setRadioCheckedStatus()
+		}
+	}
+	
+	// 监听 checked 属性变化
+	watch((): boolean => props.checked, (newVal: boolean) => {
+		if (newVal != selfChecked.value) {
+			selfChecked.value = newVal
+		}
+	})
+	
+	onMounted(() => {
+		init()
+	})
+
+	const getInternalState = (): UTSJSONObject => {
+		return {
+			name: props.name,
+			isChecked: isChecked.value
+		} as UTSJSONObject
+	}
+
+	defineExpose({
+		init,
+		getInternalState
+	})
 </script>
 
 <style lang="scss" scoped>
@@ -327,8 +472,8 @@ function labelClickHandler(e: UniEvent) {
 	$up-checkbox-icon-wrap-circle-border-radius:99px !default;
 	$up-checkbox-icon-wrap-square-border-radius:3px !default;
 	$up-checkbox-icon-wrap-checked-color:#fff !default;
-	$up-checkbox-icon-wrap-checked-background-color: $up-primary !default;
-	$up-checkbox-icon-wrap-checked-border-color: $up-primary !default;
+	$up-checkbox-icon-wrap-checked-background-color:red !default;
+	$up-checkbox-icon-wrap-checked-border-color:#2979ff !default;
 	$up-checkbox-icon-wrap-disabled-background-color:#ebedf0 !default;
 	$up-checkbox-icon-wrap-disabled-checked-color:#c8c9cc !default;
 	$up-checkbox-label-margin-left:5px !default;
@@ -346,30 +491,36 @@ function labelClickHandler(e: UniEvent) {
 		margin-top: 5px;
 
 		&-label--left {
-			flex-direction: row
+			flex-direction: row;
 		}
 
 		&-label--right {
 			flex-direction: row-reverse;
-			justify-content: space-between
+			justify-content: space-between;
 		}
 
 		&__icon-wrap {
+			/* #ifndef APP */
 			box-sizing: border-box;
+			// nvue下，border-color过渡有问题
 			transition-property: border-color, background-color, color;
 			transition-duration: 0.2s;
-			color: #606266;
+			/* #endif */
 			@include flex;
 			align-items: center;
 			justify-content: center;
-			color: transparent;
-			text-align: center;
 			margin-right: $up-checkbox-icon-wrap-margin-right;
-
-			font-size: $up-checkbox-icon-wrap-font-size;
 			border-width: $up-checkbox-icon-wrap-border-width;
 			border-color: $up-checkbox-icon-wrap-border-color;
 			border-style: solid;
+
+			/* #ifdef MP-TOUTIAO */
+			// 头条小程序兼容性问题，需要设置行高为0，否则图标偏下
+			&__icon {
+				line-height: $up-checkbox-icon-wrap-icon-line-height;
+			}
+
+			/* #endif */
 
 			&--circle {
 				border-radius: $up-checkbox-icon-wrap-circle-border-radius;
@@ -379,20 +530,19 @@ function labelClickHandler(e: UniEvent) {
 				border-radius: $up-checkbox-icon-wrap-square-border-radius;
 			}
 
-			&--unchecked {
-				background-color: #ffffff;
-				border-color: $up-checkbox-icon-wrap-border-color;
-			}
-
 			&--checked {
 				color: $up-checkbox-icon-wrap-checked-color;
-				background-color: $up-checkbox-icon-wrap-checked-background-color !important;
-				border-color: $up-checkbox-icon-wrap-checked-border-color !important;
+				background-color: $up-checkbox-icon-wrap-checked-background-color;
+				border-color: $up-checkbox-icon-wrap-checked-border-color;
+			}
+
+			&--active {
+				background-color: $up-primary;
+				border-color: $up-primary;
 			}
 
 			&--disabled {
 				background-color: $up-checkbox-icon-wrap-disabled-background-color !important;
-				border-color: $up-checkbox-icon-wrap-disabled-checked-color !important;
 			}
 
 			&--disabled--checked {

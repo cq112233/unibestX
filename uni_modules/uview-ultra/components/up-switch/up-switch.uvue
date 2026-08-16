@@ -25,7 +25,7 @@
 			    :show="loading"
 			    mode="circle"
 			    timingFunction='linear'
-				:color="modelValue == activeValue ? activeColor : '#AAABAD'"
+				:color="loadingColor"
 			    :size="loadingIconSize"
 			/>
 		</view>
@@ -99,6 +99,16 @@ const customInactiveColor = computed<boolean>(() => {
 
 const loadingIconSize = computed((): number => {
   return parseInt(getPx(props.size)) * 0.6
+})
+
+const loadingColor = computed((): string => {
+  if (isActive.value) {
+    if (props.activeColor != '' && props.activeColor != '#2979ff') {
+      return props.activeColor
+    }
+    return 'var(--theme-color, #2979ff)'
+  }
+  return '#AAABAD'
 })
 
 const switchClass = computed<string>(() => {
