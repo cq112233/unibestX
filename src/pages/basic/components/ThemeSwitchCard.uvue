@@ -22,14 +22,16 @@
           backgroundColor: item,
           borderWidth: currentTheme == item ? '3px' : '0px',
           borderStyle: 'solid',
-          borderColor: '#1e293b'
+          borderColor: '#1e293b',
         }"
         @click="changeTheme(item)"
       >
         <text
           v-if="currentTheme == item"
           class="text-16px text-white font-bold"
-        >✓</text>
+        >
+          ✓
+        </text>
       </view>
     </view>
   </Card>

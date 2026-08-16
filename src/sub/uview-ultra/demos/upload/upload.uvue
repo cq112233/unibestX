@@ -6,11 +6,11 @@
         <text class="demo-label">基础用法</text>
         <up-upload
           :file-list="fileList1"
-          @after-read="afterRead"
-          @delete="deletePic"
           name="1"
           multiple
           :max-count="3"
+          @after-read="afterRead"
+          @delete="deletePic"
         ></up-upload>
       </view>
       <view class="demo-block mt-12px">
@@ -50,7 +50,7 @@ async function afterRead(event: UTSJSONObject) {
     fileList1.value.push({
       ...item,
       status: 'uploading',
-      message: '上传中'
+      message: '上传中',
     } as UTSJSONObject)
   })
   for (let i = 0; i < lists.length; i++) {
@@ -60,7 +60,7 @@ async function afterRead(event: UTSJSONObject) {
     fileList1.value.splice(fileListLen, 1, Object.assign(item, {
       status: 'success',
       message: '',
-      url: result
+      url: result,
     }) as UTSJSONObject)
     fileListLen++
   }

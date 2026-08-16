@@ -25,8 +25,8 @@ import { ref } from 'vue'
 // #ifdef APP-ANDROID
 import Build from 'android.os.Build'
 import Context from 'android.content.Context'
-import Vibrator from 'android.os.Vibrator'
-import VibratorManager from 'android.os.VibratorManager'
+import type Vibrator from 'android.os.Vibrator'
+import type VibratorManager from 'android.os.VibratorManager'
 // #endif
 
 // #ifdef APP-HARMONY
@@ -36,7 +36,7 @@ import vibrator from '@ohos.vibrator'
 const copyText = ref('Hello unibestX!')
 
 // #ifdef APP-ANDROID
-function vibrationAndroid() : void {
+function vibrationAndroid(): void {
   const activity = UTSAndroid.getUniActivity()
   if (activity == null) {
     uni.showToast({ title: '获取 Activity 失败', icon: 'none' })
@@ -49,32 +49,36 @@ function vibrationAndroid() : void {
       if (manager != null) {
         manager.defaultVibrator.vibrate(15)
         uni.showToast({ title: '已触发短震动', icon: 'none' })
-      } else {
+      }
+      else {
         uni.showToast({ title: '获取震动服务失败', icon: 'none' })
       }
-    } else {
+    }
+    else {
       const vibrator = activity.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
       if (vibrator != null) {
         vibrator.vibrate(15)
         uni.showToast({ title: '已触发短震动', icon: 'none' })
-      } else {
+      }
+      else {
         uni.showToast({ title: '获取震动服务失败', icon: 'none' })
       }
     }
-  } catch (e : any) {
+  }
+  catch (e: any) {
     uni.showToast({ title: '震动调用失败', icon: 'none' })
   }
 }
 // #endif
 
 // #ifdef APP-IOS
-function vibrationIOS() : void {
+function vibrationIOS(): void {
   uni.showToast({ title: 'iOS 震动待实现', icon: 'none' })
 }
 // #endif
 
 // #ifdef APP-HARMONY
-function vibrationHarmony() : void {
+function vibrationHarmony(): void {
   try {
     vibrator.startVibration({
       type: 'time',
@@ -84,24 +88,25 @@ function vibrationHarmony() : void {
       usage: 'unknown',
     }).then(() => {
       uni.showToast({ title: '已触发鸿蒙短震动', icon: 'none' })
-    }).catch((_err : any) => {
+    }).catch((_err: any) => {
       uni.vibrateShort({
         success: () => {
           uni.showToast({ title: '已触发鸿蒙短震动', icon: 'none' })
         },
         fail: () => {
           uni.showToast({ title: '鸿蒙震动触发失败', icon: 'none' })
-        }
+        },
       })
     })
-  } catch (e : any) {
+  }
+  catch (e: any) {
     uni.vibrateShort({
       success: () => {
         uni.showToast({ title: '已触发鸿蒙短震动', icon: 'none' })
       },
       fail: () => {
         uni.showToast({ title: '鸿蒙震动调用失败', icon: 'none' })
-      }
+      },
     })
   }
 }

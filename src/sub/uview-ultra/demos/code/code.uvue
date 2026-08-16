@@ -34,7 +34,8 @@ function getCode() {
         uni.showToast({ title: '验证码已发送', icon: 'success' })
         codeObj.$callMethod('start')
       }, 1000)
-    } else {
+    }
+    else {
       uni.showToast({ title: '倒计时中，请稍后再试', icon: 'none' })
     }
   }

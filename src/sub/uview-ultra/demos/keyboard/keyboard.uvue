@@ -2,7 +2,6 @@
   <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
     <NavBar title="Keyboard 键盘" :auto-back="true" />
     <view class="p-16px">
-      
       <!-- 1. 数字键盘 -->
       <view class="demo-block">
         <text class="demo-label">数字键盘</text>
@@ -10,11 +9,11 @@
         <view class="mock-input" @click="showNumber = true">
           <text :class="valNumber ? 'mock-input-text' : 'mock-input-placeholder'">{{ valNumber || '请点击输入数字' }}</text>
         </view>
-        <up-keyboard 
-          mode="number" 
-          :show="showNumber" 
-          @change="onNumberChange" 
-          @backspace="onNumberBackspace" 
+        <up-keyboard
+          mode="number"
+          :show="showNumber"
+          @change="onNumberChange"
+          @backspace="onNumberBackspace"
           @close="showNumber = false"
           @cancel="showNumber = false"
           @confirm="showNumber = false"
@@ -27,11 +26,11 @@
         <view class="mock-input" @click="showCard = true">
           <text :class="valCard ? 'mock-input-text' : 'mock-input-placeholder'">{{ valCard || '请点击输入身份证' }}</text>
         </view>
-        <up-keyboard 
-          mode="card" 
-          :show="showCard" 
-          @change="onCardChange" 
-          @backspace="onCardBackspace" 
+        <up-keyboard
+          mode="card"
+          :show="showCard"
+          @change="onCardChange"
+          @backspace="onCardBackspace"
           @close="showCard = false"
           @cancel="showCard = false"
           @confirm="showCard = false"
@@ -44,17 +43,16 @@
         <view class="mock-input" @click="showCar = true">
           <text :class="valCar ? 'mock-input-text' : 'mock-input-placeholder'">{{ valCar || '请点击输入车牌号' }}</text>
         </view>
-        <up-keyboard 
-          mode="car" 
-          :show="showCar" 
-          @change="onCarChange" 
-          @backspace="onCarBackspace" 
+        <up-keyboard
+          mode="car"
+          :show="showCar"
+          @change="onCarChange"
+          @backspace="onCarBackspace"
           @close="showCar = false"
           @cancel="showCar = false"
           @confirm="showCar = false"
         ></up-keyboard>
       </view>
-
     </view>
   </view>
 </template>
@@ -65,10 +63,10 @@ import { ref } from 'vue'
 // --- 数字键盘 ---
 const showNumber = ref(false)
 const valNumber = ref('')
-const onNumberChange = (val: string) => {
+function onNumberChange(val: string) {
   valNumber.value += val
 }
-const onNumberBackspace = () => {
+function onNumberBackspace() {
   if (valNumber.value.length > 0) {
     valNumber.value = valNumber.value.substring(0, valNumber.value.length - 1)
   }
@@ -77,10 +75,10 @@ const onNumberBackspace = () => {
 // --- 身份证键盘 ---
 const showCard = ref(false)
 const valCard = ref('')
-const onCardChange = (val: string) => {
+function onCardChange(val: string) {
   valCard.value += val
 }
-const onCardBackspace = () => {
+function onCardBackspace() {
   if (valCard.value.length > 0) {
     valCard.value = valCard.value.substring(0, valCard.value.length - 1)
   }
@@ -89,10 +87,10 @@ const onCardBackspace = () => {
 // --- 车牌号键盘 ---
 const showCar = ref(false)
 const valCar = ref('')
-const onCarChange = (val: string) => {
+function onCarChange(val: string) {
   valCar.value += val
 }
-const onCarBackspace = () => {
+function onCarBackspace() {
   if (valCar.value.length > 0) {
     valCar.value = valCar.value.substring(0, valCar.value.length - 1)
   }

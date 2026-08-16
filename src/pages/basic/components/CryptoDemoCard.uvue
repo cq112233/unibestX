@@ -251,7 +251,7 @@ const rsaVerifyResult = ref('')
  * @param e 捕获到的异常
  * @returns 可读的错误消息字符串
  */
-function errorMessage(e : any): string {
+function errorMessage(e: any): string {
   if (e instanceof Error) {
     return e.message
   }
@@ -264,7 +264,7 @@ async function handleBase64Encode() {
     base64EncodeResult.value = await base64Encode(base64Input.value)
     base64DecodeResult.value = ''
   }
-  catch (e : any) {
+  catch (e: any) {
     base64EncodeResult.value = errorMessage(e)
   }
 }
@@ -275,7 +275,7 @@ async function handleBase64Decode() {
     const target = base64EncodeResult.value.length > 0 ? base64EncodeResult.value : base64Input.value
     base64DecodeResult.value = await base64Decode(target)
   }
-  catch (e : any) {
+  catch (e: any) {
     base64DecodeResult.value = errorMessage(e)
   }
 }
@@ -285,7 +285,7 @@ async function handleMd5() {
   try {
     md5Result.value = await md5(hashInput.value)
   }
-  catch (e : any) {
+  catch (e: any) {
     md5Result.value = errorMessage(e)
   }
 }
@@ -295,7 +295,7 @@ async function handleSha256() {
   try {
     sha256Result.value = await sha256(hashInput.value)
   }
-  catch (e : any) {
+  catch (e: any) {
     sha256Result.value = errorMessage(e)
   }
 }
@@ -305,7 +305,7 @@ async function handleHmac() {
   try {
     hmacResult.value = await hmacSha1(hmacText.value, hmacKey.value)
   }
-  catch (e : any) {
+  catch (e: any) {
     hmacResult.value = errorMessage(e)
   }
 }
@@ -316,7 +316,7 @@ async function handleAesEncrypt() {
     aesEncryptResult.value = await aesEncrypt(aesText.value, aesKey.value)
     aesDecryptResult.value = ''
   }
-  catch (e : any) {
+  catch (e: any) {
     aesEncryptResult.value = errorMessage(e)
   }
 }
@@ -326,7 +326,7 @@ async function handleAesDecrypt() {
   try {
     aesDecryptResult.value = await aesDecrypt(aesEncryptResult.value, aesKey.value)
   }
-  catch (e : any) {
+  catch (e: any) {
     aesDecryptResult.value = errorMessage(e)
   }
 }
@@ -337,7 +337,7 @@ async function handleDesEncrypt() {
     desEncryptResult.value = await desEncrypt(desText.value, desKey.value)
     desDecryptResult.value = ''
   }
-  catch (e : any) {
+  catch (e: any) {
     desEncryptResult.value = errorMessage(e)
   }
 }
@@ -347,7 +347,7 @@ async function handleDesDecrypt() {
   try {
     desDecryptResult.value = await desDecrypt(desEncryptResult.value, desKey.value)
   }
-  catch (e : any) {
+  catch (e: any) {
     desDecryptResult.value = errorMessage(e)
   }
 }
@@ -374,7 +374,7 @@ async function handleRsaGenerateKeyPair() {
       console.error('Failed to parse RSA keypair:', err)
     }
   }
-  catch (e : any) {
+  catch (e: any) {
     rsaKeyPairResult.value = errorMessage(e)
   }
 }
@@ -385,7 +385,7 @@ async function handleRsaEncrypt() {
     rsaEncryptResult.value = await rsaEncrypt(rsaText.value, rsaPublicKey.value)
     rsaDecryptResult.value = ''
   }
-  catch (e : any) {
+  catch (e: any) {
     rsaEncryptResult.value = errorMessage(e)
   }
 }
@@ -395,7 +395,7 @@ async function handleRsaDecrypt() {
   try {
     rsaDecryptResult.value = await rsaDecrypt(rsaEncryptResult.value, rsaPrivateKey.value)
   }
-  catch (e : any) {
+  catch (e: any) {
     rsaDecryptResult.value = errorMessage(e)
   }
 }
@@ -406,7 +406,7 @@ async function handleRsaSign() {
     rsaSignResult.value = await rsaSign(rsaText.value, rsaPrivateKey.value, 'SHA-256')
     rsaVerifyResult.value = ''
   }
-  catch (e : any) {
+  catch (e: any) {
     rsaSignResult.value = errorMessage(e)
   }
 }
@@ -417,7 +417,7 @@ async function handleRsaVerify() {
     const ok = await rsaVerify(rsaText.value, rsaPublicKey.value, rsaSignResult.value, 'SHA-256')
     rsaVerifyResult.value = ok ? '通过 (true)' : '未通过 (false)'
   }
-  catch (e : any) {
+  catch (e: any) {
     rsaVerifyResult.value = errorMessage(e)
   }
 }
