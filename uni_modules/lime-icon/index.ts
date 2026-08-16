@@ -321,10 +321,10 @@ export async function registerFontIcon(config : FontIconConfig) : Promise<void> 
 	}
 
 	// 如果有初始图标，先使用
-	if (Object.keys(icons).length > 0) {
+	if (UTSJSONObject.keys(icons).length > 0) {
 		iconData.set(prefix, icons)
 		iconDataChangeCount.value++ // 增加计数器以触发响应式更新
-		console.log(`已注册字体图标库: ${prefix} (内置${Object.keys(icons).length}个图标)`)
+		console.log(`已注册字体图标库: ${prefix} (内置${UTSJSONObject.keys(icons).length}个图标)`)
 
 		// 异步加载JSON合并
 		if (!isNullish(jsonUrl)) {
@@ -391,11 +391,11 @@ export async function registerIconify(config : IconifyConfig) : Promise<void> {
 	iconifyRegistry.set(prefix, config)
 
 	// 检查是本地SVG集合还是远程API
-	if (Object.keys(icons).length > 0) {
+	if (UTSJSONObject.keys(icons).length > 0) {
 		// 本地SVG集合 - 直接使用提供的图标数据
 		iconData.set(prefix, icons)
 		iconDataChangeCount.value++ // 增加计数器以触发响应式更新
-		console.log(`已注册本地Iconify图标库: ${prefix} (内置${Object.keys(icons).length}个图标)`)
+		console.log(`已注册本地Iconify图标库: ${prefix} (内置${UTSJSONObject.keys(icons).length}个图标)`)
 
 		// 异步加载JSON合并（如果提供了JSON URL）
 		if (jsonUrl) {
@@ -407,7 +407,7 @@ export async function registerIconify(config : IconifyConfig) : Promise<void> {
 			const jsonIcons = await loadJsonData(jsonUrl)
 			iconData.set(prefix, jsonIcons)
 			iconDataChangeCount.value++ // 增加计数器以触发响应式更新
-			console.log(`已注册本地Iconify图标库: ${prefix} (从JSON加载${Object.keys(jsonIcons).length}个图标)`)
+			console.log(`已注册本地Iconify图标库: ${prefix} (从JSON加载${UTSJSONObject.keys(jsonIcons).length}个图标)`)
 		} catch (error) {
 			console.error(`注册本地Iconify图标库失败: ${prefix}`, error)
 			throw error
@@ -637,7 +637,7 @@ export function useIcon(name : MaybeRef<string>, options : UseIconOptions = {}) 
 
 			// 判断是本地SVG还是远程API
 			// 有 icons 数据就是本地，否则是远程
-			const isLocal = !isNullish(icons) && Object.keys(icons!).length > 0
+			const isLocal = !isNullish(icons) && UTSJSONObject.keys(icons!).length > 0
 
 			// 确定API地址
 			let apiUrl = DEFAULT_ICONIFY_API

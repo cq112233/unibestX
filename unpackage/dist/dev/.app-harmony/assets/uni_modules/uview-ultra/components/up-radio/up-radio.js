@@ -1,18 +1,13 @@
 import { _ as __easycom_0 } from "../up-icon/up-icon.js";
+import { r as resolveEasycom } from "../../../../App.ku.js";
 import { a as addUnit, v as os, d as deepMerge, b as addStyle, i as formValidate } from "../../libs/function/index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, createSharedDataSlot: _createSharedDataSlot, setSharedDataEvent: _setSharedDataEvent, toDisplayString: _toDisplayString } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpRadioUpRadio";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { computed, inject, getCurrentInstance, nextTick } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-radio"
   },
-  __dynamicSharedData: true,
-  __hash: "78e96aaa",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-radio/up-radio.uvue",
   __name: "up-radio",
   props: {
     name: {
@@ -72,9 +67,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   },
   emits: ["change"],
   setup(__props, _a) {
-    var __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpRadioUpRadioSharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
     const props = __props;
     const emit = __emit;
     const instance = getCurrentInstance();
@@ -259,51 +253,68 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         setRadioCheckedStatus();
       }
     }
-    return () => {
-      "raw js";
-      const _component_up_icon = __easycom_0;
-      _renderSharedDataEffect(() => {
-        _setSharedDataClass(__sharedData, 4, ["up-radio cursor-pointer", [
-          "up-radio-label--" + elIconPlacement.value,
-          elBorderBottom.value && elPlacement.value == "column" ? "up-border-bottom" : ""
-        ]]);
-        _setSharedDataStyle(__sharedData, 5, [radioStyle.value]);
-        _setSharedDataClass(__sharedData, 6, ["up-radio__icon-wrap cursor-pointer", iconClasses.value]);
-        _setSharedDataStyle(__sharedData, 7, [iconWrapStyle.value]);
-      });
-      _createSharedDataSlot("icon", null, null, () => {
-        const n2 = _createSharedDataComponentWithFallback(_component_up_icon, "90b95890", {
-          class: "up-radio__icon-wrap__icon",
-          name: "checkbox-mark",
-          size: () => {
-            return elIconSize.value;
-          },
-          color: () => {
-            return elIconColor.value;
-          }
-        });
-        _setSharedData(__sharedData, 0, n2?.sharedData);
-      });
-      _setSharedDataEvent(__sharedData, 1, iconClickHandler);
-      _setSharedDataEvent(__sharedData, 2, labelClickHandler);
-      _setSharedDataEvent(__sharedData, 3, wrapperClickHandler);
-      _renderSharedDataEffect(() => {
-        const _elDisabled = elDisabled.value;
-        const _elLabelSize = elLabelSize.value;
-        _setSharedDataClass(__sharedData, 8, ["up-radio__label", [_elDisabled ? "up-radio__label--disabled" : ""]]);
-        _setSharedDataStyle(__sharedData, 9, {
-          color: _elDisabled ? elInactiveColor.value : elLabelColor.value,
-          fontSize: _elLabelSize,
-          lineHeight: _elLabelSize
-        });
-        _setSharedData(__sharedData, 10, _toDisplayString(__props.label));
-      });
-      return __sharedData;
-    };
+    const __returned__ = { props, emit, instance, parentGroup, checked, elDisabled, elLabelDisabled, elSize, elIconSize, elActiveColor, elInactiveColor, elLabelColor, elShape, elLabelSize, elIconColor, elIconPlacement, elBorderBottom, elPlacement, iconClasses, iconWrapStyle, radioStyle, setRadioCheckedStatus, iconClickHandler, wrapperClickHandler, labelClickHandler };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-radio": { "": { "display": "flex", "flexDirection": "row", "overflow": "hidden", "alignItems": "center", "marginBottom": 5, "marginTop": 5 } }, "up-radio-label--left": { "": { "flexDirection": "row" } }, "up-radio-label--right": { "": { "flexDirection": "row-reverse", "justifyContent": "space-between" } }, "up-radio__icon-wrap": { "": { "boxSizing": "border-box", "transitionProperty": "borderColor,backgroundColor,color", "transitionDuration": "0.2s", "color": "rgba(0,0,0,0)", "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "textAlign": "center", "marginRight": 6, "fontSize": 20, "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopColor": "#c8c9cc", "borderRightColor": "#c8c9cc", "borderBottomColor": "#c8c9cc", "borderLeftColor": "#c8c9cc", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "up-radio__icon-wrap--circle": { "": { "borderTopLeftRadius": 50, "borderTopRightRadius": 50, "borderBottomRightRadius": 50, "borderBottomLeftRadius": 50 } }, "up-radio__icon-wrap--square": { "": { "borderTopLeftRadius": 3, "borderTopRightRadius": 3, "borderBottomRightRadius": 3, "borderBottomLeftRadius": 3 } }, "up-radio__icon-wrap--checked": { "": { "color": "#ffffff", "!backgroundColor": "var(--theme-color, #0957de)", "!borderTopColor": "var(--theme-color, #0957de)", "!borderRightColor": "var(--theme-color, #0957de)", "!borderBottomColor": "var(--theme-color, #0957de)", "!borderLeftColor": "var(--theme-color, #0957de)" } }, "up-radio__icon-wrap--disabled": { "": { "!backgroundColor": "#ebedf0" } }, "up-radio__icon-wrap--disabled--checked": { "": { "!color": "#c8c9cc" } }, "up-radio__label": { "": { "marginLeft": 5, "marginRight": 12, "color": "#606266", "fontSize": 15 } }, "up-radio__label--disabled": { "": { "color": "#c8c9cc" } }, "@TRANSITION": { "up-radio__icon-wrap": { "property": "borderColor,backgroundColor,color", "duration": "0.2s" } } };
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { renderSlot: _renderSlot, resolveComponent: _resolveComponent, createVNode: _createVNode, withModifiers: _withModifiers, normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode, toDisplayString: _toDisplayString, openBlock: _openBlock, createElementBlock: _createElementBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      class: _normalizeClass(["up-radio cursor-pointer", [
+        "up-radio-label--" + $setup.elIconPlacement,
+        $setup.elBorderBottom && $setup.elPlacement == "column" ? "up-border-bottom" : ""
+      ]]),
+      onClick: _withModifiers($setup.wrapperClickHandler, ["stop"]),
+      style: _normalizeStyle([$setup.radioStyle])
+    },
+    [
+      _createElementVNode(
+        "view",
+        {
+          class: _normalizeClass(["up-radio__icon-wrap cursor-pointer", $setup.iconClasses]),
+          onClick: _withModifiers($setup.iconClickHandler, ["stop"]),
+          style: _normalizeStyle([$setup.iconWrapStyle])
+        },
+        [
+          _renderSlot(_ctx.$slots, "icon", {}, () => [
+            _createVNode(_component_up_icon, {
+              class: "up-radio__icon-wrap__icon",
+              name: "checkbox-mark",
+              size: $setup.elIconSize,
+              color: $setup.elIconColor
+            }, null, 8, ["size", "color"])
+          ])
+        ],
+        6
+        /* CLASS, STYLE */
+      ),
+      _createElementVNode(
+        "text",
+        {
+          class: _normalizeClass(["up-radio__label", [$setup.elDisabled ? "up-radio__label--disabled" : ""]]),
+          onClick: _withModifiers($setup.labelClickHandler, ["stop"]),
+          style: _normalizeStyle({
+            color: $setup.elDisabled ? $setup.elInactiveColor : $setup.elLabelColor,
+            fontSize: $setup.elLabelSize,
+            lineHeight: $setup.elLabelSize
+          })
+        },
+        _toDisplayString($props.label),
+        7
+        /* TEXT, CLASS, STYLE */
+      )
+    ],
+    6
+    /* CLASS, STYLE */
+  );
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-radio/up-radio.uvue"]]);
 export {
   __easycom_1 as _
 };

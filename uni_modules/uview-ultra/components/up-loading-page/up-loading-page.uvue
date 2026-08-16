@@ -11,25 +11,19 @@
                         :src="image"
                         class="up-loading-page__warpper__loading-icon__img"
                         mode="widthFix"
-						:style="{
-							width: addUnit(iconSize),
-						    height: addUnit(iconSize)
-						}"
+						:style="imageSizeStyle"
                     ></image>
                     <up-loading-icon
                         v-else
                         :mode="loadingMode"
-                        :size="addUnit(iconSize)"
+                        :size="formattedIconSize"
                         :color="loadingColor"
                     ></up-loading-icon>
                 </view>
                 <slot>
                     <text
                         class="up-loading-page__warpper__text"
-                        :style="{
-                            fontSize: addUnit(fontSize),
-                            color: color,
-                        }"
+                        :style="textStyle"
                         >{{ loadingText }}</text
                     >
                 </slot>
@@ -91,6 +85,24 @@ const props = defineProps({
     type: Object,
     default: () => ({})
   }
+})
+
+const imageSizeStyle = computed((): UTSJSONObject => {
+  return {
+    width: addUnit(props.iconSize),
+    height: addUnit(props.iconSize)
+  } as UTSJSONObject
+})
+
+const formattedIconSize = computed((): string => {
+  return addUnit(props.iconSize)
+})
+
+const textStyle = computed((): UTSJSONObject => {
+  return {
+    fontSize: addUnit(props.fontSize),
+    color: props.color
+  } as UTSJSONObject
 })
 
 const transitionStyle = computed<UTSJSONObject>(() => {

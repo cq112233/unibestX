@@ -41,15 +41,15 @@
 		<view
 			class="up-scroll-list__indicator"
 			v-if="indicator"
-			:style="[addStyle(indicatorStyle)]"
+			:style="customIndicatorStyle"
 		>
 			<view
 				class="up-scroll-list__indicator__line"
-				:style="[lineStyle]"
+				:style="lineStyle"
 			>
 				<view
 					class="up-scroll-list__indicator__line__bar"
-					:style="[barStyle]"
+					:style="barStyle"
 				></view>
 			</view>
 		</view>
@@ -124,6 +124,10 @@ const lineStyle = computed<UTSJSONObject>(() => {
 	style['width'] = addUnit(props.indicatorWidth)
 	style['backgroundColor'] = props.indicatorColor
 	return style
+})
+
+const customIndicatorStyle = computed((): UTSJSONObject => {
+	return addStyle(props.indicatorStyle) as UTSJSONObject
 })
 
 function scrollHandler(e: UniScrollEvent) {

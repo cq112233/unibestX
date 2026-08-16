@@ -1,7 +1,7 @@
 <template>
-  <Card :title="$t('basic.echartTitle')">
-    <view class="w-full h-260px mt-10px">
-      <e-chart ref="echartRef" class="w-full !h-full" @ready="initEchart" />
+  <Card :title="echartTitle">
+    <view class="w-full h-280px mt-10px">
+      <e-chart ref="echartRef" height="280px" class="w-full h-full" @ready="initEchart" />
     </view>
     <view class="flex-row justify-between mt-15px">
       <view class="flex-1 mr-8px">
@@ -13,7 +13,9 @@
           <text
             class="text-12px font-bold"
             :class="currentType !== 'line' ? 'text-[#3b82f6]' : 'text-[#ffffff]'"
-          >{{ $t('basic.echartLine') }}</text>
+          >
+            {{ echartLineText }}
+          </text>
         </view>
       </view>
       <view class="flex-1 mr-8px">
@@ -25,7 +27,9 @@
           <text
             class="text-12px font-bold"
             :class="currentType !== 'bar' ? 'text-[#10b981]' : 'text-[#ffffff]'"
-          >{{ $t('basic.echartBar') }}</text>
+          >
+            {{ echartBarText }}
+          </text>
         </view>
       </view>
       <view class="flex-1">
@@ -37,7 +41,9 @@
           <text
             class="text-12px font-bold"
             :class="currentType !== 'pie' ? 'text-[#f59e0b]' : 'text-[#ffffff]'"
-          >{{ $t('basic.echartPie') }}</text>
+          >
+            {{ echartPieText }}
+          </text>
         </view>
       </view>
     </view>
@@ -49,6 +55,11 @@ import Card from './Card.uvue'
 import { computed, ref, watch } from 'vue'
 import { systemInfo } from '@/src/utils/systemInfo'
 import { $t } from '@/src/utils/i18n'
+
+const echartTitle = computed((): string => $t('basic.echartTitle'))
+const echartLineText = computed((): string => $t('basic.echartLine'))
+const echartBarText = computed((): string => $t('basic.echartBar'))
+const echartPieText = computed((): string => $t('basic.echartPie'))
 
 const echartRef = ref<ComponentPublicInstance | null>(null)
 const currentType = ref('line')
@@ -173,8 +184,12 @@ const pieOption = {
   series: [{
     name: '访问来源',
     type: 'pie',
-    radius: '65%',
-    center: ['50%', '50%'],
+    radius: '52%',
+    center: ['50%', '52%'],
+    label: {
+      fontSize: 11,
+      color: '#64748b',
+    },
     data: [
       { value: 1048, name: '搜索引擎', itemStyle: { color: '#3b82f6' } },
       { value: 735, name: '直接访问', itemStyle: { color: '#10b981' } },

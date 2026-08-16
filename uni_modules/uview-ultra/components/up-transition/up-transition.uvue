@@ -5,7 +5,7 @@
 		ref="up-transition"
 		@tap="clickHandler"
 		:class="classes"
-		:style="[mergeStyle]"
+		:style="mergeStyle"
 	>
 		<slot />
 	</view>
@@ -14,7 +14,7 @@
 <script setup lang="uts">
 import { computed, ref, watch, nextTick } from 'vue'
 import defProps from './transition.uts'
-import { addStyle, sleep } from '../../libs/function/index'
+import { addStyle, sleep } from '../../libs/function/index.uts'
 
 defineOptions({
   name: 'up-transition'
@@ -63,45 +63,45 @@ const getClassNames = function (name: string): UTSJSONObject {
 
 const getModeStyle = function (mode: string, state: string): UTSJSONObject {
   const style = {} as UTSJSONObject
-  if (state === 'enter' || state === 'leave-to') {
-    if (mode === 'fade') {
+  if (state == 'enter' || state == 'leave-to') {
+    if (mode == 'fade') {
       style['opacity'] = 0
-    } else if (mode === 'zoom') {
+    } else if (mode == 'zoom') {
       style['transform'] = 'scale(0.95)'
-    } else if (mode === 'fade-zoom') {
+    } else if (mode == 'fade-zoom') {
       style['transform'] = 'scale(0.95)'
       style['opacity'] = 0
-    } else if (mode === 'fade-up') {
+    } else if (mode == 'fade-up') {
       style['transform'] = 'translateY(100%)'
       style['opacity'] = 0
-    } else if (mode === 'fade-down') {
+    } else if (mode == 'fade-down') {
       style['transform'] = 'translateY(-100%)'
       style['opacity'] = 0
-    } else if (mode === 'fade-left') {
+    } else if (mode == 'fade-left') {
       style['transform'] = 'translateX(-100%)'
       style['opacity'] = 0
-    } else if (mode === 'fade-right') {
+    } else if (mode == 'fade-right') {
       style['transform'] = 'translateX(100%)'
       style['opacity'] = 0
-    } else if (mode === 'slide-up') {
+    } else if (mode == 'slide-up') {
       style['transform'] = 'translateY(100%)'
-    } else if (mode === 'slide-down') {
+    } else if (mode == 'slide-down') {
       style['transform'] = 'translateY(-100%)'
-    } else if (mode === 'slide-left') {
+    } else if (mode == 'slide-left') {
       style['transform'] = 'translateX(-100%)'
-    } else if (mode === 'slide-right') {
+    } else if (mode == 'slide-right') {
       style['transform'] = 'translateX(100%)'
     }
-  } else if (state === 'enter-to' || state === 'leave') {
-    if (mode === 'fade') {
+  } else if (state == 'enter-to' || state == 'leave') {
+    if (mode == 'fade') {
       style['opacity'] = 1
-    } else if (mode === 'zoom') {
+    } else if (mode == 'zoom') {
       style['transform'] = 'scale(1)'
-    } else if (mode === 'fade-zoom') {
+    } else if (mode == 'fade-zoom') {
       style['transform'] = 'scale(1)'
       style['opacity'] = 1
-    } else if (mode === 'fade-up' || mode === 'fade-down' || mode === 'fade-left' || mode === 'fade-right' ||
-               mode === 'slide-up' || mode === 'slide-down' || mode === 'slide-left' || mode === 'slide-right') {
+    } else if (mode == 'fade-up' || mode == 'fade-down' || mode == 'fade-left' || mode == 'fade-right' ||
+               mode == 'slide-up' || mode == 'slide-down' || mode == 'slide-left' || mode == 'slide-right') {
       style['transform'] = 'translate(0, 0)'
       if (mode.startsWith('fade')) {
         style['opacity'] = 1
@@ -117,11 +117,11 @@ const mergeStyle = computed<UTSJSONObject>(() => {
   const duration = durationVal != null ? durationVal.toString() : '0'
 
   let transitionProp = 'all'
-  if (modeVal === 'fade') {
+  if (modeVal == 'fade') {
     transitionProp = 'opacity'
   } else if (modeVal.startsWith('slide')) {
     transitionProp = 'transform'
-  } else if (modeVal.startsWith('fade-zoom') || modeVal === 'zoom' || modeVal.startsWith('fade-up') || modeVal.startsWith('fade-down') || modeVal.startsWith('fade-left') || modeVal.startsWith('fade-right')) {
+  } else if (modeVal.startsWith('fade-zoom') || modeVal == 'zoom' || modeVal.startsWith('fade-up') || modeVal.startsWith('fade-down') || modeVal.startsWith('fade-left') || modeVal.startsWith('fade-right')) {
     transitionProp = 'transform, opacity'
   }
 
@@ -141,7 +141,7 @@ function clickHandler() {
 function onTransitionEnd() {
   if (transitionEnded.value) return
   transitionEnded.value = true
-  emit(status.value === 'leave' ? 'afterLeave' : 'afterEnter')
+  emit(status.value == 'leave' ? 'afterLeave' : 'afterEnter')
   if (!props.show && display.value) {
     display.value = false
     inited.value = false
@@ -181,7 +181,7 @@ async function vueLeave() {
   viewStyle.value = getModeStyle(props.mode, 'leave-to')
 }
 
-watch(() => props.show, (newVal: boolean) => {
+watch((): boolean => props.show, (newVal: boolean) => {
   if (newVal) {
     vueEnter()
   } else {

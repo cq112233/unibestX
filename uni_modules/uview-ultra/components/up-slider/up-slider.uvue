@@ -1,7 +1,7 @@
 <template>
 	<view
 		class="up-slider"
-		:style="addStyle(customStyle)"
+		:style="sliderCustomStyle"
 	>
 		<template v-if="!useNative || isRange">
 			<view ref="upSliderInnerRef" class="up-slider-inner" @click="onClick"
@@ -11,10 +11,7 @@
 			>
 				<view
 					class="up-slider__base"
-					:style="{
-						height: height,
-						backgroundColor: inactiveColor
-					}"
+					:style="baseStyleCpu"
 				>
 				</view>
 				<view
@@ -25,36 +22,30 @@
 				</view>
 				<view v-if="isRange"
 					class="up-slider__gap up-slider__gap-0"
-					:style="{
-						width: barStyle0.width,
-						transition: barStyle0.transition,
-						height: height,
-						marginTop: '-' + height,
-						backgroundColor: inactiveColor
-					}"
+					:style="rangeGap0StyleCpu"
 				>
 				</view>
 				<text v-if="isRange && showValue"
 					class="up-slider__show-range-value"
-					:style="{left: (parseFloat(getPx(barStyle0.width)) + parseFloat(getPx(blockSize))/2) + 'px'}">
+					:style="btnWrapStyle0">
 					{{ rangeValue[0] ?? '' }}
 				</text>
 				<text v-if="isRange && showValue"
 					class="up-slider__show-range-value"
-					:style="{left: (parseFloat(getPx(barStyle.width)) + parseFloat(getPx(blockSize))/2) + 'px'}">
+					:style="btnWrapStyle1">
 					{{ rangeValue[1] ?? '' }}
 				</text>
 				<template v-if="isRange">
 					<view class="up-slider__button-wrap up-slider__button-wrap-0" @touchstart="onTouchStart($event, 0)"
 						@touchmove="onTouchMove($event, 0)" @touchend="onTouchEnd($event, 0)"
-						@touchcancel="onTouchEnd($event, 0)" :style="{left: (parseFloat(getPx(barStyle0.width)) + parseFloat(getPx(blockSize))/2).toString() + 'px'}">
+						@touchcancel="onTouchEnd($event, 0)" :style="btnWrapStyle0">
 						<slot name="min" v-if="$slots['min'] != null"/>
 						<view v-else class="up-slider__button" :style="blockStyleCpu"></view>
 					</view>
 				</template>
 				<view class="up-slider__button-wrap" @touchstart="onTouchStart($event, 1)"
 					@touchmove="onTouchMove($event, 1)" @touchend="onTouchEnd($event, 1)"
-					@touchcancel="onTouchEnd($event, 1)" :style="{left: (parseFloat(getPx(barStyle.width)) + parseFloat(getPx(blockSize))/2) + 'px'}">
+					@touchcancel="onTouchEnd($event, 1)" :style="btnWrapStyle1">
 					<slot name="max" v-if="isRange && $slots['max'] != null"/>
 					<slot v-else-if="$slots['default'] != null"/>
 					<view v-else class="up-slider__button" :style="blockStyleCpu"></view>
@@ -72,7 +63,7 @@
 			:value="parseFloat(modelValue.toString())"
 			:activeColor="activeColor"
 			:backgroundColor="inactiveColor"
-			:blockSize="parseFloat(getPx(blockSize))"
+			:blockSize="computedBlockSize"
 			:blockColor="blockColor"
 			:showValue="showValue"
 			:disabled="disabled"
@@ -84,7 +75,7 @@
 
 <script setup lang="uts">
 import { computed, ref, watch, onMounted, getCurrentInstance } from 'vue'
-import { addStyle, getPx, sleep, upGetRect } from '../../libs/function/index'
+import { addStyle, getPx, sleep, upGetRect } from '../../libs/function/index.uts'
 
 defineOptions({
   name: 'up-slider'
@@ -202,6 +193,31 @@ const innerStyleCpu = computed<UTSJSONObject>(() => {
   return style
 })
 
+const sliderCustomStyle = computed((): UTSJSONObject => {
+  return addStyle(props.customStyle) as UTSJSONObject
+})
+
+const computedBlockSize = computed((): number => {
+  return parseFloat(getPx(props.blockSize))
+})
+
+const baseStyleCpu = computed<UTSJSONObject>(() => {
+  return {
+    height: props.height,
+    backgroundColor: props.inactiveColor
+  } as UTSJSONObject
+})
+
+const rangeGap0StyleCpu = computed<UTSJSONObject>(() => {
+  return {
+    width: barStyle0.value.width,
+    transition: barStyle0.value.transition ?? '',
+    height: props.height,
+    marginTop: '-' + props.height,
+    backgroundColor: props.inactiveColor
+  } as UTSJSONObject
+})
+
 const blockStyleCpu = computed<UTSJSONObject>(() => {
   const style = {} as UTSJSONObject
   if (props.blockStyle != null) {
@@ -219,10 +235,24 @@ const gapStyleCpu = computed<UTSJSONObject>(() => {
   style['transition'] = barStyle.value.transition ?? ''
   style['height'] = props.height
   style['marginTop'] = '-' + props.height
-  if (props.activeColor !== '#2979ff') {
+  if (props.activeColor != '#2979ff') {
     style['backgroundColor'] = props.activeColor
   }
   return style
+})
+
+const btnWrapStyle0 = computed((): UTSJSONObject => {
+  const leftVal = (parseFloat(getPx(barStyle0.value.width)) + parseFloat(getPx(props.blockSize)) / 2).toString() + 'px'
+  return {
+    left: leftVal
+  } as UTSJSONObject
+})
+
+const btnWrapStyle1 = computed((): UTSJSONObject => {
+  const leftVal = (parseFloat(getPx(barStyle.value.width)) + parseFloat(getPx(props.blockSize)) / 2).toString() + 'px'
+  return {
+    left: leftVal
+  } as UTSJSONObject
 })
 
 function format(value: number, index = 1): number {
@@ -365,14 +395,14 @@ function onClick(event: UniPointerEvent) {
   updateValue(newValue.value, false, 1)
 }
 
-watch(() => props.modelValue, (n: number) => {
+watch((): number => props.modelValue, (n: number) => {
   if (status.value == 'end') {
     const crtFmt = updateValue(props.modelValue, false, 1)
     emit('change', crtFmt)
   }
 })
 
-watch(() => props.rangeValue, (n: Array<number>) => {
+watch((): Array<number> => props.rangeValue, (n: Array<number>) => {
   if (status.value == 'end') {
     updateValue(n[0], false, 0)
     updateValue(n[1], false, 1)

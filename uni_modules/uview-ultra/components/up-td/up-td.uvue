@@ -1,15 +1,15 @@
 <template>
-	<view class="up-td" :class="[customClass]" :style="[tdStyle, addStyle(customStyle)]">
+	<view class="up-td" :class="[customClass]" :style="mergedTdStyle">
 		<slot>
-			<text class="up-td__text" :style="[tdTextStyle]">{{ (text != null && text != '' ? text : label).toString() }}</text>
+			<text class="up-td__text" :style="tdTextStyle">{{ (text != null && text != '' ? text : label).toString() }}</text>
 		</slot>
 		<slot name="content"></slot>
 	</view>
 </template>
 
 <script setup lang="uts">
-	import { ref, onMounted, getCurrentInstance } from 'vue'
-	import { addUnit, addStyle } from '../../libs/function/index'
+	import { ref, computed, onMounted, getCurrentInstance } from 'vue'
+	import { addUnit, addStyle, deepMerge } from '../../libs/function/index'
 	import { useUltraUI } from '../../libs/composable/useUltraUI'
 	const { parent, getParent } = useUltraUI({
 		padding: 0,
@@ -64,6 +64,12 @@
 	
 	const tdStyle = ref<UTSJSONObject>({})
 	const tdTextStyle = ref<UTSJSONObject>({})
+
+	const mergedTdStyle = computed((): UTSJSONObject => {
+		const custom = addStyle(props.customStyle) as UTSJSONObject
+		const td = tdStyle.value
+		return deepMerge(td, custom) as UTSJSONObject
+	})
 	
 	onMounted(() => {
 		getParent('up-table', instance)

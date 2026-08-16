@@ -1,5 +1,5 @@
 <template>
-	<view class="up-box" :style="[{height: height}, addStyle(customStyle)]">
+	<view class="up-box" :style="mergedBoxStyle">
         <view class="up-box__left" :style="{borderRadius: borderRadius, backgroundColor: bgColors[0]}">
             <slot name="left">
                 <view class="flex flex-row items-center justify-center">
@@ -33,7 +33,8 @@
 
 <script setup lang="uts">
     import type { PropType } from 'vue'
-	import { addStyle } from '../../libs/function/index.uts'
+    import { computed } from 'vue'
+	import { addStyle, deepMerge } from '../../libs/function/index.uts'
     import defProps from './box.uts'
 	
     // options
@@ -93,6 +94,14 @@
 			default: () => defProps.getString('box.rightBottomTitle')
 		}
 	});
+
+	const mergedBoxStyle = computed((): UTSJSONObject => {
+		const custom = addStyle(props.customStyle) as UTSJSONObject
+		const base = {
+			height: props.height
+		} as UTSJSONObject
+		return deepMerge(base, custom) as UTSJSONObject
+	})
 </script>
 
 <style lang="scss" scoped>

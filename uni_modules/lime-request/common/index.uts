@@ -164,7 +164,7 @@ export class Request {
 							// #ifndef UNI-APP-X
 							const data = config.data
 							// #endif 
-							task = uni.request<T>({
+							task = uni.request({
 								url: mergedUrl,
 								data,
 								header: config.header,
@@ -173,13 +173,13 @@ export class Request {
 								withCredentials: config.withCredentials,
 								firstIpv4: config.firstIpv4,
 								enableChunked: config.enableChunked,
-								success(result: RequestSuccess<T>) {
+								success(result: RequestSuccess<any>) {
 									const {
 										data,
 										statusCode,
 										header,
 										cookies,
-									} = result as RequestSuccess<T>
+									} = result as RequestSuccess<any>
 									
 									const tempFilePath = ''
 									const apFilePath = ''
@@ -189,7 +189,7 @@ export class Request {
 									if (typeof data == 'string') {
 										try {
 											if(isJSON(data as string)) {
-												 parsedData = JSON.parse<T>(data as string)
+												 parsedData = JSON.parse(data as string)
 											}
 										} catch (error) {
 											//TODO handle the exception

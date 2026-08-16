@@ -4,11 +4,7 @@
 		:zoom="zoom"
 		:show="show"
 		:class="[customClass]"
-		:customStyle="{
-			borderRadius: '6px', 
-			overflow: 'hidden',
-			marginTop: `-${addUnit(negativeTop)}`
-		}"
+		:customStyle="popupCustomStyle"
 		:closeOnClickOverlay="closeOnClickOverlay"
 		:safeAreaInsetBottom="false"
 		:duration="duration"
@@ -16,9 +12,7 @@
 	>
 		<view
 			class="up-modal"
-			:style="{
-				width: addUnit(width),
-			}"
+			:style="modalStyle"
 		>
 			<view
 				class="up-modal__title"
@@ -29,7 +23,7 @@
 				:style="contentStyleCpu"
 			>
 				<slot>
-					<text class="up-modal__content__text" :style="{textAlign: contentTextAlign}">
+					<text class="up-modal__content__text" :style="contentTextStyle">
 						{{ content }}
 					</text>
 				</slot>
@@ -44,9 +38,7 @@
 				<up-line></up-line>
 				<view
 					class="up-modal__button-group"
-					:style="{
-						flexDirection: buttonReverse ? 'row-reverse' : 'row'
-					}"
+					:style="buttonGroupStyle"
 				>
 					<view
 						class="up-modal__button-group__wrapper up-modal__button-group__wrapper--cancel"
@@ -58,9 +50,7 @@
 					>
 						<text
 							class="up-modal__button-group__wrapper__text"
-							:style="{
-								color: cancelColor
-							}"
+							:style="cancelTextStyle"
 						>{{ elCancelText }}</text>
 					</view>
 					<up-line
@@ -79,9 +69,7 @@
 						<text
 							v-else
 							class="up-modal__button-group__wrapper__text"
-							:style="{
-								color: confirmColor
-							}"
+							:style="confirmTextStyle"
 						>{{ elConfirmText }}</text>
 					</view>
 				</view>
@@ -95,7 +83,7 @@
 
 <script setup lang="uts">
 import { computed, ref, watch } from 'vue'
-import { addUnit } from '../../libs/function/index'
+import { addUnit } from '../../libs/function/index.uts'
 import { t } from '../../libs/i18n/index.uts'
 
 defineOptions({
@@ -197,7 +185,7 @@ const emit = defineEmits(['confirm', 'cancel', 'close', 'update:show', 'cancelOn
 
 const loading = ref<boolean>(false)
 
-watch(() => props.show, (n: boolean) => {
+watch((): boolean => props.show, (n: boolean) => {
   if (n && loading.value) {
     loading.value = false
   }
@@ -215,6 +203,44 @@ const elConfirmText = computed<string>(() => {
     return t('up_common_confirm', {} as UTSJSONObject)
   }
   return props.confirmText
+})
+
+const popupCustomStyle = computed((): UTSJSONObject => {
+  return {
+    borderRadius: '6px',
+    overflow: 'hidden',
+    marginTop: `-${addUnit(props.negativeTop)}`
+  } as UTSJSONObject
+})
+
+const modalStyle = computed((): UTSJSONObject => {
+  return {
+    width: addUnit(props.width)
+  } as UTSJSONObject
+})
+
+const buttonGroupStyle = computed((): UTSJSONObject => {
+  return {
+    flexDirection: props.buttonReverse ? 'row-reverse' : 'row'
+  } as UTSJSONObject
+})
+
+const cancelTextStyle = computed((): UTSJSONObject => {
+  return {
+    color: props.cancelColor
+  } as UTSJSONObject
+})
+
+const confirmTextStyle = computed((): UTSJSONObject => {
+  return {
+    color: props.confirmColor
+  } as UTSJSONObject
+})
+
+const contentTextStyle = computed((): UTSJSONObject => {
+  return {
+    textAlign: props.contentTextAlign
+  } as UTSJSONObject
 })
 
 const contentStyleCpu = computed<UTSJSONObject>(() => {

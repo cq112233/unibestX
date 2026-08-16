@@ -4,7 +4,7 @@
 		    class="up-number-box__slot cursor-pointer"
 		    @tap.stop="clickHandler('minus')"
 		    @touchstart="onTouchStart('minus')"
-		    @touchend.stop="clearTimeout"
+		    @touchend.stop="clearTimeoutHandler"
 		    v-if="showMinus && !hideMinus && $slots['minus'] != null"
 		>
 			<slot name="minus" />
@@ -14,11 +14,11 @@
 		    class="up-number-box__minus cursor-pointer"
 		    @tap.stop="clickHandler('minus')"
 		    @touchstart="onTouchStart('minus')"
-		    @touchend.stop="clearTimeout"
+		    @touchend.stop="clearTimeoutHandler"
 		    hover-class="up-number-box__minus--hover"
 		    hover-stay-time="150"
 		    :class="{'up-number-box__minus--disabled': isDisabled('minus') }"
-		    :style="[buttonStyle('minus')]"
+		    :style="buttonStyle('minus')"
 		>
 			<up-icon
 			    name="minus"
@@ -42,7 +42,7 @@
 					@focus="onFocus"
 					@input="onInput"
 					type="number"
-					:style="[inputStyle]"
+					:style="inputStyle"
 				/>
 				<!-- #endif -->
 				<!-- #ifndef MP-WEIXIN -->
@@ -56,7 +56,7 @@
 					@focus="onFocus"
 					@input="onInput"
 					type="number"
-					:style="[inputStyle]"
+					:style="inputStyle"
 				/>
 				<!-- #endif -->
 			</slot>
@@ -65,7 +65,7 @@
 		    class="up-number-box__slot cursor-pointer"
 		    @tap.stop="clickHandler('plus')"
 		    @touchstart="onTouchStart('plus')"
-		    @touchend.stop="clearTimeout"
+		    @touchend.stop="clearTimeoutHandler"
 		    v-if="showPlus && $slots['plus'] != null"
 		>
 			<slot name="plus" />
@@ -75,11 +75,11 @@
 		    class="up-number-box__plus cursor-pointer"
 		    @tap.stop="clickHandler('plus')"
 		    @touchstart="onTouchStart('plus')"
-		    @touchend.stop="clearTimeout"
+		    @touchend.stop="clearTimeoutHandler"
 		    hover-class="up-number-box__plus--hover"
 		    hover-stay-time="150"
 		    :class="{ 'up-number-box__minus--disabled': isDisabled('plus') }"
-		    :style="[buttonStyle('plus')]"
+		    :style="buttonStyle('plus')"
 		>
 			<up-icon
 			    name="plus"
@@ -94,7 +94,7 @@
 
 <script setup lang="uts">
 import { computed, ref, watch, onMounted, nextTick } from 'vue'
-import { getPx, addUnit } from '../../libs/function/index'
+import { getPx, addUnit } from '../../libs/function/index.uts'
 
 defineOptions({
   name: 'up-number-box'
@@ -384,13 +384,13 @@ function init() {
   currentValue.value = format(props.modelValue != null ? props.modelValue.toString() : '0')
 }
 
-watch(() => props.modelValue, (newV: string | number) => {
+watch((): any => props.modelValue, (newV: string | number) => {
   if (newV !== currentValue.value) {
     currentValue.value = format(newV.toString())
   }
 })
 
-watch(() => [props.integer, props.decimalLength, props.min, props.max], () => {
+watch((): Array<any | null> => [props.integer, props.decimalLength, props.min, props.max] as Array<any | null>, () => {
   check()
 })
 

@@ -1,22 +1,17 @@
 import { _ as __easycom_2 } from "../up-overlay/up-overlay.js";
+import { r as resolveEasycom } from "../../../../App.ku.js";
 import { _ as __easycom_0 } from "../up-line/up-line.js";
 import { _ as __easycom_1$1 } from "../up-transition/up-transition.js";
-import { j as guid, b as addStyle, a as addUnit, z as sys, s as sleep, t as toast, u as upGetRect } from "../../libs/function/index.js";
+import { j as guid, b as addStyle, a as addUnit, z as sys, s as sleep, u as upGetRect, t as toast } from "../../libs/function/index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, setSharedDataEvent: _setSharedDataEvent, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, toDisplayString: _toDisplayString, setSharedDataTemplateRef: _setSharedDataTemplateRef, createSharedDataSlot: _createSharedDataSlot, createSharedDataIf: _createSharedDataIf, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, createSharedDataFor: _createSharedDataFor, withSharedDataVaporCtx: _withSharedDataVaporCtx } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpTooltipUpTooltip";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref, computed, watch, onMounted, getCurrentInstance, nextTick } = globalThis.Vue;
 const screenGap = 12;
 const indicatorWidth = 14;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-tooltip"
   },
-  __dynamicSharedData: true,
-  __hash: "4613a563",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-tooltip/up-tooltip.uvue",
   __name: "up-tooltip",
   props: {
     text: {
@@ -97,8 +92,6 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   emits: ["click", "open", "close"],
   setup(__props, _a) {
     var __expose = _a.expose, __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpTooltipUpTooltipSharedData", sharedDataClassId: 0 })));
     const props = __props;
     const emit = __emit;
     const instance = getCurrentInstance();
@@ -409,134 +402,150 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         emit("close");
       }
     });
-    return () => {
-      "raw js";
-      const _setTemplateRef = _createSharedDataTemplateRefSetter();
-      const _component_up_overlay = __easycom_2;
-      const _component_up_line = __easycom_0;
-      const _component_up_transition = __easycom_1$1;
-      _renderSharedDataEffect(() => {
-        return _setSharedDataStyle(__sharedData, 23, [rootStyle.value]);
-      });
-      const n0 = _createSharedDataComponentWithFallback(_component_up_overlay, "5f52d03a", {
-        show: () => {
-          return overlayShow.value;
-        },
-        opacity: 0,
-        onClick: () => {
-          return overlayClickHandler;
-        }
-      });
-      _setSharedData(__sharedData, 0, n0?.sharedData);
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 1, _toSharedDataBoolean(hasText.value));
-      }, () => {
-        _setSharedDataEvent(__sharedData, 2, longpressHandler);
-        _setSharedDataEvent(__sharedData, 3, clickHandler);
-        _renderSharedDataEffect(() => {
-          const _textId = textId.value;
-          _setSharedDataAttr(__sharedData, 4, _toSharedDataString(_textId));
-          _setSharedDataStyle(__sharedData, 5, [textStyle.value]);
-          _setSharedData(__sharedData, 6, _toDisplayString(displayText.value));
-          _setSharedDataTemplateRef(__sharedData, 7, (n3) => {
-            _setTemplateRef(n3, textId, null, "textId");
-          });
-        });
-      }, () => {
-        _renderSharedDataEffect(() => {
-          return _setSharedDataAttr(__sharedData, 10, _toSharedDataString(textId.value));
-        });
-        _createSharedDataSlot("trigger", null, null, () => {
-          _createSharedDataSlot("default", null, null);
-        });
-        _setSharedDataEvent(__sharedData, 8, longpressHandler);
-        _setSharedDataEvent(__sharedData, 9, clickHandler);
-        _renderSharedDataEffect(() => {
-          return _setSharedDataTemplateRef(__sharedData, 11, (n8) => {
-            _setTemplateRef(n8, textId, null, "textId");
-          });
-        });
-      }, 261);
-      const n30 = _createSharedDataComponentWithFallback(_component_up_transition, "3a7c6892", {
-        mode: "fade",
-        show: () => {
-          return displayShow.value;
-        },
-        duration: "300",
-        customStyle: () => {
-          return transitionStyle.value;
-        }
-      }, {
-        "default": _withSharedDataVaporCtx(() => {
-          _renderSharedDataEffect(() => {
-            return _setSharedDataAttr(__sharedData, 21, _toSharedDataString(tooltipId.value));
-          });
-          _createSharedDataIf(() => {
-            return _setSharedData(__sharedData, 13, _toSharedDataBoolean(showIndicator.value));
-          }, () => {
-            _renderSharedDataEffect(() => {
-              return _setSharedDataStyle(__sharedData, 14, [indicatorMergedStyle.value]);
-            });
-          });
-          _createSharedDataSlot("content", null, null, () => {
-            _renderSharedDataEffect(() => {
-              return _setSharedDataStyle(__sharedData, 20, [popupListStyle.value]);
-            });
-            _createSharedDataIf(() => {
-              return _setSharedData(__sharedData, 15, _toSharedDataBoolean(showCopyButton.value));
-            }, () => {
-              _setSharedDataEvent(__sharedData, 16, setClipboardData);
-            });
-            _createSharedDataIf(() => {
-              return _setSharedData(__sharedData, 17, _toSharedDataBoolean(showCopyLine.value));
-            }, () => {
-              const n20 = _createSharedDataComponentWithFallback(_component_up_line, "150e58a2", {
-                direction: "column",
-                color: "#8d8e90",
-                length: "18"
-              });
-              _setSharedData(__sharedData, 18, n20?.sharedData);
-            });
-            _createSharedDataFor(_setSharedDataScoped(__sharedData, 19, _createSharedDataVFor(__sharedDataScope, () => {
-              return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-            })), () => {
-              return buttonItems.value;
-            }, (__sharedData_VFor0, _for_item0, _for_key0) => {
-              _setSharedDataEvent(__sharedData_VFor0, 3, () => {
-                return btnClickHandler(_for_key0.value);
-              });
-              _renderSharedDataEffect(() => {
-                return _setSharedData(__sharedData_VFor0, 4, _toDisplayString(_for_item0.value));
-              });
-              _createSharedDataIf(() => {
-                return _setSharedData(__sharedData_VFor0, 1, _toSharedDataBoolean(_for_key0.value < buttonCount.value - 1));
-              }, () => {
-                const n27 = _createSharedDataComponentWithFallback(_component_up_line, "150eba5d-" + _for_key0.value, {
-                  direction: "column",
-                  color: "#8d8e90",
-                  length: "18"
-                });
-                _setSharedData(__sharedData_VFor0, 2, n27?.sharedData);
-              }, null, 10);
-              return null;
-            }, (__sharedData_VFor0, item, index) => {
-              return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
-            });
-          });
-          _renderSharedDataEffect(() => {
-            return _setSharedDataTemplateRef(__sharedData, 22, (n29) => {
-              _setTemplateRef(n29, tooltipId, null, "tooltipId");
-            });
-          });
-        })
-      });
-      _setSharedData(__sharedData, 12, n30?.sharedData);
-      return __sharedData;
-    };
+    const __returned__ = { props, emit, instance, createRectInfo, normalizeBool, normalizeNumber, getObjNumber, innerShow, lastLongpressTime, lastClickTime, openTime, textId, tooltipId, tooltipInfo, textInfo, screenGap, indicatorWidth, displayText, hasText, currentDirection, displayShow, rootStyle, buttonItems, buttonCount, overlayShow, showIndicator, showCopyLine, showCopyButton, textStyle, popupListStyle, indicatorStyle, tooltipStyle, transitionStyle, indicatorMergedStyle, queryRect, getElRect, triggerPopup, longpressHandler, clickHandler, overlayClickHandler, btnClickHandler, getCopyData, setClipboardData };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tooltip": { "": { "position": "relative", "display": "flex", "flexDirection": "row" } }, "up-tooltip__wrapper": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "whiteSpace": "nowrap" } }, "up-tooltip__wrapper__text": { "": { "fontSize": 14 } }, "up-tooltip__wrapper__trigger": { "": { "display": "flex", "flexDirection": "row" } }, "up-tooltip__wrapper__popup": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "center" } }, "up-tooltip__wrapper__popup__list": { "": { "backgroundColor": "#060607", "position": "relative", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "borderTopLeftRadius": 5, "borderTopRightRadius": 5, "borderBottomRightRadius": 5, "borderBottomLeftRadius": 5, "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0, "display": "flex", "flexDirection": "row", "alignItems": "center", "overflow": "hidden" } }, "up-tooltip__wrapper__popup__list__btn": { "": { "paddingTop": 11, "paddingRight": 13, "paddingBottom": 11, "paddingLeft": 13 } }, "up-tooltip__wrapper__popup__list__btn--hover": { "": { "backgroundColor": "#58595B" } }, "up-tooltip__wrapper__popup__list__btn__text": { "": { "lineHeight": "12px", "fontSize": 13, "color": "#FFFFFF" } }, "up-tooltip__wrapper__popup__indicator": { "": { "position": "absolute", "backgroundColor": "#060607", "width": 14, "height": 14, "bottom": -4, "transform": "rotate(45deg)", "borderTopLeftRadius": 2, "borderTopRightRadius": 2, "borderBottomRightRadius": 2, "borderBottomLeftRadius": 2, "zIndex": -1 } }, "up-tooltip__wrapper__popup__indicator--hover": { "": { "backgroundColor": "#58595B" } } };
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { resolveComponent: _resolveComponent, createVNode: _createVNode, toDisplayString: _toDisplayString, withModifiers: _withModifiers, normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, renderSlot: _renderSlot, createElementVNode: _createElementVNode, createBlock: _createBlock, renderList: _renderList, Fragment: _Fragment, withCtx: _withCtx } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_overlay = resolveEasycom(__resolveDynamicComponent("up-overlay"), __easycom_2);
+  const _component_up_line = resolveEasycom(__resolveDynamicComponent("up-line"), __easycom_0);
+  const _component_up_transition = resolveEasycom(__resolveDynamicComponent("up-transition"), __easycom_1$1);
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      class: "up-tooltip",
+      style: _normalizeStyle([$setup.rootStyle])
+    },
+    [
+      _createVNode(_component_up_overlay, {
+        show: $setup.overlayShow,
+        opacity: 0,
+        onClick: $setup.overlayClickHandler
+      }, null, 8, ["show"]),
+      _createElementVNode("view", { class: "up-tooltip__wrapper" }, [
+        $setup.hasText ? (_openBlock(), _createElementBlock("text", {
+          key: 0,
+          class: "up-tooltip__wrapper__text",
+          id: $setup.textId,
+          ref: $setup.textId,
+          selectable: false,
+          onLongpress: _withModifiers($setup.longpressHandler, ["stop"]),
+          onClick: _withModifiers($setup.clickHandler, ["stop"]),
+          style: _normalizeStyle([$setup.textStyle])
+        }, _toDisplayString($setup.displayText), 45, ["id"])) : (_openBlock(), _createElementBlock("view", {
+          key: 1,
+          class: "up-tooltip__wrapper__trigger",
+          id: $setup.textId,
+          ref: $setup.textId,
+          onLongpress: _withModifiers($setup.longpressHandler, ["stop"]),
+          onClick: _withModifiers($setup.clickHandler, ["stop"])
+        }, [
+          _renderSlot(_ctx.$slots, "trigger", {}, () => [
+            _renderSlot(_ctx.$slots, "default")
+          ])
+        ], 40, ["id"])),
+        _createVNode(_component_up_transition, {
+          mode: "fade",
+          show: $setup.displayShow,
+          duration: "300",
+          customStyle: $setup.transitionStyle
+        }, {
+          default: _withCtx(() => [
+            _createElementVNode("view", {
+              class: "up-tooltip__wrapper__popup",
+              id: $setup.tooltipId,
+              ref: $setup.tooltipId
+            }, [
+              $setup.showIndicator ? (_openBlock(), _createElementBlock(
+                "view",
+                {
+                  key: 0,
+                  class: "up-tooltip__wrapper__popup__indicator",
+                  "hover-class": "up-tooltip__wrapper__popup__indicator--hover",
+                  style: _normalizeStyle([$setup.indicatorMergedStyle])
+                },
+                null,
+                4
+                /* STYLE */
+              )) : _createCommentVNode("v-if", true),
+              _renderSlot(_ctx.$slots, "content", {}, () => [
+                _createElementVNode(
+                  "view",
+                  {
+                    class: "up-tooltip__wrapper__popup__list",
+                    style: _normalizeStyle([$setup.popupListStyle])
+                  },
+                  [
+                    $setup.showCopyButton ? (_openBlock(), _createElementBlock("view", {
+                      key: 0,
+                      class: "up-tooltip__wrapper__popup__list__btn",
+                      "hover-class": "up-tooltip__wrapper__popup__list__btn--hover",
+                      onClick: $setup.setClipboardData
+                    }, [
+                      _createElementVNode("text", { class: "up-tooltip__wrapper__popup__list__btn__text" }, "复制")
+                    ])) : _createCommentVNode("v-if", true),
+                    $setup.showCopyLine ? (_openBlock(), _createBlock(_component_up_line, {
+                      key: 1,
+                      direction: "column",
+                      color: "#8d8e90",
+                      length: "18"
+                    })) : _createCommentVNode("v-if", true),
+                    (_openBlock(true), _createElementBlock(
+                      _Fragment,
+                      null,
+                      _renderList($setup.buttonItems, (item, index) => {
+                        return _openBlock(), _createElementBlock(
+                          _Fragment,
+                          { key: index },
+                          [
+                            _createElementVNode("view", {
+                              class: "up-tooltip__wrapper__popup__list__btn",
+                              "hover-class": "up-tooltip__wrapper__popup__list__btn--hover",
+                              onClick: ($event) => $setup.btnClickHandler(index)
+                            }, [
+                              _createElementVNode(
+                                "text",
+                                { class: "up-tooltip__wrapper__popup__list__btn__text" },
+                                _toDisplayString(item),
+                                1
+                                /* TEXT */
+                              )
+                            ], 8, ["onClick"]),
+                            index < $setup.buttonCount - 1 ? (_openBlock(), _createBlock(_component_up_line, {
+                              key: 0,
+                              direction: "column",
+                              color: "#8d8e90",
+                              length: "18"
+                            })) : _createCommentVNode("v-if", true)
+                          ],
+                          64
+                          /* STABLE_FRAGMENT */
+                        );
+                      }),
+                      128
+                      /* KEYED_FRAGMENT */
+                    ))
+                  ],
+                  4
+                  /* STYLE */
+                )
+              ])
+            ], 8, ["id"])
+          ]),
+          _: 3
+          /* FORWARDED */
+        }, 8, ["show", "customStyle"])
+      ])
+    ],
+    4
+    /* STYLE */
+  );
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-tooltip/up-tooltip.uvue"]]);
 export {
   __easycom_1 as _
 };

@@ -10,10 +10,7 @@
 			    class="up-skeleton__wrapper__avatar"
 			    v-if="avatar"
 			    :class="[`up-skeleton__wrapper__avatar--${avatarShape}`, animate ? 'animate' : '']"
-			    :style="{
-						height: addUnit(avatarSize),
-						width: addUnit(avatarSize)
-					}"
+			    :style="avatarStyle"
 			></view>
 			<view
 			    class="up-skeleton__wrapper__content"
@@ -23,10 +20,7 @@
 				<view
 				    class="up-skeleton__wrapper__content__title"
 				    v-if="title"
-				    :style="{
-							width: uTitleWidth,
-							height: addUnit(titleHeight),
-						}"
+				    :style="titleStyle"
 				    :class="[animate ? 'animate' : '']"
 				></view>
 				<view
@@ -34,11 +28,7 @@
 				    :class="[animate ? 'animate' : '']"
 				    v-for="(item, index) in rowsArray"
 				    :key="index"
-				    :style="{
-							 width: item['width'],
-							 height: item['height'],
-							 marginTop: item['marginTop']
-						}"
+				    :style="getRowStyle(item)"
 				>
 		
 				</view>
@@ -50,7 +40,7 @@
 
 <script setup lang="uts">
 import { computed, onMounted } from 'vue'
-import { addUnit, sleep } from '../../libs/function/index'
+import { addUnit, sleep } from '../../libs/function/index.uts'
 
 defineOptions({
   name: 'up-skeleton'
@@ -154,6 +144,28 @@ const uTitleWidth = computed<string>(() => {
   tWidth = addUnit(props.titleWidth)
   return addUnit(tWidth)
 })
+
+const avatarStyle = computed((): UTSJSONObject => {
+  return {
+    height: addUnit(props.avatarSize),
+    width: addUnit(props.avatarSize)
+  } as UTSJSONObject
+})
+
+const titleStyle = computed((): UTSJSONObject => {
+  return {
+    width: uTitleWidth.value,
+    height: addUnit(props.titleHeight)
+  } as UTSJSONObject
+})
+
+function getRowStyle(item: UTSJSONObject): UTSJSONObject {
+  return {
+    width: item['width'],
+    height: item['height'],
+    marginTop: item['marginTop']
+  } as UTSJSONObject
+}
 
 async function getComponentWidth() {
   await sleep(20)

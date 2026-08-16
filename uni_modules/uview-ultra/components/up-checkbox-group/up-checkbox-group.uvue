@@ -2,7 +2,7 @@
 	<view
 	    class="up-checkbox-group"
 	    :class="bemClass"
-	    :style="addStyle(customStyle)"
+	    :style="customStyleComputed"
 	>
 		<slot></slot>
 	</view>
@@ -90,6 +90,10 @@ const bemClass = computed(() => {
 	return bem('checkbox-group', [props.placement], [])
 })
 
+const customStyleComputed = computed((): UTSJSONObject => {
+	return addStyle(props.customStyle) as UTSJSONObject
+})
+
 function onCheckboxToggle(name: any) {
 	const currentList = [...props.modelValue]
 	const idx = currentList.findIndex((item: any): boolean => item.toString() == name.toString())
@@ -100,29 +104,54 @@ function onCheckboxToggle(name: any) {
 	}
 	emit('update:modelValue', currentList)
 	emit('change', currentList)
-	formValidate(instance?.proxy, 'change')
+	if (instance?.proxy != null) {
+		formValidate(instance!.proxy!, 'change')
+	}
 }
 
-provide('upCheckboxGroup', {
-	props,
-	onCheckboxToggle
+const parentState = computed((): UTSJSONObject => {
+	return {
+		name: props.name,
+		modelValue: props.modelValue,
+		shape: props.shape,
+		disabled: props.disabled,
+		activeColor: props.activeColor,
+		inactiveColor: props.inactiveColor,
+		size: props.size,
+		placement: props.placement,
+		labelSize: props.labelSize,
+		labelColor: props.labelColor,
+		labelDisabled: props.labelDisabled,
+		iconColor: props.iconColor,
+		iconSize: props.iconSize,
+		iconPlacement: props.iconPlacement,
+		borderBottom: props.borderBottom,
+	} as UTSJSONObject
 })
+
+provide('upCheckboxGroupProps', parentState)
+provide('upCheckboxGroupToggle', onCheckboxToggle)
 </script>
 
 <style lang="scss" scoped>
 	@import "../../libs/css/components.scss";
 
 	.up-checkbox-group {
-		flex: 1;
+		display: flex;
+		width: 100%;
 
 		&--row {
 			display: flex;
 			flex-direction: row;
 			flex-wrap: wrap;
+			align-items: center;
+			width: 100%;
 		}
 
 		&--column {
-			@include flex(column);
+			display: flex;
+			flex-direction: column;
+			width: 100%;
 		}
 	}
 </style>

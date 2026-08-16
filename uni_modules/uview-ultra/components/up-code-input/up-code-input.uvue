@@ -2,7 +2,7 @@
 	<view class="up-code-input">
 		<view
 			class="up-code-input__item"
-			:style="[itemStyle(index)]"
+			:style="itemStyle(index)"
 			v-for="(item, index) in codeLength"
 			:key="index"
 		>
@@ -12,19 +12,15 @@
 			></view>
 			<text
 				v-else
-				:style="{
-					fontSize: addUnit(fontSize),
-					fontWeight: bold ? 'bold' : 'normal',
-					color: color
-				}"
+				:style="codeTextStyle"
 			>{{getCodeValue(index)}}</text>
 			<view
 				class="up-code-input__item__line"
 				v-if="mode == 'line'"
-				:style="[lineStyle]"
+				:style="lineStyle"
 			></view>
-			<view v-if="isFocus && inputLength === index"
-				:style="{backgroundColor: color, opacity: cursorOpacity}" class="up-code-input__item__cursor"></view>
+			<view v-if="isFocus && inputLength == index"
+				:style="cursorStyle" class="up-code-input__item__cursor"></view>
 		</view>
 		<input
 			:disabled="disabledKeyboard"
@@ -35,9 +31,7 @@
 			:adjustPosition="adjustPosition"
 			class="up-code-input__input"
 			@input="inputHandler"
-			:style="{
-				height: addUnit(size)
-			}"
+			:style="inputStyle"
 			@focus="isFocus = true"
 			@blur="isFocus = false"
 		/>
@@ -166,9 +160,30 @@
 		return Math.min(length, codeLength.value.length)
 	})
 	
+	const codeTextStyle = computed((): UTSJSONObject => {
+		return {
+			fontSize: addUnit(props.fontSize),
+			fontWeight: props.bold ? 'bold' : 'normal',
+			color: props.color
+		} as UTSJSONObject
+	})
+
+	const cursorStyle = computed((): UTSJSONObject => {
+		return {
+			backgroundColor: props.color,
+			opacity: cursorOpacity.value
+		} as UTSJSONObject
+	})
+
+	const inputStyle = computed((): UTSJSONObject => {
+		return {
+			height: addUnit(props.size)
+		} as UTSJSONObject
+	})
+	
 	// 下划线模式下，横线的样式
-	const lineStyle = computed(() => {
-		const style = {}
+	const lineStyle = computed((): UTSJSONObject => {
+		const style = {} as UTSJSONObject
 		style['height'] = props.hairline ? '2px' : '4px'
 		style['width'] = addUnit(props.size)
 		// 线条模式下，背景色即为边框颜色
@@ -219,11 +234,11 @@
 	}
 	
 	// 根据索引获取对应项的样式
-	const itemStyle = (index: number): any => {
+	const itemStyle = (index: number): UTSJSONObject => {
 		const style = {
 			width: addUnit(props.size),
 			height: addUnit(props.size)
-		}
+		} as UTSJSONObject
 		// 盒子模式下，需要额外进行处理
 		if (props.mode == 'box') {
 			// 设置盒子的边框，如果是细边框，则设置为0.5px宽度

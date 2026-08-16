@@ -3,7 +3,7 @@
         class="up-subsection"
         ref="upSubsectionRef"
         :class="[`up-subsection--${mode}`]"
-        :style="[addStyle(customStyle), wrapperStyle]"
+        :style="computedRootStyle"
     >
         <view
             class="up-subsection__bar cursor-pointer"
@@ -12,11 +12,11 @@
             <view
                 class="up-subsection__bar__inner"
                 :class="{
-					'up-subsection--button__bar': mode === 'button',
-					'up-subsection__bar__inner--button': mode === 'button',
-					'up-subsection__bar--first': (innerCurrent == 0 && mode === 'subsection'),
-					'up-subsection__bar--center': (innerCurrent > 0 && innerCurrent < list.length - 1 && mode === 'subsection'),
-					'up-subsection__bar--last': (innerCurrent == list.length - 1 && mode === 'subsection')
+					'up-subsection--button__bar': mode == 'button',
+					'up-subsection__bar__inner--button': mode == 'button',
+					'up-subsection__bar--first': (innerCurrent == 0 && mode == 'subsection'),
+					'up-subsection__bar--center': (innerCurrent > 0 && innerCurrent < list.length - 1 && mode == 'subsection'),
+					'up-subsection__bar--last': (innerCurrent == list.length - 1 && mode == 'subsection')
 				}"
                 :style="innerBarStyle"
             ></view>
@@ -31,7 +31,7 @@
 	                index == list.length - 1 ? 'up-subsection__item--last' : '',
 					disabled ? 'up-subsection__item--disabled' : ''
 	            ]"
-            :style="[itemStyle(index)]"
+            :style="itemStyle(index)"
             @tap="clickHandler(index)"
             v-for="(item, index) in list"
             :key="index"
@@ -41,9 +41,9 @@
 					    class="up-subsection__item__text"
 						:class="[
 							disabled ? 'up-subsection__item__text--disabled' : '',
-							(innerCurrent == index && mode === 'button' && activeColor == '#3c9cff') ? 'up-subsection__item__text--active' : ''
+							(innerCurrent == index && mode == 'button' && activeColor == '#3c9cff') ? 'up-subsection__item__text--active' : ''
 						]"
-					    :style="[textStyle(index)]"
+					    :style="textStyle(index)"
 					    >{{ getText(item) }}</text
 					>
 				</slot>
@@ -53,7 +53,7 @@
 
 <script setup lang="uts">
 import { computed, ref, watch, onMounted, nextTick, getCurrentInstance } from 'vue'
-import { addStyle, addUnit, sleep } from '../../libs/function/index'
+import { addStyle, addUnit, sleep, deepMerge } from '../../libs/function/index.uts'
 
 defineOptions({
   name: 'up-subsection'
@@ -121,23 +121,29 @@ const innerCurrent = ref<number>(parseInt(props.current.toString()))
 const componentWidth = ref<number>(0)
 const firstTime = ref<boolean>(true)
 
-watch(() => props.current, (n: any) => {
+watch((): any => props.current, (n: any) => {
   const nn = parseInt(n.toString())
-  if (nn !== innerCurrent.value) {
+  if (nn != innerCurrent.value) {
     innerCurrent.value = nn
   }
 })
 
-watch(() => props.list, () => {
+watch((): Array<any> => props.list, () => {
   init()
 })
 
 const wrapperStyle = computed<UTSJSONObject>(() => {
   const style = {} as UTSJSONObject
-  if (props.mode === 'button') {
+  if (props.mode == 'button') {
     style['backgroundColor'] = props.bgColor
   }
   return style
+})
+
+const computedRootStyle = computed((): UTSJSONObject => {
+  const custom = addStyle(props.customStyle) as UTSJSONObject
+  const wrapper = wrapperStyle.value
+  return deepMerge(wrapper, custom) as UTSJSONObject
 })
 
 const barStyle = computed<UTSJSONObject>(() => {

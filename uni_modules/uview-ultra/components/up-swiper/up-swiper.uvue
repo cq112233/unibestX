@@ -1,11 +1,7 @@
 <template>
 	<view
 		class="up-swiper"
-		:style="{
-			backgroundColor: bgColor,
-			height: addUnit(height),
-			borderRadius: addUnit(radius)
-		}"
+		:style="swiperContainerStyle"
 	>
 		<view
 			class="up-swiper__loading"
@@ -16,10 +12,7 @@
 		<swiper
 			v-else
 			class="up-swiper__wrapper"
-			:style="{
-				width: '100%',
-				height: addUnit(height)
-			}"
+			:style="swiperWrapperStyle"
 			@change="change"
 			:circular="circular"
 			:interval="interval"
@@ -36,36 +29,30 @@
 				<slot :item="item" :index="index">
 					<view
 						class="up-swiper__wrapper__item__wrapper"
-						:style="[itemStyle(index)]"
+						:style="itemStyle(index)"
 					>
 						<!-- 在nvue中，image图片的宽度默认为屏幕宽度，需要通过flex:1撑开，另外必须设置高度才能显示图片 -->
 						<image
 							class="up-swiper__wrapper__item__wrapper__image"
-							v-if="getItemType(item) === 'image'"
+							v-if="getItemType(item) == 'image'"
 							:src="getSource(item)"
 							:mode="imgMode"
 							@tap="clickHandler(index)"
-							:style="{
-								width: '100%',
-								height: addUnit(height),
-								borderRadius: addUnit(radius)
-							}"
+							:style="swiperImageStyle"
 						></image>
 						<video
 							class="up-swiper__wrapper__item__wrapper__video"
-							v-if="getItemType(item) === 'video'"
+							v-if="getItemType(item) == 'video'"
 							:id="`video-${index}`"
 							:enable-progress-gesture="false"
 							:src="getSource(item)"
 							:poster="getPoster(item)"
-							:title="showTitle && testObject(item) && getItemTitle(item) != '' ? getItemTitle(item) : ''"
-							:style="{
-								height: addUnit(height)
-							}"
+							:title="getVideoTitle(item)"
+							:style="swiperVideoStyle"
 							controls
 							@tap="clickHandler(index)"
 						></video>
-						<view v-if="showTitle && getItemTitle(item) != '' && testImage(getSource(item))"
+						<view v-if="isImageTitleVisible(item)"
 							class="up-swiper__wrapper__item__wrapper__title">
 							<text class="up-line-1 up-swiper__wrapper__item__wrapper__title-text">{{ getItemTitle(item) }}</text>
 						</view>
@@ -73,7 +60,7 @@
 				</slot>
 			</swiper-item>
 		</swiper>
-		<view class="up-swiper__indicator" :style="[addStyle(indicatorStyle)]">
+		<view class="up-swiper__indicator" :style="customIndicatorStyle">
 			<slot name="indicator">
 				<up-swiper-indicator
 					v-if="!loading && indicator && !showTitle"
@@ -203,39 +190,44 @@ const props = defineProps({
 
 const emit = defineEmits(['click', 'change', 'update:current'])
 
-const currentIndex = ref<number>(0)
+const currentIndex = ref<number>(parseInt(props.current.toString()))
 
-watch(() => props.current, (val: any, preVal: any) => {
-  if (val == preVal) return
-  currentIndex.value = parseInt(val.toString())
+const swiperContainerStyle = computed((): UTSJSONObject => {
+  return {
+    backgroundColor: props.bgColor,
+    height: addUnit(props.height),
+    borderRadius: addUnit(props.radius)
+  } as UTSJSONObject
 })
 
-function itemStyle(index: number): any {
-  const style = {}
-  if (props.nextMargin.toString() != '' && props.previousMargin.toString() != '') {
-    style['borderRadius'] = addUnit(props.radius)
-    if (index !== currentIndex.value) {
-      style['transform'] = 'scale(0.92)'
-    }
-  }
-  return style
-}
+const swiperWrapperStyle = computed((): UTSJSONObject => {
+  return {
+    width: '100%',
+    height: addUnit(props.height)
+  } as UTSJSONObject
+})
 
-function getItemType(item: any | null): string {
-  if (item == null) return ''
-  if (typeof item === 'string') return testVideo(getSource(item)) ? 'video' : 'image'
-  if (typeof item === 'object' && props.keyName != '') {
-    const obj = item as UTSJSONObject
-    if (obj['type'] == null) return testVideo(getSource(item)) ? 'video' : 'image'
-    if (obj['type'] === 'image') return 'image'
-    if (obj['type'] === 'video') return 'video'
-    return 'image'
-  }
-  return 'image'
-}
+const swiperImageStyle = computed((): UTSJSONObject => {
+  return {
+    width: '100%',
+    height: addUnit(props.height),
+    borderRadius: addUnit(props.radius)
+  } as UTSJSONObject
+})
+
+const swiperVideoStyle = computed((): UTSJSONObject => {
+  return {
+    height: addUnit(props.height)
+  } as UTSJSONObject
+})
+
+const customIndicatorStyle = computed((): UTSJSONObject => {
+  return addStyle(props.indicatorStyle) as UTSJSONObject
+})
 
 function getSource(item: any | null): string {
   let src = ''
+  if (item == null) return ''
   if (typeof item === 'string') {
     src = item as string
   } else if (typeof item === 'object' && props.keyName != '') {
@@ -249,22 +241,60 @@ function getSource(item: any | null): string {
 }
 
 function getItemTitle(item: any | null): string {
+  if (item == null) return ''
   if (typeof item === 'string') return item as string
   if (typeof item === 'object') {
     const obj = item as UTSJSONObject
     return obj['title']?.toString() ?? ''
-  } else {
-    error('请按格式传递列表参数')
   }
   return ''
 }
 
+function getPoster(item: any | null): string {
+  if (item == null) return ''
+  if (typeof item === 'object') {
+    const obj = item as UTSJSONObject
+    return obj['poster']?.toString() ?? ''
+  }
+  return ''
+}
+
+function getVideoTitle(item: any | null): string {
+  if (!props.showTitle || item == null) return ''
+  if (typeof item === 'object') {
+    return getItemTitle(item)
+  }
+  return ''
+}
+
+function isImageTitleVisible(item: any | null): boolean {
+  if (!props.showTitle || item == null) return false
+  const title = getItemTitle(item)
+  if (title == '') return false
+  return testImage(getSource(item))
+}
+
+function getItemType(item: any | null): string {
+  if (item == null) return ''
+  if (typeof item === 'string') return testVideo(getSource(item)) ? 'video' : 'image'
+  if (typeof item === 'object' && props.keyName != '') {
+    const obj = item as UTSJSONObject
+    if (obj['type'] == null) return testVideo(getSource(item)) ? 'video' : 'image'
+    if (obj['type'] == 'image') return 'image'
+    if (obj['type'] == 'video') return 'video'
+    return 'image'
+  }
+  return 'image'
+}
+
 function pauseVideo(index: number) {
-  const lastItem = getSource(props.list[index])
-  if (testVideo(lastItem)) {
-    // @ts-ignore
-    const video = uni.createVideoContext(`video-${index}`)
-    video?.pause()
+  if (index >= 0 && index < props.list.length) {
+    const lastItem = getSource(props.list[index])
+    if (testVideo(lastItem)) {
+      // @ts-ignore
+      const video = uni.createVideoContext(`video-${index}`)
+      video?.pause()
+    }
   }
 }
 
@@ -276,17 +306,25 @@ function change(e: UniSwiperChangeEvent) {
   emit('change', e.detail)
 }
 
-function getPoster(item: any | null): string {
-  if (typeof item === 'object') {
-    const obj = item as UTSJSONObject
-    return obj['poster']?.toString() ?? ''
+function itemStyle(index: number): any {
+  const style = {}
+  if (props.nextMargin.toString() != '' && props.previousMargin.toString() != '') {
+    style['borderRadius'] = addUnit(props.radius)
+    if (index != currentIndex.value) {
+      style['transform'] = 'scale(0.92)'
+    }
   }
-  return ''
+  return style
 }
 
 function clickHandler(index: number) {
   emit('click', index)
 }
+
+watch((): any => props.current, (val: any, preVal: any) => {
+  if (val == preVal) return
+  currentIndex.value = parseInt(val.toString())
+})
 </script>
 
 <style lang="scss" scoped>

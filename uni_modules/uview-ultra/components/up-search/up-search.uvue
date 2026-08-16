@@ -1,21 +1,15 @@
 <template>
 	<view
 	    class="up-search"
-		:class="[iconPosition === 'right' ? 'up-search__reverse' : '']"
+		:class="[iconPosition == 'right' ? 'up-search__reverse' : '']"
 	    @tap="clickHandler"
-	    :style="[{
-			margin: margin,
-		}, addStyle(customStyle)]"
+	    :style="searchStyle"
 	>
 		<view
 		    class="up-search__content"
-		    :style="{
-				backgroundColor: bgColor,
-				borderRadius: shape == 'round' ? '100px' : '4px',
-				borderColor: borderColor,
-			}"
+		    :style="contentStyle"
 		>
-			<template v-if="$slots['label'] != null || label !== ''">
+			<template v-if="$slots['label'] != null || label != ''">
 				<slot name="label">
 					<text class="up-search__content__label">{{ label }}</text>
 				</slot>
@@ -45,13 +39,7 @@
 			    :placeholder-style="`color: ${placeholderColor}`"
 			    class="up-search__content__input"
 			    type="text"
-			    :style="[{
-					pointerEvents: disabled ? 'none' : 'auto',
-					textAlign: inputAlign,
-					color: color,
-					backgroundColor: bgColor,
-					height: addUnit(height)
-				}, inputStyle]"
+			    :style="inputMergedStyle"
 			/>
 			<view
 			    class="up-search__content__icon up-search__content__close"
@@ -68,7 +56,7 @@
             <slot name="inputRight"></slot>
 		</view>
 		<text
-		    :style="[actionStyle]"
+		    :style="actionCustomStyle"
 		    class="up-search__action"
 		    :class="[(showActionBtn || show) ? 'up-search__action--active' : '']"
 		    @tap.stop.prevent="custom"
@@ -78,7 +66,7 @@
 
 <script setup lang="uts">
 import { ref, computed, watch, onMounted, nextTick } from 'vue'
-import { addUnit, addStyle } from '../../libs/function/index'
+import { addUnit, addStyle, deepMerge } from '../../libs/function/index.uts'
 
 defineOptions({
 	name: "up-search"
@@ -205,8 +193,40 @@ const keyword = ref<string>(props.modelValue.toString())
 const show = ref<boolean>(false)
 const focused = ref<boolean>(false)
 
-watch(() => props.modelValue, (nVal: any) => {
+watch((): any => props.modelValue, (nVal: any) => {
 	keyword.value = nVal != null ? nVal.toString() : ''
+})
+
+const searchStyle = computed((): UTSJSONObject => {
+	const base = {
+		margin: props.margin
+	} as UTSJSONObject
+	const custom = addStyle(props.customStyle) as UTSJSONObject
+	return deepMerge(base, custom) as UTSJSONObject
+})
+
+const contentStyle = computed((): UTSJSONObject => {
+	return {
+		backgroundColor: props.bgColor,
+		borderRadius: props.shape == 'round' ? '100px' : '4px',
+		borderColor: props.borderColor
+	} as UTSJSONObject
+})
+
+const inputMergedStyle = computed((): UTSJSONObject => {
+	const base = {
+		pointerEvents: props.disabled ? 'none' : 'auto',
+		textAlign: props.inputAlign,
+		color: props.color,
+		backgroundColor: props.bgColor,
+		height: addUnit(props.height)
+	} as UTSJSONObject
+	const custom = (props.inputStyle ?? {}) as UTSJSONObject
+	return deepMerge(base, custom) as UTSJSONObject
+})
+
+const actionCustomStyle = computed((): UTSJSONObject => {
+	return (props.actionStyle ?? {}) as UTSJSONObject
 })
 
 const showActionBtn = computed<boolean>(() => {
@@ -218,9 +238,9 @@ const isShowClear = computed<boolean>(() => {
 		return false
 	}
 	if (props.onlyClearableOnFocused) {
-		return !!focused.value && keyword.value !== ''
+		return !!focused.value && keyword.value != ''
 	} else {
-		return keyword.value !== ''
+		return keyword.value != ''
 	}
 })
 

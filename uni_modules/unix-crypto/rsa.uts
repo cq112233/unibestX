@@ -801,6 +801,25 @@ function derSequence(items: Uint8Array[]): Uint8Array {
   return out
 }
 
+// #ifdef APP-ANDROID
+function rsaGenerateKeyPairAndroid(bits: number): string {
+  try {
+    const kpg = java.security.KeyPairGenerator.getInstance('RSA')
+    kpg.initialize(bits.toInt())
+    const kp = kpg.generateKeyPair()
+    const pubBytes = kp.getPublic().getEncoded()
+    const priBytes = kp.getPrivate().getEncoded()
+    const pubB64 = android.util.Base64.encodeToString(pubBytes, android.util.Base64.NO_WRAP)
+    const priB64 = android.util.Base64.encodeToString(priBytes, android.util.Base64.NO_WRAP)
+    return '{"publicKey":"' + pubB64 + '","privateKey":"' + priB64 + '"}'
+  }
+  catch (_e) {
+    return '{"publicKey":"","privateKey":""}'
+  }
+}
+// #endif
+
+// #ifndef APP-ANDROID
 function getRandomBigInt(bits: number): any {
   const bytes = Math.ceil(bits / 8)
   let hex = ''
@@ -808,18 +827,21 @@ function getRandomBigInt(bits: number): any {
     const b = Math.floor(Math.random() * 256)
     hex += (b < 16 ? '0' : '') + b.toString(16)
   }
-  let n = (globalThis as any).BigInt('0x' + hex)
-  const one = (globalThis as any).BigInt(1)
-  const shiftVal = (globalThis as any).BigInt(bits - 1)
+  const bigIntFunc = (typeof BigInt !== 'undefined' ? BigInt : null) as any
+  if (bigIntFunc == null) return null
+  let n = bigIntFunc('0x' + hex)
+  const one = bigIntFunc(1)
+  const shiftVal = bigIntFunc(bits - 1)
   n = n | (one << shiftVal)
   n = n | one
   return n
 }
 
 function bigIntModPow(base: any, exp: any, mod: any): any {
-  const zero = (globalThis as any).BigInt(0)
-  const one = (globalThis as any).BigInt(1)
-  const two = (globalThis as any).BigInt(2)
+  const bigIntFunc = (typeof BigInt !== 'undefined' ? BigInt : null) as any
+  const zero = bigIntFunc(0)
+  const one = bigIntFunc(1)
+  const two = bigIntFunc(2)
   let res = one
   base = base % mod
   while (exp > zero) {
@@ -833,11 +855,12 @@ function bigIntModPow(base: any, exp: any, mod: any): any {
 }
 
 function isProbablePrime(n: any, k: number = 5): boolean {
-  const zero = (globalThis as any).BigInt(0)
-  const one = (globalThis as any).BigInt(1)
-  const two = (globalThis as any).BigInt(2)
-  const three = (globalThis as any).BigInt(3)
-  const four = (globalThis as any).BigInt(4)
+  const bigIntFunc = (typeof BigInt !== 'undefined' ? BigInt : null) as any
+  const zero = bigIntFunc(0)
+  const one = bigIntFunc(1)
+  const two = bigIntFunc(2)
+  const three = bigIntFunc(3)
+  const four = bigIntFunc(4)
 
   if (n <= one || n == four) return false
   if (n <= three) return true
@@ -851,14 +874,14 @@ function isProbablePrime(n: any, k: number = 5): boolean {
 
   const smallPrimes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37]
   for (let i = 0; i < smallPrimes.length; i++) {
-    const p = (globalThis as any).BigInt(smallPrimes[i])
+    const p = bigIntFunc(smallPrimes[i])
     if (n % p == zero) {
       return n == p
     }
   }
 
   for (let i = 0; i < k; i++) {
-    const a = two + (globalThis as any).BigInt(Math.floor(Math.random() * 10000)) % (n - four)
+    const a = two + bigIntFunc(Math.floor(Math.random() * 10000)) % (n - four)
     let x = bigIntModPow(a, d, n)
     if (x == one || x == n - one) continue
     let composite = true
@@ -877,13 +900,14 @@ function isProbablePrime(n: any, k: number = 5): boolean {
 function getPrime(bits: number): any {
   while (true) {
     const p = getRandomBigInt(bits)
-    if (isProbablePrime(p)) return p
+    if (p != null && isProbablePrime(p)) return p
   }
 }
 
 function bigIntModInverse(a: any, m: any): any {
-  const zero = (globalThis as any).BigInt(0)
-  const one = (globalThis as any).BigInt(1)
+  const bigIntFunc = (typeof BigInt !== 'undefined' ? BigInt : null) as any
+  const zero = bigIntFunc(0)
+  const one = bigIntFunc(1)
   let m0 = m
   let y = zero
   let x = one
@@ -903,18 +927,17 @@ function bigIntModInverse(a: any, m: any): any {
   return x
 }
 
-/**
- * 纯 JS/BigInt 生成 RSA 密钥对（支持 H5 / 微信小程序 / 全端）
- * @param bits 密钥长度（建议 1024）
- * @returns JSON：{"publicKey":"SPKI-Base64","privateKey":"PKCS8-Base64"}
- */
-export function rsaGenerateKeyPairUts(bits: number): string {
+function rsaGenerateKeyPairJs(bits: number): string {
+  const bigIntFunc = (typeof BigInt !== 'undefined' ? BigInt : null) as any
+  if (bigIntFunc == null) {
+    return '{"publicKey":"","privateKey":""}'
+  }
   const primeBits = Math.floor(bits / 2)
   const p = getPrime(primeBits)
   const q = getPrime(primeBits)
   const n = p * q
-  const e = (globalThis as any).BigInt(65537)
-  const one = (globalThis as any).BigInt(1)
+  const e = bigIntFunc(65537)
+  const one = bigIntFunc(1)
   const phi = (p - one) * (q - one)
   const d = bigIntModInverse(e, phi)
   const dp = d % (p - one)
@@ -969,4 +992,20 @@ export function rsaGenerateKeyPairUts(bits: number): string {
   const priB64 = uni.arrayBufferToBase64(pkcs8Der.buffer as ArrayBuffer)
 
   return '{"publicKey":"' + pubB64 + '","privateKey":"' + priB64 + '"}'
+}
+// #endif
+
+/**
+ * 生成 RSA 密钥对（全端兼容）
+ * @param bits 密钥长度（建议 1024）
+ * @returns JSON：{"publicKey":"SPKI-Base64","privateKey":"PKCS8-Base64"}
+ */
+export function rsaGenerateKeyPairUts(bits: number): string {
+  // #ifdef APP-ANDROID
+  return rsaGenerateKeyPairAndroid(bits)
+  // #endif
+
+  // #ifndef APP-ANDROID
+  return rsaGenerateKeyPairJs(bits)
+  // #endif
 }

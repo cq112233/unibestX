@@ -1,11 +1,7 @@
 <template>
 	<text
 		class="up-count-num"
-		:style="{
-			fontSize: addUnit(fontSize),
-			fontWeight: bold ? 'bold' : 'normal',
-			color: color
-		}"
+		:style="countStyle"
 	>{{ displayValue }}</text>
 </template>
 
@@ -86,7 +82,15 @@ const props = defineProps({
 const emit = defineEmits(['end'])
 
 // 导入ref
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+
+const countStyle = computed((): UTSJSONObject => {
+	return {
+		fontSize: addUnit(props.fontSize),
+		fontWeight: props.bold ? 'bold' : 'normal',
+		color: props.color
+	} as UTSJSONObject
+})
 
 let localStartVal = ref<number>(0);
 let displayValue = ref<string>('');

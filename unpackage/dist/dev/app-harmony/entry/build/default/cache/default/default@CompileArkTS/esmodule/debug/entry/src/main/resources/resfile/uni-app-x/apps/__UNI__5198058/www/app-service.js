@@ -583,7 +583,7 @@ const UNI_CONSOLE_RUNTIME_PROMISE = "__uni_console_runtime_promise__";
 function initRuntimeSocketService() {
   const hosts = "127.0.0.1,192.168.31.235,198.18.0.1";
   const port = "8090";
-  const id = "app-harmony_u56xM3";
+  const id = "app-harmony_vh6G8I";
   const runtimeGlobal = getRuntimeGlobal();
   const existingPromise = runtimeGlobal === null || runtimeGlobal === void 0 ? void 0 : runtimeGlobal[UNI_CONSOLE_RUNTIME_PROMISE];
   if (existingPromise) {
@@ -683,6 +683,7 @@ function getMiniProgramGlobal() {
   }
 }
 initRuntimeSocketService();
+enableStyleIsolation();
 const __global__ = typeof globalThis === "undefined" ? Function("return this")() : globalThis;
 __global__.__uniX = true;
 const { createSSRApp } = globalThis.Vue;

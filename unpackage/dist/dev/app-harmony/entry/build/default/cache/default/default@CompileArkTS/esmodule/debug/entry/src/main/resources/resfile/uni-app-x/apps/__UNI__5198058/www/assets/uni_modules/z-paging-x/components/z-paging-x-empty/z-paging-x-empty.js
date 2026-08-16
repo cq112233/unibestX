@@ -1,17 +1,11 @@
 import { b as base64Error, a as base64Empty } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/z-paging-x/components/z-paging-x/static/index&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, createSharedDataIf: _createSharedDataIf, toDisplayString: _toDisplayString, setSharedDataEvent: _setSharedDataEvent, setSharedDataClass: _setSharedDataClass } = globalThis.Vue;
-const __className = "GenUniModulesZPagingXComponentsZPagingXEmptyZPagingXEmpty";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { computed } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "z-paging-x-empty"
   },
-  __dynamicSharedData: true,
-  __hash: "5ee097ee",
-  __className,
-  __filename: "uni_modules/z-paging-x/components/z-paging-x-empty/z-paging-x-empty.uvue",
   __name: "z-paging-x-empty",
   props: {
     // 空数据描述文字
@@ -58,9 +52,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   },
   emits: ["reload", "viewClick"],
   setup(__props, _a) {
-    var __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesZPagingXComponentsZPagingXEmptyZPagingXEmptySharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
     const props = __props;
     const emit = __emit;
     const localEmptyImg = computed(() => {
@@ -72,45 +65,64 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     const emptyClick = () => {
       emit("viewClick");
     };
-    return () => {
-      "raw js";
-      _renderSharedDataEffect(() => {
-        return _setSharedDataStyle(__sharedData, 11, [__props.emptyStyle]);
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.emptyImg.length > 0));
-      }, () => {
-        _renderSharedDataEffect(() => {
-          _setSharedDataStyle(__sharedData, 1, [__props.emptyImgStyle]);
-          _setSharedDataAttr(__sharedData, 2, _toSharedDataString(__props.emptyImg));
-        });
-      }, () => {
-        _renderSharedDataEffect(() => {
-          _setSharedDataStyle(__sharedData, 3, [__props.emptyImgStyle]);
-          _setSharedDataAttr(__sharedData, 4, _toSharedDataString(localEmptyImg.value));
-        });
-      }, 261);
-      _renderSharedDataEffect(() => {
-        _setSharedDataStyle(__sharedData, 12, [__props.emptyTitleStyle]);
-        _setSharedData(__sharedData, 13, _toDisplayString(__props.emptyText));
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 5, _toSharedDataBoolean(__props.showEmptyReload));
-      }, () => {
-        _setSharedDataEvent(__sharedData, 6, reloadClick);
-        _renderSharedDataEffect(() => {
-          _setSharedDataStyle(__sharedData, 7, [__props.emptyReloadStyle]);
-          _setSharedData(__sharedData, 8, _toDisplayString(__props.emptyReloadText));
-        });
-      });
-      _setSharedDataEvent(__sharedData, 9, emptyClick);
-      _setSharedDataClass(__sharedData, 10, { "zpx-container": true });
-      return __sharedData;
-    };
+    const __returned__ = { props, emit, localEmptyImg, reloadClick, emptyClick };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "zpx-container": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "alignItems": "center", "justifyContent": "center" } }, "zpx-main": { "": { "flexDirection": "column", "alignItems": "center", "paddingTop": "50rpx", "paddingRight": "0rpx", "paddingBottom": "50rpx", "paddingLeft": "0rpx" } }, "zpx-main-image": { "": { "width": "240rpx", "height": "240rpx" } }, "zpx-main-title": { "": { "fontSize": "28rpx", "color": "#aaaaaa", "textAlign": "center", "marginTop": "10rpx", "paddingTop": "0rpx", "paddingRight": "20rpx", "paddingBottom": "0rpx", "paddingLeft": "20rpx" } }, "zpx-main-error-btn": { "": { "fontSize": "28rpx", "paddingTop": "8rpx", "paddingRight": "24rpx", "paddingBottom": "8rpx", "paddingLeft": "24rpx", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#dddddd", "borderRightColor": "#dddddd", "borderBottomColor": "#dddddd", "borderLeftColor": "#dddddd", "borderTopLeftRadius": "6rpx", "borderTopRightRadius": "6rpx", "borderBottomRightRadius": "6rpx", "borderBottomLeftRadius": "6rpx", "color": "#aaaaaa", "marginTop": "50rpx" } } };
+const { normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, toDisplayString: _toDisplayString, createElementVNode: _createElementVNode, withModifiers: _withModifiers, normalizeClass: _normalizeClass } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      class: _normalizeClass({ "zpx-container": true }),
+      style: _normalizeStyle([$props.emptyStyle]),
+      onClick: $setup.emptyClick
+    },
+    [
+      _createElementVNode("view", { class: "zpx-main" }, [
+        $props.emptyImg.length > 0 ? (_openBlock(), _createElementBlock("image", {
+          key: 0,
+          class: "zpx-main-image",
+          style: _normalizeStyle([$props.emptyImgStyle]),
+          src: $props.emptyImg
+        }, null, 12, ["src"])) : (_openBlock(), _createElementBlock("image", {
+          key: 1,
+          class: "zpx-main-image",
+          mode: "aspectFit",
+          style: _normalizeStyle([$props.emptyImgStyle]),
+          src: $setup.localEmptyImg
+        }, null, 12, ["src"])),
+        _createElementVNode(
+          "text",
+          {
+            class: "zpx-main-title",
+            style: _normalizeStyle([$props.emptyTitleStyle])
+          },
+          _toDisplayString($props.emptyText),
+          5
+          /* TEXT, STYLE */
+        ),
+        $props.showEmptyReload ? (_openBlock(), _createElementBlock(
+          "text",
+          {
+            key: 2,
+            class: "zpx-main-error-btn",
+            style: _normalizeStyle([$props.emptyReloadStyle]),
+            onClick: _withModifiers($setup.reloadClick, ["stop"])
+          },
+          _toDisplayString($props.emptyReloadText),
+          5
+          /* TEXT, STYLE */
+        )) : _createCommentVNode("v-if", true)
+      ])
+    ],
+    4
+    /* STYLE */
+  );
+}
+const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/z-paging-x/components/z-paging-x-empty/z-paging-x-empty.uvue"]]);
 export {
   __easycom_0 as _
 };

@@ -1,11 +1,9 @@
 <template>
-	<view class="up-form-item" :class="{'up-form-item--error':(message != '' && parentData['errorType'] == 'message')}">
+	<view class="up-form-item" :class="{'up-form-item--error': isErrorMessage}">
 		<view
 			class="up-form-item__body"
 			@tap="clickHandler"
-			:style="[addStyle(customStyle), {
-                flexDirection: (labelPosition != '' ? labelPosition : parentData['labelPosition']) == 'left' ? 'row' : 'column'
-			}]"
+			:style="bodyStyle"
 		>
 			<!-- 微信小程序中，将一个参数设置空字符串，结果会变成字符串"true" -->
 			<slot name="label">
@@ -13,10 +11,7 @@
 				<view
 					class="up-form-item__body__left"
 					v-if="required || leftIcon != '' || label != ''"
-					:style="{
-						width: addUnit(labelWidth != '' ? labelWidth : parentData['labelWidth']),
-						marginBottom: (labelPosition != '' ? labelPosition : parentData['labelPosition']) == 'left' ? 0 : '5px',
-					}"
+					:style="labelWrapperStyle"
 				>
 					<!-- 为了块对齐 -->
 					<view class="up-form-item__body__left__content">
@@ -36,13 +31,11 @@
 						</view>
 						<view
 							class="up-form-item__body__left__content__label"
-							:style="{
-								justifyContent: parentData['labelAlign'] == 'left' ? 'flex-start' : parentData['labelAlign'] == 'center' ? 'center' : 'flex-end'
-							}"
+							:style="labelAlignStyle"
 						>
 							<text
 								class="up-form-item__body__left__content__label__text"
-								:style="(parentData['labelStyle'] ?? {}) as any"
+								:style="labelCustomStyle"
 							>{{ label }}</text>
 						</view>
 					</view>
@@ -64,17 +57,15 @@
 		</view>
 		<slot name="error">
 			<text
-				v-if="message != '' && parentData['errorType'] == 'message'"
+				v-if="isErrorMessage"
 				class="up-form-item__body__right__message"
-				:style="{
-					marginLeft:  addUnit((labelPosition ?? parentData['labelPosition']) == 'top' ? 0 : (labelWidth != null ? labelWidth : parentData['labelWidth']))
-				}"
+				:style="messageStyle"
 			>{{ message }}</text>
 		</slot>
 		<up-line
 			v-if="borderBottom"
-			:color="message != '' && parentData['errorType'] == 'border-bottom' ? color['error'] : propsLine['color']"
-			:customStyle="`margin-top: ${message != '' && parentData['errorType'] == 'message' ? '5px' : 0}`"
+			:color="lineColor"
+			:customStyle="lineStyle"
 		></up-line>
 	</view>
 </template>
@@ -85,7 +76,7 @@
 	import defProps from './formItem.uts'
 	import propsLine from '../up-line/line.uts'
 	import color from '../../libs/config/color.uts'
-	import { addStyle, addUnit, getProperty, setProperty, error } from '../../libs/function/index.uts'
+	import { addStyle, addUnit, getProperty, setProperty, error, deepMerge } from '../../libs/function/index.uts'
 	import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'
 	const { parent, parentData, getParentData } = useUltraUI({
 		// 提示文本的位置
@@ -173,6 +164,68 @@
 	// 响应式数据
 	const message = ref('')
 	const itemRules = ref<UTSJSONObject[]|UTSJSONObject>({})
+
+	const bodyStyle = computed((): UTSJSONObject => {
+		const custom = addStyle(props.customStyle) as UTSJSONObject
+		const parentPos = parentData.value != null ? (parentData.value['labelPosition'] as string | null) : null
+		const pos = props.labelPosition != '' ? props.labelPosition : (parentPos ?? 'left')
+		const base = {
+			flexDirection: pos == 'left' ? 'row' : 'column'
+		} as UTSJSONObject
+		return deepMerge(base, custom) as UTSJSONObject
+	})
+
+	const labelWrapperStyle = computed((): UTSJSONObject => {
+		const parentPos = parentData.value != null ? (parentData.value['labelPosition'] as string | null) : null
+		const pos = props.labelPosition != '' ? props.labelPosition : (parentPos ?? 'left')
+		const parentWidth = parentData.value != null ? (parentData.value['labelWidth'] ?? 45) : 45
+		const widthVal = props.labelWidth != null && props.labelWidth != '' ? props.labelWidth : parentWidth
+		return {
+			width: addUnit(widthVal),
+			marginBottom: pos == 'left' ? '0px' : '5px'
+		} as UTSJSONObject
+	})
+
+	const labelAlignStyle = computed((): UTSJSONObject => {
+		const align = parentData.value != null ? (parentData.value['labelAlign'] as string | null) : null
+		return {
+			justifyContent: align == 'left' ? 'flex-start' : align == 'center' ? 'center' : 'flex-end'
+		} as UTSJSONObject
+	})
+
+	const labelCustomStyle = computed((): UTSJSONObject => {
+		if (parentData.value != null && parentData.value['labelStyle'] != null) {
+			return parentData.value['labelStyle'] as UTSJSONObject
+		}
+		return {} as UTSJSONObject
+	})
+
+	const messageStyle = computed((): UTSJSONObject => {
+		const parentPos = parentData.value != null ? (parentData.value['labelPosition'] as string | null) : null
+		const pos = props.labelPosition != '' ? props.labelPosition : (parentPos ?? 'left')
+		const parentWidth = parentData.value != null ? (parentData.value['labelWidth'] ?? 45) : 45
+		const widthVal = props.labelWidth != null && props.labelWidth != '' ? props.labelWidth : parentWidth
+		const left = pos == 'top' ? '0px' : addUnit(widthVal)
+		return {
+			marginLeft: left
+		} as UTSJSONObject
+	})
+
+	const isErrorMessage = computed((): boolean => {
+		const errorType = parentData.value != null ? (parentData.value['errorType'] as string | null) : null
+		return message.value != '' && errorType == 'message'
+	})
+
+	const lineColor = computed((): string => {
+		const errorType = parentData.value != null ? (parentData.value['errorType'] as string | null) : null
+		return message.value != '' && errorType == 'border-bottom' ? (color['error'] as string) : ((propsLine['color'] ?? '#d6d7d9') as string)
+	})
+
+	const lineStyle = computed((): UTSJSONObject => {
+		return {
+			marginTop: isErrorMessage.value ? '5px' : '0px'
+		} as UTSJSONObject
+	})
 
 	// 获取父组件的参数
 	const updateParentData = () => {

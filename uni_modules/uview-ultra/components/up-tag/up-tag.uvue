@@ -9,10 +9,7 @@
 				class="up-tag"
 				:class="[`up-tag--${shape}`, !plain ? `up-tag--${type}` : '', plain ? `up-tag--${type}--plain` : '', `up-tag--${size}`, (plain && plainFill) ?  `up-tag--${type}--plain--fill` : '']"
 				@tap.stop="clickHandler"
-				:style="[{
-					marginRight: closable ? '10px' : 0,
-					marginTop: closable ? '10px' : 0,
-				}, style]"
+				:style="tagMergedStyle"
 			>
 				<slot name="icon">
 					<view
@@ -20,9 +17,9 @@
 						v-if="icon != ''"
 					>
 						<image
-							v-if="testImage(icon)"
+							v-if="isImageIcon"
 							:src="icon"
-							:style="[imgStyle]"
+							:style="imgStyle"
 						></image>
 						<up-icon
 							v-else
@@ -35,7 +32,7 @@
 				<slot>
 					<text
 						class="up-tag__text"
-						:style="[textColor]"
+						:style="textColor"
 						:class="[`up-tag__text--${type}`, plain ? `up-tag__text--${type}--plain` : '', `up-tag__text--${size}`]"
 					>
 						{{ text }}
@@ -47,7 +44,7 @@
 				:class="[`up-tag__close--${size}`]"
 				v-if="closable"
 				@tap.stop="closeHandler"
-				:style="{backgroundColor: closeColor}"
+				:style="closeStyle"
 			>
 				<up-icon
 					name="close"
@@ -61,7 +58,8 @@
 
 <script setup lang="uts">
 import { computed } from 'vue'
-import { image as testImage } from '../../libs/function/test'
+import { image as testImage } from '../../libs/function/test.uts'
+import { deepMerge } from '../../libs/function/index.uts'
 
 defineOptions({
   name: 'up-tag'
@@ -150,6 +148,14 @@ const style = computed<UTSJSONObject>(() => {
   return s
 })
 
+const tagMergedStyle = computed<UTSJSONObject>(() => {
+  const marginObj = {
+    marginRight: props.closable ? '10px' : '0px',
+    marginTop: props.closable ? '10px' : '0px'
+  } as UTSJSONObject
+  return deepMerge(marginObj, style.value) as UTSJSONObject
+})
+
 const textColor = computed<UTSJSONObject>(() => {
   const s = {} as UTSJSONObject
   if (props.color != '') {
@@ -158,8 +164,18 @@ const textColor = computed<UTSJSONObject>(() => {
   return s
 })
 
+const closeStyle = computed<UTSJSONObject>(() => {
+  return {
+    backgroundColor: props.closeColor
+  } as UTSJSONObject
+})
+
+const isImageIcon = computed<boolean>(() => {
+  return testImage(props.icon)
+})
+
 const imgStyle = computed<UTSJSONObject>(() => {
-  const width = props.size === 'large' ? '17px' : props.size === 'medium' ? '15px' : '13px'
+  const width = props.size == 'large' ? '17px' : props.size == 'medium' ? '15px' : '13px'
   return {
     width,
     height: width
@@ -167,11 +183,11 @@ const imgStyle = computed<UTSJSONObject>(() => {
 })
 
 const closeSize = computed<string>(() => {
-  return props.size === 'large' ? '15px' : props.size === 'medium' ? '13px' : '12px'
+  return props.size == 'large' ? '15px' : props.size == 'medium' ? '13px' : '12px'
 })
 
 const iconSize = computed<string>(() => {
-  return props.size === 'large' ? '21px' : props.size === 'medium' ? '19px' : '16px'
+  return props.size == 'large' ? '21px' : props.size == 'medium' ? '19px' : '16px'
 })
 
 const elIconColor = computed<string>(() => {

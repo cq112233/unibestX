@@ -24,19 +24,17 @@ export function handleBackPressExit() : boolean {
   // 2秒内再次触发，退出应用
   // #ifdef APP-ANDROID
   try {
-    if (typeof UTSAndroid !== 'undefined' && UTSAndroid?.getUniActivity != null) {
-      const activity = UTSAndroid.getUniActivity()
-      if (activity != null) {
-        // 先关闭 Activity（带退出动画）
-        activity.finishAffinity()
-      }
-      // 等退出动画播放完毕后，强制杀进程确保彻底退出
-      setTimeout(() => {
-        java.lang.System.exit(0)
-      }, 500)
-    } else {
-      uni.exit()
+    const activity = UTSAndroid.getUniActivity()
+    if (activity != null) {
+      // 先关闭 Activity（带退出动画）
+      activity.finishAffinity()
     }
+    // 等退出动画播放完毕后，强制杀进程确保彻底退出
+    setTimeout(() => {
+      // #ifdef APP-ANDROID
+      java.lang.System.exit(0)
+      // #endif
+    }, 500)
   } catch (_e) {
     uni.exit()
   }

@@ -3,18 +3,16 @@
 		<view class="up-swipe-action-item__right" ref="rightButtonsRef">
 			<slot name="button">
 				<view v-for="(item, index) in options" :key="index" class="up-swipe-action-item__right__button"
-					:style="[getButtonStyle(item)]" @tap="buttonClickHandler(item, index)">
+					:style="getButtonStyle(item)" @tap="buttonClickHandler(item, index)">
 					<view class="up-swipe-action-item__right__button__wrapper" :class="{
 						'up-swipe-action-item__right__button__wrapper--primary': getOptionStyleProp(item, 'backgroundColor', '') == 'primary'
-					}" :style="[getWrapperStyle(item)]">
+					}" :style="getWrapperStyle(item)">
 						<up-icon v-if="item['icon'] != null" :name="item['icon']!.toString()"
 							:color="getOptionStyleProp(item, 'color', '#ffffff')"
 							:size="getOptionIconSize(item)"
-							:customStyle="{
-								marginRight: item['text'] != null ? '2px' : '0px'
-							}"></up-icon>
+							:customStyle="getIconCustomStyle(item)"></up-icon>
 						<text v-if="item['text'] != null" class="up-swipe-action-item__right__button__wrapper__text up-line-1"
-							:style="[getTextStyle(item)]">{{ item['text'] }}</text>
+							:style="getTextStyle(item)">{{ item['text'] }}</text>
 					</view>
 				</view>
 			</slot>
@@ -28,7 +26,8 @@
 
 <script setup lang="uts">
 import { ref, computed, watch, onMounted, onBeforeUnmount, inject, getCurrentInstance } from 'vue'
-import { addUnit, getPx, sleep, upGetRect } from '../../libs/function/index'
+import type { Ref } from 'vue'
+import { addUnit, getPx, sleep, upGetRect } from '../../libs/function/index.uts'
 
 let nextSwipeItemId = 0
 
@@ -88,54 +87,11 @@ const isMoving = ref<boolean>(false)
 const startX = ref<number>(0)
 const startY = ref<number>(0)
 
-if (parentContext != null) {
-	const activeItemIdRef = parentContext['activeItemId'] as any
-	if (activeItemIdRef != null) {
-		watch(() => activeItemIdRef.value, (newActiveId: any) => {
-			if (newActiveId != selfItemId && status.value === 'open') {
-				closeHandler()
-			}
-		})
-	}
+function getIconCustomStyle(item: UTSJSONObject): UTSJSONObject {
+	return {
+		marginRight: item['text'] != null ? '2px' : '0px'
+	} as UTSJSONObject
 }
-
-watch(() => props.show, (newVal: boolean) => {
-	status.value = newVal ? 'open' : 'close'
-})
-
-watch(status, (newValue: string, oldValue: string) => {
-	if (newValue === 'open') {
-		emit('update:show', true)
-		emit('open', props.index)
-		if (parentContext != null && parentContext['registerActive'] != null) {
-			const regFn = parentContext['registerActive'] as ((id: number) => void)
-			regFn(selfItemId)
-		}
-	} else {
-		emit('update:show', false)
-		emit('close', props.index)
-	}
-	if (props.disabled) return
-	if (newValue === 'close' && oldValue === 'open') {
-		closeSwipeAction()
-	} else if (newValue === 'open' && oldValue === 'close') {
-		openSwipeAction()
-	}
-})
-
-watch(() => props.options, () => {
-	getBtnWidth()
-}, { deep: true })
-
-onMounted(() => {
-	sleep(100).then(() => {
-		getBtnWidth()
-	})
-})
-
-onBeforeUnmount(() => {
-	closeHandler()
-})
 
 function getOptionStyle(item: UTSJSONObject): UTSJSONObject | null {
 	const style = item['style']
@@ -223,103 +179,6 @@ function getOptionIconSize(item: UTSJSONObject): any {
 	return 17
 }
 
-function buttonClickHandler(item: any, index: number) {
-	emit('click', {
-		index,
-		name: props.name
-	})
-	if (props.closeOnClick) {
-		closeHandler()
-	}
-}
-
-function clickHandler() {}
-
-function closeHandler() {
-	closeSwipeAction()
-}
-
-function getBtnWidth() {
-	upGetRect('.up-swipe-action-item__right', false, instance?.proxy).then((res: NodeInfo) => {
-		buttonsWidth.value = res.width ?? 0
-	})
-}
-
-function touchstart(event: UniTouchEvent) {
-	isMoving.value = true
-	var touches = event.touches
-	startX.value = touches[0].pageX
-	startY.value = touches[0].pageY
-	getBtnWidth()
-	if (parentContext != null && parentContext['registerActive'] != null) {
-		const regFn = parentContext['registerActive'] as ((id: number) => void)
-		regFn(selfItemId)
-	}
-}
-
-function touchmove(event: UniTouchEvent) {
-	if (props.disabled || !isMoving.value) return
-	var touches = event.touches
-	var pageX = touches[0].pageX
-	var pageY = touches[0].pageY
-	var moveX = pageX - startX.value
-	var moveY = pageY - startY.value
-
-	if (Math.abs(moveX) > Math.abs(moveY) || Math.abs(moveX) > props.threshold) {
-		event.preventDefault()
-		event.stopPropagation()
-	}
-	if (Math.abs(moveX) < Math.abs(moveY)) return
-
-	if (status.value === 'open') {
-		if (moveX < 0) moveX = 0
-		const btnW = buttonsWidth.value
-		if (moveX > btnW) moveX = btnW
-		moveSwipeAction(0 - btnW + moveX)
-	} else {
-		if (moveX > 0) moveX = 0
-		const btnW = buttonsWidth.value
-		if (Math.abs(moveX) > btnW) moveX = 0 - btnW
-		moveSwipeAction(moveX)
-	}
-}
-
-function touchend(event: UniTouchEvent) {
-	if (!isMoving.value || props.disabled) return
-	isMoving.value = false
-	var touches: UniTouch = event.changedTouches[0] as UniTouch
-	var pageX = touches.pageX
-	var moveX = pageX - startX.value
-	if (status.value === 'open') {
-		if (moveX < 0) return
-		if (moveX === 0) {
-			return closeSwipeAction()
-		}
-		if (Math.abs(moveX) < props.threshold) {
-			openSwipeAction()
-		} else {
-			closeSwipeAction()
-		}
-	} else {
-		if (moveX > 0) return
-		if (Math.abs(moveX) < props.threshold) {
-			closeSwipeAction()
-		} else {
-			openSwipeAction()
-		}
-	}
-}
-
-function touchcancel(event: UniTouchEvent) {
-	if (!isMoving.value || props.disabled) return
-	isMoving.value = false
-	if (status.value === 'open') {
-		openSwipeAction()
-	} else {
-		closeSwipeAction()
-	}
-}
-
 function getDuration(value: any): string {
 	if (value.toString().indexOf('s') >= 0) return value as string
 	return parseInt(value.toString()) > 30 ? value.toString() + 'ms' : value.toString() + 's'
@@ -352,6 +211,153 @@ function moveSwipeAction(moveX: number) {
 		'-webkit-transform': 'translateX(' + moveX + 'px)'
 	} as UTSJSONObject
 }
+
+function closeHandler() {
+	closeSwipeAction()
+}
+
+function buttonClickHandler(item: any, index: number) {
+	emit('click', {
+		index,
+		name: props.name
+	})
+	if (props.closeOnClick) {
+		closeHandler()
+	}
+}
+
+function clickHandler() {}
+
+function getBtnWidth() {
+	upGetRect('.up-swipe-action-item__right', false, instance?.proxy).then((res: NodeInfo) => {
+		buttonsWidth.value = res.width ?? 0
+	})
+}
+
+function touchstart(event: UniTouchEvent) {
+	isMoving.value = true
+	var touches = event.touches
+	startX.value = touches[0].pageX
+	startY.value = touches[0].pageY
+	getBtnWidth()
+	if (parentContext != null && (parentContext as UTSJSONObject)['registerActive'] != null) {
+		const regFn = (parentContext as UTSJSONObject)['registerActive'] as ((id: number) => void)
+		regFn(selfItemId)
+	}
+}
+
+function touchmove(event: UniTouchEvent) {
+	if (props.disabled || !isMoving.value) return
+	var touches = event.touches
+	var pageX = touches[0].pageX
+	var pageY = touches[0].pageY
+	var moveX = pageX - startX.value
+	var moveY = pageY - startY.value
+
+	if (Math.abs(moveX) > Math.abs(moveY) || Math.abs(moveX) > props.threshold) {
+		event.preventDefault()
+		event.stopPropagation()
+	}
+	if (Math.abs(moveX) < Math.abs(moveY)) return
+
+	if (status.value == 'open') {
+		if (moveX < 0) moveX = 0
+		const btnW = buttonsWidth.value
+		if (moveX > btnW) moveX = btnW
+		moveSwipeAction(0 - btnW + moveX)
+	} else {
+		if (moveX > 0) moveX = 0
+		const btnW = buttonsWidth.value
+		if (Math.abs(moveX) > btnW) moveX = 0 - btnW
+		moveSwipeAction(moveX)
+	}
+}
+
+function touchend(event: UniTouchEvent) {
+	if (!isMoving.value || props.disabled) return
+	isMoving.value = false
+	var touches: UniTouch = event.changedTouches[0] as UniTouch
+	var pageX = touches.pageX
+	var moveX = pageX - startX.value
+	if (status.value == 'open') {
+		if (moveX < 0) return
+		if (moveX == 0) {
+			closeSwipeAction()
+			return
+		}
+		if (Math.abs(moveX) < props.threshold) {
+			openSwipeAction()
+		} else {
+			closeSwipeAction()
+		}
+	} else {
+		if (moveX > 0) return
+		if (Math.abs(moveX) < props.threshold) {
+			closeSwipeAction()
+		} else {
+			openSwipeAction()
+		}
+	}
+}
+
+function touchcancel(event: UniTouchEvent) {
+	if (!isMoving.value || props.disabled) return
+	isMoving.value = false
+	if (status.value == 'open') {
+		openSwipeAction()
+	} else {
+		closeSwipeAction()
+	}
+}
+
+if (parentContext != null) {
+	const activeItemIdRef = (parentContext as UTSJSONObject)['activeItemId'] as Ref<number> | null
+	if (activeItemIdRef != null) {
+		watch((): number => activeItemIdRef!.value, (newActiveId: number) => {
+			if (newActiveId != selfItemId && status.value == 'open') {
+				closeHandler()
+			}
+		})
+	}
+}
+
+watch((): boolean => props.show, (newVal: boolean) => {
+	status.value = newVal ? 'open' : 'close'
+})
+
+watch(status, (newValue: string, oldValue: string) => {
+	if (newValue == 'open') {
+		emit('update:show', true)
+		emit('open', props.index)
+		if (parentContext != null && (parentContext as UTSJSONObject)['registerActive'] != null) {
+			const regFn = (parentContext as UTSJSONObject)['registerActive'] as ((id: number) => void)
+			regFn(selfItemId)
+		}
+	} else {
+		emit('update:show', false)
+		emit('close', props.index)
+	}
+	if (props.disabled) return
+	if (newValue == 'close' && oldValue == 'open') {
+		closeSwipeAction()
+	} else if (newValue == 'open' && oldValue == 'close') {
+		openSwipeAction()
+	}
+})
+
+watch((): Array<UTSJSONObject> => props.options, () => {
+	getBtnWidth()
+}, { deep: true })
+
+onMounted(() => {
+	sleep(100).then(() => {
+		getBtnWidth()
+	})
+})
+
+onBeforeUnmount(() => {
+	closeHandler()
+})
 
 defineExpose({
 	open: openSwipeAction,

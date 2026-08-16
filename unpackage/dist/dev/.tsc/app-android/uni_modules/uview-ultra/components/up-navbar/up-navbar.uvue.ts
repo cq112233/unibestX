@@ -1,0 +1,227 @@
+import _easycom_up_status_bar from '@/uni_modules/uview-ultra/components/up-status-bar/up-status-bar.uvue'
+import _easycom_up_icon from '@/uni_modules/uview-ultra/components/up-icon/up-icon.uvue'
+import { computed } from 'vue'
+import { addUnit, addStyle, getPx, deepMerge } from '../../libs/function/index.uts'
+
+
+const __sfc__ = defineComponent({
+  __name: 'up-navbar',
+name: 'up-navbar',
+  props: {
+  safeAreaInsetTop: {
+    type: Boolean,
+    default: true
+  },
+  placeholder: {
+    type: Boolean,
+    default: false
+  },
+  fixed: {
+    type: Boolean,
+    default: false
+  },
+  border: {
+    type: Boolean,
+    default: false
+  },
+  leftIcon: {
+    type: String,
+    default: 'arrow-left'
+  },
+  leftText: {
+    type: String,
+    default: ''
+  },
+  rightText: {
+    type: String,
+    default: ''
+  },
+  rightIcon: {
+    type: String,
+    default: ''
+  },
+  title: {
+    type: String,
+    default: ''
+  },
+  bgColor: {
+    type: String,
+    default: '#ffffff'
+  },
+  titleWidth: {
+    type: [String, Number],
+    default: '400rpx'
+  },
+  height: {
+    type: [String, Number],
+    default: '44px'
+  },
+  leftIconSize: {
+    type: [String, Number],
+    default: 20
+  },
+  leftIconColor: {
+    type: String,
+    default: '#303133'
+  },
+  autoBack: {
+    type: Boolean,
+    default: false
+  },
+  titleStyle: {
+    type: [Object, String],
+    default: () => ({})
+  },
+  customClass: {
+    type: String,
+    default: ''
+  }
+},
+  emits: ['leftClick', 'rightClick'],
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+
+
+const props = __props
+
+function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+__ins.emit(event, ...do_not_transform_spread)
+}
+
+const placeholderHeight = computed<string>(() => {
+  const statusBarHeight = uni.getSystemInfoSync().statusBarHeight
+  return addUnit(parseInt(getPx(props.height)) + statusBarHeight, 'px')
+})
+
+const placeholderStyle = computed((): UTSJSONObject => {
+  return {
+    height: placeholderHeight.value
+  } as UTSJSONObject
+})
+
+const contentStyle = computed((): UTSJSONObject => {
+  return {
+    height: addUnit(props.height),
+    backgroundColor: props.bgColor
+  } as UTSJSONObject
+})
+
+const leftTextStyle = computed((): UTSJSONObject => {
+  return {
+    color: props.leftIconColor
+  } as UTSJSONObject
+})
+
+const mergedTitleStyle = computed((): UTSJSONObject => {
+  const custom = addStyle(props.titleStyle) as UTSJSONObject
+  const base = { __$originalPosition: new UTSSourceMapPosition("base", "uni_modules/uview-ultra/components/up-navbar/up-navbar.uvue", 173, 9), 
+    width: addUnit(props.titleWidth)
+  } as UTSJSONObject
+  return deepMerge(base, custom) as UTSJSONObject
+})
+
+function leftClick(): void {
+  emit('leftClick')
+  if (props.autoBack) {
+    uni.navigateBack()
+  }
+}
+
+function rightClick(): void {
+  emit('rightClick')
+}
+
+return (): any | null => {
+
+const _component_up_status_bar = resolveEasyComponent("up-status-bar",_easycom_up_status_bar)
+const _component_up_icon = resolveEasyComponent("up-icon",_easycom_up_icon)
+
+  return _cE("view", _uM({
+    class: _nC(["up-navbar", [_ctx.customClass]])
+  }), [
+    isTrue(_ctx.fixed && _ctx.placeholder)
+      ? _cE("view", _uM({
+          key: 0,
+          class: "up-navbar__placeholder",
+          style: _nS(placeholderStyle.value)
+        }), null, 4 /* STYLE */)
+      : _cC("v-if", true),
+    _cE("view", _uM({
+      class: _nC([_ctx.fixed ? 'up-navbar--fixed' : ''])
+    }), [
+      isTrue(_ctx.safeAreaInsetTop)
+        ? _cV(_component_up_status_bar, _uM({
+            key: 0,
+            bgColor: _ctx.bgColor
+          }), null, 8 /* PROPS */, ["bgColor"])
+        : _cC("v-if", true),
+      _cE("view", _uM({
+        class: _nC(["up-navbar__content", [_ctx.border ? 'up-border-bottom' : '']]),
+        style: _nS(contentStyle.value)
+      }), [
+        _cE("view", _uM({
+          class: "up-navbar__content__left",
+          "hover-class": "up-navbar__content__left--hover",
+          "hover-start-time": "150",
+          onClick: leftClick
+        }), [
+          renderSlot(_ctx.$slots, "left", {}, (): any[] => [
+            _ctx.leftIcon != ''
+              ? _cV(_component_up_icon, _uM({
+                  key: 0,
+                  name: _ctx.leftIcon,
+                  size: _ctx.leftIconSize,
+                  color: _ctx.leftIconColor
+                }), null, 8 /* PROPS */, ["name", "size", "color"])
+              : _cC("v-if", true),
+            _ctx.leftText != ''
+              ? _cE("text", _uM({
+                  key: 1,
+                  style: _nS(leftTextStyle.value),
+                  class: "up-navbar__content__left__text"
+                }), _tD(_ctx.leftText), 5 /* TEXT, STYLE */)
+              : _cC("v-if", true)
+          ])
+        ]),
+        renderSlot(_ctx.$slots, "center", {}, (): any[] => [
+          _cE("text", _uM({
+            class: "up-line-1 up-navbar__content__title",
+            style: _nS(mergedTitleStyle.value)
+          }), _tD(_ctx.title), 5 /* TEXT, STYLE */)
+        ]),
+        isTrue(_ctx.$slots['right'] != null || _ctx.rightIcon != '' || _ctx.rightText != '')
+          ? _cE("view", _uM({
+              key: 0,
+              class: "up-navbar__content__right",
+              onClick: rightClick
+            }), [
+              renderSlot(_ctx.$slots, "right", {}, (): any[] => [
+                _ctx.rightIcon != ''
+                  ? _cV(_component_up_icon, _uM({
+                      key: 0,
+                      name: _ctx.rightIcon,
+                      size: "20"
+                    }), null, 8 /* PROPS */, ["name"])
+                  : _cC("v-if", true),
+                _ctx.rightText != ''
+                  ? _cE("text", _uM({
+                      key: 1,
+                      class: "up-navbar__content__right__text"
+                    }), _tD(_ctx.rightText), 1 /* TEXT */)
+                  : _cC("v-if", true)
+              ])
+            ])
+          : _cC("v-if", true)
+      ], 6 /* CLASS, STYLE */)
+    ], 2 /* CLASS */)
+  ], 2 /* CLASS */)
+}
+}
+
+})
+export default __sfc__
+export type UpNavbarComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpNavbarUpNavbarStyles = [_uM([["u-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-navbar--fixed", _pS(_uM([["position", "fixed"], ["left", 0], ["right", 0], ["top", 0], ["zIndex", 11]]))], ["up-navbar__content", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["height", 44], ["backgroundColor", "#9acafc"], ["position", "relative"], ["justifyContent", "center"]]))], ["up-navbar__content__left", _pS(_uM([["paddingTop", 0], ["paddingRight", 13], ["paddingBottom", 0], ["paddingLeft", 13], ["position", "absolute"], ["top", 0], ["bottom", 0], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["left", 0]]))], ["up-navbar__content__right", _pS(_uM([["paddingTop", 0], ["paddingRight", 13], ["paddingBottom", 0], ["paddingLeft", 13], ["position", "absolute"], ["top", 0], ["bottom", 0], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["right", 0]]))], ["up-navbar__content__left--hover", _pS(_uM([["opacity", 0.7]]))], ["up-navbar__content__left__text", _pS(_uM([["fontSize", 15], ["marginLeft", 3]]))], ["up-navbar__content__title", _pS(_uM([["textAlign", "center"], ["fontSize", 16], ["color", "#303133"]]))], ["up-navbar__content__right__text", _pS(_uM([["fontSize", 15], ["marginLeft", 3]]))]])]

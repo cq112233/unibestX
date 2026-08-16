@@ -11,24 +11,60 @@ import config from '../config/config'
 // 解决办法为在组件根部再套一个没有任何作用的view元素
 export function upGetRect(selector: string, all: boolean = false, comp: ComponentPublicInstance|ComponentInternalInstance|null = null): Promise<NodeInfo> {
 	return new Promise((resolve) => {
-		if (all == true) {
-			uni.createSelectorQuery()
-				.in(comp).select(selector)
-				.boundingClientRect((res) => {
-					const nodeInfoArray = res as NodeInfo[]
-					const nodeInfoArrayItem = nodeInfoArray != null && nodeInfoArray.length > 0 ? nodeInfoArray[0] : ({} as NodeInfo)
-					resolve(nodeInfoArrayItem)
+		try {
+			const query = uni.createSelectorQuery()
+			const queryIn = comp != null ? query.in(comp) : query
+			if (all == true) {
+				queryIn.selectAll(selector)
+					.boundingClientRect((res: any | null) => {
+						if (res != null && Array.isArray(res)) {
+							const arr = res as NodeInfo[]
+							resolve(arr.length > 0 ? arr[0] : ({} as NodeInfo))
+						} else if (res != null) {
+							resolve(res as NodeInfo)
+						} else {
+							resolve({} as NodeInfo)
+						}
+					})
+					.exec()
+			} else {
+				queryIn.select(selector)
+					.boundingClientRect((res: any | null) => {
+						if (res != null && Array.isArray(res)) {
+							const arr = res as NodeInfo[]
+							resolve(arr.length > 0 ? arr[0] : ({} as NodeInfo))
+						} else if (res != null) {
+							resolve(res as NodeInfo)
+						} else {
+							resolve({} as NodeInfo)
+						}
+					})
+					.exec()
+			}
+		} catch (_e) {
+			resolve({} as NodeInfo)
+		}
+	})
+}
+
+export function upGetAllRect(selector: string, comp: ComponentPublicInstance|ComponentInternalInstance|null = null): Promise<Array<NodeInfo>> {
+	return new Promise((resolve) => {
+		try {
+			const query = uni.createSelectorQuery()
+			const queryIn = comp != null ? query.in(comp) : query
+			queryIn.selectAll(selector)
+				.boundingClientRect((res: any | null) => {
+					if (res != null && Array.isArray(res)) {
+						resolve(res as NodeInfo[])
+					} else if (res != null) {
+						resolve([res as NodeInfo])
+					} else {
+						resolve([] as NodeInfo[])
+					}
 				})
 				.exec()
-		} else {
-			uni.createSelectorQuery()
-				.in(comp).selectAll(selector)
-				.boundingClientRect((res) => {
-					const nodeInfoArray = res as NodeInfo[]
-					const nodeInfoArrayItem = nodeInfoArray != null && nodeInfoArray.length > 0 ? nodeInfoArray[0] : ({} as NodeInfo)
-					resolve(nodeInfoArrayItem)
-				})
-				.exec()
+		} catch (_e) {
+			resolve([] as NodeInfo[])
 		}
 	})
 }

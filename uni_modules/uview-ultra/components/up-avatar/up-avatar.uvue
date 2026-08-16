@@ -2,11 +2,7 @@
 	<view
 		class="up-avatar"
 		:class="[`up-avatar--${shape}`]"
-		:style="[{
-			backgroundColor: getBackColor,
-			width: addUnit(size),
-			height: addUnit(size),
-		}, addStyle(customStyle)]"
+		:style="avatarStyle"
 		@tap="clickHandler"
 	>
 		<slot>
@@ -33,10 +29,7 @@
 					:src="avatarUrl != '' ? avatarUrl : defaultUrl"
 					:mode="mode"
 					@error="errorHandler"
-					:style="[{
-						width: addUnit(size),
-						height: addUnit(size)
-					}]"
+					:style="imageSizeStyle"
 				></image>
 			</template>
 		</slot>
@@ -45,7 +38,7 @@
 
 <script setup lang="uts">
 import { ref, computed, watch, onMounted } from 'vue'
-import { addStyle, addUnit, random } from '../../libs/function/index'
+import { addStyle, addUnit, random, deepMerge } from '../../libs/function/index'
 
 defineOptions({
   name: 'up-avatar'
@@ -142,6 +135,23 @@ const getBackColor = computed<string>(() => {
   return result
 })
 
+const avatarStyle = computed((): UTSJSONObject => {
+  const custom = addStyle(props.customStyle) as UTSJSONObject
+  const base = {
+    backgroundColor: getBackColor.value,
+    width: addUnit(props.size),
+    height: addUnit(props.size)
+  } as UTSJSONObject
+  return deepMerge(base, custom) as UTSJSONObject
+})
+
+const imageSizeStyle = computed((): UTSJSONObject => {
+  return {
+    width: addUnit(props.size),
+    height: addUnit(props.size)
+  } as UTSJSONObject
+})
+
 const errorHandler = () => {
   avatarUrl.value = props.defaultUrl
 }
@@ -150,7 +160,7 @@ const clickHandler = () => {
   emit('click', props.name)
 }
 
-watch(() => props.src, (newValue: string) => {
+watch((): string => props.src, (newValue: string) => {
   avatarUrl.value = newValue
 })
 

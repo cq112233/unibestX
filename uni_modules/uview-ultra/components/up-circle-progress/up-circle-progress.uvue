@@ -1,6 +1,6 @@
 <template>
-	<view class="up-circle-progress" :style="[circleStyle, addStyle(customStyle)]">
-		<view class="up-circle-progress__inner" :style="[innerStyle]">
+	<view class="up-circle-progress" :style="rootCircleStyle">
+		<view class="up-circle-progress__inner" :style="innerStyle">
 			<slot>
 				<text class="up-circle-progress__text" :style="{ color: activeColor }">{{ percent }}%</text>
 			</slot>
@@ -10,7 +10,7 @@
 
 <script setup lang="uts">
 import { computed } from 'vue'
-import { addStyle, addUnit } from '../../libs/function/index.uts'
+import { addStyle, addUnit, deepMerge } from '../../libs/function/index.uts'
 
 defineOptions({
 	name: 'up-circle-progress'
@@ -72,6 +72,12 @@ const circleStyle = computed<UTSJSONObject>(() => {
 	style['borderStyle'] = 'solid'
 	style['borderColor'] = percent.value > 0 ? props.activeColor : props.inactiveColor
 	return style
+})
+
+const rootCircleStyle = computed((): UTSJSONObject => {
+	const custom = addStyle(props.customStyle) as UTSJSONObject
+	const circle = circleStyle.value
+	return deepMerge(circle, custom) as UTSJSONObject
 })
 
 const innerStyle = computed<UTSJSONObject>(() => {

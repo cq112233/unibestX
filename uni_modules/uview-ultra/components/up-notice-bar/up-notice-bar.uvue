@@ -2,11 +2,9 @@
 	<view
 		class="up-notice-bar"
 		v-if="show"
-		:style="[{
-			backgroundColor: bgColor
-		}, addStyle(customStyle)]"
+		:style="noticeBarStyle"
 	>
-		<template v-if="direction === 'column' || (direction === 'row' && step)">
+		<template v-if="direction == 'column' || (direction == 'row' && step)">
 			<up-column-notice
 				:color="color"
 				:bgColor="bgColor"
@@ -40,8 +38,8 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
-import { addStyle } from '../../libs/function/index'
+import { ref, computed } from 'vue'
+import { addStyle, deepMerge } from '../../libs/function/index.uts'
 
 defineOptions({
 	name: "up-notice-bar"
@@ -109,6 +107,14 @@ const props = defineProps({
 const emit = defineEmits(["click", "close"])
 
 const show = ref<boolean>(true)
+
+const noticeBarStyle = computed((): UTSJSONObject => {
+	const base = {
+		backgroundColor: props.bgColor
+	} as UTSJSONObject
+	const custom = addStyle(props.customStyle) as UTSJSONObject
+	return deepMerge(base, custom) as UTSJSONObject
+})
 
 function click(index: number) {
 	emit('click', index)

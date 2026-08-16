@@ -7,7 +7,7 @@
 		    class="up-alert"
 		    :class="[`up-alert--${type}--${effect}`]"
 		    @tap.stop="clickHandler"
-		    :style="[addStyle(customStyle)]"
+		    :style="alertStyle"
 		>
 			<view
 			    class="up-alert__icon"
@@ -21,20 +21,20 @@
 			</view>
 			<view
 			    class="up-alert__content"
-			    :style="[{
-					paddingRight: closable ? '20px' : 0
-				}]"
+			    :style="{
+					paddingRight: closable ? '20px' : '0px'
+				}"
 			>
 				<text
 				    class="up-alert__content__title"
 				    v-if="title"
-					:style="[style1]"
+					:style="style1"
 				    :class="[effect === 'dark' ? 'up-alert__text--dark' : `up-alert__text--${type}--light`]"
 				>{{ title }}</text>
 				<text
 				    class="up-alert__content__desc"
 					v-if="description"
-					:style="[style1]"
+					:style="style1"
 				    :class="[effect === 'dark' ? 'up-alert__text--dark' : `up-alert__text--${type}--light`]"
 				>{{ description }}</text>
 			</view>
@@ -121,6 +121,10 @@ const emit = defineEmits(['click']);
 const show = ref(true);
 
 // 计算属性
+const alertStyle = computed((): UTSJSONObject => {
+    return addStyle(props.customStyle) as UTSJSONObject
+});
+
 const style1 = computed(() => {
     return {
         fontSize: addUnit(props.fontSize),

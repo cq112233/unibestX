@@ -45,7 +45,7 @@
 		</up-cell>
 		<view
 			class="up-collapse-item__content"
-			:style="{height: addUnit(height)}"
+			:style="contentHeightStyle"
 		>
 			<view
 				class="up-collapse-item__content__text content-class"
@@ -142,6 +142,10 @@
 		} else {
 			return ''
 		}
+	})
+
+	const contentHeightStyle = computed((): UTSJSONObject => {
+		return { height: addUnit(height.value) } as UTSJSONObject
 	})
 	
 	async function setContentAnimate(expandedFrom: boolean) {

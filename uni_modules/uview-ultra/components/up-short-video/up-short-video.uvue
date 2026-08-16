@@ -460,7 +460,7 @@ function goNext(): void {
 	emit('goNext')
 }
 
-watch(() => props.videoList, (newVal: Array<UTSJSONObject>) => {
+watch((): Array<UTSJSONObject> => props.videoList, (newVal: Array<UTSJSONObject>) => {
 	syncVideoList(newVal)
 }, { immediate: true })
 

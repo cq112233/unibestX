@@ -1,25 +1,20 @@
 import { _ as __easycom_0 } from "../up-icon/up-icon.js";
+import { r as resolveEasycom } from "../../../../App.ku.js";
 import { _ as __easycom_1$1 } from "../up-cell/up-cell.js";
 import { _ as __easycom_2 } from "../up-cell-group/up-cell-group.js";
 import { a as addUnit } from "../../libs/function/index.js";
 import { d as defProps } from "./dropdown-item.js";
 import { U as UPDropdownMenu } from "../up-dropdown/types.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, setSharedDataStyle: _setSharedDataStyle, unref: _unref, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, toDisplayString: _toDisplayString, setSharedDataClass: _setSharedDataClass, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataFor: _createSharedDataFor, createSharedDataSlot: _createSharedDataSlot, setSharedDataEvent: _setSharedDataEvent } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpDropdownItemUpDropdownItem";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { computed, ref, watch, onMounted, inject } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-dropdown-item",
     options: new UTSJSONObject({
       styleIsolation: "shared"
     })
   },
-  __dynamicSharedData: true,
-  __hash: "033cf882",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-dropdown-item/up-dropdown-item.uvue",
   __name: "up-dropdown-item",
   props: {
     // 当前选中项的value值
@@ -57,9 +52,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   },
   emits: ["update:modelValue", "change"],
   setup(__props, _a) {
-    var __emit = _a.emit, $slots = _a.slots;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpDropdownItemUpDropdownItemSharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
     const props = __props;
     const emit = __emit;
     const parentDropdown = inject("upDropdown", null);
@@ -116,85 +110,97 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         parentDropdown.updateItemTitle(itemIndex.value, newTitle.toString());
       }
     });
-    return () => {
-      "raw js";
-      const _component_up_icon = __easycom_0;
-      const _component_up_cell = __easycom_1$1;
-      const _component_up_cell_group = __easycom_2;
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(isActive.value));
-      }, () => {
-        _createSharedDataIf(() => {
-          return _setSharedData(__sharedData, 1, _toSharedDataBoolean($slots["default"] == null && $slots["$default"] == null));
-        }, () => {
-          _renderSharedDataEffect(() => {
-            return _setSharedDataStyle(__sharedData, 4, {
-              height: _unref(addUnit)(props.height)
-            });
-          });
-          const n12 = _createSharedDataComponentWithFallback(_component_up_cell_group, "ca585d1e", null, {
-            "default": _withSharedDataVaporCtx(() => {
-              _createSharedDataFor(_setSharedDataScoped(__sharedData, 3, _createSharedDataVFor(__sharedDataScope, () => {
-                return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-              })), () => {
-                return props.options;
-              }, (__sharedData_VFor0, _for_item0, _for_key0) => {
-                const _on_click = () => {
-                  return cellClick(_for_item0.value["value"]);
-                };
-                const n11 = _createSharedDataComponentWithFallback(_component_up_cell, "ca585c9e-" + _for_key0.value, {
-                  onClick: () => {
-                    return _on_click;
-                  },
-                  arrow: false
-                }, {
-                  "title": () => {
-                    _renderSharedDataEffect(() => {
-                      const _item = _for_item0.value;
-                      _setSharedDataClass(__sharedData_VFor0, 2, ["up-dropdown-item__text", {
-                        "up-dropdown-item__text--active": props.modelValue.toString() == _item["value"].toString() && activeColor.value == "#2979ff"
-                      }]);
-                      _setSharedDataStyle(__sharedData_VFor0, 3, [getItemTextStyle(_item)]);
-                      _setSharedData(__sharedData_VFor0, 4, _toDisplayString(_item["label"].toString()));
-                    });
-                  },
-                  "default": _withSharedDataVaporCtx(() => {
-                    _createSharedDataIf(() => {
-                      return _setSharedData(__sharedData_VFor0, 5, _toSharedDataBoolean(props.modelValue.toString() == _for_item0.value["value"].toString()));
-                    }, () => {
-                      const n10 = _createSharedDataComponentWithFallback(_component_up_icon, "ca583da6-" + _for_key0.value, {
-                        name: "checkbox-mark",
-                        color: () => {
-                          return activeColor.value == "#2979ff" ? "primary" : activeColor.value;
-                        },
-                        size: "18"
-                      });
-                      _setSharedData(__sharedData_VFor0, 6, n10?.sharedData);
-                    }, null, 129);
-                  })
-                });
-                _setSharedData(__sharedData_VFor0, 1, n11?.sharedData);
-                return n11;
-              }, (__sharedData_VFor0, item, index) => {
-                return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
-              }, 34);
-            })
-          });
-          _setSharedData(__sharedData, 2, n12?.sharedData);
-        }, () => {
-          _createSharedDataSlot("default", null, null);
-        }, 517);
-        _setSharedDataEvent(__sharedData, 5, () => {
-        });
-        _setSharedDataEvent(__sharedData, 6, () => {
-        });
-      });
-      return __sharedData;
-    };
+    const __returned__ = { props, emit, parentDropdown, itemIndex, isActive, activeColor, inactiveColor, cellClick, getItemTextStyle, get addUnit() {
+      return addUnit;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "up-dropdown-item__scroll": { "": { "backgroundImage": "none", "backgroundColor": "#ffffff" } }, "up-dropdown-item__text": { "": { "fontSize": 15 } }, "up-dropdown-item__text--active": { "": { "color": "var(--theme-color, #0957de)" } } };
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, toDisplayString: _toDisplayString, normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode, resolveComponent: _resolveComponent, createBlock: _createBlock, createCommentVNode: _createCommentVNode, withCtx: _withCtx, createVNode: _createVNode, renderSlot: _renderSlot, withModifiers: _withModifiers } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
+  const _component_up_cell = resolveEasycom(__resolveDynamicComponent("up-cell"), __easycom_1$1);
+  const _component_up_cell_group = resolveEasycom(__resolveDynamicComponent("up-cell-group"), __easycom_2);
+  return $setup.isActive ? (_openBlock(), _createElementBlock(
+    "view",
+    {
+      key: 0,
+      class: "up-dropdown-item",
+      onTouchmove: _withModifiers(() => {
+      }, ["stop", "prevent"]),
+      onClick: _withModifiers(() => {
+      }, ["stop", "prevent"])
+    },
+    [
+      _ctx.$slots["default"] == null && _ctx.$slots["$default"] == null ? (_openBlock(), _createElementBlock(
+        "view",
+        {
+          key: 0,
+          class: "up-dropdown-item__scroll",
+          style: _normalizeStyle({
+            height: $setup.addUnit($setup.props.height)
+          })
+        },
+        [
+          _createElementVNode("view", { class: "up-dropdown-item__options" }, [
+            _createVNode(_component_up_cell_group, null, {
+              default: _withCtx(() => [
+                (_openBlock(true), _createElementBlock(
+                  _Fragment,
+                  null,
+                  _renderList($setup.props.options, (item, index) => {
+                    return _openBlock(), _createBlock(_component_up_cell, {
+                      onClick: ($event) => $setup.cellClick(item["value"]),
+                      arrow: false,
+                      key: index
+                    }, {
+                      title: _withCtx(() => [
+                        _createElementVNode(
+                          "text",
+                          {
+                            class: _normalizeClass(["up-dropdown-item__text", {
+                              "up-dropdown-item__text--active": $setup.props.modelValue.toString() == item["value"].toString() && $setup.activeColor == "#2979ff"
+                            }]),
+                            style: _normalizeStyle([$setup.getItemTextStyle(item)])
+                          },
+                          _toDisplayString(item["label"].toString()),
+                          7
+                          /* TEXT, CLASS, STYLE */
+                        )
+                      ]),
+                      default: _withCtx(() => [
+                        $setup.props.modelValue.toString() == item["value"].toString() ? (_openBlock(), _createBlock(_component_up_icon, {
+                          key: 0,
+                          name: "checkbox-mark",
+                          color: $setup.activeColor == "#2979ff" ? "primary" : $setup.activeColor,
+                          size: "18"
+                        }, null, 8, ["color"])) : _createCommentVNode("v-if", true)
+                      ]),
+                      _: 2
+                      /* DYNAMIC */
+                    }, 1032, ["onClick"]);
+                  }),
+                  128
+                  /* KEYED_FRAGMENT */
+                ))
+              ]),
+              _: 1
+              /* STABLE */
+            })
+          ])
+        ],
+        4
+        /* STYLE */
+      )) : _renderSlot(_ctx.$slots, "default", { key: 1 })
+    ],
+    32
+    /* NEED_HYDRATION */
+  )) : _createCommentVNode("v-if", true);
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-dropdown-item/up-dropdown-item.uvue"]]);
 export {
   __easycom_1 as _
 };

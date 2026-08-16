@@ -376,9 +376,9 @@ function onLinkTap(n: HtmlNode): void {
   }
 }
 
-watch(() => props.content, (val: string) => {
+watch((): string => props.content, (val: string) => {
   if (val.length > 0) doParse(val)
-}, { immediate: true })
+}, { immediate: true } as WatchOptions)
 
 defineExpose({
   setContent,

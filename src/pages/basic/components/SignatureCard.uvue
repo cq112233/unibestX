@@ -123,11 +123,14 @@ function onAction(type: string) {
   if (type === 'clear') {
     el.clear()
     signUrl.value = ''
-  } else if (type === 'undo') {
+  }
+  else if (type === 'undo') {
     el.undo()
-  } else if (type === 'redo') {
+  }
+  else if (type === 'redo') {
     el.redo()
-  } else if (type === 'save') {
+  }
+  else if (type === 'save') {
     el.canvasToTempFilePath({
       success: (res: LimeSignatureToFileSuccess) => {
         if (res.isEmpty) {

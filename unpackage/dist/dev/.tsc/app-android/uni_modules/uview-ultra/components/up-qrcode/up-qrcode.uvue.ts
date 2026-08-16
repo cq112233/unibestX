@@ -1,0 +1,409 @@
+import _easycom_up_loading_icon from '@/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.uvue'
+import { ref, computed, watch, onMounted, getCurrentInstance, nextTick } from 'vue'
+import { createQrCells, getQrRenderCountWithQuietZone } from './qrcode.uts'
+
+
+const __sfc__ = defineComponent({
+  __name: 'up-qrcode',
+name: 'up-qrcode',
+  props: {
+    cid: {
+        type: String,
+        default: ''
+    },
+    size: {
+        type: [Number, String],
+        default: 200
+    },
+    unit: {
+        type: String,
+        default: 'px'
+    },
+    show: {
+        type: Boolean,
+        default: true
+    },
+    val: {
+        type: String,
+        default: ''
+    },
+    background: {
+        type: String,
+        default: '#ffffff'
+    },
+    foreground: {
+        type: String,
+        default: '#000000'
+    },
+    pdground: {
+        type: String,
+        default: '#000000'
+    },
+    icon: {
+        type: String,
+        default: ''
+    },
+    iconSize: {
+        type: [Number, String],
+        default: 40
+    },
+    lv: {
+        type: [Number, String],
+        default: 3
+    },
+    quietZone: {
+        type: [Number, String],
+        default: 0
+    },
+    onval: {
+        type: Boolean,
+        default: true
+    },
+    loadMake: {
+        type: Boolean,
+        default: true
+    },
+    usingComponents: {
+        type: Boolean,
+        default: true
+    },
+    showLoading: {
+        type: Boolean,
+        default: true
+    },
+    loadingText: {
+        type: String,
+        default: '生成中'
+    },
+    allowPreview: {
+        type: Boolean,
+        default: false
+    },
+    useRootHeightAndWidth: {
+        type: Boolean,
+        default: false
+    }
+},
+  emits: ['result', 'longpressCallback', 'preview', 'error'],
+  setup(__props, __setupCtx: SetupContext) {
+const __expose = __setupCtx.expose
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+let qrcodeCounter = 0
+
+function makeId(prefix: string): string {
+    return prefix + Date.now().toString() + '_' + (++qrcodeCounter).toString()
+}
+
+function isEmpty(value: any | null): boolean {
+    if (value == null) {
+        return true
+    }
+    const text = value.toString()
+    return text.length == 0 || text == 'undefined' || text == 'null' || text == '{}' || text == '[]'
+}
+
+function getPixelRatio(): number {
+    const info = uni.getSystemInfoSync()
+    if (info.pixelRatio > 0) {
+        return info.pixelRatio
+    }
+    return 1
+}
+
+
+
+const props = __props
+
+function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+__ins.emit(event, ...do_not_transform_spread)
+}
+const instance = getCurrentInstance()
+
+const cells = ref<Array<UTSJSONObject>>([])
+const loading = ref<boolean>(false)
+const result = ref<string>('')
+const error = ref<string>('')
+const canvasId = ref<string>(props.cid != '' ? props.cid : makeId('up-qrcode-canvas-'))
+let canvasContext: CanvasContext | null = null
+let ctx: CanvasRenderingContext2D | null = null
+
+const sizeLocal = computed<number>(() => {
+    return parseFloat(props.size.toString())
+})
+
+const rootStyle = computed<UTSJSONObject>(() => {
+    return {
+        width: props.useRootHeightAndWidth ? '100%' : sizeLocal.value.toString() + props.unit,
+        height: props.useRootHeightAndWidth ? '100%' : sizeLocal.value.toString() + props.unit
+    } as UTSJSONObject
+})
+
+const matrixStyle = computed<UTSJSONObject>(() => {
+    return {
+        width: sizeLocal.value.toString() + props.unit,
+        height: sizeLocal.value.toString() + props.unit,
+        backgroundColor: props.background
+    } as UTSJSONObject
+})
+
+const iconStyle = computed<UTSJSONObject>(() => {
+    const iSize = parseFloat(props.iconSize.toString())
+    const sz = iSize.toString() + props.unit
+    return {
+        width: sz,
+        height: sz,
+        left: ((sizeLocal.value - iSize) / 2).toString() + props.unit,
+        top: ((sizeLocal.value - iSize) / 2).toString() + props.unit
+    } as UTSJSONObject
+})
+
+const canvasStyle = computed<UTSJSONObject>(() => {
+    return {
+        width: sizeLocal.value.toString() + props.unit,
+        height: sizeLocal.value.toString() + props.unit
+    } as UTSJSONObject
+})
+
+function initCanvas(): Promise<void> {
+    return new Promise((resolve, reject) => {
+        if (canvasContext != null && ctx != null) {
+            resolve()
+            return
+        }
+        uni.createCanvasContextAsync({
+            id: canvasId.value as string.IDString,
+            component: instance?.proxy,
+            success: (context: CanvasContext) => {
+                canvasContext = context
+                const c2d = context.getContext('2d')
+                if (c2d == null) {
+                    reject(new Error('Canvas context is not ready'))
+                    return
+                }
+                const canvas = c2d.canvas
+                const pixelRatio = getPixelRatio()
+                canvas.width = sizeLocal.value * pixelRatio
+                canvas.height = sizeLocal.value * pixelRatio
+                c2d.scale(pixelRatio, pixelRatio)
+                ctx = c2d
+                resolve()
+            },
+            fail: (err: UniError) => {
+                reject(err)
+            }
+        })
+    })
+}
+
+function drawQrToCanvas(): void {
+    if (ctx == null) return
+    const drawSize = sizeLocal.value
+    ctx!.clearRect(0, 0, drawSize, drawSize)
+    ctx!.fillStyle = props.background
+    ctx!.fillRect(0, 0, drawSize, drawSize)
+    const count = getQrRenderCountWithQuietZone(props.val, parseFloat(props.lv.toString()), parseFloat(props.quietZone.toString()))
+    for (let i = 0; i < cells.value.length; i++) {
+        const cell = cells.value[i]
+        if (!cell.getBoolean('dark', false)) {
+            continue
+        }
+        const color = cell.getString('color', props.foreground)
+        const row = Math.floor(i / count)
+        const col = i % count
+        const left = Math.floor(col * drawSize / count)
+        const top = Math.floor(row * drawSize / count)
+        const right = Math.ceil((col + 1) * drawSize / count)
+        const bottom = Math.ceil((row + 1) * drawSize / count)
+        ctx!.fillStyle = color
+        ctx!.fillRect(left, top, right - left, bottom - top)
+    }
+    ctx!.draw()
+}
+
+function renderCanvas(): Promise<void> {
+    if (error.value.length > 0 || cells.value.length == 0) {
+        return Promise.resolve()
+    }
+    return initCanvas().then(() => {
+        drawQrToCanvas()
+    })
+}
+
+function makeCode(): void {
+    if (isEmpty(props.val)) {
+        error.value = '二维码内容不能为空'
+        cells.value = [] as Array<UTSJSONObject>
+        emit('error', { message: error.value } as UTSJSONObject)
+        return
+    }
+    try {
+        loading.value = true
+        error.value = ''
+        cells.value = createQrCells(props.val, props.foreground, props.background, props.pdground, parseInt(props.lv.toString()), parseInt(props.quietZone.toString()))
+        result.value = props.val
+        loading.value = false
+        nextTick(() => {
+            renderCanvas()
+        })
+        emit('result', result.value)
+    } catch (err) {
+        loading.value = false
+        const errObj = err as UTSJSONObject
+        const message = errObj['message']
+        error.value = message == null ? err.toString() : message.toString()
+        cells.value = [] as Array<UTSJSONObject>
+        emit('error', { message: error.value } as UTSJSONObject)
+    }
+}
+
+function preview(e: UniPointerEvent): void {
+    emit('preview', {
+        url: result.value
+    } as UTSJSONObject, e)
+}
+
+function emitTempFileSuccess(options: UTSJSONObject, path: string): void {
+    const success = options['success']
+    if (success != null) {
+        ;(success as (res: UTSJSONObject) => void)({
+            tempFilePath: path
+        } as UTSJSONObject)
+    }
+    const complete = options['complete']
+    if (complete != null) {
+        ;(complete as (res: UTSJSONObject) => void)({
+            tempFilePath: path
+        } as UTSJSONObject)
+    }
+}
+
+function emitTempFileFail(options: UTSJSONObject, message: string): void {
+    const payload = { __$originalPosition: new UTSSourceMapPosition("payload", "uni_modules/uview-ultra/components/up-qrcode/up-qrcode.uvue", 298, 11), 
+        errMsg: message
+    } as UTSJSONObject
+    const fail = options['fail']
+    if (fail != null) {
+        ;(fail as (error: UTSJSONObject) => void)(payload)
+    }
+    const complete = options['complete']
+    if (complete != null) {
+        ;(complete as (error: UTSJSONObject) => void)(payload)
+    }
+}
+
+function exportImage(options: UTSJSONObject): void {
+    renderCanvas().then(() => {
+        if (canvasContext == null) {
+            emitTempFileFail(options, 'Canvas is not ready')
+            return
+        }
+        const path = canvasContext!.toDataURL('image/png', 1)
+        emitTempFileSuccess(options, path)
+    }).catch((err: any | null) => {
+        const message = err == null ? 'Canvas init failed' : err.toString()
+        emitTempFileFail(options, message)
+    })
+}
+
+function toTempFilePath(options: UTSJSONObject): void {
+    if (error.value.length > 0 || cells.value.length == 0) {
+        emitTempFileFail(options, 'up-qrcode content is not ready')
+        return
+    }
+    exportImage(options)
+}
+
+function longpress(): void {
+    toTempFilePath({
+        success: (res: UTSJSONObject) => {
+            emit('longpressCallback', res['tempFilePath'])
+        },
+        fail: (_: UTSJSONObject) => {
+            emit('longpressCallback', result.value)
+        }
+    } as UTSJSONObject)
+}
+
+watch((): string => props.val, () => {
+    if (props.onval) {
+        makeCode()
+    }
+})
+
+watch((): Array<any | null> => [props.size, props.background, props.foreground, props.pdground] as Array<any | null>, () => {
+    makeCode()
+})
+
+onMounted(() => {
+    if (props.loadMake) {
+        makeCode()
+    }
+})
+
+__expose({
+    makeCode,
+    toTempFilePath
+})
+
+return (): any | null => {
+
+const _component_up_loading_icon = resolveEasyComponent("up-loading-icon",_easycom_up_loading_icon)
+
+  return _cE("view", _uM({
+    class: "up-qrcode",
+    style: _nS(rootStyle.value),
+    onLongpress: longpress,
+    onClick: preview
+  }), [
+    error.value.length > 0
+      ? _cE("view", _uM({
+          key: 0,
+          class: "up-qrcode__error",
+          style: _nS(matrixStyle.value)
+        }), [
+          _cE("text", _uM({ class: "up-qrcode__error-text" }), _tD(error.value), 1 /* TEXT */)
+        ], 4 /* STYLE */)
+      : _cE("view", _uM({
+          key: 1,
+          class: "up-qrcode__matrix",
+          style: _nS(matrixStyle.value)
+        }), [
+          _cE("canvas", _uM({
+            class: "up-qrcode__canvas",
+            id: canvasId.value,
+            "canvas-id": canvasId.value,
+            style: _nS(canvasStyle.value)
+          }), null, 12 /* STYLE, PROPS */, ["id", "canvas-id"]),
+          _ctx.icon.length > 0
+            ? _cE("image", _uM({
+                key: 0,
+                class: "up-qrcode__icon",
+                src: _ctx.icon,
+                mode: "aspectFill",
+                style: _nS(iconStyle.value)
+              }), null, 12 /* STYLE, PROPS */, ["src"])
+            : _cC("v-if", true),
+          isTrue(_ctx.showLoading && loading.value)
+            ? _cE("view", _uM({
+                key: 1,
+                class: "up-qrcode__loading"
+              }), [
+                _cV(_component_up_loading_icon, _uM({
+                  vertical: "",
+                  text: _ctx.loadingText,
+                  textSize: "14px"
+                }), null, 8 /* PROPS */, ["text"])
+              ])
+            : _cC("v-if", true)
+        ], 4 /* STYLE */)
+  ], 36 /* STYLE, NEED_HYDRATION */)
+}
+}
+
+})
+export default __sfc__
+export type UpQrcodeComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpQrcodeUpQrcodeStyles = [_uM([["up-qrcode", _pS(_uM([["display", "flex"], ["position", "relative"]]))], ["up-qrcode__matrix", _pS(_uM([["position", "relative"], ["overflow", "hidden"]]))], ["up-qrcode__canvas", _pS(_uM([["position", "absolute"], ["left", 0], ["top", 0]]))], ["up-qrcode__icon", _pS(_uM([["position", "absolute"], ["borderTopLeftRadius", 4], ["borderTopRightRadius", 4], ["borderBottomRightRadius", 4], ["borderBottomLeftRadius", 4], ["backgroundColor", "#ffffff"]]))], ["up-qrcode__loading", _pS(_uM([["position", "absolute"], ["left", 0], ["right", 0], ["top", 0], ["bottom", 0], ["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"], ["backgroundColor", "rgba(255,255,255,0.8)"]]))], ["up-qrcode__error", _pS(_uM([["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"], ["backgroundColor", "#f8f8f8"]]))], ["up-qrcode__error-text", _pS(_uM([["color", "#fa3534"], ["fontSize", 14]]))]])]

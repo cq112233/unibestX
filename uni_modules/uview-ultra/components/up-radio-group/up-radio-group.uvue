@@ -2,7 +2,7 @@
 	<view
 	    class="up-radio-group"
 	    :class="bemClass"
-	    :style="addStyle(customStyle)"
+	    :style="customRadioGroupStyle"
 	>
 		<slot></slot>
 	</view>
@@ -93,31 +93,59 @@ const bemClass = computed(() => {
 	return bem('radio-group', [props.placement], [])
 })
 
+const customRadioGroupStyle = computed((): UTSJSONObject => {
+	return addStyle(props.customStyle) as UTSJSONObject
+})
+
 function onRadioSelected(val: any) {
 	emit('update:modelValue', val)
 	emit('change', val)
 }
 
-provide('upRadioGroup', {
-	props,
-	onRadioSelected
+const parentState = computed((): UTSJSONObject => {
+	return {
+		name: props.name,
+		modelValue: props.modelValue,
+		shape: props.shape,
+		disabled: props.disabled,
+		activeColor: props.activeColor,
+		inactiveColor: props.inactiveColor,
+		size: props.size,
+		placement: props.placement,
+		label: props.label,
+		labelColor: props.labelColor,
+		labelSize: props.labelSize,
+		labelDisabled: props.labelDisabled,
+		iconColor: props.iconColor,
+		iconSize: props.iconSize,
+		borderBottom: props.borderBottom,
+		iconPlacement: props.iconPlacement,
+	} as UTSJSONObject
 })
+
+provide('upRadioGroupProps', parentState)
+provide('upRadioGroupSelect', onRadioSelected)
 </script>
 
 <style lang="scss" scoped>
 	@import "../../libs/css/components.scss";
 
 	.up-radio-group {
-		flex: 1;
+		display: flex;
+		width: 100%;
 
 		&--row {
 			display: flex;
 			flex-direction: row;
 			flex-wrap: wrap;
+			align-items: center;
+			width: 100%;
 		}
 
 		&--column {
-			@include flex(column);
+			display: flex;
+			flex-direction: column;
+			width: 100%;
 		}
 	}
 </style>

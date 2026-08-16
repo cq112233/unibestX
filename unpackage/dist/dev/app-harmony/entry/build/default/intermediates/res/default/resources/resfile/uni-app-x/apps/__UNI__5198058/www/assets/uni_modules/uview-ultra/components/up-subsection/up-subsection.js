@@ -1,17 +1,11 @@
 import { b as addStyle, a as addUnit } from "../../libs/function/index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, unref: _unref, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, setSharedData: _setSharedData, toDisplayString: _toDisplayString, createSharedDataSlot: _createSharedDataSlot, setSharedDataEvent: _setSharedDataEvent, createSharedDataFor: _createSharedDataFor, setSharedDataTemplateRef: _setSharedDataTemplateRef } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpSubsectionUpSubsection";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { computed, ref, watch, onMounted, nextTick, getCurrentInstance } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-subsection"
   },
-  __dynamicSharedData: true,
-  __hash: "28423ad6",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-subsection/up-subsection.uvue",
   __name: "up-subsection",
   props: {
     list: {
@@ -73,9 +67,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   },
   emits: ["change"],
   setup(__props, _a) {
-    var __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpSubsectionUpSubsectionSharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
     const props = __props;
     const emit = __emit;
     const instance = getCurrentInstance();
@@ -222,80 +215,96 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     onMounted(() => {
       init();
     });
-    return () => {
-      "raw js";
-      const _setTemplateRef = _createSharedDataTemplateRefSetter();
-      _renderSharedDataEffect(() => {
-        const _mode = __props.mode;
-        const _innerCurrent = innerCurrent.value;
-        const _list = __props.list;
-        const _list_length = _list.length;
-        _setSharedDataClass(__sharedData, 2, ["up-subsection", [`up-subsection--${_mode}`]]);
-        _setSharedDataStyle(__sharedData, 3, [_unref(addStyle)(__props.customStyle), wrapperStyle.value]);
-        _setSharedDataStyle(__sharedData, 4, barStyle.value);
-        _setSharedDataClass(__sharedData, 5, ["up-subsection__bar__inner", {
-          "up-subsection--button__bar": _mode === "button",
-          "up-subsection__bar__inner--button": _mode === "button",
-          "up-subsection__bar--first": _innerCurrent == 0 && _mode === "subsection",
-          "up-subsection__bar--center": _innerCurrent > 0 && _innerCurrent < _list_length - 1 && _mode === "subsection",
-          "up-subsection__bar--last": _innerCurrent == _list_length - 1 && _mode === "subsection"
-        }]);
-        _setSharedDataStyle(__sharedData, 6, innerBarStyle.value);
-      });
-      _createSharedDataFor(_setSharedDataScoped(__sharedData, 0, _createSharedDataVFor(__sharedDataScope, () => {
-        return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-      })), () => {
-        return __props.list;
-      }, (__sharedData_VFor0, _for_item0, _for_key0) => {
-        _renderSharedDataEffect(() => {
-          const _index = _for_key0.value;
-          const _list = __props.list;
-          const _list_length = _list.length;
-          _setSharedDataClass(__sharedData_VFor0, 6, ["up-subsection__item cursor-pointer", [
-            `up-subsection__item--${_index.toString()}`,
-            _index < _list_length - 1 ? "up-subsection__item--no-border-right" : "",
-            _index == 0 ? "up-subsection__item--first" : "",
-            _index == _list_length - 1 ? "up-subsection__item--last" : "",
-            __props.disabled ? "up-subsection__item--disabled" : ""
-          ]]);
-          _setSharedDataStyle(__sharedData_VFor0, 7, [itemStyle()]);
-        });
-        _createSharedDataSlot("item", {
-          item: () => {
-            return _for_item0.value;
-          },
-          index: () => {
-            return _for_key0.value;
-          }
-        }, (data) => {
-          return _setSharedData(__sharedData_VFor0, 1, data);
-        }, () => {
-          _renderSharedDataEffect(() => {
-            const _index = _for_key0.value;
-            _setSharedDataClass(__sharedData_VFor0, 2, ["up-subsection__item__text", [
-              __props.disabled ? "up-subsection__item__text--disabled" : "",
-              innerCurrent.value == _index && __props.mode === "button" && __props.activeColor == "#3c9cff" ? "up-subsection__item__text--active" : ""
-            ]]);
-            _setSharedDataStyle(__sharedData_VFor0, 3, [textStyle(_index)]);
-            _setSharedData(__sharedData_VFor0, 4, _toDisplayString(getText(_for_item0.value)));
-          });
-        });
-        _setSharedDataEvent(__sharedData_VFor0, 5, () => {
-          return clickHandler(_for_key0.value);
-        });
-        return null;
-      }, (__sharedData_VFor0, item, index) => {
-        return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
-      });
-      _setSharedDataTemplateRef(__sharedData, 1, (n8) => {
-        _setTemplateRef(n8, "upSubsectionRef");
-      });
-      return __sharedData;
-    };
+    const __returned__ = { props, emit, instance, innerCurrent, componentWidth, firstTime, wrapperStyle, barStyle, innerBarStyle, getWrapperRect, resize, init, itemStyle, textStyle, getText, clickHandler, get addStyle() {
+      return addStyle;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-subsection": { "": { "display": "flex", "flexDirection": "row", "position": "relative", "overflow": "hidden", "width": "100%", "boxSizing": "border-box" } }, "up-subsection--button": { "": { "height": 32, "backgroundColor": "#eeeeef", "paddingTop": 3, "paddingRight": 3, "paddingBottom": 3, "paddingLeft": 3, "borderTopLeftRadius": 3, "borderTopRightRadius": 3, "borderBottomRightRadius": 3, "borderBottomLeftRadius": 3, "alignItems": "stretch" } }, "up-subsection--button__bar": { "": { "backgroundColor": "#ffffff", "!borderTopLeftRadius": 3, "!borderTopRightRadius": 3, "!borderBottomRightRadius": 3, "!borderBottomLeftRadius": 3 } }, "up-subsection--subsection": { "": { "height": 30 } }, "up-subsection__bar": { "": { "position": "absolute", "transitionProperty": "transform,color", "transitionDuration": "0.3s", "transitionTimingFunction": "ease-in-out" } }, "up-subsection__bar--first": { "": { "borderTopLeftRadius": 3, "borderBottomLeftRadius": 3 } }, "up-subsection__bar--center": { "": { "borderTopLeftRadius": 0, "borderBottomLeftRadius": 0 } }, "up-subsection__bar--last": { "": { "borderTopRightRadius": 3, "borderBottomRightRadius": 3 } }, "up-subsection__bar__inner": { "": { "height": "100%", "backgroundColor": "var(--theme-color, #0957de)" } }, "up-subsection__bar__inner--button": { "": { "!borderTopLeftRadius": 3, "!borderTopRightRadius": 3, "!borderBottomRightRadius": 3, "!borderBottomLeftRadius": 3, "backgroundColor": "#ffffff", "boxShadow": "0 1px 3px rgba(0, 0, 0, 0.1)" } }, "up-subsection__item": { "": { "display": "flex", "flexDirection": "row", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "textAlign": "center", "fontSize": 12, "height": "100%", "alignItems": "center", "justifyContent": "center", "position": "relative" } }, "up-subsection__item--no-border-right": { "": { "!borderRightWidth": 0 } }, "up-subsection__item--first": { "": { "borderTopLeftRadius": 3, "borderBottomLeftRadius": 3 } }, "up-subsection__item--last": { "": { "borderTopRightRadius": 3, "borderBottomRightRadius": 3 } }, "up-subsection__item__text": { "": { "fontSize": 12, "lineHeight": "12px", "display": "flex", "flexDirection": "row", "alignItems": "center", "transitionProperty": "color", "transitionDuration": "0.3s" } }, "up-subsection__item__text--active": { "": { "color": "var(--theme-color, #0957de)" } }, "up-subsection__item__text--disabled": { "": { "color": "#c8c9cc" } }, "@TRANSITION": { "up-subsection__bar": { "property": "transform,color", "duration": "0.3s", "timingFunction": "ease-in-out" }, "up-subsection__item__text": { "property": "color", "duration": "0.3s" } } };
+const { normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode, renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, renderSlot: _renderSlot, toDisplayString: _toDisplayString } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      class: _normalizeClass(["up-subsection", [`up-subsection--${$props.mode}`]]),
+      ref: "upSubsectionRef",
+      style: _normalizeStyle([$setup.addStyle($props.customStyle), $setup.wrapperStyle])
+    },
+    [
+      _createElementVNode(
+        "view",
+        {
+          class: "up-subsection__bar cursor-pointer",
+          style: _normalizeStyle($setup.barStyle)
+        },
+        [
+          _createElementVNode(
+            "view",
+            {
+              class: _normalizeClass(["up-subsection__bar__inner", {
+                "up-subsection--button__bar": $props.mode === "button",
+                "up-subsection__bar__inner--button": $props.mode === "button",
+                "up-subsection__bar--first": $setup.innerCurrent == 0 && $props.mode === "subsection",
+                "up-subsection__bar--center": $setup.innerCurrent > 0 && $setup.innerCurrent < $props.list.length - 1 && $props.mode === "subsection",
+                "up-subsection__bar--last": $setup.innerCurrent == $props.list.length - 1 && $props.mode === "subsection"
+              }]),
+              style: _normalizeStyle($setup.innerBarStyle)
+            },
+            null,
+            6
+            /* CLASS, STYLE */
+          )
+        ],
+        4
+        /* STYLE */
+      ),
+      (_openBlock(true), _createElementBlock(
+        _Fragment,
+        null,
+        _renderList($props.list, (item, index) => {
+          return _openBlock(), _createElementBlock("view", {
+            class: _normalizeClass(["up-subsection__item cursor-pointer", [
+              `up-subsection__item--${index.toString()}`,
+              index < $props.list.length - 1 ? "up-subsection__item--no-border-right" : "",
+              index == 0 ? "up-subsection__item--first" : "",
+              index == $props.list.length - 1 ? "up-subsection__item--last" : "",
+              $props.disabled ? "up-subsection__item--disabled" : ""
+            ]]),
+            style: _normalizeStyle([$setup.itemStyle(index)]),
+            onClick: ($event) => $setup.clickHandler(index),
+            key: index
+          }, [
+            _renderSlot(_ctx.$slots, "item", {
+              item,
+              index
+            }, () => [
+              _createElementVNode(
+                "text",
+                {
+                  class: _normalizeClass(["up-subsection__item__text", [
+                    $props.disabled ? "up-subsection__item__text--disabled" : "",
+                    $setup.innerCurrent == index && $props.mode === "button" && $props.activeColor == "#3c9cff" ? "up-subsection__item__text--active" : ""
+                  ]]),
+                  style: _normalizeStyle([$setup.textStyle(index)])
+                },
+                _toDisplayString($setup.getText(item)),
+                7
+                /* TEXT, CLASS, STYLE */
+              )
+            ])
+          ], 14, ["onClick"]);
+        }),
+        128
+        /* KEYED_FRAGMENT */
+      ))
+    ],
+    6
+    /* CLASS, STYLE */
+  );
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-subsection/up-subsection.uvue"]]);
 export {
   __easycom_1 as _
 };

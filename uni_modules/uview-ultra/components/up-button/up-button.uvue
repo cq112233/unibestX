@@ -1,18 +1,18 @@
 <template>
 	<view style="position: relative"
-		:style="[baseColor, addStyle(customStyle)]"
+		:style="buttonRootStyle"
 		class="up-button"
 		:hover-class="!disabled && !loading ? 'up-button--active' : ''"
 		:class="bemClass">
 		<template v-if="loading">
 		    <up-loading-icon
 		        :mode="loadingMode"
-		        :size="addUnit(loadingSize * 1.15)"
+		        :size="loadingIconSize"
 		        :color="loadingColor"
 		    ></up-loading-icon>
 		    <text
 		        class="up-button__text up-button__loading-text"
-		        :style="[{ fontSize: textSize + 'px', color: textColorCom }]"
+		        :style="textStyle"
 		    >{{ loadingText != '' ? loadingText : text }}</text>
 		</template>
 		<template v-else>
@@ -20,13 +20,13 @@
 		        v-if="icon != ''"
 		        :name="icon"
 		        :color="iconColorCom"
-		        :size="addUnit(parseInt(getPx(textSize)) * 1.35)"
+		        :size="iconSizeComputed"
 		        :customStyle="{ marginRight: '2px' }"
 		    ></up-icon>
 		    <slot>
 		        <text
 		            class="up-button__text"
-		            :style="[{ fontSize: textSize + 'px', color: textColorCom }]"
+		            :style="textStyle"
 		        >{{ text }}</text>
 		    </slot>
 		</template>
@@ -61,7 +61,7 @@
 
 <script setup lang="uts">
 import { computed } from 'vue'
-import { addStyle, addUnit, getPx, bem } from '../../libs/function/index'
+import { addStyle, addUnit, getPx, bem, deepMerge } from '../../libs/function/index'
 import { throttle } from '../../libs/function/throttle'
 import config from '../../libs/config/config'
 
@@ -282,6 +282,26 @@ const textSize = computed(() => {
     if (props.size === "small") fontSize = '12';
     if (props.size === "mini") fontSize = '10';
     return fontSize;
+});
+
+const buttonRootStyle = computed((): UTSJSONObject => {
+    const custom = addStyle(props.customStyle) as UTSJSONObject
+    return deepMerge(baseColor.value, custom) as UTSJSONObject
+});
+
+const loadingIconSize = computed((): string => {
+    return addUnit(props.loadingSize * 1.15)
+});
+
+const textStyle = computed((): UTSJSONObject => {
+    return {
+        fontSize: textSize.value + 'px',
+        color: textColorCom.value
+    } as UTSJSONObject
+});
+
+const iconSizeComputed = computed((): string => {
+    return addUnit(parseInt(getPx(textSize.value)) * 1.35)
 });
 
 const clickHandler = (): void => {

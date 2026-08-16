@@ -1,4 +1,5 @@
 import { _ as __easycom_2$1 } from "../up-overlay/up-overlay.js";
+import { r as resolveEasycom } from "../../../../App.ku.js";
 import { _ as __easycom_0 } from "../up-status-bar/up-status-bar.js";
 import { _ as __easycom_0$1 } from "../up-icon/up-icon.js";
 import { _ as __easycom_0$2 } from "../up-safe-bottom/up-safe-bottom.js";
@@ -6,18 +7,12 @@ import { _ as __easycom_1 } from "../up-transition/up-transition.js";
 import "./popup.js";
 import { d as deepMerge, a as addUnit, b as addStyle } from "../../libs/function/index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataClass: _setSharedDataClass, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, setSharedDataStyle: _setSharedDataStyle, createSharedDataSlot: _createSharedDataSlot, setSharedDataEvent: _setSharedDataEvent, withSharedDataVaporCtx: _withSharedDataVaporCtx } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpPopupUpPopup";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { computed, ref } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-popup"
   },
-  __dynamicSharedData: true,
-  __hash: "0133db38",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-popup/up-popup.uvue",
   __name: "up-popup",
   props: {
     show: {
@@ -99,9 +94,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   },
   emits: ["open", "close", "click", "update:show"],
   setup(__props, _a) {
-    var __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpPopupUpPopupSharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
     const props = __props;
     const emit = __emit;
     const overlayDuration = computed(() => {
@@ -199,103 +193,89 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       }
       emit("click");
     }
-    return () => {
-      "raw js";
-      const _component_up_overlay = __easycom_2$1;
-      const _component_up_status_bar = __easycom_0;
-      const _component_up_icon = __easycom_0$1;
-      const _component_up_safe_bottom = __easycom_0$2;
-      const _component_up_transition = __easycom_1;
-      _renderSharedDataEffect(() => {
-        return _setSharedDataClass(__sharedData, 13, ["up-popup", [__props.customClass]]);
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.overlay && !__props.pageInline));
-      }, () => {
-        const n2 = _createSharedDataComponentWithFallback(_component_up_overlay, "5082c17d", {
-          show: () => {
-            return __props.show && !__props.pageInline;
-          },
-          onClick: () => {
-            return overlayClick;
-          },
-          zIndex: () => {
-            return __props.zIndex;
-          },
-          duration: () => {
-            return overlayDuration.value;
-          },
-          customStyle: () => {
-            return __props.overlayStyle;
-          },
-          opacity: () => {
-            return __props.overlayOpacity;
-          }
-        });
-        _setSharedData(__sharedData, 1, n2?.sharedData);
-      });
-      const n15 = _createSharedDataComponentWithFallback(_component_up_transition, "8055382a", {
-        show: () => {
-          return __props.pageInline ? true : __props.show;
-        },
-        customStyle: () => {
-          return transitionStyle.value;
-        },
-        mode: () => {
-          return __props.pageInline ? "none" : position.value;
-        },
-        duration: () => {
-          return __props.duration;
-        },
-        onAfterEnter: () => {
-          return afterEnter;
-        },
-        onClick: () => {
-          return clickHandler;
-        }
-      }, {
-        "default": _withSharedDataVaporCtx(() => {
-          _renderSharedDataEffect(() => {
-            return _setSharedDataStyle(__sharedData, 12, [contentStyle.value]);
-          });
-          _createSharedDataIf(() => {
-            return _setSharedData(__sharedData, 3, _toSharedDataBoolean(__props.safeAreaInsetTop));
-          }, () => {
-            const n5 = _createSharedDataComponentWithFallback(_component_up_status_bar, "8055219a");
-            _setSharedData(__sharedData, 4, n5?.sharedData);
-          });
-          _createSharedDataSlot("default", null, null);
-          _createSharedDataIf(() => {
-            return _setSharedData(__sharedData, 5, _toSharedDataBoolean(__props.closeable));
-          }, () => {
-            _renderSharedDataEffect(() => {
-              return _setSharedDataClass(__sharedData, 8, ["up-popup__content__close", ["up-popup__content__close--" + __props.closeIconPos]]);
-            });
-            const n9 = _createSharedDataComponentWithFallback(_component_up_icon, "8055058a", {
-              name: "close",
-              color: "#909399",
-              size: "18",
-              bold: ""
-            });
-            _setSharedData(__sharedData, 6, n9?.sharedData);
-            _setSharedDataEvent(__sharedData, 7, close);
-          });
-          _createSharedDataIf(() => {
-            return _setSharedData(__sharedData, 9, _toSharedDataBoolean(__props.safeAreaInsetBottom));
-          }, () => {
-            const n13 = _createSharedDataComponentWithFallback(_component_up_safe_bottom, "3ad68722");
-            _setSharedData(__sharedData, 10, n13?.sharedData);
-          });
-          _setSharedDataEvent(__sharedData, 11, noop);
-        })
-      });
-      _setSharedData(__sharedData, 2, n15?.sharedData);
-      return __sharedData;
-    };
+    const __returned__ = { props, emit, overlayDuration, position, transitionStyle, contentStyle, noop, overlayClick, close, afterEnter, clickHandler };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-popup": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-popup__content": { "": { "backgroundColor": "#ffffff", "position": "relative" } }, "up-popup__content--round-top": { "": { "borderTopLeftRadius": 0, "borderTopRightRadius": 0, "borderBottomLeftRadius": 10, "borderBottomRightRadius": 10 } }, "up-popup__content--round-left": { "": { "borderTopLeftRadius": 0, "borderTopRightRadius": 10, "borderBottomLeftRadius": 0, "borderBottomRightRadius": 10 } }, "up-popup__content--round-right": { "": { "borderTopLeftRadius": 10, "borderTopRightRadius": 0, "borderBottomLeftRadius": 10, "borderBottomRightRadius": 0 } }, "up-popup__content--round-bottom": { "": { "borderTopLeftRadius": 10, "borderTopRightRadius": 10, "borderBottomLeftRadius": 0, "borderBottomRightRadius": 0 } }, "up-popup__content--round-center": { "": { "borderTopLeftRadius": 10, "borderTopRightRadius": 10, "borderBottomLeftRadius": 10, "borderBottomRightRadius": 10 } }, "up-popup__content__close": { "": { "position": "absolute" } }, "up-popup__content__close--hover": { "": { "opacity": 0.4 } }, "up-popup__content__close--top-left": { "": { "top": 15, "left": 15 } }, "up-popup__content__close--top-right": { "": { "top": 15, "right": 15 } }, "up-popup__content__close--bottom-left": { "": { "bottom": 15, "left": 15 } }, "up-popup__content__close--bottom-right": { "": { "right": 15, "bottom": 15 } } };
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { resolveComponent: _resolveComponent, openBlock: _openBlock, createBlock: _createBlock, createCommentVNode: _createCommentVNode, renderSlot: _renderSlot, createVNode: _createVNode, withModifiers: _withModifiers, normalizeClass: _normalizeClass, createElementBlock: _createElementBlock, normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode, withCtx: _withCtx } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_overlay = resolveEasycom(__resolveDynamicComponent("up-overlay"), __easycom_2$1);
+  const _component_up_status_bar = resolveEasycom(__resolveDynamicComponent("up-status-bar"), __easycom_0);
+  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0$1);
+  const _component_up_safe_bottom = resolveEasycom(__resolveDynamicComponent("up-safe-bottom"), __easycom_0$2);
+  const _component_up_transition = resolveEasycom(__resolveDynamicComponent("up-transition"), __easycom_1);
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      class: _normalizeClass(["up-popup", [$props.customClass]])
+    },
+    [
+      $props.overlay && !$props.pageInline ? (_openBlock(), _createBlock(_component_up_overlay, {
+        key: 0,
+        show: $props.show && !$props.pageInline,
+        onClick: $setup.overlayClick,
+        zIndex: $props.zIndex,
+        duration: $setup.overlayDuration,
+        customStyle: $props.overlayStyle,
+        opacity: $props.overlayOpacity
+      }, null, 8, ["show", "zIndex", "duration", "customStyle", "opacity"])) : _createCommentVNode("v-if", true),
+      _createVNode(_component_up_transition, {
+        show: $props.pageInline ? true : $props.show,
+        customStyle: $setup.transitionStyle,
+        mode: $props.pageInline ? "none" : $setup.position,
+        duration: $props.duration,
+        onAfterEnter: $setup.afterEnter,
+        onClick: $setup.clickHandler
+      }, {
+        default: _withCtx(() => [
+          _createElementVNode(
+            "view",
+            {
+              class: "up-popup__content",
+              style: _normalizeStyle([$setup.contentStyle]),
+              onClick: _withModifiers($setup.noop, ["stop"])
+            },
+            [
+              $props.safeAreaInsetTop ? (_openBlock(), _createBlock(_component_up_status_bar, { key: 0 })) : _createCommentVNode("v-if", true),
+              _renderSlot(_ctx.$slots, "default"),
+              $props.closeable ? (_openBlock(), _createElementBlock(
+                "view",
+                {
+                  key: 1,
+                  onClick: _withModifiers($setup.close, ["stop"]),
+                  class: _normalizeClass(["up-popup__content__close", ["up-popup__content__close--" + $props.closeIconPos]]),
+                  "hover-class": "up-popup__content__close--hover",
+                  "hover-stay-time": "150"
+                },
+                [
+                  _createVNode(_component_up_icon, {
+                    name: "close",
+                    color: "#909399",
+                    size: "18",
+                    bold: ""
+                  })
+                ],
+                2
+                /* CLASS */
+              )) : _createCommentVNode("v-if", true),
+              $props.safeAreaInsetBottom ? (_openBlock(), _createBlock(_component_up_safe_bottom, { key: 2 })) : _createCommentVNode("v-if", true)
+            ],
+            4
+            /* STYLE */
+          )
+        ]),
+        _: 3
+        /* FORWARDED */
+      }, 8, ["show", "customStyle", "mode", "duration"])
+    ],
+    2
+    /* CLASS */
+  );
+}
+const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-popup/up-popup.uvue"]]);
 export {
   __easycom_2 as _
 };

@@ -38,17 +38,49 @@ typeof SuppressedError === "function" ? SuppressedError : function(error, suppre
   return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
 };
 class WebviewEchart {
-  constructor(ctx) {
+  constructor(canvasId, webviewCtx = null, element = null) {
+    this.canvasId = "";
+    this.webviewCtx = null;
+    this.element = null;
     this.onEventMap = /* @__PURE__ */ new Map();
     this.onceEventMap = /* @__PURE__ */ new Map();
-    this.ctx = ctx;
+    this.canvasId = canvasId;
+    this.webviewCtx = webviewCtx;
+    this.element = element;
+  }
+  evalJS(code) {
+    if (this.element != null) {
+      this.element.evalJS(code);
+      return null;
+    }
+    if (this.webviewCtx != null) {
+      this.webviewCtx.evalJS(code);
+      return null;
+    }
+    if (this.canvasId != "") {
+      const el = uni.getElementById(this.canvasId);
+      if (el != null) {
+        this.element = el;
+        this.element.evalJS(code);
+        return null;
+      }
+      try {
+        const ctx = uni.createWebviewContext(this.canvasId);
+        if (ctx != null) {
+          this.webviewCtx = ctx;
+          this.webviewCtx.evalJS(code);
+          return null;
+        }
+      } catch (_e) {
+      }
+    }
   }
   init(theme = null, opts = new UTSJSONObject({})) {
-    this.ctx.evalJS(`init(${UTS.JSON.stringify(new UTSJSONObject({ theme, opts }))})`);
+    this.evalJS(`init(${UTS.JSON.stringify(new UTSJSONObject({ theme, opts }))})`);
   }
   onWebviewMsg(e) {
     var e_1, _a;
-    uni.__f__("log", "at uni_modules/e-chart/components/e-chart/uts/WebviewEchart.uts:20", "onWebviewMsg", e.detail.data);
+    uni.__f__("log", "at uni_modules/e-chart/components/e-chart/uts/WebviewEchart.uts:51", "onWebviewMsg", e.detail.data);
     try {
       for (var _b = __values(e.detail.data), _c = _b.next(); !_c.done; _c = _b.next()) {
         var msg = _c.value;
@@ -77,56 +109,56 @@ class WebviewEchart {
     }
   }
   setOption(option, notMerge = false, lazyUpdate = false) {
-    this.ctx.evalJS(`setOption(${UTS.JSON.stringify(option)}, ${notMerge}, ${lazyUpdate})`);
+    this.evalJS(`setOption(${UTS.JSON.stringify(option)}, ${notMerge}, ${lazyUpdate})`);
   }
   getOption(success) {
     this.onceEventMap.set("getOption", success);
-    this.ctx.evalJS(`getOption()`);
+    this.evalJS(`getOption()`);
   }
   getWidth(success) {
     this.onceEventMap.set("getWidth", success);
-    this.ctx.evalJS(`getWidth()`);
+    this.evalJS(`getWidth()`);
   }
   getHeight(success) {
     this.onceEventMap.set("getHeight", success);
-    this.ctx.evalJS(`getHeight()`);
+    this.evalJS(`getHeight()`);
   }
   resize(option = new UTSJSONObject({})) {
-    this.ctx.evalJS(`resize(${UTS.JSON.stringify(option)})`);
+    this.evalJS(`resize(${UTS.JSON.stringify(option)})`);
   }
   on(name, handler) {
     this.onEventMap.set(name, handler);
-    this.ctx.evalJS(`on(${UTS.JSON.stringify(new UTSJSONObject({ name }))})`);
+    this.evalJS(`on(${UTS.JSON.stringify(new UTSJSONObject({ name }))})`);
   }
   on(name, query, handler) {
     this.onEventMap.set(name, handler);
-    this.ctx.evalJS(`on(${UTS.JSON.stringify(new UTSJSONObject({ name, query }))})`);
+    this.evalJS(`on(${UTS.JSON.stringify(new UTSJSONObject({ name, query }))})`);
   }
   off(name) {
-    this.ctx.evalJS(`off(${UTS.JSON.stringify(new UTSJSONObject({ name }))})`);
+    this.evalJS(`off(${UTS.JSON.stringify(new UTSJSONObject({ name }))})`);
   }
   dispatchAction(option) {
-    this.ctx.evalJS(`dispatchAction(${UTS.JSON.stringify(option)})`);
+    this.evalJS(`dispatchAction(${UTS.JSON.stringify(option)})`);
   }
   showLoading(option) {
-    this.ctx.evalJS(`showLoading(${UTS.JSON.stringify(option)})`);
+    this.evalJS(`showLoading(${UTS.JSON.stringify(option)})`);
   }
   hideLoading() {
-    this.ctx.evalJS(`hideLoading()`);
+    this.evalJS(`hideLoading()`);
   }
   appendData(option) {
-    this.ctx.evalJS(`appendData(${UTS.JSON.stringify(option)})`);
+    this.evalJS(`appendData(${UTS.JSON.stringify(option)})`);
   }
   canvasToTempFilePath(option) {
     const success = option["success"];
     this.onceEventMap.set("canvasToTempFilePath", success);
-    this.ctx.evalJS(`canvasToTempFilePath()`);
+    this.evalJS(`canvasToTempFilePath()`);
   }
   clear() {
-    this.ctx.evalJS(`clear()`);
+    this.evalJS(`clear()`);
   }
   dispose() {
-    this.ctx.evalJS(`dispose()`);
+    this.evalJS(`dispose()`);
   }
 }
 export {

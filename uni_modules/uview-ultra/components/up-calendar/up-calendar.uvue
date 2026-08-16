@@ -30,7 +30,7 @@
 			></uHeader>
 			<scroll-view
 				v-if="!monthSwitch"
-				:style="{height: addUnit(listHeight)}"
+				:style="listStyle"
 				direction="vertical"
 				@scroll="onScroll"
 				:scroll-top="scrollTop"
@@ -62,7 +62,7 @@
 			</scroll-view>
 			<view
 				v-else
-				:style="{height: addUnit(listHeight)}"
+				:style="listStyle"
 			>
 				<uMonth
 					:color="color"
@@ -258,6 +258,11 @@ const inited = ref<boolean>(false)
 const months = ref<Array<CalendarMonthItem>>([])
 const monthIndex = ref<number>(0)
 const listHeight = ref<number>(0)
+const listStyle = computed((): UTSJSONObject => {
+	return {
+		height: addUnit(listHeight.value)
+	} as UTSJSONObject
+})
 const selected = ref<Array<string>>([])
 const scrollIntoView = ref<string>('')
 const scrollTop = ref<number>(0)
@@ -396,6 +401,22 @@ function getMonths(minD: any, maxD: any): number {
 	return (maxYear - minYear) * 12 + (maxMonth - minMonth) + 1
 }
 
+function getDefaultMonthIndex(): number {
+	let sel = dayuts().format('YYYY-MM')
+	if (props.defaultDate != null) {
+		if (!testArray(props.defaultDate)) {
+			sel = dayuts(props.defaultDate).format('YYYY-MM')
+		} else if ((props.defaultDate as Array<any>).length > 0) {
+			sel = dayuts((props.defaultDate as Array<any>)[0]).format('YYYY-MM')
+		}
+	}
+	const idx = months.value.findIndex(({ year, month }): boolean => {
+		month = padZero(month)
+		return `${year}-${month}` === sel
+	})
+	return idx == -1 ? 0 : idx
+}
+
 function setMonth() {
 	const minD = (innerMinDate.value != '' && innerMinDate.value != '0') ? innerMinDate.value : dayuts().valueOf()
 	const maxD = (innerMaxDate.value != '' && innerMaxDate.value != '0')
@@ -441,20 +462,67 @@ function setMonth() {
 	}
 }
 
-function getDefaultMonthIndex(): number {
-	let sel = dayuts().format('YYYY-MM')
-	if (props.defaultDate != null) {
-		if (!testArray(props.defaultDate)) {
-			sel = dayuts(props.defaultDate).format('YYYY-MM')
-		} else if ((props.defaultDate as Array<any>).length > 0) {
-			sel = dayuts((props.defaultDate as Array<any>)[0]).format('YYYY-MM')
+function scrollIntoDefaultMonth(selMonth: string) {
+	const _index = months.value.findIndex(({ year, month }): boolean => {
+		month = padZero(month)
+		return `${year}-${month}` === selMonth
+	})
+	if (_index != -1) {
+		nextTick(() => {
+			scrollIntoView.value = ''
+			scrollIntoView.value = `month-${_index}`
+		})
+	}
+}
+
+function jumpToToday() {
+	if (todayDisabled.value) return
+	const targetMonth = dayuts(todayDate.value).format('YYYY-MM')
+	if (props.monthSwitch) {
+		const todayMonthIdx = months.value.findIndex(({ year, month }): boolean => {
+			month = padZero(month)
+			return `${year}-${month}` == targetMonth
+		})
+		if (todayMonthIdx != -1) {
+			monthIndex.value = todayMonthIdx
+		}
+		return
+	}
+	scrollIntoDefaultMonth(targetMonth)
+}
+
+function updateMonthTopM(topArr: Array<number>) {
+	topArr.map((item, index) => {
+		if (index < months.value.length) {
+			months.value[index].top = item
+		}
+	})
+	if (props.defaultDate == null) {
+		const sel = dayuts().format("YYYY-MM")
+		scrollIntoDefaultMonth(sel)
+		return
+	}
+	let sel = dayuts().format("YYYY-MM")
+	if (!testArray(props.defaultDate)) {
+		sel = dayuts(props.defaultDate).format("YYYY-MM")
+	} else {
+		sel = dayuts((props.defaultDate as Array<any>)[0]).format("YYYY-MM")
+	}
+	scrollIntoDefaultMonth(sel)
+}
+
+function onUpdateMonthTopM(topArr: Array<number>) {
+	if (props.monthSwitch) return
+	updateMonthTopM(topArr)
+}
+
+function onScroll(event: UniScrollEvent) {
+	const curScrollTop = Math.max(0, event.detail.scrollTop)
+	for (let i = 0; i < months.value.length; i++) {
+		if (curScrollTop >= (months.value[i].top > 0 ? months.value[i].top : listHeight.value)) {
+			monthIndex.value = i
 		}
 	}
-	const idx = months.value.findIndex(({ year, month }): boolean => {
-		month = padZero(month)
-		return `${year}-${month}` === sel
-	})
-	return idx == -1 ? 0 : idx
 }
 
 function init() {
@@ -497,70 +565,7 @@ function nextYear() {
 	}
 }
 
-function jumpToToday() {
-	if (todayDisabled.value) return
-	const targetMonth = dayuts(todayDate.value).format('YYYY-MM')
-	if (props.monthSwitch) {
-		const todayMonthIdx = months.value.findIndex(({ year, month }): boolean => {
-			month = padZero(month)
-			return `${year}-${month}` == targetMonth
-		})
-		if (todayMonthIdx != -1) {
-			monthIndex.value = todayMonthIdx
-		}
-		return
-	}
-	scrollIntoDefaultMonth(targetMonth)
-}
-
-function scrollIntoDefaultMonth(selMonth: string) {
-	const _index = months.value.findIndex(({ year, month }): boolean => {
-		month = padZero(month)
-		return `${year}-${month}` === selMonth
-	})
-	if (_index != -1) {
-		nextTick(() => {
-			scrollIntoView.value = ''
-			scrollIntoView.value = `month-${_index}`
-		})
-	}
-}
-
-function onScroll(event: UniScrollEvent) {
-	const curScrollTop = Math.max(0, event.detail.scrollTop)
-	for (let i = 0; i < months.value.length; i++) {
-		if (curScrollTop >= (months.value[i].top > 0 ? months.value[i].top : listHeight.value)) {
-			monthIndex.value = i
-		}
-	}
-}
-
-function onUpdateMonthTopM(topArr: Array<number>) {
-	if (props.monthSwitch) return
-	updateMonthTopM(topArr)
-}
-
-function updateMonthTopM(topArr: Array<number>) {
-	topArr.map((item, index) => {
-		if (index < months.value.length) {
-			months.value[index].top = item
-		}
-	})
-	if (props.defaultDate == null) {
-		const sel = dayuts().format("YYYY-MM")
-		scrollIntoDefaultMonth(sel)
-		return
-	}
-	let sel = dayuts().format("YYYY-MM")
-	if (!testArray(props.defaultDate)) {
-		sel = dayuts(props.defaultDate).format("YYYY-MM")
-	} else {
-		sel = dayuts((props.defaultDate as Array<any>)[0]).format("YYYY-MM")
-	}
-	scrollIntoDefaultMonth(sel)
-}
-
-watch(() => props.show, (nval: boolean) => {
+watch((): boolean => props.show, (nval: boolean) => {
 	if (nval) {
 		init()
 	} else {
@@ -568,7 +573,7 @@ watch(() => props.show, (nval: boolean) => {
 	}
 }, { immediate: true })
 
-watch(() => [props.defaultDate, innerMinDate.value, innerMaxDate.value], () => {
+watch((): Array<any | null> => [props.defaultDate, innerMinDate.value, innerMaxDate.value] as Array<any | null>, () => {
 	if (inited.value) setMonth()
 })
 

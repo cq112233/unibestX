@@ -1,9 +1,9 @@
 <template>
-	<view class="up-cell" :class="[customClass]" :style="[addStyle(customStyle)]"
+	<view class="up-cell" :class="[customClass]" :style="customCellStyle"
 		:hover-class="(!disabled && (clickable || isLink)) ? 'up-cell--clickable' : ''" :hover-stay-time="250"
 		@tap="clickHandler">
 		<view class="up-cell__body"
-			:class="[ center && 'up-cell--center', size === 'large' && 'up-cell__body--large']">
+			:class="{ 'up-cell--center': center, 'up-cell__body--large': size == 'large' }">
 			<view class="up-cell__body__content">
 				<view class="up-cell__left-icon-wrap"
 					v-if="$slots['icon'] != null || icon != ''">
@@ -11,19 +11,19 @@
 					</slot>
 					<up-icon v-else :name="icon"
 						:custom-style="iconStyle"
-						:size="size === 'large' ? '22px' : '18px'"></up-icon>
+						:size="size == 'large' ? '22px' : '18px'"></up-icon>
 				</view>
 				<view class="up-cell__title">
 					<slot name="title" v-if="$slots['title'] != null && title == ''">
 					</slot>
 					<text v-else class="up-cell__title-text"
-						:style="[titleTextStyle]"
-						:class="[disabled && 'up-cell--disabled', size === 'large' && 'up-cell__title-text--large']">
+						:style="titleTextStyle"
+						:class="{ 'up-cell--disabled': disabled, 'up-cell__title-text--large': size == 'large' }">
 						{{ title }}
 					</text>
 					<slot name="label">
-						<text class="up-cell__label" v-if="label"
-							:class="[disabled && 'up-cell--disabled', size === 'large' && 'up-cell__label--large']">
+						<text class="up-cell__label" v-if="label != ''"
+							:class="{ 'up-cell--disabled': disabled, 'up-cell__label--large': size == 'large' }">
 							{{ label }}
 							</text>
 					</slot>
@@ -31,16 +31,16 @@
 			</view>
 			<slot name="value">
 				<text class="up-cell__value"
-					:class="[disabled && 'up-cell--disabled', size === 'large' && 'up-cell__value--large']"
+					:class="{ 'up-cell--disabled': disabled, 'up-cell__value--large': size == 'large' }"
 					v-if="testEmpty(value) == false">{{ value }}</text>
 			</slot>
 			<view class="up-cell__right-icon-wrap"
 				v-if="$slots['right-icon'] != null || isLink"
 				:class="[`up-cell__right-icon-wrap--${arrowDirection}`]">
 				<slot name="right-icon">
-					<up-icon v-if="rightIcon" :name="rightIcon"
+					<up-icon v-if="rightIcon != ''" :name="rightIcon"
 						:custom-style="rightIconStyle" :color="disabled ? '#c8c9cc' : 'info'"
-						:size="size === 'large' ? '18px' : '16px'"></up-icon>
+						:size="size == 'large' ? '18px' : '16px'"></up-icon>
 				</slot>
 			</view>
 			<view class="up-cell__right-icon-wrap" v-if="$slots['righticon'] != null"
@@ -153,6 +153,10 @@
 
 	const titleTextStyle = computed(() => {
 		return addStyle(props.titleStyle)
+	})
+
+	const customCellStyle = computed((): UTSJSONObject => {
+		return addStyle(props.customStyle) as UTSJSONObject
 	})
 
 	const clickHandler = (e: any) => {

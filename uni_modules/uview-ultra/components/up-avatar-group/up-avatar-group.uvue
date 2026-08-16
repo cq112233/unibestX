@@ -5,7 +5,7 @@
 		    v-for="(item, index) in showUrl"
 		    :key="index"
 		    :style="{
-				marginLeft: index == 0 ? 0 : addUnit(0 - parseFloat(size.toString()) * parseFloat(gap.toString()))
+				marginLeft: getItemMarginLeft(index)
 			}"
 		>
 			<up-avatar
@@ -85,6 +85,10 @@ const emit = defineEmits(['showMore'])
 const showUrl = computed<Array<any>>(() => {
     return props.urls.slice(0, parseInt(props.maxCount.toString()))
 })
+
+function getItemMarginLeft(index: number): string {
+    return index == 0 ? '0px' : addUnit(0 - parseFloat(props.size.toString()) * parseFloat(props.gap.toString()))
+}
 
 const textStr = computed<string>(() => {
     let str = parseInt(props.extraValue.toString()) > 0

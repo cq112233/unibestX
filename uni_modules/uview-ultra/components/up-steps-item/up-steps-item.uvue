@@ -1,81 +1,97 @@
 <template>
-	<view class="up-steps-item" :class="[`up-steps-item--${direction}`]" :style="itemWidthStyle">
-		<view class="up-steps-item__line"
-			:class="[
-				`up-steps-item__line--${direction}`,
-				(stepIndex < currentStep && activeColor == '#3c9cff') ? 'up-steps-item__line--active' : ''
-			]" :style="lineStyle"></view>
-		<view class="up-steps-item__line"
-			:class="[
-				`up-steps-item__line--${direction}`,
-				((stepIndex - 1) < currentStep && activeColor == '#3c9cff') ? 'up-steps-item__line--active' : ''
-			]" :style="lineStyle2"></view>
-		<view class="up-steps-item__wrapper"
-			:class="[`up-steps-item__wrapper--${direction}`,
-				isDot ? `up-steps-item__wrapper--${direction}--dot` : '']"
-			:style="itemStyleInner">
+	<view class="up-steps-item" :class="[`up-steps-item--${direction}`]" :style="itemContainerStyle">
+		<!-- 水平模式连接线：左半段 (从左边缘到中心) -->
+		<view
+			v-if="direction == 'row' && stepIndex > 0"
+			class="up-steps-item__line up-steps-item__line--row-left"
+			:style="lineLeftStyle"
+		></view>
+		<!-- 水平模式连接线：右半段 (从中心到右边缘) -->
+		<view
+			v-if="direction == 'row' && (childLength == 0 || stepIndex < childLength - 1)"
+			class="up-steps-item__line up-steps-item__line--row-right"
+			:style="lineRightStyle"
+		></view>
+
+		<!-- 垂直模式连接线：上半段 (从顶部到中心) -->
+		<view
+			v-if="direction == 'column' && stepIndex > 0"
+			class="up-steps-item__line up-steps-item__line--col-top"
+			:style="lineColTopStyle"
+		></view>
+		<!-- 垂直模式连接线：下半段 (从中心到底部) -->
+		<view
+			v-if="direction == 'column' && (childLength == 0 || stepIndex < childLength - 1)"
+			class="up-steps-item__line up-steps-item__line--col-bottom"
+			:style="lineColBottomStyle"
+		></view>
+
+		<!-- 节点图标 / 圆圈 / 点 -->
+		<view
+			class="up-steps-item__wrapper"
+			:class="[`up-steps-item__wrapper--${direction}`, isDot ? `up-steps-item__wrapper--${direction}--dot` : '']"
+			:style="itemStyleInner"
+		>
 			<slot name="icon">
-				<view class="up-steps-item__wrapper__dot"
+				<!-- 点状模式 -->
+				<view
 					v-if="isDot"
-					:class="[
-						(statusClass === 'finish' || statusClass === 'process') ? 'up-steps-item__wrapper__dot--active' : ''
-					]"
-					:style="dotStyle">
-				</view>
-				<view class="up-steps-item__wrapper__icon"
-					v-else-if="activeIcon != '' || inactiveIcon != ''">
-					<up-icon :name="stepIndex <= currentStep ? activeIcon : inactiveIcon"
+					class="up-steps-item__wrapper__dot"
+					:style="dotStyle"
+				></view>
+				<!-- 自定义图标模式 -->
+				<view
+					v-else-if="activeIcon != '' || inactiveIcon != ''"
+					class="up-steps-item__wrapper__icon"
+				>
+					<up-icon
+						:name="stepIndex <= currentStep ? (activeIcon != '' ? activeIcon : inactiveIcon) : (inactiveIcon != '' ? inactiveIcon : activeIcon)"
 						:size="iconSize"
-						:color="stepIndex <= currentStep ? (activeColor == '#3c9cff' ? 'primary' : activeColor) : inactiveColor">
-					</up-icon>
+						:color="stepIndex <= currentStep ? (activeColor != '' ? activeColor : '#3c9cff') : inactiveColor"
+					></up-icon>
 				</view>
-				<view v-else
-					:class="[
-						statusClass === 'process' ? 'up-steps-item__wrapper__circle--active' : '',
-						statusClass === 'finish' ? 'up-steps-item__wrapper__circle--finish' : '',
-						statusClass === 'wait' ? 'up-steps-item__wrapper__circle--wait' : '',
-						statusClass === 'error' ? 'up-steps-item__wrapper__circle--error' : ''
-					]"
-					:style="circleStyle" class="up-steps-item__wrapper__circle">
-					<text v-if="statusClass === 'process' || statusClass === 'wait'"
+				<!-- 默认序号 / 勾选圆圈模式 -->
+				<view
+					v-else
+					class="up-steps-item__wrapper__circle"
+					:style="circleStyle"
+				>
+					<text
+						v-if="statusClass == 'process' || statusClass == 'wait'"
 						class="up-steps-item__wrapper__circle__text"
-						:class="[
-							statusClass === 'process' ? 'up-steps-item__wrapper__circle__text--active' : ''
-						]"
-						:style="circleTextStyle">{{ stepIndex + 1 }}</text>
-					<up-icon v-else :color="statusClass === 'error' ? 'error' : (activeColor == '#3c9cff' ? 'primary' : activeColor)" size="12"
-						:name="statusClass === 'error' ? 'close' : 'checkmark'"></up-icon>
+						:style="circleTextStyle"
+					>{{ stepIndex + 1 }}</text>
+					<up-icon
+						v-else
+						:color="statusClass == 'error' ? '#f56c6c' : (activeColor != '' ? activeColor : '#3c9cff')"
+						size="12"
+						:name="statusClass == 'error' ? 'close' : 'checkmark'"
+					></up-icon>
 				</view>
 			</slot>
 		</view>
-		<view class="up-steps-item__content" :class="[`up-steps-item__content--${direction}`,
-			currentStep == stepIndex ? 'up-steps-item__content--current' : '']"
-			:style="contentStyle">
+
+		<!-- 内容区 (标题 + 描述) -->
+		<view
+			class="up-steps-item__content"
+			:class="[`up-steps-item__content--${direction}`]"
+			:style="contentStyle"
+		>
 			<slot name="content" :index="stepIndex">
+				<slot name="title">
+					<text class="up-steps-item__content__title-text" :style="titleStyle">{{ title.toString() }}</text>
+				</slot>
+				<slot name="desc">
+					<text v-if="desc.toString() != ''" class="up-steps-item__content__desc-text" :style="descStyle">{{ desc.toString() }}</text>
+				</slot>
 			</slot>
-			<template v-if="$slots['content'] == null">
-				<view class="up-steps-item__content__title">
-					<slot name="title">
-					</slot>
-					<up-text v-if="$slots['title'] == null" :text="title.toString()" lineHeight="20px"
-						:color="currentStep == stepIndex ? (activeColor == '#3c9cff' ? '' : activeColor) : inactiveColor"
-						:type="currentStep == stepIndex && activeColor == '#3c9cff' ? 'primary' : 'default'"
-						:size="currentStep == stepIndex ? 14 : 13"></up-text>
-				</view>
-				<view class="up-steps-item__content__desc">
-					<slot name="desc">
-					</slot>
-					<up-text v-if="$slots['desc'] == null"
-						:text="desc.toString()" type="tips" size="12"></up-text>
-				</view>
-			</template>
 		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
 import { computed, inject, ref, onMounted } from 'vue'
-import color from '../../libs/config/color'
+import type { Ref, ComputedRef } from 'vue'
 
 defineOptions({
   name: 'up-steps-item'
@@ -108,9 +124,9 @@ const props = defineProps({
   }
 })
 
-const parentProps = inject<any | null>('upStepsProps', null)
+const parentProps = inject<ComputedRef<UTSJSONObject> | null>('upStepsProps', null)
 const registerStep = inject<(() => number) | null>('upStepsRegister', null)
-const totalSteps = inject<any | null>('upStepsItemCount', null)
+const totalSteps = inject<Ref<number> | null>('upStepsItemCount', null)
 
 const internalIndex = ref<number>(0)
 
@@ -122,175 +138,174 @@ onMounted(() => {
   }
 })
 
-const stepIndex = computed<number>(() => {
+function getParentProp(key: string, defaultVal: any): any {
+  if (parentProps == null) return defaultVal
+  const obj = parentProps!.value
+  if (obj != null && obj[key] != null) {
+    return (obj[key] ?? defaultVal) as any
+  }
+  return defaultVal
+}
+
+const stepIndex = computed<number>((): number => {
   if (props.index != null) return parseInt(props.index!.toString())
   return internalIndex.value
 })
 
-const childLength = computed<number>(() => {
+const childLength = computed<number>((): number => {
   return totalSteps?.value ?? 0
 })
 
-const direction = computed<string>(() => {
-  return parentProps?.direction ?? 'row'
+const direction = computed<string>((): string => {
+  return getParentProp('direction', 'row').toString()
 })
 
-const currentStep = computed<number>(() => {
-  return parseInt((parentProps?.current ?? 0).toString())
+const currentStep = computed<number>((): number => {
+  const c = getParentProp('current', 0)
+  return parseInt(c.toString())
 })
 
-const activeColor = computed<string>(() => {
-  return parentProps?.activeColor ?? '#3c9cff'
+const activeColor = computed<string>((): string => {
+  return getParentProp('activeColor', '#3c9cff').toString()
 })
 
-const inactiveColor = computed<string>(() => {
-  return parentProps?.inactiveColor ?? '#969799'
+const inactiveColor = computed<string>((): string => {
+  return getParentProp('inactiveColor', '#969799').toString()
 })
 
-const activeIcon = computed<string>(() => {
-  return parentProps?.activeIcon ?? ''
+const activeIcon = computed<string>((): string => {
+  return getParentProp('activeIcon', '').toString()
 })
 
-const inactiveIcon = computed<string>(() => {
-  return parentProps?.inactiveIcon ?? ''
+const inactiveIcon = computed<string>((): string => {
+  return getParentProp('inactiveIcon', '').toString()
 })
 
-const isDot = computed<boolean>(() => {
-  return parentProps?.dot ?? false
+const isDot = computed<boolean>((): boolean => {
+  return (getParentProp('dot', false) as boolean | null) ?? false
 })
 
-const statusClass = computed<string>(() => {
+const statusClass = computed<string>((): string => {
   if (props.error) return 'error'
   if (stepIndex.value < currentStep.value) return 'finish'
-  if (stepIndex.value === currentStep.value) return 'process'
+  if (stepIndex.value == currentStep.value) return 'process'
   return 'wait'
 })
 
-const itemWidthStyle = computed<UTSJSONObject>(() => {
+const itemContainerStyle = computed((): UTSJSONObject => {
   const style = {} as UTSJSONObject
-  if (direction.value === 'row' && childLength.value > 0) {
-    style['width'] = (100.0 / childLength.value).toString() + '%'
-  }
-  return style
-})
-
-const itemStyleInner = computed<UTSJSONObject>(() => {
-  const style = (props.itemStyle ?? {}) as UTSJSONObject
-  return style
-})
-
-const contentStyle = computed<UTSJSONObject>(() => {
-  const style = {} as UTSJSONObject
-  return style
-})
-
-const lineStyle2 = computed<UTSJSONObject>(() => {
-  const style = {} as UTSJSONObject
-  if (direction.value === 'row') {
-    if (stepIndex.value == 0) {
-      style['display'] = 'none'
-    } else {
-      style['left'] = '0px'
-      style['right'] = '50%'
-      style['width'] = 'auto'
-    }
+  if (direction.value == 'row') {
+    style['flex'] = '1'
   } else {
-    if (stepIndex.value == 0) {
-      style['display'] = 'none'
-    } else {
-      style['top'] = '0px'
-      style['bottom'] = '50%'
-      style['left'] = '10px'
-      style['height'] = 'auto'
-      style['width'] = '1px'
-    }
+    style['width'] = '100%'
   }
+  return style
+})
 
-  if (props.error) {
-    style['backgroundColor'] = color['error']
-  } else if ((stepIndex.value - 1) < currentStep.value) {
-    if (activeColor.value != '#3c9cff') {
-      style['backgroundColor'] = activeColor.value
-    }
+const itemStyleInner = computed((): UTSJSONObject => {
+  return (props.itemStyle ?? {}) as UTSJSONObject
+})
+
+const contentStyle = computed((): UTSJSONObject => {
+  return {} as UTSJSONObject
+})
+
+// 水平左连接线（连接上一节点）
+const lineLeftStyle = computed((): UTSJSONObject => {
+  const style = {} as UTSJSONObject
+  if (stepIndex.value <= currentStep.value) {
+    style['backgroundColor'] = activeColor.value
   } else {
     style['backgroundColor'] = inactiveColor.value
   }
   return style
 })
 
-const lineStyle = computed<UTSJSONObject>(() => {
+// 水平右连接线（连接下一节点）
+const lineRightStyle = computed((): UTSJSONObject => {
   const style = {} as UTSJSONObject
-  if (direction.value === 'row') {
-    if (childLength.value > 0 && stepIndex.value == childLength.value - 1) {
-      style['display'] = 'none'
-    } else {
-      style['left'] = '50%'
-      style['right'] = '0px'
-      style['width'] = 'auto'
-    }
-  } else {
-    if (childLength.value > 0 && stepIndex.value == childLength.value - 1) {
-      style['display'] = 'none'
-    } else {
-      style['top'] = '50%'
-      style['bottom'] = '0px'
-      style['left'] = '10px'
-      style['height'] = 'auto'
-      style['width'] = '1px'
-    }
-  }
-
   if (stepIndex.value < currentStep.value) {
-    if (activeColor.value != '#3c9cff') {
-      style['backgroundColor'] = activeColor.value
-    }
+    style['backgroundColor'] = activeColor.value
   } else {
     style['backgroundColor'] = inactiveColor.value
   }
   return style
 })
 
-const dotStyle = computed<UTSJSONObject>(() => {
+// 垂直上连接线
+const lineColTopStyle = computed((): UTSJSONObject => {
   const style = {} as UTSJSONObject
-  if (statusClass.value === 'finish' || statusClass.value === 'process') {
-    if (activeColor.value != '#3c9cff') {
-      style['backgroundColor'] = activeColor.value
-    }
+  if (stepIndex.value <= currentStep.value) {
+    style['backgroundColor'] = activeColor.value
   } else {
     style['backgroundColor'] = inactiveColor.value
   }
   return style
 })
 
-const circleStyle = computed<UTSJSONObject>(() => {
+// 垂直下连接线
+const lineColBottomStyle = computed((): UTSJSONObject => {
   const style = {} as UTSJSONObject
-  if (activeColor.value != '#3c9cff' || inactiveColor.value != '#969799') {
-    if (statusClass.value === 'process') {
-      style['backgroundColor'] = activeColor.value
-      style['borderColor'] = activeColor.value
-    } else if (statusClass.value === 'finish') {
-      style['backgroundColor'] = 'rgba(0, 0, 0, 0)'
-      style['borderColor'] = activeColor.value
-    } else if (statusClass.value === 'wait') {
-      style['backgroundColor'] = 'rgba(0, 0, 0, 0)'
-      style['borderColor'] = inactiveColor.value
-    } else if (statusClass.value === 'error') {
-      style['backgroundColor'] = 'rgba(0, 0, 0, 0)'
-      style['borderColor'] = color['error']
-    }
+  if (stepIndex.value < currentStep.value) {
+    style['backgroundColor'] = activeColor.value
+  } else {
+    style['backgroundColor'] = inactiveColor.value
   }
   return style
 })
 
-const circleTextStyle = computed<UTSJSONObject>(() => {
+const dotStyle = computed((): UTSJSONObject => {
   const style = {} as UTSJSONObject
-  if (activeColor.value != '#3c9cff' || inactiveColor.value != '#969799') {
-    if (statusClass.value === 'process') {
-      style['color'] = '#ffffff'
-    } else {
-      style['color'] = inactiveColor.value
-    }
+  if (statusClass.value == 'finish' || statusClass.value == 'process') {
+    style['backgroundColor'] = activeColor.value
+  } else {
+    style['backgroundColor'] = inactiveColor.value
   }
+  return style
+})
+
+const circleStyle = computed((): UTSJSONObject => {
+  const style = {} as UTSJSONObject
+  if (statusClass.value == 'process') {
+    style['backgroundColor'] = activeColor.value
+    style['borderColor'] = activeColor.value
+  } else if (statusClass.value == 'finish') {
+    style['backgroundColor'] = '#ffffff'
+    style['borderColor'] = activeColor.value
+  } else if (statusClass.value == 'error') {
+    style['backgroundColor'] = '#ffffff'
+    style['borderColor'] = '#f56c6c'
+  } else {
+    style['backgroundColor'] = '#ffffff'
+    style['borderColor'] = inactiveColor.value
+  }
+  return style
+})
+
+const circleTextStyle = computed((): UTSJSONObject => {
+  const style = {} as UTSJSONObject
+  if (statusClass.value == 'process') {
+    style['color'] = '#ffffff'
+  } else {
+    style['color'] = inactiveColor.value
+  }
+  return style
+})
+
+const titleStyle = computed((): UTSJSONObject => {
+  const style = {} as UTSJSONObject
+  if (statusClass.value == 'process' || statusClass.value == 'finish') {
+    style['color'] = '#303133'
+    style['fontWeight'] = 'bold'
+  } else {
+    style['color'] = inactiveColor.value
+  }
+  return style
+})
+
+const descStyle = computed((): UTSJSONObject => {
+  const style = {} as UTSJSONObject
+  style['color'] = '#909399'
   return style
 })
 </script>
@@ -299,113 +314,138 @@ const circleTextStyle = computed<UTSJSONObject>(() => {
 	@import "../../libs/css/components.scss";
 
 	.up-steps-item {
-		flex: 1;
-		@include flex;
 		position: relative;
+		display: flex;
 
 		&--row {
+			flex: 1;
 			flex-direction: column;
 			align-items: center;
-			justify-content: center;
+			justify-content: flex-start;
 		}
 
 		&--column {
 			flex-direction: row;
-			flex-direction: row;
-			justify-content: flex-start;
-			min-height: 50px;
+			align-items: flex-start;
+			width: 100%;
+			min-height: 60px;
 		}
 
 		&__wrapper {
-			@include flex;
+			display: flex;
 			justify-content: center;
 			align-items: center;
 			position: relative;
-			background-color: #fff;
+			background-color: #ffffff;
+			z-index: 2;
 
-			&--column {
-				width: 20px;
-				height: 32px;
+			&--row {
+				height: 24px;
+				width: 24px;
 
 				&--dot {
-					height: 20px;
-					width: 20px;
+					width: 16px;
+					height: 16px;
 				}
 			}
 
-			&--row {
-				height: 32px;
-				width: 32px;
+			&--column {
+				width: 24px;
+				height: 24px;
+				margin-right: 10px;
 
 				&--dot {
-					width: 20px;
-					height: 20px;
+					height: 16px;
+					width: 16px;
 				}
 			}
 
 			&__circle {
 				width: 20px;
 				height: 20px;
-				/* #ifndef APP-NVUE */
-				box-sizing: border-box;
-				/* #endif */
-				flex-direction: row;
 				border-radius: 100px;
 				border-width: 1px;
-				border-color: $up-tips-color;
 				border-style: solid;
-				@include flex(row);
+				display: flex;
+				flex-direction: row;
 				align-items: center;
 				justify-content: center;
-				transition: background-color 0.3s;
 
 				&__text {
-					color: $up-tips-color;
 					font-size: 11px;
-					@include flex(row);
-					align-items: center;
-					justify-content: center;
 					text-align: center;
 					line-height: 11px;
 				}
 			}
 
 			&__dot {
-				width: 10px;
-				height: 10px;
+				width: 8px;
+				height: 8px;
 				border-radius: 100px;
-				background-color: $up-content-color;
 			}
 		}
 
 		&__content {
-			@include flex;
-			flex: 1;
+			display: flex;
 
 			&--row {
 				flex-direction: column;
 				align-items: center;
 				text-align: center;
+				margin-top: 6px;
+				width: 100%;
 			}
 
 			&--column {
 				flex-direction: column;
-				margin-left: 6px;
+				flex: 1;
+				padding-bottom: 16px;
+			}
+
+			&__title-text {
+				font-size: 13px;
+				line-height: 18px;
+				text-align: center;
+			}
+
+			&__desc-text {
+				font-size: 11px;
+				line-height: 16px;
+				margin-top: 2px;
+				text-align: center;
 			}
 		}
 
 		&__line {
 			position: absolute;
-			background: $up-tips-color;
+			z-index: 1;
 
-			&--row {
-				top: 16px;
-				height: 1px;
+			&--row-left {
+				top: 11px;
+				left: 0;
+				width: 50%;
+				height: 2px;
 			}
 
-			&--column {
-				width: 1px;
-				left: 10px;
+			&--row-right {
+				top: 11px;
+				left: 50%;
+				width: 50%;
+				height: 2px;
+			}
+
+			&--col-top {
+				top: 0;
+				left: 11px;
+				width: 2px;
+				height: 12px;
+			}
+
+			&--col-bottom {
+				top: 12px;
+				bottom: 0;
+				left: 11px;
+				width: 2px;
 			}
 		}
 	}

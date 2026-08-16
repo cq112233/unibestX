@@ -1,5 +1,5 @@
 <template>
-	<view class="up-upload" :style="[addStyle(customStyle)]">
+	<view class="up-upload" :style="customUploadStyle">
 		<view class="up-upload__wrap" >
 			<template v-if="previewImage">
 				<view
@@ -8,40 +8,31 @@
 				    :key="index"
 				>
 					<image
-					    v-if="item.isImage || (item.type != null && item.type === 'image')"
+					    v-if="item.isImage || (item.type != null && item.type == 'image')"
 					    :src="item.thumb != null ? item.thumb : item.url"
 					    :mode="imageMode"
 					    class="up-upload__wrap__preview__image"
 					    @tap="onClickPreview(item, index)"
-						:style="[{
-							width: addUnit(width),
-							height: addUnit(height)
-						}]"
+						:style="itemDimensionStyle"
 					/>
 					<view class="up-upload__wrap__preview__video"
-						:style="{
-							width: addUnit(width),
-							height: addUnit(height)
-						}"
-						v-else-if="(item.isVideo || (item.type != null && item.type === 'video')) && getVideoThumb">
+						:style="itemDimensionStyle"
+						v-else-if="(item.isVideo || (item.type != null && item.type == 'video')) && getVideoThumb">
 						<image
 							v-if="item.thumb"
 						    :src="item.thumb"
 						    :mode="imageMode"
 						    class="up-upload__wrap__preview__image"
 						    @tap="onClickPreview(item, index)"
-							:style="[{
-								width: addUnit(width),
-								height: addUnit(height)
-							}]"
+							:style="itemDimensionStyle"
 						/>
 						<up-icon
 							v-else
 						    color="#80CBF9"
 						    size="26"
-						    :name="item.isVideo || (item.type != null && item.type === 'video') ? 'movie' : 'file-text'"
+						    :name="item.isVideo || (item.type != null && item.type == 'video') ? 'movie' : 'file-text'"
 						></up-icon>
-						<view v-if="item.status === 'success'"
+						<view v-if="item.status == 'success'"
 							class="up-upload__wrap__play"
 							@tap="onClickPreview(item, index)">
 							<slot name="playIcon"></slot>
@@ -54,27 +45,24 @@
 					    v-else
 					    class="up-upload__wrap__preview__other"
 						@tap="onClickPreview(item, index)"
-						:style="[{
-							width: addUnit(width),
-							height: addUnit(height)
-						}]"
+						:style="itemDimensionStyle"
 					>
 						<up-icon
 						    color="#80CBF9"
 						    size="26"
-						    :name="item.isVideo || (item.type != null && item.type === 'video') ? 'movie' : 'folder'"
+						    :name="item.isVideo || (item.type != null && item.type == 'video') ? 'movie' : 'folder'"
 						></up-icon>
 						<text class="up-upload__wrap__preview__other__text">
-							{{item.isVideo || (item.type != null && item.type === 'video') ? (item.name != null ? item.name : $t("up.common.video")) : item.name != null ? item.name : $t("up.common.file")}}
+							{{ getOtherItemText(item) }}
 						</text>
 					</view>
 					<view
 					    class="up-upload__status"
-					    v-if="item.status === 'uploading' || item.status === 'failed'"
+					    v-if="item.status == 'uploading' || item.status == 'failed'"
 					>
 						<view class="up-upload__status__icon">
 							<up-icon
-							    v-if="item.status === 'failed'"
+							    v-if="item.status == 'failed'"
 							    name="close-circle"
 							    color="#ffffff"
 							    size="25"
@@ -86,15 +74,15 @@
 							/>
 						</view>
 						<text
-						    v-if="item.message"
+						    v-if="item.message != null && item.message != ''"
 						    class="up-upload__status__message"
 						>{{ item.message }}</text>
 						<up-gap class="up-upload__progress" height="3px"
-							:style="{width: (item.progress ?? 0) + '%'}"></up-gap>
+							:style="getProgressStyle(item)"></up-gap>
 					</view>
 					<view
 					    class="up-upload__deletable"
-					    v-if="item.status !== 'uploading' && (deletable || item.deletable)"
+					    v-if="item.status != 'uploading' && (deletable || item.deletable)"
 					    @tap.stop="deleteItem(index)"
 					>
 						<view class="up-upload__deletable__icon">
@@ -108,7 +96,7 @@
 					<slot name="success">
 						<view
 							class="up-upload__success"
-							v-if="item.status === 'success'"
+							v-if="item.status == 'success'"
 						>
 							<view class="up-upload__success__icon">
 								<up-icon
@@ -141,10 +129,7 @@
 				    hover-stay-time="150"
 				    @tap="onChooseTap"
 				    :class="[disabled ? 'up-upload__button--disabled' : '']"
-					:style="[{
-						width: addUnit(width),
-						height: addUnit(height)
-					}]"
+					:style="itemDimensionStyle"
 				>
 					<up-icon
 					    :name="uploadIcon"
@@ -337,6 +322,25 @@ const isInCount = ref<boolean>(true)
 const popupShow = ref<boolean>(false)
 const currentItemIndex = ref<number>(-1)
 
+const customUploadStyle = computed((): UTSJSONObject => {
+	return addStyle(props.customStyle) as UTSJSONObject
+})
+
+const itemDimensionStyle = computed((): UTSJSONObject => {
+	return {
+		width: addUnit(props.width),
+		height: addUnit(props.height)
+	} as UTSJSONObject
+})
+
+function getProgressStyle(item: any): UTSJSONObject {
+	const it = item as UTSJSONObject
+	const prog = (it['progress'] as number | null) ?? 0
+	return {
+		width: `${prog}%`
+	} as UTSJSONObject
+}
+
 function formatFileList() {
 	let fileList = props.fileList as UTSJSONObject[]
 	let maxCount = parseInt(props.maxCount.toString())
@@ -346,9 +350,9 @@ function formatFileList() {
 			? item['name'] as string
 			: item['url'] != null ? item['url'] as string : item['thumb'] as string
 		let tmp = UTSJSONObject.assign(UTSJSONObject.assign({}, item), {
-			isImage: item['name'] != null ? testImage(item['name'] as string) : (props.accept === 'image' ?? testImage(name)),
-			isVideo: item['name'] != null ? testVideo(item['name'] as string) : (props.accept === 'video' ?? testVideo(name)),
-			deletable: typeof item.deletable === 'boolean' ? item.deletable : props.deletable,
+			isImage: item['name'] != null ? testImage(item['name'] as string) : (props.accept == 'image' ?? testImage(name)),
+			isVideo: item['name'] != null ? testVideo(item['name'] as string) : (props.accept == 'video' ?? testVideo(name)),
+			deletable: typeof item.deletable == 'boolean' ? item.deletable : props.deletable,
 		})
 		let tmpObj = (JSON.parse<UPUploadListItem>(JSON.stringify(tmp)))
 		if (tmpObj != null) {
@@ -359,19 +363,19 @@ function formatFileList() {
 	isInCount.value = resLists.length < maxCount
 }
 
-watch(() => props.fileList, () => {
+watch((): Array<UTSJSONObject> => props.fileList, () => {
 	formatFileList()
 }, { immediate: true, deep: true })
 
-watch(() => props.deletable, () => {
+watch((): boolean => props.deletable, () => {
 	formatFileList()
 })
 
-watch(() => props.maxCount, () => {
+watch((): any => props.maxCount, () => {
 	formatFileList()
 })
 
-watch(() => props.accept, () => {
+watch((): string => props.accept, () => {
 	formatFileList()
 })
 
@@ -380,38 +384,6 @@ watch(popupShow, (newVal: boolean) => {
 		currentItemIndex.value = -1
 	}
 })
-
-function videoErrorCallback() {}
-
-function onChooseTap(): void {
-	chooseFileAction({} as UTSJSONObject)
-}
-
-function chooseFileAction(params: UTSJSONObject): boolean {
-	let maxCount = parseInt(props.maxCount.toString())
-	let disabled = props.disabled
-	if (disabled) return false
-	const chooseParams = UTSJSONObject.assign({
-		accept: props.accept,
-		extension: props.extension,
-		multiple: props.multiple,
-		capture: props.capture,
-		compressed: props.compressed,
-		maxDuration: props.maxDuration,
-		sizeType: props.sizeType,
-		camera: props.camera,
-	}, {
-		maxCount: maxCount - lists.value.length,
-		...params
-	})
-	let chooseParamsObj = JSON.parseObject<UPUploadChooseFileOptions>(JSON.stringify(chooseParams))
-	if (chooseParamsObj != null) {
-		chooseFile(chooseParamsObj).then((res: Array<UPUploadFileChoosed|null>) => {
-			onBeforeRead(res)
-		})
-	}
-	return true
-}
 
 function convertFileToUTSJSON(file: Array<UPUploadFileChoosed | null>): Array<UTSJSONObject> {
 	const result: Array<UTSJSONObject> = []
@@ -431,6 +403,39 @@ function getDetail(index: number | null = null): UTSJSONObject {
 		name: props.name,
 		index: index == null ? props.fileList.length : index,
 	} as UTSJSONObject
+}
+
+function getOtherItemText(item: UPUploadListItem): string {
+	const isVid = item.isVideo || (item.type != null && item.type == 'video')
+	if (isVid) {
+		if (item.name != null && (item.name as string) != '') return item.name as string
+		return $t("up.common.video")
+	}
+	if (item.name != null && (item.name as string) != '') return item.name as string
+	return $t("up.common.file")
+}
+
+function onAfterRead(file: Array<UPUploadFileChoosed | null>) {
+	let maxSize = parseFloat(props.maxSize.toString())
+	let afterRead = props.afterRead
+	const even = (item: UPUploadFileChoosed | null): boolean => {
+		let tmp: number = (item != null && item.size != null) ? item.size : 0
+		return tmp > maxSize
+	}
+	const oversize = file.some(even)
+	if (oversize) {
+		toast($t("up.upload.sizeExceed", {} as UTSJSONObject))
+		emit('oversize', UTSJSONObject.assign({
+			file: convertFileToUTSJSON(file)
+		}, getDetail(null)))
+		return
+	}
+	if (typeof afterRead == 'function') {
+		;(afterRead as UPUploadReadCallback)(file, getDetail(null))
+	}
+	emit('afterRead', UTSJSONObject.assign({
+		file: convertFileToUTSJSON(file)
+	}, getDetail(null)))
 }
 
 function onBeforeRead(file: Array<UPUploadFileChoosed | null>) {
@@ -462,29 +467,37 @@ function onBeforeRead(file: Array<UPUploadFileChoosed | null>) {
 	onAfterRead(readFile)
 }
 
-function onAfterRead(file: Array<UPUploadFileChoosed | null>) {
-	let maxSize = parseFloat(props.maxSize.toString())
-	let afterRead = props.afterRead
-	const currentFileList = [...props.fileList]
-	const even = (item: UPUploadFileChoosed | null): boolean => {
-		let tmp: number = (item != null && item.size != null) ? item.size : 0
-		return tmp > maxSize
+function chooseFileAction(params: UTSJSONObject): boolean {
+	let maxCount = parseInt(props.maxCount.toString())
+	let disabled = props.disabled
+	if (disabled) return false
+	const chooseParams = UTSJSONObject.assign({
+		accept: props.accept,
+		extension: props.extension,
+		multiple: props.multiple,
+		capture: props.capture,
+		compressed: props.compressed,
+		maxDuration: props.maxDuration,
+		sizeType: props.sizeType,
+		camera: props.camera,
+	}, {
+		maxCount: maxCount - lists.value.length,
+		...params
+	})
+	let chooseParamsObj = JSON.parseObject<UPUploadChooseFileOptions>(JSON.stringify(chooseParams))
+	if (chooseParamsObj != null) {
+		chooseFile(chooseParamsObj).then((res: Array<UPUploadFileChoosed|null>) => {
+			onBeforeRead(res)
+		})
 	}
-	const oversize = file.some(even)
-	if (oversize) {
-		toast($t("up.upload.sizeExceed", {} as UTSJSONObject))
-		emit('oversize', UTSJSONObject.assign({
-			file: convertFileToUTSJSON(file)
-		}, getDetail(null)))
-		return
-	}
-	if (typeof afterRead === 'function') {
-		;(afterRead as UPUploadReadCallback)(file, getDetail(null))
-	}
-	emit('afterRead', UTSJSONObject.assign({
-		file: convertFileToUTSJSON(file)
-	}, getDetail(null)))
+	return true
 }
+
+function onChooseTap(): void {
+	chooseFileAction({} as UTSJSONObject)
+}
+
+function videoErrorCallback() {}
 
 function deleteItem(index: number) {
 	const currentFileList = [...props.fileList]
@@ -508,9 +521,9 @@ function onPreviewImage(previewItem: UPUploadListItem, index: number) {
 	let imageIndex = 0
 	for (let i = 0; i < lists.value.length; i++) {
 		const item = lists.value[i]
-		if (item.isImage || (item.type != null && item.type === 'image')) {
+		if (item.isImage || (item.type != null && item.type == 'image')) {
 			urls.push(item.url != null ? item.url as string : item.thumb as string)
-			if (i === index) {
+			if (i == index) {
 				current = imageIndex
 			}
 			imageIndex += 1

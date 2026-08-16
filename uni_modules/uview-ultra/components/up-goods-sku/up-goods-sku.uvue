@@ -11,7 +11,7 @@
             :border-radius="20"
             @close="close"
         >
-            <view class="up-goods-sku-container" :style="{padding: pageInline ? '0px' : ''}">
+            <view class="up-goods-sku-container" :style="containerStyle">
                 <view class="up-goods-sku__header">
                     <slot name="header">
                         <view class="up-goods-sku__header__image">
@@ -167,6 +167,12 @@ const buyNum = ref<number>(1)
 
 const skuTreeList = computed<Array<UTSJSONObject>>(() => {
 	return props.skuTree
+})
+
+const containerStyle = computed((): UTSJSONObject => {
+	return {
+		padding: props.pageInline ? '0px' : ''
+	} as UTSJSONObject
 })
 
 const skuDataList = computed<Array<UTSJSONObject>>(() => {

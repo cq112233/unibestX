@@ -1,21 +1,21 @@
 import { _ as __easycom_0 } from "../../../../components/NavBar/NavBar.js";
+import { A as AppKu, r as resolveEasycom } from "../../../../../App.ku.js";
 import { _ as __easycom_1 } from "../../../../../uni_modules/uview-ultra/components/up-search/up-search.js";
-import { _ as _sfc_main$1 } from "../../../../../App.ku.js";
 import { _ as _export_sfc } from "../../../../../plugin-vue-export-helper.js";
 import "../../../../utils/systemInfo.js";
-import "../../../../../uni_modules/uview-ultra/components/up-icon/up-icon.js";
-import "../../../../../uni_modules/uview-ultra/components/up-icon/icons.js";
+import "../../../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
+import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.js";
+import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/loadingIcon.js";
+import "../../../../../uni_modules/uview-ultra/libs/config/config.js";
 import "../../../../../uni_modules/uview-ultra/libs/function/index.js";
 import "../../../../../uni_modules/uview-ultra/libs/function/test.js";
 import "../../../../../uni_modules/uview-ultra/libs/function/digit.js";
 import "../../../../../uni_modules/e-chart/components/e-chart/uts/WebviewEchart.js";
-import "../../../../../uni_modules/uview-ultra/libs/config/config.js";
+import "../../../../../uni_modules/uview-ultra/libs/function/colorGradient.js";
+import "../../../../../uni_modules/uview-ultra/components/up-icon/up-icon.js";
+import "../../../../../uni_modules/uview-ultra/components/up-icon/icons.js";
 import "../../../../../uni_modules/uview-ultra/libs/composable/useUltraUI.js";
 import "../../../../../uni_modules/uview-ultra/components/up-icon/icon.js";
-import "../../../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
-import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.js";
-import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/loadingIcon.js";
-import "../../../../../uni_modules/uview-ultra/libs/function/colorGradient.js";
 import "../../../../../uni_modules/uview-ultra/components/up-gap/up-gap.js";
 import "../../../../../uni_modules/uview-ultra/libs/composable/useMp.js";
 import "../../../../../uni_modules/uview-ultra/components/up-gap/gap.js";
@@ -63,112 +63,94 @@ import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ko.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ja.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ru.js";
 import "../../../../utils/toast.js";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, resolveComponent: _resolveComponent, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
-const __className = "GenSrcSubUviewUltraDemosSearchSearch";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "4eb64bb2",
-  __className,
-  __filename: "src/sub/uview-ultra/demos/search/search.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "search",
-  setup(__props) {
-    const __sharedDataRenderer = _useSharedDataRenderer();
-    const __sharedData = __sharedDataRenderer == "component" ? _withSharedDataComponent(new UniDynamicSharedDataComponent(_useSharedDataScope(), _useSharedDataComponentOptions({ bundleKey: "GenSrcSubUviewUltraDemosSearchSearchSharedData", sharedDataClassId: 0 }))) : _withSharedDataPage(new UniDynamicSharedDataPage(_useSharedDataPageId(), _useSharedDataPageOptions({ bundleKey: "GenSrcSubUviewUltraDemosSearchSearchSharedData", sharedDataClassId: 0 })));
-    _useSharedDataScope(__sharedData);
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
     const searchValue1 = ref("");
     const searchValue2 = ref("");
     const searchValue3 = ref("");
     const searchValue4 = ref("");
     const searchValue5 = ref("");
-    return () => {
-      "raw js";
-      const _component_NavBar = __easycom_0;
-      const _component_up_search = __easycom_1;
-      const n18 = _createSharedDataComponent(_sfc_main$1, "441ec4f1", null, {
-        "default": _withSharedDataVaporCtx(() => {
-          const n0 = _createSharedDataComponentWithFallback(_component_NavBar, "3fb9d9fc", {
-            title: "up-search 搜索",
-            "auto-back": true,
-            "safe-area-inset-top": true,
-            "bg-color": "#ffffff"
-          });
-          _setSharedData(__sharedData, 1, n0?.sharedData);
-          const n2 = _createSharedDataComponentWithFallback(_component_up_search, "90fd5fe4", {
-            modelValue: () => {
-              return searchValue1.value;
-            },
-            "onUpdate:modelValue": () => {
-              return (_value) => {
-                return searchValue1.value = _value;
-              };
-            },
-            placeholder: "请输入搜索关键字"
-          });
-          _setSharedData(__sharedData, 2, n2?.sharedData);
-          const n5 = _createSharedDataComponentWithFallback(_component_up_search, "90fd515c", {
-            modelValue: () => {
-              return searchValue2.value;
-            },
-            "onUpdate:modelValue": () => {
-              return (_value) => {
-                return searchValue2.value = _value;
-              };
-            },
-            placeholder: "隐藏操作按钮",
-            "show-action": false
-          });
-          _setSharedData(__sharedData, 3, n5?.sharedData);
-          const n8 = _createSharedDataComponentWithFallback(_component_up_search, "90fd4228", {
-            modelValue: () => {
-              return searchValue3.value;
-            },
-            "onUpdate:modelValue": () => {
-              return (_value) => {
-                return searchValue3.value = _value;
-              };
-            },
-            shape: "square",
-            "search-icon-color": "#fa3534",
-            placeholder: "方形搜索框"
-          });
-          _setSharedData(__sharedData, 4, n8?.sharedData);
-          const n11 = _createSharedDataComponentWithFallback(_component_up_search, "90fd2d90", {
-            modelValue: () => {
-              return searchValue4.value;
-            },
-            "onUpdate:modelValue": () => {
-              return (_value) => {
-                return searchValue4.value = _value;
-              };
-            },
-            "action-text": "搜一下"
-          });
-          _setSharedData(__sharedData, 5, n11?.sharedData);
-          const n14 = _createSharedDataComponentWithFallback(_component_up_search, "38a81bbe", {
-            modelValue: () => {
-              return searchValue5.value;
-            },
-            "onUpdate:modelValue": () => {
-              return (_value) => {
-                return searchValue5.value = _value;
-              };
-            },
-            disabled: true,
-            placeholder: "禁用输入"
-          });
-          _setSharedData(__sharedData, 6, n14?.sharedData);
-        })
-      });
-      _setSharedData(__sharedData, 0, n18.sharedData);
-      return __sharedData;
-    };
+    const __returned__ = { searchValue1, searchValue2, searchValue3, searchValue4, searchValue5, get AppKu() {
+      return AppKu;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const _style_1 = {};
-const search = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0, _style_1]]]);
+const _style_0 = { "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "mt-12px": { "": { "marginTop": 12 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "pb-30px": { "": { "paddingBottom": 30 } } };
+const _style_1 = { "demo-block": { "": { "marginBottom": 12, "paddingTop": 12, "paddingRight": 12, "paddingBottom": 12, "paddingLeft": 12, "backgroundColor": "#ffffff", "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "demo-label": { "": { "fontSize": 14, "fontWeight": "bold", "color": "#606266", "marginBottom": 10, "paddingLeft": 4, "borderLeftWidth": 3, "borderLeftStyle": "solid", "borderLeftColor": "#2979ff" } } };
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { resolveComponent: _resolveComponent, createVNode: _createVNode, createElementVNode: _createElementVNode, withCtx: _withCtx, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_NavBar = resolveEasycom(__resolveDynamicComponent("NavBar"), __easycom_0);
+  const _component_up_search = resolveEasycom(__resolveDynamicComponent("up-search"), __easycom_1);
+  return _openBlock(), _createBlock($setup["AppKu"], null, {
+    default: _withCtx(() => [
+      _createElementVNode("view", { class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }, [
+        _createVNode(_component_NavBar, {
+          title: "up-search 搜索",
+          "auto-back": true,
+          "safe-area-inset-top": true,
+          "bg-color": "#ffffff"
+        }),
+        _createElementVNode("view", { class: "p-16px" }, [
+          _createElementVNode("view", { class: "demo-block" }, [
+            _createElementVNode("text", { class: "demo-label" }, "基础用法"),
+            _createVNode(_component_up_search, {
+              modelValue: $setup.searchValue1,
+              "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.searchValue1 = $event),
+              placeholder: "请输入搜索关键字"
+            }, null, 8, ["modelValue"])
+          ]),
+          _createElementVNode("view", { class: "demo-block mt-12px" }, [
+            _createElementVNode("text", { class: "demo-label" }, "隐藏右侧按钮"),
+            _createVNode(_component_up_search, {
+              modelValue: $setup.searchValue2,
+              "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.searchValue2 = $event),
+              placeholder: "隐藏操作按钮",
+              "show-action": false
+            }, null, 8, ["modelValue"])
+          ]),
+          _createElementVNode("view", { class: "demo-block mt-12px" }, [
+            _createElementVNode("text", { class: "demo-label" }, "方形与自定义图标颜色"),
+            _createVNode(_component_up_search, {
+              modelValue: $setup.searchValue3,
+              "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => $setup.searchValue3 = $event),
+              shape: "square",
+              "search-icon-color": "#fa3534",
+              placeholder: "方形搜索框"
+            }, null, 8, ["modelValue"])
+          ]),
+          _createElementVNode("view", { class: "demo-block mt-12px" }, [
+            _createElementVNode("text", { class: "demo-label" }, "自定义按钮文字"),
+            _createVNode(_component_up_search, {
+              modelValue: $setup.searchValue4,
+              "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => $setup.searchValue4 = $event),
+              "action-text": "搜一下"
+            }, null, 8, ["modelValue"])
+          ]),
+          _createElementVNode("view", { class: "demo-block mt-12px" }, [
+            _createElementVNode("text", { class: "demo-label" }, "禁用状态"),
+            _createVNode(_component_up_search, {
+              modelValue: $setup.searchValue5,
+              "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => $setup.searchValue5 = $event),
+              disabled: true,
+              placeholder: "禁用输入"
+            }, null, 8, ["modelValue"])
+          ])
+        ])
+      ])
+    ]),
+    _: 1
+    /* STABLE */
+  });
+}
+const search = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0, _style_1]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/search/search.uvue"]]);
 export {
   search as default
 };

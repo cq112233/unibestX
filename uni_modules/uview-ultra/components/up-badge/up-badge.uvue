@@ -5,13 +5,13 @@
 			inverted ? 'up-badge--inverted' : '',
 			shape === 'horn' ? 'up-badge--horn' : '',
 			inverted ? `up-badge--${type}--inverted` : `up-badge--${type}`]"
-		:style="[addStyle(customStyle), badgeStyle]"
+		:style="computedBadgeStyle"
 	>{{ isDot ? '' : showValue }}</text>
 </template>
 
 <script setup lang="uts">
 import { computed } from 'vue'
-import { addUnit, addStyle } from '../../libs/function/index'
+import { addUnit, addStyle, deepMerge } from '../../libs/function/index'
 
 defineOptions({
   name: 'up-badge'
@@ -102,6 +102,12 @@ const badgeStyle = computed<UTSJSONObject>(() => {
 		}
 	}
 	return style
+})
+
+const computedBadgeStyle = computed((): UTSJSONObject => {
+	const custom = addStyle(props.customStyle) as UTSJSONObject
+	const badge = badgeStyle.value
+	return deepMerge(badge, custom) as UTSJSONObject
 })
 
 const showValue = computed<string>(() => {

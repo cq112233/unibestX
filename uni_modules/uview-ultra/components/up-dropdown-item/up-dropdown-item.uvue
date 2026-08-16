@@ -2,9 +2,7 @@
 	<view class="up-dropdown-item" v-if="isActive"
 		@touchmove.stop.prevent="() => {}"@tap.stop.prevent="() => {}">
 		<template v-if="$slots['default'] == null && $slots['$default'] == null">
-			<view class="up-dropdown-item__scroll" :style="{
-				height: addUnit(props.height)
-			}">
+			<view class="up-dropdown-item__scroll" :style="scrollHeightStyle">
 				<view class="up-dropdown-item__options">
 					<up-cell-group>
 						<up-cell @click="cellClick(item['value'])" :arrow="false"
@@ -12,7 +10,7 @@
 							<template #title>
 								<text class="up-dropdown-item__text" :class="{
 									'up-dropdown-item__text--active': (props.modelValue).toString() == item['value'].toString() && activeColor == '#2979ff'
-								}" :style="[getItemTextStyle(item)]">{{ item['label'].toString() }}</text>
+								}" :style="getItemTextStyle(item)">{{ item['label'].toString() }}</text>
 							</template>
 							<up-icon v-if="(props.modelValue).toString() == item['value'].toString()"
 								name="checkbox-mark" :color="activeColor == '#2979ff' ? 'primary' : activeColor" size="18"></up-icon>
@@ -28,6 +26,7 @@
 </template>
 
 <script setup lang="uts">
+	import type { Ref, PropType } from 'vue'
 	import { computed, ref, watch, onMounted, inject } from 'vue'
 	import { addUnit } from '../../libs/function/index.uts';
 	import defProps from './dropdown-item.uts'
@@ -77,36 +76,53 @@
 	// 定义 emit
 	const emit = defineEmits(['update:modelValue', 'change']);
 	
-	const parentDropdown = inject<any>('upDropdown', null);
+	const parentDropdown = inject<UTSJSONObject | null>('upDropdown', null);
 	const itemIndex = ref<number>(-1);
+
+	const parentDropdownProps = computed((): UTSJSONObject | null => {
+		if (parentDropdown == null) return null
+		const p = (parentDropdown as UTSJSONObject)['props']
+		return p != null ? (p as UTSJSONObject) : null
+	})
 	
 	const isActive = computed<boolean>(() => {
-		if (parentDropdown != null && parentDropdown.current != null && parentDropdown.active != null) {
-			return parentDropdown.active.value == true && parentDropdown.current.value == itemIndex.value;
+		if (parentDropdown != null) {
+			const activeRef = (parentDropdown as UTSJSONObject)['active'] as Ref<boolean> | null
+			const currentRef = (parentDropdown as UTSJSONObject)['current'] as Ref<number> | null
+			if (activeRef != null && currentRef != null) {
+				return activeRef.value == true && currentRef.value == itemIndex.value
+			}
 		}
 		return false;
 	});
 	
 	const activeColor = computed<string>(() => {
-		if (parentDropdown != null && parentDropdown.props != null) {
-			return parentDropdown.props.activeColor ?? '#2979ff';
+		if (parentDropdownProps.value != null && (parentDropdownProps.value!['activeColor'] ?? '') != '') {
+			return parentDropdownProps.value!['activeColor'] as string;
 		}
 		return '#2979ff';
 	});
 	
 	const inactiveColor = computed<string>(() => {
-		if (parentDropdown != null && parentDropdown.props != null) {
-			return parentDropdown.props.inactiveColor ?? '#606266';
+		if (parentDropdownProps.value != null && (parentDropdownProps.value!['inactiveColor'] ?? '') != '') {
+			return parentDropdownProps.value!['inactiveColor'] as string;
 		}
 		return '#606266';
 	});
+
+	const scrollHeightStyle = computed((): UTSJSONObject => {
+		return { height: addUnit(props.height) } as UTSJSONObject
+	})
 	
 	// cell被点击
 	function cellClick(value?: any) {
         emit('update:modelValue', value)
 		emit('change', value)
-		if (parentDropdown != null && parentDropdown.close != null) {
-			parentDropdown.close()
+		if (parentDropdown != null) {
+			const closeFn = (parentDropdown as UTSJSONObject)['close'] as (() => void) | null
+			if (closeFn != null) {
+				closeFn()
+			}
 		}
 	}
 	
@@ -123,17 +139,23 @@
 	
 	// 在组件挂载时注册
 	onMounted(() => {
-		if (parentDropdown != null && parentDropdown.registerItem != null) {
-			itemIndex.value = parentDropdown.registerItem({
-				title: props.title.toString(),
-				disabled: props.disabled
-			} as UPDropdownMenu);
+		if (parentDropdown != null) {
+			const registerFn = (parentDropdown as UTSJSONObject)['registerItem'] as ((item: UPDropdownMenu) => number) | null
+			if (registerFn != null) {
+				itemIndex.value = registerFn({
+					title: props.title.toString(),
+					disabled: props.disabled
+				} as UPDropdownMenu);
+			}
 		}
 	});
 	
-	watch(() => props.title, (newTitle: any) => {
-		if (parentDropdown != null && parentDropdown.updateItemTitle != null && itemIndex.value >= 0) {
-			parentDropdown.updateItemTitle(itemIndex.value, newTitle.toString());
+	watch((): any => props.title, (newTitle: any) => {
+		if (parentDropdown != null && itemIndex.value >= 0) {
+			const updateFn = (parentDropdown as UTSJSONObject)['updateItemTitle'] as ((index: number, title: string) => void) | null
+			if (updateFn != null) {
+				updateFn(itemIndex.value, newTitle.toString());
+			}
 		}
 	});
 </script>

@@ -4,19 +4,17 @@ import "./src/store/index.js";
 import { i as isPageTabbar, s as syncCurIdxByCurrentPage } from "./src/tabbar/store.js";
 import { r as registerToast, u as unregisterToast } from "./src/utils/toast.js";
 import { u as useAppStore } from "./src/store/app.js";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedDataStyle: _setSharedDataStyle, unref: _unref, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataSlot: _createSharedDataSlot, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponent: _createSharedDataComponent, createSharedDataIf: _createSharedDataIf, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback } = globalThis.Vue;
-const __className = "GenAppku";
+import { _ as _export_sfc } from "./plugin-vue-export-helper.js";
+function resolveEasycom(component, easycom) {
+  return typeof component === "string" ? easycom : component;
+}
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { onBeforeMount, onMounted, onUnmounted, ref } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "41195380",
-  __className,
-  __filename: "App.ku.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "App.ku",
-  setup(__props) {
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenAppkuSharedData", sharedDataClassId: 0 })));
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
     const appStore = useAppStore();
     const isCurrentPageTabbar = ref(false);
     const uToastRef = ref(null);
@@ -47,28 +45,47 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         unregisterToast(uToastRef.value);
       }
     });
-    return () => {
-      "raw js";
-      const _setTemplateRef = _createSharedDataTemplateRefSetter();
-      const _component_up_toast = __easycom_2;
-      _renderSharedDataEffect(() => {
-        return _setSharedDataStyle(__sharedData, 3, ["flex: 1;", { "--theme-color": _unref(appStore).state.theme }]);
-      });
-      _createSharedDataSlot("default", null, null);
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(isCurrentPageTabbar.value));
-      }, () => {
-        const n4 = _createSharedDataComponent(Tabbar, "ca371aa4");
-        _setSharedData(__sharedData, 1, n4.sharedData);
-      });
-      const n5 = _createSharedDataComponentWithFallback(_component_up_toast, "ca3713a4");
-      _setSharedData(__sharedData, 2, n5?.sharedData);
-      _setTemplateRef(n5, uToastRef, null, "uToastRef");
-      return __sharedData;
-    };
+    const __returned__ = { appStore, isCurrentPageTabbar, uToastRef, get Tabbar() {
+      return Tabbar;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { renderSlot: _renderSlot, createElementVNode: _createElementVNode, openBlock: _openBlock, createBlock: _createBlock, createCommentVNode: _createCommentVNode, resolveComponent: _resolveComponent, createVNode: _createVNode, normalizeStyle: _normalizeStyle, createElementBlock: _createElementBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_toast = resolveEasycom(__resolveDynamicComponent("up-toast"), __easycom_2);
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      class: "flex flex-col flex-1",
+      style: _normalizeStyle([{ "flex": "1" }, { "--theme-color": $setup.appStore.state.theme }])
+    },
+    [
+      _createElementVNode("scroll-view", {
+        direction: "vertical",
+        class: "flex-1",
+        style: { "flex": "1" }
+      }, [
+        _renderSlot(_ctx.$slots, "default")
+      ]),
+      $setup.isCurrentPageTabbar ? (_openBlock(), _createBlock($setup["Tabbar"], { key: 0 })) : _createCommentVNode("v-if", true),
+      _createVNode(
+        _component_up_toast,
+        { ref: "uToastRef" },
+        null,
+        512
+        /* NEED_PATCH */
+      )
+    ],
+    4
+    /* STYLE */
+  );
+}
+const AppKu = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/App.ku.uvue"]]);
 export {
-  _sfc_main as _
+  AppKu as A,
+  resolveEasycom as r
 };
 //# sourceMappingURL=App.ku.js.map

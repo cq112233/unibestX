@@ -1,15 +1,7 @@
 <template>
 	<view
 	    class="up-loadmore"
-	    :style="[
-			addStyle(customStyle),
-			{
-				backgroundColor: bgColor,
-				marginBottom: addUnit(marginBottom),
-				marginTop: addUnit(marginTop),
-				height: addUnit(height),
-			},
-		]"
+	    :style="loadmoreStyle"
 	>
 		<up-line
 		    length="140rpx"
@@ -24,7 +16,7 @@
 		>
 			<view
 			    class="up-loadmore__content__icon-wrap"
-			    v-if="status === 'loading' && icon"
+			    v-if="status == 'loading' && icon"
 			>
 				<up-loading-icon
 				    :color="iconColor"
@@ -34,7 +26,7 @@
 			</view>
 			<text
 			    class="up-line-11"
-			    :style="[loadTextStyle]"
+			    :style="loadTextStyle"
 			    :class="[(status == 'nomore' && isDot == true) ? 'up-loadmore__content__dot-text' : 'up-loadmore__content__text']"
 			    @tap="loadMore"
 			>{{ showText }}</text>
@@ -51,7 +43,7 @@
 
 <script setup lang="uts">
 import { computed } from 'vue'
-import { addUnit, addStyle } from '../../libs/function/index.uts'
+import { addUnit, addStyle, deepMerge } from '../../libs/function/index.uts'
 
 defineOptions({
 	name: "up-loadmore"
@@ -140,12 +132,23 @@ const emit = defineEmits(['loadmore'])
 
 const dotText = "●"
 
-const loadTextStyle = computed(() => {
+const loadmoreStyle = computed((): UTSJSONObject => {
+	const base = {
+		backgroundColor: props.bgColor,
+		marginBottom: addUnit(props.marginBottom),
+		marginTop: addUnit(props.marginTop),
+		height: addUnit(props.height)
+	} as UTSJSONObject
+	const custom = addStyle(props.customStyle) as UTSJSONObject
+	return deepMerge(base, custom) as UTSJSONObject
+})
+
+const loadTextStyle = computed((): UTSJSONObject => {
 	return {
 		color: props.color,
 		fontSize: addUnit(props.fontSize),
 		backgroundColor: props.bgColor,
-	}
+	} as UTSJSONObject
 })
 
 const showText = computed<string>(() => {

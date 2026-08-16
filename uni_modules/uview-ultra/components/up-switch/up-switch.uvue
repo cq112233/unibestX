@@ -1,32 +1,32 @@
 <template>
 	<view
 	    :class="switchClass"
-	    :style="[switchStyle, addStyle(customStyle)]"
+	    :style="mergedSwitchStyle"
 	    @tap="clickHandler"
 	>
 		<view
 			class="up-switch__bg-active"
-			:style="[bgActiveStyle]"
+			:style="bgActiveStyle"
 			v-if="isActive"
 		>
 		</view>
 		<view
 		    class="up-switch__bg"
-		    :style="[bgStyle]"
+		    :style="bgStyle"
 			v-if="!isActive"
 		>
 		</view>
 		<view
 		    class="up-switch__node"
 			:class="[modelValue == activeValue ? 'up-switch__node--on' : '']"
-		    :style="[nodeStyle]"
+		    :style="nodeStyle"
 		>
 			<up-loading-icon
 			    :show="loading"
 			    mode="circle"
 			    timingFunction='linear'
 				:color="modelValue == activeValue ? activeColor : '#AAABAD'"
-			    :size="parseInt(getPx(size)) * 0.6"
+			    :size="loadingIconSize"
 			/>
 		</view>
 	</view>
@@ -34,7 +34,7 @@
 
 <script setup lang="uts">
 import { computed, nextTick } from 'vue'
-import { addStyle, getPx, addUnit } from '../../libs/function/index'
+import { addStyle, getPx, addUnit, deepMerge } from '../../libs/function/index.uts'
 
 defineOptions({
   name: 'up-switch'
@@ -94,7 +94,11 @@ const isActive = computed<boolean>(() => {
 })
 
 const customInactiveColor = computed<boolean>(() => {
-  return props.inactiveColor !== '#fff' && props.inactiveColor !== '#ffffff'
+  return props.inactiveColor != '#fff' && props.inactiveColor != '#ffffff'
+})
+
+const loadingIconSize = computed((): number => {
+  return parseInt(getPx(props.size)) * 0.6
 })
 
 const switchClass = computed<string>(() => {
@@ -126,6 +130,10 @@ const switchStyle = computed<UTSJSONObject>(() => {
     }
   }
   return style
+})
+
+const mergedSwitchStyle = computed((): UTSJSONObject => {
+  return deepMerge(switchStyle.value, addStyle(props.customStyle)) as UTSJSONObject
 })
 
 const bgActiveStyle = computed<UTSJSONObject>(() => {

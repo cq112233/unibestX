@@ -1,18 +1,13 @@
 import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
-import { b as addStyle, a as addUnit } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
+import { r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
+import { a as addUnit, b as addStyle } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, unref: _unref, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, toDisplayString: _toDisplayString, createSharedDataSlot: _createSharedDataSlot, createSharedDataIf: _createSharedDataIf, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedDataEvent: _setSharedDataEvent } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpSearchUpSearch";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref, computed, watch, onMounted, nextTick } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-search"
   },
-  __dynamicSharedData: true,
-  __hash: "4f4cc5ab",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-search/up-search.uvue",
   __name: "up-search",
   props: {
     shape: {
@@ -136,9 +131,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   },
   emits: ["clear", "search", "custom", "focus", "blur", "click", "clickIcon", "update:modelValue", "change"],
   setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit, $slots = _a.slots;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpSearchUpSearchSharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose, __emit = _a.emit;
     const props = __props;
     const emit = __emit;
     const keyword = ref(props.modelValue.toString());
@@ -219,123 +212,117 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     __expose({
       clear
     });
-    return () => {
-      "raw js";
-      const _component_up_icon = __easycom_0;
-      const _component_input = _resolveComponent("input");
-      _renderSharedDataEffect(() => {
-        _setSharedDataClass(__sharedData, 9, ["up-search", [__props.iconPosition === "right" ? "up-search__reverse" : ""]]);
-        _setSharedDataStyle(__sharedData, 10, [{
-          margin: __props.margin
-        }, _unref(addStyle)(__props.customStyle)]);
-        _setSharedDataStyle(__sharedData, 11, {
-          backgroundColor: __props.bgColor,
-          borderRadius: __props.shape == "round" ? "100px" : "4px",
-          borderColor: __props.borderColor
-        });
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 0, _toSharedDataBoolean($slots["label"] != null || __props.label !== ""));
-      }, () => {
-        _createSharedDataSlot("label", null, null, () => {
-          _renderSharedDataEffect(() => {
-            return _setSharedData(__sharedData, 1, _toDisplayString(__props.label));
-          });
-        });
-      });
-      const n5 = _createSharedDataComponentWithFallback(_component_up_icon, "ef052e98", {
-        onClick: () => {
-          return clickIcon;
-        },
-        size: () => {
-          return __props.searchIconSize;
-        },
-        name: () => {
-          return __props.searchIcon;
-        },
-        color: () => {
-          return __props.searchIconColor != "" ? __props.searchIconColor : __props.color;
-        }
-      });
-      _setSharedData(__sharedData, 6, n5?.sharedData);
-      const n7 = _createSharedDataComponentWithFallback(_component_input, "ef052008", {
-        "confirm-type": "search",
-        onBlur: () => {
-          return blurFunc;
-        },
-        value: () => {
-          return keyword.value;
-        },
-        onConfirm: () => {
-          return search;
-        },
-        onInput: () => {
-          return inputChange;
-        },
-        disabled: () => {
-          return __props.disabled;
-        },
-        onFocus: () => {
-          return getFocus;
-        },
-        focus: () => {
-          return __props.focus;
-        },
-        maxlength: () => {
-          return __props.maxlength;
-        },
-        "adjust-position": () => {
-          return __props.adjustPosition;
-        },
-        "auto-blur": () => {
-          return __props.autoBlur;
-        },
-        "placeholder-class": "up-search__content__input--placeholder",
-        placeholder: () => {
-          return __props.placeholder;
-        },
-        "placeholder-style": () => {
-          return `color: ${__props.placeholderColor}`;
-        },
-        class: "up-search__content__input",
-        type: "text",
-        style: () => {
-          return [{
-            pointerEvents: __props.disabled ? "none" : "auto",
-            textAlign: __props.inputAlign,
-            color: __props.color,
-            backgroundColor: __props.bgColor,
-            height: _unref(addUnit)(__props.height)
-          }, __props.inputStyle];
-        }
-      });
-      _setSharedData(__sharedData, 2, n7?.sharedData);
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 3, _toSharedDataBoolean(isShowClear.value));
-      }, () => {
-        const n10 = _createSharedDataComponentWithFallback(_component_up_icon, "f1a45d84", {
-          name: "close",
-          size: "11",
-          color: "#ffffff",
-          customStyle: "line-height: 12px"
-        });
-        _setSharedData(__sharedData, 4, n10?.sharedData);
-        _setSharedDataEvent(__sharedData, 5, clear);
-      });
-      _createSharedDataSlot("inputRight", null, null);
-      _setSharedDataEvent(__sharedData, 7, custom);
-      _setSharedDataEvent(__sharedData, 8, clickHandler);
-      _renderSharedDataEffect(() => {
-        _setSharedDataStyle(__sharedData, 12, [__props.actionStyle]);
-        _setSharedDataClass(__sharedData, 13, ["up-search__action", [showActionBtn.value || show.value ? "up-search__action--active" : ""]]);
-        _setSharedData(__sharedData, 14, _toDisplayString(__props.actionText));
-      });
-      return __sharedData;
-    };
+    const __returned__ = { props, emit, keyword, show, focused, showActionBtn, isShowClear, inputChange, clear, search, custom, getFocus, blurFunc, clickHandler, clickIcon, get addUnit() {
+      return addUnit;
+    }, get addStyle() {
+      return addStyle;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "up-search": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-search__content": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "paddingTop": 0, "paddingRight": 10, "paddingBottom": 0, "paddingLeft": 10, "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "justifyContent": "space-between", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopColor": "rgba(0,0,0,0)", "borderRightColor": "rgba(0,0,0,0)", "borderBottomColor": "rgba(0,0,0,0)", "borderLeftColor": "rgba(0,0,0,0)", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "overflow": "hidden" } }, "up-search__content__icon": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center" } }, "up-search__content__label": { "": { "color": "#303133", "fontSize": 14, "marginTop": 0, "marginRight": 4, "marginBottom": 0, "marginLeft": 4 } }, "up-search__content__close": { "": { "width": 20, "height": 20, "borderTopLeftRadius": 100, "borderTopRightRadius": 100, "borderBottomRightRadius": 100, "borderBottomLeftRadius": 100, "backgroundColor": "#C6C7CB", "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "transform": "scale(0.82)" } }, "up-search__content__input": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "fontSize": 14, "lineHeight": 1, "marginTop": 0, "marginRight": 5, "marginBottom": 0, "marginLeft": 5, "color": "#303133" } }, "up-search__content__input--placeholder": { "": { "color": "#909193" } }, "up-search__action": { "": { "fontSize": 14, "color": "#303133", "width": 0, "overflow": "hidden", "transitionProperty": "width", "transitionDuration": "0.3s", "whiteSpace": "nowrap", "textAlign": "center" } }, "up-search__action--active": { "": { "width": 40, "marginLeft": 5 } }, "@TRANSITION": { "up-search__action": { "property": "width", "duration": "0.3s" } } };
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { renderSlot: _renderSlot, toDisplayString: _toDisplayString, createElementVNode: _createElementVNode, createCommentVNode: _createCommentVNode, resolveComponent: _resolveComponent, createVNode: _createVNode, normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock, withModifiers: _withModifiers, normalizeClass: _normalizeClass } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      class: _normalizeClass(["up-search", [$props.iconPosition === "right" ? "up-search__reverse" : ""]]),
+      onClick: $setup.clickHandler,
+      style: _normalizeStyle([{
+        margin: $props.margin
+      }, $setup.addStyle($props.customStyle)])
+    },
+    [
+      _createElementVNode(
+        "view",
+        {
+          class: "up-search__content",
+          style: _normalizeStyle({
+            backgroundColor: $props.bgColor,
+            borderRadius: $props.shape == "round" ? "100px" : "4px",
+            borderColor: $props.borderColor
+          })
+        },
+        [
+          _ctx.$slots["label"] != null || $props.label !== "" ? _renderSlot(_ctx.$slots, "label", { key: 0 }, () => [
+            _createElementVNode(
+              "text",
+              { class: "up-search__content__label" },
+              _toDisplayString($props.label),
+              1
+              /* TEXT */
+            )
+          ]) : _createCommentVNode("v-if", true),
+          _createElementVNode("view", { class: "up-search__content__icon" }, [
+            _createVNode(_component_up_icon, {
+              onClick: $setup.clickIcon,
+              size: $props.searchIconSize,
+              name: $props.searchIcon,
+              color: $props.searchIconColor != "" ? $props.searchIconColor : $props.color
+            }, null, 8, ["size", "name", "color"])
+          ]),
+          _createElementVNode("input", {
+            "confirm-type": "search",
+            onBlur: $setup.blurFunc,
+            value: $setup.keyword,
+            onConfirm: $setup.search,
+            onInput: $setup.inputChange,
+            disabled: $props.disabled,
+            onFocus: $setup.getFocus,
+            focus: $props.focus,
+            maxlength: $props.maxlength,
+            "adjust-position": $props.adjustPosition,
+            "auto-blur": $props.autoBlur,
+            "placeholder-class": "up-search__content__input--placeholder",
+            placeholder: $props.placeholder,
+            "placeholder-style": `color: ${$props.placeholderColor}`,
+            class: "up-search__content__input",
+            type: "text",
+            style: _normalizeStyle([{
+              pointerEvents: $props.disabled ? "none" : "auto",
+              textAlign: $props.inputAlign,
+              color: $props.color,
+              backgroundColor: $props.bgColor,
+              height: $setup.addUnit($props.height)
+            }, $props.inputStyle])
+          }, null, 44, ["value", "disabled", "focus", "maxlength", "adjust-position", "auto-blur", "placeholder", "placeholder-style"]),
+          $setup.isShowClear ? (_openBlock(), _createElementBlock("view", {
+            key: 1,
+            class: "up-search__content__icon up-search__content__close",
+            onClick: $setup.clear
+          }, [
+            _createVNode(_component_up_icon, {
+              name: "close",
+              size: "11",
+              color: "#ffffff",
+              customStyle: "line-height: 12px"
+            })
+          ])) : _createCommentVNode("v-if", true),
+          _renderSlot(_ctx.$slots, "inputRight")
+        ],
+        4
+        /* STYLE */
+      ),
+      _createElementVNode(
+        "text",
+        {
+          style: _normalizeStyle([$props.actionStyle]),
+          class: _normalizeClass(["up-search__action", [$setup.showActionBtn || $setup.show ? "up-search__action--active" : ""]]),
+          onClick: _withModifiers($setup.custom, ["stop", "prevent"])
+        },
+        _toDisplayString($props.actionText),
+        7
+        /* TEXT, CLASS, STYLE */
+      )
+    ],
+    6
+    /* CLASS, STYLE */
+  );
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-search/up-search.uvue"]]);
 export {
   __easycom_1 as _
 };

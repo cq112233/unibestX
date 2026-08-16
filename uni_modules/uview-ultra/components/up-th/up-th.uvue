@@ -1,13 +1,13 @@
 <template>
-	<view class="up-th" :class="[customClass]" :style="[thStyle, addStyle(customStyle)]">
+	<view class="up-th" :class="[customClass]" :style="mergedThStyle">
 		<slot>
-			<text class="up-th__text" :style="[thTextStyle]">{{ text }}</text>
+			<text class="up-th__text" :style="thTextStyle">{{ text }}</text>
 		</slot>
 	</view>
 </template>
 
 <script setup lang="uts">
-	import { ref, getCurrentInstance, onMounted } from 'vue'
+	import { ref, computed, getCurrentInstance, onMounted } from 'vue'
 	import { deepMerge, addStyle } from '../../libs/function/index'
 	import { useUltraUI } from '../../libs/composable/useUltraUI'
 	const { parent, getParent } = useUltraUI({
@@ -43,6 +43,12 @@
 	
 	const thStyle = ref<UTSJSONObject>({})
 	const thTextStyle = ref<UTSJSONObject>({})
+
+	const mergedThStyle = computed((): UTSJSONObject => {
+		const custom = addStyle(props.customStyle) as UTSJSONObject
+		const th = thStyle.value
+		return deepMerge(th, custom) as UTSJSONObject
+	})
 	
 	onMounted(() => {
 		getParent('up-table', instance)

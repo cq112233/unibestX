@@ -341,13 +341,13 @@ function longpress(): void {
     } as UTSJSONObject)
 }
 
-watch(() => props.val, () => {
+watch((): string => props.val, () => {
     if (props.onval) {
         makeCode()
     }
 })
 
-watch(() => [props.size, props.background, props.foreground, props.pdground], () => {
+watch((): Array<any | null> => [props.size, props.background, props.foreground, props.pdground] as Array<any | null>, () => {
     makeCode()
 })
 

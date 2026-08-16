@@ -27,6 +27,7 @@ const copyText = ref('Hello unibestX!')
 function triggerVibration() {
   // #ifdef APP || MP-WEIXIN || MP-ALIPAY
   uni.vibrateShort({
+    type: 'light',
     success: () => {
       uni.showToast({ title: '已触发短震动', icon: 'none' })
     },

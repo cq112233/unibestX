@@ -11,24 +11,24 @@
 				</view>
 				<template v-for="(item1, index1) in item.date" :key="index1">
 					<view class="up-calendar-month__days__day"
-						:style="[dayStyle(index, index1, item1)]" @tap="clickHandler(index, index1, item1)">
+						:style="dayStyle(index, index1, item1)" @tap="clickHandler(index, index1, item1)">
 						<view class="up-calendar-month__days__day__select" 
-							:style="[daySelectStyle(index, index1, item1)]"
+							:style="daySelectStyle(index, index1, item1)"
 							:class="{
 								'up-calendar-month__days__day__select--selected': isSelected(item1),
 								'up-calendar-month__days__day__select--today': isToday(item1)
 							}">
-							<view v-if="isRangeMiddle(item1)" class="up-calendar-month__days__day__select__range-bg" :style="[rangeBgStyle(item1)]"></view>
+							<view v-if="isRangeMiddle(item1)" class="up-calendar-month__days__day__select__range-bg" :style="rangeBgStyle(item1)"></view>
 							<text class="up-calendar-month__days__day__select__info"
 								:class="{
 									'up-calendar-month__days__day__select__info--disabled': item1.disabled,
 									'up-calendar-month__days__day__select__info--range-middle': isRangeMiddle(item1)
 								}"
-								:style="[textStyle(item1)]">{{ item1['day'] }}</text>
+								:style="textStyle(item1)">{{ item1['day'] }}</text>
 							<text v-if="getBottomInfo(index, index1, item1) != ''"
 								class="up-calendar-month__days__day__select__buttom-info"
 								:class="{'up-calendar-month__days__day__select__buttom-info--disabled' : item1['disabled']}"
-								:style="[textStyle(item1)]">
+								:style="textStyle(item1)">
 								{{ getBottomInfo(index, index1, item1) }}
 							</text>
 							<text v-if="item1['dot']" class="up-calendar-month__days__day__select__dot"></text>
@@ -287,6 +287,13 @@ function getBottomInfo(index1: number, index2: number, item: UPCalendarMonthsIte
 	return bottomInfo
 }
 
+function setSelected(sel: Array<string>, shouldEmit = true) {
+	selected.value = sel
+	if (shouldEmit) {
+		emit('monthSelected', selected.value, 'tap')
+	}
+}
+
 function clickHandler(index1: number, index21: number, item: UPCalendarMonthsItemDate) {
 	if (props.readonly) return
 	const date = (item['dateStr'] != null ? item['dateStr'] as string : dayuts(item['date']).format("YYYY-MM-DD"))
@@ -336,7 +343,8 @@ function clickHandler(index1: number, index21: number, item: UPCalendarMonthsIte
 function setDefaultDate() {
 	if (props.defaultDate == null) {
 		const sel = [dayuts().format("YYYY-MM-DD")]
-		return setSelected(sel, false)
+		setSelected(sel, false)
+		return
 	}
 	let defDate = [] as Array<string>
 	let minDateData = props.minDate.toString()
@@ -358,13 +366,6 @@ function setDefaultDate() {
 		return dayuts(it).isAfter(dayuts(minDate).subtract(1, 'day')) && dayuts(it).isBefore(dayuts(maxDate).add(1, 'day'))
 	})
 	setSelected(defDate, false)
-}
-
-function setSelected(sel: Array<string>, shouldEmit = true) {
-	selected.value = sel
-	if (shouldEmit) {
-		emit('monthSelected', selected.value, 'tap')
-	}
 }
 
 function getWrapperWidth() {
@@ -401,11 +402,11 @@ function init() {
 	})
 }
 
-watch(() => [props.minDate, props.maxDate, props.defaultDate], () => {
+watch((): Array<any | null> => [props.minDate, props.maxDate, props.defaultDate] as Array<any | null>, () => {
 	setDefaultDate()
 }, { immediate: true })
 
-watch(() => props.months, (n: Array<CalendarMonthItem>) => {
+watch((): Array<CalendarMonthItem> => props.months, (n: Array<CalendarMonthItem>) => {
 	monthsInner.value = n
 }, { immediate: true })
 

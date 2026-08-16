@@ -700,11 +700,11 @@ function toTempFilePath(options: UTSJSONObject = {} as UTSJSONObject): void {
   })
 }
 
-watch(() => [
+watch((): Array<any | null> => [
   props.value, props.format, props.width, props.height, props.displayValue,
   props.text, props.textPosition, props.textMargin, props.fontSize,
   props.background, props.lineColor, props.margin
-], () => {
+] as Array<any | null>, () => {
   generateBarcode()
 })
 

@@ -1,0 +1,283 @@
+import { computed } from 'vue'
+import { addUnit, getPx } from '../../libs/function/index'
+
+
+const __sfc__ = defineComponent({
+  __name: 'up-card',
+name: 'up-card',
+  props: {
+  full: {
+    type: Boolean,
+    default: false
+  },
+  title: {
+    type: String,
+    default: ''
+  },
+  titleColor: {
+    type: String,
+    default: '#303133'
+  },
+  titleSize: {
+    type: [Number, String],
+    default: 15
+  },
+  subTitle: {
+    type: String,
+    default: ''
+  },
+  subTitleColor: {
+    type: String,
+    default: '#909193'
+  },
+  subTitleSize: {
+    type: [Number, String],
+    default: 12
+  },
+  border: {
+    type: Boolean,
+    default: true
+  },
+  index: {
+    type: [Number, String, Object],
+    default: ''
+  },
+  margin: {
+    type: String,
+    default: '15px'
+  },
+  borderRadius: {
+    type: [Number, String],
+    default: 8
+  },
+  headStyle: {
+    type: Object,
+    default: () => ({})
+  },
+  bodyStyle: {
+    type: Object,
+    default: () => ({})
+  },
+  footStyle: {
+    type: Object,
+    default: () => ({})
+  },
+  headBorderBottom: {
+    type: Boolean,
+    default: true
+  },
+  footBorderTop: {
+    type: Boolean,
+    default: true
+  },
+  thumb: {
+    type: String,
+    default: ''
+  },
+  thumbWidth: {
+    type: [String, Number],
+    default: 30
+  },
+  thumbCircle: {
+    type: Boolean,
+    default: false
+  },
+  padding: {
+    type: [String, Number],
+    default: 15
+  },
+  paddingHead: {
+    type: [String, Number],
+    default: ''
+  },
+  paddingBody: {
+    type: [String, Number],
+    default: ''
+  },
+  paddingFoot: {
+    type: [String, Number],
+    default: ''
+  },
+  showHead: {
+    type: Boolean,
+    default: true
+  },
+  showFoot: {
+    type: Boolean,
+    default: true
+  },
+  boxShadow: {
+    type: String,
+    default: 'none'
+  }
+},
+  emits: ['click', 'head-click', 'body-click', 'foot-click'],
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+
+
+const props = __props
+
+const realThumb = computed((): string => {
+  return props.thumb
+})
+
+const hasBorderRadius = computed((): boolean => {
+  const pxStr = getPx(props.borderRadius)
+  return parseFloat(pxStr) > 0
+})
+
+const cardStyle = computed((): UTSJSONObject => {
+  return {
+    borderRadius: addUnit(props.borderRadius),
+    margin: props.margin,
+    boxShadow: props.boxShadow
+  } as UTSJSONObject
+})
+
+const headPaddingStyle = computed((): UTSJSONObject => {
+  const padVal = props.paddingHead != '' ? props.paddingHead : props.padding
+  return { padding: addUnit(padVal) } as UTSJSONObject
+})
+
+const thumbStyle = computed((): UTSJSONObject => {
+  return {
+    height: addUnit(props.thumbWidth),
+    width: addUnit(props.thumbWidth),
+    borderRadius: props.thumbCircle ? '50px' : '4px'
+  } as UTSJSONObject
+})
+
+const titleStyle = computed((): UTSJSONObject => {
+  return {
+    fontSize: addUnit(props.titleSize),
+    color: props.titleColor
+  } as UTSJSONObject
+})
+
+const subTitleStyle = computed((): UTSJSONObject => {
+  return {
+    fontSize: addUnit(props.subTitleSize),
+    color: props.subTitleColor
+  } as UTSJSONObject
+})
+
+const bodyPaddingStyle = computed((): UTSJSONObject => {
+  const padVal = props.paddingBody != '' ? props.paddingBody : props.padding
+  return { padding: addUnit(padVal) } as UTSJSONObject
+})
+
+const footPaddingStyle = computed((): UTSJSONObject => {
+  const padVal = props.paddingFoot != '' ? props.paddingFoot : props.padding
+  return { padding: addUnit(padVal) } as UTSJSONObject
+})
+
+function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+__ins.emit(event, ...do_not_transform_spread)
+}
+
+const click = () => {
+  emit('click', props.index)
+}
+
+const headClick = () => {
+  emit('head-click', props.index)
+}
+
+const bodyClick = () => {
+  emit('body-click', props.index)
+}
+
+const footClick = () => {
+  emit('foot-click', props.index)
+}
+
+return (): any | null => {
+
+  return _cE("view", _uM({
+    class: _nC(["up-card", _uM({ 'up-border': _ctx.border, 'up-card-full': _ctx.full,
+			'up-card--border': hasBorderRadius.value })]),
+    onClick: withModifiers(click, ["stop"]),
+    style: _nS(cardStyle.value)
+  }), [
+    isTrue(_ctx.showHead)
+      ? _cE("view", _uM({
+          key: 0,
+          class: _nC(["up-card__head", _uM({
+				'up-border-bottom': _ctx.headBorderBottom
+			})]),
+          style: _nS([headPaddingStyle.value, (_ctx.headStyle ?? _uM<string, any | null>({})) as any]),
+          onClick: headClick
+        }), [
+          _ctx.$slots['head'] == null
+            ? _cE("view", _uM({
+                key: 0,
+                class: "up-flex up-row-between up-flex-between up-flex-items-center"
+              }), [
+                _ctx.title != ''
+                  ? _cE("view", _uM({
+                      key: 0,
+                      class: "up-card__head--left up-flex up-flex-items-center up-line-11"
+                    }), [
+                      realThumb.value != ''
+                        ? _cE("image", _uM({
+                            key: 0,
+                            src: realThumb.value,
+                            class: "up-card__head--left__thumb",
+                            mode: "aspectFill",
+                            style: _nS(thumbStyle.value)
+                          }), null, 12 /* STYLE, PROPS */, ["src"])
+                        : _cC("v-if", true),
+                      _cE("text", _uM({
+                        class: "up-card__head--left__title up-line-1",
+                        style: _nS(titleStyle.value)
+                      }), _tD(_ctx.title), 5 /* TEXT, STYLE */)
+                    ])
+                  : _cC("v-if", true),
+                _ctx.subTitle != ''
+                  ? _cE("view", _uM({
+                      key: 1,
+                      class: "up-card__head--right up-line-1"
+                    }), [
+                      _cE("text", _uM({
+                        class: "up-card__head__title__text",
+                        style: _nS(subTitleStyle.value)
+                      }), _tD(_ctx.subTitle), 5 /* TEXT, STYLE */)
+                    ])
+                  : _cC("v-if", true)
+              ])
+            : renderSlot(_ctx.$slots, "head", _uM({ key: 1 }))
+        ], 6 /* CLASS, STYLE */)
+      : _cC("v-if", true),
+    _cE("view", _uM({
+      onClick: bodyClick,
+      class: "up-card__body",
+      style: _nS([bodyPaddingStyle.value, (_ctx.bodyStyle ?? _uM<string, any | null>({})) as any])
+    }), [
+      renderSlot(_ctx.$slots, "body", {}, (): any[] => [
+        renderSlot(_ctx.$slots, "default")
+      ])
+    ], 4 /* STYLE */),
+    isTrue(_ctx.showFoot)
+      ? _cE("view", _uM({
+          key: 1,
+          class: _nC(["up-card__foot", _uM({
+				'up-border-top': _ctx.footBorderTop
+			})]),
+          onClick: footClick,
+          style: _nS([footPaddingStyle.value, (_ctx.footStyle ?? _uM<string, any | null>({})) as any])
+        }), [
+          renderSlot(_ctx.$slots, "foot")
+        ], 6 /* CLASS, STYLE */)
+      : _cC("v-if", true)
+  ], 6 /* CLASS, STYLE */)
+}
+}
+
+})
+export default __sfc__
+export type UpCardComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpCardUpCardStyles = [_uM([["u-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-card", _pS(_uM([["position", "relative"], ["overflow", "hidden"], ["backgroundColor", "#ffffff"], ["boxSizing", "border-box"]]))], ["up-card-full", _pS(_uM([["!marginLeft", 0], ["!marginRight", 0], ["width", "100%"]]))], ["up-card__head--left", _pS(_uM([["color", "#303133"]]))], ["up-card__head--left__thumb", _pS(_uM([["marginRight", "16rpx"]]))], ["up-card__head--left__title", _pS(_uM([["maxWidth", "400rpx"]]))], ["up-card__head--right", _pS(_uM([["color", "#909193"], ["marginLeft", "16rpx"]]))], ["up-card__body", _pS(_uM([["color", "#606266"]]))], ["up-card__foot", _pS(_uM([["color", "#909193"]]))]])]

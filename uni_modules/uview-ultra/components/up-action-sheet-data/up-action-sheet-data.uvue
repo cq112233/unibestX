@@ -84,7 +84,7 @@ function select(item: UTSJSONObject): void {
 	current.value = stringValue(item[props.labelKey])
 }
 
-watch(() => [props.modelValue, props.options], () => {
+watch((): Array<any | null> => [props.modelValue, props.options] as Array<any | null>, () => {
 	syncCurrent()
 }, { immediate: true, deep: true })
 </script>

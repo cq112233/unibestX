@@ -12,13 +12,13 @@
         <text
             :class="['up-text__price', `up-text__value--${type}`]"
             v-if="mode === 'price'"
-            :style="[valueStyle]"
+            :style="valueStyle"
             >￥</text
         >
         <view class="up-text__prefix-icon" v-if="prefixIcon != ''">
             <up-icon
                 :name="prefixIcon"
-                :customStyle="addStyle(iconStyle)"
+                :customStyle="customIconStyle"
             ></up-icon>
         </view>
         <up-link
@@ -31,7 +31,7 @@
         <template v-else-if="openType != '' && isMp">
             <button
                 class="up-reset-button up-text__value"
-                :style="[valueStyle]"
+                :style="valueStyle"
                 data-index="index"
                 :openType="openType"
                 @getuserinfo="onGetUserInfo"
@@ -54,7 +54,7 @@
         <text
             v-else
             class="up-text__value"
-            :style="[valueStyle]"
+            :style="valueStyle"
             :class="[
                 `up-text__value--${type}`,
                 `up-line-${lines}`
@@ -64,7 +64,7 @@
         <view class="up-text__suffix-icon" v-if="suffixIcon != ''">
             <up-icon
                 :name="suffixIcon"
-                :customStyle="addStyle(iconStyle)"
+                :customStyle="customIconStyle"
             ></up-icon>
         </view>
     </view>
@@ -232,6 +232,10 @@ const valueStyle = computed<UTSJSONObject>(() => {
     style['display'] = 'block'
   }
   return deepMerge(style, addStyle(props.customStyle)) as UTSJSONObject
+})
+
+const customIconStyle = computed((): UTSJSONObject => {
+  return addStyle(props.iconStyle) as UTSJSONObject
 })
 
 function formatName(name: string): string {

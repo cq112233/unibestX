@@ -4,7 +4,7 @@
 		    class="up-tabbar__content"
 		    @touchmove.stop.prevent="noop"
 		    :class="[border ? 'up-border-top' : '', fixed ? 'up-tabbar--fixed' : '']"
-		    :style="[tabbarStyle]"
+		    :style="tabbarStyle"
 		>
 			<view class="up-tabbar__content__item-wrapper">
 				<slot />
@@ -93,8 +93,31 @@ const tabbarStyle = computed<UTSJSONObject>(() => {
   return deepMerge(style, addStyle(props.customStyle)) as UTSJSONObject
 })
 
-provide('upTabbarProps', props)
-provide('upTabbarChange', (name: string | number) => {
+const parentState = computed((): UTSJSONObject => {
+  return {
+    value: props.value,
+    activeColor: props.activeColor,
+    inactiveColor: props.inactiveColor,
+    safeAreaInsetBottom: props.safeAreaInsetBottom,
+    border: props.border,
+    borderColor: props.borderColor,
+    zIndex: props.zIndex,
+    fixed: props.fixed,
+    placeholder: props.placeholder,
+    backgroundColor: props.backgroundColor,
+  } as UTSJSONObject
+})
+
+const itemCount = ref<number>(0)
+const registerTabbarItem = (): number => {
+  const currentIndex = itemCount.value
+  itemCount.value = itemCount.value + 1
+  return currentIndex
+}
+
+provide('upTabbarProps', parentState)
+provide('upTabbarRegister', registerTabbarItem)
+provide('upTabbarChange', (name: any) => {
   emit('update:value', name)
   emit('change', name)
 })
@@ -109,7 +132,7 @@ async function setPlaceholderHeight() {
 
 function noop() {}
 
-watch(() => [props.fixed, props.placeholder], () => {
+watch((): Array<any | null> => [props.fixed, props.placeholder] as Array<any | null>, () => {
   setPlaceholderHeight()
 })
 
@@ -122,16 +145,20 @@ onMounted(() => {
 	@import '../../libs/css/components.scss';
 
 	.up-tabbar {
-		@include flex(column);
+		display: flex;
+		flex-direction: column;
 		width: 100%;
 
 		&__content {
-			@include flex(column);
+			display: flex;
+			flex-direction: column;
 			background-color: #fff;
+			width: 100%;
 
 			&__item-wrapper {
 				height: 50px;
-				@include flex(row);
+				display: flex;
+				flex-direction: row;
 				justify-content: space-around;
 				align-items: stretch;
 				width: 100%;

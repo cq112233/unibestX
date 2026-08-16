@@ -3,7 +3,7 @@
         <textarea
             class="up-textarea__field"
             :value="innerValue"
-            :style="{ height: addUnit(height) }"
+            :style="fieldStyle"
             :placeholder="placeholder"
             :placeholder-style="placeholderStyleStr"
             :placeholder-class="placeholderClass"
@@ -44,7 +44,7 @@
 
 <script setup lang="uts">
 import { computed, ref, watch, nextTick, getCurrentInstance } from 'vue'
-import { addStyle, addUnit, deepMerge, formValidate } from '../../libs/function/index'
+import { addStyle, addUnit, deepMerge, formValidate } from '../../libs/function/index.uts'
 
 defineOptions({
   name: 'up-textarea'
@@ -151,13 +151,13 @@ const instance = getCurrentInstance()
 const innerValue = ref<string>('')
 const changeFromInner = ref<boolean>(false)
 
-watch(() => props.modelValue, (newVal: string) => {
+watch((): string => props.modelValue, (newVal: string) => {
   innerValue.value = newVal
   changeFromInner.value = false
 }, { immediate: true })
 
 const placeholderStyleStr = computed<string>(() => {
-  if (typeof props.placeholderStyle === 'string') {
+  if (typeof props.placeholderStyle == 'string') {
     return props.placeholderStyle as string
   }
   return ''
@@ -165,10 +165,10 @@ const placeholderStyleStr = computed<string>(() => {
 
 const textareaClass = computed<string>(() => {
   let classes = ['up-textarea']
-  if (props.border === 'surround') {
+  if (props.border == 'surround') {
     classes.push('up-border')
     classes.push('up-textarea--radius')
-  } else if (props.border === 'bottom') {
+  } else if (props.border == 'bottom') {
     classes.push('up-border-bottom')
     classes.push('up-textarea--no-radius')
   }
@@ -176,6 +176,12 @@ const textareaClass = computed<string>(() => {
     classes.push('up-textarea--disabled')
   }
   return classes.join(' ')
+})
+
+const fieldStyle = computed<UTSJSONObject>(() => {
+  return {
+    height: addUnit(props.height)
+  } as UTSJSONObject
 })
 
 const textareaStyle = computed<UTSJSONObject>(() => {
@@ -189,7 +195,9 @@ function onFocus(e: UniTextareaFocusEvent): void {
 
 function onBlur(e: UniTextareaBlurEvent): void {
   emit('blur', e)
-  formValidate(instance?.proxy, 'bl' + 'ur')
+  if (instance?.proxy != null) {
+    formValidate(instance!.proxy!, 'bl' + 'ur')
+  }
 }
 
 function onLinechange(e: UniTextareaLineChangeEvent): void {
@@ -202,7 +210,9 @@ function valueChange(): void {
     emit('update:modelValue', value)
     changeFromInner.value = true
     emit('change', value)
-    formValidate(instance?.proxy, 'change')
+    if (instance?.proxy != null) {
+      formValidate(instance!.proxy!, 'change')
+    }
   })
 }
 

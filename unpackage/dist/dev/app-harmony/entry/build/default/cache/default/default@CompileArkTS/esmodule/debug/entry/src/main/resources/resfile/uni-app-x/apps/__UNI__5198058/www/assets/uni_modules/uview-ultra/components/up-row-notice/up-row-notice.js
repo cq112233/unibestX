@@ -1,17 +1,12 @@
 import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
+import { r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { d as defProps } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-row-notice/rowNotice&";
 import { a as addUnit, k as error, s as sleep, u as upGetRect, g as getPx } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import { s as string } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/test&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, createSharedDataSlot: _createSharedDataSlot, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, toDisplayString: _toDisplayString, createSharedDataFor: _createSharedDataFor, setSharedDataTemplateRef: _setSharedDataTemplateRef, setSharedDataEvent: _setSharedDataEvent } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpRowNoticeUpRowNotice";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref, computed, watch, onMounted, onBeforeUnmount, getCurrentInstance } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "1e6934a4",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-row-notice/up-row-notice.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "up-row-notice",
   props: {
     text: {
@@ -46,9 +41,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   emits: ["click", "close"],
   setup(__props, _a) {
     var _b;
-    var __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpRowNoticeUpRowNoticeSharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
     const props = __props;
     const instance = (_b = getCurrentInstance()) === null || _b === void 0 ? null : _b.proxy;
     const transform = ref("");
@@ -58,8 +52,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     const scrollWidth = ref(0);
     const containerWidth = ref(0);
     const isAnimating = ref(false);
-    ref(true);
-    ref(false);
+    const show = ref(true);
+    const webviewHide = ref(false);
     const emit = __emit;
     const textStyle = computed(() => {
       let style = new UTSJSONObject({});
@@ -155,86 +149,94 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     onBeforeUnmount(() => {
       stopScroll();
     });
-    return () => {
-      "raw js";
-      const _setTemplateRef = _createSharedDataTemplateRefSetter();
-      const _component_up_icon = __easycom_0;
-      _createSharedDataSlot("icon", null, null, () => {
-        _createSharedDataIf(() => {
-          return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.icon));
-        }, () => {
-          const n4 = _createSharedDataComponentWithFallback(_component_up_icon, "47b79926", {
-            name: () => {
-              return __props.icon;
-            },
-            color: () => {
-              return __props.color;
-            },
-            size: "19"
-          });
-          _setSharedData(__sharedData, 1, n4?.sharedData);
-        });
-      });
-      _renderSharedDataEffect(() => {
-        return _setSharedDataStyle(__sharedData, 11, [animationStyle.value]);
-      });
-      _createSharedDataFor(_setSharedDataScoped(__sharedData, 7, _createSharedDataVFor(__sharedDataScope, () => {
-        return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-      })), () => {
-        return innerText.value;
-      }, (__sharedData_VFor0, _for_item0, _for_key0) => {
-        _renderSharedDataEffect(() => {
-          _setSharedDataStyle(__sharedData_VFor0, 1, [textStyle.value]);
-          _setSharedData(__sharedData_VFor0, 2, _toDisplayString(_for_item0.value));
-        });
-        return null;
-      }, (__sharedData_VFor0, item, index) => {
-        return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
-      }, 1);
-      _setSharedDataTemplateRef(__sharedData, 8, (n9) => {
-        _setTemplateRef(n9, "up-notice__content__text");
-      });
-      _setSharedDataTemplateRef(__sharedData, 9, (n10) => {
-        _setTemplateRef(n10, "up-notice__content");
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 2, _toSharedDataBoolean(["link", "closable"].includes(__props.mode)));
-      }, () => {
-        _createSharedDataIf(() => {
-          return _setSharedData(__sharedData, 3, _toSharedDataBoolean(__props.mode === "link"));
-        }, () => {
-          const n15 = _createSharedDataComponentWithFallback(_component_up_icon, "47b77354", {
-            name: "arrow-right",
-            size: 17,
-            color: () => {
-              return __props.color;
-            }
-          });
-          _setSharedData(__sharedData, 4, n15?.sharedData);
-        });
-        _createSharedDataIf(() => {
-          return _setSharedData(__sharedData, 5, _toSharedDataBoolean(__props.mode === "closable"));
-        }, () => {
-          const n18 = _createSharedDataComponentWithFallback(_component_up_icon, "47b76b92", {
-            onClick: () => {
-              return close;
-            },
-            name: "close",
-            size: 16,
-            color: () => {
-              return __props.color;
-            }
-          });
-          _setSharedData(__sharedData, 6, n18?.sharedData);
-        });
-      });
-      _setSharedDataEvent(__sharedData, 10, clickHandler);
-      return __sharedData;
-    };
+    const __returned__ = { props, instance, transform, animationFrameId, startTime, currentPosition, scrollWidth, containerWidth, isAnimating, show, webviewHide, emit, textStyle, animationStyle, innerText, clickHandler, close, animate, startScroll, stopScroll };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-notice": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "up-notice__left-icon": { "": { "alignItems": "center", "marginRight": 5 } }, "up-notice__right-icon": { "": { "marginLeft": 5, "alignItems": "center" } }, "up-notice__content": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "row", "flexWrap": "nowrap", "overflow": "hidden" } }, "up-notice__content__text": { "": { "display": "flex", "flexDirection": "row" } } };
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { renderSlot: _renderSlot, resolveComponent: _resolveComponent, createVNode: _createVNode, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, renderList: _renderList, Fragment: _Fragment, toDisplayString: _toDisplayString, normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
+  return _openBlock(), _createElementBlock("view", {
+    class: "up-notice",
+    onClick: $setup.clickHandler
+  }, [
+    _renderSlot(_ctx.$slots, "icon", {}, () => [
+      $props.icon ? (_openBlock(), _createElementBlock("view", {
+        key: 0,
+        class: "up-notice__left-icon"
+      }, [
+        _createVNode(_component_up_icon, {
+          name: $props.icon,
+          color: $props.color,
+          size: "19"
+        }, null, 8, ["name", "color"])
+      ])) : _createCommentVNode("v-if", true)
+    ]),
+    _createElementVNode(
+      "view",
+      {
+        class: "up-notice__content",
+        ref: "up-notice__content"
+      },
+      [
+        _createElementVNode(
+          "view",
+          {
+            ref: "up-notice__content__text",
+            class: "up-notice__content__text",
+            style: _normalizeStyle([$setup.animationStyle])
+          },
+          [
+            (_openBlock(true), _createElementBlock(
+              _Fragment,
+              null,
+              _renderList($setup.innerText, (item, index) => {
+                return _openBlock(), _createElementBlock(
+                  "text",
+                  {
+                    key: index,
+                    style: _normalizeStyle([$setup.textStyle])
+                  },
+                  _toDisplayString(item),
+                  5
+                  /* TEXT, STYLE */
+                );
+              }),
+              128
+              /* KEYED_FRAGMENT */
+            ))
+          ],
+          4
+          /* STYLE */
+        )
+      ],
+      512
+      /* NEED_PATCH */
+    ),
+    ["link", "closable"].includes($props.mode) ? (_openBlock(), _createElementBlock("view", {
+      key: 0,
+      class: "up-notice__right-icon"
+    }, [
+      $props.mode === "link" ? (_openBlock(), _createBlock(_component_up_icon, {
+        key: 0,
+        name: "arrow-right",
+        size: 17,
+        color: $props.color
+      }, null, 8, ["color"])) : _createCommentVNode("v-if", true),
+      $props.mode === "closable" ? (_openBlock(), _createBlock(_component_up_icon, {
+        key: 1,
+        onClick: $setup.close,
+        name: "close",
+        size: 16,
+        color: $props.color
+      }, null, 8, ["color"])) : _createCommentVNode("v-if", true)
+    ])) : _createCommentVNode("v-if", true)
+  ]);
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-row-notice/up-row-notice.uvue"]]);
 export {
   __easycom_1 as _
 };

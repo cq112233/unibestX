@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="uts">
-import { provide, ref, reactive } from 'vue'
+import { provide, ref, computed } from 'vue'
 
 defineOptions({
   name: 'up-steps'
@@ -45,10 +45,22 @@ const props = defineProps({
   }
 })
 
-provide('upStepsProps', props)
+const parentState = computed((): UTSJSONObject => {
+  return {
+    direction: props.direction,
+    current: props.current,
+    activeColor: props.activeColor,
+    inactiveColor: props.inactiveColor,
+    activeIcon: props.activeIcon,
+    inactiveIcon: props.inactiveIcon,
+    dot: props.dot
+  } as UTSJSONObject
+})
+
+provide('upStepsProps', parentState)
 
 const itemCount = ref<number>(0)
-const registerStepItem = () => {
+const registerStepItem = (): number => {
   const currentIndex = itemCount.value
   itemCount.value = itemCount.value + 1
   return currentIndex
@@ -62,24 +74,18 @@ provide('upStepsItemCount', itemCount)
 	@import "../../libs/css/components.scss";
 	
 	.up-steps {
-		@include flex;
+		display: flex;
+		width: 100%;
 
 		&--column {
-			flex-direction: column
+			flex-direction: column;
+			width: 100%;
 		}
 
 		&--row {
 			flex-direction: row;
-			flex: 1;
-			/* #ifdef MP */
-			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-			/* #endif */
-
-            //微信小程序优化的比抖音的好 因此微信小程序使用flex布局
-            /* #ifdef MP-WEIXIN */
-            display: flex !important;
-            /* #endif */
+			width: 100%;
+			align-items: flex-start;
 		}
 	}
 </style>

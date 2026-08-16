@@ -40,10 +40,7 @@
           <!-- 中间选中高亮边框 -->
           <view
             class="up-picker__indicator"
-            :style="{
-              top: indicatorTop,
-              height: addUnit(itemHeight)
-            }"
+            :style="indicatorStyle"
           ></view>
 
           <!-- 顶部渐变遮罩 -->
@@ -78,17 +75,12 @@
                 v-for="(item, itemIndex) in column"
                 :key="itemIndex"
                 class="up-picker__item"
-                :style="{ height: addUnit(itemHeight) }"
+                :style="itemStyle"
                 @click="onItemClick(colIndex, itemIndex)"
               >
                 <text
                   class="up-picker__item__text"
-                  :style="{
-                    lineHeight: addUnit(itemHeight),
-                    color: isItemSelected(colIndex, itemIndex) ? '#303133' : '#909399',
-                    fontWeight: isItemSelected(colIndex, itemIndex) ? 'bold' : 'normal',
-                    fontSize: '16px'
-                  }"
+                  :style="getItemTextStyle(colIndex, itemIndex)"
                 >
                   {{ getItemText(item) }}
                 </text>
@@ -231,6 +223,23 @@ const indicatorTop = computed<string>(() => {
 	return addUnit(topCount * itemHeightNumber.value)
 })
 
+const itemHeightUnit = computed((): string => {
+	return addUnit(itemHeightNumber.value)
+})
+
+const indicatorStyle = computed((): UTSJSONObject => {
+	return {
+		top: indicatorTop.value,
+		height: itemHeightUnit.value
+	} as UTSJSONObject
+})
+
+const itemStyle = computed((): UTSJSONObject => {
+	return {
+		height: itemHeightUnit.value
+	} as UTSJSONObject
+})
+
 const inputLabel = computed<string[]>(() => {
 	let items: Array<any> = []
 	innerColumns.value.map((item, index) => {
@@ -291,6 +300,20 @@ function isItemSelected(colIdx: number, itemIdx: number): boolean {
 	return itemIdx == 0
 }
 
+function getItemTextStyle(colIndex: number, itemIndex: number): UTSJSONObject {
+	const isSel = isItemSelected(colIndex, itemIndex)
+	return {
+		lineHeight: itemHeightUnit.value,
+		color: isSel ? '#303133' : '#909399',
+		fontWeight: isSel ? 'bold' : 'normal',
+		fontSize: '16px'
+	} as UTSJSONObject
+}
+
+function setLastIndex(index: number[]): void {
+	lastIndex.value = [...index]
+}
+
 function syncScrollPositions(): void {
 	let tops: number[] = []
 	for (let i = 0; i < innerColumns.value.length; i++) {
@@ -300,8 +323,47 @@ function syncScrollPositions(): void {
 	columnScrollTops.value = tops
 }
 
-function onColumnScroll(e: UniScrollEvent, colIndex: number): void {
-	const scrollTop = e.detail.scrollTop
+function setIndexs(index: number[] | null, shouldSetLast: boolean): void {
+	if (index != null && index.length > 0) {
+		innerIndex.value = [...index]
+	} else {
+		let newIndexes: number[] = []
+		for (let i = 0; i < innerColumns.value.length; i++) {
+			newIndexes.push(0)
+		}
+		innerIndex.value = newIndexes
+	}
+	if (shouldSetLast) {
+		setLastIndex(innerIndex.value)
+	}
+	syncScrollPositions()
+}
+
+function notifyChange(colIdx: number, changedItemIdx: number): void {
+	const values = innerColumns.value
+	setLastIndex(innerIndex.value)
+	emit('update:modelValue', inputValue.value)
+
+	let valueOrigin: Array<any> = []
+	for (let index = 0; index < innerColumns.value.length; index++) {
+		const item = innerColumns.value[index]
+		const idx = index < innerIndex.value.length ? innerIndex.value[index] : 0
+		if (idx < item.length) {
+			valueOrigin.push(item[idx])
+		}
+	}
+	emit('change', {
+		value: valueOrigin,
+		index: changedItemIdx,
+		indexs: innerIndex.value,
+		values,
+		columnIndex: colIdx
+	} as UTSJSONObject)
+}
+
+function onColumnScroll(e: any, colIndex: number): void {
+	const scrollEvent = e as UniScrollEvent
+	const scrollTop = scrollEvent.detail.scrollTop
 	const targetIndex = Math.max(0, Math.min(innerColumns.value[colIndex].length - 1, Math.round(scrollTop / itemHeightNumber.value)))
 	if (innerIndex.value.length > colIndex && innerIndex.value[colIndex] != targetIndex) {
 		innerIndex.value[colIndex] = targetIndex
@@ -328,27 +390,6 @@ function onItemClick(colIndex: number, itemIndex: number): void {
 	}
 }
 
-function notifyChange(colIdx: number, changedItemIdx: number): void {
-	const values = innerColumns.value
-	setLastIndex(innerIndex.value)
-	emit('update:modelValue', inputValue.value)
-
-	let valueOrigin: Array<any> = []
-	innerColumns.value.map((item, index) => {
-		const idx = index < innerIndex.value.length ? innerIndex.value[index] : 0
-		if (idx < item.length) {
-			valueOrigin.push(item[idx])
-		}
-	})
-	emit('change', {
-		value: valueOrigin,
-		index: changedItemIdx,
-		indexs: innerIndex.value,
-		values,
-		columnIndex: colIdx
-	})
-}
-
 function closeHandler(): void {
 	if (props.closeOnClickOverlay) {
 		if (props.hasInput) {
@@ -370,34 +411,19 @@ function confirm(): void {
 	if (props.hasInput) {
 		showByClickInput.value = false
 	}
+	let confirmValues: Array<any> = []
+	for (let index = 0; index < innerColumns.value.length; index++) {
+		const item = innerColumns.value[index]
+		const idx = index < innerIndex.value.length ? innerIndex.value[index] : 0
+		if (idx < item.length) {
+			confirmValues.push(item[idx])
+		}
+	}
 	emit('confirm', {
 		indexs: innerIndex.value,
-		value: innerColumns.value.map((item, index) => {
-			const idx = index < innerIndex.value.length ? innerIndex.value[index] : 0
-			return idx < item.length ? item[idx] : null
-		}),
+		value: confirmValues,
 		values: innerColumns.value
-	})
-}
-
-function setIndexs(index: number[] | null, shouldSetLast: boolean): void {
-	if (index != null && index.length > 0) {
-		innerIndex.value = [...index]
-	} else {
-		let newIndexes: number[] = []
-		for (let i = 0; i < innerColumns.value.length; i++) {
-			newIndexes.push(0)
-		}
-		innerIndex.value = newIndexes
-	}
-	if (shouldSetLast) {
-		setLastIndex(innerIndex.value)
-	}
-	syncScrollPositions()
-}
-
-function setLastIndex(index: number[]): void {
-	lastIndex.value = [...index]
+	} as UTSJSONObject)
 }
 
 function setColumnValues(colIdx: number, values: Array<any>): void {
@@ -438,21 +464,26 @@ function getIndexs(): number[] {
 }
 
 function getValues(): Array<any> {
-	return innerColumns.value.map((item, index) => {
+	let res: Array<any> = []
+	for (let index = 0; index < innerColumns.value.length; index++) {
+		const item = innerColumns.value[index]
 		const idx = index < innerIndex.value.length ? innerIndex.value[index] : 0
-		return idx < item.length ? item[idx] : null
-	})
+		if (idx < item.length) {
+			res.push(item[idx])
+		}
+	}
+	return res
 }
 
-watch(() => props.defaultIndex, (n: number[]) => {
+watch((): number[] => props.defaultIndex, (n: number[]) => {
 	setIndexs(n, true)
 }, { immediate: true, deep: true })
 
-watch(() => props.columns, (n: Array<Array<any>>) => {
+watch((): Array<Array<any>> => props.columns, (n: Array<Array<any>>) => {
 	setColumns(n)
 }, { immediate: true, deep: true })
 
-watch(() => props.show, (val: boolean) => {
+watch((): boolean => props.show, (val: boolean) => {
 	if (val) {
 		setColumns(props.columns)
 		nextTick(() => {

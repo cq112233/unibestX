@@ -1,5 +1,5 @@
 <template>
-    <view :style="[addStyle(customStyle)]"
+    <view :style="customCellGroupStyle"
 		:class="[customClass]" class="up-cell-group">
         <view v-if="title" class="up-cell-group__title">
             <slot name="title">
@@ -16,6 +16,7 @@
 </template>
 
 <script setup lang="uts">
+	import { computed } from 'vue'
 	import { addStyle } from '../../libs/function/index'
 	import defProps from './cellGroup'
 	// props
@@ -39,6 +40,10 @@
 	})
 	defineOptions({
 		name: "up-cell-group"
+	})
+
+	const customCellGroupStyle = computed((): UTSJSONObject => {
+		return addStyle(props.customStyle) as UTSJSONObject
 	})
 </script>
 

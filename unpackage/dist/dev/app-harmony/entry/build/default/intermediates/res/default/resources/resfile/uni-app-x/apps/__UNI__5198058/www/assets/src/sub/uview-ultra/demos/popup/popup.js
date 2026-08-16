@@ -1,9 +1,10 @@
 import { _ as __easycom_0 } from "../../../../components/NavBar/NavBar.js";
+import { A as AppKu, r as resolveEasycom } from "../../../../../App.ku.js";
 import { _ as __easycom_2 } from "../../../../../uni_modules/uview-ultra/components/up-button/up-button.js";
 import { _ as __easycom_2$1 } from "../../../../../uni_modules/uview-ultra/components/up-popup/up-popup.js";
-import { _ as _sfc_main$1 } from "../../../../../App.ku.js";
 import { _ as _export_sfc } from "../../../../../plugin-vue-export-helper.js";
 import "../../../../utils/systemInfo.js";
+import "../../../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
 import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.js";
 import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/loadingIcon.js";
 import "../../../../../uni_modules/uview-ultra/libs/config/config.js";
@@ -16,18 +17,12 @@ import "../../../../../uni_modules/uview-ultra/components/up-icon/up-icon.js";
 import "../../../../../uni_modules/uview-ultra/components/up-icon/icons.js";
 import "../../../../../uni_modules/uview-ultra/libs/composable/useUltraUI.js";
 import "../../../../../uni_modules/uview-ultra/components/up-icon/icon.js";
-import "../../../../../uni_modules/uview-ultra/libs/function/throttle.js";
-import "../../../../../uni_modules/uview-ultra/components/up-overlay/up-overlay.js";
-import "../../../../../uni_modules/uview-ultra/components/up-transition/up-transition.js";
-import "../../../../../uni_modules/uview-ultra/components/up-transition/transition.js";
-import "../../../../../uni_modules/uview-ultra/components/up-status-bar/up-status-bar.js";
-import "../../../../../uni_modules/uview-ultra/components/up-status-bar/statusBar.js";
-import "../../../../../uni_modules/uview-ultra/components/up-safe-bottom/up-safe-bottom.js";
-import "../../../../../uni_modules/uview-ultra/components/up-popup/popup.js";
-import "../../../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
 import "../../../../../uni_modules/uview-ultra/components/up-gap/up-gap.js";
 import "../../../../../uni_modules/uview-ultra/libs/composable/useMp.js";
 import "../../../../../uni_modules/uview-ultra/components/up-gap/gap.js";
+import "../../../../../uni_modules/uview-ultra/components/up-overlay/up-overlay.js";
+import "../../../../../uni_modules/uview-ultra/components/up-transition/up-transition.js";
+import "../../../../../uni_modules/uview-ultra/components/up-transition/transition.js";
 import "../../../../../uni_modules/uview-ultra/libs/config/color.js";
 import "../../../../tabbar/index.js";
 import "../../../../tabbar/store.js";
@@ -69,20 +64,18 @@ import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ko.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ja.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ru.js";
 import "../../../../utils/toast.js";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, resolveComponent: _resolveComponent, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
-const __className = "GenSrcSubUviewUltraDemosPopupPopup";
+import "../../../../../uni_modules/uview-ultra/libs/function/throttle.js";
+import "../../../../../uni_modules/uview-ultra/components/up-status-bar/up-status-bar.js";
+import "../../../../../uni_modules/uview-ultra/components/up-status-bar/statusBar.js";
+import "../../../../../uni_modules/uview-ultra/components/up-safe-bottom/up-safe-bottom.js";
+import "../../../../../uni_modules/uview-ultra/components/up-popup/popup.js";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "b96921f6",
-  __className,
-  __filename: "src/sub/uview-ultra/demos/popup/popup.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "popup",
-  setup(__props) {
-    const __sharedDataRenderer = _useSharedDataRenderer();
-    const __sharedData = __sharedDataRenderer == "component" ? _withSharedDataComponent(new UniDynamicSharedDataComponent(_useSharedDataScope(), _useSharedDataComponentOptions({ bundleKey: "GenSrcSubUviewUltraDemosPopupPopupSharedData", sharedDataClassId: 0 }))) : _withSharedDataPage(new UniDynamicSharedDataPage(_useSharedDataPageId(), _useSharedDataPageOptions({ bundleKey: "GenSrcSubUviewUltraDemosPopupPopupSharedData", sharedDataClassId: 0 })));
-    _useSharedDataScope(__sharedData);
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
     const popupShow = ref(false);
     const popupMode = ref("bottom");
     function openPopup(mode) {
@@ -92,110 +85,103 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     function onPopupClose() {
       popupShow.value = false;
     }
-    return () => {
-      "raw js";
-      const _component_NavBar = __easycom_0;
-      const _component_up_button = __easycom_2;
-      const _component_up_popup = __easycom_2$1;
-      const n21 = _createSharedDataComponent(_sfc_main$1, "69dd3ce1", null, {
-        "default": _withSharedDataVaporCtx(() => {
-          const n0 = _createSharedDataComponentWithFallback(_component_NavBar, "5c6b3fe8", {
-            title: "up-popup 弹出层",
-            "auto-back": true,
-            "safe-area-inset-top": true,
-            "bg-color": "#ffffff"
-          });
-          _setSharedData(__sharedData, 1, n0?.sharedData);
-          const _on_click = () => {
-            return openPopup("top");
-          };
-          const n2 = _createSharedDataComponentWithFallback(_component_up_button, "67818f21", {
-            type: "primary",
-            text: "顶部弹出",
-            size: "mini",
-            onClick: () => {
-              return _on_click;
-            }
-          });
-          _setSharedData(__sharedData, 4, n2?.sharedData);
-          const _on_click1 = () => {
-            return openPopup("bottom");
-          };
-          const n4 = _createSharedDataComponentWithFallback(_component_up_button, "6781935c", {
-            type: "primary",
-            text: "底部弹出",
-            size: "mini",
-            onClick: () => {
-              return _on_click1;
-            }
-          });
-          _setSharedData(__sharedData, 5, n4?.sharedData);
-          const _on_click2 = () => {
-            return openPopup("left");
-          };
-          const n8 = _createSharedDataComponentWithFallback(_component_up_button, "67819e27", {
-            type: "success",
-            text: "左侧弹出",
-            size: "mini",
-            onClick: () => {
-              return _on_click2;
-            }
-          });
-          _setSharedData(__sharedData, 6, n8?.sharedData);
-          const _on_click3 = () => {
-            return openPopup("right");
-          };
-          const n10 = _createSharedDataComponentWithFallback(_component_up_button, "6781a263", {
-            type: "success",
-            text: "右侧弹出",
-            size: "mini",
-            onClick: () => {
-              return _on_click3;
-            }
-          });
-          _setSharedData(__sharedData, 7, n10?.sharedData);
-          const _on_click4 = () => {
-            return openPopup("center");
-          };
-          const n12 = _createSharedDataComponentWithFallback(_component_up_button, "eea14598", {
-            type: "success",
-            text: "居中弹出",
-            size: "mini",
-            onClick: () => {
-              return _on_click4;
-            }
-          });
-          _setSharedData(__sharedData, 8, n12?.sharedData);
-          const n19 = _createSharedDataComponentWithFallback(_component_up_popup, "eea13d22", {
-            show: () => {
-              return popupShow.value;
-            },
-            mode: () => {
-              return popupMode.value;
-            },
-            closeable: true,
-            round: 10,
-            onClose: () => {
-              return onPopupClose;
-            }
-          }, {
-            "default": () => {
-              _renderSharedDataEffect(() => {
-                return _setSharedData(__sharedData, 3, _toDisplayString(popupMode.value));
-              });
-            }
-          });
-          _setSharedData(__sharedData, 2, n19?.sharedData);
-        })
-      });
-      _setSharedData(__sharedData, 0, n21.sharedData);
-      return __sharedData;
-    };
+    const __returned__ = { popupShow, popupMode, openPopup, onPopupClose, get AppKu() {
+      return AppKu;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const _style_1 = {};
-const popup = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0, _style_1]]]);
+const _style_0 = { "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "flex-row": { "": { "flexDirection": "row" } }, "items-center": { "": { "alignItems": "center" } }, "mt-12px": { "": { "marginTop": 12 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "p-30px": { "": { "paddingTop": 30, "paddingRight": 30, "paddingBottom": 30, "paddingLeft": 30 } }, "pb-30px": { "": { "paddingBottom": 30 } }, "text-__303133_": { "": { "color": "#303133" } }, "text-16px": { "": { "fontSize": 16 } }, "w-10px": { "": { "width": 10 } } };
+const _style_1 = { "demo-block": { "": { "marginBottom": 12, "paddingTop": 12, "paddingRight": 12, "paddingBottom": 12, "paddingLeft": 12, "backgroundColor": "#ffffff", "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "demo-label": { "": { "fontSize": 14, "fontWeight": "bold", "color": "#606266", "marginBottom": 10, "paddingLeft": 4, "borderLeftWidth": 3, "borderLeftStyle": "solid", "borderLeftColor": "#2979ff" } } };
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { resolveComponent: _resolveComponent, createVNode: _createVNode, createElementVNode: _createElementVNode, toDisplayString: _toDisplayString, withCtx: _withCtx, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_NavBar = resolveEasycom(__resolveDynamicComponent("NavBar"), __easycom_0);
+  const _component_up_button = resolveEasycom(__resolveDynamicComponent("up-button"), __easycom_2);
+  const _component_up_popup = resolveEasycom(__resolveDynamicComponent("up-popup"), __easycom_2$1);
+  return _openBlock(), _createBlock($setup["AppKu"], null, {
+    default: _withCtx(() => [
+      _createElementVNode("view", { class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }, [
+        _createVNode(_component_NavBar, {
+          title: "up-popup 弹出层",
+          "auto-back": true,
+          "safe-area-inset-top": true,
+          "bg-color": "#ffffff"
+        }),
+        _createElementVNode("view", { class: "p-16px" }, [
+          _createElementVNode("view", { class: "demo-block" }, [
+            _createElementVNode("text", { class: "demo-label" }, "基础用法"),
+            _createElementVNode("view", { class: "flex-row items-center" }, [
+              _createVNode(_component_up_button, {
+                type: "primary",
+                text: "顶部弹出",
+                size: "mini",
+                onClick: _cache[0] || (_cache[0] = ($event) => $setup.openPopup("top"))
+              }),
+              _createElementVNode("view", { class: "w-10px" }),
+              _createVNode(_component_up_button, {
+                type: "primary",
+                text: "底部弹出",
+                size: "mini",
+                onClick: _cache[1] || (_cache[1] = ($event) => $setup.openPopup("bottom"))
+              })
+            ])
+          ]),
+          _createElementVNode("view", { class: "demo-block mt-12px" }, [
+            _createElementVNode("text", { class: "demo-label" }, "更多方向弹出"),
+            _createElementVNode("view", { class: "flex-row items-center" }, [
+              _createVNode(_component_up_button, {
+                type: "success",
+                text: "左侧弹出",
+                size: "mini",
+                onClick: _cache[2] || (_cache[2] = ($event) => $setup.openPopup("left"))
+              }),
+              _createElementVNode("view", { class: "w-10px" }),
+              _createVNode(_component_up_button, {
+                type: "success",
+                text: "右侧弹出",
+                size: "mini",
+                onClick: _cache[3] || (_cache[3] = ($event) => $setup.openPopup("right"))
+              }),
+              _createElementVNode("view", { class: "w-10px" }),
+              _createVNode(_component_up_button, {
+                type: "success",
+                text: "居中弹出",
+                size: "mini",
+                onClick: _cache[4] || (_cache[4] = ($event) => $setup.openPopup("center"))
+              })
+            ])
+          ])
+        ]),
+        _createVNode(_component_up_popup, {
+          show: $setup.popupShow,
+          mode: $setup.popupMode,
+          closeable: true,
+          round: 10,
+          onClose: $setup.onPopupClose
+        }, {
+          default: _withCtx(() => [
+            _createElementVNode("view", { class: "p-30px items-center" }, [
+              _createElementVNode(
+                "text",
+                { class: "text-16px text-__303133_" },
+                _toDisplayString($setup.popupMode) + " 弹出层内容",
+                1
+                /* TEXT */
+              )
+            ])
+          ]),
+          _: 1
+          /* STABLE */
+        }, 8, ["show", "mode"])
+      ])
+    ]),
+    _: 1
+    /* STABLE */
+  });
+}
+const popup = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0, _style_1]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/popup/popup.uvue"]]);
 export {
   popup as default
 };

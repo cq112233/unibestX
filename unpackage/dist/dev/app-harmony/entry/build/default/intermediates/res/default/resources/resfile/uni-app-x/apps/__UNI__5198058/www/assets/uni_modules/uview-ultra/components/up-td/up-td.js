@@ -1,18 +1,12 @@
 import { a as addUnit, b as addStyle } from "../../libs/function/index.js";
 import { u as useUltraUI } from "../../libs/composable/useUltraUI.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, unref: _unref, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toDisplayString: _toDisplayString, createSharedDataSlot: _createSharedDataSlot } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpTdUpTd";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref, onMounted, getCurrentInstance } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-td"
   },
-  __dynamicSharedData: true,
-  __hash: "12391e6e",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-td/up-td.uvue",
   __name: "up-td",
   props: {
     customStyle: {
@@ -54,15 +48,15 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       default: ""
     }
   },
-  setup(__props) {
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpTdUpTdSharedData", sharedDataClassId: 0 })));
-    const _a = useUltraUI(new UTSJSONObject({
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
+    const _b = useUltraUI(new UTSJSONObject({
       padding: 0,
       align: "",
       borderColor: "",
       thStyle: new UTSJSONObject({})
-    })), parent = _a.parent, getParent = _a.getParent;
+    })), parent = _b.parent, getParent = _b.getParent;
     const instance = getCurrentInstance().proxy;
     const props = __props;
     const tdStyle = ref(new UTSJSONObject({}));
@@ -101,25 +95,42 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         tdTextStyle.value = styleText;
       }
     });
-    return () => {
-      "raw js";
-      _renderSharedDataEffect(() => {
-        _setSharedDataClass(__sharedData, 2, ["up-td", [__props.customClass]]);
-        _setSharedDataStyle(__sharedData, 3, [tdStyle.value, _unref(addStyle)(__props.customStyle)]);
-      });
-      _createSharedDataSlot("default", null, null, () => {
-        _renderSharedDataEffect(() => {
-          _setSharedDataStyle(__sharedData, 0, [tdTextStyle.value]);
-          _setSharedData(__sharedData, 1, _toDisplayString((__props.text != null && __props.text != "" ? __props.text : __props.label).toString()));
-        });
-      });
-      _createSharedDataSlot("content", null, null);
-      return __sharedData;
-    };
+    const __returned__ = { parent, getParent, instance, props, tdStyle, tdTextStyle, get addStyle() {
+      return addStyle;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_3 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "up-td": { "": { "display": "flex", "flexDirection": "column", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "justifyContent": "center", "alignSelf": "stretch", "boxSizing": "border-box", "height": "100%" } }, "up-td__text": { "": { "fontSize": 14, "color": "#606266" } } };
+const { renderSlot: _renderSlot, toDisplayString: _toDisplayString, normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode, normalizeClass: _normalizeClass, openBlock: _openBlock, createElementBlock: _createElementBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      class: _normalizeClass(["up-td", [$props.customClass]]),
+      style: _normalizeStyle([$setup.tdStyle, $setup.addStyle($props.customStyle)])
+    },
+    [
+      _renderSlot(_ctx.$slots, "default", {}, () => [
+        _createElementVNode(
+          "text",
+          {
+            class: "up-td__text",
+            style: _normalizeStyle([$setup.tdTextStyle])
+          },
+          _toDisplayString(($props.text != null && $props.text != "" ? $props.text : $props.label).toString()),
+          5
+          /* TEXT, STYLE */
+        )
+      ]),
+      _renderSlot(_ctx.$slots, "content")
+    ],
+    6
+    /* CLASS, STYLE */
+  );
+}
+const __easycom_3 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-td/up-td.uvue"]]);
 export {
   __easycom_3 as _
 };

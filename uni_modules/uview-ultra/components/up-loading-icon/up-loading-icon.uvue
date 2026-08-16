@@ -1,7 +1,7 @@
 <template>
 	<view
 		class="up-loading-icon"
-		:style="[addStyle(customStyle)]"
+		:style="customLoadingIconStyle"
 		:class="[vertical ? 'up-loading-icon--vertical' : '']"
 		v-if="show"
 	>
@@ -10,22 +10,14 @@
 			class="up-loading-icon__spinner"
 			:class="[`up-loading-icon__spinner--${mode}`]"
 			ref="ani"
-			:style="{
-				transform: transform,
-				width: addUnit(size),
-				height: addUnit(size),
-				borderTopColor: color,
-				borderBottomColor: otherBorderColor,
-				borderLeftColor: otherBorderColor,
-				borderRightColor: otherBorderColor
-			}"
+			:style="spinnerStyle"
 		>
 			<template v-if="mode === 'spinner'">
 				<view
 					v-for="(item, index) in array12"
 					:key="index"
 					class="up-loading-icon__dot"
-					:style="[spinnerStyle[index], getSpinnerDotStyle(index)]"
+					:style="getSpinnerDotStyle(index)"
 				>
 				</view>
 			</template>
@@ -33,10 +25,7 @@
 		<text
 			v-if="text != ''"
 			class="up-loading-icon__text"
-			:style="{
-				fontSize: addUnit(textSize),
-				color: textColor,
-			}"
+			:style="textStyle"
 		>{{text}}</text>
 	</view>
 </template>
@@ -106,7 +95,7 @@ const array12 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 const webviewHide = ref<boolean>(false)
 const degree = ref<number>(0)
 const transform = ref<string>('')
-const spinnerStyle = ref<UTSJSONObject[]>([
+const spinnerItemsStyle = ref<UTSJSONObject[]>([
   { left: '0', top: '0' } as UTSJSONObject, { left: '0', top: '0' } as UTSJSONObject,
   { left: '0', top: '0' } as UTSJSONObject, { left: '0', top: '0' } as UTSJSONObject,
   { left: '0', top: '0' } as UTSJSONObject, { left: '0', top: '0' } as UTSJSONObject,
@@ -118,11 +107,34 @@ let animationFrame: number = 0
 
 const otherBorderColor = computed<string>(() => {
   const lightColor = colorGradient(props.color, '#ffffff', 100)[80]
-  if (props.mode === 'circle') {
+  if (props.mode == 'circle') {
     return props.inactiveColor != '' ? props.inactiveColor : lightColor
   } else {
     return 'transparent'
   }
+})
+
+const customLoadingIconStyle = computed((): UTSJSONObject => {
+  return addStyle(props.customStyle) as UTSJSONObject
+})
+
+const spinnerStyle = computed((): UTSJSONObject => {
+  return {
+    transform: transform.value,
+    width: addUnit(props.size),
+    height: addUnit(props.size),
+    borderTopColor: props.color,
+    borderBottomColor: otherBorderColor.value,
+    borderLeftColor: otherBorderColor.value,
+    borderRightColor: otherBorderColor.value
+  } as UTSJSONObject
+})
+
+const textStyle = computed((): UTSJSONObject => {
+  return {
+    fontSize: addUnit(props.textSize),
+    color: props.textColor
+  } as UTSJSONObject
 })
 
 function getSpinnerDotStyle(index: number): UTSJSONObject {
@@ -175,8 +187,8 @@ function calcSpinnerTopAndLeft() {
     const banjing = calculateSquareRadius(parseInt(getPx(parseInt(props.size.toString()) * 2)))
     const xOffset = banjing * Math.cos(angleRad)
     const yOffset = banjing * Math.sin(angleRad)
-    spinnerStyle.value[index]['left'] = `${Math.round(45 + xOffset).toString()}%`
-    spinnerStyle.value[index]['top'] = `${Math.round(34 + yOffset).toString()}%`
+    spinnerItemsStyle.value[index]['left'] = `${Math.round(45 + xOffset).toString()}%`
+    spinnerItemsStyle.value[index]['top'] = `${Math.round(34 + yOffset).toString()}%`
   })
 }
 
@@ -185,7 +197,7 @@ function init(): void {
   startRotate()
 }
 
-watch(() => props.show, (nVal: boolean) => {
+watch((): boolean => props.show, (nVal: boolean) => {
   if (nVal) {
     startRotate()
   } else {

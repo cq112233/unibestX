@@ -1,19 +1,14 @@
 import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
+import { r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { _ as __easycom_1$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-transition/up-transition&";
 import { i as image } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/test&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, unref: _unref, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, createSharedDataSlot: _createSharedDataSlot, toDisplayString: _toDisplayString, setSharedDataEvent: _setSharedDataEvent, withSharedDataVaporCtx: _withSharedDataVaporCtx } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpTagUpTag";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { computed } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-tag"
   },
-  __dynamicSharedData: true,
-  __hash: "a471025e",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-tag/up-tag.uvue",
   __name: "up-tag",
   props: {
     type: {
@@ -83,9 +78,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   },
   emits: ["click", "close"],
   setup(__props, _a) {
-    var __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpTagUpTagSharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
     const props = __props;
     const emit = __emit;
     const style = computed(() => {
@@ -130,97 +124,95 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     function clickHandler() {
       emit("click", props.name.toString());
     }
-    return () => {
-      "raw js";
-      const _component_up_icon = __easycom_0;
-      const _component_up_transition = __easycom_1$1;
-      const n19 = _createSharedDataComponentWithFallback(
-        _component_up_transition,
-        "5a09e631",
-        {
-          mode: "fade",
-          show: () => {
-            return __props.show;
-          },
-          style: "display: flex;"
-        },
-        {
-          "default": _withSharedDataVaporCtx(() => {
-            _renderSharedDataEffect(() => {
-              const _plain = __props.plain;
-              const _type = __props.type;
-              const _closable = __props.closable;
-              _setSharedDataClass(__sharedData, 15, ["up-tag", [`up-tag--${__props.shape}`, !_plain ? `up-tag--${_type}` : "", _plain ? `up-tag--${_type}--plain` : "", `up-tag--${__props.size}`, _plain && __props.plainFill ? `up-tag--${_type}--plain--fill` : ""]]);
-              _setSharedDataStyle(__sharedData, 16, [{
-                marginRight: _closable ? "10px" : 0,
-                marginTop: _closable ? "10px" : 0
-              }, style.value]);
-            });
-            _createSharedDataSlot("icon", null, null, () => {
-              _createSharedDataIf(() => {
-                return _setSharedData(__sharedData, 6, _toSharedDataBoolean(__props.icon != ""));
-              }, () => {
-                _createSharedDataIf(() => {
-                  return _setSharedData(__sharedData, 7, _toSharedDataBoolean(_unref(image)(__props.icon)));
-                }, () => {
-                  _renderSharedDataEffect(() => {
-                    _setSharedDataAttr(__sharedData, 8, _toSharedDataString(__props.icon));
-                    _setSharedDataStyle(__sharedData, 9, [imgStyle.value]);
-                  });
-                }, () => {
-                  const n8 = _createSharedDataComponentWithFallback(_component_up_icon, "01ad9822", {
-                    color: () => {
-                      return elIconColor.value;
-                    },
-                    name: () => {
-                      return __props.icon;
-                    },
-                    size: () => {
-                      return iconSize.value;
-                    }
-                  });
-                  _setSharedData(__sharedData, 10, n8?.sharedData);
-                }, 261);
-              }, null, 129);
-            });
-            _createSharedDataSlot("default", null, null, () => {
-              _renderSharedDataEffect(() => {
-                const _type = __props.type;
-                _setSharedDataClass(__sharedData, 11, ["up-tag__text", [`up-tag__text--${_type}`, __props.plain ? `up-tag__text--${_type}--plain` : "", `up-tag__text--${__props.size}`]]);
-                _setSharedDataStyle(__sharedData, 12, [textColor.value]);
-                _setSharedData(__sharedData, 13, _toDisplayString(__props.text));
-              });
-            });
-            _setSharedDataEvent(__sharedData, 14, clickHandler);
-            _createSharedDataIf(() => {
-              return _setSharedData(__sharedData, 1, _toSharedDataBoolean(__props.closable));
-            }, () => {
-              _renderSharedDataEffect(() => {
-                _setSharedDataClass(__sharedData, 4, ["up-tag__close", [`up-tag__close--${__props.size}`]]);
-                _setSharedDataStyle(__sharedData, 5, { backgroundColor: __props.closeColor });
-              });
-              const n16 = _createSharedDataComponentWithFallback(_component_up_icon, "340a23fe", {
-                name: "close",
-                size: () => {
-                  return closeSize.value;
-                },
-                color: "#ffffff"
-              });
-              _setSharedData(__sharedData, 2, n16?.sharedData);
-              _setSharedDataEvent(__sharedData, 3, closeHandler);
-            });
-          })
-        },
-        1
-        /* SINGLE_ROOT */
-      );
-      _setSharedData(__sharedData, 0, n19?.sharedData);
-      return __sharedData;
-    };
+    const __returned__ = { props, emit, style, textColor, imgStyle, closeSize, iconSize, elIconColor, closeHandler, clickHandler, get testImage() {
+      return image;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tag-wrapper": { "": { "position": "relative" } }, "up-tag": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "up-tag--circle": { "": { "borderTopLeftRadius": 100, "borderTopRightRadius": 100, "borderBottomRightRadius": 100, "borderBottomLeftRadius": 100 } }, "up-tag--square": { "": { "borderTopLeftRadius": 3, "borderTopRightRadius": 3, "borderBottomRightRadius": 3, "borderBottomLeftRadius": 3 } }, "up-tag__icon": { "": { "marginRight": 4 } }, "up-tag__text--mini": { "": { "fontSize": 12, "lineHeight": "12px" } }, "up-tag__text--medium": { "": { "fontSize": 13, "lineHeight": "13px" } }, "up-tag__text--large": { "": { "fontSize": 15, "lineHeight": "15px" } }, "up-tag--primary": { "": { "backgroundColor": "var(--theme-color, #0957de)", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopColor": "var(--theme-color, #0957de)", "borderRightColor": "var(--theme-color, #0957de)", "borderBottomColor": "var(--theme-color, #0957de)", "borderLeftColor": "var(--theme-color, #0957de)" } }, "up-tag--primary--plain": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopColor": "var(--theme-color, #0957de)", "borderRightColor": "var(--theme-color, #0957de)", "borderBottomColor": "var(--theme-color, #0957de)", "borderLeftColor": "var(--theme-color, #0957de)" } }, "up-tag--primary--plain--fill": { "": { "backgroundColor": "#ecf5ff" } }, "up-tag__text--primary": { "": { "color": "#FFFFFF" } }, "up-tag__text--primary--plain": { "": { "color": "var(--theme-color, #0957de)" } }, "up-tag--error": { "": { "backgroundColor": "#f56c6c", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopColor": "#f56c6c", "borderRightColor": "#f56c6c", "borderBottomColor": "#f56c6c", "borderLeftColor": "#f56c6c" } }, "up-tag--error--plain": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopColor": "#f56c6c", "borderRightColor": "#f56c6c", "borderBottomColor": "#f56c6c", "borderLeftColor": "#f56c6c" } }, "up-tag--error--plain--fill": { "": { "backgroundColor": "#fef0f0" } }, "up-tag__text--error": { "": { "color": "#FFFFFF" } }, "up-tag__text--error--plain": { "": { "color": "#f56c6c" } }, "up-tag--warning": { "": { "backgroundColor": "#f9ae3d", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopColor": "#f9ae3d", "borderRightColor": "#f9ae3d", "borderBottomColor": "#f9ae3d", "borderLeftColor": "#f9ae3d" } }, "up-tag--warning--plain": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopColor": "#f9ae3d", "borderRightColor": "#f9ae3d", "borderBottomColor": "#f9ae3d", "borderLeftColor": "#f9ae3d" } }, "up-tag--warning--plain--fill": { "": { "backgroundColor": "#fdf6ec" } }, "up-tag__text--warning": { "": { "color": "#FFFFFF" } }, "up-tag__text--warning--plain": { "": { "color": "#f9ae3d" } }, "up-tag--success": { "": { "backgroundColor": "#5ac725", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopColor": "#5ac725", "borderRightColor": "#5ac725", "borderBottomColor": "#5ac725", "borderLeftColor": "#5ac725" } }, "up-tag--success--plain": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopColor": "#5ac725", "borderRightColor": "#5ac725", "borderBottomColor": "#5ac725", "borderLeftColor": "#5ac725" } }, "up-tag--success--plain--fill": { "": { "backgroundColor": "#f5fff0" } }, "up-tag__text--success": { "": { "color": "#FFFFFF" } }, "up-tag__text--success--plain": { "": { "color": "#5ac725" } }, "up-tag--info": { "": { "backgroundColor": "#909399", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopColor": "#909399", "borderRightColor": "#909399", "borderBottomColor": "#909399", "borderLeftColor": "#909399" } }, "up-tag--info--plain": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopColor": "#909399", "borderRightColor": "#909399", "borderBottomColor": "#909399", "borderLeftColor": "#909399" } }, "up-tag--info--plain--fill": { "": { "backgroundColor": "#f4f4f5" } }, "up-tag__text--info": { "": { "color": "#FFFFFF" } }, "up-tag__text--info--plain": { "": { "color": "#909399" } }, "up-tag--mini": { "": { "height": 19, "lineHeight": "19px", "paddingTop": 0, "paddingRight": 5, "paddingBottom": 0, "paddingLeft": 5 } }, "up-tag--medium": { "": { "height": 22, "lineHeight": "22px", "paddingTop": 0, "paddingRight": 7, "paddingBottom": 0, "paddingLeft": 7 } }, "up-tag--large": { "": { "height": 25, "lineHeight": "25px", "paddingTop": 0, "paddingRight": 10, "paddingBottom": 0, "paddingLeft": 10 } }, "up-tag__close": { "": { "position": "absolute", "zIndex": 999, "top": 10, "right": 10, "borderTopLeftRadius": 100, "borderTopRightRadius": 100, "borderBottomRightRadius": 100, "borderBottomLeftRadius": 100, "backgroundColor": "#C6C7CB", "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "transform": "scale(0.6) translate(80%, -80%)" } }, "up-tag__close--mini": { "": { "width": 18, "height": 18 } }, "up-tag__close--medium": { "": { "width": 22, "height": 22 } }, "up-tag__close--large": { "": { "width": 25, "height": 25 } } };
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { renderSlot: _renderSlot, normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, resolveComponent: _resolveComponent, createBlock: _createBlock, toDisplayString: _toDisplayString, normalizeClass: _normalizeClass, createElementVNode: _createElementVNode, withModifiers: _withModifiers, createVNode: _createVNode, withCtx: _withCtx } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
+  const _component_up_transition = resolveEasycom(__resolveDynamicComponent("up-transition"), __easycom_1$1);
+  return _openBlock(), _createBlock(_component_up_transition, {
+    mode: "fade",
+    show: $props.show,
+    style: { "display": "flex" }
+  }, {
+    default: _withCtx(() => [
+      _createElementVNode("view", { class: "up-tag-wrapper cursor-pointer" }, [
+        _createElementVNode(
+          "view",
+          {
+            class: _normalizeClass(["up-tag", [`up-tag--${$props.shape}`, !$props.plain ? `up-tag--${$props.type}` : "", $props.plain ? `up-tag--${$props.type}--plain` : "", `up-tag--${$props.size}`, $props.plain && $props.plainFill ? `up-tag--${$props.type}--plain--fill` : ""]]),
+            onClick: _withModifiers($setup.clickHandler, ["stop"]),
+            style: _normalizeStyle([{
+              marginRight: $props.closable ? "10px" : 0,
+              marginTop: $props.closable ? "10px" : 0
+            }, $setup.style])
+          },
+          [
+            _renderSlot(_ctx.$slots, "icon", {}, () => [
+              $props.icon != "" ? (_openBlock(), _createElementBlock("view", {
+                key: 0,
+                class: "up-tag__icon"
+              }, [
+                $setup.testImage($props.icon) ? (_openBlock(), _createElementBlock("image", {
+                  key: 0,
+                  src: $props.icon,
+                  style: _normalizeStyle([$setup.imgStyle])
+                }, null, 12, ["src"])) : (_openBlock(), _createBlock(_component_up_icon, {
+                  key: 1,
+                  color: $setup.elIconColor,
+                  name: $props.icon,
+                  size: $setup.iconSize
+                }, null, 8, ["color", "name", "size"]))
+              ])) : _createCommentVNode("v-if", true)
+            ]),
+            _renderSlot(_ctx.$slots, "default", {}, () => [
+              _createElementVNode(
+                "text",
+                {
+                  class: _normalizeClass(["up-tag__text", [`up-tag__text--${$props.type}`, $props.plain ? `up-tag__text--${$props.type}--plain` : "", `up-tag__text--${$props.size}`]]),
+                  style: _normalizeStyle([$setup.textColor])
+                },
+                _toDisplayString($props.text),
+                7
+                /* TEXT, CLASS, STYLE */
+              )
+            ])
+          ],
+          6
+          /* CLASS, STYLE */
+        ),
+        $props.closable ? (_openBlock(), _createElementBlock(
+          "view",
+          {
+            key: 0,
+            class: _normalizeClass(["up-tag__close", [`up-tag__close--${$props.size}`]]),
+            onClick: _withModifiers($setup.closeHandler, ["stop"]),
+            style: _normalizeStyle({ backgroundColor: $props.closeColor })
+          },
+          [
+            _createVNode(_component_up_icon, {
+              name: "close",
+              size: $setup.closeSize,
+              color: "#ffffff"
+            }, null, 8, ["size"])
+          ],
+          6
+          /* CLASS, STYLE */
+        )) : _createCommentVNode("v-if", true)
+      ])
+    ]),
+    _: 3
+    /* FORWARDED */
+  }, 8, ["show"]);
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-tag/up-tag.uvue"]]);
 export {
   __easycom_1 as _
 };

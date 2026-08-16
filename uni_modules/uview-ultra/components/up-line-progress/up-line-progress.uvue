@@ -1,16 +1,16 @@
 <template>
 	<view
 		class="up-line-progress"
-		:style="[addStyle(customStyle)]"
+		:style="customLineProgressStyle"
 	>
 		<view
 			class="up-line-progress__background"
-			:style="[backgroundStyle]"
+			:style="backgroundStyle"
 		>
 		</view>
 		<view
 			class="up-line-progress__line"
-			:style="[progressStyle]"
+			:style="progressStyle"
 		>
 			<slot>
 				<text v-if="showText && percentageValue >= 10" class="up-line-progress__text">{{ innerPercentage + '%' }}</text>
@@ -91,6 +91,10 @@ const progressStyle = computed<UTSJSONObject>(() => {
   } as UTSJSONObject
 })
 
+const customLineProgressStyle = computed((): UTSJSONObject => {
+  return addStyle(props.customStyle) as UTSJSONObject
+})
+
 function resizeProgressWidth() {
   upGetRect('.up-line-progress__background', false, instance?.proxy).then((size: NodeInfo) => {
     const width = size.width != null ? size.width! : 0
@@ -104,11 +108,11 @@ function init() {
   })
 }
 
-watch(() => props.percentage, () => {
+watch((): any => props.percentage, () => {
   resizeProgressWidth()
 })
 
-watch(() => props.height, () => {
+watch((): any => props.height, () => {
   resizeProgressWidth()
 })
 

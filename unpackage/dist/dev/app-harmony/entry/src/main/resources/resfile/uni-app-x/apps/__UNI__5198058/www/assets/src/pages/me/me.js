@@ -1,4 +1,4 @@
-import { _ as _sfc_main$1 } from "../../../App.ku.js";
+import { A as AppKu } from "../../../App.ku.js";
 import "../../store/index.js";
 import { L as LOGIN_PAGE } from "../../router/config.js";
 import { h as handleBackPressExit } from "../../utils/backPress.js";
@@ -63,20 +63,13 @@ import "../../../uni_modules/uview-ultra/libs/i18n/locales/ko.js";
 import "../../../uni_modules/uview-ultra/libs/i18n/locales/ja.js";
 import "../../../uni_modules/uview-ultra/libs/i18n/locales/ru.js";
 import "../../tabbar/config.js";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, unref: _unref, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, setSharedData: _setSharedData, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataIf: _createSharedDataIf, setSharedDataClass: _setSharedDataClass, setSharedDataEvent: _setSharedDataEvent, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
-const __className = "GenSrcPagesMeMe";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { onBackPress, computed, onShow } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "a7bc1ff2",
-  __className,
-  __filename: "src/pages/me/me.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "me",
-  setup(__props) {
-    const __sharedDataRenderer = _useSharedDataRenderer();
-    const __sharedData = __sharedDataRenderer == "component" ? _withSharedDataComponent(new UniDynamicSharedDataComponent(_useSharedDataScope(), _useSharedDataComponentOptions({ bundleKey: "GenSrcPagesMeMeSharedData", sharedDataClassId: 0 }))) : _withSharedDataPage(new UniDynamicSharedDataPage(_useSharedDataPageId(), _useSharedDataPageOptions({ bundleKey: "GenSrcPagesMeMeSharedData", sharedDataClassId: 0 })));
-    _useSharedDataScope(__sharedData);
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
     onBackPress((options) => {
       if (options.from == "backbutton") {
         return handleBackPressExit();
@@ -131,45 +124,95 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         }
       }));
     }
-    return () => {
-      "raw js";
-      const n23 = _createSharedDataComponent(_sfc_main$1, "69b481fa", null, {
-        "default": () => {
-          _renderSharedDataEffect(() => {
-            const _userStore = _unref(userStore);
-            const _userStore_state = _userStore.state;
-            _setSharedDataAttr(__sharedData, 6, _toSharedDataString(_unref(avatarUrl)));
-            _setSharedData(__sharedData, 7, _toDisplayString(_userStore_state.userInfo.username.length > 0 ? _userStore_state.userInfo.username : "未登录用户"));
-          });
-          _createSharedDataIf(() => {
-            return _setSharedData(__sharedData, 1, _toSharedDataBoolean(_unref(userStore).state.userInfo.username.length > 0));
-          }, () => {
-            _renderSharedDataEffect(() => {
-              return _setSharedData(__sharedData, 2, _toDisplayString(_unref(userStore).state.userInfo.nickname));
-            });
-          });
-          _renderSharedDataEffect(() => {
-            const _tokenStore = _unref(tokenStore);
-            _setSharedDataClass(__sharedData, 8, ["text-12px px-12px py-4px rounded-20px font-medium overflow-hidden", _tokenStore.hasValidLogin() ? "bg-__d1fae5_ text-__065f46_" : "bg-__f1f5f9_ text-__64748b_"]);
-            _setSharedData(__sharedData, 9, _toDisplayString(_tokenStore.hasValidLogin() ? "已登录" : "未登录"));
-            _setSharedData(__sharedData, 10, _toDisplayString(_unref(userInfoJson)));
-          });
-          _createSharedDataIf(() => {
-            return _setSharedData(__sharedData, 3, _toSharedDataBoolean(_unref(tokenStore).hasValidLogin()));
-          }, () => {
-            _setSharedDataEvent(__sharedData, 4, handleLogout);
-          }, () => {
-            _setSharedDataEvent(__sharedData, 5, handleLogin);
-          }, 517);
-        }
-      });
-      _setSharedData(__sharedData, 0, n23.sharedData);
-      return __sharedData;
-    };
+    const __returned__ = { userStore, tokenStore, avatarUrl, userInfoJson, handleLogin, handleLogout, get AppKu() {
+      return AppKu;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const me = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "bg-__0f172a_": { "": { "backgroundImage": "none", "backgroundColor": "#0f172a" } }, "bg-__3b82f6_": { "": { "backgroundImage": "none", "backgroundColor": "#3b82f6" } }, "bg-__d1fae5_": { "": { "backgroundImage": "none", "backgroundColor": "#d1fae5" } }, "bg-__ef4444_": { "": { "backgroundImage": "none", "backgroundColor": "#ef4444" } }, "bg-__f1f5f9_": { "": { "backgroundImage": "none", "backgroundColor": "#f1f5f9" } }, "bg-white": { "": { "backgroundColor": "rgba(255,255,255,var(--un-bg-opacity,1))" } }, "border-bottom-color-__f1f5f9_": { "": { "borderBottomColor": "#f1f5f9" } }, "border-bottom-style-solid": { "": { "borderBottomStyle": "solid" } }, "border-bottom-width-1px": { "": { "borderBottomWidth": 1 } }, "border-color-__f1f5f9_": { "": { "borderTopColor": "#f1f5f9", "borderRightColor": "#f1f5f9", "borderBottomColor": "#f1f5f9", "borderLeftColor": "#f1f5f9" } }, "border-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-3px": { "": { "borderTopWidth": 3, "borderRightWidth": 3, "borderBottomWidth": 3, "borderLeftWidth": 3 } }, "flex": { "": { "display": "flex" } }, "flex-col": { "": { "flexDirection": "column" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "font-medium": { "": { "fontWeight": 500 } }, "font-semibold": { "": { "fontWeight": 600 } }, "h-180px": { "": { "height": 180 } }, "h-48px": { "": { "height": 48 } }, "h-90px": { "": { "height": 90 } }, "items-center": { "": { "alignItems": "center" } }, "justify-center": { "": { "justifyContent": "center" } }, "leading-20px": { "": { "lineHeight": "20px" } }, "mb-12px": { "": { "marginBottom": 12 } }, "mb-16px": { "": { "marginBottom": 16 } }, "mb-20px": { "": { "marginBottom": 20 } }, "mb-24px": { "": { "marginBottom": 24 } }, "mb-4px": { "": { "marginBottom": 4 } }, "overflow-hidden": { "": { "overflow": "hidden" } }, "p-12px": { "": { "paddingTop": 12, "paddingRight": 12, "paddingBottom": 12, "paddingLeft": 12 } }, "p-20px": { "": { "paddingTop": 20, "paddingRight": 20, "paddingBottom": 20, "paddingLeft": 20 } }, "pb-100px": { "": { "paddingBottom": 100 } }, "pb-8px": { "": { "paddingBottom": 8 } }, "px-12px": { "": { "paddingLeft": 12, "paddingRight": 12 } }, "px-16px": { "": { "paddingLeft": 16, "paddingRight": 16 } }, "px-20px": { "": { "paddingLeft": 20, "paddingRight": 20 } }, "px-8px": { "": { "paddingLeft": 8, "paddingRight": 8 } }, "py-24px": { "": { "paddingTop": 24, "paddingBottom": 24 } }, "py-30px": { "": { "paddingTop": 30, "paddingBottom": 30 } }, "py-4px": { "": { "paddingTop": 4, "paddingBottom": 4 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-20px": { "": { "borderTopLeftRadius": 20, "borderTopRightRadius": 20, "borderBottomRightRadius": 20, "borderBottomLeftRadius": 20 } }, "rounded-45px": { "": { "borderTopLeftRadius": 45, "borderTopRightRadius": 45, "borderBottomRightRadius": 45, "borderBottomLeftRadius": 45 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__065f46_": { "": { "color": "#065f46" } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__334155_": { "": { "color": "#334155" } }, "text-__38bdf8_": { "": { "color": "#38bdf8" } }, "text-__64748b_": { "": { "color": "#64748b" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-12px": { "": { "fontSize": 12 } }, "text-13px": { "": { "fontSize": 13 } }, "text-14px": { "": { "fontSize": 14 } }, "text-15px": { "": { "fontSize": 15 } }, "text-20px": { "": { "fontSize": 20 } }, "w-90px": { "": { "width": 90 } }, "w-full": { "": { "width": "100%" } } };
+const { createElementVNode: _createElementVNode, toDisplayString: _toDisplayString, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, normalizeClass: _normalizeClass, withCtx: _withCtx, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createBlock($setup["AppKu"], null, {
+    default: _withCtx(() => [
+      _createElementVNode("view", { class: "flex flex-col items-center px-16px py-24px pb-100px" }, [
+        _createElementVNode("view", { class: "w-full bg-white rounded-12px px-20px py-30px mb-20px flex flex-col items-center" }, [
+          _createElementVNode("image", {
+            class: "w-90px h-90px rounded-45px mb-16px border-width-3px border-color-__f1f5f9_ border-solid",
+            src: $setup.avatarUrl
+          }, null, 8, ["src"]),
+          _createElementVNode(
+            "text",
+            { class: "text-20px font-bold text-__1e293b_ mb-4px" },
+            _toDisplayString($setup.userStore.state.userInfo.username.length > 0 ? $setup.userStore.state.userInfo.username : "未登录用户"),
+            1
+            /* TEXT */
+          ),
+          $setup.userStore.state.userInfo.username.length > 0 ? (_openBlock(), _createElementBlock(
+            "text",
+            {
+              key: 0,
+              class: "text-14px text-__64748b_ mb-12px"
+            },
+            _toDisplayString($setup.userStore.state.userInfo.nickname),
+            1
+            /* TEXT */
+          )) : _createCommentVNode("v-if", true),
+          _createElementVNode("view", { class: "flex flex-row" }, [
+            _createElementVNode(
+              "text",
+              {
+                class: _normalizeClass(["text-12px px-12px py-4px rounded-20px font-medium overflow-hidden", $setup.tokenStore.hasValidLogin() ? "bg-__d1fae5_ text-__065f46_" : "bg-__f1f5f9_ text-__64748b_"])
+              },
+              _toDisplayString($setup.tokenStore.hasValidLogin() ? "已登录" : "未登录"),
+              3
+              /* TEXT, CLASS */
+            )
+          ])
+        ]),
+        _createElementVNode("view", { class: "w-full bg-white rounded-12px p-20px mb-24px flex flex-col" }, [
+          _createElementVNode("view", { class: "border-bottom-width-1px border-bottom-style-solid border-bottom-color-__f1f5f9_ pb-8px mb-12px flex flex-row" }, [
+            _createElementVNode("text", { class: "text-15px font-semibold text-__334155_" }, "用户信息 (JSON)")
+          ]),
+          _createElementVNode("scroll-view", {
+            class: "bg-__0f172a_ rounded-8px p-12px h-180px",
+            direction: "vertical"
+          }, [
+            _createElementVNode(
+              "text",
+              {
+                class: "text-13px text-__38bdf8_ leading-20px",
+                style: { "font-family": "monospace" }
+              },
+              _toDisplayString($setup.userInfoJson),
+              1
+              /* TEXT */
+            )
+          ])
+        ]),
+        _createElementVNode("view", { class: "w-full px-8px flex flex-col" }, [
+          $setup.tokenStore.hasValidLogin() ? (_openBlock(), _createElementBlock("view", {
+            key: 0,
+            class: "w-full h-48px rounded-8px bg-__ef4444_ flex flex-row items-center justify-center",
+            onClick: $setup.handleLogout
+          }, [
+            _createElementVNode("text", { class: "text-__ffffff_ text-14px font-bold" }, "退出登录")
+          ])) : (_openBlock(), _createElementBlock("view", {
+            key: 1,
+            class: "w-full h-48px rounded-8px bg-__3b82f6_ flex flex-row items-center justify-center",
+            onClick: $setup.handleLogin
+          }, [
+            _createElementVNode("text", { class: "text-__ffffff_ text-14px font-bold" }, "登录")
+          ]))
+        ])
+      ])
+    ]),
+    _: 1
+    /* STABLE */
+  });
+}
+const me = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/me/me.uvue"]]);
 export {
   me as default
 };

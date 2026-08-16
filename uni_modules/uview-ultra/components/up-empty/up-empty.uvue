@@ -1,28 +1,25 @@
 <template>
 	<view
 	    class="up-empty"
-	    :style="[emptyStyle, addStyle(customStyle)]"
+	    :style="mergedEmptyStyle"
 	    v-if="show"
 	>
 		<up-icon
-		    v-if="!isSrc"
-		    :name="mode === 'message' ? 'chat' : `empty-${mode}`"
-		    :size="iconSize"
-		    :color="iconColor"
-		    margin-top="14"
+			v-if="!isSrc"
+			:name="mode === 'message' ? 'chat' : `empty-${mode}`"
+			:size="iconSize"
+			:color="iconColor"
+			margin-top="14"
 		></up-icon>
 		<image
-		    v-else
-		    :style="{
-				width: addUnit(width),
-				height: addUnit(height),
-			}"
-		    :src="icon"
-		    mode="widthFix"
+			v-else
+			:style="imageDimensionStyle"
+			:src="icon"
+			mode="widthFix"
 		></image>
 		<text
-		    class="up-empty__text"
-		    :style="[textStyle]"
+			class="up-empty__text"
+			:style="textStyle"
 		>{{text != '' ? text : icons[mode]}}</text>
 		<view class="up-empty__wrap" v-if="$slots['default'] != null || $slots['$default'] != null">
 			<slot />
@@ -34,7 +31,7 @@
 import { computed, getCurrentInstance } from 'vue'
 import { mpSharedMpOptions } from '../../libs/composable/useMp'
 import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'
-import { addUnit, addStyle } from '../../libs/function/index.uts'
+import { addUnit, addStyle, deepMerge } from '../../libs/function/index.uts'
 import { t } from '../../libs/i18n/index.uts'
 import defProps from './empty.uts'
 
@@ -145,6 +142,19 @@ const emptyStyle = computed(() => {
 	style['marginTop'] = addUnit(props.marginTop)
 	// 合并customStyle样式
 	return style
+})
+
+const mergedEmptyStyle = computed((): UTSJSONObject => {
+	const custom = addStyle(props.customStyle) as UTSJSONObject
+	const empty = emptyStyle.value as UTSJSONObject
+	return deepMerge(empty, custom) as UTSJSONObject
+})
+
+const imageDimensionStyle = computed((): UTSJSONObject => {
+	return {
+		width: addUnit(props.width),
+		height: addUnit(props.height)
+	} as UTSJSONObject
 })
 
 // 文本样式

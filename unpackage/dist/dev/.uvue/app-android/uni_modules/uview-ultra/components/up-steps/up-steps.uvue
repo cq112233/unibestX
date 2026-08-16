@@ -1,0 +1,72 @@
+import { provide, ref, computed } from 'vue';
+const __sfc__ = defineComponent({
+    __name: 'up-steps',
+    name: 'up-steps',
+    props: {
+        direction: {
+            type: String,
+            default: 'row'
+        },
+        current: {
+            type: [String, Number],
+            default: 0
+        },
+        activeColor: {
+            type: String,
+            default: '#3c9cff'
+        },
+        inactiveColor: {
+            type: String,
+            default: '#969799'
+        },
+        activeIcon: {
+            type: String,
+            default: ''
+        },
+        inactiveIcon: {
+            type: String,
+            default: ''
+        },
+        dot: {
+            type: Boolean,
+            default: false
+        }
+    },
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        const props = __props;
+        const parentState = computed((): UTSJSONObject => {
+            return {
+                direction: props.direction,
+                current: props.current,
+                activeColor: props.activeColor,
+                inactiveColor: props.inactiveColor,
+                activeIcon: props.activeIcon,
+                inactiveIcon: props.inactiveIcon,
+                dot: props.dot
+            } as UTSJSONObject;
+        });
+        provide('upStepsProps', parentState);
+        const itemCount = ref<number>(0);
+        const registerStepItem = (): number => {
+            const currentIndex = itemCount.value;
+            itemCount.value = itemCount.value + 1;
+            return currentIndex;
+        };
+        provide('upStepsRegister', registerStepItem);
+        provide('upStepsItemCount', itemCount);
+        return (): any | null => {
+            return _cE("view", _uM({
+                class: _nC(["up-steps", [`up-steps--${_ctx.direction}`]])
+            }), [
+                renderSlot(_ctx.$slots, "default")
+            ], 2 /* CLASS */);
+        };
+    }
+});
+export default __sfc__;
+export type UpStepsComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpStepsUpStepsStyles = [_uM([["u-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-steps", _pS(_uM([["display", "flex"], ["width", "100%"]]))], ["up-steps--column", _pS(_uM([["flexDirection", "column"], ["width", "100%"]]))], ["up-steps--row", _pS(_uM([["flexDirection", "row"], ["width", "100%"], ["alignItems", "flex-start"]]))]])];
+//# sourceMappingURL=up-steps.uvue.map

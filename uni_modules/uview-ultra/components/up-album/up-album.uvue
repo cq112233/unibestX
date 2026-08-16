@@ -5,31 +5,19 @@
             ref="up-album__row"
             v-for="(arr, index) in showUrls"
             :key="index"
-            :style="{flexWrap: autoWrap ? 'wrap' : 'nowrap'}"
+            :style="rowWrapStyle"
         >
             <view
                 class="up-album__row__wrapper"
                 v-for="(item, index1) in arr"
                 :key="index1"
-                :style="[imageStyle(index + 1, index1 + 1)]"
+                :style="getImageStyle(index + 1, index1 + 1)"
                 @tap="onPreviewTap($event, getSrc(item))"
             >
                 <image
                     :src="getSrc(item)"
-                    :mode="
-                        urls.length == 1
-                            ? (imageHeight != '0px' && imageHeight != '0rpx')
-                                ? singleMode
-                                : 'widthFix'
-                            : multipleMode
-                    "
-                    :style="[
-                        {
-                            width: imageWidth,
-                            height: imageHeight,
-                            borderRadius: shape == 'circle' ? '10000px' : addUnit(radius)
-                        }
-                    ]"
+                    :mode="imageModeComputed"
+                    :style="imageStyleComputed"
                 ></image>
                 <view
                     v-if="
@@ -40,7 +28,7 @@
                     "
                     class="up-album__row__wrapper__text"
                     :style="{
-					    borderRadius: shape == 'circle' ? '50%' : addUnit(radius),
+					    borderRadius: moreBorderRadius,
 				    }"
                 >
                     <up-text
@@ -138,6 +126,7 @@ const props = defineProps({
 	    type: Boolean,
 	    default: defProps.getBoolean('album.showMore')
 	},
+
 	// 图片形状，circle-圆形，square-方形
 	shape: {
 	    type: String,
@@ -256,7 +245,7 @@ onMounted(() => {
 })
 
 // 监听 urls 变化
-watch(() : Array<any> => props.urls, (newVal: Array<any>) => {
+watch((): Array<any> => props.urls, (newVal: Array<any>) => {
   if (newVal.length == 1) {
       getImageRect()
   }
@@ -266,30 +255,28 @@ watch(() : Array<any> => props.urls, (newVal: Array<any>) => {
   immediate: false
 })
 
-// 计算属性 - 图片样式
-const imageStyle = computed(() => {
-    return (index1: number, index2: number) => {
-        const { space, rowCount, multipleSize, urls } = props
-        const rowLen = showUrls.value.length
-        const allLen = props.urls.length
-        const style = {
-            marginRight: addUnit(space),
-            marginBottom: addUnit(space)
-        }
-        // 如果为最后一行，则每个图片都无需下边框
-        if (index1 === rowLen && !props.autoWrap) style.marginBottom = 0
-        // 每行的最右边一张和总长度的最后一张无需右边框
-        if (!props.autoWrap) {
-            if (
-                index2 === parseInt(rowCount.toString()) ||
-                (index1 == rowLen &&
-                    index2 == showUrls.value[index1 - 1].length)
-            )
-                style.marginRight = 0
-        }
-        return style
+// 方法 - 图片样式
+function getImageStyle(index1: number, index2: number): UTSJSONObject {
+    const { space, rowCount, multipleSize, urls } = props
+    const rowLen = showUrls.value.length
+    const allLen = props.urls.length
+    const style = {
+        marginRight: addUnit(space),
+        marginBottom: addUnit(space)
+    } as UTSJSONObject
+    // 如果为最后一行，则每个图片都无需下边框
+    if (index1 === rowLen && !props.autoWrap) style['marginBottom'] = 0
+    // 每行的最右边一张和总长度的最后一张无需右边框
+    if (!props.autoWrap) {
+        if (
+            index2 === parseInt(rowCount.toString()) ||
+            (index1 == rowLen &&
+                index2 == showUrls.value[index1 - 1].length)
+        )
+            style['marginRight'] = 0
     }
-})
+    return style
+}
 
 // 计算属性 - 图片宽度
 const imageWidth = computed(() => {
@@ -305,6 +292,16 @@ const imageHeight = computed(() => {
     )
 })
 
+// 计算属性 - 图片圆角
+const imageBorderRadius = computed((): string => {
+    return props.shape == 'circle' ? '10000px' : addUnit(props.radius)
+})
+
+// 计算属性 - 查看更多圆角
+const moreBorderRadius = computed((): string => {
+    return props.shape == 'circle' ? '50%' : addUnit(props.radius)
+})
+
 // 计算属性 - 相册宽度
 const albumWidth = computed(() => {
     let width = 0
@@ -317,6 +314,27 @@ const albumWidth = computed(() => {
     }
     emit('albumWidth', width)
     return width
+})
+
+const rowWrapStyle = computed((): UTSJSONObject => {
+    return { flexWrap: props.autoWrap ? 'wrap' : 'nowrap' } as UTSJSONObject
+})
+
+const imageStyleComputed = computed((): UTSJSONObject => {
+    return {
+        width: imageWidth.value,
+        height: imageHeight.value,
+        borderRadius: imageBorderRadius.value
+    } as UTSJSONObject
+})
+
+const imageModeComputed = computed((): string => {
+    if (props.urls.length == 1) {
+        return (imageHeight.value != '0px' && imageHeight.value != '0rpx')
+            ? props.singleMode
+            : 'widthFix'
+    }
+    return props.multipleMode
 })
 
 // 预览图片

@@ -138,25 +138,6 @@ function getRect(): Promise<NodeInfo> {
   })
 }
 
-function init() {
-  getRect().then((res: NodeInfo) => {
-    if (res.height != null && res.height! > 0) {
-      height.value = res.height!
-    }
-    if (res.left != null) {
-      left.value = res.left!
-    }
-    if (res.width != null && res.width! > 0) {
-      width.value = res.width!
-    }
-    const currentTop = res.top ?? 0
-    const st = parseFloat(props.scrollTop.toString())
-    initialTop.value = currentTop + st
-    isInit.value = true
-    checkFixed(st)
-  })
-}
-
 function checkFixed(st: number) {
   if (!isInit.value) {
     init()
@@ -183,7 +164,26 @@ function checkFixed(st: number) {
   }
 }
 
-watch(() => props.scrollTop, (val: any) => {
+function init() {
+  getRect().then((res: NodeInfo) => {
+    if (res.height != null && res.height! > 0) {
+      height.value = res.height!
+    }
+    if (res.left != null) {
+      left.value = res.left!
+    }
+    if (res.width != null && res.width! > 0) {
+      width.value = res.width!
+    }
+    const currentTop = res.top ?? 0
+    const st = parseFloat(props.scrollTop.toString())
+    initialTop.value = currentTop + st
+    isInit.value = true
+    checkFixed(st)
+  })
+}
+
+watch((): any => props.scrollTop, (val: any) => {
   if (props.disabled) return
   const st = parseFloat(val.toString())
   checkFixed(st)

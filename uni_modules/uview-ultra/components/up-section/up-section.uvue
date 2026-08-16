@@ -1,14 +1,14 @@
 <template>
-	<view class="up-section" :style="[addStyle(customStyle)]">
+	<view class="up-section" :style="customSectionStyle">
 		<view class="up-section__content" @tap="clickHandler">
 			<view
 				v-if="showLine"
 				class="up-section__content__line"
-				:style="[lineStyle]"
+				:style="lineStyle"
 			></view>
 			<text
 				class="up-section__content__title"
-				:style="[titleStyle]"
+				:style="titleStyle"
 			>{{ title }}</text>
 		</view>
 		<view
@@ -20,7 +20,7 @@
 				<text
 					v-if="subTitle != ''"
 					class="up-section__right__text"
-					:style="[subTitleStyle]"
+					:style="subTitleStyle"
 				>{{ subTitle }}</text>
 				<up-icon
 					v-if="arrow"
@@ -112,6 +112,10 @@ const subTitleStyle = computed<UTSJSONObject>(() => {
 	const style = {} as UTSJSONObject
 	style['color'] = props.subColor
 	return style
+})
+
+const customSectionStyle = computed((): UTSJSONObject => {
+	return addStyle(props.customStyle) as UTSJSONObject
 })
 
 function clickHandler() {

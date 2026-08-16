@@ -75,10 +75,10 @@ function getEnvLabel(type) {
   return "未知";
 }
 export {
-  getCurrentEnv as a,
-  getEnvLabel as b,
-  getEnvConfigFor as c,
-  getSystemEnv as g,
+  getEnvLabel as a,
+  getEnvConfigFor as b,
+  getSystemEnv as c,
+  getCurrentEnv as g,
   resetEnv as r,
   setCurrentEnv as s
 };

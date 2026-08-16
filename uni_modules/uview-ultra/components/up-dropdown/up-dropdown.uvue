@@ -1,33 +1,26 @@
 <template>
-	<view class="up-dropdown" :style="{
-		height: active ? addUnit((contentHeight + parseInt(props.height.toString()))) : addUnit(props.height)
-	}">
-		<view class="up-dropdown__menu" :style="{
-			height: addUnit(props.height)
-		}" :class="{
+	<view class="up-dropdown" :style="dropdownStyle">
+		<view class="up-dropdown__menu" :style="menuStyle" :class="{
 			'u-border-bottom': props.borderBottom
 		}">
 			<view class="up-dropdown__menu__item" v-for="(item, index) in menuList" :key="index" @tap.stop="menuClick(index)">
 				<view class="up-flex up-flex-row">
 					<text class="up-dropdown__menu__item__text" :class="{
 						'up-dropdown__menu__item__text--active': (index == current || highlightIndexList.includes(index)) && props.activeColor == '#2979ff'
-					}" :style="[getContentTextStyle(item, index)]">{{item['title']}}</text>
+					}" :style="getContentTextStyle(item, index)">{{item['title']}}</text>
 					<view class="up-dropdown__menu__item__arrow" :class="{
 						'up-dropdown__menu__item__arrow--rotate': index == current
 					}">
 						<up-icon :custom-style="{display: 'flex'}" :name="props.menuIcon"
-							:size="addUnit(props.menuIconSize)"
-							:color="index == current || highlightIndexList.includes(index) ? (props.activeColor == '#2979ff' ? 'primary' : props.activeColor) : '#c0c4cc'"></up-icon>
+							:size="menuIconSizeUnit"
+							:color="getMenuIconColor(index)"></up-icon>
 					</view>
 				</view>
 			</view>
 		</view>
-		<view class="up-dropdown__content" :style="[contentStyle, {
-			top: addUnit(props.height),
-			transition: `opacity ${parseInt(props.duration.toString()) / 1000}s, z-index ${parseInt(props.duration.toString()) / 1000}s linear`,
-		}]"
+		<view class="up-dropdown__content" :style="contentWrapStyle"
 		 @tap="maskClick" @touchmove.stop.prevent>
-			<view @tap.stop.prevent class="up-dropdown__content__popup" :style="[popupStyle]">
+			<view @tap.stop.prevent class="up-dropdown__content__popup" :style="popupStyle">
 				<slot></slot>
 			</view>
 			<view class="up-dropdown__content__mask"></view>
@@ -37,7 +30,7 @@
 
 <script setup lang="uts">
 	import { computed, ref, watch, onMounted, getCurrentInstance, provide } from 'vue'
-	import { addUnit, getWindowInfo, upGetRect } from '../../libs/function/index.uts';
+	import { addUnit, getWindowInfo, upGetRect, deepMerge } from '../../libs/function/index.uts';
 	import { UPDropdownMenu } from './types.uts';
 	const instance = getCurrentInstance()!.proxy!
 	
@@ -124,8 +117,38 @@
 		}
 	})
 	
+	const dropdownStyle = computed((): UTSJSONObject => {
+		const h = active.value
+			? addUnit(contentHeight.value + parseInt(props.height.toString()))
+			: addUnit(props.height)
+		return { height: h } as UTSJSONObject
+	})
+
+	const menuStyle = computed((): UTSJSONObject => {
+		return { height: addUnit(props.height) } as UTSJSONObject
+	})
+
+	const contentWrapStyle = computed((): UTSJSONObject => {
+		const style = deepMerge(contentStyle.value, {
+			top: addUnit(props.height),
+			transition: `opacity ${parseInt(props.duration.toString()) / 1000}s, z-index ${parseInt(props.duration.toString()) / 1000}s linear`,
+		} as UTSJSONObject) as UTSJSONObject
+		return style
+	})
+
+	const menuIconSizeUnit = computed((): string => {
+		return addUnit(props.menuIconSize)
+	})
+
+	function getMenuIconColor(index: number): string {
+		if (index == current.value || highlightIndexList.value.includes(index)) {
+			return props.activeColor == '#2979ff' ? 'primary' : props.activeColor
+		}
+		return '#c0c4cc'
+	}
+
 	// 下拉出来部分的样式
-	const popupStyle = computed(() => {
+	const popupStyle = computed((): UTSJSONObject => {
 		let style = {} as UTSJSONObject
 		style['transform'] = `translateY(${active.value ? '0%' : '-100%'})`
 		style['transition-duration'] = parseInt(props.duration.toString()) / 1000 + 's'

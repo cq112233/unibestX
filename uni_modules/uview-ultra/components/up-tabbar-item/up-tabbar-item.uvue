@@ -1,7 +1,7 @@
 <template>
 	<view
 	    class="up-tabbar-item"
-	    :style="[addStyle(customStyle)]"
+	    :style="customTabbarItemStyle"
 	    :class="[isMidButton ? 'up-tabbar-item--mid-button' : '']"
 	    @tap="clickHandler"
 	>
@@ -30,7 +30,7 @@
 			<up-badge
 				absolute
 				:offset="[0, dot ? '34rpx' : (badge != null && parseInt(badge.toString()) > 9 ? '14rpx' : '20rpx')]"
-			    :customStyle="badgeStyle"
+			    :customStyle="customBadgeStyle"
 			    :isDot="dot"
 			    :value="badge != null ? (dot ? 1 : badge) : 0"
 			    :show="dot ? true : (badge != null ? parseInt(badge.toString()) > 0 : false)"
@@ -49,7 +49,8 @@
 </template>
 
 <script setup lang="uts">
-import { computed, inject } from 'vue'
+import { computed, inject, ref, onMounted } from 'vue'
+import type { ComputedRef } from 'vue'
 import { addStyle } from '../../libs/function/index.uts'
 
 defineOptions({
@@ -79,7 +80,7 @@ const props = defineProps({
   },
   badgeStyle: {
     type: [Object, String],
-    default: 'top: 6px;right:2px;'
+    default: () => ({ top: '6px', right: '2px' })
   },
   mode: {
     type: String,
@@ -93,31 +94,67 @@ const props = defineProps({
 
 const emit = defineEmits(['click'])
 
-const parentProps = inject<any | null>('upTabbarProps', null)
-const parentChange = inject<((name: string | number) => void) | null>('upTabbarChange', null)
+const parentProps = inject<ComputedRef<UTSJSONObject> | null>('upTabbarProps', null)
+const parentRegister = inject<(() => number) | null>('upTabbarRegister', null)
+const parentChange = inject<((name: any) => void) | null>('upTabbarChange', null)
+
+const internalIndex = ref<number>(0)
+
+onMounted(() => {
+  if (parentRegister != null) {
+    internalIndex.value = parentRegister()
+  }
+})
 
 const isMidButton = computed<boolean>(() => {
-  return props.mode === 'midButton'
+  return props.mode == 'midButton'
+})
+
+const itemName = computed((): any => {
+  if (props.name != null) {
+    return props.name!
+  }
+  return internalIndex.value
 })
 
 const isActive = computed<boolean>(() => {
-  if (parentProps == null || props.name == null) return false
-  return parentProps.value == props.name
+  if (parentProps == null) return false
+  const parentObj = parentProps!.value
+  if (parentObj == null) return false
+  const parentVal = parentObj['value']
+  if (parentVal == null) return false
+  return parentVal.toString() == itemName.value.toString()
 })
 
-const activeColor = computed<string>(() => {
-  return parentProps?.activeColor ?? '#1989fa'
+const activeColor = computed<string>((): string => {
+  if (parentProps != null && parentProps!.value != null) {
+    const val = parentProps!.value!['activeColor']
+    if (val != null && val.toString() != '') return val.toString()
+  }
+  return '#1989fa'
 })
 
-const inactiveColor = computed<string>(() => {
-  return parentProps?.inactiveColor ?? '#7d7e80'
+const inactiveColor = computed<string>((): string => {
+  if (parentProps != null && parentProps!.value != null) {
+    const val = parentProps!.value!['inactiveColor']
+    if (val != null && val.toString() != '') return val.toString()
+  }
+  return '#7d7e80'
+})
+
+const customTabbarItemStyle = computed((): UTSJSONObject => {
+  return addStyle(props.customStyle) as UTSJSONObject
+})
+
+const customBadgeStyle = computed((): UTSJSONObject => {
+  return addStyle(props.badgeStyle) as UTSJSONObject
 })
 
 function clickHandler() {
-  if (props.name != null && parentChange != null) {
-    parentChange(props.name!)
+  if (parentChange != null) {
+    parentChange(itemName.value)
   }
-  emit('click', props.name)
+  emit('click', itemName.value)
 }
 </script>
 

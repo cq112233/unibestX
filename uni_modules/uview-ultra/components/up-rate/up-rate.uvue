@@ -2,7 +2,7 @@
     <view
         class="up-rate"
         :id="elId"
-        :style="[addStyle(customStyle)]"
+        :style="customRateStyle"
     >
         <view
             class="up-rate__content"
@@ -29,12 +29,10 @@
                             disabled
                                 ? '#c8c9cc'
                                 : Math.floor(parseFloat(activeIndex.toString())) > index
-                                ? (activeColor === '#FA3534' ? 'primary' : activeColor)
+                                ? (activeColor == '#FA3534' ? 'primary' : activeColor)
                                 : inactiveColor
                         "
-                        :custom-style="{
-                            padding: `0 ${addUnit(parseInt(gutter.toString()) / 2)}`,
-                        }"
+                        :custom-style="iconPaddingStyle"
                         :size="size"
                     ></up-icon>
                 </view>
@@ -42,9 +40,7 @@
                     v-if="allowHalf"
                     @click.stop="clickHandler($event, index + 1)"
                     class="up-rate__content__item__icon-wrap up-rate__content__item__icon-wrap--half"
-                    :style="[{
-                        width: addUnit(rateWidth / 2),
-                    }]"
+                    :style="halfWidthStyle"
                 >
                     <up-icon
                         :name="
@@ -56,12 +52,10 @@
                             disabled
                                 ? '#c8c9cc'
                                 : Math.ceil(parseFloat(activeIndex.toString())) > index
-                                ? (activeColor === '#FA3534' ? 'primary' : activeColor)
+                                ? (activeColor == '#FA3534' ? 'primary' : activeColor)
                                 : inactiveColor
                         "
-                        :custom-style="{
-                            padding: `0 ${addUnit(parseInt(gutter.toString()) / 2)}`
-                        }"
+                        :custom-style="iconPaddingStyle"
                         :size="size"
                     ></up-icon>
                 </view>
@@ -71,8 +65,8 @@
 </template>
 
 <script setup lang="uts">
-import { ref, watch, onMounted, getCurrentInstance } from 'vue'
-import { addUnit, addStyle, guid, sleep, range, os, upGetRect } from '../../libs/function/index'
+import { computed, ref, watch, onMounted, getCurrentInstance } from 'vue'
+import { addUnit, addStyle, guid, sleep, range, os, upGetRect } from '../../libs/function/index.uts'
 
 defineOptions({
   name: 'up-rate'
@@ -107,25 +101,25 @@ const props = defineProps({
     type: String,
     default: '#FA3534'
   },
+  inactiveIcon: {
+    type: String,
+    default: 'star-fill'
+  },
+  activeIcon: {
+    type: String,
+    default: 'star-fill'
+  },
   gutter: {
     type: [String, Number],
     default: 4
   },
   minCount: {
     type: [String, Number],
-    default: 1
+    default: 0
   },
   allowHalf: {
     type: Boolean,
     default: false
-  },
-  activeIcon: {
-    type: String,
-    default: 'star-fill'
-  },
-  inactiveIcon: {
-    type: String,
-    default: 'star'
   },
   touchable: {
     type: Boolean,
@@ -146,6 +140,22 @@ const rateBoxLeft = ref<number>(0)
 const activeIndex = ref<number>(0)
 const rateWidth = ref<number>(0)
 const moving = ref<boolean>(false)
+
+const customRateStyle = computed((): UTSJSONObject => {
+  return addStyle(props.customStyle) as UTSJSONObject
+})
+
+const iconPaddingStyle = computed((): UTSJSONObject => {
+  return {
+    padding: `0 ${addUnit(parseInt(props.gutter.toString()) / 2)}`
+  } as UTSJSONObject
+})
+
+const halfWidthStyle = computed((): UTSJSONObject => {
+  return {
+    width: addUnit(rateWidth.value / 2)
+  } as UTSJSONObject
+})
 
 function toNumber(value: any, fallback: number = 0): number {
   if (value == null) return fallback
@@ -177,15 +187,13 @@ function getFallbackRateWidth(): number {
   return width > 0 ? width : 18
 }
 
-function ensureRateMetrics(): boolean {
-  if (isNaN(rateBoxLeft.value)) {
-    rateBoxLeft.value = 0
-  }
-  if (isNaN(rateWidth.value) || rateWidth.value <= 0) {
-    rateWidth.value = getFallbackRateWidth()
-    getRateIconWrapRect()
-  }
-  return !isNaN(rateWidth.value) && rateWidth.value > 0
+function getRateIconWrapRect() {
+  upGetRect('.' + elClass.value, false, instance?.proxy).then((res: NodeInfo) => {
+    const width = res.width ?? NaN
+    if (!isNaN(width) && width > 0) {
+      rateWidth.value = width
+    }
+  })
 }
 
 async function getRateItemRect() {
@@ -198,13 +206,15 @@ async function getRateItemRect() {
   })
 }
 
-function getRateIconWrapRect() {
-  upGetRect('.' + elClass.value, false, instance?.proxy).then((res: NodeInfo) => {
-    const width = res.width ?? NaN
-    if (!isNaN(width) && width > 0) {
-      rateWidth.value = width
-    }
-  })
+function ensureRateMetrics(): boolean {
+  if (isNaN(rateBoxLeft.value)) {
+    rateBoxLeft.value = 0
+  }
+  if (isNaN(rateWidth.value) || rateWidth.value <= 0) {
+    rateWidth.value = getFallbackRateWidth()
+    getRateIconWrapRect()
+  }
+  return !isNaN(rateWidth.value) && rateWidth.value > 0
 }
 
 function emitEvent() {
@@ -298,7 +308,7 @@ function init() {
   })
 }
 
-watch(() => props.modelValue, (val: any) => {
+watch((): any => props.modelValue, (val: any) => {
   activeIndex.value = normalizeActiveIndex(val)
 })
 

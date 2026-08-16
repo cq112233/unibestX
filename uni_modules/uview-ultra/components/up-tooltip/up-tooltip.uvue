@@ -94,7 +94,7 @@
 
 <script setup lang="uts">
 import { ref, computed, watch, onMounted, getCurrentInstance, nextTick } from 'vue'
-import { addStyle, addUnit, guid, toast, sleep, sys, upGetRect } from '../../libs/function/index'
+import { addStyle, addUnit, guid, toast, sleep, sys, upGetRect } from '../../libs/function/index.uts'
 
 defineOptions({
 	name: 'up-tooltip'
@@ -399,20 +399,16 @@ const indicatorMergedStyle = computed<UTSJSONObject>(() => {
 	return style
 })
 
-function queryRect(refName: string): Promise<any | null> {
+function queryRect(refName: string): Promise<NodeInfo> {
 	return upGetRect(`#${refName}`, false, instance?.proxy)
 }
 
 function getElRect() {
-	queryRect(tooltipId.value).then((size: any | null) => {
-		if (size != null) {
-			tooltipInfo.value = size as UTSJSONObject
-		}
+	queryRect(tooltipId.value).then((size: NodeInfo) => {
+		tooltipInfo.value = size as UTSJSONObject
 	})
-	queryRect(textId.value).then((size: any | null) => {
-		if (size != null) {
-			textInfo.value = size as UTSJSONObject
-		}
+	queryRect(textId.value).then((size: NodeInfo) => {
+		textInfo.value = size as UTSJSONObject
 	})
 }
 
@@ -482,7 +478,7 @@ function setClipboardData() {
 	})
 }
 
-watch(() => props.show, (newVal: boolean) => {
+watch((): boolean => props.show, (newVal: boolean) => {
 	innerShow.value = newVal
 	if (newVal) {
 		getElRect()

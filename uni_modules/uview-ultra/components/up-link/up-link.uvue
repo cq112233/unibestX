@@ -2,14 +2,14 @@
 	<text
 	    class="up-link"
 	    @tap.stop="openLink"
-	    :style="[linkStyle, addStyle(customStyle)]"
+	    :style="mergedLinkStyle"
 	>{{text}}</text>
 </template>
 
 <script setup lang="uts">
 import { computed } from 'vue'
 import defProps from './link'
-import { addStyle, addUnit, getPx } from '../../libs/function/index'
+import { addStyle, addUnit, getPx, deepMerge } from '../../libs/function/index'
 
 defineOptions({
   name: 'up-link'
@@ -60,6 +60,12 @@ const linkStyle = computed<UTSJSONObject>(() => {
     textDecoration: props.underLine ? 'underline' : 'none'
   } as UTSJSONObject
   return style
+})
+
+const mergedLinkStyle = computed((): UTSJSONObject => {
+  const custom = addStyle(props.customStyle) as UTSJSONObject
+  const link = linkStyle.value
+  return deepMerge(link, custom) as UTSJSONObject
 })
 
 function openLink(): void {

@@ -1,15 +1,9 @@
 import { d as defProps } from "./codeInput.js";
 import { a as addUnit, g as getPx } from "../../libs/function/index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, setSharedData: _setSharedData, toDisplayString: _toDisplayString, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, toSharedDataBoolean: _toSharedDataBoolean, unref: _unref, createSharedDataIf: _createSharedDataIf, createSharedDataFor: _createSharedDataFor, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpCodeInputUpCodeInput";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref, computed, watch, nextTick, onBeforeUnmount } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "18f41df6",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-code-input/up-code-input.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "up-code-input",
   props: {
     customStyle: {
@@ -100,9 +94,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   },
   emits: ["change", "finish", "update:modelValue"],
   setup(__props, _a) {
-    var __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpCodeInputUpCodeInputSharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
     const props = __props;
     const emit = __emit;
     const inputValue = ref("");
@@ -214,94 +207,94 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     onBeforeUnmount(() => {
       clearCursorTimer();
     });
-    return () => {
-      "raw js";
-      const _component_input = _resolveComponent("input");
-      _createSharedDataFor(_setSharedDataScoped(__sharedData, 0, _createSharedDataVFor(__sharedDataScope, () => {
-        return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-      })), () => {
-        return codeLength.value;
-      }, (__sharedData_VFor0, _for_item0, _for_key0) => {
-        _renderSharedDataEffect(() => {
-          return _setSharedDataStyle(__sharedData_VFor0, 8, [itemStyle(_for_key0.value)]);
-        });
-        _createSharedDataIf(() => {
-          return _setSharedData(__sharedData_VFor0, 1, _toSharedDataBoolean(__props.dot && codeArray.value.length > _for_key0.value));
-        }, () => {
-        }, () => {
-          _renderSharedDataEffect(() => {
-            _setSharedDataStyle(__sharedData_VFor0, 2, {
-              fontSize: _unref(addUnit)(__props.fontSize),
-              fontWeight: __props.bold ? "bold" : "normal",
-              color: __props.color
-            });
-            _setSharedData(__sharedData_VFor0, 3, _toDisplayString(getCodeValue(_for_key0.value)));
-          });
-        }, 261);
-        _createSharedDataIf(() => {
-          return _setSharedData(__sharedData_VFor0, 4, _toSharedDataBoolean(__props.mode == "line"));
-        }, () => {
-          _renderSharedDataEffect(() => {
-            return _setSharedDataStyle(__sharedData_VFor0, 5, [lineStyle.value]);
-          });
-        });
-        _createSharedDataIf(() => {
-          return _setSharedData(__sharedData_VFor0, 6, _toSharedDataBoolean(isFocus.value && inputLength.value === _for_key0.value));
-        }, () => {
-          _renderSharedDataEffect(() => {
-            return _setSharedDataStyle(__sharedData_VFor0, 7, { backgroundColor: __props.color, opacity: cursorOpacity.value });
-          });
-        });
-        return null;
-      }, (__sharedData_VFor0, item, index) => {
-        return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
-      });
-      const _on_focus = () => {
-        return isFocus.value = true;
-      };
-      const _on_blur = () => {
-        return isFocus.value = false;
-      };
-      const n14 = _createSharedDataComponentWithFallback(_component_input, "59ae04fa", {
-        disabled: () => {
-          return __props.disabledKeyboard;
-        },
-        type: "number",
-        focus: () => {
-          return __props.focus;
-        },
-        value: () => {
-          return inputValue.value;
-        },
-        maxlength: () => {
-          return __props.maxlength;
-        },
-        adjustPosition: () => {
-          return __props.adjustPosition;
-        },
-        class: "up-code-input__input",
-        onInput: () => {
-          return inputHandler;
-        },
-        style: () => {
-          return {
-            height: _unref(addUnit)(__props.size)
-          };
-        },
-        onFocus: () => {
-          return _on_focus;
-        },
-        onBlur: () => {
-          return _on_blur;
-        }
-      });
-      _setSharedData(__sharedData, 1, n14?.sharedData);
-      return __sharedData;
-    };
+    const __returned__ = { props, emit, inputValue, isFocus, timer, cursorOpacity, codeLength, codeArray, inputLength, lineStyle, inputHandler, getCodeValue, clearCursorTimer, startCursorTimer, itemStyle, get addUnit() {
+      return addUnit;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-code-input": { "": { "display": "flex", "flexDirection": "row", "position": "relative", "overflow": "hidden" } }, "up-code-input__item": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "position": "relative" } }, "up-code-input__item__text": { "": { "fontSize": 15, "color": "#606266" } }, "up-code-input__item__dot": { "": { "width": 7, "height": 7, "borderTopLeftRadius": 100, "borderTopRightRadius": 100, "borderBottomRightRadius": 100, "borderBottomLeftRadius": 100, "backgroundColor": "#606266" } }, "up-code-input__item__line": { "": { "position": "absolute", "bottom": 0, "height": 4, "borderTopLeftRadius": 100, "borderTopRightRadius": 100, "borderBottomRightRadius": 100, "borderBottomLeftRadius": 100, "width": 40, "backgroundColor": "#606266" } }, "up-code-input__item__cursor": { "": { "position": "absolute", "top": "50%", "left": "50%", "opacity": 1, "transform": "translate(-50%, -50%)", "width": 1, "height": 20 } }, "up-code-input__input": { "": { "position": "absolute", "left": "-750rpx", "width": "1500rpx", "top": 0, "backgroundColor": "rgba(0,0,0,0)", "textAlign": "left" } } };
+const { renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, toDisplayString: _toDisplayString, normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createElementBlock("view", { class: "up-code-input" }, [
+    (_openBlock(true), _createElementBlock(
+      _Fragment,
+      null,
+      _renderList($setup.codeLength, (item, index) => {
+        return _openBlock(), _createElementBlock(
+          "view",
+          {
+            class: "up-code-input__item",
+            style: _normalizeStyle([$setup.itemStyle(index)]),
+            key: index
+          },
+          [
+            $props.dot && $setup.codeArray.length > index ? (_openBlock(), _createElementBlock("view", {
+              key: 0,
+              class: "up-code-input__item__dot"
+            })) : (_openBlock(), _createElementBlock(
+              "text",
+              {
+                key: 1,
+                style: _normalizeStyle({
+                  fontSize: $setup.addUnit($props.fontSize),
+                  fontWeight: $props.bold ? "bold" : "normal",
+                  color: $props.color
+                })
+              },
+              _toDisplayString($setup.getCodeValue(index)),
+              5
+              /* TEXT, STYLE */
+            )),
+            $props.mode == "line" ? (_openBlock(), _createElementBlock(
+              "view",
+              {
+                key: 2,
+                class: "up-code-input__item__line",
+                style: _normalizeStyle([$setup.lineStyle])
+              },
+              null,
+              4
+              /* STYLE */
+            )) : _createCommentVNode("v-if", true),
+            $setup.isFocus && $setup.inputLength === index ? (_openBlock(), _createElementBlock(
+              "view",
+              {
+                key: 3,
+                style: _normalizeStyle({ backgroundColor: $props.color, opacity: $setup.cursorOpacity }),
+                class: "up-code-input__item__cursor"
+              },
+              null,
+              4
+              /* STYLE */
+            )) : _createCommentVNode("v-if", true)
+          ],
+          4
+          /* STYLE */
+        );
+      }),
+      128
+      /* KEYED_FRAGMENT */
+    )),
+    _createElementVNode("input", {
+      disabled: $props.disabledKeyboard,
+      type: "number",
+      focus: $props.focus,
+      value: $setup.inputValue,
+      maxlength: $props.maxlength,
+      adjustPosition: $props.adjustPosition,
+      class: "up-code-input__input",
+      onInput: $setup.inputHandler,
+      style: _normalizeStyle({
+        height: $setup.addUnit($props.size)
+      }),
+      onFocus: _cache[0] || (_cache[0] = ($event) => $setup.isFocus = true),
+      onBlur: _cache[1] || (_cache[1] = ($event) => $setup.isFocus = false)
+    }, null, 44, ["disabled", "focus", "value", "maxlength", "adjustPosition"])
+  ]);
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-code-input/up-code-input.uvue"]]);
 export {
   __easycom_1 as _
 };

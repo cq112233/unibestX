@@ -23,7 +23,7 @@
         </view>
       </view>
     </view>
-    
+
     <up-picker :show="pickerShow1" :columns="columns1" @confirm="onConfirm1" @cancel="pickerShow1 = false"></up-picker>
     <up-picker :show="pickerShow2" :columns="columns2" @confirm="onConfirm2" @cancel="pickerShow2 = false"></up-picker>
     <up-picker :show="pickerShow3" :columns="columns1" :loading="true" @confirm="onConfirm3" @cancel="pickerShow3 = false"></up-picker>
@@ -38,11 +38,11 @@ const pickerShow2 = ref(false)
 const pickerShow3 = ref(false)
 
 const columns1 = ref([
-  ['中国', '美国', '日本', '英国']
+  ['中国', '美国', '日本', '英国'],
 ])
 const columns2 = ref([
   ['亚洲', '欧洲'],
-  ['中国', '英国']
+  ['中国', '英国'],
 ])
 
 function showPicker1() {

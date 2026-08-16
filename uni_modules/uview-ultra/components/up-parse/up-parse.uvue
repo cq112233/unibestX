@@ -493,7 +493,7 @@ function onRootClick(): void {
 	emit('click')
 }
 
-watch(() => props.content, (value: string) => {
+watch((): string => props.content, (value: string) => {
 	setContent(value, false)
 }, { immediate: true })
 

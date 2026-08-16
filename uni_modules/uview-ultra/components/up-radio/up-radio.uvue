@@ -2,7 +2,7 @@
 	<view
 	    class="up-radio cursor-pointer"
 		@tap.stop="wrapperClickHandler"
-	    :style="[radioStyle]"
+	    :style="radioStyle"
 	    :class="['up-radio-label--' + elIconPlacement,
 			(elBorderBottom && elPlacement == 'column') ? 'up-border-bottom' : '']"
 	>
@@ -10,7 +10,7 @@
 		    class="up-radio__icon-wrap cursor-pointer"
 		    @tap.stop="iconClickHandler"
 		    :class="iconClasses"
-		    :style="[iconWrapStyle]"
+		    :style="iconWrapStyle"
 		>
 			<slot name="icon">
 				<up-icon
@@ -99,11 +99,17 @@ const props = defineProps({
 
 const emit = defineEmits(['change'])
 const instance = getCurrentInstance()
-const parentGroup = inject<any>('upRadioGroup', null)
+const parentProps = inject<ComputedRef<UTSJSONObject> | null>('upRadioGroupProps', null)
+const parentSelect = inject<((val: any) => void) | null>('upRadioGroupSelect', null)
+
+const parentGroupProps = computed((): UTSJSONObject | null => {
+	if (parentProps == null) return null
+	return parentProps!.value
+})
 
 const checked = computed<boolean>(() => {
-	if (parentGroup != null && parentGroup.props != null) {
-		const groupVal = parentGroup.props.modelValue
+	if (parentGroupProps.value != null) {
+		const groupVal = parentGroupProps.value!['modelValue']
 		if (groupVal != null && props.name != null) {
 			return groupVal.toString() == props.name.toString()
 		}
@@ -113,82 +119,83 @@ const checked = computed<boolean>(() => {
 
 const elDisabled = computed<boolean>(() => {
 	if (props.disabled) return true
-	if (parentGroup != null && parentGroup.props != null) {
-		return parentGroup.props.disabled ?? false
+	if (parentGroupProps.value != null) {
+		return (parentGroupProps.value!['disabled'] as boolean | null) ?? false
 	}
 	return false
 })
 
 const elLabelDisabled = computed<boolean>(() => {
 	if (props.labelDisabled) return true
-	if (parentGroup != null && parentGroup.props != null) {
-		return parentGroup.props.labelDisabled ?? false
+	if (parentGroupProps.value != null) {
+		return (parentGroupProps.value!['labelDisabled'] as boolean | null) ?? false
 	}
 	return false
 })
 
 const elSize = computed<string>(() => {
 	if (props.size != '') return addUnit(props.size)
-	if (parentGroup != null && parentGroup.props != null && parentGroup.props.size != '') {
-		return addUnit(parentGroup.props.size)
+	if (parentGroupProps.value != null && (parentGroupProps.value!['size'] ?? '') != '') {
+		return addUnit(parentGroupProps.value!['size']!)
 	}
 	return '21px'
 })
 
 const elIconSize = computed<string>(() => {
 	if (props.iconSize != '') return addUnit(props.iconSize)
-	if (parentGroup != null && parentGroup.props != null && parentGroup.props.iconSize != '') {
-		return addUnit(parentGroup.props.iconSize)
+	if (parentGroupProps.value != null && (parentGroupProps.value!['iconSize'] ?? '') != '') {
+		return addUnit(parentGroupProps.value!['iconSize']!)
 	}
 	return '12px'
 })
 
 const elActiveColor = computed<string>(() => {
 	if (props.activeColor != '') return props.activeColor
-	if (parentGroup != null && parentGroup.props != null && parentGroup.props.activeColor != '') {
-		return parentGroup.props.activeColor
+	if (parentGroupProps.value != null && (parentGroupProps.value!['activeColor'] ?? '') != '') {
+		return (parentGroupProps.value!['activeColor'] as string)
 	}
 	return ''
 })
 
 const elInactiveColor = computed<string>(() => {
 	if (props.inactiveColor != '') return props.inactiveColor
-	if (parentGroup != null && parentGroup.props != null && parentGroup.props.inactiveColor != '') {
-		return parentGroup.props.inactiveColor
+	if (parentGroupProps.value != null && (parentGroupProps.value!['inactiveColor'] ?? '') != '') {
+		return (parentGroupProps.value!['inactiveColor'] as string)
 	}
 	return '#c8c9cc'
 })
 
 const elLabelColor = computed<string>(() => {
 	if (props.labelColor != '') return props.labelColor
-	if (parentGroup != null && parentGroup.props != null && parentGroup.props.labelColor != '') {
-		return parentGroup.props.labelColor
+	if (parentGroupProps.value != null && (parentGroupProps.value!['labelColor'] ?? '') != '') {
+		return (parentGroupProps.value!['labelColor'] as string)
 	}
 	return '#606266'
 })
 
 const elShape = computed<string>(() => {
 	if (props.shape != '') return props.shape
-	if (parentGroup != null && parentGroup.props != null && parentGroup.props.shape != '') {
-		return parentGroup.props.shape
+	if (parentGroupProps.value != null && (parentGroupProps.value!['shape'] ?? '') != '') {
+		return (parentGroupProps.value!['shape'] as string)
 	}
 	return 'circle'
 })
 
 const elLabelSize = computed<string>(() => {
 	if (props.labelSize != '') return addUnit(props.labelSize)
-	if (parentGroup != null && parentGroup.props != null && parentGroup.props.labelSize != '') {
-		return addUnit(parentGroup.props.labelSize)
+	if (parentGroupProps.value != null && (parentGroupProps.value!['labelSize'] ?? '') != '') {
+		return addUnit(parentGroupProps.value!['labelSize']!)
 	}
 	return '15px'
 })
 
 const elIconColor = computed<string>(() => {
 	let iconColorStr = '#ffffff'
+	const parentColor = parentGroupProps.value != null ? (parentGroupProps.value!['iconColor'] as string | null) : null
 	if (props.iconColor != '') {
 		iconColorStr = props.iconColor
-	} else if (parentGroup != null && parentGroup.props != null && parentGroup.props.iconColor != '') {
-		iconColorStr = parentGroup.props.iconColor
+	} else if (parentColor != null && parentColor != '') {
+		iconColorStr = parentColor
 	}
 	if (elDisabled.value) {
 		return checked.value ? elInactiveColor.value : 'transparent'
@@ -197,27 +204,27 @@ const elIconColor = computed<string>(() => {
 })
 
 const elIconPlacement = computed<string>(() => {
-	if (parentGroup != null && parentGroup.props != null && parentGroup.props.iconPlacement != '') {
-		return parentGroup.props.iconPlacement
+	if (parentGroupProps.value != null && (parentGroupProps.value!['iconPlacement'] ?? '') != '') {
+		return (parentGroupProps.value!['iconPlacement'] as string)
 	}
 	return 'left'
 })
 
 const elBorderBottom = computed<boolean>(() => {
-	if (parentGroup != null && parentGroup.props != null) {
-		return parentGroup.props.borderBottom ?? false
+	if (parentGroupProps.value != null) {
+		return (parentGroupProps.value!['borderBottom'] as boolean | null) ?? false
 	}
 	return false
 })
 
 const elPlacement = computed<string>(() => {
-	if (parentGroup != null && parentGroup.props != null) {
-		return parentGroup.props.placement ?? 'row'
+	if (parentGroupProps.value != null) {
+		return (parentGroupProps.value!['placement'] as string | null) ?? 'row'
 	}
 	return 'row'
 })
 
-const iconClasses = computed<string>(() => {
+const iconClasses = computed((): string => {
 	let classes = ['up-radio__icon-wrap--' + elShape.value]
 	if (elDisabled.value) {
 		classes.push('up-radio__icon-wrap--disabled')
@@ -227,6 +234,8 @@ const iconClasses = computed<string>(() => {
 	}
 	if (checked.value && !elDisabled.value) {
 		classes.push('up-radio__icon-wrap--checked')
+	} else if (!checked.value && !elDisabled.value) {
+		classes.push('up-radio__icon-wrap--unchecked')
 	}
 	return classes.join(' ')
 })
@@ -238,15 +247,15 @@ const iconWrapStyle = computed<UTSJSONObject>(() => {
 			style['backgroundColor'] = elActiveColor.value
 			style['borderColor'] = elActiveColor.value
 		}
-	} else if (checked.value && elDisabled.value) {
-		style['backgroundColor'] = '#ebedf0'
-		style['borderColor'] = '#c8c9cc'
-	} else {
-		style['backgroundColor'] = '#ffffff'
-		style['borderColor'] = elInactiveColor.value
+	} else if (!checked.value && !elDisabled.value) {
+		if (elInactiveColor.value != '' && elInactiveColor.value != '#c8c9cc') {
+			style['borderColor'] = elInactiveColor.value
+		}
 	}
-	style['width'] = elSize.value
-	style['height'] = elSize.value
+	if (elSize.value != '') {
+		style['width'] = elSize.value
+		style['height'] = elSize.value
+	}
 	if (elIconPlacement.value == 'right') {
 		style['marginRight'] = 0
 	}
@@ -262,12 +271,14 @@ const radioStyle = computed<UTSJSONObject>(() => {
 })
 
 function setRadioCheckedStatus(): void {
-	if (parentGroup != null) {
-		parentGroup.onRadioSelected(props.name)
+	if (parentSelect != null) {
+		parentSelect!(props.name)
 	}
 	emit('change', props.name)
 	nextTick(() => {
-		formValidate(instance?.proxy, 'change')
+		if (instance?.proxy != null) {
+			formValidate(instance!.proxy!, 'change')
+		}
 	})
 }
 
@@ -351,6 +362,11 @@ function labelClickHandler(e: UniEvent): void {
 			&--square {
 				border-radius: $up-radio-square-border-radius;
 			}
+
+			&--unchecked {
+				background-color: #ffffff;
+				border-color: $up-radio-wrap-border-color;
+			}
 			
 			&--checked {
 				color: $up-radio-checked-color;
@@ -360,6 +376,7 @@ function labelClickHandler(e: UniEvent): void {
 			
 			&--disabled {
 				background-color: $up-radio-disabled-background-color !important;
+				border-color: $up-radio-disabled--checked-color !important;
 			}
 			
 			&--disabled--checked {

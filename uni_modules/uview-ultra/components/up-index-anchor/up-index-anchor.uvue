@@ -3,17 +3,11 @@
 	    class="up-index-anchor up-border-bottom"
 		:class="{ 'up-index-anchor--sticky': parentSticky }"
 		:ref="`up-index-anchor-${textName}`"
-	    :style="{
-			height: addUnit(height),
-			backgroundColor: bgColor
-		}"
+	    :style="anchorStyle"
 	>
 		<text
 		    class="up-index-anchor__text"
-		    :style="{
-				fontSize: addUnit(size),
-				color: color
-			}"
+		    :style="textStyle"
 		>{{ textName }}</text>
 	</view>
 </template>
@@ -68,6 +62,20 @@
 		} else {
 			return false
 		}
+	})
+
+	const anchorStyle = computed((): UTSJSONObject => {
+		return {
+			height: addUnit(props.height),
+			backgroundColor: props.bgColor
+		} as UTSJSONObject
+	})
+
+	const textStyle = computed((): UTSJSONObject => {
+		return {
+			fontSize: addUnit(props.size),
+			color: props.color
+		} as UTSJSONObject
 	})
 	
 	const init = function() {

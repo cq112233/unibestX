@@ -114,7 +114,7 @@ function confirm(e: UTSJSONObject): void {
 	emit('confirm')
 }
 
-watch(() => [props.modelValue, props.options], () => {
+watch((): Array<any | null> => [props.modelValue, props.options] as Array<any | null>, () => {
 	syncCurrent()
 }, { immediate: true, deep: true })
 </script>

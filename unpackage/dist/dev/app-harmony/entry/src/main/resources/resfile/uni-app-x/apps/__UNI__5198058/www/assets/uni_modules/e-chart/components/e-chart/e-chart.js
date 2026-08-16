@@ -1,17 +1,12 @@
 import { W as WebviewEchart } from "./uts/WebviewEchart.js";
 import { g as getRandomId, a as addUnitRpx } from "./uts/util.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, unref: _unref, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData } = globalThis.Vue;
-const __className = "GenUniModulesEChartComponentsEChartEChart";
-const { computed, ref, watch, onMounted } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineComponent: _defineComponent } = globalThis.Vue;
+const { computed, ref, watch, onMounted, getCurrentInstance } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "e-chart"
   },
-  __dynamicSharedData: true,
-  __hash: "6604b9e4",
-  __className,
-  __filename: "uni_modules/e-chart/components/e-chart/e-chart.uvue",
   __name: "e-chart",
   props: {
     width: {
@@ -34,10 +29,9 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   emits: ["ready"],
   setup(__props, _a) {
     var __expose = _a.expose, __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesEChartComponentsEChartEChartSharedData", sharedDataClassId: 0 })));
     const emit = __emit;
     const props = __props;
+    const instance = getCurrentInstance();
     const echartObj = ref(null);
     const canvasId = getRandomId();
     const canvasStyle = computed(() => {
@@ -47,14 +41,30 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       emit("ready");
     }
     function initAPP(option) {
-      const ctx = uni.createWebviewContext(canvasId);
-      if (ctx == null) {
-        uni.__f__("error", "at uni_modules/e-chart/components/e-chart/e-chart.uvue:172", "初始化echart的webview失败");
-        return null;
+      var _a2;
+      let elem = null;
+      let ctx = null;
+      try {
+        const el = uni.getElementById(canvasId);
+        if (el != null) {
+          elem = el;
+        }
+      } catch (_e) {
       }
-      echartObj.value = new WebviewEchart(ctx);
+      if (elem == null) {
+        try {
+          ctx = uni.createWebviewContext(canvasId);
+        } catch (_e) {
+        }
+      }
+      echartObj.value = new WebviewEchart(canvasId, ctx, elem);
       echartObj.value.init(props.theme);
-      setOption(option);
+      (_a2 = echartObj.value) === null || _a2 === void 0 ? null : _a2.setOption(option);
+      setTimeout(() => {
+        var _a3, _b;
+        (_a3 = echartObj.value) === null || _a3 === void 0 ? null : _a3.init(props.theme);
+        (_b = echartObj.value) === null || _b === void 0 ? null : _b.setOption(option);
+      }, 120);
       return new UTSJSONObject({ echartObj: echartObj.value });
     }
     async function init(option) {
@@ -131,7 +141,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       (_a2 = echartObj.value) === null || _a2 === void 0 ? null : _a2.onWebviewMsg(e);
     }
     function onWebviewError(e) {
-      uni.__f__("error", "at uni_modules/e-chart/components/e-chart/e-chart.uvue:411", "onWebviewError:", e);
+      uni.__f__("error", "at uni_modules/e-chart/components/e-chart/e-chart.uvue:434", "onWebviewError:", e);
     }
     watch(() => {
       return props.width;
@@ -144,7 +154,6 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       resize();
     });
     onMounted(() => {
-      onCanvasReady();
     });
     __expose({
       init,
@@ -159,44 +168,28 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       hideLoading,
       onCanvasReady
     });
-    return () => {
-      "raw js";
-      const _component_web_view = _resolveComponent("web-view");
-      const n0 = _createSharedDataComponentWithFallback(
-        _component_web_view,
-        "8080c770",
-        {
-          id: () => {
-            return _unref(canvasId);
-          },
-          style: () => {
-            return canvasStyle.value;
-          },
-          bounces: false,
-          horizontalScrollBarAccess: false,
-          verticalScrollBarAccess: false,
-          "webview-styles": { progress: false },
-          src: "/uni_modules/e-chart/static/app/webview.html",
-          onLoad: () => {
-            return onCanvasReady;
-          },
-          onError: () => {
-            return onWebviewError;
-          },
-          onMessage: () => {
-            return onWebviewMsg;
-          }
-        },
-        null,
-        1
-        /* SINGLE_ROOT */
-      );
-      _setSharedData(__sharedData, 0, n0?.sharedData);
-      return __sharedData;
-    };
+    const __returned__ = { emit, props, instance, echartObj, canvasId, canvasStyle, onCanvasReady, initAPP, init, getEchartObj, setOption, getOption, getWidth, getHeight, resize, canvasToTempFilePath, showLoading, hideLoading, onWebviewMsg, onWebviewError };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
+const { normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createElementBlock("web-view", {
+    id: $setup.canvasId,
+    style: _normalizeStyle($setup.canvasStyle),
+    bounces: false,
+    horizontalScrollBarAccess: false,
+    verticalScrollBarAccess: false,
+    "webview-styles": { progress: false },
+    src: "/uni_modules/e-chart/static/app/webview.html",
+    onLoad: $setup.onCanvasReady,
+    onError: $setup.onWebviewError,
+    onMessage: $setup.onWebviewMsg
+  }, null, 44, ["id"]);
+}
+const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/e-chart/components/e-chart/e-chart.uvue"]]);
 export {
-  _sfc_main as _
+  __easycom_0 as _
 };
 //# sourceMappingURL=e-chart.js.map

@@ -3,9 +3,7 @@
 		<view
 			class="up-navbar__placeholder"
 			v-if="fixed && placeholder"
-			:style="{
-				height: placeholderHeight,
-			}"
+			:style="placeholderStyle"
 		></view>
 		<view :class="[fixed ? 'up-navbar--fixed' : '']">
 			<up-status-bar
@@ -15,10 +13,7 @@
 			<view
 				class="up-navbar__content"
 				:class="[border ? 'up-border-bottom' : '']"
-				:style="{
-					height: addUnit(height),
-					backgroundColor: bgColor,
-				}"
+				:style="contentStyle"
 			>
 				<view
 					class="up-navbar__content__left"
@@ -35,9 +30,7 @@
 						></up-icon>
 						<text
 							v-if="leftText != ''"
-							:style="{
-								color: leftIconColor
-							}"
+							:style="leftTextStyle"
 							class="up-navbar__content__left__text"
 						>{{ leftText }}</text>
 					</slot>
@@ -45,9 +38,7 @@
 				<slot name="center">
 					<text
 						class="up-line-1 up-navbar__content__title"
-						:style="[{
-							width: addUnit(titleWidth),
-						}, addStyle(titleStyle)]"
+						:style="mergedTitleStyle"
 					>{{ title }}</text>
 				</slot>
 				<view
@@ -74,7 +65,7 @@
 
 <script setup lang="uts">
 import { computed } from 'vue'
-import { addUnit, addStyle, getPx } from '../../libs/function/index'
+import { addUnit, addStyle, getPx, deepMerge } from '../../libs/function/index.uts'
 
 defineOptions({
   name: 'up-navbar'
@@ -156,6 +147,33 @@ const emit = defineEmits(['leftClick', 'rightClick'])
 const placeholderHeight = computed<string>(() => {
   const statusBarHeight = uni.getSystemInfoSync().statusBarHeight
   return addUnit(parseInt(getPx(props.height)) + statusBarHeight, 'px')
+})
+
+const placeholderStyle = computed((): UTSJSONObject => {
+  return {
+    height: placeholderHeight.value
+  } as UTSJSONObject
+})
+
+const contentStyle = computed((): UTSJSONObject => {
+  return {
+    height: addUnit(props.height),
+    backgroundColor: props.bgColor
+  } as UTSJSONObject
+})
+
+const leftTextStyle = computed((): UTSJSONObject => {
+  return {
+    color: props.leftIconColor
+  } as UTSJSONObject
+})
+
+const mergedTitleStyle = computed((): UTSJSONObject => {
+  const custom = addStyle(props.titleStyle) as UTSJSONObject
+  const base = {
+    width: addUnit(props.titleWidth)
+  } as UTSJSONObject
+  return deepMerge(base, custom) as UTSJSONObject
 })
 
 function leftClick(): void {

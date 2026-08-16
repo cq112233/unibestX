@@ -4,14 +4,11 @@
 			class="up-swiper-indicator__wrapper"
 			v-if="indicatorMode === 'line'"
 			:class="[`up-swiper-indicator__wrapper--${indicatorMode}`]"
-			:style="{
-				width: addUnit(lineWidth * (parseInt(length.toString()))),
-				backgroundColor: indicatorInactiveColor
-			}"
+			:style="lineWrapperStyle"
 		>
 			<view
 				class="up-swiper-indicator__wrapper--line__bar"
-				:style="[lineStyle]"
+				:style="lineStyle"
 			></view>
 		</view>
 		<view
@@ -23,7 +20,7 @@
 				v-for="(item, index) in lengthArray"
 				:key="index"
 				:class="[index === parseInt(current.toString()) ? 'up-swiper-indicator__wrapper__dot--active' : '']"
-				:style="[dotStyle(index)]"
+				:style="dotStyle(index)"
 			>
 			</view>
 		</view>
@@ -79,6 +76,13 @@ const lineStyle = computed<UTSJSONObject>(() => {
   style['transform'] = `translateX(${addUnit(parseInt(props.current.toString()) * lineWidth.value)})`
   style['backgroundColor'] = props.indicatorActiveColor
   return style
+})
+
+const lineWrapperStyle = computed((): UTSJSONObject => {
+  return {
+    width: addUnit(lineWidth.value * parseInt(props.length.toString())),
+    backgroundColor: props.indicatorInactiveColor
+  } as UTSJSONObject
 })
 
 function dotStyle(index: number): UTSJSONObject {
