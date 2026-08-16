@@ -745,8 +745,25 @@ export function rsaVerifyUts(digestHex: string, hashType: string, publicKey: str
   return true
 }
 
-// ---- RSA 密钥对生成（纯 JS / BigInt，支持微信小程序 / H5 / 全端） ----
+// ---- RSA 密钥对生成 ----
 
+// #ifdef APP-ANDROID
+/**
+ * Android 原生 KeyPairGenerator 生成 RSA 密钥对
+ * @param bits 密钥长度（建议 1024）
+ * @returns JSON：{"publicKey":"SPKI-Base64","privateKey":"PKCS8-Base64"}
+ */
+export function rsaGenerateKeyPairUts(bits: number): string {
+  const kpg = java.security.KeyPairGenerator.getInstance('RSA')
+  kpg.initialize(bits.toInt())
+  const kp = kpg.generateKeyPair()
+  const pubB64 = android.util.Base64.encodeToString(kp.getPublic().getEncoded(), android.util.Base64.NO_WRAP)
+  const priB64 = android.util.Base64.encodeToString(kp.getPrivate().getEncoded(), android.util.Base64.NO_WRAP)
+  return '{"publicKey":"' + pubB64 + '","privateKey":"' + priB64 + '"}'
+}
+// #endif
+
+// #ifndef APP-ANDROID
 function bigIntToDerInteger(n: any): Uint8Array {
   let hex: string = n.toString(16)
   if (hex.length % 2 != 0) {
@@ -970,3 +987,4 @@ export function rsaGenerateKeyPairUts(bits: number): string {
 
   return '{"publicKey":"' + pubB64 + '","privateKey":"' + priB64 + '"}'
 }
+// #endif

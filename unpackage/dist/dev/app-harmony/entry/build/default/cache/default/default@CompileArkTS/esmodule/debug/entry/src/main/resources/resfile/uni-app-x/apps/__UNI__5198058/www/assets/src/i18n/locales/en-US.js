@@ -15,7 +15,6 @@ const basic = new UTSJSONObject({
   svgAuthWarning: "SVG mode requires authorization & fee",
   langTitle: "Language Settings",
   langPreview: "Multi-language Preview",
-  uviewPreview: "UI Library (uView-Ultra) Preview",
   themeTitle: "Theme Settings",
   themePreview: "Theme Color Preview",
   themeButton: "Theme Button",

@@ -1,9 +1,7 @@
 <script setup lang="uts">
 import { checkDirectEntry } from './src/router/interceptor'
-import { loadFont } from '@/uni_modules/uview-ultra/index.uts'
 
 onLaunch(() => {
-  loadFont()
   // #ifdef MP-WEIXIN
   // 微信小程序真机 @font-face 不生效，使用 uni.loadFontFace 加载 uni-icons 字体
   uni.loadFontFace({
@@ -29,13 +27,14 @@ onShow((options?) => {
 
 <style lang="scss">
 /* uni.scss */
-@import '@/uni_modules/uview-ultra/index.scss';
+@import '@/uni_modules/rice-ui/libs/style/index.css';
+@import '@/uni_modules/rice-ui/libs/style/variables.css';
+@import '@/src/style/theme.css';
 @import './src/style/index.scss';
 @import './js_sdk/a-hua-unocss/temp.scss';
 
 /* #ifdef MP-WEIXIN */
 /* 微信小程序真机：在全局 app.wxss 中注册字体，确保组件内可用 */
 @import '@/uni_modules/uni-icons/components/uni-icons/uniicons_mp.css';
-@import '@/uni_modules/uview-ultra/components/up-icon/upicon_mp.css';
 /* #endif */
 </style>

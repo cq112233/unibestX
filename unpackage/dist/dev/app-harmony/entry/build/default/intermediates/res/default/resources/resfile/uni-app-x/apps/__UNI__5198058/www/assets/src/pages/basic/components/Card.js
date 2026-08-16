@@ -2,6 +2,25 @@ import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
 const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
 const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedData: _setSharedData, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataSlot: _createSharedDataSlot } = globalThis.Vue;
 const __className = "GenSrcPagesBasicComponentsCard";
+class CardProps extends UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          title: { type: String, optional: true }
+        };
+      },
+      name: "CardProps"
+    };
+  }
+  constructor(options, metadata = CardProps.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.title = this.__props__.title;
+    delete this.__props__;
+  }
+}
 const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   __dynamicSharedData: true,
   __hash: "00039df3",
@@ -9,10 +28,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   __filename: "src/pages/basic/components/Card.uvue",
   __name: "Card",
   props: {
-    title: {
-      type: String,
-      default: "默认标题"
-    }
+    title: { default: "默认标题", type: String }
   },
   setup(__props) {
     const __sharedDataScope = _useSharedDataScope();

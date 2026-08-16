@@ -1,5 +1,5 @@
 <template>
-  <Card :title="$t('basic.echartTitle')">
+  <Card :title="echartTitle">
     <view class="w-full h-260px mt-10px">
       <e-chart ref="echartRef" class="w-full !h-full" @ready="initEchart" />
     </view>
@@ -7,37 +7,43 @@
       <view class="flex-1 mr-8px">
         <view
           class="w-full h-36px rounded-8px flex flex-row items-center justify-center"
-          :class="currentType !== 'line' ? 'bg-[#e0edff]' : 'bg-[#3b82f6]'"
+          :class="currentType != 'line' ? 'bg-[#e0edff]' : 'bg-[#3b82f6]'"
           @click="changeToLine"
         >
           <text
             class="text-12px font-bold"
-            :class="currentType !== 'line' ? 'text-[#3b82f6]' : 'text-[#ffffff]'"
-          >{{ $t('basic.echartLine') }}</text>
+            :class="currentType != 'line' ? 'text-[#3b82f6]' : 'text-[#ffffff]'"
+          >
+            {{ echartLineText }}
+          </text>
         </view>
       </view>
       <view class="flex-1 mr-8px">
         <view
           class="w-full h-36px rounded-8px flex flex-row items-center justify-center"
-          :class="currentType !== 'bar' ? 'bg-[#d1fae5]' : 'bg-[#10b981]'"
+          :class="currentType != 'bar' ? 'bg-[#d1fae5]' : 'bg-[#10b981]'"
           @click="changeToBar"
         >
           <text
             class="text-12px font-bold"
-            :class="currentType !== 'bar' ? 'text-[#10b981]' : 'text-[#ffffff]'"
-          >{{ $t('basic.echartBar') }}</text>
+            :class="currentType != 'bar' ? 'text-[#10b981]' : 'text-[#ffffff]'"
+          >
+            {{ echartBarText }}
+          </text>
         </view>
       </view>
       <view class="flex-1">
         <view
           class="w-full h-36px rounded-8px flex flex-row items-center justify-center"
-          :class="currentType !== 'pie' ? 'bg-[#fef3c7]' : 'bg-[#f59e0b]'"
+          :class="currentType != 'pie' ? 'bg-[#fef3c7]' : 'bg-[#f59e0b]'"
           @click="changeToPie"
         >
           <text
             class="text-12px font-bold"
-            :class="currentType !== 'pie' ? 'text-[#f59e0b]' : 'text-[#ffffff]'"
-          >{{ $t('basic.echartPie') }}</text>
+            :class="currentType != 'pie' ? 'text-[#f59e0b]' : 'text-[#ffffff]'"
+          >
+            {{ echartPieText }}
+          </text>
         </view>
       </view>
     </view>
@@ -51,7 +57,11 @@ import { systemInfo } from '@/src/utils/systemInfo'
 import { $t } from '@/src/utils/i18n'
 
 const echartRef = ref<ComponentPublicInstance | null>(null)
-const currentType = ref('line')
+const currentType = ref<string>('line')
+const echartTitle = computed((): string => $t('basic.echartTitle'))
+const echartLineText = computed((): string => $t('basic.echartLine'))
+const echartBarText = computed((): string => $t('basic.echartBar'))
+const echartPieText = computed((): string => $t('basic.echartPie'))
 const gridKey = 'gr' + 'id'
 
 const lineOption = {

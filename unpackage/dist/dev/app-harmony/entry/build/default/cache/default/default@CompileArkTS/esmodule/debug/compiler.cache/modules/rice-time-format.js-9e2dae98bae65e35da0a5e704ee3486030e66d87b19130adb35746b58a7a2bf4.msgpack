@@ -1,0 +1,416 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚôimport "./type.js";
+import "../../libs/use/useCountDown/index.js";
+import "../../libs/store/useConfig.js";
+import { u as useNamespace } from "../../libs/use/useNamespace/index.js";
+import "../../libs/use/usePopup/index.js";
+import "../../libs/use/useRelation/useChildren.js";
+import "../../libs/use/useRelation/useParent.js";
+import "../../libs/use/useSafeArea/index.js";
+import "../../libs/use/useTouch/index.js";
+import "../../libs/plugin/coloruts/constant.js";
+import "../../libs/plugin/coloruts/type.js";
+import { d as dateuts } from "../../libs/plugin/dateuts/index.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataClass: _setSharedDataClass, unref: _unref, setSharedData: _setSharedData, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect } = globalThis.Vue;
+const __className = "GenUniModulesRiceUiComponentsRiceTimeFormatRiceTimeFormat";
+const { ref, watch } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  ...{
+    name: "rice-time-format",
+    styleIsolation: "app-and-page"
+  },
+  __dynamicSharedData: true,
+  __hash: "37f5d6bf",
+  __className,
+  __filename: "uni_modules/rice-ui/components/rice-time-format/rice-time-format.uvue",
+  __name: "rice-time-format",
+  props: {
+    timestamp: { type: Number },
+    format: { default: "YYYY-MM-DD HH:mm", type: String },
+    futureRelative: { type: Boolean, default: true }
+  },
+  setup(__props) {
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesRiceUiComponentsRiceTimeFormatRiceTimeFormatSharedData", sharedDataClassId: 0 })));
+    const ns = useNamespace("time-format");
+    const props = __props;
+    const timeValue = ref("");
+    const isValidDate = (date) => {
+      return !isNaN(date.getTime());
+    };
+    const getRelativeTime = (date) => {
+      const currentTimestamp = Date.now();
+      const targetTimestamp = date.valueOf();
+      const todayStart = dateuts(currentTimestamp).startOf("day").valueOf();
+      const tomorrowStart = todayStart + 24 * 60 * 60 * 1e3;
+      const yesterdayStart = todayStart - 24 * 60 * 60 * 1e3;
+      if (targetTimestamp > currentTimestamp) {
+        if (props.futureRelative != true) {
+          return date.format("YYYY-MM-DD HH:mm");
+        }
+        if (targetTimestamp < tomorrowStart) {
+          const diffMs = targetTimestamp - currentTimestamp;
+          if (diffMs < 60 * 1e3) {
+            return "ç¨åŽ";
+          }
+          const diffMinutes = Math.floor(diffMs / (60 * 1e3));
+          if (diffMinutes < 60) {
+            return `${diffMinutes}åˆ†é’ŸåŽ`;
+          }
+          const diffHours = Math.floor(diffMs / (60 * 60 * 1e3));
+          return `${diffHours}å°æ—¶åŽ`;
+        }
+        if (targetTimestamp < tomorrowStart + 24 * 60 * 60 * 1e3) {
+          return `æ˜Žå¤© ${date.format("HH:mm")}`;
+        }
+        return date.format("YYYY-MM-DD HH:mm");
+      }
+      if (targetTimestamp >= todayStart) {
+        const diffMs = currentTimestamp - targetTimestamp;
+        if (diffMs < 60 * 1e3) {
+          return "åˆšåˆš";
+        }
+        const diffMinutes = Math.floor(diffMs / (60 * 1e3));
+        if (diffMinutes < 60) {
+          return `${diffMinutes}åˆ†é’Ÿå‰`;
+        }
+        const diffHours = Math.floor(diffMs / (60 * 60 * 1e3));
+        return `${diffHours}å°æ—¶å‰`;
+      }
+      if (targetTimestamp >= yesterdayStart) {
+        return `æ˜¨å¤© ${date.format("HH:mm")}`;
+      }
+      return date.format("YYYY-MM-DD HH:mm");
+    };
+    const normalizeTimestamp = (timestamp) => {
+      const absTimestamp = Math.abs(timestamp);
+      if (absTimestamp > 0 && absTimestamp < 1e11) {
+        return timestamp * 1e3;
+      }
+      return timestamp;
+    };
+    const initFormatTime = () => {
+      const time = normalizeTimestamp(props.timestamp);
+      const targetDate = new Date(time);
+      if (!isValidDate(targetDate)) {
+        timeValue.value = "";
+        return null;
+      }
+      const date = dateuts(targetDate);
+      if (props.format == "relative") {
+        timeValue.value = getRelativeTime(date);
+        return null;
+      }
+      timeValue.value = date.format(props.format);
+    };
+    initFormatTime();
+    watch(() => {
+      return props.format;
+    }, () => {
+      initFormatTime();
+    });
+    watch(() => {
+      return props.timestamp;
+    }, () => {
+      initFormatTime();
+    });
+    watch(() => {
+      return props.futureRelative;
+    }, () => {
+      initFormatTime();
+    });
+    return () => {
+      "raw js";
+      _renderSharedDataEffect(() => {
+        _setSharedDataClass(__sharedData, 0, ["rice-time-format", _unref(ns).theme()]);
+        _setSharedData(__sharedData, 1, _toDisplayString(_unref(timeValue)));
+      });
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=rice-time-format.js.map
+ÂÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-time-format/type.jsÙÉ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useCountDown/index.jsÙÂ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/store/useConfig.jsÙÉ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useNamespace/index.jsÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/usePopup/index.jsÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useRelation/useChildren.jsÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useRelation/useParent.jsÙÈ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useSafeArea/index.jsÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useTouch/index.jsÙË/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/plugin/coloruts/constant.jsÙÇ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/plugin/coloruts/type.jsÙÇ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/plugin/dateuts/index.jsÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-time-format/rice-time-format.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ‘ÔrD’²hostDependencyName®hostModuleNameÙR../../../../../uni_modules/rice-ui/components/rice-time-format/rice-time-format.js¥entryÃÚôimport "./type.js";
+import "../../libs/use/useCountDown/index.js";
+import "../../libs/store/useConfig.js";
+import { u as useNamespace } from "../../libs/use/useNamespace/index.js";
+import "../../libs/use/usePopup/index.js";
+import "../../libs/use/useRelation/useChildren.js";
+import "../../libs/use/useRelation/useParent.js";
+import "../../libs/use/useSafeArea/index.js";
+import "../../libs/use/useTouch/index.js";
+import "../../libs/plugin/coloruts/constant.js";
+import "../../libs/plugin/coloruts/type.js";
+import { d as dateuts } from "../../libs/plugin/dateuts/index.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataClass: _setSharedDataClass, unref: _unref, setSharedData: _setSharedData, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect } = globalThis.Vue;
+const __className = "GenUniModulesRiceUiComponentsRiceTimeFormatRiceTimeFormat";
+const { ref, watch } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  ...{
+    name: "rice-time-format",
+    styleIsolation: "app-and-page"
+  },
+  __dynamicSharedData: true,
+  __hash: "37f5d6bf",
+  __className,
+  __filename: "uni_modules/rice-ui/components/rice-time-format/rice-time-format.uvue",
+  __name: "rice-time-format",
+  props: {
+    timestamp: { type: Number },
+    format: { default: "YYYY-MM-DD HH:mm", type: String },
+    futureRelative: { type: Boolean, default: true }
+  },
+  setup(__props) {
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesRiceUiComponentsRiceTimeFormatRiceTimeFormatSharedData", sharedDataClassId: 0 })));
+    const ns = useNamespace("time-format");
+    const props = __props;
+    const timeValue = ref("");
+    const isValidDate = (date) => {
+      return !isNaN(date.getTime());
+    };
+    const getRelativeTime = (date) => {
+      const currentTimestamp = Date.now();
+      const targetTimestamp = date.valueOf();
+      const todayStart = dateuts(currentTimestamp).startOf("day").valueOf();
+      const tomorrowStart = todayStart + 24 * 60 * 60 * 1e3;
+      const yesterdayStart = todayStart - 24 * 60 * 60 * 1e3;
+      if (targetTimestamp > currentTimestamp) {
+        if (props.futureRelative != true) {
+          return date.format("YYYY-MM-DD HH:mm");
+        }
+        if (targetTimestamp < tomorrowStart) {
+          const diffMs = targetTimestamp - currentTimestamp;
+          if (diffMs < 60 * 1e3) {
+            return "ç¨åŽ";
+          }
+          const diffMinutes = Math.floor(diffMs / (60 * 1e3));
+          if (diffMinutes < 60) {
+            return `${diffMinutes}åˆ†é’ŸåŽ`;
+          }
+          const diffHours = Math.floor(diffMs / (60 * 60 * 1e3));
+          return `${diffHours}å°æ—¶åŽ`;
+        }
+        if (targetTimestamp < tomorrowStart + 24 * 60 * 60 * 1e3) {
+          return `æ˜Žå¤© ${date.format("HH:mm")}`;
+        }
+        return date.format("YYYY-MM-DD HH:mm");
+      }
+      if (targetTimestamp >= todayStart) {
+        const diffMs = currentTimestamp - targetTimestamp;
+        if (diffMs < 60 * 1e3) {
+          return "åˆšåˆš";
+        }
+        const diffMinutes = Math.floor(diffMs / (60 * 1e3));
+        if (diffMinutes < 60) {
+          return `${diffMinutes}åˆ†é’Ÿå‰`;
+        }
+        const diffHours = Math.floor(diffMs / (60 * 60 * 1e3));
+        return `${diffHours}å°æ—¶å‰`;
+      }
+      if (targetTimestamp >= yesterdayStart) {
+        return `æ˜¨å¤© ${date.format("HH:mm")}`;
+      }
+      return date.format("YYYY-MM-DD HH:mm");
+    };
+    const normalizeTimestamp = (timestamp) => {
+      const absTimestamp = Math.abs(timestamp);
+      if (absTimestamp > 0 && absTimestamp < 1e11) {
+        return timestamp * 1e3;
+      }
+      return timestamp;
+    };
+    const initFormatTime = () => {
+      const time = normalizeTimestamp(props.timestamp);
+      const targetDate = new Date(time);
+      if (!isValidDate(targetDate)) {
+        timeValue.value = "";
+        return null;
+      }
+      const date = dateuts(targetDate);
+      if (props.format == "relative") {
+        timeValue.value = getRelativeTime(date);
+        return null;
+      }
+      timeValue.value = date.format(props.format);
+    };
+    initFormatTime();
+    watch(() => {
+      return props.format;
+    }, () => {
+      initFormatTime();
+    });
+    watch(() => {
+      return props.timestamp;
+    }, () => {
+      initFormatTime();
+    });
+    watch(() => {
+      return props.futureRelative;
+    }, () => {
+      initFormatTime();
+    });
+    return () => {
+      "raw js";
+      _renderSharedDataEffect(() => {
+        _setSharedDataClass(__sharedData, 0, ["rice-time-format", _unref(ns).theme()]);
+        _setSharedData(__sharedData, 1, _toDisplayString(_unref(timeValue)));
+      });
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=rice-time-format.js.map
+ÔrE•§version¨mappings¥names§sources®sourcesContentÜ ‹‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘ÙÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-time-format/rice-time-format.js‘Úôimport "./type.js";
+import "../../libs/use/useCountDown/index.js";
+import "../../libs/store/useConfig.js";
+import { u as useNamespace } from "../../libs/use/useNamespace/index.js";
+import "../../libs/use/usePopup/index.js";
+import "../../libs/use/useRelation/useChildren.js";
+import "../../libs/use/useRelation/useParent.js";
+import "../../libs/use/useSafeArea/index.js";
+import "../../libs/use/useTouch/index.js";
+import "../../libs/plugin/coloruts/constant.js";
+import "../../libs/plugin/coloruts/type.js";
+import { d as dateuts } from "../../libs/plugin/dateuts/index.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataClass: _setSharedDataClass, unref: _unref, setSharedData: _setSharedData, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect } = globalThis.Vue;
+const __className = "GenUniModulesRiceUiComponentsRiceTimeFormatRiceTimeFormat";
+const { ref, watch } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  ...{
+    name: "rice-time-format",
+    styleIsolation: "app-and-page"
+  },
+  __dynamicSharedData: true,
+  __hash: "37f5d6bf",
+  __className,
+  __filename: "uni_modules/rice-ui/components/rice-time-format/rice-time-format.uvue",
+  __name: "rice-time-format",
+  props: {
+    timestamp: { type: Number },
+    format: { default: "YYYY-MM-DD HH:mm", type: String },
+    futureRelative: { type: Boolean, default: true }
+  },
+  setup(__props) {
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesRiceUiComponentsRiceTimeFormatRiceTimeFormatSharedData", sharedDataClassId: 0 })));
+    const ns = useNamespace("time-format");
+    const props = __props;
+    const timeValue = ref("");
+    const isValidDate = (date) => {
+      return !isNaN(date.getTime());
+    };
+    const getRelativeTime = (date) => {
+      const currentTimestamp = Date.now();
+      const targetTimestamp = date.valueOf();
+      const todayStart = dateuts(currentTimestamp).startOf("day").valueOf();
+      const tomorrowStart = todayStart + 24 * 60 * 60 * 1e3;
+      const yesterdayStart = todayStart - 24 * 60 * 60 * 1e3;
+      if (targetTimestamp > currentTimestamp) {
+        if (props.futureRelative != true) {
+          return date.format("YYYY-MM-DD HH:mm");
+        }
+        if (targetTimestamp < tomorrowStart) {
+          const diffMs = targetTimestamp - currentTimestamp;
+          if (diffMs < 60 * 1e3) {
+            return "ç¨åŽ";
+          }
+          const diffMinutes = Math.floor(diffMs / (60 * 1e3));
+          if (diffMinutes < 60) {
+            return `${diffMinutes}åˆ†é’ŸåŽ`;
+          }
+          const diffHours = Math.floor(diffMs / (60 * 60 * 1e3));
+          return `${diffHours}å°æ—¶åŽ`;
+        }
+        if (targetTimestamp < tomorrowStart + 24 * 60 * 60 * 1e3) {
+          return `æ˜Žå¤© ${date.format("HH:mm")}`;
+        }
+        return date.format("YYYY-MM-DD HH:mm");
+      }
+      if (targetTimestamp >= todayStart) {
+        const diffMs = currentTimestamp - targetTimestamp;
+        if (diffMs < 60 * 1e3) {
+          return "åˆšåˆš";
+        }
+        const diffMinutes = Math.floor(diffMs / (60 * 1e3));
+        if (diffMinutes < 60) {
+          return `${diffMinutes}åˆ†é’Ÿå‰`;
+        }
+        const diffHours = Math.floor(diffMs / (60 * 60 * 1e3));
+        return `${diffHours}å°æ—¶å‰`;
+      }
+      if (targetTimestamp >= yesterdayStart) {
+        return `æ˜¨å¤© ${date.format("HH:mm")}`;
+      }
+      return date.format("YYYY-MM-DD HH:mm");
+    };
+    const normalizeTimestamp = (timestamp) => {
+      const absTimestamp = Math.abs(timestamp);
+      if (absTimestamp > 0 && absTimestamp < 1e11) {
+        return timestamp * 1e3;
+      }
+      return timestamp;
+    };
+    const initFormatTime = () => {
+      const time = normalizeTimestamp(props.timestamp);
+      const targetDate = new Date(time);
+      if (!isValidDate(targetDate)) {
+        timeValue.value = "";
+        return null;
+      }
+      const date = dateuts(targetDate);
+      if (props.format == "relative") {
+        timeValue.value = getRelativeTime(date);
+        return null;
+      }
+      timeValue.value = date.format(props.format);
+    };
+    initFormatTime();
+    watch(() => {
+      return props.format;
+    }, () => {
+      initFormatTime();
+    });
+    watch(() => {
+      return props.timestamp;
+    }, () => {
+      initFormatTime();
+    });
+    watch(() => {
+      return props.futureRelative;
+    }, () => {
+      initFormatTime();
+    });
+    return () => {
+      "raw js";
+      _renderSharedDataEffect(() => {
+        _setSharedDataClass(__sharedData, 0, ["rice-time-format", _unref(ns).theme()]);
+        _setSharedData(__sharedData, 1, _toDisplayString(_unref(timeValue)));
+      });
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=rice-time-format.js.map
+ÔrF©./type.jsÙ$../../libs/use/useCountDown/index.js½../../libs/store/useConfig.jsÙ ../../libs/use/usePopup/index.jsÙ)../../libs/use/useRelation/useChildren.jsÙ$../../libs/use/useNamespace/index.jsÙ'../../libs/use/useRelation/useParent.jsÙ#../../libs/use/useSafeArea/index.jsÙ ../../libs/use/useTouch/index.jsÙ&../../libs/plugin/coloruts/constant.jsÙ"../../libs/plugin/coloruts/type.jsÙ"../../libs/plugin/dateuts/index.jsÙ'../../../../plugin-vue-export-helper.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-time-format/type.jsAÃªoh-resolveÂGAÂÙÉ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useCountDown/index.jsAÃªoh-resolveÂGAÂÙÂ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/store/useConfig.jsAÃªoh-resolveÂGAÂÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/usePopup/index.jsAÃªoh-resolveÂGAÂÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useRelation/useChildren.jsAÃªoh-resolveÂGAÂÙÉ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useNamespace/index.jsAÃªoh-resolveÂGAÂÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useRelation/useParent.jsAÃªoh-resolveÂGAÂÙÈ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useSafeArea/index.jsAÃªoh-resolveÂGAÂÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useTouch/index.jsAÃªoh-resolveÂGAÂÙË/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/plugin/coloruts/constant.jsAÃªoh-resolveÂGAÂÙÇ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/plugin/coloruts/type.jsAÃªoh-resolveÂGAÂÙÇ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/plugin/dateuts/index.jsAÃªoh-resolveÂGAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ€ÍžÀ‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍ‹Í›ÔrL”¤type¥start£end¤nameªIdentifierÍ‹Í–«__easycom_1LªIdentifierÍšÍ›¡_ÀÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration ÔrN•¤type¥start£end¥value£raw§Literal©./type.js«"./type.js"M±ImportDeclarationÌBN§LiteralÌAÙ$../../libs/use/useCountDown/index.jsÙ&"../../libs/use/useCountDown/index.js"M±ImportDeclarationÌCÌjN§LiteralÌJÌi½../../libs/store/useConfig.js¿"../../libs/store/useConfig.js"M±ImportDeclarationÌkÌ´‘ÔrO•¤type¥start£end¨imported¥local¯ImportSpecifierÌtÌ…LªIdentifierÌtÌu¡uLªIdentifierÌyÌ…¬useNamespaceN§LiteralÌÌ³Ù$../../libs/use/useNamespace/index.jsÙ&"../../libs/use/useNamespace/index.js"M±ImportDeclarationÌµÌßN§LiteralÌ¼ÌÞÙ ../../libs/use/usePopup/index.jsÙ""../../libs/use/usePopup/index.js"M±ImportDeclarationÌàÍN§LiteralÌçÍÙ)../../libs/use/useRelation/useChildren.jsÙ+"../../libs/use/useRelation/useChildren.js"M±ImportDeclarationÍÍEN§LiteralÍÍDÙ'../../libs/use/useRelation/useParent.jsÙ)"../../libs/use/useRelation/useParent.js"M±ImportDeclarationÍFÍsN§LiteralÍMÍrÙ#../../libs/use/useSafeArea/index.jsÙ%"../../libs/use/useSafeArea/index.js"M±ImportDeclarationÍtÍžN§LiteralÍ{ÍÙ ../../libs/use/useTouch/index.jsÙ""../../libs/use/useTouch/index.js"M±ImportDeclarationÍŸÍÏN§LiteralÍ¦ÍÎÙ&../../libs/plugin/coloruts/constant.jsÙ("../../libs/plugin/coloruts/constant.js"M±ImportDeclarationÍÐÍüN§LiteralÍ×ÍûÙ"../../libs/plugin/coloruts/type.jsÙ$"../../libs/plugin/coloruts/type.js"M±ImportDeclarationÍýÍ?‘O¯ImportSpecifierÍÍLªIdentifierÍÍ¡dLªIdentifierÍÍ§dateutsN§LiteralÍÍ>Ù"../../libs/plugin/dateuts/index.jsÙ$"../../libs/plugin/dateuts/index.js"M±ImportDeclarationÍ@Í‹‘O¯ImportSpecifierÍIÍYLªIdentifierÍIÍJ¡_LªIdentifierÍNÍY«_export_sfcN§LiteralÍaÍŠÙ'../../../../plugin-vue-export-helper.jsÙ)"../../../../plugin-vue-export-helper.js"

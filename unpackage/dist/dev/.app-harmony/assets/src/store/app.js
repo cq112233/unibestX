@@ -4,7 +4,6 @@ import { d as defineStore } from "../../uni_modules/x-pinia-s/instans/defineStor
 import "../../uni_modules/x-pinia-s/instans/persist.js";
 import { t as themeColor } from "../tabbar/store.js";
 import { i as i18n } from "../i18n/index.js";
-import { s as setLocale } from "../../uni_modules/uview-ultra/libs/i18n/index.js";
 const { reactive } = globalThis.Vue;
 class IAppState extends UTS.UTSType {
   static get$UTSMetadata$() {
@@ -61,7 +60,6 @@ class AppStore extends PiniaStoreBase {
     this.bindState(this.state);
     themeColor.value = this.state.theme;
     i18n.global.locale.value = this.state.locale;
-    setLocale(this.state.locale);
   }
   // ==========================================
   // 持久化钩子
@@ -71,7 +69,6 @@ class AppStore extends PiniaStoreBase {
     this.state.locale = defaultAppState.locale;
     themeColor.value = defaultAppState.theme;
     i18n.global.locale.value = defaultAppState.locale;
-    setLocale(defaultAppState.locale);
   }
   _hydrate(_data) {
     if (_data["theme"] != null) {
@@ -83,7 +80,6 @@ class AppStore extends PiniaStoreBase {
       const localeVal = _data["locale"];
       this.state.locale = localeVal;
       i18n.global.locale.value = localeVal;
-      setLocale(localeVal);
     }
   }
   _serialize() {
@@ -108,7 +104,6 @@ class AppStore extends PiniaStoreBase {
   setLocale(locale) {
     this.state.locale = locale;
     i18n.global.locale.value = locale;
-    setLocale(locale);
   }
 }
 const useAppStore = defineStore("app", () => {

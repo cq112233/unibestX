@@ -1,0 +1,253 @@
+<template>
+	<view v-if="fixed&&placeholder" class="rice-navbar--placeholder" :style="{height:navbarHeight}"></view>
+	<view :class="[navbarCustomClass,navbarClass]" :style="navbarStyle">
+		<view v-if="hasLeft" class="rice-navbar__aside rice-navbar__left"
+			:class="{'rice-navbar__aside--safearea-top':safeAreaInsetTop}" @click.stop="clickLeft">
+			<slot name="left">
+				<rice-icon v-if="leftArrow" :name="leftIcon" :size="leftIconSize" :color="arrowColor" />
+				<text v-if="hasStrValue(leftText)" :style="leftTextStyle" class="rice-navbar__aside__text">{{leftText}}</text>
+			</slot>
+		</view>
+		<view class="rice-navbar__center" :class="{'rice-navbar__center--has-right':hasRight&&safeAreaInsetTop}"
+			:style="centerStyle">
+			<slot name="title">
+				<text class="rice-navbar__title" :class="titleTextClass" :style="titleTextStyle">{{title}}</text>
+			</slot>
+		</view>
+		<view v-if="hasRight" class="rice-navbar__aside rice-navbar__right"
+			:class="{'rice-navbar__aside--safearea-top':safeAreaInsetTop}" @click.stop="clickRight">
+			<slot name="right">
+				<text class="rice-navbar__aside__text" :style="rightTextStyle"
+					v-if="hasStrValue(rightText)">{{rightText}}</text>
+			</slot>
+		</view>
+	</view>
+
+</template>
+
+<script setup>
+	import { addUnit, getPxNum, hasStrValue } from "../../libs/utils"
+	import { useNamespace, useSafeArea, safeAreaInsets } from "../../libs/use"
+	import { isDark } from "../../libs/store"
+	import { NavbarProps } from "./type.uts"
+
+	defineOptions({
+		name: 'rice-navbar',
+		styleIsolation: "app-and-page",
+		externalClasses: ['title-text-class', 'navbar-class']
+	})
+	const slot = defineSlots()
+	const emit = defineEmits<{
+		clickLeft : [],
+		clickRight : [],
+	}>()
+	const ns = useNamespace('navbar')
+	useSafeArea()
+
+	const props = withDefaults(defineProps<NavbarProps>(), {
+		fixed: true,
+		placeholder: true,
+		border: false,
+		leftArrow: true,
+		leftIcon: 'arrow-left',
+		safeAreaInsetTop: true,
+		autoBack: true,
+		height: '44px',
+		leftIconSize: '20px',
+		navbarClass: "",
+		titleTextClass: "",
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+	const hasLeft = computed(() => slot['left'] != null || props.leftArrow || hasStrValue(props.leftText))
+	const hasRight = computed(() => slot['right'] != null || hasStrValue(props.rightText))
+
+	const clickLeft = (e : UniPointerEvent) => {
+		if (slot['left'] != null) return
+		e.stopPropagation()
+		if (props.autoBack) uni.navigateBack()
+		emit('clickLeft')
+	}
+
+	const clickRight = (e : UniPointerEvent) => {
+		if (slot['right'] != null) return
+		e.stopPropagation()
+		emit('clickRight')
+	}
+
+	const arrowColor = computed<string>(() => props.leftIconColor ?? 'var(--rice-text-color)')
+
+	const navbarHeight = computed(() => {
+		let height = getPxNum(props.height)
+		if (props.safeAreaInsetTop) height += safeAreaInsets.value.statusBarHeight
+		return height + 'px'
+	})
+
+	const centerStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.titleWidth != null) css.set('width', addUnit(props.titleWidth!))
+		return css
+	})
+
+	const navbarStyle = computed(() => {
+		const css = new Map<string, string | number>()
+		if (props.bgColor != null) css.set('background', props.bgColor!)
+		if (props.fixed && props.zIndex != null) css.set('z-index', props.zIndex!)
+		css.set('height', addUnit(props.height!))
+		return css
+	})
+
+	const leftTextStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.leftTextColor != null) css.set('color', props.leftTextColor!)
+		return css
+	})
+
+	const rightTextStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.rightTextColor != null) css.set('color', props.rightTextColor!)
+		return css
+	})
+
+	const titleTextStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.titleColor != null) css.set('color', props.titleColor!)
+		if (props.titleSize != null) css.set('font-size', addUnit(props.titleSize!))
+		return css
+	})
+
+	const navbarCustomClass = computed(() => {
+		return [
+			ns.b(""),
+			ns.theme(),
+			ns.is('fixed', props.fixed),
+			ns.is('safearea-top', props.safeAreaInsetTop),
+			ns.is('border', props.border),
+		]
+	})
+
+	// #ifdef MP
+	const mpMenuInfo = ref({
+		top: 25,
+		right: 0,
+	})
+	// #endif
+
+	onMounted(() => {
+		// #ifdef MP
+		const menuButtonInfo = uni.getMenuButtonBoundingClientRect()
+		const statusBarHeight = uni.getWindowInfo().statusBarHeight
+		mpMenuInfo.value.top = menuButtonInfo.top - (menuButtonInfo.top - statusBarHeight)
+		mpMenuInfo.value.right = menuButtonInfo.width - 30
+		// #endif
+	})
+</script>
+
+<style scoped lang="scss">
+	.rice-navbar {
+		position: relative;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		background-color: var(--rice-navbar-background);
+		height: 44px;
+		box-sizing: content-box;
+		width: 100%;
+
+		&--fixed {
+			position: fixed;
+			left: 0;
+			right: 0;
+			top: 0;
+			width: 100%;
+			z-index: 998;
+		}
+
+		&--placeholder {
+			width: 100%;
+			/* #ifdef WEB */
+			height: calc(44px + env(safe-area-inset-top));
+			/* #endif */
+		}
+
+		&--border {
+			border-bottom: 1px solid var(--rice-border-color);
+		}
+
+
+
+		&--safearea-top {
+
+			/* #ifdef WEB */
+			height: calc(44px + env(safe-area-inset-top));
+			/* #endif */
+
+			/* #ifdef APP */
+			padding-top: var(--status-bar-height);
+			/* #endif */
+			/* #ifdef MP */
+			padding-top: v-bind('mpMenuInfo.top + "px" ');
+			/* #endif */
+		}
+
+		&__aside {
+			position: absolute;
+			bottom: 0;
+			top: 0;
+			padding: 0 10px;
+			flex-direction: row;
+			align-items: center;
+			/* #ifndef APP */
+			color: var(--rice-text-color);
+
+			/* #endif */
+			&--safearea-top {
+				/* #ifdef APP */
+				top: var(--status-bar-height);
+				/* #endif */
+				/* #ifdef MP */
+				top: v-bind('mpMenuInfo.top + "px" ')
+					/* #endif */
+			}
+
+			&__text {
+				font-size: 14px;
+				color: var(--rice-text-color)
+			}
+
+		}
+
+		&__left {
+			left: 0;
+		}
+
+		&__right {
+			right: 0;
+		}
+
+		&__center {
+			align-items: center;
+			padding: 0 10px;
+			box-sizing: border-box;
+			width: 70%;
+
+			/* #ifdef MP */
+			&--has-right {
+				width: calc(70% - v-bind('mpMenuInfo.right + "px" '));
+			}
+
+			/* #endif */
+		}
+
+		&__title {
+			width: 100%;
+			font-size: 15px;
+			color: var(--rice-text-color);
+			font-weight: bold;
+			text-align: center;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
+
+	}
+</style>

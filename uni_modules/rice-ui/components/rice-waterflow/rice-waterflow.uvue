@@ -1,0 +1,333 @@
+<template>
+	<!-- 蒸汽模式下，waterflow封装在组件中有问题：https://issues.dcloud.net.cn/pages/issues/detail?id=29918 -->
+	<!-- #ifdef APP && !VUE3-VAPOR -->
+	<waterflow class="rice-waterflow" :cross-axis-count="crossAxisCount" :main-axis-gap="mainAxisGap"
+		:cross-axis-gap="crossAxisGap" :associative-container="associativeContainer" :bounces="bounces"
+		:upper-threshold="upperThreshold" :lower-threshold="lowerThreshold" :scroll-top="scrollTop"
+		:show-scrollbar="showScrollbar" :scroll-into-view="scrollIntoView" :scroll-with-animation="scrollWithAnimation"
+		:refresher-enabled="refresherEnabled" :refresher-threshold="refresherThreshold"
+		:refresher-default-style="refresherDefaultStyle" :refresher-background="refresherBackground"
+		:refresher-triggered="refresherTriggered" :enable-back-to-top="enableBackToTop"
+		:custom-nested-scroll="customNestedScroll" @scroll="onScroll" @scrolltoupper="onScrolltoupper"
+		@scrolltolower="onScrolltolower" @refresherrefresh="onRefresherrefresh" @refresherrestore="onRefresherrestore"
+		@refresherabort="onRefresherabort" @refresherpulling="onRefresherpulling" @scrollend="onScrollend">
+		<slot></slot>
+
+		<flow-item slot="refresher" class="rice-waterflow__refresh" :type="999998">
+			<slot name="refresher"></slot>
+		</flow-item>
+
+		<flow-item slot="load-more" id="loadmore" :type="99999">
+			<slot name="load"></slot>
+		</flow-item>
+	</waterflow>
+
+	<!-- #endif -->
+
+
+	<!-- #ifdef VUE3-VAPOR || MP || WEB -->
+	<scroll-view class="rice-waterflow" direction="vertical" :bounces="bounces" :upper-threshold="upperThreshold"
+		:lower-threshold="lowerThreshold" :scroll-top="scrollTop" :show-scrollbar="showScrollbar"
+		:scroll-into-view="scrollIntoView" :scroll-with-animation="scrollWithAnimation"
+		:refresher-enabled="refresherEnabled" :refresher-threshold="refresherThreshold"
+		:associative-container="associativeContainer" :enable-back-to-top="enableBackToTop"
+		:refresher-default-style="refresherDefaultStyle" :refresher-background="refresherBackground"
+		:refresher-triggered="refresherTriggered" @scroll="onScroll" @scrolltoupper="onScrolltoupper"
+		@scrolltolower="onScrolltolower" @refresherrefresh="onRefresherrefresh" @refresherrestore="onRefresherrestore"
+		@refresherabort="onRefresherabort" @refresherpulling="onRefresherpulling" @scrollend="onScrollend">
+		<view class="rice-waterflow__wrap" :style="wrapStyle" ref="wrapRef">
+			<slot></slot>
+		</view>
+
+		<view slot="refresher" class="rice-waterflow__refresh">
+			<slot name="refresher"></slot>
+		</view>
+		<view class="rice-waterflow__load">
+			<slot name="load"></slot>
+		</view>
+	</scroll-view>
+	<!-- #endif -->
+
+</template>
+
+<script setup>
+	import { useChildren } from "../../libs/use"
+	import { WaterflowItemLayout, WaterflowProps, WaterflowProvide, waterflowInjectKey, waterflowName } from "./index.uts"
+	defineOptions({
+		name: 'rice-waterflow',
+		styleIsolation: 'app-and-page'
+	})
+
+	const emit = defineEmits<{
+		scroll : [event: UniScrollEvent],
+		scrollend : [event: UniScrollEvent],
+		scrolltoupper : [event: UniScrollToUpperEvent],
+		scrolltolower : [event: UniScrollToLowerEvent],
+		refresherrefresh : [event: UniRefresherEvent],
+		refresherrestore : [event: UniRefresherEvent],
+		refresherabort : [event: UniRefresherEvent],
+		refresherpulling : [event: UniRefresherEvent],
+	}>()
+
+	const props = withDefaults(defineProps<WaterflowProps>(), {
+		crossAxisCount: 2,
+		mainAxisGap: 0,
+		crossAxisGap: 0,
+		bounces: true,
+		upperThreshold: 50,
+		lowerThreshold: 50,
+		scrollTop: 0,
+		showScrollbar: true,
+		scrollWithAnimation: false,
+		refresherEnabled: false,
+		refresherThreshold: 45,
+		refresherDefaultStyle: 'black',
+		refresherBackground: 'transparent',
+		customNestedScroll: false,
+		refresherTriggered: false,
+		enableBackToTop: false,
+	})
+
+
+	const onScroll = (event : UniScrollEvent) => {
+		emit('scroll', event)
+	}
+
+	const onScrollend = (event : UniScrollEvent) => {
+		emit('scrollend', event)
+	}
+
+	const onScrolltoupper = (event : UniScrollToUpperEvent) => {
+		emit('scrolltoupper', event)
+	}
+
+	const onScrolltolower = (event : UniScrollToLowerEvent) => {
+		emit('scrolltolower', event)
+	}
+
+	const onRefresherrefresh = (event : UniRefresherEvent) => {
+		emit('refresherrefresh', event)
+	}
+
+	const onRefresherrestore = (event : UniRefresherEvent) => {
+		emit('refresherrestore', event)
+	}
+
+	const onRefresherabort = (event : UniRefresherEvent) => {
+		emit('refresherabort', event)
+	}
+
+	const onRefresherpulling = (event : UniRefresherEvent) => {
+		emit('refresherpulling', event)
+	}
+
+
+
+	// #ifdef VUE3-VAPOR || MP || WEB
+	const { linkChildren, childrenList } = useChildren(waterflowName)
+	linkChildren()
+
+	const wrapRef = shallowRef<UniElement | null>(null)
+	const itemWidth = ref(0)
+	const ready = ref(false)
+	const initialized = ref(false)
+	const contentHeight = ref(0)
+	const itemLayouts = ref([] as WaterflowItemLayout[])
+	const itemHeights = ref([] as number[])
+	let layoutTimer : number | null = null
+	let isLayingOut = false
+
+	const wrapStyle = computed(() => {
+		const css = new Map<string, string>()
+		css.set('height', contentHeight.value + 'px')
+		return css
+	})
+
+	const normalizeHeights = () => {
+		const count = childrenList.value.length
+		if (itemHeights.value.length > count) {
+			itemHeights.value.splice(count)
+		}
+		while (itemHeights.value.length < count) {
+			itemHeights.value.push(0)
+		}
+	}
+
+	const scheduleLayout = (delay = 16) => {
+		if (layoutTimer != null) {
+			clearTimeout(layoutTimer)
+		}
+		layoutTimer = setTimeout(() => {
+			layoutWaterflow()
+		}, delay)
+	}
+
+	// 非 App 端对外暴露的整体验证和重排入口，适合图片异步加载完成后调用。
+	const relayout = () => {
+		// 只在首屏布局前隐藏内容，后续重排保持旧内容可见，避免加载更多时闪烁。
+		if (!initialized.value) {
+			ready.value = false
+		}
+		scheduleLayout()
+	}
+
+	const updateItemHeight = (index : number, height : number) => {
+		if (index < 0) return
+		normalizeHeights()
+		if (itemHeights.value[index] == height) return
+		itemHeights.value[index] = height
+		scheduleLayout()
+	}
+
+	provide(waterflowInjectKey, {
+		itemWidth,
+		itemLayouts,
+		ready,
+		requestLayout: () => relayout(),
+		updateItemHeight,
+	} as WaterflowProvide)
+
+	const layoutWaterflow = async () => {
+
+		if (isLayingOut || wrapRef.value == null) return
+		isLayingOut = true
+		await nextTick()
+		normalizeHeights()
+		const rect = await wrapRef.value!.getBoundingClientRectAsync()!
+		const columnCount = Math.max(1, props.crossAxisCount)
+		const crossGap = props.crossAxisGap
+		const mainGap = props.mainAxisGap
+		const totalGap = crossGap * (columnCount - 1)
+		const nextWidth = columnCount > 0 ? (rect.width - totalGap) / columnCount : rect.width
+		if (nextWidth <= 0) {
+			isLayingOut = false
+			scheduleLayout(60)
+			return
+		}
+		if (itemWidth.value != nextWidth) {
+			itemWidth.value = nextWidth
+			if (!initialized.value) {
+				ready.value = false
+			}
+			isLayingOut = false
+			scheduleLayout(32)
+			return
+		}
+
+		const count = childrenList.value.length
+		if (count == 0) {
+			itemLayouts.value = [] as WaterflowItemLayout[]
+			contentHeight.value = 0
+			ready.value = true
+			initialized.value = true
+			isLayingOut = false
+			return
+		}
+
+		const columnHeights = [] as number[]
+		for (let i = 0; i < columnCount; i++) {
+			columnHeights.push(0)
+		}
+
+		const nextLayouts = [] as WaterflowItemLayout[]
+		for (let i = 0; i < count; i++) {
+			const height = itemHeights.value[i] ?? 0
+			if (height <= 0) {
+				if (!initialized.value) {
+					ready.value = false
+				}
+				isLayingOut = false
+				scheduleLayout(32)
+				return
+			}
+			let minIndex = 0
+			for (let j = 1; j < columnHeights.length; j++) {
+				if (columnHeights[j] < columnHeights[minIndex]) {
+					minIndex = j
+				}
+			}
+			const x = minIndex * (itemWidth.value + crossGap)
+			const y = columnHeights[minIndex]
+			nextLayouts.push({ x, y } as WaterflowItemLayout)
+			columnHeights[minIndex] = y + height + mainGap
+		}
+
+		let maxHeight = 0
+		for (let i = 0; i < columnHeights.length; i++) {
+			const value = columnHeights[i]
+			if (value > maxHeight) {
+				maxHeight = value
+			}
+		}
+		if (maxHeight > 0) {
+			maxHeight -= mainGap
+		}
+		contentHeight.value = maxHeight
+		itemLayouts.value = nextLayouts
+		ready.value = true
+		initialized.value = true
+		isLayingOut = false
+	}
+
+	watch(() => childrenList.value.length, () => {
+		normalizeHeights()
+		relayout()
+	})
+
+	watch(() => [props.crossAxisCount, props.crossAxisGap, props.mainAxisGap], async () => {
+		await nextTick()
+		relayout()
+	}, {
+		deep: true
+	})
+
+
+	let resizeTimer : number | null = null
+	const onResize = () => {
+		ready.value = false
+		scheduleLayout(32)
+	}
+
+	onMounted(() => {
+		resizeTimer = setTimeout(() => {
+			scheduleLayout(32)
+		}, 32)
+		// #ifdef WEB
+		window.addEventListener('resize', onResize)
+		// #endif
+	})
+
+	onUnmounted(() => {
+		if (layoutTimer != null) clearTimeout(layoutTimer)
+		if (resizeTimer != null) clearTimeout(resizeTimer)
+		// #ifdef WEB
+		window.removeEventListener('resize', onResize)
+		// #endif
+	})
+
+	defineExpose({
+		relayout,
+	})
+	// #endif
+</script>
+
+<style scoped lang="scss">
+	.rice-waterflow {
+		flex: 1;
+
+		&__wrap {
+			position: relative;
+			width: 100%;
+		}
+
+		&__load {
+			width: 100%;
+		}
+
+		&__refresh {
+			align-items: center;
+			justify-content: center;
+			width: 100%;
+		}
+	}
+</style>

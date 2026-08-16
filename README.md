@@ -27,10 +27,10 @@
 
 > ⚠️ **三方组件库与插件修改说明**
 >
-> 本项目内置的 **`z-paging-x`** 分页组件（如 [z-paging-x.uvue](file:///Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/z-paging-x/components/z-paging-x/z-paging-x.uvue)）以及 **`uview-ultra`** 组件库均已由作者进行了**深度定制修改与修复**，专门用于兼容 `uni-app X` 各端平台（特别针对 Android 原生嵌套手势协商、`type="nested"` 架构支持以及各端 CSS 解析限制等进行了优化）。
+> 本项目内置的 **`z-paging-x`** 分页组件（如 [z-paging-x.uvue](file:///Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/z-paging-x/components/z-paging-x/z-paging-x.uvue)）已由作者进行了**深度定制修改与修复**，专门用于兼容 `uni-app X` 各端平台（特别针对 Android 原生嵌套手势协商、`type="nested"` 架构支持以及各端 CSS 解析限制等进行了优化）。
 > **提示**：请勿直接从官方插件市场重新下载覆盖。若从官方重新下载安装，可能会导致多端兼容性与手势机制失效，届时请务必重新测试与调试！
 
-`unibestX` —— 最好的 `uni-app X` 开发模板，由 `uni-app X` + `Vue3` + `UTS` + `Vite5` + `UnoCSS` + `uview-ultra` + `z-paging-x` 构成，使用了下一代 uni-app 原生开发技术栈，通过 `HBuilderX` 运行 `Android`、`iOS`、`鸿蒙`、`H5` 和 `小程序` 等多端平台。
+`unibestX` —— 最好的 `uni-app X` 开发模板，由 `uni-app X` + `Vue3` + `UTS` + `Vite5` + `UnoCSS` + `Rice UI` + `z-paging-x` 构成，使用了下一代 uni-app 原生开发技术栈，通过 `HBuilderX` 运行 `Android`、`iOS`、`鸿蒙`、`H5` 和 `小程序` 等多端平台。
 
 👉 **在线 H5 演示体验**：[https://cq112233.github.io/unibestX/](https://cq112233.github.io/unibestX/)
 
@@ -61,7 +61,7 @@
 * 🚀 **uni-app X** — 基于 UTS 语言的原生渲染，性能远超 WebView 方案
 * 💪 **Vue3 + Vite5** — 最新前端技术栈，开发体验极佳
 * 🎨 **UnoCSS** — 原子化 CSS 引擎，高效编写样式
-* 📦 **uview-ultra** — 专为 uni-app X 打造的 UI 组件库（本项目使用的为自行修复过的版本，深度修复了大量的 bug 与兼容性问题，如针对 uni-app X 原生平台暂不支持 `gap`、`display: grid` 等 CSS 属性的限制，重构并修复了 `up-box`、`up-sticky`、`up-tooltip` 等核心组件，保障原生端的流畅体验）
+* 📦 **Rice UI** — 专为 uni-app X 打造的高性能跨端组件库，内置 48+ 丰富组件，全端原生渲染，轻盈灵动
 * 📜 **z-paging-x** — 强大的分页列表组件（本项目已对 [z-paging-x.uvue](file:///Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/z-paging-x/components/z-paging-x/z-paging-x.uvue) 底层 Android 嵌套手势协商、Flex 布局及 `type="nested"` 架构进行了深度兼容修改与适配）
 * 🔧 **Pinia 持久化** — 状态管理 + 本地持久化，开箱即用
 * 🌐 **i18n 多语言** — 内置中英文切换，支持自动检测系统语言
@@ -146,7 +146,7 @@ unibestX/
 │   │   ├── paging/           #   z-paging-x 分页列表各种场景演示
 │   │   ├── test/             #   页面间参数传递测试
 │   │   ├── uiTest/           #   UI 测试与排版页面
-│   │   └── uview-ultra/      #   uview-ultra 组件库示例
+│   │   └── rice-ui/          #   Rice UI 组件库演示页面
 │   ├── tabbar/               # 自定义 TabBar
 │   │   ├── index.uvue        #   TabBar 底部容器
 │   │   ├── TabbarItem.uvue   #   单个 Tab 项与角标
@@ -163,7 +163,7 @@ unibestX/
 │       └── i18n.uts          #   多语言辅助工具
 ├── uni_modules/              # uni-app 扩展插件模块
 │   ├── unix-crypto/          #   全端跨平台加密解密库（AES/DES/RSA/MD5/SHA/HMAC/Base64/UUID）
-│   ├── uview-ultra/          #   针对 uni-app X 深度优化适配的 UI 组件库
+│   ├── rice-ui/              #   针对 uni-app X 打造的现代 UI 组件库
 │   ├── z-paging-x/           #   针对 uni-app X 深度优化适配的分页组件
 │   ├── iRainna-lodash/       #   UTS 版 Lodash 工具库
 │   ├── lime-request/         #   HTTP 请求核心库
@@ -293,7 +293,7 @@ pnpm install
 | 前端框架    | Vue 3                 | Composition API                        |
 | 构建工具    | Vite 5                | 极速开发体验                                 |
 | CSS 引擎  | UnoCSS                | 原子化 CSS，自定义规则                          |
-| UI 组件库  | uview-ultra           | uni-app X 专用 UI 库（本项目使用的为自行修复过的版本，已深度重构修复原生 `gap`/`grid` 限制下的多端兼容问题，如 `up-sticky`、`up-box` 等） |
+| UI 组件库  | Rice UI               | 专为 uni-app X 打造的高性能跨端组件库，48+ 原生组件开箱即用 |
 | 分页组件    | z-paging-x            | 强大的下拉刷新 + 分页加载                         |
 | 状态管理    | x-pinia-s (Pinia)     | uni-app X 版 Pinia                      |
 | HTTP 请求 | lime-request          | uni-app X 兼容请求库                        |

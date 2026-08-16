@@ -1,0 +1,51 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Overlay 遮罩层" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <!-- 基础遮罩层 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">基础遮罩层</text>
+        <rice-button type="primary" :color="currentTheme" text="显示全屏遮罩层" @click="showOverlay = true" />
+      </view>
+    </view>
+
+    <!-- 遮罩层组件 -->
+    <rice-overlay v-model:show="showOverlay">
+      <view class="w-full h-full flex items-center justify-center" @click.stop="">
+        <view class="w-160px h-160px bg-white rounded-12px flex-col items-center justify-center shadow-lg">
+          <rice-loading size="32px" :color="currentTheme" />
+          <text class="text-14px text-[#334155] mt-12px">加载中...</text>
+          <rice-button size="mini" type="default" text="关闭遮罩" class="mt-12px" @click="showOverlay = false" />
+        </view>
+      </view>
+    </rice-overlay>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store'
+import { computed } from 'vue'
+
+const appStore = useAppStore()
+const currentTheme = computed((): string => appStore.state.theme)
+
+const showOverlay = ref(false)
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 14px;
+  background-color: #ffffff;
+  border-radius: 10px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 12px;
+  padding-left: 6px;
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+</style>

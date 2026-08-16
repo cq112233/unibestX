@@ -10,7 +10,7 @@ const { computed } = globalThis.Vue;
 const inactiveColor = "#999999";
 const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   __dynamicSharedData: true,
-  __hash: "466aeb92",
+  __hash: "62588060",
   __className,
   __filename: "src/tabbar/TabbarItem.uvue",
   __name: "TabbarItem",
@@ -62,6 +62,9 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       }
       return `${badge}`;
     }
+    function getText() {
+      return $t(tabbarItem.value.text);
+    }
     return () => {
       "raw js";
       const _component_uni_icons = __easycom_1;
@@ -92,7 +95,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         });
         _renderSharedDataEffect(() => {
           _setSharedDataStyle(__sharedData, 8, { color: getActiveColor() });
-          _setSharedData(__sharedData, 9, _toDisplayString(_unref($t)(_unref(tabbarItem).text)));
+          _setSharedData(__sharedData, 9, _toDisplayString(getText()));
         });
         _createSharedDataIf(() => {
           return _setSharedData(__sharedData, 5, _toSharedDataBoolean(isDotBadge()));

@@ -1,0 +1,85 @@
+export type UploaderAccept = 'media' | 'image' | 'video'
+export type UploaderStatus = 'ready' | 'uploading' | 'success' | 'failed'
+
+export type UploaderFileItem = {
+	url : string,
+	poster ?: string,
+	fileName ?: string,
+	status ?: UploaderStatus,
+	fileType ?: string,
+	message ?: string,
+	percent ?: number,
+	size ?: number,
+	duration ?: number,
+	deletable ?: boolean,
+	uid ?: string,
+	name ?: string,
+	action ?: string,
+	formData ?: UTSJSONObject,
+	header ?: UTSJSONObject,
+}
+
+export type UploaderSuccess = {
+	statusCode : number,
+	data : string,
+	file : UploaderFileItem,
+}
+
+export type UploaderFail = {
+	errCode : number,
+	statusCode : number,
+	data : any | null,
+	errMsg : string,
+	file : UploaderFileItem,
+}
+
+export type UploaderComplete = {
+	successList : UploaderSuccess[],
+	failList : UploaderFail[]
+}
+
+export type UploaderProps = {
+	action ?: string,
+	accept ?: UploaderAccept,
+	autoUpload ?: boolean,
+	name ?: string,
+	header ?: UTSJSONObject,
+	formData ?: UTSJSONObject,
+	timeout ?: number,
+	maxCount ?: number,
+	maxDuration ?: number,
+	showFileList ?: boolean,
+	preview ?: boolean,
+	imageMode ?: string,
+	objectFit ?: string,
+	uploadIcon ?: string,
+	uploadIconStyle ?: UTSJSONObject,
+	uploadText ?: string,
+	loadingText ?: string,
+	uploadFailText ?: string,
+	showPercent ?: boolean,
+	showSuccess ?: boolean,
+	deletable ?: boolean,
+	deleteIcon ?: string,
+	deleteIconStyle ?: UTSJSONObject,
+	width ?: string | number,
+	height ?: string | number,
+	bgColor ?: string,
+	disabled ?: boolean,
+	readonly ?: boolean,
+	camera ?: string,
+	pageOrientation ?: string,
+	uploadIconSize ?: string | number,
+	deleteStyle ?: UTSJSONObject,
+	sizeType ?: string[],
+	sourceType ?: string[],
+	extension ?: string[],
+	successCode ?: number,
+	beforeRead ?: (files : UploaderFileItem[]) => Promise<any> | any,
+	afterRead ?: (files : UploaderFileItem[]) => void,
+	beforeUpload ?: (files : UploaderFileItem) => Promise<any> | any,
+	beforeRemove ?: (file : UploaderFileItem, index : number) => Promise<boolean | null> | boolean | null,
+	onSuccess ?: (response : UploaderSuccess, file : UploaderFileItem) => boolean | null,
+	onFail ?: (response : UploaderFail, file : UploaderFileItem) => void,
+	customStyle ?: UTSJSONObject,
+}

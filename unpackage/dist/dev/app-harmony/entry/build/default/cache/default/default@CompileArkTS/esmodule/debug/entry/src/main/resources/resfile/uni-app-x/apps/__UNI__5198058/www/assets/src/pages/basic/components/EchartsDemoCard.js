@@ -4,13 +4,13 @@ import { a as systemInfo } from "@normalized:N&&&entry/src/main/resources/resfil
 import { $ as $t } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/i18n&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
 const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, setSharedDataEvent: _setSharedDataEvent, unref: _unref, setSharedDataClass: _setSharedDataClass, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, setSharedDataEvent: _setSharedDataEvent, setSharedDataClass: _setSharedDataClass, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
 const __className = "GenSrcPagesBasicComponentsEchartsDemoCard";
 const { computed, ref, watch } = globalThis.Vue;
 const gridKey = "grid";
 const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   __dynamicSharedData: true,
-  __hash: "371a198f",
+  __hash: "21e5c043",
   __className,
   __filename: "src/pages/basic/components/EchartsDemoCard.uvue",
   __name: "EchartsDemoCard",
@@ -19,6 +19,18 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenSrcPagesBasicComponentsEchartsDemoCardSharedData", sharedDataClassId: 0 })));
     const echartRef = ref(null);
     const currentType = ref("line");
+    const echartTitle = computed(() => {
+      return $t("basic.echartTitle");
+    });
+    const echartLineText = computed(() => {
+      return $t("basic.echartLine");
+    });
+    const echartBarText = computed(() => {
+      return $t("basic.echartBar");
+    });
+    const echartPieText = computed(() => {
+      return $t("basic.echartPie");
+    });
     const lineOption = new UTSJSONObject({
       title: new UTSJSONObject({
         text: "访问趋势 (折线图)",
@@ -193,11 +205,11 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         Card,
         "4e294b1c",
         { title: () => {
-          return _unref($t)("basic.echartTitle");
+          return echartTitle.value;
         } },
         {
           "default": _withSharedDataVaporCtx(() => {
-            const n0 = _createSharedDataComponentWithFallback(_component_e_chart, "7700194f", {
+            const n0 = _createSharedDataComponentWithFallback(_component_e_chart, "77001919", {
               class: "w-full i_h-full",
               onReady: () => {
                 return initEchart;
@@ -210,16 +222,15 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
             _setSharedDataEvent(__sharedData, 4, changeToPie);
             _renderSharedDataEffect(() => {
               const _currentType = currentType.value;
-              const _$t = _unref($t);
-              _setSharedDataClass(__sharedData, 5, ["w-full h-36px rounded-8px flex flex-row items-center justify-center", _currentType !== "line" ? "bg-__e0edff_" : "bg-__3b82f6_"]);
-              _setSharedDataClass(__sharedData, 6, ["text-12px font-bold", _currentType !== "line" ? "text-__3b82f6_" : "text-__ffffff_"]);
-              _setSharedData(__sharedData, 7, _toDisplayString(_$t("basic.echartLine")));
-              _setSharedDataClass(__sharedData, 8, ["w-full h-36px rounded-8px flex flex-row items-center justify-center", _currentType !== "bar" ? "bg-__d1fae5_" : "bg-__10b981_"]);
-              _setSharedDataClass(__sharedData, 9, ["text-12px font-bold", _currentType !== "bar" ? "text-__10b981_" : "text-__ffffff_"]);
-              _setSharedData(__sharedData, 10, _toDisplayString(_$t("basic.echartBar")));
-              _setSharedDataClass(__sharedData, 11, ["w-full h-36px rounded-8px flex flex-row items-center justify-center", _currentType !== "pie" ? "bg-__fef3c7_" : "bg-__f59e0b_"]);
-              _setSharedDataClass(__sharedData, 12, ["text-12px font-bold", _currentType !== "pie" ? "text-__f59e0b_" : "text-__ffffff_"]);
-              _setSharedData(__sharedData, 13, _toDisplayString(_$t("basic.echartPie")));
+              _setSharedDataClass(__sharedData, 5, ["w-full h-36px rounded-8px flex flex-row items-center justify-center", _currentType != "line" ? "bg-__e0edff_" : "bg-__3b82f6_"]);
+              _setSharedDataClass(__sharedData, 6, ["text-12px font-bold", _currentType != "line" ? "text-__3b82f6_" : "text-__ffffff_"]);
+              _setSharedData(__sharedData, 7, _toDisplayString(echartLineText.value));
+              _setSharedDataClass(__sharedData, 8, ["w-full h-36px rounded-8px flex flex-row items-center justify-center", _currentType != "bar" ? "bg-__d1fae5_" : "bg-__10b981_"]);
+              _setSharedDataClass(__sharedData, 9, ["text-12px font-bold", _currentType != "bar" ? "text-__10b981_" : "text-__ffffff_"]);
+              _setSharedData(__sharedData, 10, _toDisplayString(echartBarText.value));
+              _setSharedDataClass(__sharedData, 11, ["w-full h-36px rounded-8px flex flex-row items-center justify-center", _currentType != "pie" ? "bg-__fef3c7_" : "bg-__f59e0b_"]);
+              _setSharedDataClass(__sharedData, 12, ["text-12px font-bold", _currentType != "pie" ? "text-__f59e0b_" : "text-__ffffff_"]);
+              _setSharedData(__sharedData, 13, _toDisplayString(echartPieText.value));
             });
           })
         },

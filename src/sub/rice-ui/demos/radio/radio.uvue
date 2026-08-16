@@ -1,0 +1,74 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Radio 单选框" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <!-- 基础单选框组 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">基础用法</text>
+        <rice-radio-group v-model="selectedFruit" :checked-color="currentTheme">
+          <view class="mb-10px">
+            <rice-radio value="apple" label="苹果 🍎" :checked-color="currentTheme" />
+          </view>
+          <view class="mb-10px">
+            <rice-radio value="banana" label="香蕉 🍌" :checked-color="currentTheme" />
+          </view>
+          <view><rice-radio value="orange" label="橙子 🍊" :checked-color="currentTheme" /></view>
+        </rice-radio-group>
+        <view class="mt-12px">
+          <text class="text-13px text-[#64748b]">已选：{{ selectedFruit }}</text>
+        </view>
+      </view>
+
+      <!-- 自定义颜色与形状 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">自定义颜色与形状</text>
+        <rice-radio-group v-model="selectedShape" checked-color="#ee0a24" shape="square">
+          <view class="mb-10px">
+            <rice-radio value="1" label="红色方形单选 1" />
+          </view>
+          <view><rice-radio value="2" label="红色方形单选 2" /></view>
+        </rice-radio-group>
+      </view>
+
+      <!-- 禁用状态 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">禁用状态</text>
+        <view class="flex-col">
+          <view class="mb-10px">
+            <rice-radio :disabled="true" :value="true" :checked-color="currentTheme" label="禁用且选中" />
+          </view>
+          <view><rice-radio :disabled="true" :value="false" :checked-color="currentTheme" label="禁用且未选" /></view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store'
+import { computed } from 'vue'
+
+const appStore = useAppStore()
+const currentTheme = computed((): string => appStore.state.theme)
+
+const selectedFruit = ref('apple')
+const selectedShape = ref('1')
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 14px;
+  background-color: #ffffff;
+  border-radius: 10px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 12px;
+  padding-left: 6px;
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+</style>

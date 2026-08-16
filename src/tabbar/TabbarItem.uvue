@@ -61,6 +61,11 @@ function getBadgeText(): string {
   }
   return `${badge}`
 }
+
+/** 获取翻译后的标签文本 */
+function getText(): string {
+  return $t(tabbarItem.value.text)
+}
 </script>
 
 <template>
@@ -96,7 +101,7 @@ function getBadgeText(): string {
       </view>
 
       <!-- 文本（包含 i18n 翻译，支持动态语言切换） -->
-      <text class="tabbar-text" :style="{ color: getActiveColor() }">{{ $t(tabbarItem.text) }}</text>
+      <text class="tabbar-text" :style="{ color: getActiveColor() }">{{ getText() }}</text>
 
       <!-- 角标：小红点 -->
       <view v-if="isDotBadge()" class="badge-dot" />

@@ -1,0 +1,255 @@
+<template>
+	<view :class="textareaClass" :style="[bgcolorStyle,customStyle]">
+		<textarea v-model="modelValue" :inputmode="inputmode" :placeholder="placeholder" :disabled="isDisabled||isReadonly"
+			:maxlength="maxlength" :placeholder-style="_placeholderStyle" :cursor-spacing="cursorSpacing"
+			:cursor-color="cursorColor" :auto-focus="autoFocus" :focus="focus" :confirm-type="confirmType"
+			:confirm-hold="confirmHold" :cursor="cursor" :selection-start="selectionStart" :selection-end="selectionEnd"
+			:adjust-position="adjustPosition" :hold-keyboard="holdKeyboard" :fixed="fixed" :show-confirm-bar="showConfirmBar"
+			:disable-default-padding="disableDefaultPadding" :auto-height="autoHeight" :class="textareaInnerClass"
+			:style="[customTextareaStyle,textareaStyle]" @input="onInput" @focus="onFocus" @blur="onBlur"
+			@keyboardheightchange="onKeyboardheightchange" @change="onChange" @linechange="onLinechange" />
+		<text v-if="showWordLimit&&maxlength>=0" :class="countClass"
+			:style="bgcolorStyle">{{modelValue!.length}}/{{maxlength}}</text>
+	</view>
+</template>
+
+<script setup>
+	import { useNamespace } from "../../libs/use"
+	import { isDark } from "../../libs/store"
+	import { hasStrValue, addUnit } from "../../libs/utils"
+	import { formDisabledInjectKey, formReadonlyInjectKey } from "../rice-form"
+	import { formItemBlurInjectKey } from "../rice-form-item"
+	import { TextareaProps } from "./type.uts"
+	defineOptions({
+		name: 'rice-textarea',
+		styleIsolation: 'app-and-page'
+	})
+	const ns = useNamespace("textarea")
+	const emit = defineEmits<{
+		input : [value: string],
+		focus : [event: UniTextareaFocusEvent],
+		blur : [event: UniTextareaBlurEvent],
+		keyboardheightchange : [event: UniInputKeyboardHeightChangeEvent],
+		change : [value: string],
+		linechange : [event: UniTextareaLineChangeEvent],
+	}>()
+
+	const props = withDefaults(defineProps<TextareaProps>(), {
+		maxlength: -1,
+		cursorSpacing: 0,
+		autoFocus: false,
+		focus: false,
+		confirmType: 'return',
+		confirmHold: false,
+		cursor: 0,
+		selectionStart: -1,
+		selectionEnd: -1,
+		adjustPosition: true,
+		holdKeyboard: false,
+		autoHeight: false,
+		border: 'surround',
+		showWordLimit: false,
+		height: '90px',
+		textareaStyle: () : UTSJSONObject => ({}),
+		customStyle: () : UTSJSONObject => ({}),
+	})
+
+	const modelValue = defineModel({
+		type: String,
+		default: ""
+	})
+
+	const isFocus = ref(false)
+	const showPasswordValue = ref(false)
+
+	const formDisabled = inject<Ref<boolean | null> | null>(formDisabledInjectKey, null)
+	const formReadonly = inject<Ref<boolean | null> | null>(formReadonlyInjectKey, null)
+	const formItemBlur = inject<(() => void) | null>(formItemBlurInjectKey, null)
+
+	const isDisabled = computed<boolean>(() => (formDisabled?.value ?? false) || (props.disabled ?? false))
+	const isReadonly = computed<boolean>(() => (formReadonly?.value ?? false) || (props.readonly ?? false))
+
+	const onClear = () => {
+		if (isDisabled.value || isReadonly.value) return
+		modelValue.value = ""
+	}
+
+	const onInput = (e : UniInputEvent) => {
+		emit('input', e.detail.value)
+	}
+
+	const onFocus = (e : UniTextareaFocusEvent) => {
+		isFocus.value = true
+		emit('focus', e)
+	}
+
+	let timer : null | number = null
+	const onBlur = (e : UniTextareaBlurEvent) => {
+		//加个延迟，防止web等端清除按钮点击不到
+		timer = setTimeout(() => {
+			isFocus.value = false
+			emit('blur', e)
+		}, 100)
+		formItemBlur?.()
+	}
+
+	const onKeyboardheightchange = (e : UniInputKeyboardHeightChangeEvent) => {
+		emit('keyboardheightchange', e)
+	}
+
+	const onChange = (e : UniInputChangeEvent) => {
+		emit('change', e.detail.value)
+	}
+
+	const onLinechange = (e : UniTextareaLineChangeEvent) => {
+		emit('linechange', e)
+	}
+
+	const bgcolorStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (hasStrValue(props.bgColor)) {
+			css.set('background-color', props.bgColor!)
+		}
+		return css
+	})
+
+	const customTextareaStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (hasStrValue(props.color)) {
+			css.set('color', props.color!)
+		}
+		if (hasStrValue(props.fontSize)) {
+			css.set('font-size', addUnit(props.fontSize!))
+		}
+		css.set('height', addUnit(props.height!))
+		if (props.maxHeight != null) {
+			css.set('max-height', addUnit(props.maxHeight!))
+		}
+		if (props.minHeight != null) {
+			css.set('min-height', addUnit(props.minHeight!))
+		}
+		return css
+	})
+
+	const textareaClass = computed(() => {
+		return [
+			ns.b(""),
+			ns.theme(),
+			ns.is("disabled", isDisabled.value),
+			ns.m(props.border),
+		]
+	})
+
+	const textareaInnerClass = computed(() => {
+		return [
+			ns.e('textarea'),
+			ns.is("__textarea--disabled", isDisabled.value),
+			ns.e(`textarea--${props.textareaAlign ?? 'left'}`),
+			// #ifdef VUE3-VAPOR
+			ns.is("__textarea--dark", isDark.value),
+			ns.is("__textarea--disabled--dark", isDisabled.value && isDark.value),
+			// #endif
+		]
+	})
+
+	const countClass = computed(() => {
+		return [
+			ns.e('count'),
+			ns.is('__count--disabled', isDisabled.value)
+		]
+	})
+
+	const _placeholderStyle = computed(() => {
+		let baseColor = isDark.value ? '#4d4d4d' : '#c8c9cc'
+		let css = `color:${baseColor};font-size:${addUnit(props.fontSize ?? '15px')};`
+		return css + (props.placeholderStyle ?? "")
+	})
+
+	onUnmounted(() => {
+		if (timer != null) clearTimeout(timer!)
+	})
+</script>
+
+<style scoped lang="scss">
+	.rice-textarea {
+		position: relative;
+		border-radius: 4px;
+		background-color: var(--rice-textarea-background);
+		padding: 10px;
+
+		&__textarea {
+			text-align: left;
+			font-size: 15px;
+			width: 100%;
+
+			/* #ifndef VUE3-VAPOR */
+			color: var(--rice-text-color);
+			/* #endif */
+
+			/* #ifdef VUE3-VAPOR  */
+			color: #323233;
+
+			&--dark {
+				color: #f5f5f5;
+			}
+
+			/* #endif */
+
+			&--disabled {
+
+				/* #ifndef VUE3-VAPOR */
+				color: var(--rice-textarea-disabled-text-color);
+				/* #endif */
+
+				/* #ifdef VUE3-VAPOR  */
+				color: #c0c4cc;
+
+				&--dark {
+					color: #8d9095;
+				}
+
+				/* #endif */
+			}
+
+			&--center {
+				text-align: center;
+			}
+
+			&--right {
+				text-align: right;
+			}
+		}
+
+		&__count {
+			position: absolute;
+			right: 5px;
+			bottom: 2px;
+			font-size: 12px;
+			background-color: var(--rice-textarea-background);
+			color: var(--rice-text-color-2);
+			padding: 1px 4px;
+
+			&--disabled {
+				background-color: var(--rice-textarea-disabled-background);
+				color: var(--rice-textarea-disabled-text-color)
+			}
+		}
+
+		&--surround {
+			border-radius: 4px;
+			border: 1px solid var(--rice-textarea-border-color);
+		}
+
+		&--bottom {
+			border-bottom: 1px solid var(--rice-textarea-border-color);
+		}
+
+
+		&--disabled {
+			background-color: var(--rice-textarea-disabled-background);
+			/* #ifdef WEB */
+			cursor: not-allowed;
+			/* #endif */
+		}
+	}
+</style>

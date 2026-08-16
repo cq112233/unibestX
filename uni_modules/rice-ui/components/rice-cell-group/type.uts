@@ -1,0 +1,7 @@
+export type CellGroupProps = {
+	title ?: string | number,
+	border ?: boolean,
+	radius ?: string | number,
+	titleStyle ?: UTSJSONObject,
+	customStyle ?: UTSJSONObject
+}

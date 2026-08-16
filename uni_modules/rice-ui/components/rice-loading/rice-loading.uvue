@@ -1,0 +1,249 @@
+<template>
+	<view :class="rootClass" :style="customStyle">
+		<view v-if="mode=='snow' || slot['icon']!=null" class="rice-loading--snow" ref="rotateRef">
+			<slot name="icon">
+				<rice-icon name="loading" :size="size" :color="color" />
+			</slot>
+		</view>
+
+		<!-- https://issues.dcloud.net.cn/pages/issues/detail?id=29778 -->
+		<!-- #ifndef VUE3-VAPOR && APP-IOS -->
+		<!-- 在蒸汽模式且hb版本小于5.13且iOS中不生效 -->
+		<view v-else-if="mode=='semicircle'||mode=='circle'" :class="ns.m(mode)" :style="semicircleStyle" ref="rotateRef">
+		</view>
+		<!-- #endif -->
+
+		<!-- #ifdef uniVersion>=5.12&& VUE3-VAPOR && APP-IOS  -->
+		<view v-else-if="mode=='semicircle'||mode=='circle'" :class="ns.m(mode)" :style="semicircleStyle" ref="rotateRef">
+		</view>
+		<!-- #endif -->
+
+		<!-- #ifdef VUE3-VAPOR -->
+		<loading v-else :style="nativeLoadingStyle"></loading>
+		<!-- #endif -->
+
+		<!-- #ifndef VUE3-VAPOR -->
+		<view v-else class="rice-loading--circular" :style="circularStyle" ref="circularRef"></view>
+		<!-- #endif -->
+
+		<!-- #ifndef APP -->
+		<view v-if="hasText" class="rice-loading__text" :class="[loadingTextClass,props.textClass]" :style="textStyle">
+			<slot>{{text}}</slot>
+		</view>
+		<!-- #endif -->
+
+		<!-- #ifdef APP -->
+		<text v-if="hasText" class="rice-loading__text" :class="[loadingTextClass,props.textClass]" :style="textStyle">
+			<slot>{{text}}</slot>
+		</text>
+		<!-- #endif -->
+
+
+	</view>
+</template>
+
+<script setup>
+	import { addUnit, hasStrValue } from '../../libs/utils';
+	import { useNamespace } from '../../libs/use';
+	import { Coloruts } from "../../libs/plugin";
+	import { LoadingProps, LoadingMode, LoadingTimingFunction } from './type.uts';
+	// #ifdef APP
+	import { useLoading, UseLoadingOptions } from "./useLoading"
+	// #endif
+
+	defineOptions({
+		name: 'rice-loading',
+		styleIsolation: 'app-and-page',
+		externalClasses: ['text-class']
+	})
+
+
+
+	const slot = useSlots()
+	const ns = useNamespace('loading')
+
+	const props = withDefaults(defineProps<LoadingProps>(), {
+		mode: 'circular',
+		duration: 1100,
+		vertical: false,
+		size: '24px',
+		textClass: '',
+		timingFunction: 'ease-in-out',
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+	const color = computed(() => hasStrValue(props.color) ? props.color! : '#1989fa')
+
+	const hasText = computed(() => (props.text != null && props.text != '') || slot['default'] != null)
+
+
+	//https://issues.dcloud.net.cn/pages/issues/detail?id=29778 
+	// #ifdef uniVersion>=5.12
+	const _model = computed(() => props.mode)
+	// #endif
+
+	// #ifdef uniVersion<5.12 && VUE3-VAPOR && APP-IOS
+	const _mode = computed(() => {
+		if (props.mode == 'semicircle' || props.mode == 'circle') return 'circular'
+		return props.mode
+	})
+	// #endif
+
+	const rootClass = computed(() => {
+		return [
+			ns.b(""),
+			ns.theme(),
+			ns.is('vertical', props.vertical),
+			ns.is('slot', slot['icon'] != null)
+		]
+	})
+
+	//圆形/半圆
+	const semicircleStyle = computed(() => {
+		const css = new Map<string, string>()
+		const size = addUnit(props.size!)
+		css.set('height', size)
+		css.set('width', size)
+
+		if (props.mode == 'circle') {
+			if (hasStrValue(props.inactiveColor)) {
+				css.set('border-color', props.inactiveColor!)
+			} else if (color.value != 'inherit') {
+				const rgb = new Coloruts(color.value).toRgb()
+				css.set('border-color', `rgba(${rgb['r']},${rgb['g']},${rgb['b']},.2)`)
+			}
+		}
+		css.set('border-top-color', color.value)
+
+		// #ifndef APP
+		css.set('animation-timing-function', props.timingFunction)
+		// #endif
+		return css
+	})
+
+	// 默认loading
+	const circularStyle = computed(() => {
+		const css = new Map<string, string>()
+		const size = addUnit(props.size!)
+		css.set('height', size)
+		css.set('width', size)
+		return css
+	})
+
+	//文字样式
+	const textStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.textColor != null) css.set('color', props.textColor!)
+		if (props.textSize != null) css.set('font-size', addUnit(props.textSize!))
+		return css
+	})
+
+	const loadingTextClass = computed(() => `rice-loading__text--${props.vertical ? 'vertical' : 'row'}`)
+
+	// #ifdef APP
+	const rotateRef = shallowRef<UniElement | null>(null)
+	const circularRef = shallowRef<UniElement | null>(null)
+
+	//动画类型，snow 时恒为 linear
+	const animationTimingFn = computed(() => (props.mode == 'snow' || slot['icon'] != null) ? 'linear' : props.timingFunction)
+
+	useLoading({
+		rotateRef,
+		circularRef,
+		timingFunction: animationTimingFn.value,
+		mode: props.mode,
+		color,
+		size: props.size,
+		duration: props.duration,
+	} as UseLoadingOptions)
+
+	// #endif
+
+	// #ifdef VUE3-VAPOR
+	const nativeLoadingStyle = computed(() => {
+		const css = new Map<string, string>()
+		const size = addUnit(props.size!)
+		css.set('height', size)
+		css.set('width', size)
+		css.set('border-color', color.value)
+		return css
+	})
+	// #endif
+</script>
+
+<style scoped lang="scss">
+	@mixin circle($color) {
+		border-radius: 999px;
+		border: 2px solid $color;
+		/* #ifndef APP */
+		border-top-color: v-bind("color");
+		animation: rotate v-bind("props.duration + 'ms'") ease-in-out infinite;
+		/* #endif */
+	}
+
+	.rice-loading {
+		flex-direction: row;
+		align-items: center;
+
+
+		&__text {
+			font-size: 14px;
+			color: var(--rice-text-color-2);
+
+			&--row {
+				margin-left: 8px;
+			}
+
+			&--vertical {
+				margin-top: 8px;
+			}
+
+		}
+
+		&--vertical {
+			flex-direction: column;
+			justify-content: center;
+		}
+
+
+		&--semicircle {
+			@include circle(transparent);
+		}
+
+		&--circle {
+			@include circle(rgba(25, 136, 249, .2));
+		}
+
+
+		/* #ifndef APP */
+
+		&--circular {
+			color: v-bind("color");
+			border-radius: 100%;
+			animation: rotate v-bind("props.duration + 'ms'") linear infinite;
+			background: conic-gradient(from 180deg at 50% 50%, rgba(255, 255, 255, 0) 0deg, rgba(255, 255, 255, 0) 60deg, currentColor 330deg, rgba(255, 255, 255, 0) 360deg);
+			mask: radial-gradient(transparent calc(50% - 1rpx), #fff 50%);
+		}
+
+
+		&--snow {
+			animation: rotate v-bind("props.duration + 'ms'") linear infinite;
+		}
+
+		@keyframes rotate {
+			from {
+				transform: rotate(0deg);
+			}
+
+			to {
+				transform: rotate(360deg);
+			}
+		}
+
+
+		/* #endif */
+
+
+
+	}
+</style>

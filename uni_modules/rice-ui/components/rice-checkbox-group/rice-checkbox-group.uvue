@@ -1,0 +1,78 @@
+<template>
+	<view :class="rootClass" :style="customStyle">
+		<slot />
+	</view>
+</template>
+
+<script setup>
+
+	import { useNamespace } from '../../libs/use';
+	import { CheckboxGroupProps, CheckboxValueType } from "./type.uts"
+	import { defCheckboxDirection, defCheckboxIconPosition, defCheckboxShape, checkboxGroupInjectKey } from "./index.uts"
+	import { CheckboxDirection, CheckboxShape, CheckboxIconPosition, CheckboxGroupProvide } from "./type.uts"
+
+	defineOptions({
+		name: 'rice-checkbox-group',
+		styleIsolation: 'app-and-page'
+	})
+	const ns = useNamespace('checkbox-group')
+	const emit = defineEmits<{
+		change : [value: CheckboxValueType[]],
+	}>()
+	const props = withDefaults(defineProps<CheckboxGroupProps>(), {
+		disabled: false,
+		readonly: false,
+		direction: defCheckboxDirection,
+		spaceBetween: false,
+		shape: defCheckboxShape,
+		iconPosition: defCheckboxIconPosition,
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+	const modelValue = defineModel({
+		type: Array as PropType<CheckboxValueType[]>,
+		default: () : CheckboxValueType[] => ([])
+	})
+
+	const updateValue = (value : CheckboxValueType[]) => {
+		modelValue.value = value.slice(0)
+		emit('change', value)
+	}
+
+	// 不支持 ...toRefs()
+	provide(checkboxGroupInjectKey, {
+		modelValue,
+		disabled: toRef<boolean>(() => props.disabled),
+		readonly: toRef<boolean>(() => props.readonly),
+		direction: toRef<CheckboxDirection>(() => props.direction),
+		iconPosition: toRef<CheckboxIconPosition>(() => props.iconPosition),
+		spaceBetween: toRef<boolean>(() => props.spaceBetween),
+		iconSize: toRef<string | number | null>(() => props.iconSize),
+		labelSize: toRef<string | number | null>(() => props.labelSize),
+		labelColor: toRef<string | null>(() => props.labelColor),
+		checkedColor: toRef<string | null>(() => props.checkedColor),
+		shape: toRef<CheckboxShape>(() => props.shape),
+		max: toRef<number | null>(() => props.max),
+		updateValue,
+	} as CheckboxGroupProvide)
+
+
+	const rootClass = computed(() => {
+		return [
+			ns.b(""),
+			ns.m(props.direction),
+			ns.theme(),
+		]
+	})
+</script>
+
+<style scoped lang="scss">
+	.rice-checkbox-group {
+		flex-direction: column;
+
+		&--row {
+			flex-direction: row;
+			flex-wrap: wrap;
+		}
+	}
+</style>

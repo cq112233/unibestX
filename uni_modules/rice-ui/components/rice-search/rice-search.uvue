@@ -1,0 +1,279 @@
+<template>
+	<view :class="searchClass" :style="[searchStyle,customStyle]">
+		<slot name="left"></slot>
+		<view :class="customWrapperClass" :style="wrapperStyle">
+			<slot name="label" v-if="$slots['label']!=null||hasStrValue(label)">
+				<text class="rice-search__label">{{label}}</text>
+			</slot>
+			<slot v-if="$slots['leftIcon']!=null||hasStrValue(leftIcon)" name="leftIcon">
+				<rice-icon :name="leftIcon" :size="leftIconSize" :color="leftIconColor" @click="clickLeftIcon" />
+			</slot>
+			<input v-model="modelValue" type="search" inputmode="search" :maxlength="maxlength" confirm-type="search"
+				:focus="focus" :disabled="disabled" :holdKeyboard="holdKeyboard" :placeholder="placeholder"
+				:placeholder-style="_placeholderStyle" :class="customInputClass" :style="inputStyle" @input="onInput"
+				@focus="onFocus" @blur="onBlur" @confirm="onConfirm" @keyboardheightchange="onKeyboardheightchange"
+				@click="handleClick" />
+			<slot v-if="$slots['rightIcon']!=null||hasStrValue(rightIcon)" name="rightIcon">
+				<rice-icon :name="rightIcon" :size="rightIconSize" :color="rightIconColor" @click="clickRightIcon" />
+			</slot>
+			<rice-icon v-if="isShowClearable" :name="clearIcon" size="17px" :custom-style="clearIconStyle" @click="onClear" />
+		</view>
+		<slot v-if="showAction" name="action">
+			<text class="rice-search__action" :style="actionStyle" @click="clickAction">{{actionText}}</text>
+		</slot>
+	</view>
+</template>
+
+<script setup>
+	import { useNamespace } from '../../libs/use';
+	import { isDark } from "../../libs/store";
+	import { addUnit, hasStrValue } from "../../libs/utils";
+	import { SearchProps } from './type.uts';
+
+	defineOptions({
+		name: 'rice-search',
+		styleIsolation: 'app-and-page',
+		externalClasses: ['input-class', 'wrapper-class']
+	})
+
+	const ns = useNamespace('search')
+	const emit = defineEmits<{
+		input : [value: string],
+		search : [value: string],
+		focus : [event: UniInputFocusEvent],
+		blur : [event: UniInputBlurEvent],
+		keyboardheightchange : [event: UniInputKeyboardHeightChangeEvent],
+		clickInput : [event: UniPointerEvent],
+		clickLeftIcon : [value: string],
+		clickRightIcon : [value: string],
+		clickAction : [value: string],
+		clear : [],
+	}>()
+
+	const props = withDefaults(defineProps<SearchProps>(), {
+		shape: 'square',
+		maxlength: -1,
+		holdKeyboard: false,
+		placeholder: '请输入搜索关键字',
+		focus: false,
+		disabled: false,
+		clearable: true,
+		clearTrigger: 'focus',
+		clearIcon: 'clear',
+		leftIconSize: '16px',
+		rightIconSize: '16px',
+		showAction: false,
+		actionText: '搜索',
+		inputAlign: 'left',
+		leftIcon: 'search',
+		wrapperClass: "",
+		inputClass: "",
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+	const modelValue = defineModel({
+		type: String,
+		default: ""
+	})
+
+	const isFocus = ref(false)
+
+	const isShowClearable = computed<boolean>(() => {
+		if (props.disabled) return false
+		const shouldTrigger = props.clearTrigger == 'focus' ? isFocus.value : true
+		return props.clearable && modelValue.value != "" && shouldTrigger
+	})
+
+	const onClear = () => {
+		if (props.disabled) return
+		modelValue.value = ""
+		emit('clear')
+	}
+
+	const handleClick = (e : UniPointerEvent) => {
+		emit('clickInput', e)
+	}
+
+	const onInput = (e : UniInputEvent) => {
+		emit('input', e.detail.value)
+	}
+
+	const onFocus = (e : UniInputFocusEvent) => {
+		isFocus.value = true
+		emit('focus', e)
+	}
+
+	let timer : null | number = null
+	const onBlur = (e : UniInputBlurEvent) => {
+		//加个延迟，防止web等端清除按钮点击不到
+		timer = setTimeout(() => {
+			isFocus.value = false
+			emit('blur', e)
+		}, 100)
+
+	}
+
+	const onConfirm = (e : UniInputConfirmEvent) => {
+		emit('search', e.detail.value)
+	}
+
+	const onKeyboardheightchange = (e : UniInputKeyboardHeightChangeEvent) => {
+		emit('keyboardheightchange', e)
+	}
+
+	const clickLeftIcon = () => {
+		emit('clickLeftIcon', modelValue.value)
+	}
+
+	const clickRightIcon = () => {
+		emit('clickRightIcon', modelValue.value)
+	}
+
+	const clickAction = () => {
+		emit('clickAction', modelValue.value)
+	}
+
+	const searchStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (hasStrValue(props.bgColor)) css.set('background-color', props.bgColor!)
+		return css
+	})
+
+	const wrapperStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.height != null) css.set('height', addUnit(props.height!))
+		if (hasStrValue(props.inputColor)) css.set('background-color', props.inputColor!)
+		return css
+	})
+
+	const inputStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.fontSize != null) css.set('font-size', addUnit(props.fontSize!))
+		if (hasStrValue(props.color)) css.set('color', props.color!)
+		return css
+	})
+
+	const actionStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.actionSize != null) css.set('font-size', addUnit(props.actionSize!))
+		if (hasStrValue(props.actionColor)) css.set('color', props.actionColor!)
+		return css
+	})
+
+	const customInputClass = computed(() => {
+		return [
+			ns.e('wrapper__input'),
+			ns.e(`wrapper__input--${props.inputAlign}`),
+			props.inputClass ?? "",
+			// #ifdef VUE3-VAPOR
+			ns.is("__wrapper__input--dark", isDark.value),
+			// #endif
+		]
+	})
+
+	const _placeholderStyle = computed(() => {
+		let baseColor = isDark.value ? '#4d4d4d' : '#c8c9cc'
+		let css = `color:${baseColor};font-size:${addUnit(props.fontSize ?? '15px')};`
+		return css + (props.placeholderStyle ?? "")
+	})
+
+	const clearIconStyle = computed(() => {
+		return {
+			paddingLeft: '6px',
+		}
+	})
+
+	const searchClass = computed(() => {
+		return [
+			ns.b(""),
+			ns.theme(),
+			//#ifdef WEB
+			ns.is('disabled', props.disabled),
+			//#endif
+		]
+	})
+
+	const customWrapperClass = computed(() => {
+		return [
+			ns.e("wrapper"),
+			ns.e(`wrapper--${props.shape}`),
+			props.wrapperClass ?? "",
+		]
+	})
+
+	onUnmounted(() => {
+		if (timer != null) clearTimeout(timer!)
+	})
+</script>
+
+<style scoped lang="scss">
+	.rice-search {
+		flex-direction: row;
+		align-items: center;
+		background-color: var(--rice-search-background);
+		padding: 10px 12px;
+
+		&__label {
+			padding-right: 5px;
+			font-size: 14px;
+			color: var(--rice-text-color);
+		}
+
+		&__wrapper {
+			flex: 1;
+			flex-direction: row;
+			align-items: center;
+			background-color: var(--rice-search-input-background);
+			height: 36px;
+			padding: 0 10px;
+			border-radius: 4px;
+
+			&__input {
+				flex: 1;
+				padding: 0 8px;
+				font-size: 15px;
+				height: 100%;
+				text-align: left;
+
+				/* #ifndef VUE3-VAPOR */
+				color: var(--rice-text-color);
+				/* #endif */
+
+				/* #ifdef VUE3-VAPOR */
+				color: #323233;
+
+				&--dark {
+					color: #f5f5f5;
+				}
+
+				/* #endif */
+
+				&--center {
+					text-align: center;
+				}
+
+				&--right {
+					text-align: right;
+				}
+			}
+
+			&--round {
+				border-radius: 999px;
+			}
+		}
+
+
+		&__action {
+			padding-left: 10px;
+			font-size: 14px;
+			color: var(--rice-text-color);
+		}
+
+		//#ifdef WEB
+		&--disabled {
+			cursor: not-allowed;
+		}
+
+		//#endif
+	}
+</style>

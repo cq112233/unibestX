@@ -1,14 +1,17 @@
 <template>
-  <!-- 应用全局骨架与皮肤容器，通过 CSS 变量绑定响应式主题色 -->
-  <view class="flex flex-col flex-1" style="flex: 1;" :style="{ '--theme-color': appStore.state.theme }">
+  <!-- 应用全局骨架与皮肤容器，通过 CSS 变量绑定响应式主题色与 Rice UI 变量 -->
+  <view
+    class="flex flex-col flex-1"
+    style="flex: 1;"
+    :class="[isDarkMode ? 'rice-theme-dark rice-variables' : 'rice-theme-light rice-variables', currentThemeClass]"
+    :style="rootThemeStyle"
+  >
     <!-- 页面内容滚动容器 -->
     <scroll-view direction="vertical" class="flex-1" style="flex: 1;">
       <slot></slot>
     </scroll-view>
     <!-- 仅在当前页面为底部 Tabbar 页面时渲染自定义导航栏 -->
     <Tabbar v-if="isCurrentPageTabbar" />
-    <!-- 全局统一绑定的 Toast 轻提示弹窗组件 -->
-    <up-toast ref="uToastRef" />
   </view>
 </template>
 
@@ -16,17 +19,47 @@
 import Tabbar from '@/src/tabbar/index.uvue'
 import { useAppStore } from '@/src/store'
 import { isPageTabbar, syncCurIdxByCurrentPage } from '@/src/tabbar/store'
-import { registerToast, unregisterToast } from '@/src/utils/toast'
-import type { ComponentPublicInstance } from 'vue'
-import { onBeforeMount, onMounted, onUnmounted, ref } from 'vue'
+import { isDark } from '@/uni_modules/rice-ui'
+import { computed, onBeforeMount, ref } from 'vue'
 
 // 激活应用状态管理 Store
 const appStore = useAppStore()
 
+// Rice UI 暗黑模式响应式计算
+const isDarkMode = computed((): boolean => isDark.value)
+
+// 响应式计算当前主题类名 (支持 5 套主题无缝切换)
+const currentThemeClass = computed((): string => {
+  const theme = appStore.state.theme
+  if (theme == '#37c2bc') {
+    return 'theme-teal'
+  }
+  if (theme == '#0957DE' || theme == '#0957de') {
+    return 'theme-blue'
+  }
+  if (theme == '#10b981') {
+    return 'theme-green'
+  }
+  if (theme == '#f43f5e') {
+    return 'theme-rose'
+  }
+  if (theme == '#f97316') {
+    return 'theme-orange'
+  }
+  return 'theme-teal'
+})
+
+// 动态计算根视图样式变量
+const rootThemeStyle = computed((): UTSJSONObject => {
+  const theme = appStore.state.theme
+  return {
+    '--theme-color': theme,
+    '--rice-primary-color': theme,
+  } as UTSJSONObject
+})
+
 // 控制当前页面是否需要显示底部导航栏
 const isCurrentPageTabbar = ref(false)
-// 挂载全局 Toast 组件的 DOM/组件实例引用
-const uToastRef = ref<ComponentPublicInstance | null>(null)
 
 // 页面显示钩子：解析当前路由，动态控制导航栏显示及同步选中索引
 onBeforeMount(() => {
@@ -42,26 +75,6 @@ onBeforeMount(() => {
         syncCurIdxByCurrentPage()
       }
     }
-  }
-  // 注册全局 Toast 组件引用，供 HTTP 或工具类直接调用
-  if (uToastRef.value != null) {
-    registerToast(uToastRef.value!)
-  }
-})
-
-// 组件挂载钩子：注册全局 Toast
-onMounted(() => {
-  // 注册 Toast 实例
-  if (uToastRef.value != null) {
-    registerToast(uToastRef.value!)
-  }
-})
-
-// 组件销毁钩子：反注册 Toast 以释放内存防内存泄漏
-onUnmounted(() => {
-  // 卸载 Toast 实例
-  if (uToastRef.value != null) {
-    unregisterToast(uToastRef.value!)
   }
 })
 </script>

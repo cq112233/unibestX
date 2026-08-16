@@ -1,0 +1,97 @@
+<template>
+	<view class="rice-collapse" :class="rootClass">
+		<slot></slot>
+	</view>
+</template>
+
+<script setup>
+	import { useNamespace } from '../../libs/use';
+	import { CollapseProps, CollapseInjectKey, CollapseActiveName } from "./type.uts"
+	import { collapseInjectKey } from "./index"
+
+	defineOptions({
+		name: 'rice-collapse',
+		styleIsolation: 'app-and-page'
+	})
+
+	const ns = useNamespace('collapse')
+	const emit = defineEmits<{
+		change : [names: CollapseActiveName[] | CollapseActiveName]
+	}>()
+
+	const props = withDefaults(defineProps<CollapseProps>(), {
+		accordion: false,
+		border: false,
+		duration: 250,
+	})
+
+	const modelValue = defineModel({
+		type: [Array, Number, String] as PropType<CollapseActiveName[] | CollapseActiveName>,
+		default: () : CollapseActiveName[] => ([])
+	})
+
+	const castArray = () : CollapseActiveName[] => {
+		// #ifndef APP
+		if (modelValue.value == null) return [] as CollapseActiveName[]
+		// #endif
+		return Array.isArray(modelValue.value)
+			? modelValue.value.slice(0)
+			: [modelValue.value!]
+	}
+
+	const activeNames = ref<CollapseActiveName[]>(castArray())
+
+	const setActiveNames = (names : CollapseActiveName[]) => {
+		activeNames.value = names
+		const value = props.accordion ? activeNames.value[0] : activeNames.value
+		modelValue.value = value
+		emit('change', value)
+	}
+
+	/**
+	 * collapseItem点击
+	 */
+	const handleItemClick = (name : CollapseActiveName) => {
+		if (props.accordion) {
+			setActiveNames([activeNames.value.length > 0 && activeNames.value[0] == name ? '' : name])
+		} else {
+			const _activeNames = activeNames.value.slice(0)
+			const index = _activeNames.indexOf(name)
+			if (index > -1) {
+				_activeNames.splice(index, 1)
+			} else {
+				_activeNames.push(name)
+			}
+			setActiveNames(_activeNames)
+		}
+	}
+
+	watch(modelValue, () => {
+		activeNames.value = castArray()
+	}, {
+		deep: true
+	})
+
+	provide(collapseInjectKey, {
+		activeNames,
+		duration: toRef<number>(() => props.duration),
+		handleItemClick
+	} as CollapseInjectKey)
+
+	const rootClass = computed(() => {
+		return [
+			ns.theme(),
+			ns.is('border', props.border),
+		]
+	})
+</script>
+
+<style scoped lang="scss">
+	@import "../../libs/style/mixins/hairline";
+
+	.rice-collapse {
+		&--border {
+			@include hairline-top-bottom;
+		}
+	}
+</style>

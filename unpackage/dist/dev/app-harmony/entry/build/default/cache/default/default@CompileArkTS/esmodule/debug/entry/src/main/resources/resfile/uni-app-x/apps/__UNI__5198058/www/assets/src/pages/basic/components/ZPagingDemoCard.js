@@ -36,7 +36,7 @@ class CompactArticleItem extends UTS.UTSType {
 }
 const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   __dynamicSharedData: true,
-  __hash: "f03ccf20",
+  __hash: "556723a2",
   __className,
   __filename: "src/pages/basic/components/ZPagingDemoCard.uvue",
   __name: "ZPagingDemoCard",
@@ -147,7 +147,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
                 _setSharedDataStyle(__sharedData_VFor0, 2, { backgroundColor: tabIndex.value === _for_key0.value ? "#ffffff" : "transparent" });
               });
               _selector9_1(_for_key0.value, () => {
-                _setSharedDataStyle(__sharedData_VFor0, 3, { color: tabIndex.value === _for_key0.value ? "var(--theme-color, #37c2bc)" : "#64748b" });
+                _setSharedDataStyle(__sharedData_VFor0, 3, { color: tabIndex.value === _for_key0.value ? "var(--theme-color, #845ec2)" : "#64748b" });
               });
               return null;
             }, (__sharedData_VFor0, tab, index) => {

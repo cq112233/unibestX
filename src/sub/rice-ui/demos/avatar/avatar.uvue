@@ -1,0 +1,68 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Avatar 头像" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <!-- 基础形状 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">头像形状</text>
+        <view class="flex-row items-center justify-around py-10px">
+          <view class="flex-col items-center">
+            <rice-avatar src="/static/logo.png" size="50px" :round="true" />
+            <text class="text-12px text-[#64748b] mt-6px">圆形 (Round)</text>
+          </view>
+          <view class="flex-col items-center">
+            <rice-avatar src="/static/logo.png" size="50px" :round="false" radius="8px" />
+            <text class="text-12px text-[#64748b] mt-6px">方形圆角</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 尺寸展示 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">头像尺寸</text>
+        <view class="flex-row items-center justify-around py-10px">
+          <rice-avatar src="/static/logo.png" size="32px" />
+          <rice-avatar src="/static/logo.png" size="44px" />
+          <rice-avatar src="/static/logo.png" size="56px" />
+          <rice-avatar src="/static/logo.png" size="68px" />
+        </view>
+      </view>
+
+      <!-- 文字与图标头像 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">文字与图标</text>
+        <view class="flex-row items-center justify-around py-10px">
+          <rice-avatar text="UN" :bg-color="currentTheme" color="#ffffff" size="48px" />
+          <rice-avatar icon="user" :bg-color="currentTheme" color="#ffffff" size="48px" />
+          <rice-avatar text="RICE" bg-color="#334155" color="#ffffff" size="48px" />
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store'
+import { computed } from 'vue'
+
+const appStore = useAppStore()
+const currentTheme = computed((): string => appStore.state.theme)
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 14px;
+  background-color: #ffffff;
+  border-radius: 10px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 12px;
+  padding-left: 6px;
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+</style>

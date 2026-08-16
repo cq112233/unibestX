@@ -1,0 +1,2890 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚšÿimport { _ as __easycom_0 } from "../rice-overlay/rice-overlay.js";
+import { _ as __easycom_0$1 } from "../rice-icon/rice-icon.js";
+import { _ as __easycom_1$1 } from "../rice-button/rice-button.js";
+import { u as usePopup, U as UsePopupOptions } from "../../libs/use/usePopup/index.js";
+import "../../libs/use/useCountDown/index.js";
+import { i as isDark } from "../../libs/store/useConfig.js";
+import { u as useNamespace } from "../../libs/use/useNamespace/index.js";
+import "../../libs/use/useRelation/useChildren.js";
+import "../../libs/use/useRelation/useParent.js";
+import { u as useSafeArea, s as safeAreaInsets } from "../../libs/use/useSafeArea/index.js";
+import "../../libs/use/useTouch/index.js";
+import { C as Coloruts } from "../../libs/plugin/coloruts/conversion.js";
+import "../../libs/plugin/coloruts/constant.js";
+import "../../libs/plugin/coloruts/type.js";
+import { d as dateuts } from "../../libs/plugin/dateuts/index.js";
+import { C as CalendarPanelChangeResult, G as GridItem } from "./type.js";
+import { c as clamp, h as hasStrValue, a as addUnit, d as getPxNum } from "../../libs/utils/basic.js";
+import { g as getMonthDays, f as formatDate, a as getDateRange, b as getIsSelected, c as getIsBetween } from "./utils.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineEmits: _defineEmits, useModel: _useModel, mergeModels: _mergeModels, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, unref: _unref, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, toDisplayString: _toDisplayString, createSharedDataSlot: _createSharedDataSlot, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, createSharedDataFor: _createSharedDataFor, setSharedDataEvent: _setSharedDataEvent, setSharedDataTemplateRef: _setSharedDataTemplateRef } = globalThis.Vue;
+const __className = "GenUniModulesRiceUiComponentsRiceCalendarRiceCalendar";
+const { shallowRef, computed, ref, watch, onMounted } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  ...{
+    name: "rice-calendar",
+    styleIsolation: "app-and-page"
+  },
+  __dynamicSharedData: true,
+  __hash: "7a9b2dba",
+  __className,
+  __filename: "uni_modules/rice-ui/components/rice-calendar/rice-calendar.uvue",
+  __name: "rice-calendar",
+  props: /* @__PURE__ */ _mergeModels(new UTSJSONObject({
+    mode: { default: "single", type: String },
+    date: { type: null },
+    switchMode: { default: "year-month", type: String },
+    minDate: { type: String },
+    maxDate: { type: String },
+    lunar: { type: Boolean, default: false },
+    title: { default: "è¯·é€‰æ‹©æ—¥æœŸ", type: String },
+    showTitle: { type: Boolean, default: true },
+    color: { type: String },
+    formatter: { type: Function },
+    showSubtitle: { type: Boolean, default: true },
+    showConfirmBtn: { type: Boolean, default: true },
+    confirmText: { default: "ç¡®è®¤", type: String },
+    confirmDisabledText: { type: String },
+    maxRange: { type: Number },
+    rangePrompt: { type: String },
+    showRangePrompt: { type: Boolean, default: true },
+    allowSameDay: { type: Boolean, default: false },
+    rowHeight: { default: "60px", type: [String, Number] },
+    readonly: { type: Boolean },
+    firstDayOfWeek: { default: 1, type: Number },
+    closeable: { type: Boolean, default: true },
+    closeIcon: { default: "cross", type: String },
+    usePopup: { type: Boolean, default: true },
+    closeOnClickClose: { type: Boolean, default: true },
+    closeOnClickOverlay: { type: Boolean, default: true },
+    safeAreaInsetBottom: { type: Boolean, default: null },
+    zIndex: { default: 999, type: Number },
+    weeklyCalendar: { type: Boolean, default: false },
+    showWeeklyText: { type: Boolean, default: true },
+    showFullDate: { type: Boolean, default: null },
+    showMonthMark: { type: Boolean, default: false },
+    customStyle: { default: () => {
+      return new UTSJSONObject({});
+    }, type: null }
+  }), new UTSJSONObject({
+    "show": {
+      type: Boolean,
+      default: false
+    },
+    "showModifiers": {}
+  })),
+  emits: /* @__PURE__ */ _mergeModels(["select", "confirm", "unselect", "panelChange", "clickDisabledDate", "clickClose", "open", "close", "opened", "closed", "overRange"], ["update:show"]),
+  __multiRoot: true,
+  setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesRiceUiComponentsRiceCalendarRiceCalendarSharedData", sharedDataClassId: 0 })));
+    const ns = useNamespace("calendar");
+    useSafeArea();
+    const emit = __emit;
+    const props = __props;
+    const show = _useModel(__props, "show");
+    const calendarRef = shallowRef(null);
+    const realShow = usePopup(calendarRef, new UsePopupOptions({
+      zoom: null,
+      zoomScale: null,
+      beforeClose: null,
+      show,
+      duration: 300,
+      position: "bottom",
+      opacity: false
+    })).realShow;
+    const isShow = computed(() => {
+      return props.usePopup ? realShow.value : true;
+    });
+    const _showFullDate = computed(() => {
+      var _a2;
+      return (_a2 = props.showFullDate) !== null && _a2 !== void 0 ? _a2 : props.weeklyCalendar;
+    });
+    const getDayIsDisabled = (day) => {
+      if (props.weeklyCalendar && day.disabled == false)
+        return false;
+      return day.disabled == true || day.isCurrentMonth == false;
+    };
+    const getInitDate = () => {
+      const mode = props.mode;
+      let defaultDate = props.date;
+      if (defaultDate == "") {
+        return [];
+      }
+      const today = dateuts().format("YYYY-MM-DD");
+      let dates = [];
+      if (typeof defaultDate == "string") {
+        dates = [defaultDate];
+      } else if (Array.isArray(defaultDate)) {
+        dates = defaultDate.slice();
+      }
+      if (dates.length == 0) {
+        dates.push(today);
+      }
+      if (mode == "range" && dates.length >= 2) {
+        const start = getDateRange(dates[0], props.minDate, props.maxDate);
+        const end = getDateRange(dates[1], props.minDate, props.maxDate);
+        if (dateuts(start).isAfter(end)) {
+          return [end, start];
+        }
+        return [start, end];
+      }
+      return dates.map((v) => {
+        return getDateRange(v, props.minDate, props.maxDate);
+      });
+    };
+    const currentDate = ref(getInitDate());
+    const getInitPanelDate = () => {
+      const date = currentDate.value;
+      if (date.length > 0)
+        return date[0];
+      return getDateRange(dateuts().format("YYYY-MM-DD"), props.minDate, props.maxDate);
+    };
+    const primaryColor = ref("");
+    const activeColor = computed(() => {
+      var _a2;
+      const color = (_a2 = props.color) !== null && _a2 !== void 0 ? _a2 : primaryColor.value;
+      return color == "" ? "#1989fa" : color;
+    });
+    const getTintColor = (color) => {
+      const colorUts = new Coloruts(color);
+      return isDark.value ? colorUts.mix("#141414", 90).toHexString() : colorUts.tint(90).toHexString();
+    };
+    const firstDayOfWeek = computed(() => {
+      return clamp(props.firstDayOfWeek, 1, 7);
+    });
+    const currentPanelDate = ref(getInitPanelDate());
+    const monthDays = ref([]);
+    monthDays.value = getMonthDays([currentPanelDate.value], firstDayOfWeek.value, props.formatter, props.minDate, props.maxDate, _showFullDate.value);
+    const currentMonth = computed(() => {
+      return dateuts(currentPanelDate.value).format("M");
+    });
+    const currentWeekIndex = computed(() => {
+      if (props.weeklyCalendar == false)
+        return 0;
+      const panelDate = formatDate(currentPanelDate.value);
+      for (let week = 0; week < monthDays.value.length; week++) {
+        const weekItem = monthDays.value[week];
+        const dayIndex = weekItem.findIndex((day) => {
+          return day.fullDate == panelDate;
+        });
+        if (dayIndex != -1) {
+          return week;
+        }
+      }
+      return 0;
+    });
+    const displayMonthDays = computed(() => {
+      if (props.weeklyCalendar == false) {
+        return monthDays.value;
+      }
+      if (monthDays.value.length == 0) {
+        return [];
+      }
+      return [monthDays.value[currentWeekIndex.value]];
+    });
+    const displayMonthDaysRenderKey = computed(() => {
+      const list = displayMonthDays.value;
+      const rowCount = list.length;
+      const first = rowCount > 0 && list[0].length > 0 ? list[0][0].fullDate : "empty";
+      const lastRow = rowCount > 0 ? list[rowCount - 1] : [];
+      const last = lastRow.length > 0 ? lastRow[lastRow.length - 1].fullDate : "empty";
+      return `${currentPanelDate.value}-${rowCount}-${first}-${last}`;
+    });
+    const getWeekRowKey = (weekItem, index) => {
+      const first = weekItem.length > 0 ? weekItem[0].fullDate : `empty-${index}`;
+      const last = weekItem.length > 0 ? weekItem[weekItem.length - 1].fullDate : `empty-${index}`;
+      return `${props.weeklyCalendar}-${displayMonthDaysRenderKey.value}-${first}-${last}-${index}`;
+    };
+    const getRealWeekIndex = (index) => {
+      if (props.weeklyCalendar == false)
+        return index;
+      return currentWeekIndex.value + index;
+    };
+    const formatPanelDate = computed(() => {
+      if (props.weeklyCalendar && props.showWeeklyText) {
+        return `${dateuts(currentPanelDate.value).format("YYYYå¹´Mæœˆ")} ç¬¬${currentWeekIndex.value + 1}å‘¨`;
+      }
+      return dateuts(currentPanelDate.value).format("YYYYå¹´Mæœˆ");
+    });
+    const weeks = ["ä¸€", "äºŒ", "ä¸‰", "å››", "äº”", "å…­", "æ—¥"];
+    const weekList = computed(() => {
+      if (firstDayOfWeek.value == 1)
+        return weeks;
+      const firstDay = firstDayOfWeek.value;
+      return [...weeks.slice(firstDay - 1, 7), ...weeks.slice(0, firstDay - 1)];
+    });
+    const getBottomInfo = (day) => {
+      var _a2;
+      if (hasStrValue(day.bottomInfo))
+        return day.bottomInfo;
+      if (props.mode == "range") {
+        const dates = currentDate.value;
+        if (props.allowSameDay == true && dates.length >= 2 && getIsSelected(day, currentDate.value, props.mode) && dateuts(dates[0]).isSame(dates[1])) {
+          return "å¼€å§‹/ç»“æŸ";
+        }
+        if (dateuts(day.fullDate).isSame(dates[0]))
+          return "å¼€å§‹";
+        if (dates.length >= 2 && dateuts(day.fullDate).isSame(dates[1]))
+          return "ç»“æŸ";
+      }
+      return props.lunar ? (_a2 = day.lunarInfo) === null || _a2 === void 0 ? null : _a2.IDayCn : null;
+    };
+    const getPanelYearMonth = () => {
+      return dateuts(currentPanelDate.value).format("YYYY-MM");
+    };
+    const getPanelYearMonthByDate = (panelDate) => {
+      return dateuts(panelDate).format("YYYY-MM");
+    };
+    const getPanelWeekByDate = (panelDate) => {
+      if (props.weeklyCalendar == false) {
+        return 1;
+      }
+      const normalizedDate = formatDate(panelDate);
+      const panelMonthDays = getMonthDays([normalizedDate], firstDayOfWeek.value, props.formatter, props.minDate, props.maxDate, _showFullDate.value);
+      for (let week = 0; week < panelMonthDays.length; week++) {
+        const weekItem = panelMonthDays[week];
+        const dayIndex = weekItem.findIndex((day) => {
+          return day.fullDate == normalizedDate;
+        });
+        if (dayIndex != -1) {
+          return week + 1;
+        }
+      }
+      return 1;
+    };
+    const getPanelRowsByDate = (panelDate) => {
+      const normalizedDate = props.weeklyCalendar ? formatDate(panelDate) : panelDate;
+      const panelMonthDays = getMonthDays([normalizedDate], firstDayOfWeek.value, props.formatter, props.minDate, props.maxDate, _showFullDate.value);
+      if (props.weeklyCalendar == false) {
+        return panelMonthDays;
+      }
+      for (let week = 0; week < panelMonthDays.length; week++) {
+        const weekItem = panelMonthDays[week];
+        const dayIndex = weekItem.findIndex((day) => {
+          return day.fullDate == normalizedDate;
+        });
+        if (dayIndex != -1) {
+          return [weekItem];
+        }
+      }
+      return panelMonthDays.length > 0 ? [panelMonthDays[0]] : [];
+    };
+    const getPanelChangeResultByDate = (panelDate) => {
+      const panelRows = getPanelRowsByDate(panelDate);
+      const panelYearMonth = getPanelYearMonthByDate(panelDate);
+      let firstDate = dateuts(panelDate).startOf("month").format("YYYY-MM-DD");
+      let lastDate = dateuts(panelDate).endOf("month").format("YYYY-MM-DD");
+      let prevMonthFirstDate = "";
+      let nextMonthLastDate = "";
+      if (props.weeklyCalendar && panelRows.length > 0) {
+        firstDate = "";
+        lastDate = "";
+      }
+      for (let rowIndex = 0; rowIndex < panelRows.length; rowIndex++) {
+        const row = panelRows[rowIndex];
+        for (let dayIndex = 0; dayIndex < row.length; dayIndex++) {
+          const day = row[dayIndex];
+          const dayYearMonth = dateuts(day.fullDate).format("YYYY-MM");
+          if (props.weeklyCalendar && dayYearMonth == panelYearMonth) {
+            if (firstDate == "") {
+              firstDate = day.fullDate;
+            }
+            lastDate = day.fullDate;
+          }
+          if (dayYearMonth < panelYearMonth && prevMonthFirstDate == "") {
+            prevMonthFirstDate = day.fullDate;
+          }
+          if (dayYearMonth > panelYearMonth) {
+            nextMonthLastDate = day.fullDate;
+          }
+        }
+      }
+      if (props.weeklyCalendar && firstDate == "") {
+        firstDate = dateuts(panelDate).format("YYYY-MM-DD");
+        lastDate = firstDate;
+      }
+      return new CalendarPanelChangeResult({
+        firstDate,
+        lastDate,
+        panelDate: panelYearMonth,
+        prevMonthFirstDate,
+        nextMonthLastDate,
+        week: getPanelWeekByDate(panelDate)
+      });
+    };
+    const emitPanelChangeByDate = (panelDate) => {
+      emit("panelChange", getPanelChangeResultByDate(panelDate));
+    };
+    const getPanelDate = () => {
+      return getPanelYearMonth();
+    };
+    const setPanelDate = (panelDate) => {
+      currentPanelDate.value = panelDate;
+      emitPanelChangeByDate(panelDate);
+    };
+    const shiftPanelDate = (step, unit, format) => {
+      const panelDate = dateuts(currentPanelDate.value).add(step, unit).format(format);
+      setPanelDate(panelDate);
+    };
+    const getLastMonth = () => {
+      if (props.weeklyCalendar) {
+        shiftPanelDate(-7, "day", "YYYY-MM-DD");
+      } else {
+        shiftPanelDate(-1, "month", "YYYY-MM");
+      }
+    };
+    const getNextMonth = () => {
+      if (props.weeklyCalendar) {
+        shiftPanelDate(7, "day", "YYYY-MM-DD");
+      } else {
+        shiftPanelDate(1, "month", "YYYY-MM");
+      }
+    };
+    const getLastYear = () => {
+      if (props.weeklyCalendar) {
+        shiftPanelDate(-1, "month", "YYYY-MM-DD");
+      } else {
+        shiftPanelDate(-1, "year", "YYYY-MM");
+      }
+    };
+    const getNextYear = () => {
+      if (props.weeklyCalendar) {
+        shiftPanelDate(1, "month", "YYYY-MM-DD");
+      } else {
+        shiftPanelDate(1, "year", "YYYY-MM");
+      }
+    };
+    const getLastWeek = () => {
+      if (props.weeklyCalendar == false)
+        return null;
+      shiftPanelDate(-7, "day", "YYYY-MM-DD");
+    };
+    const getNextWeek = () => {
+      if (props.weeklyCalendar == false)
+        return null;
+      shiftPanelDate(7, "day", "YYYY-MM-DD");
+    };
+    const switchPanelMonth = (step) => {
+      const format = props.weeklyCalendar ? "YYYY-MM-DD" : "YYYY-MM";
+      shiftPanelDate(step, "month", format);
+    };
+    const switchPanelYear = (step) => {
+      const format = props.weeklyCalendar ? "YYYY-MM-DD" : "YYYY-MM";
+      shiftPanelDate(step, "year", format);
+    };
+    const switchPanel = (type) => {
+      if (type == "prev-week") {
+        getLastWeek();
+      } else if (type == "next-week") {
+        getNextWeek();
+      } else if (type == "prev-month") {
+        switchPanelMonth(-1);
+      } else if (type == "next-month") {
+        switchPanelMonth(1);
+      } else if (type == "next-year") {
+        switchPanelYear(1);
+      } else if (type == "prev-year") {
+        switchPanelYear(-1);
+      }
+    };
+    const handleOverRange = () => {
+      var _a2;
+      emit("overRange");
+      if (props.showRangePrompt == false)
+        return null;
+      const rangePrompt = (_a2 = props.rangePrompt) !== null && _a2 !== void 0 ? _a2 : `æœ€å¤šé€‰æ‹©${props.maxRange}å¤©`;
+      uni.showToast({
+        title: rangePrompt,
+        icon: "none"
+      });
+    };
+    const confirmDisabled = computed(() => {
+      const len = currentDate.value.length;
+      return len <= 0 || props.mode === "range" && len < 2;
+    });
+    const confirmText = computed(() => {
+      if (confirmDisabled.value && hasStrValue(props.confirmDisabledText)) {
+        return props.confirmDisabledText;
+      }
+      return props.confirmText;
+    });
+    const onConfirm = () => {
+      if (confirmDisabled.value) {
+        return null;
+      }
+      emit("confirm", props.mode == "single" ? currentDate.value[0] : currentDate.value.slice());
+      show.value = false;
+    };
+    const handleSelect = (date) => {
+      if (props.mode == "range" && date.length >= 2 && props.maxRange != null) {
+        const diff = dateuts(date[1]).diff(date[0], "day") + 1;
+        if (diff > props.maxRange) {
+          handleOverRange();
+          return null;
+        }
+      }
+      currentDate.value = date;
+      emit("select", props.mode == "single" ? date[0] : date.slice());
+      if (props.showConfirmBtn == false) {
+        onConfirm();
+      }
+    };
+    const handleClick = (day) => {
+      const fullDate = day.fullDate;
+      if (props.readonly == true || day.isCurrentMonth == false && !props.weeklyCalendar)
+        return null;
+      if (day.disabled == true) {
+        emit("clickDisabledDate", fullDate);
+        return null;
+      }
+      if (props.mode == "range") {
+        if (currentDate.value.length == 0) {
+          handleSelect([fullDate]);
+          return null;
+        }
+        const start = currentDate.value[0];
+        const end = currentDate.value.length >= 2 ? currentDate.value[1] : null;
+        if (end == null) {
+          const isAfter = dateuts(fullDate).isAfter(start);
+          if (isAfter) {
+            handleSelect([start, fullDate]);
+          } else if (dateuts(fullDate).isBefore(start)) {
+            handleSelect([fullDate]);
+          } else if (props.allowSameDay) {
+            handleSelect([fullDate, fullDate]);
+          }
+        } else {
+          handleSelect([fullDate]);
+        }
+      } else if (props.mode == "multiple") {
+        const selectedIndex = currentDate.value.findIndex((v) => {
+          return dateuts(v).isSame(fullDate);
+        });
+        if (selectedIndex != -1) {
+          let unselect = currentDate.value.splice(selectedIndex, 1);
+          emit("unselect", unselect[0]);
+        } else if (props.maxRange != null && currentDate.value.length >= props.maxRange) {
+          handleOverRange();
+        } else {
+          handleSelect([...currentDate.value, fullDate]);
+        }
+      } else {
+        handleSelect([fullDate]);
+      }
+    };
+    const bodyRef = shallowRef(null);
+    const getCalendarGrid = (width) => {
+      const gridList = [];
+      const oneWidth = width / weekList.value.length;
+      const oneHeight = getPxNum(addUnit(props.rowHeight));
+      for (let week = 0; week < displayMonthDays.value.length; week++) {
+        const weekItem = displayMonthDays.value[week];
+        const realWeekIndex = getRealWeekIndex(week);
+        for (let day = 0; day < weekItem.length; day++) {
+          const dayItem = weekItem[day];
+          let space = day;
+          if (realWeekIndex == 0) {
+            space = 7 - weekItem.length + day;
+          }
+          gridList.push(new GridItem({
+            x: space * oneWidth,
+            y: oneHeight * week + 4,
+            width: oneWidth,
+            height: oneHeight,
+            data: dayItem
+          }));
+        }
+      }
+      return gridList;
+    };
+    const onClick = (e) => {
+      const target = e.currentTarget;
+      const rect = target.getBoundingClientRect();
+      let bodyLeft = rect.left;
+      let bodyTop = rect.top;
+      let bodyWidth = rect.width;
+      if (props.usePopup && calendarRef.value != null) {
+        const calendarRect = calendarRef.value.getBoundingClientRect();
+        bodyLeft = calendarRect.left + target.offsetLeft;
+        bodyTop = calendarRect.top + target.offsetTop;
+        bodyWidth = target.offsetWidth > 0 ? target.offsetWidth : rect.width;
+      }
+      const x = e.clientX - bodyLeft;
+      const y = e.clientY - bodyTop;
+      const currentGrid = getCalendarGrid(bodyWidth);
+      for (let i = 0; i < currentGrid.length; i++) {
+        const grid = currentGrid[i];
+        const maxX = grid.x + grid.width;
+        const maxY = grid.y + grid.height;
+        const isXLimit = grid.x < x && x < maxX;
+        const isYLimit = grid.y < y && y < maxY;
+        if (isXLimit && isYLimit) {
+          handleClick(grid.data);
+          break;
+        }
+      }
+    };
+    const clickClose = () => {
+      if (props.usePopup && props.closeOnClickClose) {
+        show.value = false;
+      }
+      emit("clickClose");
+    };
+    const getDayClass = (day, index) => {
+      const css = [];
+      const pre = "rice-calendar__day";
+      const isSelect = getIsSelected(day, currentDate.value, props.mode);
+      if (getDayIsDisabled(day)) {
+        css.push(`${pre}--disabled`);
+      }
+      if (isSelect) {
+        css.push(`${pre}--selected`);
+      }
+      if (getIsBetween(day, currentDate.value) && props.mode == "range") {
+        css.push(`${pre}--middle`);
+      }
+      if (props.mode == "range") {
+        if (currentDate.value[0] != null && formatDate(currentDate.value[0]) == day.fullDate) {
+          css.push(`${pre}--range--start`);
+        }
+        if (currentDate.value[1] != null && formatDate(currentDate.value[1]) == day.fullDate) {
+          css.push(`${pre}--range--end`);
+        }
+        if (getIsBetween(day, currentDate.value)) {
+          css.push(`${pre}--middle`);
+        }
+      }
+      return css;
+    };
+    const getDayTextClass = (day, index, type) => {
+      const css = [];
+      const pre = "rice-calendar__day";
+      const isSelect = getIsSelected(day, currentDate.value, props.mode);
+      if (getDayIsDisabled(day)) {
+        css.push(`${pre}--disabled__text`);
+      }
+      if (isSelect) {
+        css.push(`${pre}--selected__text`);
+      }
+      if (type == "inner" && getIsBetween(day, currentDate.value) && props.mode == "range") {
+        css.push(`${pre}--middle__text`);
+      }
+      return css;
+    };
+    const getDayStyle = (day, index) => {
+      const css = /* @__PURE__ */ new Map();
+      if (getRealWeekIndex(index) == 0 && day.date == 1 && !_showFullDate.value) {
+        const realDay = (day.day + 7 - firstDayOfWeek.value) % 7;
+        css.set("margin-left", `${100 * realDay / 7}%`);
+      }
+      if (hasStrValue(props.rowHeight)) {
+        css.set("height", addUnit(props.rowHeight));
+      }
+      const color = activeColor.value;
+      const isSelect = getIsSelected(day, currentDate.value, props.mode);
+      if (isSelect) {
+        css.set("background-color", color);
+      }
+      if (getIsBetween(day, currentDate.value) && props.mode == "range") {
+        css.set("background-color", getTintColor(color));
+      }
+      return css;
+    };
+    const getDayTextStyle = (day, index) => {
+      const css = /* @__PURE__ */ new Map();
+      if (props.color != null) {
+        const isSelect = getIsSelected(day, currentDate.value, props.mode);
+        if (isSelect) {
+          css.set("color", "#f5f5f5");
+        } else {
+          const disabled = getDayIsDisabled(day);
+          css.set("color", disabled ? "var(--rice-calendar-disabled-text)" : "var(--rice-text-color)");
+        }
+        if (getIsBetween(day, currentDate.value) && props.mode == "range")
+          css.set("color", props.color);
+      }
+      return css;
+    };
+    const rootClass = computed(() => {
+      return [
+        ns.theme(),
+        ns.is("popup", props.usePopup == true)
+      ];
+    });
+    const rootStyle = computed(() => {
+      var _a2;
+      const css = /* @__PURE__ */ new Map();
+      if (props.usePopup) {
+        css.set("z-index", props.zIndex);
+      }
+      const isSafeAreaInsetBottom = (_a2 = props.safeAreaInsetBottom) !== null && _a2 !== void 0 ? _a2 : props.usePopup;
+      if (isSafeAreaInsetBottom) {
+        css.set("padding-bottom", safeAreaInsets.value.bottom + "px");
+      }
+      return css;
+    });
+    const getBottomTextStyle = (day) => {
+      const css = new UTSJSONObject({});
+      if (day.bottomInfoColor != null)
+        css.color = day.bottomInfoColor;
+      return css;
+    };
+    const getTopTextStyle = (day) => {
+      const css = new UTSJSONObject({});
+      if (day.topInfoColor != null)
+        css.color = day.topInfoColor;
+      return css;
+    };
+    const closeStyle = ref(new UTSJSONObject({
+      position: "absolute",
+      right: "16px",
+      top: "12px",
+      zIndex: 9
+    }));
+    const switchArrowStyle = ref(new UTSJSONObject({
+      padding: "10px 4px"
+    }));
+    watch(() => {
+      return props.date;
+    }, () => {
+      const previousPanelDate = currentPanelDate.value;
+      currentDate.value = getInitDate();
+      let nextPanelDate = previousPanelDate;
+      if (typeof props.date == "string") {
+        nextPanelDate = props.date;
+      } else if (Array.isArray(props.date)) {
+        const d = props.date;
+        if (d.length > 0) {
+          nextPanelDate = d[0];
+        }
+      }
+      currentPanelDate.value = nextPanelDate;
+      const previousYearMonth = getPanelYearMonthByDate(previousPanelDate);
+      const nextYearMonth = getPanelYearMonthByDate(nextPanelDate);
+      const previousWeek = getPanelWeekByDate(previousPanelDate);
+      const nextWeek = getPanelWeekByDate(nextPanelDate);
+      if (previousYearMonth != nextYearMonth || previousWeek != nextWeek) {
+        emit("panelChange", getPanelChangeResultByDate(nextPanelDate));
+      }
+    });
+    watch([
+      () => {
+        return props.minDate;
+      },
+      () => {
+        return props.maxDate;
+      }
+    ], () => {
+      currentDate.value = getInitDate();
+      monthDays.value = getMonthDays([currentPanelDate.value], firstDayOfWeek.value, props.formatter, props.minDate, props.maxDate, _showFullDate.value);
+    });
+    watch(() => {
+      return props.weeklyCalendar;
+    }, (newVal) => {
+      const normalizedDate = formatDate(currentPanelDate.value);
+      const nextPanelDate = newVal ? normalizedDate : dateuts(normalizedDate).format("YYYY-MM");
+      if (nextPanelDate != currentPanelDate.value) {
+        currentPanelDate.value = nextPanelDate;
+        return null;
+      }
+      monthDays.value = getMonthDays([nextPanelDate], firstDayOfWeek.value, props.formatter, props.minDate, props.maxDate, _showFullDate.value);
+    });
+    watch([currentPanelDate, _showFullDate], () => {
+      monthDays.value = getMonthDays([currentPanelDate.value], firstDayOfWeek.value, props.formatter, props.minDate, props.maxDate, _showFullDate.value);
+    });
+    onMounted(() => {
+      var _a2, _b;
+      primaryColor.value = (_b = (_a2 = calendarRef.value) === null || _a2 === void 0 ? null : _a2.style.getPropertyValue("--rice-primary-color")) !== null && _b !== void 0 ? _b : "";
+    });
+    __expose({
+      switchPanel,
+      getPanelDate
+    });
+    return () => {
+      "raw js";
+      const _setTemplateRef = _createSharedDataTemplateRefSetter();
+      const _component_rice_overlay = __easycom_0;
+      const _component_rice_icon = __easycom_0$1;
+      const _component_rice_button = __easycom_1$1;
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.usePopup));
+      }, () => {
+        const n2 = _createSharedDataComponentWithFallback(_component_rice_overlay, "f1dd364a", {
+          show: () => {
+            return show.value;
+          },
+          "onUpdate:show": () => {
+            return (_value) => {
+              return show.value = _value;
+            };
+          },
+          "z-index": () => {
+            return __props.zIndex - 1;
+          },
+          "close-on-click-overlay": () => {
+            return __props.closeOnClickOverlay;
+          },
+          duration: 300
+        });
+        _setSharedData(__sharedData, 1, n2?.sharedData);
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 2, _toSharedDataBoolean(_unref(isShow)));
+      }, () => {
+        _renderSharedDataEffect(() => {
+          _setSharedDataClass(__sharedData, 29, ["rice-calendar", _unref(rootClass)]);
+          _setSharedDataStyle(__sharedData, 30, [_unref(rootStyle), __props.customStyle]);
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 3, _toSharedDataBoolean(__props.showTitle || __props.closeable));
+        }, () => {
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData, 4, _toSharedDataBoolean(__props.showTitle));
+          }, () => {
+            _renderSharedDataEffect(() => {
+              return _setSharedData(__sharedData, 5, _toDisplayString(__props.title));
+            });
+          });
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData, 6, _toSharedDataBoolean(__props.closeable));
+          }, () => {
+            const n12 = _createSharedDataComponentWithFallback(_component_rice_icon, "084ba3e2", {
+              name: () => {
+                return __props.closeIcon;
+              },
+              "custom-style": () => {
+                return _unref(closeStyle);
+              },
+              size: "20px",
+              onClick: () => {
+                return clickClose;
+              }
+            });
+            _setSharedData(__sharedData, 7, n12?.sharedData);
+          });
+        });
+        _createSharedDataSlot("header", {
+          panelDate: () => {
+            return getPanelYearMonth();
+          },
+          currentWeek: () => {
+            return _unref(currentWeekIndex) + 1;
+          }
+        }, (data) => {
+          return _setSharedData(__sharedData, 8, data);
+        }, () => {
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData, 9, _toSharedDataBoolean(__props.switchMode != "none" || __props.showSubtitle));
+          }, () => {
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData, 10, _toSharedDataBoolean(__props.switchMode != "none"));
+            }, () => {
+              _createSharedDataIf(() => {
+                return _setSharedData(__sharedData, 11, _toSharedDataBoolean(__props.switchMode != "month"));
+              }, () => {
+                const n22 = _createSharedDataComponentWithFallback(_component_rice_icon, "084bb001", {
+                  name: "double-left",
+                  "custom-style": () => {
+                    return _unref(switchArrowStyle);
+                  },
+                  onClick: () => {
+                    return getLastYear;
+                  }
+                });
+                _setSharedData(__sharedData, 12, n22?.sharedData);
+              });
+              const n23 = _createSharedDataComponentWithFallback(_component_rice_icon, "084bb6a7", {
+                name: "arrow-left",
+                "custom-style": () => {
+                  return _unref(switchArrowStyle);
+                },
+                onClick: () => {
+                  return getLastMonth;
+                }
+              });
+              _setSharedData(__sharedData, 13, n23?.sharedData);
+            });
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData, 14, _toSharedDataBoolean(__props.showSubtitle));
+            }, () => {
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData, 15, _toDisplayString(_unref(formatPanelDate)));
+              });
+            });
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData, 16, _toSharedDataBoolean(__props.switchMode != "none"));
+            }, () => {
+              const n30 = _createSharedDataComponentWithFallback(_component_rice_icon, "01277f72", {
+                name: "arrow-right",
+                "custom-style": () => {
+                  return _unref(switchArrowStyle);
+                },
+                onClick: () => {
+                  return getNextMonth;
+                }
+              });
+              _setSharedData(__sharedData, 17, n30?.sharedData);
+              _createSharedDataIf(() => {
+                return _setSharedData(__sharedData, 18, _toSharedDataBoolean(__props.switchMode != "month"));
+              }, () => {
+                const n33 = _createSharedDataComponentWithFallback(_component_rice_icon, "01278318", {
+                  name: "double-right",
+                  "custom-style": () => {
+                    return _unref(switchArrowStyle);
+                  },
+                  onClick: () => {
+                    return getNextYear;
+                  }
+                });
+                _setSharedData(__sharedData, 19, n33?.sharedData);
+              });
+            });
+          });
+        });
+        _createSharedDataFor(_setSharedDataScoped(__sharedData, 22, _createSharedDataVFor(__sharedDataScope, () => {
+          return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
+        })), () => {
+          return _unref(weekList);
+        }, (__sharedData_VFor0, _for_item0) => {
+          _renderSharedDataEffect(() => {
+            return _setSharedData(__sharedData_VFor0, 1, _toDisplayString(_for_item0.value));
+          });
+          return null;
+        }, (__sharedData_VFor0, item) => {
+          return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(item));
+        }, 1);
+        _renderSharedDataEffect(() => {
+          return _setSharedDataClass(__sharedData, 31, ["rice-calendar__body", { "rice-calendar__body--week": __props.weeklyCalendar }]);
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 23, _toSharedDataBoolean(__props.showMonthMark));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            return _setSharedData(__sharedData, 24, _toDisplayString(_unref(currentMonth)));
+          });
+        });
+        _createSharedDataFor(_setSharedDataScoped(__sharedData, 25, _createSharedDataVFor(__sharedDataScope, () => {
+          return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 2 });
+        })), () => {
+          return _unref(displayMonthDays);
+        }, (__sharedData_VFor1, _for_item1, _for_key1) => {
+          _createSharedDataFor(_setSharedDataScoped(__sharedData_VFor1, 1, _createSharedDataVFor(__sharedDataScope, () => {
+            return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 3 });
+          })), () => {
+            return _for_item1.value;
+          }, (__sharedData_VFor2, _for_item2) => {
+            _renderSharedDataEffect(() => {
+              const _day = _for_item2.value;
+              const _index = _for_key1.value;
+              _setSharedDataClass(__sharedData_VFor2, 10, ["rice-calendar__day", getDayClass(_day)]);
+              _setSharedDataStyle(__sharedData_VFor2, 11, getDayStyle(_day, _index));
+            });
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData_VFor2, 1, _toSharedDataBoolean(_unref(hasStrValue)(_for_item2.value.topInfo)));
+            }, () => {
+              _renderSharedDataEffect(() => {
+                const _day = _for_item2.value;
+                _setSharedDataClass(__sharedData_VFor2, 2, ["rice-calendar__day__top", getDayTextClass(_day, _for_key1.value, "top")]);
+                _setSharedDataStyle(__sharedData_VFor2, 3, getTopTextStyle(_day));
+                _setSharedData(__sharedData_VFor2, 4, _toDisplayString(_day.topInfo));
+              });
+            });
+            _renderSharedDataEffect(() => {
+              const _day = _for_item2.value;
+              const _index = _for_key1.value;
+              _setSharedDataClass(__sharedData_VFor2, 12, ["rice-calendar__day__text", getDayTextClass(_day, _index, "inner")]);
+              _setSharedDataStyle(__sharedData_VFor2, 13, getDayTextStyle(_day));
+              _setSharedData(__sharedData_VFor2, 14, _toDisplayString(_unref(hasStrValue)(_day.text) ? _day.text : _day.date));
+            });
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData_VFor2, 5, _toSharedDataBoolean(__props.lunar || getBottomInfo(_for_item2.value) != null));
+            }, () => {
+              _renderSharedDataEffect(() => {
+                const _day = _for_item2.value;
+                _setSharedDataClass(__sharedData_VFor2, 6, ["rice-calendar__day__bottom", getDayTextClass(_day, _for_key1.value, "bottom")]);
+                _setSharedDataStyle(__sharedData_VFor2, 7, getBottomTextStyle(_day));
+                _setSharedData(__sharedData_VFor2, 8, _toDisplayString(getBottomInfo(_day)));
+              });
+            });
+            _setSharedDataEvent(__sharedData_VFor2, 9, () => {
+              return handleClick(_for_item2.value);
+            });
+            return null;
+          }, (__sharedData_VFor2, day) => {
+            return _setSharedData(__sharedData_VFor2, 0, _toDisplayString(day.fullDate));
+          }, 1);
+          return null;
+        }, (__sharedData_VFor1, item, index) => {
+          return _setSharedData(__sharedData_VFor1, 0, _toDisplayString(getWeekRowKey(item, index)));
+        });
+        _setSharedDataEvent(__sharedData, 26, onClick);
+        _setSharedDataTemplateRef(__sharedData, 27, (n56) => {
+          _setTemplateRef(n56, bodyRef, null, "bodyRef");
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 20, _toSharedDataBoolean(__props.showConfirmBtn));
+        }, () => {
+          const n59 = _createSharedDataComponentWithFallback(_component_rice_button, "01280d3f", {
+            color: () => {
+              return __props.color;
+            },
+            type: "primary",
+            disabled: () => {
+              return _unref(confirmDisabled);
+            },
+            text: () => {
+              return _unref(confirmText);
+            },
+            shape: "round",
+            onClick: () => {
+              return onConfirm;
+            }
+          });
+          _setSharedData(__sharedData, 21, n59?.sharedData);
+        });
+        _setSharedDataTemplateRef(__sharedData, 28, (n61) => {
+          _setTemplateRef(n61, calendarRef, null, "calendarRef");
+        });
+      });
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=rice-calendar.js.map
+ÂÜ ÙÒ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-overlay/rice-overlay.jsÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-icon/rice-icon.jsÙĞ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-button/rice-button.jsÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/usePopup/index.jsÙÉ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useCountDown/index.jsÙÂ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/store/useConfig.jsÙÉ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useNamespace/index.jsÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useRelation/useChildren.jsÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useRelation/useParent.jsÙÈ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useSafeArea/index.jsÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useTouch/index.jsÙÍ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/plugin/coloruts/conversion.jsÙË/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/plugin/coloruts/constant.jsÙÇ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/plugin/coloruts/type.jsÙÇ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/plugin/dateuts/index.jsÙË/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-calendar/type.jsÙ¾/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/utils/basic.jsÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-calendar/utils.jsÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙÔ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-calendar/rice-calendar.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ‘ÔrD’²hostDependencyName®hostModuleNameÙL../../../../../uni_modules/rice-ui/components/rice-calendar/rice-calendar.js¥entryÃÚšÿimport { _ as __easycom_0 } from "../rice-overlay/rice-overlay.js";
+import { _ as __easycom_0$1 } from "../rice-icon/rice-icon.js";
+import { _ as __easycom_1$1 } from "../rice-button/rice-button.js";
+import { u as usePopup, U as UsePopupOptions } from "../../libs/use/usePopup/index.js";
+import "../../libs/use/useCountDown/index.js";
+import { i as isDark } from "../../libs/store/useConfig.js";
+import { u as useNamespace } from "../../libs/use/useNamespace/index.js";
+import "../../libs/use/useRelation/useChildren.js";
+import "../../libs/use/useRelation/useParent.js";
+import { u as useSafeArea, s as safeAreaInsets } from "../../libs/use/useSafeArea/index.js";
+import "../../libs/use/useTouch/index.js";
+import { C as Coloruts } from "../../libs/plugin/coloruts/conversion.js";
+import "../../libs/plugin/coloruts/constant.js";
+import "../../libs/plugin/coloruts/type.js";
+import { d as dateuts } from "../../libs/plugin/dateuts/index.js";
+import { C as CalendarPanelChangeResult, G as GridItem } from "./type.js";
+import { c as clamp, h as hasStrValue, a as addUnit, d as getPxNum } from "../../libs/utils/basic.js";
+import { g as getMonthDays, f as formatDate, a as getDateRange, b as getIsSelected, c as getIsBetween } from "./utils.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineEmits: _defineEmits, useModel: _useModel, mergeModels: _mergeModels, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, unref: _unref, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, toDisplayString: _toDisplayString, createSharedDataSlot: _createSharedDataSlot, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, createSharedDataFor: _createSharedDataFor, setSharedDataEvent: _setSharedDataEvent, setSharedDataTemplateRef: _setSharedDataTemplateRef } = globalThis.Vue;
+const __className = "GenUniModulesRiceUiComponentsRiceCalendarRiceCalendar";
+const { shallowRef, computed, ref, watch, onMounted } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  ...{
+    name: "rice-calendar",
+    styleIsolation: "app-and-page"
+  },
+  __dynamicSharedData: true,
+  __hash: "7a9b2dba",
+  __className,
+  __filename: "uni_modules/rice-ui/components/rice-calendar/rice-calendar.uvue",
+  __name: "rice-calendar",
+  props: /* @__PURE__ */ _mergeModels(new UTSJSONObject({
+    mode: { default: "single", type: String },
+    date: { type: null },
+    switchMode: { default: "year-month", type: String },
+    minDate: { type: String },
+    maxDate: { type: String },
+    lunar: { type: Boolean, default: false },
+    title: { default: "è¯·é€‰æ‹©æ—¥æœŸ", type: String },
+    showTitle: { type: Boolean, default: true },
+    color: { type: String },
+    formatter: { type: Function },
+    showSubtitle: { type: Boolean, default: true },
+    showConfirmBtn: { type: Boolean, default: true },
+    confirmText: { default: "ç¡®è®¤", type: String },
+    confirmDisabledText: { type: String },
+    maxRange: { type: Number },
+    rangePrompt: { type: String },
+    showRangePrompt: { type: Boolean, default: true },
+    allowSameDay: { type: Boolean, default: false },
+    rowHeight: { default: "60px", type: [String, Number] },
+    readonly: { type: Boolean },
+    firstDayOfWeek: { default: 1, type: Number },
+    closeable: { type: Boolean, default: true },
+    closeIcon: { default: "cross", type: String },
+    usePopup: { type: Boolean, default: true },
+    closeOnClickClose: { type: Boolean, default: true },
+    closeOnClickOverlay: { type: Boolean, default: true },
+    safeAreaInsetBottom: { type: Boolean, default: null },
+    zIndex: { default: 999, type: Number },
+    weeklyCalendar: { type: Boolean, default: false },
+    showWeeklyText: { type: Boolean, default: true },
+    showFullDate: { type: Boolean, default: null },
+    showMonthMark: { type: Boolean, default: false },
+    customStyle: { default: () => {
+      return new UTSJSONObject({});
+    }, type: null }
+  }), new UTSJSONObject({
+    "show": {
+      type: Boolean,
+      default: false
+    },
+    "showModifiers": {}
+  })),
+  emits: /* @__PURE__ */ _mergeModels(["select", "confirm", "unselect", "panelChange", "clickDisabledDate", "clickClose", "open", "close", "opened", "closed", "overRange"], ["update:show"]),
+  __multiRoot: true,
+  setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesRiceUiComponentsRiceCalendarRiceCalendarSharedData", sharedDataClassId: 0 })));
+    const ns = useNamespace("calendar");
+    useSafeArea();
+    const emit = __emit;
+    const props = __props;
+    const show = _useModel(__props, "show");
+    const calendarRef = shallowRef(null);
+    const realShow = usePopup(calendarRef, new UsePopupOptions({
+      zoom: null,
+      zoomScale: null,
+      beforeClose: null,
+      show,
+      duration: 300,
+      position: "bottom",
+      opacity: false
+    })).realShow;
+    const isShow = computed(() => {
+      return props.usePopup ? realShow.value : true;
+    });
+    const _showFullDate = computed(() => {
+      var _a2;
+      return (_a2 = props.showFullDate) !== null && _a2 !== void 0 ? _a2 : props.weeklyCalendar;
+    });
+    const getDayIsDisabled = (day) => {
+      if (props.weeklyCalendar && day.disabled == false)
+        return false;
+      return day.disabled == true || day.isCurrentMonth == false;
+    };
+    const getInitDate = () => {
+      const mode = props.mode;
+      let defaultDate = props.date;
+      if (defaultDate == "") {
+        return [];
+      }
+      const today = dateuts().format("YYYY-MM-DD");
+      let dates = [];
+      if (typeof defaultDate == "string") {
+        dates = [defaultDate];
+      } else if (Array.isArray(defaultDate)) {
+        dates = defaultDate.slice();
+      }
+      if (dates.length == 0) {
+        dates.push(today);
+      }
+      if (mode == "range" && dates.length >= 2) {
+        const start = getDateRange(dates[0], props.minDate, props.maxDate);
+        const end = getDateRange(dates[1], props.minDate, props.maxDate);
+        if (dateuts(start).isAfter(end)) {
+          return [end, start];
+        }
+        return [start, end];
+      }
+      return dates.map((v) => {
+        return getDateRange(v, props.minDate, props.maxDate);
+      });
+    };
+    const currentDate = ref(getInitDate());
+    const getInitPanelDate = () => {
+      const date = currentDate.value;
+      if (date.length > 0)
+        return date[0];
+      return getDateRange(dateuts().format("YYYY-MM-DD"), props.minDate, props.maxDate);
+    };
+    const primaryColor = ref("");
+    const activeColor = computed(() => {
+      var _a2;
+      const color = (_a2 = props.color) !== null && _a2 !== void 0 ? _a2 : primaryColor.value;
+      return color == "" ? "#1989fa" : color;
+    });
+    const getTintColor = (color) => {
+      const colorUts = new Coloruts(color);
+      return isDark.value ? colorUts.mix("#141414", 90).toHexString() : colorUts.tint(90).toHexString();
+    };
+    const firstDayOfWeek = computed(() => {
+      return clamp(props.firstDayOfWeek, 1, 7);
+    });
+    const currentPanelDate = ref(getInitPanelDate());
+    const monthDays = ref([]);
+    monthDays.value = getMonthDays([currentPanelDate.value], firstDayOfWeek.value, props.formatter, props.minDate, props.maxDate, _showFullDate.value);
+    const currentMonth = computed(() => {
+      return dateuts(currentPanelDate.value).format("M");
+    });
+    const currentWeekIndex = computed(() => {
+      if (props.weeklyCalendar == false)
+        return 0;
+      const panelDate = formatDate(currentPanelDate.value);
+      for (let week = 0; week < monthDays.value.length; week++) {
+        const weekItem = monthDays.value[week];
+        const dayIndex = weekItem.findIndex((day) => {
+          return day.fullDate == panelDate;
+        });
+        if (dayIndex != -1) {
+          return week;
+        }
+      }
+      return 0;
+    });
+    const displayMonthDays = computed(() => {
+      if (props.weeklyCalendar == false) {
+        return monthDays.value;
+      }
+      if (monthDays.value.length == 0) {
+        return [];
+      }
+      return [monthDays.value[currentWeekIndex.value]];
+    });
+    const displayMonthDaysRenderKey = computed(() => {
+      const list = displayMonthDays.value;
+      const rowCount = list.length;
+      const first = rowCount > 0 && list[0].length > 0 ? list[0][0].fullDate : "empty";
+      const lastRow = rowCount > 0 ? list[rowCount - 1] : [];
+      const last = lastRow.length > 0 ? lastRow[lastRow.length - 1].fullDate : "empty";
+      return `${currentPanelDate.value}-${rowCount}-${first}-${last}`;
+    });
+    const getWeekRowKey = (weekItem, index) => {
+      const first = weekItem.length > 0 ? weekItem[0].fullDate : `empty-${index}`;
+      const last = weekItem.length > 0 ? weekItem[weekItem.length - 1].fullDate : `empty-${index}`;
+      return `${props.weeklyCalendar}-${displayMonthDaysRenderKey.value}-${first}-${last}-${index}`;
+    };
+    const getRealWeekIndex = (index) => {
+      if (props.weeklyCalendar == false)
+        return index;
+      return currentWeekIndex.value + index;
+    };
+    const formatPanelDate = computed(() => {
+      if (props.weeklyCalendar && props.showWeeklyText) {
+        return `${dateuts(currentPanelDate.value).format("YYYYå¹´Mæœˆ")} ç¬¬${currentWeekIndex.value + 1}å‘¨`;
+      }
+      return dateuts(currentPanelDate.value).format("YYYYå¹´Mæœˆ");
+    });
+    const weeks = ["ä¸€", "äºŒ", "ä¸‰", "å››", "äº”", "å…­", "æ—¥"];
+    const weekList = computed(() => {
+      if (firstDayOfWeek.value == 1)
+        return weeks;
+      const firstDay = firstDayOfWeek.value;
+      return [...weeks.slice(firstDay - 1, 7), ...weeks.slice(0, firstDay - 1)];
+    });
+    const getBottomInfo = (day) => {
+      var _a2;
+      if (hasStrValue(day.bottomInfo))
+        return day.bottomInfo;
+      if (props.mode == "range") {
+        const dates = currentDate.value;
+        if (props.allowSameDay == true && dates.length >= 2 && getIsSelected(day, currentDate.value, props.mode) && dateuts(dates[0]).isSame(dates[1])) {
+          return "å¼€å§‹/ç»“æŸ";
+        }
+        if (dateuts(day.fullDate).isSame(dates[0]))
+          return "å¼€å§‹";
+        if (dates.length >= 2 && dateuts(day.fullDate).isSame(dates[1]))
+          return "ç»“æŸ";
+      }
+      return props.lunar ? (_a2 = day.lunarInfo) === null || _a2 === void 0 ? null : _a2.IDayCn : null;
+    };
+    const getPanelYearMonth = () => {
+      return dateuts(currentPanelDate.value).format("YYYY-MM");
+    };
+    const getPanelYearMonthByDate = (panelDate) => {
+      return dateuts(panelDate).format("YYYY-MM");
+    };
+    const getPanelWeekByDate = (panelDate) => {
+      if (props.weeklyCalendar == false) {
+        return 1;
+      }
+      const normalizedDate = formatDate(panelDate);
+      const panelMonthDays = getMonthDays([normalizedDate], firstDayOfWeek.value, props.formatter, props.minDate, props.maxDate, _showFullDate.value);
+      for (let week = 0; week < panelMonthDays.length; week++) {
+        const weekItem = panelMonthDays[week];
+        const dayIndex = weekItem.findIndex((day) => {
+          return day.fullDate == normalizedDate;
+        });
+        if (dayIndex != -1) {
+          return week + 1;
+        }
+      }
+      return 1;
+    };
+    const getPanelRowsByDate = (panelDate) => {
+      const normalizedDate = props.weeklyCalendar ? formatDate(panelDate) : panelDate;
+      const panelMonthDays = getMonthDays([normalizedDate], firstDayOfWeek.value, props.formatter, props.minDate, props.maxDate, _showFullDate.value);
+      if (props.weeklyCalendar == false) {
+        return panelMonthDays;
+      }
+      for (let week = 0; week < panelMonthDays.length; week++) {
+        const weekItem = panelMonthDays[week];
+        const dayIndex = weekItem.findIndex((day) => {
+          return day.fullDate == normalizedDate;
+        });
+        if (dayIndex != -1) {
+          return [weekItem];
+        }
+      }
+      return panelMonthDays.length > 0 ? [panelMonthDays[0]] : [];
+    };
+    const getPanelChangeResultByDate = (panelDate) => {
+      const panelRows = getPanelRowsByDate(panelDate);
+      const panelYearMonth = getPanelYearMonthByDate(panelDate);
+      let firstDate = dateuts(panelDate).startOf("month").format("YYYY-MM-DD");
+      let lastDate = dateuts(panelDate).endOf("month").format("YYYY-MM-DD");
+      let prevMonthFirstDate = "";
+      let nextMonthLastDate = "";
+      if (props.weeklyCalendar && panelRows.length > 0) {
+        firstDate = "";
+        lastDate = "";
+      }
+      for (let rowIndex = 0; rowIndex < panelRows.length; rowIndex++) {
+        const row = panelRows[rowIndex];
+        for (let dayIndex = 0; dayIndex < row.length; dayIndex++) {
+          const day = row[dayIndex];
+          const dayYearMonth = dateuts(day.fullDate).format("YYYY-MM");
+          if (props.weeklyCalendar && dayYearMonth == panelYearMonth) {
+            if (firstDate == "") {
+              firstDate = day.fullDate;
+            }
+            lastDate = day.fullDate;
+          }
+          if (dayYearMonth < panelYearMonth && prevMonthFirstDate == "") {
+            prevMonthFirstDate = day.fullDate;
+          }
+          if (dayYearMonth > panelYearMonth) {
+            nextMonthLastDate = day.fullDate;
+          }
+        }
+      }
+      if (props.weeklyCalendar && firstDate == "") {
+        firstDate = dateuts(panelDate).format("YYYY-MM-DD");
+        lastDate = firstDate;
+      }
+      return new CalendarPanelChangeResult({
+        firstDate,
+        lastDate,
+        panelDate: panelYearMonth,
+        prevMonthFirstDate,
+        nextMonthLastDate,
+        week: getPanelWeekByDate(panelDate)
+      });
+    };
+    const emitPanelChangeByDate = (panelDate) => {
+      emit("panelChange", getPanelChangeResultByDate(panelDate));
+    };
+    const getPanelDate = () => {
+      return getPanelYearMonth();
+    };
+    const setPanelDate = (panelDate) => {
+      currentPanelDate.value = panelDate;
+      emitPanelChangeByDate(panelDate);
+    };
+    const shiftPanelDate = (step, unit, format) => {
+      const panelDate = dateuts(currentPanelDate.value).add(step, unit).format(format);
+      setPanelDate(panelDate);
+    };
+    const getLastMonth = () => {
+      if (props.weeklyCalendar) {
+        shiftPanelDate(-7, "day", "YYYY-MM-DD");
+      } else {
+        shiftPanelDate(-1, "month", "YYYY-MM");
+      }
+    };
+    const getNextMonth = () => {
+      if (props.weeklyCalendar) {
+        shiftPanelDate(7, "day", "YYYY-MM-DD");
+      } else {
+        shiftPanelDate(1, "month", "YYYY-MM");
+      }
+    };
+    const getLastYear = () => {
+      if (props.weeklyCalendar) {
+        shiftPanelDate(-1, "month", "YYYY-MM-DD");
+      } else {
+        shiftPanelDate(-1, "year", "YYYY-MM");
+      }
+    };
+    const getNextYear = () => {
+      if (props.weeklyCalendar) {
+        shiftPanelDate(1, "month", "YYYY-MM-DD");
+      } else {
+        shiftPanelDate(1, "year", "YYYY-MM");
+      }
+    };
+    const getLastWeek = () => {
+      if (props.weeklyCalendar == false)
+        return null;
+      shiftPanelDate(-7, "day", "YYYY-MM-DD");
+    };
+    const getNextWeek = () => {
+      if (props.weeklyCalendar == false)
+        return null;
+      shiftPanelDate(7, "day", "YYYY-MM-DD");
+    };
+    const switchPanelMonth = (step) => {
+      const format = props.weeklyCalendar ? "YYYY-MM-DD" : "YYYY-MM";
+      shiftPanelDate(step, "month", format);
+    };
+    const switchPanelYear = (step) => {
+      const format = props.weeklyCalendar ? "YYYY-MM-DD" : "YYYY-MM";
+      shiftPanelDate(step, "year", format);
+    };
+    const switchPanel = (type) => {
+      if (type == "prev-week") {
+        getLastWeek();
+      } else if (type == "next-week") {
+        getNextWeek();
+      } else if (type == "prev-month") {
+        switchPanelMonth(-1);
+      } else if (type == "next-month") {
+        switchPanelMonth(1);
+      } else if (type == "next-year") {
+        switchPanelYear(1);
+      } else if (type == "prev-year") {
+        switchPanelYear(-1);
+      }
+    };
+    const handleOverRange = () => {
+      var _a2;
+      emit("overRange");
+      if (props.showRangePrompt == false)
+        return null;
+      const rangePrompt = (_a2 = props.rangePrompt) !== null && _a2 !== void 0 ? _a2 : `æœ€å¤šé€‰æ‹©${props.maxRange}å¤©`;
+      uni.showToast({
+        title: rangePrompt,
+        icon: "none"
+      });
+    };
+    const confirmDisabled = computed(() => {
+      const len = currentDate.value.length;
+      return len <= 0 || props.mode === "range" && len < 2;
+    });
+    const confirmText = computed(() => {
+      if (confirmDisabled.value && hasStrValue(props.confirmDisabledText)) {
+        return props.confirmDisabledText;
+      }
+      return props.confirmText;
+    });
+    const onConfirm = () => {
+      if (confirmDisabled.value) {
+        return null;
+      }
+      emit("confirm", props.mode == "single" ? currentDate.value[0] : currentDate.value.slice());
+      show.value = false;
+    };
+    const handleSelect = (date) => {
+      if (props.mode == "range" && date.length >= 2 && props.maxRange != null) {
+        const diff = dateuts(date[1]).diff(date[0], "day") + 1;
+        if (diff > props.maxRange) {
+          handleOverRange();
+          return null;
+        }
+      }
+      currentDate.value = date;
+      emit("select", props.mode == "single" ? date[0] : date.slice());
+      if (props.showConfirmBtn == false) {
+        onConfirm();
+      }
+    };
+    const handleClick = (day) => {
+      const fullDate = day.fullDate;
+      if (props.readonly == true || day.isCurrentMonth == false && !props.weeklyCalendar)
+        return null;
+      if (day.disabled == true) {
+        emit("clickDisabledDate", fullDate);
+        return null;
+      }
+      if (props.mode == "range") {
+        if (currentDate.value.length == 0) {
+          handleSelect([fullDate]);
+          return null;
+        }
+        const start = currentDate.value[0];
+        const end = currentDate.value.length >= 2 ? currentDate.value[1] : null;
+        if (end == null) {
+          const isAfter = dateuts(fullDate).isAfter(start);
+          if (isAfter) {
+            handleSelect([start, fullDate]);
+          } else if (dateuts(fullDate).isBefore(start)) {
+            handleSelect([fullDate]);
+          } else if (props.allowSameDay) {
+            handleSelect([fullDate, fullDate]);
+          }
+        } else {
+          handleSelect([fullDate]);
+        }
+      } else if (props.mode == "multiple") {
+        const selectedIndex = currentDate.value.findIndex((v) => {
+          return dateuts(v).isSame(fullDate);
+        });
+        if (selectedIndex != -1) {
+          let unselect = currentDate.value.splice(selectedIndex, 1);
+          emit("unselect", unselect[0]);
+        } else if (props.maxRange != null && currentDate.value.length >= props.maxRange) {
+          handleOverRange();
+        } else {
+          handleSelect([...currentDate.value, fullDate]);
+        }
+      } else {
+        handleSelect([fullDate]);
+      }
+    };
+    const bodyRef = shallowRef(null);
+    const getCalendarGrid = (width) => {
+      const gridList = [];
+      const oneWidth = width / weekList.value.length;
+      const oneHeight = getPxNum(addUnit(props.rowHeight));
+      for (let week = 0; week < displayMonthDays.value.length; week++) {
+        const weekItem = displayMonthDays.value[week];
+        const realWeekIndex = getRealWeekIndex(week);
+        for (let day = 0; day < weekItem.length; day++) {
+          const dayItem = weekItem[day];
+          let space = day;
+          if (realWeekIndex == 0) {
+            space = 7 - weekItem.length + day;
+          }
+          gridList.push(new GridItem({
+            x: space * oneWidth,
+            y: oneHeight * week + 4,
+            width: oneWidth,
+            height: oneHeight,
+            data: dayItem
+          }));
+        }
+      }
+      return gridList;
+    };
+    const onClick = (e) => {
+      const target = e.currentTarget;
+      const rect = target.getBoundingClientRect();
+      let bodyLeft = rect.left;
+      let bodyTop = rect.top;
+      let bodyWidth = rect.width;
+      if (props.usePopup && calendarRef.value != null) {
+        const calendarRect = calendarRef.value.getBoundingClientRect();
+        bodyLeft = calendarRect.left + target.offsetLeft;
+        bodyTop = calendarRect.top + target.offsetTop;
+        bodyWidth = target.offsetWidth > 0 ? target.offsetWidth : rect.width;
+      }
+      const x = e.clientX - bodyLeft;
+      const y = e.clientY - bodyTop;
+      const currentGrid = getCalendarGrid(bodyWidth);
+      for (let i = 0; i < currentGrid.length; i++) {
+        const grid = currentGrid[i];
+        const maxX = grid.x + grid.width;
+        const maxY = grid.y + grid.height;
+        const isXLimit = grid.x < x && x < maxX;
+        const isYLimit = grid.y < y && y < maxY;
+        if (isXLimit && isYLimit) {
+          handleClick(grid.data);
+          break;
+        }
+      }
+    };
+    const clickClose = () => {
+      if (props.usePopup && props.closeOnClickClose) {
+        show.value = false;
+      }
+      emit("clickClose");
+    };
+    const getDayClass = (day, index) => {
+      const css = [];
+      const pre = "rice-calendar__day";
+      const isSelect = getIsSelected(day, currentDate.value, props.mode);
+      if (getDayIsDisabled(day)) {
+        css.push(`${pre}--disabled`);
+      }
+      if (isSelect) {
+        css.push(`${pre}--selected`);
+      }
+      if (getIsBetween(day, currentDate.value) && props.mode == "range") {
+        css.push(`${pre}--middle`);
+      }
+      if (props.mode == "range") {
+        if (currentDate.value[0] != null && formatDate(currentDate.value[0]) == day.fullDate) {
+          css.push(`${pre}--range--start`);
+        }
+        if (currentDate.value[1] != null && formatDate(currentDate.value[1]) == day.fullDate) {
+          css.push(`${pre}--range--end`);
+        }
+        if (getIsBetween(day, currentDate.value)) {
+          css.push(`${pre}--middle`);
+        }
+      }
+      return css;
+    };
+    const getDayTextClass = (day, index, type) => {
+      const css = [];
+      const pre = "rice-calendar__day";
+      const isSelect = getIsSelected(day, currentDate.value, props.mode);
+      if (getDayIsDisabled(day)) {
+        css.push(`${pre}--disabled__text`);
+      }
+      if (isSelect) {
+        css.push(`${pre}--selected__text`);
+      }
+      if (type == "inner" && getIsBetween(day, currentDate.value) && props.mode == "range") {
+        css.push(`${pre}--middle__text`);
+      }
+      return css;
+    };
+    const getDayStyle = (day, index) => {
+      const css = /* @__PURE__ */ new Map();
+      if (getRealWeekIndex(index) == 0 && day.date == 1 && !_showFullDate.value) {
+        const realDay = (day.day + 7 - firstDayOfWeek.value) % 7;
+        css.set("margin-left", `${100 * realDay / 7}%`);
+      }
+      if (hasStrValue(props.rowHeight)) {
+        css.set("height", addUnit(props.rowHeight));
+      }
+      const color = activeColor.value;
+      const isSelect = getIsSelected(day, currentDate.value, props.mode);
+      if (isSelect) {
+        css.set("background-color", color);
+      }
+      if (getIsBetween(day, currentDate.value) && props.mode == "range") {
+        css.set("background-color", getTintColor(color));
+      }
+      return css;
+    };
+    const getDayTextStyle = (day, index) => {
+      const css = /* @__PURE__ */ new Map();
+      if (props.color != null) {
+        const isSelect = getIsSelected(day, currentDate.value, props.mode);
+        if (isSelect) {
+          css.set("color", "#f5f5f5");
+        } else {
+          const disabled = getDayIsDisabled(day);
+          css.set("color", disabled ? "var(--rice-calendar-disabled-text)" : "var(--rice-text-color)");
+        }
+        if (getIsBetween(day, currentDate.value) && props.mode == "range")
+          css.set("color", props.color);
+      }
+      return css;
+    };
+    const rootClass = computed(() => {
+      return [
+        ns.theme(),
+        ns.is("popup", props.usePopup == true)
+      ];
+    });
+    const rootStyle = computed(() => {
+      var _a2;
+      const css = /* @__PURE__ */ new Map();
+      if (props.usePopup) {
+        css.set("z-index", props.zIndex);
+      }
+      const isSafeAreaInsetBottom = (_a2 = props.safeAreaInsetBottom) !== null && _a2 !== void 0 ? _a2 : props.usePopup;
+      if (isSafeAreaInsetBottom) {
+        css.set("padding-bottom", safeAreaInsets.value.bottom + "px");
+      }
+      return css;
+    });
+    const getBottomTextStyle = (day) => {
+      const css = new UTSJSONObject({});
+      if (day.bottomInfoColor != null)
+        css.color = day.bottomInfoColor;
+      return css;
+    };
+    const getTopTextStyle = (day) => {
+      const css = new UTSJSONObject({});
+      if (day.topInfoColor != null)
+        css.color = day.topInfoColor;
+      return css;
+    };
+    const closeStyle = ref(new UTSJSONObject({
+      position: "absolute",
+      right: "16px",
+      top: "12px",
+      zIndex: 9
+    }));
+    const switchArrowStyle = ref(new UTSJSONObject({
+      padding: "10px 4px"
+    }));
+    watch(() => {
+      return props.date;
+    }, () => {
+      const previousPanelDate = currentPanelDate.value;
+      currentDate.value = getInitDate();
+      let nextPanelDate = previousPanelDate;
+      if (typeof props.date == "string") {
+        nextPanelDate = props.date;
+      } else if (Array.isArray(props.date)) {
+        const d = props.date;
+        if (d.length > 0) {
+          nextPanelDate = d[0];
+        }
+      }
+      currentPanelDate.value = nextPanelDate;
+      const previousYearMonth = getPanelYearMonthByDate(previousPanelDate);
+      const nextYearMonth = getPanelYearMonthByDate(nextPanelDate);
+      const previousWeek = getPanelWeekByDate(previousPanelDate);
+      const nextWeek = getPanelWeekByDate(nextPanelDate);
+      if (previousYearMonth != nextYearMonth || previousWeek != nextWeek) {
+        emit("panelChange", getPanelChangeResultByDate(nextPanelDate));
+      }
+    });
+    watch([
+      () => {
+        return props.minDate;
+      },
+      () => {
+        return props.maxDate;
+      }
+    ], () => {
+      currentDate.value = getInitDate();
+      monthDays.value = getMonthDays([currentPanelDate.value], firstDayOfWeek.value, props.formatter, props.minDate, props.maxDate, _showFullDate.value);
+    });
+    watch(() => {
+      return props.weeklyCalendar;
+    }, (newVal) => {
+      const normalizedDate = formatDate(currentPanelDate.value);
+      const nextPanelDate = newVal ? normalizedDate : dateuts(normalizedDate).format("YYYY-MM");
+      if (nextPanelDate != currentPanelDate.value) {
+        currentPanelDate.value = nextPanelDate;
+        return null;
+      }
+      monthDays.value = getMonthDays([nextPanelDate], firstDayOfWeek.value, props.formatter, props.minDate, props.maxDate, _showFullDate.value);
+    });
+    watch([currentPanelDate, _showFullDate], () => {
+      monthDays.value = getMonthDays([currentPanelDate.value], firstDayOfWeek.value, props.formatter, props.minDate, props.maxDate, _showFullDate.value);
+    });
+    onMounted(() => {
+      var _a2, _b;
+      primaryColor.value = (_b = (_a2 = calendarRef.value) === null || _a2 === void 0 ? null : _a2.style.getPropertyValue("--rice-primary-color")) !== null && _b !== void 0 ? _b : "";
+    });
+    __expose({
+      switchPanel,
+      getPanelDate
+    });
+    return () => {
+      "raw js";
+      const _setTemplateRef = _createSharedDataTemplateRefSetter();
+      const _component_rice_overlay = __easycom_0;
+      const _component_rice_icon = __easycom_0$1;
+      const _component_rice_button = __easycom_1$1;
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.usePopup));
+      }, () => {
+        const n2 = _createSharedDataComponentWithFallback(_component_rice_overlay, "f1dd364a", {
+          show: () => {
+            return show.value;
+          },
+          "onUpdate:show": () => {
+            return (_value) => {
+              return show.value = _value;
+            };
+          },
+          "z-index": () => {
+            return __props.zIndex - 1;
+          },
+          "close-on-click-overlay": () => {
+            return __props.closeOnClickOverlay;
+          },
+          duration: 300
+        });
+        _setSharedData(__sharedData, 1, n2?.sharedData);
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 2, _toSharedDataBoolean(_unref(isShow)));
+      }, () => {
+        _renderSharedDataEffect(() => {
+          _setSharedDataClass(__sharedData, 29, ["rice-calendar", _unref(rootClass)]);
+          _setSharedDataStyle(__sharedData, 30, [_unref(rootStyle), __props.customStyle]);
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 3, _toSharedDataBoolean(__props.showTitle || __props.closeable));
+        }, () => {
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData, 4, _toSharedDataBoolean(__props.showTitle));
+          }, () => {
+            _renderSharedDataEffect(() => {
+              return _setSharedData(__sharedData, 5, _toDisplayString(__props.title));
+            });
+          });
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData, 6, _toSharedDataBoolean(__props.closeable));
+          }, () => {
+            const n12 = _createSharedDataComponentWithFallback(_component_rice_icon, "084ba3e2", {
+              name: () => {
+                return __props.closeIcon;
+              },
+              "custom-style": () => {
+                return _unref(closeStyle);
+              },
+              size: "20px",
+              onClick: () => {
+                return clickClose;
+              }
+            });
+            _setSharedData(__sharedData, 7, n12?.sharedData);
+          });
+        });
+        _createSharedDataSlot("header", {
+          panelDate: () => {
+            return getPanelYearMonth();
+          },
+          currentWeek: () => {
+            return _unref(currentWeekIndex) + 1;
+          }
+        }, (data) => {
+          return _setSharedData(__sharedData, 8, data);
+        }, () => {
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData, 9, _toSharedDataBoolean(__props.switchMode != "none" || __props.showSubtitle));
+          }, () => {
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData, 10, _toSharedDataBoolean(__props.switchMode != "none"));
+            }, () => {
+              _createSharedDataIf(() => {
+                return _setSharedData(__sharedData, 11, _toSharedDataBoolean(__props.switchMode != "month"));
+              }, () => {
+                const n22 = _createSharedDataComponentWithFallback(_component_rice_icon, "084bb001", {
+                  name: "double-left",
+                  "custom-style": () => {
+                    return _unref(switchArrowStyle);
+                  },
+                  onClick: () => {
+                    return getLastYear;
+                  }
+                });
+                _setSharedData(__sharedData, 12, n22?.sharedData);
+              });
+              const n23 = _createSharedDataComponentWithFallback(_component_rice_icon, "084bb6a7", {
+                name: "arrow-left",
+                "custom-style": () => {
+                  return _unref(switchArrowStyle);
+                },
+                onClick: () => {
+                  return getLastMonth;
+                }
+              });
+              _setSharedData(__sharedData, 13, n23?.sharedData);
+            });
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData, 14, _toSharedDataBoolean(__props.showSubtitle));
+            }, () => {
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData, 15, _toDisplayString(_unref(formatPanelDate)));
+              });
+            });
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData, 16, _toSharedDataBoolean(__props.switchMode != "none"));
+            }, () => {
+              const n30 = _createSharedDataComponentWithFallback(_component_rice_icon, "01277f72", {
+                name: "arrow-right",
+                "custom-style": () => {
+                  return _unref(switchArrowStyle);
+                },
+                onClick: () => {
+                  return getNextMonth;
+                }
+              });
+              _setSharedData(__sharedData, 17, n30?.sharedData);
+              _createSharedDataIf(() => {
+                return _setSharedData(__sharedData, 18, _toSharedDataBoolean(__props.switchMode != "month"));
+              }, () => {
+                const n33 = _createSharedDataComponentWithFallback(_component_rice_icon, "01278318", {
+                  name: "double-right",
+                  "custom-style": () => {
+                    return _unref(switchArrowStyle);
+                  },
+                  onClick: () => {
+                    return getNextYear;
+                  }
+                });
+                _setSharedData(__sharedData, 19, n33?.sharedData);
+              });
+            });
+          });
+        });
+        _createSharedDataFor(_setSharedDataScoped(__sharedData, 22, _createSharedDataVFor(__sharedDataScope, () => {
+          return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
+        })), () => {
+          return _unref(weekList);
+        }, (__sharedData_VFor0, _for_item0) => {
+          _renderSharedDataEffect(() => {
+            return _setSharedData(__sharedData_VFor0, 1, _toDisplayString(_for_item0.value));
+          });
+          return null;
+        }, (__sharedData_VFor0, item) => {
+          return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(item));
+        }, 1);
+        _renderSharedDataEffect(() => {
+          return _setSharedDataClass(__sharedData, 31, ["rice-calendar__body", { "rice-calendar__body--week": __props.weeklyCalendar }]);
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 23, _toSharedDataBoolean(__props.showMonthMark));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            return _setSharedData(__sharedData, 24, _toDisplayString(_unref(currentMonth)));
+          });
+        });
+        _createSharedDataFor(_setSharedDataScoped(__sharedData, 25, _createSharedDataVFor(__sharedDataScope, () => {
+          return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 2 });
+        })), () => {
+          return _unref(displayMonthDays);
+        }, (__sharedData_VFor1, _for_item1, _for_key1) => {
+          _createSharedDataFor(_setSharedDataScoped(__sharedData_VFor1, 1, _createSharedDataVFor(__sharedDataScope, () => {
+            return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 3 });
+          })), () => {
+            return _for_item1.value;
+          }, (__sharedData_VFor2, _for_item2) => {
+            _renderSharedDataEffect(() => {
+              const _day = _for_item2.value;
+              const _index = _for_key1.value;
+              _setSharedDataClass(__sharedData_VFor2, 10, ["rice-calendar__day", getDayClass(_day)]);
+              _setSharedDataStyle(__sharedData_VFor2, 11, getDayStyle(_day, _index));
+            });
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData_VFor2, 1, _toSharedDataBoolean(_unref(hasStrValue)(_for_item2.value.topInfo)));
+            }, () => {
+              _renderSharedDataEffect(() => {
+                const _day = _for_item2.value;
+                _setSharedDataClass(__sharedData_VFor2, 2, ["rice-calendar__day__top", getDayTextClass(_day, _for_key1.value, "top")]);
+                _setSharedDataStyle(__sharedData_VFor2, 3, getTopTextStyle(_day));
+                _setSharedData(__sharedData_VFor2, 4, _toDisplayString(_day.topInfo));
+              });
+            });
+            _renderSharedDataEffect(() => {
+              const _day = _for_item2.value;
+              const _index = _for_key1.value;
+              _setSharedDataClass(__sharedData_VFor2, 12, ["rice-calendar__day__text", getDayTextClass(_day, _index, "inner")]);
+              _setSharedDataStyle(__sharedData_VFor2, 13, getDayTextStyle(_day));
+              _setSharedData(__sharedData_VFor2, 14, _toDisplayString(_unref(hasStrValue)(_day.text) ? _day.text : _day.date));
+            });
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData_VFor2, 5, _toSharedDataBoolean(__props.lunar || getBottomInfo(_for_item2.value) != null));
+            }, () => {
+              _renderSharedDataEffect(() => {
+                const _day = _for_item2.value;
+                _setSharedDataClass(__sharedData_VFor2, 6, ["rice-calendar__day__bottom", getDayTextClass(_day, _for_key1.value, "bottom")]);
+                _setSharedDataStyle(__sharedData_VFor2, 7, getBottomTextStyle(_day));
+                _setSharedData(__sharedData_VFor2, 8, _toDisplayString(getBottomInfo(_day)));
+              });
+            });
+            _setSharedDataEvent(__sharedData_VFor2, 9, () => {
+              return handleClick(_for_item2.value);
+            });
+            return null;
+          }, (__sharedData_VFor2, day) => {
+            return _setSharedData(__sharedData_VFor2, 0, _toDisplayString(day.fullDate));
+          }, 1);
+          return null;
+        }, (__sharedData_VFor1, item, index) => {
+          return _setSharedData(__sharedData_VFor1, 0, _toDisplayString(getWeekRowKey(item, index)));
+        });
+        _setSharedDataEvent(__sharedData, 26, onClick);
+        _setSharedDataTemplateRef(__sharedData, 27, (n56) => {
+          _setTemplateRef(n56, bodyRef, null, "bodyRef");
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 20, _toSharedDataBoolean(__props.showConfirmBtn));
+        }, () => {
+          const n59 = _createSharedDataComponentWithFallback(_component_rice_button, "01280d3f", {
+            color: () => {
+              return __props.color;
+            },
+            type: "primary",
+            disabled: () => {
+              return _unref(confirmDisabled);
+            },
+            text: () => {
+              return _unref(confirmText);
+            },
+            shape: "round",
+            onClick: () => {
+              return onConfirm;
+            }
+          });
+          _setSharedData(__sharedData, 21, n59?.sharedData);
+        });
+        _setSharedDataTemplateRef(__sharedData, 28, (n61) => {
+          _setTemplateRef(n61, calendarRef, null, "calendarRef");
+        });
+      });
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=rice-calendar.js.map
+ÔrE•§version¨mappings¥names§sources®sourcesContentÜÂ‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘”  ÌÙ ‘”  ÌÚ ‘”  ÌÛ ‘”  ÌÜ ‘”  Ìİ ‘”  ÌŞ ‘”  Ìß ‘”  Ìà ‘”  Ìá ‘”  Ìâ ‘”  Ìã ‘”  Ìä ‘”  Ìå ‘”  Ìæ ‘”  Ìç ‘”  Ìè ‘”  Ìé ‘”  Ìê ‘”  Ìë ‘”  Ìì ‘”  Ìí ‘”  Ìî ‘”  Ìï ‘”  Ìğ ‘”  Ìñ ‘”  Ìò ‘”  Ìó ‘”  Ìô ‘”  Ìõ ‘”  Ìö ‘”  Ì÷ ‘”  Ìø ‘”  Ìù ‘”  Ìú ‘”  Ìû ‘”  Ìü ‘”  Ìı ‘”  Ìş ‘”  Ìÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘”  Í ‘”  Í€ ‘”  Í ‘”  Í‚ ‘”  Íƒ ‘”  Í„ ‘”  Í… ‘”  Í† ‘”  Í‡ ‘”  Íˆ ‘”  Í‰ ‘”  ÍŠ ‘”  Í‹ ‘”  ÍŒ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í‘ ‘”  Í’ ‘”  Í“ ‘”  Í” ‘”  Í• ‘”  Í– ‘”  Í— ‘”  Í˜ ‘”  Í™ ‘”  Íš ‘”  Í› ‘”  Íœ ‘”  Í ‘”  Í ‘”  ÍŸ ‘”  Í  ‘”  Í¡ ‘”  Í¢ ‘”  Í£ ‘”  Í¤ ‘”  Í¥ ‘”  Í¦ ‘”  Í§ ‘”  Í¨ ‘”  Í© ‘”  Íª ‘”  Í« ‘”  Í¬ ‘”  Í­ ‘”  Í® ‘”  Í¯ ‘”  Í° ‘”  Í± ‘”  Í² ‘”  Í³ ‘”  Í´ ‘”  Íµ ‘”  Í¶ ‘”  Í· ‘”  Í¸ ‘”  Í¹ ‘”  Íº ‘”  Í» ‘”  Í¼ ‘”  Í½ ‘”  Í¾ ‘”  Í¿ ‘”  ÍÀ ‘”  ÍÁ ‘”  ÍÂ ‘”  ÍÃ ‘”  ÍÄ ‘”  ÍÅ ‘”  ÍÆ ‘”  ÍÇ ‘”  ÍÈ ‘”  ÍÉ ‘”  ÍÊ ‘”  ÍË ‘”  ÍÌ ‘”  ÍÍ ‘”  ÍÎ ‘”  ÍÏ ‘”  ÍĞ ‘”  ÍÑ ‘”  ÍÒ ‘”  ÍÓ ‘”  ÍÔ ‘”  ÍÕ ‘”  ÍÖ ‘”  Í× ‘”  ÍØ ‘”  ÍÙ ‘”  ÍÚ ‘”  ÍÛ ‘”  ÍÜ ‘”  Íİ ‘”  ÍŞ ‘”  Íß ‘”  Íà ‘”  Íá ‘”  Íâ ‘”  Íã ‘”  Íä ‘”  Íå ‘”  Íæ ‘”  Íç ‘”  Íè ‘”  Íé ‘”  Íê ‘”  Íë ‘”  Íì ‘”  Íí ‘”  Íî ‘”  Íï ‘”  Íğ ‘”  Íñ ‘”  Íò ‘”  Íó ‘”  Íô ‘”  Íõ ‘”  Íö ‘”  Í÷ ‘”  Íø ‘”  Íù ‘”  Íú ‘”  Íû ‘”  Íü ‘”  Íı ‘”  Íş ‘”  Íÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘”  Í ‘”  Í€ ‘”  Í ‘”  Í‚ ‘”  Íƒ ‘”  Í„ ‘”  Í… ‘”  Í† ‘”  Í‡ ‘”  Íˆ ‘”  Í‰ ‘”  ÍŠ ‘”  Í‹ ‘”  ÍŒ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í‘ ‘”  Í’ ‘”  Í“ ‘”  Í” ‘”  Í• ‘”  Í– ‘”  Í— ‘”  Í˜ ‘”  Í™ ‘”  Íš ‘”  Í› ‘”  Íœ ‘”  Í ‘”  Í ‘”  ÍŸ ‘”  Í  ‘”  Í¡ ‘”  Í¢ ‘”  Í£ ‘”  Í¤ ‘”  Í¥ ‘”  Í¦ ‘”  Í§ ‘”  Í¨ ‘”  Í© ‘”  Íª ‘”  Í« ‘”  Í¬ ‘”  Í­ ‘”  Í® ‘”  Í¯ ‘”  Í° ‘”  Í± ‘”  Í² ‘”  Í³ ‘”  Í´ ‘”  Íµ ‘”  Í¶ ‘”  Í· ‘”  Í¸ ‘”  Í¹ ‘”  Íº ‘”  Í» ‘”  Í¼ ‘”  Í½ ‘”  Í¾ ‘”  Í¿ ‘”  ÍÀ ‘”  ÍÁ ‘”  ÍÂ ‘”  ÍÃ ‘”  ÍÄ ‘”  ÍÅ ‘”  ÍÆ ‘”  ÍÇ ‘”  ÍÈ ‘”  ÍÉ ‘”  ÍÊ ‘”  ÍË ‘”  ÍÌ ‘”  ÍÍ ‘”  ÍÎ ‘”  ÍÏ ‘”  ÍĞ ‘”  ÍÑ ‘”  ÍÒ ‘”  ÍÓ ‘”  ÍÔ ‘”  ÍÕ ‘”  ÍÖ ‘”  Í× ‘”  ÍØ ‘”  ÍÙ ‘”  ÍÚ ‘”  ÍÛ ‘”  ÍÜ ‘”  Íİ ‘”  ÍŞ ‘”  Íß ‘”  Íà ‘”  Íá ‘”  Íâ ‘”  Íã ‘”  Íä ‘”  Íå ‘”  Íæ ‘”  Íç ‘”  Íè ‘”  Íé ‘”  Íê ‘”  Íë ‘”  Íì ‘”  Íí ‘”  Íî ‘”  Íï ‘”  Íğ ‘”  Íñ ‘”  Íò ‘”  Íó ‘”  Íô ‘”  Íõ ‘”  Íö ‘”  Í÷ ‘”  Íø ‘”  Íù ‘”  Íú ‘”  Íû ‘”  Íü ‘”  Íı ‘”  Íş ‘”  Íÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘”  Í ‘”  Í€ ‘”  Í ‘”  Í‚ ‘”  Íƒ ‘”  Í„ ‘”  Í… ‘”  Í† ‘”  Í‡ ‘”  Íˆ ‘”  Í‰ ‘”  ÍŠ ‘”  Í‹ ‘”  ÍŒ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í‘ ‘”  Í’ ‘”  Í“ ‘”  Í” ‘”  Í• ‘”  Í– ‘”  Í— ‘”  Í˜ ‘”  Í™ ‘”  Íš ‘”  Í› ‘”  Íœ ‘”  Í ‘”  Í ‘”  ÍŸ ‘”  Í  ‘”  Í¡ ‘”  Í¢ ‘”  Í£ ‘”  Í¤ ‘”  Í¥ ‘”  Í¦ ‘”  Í§ ‘”  Í¨ ‘”  Í© ‘”  Íª ‘”  Í« ‘”  Í¬ ‘”  Í­ ‘”  Í® ‘”  Í¯ ‘”  Í° ‘”  Í± ‘”  Í² ‘”  Í³ ‘”  Í´ ‘”  Íµ ‘”  Í¶ ‘”  Í· ‘”  Í¸ ‘”  Í¹ ‘”  Íº ‘”  Í» ‘”  Í¼ ‘”  Í½ ‘”  Í¾ ‘”  Í¿ ‘”  ÍÀ ‘ÙÔ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-calendar/rice-calendar.js‘Úšÿimport { _ as __easycom_0 } from "../rice-overlay/rice-overlay.js";
+import { _ as __easycom_0$1 } from "../rice-icon/rice-icon.js";
+import { _ as __easycom_1$1 } from "../rice-button/rice-button.js";
+import { u as usePopup, U as UsePopupOptions } from "../../libs/use/usePopup/index.js";
+import "../../libs/use/useCountDown/index.js";
+import { i as isDark } from "../../libs/store/useConfig.js";
+import { u as useNamespace } from "../../libs/use/useNamespace/index.js";
+import "../../libs/use/useRelation/useChildren.js";
+import "../../libs/use/useRelation/useParent.js";
+import { u as useSafeArea, s as safeAreaInsets } from "../../libs/use/useSafeArea/index.js";
+import "../../libs/use/useTouch/index.js";
+import { C as Coloruts } from "../../libs/plugin/coloruts/conversion.js";
+import "../../libs/plugin/coloruts/constant.js";
+import "../../libs/plugin/coloruts/type.js";
+import { d as dateuts } from "../../libs/plugin/dateuts/index.js";
+import { C as CalendarPanelChangeResult, G as GridItem } from "./type.js";
+import { c as clamp, h as hasStrValue, a as addUnit, d as getPxNum } from "../../libs/utils/basic.js";
+import { g as getMonthDays, f as formatDate, a as getDateRange, b as getIsSelected, c as getIsBetween } from "./utils.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineEmits: _defineEmits, useModel: _useModel, mergeModels: _mergeModels, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, unref: _unref, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, toDisplayString: _toDisplayString, createSharedDataSlot: _createSharedDataSlot, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, createSharedDataFor: _createSharedDataFor, setSharedDataEvent: _setSharedDataEvent, setSharedDataTemplateRef: _setSharedDataTemplateRef } = globalThis.Vue;
+const __className = "GenUniModulesRiceUiComponentsRiceCalendarRiceCalendar";
+const { shallowRef, computed, ref, watch, onMounted } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  ...{
+    name: "rice-calendar",
+    styleIsolation: "app-and-page"
+  },
+  __dynamicSharedData: true,
+  __hash: "7a9b2dba",
+  __className,
+  __filename: "uni_modules/rice-ui/components/rice-calendar/rice-calendar.uvue",
+  __name: "rice-calendar",
+  props: /* @__PURE__ */ _mergeModels(new UTSJSONObject({
+    mode: { default: "single", type: String },
+    date: { type: null },
+    switchMode: { default: "year-month", type: String },
+    minDate: { type: String },
+    maxDate: { type: String },
+    lunar: { type: Boolean, default: false },
+    title: { default: "è¯·é€‰æ‹©æ—¥æœŸ", type: String },
+    showTitle: { type: Boolean, default: true },
+    color: { type: String },
+    formatter: { type: Function },
+    showSubtitle: { type: Boolean, default: true },
+    showConfirmBtn: { type: Boolean, default: true },
+    confirmText: { default: "ç¡®è®¤", type: String },
+    confirmDisabledText: { type: String },
+    maxRange: { type: Number },
+    rangePrompt: { type: String },
+    showRangePrompt: { type: Boolean, default: true },
+    allowSameDay: { type: Boolean, default: false },
+    rowHeight: { default: "60px", type: [String, Number] },
+    readonly: { type: Boolean },
+    firstDayOfWeek: { default: 1, type: Number },
+    closeable: { type: Boolean, default: true },
+    closeIcon: { default: "cross", type: String },
+    usePopup: { type: Boolean, default: true },
+    closeOnClickClose: { type: Boolean, default: true },
+    closeOnClickOverlay: { type: Boolean, default: true },
+    safeAreaInsetBottom: { type: Boolean, default: null },
+    zIndex: { default: 999, type: Number },
+    weeklyCalendar: { type: Boolean, default: false },
+    showWeeklyText: { type: Boolean, default: true },
+    showFullDate: { type: Boolean, default: null },
+    showMonthMark: { type: Boolean, default: false },
+    customStyle: { default: () => {
+      return new UTSJSONObject({});
+    }, type: null }
+  }), new UTSJSONObject({
+    "show": {
+      type: Boolean,
+      default: false
+    },
+    "showModifiers": {}
+  })),
+  emits: /* @__PURE__ */ _mergeModels(["select", "confirm", "unselect", "panelChange", "clickDisabledDate", "clickClose", "open", "close", "opened", "closed", "overRange"], ["update:show"]),
+  __multiRoot: true,
+  setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesRiceUiComponentsRiceCalendarRiceCalendarSharedData", sharedDataClassId: 0 })));
+    const ns = useNamespace("calendar");
+    useSafeArea();
+    const emit = __emit;
+    const props = __props;
+    const show = _useModel(__props, "show");
+    const calendarRef = shallowRef(null);
+    const realShow = usePopup(calendarRef, new UsePopupOptions({
+      zoom: null,
+      zoomScale: null,
+      beforeClose: null,
+      show,
+      duration: 300,
+      position: "bottom",
+      opacity: false
+    })).realShow;
+    const isShow = computed(() => {
+      return props.usePopup ? realShow.value : true;
+    });
+    const _showFullDate = computed(() => {
+      var _a2;
+      return (_a2 = props.showFullDate) !== null && _a2 !== void 0 ? _a2 : props.weeklyCalendar;
+    });
+    const getDayIsDisabled = (day) => {
+      if (props.weeklyCalendar && day.disabled == false)
+        return false;
+      return day.disabled == true || day.isCurrentMonth == false;
+    };
+    const getInitDate = () => {
+      const mode = props.mode;
+      let defaultDate = props.date;
+      if (defaultDate == "") {
+        return [];
+      }
+      const today = dateuts().format("YYYY-MM-DD");
+      let dates = [];
+      if (typeof defaultDate == "string") {
+        dates = [defaultDate];
+      } else if (Array.isArray(defaultDate)) {
+        dates = defaultDate.slice();
+      }
+      if (dates.length == 0) {
+        dates.push(today);
+      }
+      if (mode == "range" && dates.length >= 2) {
+        const start = getDateRange(dates[0], props.minDate, props.maxDate);
+        const end = getDateRange(dates[1], props.minDate, props.maxDate);
+        if (dateuts(start).isAfter(end)) {
+          return [end, start];
+        }
+        return [start, end];
+      }
+      return dates.map((v) => {
+        return getDateRange(v, props.minDate, props.maxDate);
+      });
+    };
+    const currentDate = ref(getInitDate());
+    const getInitPanelDate = () => {
+      const date = currentDate.value;
+      if (date.length > 0)
+        return date[0];
+      return getDateRange(dateuts().format("YYYY-MM-DD"), props.minDate, props.maxDate);
+    };
+    const primaryColor = ref("");
+    const activeColor = computed(() => {
+      var _a2;
+      const color = (_a2 = props.color) !== null && _a2 !== void 0 ? _a2 : primaryColor.value;
+      return color == "" ? "#1989fa" : color;
+    });
+    const getTintColor = (color) => {
+      const colorUts = new Coloruts(color);
+      return isDark.value ? colorUts.mix("#141414", 90).toHexString() : colorUts.tint(90).toHexString();
+    };
+    const firstDayOfWeek = computed(() => {
+      return clamp(props.firstDayOfWeek, 1, 7);
+    });
+    const currentPanelDate = ref(getInitPanelDate());
+    const monthDays = ref([]);
+    monthDays.value = getMonthDays([currentPanelDate.value], firstDayOfWeek.value, props.formatter, props.minDate, props.maxDate, _showFullDate.value);
+    const currentMonth = computed(() => {
+      return dateuts(currentPanelDate.value).format("M");
+    });
+    const currentWeekIndex = computed(() => {
+      if (props.weeklyCalendar == false)
+        return 0;
+      const panelDate = formatDate(currentPanelDate.value);
+      for (let week = 0; week < monthDays.value.length; week++) {
+        const weekItem = monthDays.value[week];
+        const dayIndex = weekItem.findIndex((day) => {
+          return day.fullDate == panelDate;
+        });
+        if (dayIndex != -1) {
+          return week;
+        }
+      }
+      return 0;
+    });
+    const displayMonthDays = computed(() => {
+      if (props.weeklyCalendar == false) {
+        return monthDays.value;
+      }
+      if (monthDays.value.length == 0) {
+        return [];
+      }
+      return [monthDays.value[currentWeekIndex.value]];
+    });
+    const displayMonthDaysRenderKey = computed(() => {
+      const list = displayMonthDays.value;
+      const rowCount = list.length;
+      const first = rowCount > 0 && list[0].length > 0 ? list[0][0].fullDate : "empty";
+      const lastRow = rowCount > 0 ? list[rowCount - 1] : [];
+      const last = lastRow.length > 0 ? lastRow[lastRow.length - 1].fullDate : "empty";
+      return `${currentPanelDate.value}-${rowCount}-${first}-${last}`;
+    });
+    const getWeekRowKey = (weekItem, index) => {
+      const first = weekItem.length > 0 ? weekItem[0].fullDate : `empty-${index}`;
+      const last = weekItem.length > 0 ? weekItem[weekItem.length - 1].fullDate : `empty-${index}`;
+      return `${props.weeklyCalendar}-${displayMonthDaysRenderKey.value}-${first}-${last}-${index}`;
+    };
+    const getRealWeekIndex = (index) => {
+      if (props.weeklyCalendar == false)
+        return index;
+      return currentWeekIndex.value + index;
+    };
+    const formatPanelDate = computed(() => {
+      if (props.weeklyCalendar && props.showWeeklyText) {
+        return `${dateuts(currentPanelDate.value).format("YYYYå¹´Mæœˆ")} ç¬¬${currentWeekIndex.value + 1}å‘¨`;
+      }
+      return dateuts(currentPanelDate.value).format("YYYYå¹´Mæœˆ");
+    });
+    const weeks = ["ä¸€", "äºŒ", "ä¸‰", "å››", "äº”", "å…­", "æ—¥"];
+    const weekList = computed(() => {
+      if (firstDayOfWeek.value == 1)
+        return weeks;
+      const firstDay = firstDayOfWeek.value;
+      return [...weeks.slice(firstDay - 1, 7), ...weeks.slice(0, firstDay - 1)];
+    });
+    const getBottomInfo = (day) => {
+      var _a2;
+      if (hasStrValue(day.bottomInfo))
+        return day.bottomInfo;
+      if (props.mode == "range") {
+        const dates = currentDate.value;
+        if (props.allowSameDay == true && dates.length >= 2 && getIsSelected(day, currentDate.value, props.mode) && dateuts(dates[0]).isSame(dates[1])) {
+          return "å¼€å§‹/ç»“æŸ";
+        }
+        if (dateuts(day.fullDate).isSame(dates[0]))
+          return "å¼€å§‹";
+        if (dates.length >= 2 && dateuts(day.fullDate).isSame(dates[1]))
+          return "ç»“æŸ";
+      }
+      return props.lunar ? (_a2 = day.lunarInfo) === null || _a2 === void 0 ? null : _a2.IDayCn : null;
+    };
+    const getPanelYearMonth = () => {
+      return dateuts(currentPanelDate.value).format("YYYY-MM");
+    };
+    const getPanelYearMonthByDate = (panelDate) => {
+      return dateuts(panelDate).format("YYYY-MM");
+    };
+    const getPanelWeekByDate = (panelDate) => {
+      if (props.weeklyCalendar == false) {
+        return 1;
+      }
+      const normalizedDate = formatDate(panelDate);
+      const panelMonthDays = getMonthDays([normalizedDate], firstDayOfWeek.value, props.formatter, props.minDate, props.maxDate, _showFullDate.value);
+      for (let week = 0; week < panelMonthDays.length; week++) {
+        const weekItem = panelMonthDays[week];
+        const dayIndex = weekItem.findIndex((day) => {
+          return day.fullDate == normalizedDate;
+        });
+        if (dayIndex != -1) {
+          return week + 1;
+        }
+      }
+      return 1;
+    };
+    const getPanelRowsByDate = (panelDate) => {
+      const normalizedDate = props.weeklyCalendar ? formatDate(panelDate) : panelDate;
+      const panelMonthDays = getMonthDays([normalizedDate], firstDayOfWeek.value, props.formatter, props.minDate, props.maxDate, _showFullDate.value);
+      if (props.weeklyCalendar == false) {
+        return panelMonthDays;
+      }
+      for (let week = 0; week < panelMonthDays.length; week++) {
+        const weekItem = panelMonthDays[week];
+        const dayIndex = weekItem.findIndex((day) => {
+          return day.fullDate == normalizedDate;
+        });
+        if (dayIndex != -1) {
+          return [weekItem];
+        }
+      }
+      return panelMonthDays.length > 0 ? [panelMonthDays[0]] : [];
+    };
+    const getPanelChangeResultByDate = (panelDate) => {
+      const panelRows = getPanelRowsByDate(panelDate);
+      const panelYearMonth = getPanelYearMonthByDate(panelDate);
+      let firstDate = dateuts(panelDate).startOf("month").format("YYYY-MM-DD");
+      let lastDate = dateuts(panelDate).endOf("month").format("YYYY-MM-DD");
+      let prevMonthFirstDate = "";
+      let nextMonthLastDate = "";
+      if (props.weeklyCalendar && panelRows.length > 0) {
+        firstDate = "";
+        lastDate = "";
+      }
+      for (let rowIndex = 0; rowIndex < panelRows.length; rowIndex++) {
+        const row = panelRows[rowIndex];
+        for (let dayIndex = 0; dayIndex < row.length; dayIndex++) {
+          const day = row[dayIndex];
+          const dayYearMonth = dateuts(day.fullDate).format("YYYY-MM");
+          if (props.weeklyCalendar && dayYearMonth == panelYearMonth) {
+            if (firstDate == "") {
+              firstDate = day.fullDate;
+            }
+            lastDate = day.fullDate;
+          }
+          if (dayYearMonth < panelYearMonth && prevMonthFirstDate == "") {
+            prevMonthFirstDate = day.fullDate;
+          }
+          if (dayYearMonth > panelYearMonth) {
+            nextMonthLastDate = day.fullDate;
+          }
+        }
+      }
+      if (props.weeklyCalendar && firstDate == "") {
+        firstDate = dateuts(panelDate).format("YYYY-MM-DD");
+        lastDate = firstDate;
+      }
+      return new CalendarPanelChangeResult({
+        firstDate,
+        lastDate,
+        panelDate: panelYearMonth,
+        prevMonthFirstDate,
+        nextMonthLastDate,
+        week: getPanelWeekByDate(panelDate)
+      });
+    };
+    const emitPanelChangeByDate = (panelDate) => {
+      emit("panelChange", getPanelChangeResultByDate(panelDate));
+    };
+    const getPanelDate = () => {
+      return getPanelYearMonth();
+    };
+    const setPanelDate = (panelDate) => {
+      currentPanelDate.value = panelDate;
+      emitPanelChangeByDate(panelDate);
+    };
+    const shiftPanelDate = (step, unit, format) => {
+      const panelDate = dateuts(currentPanelDate.value).add(step, unit).format(format);
+      setPanelDate(panelDate);
+    };
+    const getLastMonth = () => {
+      if (props.weeklyCalendar) {
+        shiftPanelDate(-7, "day", "YYYY-MM-DD");
+      } else {
+        shiftPanelDate(-1, "month", "YYYY-MM");
+      }
+    };
+    const getNextMonth = () => {
+      if (props.weeklyCalendar) {
+        shiftPanelDate(7, "day", "YYYY-MM-DD");
+      } else {
+        shiftPanelDate(1, "month", "YYYY-MM");
+      }
+    };
+    const getLastYear = () => {
+      if (props.weeklyCalendar) {
+        shiftPanelDate(-1, "month", "YYYY-MM-DD");
+      } else {
+        shiftPanelDate(-1, "year", "YYYY-MM");
+      }
+    };
+    const getNextYear = () => {
+      if (props.weeklyCalendar) {
+        shiftPanelDate(1, "month", "YYYY-MM-DD");
+      } else {
+        shiftPanelDate(1, "year", "YYYY-MM");
+      }
+    };
+    const getLastWeek = () => {
+      if (props.weeklyCalendar == false)
+        return null;
+      shiftPanelDate(-7, "day", "YYYY-MM-DD");
+    };
+    const getNextWeek = () => {
+      if (props.weeklyCalendar == false)
+        return null;
+      shiftPanelDate(7, "day", "YYYY-MM-DD");
+    };
+    const switchPanelMonth = (step) => {
+      const format = props.weeklyCalendar ? "YYYY-MM-DD" : "YYYY-MM";
+      shiftPanelDate(step, "month", format);
+    };
+    const switchPanelYear = (step) => {
+      const format = props.weeklyCalendar ? "YYYY-MM-DD" : "YYYY-MM";
+      shiftPanelDate(step, "year", format);
+    };
+    const switchPanel = (type) => {
+      if (type == "prev-week") {
+        getLastWeek();
+      } else if (type == "next-week") {
+        getNextWeek();
+      } else if (type == "prev-month") {
+        switchPanelMonth(-1);
+      } else if (type == "next-month") {
+        switchPanelMonth(1);
+      } else if (type == "next-year") {
+        switchPanelYear(1);
+      } else if (type == "prev-year") {
+        switchPanelYear(-1);
+      }
+    };
+    const handleOverRange = () => {
+      var _a2;
+      emit("overRange");
+      if (props.showRangePrompt == false)
+        return null;
+      const rangePrompt = (_a2 = props.rangePrompt) !== null && _a2 !== void 0 ? _a2 : `æœ€å¤šé€‰æ‹©${props.maxRange}å¤©`;
+      uni.showToast({
+        title: rangePrompt,
+        icon: "none"
+      });
+    };
+    const confirmDisabled = computed(() => {
+      const len = currentDate.value.length;
+      return len <= 0 || props.mode === "range" && len < 2;
+    });
+    const confirmText = computed(() => {
+      if (confirmDisabled.value && hasStrValue(props.confirmDisabledText)) {
+        return props.confirmDisabledText;
+      }
+      return props.confirmText;
+    });
+    const onConfirm = () => {
+      if (confirmDisabled.value) {
+        return null;
+      }
+      emit("confirm", props.mode == "single" ? currentDate.value[0] : currentDate.value.slice());
+      show.value = false;
+    };
+    const handleSelect = (date) => {
+      if (props.mode == "range" && date.length >= 2 && props.maxRange != null) {
+        const diff = dateuts(date[1]).diff(date[0], "day") + 1;
+        if (diff > props.maxRange) {
+          handleOverRange();
+          return null;
+        }
+      }
+      currentDate.value = date;
+      emit("select", props.mode == "single" ? date[0] : date.slice());
+      if (props.showConfirmBtn == false) {
+        onConfirm();
+      }
+    };
+    const handleClick = (day) => {
+      const fullDate = day.fullDate;
+      if (props.readonly == true || day.isCurrentMonth == false && !props.weeklyCalendar)
+        return null;
+      if (day.disabled == true) {
+        emit("clickDisabledDate", fullDate);
+        return null;
+      }
+      if (props.mode == "range") {
+        if (currentDate.value.length == 0) {
+          handleSelect([fullDate]);
+          return null;
+        }
+        const start = currentDate.value[0];
+        const end = currentDate.value.length >= 2 ? currentDate.value[1] : null;
+        if (end == null) {
+          const isAfter = dateuts(fullDate).isAfter(start);
+          if (isAfter) {
+            handleSelect([start, fullDate]);
+          } else if (dateuts(fullDate).isBefore(start)) {
+            handleSelect([fullDate]);
+          } else if (props.allowSameDay) {
+            handleSelect([fullDate, fullDate]);
+          }
+        } else {
+          handleSelect([fullDate]);
+        }
+      } else if (props.mode == "multiple") {
+        const selectedIndex = currentDate.value.findIndex((v) => {
+          return dateuts(v).isSame(fullDate);
+        });
+        if (selectedIndex != -1) {
+          let unselect = currentDate.value.splice(selectedIndex, 1);
+          emit("unselect", unselect[0]);
+        } else if (props.maxRange != null && currentDate.value.length >= props.maxRange) {
+          handleOverRange();
+        } else {
+          handleSelect([...currentDate.value, fullDate]);
+        }
+      } else {
+        handleSelect([fullDate]);
+      }
+    };
+    const bodyRef = shallowRef(null);
+    const getCalendarGrid = (width) => {
+      const gridList = [];
+      const oneWidth = width / weekList.value.length;
+      const oneHeight = getPxNum(addUnit(props.rowHeight));
+      for (let week = 0; week < displayMonthDays.value.length; week++) {
+        const weekItem = displayMonthDays.value[week];
+        const realWeekIndex = getRealWeekIndex(week);
+        for (let day = 0; day < weekItem.length; day++) {
+          const dayItem = weekItem[day];
+          let space = day;
+          if (realWeekIndex == 0) {
+            space = 7 - weekItem.length + day;
+          }
+          gridList.push(new GridItem({
+            x: space * oneWidth,
+            y: oneHeight * week + 4,
+            width: oneWidth,
+            height: oneHeight,
+            data: dayItem
+          }));
+        }
+      }
+      return gridList;
+    };
+    const onClick = (e) => {
+      const target = e.currentTarget;
+      const rect = target.getBoundingClientRect();
+      let bodyLeft = rect.left;
+      let bodyTop = rect.top;
+      let bodyWidth = rect.width;
+      if (props.usePopup && calendarRef.value != null) {
+        const calendarRect = calendarRef.value.getBoundingClientRect();
+        bodyLeft = calendarRect.left + target.offsetLeft;
+        bodyTop = calendarRect.top + target.offsetTop;
+        bodyWidth = target.offsetWidth > 0 ? target.offsetWidth : rect.width;
+      }
+      const x = e.clientX - bodyLeft;
+      const y = e.clientY - bodyTop;
+      const currentGrid = getCalendarGrid(bodyWidth);
+      for (let i = 0; i < currentGrid.length; i++) {
+        const grid = currentGrid[i];
+        const maxX = grid.x + grid.width;
+        const maxY = grid.y + grid.height;
+        const isXLimit = grid.x < x && x < maxX;
+        const isYLimit = grid.y < y && y < maxY;
+        if (isXLimit && isYLimit) {
+          handleClick(grid.data);
+          break;
+        }
+      }
+    };
+    const clickClose = () => {
+      if (props.usePopup && props.closeOnClickClose) {
+        show.value = false;
+      }
+      emit("clickClose");
+    };
+    const getDayClass = (day, index) => {
+      const css = [];
+      const pre = "rice-calendar__day";
+      const isSelect = getIsSelected(day, currentDate.value, props.mode);
+      if (getDayIsDisabled(day)) {
+        css.push(`${pre}--disabled`);
+      }
+      if (isSelect) {
+        css.push(`${pre}--selected`);
+      }
+      if (getIsBetween(day, currentDate.value) && props.mode == "range") {
+        css.push(`${pre}--middle`);
+      }
+      if (props.mode == "range") {
+        if (currentDate.value[0] != null && formatDate(currentDate.value[0]) == day.fullDate) {
+          css.push(`${pre}--range--start`);
+        }
+        if (currentDate.value[1] != null && formatDate(currentDate.value[1]) == day.fullDate) {
+          css.push(`${pre}--range--end`);
+        }
+        if (getIsBetween(day, currentDate.value)) {
+          css.push(`${pre}--middle`);
+        }
+      }
+      return css;
+    };
+    const getDayTextClass = (day, index, type) => {
+      const css = [];
+      const pre = "rice-calendar__day";
+      const isSelect = getIsSelected(day, currentDate.value, props.mode);
+      if (getDayIsDisabled(day)) {
+        css.push(`${pre}--disabled__text`);
+      }
+      if (isSelect) {
+        css.push(`${pre}--selected__text`);
+      }
+      if (type == "inner" && getIsBetween(day, currentDate.value) && props.mode == "range") {
+        css.push(`${pre}--middle__text`);
+      }
+      return css;
+    };
+    const getDayStyle = (day, index) => {
+      const css = /* @__PURE__ */ new Map();
+      if (getRealWeekIndex(index) == 0 && day.date == 1 && !_showFullDate.value) {
+        const realDay = (day.day + 7 - firstDayOfWeek.value) % 7;
+        css.set("margin-left", `${100 * realDay / 7}%`);
+      }
+      if (hasStrValue(props.rowHeight)) {
+        css.set("height", addUnit(props.rowHeight));
+      }
+      const color = activeColor.value;
+      const isSelect = getIsSelected(day, currentDate.value, props.mode);
+      if (isSelect) {
+        css.set("background-color", color);
+      }
+      if (getIsBetween(day, currentDate.value) && props.mode == "range") {
+        css.set("background-color", getTintColor(color));
+      }
+      return css;
+    };
+    const getDayTextStyle = (day, index) => {
+      const css = /* @__PURE__ */ new Map();
+      if (props.color != null) {
+        const isSelect = getIsSelected(day, currentDate.value, props.mode);
+        if (isSelect) {
+          css.set("color", "#f5f5f5");
+        } else {
+          const disabled = getDayIsDisabled(day);
+          css.set("color", disabled ? "var(--rice-calendar-disabled-text)" : "var(--rice-text-color)");
+        }
+        if (getIsBetween(day, currentDate.value) && props.mode == "range")
+          css.set("color", props.color);
+      }
+      return css;
+    };
+    const rootClass = computed(() => {
+      return [
+        ns.theme(),
+        ns.is("popup", props.usePopup == true)
+      ];
+    });
+    const rootStyle = computed(() => {
+      var _a2;
+      const css = /* @__PURE__ */ new Map();
+      if (props.usePopup) {
+        css.set("z-index", props.zIndex);
+      }
+      const isSafeAreaInsetBottom = (_a2 = props.safeAreaInsetBottom) !== null && _a2 !== void 0 ? _a2 : props.usePopup;
+      if (isSafeAreaInsetBottom) {
+        css.set("padding-bottom", safeAreaInsets.value.bottom + "px");
+      }
+      return css;
+    });
+    const getBottomTextStyle = (day) => {
+      const css = new UTSJSONObject({});
+      if (day.bottomInfoColor != null)
+        css.color = day.bottomInfoColor;
+      return css;
+    };
+    const getTopTextStyle = (day) => {
+      const css = new UTSJSONObject({});
+      if (day.topInfoColor != null)
+        css.color = day.topInfoColor;
+      return css;
+    };
+    const closeStyle = ref(new UTSJSONObject({
+      position: "absolute",
+      right: "16px",
+      top: "12px",
+      zIndex: 9
+    }));
+    const switchArrowStyle = ref(new UTSJSONObject({
+      padding: "10px 4px"
+    }));
+    watch(() => {
+      return props.date;
+    }, () => {
+      const previousPanelDate = currentPanelDate.value;
+      currentDate.value = getInitDate();
+      let nextPanelDate = previousPanelDate;
+      if (typeof props.date == "string") {
+        nextPanelDate = props.date;
+      } else if (Array.isArray(props.date)) {
+        const d = props.date;
+        if (d.length > 0) {
+          nextPanelDate = d[0];
+        }
+      }
+      currentPanelDate.value = nextPanelDate;
+      const previousYearMonth = getPanelYearMonthByDate(previousPanelDate);
+      const nextYearMonth = getPanelYearMonthByDate(nextPanelDate);
+      const previousWeek = getPanelWeekByDate(previousPanelDate);
+      const nextWeek = getPanelWeekByDate(nextPanelDate);
+      if (previousYearMonth != nextYearMonth || previousWeek != nextWeek) {
+        emit("panelChange", getPanelChangeResultByDate(nextPanelDate));
+      }
+    });
+    watch([
+      () => {
+        return props.minDate;
+      },
+      () => {
+        return props.maxDate;
+      }
+    ], () => {
+      currentDate.value = getInitDate();
+      monthDays.value = getMonthDays([currentPanelDate.value], firstDayOfWeek.value, props.formatter, props.minDate, props.maxDate, _showFullDate.value);
+    });
+    watch(() => {
+      return props.weeklyCalendar;
+    }, (newVal) => {
+      const normalizedDate = formatDate(currentPanelDate.value);
+      const nextPanelDate = newVal ? normalizedDate : dateuts(normalizedDate).format("YYYY-MM");
+      if (nextPanelDate != currentPanelDate.value) {
+        currentPanelDate.value = nextPanelDate;
+        return null;
+      }
+      monthDays.value = getMonthDays([nextPanelDate], firstDayOfWeek.value, props.formatter, props.minDate, props.maxDate, _showFullDate.value);
+    });
+    watch([currentPanelDate, _showFullDate], () => {
+      monthDays.value = getMonthDays([currentPanelDate.value], firstDayOfWeek.value, props.formatter, props.minDate, props.maxDate, _showFullDate.value);
+    });
+    onMounted(() => {
+      var _a2, _b;
+      primaryColor.value = (_b = (_a2 = calendarRef.value) === null || _a2 === void 0 ? null : _a2.style.getPropertyValue("--rice-primary-color")) !== null && _b !== void 0 ? _b : "";
+    });
+    __expose({
+      switchPanel,
+      getPanelDate
+    });
+    return () => {
+      "raw js";
+      const _setTemplateRef = _createSharedDataTemplateRefSetter();
+      const _component_rice_overlay = __easycom_0;
+      const _component_rice_icon = __easycom_0$1;
+      const _component_rice_button = __easycom_1$1;
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.usePopup));
+      }, () => {
+        const n2 = _createSharedDataComponentWithFallback(_component_rice_overlay, "f1dd364a", {
+          show: () => {
+            return show.value;
+          },
+          "onUpdate:show": () => {
+            return (_value) => {
+              return show.value = _value;
+            };
+          },
+          "z-index": () => {
+            return __props.zIndex - 1;
+          },
+          "close-on-click-overlay": () => {
+            return __props.closeOnClickOverlay;
+          },
+          duration: 300
+        });
+        _setSharedData(__sharedData, 1, n2?.sharedData);
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 2, _toSharedDataBoolean(_unref(isShow)));
+      }, () => {
+        _renderSharedDataEffect(() => {
+          _setSharedDataClass(__sharedData, 29, ["rice-calendar", _unref(rootClass)]);
+          _setSharedDataStyle(__sharedData, 30, [_unref(rootStyle), __props.customStyle]);
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 3, _toSharedDataBoolean(__props.showTitle || __props.closeable));
+        }, () => {
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData, 4, _toSharedDataBoolean(__props.showTitle));
+          }, () => {
+            _renderSharedDataEffect(() => {
+              return _setSharedData(__sharedData, 5, _toDisplayString(__props.title));
+            });
+          });
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData, 6, _toSharedDataBoolean(__props.closeable));
+          }, () => {
+            const n12 = _createSharedDataComponentWithFallback(_component_rice_icon, "084ba3e2", {
+              name: () => {
+                return __props.closeIcon;
+              },
+              "custom-style": () => {
+                return _unref(closeStyle);
+              },
+              size: "20px",
+              onClick: () => {
+                return clickClose;
+              }
+            });
+            _setSharedData(__sharedData, 7, n12?.sharedData);
+          });
+        });
+        _createSharedDataSlot("header", {
+          panelDate: () => {
+            return getPanelYearMonth();
+          },
+          currentWeek: () => {
+            return _unref(currentWeekIndex) + 1;
+          }
+        }, (data) => {
+          return _setSharedData(__sharedData, 8, data);
+        }, () => {
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData, 9, _toSharedDataBoolean(__props.switchMode != "none" || __props.showSubtitle));
+          }, () => {
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData, 10, _toSharedDataBoolean(__props.switchMode != "none"));
+            }, () => {
+              _createSharedDataIf(() => {
+                return _setSharedData(__sharedData, 11, _toSharedDataBoolean(__props.switchMode != "month"));
+              }, () => {
+                const n22 = _createSharedDataComponentWithFallback(_component_rice_icon, "084bb001", {
+                  name: "double-left",
+                  "custom-style": () => {
+                    return _unref(switchArrowStyle);
+                  },
+                  onClick: () => {
+                    return getLastYear;
+                  }
+                });
+                _setSharedData(__sharedData, 12, n22?.sharedData);
+              });
+              const n23 = _createSharedDataComponentWithFallback(_component_rice_icon, "084bb6a7", {
+                name: "arrow-left",
+                "custom-style": () => {
+                  return _unref(switchArrowStyle);
+                },
+                onClick: () => {
+                  return getLastMonth;
+                }
+              });
+              _setSharedData(__sharedData, 13, n23?.sharedData);
+            });
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData, 14, _toSharedDataBoolean(__props.showSubtitle));
+            }, () => {
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData, 15, _toDisplayString(_unref(formatPanelDate)));
+              });
+            });
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData, 16, _toSharedDataBoolean(__props.switchMode != "none"));
+            }, () => {
+              const n30 = _createSharedDataComponentWithFallback(_component_rice_icon, "01277f72", {
+                name: "arrow-right",
+                "custom-style": () => {
+                  return _unref(switchArrowStyle);
+                },
+                onClick: () => {
+                  return getNextMonth;
+                }
+              });
+              _setSharedData(__sharedData, 17, n30?.sharedData);
+              _createSharedDataIf(() => {
+                return _setSharedData(__sharedData, 18, _toSharedDataBoolean(__props.switchMode != "month"));
+              }, () => {
+                const n33 = _createSharedDataComponentWithFallback(_component_rice_icon, "01278318", {
+                  name: "double-right",
+                  "custom-style": () => {
+                    return _unref(switchArrowStyle);
+                  },
+                  onClick: () => {
+                    return getNextYear;
+                  }
+                });
+                _setSharedData(__sharedData, 19, n33?.sharedData);
+              });
+            });
+          });
+        });
+        _createSharedDataFor(_setSharedDataScoped(__sharedData, 22, _createSharedDataVFor(__sharedDataScope, () => {
+          return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
+        })), () => {
+          return _unref(weekList);
+        }, (__sharedData_VFor0, _for_item0) => {
+          _renderSharedDataEffect(() => {
+            return _setSharedData(__sharedData_VFor0, 1, _toDisplayString(_for_item0.value));
+          });
+          return null;
+        }, (__sharedData_VFor0, item) => {
+          return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(item));
+        }, 1);
+        _renderSharedDataEffect(() => {
+          return _setSharedDataClass(__sharedData, 31, ["rice-calendar__body", { "rice-calendar__body--week": __props.weeklyCalendar }]);
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 23, _toSharedDataBoolean(__props.showMonthMark));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            return _setSharedData(__sharedData, 24, _toDisplayString(_unref(currentMonth)));
+          });
+        });
+        _createSharedDataFor(_setSharedDataScoped(__sharedData, 25, _createSharedDataVFor(__sharedDataScope, () => {
+          return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 2 });
+        })), () => {
+          return _unref(displayMonthDays);
+        }, (__sharedData_VFor1, _for_item1, _for_key1) => {
+          _createSharedDataFor(_setSharedDataScoped(__sharedData_VFor1, 1, _createSharedDataVFor(__sharedDataScope, () => {
+            return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 3 });
+          })), () => {
+            return _for_item1.value;
+          }, (__sharedData_VFor2, _for_item2) => {
+            _renderSharedDataEffect(() => {
+              const _day = _for_item2.value;
+              const _index = _for_key1.value;
+              _setSharedDataClass(__sharedData_VFor2, 10, ["rice-calendar__day", getDayClass(_day)]);
+              _setSharedDataStyle(__sharedData_VFor2, 11, getDayStyle(_day, _index));
+            });
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData_VFor2, 1, _toSharedDataBoolean(_unref(hasStrValue)(_for_item2.value.topInfo)));
+            }, () => {
+              _renderSharedDataEffect(() => {
+                const _day = _for_item2.value;
+                _setSharedDataClass(__sharedData_VFor2, 2, ["rice-calendar__day__top", getDayTextClass(_day, _for_key1.value, "top")]);
+                _setSharedDataStyle(__sharedData_VFor2, 3, getTopTextStyle(_day));
+                _setSharedData(__sharedData_VFor2, 4, _toDisplayString(_day.topInfo));
+              });
+            });
+            _renderSharedDataEffect(() => {
+              const _day = _for_item2.value;
+              const _index = _for_key1.value;
+              _setSharedDataClass(__sharedData_VFor2, 12, ["rice-calendar__day__text", getDayTextClass(_day, _index, "inner")]);
+              _setSharedDataStyle(__sharedData_VFor2, 13, getDayTextStyle(_day));
+              _setSharedData(__sharedData_VFor2, 14, _toDisplayString(_unref(hasStrValue)(_day.text) ? _day.text : _day.date));
+            });
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData_VFor2, 5, _toSharedDataBoolean(__props.lunar || getBottomInfo(_for_item2.value) != null));
+            }, () => {
+              _renderSharedDataEffect(() => {
+                const _day = _for_item2.value;
+                _setSharedDataClass(__sharedData_VFor2, 6, ["rice-calendar__day__bottom", getDayTextClass(_day, _for_key1.value, "bottom")]);
+                _setSharedDataStyle(__sharedData_VFor2, 7, getBottomTextStyle(_day));
+                _setSharedData(__sharedData_VFor2, 8, _toDisplayString(getBottomInfo(_day)));
+              });
+            });
+            _setSharedDataEvent(__sharedData_VFor2, 9, () => {
+              return handleClick(_for_item2.value);
+            });
+            return null;
+          }, (__sharedData_VFor2, day) => {
+            return _setSharedData(__sharedData_VFor2, 0, _toDisplayString(day.fullDate));
+          }, 1);
+          return null;
+        }, (__sharedData_VFor1, item, index) => {
+          return _setSharedData(__sharedData_VFor1, 0, _toDisplayString(getWeekRowKey(item, index)));
+        });
+        _setSharedDataEvent(__sharedData, 26, onClick);
+        _setSharedDataTemplateRef(__sharedData, 27, (n56) => {
+          _setTemplateRef(n56, bodyRef, null, "bodyRef");
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 20, _toSharedDataBoolean(__props.showConfirmBtn));
+        }, () => {
+          const n59 = _createSharedDataComponentWithFallback(_component_rice_button, "01280d3f", {
+            color: () => {
+              return __props.color;
+            },
+            type: "primary",
+            disabled: () => {
+              return _unref(confirmDisabled);
+            },
+            text: () => {
+              return _unref(confirmText);
+            },
+            shape: "round",
+            onClick: () => {
+              return onConfirm;
+            }
+          });
+          _setSharedData(__sharedData, 21, n59?.sharedData);
+        });
+        _setSharedDataTemplateRef(__sharedData, 28, (n61) => {
+          _setTemplateRef(n61, calendarRef, null, "calendarRef");
+        });
+      });
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=rice-calendar.js.map
+ÔrFÜ ¿../rice-overlay/rice-overlay.jsÙ ../../libs/use/usePopup/index.js¹../rice-icon/rice-icon.js½../rice-button/rice-button.js½../../libs/store/useConfig.jsÙ$../../libs/use/useCountDown/index.jsÙ$../../libs/use/useNamespace/index.jsÙ)../../libs/use/useRelation/useChildren.jsÙ'../../libs/use/useRelation/useParent.jsÙ#../../libs/use/useSafeArea/index.jsÙ ../../libs/use/useTouch/index.jsÙ(../../libs/plugin/coloruts/conversion.jsÙ&../../libs/plugin/coloruts/constant.jsÙ"../../libs/plugin/coloruts/type.js©./type.js¹../../libs/utils/basic.jsÙ"../../libs/plugin/dateuts/index.jsÙ'../../../../plugin-vue-export-helper.jsª./utils.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙÒ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-overlay/rice-overlay.jsAÃªoh-resolveÂGAÂÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/usePopup/index.jsAÃªoh-resolveÂGAÂÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-icon/rice-icon.jsAÃªoh-resolveÂGAÂÙĞ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-button/rice-button.jsAÃªoh-resolveÂGAÂÙÂ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/store/useConfig.jsAÃªoh-resolveÂGAÂÙÉ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useCountDown/index.jsAÃªoh-resolveÂGAÂÙÉ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useNamespace/index.jsAÃªoh-resolveÂGAÂÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useRelation/useChildren.jsAÃªoh-resolveÂGAÂÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useRelation/useParent.jsAÃªoh-resolveÂGAÂÙÈ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useSafeArea/index.jsAÃªoh-resolveÂGAÂÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useTouch/index.jsAÃªoh-resolveÂGAÂÙÍ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/plugin/coloruts/conversion.jsAÃªoh-resolveÂGAÂÙË/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/plugin/coloruts/constant.jsAÃªoh-resolveÂGAÂÙÇ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/plugin/coloruts/type.jsAÃªoh-resolveÂGAÂÙË/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-calendar/type.jsAÃªoh-resolveÂGAÂÙ¾/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/utils/basic.jsAÃªoh-resolveÂGAÂÙÇ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/plugin/dateuts/index.jsAÃªoh-resolveÂGAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂGAÂÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-calendar/utils.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍštÍš’À‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍšÍšÔrL”¤type¥start£end¤nameªIdentifierÍšÍšŠ«__easycom_1LªIdentifierÍšÍš¡_ÀÜ ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration ÌC‘ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	
+¡_LªIdentifier«__easycom_0ÔrO•¤type¥start£end¥value£raw§Literal!ÌB¿../rice-overlay/rice-overlay.jsÙ!"../rice-overlay/rice-overlay.js"M±ImportDeclarationÌDÌƒ‘N¯ImportSpecifierÌMÌ_LªIdentifierÌMÌN¡_LªIdentifierÌRÌ_­__easycom_0$1O§LiteralÌgÌ‚¹../rice-icon/rice-icon.js»"../rice-icon/rice-icon.js"M±ImportDeclarationÌ„ÌÇ‘N¯ImportSpecifierÌÌŸLªIdentifierÌÌ¡_LªIdentifierÌ’ÌŸ­__easycom_1$1O§LiteralÌ§ÌÆ½../rice-button/rice-button.js¿"../rice-button/rice-button.js"M±ImportDeclarationÌÈÍ’N¯ImportSpecifierÌÑÌŞLªIdentifierÌÑÌÒ¡uLªIdentifierÌÖÌŞ¨usePopupN¯ImportSpecifierÌàÌôLªIdentifierÌàÌá¡ULªIdentifierÌåÌô¯UsePopupOptionsO§LiteralÌüÍÙ ../../libs/use/usePopup/index.jsÙ""../../libs/use/usePopup/index.js"M±ImportDeclarationÍ ÍNO§LiteralÍ'ÍMÙ$../../libs/use/useCountDown/index.jsÙ&"../../libs/use/useCountDown/index.js"M±ImportDeclarationÍOÍ‹‘N¯ImportSpecifierÍXÍcLªIdentifierÍXÍY¡iLªIdentifierÍ]Íc¦isDarkO§LiteralÍkÍŠ½../../libs/store/useConfig.js¿"../../libs/store/useConfig.js"M±ImportDeclarationÍŒÍÕ‘N¯ImportSpecifierÍ•Í¦LªIdentifierÍ•Í–¡uLªIdentifierÍšÍ¦¬useNamespaceO§LiteralÍ®ÍÔÙ$../../libs/use/useNamespace/index.jsÙ&"../../libs/use/useNamespace/index.js"M±ImportDeclarationÍÖÍ	O§LiteralÍİÍÙ)../../libs/use/useRelation/useChildren.jsÙ+"../../libs/use/useRelation/useChildren.js"M±ImportDeclarationÍ
+Í;O§LiteralÍÍ:Ù'../../libs/use/useRelation/useParent.jsÙ)"../../libs/use/useRelation/useParent.js"M±ImportDeclarationÍ<Í˜’N¯ImportSpecifierÍEÍULªIdentifierÍEÍF¡uLªIdentifierÍJÍU«useSafeAreaN¯ImportSpecifierÍWÍjLªIdentifierÍWÍX¡sLªIdentifierÍ\Íj®safeAreaInsetsO§LiteralÍrÍ—Ù#../../libs/use/useSafeArea/index.jsÙ%"../../libs/use/useSafeArea/index.js"M±ImportDeclarationÍ™ÍÃO§LiteralÍ ÍÂÙ ../../libs/use/useTouch/index.jsÙ""../../libs/use/useTouch/index.js"M±ImportDeclarationÍÄÍ‘N¯ImportSpecifierÍÍÍÚLªIdentifierÍÍÍÎ¡CLªIdentifierÍÒÍÚ¨ColorutsO§LiteralÍâÍÙ(../../libs/plugin/coloruts/conversion.jsÙ*"../../libs/plugin/coloruts/conversion.js"M±ImportDeclarationÍÍ>O§LiteralÍÍ=Ù&../../libs/plugin/coloruts/constant.jsÙ("../../libs/plugin/coloruts/constant.js"M±ImportDeclarationÍ?ÍkO§LiteralÍFÍjÙ"../../libs/plugin/coloruts/type.jsÙ$"../../libs/plugin/coloruts/type.js"M±ImportDeclarationÍlÍ®‘N¯ImportSpecifierÍuÍLªIdentifierÍuÍv¡dLªIdentifierÍzÍ§dateutsO§LiteralÍ‰Í­Ù"../../libs/plugin/dateuts/index.jsÙ$"../../libs/plugin/dateuts/index.js"M±ImportDeclarationÍ¯Íù’N¯ImportSpecifierÍ¸ÍÖLªIdentifierÍ¸Í¹¡CLªIdentifierÍ½ÍÖ¹CalendarPanelChangeResultN¯ImportSpecifierÍØÍåLªIdentifierÍØÍÙ¡GLªIdentifierÍİÍå¨GridItemO§LiteralÍíÍø©./type.js«"./type.js"M±ImportDeclarationÍúÍ`”N¯ImportSpecifierÍÍLªIdentifierÍÍ¡cLªIdentifierÍÍ¥clampN¯ImportSpecifierÍÍLªIdentifierÍÍ¡hLªIdentifierÍÍ«hasStrValueN¯ImportSpecifierÍ!Í-LªIdentifierÍ!Í"¡aLªIdentifierÍ&Í-§addUnitN¯ImportSpecifierÍ/Í<LªIdentifierÍ/Í0¡dLªIdentifierÍ4Í<¨getPxNumO§LiteralÍDÍ_¹../../libs/utils/basic.js»"../../libs/utils/basic.js"M±ImportDeclarationÍaÍÛ•N¯ImportSpecifierÍjÍ{LªIdentifierÍjÍk¡gLªIdentifierÍoÍ{¬getMonthDaysN¯ImportSpecifierÍ}ÍŒLªIdentifierÍ}Í~¡fLªIdentifierÍ‚ÍŒªformatDateN¯ImportSpecifierÍÍŸLªIdentifierÍÍ¡aLªIdentifierÍ“ÍŸ¬getDateRangeN¯ImportSpecifierÍ¡Í³LªIdentifierÍ¡Í¢¡bLªIdentifierÍ¦Í³­getIsSelectedN¯ImportSpecifierÍµÍÆLªIdentifierÍµÍ¶¡cLªIdentifierÍºÍÆ¬getIsBetweenO§LiteralÍÎÍÚª./utils.js¬"./utils.js"M±ImportDeclarationÍÜÍ'‘N¯ImportSpecifierÍåÍõLªIdentifierÍåÍæ¡_LªIdentifierÍêÍõ«_export_sfcO§LiteralÍıÍ&Ù'../../../../plugin-vue-export-helper.jsÙ)"../../../../plugin-vue-export-helper.js"

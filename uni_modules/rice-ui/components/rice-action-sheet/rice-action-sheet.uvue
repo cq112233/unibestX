@@ -1,0 +1,455 @@
+<template>
+	<rice-overlay v-if="showOverlay" :show="show" :z-index="zIndex-1" :close-on-click-overlay="false" :duration="duration"
+		:bg-color="overlayBgColor" @click="overlayClick" />
+	<view v-if="realShow" :class="actionSheetClass" :style="[actionSheetStyle,customStyle]" ref="actionSheetRef">
+		<view v-if="hasStrValue(props.title)" class="rice-action-sheet__title">
+			<text class="rice-action-sheet__title__text">{{props.title}}</text>
+		</view>
+		<scroll-view class="rice-action-sheet__container" direction="vertical">
+			<view v-for="(item,index) in actionsList" :key="`${item.name}${index}`" :class="getMenuClass(item,index)"
+				:hover-stay-time="100" :hover-class="item.disabled==true?'none':'rice-action-sheet--hover'"
+				@click="handleSelect(item,index)">
+				<rice-icon v-if="hasStrValue(item.icon)" :color="getIconColor(item)" :name="item.icon" :size="item.iconSize"
+					:font-family="item.iconFontFamily" :custom-style="{marginRight:'6px'}" />
+				<text :class="getMenuTextClass(item)" :style="getMenuTextStyle(item)">{{item.name}}</text>
+				<text v-if="hasStrValue(item.subname)" :class="getMenuSubnameClass(item)">{{item.subname}}</text>
+			</view>
+		</scroll-view>
+		<view v-if="showCancel" class="rice-action-sheet__gap"></view>
+		<view v-if="showCancel" class="rice-action-sheet__cancel" :hover-stay-time="100"
+			hover-class="rice-action-sheet--hover" @click="cancel">
+			<text class="rice-action-sheet__cancel__text">{{cancelText}}</text>
+		</view>
+	</view>
+</template>
+
+<script setup>
+	import { addUnit, hasStrValue } from "../../libs/utils"
+	import { ActionSheetProps, ActionSheetAction } from "./index.uts"
+	import { showActionSheet } from "./index.uts"
+	import { useCssVar, useNamespace, useSafeArea, safeAreaInsets } from "../../libs/use"
+	defineOptions({
+		name: 'rice-action-sheet',
+		styleIsolation: 'app-and-page'
+	})
+	const ns = useNamespace('action-sheet')
+	useSafeArea()
+	const emit = defineEmits<{
+		select : [action: ActionSheetAction, index: number],
+		cancel : [],
+		open : [],
+		close : [],
+		opened : [],
+		closed : [],
+		clickOverlay : [],
+	}>()
+
+
+	const props = withDefaults(defineProps<ActionSheetProps>(), {
+		showCancel: true,
+		cancelText: '取消',
+		duration: 300,
+		zIndex: 999,
+		opaction: false,
+		overlay: true,
+		overlayBgColor: 'rgba(0,0,0,.6)',
+		radius: '12px',
+		closeOnClickAction: true,
+		closeOnClickOverlay: true,
+		safeAreaInsetBottom: true,
+		useDialogPage: true,
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+	const show = defineModel('show', {
+		type: Boolean,
+		default: false,
+	})
+
+	const actionsList = computed<ActionSheetAction[]>(() => props.actions ?? [] as ActionSheetAction[])
+	let openTimer : number | null = null
+	let openedTimer : number | null = null
+	let closeTimer : number | null = null
+
+	const handleOpenTimer = () => {
+		if (openTimer != null) clearTimeout(openTimer!)
+		if (openedTimer != null) clearTimeout(openedTimer!)
+	}
+
+	const handleCloseTimer = () => {
+		if (closeTimer != null) clearTimeout(closeTimer!)
+	}
+
+	const realShow = ref(false)
+	const actionSheetRef = shallowRef<UniElement | null>(null)
+
+
+	const open = async () => {
+		if (realShow.value) return
+		realShow.value = true
+		await nextTick()
+		handleOpenTimer()
+		openTimer = setTimeout(() => {
+			actionSheetRef.value?.style.setProperty('transition-duration', props.duration + 'ms')
+			actionSheetRef.value?.style.setProperty('opacity', '1')
+			actionSheetRef.value?.style.setProperty('transform', 'translate(0px, 0px)')
+			openedTimer = setTimeout(() => {
+				emit('opened')
+			}, props.duration)
+		}, 30)
+	}
+
+	const handleSelect = (action : ActionSheetAction, index : number) => {
+		if (action.disabled == true) return
+		if (props.closeOnClickAction == true) {
+			show.value = false
+		}
+		emit('select', action, index)
+	}
+
+	const cancel = () => {
+		show.value = false
+		emit('cancel')
+	}
+
+
+	// #ifdef APP
+	const hasDialogPage = ref(true)
+	//使用dialogPage的前提：useDialogPage为true且没有使用插槽
+	const isUseDialogPage = computed(() => props.useDialogPage == true && hasDialogPage.value)
+	const dialogPageIns = ref<UniPage | null>(null)
+	const handleShowDialog = () => {
+		// toRefs() 仅支持 Array 和 UTSJSONObject, 不支持自定义类型。App端此处不能使用toRefs
+		// 也不能使用JSON.parse 进行转换（APP端数据会丢失）
+		showActionSheet({
+			actions: actionsList.value,
+			title: props.title,
+			showCancel: props.showCancel,
+			cancelText: props.cancelText,
+			duration: props.duration,
+			zIndex: props.zIndex,
+			opacity: props.opacity,
+			overlay: props.overlay,
+			overlayBgColor: props.overlayBgColor,
+			closeOnClickAction: props.closeOnClickAction,
+			closeOnClickOverlay: props.closeOnClickOverlay,
+			radius: props.radius,
+			safeAreaInsetBottom: props.safeAreaInsetBottom,
+			customStyle: props.customStyle,
+			select: (action : ActionSheetAction, index : number) => {
+				emit('select', action, index)
+			},
+			cancel: () => {
+				emit('cancel')
+			},
+			ready: (pageIns : UniPage | null) => {
+				dialogPageIns.value = pageIns
+				hasDialogPage.value = true
+			},
+			open: () => {
+				emit('open')
+			},
+			close: () => {
+				if (show.value) {
+					show.value = false
+					emit('close')
+				}
+			},
+			opened: () => {
+				emit('opened')
+			},
+			closed: () => {
+				emit('closed')
+			},
+			clickOverlay: () => {
+				emit('clickOverlay')
+			},
+			fail: () => {
+				hasDialogPage.value = false
+				emit('open')
+				open()
+			}
+		})
+	}
+
+	watch(
+		() : (any | null)[] =>
+			[
+				props.title,
+				props.actions,
+			],
+		() => {
+			if (show.value) {
+				dialogPageIns.value?.vm?.$callMethod('updateParams', {
+					title: props.title,
+					actions: props.actions,
+				} as ActionSheetProps)
+			}
+		}, {
+		deep: true,
+	})
+
+	//#endif
+
+	const close = () => {
+		if (!realShow.value) return
+		const opacity = props.opacity == true ? '0' : '1'
+		actionSheetRef.value?.style.setProperty('opacity', opacity)
+		actionSheetRef.value?.style.setProperty('transform', 'translate(0px, 100%)')
+		handleCloseTimer()
+		closeTimer = setTimeout(() => {
+			realShow.value = false
+			emit('closed')
+			//#ifdef APP
+			dialogPageIns.value = null
+			//#endif
+		}, props.duration)
+	}
+
+	const overlayClick = () => {
+		if (props.closeOnClickOverlay == true) {
+			show.value = false
+		}
+		emit('clickOverlay')
+	}
+
+	const showOverlay = computed(() => {
+		//#ifdef APP
+		return isUseDialogPage.value ? false : props.overlay
+		//#endif
+		//#ifndef APP
+		return props.overlay
+		//#endif
+	})
+
+	watch(show, (newVal : boolean) => {
+		if (newVal && !realShow.value) {
+			// #ifdef APP
+			if (isUseDialogPage.value) {
+				handleShowDialog()
+				return
+			}
+			// #endif
+			open()
+			emit('open')
+		}
+		if (!newVal && realShow.value) {
+			close()
+			emit('close')
+		}
+	}, {
+		immediate: true
+	})
+
+	// #ifdef APP
+	const menuDisabledColor = useCssVar('--rice-action-sheet-menu-disabled-text-color', actionSheetRef)
+	const menuTextColor = useCssVar('--rice-text-color', actionSheetRef)
+	// #endif
+
+	const getIconColor = (menu : ActionSheetAction) => {
+		if (hasStrValue(menu.color)) return menu.color!
+
+		// #ifndef APP
+		return 'inherit'
+		// #endif
+
+		// #ifdef APP
+		return menu.disabled == true ? menuDisabledColor.value : menuTextColor.value
+		// #endif
+	}
+
+	const getMenuTextStyle = (menu : ActionSheetAction) => {
+		const css = new Map<string, string>()
+		if (hasStrValue(menu.color)) css.set('color', menu.color!)
+		return css
+	}
+
+	const getMenuTextClass = (menu : ActionSheetAction) => {
+		return [
+			ns.e('menu__text'),
+			// #ifdef APP
+			ns.is(`__menu__text--disabled`, menu.disabled == true)
+			// #endif
+		]
+	}
+
+	const getMenuSubnameClass = (menu : ActionSheetAction) => {
+		return [
+			ns.e('menu__subname'),
+			// #ifdef APP
+			ns.is(`__menu__subname--disabled`, menu.disabled == true)
+			// #endif
+		]
+	}
+
+	const actionSheetStyle = computed(() => {
+		const css = new Map<string, string | number>()
+		css.set('z-index', props.zIndex)
+		css.set('border-top-left-radius', addUnit(props.radius))
+		css.set('border-top-right-radius', addUnit(props.radius))
+		// #ifndef WEB
+		if (props.safeAreaInsetBottom) {
+			css.set('padding-bottom', safeAreaInsets.value.bottom + 'px')
+		}
+		// #endif
+		return css
+	})
+
+	const actionSheetClass = computed(() => {
+		return [
+			ns.b(""),
+			ns.theme(),
+			ns.is('opacity', props.opacity),
+			//#ifdef WEB
+			{ 'rice-safe-area-bottom': props.safeAreaInsetBottom }
+			//#endif
+		]
+	})
+
+	const getMenuClass = (menu : ActionSheetAction, index : number) => {
+		return [
+			ns.e("menu"),
+			ns.is("__menu--border", index < actionsList.value.length - 1),
+			// #ifndef APP
+			ns.is(`__menu--disabled`, menu.disabled == true)
+			// #endif
+		]
+	}
+
+	onUnmounted(() => {
+		handleOpenTimer()
+		handleCloseTimer()
+	})
+</script>
+
+<style scoped lang="scss">
+	@import "../../libs/style/mixins/hairline";
+
+	@mixin common {
+		width: 100%;
+		padding: 16px;
+		background-color: var(--rice-action-sheet-menu-background);
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		flex-wrap: wrap;
+		/* #ifdef WEB */
+		cursor: pointer;
+		/* #endif */
+		/* #ifndef APP */
+		word-break: break-all;
+		/* #endif */
+	}
+
+
+	.rice-action-sheet {
+		position: fixed;
+		left: 0;
+		bottom: 0;
+		width: 100%;
+		z-index: 999;
+		transition-property: transform, opacity;
+		transform: translate(0px, 100%);
+		background-color: var(--rice-action-sheet-menu-background);
+
+
+		&--opacity {
+			opacity: 0;
+		}
+
+		&__title {
+			@include hairline-bottom;
+			@include common;
+			/* #ifndef APP */
+			cursor: default;
+
+			/* #endif */
+			&__text {
+				text-overflow: ellipsis;
+				overflow: hidden;
+				white-space: nowrap;
+				width: 100%;
+				text-align: center;
+				font-size: 15px;
+				color: var(--rice-text-color-2);
+
+			}
+		}
+
+		&__container {
+			max-height: 350px;
+		}
+
+		&__menu {
+			@include common;
+			/* #ifndef APP */
+			color: var(--rice-text-color);
+
+			/* #endif */
+			&__text {
+				text-align: center;
+				/* #ifndef APP */
+				max-width: 100%;
+				/* #endif */
+				/* #ifdef APP */
+				color: var(--rice-text-color);
+
+				&--disabled {
+					color: var(--rice-action-sheet-menu-disabled-text-color);
+				}
+
+				/* #endif */
+			}
+
+			&__subname {
+				width: 100%;
+				color: var(--rice-text-color-2);
+				font-size: 12px;
+				margin-top: 6px;
+				text-align: center;
+
+				/* #ifdef APP */
+				&--disabled {
+					color: var(--rice-action-sheet-menu-disabled-text-color);
+				}
+
+				/* #endif */
+			}
+
+			/* #ifndef APP */
+			&--disabled {
+				color: var(--rice-action-sheet-menu-disabled-text-color);
+				cursor: not-allowed;
+
+				.rice-action-sheet__menu__subname {
+					color: var(--rice-action-sheet-menu-disabled-text-color);
+				}
+			}
+
+			/* #endif */
+			&--border {
+				@include hairline-bottom;
+			}
+		}
+
+
+
+		&__gap {
+			background-color: var(--rice-action-sheet-background);
+			height: 6px;
+		}
+
+		&__cancel {
+			@include common;
+
+			&__text {
+				color: var(--rice-action-sheet-cancel-text-color);
+			}
+		}
+
+		&--hover {
+			background-color: var(--rice-action-sheet-hover-background);
+		}
+
+	}
+</style>

@@ -1,5 +1,4 @@
 import "./src/router/interceptor.js";
-import { l as loadFont } from "./uni_modules/uview-ultra/index.js";
 import { _ as _export_sfc } from "./plugin-vue-export-helper.js";
 const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
 const { onLaunch } = globalThis.Vue;
@@ -7,7 +6,6 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   __name: "App",
   setup(__props) {
     onLaunch(() => {
-      loadFont();
     });
   }
 });

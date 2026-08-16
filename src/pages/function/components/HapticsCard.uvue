@@ -27,13 +27,14 @@ const copyText = ref('Hello unibestX!')
 function triggerVibration() {
   // #ifdef APP || MP-WEIXIN || MP-ALIPAY
   uni.vibrateShort({
-    success: () => {
+    type: 'light',
+    success: (_res: any) => {
       uni.showToast({ title: '已触发短震动', icon: 'none' })
     },
-    fail: () => {
+    fail: (_err: any) => {
       uni.showToast({ title: '震动触发失败', icon: 'none' })
     },
-  })
+  } as VibrateShortOptions)
   // #endif
   // #ifndef APP || MP-WEIXIN || MP-ALIPAY
   uni.showToast({

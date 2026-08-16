@@ -36,6 +36,7 @@ const composer = uniHelper({
     'jsdoc/check-param-names': 'off',
     'jsdoc/require-returns-description': 'off',
     'ts/no-empty-object-type': 'off',
+    'ts/consistent-type-definitions': 'off',
     'no-extend-native': 'off',
     // uni 条件编译注释可能包裹 import，自动排序会破坏平台条件边界
     'perfectionist/sort-imports': 'off',

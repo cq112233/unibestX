@@ -1,0 +1,103 @@
+/* ==========================================================================
+   Rice UI 自定义主题色配置
+   官方文档: https://riceui.cn/components/theme.html
+   说明:
+   1. .rice-theme-light 表示明亮模式，.rice-theme-dark 表示暗黑模式
+   2. 开发者可在此直接修改默认的主题主色(primary)、成功色(success)、警告色(warning)、错误色(error)
+   ========================================================================== */
+
+/* 1. 明亮模式下的默认主题 (可在下方直接修改默认颜色值) */
+.rice-theme-light {
+  /* 主色 (Primary) - 默认 #37c2bc */
+  --rice-primary-color: #37c2bc;
+  --rice-primary-color-1: #a8ece8;
+  --rice-primary-color-7: #269994;
+
+  /* 成功色 (Success) */
+  --rice-success-color: #10b981;
+  --rice-success-color-1: #a7f3d0;
+  --rice-success-color-7: #059669;
+
+  /* 警告色 (Warning) */
+  --rice-warning-color: #e6a23c;
+  --rice-warning-color-1: #fffbe8;
+  --rice-warning-color-7: #bf7e28;
+
+  /* 错误色 (Error) */
+  --rice-error-color: #f56c6c;
+  --rice-error-color-1: #fff2f0;
+  --rice-error-color-7: #cf5155;
+
+  /* 全局通用 CSS 变量映射 */
+  --theme-color: var(--rice-primary-color);
+}
+
+/* 2. 暗黑模式下的默认主题 */
+.rice-theme-dark {
+  /* 主色 (Primary) */
+  --rice-primary-color: #37c2bc;
+  --rice-primary-color-1: #1f5e5b;
+  --rice-primary-color-7: #269994;
+
+  /* 成功色 (Success) */
+  --rice-success-color: #0d8063;
+  --rice-success-color-1: #e6ffee;
+  --rice-success-color-7: #009c50;
+
+  /* 警告色 (Warning) */
+  --rice-warning-color: #e6a23c;
+  --rice-warning-color-1: #fffbe8;
+  --rice-warning-color-7: #bf7e28;
+
+  /* 错误色 (Error) */
+  --rice-error-color: #f56c6c;
+  --rice-error-color-1: #fff2f0;
+  --rice-error-color-7: #cf5155;
+
+  /* 全局通用 CSS 变量映射 */
+  --theme-color: var(--rice-primary-color);
+}
+
+/* ==========================================================================
+   多套预设主题样式类 (供应用内随时动态切换)
+   ========================================================================== */
+
+/* 1. 清爽青主题 (默认) */
+.theme-teal {
+  --theme-color: #37c2bc;
+  --rice-primary-color: #37c2bc;
+  --rice-primary-color-1: #a8ece8;
+  --rice-primary-color-7: #269994;
+}
+
+/* 2. 经典蓝主题 */
+.theme-blue {
+  --theme-color: #0957de;
+  --rice-primary-color: #0957de;
+  --rice-primary-color-1: #c2d8ff;
+  --rice-primary-color-7: #0743ab;
+}
+
+/* 3. 生机绿主题 */
+.theme-green {
+  --theme-color: #10b981;
+  --rice-primary-color: #10b981;
+  --rice-primary-color-1: #a7f3d0;
+  --rice-primary-color-7: #059669;
+}
+
+/* 4. 热情红主题 */
+.theme-rose {
+  --theme-color: #f43f5e;
+  --rice-primary-color: #f43f5e;
+  --rice-primary-color-1: #fbc7d1;
+  --rice-primary-color-7: #c22944;
+}
+
+/* 5. 活力橙主题 */
+.theme-orange {
+  --theme-color: #f97316;
+  --rice-primary-color: #f97316;
+  --rice-primary-color-1: #fdd6ba;
+  --rice-primary-color-7: #c75608;
+}

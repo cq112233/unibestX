@@ -3,7 +3,7 @@ import { g as getRandomId, a as addUnitRpx } from "./uts/util.js";
 const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
 const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, unref: _unref, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData } = globalThis.Vue;
 const __className = "GenUniModulesEChartComponentsEChartEChart";
-const { computed, ref, watch, onMounted } = globalThis.Vue;
+const { computed, ref, watch, onMounted, getCurrentInstance } = globalThis.Vue;
 const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "e-chart"
@@ -47,14 +47,15 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       emit("ready");
     }
     function initAPP(option) {
+      var _a2;
       const ctx = uni.createWebviewContext(canvasId);
       if (ctx == null) {
-        uni.__f__("error", "at uni_modules/e-chart/components/e-chart/e-chart.uvue:172", "初始化echart的webview失败");
+        uni.__f__("error", "at uni_modules/e-chart/components/e-chart/e-chart.uvue:177", "初始化echart的webview失败");
         return null;
       }
       echartObj.value = new WebviewEchart(ctx);
       echartObj.value.init(props.theme);
-      setOption(option);
+      (_a2 = echartObj.value) === null || _a2 === void 0 ? null : _a2.setOption(option);
       return new UTSJSONObject({ echartObj: echartObj.value });
     }
     async function init(option) {
@@ -131,7 +132,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       (_a2 = echartObj.value) === null || _a2 === void 0 ? null : _a2.onWebviewMsg(e);
     }
     function onWebviewError(e) {
-      uni.__f__("error", "at uni_modules/e-chart/components/e-chart/e-chart.uvue:411", "onWebviewError:", e);
+      uni.__f__("error", "at uni_modules/e-chart/components/e-chart/e-chart.uvue:416", "onWebviewError:", e);
     }
     watch(() => {
       return props.width;

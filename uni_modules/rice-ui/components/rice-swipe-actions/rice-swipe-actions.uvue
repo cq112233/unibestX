@@ -1,0 +1,81 @@
+<template>
+	<view class="rice-swipe-actions" :style="customStyle">
+		<slot></slot>
+	</view>
+</template>
+
+<script setup>
+
+	import { useChildren } from "../../libs/use"
+	import { swipeActionsInjectKey, swipeActionsName } from "./index.uts"
+	import { SwipeActionsProps, SwipeActionsProvide } from './type.uts';
+
+	defineOptions({
+		name: 'rice-swipe-actions',
+		styleIsolation: "app-and-page"
+	})
+
+	const { linkChildren, childrenList } = useChildren(swipeActionsName)
+	linkChildren()
+
+	const props = withDefaults(defineProps<SwipeActionsProps>(), {
+		disabled: false,
+		accordion: false,
+		autoClose: true,
+		iosStyle: true,
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+	const submitClose = (item : ComponentInternalInstance) => {
+		// #ifndef MP-WEIXIN
+		item.proxy?.$callMethod('close')
+		// #endif
+		// #ifdef MP-WEIXIN
+		item.exposed?.close?.()
+		// #endif
+	}
+
+
+	const closeOtherSwipe = (vm ?: ComponentInternalInstance) => {
+		if (!props.accordion || vm == null) return
+		childrenList.value.forEach(item => {
+			if (item.proxy !== vm.proxy) {
+				submitClose(item)
+			}
+		})
+	}
+
+	const closeAll = () => {
+		childrenList.value.forEach(item => {
+			submitClose(item)
+		})
+	}
+
+	const close = (names : Array<string | number>) => {
+		childrenList.value.forEach(item => {
+			const name = item.props['name']
+			if (name != null) {
+				const hasName = names.includes(name!)
+				if (hasName) submitClose(item)
+			}
+		})
+	}
+
+	provide(swipeActionsInjectKey, {
+		accordion: toRef<boolean>(() => props.accordion),
+		disabled: toRef<boolean>(() => props.disabled),
+		autoClose: toRef<boolean>(() => props.autoClose),
+		iosStyle: toRef<boolean>(() => props.iosStyle),
+		closeOtherSwipe,
+	} as SwipeActionsProvide)
+
+
+	defineExpose({
+		closeAll,
+		close
+	})
+</script>
+
+<style scoped lang="scss">
+	.rice-swipe-actions {}
+</style>

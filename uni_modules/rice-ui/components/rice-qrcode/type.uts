@@ -1,0 +1,42 @@
+
+export type QRCodeCompletePayload = {
+	tempFilePath : string | null,
+	autoExport : boolean,
+}
+
+
+export type QRCodeError = {
+	code : number, // 0 uni.createCanvasContextAsync 失败 ,1 value 为空 2：绘制二维码失败
+	errMsg : string,
+}
+
+
+export type QRRSBlock = {
+	totalCount : number,
+	dataCount : number,
+}
+
+export type QRPolynomial = {
+	num : number[],
+}
+
+export type QRBitBuffer = {
+	buffer : number[],
+	length : number,
+}
+
+export type QRCodeProps = {
+	value : string,
+	color ?: string,
+	bgColor ?: string,
+	icon ?: string,
+	iconOption ?: UTSJSONObject,
+	level ?: 'L' | 'M' | 'Q' | 'H',
+	autoExport ?: boolean,
+	padding ?: number,
+	eyeShape ?: 'square' | 'circle' | 'round',
+	dotShape ?: 'square' | 'dot',
+	size ?: number,
+	statusClass ?: string,
+	showStatus ?: boolean,
+}

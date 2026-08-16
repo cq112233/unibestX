@@ -1,7 +1,6 @@
 import { defineStore, PiniaStoreBase } from '@/uni_modules/x-pinia-s'
 import { themeColor } from '@/src/tabbar/store'
 import i18n from '@/src/i18n/index.uts'
-import { setLocale as setUViewLocale } from '@/uni_modules/uview-ultra/libs/i18n/index.uts'
 
 // ==========================================
 // 类型定义
@@ -56,12 +55,14 @@ export class AppStore extends PiniaStoreBase {
     const docEl = document.documentElement
     if (docEl != null) {
       docEl.style.setProperty('--theme-color', this.state.theme)
+      docEl.style.setProperty('--rice-primary-color', this.state.theme)
+      docEl.style.setProperty('--rice-primary-color-1', `${this.state.theme}20`)
+      docEl.style.setProperty('--rice-primary-color-7', this.state.theme)
     }
     // #endif
 
     // 同步语言到 i18n
     i18n.global.locale.value = this.state.locale
-    setUViewLocale(this.state.locale)
   }
 
   // ==========================================
@@ -77,10 +78,12 @@ export class AppStore extends PiniaStoreBase {
     const docEl = document.documentElement
     if (docEl != null) {
       docEl.style.setProperty('--theme-color', defaultAppState.theme)
+      docEl.style.setProperty('--rice-primary-color', defaultAppState.theme)
+      docEl.style.setProperty('--rice-primary-color-1', `${defaultAppState.theme}20`)
+      docEl.style.setProperty('--rice-primary-color-7', defaultAppState.theme)
     }
     // #endif
     i18n.global.locale.value = defaultAppState.locale
-    setUViewLocale(defaultAppState.locale)
   }
 
   override _hydrate(_data : UTSJSONObject) : void {
@@ -93,6 +96,9 @@ export class AppStore extends PiniaStoreBase {
       const docEl = document.documentElement
       if (docEl != null) {
         docEl.style.setProperty('--theme-color', colorVal)
+        docEl.style.setProperty('--rice-primary-color', colorVal)
+        docEl.style.setProperty('--rice-primary-color-1', `${colorVal}20`)
+        docEl.style.setProperty('--rice-primary-color-7', colorVal)
       }
       // #endif
     }
@@ -100,7 +106,6 @@ export class AppStore extends PiniaStoreBase {
       const localeVal = _data['locale'] as string
       this.state.locale = localeVal
       i18n.global.locale.value = localeVal
-      setUViewLocale(localeVal)
     }
   }
 
@@ -126,6 +131,9 @@ export class AppStore extends PiniaStoreBase {
     const docEl = document.documentElement
     if (docEl != null) {
       docEl.style.setProperty('--theme-color', theme)
+      docEl.style.setProperty('--rice-primary-color', theme)
+      docEl.style.setProperty('--rice-primary-color-1', `${theme}20`)
+      docEl.style.setProperty('--rice-primary-color-7', theme)
     }
     // #endif
   }
@@ -136,7 +144,6 @@ export class AppStore extends PiniaStoreBase {
   setLocale(locale : string) : void {
     this.state.locale = locale
     i18n.global.locale.value = locale
-    setUViewLocale(locale)
   }
 }
 

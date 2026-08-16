@@ -1,0 +1,24 @@
+import { BeforeChangeInterceptor } from "../../libs/types"
+
+export type SwitchValueType = string | number | boolean
+
+export type SwitchProps = {
+	activeValue ?: string | number | boolean,
+	inactiveValue ?: string | number | boolean,
+	loading ?: boolean,
+	disabled ?: boolean,
+	readonly ?: boolean,
+	width ?: string | number,
+	iconSize ?: string | number,
+	textSize ?: string | number,
+	activeColor ?: string,
+	inactiveColor ?: string,
+	activeText ?: string | number,
+	inactiveText ?: string | number,
+	activeIcon ?: string | number,
+	inactiveIcon ?: string | number,
+	promptPosition ?: 'inball' | 'outball',
+	beforeChange ?: BeforeChangeInterceptor,
+	vibrate ?: boolean,
+	customStyle ?: UTSJSONObject
+}

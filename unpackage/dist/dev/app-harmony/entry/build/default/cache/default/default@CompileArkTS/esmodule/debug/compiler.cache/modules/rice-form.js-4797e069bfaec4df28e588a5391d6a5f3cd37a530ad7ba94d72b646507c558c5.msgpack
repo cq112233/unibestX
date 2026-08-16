@@ -1,0 +1,539 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ"import "../../libs/use/useCountDown/index.js";
+import "../../libs/store/useConfig.js";
+import { u as useNamespace } from "../../libs/use/useNamespace/index.js";
+import "../../libs/use/usePopup/index.js";
+import "../../libs/use/useRelation/useChildren.js";
+import "../../libs/use/useRelation/useParent.js";
+import "../../libs/use/useSafeArea/index.js";
+import "../../libs/use/useTouch/index.js";
+import { h as hasStrValue } from "../../libs/utils/basic.js";
+import { b as formInjectKey, c as formDataInjectKey, f as formDisabledInjectKey, a as formReadonlyInjectKey } from "./index.js";
+import { f as formItemContextInjectKey } from "../rice-form-item/index.js";
+import { u as useFormData } from "./useForm.js";
+import { b as FormItemContextProvide, c as FormValidateErrors } from "./type.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataClass: _setSharedDataClass, unref: _unref, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataSlot: _createSharedDataSlot } = globalThis.Vue;
+const __className = "GenUniModulesRiceUiComponentsRiceFormRiceForm";
+const { ref, watch, provide, toRef, computed } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  ...{
+    name: "rice-form",
+    styleIsolation: "app-and-page"
+  },
+  __dynamicSharedData: true,
+  __hash: "5d3424d0",
+  __className,
+  __filename: "uni_modules/rice-ui/components/rice-form/rice-form.uvue",
+  __name: "rice-form",
+  props: {
+    model: { type: null },
+    rules: { type: Map },
+    labelWidth: { type: [String, Number] },
+    labelPosition: { default: "left", type: String },
+    labelStyle: { type: null },
+    showRequired: { type: Boolean, default: null },
+    requiredPosition: { default: "left", type: String },
+    showError: { type: Boolean, default: true },
+    borderBottom: { type: Boolean, default: true },
+    errorBottom: { type: Boolean, default: false },
+    scrollToError: { type: Boolean, default: false },
+    disabled: { type: Boolean, default: false },
+    readonly: { type: Boolean, default: false },
+    errorStyle: { type: null },
+    customStyle: { default: () => {
+      return new UTSJSONObject({});
+    }, type: null }
+  },
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesRiceUiComponentsRiceFormRiceFormSharedData", sharedDataClassId: 0 })));
+    const ns = useNamespace("form");
+    const props = __props;
+    const formData = ref(new UTSJSONObject({}));
+    const formItems = ref([]);
+    const addField = (field) => {
+      formItems.value.push(field);
+    };
+    const removeField = (field) => {
+      if (hasStrValue(field.name)) {
+        formItems.value.splice(formItems.value.indexOf(field), 1);
+      }
+    };
+    const filterFields = (fields, normalized) => {
+      if (normalized.length == 0)
+        return fields;
+      return fields.filter((field) => {
+        return hasStrValue(field.name) && normalized.includes(field.name) && typeof field.validate == "function";
+      });
+    };
+    const getValidateFields = (normalized) => {
+      if (formItems.value.length == 0)
+        return [];
+      return filterFields(formItems.value, normalized);
+    };
+    const scrollToField = (name) => {
+      const field = UTS.arrayFind(formItems.value, (v) => {
+        return v.name == name;
+      });
+      field === null || field === void 0 ? null : field.scrollToField();
+    };
+    const runValidateField = async (normalized) => {
+      const fields = getValidateFields(normalized);
+      if (fields.length == 0)
+        return true;
+      const promises = fields.map((item) => {
+        return item.validate("all");
+      });
+      const results = await Promise.all(promises);
+      const errors = results.filter((field) => {
+        return field.rule != null && field.status != "passed";
+      }).map((field) => {
+        return new FormValidateErrors({
+          name: field.name,
+          rule: field.rule,
+          message: field.validateMessage,
+          label: field.label
+        });
+      });
+      if (props.scrollToError == true && errors.length > 0) {
+        scrollToField(errors[0].name);
+      }
+      return errors.length == 0 ? true : errors;
+    };
+    watch(() => {
+      return props.model;
+    }, (newVal = null) => {
+      const newData = useFormData(newVal);
+      newData.toMap().forEach((value = null, key) => {
+        if (formData.value[key] != value) {
+          formData.value[key] = value;
+        }
+      });
+    }, {
+      deep: true,
+      immediate: true
+    });
+    provide(formInjectKey, props);
+    provide(formDataInjectKey, formData);
+    provide(formDisabledInjectKey, toRef(() => {
+      return props.disabled;
+    }));
+    provide(formReadonlyInjectKey, toRef(() => {
+      return props.readonly;
+    }));
+    provide(formItemContextInjectKey, new FormItemContextProvide({
+      formItems,
+      addField,
+      removeField
+    }));
+    const validate = async () => {
+      return await runValidateField([]);
+    };
+    const validateFields = async (params) => {
+      return await runValidateField(params);
+    };
+    const clearValidate = (params) => {
+      formItems.value.filter((field) => {
+        return hasStrValue(field.name) && params.includes(field.name);
+      }).map((field) => {
+        return field.clearValidate();
+      });
+    };
+    const clearAllValidate = () => {
+      formItems.value.map((field) => {
+        return field.clearValidate();
+      });
+    };
+    const formClass = computed(() => {
+      return [
+        ns.b(""),
+        ns.theme()
+      ];
+    });
+    __expose({
+      validate,
+      validateFields,
+      scrollToField,
+      clearValidate,
+      clearAllValidate
+      // æ¸…é™¤å…¨éƒ¨çš„æ ¡éªŒä¿¡æ¯
+    });
+    return () => {
+      "raw js";
+      _renderSharedDataEffect(() => {
+        _setSharedDataClass(__sharedData, 0, _unref(formClass));
+        _setSharedDataStyle(__sharedData, 1, __props.customStyle);
+      });
+      _createSharedDataSlot("default", null, null);
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {};
+const __easycom_3 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+export {
+  __easycom_3 as _
+};
+//# sourceMappingURL=rice-form.js.map
+ÂÙÉ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useCountDown/index.jsÙÂ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/store/useConfig.jsÙÉ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useNamespace/index.jsÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/usePopup/index.jsÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useRelation/useChildren.jsÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useRelation/useParent.jsÙÈ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useSafeArea/index.jsÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useTouch/index.jsÙ¾/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/utils/basic.jsÙÈ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-form/index.jsÙÍ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-form-item/index.jsÙÊ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-form/useForm.jsÙÇ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-form/type.jsÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-form/rice-form.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ‘ÔrD’²hostDependencyName®hostModuleNameÙD../../../../../uni_modules/rice-ui/components/rice-form/rice-form.js¥entryÃÚ"import "../../libs/use/useCountDown/index.js";
+import "../../libs/store/useConfig.js";
+import { u as useNamespace } from "../../libs/use/useNamespace/index.js";
+import "../../libs/use/usePopup/index.js";
+import "../../libs/use/useRelation/useChildren.js";
+import "../../libs/use/useRelation/useParent.js";
+import "../../libs/use/useSafeArea/index.js";
+import "../../libs/use/useTouch/index.js";
+import { h as hasStrValue } from "../../libs/utils/basic.js";
+import { b as formInjectKey, c as formDataInjectKey, f as formDisabledInjectKey, a as formReadonlyInjectKey } from "./index.js";
+import { f as formItemContextInjectKey } from "../rice-form-item/index.js";
+import { u as useFormData } from "./useForm.js";
+import { b as FormItemContextProvide, c as FormValidateErrors } from "./type.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataClass: _setSharedDataClass, unref: _unref, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataSlot: _createSharedDataSlot } = globalThis.Vue;
+const __className = "GenUniModulesRiceUiComponentsRiceFormRiceForm";
+const { ref, watch, provide, toRef, computed } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  ...{
+    name: "rice-form",
+    styleIsolation: "app-and-page"
+  },
+  __dynamicSharedData: true,
+  __hash: "5d3424d0",
+  __className,
+  __filename: "uni_modules/rice-ui/components/rice-form/rice-form.uvue",
+  __name: "rice-form",
+  props: {
+    model: { type: null },
+    rules: { type: Map },
+    labelWidth: { type: [String, Number] },
+    labelPosition: { default: "left", type: String },
+    labelStyle: { type: null },
+    showRequired: { type: Boolean, default: null },
+    requiredPosition: { default: "left", type: String },
+    showError: { type: Boolean, default: true },
+    borderBottom: { type: Boolean, default: true },
+    errorBottom: { type: Boolean, default: false },
+    scrollToError: { type: Boolean, default: false },
+    disabled: { type: Boolean, default: false },
+    readonly: { type: Boolean, default: false },
+    errorStyle: { type: null },
+    customStyle: { default: () => {
+      return new UTSJSONObject({});
+    }, type: null }
+  },
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesRiceUiComponentsRiceFormRiceFormSharedData", sharedDataClassId: 0 })));
+    const ns = useNamespace("form");
+    const props = __props;
+    const formData = ref(new UTSJSONObject({}));
+    const formItems = ref([]);
+    const addField = (field) => {
+      formItems.value.push(field);
+    };
+    const removeField = (field) => {
+      if (hasStrValue(field.name)) {
+        formItems.value.splice(formItems.value.indexOf(field), 1);
+      }
+    };
+    const filterFields = (fields, normalized) => {
+      if (normalized.length == 0)
+        return fields;
+      return fields.filter((field) => {
+        return hasStrValue(field.name) && normalized.includes(field.name) && typeof field.validate == "function";
+      });
+    };
+    const getValidateFields = (normalized) => {
+      if (formItems.value.length == 0)
+        return [];
+      return filterFields(formItems.value, normalized);
+    };
+    const scrollToField = (name) => {
+      const field = UTS.arrayFind(formItems.value, (v) => {
+        return v.name == name;
+      });
+      field === null || field === void 0 ? null : field.scrollToField();
+    };
+    const runValidateField = async (normalized) => {
+      const fields = getValidateFields(normalized);
+      if (fields.length == 0)
+        return true;
+      const promises = fields.map((item) => {
+        return item.validate("all");
+      });
+      const results = await Promise.all(promises);
+      const errors = results.filter((field) => {
+        return field.rule != null && field.status != "passed";
+      }).map((field) => {
+        return new FormValidateErrors({
+          name: field.name,
+          rule: field.rule,
+          message: field.validateMessage,
+          label: field.label
+        });
+      });
+      if (props.scrollToError == true && errors.length > 0) {
+        scrollToField(errors[0].name);
+      }
+      return errors.length == 0 ? true : errors;
+    };
+    watch(() => {
+      return props.model;
+    }, (newVal = null) => {
+      const newData = useFormData(newVal);
+      newData.toMap().forEach((value = null, key) => {
+        if (formData.value[key] != value) {
+          formData.value[key] = value;
+        }
+      });
+    }, {
+      deep: true,
+      immediate: true
+    });
+    provide(formInjectKey, props);
+    provide(formDataInjectKey, formData);
+    provide(formDisabledInjectKey, toRef(() => {
+      return props.disabled;
+    }));
+    provide(formReadonlyInjectKey, toRef(() => {
+      return props.readonly;
+    }));
+    provide(formItemContextInjectKey, new FormItemContextProvide({
+      formItems,
+      addField,
+      removeField
+    }));
+    const validate = async () => {
+      return await runValidateField([]);
+    };
+    const validateFields = async (params) => {
+      return await runValidateField(params);
+    };
+    const clearValidate = (params) => {
+      formItems.value.filter((field) => {
+        return hasStrValue(field.name) && params.includes(field.name);
+      }).map((field) => {
+        return field.clearValidate();
+      });
+    };
+    const clearAllValidate = () => {
+      formItems.value.map((field) => {
+        return field.clearValidate();
+      });
+    };
+    const formClass = computed(() => {
+      return [
+        ns.b(""),
+        ns.theme()
+      ];
+    });
+    __expose({
+      validate,
+      validateFields,
+      scrollToField,
+      clearValidate,
+      clearAllValidate
+      // æ¸…é™¤å…¨éƒ¨çš„æ ¡éªŒä¿¡æ¯
+    });
+    return () => {
+      "raw js";
+      _renderSharedDataEffect(() => {
+        _setSharedDataClass(__sharedData, 0, _unref(formClass));
+        _setSharedDataStyle(__sharedData, 1, __props.customStyle);
+      });
+      _createSharedDataSlot("default", null, null);
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {};
+const __easycom_3 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+export {
+  __easycom_3 as _
+};
+//# sourceMappingURL=rice-form.js.map
+ÔrE•§version¨mappings¥names§sources®sourcesContentÜ ´‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘ÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-form/rice-form.js‘Ú"import "../../libs/use/useCountDown/index.js";
+import "../../libs/store/useConfig.js";
+import { u as useNamespace } from "../../libs/use/useNamespace/index.js";
+import "../../libs/use/usePopup/index.js";
+import "../../libs/use/useRelation/useChildren.js";
+import "../../libs/use/useRelation/useParent.js";
+import "../../libs/use/useSafeArea/index.js";
+import "../../libs/use/useTouch/index.js";
+import { h as hasStrValue } from "../../libs/utils/basic.js";
+import { b as formInjectKey, c as formDataInjectKey, f as formDisabledInjectKey, a as formReadonlyInjectKey } from "./index.js";
+import { f as formItemContextInjectKey } from "../rice-form-item/index.js";
+import { u as useFormData } from "./useForm.js";
+import { b as FormItemContextProvide, c as FormValidateErrors } from "./type.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataClass: _setSharedDataClass, unref: _unref, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataSlot: _createSharedDataSlot } = globalThis.Vue;
+const __className = "GenUniModulesRiceUiComponentsRiceFormRiceForm";
+const { ref, watch, provide, toRef, computed } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  ...{
+    name: "rice-form",
+    styleIsolation: "app-and-page"
+  },
+  __dynamicSharedData: true,
+  __hash: "5d3424d0",
+  __className,
+  __filename: "uni_modules/rice-ui/components/rice-form/rice-form.uvue",
+  __name: "rice-form",
+  props: {
+    model: { type: null },
+    rules: { type: Map },
+    labelWidth: { type: [String, Number] },
+    labelPosition: { default: "left", type: String },
+    labelStyle: { type: null },
+    showRequired: { type: Boolean, default: null },
+    requiredPosition: { default: "left", type: String },
+    showError: { type: Boolean, default: true },
+    borderBottom: { type: Boolean, default: true },
+    errorBottom: { type: Boolean, default: false },
+    scrollToError: { type: Boolean, default: false },
+    disabled: { type: Boolean, default: false },
+    readonly: { type: Boolean, default: false },
+    errorStyle: { type: null },
+    customStyle: { default: () => {
+      return new UTSJSONObject({});
+    }, type: null }
+  },
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesRiceUiComponentsRiceFormRiceFormSharedData", sharedDataClassId: 0 })));
+    const ns = useNamespace("form");
+    const props = __props;
+    const formData = ref(new UTSJSONObject({}));
+    const formItems = ref([]);
+    const addField = (field) => {
+      formItems.value.push(field);
+    };
+    const removeField = (field) => {
+      if (hasStrValue(field.name)) {
+        formItems.value.splice(formItems.value.indexOf(field), 1);
+      }
+    };
+    const filterFields = (fields, normalized) => {
+      if (normalized.length == 0)
+        return fields;
+      return fields.filter((field) => {
+        return hasStrValue(field.name) && normalized.includes(field.name) && typeof field.validate == "function";
+      });
+    };
+    const getValidateFields = (normalized) => {
+      if (formItems.value.length == 0)
+        return [];
+      return filterFields(formItems.value, normalized);
+    };
+    const scrollToField = (name) => {
+      const field = UTS.arrayFind(formItems.value, (v) => {
+        return v.name == name;
+      });
+      field === null || field === void 0 ? null : field.scrollToField();
+    };
+    const runValidateField = async (normalized) => {
+      const fields = getValidateFields(normalized);
+      if (fields.length == 0)
+        return true;
+      const promises = fields.map((item) => {
+        return item.validate("all");
+      });
+      const results = await Promise.all(promises);
+      const errors = results.filter((field) => {
+        return field.rule != null && field.status != "passed";
+      }).map((field) => {
+        return new FormValidateErrors({
+          name: field.name,
+          rule: field.rule,
+          message: field.validateMessage,
+          label: field.label
+        });
+      });
+      if (props.scrollToError == true && errors.length > 0) {
+        scrollToField(errors[0].name);
+      }
+      return errors.length == 0 ? true : errors;
+    };
+    watch(() => {
+      return props.model;
+    }, (newVal = null) => {
+      const newData = useFormData(newVal);
+      newData.toMap().forEach((value = null, key) => {
+        if (formData.value[key] != value) {
+          formData.value[key] = value;
+        }
+      });
+    }, {
+      deep: true,
+      immediate: true
+    });
+    provide(formInjectKey, props);
+    provide(formDataInjectKey, formData);
+    provide(formDisabledInjectKey, toRef(() => {
+      return props.disabled;
+    }));
+    provide(formReadonlyInjectKey, toRef(() => {
+      return props.readonly;
+    }));
+    provide(formItemContextInjectKey, new FormItemContextProvide({
+      formItems,
+      addField,
+      removeField
+    }));
+    const validate = async () => {
+      return await runValidateField([]);
+    };
+    const validateFields = async (params) => {
+      return await runValidateField(params);
+    };
+    const clearValidate = (params) => {
+      formItems.value.filter((field) => {
+        return hasStrValue(field.name) && params.includes(field.name);
+      }).map((field) => {
+        return field.clearValidate();
+      });
+    };
+    const clearAllValidate = () => {
+      formItems.value.map((field) => {
+        return field.clearValidate();
+      });
+    };
+    const formClass = computed(() => {
+      return [
+        ns.b(""),
+        ns.theme()
+      ];
+    });
+    __expose({
+      validate,
+      validateFields,
+      scrollToField,
+      clearValidate,
+      clearAllValidate
+      // æ¸…é™¤å…¨éƒ¨çš„æ ¡éªŒä¿¡æ¯
+    });
+    return () => {
+      "raw js";
+      _renderSharedDataEffect(() => {
+        _setSharedDataClass(__sharedData, 0, _unref(formClass));
+        _setSharedDataStyle(__sharedData, 1, __props.customStyle);
+      });
+      _createSharedDataSlot("default", null, null);
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {};
+const __easycom_3 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+export {
+  __easycom_3 as _
+};
+//# sourceMappingURL=rice-form.js.map
+ÔrF½../../libs/store/useConfig.jsÙ$../../libs/use/useCountDown/index.jsÙ$../../libs/use/useNamespace/index.jsÙ ../../libs/use/usePopup/index.jsÙ'../../libs/use/useRelation/useParent.jsÙ ../../libs/use/useTouch/index.jsÙ)../../libs/use/useRelation/useChildren.jsÙ#../../libs/use/useSafeArea/index.js¹../../libs/utils/basic.jsª./index.jsÙ'../../../../plugin-vue-export-helper.jsº../rice-form-item/index.js©./type.js¬./useForm.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙÂ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/store/useConfig.jsAÃªoh-resolveÂGAÂÙÉ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useCountDown/index.jsAÃªoh-resolveÂGAÂÙÉ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useNamespace/index.jsAÃªoh-resolveÂGAÂÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/usePopup/index.jsAÃªoh-resolveÂGAÂÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useRelation/useParent.jsAÃªoh-resolveÂGAÂÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useTouch/index.jsAÃªoh-resolveÂGAÂÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useRelation/useChildren.jsAÃªoh-resolveÂGAÂÙÈ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useSafeArea/index.jsAÃªoh-resolveÂGAÂÙ¾/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/utils/basic.jsAÃªoh-resolveÂGAÂÙÈ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-form/index.jsAÃªoh-resolveÂGAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂGAÂÙÍ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-form-item/index.jsAÃªoh-resolveÂGAÂÙÇ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-form/type.jsAÃªoh-resolveÂGAÂÙÊ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-form/useForm.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍËÍéÀ‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍÖÍæÔrL”¤type¥start£end¤nameªIdentifierÍÖÍá«__easycom_3LªIdentifierÍåÍæ¡_ÀÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration .ÔrN•¤type¥start£end¥value£raw§Literal-Ù$../../libs/use/useCountDown/index.jsÙ&"../../libs/use/useCountDown/index.js"M±ImportDeclaration/ÌVN§Literal6ÌU½../../libs/store/useConfig.js¿"../../libs/store/useConfig.js"M±ImportDeclarationÌWÌ ‘ÔrO•¤type¥start£end¨imported¥local¯ImportSpecifierÌ`ÌqLªIdentifierÌ`Ìa¡uLªIdentifierÌeÌq¬useNamespaceN§LiteralÌyÌŸÙ$../../libs/use/useNamespace/index.jsÙ&"../../libs/use/useNamespace/index.js"M±ImportDeclarationÌ¡ÌËN§LiteralÌ¨ÌÊÙ ../../libs/use/usePopup/index.jsÙ""../../libs/use/usePopup/index.js"M±ImportDeclarationÌÌÌÿN§LiteralÌÓÌşÙ)../../libs/use/useRelation/useChildren.jsÙ+"../../libs/use/useRelation/useChildren.js"M±ImportDeclarationÍ Í1N§LiteralÍÍ0Ù'../../libs/use/useRelation/useParent.jsÙ)"../../libs/use/useRelation/useParent.js"M±ImportDeclarationÍ2Í_N§LiteralÍ9Í^Ù#../../libs/use/useSafeArea/index.jsÙ%"../../libs/use/useSafeArea/index.js"M±ImportDeclarationÍ`ÍŠN§LiteralÍgÍ‰Ù ../../libs/use/useTouch/index.jsÙ""../../libs/use/useTouch/index.js"M±ImportDeclarationÍ‹ÍÈ‘O¯ImportSpecifierÍ”Í¤LªIdentifierÍ”Í•¡hLªIdentifierÍ™Í¤«hasStrValueN§LiteralÍ¬ÍÇ¹../../libs/utils/basic.js»"../../libs/utils/basic.js"M±ImportDeclarationÍÉÍI”O¯ImportSpecifierÍÒÍäLªIdentifierÍÒÍÓ¡bLªIdentifierÍ×Íä­formInjectKeyO¯ImportSpecifierÍæÍüLªIdentifierÍæÍç¡cLªIdentifierÍëÍü±formDataInjectKeyO¯ImportSpecifierÍşÍLªIdentifierÍşÍÿ¡fLªIdentifierÍÍµformDisabledInjectKeyO¯ImportSpecifierÍÍ4LªIdentifierÍÍ¡aLªIdentifierÍÍ4µformReadonlyInjectKeyN§LiteralÍ<ÍHª./index.js¬"./index.js"M±ImportDeclarationÍJÍ•‘O¯ImportSpecifierÍSÍpLªIdentifierÍSÍT¡fLªIdentifierÍXÍp¸formItemContextInjectKeyN§LiteralÍxÍ”º../rice-form-item/index.js¼"../rice-form-item/index.js"M±ImportDeclarationÍ–ÍÆ‘O¯ImportSpecifierÍŸÍ¯LªIdentifierÍŸÍ ¡uLªIdentifierÍ¤Í¯«useFormDataN§LiteralÍ·ÍÅ¬./useForm.js®"./useForm.js"M±ImportDeclarationÍÇÍ’O¯ImportSpecifierÍĞÍëLªIdentifierÍĞÍÑ¡bLªIdentifierÍÕÍë¶FormItemContextProvideO¯ImportSpecifierÍíÍLªIdentifierÍíÍî¡cLªIdentifierÍòÍ²FormValidateErrorsN§LiteralÍÍ©./type.js«"./type.js"M±ImportDeclarationÍÍd‘O¯ImportSpecifierÍ"Í2LªIdentifierÍ"Í#¡_LªIdentifierÍ'Í2«_export_sfcN§LiteralÍ:ÍcÙ'../../../../plugin-vue-export-helper.jsÙ)"../../../../plugin-vue-export-helper.js"

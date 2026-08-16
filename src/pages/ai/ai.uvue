@@ -73,7 +73,6 @@
 </template>
 
 <script setup lang="uts">
-/* eslint-disable ts/consistent-type-definitions */
 import NavBar from '@/src/components/NavBar/NavBar.uvue'
 import { safeAreaInsets } from '@/src/utils/systemInfo'
 
@@ -152,7 +151,7 @@ function sendMessage() {
       replyContent = 'unibestX 是基于 uni-app X 极速开发模板。它支持 TypeScript、UnoCSS、UTS 插件，并能完美编译为原生 Android/iOS App！'
     }
     else if (text.includes('组件')) {
-      replyContent = '当前模板内置了许多优秀的组件，例如 NavBar 导航栏、uview UI 库组件等，你都可以直接使用。'
+      replyContent = '当前模板内置了许多优秀的组件，例如 NavBar 导航栏、Rice UI 组件库等，你都可以直接使用。'
     }
 
     messages.value.push({

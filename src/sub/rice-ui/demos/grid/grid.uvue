@@ -1,0 +1,53 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Grid 宫格" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <!-- 基础 4 宫格 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">基础 4 宫格</text>
+        <rice-grid :column-num="4">
+          <rice-grid-item icon="photo" :icon-color="currentTheme" text="相册" />
+          <rice-grid-item icon="search" :icon-color="currentTheme" text="发现" />
+          <rice-grid-item icon="star-fill" :icon-color="currentTheme" text="收藏" />
+          <rice-grid-item icon="set" :icon-color="currentTheme" text="设置" />
+        </rice-grid>
+      </view>
+
+      <!-- 3 宫格与点击事件 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">3 宫格带角标</text>
+        <rice-grid :column-num="3">
+          <rice-grid-item icon="volume" :icon-color="currentTheme" text="消息" badge="9+" />
+          <rice-grid-item icon="user" :icon-color="currentTheme" text="个人中心" />
+          <rice-grid-item icon="qr" :icon-color="currentTheme" text="扫一扫" />
+        </rice-grid>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store'
+import { computed } from 'vue'
+
+const appStore = useAppStore()
+const currentTheme = computed((): string => appStore.state.theme)
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 14px;
+  background-color: #ffffff;
+  border-radius: 10px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 12px;
+  padding-left: 6px;
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+</style>

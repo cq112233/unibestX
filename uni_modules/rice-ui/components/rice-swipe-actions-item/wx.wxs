@@ -1,0 +1,225 @@
+// #ifdef MP-WEIXIN
+
+/**
+ * 此为wxs模块，支持微信小程序
+ * wxs内部不支持es6语法，变量只能使用var定义，无法使用解构，箭头函数等特性
+ */
+var touch = require('../../libs/use/useTouch/touch.wxs')
+
+function clamp(num, min, max) {
+	return Math.min(Math.max(num, min), max);
+}
+
+
+function resize(ownerInstance, state) {
+	//左侧
+	var left = ownerInstance.selectComponent('.rice-swipe__cell__left')
+	state.leftWidth = left ? left.getBoundingClientRect().width : 0
+	state.leftMenuDom = []
+	state.leftMenuOffset = []
+	if (left && state.iosStyle) {
+		var leftMenuOffset = []
+		state.leftMenuDom = ownerInstance.selectAllComponents('.rice-swipe_cell__left__menu') || []
+		var offsetLeft = state.leftWidth
+		for (var i = 0; i < state.leftMenuDom.length; i++) {
+			leftMenuOffset.push(offsetLeft)
+			offsetLeft -= state.leftMenuDom[i].getBoundingClientRect().width
+		}
+		state.leftMenuOffset = leftMenuOffset
+	}
+
+	//右侧
+	var right = ownerInstance.selectComponent('.rice-swipe__cell__right')
+	state.rightWidth = right ? right.getBoundingClientRect().width : 0
+	state.rightMenuOffset = []
+	state.rightMenuOffset = []
+	if (right && state.iosStyle) {
+		state.rightMenuDom = ownerInstance.selectAllComponents('.rice-swipe_cell__right__menu') || []
+		var rightMenuOffset = []
+		var offset = 0
+		for (var i = 0; i < state.rightMenuDom.length; i++) {
+			offset += state.rightMenuDom[i].getBoundingClientRect().width
+			rightMenuOffset.push(-offset)
+		}
+		state.rightMenuOffset = rightMenuOffset
+	}
+}
+
+function getThreshold(state) {
+	var THRESHOLD = 0.15
+	var num = state.opened ? 1 - THRESHOLD : THRESHOLD
+	return state.currentPosition == 'left' ? state.leftWidth * num : state.rightWidth * num
+}
+
+
+function handleRightActions(instance, ownerInstance, state) {
+	var x = state.x
+	if (x > 0) {
+		x = 0
+	}
+	if (!state.rightMenuDom) return
+	var duration = state.dragging ? '0ms' : state.duration + 'ms'
+	for (var i = 0; i < state.rightMenuDom.length; i++) {
+		var moveX = 0;
+		if (i > 0) {
+			var offset = state.rightMenuOffset[i - 1]
+			moveX = offset + x * (offset / state.rightWidth)
+		}
+		if (moveX > 0) moveX = 0
+		state.rightMenuDom[i].setStyle({
+			'transform': 'translateX(' + moveX + 'px)',
+			'transition-duration': duration,
+		})
+	}
+}
+
+function handleLeftActions(instance, ownerInstance, state) {
+	var x = state.x
+	if (x < 0) {
+		x = 0
+	}
+	if (!state.leftMenuDom) return
+	var duration = state.dragging ? '0ms' : state.duration + 'ms'
+	for (var i = 0; i < state.leftMenuDom.length; i++) {
+		var moveX = 0
+		if (i != state.leftMenuDom.length - 1) {
+			var offset = state.leftMenuOffset[i + 1]
+			moveX = offset - x * (offset / state.leftWidth)
+		}
+		if (moveX < 0) moveX = 0
+		state.leftMenuDom[i].setStyle({
+			'transform': 'translateX(' + moveX + 'px)',
+			'transition-duration': duration,
+			'z-index': state.leftMenuDom.length - i
+		})
+	}
+}
+
+function animateActions(x, instance, ownerInstance, state) {
+	x = x || 0
+	state.x = clamp(x, -state.rightWidth, state.leftWidth)
+	var duration = state.dragging ? '0ms' : state.duration + 'ms'
+	instance.setStyle({
+		'transform': 'translateX(' + state.x + 'px)',
+		'transition-duration': duration,
+	})
+	if (state.iosStyle) {
+		handleRightActions(instance, ownerInstance, state)
+		handleLeftActions(instance, ownerInstance, state)
+	}
+}
+
+function handleOpen(instance, ownerInstance, state) {
+	ownerInstance.callMethod('_closeOtherSwipe')
+	var dire = state.currentPosition
+	var offsetX = dire == 'left' ? state.leftWidth : -state.rightWidth
+	state.dragging = false
+	animateActions(offsetX, instance, ownerInstance, state)
+	if (!state.opened) {
+		state.opened = true
+		ownerInstance.callMethod('_emitOpen', {
+			position: state.currentPosition
+		})
+	}
+}
+
+function close(instance, ownerInstance, state) {
+	state.dragging = false
+	animateActions(0, instance, ownerInstance, state)
+	if (state.opened) {
+		state.opened = false
+		ownerInstance.callMethod('_emitClose')
+	}
+}
+
+function getCurrentPosition(x, state) {
+	if (x == 0) return 'cell'
+	return x > 0 ? 'left' : 'right'
+}
+
+function onTouchstart(event, ownerInstance) {
+	var instance = event.instance
+	var state = instance.getState()
+	if (state.disabled) return
+	state.skipMove = false
+	touch.start(event, ownerInstance, state)
+	resize(ownerInstance, state)
+	state.lastX = state.x || 0
+	ownerInstance.callMethod('_closeOtherSwipe')
+
+}
+
+function onTouchmove(event, ownerInstance) {
+	var instance = event.instance
+	var state = instance.getState()
+	if (state.disabled || state.skipMove) return
+	touch.move(event, ownerInstance, state)
+	if (state.direction == 'vertical') {
+		state.skipMove = true
+	}
+	if (state.direction != 'horizontal') {
+		return
+	}
+	var offsetX = state.deltaX + state.lastX
+	state.currentPosition = getCurrentPosition(offsetX, state)
+	animateActions(offsetX, instance, ownerInstance, state)
+	//阻止页面滚动
+	return false
+}
+
+function onTouchend(event, ownerInstance) {
+	var instance = event.instance
+	var state = instance.getState()
+	if (state.disabled) return
+	touch.end(state)
+	var threshold = getThreshold(state)
+	if (Math.abs(state.x) > threshold) {
+		handleOpen(instance, ownerInstance, state)
+	} else {
+		close(instance, ownerInstance, state)
+	}
+}
+
+function updateMpProps(newVal, oldVal, ownerInstance, instance) {
+	var state = instance.getState()
+	if (newVal && typeof newVal == 'object') {
+		//wxs 不支持 Object.assign 等方式
+		state.duration = newVal.duration
+		state.iosStyle = newVal.iosStyle
+		state.disabled = newVal.disabled
+	}
+
+}
+
+function updateOpened(newVal, oldVal, ownerInstance, instance) {
+	var state = instance.getState()
+	var opened = state.opened || false
+	newVal = newVal || false
+	if (opened != newVal) {
+		resize(ownerInstance, state)
+		newVal ? handleOpen(instance, ownerInstance, state) : close(instance, ownerInstance, state)
+	}
+}
+
+function updateCurrentPosition(newVal, oldVal, ownerInstance, instance) {
+	var state = instance.getState()
+	if (newVal && newVal != 'cell') {
+		state.currentPosition = newVal
+		//可能是在打开的情况下，调用ref方法打开了另一侧的单元格
+		if (newVal != oldVal && state.opened) {
+			resize(ownerInstance, state)
+			handleOpen(instance, ownerInstance, state)
+		}
+	}
+
+}
+
+module.exports = {
+	onTouchstart: onTouchstart,
+	onTouchmove: onTouchmove,
+	onTouchend: onTouchend,
+	updateMpProps: updateMpProps,
+	updateOpened: updateOpened,
+	updateCurrentPosition: updateCurrentPosition,
+}
+// #endif

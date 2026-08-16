@@ -3,6 +3,10 @@ import type { ComputedRef, WritableComputedRef } from 'vue'
 export type ComputedRefImpl<T> = WritableComputedRef<T>;
 // #endif
 
+// #ifdef APP
+export type ComputedRefImpl<T> = Ref<T>;
+// #endif
+
 
 export type AnyOrNull = any | null;
 export type NumberOrNull = number | null;

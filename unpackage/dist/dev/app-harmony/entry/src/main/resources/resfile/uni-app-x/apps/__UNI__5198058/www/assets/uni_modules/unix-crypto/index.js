@@ -491,9 +491,18 @@ const AES_SUB_MIX = [[], [], [], []];
 const AES_INV_SUB_MIX = [[], [], [], []];
 const AES_RCON = [0, 1, 2, 4, 8, 16, 32, 64, 128, 27, 54];
 function aesBuildTables() {
-  const d = [];
-  for (let i = 0; i < 256; i++)
-    d[i] = i < 128 ? i << 1 : i << 1 ^ 283;
+  for (let i = 0; i < 256; i++) {
+    AES_SBOX.push(0);
+    AES_INV_SBOX.push(0);
+    for (let s = 0; s < 4; s++) {
+      AES_SUB_MIX[s].push(0);
+      AES_INV_SUB_MIX[s].push(0);
+    }
+  }
+  const d = new Uint8Array(256);
+  for (let i = 0; i < 256; i++) {
+    d[i] = (i < 128 ? i << 1 : i << 1 ^ 283) & 255;
+  }
   let x = 0;
   let xi = 0;
   for (let i = 0; i < 256; i++) {
@@ -501,9 +510,9 @@ function aesBuildTables() {
     sx = sx >>> 8 ^ sx & 255 ^ 99;
     AES_SBOX[x] = sx;
     AES_INV_SBOX[sx] = x;
-    const x2 = d[x];
-    const x4 = d[x2];
-    const x8 = d[x4];
+    const x2 = d[x] | 0;
+    const x4 = d[x2] | 0;
+    const x8 = d[x4] | 0;
     let t = d[sx] * 257 ^ sx * 16843008;
     AES_SUB_MIX[0][x] = t << 24 | t >>> 8;
     AES_SUB_MIX[1][x] = t << 16 | t >>> 16;
@@ -518,8 +527,8 @@ function aesBuildTables() {
       x = 1;
       xi = 1;
     } else {
-      x = x2 ^ d[d[d[x8 ^ x2]]];
-      xi ^= d[d[xi]];
+      x = x2 ^ (d[d[d[x8 ^ x2]]] | 0);
+      xi ^= d[d[xi]] | 0;
     }
   }
 }
@@ -527,7 +536,7 @@ aesBuildTables();
 function aesExpandKeyWords(key) {
   const keySchedule = [];
   for (let i = 0; i < 4; i++) {
-    keySchedule[i] = (key[i * 4] | 0) << 24 | (key[i * 4 + 1] | 0) << 16 | (key[i * 4 + 2] | 0) << 8 | (key[i * 4 + 3] | 0);
+    keySchedule.push((key[i * 4] | 0) << 24 | (key[i * 4 + 1] | 0) << 16 | (key[i * 4 + 2] | 0) << 8 | (key[i * 4 + 3] | 0));
   }
   for (let ksRow = 4; ksRow < 44; ksRow++) {
     let t = keySchedule[ksRow - 1];
@@ -536,7 +545,7 @@ function aesExpandKeyWords(key) {
       t = AES_SBOX[t >>> 24] << 24 | AES_SBOX[t >>> 16 & 255] << 16 | AES_SBOX[t >>> 8 & 255] << 8 | AES_SBOX[t & 255];
       t ^= AES_RCON[Math.floor(ksRow / 4)] << 24;
     }
-    keySchedule[ksRow] = keySchedule[ksRow - 4] ^ t;
+    keySchedule.push(keySchedule[ksRow - 4] ^ t);
   }
   return keySchedule;
 }
@@ -583,7 +592,7 @@ function aesDoCryptBlock(M, offset, keySchedule, SUB_MIX_0, SUB_MIX_1, SUB_MIX_2
 function aesBytesToWords(bytes, off) {
   const w = [];
   for (let i = 0; i < 4; i++) {
-    w[i] = (bytes[off + i * 4] | 0) << 24 | (bytes[off + i * 4 + 1] | 0) << 16 | (bytes[off + i * 4 + 2] | 0) << 8 | (bytes[off + i * 4 + 3] | 0);
+    w.push((bytes[off + i * 4] | 0) << 24 | (bytes[off + i * 4 + 1] | 0) << 16 | (bytes[off + i * 4 + 2] | 0) << 8 | (bytes[off + i * 4 + 3] | 0));
   }
   return w;
 }
@@ -677,8 +686,9 @@ function desBitsToBytes(bits) {
 }
 function desPermute(bits, table) {
   const out = [];
-  for (let i = 0; i < table.length; i++)
-    out[i] = bits[table[i] - 1];
+  for (let i = 0; i < table.length; i++) {
+    out.push(bits[table[i] - 1]);
+  }
   return out;
 }
 function desRotateLeft(bits, shift) {
@@ -704,8 +714,9 @@ function desSubKeys(key) {
 function desFeistel(rBits, subkey) {
   const expanded = desPermute(rBits, DES_E);
   const xored = [];
-  for (let i = 0; i < 48; i++)
-    xored[i] = expanded[i] ^ subkey[i];
+  for (let i = 0; i < 48; i++) {
+    xored.push(expanded[i] ^ subkey[i]);
+  }
   let sboxOut = [];
   for (let i = 0; i < 8; i++) {
     const group = xored.slice(i * 6, i * 6 + 6);
@@ -729,8 +740,9 @@ function desProcessBlock(block, off, subkeys) {
   for (let i = 0; i < 16; i++) {
     const f = desFeistel(r, subkeys[i]);
     const nr = [];
-    for (let j = 0; j < 32; j++)
-      nr[j] = l[j] ^ f[j];
+    for (let j = 0; j < 32; j++) {
+      nr.push(l[j] ^ f[j]);
+    }
     l = r;
     r = nr;
   }
@@ -900,14 +912,6 @@ function rsaVerify(text, publicKey, sigHex, hashType) {
   });
 }
 function generateUUID() {
-  var _a;
-  try {
-    const cryptoObj = (_a = typeof window != "undefined" ? window.crypto : null) !== null && _a !== void 0 ? _a : typeof globalThis != "undefined" ? globalThis.crypto : null;
-    if (cryptoObj != null && typeof cryptoObj.randomUUID == "function") {
-      return cryptoObj.randomUUID();
-    }
-  } catch (_) {
-  }
   const hexDigits = "0123456789abcdef";
   let s = "";
   for (let i = 0; i < 36; i++) {

@@ -1,0 +1,501 @@
+import { parseDate, padStart, getShort, getH, monthDiff, absFloor } from "./utils.uts"
+// import { parseCustomFormat } from "./customFormat.uts"
+import { local } from "./locale.uts"
+import {
+	REGEX_FORMAT, MS, S, MIN, H, D, W, M, Q, Y, DATE, MILLISECONDS_A_MINUTE, MILLISECONDS_A_SECOND, MILLISECONDS_A_HOUR
+	, MILLISECONDS_A_WEEK, MILLISECONDS_A_DAY, INVALID_DATE_STRING
+} from "./constant.uts"
+import { DateParams, DateType, DateUnits, DateObject } from "./type.uts"
+
+
+const wrapper = (d : DateType) : Dateuts => {
+	return dateuts(d)
+}
+
+export const isDateuts = (d : any) => {
+	return d instanceof Dateuts
+}
+
+export class Dateuts {
+	private $d : Date;
+	private $y = 0;
+	private $M = 0;
+	private $D = 0;
+	private $W = 0;
+	private $H = 0;
+	private $m = 0;
+	private $s = 0;
+	private $ms = 0;
+	constructor(params : DateParams) {
+		// if (typeof params.customFormat == 'string' && params.customFormat != "") {
+		// 	this.$d = parseCustomFormat(params)
+		// } else {
+		// 	this.$d = parseDate(params)
+		// }
+		this.$d = parseDate(params)
+		this.init()
+	}
+
+	private init() {
+		this.$y = this.$d.getFullYear()
+		this.$M = this.$d.getMonth()
+		this.$D = this.$d.getDate()
+		this.$W = this.$d.getDay()
+		this.$H = this.$d.getHours()
+		this.$m = this.$d.getMinutes()
+		this.$s = this.$d.getSeconds()
+		this.$ms = this.$d.getMilliseconds()
+	}
+
+
+	valueOf() {
+		return this.$d.getTime()
+	}
+
+	unix() {
+		return Math.floor(this.valueOf() / 1000)
+	}
+
+	toDate() {
+		return new Date(this.valueOf())
+	}
+
+	clone() {
+		return wrapper(this.$d)
+	}
+
+	startOf(unit : DateUnits, flag : boolean = true) : Dateuts {
+		const isStartOf = flag
+		const instanceFactory = (d : number, m : number) : Dateuts => {
+			const ins = dateuts(new Date(this.$y, m, d))
+			return isStartOf ? ins : ins.endOf(D)
+		}
+
+		const instanceFactorySet = (method : string, slice : number) => {
+			const argumentStart = [0, 0, 0, 0]
+			const argumentEnd = [23, 59, 59, 999]
+			const arg = (isStartOf ? argumentStart : argumentEnd).slice(slice)
+			const date = this.toDate()
+			if (method == 'setHours') {
+				date.setHours(arg[0])
+				date.setMinutes(arg[1])
+				date.setSeconds(arg[2])
+				date.setMilliseconds(arg[3])
+			} else if (method == 'setMinutes') {
+				date.setMinutes(arg[0])
+				date.setSeconds(arg[1])
+				date.setMilliseconds(arg[2])
+			} else if (method == 'setSeconds') {
+				date.setSeconds(arg[0])
+				date.setMilliseconds(arg[1])
+			} else if (method == 'setMilliseconds') {
+				date.setMilliseconds(arg[0])
+			}
+			return dateuts(date)
+		}
+		if (unit == Y) {
+			return isStartOf ? instanceFactory(1, 0) :
+				instanceFactory(31, 11);
+		} else if (unit == M) {
+			return isStartOf ? instanceFactory(1, this.$M) :
+				instanceFactory(0, this.$M + 1);
+		} else if (unit == Q) {
+			const quarter = this.quarter() - 1
+			return isStartOf
+				? this.month(quarter * 3).startOf(M).startOf(D)
+				: this.month((quarter * 3) + 2).endOf(M).endOf(D)
+		} else if (unit == W) {
+			const weekStart = local.weekStart
+			const gap = (this.$W < weekStart ? this.$W + 7 : this.$W) - weekStart
+			return instanceFactory(isStartOf ? this.$D - gap : this.$D + (6 - gap), this.$M)
+		} else if (unit == D || unit == DATE) {
+			return instanceFactorySet('setHours', 0)
+		} else if (unit == H) {
+			return instanceFactorySet('setMinutes', 1)
+		} else if (unit == MIN) {
+			return instanceFactorySet('setSeconds', 2)
+		} else if (unit == S) {
+			return instanceFactorySet('setMilliseconds', 3)
+		}
+		return this.clone()
+	}
+
+	endOf(unit : DateUnits) {
+		return this.startOf(unit, false)
+	}
+
+	daysInMonth() {
+
+		return this.endOf(M).$D
+	}
+
+	isValid() {
+		return !(this.$d.toString() == INVALID_DATE_STRING)
+	}
+
+
+	format(formatStr : string) {
+
+		const matches = (match : string) : string => {
+			switch (match) {
+				case 'YY':
+					return this.$y.toString().slice(-2);
+				case 'YYYY':
+					return this.$y.toString();
+				case 'M':
+					return (this.$M + 1).toString();
+				case 'MM':
+					return padStart(this.$M + 1, 2, '0');
+				case 'MMM':
+					return getShort(local.monthsShort, this.$M);
+				case 'MMMM':
+					return getShort(local.months, this.$M);
+				case 'D':
+					return this.$D.toString();
+				case 'DD':
+					return padStart(this.$D, 2, '0');
+				case 'd':
+					return this.$W.toString();
+				case 'dd':
+					return getShort(local.weekdaysMin, this.$W);
+				case 'ddd':
+					return getShort(local.weekdaysShort, this.$W);
+				case 'dddd':
+					return getShort(local.weekdays, this.$W);
+				case 'H':
+					return this.$H.toString();
+				case 'HH':
+					return padStart(this.$H, 2, '0');
+				case 'h':
+					return getH(this.$H, 1);
+				case 'hh':
+					return getH(this.$H, 2);
+				case 'm':
+					return this.$m.toString();
+				case 'mm':
+					return padStart(this.$m, 2, '0');
+				case 's':
+					return this.$s.toString();
+				case 'ss':
+					return padStart(this.$s, 2, '0');
+				case 'SSS':
+					return padStart(this.$ms, 3, '0');
+				default:
+					break;
+			}
+			return ""
+		}
+		return formatStr.replace(REGEX_FORMAT, (match : string, p1 : string | null, offset : number, str : string) : string => {
+			if (p1 == null) {
+				return matches(match)
+			}
+			return p1
+		})
+	}
+
+
+
+	private utcOffset() {
+		// #ifndef APP
+		return -Math.round(this.$d.getTimezoneOffset() / 15) * 15
+		// #endif
+		// #ifdef APP
+		return 0
+		// #endif
+	}
+
+
+
+	private $set(unit : DateUnits, num : number) : Dateuts {
+		const arg = unit == D ? this.$D + (num - this.$W) : num
+
+		const setDate = (date : Dateuts, unit : DateUnits, val : number) => {
+			if (unit == D || unit == DATE) {
+				date.$d.setDate(val)
+			} else if (unit == Y) {
+				date.$d.setFullYear(val)
+			} else if (unit == M) {
+				date.$d.setMonth(val)
+			} else if (unit == H) {
+				date.$d.setHours(val)
+			} else if (unit == MIN) {
+				date.$d.setMinutes(val)
+			} else if (unit == S) {
+				date.$d.setSeconds(val)
+			} else if (unit == MS) {
+				date.$d.setMilliseconds(val)
+			}
+		}
+
+		if (unit == M || unit == Y) {
+			const date = this.clone().set(DATE, 1)
+			setDate(date, unit, arg)
+			date.init()
+			this.$d = date.set(DATE, Math.min(this.$D, date.daysInMonth())).$d
+		} else {
+			setDate(this, unit, arg)
+		}
+		this.init()
+
+		return this
+	}
+
+	set(str : DateUnits, value : number) : Dateuts {
+		return this.clone().$set(str, value)
+	}
+
+	get(unit : DateUnits) {
+		if (unit == Y) {
+			return this.year()
+		}
+		if (unit == M) {
+			return this.month()
+		}
+		if (unit == Q) {
+			return this.quarter()
+		}
+		if (unit == D || unit == W) {
+			return this.day()
+		}
+		if (unit == DATE) {
+			return this.date()
+		}
+		if (unit == H) {
+			return this.hour()
+		}
+		if (unit == MIN) {
+			return this.minute()
+		}
+		if (unit == S) {
+			return this.second()
+		}
+		if (unit == MS) {
+			return this.millisecond()
+		}
+		return 0
+	}
+	year() : number
+	year(input : number) : Dateuts
+	year(input ?: number | null) {
+		if (input == null) return this.$y
+		return this.set(Y, input)
+	}
+
+	month() : number
+	month(input : number) : Dateuts
+	month(input ?: number | null) {
+		if (input == null) return this.$M
+		return this.set(M, input)
+	}
+
+	quarter() : number
+	quarter(input : number) : Dateuts
+	quarter(input ?: number | null) {
+		const m = this.month()
+		if (input == null) return Math.ceil((m + 1) / 3)
+		const arg = (m % 3) + ((input - 1) * 3)
+		return this.month(arg)
+	}
+
+	day() : number
+	day(input : number) : Dateuts
+	day(input ?: number | null) {
+		if (input == null) return this.$W
+		return this.set(D, input)
+	}
+
+	date() : number
+	date(input : number) : Dateuts
+	date(input ?: number | null) {
+		if (input == null) return this.$D
+		return this.set(DATE, input)
+	}
+
+	hour() : number
+	hour(input : number) : Dateuts
+	hour(input ?: number | null) {
+		if (input == null) return this.$H
+		return this.set(H, input)
+	}
+
+	minute() : number
+	minute(input : number) : Dateuts
+	minute(input ?: number | null) {
+		if (input == null) return this.$m
+		return this.set(MIN, input)
+	}
+
+	second() : number
+	second(input : number) : Dateuts
+	second(input ?: number | null) {
+		if (input == null) return this.$s
+		return this.set(S, input)
+	}
+
+	millisecond() : number
+	millisecond(input : number) : Dateuts
+	millisecond(input ?: number | null) {
+		if (input == null) return this.$ms
+		return this.set(MS, input)
+	}
+
+	add(num : number, unit : DateUnits) : Dateuts {
+		const instanceFactorySet = (n : number) => {
+			// @ts-ignore
+			const d = dateuts(this)
+			const ddate = d.date() as number
+			// @ts-ignore
+			return wrapper(d.date(ddate + Math.round(n * num)))
+		}
+
+		if (unit == Y) {
+			return this.set(Y, this.$y + num)
+		}
+		if (unit == M) {
+			return this.set(M, this.$M + num)
+		}
+		if (unit == Q) {
+			return this.add(num * 3, M)
+		}
+		if (unit == D) {
+			return instanceFactorySet(1)
+		}
+		if (unit == W) {
+			return instanceFactorySet(7)
+		}
+		const stepMap = new Map<string, number>([
+			[MIN, MILLISECONDS_A_MINUTE],
+			[H, MILLISECONDS_A_HOUR],
+			[S, MILLISECONDS_A_SECOND]
+		])
+		const step = stepMap.get(unit) ?? 1
+		const nextTimeStamp = this.$d.getTime() + (num * step)
+		return wrapper(nextTimeStamp)
+	}
+
+	subtract(num : number, unit : DateUnits) : Dateuts {
+		return this.add(num * -1, unit)
+	}
+
+	diff(input : DateType, unit : DateUnits = 'millisecond', float : boolean = false) : number {
+		const that = dateuts(input)
+		const zoneDelta = (that.utcOffset() - this.utcOffset()) * MILLISECONDS_A_MINUTE
+		const diff = this.valueOf() - that.valueOf()
+		// @ts-ignore
+		const getMonth = () : number => monthDiff(this, that)
+		let result : number;
+
+		switch (unit) {
+			case Y:
+				result = getMonth() / 12;
+				break;
+			case M:
+				result = getMonth()
+				break;
+			case Q:
+				result = getMonth() / 3
+				break;
+			case W:
+				result = (diff - zoneDelta) / MILLISECONDS_A_WEEK
+				break;
+			case D:
+				result = (diff - zoneDelta) / MILLISECONDS_A_DAY
+				break;
+			case H:
+				result = diff / MILLISECONDS_A_HOUR
+				break;
+			case MIN:
+				result = diff / MILLISECONDS_A_MINUTE
+				break;
+			case S:
+				result = diff / MILLISECONDS_A_SECOND
+				break;
+			default:
+				result = diff
+				break;
+		}
+		return float ? result : absFloor(result)
+	}
+
+	toArray() {
+		return [
+			this.$y,
+			this.$M,
+			this.$D,
+			this.$H,
+			this.$m,
+			this.$s,
+			this.$ms
+		]
+	}
+
+	toObject() {
+		return {
+			year: this.$y,
+			month: this.$M,
+			date: this.$D,
+			hours: this.$H,
+			minutes: this.$m,
+			seconds: this.$s,
+			milliseconds: this.$ms,
+		} as DateObject
+	}
+
+	isBefore(date : DateType = "", unit : DateUnits = "millisecond") {
+		return this.endOf(unit).valueOf() < dateuts(date).valueOf()
+	}
+
+	isSame(date : DateType = "", unit : DateUnits = "millisecond") {
+		const other = dateuts(date).valueOf()
+		return this.startOf(unit).valueOf() <= other && other <= this.endOf(unit).valueOf()
+	}
+
+	isAfter(date : DateType = "", unit : DateUnits = "millisecond") {
+		return dateuts(date).valueOf() < this.startOf(unit).valueOf()
+	}
+
+	isSameOrBefore(date : DateType = "", unit : DateUnits = "millisecond") {
+		return this.isSame(date, unit) || this.isBefore(date, unit)
+	}
+
+	isSameOrAfter(date : DateType = "", unit : DateUnits = "millisecond") {
+		return this.isSame(date, unit) || this.isAfter(date, unit)
+	}
+
+	isBetween(date1 : DateType = "", date2 : DateType = "", unit : DateUnits = "millisecond", i = "()") {
+		const dA = dateuts(date1)
+		const dB = dateuts(date2)
+		let str = i.length == 2 ? i : '()'
+		const dAi = str.startsWith('(')
+		const dBi = str.endsWith(')')
+		// @ts-ignore
+		return ((dAi ? this.isAfter(dA, unit) : !this.isBefore(dA, unit)) &&
+			// @ts-ignore
+			(dBi ? this.isBefore(dB, unit) : !this.isAfter(dB, unit)))
+			// @ts-ignore
+			|| ((dAi ? this.isBefore(dA, unit) : !this.isAfter(dA, unit)) &&
+				// @ts-ignore
+				(dBi ? this.isAfter(dB, unit) : !this.isBefore(dB, unit)))
+	}
+
+	isLeapYear() {
+		return ((this.$y % 4 == 0) && (this.$y % 100 != 0)) || (this.$y % 400 == 0)
+	}
+
+}
+
+
+export function dateuts(date : DateType = "", customFormat = "") {
+	if (isDateuts(date)) {
+		// @ts-ignore
+		return (date as Dateuts).clone()
+	}
+	const params = {
+		date: date as DateType,
+		customFormat
+	} as DateParams
+
+	return new Dateuts(params)
+}
+
+export * from "./type.uts"

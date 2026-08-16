@@ -1,0 +1,60 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Textarea 文本框" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <!-- 基础多行输入 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">基础多行文本框</text>
+        <rice-textarea v-model="textVal1" placeholder="请输入您的宝贵建议与反馈..." />
+      </view>
+
+      <!-- 字数统计与限制 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">字数统计 (Max: 100)</text>
+        <rice-textarea
+          v-model="textVal2"
+          placeholder="请输入详细描述"
+          :maxlength="100"
+          :show-word-limit="true"
+          height="100px"
+        />
+      </view>
+
+      <!-- 自动增高 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">自动增高 (Auto Height)</text>
+        <rice-textarea v-model="textVal3" placeholder="随着内容自动增高" :auto-height="true" />
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store'
+import { computed } from 'vue'
+
+const appStore = useAppStore()
+const currentTheme = computed((): string => appStore.state.theme)
+
+const textVal1 = ref('')
+const textVal2 = ref('')
+const textVal3 = ref('')
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 14px;
+  background-color: #ffffff;
+  border-radius: 10px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 12px;
+  padding-left: 6px;
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+</style>

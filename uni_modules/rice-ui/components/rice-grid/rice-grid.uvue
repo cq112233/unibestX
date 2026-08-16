@@ -1,0 +1,82 @@
+<template>
+	<view :class="rootClass" :style="customStyle">
+		<slot></slot>
+	</view>
+</template>
+
+<script setup>
+	/**
+	 * @description Grid 宫格
+	 * @property {String|Number} columnNum 列数，默认 4列
+	 * @property {Boolean} border 是否显示边框
+	 * @property {Boolean} clickable 是否开启格子的点击反馈
+	 * @property {Boolean} vertical 格子内容是否垂直排列
+	 * @property {String} textColor 文字颜色
+	 * @property {String|Number} textSize 文字大小
+	 * @property {String} iconColor 图标颜色
+	 * @property {String|Number} iconSize 图标大小
+	 * @property {Object} customStyle 自定义样式
+	 */
+	import { addUnit, hasStrValue } from '../../libs/utils';
+	import { useChildren, useNamespace } from "../../libs/use"
+	import { gridInjectKey, gridName } from "./index"
+	import { GridProps, GridProvice } from "./type.uts"
+
+	defineOptions({
+		name: 'rice-grid',
+		styleIsolation: "app-and-page"
+	})
+
+	const ns = useNamespace('grid')
+
+	const props = withDefaults(defineProps<GridProps>(), {
+		border: true,
+		clickable: true,
+		vertical: true,
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+	const { linkChildren, childrenList } = useChildren(gridName)
+	linkChildren()
+
+	const formatColumnNum = computed(() => {
+		const num = props.columnNum ?? 4
+		return typeof num == 'string' ? parseInt(num) : num
+	})
+
+
+
+	const rootClass = computed(() => {
+		return [
+			ns.b(""),
+			ns.theme(),
+			ns.is('border', props.border),
+		]
+	})
+
+
+	provide(gridInjectKey, {
+		columnNum: toRef<number>(() => formatColumnNum.value),
+		textColor: toRef<string | null>(() => props.textColor),
+		textSize: toRef<string | number | null>(() => props.textSize),
+		iconColor: toRef<string | null>(() => props.iconColor),
+		iconSize: toRef<string | number | null>(() => props.iconSize),
+		border: toRef<boolean>(() => props.border),
+		clickable: toRef<boolean>(() => props.clickable),
+		vertical: toRef<boolean>(() => props.vertical),
+		childrenList
+	} as GridProvice)
+</script>
+
+<style scoped lang="scss">
+	@import "../../libs/style/mixins/hairline";
+
+	.rice-grid {
+		flex-direction: row;
+		flex-wrap: wrap;
+
+		&--border {
+			@include hairline-top;
+		}
+	}
+</style>

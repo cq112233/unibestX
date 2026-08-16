@@ -11,26 +11,6 @@ import "../../../uni_modules/z-paging-x/components/z-paging-x/enums/index.js";
 import "../../../uni_modules/z-paging-x/components/z-paging-x/utils/index.js";
 import "../../../uni_modules/z-paging-x/components/z-paging-x/components/z-paging-load-more.js";
 import "../../../uni_modules/z-paging-x/components/z-paging-x/config/index.js";
-import "../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
-import "../../../uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.js";
-import "../../../uni_modules/uview-ultra/components/up-loading-icon/loadingIcon.js";
-import "../../../uni_modules/uview-ultra/libs/config/config.js";
-import "../../../uni_modules/uview-ultra/libs/function/index.js";
-import "../../../uni_modules/uview-ultra/libs/function/test.js";
-import "../../../uni_modules/uview-ultra/libs/function/digit.js";
-import "../../../uni_modules/e-chart/components/e-chart/uts/WebviewEchart.js";
-import "../../../uni_modules/uview-ultra/libs/function/colorGradient.js";
-import "../../../uni_modules/uview-ultra/components/up-icon/up-icon.js";
-import "../../../uni_modules/uview-ultra/components/up-icon/icons.js";
-import "../../../uni_modules/uview-ultra/libs/composable/useUltraUI.js";
-import "../../../uni_modules/uview-ultra/components/up-icon/icon.js";
-import "../../../uni_modules/uview-ultra/components/up-gap/up-gap.js";
-import "../../../uni_modules/uview-ultra/libs/composable/useMp.js";
-import "../../../uni_modules/uview-ultra/components/up-gap/gap.js";
-import "../../../uni_modules/uview-ultra/components/up-overlay/up-overlay.js";
-import "../../../uni_modules/uview-ultra/components/up-transition/up-transition.js";
-import "../../../uni_modules/uview-ultra/components/up-transition/transition.js";
-import "../../../uni_modules/uview-ultra/libs/config/color.js";
 import "../../tabbar/index.js";
 import "../../tabbar/store.js";
 import "../../tabbar/types.js";
@@ -42,6 +22,7 @@ import "../../utils/i18n.js";
 import "../../i18n/index.js";
 import "../../../uni_modules/lime-i18n/common/index.js";
 import "../../../uni_modules/lime-i18n/common/composer-class.js";
+import "../../../uni_modules/e-chart/components/e-chart/uts/WebviewEchart.js";
 import "../../../uni_modules/lime-i18n/common/format.js";
 import "../../../uni_modules/lime-i18n/common/util.js";
 import "../../../uni_modules/lime-i18n/common/errors.js";
@@ -60,17 +41,49 @@ import "../../../uni_modules/x-pinia-s/instans/storeBase.js";
 import "../../../uni_modules/x-pinia-s/instans/defineStore.js";
 import "../../store/user.js";
 import "../../store/app.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/index.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hans.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hant.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/en.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/es.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/fr.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/de.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/ko.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/ja.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/ru.js";
-import "../../utils/toast.js";
+import "../../../uni_modules/rice-ui/libs/store/useConfig.js";
+import "../../../uni_modules/rice-ui/libs/use/useCountDown/index.js";
+import "../../../uni_modules/rice-ui/libs/use/useNamespace/index.js";
+import "../../../uni_modules/rice-ui/libs/use/usePopup/index.js";
+import "../../../uni_modules/rice-ui/libs/utils/basic.js";
+import "../../../uni_modules/rice-ui/libs/use/useRelation/useChildren.js";
+import "../../../uni_modules/rice-ui/libs/use/useRelation/useParent.js";
+import "../../../uni_modules/rice-ui/libs/use/useSafeArea/index.js";
+import "../../../uni_modules/rice-ui/libs/use/useTouch/index.js";
+import "../../../uni_modules/rice-ui/libs/plugin/coloruts/constant.js";
+import "../../../uni_modules/rice-ui/libs/plugin/coloruts/type.js";
+import "../../../uni_modules/rice-ui/libs/plugin/dateuts/type.js";
+import "../../../uni_modules/rice-ui/libs/plugin/dateuts/locale.js";
+import "../../../uni_modules/rice-ui/components/rice-action-sheet/type.js";
+import "../../../uni_modules/rice-ui/components/rice-action-sheet/api.js";
+import "../../../uni_modules/rice-ui/libs/utils/debug.js";
+import "../../../uni_modules/rice-ui/components/rice-button/type.js";
+import "../../../uni_modules/rice-ui/components/rice-loading/type.js";
+import "../../../uni_modules/rice-ui/components/rice-calendar/type.js";
+import "../../../uni_modules/rice-ui/components/rice-calendar/lunar.js";
+import "../../../uni_modules/rice-ui/components/rice-cascader/type.js";
+import "../../../uni_modules/rice-ui/components/rice-dialog/type.js";
+import "../../../uni_modules/rice-ui/components/rice-dialog/api.js";
+import "../../../uni_modules/rice-ui/components/rice-datetime-picker/type.js";
+import "../../../uni_modules/rice-ui/components/rice-picker/type.js";
+import "../../../uni_modules/rice-ui/components/rice-float-fab/type.js";
+import "../../../uni_modules/rice-ui/components/rice-swipe-actions-item/type.js";
+import "../../../uni_modules/rice-ui/components/rice-tabs/type.js";
+import "../../../uni_modules/rice-ui/components/rice-badge/type.js";
+import "../../../uni_modules/rice-ui/components/rice-icon/font.js";
+import "../../../uni_modules/rice-ui/components/rice-uploader/type.js";
+import "../../../uni_modules/rice-ui/components/rice-form/index.js";
+import "../../../uni_modules/rice-ui/components/rice-form/type.js";
+import "../../../uni_modules/rice-ui/components/rice-form-item/index.js";
+import "../../../uni_modules/rice-ui/components/rice-form-item/type.js";
+import "../../../uni_modules/rice-ui/components/rice-radio/type.js";
+import "../../../uni_modules/rice-ui/components/rice-radio-group/index.js";
+import "../../../uni_modules/rice-ui/components/rice-radio-group/type.js";
+import "../../../uni_modules/rice-ui/components/rice-checkbox/type.js";
+import "../../../uni_modules/rice-ui/components/rice-checkbox-group/index.js";
+import "../../../uni_modules/rice-ui/components/rice-checkbox-group/type.js";
+import "../../../uni_modules/rice-ui/components/rice-code-input/type.js";
+import "../../../uni_modules/rice-ui/components/rice-qrcode/type.js";
 const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
 const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, toDisplayString: _toDisplayString, createSharedDataSelector: _createSharedDataSelector, setSharedDataEvent: _setSharedDataEvent, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataStyle: _setSharedDataStyle, createSharedDataFor: _createSharedDataFor, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
 const __className = "GenSrcSubPagingPaging";
@@ -110,7 +123,7 @@ class ArticleItem extends UTS.UTSType {
 }
 const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   __dynamicSharedData: true,
-  __hash: "1baa0732",
+  __hash: "5fde80d2",
   __className,
   __filename: "src/sub/paging/paging.uvue",
   __name: "paging",
@@ -219,7 +232,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
               _setSharedDataStyle(__sharedData_VFor0, 2, { backgroundColor: tabIndex.value === _for_key0.value ? "#ffffff" : "transparent" });
             });
             _selector1_1(_for_key0.value, () => {
-              _setSharedDataStyle(__sharedData_VFor0, 3, { color: tabIndex.value === _for_key0.value ? "var(--theme-color, #37c2bc)" : "#64748b" });
+              _setSharedDataStyle(__sharedData_VFor0, 3, { color: tabIndex.value === _for_key0.value ? "var(--theme-color, #845ec2)" : "#64748b" });
             });
             return null;
           }, (__sharedData_VFor0, tab, index) => {

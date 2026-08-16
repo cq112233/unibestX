@@ -1,0 +1,74 @@
+import { isDark } from "../../store"
+
+
+export type UseNamespace = {
+	b : (blockSuffix : string) => string,
+	e : (element ?: string) => string,
+	m : (modifier ?: string) => string,
+	is : (name : string, state ?: boolean) => string,
+	theme : () => string
+
+}
+
+const createBem = (block : string, blockSuffix : string, element : string, modifier : string) => {
+	let cls = block
+	//rice-block
+	if (blockSuffix != "") {
+		cls += `-${blockSuffix}`
+	}
+	//rice-block__item
+	if (element != "") {
+		cls += `__${element}`
+	}
+	//rice-block--disabled
+	if (modifier != "") {
+		cls += `--${modifier}`
+	}
+	return cls
+}
+
+
+export function useNamespace(block : string) {
+
+	//eg:rice-block
+	const prefix = `rice-${block}`
+
+	//rice-button
+	const b = (blockSuffix : string) => createBem(prefix, blockSuffix, "", "")
+
+	//rice-button__text
+	const e = (element ?: string) => (element != null && element != '') ? createBem(prefix, '', element!, '') : ""
+
+	//rice-button--disabled
+	const m = (modifier ?: string) => (modifier != null && modifier != '') ? createBem(prefix, '', '', modifier!) : ""
+
+	//rice-button--disabled
+
+	const is = (name : string, state ?: boolean) => {
+		const symbol = (name.startsWith('-') || name.startsWith('_')) ? '' : '--'
+		return state == true ? prefix + symbol + name : ''
+	}
+
+
+	const theme = () => {
+		// #ifdef MP
+		return isDark.value ? 'rice-theme-dark' : 'rice-theme-light'
+		// #endif
+
+		// #ifdef APP
+		return isDark.value ? 'rice-theme-dark rice-variables' : 'rice-theme-light rice-variables'
+		// #endif
+
+		// #ifdef WEB
+		return ""
+		// #endif
+	}
+
+	return {
+		b,
+		e,
+		m,
+		is,
+		theme,
+	} as UseNamespace
+}

@@ -14,11 +14,12 @@
 </template>
 
 <script setup lang="uts">
-defineProps({
-  title: {
-    type: String,
-    default: '默认标题',
-  },
+type CardProps = {
+  title?: string
+}
+
+withDefaults(defineProps<CardProps>(), {
+  title: '默认标题',
 })
 </script>
 

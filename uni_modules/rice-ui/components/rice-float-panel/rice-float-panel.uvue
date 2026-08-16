@@ -1,0 +1,53 @@
+<template>
+	<view class="rice-float-panel" :class="[ns.theme(),popupClass]">
+		<view class="rice-float-panel__header">
+			<view class="rice-float-panel__header__bar"></view>
+		</view>
+		<slot></slot>
+	</view>
+</template>
+
+<script setup>
+	import { useNamespace } from "../../libs/use";
+	import { FloatPanelProps } from "./type.uts"
+
+	defineOptions({
+		name: 'rice-float-panel',
+		styleIsolation: 'app-and-page'
+	})
+
+	const ns = useNamespace('float-panel')
+
+	const props = withDefaults(defineProps<FloatPanelProps>(), {
+		contentDraggable: true,
+		duration: 300,
+		zIndex: 999,
+		popupClass: ""
+	})
+
+	const show = defineModel('show', {
+		type: Boolean,
+		default: false
+	})
+</script>
+
+<style scoped lang="scss">
+	.rice-float-panel {
+		&__header {
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+			height: 30px;
+			/* #ifdef WEB */
+			cursor: grab;
+
+			/* #endif */
+			&__bar {
+				height: 3px;
+				border-radius: 6px;
+				width: 20px;
+				background-color: #c8c9cc;
+			}
+		}
+	}
+</style>

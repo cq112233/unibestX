@@ -1,0 +1,53 @@
+
+export type SwipeActionsMenu = {
+	text ?: string,
+	icon ?: string,
+	iconSize ?: string | number,
+	disabled ?: boolean,
+	style ?: UTSJSONObject
+}
+
+
+export type SwipeActionsPosition = "left" | "right" | "cell"
+
+export type SwipeActionsState = {
+	x : number,
+	rightWidth : number,
+	leftWidth : number,
+	opened : boolean,
+	position : SwipeActionsPosition
+}
+
+export type SwipeActionsMenuRect = {
+	rightMenuDom : UniElement[],
+	rightMenuOffset : number[],
+	leftMenuOffset : number[],
+	leftMenuDom : UniElement[],
+}
+
+export type SwipeActionsItemClick = {
+	name ?: string | number,
+	position : SwipeActionsPosition,
+	index : number,
+	opened : boolean,
+}
+
+export type SwipeActionsItemOpen = {
+	name ?: string | number,
+	position : SwipeActionsPosition
+}
+
+export type SwipeActionsItemClose = {
+	name ?: string | number
+}
+
+export type SwipeActionsItemProps = {
+	name ?: string | number,
+	leftMenu ?: SwipeActionsMenu[],
+	rightMenu ?: SwipeActionsMenu[],
+	iosStyle ?: boolean,
+	disabled ?: boolean,
+	duration ?: number,
+	autoClose ?: boolean,
+	customStyle ?: UTSJSONObject,
+}

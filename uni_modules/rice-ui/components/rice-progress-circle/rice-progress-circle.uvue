@@ -1,0 +1,289 @@
+<template>
+	<view class="rice-progress-circle" :class="ns.theme()" :style="[progressCircleSize,customStyle]">
+
+		<!-- #ifdef VUE3-VAPOR || WEB || MP || APP-HARMONY -->
+		<canvas class="rice-progress-circle__canvas" :style="progressCircleSize" :id="canvasId" type="2d"></canvas>
+		<!-- #endif -->
+
+		<!-- #ifdef (APP-ANDROID ||APP-IOS) && !VUE3-VAPOR -->
+		<view class="rice-progress-circle__canvas" :style="progressCircleSize" ref="drawIns"></view>
+		<!-- #endif -->
+
+		<view v-if="showText||$slots['default']!=null" class="rice-progress-circle__content" :style="contentStyle">
+			<slot>
+				<text class="rice-progress-circle__text" :style="textStyle">{{formatText}}</text>
+			</slot>
+		</view>
+	</view>
+</template>
+
+<script setup>
+	import { useNamespace } from '../../libs/use';
+	import { isDark } from "../../libs/store"
+	import { addUnit, clamp, toNum, getRandomStr, getPxNum } from '../../libs/utils';
+	import { ProgressCircleProps, ProgressCircleDrawParams } from './type.uts';
+
+	defineOptions({
+		name: 'rice-progress-circle',
+		styleIsolation: 'app-and-page'
+	})
+
+	const ns = useNamespace('progress-circle')
+	const canvasId = 'rice-progress-circle-' + getRandomStr()
+
+	const props = withDefaults(defineProps<ProgressCircleProps>(), {
+		percentage: 0,
+		type: 'circle',
+		size: 100,
+		strokeWidth: 8,
+		showText: true,
+		gapAngle: 60,
+		duration: 350,
+		customStyle: () => ({})
+	})
+
+	//百分比转换
+	const percent = computed<number>(() => toNum(props.percentage))
+
+	//显示的文字
+	const formatText = computed(() => {
+		if (typeof props.format == 'function') {
+			return props.format!(percent.value)
+		}
+		return `${percent.value}%`
+	})
+
+	const currentProgress = ref(0)
+	//  #ifdef VUE3-VAPOR || WEB || MP || APP-HARMONY
+	const drawCtx = ref<CanvasRenderingContext2D | null>(null)
+	// #endif
+
+	// #ifdef (APP-ANDROID ||APP-IOS) && !VUE3-VAPOR
+	const drawIns = shallowRef<UniElement | null>(null)
+	// #endif
+
+	//激活时的背景色
+	const activeColor = computed<string>(() => props.color ?? '#1989fa')
+
+	//非激活时的背景色
+	const inActiveColor = computed<string>(() => {
+		if (props.inactiveColor != null) props.inactiveColor!
+		return isDark.value ? '#363637' : '#ebedf0'
+	})
+
+	//绘制参数
+	const drawParams = computed<ProgressCircleDrawParams>(() => {
+		const size = getPxNum(props.size)
+		const strokeWidth = props.strokeWidth
+		const radius = (size - strokeWidth) / 2
+		const centerX = size / 2
+		const centerY = size / 2
+		let startAngle = 0;
+		let endAngle = 0;
+		let totalAngle = 0;
+		if (props.type == 'circle') {
+			startAngle = -Math.PI / 2
+			totalAngle = Math.PI * 2
+			endAngle = startAngle + totalAngle
+		} else {
+			const gapRadian = (props.gapAngle * Math.PI) / 180
+			totalAngle = 2 * Math.PI - gapRadian
+			startAngle = -Math.PI / 2 - (totalAngle / 2)
+			endAngle = -Math.PI / 2 + (totalAngle / 2)
+		}
+
+		const progressAngle = startAngle + (currentProgress.value / 100) * totalAngle
+		return {
+			radius,
+			centerX,
+			centerY,
+			startAngle,
+			endAngle,
+			progressAngle
+		} as ProgressCircleDrawParams
+
+	})
+
+	/**
+		 * 鸿蒙平台 DrawableContext 的lineCap值设置为round时无效，
+		 * 为了全端样式统一，鸿蒙平台和web/小程序平台一致，使用canvas实现
+		 * Android和iOS平台使用 DrawableContext 实现
+		 */
+	const drawProgress = () => {
+		const { radius, centerX, centerY, startAngle, endAngle, progressAngle } = drawParams.value;
+
+		// #ifdef (APP-ANDROID ||APP-IOS) && !VUE3-VAPOR
+		if (drawIns.value == null) return
+		const ctx = drawIns.value.getDrawableContext()!
+		ctx.reset()
+		// #endif
+
+		// #ifdef VUE3-VAPOR || WEB || MP || APP-HARMONY
+		const ctx = drawCtx.value
+		if (ctx == null) return
+		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+		// #endif
+
+		//绘制背景圆弧
+		ctx.beginPath()
+		ctx.arc(centerX, centerY, radius, startAngle, endAngle, false)
+		ctx.strokeStyle = inActiveColor.value
+		ctx.lineWidth = props.strokeWidth
+		ctx.lineCap = 'round'
+		ctx.stroke()
+
+		// 绘制进度条
+		ctx.beginPath();
+		ctx.arc(centerX, centerY, radius, startAngle, progressAngle, false);
+		ctx.strokeStyle = activeColor.value
+		ctx.lineWidth = props.strokeWidth;
+		ctx.lineCap = 'round'
+		ctx.stroke();
+
+		// #ifdef (APP-ANDROID ||APP-IOS) && !VUE3-VAPOR 
+		ctx.update()
+		// #endif
+
+	}
+
+	let animationTimer : number | null = null;
+	let animateFrame : (() => void) | null = null
+
+	/**
+	 * 更新进度条
+	 */
+	const updateProgress = () => {
+
+		if (animationTimer != null) {
+			clearTimeout(animationTimer!);
+		}
+		const start = currentProgress.value
+		const end = clamp(toNum(props.percentage), 0, 100)
+		const frameRate = 60; // 帧率（每秒60帧）
+		const totalFrames = Math.floor((props.duration / 1000) * frameRate); // 总帧数
+		const frameDuration = props.duration / totalFrames; // 每帧间隔时间（ms）
+		const progressStep = (end - start) / totalFrames; // 每帧的进度增量
+		let currentFrame = 0; // 当前帧
+
+		// 帧动画函数
+		animateFrame = () => {
+			currentFrame++;
+			currentProgress.value = start + (progressStep * currentFrame);
+			// 避免进度超出边界
+			if (end > start) {
+				currentProgress.value = Math.min(currentProgress.value, end);
+			} else {
+				currentProgress.value = Math.max(currentProgress.value, end);
+			}
+			drawProgress();
+			// 未到最后一帧，继续下一个定时器
+			if (currentFrame < totalFrames) {
+				animationTimer = setTimeout(animateFrame!, frameDuration);
+			}
+		}
+		// 直接启动第一帧
+		animationTimer = setTimeout(animateFrame!, frameDuration);
+	}
+
+	/**
+	 * 获取canvas实例
+	 */
+	const createCanvasContext = async () => {
+		// #ifndef MP
+		await nextTick()
+		// #endif
+
+		// Android和iOS平台使用 DrawableContext 实现
+		// #ifdef (APP-ANDROID ||APP-IOS) && !VUE3-VAPOR 
+		updateProgress()
+		// #endif
+
+		//其他平台使用canvas实现（鸿蒙平台由于DrawableContext 的lineCap值无效，所以也改用canvas实现）
+		// #ifdef VUE3-VAPOR || WEB || MP || APP-HARMONY
+		uni.createCanvasContextAsync({
+			id: canvasId,
+			component: getCurrentInstance()?.proxy,
+			success: (context : CanvasContext) => {
+				const canvasContext = context.getContext('2d')!
+				const canvas = canvasContext.canvas
+				//处理高清屏
+				const dpr = uni.getWindowInfo().pixelRatio ?? 1;
+				canvas.width = canvas.offsetWidth * dpr
+				canvas.height = canvas.offsetHeight * dpr
+				canvasContext.scale(dpr, dpr)
+				drawCtx.value = canvasContext
+				updateProgress()
+			}
+		})
+		// #endif
+	}
+
+	const progressCircleSize = computed(() => {
+		const css = new Map<string, string>()
+		css.set('height', addUnit(props.size))
+		css.set('width', addUnit(props.size))
+		return css
+	})
+
+	//内容区域避开左右两边的进度条
+	const contentStyle = computed(() => {
+		const css = new Map<string, string>()
+		css.set('padding-left', props.strokeWidth + 'px')
+		css.set('padding-right', props.strokeWidth + 'px')
+		return css
+	})
+
+	//文字样式
+	const textStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.textSize != null) css.set('font-size', addUnit(props.textSize!))
+		if (props.textColor != null) css.set('color', props.textColor)
+		return css
+	})
+
+	watch(() : string | number => props.percentage, () => {
+		updateProgress()
+	})
+
+	watch(isDark, async () => {
+		await nextTick()
+		updateProgress()
+	})
+
+	onMounted(() => {
+		createCanvasContext()
+	})
+
+	onUnmounted(() => {
+		if (animationTimer != null) {
+			clearTimeout(animationTimer!);
+		}
+	})
+</script>
+
+<style scoped lang="scss">
+	.rice-progress-circle {
+		position: relative;
+		align-items: center;
+		justify-content: center;
+
+		&__canvas {}
+
+		&__content {
+			position: absolute;
+			top: 50%;
+			left: 0;
+			width: 100%;
+			transform: translateY(-50%);
+		}
+
+		&__text {
+			color: var(--rice-text-color-2);
+			font-size: 14px;
+			text-align: center;
+			/* #ifndef APP */
+			word-break: break-all;
+			/* #endif */
+		}
+	}
+</style>

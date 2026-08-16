@@ -1,0 +1,57 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="NoticeBar 公告栏" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <!-- 基础滚动公告 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">基础滚动公告</text>
+        <rice-notice-bar
+          message="🎉 欢迎体验 unibestX 集成的 Rice UI 组件库，全端原生渲染，轻盈灵动！"
+          :scrollable="true"
+          :color="currentTheme"
+          left-icon="volume"
+        />
+      </view>
+
+      <!-- 样式类型 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">类型与通知</text>
+        <view class="mb-10px">
+          <rice-notice-bar type="primary" :color="currentTheme" message="系统已升级至最新版本，体验更佳。" />
+        </view>
+        <view class="mb-10px">
+          <rice-notice-bar type="success" message="您提交的申请已审批通过。" />
+        </view>
+        <view class="mb-10px">
+          <rice-notice-bar type="error" message="网络连接异常，请检查网络设置。" :closeable="true" />
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store'
+import { computed } from 'vue'
+
+const appStore = useAppStore()
+const currentTheme = computed((): string => appStore.state.theme)
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 14px;
+  background-color: #ffffff;
+  border-radius: 10px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 12px;
+  padding-left: 6px;
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+</style>

@@ -1,0 +1,1216 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ:äimport { _ as __easycom_0 } from "../rice-icon/rice-icon.js";
+import "../../libs/use/useCountDown/index.js";
+import { i as isDark } from "../../libs/store/useConfig.js";
+import { u as useNamespace } from "../../libs/use/useNamespace/index.js";
+import "../../libs/use/usePopup/index.js";
+import "../../libs/use/useRelation/useChildren.js";
+import "../../libs/use/useRelation/useParent.js";
+import "../../libs/use/useSafeArea/index.js";
+import "../../libs/use/useTouch/index.js";
+import { h as hasStrValue, a as addUnit } from "../../libs/utils/basic.js";
+import { f as formDisabledInjectKey, a as formReadonlyInjectKey } from "../rice-form/index.js";
+import { a as formItemBlurInjectKey } from "../rice-form-item/index.js";
+import "./type.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineEmits: _defineEmits, useModel: _useModel, mergeModels: _mergeModels, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataClass: _setSharedDataClass, unref: _unref, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataSlot: _createSharedDataSlot, createSharedDataIf: _createSharedDataIf } = globalThis.Vue;
+const __className = "GenUniModulesRiceUiComponentsRiceInputRiceInput";
+const { useSlots, computed, inject, ref, onUnmounted } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  ...{
+    name: "rice-input",
+    styleIsolation: "app-and-page"
+  },
+  __dynamicSharedData: true,
+  __hash: "66f6d13a",
+  __className,
+  __filename: "uni_modules/rice-ui/components/rice-input/rice-input.uvue",
+  __name: "rice-input",
+  props: /* @__PURE__ */ _mergeModels(new UTSJSONObject({
+    type: { default: "text", type: String },
+    disabled: { type: Boolean },
+    readonly: { type: Boolean },
+    placeholder: { type: String },
+    placeholderStyle: { type: String },
+    maxlength: { default: -1, type: Number },
+    cursorSpacing: { default: 0, type: Number },
+    cursorColor: { type: String },
+    autoFocus: { type: Boolean, default: false },
+    focus: { type: Boolean, default: false },
+    confirmType: { default: "done", type: String },
+    confirmHold: { type: Boolean, default: false },
+    cursor: { default: 0, type: Number },
+    selectionStart: { default: -1, type: Number },
+    selectionEnd: { default: -1, type: Number },
+    adjustPosition: { type: Boolean, default: true },
+    inputmode: { type: String },
+    holdKeyboard: { type: Boolean, default: false },
+    color: { type: String },
+    fontSize: { type: [String, Number] },
+    border: { default: "surround", type: String },
+    focusBorder: { type: Boolean, default: false },
+    bgColor: { type: String },
+    shape: { default: "square", type: String },
+    height: { type: [String, Number] },
+    clearable: { type: Boolean, default: false },
+    clearTrigger: { default: "focus", type: String },
+    clearIcon: { default: "clear", type: String },
+    showPassword: { type: Boolean, default: true },
+    showPasswordTrigger: { default: "focus", type: String },
+    prefixIcon: { type: String },
+    suffixIcon: { type: String },
+    iconSize: { default: "16px", type: [String, Number] },
+    iconColor: { type: String },
+    inputAlign: { type: String },
+    iputStyle: { default: () => {
+      return new UTSJSONObject({});
+    }, type: null },
+    customStyle: { default: () => {
+      return new UTSJSONObject({});
+    }, type: null }
+  }), new UTSJSONObject({
+    "modelValue": {
+      type: String,
+      default: ""
+    },
+    "modelModifiers": {}
+  })),
+  emits: /* @__PURE__ */ _mergeModels(["input", "focus", "blur", "keyboardheightchange", "change", "confirm", "nicknamereview", "clickLeftIcon", "clickRightIcon"], ["update:modelValue"]),
+  setup(__props, _a) {
+    var __emit = _a.emit, $slots = _a.slots;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesRiceUiComponentsRiceInputRiceInputSharedData", sharedDataClassId: 0 })));
+    const ns = useNamespace("input");
+    useSlots();
+    const emit = __emit;
+    const props = __props;
+    const modelValue = _useModel(__props, "modelValue");
+    const inputType = computed(() => {
+      const type = props.type;
+      if (type == "password")
+        return "text";
+      return type;
+    });
+    const formDisabled = inject(formDisabledInjectKey, null);
+    const formReadonly = inject(formReadonlyInjectKey, null);
+    const formItemBlur = inject(formItemBlurInjectKey, null);
+    const isFocus = ref(false);
+    const showPasswordValue = ref(false);
+    const isPassword = computed(() => {
+      return props.type == "password" && !showPasswordValue.value ? true : null;
+    });
+    const isDisabled = computed(() => {
+      var _a2, _b;
+      return ((_a2 = formDisabled === null || formDisabled === void 0 ? null : formDisabled.value) !== null && _a2 !== void 0 ? _a2 : false) || ((_b = props.disabled) !== null && _b !== void 0 ? _b : false);
+    });
+    const isReadonly = computed(() => {
+      var _a2, _b;
+      return ((_a2 = formReadonly === null || formReadonly === void 0 ? null : formReadonly.value) !== null && _a2 !== void 0 ? _a2 : false) || ((_b = props.readonly) !== null && _b !== void 0 ? _b : false);
+    });
+    const isShowClearable = computed(() => {
+      if (isDisabled.value)
+        return false;
+      const shouldTrigger = props.clearTrigger == "focus" ? isFocus.value : true;
+      return props.clearable && modelValue.value != "" && shouldTrigger;
+    });
+    const isShowPassword = computed(() => {
+      if (props.showPassword == false)
+        return false;
+      const isPasswordType = props.type == "password";
+      const shouldTrigger = props.showPasswordTrigger == "focus" ? isFocus.value : true;
+      return isPasswordType && modelValue.value != "" && shouldTrigger;
+    });
+    const changeShowPassword = () => {
+      if (isDisabled.value || isReadonly.value)
+        return null;
+      showPasswordValue.value = !showPasswordValue.value;
+    };
+    const onClear = () => {
+      if (isDisabled.value || isReadonly.value)
+        return null;
+      modelValue.value = "";
+    };
+    const onInput = (e) => {
+      emit("input", e.detail.value);
+    };
+    const onFocus = (e) => {
+      isFocus.value = true;
+      emit("focus", e);
+    };
+    let timer = null;
+    const onBlur = (e) => {
+      timer = setTimeout(() => {
+        isFocus.value = false;
+        emit("blur", e);
+      }, 100);
+      formItemBlur === null || formItemBlur === void 0 ? null : formItemBlur();
+    };
+    const onKeyboardheightchange = (e) => {
+      emit("keyboardheightchange", e);
+    };
+    const onChange = (e) => {
+      emit("change", e.detail.value);
+    };
+    const onConfirm = (e) => {
+      emit("confirm", e.detail.value);
+    };
+    const onNicknamereview = (e = null) => {
+      emit("nicknamereview", e);
+    };
+    const clickLeftIcon = () => {
+      emit("clickLeftIcon");
+    };
+    const clickRightIcon = () => {
+      emit("clickRightIcon");
+    };
+    const iconStyle = computed(() => {
+      return new UTSJSONObject({
+        paddingLeft: "6px",
+        opacity: isDisabled.value ? 0.4 : 1
+      });
+    });
+    const rootStyle = computed(() => {
+      const css = /* @__PURE__ */ new Map();
+      if (hasStrValue(props.bgColor)) {
+        css.set("background-color", props.bgColor);
+      }
+      if (props.height != null)
+        css.set("height", addUnit(props.height));
+      return css;
+    });
+    const customInputStyle = computed(() => {
+      const css = /* @__PURE__ */ new Map();
+      if (hasStrValue(props.color))
+        css.set("color", props.color);
+      if (props.fontSize != null)
+        css.set("font-size", addUnit(props.fontSize));
+      return css;
+    });
+    const inputClass = computed(() => {
+      return [
+        ns.b(""),
+        ns.theme(),
+        ns.is("disabled", isDisabled.value),
+        ns.m(props.border),
+        ns.m(props.shape),
+        ns.is("border--focus", isFocus.value && props.border != "none" && props.focusBorder)
+      ];
+    });
+    const inputInnerClass = computed(() => {
+      var _a2;
+      return [
+        ns.e("input"),
+        ns.is("__input--disabled", isDisabled.value),
+        ns.e(`input--${(_a2 = props.inputAlign) !== null && _a2 !== void 0 ? _a2 : "left"}`),
+        ns.is("__input--dark", isDark.value),
+        ns.is("__input--disabled--dark", isDisabled.value && isDark.value)
+      ];
+    });
+    const _placeholderStyle = computed(() => {
+      var _a2, _b;
+      let baseColor = isDark.value ? "#4d4d4d" : "#c8c9cc";
+      let css = `color:${baseColor};font-size:${addUnit((_a2 = props.fontSize) !== null && _a2 !== void 0 ? _a2 : "15px")};`;
+      return css + ((_b = props.placeholderStyle) !== null && _b !== void 0 ? _b : "");
+    });
+    onUnmounted(() => {
+      if (timer != null)
+        clearTimeout(timer);
+    });
+    return () => {
+      "raw js";
+      const _component_rice_icon = __easycom_0;
+      const _component_input = _resolveComponent("input");
+      _renderSharedDataEffect(() => {
+        _setSharedDataClass(__sharedData, 9, _unref(inputClass));
+        _setSharedDataStyle(__sharedData, 10, [_unref(rootStyle), __props.customStyle]);
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean($slots["prefix"] != null || __props.prefixIcon != null));
+      }, () => {
+        _createSharedDataSlot("prefix", null, null, () => {
+          const n4 = _createSharedDataComponentWithFallback(_component_rice_icon, "8a8f72fa", {
+            name: () => {
+              return __props.prefixIcon;
+            },
+            size: () => {
+              return __props.iconSize;
+            },
+            color: () => {
+              return __props.iconColor;
+            },
+            onClick: () => {
+              return clickLeftIcon;
+            }
+          });
+          _setSharedData(__sharedData, 1, n4?.sharedData);
+        });
+      });
+      const n6 = _createSharedDataComponentWithFallback(_component_input, "8a8f6b2a", {
+        value: () => {
+          return modelValue.value;
+        },
+        "onUpdate:value": () => {
+          return (_value) => {
+            return modelValue.value = _value;
+          };
+        },
+        type: () => {
+          return _unref(inputType);
+        },
+        inputmode: () => {
+          return __props.inputmode;
+        },
+        placeholder: () => {
+          return __props.placeholder;
+        },
+        password: () => {
+          return _unref(isPassword);
+        },
+        disabled: () => {
+          return _unref(isDisabled) || _unref(isReadonly);
+        },
+        maxlength: () => {
+          return __props.maxlength;
+        },
+        "placeholder-style": () => {
+          return _unref(_placeholderStyle);
+        },
+        "cursor-spacing": () => {
+          return __props.cursorSpacing;
+        },
+        "cursor-color": () => {
+          return __props.cursorColor;
+        },
+        "auto-focus": () => {
+          return __props.autoFocus;
+        },
+        focus: () => {
+          return __props.focus;
+        },
+        "confirm-type": () => {
+          return __props.confirmType;
+        },
+        "confirm-hold": () => {
+          return __props.confirmHold;
+        },
+        cursor: () => {
+          return __props.cursor;
+        },
+        "selection-start": () => {
+          return __props.selectionStart;
+        },
+        "selection-end": () => {
+          return __props.selectionEnd;
+        },
+        "adjust-position": () => {
+          return __props.adjustPosition;
+        },
+        "hold-keyboard": () => {
+          return __props.holdKeyboard;
+        },
+        class: () => {
+          return _unref(inputInnerClass);
+        },
+        style: () => {
+          return [_unref(customInputStyle), __props.iputStyle];
+        },
+        onInput: () => {
+          return onInput;
+        },
+        onFocus: () => {
+          return onFocus;
+        },
+        onBlur: () => {
+          return onBlur;
+        },
+        onKeyboardheightchange: () => {
+          return onKeyboardheightchange;
+        },
+        onChange: () => {
+          return onChange;
+        },
+        onConfirm: () => {
+          return onConfirm;
+        },
+        onNicknamereview: () => {
+          return onNicknamereview;
+        }
+      });
+      _setSharedData(__sharedData, 2, n6?.sharedData);
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 3, _toSharedDataBoolean(_unref(isShowPassword)));
+      }, () => {
+        const n9 = _createSharedDataComponentWithFallback(_component_rice_icon, "c75f2602", {
+          name: () => {
+            return _unref(showPasswordValue) ? "eyes" : "eyes-close";
+          },
+          size: "17px",
+          "custom-style": () => {
+            return _unref(iconStyle);
+          },
+          onClick: () => {
+            return changeShowPassword;
+          }
+        });
+        _setSharedData(__sharedData, 4, n9?.sharedData);
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 5, _toSharedDataBoolean(_unref(isShowClearable)));
+      }, () => {
+        const n12 = _createSharedDataComponentWithFallback(_component_rice_icon, "c75f182a", {
+          name: () => {
+            return __props.clearIcon;
+          },
+          size: "17px",
+          "custom-style": () => {
+            return _unref(iconStyle);
+          },
+          onClick: () => {
+            return onClear;
+          }
+        });
+        _setSharedData(__sharedData, 6, n12?.sharedData);
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 7, _toSharedDataBoolean($slots["suffix"] != null || __props.suffixIcon != null));
+      }, () => {
+        _createSharedDataSlot("suffix", null, null, () => {
+          const n17 = _createSharedDataComponentWithFallback(_component_rice_icon, "c75f0876", {
+            name: () => {
+              return __props.suffixIcon;
+            },
+            size: () => {
+              return __props.iconSize;
+            },
+            color: () => {
+              return __props.iconColor;
+            },
+            onClick: () => {
+              return clickRightIcon;
+            }
+          });
+          _setSharedData(__sharedData, 8, n17?.sharedData);
+        });
+      });
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=rice-input.js.map
+ÂÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-icon/rice-icon.jsÙÉ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useCountDown/index.jsÙÂ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/store/useConfig.jsÙÉ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useNamespace/index.jsÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/usePopup/index.jsÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useRelation/useChildren.jsÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useRelation/useParent.jsÙÈ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useSafeArea/index.jsÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useTouch/index.jsÙ¾/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/utils/basic.jsÙÈ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-form/index.jsÙÍ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-form-item/index.jsÙÈ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-input/type.jsÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-input/rice-input.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ‘ÔrD’²hostDependencyName®hostModuleNameÙF../../../../../uni_modules/rice-ui/components/rice-input/rice-input.js¥entryÃÚ:äimport { _ as __easycom_0 } from "../rice-icon/rice-icon.js";
+import "../../libs/use/useCountDown/index.js";
+import { i as isDark } from "../../libs/store/useConfig.js";
+import { u as useNamespace } from "../../libs/use/useNamespace/index.js";
+import "../../libs/use/usePopup/index.js";
+import "../../libs/use/useRelation/useChildren.js";
+import "../../libs/use/useRelation/useParent.js";
+import "../../libs/use/useSafeArea/index.js";
+import "../../libs/use/useTouch/index.js";
+import { h as hasStrValue, a as addUnit } from "../../libs/utils/basic.js";
+import { f as formDisabledInjectKey, a as formReadonlyInjectKey } from "../rice-form/index.js";
+import { a as formItemBlurInjectKey } from "../rice-form-item/index.js";
+import "./type.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineEmits: _defineEmits, useModel: _useModel, mergeModels: _mergeModels, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataClass: _setSharedDataClass, unref: _unref, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataSlot: _createSharedDataSlot, createSharedDataIf: _createSharedDataIf } = globalThis.Vue;
+const __className = "GenUniModulesRiceUiComponentsRiceInputRiceInput";
+const { useSlots, computed, inject, ref, onUnmounted } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  ...{
+    name: "rice-input",
+    styleIsolation: "app-and-page"
+  },
+  __dynamicSharedData: true,
+  __hash: "66f6d13a",
+  __className,
+  __filename: "uni_modules/rice-ui/components/rice-input/rice-input.uvue",
+  __name: "rice-input",
+  props: /* @__PURE__ */ _mergeModels(new UTSJSONObject({
+    type: { default: "text", type: String },
+    disabled: { type: Boolean },
+    readonly: { type: Boolean },
+    placeholder: { type: String },
+    placeholderStyle: { type: String },
+    maxlength: { default: -1, type: Number },
+    cursorSpacing: { default: 0, type: Number },
+    cursorColor: { type: String },
+    autoFocus: { type: Boolean, default: false },
+    focus: { type: Boolean, default: false },
+    confirmType: { default: "done", type: String },
+    confirmHold: { type: Boolean, default: false },
+    cursor: { default: 0, type: Number },
+    selectionStart: { default: -1, type: Number },
+    selectionEnd: { default: -1, type: Number },
+    adjustPosition: { type: Boolean, default: true },
+    inputmode: { type: String },
+    holdKeyboard: { type: Boolean, default: false },
+    color: { type: String },
+    fontSize: { type: [String, Number] },
+    border: { default: "surround", type: String },
+    focusBorder: { type: Boolean, default: false },
+    bgColor: { type: String },
+    shape: { default: "square", type: String },
+    height: { type: [String, Number] },
+    clearable: { type: Boolean, default: false },
+    clearTrigger: { default: "focus", type: String },
+    clearIcon: { default: "clear", type: String },
+    showPassword: { type: Boolean, default: true },
+    showPasswordTrigger: { default: "focus", type: String },
+    prefixIcon: { type: String },
+    suffixIcon: { type: String },
+    iconSize: { default: "16px", type: [String, Number] },
+    iconColor: { type: String },
+    inputAlign: { type: String },
+    iputStyle: { default: () => {
+      return new UTSJSONObject({});
+    }, type: null },
+    customStyle: { default: () => {
+      return new UTSJSONObject({});
+    }, type: null }
+  }), new UTSJSONObject({
+    "modelValue": {
+      type: String,
+      default: ""
+    },
+    "modelModifiers": {}
+  })),
+  emits: /* @__PURE__ */ _mergeModels(["input", "focus", "blur", "keyboardheightchange", "change", "confirm", "nicknamereview", "clickLeftIcon", "clickRightIcon"], ["update:modelValue"]),
+  setup(__props, _a) {
+    var __emit = _a.emit, $slots = _a.slots;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesRiceUiComponentsRiceInputRiceInputSharedData", sharedDataClassId: 0 })));
+    const ns = useNamespace("input");
+    useSlots();
+    const emit = __emit;
+    const props = __props;
+    const modelValue = _useModel(__props, "modelValue");
+    const inputType = computed(() => {
+      const type = props.type;
+      if (type == "password")
+        return "text";
+      return type;
+    });
+    const formDisabled = inject(formDisabledInjectKey, null);
+    const formReadonly = inject(formReadonlyInjectKey, null);
+    const formItemBlur = inject(formItemBlurInjectKey, null);
+    const isFocus = ref(false);
+    const showPasswordValue = ref(false);
+    const isPassword = computed(() => {
+      return props.type == "password" && !showPasswordValue.value ? true : null;
+    });
+    const isDisabled = computed(() => {
+      var _a2, _b;
+      return ((_a2 = formDisabled === null || formDisabled === void 0 ? null : formDisabled.value) !== null && _a2 !== void 0 ? _a2 : false) || ((_b = props.disabled) !== null && _b !== void 0 ? _b : false);
+    });
+    const isReadonly = computed(() => {
+      var _a2, _b;
+      return ((_a2 = formReadonly === null || formReadonly === void 0 ? null : formReadonly.value) !== null && _a2 !== void 0 ? _a2 : false) || ((_b = props.readonly) !== null && _b !== void 0 ? _b : false);
+    });
+    const isShowClearable = computed(() => {
+      if (isDisabled.value)
+        return false;
+      const shouldTrigger = props.clearTrigger == "focus" ? isFocus.value : true;
+      return props.clearable && modelValue.value != "" && shouldTrigger;
+    });
+    const isShowPassword = computed(() => {
+      if (props.showPassword == false)
+        return false;
+      const isPasswordType = props.type == "password";
+      const shouldTrigger = props.showPasswordTrigger == "focus" ? isFocus.value : true;
+      return isPasswordType && modelValue.value != "" && shouldTrigger;
+    });
+    const changeShowPassword = () => {
+      if (isDisabled.value || isReadonly.value)
+        return null;
+      showPasswordValue.value = !showPasswordValue.value;
+    };
+    const onClear = () => {
+      if (isDisabled.value || isReadonly.value)
+        return null;
+      modelValue.value = "";
+    };
+    const onInput = (e) => {
+      emit("input", e.detail.value);
+    };
+    const onFocus = (e) => {
+      isFocus.value = true;
+      emit("focus", e);
+    };
+    let timer = null;
+    const onBlur = (e) => {
+      timer = setTimeout(() => {
+        isFocus.value = false;
+        emit("blur", e);
+      }, 100);
+      formItemBlur === null || formItemBlur === void 0 ? null : formItemBlur();
+    };
+    const onKeyboardheightchange = (e) => {
+      emit("keyboardheightchange", e);
+    };
+    const onChange = (e) => {
+      emit("change", e.detail.value);
+    };
+    const onConfirm = (e) => {
+      emit("confirm", e.detail.value);
+    };
+    const onNicknamereview = (e = null) => {
+      emit("nicknamereview", e);
+    };
+    const clickLeftIcon = () => {
+      emit("clickLeftIcon");
+    };
+    const clickRightIcon = () => {
+      emit("clickRightIcon");
+    };
+    const iconStyle = computed(() => {
+      return new UTSJSONObject({
+        paddingLeft: "6px",
+        opacity: isDisabled.value ? 0.4 : 1
+      });
+    });
+    const rootStyle = computed(() => {
+      const css = /* @__PURE__ */ new Map();
+      if (hasStrValue(props.bgColor)) {
+        css.set("background-color", props.bgColor);
+      }
+      if (props.height != null)
+        css.set("height", addUnit(props.height));
+      return css;
+    });
+    const customInputStyle = computed(() => {
+      const css = /* @__PURE__ */ new Map();
+      if (hasStrValue(props.color))
+        css.set("color", props.color);
+      if (props.fontSize != null)
+        css.set("font-size", addUnit(props.fontSize));
+      return css;
+    });
+    const inputClass = computed(() => {
+      return [
+        ns.b(""),
+        ns.theme(),
+        ns.is("disabled", isDisabled.value),
+        ns.m(props.border),
+        ns.m(props.shape),
+        ns.is("border--focus", isFocus.value && props.border != "none" && props.focusBorder)
+      ];
+    });
+    const inputInnerClass = computed(() => {
+      var _a2;
+      return [
+        ns.e("input"),
+        ns.is("__input--disabled", isDisabled.value),
+        ns.e(`input--${(_a2 = props.inputAlign) !== null && _a2 !== void 0 ? _a2 : "left"}`),
+        ns.is("__input--dark", isDark.value),
+        ns.is("__input--disabled--dark", isDisabled.value && isDark.value)
+      ];
+    });
+    const _placeholderStyle = computed(() => {
+      var _a2, _b;
+      let baseColor = isDark.value ? "#4d4d4d" : "#c8c9cc";
+      let css = `color:${baseColor};font-size:${addUnit((_a2 = props.fontSize) !== null && _a2 !== void 0 ? _a2 : "15px")};`;
+      return css + ((_b = props.placeholderStyle) !== null && _b !== void 0 ? _b : "");
+    });
+    onUnmounted(() => {
+      if (timer != null)
+        clearTimeout(timer);
+    });
+    return () => {
+      "raw js";
+      const _component_rice_icon = __easycom_0;
+      const _component_input = _resolveComponent("input");
+      _renderSharedDataEffect(() => {
+        _setSharedDataClass(__sharedData, 9, _unref(inputClass));
+        _setSharedDataStyle(__sharedData, 10, [_unref(rootStyle), __props.customStyle]);
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean($slots["prefix"] != null || __props.prefixIcon != null));
+      }, () => {
+        _createSharedDataSlot("prefix", null, null, () => {
+          const n4 = _createSharedDataComponentWithFallback(_component_rice_icon, "8a8f72fa", {
+            name: () => {
+              return __props.prefixIcon;
+            },
+            size: () => {
+              return __props.iconSize;
+            },
+            color: () => {
+              return __props.iconColor;
+            },
+            onClick: () => {
+              return clickLeftIcon;
+            }
+          });
+          _setSharedData(__sharedData, 1, n4?.sharedData);
+        });
+      });
+      const n6 = _createSharedDataComponentWithFallback(_component_input, "8a8f6b2a", {
+        value: () => {
+          return modelValue.value;
+        },
+        "onUpdate:value": () => {
+          return (_value) => {
+            return modelValue.value = _value;
+          };
+        },
+        type: () => {
+          return _unref(inputType);
+        },
+        inputmode: () => {
+          return __props.inputmode;
+        },
+        placeholder: () => {
+          return __props.placeholder;
+        },
+        password: () => {
+          return _unref(isPassword);
+        },
+        disabled: () => {
+          return _unref(isDisabled) || _unref(isReadonly);
+        },
+        maxlength: () => {
+          return __props.maxlength;
+        },
+        "placeholder-style": () => {
+          return _unref(_placeholderStyle);
+        },
+        "cursor-spacing": () => {
+          return __props.cursorSpacing;
+        },
+        "cursor-color": () => {
+          return __props.cursorColor;
+        },
+        "auto-focus": () => {
+          return __props.autoFocus;
+        },
+        focus: () => {
+          return __props.focus;
+        },
+        "confirm-type": () => {
+          return __props.confirmType;
+        },
+        "confirm-hold": () => {
+          return __props.confirmHold;
+        },
+        cursor: () => {
+          return __props.cursor;
+        },
+        "selection-start": () => {
+          return __props.selectionStart;
+        },
+        "selection-end": () => {
+          return __props.selectionEnd;
+        },
+        "adjust-position": () => {
+          return __props.adjustPosition;
+        },
+        "hold-keyboard": () => {
+          return __props.holdKeyboard;
+        },
+        class: () => {
+          return _unref(inputInnerClass);
+        },
+        style: () => {
+          return [_unref(customInputStyle), __props.iputStyle];
+        },
+        onInput: () => {
+          return onInput;
+        },
+        onFocus: () => {
+          return onFocus;
+        },
+        onBlur: () => {
+          return onBlur;
+        },
+        onKeyboardheightchange: () => {
+          return onKeyboardheightchange;
+        },
+        onChange: () => {
+          return onChange;
+        },
+        onConfirm: () => {
+          return onConfirm;
+        },
+        onNicknamereview: () => {
+          return onNicknamereview;
+        }
+      });
+      _setSharedData(__sharedData, 2, n6?.sharedData);
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 3, _toSharedDataBoolean(_unref(isShowPassword)));
+      }, () => {
+        const n9 = _createSharedDataComponentWithFallback(_component_rice_icon, "c75f2602", {
+          name: () => {
+            return _unref(showPasswordValue) ? "eyes" : "eyes-close";
+          },
+          size: "17px",
+          "custom-style": () => {
+            return _unref(iconStyle);
+          },
+          onClick: () => {
+            return changeShowPassword;
+          }
+        });
+        _setSharedData(__sharedData, 4, n9?.sharedData);
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 5, _toSharedDataBoolean(_unref(isShowClearable)));
+      }, () => {
+        const n12 = _createSharedDataComponentWithFallback(_component_rice_icon, "c75f182a", {
+          name: () => {
+            return __props.clearIcon;
+          },
+          size: "17px",
+          "custom-style": () => {
+            return _unref(iconStyle);
+          },
+          onClick: () => {
+            return onClear;
+          }
+        });
+        _setSharedData(__sharedData, 6, n12?.sharedData);
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 7, _toSharedDataBoolean($slots["suffix"] != null || __props.suffixIcon != null));
+      }, () => {
+        _createSharedDataSlot("suffix", null, null, () => {
+          const n17 = _createSharedDataComponentWithFallback(_component_rice_icon, "c75f0876", {
+            name: () => {
+              return __props.suffixIcon;
+            },
+            size: () => {
+              return __props.iconSize;
+            },
+            color: () => {
+              return __props.iconColor;
+            },
+            onClick: () => {
+              return clickRightIcon;
+            }
+          });
+          _setSharedData(__sharedData, 8, n17?.sharedData);
+        });
+      });
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=rice-input.js.map
+ÔrE•§version¨mappings¥names§sources®sourcesContentÜ•‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘”  ÌÙ ‘”  ÌÚ ‘”  ÌÛ ‘”  ÌÜ ‘”  Ìİ ‘”  ÌŞ ‘”  Ìß ‘”  Ìà ‘”  Ìá ‘”  Ìâ ‘”  Ìã ‘”  Ìä ‘”  Ìå ‘”  Ìæ ‘”  Ìç ‘”  Ìè ‘”  Ìé ‘”  Ìê ‘”  Ìë ‘”  Ìì ‘”  Ìí ‘”  Ìî ‘”  Ìï ‘”  Ìğ ‘”  Ìñ ‘”  Ìò ‘”  Ìó ‘”  Ìô ‘”  Ìõ ‘”  Ìö ‘”  Ì÷ ‘”  Ìø ‘”  Ìù ‘”  Ìú ‘”  Ìû ‘”  Ìü ‘”  Ìı ‘”  Ìş ‘”  Ìÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘”  Í ‘”  Í€ ‘”  Í ‘”  Í‚ ‘”  Íƒ ‘”  Í„ ‘”  Í… ‘”  Í† ‘”  Í‡ ‘”  Íˆ ‘”  Í‰ ‘”  ÍŠ ‘”  Í‹ ‘”  ÍŒ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í‘ ‘”  Í’ ‘”  Í“ ‘ÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-input/rice-input.js‘Ú:äimport { _ as __easycom_0 } from "../rice-icon/rice-icon.js";
+import "../../libs/use/useCountDown/index.js";
+import { i as isDark } from "../../libs/store/useConfig.js";
+import { u as useNamespace } from "../../libs/use/useNamespace/index.js";
+import "../../libs/use/usePopup/index.js";
+import "../../libs/use/useRelation/useChildren.js";
+import "../../libs/use/useRelation/useParent.js";
+import "../../libs/use/useSafeArea/index.js";
+import "../../libs/use/useTouch/index.js";
+import { h as hasStrValue, a as addUnit } from "../../libs/utils/basic.js";
+import { f as formDisabledInjectKey, a as formReadonlyInjectKey } from "../rice-form/index.js";
+import { a as formItemBlurInjectKey } from "../rice-form-item/index.js";
+import "./type.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineEmits: _defineEmits, useModel: _useModel, mergeModels: _mergeModels, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataClass: _setSharedDataClass, unref: _unref, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataSlot: _createSharedDataSlot, createSharedDataIf: _createSharedDataIf } = globalThis.Vue;
+const __className = "GenUniModulesRiceUiComponentsRiceInputRiceInput";
+const { useSlots, computed, inject, ref, onUnmounted } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  ...{
+    name: "rice-input",
+    styleIsolation: "app-and-page"
+  },
+  __dynamicSharedData: true,
+  __hash: "66f6d13a",
+  __className,
+  __filename: "uni_modules/rice-ui/components/rice-input/rice-input.uvue",
+  __name: "rice-input",
+  props: /* @__PURE__ */ _mergeModels(new UTSJSONObject({
+    type: { default: "text", type: String },
+    disabled: { type: Boolean },
+    readonly: { type: Boolean },
+    placeholder: { type: String },
+    placeholderStyle: { type: String },
+    maxlength: { default: -1, type: Number },
+    cursorSpacing: { default: 0, type: Number },
+    cursorColor: { type: String },
+    autoFocus: { type: Boolean, default: false },
+    focus: { type: Boolean, default: false },
+    confirmType: { default: "done", type: String },
+    confirmHold: { type: Boolean, default: false },
+    cursor: { default: 0, type: Number },
+    selectionStart: { default: -1, type: Number },
+    selectionEnd: { default: -1, type: Number },
+    adjustPosition: { type: Boolean, default: true },
+    inputmode: { type: String },
+    holdKeyboard: { type: Boolean, default: false },
+    color: { type: String },
+    fontSize: { type: [String, Number] },
+    border: { default: "surround", type: String },
+    focusBorder: { type: Boolean, default: false },
+    bgColor: { type: String },
+    shape: { default: "square", type: String },
+    height: { type: [String, Number] },
+    clearable: { type: Boolean, default: false },
+    clearTrigger: { default: "focus", type: String },
+    clearIcon: { default: "clear", type: String },
+    showPassword: { type: Boolean, default: true },
+    showPasswordTrigger: { default: "focus", type: String },
+    prefixIcon: { type: String },
+    suffixIcon: { type: String },
+    iconSize: { default: "16px", type: [String, Number] },
+    iconColor: { type: String },
+    inputAlign: { type: String },
+    iputStyle: { default: () => {
+      return new UTSJSONObject({});
+    }, type: null },
+    customStyle: { default: () => {
+      return new UTSJSONObject({});
+    }, type: null }
+  }), new UTSJSONObject({
+    "modelValue": {
+      type: String,
+      default: ""
+    },
+    "modelModifiers": {}
+  })),
+  emits: /* @__PURE__ */ _mergeModels(["input", "focus", "blur", "keyboardheightchange", "change", "confirm", "nicknamereview", "clickLeftIcon", "clickRightIcon"], ["update:modelValue"]),
+  setup(__props, _a) {
+    var __emit = _a.emit, $slots = _a.slots;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesRiceUiComponentsRiceInputRiceInputSharedData", sharedDataClassId: 0 })));
+    const ns = useNamespace("input");
+    useSlots();
+    const emit = __emit;
+    const props = __props;
+    const modelValue = _useModel(__props, "modelValue");
+    const inputType = computed(() => {
+      const type = props.type;
+      if (type == "password")
+        return "text";
+      return type;
+    });
+    const formDisabled = inject(formDisabledInjectKey, null);
+    const formReadonly = inject(formReadonlyInjectKey, null);
+    const formItemBlur = inject(formItemBlurInjectKey, null);
+    const isFocus = ref(false);
+    const showPasswordValue = ref(false);
+    const isPassword = computed(() => {
+      return props.type == "password" && !showPasswordValue.value ? true : null;
+    });
+    const isDisabled = computed(() => {
+      var _a2, _b;
+      return ((_a2 = formDisabled === null || formDisabled === void 0 ? null : formDisabled.value) !== null && _a2 !== void 0 ? _a2 : false) || ((_b = props.disabled) !== null && _b !== void 0 ? _b : false);
+    });
+    const isReadonly = computed(() => {
+      var _a2, _b;
+      return ((_a2 = formReadonly === null || formReadonly === void 0 ? null : formReadonly.value) !== null && _a2 !== void 0 ? _a2 : false) || ((_b = props.readonly) !== null && _b !== void 0 ? _b : false);
+    });
+    const isShowClearable = computed(() => {
+      if (isDisabled.value)
+        return false;
+      const shouldTrigger = props.clearTrigger == "focus" ? isFocus.value : true;
+      return props.clearable && modelValue.value != "" && shouldTrigger;
+    });
+    const isShowPassword = computed(() => {
+      if (props.showPassword == false)
+        return false;
+      const isPasswordType = props.type == "password";
+      const shouldTrigger = props.showPasswordTrigger == "focus" ? isFocus.value : true;
+      return isPasswordType && modelValue.value != "" && shouldTrigger;
+    });
+    const changeShowPassword = () => {
+      if (isDisabled.value || isReadonly.value)
+        return null;
+      showPasswordValue.value = !showPasswordValue.value;
+    };
+    const onClear = () => {
+      if (isDisabled.value || isReadonly.value)
+        return null;
+      modelValue.value = "";
+    };
+    const onInput = (e) => {
+      emit("input", e.detail.value);
+    };
+    const onFocus = (e) => {
+      isFocus.value = true;
+      emit("focus", e);
+    };
+    let timer = null;
+    const onBlur = (e) => {
+      timer = setTimeout(() => {
+        isFocus.value = false;
+        emit("blur", e);
+      }, 100);
+      formItemBlur === null || formItemBlur === void 0 ? null : formItemBlur();
+    };
+    const onKeyboardheightchange = (e) => {
+      emit("keyboardheightchange", e);
+    };
+    const onChange = (e) => {
+      emit("change", e.detail.value);
+    };
+    const onConfirm = (e) => {
+      emit("confirm", e.detail.value);
+    };
+    const onNicknamereview = (e = null) => {
+      emit("nicknamereview", e);
+    };
+    const clickLeftIcon = () => {
+      emit("clickLeftIcon");
+    };
+    const clickRightIcon = () => {
+      emit("clickRightIcon");
+    };
+    const iconStyle = computed(() => {
+      return new UTSJSONObject({
+        paddingLeft: "6px",
+        opacity: isDisabled.value ? 0.4 : 1
+      });
+    });
+    const rootStyle = computed(() => {
+      const css = /* @__PURE__ */ new Map();
+      if (hasStrValue(props.bgColor)) {
+        css.set("background-color", props.bgColor);
+      }
+      if (props.height != null)
+        css.set("height", addUnit(props.height));
+      return css;
+    });
+    const customInputStyle = computed(() => {
+      const css = /* @__PURE__ */ new Map();
+      if (hasStrValue(props.color))
+        css.set("color", props.color);
+      if (props.fontSize != null)
+        css.set("font-size", addUnit(props.fontSize));
+      return css;
+    });
+    const inputClass = computed(() => {
+      return [
+        ns.b(""),
+        ns.theme(),
+        ns.is("disabled", isDisabled.value),
+        ns.m(props.border),
+        ns.m(props.shape),
+        ns.is("border--focus", isFocus.value && props.border != "none" && props.focusBorder)
+      ];
+    });
+    const inputInnerClass = computed(() => {
+      var _a2;
+      return [
+        ns.e("input"),
+        ns.is("__input--disabled", isDisabled.value),
+        ns.e(`input--${(_a2 = props.inputAlign) !== null && _a2 !== void 0 ? _a2 : "left"}`),
+        ns.is("__input--dark", isDark.value),
+        ns.is("__input--disabled--dark", isDisabled.value && isDark.value)
+      ];
+    });
+    const _placeholderStyle = computed(() => {
+      var _a2, _b;
+      let baseColor = isDark.value ? "#4d4d4d" : "#c8c9cc";
+      let css = `color:${baseColor};font-size:${addUnit((_a2 = props.fontSize) !== null && _a2 !== void 0 ? _a2 : "15px")};`;
+      return css + ((_b = props.placeholderStyle) !== null && _b !== void 0 ? _b : "");
+    });
+    onUnmounted(() => {
+      if (timer != null)
+        clearTimeout(timer);
+    });
+    return () => {
+      "raw js";
+      const _component_rice_icon = __easycom_0;
+      const _component_input = _resolveComponent("input");
+      _renderSharedDataEffect(() => {
+        _setSharedDataClass(__sharedData, 9, _unref(inputClass));
+        _setSharedDataStyle(__sharedData, 10, [_unref(rootStyle), __props.customStyle]);
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean($slots["prefix"] != null || __props.prefixIcon != null));
+      }, () => {
+        _createSharedDataSlot("prefix", null, null, () => {
+          const n4 = _createSharedDataComponentWithFallback(_component_rice_icon, "8a8f72fa", {
+            name: () => {
+              return __props.prefixIcon;
+            },
+            size: () => {
+              return __props.iconSize;
+            },
+            color: () => {
+              return __props.iconColor;
+            },
+            onClick: () => {
+              return clickLeftIcon;
+            }
+          });
+          _setSharedData(__sharedData, 1, n4?.sharedData);
+        });
+      });
+      const n6 = _createSharedDataComponentWithFallback(_component_input, "8a8f6b2a", {
+        value: () => {
+          return modelValue.value;
+        },
+        "onUpdate:value": () => {
+          return (_value) => {
+            return modelValue.value = _value;
+          };
+        },
+        type: () => {
+          return _unref(inputType);
+        },
+        inputmode: () => {
+          return __props.inputmode;
+        },
+        placeholder: () => {
+          return __props.placeholder;
+        },
+        password: () => {
+          return _unref(isPassword);
+        },
+        disabled: () => {
+          return _unref(isDisabled) || _unref(isReadonly);
+        },
+        maxlength: () => {
+          return __props.maxlength;
+        },
+        "placeholder-style": () => {
+          return _unref(_placeholderStyle);
+        },
+        "cursor-spacing": () => {
+          return __props.cursorSpacing;
+        },
+        "cursor-color": () => {
+          return __props.cursorColor;
+        },
+        "auto-focus": () => {
+          return __props.autoFocus;
+        },
+        focus: () => {
+          return __props.focus;
+        },
+        "confirm-type": () => {
+          return __props.confirmType;
+        },
+        "confirm-hold": () => {
+          return __props.confirmHold;
+        },
+        cursor: () => {
+          return __props.cursor;
+        },
+        "selection-start": () => {
+          return __props.selectionStart;
+        },
+        "selection-end": () => {
+          return __props.selectionEnd;
+        },
+        "adjust-position": () => {
+          return __props.adjustPosition;
+        },
+        "hold-keyboard": () => {
+          return __props.holdKeyboard;
+        },
+        class: () => {
+          return _unref(inputInnerClass);
+        },
+        style: () => {
+          return [_unref(customInputStyle), __props.iputStyle];
+        },
+        onInput: () => {
+          return onInput;
+        },
+        onFocus: () => {
+          return onFocus;
+        },
+        onBlur: () => {
+          return onBlur;
+        },
+        onKeyboardheightchange: () => {
+          return onKeyboardheightchange;
+        },
+        onChange: () => {
+          return onChange;
+        },
+        onConfirm: () => {
+          return onConfirm;
+        },
+        onNicknamereview: () => {
+          return onNicknamereview;
+        }
+      });
+      _setSharedData(__sharedData, 2, n6?.sharedData);
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 3, _toSharedDataBoolean(_unref(isShowPassword)));
+      }, () => {
+        const n9 = _createSharedDataComponentWithFallback(_component_rice_icon, "c75f2602", {
+          name: () => {
+            return _unref(showPasswordValue) ? "eyes" : "eyes-close";
+          },
+          size: "17px",
+          "custom-style": () => {
+            return _unref(iconStyle);
+          },
+          onClick: () => {
+            return changeShowPassword;
+          }
+        });
+        _setSharedData(__sharedData, 4, n9?.sharedData);
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 5, _toSharedDataBoolean(_unref(isShowClearable)));
+      }, () => {
+        const n12 = _createSharedDataComponentWithFallback(_component_rice_icon, "c75f182a", {
+          name: () => {
+            return __props.clearIcon;
+          },
+          size: "17px",
+          "custom-style": () => {
+            return _unref(iconStyle);
+          },
+          onClick: () => {
+            return onClear;
+          }
+        });
+        _setSharedData(__sharedData, 6, n12?.sharedData);
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 7, _toSharedDataBoolean($slots["suffix"] != null || __props.suffixIcon != null));
+      }, () => {
+        _createSharedDataSlot("suffix", null, null, () => {
+          const n17 = _createSharedDataComponentWithFallback(_component_rice_icon, "c75f0876", {
+            name: () => {
+              return __props.suffixIcon;
+            },
+            size: () => {
+              return __props.iconSize;
+            },
+            color: () => {
+              return __props.iconColor;
+            },
+            onClick: () => {
+              return clickRightIcon;
+            }
+          });
+          _setSharedData(__sharedData, 8, n17?.sharedData);
+        });
+      });
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=rice-input.js.map
+ÔrF¹../rice-icon/rice-icon.jsÙ$../../libs/use/useCountDown/index.jsÙ ../../libs/use/usePopup/index.jsÙ$../../libs/use/useNamespace/index.js½../../libs/store/useConfig.jsÙ'../../libs/use/useRelation/useParent.jsÙ)../../libs/use/useRelation/useChildren.jsÙ ../../libs/use/useTouch/index.jsÙ#../../libs/use/useSafeArea/index.js¹../../libs/utils/basic.jsÙ'../../../../plugin-vue-export-helper.jsº../rice-form-item/index.jsµ../rice-form/index.js©./type.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-icon/rice-icon.jsAÃªoh-resolveÂGAÂÙÉ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useCountDown/index.jsAÃªoh-resolveÂGAÂÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/usePopup/index.jsAÃªoh-resolveÂGAÂÙÉ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useNamespace/index.jsAÃªoh-resolveÂGAÂÙÂ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/store/useConfig.jsAÃªoh-resolveÂGAÂÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useRelation/useParent.jsAÃªoh-resolveÂGAÂÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useRelation/useChildren.jsAÃªoh-resolveÂGAÂÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useTouch/index.jsAÃªoh-resolveÂGAÂÙÈ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useSafeArea/index.jsAÃªoh-resolveÂGAÂÙ¾/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/utils/basic.jsAÃªoh-resolveÂGAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂGAÂÙÍ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-form-item/index.jsAÃªoh-resolveÂGAÂÙÈ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-form/index.jsAÃªoh-resolveÂGAÂÙÈ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-input/type.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ:Í:¼À‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍ:©Í:¹ÔrL”¤type¥start£end¤nameªIdentifierÍ:©Í:´«__easycom_1LªIdentifierÍ:¸Í:¹¡_ÀÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration =‘ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	
+¡_LªIdentifier«__easycom_0ÔrO•¤type¥start£end¥value£raw§Literal!<¹../rice-icon/rice-icon.js»"../rice-icon/rice-icon.js"M±ImportDeclaration>ÌlO§LiteralÌEÌkÙ$../../libs/use/useCountDown/index.jsÙ&"../../libs/use/useCountDown/index.js"M±ImportDeclarationÌmÌ©‘N¯ImportSpecifierÌvÌLªIdentifierÌvÌw¡iLªIdentifierÌ{Ì¦isDarkO§LiteralÌ‰Ì¨½../../libs/store/useConfig.js¿"../../libs/store/useConfig.js"M±ImportDeclarationÌªÌó‘N¯ImportSpecifierÌ³ÌÄLªIdentifierÌ³Ì´¡uLªIdentifierÌ¸ÌÄ¬useNamespaceO§LiteralÌÌÌòÙ$../../libs/use/useNamespace/index.jsÙ&"../../libs/use/useNamespace/index.js"M±ImportDeclarationÌôÍO§LiteralÌûÍÙ ../../libs/use/usePopup/index.jsÙ""../../libs/use/usePopup/index.js"M±ImportDeclarationÍÍRO§LiteralÍ&ÍQÙ)../../libs/use/useRelation/useChildren.jsÙ+"../../libs/use/useRelation/useChildren.js"M±ImportDeclarationÍSÍ„O§LiteralÍZÍƒÙ'../../libs/use/useRelation/useParent.jsÙ)"../../libs/use/useRelation/useParent.js"M±ImportDeclarationÍ…Í²O§LiteralÍŒÍ±Ù#../../libs/use/useSafeArea/index.jsÙ%"../../libs/use/useSafeArea/index.js"M±ImportDeclarationÍ³ÍİO§LiteralÍºÍÜÙ ../../libs/use/useTouch/index.jsÙ""../../libs/use/useTouch/index.js"M±ImportDeclarationÍŞÍ)’N¯ImportSpecifierÍçÍ÷LªIdentifierÍçÍè¡hLªIdentifierÍìÍ÷«hasStrValueN¯ImportSpecifierÍùÍLªIdentifierÍùÍú¡aLªIdentifierÍşÍ§addUnitO§LiteralÍÍ(¹../../libs/utils/basic.js»"../../libs/utils/basic.js"M±ImportDeclarationÍ*Í‰’N¯ImportSpecifierÍ3ÍMLªIdentifierÍ3Í4¡fLªIdentifierÍ8ÍMµformDisabledInjectKeyN¯ImportSpecifierÍOÍiLªIdentifierÍOÍP¡aLªIdentifierÍTÍiµformReadonlyInjectKeyO§LiteralÍqÍˆµ../rice-form/index.js·"../rice-form/index.js"M±ImportDeclarationÍŠÍÒ‘N¯ImportSpecifierÍ“Í­LªIdentifierÍ“Í”¡aLªIdentifierÍ˜Í­µformItemBlurInjectKeyO§LiteralÍµÍÑº../rice-form-item/index.js¼"../rice-form-item/index.js"M±ImportDeclarationÍÓÍæO§LiteralÍÚÍå©./type.js«"./type.js"M±ImportDeclarationÍçÍ2‘N¯ImportSpecifierÍğÍ LªIdentifierÍğÍñ¡_LªIdentifierÍõÍ «_export_sfcO§LiteralÍÍ1Ù'../../../../plugin-vue-export-helper.jsÙ)"../../../../plugin-vue-export-helper.js"

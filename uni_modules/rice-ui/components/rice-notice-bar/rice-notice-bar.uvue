@@ -1,0 +1,321 @@
+<template>
+	<view v-if="state.show" :class="noticeBarClass" :style="[noticeBarStyle,customStyle]">
+		<slot name="leftIcon">
+			<rice-icon v-if="hasStrValue(leftIcon)" :name="leftIcon" :color="iconColor" size="18px"
+				:custom-style="{width:'25px'}" @click="clickLeft" />
+		</slot>
+		<view class="rice-notice-bar__wrapper" ref="wrapperRef" @click="handleClick">
+			<!-- #ifdef APP-IOS || APP-HARMONY -->
+			<!-- ios 和 HARMONY 要加一个宽度为10000px的view，不然text的宽度获取到的永远都是 wrapper 的宽度-->
+			<view :class="scrollClass">
+			<!-- #endif -->
+				<text :class="[contentClass,textClass]" :style="contentStyle" ref="contentRef"
+					@transitionend="onTransitionend">{{message}}</text>
+			<!-- #ifdef APP-IOS || APP-HARMONY -->
+			</view>
+			<!-- #endif -->
+		</view>
+		<slot name="rightIcon">
+			<rice-icon v-if="hasStrValue(rightIcon)" :name="rightIcon" :custom-style="{width:'25px',textAlign:'right'}"
+				:color="iconColor" size="18px" @click="clickRight" />
+		</slot>
+		<rice-icon v-if="closeable" name="cross" :custom-style="{width:'25px',textAlign:'right',}" :color="iconColor"
+			size="18px" @click="handleClose" />
+	</view>
+</template>
+
+<script setup>
+	import { useNamespace } from '../../libs/use';
+	import { addUnit, hasStrValue, getRandomStr, isThemeColor } from "../../libs/utils";
+	import { NoticeBarProps, NoticeBarState } from './type.uts';
+
+	defineOptions({
+		name: 'rice-notice-bar',
+		styleIsolation: "app-and-page",
+		externalClasses: ['text-class']
+	})
+	const ns = useNamespace('notice-bar')
+
+	const emit = defineEmits<{
+		click : [],
+		clickLeft : [],
+		clickRight : [],
+	}>()
+
+	const props = withDefaults(defineProps<NoticeBarProps>(), {
+		type: 'warning',
+		speed: 60,
+		scrollable: null,
+		closeable: false,
+		textClass: "",
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+	const state = reactive<NoticeBarState>({
+		show: true,
+		offset: 0,
+		duration: 0,
+		wrapWidth: 0,
+		contentWidth: 0,
+	})
+
+	let startTimer : number | null = null
+	let endTimer : number | null = null
+	let transitionTimer : number | null = null
+	const wrapperRef = shallowRef<UniElement | null>(null)
+	const contentRef = shallowRef<UniElement | null>(null)
+
+	const startSleep = () => {
+		return new Promise((resolve) => {
+			const ms = props.delay ?? 0.3
+			if (startTimer != null) clearTimeout(startTimer!)
+			startTimer = setTimeout(() => {
+				resolve(true)
+			}, ms * 1000)
+		})
+	}
+
+
+	const reset = async () => {
+		await nextTick()
+		if (startTimer != null) clearTimeout(startTimer!)
+		await startSleep()
+		if (wrapperRef.value == null || contentRef.value == null) return
+
+		state.duration = 0
+		state.offset = 0
+
+		const wrapperRet = await wrapperRef.value!.getBoundingClientRectAsync()!
+		const contentRet = await contentRef.value!.getBoundingClientRectAsync()!
+		const wrapperWidth = wrapperRet.width
+		const contentWidth = contentRet.width
+		if ((props.scrollable == true || contentWidth > wrapperWidth) && props.wrapable == false) {
+			if (transitionTimer != null) clearTimeout(transitionTimer!)
+			transitionTimer = setTimeout(() => {
+				state.wrapWidth = wrapperWidth
+				state.contentWidth = contentWidth
+				state.offset = -contentWidth
+				state.duration = contentWidth / props.speed
+
+			}, 50)
+		}
+	}
+
+	const onTransitionend = () => {
+		state.duration = 0
+		state.offset = state.wrapWidth
+		if (endTimer != null) clearTimeout(endTimer!)
+		endTimer = setTimeout(() => {
+			state.duration = (state.contentWidth + state.wrapWidth) / props.speed
+			state.offset = -state.contentWidth
+		}, 50)
+	}
+
+	const handleClick = () => {
+		emit('click')
+	}
+
+	const clickLeft = () => {
+		emit('clickLeft')
+	}
+
+	const clickRight = () => {
+		emit('clickRight')
+	}
+
+	const handleClose = () => {
+		state.show = false
+	}
+
+	watch(() : (any | null)[] => [props.message, props.scrollable], async () => {
+		await nextTick()
+		console.log('ios change')
+		reset()
+	}, {
+		deep: true,
+	})
+
+	const noticeBarStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.bgColor != null) css.set('background-color', props.bgColor!)
+		return css
+	})
+
+	const contentStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (state.offset != 0) {
+			css.set('transform', `translateX(${state.offset}px)`)
+		}
+		css.set('transition-duration', `${state.duration}s`)
+		if (props.color != null) css.set('color', props.color!)
+		if (props.fontSize != null) css.set('font-size', addUnit(props.fontSize!))
+		return css
+	})
+
+	const noticeBarType = computed(() => isThemeColor(props.type) ? props.type : 'warning')
+
+	const noticeBarClass = computed(() => {
+		return [
+			ns.b(""),
+			ns.theme(),
+			ns.m(noticeBarType.value),
+			ns.is('wrapable', props.wrapable == true)
+		]
+	})
+
+	// #ifdef APP-IOS ||APP-HARMONY
+	const scrollClass = computed(() => {
+		const ellipsis = props.scrollable == false && props.wrapable == false
+		return [
+			ns.e('scroll'),
+			ns.is('__scroll--auto', props.wrapable == true || ellipsis)
+		]
+	})
+	// #endif
+
+	const contentClass = computed(() => {
+		const ellipsis = props.scrollable == false && props.wrapable == false
+		return [
+			ns.e('content'),
+			ns.is('__content--wrapable', props.wrapable == true),
+			ns.is('__content--ellipsis', ellipsis),
+			// #ifdef APP
+			ns.e(`content--${noticeBarType.value}`),
+			// #endif
+		]
+	})
+
+	const iconColor = computed(() => props.color ?? `var(--rice-${noticeBarType.value}-color)`)
+
+
+	onMounted(() => {
+		reset()
+	})
+
+	defineExpose({
+		reset
+	})
+</script>
+
+<style scoped lang="scss">
+	.rice-notice-bar {
+		position: relative;
+		flex-direction: row;
+		align-items: center;
+		/* #ifndef APP */
+		height: 45px;
+		/* #endif */
+
+		/* #ifdef APP */
+		min-height: 45px;
+		/* #endif */
+
+		padding: 0 16px;
+
+		&--primary {
+			background-color: var(--rice-primary-color-1);
+			/* #ifndef APP */
+			color: var(--rice-primary-color);
+			/* #endif */
+		}
+
+		&--warning {
+			background-color: var(--rice-warning-color-1);
+			/* #ifndef APP */
+			color: var(--rice-warning-color);
+			/* #endif */
+		}
+
+		&--success {
+			background-color: var(--rice-success-color-1);
+			/* #ifndef APP */
+			color: var(--rice-success-color);
+			/* #endif */
+		}
+
+		&--error {
+			background-color: var(--rice-error-color-1);
+			/* #ifndef APP */
+			color: var(--rice-error-color);
+			/* #endif */
+		}
+
+
+		&__wrapper {
+			flex: 1;
+			flex-direction: row;
+			align-items: center;
+			height: 100%;
+		}
+
+		/* #ifdef APP-HARMONY || APP-IOS */
+		&__scroll {
+			position: relative;
+			flex-direction: row;
+			align-items: center;
+			width: 10000px;
+			height: 100%;
+
+			&--auto {
+				width: 100%;
+			}
+		}
+
+		/* #endif */
+
+		&__content {
+			position: absolute;
+			white-space: nowrap;
+			transform: translateX(0px);
+			transition-property: transform;
+			transition-timing-function: linear;
+			font-size: 15px;
+
+			&--wrapable {
+				position: relative;
+				white-space: normal;
+				/* #ifndef APP */
+				word-wrap: break-word;
+				max-width: 100%;
+				/* #endif */
+
+			}
+
+			&--ellipsis {
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				width: 100%;
+			}
+
+			/* #ifdef APP */
+
+			&--primary {
+				color: var(--rice-primary-color);
+			}
+
+			&--warning {
+				color: var(--rice-warning-color);
+			}
+
+			&--success {
+				color: var(--rice-success-color);
+			}
+
+			&--error {
+				color: var(--rice-error-color);
+			}
+
+			/* #endif */
+
+		}
+
+
+
+		&--wrapable {
+			/* #ifndef APP */
+			height: auto;
+			/* #endif */
+			padding: 14px 16px;
+		}
+	}
+</style>

@@ -1,0 +1,1153 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ:Æimport { _ as __easycom_0 } from "../rice-overlay/rice-overlay.js";
+import { _ as __easycom_0$1 } from "../rice-icon/rice-icon.js";
+import { a as addUnit } from "../../libs/utils/basic.js";
+import "../../libs/use/useCountDown/index.js";
+import "../../libs/store/useConfig.js";
+import { u as useNamespace } from "../../libs/use/useNamespace/index.js";
+import { u as usePopup, U as UsePopupOptions } from "../../libs/use/usePopup/index.js";
+import "../../libs/use/useRelation/useChildren.js";
+import "../../libs/use/useRelation/useParent.js";
+import { u as useSafeArea, s as safeAreaInsets } from "../../libs/use/useSafeArea/index.js";
+import "../../libs/use/useTouch/index.js";
+import "./type.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineEmits: _defineEmits, useModel: _useModel, mergeModels: _mergeModels, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, unref: _unref, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataEvent: _setSharedDataEvent, createSharedDataSlot: _createSharedDataSlot, setSharedDataTemplateRef: _setSharedDataTemplateRef } = globalThis.Vue;
+const __className = "GenUniModulesRiceUiComponentsRicePopupRicePopup";
+const { shallowRef, computed, toRef } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  ...{
+    name: "rice-popup",
+    styleIsolation: "app-and-page",
+    externalClasses: ["popup-class", "drag-bar-class", "drag-wrap-class"]
+  },
+  __dynamicSharedData: true,
+  __hash: "350cee08",
+  __className,
+  __filename: "uni_modules/rice-ui/components/rice-popup/rice-popup.uvue",
+  __name: "rice-popup",
+  props: /* @__PURE__ */ _mergeModels(new UTSJSONObject({
+    duration: { default: 300, type: Number },
+    position: { default: "bottom", type: String },
+    zIndex: { default: 999, type: Number },
+    opacity: { type: Boolean, default: null },
+    zoom: { type: Boolean, default: true },
+    overlay: { type: Boolean, default: true },
+    overlayBgColor: { type: String },
+    closeable: { type: Boolean, default: true },
+    closeIcon: { default: "cross", type: String },
+    closeIconPosition: { default: "top-right", type: String },
+    closeOnClickOverlay: { type: Boolean, default: true },
+    radius: { type: [Number, String] },
+    bgColor: { type: String },
+    safeAreaInsetTop: { type: Boolean, default: false },
+    safeAreaInsetBottom: { type: Boolean, default: true },
+    closeOnSlideDown: { type: Boolean, default: false },
+    slideDownThreshold: { default: 40, type: Number },
+    showDragBar: { type: Boolean },
+    dragWrapClass: { default: "", type: String },
+    dragBarClass: { default: "", type: String },
+    lockScroll: { type: Boolean, default: true },
+    scrollId: { type: String },
+    beforeClose: { type: null },
+    marginTop: { type: [String, Number] },
+    popupClass: { default: "", type: String },
+    customStyle: { default: () => {
+      return new UTSJSONObject({});
+    }, type: null }
+  }), new UTSJSONObject({
+    "show": {
+      type: Boolean,
+      default: false
+    },
+    "showModifiers": {}
+  })),
+  emits: /* @__PURE__ */ _mergeModels(["open", "close", "opened", "closed", "clickOverlay"], ["update:show"]),
+  __multiRoot: true,
+  setup(__props, _a) {
+    var __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesRiceUiComponentsRicePopupRicePopupSharedData", sharedDataClassId: 0 })));
+    useSafeArea();
+    const ns = useNamespace("popup");
+    const emit = __emit;
+    const props = __props;
+    const show = _useModel(__props, "show");
+    const popupRef = shallowRef(null);
+    const _opacity = computed(() => {
+      if (props.opacity != null)
+        return props.opacity;
+      return props.position == "center";
+    });
+    const _b = usePopup(popupRef, new UsePopupOptions({
+      zoomScale: null,
+      show,
+      position: toRef(() => {
+        return props.position;
+      }),
+      duration: toRef(() => {
+        return props.duration;
+      }),
+      opacity: toRef(() => {
+        return _opacity.value;
+      }),
+      zoom: toRef(() => {
+        return props.zoom;
+      }),
+      beforeClose: toRef(() => {
+        return props.beforeClose;
+      })
+    })), realShow = _b.realShow, doClose = _b.doClose;
+    const handleClose = (e) => {
+      e.stopPropagation();
+      doClose();
+    };
+    const overlayClick = () => {
+      emit("clickOverlay");
+      if (!props.closeOnClickOverlay) {
+        return null;
+      }
+      doClose();
+    };
+    let isAnimation = false;
+    let halfScreenY = 0;
+    let currentY = 0;
+    let previousY = 0;
+    let lastDragDirection = 0;
+    let halfOffset = 0;
+    let scrollEl = null;
+    let contentTouchStartY = 0;
+    let isContentDragging = false;
+    const canDrag = computed(() => {
+      return props.position == "bottom";
+    });
+    const lockScrollAtTop = () => {
+      if (scrollEl == null)
+        return null;
+      if (scrollEl.scrollTop > 0) {
+        scrollEl.scrollTop = 0;
+      }
+    };
+    const resetDragState = (startY) => {
+      var _a2;
+      halfScreenY = startY;
+      currentY = startY;
+      previousY = startY;
+      lastDragDirection = 0;
+      halfOffset = 0;
+      (_a2 = popupRef.value) === null || _a2 === void 0 ? null : _a2.style.setProperty("transition-duration", "0ms");
+    };
+    const onDragstart = (e) => {
+      const startY = e.touches[0].screenY;
+      resetDragState(startY);
+      isContentDragging = false;
+    };
+    const onDragmove = (e) => {
+      var _a2;
+      if (isAnimation || !canDrag.value)
+        return null;
+      let p = e.touches[0];
+      previousY = currentY;
+      currentY = p.screenY;
+      const moveDelta = currentY - previousY;
+      if (Math.abs(moveDelta) >= 2) {
+        lastDragDirection = moveDelta > 0 ? 1 : -1;
+      }
+      if (halfScreenY == 0) {
+        halfScreenY = p.screenY;
+      }
+      let offset = p.screenY - halfScreenY;
+      if (offset > 0) {
+        lockScrollAtTop();
+        (_a2 = popupRef.value) === null || _a2 === void 0 ? null : _a2.style.setProperty("transform", `translateY(${offset}px)`);
+        halfOffset = offset;
+      }
+    };
+    const resumedPopup = () => {
+      var _a2;
+      (_a2 = popupRef.value) === null || _a2 === void 0 ? null : _a2.style.setProperty("transform", "translateY(0px)");
+      halfScreenY = 0;
+      halfOffset = 0;
+      lastDragDirection = 0;
+      isContentDragging = false;
+      isAnimation = false;
+    };
+    const onDragend = () => {
+      var _a2;
+      (_a2 = popupRef.value) === null || _a2 === void 0 ? null : _a2.style.setProperty("transition-duration", `${props.duration}ms`);
+      if (!canDrag.value)
+        return null;
+      halfScreenY = 0;
+      if (isAnimation)
+        return null;
+      const threshold = Math.max(0, props.slideDownThreshold);
+      const isLastSwipeUp = lastDragDirection < 0;
+      let shouldClose = halfOffset >= threshold && !isLastSwipeUp;
+      if (shouldClose) {
+        isContentDragging = false;
+        doClose();
+      } else {
+        resumedPopup();
+      }
+    };
+    const onContentstart = (e) => {
+      if (!props.closeOnSlideDown)
+        return null;
+      if (props.scrollId != null && props.scrollId != "") {
+        scrollEl = uni.getElementById(props.scrollId);
+      } else {
+        scrollEl = null;
+      }
+      contentTouchStartY = e.touches[0].screenY;
+      isContentDragging = false;
+      resetDragState(contentTouchStartY);
+    };
+    const onContentmove = (e) => {
+      var _a2;
+      if (!props.closeOnSlideDown)
+        return null;
+      if (!canDrag.value || isAnimation)
+        return null;
+      const currentTouchY = e.touches[0].screenY;
+      const gestureOffset = currentTouchY - contentTouchStartY;
+      const isMovingDown = gestureOffset > 0;
+      if (isContentDragging) {
+        lockScrollAtTop();
+        onDragmove(e);
+        return null;
+      }
+      if (!isMovingDown) {
+        return null;
+      }
+      const top = (_a2 = scrollEl === null || scrollEl === void 0 ? null : scrollEl.scrollTop) !== null && _a2 !== void 0 ? _a2 : 0;
+      if (top >= 0.01) {
+        return null;
+      }
+      isContentDragging = true;
+      resetDragState(contentTouchStartY);
+      lockScrollAtTop();
+      onDragmove(e);
+    };
+    const onContentend = () => {
+      var _a2;
+      (_a2 = popupRef.value) === null || _a2 === void 0 ? null : _a2.style.setProperty("transition-duration", `${props.duration}ms`);
+      if (!props.closeOnSlideDown)
+        return null;
+      if (!isContentDragging) {
+        resumedPopup();
+        return null;
+      }
+      onDragend();
+    };
+    const rootClass = computed(() => {
+      const isZoom = props.zoom && props.position == "center";
+      const basic = [
+        ns.theme(),
+        ns.is("opacity", _opacity.value),
+        ns.m(props.position),
+        ns.is("zoom", isZoom)
+      ];
+      if (props.position == "center" && !props.zoom) {
+        basic.push("rice-popup--notzoom");
+      }
+      return basic;
+    });
+    const popupStyle = computed(() => {
+      const css = /* @__PURE__ */ new Map();
+      const position = props.position;
+      css.set("z-index", props.zIndex);
+      if (props.bgColor != null) {
+        css.set("background-color", props.bgColor);
+      }
+      if (props.position == "center" && props.marginTop != null) {
+        css.set("margin-top", addUnit(props.marginTop));
+      }
+      if (props.position != "center" && props.safeAreaInsetBottom) {
+        css.set("padding-bottom", safeAreaInsets.value.bottom + "px");
+      }
+      if (props.position != "center" && props.safeAreaInsetTop) {
+        css.set("padding-top", safeAreaInsets.value.top + "px");
+      }
+      if (props.radius != null) {
+        const radius = addUnit(props.radius);
+        if (position == "top") {
+          css.set("border-bottom-left-radius", radius);
+          css.set("border-bottom-right-radius", radius);
+        } else if (position == "bottom") {
+          css.set("border-top-left-radius", radius);
+          css.set("border-top-right-radius", radius);
+        } else if (position == "left") {
+          css.set("border-top-right-radius", radius);
+          css.set("border-bottom-right-radius", radius);
+        } else if (position == "right") {
+          css.set("border-top-left-radius", radius);
+          css.set("border-bottom-left-radius", radius);
+        } else {
+          css.set("border-radius", radius);
+        }
+      }
+      return css;
+    });
+    const closeStyle = computed(() => {
+      const css = /* @__PURE__ */ new Map();
+      if (props.position != "center" && props.safeAreaInsetBottom) {
+        css.set("bottom", safeAreaInsets.value.bottom + "px");
+      }
+      if (props.position != "center" && props.safeAreaInsetTop) {
+        css.set("top", safeAreaInsets.value.top + "px");
+      }
+      return css;
+    });
+    return () => {
+      "raw js";
+      const _setTemplateRef = _createSharedDataTemplateRefSetter();
+      const _component_rice_overlay = __easycom_0;
+      const _component_rice_icon = __easycom_0$1;
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.overlay));
+      }, () => {
+        const n2 = _createSharedDataComponentWithFallback(_component_rice_overlay, "045af48d", {
+          show: () => {
+            return show.value;
+          },
+          "z-index": () => {
+            return __props.zIndex - 1;
+          },
+          "close-on-click-overlay": false,
+          "bg-color": () => {
+            return __props.overlayBgColor;
+          },
+          onClick: () => {
+            return overlayClick;
+          }
+        });
+        _setSharedData(__sharedData, 1, n2?.sharedData);
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 2, _toSharedDataBoolean(_unref(realShow)));
+      }, () => {
+        _renderSharedDataEffect(() => {
+          _setSharedDataClass(__sharedData, 20, ["rice-popup", [__props.popupClass, _unref(rootClass)]]);
+          _setSharedDataStyle(__sharedData, 21, [_unref(popupStyle), __props.customStyle]);
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 3, _toSharedDataBoolean(__props.closeable));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            _setSharedDataClass(__sharedData, 6, ["rice-popup__close", `rice-popup__close--${__props.closeIconPosition}`]);
+            _setSharedDataStyle(__sharedData, 7, _unref(closeStyle));
+          });
+          const n7 = _createSharedDataComponentWithFallback(_component_rice_icon, "59701371", {
+            name: () => {
+              return __props.closeIcon;
+            },
+            size: "20px"
+          });
+          _setSharedData(__sharedData, 4, n7?.sharedData);
+          _setSharedDataEvent(__sharedData, 5, handleClose);
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 8, _toSharedDataBoolean(__props.showDragBar == true && __props.position == "bottom"));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            return _setSharedDataClass(__sharedData, 14, ["rice-popup__drag", __props.dragWrapClass]);
+          });
+          _createSharedDataSlot("drag", null, null, () => {
+            _renderSharedDataEffect(() => {
+              return _setSharedDataClass(__sharedData, 9, ["rice-popup__drag__bar", __props.dragBarClass]);
+            });
+          });
+          _setSharedDataEvent(__sharedData, 10, onDragstart);
+          _setSharedDataEvent(__sharedData, 11, onDragmove);
+          _setSharedDataEvent(__sharedData, 12, onDragend);
+          _setSharedDataEvent(__sharedData, 13, onDragend);
+        });
+        _createSharedDataSlot("default", null, null);
+        _setSharedDataEvent(__sharedData, 15, onContentstart);
+        _setSharedDataEvent(__sharedData, 16, onContentmove);
+        _setSharedDataEvent(__sharedData, 17, onContentend);
+        _setSharedDataEvent(__sharedData, 18, onContentend);
+        _setSharedDataTemplateRef(__sharedData, 19, (n16) => {
+          _setTemplateRef(n16, popupRef, null, "popupRef");
+        });
+      });
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {};
+const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+export {
+  __easycom_2 as _
+};
+//# sourceMappingURL=rice-popup.js.map
+ÂÙÒ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-overlay/rice-overlay.jsÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-icon/rice-icon.jsÙ¾/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/utils/basic.jsÙÉ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useCountDown/index.jsÙÂ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/store/useConfig.jsÙÉ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useNamespace/index.jsÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/usePopup/index.jsÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useRelation/useChildren.jsÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useRelation/useParent.jsÙÈ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useSafeArea/index.jsÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useTouch/index.jsÙÈ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-popup/type.jsÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-popup/rice-popup.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ‘ÔrD’²hostDependencyName®hostModuleNameÙF../../../../../uni_modules/rice-ui/components/rice-popup/rice-popup.js¥entryÃÚ:Æimport { _ as __easycom_0 } from "../rice-overlay/rice-overlay.js";
+import { _ as __easycom_0$1 } from "../rice-icon/rice-icon.js";
+import { a as addUnit } from "../../libs/utils/basic.js";
+import "../../libs/use/useCountDown/index.js";
+import "../../libs/store/useConfig.js";
+import { u as useNamespace } from "../../libs/use/useNamespace/index.js";
+import { u as usePopup, U as UsePopupOptions } from "../../libs/use/usePopup/index.js";
+import "../../libs/use/useRelation/useChildren.js";
+import "../../libs/use/useRelation/useParent.js";
+import { u as useSafeArea, s as safeAreaInsets } from "../../libs/use/useSafeArea/index.js";
+import "../../libs/use/useTouch/index.js";
+import "./type.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineEmits: _defineEmits, useModel: _useModel, mergeModels: _mergeModels, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, unref: _unref, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataEvent: _setSharedDataEvent, createSharedDataSlot: _createSharedDataSlot, setSharedDataTemplateRef: _setSharedDataTemplateRef } = globalThis.Vue;
+const __className = "GenUniModulesRiceUiComponentsRicePopupRicePopup";
+const { shallowRef, computed, toRef } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  ...{
+    name: "rice-popup",
+    styleIsolation: "app-and-page",
+    externalClasses: ["popup-class", "drag-bar-class", "drag-wrap-class"]
+  },
+  __dynamicSharedData: true,
+  __hash: "350cee08",
+  __className,
+  __filename: "uni_modules/rice-ui/components/rice-popup/rice-popup.uvue",
+  __name: "rice-popup",
+  props: /* @__PURE__ */ _mergeModels(new UTSJSONObject({
+    duration: { default: 300, type: Number },
+    position: { default: "bottom", type: String },
+    zIndex: { default: 999, type: Number },
+    opacity: { type: Boolean, default: null },
+    zoom: { type: Boolean, default: true },
+    overlay: { type: Boolean, default: true },
+    overlayBgColor: { type: String },
+    closeable: { type: Boolean, default: true },
+    closeIcon: { default: "cross", type: String },
+    closeIconPosition: { default: "top-right", type: String },
+    closeOnClickOverlay: { type: Boolean, default: true },
+    radius: { type: [Number, String] },
+    bgColor: { type: String },
+    safeAreaInsetTop: { type: Boolean, default: false },
+    safeAreaInsetBottom: { type: Boolean, default: true },
+    closeOnSlideDown: { type: Boolean, default: false },
+    slideDownThreshold: { default: 40, type: Number },
+    showDragBar: { type: Boolean },
+    dragWrapClass: { default: "", type: String },
+    dragBarClass: { default: "", type: String },
+    lockScroll: { type: Boolean, default: true },
+    scrollId: { type: String },
+    beforeClose: { type: null },
+    marginTop: { type: [String, Number] },
+    popupClass: { default: "", type: String },
+    customStyle: { default: () => {
+      return new UTSJSONObject({});
+    }, type: null }
+  }), new UTSJSONObject({
+    "show": {
+      type: Boolean,
+      default: false
+    },
+    "showModifiers": {}
+  })),
+  emits: /* @__PURE__ */ _mergeModels(["open", "close", "opened", "closed", "clickOverlay"], ["update:show"]),
+  __multiRoot: true,
+  setup(__props, _a) {
+    var __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesRiceUiComponentsRicePopupRicePopupSharedData", sharedDataClassId: 0 })));
+    useSafeArea();
+    const ns = useNamespace("popup");
+    const emit = __emit;
+    const props = __props;
+    const show = _useModel(__props, "show");
+    const popupRef = shallowRef(null);
+    const _opacity = computed(() => {
+      if (props.opacity != null)
+        return props.opacity;
+      return props.position == "center";
+    });
+    const _b = usePopup(popupRef, new UsePopupOptions({
+      zoomScale: null,
+      show,
+      position: toRef(() => {
+        return props.position;
+      }),
+      duration: toRef(() => {
+        return props.duration;
+      }),
+      opacity: toRef(() => {
+        return _opacity.value;
+      }),
+      zoom: toRef(() => {
+        return props.zoom;
+      }),
+      beforeClose: toRef(() => {
+        return props.beforeClose;
+      })
+    })), realShow = _b.realShow, doClose = _b.doClose;
+    const handleClose = (e) => {
+      e.stopPropagation();
+      doClose();
+    };
+    const overlayClick = () => {
+      emit("clickOverlay");
+      if (!props.closeOnClickOverlay) {
+        return null;
+      }
+      doClose();
+    };
+    let isAnimation = false;
+    let halfScreenY = 0;
+    let currentY = 0;
+    let previousY = 0;
+    let lastDragDirection = 0;
+    let halfOffset = 0;
+    let scrollEl = null;
+    let contentTouchStartY = 0;
+    let isContentDragging = false;
+    const canDrag = computed(() => {
+      return props.position == "bottom";
+    });
+    const lockScrollAtTop = () => {
+      if (scrollEl == null)
+        return null;
+      if (scrollEl.scrollTop > 0) {
+        scrollEl.scrollTop = 0;
+      }
+    };
+    const resetDragState = (startY) => {
+      var _a2;
+      halfScreenY = startY;
+      currentY = startY;
+      previousY = startY;
+      lastDragDirection = 0;
+      halfOffset = 0;
+      (_a2 = popupRef.value) === null || _a2 === void 0 ? null : _a2.style.setProperty("transition-duration", "0ms");
+    };
+    const onDragstart = (e) => {
+      const startY = e.touches[0].screenY;
+      resetDragState(startY);
+      isContentDragging = false;
+    };
+    const onDragmove = (e) => {
+      var _a2;
+      if (isAnimation || !canDrag.value)
+        return null;
+      let p = e.touches[0];
+      previousY = currentY;
+      currentY = p.screenY;
+      const moveDelta = currentY - previousY;
+      if (Math.abs(moveDelta) >= 2) {
+        lastDragDirection = moveDelta > 0 ? 1 : -1;
+      }
+      if (halfScreenY == 0) {
+        halfScreenY = p.screenY;
+      }
+      let offset = p.screenY - halfScreenY;
+      if (offset > 0) {
+        lockScrollAtTop();
+        (_a2 = popupRef.value) === null || _a2 === void 0 ? null : _a2.style.setProperty("transform", `translateY(${offset}px)`);
+        halfOffset = offset;
+      }
+    };
+    const resumedPopup = () => {
+      var _a2;
+      (_a2 = popupRef.value) === null || _a2 === void 0 ? null : _a2.style.setProperty("transform", "translateY(0px)");
+      halfScreenY = 0;
+      halfOffset = 0;
+      lastDragDirection = 0;
+      isContentDragging = false;
+      isAnimation = false;
+    };
+    const onDragend = () => {
+      var _a2;
+      (_a2 = popupRef.value) === null || _a2 === void 0 ? null : _a2.style.setProperty("transition-duration", `${props.duration}ms`);
+      if (!canDrag.value)
+        return null;
+      halfScreenY = 0;
+      if (isAnimation)
+        return null;
+      const threshold = Math.max(0, props.slideDownThreshold);
+      const isLastSwipeUp = lastDragDirection < 0;
+      let shouldClose = halfOffset >= threshold && !isLastSwipeUp;
+      if (shouldClose) {
+        isContentDragging = false;
+        doClose();
+      } else {
+        resumedPopup();
+      }
+    };
+    const onContentstart = (e) => {
+      if (!props.closeOnSlideDown)
+        return null;
+      if (props.scrollId != null && props.scrollId != "") {
+        scrollEl = uni.getElementById(props.scrollId);
+      } else {
+        scrollEl = null;
+      }
+      contentTouchStartY = e.touches[0].screenY;
+      isContentDragging = false;
+      resetDragState(contentTouchStartY);
+    };
+    const onContentmove = (e) => {
+      var _a2;
+      if (!props.closeOnSlideDown)
+        return null;
+      if (!canDrag.value || isAnimation)
+        return null;
+      const currentTouchY = e.touches[0].screenY;
+      const gestureOffset = currentTouchY - contentTouchStartY;
+      const isMovingDown = gestureOffset > 0;
+      if (isContentDragging) {
+        lockScrollAtTop();
+        onDragmove(e);
+        return null;
+      }
+      if (!isMovingDown) {
+        return null;
+      }
+      const top = (_a2 = scrollEl === null || scrollEl === void 0 ? null : scrollEl.scrollTop) !== null && _a2 !== void 0 ? _a2 : 0;
+      if (top >= 0.01) {
+        return null;
+      }
+      isContentDragging = true;
+      resetDragState(contentTouchStartY);
+      lockScrollAtTop();
+      onDragmove(e);
+    };
+    const onContentend = () => {
+      var _a2;
+      (_a2 = popupRef.value) === null || _a2 === void 0 ? null : _a2.style.setProperty("transition-duration", `${props.duration}ms`);
+      if (!props.closeOnSlideDown)
+        return null;
+      if (!isContentDragging) {
+        resumedPopup();
+        return null;
+      }
+      onDragend();
+    };
+    const rootClass = computed(() => {
+      const isZoom = props.zoom && props.position == "center";
+      const basic = [
+        ns.theme(),
+        ns.is("opacity", _opacity.value),
+        ns.m(props.position),
+        ns.is("zoom", isZoom)
+      ];
+      if (props.position == "center" && !props.zoom) {
+        basic.push("rice-popup--notzoom");
+      }
+      return basic;
+    });
+    const popupStyle = computed(() => {
+      const css = /* @__PURE__ */ new Map();
+      const position = props.position;
+      css.set("z-index", props.zIndex);
+      if (props.bgColor != null) {
+        css.set("background-color", props.bgColor);
+      }
+      if (props.position == "center" && props.marginTop != null) {
+        css.set("margin-top", addUnit(props.marginTop));
+      }
+      if (props.position != "center" && props.safeAreaInsetBottom) {
+        css.set("padding-bottom", safeAreaInsets.value.bottom + "px");
+      }
+      if (props.position != "center" && props.safeAreaInsetTop) {
+        css.set("padding-top", safeAreaInsets.value.top + "px");
+      }
+      if (props.radius != null) {
+        const radius = addUnit(props.radius);
+        if (position == "top") {
+          css.set("border-bottom-left-radius", radius);
+          css.set("border-bottom-right-radius", radius);
+        } else if (position == "bottom") {
+          css.set("border-top-left-radius", radius);
+          css.set("border-top-right-radius", radius);
+        } else if (position == "left") {
+          css.set("border-top-right-radius", radius);
+          css.set("border-bottom-right-radius", radius);
+        } else if (position == "right") {
+          css.set("border-top-left-radius", radius);
+          css.set("border-bottom-left-radius", radius);
+        } else {
+          css.set("border-radius", radius);
+        }
+      }
+      return css;
+    });
+    const closeStyle = computed(() => {
+      const css = /* @__PURE__ */ new Map();
+      if (props.position != "center" && props.safeAreaInsetBottom) {
+        css.set("bottom", safeAreaInsets.value.bottom + "px");
+      }
+      if (props.position != "center" && props.safeAreaInsetTop) {
+        css.set("top", safeAreaInsets.value.top + "px");
+      }
+      return css;
+    });
+    return () => {
+      "raw js";
+      const _setTemplateRef = _createSharedDataTemplateRefSetter();
+      const _component_rice_overlay = __easycom_0;
+      const _component_rice_icon = __easycom_0$1;
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.overlay));
+      }, () => {
+        const n2 = _createSharedDataComponentWithFallback(_component_rice_overlay, "045af48d", {
+          show: () => {
+            return show.value;
+          },
+          "z-index": () => {
+            return __props.zIndex - 1;
+          },
+          "close-on-click-overlay": false,
+          "bg-color": () => {
+            return __props.overlayBgColor;
+          },
+          onClick: () => {
+            return overlayClick;
+          }
+        });
+        _setSharedData(__sharedData, 1, n2?.sharedData);
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 2, _toSharedDataBoolean(_unref(realShow)));
+      }, () => {
+        _renderSharedDataEffect(() => {
+          _setSharedDataClass(__sharedData, 20, ["rice-popup", [__props.popupClass, _unref(rootClass)]]);
+          _setSharedDataStyle(__sharedData, 21, [_unref(popupStyle), __props.customStyle]);
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 3, _toSharedDataBoolean(__props.closeable));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            _setSharedDataClass(__sharedData, 6, ["rice-popup__close", `rice-popup__close--${__props.closeIconPosition}`]);
+            _setSharedDataStyle(__sharedData, 7, _unref(closeStyle));
+          });
+          const n7 = _createSharedDataComponentWithFallback(_component_rice_icon, "59701371", {
+            name: () => {
+              return __props.closeIcon;
+            },
+            size: "20px"
+          });
+          _setSharedData(__sharedData, 4, n7?.sharedData);
+          _setSharedDataEvent(__sharedData, 5, handleClose);
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 8, _toSharedDataBoolean(__props.showDragBar == true && __props.position == "bottom"));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            return _setSharedDataClass(__sharedData, 14, ["rice-popup__drag", __props.dragWrapClass]);
+          });
+          _createSharedDataSlot("drag", null, null, () => {
+            _renderSharedDataEffect(() => {
+              return _setSharedDataClass(__sharedData, 9, ["rice-popup__drag__bar", __props.dragBarClass]);
+            });
+          });
+          _setSharedDataEvent(__sharedData, 10, onDragstart);
+          _setSharedDataEvent(__sharedData, 11, onDragmove);
+          _setSharedDataEvent(__sharedData, 12, onDragend);
+          _setSharedDataEvent(__sharedData, 13, onDragend);
+        });
+        _createSharedDataSlot("default", null, null);
+        _setSharedDataEvent(__sharedData, 15, onContentstart);
+        _setSharedDataEvent(__sharedData, 16, onContentmove);
+        _setSharedDataEvent(__sharedData, 17, onContentend);
+        _setSharedDataEvent(__sharedData, 18, onContentend);
+        _setSharedDataTemplateRef(__sharedData, 19, (n16) => {
+          _setTemplateRef(n16, popupRef, null, "popupRef");
+        });
+      });
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {};
+const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+export {
+  __easycom_2 as _
+};
+//# sourceMappingURL=rice-popup.js.map
+ÔrE•§version¨mappings¥names§sources®sourcesContentÜ€‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘”  ÌÙ ‘”  ÌÚ ‘”  ÌÛ ‘”  ÌÜ ‘”  Ìİ ‘”  ÌŞ ‘”  Ìß ‘”  Ìà ‘”  Ìá ‘”  Ìâ ‘”  Ìã ‘”  Ìä ‘”  Ìå ‘”  Ìæ ‘”  Ìç ‘”  Ìè ‘”  Ìé ‘”  Ìê ‘”  Ìë ‘”  Ìì ‘”  Ìí ‘”  Ìî ‘”  Ìï ‘”  Ìğ ‘”  Ìñ ‘”  Ìò ‘”  Ìó ‘”  Ìô ‘”  Ìõ ‘”  Ìö ‘”  Ì÷ ‘”  Ìø ‘”  Ìù ‘”  Ìú ‘”  Ìû ‘”  Ìü ‘”  Ìı ‘”  Ìş ‘”  Ìÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘ÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-popup/rice-popup.js‘Ú:Æimport { _ as __easycom_0 } from "../rice-overlay/rice-overlay.js";
+import { _ as __easycom_0$1 } from "../rice-icon/rice-icon.js";
+import { a as addUnit } from "../../libs/utils/basic.js";
+import "../../libs/use/useCountDown/index.js";
+import "../../libs/store/useConfig.js";
+import { u as useNamespace } from "../../libs/use/useNamespace/index.js";
+import { u as usePopup, U as UsePopupOptions } from "../../libs/use/usePopup/index.js";
+import "../../libs/use/useRelation/useChildren.js";
+import "../../libs/use/useRelation/useParent.js";
+import { u as useSafeArea, s as safeAreaInsets } from "../../libs/use/useSafeArea/index.js";
+import "../../libs/use/useTouch/index.js";
+import "./type.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineEmits: _defineEmits, useModel: _useModel, mergeModels: _mergeModels, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, unref: _unref, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataEvent: _setSharedDataEvent, createSharedDataSlot: _createSharedDataSlot, setSharedDataTemplateRef: _setSharedDataTemplateRef } = globalThis.Vue;
+const __className = "GenUniModulesRiceUiComponentsRicePopupRicePopup";
+const { shallowRef, computed, toRef } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  ...{
+    name: "rice-popup",
+    styleIsolation: "app-and-page",
+    externalClasses: ["popup-class", "drag-bar-class", "drag-wrap-class"]
+  },
+  __dynamicSharedData: true,
+  __hash: "350cee08",
+  __className,
+  __filename: "uni_modules/rice-ui/components/rice-popup/rice-popup.uvue",
+  __name: "rice-popup",
+  props: /* @__PURE__ */ _mergeModels(new UTSJSONObject({
+    duration: { default: 300, type: Number },
+    position: { default: "bottom", type: String },
+    zIndex: { default: 999, type: Number },
+    opacity: { type: Boolean, default: null },
+    zoom: { type: Boolean, default: true },
+    overlay: { type: Boolean, default: true },
+    overlayBgColor: { type: String },
+    closeable: { type: Boolean, default: true },
+    closeIcon: { default: "cross", type: String },
+    closeIconPosition: { default: "top-right", type: String },
+    closeOnClickOverlay: { type: Boolean, default: true },
+    radius: { type: [Number, String] },
+    bgColor: { type: String },
+    safeAreaInsetTop: { type: Boolean, default: false },
+    safeAreaInsetBottom: { type: Boolean, default: true },
+    closeOnSlideDown: { type: Boolean, default: false },
+    slideDownThreshold: { default: 40, type: Number },
+    showDragBar: { type: Boolean },
+    dragWrapClass: { default: "", type: String },
+    dragBarClass: { default: "", type: String },
+    lockScroll: { type: Boolean, default: true },
+    scrollId: { type: String },
+    beforeClose: { type: null },
+    marginTop: { type: [String, Number] },
+    popupClass: { default: "", type: String },
+    customStyle: { default: () => {
+      return new UTSJSONObject({});
+    }, type: null }
+  }), new UTSJSONObject({
+    "show": {
+      type: Boolean,
+      default: false
+    },
+    "showModifiers": {}
+  })),
+  emits: /* @__PURE__ */ _mergeModels(["open", "close", "opened", "closed", "clickOverlay"], ["update:show"]),
+  __multiRoot: true,
+  setup(__props, _a) {
+    var __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesRiceUiComponentsRicePopupRicePopupSharedData", sharedDataClassId: 0 })));
+    useSafeArea();
+    const ns = useNamespace("popup");
+    const emit = __emit;
+    const props = __props;
+    const show = _useModel(__props, "show");
+    const popupRef = shallowRef(null);
+    const _opacity = computed(() => {
+      if (props.opacity != null)
+        return props.opacity;
+      return props.position == "center";
+    });
+    const _b = usePopup(popupRef, new UsePopupOptions({
+      zoomScale: null,
+      show,
+      position: toRef(() => {
+        return props.position;
+      }),
+      duration: toRef(() => {
+        return props.duration;
+      }),
+      opacity: toRef(() => {
+        return _opacity.value;
+      }),
+      zoom: toRef(() => {
+        return props.zoom;
+      }),
+      beforeClose: toRef(() => {
+        return props.beforeClose;
+      })
+    })), realShow = _b.realShow, doClose = _b.doClose;
+    const handleClose = (e) => {
+      e.stopPropagation();
+      doClose();
+    };
+    const overlayClick = () => {
+      emit("clickOverlay");
+      if (!props.closeOnClickOverlay) {
+        return null;
+      }
+      doClose();
+    };
+    let isAnimation = false;
+    let halfScreenY = 0;
+    let currentY = 0;
+    let previousY = 0;
+    let lastDragDirection = 0;
+    let halfOffset = 0;
+    let scrollEl = null;
+    let contentTouchStartY = 0;
+    let isContentDragging = false;
+    const canDrag = computed(() => {
+      return props.position == "bottom";
+    });
+    const lockScrollAtTop = () => {
+      if (scrollEl == null)
+        return null;
+      if (scrollEl.scrollTop > 0) {
+        scrollEl.scrollTop = 0;
+      }
+    };
+    const resetDragState = (startY) => {
+      var _a2;
+      halfScreenY = startY;
+      currentY = startY;
+      previousY = startY;
+      lastDragDirection = 0;
+      halfOffset = 0;
+      (_a2 = popupRef.value) === null || _a2 === void 0 ? null : _a2.style.setProperty("transition-duration", "0ms");
+    };
+    const onDragstart = (e) => {
+      const startY = e.touches[0].screenY;
+      resetDragState(startY);
+      isContentDragging = false;
+    };
+    const onDragmove = (e) => {
+      var _a2;
+      if (isAnimation || !canDrag.value)
+        return null;
+      let p = e.touches[0];
+      previousY = currentY;
+      currentY = p.screenY;
+      const moveDelta = currentY - previousY;
+      if (Math.abs(moveDelta) >= 2) {
+        lastDragDirection = moveDelta > 0 ? 1 : -1;
+      }
+      if (halfScreenY == 0) {
+        halfScreenY = p.screenY;
+      }
+      let offset = p.screenY - halfScreenY;
+      if (offset > 0) {
+        lockScrollAtTop();
+        (_a2 = popupRef.value) === null || _a2 === void 0 ? null : _a2.style.setProperty("transform", `translateY(${offset}px)`);
+        halfOffset = offset;
+      }
+    };
+    const resumedPopup = () => {
+      var _a2;
+      (_a2 = popupRef.value) === null || _a2 === void 0 ? null : _a2.style.setProperty("transform", "translateY(0px)");
+      halfScreenY = 0;
+      halfOffset = 0;
+      lastDragDirection = 0;
+      isContentDragging = false;
+      isAnimation = false;
+    };
+    const onDragend = () => {
+      var _a2;
+      (_a2 = popupRef.value) === null || _a2 === void 0 ? null : _a2.style.setProperty("transition-duration", `${props.duration}ms`);
+      if (!canDrag.value)
+        return null;
+      halfScreenY = 0;
+      if (isAnimation)
+        return null;
+      const threshold = Math.max(0, props.slideDownThreshold);
+      const isLastSwipeUp = lastDragDirection < 0;
+      let shouldClose = halfOffset >= threshold && !isLastSwipeUp;
+      if (shouldClose) {
+        isContentDragging = false;
+        doClose();
+      } else {
+        resumedPopup();
+      }
+    };
+    const onContentstart = (e) => {
+      if (!props.closeOnSlideDown)
+        return null;
+      if (props.scrollId != null && props.scrollId != "") {
+        scrollEl = uni.getElementById(props.scrollId);
+      } else {
+        scrollEl = null;
+      }
+      contentTouchStartY = e.touches[0].screenY;
+      isContentDragging = false;
+      resetDragState(contentTouchStartY);
+    };
+    const onContentmove = (e) => {
+      var _a2;
+      if (!props.closeOnSlideDown)
+        return null;
+      if (!canDrag.value || isAnimation)
+        return null;
+      const currentTouchY = e.touches[0].screenY;
+      const gestureOffset = currentTouchY - contentTouchStartY;
+      const isMovingDown = gestureOffset > 0;
+      if (isContentDragging) {
+        lockScrollAtTop();
+        onDragmove(e);
+        return null;
+      }
+      if (!isMovingDown) {
+        return null;
+      }
+      const top = (_a2 = scrollEl === null || scrollEl === void 0 ? null : scrollEl.scrollTop) !== null && _a2 !== void 0 ? _a2 : 0;
+      if (top >= 0.01) {
+        return null;
+      }
+      isContentDragging = true;
+      resetDragState(contentTouchStartY);
+      lockScrollAtTop();
+      onDragmove(e);
+    };
+    const onContentend = () => {
+      var _a2;
+      (_a2 = popupRef.value) === null || _a2 === void 0 ? null : _a2.style.setProperty("transition-duration", `${props.duration}ms`);
+      if (!props.closeOnSlideDown)
+        return null;
+      if (!isContentDragging) {
+        resumedPopup();
+        return null;
+      }
+      onDragend();
+    };
+    const rootClass = computed(() => {
+      const isZoom = props.zoom && props.position == "center";
+      const basic = [
+        ns.theme(),
+        ns.is("opacity", _opacity.value),
+        ns.m(props.position),
+        ns.is("zoom", isZoom)
+      ];
+      if (props.position == "center" && !props.zoom) {
+        basic.push("rice-popup--notzoom");
+      }
+      return basic;
+    });
+    const popupStyle = computed(() => {
+      const css = /* @__PURE__ */ new Map();
+      const position = props.position;
+      css.set("z-index", props.zIndex);
+      if (props.bgColor != null) {
+        css.set("background-color", props.bgColor);
+      }
+      if (props.position == "center" && props.marginTop != null) {
+        css.set("margin-top", addUnit(props.marginTop));
+      }
+      if (props.position != "center" && props.safeAreaInsetBottom) {
+        css.set("padding-bottom", safeAreaInsets.value.bottom + "px");
+      }
+      if (props.position != "center" && props.safeAreaInsetTop) {
+        css.set("padding-top", safeAreaInsets.value.top + "px");
+      }
+      if (props.radius != null) {
+        const radius = addUnit(props.radius);
+        if (position == "top") {
+          css.set("border-bottom-left-radius", radius);
+          css.set("border-bottom-right-radius", radius);
+        } else if (position == "bottom") {
+          css.set("border-top-left-radius", radius);
+          css.set("border-top-right-radius", radius);
+        } else if (position == "left") {
+          css.set("border-top-right-radius", radius);
+          css.set("border-bottom-right-radius", radius);
+        } else if (position == "right") {
+          css.set("border-top-left-radius", radius);
+          css.set("border-bottom-left-radius", radius);
+        } else {
+          css.set("border-radius", radius);
+        }
+      }
+      return css;
+    });
+    const closeStyle = computed(() => {
+      const css = /* @__PURE__ */ new Map();
+      if (props.position != "center" && props.safeAreaInsetBottom) {
+        css.set("bottom", safeAreaInsets.value.bottom + "px");
+      }
+      if (props.position != "center" && props.safeAreaInsetTop) {
+        css.set("top", safeAreaInsets.value.top + "px");
+      }
+      return css;
+    });
+    return () => {
+      "raw js";
+      const _setTemplateRef = _createSharedDataTemplateRefSetter();
+      const _component_rice_overlay = __easycom_0;
+      const _component_rice_icon = __easycom_0$1;
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.overlay));
+      }, () => {
+        const n2 = _createSharedDataComponentWithFallback(_component_rice_overlay, "045af48d", {
+          show: () => {
+            return show.value;
+          },
+          "z-index": () => {
+            return __props.zIndex - 1;
+          },
+          "close-on-click-overlay": false,
+          "bg-color": () => {
+            return __props.overlayBgColor;
+          },
+          onClick: () => {
+            return overlayClick;
+          }
+        });
+        _setSharedData(__sharedData, 1, n2?.sharedData);
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 2, _toSharedDataBoolean(_unref(realShow)));
+      }, () => {
+        _renderSharedDataEffect(() => {
+          _setSharedDataClass(__sharedData, 20, ["rice-popup", [__props.popupClass, _unref(rootClass)]]);
+          _setSharedDataStyle(__sharedData, 21, [_unref(popupStyle), __props.customStyle]);
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 3, _toSharedDataBoolean(__props.closeable));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            _setSharedDataClass(__sharedData, 6, ["rice-popup__close", `rice-popup__close--${__props.closeIconPosition}`]);
+            _setSharedDataStyle(__sharedData, 7, _unref(closeStyle));
+          });
+          const n7 = _createSharedDataComponentWithFallback(_component_rice_icon, "59701371", {
+            name: () => {
+              return __props.closeIcon;
+            },
+            size: "20px"
+          });
+          _setSharedData(__sharedData, 4, n7?.sharedData);
+          _setSharedDataEvent(__sharedData, 5, handleClose);
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 8, _toSharedDataBoolean(__props.showDragBar == true && __props.position == "bottom"));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            return _setSharedDataClass(__sharedData, 14, ["rice-popup__drag", __props.dragWrapClass]);
+          });
+          _createSharedDataSlot("drag", null, null, () => {
+            _renderSharedDataEffect(() => {
+              return _setSharedDataClass(__sharedData, 9, ["rice-popup__drag__bar", __props.dragBarClass]);
+            });
+          });
+          _setSharedDataEvent(__sharedData, 10, onDragstart);
+          _setSharedDataEvent(__sharedData, 11, onDragmove);
+          _setSharedDataEvent(__sharedData, 12, onDragend);
+          _setSharedDataEvent(__sharedData, 13, onDragend);
+        });
+        _createSharedDataSlot("default", null, null);
+        _setSharedDataEvent(__sharedData, 15, onContentstart);
+        _setSharedDataEvent(__sharedData, 16, onContentmove);
+        _setSharedDataEvent(__sharedData, 17, onContentend);
+        _setSharedDataEvent(__sharedData, 18, onContentend);
+        _setSharedDataTemplateRef(__sharedData, 19, (n16) => {
+          _setTemplateRef(n16, popupRef, null, "popupRef");
+        });
+      });
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {};
+const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+export {
+  __easycom_2 as _
+};
+//# sourceMappingURL=rice-popup.js.map
+ÔrF¹../../libs/utils/basic.js¿../rice-overlay/rice-overlay.js¹../rice-icon/rice-icon.js½../../libs/store/useConfig.jsÙ$../../libs/use/useCountDown/index.jsÙ$../../libs/use/useNamespace/index.jsÙ ../../libs/use/usePopup/index.jsÙ#../../libs/use/useSafeArea/index.jsÙ ../../libs/use/useTouch/index.jsÙ)../../libs/use/useRelation/useChildren.js©./type.jsÙ'../../libs/use/useRelation/useParent.jsÙ'../../../../plugin-vue-export-helper.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙ¾/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/utils/basic.jsAÃªoh-resolveÂGAÂÙÒ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-overlay/rice-overlay.jsAÃªoh-resolveÂGAÂÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-icon/rice-icon.jsAÃªoh-resolveÂGAÂÙÂ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/store/useConfig.jsAÃªoh-resolveÂGAÂÙÉ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useCountDown/index.jsAÃªoh-resolveÂGAÂÙÉ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useNamespace/index.jsAÃªoh-resolveÂGAÂÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/usePopup/index.jsAÃªoh-resolveÂGAÂÙÈ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useSafeArea/index.jsAÃªoh-resolveÂGAÂÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useTouch/index.jsAÃªoh-resolveÂGAÂÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useRelation/useChildren.jsAÃªoh-resolveÂGAÂÙÈ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-popup/type.jsAÃªoh-resolveÂGAÂÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/libs/use/useRelation/useParent.jsAÃªoh-resolveÂGAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ:€Í:À‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍ:‹Í:›ÔrL”¤type¥start£end¤nameªIdentifierÍ:‹Í:–«__easycom_2LªIdentifierÍ:šÍ:›¡_ÀÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration ÌC‘ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	
+¡_LªIdentifier«__easycom_0ÔrO•¤type¥start£end¥value£raw§Literal!ÌB¿../rice-overlay/rice-overlay.jsÙ!"../rice-overlay/rice-overlay.js"M±ImportDeclarationÌDÌƒ‘N¯ImportSpecifierÌMÌ_LªIdentifierÌMÌN¡_LªIdentifierÌRÌ_­__easycom_0$1O§LiteralÌgÌ‚¹../rice-icon/rice-icon.js»"../rice-icon/rice-icon.js"M±ImportDeclarationÌ„Ì½‘N¯ImportSpecifierÌÌ™LªIdentifierÌÌ¡aLªIdentifierÌ’Ì™§addUnitO§LiteralÌ¡Ì¼¹../../libs/utils/basic.js»"../../libs/utils/basic.js"M±ImportDeclarationÌ¾ÌìO§LiteralÌÅÌëÙ$../../libs/use/useCountDown/index.jsÙ&"../../libs/use/useCountDown/index.js"M±ImportDeclarationÌíÍO§LiteralÌôÍ½../../libs/store/useConfig.js¿"../../libs/store/useConfig.js"M±ImportDeclarationÍÍ^‘N¯ImportSpecifierÍÍ/LªIdentifierÍÍ¡uLªIdentifierÍ#Í/¬useNamespaceO§LiteralÍ7Í]Ù$../../libs/use/useNamespace/index.jsÙ&"../../libs/use/useNamespace/index.js"M±ImportDeclarationÍ_Í¶’N¯ImportSpecifierÍhÍuLªIdentifierÍhÍi¡uLªIdentifierÍmÍu¨usePopupN¯ImportSpecifierÍwÍ‹LªIdentifierÍwÍx¡ULªIdentifierÍ|Í‹¯UsePopupOptionsO§LiteralÍ“ÍµÙ ../../libs/use/usePopup/index.jsÙ""../../libs/use/usePopup/index.js"M±ImportDeclarationÍ·ÍêO§LiteralÍ¾ÍéÙ)../../libs/use/useRelation/useChildren.jsÙ+"../../libs/use/useRelation/useChildren.js"M±ImportDeclarationÍëÍO§LiteralÍòÍÙ'../../libs/use/useRelation/useParent.jsÙ)"../../libs/use/useRelation/useParent.js"M±ImportDeclarationÍÍy’N¯ImportSpecifierÍ&Í6LªIdentifierÍ&Í'¡uLªIdentifierÍ+Í6«useSafeAreaN¯ImportSpecifierÍ8ÍKLªIdentifierÍ8Í9¡sLªIdentifierÍ=ÍK®safeAreaInsetsO§LiteralÍSÍxÙ#../../libs/use/useSafeArea/index.jsÙ%"../../libs/use/useSafeArea/index.js"M±ImportDeclarationÍzÍ¤O§LiteralÍÍ£Ù ../../libs/use/useTouch/index.jsÙ""../../libs/use/useTouch/index.js"M±ImportDeclarationÍ¥Í¸O§LiteralÍ¬Í·©./type.js«"./type.js"M±ImportDeclarationÍ¹Í‘N¯ImportSpecifierÍÂÍÒLªIdentifierÍÂÍÃ¡_LªIdentifierÍÇÍÒ«_export_sfcO§LiteralÍÚÍÙ'../../../../plugin-vue-export-helper.jsÙ)"../../../../plugin-vue-export-helper.js"

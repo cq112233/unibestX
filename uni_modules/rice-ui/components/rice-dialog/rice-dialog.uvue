@@ -1,0 +1,530 @@
+<template>
+	<rice-overlay v-if="showOverlay" :show="show" :duration="duration" :close-on-click-overlay="false"
+		:bg-color="overlayBgColor" :z-index="zIndex-1" @click="overlayClick" />
+	<view v-if="realShow" :class="dialogClass" :style="[dialogStyle,customStyle]" ref="dialogRef">
+		<view v-if="hasTitle" class="rice-dialog__title">
+			<slot name="title">
+				<text class="rice-dialog__title__text">{{title}}</text>
+			</slot>
+		</view>
+		<view :class="contentClass">
+			<slot>
+				<scroll-view v-if="hasStrValue(message)" class="rice-dialog__message" :show-scrollbar="false">
+					<text :class="messageTextClass">{{message}}</text>
+				</scroll-view>
+			</slot>
+		</view>
+		<view :class="footerClass">
+			<slot name="footer">
+				<template v-if="showCancelButton">
+					<rice-button v-if="buttonTheme!='default'" type="primary" plain-fill :text="cancelButtonText"
+						:shape="buttonTheme=='round'?'round':''" :color="cancelButtonColor" :disabled="cancelButtonDisabled"
+						:style="cancelButtonStyle" @click="cancel" />
+					<view v-else :class="getButtonClass('cancel')" :hover-stay-time="100" :hover-class="cancelButtonHover"
+						@click="cancel">
+						<text class="rice-dialog__button__text" :style="cancelTextStyle">{{cancelButtonText}}</text>
+					</view>
+				</template>
+				<template v-if="showConfirmButton">
+					<rice-button v-if="buttonTheme!='default'" type="primary" :text="confirmButtonText"
+						:color="confirmButtonColor" :shape="buttonTheme=='round'?'round':''" :style="confirmButtonStyle"
+						:disabled="confirmButtonDisabled" :loading="confirmLoading" @click="confirm" />
+					<view v-else :class="getButtonClass('confirm')" :hover-class="confirmButtonHover" :hover-stay-time="100"
+						@click="confirm">
+						<text v-if="!confirmLoading" class="rice-dialog__button__text rice-dialog__button__text__confirm"
+							:style="confirmTextStyle">{{confirmButtonText}}</text>
+						<rice-loading v-else :color="confirmButtonColor" />
+					</view>
+				</template>
+			</slot>
+		</view>
+
+	</view>
+
+</template>
+
+<script setup>
+	import { useNamespace } from '../../libs/use';
+	import { addUnit, callInterceptor, hasStrValue } from "../../libs/utils"
+	import { BeforeChangeInterceptor } from "../../libs/types"
+	import { isDark } from "../../libs/store"
+	import { showDialog, hideDialog } from "./api.uts"
+	import { DialogProps } from './type.uts';
+
+	defineOptions({
+		name: 'rice-dialog',
+		styleIsolation: 'app-and-page'
+	})
+
+	const ns = useNamespace('dialog')
+	const slots = useSlots()
+
+	const emit = defineEmits<{
+		confirm : [],
+		cancel : [],
+		open : [],
+		close : [],
+		closed : [],
+		opened : [],
+		clickOverlay : [],
+	}>()
+
+	const show = defineModel('show', {
+		type: Boolean,
+		default: false,
+	})
+
+	const props = withDefaults(defineProps<DialogProps>(), {
+		duration: 250,
+		messageAlign: 'center',
+		buttonTheme: 'default',
+		buttonLayout: 'row',
+		showConfirmButton: true,
+		confirmButtonText: '确认',
+		confirmButtonDisabled: false,
+		showCancelButton: true,
+		cancelButtonText: '取消',
+		cancelButtonDisabled: false,
+		overlay: true,
+		overlayBgColor: 'rgba(0,0,0,.6)',
+		zIndex: 999,
+		closeOnClickOverlay: false,
+		useDialogPage: true,
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+	const hasTitle = computed(() => slots['title'] != null || hasStrValue(props.title))
+
+	let openTimer : number | null = null
+	let openedTimer : number | null = null
+	let closeTimer : number | null = null
+
+	const handleOpenTimer = () => {
+		if (openTimer != null) clearTimeout(openTimer!)
+		if (openedTimer != null) clearTimeout(openedTimer!)
+	}
+
+	const handleCloseTimer = () => {
+		if (closeTimer != null) clearTimeout(closeTimer!)
+	}
+
+	const realShow = ref(false)
+	const dialogRef = shallowRef<UniElement | null>(null)
+
+	const open = async () => {
+		if (realShow.value) return
+		realShow.value = true
+		await nextTick()
+		handleOpenTimer()
+		openTimer = setTimeout(() => {
+			dialogRef.value?.style.setProperty('transition-duration', props.duration + 'ms')
+			dialogRef.value?.style.setProperty('opacity', '1')
+			dialogRef.value?.style.setProperty('transform', 'translate(-50%, -50%) scale(1)')
+			openedTimer = setTimeout(() => {
+				emit('opened')
+			}, props.duration)
+		}, 30)
+	}
+
+
+	// #ifdef APP
+	const hasDialogPage = ref(true)
+	//使用dialogPage的前提：useDialogPage为true且没有使用插槽
+	const isUseDialogPage = computed(() => props.useDialogPage == true && hasDialogPage.value && slots['title'] == null && slots['default'] == null && slots['footer'] == null)
+	const dialogPageIns = ref<UniPage | null>(null)
+	const handleShowDialog = () => {
+		// toRefs() 仅支持 Array 和 UTSJSONObject, 不支持自定义类型。App端此处不能使用toRefs
+		// 也不能使用JSON.parse 进行转换（APP端数据会丢失）
+		showDialog({
+			title: props.title,
+			message: props.message,
+			messageAlign: props.messageAlign,
+			buttonTheme: props.buttonTheme,
+			buttonLayout: props.buttonLayout,
+			showConfirmButton: props.showConfirmButton,
+			confirmButtonText: props.confirmButtonText,
+			confirmButtonColor: props.confirmButtonColor,
+			confirmButtonDisabled: props.confirmButtonDisabled,
+			showCancelButton: props.showCancelButton,
+			cancelButtonText: props.cancelButtonText,
+			cancelButtonColor: props.cancelButtonColor,
+			cancelButtonDisabled: props.cancelButtonDisabled,
+			duration: props.duration,
+			overlay: props.overlay,
+			overlayBgColor: props.overlayBgColor,
+			closeOnClickOverlay: props.closeOnClickOverlay,
+			beforeClose: props.beforeClose as BeforeChangeInterceptor | null,
+			bgColor: props.bgColor,
+			zIndex: props.zIndex,
+			marginTop: props.marginTop,
+			confirm: () => {
+				emit('confirm')
+			},
+			cancel: () => {
+				emit('cancel')
+			},
+			ready: (pageIns : UniPage | null) => {
+				dialogPageIns.value = pageIns
+				hasDialogPage.value = true
+			},
+			open: () => {
+				emit('open')
+			},
+			close: () => {
+				if (show.value) {
+					show.value = false
+					emit('close')
+				}
+			},
+			opened: () => {
+				emit('opened')
+			},
+			closed: () => {
+				emit('closed')
+			},
+			fail: () => {
+				hasDialogPage.value = false
+				emit('open')
+				open()
+			}
+		})
+	}
+
+	watch(
+		() : (any | null)[] =>
+			[
+				props.title,
+				props.message,
+			],
+		() => {
+			if (show.value) {
+				dialogPageIns.value?.vm?.$callMethod('updateParams', {
+					title: props.title,
+					message: props.message,
+				} as DialogProps)
+			}
+		})
+
+	//#endif
+
+	const showOverlay = computed(() => {
+		//#ifdef APP
+		return isUseDialogPage.value ? false : props.overlay
+		//#endif
+		//#ifndef APP
+		return props.overlay
+		//#endif
+	})
+
+	const close = () => {
+		if (!realShow.value) return
+		dialogRef.value?.style.setProperty('opacity', '0')
+		dialogRef.value?.style.setProperty('transform', `translate(-50%, -50%) scale(0.85)`)
+		handleCloseTimer()
+		closeTimer = setTimeout(() => {
+			realShow.value = false
+			emit('closed')
+			//#ifdef APP
+			dialogPageIns.value = null
+			//#endif
+		}, props.duration)
+
+	}
+
+
+	const confirmLoading = ref(false)
+	const confirm = () => {
+		if (props.confirmButtonDisabled || confirmLoading.value) return
+		emit('confirm')
+		if (typeof props.beforeClose != 'function') {
+			show.value = false
+			return
+		}
+		//异步控制-
+		confirmLoading.value = true
+		callInterceptor(props.beforeClose as BeforeChangeInterceptor, {
+			done() {
+				show.value = false
+			},
+			complete() {
+				confirmLoading.value = false
+			}
+		})
+	}
+
+	const cancel = () => {
+		if (props.cancelButtonDisabled) return
+		show.value = false
+		emit('cancel')
+	}
+
+	const overlayClick = () => {
+		if (props.closeOnClickOverlay) {
+			show.value = false
+		}
+		emit('clickOverlay')
+	}
+
+	watch(show, (newVal : boolean) => {
+		if (newVal && !realShow.value) {
+			// #ifdef APP
+			if (isUseDialogPage.value) {
+				handleShowDialog()
+				return
+			}
+			// #endif
+			open()
+			emit('open')
+		}
+		if (!newVal && realShow.value) {
+			close()
+			emit('close')
+		}
+	}, {
+		immediate: true
+	})
+
+	const cancelButtonHover = computed(() => props.cancelButtonDisabled
+		? 'none'
+		: `rice-dialog__button--${isDark.value ? 'hover--dark' : 'hover'}`)
+	const confirmButtonHover = computed(() => (props.confirmButtonDisabled || confirmLoading.value) ?
+		'none' :
+		`rice-dialog__button--${isDark.value ? 'hover--dark' : 'hover'}`)
+
+	const dialogStyle = computed(() => {
+		const css = new Map<string, string | number>()
+		css.set('z-index', props.zIndex)
+		if (props.width != null) {
+			css.set('width', addUnit(props.width!))
+		}
+		if (props.marginTop != null) {
+			css.set('margin-top', addUnit(props.marginTop!))
+		}
+		if (hasStrValue(props.bgColor)) {
+			css.set('background-color', props.bgColor!)
+		}
+		return css
+	})
+
+	const cancelTextStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (hasStrValue(props.cancelButtonColor)) {
+			css.set('color', props.cancelButtonColor!)
+		}
+		return css
+	})
+
+	const confirmTextStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (hasStrValue(props.confirmButtonColor)) {
+			css.set('color', props.confirmButtonColor!)
+		}
+		return css
+	})
+
+	const dialogClass = computed(() => {
+		return [
+			ns.b(""),
+			ns.theme(),
+
+		]
+	})
+
+	const contentClass = computed(() => {
+		return [
+			ns.e("content"),
+			ns.is("__content--has-title", hasTitle.value)
+		]
+	})
+
+	const messageTextClass = computed(() => {
+		return [
+			ns.e('message__text'),
+			ns.e(`message__${props.messageAlign}`),
+		]
+	})
+
+
+	const footerClass = computed(() => {
+		const hasSlot = slots['footer'] != null
+		const isDefaultTheme = props.buttonTheme == 'default'
+		return [
+			ns.e('footer'),
+			ns.is('__footer--border', isDefaultTheme && !hasSlot),
+			ns.is('__footer--vertical', props.buttonLayout == 'col' && !isDefaultTheme && !hasSlot),
+			ns.is('__footer--btn', !isDefaultTheme && !hasSlot)
+		]
+	})
+
+	const getButtonClass = (type : string) => {
+		const base = [
+			ns.e("button"),
+			ns.is(`__button--disabled`, type == 'cancel' ? props.cancelButtonDisabled : props.confirmButtonDisabled)
+		]
+		if (type == 'cancel' && props.showConfirmButton) {
+			base.push(ns.e('button--border'))
+		}
+		return base
+	}
+
+	const cancelButtonStyle = computed(() => {
+		const isVertical = props.buttonLayout == 'col'
+		const css = new Map<string, string | number>()
+		if (props.buttonLayout == 'row') {
+			css.set('flex', 1)
+		}
+		css.set('marginRight', props.showConfirmButton && !isVertical ? '12px' : '0px')
+		css.set('marginTop', props.showConfirmButton && isVertical ? '12px' : '0px')
+		return css
+		// return {
+		// 	flex: props.buttonLayout == 'row' ? 1 : 'none',
+		// 	marginRight: props.showConfirmButton && !isVertical ? '12px' : '0px',
+		// 	marginTop: props.showConfirmButton && isVertical ? '12px' : '0px'
+		// }
+	})
+
+	const confirmButtonStyle = computed(() => {
+		const css = new Map<string, string | number>()
+		if (props.buttonLayout == 'row') {
+			css.set('flex', 1)
+		}
+		// return {
+		// 	flex: props.buttonLayout == 'row' ? 1 : 'none',
+		// }
+		return css
+
+	})
+
+	onUnmounted(() => {
+		handleOpenTimer()
+		handleCloseTimer()
+	})
+</script>
+<style scoped lang="scss">
+	$gap: 24px;
+
+	.rice-dialog {
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		width: 320px;
+		background-color: var(--rice-dialog-background);
+		border-radius: 12px;
+		opacity: 0;
+		transform: translate(-50%, -50%) scale(0.8);
+		transition-property: opacity, transform;
+
+		&__title {
+			align-items: center;
+			padding: $gap 16px 0;
+
+			&__text {
+				width: 100%;
+				font-size: 17px;
+				font-weight: bold;
+				text-align: center;
+				color: var(--rice-text-color);
+				/* #ifndef VUE3-VAPOR */
+				lines: 2;
+				/* #endif */
+
+				text-overflow: ellipsis;
+				/* #ifndef APP */
+				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				/* 限制显示两行 */
+				-webkit-box-orient: vertical;
+				overflow: hidden;
+				word-break: break-all;
+				/* #endif */
+			}
+		}
+
+		&__content {
+			justify-content: center;
+			align-items: center;
+			padding: $gap 16px;
+
+			&--has-title {
+				padding-top: 16px;
+			}
+		}
+
+		&__message {
+			max-height: 280px;
+			width: 100%;
+
+			&__text {
+				font-size: 16px;
+				color: var(--rice-dialog-message-text-color);
+				text-align: center;
+				/* #ifndef APP */
+				word-break: break-all;
+				/* #endif */
+			}
+
+			&__left {
+				text-align: left
+			}
+
+			&__right {
+				text-align: right
+			}
+		}
+
+		&__footer {
+			flex-direction: row;
+			width: 100%;
+
+			&--border {
+				border-top: 1px solid var(--rice-border-color);
+			}
+
+			&--vertical {
+				flex-flow: column-reverse;
+			}
+
+			&--btn {
+				padding: 0 16px $gap;
+
+			}
+
+		}
+
+		&__button {
+			height: 48px;
+			flex: 1;
+			align-items: center;
+			justify-content: center;
+
+			&__text {
+				text-align: center;
+				font-size: 16px;
+				color: var(--rice-text-color);
+				font-weight: bold;
+
+				&__confirm {
+					color: var(--rice-primary-color);
+				}
+			}
+
+			&--disabled {
+				opacity: .5;
+			}
+
+			&--border {
+				border-right: 1px solid var(--rice-border-color);
+			}
+
+			//ios 平台hover如果使用css变量会有问题，按下去后背景色会一直是hover的背景色
+			&--hover {
+				background-color: #f2f3f5;
+
+				&--dark {
+					background-color: #3a3a3c;
+				}
+			}
+
+		}
+	}
+</style>

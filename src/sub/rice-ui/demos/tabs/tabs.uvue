@@ -1,0 +1,70 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Tabs 选项卡" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <!-- 基础选项卡 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">基础选项卡</text>
+        <rice-tabs v-model="tabIndex1" :list="tabList1" :color="currentTheme" />
+        <view class="p-16px mt-8px bg-[#f8fafc] rounded-8px">
+          <text class="text-14px text-[#334155]">当前标签内容：{{ tabList1[tabIndex1].name }}</text>
+        </view>
+      </view>
+
+      <!-- 多个可滚动标签 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">多标签横向滑动</text>
+        <rice-tabs v-model="tabIndex2" :list="tabList2" :color="currentTheme" />
+        <view class="p-16px mt-8px bg-[#f8fafc] rounded-8px">
+          <text class="text-14px text-[#334155]">当前标签内容：{{ tabList2[tabIndex2].name }}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store'
+import type { TabsOptions } from '@/uni_modules/rice-ui'
+import { computed } from 'vue'
+
+const appStore = useAppStore()
+const currentTheme = computed((): string => appStore.state.theme)
+
+const tabIndex1 = ref(0)
+const tabIndex2 = ref(0)
+
+const tabList1: TabsOptions[] = [
+  { name: '关注' } as TabsOptions,
+  { name: '推荐' } as TabsOptions,
+  { name: '热榜' } as TabsOptions,
+]
+
+const tabList2: TabsOptions[] = [
+  { name: '综合' } as TabsOptions,
+  { name: '前端' } as TabsOptions,
+  { name: 'Android' } as TabsOptions,
+  { name: 'iOS' } as TabsOptions,
+  { name: 'Harmony' } as TabsOptions,
+  { name: 'AI' } as TabsOptions,
+  { name: '工具' } as TabsOptions,
+]
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 14px;
+  background-color: #ffffff;
+  border-radius: 10px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 12px;
+  padding-left: 6px;
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+</style>

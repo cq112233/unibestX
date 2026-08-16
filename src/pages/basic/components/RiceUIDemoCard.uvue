@@ -1,0 +1,71 @@
+<template>
+  <Card title="Rice UI 组件库">
+    <view class="flex-col mb-16px">
+      <text class="text-13px text-[#64748b] leading-18px mb-12px">
+        Rice UI 是一款专为 uni-app X 打造的多端 UI 组件库，支持 Android、iOS、鸿蒙Next、蒸汽模式、微信小程序与 H5，内置 48+ 丰富组件与暗黑模式。
+      </text>
+
+      <!-- 官网网址提示 -->
+      <view class="flex-row items-center bg-[#f1f5f9] p-8px rounded-6px mb-12px" @click="copyWebsiteUrl">
+        <text class="text-12px text-[#475569] font-medium mr-4px">官网：</text>
+        <text class="text-12px text-[#2563eb] underline flex-1">https://riceui.cn/</text>
+        <text class="text-11px text-[#94a3b8]">点击复制</text>
+      </view>
+
+      <!-- 亮点标签点缀 -->
+      <view class="flex-row items-center mb-4px flex-wrap">
+        <view class="mr-6px mb-4px px-10px py-3px rounded-20px bg-[#e0edff] border-width-1px border-solid border-color-[#bfdbfe]">
+          <text class="text-11px text-[#2563eb] font-medium">48+ 丰富组件</text>
+        </view>
+        <view class="mr-6px mb-4px px-10px py-3px rounded-20px bg-[#d1fae5] border-width-1px border-solid border-color-[#a7f3d0]">
+          <text class="text-11px text-[#059669] font-medium">支持蒸汽模式</text>
+        </view>
+        <view class="mb-4px px-10px py-3px rounded-20px bg-[#fef3c7] border-width-1px border-solid border-color-[#fde68a]">
+          <text class="text-11px text-[#d97706] font-medium">暗黑与主题定制</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 进入演示页面按钮 -->
+    <view
+      class="w-full h-44px rounded-8px flex flex-row items-center justify-center"
+      :style="{ backgroundColor: currentTheme }"
+      @click="navigateToShowcase"
+    >
+      <text class="text-[#ffffff] text-14px font-bold">进入 Rice UI 示例</text>
+    </view>
+  </Card>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store'
+import { computed } from 'vue'
+import Card from './Card.uvue'
+
+const appStore = useAppStore()
+const currentTheme = computed((): string => appStore.state.theme)
+
+function copyWebsiteUrl() {
+  uni.setClipboardData({
+    data: 'https://riceui.cn/',
+    success: () => {
+      uni.showToast({
+        title: '官网网址已复制到剪贴板',
+        icon: 'none',
+      })
+    },
+  })
+}
+
+function navigateToShowcase() {
+  uni.navigateTo({
+    url: '/src/sub/rice-ui/rice-ui',
+    fail: (err) => {
+      console.error('navigateToShowcase fail:', err)
+    },
+  })
+}
+</script>
+
+<style>
+</style>

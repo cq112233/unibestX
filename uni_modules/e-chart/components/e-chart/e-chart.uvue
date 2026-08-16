@@ -1,5 +1,5 @@
 <script setup lang="uts">
-import { computed, ref, watch, onMounted } from 'vue'
+import { computed, ref, watch, onMounted, getCurrentInstance } from 'vue'
 
 // #ifdef WEB || MP
 import * as echarts from './js/echarts.esm.min.js'
@@ -45,6 +45,7 @@ const echartObj = ref<WebviewEchart | null>(null)
 let echartObj: any = null
 let echartCanvas: any = null
 let _resizeTimer: any = null
+const instance = getCurrentInstance()
 // #endif
 
 const canvasId = getRandomId()
@@ -84,6 +85,19 @@ function initWeb(option: UTSJSONObject) {
   }
 
   return { echartCanvas, echartObj, canvasId, width: echartDom.clientWidth, height: echartDom.clientHeight }
+}
+// #endif
+
+// #ifndef APP
+function getCanvasQuery(): any {
+  let query = uni.createSelectorQuery()
+  // #ifndef MP-ALIPAY
+  if (instance != null && instance.proxy != null) {
+    // @ts-ignore
+    query = query.in(instance.proxy)
+  }
+  // #endif
+  return query.select(`#${canvasId}`)
 }
 // #endif
 
@@ -133,15 +147,6 @@ async function initMP(option: UTSJSONObject) {
   return { echartCanvas: node, echartObj, canvasId, width, height }
 }
 
-function getCanvasQuery() {
-  let query = uni.createSelectorQuery()
-  // #ifndef MP-ALIPAY
-  // @ts-ignore
-  query = query.in(this)
-  // #endif
-  return query.select(`#${canvasId}`)
-}
-
 function getMpCanvas(): Promise<any> {
   return new Promise((resolve) => {
     getCanvasQuery().fields({ node: true, size: true }).exec((res) => {
@@ -166,7 +171,7 @@ function getMpCanvas(): Promise<any> {
 // #endif
 
 // #ifdef APP
-function initAPP(option: UTSJSONObject): any {
+function initAPP(option: UTSJSONObject): UTSJSONObject | null {
   const ctx = uni.createWebviewContext(canvasId)
   if (ctx == null) {
     console.error('初始化echart的webview失败')
@@ -174,8 +179,8 @@ function initAPP(option: UTSJSONObject): any {
   }
   echartObj.value = new WebviewEchart(ctx)
   echartObj.value!.init(props.theme)
-  setOption(option)
-  return { echartObj: echartObj.value }
+  echartObj.value?.setOption(option)
+  return { echartObj: echartObj.value } as UTSJSONObject
 }
 // #endif
 
@@ -189,11 +194,11 @@ async function init(option: UTSJSONObject): Promise<any> {
   // #endif
 
   // #ifdef APP
-  return initAPP(option) as UTSJSONObject
+  return initAPP(option)
   // #endif
 }
 
-function getEchartObj(): any {
+function getEchartObj(): any | null {
   // #ifdef APP
   return echartObj.value
   // #endif
@@ -412,11 +417,11 @@ function onWebviewError(e: UniWebViewErrorEvent) {
 }
 // #endif
 
-watch(() => props.width, () => {
+watch((): any => props.width, () => {
   resize()
 })
 
-watch(() => props.height, () => {
+watch((): any => props.height, () => {
   resize()
 })
 

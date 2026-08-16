@@ -1,0 +1,26 @@
+
+export type ProgressCircleDrawParams = {
+	radius : number,
+	centerX : number,
+	centerY : number,
+	startAngle : number,
+	endAngle : number,
+	progressAngle : number,
+}
+
+
+export type ProgressCircleProps = {
+	percentage : string | number,
+	type ?: 'circle' | 'dashboard',
+	size ?: string | number,
+	duration ?: number,
+	strokeWidth ?: number,
+	showText ?: boolean,
+	textColor ?: string,
+	textSize ?: string | number,
+	format ?: (percentage : number) => string,
+	color ?: string,
+	inactiveColor ?: string,
+	gapAngle ?: number,
+	customStyle ?: UTSJSONObject
+}

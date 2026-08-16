@@ -1,0 +1,159 @@
+import { BeforeChangeInterceptor } from "../../types"
+import { callInterceptor } from "../../utils"
+
+export type UsePopup = {
+	realShow : Ref<boolean>,
+	doClose : () => void,
+}
+
+export type UsePopupOptions = {
+	show : Ref<boolean>,
+	position ?: Ref<string> | string,
+	duration ?: Ref<number> | number,
+	opacity ?: Ref<boolean> | boolean,
+	zoom ?: Ref<boolean> | boolean,
+	zoomScale ?: number,
+	beforeClose ?: Ref<BeforeChangeInterceptor | null> | null,
+}
+
+
+export function usePopup(target : Ref<UniElement | null>, options : UsePopupOptions) {
+
+	const { show } = options
+
+	const instance = getCurrentInstance()!
+
+	const realShow = ref(false)
+	const closing = ref(false)
+
+	let openTimer : number | null = null
+	let openedTimer : number | null = null
+	let closeTimer : number | null = null
+
+	const position = computed(() => toValue(options.position ?? 'bottom'))
+	const duration = computed(() => toValue(options.duration ?? 300))
+	const isOpacity = computed(() => toValue(options.opacity ?? false))
+	const isZoom = computed(() => toValue(options.zoom ?? true))
+
+	const handleOpenTimer = () => {
+		if (openTimer != null) clearTimeout(openTimer!)
+		if (openedTimer != null) clearTimeout(openedTimer!)
+	}
+
+	const handleCloseTimer = () => {
+		if (closeTimer != null) clearTimeout(closeTimer!)
+	}
+
+
+	/**
+	 * 打开popup
+	 */
+	const open = async () => {
+		if (realShow.value) return
+		realShow.value = true
+		await nextTick()
+		instance.emit('open')
+		handleOpenTimer()
+		openTimer = setTimeout(() => {
+			target.value?.style.setProperty('transition-duration', `${duration.value}ms`)
+			target.value?.style.setProperty('opacity', '1')
+			if (position.value == 'center') {
+				target.value?.style.setProperty('transform', 'translate(-50%, -50%) scale(1)')
+			} else {
+				// #ifdef APP-HARMONY
+				target.value?.style.setProperty('transform', 'translate(0, 0) scale(1)')
+				// #endif
+				// #ifndef APP-HARMONY
+				target.value?.style.setProperty('transform', 'translate(0, 0)')
+				// #endif
+			}
+			openedTimer = setTimeout(() => {
+				instance.emit('opened')
+			}, duration.value)
+
+		}, 50)
+
+	}
+
+	/**
+	 * 关闭popup
+	 */
+	const close = () => {
+		if (!realShow.value) return
+		instance.emit('close')
+
+		const opacity = isOpacity.value ? '0' : '1'
+		target.value?.style.setProperty('opacity', opacity)
+
+		if (position.value == 'top') {
+			target.value?.style.setProperty('transform', 'translate(0, -100%)')
+		} else if (position.value == 'bottom') {
+			target.value?.style.setProperty('transform', 'translate(0px, 100%)')
+		} else if (position.value == 'left') {
+			target.value?.style.setProperty('transform', 'translate(-100%, 0)')
+		} else if (position.value == 'right') {
+			target.value?.style.setProperty('transform', 'translate(100%, 0)')
+		} else {
+			const scale = isZoom.value == true ? (options.zoomScale ?? 0.6) : 1
+			target.value?.style.setProperty('transform', `translate(-50%, -50%) scale(${scale})`)
+		}
+		handleCloseTimer()
+		closeTimer = setTimeout(() => {
+			realShow.value = false
+			instance.emit('closed')
+		}, duration.value)
+	}
+
+
+	/**
+	 * 执行关闭
+	 */
+	const doClose = () => {
+		if (!show.value || closing.value) return
+		closing.value = true
+		const beforeClose = options.beforeClose?.value
+
+		//异步关闭
+		if (typeof beforeClose == 'function') {
+			callInterceptor(beforeClose as BeforeChangeInterceptor, {
+				done() {
+					options.show.value = false
+				},
+				complete() {
+					closing.value = false
+				}
+			})
+		} else {
+			options.show.value = false
+			closing.value = false
+		}
+	}
+
+	watch(show, (newVal : boolean) => {
+		if (newVal && !realShow.value) {
+			open()
+		}
+		if (!newVal && realShow.value) {
+			close()
+		}
+	})
+
+	onMounted(() => {
+		if (show.value) {
+			realShow.value = true
+			open()
+		}
+	})
+
+	onUnmounted(() => {
+		handleOpenTimer()
+		handleCloseTimer()
+	})
+
+
+	return {
+		realShow,
+		doClose
+	} as UsePopup
+
+}

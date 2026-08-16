@@ -1,0 +1,4 @@
+import { getRandomStr } from "../../libs/utils"
+export * from "./type.uts"
+export const formItemContextInjectKey = `FormItemContextKey-${getRandomStr()}`
+export const formItemBlurInjectKey = `FormItemBlurKey-${getRandomStr()}`

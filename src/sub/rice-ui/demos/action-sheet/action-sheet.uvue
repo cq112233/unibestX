@@ -1,0 +1,80 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="ActionSheet 动作面板" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <!-- 基础动作面板 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">基础用法</text>
+        <rice-button type="primary" :color="currentTheme" text="打开基础动作面板" @click="showActionSheet1 = true" />
+        <rice-action-sheet
+          v-model:show="showActionSheet1"
+          :actions="actions1"
+          :show-cancel="true"
+          title="请选择操作"
+          @select="onSelect"
+        />
+      </view>
+
+      <!-- 包含危险状态与副标题 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">状态展示</text>
+        <rice-button type="warning" text="打开带描述动作面板" @click="showActionSheet2 = true" />
+        <rice-action-sheet
+          v-model:show="showActionSheet2"
+          :actions="actions2"
+          :show-cancel="true"
+          @select="onSelect"
+        />
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store'
+import type { ActionSheetAction } from '@/uni_modules/rice-ui'
+import { computed } from 'vue'
+
+const appStore = useAppStore()
+const currentTheme = computed((): string => appStore.state.theme)
+
+const showActionSheet1 = ref(false)
+const showActionSheet2 = ref(false)
+
+const actions1: ActionSheetAction[] = [
+  { name: '选项一' } as ActionSheetAction,
+  { name: '选项二' } as ActionSheetAction,
+  { name: '选项三' } as ActionSheetAction,
+]
+
+const actions2: ActionSheetAction[] = [
+  { name: '分享到微信', subname: '分享给微信好友' } as ActionSheetAction,
+  { name: '保存到相册', subname: '保存高清图片' } as ActionSheetAction,
+  { name: '删除该项', color: '#ee0a24' } as ActionSheetAction,
+]
+
+function onSelect(action: ActionSheetAction) {
+  uni.showToast({
+    title: `选择了: ${action.name}`,
+    icon: 'none',
+  })
+}
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 14px;
+  background-color: #ffffff;
+  border-radius: 10px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 12px;
+  padding-left: 6px;
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+</style>

@@ -1,0 +1,85 @@
+<template>
+	<view class="rice-count-down" :class="ns.theme()" :style="customStyle">
+		<slot :current="current">
+			<text class="rice-count-down__text" :class="textClass" :style="textStyle">{{timeValue}}</text>
+		</slot>
+	</view>
+</template>
+
+<script setup>
+	import { useCountDown, useNamespace, CurrentTime, UseCountDownOptions } from '../../libs/use';
+	import { addUnit, padZero } from "../../libs/utils"
+	import { formatTime } from "./utils"
+	import { CountDownProps } from "./type.uts"
+
+	defineOptions({
+		name: 'rice-count-down',
+		styleIsolation: "app-and-page",
+		externalClasses: ['text-class']
+	})
+
+	defineSlots<{
+		default(props : { current : CurrentTime }) : any
+	}>()
+
+	const emit = defineEmits<{
+		change : [current: CurrentTime],
+		finish : [],
+	}>()
+
+	const ns = useNamespace('count-down')
+	const props = withDefaults(defineProps<CountDownProps>(), {
+		time: 0,
+		format: 'HH:mm:ss',
+		autoStart: true,
+		millisecond: false,
+		textClass: "",
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+	const { current, start, pause, reset } = useCountDown({
+		time: props.time,
+		millisecond: props.millisecond,
+		onChange: (current : CurrentTime) => emit('change', current),
+		onFinish: () => emit('finish')
+	} as UseCountDownOptions)
+
+	const timeValue = computed(() => formatTime(props.format, current.value))
+
+	const resetTime = () => {
+		reset(props.time)
+		if (props.autoStart) {
+			start()
+		}
+	}
+
+	watch(() : number => props.time, () => {
+		resetTime()
+	}, {
+		immediate: true
+	})
+
+	const textStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.fontSize != null) css.set('font-size', addUnit(props.fontSize!))
+		if (props.color != null) css.set('color', props.color!)
+
+		return css
+	})
+
+	defineExpose({
+		//兼容 Android的写法
+		start: () => start(),
+		pause: () => pause(),
+		reset: resetTime
+	})
+</script>
+
+<style scoped lang="scss">
+	.rice-count-down {
+		&__text {
+			font-size: 15px;
+			color: var(--rice-text-color);
+		}
+	}
+</style>

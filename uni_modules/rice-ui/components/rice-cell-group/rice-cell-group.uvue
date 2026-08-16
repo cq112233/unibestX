@@ -1,0 +1,63 @@
+<template>
+	<text v-if="hasStrValue(title)" class="rice-cell-group__title" :class="ns.theme()"
+		:style="titleStyle">{{title}}</text>
+	<view :class="cellGroupClass" :style="[cellGroupStyle,customStyle]">
+		<slot />
+	</view>
+</template>
+
+<script setup>
+	import { hasStrValue, addUnit } from "../../libs/utils"
+	import { useNamespace } from "../../libs/use"
+	import { CellGroupProps } from "./type.uts"
+
+	defineOptions({
+		name: 'rice-cell-group',
+		styleIsolation: 'app-and-page'
+	})
+
+	const ns = useNamespace("cell-group")
+
+	const props = withDefaults(defineProps<CellGroupProps>(), {
+		border: false,
+		titleStyle: () : UTSJSONObject => ({}),
+		customStyle: () : UTSJSONObject => ({}),
+	})
+
+	const cellGroupStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.radius != null) {
+			css.set('border-radius', addUnit(props.radius!))
+		}
+		return css
+	})
+
+	const cellGroupClass = computed(() => {
+		return [
+			ns.b(""),
+			ns.theme(),
+			ns.is('border', props.border)
+		]
+	})
+
+
+</script>
+
+<style scoped lang="scss">
+	@import "../../libs/style/mixins/hairline";
+
+	.rice-cell-group {
+		background-color: var(--rice-cell-background);
+
+		&__title {
+			padding: 16px;
+			color: var(--rice-text-color-2);
+			font-size: 15px;
+
+		}
+
+		&--border {
+			@include hairline-top-bottom;
+		}
+	}
+</style>

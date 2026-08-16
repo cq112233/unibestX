@@ -1,0 +1,38 @@
+export type SliderValue = number | number[]
+
+export type SliderInitData = {
+	dragging : 'first' | 'second' | 'none',
+	moveReady : boolean,
+	firstValue : number,
+	secondValue : number,
+	startValue : SliderValue,
+	sliderWidth : number,
+	sliderHeight : number,
+	trackLeft : number,
+	trackTop : number,
+	trackWidth : number,
+	trackHeight : number,
+}
+
+export type SliderProps = {
+	min ?: number,
+	max ?: number,
+	step ?: number,
+	range ?: boolean,
+	showValue ?: boolean,
+	valuePosition ?: 'top' | 'right' | 'none',
+	valueColor ?: string,
+	formatValuetip ?: (value : number) => number | string,
+	disabled ?: boolean,
+	readonly ?: boolean,
+	mode ?: 'capsule' | 'default',
+	trackHeight ?: string | number,
+	buttonSize ?: string | number,
+	buttonColor ?: string,
+	buttonBorderColor ?: string,
+	buttonClass ?: string,
+	activeColor ?: string,
+	inactiveColor ?: string,
+	clickChange ?: boolean,
+	customStyle ?: UTSJSONObject
+}

@@ -1,0 +1,181 @@
+:host{display:flex;flex-direction:column}
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.rice-color-picker.data-v-7188e107 {
+  padding: 12px;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  background-color: var(--rice-color-picker-background);
+}
+.rice-color-picker__panel.data-v-7188e107 {
+  position: relative;
+  height: 150px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+.rice-color-picker__panel--base.data-v-7188e107, .rice-color-picker__panel--white.data-v-7188e107, .rice-color-picker__panel--black.data-v-7188e107 {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+.rice-color-picker__panel--white.data-v-7188e107 {
+  background-image: linear-gradient(to right, white, rgba(255, 255, 255, 0));
+}
+.rice-color-picker__panel--black.data-v-7188e107 {
+  background-image: linear-gradient(to top, black, rgba(0, 0, 0, 0));
+}
+.rice-color-picker__panel--cursor.data-v-7188e107 {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  border: 2px solid #fff;
+}
+.rice-color-picker__slider.data-v-7188e107 {
+  flex-direction: row;
+  align-items: center;
+}
+.rice-color-picker__slider__preview.data-v-7188e107 {
+  height: 36px;
+  width: 36px;
+  border-radius: 4px;
+  margin-right: 12px;
+}
+.rice-color-picker__slider__drag.data-v-7188e107 {
+  flex: 1;
+}
+.rice-color-picker__slider__view.data-v-7188e107 {
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+}
+.rice-color-picker--slider.data-v-7188e107 {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+.rice-color-picker--alpha.data-v-7188e107 {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  transform: translateY(-50%);
+  flex-direction: row;
+  height: 8px;
+  border-radius: 8px;
+}
+.rice-color-picker--alpha__img.data-v-7188e107 {
+  height: 100%;
+}
+.rice-color-picker__preset.data-v-7188e107 {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.rice-color-picker__preset__item.data-v-7188e107 {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  margin-top: 8px;
+  margin-right: 8px;
+  border: 1px solid var(--rice-border-color);
+}
+.rice-color-picker__preset__view.data-v-7188e107 {
+  width: 100%;
+  height: 100%;
+}
+.rice-color-picker__result.data-v-7188e107 {
+  margin-top: 12px;
+  flex-direction: row;
+  justify-content: center;
+}
+.rice-color-picker__result__box.data-v-7188e107 {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  margin-left: 12px;
+  border: 1px solid var(--rice-border-color);
+  border-radius: 4px;
+  height: 28px;
+}
+.rice-color-picker__result__input.data-v-7188e107 {
+  font-size: 15px;
+  color: var(--rice-text-color-2);
+  flex: 1;
+  text-align: center;
+  border-right: 1px solid var(--rice-border-color);
+  height: 100%;
+}
+.rice-color-picker__result__alpha.data-v-7188e107 {
+  flex-direction: row;
+  align-items: center;
+  flex: 1;
+  height: 100%;
+}
+.rice-color-picker__result__input2.data-v-7188e107 {
+  font-size: 15px;
+  color: var(--rice-text-color-2);
+  flex: 1;
+  height: 100%;
+  text-align: right;
+  padding-right: 2px;
+}
+.rice-color-picker__result__text.data-v-7188e107 {
+  font-size: 15px;
+  color: var(--rice-text-color-2);
+  text-align: center;
+  width: 65px;
+}
+.rice-color-picker__result__text2.data-v-7188e107 {
+  font-size: 15px;
+  color: var(--rice-text-color-2);
+  width: 36%;
+}
+.rice-color-picker__result__symbol.data-v-7188e107 {
+  width: 30%;
+  text-align: right;
+  padding-right: 2px;
+}
+.rice-color-picker__switch.data-v-7188e107 {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  width: 72px;
+  border-radius: 4px;
+  border: 1px solid var(--rice-border-color);
+}
+.rice-color-picker__switch__text.data-v-7188e107 {
+  font-size: 14px;
+  color: var(--rice-text-color-2);
+}

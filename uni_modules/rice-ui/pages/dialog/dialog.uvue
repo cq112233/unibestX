@@ -1,0 +1,127 @@
+<template>
+	<rice-dialog v-model:show="show" :title="params.title" :width="params.width" :duration="params.duration"
+		:message="params.message" :message-align="params.messageAlign" :button-theme="params.buttonTheme"
+		:button-layout="params.buttonLayout" :show-confirm-button="params.showConfirmButton"
+		:confirm-button-text="params.confirmButtonText" :confirm-button-color="params.confirmButtonColor"
+		:confirm-button-disabled="params.confirmButtonDisabled" :show-cancel-button="params.showCancelButton"
+		:cancel-button-text="params.cancelButtonText" :cancel-button-color="params.cancelButtonColor"
+		:cancel-button-disabled="params.cancelButtonDisabled" :overlay="params.overlay"
+		:overlay-bg-color="params.overlayBgColor" :close-on-click-overlay="params.closeOnClickOverlay"
+		:bg-color="params.bgColor" :z-index="params.zIndex" :marginTop="params.marginTop" :before-close="params.beforeClose"
+		:use-dialog-page="false" :custom-style="params.customStyle" @confirm="onConfirm" @cancel="onCancel" @open="onOpen"
+		@close="onClose" @opened="onOpened" @closed="onClosed" @clickOverlay="clickOverlay" />
+
+</template>
+
+<script setup>
+	import { DialogProps, DialogBusEvent } from '../../components/rice-dialog/index';
+	defineOptions({
+		name: 'rice-dialog-page'
+	})
+
+	const show = ref(false)
+	const params = ref<DialogProps>({})
+	let busEventName : string | null = null
+	let optionsEventName : string | null = null
+	let readyEventName : string | null = null
+	let closeTimer : number | null = null
+	const dialogPageIns = ref<UniPage | null>(null)
+
+	const handleBusEvent = (event : DialogBusEvent) => {
+		if (busEventName != null) {
+			uni.$emit(busEventName!, event)
+		}
+	}
+
+	const onConfirm = () => {
+		handleBusEvent({ type: 'confirm' })
+	}
+	const onCancel = () => {
+		handleBusEvent({ type: 'cancel' })
+	}
+
+	const onOpen = () => {
+		handleBusEvent({ type: 'open' })
+	}
+
+	const onClose = () => {
+		show.value = false
+	}
+
+	const onOpened = () => {
+		handleBusEvent({ type: 'opened' })
+	}
+
+	const onClosed = () => {
+		handleBusEvent({ type: 'closed' })
+		uni.closeDialogPage({
+			dialogPage: dialogPageIns.value
+		})
+	}
+
+	const clickOverlay = () => {
+		handleBusEvent({ type: 'clickOverlay' })
+	}
+
+	const updateParams = (data : DialogProps) => {
+		for (let key in data) {
+			if (data[key] != null) {
+				params.value[key] = data[key]
+			}
+		}
+	}
+
+	watch(show, (newVal : boolean) => {
+		if (!newVal) {
+			handleBusEvent({ type: 'close' })
+		}
+	})
+
+	const close = () => {
+		show.value = false
+	}
+
+	onLoad((options) => {
+		readyEventName = options['readyEventName']
+		optionsEventName = options['optionsEventName']
+		busEventName = options['busEventName']
+		if (readyEventName != null && optionsEventName != null) {
+			uni.$on(optionsEventName!, (data : DialogProps) => {
+				params.value = data
+			})
+			uni.$emit(readyEventName!, {})
+		}
+
+	})
+
+	onReady(() => {
+		show.value = true
+		dialogPageIns.value = getCurrentInstance()?.proxy?.$page
+		handleBusEvent({
+			type: 'ready',
+			pageIns: dialogPageIns.value!
+		})
+	})
+
+	onBackPress(() => {
+		close()
+		return true
+	})
+
+	onUnload(() => {
+		if (busEventName != null) uni.$off(busEventName!, null)
+		if (optionsEventName != null) uni.$off(optionsEventName!, null)
+		if (readyEventName != null) uni.$off(readyEventName!, null)
+		if (closeTimer != null) clearTimeout(closeTimer!)
+	})
+
+
+
+	defineExpose({
+		updateParams,
+		close,
+	})
+</script>
+
+<style scoped lang="scss">
+</style>

@@ -1,0 +1,278 @@
+<template>
+	<view :class="checkboxClass" :style="customStyle" ref="checkboxRef" @click.stop="handleClick">
+		<view v-if="_iconPosition=='right'" :class="labelClass">
+			<slot :checked="isChecked" :disabled="isDisabled">
+				<text :class="textClass" :style="textStyle">{{label}}</text>
+			</slot>
+		</view>
+		<slot name="icon" :checked="isChecked" :disabled="isDisabled">
+			<view :class="iconClass" :style="iconBoxStyle" ref="iconBoxRef">
+				<rice-icon v-if="showIcon" :name="indeterminate?'minus':'checked'" color="#fff" :size="_iconSize"
+					:custom-style="{transform: 'scale(0.6)'}" />
+			</view>
+		</slot>
+		<view v-if="_iconPosition=='left'" :class="labelClass">
+			<slot :checked="isChecked" :disabled="isDisabled">
+				<text :class="textClass" :style="textStyle">{{label}}</text>
+			</slot>
+		</view>
+	</view>
+</template>
+
+<script setup>
+	import { useNamespace } from '../../libs/use';
+	import { CheckboxGroupProvide, checkboxGroupInjectKey, defCheckboxIconPosition, CheckboxValueType } from '../rice-checkbox-group';
+	import { addUnit, hasStrValue, isSameValue } from '../../libs/utils';
+	import { isDark } from "../../libs/store";
+	import { formDisabledInjectKey, formReadonlyInjectKey } from '../rice-form';
+	import { CheckboxProps } from './type.uts';
+
+	defineOptions({
+		name: 'rice-checkbox',
+		styleIsolation: 'app-and-page'
+	})
+
+	const ns = useNamespace('checkbox')
+	const emit = defineEmits<{
+		change : [value: CheckboxValueType],
+	}>()
+
+	const slot = defineSlots<{
+		default(props : { checked : boolean, disabled : boolean }) : any,
+		icon(props : { checked : boolean, disabled : boolean }) : any,
+	}>()
+
+	const props = withDefaults(defineProps<CheckboxProps>(), {
+		disabled: false,
+		readonly: false,
+		spaceBetween: null,
+		checkedValue: true,
+		incheckedValue: false,
+		indeterminate: false,
+		customStyle: () : UTSJSONObject => ({}),
+	})
+
+	const modelValue = defineModel({
+		type: [String, Boolean, Number] as PropType<CheckboxValueType>,
+		default: false
+	})
+
+	const checkboxGroup = inject<CheckboxGroupProvide | null>(checkboxGroupInjectKey, null)
+	const formDisabled = inject<Ref<boolean | null> | null>(formDisabledInjectKey, null)
+	const formReadonly = inject<Ref<boolean | null> | null>(formReadonlyInjectKey, null)
+
+
+	const isChecked = computed(() => {
+		if (checkboxGroup != null) {
+			return props.value != null ? checkboxGroup!.modelValue.value.includes(props.value!) : false
+		}
+		const value = modelValue.value
+		if (typeof value == 'boolean') return value
+		return isSameValue(value, props.checkedValue)
+	})
+
+	const isDisabled = computed<boolean>(() => {
+		const disabled = props.disabled || (checkboxGroup?.disabled.value ?? false) || (formDisabled?.value ?? false)
+		if (checkboxGroup != null) {
+			const max = checkboxGroup.max.value
+			const values = checkboxGroup.modelValue.value
+			const overlimit = max != null && max != 0 && values.length >= max
+			return disabled || (overlimit && !isChecked.value)
+		}
+		return disabled
+	})
+
+	const isReadonly = computed<boolean>(() => props.readonly || (checkboxGroup?.readonly.value ?? false) || (formReadonly?.value ?? false))
+	const _iconPosition = computed(() => props.iconPosition ?? checkboxGroup?.iconPosition.value ?? defCheckboxIconPosition)
+	const _iconSize = computed(() => props.iconSize ?? checkboxGroup?.iconSize.value ?? '20px')
+	const showIcon = computed<boolean>(() => isChecked.value || props.indeterminate)
+
+
+	const handleClick = (e : UniPointerEvent) => {
+		e.stopPropagation()
+		if (isReadonly.value || isDisabled.value) return
+		if (checkboxGroup != null) {
+			const values = checkboxGroup.modelValue.value.slice(0)
+			if (props.value != null) {
+				const index = values.findIndex(v => isSameValue(props.value, v))
+				index == -1 ? values.push(props.value!) : values.splice(index, 1)
+				//@ts-ignore
+				checkboxGroup.updateValue(values)
+			}
+		}
+		const newVal = isChecked.value ? props.incheckedValue : props.checkedValue
+		modelValue.value = newVal
+		emit('change', newVal)
+	}
+
+
+	const checkboxRef = shallowRef<UniElement | null>(null)
+
+
+	const iconBoxStyle = computed(() => {
+		const css = new Map<string, string>()
+		const size = props.iconSize ?? checkboxGroup?.iconSize.value
+		if (size != null) {
+			const width = addUnit(size)
+			css.set('height', width)
+			css.set('width', width)
+		}
+
+		const checkedColor = props.checkedColor ?? checkboxGroup?.checkedColor.value
+
+		if (hasStrValue(checkedColor)) {
+			if (isChecked.value) {
+				css.set('background-color', checkedColor!)
+				css.set('border', `1px solid ${checkedColor!}`)
+			}
+			// #ifdef APP
+			else {
+				css.set('border', `1px solid ${isDisabled.value ? 'var(--rice-checkbox-disabled-border-color)' : 'var(--rice-checkbox-border-color)'}`)
+			}
+			// #endif
+
+		}
+
+		return css
+	})
+
+
+	const textStyle = computed(() => {
+		const css = new Map<string, string>()
+		const labelSize = props.labelSize ?? checkboxGroup?.labelSize.value
+		const labelColor = props.labelColor ?? checkboxGroup?.labelColor.value
+		if (hasStrValue(labelSize)) css.set('font-size', addUnit(labelSize!))
+		if (hasStrValue(labelColor) && !isDisabled.value) css.set('color', labelColor!)
+		return css
+	})
+
+	const checkboxClass = computed(() => {
+		const isSpace = props.spaceBetween ?? checkboxGroup?.spaceBetween.value
+		return [
+			ns.b(""),
+			ns.theme(),
+			ns.is('row', checkboxGroup?.direction.value == 'row'),
+			ns.is('space-between', isSpace == true),
+
+		]
+	})
+
+	const labelClass = computed(() => {
+		return [
+			ns.e('label'),
+			ns.e(`label--${_iconPosition.value}`)
+		]
+	})
+
+	const iconClass = computed(() => {
+		const shape = props.shape ?? checkboxGroup?.shape.value
+		return [
+			ns.e('icon'),
+			ns.is('__icon--round', shape == 'round'),
+			ns.is('__icon--checked', showIcon.value),
+			ns.is('__icon--disabled', isDisabled.value && !isChecked.value),
+			ns.is('__icon--checked--disabled', isDisabled.value && isChecked.value),
+		]
+	})
+
+	const textClass = computed(() => {
+		return [
+			ns.e("label__text"),
+			ns.is("__label__text--disabled", isDisabled.value)
+		]
+	})
+</script>
+
+<style scoped lang="scss">
+	.rice-checkbox {
+		flex-direction: row;
+		align-items: center;
+
+
+		&__icon {
+			flex-direction: row;
+			align-items: center;
+			justify-content: center;
+			/* #ifndef APP */
+			transition: all 100ms ease-in-out;
+			/* #endif */
+			width: 20px;
+			height: 20px;
+			border: 1px solid var(--rice-checkbox-border-color);
+			border-radius: 4px;
+			background-color: transparent;
+
+
+			&--disabled {
+				background-color: var(--rice-checkbox-disabled-background);
+				border: 1px solid var(--rice-checkbox-disabled-border-color);
+				/* #ifdef WEB */
+				cursor: not-allowed;
+				/* #endif */
+			}
+
+			&--checked {
+				background-color: var(--rice-primary-color);
+				border: 1px solid var(--rice-primary-color);
+
+			}
+
+			&--checked--disabled {
+				background-color: var(--rice-primary-color);
+				border: 1px solid var(--rice-primary-color);
+				/* #ifndef APP-HARMONY */
+				opacity: 0.4;
+				/* #endif */
+				/* #ifdef APP-HARMONY */
+				opacity: 0.6;
+				/* #endif */
+			}
+
+
+			&--round {
+				border-radius: 999px;
+			}
+
+		}
+
+		&__label {
+
+			//#ifndef VUE3-VAPOR
+			flex: 0 1 auto;
+			//#endif
+
+			&--left {
+				padding-left: 8px;
+			}
+
+			&--right {
+				padding-right: 8px;
+			}
+
+			&__text {
+				font-size: 15px;
+				color: var(--rice-text-color);
+
+				&--disabled {
+					color: var(--rice-checkbox-label-disabled-color);
+					/* #ifdef WEB */
+					cursor: not-allowed;
+					/* #endif */
+				}
+			}
+		}
+
+		&--row {
+			margin-right: 12px;
+			
+			//#ifndef VUE3-VAPOR
+			flex: 0 1 auto;
+			//#endif
+		}
+
+		&--space-between {
+			justify-content: space-between;
+		}
+
+	}
+</style>

@@ -15,7 +15,6 @@ const basic = new UTSJSONObject({
   svgAuthWarning: "SVG模式需授权收费",
   langTitle: "语言设置",
   langPreview: "多语言文本预览",
-  uviewPreview: "组件库 (uView-Ultra) 文本预览",
   themeTitle: "主题设置",
   themePreview: "主题色效果预览",
   themeButton: "主题按钮",

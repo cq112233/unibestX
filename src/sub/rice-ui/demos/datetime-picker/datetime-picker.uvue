@@ -1,0 +1,73 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="DateTimePicker 时间选择" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <!-- 年月日选择 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">选择年月日 (Date)</text>
+        <view class="rounded-8px overflow-hidden border-width-1px border-solid border-color-[#e2e8f0]">
+          <rice-datetime-picker
+            v-model="currentDate"
+            type="date"
+            :use-popup="false"
+            title="选择日期"
+            @confirm="onConfirm"
+          />
+        </view>
+        <view class="mt-10px">
+          <text class="text-13px text-[#64748b]">已选时间：{{ currentDate }}</text>
+        </view>
+      </view>
+
+      <!-- 时间选择 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">选择时间 (Time: 时分秒)</text>
+        <view class="rounded-8px overflow-hidden border-width-1px border-solid border-color-[#e2e8f0]">
+          <rice-datetime-picker
+            v-model="currentTime"
+            type="time"
+            :use-popup="false"
+            title="选择具体时间"
+          />
+        </view>
+        <view class="mt-10px">
+          <text class="text-13px text-[#64748b]">已选时间：{{ currentTime }}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store'
+import type { DateTimePickerEvent } from '@/uni_modules/rice-ui'
+import { computed } from 'vue'
+
+const appStore = useAppStore()
+const currentTheme = computed((): string => appStore.state.theme)
+
+const currentDate = ref('2026-08-15')
+const currentTime = ref('12:00:00')
+
+function onConfirm(e: DateTimePickerEvent) {
+  currentDate.value = e.value
+}
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 14px;
+  background-color: #ffffff;
+  border-radius: 10px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 12px;
+  padding-left: 6px;
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+</style>

@@ -11,7 +11,7 @@
 | **前端框架** | Vue 3 | 采用 Composition API 编写 UI 逻辑 |
 | **构建工具** | Vite 5 | 提供极速的本地开发启动与热更新体验 |
 | **CSS 引擎** | UnoCSS | 按需生成的原子化 CSS，轻量且高效 |
-| **UI 组件库** | uview-ultra | 专为 uni-app X 深度重构的组件库，修复了原生 `gap`/`grid` 等布局限制 |
+| **UI 组件库** | Rice UI | 专为 uni-app X 打造的高性能跨端组件库，内置 48+ 丰富组件 |
 | **分页组件** | z-paging-x | 提供强大的下拉刷新与分页列表加载体验 |
 | **状态管理** | x-pinia-s | 兼容 uni-app X 的 Pinia 方案 |
 | **HTTP 请求** | lime-request | uni-app X 兼容的现代化请求库 |
@@ -36,13 +36,13 @@ unibestX/
 │   ├── router/               # 全局路由拦截器与登录白名单策略
 │   ├── store/                # Pinia 状态管理与持久化（app, token, user）
 │   ├── style/                # 全局样式（UnoCSS / SCSS）
-│   ├── sub/                  # 应用分包页面（auth, paging, test, uiTest, uview-ultra 等）
+│   ├── sub/                  # 应用分包页面（auth, paging, test, uiTest, rice-ui 等）
 │   ├── tabbar/               # 自定义 TabBar 组件与状态配置
 │   ├── types/                # 全局类型定义
 │   └── utils/                # 全局工具函数（toast, systemInfo, env, backPress 等）
 ├── uni_modules/              # uni-app 扩展插件模块
 │   ├── unix-crypto/          #   全端跨平台加密解密与安全工具库
-│   ├── uview-ultra/          #   uni-app X 深度定制 UI 组件库
+│   ├── rice-ui/              #   uni-app X 原生 UI 组件库
 │   ├── z-paging-x/           #   uni-app X 深度定制分页列表组件
 │   ├── iRainna-lodash/       #   UTS 版 Lodash 工具库
 │   ├── lime-request/         #   HTTP 请求库

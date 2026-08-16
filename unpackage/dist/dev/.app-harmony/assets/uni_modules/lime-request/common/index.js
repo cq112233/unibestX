@@ -135,7 +135,7 @@ class Request {
               firstIpv4: config2.firstIpv4,
               enableChunked: config2.enableChunked,
               success(result) {
-                const _a2 = result, data2 = _a2.data, statusCode = _a2.statusCode, header = _a2.header, cookies = _a2.cookies;
+                const data2 = result.data, statusCode = result.statusCode, header = result.header, cookies = result.cookies;
                 const tempFilePath = "";
                 const apFilePath = "";
                 const filePath = "";

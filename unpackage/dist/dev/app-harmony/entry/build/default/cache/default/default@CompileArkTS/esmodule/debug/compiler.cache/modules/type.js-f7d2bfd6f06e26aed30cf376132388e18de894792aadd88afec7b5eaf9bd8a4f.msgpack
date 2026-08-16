@@ -1,0 +1,686 @@
+‘r@ü™assertions§code¥customTransformCache¨dependencies¢id§meta±moduleSideEffects¨originalCode±originalSourcemap´resolvedIdsÆsourcemapChainµsyntheticNamedExportsµtransformDependenciesÆtransformFiles®cacheAst‘rAê⁄$Kclass UploaderFileItem extends UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          url: { type: String, optional: false },
+          poster: { type: String, optional: true },
+          fileName: { type: String, optional: true },
+          status: { type: "Unknown", optional: true },
+          fileType: { type: String, optional: true },
+          message: { type: String, optional: true },
+          percent: { type: Number, optional: true },
+          size: { type: Number, optional: true },
+          duration: { type: Number, optional: true },
+          deletable: { type: Boolean, optional: true },
+          uid: { type: String, optional: true },
+          name: { type: String, optional: true },
+          action: { type: String, optional: true },
+          formData: { type: "Unknown", optional: true },
+          header: { type: "Unknown", optional: true }
+        };
+      },
+      name: "UploaderFileItem"
+    };
+  }
+  constructor(options, metadata = UploaderFileItem.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.url = this.__props__.url;
+    this.poster = this.__props__.poster;
+    this.fileName = this.__props__.fileName;
+    this.status = this.__props__.status;
+    this.fileType = this.__props__.fileType;
+    this.message = this.__props__.message;
+    this.percent = this.__props__.percent;
+    this.size = this.__props__.size;
+    this.duration = this.__props__.duration;
+    this.deletable = this.__props__.deletable;
+    this.uid = this.__props__.uid;
+    this.name = this.__props__.name;
+    this.action = this.__props__.action;
+    this.formData = this.__props__.formData;
+    this.header = this.__props__.header;
+    delete this.__props__;
+  }
+}
+class UploaderSuccess extends UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          statusCode: { type: Number, optional: false },
+          data: { type: String, optional: false },
+          file: { type: UploaderFileItem, optional: false }
+        };
+      },
+      name: "UploaderSuccess"
+    };
+  }
+  constructor(options, metadata = UploaderSuccess.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.statusCode = this.__props__.statusCode;
+    this.data = this.__props__.data;
+    this.file = this.__props__.file;
+    delete this.__props__;
+  }
+}
+class UploaderFail extends UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          errCode: { type: Number, optional: false },
+          statusCode: { type: Number, optional: false },
+          data: { type: "Any", optional: true },
+          errMsg: { type: String, optional: false },
+          file: { type: UploaderFileItem, optional: false }
+        };
+      },
+      name: "UploaderFail"
+    };
+  }
+  constructor(options, metadata = UploaderFail.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.errCode = this.__props__.errCode;
+    this.statusCode = this.__props__.statusCode;
+    this.data = this.__props__.data;
+    this.errMsg = this.__props__.errMsg;
+    this.file = this.__props__.file;
+    delete this.__props__;
+  }
+}
+class UploaderComplete extends UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          successList: { type: UTS.UTSType.withGenerics(Array, [UploaderSuccess]), optional: false },
+          failList: { type: UTS.UTSType.withGenerics(Array, [UploaderFail]), optional: false }
+        };
+      },
+      name: "UploaderComplete"
+    };
+  }
+  constructor(options, metadata = UploaderComplete.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.successList = this.__props__.successList;
+    this.failList = this.__props__.failList;
+    delete this.__props__;
+  }
+}
+class UploaderProps extends UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          action: { type: String, optional: true },
+          accept: { type: "Unknown", optional: true },
+          autoUpload: { type: Boolean, optional: true },
+          name: { type: String, optional: true },
+          header: { type: "Unknown", optional: true },
+          formData: { type: "Unknown", optional: true },
+          timeout: { type: Number, optional: true },
+          maxCount: { type: Number, optional: true },
+          maxDuration: { type: Number, optional: true },
+          showFileList: { type: Boolean, optional: true },
+          preview: { type: Boolean, optional: true },
+          imageMode: { type: String, optional: true },
+          objectFit: { type: String, optional: true },
+          uploadIcon: { type: String, optional: true },
+          uploadIconStyle: { type: "Unknown", optional: true },
+          uploadText: { type: String, optional: true },
+          loadingText: { type: String, optional: true },
+          uploadFailText: { type: String, optional: true },
+          showPercent: { type: Boolean, optional: true },
+          showSuccess: { type: Boolean, optional: true },
+          deletable: { type: Boolean, optional: true },
+          deleteIcon: { type: String, optional: true },
+          deleteIconStyle: { type: "Unknown", optional: true },
+          width: { type: "Unknown", optional: true },
+          height: { type: "Unknown", optional: true },
+          bgColor: { type: String, optional: true },
+          disabled: { type: Boolean, optional: true },
+          readonly: { type: Boolean, optional: true },
+          camera: { type: String, optional: true },
+          pageOrientation: { type: String, optional: true },
+          uploadIconSize: { type: "Unknown", optional: true },
+          deleteStyle: { type: "Unknown", optional: true },
+          sizeType: { type: UTS.UTSType.withGenerics(Array, [String]), optional: true },
+          sourceType: { type: UTS.UTSType.withGenerics(Array, [String]), optional: true },
+          extension: { type: UTS.UTSType.withGenerics(Array, [String]), optional: true },
+          successCode: { type: Number, optional: true },
+          beforeRead: { type: "Unknown", optional: true },
+          afterRead: { type: "Unknown", optional: true },
+          beforeUpload: { type: "Unknown", optional: true },
+          beforeRemove: { type: "Unknown", optional: true },
+          onSuccess: { type: "Unknown", optional: true },
+          onFail: { type: "Unknown", optional: true },
+          customStyle: { type: "Unknown", optional: true }
+        };
+      },
+      name: "UploaderProps"
+    };
+  }
+  constructor(options, metadata = UploaderProps.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.action = this.__props__.action;
+    this.accept = this.__props__.accept;
+    this.autoUpload = this.__props__.autoUpload;
+    this.name = this.__props__.name;
+    this.header = this.__props__.header;
+    this.formData = this.__props__.formData;
+    this.timeout = this.__props__.timeout;
+    this.maxCount = this.__props__.maxCount;
+    this.maxDuration = this.__props__.maxDuration;
+    this.showFileList = this.__props__.showFileList;
+    this.preview = this.__props__.preview;
+    this.imageMode = this.__props__.imageMode;
+    this.objectFit = this.__props__.objectFit;
+    this.uploadIcon = this.__props__.uploadIcon;
+    this.uploadIconStyle = this.__props__.uploadIconStyle;
+    this.uploadText = this.__props__.uploadText;
+    this.loadingText = this.__props__.loadingText;
+    this.uploadFailText = this.__props__.uploadFailText;
+    this.showPercent = this.__props__.showPercent;
+    this.showSuccess = this.__props__.showSuccess;
+    this.deletable = this.__props__.deletable;
+    this.deleteIcon = this.__props__.deleteIcon;
+    this.deleteIconStyle = this.__props__.deleteIconStyle;
+    this.width = this.__props__.width;
+    this.height = this.__props__.height;
+    this.bgColor = this.__props__.bgColor;
+    this.disabled = this.__props__.disabled;
+    this.readonly = this.__props__.readonly;
+    this.camera = this.__props__.camera;
+    this.pageOrientation = this.__props__.pageOrientation;
+    this.uploadIconSize = this.__props__.uploadIconSize;
+    this.deleteStyle = this.__props__.deleteStyle;
+    this.sizeType = this.__props__.sizeType;
+    this.sourceType = this.__props__.sourceType;
+    this.extension = this.__props__.extension;
+    this.successCode = this.__props__.successCode;
+    this.beforeRead = this.__props__.beforeRead;
+    this.afterRead = this.__props__.afterRead;
+    this.beforeUpload = this.__props__.beforeUpload;
+    this.beforeRemove = this.__props__.beforeRemove;
+    this.onSuccess = this.__props__.onSuccess;
+    this.onFail = this.__props__.onFail;
+    this.customStyle = this.__props__.customStyle;
+    delete this.__props__;
+  }
+}
+export {
+  UploaderFileItem as U,
+  UploaderComplete as a,
+  UploaderFail as b,
+  UploaderSuccess as c
+};
+//# sourceMappingURL=type.js.map
+¬êŸÀ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-uploader/type.js‘rBõ™moduleName±isLocalDependencyØisNodeEntryFileßpkgPath±belongProjectPathßpkgName™pkgVersion±dependencyPkgInfo∞belongModulePath®commonjsØhostModulesInfo•entry√¬ŸR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryŸL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony•entry•1.0.0‘  ŸR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry‘rCíØhasNamedExports™isCommonJS√¬ï‘rDí≤hostDependencyNameÆhostModuleNameŸ=../../../uni_modules/rice-ui/components/rice-uploader/type.js•entryDŸC../../../../../uni_modules/rice-ui/components/rice-uploader/type.js•entryDŸ6./uni_modules/rice-ui/components/rice-uploader/type.js•entryDŸ@../../../../uni_modules/rice-ui/components/rice-uploader/type.js•entryD©./type.js•entry√⁄$Kclass UploaderFileItem extends UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          url: { type: String, optional: false },
+          poster: { type: String, optional: true },
+          fileName: { type: String, optional: true },
+          status: { type: "Unknown", optional: true },
+          fileType: { type: String, optional: true },
+          message: { type: String, optional: true },
+          percent: { type: Number, optional: true },
+          size: { type: Number, optional: true },
+          duration: { type: Number, optional: true },
+          deletable: { type: Boolean, optional: true },
+          uid: { type: String, optional: true },
+          name: { type: String, optional: true },
+          action: { type: String, optional: true },
+          formData: { type: "Unknown", optional: true },
+          header: { type: "Unknown", optional: true }
+        };
+      },
+      name: "UploaderFileItem"
+    };
+  }
+  constructor(options, metadata = UploaderFileItem.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.url = this.__props__.url;
+    this.poster = this.__props__.poster;
+    this.fileName = this.__props__.fileName;
+    this.status = this.__props__.status;
+    this.fileType = this.__props__.fileType;
+    this.message = this.__props__.message;
+    this.percent = this.__props__.percent;
+    this.size = this.__props__.size;
+    this.duration = this.__props__.duration;
+    this.deletable = this.__props__.deletable;
+    this.uid = this.__props__.uid;
+    this.name = this.__props__.name;
+    this.action = this.__props__.action;
+    this.formData = this.__props__.formData;
+    this.header = this.__props__.header;
+    delete this.__props__;
+  }
+}
+class UploaderSuccess extends UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          statusCode: { type: Number, optional: false },
+          data: { type: String, optional: false },
+          file: { type: UploaderFileItem, optional: false }
+        };
+      },
+      name: "UploaderSuccess"
+    };
+  }
+  constructor(options, metadata = UploaderSuccess.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.statusCode = this.__props__.statusCode;
+    this.data = this.__props__.data;
+    this.file = this.__props__.file;
+    delete this.__props__;
+  }
+}
+class UploaderFail extends UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          errCode: { type: Number, optional: false },
+          statusCode: { type: Number, optional: false },
+          data: { type: "Any", optional: true },
+          errMsg: { type: String, optional: false },
+          file: { type: UploaderFileItem, optional: false }
+        };
+      },
+      name: "UploaderFail"
+    };
+  }
+  constructor(options, metadata = UploaderFail.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.errCode = this.__props__.errCode;
+    this.statusCode = this.__props__.statusCode;
+    this.data = this.__props__.data;
+    this.errMsg = this.__props__.errMsg;
+    this.file = this.__props__.file;
+    delete this.__props__;
+  }
+}
+class UploaderComplete extends UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          successList: { type: UTS.UTSType.withGenerics(Array, [UploaderSuccess]), optional: false },
+          failList: { type: UTS.UTSType.withGenerics(Array, [UploaderFail]), optional: false }
+        };
+      },
+      name: "UploaderComplete"
+    };
+  }
+  constructor(options, metadata = UploaderComplete.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.successList = this.__props__.successList;
+    this.failList = this.__props__.failList;
+    delete this.__props__;
+  }
+}
+class UploaderProps extends UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          action: { type: String, optional: true },
+          accept: { type: "Unknown", optional: true },
+          autoUpload: { type: Boolean, optional: true },
+          name: { type: String, optional: true },
+          header: { type: "Unknown", optional: true },
+          formData: { type: "Unknown", optional: true },
+          timeout: { type: Number, optional: true },
+          maxCount: { type: Number, optional: true },
+          maxDuration: { type: Number, optional: true },
+          showFileList: { type: Boolean, optional: true },
+          preview: { type: Boolean, optional: true },
+          imageMode: { type: String, optional: true },
+          objectFit: { type: String, optional: true },
+          uploadIcon: { type: String, optional: true },
+          uploadIconStyle: { type: "Unknown", optional: true },
+          uploadText: { type: String, optional: true },
+          loadingText: { type: String, optional: true },
+          uploadFailText: { type: String, optional: true },
+          showPercent: { type: Boolean, optional: true },
+          showSuccess: { type: Boolean, optional: true },
+          deletable: { type: Boolean, optional: true },
+          deleteIcon: { type: String, optional: true },
+          deleteIconStyle: { type: "Unknown", optional: true },
+          width: { type: "Unknown", optional: true },
+          height: { type: "Unknown", optional: true },
+          bgColor: { type: String, optional: true },
+          disabled: { type: Boolean, optional: true },
+          readonly: { type: Boolean, optional: true },
+          camera: { type: String, optional: true },
+          pageOrientation: { type: String, optional: true },
+          uploadIconSize: { type: "Unknown", optional: true },
+          deleteStyle: { type: "Unknown", optional: true },
+          sizeType: { type: UTS.UTSType.withGenerics(Array, [String]), optional: true },
+          sourceType: { type: UTS.UTSType.withGenerics(Array, [String]), optional: true },
+          extension: { type: UTS.UTSType.withGenerics(Array, [String]), optional: true },
+          successCode: { type: Number, optional: true },
+          beforeRead: { type: "Unknown", optional: true },
+          afterRead: { type: "Unknown", optional: true },
+          beforeUpload: { type: "Unknown", optional: true },
+          beforeRemove: { type: "Unknown", optional: true },
+          onSuccess: { type: "Unknown", optional: true },
+          onFail: { type: "Unknown", optional: true },
+          customStyle: { type: "Unknown", optional: true }
+        };
+      },
+      name: "UploaderProps"
+    };
+  }
+  constructor(options, metadata = UploaderProps.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.action = this.__props__.action;
+    this.accept = this.__props__.accept;
+    this.autoUpload = this.__props__.autoUpload;
+    this.name = this.__props__.name;
+    this.header = this.__props__.header;
+    this.formData = this.__props__.formData;
+    this.timeout = this.__props__.timeout;
+    this.maxCount = this.__props__.maxCount;
+    this.maxDuration = this.__props__.maxDuration;
+    this.showFileList = this.__props__.showFileList;
+    this.preview = this.__props__.preview;
+    this.imageMode = this.__props__.imageMode;
+    this.objectFit = this.__props__.objectFit;
+    this.uploadIcon = this.__props__.uploadIcon;
+    this.uploadIconStyle = this.__props__.uploadIconStyle;
+    this.uploadText = this.__props__.uploadText;
+    this.loadingText = this.__props__.loadingText;
+    this.uploadFailText = this.__props__.uploadFailText;
+    this.showPercent = this.__props__.showPercent;
+    this.showSuccess = this.__props__.showSuccess;
+    this.deletable = this.__props__.deletable;
+    this.deleteIcon = this.__props__.deleteIcon;
+    this.deleteIconStyle = this.__props__.deleteIconStyle;
+    this.width = this.__props__.width;
+    this.height = this.__props__.height;
+    this.bgColor = this.__props__.bgColor;
+    this.disabled = this.__props__.disabled;
+    this.readonly = this.__props__.readonly;
+    this.camera = this.__props__.camera;
+    this.pageOrientation = this.__props__.pageOrientation;
+    this.uploadIconSize = this.__props__.uploadIconSize;
+    this.deleteStyle = this.__props__.deleteStyle;
+    this.sizeType = this.__props__.sizeType;
+    this.sourceType = this.__props__.sourceType;
+    this.extension = this.__props__.extension;
+    this.successCode = this.__props__.successCode;
+    this.beforeRead = this.__props__.beforeRead;
+    this.afterRead = this.__props__.afterRead;
+    this.beforeUpload = this.__props__.beforeUpload;
+    this.beforeRemove = this.__props__.beforeRemove;
+    this.onSuccess = this.__props__.onSuccess;
+    this.onFail = this.__props__.onFail;
+    this.customStyle = this.__props__.customStyle;
+    delete this.__props__;
+  }
+}
+export {
+  UploaderFileItem as U,
+  UploaderComplete as a,
+  UploaderFail as b,
+  UploaderSuccess as c
+};
+//# sourceMappingURL=type.js.map
+‘rEïßversion®mappings•namesßsourcesÆsourcesContent‹ Âëî    ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî  	 ëî  
+ ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî   ëî    ëî  ! ëî  " ëî  # ëî  $ ëî  % ëî  & ëî  ' ëî  ( ëî  ) ëî  * ëî  + ëî  , ëî  - ëî  . ëî  / ëî  0 ëî  1 ëî  2 ëî  3 ëî  4 ëî  5 ëî  6 ëî  7 ëî  8 ëî  9 ëî  : ëî  ; ëî  < ëî  = ëî  > ëî  ? ëî  Ã@ ëî  ÃA ëî  ÃB ëî  ÃC ëî  ÃD ëî  ÃE ëî  ÃF ëî  ÃG ëî  ÃH ëî  ÃI ëî  ÃJ ëî  ÃK ëî  ÃL ëî  ÃM ëî  ÃN ëî  ÃO ëî  ÃP ëî  ÃQ ëî  ÃR ëî  ÃS ëî  ÃT ëî  ÃU ëî  ÃV ëî  ÃW ëî  ÃX ëî  ÃY ëî  ÃZ ëî  Ã[ ëî  Ã\ ëî  Ã] ëî  Ã^ ëî  Ã_ ëî  Ã` ëî  Ãa ëî  Ãb ëî  Ãc ëî  Ãd ëî  Ãe ëî  Ãf ëî  Ãg ëî  Ãh ëî  Ãi ëî  Ãj ëî  Ãk ëî  Ãl ëî  Ãm ëî  Ãn ëî  Ão ëî  Ãp ëî  Ãq ëî  Ãr ëî  Ãs ëî  Ãt ëî  Ãu ëî  Ãv ëî  Ãw ëî  Ãx ëî  Ãy ëî  Ãz ëî  Ã{ ëî  Ã| ëî  Ã} ëî  Ã~ ëî  Ã ëî  ÃÄ ëî  ÃÅ ëî  ÃÇ ëî  ÃÉ ëî  ÃÑ ëî  ÃÖ ëî  ÃÜ ëî  Ãá ëî  Ãà ëî  Ãâ ëî  Ãä ëî  Ãã ëî  Ãå ëî  Ãç ëî  Ãé ëî  Ãè ëî  Ãê ëî  Ãë ëî  Ãí ëî  Ãì ëî  Ãî ëî  Ãï ëî  Ãñ ëî  Ãó ëî  Ãò ëî  Ãô ëî  Ãö ëî  Ãõ ëî  Ãú ëî  Ãù ëî  Ãû ëî  Ãü ëî  Ã† ëî  Ã° ëî  Ã¢ ëî  Ã£ ëî  Ã§ ëî  Ã• ëî  Ã¶ ëî  Ãß ëî  Ã® ëî  Ã© ëî  Ã™ ëî  Ã´ ëî  Ã¨ ëî  Ã≠ ëî  ÃÆ ëî  ÃØ ëî  Ã∞ ëî  Ã± ëî  Ã≤ ëî  Ã≥ ëî  Ã¥ ëî  Ãµ ëî  Ã∂ ëî  Ã∑ ëî  Ã∏ ëî  Ãπ ëî  Ã∫ ëî  Ãª ëî  Ãº ëî  ÃΩ ëî  Ãæ ëî  Ãø ëî  Ã¿ ëî  Ã¡ ëî  Ã¬ ëî  Ã√ ëî  Ãƒ ëî  Ã≈ ëî  Ã∆ ëî  Ã« ëî  Ã» ëî  Ã… ëî  Ã  ëî  ÃÀ ëî  ÃÃ ëî  ÃÕ ëî  ÃŒ ëî  Ãœ ëî  Ã– ëî  Ã— ëî  Ã“ ëî  Ã” ëî  Ã‘ ëî  Ã’ ëî  Ã÷ ëî  Ã◊ ëî  Ãÿ ëî  ÃŸ ëî  Ã⁄ ëî  Ã€ ëî  Ã‹ ëî  Ã› ëî  Ãﬁ ëî  Ãﬂ ëî  Ã‡ ëî  Ã· ëî  Ã‚ ëî  Ã„ êêëŸÀ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/rice-ui/components/rice-uploader/type.jsë⁄$Kclass UploaderFileItem extends UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          url: { type: String, optional: false },
+          poster: { type: String, optional: true },
+          fileName: { type: String, optional: true },
+          status: { type: "Unknown", optional: true },
+          fileType: { type: String, optional: true },
+          message: { type: String, optional: true },
+          percent: { type: Number, optional: true },
+          size: { type: Number, optional: true },
+          duration: { type: Number, optional: true },
+          deletable: { type: Boolean, optional: true },
+          uid: { type: String, optional: true },
+          name: { type: String, optional: true },
+          action: { type: String, optional: true },
+          formData: { type: "Unknown", optional: true },
+          header: { type: "Unknown", optional: true }
+        };
+      },
+      name: "UploaderFileItem"
+    };
+  }
+  constructor(options, metadata = UploaderFileItem.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.url = this.__props__.url;
+    this.poster = this.__props__.poster;
+    this.fileName = this.__props__.fileName;
+    this.status = this.__props__.status;
+    this.fileType = this.__props__.fileType;
+    this.message = this.__props__.message;
+    this.percent = this.__props__.percent;
+    this.size = this.__props__.size;
+    this.duration = this.__props__.duration;
+    this.deletable = this.__props__.deletable;
+    this.uid = this.__props__.uid;
+    this.name = this.__props__.name;
+    this.action = this.__props__.action;
+    this.formData = this.__props__.formData;
+    this.header = this.__props__.header;
+    delete this.__props__;
+  }
+}
+class UploaderSuccess extends UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          statusCode: { type: Number, optional: false },
+          data: { type: String, optional: false },
+          file: { type: UploaderFileItem, optional: false }
+        };
+      },
+      name: "UploaderSuccess"
+    };
+  }
+  constructor(options, metadata = UploaderSuccess.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.statusCode = this.__props__.statusCode;
+    this.data = this.__props__.data;
+    this.file = this.__props__.file;
+    delete this.__props__;
+  }
+}
+class UploaderFail extends UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          errCode: { type: Number, optional: false },
+          statusCode: { type: Number, optional: false },
+          data: { type: "Any", optional: true },
+          errMsg: { type: String, optional: false },
+          file: { type: UploaderFileItem, optional: false }
+        };
+      },
+      name: "UploaderFail"
+    };
+  }
+  constructor(options, metadata = UploaderFail.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.errCode = this.__props__.errCode;
+    this.statusCode = this.__props__.statusCode;
+    this.data = this.__props__.data;
+    this.errMsg = this.__props__.errMsg;
+    this.file = this.__props__.file;
+    delete this.__props__;
+  }
+}
+class UploaderComplete extends UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          successList: { type: UTS.UTSType.withGenerics(Array, [UploaderSuccess]), optional: false },
+          failList: { type: UTS.UTSType.withGenerics(Array, [UploaderFail]), optional: false }
+        };
+      },
+      name: "UploaderComplete"
+    };
+  }
+  constructor(options, metadata = UploaderComplete.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.successList = this.__props__.successList;
+    this.failList = this.__props__.failList;
+    delete this.__props__;
+  }
+}
+class UploaderProps extends UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          action: { type: String, optional: true },
+          accept: { type: "Unknown", optional: true },
+          autoUpload: { type: Boolean, optional: true },
+          name: { type: String, optional: true },
+          header: { type: "Unknown", optional: true },
+          formData: { type: "Unknown", optional: true },
+          timeout: { type: Number, optional: true },
+          maxCount: { type: Number, optional: true },
+          maxDuration: { type: Number, optional: true },
+          showFileList: { type: Boolean, optional: true },
+          preview: { type: Boolean, optional: true },
+          imageMode: { type: String, optional: true },
+          objectFit: { type: String, optional: true },
+          uploadIcon: { type: String, optional: true },
+          uploadIconStyle: { type: "Unknown", optional: true },
+          uploadText: { type: String, optional: true },
+          loadingText: { type: String, optional: true },
+          uploadFailText: { type: String, optional: true },
+          showPercent: { type: Boolean, optional: true },
+          showSuccess: { type: Boolean, optional: true },
+          deletable: { type: Boolean, optional: true },
+          deleteIcon: { type: String, optional: true },
+          deleteIconStyle: { type: "Unknown", optional: true },
+          width: { type: "Unknown", optional: true },
+          height: { type: "Unknown", optional: true },
+          bgColor: { type: String, optional: true },
+          disabled: { type: Boolean, optional: true },
+          readonly: { type: Boolean, optional: true },
+          camera: { type: String, optional: true },
+          pageOrientation: { type: String, optional: true },
+          uploadIconSize: { type: "Unknown", optional: true },
+          deleteStyle: { type: "Unknown", optional: true },
+          sizeType: { type: UTS.UTSType.withGenerics(Array, [String]), optional: true },
+          sourceType: { type: UTS.UTSType.withGenerics(Array, [String]), optional: true },
+          extension: { type: UTS.UTSType.withGenerics(Array, [String]), optional: true },
+          successCode: { type: Number, optional: true },
+          beforeRead: { type: "Unknown", optional: true },
+          afterRead: { type: "Unknown", optional: true },
+          beforeUpload: { type: "Unknown", optional: true },
+          beforeRemove: { type: "Unknown", optional: true },
+          onSuccess: { type: "Unknown", optional: true },
+          onFail: { type: "Unknown", optional: true },
+          customStyle: { type: "Unknown", optional: true }
+        };
+      },
+      name: "UploaderProps"
+    };
+  }
+  constructor(options, metadata = UploaderProps.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.action = this.__props__.action;
+    this.accept = this.__props__.accept;
+    this.autoUpload = this.__props__.autoUpload;
+    this.name = this.__props__.name;
+    this.header = this.__props__.header;
+    this.formData = this.__props__.formData;
+    this.timeout = this.__props__.timeout;
+    this.maxCount = this.__props__.maxCount;
+    this.maxDuration = this.__props__.maxDuration;
+    this.showFileList = this.__props__.showFileList;
+    this.preview = this.__props__.preview;
+    this.imageMode = this.__props__.imageMode;
+    this.objectFit = this.__props__.objectFit;
+    this.uploadIcon = this.__props__.uploadIcon;
+    this.uploadIconStyle = this.__props__.uploadIconStyle;
+    this.uploadText = this.__props__.uploadText;
+    this.loadingText = this.__props__.loadingText;
+    this.uploadFailText = this.__props__.uploadFailText;
+    this.showPercent = this.__props__.showPercent;
+    this.showSuccess = this.__props__.showSuccess;
+    this.deletable = this.__props__.deletable;
+    this.deleteIcon = this.__props__.deleteIcon;
+    this.deleteIconStyle = this.__props__.deleteIconStyle;
+    this.width = this.__props__.width;
+    this.height = this.__props__.height;
+    this.bgColor = this.__props__.bgColor;
+    this.disabled = this.__props__.disabled;
+    this.readonly = this.__props__.readonly;
+    this.camera = this.__props__.camera;
+    this.pageOrientation = this.__props__.pageOrientation;
+    this.uploadIconSize = this.__props__.uploadIconSize;
+    this.deleteStyle = this.__props__.deleteStyle;
+    this.sizeType = this.__props__.sizeType;
+    this.sourceType = this.__props__.sourceType;
+    this.extension = this.__props__.extension;
+    this.successCode = this.__props__.successCode;
+    this.beforeRead = this.__props__.beforeRead;
+    this.afterRead = this.__props__.afterRead;
+    this.beforeUpload = this.__props__.beforeUpload;
+    this.beforeRemove = this.__props__.beforeRemove;
+    this.onSuccess = this.__props__.onSuccess;
+    this.onFail = this.__props__.onFail;
+    this.customStyle = this.__props__.customStyle;
+    delete this.__props__;
+  }
+}
+export {
+  UploaderFileItem as U,
+  UploaderComplete as a,
+  UploaderFail as b,
+  UploaderSuccess as c
+};
+//# sourceMappingURL=type.js.map
+Aë‘rFíßmissing¶plugin√¶genAbc¬ê‘  ‘rGî≤dynamicImportCacheπexportAllDeclarationCacheªexportNamedDeclarationCache´importCacheêêë‘rHñ§type•start£end´declaration™specifiers¶source∂ExportNamedDeclarationÕ#¿Õ$)¿î‘rIï§type•start£end•local®exportedØExportSpecifierÕ#ÀÕ#‡‘rJî§type•start£end§name™IdentifierÕ#ÀÕ#€∞UploaderFileItemJ™IdentifierÕ#ﬂÕ#‡°UIØExportSpecifierÕ#‰Õ#˘J™IdentifierÕ#‰Õ#Ù∞UploaderCompleteJ™IdentifierÕ#¯Õ#˘°aIØExportSpecifierÕ#˝Õ$J™IdentifierÕ#˝Õ$	¨UploaderFailJ™IdentifierÕ$Õ$°bIØExportSpecifierÕ$Õ$&J™IdentifierÕ$Õ$!ØUploaderSuccessJ™IdentifierÕ$%Õ$&°c¿ê

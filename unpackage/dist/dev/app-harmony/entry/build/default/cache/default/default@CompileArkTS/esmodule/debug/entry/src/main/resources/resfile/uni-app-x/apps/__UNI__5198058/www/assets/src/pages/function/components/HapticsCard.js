@@ -16,10 +16,11 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     const copyText = ref("Hello unibestX!");
     function triggerVibration() {
       uni.vibrateShort({
-        success: () => {
+        type: "light",
+        success: (_res = null) => {
           uni.showToast({ title: "已触发短震动", icon: "none" });
         },
-        fail: () => {
+        fail: (_err = null) => {
           uni.showToast({ title: "震动触发失败", icon: "none" });
         }
       });

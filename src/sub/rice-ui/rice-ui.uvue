@@ -1,0 +1,385 @@
+<template>
+  <view class="page-container pb-50px" :class="isDarkMode ? 'bg-[#121212]' : 'bg-[#f8fafc]'">
+    <NavBar
+      title="Rice UI 组件演示"
+      :auto-back="true"
+      :safe-area-inset-top="true"
+      :bg-color="isDarkMode ? '#1e1e1e' : '#ffffff'"
+    ></NavBar>
+
+    <!-- 顶部 Banner -->
+    <view
+      class="p-16px mb-12px shadow-xs flex-row items-center justify-between"
+      :class="isDarkMode ? 'bg-[#1e1e1e]' : 'bg-white'"
+    >
+      <view class="flex-row items-center flex-1">
+        <image src="/static/logo.png" style="width: 48px; height: 48px;" class="mr-12px rounded-8px" />
+        <view class="flex-1">
+          <view class="flex-row items-center">
+            <text class="text-16px font-bold" :class="isDarkMode ? 'text-[#f8fafc]' : 'text-[#1e293b]'">Rice UI 组件库</text>
+            <!-- 当前主题色小标记 -->
+            <view class="w-10px h-10px rounded-5px ml-8px" :style="{ backgroundColor: currentTheme }" />
+          </view>
+          <text class="text-12px mt-4px" :class="isDarkMode ? 'text-[#94a3b8]' : 'text-[#64748b]'">基于 uni-app X 打造，48+ 跨端组件</text>
+        </view>
+      </view>
+      <view
+        class="px-10px py-6px rounded-6px flex-row items-center"
+        :class="isDarkMode ? 'bg-[#334155]' : 'bg-[#f1f5f9]'"
+        @click="toggleTheme"
+      >
+        <text class="text-12px font-medium" :class="isDarkMode ? 'text-[#f8fafc]' : 'text-[#334155]'">
+          {{ isDarkMode ? '🌙 暗黑' : '☀️ 明亮' }}
+        </text>
+      </view>
+    </view>
+
+    <!-- 1. 基础组件 -->
+    <view class="demo-group-card" :class="isDarkMode ? 'bg-[#1e1e1e]' : 'bg-white'">
+      <view class="flex-row items-center mb-10px">
+        <view class="w-4px h-16px rounded-2px mr-8px" :style="{ backgroundColor: currentTheme }" />
+        <text class="group-title" :class="isDarkMode ? 'text-[#f8fafc]' : 'text-[#1e293b]'">基础组件 (4)</text>
+      </view>
+      <rice-cell-group :border="false">
+        <rice-cell title="Button 按钮" is-link @click="goToDemo('button')">
+          <template #leftIcon>
+            <rice-icon name="plus" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Icon 图标" is-link @click="goToDemo('icon')">
+          <template #leftIcon>
+            <rice-icon name="search" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Image 图片" is-link @click="goToDemo('image')">
+          <template #leftIcon>
+            <rice-icon name="photo" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Layout 布局" is-link @click="goToDemo('layout')">
+          <template #leftIcon>
+            <rice-icon name="app" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+      </rice-cell-group>
+    </view>
+
+    <!-- 2. 表单组件 -->
+    <view class="demo-group-card" :class="isDarkMode ? 'bg-[#1e1e1e]' : 'bg-white'">
+      <view class="flex-row items-center mb-10px">
+        <view class="w-4px h-16px rounded-2px mr-8px" :style="{ backgroundColor: currentTheme }" />
+        <text class="group-title" :class="isDarkMode ? 'text-[#f8fafc]' : 'text-[#1e293b]'">表单组件 (18)</text>
+      </view>
+      <rice-cell-group :border="false">
+        <rice-cell title="Calendar 日历" is-link @click="goToDemo('calendar')">
+          <template #leftIcon>
+            <rice-icon name="calendar" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Cascader 级联选择器" is-link @click="goToDemo('cascader')">
+          <template #leftIcon>
+            <rice-icon name="bars" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Checkbox 复选框" is-link @click="goToDemo('checkbox')">
+          <template #leftIcon>
+            <rice-icon name="checked-circle" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="CodeInput 验证码输入框" is-link @click="goToDemo('code-input')">
+          <template #leftIcon>
+            <rice-icon name="edit" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="ColorPicker 颜色选择器" is-link @click="goToDemo('color-picker')">
+          <template #leftIcon>
+            <rice-icon name="set" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="DateTimePicker 时间选择器" is-link @click="goToDemo('datetime-picker')">
+          <template #leftIcon>
+            <rice-icon name="calendar" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Form 表单" is-link @click="goToDemo('form')">
+          <template #leftIcon>
+            <rice-icon name="file-success" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Input 输入框" is-link @click="goToDemo('input')">
+          <template #leftIcon>
+            <rice-icon name="edit" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Picker 选择器" is-link @click="goToDemo('picker')">
+          <template #leftIcon>
+            <rice-icon name="arrow-down" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Radio 单选框" is-link @click="goToDemo('radio')">
+          <template #leftIcon>
+            <rice-icon name="checked-circle" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Rate 评分" is-link @click="goToDemo('rate')">
+          <template #leftIcon>
+            <rice-icon name="star-fill" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Search 搜索框" is-link @click="goToDemo('search')">
+          <template #leftIcon>
+            <rice-icon name="search" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Signature 签名" is-link @click="goToDemo('signature')">
+          <template #leftIcon>
+            <rice-icon name="edit" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Slider 滑块" is-link @click="goToDemo('slider')">
+          <template #leftIcon>
+            <rice-icon name="minus" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Stepper 步进器" is-link @click="goToDemo('stepper')">
+          <template #leftIcon>
+            <rice-icon name="plus" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Switch 开关" is-link @click="goToDemo('switch')">
+          <template #leftIcon>
+            <rice-icon name="checked" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Textarea 多行文本框" is-link @click="goToDemo('textarea')">
+          <template #leftIcon>
+            <rice-icon name="edit" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Uploader 上传" is-link @click="goToDemo('uploader')">
+          <template #leftIcon>
+            <rice-icon name="upload" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+      </rice-cell-group>
+    </view>
+
+    <!-- 3. 数据展示 -->
+    <view class="demo-group-card" :class="isDarkMode ? 'bg-[#1e1e1e]' : 'bg-white'">
+      <view class="flex-row items-center mb-10px">
+        <view class="w-4px h-16px rounded-2px mr-8px" :style="{ backgroundColor: currentTheme }" />
+        <text class="group-title" :class="isDarkMode ? 'text-[#f8fafc]' : 'text-[#1e293b]'">数据展示 (15)</text>
+      </view>
+      <rice-cell-group :border="false">
+        <rice-cell title="Avatar 头像" is-link @click="goToDemo('avatar')">
+          <template #leftIcon>
+            <rice-icon name="user" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Badge 徽标" is-link @click="goToDemo('badge')">
+          <template #leftIcon>
+            <rice-icon name="info" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Cell 单元格" is-link @click="goToDemo('cell')">
+          <template #leftIcon>
+            <rice-icon name="bars" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Collapse 折叠面板" is-link @click="goToDemo('collapse')">
+          <template #leftIcon>
+            <rice-icon name="arrow-down" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="CountDown 倒计时" is-link @click="goToDemo('count-down')">
+          <template #leftIcon>
+            <rice-icon name="calendar" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="CountTo 数字滚动" is-link @click="goToDemo('count-to')">
+          <template #leftIcon>
+            <rice-icon name="trend" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Divider 分割线" is-link @click="goToDemo('divider')">
+          <template #leftIcon>
+            <rice-icon name="minus" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Grid 宫格" is-link @click="goToDemo('gr' + 'id')">
+          <template #leftIcon>
+            <rice-icon name="app" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Progress 进度条" is-link @click="goToDemo('progress')">
+          <template #leftIcon>
+            <rice-icon name="minus" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="ProgressCircle 圆环进度条" is-link @click="goToDemo('progress-circle')">
+          <template #leftIcon>
+            <rice-icon name="replay" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="QRCode 二维码" is-link @click="goToDemo('qrcode')">
+          <template #leftIcon>
+            <rice-icon name="qr" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="ScrollX 横向滚动列表" is-link @click="goToDemo('scroll-x')">
+          <template #leftIcon>
+            <rice-icon name="right" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Tag 标签" is-link @click="goToDemo('tag')">
+          <template #leftIcon>
+            <rice-icon name="gift" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="TimeFormat 时间格式化" is-link @click="goToDemo('time-format')">
+          <template #leftIcon>
+            <rice-icon name="calendar" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Waterflow 瀑布流" is-link @click="goToDemo('waterflow')">
+          <template #leftIcon>
+            <rice-icon name="app" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+      </rice-cell-group>
+    </view>
+
+    <!-- 4. 反馈组件 -->
+    <view class="demo-group-card" :class="isDarkMode ? 'bg-[#1e1e1e]' : 'bg-white'">
+      <view class="flex-row items-center mb-10px">
+        <view class="w-4px h-16px rounded-2px mr-8px" :style="{ backgroundColor: currentTheme }" />
+        <text class="group-title" :class="isDarkMode ? 'text-[#f8fafc]' : 'text-[#1e293b]'">反馈组件 (8)</text>
+      </view>
+      <rice-cell-group :border="false">
+        <rice-cell title="ActionSheet 动作面板" is-link @click="goToDemo('action-sheet')">
+          <template #leftIcon>
+            <rice-icon name="arrow-up" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Dialog 对话框" is-link @click="goToDemo('dialog')">
+          <template #leftIcon>
+            <rice-icon name="info" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="FloatFab 悬浮按钮" is-link @click="goToDemo('float-fab')">
+          <template #leftIcon>
+            <rice-icon name="plus" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Loading 加载" is-link @click="goToDemo('loading')">
+          <template #leftIcon>
+            <rice-icon name="replay" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="NoticeBar 公告" is-link @click="goToDemo('notice-bar')">
+          <template #leftIcon>
+            <rice-icon name="volume" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Overlay 遮罩层" is-link @click="goToDemo('overlay')">
+          <template #leftIcon>
+            <rice-icon name="cross" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Popup 弹出层" is-link @click="goToDemo('popup')">
+          <template #leftIcon>
+            <rice-icon name="arrow-up" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="SwipeActions 滑动单元格" is-link @click="goToDemo('swipe-actions')">
+          <template #leftIcon>
+            <rice-icon name="left" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+      </rice-cell-group>
+    </view>
+
+    <!-- 5. 导航组件 -->
+    <view class="demo-group-card" :class="isDarkMode ? 'bg-[#1e1e1e]' : 'bg-white'">
+      <view class="flex-row items-center mb-10px">
+        <view class="w-4px h-16px rounded-2px mr-8px" :style="{ backgroundColor: currentTheme }" />
+        <text class="group-title" :class="isDarkMode ? 'text-[#f8fafc]' : 'text-[#1e293b]'">导航组件 (4)</text>
+      </view>
+      <rice-cell-group :border="false">
+        <rice-cell title="BackTop 返回顶部" is-link @click="goToDemo('back-top')">
+          <template #leftIcon>
+            <rice-icon name="back-top" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Navbar 导航栏" is-link @click="goToDemo('navbar')">
+          <template #leftIcon>
+            <rice-icon name="arrow-left" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Subsection 分段器" is-link @click="goToDemo('subsection')">
+          <template #leftIcon>
+            <rice-icon name="app" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+        <rice-cell title="Tabs 选项卡" is-link @click="goToDemo('tabs')">
+          <template #leftIcon>
+            <rice-icon name="right" :color="currentTheme" size="18px" style="margin-right: 8px;" />
+          </template>
+        </rice-cell>
+      </rice-cell-group>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store'
+import { isDark, setTheme } from '@/uni_modules/rice-ui'
+import { computed } from 'vue'
+
+const appStore = useAppStore()
+
+const currentTheme = computed((): string => {
+  return appStore.state.theme
+})
+
+const isDarkMode = computed((): boolean => {
+  return isDark.value
+})
+
+function toggleTheme() {
+  if (isDarkMode.value) {
+    setTheme('light')
+  }
+  else {
+    setTheme('dark')
+  }
+}
+
+function goToDemo(page: string) {
+  uni.navigateTo({
+    url: `/src/sub/rice-ui/demos/${page}/${page}`,
+    fail: (err) => {
+      console.error('goToDemo fail:', err)
+      uni.showToast({
+        title: `打开 ${page} 页面失败`,
+        icon: 'none',
+      })
+    },
+  })
+}
+</script>
+
+<style scoped>
+.demo-group-card {
+  margin: 0 16px 16px 16px;
+  padding: 16px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+.group-title {
+  font-size: 15px;
+  font-weight: bold;
+  color: #1e293b;
+}
+</style>
