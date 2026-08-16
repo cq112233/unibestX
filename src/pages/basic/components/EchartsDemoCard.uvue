@@ -1,7 +1,7 @@
 <template>
   <Card :title="echartTitle">
     <view class="w-full h-260px mt-10px">
-      <e-chart ref="echartRef" class="w-full !h-full" @ready="initEchart" />
+      <e-chart ref="echartRef" height="260px" class="w-full !h-full" @ready="initEchart" />
     </view>
     <view class="flex-row justify-between mt-15px">
       <view class="flex-1 mr-8px">
@@ -183,8 +183,12 @@ const pieOption = {
   series: [{
     name: '访问来源',
     type: 'pie',
-    radius: '65%',
-    center: ['50%', '50%'],
+    radius: '52%',
+    center: ['50%', '52%'],
+    label: {
+      fontSize: 11,
+      color: '#64748b',
+    },
     data: [
       { value: 1048, name: '搜索引擎', itemStyle: { color: '#3b82f6' } },
       { value: 735, name: '直接访问', itemStyle: { color: '#10b981' } },

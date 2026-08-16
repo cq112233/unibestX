@@ -39,13 +39,25 @@
 			function init(option) {
 				vlog('init', option);
                 const chartDom = document.getElementById('chartDom')
-				echartObj = echarts.init(chartDom, option.theme, option.opts)
+				if (!chartDom) return
+				if (echartObj) {
+					try { echartObj.dispose() } catch(e) {}
+				}
+				echartObj = echarts.init(chartDom, option ? option.theme : undefined, option ? option.opts : undefined)
 			}
 			
             // 图表配置
             function setOption(option, notMerge, lazyUpdate) {
 				vlog('setOption', option, notMerge, lazyUpdate);
-                echartObj.setOption(option, notMerge, lazyUpdate)
+                if (!echartObj) {
+                    const chartDom = document.getElementById('chartDom')
+                    if (chartDom) {
+                        echartObj = echarts.init(chartDom)
+                    }
+                }
+                if (echartObj) {
+                    echartObj.setOption(option, notMerge, lazyUpdate)
+                }
             }
 			
             // 获取宽度

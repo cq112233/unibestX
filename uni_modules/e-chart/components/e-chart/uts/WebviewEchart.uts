@@ -1,19 +1,50 @@
 type EchartEvent = (e: UTSJSONObject) => void;
 
 /**
- * 模拟Echart对象,兼容Webview交互
+ * 模拟Echart对象,兼容Webview交互 (支持 Vapor 蒸汽模式与 VDOM 模式)
  */
 export default class WebviewEchart {
-	private ctx: WebviewContext;
+	private canvasId: string = "";
+	private webviewCtx: WebviewContext | null = null;
+	private element: UniWebViewElement | null = null;
 	private onEventMap: Map<string, EchartEvent> = new Map();
 	private onceEventMap: Map<string, EchartEvent> = new Map();
     
-	constructor(ctx: WebviewContext){
-		this.ctx = ctx
+	constructor(canvasId: string, webviewCtx: WebviewContext | null = null, element: UniWebViewElement | null = null){
+		this.canvasId = canvasId
+		this.webviewCtx = webviewCtx
+		this.element = element
+	}
+
+	evalJS(code: string){
+		if (this.element != null) {
+			this.element!.evalJS(code)
+			return
+		}
+		if (this.webviewCtx != null) {
+			this.webviewCtx!.evalJS(code)
+			return
+		}
+		if (this.canvasId != "") {
+			const el = uni.getElementById(this.canvasId) as UniWebViewElement | null
+			if (el != null) {
+				this.element = el
+				this.element!.evalJS(code)
+				return
+			}
+			try {
+				const ctx = uni.createWebviewContext(this.canvasId)
+				if (ctx != null) {
+					this.webviewCtx = ctx
+					this.webviewCtx!.evalJS(code)
+					return
+				}
+			} catch (_e) {}
+		}
 	}
 	
 	init(theme?: string, opts: UTSJSONObject = {}){
-		this.ctx.evalJS(`init(${JSON.stringify({theme, opts})})`)
+		this.evalJS(`init(${JSON.stringify({theme, opts})})`)
 	}
     
     onWebviewMsg(e: UniWebViewMessageEvent){
@@ -39,69 +70,69 @@ export default class WebviewEchart {
     }
 	
 	setOption(option: UTSJSONObject, notMerge: boolean = false, lazyUpdate: boolean = false){
-		this.ctx.evalJS(`setOption(${JSON.stringify(option)}, ${notMerge}, ${lazyUpdate})`)
+		this.evalJS(`setOption(${JSON.stringify(option)}, ${notMerge}, ${lazyUpdate})`)
 	}
 	
 	getOption(success: EchartEvent){
 	    this.onceEventMap.set('getOption', success)
-	    this.ctx.evalJS(`getOption()`)
+	    this.evalJS(`getOption()`)
 	}
 	
 	getWidth(success: EchartEvent){
 	    this.onceEventMap.set('getWidth', success)
-	    this.ctx.evalJS(`getWidth()`)
+	    this.evalJS(`getWidth()`)
 	}
 	
 	getHeight(success: EchartEvent){
 	    this.onceEventMap.set('getHeight', success)
-	    this.ctx.evalJS(`getHeight()`)
+	    this.evalJS(`getHeight()`)
 	}
  
     resize(option: UTSJSONObject = {}){
-        this.ctx.evalJS(`resize(${JSON.stringify(option)})`)
+        this.evalJS(`resize(${JSON.stringify(option)})`)
     }
     
     on(name: string, handler: EchartEvent){
 		this.onEventMap.set(name, handler)
-		this.ctx.evalJS(`on(${JSON.stringify({name})})`) // 无法传递单纯的string,必须为对象形态的string
+		this.evalJS(`on(${JSON.stringify({name})})`) // 无法传递单纯的string,必须为对象形态的string
     }
     
     on(name: string, query: string | UTSJSONObject, handler: EchartEvent){
 		this.onEventMap.set(name, handler)
-        this.ctx.evalJS(`on(${JSON.stringify({name, query})})`) // 无法传递单纯的string,必须为对象形态的string
+        this.evalJS(`on(${JSON.stringify({name, query})})`) // 无法传递单纯的string,必须为对象形态的string
     }
     
     off(name: string){
-        this.ctx.evalJS(`off(${JSON.stringify({name})})`)
+        this.evalJS(`off(${JSON.stringify({name})})`)
     }
     
     dispatchAction(option: UTSJSONObject){
-        this.ctx.evalJS(`dispatchAction(${JSON.stringify(option)})`)
+        this.evalJS(`dispatchAction(${JSON.stringify(option)})`)
     }
     
     showLoading(option: UTSJSONObject){
-        this.ctx.evalJS(`showLoading(${JSON.stringify(option)})`)
+        this.evalJS(`showLoading(${JSON.stringify(option)})`)
     }
     
     hideLoading(){
-        this.ctx.evalJS(`hideLoading()`)
+        this.evalJS(`hideLoading()`)
     }
     
     appendData(option: UTSJSONObject){
-        this.ctx.evalJS(`appendData(${JSON.stringify(option)})`)
+        this.evalJS(`appendData(${JSON.stringify(option)})`)
     }
     
     canvasToTempFilePath(option: UTSJSONObject){
         const success = option['success'] as (res: UTSJSONObject) => void;
         this.onceEventMap.set('canvasToTempFilePath', success)
-        this.ctx.evalJS(`canvasToTempFilePath()`)
+        this.evalJS(`canvasToTempFilePath()`)
     }   
 	
     clear(){
-        this.ctx.evalJS(`clear()`)
+        this.evalJS(`clear()`)
     }
 	
     dispose(){
-        this.ctx.evalJS(`dispose()`)
+        this.evalJS(`dispose()`)
     }
 }

@@ -38,6 +38,8 @@ const props = defineProps({
   }
 })
 
+const instance = getCurrentInstance()
+
 // #ifdef APP
 const echartObj = ref<WebviewEchart | null>(null)
 // #endif
@@ -45,7 +47,6 @@ const echartObj = ref<WebviewEchart | null>(null)
 let echartObj: any = null
 let echartCanvas: any = null
 let _resizeTimer: any = null
-const instance = getCurrentInstance()
 // #endif
 
 const canvasId = getRandomId()
@@ -172,14 +173,31 @@ function getMpCanvas(): Promise<any> {
 
 // #ifdef APP
 function initAPP(option: UTSJSONObject): UTSJSONObject | null {
-  const ctx = uni.createWebviewContext(canvasId)
-  if (ctx == null) {
-    console.error('初始化echart的webview失败')
-    return null
+  let elem: UniWebViewElement | null = null
+  let ctx: WebviewContext | null = null
+
+  // 1. 优先尝试 uni.getElementById (适配 Vapor 蒸汽模式)
+  try {
+    const el = uni.getElementById(canvasId) as UniWebViewElement | null
+    if (el != null) {
+      elem = el
+    }
+  } catch (_e) {}
+
+  // 2. 尝试 uni.createWebviewContext (适配 VDOM 模式)
+  if (elem == null) {
+    try {
+      ctx = uni.createWebviewContext(canvasId)
+    } catch (_e) {}
   }
-  echartObj.value = new WebviewEchart(ctx)
+
+  echartObj.value = new WebviewEchart(canvasId, ctx, elem)
   echartObj.value!.init(props.theme)
   echartObj.value?.setOption(option)
+  setTimeout(() => {
+    echartObj.value?.init(props.theme)
+    echartObj.value?.setOption(option)
+  }, 120)
   return { echartObj: echartObj.value } as UTSJSONObject
 }
 // #endif
@@ -426,8 +444,10 @@ watch((): any => props.height, () => {
 })
 
 onMounted(() => {
+  // #ifndef APP
   // #ifndef MP-ALIPAY
   onCanvasReady()
+  // #endif
   // #endif
 })
 
