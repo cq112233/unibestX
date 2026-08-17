@@ -1,0 +1,1 @@
+import{O as a,e as s,f as e,w as t,C as o,j as l}from"./index-DvNeneMc.js";const d=a({},[["render",function(a,d){const f=l;return s(),e(f,{class:"default-layout flex flex-col"},{default:t(()=>[o(a.$slots,"default",{},void 0,!0)]),_:3})}],["__scopeId","data-v-a2984e7c"]]);export{d as L};
