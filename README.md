@@ -117,6 +117,8 @@ pnpm install
 
 #### 🖥️ 方式一：命令行 CLI 运行
 
+> ⚠️ **使用 CLI 命令前，必须先启动 HBuilderX**（推荐 **HBuilderX 5.24+**）。CLI 命令本质是通过正在运行的 HBuilderX 来编译运行项目，未打开时会报「未找到 HBuilderX」；App 端（Android / iOS / 鸿蒙）编译只能由 HBuilderX 完成。
+
 ```bash
 # 运行到 H5 / Web 端
 pnpm dev:web
@@ -124,8 +126,11 @@ pnpm dev:web
 # 运行到 Android 原生端
 pnpm dev:app-android
 
-# 运行到 iOS 原生端（需 macOS + Xcode 环境）
+# 运行到 iOS 模拟器（需 macOS + Xcode 环境）
 pnpm dev:app-ios
+
+# 运行到 iOS 真机（需连接 iPhone 并信任此电脑）
+pnpm dev:app-ios:device
 
 # 运行到 鸿蒙原生端（需 DevEco Studio 环境）
 pnpm dev:app-harmony
@@ -133,6 +138,8 @@ pnpm dev:app-harmony
 # 运行到 微信小程序
 pnpm dev:mp-weixin
 ```
+
+> 💡 **开发模式**：可以使用命令（`pnpm dev:*`）运行，但前提是 HBuilderX 已打开。
 
 #### 🛠️ 方式二：HBuilderX 图形化运行
 
@@ -148,13 +155,7 @@ pnpm dev:mp-weixin
 
 #### 🖥️ 命令行打包构建
 
-```bash
-# 打包构建 H5
-pnpm build:h5
-
-# 打包构建 微信小程序
-pnpm build:mp-weixin
-```
+> ⚠️ **打包发布请使用 HBuilderX，命令行（CLI）不支持打包发布**：uni-app x 的打包（原生 App 云打包 / 小程序上传等）依赖 HBuilderX 发行能力，且 `uni build` 会在构建时改写 `pages.json`，因此本项目已移除 CLI 构建脚本。
 
 #### 🛠️ HBuilderX 发行打包
 
