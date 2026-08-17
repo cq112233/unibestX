@@ -21,8 +21,8 @@
 
 > 💡 **HBuilderX 版本建议与下载**
 >
-> - **默认蒸汽模式（Vapor）**：推荐使用 **HBuilderX 5.24 及以上版本**（可完整体验与使用无虚拟 DOM 高性能原生渲染）；
-> - 如需使用传统 **VDOM 模式**：**HBuilderX 5.15 及之后版本** 均可稳定运行。
+> - **不想升级 HBuilderX 版本**：请切换 **VDOM 模式**（`manifest.json` 中 `"vapor": false`），**HBuilderX 5.15 及之后版本** 均可稳定运行；
+> - **建议升级后使用 Vapor 蒸汽模式**：推荐 **HBuilderX 5.24 及以上版本**（可完整体验与使用无虚拟 DOM 高性能原生渲染）。
 >
 > 📥 **HBuilderX 5.15 下载地址**：[https://wwbsy.lanzoue.com/b01eupb32d](https://wwbsy.lanzoue.com/b01eupb32d) （密码：`4xdv`）
 
@@ -224,7 +224,7 @@ pnpm build:mp-weixin
 
 * Node >= 22
 * pnpm >= 7.30
-* HBuilderX >= 5.15（默认 Vapor 蒸汽模式推荐使用 **HBuilderX 5.24**；如使用传统 VDOM 模式 5.15+ 即可）
+* HBuilderX >= 5.15（不想升级 HBuilderX 请切换 VDOM 模式，5.15+ 即可；建议升级至 **HBuilderX 5.24** 后使用 Vapor 蒸汽模式）
 * Vue Official >= 2.1.10
 * TypeScript >= 5.0
 * JDK >= 17（Android 平台）
