@@ -1,0 +1,1 @@
+import{O as s,c as a,e,w as t,C as o,i as d}from"./index-C3-smgS2.js";const l=s({},[["render",function(s,l){const c=d;return a(),e(c,{class:"default-layout flex flex-col"},{default:t(()=>[o(s.$slots,"default",{},void 0,!0)]),_:3})}],["__scopeId","data-v-97fc6d05"]]);export{l as L};
