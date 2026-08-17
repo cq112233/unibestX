@@ -1,18 +1,12 @@
 import { C as Card } from "../../basic/components/Card.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataIf: _createSharedDataIf, setSharedDataEvent: _setSharedDataEvent, toDisplayString: _toDisplayString, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
-const __className = "GenSrcPagesFunctionComponentsMediaCard";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "0c3ac25c",
-  __className,
-  __filename: "src/pages/function/components/MediaCard.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "MediaCard",
-  setup(__props) {
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenSrcPagesFunctionComponentsMediaCardSharedData", sharedDataClassId: 0 })));
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
     const photoUrl = ref("");
     const scanResult = ref("");
     function chooseImage() {
@@ -39,40 +33,57 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         }
       }));
     }
-    return () => {
-      "raw js";
-      const n13 = _createSharedDataComponent(
-        Card,
-        "679fa9a5",
-        { title: "相机与多媒体" },
-        {
-          "default": () => {
-            _createSharedDataIf(() => {
-              return _setSharedData(__sharedData, 1, _toSharedDataBoolean(photoUrl.value === ""));
-            }, () => {
-            }, () => {
-              _renderSharedDataEffect(() => {
-                return _setSharedDataAttr(__sharedData, 2, _toSharedDataString(photoUrl.value));
-              });
-            }, 261);
-            _setSharedDataEvent(__sharedData, 3, chooseImage);
-            _setSharedDataEvent(__sharedData, 4, scanCode);
-            _renderSharedDataEffect(() => {
-              const _scanResult = scanResult.value;
-              _setSharedData(__sharedData, 5, _toDisplayString(_scanResult !== "" ? _scanResult : "暂无数据"));
-            });
-          }
-        },
-        1
-        /* SINGLE_ROOT */
-      );
-      _setSharedData(__sharedData, 0, n13.sharedData);
-      return __sharedData;
-    };
+    const __returned__ = { photoUrl, scanResult, chooseImage, scanCode, get Card() {
+      return Card;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const MediaCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "bg-__10b981_": { "": { "backgroundImage": "none", "backgroundColor": "#10b981" } }, "bg-__3b82f6_": { "": { "backgroundImage": "none", "backgroundColor": "#3b82f6" } }, "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex": { "": { "display": "flex" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-150px": { "": { "height": 150 } }, "h-44px": { "": { "height": 44 } }, "items-center": { "": { "alignItems": "center" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-12px": { "": { "marginBottom": 12 } }, "mb-16px": { "": { "marginBottom": 16 } }, "mb-8px": { "": { "marginBottom": 8 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__334155_": { "": { "color": "#334155" } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-12px": { "": { "fontSize": 12 } }, "text-14px": { "": { "fontSize": 14 } }, "w-150px": { "": { "width": 150 } }, "w-full": { "": { "width": "100%" } } };
+const { openBlock: _openBlock, createElementBlock: _createElementBlock, createElementVNode: _createElementVNode, toDisplayString: _toDisplayString, withCtx: _withCtx, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createBlock($setup["Card"], { title: "相机与多媒体" }, {
+    default: _withCtx(() => [
+      _createElementVNode("view", { class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_ items-center justify-center" }, [
+        $setup.photoUrl === "" ? (_openBlock(), _createElementBlock("text", {
+          key: 0,
+          class: "text-14px text-__94a3b8_"
+        }, "未选择照片")) : (_openBlock(), _createElementBlock("image", {
+          key: 1,
+          src: $setup.photoUrl,
+          class: "w-150px h-150px rounded-8px",
+          mode: "aspectFill"
+        }, null, 8, ["src"]))
+      ]),
+      _createElementVNode("view", {
+        class: "w-full h-44px rounded-8px bg-__3b82f6_ mb-12px flex flex-row items-center justify-center",
+        onClick: $setup.chooseImage
+      }, [
+        _createElementVNode("text", { class: "text-__ffffff_ text-14px font-bold" }, "拍摄/选择照片")
+      ]),
+      _createElementVNode("view", { class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
+        _createElementVNode("text", { class: "text-12px text-__94a3b8_ mb-8px" }, "扫码结果"),
+        _createElementVNode(
+          "text",
+          { class: "text-14px font-bold text-__334155_" },
+          _toDisplayString($setup.scanResult !== "" ? $setup.scanResult : "暂无数据"),
+          1
+          /* TEXT */
+        )
+      ]),
+      _createElementVNode("view", {
+        class: "w-full h-44px rounded-8px bg-__10b981_ flex flex-row items-center justify-center",
+        onClick: $setup.scanCode
+      }, [
+        _createElementVNode("text", { class: "text-__ffffff_ text-14px font-bold" }, "扫码测试")
+      ])
+    ]),
+    _: 1
+    /* STABLE */
+  });
+}
+const MediaCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/function/components/MediaCard.uvue"]]);
 export {
   MediaCard as M
 };

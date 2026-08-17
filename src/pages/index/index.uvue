@@ -35,7 +35,21 @@
           　　注意：Vapor 模式下开发过的代码，切换回 VDOM 模式可能因编译检查更严格而报类型或语法错误，请按需选择。
         </text>
       </view>
+      <view class="mt-15px mx-30px px-20px py-15px rounded-12px" style="background-color: rgba(245, 158, 11, 0.1);">
+        <text class="text-14px text-bold" style="color: #d97706;">
+          ⚠️ 页面路由配置须知（重要）
+        </text>
+        <text class="text-14px" style="color: #666; line-height: 26px;">
+          　　本项目内置 vite-plugin-uni-pages 自动文件路由插件，pages.json 为自动构建产物（构建打包时会被重新生成并覆盖）。
+        </text>
+        <text class="text-14px" style="color: #666; line-height: 26px;">
+          　　页面配置请在根目录 pages.config.json 中配置，或在页面代码中使用 definePage 编译宏，切勿直接修改 pages.json！
+        </text>
+      </view>
       <view class="mt-15px mx-30px px-20px py-15px rounded-12px" style="background-color: rgba(55, 194, 188, 0.08);">
+        <text class="text-14px" style="color: #666; line-height: 26px;">
+          📄 文件路由 — 自动扫描路由，通过 pages.config.json / definePage 统一配置
+        </text>
         <text class="text-14px" style="color: #666; line-height: 26px;">
           ⚡ 渲染模式 — 全面支持 VDOM / Vapor 两种模式，默认 Vapor 蒸汽模式
         </text>
@@ -112,13 +126,6 @@ function goToUiTest() {
     url: '/src/pages/haha/haha',
   })
 }
-
-const type = computed(() => {
-  return import.meta.env.VITE_ENV_TYPE
-})
-const title = computed(() => {
-  return import.meta.env.VITE_APP_TITLE
-})
 </script>
 
 <style lang="scss" scoped>

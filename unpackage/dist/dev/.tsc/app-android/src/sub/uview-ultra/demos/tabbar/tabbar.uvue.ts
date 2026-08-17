@@ -1,0 +1,152 @@
+import _easycom_NavBar from '@/src/components/NavBar/NavBar.uvue'
+import _easycom_up_tabbar_item from '@/uni_modules/uview-ultra/components/up-tabbar-item/up-tabbar-item.uvue'
+import _easycom_up_tabbar from '@/uni_modules/uview-ultra/components/up-tabbar/up-tabbar.uvue'
+import AppKu from '@/App.ku.uvue'
+import LayoutComponent from '@/src/layouts/default.uvue'
+import { ref } from 'vue'
+
+
+const __sfc__ = defineComponent({
+  __name: 'tabbar',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+const value1 = ref<number>(0)
+const value2 = ref<number>(0)
+const value3 = ref<number>(0)
+
+function change1(index: any): void {
+  // eslint-disable-next-line unicorn/prefer-number-properties
+  value1.value = parseInt(index.toString())
+}
+
+function change2(index: any): void {
+  // eslint-disable-next-line unicorn/prefer-number-properties
+  value2.value = parseInt(index.toString())
+}
+
+function change3(index: any): void {
+  // eslint-disable-next-line unicorn/prefer-number-properties
+  value3.value = parseInt(index.toString())
+}
+
+return (): any | null => {
+
+const _component_NavBar = resolveEasyComponent("NavBar",_easycom_NavBar)
+const _component_up_tabbar_item = resolveEasyComponent("up-tabbar-item",_easycom_up_tabbar_item)
+const _component_up_tabbar = resolveEasyComponent("up-tabbar",_easycom_up_tabbar)
+
+  return _cV(unref(AppKu), null, _uM({
+    default: withSlotCtx((): any[] => [
+      _cV(unref(LayoutComponent), _uM({
+        "navigation-style": 'custom',
+        "navigation-bar-title-text": 'up-tabbar 底部导航'
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({ class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }), [
+            _cV(_component_NavBar, _uM({
+              title: "Tabbar 底部导航",
+              "auto-back": true,
+              "safe-area-inset-top": true,
+              "bg-color": "#ffffff"
+            })),
+            _cE("view", _uM({ class: "p-16px" }), [
+              _cE("view", _uM({ class: "demo-block" }), [
+                _cE("text", _uM({ class: "demo-label" }), "基础用法"),
+                _cV(_component_up_tabbar, _uM({
+                  value: value1.value,
+                  fixed: false,
+                  "safe-area-inset-bottom": false,
+                  onChange: change1
+                }), _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cV(_component_up_tabbar_item, _uM({
+                      text: "首页",
+                      icon: "home"
+                    })),
+                    _cV(_component_up_tabbar_item, _uM({
+                      text: "放映厅",
+                      icon: "photo"
+                    })),
+                    _cV(_component_up_tabbar_item, _uM({
+                      text: "直播",
+                      icon: "play-right"
+                    })),
+                    _cV(_component_up_tabbar_item, _uM({
+                      text: "我的",
+                      icon: "account"
+                    }))
+                  ]),
+                  _: 1 /* STABLE */
+                }), 8 /* PROPS */, ["value"])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "徽标提示与小红点"),
+                _cV(_component_up_tabbar, _uM({
+                  value: value2.value,
+                  fixed: false,
+                  "safe-area-inset-bottom": false,
+                  onChange: change2
+                }), _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cV(_component_up_tabbar_item, _uM({
+                      text: "首页",
+                      icon: "home",
+                      badge: "5"
+                    })),
+                    _cV(_component_up_tabbar_item, _uM({
+                      text: "消息",
+                      icon: "chat",
+                      dot: true
+                    })),
+                    _cV(_component_up_tabbar_item, _uM({
+                      text: "我的",
+                      icon: "account"
+                    }))
+                  ]),
+                  _: 1 /* STABLE */
+                }), 8 /* PROPS */, ["value"])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "自定义颜色"),
+                _cV(_component_up_tabbar, _uM({
+                  value: value3.value,
+                  fixed: false,
+                  "safe-area-inset-bottom": false,
+                  "active-color": "#fa3534",
+                  "inactive-color": "#909399",
+                  onChange: change3
+                }), _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cV(_component_up_tabbar_item, _uM({
+                      text: "发现",
+                      icon: "search"
+                    })),
+                    _cV(_component_up_tabbar_item, _uM({
+                      text: "购物车",
+                      icon: "shopping-cart"
+                    })),
+                    _cV(_component_up_tabbar_item, _uM({
+                      text: "我的",
+                      icon: "account"
+                    }))
+                  ]),
+                  _: 1 /* STABLE */
+                }), 8 /* PROPS */, ["value"])
+              ])
+            ])
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }))
+    ]),
+    _: 1 /* STABLE */
+  }))
+}
+}
+
+})
+export default __sfc__
+const GenSrcSubUviewUltraDemosTabbarTabbarStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["mt-12px", _pS(_uM([["marginTop", 12]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 12], ["paddingLeft", 6], ["borderLeftWidth", 3], ["borderLeftColor", "#2979ff"], ["borderLeftStyle", "solid"]]))]])]

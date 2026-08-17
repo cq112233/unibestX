@@ -10,7 +10,7 @@
           {
             "path": "debuggable",
             "traceValue": true,
-            "value": false
+            "value": true
           },
           {
             "path": "copyFrom",
@@ -46,69 +46,17 @@
             "path": "arkOptions.runtimeOnly.sources",
             "traceValue": false,
             "value": ""
-          },
-          {
-            "path": "arkOptions.obfuscation",
-            "traceValue": false,
-            "value": ""
-          },
-          {
-            "path": "arkOptions.obfuscation.ruleOptions",
-            "traceValue": false,
-            "value": ""
-          },
-          {
-            "path": "arkOptions.obfuscation.ruleOptions.enable",
-            "traceValue": true,
-            "value": false
-          },
-          {
-            "path": "arkOptions.obfuscation.ruleOptions.files",
-            "traceValue": false,
-            "value": ""
-          },
-          {
-            "path": "externalNativeOptions",
-            "traceValue": false,
-            "value": ""
-          },
-          {
-            "path": "externalNativeOptions.path",
-            "traceValue": false,
-            "value": ""
-          },
-          {
-            "path": "externalNativeOptions.abiFilters",
-            "traceValue": true,
-            "value": [
-              "arm64-v8a"
-            ]
-          },
-          {
-            "path": "externalNativeOptions.arguments",
-            "traceValue": false,
-            "value": ""
-          },
-          {
-            "path": "externalNativeOptions.cppFlags",
-            "traceValue": false,
-            "value": ""
           }
         ],
         "PACKAGE_JSON": [],
         "MODULE_TYPE": "entry",
-        "INCREMENTAL_TASKS": {
-          "BUILD_NATIVE_WITH_CMAKE": false,
-          "COMPILE_ARKTS": true
-        },
-        "IS_INCREMENTAL_MODULE": false
+        "IS_INCREMENTAL_MODULE": true
       }
     ],
     "NATIVE_COMPILER": "Default",
-    "IS_FULL_BUILD": true,
+    "IS_FULL_BUILD": false,
     "PACKAGE_JSON": [],
-    "BUILD_MODE": "release",
-    "USE_NORMALIZED_OHMURL": true
+    "BUILD_MODE": "debug"
   },
   "HVIGOR": {
     "IS_INCREMENTAL": true,
@@ -117,49 +65,83 @@
     "IS_HVIGORFILE_TYPE_CHECK": false,
     "IS_EXECUTION_OHPM_BY_HVIGOR": false,
     "BUILD_ANALYSIS_MODE": "normal",
-    "TASK_TIME": {
-      "923fe53966c6cd9343e11af776cd4b05be315ea4b200b02e4d5dfb0f929b73bf": {
-        "PreBuild": 7618833,
-        "CreateModuleInfo": 238375,
-        "ConfigureCmake": 48545083,
-        "MergeProfile": 7526500,
-        "CreateBuildProfile": 420500,
-        "PreCheckSyscap": 114208,
-        "GeneratePkgSdkInfo": 692833,
-        "ProcessIntegratedHsp": 175667,
-        "MakePackInfo": 1464750,
-        "SyscapTransform": 813917,
-        "BuildNativeWithCmake": 394142083,
-        "ProcessProfile": 50162208,
-        "ProcessRouterMap": 1862291,
-        "ProcessShareConfig": 1963792,
-        "ProcessStartupConfig": 1680209,
-        "GenerateLoaderJson": 7045125,
-        "BuildNativeWithNinja": 108830792,
-        "ProcessLibs": 96294458,
-        "CompileResource": 528302000,
-        "BuildJS": 1914042,
-        "CompileArkTS": 9931286125,
-        "GeneratePkgModuleJson": 2454500,
-        "ProcessCompiledResources": 384833,
-        "PackageHap": 694899208,
-        "PackingCheck": 31585292,
-        "SignHap": 360142292,
-        "CollectDebugSymbol": 4178500,
-        "assembleHap": 199750
-      }
-    },
+    "TASK_TIME": {},
     "CUSTOM_TASK_TIME": {},
     "CUSTOM_PLUGIN_TIME": {},
-    "APIS": [
-      "getProperty"
-    ],
+    "APIS": [],
     "CONFIG_EXPERIMENT": {
       "ENABLE_MODULE_SKIP": false,
       "ENABLE_CPP_FUNCTION_LEVEL_INCREMENTAL": false
     },
     "CONFIG_PROPERTIES": {},
-    "TOTAL_TIME": 12203159792,
-    "BUILD_ID": "202608171832558120"
+    "TOTAL_TIME": 86241458,
+    "BUILD_ID": "202608171937235620",
+    "ERROR_MESSAGE": [
+      {
+        "CODE": "00303038",
+        "MESSAGE": "%s",
+        "SOLUTIONS": [
+          "Please check the following fields. \n {\n  instancePath: 'app',\n  keyword: 'required',\n  params: { missingProperty: 'icon' },\n  message: \"must have required property 'icon'\",\n  location: '/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/AppScope/app.json5:2:11'\n} \n{\n  instancePath: 'app',\n  keyword: 'required',\n  params: { missingProperty: 'label' },\n  message: \"must have required property 'label'\",\n  location: '/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/AppScope/app.json5:2:11'\n} \n"
+        ],
+        "TIMESTAMP": "1786966643646"
+      },
+      {
+        "CODE": "00303038",
+        "STACK": "00303038 Configuration Error\n...",
+        "PROJECT_CONFIG": {
+          "buildMode": "Debug",
+          "compileMode": "esmodule",
+          "moduleType": "entry",
+          "targetName": ".default",
+          "packageManagerType": "ohpm",
+          "isLocalTest": false,
+          "needCoverageInsert": false,
+          "debugLine": false,
+          "compileSdkVersion": 24,
+          "compatibleSdkVersion": 13,
+          "originCompatibleSdkVersion": "5.0.1(13)",
+          "etsLoaderVersion": "6.1.1.125",
+          "etsLoaderReleaseType": "Release",
+          "aotCompileMode": "type",
+          "isCrossplatform": false,
+          "bundleType": "app",
+          "apiVersion": 24,
+          "isFaMode": false,
+          "deviceTypes": [
+            "phone"
+          ],
+          "integratedHsp": false,
+          "branchElimination": false,
+          "tsImportSendable": false,
+          "resolveConflictMode": true,
+          "useNativeResolver": true,
+          "shouldEmitJs": true,
+          "useTscResolve": false,
+          "singleFileEmit": false,
+          "executionMode": "memory",
+          "isHarDeduplicateEnabled": false,
+          "autoLazyImport": false,
+          "allowEmptyBundleName": false,
+          "reExportCheckMode": "noCheck",
+          "usePathPlaceholder": false,
+          "writeRollupCache": true,
+          "isExpandImportEnabled": false,
+          "ignoreCrossplatformCheck": false,
+          "skipOhModulesLint": false,
+          "enableStrictCheckOHModule": false,
+          "useDeclarationFileSignature": false,
+          "isPreloadSoEnabled": false,
+          "strictMode.caseSensitiveCheck": true,
+          "strictMode.useNormalizedOHMUrl": true,
+          "strictMode.noExternalImportByPath": true,
+          "runtimeOS": "HarmonyOS",
+          "sdkInfo": "false:24:6.1.1.125:Release",
+          "useSourceHash": false,
+          "isByteCodeHarOptimize": false,
+          "copyCodeResourceEnable": true,
+          "uiTransformOptimization": false
+        }
+      }
+    ]
   }
 }

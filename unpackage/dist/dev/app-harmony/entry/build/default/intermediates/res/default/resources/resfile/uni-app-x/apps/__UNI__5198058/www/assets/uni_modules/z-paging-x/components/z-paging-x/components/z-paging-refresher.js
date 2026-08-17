@@ -3,18 +3,12 @@ import { z as zPagingLoading } from "./z-paging-loading.js";
 import { E as Enum } from "../enums/index.js";
 import { g as getRefesrherFormatTimeByKey } from "../utils/index.js";
 import { _ as _export_sfc } from "../../../../../plugin-vue-export-helper.js";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponent: _createSharedDataComponent, setSharedDataClass: _setSharedDataClass, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, createSharedDataIf: _createSharedDataIf, toDisplayString: _toDisplayString } = globalThis.Vue;
-const __className = "GenUniModulesZPagingXComponentsZPagingXComponentsZPagingRefresher";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref, computed } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "z-paging-refresher"
   },
-  __dynamicSharedData: true,
-  __hash: "3d55d144",
-  __className,
-  __filename: "uni_modules/z-paging-x/components/z-paging-x/components/z-paging-refresher.uvue",
   __name: "z-paging-refresher",
   props: {
     // 下拉刷新状态
@@ -58,9 +52,9 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       default: 0
     }
   },
-  setup(__props) {
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesZPagingXComponentsZPagingXComponentsZPagingRefresherSharedData", sharedDataClassId: 0 })));
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
     const props = __props;
     const base64ArrowImg = ref(base64Arrow);
     const base64FlowerImg = ref(base64Flower);
@@ -117,39 +111,62 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     const showRefresherTimeText = computed(() => {
       return props.showUpdateTime && refresherTimeText.value.length > 0;
     });
-    return () => {
-      "raw js";
-      _renderSharedDataEffect(() => {
-        return _setSharedDataStyle(__sharedData, 6, { height: __props.showUpdateTime ? "60px" : "40px" });
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(isLoading.value));
-      }, () => {
-        const n2 = _createSharedDataComponent(zPagingLoading, "49dd896e");
-        _setSharedData(__sharedData, 1, n2.sharedData);
-      }, () => {
-        _renderSharedDataEffect(() => {
-          _setSharedDataClass(__sharedData, 2, ["zpx-r-image", getLeftImageClass.value]);
-          _setSharedDataAttr(__sharedData, 3, _toSharedDataString(getLeftImageSrc.value));
-        });
-      }, 261);
-      _renderSharedDataEffect(() => {
-        _setSharedDataStyle(__sharedData, 7, { marginLeft: showRefresherTimeText.value ? "25rpx" : "10rpx" });
-        _setSharedData(__sharedData, 8, _toDisplayString(statusText.value));
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 4, _toSharedDataBoolean(showRefresherTimeText.value));
-      }, () => {
-        _renderSharedDataEffect(() => {
-          return _setSharedData(__sharedData, 5, _toDisplayString(refresherTimeText.value));
-        });
-      });
-      return __sharedData;
-    };
+    const __returned__ = { props, base64ArrowImg, base64FlowerImg, base64SuccessImg, isDefault, isReleaseToRefresh, isLoading, isComplete, getLeftImageClass, getLeftImageSrc, statusText, refresherTimeText, showRefresherTimeText, get zPagingLoading() {
+      return zPagingLoading;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const zPagingRefresher = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "zpx-r-container": { "": { "height": 40, "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "zpx-r-image": { "": { "width": "34rpx", "height": "34rpx", "transitionDuration": ".2s", "transitionProperty": "transform", "transform": "rotate(0deg)" } }, "zpx-r-arrow-top": { "": { "transform": "rotate(0deg)" } }, "zpx-r-arrow-down": { "": { "transform": "rotate(180deg)" } }, "zpx-r-text-container": { "": { "flexDirection": "column", "alignItems": "center" } }, "zpx-r-text": { "": { "color": "#808080", "fontSize": "28rpx" } }, "zpx-r-time-text": { "": { "fontSize": "26rpx", "marginTop": "10rpx" } }, "@TRANSITION": { "zpx-r-image": { "duration": ".2s", "property": "transform" } } };
+const { openBlock: _openBlock, createBlock: _createBlock, createCommentVNode: _createCommentVNode, normalizeClass: _normalizeClass, createElementBlock: _createElementBlock, toDisplayString: _toDisplayString, createElementVNode: _createElementVNode, normalizeStyle: _normalizeStyle } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      class: "zpx-r-container",
+      style: _normalizeStyle({ height: $props.showUpdateTime ? "60px" : "40px" })
+    },
+    [
+      $setup.isLoading ? (_openBlock(), _createBlock($setup["zPagingLoading"], { key: 0 })) : (_openBlock(), _createElementBlock("image", {
+        key: 1,
+        class: _normalizeClass(["zpx-r-image", $setup.getLeftImageClass]),
+        src: $setup.getLeftImageSrc
+      }, null, 10, ["src"])),
+      _createElementVNode(
+        "view",
+        {
+          class: "zpx-r-text-container",
+          style: _normalizeStyle({ marginLeft: $setup.showRefresherTimeText ? "25rpx" : "10rpx" })
+        },
+        [
+          _createElementVNode(
+            "text",
+            { class: "zpx-r-text" },
+            _toDisplayString($setup.statusText),
+            1
+            /* TEXT */
+          ),
+          $setup.showRefresherTimeText ? (_openBlock(), _createElementBlock(
+            "text",
+            {
+              key: 0,
+              class: "zpx-r-text zpx-r-time-text"
+            },
+            _toDisplayString($setup.refresherTimeText),
+            1
+            /* TEXT */
+          )) : _createCommentVNode("v-if", true)
+        ],
+        4
+        /* STYLE */
+      )
+    ],
+    4
+    /* STYLE */
+  );
+}
+const zPagingRefresher = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/z-paging-x/components/z-paging-x/components/z-paging-refresher.uvue"]]);
 export {
   zPagingRefresher as z
 };

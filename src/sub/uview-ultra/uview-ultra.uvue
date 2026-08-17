@@ -12,6 +12,7 @@
       <image src="/static/logo.png" style="width: 50px; height: 50px;" class="mr-12px rounded-8px" />
       <view class="flex-1">
         <text class="text-16px font-bold text-[#1e293b]">uview-ultra 组件库</text>
+        <text class="text-12px text-[#64748b] mt-4px">已收录 {{ demoCount }} 个组件 Demo</text>
         <text class="text-12px text-[#64748b] mt-4px">点击下方任意功能组件，进入独立页面进行演示</text>
       </view>
     </view>
@@ -337,6 +338,11 @@
             <up-icon name="minus" :color="themeColor" size="20" class="mr-8px"></up-icon>
           </template>
         </up-cell>
+        <up-cell title="CircleProgress 圆形进度条" is-link @click="goToDemo('circle-progress')">
+          <template #icon>
+            <up-icon name="reload" :color="themeColor" size="20" class="mr-8px"></up-icon>
+          </template>
+        </up-cell>
         <up-cell title="CountDown 倒计时" is-link @click="goToDemo('count-down')">
           <template #icon>
             <up-icon name="clock" :color="themeColor" size="20" class="mr-8px"></up-icon>
@@ -410,6 +416,7 @@ import { useAppStore } from '@/src/store/index.uts'
 
 const appStore = useAppStore()
 const themeColor = computed<string>(() => appStore.state.theme)
+const demoCount: number = 73
 
 function goToDemo(page: string): void {
   uni.navigateTo({

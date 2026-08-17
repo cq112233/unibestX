@@ -1,0 +1,724 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ0Šimport { UniElementImpl } from './UniElement';
+import { WebView } from '../components/WebView';
+import { createUniFrameNode, UniFrameNode } from '../Node';
+import webview from "@ohos.web.webview";
+import { UniWebViewLoadEvent, UniWebViewMessageEvent, UniWebViewLoadingEvent, UniWebViewDownloadEvent, UniWebViewErrorEvent, UniWebViewContentHeightChangeEvent } from './UniWebViewEvent';
+import { createDownloadDelegate } from '../helper';
+import buffer from "@ohos.buffer";
+import util from "@ohos.util";
+const BASE64_ENCODING = 'base64';
+export function WebViewBuilder(options, parent = null) {
+    const __options__ = options;
+    {
+        (parent ? parent : this).observeComponentCreation2((elmtId, isInitialRender, options = __options__) => {
+            if (isInitialRender) {
+                let componentCall = new WebView(parent ? parent : this, options, undefined, elmtId, () => { }, { page: "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/UniWebViewElement.ets", line: 24, col: 3 });
+                ViewPU.create(componentCall);
+                let paramsLambda = () => {
+                    return options;
+                };
+                componentCall.paramsGenerator_ = paramsLambda;
+            }
+            else {
+                (parent ? parent : this).updateStateVarsOfChildByElmtId(elmtId, {});
+            }
+        }, { name: "WebView" });
+    }
+}
+class WebViewFrameNode extends UniFrameNode {
+}
+export class UniWebViewElementImpl extends UniElementImpl {
+    constructor() {
+        super(...arguments);
+        this.controllerAttachedInvokers = [];
+        this.isControllerAttached = false;
+        this.isPageEnd = false;
+        this.lastPageHeight = 0;
+        this.widthByAreaChange = 0;
+        this.heightByAreaChange = 0;
+        this.curOffsetY = 0;
+    }
+    static get defaultStyle() {
+        const baseDefaultStyle = super.defaultStyle;
+        const defaultStyle = new Map(baseDefaultStyle);
+        defaultStyle.set('width', ['100%', true]);
+        defaultStyle.set('height', ['100%', true]);
+        return defaultStyle;
+    }
+    createFrameNode() {
+        const controller = this.controller = new webview.WebviewController();
+        this.options = {
+            delegate: createDownloadDelegate(),
+            controller,
+            onContentHeightChange: (contentHeight) => {
+                this.lastPageHeight = contentHeight;
+                this.dispatchEvent(new UniWebViewContentHeightChangeEvent({
+                    height: this.lastPageHeight
+                }));
+            },
+            onControllerAttached: () => {
+                if (!this.isControllerAttached) {
+                    this.isControllerAttached = true;
+                    this.controllerAttachedInvokers.forEach(cb => cb());
+                    this.controllerAttachedInvokers = [];
+                }
+            },
+            onPageEnd: () => {
+                if (!this.isPageEnd) {
+                    this.isPageEnd = true;
+                }
+            },
+            onPostMessageToService: (event) => {
+                const detail = event.detail;
+                const name = detail.args.data.name;
+                const arg = detail.args.data.arg;
+                switch (name) {
+                    case 'navigateTo':
+                        globalThis.uni.navigateTo({
+                            url: encodeURI(arg.url)
+                        });
+                        break;
+                    case 'navigateBack':
+                        const delta = parseInt(arg.delta);
+                        globalThis.uni.navigateBack({
+                            delta: !isNaN(delta) ? delta : 1
+                        });
+                        break;
+                    case 'switchTab':
+                        globalThis.uni.switchTab({
+                            url: encodeURI(arg.url)
+                        });
+                        break;
+                    case 'reLaunch':
+                        globalThis.uni.reLaunch({
+                            url: encodeURI(arg.url)
+                        });
+                        break;
+                    case 'redirectTo':
+                        globalThis.uni.redirectTo({
+                            url: encodeURI(arg.url)
+                        });
+                        break;
+                }
+            }
+        };
+        const web = createUniFrameNode(this.app.context, WebViewFrameNode, wrapBuilder(WebViewBuilder), this.options);
+        web.componentInstance.handleAreaChange = (_, newValue) => {
+            this.widthByAreaChange = newValue.width;
+            this.heightByAreaChange = newValue.height;
+        };
+        web.componentInstance.handleScroll = (event) => {
+            this.curOffsetY = event.yOffset;
+        };
+        return web;
+    }
+    updateNativeNodeStyle(key, value) {
+        switch (key) {
+            default:
+                super.updateNativeNodeStyle(key, value);
+        }
+    }
+    updateNativeAttribute(key, value) {
+        switch (key) {
+            case 'src':
+                this.frameNode.componentInstance.src = value;
+                break;
+            case 'updateTitle':
+                if (typeof value === 'boolean') {
+                    this.frameNode.componentInstance.onTitleUpdate = value ? (event) => {
+                        const detail = event.detail;
+                        this.page.navBarFrameNode.componentInstance.titleText = detail.title;
+                    } : undefined;
+                }
+                break;
+            case 'horizontalScrollBarAccess':
+                if (typeof value === 'boolean') {
+                    this.frameNode.componentInstance.setHorizontalScrollBarAccess(value);
+                }
+                break;
+            case 'verticalScrollBarAccess':
+                if (typeof value === 'boolean') {
+                    this.frameNode.componentInstance.setVerticalScrollBarAccess(value);
+                }
+                break;
+            case 'bounces':
+                if (typeof value === 'boolean') {
+                    this.frameNode.componentInstance.bounces = value;
+                }
+        }
+    }
+    initNativeEvent(type) {
+        switch (type) {
+            case 'load': {
+                this.frameNode.componentInstance.onLoad = (event) => {
+                    this.dispatchEvent(new UniWebViewLoadEvent('load', event.detail));
+                };
+                break;
+            }
+            case 'message': {
+                this.frameNode.componentInstance.onMessage = (event) => {
+                    this.dispatchEvent(new UniWebViewMessageEvent('message', event.detail));
+                };
+                break;
+            }
+            case 'loading': {
+                this.frameNode.componentInstance.onLoading = (event) => {
+                    this.dispatchEvent(new UniWebViewLoadingEvent('loading', event.detail));
+                };
+                break;
+            }
+            case 'download': {
+                this.frameNode.componentInstance.onDownload = (event) => {
+                    this.dispatchEvent(new UniWebViewDownloadEvent('download', event.detail));
+                };
+                break;
+            }
+            case 'error': {
+                this.frameNode.componentInstance.onError = (event) => {
+                    this.dispatchEvent(new UniWebViewErrorEvent('error', event.detail));
+                };
+                break;
+            }
+            default:
+                super.initNativeEvent(type);
+                break;
+        }
+    }
+    deleteNativeEvent(type, res) {
+        switch (type) {
+            case 'load': {
+                this.frameNode.componentInstance.onLoad = undefined;
+                return true;
+            }
+            case 'message': {
+                this.frameNode.componentInstance.onMessage = undefined;
+                return true;
+            }
+            case 'loading': {
+                this.frameNode.componentInstance.onLoading = undefined;
+                return true;
+            }
+            case 'download': {
+                this.frameNode.componentInstance.onDownload = undefined;
+                return true;
+            }
+            case 'error': {
+                this.frameNode.componentInstance.onError = undefined;
+                return true;
+            }
+            default:
+                return super.deleteNativeEvent(type, res);
+        }
+    }
+    getHarmonyController() {
+        return this.controller;
+    }
+    invokeController(methodName, ...args) {
+        if (this.isControllerAttached) {
+            return this.controller[methodName](...args);
+        }
+        else {
+            this.controllerAttachedInvokers.push(() => {
+                this.controller[methodName](...args);
+            });
+        }
+    }
+    back() {
+        this.invokeController('backward');
+    }
+    forward() {
+        this.invokeController('forward');
+    }
+    reload() {
+        this.invokeController('refresh');
+    }
+    stop() {
+        this.invokeController('stop');
+    }
+    evalJS(js) {
+        this.invokeController('runJavaScript', js);
+    }
+    getContentHeight() {
+        const pageHeight = this.controller.getPageHeight();
+        if (this.lastPageHeight === 0 && this.lastPageHeight !== pageHeight) {
+            return pageHeight;
+        }
+        return this.lastPageHeight;
+    }
+    canBack() {
+        return this.controller.accessBackward();
+    }
+    canForward() {
+        return this.controller.accessForward();
+    }
+    loadData(options) {
+        /**
+         * @tutorial https://developer.huawei.com/consumer/cn/doc/harmonyos-references/js-apis-webview#loaddata
+         *
+         * è‹¥åŠ è½½æœ¬åœ°å›¾ç‰‡ï¼Œå¯ä»¥ç»™baseUrlæˆ–historyUrlä»»ä¸€å‚æ•°èµ‹å€¼ç©ºæ ¼ï¼Œè¯¦æƒ…è¯·å‚è€ƒç¤ºä¾‹ä»£ç ã€‚
+         * åŠ è½½æœ¬åœ°å›¾ç‰‡åœºæ™¯ï¼ŒbaseUrlå’ŒhistoryUrlä¸èƒ½åŒæ—¶ä¸ºç©ºï¼Œå¦åˆ™å›¾ç‰‡æ— æ³•æˆåŠŸåŠ è½½ã€‚
+         * è‹¥htmlä¸­çš„å¯Œæ–‡æœ¬ä¸­å¸¦æœ‰æ³¨å…¥#ç­‰ç‰¹æ®Šå­—ç¬¦ï¼Œå»ºè®®å°†baseUrlå’ŒhistoryUrlä¸¤ä¸ªå‚æ•°çš„å€¼è®¾ç½®ä¸º"ç©ºæ ¼"ã€‚
+         * dataæ•°æ®å¿…é¡»ä½¿ç”¨base64ç¼–ç æˆ–å°†å†…å®¹ä¸­çš„ä»»ä½•#å­—ç¬¦ç¼–ç ä¸º%23ã€‚å¦åˆ™#å°†è¢«è§†ä¸ºå†…å®¹çš„ç»“å°¾è€Œå‰©ä½™çš„æ–‡æœ¬å°†è¢«ç”¨ä½œæ–‡æ¡£ç‰‡æ®µæ ‡è¯†ç¬¦ã€‚
+         *
+         * ç”¨æˆ·ä¸ä¼ é€’ encoding ä¸” baseURL ä¸ºç©ºæ—¶ï¼Œåˆ™é»˜è®¤å¯¹ data è¿›è¡Œ base64 ç¼–ç åå†ä¼ ç»™åº•å±‚ï¼Œä»¥å…¼å®¹ç”¨æˆ·ç›´æ¥ä¼ å…¥ html ä¸­æœ‰ç‰¹æ®Šå­—ç¬¦é¸¿è’™ Web æ˜¾ç¤ºå¼‚å¸¸ https://issues.dcloud.net.cn/pages/issues/detail?id=28962
+         *    å¦‚æœ encoding=base64 ä¸” baseURL ä¸ä¸ºç©ºä¼šå°† base64 å†…å®¹åŸæ ·æ˜¾ç¤º
+         */
+        let data = options.data;
+        let encoding = options?.encoding;
+        const baseURL = options?.baseURL ?? '';
+        if (encoding == null && baseURL.length === 0) {
+            try {
+                const htmlBytes = new util.TextEncoder().encodeInto(data);
+                const byteOffset = htmlBytes.byteOffset;
+                const byteLength = htmlBytes.byteLength;
+                const htmlBuffer = byteOffset == 0 && byteLength == htmlBytes.buffer.byteLength
+                    ? htmlBytes.buffer
+                    : htmlBytes.buffer.slice(byteOffset, byteOffset + byteLength);
+                data = buffer.from(htmlBuffer).toString(BASE64_ENCODING);
+                encoding = BASE64_ENCODING;
+            }
+            catch (error) {
+                console.error('[WebView loadData] Failed to encode data to base64:', error);
+            }
+        }
+        if (encoding !== BASE64_ENCODING) {
+            data = data.replace(/#/g, '%23');
+        }
+        this.invokeController('loadData', data, options.mimeType ?? "text/html", encoding ?? "UTF-8", baseURL ?? '');
+    }
+    dispose() {
+        this.options.delegate.onBeforeDownload(undefined);
+        this.options.delegate.onDownloadUpdated(undefined);
+        this.options.delegate.onDownloadFinish(undefined);
+        this.options.delegate.onDownloadFailed(undefined);
+        super.dispose();
+    }
+}
+//# sourceMappingURL=UniWebViewElement.js.mapÂ˜Ùõ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/UniElement.etsÙù/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/components/WebView.etsÙë/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/Node.etsÙn hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.web.webview.d.tsÙÿ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/UniWebViewEvent/index.tsÙó/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/helper/index.etsÙi hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.buffer.d.tsÙg hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.util.d.tsÙü/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/UniWebViewElement.etsÔrB˜±isLocalDependency¯isNodeEntryFile§pkgPath§pkgNameªpkgVersion±belongProjectPath±dependencyPkgInfo¬shouldEmitJsÂÂÙâ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime½@dcloudio/uni-runtime-harmony¥1.0.0ÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmonyÔrC’§pkgNameªpkgVersion½@dcloudio/uni-runtime-harmony¥1.0.0ÃÃÚ(˜import {
+  UniWebViewElement as IUniWebViewElement,
+  UniWebViewElementLoadDataOptions
+} from '@dcloudio/uni-app-x/types/native'
+import { UniElementImpl } from './UniElement'
+import { WebView, WebViewOptions } from '../components/WebView'
+import { createUniFrameNode, UniFrameNode } from '../Node'
+import { webview } from '@kit.ArkWeb';
+import {
+  UniWebViewLoadEvent,
+  UniWebViewMessageEvent,
+  UniWebViewLoadingEvent,
+  UniWebViewDownloadEvent,
+  UniWebViewErrorEvent,
+  UniWebViewContentHeightChangeEvent
+} from './UniWebViewEvent'
+import { createDownloadDelegate } from '../helper';
+import { buffer, util } from '@kit.ArkTS';
+
+const BASE64_ENCODING = 'base64'
+
+@Builder
+export function WebViewBuilder(options: WebViewOptions) {
+  WebView(options)
+}
+
+class WebViewFrameNode extends UniFrameNode {
+  componentInstance!: WebView
+}
+
+export class UniWebViewElementImpl
+  extends UniElementImpl<WebViewFrameNode>
+implements IUniWebViewElement {
+  private options!: WebViewOptions
+  private controller!: webview.WebviewController
+  private controllerAttachedInvokers: Array<() => void> = []
+  private isControllerAttached: boolean = false
+  private isPageEnd: boolean = false
+  private lastPageHeight: number = 0
+  protected widthByAreaChange: number = 0
+  protected heightByAreaChange: number = 0
+  protected curOffsetY: number = 0
+
+  static override get defaultStyle() {
+    const baseDefaultStyle = super.defaultStyle as Map<string, [string] | [string, boolean]>
+    const defaultStyle = new Map(baseDefaultStyle)
+    defaultStyle.set('width', ['100%', true])
+    defaultStyle.set('height', ['100%', true])
+    return defaultStyle
+  }
+
+  protected override createFrameNode(): WebViewFrameNode {
+    const controller = this.controller = new webview.WebviewController()
+    this.options = {
+      delegate: createDownloadDelegate(),
+      controller,
+      onContentHeightChange: (contentHeight) => {
+        this.lastPageHeight = contentHeight
+        this.dispatchEvent(new UniWebViewContentHeightChangeEvent({
+          height: this.lastPageHeight
+        }))
+      },
+      onControllerAttached: () => {
+        if (!this.isControllerAttached) {
+          this.isControllerAttached = true
+          this.controllerAttachedInvokers.forEach(cb => cb())
+          this.controllerAttachedInvokers = []
+        }
+      },
+      onPageEnd: () => {
+        if (!this.isPageEnd) {
+          this.isPageEnd = true
+        }
+      },
+      onPostMessageToService: (event) => {
+        const detail = event.detail
+        const name = detail.args.data.name
+        const arg: ESObject = detail.args.data.arg
+        switch (name) {
+          case 'navigateTo':
+            globalThis.uni.navigateTo({
+              url: encodeURI(arg.url)
+            })
+            break;
+          case 'navigateBack':
+            const delta = parseInt(arg.delta)
+            globalThis.uni.navigateBack({
+              delta: !isNaN(delta) ? delta : 1
+            })
+            break;
+          case 'switchTab':
+            globalThis.uni.switchTab({
+              url: encodeURI(arg.url)
+            })
+            break;
+          case 'reLaunch':
+            globalThis.uni.reLaunch({
+              url: encodeURI(arg.url)
+            })
+            break;
+          case 'redirectTo':
+            globalThis.uni.redirectTo({
+              url: encodeURI(arg.url)
+            })
+            break;
+        }
+      }
+    }
+    const web = createUniFrameNode<WebViewFrameNode, WebViewOptions>(this.app.context!, WebViewFrameNode,
+      wrapBuilder(WebViewBuilder),
+      this.options)
+
+    web.componentInstance.handleAreaChange = (_: Area, newValue: Area) => {
+      this.widthByAreaChange = newValue.width as number
+      this.heightByAreaChange = newValue.height as number
+    }
+    web.componentInstance.handleScroll = (event) => {
+      this.curOffsetY = event.yOffset
+    }
+    return web
+  }
+
+  override updateNativeNodeStyle(key: string, value: Object): void {
+    switch (key) {
+      default:
+        super.updateNativeNodeStyle(key, value)
+    }
+  }
+
+  override updateNativeAttribute(key: string, value: ESObject) {
+    switch (key) {
+      case 'src':
+        this.frameNode.componentInstance.src = value as string
+        break
+      case 'updateTitle':
+        if (typeof value === 'boolean') {
+          this.frameNode.componentInstance.onTitleUpdate = value ? (event) => {
+            const detail = event.detail
+            this.page.navBarFrameNode.componentInstance.titleText = detail.title
+          } : undefined
+        }
+        break
+      case 'horizontalScrollBarAccess':
+        if (typeof value === 'boolean') {
+          this.frameNode.componentInstance.setHorizontalScrollBarAccess(value)
+        }
+        break
+      case 'verticalScrollBarAccess':
+        if (typeof value === 'boolean') {
+          this.frameNode.componentInstance.setVerticalScrollBarAccess(value)
+        }
+        break
+      case 'bounces':
+        if (typeof value === 'boolean') {
+          this.frameNode.componentInstance.bounces = value
+        }
+    }
+  }
+
+  protected override initNativeEvent(type: string): void {
+    switch (type) {
+      case 'load': {
+        this.frameNode.componentInstance.onLoad = (event) => {
+          this.dispatchEvent(new UniWebViewLoadEvent('load', event.detail))
+        }
+        break
+      }
+      case 'message': {
+        this.frameNode.componentInstance.onMessage = (event) => {
+          this.dispatchEvent(new UniWebViewMessageEvent('message', event.detail))
+        }
+        break
+      }
+      case 'loading': {
+        this.frameNode.componentInstance.onLoading = (event) => {
+          this.dispatchEvent(new UniWebViewLoadingEvent('loading', event.detail))
+        }
+        break
+      }
+      case 'download': {
+        this.frameNode.componentInstance.onDownload = (event) => {
+          this.dispatchEvent(new UniWebViewDownloadEvent('download', event.detail))
+        }
+        break
+      }
+      case 'error': {
+        this.frameNode.componentInstance.onError = (event) => {
+          this.dispatchEvent(new UniWebViewErrorEvent('error', event.detail))
+        }
+        break
+      }
+      default:
+        super.initNativeEvent(type)
+        break
+    }
+  }
+
+  protected override deleteNativeEvent(type: string, res: void | Object): boolean {
+    switch (type) {
+      case 'load': {
+        this.frameNode.componentInstance.onLoad = undefined
+        return true
+      }
+      case 'message': {
+        this.frameNode.componentInstance.onMessage = undefined
+        return true
+      }
+      case 'loading': {
+        this.frameNode.componentInstance.onLoading = undefined
+        return true
+      }
+      case 'download': {
+        this.frameNode.componentInstance.onDownload = undefined
+        return true
+      }
+      case 'error': {
+        this.frameNode.componentInstance.onError = undefined
+        return true
+      }
+      default:
+        return super.deleteNativeEvent(type, res)
+    }
+  }
+
+  override getHarmonyController<T extends webview.WebviewController>(): T | null {
+    return this.controller as T
+  }
+
+  private invokeController(methodName: string, ...args: ESObject[]): ESObject {
+    if (this.isControllerAttached) {
+      return this.controller[methodName](...args);
+    } else {
+      this.controllerAttachedInvokers.push(() => {
+        this.controller[methodName](...args);
+      });
+    }
+  }
+
+  back(): void {
+    this.invokeController('backward')
+  }
+
+  forward(): void {
+    this.invokeController('forward')
+  }
+
+  reload(): void {
+    this.invokeController('refresh')
+  }
+
+  stop(): void {
+    this.invokeController('stop')
+  }
+
+  evalJS(js: string): void {
+    this.invokeController('runJavaScript', js)
+  }
+
+  getContentHeight(): number {
+    const pageHeight = this.controller.getPageHeight()
+    if (this.lastPageHeight === 0 && this.lastPageHeight !== pageHeight) {
+      return pageHeight
+    }
+    return this.lastPageHeight
+  }
+
+  canBack(): boolean {
+    return this.controller.accessBackward()
+  }
+
+  canForward(): boolean {
+    return this.controller.accessForward()
+  }
+
+  loadData(options: UniWebViewElementLoadDataOptions): void {
+    /**
+     * @tutorial https://developer.huawei.com/consumer/cn/doc/harmonyos-references/js-apis-webview#loaddata
+     *
+     * è‹¥åŠ è½½æœ¬åœ°å›¾ç‰‡ï¼Œå¯ä»¥ç»™baseUrlæˆ–historyUrlä»»ä¸€å‚æ•°èµ‹å€¼ç©ºæ ¼ï¼Œè¯¦æƒ…è¯·å‚è€ƒç¤ºä¾‹ä»£ç ã€‚
+     * åŠ è½½æœ¬åœ°å›¾ç‰‡åœºæ™¯ï¼ŒbaseUrlå’ŒhistoryUrlä¸èƒ½åŒæ—¶ä¸ºç©ºï¼Œå¦åˆ™å›¾ç‰‡æ— æ³•æˆåŠŸåŠ è½½ã€‚
+     * è‹¥htmlä¸­çš„å¯Œæ–‡æœ¬ä¸­å¸¦æœ‰æ³¨å…¥#ç­‰ç‰¹æ®Šå­—ç¬¦ï¼Œå»ºè®®å°†baseUrlå’ŒhistoryUrlä¸¤ä¸ªå‚æ•°çš„å€¼è®¾ç½®ä¸º"ç©ºæ ¼"ã€‚
+     * dataæ•°æ®å¿…é¡»ä½¿ç”¨base64ç¼–ç æˆ–å°†å†…å®¹ä¸­çš„ä»»ä½•#å­—ç¬¦ç¼–ç ä¸º%23ã€‚å¦åˆ™#å°†è¢«è§†ä¸ºå†…å®¹çš„ç»“å°¾è€Œå‰©ä½™çš„æ–‡æœ¬å°†è¢«ç”¨ä½œæ–‡æ¡£ç‰‡æ®µæ ‡è¯†ç¬¦ã€‚
+     *
+     * ç”¨æˆ·ä¸ä¼ é€’ encoding ä¸” baseURL ä¸ºç©ºæ—¶ï¼Œåˆ™é»˜è®¤å¯¹ data è¿›è¡Œ base64 ç¼–ç åå†ä¼ ç»™åº•å±‚ï¼Œä»¥å…¼å®¹ç”¨æˆ·ç›´æ¥ä¼ å…¥ html ä¸­æœ‰ç‰¹æ®Šå­—ç¬¦é¸¿è’™ Web æ˜¾ç¤ºå¼‚å¸¸ https://issues.dcloud.net.cn/pages/issues/detail?id=28962
+     *    å¦‚æœ encoding=base64 ä¸” baseURL ä¸ä¸ºç©ºä¼šå°† base64 å†…å®¹åŸæ ·æ˜¾ç¤º
+     */
+    let data = options.data
+    let encoding = options?.encoding
+    const baseURL = options?.baseURL ?? ''
+
+    if (encoding == null && baseURL.length === 0) {
+      try {
+        const htmlBytes = new util.TextEncoder().encodeInto(data);
+        const byteOffset = htmlBytes.byteOffset
+        const byteLength = htmlBytes.byteLength
+        const htmlBuffer = byteOffset == 0 && byteLength == htmlBytes.buffer.byteLength
+          ? htmlBytes.buffer
+          : htmlBytes.buffer.slice(byteOffset, byteOffset + byteLength);
+        data = buffer.from(htmlBuffer).toString(BASE64_ENCODING);
+        encoding = BASE64_ENCODING
+      } catch (error) {
+        console.error('[WebView loadData] Failed to encode data to base64:', error)
+      }
+    }
+
+    if (encoding !== BASE64_ENCODING) {
+      data = data.replace(/#/g, '%23')
+    }
+
+    this.invokeController('loadData',
+      data,
+      options.mimeType ?? "text/html",
+      encoding ?? "UTF-8",
+      baseURL ?? ''
+    )
+  }
+
+  override dispose(): void {
+    this.options.delegate.onBeforeDownload(undefined)
+    this.options.delegate.onDownloadUpdated(undefined)
+    this.options.delegate.onDownloadFinish(undefined)
+    this.options.delegate.onDownloadFailed(undefined)
+    super.dispose()
+  }
+}
+ÀÔrD˜±@ohos.web.webview¬@ohos.bufferª@ohos.util¬./UniElement§../Nodeµ../components/WebView©../helper±./UniWebViewEventÔrE—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÃÙn hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.web.webview.d.tsAÃªoh-resolveÂEAÃÙi hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.buffer.d.tsAÃªoh-resolveÂEAÃÙg hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.util.d.tsAÃªoh-resolveÂEAÂÙõ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/UniElement.etsAÃªoh-resolveÂEAÂÙë/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/Node.etsAÃªoh-resolveÂEAÂÙù/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/components/WebView.etsAÃªoh-resolveÂEAÂÙó/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/helper/index.etsAÃªoh-resolveÂEAÂÙÿ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/UniWebViewEvent/index.tsAÃªoh-resolveÂ“ÔrF–§version¤fileªsourceRoot§sources¥names¨mappings´UniWebViewElement.js ‘µUniWebViewElement.etsÜ(˜”   ” ”	 	” ” ” ”- -”. -˜”   ” ”	 	” ” "” (”/ ?”0 ?š”   ” ”	 	” ” ”) )”+ +”1 1”: :”; :–”   ” 	” ” ”' %”( &Ü ”   ” ”	 	” 	” 
+”4 
+”6 ”ÌL ”ÌN ”Ìe ”Ìg ”Ì{ ”Ì} ”ÌŸ $”Ì¡ ”Ì§ ”Ìº ”Ì» ˜”   ” ”	 	” ”! !”' '”2 2”3 3–”   ” 	” ” ”! )”" *–”   ” ” ” ” )” *–”   ” ” ” ”   ”!  –”   ” ” ” ” ”& 6‘” ‘”ÌU ””( ”/ 	”ÌH 
+”ÌO ’” 
+”" ‘” •”   ” ” ” ”+ +‘” –”   ” ” ”" ”+ 
+”9 *‘”  •” #
+”' #$”* #:”, #<”- #<•” $
+”! $”$ $*”) $/”* $/•” %
+” %” %” %$” %$•” &
+” &” &#” &$”  &$•” '” '”! '(”" ')”# ')•” (” (”" ()”# (*”$ (*•” )” )” )!” )"” )"’” ÍD ” ÍD”” +”
+ +” +” +"˜” ,” ,
+” ,”! ,”& ,"”' ,#”3 ,Ì\”4 ,Ì\š” -” -
+” -” -”! -”$ - ”% -!”5 -1”6 -2”7 -2” .” .” .” .” .”  .”" .”# .”) .%”+ .'”/ .+”0 .,”1 .-”2 .-” /” /” /” /” /”! /”# /”$ / ”* /&”, /(”0 /,”1 /-”2 /.”3 /.”” 0” 0” 0” 0’” 1” 1’” 3” 3$” 4” 4
+” 4” 4” 4”  4”* 4&”- 4)”1 4-”8 44”9 45”ÌJ 4ÌF”ÌL 4ÌH”ÌM 4ÌH•” 5” 5” 5	” 5” 5•” 6” 6” 6”, 6&”. 6(’” 7” 7—” 8”! 8”# 8”$ 8”1 8+”3 8-”5 8/—” 9” 9” 9”# 9”& 9”3 9+”4 9+˜” :” :” :”" :”# :”' :”ÌI :ÌA”ÌJ :ÌB–” ;
+” ;” ;”  ;”! ;”/ ;%”” <	” <
+” <” <’” =” =•” >”  >”" >”% >”' >!—” ?” ?” ?” ?” ?”. ?&”0 ?(—” Ì@
+” Ì@” Ì@”- Ì@#”0 Ì@&”4 Ì@*”5 Ì@*Ÿ” ÌA
+” ÌA” ÌA”3 ÌA)”4 ÌA*”; ÌA1”< ÌA2”> ÌA4”? ÌA5”ÌA ÌA7”ÌB ÌA8”ÌD ÌA:”ÌF ÌA<”ÌG ÌA=”ÌH ÌA=—” ÌB
+” ÌB” ÌB”3 ÌB)”6 ÌB,”8 ÌB.”9 ÌB.‘” ÌC	’” ÌD” ÌD•” ÌE” ÌE” ÌE” ÌE” ÌE—” ÌF” ÌF” ÌF” ÌF” ÌF”# ÌF”% ÌF—” ÌG
+” ÌG” ÌG”" ÌG”% ÌG”) ÌG”* ÌG‘” ÌH	’” ÌI” ÌI—” ÌJ”" ÌJ”$ ÌJ”% ÌJ”* ÌJ$”, ÌJ&”. ÌJ(˜” ÌK” ÌK” ÌK” ÌK”$ ÌK”% ÌK”+ ÌK#”, ÌK#œ” ÌL” ÌL” ÌL” ÌL”# ÌL”$ ÌL”( ÌL ”) ÌL!”- ÌL%”. ÌL&”2 ÌL*”3 ÌL*œ” ÌM” ÌM” ÌM” ÌM”" ÌM$”# ÌM%”' ÌM)”( ÌM*”, ÌM.”- ÌM/”0 ÌM2”1 ÌM2”” ÌN” ÌN” ÌN” ÌN“” ÌO
+” ÌO”% ÌO—” ÌP”" ÌP”# ÌP”& ÌP”' ÌP”1 ÌP%”2 ÌP&™” ÌQ” ÌQ”! ÌQ”* ÌQ”+ ÌQ”. ÌQ ”/ ÌQ!”2 ÌQ$”3 ÌQ%“” ÌR” ÌR” ÌR’” ÌS” ÌS“” ÌT
+” ÌT”' ÌT›” ÌU” ÌU”# ÌU”& ÌU”. ÌU"”/ ÌU#”2 ÌU&”3 ÌU'”8 ÌU,”9 ÌU-”: ÌU-—” ÌV”" ÌV”# ÌV”& ÌV”' ÌV”3 ÌV'”4 ÌV(Ü ” ÌW”! ÌW”# ÌW”$ ÌW”) ÌW”* ÌW”/ ÌW!”0 ÌW"”1 ÌW#”2 ÌW$”3 ÌW%”8 ÌW*”9 ÌW+”: ÌW,”; ÌW-”< ÌW.“” ÌX” ÌX” ÌX’” ÌY” ÌY“” ÌZ
+” ÌZ”$ ÌZ—” Ì[”" Ì[”# Ì[”& Ì[”' Ì[”0 Ì[$”1 Ì[%™” Ì\” Ì\”! Ì\”* Ì\”+ Ì\”. Ì\ ”/ Ì\!”2 Ì\$”3 Ì\%“” Ì]” Ì]” Ì]’” Ì^” Ì^“” Ì_
+” Ì_”# Ì_—” Ì`”" Ì`”# Ì`”& Ì`”' Ì`”/ Ì`#”0 Ì`$™” Ìa” Ìa”! Ìa”* Ìa”+ Ìa”. Ìa ”/ Ìa!”2 Ìa$”3 Ìa%“” Ìb” Ìb” Ìb’” Ìc” Ìc“” Ìd
+” Ìd”% Ìd—” Ìe”" Ìe”# Ìe”& Ìe”' Ìe”1 Ìe%”2 Ìe&™” Ìf” Ìf”! Ìf”* Ìf”+ Ìf”. Ìf ”/ Ìf!”2 Ìf$”3 Ìf%“” Ìg” Ìg” Ìg’” Ìh” Ìh‘” Ìi	’” Ìj” Ìj’”	 Ìk”
+ ÌkÜ ” Ìl” Ìl
+” Ìl” Ìl”& Ìl"”' ÌlÌE”+ ÌlÌI”, ÌlÌJ”/ ÌlÌM”0 ÌlÌN”7 ÌlÌV”9 ÌlÌX”ÌI ÌlÌh”ÌK Ìm”ÌV Ìm”ÌW Ìm”Ìe Ìm ”Ìf Ìm!”Ìh Ìn”Ìl Ìn
+”Ìm Ìn”Ìt Ìn”Ìu Ìn”Ìv Ìn” Ìp” Ìp” Ìp” Ìp” Ìp”. Ìp*”1 Ìp-”2 Ìp.”3 Ìp5”5 Ìp7”= ÌpÌE”? ÌpÌG”ÌA ÌpÌI™” Ìq” Ìq
+” Ìq”" Ìq”% Ìq”- Ìq'”. Ìq(”3 Ìq7”4 Ìq7™” Ìr” Ìr
+” Ìr”# Ìr”& Ìr ”. Ìr(”/ Ìr)”5 Ìr9”6 Ìr9“” Ìs”	 Ìs”
+ Ìs›” Ìt” Ìt” Ìt” Ìt” Ìt”* Ìt&”- Ìt)”. Ìt*”3 Ìt/”5 Ìt1”7 Ìt3™” Ìu” Ìu
+” Ìu” Ìu” Ìu”# Ìu”$ Ìu”+ Ìu%”, Ìu%“” Ìv”	 Ìv”
+ Ìv”” Ìw” Ìw” Ìw” Ìw’” Ìx” Ìx–” Ìz” Ìz ” Ìz!” Ìz,” Ìz.”$ Ìz;”” Ì{” Ì{” Ì{” Ì{‘” Ì|š” Ì}” Ì}” Ì}”+ Ì}#”, Ì}$”/ Ì}'”1 Ì})”6 Ì}.”7 Ì}/”8 Ì}/‘”	 Ì~’” Ì” Ì–” Ì” Ì ” Ì!” Ì,” Ì.”$ Ì=”” Ì‚” Ì‚” Ì‚” Ì‚“” Ìƒ” Ìƒ” Ìƒ›” Ì„” Ì„” Ì„” Ì„” Ì„”0 Ì„(”1 Ì„)”4 Ì„,”7 Ì„/”< Ì„>”= Ì„>’” Ì…” Ì…“” Ì†” Ì†” Ì†—” Ì‡” Ì‡” Ì‡”  Ì‡”% Ì‡”. Ì‡&”0 Ì‡(Ü ” Ìˆ
+” Ìˆ” Ìˆ”" Ìˆ”# Ìˆ”4 Ìˆ*”5 Ìˆ+”ÌB Ìˆ8”ÌE Ìˆ;”ÌJ ÌˆÌ@”ÌK ÌˆÌA”ÌL ÌˆÌB”ÌM ÌˆÌC”ÌN ÌˆÌD”ÌS ÌˆÌI”ÌU ÌˆÌK”ÌW ÌˆÌM˜” Ì‰” Ì‰”$ Ì‰”' Ì‰”, Ì‰ ”- Ì‰!”3 Ì‰'”4 Ì‰'Ÿ” ÌŠ” ÌŠ” ÌŠ”! ÌŠ”" ÌŠ”1 ÌŠ%”2 ÌŠ&”ÌC ÌŠ7”ÌD ÌŠ8”ÌM ÌŠÌA”ÌP ÌŠÌD”ÌV ÌŠÌJ”ÌW ÌŠÌK”Ì\ ÌŠÌP”Ì] ÌŠÌP—” Ì‹
+” Ì‹” Ì‹” Ì‹” Ì‹”! Ì‹”" Ì‹‘” ÌŒ	’” Ì” Ì“” Ì” Ì”, Ì&—” Ì” Ì” Ì”  Ì”% Ì”. Ì&”0 Ì(œ” Ì
+” Ì” Ì”" Ì”# Ì”4 Ì*”5 Ì+”ÌQ ÌÌG”ÌR ÌÌH”ÌW ÌÌM”ÌX ÌÌN”ÌY ÌÌN‘” Ì‘	’” Ì’” Ì’“” Ì“” Ì“”* Ì“$—” Ì”” Ì”” Ì””  Ì””% Ì””. Ì”&”0 Ì”(œ” Ì•
+” Ì•” Ì•”" Ì•”# Ì•”4 Ì•*”5 Ì•+”ÌO Ì•ÌE”ÌP Ì•ÌF”ÌU Ì•ÌK”ÌV Ì•ÌL”ÌW Ì•ÌL‘” Ì–	’” Ì—” Ì—“” Ì˜” Ì˜” Ì˜—” Ì™” Ì™” Ì™”  Ì™”% Ì™”. Ì™&”0 Ì™(›” Ìš
+” Ìš” Ìš”" Ìš”# Ìš”4 Ìš*”5 Ìš+”< Ìš2”? Ìš5”ÌD Ìš:”ÌE Ìš:‘” Ì›	‘”	 Ìœ’” Ì” Ì”” ÌŸ” ÌŸ$” ÌŸ%” ÌŸ1”” Ì ” Ì ” Ì ” Ì •” Ì¡” Ì¡” Ì¡” Ì¡” Ì¡” Ì¢” Ì¢” Ì¢” Ì¢” Ì¢”0 Ì¢(”1 Ì¢)”7 Ì¢/”: Ì¢2”; Ì¢3”Ì@ Ì¢8”ÌB Ì¢:”ÌD Ì¢<Ü ” Ì£
+” Ì£” Ì£”& Ì£”' Ì£”+ Ì£!”> Ì£4”? Ì£5”ÌE Ì£;”ÌG Ì£=”ÌL Ì£ÌB”ÌM Ì£ÌC”ÌS Ì£ÌI”ÌT Ì£ÌJ”ÌU Ì£ÌK”ÌV Ì£ÌK“” Ì¤” Ì¤	” Ì¤	’” Ì¥” Ì¥‘” Ì¦•” Ì§” Ì§” Ì§” Ì§” Ì§” Ì¨” Ì¨” Ì¨” Ì¨” Ì¨”0 Ì¨(”1 Ì¨)”: Ì¨2”= Ì¨5”> Ì¨6”ÌC Ì¨;”ÌE Ì¨=”ÌG Ì¨?Ü ” Ì©
+” Ì©” Ì©”& Ì©”' Ì©”+ Ì©!”ÌA Ì©7”ÌB Ì©8”ÌK Ì©ÌA”ÌM Ì©ÌC”ÌR Ì©ÌH”ÌS Ì©ÌI”ÌY Ì©ÌO”ÌZ Ì©ÌP”Ì[ Ì©ÌQ”Ì\ Ì©ÌQ“” Ìª” Ìª	” Ìª	’” Ì«” Ì«‘” Ì¬•” Ì­” Ì­” Ì­” Ì­” Ì­” Ì®” Ì®” Ì®” Ì®” Ì®”0 Ì®(”1 Ì®)”: Ì®2”= Ì®5”> Ì®6”ÌC Ì®;”ÌE Ì®=”ÌG Ì®?Ü ” Ì¯
+” Ì¯” Ì¯”& Ì¯”' Ì¯”+ Ì¯!”ÌA Ì¯7”ÌB Ì¯8”ÌK Ì¯ÌA”ÌM Ì¯ÌC”ÌR Ì¯ÌH”ÌS Ì¯ÌI”ÌY Ì¯ÌO”ÌZ Ì¯ÌP”Ì[ Ì¯ÌQ”Ì\ Ì¯ÌQ“” Ì°” Ì°	” Ì°	’” Ì±” Ì±‘” Ì²•” Ì³” Ì³” Ì³” Ì³” Ì³” Ì´” Ì´” Ì´” Ì´” Ì´”0 Ì´(”1 Ì´)”; Ì´3”> Ì´6”? Ì´7”ÌD Ì´<”ÌF Ì´>”ÌH Ì´Ì@Ü ” Ìµ
+” Ìµ” Ìµ”& Ìµ”' Ìµ”+ Ìµ!”ÌB Ìµ8”ÌC Ìµ9”ÌM ÌµÌC”ÌO ÌµÌE”ÌT ÌµÌJ”ÌU ÌµÌK”Ì[ ÌµÌQ”Ì\ ÌµÌR”Ì] ÌµÌS”Ì^ ÌµÌS“” Ì¶” Ì¶	” Ì¶	’” Ì·” Ì·‘” Ì¸•” Ì¹” Ì¹” Ì¹” Ì¹” Ì¹” Ìº” Ìº” Ìº” Ìº” Ìº”0 Ìº(”1 Ìº)”8 Ìº0”; Ìº3”< Ìº4”ÌA Ìº9”ÌC Ìº;”ÌE Ìº=Ü ” Ì»
+” Ì»” Ì»”& Ì»”' Ì»”+ Ì»!”? Ì»5”Ì@ Ì»6”ÌG Ì»=”ÌI Ì»?”ÌN Ì»ÌD”ÌO Ì»ÌE”ÌU Ì»ÌK”ÌV Ì»ÌL”ÌW Ì»ÌM”ÌX Ì»ÌM“” Ì¼” Ì¼	” Ì¼	’” Ì½” Ì½‘” Ì¾‘” Ì¿˜” ÌÀ” ÌÀ” ÌÀ”% ÌÀ”& ÌÀ”* ÌÀ"”+ ÌÀ#”, ÌÀ#’” ÌÁ” ÌÁ‘”	 ÌÂ’” ÌÃ” ÌÃ–” ÌÅ” ÌÅ&” ÌÅ'” ÌÅ3” ÌÅ5” ÌÅÌG”” ÌÆ” ÌÆ” ÌÆ” ÌÆ•” ÌÇ” ÌÇ” ÌÇ” ÌÇ” ÌÇ›” ÌÈ” ÌÈ” ÌÈ” ÌÈ” ÌÈ”0 ÌÈ(”1 ÌÈ)”7 ÌÈ/”: ÌÈ2”ÌC ÌÈ;”ÌD ÌÈ;”” ÌÉ” ÌÉ” ÌÉ” ÌÉ‘” ÌÊ•” ÌË” ÌË” ÌË” ÌË” ÌË›” ÌÌ” ÌÌ” ÌÌ” ÌÌ” ÌÌ”0 ÌÌ(”1 ÌÌ)”: ÌÌ2”= ÌÌ5”ÌF ÌÌ>”ÌG ÌÌ>”” ÌÍ” ÌÍ” ÌÍ” ÌÍ‘” ÌÎ•” ÌÏ” ÌÏ” ÌÏ” ÌÏ” ÌÏ›” ÌĞ” ÌĞ” ÌĞ” ÌĞ” ÌĞ”0 ÌĞ(”1 ÌĞ)”: ÌĞ2”= ÌĞ5”ÌF ÌĞ>”ÌG ÌĞ>”” ÌÑ” ÌÑ” ÌÑ” ÌÑ‘” ÌÒ•” ÌÓ” ÌÓ” ÌÓ” ÌÓ” ÌÓ›” ÌÔ” ÌÔ” ÌÔ” ÌÔ” ÌÔ”0 ÌÔ(”1 ÌÔ)”; ÌÔ3”> ÌÔ6”ÌG ÌÔ?”ÌH ÌÔ?”” ÌÕ” ÌÕ” ÌÕ” ÌÕ‘” ÌÖ•” Ì×” Ì×” Ì×” Ì×” Ì×›” ÌØ” ÌØ” ÌØ” ÌØ” ÌØ”0 ÌØ(”1 ÌØ)”8 ÌØ0”; ÌØ3”ÌD ÌØ<”ÌE ÌØ<”” ÌÙ” ÌÙ” ÌÙ” ÌÙ‘” ÌÚ‘” ÌÛ›” ÌÜ” ÌÜ” ÌÜ” ÌÜ”. ÌÜ&”/ ÌÜ'”3 ÌÜ+”5 ÌÜ-”8 ÌÜ0”9 ÌÜ1”: ÌÜ1‘”	 Ìİ’” ÌŞ” ÌŞ’” Ìà” Ìà–” Ìá” Ìá” Ìá” Ìá” Ìá” Ìá’” Ìâ” Ìâ—” Ìä
+” Ìä” Ìä” Ìä-”! Ìä/”$ Ìä2”( ÌäÌB–” Ìå” Ìå” Ìå” Ìå”% Ìå!”' Ìå#” Ìæ” Ìæ” Ìæ” Ìæ”" Ìæ”# Ìæ”- Ìæ'”. Ìæ(”/ Ìæ)”2 Ìæ,”6 Ìæ0”7 Ìæ1”8 Ìæ2‘”	 Ìç‘” Ìç™” Ìè” Ìè
+” Ìè”+ Ìè%”, Ìè&”0 Ìè*”1 Ìè+”4 Ìè.”6 Ìè0œ” Ìé” Ìé” Ìé” Ìé”  Ìé”* Ìé"”+ Ìé#”, Ìé$”/ Ìé'”3 Ìé+”4 Ìé,”5 Ìé-”” Ìê” Ìê” Ìê” Ìê	‘”	 Ìë’” Ìì” Ìì’” Ìî” Ìî˜” Ìï” Ìï” Ìï	” Ìï” Ìï”( Ìï$”) Ìï%”* Ìï%’” Ìğ” Ìğ’” Ìò” Ìò	˜” Ìó” Ìó” Ìó	” Ìó” Ìó”' Ìó#”( Ìó$”) Ìó$’” Ìô” Ìô’” Ìö”
+ Ìö˜” Ì÷” Ì÷” Ì÷	” Ì÷” Ì÷”' Ì÷#”( Ì÷$”) Ì÷$’” Ìø” Ìø’” Ìú” Ìú˜” Ìû” Ìû” Ìû	” Ìû” Ìû”$ Ìû ”% Ìû!”& Ìû!’” Ìü” Ìü”” Ìş”
+ Ìş” Ìş	” Ìşš” Ìÿ” Ìÿ” Ìÿ	” Ìÿ” Ìÿ”- Ìÿ)”/ Ìÿ+”1 Ìÿ-”2 Ìÿ.”3 Ìÿ.’” Í ” Í ’” Í” Í›” Í” Í
+” Í” Í” Í”  Í”* Í&”+ Í'”8 Í4”: Í6”; Í6” Í” Í” Í” Í” Í”$ Í ”% Í!”) Í%”- Í)”. Í*”< Í8”ÌA Í=”ÌK ÍÌG”ÌM ÍÌI”” Í” Í” Í” Í‘”	 Í–” Í” Í” Í” Í”" Í”# Í’” Í” Í’” Í
+” Í
+	™” Í” Í” Í” Í” Í” Í”- Í)”/ Í+”0 Í+’” Í” Í’” Í” Í™” Í” Í” Í” Í” Í” Í”, Í(”. Í*”/ Í*’” Í” Í”” Í” Í
+” Í” Í4‘” Í‘” Í˜” Í” Í” Í” Í” Í” Í” Í”  Í˜” Í” Í” Í” Í” Í”  Í”( Í$”) Í$š” Í ” Í 
+” Í ” Í ” Í ”! Í ”( Í $”, Í (”. Í *”/ Í *œ” Í"” Í"” Í"” Í"” Í"”  Í"”' Í"#”( Í"$”. Í"*”3 Í"/”4 Í"0”6 Í"2’” Í#” Í#
+Ÿ” Í$” Í$” Í$”" Í$”& Í$”* Í$"”+ Í$#”6 Í$.”8 Í$0”9 Í$1”ÌC Í$;”ÌD Í$<”ÌH Í$Ì@”ÌI Í$ÌA”ÌJ Í$ÌB˜” Í%” Í%”  Í%”# Í%”, Í%$”- Í%%”7 Í%/”8 Í%/˜” Í&” Í&”  Í&”# Í&”, Í&$”- Í&%”7 Í&/”8 Í&/Ÿ” Í'” Í'”  Í'”# Í'”- Í'%”1 Í')”2 Í'*”6 Í'.”Ì@ Í'8”ÌD Í'<”ÌM Í'ÌE”ÌN Í'ÌF”ÌT Í'ÌL”ÌU Í'ÌM”Ì_ Í'ÌW–” Í(
+” Í(” Í(” Í(”  Í(”& Í(Ü ” Í)
+” Í)” Í)” Í)”  Í)”& Í)”' Í)”, Í)"”- Í)#”7 Í)-”9 Í)/”ÌC Í)9”ÌF Í)<”ÌP Í)ÌF”ÌQ Í)ÌG”ÌR Í)ÌHŸ” Í*” Í*” Í*” Í*” Í*”" Í*”# Í*”- Í*%”. Í*&”/ Í*'”7 Í*/”8 Í*0”ÌG Í*?”ÌH Í*Ì@”ÌI Í*ÌA•” Í+” Í+” Í+”* Í+"”+ Í+"‘” Í,”” Í,” Í,” Í,” Í,š” Í-” Í-” Í-” Í-” Í-”ÌS Í-ÌK”ÌU Í-ÌM”ÌZ Í-ÌR”Ì[ Í-ÌS”Ì\ Í-ÌS‘” Í.‘”	 Í/–” Í1” Í1” Í1” Í1”( Í1$”* Í1&œ” Í2” Í2
+” Í2” Í2” Í2” Í2”  Í2”$ Í2”& Í2 ”+ Í2%”, Í2&”- Í2&‘”	 Í3Ü ” Í5” Í5” Í5	” Í5” Í5”( Í5$”* Í6”. Í6
+”0 Í7”7 Í7”8 Í7”Ì@ Í7”ÌD Í7”ÌO Í7%”ÌQ Í8”ÌY Í8”Ì] Í8”Ìd Í8”Ìf Í9”Ìm Í9”Ìq Í9”Ìs Í9”Ìt Í:”Ìu Í:’” Í;” Í;’” Í=” Í=œ” Í>” Í>” Í>	” Í>” Í>” Í>” Í>”. Í>*”/ Í>+”8 Í>4”9 Í>5”: Í>5œ” Í?” Í?” Í?	” Í?” Í?” Í?” Í?”/ Í?+”0 Í?,”9 Í?5”: Í?6”; Í?6œ” Í@” Í@” Í@	” Í@” Í@” Í@” Í@”. Í@*”/ Í@+”8 Í@4”9 Í@5”: Í@5œ” ÍA” ÍA” ÍA	” ÍA” ÍA” ÍA” ÍA”. ÍA*”/ ÍA+”8 ÍA4”9 ÍA5”: ÍA5–” ÍB” ÍB	” ÍB
+” ÍB” ÍB” ÍB’” ÍC” ÍC‘” ÍDÔrG–§version¤file§sources®sourcesContent¥names¨mappingsÀ‘À‘ÀÜ)‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘”  ÌÙ ‘”  ÌÚ ‘”  ÌÛ ‘”  ÌÜ ‘”  Ìİ ‘”  ÌŞ ‘”  Ìß ‘”  Ìà ‘”  Ìá ‘”  Ìâ ‘”  Ìã ‘”  Ìä ‘”  Ìå ‘”  Ìæ ‘”  Ìç ‘”  Ìè ‘”  Ìé ‘”  Ìê ‘”  Ìë ‘”  Ìì ‘”  Ìí ‘”  Ìî ‘”  Ìï ‘”  Ìğ ‘”  Ìñ ‘”  Ìò ‘”  Ìó ‘”  Ìô ‘”  Ìõ ‘”  Ìö ‘”  Ì÷ ‘”  Ìø ‘”  Ìù ‘”  Ìú ‘”  Ìû ‘”  Ìü ‘”  Ìı ‘”  Ìş ‘”  Ìÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache’ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ"ÍáÔrK™¤type¥start£end¢idªexpression©generator¥async¦params¤body³FunctionDeclarationÍ)ÍáÔrL”¤type¥start£end¤nameªIdentifierÍ2Í@®WebViewBuilderÂÂÂ’LªIdentifierÍAÍH§optionsÔrM•¤type¥start£end¤left¥right±AssignmentPatternÍJÍWLªIdentifierÍJÍP¦parentÔrN•¤type¥start£end¥value£raw§LiteralÍSÍWÀ¤nullÔrO”¤type¥start£end¤body®BlockStatementÍYÍá’ÔrP•¤type¥start£end¬declarations¤kind³VariableDeclarationÍ`Í|‘ÔrQ•¤type¥start£end¢id¤init²VariableDeclaratorÍfÍ{LªIdentifierÍfÍq«__options__LªIdentifierÍtÍ{§options¥constO®BlockStatementÍ‚ÍŞ‘ÔrR”¤type¥start£endªexpression³ExpressionStatementÍÍ×ÔrS–¤type¥start£end¦callee©arguments¨optional®CallExpressionÍÍÖÔrT—¤type¥start£end¦object¨property¨computed¨optional°MemberExpressionÍÍ¿ÔrU–¤type¥start£end¤testªconsequent©alternateµConditionalExpressionÍÍ¤LªIdentifierÍÍ”¦parentLªIdentifierÍ—Í¦parentÔrV“¤type¥start£end®ThisExpressionÍ Í¤LªIdentifierÍ¦Í¿¹observeComponentCreation2ÂÂ’K·ArrowFunctionExpressionÍÀÍÀÀÂÂÂ“LªIdentifierÍÁÍÇ¦elmtIdLªIdentifierÍÉÍØ¯isInitialRenderM±AssignmentPatternÍÚÍïLªIdentifierÍÚÍá§optionsLªIdentifierÍäÍï«__options__O®BlockStatementÍôÍÀ‘U«IfStatementÍÍµLªIdentifierÍÍ¯isInitialRenderO®BlockStatementÍÍ<”P³VariableDeclarationÍ+ÍY‘Q²VariableDeclaratorÍ/ÍXLªIdentifierÍ/Í<­componentCallÔrW•¤type¥start£end¦callee©arguments­NewExpressionÍ?ÍXLªIdentifierÍCÍJ§WebView–UµConditionalExpressionÍKÍaLªIdentifierÍKÍQ¦parentLªIdentifierÍTÍZ¦parentV®ThisExpressionÍ]ÍaLªIdentifierÍcÍj§optionsLªIdentifierÍlÍu©undefinedLªIdentifierÍwÍ}¦elmtIdK·ArrowFunctionExpressionÍÍˆÀÂÂÂO®BlockStatementÍ…ÍˆÔrX”¤type¥start£endªproperties°ObjectExpressionÍŠÍW“ÔrY™¤type¥start£end¦method©shorthand¨computed£key¥value¤kind¨PropertyÍŒÍCÂÂÂLªIdentifierÍŒÍ¤pageN§LiteralÍ’ÍCÙ¯oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/UniWebViewElement.etsÙ±"oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/UniWebViewElement.ets"¤initY¨PropertyÍEÍMÂÂÂLªIdentifierÍEÍI¤lineN§LiteralÍKÍM¢24¤initY¨PropertyÍOÍUÂÂÂLªIdentifierÍOÍR£colN§LiteralÍTÍU¡3¤init£letR³ExpressionStatementÍkÍˆS®CallExpressionÍkÍ‡T°MemberExpressionÍkÍxLªIdentifierÍkÍq¦ViewPULªIdentifierÍrÍx¦createÂÂ‘LªIdentifierÍyÍ†­componentCallÂP³VariableDeclarationÍšÍí‘Q²VariableDeclaratorÍÍìLªIdentifierÍÍª¬paramsLambdaK·ArrowFunctionExpressionÍ­ÍìÀÂÂÂO®BlockStatementÍ³Íì‘ÔrZ”¤type¥start£end¨argument¯ReturnStatementÍÊÍÙLªIdentifierÍÑÍØ§options£letR³ExpressionStatementÍÿÍ-Ôr[–¤type¥start£end¨operator¤left¥right´AssignmentExpressionÍÿÍ,¡=T°MemberExpressionÍÿÍLªIdentifierÍÿÍ­componentCallLªIdentifierÍÍ°paramsGenerator_ÂÂLªIdentifierÍ Í,¬paramsLambdaO®BlockStatementÍOÍµ‘R³ExpressionStatementÍbÍ¦S®CallExpressionÍbÍ¥T°MemberExpressionÍbÍ™UµConditionalExpressionÍcÍyLªIdentifierÍcÍi¦parentLªIdentifierÍlÍr¦parentV®ThisExpressionÍuÍyLªIdentifierÍ{Í™¾updateStateVarsOfChildByElmtIdÂÂ’LªIdentifierÍšÍ ¦elmtIdX°ObjectExpressionÍ¢Í¤ÂX°ObjectExpressionÍÂÍÕ‘Y¨PropertyÍÄÍÓÂÂÂLªIdentifierÍÄÍÈ¤nameN§LiteralÍÊÍÓ§WebView©"WebView"¤initÂÀJ¶ExportNamedDeclarationÍÍ.ÅÔr\–¤type¥start£end¢idªsuperClass¤body°ClassDeclarationÍÍ.ÅLªIdentifierÍ"Í7µUniWebViewElementImplLªIdentifierÍ@ÍN®UniElementImplO©ClassBodyÍOÍ.ÅÜ Ôr]˜¤type¥start£end¦static¨computed£key¤kind¥value°MethodDefinitionÍVÍ‘ÂÂLªIdentifierÍVÍa«constructor«constructorK²FunctionExpressionÍaÍ‘ÀÂÂÂO®BlockStatementÍdÍ‘˜R³ExpressionStatementÍoÍƒS®CallExpressionÍoÍ‚V¥SuperÍoÍt‘Z­SpreadElementÍuÍLªIdentifierÍxÍ©argumentsÂR³ExpressionStatementÍÍ²[´AssignmentExpressionÍÍ±¡=T°MemberExpressionÍÍ¬V®ThisExpressionÍÍ‘LªIdentifierÍ’Í¬ºcontrollerAttachedInvokersÂÂÔr^”¤type¥start£end¨elements¯ArrayExpressionÍ¯Í±R³ExpressionStatementÍ¼ÍŞ[´AssignmentExpressionÍ¼Íİ¡=T°MemberExpressionÍ¼ÍÕV®ThisExpressionÍ¼ÍÀLªIdentifierÍÁÍÕ´isControllerAttachedÂÂN§LiteralÍØÍİÂ¥falseR³ExpressionStatementÍèÍÿ[´AssignmentExpressionÍèÍş¡=T°MemberExpressionÍèÍöV®ThisExpressionÍèÍìLªIdentifierÍíÍö©isPageEndÂÂN§LiteralÍùÍşÂ¥falseR³ExpressionStatementÍ	Í![´AssignmentExpressionÍ	Í ¡=T°MemberExpressionÍ	ÍV®ThisExpressionÍ	ÍLªIdentifierÍÍ®lastPageHeightÂÂN§LiteralÍÍ  ¡0R³ExpressionStatementÍ+ÍF[´AssignmentExpressionÍ+ÍE¡=T°MemberExpressionÍ+ÍAV®ThisExpressionÍ+Í/LªIdentifierÍ0ÍA±widthByAreaChangeÂÂN§LiteralÍDÍE ¡0R³ExpressionStatementÍPÍl[´AssignmentExpressionÍPÍk¡=T°MemberExpressionÍPÍgV®ThisExpressionÍPÍTLªIdentifierÍUÍg²heightByAreaChangeÂÂN§LiteralÍjÍk ¡0R³ExpressionStatementÍvÍŠ[´AssignmentExpressionÍvÍ‰¡=T°MemberExpressionÍvÍ…V®ThisExpressionÍvÍzLªIdentifierÍ{Í…ªcurOffsetYÂÂN§LiteralÍˆÍ‰ ¡0]°MethodDefinitionÍ—Í¯ÃÂLªIdentifierÍ¢Í®¬defaultStyle£getK²FunctionExpressionÍ®Í¯ÀÂÂÂO®BlockStatementÍ±Í¯•P³VariableDeclarationÍ¼Íè‘Q²VariableDeclaratorÍÂÍçLªIdentifierÍÂÍÒ°baseDefaultStyleT°MemberExpressionÍÕÍçV¥SuperÍÕÍÚLªIdentifierÍÛÍç¬defaultStyleÂÂ¥constP³VariableDeclarationÍòÍ!‘Q²VariableDeclaratorÍøÍ LªIdentifierÍøÍ¬defaultStyleW­NewExpressionÍÍ LªIdentifierÍÍ£Map‘LªIdentifierÍÍ°baseDefaultStyle¥constR³ExpressionStatementÍ+ÍUS®CallExpressionÍ+ÍTT°MemberExpressionÍ+Í;LªIdentifierÍ+Í7¬defaultStyleLªIdentifierÍ8Í;£setÂÂ’N§LiteralÍ<ÍC¥width§'width'^¯ArrayExpressionÍEÍS’N§LiteralÍFÍL¤100%¦'100%'N§LiteralÍNÍRÃ¤trueÂR³ExpressionStatementÍ_ÍŠS®CallExpressionÍ_Í‰T°MemberExpressionÍ_ÍoLªIdentifierÍ_Ík¬defaultStyleLªIdentifierÍlÍo£setÂÂ’N§LiteralÍpÍx¦height¨'height'^¯ArrayExpressionÍzÍˆ’N§LiteralÍ{Í¤100%¦'100%'N§LiteralÍƒÍ‡Ã¤trueÂZ¯ReturnStatementÍ”Í¨LªIdentifierÍ›Í§¬defaultStyle]°MethodDefinitionÍµÍÂÂLªIdentifierÍµÍÄ¯createFrameNode¦methodK²FunctionExpressionÍÄÍÀÂÂÂO®BlockStatementÍÇÍ–P³VariableDeclarationÍÒÍ	‘Q²VariableDeclaratorÍØÍ	LªIdentifierÍØÍâªcontroller[´AssignmentExpressionÍåÍ	¡=T°MemberExpressionÍåÍôV®ThisExpressionÍåÍéLªIdentifierÍêÍôªcontrollerÂÂW­NewExpressionÍ÷Í	T°MemberExpressionÍûÍ	LªIdentifierÍûÍ	§webviewLªIdentifierÍ	Í	±WebviewControllerÂÂ¥constR³ExpressionStatementÍ	!ÍÇ[´AssignmentExpressionÍ	!ÍÆ¡=T°MemberExpressionÍ	!Í	-V®ThisExpressionÍ	!Í	%LªIdentifierÍ	&Í	-§optionsÂÂX°ObjectExpressionÍ	0ÍÆ–Y¨PropertyÍ	?Í	aÂÂÂLªIdentifierÍ	?Í	G¨delegateS®CallExpressionÍ	IÍ	aLªIdentifierÍ	IÍ	_¶createDownloadDelegateÂ¤initÔr_™¤type¥start£end¦method©shorthand¨computed£key¤kind¥value¨PropertyÍ	pÍ	zÂÃÂLªIdentifierÍ	pÍ	zªcontroller¤initLªIdentifierÍ	pÍ	zªcontrollerY¨PropertyÍ	‰Í
+ÂÂÂLªIdentifierÍ	‰Í	µonContentHeightChangeK·ArrowFunctionExpressionÍ	 Í
+ÀÂÂÂ‘LªIdentifierÍ	¡Í	®­contentHeightO®BlockStatementÍ	³Í
+’R³ExpressionStatementÍ	ÆÍ	ê[´AssignmentExpressionÍ	ÆÍ	é¡=T°MemberExpressionÍ	ÆÍ	ÙV®ThisExpressionÍ	ÆÍ	ÊLªIdentifierÍ	ËÍ	Ù®lastPageHeightÂÂLªIdentifierÍ	ÜÍ	é­contentHeightR³ExpressionStatementÍ	üÍ
+~S®CallExpressionÍ	üÍ
+}T°MemberExpressionÍ	üÍ
+V®ThisExpressionÍ	üÍ
+ LªIdentifierÍ
+Í
+­dispatchEventÂÂ‘W­NewExpressionÍ
+Í
+|LªIdentifierÍ
+Í
+5Ù"UniWebViewContentHeightChangeEvent‘X°ObjectExpressionÍ
+6Í
+{‘Y¨PropertyÍ
+MÍ
+hÂÂÂLªIdentifierÍ
+MÍ
+S¦heightT°MemberExpressionÍ
+UÍ
+hV®ThisExpressionÍ
+UÍ
+YLªIdentifierÍ
+ZÍ
+h®lastPageHeightÂÂ¤initÂ¤initY¨PropertyÍ
+œÍÊÂÂÂLªIdentifierÍ
+œÍ
+°´onControllerAttachedK·ArrowFunctionExpressionÍ
+²ÍÊÀÂÂÂO®BlockStatementÍ
+¸ÍÊ‘U«IfStatementÍ
+ËÍ»Ôr`–¤type¥start£end¨operator¦prefix¨argument¯UnaryExpressionÍ
+ÏÍ
+é¡!ÃT°MemberExpressionÍ
+ĞÍ
+éV®ThisExpressionÍ
+ĞÍ
+ÔLªIdentifierÍ
+ÕÍ
+é´isControllerAttachedÂÂO®BlockStatementÍ
+ëÍ»“R³ExpressionStatementÍÍ#[´AssignmentExpressionÍÍ"¡=T°MemberExpressionÍÍV®ThisExpressionÍÍLªIdentifierÍÍ´isControllerAttachedÂÂN§LiteralÍÍ"Ã¤trueR³ExpressionStatementÍ9ÍmS®CallExpressionÍ9ÍlT°MemberExpressionÍ9Í`T°MemberExpressionÍ9ÍXV®ThisExpressionÍ9Í=LªIdentifierÍ>ÍXºcontrollerAttachedInvokersÂÂLªIdentifierÍYÍ`§forEachÂÂ‘K·ArrowFunctionExpressionÍaÍkÀÃÂÂ‘LªIdentifierÍaÍc¢cbS®CallExpressionÍgÍkLªIdentifierÍgÍi¢cbÂÂR³ExpressionStatementÍƒÍ¨[´AssignmentExpressionÍƒÍ§¡=T°MemberExpressionÍƒÍ¢V®ThisExpressionÍƒÍ‡LªIdentifierÍˆÍ¢ºcontrollerAttachedInvokersÂÂ^¯ArrayExpressionÍ¥Í§À¤initY¨PropertyÍÙÍaÂÂÂLªIdentifierÍÙÍâ©onPageEndK·ArrowFunctionExpressionÍäÍaÀÂÂÂO®BlockStatementÍêÍa‘U«IfStatementÍıÍR`¯UnaryExpressionÍÍ¡!ÃT°MemberExpressionÍÍV®ThisExpressionÍÍLªIdentifierÍÍ©isPageEndÂÂO®BlockStatementÍÍR‘R³ExpressionStatementÍ)Í?[´AssignmentExpressionÍ)Í>¡=T°MemberExpressionÍ)Í7V®ThisExpressionÍ)Í-LªIdentifierÍ.Í7©isPageEndÂÂN§LiteralÍ:Í>Ã¤trueÀ¤initY¨PropertyÍpÍ»ÂÂÂLªIdentifierÍpÍ†¶onPostMessageToServiceK·ArrowFunctionExpressionÍˆÍ»ÀÂÂÂ‘LªIdentifierÍ‰Í¥eventO®BlockStatementÍ“Í»”P³VariableDeclarationÍ¦ÍÂ‘Q²VariableDeclaratorÍ¬ÍÁLªIdentifierÍ¬Í²¦detailT°MemberExpressionÍµÍÁLªIdentifierÍµÍº¥eventLªIdentifierÍ»ÍÁ¦detailÂÂ¥constP³VariableDeclarationÍÔÍ÷‘Q²VariableDeclaratorÍÚÍöLªIdentifierÍÚÍŞ¤nameT°MemberExpressionÍáÍöT°MemberExpressionÍáÍñT°MemberExpressionÍáÍìLªIdentifierÍáÍç¦detailLªIdentifierÍèÍì¤argsÂÂLªIdentifierÍíÍñ¤dataÂÂLªIdentifierÍòÍö¤nameÂÂ¥constP³VariableDeclarationÍ	Í*‘Q²VariableDeclaratorÍÍ)LªIdentifierÍÍ£argT°MemberExpressionÍÍ)T°MemberExpressionÍÍ%T°MemberExpressionÍÍ LªIdentifierÍÍ¦detailLªIdentifierÍÍ ¤argsÂÂLªIdentifierÍ!Í%¤dataÂÂLªIdentifierÍ&Í)£argÂÂ¥constÔra•¤type¥start£end¬discriminant¥cases¯SwitchStatementÍ<Í¬LªIdentifierÍDÍH¤name•Ôrb•¤type¥start£endªconsequent¤testªSwitchCaseÍaÍ’R³ExpressionStatementÍÍúS®CallExpressionÍÍùT°MemberExpressionÍÍ¦T°MemberExpressionÍÍ›LªIdentifierÍÍ—ªglobalThisLªIdentifierÍ˜Í›£uniÂÂLªIdentifierÍœÍ¦ªnavigateToÂÂ‘X°ObjectExpressionÍ§Íø‘Y¨PropertyÍÆÍİÂÂÂLªIdentifierÍÆÍÉ£urlS®CallExpressionÍËÍİLªIdentifierÍËÍÔ©encodeURI‘T°MemberExpressionÍÕÍÜLªIdentifierÍÕÍØ£argLªIdentifierÍÙÍÜ£urlÂÂÂ¤initÂÔrc”¤type¥start£end¥label®BreakStatementÍÍÀN§LiteralÍfÍrªnavigateTo¬'navigateTo'bªSwitchCaseÍ0Í2“P³VariableDeclarationÍ^Í€‘Q²VariableDeclaratorÍdÍLªIdentifierÍdÍi¥deltaS®CallExpressionÍlÍLªIdentifierÍlÍt¨parseInt‘T°MemberExpressionÍuÍ~LªIdentifierÍuÍx£argLªIdentifierÍyÍ~¥deltaÂÂÂ¥constR³ExpressionStatementÍšÍS®CallExpressionÍšÍT°MemberExpressionÍšÍµT°MemberExpressionÍšÍ¨LªIdentifierÍšÍ¤ªglobalThisLªIdentifierÍ¥Í¨£uniÂÂLªIdentifierÍ©Íµ¬navigateBackÂÂ‘X°ObjectExpressionÍ¶Í‘Y¨PropertyÍÕÍõÂÂÂLªIdentifierÍÕÍÚ¥deltaUµConditionalExpressionÍÜÍõ`¯UnaryExpressionÍÜÍé¡!ÃS®CallExpressionÍİÍéLªIdentifierÍİÍâ¥isNaN‘LªIdentifierÍãÍè¥deltaÂLªIdentifierÍìÍñ¥deltaN§LiteralÍôÍõ¡1¤initÂc®BreakStatementÍ,Í2ÀN§LiteralÍ5ÍC¬navigateBack®'navigateBack'bªSwitchCaseÍHÍÿ’R³ExpressionStatementÍsÍßS®CallExpressionÍsÍŞT°MemberExpressionÍsÍ‹T°MemberExpressionÍsÍLªIdentifierÍsÍ}ªglobalThisLªIdentifierÍ~Í£uniÂÂLªIdentifierÍ‚Í‹©switchTabÂÂ‘X°ObjectExpressionÍŒÍİ‘Y¨PropertyÍ«ÍÂÂÂÂLªIdentifierÍ«Í®£urlS®CallExpressionÍ°ÍÂLªIdentifierÍ°Í¹©encodeURI‘T°MemberExpressionÍºÍÁLªIdentifierÍºÍ½£argLªIdentifierÍ¾ÍÁ£urlÂÂÂ¤initÂc®BreakStatementÍùÍÿÀN§LiteralÍMÍX©switchTab«'switchTab'bªSwitchCaseÍÍÊ’R³ExpressionStatementÍ?ÍªS®CallExpressionÍ?Í©T°MemberExpressionÍ?ÍVT°MemberExpressionÍ?ÍMLªIdentifierÍ?ÍIªglobalThisLªIdentifierÍJÍM£uniÂÂLªIdentifierÍNÍV¨reLaunchÂÂ‘X°ObjectExpressionÍWÍ¨‘Y¨PropertyÍvÍÂÂÂLªIdentifierÍvÍy£urlS®CallExpressionÍ{ÍLªIdentifierÍ{Í„©encodeURI‘T°MemberExpressionÍ…ÍŒLªIdentifierÍ…Íˆ£argLªIdentifierÍ‰ÍŒ£urlÂÂÂ¤initÂc®BreakStatementÍÄÍÊÀN§LiteralÍÍ$¨reLaunchª'reLaunch'bªSwitchCaseÍàÍ™’R³ExpressionStatementÍÍyS®CallExpressionÍÍxT°MemberExpressionÍÍ%T°MemberExpressionÍÍLªIdentifierÍÍªglobalThisLªIdentifierÍÍ£uniÂÂLªIdentifierÍÍ%ªredirectToÂÂ‘X°ObjectExpressionÍ&Íw‘Y¨PropertyÍEÍ\ÂÂÂLªIdentifierÍEÍH£urlS®CallExpressionÍJÍ\LªIdentifierÍJÍS©encodeURI‘T°MemberExpressionÍTÍ[LªIdentifierÍTÍW£argLªIdentifierÍXÍ[£urlÂÂÂ¤initÂc®BreakStatementÍ“Í™ÀN§LiteralÍåÍñªredirectTo¬'redirectTo'¤initP³VariableDeclarationÍÑÍ?‘Q²VariableDeclaratorÍ×Í>LªIdentifierÍ×ÍÚ£webS®CallExpressionÍİÍ>LªIdentifierÍİÍï²createUniFrameNode”T°MemberExpressionÍğÍ T°MemberExpressionÍğÍøV®ThisExpressionÍğÍôLªIdentifierÍõÍø£appÂÂLªIdentifierÍùÍ §contextÂÂLªIdentifierÍÍ°WebViewFrameNodeS®CallExpressionÍÍ/LªIdentifierÍÍ«wrapBuilder‘LªIdentifierÍ Í.®WebViewBuilderÂT°MemberExpressionÍ1Í=V®ThisExpressionÍ1Í5LªIdentifierÍ6Í=§optionsÂÂÂ¥constR³ExpressionStatementÍIÍş[´AssignmentExpressionÍIÍı¡=T°MemberExpressionÍIÍoT°MemberExpressionÍIÍ^LªIdentifierÍIÍL£webLªIdentifierÍMÍ^±componentInstanceÂÂLªIdentifierÍ_Ío°handleAreaChangeÂÂK·ArrowFunctionExpressionÍrÍıÀÂÂÂ’LªIdentifierÍsÍt¡_LªIdentifierÍvÍ~¨newValueO®BlockStatementÍƒÍı’R³ExpressionStatementÍ’Íº[´AssignmentExpressionÍ’Í¹¡=T°MemberExpressionÍ’Í¨V®ThisExpressionÍ’Í–LªIdentifierÍ—Í¨±widthByAreaChangeÂÂT°MemberExpressionÍ«Í¹LªIdentifierÍ«Í³¨newValueLªIdentifierÍ´Í¹¥widthÂÂR³ExpressionStatementÍÈÍò[´AssignmentExpressionÍÈÍñ¡=T°MemberExpressionÍÈÍßV®ThisExpressionÍÈÍÌLªIdentifierÍÍÍß²heightByAreaChangeÂÂT°MemberExpressionÍâÍñLªIdentifierÍâÍê¨newValueLªIdentifierÍëÍñ¦heightÂÂR³ExpressionStatementÍÍs[´AssignmentExpressionÍÍr¡=T°MemberExpressionÍÍ*T°MemberExpressionÍÍLªIdentifierÍÍ£webLªIdentifierÍÍ±componentInstanceÂÂLªIdentifierÍÍ*¬handleScrollÂÂK·ArrowFunctionExpressionÍ-ÍrÀÂÂÂ‘LªIdentifierÍ.Í3¥eventO®BlockStatementÍ8Ír‘R³ExpressionStatementÍGÍg[´AssignmentExpressionÍGÍf¡=T°MemberExpressionÍGÍVV®ThisExpressionÍGÍKLªIdentifierÍLÍVªcurOffsetYÂÂT°MemberExpressionÍYÍfLªIdentifierÍYÍ^¥eventLªIdentifierÍ_Íf§yOffsetÂÂZ¯ReturnStatementÍ}ÍˆLªIdentifierÍ„Í‡£web]°MethodDefinitionÍ•Í2ÂÂLªIdentifierÍ•ÍªµupdateNativeNodeStyle¦methodK²FunctionExpressionÍªÍ2ÀÂÂÂ’LªIdentifierÍ«Í®£keyLªIdentifierÍ°Íµ¥valueO®BlockStatementÍ·Í2‘a¯SwitchStatementÍÂÍ+LªIdentifierÍÊÍÍ£key‘bªSwitchCaseÍŞÍ ‘R³ExpressionStatementÍøÍ S®CallExpressionÍøÍT°MemberExpressionÍøÍV¥SuperÍøÍıLªIdentifierÍşÍµupdateNativeNodeStyleÂÂ’LªIdentifierÍÍ£keyLªIdentifierÍÍ¥valueÂÀ]°MethodDefinitionÍ8ÍşÂÂLªIdentifierÍ8ÍMµupdateNativeAttribute¦methodK²FunctionExpressionÍMÍşÀÂÂÂ’LªIdentifierÍNÍQ£keyLªIdentifierÍSÍX¥valueO®BlockStatementÍZÍş‘a¯SwitchStatementÍeÍ÷LªIdentifierÍmÍp£key•bªSwitchCaseÍÍã’R³ExpressionStatementÍÍË[´AssignmentExpressionÍÍÊ¡=T°MemberExpressionÍÍÂT°MemberExpressionÍÍ¾T°MemberExpressionÍÍ¬V®ThisExpressionÍÍ¢LªIdentifierÍ£Í¬©frameNodeÂÂLªIdentifierÍ­Í¾±componentInstanceÂÂLªIdentifierÍ¿ÍÂ£srcÂÂLªIdentifierÍÅÍÊ¥valuec®BreakStatementÍİÍãÀN§LiteralÍ†Í‹£src¥'src'bªSwitchCaseÍñÍv’U«IfStatementÍÍ^Ôrd–¤type¥start£end¤left¨operator¥right°BinaryExpressionÍÍ4`¯UnaryExpressionÍÍ&¦typeofÃLªIdentifierÍ!Í&¥value£===N§LiteralÍ+Í4§boolean©'boolean'O®BlockStatementÍ6Í^‘R³ExpressionStatementÍMÍK[´AssignmentExpressionÍMÍJ¡=T°MemberExpressionÍMÍ{T°MemberExpressionÍMÍmT°MemberExpressionÍMÍ[V®ThisExpressionÍMÍQLªIdentifierÍRÍ[©frameNodeÂÂLªIdentifierÍ\Ím±componentInstanceÂÂLªIdentifierÍnÍ{­onTitleUpdateÂÂUµConditionalExpressionÍ~ÍJLªIdentifierÍ~Íƒ¥valueK·ArrowFunctionExpressionÍ†Í>ÀÂÂÂ‘LªIdentifierÍ‡ÍŒ¥eventO®BlockStatementÍ‘Í>’P³VariableDeclarationÍ¬ÍÈ‘Q²VariableDeclaratorÍ²ÍÇLªIdentifierÍ²Í¸¦detailT°MemberExpressionÍ»ÍÇLªIdentifierÍ»ÍÀ¥eventLªIdentifierÍÁÍÇ¦detailÂÂ¥constR³ExpressionStatementÍâÍ'[´AssignmentExpressionÍâÍ&¡=T°MemberExpressionÍâÍT°MemberExpressionÍâÍT°MemberExpressionÍâÍûT°MemberExpressionÍâÍëV®ThisExpressionÍâÍæLªIdentifierÍçÍë¤pageÂÂLªIdentifierÍìÍû¯navBarFrameNodeÂÂLªIdentifierÍüÍ±componentInstanceÂÂLªIdentifierÍÍ©titleTextÂÂT°MemberExpressionÍÍ&LªIdentifierÍÍ ¦detailLªIdentifierÍ!Í&¥titleÂÂLªIdentifierÍAÍJ©undefinedÀc®BreakStatementÍpÍvÀN§LiteralÍöÍ«updateTitle­'updateTitle'bªSwitchCaseÍ„Í^’U«IfStatementÍ·ÍFd°BinaryExpressionÍ»ÍÕ`¯UnaryExpressionÍ»ÍÇ¦typeofÃLªIdentifierÍÂÍÇ¥value£===N§LiteralÍÌÍÕ§boolean©'boolean'O®BlockStatementÍ×ÍF‘R³ExpressionStatementÍîÍ3S®CallExpressionÍîÍ2T°MemberExpressionÍîÍ+T°MemberExpressionÍîÍT°MemberExpressionÍîÍüV®ThisExpressionÍîÍòLªIdentifierÍóÍü©frameNodeÂÂLªIdentifierÍıÍ±componentInstanceÂÂLªIdentifierÍÍ+¼setHorizontalScrollBarAccessÂÂ‘LªIdentifierÍ,Í1¥valueÂÀc®BreakStatementÍXÍ^ÀN§LiteralÍ‰Í¤¹horizontalScrollBarAccess»'horizontalScrollBarAccess'bªSwitchCaseÍlÍB’U«IfStatementÍÍ*d°BinaryExpressionÍ¡Í»`¯UnaryExpressionÍ¡Í­¦typeofÃLªIdentifierÍ¨Í­¥value£===N§LiteralÍ²Í»§boolean©'boolean'O®BlockStatementÍ½Í*‘R³ExpressionStatementÍÔÍS®CallExpressionÍÔÍT°MemberExpressionÍÔÍT°MemberExpressionÍÔÍôT°MemberExpressionÍÔÍâV®ThisExpressionÍÔÍØLªIdentifierÍÙÍâ©frameNodeÂÂLªIdentifierÍãÍô±componentInstanceÂÂLªIdentifierÍõÍºsetVerticalScrollBarAccessÂÂ‘LªIdentifierÍÍ¥valueÂÀc®BreakStatementÍ<ÍBÀN§LiteralÍqÍŠ·verticalScrollBarAccess¹'verticalScrollBarAccess'bªSwitchCaseÍPÍì‘U«IfStatementÍqÍìd°BinaryExpressionÍuÍ`¯UnaryExpressionÍuÍ¦typeofÃLªIdentifierÍ|Í¥value£===N§LiteralÍ†Í§boolean©'boolean'O®BlockStatementÍ‘Íì‘R³ExpressionStatementÍ¨ÍÙ[´AssignmentExpressionÍ¨ÍØ¡=T°MemberExpressionÍ¨ÍĞT°MemberExpressionÍ¨ÍÈT°MemberExpressionÍ¨Í¶V®ThisExpressionÍ¨Í¬LªIdentifierÍ­Í¶©frameNodeÂÂLªIdentifierÍ·ÍÈ±componentInstanceÂÂLªIdentifierÍÉÍĞ§bouncesÂÂLªIdentifierÍÓÍØ¥valueÀN§LiteralÍUÍ^§bounces©'bounces']°MethodDefinitionÍÍ¡ÂÂLªIdentifierÍÍ¯initNativeEvent¦methodK²FunctionExpressionÍÍ¡ÀÂÂÂ‘LªIdentifierÍÍ¤typeO®BlockStatementÍÍ¡‘a¯SwitchStatementÍ%ÍšLªIdentifierÍ-Í1¤type–bªSwitchCaseÍBÍ+‘O®BlockStatementÍOÍ+’R³ExpressionStatementÍbÍ[´AssignmentExpressionÍbÍ¡=T°MemberExpressionÍbÍ‰T°MemberExpressionÍbÍ‚T°MemberExpressionÍbÍpV®ThisExpressionÍbÍfLªIdentifierÍgÍp©frameNodeÂÂLªIdentifierÍqÍ‚±componentInstanceÂÂLªIdentifierÍƒÍ‰¦onLoadÂÂK·ArrowFunctionExpressionÍŒÍÀÂÂÂ‘LªIdentifierÍÍ’¥eventO®BlockStatementÍ—Í‘R³ExpressionStatementÍ®ÍğS®CallExpressionÍ®ÍïT°MemberExpressionÍ®ÍÀV®ThisExpressionÍ®Í²LªIdentifierÍ³ÍÀ­dispatchEventÂÂ‘W­NewExpressionÍÁÍîLªIdentifierÍÅÍØ³UniWebViewLoadEvent’N§LiteralÍÙÍß¤load¦'load'T°MemberExpressionÍáÍíLªIdentifierÍáÍæ¥eventLªIdentifierÍçÍí¦detailÂÂÂc®BreakStatementÍÍÀN§LiteralÍGÍM¤load¦'load'bªSwitchCaseÍ9Í.‘O®BlockStatementÍIÍ.’R³ExpressionStatementÍ\Í[´AssignmentExpressionÍ\Í¡=T°MemberExpressionÍ\Í†T°MemberExpressionÍ\Í|T°MemberExpressionÍ\ÍjV®ThisExpressionÍ\Í`LªIdentifierÍaÍj©frameNodeÂÂLªIdentifierÍkÍ|±componentInstanceÂÂLªIdentifierÍ}Í†©onMessageÂÂK·ArrowFunctionExpressionÍ‰ÍÀÂÂÂ‘LªIdentifierÍŠÍ¥eventO®BlockStatementÍ”Í‘R³ExpressionStatementÍ«ÍóS®CallExpressionÍ«ÍòT°MemberExpressionÍ«Í½V®ThisExpressionÍ«Í¯LªIdentifierÍ°Í½­dispatchEventÂÂ‘W­NewExpressionÍ¾ÍñLªIdentifierÍÂÍØ¶UniWebViewMessageEvent’N§LiteralÍÙÍâ§message©'message'T°MemberExpressionÍäÍğLªIdentifierÍäÍé¥eventLªIdentifierÍêÍğ¦detailÂÂÂc®BreakStatementÍÍÀN§LiteralÍ>ÍG§message©'message'bªSwitchCaseÍ<Í1‘O®BlockStatementÍLÍ1’R³ExpressionStatementÍ_Í
+[´AssignmentExpressionÍ_Í	¡=T°MemberExpressionÍ_Í‰T°MemberExpressionÍ_ÍT°MemberExpressionÍ_ÍmV®ThisExpressionÍ_ÍcLªIdentifierÍdÍm©frameNodeÂÂLªIdentifierÍnÍ±componentInstanceÂÂLªIdentifierÍ€Í‰©onLoadingÂÂK·ArrowFunctionExpressionÍŒÍ	ÀÂÂÂ‘LªIdentifierÍÍ’¥eventO®BlockStatementÍ—Í	‘R³ExpressionStatementÍ®ÍöS®CallExpressionÍ®ÍõT°MemberExpressionÍ®ÍÀV®ThisExpressionÍ®Í²LªIdentifierÍ³ÍÀ­dispatchEventÂÂ‘W­NewExpressionÍÁÍôLªIdentifierÍÅÍÛ¶UniWebViewLoadingEvent’N§LiteralÍÜÍå§loading©'loading'T°MemberExpressionÍçÍóLªIdentifierÍçÍì¥eventLªIdentifierÍíÍó¦detailÂÂÂc®BreakStatementÍÍ"ÀN§LiteralÍAÍJ§loading©'loading'bªSwitchCaseÍ?Í8‘O®BlockStatementÍPÍ8’R³ExpressionStatementÍcÍ[´AssignmentExpressionÍcÍ¡=T°MemberExpressionÍcÍT°MemberExpressionÍcÍƒT°MemberExpressionÍcÍqV®ThisExpressionÍcÍgLªIdentifierÍhÍq©frameNodeÂÂLªIdentifierÍrÍƒ±componentInstanceÂÂLªIdentifierÍ„ÍªonDownloadÂÂK·ArrowFunctionExpressionÍ‘ÍÀÂÂÂ‘LªIdentifierÍ’Í—¥eventO®BlockStatementÍœÍ‘R³ExpressionStatementÍ³ÍıS®CallExpressionÍ³ÍüT°MemberExpressionÍ³ÍÅV®ThisExpressionÍ³Í·LªIdentifierÍ¸ÍÅ­dispatchEventÂÂ‘W­NewExpressionÍÆÍûLªIdentifierÍÊÍá·UniWebViewDownloadEvent’N§LiteralÍâÍì¨downloadª'download'T°MemberExpressionÍîÍúLªIdentifierÍîÍó¥eventLªIdentifierÍôÍú¦detailÂÂÂc®BreakStatementÍ#Í)ÀN§LiteralÍDÍN¨downloadª'download'bªSwitchCaseÍFÍ3‘O®BlockStatementÍTÍ3’R³ExpressionStatementÍgÍ[´AssignmentExpressionÍgÍ¡=T°MemberExpressionÍgÍT°MemberExpressionÍgÍ‡T°MemberExpressionÍgÍuV®ThisExpressionÍgÍkLªIdentifierÍlÍu©frameNodeÂÂLªIdentifierÍvÍ‡±componentInstanceÂÂLªIdentifierÍˆÍ§onErrorÂÂK·ArrowFunctionExpressionÍ’ÍÀÂÂÂ‘LªIdentifierÍ“Í˜¥eventO®BlockStatementÍÍ‘R³ExpressionStatementÍ´ÍøS®CallExpressionÍ´Í÷T°MemberExpressionÍ´ÍÆV®ThisExpressionÍ´Í¸LªIdentifierÍ¹ÍÆ­dispatchEventÂÂ‘W­NewExpressionÍÇÍöLªIdentifierÍËÍß´UniWebViewErrorEvent’N§LiteralÍàÍç¥error§'error'T°MemberExpressionÍéÍõLªIdentifierÍéÍî¥eventLªIdentifierÍïÍõ¦detailÂÂÂc®BreakStatementÍÍ$ÀN§LiteralÍKÍR¥error§'error'bªSwitchCaseÍAÍ’R³ExpressionStatementÍ[ÍwS®CallExpressionÍ[ÍvT°MemberExpressionÍ[ÍpV¥SuperÍ[Í`LªIdentifierÍaÍp¯initNativeEventÂÂ‘LªIdentifierÍqÍu¤typeÂc®BreakStatementÍ‰ÍÀÀ]°MethodDefinitionÍ§Í"#ÂÂLªIdentifierÍ§Í¸±deleteNativeEvent¦methodK²FunctionExpressionÍ¸Í"#ÀÂÂÂ’LªIdentifierÍ¹Í½¤typeLªIdentifierÍ¿ÍÂ£resO®BlockStatementÍÄÍ"#‘a¯SwitchStatementÍÏÍ"LªIdentifierÍ×ÍÛ¤type–bªSwitchCaseÍìÍm‘O®BlockStatementÍùÍm’R³ExpressionStatementÍÍ@[´AssignmentExpressionÍÍ?¡=T°MemberExpressionÍÍ3T°MemberExpressionÍÍ,T°MemberExpressionÍÍV®ThisExpressionÍÍLªIdentifierÍÍ©frameNodeÂÂLªIdentifierÍÍ,±componentInstanceÂÂLªIdentifierÍ-Í3¦onLoadÂÂLªIdentifierÍ6Í?©undefinedZ¯ReturnStatementÍRÍ^N§LiteralÍYÍ]Ã¤trueN§LiteralÍñÍ÷¤load¦'load'bªSwitchCaseÍ{Í ‘O®BlockStatementÍ‹Í ’R³ExpressionStatementÍÍÕ[´AssignmentExpressionÍÍÔ¡=T°MemberExpressionÍÍÈT°MemberExpressionÍÍ¾T°MemberExpressionÍÍ¬V®ThisExpressionÍÍ¢LªIdentifierÍ£Í¬©frameNodeÂÂLªIdentifierÍ­Í¾±componentInstanceÂÂLªIdentifierÍ¿ÍÈ©onMessageÂÂLªIdentifierÍËÍÔ©undefinedZ¯ReturnStatementÍçÍóN§LiteralÍîÍòÃ¤trueN§LiteralÍ€Í‰§message©'message'bªSwitchCaseÍ Í —‘O®BlockStatementÍ  Í —’R³ExpressionStatementÍ 3Í j[´AssignmentExpressionÍ 3Í i¡=T°MemberExpressionÍ 3Í ]T°MemberExpressionÍ 3Í ST°MemberExpressionÍ 3Í AV®ThisExpressionÍ 3Í 7LªIdentifierÍ 8Í A©frameNodeÂÂLªIdentifierÍ BÍ S±componentInstanceÂÂLªIdentifierÍ TÍ ]©onLoadingÂÂLªIdentifierÍ `Í i©undefinedZ¯ReturnStatementÍ |Í ˆN§LiteralÍ ƒÍ ‡Ã¤trueN§LiteralÍ Í §loading©'loading'bªSwitchCaseÍ ¥Í!.‘O®BlockStatementÍ ¶Í!.’R³ExpressionStatementÍ ÉÍ![´AssignmentExpressionÍ ÉÍ! ¡=T°MemberExpressionÍ ÉÍ ôT°MemberExpressionÍ ÉÍ éT°MemberExpressionÍ ÉÍ ×V®ThisExpressionÍ ÉÍ ÍLªIdentifierÍ ÎÍ ×©frameNodeÂÂLªIdentifierÍ ØÍ é±componentInstanceÂÂLªIdentifierÍ êÍ ôªonDownloadÂÂLªIdentifierÍ ÷Í! ©undefinedZ¯ReturnStatementÍ!Í!N§LiteralÍ!Í!Ã¤trueN§LiteralÍ ªÍ ´¨downloadª'download'bªSwitchCaseÍ!<Í!¿‘O®BlockStatementÍ!JÍ!¿’R³ExpressionStatementÍ!]Í!’[´AssignmentExpressionÍ!]Í!‘¡=T°MemberExpressionÍ!]Í!…T°MemberExpressionÍ!]Í!}T°MemberExpressionÍ!]Í!kV®ThisExpressionÍ!]Í!aLªIdentifierÍ!bÍ!k©frameNodeÂÂLªIdentifierÍ!lÍ!}±componentInstanceÂÂLªIdentifierÍ!~Í!…§onErrorÂÂLªIdentifierÍ!ˆÍ!‘©undefinedZ¯ReturnStatementÍ!¤Í!°N§LiteralÍ!«Í!¯Ã¤trueN§LiteralÍ!AÍ!H¥error§'error'bªSwitchCaseÍ!ÍÍ"‘Z¯ReturnStatementÍ!çÍ"S®CallExpressionÍ!îÍ"T°MemberExpressionÍ!îÍ"V¥SuperÍ!îÍ!óLªIdentifierÍ!ôÍ"±deleteNativeEventÂÂ’LªIdentifierÍ"Í"
+¤typeLªIdentifierÍ"Í"£resÂÀ]°MethodDefinitionÍ")Í"iÂÂLªIdentifierÍ")Í"=´getHarmonyController¦methodK²FunctionExpressionÍ"=Í"iÀÂÂÂO®BlockStatementÍ"@Í"i‘Z¯ReturnStatementÍ"KÍ"bT°MemberExpressionÍ"RÍ"aV®ThisExpressionÍ"RÍ"VLªIdentifierÍ"WÍ"aªcontrollerÂÂ]°MethodDefinitionÍ"oÍ#©ÂÂLªIdentifierÍ"oÍ"°invokeController¦methodK²FunctionExpressionÍ"Í#©ÀÂÂÂ’LªIdentifierÍ"€Í"ŠªmethodNameZ«RestElementÍ"ŒÍ"“LªIdentifierÍ"Í"“¤argsO®BlockStatementÍ"•Í#©‘U«IfStatementÍ" Í#¢T°MemberExpressionÍ"¤Í"½V®ThisExpressionÍ"¤Í"¨LªIdentifierÍ"©Í"½´isControllerAttachedÂÂO®BlockStatementÍ"¿Í#‘Z¯ReturnStatementÍ"ÎÍ"úS®CallExpressionÍ"ÕÍ"ùT°MemberExpressionÍ"ÕÍ"ğT°MemberExpressionÍ"ÕÍ"äV®ThisExpressionÍ"ÕÍ"ÙLªIdentifierÍ"ÚÍ"äªcontrollerÂÂLªIdentifierÍ"åÍ"ïªmethodNameÃÂ‘Z­SpreadElementÍ"ñÍ"øLªIdentifierÍ"ôÍ"ø¤argsÂO®BlockStatementÍ#Í#¢‘R³ExpressionStatementÍ##Í#—S®CallExpressionÍ##Í#–T°MemberExpressionÍ##Í#GT°MemberExpressionÍ##Í#BV®ThisExpressionÍ##Í#'LªIdentifierÍ#(Í#BºcontrollerAttachedInvokersÂÂLªIdentifierÍ#CÍ#G¤pushÂÂ‘K·ArrowFunctionExpressionÍ#HÍ#•ÀÂÂÂO®BlockStatementÍ#NÍ#•‘R³ExpressionStatementÍ#aÍ#†S®CallExpressionÍ#aÍ#…T°MemberExpressionÍ#aÍ#|T°MemberExpressionÍ#aÍ#pV®ThisExpressionÍ#aÍ#eLªIdentifierÍ#fÍ#pªcontrollerÂÂLªIdentifierÍ#qÍ#{ªmethodNameÃÂ‘Z­SpreadElementÍ#}Í#„LªIdentifierÍ#€Í#„¤argsÂÂ]°MethodDefinitionÍ#¯Í#êÂÂLªIdentifierÍ#¯Í#³¤back¦methodK²FunctionExpressionÍ#³Í#êÀÂÂÂO®BlockStatementÍ#¶Í#ê‘R³ExpressionStatementÍ#ÁÍ#ãS®CallExpressionÍ#ÁÍ#âT°MemberExpressionÍ#ÁÍ#ÖV®ThisExpressionÍ#ÁÍ#ÅLªIdentifierÍ#ÆÍ#Ö°invokeControllerÂÂ‘N§LiteralÍ#×Í#á¨backwardª'backward'Â]°MethodDefinitionÍ#ğÍ$-ÂÂLªIdentifierÍ#ğÍ#÷§forward¦methodK²FunctionExpressionÍ#÷Í$-ÀÂÂÂO®BlockStatementÍ#úÍ$-‘R³ExpressionStatementÍ$Í$&S®CallExpressionÍ$Í$%T°MemberExpressionÍ$Í$V®ThisExpressionÍ$Í$	LªIdentifierÍ$
+Í$°invokeControllerÂÂ‘N§LiteralÍ$Í$$§forward©'forward'Â]°MethodDefinitionÍ$3Í$oÂÂLªIdentifierÍ$3Í$9¦reload¦methodK²FunctionExpressionÍ$9Í$oÀÂÂÂO®BlockStatementÍ$<Í$o‘R³ExpressionStatementÍ$GÍ$hS®CallExpressionÍ$GÍ$gT°MemberExpressionÍ$GÍ$\V®ThisExpressionÍ$GÍ$KLªIdentifierÍ$LÍ$\°invokeControllerÂÂ‘N§LiteralÍ$]Í$f§refresh©'refresh'Â]°MethodDefinitionÍ$uÍ$¬ÂÂLªIdentifierÍ$uÍ$y¤stop¦methodK²FunctionExpressionÍ$yÍ$¬ÀÂÂÂO®BlockStatementÍ$|Í$¬‘R³ExpressionStatementÍ$‡Í$¥S®CallExpressionÍ$‡Í$¤T°MemberExpressionÍ$‡Í$œV®ThisExpressionÍ$‡Í$‹LªIdentifierÍ$ŒÍ$œ°invokeControllerÂÂ‘N§LiteralÍ$Í$£¤stop¦'stop'Â]°MethodDefinitionÍ$²Í$úÂÂLªIdentifierÍ$²Í$¸¦evalJS¦methodK²FunctionExpressionÍ$¸Í$úÀÂÂÂ‘LªIdentifierÍ$¹Í$»¢jsO®BlockStatementÍ$½Í$ú‘R³ExpressionStatementÍ$ÈÍ$óS®CallExpressionÍ$ÈÍ$òT°MemberExpressionÍ$ÈÍ$İV®ThisExpressionÍ$ÈÍ$ÌLªIdentifierÍ$ÍÍ$İ°invokeControllerÂÂ’N§LiteralÍ$ŞÍ$í­runJavaScript¯'runJavaScript'LªIdentifierÍ$ïÍ$ñ¢jsÂ]°MethodDefinitionÍ% Í%øÂÂLªIdentifierÍ% Í%°getContentHeight¦methodK²FunctionExpressionÍ%Í%øÀÂÂÂO®BlockStatementÍ%Í%ø“P³VariableDeclarationÍ%Í%Q‘Q²VariableDeclaratorÍ%$Í%PLªIdentifierÍ%$Í%.ªpageHeightS®CallExpressionÍ%1Í%PT°MemberExpressionÍ%1Í%NT°MemberExpressionÍ%1Í%@V®ThisExpressionÍ%1Í%5LªIdentifierÍ%6Í%@ªcontrollerÂÂLªIdentifierÍ%AÍ%N­getPageHeightÂÂÂ¥constU«IfStatementÍ%[Í%Ìd±LogicalExpressionÍ%_Í%d°BinaryExpressionÍ%_Í%xT°MemberExpressionÍ%_Í%rV®ThisExpressionÍ%_Í%cLªIdentifierÍ%dÍ%r®lastPageHeightÂÂ£===N§LiteralÍ%wÍ%x ¡0¢&&d°BinaryExpressionÍ%|Í%T°MemberExpressionÍ%|Í%V®ThisExpressionÍ%|Í%€LªIdentifierÍ%Í%®lastPageHeightÂÂ£!==LªIdentifierÍ%”Í%ªpageHeightO®BlockStatementÍ% Í%Ì‘Z¯ReturnStatementÍ%¯Í%ÁLªIdentifierÍ%¶Í%ÀªpageHeightÀZ¯ReturnStatementÍ%ÖÍ%ñT°MemberExpressionÍ%İÍ%ğV®ThisExpressionÍ%İÍ%áLªIdentifierÍ%âÍ%ğ®lastPageHeightÂÂ]°MethodDefinitionÍ%şÍ&BÂÂLªIdentifierÍ%şÍ&§canBack¦methodK²FunctionExpressionÍ&Í&BÀÂÂÂO®BlockStatementÍ&Í&B‘Z¯ReturnStatementÍ&Í&;S®CallExpressionÍ&Í&:T°MemberExpressionÍ&Í&8T°MemberExpressionÍ&Í&)V®ThisExpressionÍ&Í&LªIdentifierÍ&Í&)ªcontrollerÂÂLªIdentifierÍ&*Í&8®accessBackwardÂÂÂ]°MethodDefinitionÍ&HÍ&ÂÂLªIdentifierÍ&HÍ&RªcanForward¦methodK²FunctionExpressionÍ&RÍ&ÀÂÂÂO®BlockStatementÍ&UÍ&‘Z¯ReturnStatementÍ&`Í&‡S®CallExpressionÍ&gÍ&†T°MemberExpressionÍ&gÍ&„T°MemberExpressionÍ&gÍ&vV®ThisExpressionÍ&gÍ&kLªIdentifierÍ&lÍ&vªcontrollerÂÂLªIdentifierÍ&wÍ&„­accessForwardÂÂÂ]°MethodDefinitionÍ&”Í-ŸÂÂLªIdentifierÍ&”Í&œ¨loadData¦methodK²FunctionExpressionÍ&œÍ-ŸÀÂÂÂ‘LªIdentifierÍ&Í&¤§optionsO®BlockStatementÍ&¦Í-Ÿ–P³VariableDeclarationÍ)AÍ)Y‘Q²VariableDeclaratorÍ)EÍ)XLªIdentifierÍ)EÍ)I¤dataT°MemberExpressionÍ)LÍ)XLªIdentifierÍ)LÍ)S§optionsLªIdentifierÍ)TÍ)X¤dataÂÂ£letP³VariableDeclarationÍ)cÍ)„‘Q²VariableDeclaratorÍ)gÍ)ƒLªIdentifierÍ)gÍ)o¨encodingR¯ChainExpressionÍ)rÍ)ƒT°MemberExpressionÍ)rÍ)ƒLªIdentifierÍ)rÍ)y§optionsLªIdentifierÍ){Í)ƒ¨encodingÂÃ£letP³VariableDeclarationÍ)Í)µ‘Q²VariableDeclaratorÍ)”Í)´LªIdentifierÍ)”Í)›§baseURLd±LogicalExpressionÍ)Í)´R¯ChainExpressionÍ)Í)®T°MemberExpressionÍ)Í)®LªIdentifierÍ)Í)¥§optionsLªIdentifierÍ)§Í)®§baseURLÂÃ¢??N§LiteralÍ)²Í)´ ¢''¥constU«IfStatementÍ)¿Í,ºd±LogicalExpressionÍ)ÃÍ)ëd°BinaryExpressionÍ)ÃÍ)ÓLªIdentifierÍ)ÃÍ)Ë¨encoding¢==N§LiteralÍ)ÏÍ)ÓÀ¤null¢&&d°BinaryExpressionÍ)×Í)ëT°MemberExpressionÍ)×Í)åLªIdentifierÍ)×Í)Ş§baseURLLªIdentifierÍ)ßÍ)å¦lengthÂÂ£===N§LiteralÍ)êÍ)ë ¡0O®BlockStatementÍ)íÍ,º‘Ôre–¤type¥start£end¥block§handler©finalizer¬TryStatementÍ)üÍ,¯O®BlockStatementÍ* Í,%–P³VariableDeclarationÍ*Í*M‘Q²VariableDeclaratorÍ*Í*LLªIdentifierÍ*Í*"©htmlBytesS®CallExpressionÍ*%Í*LT°MemberExpressionÍ*%Í*FW­NewExpressionÍ*%Í*;T°MemberExpressionÍ*)Í*9LªIdentifierÍ*)Í*-¤utilLªIdentifierÍ*.Í*9«TextEncoderÂÂLªIdentifierÍ*<Í*FªencodeIntoÂÂ‘LªIdentifierÍ*GÍ*K¤dataÂ¥constP³VariableDeclarationÍ*_Í*‡‘Q²VariableDeclaratorÍ*eÍ*†LªIdentifierÍ*eÍ*oªbyteOffsetT°MemberExpressionÍ*rÍ*†LªIdentifierÍ*rÍ*{©htmlBytesLªIdentifierÍ*|Í*†ªbyteOffsetÂÂ¥constP³VariableDeclarationÍ*™Í*Á‘Q²VariableDeclaratorÍ*ŸÍ*ÀLªIdentifierÍ*ŸÍ*©ªbyteLengthT°MemberExpressionÍ*¬Í*ÀLªIdentifierÍ*¬Í*µ©htmlBytesLªIdentifierÍ*¶Í*ÀªbyteLengthÂÂ¥constP³VariableDeclarationÍ*ÓÍ+‘Q²VariableDeclaratorÍ*ÙÍ+LªIdentifierÍ*ÙÍ*ãªhtmlBufferUµConditionalExpressionÍ*æÍ+d±LogicalExpressionÍ*æÍ+"d°BinaryExpressionÍ*æÍ*õLªIdentifierÍ*æÍ*ğªbyteOffset¢==N§LiteralÍ*ôÍ*õ ¡0¢&&d°BinaryExpressionÍ*ùÍ+"LªIdentifierÍ*ùÍ+ªbyteLength¢==T°MemberExpressionÍ+Í+"T°MemberExpressionÍ+Í+LªIdentifierÍ+Í+©htmlBytesLªIdentifierÍ+Í+¦bufferÂÂLªIdentifierÍ+Í+"ªbyteLengthÂÂT°MemberExpressionÍ+:Í+JLªIdentifierÍ+:Í+C©htmlBytesLªIdentifierÍ+DÍ+J¦bufferÂÂS®CallExpressionÍ+bÍ+T°MemberExpressionÍ+bÍ+xT°MemberExpressionÍ+bÍ+rLªIdentifierÍ+bÍ+k©htmlBytesLªIdentifierÍ+lÍ+r¦bufferÂÂLªIdentifierÍ+sÍ+x¥sliceÂÂ’LªIdentifierÍ+yÍ+ƒªbyteOffsetd°BinaryExpressionÍ+…Í+œLªIdentifierÍ+…Í+ªbyteOffset¡+LªIdentifierÍ+’Í+œªbyteLengthÂ¥constR³ExpressionStatementÍ+°Í+é[´AssignmentExpressionÍ+°Í+è¡=LªIdentifierÍ+°Í+´¤dataS®CallExpressionÍ+·Í+èT°MemberExpressionÍ+·Í+×S®CallExpressionÍ+·Í+ÎT°MemberExpressionÍ+·Í+ÂLªIdentifierÍ+·Í+½¦bufferLªIdentifierÍ+¾Í+Â¤fromÂÂ‘LªIdentifierÍ+ÃÍ+ÍªhtmlBufferÂLªIdentifierÍ+ÏÍ+×¨toStringÂÂ‘LªIdentifierÍ+ØÍ+ç¯BASE64_ENCODINGÂR³ExpressionStatementÍ+ûÍ,[´AssignmentExpressionÍ+ûÍ,¡=LªIdentifierÍ+ûÍ,¨encodingLªIdentifierÍ,Í,¯BASE64_ENCODINGÔrf•¤type¥start£end¥param¤body«CatchClauseÍ,3Í,¯LªIdentifierÍ,:Í,?¥errorO®BlockStatementÍ,AÍ,¯‘R³ExpressionStatementÍ,TÍ, S®CallExpressionÍ,TÍ,ŸT°MemberExpressionÍ,TÍ,aLªIdentifierÍ,TÍ,[§consoleLªIdentifierÍ,\Í,a¥errorÂÂ’N§LiteralÍ,bÍ,—Ù3[WebView loadData] Failed to encode data to base64:Ù5'[WebView loadData] Failed to encode data to base64:'LªIdentifierÍ,™Í,¥errorÂÀÀU«IfStatementÍ,ÄÍ-!d°BinaryExpressionÍ,ÈÍ,äLªIdentifierÍ,ÈÍ,Ğ¨encoding£!==LªIdentifierÍ,ÕÍ,ä¯BASE64_ENCODINGO®BlockStatementÍ,æÍ-!‘R³ExpressionStatementÍ,õÍ-[´AssignmentExpressionÍ,õÍ-¡=LªIdentifierÍ,õÍ,ù¤dataS®CallExpressionÍ,üÍ-T°MemberExpressionÍ,üÍ-LªIdentifierÍ,üÍ- ¤dataLªIdentifierÍ-Í-§replaceÂÂ’Ôrg–¤type¥start£end¥value£raw¥regex§LiteralÍ-	Í-’¡#¡g¤/#/gÔrh’§pattern¥flags¡#¡gN§LiteralÍ-Í-£%23¥'%23'ÂÀR³ExpressionStatementÍ-+Í-˜S®CallExpressionÍ-+Í-—T°MemberExpressionÍ-+Í-@V®ThisExpressionÍ-+Í-/LªIdentifierÍ-0Í-@°invokeControllerÂÂ•N§LiteralÍ-AÍ-K¨loadDataª'loadData'LªIdentifierÍ-MÍ-Q¤datad±LogicalExpressionÍ-SÍ-rT°MemberExpressionÍ-SÍ-cLªIdentifierÍ-SÍ-Z§optionsLªIdentifierÍ-[Í-c¨mimeTypeÂÂ¢??N§LiteralÍ-gÍ-r©text/html«"text/html"d±LogicalExpressionÍ-tÍ-‡LªIdentifierÍ-tÍ-|¨encoding¢??N§LiteralÍ-€Í-‡¥UTF-8§"UTF-8"d±LogicalExpressionÍ-‰Í-–LªIdentifierÍ-‰Í-§baseURL¢??N§LiteralÍ-”Í-– ¢''Â]°MethodDefinitionÍ-¥Í.ÂÂÂLªIdentifierÍ-¥Í-¬§dispose¦methodK²FunctionExpressionÍ-¬Í.ÂÀÂÂÂO®BlockStatementÍ-¯Í.Â•R³ExpressionStatementÍ-ºÍ-ìS®CallExpressionÍ-ºÍ-ëT°MemberExpressionÍ-ºÍ-àT°MemberExpressionÍ-ºÍ-ÏT°MemberExpressionÍ-ºÍ-ÆV®ThisExpressionÍ-ºÍ-¾LªIdentifierÍ-¿Í-Æ§optionsÂÂLªIdentifierÍ-ÇÍ-Ï¨delegateÂÂLªIdentifierÍ-ĞÍ-à°onBeforeDownloadÂÂ‘LªIdentifierÍ-áÍ-ê©undefinedÂR³ExpressionStatementÍ-öÍ.)S®CallExpressionÍ-öÍ.(T°MemberExpressionÍ-öÍ.T°MemberExpressionÍ-öÍ.T°MemberExpressionÍ-öÍ.V®ThisExpressionÍ-öÍ-úLªIdentifierÍ-ûÍ.§optionsÂÂLªIdentifierÍ.Í.¨delegateÂÂLªIdentifierÍ.Í.±onDownloadUpdatedÂÂ‘LªIdentifierÍ.Í.'©undefinedÂR³ExpressionStatementÍ.3Í.eS®CallExpressionÍ.3Í.dT°MemberExpressionÍ.3Í.YT°MemberExpressionÍ.3Í.HT°MemberExpressionÍ.3Í.?V®ThisExpressionÍ.3Í.7LªIdentifierÍ.8Í.?§optionsÂÂLªIdentifierÍ.@Í.H¨delegateÂÂLªIdentifierÍ.IÍ.Y°onDownloadFinishÂÂ‘LªIdentifierÍ.ZÍ.c©undefinedÂR³ExpressionStatementÍ.oÍ.¡S®CallExpressionÍ.oÍ. T°MemberExpressionÍ.oÍ.•T°MemberExpressionÍ.oÍ.„T°MemberExpressionÍ.oÍ.{V®ThisExpressionÍ.oÍ.sLªIdentifierÍ.tÍ.{§optionsÂÂLªIdentifierÍ.|Í.„¨delegateÂÂLªIdentifierÍ.…Í.•°onDownloadFailedÂÂ‘LªIdentifierÍ.–Í.Ÿ©undefinedÂR³ExpressionStatementÍ.«Í.»S®CallExpressionÍ.«Í.ºT°MemberExpressionÍ.«Í.¸V¥SuperÍ.«Í.°LªIdentifierÍ.±Í.¸§disposeÂÂÂÀ˜Ôri•¤type¥start£endªspecifiers¦source±ImportDeclaration .‘Ôrj•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	®UniElementImplLªIdentifier	®UniElementImplN§Literal-¬./UniElement®'./UniElement'i±ImportDeclaration0Ì`‘j¯ImportSpecifier9Ì@LªIdentifier9Ì@§WebViewLªIdentifier9Ì@§WebViewN§LiteralÌHÌ_µ../components/WebView·'../components/WebView'i±ImportDeclarationÌbÌ’j¯ImportSpecifierÌkÌ}LªIdentifierÌkÌ}²createUniFrameNodeLªIdentifierÌkÌ}²createUniFrameNodej¯ImportSpecifierÌÌ‹LªIdentifierÌÌ‹¬UniFrameNodeLªIdentifierÌÌ‹¬UniFrameNodeN§LiteralÌ“Ìœ§../Node©'../Node'i±ImportDeclarationÌŸÌÇ‘Ôrk”¤type¥start£end¥local¶ImportDefaultSpecifierÌ¦Ì­LªIdentifierÌ¦Ì­§webviewN§LiteralÌ³ÌÆ±@ohos.web.webview³"@ohos.web.webview"i±ImportDeclarationÌÉÍ„–j¯ImportSpecifierÌÒÌåLªIdentifierÌÒÌå³UniWebViewLoadEventLªIdentifierÌÒÌå³UniWebViewLoadEventj¯ImportSpecifierÌçÌıLªIdentifierÌçÌı¶UniWebViewMessageEventLªIdentifierÌçÌı¶UniWebViewMessageEventj¯ImportSpecifierÌÿÍLªIdentifierÌÿÍ¶UniWebViewLoadingEventLªIdentifierÌÿÍ¶UniWebViewLoadingEventj¯ImportSpecifierÍÍ.LªIdentifierÍÍ.·UniWebViewDownloadEventLªIdentifierÍÍ.·UniWebViewDownloadEventj¯ImportSpecifierÍ0ÍDLªIdentifierÍ0ÍD´UniWebViewErrorEventLªIdentifierÍ0ÍD´UniWebViewErrorEventj¯ImportSpecifierÍFÍhLªIdentifierÍFÍhÙ"UniWebViewContentHeightChangeEventLªIdentifierÍFÍhÙ"UniWebViewContentHeightChangeEventN§LiteralÍpÍƒ±./UniWebViewEvent³'./UniWebViewEvent'i±ImportDeclarationÍ†Í¹‘j¯ImportSpecifierÍÍ¥LªIdentifierÍÍ¥¶createDownloadDelegateLªIdentifierÍÍ¥¶createDownloadDelegateN§LiteralÍ­Í¸©../helper«'../helper'i±ImportDeclarationÍ»Íİ‘k¶ImportDefaultSpecifierÍÂÍÈLªIdentifierÍÂÍÈ¦bufferN§LiteralÍÎÍÜ¬@ohos.buffer®"@ohos.buffer"i±ImportDeclarationÍßÍı‘k¶ImportDefaultSpecifierÍæÍêLªIdentifierÍæÍê¤utilN§LiteralÍğÍüª@ohos.util¬"@ohos.util"

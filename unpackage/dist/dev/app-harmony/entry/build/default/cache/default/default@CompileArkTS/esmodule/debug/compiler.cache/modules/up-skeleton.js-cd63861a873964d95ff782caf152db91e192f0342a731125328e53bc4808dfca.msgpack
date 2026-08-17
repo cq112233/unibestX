@@ -1,0 +1,645 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚãimport { a as addUnit, s as sleep } from "../../libs/function/index.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineComponent: _defineComponent } = globalThis.Vue;
+const { computed, onMounted } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineComponent({
+  ...{
+    name: "up-skeleton"
+  },
+  __name: "up-skeleton",
+  props: {
+    loading: {
+      type: Boolean,
+      default: true
+    },
+    animate: {
+      type: Boolean,
+      default: true
+    },
+    rows: {
+      type: [String, Number],
+      default: 0
+    },
+    rowsWidth: {
+      type: [String, Number, Array],
+      default: "100%"
+    },
+    rowsHeight: {
+      type: [String, Number, Array],
+      default: 18
+    },
+    title: {
+      type: Boolean,
+      default: true
+    },
+    titleWidth: {
+      type: [String, Number],
+      default: "50%"
+    },
+    titleHeight: {
+      type: [String, Number],
+      default: 18
+    },
+    avatar: {
+      type: Boolean,
+      default: false
+    },
+    avatarSize: {
+      type: [String, Number],
+      default: 32
+    },
+    avatarShape: {
+      type: String,
+      default: "circle"
+    }
+  },
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
+    const props = __props;
+    const rowsArray = computed(() => {
+      var _a2, _b;
+      const rows = [];
+      const rowCount = parseInt(props.rows.toString());
+      const rWidth = props.rowsWidth;
+      const rHeight = props.rowsHeight;
+      for (let i = 0; i < rowCount; i++) {
+        let item = new UTSJSONObject({});
+        let rowWidth = "";
+        if (UTS.isInstanceOf(rWidth, Array)) {
+          const rWidthArr = rWidth;
+          if (i == rowCount - 1) {
+            rowWidth = "70%";
+          } else {
+            rowWidth = rWidthArr[i] != null ? (_a2 = rWidthArr[i]) !== null && _a2 !== void 0 ? _a2 : "0px" : i == rWidthArr.length ? "70%" : "100%";
+          }
+        } else {
+          if (i == rowCount - 1) {
+            rowWidth = "70%";
+          } else {
+            rowWidth = rWidth != null ? rWidth.toString() : "";
+          }
+        }
+        let rowHeight = "";
+        if (UTS.isInstanceOf(rHeight, Array)) {
+          const rHeightArr = rHeight;
+          rowHeight = rHeightArr[i] != null ? (_b = rHeightArr[i]) !== null && _b !== void 0 ? _b : "0px" : "18px";
+        } else {
+          rowHeight = rHeight != null ? rHeight.toString() : "";
+        }
+        if (!props.title && i == 0) {
+          item["marginTop"] = "0px";
+        } else if (props.title && i == 0) {
+          item["marginTop"] = "20px";
+        } else {
+          item["marginTop"] = "12px";
+        }
+        item["width"] = addUnit(rowWidth);
+        item["height"] = addUnit(rowHeight);
+        rows.push(item);
+      }
+      return rows;
+    });
+    const uTitleWidth = computed(() => {
+      let tWidth = "0px";
+      tWidth = addUnit(props.titleWidth);
+      return addUnit(tWidth);
+    });
+    const avatarStyle = computed(() => {
+      return new UTSJSONObject({
+        height: addUnit(props.avatarSize),
+        width: addUnit(props.avatarSize)
+      });
+    });
+    const titleStyle = computed(() => {
+      return new UTSJSONObject({
+        width: uTitleWidth.value,
+        height: addUnit(props.titleHeight)
+      });
+    });
+    function getRowStyle(item) {
+      return new UTSJSONObject({
+        width: item["width"],
+        height: item["height"],
+        marginTop: item["marginTop"]
+      });
+    }
+    async function getComponentWidth() {
+      await sleep(20);
+    }
+    onMounted(() => {
+      getComponentWidth();
+    });
+    const __returned__ = { props, rowsArray, uTitleWidth, avatarStyle, titleStyle, getRowStyle, getComponentWidth };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = { "up-skeleton": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-skeleton__wrapper": { "": { "display": "flex", "flexDirection": "row" } }, "up-skeleton__wrapper__avatar": { "": { "backgroundColor": "#F1F2F4", "marginRight": 15 } }, "up-skeleton__wrapper__avatar--circle": { "": { "borderTopLeftRadius": 100, "borderTopRightRadius": 100, "borderBottomRightRadius": 100, "borderBottomLeftRadius": 100 } }, "up-skeleton__wrapper__avatar--square": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "up-skeleton__wrapper__content": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-skeleton__wrapper__content__rows": { "": { "backgroundColor": "#F1F2F4", "borderTopLeftRadius": 3, "borderTopRightRadius": 3, "borderBottomRightRadius": 3, "borderBottomLeftRadius": 3 } }, "up-skeleton__wrapper__content__title": { "": { "backgroundColor": "#F1F2F4", "borderTopLeftRadius": 3, "borderTopRightRadius": 3, "borderBottomRightRadius": 3, "borderBottomLeftRadius": 3 } } };
+const { normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, renderList: _renderList, Fragment: _Fragment, createElementVNode: _createElementVNode, renderSlot: _renderSlot } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createElementBlock("view", { class: "up-skeleton" }, [
+    $props.loading ? (_openBlock(), _createElementBlock(
+      "view",
+      {
+        key: 0,
+        class: "up-skeleton__wrapper",
+        ref: "up-skeleton__wrapper",
+        style: { "display": "flex", "flex-direction": "row" }
+      },
+      [
+        $props.avatar ? (_openBlock(), _createElementBlock(
+          "view",
+          {
+            key: 0,
+            class: _normalizeClass(["up-skeleton__wrapper__avatar", [`up-skeleton__wrapper__avatar--${$props.avatarShape}`, $props.animate ? "animate" : ""]]),
+            style: _normalizeStyle($setup.avatarStyle)
+          },
+          null,
+          6
+          /* CLASS, STYLE */
+        )) : _createCommentVNode("v-if", true),
+        _createElementVNode(
+          "view",
+          {
+            class: "up-skeleton__wrapper__content",
+            ref: "up-skeleton__wrapper__content",
+            style: { "flex": "1" }
+          },
+          [
+            $props.title ? (_openBlock(), _createElementBlock(
+              "view",
+              {
+                key: 0,
+                class: _normalizeClass(["up-skeleton__wrapper__content__title", [$props.animate ? "animate" : ""]]),
+                style: _normalizeStyle($setup.titleStyle)
+              },
+              null,
+              6
+              /* CLASS, STYLE */
+            )) : _createCommentVNode("v-if", true),
+            (_openBlock(true), _createElementBlock(
+              _Fragment,
+              null,
+              _renderList($setup.rowsArray, (item, index) => {
+                return _openBlock(), _createElementBlock(
+                  "view",
+                  {
+                    class: _normalizeClass(["up-skeleton__wrapper__content__rows", [$props.animate ? "animate" : ""]]),
+                    key: index,
+                    style: _normalizeStyle($setup.getRowStyle(item))
+                  },
+                  null,
+                  6
+                  /* CLASS, STYLE */
+                );
+              }),
+              128
+              /* KEYED_FRAGMENT */
+            ))
+          ],
+          512
+          /* NEED_PATCH */
+        )
+      ],
+      512
+      /* NEED_PATCH */
+    )) : _renderSlot(_ctx.$slots, "default", { key: 1 })
+  ]);
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-skeleton/up-skeleton.uvue"]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-skeleton.js.map
+Â’ÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙÔ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-skeleton/up-skeleton.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ‘ÔrD’²hostDependencyName®hostModuleNameÙL../../../../../uni_modules/uview-ultra/components/up-skeleton/up-skeleton.js¥entryÃÚãimport { a as addUnit, s as sleep } from "../../libs/function/index.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineComponent: _defineComponent } = globalThis.Vue;
+const { computed, onMounted } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineComponent({
+  ...{
+    name: "up-skeleton"
+  },
+  __name: "up-skeleton",
+  props: {
+    loading: {
+      type: Boolean,
+      default: true
+    },
+    animate: {
+      type: Boolean,
+      default: true
+    },
+    rows: {
+      type: [String, Number],
+      default: 0
+    },
+    rowsWidth: {
+      type: [String, Number, Array],
+      default: "100%"
+    },
+    rowsHeight: {
+      type: [String, Number, Array],
+      default: 18
+    },
+    title: {
+      type: Boolean,
+      default: true
+    },
+    titleWidth: {
+      type: [String, Number],
+      default: "50%"
+    },
+    titleHeight: {
+      type: [String, Number],
+      default: 18
+    },
+    avatar: {
+      type: Boolean,
+      default: false
+    },
+    avatarSize: {
+      type: [String, Number],
+      default: 32
+    },
+    avatarShape: {
+      type: String,
+      default: "circle"
+    }
+  },
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
+    const props = __props;
+    const rowsArray = computed(() => {
+      var _a2, _b;
+      const rows = [];
+      const rowCount = parseInt(props.rows.toString());
+      const rWidth = props.rowsWidth;
+      const rHeight = props.rowsHeight;
+      for (let i = 0; i < rowCount; i++) {
+        let item = new UTSJSONObject({});
+        let rowWidth = "";
+        if (UTS.isInstanceOf(rWidth, Array)) {
+          const rWidthArr = rWidth;
+          if (i == rowCount - 1) {
+            rowWidth = "70%";
+          } else {
+            rowWidth = rWidthArr[i] != null ? (_a2 = rWidthArr[i]) !== null && _a2 !== void 0 ? _a2 : "0px" : i == rWidthArr.length ? "70%" : "100%";
+          }
+        } else {
+          if (i == rowCount - 1) {
+            rowWidth = "70%";
+          } else {
+            rowWidth = rWidth != null ? rWidth.toString() : "";
+          }
+        }
+        let rowHeight = "";
+        if (UTS.isInstanceOf(rHeight, Array)) {
+          const rHeightArr = rHeight;
+          rowHeight = rHeightArr[i] != null ? (_b = rHeightArr[i]) !== null && _b !== void 0 ? _b : "0px" : "18px";
+        } else {
+          rowHeight = rHeight != null ? rHeight.toString() : "";
+        }
+        if (!props.title && i == 0) {
+          item["marginTop"] = "0px";
+        } else if (props.title && i == 0) {
+          item["marginTop"] = "20px";
+        } else {
+          item["marginTop"] = "12px";
+        }
+        item["width"] = addUnit(rowWidth);
+        item["height"] = addUnit(rowHeight);
+        rows.push(item);
+      }
+      return rows;
+    });
+    const uTitleWidth = computed(() => {
+      let tWidth = "0px";
+      tWidth = addUnit(props.titleWidth);
+      return addUnit(tWidth);
+    });
+    const avatarStyle = computed(() => {
+      return new UTSJSONObject({
+        height: addUnit(props.avatarSize),
+        width: addUnit(props.avatarSize)
+      });
+    });
+    const titleStyle = computed(() => {
+      return new UTSJSONObject({
+        width: uTitleWidth.value,
+        height: addUnit(props.titleHeight)
+      });
+    });
+    function getRowStyle(item) {
+      return new UTSJSONObject({
+        width: item["width"],
+        height: item["height"],
+        marginTop: item["marginTop"]
+      });
+    }
+    async function getComponentWidth() {
+      await sleep(20);
+    }
+    onMounted(() => {
+      getComponentWidth();
+    });
+    const __returned__ = { props, rowsArray, uTitleWidth, avatarStyle, titleStyle, getRowStyle, getComponentWidth };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = { "up-skeleton": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-skeleton__wrapper": { "": { "display": "flex", "flexDirection": "row" } }, "up-skeleton__wrapper__avatar": { "": { "backgroundColor": "#F1F2F4", "marginRight": 15 } }, "up-skeleton__wrapper__avatar--circle": { "": { "borderTopLeftRadius": 100, "borderTopRightRadius": 100, "borderBottomRightRadius": 100, "borderBottomLeftRadius": 100 } }, "up-skeleton__wrapper__avatar--square": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "up-skeleton__wrapper__content": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-skeleton__wrapper__content__rows": { "": { "backgroundColor": "#F1F2F4", "borderTopLeftRadius": 3, "borderTopRightRadius": 3, "borderBottomRightRadius": 3, "borderBottomLeftRadius": 3 } }, "up-skeleton__wrapper__content__title": { "": { "backgroundColor": "#F1F2F4", "borderTopLeftRadius": 3, "borderTopRightRadius": 3, "borderBottomRightRadius": 3, "borderBottomLeftRadius": 3 } } };
+const { normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, renderList: _renderList, Fragment: _Fragment, createElementVNode: _createElementVNode, renderSlot: _renderSlot } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createElementBlock("view", { class: "up-skeleton" }, [
+    $props.loading ? (_openBlock(), _createElementBlock(
+      "view",
+      {
+        key: 0,
+        class: "up-skeleton__wrapper",
+        ref: "up-skeleton__wrapper",
+        style: { "display": "flex", "flex-direction": "row" }
+      },
+      [
+        $props.avatar ? (_openBlock(), _createElementBlock(
+          "view",
+          {
+            key: 0,
+            class: _normalizeClass(["up-skeleton__wrapper__avatar", [`up-skeleton__wrapper__avatar--${$props.avatarShape}`, $props.animate ? "animate" : ""]]),
+            style: _normalizeStyle($setup.avatarStyle)
+          },
+          null,
+          6
+          /* CLASS, STYLE */
+        )) : _createCommentVNode("v-if", true),
+        _createElementVNode(
+          "view",
+          {
+            class: "up-skeleton__wrapper__content",
+            ref: "up-skeleton__wrapper__content",
+            style: { "flex": "1" }
+          },
+          [
+            $props.title ? (_openBlock(), _createElementBlock(
+              "view",
+              {
+                key: 0,
+                class: _normalizeClass(["up-skeleton__wrapper__content__title", [$props.animate ? "animate" : ""]]),
+                style: _normalizeStyle($setup.titleStyle)
+              },
+              null,
+              6
+              /* CLASS, STYLE */
+            )) : _createCommentVNode("v-if", true),
+            (_openBlock(true), _createElementBlock(
+              _Fragment,
+              null,
+              _renderList($setup.rowsArray, (item, index) => {
+                return _openBlock(), _createElementBlock(
+                  "view",
+                  {
+                    class: _normalizeClass(["up-skeleton__wrapper__content__rows", [$props.animate ? "animate" : ""]]),
+                    key: index,
+                    style: _normalizeStyle($setup.getRowStyle(item))
+                  },
+                  null,
+                  6
+                  /* CLASS, STYLE */
+                );
+              }),
+              128
+              /* KEYED_FRAGMENT */
+            ))
+          ],
+          512
+          /* NEED_PATCH */
+        )
+      ],
+      512
+      /* NEED_PATCH */
+    )) : _renderSlot(_ctx.$slots, "default", { key: 1 })
+  ]);
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-skeleton/up-skeleton.uvue"]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-skeleton.js.map
+ÔrE•§version¨mappings¥names§sources®sourcesContentÜ ×‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘ÙÔ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-skeleton/up-skeleton.js‘Úãimport { a as addUnit, s as sleep } from "../../libs/function/index.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineComponent: _defineComponent } = globalThis.Vue;
+const { computed, onMounted } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineComponent({
+  ...{
+    name: "up-skeleton"
+  },
+  __name: "up-skeleton",
+  props: {
+    loading: {
+      type: Boolean,
+      default: true
+    },
+    animate: {
+      type: Boolean,
+      default: true
+    },
+    rows: {
+      type: [String, Number],
+      default: 0
+    },
+    rowsWidth: {
+      type: [String, Number, Array],
+      default: "100%"
+    },
+    rowsHeight: {
+      type: [String, Number, Array],
+      default: 18
+    },
+    title: {
+      type: Boolean,
+      default: true
+    },
+    titleWidth: {
+      type: [String, Number],
+      default: "50%"
+    },
+    titleHeight: {
+      type: [String, Number],
+      default: 18
+    },
+    avatar: {
+      type: Boolean,
+      default: false
+    },
+    avatarSize: {
+      type: [String, Number],
+      default: 32
+    },
+    avatarShape: {
+      type: String,
+      default: "circle"
+    }
+  },
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
+    const props = __props;
+    const rowsArray = computed(() => {
+      var _a2, _b;
+      const rows = [];
+      const rowCount = parseInt(props.rows.toString());
+      const rWidth = props.rowsWidth;
+      const rHeight = props.rowsHeight;
+      for (let i = 0; i < rowCount; i++) {
+        let item = new UTSJSONObject({});
+        let rowWidth = "";
+        if (UTS.isInstanceOf(rWidth, Array)) {
+          const rWidthArr = rWidth;
+          if (i == rowCount - 1) {
+            rowWidth = "70%";
+          } else {
+            rowWidth = rWidthArr[i] != null ? (_a2 = rWidthArr[i]) !== null && _a2 !== void 0 ? _a2 : "0px" : i == rWidthArr.length ? "70%" : "100%";
+          }
+        } else {
+          if (i == rowCount - 1) {
+            rowWidth = "70%";
+          } else {
+            rowWidth = rWidth != null ? rWidth.toString() : "";
+          }
+        }
+        let rowHeight = "";
+        if (UTS.isInstanceOf(rHeight, Array)) {
+          const rHeightArr = rHeight;
+          rowHeight = rHeightArr[i] != null ? (_b = rHeightArr[i]) !== null && _b !== void 0 ? _b : "0px" : "18px";
+        } else {
+          rowHeight = rHeight != null ? rHeight.toString() : "";
+        }
+        if (!props.title && i == 0) {
+          item["marginTop"] = "0px";
+        } else if (props.title && i == 0) {
+          item["marginTop"] = "20px";
+        } else {
+          item["marginTop"] = "12px";
+        }
+        item["width"] = addUnit(rowWidth);
+        item["height"] = addUnit(rowHeight);
+        rows.push(item);
+      }
+      return rows;
+    });
+    const uTitleWidth = computed(() => {
+      let tWidth = "0px";
+      tWidth = addUnit(props.titleWidth);
+      return addUnit(tWidth);
+    });
+    const avatarStyle = computed(() => {
+      return new UTSJSONObject({
+        height: addUnit(props.avatarSize),
+        width: addUnit(props.avatarSize)
+      });
+    });
+    const titleStyle = computed(() => {
+      return new UTSJSONObject({
+        width: uTitleWidth.value,
+        height: addUnit(props.titleHeight)
+      });
+    });
+    function getRowStyle(item) {
+      return new UTSJSONObject({
+        width: item["width"],
+        height: item["height"],
+        marginTop: item["marginTop"]
+      });
+    }
+    async function getComponentWidth() {
+      await sleep(20);
+    }
+    onMounted(() => {
+      getComponentWidth();
+    });
+    const __returned__ = { props, rowsArray, uTitleWidth, avatarStyle, titleStyle, getRowStyle, getComponentWidth };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = { "up-skeleton": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-skeleton__wrapper": { "": { "display": "flex", "flexDirection": "row" } }, "up-skeleton__wrapper__avatar": { "": { "backgroundColor": "#F1F2F4", "marginRight": 15 } }, "up-skeleton__wrapper__avatar--circle": { "": { "borderTopLeftRadius": 100, "borderTopRightRadius": 100, "borderBottomRightRadius": 100, "borderBottomLeftRadius": 100 } }, "up-skeleton__wrapper__avatar--square": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "up-skeleton__wrapper__content": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-skeleton__wrapper__content__rows": { "": { "backgroundColor": "#F1F2F4", "borderTopLeftRadius": 3, "borderTopRightRadius": 3, "borderBottomRightRadius": 3, "borderBottomLeftRadius": 3 } }, "up-skeleton__wrapper__content__title": { "": { "backgroundColor": "#F1F2F4", "borderTopLeftRadius": 3, "borderTopRightRadius": 3, "borderBottomRightRadius": 3, "borderBottomLeftRadius": 3 } } };
+const { normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, renderList: _renderList, Fragment: _Fragment, createElementVNode: _createElementVNode, renderSlot: _renderSlot } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createElementBlock("view", { class: "up-skeleton" }, [
+    $props.loading ? (_openBlock(), _createElementBlock(
+      "view",
+      {
+        key: 0,
+        class: "up-skeleton__wrapper",
+        ref: "up-skeleton__wrapper",
+        style: { "display": "flex", "flex-direction": "row" }
+      },
+      [
+        $props.avatar ? (_openBlock(), _createElementBlock(
+          "view",
+          {
+            key: 0,
+            class: _normalizeClass(["up-skeleton__wrapper__avatar", [`up-skeleton__wrapper__avatar--${$props.avatarShape}`, $props.animate ? "animate" : ""]]),
+            style: _normalizeStyle($setup.avatarStyle)
+          },
+          null,
+          6
+          /* CLASS, STYLE */
+        )) : _createCommentVNode("v-if", true),
+        _createElementVNode(
+          "view",
+          {
+            class: "up-skeleton__wrapper__content",
+            ref: "up-skeleton__wrapper__content",
+            style: { "flex": "1" }
+          },
+          [
+            $props.title ? (_openBlock(), _createElementBlock(
+              "view",
+              {
+                key: 0,
+                class: _normalizeClass(["up-skeleton__wrapper__content__title", [$props.animate ? "animate" : ""]]),
+                style: _normalizeStyle($setup.titleStyle)
+              },
+              null,
+              6
+              /* CLASS, STYLE */
+            )) : _createCommentVNode("v-if", true),
+            (_openBlock(true), _createElementBlock(
+              _Fragment,
+              null,
+              _renderList($setup.rowsArray, (item, index) => {
+                return _openBlock(), _createElementBlock(
+                  "view",
+                  {
+                    class: _normalizeClass(["up-skeleton__wrapper__content__rows", [$props.animate ? "animate" : ""]]),
+                    key: index,
+                    style: _normalizeStyle($setup.getRowStyle(item))
+                  },
+                  null,
+                  6
+                  /* CLASS, STYLE */
+                );
+              }),
+              128
+              /* KEYED_FRAGMENT */
+            ))
+          ],
+          512
+          /* NEED_PATCH */
+        )
+      ],
+      512
+      /* NEED_PATCH */
+    )) : _renderSlot(_ctx.$slots, "default", { key: 1 })
+  ]);
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-skeleton/up-skeleton.uvue"]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-skeleton.js.map
+ÔrF’Ù'../../../../plugin-vue-export-helper.js¼../../libs/function/index.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂGAÂÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍœÍºÀ‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍ§Í·ÔrL”¤type¥start£end¤nameªIdentifierÍ§Í²«__easycom_1LªIdentifierÍ¶Í·¡_À’ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration ÌH’ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	
+¡aLªIdentifier§addUnitN¯ImportSpecifier!LªIdentifier¡sLªIdentifier!¥sleepÔrO•¤type¥start£end¥value£raw§Literal)ÌG¼../../libs/function/index.js¾"../../libs/function/index.js"M±ImportDeclarationÌIÌ”‘N¯ImportSpecifierÌRÌbLªIdentifierÌRÌS¡_LªIdentifierÌWÌb«_export_sfcO§LiteralÌjÌ“Ù'../../../../plugin-vue-export-helper.jsÙ)"../../../../plugin-vue-export-helper.js"

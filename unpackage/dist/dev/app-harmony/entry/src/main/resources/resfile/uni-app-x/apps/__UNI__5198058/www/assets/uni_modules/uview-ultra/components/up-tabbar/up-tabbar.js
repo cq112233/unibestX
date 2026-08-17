@@ -1,18 +1,13 @@
 import { _ as __easycom_0 } from "../up-safe-bottom/up-safe-bottom.js";
+import { r as resolveEasycom } from "../../../../App.ku.js";
 import { d as deepMerge, b as addStyle, s as sleep, u as upGetRect } from "../../libs/function/index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataSlot: _createSharedDataSlot, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, setSharedDataEvent: _setSharedDataEvent } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpTabbarUpTabbar";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { computed, ref, watch, provide, onMounted, getCurrentInstance } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-tabbar"
   },
-  __dynamicSharedData: true,
-  __hash: "0d3705f7",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-tabbar/up-tabbar.uvue",
   __name: "up-tabbar",
   props: {
     value: {
@@ -64,9 +59,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   },
   emits: ["change", "update:value"],
   setup(__props, _a) {
-    var __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpTabbarUpTabbarSharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
     const props = __props;
     const emit = __emit;
     const instance = getCurrentInstance();
@@ -128,36 +122,49 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     onMounted(() => {
       setPlaceholderHeight();
     });
-    return () => {
-      "raw js";
-      const _component_up_safe_bottom = __easycom_0;
-      _renderSharedDataEffect(() => {
-        _setSharedDataClass(__sharedData, 5, ["up-tabbar__content", [__props.border ? "up-border-top" : "", __props.fixed ? "up-tabbar--fixed" : ""]]);
-        _setSharedDataStyle(__sharedData, 6, tabbarStyle.value);
-      });
-      _createSharedDataSlot("default", null, null);
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 2, _toSharedDataBoolean(__props.safeAreaInsetBottom));
-      }, () => {
-        const n4 = _createSharedDataComponentWithFallback(_component_up_safe_bottom, "d503d244");
-        _setSharedData(__sharedData, 3, n4?.sharedData);
-      });
-      _setSharedDataEvent(__sharedData, 4, noop);
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.placeholder && __props.fixed));
-      }, () => {
-        _renderSharedDataEffect(() => {
-          return _setSharedDataStyle(__sharedData, 1, {
-            height: placeholderHeight.value + "px"
-          });
-        });
-      });
-      return __sharedData;
-    };
+    const __returned__ = { props, emit, instance, placeholderHeight, tabbarStyle, parentState, itemCount, registerTabbarItem, setPlaceholderHeight, noop };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabbar": { "": { "display": "flex", "flexDirection": "column", "width": "100%" } }, "up-tabbar__content": { "": { "display": "flex", "flexDirection": "column", "backgroundColor": "#ffffff", "width": "100%" } }, "up-tabbar__content__item-wrapper": { "": { "height": 50, "display": "flex", "flexDirection": "row", "justifyContent": "space-around", "alignItems": "stretch", "width": "100%" } }, "up-tabbar--fixed": { "": { "position": "fixed", "bottom": 0, "left": 0, "right": 0 } } };
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { renderSlot: _renderSlot, createElementVNode: _createElementVNode, resolveComponent: _resolveComponent, openBlock: _openBlock, createBlock: _createBlock, createCommentVNode: _createCommentVNode, withModifiers: _withModifiers, normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, createElementBlock: _createElementBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_safe_bottom = resolveEasycom(__resolveDynamicComponent("up-safe-bottom"), __easycom_0);
+  return _openBlock(), _createElementBlock("view", { class: "up-tabbar" }, [
+    _createElementVNode(
+      "view",
+      {
+        class: _normalizeClass(["up-tabbar__content", [$props.border ? "up-border-top" : "", $props.fixed ? "up-tabbar--fixed" : ""]]),
+        onTouchmove: _withModifiers($setup.noop, ["stop", "prevent"]),
+        style: _normalizeStyle($setup.tabbarStyle)
+      },
+      [
+        _createElementVNode("view", { class: "up-tabbar__content__item-wrapper" }, [
+          _renderSlot(_ctx.$slots, "default")
+        ]),
+        $props.safeAreaInsetBottom ? (_openBlock(), _createBlock(_component_up_safe_bottom, { key: 0 })) : _createCommentVNode("v-if", true)
+      ],
+      38
+      /* CLASS, STYLE, NEED_HYDRATION */
+    ),
+    $props.placeholder && $props.fixed ? (_openBlock(), _createElementBlock(
+      "view",
+      {
+        key: 0,
+        class: "up-tabbar__placeholder",
+        style: _normalizeStyle({
+          height: $setup.placeholderHeight + "px"
+        })
+      },
+      null,
+      4
+      /* STYLE */
+    )) : _createCommentVNode("v-if", true)
+  ]);
+}
+const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-tabbar/up-tabbar.uvue"]]);
 export {
   __easycom_2 as _
 };

@@ -1,0 +1,164 @@
+import _easycom_NavBar from '@/src/components/NavBar/NavBar.uvue'
+import _easycom_up_steps_item from '@/uni_modules/uview-ultra/components/up-steps-item/up-steps-item.uvue'
+import _easycom_up_steps from '@/uni_modules/uview-ultra/components/up-steps/up-steps.uvue'
+import _easycom_up_button from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue'
+import AppKu from '@/App.ku.uvue'
+import LayoutComponent from '@/src/layouts/default.uvue'
+import { ref } from 'vue'
+
+
+const __sfc__ = defineComponent({
+  __name: 'steps',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+const currentStep = ref<number>(1)
+
+function nextStep(): void {
+  currentStep.value = (currentStep.value + 1) % 4
+}
+
+return (): any | null => {
+
+const _component_NavBar = resolveEasyComponent("NavBar",_easycom_NavBar)
+const _component_up_steps_item = resolveEasyComponent("up-steps-item",_easycom_up_steps_item)
+const _component_up_steps = resolveEasyComponent("up-steps",_easycom_up_steps)
+const _component_up_button = resolveEasyComponent("up-button",_easycom_up_button)
+
+  return _cV(unref(AppKu), null, _uM({
+    default: withSlotCtx((): any[] => [
+      _cV(unref(LayoutComponent), _uM({
+        "navigation-style": 'custom',
+        "navigation-bar-title-text": 'up-steps 步骤条'
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({ class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }), [
+            _cV(_component_NavBar, _uM({
+              title: "Steps 步骤条",
+              "auto-back": true,
+              "safe-area-inset-top": true,
+              "bg-color": "#ffffff"
+            })),
+            _cE("view", _uM({ class: "p-16px" }), [
+              _cE("view", _uM({ class: "demo-block" }), [
+                _cE("text", _uM({ class: "demo-label" }), "基础步骤条"),
+                _cV(_component_up_steps, _uM({ current: currentStep.value }), _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cV(_component_up_steps_item, _uM({
+                      title: "已下单",
+                      desc: "10:30"
+                    })),
+                    _cV(_component_up_steps_item, _uM({
+                      title: "已出库",
+                      desc: "10:35"
+                    })),
+                    _cV(_component_up_steps_item, _uM({
+                      title: "运输中",
+                      desc: "11:40"
+                    })),
+                    _cV(_component_up_steps_item, _uM({
+                      title: "已签收",
+                      desc: "14:20"
+                    }))
+                  ]),
+                  _: 1 /* STABLE */
+                }), 8 /* PROPS */, ["current"]),
+                _cE("view", _uM({ class: "mt-12px flex-row justify-center" }), [
+                  _cV(_component_up_button, _uM({
+                    size: "small",
+                    type: "primary",
+                    text: "下一步",
+                    onClick: nextStep
+                  }))
+                ])
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "圆点模式 (dot)"),
+                _cV(_component_up_steps, _uM({
+                  current: 1,
+                  dot: true
+                }), _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cV(_component_up_steps_item, _uM({
+                      title: "已下单",
+                      desc: "10:30"
+                    })),
+                    _cV(_component_up_steps_item, _uM({
+                      title: "已出库",
+                      desc: "10:35"
+                    })),
+                    _cV(_component_up_steps_item, _uM({
+                      title: "运输中",
+                      desc: "11:40"
+                    }))
+                  ]),
+                  _: 1 /* STABLE */
+                }))
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "自定义颜色与错误状态"),
+                _cV(_component_up_steps, _uM({
+                  current: 1,
+                  "active-color": "#19be6b"
+                }), _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cV(_component_up_steps_item, _uM({
+                      title: "已下单",
+                      desc: "10:30"
+                    })),
+                    _cV(_component_up_steps_item, _uM({
+                      title: "出库异常",
+                      desc: "10:35",
+                      error: true
+                    })),
+                    _cV(_component_up_steps_item, _uM({
+                      title: "运输中",
+                      desc: "11:40"
+                    }))
+                  ]),
+                  _: 1 /* STABLE */
+                }))
+              ]),
+              _cE("view", _uM({ class: "demo-block mt-12px" }), [
+                _cE("text", _uM({ class: "demo-label" }), "垂直方向"),
+                _cV(_component_up_steps, _uM({
+                  current: 1,
+                  direction: "column"
+                }), _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cV(_component_up_steps_item, _uM({
+                      title: "已下单",
+                      desc: "买家已提交订单 10:30"
+                    })),
+                    _cV(_component_up_steps_item, _uM({
+                      title: "已出库",
+                      desc: "包裹已出库并在分拣 10:35"
+                    })),
+                    _cV(_component_up_steps_item, _uM({
+                      title: "运输中",
+                      desc: "快件正在运往目的地 11:40"
+                    })),
+                    _cV(_component_up_steps_item, _uM({
+                      title: "已签收",
+                      desc: "快件已安全送达 14:20"
+                    }))
+                  ]),
+                  _: 1 /* STABLE */
+                }))
+              ])
+            ])
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }))
+    ]),
+    _: 1 /* STABLE */
+  }))
+}
+}
+
+})
+export default __sfc__
+const GenSrcSubUviewUltraDemosStepsStepsStyles = [_uM([["bg-__f8fafc_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f8fafc"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["justify-center", _pS(_uM([["justifyContent", "center"]]))], ["mt-12px", _pS(_uM([["marginTop", 12]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["pb-30px", _pS(_uM([["paddingBottom", 30]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 12], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftColor", "#2979ff"], ["borderLeftStyle", "solid"]]))]])]

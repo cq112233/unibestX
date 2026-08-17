@@ -273,7 +273,7 @@ unibestX/
 │   ├── vite-plugin-uni-pages.ts #   自动文件路由插件（生成 pages.json / definePage 支持）
 │   ├── uni-layouts-plugin.ts #   跨端 Layout 布局插件（支持 default/empty 及自定义布局）
 │   └── root-plugin.ts        #   自动包裹 App.ku.uvue 全局根骨架组件
-├── pages.config.json         # pages.json 基础配置文件（全局 globalStyle、tabBar 等）
+├── pages.config.json         # 页面路由与全局配置文件（⚠️ 路由与页面配置请在此处修改，勿直接修改 pages.json）
 ├── src/
 │   ├── api/                  # API 请求模块（foo.uts, user.uts, auth.uts 等）
 │   ├── assets/               # 静态资源（图标、图片等）
@@ -338,7 +338,7 @@ unibestX/
 ├── docs/                     # VitePress 项目文档源码
 ├── App.ku.uvue               # 全局根包裹组件（动态主题注入、全局 Toast 容器）
 ├── main.uts                  # 应用主入口文件
-├── pages.json                # 自动生成的页面路由表、分包与 easycom 配置
+├── pages.json                # ⚠️ 自动生成的页面路由表（编译产物，构建时自动覆盖，请勿手动编辑）
 ├── manifest.json             # 应用配置清单（多端 AppID、权限、原生模块配置）
 ├── vite.config.ts            # Vite 构建配置（UnoCSS 规则与自定义插件）
 ├── uni.scss                  # 全局 SCSS 变量与主题注入
@@ -346,6 +346,43 @@ unibestX/
 ```
 
 ## 🧩 核心功能说明
+
+### 页面路由与配置 (uni-pages) ⚠️
+
+本项目内置了自动文件路由插件 **`vite-plugin-uni-pages`**，自动递归扫描 `src/pages` 主包与 `src/sub` 分包目录，并实时维护生成 `pages.json`。
+
+> [!WARNING]
+> **请勿直接手动修改 `pages.json`！**
+> `pages.json` 为 Vite 插件的**自动构建产物**。每次在 HBuilderX 中运行、保存代码或打包时，插件都会根据源配置重新生成并完全覆盖 `pages.json`。
+
+**正确的页面配置方式（二选一）**：
+
+1. **在根目录 `pages.config.json` 中配置**（推荐）：
+   在 `pages.config.json` 中定义全局 `globalStyle`、`tabBar` 以及页面的 `style`（如自定义导航栏、页面标题等）：
+
+   ```json
+   {
+     "path": "uview-ultra/demos/circle-progress/circle-progress",
+     "style": {
+       "navigationBarTitleText": "CircleProgress 圆形进度条",
+       "navigationStyle": "custom"
+     }
+   }
+   ```
+
+2. **在页面代码中通过 `definePage` 编译宏或 `<route>` 声明**：
+   直接在页面的 `.uvue` 代码中内联声明，插件会在编译时自动提取：
+
+   ```html
+   <script setup lang="uts">
+   definePage({
+     style: {
+       navigationBarTitleText: 'CircleProgress 圆形进度条',
+       navigationStyle: 'custom'
+     }
+   })
+   </script>
+   ```
 
 ### VDOM 模式与 Vapor 蒸汽模式切换
 
@@ -456,6 +493,7 @@ uni-app x 推出了新一代的 **蒸汽模式（Vapor）**。新版渲染引擎
 3. **CSS 限制**：部分 CSS 属性在原生平台不支持，具体参考 [uni-app X 文档](https://uniapp.dcloud.net.cn/uni-app-x/)
 4. **API 限制**：原生平台不支持浏览器 API（如 `window`、`document`、`localStorage` 等）
 5. **SCSS 变量**：支持 SCSS 变量，但动态覆盖需使用 CSS 变量方式
+6. **路由与页面配置**：`pages.json` 为自动构建产物（构建时会被覆盖），请在 `pages.config.json` 或页面代码 `definePage` 中配置，**切勿直接修改 `pages.json`**
 
 > \[!IMPORTANT]
 > **安卓端语法最严**：Android 编译器的 UTS 类型与语法校验是所有平台中最严格的。一般如果 Android 端编译正常通过，其他平台（H5、微信小程序、iOS等）通常都不会有大问题。

@@ -1,14 +1,9 @@
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataSlot: _createSharedDataSlot, setSharedDataEvent: _setSharedDataEvent } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpCopyUpCopy";
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineComponent: _defineComponent } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-copy"
   },
-  __dynamicSharedData: true,
-  __hash: "099f71fe",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-copy/up-copy.uvue",
   __name: "up-copy",
   props: {
     content: {
@@ -26,9 +21,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   },
   emits: ["success"],
   setup(__props, _a) {
-    var __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpCopyUpCopySharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
     const props = __props;
     const emit = __emit;
     const handleClick = () => {
@@ -69,16 +63,24 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         }
       });
     };
-    return () => {
-      "raw js";
-      _createSharedDataSlot("default", null, null, () => {
-      });
-      _setSharedDataEvent(__sharedData, 0, handleClick);
-      return __sharedData;
-    };
+    const __returned__ = { props, emit, handleClick };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
+const { renderSlot: _renderSlot, createTextVNode: _createTextVNode, openBlock: _openBlock, createElementBlock: _createElementBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createElementBlock("view", {
+    class: "up-copy",
+    onClick: $setup.handleClick
+  }, [
+    _renderSlot(_ctx.$slots, "default", {}, () => [
+      _createTextVNode("复制")
+    ])
+  ]);
+}
+const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-copy/up-copy.uvue"]]);
 export {
-  _sfc_main as _
+  __easycom_2 as _
 };
 //# sourceMappingURL=up-copy.js.map

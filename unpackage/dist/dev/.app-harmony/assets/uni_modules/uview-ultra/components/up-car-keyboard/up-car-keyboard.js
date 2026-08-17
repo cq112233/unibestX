@@ -1,20 +1,15 @@
 import { _ as __easycom_0 } from "../up-icon/up-icon.js";
+import { r as resolveEasycom } from "../../../../App.ku.js";
 import "../../libs/composable/useUltraUI.js";
 import { h as randomArray, s as sleep } from "../../libs/function/index.js";
 import { d as defProps } from "./carKeyboard.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, setSharedData: _setSharedData, toDisplayString: _toDisplayString, toSharedDataBoolean: _toSharedDataBoolean, setSharedDataEvent: _setSharedDataEvent, setSharedDataClass: _setSharedDataClass, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataIf: _createSharedDataIf, createSharedDataFor: _createSharedDataFor, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpCarKeyboardUpCarKeyboard";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { computed, ref } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-car-keyboard"
   },
-  __dynamicSharedData: true,
-  __hash: "098e85a4",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-car-keyboard/up-car-keyboard.uvue",
   __name: "up-car-keyboard",
   props: {
     // 是否打乱键盘的顺序
@@ -30,9 +25,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   },
   emits: ["change", "backspace"],
   setup(__props, _a) {
-    var __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpCarKeyboardUpCarKeyboardSharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
     const props = __props;
     const emit = __emit;
     const abc = ref(false);
@@ -166,63 +160,130 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     };
     const noop = () => {
     };
-    return () => {
-      "raw js";
-      const _component_up_icon = __easycom_0;
-      _createSharedDataFor(_setSharedDataScoped(__sharedData, 0, _createSharedDataVFor(__sharedDataScope, () => {
-        return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-      })), () => {
-        return abc.value ? engKeyBoardList.value : areaList.value;
-      }, (__sharedData_VFor0, _for_item0, _for_key0) => {
-        _createSharedDataIf(() => {
-          return _setSharedData(__sharedData_VFor0, 1, _toSharedDataBoolean(_for_key0.value == 3));
-        }, () => {
-          _setSharedDataEvent(__sharedData_VFor0, 2, changeCarInputMode);
-          _renderSharedDataEffect(() => {
-            const _abc = abc.value;
-            _setSharedDataClass(__sharedData_VFor0, 3, ["up-keyboard__button__inner-wrapper__left__lang", [!_abc ? "up-keyboard__button__inner-wrapper__left__lang--active" : ""]]);
-            _setSharedDataClass(__sharedData_VFor0, 4, ["up-keyboard__button__inner-wrapper__left__lang", [_abc ? "up-keyboard__button__inner-wrapper__left__lang--active" : ""]]);
-          });
-        });
-        _createSharedDataFor(_setSharedDataScoped(__sharedData_VFor0, 5, _createSharedDataVFor(__sharedDataScope, () => {
-          return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 2 });
-        })), () => {
-          return _for_item0.value;
-        }, (__sharedData_VFor1, _for_item1, _for_key1) => {
-          _setSharedDataEvent(__sharedData_VFor1, 1, () => {
-            return carInputClick(_for_key0.value, _for_key1.value);
-          });
-          _renderSharedDataEffect(() => {
-            return _setSharedData(__sharedData_VFor1, 2, _toDisplayString(_for_item1.value));
-          });
-          return null;
-        }, (__sharedData_VFor1, item, j) => {
-          return _setSharedData(__sharedData_VFor1, 0, _toDisplayString(j));
-        });
-        _createSharedDataIf(() => {
-          return _setSharedData(__sharedData_VFor0, 6, _toSharedDataBoolean(_for_key0.value == 3));
-        }, () => {
-          const n16 = _createSharedDataComponentWithFallback(_component_up_icon, "bd3121bc-" + _for_key0.value, {
-            size: "28",
-            name: "backspace",
-            color: "#303133"
-          });
-          _setSharedData(__sharedData_VFor0, 7, n16?.sharedData);
-          _setSharedDataEvent(__sharedData_VFor0, 8, backspaceClick);
-          _setSharedDataEvent(__sharedData_VFor0, 9, clearTimer);
-        });
-        _setSharedDataClass(__sharedData_VFor0, 10, ["up-keyboard__button", [_for_key0.value + 1 == 4 ? "up-keyboard__button--center" : ""]]);
-        return null;
-      }, (__sharedData_VFor0, group, i) => {
-        return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(i));
-      }, 1);
-      _setSharedDataEvent(__sharedData, 1, noop);
-      return __sharedData;
-    };
+    const __returned__ = { props, emit, abc, timer, areaList, engKeyBoardList, carInputClick, changeCarInputMode, backspaceClick, clearTimer, noop };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-keyboard": { "": { "display": "flex", "flexDirection": "column", "justifyContent": "space-around", "backgroundColor": "#e0e4e6", "alignItems": "stretch", "paddingTop": 6, "paddingRight": 0, "paddingBottom": 6, "paddingLeft": 0 } }, "up-keyboard__button": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-keyboard__button__inner-wrapper": { "": { "boxShadow": "0 1px 0px #999992", "marginTop": "8rpx", "marginRight": "5rpx", "marginBottom": "8rpx", "marginLeft": "5rpx", "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "up-keyboard__button__inner-wrapper__inner": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "width": "64rpx", "backgroundColor": "#FFFFFF", "height": "80rpx", "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "up-keyboard__button__inner-wrapper__inner__text": { "": { "fontSize": 16, "color": "#303133" } }, "up-keyboard__button__inner-wrapper__left": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4, "width": "134rpx", "height": "80rpx", "backgroundColor": "#BBBCC6", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "boxShadow": "0 1px 0px #999992" } }, "up-keyboard__button__inner-wrapper__right": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4, "width": "134rpx", "height": "80rpx", "backgroundColor": "#BBBCC6", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "boxShadow": "0 1px 0px #999992" } }, "up-keyboard__button__inner-wrapper__left__line": { "": { "fontSize": 15, "color": "#303133", "marginTop": 0, "marginRight": 1, "marginBottom": 0, "marginLeft": 1 } }, "up-keyboard__button__inner-wrapper__left__lang": { "": { "fontSize": 16, "color": "#303133" } }, "up-keyboard__button__inner-wrapper__left__lang--active": { "": { "color": "var(--theme-color, #0957de)" } }, "up-hover-class": { "": { "backgroundColor": "#BBBCC6" } } };
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, normalizeClass: _normalizeClass, createElementVNode: _createElementVNode, createCommentVNode: _createCommentVNode, toDisplayString: _toDisplayString, resolveComponent: _resolveComponent, createVNode: _createVNode, withModifiers: _withModifiers } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      class: "up-keyboard",
+      onTouchmove: _withModifiers($setup.noop, ["stop", "prevent"])
+    },
+    [
+      (_openBlock(true), _createElementBlock(
+        _Fragment,
+        null,
+        _renderList($setup.abc ? $setup.engKeyBoardList : $setup.areaList, (group, i) => {
+          return _openBlock(), _createElementBlock(
+            "view",
+            {
+              key: i,
+              class: _normalizeClass(["up-keyboard__button", [i + 1 == 4 ? "up-keyboard__button--center" : ""]])
+            },
+            [
+              i == 3 ? (_openBlock(), _createElementBlock("view", {
+                key: 0,
+                class: "up-keyboard__button__inner-wrapper"
+              }, [
+                _createElementVNode("view", {
+                  class: "up-keyboard__button__inner-wrapper__left",
+                  "hover-class": "up-hover-class",
+                  "hover-stay-time": 200,
+                  onClick: $setup.changeCarInputMode
+                }, [
+                  _createElementVNode(
+                    "text",
+                    {
+                      class: _normalizeClass(["up-keyboard__button__inner-wrapper__left__lang", [!$setup.abc ? "up-keyboard__button__inner-wrapper__left__lang--active" : ""]])
+                    },
+                    "中",
+                    2
+                    /* CLASS */
+                  ),
+                  _createElementVNode("text", { class: "up-keyboard__button__inner-wrapper__left__line" }, "/"),
+                  _createElementVNode(
+                    "text",
+                    {
+                      class: _normalizeClass(["up-keyboard__button__inner-wrapper__left__lang", [$setup.abc ? "up-keyboard__button__inner-wrapper__left__lang--active" : ""]])
+                    },
+                    "英",
+                    2
+                    /* CLASS */
+                  )
+                ])
+              ])) : _createCommentVNode("v-if", true),
+              (_openBlock(true), _createElementBlock(
+                _Fragment,
+                null,
+                _renderList(group, (item, j) => {
+                  return _openBlock(), _createElementBlock("view", {
+                    class: "up-keyboard__button__inner-wrapper",
+                    key: j
+                  }, [
+                    _createElementVNode("view", {
+                      class: "up-keyboard__button__inner-wrapper__inner",
+                      "hover-stay-time": 200,
+                      onClick: ($event) => $setup.carInputClick(i, j),
+                      "hover-class": "up-hover-class"
+                    }, [
+                      _createElementVNode(
+                        "text",
+                        { class: "up-keyboard__button__inner-wrapper__inner__text" },
+                        _toDisplayString(item),
+                        1
+                        /* TEXT */
+                      )
+                    ], 8, ["onClick"])
+                  ]);
+                }),
+                128
+                /* KEYED_FRAGMENT */
+              )),
+              i == 3 ? (_openBlock(), _createElementBlock(
+                "view",
+                {
+                  key: 1,
+                  onTouchstart: $setup.backspaceClick,
+                  onTouchend: $setup.clearTimer,
+                  class: "up-keyboard__button__inner-wrapper"
+                },
+                [
+                  _createElementVNode("view", {
+                    class: "up-keyboard__button__inner-wrapper__right",
+                    "hover-class": "up-hover-class",
+                    "hover-stay-time": 200
+                  }, [
+                    _createVNode(_component_up_icon, {
+                      size: "28",
+                      name: "backspace",
+                      color: "#303133"
+                    })
+                  ])
+                ],
+                32
+                /* NEED_HYDRATION */
+              )) : _createCommentVNode("v-if", true)
+            ],
+            2
+            /* CLASS */
+          );
+        }),
+        128
+        /* KEYED_FRAGMENT */
+      ))
+    ],
+    32
+    /* NEED_HYDRATION */
+  );
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-car-keyboard/up-car-keyboard.uvue"]]);
 export {
   __easycom_1 as _
 };
