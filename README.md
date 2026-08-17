@@ -21,16 +21,16 @@
 
 > 💡 **HBuilderX 版本建议与下载**
 >
-> - **默认 VDOM 模式**：使用 **HBuilderX 5.15 及之后版本** 均可稳定运行；
-> - **若开启体验 Vapor 模式**：推荐使用 **HBuilderX 5.24 及以上版本**（可完整体验与使用无虚拟 DOM 高性能原生渲染）。
+> - **默认蒸汽模式（Vapor）**：推荐使用 **HBuilderX 5.24 及以上版本**（可完整体验与使用无虚拟 DOM 高性能原生渲染）；
+> - 如需使用传统 **VDOM 模式**：**HBuilderX 5.15 及之后版本** 均可稳定运行。
 >
 > 📥 **HBuilderX 5.15 下载地址**：[https://wwbsy.lanzoue.com/b01eupb32d](https://wwbsy.lanzoue.com/b01eupb32d) （密码：`4xdv`）
 
 > ⚡ **渲染模式与 UI 组件库重要说明**
 >
-> 1. 🚀 **main 分支全面兼容 VDOM 模式与 Vapor 模式（默认 VDOM 模式）**：
+> 1. 🚀 **main 分支全面兼容 VDOM 模式与 Vapor 模式（默认 Vapor 蒸汽模式）**：
 >    - `main` 分支现已全面兼通 Vue3 传统 **VDOM 模式** 与 **Vapor 模式**（蒸汽模式，无虚拟 DOM 高性能原生渲染）；
->    - 默认采用 **VDOM 模式**，开发者可在 `manifest.json` 中按需自由切换/开启 Vapor 模式。
+>    - **默认采用 Vapor 蒸汽模式**，开发者可在 `manifest.json` 中按需切换回 VDOM 模式。
 > 2. 📦 **关于 uview-ultra 组件库**：
 >    - `main` 分支内置了深度修复版的 `uview-ultra`，已全面适配多端与 VDOM/Vapor 模式，常用基础功能**基本够用**；
 >    - 因个人精力有限，作者后续将**不再对 uview-ultra 进行维护与定制更新**。
@@ -80,7 +80,7 @@
 * **方式一：通过 `degit` 快速创建（推荐，无历史提交记录）**：
 
   ```bash
-  # 主分支（main，默认 VDOM 模式，全面兼通 VDOM & Vapor）
+  # 主分支（main，默认 Vapor 蒸汽模式，全面兼通 VDOM & Vapor）
   npx degit cq112233/unibestX my-project
 
   # Rice UI 官方支持分支（强烈推荐，团队持续维护，支持 VDOM & Vapor 模式）
@@ -180,7 +180,7 @@ pnpm build:mp-weixin
 
 > 💡 **选型与分支建议**：
 >
-> 1. **主分支（`main`）**：全面兼容 **VDOM 模式** 与 **Vapor 模式**（**默认开启 VDOM 模式**）。内置了作者深度修复的 `uview-ultra` 组件库，常用基础组件功能完备、**基本够用**。但由于个人精力有限，作者后续将**不再对其进行维护与后续定制**。
+> 1. **主分支（`main`）**：全面兼容 **VDOM 模式** 与 **Vapor 模式**（**默认采用 Vapor 蒸汽模式**）。内置了作者深度修复的 `uview-ultra` 组件库，常用基础组件功能完备、**基本够用**。但由于个人精力有限，作者后续将**不再对其进行维护与后续定制**。
 > 2. **`uniX-rice-ui` 分支（强烈推荐）**：集成了由 **Rice UI 官方团队持续维护** 的组件库，同样完美支持 VDOM 和 Vapor 模式。若有新项目或需要长期维护支持，强烈建议选用 **`uniX-rice-ui`** 分支。
 
 ## ✨ 特性
@@ -224,7 +224,7 @@ pnpm build:mp-weixin
 
 * Node >= 22
 * pnpm >= 7.30
-* HBuilderX >= 5.15（默认 VDOM 模式下使用 5.15+ 即可；若需开启 Vapor 蒸汽模式推荐使用 **HBuilderX 5.24**）
+* HBuilderX >= 5.15（默认 Vapor 蒸汽模式推荐使用 **HBuilderX 5.24**；如使用传统 VDOM 模式 5.15+ 即可）
 * Vue Official >= 2.1.10
 * TypeScript >= 5.0
 * JDK >= 17（Android 平台）
@@ -312,7 +312,18 @@ unibestX/
 
 ### VDOM 模式与 Vapor 蒸汽模式切换
 
-本项目 `main` 分支全面兼通 **VDOM 模式** 与 **Vapor 模式**，**默认开启 VDOM 模式**。
+#### 什么是 Vapor 蒸汽模式？
+
+uni-app x 推出了新一代的 **蒸汽模式（Vapor）**。新版渲染引擎性能远超原生，考虑到 **AI 友好度、动态性** 以及老 uni-app 用户的升级，蒸汽模式下改用普通的 **TS / JS** 编写：
+
+- 蒸汽模式下**不再依赖 UTS 的原生编译能力**：拥有 JS 的动态性、非常强的 AI 友好度，渲染性能又超过原生；
+- 如果写成 **UTS**，Android 和 iOS 也会通过 **uts2js** 运行在 JS 引擎上；
+- **鸿蒙（HarmonyOS）**目前运行在 ArkTS 引擎上，未来为了热更新，也会提供运行在 JS 引擎上的选项；
+- 蒸汽模式之后，**UTS 语言的主要作用是开发 UTS 原生插件**：仅 UTS 插件（`utssdk` 目录）继续保留 UTS 向 Kotlin / Swift / ets 的编译能力。
+
+> 🚀 从 **2026 年起**，新的[**蒸汽模式**](https://doc.dcloud.net.cn/uni-app-x/app-vapor.html)将逐渐替代老的 VDOM 模式。
+
+本项目 `main` 分支全面兼通 **VDOM 模式** 与 **Vapor 模式**，**默认采用 Vapor 蒸汽模式**（可在下方 `manifest.json` 配置中随时切换回 VDOM）。
 
 若需开启 **Vapor 蒸汽模式**（无虚拟 DOM 高性能原生渲染），可通过修改根目录下的 `manifest.json` 进行开启与配置：
 
@@ -320,10 +331,16 @@ unibestX/
 {
   "uni-app-x": {
     "styleIsolationVersion": "2",
-    "vapor": true // false 为传统 VDOM 模式 (默认)；true 为 Vapor 蒸汽模式
+    "vapor": true // true 为 Vapor 蒸汽模式（本项目默认）；false 为传统 VDOM 模式
   }
 }
 ```
+
+> 💡 **本人建议使用 Vapor 模式**：
+>
+> - **推荐优先使用 Vapor 模式**：Android 端语法要求不会那么严格，许多 UTS 强类型检查会更宽松，开发调试更省心；
+> - **注意切换风险**：一旦在 Vapor 模式下开发过，之后若再切换回 **VDOM 模式**，之前可正常编译的代码可能会报类型或语法错误（VDOM 模式编译检查更严格）；
+> - 最终选用哪种模式**看个人选择**：追求开发体验、少踩编译报错建议选 Vapor；追求最大兼容性与传统写法生态可保持 VDOM。
 
 ### 自定义 TabBar
 
@@ -382,7 +399,7 @@ unibestX/
 
 | 类别      | 技术                    | 说明                                     |
 | ------- | --------------------- | -------------------------------------- |
-| 框架      | uni-app X (VDOM / Vapor) | 下一代 uni-app，默认 VDOM 模式原生渲染，全面兼容 Vapor 蒸汽模式 |
+| 框架      | uni-app X (VDOM / Vapor) | 下一代 uni-app，默认 Vapor 蒸汽模式渲染，全面兼容传统 VDOM 模式 |
 | 语言      | UTS                   | uni-app Type Script，编译为原生 Kotlin/Swift |
 | 前端框架    | Vue 3                 | Composition API                        |
 | 构建工具    | Vite 5                | 极速开发体验                                 |
