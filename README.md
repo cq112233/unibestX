@@ -155,14 +155,49 @@ pnpm dev:mp-weixin
 
 #### 🖥️ 命令行打包构建
 
-> ⚠️ **打包发布请使用 HBuilderX，命令行（CLI）不支持打包发布**：uni-app x 的打包（原生 App 云打包 / 小程序上传等）依赖 HBuilderX 发行能力，且 `uni build` 会在构建时改写 `pages.json`，因此本项目已移除 CLI 构建脚本。
+##### 🖥️ H5：在自己服务器 / CI 上打包（推荐）
+
+> H5 支持在**自己的服务器 / CI 上打包**，脚本调用 HBuilderX 官方 CLI（`cli publish`）完成构建，产物完整（包含 `src/sub` 分包页面）。⚠️ 纯 CLI 的 `uni build` 产物不完整（分包页面不会编译进去），请勿使用。
+
+```bash
+# 1. 切换打包环境（默认是生产环境，打测试包才需要切换）
+pnpm env:test    # 打测试包：生成 .env.production.local（不影响 git）
+pnpm env:prod    # 恢复生产环境：删除 .env.production.local
+
+# 2. 打包 H5，产物输出到 unpackage/dist/build/web
+pnpm build:h5
+```
+
+**环境文件（四件套）：**
+
+| 文件 | 用途 |
+| :--- | :--- |
+| `.env` | 公用变量，所有环境都会加载 |
+| `.env.development` | 开发环境，HBuilderX 运行 / `pnpm dev:*` 自动加载 |
+| `.env.test` | 测试环境，`pnpm env:test` 后打测试包 |
+| `.env.production` | 生产环境，默认即此环境，打正式包无需切换 |
+
+> 💡 `pnpm env:test` 会把「公用 + 测试」合并写入 `.env.production.local`（Vite 生产模式优先加载它），`pnpm env:prod` 删除它即恢复生产，四个 env 文件本身不会被动修改。
+
+**接口地址（`VITE_SERVER_BASEURL`）各端规则：**
+
+- **H5**：通过 `.env` 配置项 `VITE_H5_USE_PROXY` 切换——`true` 走反向代理（请求 `/api`，开发配 `vite.config.ts` 的 `server.proxy`，生产配 `deploy/nginx.conf`）；`false` 直连 `VITE_SERVER_BASEURL` 完整域名（默认）。切换只改配置，不用动代码。
+- **微信小程序 / App**（蒸汽与 vdom 模式）：统一读取 `VITE_SERVER_BASEURL`，固定直连完整域名；若误配 `/api` 相对路径会自动回退为默认完整域名。
+- **微信小程序**：需在微信公众平台后台配置 request 合法域名。
+
+**服务器要求：**
+- 安装 HBuilderX 官方 **Linux 版**（常见安装目录 `/opt/hbuilderx/HBuilderX`，命令行工具为 `cli`），或设置环境变量指定路径：`export HBUILDERX_CLI_PATH=/opt/hbuilderx/HBuilderX/cli`。
+- macOS / Windows 本机打包同样支持，脚本会自动查找常见安装路径（macOS 为 `/Applications/HBuilderX.app/Contents/MacOS/cli`）。
+- 脚本在构建前后会自动备份并还原 `pages.json`，不会污染工作区。
+
+> ⚠️ **App 端（Android / iOS / 鸿蒙）与小程序发布仍需使用 HBuilderX**：原生 App 云打包 / 小程序上传依赖 HBuilderX 发行能力，命令行仅支持 H5。
 
 #### 🛠️ HBuilderX 发行打包
 
 - **Android 平台**：在 HBuilderX 中选择 `发行 → 原生App-云打包` 或 `原生App-本地打包`。
 - **iOS 平台**：在 HBuilderX 中选择 `发行 → 原生App-云打包`（需 Apple 开发者证书）。
 - **鸿蒙平台**：在 HBuilderX 中选择 `发行 → 原生App-鸿蒙`。
-- **H5 平台**：在 HBuilderX 中选择 `发行 → 网站-H5手机版`，打包后的文件在 `dist/build/h5`。
+- **H5 平台**：在 HBuilderX 中选择 `发行 → 网站-H5手机版`，打包后的文件在 `unpackage/dist/build/web`。
 - **微信小程序**：在 HBuilderX 中选择 `发行 → 小程序-微信`，然后通过微信开发者工具上传。
 
 ## 📦 推荐的 UI 组件库

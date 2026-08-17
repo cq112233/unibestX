@@ -5,18 +5,25 @@ import { toLoginPage } from '../utils/toLoginPage'
 import { ContentTypeEnum, ResultEnum, ShowMessage } from './tools/enum'
 
 // ==========================================
-// 域名配置
+// 域名配置（所有端统一从 Vite 环境变量读取）
 // ==========================================
+// H5：VITE_H5_USE_PROXY=true 走 /api 反向代理，false 直连（默认）
+// 小程序 / App：固定直连，不支持 /api，误配时回退默认完整域名
+
+const DEFAULT_API_URL: string = 'https://ukw0y1.laf.run'
+const directBaseUrl: string = `${import.meta.env.VITE_SERVER_BASEURL ?? DEFAULT_API_URL}`
+const directSecondaryUrl: string = `${import.meta.env.VITE_SERVER_BASEURL_SECONDARY ?? DEFAULT_API_URL}`
 
 // #ifdef H5
-// H5 环境下从 Vite 环境变量读取，模板字符串确保为 string 类型
-const defaultUrl: string = `${import.meta.env.VITE_SERVER_BASEURL ?? 'https://ukw0y1.laf.run'}`
-const secondaryUrl: string = `${import.meta.env.VITE_SERVER_BASEURL_SECONDARY ?? 'https://ukw0y1.laf.run'}`
+// H5：VITE_H5_USE_PROXY=true 时走 /api 反向代理
+const useH5Proxy: boolean = `${import.meta.env.VITE_H5_USE_PROXY ?? 'false'}` == 'true'
+const defaultUrl: string = useH5Proxy ? '/api' : directBaseUrl
+const secondaryUrl: string = useH5Proxy ? '/api' : directSecondaryUrl
 // #endif
 // #ifndef H5
-// 非 H5 环境直接硬编码（编译期不存在 import.meta.env）
-const defaultUrl: string = 'https://ukw0y1.laf.run'
-const secondaryUrl: string = 'https://ukw0y1.laf.run'
+// 小程序 / App：固定直连，误配 /api 时回退默认完整域名
+const defaultUrl: string = directBaseUrl.startsWith('/') ? DEFAULT_API_URL : directBaseUrl
+const secondaryUrl: string = directSecondaryUrl.startsWith('/') ? DEFAULT_API_URL : directSecondaryUrl
 // #endif
 
 type ApiDomainConfig = {

@@ -26,6 +26,15 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 9001,
+    // H5 走代理模式时生效（.env 里 VITE_H5_USE_PROXY=true）；直连模式（false）请求不经过此代理
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000', // 改成你的后端地址
+        changeOrigin: true,
+        // 如果后端接口路径本身不带 /api 前缀，放开下面这行去掉前缀
+        // rewrite: (p) => p.replace(/^\/api/, ''),
+      },
+    },
   },
   build: {
     sourcemap: false, // 关闭 sourcemap，警告直接消失
