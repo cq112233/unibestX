@@ -1,0 +1,177 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ	Uimport { UTSObject, UniError, getUniProviders, defineAsyncApi, defineSyncApi } from "@dcloudio/uni-app-framework";
+const ProviderUniErrorSubject = 'uni-Provider';
+class GetProviderSuccess extends UTSObject {
+}
+class GetProviderSyncSuccess extends UTSObject {
+}
+class GetProviderSyncOptions extends UTSObject {
+}
+class GetProviderOptions extends UTSObject {
+    constructor() {
+        super(...arguments);
+        this.success = null;
+        this.fail = null;
+        this.complete = null;
+    }
+}
+const ProviderUniErrors = new Map([
+    [
+        110600,
+        'Parameter service invalid.'
+    ]
+]);
+class GetProviderFailImpl__1 extends UniError {
+    constructor(errCode) {
+        super();
+        this.errSubject = ProviderUniErrorSubject;
+        this.errCode = errCode;
+        this.errMsg = ProviderUniErrors[errCode] ?? "";
+    }
+}
+const API_GET_PROVIDER = 'getProvider';
+const API_GET_PROVIDER_SYNC = 'getProviderSync';
+const SupportedProviderServiceList = [
+    'oauth',
+    'share',
+    'payment',
+    'push',
+    'location'
+];
+function _getProviderSync(options) {
+    if (!SupportedProviderServiceList.includes(options.service)) {
+        return 'Parameter service invalid.';
+    }
+    const providers = getUniProviders(options.service);
+    const providerIds = providers.map((provider) => {
+        return provider.id;
+    });
+    const result = {
+        service: options.service,
+        provider: providerIds,
+        providers
+    };
+    return result;
+}
+const getProvider = defineAsyncApi(API_GET_PROVIDER, (options, exec) => {
+    const res = _getProviderSync(options);
+    if (typeof res === 'string')
+        exec.reject(res);
+    else
+        exec.resolve(res);
+});
+const getProviderSync = defineSyncApi(API_GET_PROVIDER_SYNC, (options) => {
+    const res = _getProviderSync(options);
+    if (typeof res === 'string')
+        throw new Error(res);
+    return {
+        service: res.service,
+        providerIds: res.provider,
+        providerObjects: res.providers
+    };
+});
+export { GetProviderOptions as GetProviderOptions, GetProviderSuccess as GetProviderSuccess, GetProviderSyncOptions as GetProviderSyncOptions, GetProviderSyncSuccess as GetProviderSyncSuccess };
+export { getProvider as getProvider };
+export { getProviderSync as getProviderSync };
+//# sourceMappingURL=index.js.mapÂ‘Ùî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework/index.etsÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-getProvider/utssdk/app-harmony/index.etsÔrB˜±isLocalDependency¯isNodeEntryFile§pkgPath§pkgNameªpkgVersion±belongProjectPath±dependencyPkgInfo¬shouldEmitJsÂÂÙâ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules¹@dcloudio/uni-app-modules¥1.0.0ÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmonyÔrC’§pkgNameªpkgVersion¹@dcloudio/uni-app-modules¥1.0.0ÃÃÚ]import { UniProvider, UTSObject, IUniError, UniError, getUniProviders, defineAsyncApi, ApiExecutor, defineSyncApi } from "@dcloudio/uni-app-framework";
+type GetProviderFailImpl = GetProviderFailImpl__1;
+const ProviderUniErrorSubject = 'uni-Provider';
+class GetProviderSuccess extends UTSObject {
+    service!: 'payment' | 'location' | 'oauth' | 'share';
+    provider!: string[];
+    providers!: UniProvider[];
+}
+class GetProviderSyncSuccess extends UTSObject {
+    service!: 'payment' | 'location' | 'oauth' | 'share';
+    providerIds!: string[];
+    providerObjects!: UniProvider[];
+}
+type GetProviderSync = (options: GetProviderSyncOptions) => GetProviderSyncSuccess;
+class GetProviderSyncOptions extends UTSObject {
+    service!: 'payment' | 'location' | 'oauth' | 'share';
+}
+type GetProviderSuccessCallback = (result: GetProviderSuccess) => void;
+type GetProviderFail = IGetProviderFail;
+type GetProviderFailCallback = (result: GetProviderFail) => void;
+type GetProviderComplete = Object;
+type GetProviderCompleteCallback = (result: GetProviderComplete) => void;
+class GetProviderOptions extends UTSObject {
+    service!: 'payment' | 'location' | 'oauth' | 'share';
+    success: GetProviderSuccessCallback | null = null;
+    fail: GetProviderFailCallback | null = null;
+    complete: GetProviderCompleteCallback | null = null;
+}
+type GetProvider = (options: GetProviderOptions) => void;
+type ProviderErrorCode = 110600;
+interface IGetProviderFail extends IUniError {
+    errCode: ProviderErrorCode;
+}
+const ProviderUniErrors: Map<ProviderErrorCode, string> = new Map([
+    [
+        110600,
+        'Parameter service invalid.'
+    ]
+]);
+class GetProviderFailImpl__1 extends UniError implements IGetProviderFail {
+    errCode: ProviderErrorCode;
+    constructor(errCode: ProviderErrorCode){
+        super();
+        this.errSubject = ProviderUniErrorSubject;
+        this.errCode = errCode;
+        this.errMsg = ProviderUniErrors[errCode] ?? "";
+    }
+}
+const API_GET_PROVIDER = 'getProvider';
+const API_GET_PROVIDER_SYNC = 'getProviderSync';
+const SupportedProviderServiceList = [
+    'oauth',
+    'share',
+    'payment',
+    'push',
+    'location'
+];
+function _getProviderSync(options: GetProviderOptions): "Parameter service invalid." | GetProviderSuccess {
+    if (!SupportedProviderServiceList.includes(options.service)) {
+        return 'Parameter service invalid.';
+    }
+    const providers = getUniProviders(options.service);
+    const providerIds = providers.map((provider): string =>{
+        return provider.id;
+    });
+    const result: GetProviderSuccess = {
+        service: options.service,
+        provider: providerIds,
+        providers
+    };
+    return result;
+}
+const getProvider: GetProvider = defineAsyncApi<GetProviderOptions, GetProviderSuccess>(API_GET_PROVIDER, (options: GetProviderOptions, exec: ApiExecutor<GetProviderSuccess>): void =>{
+    const res = _getProviderSync(options);
+    if (typeof res === 'string') exec.reject(res);
+    else exec.resolve(res);
+}) as GetProvider;
+const getProviderSync: GetProviderSync = defineSyncApi<GetProviderSyncSuccess>(API_GET_PROVIDER_SYNC, (options: GetProviderSyncOptions): GetProviderSyncSuccess =>{
+    const res = _getProviderSync(options as GetProviderOptions);
+    if (typeof res === 'string') throw new Error(res);
+    return {
+        service: res.service,
+        providerIds: res.provider,
+        providerObjects: res.providers
+    } as GetProviderSyncSuccess;
+}) as GetProviderSync;
+export { GetProvider as GetProvider, GetProviderComplete as GetProviderComplete, GetProviderCompleteCallback as GetProviderCompleteCallback, GetProviderFail as GetProviderFail, GetProviderFailCallback as GetProviderFailCallback, GetProviderFailImpl as GetProviderFailImpl, GetProviderOptions as GetProviderOptions, GetProviderSuccess as GetProviderSuccess, GetProviderSuccessCallback as GetProviderSuccessCallback, GetProviderSync as GetProviderSync, GetProviderSyncOptions as GetProviderSyncOptions, GetProviderSyncSuccess as GetProviderSyncSuccess, IGetProviderFail as IGetProviderFail, ProviderErrorCode as ProviderErrorCode };
+export { getProvider as getProvider };
+export { getProviderSync as getProviderSync };
+ÀÔrD‘»@dcloudio/uni-app-frameworkÔrE—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework/index.etsAÃªoh-resolveÂ“ÔrF–§version¤fileªsourceRoot§sources¥names¨mappings¨index.js ‘©index.etsÜ JÜ ”    ”  ”	  ”  ”  ,”  4”  6”-  ÌE”/  ÌG”=  ÌU”?  Ìd”ÌL  Ìq”ÌN  Ìs”ÌT  Ìy”Ìq  Ì–”Ìr  Ì—–”   ” ” ”   ”. .”/ /•”   ” ” ”! !”* *‘” •”   ” ” ”% %”. .‘” •”   ” ” ”% %”. .‘” •”   ” ” ”! !”* *‘”  •” ” ” 1” 5” 6•” ” ” +” /” 0•” ” ” 3” 7” 8’”  ” ‘” —”  ! ” !” !” !:” !>”! !ÌA”" !ÌB‘” "’” #” #’” $”$ $$‘” %“” &” &” &•”  ' ” '” '”% '%”- '-“” )” )” )*”” *” *” *” *—” +” +” +” +” +”1 +1”2 +2—” ,” ,” ,” ,” ,” ,” ,œ” -” -” -” -” -”' -'”( -(”/ -/”0 -0”4 -4”6 -6”7 -7’” .” .‘” /–”  0 ” 0” 0” 0”& 0&”' 0'–”  1 ” 1” 1” 1”/ 1/”0 10””  2 ” 2”" 2"”% 2%’” 3” 3’” 4” 4’” 5” 5’” 6”
+ 6
+’” 7” 7’” 8” 8•”  9 ”	 9	” 9” 9”! 95œ” :” :”	 :	”% :%”& :&”. :.”/ :/”6 :6”7 :7”> :>”? :?”ÌA :ÌA”” ;” ;”+ ;+”, ;,‘” <›” =”
+ =
+” =” =”% =%”& =&”- =-”. =.”5 =5”6 =6”7 =7œ” >”
+ >
+” >” >”! >!”" >"”% >%”& >&”' >'”/ >/”1 >9”3 >;–” ?” ?” ?” ?” ?” ?”” Ì@” Ì@” Ì@” Ì@”” ÌA”
+ ÌA
+” ÌA” ÌA'–” ÌB” ÌB” ÌB” ÌB” ÌB”  ÌB ”” ÌC” ÌC” ÌC” ÌC’” ÌD” ÌD’” ÌE” ÌE”” ÌF” ÌF” ÌF” ÌF’”  ÌG ” ÌG”  ÌH ” ÌH” ÌH” ÌH!”" ÌH/”# ÌHÌX”3 ÌHÌh”5 ÌHÌj”6 ÌHÌk”= ÌHÌ†”? ÌHÌˆ”ÌC ÌHÌ­”ÌE ÌHÌµ”ÌG ÌHÌ·™” ÌI”
+ ÌI
+” ÌI” ÌI”  ÌI ”! ÌI!”( ÌI(”) ÌI)”* ÌI*–” ÌJ” ÌJ” ÌJ” ÌJ” ÌJ” ÌJ˜” ÌJ!” ÌJ%” ÌJ&” ÌJ,” ÌJ-” ÌJ0” ÌJ1” ÌJ2˜” ÌK	” ÌK” ÌK” ÌK” ÌK” ÌK” ÌK” ÌK””  ÌL ” ÌL” ÌL” ÌLœ”  ÌM ” ÌM” ÌM” ÌM)”% ÌM6”& ÌMÌO”; ÌMÌd”= ÌMÌf”> ÌMÌg”ÌE ÌMÌ†”ÌG ÌMÌ ”ÌI ÌMÌ¢™” ÌN”
+ ÌN
+” ÌN” ÌN”  ÌN ”! ÌN!”( ÌN>”) ÌN?”* ÌNÌ@–” ÌO” ÌO” ÌO” ÌO” ÌO” ÌO˜” ÌO!” ÌO'” ÌO+” ÌO0” ÌO1” ÌO4” ÌO5” ÌO6’” ÌP” ÌP–” ÌQ” ÌQ” ÌQ” ÌQ” ÌQ” ÌQ–” ÌR” ÌR” ÌR” ÌR” ÌR”! ÌR!–” ÌS” ÌS” ÌS” ÌS” ÌS”& ÌS&’” ÌT” ÌT ””  ÌU ” ÌU” ÌU” ÌUÜ ”  ÌV ” ÌV”	 ÌVÍ” ÌVÍ#” ÌVÍ'”1 ÌVÍ9”3 ÌVÍ;”ÌE ÌVÍM”ÌI ÌVÍQ”Ì[ ÌVÍc”Ì] ÌVÍÃ”Ìs ÌVÍÙ”Ìw ÌVÍİ”Ì ÌVÍó”Ì ÌVÍõ”Ì¥ ÌVÍ”Ì© ÌVÍ”Ì¿ ÌVÍ%”ÌÁ ÌVÍu”ÌÂ ÌVÍv˜”  ÌW ” ÌW”	 ÌW	” ÌW” ÌW”# ÌW#”% ÌW%”& ÌW&˜”  ÌX ” ÌX”	 ÌX	” ÌX” ÌX”+ ÌX+”- ÌX-”. ÌX.ÔrG–§version¤file§sources®sourcesContent¥names¨mappingsÀ‘À‘ÀÜ K‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache“ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍÍÚÀ”ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍ!ÍIÔrL”¤type¥start£end¤nameªIdentifierÍ!Í3²GetProviderOptionsLªIdentifierÍ7ÍI²GetProviderOptionsK¯ExportSpecifierÍKÍsLªIdentifierÍKÍ]²GetProviderSuccessLªIdentifierÍaÍs²GetProviderSuccessK¯ExportSpecifierÍuÍ¥LªIdentifierÍuÍ‹¶GetProviderSyncOptionsLªIdentifierÍÍ¥¶GetProviderSyncOptionsK¯ExportSpecifierÍ§Í×LªIdentifierÍ§Í½¶GetProviderSyncSuccessLªIdentifierÍÁÍ×¶GetProviderSyncSuccessÀJ¶ExportNamedDeclarationÍÜÍ	À‘K¯ExportSpecifierÍåÍÿLªIdentifierÍåÍğ«getProviderLªIdentifierÍôÍÿ«getProviderÀJ¶ExportNamedDeclarationÍ	Í	2À‘K¯ExportSpecifierÍ	Í	/LªIdentifierÍ	Í	¯getProviderSyncLªIdentifierÍ	 Í	/¯getProviderSyncÀ‘ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration Ìr•ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	©UTSObjectLªIdentifier	©UTSObjectN¯ImportSpecifierLªIdentifier¨UniErrorLªIdentifier¨UniErrorN¯ImportSpecifier-LªIdentifier-¯getUniProvidersLªIdentifier-¯getUniProvidersN¯ImportSpecifier/=LªIdentifier/=®defineAsyncApiLªIdentifier/=®defineAsyncApiN¯ImportSpecifier?ÌLLªIdentifier?ÌL­defineSyncApiLªIdentifier?ÌL­defineSyncApiÔrO•¤type¥start£end¥value£raw§LiteralÌTÌq»@dcloudio/uni-app-framework½"@dcloudio/uni-app-framework"

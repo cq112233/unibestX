@@ -1,0 +1,22 @@
+// 本文件为自动构建生成
+export {
+  PreviewImageErrorCode,
+  IPreviewImageError,
+  PreviewImageSuccess,
+  PreviewImageFail,
+  PreviewImageSuccessCallback,
+  PreviewImageFailCallback,
+  PreviewImageCompleteCallback,
+  LongPressActionsSuccessResult,
+  LongPressActionsFailResult,
+  LongPressActionsOptions,
+  PreviewImageOptions,
+  PreviewImage,
+  ClosePreviewImage,
+  ClosePreviewImageSuccess,
+  ClosePreviewImageFail,
+  ClosePreviewImageSuccessCallback,
+  ClosePreviewImageFailCallback,
+  ClosePreviewImageCompleteCallback,
+  ClosePreviewImageOptions,
+} from './interface'

@@ -1,0 +1,752 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ$_import "./loadingIcon.js";
+import { b as addStyle, a as addUnit, g as getPx } from "../../libs/function/index.js";
+import { c as colorGradient } from "../../libs/function/colorGradient.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, toDisplayString: _toDisplayString, createSharedDataFor: _createSharedDataFor, createSharedDataIf: _createSharedDataIf, setSharedDataTemplateRef: _setSharedDataTemplateRef } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpLoadingIconUpLoadingIcon";
+const { computed, ref, watch, onMounted, onBeforeUnmount } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  ...{
+    name: "up-loading-icon"
+  },
+  __dynamicSharedData: true,
+  __hash: "4d7d5706",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.uvue",
+  __name: "up-loading-icon",
+  props: {
+    show: {
+      type: Boolean,
+      default: true
+    },
+    color: {
+      type: String,
+      default: "#909193"
+    },
+    textColor: {
+      type: String,
+      default: "#909193"
+    },
+    vertical: {
+      type: Boolean,
+      default: false
+    },
+    mode: {
+      type: String,
+      default: "spinner"
+    },
+    size: {
+      type: [String, Number],
+      default: "24"
+    },
+    textSize: {
+      type: [String, Number],
+      default: "15"
+    },
+    text: {
+      type: [String, Number],
+      default: ""
+    },
+    timingFunction: {
+      type: String,
+      default: "ease-in-out"
+    },
+    duration: {
+      type: [String, Number],
+      default: 1200
+    },
+    inactiveColor: {
+      type: String,
+      default: ""
+    },
+    customStyle: {
+      type: Object,
+      default: () => {
+        return new UTSJSONObject({});
+      }
+    }
+  },
+  setup(__props) {
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpLoadingIconUpLoadingIconSharedData", sharedDataClassId: 0 })));
+    const props = __props;
+    const array12 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    const webviewHide = ref(false);
+    const degree = ref(0);
+    const transform = ref("");
+    const spinnerItemsStyle = ref([
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" })
+    ]);
+    let animationFrame = 0;
+    const otherBorderColor = computed(() => {
+      if (props.inactiveColor != "") {
+        return props.inactiveColor;
+      }
+      if (props.mode == "circle") {
+        if (props.color.startsWith("#")) {
+          const gradient = colorGradient(props.color, "#ffffff", 100);
+          if (gradient.length > 80) {
+            return gradient[80];
+          }
+        }
+        return "#e5e5e5";
+      } else {
+        return "transparent";
+      }
+    });
+    const customLoadingIconStyle = computed(() => {
+      return addStyle(props.customStyle);
+    });
+    const spinnerStyle = computed(() => {
+      return new UTSJSONObject({
+        transform: transform.value,
+        width: addUnit(props.size),
+        height: addUnit(props.size),
+        borderTopColor: props.color,
+        borderBottomColor: otherBorderColor.value,
+        borderLeftColor: otherBorderColor.value,
+        borderRightColor: otherBorderColor.value
+      });
+    });
+    const textStyle = computed(() => {
+      return new UTSJSONObject({
+        fontSize: addUnit(props.textSize),
+        color: props.textColor
+      });
+    });
+    function getSpinnerDotStyle(index) {
+      const style = new UTSJSONObject({});
+      style["backgroundColor"] = props.color;
+      style["transform"] = `rotate(${((index + 1) * 30).toString()}deg)`;
+      style["opacity"] = 1 - 0.0625 * index;
+      return style;
+    }
+    function getRotateDuration() {
+      const durationNumber = parseInt(props.duration.toString());
+      return durationNumber > 0 ? durationNumber : 1200;
+    }
+    function getRotateStep() {
+      return 360 * 16 / getRotateDuration();
+    }
+    function rotateLoader() {
+      degree.value = (degree.value + getRotateStep()) % 360;
+      transform.value = `rotate(${degree.value.toString()}deg)`;
+    }
+    function startRotate() {
+      if (!props.show || animationFrame > 0) {
+        return null;
+      }
+      animationFrame = setInterval(() => {
+        rotateLoader();
+      }, 16);
+    }
+    function stopRotate() {
+      if (animationFrame > 0) {
+        clearInterval(animationFrame);
+        animationFrame = 0;
+      }
+    }
+    function calculateSquareRadius(sideLength) {
+      const diagonalLength = Math.sqrt(sideLength * sideLength + sideLength * sideLength);
+      return diagonalLength / 2;
+    }
+    function calcSpinnerTopAndLeft() {
+      array12.forEach((_ele, index) => {
+        const angle = index * (360 / 12);
+        const angleRad = angle * (Math.PI / 180);
+        const banjing = calculateSquareRadius(parseInt(getPx(parseInt(props.size.toString()) * 2)));
+        const xOffset = banjing * Math.cos(angleRad);
+        const yOffset = banjing * Math.sin(angleRad);
+        spinnerItemsStyle.value[index]["left"] = `${Math.round(45 + xOffset).toString()}%`;
+        spinnerItemsStyle.value[index]["top"] = `${Math.round(34 + yOffset).toString()}%`;
+      });
+    }
+    function init() {
+      calcSpinnerTopAndLeft();
+      startRotate();
+    }
+    watch(() => {
+      return props.show;
+    }, (nVal) => {
+      if (nVal) {
+        startRotate();
+      } else {
+        stopRotate();
+      }
+    });
+    onMounted(() => {
+      init();
+    });
+    onBeforeUnmount(() => {
+      stopRotate();
+    });
+    return () => {
+      "raw js";
+      const _setTemplateRef = _createSharedDataTemplateRefSetter();
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.show));
+      }, () => {
+        _renderSharedDataEffect(() => {
+          _setSharedDataClass(__sharedData, 10, ["up-loading-icon", [__props.vertical ? "up-loading-icon--vertical" : ""]]);
+          _setSharedDataStyle(__sharedData, 11, customLoadingIconStyle.value);
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 1, _toSharedDataBoolean(!webviewHide.value));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            _setSharedDataClass(__sharedData, 5, ["up-loading-icon__spinner", [`up-loading-icon__spinner--${__props.mode}`]]);
+            _setSharedDataStyle(__sharedData, 6, spinnerStyle.value);
+          });
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData, 2, _toSharedDataBoolean(__props.mode === "spinner"));
+          }, () => {
+            _createSharedDataFor(_setSharedDataScoped(__sharedData, 3, _createSharedDataVFor(__sharedDataScope, () => {
+              return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
+            })), () => {
+              return array12;
+            }, (__sharedData_VFor0, _for_item0, _for_key0) => {
+              _renderSharedDataEffect(() => {
+                return _setSharedDataStyle(__sharedData_VFor0, 1, getSpinnerDotStyle(_for_key0.value));
+              });
+              return null;
+            }, (__sharedData_VFor0, item, index) => {
+              return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
+            });
+          });
+          _setSharedDataTemplateRef(__sharedData, 4, (n9) => {
+            _setTemplateRef(n9, "ani");
+          });
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 7, _toSharedDataBoolean(__props.text != ""));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            _setSharedDataStyle(__sharedData, 8, textStyle.value);
+            _setSharedData(__sharedData, 9, _toDisplayString(__props.text));
+          });
+        });
+      });
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-loading-icon.js.map
+Â”ÙØ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/loadingIcon.jsÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsÙÍ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/colorGradient.jsÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙÜ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ“ÔrD’²hostDependencyName®hostModuleNameÙN../../../uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.js¥entryDÙT../../../../../uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.js¥entryDÙ%../up-loading-icon/up-loading-icon.js¥entryÃÚ$_import "./loadingIcon.js";
+import { b as addStyle, a as addUnit, g as getPx } from "../../libs/function/index.js";
+import { c as colorGradient } from "../../libs/function/colorGradient.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, toDisplayString: _toDisplayString, createSharedDataFor: _createSharedDataFor, createSharedDataIf: _createSharedDataIf, setSharedDataTemplateRef: _setSharedDataTemplateRef } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpLoadingIconUpLoadingIcon";
+const { computed, ref, watch, onMounted, onBeforeUnmount } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  ...{
+    name: "up-loading-icon"
+  },
+  __dynamicSharedData: true,
+  __hash: "4d7d5706",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.uvue",
+  __name: "up-loading-icon",
+  props: {
+    show: {
+      type: Boolean,
+      default: true
+    },
+    color: {
+      type: String,
+      default: "#909193"
+    },
+    textColor: {
+      type: String,
+      default: "#909193"
+    },
+    vertical: {
+      type: Boolean,
+      default: false
+    },
+    mode: {
+      type: String,
+      default: "spinner"
+    },
+    size: {
+      type: [String, Number],
+      default: "24"
+    },
+    textSize: {
+      type: [String, Number],
+      default: "15"
+    },
+    text: {
+      type: [String, Number],
+      default: ""
+    },
+    timingFunction: {
+      type: String,
+      default: "ease-in-out"
+    },
+    duration: {
+      type: [String, Number],
+      default: 1200
+    },
+    inactiveColor: {
+      type: String,
+      default: ""
+    },
+    customStyle: {
+      type: Object,
+      default: () => {
+        return new UTSJSONObject({});
+      }
+    }
+  },
+  setup(__props) {
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpLoadingIconUpLoadingIconSharedData", sharedDataClassId: 0 })));
+    const props = __props;
+    const array12 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    const webviewHide = ref(false);
+    const degree = ref(0);
+    const transform = ref("");
+    const spinnerItemsStyle = ref([
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" })
+    ]);
+    let animationFrame = 0;
+    const otherBorderColor = computed(() => {
+      if (props.inactiveColor != "") {
+        return props.inactiveColor;
+      }
+      if (props.mode == "circle") {
+        if (props.color.startsWith("#")) {
+          const gradient = colorGradient(props.color, "#ffffff", 100);
+          if (gradient.length > 80) {
+            return gradient[80];
+          }
+        }
+        return "#e5e5e5";
+      } else {
+        return "transparent";
+      }
+    });
+    const customLoadingIconStyle = computed(() => {
+      return addStyle(props.customStyle);
+    });
+    const spinnerStyle = computed(() => {
+      return new UTSJSONObject({
+        transform: transform.value,
+        width: addUnit(props.size),
+        height: addUnit(props.size),
+        borderTopColor: props.color,
+        borderBottomColor: otherBorderColor.value,
+        borderLeftColor: otherBorderColor.value,
+        borderRightColor: otherBorderColor.value
+      });
+    });
+    const textStyle = computed(() => {
+      return new UTSJSONObject({
+        fontSize: addUnit(props.textSize),
+        color: props.textColor
+      });
+    });
+    function getSpinnerDotStyle(index) {
+      const style = new UTSJSONObject({});
+      style["backgroundColor"] = props.color;
+      style["transform"] = `rotate(${((index + 1) * 30).toString()}deg)`;
+      style["opacity"] = 1 - 0.0625 * index;
+      return style;
+    }
+    function getRotateDuration() {
+      const durationNumber = parseInt(props.duration.toString());
+      return durationNumber > 0 ? durationNumber : 1200;
+    }
+    function getRotateStep() {
+      return 360 * 16 / getRotateDuration();
+    }
+    function rotateLoader() {
+      degree.value = (degree.value + getRotateStep()) % 360;
+      transform.value = `rotate(${degree.value.toString()}deg)`;
+    }
+    function startRotate() {
+      if (!props.show || animationFrame > 0) {
+        return null;
+      }
+      animationFrame = setInterval(() => {
+        rotateLoader();
+      }, 16);
+    }
+    function stopRotate() {
+      if (animationFrame > 0) {
+        clearInterval(animationFrame);
+        animationFrame = 0;
+      }
+    }
+    function calculateSquareRadius(sideLength) {
+      const diagonalLength = Math.sqrt(sideLength * sideLength + sideLength * sideLength);
+      return diagonalLength / 2;
+    }
+    function calcSpinnerTopAndLeft() {
+      array12.forEach((_ele, index) => {
+        const angle = index * (360 / 12);
+        const angleRad = angle * (Math.PI / 180);
+        const banjing = calculateSquareRadius(parseInt(getPx(parseInt(props.size.toString()) * 2)));
+        const xOffset = banjing * Math.cos(angleRad);
+        const yOffset = banjing * Math.sin(angleRad);
+        spinnerItemsStyle.value[index]["left"] = `${Math.round(45 + xOffset).toString()}%`;
+        spinnerItemsStyle.value[index]["top"] = `${Math.round(34 + yOffset).toString()}%`;
+      });
+    }
+    function init() {
+      calcSpinnerTopAndLeft();
+      startRotate();
+    }
+    watch(() => {
+      return props.show;
+    }, (nVal) => {
+      if (nVal) {
+        startRotate();
+      } else {
+        stopRotate();
+      }
+    });
+    onMounted(() => {
+      init();
+    });
+    onBeforeUnmount(() => {
+      stopRotate();
+    });
+    return () => {
+      "raw js";
+      const _setTemplateRef = _createSharedDataTemplateRefSetter();
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.show));
+      }, () => {
+        _renderSharedDataEffect(() => {
+          _setSharedDataClass(__sharedData, 10, ["up-loading-icon", [__props.vertical ? "up-loading-icon--vertical" : ""]]);
+          _setSharedDataStyle(__sharedData, 11, customLoadingIconStyle.value);
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 1, _toSharedDataBoolean(!webviewHide.value));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            _setSharedDataClass(__sharedData, 5, ["up-loading-icon__spinner", [`up-loading-icon__spinner--${__props.mode}`]]);
+            _setSharedDataStyle(__sharedData, 6, spinnerStyle.value);
+          });
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData, 2, _toSharedDataBoolean(__props.mode === "spinner"));
+          }, () => {
+            _createSharedDataFor(_setSharedDataScoped(__sharedData, 3, _createSharedDataVFor(__sharedDataScope, () => {
+              return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
+            })), () => {
+              return array12;
+            }, (__sharedData_VFor0, _for_item0, _for_key0) => {
+              _renderSharedDataEffect(() => {
+                return _setSharedDataStyle(__sharedData_VFor0, 1, getSpinnerDotStyle(_for_key0.value));
+              });
+              return null;
+            }, (__sharedData_VFor0, item, index) => {
+              return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
+            });
+          });
+          _setSharedDataTemplateRef(__sharedData, 4, (n9) => {
+            _setTemplateRef(n9, "ani");
+          });
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 7, _toSharedDataBoolean(__props.text != ""));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            _setSharedDataStyle(__sharedData, 8, textStyle.value);
+            _setSharedData(__sharedData, 9, _toDisplayString(__props.text));
+          });
+        });
+      });
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-loading-icon.js.map
+ÔrE•§version¨mappings¥names§sources®sourcesContentÜ û‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘”  ÌÙ ‘”  ÌÚ ‘”  ÌÛ ‘”  ÌÜ ‘”  Ìİ ‘”  ÌŞ ‘”  Ìß ‘”  Ìà ‘”  Ìá ‘”  Ìâ ‘”  Ìã ‘”  Ìä ‘”  Ìå ‘”  Ìæ ‘”  Ìç ‘”  Ìè ‘”  Ìé ‘”  Ìê ‘”  Ìë ‘”  Ìì ‘”  Ìí ‘”  Ìî ‘”  Ìï ‘”  Ìğ ‘”  Ìñ ‘”  Ìò ‘”  Ìó ‘”  Ìô ‘”  Ìõ ‘”  Ìö ‘”  Ì÷ ‘”  Ìø ‘”  Ìù ‘ÙÜ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.js‘Ú$_import "./loadingIcon.js";
+import { b as addStyle, a as addUnit, g as getPx } from "../../libs/function/index.js";
+import { c as colorGradient } from "../../libs/function/colorGradient.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, toDisplayString: _toDisplayString, createSharedDataFor: _createSharedDataFor, createSharedDataIf: _createSharedDataIf, setSharedDataTemplateRef: _setSharedDataTemplateRef } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpLoadingIconUpLoadingIcon";
+const { computed, ref, watch, onMounted, onBeforeUnmount } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  ...{
+    name: "up-loading-icon"
+  },
+  __dynamicSharedData: true,
+  __hash: "4d7d5706",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.uvue",
+  __name: "up-loading-icon",
+  props: {
+    show: {
+      type: Boolean,
+      default: true
+    },
+    color: {
+      type: String,
+      default: "#909193"
+    },
+    textColor: {
+      type: String,
+      default: "#909193"
+    },
+    vertical: {
+      type: Boolean,
+      default: false
+    },
+    mode: {
+      type: String,
+      default: "spinner"
+    },
+    size: {
+      type: [String, Number],
+      default: "24"
+    },
+    textSize: {
+      type: [String, Number],
+      default: "15"
+    },
+    text: {
+      type: [String, Number],
+      default: ""
+    },
+    timingFunction: {
+      type: String,
+      default: "ease-in-out"
+    },
+    duration: {
+      type: [String, Number],
+      default: 1200
+    },
+    inactiveColor: {
+      type: String,
+      default: ""
+    },
+    customStyle: {
+      type: Object,
+      default: () => {
+        return new UTSJSONObject({});
+      }
+    }
+  },
+  setup(__props) {
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpLoadingIconUpLoadingIconSharedData", sharedDataClassId: 0 })));
+    const props = __props;
+    const array12 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    const webviewHide = ref(false);
+    const degree = ref(0);
+    const transform = ref("");
+    const spinnerItemsStyle = ref([
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" }),
+      new UTSJSONObject({ left: "0", top: "0" })
+    ]);
+    let animationFrame = 0;
+    const otherBorderColor = computed(() => {
+      if (props.inactiveColor != "") {
+        return props.inactiveColor;
+      }
+      if (props.mode == "circle") {
+        if (props.color.startsWith("#")) {
+          const gradient = colorGradient(props.color, "#ffffff", 100);
+          if (gradient.length > 80) {
+            return gradient[80];
+          }
+        }
+        return "#e5e5e5";
+      } else {
+        return "transparent";
+      }
+    });
+    const customLoadingIconStyle = computed(() => {
+      return addStyle(props.customStyle);
+    });
+    const spinnerStyle = computed(() => {
+      return new UTSJSONObject({
+        transform: transform.value,
+        width: addUnit(props.size),
+        height: addUnit(props.size),
+        borderTopColor: props.color,
+        borderBottomColor: otherBorderColor.value,
+        borderLeftColor: otherBorderColor.value,
+        borderRightColor: otherBorderColor.value
+      });
+    });
+    const textStyle = computed(() => {
+      return new UTSJSONObject({
+        fontSize: addUnit(props.textSize),
+        color: props.textColor
+      });
+    });
+    function getSpinnerDotStyle(index) {
+      const style = new UTSJSONObject({});
+      style["backgroundColor"] = props.color;
+      style["transform"] = `rotate(${((index + 1) * 30).toString()}deg)`;
+      style["opacity"] = 1 - 0.0625 * index;
+      return style;
+    }
+    function getRotateDuration() {
+      const durationNumber = parseInt(props.duration.toString());
+      return durationNumber > 0 ? durationNumber : 1200;
+    }
+    function getRotateStep() {
+      return 360 * 16 / getRotateDuration();
+    }
+    function rotateLoader() {
+      degree.value = (degree.value + getRotateStep()) % 360;
+      transform.value = `rotate(${degree.value.toString()}deg)`;
+    }
+    function startRotate() {
+      if (!props.show || animationFrame > 0) {
+        return null;
+      }
+      animationFrame = setInterval(() => {
+        rotateLoader();
+      }, 16);
+    }
+    function stopRotate() {
+      if (animationFrame > 0) {
+        clearInterval(animationFrame);
+        animationFrame = 0;
+      }
+    }
+    function calculateSquareRadius(sideLength) {
+      const diagonalLength = Math.sqrt(sideLength * sideLength + sideLength * sideLength);
+      return diagonalLength / 2;
+    }
+    function calcSpinnerTopAndLeft() {
+      array12.forEach((_ele, index) => {
+        const angle = index * (360 / 12);
+        const angleRad = angle * (Math.PI / 180);
+        const banjing = calculateSquareRadius(parseInt(getPx(parseInt(props.size.toString()) * 2)));
+        const xOffset = banjing * Math.cos(angleRad);
+        const yOffset = banjing * Math.sin(angleRad);
+        spinnerItemsStyle.value[index]["left"] = `${Math.round(45 + xOffset).toString()}%`;
+        spinnerItemsStyle.value[index]["top"] = `${Math.round(34 + yOffset).toString()}%`;
+      });
+    }
+    function init() {
+      calcSpinnerTopAndLeft();
+      startRotate();
+    }
+    watch(() => {
+      return props.show;
+    }, (nVal) => {
+      if (nVal) {
+        startRotate();
+      } else {
+        stopRotate();
+      }
+    });
+    onMounted(() => {
+      init();
+    });
+    onBeforeUnmount(() => {
+      stopRotate();
+    });
+    return () => {
+      "raw js";
+      const _setTemplateRef = _createSharedDataTemplateRefSetter();
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.show));
+      }, () => {
+        _renderSharedDataEffect(() => {
+          _setSharedDataClass(__sharedData, 10, ["up-loading-icon", [__props.vertical ? "up-loading-icon--vertical" : ""]]);
+          _setSharedDataStyle(__sharedData, 11, customLoadingIconStyle.value);
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 1, _toSharedDataBoolean(!webviewHide.value));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            _setSharedDataClass(__sharedData, 5, ["up-loading-icon__spinner", [`up-loading-icon__spinner--${__props.mode}`]]);
+            _setSharedDataStyle(__sharedData, 6, spinnerStyle.value);
+          });
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData, 2, _toSharedDataBoolean(__props.mode === "spinner"));
+          }, () => {
+            _createSharedDataFor(_setSharedDataScoped(__sharedData, 3, _createSharedDataVFor(__sharedDataScope, () => {
+              return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
+            })), () => {
+              return array12;
+            }, (__sharedData_VFor0, _for_item0, _for_key0) => {
+              _renderSharedDataEffect(() => {
+                return _setSharedDataStyle(__sharedData_VFor0, 1, getSpinnerDotStyle(_for_key0.value));
+              });
+              return null;
+            }, (__sharedData_VFor0, item, index) => {
+              return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
+            });
+          });
+          _setSharedDataTemplateRef(__sharedData, 4, (n9) => {
+            _setTemplateRef(n9, "ani");
+          });
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 7, _toSharedDataBoolean(__props.text != ""));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            _setSharedDataStyle(__sharedData, 8, textStyle.value);
+            _setSharedData(__sharedData, 9, _toDisplayString(__props.text));
+          });
+        });
+      });
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-loading-icon.js.map
+ÔrF”Ù$../../libs/function/colorGradient.js¼../../libs/function/index.jsÙ'../../../../plugin-vue-export-helper.js°./loadingIcon.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙÍ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/colorGradient.jsAÃªoh-resolveÂGAÂÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsAÃªoh-resolveÂGAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂGAÂÙØ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/loadingIcon.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ$Í$2À‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍ$Í$/ÔrL”¤type¥start£end¤nameªIdentifierÍ$Í$*«__easycom_1LªIdentifierÍ$.Í$/¡_À”ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration ÔrN•¤type¥start£end¥value£raw§Literal°./loadingIcon.js²"./loadingIcon.js"M±ImportDeclarationÌr“ÔrO•¤type¥start£end¨imported¥local¯ImportSpecifier$1LªIdentifier$%¡bLªIdentifier)1¨addStyleO¯ImportSpecifier3?LªIdentifier34¡aLªIdentifier8?§addUnitO¯ImportSpecifierÌAÌKLªIdentifierÌAÌB¡gLªIdentifierÌFÌK¥getPxN§LiteralÌSÌq¼../../libs/function/index.js¾"../../libs/function/index.js"M±ImportDeclarationÌsÌ½‘O¯ImportSpecifierÌ|ÌLªIdentifierÌ|Ì}¡cLªIdentifierÌÌ­colorGradientN§LiteralÌ–Ì¼Ù$../../libs/function/colorGradient.jsÙ&"../../libs/function/colorGradient.js"M±ImportDeclarationÌ¾Í	‘O¯ImportSpecifierÌÇÌ×LªIdentifierÌÇÌÈ¡_LªIdentifierÌÌÌ×«_export_sfcN§LiteralÌßÍÙ'../../../../plugin-vue-export-helper.jsÙ)"../../../../plugin-vue-export-helper.js"
