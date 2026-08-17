@@ -6894,7 +6894,7 @@
   const __className$3c = "GenSrcPagesIndexIndex";
   const _sfc_main$3d = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
     __dynamicSharedData: true,
-    __hash: "3718b46a",
+    __hash: "60c757bb",
     __className: __className$3c,
     __filename: "src/pages/index/index.uvue",
     __name: "index",
@@ -6915,20 +6915,20 @@
       vue.ref(30);
       vue.ref(3);
       vue.ref(true);
-      const tx = vue.computed(() => {
+      vue.computed(() => {
         return "development";
       });
-      const title = vue.computed(() => {
+      vue.computed(() => {
         return "unibestX";
       });
       return () => {
         "raw js";
         const _component_NavBar = __easycom_0$a;
-        const n27 = vue.createSharedDataComponent(_sfc_main$3f, { __cid: () => {
+        const n25 = vue.createSharedDataComponent(_sfc_main$3f, { __cid: () => {
           return "05e1f953";
         } }, {
           "default": vue.withSharedDataVaporCtx(() => {
-            const n26 = vue.createSharedDataComponent(LayoutComponent, {
+            const n24 = vue.createSharedDataComponent(LayoutComponent, {
               "navigation-style": () => {
                 return "custom";
               },
@@ -6952,16 +6952,12 @@
                   }
                 });
                 vue.setSharedData(__sharedData, 2, n0 == null ? void 0 : n0.sharedData);
-                vue.renderSharedDataEffect(() => {
-                  vue.setSharedData(__sharedData, 3, vue.toDisplayString(vue.unref(tx)));
-                  vue.setSharedData(__sharedData, 4, vue.toDisplayString(vue.unref(title)));
-                });
               })
             });
-            vue.setSharedData(__sharedData, 1, n26.sharedData);
+            vue.setSharedData(__sharedData, 1, n24.sharedData);
           })
         });
-        vue.setSharedData(__sharedData, 0, n27.sharedData);
+        vue.setSharedData(__sharedData, 0, n25.sharedData);
         return __sharedData;
       };
     }

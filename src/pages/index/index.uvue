@@ -6,12 +6,6 @@
       <text class="text-32px text-bold mx-auto mt-10px text-[#d14328]">
         unibestX
       </text>
-      <text>
-        {{ tx }}
-      </text>
-      <text>
-        {{ title }}
-      </text>
       <!-- <view class="mx-30px mt-15px">
         <button type="primary" @click="goToUiTest">
           前往 uiTest 测试页
@@ -119,7 +113,7 @@ function goToUiTest() {
   })
 }
 
-const tx = computed(() => {
+const type = computed(() => {
   return import.meta.env.VITE_ENV_TYPE
 })
 const title = computed(() => {
