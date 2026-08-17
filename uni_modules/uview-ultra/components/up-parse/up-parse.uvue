@@ -472,7 +472,7 @@ function handleLinkTap(attrs: UTSJSONObject): void {
 }
 
 function onRichTextItemClick(event: UniRichTextItemClickEvent): void {
-	const detail = event.detail as UTSJSONObject
+	const detail = event.detail as any as UTSJSONObject
 	const src = textValue(detail['src'])
 	const href = textValue(detail['href'])
 	if (src.length > 0) {

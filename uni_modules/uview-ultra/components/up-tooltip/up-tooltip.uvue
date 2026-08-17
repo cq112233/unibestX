@@ -405,10 +405,10 @@ function queryRect(refName: string): Promise<NodeInfo> {
 
 function getElRect() {
 	queryRect(tooltipId.value).then((size: NodeInfo) => {
-		tooltipInfo.value = size as UTSJSONObject
+		tooltipInfo.value = size as any as UTSJSONObject
 	})
 	queryRect(textId.value).then((size: NodeInfo) => {
-		textInfo.value = size as UTSJSONObject
+		textInfo.value = size as any as UTSJSONObject
 	})
 }
 

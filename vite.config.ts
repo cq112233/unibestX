@@ -4,6 +4,7 @@ import uni from '@dcloudio/vite-plugin-uni'
 import { unovite } from './js_sdk/a-hua-unocss'
 import uniLayoutsPlugin from './plugins/uni-layouts-plugin'
 import autoRootPlugin from './plugins/root-plugin'
+import uniPagesPlugin from './plugins/vite-plugin-uni-pages'
 
 // 修复 uni-app x web端/h5端 丢掉 easycom 导入的官方 bug
 import { uniEasycomPlugin } from '@dcloudio/uni-cli-shared/dist/vite/plugins/easycom.js'
@@ -30,6 +31,11 @@ export default defineConfig({
     sourcemap: false, // 关闭 sourcemap，警告直接消失
   },
   plugins: [
+    // 自动生成 pages.json（基于 pages.config.json 手动配置 + 页面内 <route>/definePage 声明）
+    uniPagesPlugin({
+      dir: 'src/pages',
+      subPackages: ['src/sub'],
+    }),
     // 手动补充 easycom 插件（仅在 Web/H5 平台生效，避免影响 App 原生编译）
     (process.env.UNI_PLATFORM === 'web' || process.env.UNI_PLATFORM === 'h5' || !process.env.UNI_PLATFORM)
       ? uniEasycomPlugin({ exclude: UNI_EASYCOM_EXCLUDE })

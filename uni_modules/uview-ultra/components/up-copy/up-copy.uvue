@@ -5,27 +5,30 @@
 </template>
 
 <script setup lang="uts">
-interface Props {
-    content?: string | null
-    alertStyle?: string | null
-    notice?: string | null
-}
-
-interface Emits {
-    (e: 'success'): void
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    content: null,
-    alertStyle: null,
-    notice: null
+defineOptions({
+    name: 'up-copy'
 })
 
-const emit = defineEmits<Emits>()
+const props = defineProps({
+    content: {
+        type: String,
+        default: ''
+    },
+    alertStyle: {
+        type: String,
+        default: 'toast'
+    },
+    notice: {
+        type: String,
+        default: '复制成功'
+    }
+})
+
+const emit = defineEmits(['success'])
 
 const handleClick = (): void => {
-    let content = props.content
-    if (content == null || content.length == 0) {
+    const rawContent = props.content
+    if (rawContent == null || rawContent == '') {
         uni.showToast({
             title: '暂无',
             icon: 'none',
@@ -33,7 +36,7 @@ const handleClick = (): void => {
         })
         return
     }
-    content = typeof content === 'string' ? content : content.toString() // 复制内容，必须字符串，数字需要转换为字符串
+    const content = `${rawContent}`
     
     /**
     * 小程序端 和 app端的复制逻辑

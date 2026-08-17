@@ -284,13 +284,13 @@ const todayText = computed<string>(() => {
 })
 
 const todayDisabled = computed<boolean>(() => {
-	let today = dayuts(todayDate.value)
+	let today = dayuts(todayDate.value as any)
 	let minD = innerMinDate.value
 	let maxD = innerMaxDate.value
-	if (minD != '' && minD != '0' && today.isBefore(dayuts(minD), 'day')) {
+	if (minD != '' && minD != '0' && today.isBefore(dayuts(minD as any), 'day')) {
 		return true
 	}
-	if (maxD != '' && maxD != '0' && today.isAfter(dayuts(maxD), 'day')) {
+	if (maxD != '' && maxD != '0' && today.isAfter(dayuts(maxD as any), 'day')) {
 		return true
 	}
 	return false
@@ -394,10 +394,10 @@ function monthSelectedM(e: Array<string>, scene: string) {
 }
 
 function getMonths(minD: any, maxD: any): number {
-	const minYear = dayuts(minD).year()
-	const minMonth = dayuts(minD).month() + 1
-	const maxYear = dayuts(maxD).year()
-	const maxMonth = dayuts(maxD).month() + 1
+	const minYear = dayuts(minD as any).year()
+	const minMonth = dayuts(minD as any).month() + 1
+	const maxYear = dayuts(maxD as any).year()
+	const maxMonth = dayuts(maxD as any).month() + 1
 	return (maxYear - minYear) * 12 + (maxMonth - minMonth) + 1
 }
 
@@ -405,9 +405,9 @@ function getDefaultMonthIndex(): number {
 	let sel = dayuts().format('YYYY-MM')
 	if (props.defaultDate != null) {
 		if (!testArray(props.defaultDate)) {
-			sel = dayuts(props.defaultDate).format('YYYY-MM')
+			sel = dayuts(props.defaultDate as any).format('YYYY-MM')
 		} else if ((props.defaultDate as Array<any>).length > 0) {
-			sel = dayuts((props.defaultDate as Array<any>)[0]).format('YYYY-MM')
+			sel = dayuts((props.defaultDate as Array<any>)[0] as any).format('YYYY-MM')
 		}
 	}
 	const idx = months.value.findIndex(({ year, month }): boolean => {
@@ -421,13 +421,13 @@ function setMonth() {
 	const minD = (innerMinDate.value != '' && innerMinDate.value != '0') ? innerMinDate.value : dayuts().valueOf()
 	const maxD = (innerMaxDate.value != '' && innerMaxDate.value != '0')
 		? innerMaxDate.value
-		: dayuts(minD).add(parseInt(props.monthNum.toString()) - 1, 'month').valueOf()
+		: dayuts(minD as any).add(parseInt(props.monthNum.toString()) - 1, 'month').valueOf()
 	const monthCount = range(1, parseInt(props.monthNum.toString()), getMonths(minD, maxD))
 	let newMonths = [] as Array<CalendarMonthItem>
-	const minDateStr = dayuts(minD).format('YYYY-MM-DD')
-	const maxDateStr = dayuts(maxD).format('YYYY-MM-DD')
+	const minDateStr = dayuts(minD as any).format('YYYY-MM-DD')
+	const maxDateStr = dayuts(maxD as any).format('YYYY-MM-DD')
 	for (let i = 0; i < monthCount; i++) {
-		const monthBase = dayuts(minD).add(i, 'month')
+		const monthBase = dayuts(minD as any).add(i, 'month')
 		const daysInMonth = monthBase.daysInMonth()
 		const monthValue = monthBase.month() + 1
 		const yearValue = monthBase.year()
@@ -477,7 +477,7 @@ function scrollIntoDefaultMonth(selMonth: string) {
 
 function jumpToToday() {
 	if (todayDisabled.value) return
-	const targetMonth = dayuts(todayDate.value).format('YYYY-MM')
+	const targetMonth = dayuts(todayDate.value as any).format('YYYY-MM')
 	if (props.monthSwitch) {
 		const todayMonthIdx = months.value.findIndex(({ year, month }): boolean => {
 			month = padZero(month)
@@ -504,9 +504,9 @@ function updateMonthTopM(topArr: Array<number>) {
 	}
 	let sel = dayuts().format("YYYY-MM")
 	if (!testArray(props.defaultDate)) {
-		sel = dayuts(props.defaultDate).format("YYYY-MM")
+		sel = dayuts(props.defaultDate as any).format("YYYY-MM")
 	} else {
-		sel = dayuts((props.defaultDate as Array<any>)[0]).format("YYYY-MM")
+		sel = dayuts((props.defaultDate as Array<any>)[0] as any).format("YYYY-MM")
 	}
 	scrollIntoDefaultMonth(sel)
 }

@@ -9,10 +9,10 @@
 							v-for="(item, index) in props.options" :key="index">
 							<template #title>
 								<text class="up-dropdown-item__text" :class="{
-									'up-dropdown-item__text--active': (props.modelValue).toString() == item['value'].toString() && activeColor == '#2979ff'
-								}" :style="getItemTextStyle(item)">{{ item['label'].toString() }}</text>
+									'up-dropdown-item__text--active': isItemActive(item) && activeColor == '#2979ff'
+								}" :style="getItemTextStyle(item)">{{ item['label'] != null ? item['label']!.toString() : '' }}</text>
 							</template>
-							<up-icon v-if="(props.modelValue).toString() == item['value'].toString()"
+							<up-icon v-if="isItemActive(item)"
 								name="checkbox-mark" :color="activeColor == '#2979ff' ? 'primary' : activeColor" size="18"></up-icon>
 						</up-cell>
 					</up-cell-group>
@@ -126,9 +126,15 @@
 		}
 	}
 	
+	function isItemActive(item: UTSJSONObject): boolean {
+		const val = item['value']
+		if (props.modelValue == null || val == null) return false
+		return `${props.modelValue}` == `${val}`
+	}
+	
 	function getItemTextStyle(item: UTSJSONObject): UTSJSONObject {
 		const style = {} as UTSJSONObject
-		const isSelected = (props.modelValue).toString() == item['value'].toString()
+		const isSelected = isItemActive(item)
 		if (isSelected) {
 			style['color'] = activeColor.value
 		} else {

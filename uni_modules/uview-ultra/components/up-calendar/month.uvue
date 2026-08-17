@@ -145,7 +145,7 @@ function dateSame(date1: string, date2: string): boolean {
 
 function isRangeMiddle(item: UPCalendarMonthsItemDate): boolean {
 	if (props.mode != 'range' || selected.value.length < 2) return false
-	const date = (item['dateStr'] != null ? item['dateStr'] as string : dayuts(item['date']).format("YYYY-MM-DD"))
+	const date = (item['dateStr'] != null ? item['dateStr'] as string : dayuts(item['date'] as any).format("YYYY-MM-DD"))
 	const len = selected.value.length - 1
 	return dayuts(date).isAfter(dayuts(selected.value[0])) && dayuts(date).isBefore(dayuts(selected.value[len]))
 }
@@ -160,7 +160,7 @@ function rangeBgStyle(item: UPCalendarMonthsItemDate): UTSJSONObject {
 }
 
 function isSelected(item: UPCalendarMonthsItemDate): boolean {
-	const date = (item['dateStr'] != null ? item['dateStr'] as string : dayuts(item['date']).format("YYYY-MM-DD"))
+	const date = (item['dateStr'] != null ? item['dateStr'] as string : dayuts(item['date'] as any).format("YYYY-MM-DD"))
 	const sameDate = (element: string): boolean => dateSame(element, date)
 	if (!selected.value.some(sameDate)) return false
 	if (props.mode == 'range' && selected.value.length >= 2) {
@@ -171,7 +171,7 @@ function isSelected(item: UPCalendarMonthsItemDate): boolean {
 }
 
 function isToday(item: UPCalendarMonthsItemDate): boolean {
-	const date = (item['dateStr'] != null ? item['dateStr'] as string : dayuts(item['date']).format("YYYY-MM-DD"))
+	const date = (item['dateStr'] != null ? item['dateStr'] as string : dayuts(item['date'] as any).format("YYYY-MM-DD"))
 	const sameDate = (element: string): boolean => dateSame(element, date)
 	return props.todayDate != '' && dateSame(date, props.todayDate) && !selected.value.some(sameDate)
 }
@@ -193,7 +193,7 @@ function dayStyle(index1: number, index2: number, item: UPCalendarMonthsItemDate
 }
 
 function daySelectStyle(index1: number, index2: number, item: UPCalendarMonthsItemDate): UTSJSONObject {
-	let date = (item['dateStr'] != null ? item['dateStr'] as string : dayuts(item['date']).format("YYYY-MM-DD"))
+	let date = (item['dateStr'] != null ? item['dateStr'] as string : dayuts(item['date'] as any).format("YYYY-MM-DD"))
 	let style = {} as UTSJSONObject
 	const sameDate = (element: string): boolean => dateSame(element, date)
 	if (selected.value.some(sameDate)) {
@@ -244,7 +244,7 @@ function daySelectStyle(index1: number, index2: number, item: UPCalendarMonthsIt
 }
 
 function textStyle(item: UPCalendarMonthsItemDate): UTSJSONObject {
-	const date = (item['dateStr'] != null ? item['dateStr'] as string : dayuts(item['date']).format("YYYY-MM-DD"))
+	const date = (item['dateStr'] != null ? item['dateStr'] as string : dayuts(item['date'] as any).format("YYYY-MM-DD"))
 	let style = {} as UTSJSONObject
 	const sameDate = (element: string): boolean => dateSame(element, date)
 	if (selected.value.some(sameDate)) {
@@ -262,7 +262,7 @@ function textStyle(item: UPCalendarMonthsItemDate): UTSJSONObject {
 }
 
 function getBottomInfo(index1: number, index2: number, item: UPCalendarMonthsItemDate): string {
-	const date = (item['dateStr'] != null ? item['dateStr'] as string : dayuts(item['date']).format("YYYY-MM-DD"))
+	const date = (item['dateStr'] != null ? item['dateStr'] as string : dayuts(item['date'] as any).format("YYYY-MM-DD"))
 	let bottomInfo = ''
 	if (item['bottomInfo'] != null) {
 		bottomInfo = item['bottomInfo']!.toString()
@@ -296,7 +296,7 @@ function setSelected(sel: Array<string>, shouldEmit = true) {
 
 function clickHandler(index1: number, index21: number, item: UPCalendarMonthsItemDate) {
 	if (props.readonly) return
-	const date = (item['dateStr'] != null ? item['dateStr'] as string : dayuts(item['date']).format("YYYY-MM-DD"))
+	const date = (item['dateStr'] != null ? item['dateStr'] as string : dayuts(item['date'] as any).format("YYYY-MM-DD"))
 	let disabled = item.disabled ?? false
 	if (disabled) return
 	let curSelected = [...selected.value]
@@ -350,12 +350,12 @@ function setDefaultDate() {
 	let minDateData = props.minDate.toString()
 	let maxDateData = props.maxDate.toString()
 	const minDate = minDateData != '' ? minDateData : dayuts().format("YYYY-MM-DD")
-	const maxDate = maxDateData != '' ? maxDateData : dayuts(minDate).add(parseInt(props.maxMonth.toString()) - 1, 'month').format("YYYY-MM-DD")
+	const maxDate = maxDateData != '' ? maxDateData : dayuts(minDate as any).add(parseInt(props.maxMonth.toString()) - 1, 'month').format("YYYY-MM-DD")
 	if (props.mode === 'single') {
 		if (!testArray(props.defaultDate)) {
-			defDate = [dayuts(props.defaultDate).format("YYYY-MM-DD")]
+			defDate = [dayuts(props.defaultDate as any).format("YYYY-MM-DD")]
 		} else {
-			let tmp = dayuts((props.defaultDate as Array<any>)[0]).format("YYYY-MM-DD")
+			let tmp = dayuts((props.defaultDate as Array<any>)[0] as any).format("YYYY-MM-DD")
 			defDate = [tmp]
 		}
 	} else {
@@ -363,7 +363,7 @@ function setDefaultDate() {
 		defDate = props.defaultDate as Array<string>
 	}
 	defDate = defDate.filter(it => {
-		return dayuts(it).isAfter(dayuts(minDate).subtract(1, 'day')) && dayuts(it).isBefore(dayuts(maxDate).add(1, 'day'))
+		return dayuts(it as any).isAfter(dayuts(minDate as any).subtract(1, 'day')) && dayuts(it as any).isBefore(dayuts(maxDate as any).add(1, 'day'))
 	})
 	setSelected(defDate, false)
 }

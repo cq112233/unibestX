@@ -22,23 +22,25 @@
 
 ```text
 unibestX/
-├── plugins/                  # Vite 构建插件（自定义布局插件、根组件注入插件）
-│   ├── uni-layouts-plugin.ts #   自动布局插件（仿 vite-plugin-uni-layouts）
-│   └── root-plugin.ts        #   自动包裹 App.ku.uvue 根组件插件
+├── plugins/                  # Vite 构建插件
+│   ├── vite-plugin-uni-pages.ts #   自动文件路由插件（生成 pages.json / definePage 支持）
+│   ├── uni-layouts-plugin.ts #   跨端 Layout 布局插件（支持 default/empty 及自定义布局）
+│   └── root-plugin.ts        #   自动包裹 App.ku.uvue 全局根骨架组件
+├── pages.config.json         # pages.json 基础配置文件（全局 globalStyle、tabBar 等）
 ├── src/
 │   ├── api/                  # 业务模块 API 请求函数（foo.uts, user.uts, auth.uts 等）
 │   ├── assets/               # 静态资源（图标、图片）
 │   ├── components/           # 公共业务组件（NavBar 自定义通用导航栏）
 │   ├── http/                 # HTTP 客户端封装（基于 lime-request，拦截器与错误处理）
 │   ├── i18n/                 # 国际化多语言配置（zh-Hans / en 语言包）
-│   ├── layouts/              # 页面布局模板（如 default.uvue）
+│   ├── layouts/              # 页面布局模板（如 default.uvue / empty.uvue）
 │   ├── pages/                # 主应用页面（首页、基础组件展示、原生能力展示、AI助手、个人中心）
 │   ├── router/               # 全局路由拦截器与登录白名单策略
 │   ├── store/                # Pinia 状态管理与持久化（app, token, user）
 │   ├── style/                # 全局样式（UnoCSS / SCSS）
 │   ├── sub/                  # 应用分包页面（auth, paging, test, uiTest, uview-ultra 等）
 │   ├── tabbar/               # 自定义 TabBar 组件与状态配置
-│   ├── types/                # 全局类型定义
+│   ├── types/                # 全局类型定义（uni.d.ts 等）
 │   └── utils/                # 全局工具函数（toast, systemInfo, env, backPress 等）
 ├── uni_modules/              # uni-app 扩展插件模块
 │   ├── unix-crypto/          #   全端跨平台加密解密与安全工具库
@@ -51,10 +53,10 @@ unibestX/
 ├── js_sdk/                   # JS / UTS SDK 资源（UnoCSS 解析引擎等）
 ├── docs/                     # VitePress 文档源码
 ├── App.ku.uvue               # 全局根包裹组件（动态主题注入、全局 Toast 容器）
-├── main.uts                  # 应用的入口文件
-├── pages.json                # 页面路由表、分包与构建配置
-├── manifest.json             # 应用配置清单（多端 AppID、权限等）
-├── vite.config.ts            # Vite 构建配置（UnoCSS 规则、插件与别名）
+├── main.uts                  # 应用主入口文件
+├── pages.json                # 自动生成的页面路由表、分包与 easycom 配置
+├── manifest.json             # 应用配置清单（多端 AppID、权限、原生模块配置）
+├── vite.config.ts            # Vite 构建配置（UnoCSS 规则与自定义插件）
 ├── uni.scss                  # 全局 SCSS 变量与主题注入
-└── tsconfig.json             # TypeScript / UTS 编译配置
+└── tsconfig.json             # TypeScript / UTS 编译配置文件
 ```

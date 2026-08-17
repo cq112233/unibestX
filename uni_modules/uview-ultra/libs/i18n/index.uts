@@ -42,8 +42,8 @@ let settings = reactive({
         ru,
         'zh-Hant': zhHant,
         'zh-Hans': zhHans
-    } as UTSJSONObject
-}) as UTSJSONObject
+    } as any as UTSJSONObject
+} as any as UTSJSONObject)
 
 export function setLocale(locale: string) {
     settings['lang'] = normalizeLocale(locale)
@@ -68,9 +68,9 @@ export function t(value: string, params: UTSJSONObject = {} as UTSJSONObject): s
 
         let result = ''
         if (currentDict != null && currentDict[key] != null) {
-            result = currentDict[key].toString()
+            result = currentDict[key]?.toString() ?? ''
         } else if (currentDict != null && currentDict[value] != null) {
-            result = currentDict[value].toString()
+            result = currentDict[value]?.toString() ?? ''
         } else {
             result = value
         }

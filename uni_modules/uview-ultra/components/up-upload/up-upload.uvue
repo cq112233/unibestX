@@ -562,7 +562,7 @@ function onClickPreview(item: UPUploadListItem, index: number) {
 	}
 	emit(
 		'clickPreview',
-		UTSJSONObject.assign(UTSJSONObject.assign({}, item as UTSJSONObject), getDetail(index))
+		UTSJSONObject.assign(UTSJSONObject.assign({}, item as any as UTSJSONObject), getDetail(index))
 	)
 }
 </script>

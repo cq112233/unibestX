@@ -47,6 +47,13 @@ import { LOGIN_PAGE } from '../../router/config'
 import { handleBackPressExit } from '@/src/utils/backPress'
 import { setCurIdxByPath } from '@/src/tabbar/store'
 
+definePage({
+  layout: false,
+  style: {
+    navigationBarTitleText: '我的',
+  },
+})
+
 onBackPress((options: OnBackPressOptions): boolean => {
   // #ifdef APP
   if (options.from == 'backbutton') {

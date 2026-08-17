@@ -8,9 +8,16 @@ export default function autoRootPlugin() {
     name: 'auto-root',
     transform(code: string, id: string) {
       const normalizedId = id.replace(/\\/g, '/')
+      // 必须是顶级 SFC 文件，忽略所有带 ? 的子请求（如 ?vue&type=script 等）
+      if (normalizedId.includes('?')) {
+        return null
+      }
+      if (!normalizedId.endsWith('.uvue') && !normalizedId.endsWith('.vue')) {
+        return null
+      }
       // 只处理 src/pages 和 src/sub 下的非组件 uvue 页面，排除 App.uvue、App.ku.uvue 以及组件目录
       const isPage = normalizedId.includes('src/pages/') || normalizedId.includes('src/sub/')
-      if (!isPage || normalizedId.includes('/components/') || normalizedId.includes('App.ku.uvue')) {
+      if (!isPage || normalizedId.includes('/components/') || normalizedId.includes('App.ku.uvue') || normalizedId.includes('/src/layouts/')) {
         return null
       }
 
@@ -43,11 +50,21 @@ export default function autoRootPlugin() {
           newCode = `${before}<template${templateAttrs}>\n  <AppKu>\n${content}\n  </AppKu>\n</template>${after}`
         }
       }
+      else {
+        // 没有 template，不处理
+        return null
+      }
 
       // 2. 在 script setup 内引入 AppKu 组件
-      newCode = newCode.replace(/<script setup([\s\S]*?)>/, (match) => {
-        return `${match}\nimport AppKu from '@/App.ku.uvue'`
-      })
+      const scriptSetupRegex = /<script\s[^>]*\bsetup\b[^>]*>/
+      if (scriptSetupRegex.test(newCode)) {
+        newCode = newCode.replace(scriptSetupRegex, (match) => {
+          return `${match}\nimport AppKu from '@/App.ku.uvue'`
+        })
+      }
+      else {
+        newCode = `${newCode}\n<script setup lang="uts">\nimport AppKu from '@/App.ku.uvue'\n</script>\n`
+      }
 
       return {
         code: newCode,

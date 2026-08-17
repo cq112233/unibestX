@@ -1,14 +1,16 @@
 <template>
   <view>
     <NavBar title="首页" :show-back="false" />
-    <view class="content-container pb-100px">
-      <!-- <view class="mx-30px mt-15px">
-        <button type="primary" @click="goToUiTest">前往 uiTest 测试页</button>
-      </view> -->
+    <view class="content-container">
       <image class="w-100px h-100px mx-auto mt-20px rounded-20px" src="/static/logo.png" />
       <text class="text-32px text-bold mx-auto mt-10px text-[#d14328]">
         unibestX
       </text>
+      <!-- <view class="mx-30px mt-15px">
+        <button type="primary" @click="goToUiTest">
+          前往 uiTest 测试页
+        </button>
+      </view> -->
       <text class="text-center text-25px mt-10px">
         最好用的 uni-appX 开发模板
       </text>
@@ -57,6 +59,14 @@
 <script setup lang="uts">
 import { handleBackPressExit } from '../../utils/backPress.uts'
 
+definePage({
+  type: 'home',
+  layout: 'default',
+  style: {
+    navigationBarTitleText: '首页',
+  },
+})
+
 onBackPress((options: OnBackPressOptions): boolean => {
   // #ifdef APP
   if (options.from == 'backbutton') {
@@ -81,7 +91,7 @@ function switchBg() {
 
 function goToUiTest() {
   uni.navigateTo({
-    url: '/src/sub/uiTest/uiTest',
+    url: '/src/pages/haha/haha',
   })
 }
 </script>

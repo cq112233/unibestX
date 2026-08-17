@@ -263,11 +263,19 @@ function makeCode(): void {
             renderCanvas()
         })
         emit('result', result.value)
-    } catch (err) {
+    } catch (err: any) {
         loading.value = false
-        const errObj = err as UTSJSONObject
-        const message = errObj['message']
-        error.value = message == null ? err.toString() : message.toString()
+        let msg = ''
+        if (err != null && typeof err == 'object') {
+            const errObj = err as UTSJSONObject
+            if (errObj['message'] != null) {
+                msg = errObj['message']!.toString()
+            }
+        }
+        if (msg == '') {
+            msg = `${err}`
+        }
+        error.value = msg
         cells.value = [] as Array<UTSJSONObject>
         emit('error', { message: error.value } as UTSJSONObject)
     }

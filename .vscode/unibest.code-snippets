@@ -1,31 +1,20 @@
 {
   "Print uni-app X Page SFC": {
-    "scope": "vue",
+    "scope": "vue,uvue",
     "prefix": "v3",
     "body": [
       "<script lang=\"uts\" setup>",
+      "definePage({",
+      "  style: {",
+      "    navigationBarTitleText: '$1',",
+      "  },",
+      "})",
       "</script>",
       "",
       "<template>",
-      "  <view class=\"\">$1</view>",
-      "</template>",
-      "",
-      "<style lang=\"scss\" scoped>",
-      "//$2",
-      "</style>",
-      ""
-    ],
-    "description": "uni-app X 页面 SFC（含 script/template/style）"
-  },
-  "Print uni-app X Component SFC": {
-    "scope": "vue",
-    "prefix": "v3c",
-    "body": [
-      "<script lang=\"uts\" setup>",
-      "</script>",
-      "",
-      "<template>",
-      "  <view class=\"\">$2</view>",
+      "  <view class=\"\">",
+      "    <text>$2</text>",
+      "  </view>",
       "</template>",
       "",
       "<style lang=\"scss\" scoped>",
@@ -33,41 +22,76 @@
       "</style>",
       ""
     ],
-    "description": "uni-app X 组件 SFC（无 definePage，仅 defineOptions）"
+    "description": "uni-app X 页面 SFC（含 definePage / template / 样式隔离 2.0 scoped）"
+  },
+  "Print uni-app X Component SFC": {
+    "scope": "vue,uvue",
+    "prefix": "v3c",
+    "body": [
+      "<script lang=\"uts\" setup>",
+      "defineOptions({",
+      "  name: '$1',",
+      "  styleIsolation: 'isolated', // 表示隔离，不受外部影响",
+      "})",
+      "</script>",
+      "",
+      "<template>",
+      "  <view class=\"\">",
+      "    <text>$2</text>",
+      "  </view>",
+      "</template>",
+      "",
+      "<style lang=\"scss\" scoped>",
+      "//$3",
+      "</style>",
+      ""
+    ],
+    "description": "uni-app X 组件 SFC（含 defineOptions / styleIsolation: isolated / scoped 样式）"
   },
   "Print uni-app X Script (Page)": {
-    "scope": "vue",
+    "scope": "vue,uvue",
     "prefix": "sc",
     "body": [
       "<script lang=\"uts\" setup>",
+      "definePage({",
+      "  style: {",
+      "    navigationBarTitleText: '$1',",
+      "  },",
+      "})",
       "</script>",
       ""
     ],
     "description": "uni-app X 页面 script 块（含 definePage）"
   },
   "Print uni-app X Script (Component)": {
-    "scope": "vue",
+    "scope": "vue,uvue",
     "prefix": "scc",
     "body": [
       "<script lang=\"uts\" setup>",
+      "defineOptions({",
+      "  name: '$1',",
+      "  styleIsolation: 'isolated', // 表示隔离，不受外部影响",
+      "})",
       "</script>",
       ""
     ],
-    "description": "uni-app X 组件 script 块（仅 defineOptions）"
+    "description": "uni-app X 组件 script 块（含 defineOptions / styleIsolation: isolated）"
   },
   "Print uni-app X Template": {
-    "scope": "vue",
+    "scope": "vue,uvue",
     "prefix": "te",
     "body": [
       "<template>",
-      "  <view class=\"\">$1</view>",
+      "  <view class=\"\">",
+      "    <text>$1</text>",
+      "  </view>",
       "</template>",
       ""
     ],
-    "description": "uni-app X 模板块"
+    "description": "uni-app X 模板块（规范包含 text 标签）"
   },
   "Print uni-app X Style": {
-    "scope": "vue",
+    "scope": "vue,uvue",
     "prefix": "st",
     "body": [
       "<style lang=\"scss\" scoped>",
@@ -75,6 +99,6 @@
       "</style>",
       ""
     ],
-    "description": "uni-app X 样式块"
+    "description": "uni-app X 样式块（样式隔离 2.0 scoped）"
   }
 }

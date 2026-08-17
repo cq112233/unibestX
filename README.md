@@ -77,7 +77,7 @@
 
 ### 1. 创建 / 克隆项目与分支选择
 
-* **方式一：通过 `degit` 快速创建（推荐，无历史提交记录）**：
+- **方式一：通过 `degit` 快速创建（推荐，无历史提交记录）**：
 
   ```bash
   # 主分支（main，默认 Vapor 蒸汽模式，全面兼通 VDOM & Vapor）
@@ -87,7 +87,7 @@
   npx degit cq112233/unibestX#uniX-rice-ui my-project
   ```
 
-* **方式二：通过 `git clone` 克隆**：
+- **方式二：通过 `git clone` 克隆**：
 
   ```bash
   # GitHub
@@ -141,11 +141,11 @@ pnpm dev:mp-alipay
 
 使用 **HBuilderX** 打开项目根目录，在顶部菜单中选择：
 
-* **Android 平台**：在 HBuilderX 中选择 `运行 → 运行到手机或模拟器`，选择连接的 Android 设备即可。
-* **iOS 平台**：在 HBuilderX 中选择 `运行 → 运行到手机或模拟器`，选择 iOS 设备（需 macOS + Xcode 环境）。
-* **鸿蒙平台**：在 HBuilderX 中选择 `运行 → 运行到手机或模拟器`，选择鸿蒙设备（需 DevEco Studio 环境）。
-* **H5 平台**：在 HBuilderX 中选择 `运行 → 运行到浏览器`。
-* **微信小程序**：在 HBuilderX 中选择 `运行 → 运行到小程序模拟器 → 微信开发者工具`。
+- **Android 平台**：在 HBuilderX 中选择 `运行 → 运行到手机或模拟器`，选择连接的 Android 设备即可。
+- **iOS 平台**：在 HBuilderX 中选择 `运行 → 运行到手机或模拟器`，选择 iOS 设备（需 macOS + Xcode 环境）。
+- **鸿蒙平台**：在 HBuilderX 中选择 `运行 → 运行到手机或模拟器`，选择鸿蒙设备（需 DevEco Studio 环境）。
+- **H5 平台**：在 HBuilderX 中选择 `运行 → 运行到浏览器`。
+- **微信小程序**：在 HBuilderX 中选择 `运行 → 运行到小程序模拟器 → 微信开发者工具`。
 
 ### 4. 打包与发布
 
@@ -161,11 +161,11 @@ pnpm build:mp-weixin
 
 #### 🛠️ HBuilderX 发行打包
 
-* **Android 平台**：在 HBuilderX 中选择 `发行 → 原生App-云打包` 或 `原生App-本地打包`。
-* **iOS 平台**：在 HBuilderX 中选择 `发行 → 原生App-云打包`（需 Apple 开发者证书）。
-* **鸿蒙平台**：在 HBuilderX 中选择 `发行 → 原生App-鸿蒙`。
-* **H5 平台**：在 HBuilderX 中选择 `发行 → 网站-H5手机版`，打包后的文件在 `dist/build/h5`。
-* **微信小程序**：在 HBuilderX 中选择 `发行 → 小程序-微信`，然后通过微信开发者工具上传。
+- **Android 平台**：在 HBuilderX 中选择 `发行 → 原生App-云打包` 或 `原生App-本地打包`。
+- **iOS 平台**：在 HBuilderX 中选择 `发行 → 原生App-云打包`（需 Apple 开发者证书）。
+- **鸿蒙平台**：在 HBuilderX 中选择 `发行 → 原生App-鸿蒙`。
+- **H5 平台**：在 HBuilderX 中选择 `发行 → 网站-H5手机版`，打包后的文件在 `dist/build/h5`。
+- **微信小程序**：在 HBuilderX 中选择 `发行 → 小程序-微信`，然后通过微信开发者工具上传。
 
 ## 📦 推荐的 UI 组件库
 
@@ -185,18 +185,18 @@ pnpm build:mp-weixin
 
 ## ✨ 特性
 
-* 🚀 **uni-app X (VDOM & Vapor 全面兼容)** — 默认启用传统 VDOM 模式，同时完美兼容 Vapor 蒸汽模式（无虚拟 DOM 高性能原生渲染）自由切换
-* 💪 **Vue3 + Vite5** — 最新前端技术栈，开发体验极佳
-* 🎨 **UnoCSS** — 原子化 CSS 引擎，高效编写样式
-* 📦 **uview-ultra** — 专为 uni-app X 打造的 UI 组件库（内置深度修复版，已全面兼容 VDOM 与 Vapor 模式，常用基础功能完备，基本够用；后续不再单独维护与定制）
-* 📜 **z-paging-x** — 强大的分页列表组件（本项目已对 [z-paging-x.uvue](file:///Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/z-paging-x/components/z-paging-x/z-paging-x.uvue) 底层 Android 嵌套手势协商、Flex 布局及 `type="nested"` 架构进行了深度兼容修改与适配）
-* 🔧 **Pinia 持久化** — 状态管理 + 本地持久化，开箱即用
-* 🌐 **i18n 多语言** — 内置中英文切换，支持自动检测系统语言
-* 🛡️ **路由守卫** — 黑名单/白名单策略，灵活的登录拦截
-* 🌈 **动态主题** — CSS 变量驱动的主题切换
-* 📊 **ECharts** — 图表组件支持
-* 📱 **自定义 TabBar** — 支持凸起按钮和角标
-* 🔌 **请求封装** — 基于lime-request，支持多域名、Token 自动续期
+- 🚀 **uni-app X (VDOM & Vapor 全面兼容)** — 默认启用传统 VDOM 模式，同时完美兼容 Vapor 蒸汽模式（无虚拟 DOM 高性能原生渲染）自由切换
+- 💪 **Vue3 + Vite5** — 最新前端技术栈，开发体验极佳
+- 🎨 **UnoCSS** — 原子化 CSS 引擎，高效编写样式
+- 📦 **uview-ultra** — 专为 uni-app X 打造的 UI 组件库（内置深度修复版，已全面兼容 VDOM 与 Vapor 模式，常用基础功能完备，基本够用；后续不再单独维护与定制）
+- 📜 **z-paging-x** — 强大的分页列表组件（本项目已对 [z-paging-x.uvue](file:///Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/z-paging-x/components/z-paging-x/z-paging-x.uvue) 底层 Android 嵌套手势协商、Flex 布局及 `type="nested"` 架构进行了深度兼容修改与适配）
+- 🔧 **Pinia 持久化** — 状态管理 + 本地持久化，开箱即用
+- 🌐 **i18n 多语言** — 内置中英文切换，支持自动检测系统语言
+- 🛡️ **路由守卫** — 黑名单/白名单策略，灵活的登录拦截
+- 🌈 **动态主题** — CSS 变量驱动的主题切换
+- 📊 **ECharts** — 图表组件支持
+- 📱 **自定义 TabBar** — 支持凸起按钮和角标
+- 🔌 **请求封装** — 基于lime-request，支持多域名、Token 自动续期
 
 ## 平台兼容性
 
@@ -222,23 +222,25 @@ pnpm build:mp-weixin
 
 ## ⚙️ 环境
 
-* Node >= 22
-* pnpm >= 7.30
-* HBuilderX >= 5.15（不想升级 HBuilderX 请切换 VDOM 模式，5.15+ 即可；建议升级至 **HBuilderX 5.24** 后使用 Vapor 蒸汽模式）
-* Vue Official >= 2.1.10
-* TypeScript >= 5.0
-* JDK >= 17（Android 平台）
-* Android SDK（Android 平台）
-* Xcode（iOS 平台，仅 macOS）
-* DevEco Studio（鸿蒙平台）
+- Node >= 22
+- pnpm >= 7.30
+- HBuilderX >= 5.15（不想升级 HBuilderX 请切换 VDOM 模式，5.15+ 即可；建议升级至 **HBuilderX 5.24** 后使用 Vapor 蒸汽模式）
+- Vue Official >= 2.1.10
+- TypeScript >= 5.0
+- JDK >= 17（Android 平台）
+- Android SDK（Android 平台）
+- Xcode（iOS 平台，仅 macOS）
+- DevEco Studio（鸿蒙平台）
 
 ## 📁 项目结构
 
 ```text
 unibestX/
 ├── plugins/                  # Vite 构建插件
-│   ├── uni-layouts-plugin.ts #   自动布局插件（仿 vite-plugin-uni-layouts）
-│   └── root-plugin.ts        #   自动包裹 App.ku.uvue 根组件插件
+│   ├── vite-plugin-uni-pages.ts #   自动文件路由插件（生成 pages.json / definePage 支持）
+│   ├── uni-layouts-plugin.ts #   跨端 Layout 布局插件（支持 default/empty 及自定义布局）
+│   └── root-plugin.ts        #   自动包裹 App.ku.uvue 全局根骨架组件
+├── pages.config.json         # pages.json 基础配置文件（全局 globalStyle、tabBar 等）
 ├── src/
 │   ├── api/                  # API 请求模块（foo.uts, user.uts, auth.uts 等）
 │   ├── assets/               # 静态资源（图标、图片等）
@@ -252,7 +254,8 @@ unibestX/
 │   │   ├── index.uts         #   i18n 实例与响应式切换
 │   │   └── locales/          #   中英文语言包（zh-Hans / en）
 │   ├── layouts/              # 页面布局模板
-│   │   └── default.uvue      #   默认根布局
+│   │   ├── default.uvue      #   默认页面布局
+│   │   └── empty.uvue        #   空白全屏布局
 │   ├── pages/                # 主包页面（TabBar 页面）
 │   │   ├── index/            #   首页（概览、常用入口）
 │   │   ├── basic/            #   基础组件与工具演示（Crypto、Lodash、HTTP、Dayuts 等）
@@ -281,6 +284,7 @@ unibestX/
 │   │   ├── store.uts         #   TabBar 选中状态管理
 │   │   └── types.uts         #   TabBar 类型定义
 │   ├── types/                # 全局 TypeScript / UTS 类型定义
+│   │   └── uni.d.ts          #   definePage 宏、Vue 宏与全局 API 类型补全
 │   └── utils/                # 全局工具函数
 │       ├── toast.uts         #   全局 Toast 轻提示
 │       ├── systemInfo.uts    #   屏幕与系统信息获取
@@ -301,7 +305,7 @@ unibestX/
 ├── docs/                     # VitePress 项目文档源码
 ├── App.ku.uvue               # 全局根包裹组件（动态主题注入、全局 Toast 容器）
 ├── main.uts                  # 应用主入口文件
-├── pages.json                # 页面路由表、分包与 easycom 配置
+├── pages.json                # 自动生成的页面路由表、分包与 easycom 配置
 ├── manifest.json             # 应用配置清单（多端 AppID、权限、原生模块配置）
 ├── vite.config.ts            # Vite 构建配置（UnoCSS 规则与自定义插件）
 ├── uni.scss                  # 全局 SCSS 变量与主题注入
@@ -346,54 +350,54 @@ uni-app x 推出了新一代的 **蒸汽模式（Vapor）**。新版渲染引擎
 
 内置自定义 TabBar 组件，支持：
 
-* 5 个 Tab 项配置
-* 中间凸起按钮（如 AI 入口）
-* 角标显示
-* 动态主题色
+- 5 个 Tab 项配置
+- 中间凸起按钮（如 AI 入口）
+- 角标显示
+- 动态主题色
 
 ### 路由守卫
 
 提供灵活的登录拦截策略：
 
-* **黑名单模式**（默认）：仅指定页面需要登录
-* **白名单模式**：除指定页面外，全部需要登录
-* 支持登录后自动跳回原页面
+- **黑名单模式**（默认）：仅指定页面需要登录
+- **白名单模式**：除指定页面外，全部需要登录
+- 支持登录后自动跳回原页面
 
 ### 请求封装
 
 基于 `lime-request` 封装的 HTTP 客户端：
 
-* 自动携带 Token
-* 请求/响应拦截器
-* 多域名支持
-* 401 自动登出
-* 支持忽略认证的请求
+- 自动携带 Token
+- 请求/响应拦截器
+- 多域名支持
+- 401 自动登出
+- 支持忽略认证的请求
 
 ### 状态管理
 
 基于 `x-pinia-s`（Pinia for uni-app X）：
 
-* `AppStore` — 主题色、语言设置
-* `TokenStore` — 支持单 Token 和双 Token（access + refresh）模式
-* `UserStore` — 用户信息管理
-* 内置持久化插件，自动同步到本地存储
+- `AppStore` — 主题色、语言设置
+- `TokenStore` — 支持单 Token 和双 Token（access + refresh）模式
+- `UserStore` — 用户信息管理
+- 内置持久化插件，自动同步到本地存储
 
 ### i18n 多语言
 
 基于 `lime-i18n` 的国际化方案：
 
-* 内置中文（zh-CN）和英文（en-US）
-* 自动检测系统语言
-* VSCode i18n-ally 插件支持
-* 非 Vue 文件中也可使用翻译函数
+- 内置中文（zh-CN）和英文（en-US）
+- 自动检测系统语言
+- VSCode i18n-ally 插件支持
+- 非 Vue 文件中也可使用翻译函数
 
 ### Layout 布局
 
 通过自定义 Vite 插件实现：
 
-* 自动为页面包裹 Layout 组件
-* 支持页面级别 `<route>` 配置自定义布局
-* 可通过 `layout: false` 禁用布局
+- 自动为页面包裹 Layout 组件
+- 支持页面级别 `<route>` 配置自定义布局
+- 可通过 `layout: false` 禁用布局
 
 ## 🔧 技术栈详情
 

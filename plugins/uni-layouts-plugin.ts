@@ -1,12 +1,89 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
+import JSON5 from 'json5'
 
 /**
  * 驼峰转连字符 helper
  */
 function kebabCase(str: string): string {
   return str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()
+}
+
+/** 从源码中提取 definePage({...}) 的配置对象 */
+function parseDefinePage(content: string): Record<string, any> | null {
+  const startRegex = /definePage\s*\(\s*\{/
+  const match = content.match(startRegex)
+  if (match == null || match.index == null) {
+    return null
+  }
+
+  const openParen = content.indexOf('(', match.index)
+  if (openParen === -1) {
+    return null
+  }
+
+  let depth = 0
+  let inString = false
+  let stringChar = ''
+  let i = openParen + 1
+
+  for (; i < content.length; i++) {
+    const ch = content[i]
+    const prev = i > 0 ? content[i - 1] : ''
+
+    if (inString) {
+      if (ch === stringChar && prev !== '\\') {
+        inString = false
+      }
+      continue
+    }
+
+    if (ch === '"' || ch === '\'' || ch === '`') {
+      inString = true
+      stringChar = ch
+      continue
+    }
+
+    if (ch === '/' && i + 1 < content.length) {
+      if (content[i + 1] === '/') {
+        const newline = content.indexOf('\n', i)
+        if (newline === -1) {
+          break
+        }
+        i = newline
+        continue
+      }
+      if (content[i + 1] === '*') {
+        const end = content.indexOf('*/', i + 2)
+        if (end === -1) {
+          break
+        }
+        i = end + 1
+        continue
+      }
+    }
+
+    if (ch === '{' || ch === '(') {
+      depth++
+    }
+    if (ch === '}' || ch === ')') {
+      depth--
+      if (depth < 0) {
+        const arg = content.slice(openParen + 1, i).trim()
+        if (arg.startsWith('{')) {
+          try {
+            return JSON5.parse(arg) as Record<string, any>
+          }
+          catch {
+            return null
+          }
+        }
+        return null
+      }
+    }
+  }
+  return null
 }
 
 export interface UniLayoutsOptions {
@@ -178,6 +255,9 @@ export default function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
     },
     transform(code: string, id: string) {
       const normalizedId = id.replace(/\\/g, '/')
+      if (normalizedId.includes('?')) {
+        return null
+      }
 
       // 1. 只过滤处理页面相关文件，排除 App.uvue / App.ku.uvue / layouts 以及 components
       if (!normalizedId.endsWith('.uvue') && !normalizedId.endsWith('.vue')) {
@@ -206,7 +286,7 @@ export default function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
         this.addWatchFile(pagesJsonPath)
       }
 
-      // 2. 匹配页面中的 <route> 块
+      // 2. 匹配页面中的 <route> 块或 definePage
       const routeRegex = /<route[^>]*>([\s\S]*?)<\/route>/
       const routeMatch = code.match(routeRegex)
       let layoutName: string | boolean | undefined
@@ -216,7 +296,7 @@ export default function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
         try {
           const routeStr = routeMatch[1].trim()
           const cleanRouteStr = routeStr.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, '$1')
-          const routeObj = JSON.parse(cleanRouteStr) as Record<string, any>
+          const routeObj = JSON5.parse(cleanRouteStr) as Record<string, any>
           if (routeObj.layout !== undefined) {
             layoutName = routeObj.layout
           }
@@ -231,11 +311,34 @@ export default function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
           console.error(`[Layout Plugin] Failed to parse <route> block in ${id}:`, e)
         }
       }
+      else {
+        // 如果没有 <route> 标签，解析 definePage
+        const definePageMeta = parseDefinePage(code)
+        if (definePageMeta != null) {
+          if (definePageMeta.layout !== undefined) {
+            layoutName = definePageMeta.layout
+          }
+          Object.keys(definePageMeta).forEach((key) => {
+            if (key === 'layout')
+              return
+            if (key === 'style' && typeof definePageMeta.style === 'object' && definePageMeta.style !== null) {
+              Object.keys(definePageMeta.style).forEach((sk) => {
+                if (sk !== 'layout') {
+                  routeParams[sk] = definePageMeta.style[sk]
+                }
+              })
+            }
+            else {
+              routeParams[key] = definePageMeta[key]
+            }
+          })
+        }
+      }
 
       // 3. 移去代码中的 <route> 标签块
       let cleanCode = code.replace(routeRegex, '')
 
-      // 4. 从 pages.json 中获取 layout，如果 route 块中未指定的话
+      // 4. 从 pages.json 中获取 layout，如果 route 块和 definePage 中未指定的话
       const pageConfig = pageLayouts.get(cleanRelativeId)
       if (layoutName === undefined) {
         if (pageConfig && pageConfig.layout !== undefined) {
@@ -283,14 +386,16 @@ export default function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
         }
       }
 
-      // 7. 生成传给 Layout 的属性字符串
+      // 7. 生成传给 Layout 的属性字符串（只传递基本标量类型，排除 style 对象以防产生 [object Object] 语法错误）
       let attrs = ''
       Object.keys(mergedParams).forEach((key) => {
+        if (key === 'style' || key === 'layout')
+          return
         const val = mergedParams[key]
         if (typeof val === 'string') {
-          attrs += ` :${kebabCase(key)}="'${val}'"`
+          attrs += ` :${kebabCase(key)}="'${val.replace(/'/g, '\\\'')}'"`
         }
-        else {
+        else if (typeof val === 'number' || typeof val === 'boolean') {
           attrs += ` :${kebabCase(key)}="${val}"`
         }
       })
@@ -319,7 +424,7 @@ export default function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
       }
 
       // 9. 自动引入 Layout 组件到 setup script
-      const scriptSetupRegex = /<script setup([\s\S]*?)>/
+      const scriptSetupRegex = /<script\s[^>]*\bsetup\b[^>]*>/
       const importStatement = `\nimport LayoutComponent from '@/src/layouts/${layoutFileName}'`
 
       if (scriptSetupRegex.test(cleanCode)) {

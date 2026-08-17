@@ -314,7 +314,11 @@ function onChange() {
   const diff = crtType === 'minus' ? -stepVal : stepVal
   const value = format(add(parseFloat(currentValue.value.toString()), diff).toString())
   emitChange(value, crtType)
-  emit(crtType)
+  if (crtType == 'plus') {
+    emit('plus')
+  } else if (crtType == 'minus') {
+    emit('minus')
+  }
 }
 
 function clearTimeoutHandler() {
