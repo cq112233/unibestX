@@ -10942,1217 +10942,11 @@
   });
   const _style_0$30 = {};
   const ThemeSwitchCard = /* @__PURE__ */ _export_sfc(_sfc_main$35, [["styles", [_style_0$30]]]);
-  class DayutsConfig extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            date: { type: "Any", optional: true },
-            format: { type: String, optional: true },
-            locale: { type: String, optional: true }
-          };
-        },
-        name: "DayutsConfig"
-      };
-    }
-    constructor(options, metadata = DayutsConfig.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.date = this.__props__.date;
-      this.format = this.__props__.format;
-      this.locale = this.__props__.locale;
-      delete this.__props__;
-    }
-  }
-  class DayutsFormats extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            LT: { type: String, optional: false },
-            LTS: { type: String, optional: false },
-            L: { type: String, optional: false },
-            LL: { type: String, optional: false },
-            LLL: { type: String, optional: false },
-            LLLL: { type: String, optional: false },
-            l: { type: String, optional: false },
-            ll: { type: String, optional: false },
-            lll: { type: String, optional: false },
-            llll: { type: String, optional: false }
-          };
-        },
-        name: "DayutsFormats"
-      };
-    }
-    constructor(options, metadata = DayutsFormats.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.LT = this.__props__.LT;
-      this.LTS = this.__props__.LTS;
-      this.L = this.__props__.L;
-      this.LL = this.__props__.LL;
-      this.LLL = this.__props__.LLL;
-      this.LLLL = this.__props__.LLLL;
-      this.l = this.__props__.l;
-      this.ll = this.__props__.ll;
-      this.lll = this.__props__.lll;
-      this.llll = this.__props__.llll;
-      delete this.__props__;
-    }
-  }
-  class DayutsRelativeTime extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            future: { type: String, optional: false },
-            past: { type: String, optional: false },
-            s: { type: String, optional: false },
-            m: { type: String, optional: false },
-            mm: { type: String, optional: false },
-            h: { type: String, optional: false },
-            hh: { type: String, optional: false },
-            d: { type: String, optional: false },
-            dd: { type: String, optional: false },
-            M: { type: String, optional: false },
-            MM: { type: String, optional: false },
-            y: { type: String, optional: false },
-            yy: { type: String, optional: false }
-          };
-        },
-        name: "DayutsRelativeTime"
-      };
-    }
-    constructor(options, metadata = DayutsRelativeTime.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.future = this.__props__.future;
-      this.past = this.__props__.past;
-      this.s = this.__props__.s;
-      this.m = this.__props__.m;
-      this.mm = this.__props__.mm;
-      this.h = this.__props__.h;
-      this.hh = this.__props__.hh;
-      this.d = this.__props__.d;
-      this.dd = this.__props__.dd;
-      this.M = this.__props__.M;
-      this.MM = this.__props__.MM;
-      this.y = this.__props__.y;
-      this.yy = this.__props__.yy;
-      delete this.__props__;
-    }
-  }
-  let DayutsLocale$1 = class DayutsLocale2 extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            name: { type: String, optional: false },
-            weekdays: { type: UTS.UTSType.withGenerics(Array, [String]), optional: false },
-            weekdaysShort: { type: UTS.UTSType.withGenerics(Array, [String]), optional: true },
-            weekdaysMin: { type: UTS.UTSType.withGenerics(Array, [String]), optional: true },
-            months: { type: UTS.UTSType.withGenerics(Array, [String]), optional: false },
-            monthsShort: { type: UTS.UTSType.withGenerics(Array, [String]), optional: true },
-            ordinal: { type: "Unknown", optional: false },
-            weekStart: { type: Number, optional: true },
-            yearStart: { type: Number, optional: true },
-            formats: { type: DayutsFormats, optional: true },
-            relativeTime: { type: DayutsRelativeTime, optional: true },
-            meridiem: { type: "Unknown", optional: true }
-          };
-        },
-        name: "DayutsLocale"
-      };
-    }
-    constructor(options, metadata = DayutsLocale2.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.name = this.__props__.name;
-      this.weekdays = this.__props__.weekdays;
-      this.weekdaysShort = this.__props__.weekdaysShort;
-      this.weekdaysMin = this.__props__.weekdaysMin;
-      this.months = this.__props__.months;
-      this.monthsShort = this.__props__.monthsShort;
-      this.ordinal = this.__props__.ordinal;
-      this.weekStart = this.__props__.weekStart;
-      this.yearStart = this.__props__.yearStart;
-      this.formats = this.__props__.formats;
-      this.relativeTime = this.__props__.relativeTime;
-      this.meridiem = this.__props__.meridiem;
-      delete this.__props__;
-    }
-  };
-  class DayutsObject extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            years: { type: Number, optional: false },
-            months: { type: Number, optional: false },
-            date: { type: Number, optional: false },
-            hours: { type: Number, optional: false },
-            minutes: { type: Number, optional: false },
-            seconds: { type: Number, optional: false },
-            milliseconds: { type: Number, optional: false }
-          };
-        },
-        name: "DayutsObject"
-      };
-    }
-    constructor(options, metadata = DayutsObject.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.years = this.__props__.years;
-      this.months = this.__props__.months;
-      this.date = this.__props__.date;
-      this.hours = this.__props__.hours;
-      this.minutes = this.__props__.minutes;
-      this.seconds = this.__props__.seconds;
-      this.milliseconds = this.__props__.milliseconds;
-      delete this.__props__;
-    }
-  }
-  const SECONDS_A_MINUTE = 60;
-  const SECONDS_A_HOUR = SECONDS_A_MINUTE * 60;
-  const SECONDS_A_DAY = SECONDS_A_HOUR * 24;
-  const SECONDS_A_WEEK = SECONDS_A_DAY * 7;
-  const MILLISECONDS_A_SECOND = 1e3;
-  const MILLISECONDS_A_MINUTE = SECONDS_A_MINUTE * MILLISECONDS_A_SECOND;
-  const MILLISECONDS_A_HOUR = SECONDS_A_HOUR * MILLISECONDS_A_SECOND;
-  const MILLISECONDS_A_DAY = SECONDS_A_DAY * MILLISECONDS_A_SECOND;
-  const MILLISECONDS_A_WEEK = SECONDS_A_WEEK * MILLISECONDS_A_SECOND;
-  const MS = "millisecond";
-  const S = "second";
-  const MIN = "minute";
-  const H = "hour";
-  const D = "day";
-  const W = "week";
-  const M = "month";
-  const Q = "quarter";
-  const Y = "year";
-  const DATE = "date";
-  const FORMAT_DEFAULT = "YYYY-MM-DDTHH:mm:ssZ";
-  const INVALID_DATE_STRING = "Invalid Date";
-  const REGEX_PARSE = /^(\d{4})[-/]?(\d{1,2})?[-/]?(\d{0,2})[Tt\s]*(\d{1,2})?:?(\d{1,2})?:?(\d{1,2})?[.:]?(\d+)?$/;
-  const REGEX_FORMAT = /\[([^\]]+)]|Y{1,4}|M{1,4}|D{1,2}|d{1,4}|H{1,2}|h{1,2}|a|A|m{1,2}|s{1,2}|Z{1,2}|SSS/g;
-  function padStart(string2, length, pad) {
-    const str = string2;
-    if (str.length >= length)
-      return str;
-    return str.padStart(length, pad);
-  }
-  function padZoneStr(instance) {
-    const negMinutes = -instance.utcOffset();
-    const minutes = Math.abs(negMinutes);
-    const hourOffset = Math.floor(minutes / 60);
-    const minuteOffset = minutes % 60;
-    return "".concat(negMinutes <= 0 ? "+" : "-").concat(padStart(hourOffset.toString(), 2, "0"), ":").concat(padStart(minuteOffset.toString(), 2, "0"));
-  }
-  function isNumber(value) {
-    return ["Int8", "UInt8", "Int16", "UInt16", "Int32", "UInt32", "Int64", "UInt64", "Int", "UInt", "Float", "Float16", "Float32", "Float64", "Double", "number"].includes(typeof value);
-  }
-  function prettyUnit(u) {
-    var _a2;
-    const special = /* @__PURE__ */ new Map([
-      ["M", M],
-      ["y", Y],
-      ["w", W],
-      ["d", D],
-      ["D", DATE],
-      ["h", H],
-      ["m", MIN],
-      ["s", S],
-      ["ms", MS],
-      ["Q", Q]
-    ]);
-    return (_a2 = special.get(u)) !== null && _a2 !== void 0 ? _a2 : "".concat(u).toLowerCase().replace(/s$/, "");
-  }
-  function monthDiff(a, b) {
-    if (a.date() < b.date())
-      return -monthDiff(b, a);
-    const wholeMonthDiff = (b.year() - a.year()) * 12 + (b.month() - a.month());
-    const anchor2 = a.clone().add(wholeMonthDiff, M).valueOf();
-    const c = b.valueOf() - anchor2 < 0;
-    const anchor22 = a.clone().add(wholeMonthDiff + (c ? -1 : 1), M).valueOf();
-    const decimalMonthDiff = (b.valueOf() - anchor2) / (c ? anchor2 - anchor22 : anchor22 - anchor2);
-    const result = wholeMonthDiff + decimalMonthDiff;
-    const negatedResult = -result;
-    const absResult = +negatedResult;
-    const finalResult = !isNaN(absResult) ? absResult : 0;
-    return finalResult;
-  }
-  function absFloor(n) {
-    return n < 0 ? Math.max(Math.ceil(n), 0) : Math.floor(n);
-  }
-  const en = {
-    name: "en",
-    /**
-     * 星期名称数组。
-     */
-    weekdays: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-    /**
-     * 月份名称数组。
-     */
-    months: [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December"
-    ],
-    relativeTime: {
-      future: "in %s",
-      past: "%s ago",
-      s: "a few seconds",
-      m: "a minute",
-      mm: "%d minutes",
-      h: "an hour",
-      hh: "%d hours",
-      d: "a day",
-      dd: "%d days",
-      M: "a month",
-      MM: "%d months",
-      y: "a year",
-      yy: "%d years"
-    },
-    /**
-     * 序数函数，用于将数字转换为带有序数后缀的字符串。
-     *
-     * @param {number} n - 要转换的数字。
-     * @returns {string} 带有序数后缀的字符串。
-     */
-    ordinal: (n, _) => {
-      const s = ["th", "st", "nd", "rd"];
-      const v = n % 100;
-      const i = (v - 20) % 10;
-      const k = i < s.length ? i : v < s.length ? v : 0;
-      return "[".concat(n).concat(s[k], "]");
-    }
-  };
-  const locale = {
-    name: "zh-cn",
-    weekdays: ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"],
-    weekdaysShort: ["周日", "周一", "周二", "周三", "周四", "周五", "周六"],
-    weekdaysMin: ["日", "一", "二", "三", "四", "五", "六"],
-    months: [
-      "一月",
-      "二月",
-      "三月",
-      "四月",
-      "五月",
-      "六月",
-      "七月",
-      "八月",
-      "九月",
-      "十月",
-      "十一月",
-      "十二月"
-    ],
-    monthsShort: [
-      "1月",
-      "2月",
-      "3月",
-      "4月",
-      "5月",
-      "6月",
-      "7月",
-      "8月",
-      "9月",
-      "10月",
-      "11月",
-      "12月"
-    ],
-    ordinal: (number2, period) => {
-      if (period == "W") {
-        return "".concat(number2, "周");
-      }
-      return "".concat(number2, "日");
-    },
-    weekStart: 1,
-    yearStart: 4,
-    formats: {
-      LT: "HH:mm",
-      LTS: "HH:mm:ss",
-      L: "YYYY/MM/DD",
-      LL: "YYYY年M月D日",
-      LLL: "YYYY年M月D日Ah点mm分",
-      LLLL: "YYYY年M月D日ddddAh点mm分",
-      l: "YYYY/M/D",
-      ll: "YYYY年M月D日",
-      lll: "YYYY年M月D日 HH:mm",
-      llll: "YYYY年M月D日dddd HH:mm"
-    },
-    relativeTime: {
-      future: "%s内",
-      past: "%s前",
-      s: "几秒",
-      m: "1 分钟",
-      mm: "%d 分钟",
-      h: "1 小时",
-      hh: "%d 小时",
-      d: "1 天",
-      dd: "%d 天",
-      M: "1 个月",
-      MM: "%d 个月",
-      y: "1 年",
-      yy: "%d 年"
-    },
-    meridiem: (hour, minute, _) => {
-      const hm = hour * 100 + minute;
-      if (hm < 600) {
-        return "凌晨";
-      } else if (hm < 900) {
-        return "早上";
-      } else if (hm < 1100) {
-        return "上午";
-      } else if (hm < 1300) {
-        return "中午";
-      } else if (hm < 1800) {
-        return "下午";
-      }
-      return "晚上";
-    }
-  };
-  const localesMap = /* @__PURE__ */ new Map();
-  let localeState = vue.reactive({
-    lang: "en",
-    locales: localesMap
-  });
-  localeState.locales.set("en", en);
-  localeState.locales.set("zh-cn", locale);
-  class DayutsIntl {
-    constructor() {
-    }
-    use(locale2) {
-      localeState.locales.set(locale2.name, locale2);
-      return this;
-    }
-    set locale(locale2) {
-      if (localeState.locales.has(locale2)) {
-        localeState.lang = locale2;
-      } else {
-        let list = [];
-        localeState.locales.forEach(function(_, key2) {
-          list.push(key2);
-        });
-        uni.__log__("warn", "at uni_modules/lime-dayuts/common/use.ts:46", '未知语言: "'.concat(locale2, '". 请使用以下已知语言之一:').concat(list.join(", ")));
-      }
-    }
-    get locale() {
-      return localeState.lang;
-    }
-    set(name, locale2) {
-      localeState.locales.set(name, locale2);
-    }
-    has(name) {
-      return localeState.locales.has(name);
-    }
-  }
-  const dayutsIntl = new DayutsIntl();
-  function parseLocale(preset, object = null, isLocal = false) {
-    let l = null;
-    if (preset == null)
-      return dayutsIntl.locale;
-    if (typeof preset == "string") {
-      const presetLower = preset.toLowerCase();
-      if (dayutsIntl.has(presetLower)) {
-        l = presetLower;
-      }
-      if (object != null) {
-        dayutsIntl.set(presetLower, object);
-        l = presetLower;
-      }
-      const presetSplit = preset.split("-");
-      if (l == null && presetSplit.length > 1) {
-        return parseLocale(presetSplit[0]);
-      }
-    } else if (preset instanceof DayutsLocale) {
-      dayutsIntl.set(preset.name, preset);
-      l = preset.name;
-    }
-    if (!isLocal && l != null) {
-      dayutsIntl.locale = l;
-    }
-    return l !== null && l !== void 0 ? l : dayutsIntl.locale;
-  }
-  function tryParseNumberAtIndex(digits, index) {
-    if (index >= 0 && index < digits.length) {
-      if (digits[index] == null)
-        return null;
-      const parsedNumber = isNumber(digits[index]) ? digits[index] : parseInt("".concat(digits[index]), 10);
-      if (!isNaN(parsedNumber)) {
-        return parsedNumber;
-      }
-    }
-    return null;
-  }
-  function createDateFromArray(d, offset = 0) {
-    var _a2, _b2, _c, _e, _f, _g, _h;
-    const year = (_a2 = tryParseNumberAtIndex(d, 1 - offset)) !== null && _a2 !== void 0 ? _a2 : (/* @__PURE__ */ new Date()).getFullYear();
-    const month = ((_b2 = tryParseNumberAtIndex(d, 2 - offset)) !== null && _b2 !== void 0 ? _b2 : 1) - 1;
-    const day = (_c = tryParseNumberAtIndex(d, 3 - offset)) !== null && _c !== void 0 ? _c : 1;
-    const hour = (_e = tryParseNumberAtIndex(d, 4 - offset)) !== null && _e !== void 0 ? _e : 0;
-    const minute = (_f = tryParseNumberAtIndex(d, 5 - offset)) !== null && _f !== void 0 ? _f : 0;
-    const second = (_g = tryParseNumberAtIndex(d, 6 - offset)) !== null && _g !== void 0 ? _g : 0;
-    const millisecond = ((_h = tryParseNumberAtIndex(d, 7 - offset)) !== null && _h !== void 0 ? _h : 0).toString().substring(0, 3);
-    return new Date(year, month, day, hour, minute, second, parseInt(millisecond));
-  }
-  function parseDate(cfg) {
-    const date2 = cfg.date;
-    if (date2 == null)
-      return /* @__PURE__ */ new Date();
-    if (date2 instanceof Date)
-      return date2;
-    try {
-      if (typeof date2 == "string" && !/Z$/i.test(date2)) {
-        const d = date2.match(REGEX_PARSE);
-        const isNull = d == null || Array.isArray(d) && d.length == 0;
-        if (!isNull) {
-          return createDateFromArray(d);
-        }
-      }
-      if (typeof date2 == "string")
-        return new Date(date2);
-      if (Array.isArray(date2)) {
-        return createDateFromArray(date2, 1);
-      }
-      if (isNumber(date2))
-        return new Date(date2);
-      return null;
-    } catch (err) {
-      return null;
-    }
-  }
-  function wrapper(date2, instance) {
-    return dayuts(date2, instance.$L);
-  }
-  class Dayuts {
-    constructor(cfg) {
-      var _a2;
-      this.valid = true;
-      this.$d = /* @__PURE__ */ new Date();
-      this.$y = 0;
-      this.$M = 0;
-      this.$D = 0;
-      this.$W = 0;
-      this.$H = 0;
-      this.$m = 0;
-      this.$s = 0;
-      this.$ms = 0;
-      this.$u = false;
-      this.$L = (_a2 = parseLocale(cfg.locale)) !== null && _a2 !== void 0 ? _a2 : dayutsIntl.locale;
-      this.parse(cfg);
-    }
-    parse(cfg) {
-      const _d = parseDate(cfg);
-      if (_d != null) {
-        this.$d = parseDate(cfg);
-        this.init();
-      } else {
-        this.valid = false;
-      }
-    }
-    init() {
-      const $d = this.$d;
-      this.$y = $d.getFullYear();
-      this.$M = $d.getMonth();
-      this.$D = $d.getDate();
-      this.$W = $d.getDay();
-      this.$H = $d.getHours();
-      this.$m = $d.getMinutes();
-      this.$s = $d.getSeconds();
-      this.$ms = $d.getMilliseconds();
-    }
-    /**
-     * 检查日期对象是否有效。
-     *
-     * @returns {boolean} 如果日期对象有效，则返回true；否则返回false。
-     */
-    isValid() {
-      return this.valid;
-    }
-    isSame(input, units = "millisecond") {
-      const other = input instanceof Dayuts ? input : dayuts(input);
-      const date1 = this.startOf(units).valueOf();
-      const date2 = other.valueOf();
-      const date3 = this.endOf(units).valueOf();
-      return date1 <= date2 && date2 <= date3;
-    }
-    isAfter(input, units = "millisecond") {
-      const other = input instanceof Dayuts ? input : dayuts(input);
-      const date1 = other.valueOf();
-      const date2 = this.startOf(units).valueOf();
-      return date1 < date2;
-    }
-    isBefore(input, units = "millisecond") {
-      const other = input instanceof Dayuts ? input : dayuts(input);
-      const date1 = other.valueOf();
-      const date2 = this.endOf(units).valueOf();
-      return date2 < date1;
-    }
-    isSameOrBefore(input, units = "millisecond") {
-      return this.isSame(input, units) || this.isBefore(input, units);
-    }
-    isSameOrAfter(input, units = "millisecond") {
-      return this.isSame(input, units) || this.isAfter(input, units);
-    }
-    /**
-     * 判断当前Dayuts对象是否在给定的两个时间之间
-     * @param {any} input - 第一个时间输入
-     * @param {any} input2 - 第二个时间输入
-     * @param {DayutsUnit} units - 指定的时间单位
-     * @param {string} interval - 区间符号，表示区间的开闭性，默认为'()'，表示开区间
-     * @returns {boolean} - 如果当前Dayuts对象在给定的两个时间之间，则返回true，否则返回false
-     */
-    isBetween(input, input2, units = "millisecond", interval = "()") {
-      const dA = dayuts(input);
-      const dB = dayuts(input2);
-      const dAi = interval.startsWith("(");
-      const dBi = interval.endsWith(")");
-      return (dAi ? this.isAfter(dA, units) : !this.isBefore(dA, units)) && (dBi ? this.isBefore(dB, units) : !this.isAfter(dB, units)) || (dAi ? this.isBefore(dA, units) : !this.isAfter(dA, units)) && (dBi ? this.isAfter(dB, units) : !this.isBefore(dB, units));
-    }
-    /**
-     * 判断当前Dayuts对象所在的年份是否为闰年
-     * @returns {boolean} - 如果当前Dayuts对象所在的年份是闰年，则返回true，否则返回false
-     */
-    isLeapYear() {
-      return this.$y % 4 == 0 && this.$y % 100 != 0 || this.$y % 400 == 0;
-    }
-    isToday() {
-      const comparisonTemplate = "YYYY-MM-DD";
-      const now = dayuts();
-      return this.format(comparisonTemplate) == now.format(comparisonTemplate);
-    }
-    /**
-     * 获取当前 `dayuts` 对象的 Unix 时间戳（以秒为单位）。
-     *
-     * @returns {number} 返回当前 `dayuts` 对象的 Unix 时间戳（以秒为单位）。
-     */
-    unix() {
-      return Math.floor(this.valueOf() / 1e3);
-    }
-    /**
-     * 将当前日期设置为指定时间单位的开始或结束。
-     *
-     * @param {string} units - 时间单位，例如'year'、'month'、'day'等。
-     * @param {boolean} startOf - 如果为true，则设置为开始；如果为false，则设置为结束。
-     * @returns {Dayuts} 返回一个新的Dayuts对象，表示调整后的日期。
-     */
-    startOf(units, startOf = true) {
-      var _a2;
-      const isStartOf = startOf;
-      const unit = prettyUnit(units);
-      const instanceFactory = (d, m) => {
-        const ins = dayuts(new Date(this.$y, m, d));
-        return isStartOf ? ins : ins.endOf(D);
-      };
-      const instanceFactorySet = (method, slice2) => {
-        const argumentStart = [0, 0, 0, 0];
-        const argumentEnd = [23, 59, 59, 999];
-        const args = (isStartOf ? argumentStart : argumentEnd).slice(slice2);
-        const date2 = this.toDate();
-        if (method == "setHours") {
-          date2.setHours(args[0]);
-          date2.setMinutes(args[1]);
-          date2.setSeconds(args[2]);
-          date2.setMilliseconds(args[3]);
-        } else if (method == "setMinutes") {
-          date2.setMinutes(args[0]);
-          date2.setSeconds(args[1]);
-          date2.setMilliseconds(args[2]);
-        } else if (method == "setSeconds") {
-          date2.setSeconds(args[0]);
-          date2.setMilliseconds(args[1]);
-        } else if (method == "setMilliseconds") {
-          date2.setMilliseconds(args[0]);
-        }
-        return dayuts(date2);
-      };
-      const _b2 = this, $W = _b2.$W, $M = _b2.$M, $D = _b2.$D;
-      const utcPad = "set".concat(this.$u ? "UTC" : "");
-      if (unit == Y) {
-        return isStartOf ? instanceFactory(1, 0) : instanceFactory(31, 11);
-      } else if (unit == M) {
-        return isStartOf ? instanceFactory(1, $M) : instanceFactory(0, $M + 1);
-      } else if (unit == W) {
-        const weekStart = (_a2 = this.$locale().weekStart) !== null && _a2 !== void 0 ? _a2 : 0;
-        const gap = ($W < weekStart ? $W + 7 : $W) - weekStart;
-        return instanceFactory(isStartOf ? $D - gap : $D + (6 - gap), $M);
-      } else if (unit == D || unit == DATE) {
-        return instanceFactorySet("".concat(utcPad, "Hours"), 0);
-      } else if (unit == H) {
-        return instanceFactorySet("".concat(utcPad, "Minutes"), 1);
-      } else if (unit == MIN) {
-        return instanceFactorySet("".concat(utcPad, "Seconds"), 2);
-      } else if (unit == S) {
-        return instanceFactorySet("".concat(utcPad, "Milliseconds"), 3);
-      } else {
-        return this.clone();
-      }
-    }
-    /**
-     * 将当前日期设置为指定时间单位的结束。
-     *
-     * @param {string} arg - 时间单位，例如'year'、'month'、'day'等。
-     * @returns {Dayuts} 返回一个新的Dayuts对象，表示调整后的日期。
-     */
-    endOf(units) {
-      return this.startOf(units, false);
-    }
-    /**
-     * 设置指定的时间单位的值。
-     *
-     * @param {string} units - 要设置的时间单位（如 "year"、"month"、"day" 等）。
-     * @param {number} int - 要设置的值。
-     * @returns {Dayuts} 返回当前对象。
-     */
-    $set(units, int) {
-      const unit = prettyUnit(units);
-      const arg = unit == D ? this.$D + (int - this.$W) : int;
-      const setDateUnit = (date2, unit2, arg2) => {
-        if (unit2 == D || unit2 == DATE) {
-          date2.$d.setDate(arg2);
-        } else if (unit2 == M) {
-          date2.$d.setMonth(arg2);
-        } else if (unit2 == Y) {
-          date2.$d.setFullYear(arg2);
-        } else if (unit2 == H) {
-          date2.$d.setHours(arg2);
-        } else if (unit2 == MIN) {
-          date2.$d.setMinutes(arg2);
-        } else if (unit2 == S) {
-          date2.$d.setSeconds(arg2);
-        } else if (unit2 == MS) {
-          date2.$d.setMilliseconds(arg2);
-        }
-      };
-      if (unit == M || unit == Y) {
-        const date2 = this.clone().set(DATE, 1);
-        setDateUnit(date2, unit, arg);
-        date2.init();
-        this.$d = date2.set(DATE, Math.min(this.$D, date2.daysInMonth())).$d;
-      } else {
-        setDateUnit(this, unit, arg);
-      }
-      this.init();
-      return this;
-    }
-    /**
-     * 创建一个当前对象的副本，并设置指定的时间单位的值。
-     *
-     * @param {string} string - 要设置的时间单位（如 "year"、"month"、"day" 等）。
-     * @param {number} int - 要设置的值。
-     * @returns {Dayuts} 返回一个新的 `dayuts` 对象，其值为当前对象的副本，并设置了指定的时间单位的值。
-     */
-    set(string2, int) {
-      return this.clone().$set(string2, int);
-    }
-    /**
-     * 获取当前 `dayuts` 对象的指定时间单位的值。
-     *
-     * @param {string} units - 要获取的时间单位（如 "year"、"month"、"day" 等）。
-     * @returns {number} 返回当前 `dayuts` 对象的指定时间单位的值。
-     */
-    get(units) {
-      const unit = prettyUnit(units);
-      if (unit == D) {
-        return this.day();
-      } else if (unit == DATE) {
-        return this.date();
-      } else if (unit == M) {
-        return this.month();
-      } else if (unit == Y) {
-        return this.year();
-      } else if (unit == H) {
-        return this.hour();
-      } else if (unit == MIN) {
-        return this.minute();
-      } else if (unit == S) {
-        return this.second();
-      } else if (unit == MS) {
-        return this.millisecond();
-      }
-      return 0;
-    }
-    year(input = null) {
-      if (input == null)
-        return this.$y;
-      return this.set(Y, input);
-    }
-    month(input = null) {
-      if (input == null)
-        return this.$M;
-      return this.set(M, input);
-    }
-    day(input = null) {
-      if (input == null)
-        return this.$W;
-      return this.set(D, input);
-    }
-    date(input = null) {
-      if (input == null)
-        return this.$D;
-      return this.set(DATE, input);
-    }
-    hour(input = null) {
-      if (input == null)
-        return this.$H;
-      return this.set(H, input);
-    }
-    minute(input = null) {
-      if (input == null)
-        return this.$m;
-      return this.set(MIN, input);
-    }
-    second(input = null) {
-      if (input == null)
-        return this.$s;
-      return this.set(S, input);
-    }
-    millisecond(input = null) {
-      if (input == null)
-        return this.$ms;
-      return this.set(MS, input);
-    }
-    /**
-     * 在当前 Dayuts 实例上添加指定的时间长度。
-     * @param {number} number - 要添加的时间长度。
-     * @param {string} units - 要添加的时间单位（例如，“years”，“months”，“days”等）。
-     * @returns {Dayuts} 更新的 Dayuts 实例。
-     */
-    add(number2, units) {
-      var _a2;
-      const unit = prettyUnit(units);
-      const instanceFactorySet = (n) => {
-        const d = dayuts(this);
-        return d.date(d.date() + Math.round(n * number2));
-      };
-      if (unit == M) {
-        return this.set(M, this.$M + number2);
-      }
-      if (unit == Y) {
-        return this.set(Y, this.$y + number2);
-      }
-      if (unit == D) {
-        return instanceFactorySet(1);
-      }
-      if (unit == W) {
-        return instanceFactorySet(7);
-      }
-      const steps = /* @__PURE__ */ new Map([
-        [MIN, MILLISECONDS_A_MINUTE],
-        [H, MILLISECONDS_A_HOUR],
-        [S, MILLISECONDS_A_SECOND]
-      ]);
-      const step = (_a2 = steps.get(unit)) !== null && _a2 !== void 0 ? _a2 : 1;
-      const nextTimeStamp = this.$d.getTime() + number2 * step;
-      return wrapper(nextTimeStamp, this);
-    }
-    /**
-     * 从当前 Dayuts 实例中减去指定的时间。
-     * @param {number} number - 要减去的时间。
-     * @param {string} units - 要减去的时间单位（例如，“years”，“months”，“days”等）。
-     * @returns {Dayuts} 更新的 Dayuts 实例。
-     */
-    subtract(number2, units) {
-      return this.add(number2 * -1, units);
-    }
-    /**
-     * 日期格式化
-     * @param {string} formatStr - 格式化字符串，包含各种格式化占位符（例如，“YYYY-MM-DD”，“HH:mm:ss”等）。
-     * @returns {string} 格式化后的日期字符串。
-     */
-    format(formatStr = null) {
-      const locale2 = this.$locale();
-      if (!this.isValid())
-        return INVALID_DATE_STRING;
-      const str = formatStr !== null && formatStr !== void 0 ? formatStr : FORMAT_DEFAULT;
-      const zoneStr = padZoneStr(this);
-      const _a2 = this, $H = _a2.$H, $m = _a2.$m, $M = _a2.$M;
-      const weekdays = locale2.weekdays, months = locale2.months, meridiem = locale2.meridiem;
-      function getShort(arr, index, full = [], length = 0) {
-        if (arr != null && arr.length >= index) {
-          return arr[index];
-        } else if (full.length >= index) {
-          return full[index].slice(0, length);
-        }
-        return "";
-      }
-      const get$H = (num) => {
-        return padStart(($H % 12 == 0 ? 12 : $H % 12).toString(), num, "0");
-      };
-      const meridiemFunc = meridiem !== null && meridiem !== void 0 ? meridiem : (hour, _, isLowercase) => {
-        const m = hour < 12 ? "AM" : "PM";
-        return isLowercase ? m.toLowerCase() : m;
-      };
-      const matches = (match) => {
-        if (match == "YY") {
-          return this.$y.toString().slice(-2);
-        } else if (match == "YYYY") {
-          return padStart(this.$y.toString(), 4, "0");
-        } else if (match == "M") {
-          return ($M + 1).toString();
-        } else if (match == "MM") {
-          return padStart(($M + 1).toString(), 2, "0");
-        } else if (match == "MMM") {
-          return getShort(locale2.monthsShort, $M, months, 3);
-        } else if (match == "MMMM") {
-          return getShort(months, $M);
-        } else if (match == "D") {
-          return this.$D.toString();
-        } else if (match == "DD") {
-          return padStart(this.$D.toString(), 2, "0");
-        } else if (match == "d") {
-          return this.$W.toString();
-        } else if (match == "dd") {
-          return getShort(locale2.weekdaysMin, this.$W, weekdays, 2);
-        } else if (match == "ddd") {
-          return getShort(locale2.weekdaysShort, this.$W, weekdays, 3);
-        } else if (match == "dddd") {
-          return weekdays[this.$W];
-        } else if (match == "H") {
-          return $H.toString();
-        } else if (match == "HH") {
-          return padStart($H.toString(), 2, "0");
-        } else if (match == "h") {
-          return get$H(1);
-        } else if (match == "hh") {
-          return get$H(2);
-        } else if (match == "a") {
-          return meridiemFunc($H, $m, true);
-        } else if (match == "A") {
-          return meridiemFunc($H, $m, false);
-        } else if (match == "m") {
-          return $m.toString();
-        } else if (match == "mm") {
-          return padStart($m.toString(), 2, "0");
-        } else if (match == "s") {
-          return this.$s.toString();
-        } else if (match == "ss") {
-          return padStart(this.$s.toString(), 2, "0");
-        } else if (match == "SSS") {
-          return padStart(this.$ms.toString(), 3, "0");
-        } else if (match == "Z") {
-          return zoneStr;
-        }
-        return null;
-      };
-      return str.replace(REGEX_FORMAT, (match, $1, offset, string2) => {
-        var _a3;
-        return (_a3 = $1 !== null && $1 !== void 0 ? $1 : matches(match)) !== null && _a3 !== void 0 ? _a3 : zoneStr.replace(":", "");
-      });
-    }
-    /**
-     * 获取 Dayuts 实例的 UTC 偏移量（以分钟为单位）。
-     * @returns {number} UTC 偏移量（以分钟为单位）。
-     */
-    utcOffset() {
-      return 0;
-    }
-    diff(input, units = "millisecond", float = false) {
-      const unit = prettyUnit(units);
-      const that = dayuts(input);
-      const zoneDelta = (that.utcOffset() - this.utcOffset()) * MILLISECONDS_A_MINUTE;
-      const diff = this.valueOf() - that.valueOf();
-      const getMonth = () => {
-        return monthDiff(this, that);
-      };
-      let result;
-      switch (unit) {
-        case Y:
-          result = getMonth() / 12;
-          break;
-        case M:
-          result = getMonth();
-          break;
-        case Q:
-          result = getMonth() / 3;
-          break;
-        case W:
-          result = (diff - zoneDelta) / MILLISECONDS_A_WEEK;
-          break;
-        case D:
-          result = (diff - zoneDelta) / MILLISECONDS_A_DAY;
-          break;
-        case H:
-          result = diff / MILLISECONDS_A_HOUR;
-          break;
-        case MIN:
-          result = diff / MILLISECONDS_A_MINUTE;
-          break;
-        case S:
-          result = diff / MILLISECONDS_A_SECOND;
-          break;
-        default:
-          result = diff;
-          break;
-      }
-      return float ? result : absFloor(result);
-    }
-    /**
-     * 将当前 Dayuts 对象转换为原生 Date 对象。
-     *
-     * @returns {Date} 返回一个表示当前日期的原生 Date 对象。
-     */
-    toDate() {
-      return new Date(this.valueOf());
-    }
-    /**
-     * 将 Moment 对象转换为 JSON 字符串
-     * @returns {string | null} 如果 Moment 对象有效，则返回 ISO 8601 格式的字符串，否则返回 null
-     */
-    toJSON() {
-      return this.isValid() ? this.toISOString() : null;
-    }
-    /**
-     * 将 Moment 对象转换为 ISO 8601 格式的字符串
-     * @returns {string} 返回 ISO 8601 格式的字符串
-     */
-    toISOString() {
-      return this.$d.toString();
-    }
-    toObject() {
-      return {
-        years: this.$y,
-        months: this.$M,
-        date: this.$D,
-        hours: this.$H,
-        minutes: this.$m,
-        seconds: this.$s,
-        milliseconds: this.$ms
-      };
-    }
-    toArray() {
-      return [
-        this.$y,
-        this.$M,
-        this.$D,
-        this.$H,
-        this.$m,
-        this.$s,
-        this.$ms
-      ];
-    }
-    /**
-     * 获取当前日期的毫秒数。
-     *
-     * @returns {number} 返回一个表示当前日期的毫秒数。
-     */
-    valueOf() {
-      return this.$d.getTime();
-    }
-    /**
-     * 获取当前 `dayuts` 对象所在月份的天数。
-     *
-     * @returns {number} 返回当前 `dayuts` 对象所在月份的天数。
-     */
-    daysInMonth() {
-      return this.endOf(M).$D;
-    }
-    /**
-     * 获取当前日期的区域设置对象。
-     *
-     * @returns {Object} 区域设置对象。
-     */
-    $locale() {
-      return localeState.locales.get(this.$L);
-    }
-    locale(preset, object = null) {
-      const that = this.clone();
-      const nextLocaleName = parseLocale(preset, object, true);
-      if (nextLocaleName != null)
-        that.$L = nextLocaleName;
-      return that;
-    }
-    clone() {
-      return wrapper(this.$d.getTime(), this);
-    }
-    /**
-     * 返回当前 dayuts 对象的 UTC 字符串表示。
-     *
-     * @returns {string} 当前 dayuts 对象的 UTC 字符串表示。
-     */
-    toString() {
-      return this.$d.toString();
-    }
-    dayOfYear(input = null) {
-      const dayOfYear = Math.round((this.startOf("day").valueOf() - this.startOf("year").valueOf()) / 864e5) + 1;
-      return input == null ? dayOfYear : this.add(input - dayOfYear, "day");
-    }
-    fromToBase(input, withoutSuffix, instance, isFrom) {
-      var _a2, _b2;
-      const relObj = (_a2 = localeState.locales.get("en")) === null || _a2 === void 0 ? void 0 : _a2.relativeTime;
-      const loc = (_b2 = instance.$locale().relativeTime) !== null && _b2 !== void 0 ? _b2 : relObj;
-      if (loc == null)
-        return "";
-      const T = [
-        { l: "s", r: 44, d: S },
-        { l: "m", r: 89 },
-        { l: "mm", r: 44, d: MIN },
-        { l: "h", r: 89 },
-        { l: "hh", r: 21, d: H },
-        { l: "d", r: 35 },
-        { l: "dd", r: 25, d: D },
-        { l: "M", r: 45 },
-        { l: "MM", r: 10, d: M },
-        { l: "y", r: 17 },
-        { l: "yy", d: Y }
-      ];
-      const Tl = T.length;
-      let result = 0;
-      let out = "";
-      let isFuture = false;
-      for (let i = 0; i < Tl; i += 1) {
-        let t2 = T[i];
-        if (t2.d != null) {
-          result = isFrom ? dayuts(input).diff(instance, t2.d, true) : instance.diff(input, t2.d, true);
-        }
-        let abs = Math.round(Math.abs(result));
-        isFuture = result > 0;
-        if (t2.r == null || t2.r != null && abs <= t2.r) {
-          if (abs <= 1 && i > 0)
-            t2 = T[i - 1];
-          const format = loc[t2.l];
-          if (typeof format == "string") {
-            out = format.replace("%d", abs.toString());
-          }
-          break;
-        }
-      }
-      if (withoutSuffix)
-        return out;
-      const pastOrFuture = isFuture ? loc.future : loc.past;
-      return pastOrFuture.replace("%s", out);
-    }
-    to(input, withoutSuffix = false) {
-      return this.fromToBase(input, withoutSuffix, this, true);
-    }
-    from(input, withoutSuffix = false) {
-      return this.fromToBase(input, withoutSuffix, this, false);
-    }
-    toNow(withoutSuffix = false) {
-      return this.to(dayuts(), withoutSuffix);
-    }
-    fromNow(withoutSuffix = false) {
-      return this.from(dayuts(), withoutSuffix);
-    }
-  }
-  function dayuts(date2 = null, format = null, locale2 = null) {
-    if (date2 != null && date2 instanceof Dayuts)
-      return date2.clone();
-    return new Dayuts({
-      date: date2,
-      format,
-      locale: locale2
-    });
-  }
-  const __className$33 = "GenSrcPagesBasicComponentsTimeDemoCard";
+  const __className$33 = "GenSrcPagesBasicComponentsRouterDemoCard";
   const _sfc_main$34 = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
     __dynamicSharedData: true,
-    __hash: "d319b340",
-    __className: __className$33,
-    __filename: "src/pages/basic/components/TimeDemoCard.uvue",
-    __name: "TimeDemoCard",
-    setup(__props) {
-      const __sharedDataScope = vue.useSharedDataScope();
-      const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesBasicComponentsTimeDemoCardSharedData", sharedDataClassId: 0 })));
-      const currentFullTime = vue.ref("");
-      let timerId = 0;
-      const offsetDays = vue.ref(0);
-      function updateClock() {
-        currentFullTime.value = dayuts().format("YYYY-MM-DD HH:mm:ss.SSS dddd");
-      }
-      function adjustOffset(days) {
-        offsetDays.value += days;
-      }
-      const targetOffsetTime = vue.computed(() => {
-        return dayuts().add(offsetDays.value, "day").format("YYYY-MM-DD HH:mm:ss");
-      });
-      const startOfMonth = vue.computed(() => {
-        return dayuts().startOf("month").format("YYYY-MM-DD");
-      });
-      const endOfMonth = vue.computed(() => {
-        return dayuts().endOf("month").format("YYYY-MM-DD");
-      });
-      const isLeapYear = vue.computed(() => {
-        return dayuts().isLeapYear();
-      });
-      const daysToYearEnd = vue.computed(() => {
-        const endOfYear = dayuts().endOf("year");
-        const diffVal = endOfYear.diff(dayuts(), "day");
-        return Math.ceil(diffVal);
-      });
-      vue.onMounted(() => {
-        updateClock();
-        timerId = setInterval(() => {
-          updateClock();
-        }, 100);
-      });
-      vue.onUnmounted(() => {
-        if (timerId != 0) {
-          clearInterval(timerId);
-        }
-      });
-      return () => {
-        "raw js";
-        const n39 = vue.createSharedDataComponent(Card, {
-          title: () => {
-            return "时间日期操作 (lime-dayuts)";
-          },
-          __cid: () => {
-            return "0cd4a003";
-          }
-        }, {
-          "default": () => {
-            vue.setSharedDataEvent(__sharedData, 1, () => {
-              return adjustOffset(-7);
-            });
-            vue.setSharedDataEvent(__sharedData, 2, () => {
-              return adjustOffset(-1);
-            });
-            vue.setSharedDataEvent(__sharedData, 3, () => {
-              return adjustOffset(1);
-            });
-            vue.setSharedDataEvent(__sharedData, 4, () => {
-              return adjustOffset(7);
-            });
-            vue.renderSharedDataEffect(() => {
-              const _offsetDays = offsetDays.value;
-              vue.setSharedData(__sharedData, 5, vue.toDisplayString(currentFullTime.value));
-              vue.setSharedData(__sharedData, 6, vue.toDisplayString(_offsetDays > 0 ? "+" : ""));
-              vue.setSharedData(__sharedData, 7, vue.toDisplayString(_offsetDays));
-              vue.setSharedData(__sharedData, 8, vue.toDisplayString(targetOffsetTime.value));
-              vue.setSharedData(__sharedData, 9, vue.toDisplayString(startOfMonth.value));
-              vue.setSharedData(__sharedData, 10, vue.toDisplayString(endOfMonth.value));
-              vue.setSharedData(__sharedData, 11, vue.toDisplayString(isLeapYear.value ? "366天 (闰年)" : "365天 (平年)"));
-              vue.setSharedData(__sharedData, 12, vue.toDisplayString(daysToYearEnd.value));
-            });
-          }
-        }, true);
-        vue.setSharedData(__sharedData, 0, n39.sharedData);
-        return __sharedData;
-      };
-    }
-  });
-  const _style_0$2$ = {};
-  const TimeDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main$34, [["styles", [_style_0$2$]]]);
-  const __className$32 = "GenSrcPagesBasicComponentsRouterDemoCard";
-  const _sfc_main$33 = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
-    __dynamicSharedData: true,
     __hash: "9ee62fdc",
-    __className: __className$32,
+    __className: __className$33,
     __filename: "src/pages/basic/components/RouterDemoCard.uvue",
     __name: "RouterDemoCard",
     setup(__props) {
@@ -12201,8 +10995,8 @@
       };
     }
   });
-  const _style_0$2_ = {};
-  const RouterDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main$33, [["styles", [_style_0$2_]]]);
+  const _style_0$2$ = {};
+  const RouterDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main$34, [["styles", [_style_0$2$]]]);
   class LimeRequestSource extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -13071,8 +11865,8 @@
   }
   var _a, _b;
   const DEFAULT_API_URL = "https://ukw0y1.laf.run";
-  const directBaseUrl = "".concat((_a = "/api") !== null && _a !== void 0 ? _a : DEFAULT_API_URL);
-  const directSecondaryUrl = "".concat((_b = "/api") !== null && _b !== void 0 ? _b : DEFAULT_API_URL);
+  const directBaseUrl = "".concat((_a = "https://ukw0y1.laf.run") !== null && _a !== void 0 ? _a : DEFAULT_API_URL);
+  const directSecondaryUrl = "".concat((_b = "https://ukw0y1.laf.run") !== null && _b !== void 0 ? _b : DEFAULT_API_URL);
   const defaultUrl = directBaseUrl.startsWith("/") ? DEFAULT_API_URL : directBaseUrl;
   const secondaryUrl = directSecondaryUrl.startsWith("/") ? DEFAULT_API_URL : directSecondaryUrl;
   class ApiDomainConfig extends UTS.UTSType {
@@ -13390,11 +12184,11 @@
     uni.__log__("log", "at src/api/foo.uts:66", res, "res112233");
     return res;
   }
-  const __className$31 = "GenSrcPagesBasicComponentsHttpDemoCard";
-  const _sfc_main$32 = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
+  const __className$32 = "GenSrcPagesBasicComponentsHttpDemoCard";
+  const _sfc_main$33 = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
     __dynamicSharedData: true,
     __hash: "0183dc95",
-    __className: __className$31,
+    __className: __className$32,
     __filename: "src/pages/basic/components/HttpDemoCard.uvue",
     __name: "HttpDemoCard",
     setup(__props) {
@@ -13500,7 +12294,7 @@
         }, {
           "default": () => {
             vue.createSharedDataFor(vue.setSharedData(__sharedData, 1, vue.createSharedDataVFor(__sharedDataScope, () => {
-              return new UniDynamicSharedData(__sharedDataScope, { bundleKey: "".concat(__className$31, "SharedData"), sharedDataClassId: 1 });
+              return new UniDynamicSharedData(__sharedDataScope, { bundleKey: "".concat(__className$32, "SharedData"), sharedDataClassId: 1 });
             })), () => {
               return mockList.value;
             }, (__sharedData_VFor0, _for_item0, _for_key0) => {
@@ -13544,1270 +12338,608 @@
       };
     }
   });
-  const _style_0$2Z = {};
-  const HttpDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main$32, [["styles", [_style_0$2Z]]]);
-  class WebviewEchart {
-    constructor(canvasId, webviewCtx = null, element = null) {
-      this.canvasId = "";
-      this.webviewCtx = null;
-      this.element = null;
-      this.onEventMap = /* @__PURE__ */ new Map();
-      this.onceEventMap = /* @__PURE__ */ new Map();
-      this.canvasId = canvasId;
-      this.webviewCtx = webviewCtx;
-      this.element = element;
-    }
-    evalJS(code2) {
-      if (this.element != null) {
-        this.element.evalJS(code2);
-        return null;
-      }
-      if (this.webviewCtx != null) {
-        this.webviewCtx.evalJS(code2);
-        return null;
-      }
-      if (this.canvasId != "") {
-        const el = uni.getElementById(this.canvasId);
-        if (el != null) {
-          this.element = el;
-          this.element.evalJS(code2);
-          return null;
-        }
-        try {
-          const ctx = uni.createWebviewContext(this.canvasId);
-          if (ctx != null) {
-            this.webviewCtx = ctx;
-            this.webviewCtx.evalJS(code2);
-            return null;
-          }
-        } catch (_e) {
-        }
-      }
-    }
-    init(theme = null, opts = new UTSJSONObject({})) {
-      this.evalJS("init(".concat(UTS.JSON.stringify(new UTSJSONObject({ theme, opts })), ")"));
-    }
-    onWebviewMsg(e) {
-      var e_1, _a2;
-      uni.__log__("log", "at uni_modules/e-chart/components/e-chart/uts/WebviewEchart.uts:51", "onWebviewMsg", e.detail.data);
-      try {
-        for (var _b2 = __values(e.detail.data), _c = _b2.next(); !_c.done; _c = _b2.next()) {
-          var msg = _c.value;
-          const msgType = msg["type"];
-          const data2 = msg["data"];
-          const onEventMap = UTS.mapGet(this.onEventMap, msgType);
-          if (onEventMap != null) {
-            onEventMap(data2);
-          }
-          const onceEvent = UTS.mapGet(this.onceEventMap, msgType);
-          if (onceEvent != null) {
-            onceEvent(data2);
-            this.onceEventMap.delete(msgType);
-          }
-        }
-      } catch (e_1_1) {
-        e_1 = { error: e_1_1 };
-      } finally {
-        try {
-          if (_c && !_c.done && (_a2 = _b2.return))
-            _a2.call(_b2);
-        } finally {
-          if (e_1)
-            throw e_1.error;
-        }
-      }
-    }
-    setOption(option, notMerge = false, lazyUpdate = false) {
-      this.evalJS("setOption(".concat(UTS.JSON.stringify(option), ", ").concat(notMerge, ", ").concat(lazyUpdate, ")"));
-    }
-    getOption(success) {
-      this.onceEventMap.set("getOption", success);
-      this.evalJS("getOption()");
-    }
-    getWidth(success) {
-      this.onceEventMap.set("getWidth", success);
-      this.evalJS("getWidth()");
-    }
-    getHeight(success) {
-      this.onceEventMap.set("getHeight", success);
-      this.evalJS("getHeight()");
-    }
-    resize(option = new UTSJSONObject({})) {
-      this.evalJS("resize(".concat(UTS.JSON.stringify(option), ")"));
-    }
-    on(name, handler) {
-      this.onEventMap.set(name, handler);
-      this.evalJS("on(".concat(UTS.JSON.stringify(new UTSJSONObject({ name })), ")"));
-    }
-    on(name, query, handler) {
-      this.onEventMap.set(name, handler);
-      this.evalJS("on(".concat(UTS.JSON.stringify(new UTSJSONObject({ name, query })), ")"));
-    }
-    off(name) {
-      this.evalJS("off(".concat(UTS.JSON.stringify(new UTSJSONObject({ name })), ")"));
-    }
-    dispatchAction(option) {
-      this.evalJS("dispatchAction(".concat(UTS.JSON.stringify(option), ")"));
-    }
-    showLoading(option) {
-      this.evalJS("showLoading(".concat(UTS.JSON.stringify(option), ")"));
-    }
-    hideLoading() {
-      this.evalJS("hideLoading()");
-    }
-    appendData(option) {
-      this.evalJS("appendData(".concat(UTS.JSON.stringify(option), ")"));
-    }
-    canvasToTempFilePath(option) {
-      const success = option["success"];
-      this.onceEventMap.set("canvasToTempFilePath", success);
-      this.evalJS("canvasToTempFilePath()");
-    }
-    clear() {
-      this.evalJS("clear()");
-    }
-    dispose() {
-      this.evalJS("dispose()");
-    }
-  }
-  function getRandomId() {
-    return "chart_".concat(Math.random().toString(36).substring(2, 16));
-  }
-  function addUnitRpx(num) {
-    return typeof num === "number" ? "".concat(num, "rpx") : num;
-  }
-  const __className$30 = "GenUniModulesEChartComponentsEChartEChart";
-  const _sfc_main$31 = /* @__PURE__ */ vue.defineVaporSharedDataComponent(Object.assign({
-    name: "e-chart"
-  }, { __dynamicSharedData: true, __hash: "c73315bc", __className: __className$30, __filename: "uni_modules/e-chart/components/e-chart/e-chart.uvue", __name: "e-chart", props: {
-    width: {
-      type: [Number, String],
-      default: "100%"
-    },
-    height: {
-      type: [Number, String],
-      default: 600
-    },
-    disableScroll: {
-      type: Boolean,
-      default: false
-    },
-    theme: {
-      type: String,
-      default: ""
-    }
-  }, emits: ["ready"], setup(__props, _a2) {
-    var __expose = _a2.expose, __emit = _a2.emit;
-    const __sharedDataScope = vue.useSharedDataScope();
-    const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenUniModulesEChartComponentsEChartEChartSharedData", sharedDataClassId: 0 })));
-    const emit = __emit;
-    const props = __props;
-    vue.getCurrentInstance();
-    const echartObj = vue.ref(null);
-    const canvasId = getRandomId();
-    const canvasStyle = vue.computed(() => {
-      return "width:".concat(addUnitRpx(props.width), ";height:").concat(addUnitRpx(props.height));
-    });
-    function onCanvasReady() {
-      emit("ready");
-    }
-    function initAPP(option) {
-      var _a3;
-      let elem = null;
-      let ctx = null;
-      try {
-        const el = uni.getElementById(canvasId);
-        if (el != null) {
-          elem = el;
-        }
-      } catch (_e) {
-      }
-      if (elem == null) {
-        try {
-          ctx = uni.createWebviewContext(canvasId);
-        } catch (_e) {
-        }
-      }
-      echartObj.value = new WebviewEchart(canvasId, ctx, elem);
-      echartObj.value.init(props.theme);
-      (_a3 = echartObj.value) === null || _a3 === void 0 ? null : _a3.setOption(option);
-      setTimeout(() => {
-        var _a4, _b2;
-        (_a4 = echartObj.value) === null || _a4 === void 0 ? null : _a4.init(props.theme);
-        (_b2 = echartObj.value) === null || _b2 === void 0 ? null : _b2.setOption(option);
-      }, 120);
-      return new UTSJSONObject({ echartObj: echartObj.value });
-    }
-    function init(option) {
-      return __awaiter(this, void 0, void 0, function* () {
-        return initAPP(option);
-      });
-    }
-    function getEchartObj() {
-      return echartObj.value;
-    }
-    function setOption(option) {
-      var _a3;
-      (_a3 = echartObj.value) === null || _a3 === void 0 ? null : _a3.setOption(option);
-    }
-    function getOption() {
-      return new Promise((resolve) => {
-        echartObj.value.getOption(resolve);
-      });
-    }
-    function getWidth() {
-      return new Promise((resolve) => {
-        echartObj.value.getWidth((e) => {
-          resolve(e["width"]);
-        });
-      });
-    }
-    function getHeight() {
-      return new Promise((resolve) => {
-        echartObj.value.getHeight((e) => {
-          resolve(e["height"]);
-        });
-      });
-    }
-    function resize() {
-      var _a3;
-      (_a3 = echartObj.value) === null || _a3 === void 0 ? null : _a3.resize();
-    }
-    function canvasToTempFilePath() {
-      return new Promise((resolve, reject) => {
-        var _a3;
-        const fail = (e) => {
-          uni.showModal(new UTSJSONObject({ title: "保存失败", content: UTS.JSON.stringify(e), showCancel: false }));
-          reject(e);
-        };
-        (_a3 = echartObj.value) === null || _a3 === void 0 ? null : _a3.canvasToTempFilePath(new UTSJSONObject({
-          success: (e) => {
-            const base64 = e["base64"];
-            const fileSystemManager = uni.getFileSystemManager();
-            const filePath = "".concat(uni.env.USER_DATA_PATH, "/").concat(Date.now(), ".png");
-            fileSystemManager.writeFile({
-              filePath,
-              encoding: "base64",
-              data: base64.replace("data:image/png;base64,", ""),
-              success: (_res) => {
-                resolve(filePath);
-              },
-              fail: (err) => {
-                fail(err);
-              }
-            });
-          },
-          fail
-        }));
-      });
-    }
-    function showLoading(option) {
-      var _a3;
-      (_a3 = echartObj.value) === null || _a3 === void 0 ? null : _a3.showLoading(option);
-    }
-    function hideLoading() {
-      var _a3;
-      (_a3 = echartObj.value) === null || _a3 === void 0 ? null : _a3.hideLoading();
-    }
-    function onWebviewMsg(e) {
-      var _a3;
-      (_a3 = echartObj.value) === null || _a3 === void 0 ? null : _a3.onWebviewMsg(e);
-    }
-    function onWebviewError(e) {
-      uni.__log__("error", "at uni_modules/e-chart/components/e-chart/e-chart.uvue:434", "onWebviewError:", e);
-    }
-    vue.watch(() => {
-      return props.width;
-    }, () => {
-      resize();
-    });
-    vue.watch(() => {
-      return props.height;
-    }, () => {
-      resize();
-    });
-    vue.onMounted(() => {
-    });
-    __expose({
-      init,
-      setOption,
-      getOption,
-      getWidth,
-      getHeight,
-      resize,
-      getEchartObj,
-      canvasToTempFilePath,
-      showLoading,
-      hideLoading,
-      onCanvasReady
-    });
-    return () => {
-      "raw js";
-      const _component_web_view = vue.resolveComponent("web-view");
-      const n0 = vue.createSharedDataComponentWithFallback(_component_web_view, {
-        id: () => {
-          return vue.unref(canvasId);
-        },
-        style: () => {
-          return canvasStyle.value;
-        },
-        bounces: () => {
-          return false;
-        },
-        horizontalScrollBarAccess: () => {
-          return false;
-        },
-        verticalScrollBarAccess: () => {
-          return false;
-        },
-        "webview-styles": () => {
-          return { progress: false };
-        },
-        src: () => {
-          return "/uni_modules/e-chart/static/app/webview.html";
-        },
-        onLoad: () => {
-          return onCanvasReady;
-        },
-        onError: () => {
-          return onWebviewError;
-        },
-        onMessage: () => {
-          return onWebviewMsg;
-        },
-        __cid: () => {
-          return "8080c770";
-        }
-      }, null, true);
-      vue.setSharedData(__sharedData, 0, n0 == null ? void 0 : n0.sharedData);
-      return __sharedData;
-    };
-  } }));
-  const __className$2$ = "GenSrcPagesBasicComponentsEchartsDemoCard";
-  const gridKey = "grid";
-  const _sfc_main$30 = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
+  const _style_0$2_ = {};
+  const HttpDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main$33, [["styles", [_style_0$2_]]]);
+  const __className$31 = "GenSrcPagesBasicComponentsSystemInfoDemoCard";
+  const _sfc_main$32 = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
     __dynamicSharedData: true,
-    __hash: "f8ec25d0",
-    __className: __className$2$,
-    __filename: "src/pages/basic/components/EchartsDemoCard.uvue",
-    __name: "EchartsDemoCard",
+    __hash: "457495a2",
+    __className: __className$31,
+    __filename: "src/pages/basic/components/SystemInfoDemoCard.uvue",
+    __name: "SystemInfoDemoCard",
     setup(__props) {
       const __sharedDataScope = vue.useSharedDataScope();
-      const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesBasicComponentsEchartsDemoCardSharedData", sharedDataClassId: 0 })));
-      const echartTitle = vue.computed(() => {
-        return $t("basic.echartTitle");
+      const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesBasicComponentsSystemInfoDemoCardSharedData", sharedDataClassId: 0 })));
+      const screenWidth = vue.computed(() => {
+        var _a2, _b2;
+        return (_b2 = (_a2 = systemInfo.value) === null || _a2 === void 0 ? null : _a2.screenWidth) !== null && _b2 !== void 0 ? _b2 : 0;
       });
-      const echartLineText = vue.computed(() => {
-        return $t("basic.echartLine");
+      const screenHeight = vue.computed(() => {
+        var _a2, _b2;
+        return (_b2 = (_a2 = systemInfo.value) === null || _a2 === void 0 ? null : _a2.screenHeight) !== null && _b2 !== void 0 ? _b2 : 0;
       });
-      const echartBarText = vue.computed(() => {
-        return $t("basic.echartBar");
-      });
-      const echartPieText = vue.computed(() => {
-        return $t("basic.echartPie");
-      });
-      const echartRef = vue.ref(null);
-      const currentType = vue.ref("line");
-      const lineOption = new UTSJSONObject({
-        title: new UTSJSONObject({
-          text: "访问趋势 (折线图)",
-          textStyle: new UTSJSONObject({
-            fontSize: 12,
-            color: "#64748b"
-          })
-        }),
-        xAxis: new UTSJSONObject({
-          type: "category",
-          data: ["周一", "周二", "周三", "周四", "周五", "周六", "周日"],
-          axisLine: new UTSJSONObject({
-            lineStyle: new UTSJSONObject({
-              color: "#cbd5e1"
-            })
-          }),
-          axisLabel: new UTSJSONObject({
-            color: "#64748b"
-          })
-        }),
-        yAxis: new UTSJSONObject({
-          type: "value",
-          axisLine: new UTSJSONObject({
-            show: false
-          }),
-          splitLine: new UTSJSONObject({
-            lineStyle: new UTSJSONObject({
-              color: "#f1f5f9"
-            })
-          }),
-          axisLabel: new UTSJSONObject({
-            color: "#64748b"
-          })
-        }),
-        [gridKey]: new UTSJSONObject({
-          left: "12%",
-          right: "5%",
-          top: "18%",
-          bottom: "12%"
-        }),
-        series: [new UTSJSONObject({
-          data: [120, 200, 150, 80, 70, 110, 130],
-          type: "line",
-          smooth: true,
-          color: "#3b82f6",
-          areaStyle: new UTSJSONObject({
-            color: new UTSJSONObject({
-              type: "linear",
-              x: 0,
-              y: 0,
-              x2: 0,
-              y2: 1,
-              colorStops: [
-                new UTSJSONObject({ offset: 0, color: "rgba(59, 130, 246, 0.4)" }),
-                new UTSJSONObject({ offset: 1, color: "rgba(59, 130, 246, 0)" })
-              ]
-            })
-          })
-        })]
-      });
-      const barOption = new UTSJSONObject({
-        title: new UTSJSONObject({
-          text: "访问分布 (柱状图)",
-          textStyle: new UTSJSONObject({
-            fontSize: 12,
-            color: "#64748b"
-          })
-        }),
-        xAxis: new UTSJSONObject({
-          type: "category",
-          data: ["周一", "周二", "周三", "周四", "周五", "周六", "周日"],
-          axisLine: new UTSJSONObject({
-            lineStyle: new UTSJSONObject({
-              color: "#cbd5e1"
-            })
-          }),
-          axisLabel: new UTSJSONObject({
-            color: "#64748b"
-          })
-        }),
-        yAxis: new UTSJSONObject({
-          type: "value",
-          axisLine: new UTSJSONObject({
-            show: false
-          }),
-          splitLine: new UTSJSONObject({
-            lineStyle: new UTSJSONObject({
-              color: "#f1f5f9"
-            })
-          }),
-          axisLabel: new UTSJSONObject({
-            color: "#64748b"
-          })
-        }),
-        [gridKey]: new UTSJSONObject({
-          left: "12%",
-          right: "5%",
-          top: "18%",
-          bottom: "12%"
-        }),
-        series: [new UTSJSONObject({
-          data: [120, 200, 150, 80, 70, 110, 130],
-          type: "bar",
-          color: "#10b981"
-        })]
-      });
-      const pieOption = new UTSJSONObject({
-        title: new UTSJSONObject({
-          text: "访问来源 (饼图)",
-          textStyle: new UTSJSONObject({
-            fontSize: 12,
-            color: "#64748b"
-          })
-        }),
-        series: [new UTSJSONObject({
-          name: "访问来源",
-          type: "pie",
-          radius: "52%",
-          center: ["50%", "52%"],
-          label: new UTSJSONObject({
-            fontSize: 11,
-            color: "#64748b"
-          }),
-          data: [
-            new UTSJSONObject({ value: 1048, name: "搜索引擎", itemStyle: new UTSJSONObject({ color: "#3b82f6" }) }),
-            new UTSJSONObject({ value: 735, name: "直接访问", itemStyle: new UTSJSONObject({ color: "#10b981" }) }),
-            new UTSJSONObject({ value: 580, name: "邮件营销", itemStyle: new UTSJSONObject({ color: "#f59e0b" }) }),
-            new UTSJSONObject({ value: 484, name: "联盟广告", itemStyle: new UTSJSONObject({ color: "#8b5cf6" }) })
-          ]
-        })]
-      });
-      function initEchart() {
-        if (echartRef.value != null) {
-          const chart2 = echartRef.value;
-          chart2.$callMethod("init", lineOption);
-        }
-      }
-      function changeToLine() {
-        currentType.value = "line";
-        if (echartRef.value != null) {
-          const chart2 = echartRef.value;
-          chart2.$callMethod("setOption", lineOption);
-        }
-      }
-      function changeToBar() {
-        currentType.value = "bar";
-        if (echartRef.value != null) {
-          const chart2 = echartRef.value;
-          chart2.$callMethod("setOption", barOption);
-        }
-      }
-      function changeToPie() {
-        currentType.value = "pie";
-        if (echartRef.value != null) {
-          const chart2 = echartRef.value;
-          chart2.$callMethod("setOption", pieOption);
-        }
-      }
       const windowWidth = vue.computed(() => {
         var _a2, _b2;
         return (_b2 = (_a2 = systemInfo.value) === null || _a2 === void 0 ? null : _a2.windowWidth) !== null && _b2 !== void 0 ? _b2 : 0;
       });
-      vue.watch(windowWidth, () => {
-        setTimeout(() => {
-          if (echartRef.value != null) {
-            const chart2 = echartRef.value;
-            chart2.$callMethod("resize");
-          }
-        }, 100);
+      const windowHeight = vue.computed(() => {
+        var _a2, _b2;
+        return (_b2 = (_a2 = systemInfo.value) === null || _a2 === void 0 ? null : _a2.windowHeight) !== null && _b2 !== void 0 ? _b2 : 0;
+      });
+      const statusBarHeight = vue.computed(() => {
+        var _a2, _b2;
+        return (_b2 = (_a2 = systemInfo.value) === null || _a2 === void 0 ? null : _a2.statusBarHeight) !== null && _b2 !== void 0 ? _b2 : 0;
+      });
+      const pixelRatio = vue.computed(() => {
+        var _a2, _b2;
+        return (_b2 = (_a2 = systemInfo.value) === null || _a2 === void 0 ? null : _a2.pixelRatio) !== null && _b2 !== void 0 ? _b2 : 1;
+      });
+      const safeAreaTop = vue.computed(() => {
+        return safeAreaInsets.value != null ? "".concat(safeAreaInsets.value.top, "px") : "N/A";
+      });
+      const safeAreaBottom = vue.computed(() => {
+        return safeAreaInsets.value != null ? "".concat(safeAreaInsets.value.bottom, "px") : "N/A";
+      });
+      const safeAreaLeft = vue.computed(() => {
+        return safeAreaInsets.value != null ? "".concat(safeAreaInsets.value.left, "px") : "N/A";
+      });
+      const safeAreaRight = vue.computed(() => {
+        return safeAreaInsets.value != null ? "".concat(safeAreaInsets.value.right, "px") : "N/A";
       });
       return () => {
         "raw js";
-        const _setTemplateRef = vue.createSharedDataTemplateRefSetter();
-        const _component_e_chart = _sfc_main$31;
-        const n12 = vue.createSharedDataComponent(Card, {
-          title: () => {
-            return echartTitle.value;
-          },
-          __cid: () => {
-            return "4e294b1c";
-          }
-        }, {
-          "default": vue.withSharedDataVaporCtx(() => {
-            const n0 = vue.createSharedDataComponentWithFallback(_component_e_chart, {
-              height: () => {
-                return "280px";
-              },
-              class: () => {
-                return "w-full h-full";
-              },
-              onReady: () => {
-                return initEchart;
-              },
-              __cid: () => {
-                return "77001919";
-              }
-            });
-            vue.setSharedData(__sharedData, 1, n0 == null ? void 0 : n0.sharedData);
-            _setTemplateRef(n0, echartRef, null, "echartRef");
-            vue.setSharedDataEvent(__sharedData, 2, changeToLine);
-            vue.setSharedDataEvent(__sharedData, 3, changeToBar);
-            vue.setSharedDataEvent(__sharedData, 4, changeToPie);
-            vue.renderSharedDataEffect(() => {
-              const _currentType = currentType.value;
-              vue.setSharedDataClass(__sharedData, 5, ["w-full h-36px rounded-8px flex flex-row items-center justify-center", _currentType !== "line" ? "bg-__e0edff_" : "bg-__3b82f6_"]);
-              vue.setSharedDataClass(__sharedData, 6, ["text-12px font-bold", _currentType !== "line" ? "text-__3b82f6_" : "text-__ffffff_"]);
-              vue.setSharedData(__sharedData, 7, vue.toDisplayString(echartLineText.value));
-              vue.setSharedDataClass(__sharedData, 8, ["w-full h-36px rounded-8px flex flex-row items-center justify-center", _currentType !== "bar" ? "bg-__d1fae5_" : "bg-__10b981_"]);
-              vue.setSharedDataClass(__sharedData, 9, ["text-12px font-bold", _currentType !== "bar" ? "text-__10b981_" : "text-__ffffff_"]);
-              vue.setSharedData(__sharedData, 10, vue.toDisplayString(echartBarText.value));
-              vue.setSharedDataClass(__sharedData, 11, ["w-full h-36px rounded-8px flex flex-row items-center justify-center", _currentType !== "pie" ? "bg-__fef3c7_" : "bg-__f59e0b_"]);
-              vue.setSharedDataClass(__sharedData, 12, ["text-12px font-bold", _currentType !== "pie" ? "text-__f59e0b_" : "text-__ffffff_"]);
-              vue.setSharedData(__sharedData, 13, vue.toDisplayString(echartPieText.value));
-            });
-          })
-        }, true);
-        vue.setSharedData(__sharedData, 0, n12.sharedData);
-        return __sharedData;
-      };
-    }
-  });
-  const _style_0$2Y = {};
-  const EchartsDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main$30, [["styles", [_style_0$2Y]]]);
-  class LimeSignatureToFileSuccess extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            tempFilePath: { type: String, optional: false },
-            isEmpty: { type: Boolean, optional: false }
-          };
-        },
-        name: "LimeSignatureToFileSuccess"
-      };
-    }
-    constructor(options, metadata = LimeSignatureToFileSuccess.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.tempFilePath = this.__props__.tempFilePath;
-      this.isEmpty = this.__props__.isEmpty;
-      delete this.__props__;
-    }
-  }
-  class LimeSignatureToTempFilePathOptions extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            success: { type: "Unknown", optional: true },
-            fail: { type: "Unknown", optional: true },
-            complete: { type: "Unknown", optional: true },
-            format: { type: String, optional: true }
-          };
-        },
-        name: "LimeSignatureToTempFilePathOptions"
-      };
-    }
-    constructor(options, metadata = LimeSignatureToTempFilePathOptions.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.success = this.__props__.success;
-      this.fail = this.__props__.fail;
-      this.complete = this.__props__.complete;
-      this.format = this.__props__.format;
-      delete this.__props__;
-    }
-  }
-  class LimeSignatureOptions extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            penColor: { type: String, optional: false },
-            openSmooth: { type: Boolean, optional: false },
-            disableScroll: { type: Boolean, optional: false },
-            disabled: { type: Boolean, optional: false },
-            penSize: { type: Number, optional: false },
-            minLineWidth: { type: Number, optional: false },
-            maxLineWidth: { type: Number, optional: false },
-            minSpeed: { type: Number, optional: false },
-            maxWidthDiffRate: { type: Number, optional: false },
-            maxHistoryLength: { type: Number, optional: false }
-          };
-        },
-        name: "LimeSignatureOptions"
-      };
-    }
-    constructor(options, metadata = LimeSignatureOptions.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.penColor = this.__props__.penColor;
-      this.openSmooth = this.__props__.openSmooth;
-      this.disableScroll = this.__props__.disableScroll;
-      this.disabled = this.__props__.disabled;
-      this.penSize = this.__props__.penSize;
-      this.minLineWidth = this.__props__.minLineWidth;
-      this.maxLineWidth = this.__props__.maxLineWidth;
-      this.minSpeed = this.__props__.minSpeed;
-      this.maxWidthDiffRate = this.__props__.maxWidthDiffRate;
-      this.maxHistoryLength = this.__props__.maxHistoryLength;
-      delete this.__props__;
-    }
-  }
-  class LimeSignaturePoint extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            x: { type: Number, optional: false },
-            y: { type: Number, optional: false },
-            c: { type: String, optional: true },
-            w: { type: Number, optional: true }
-          };
-        },
-        name: "LimeSignaturePoint"
-      };
-    }
-    constructor(options, metadata = LimeSignaturePoint.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.x = this.__props__.x;
-      this.y = this.__props__.y;
-      this.c = this.__props__.c;
-      this.w = this.__props__.w;
-      delete this.__props__;
-    }
-  }
-  let points = [];
-  let undoStack = [];
-  let redoStack = [];
-  let lastX = 0;
-  let lastY = 0;
-  class Signature {
-    constructor(el) {
-      this.options = new LimeSignatureOptions({
-        penColor: "black",
-        openSmooth: true,
-        disableScroll: true,
-        disabled: false,
-        penSize: 2,
-        minLineWidth: 2,
-        maxLineWidth: 6,
-        minSpeed: 1.5,
-        maxWidthDiffRate: 20,
-        maxHistoryLength: 20
-      });
-      this.isEmpty = true;
-      this.isDrawing = false;
-      this.touchstartCallbackWrapper = null;
-      this.touchmoveCallbackWrapper = null;
-      this.touchendCallbackWrapper = null;
-      this.change = null;
-      this.onTouchStart = (event) => {
-        if (this.options.disabled) {
-          return null;
-        }
-        this.disableScroll(event);
-        const _a2 = this.getTouchLimeSignaturePoint(event), x = _a2.x, y = _a2.y;
-        this.isDrawing = true;
-        this.isEmpty = false;
-        lastX = x;
-        lastY = y;
-        points.push(new LimeSignaturePoint({
-          c: null,
-          w: null,
-          x,
-          y
-        }));
-      };
-      this.onTouchMove = (event) => {
-        if (this.options.disabled || !this.isDrawing) {
-          return null;
-        }
-        this.disableScroll(event);
-        const _a2 = this.getTouchLimeSignaturePoint(event), x = _a2.x, y = _a2.y;
-        const lineWidth = this.options.penSize;
-        const strokeStyle = this.options.penColor;
-        const point = new LimeSignaturePoint({
-          c: null,
-          w: null,
-          x,
-          y
-        });
-        const last = new LimeSignaturePoint({
-          c: null,
-          w: null,
-          x: lastX,
-          y: lastY
-        });
-        this.drawLine(point, last, lineWidth, strokeStyle);
-        lastX = x;
-        lastY = y;
-        points.push(new LimeSignaturePoint({ x, y, c: strokeStyle, w: lineWidth }));
-      };
-      this.onTouchEnd = (event) => {
-        var _a2;
-        this.disableScroll(event);
-        this.isDrawing = false;
-        undoStack.push(points);
-        redoStack = [];
-        points = [];
-        (_a2 = this.change) === null || _a2 === void 0 ? null : _a2.call(this, this.isEmpty);
-      };
-      this.el = el;
-      this.ctx = el.getDrawableContext();
-      this.init();
-    }
-    onChange(cb) {
-      this.change = cb;
-    }
-    init() {
-      this.touchstartCallbackWrapper = this.el.addEventListener("touchstart", this.onTouchStart);
-      this.touchmoveCallbackWrapper = this.el.addEventListener("touchmove", this.onTouchMove);
-      this.touchendCallbackWrapper = this.el.addEventListener("touchend", this.onTouchEnd);
-    }
-    remove() {
-      if (this.touchstartCallbackWrapper == null)
-        return null;
-      this.el.removeEventListener("touchstart", this.touchstartCallbackWrapper);
-      this.el.removeEventListener("touchmove", this.touchmoveCallbackWrapper);
-      this.el.removeEventListener("touchend", this.touchendCallbackWrapper);
-    }
-    setOption(options) {
-      this.options = options;
-    }
-    disableScroll(event) {
-      event.stopPropagation();
-      if (this.options.disableScroll) {
-        {
-          event.preventDefault();
-        }
-      }
-    }
-    getTouchLimeSignaturePoint(event) {
-      const rect = this.el.getBoundingClientRect();
-      const touche = event.touches[0];
-      const x = touche.clientX;
-      const y = touche.clientY;
-      return new LimeSignaturePoint({
-        c: null,
-        w: null,
-        x: x - rect.left,
-        y: y - rect.top
-      });
-    }
-    drawLine(point, last, lineWidth, strokeStyle) {
-      const ctx = this.ctx;
-      ctx.lineWidth = lineWidth;
-      ctx.strokeStyle = strokeStyle;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      ctx.beginPath();
-      ctx.moveTo(last.x, last.y);
-      ctx.lineTo(point.x, point.y);
-      ctx.stroke();
-      ctx.closePath();
-      this._draw();
-    }
-    _clear() {
-      this.ctx.reset();
-    }
-    _draw() {
-      this.ctx.update();
-    }
-    // addHistory() { }
-    clear() {
-      this._clear();
-      this._draw();
-      this.isEmpty = true;
-      undoStack = [];
-      redoStack = [];
-      points = [];
-    }
-    undo() {
-      if (redoStack.length == this.options.maxHistoryLength && this.options.maxHistoryLength != 0) {
-        return null;
-      }
-      this._clear();
-      if (undoStack.length > 0) {
-        const lastPath = UTS.arrayPop(undoStack);
-        redoStack.push(lastPath);
-        if (undoStack.length == 0) {
-          this.isEmpty = true;
-          this._draw();
-          return null;
-        }
-        for (let l = 0; l < undoStack.length; l++) {
-          for (let i = 1; i < undoStack[l].length; i++) {
-            const last = undoStack[l][i - 1];
-            const point = undoStack[l][i];
-            this.drawLine(point, last, point.w, point.c);
-          }
-        }
-      } else {
-        this._draw();
-      }
-    }
-    redo() {
-      if (redoStack.length < 1)
-        return null;
-      const lastPath = UTS.arrayPop(redoStack);
-      undoStack.push(lastPath);
-      this.isEmpty = false;
-      for (let l = 0; l < undoStack.length; l++) {
-        for (let i = 1; i < undoStack[l].length; i++) {
-          const last = undoStack[l][i - 1];
-          const point = undoStack[l][i];
-          this.drawLine(point, last, point.w, point.c);
-        }
-      }
-    }
-  }
-  const __className$2_ = "GenUniModulesLimeSignatureComponentsLSignatureLSignature";
-  const _sfc_main$2$ = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
-    __dynamicSharedData: true,
-    __hash: "7363d352",
-    __className: __className$2_,
-    __filename: "uni_modules/lime-signature/components/l-signature/l-signature.uvue",
-    __name: "l-signature",
-    props: {
-      styles: {
-        type: String,
-        default: ""
-      },
-      penColor: {
-        type: String,
-        default: "black"
-      },
-      penSize: {
-        type: Number,
-        default: 2
-      },
-      backgroundColor: {
-        type: String,
-        default: ""
-      },
-      openSmooth: {
-        type: Boolean,
-        default: false
-      },
-      minLineWidth: {
-        type: Number,
-        default: 2
-      },
-      maxLineWidth: {
-        type: Number,
-        default: 6
-      },
-      minSpeed: {
-        type: Number,
-        default: 1.5
-      },
-      maxWidthDiffRate: {
-        type: Number,
-        default: 20
-      },
-      maxHistoryLength: {
-        type: Number,
-        default: 20
-      },
-      disableScroll: {
-        type: Boolean,
-        default: true
-      },
-      disabled: {
-        type: Boolean,
-        default: false
-      },
-      landscape: {
-        type: Boolean,
-        default: false
-      }
-    },
-    emits: ["change"],
-    setup(__props, _a2) {
-      var __expose = _a2.expose, __emit = _a2.emit;
-      const __sharedDataScope = vue.useSharedDataScope();
-      const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenUniModulesLimeSignatureComponentsLSignatureLSignatureSharedData", sharedDataClassId: 0 })));
-      const emit = __emit;
-      const props = __props;
-      const drawableStyle = vue.computed(() => {
-        let style = "";
-        if (props.backgroundColor != "") {
-          style += "background-color: ".concat(props.backgroundColor, ";");
-        }
-        if (props.styles != "") {
-          style += props.styles;
-        }
-        return style;
-      });
-      const signatureRef = vue.ref(null);
-      vue.ref(null);
-      let signatureLandscapeRef = vue.ref(null);
-      let landscapeStyle = vue.ref(/* @__PURE__ */ new Map());
-      let landscapeImageStyle = vue.ref(/* @__PURE__ */ new Map());
-      let isCanvasEmpty = true;
-      let signature = null;
-      let url2 = vue.ref("");
-      const checkAndEmitEmptyStatus = () => {
-        var _a3;
-        const isEmpty2 = (_a3 = signature === null || signature === void 0 ? null : signature.isEmpty) !== null && _a3 !== void 0 ? _a3 : true;
-        if (isEmpty2 != isCanvasEmpty) {
-          isCanvasEmpty = isEmpty2;
-          emit("change", isCanvasEmpty);
-        }
-      };
-      const clear2 = () => {
-        signature === null || signature === void 0 ? null : signature.clear();
-        checkAndEmitEmptyStatus();
-      };
-      const redo = () => {
-        signature === null || signature === void 0 ? null : signature.redo();
-        checkAndEmitEmptyStatus();
-      };
-      const undo = () => {
-        signature === null || signature === void 0 ? null : signature.undo();
-        checkAndEmitEmptyStatus();
-      };
-      const canvasToTempFilePath = (options) => {
-        var _a3, _b2;
-        const success = options.success;
-        const fail = options.fail;
-        const complete = options.complete;
-        const format = (_a3 = options.format) !== null && _a3 !== void 0 ? _a3 : "png";
-        (_b2 = signatureRef.value) === null || _b2 === void 0 ? null : _b2.takeSnapshot({
-          format,
-          success: (res) => {
-            var _a4, _b3, _c;
-            if (props.landscape) {
-              url2.value = res.tempFilePath;
-              (_b3 = (_a4 = signatureLandscapeRef.value) === null || _a4 === void 0 ? null : _a4.getBoundingClientRectAsync()) === null || _b3 === void 0 ? null : _b3.then((rect) => {
-                setTimeout(() => {
-                  var _a5;
-                  (_a5 = signatureLandscapeRef.value) === null || _a5 === void 0 ? null : _a5.takeSnapshot(new UTSJSONObject({
-                    format,
-                    success: (res2) => {
-                      var _a6;
-                      success === null || success === void 0 ? null : success(new LimeSignatureToFileSuccess({
-                        tempFilePath: res2.tempFilePath,
-                        isEmpty: (_a6 = signature === null || signature === void 0 ? null : signature.isEmpty) !== null && _a6 !== void 0 ? _a6 : false
-                      }));
-                    }
-                  }));
-                }, 300);
-              });
-            } else {
-              success === null || success === void 0 ? null : success(new LimeSignatureToFileSuccess({
-                tempFilePath: res.tempFilePath,
-                isEmpty: (_c = signature === null || signature === void 0 ? null : signature.isEmpty) !== null && _c !== void 0 ? _c : false
-              }));
-            }
-          },
-          fail: (res) => {
-            fail === null || fail === void 0 ? null : fail(res);
-          },
-          complete: (res = null) => {
-            complete === null || complete === void 0 ? null : complete(res);
-          }
-        });
-      };
-      __expose({
-        clear: clear2,
-        redo,
-        undo,
-        canvasToTempFilePath
-      });
-      vue.onMounted(() => {
-        vue.nextTick(() => {
-          setTimeout(() => {
-            var _a3, _b2;
-            const width = (_a3 = signatureRef.value) === null || _a3 === void 0 ? null : _a3.offsetWidth;
-            const height = (_b2 = signatureRef.value) === null || _b2 === void 0 ? null : _b2.offsetHeight;
-            landscapeStyle.value.set("width", "".concat(height, "px"));
-            landscapeStyle.value.set("height", "".concat(width, "px"));
-            landscapeImageStyle.value.set("width", "".concat(width, "px"));
-            landscapeImageStyle.value.set("height", "".concat(height, "px"));
-            landscapeImageStyle.value.set("transform", "rotate(-90deg) translateX(-".concat(width, "px)"));
-            signature = new Signature(signatureRef.value);
-            vue.watchEffect(() => {
-              const options = new LimeSignatureOptions({
-                penColor: props.penColor,
-                openSmooth: props.openSmooth,
-                disableScroll: props.disableScroll,
-                disabled: props.disabled,
-                penSize: props.penSize,
-                minLineWidth: props.minLineWidth,
-                maxLineWidth: props.maxLineWidth,
-                minSpeed: props.minSpeed,
-                maxWidthDiffRate: props.maxWidthDiffRate,
-                maxHistoryLength: props.maxHistoryLength
-              });
-              signature === null || signature === void 0 ? null : signature.setOption(options);
-              signature === null || signature === void 0 ? null : signature.onChange((_isEmpty) => {
-                checkAndEmitEmptyStatus();
-              });
-            });
-          }, 300);
-        });
-      });
-      vue.onUnmounted(() => {
-      });
-      return () => {
-        "raw js";
-        const _setTemplateRef = vue.createSharedDataTemplateRefSetter();
-        vue.renderSharedDataEffect(() => {
-          return vue.setSharedDataStyle(__sharedData, 6, [vue.unref(drawableStyle)]);
-        });
-        vue.createSharedDataIf(() => {
-          return vue.setSharedData(__sharedData, 0, vue.toSharedDataBoolean(__props.landscape));
-        }, () => {
-          vue.setSharedDataTemplateRef(__sharedData, 1, (n3) => {
-            _setTemplateRef(n3, signatureLandscapeRef, null, "signatureLandscapeRef");
-          });
-          vue.renderSharedDataEffect(() => {
-            vue.setSharedDataStyle(__sharedData, 2, [vue.unref(landscapeStyle)]);
-            vue.setSharedDataStyle(__sharedData, 3, [vue.unref(landscapeImageStyle)]);
-            vue.setSharedDataAttr(__sharedData, 4, vue.toSharedDataString(vue.unref(url2)));
-          });
-        });
-        vue.setSharedDataTemplateRef(__sharedData, 5, (n4) => {
-          _setTemplateRef(n4, signatureRef, null, "signatureRef");
-        });
-        return __sharedData;
-      };
-    }
-  });
-  const _style_0$2X = {};
-  const __easycom_0$8 = /* @__PURE__ */ _export_sfc(_sfc_main$2$, [["styles", [_style_0$2X]]]);
-  const __className$2Z = "GenSrcPagesBasicComponentsSignatureCard";
-  const _sfc_main$2_ = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
-    __dynamicSharedData: true,
-    __hash: "11651af3",
-    __className: __className$2Z,
-    __filename: "src/pages/basic/components/SignatureCard.uvue",
-    __name: "SignatureCard",
-    setup(__props) {
-      const __sharedDataScope = vue.useSharedDataScope();
-      const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesBasicComponentsSignatureCardSharedData", sharedDataClassId: 0 })));
-      let sigInstance = null;
-      function onSigRef(el = null) {
-        sigInstance = el;
-      }
-      const penColor = vue.ref("red");
-      const penSize = vue.ref(4);
-      const openSmooth = vue.ref(true);
-      const signUrl = vue.ref("");
-      const colorList = ["#ef4444", "#000000", "#3b82f6", "#10b981", "#f59e0b"];
-      const penSizeOptions = [1, 3, 5, 8, 12];
-      function onAction(type) {
-        const el = sigInstance;
-        if (el == null) {
-          uni.showToast({ title: "签名组件未就绪", icon: "none" });
-          return null;
-        }
-        if (type === "clear") {
-          el.clear();
-          signUrl.value = "";
-        } else if (type === "undo") {
-          el.undo();
-        } else if (type === "redo") {
-          el.redo();
-        } else if (type === "save") {
-          el.canvasToTempFilePath(new LimeSignatureToTempFilePathOptions({
-            complete: null,
-            format: null,
-            success: (res) => {
-              if (res.isEmpty) {
-                uni.showToast({ title: "请先签名", icon: "none" });
-                return null;
-              }
-              signUrl.value = res.tempFilePath;
-              uni.showToast({ title: "签名保存成功", icon: "success" });
-            },
-            fail: (_err = null) => {
-              uni.showToast({ title: "保存失败", icon: "error" });
-            }
-          }));
-        }
-      }
-      return () => {
-        "raw js";
-        const _setTemplateRef = vue.createSharedDataTemplateRefSetter();
-        const _component_l_signature = __easycom_0$8;
         const n34 = vue.createSharedDataComponent(Card, {
           title: () => {
-            return "签名板 lime-signature";
+            return "系统与安全区域信息";
           },
           __cid: () => {
-            return "86f131d2";
+            return "e90ea59a";
           }
         }, {
-          "default": vue.withSharedDataVaporCtx(() => {
-            const n0 = vue.createSharedDataComponentWithFallback(_component_l_signature, {
-              "pen-color": () => {
-                return penColor.value;
-              },
-              "pen-size": () => {
-                return penSize.value;
-              },
-              "open-smooth": () => {
-                return openSmooth.value;
-              },
-              "disable-scroll": () => {
-                return "";
-              },
-              "background-color": () => {
-                return "#ffffff";
-              },
-              __cid: () => {
-                return "8f6c008e";
-              }
-            });
-            vue.setSharedData(__sharedData, 3, n0 == null ? void 0 : n0.sharedData);
-            vue.setSharedDataEvent(__sharedData, 6, () => {
-              return onAction("save");
-            });
-            vue.setSharedDataEvent(__sharedData, 7, () => {
-              return onAction("undo");
-            });
-            vue.setSharedDataEvent(__sharedData, 8, () => {
-              return onAction("redo");
-            });
-            vue.setSharedDataEvent(__sharedData, 9, () => {
-              return onAction("clear");
-            });
+          "default": () => {
             vue.renderSharedDataEffect(() => {
-              return _setTemplateRef(n0, onSigRef);
+              vue.setSharedData(__sharedData, 1, vue.toDisplayString(safeAreaTop.value));
+              vue.setSharedData(__sharedData, 2, vue.toDisplayString(safeAreaBottom.value));
+              vue.setSharedData(__sharedData, 3, vue.toDisplayString(safeAreaLeft.value));
+              vue.setSharedData(__sharedData, 4, vue.toDisplayString(safeAreaRight.value));
+              vue.setSharedData(__sharedData, 5, vue.toDisplayString(screenWidth.value));
+              vue.setSharedData(__sharedData, 6, vue.toDisplayString(screenHeight.value));
+              vue.setSharedData(__sharedData, 7, vue.toDisplayString(windowWidth.value));
+              vue.setSharedData(__sharedData, 8, vue.toDisplayString(windowHeight.value));
+              vue.setSharedData(__sharedData, 9, vue.toDisplayString(statusBarHeight.value));
+              vue.setSharedData(__sharedData, 10, vue.toDisplayString(pixelRatio.value));
             });
-            vue.createSharedDataFor(vue.setSharedData(__sharedData, 4, vue.createSharedDataVFor(__sharedDataScope, () => {
-              return new UniDynamicSharedData(__sharedDataScope, { bundleKey: "".concat(__className$2Z, "SharedData"), sharedDataClassId: 1 });
-            })), () => {
-              return colorList;
-            }, (__sharedData_VFor0, _for_item0) => {
-              vue.setSharedDataEvent(__sharedData_VFor0, 1, () => {
-                return penColor.value = _for_item0.value;
-              });
-              vue.renderSharedDataEffect(() => {
-                const _clr = _for_item0.value;
-                vue.setSharedDataStyle(__sharedData_VFor0, 2, {
-                  backgroundColor: _clr,
-                  borderColor: penColor.value === _clr ? "#1e293b" : "transparent"
-                });
-              });
-              return null;
-            }, (__sharedData_VFor0, clr) => {
-              return vue.setSharedData(__sharedData_VFor0, 0, vue.toDisplayString(clr));
-            }, 1);
-            vue.renderSharedDataEffect(() => {
-              return vue.setSharedData(__sharedData, 10, vue.toDisplayString(penSize.value));
-            });
-            const _selector23_0 = vue.createSharedDataSelector(() => {
-              return penSize.value;
-            });
-            const _selector23_1 = vue.createSharedDataSelector(() => {
-              return penSize.value;
-            });
-            const n23 = vue.createSharedDataFor(vue.setSharedData(__sharedData, 5, vue.createSharedDataVFor(__sharedDataScope, () => {
-              return new UniDynamicSharedData(__sharedDataScope, { bundleKey: "".concat(__className$2Z, "SharedData"), sharedDataClassId: 2 });
-            })), () => {
-              return penSizeOptions;
-            }, (__sharedData_VFor1, _for_item1, _for_key1) => {
-              vue.setSharedDataEvent(__sharedData_VFor1, 1, () => {
-                return penSize.value = _for_item1.value;
-              });
-              vue.renderSharedDataEffect(() => {
-                vue.setSharedDataClass(__sharedData_VFor1, 2, ["flex-1 h-32px rounded-6px flex flex-row items-center justify-center", _for_key1.value < penSizeOptions.length - 1 ? "mr-6px" : ""]);
-                vue.setSharedData(__sharedData_VFor1, 5, vue.toDisplayString(_for_item1.value));
-              });
-              _selector23_0(_for_item1.value, () => {
-                vue.setSharedDataStyle(__sharedData_VFor1, 3, { backgroundColor: penSize.value === _for_item1.value ? "#3b82f6" : "#e2e8f0" });
-              });
-              _selector23_1(_for_item1.value, () => {
-                vue.setSharedDataStyle(__sharedData_VFor1, 4, { color: penSize.value === _for_item1.value ? "#ffffff" : "#475569" });
-              });
-              return null;
-            }, (__sharedData_VFor1, sz, _j) => {
-              return vue.setSharedData(__sharedData_VFor1, 0, vue.toDisplayString(sz));
-            }, 1);
-            n23.onReset(_selector23_0.reset);
-            n23.onReset(_selector23_1.reset);
-            vue.createSharedDataIf(() => {
-              return vue.setSharedData(__sharedData, 1, vue.toSharedDataBoolean(signUrl.value !== ""));
-            }, () => {
-              vue.renderSharedDataEffect(() => {
-                return vue.setSharedDataAttr(__sharedData, 2, vue.toSharedDataString(signUrl.value));
-              });
-            });
-          })
+          }
         }, true);
         vue.setSharedData(__sharedData, 0, n34.sharedData);
         return __sharedData;
       };
     }
   });
+  const _style_0$2Z = {};
+  const SystemInfoDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main$32, [["styles", [_style_0$2Z]]]);
+  const __className$30 = "GenSrcPagesBasicComponentsUViewUltraDemoCard";
+  const _sfc_main$31 = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
+    __dynamicSharedData: true,
+    __hash: "a6d44598",
+    __className: __className$30,
+    __filename: "src/pages/basic/components/UViewUltraDemoCard.uvue",
+    __name: "UViewUltraDemoCard",
+    setup(__props) {
+      const __sharedDataScope = vue.useSharedDataScope();
+      const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesBasicComponentsUViewUltraDemoCardSharedData", sharedDataClassId: 0 })));
+      function copyWebsiteUrl() {
+        uni.setClipboardData({
+          data: "https://uview-ultra.lingyun.net/",
+          success: () => {
+            uni.showToast({
+              title: "官网网址已复制到剪贴板",
+              icon: "none"
+            });
+          }
+        });
+      }
+      function navigateToShowcase() {
+        uni.navigateTo({
+          url: "/src/sub/uview-ultra/uview-ultra",
+          fail: (err) => {
+            uni.__log__("error", "at src/pages/basic/components/UViewUltraDemoCard.uvue:58", "navigateToShowcase fail:", err);
+          }
+        });
+      }
+      return () => {
+        "raw js";
+        const n15 = vue.createSharedDataComponent(Card, {
+          title: () => {
+            return "uview-ultra 组件库";
+          },
+          __cid: () => {
+            return "169f0af0";
+          }
+        }, {
+          "default": () => {
+            vue.setSharedDataEvent(__sharedData, 1, copyWebsiteUrl);
+            vue.setSharedDataEvent(__sharedData, 2, navigateToShowcase);
+          }
+        }, true);
+        vue.setSharedData(__sharedData, 0, n15.sharedData);
+        return __sharedData;
+      };
+    }
+  });
+  const _style_0$2Y = {};
+  const UViewUltraDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main$31, [["styles", [_style_0$2Y]]]);
+  const __className$2$ = "GenSrcPagesBasicBasic";
+  const _sfc_main$30 = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
+    __dynamicSharedData: true,
+    __hash: "20d544b4",
+    __className: __className$2$,
+    __filename: "src/pages/basic/basic.uvue",
+    __name: "basic",
+    setup(__props) {
+      const __sharedDataRenderer = vue.useSharedDataRenderer();
+      const __sharedData = __sharedDataRenderer == "component" ? vue.withSharedDataComponent(new UniDynamicSharedDataComponent(vue.useSharedDataScope(), vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesBasicBasicSharedData", sharedDataClassId: 0 }))) : vue.withSharedDataPage(new UniDynamicSharedDataPage(vue.useSharedDataPageId(), vue.useSharedDataPageOptions({ bundleKey: "GenSrcPagesBasicBasicSharedData", sharedDataClassId: 0 })));
+      vue.useSharedDataScope(__sharedData);
+      vue.onBackPress((options) => {
+        if (options.from == "backbutton") {
+          return handleBackPressExit();
+        }
+        return false;
+      });
+      vue.onResize(() => {
+        updateSystemInfo();
+      });
+      return () => {
+        "raw js";
+        const n10 = vue.createSharedDataComponent(_sfc_main$3f, { __cid: () => {
+          return "56ab5a5a";
+        } }, {
+          "default": vue.withSharedDataVaporCtx(() => {
+            const n0 = vue.createSharedDataComponent(UViewUltraDemoCard, { __cid: () => {
+              return "5360e8b4";
+            } });
+            vue.setSharedData(__sharedData, 1, n0.sharedData);
+            const n1 = vue.createSharedDataComponent(PropsDemoCard, { __cid: () => {
+              return "5360e971";
+            } });
+            vue.setSharedData(__sharedData, 2, n1.sharedData);
+            const n2 = vue.createSharedDataComponent(SystemInfoDemoCard, { __cid: () => {
+              return "5360ec99";
+            } });
+            vue.setSharedData(__sharedData, 3, n2.sharedData);
+            const n3 = vue.createSharedDataComponent(IconDemoCard, { __cid: () => {
+              return "5360ed50";
+            } });
+            vue.setSharedData(__sharedData, 4, n3.sharedData);
+            const n4 = vue.createSharedDataComponent(LangSwitchCard, { __cid: () => {
+              return "5360f078";
+            } });
+            vue.setSharedData(__sharedData, 5, n4.sharedData);
+            const n5 = vue.createSharedDataComponent(ThemeSwitchCard, { __cid: () => {
+              return "5360f12b";
+            } });
+            vue.setSharedData(__sharedData, 6, n5.sharedData);
+            const n6 = vue.createSharedDataComponent(RouterDemoCard, { __cid: () => {
+              return "5360f457";
+            } });
+            vue.setSharedData(__sharedData, 7, n6.sharedData);
+            const n7 = vue.createSharedDataComponent(HttpDemoCard, { __cid: () => {
+              return "5360f799";
+            } });
+            vue.setSharedData(__sharedData, 8, n7.sharedData);
+          })
+        });
+        vue.setSharedData(__sharedData, 0, n10.sharedData);
+        return __sharedData;
+      };
+    }
+  });
+  const _style_0$2X = {};
+  const SrcPagesBasicBasic = /* @__PURE__ */ _export_sfc(_sfc_main$30, [["styles", [_style_0$2X]]]);
+  class EnvConfig extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            name: { type: String, optional: false },
+            baseURL: { type: String, optional: false }
+          };
+        },
+        name: "EnvConfig"
+      };
+    }
+    constructor(options, metadata = EnvConfig.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.name = this.__props__.name;
+      this.baseURL = this.__props__.baseURL;
+      delete this.__props__;
+    }
+  }
+  const devConfig = new EnvConfig({
+    name: "开发环境",
+    baseURL: "https://ukw0y1.laf.run"
+  });
+  const testConfig = new EnvConfig({
+    name: "测试环境",
+    baseURL: "https://ukw0y1.laf.run"
+  });
+  const prodConfig = new EnvConfig(
+    {
+      name: "生产环境",
+      baseURL: "https://ukw0y1.laf.run"
+    }
+    // ----- 编译期自动识别 -----
+    // uni-app X 中：HBuilderX「运行」→ 'development'，「发行」→ 'production'
+  );
+  const systemEnv = "development";
+  let overrideEnv = null;
+  function getSystemEnv() {
+    return systemEnv;
+  }
+  function getCurrentEnv() {
+    const env = overrideEnv;
+    if (env != null) {
+      return env;
+    }
+    return systemEnv;
+  }
+  function setCurrentEnv(env) {
+    overrideEnv = env;
+  }
+  function resetEnv() {
+    overrideEnv = null;
+  }
+  function getEnvConfigFor(env) {
+    if (env === "test") {
+      return testConfig;
+    }
+    if (env === "production") {
+      return prodConfig;
+    }
+    return devConfig;
+  }
+  function getEnvLabel(type) {
+    if (type === "development") {
+      return "开发";
+    }
+    if (type === "test") {
+      return "测试";
+    }
+    if (type === "production") {
+      return "生产";
+    }
+    return "未知";
+  }
+  const __className$2_ = "GenSrcPagesFunctionComponentsEnvCard";
+  const COLOR_DEV = "#10b981";
+  const COLOR_TEST = "#f59e0b";
+  const COLOR_PROD = "#ef4444";
+  const COLOR_BG = "#e2e8f0";
+  const COLOR_WHITE = "#ffffff";
+  const COLOR_DARK = "#475569";
+  const _sfc_main$2$ = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
+    __dynamicSharedData: true,
+    __hash: "4ed548ae",
+    __className: __className$2_,
+    __filename: "src/pages/function/components/EnvCard.uvue",
+    __name: "EnvCard",
+    setup(__props) {
+      const __sharedDataScope = vue.useSharedDataScope();
+      const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesFunctionComponentsEnvCardSharedData", sharedDataClassId: 0 })));
+      const systemEnv2 = getSystemEnv();
+      const systemEnvLabel = vue.computed(() => {
+        return "开发";
+      });
+      const currentEnv = vue.ref(getCurrentEnv());
+      const isOverridden = vue.computed(() => {
+        return currentEnv.value !== systemEnv2;
+      });
+      const currentEnvLabel = vue.computed(() => {
+        return getEnvLabel(currentEnv.value);
+      });
+      const envColor = vue.computed(() => {
+        if (currentEnv.value === "development") {
+          return COLOR_DEV;
+        }
+        if (currentEnv.value === "test") {
+          return COLOR_TEST;
+        }
+        return COLOR_PROD;
+      });
+      const envConfig = vue.computed(() => {
+        return getEnvConfigFor(currentEnv.value);
+      });
+      const devBtnBg = vue.computed(() => {
+        return currentEnv.value === "development" ? COLOR_DEV : COLOR_BG;
+      });
+      const devBtnText = vue.computed(() => {
+        return currentEnv.value === "development" ? COLOR_WHITE : COLOR_DARK;
+      });
+      const testBtnBg = vue.computed(() => {
+        return currentEnv.value === "test" ? COLOR_TEST : COLOR_BG;
+      });
+      const testBtnText = vue.computed(() => {
+        return currentEnv.value === "test" ? COLOR_WHITE : COLOR_DARK;
+      });
+      const prodBtnBg = vue.computed(() => {
+        return currentEnv.value === "production" ? COLOR_PROD : COLOR_BG;
+      });
+      const prodBtnText = vue.computed(() => {
+        return currentEnv.value === "production" ? COLOR_WHITE : COLOR_DARK;
+      });
+      function switchEnv(type) {
+        const env = type;
+        setCurrentEnv(env);
+        currentEnv.value = env;
+        const label = getEnvLabel(env);
+        uni.showToast({
+          title: "已切换至".concat(label, "环境"),
+          icon: "none",
+          duration: 1500
+        });
+      }
+      function handleReset() {
+        resetEnv();
+        currentEnv.value = systemEnv2;
+        uni.showToast({
+          title: "已重置为系统默认环境",
+          icon: "none",
+          duration: 1500
+        });
+      }
+      return () => {
+        "raw js";
+        const n24 = vue.createSharedDataComponent(Card, {
+          title: () => {
+            return "环境变量";
+          },
+          __cid: () => {
+            return "5df1cdee";
+          }
+        }, {
+          "default": () => {
+            vue.setSharedDataEvent(__sharedData, 1, () => {
+              return switchEnv("development");
+            });
+            vue.setSharedDataEvent(__sharedData, 2, () => {
+              return switchEnv("test");
+            });
+            vue.setSharedDataEvent(__sharedData, 3, () => {
+              return switchEnv("production");
+            });
+            vue.setSharedDataEvent(__sharedData, 4, handleReset);
+            vue.renderSharedDataEffect(() => {
+              vue.setSharedData(__sharedData, 5, vue.toDisplayString(systemEnvLabel.value));
+              vue.setSharedDataStyle(__sharedData, 6, { color: envColor.value });
+              vue.setSharedData(__sharedData, 7, vue.toDisplayString(currentEnvLabel.value));
+              vue.setSharedData(__sharedData, 8, vue.toDisplayString(envConfig.value.baseURL));
+              vue.setSharedData(__sharedData, 9, vue.toDisplayString(isOverridden.value ? "是" : "否"));
+              vue.setSharedDataStyle(__sharedData, 10, { backgroundColor: devBtnBg.value });
+              vue.setSharedDataStyle(__sharedData, 11, { color: devBtnText.value });
+              vue.setSharedDataStyle(__sharedData, 12, { backgroundColor: testBtnBg.value });
+              vue.setSharedDataStyle(__sharedData, 13, { color: testBtnText.value });
+              vue.setSharedDataStyle(__sharedData, 14, { backgroundColor: prodBtnBg.value });
+              vue.setSharedDataStyle(__sharedData, 15, { color: prodBtnText.value });
+            });
+          }
+        }, true);
+        vue.setSharedData(__sharedData, 0, n24.sharedData);
+        return __sharedData;
+      };
+    }
+  });
   const _style_0$2W = {};
-  const SignatureCard = /* @__PURE__ */ _export_sfc(_sfc_main$2_, [["styles", [_style_0$2W]]]);
+  const EnvCard = /* @__PURE__ */ _export_sfc(_sfc_main$2$, [["styles", [_style_0$2W]]]);
+  const __className$2Z = "GenSrcPagesFunctionComponentsSystemInfoCard";
+  const _sfc_main$2_ = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
+    __dynamicSharedData: true,
+    __hash: "367f9891",
+    __className: __className$2Z,
+    __filename: "src/pages/function/components/SystemInfoCard.uvue",
+    __name: "SystemInfoCard",
+    setup(__props) {
+      const __sharedDataScope = vue.useSharedDataScope();
+      const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesFunctionComponentsSystemInfoCardSharedData", sharedDataClassId: 0 })));
+      const sysBrand = vue.ref("");
+      const sysModel = vue.ref("");
+      const sysSystem = vue.ref("");
+      const sysPlatform = vue.ref("");
+      function fetchSystemInfo() {
+        var _a2, _b2, _c, _d;
+        try {
+          const info = uni.getSystemInfoSync();
+          sysBrand.value = (_a2 = info.brand) !== null && _a2 !== void 0 ? _a2 : "";
+          sysModel.value = (_b2 = info.model) !== null && _b2 !== void 0 ? _b2 : "";
+          sysSystem.value = (_c = info.system) !== null && _c !== void 0 ? _c : "";
+          sysPlatform.value = (_d = info.uniPlatform) !== null && _d !== void 0 ? _d : "";
+        } catch (err) {
+          uni.__log__("error", "at src/pages/function/components/SystemInfoCard.uvue:45", err);
+        }
+      }
+      vue.onMounted(() => {
+        fetchSystemInfo();
+      });
+      return () => {
+        "raw js";
+        const n15 = vue.createSharedDataComponent(Card, {
+          title: () => {
+            return "设备系统信息";
+          },
+          __cid: () => {
+            return "031f20ce";
+          }
+        }, {
+          "default": () => {
+            vue.setSharedDataEvent(__sharedData, 1, fetchSystemInfo);
+            vue.renderSharedDataEffect(() => {
+              const _sysBrand = sysBrand.value;
+              const _sysModel = sysModel.value;
+              const _sysSystem = sysSystem.value;
+              const _sysPlatform = sysPlatform.value;
+              vue.setSharedData(__sharedData, 2, vue.toDisplayString(_sysBrand !== "" ? _sysBrand : "暂无数据"));
+              vue.setSharedData(__sharedData, 3, vue.toDisplayString(_sysModel !== "" ? _sysModel : "暂无数据"));
+              vue.setSharedData(__sharedData, 4, vue.toDisplayString(_sysSystem !== "" ? _sysSystem : "暂无数据"));
+              vue.setSharedData(__sharedData, 5, vue.toDisplayString(_sysPlatform !== "" ? _sysPlatform : "暂无数据"));
+            });
+          }
+        }, true);
+        vue.setSharedData(__sharedData, 0, n15.sharedData);
+        return __sharedData;
+      };
+    }
+  });
+  const _style_0$2V = {};
+  const SystemInfoCard = /* @__PURE__ */ _export_sfc(_sfc_main$2_, [["styles", [_style_0$2V]]]);
+  const __className$2Y = "GenSrcPagesFunctionComponentsHapticsCard";
+  const _sfc_main$2Z = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
+    __dynamicSharedData: true,
+    __hash: "642b45d7",
+    __className: __className$2Y,
+    __filename: "src/pages/function/components/HapticsCard.uvue",
+    __name: "HapticsCard",
+    setup(__props) {
+      const __sharedDataScope = vue.useSharedDataScope();
+      const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesFunctionComponentsHapticsCardSharedData", sharedDataClassId: 0 })));
+      const copyText = vue.ref("Hello unibestX!");
+      function triggerVibration() {
+        uni.vibrateShort({
+          type: "light",
+          success: () => {
+            uni.showToast({ title: "已触发短震动", icon: "none" });
+          },
+          fail: () => {
+            uni.showToast({ title: "震动触发失败", icon: "none" });
+          }
+        });
+      }
+      function handleCopy() {
+        if (copyText.value === "")
+          return null;
+        uni.setClipboardData({
+          data: copyText.value,
+          success: () => {
+            uni.showToast({
+              title: "复制成功",
+              icon: "success"
+            });
+          }
+        });
+      }
+      return () => {
+        "raw js";
+        const _component_input = vue.resolveComponent("input");
+        const n8 = vue.createSharedDataComponent(Card, {
+          title: () => {
+            return "触感与工具";
+          },
+          __cid: () => {
+            return "91c87b06";
+          }
+        }, {
+          "default": vue.withSharedDataVaporCtx(() => {
+            const n1 = vue.createSharedDataComponentWithFallback(_component_input, {
+              modelValue: () => {
+                return copyText.value;
+              },
+              "onUpdate:modelValue": () => {
+                return (_value) => {
+                  return copyText.value = _value;
+                };
+              },
+              placeholder: () => {
+                return "请输入要复制的文本";
+              },
+              class: () => {
+                return "h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-__cbd5e1_ text-14px text-__334155_ mb-12px";
+              },
+              __cid: () => {
+                return "5f35197f";
+              }
+            });
+            vue.setSharedData(__sharedData, 1, n1 == null ? void 0 : n1.sharedData);
+            vue.setSharedDataEvent(__sharedData, 2, handleCopy);
+            vue.setSharedDataEvent(__sharedData, 3, triggerVibration);
+          })
+        }, true);
+        vue.setSharedData(__sharedData, 0, n8.sharedData);
+        return __sharedData;
+      };
+    }
+  });
+  const _style_0$2U = {};
+  const HapticsCard = /* @__PURE__ */ _export_sfc(_sfc_main$2Z, [["styles", [_style_0$2U]]]);
+  const __className$2X = "GenSrcPagesFunctionComponentsMediaCard";
+  const _sfc_main$2Y = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
+    __dynamicSharedData: true,
+    __hash: "e76e5a26",
+    __className: __className$2X,
+    __filename: "src/pages/function/components/MediaCard.uvue",
+    __name: "MediaCard",
+    setup(__props) {
+      const __sharedDataScope = vue.useSharedDataScope();
+      const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesFunctionComponentsMediaCardSharedData", sharedDataClassId: 0 })));
+      const photoUrl = vue.ref("");
+      const scanResult = vue.ref("");
+      function chooseImage() {
+        uni.chooseImage(new UTSJSONObject({
+          count: 1,
+          success: (res) => {
+            const paths = res.tempFilePaths;
+            if (paths.length > 0) {
+              photoUrl.value = paths[0];
+            }
+          },
+          fail: (err) => {
+            uni.__log__("error", "at src/pages/function/components/MediaCard.uvue:39", err);
+          }
+        }));
+      }
+      function scanCode() {
+        uni.scanCode(new UTSJSONObject({
+          success: (res) => {
+            scanResult.value = res.result;
+          },
+          fail: (err) => {
+            uni.__log__("error", "at src/pages/function/components/MediaCard.uvue:50", err);
+          }
+        }));
+      }
+      return () => {
+        "raw js";
+        const n13 = vue.createSharedDataComponent(Card, {
+          title: () => {
+            return "相机与多媒体";
+          },
+          __cid: () => {
+            return "679fa9a5";
+          }
+        }, {
+          "default": () => {
+            vue.createSharedDataIf(() => {
+              return vue.setSharedData(__sharedData, 1, vue.toSharedDataBoolean(photoUrl.value === ""));
+            }, () => {
+            }, () => {
+              vue.renderSharedDataEffect(() => {
+                return vue.setSharedDataAttr(__sharedData, 2, vue.toSharedDataString(photoUrl.value));
+              });
+            });
+            vue.setSharedDataEvent(__sharedData, 3, chooseImage);
+            vue.setSharedDataEvent(__sharedData, 4, scanCode);
+            vue.renderSharedDataEffect(() => {
+              const _scanResult = scanResult.value;
+              vue.setSharedData(__sharedData, 5, vue.toDisplayString(_scanResult !== "" ? _scanResult : "暂无数据"));
+            });
+          }
+        }, true);
+        vue.setSharedData(__sharedData, 0, n13.sharedData);
+        return __sharedData;
+      };
+    }
+  });
+  const _style_0$2T = {};
+  const MediaCard = /* @__PURE__ */ _export_sfc(_sfc_main$2Y, [["styles", [_style_0$2T]]]);
   function uniq(array2) {
     let index = -1;
     const length = array2.length;
@@ -14950,16 +13082,16 @@
     const max = Math.max(lower, upper);
     return Math.floor(min + Math.random() * (max - min + 1));
   }
-  const __className$2Y = "GenSrcPagesBasicComponentsLodashDemoCard";
-  const _sfc_main$2Z = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
+  const __className$2W = "GenSrcPagesFunctionComponentsLodashDemoCard";
+  const _sfc_main$2X = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
     __dynamicSharedData: true,
-    __hash: "3ffd3e9f",
-    __className: __className$2Y,
-    __filename: "src/pages/basic/components/LodashDemoCard.uvue",
+    __hash: "0c9698c6",
+    __className: __className$2W,
+    __filename: "src/pages/function/components/LodashDemoCard.uvue",
     __name: "LodashDemoCard",
     setup(__props) {
       const __sharedDataScope = vue.useSharedDataScope();
-      const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesBasicComponentsLodashDemoCardSharedData", sharedDataClassId: 0 })));
+      const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesFunctionComponentsLodashDemoCardSharedData", sharedDataClassId: 0 })));
       const rawArray = vue.ref([1, 2, 2, 3, 4, 4, 5, 6, 7, 8]);
       const uniqArray = vue.computed(() => {
         return uniq(rawArray.value);
@@ -15029,7 +13161,7 @@
             return "Lodash 工具库 (iRainna-lodash)";
           },
           __cid: () => {
-            return "6b0acc4b";
+            return "772f6fae";
           }
         }, {
           "default": vue.withSharedDataVaporCtx(() => {
@@ -15061,7 +13193,7 @@
                 return "请输入待转换文本";
               },
               __cid: () => {
-                return "c4d6d3fa";
+                return "23662565";
               }
             });
             vue.setSharedData(__sharedData, 1, n33 == null ? void 0 : n33.sharedData);
@@ -15081,8 +13213,8 @@
       };
     }
   });
-  const _style_0$2V = {};
-  const LodashDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main$2Z, [["styles", [_style_0$2V]]]);
+  const _style_0$2S = {};
+  const LodashDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main$2X, [["styles", [_style_0$2S]]]);
   class RsaPublicKey extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -16736,16 +14868,16 @@
     }
     return s;
   }
-  const __className$2X = "GenSrcPagesBasicComponentsCryptoDemoCard";
-  const _sfc_main$2Y = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
+  const __className$2V = "GenSrcPagesFunctionComponentsCryptoDemoCard";
+  const _sfc_main$2W = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
     __dynamicSharedData: true,
-    __hash: "2500fcad",
-    __className: __className$2X,
-    __filename: "src/pages/basic/components/CryptoDemoCard.uvue",
+    __hash: "19977b3a",
+    __className: __className$2V,
+    __filename: "src/pages/function/components/CryptoDemoCard.uvue",
     __name: "CryptoDemoCard",
     setup(__props) {
       const __sharedDataScope = vue.useSharedDataScope();
-      const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesBasicComponentsCryptoDemoCardSharedData", sharedDataClassId: 0 })));
+      const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesFunctionComponentsCryptoDemoCardSharedData", sharedDataClassId: 0 })));
       const base64Input = vue.ref("hello uni-app x");
       const base64EncodeResult = vue.ref("");
       const base64DecodeResult = vue.ref("");
@@ -16879,7 +15011,7 @@
                 rsaPrivateKey.value = pri;
               }
             } catch (err) {
-              uni.__log__("error", "at src/pages/basic/components/CryptoDemoCard.uvue:374", "Failed to parse RSA keypair:", err);
+              uni.__log__("error", "at src/pages/function/components/CryptoDemoCard.uvue:374", "Failed to parse RSA keypair:", err);
             }
           } catch (e) {
             rsaKeyPairResult.value = errorMessage(e);
@@ -16937,7 +15069,7 @@
             return "加密解密工具 (crypto)";
           },
           __cid: () => {
-            return "254db277";
+            return "7eab2e55";
           }
         }, {
           "default": vue.withSharedDataVaporCtx(() => {
@@ -16957,7 +15089,7 @@
                 return "h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-__cbd5e1_ text-13px text-__334155_ mb-12px";
               },
               __cid: () => {
-                return "08aaf3b1";
+                return "fece1fe2";
               }
             });
             vue.setSharedData(__sharedData, 1, n1 == null ? void 0 : n1.sharedData);
@@ -16983,7 +15115,7 @@
                 return "h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-__cbd5e1_ text-13px text-__334155_ mb-12px";
               },
               __cid: () => {
-                return "0cb30ea4";
+                return "daf6c3f4";
               }
             });
             vue.setSharedData(__sharedData, 2, n14 == null ? void 0 : n14.sharedData);
@@ -17009,7 +15141,7 @@
                 return "h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-__cbd5e1_ text-13px text-__334155_ mb-8px";
               },
               __cid: () => {
-                return "0cb38edb";
+                return "daf5c386";
               }
             });
             vue.setSharedData(__sharedData, 3, n27 == null ? void 0 : n27.sharedData);
@@ -17029,7 +15161,7 @@
                 return "h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-__cbd5e1_ text-13px text-__334155_ mb-12px";
               },
               __cid: () => {
-                return "0cb3e7ff";
+                return "daf5113e";
               }
             });
             vue.setSharedData(__sharedData, 4, n28 == null ? void 0 : n28.sharedData);
@@ -17053,7 +15185,7 @@
                 return "h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-__cbd5e1_ text-13px text-__334155_ mb-8px";
               },
               __cid: () => {
-                return "0cb454fb";
+                return "daf43746";
               }
             });
             vue.setSharedData(__sharedData, 5, n35 == null ? void 0 : n35.sharedData);
@@ -17073,7 +15205,7 @@
                 return "h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-__cbd5e1_ text-13px text-__334155_ mb-12px";
               },
               __cid: () => {
-                return "0cb45cbe";
+                return "daf427c0";
               }
             });
             vue.setSharedData(__sharedData, 6, n36 == null ? void 0 : n36.sharedData);
@@ -17099,7 +15231,7 @@
                 return "h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-__cbd5e1_ text-13px text-__334155_ mb-8px";
               },
               __cid: () => {
-                return "0cb4dfbc";
+                return "daf321c4";
               }
             });
             vue.setSharedData(__sharedData, 7, n49 == null ? void 0 : n49.sharedData);
@@ -17119,7 +15251,7 @@
                 return "h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-__cbd5e1_ text-13px text-__334155_ mb-12px";
               },
               __cid: () => {
-                return "0cb4e77f";
+                return "daf3123e";
               }
             });
             vue.setSharedData(__sharedData, 8, n50 == null ? void 0 : n50.sharedData);
@@ -17145,7 +15277,7 @@
                 return "h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-__cbd5e1_ text-13px text-__334155_ mb-8px";
               },
               __cid: () => {
-                return "0cb5b979";
+                return "daf16e4a";
               }
             });
             vue.setSharedData(__sharedData, 9, n63 == null ? void 0 : n63.sharedData);
@@ -17167,7 +15299,7 @@
                 return "h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-__cbd5e1_ text-13px text-__334155_ mb-8px";
               },
               __cid: () => {
-                return "0cb5d43e";
+                return "daf138c0";
               }
             });
             vue.setSharedData(__sharedData, 10, n69 == null ? void 0 : n69.sharedData);
@@ -17187,7 +15319,7 @@
                 return "h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-__cbd5e1_ text-13px text-__334155_ mb-12px";
               },
               __cid: () => {
-                return "0cb62dbe";
+                return "daf085c0";
               }
             });
             vue.setSharedData(__sharedData, 11, n70 == null ? void 0 : n70.sharedData);
@@ -17210,96 +15342,2486 @@
       };
     }
   });
-  const _style_0$2U = {};
-  const CryptoDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main$2Y, [["styles", [_style_0$2U]]]);
-  const __className$2W = "GenSrcPagesBasicComponentsSystemInfoDemoCard";
-  const _sfc_main$2X = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
+  const _style_0$2R = {};
+  const CryptoDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main$2W, [["styles", [_style_0$2R]]]);
+  class DayutsConfig extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            date: { type: "Any", optional: true },
+            format: { type: String, optional: true },
+            locale: { type: String, optional: true }
+          };
+        },
+        name: "DayutsConfig"
+      };
+    }
+    constructor(options, metadata = DayutsConfig.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.date = this.__props__.date;
+      this.format = this.__props__.format;
+      this.locale = this.__props__.locale;
+      delete this.__props__;
+    }
+  }
+  class DayutsFormats extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            LT: { type: String, optional: false },
+            LTS: { type: String, optional: false },
+            L: { type: String, optional: false },
+            LL: { type: String, optional: false },
+            LLL: { type: String, optional: false },
+            LLLL: { type: String, optional: false },
+            l: { type: String, optional: false },
+            ll: { type: String, optional: false },
+            lll: { type: String, optional: false },
+            llll: { type: String, optional: false }
+          };
+        },
+        name: "DayutsFormats"
+      };
+    }
+    constructor(options, metadata = DayutsFormats.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.LT = this.__props__.LT;
+      this.LTS = this.__props__.LTS;
+      this.L = this.__props__.L;
+      this.LL = this.__props__.LL;
+      this.LLL = this.__props__.LLL;
+      this.LLLL = this.__props__.LLLL;
+      this.l = this.__props__.l;
+      this.ll = this.__props__.ll;
+      this.lll = this.__props__.lll;
+      this.llll = this.__props__.llll;
+      delete this.__props__;
+    }
+  }
+  class DayutsRelativeTime extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            future: { type: String, optional: false },
+            past: { type: String, optional: false },
+            s: { type: String, optional: false },
+            m: { type: String, optional: false },
+            mm: { type: String, optional: false },
+            h: { type: String, optional: false },
+            hh: { type: String, optional: false },
+            d: { type: String, optional: false },
+            dd: { type: String, optional: false },
+            M: { type: String, optional: false },
+            MM: { type: String, optional: false },
+            y: { type: String, optional: false },
+            yy: { type: String, optional: false }
+          };
+        },
+        name: "DayutsRelativeTime"
+      };
+    }
+    constructor(options, metadata = DayutsRelativeTime.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.future = this.__props__.future;
+      this.past = this.__props__.past;
+      this.s = this.__props__.s;
+      this.m = this.__props__.m;
+      this.mm = this.__props__.mm;
+      this.h = this.__props__.h;
+      this.hh = this.__props__.hh;
+      this.d = this.__props__.d;
+      this.dd = this.__props__.dd;
+      this.M = this.__props__.M;
+      this.MM = this.__props__.MM;
+      this.y = this.__props__.y;
+      this.yy = this.__props__.yy;
+      delete this.__props__;
+    }
+  }
+  let DayutsLocale$1 = class DayutsLocale2 extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            name: { type: String, optional: false },
+            weekdays: { type: UTS.UTSType.withGenerics(Array, [String]), optional: false },
+            weekdaysShort: { type: UTS.UTSType.withGenerics(Array, [String]), optional: true },
+            weekdaysMin: { type: UTS.UTSType.withGenerics(Array, [String]), optional: true },
+            months: { type: UTS.UTSType.withGenerics(Array, [String]), optional: false },
+            monthsShort: { type: UTS.UTSType.withGenerics(Array, [String]), optional: true },
+            ordinal: { type: "Unknown", optional: false },
+            weekStart: { type: Number, optional: true },
+            yearStart: { type: Number, optional: true },
+            formats: { type: DayutsFormats, optional: true },
+            relativeTime: { type: DayutsRelativeTime, optional: true },
+            meridiem: { type: "Unknown", optional: true }
+          };
+        },
+        name: "DayutsLocale"
+      };
+    }
+    constructor(options, metadata = DayutsLocale2.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.name = this.__props__.name;
+      this.weekdays = this.__props__.weekdays;
+      this.weekdaysShort = this.__props__.weekdaysShort;
+      this.weekdaysMin = this.__props__.weekdaysMin;
+      this.months = this.__props__.months;
+      this.monthsShort = this.__props__.monthsShort;
+      this.ordinal = this.__props__.ordinal;
+      this.weekStart = this.__props__.weekStart;
+      this.yearStart = this.__props__.yearStart;
+      this.formats = this.__props__.formats;
+      this.relativeTime = this.__props__.relativeTime;
+      this.meridiem = this.__props__.meridiem;
+      delete this.__props__;
+    }
+  };
+  class DayutsObject extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            years: { type: Number, optional: false },
+            months: { type: Number, optional: false },
+            date: { type: Number, optional: false },
+            hours: { type: Number, optional: false },
+            minutes: { type: Number, optional: false },
+            seconds: { type: Number, optional: false },
+            milliseconds: { type: Number, optional: false }
+          };
+        },
+        name: "DayutsObject"
+      };
+    }
+    constructor(options, metadata = DayutsObject.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.years = this.__props__.years;
+      this.months = this.__props__.months;
+      this.date = this.__props__.date;
+      this.hours = this.__props__.hours;
+      this.minutes = this.__props__.minutes;
+      this.seconds = this.__props__.seconds;
+      this.milliseconds = this.__props__.milliseconds;
+      delete this.__props__;
+    }
+  }
+  const SECONDS_A_MINUTE = 60;
+  const SECONDS_A_HOUR = SECONDS_A_MINUTE * 60;
+  const SECONDS_A_DAY = SECONDS_A_HOUR * 24;
+  const SECONDS_A_WEEK = SECONDS_A_DAY * 7;
+  const MILLISECONDS_A_SECOND = 1e3;
+  const MILLISECONDS_A_MINUTE = SECONDS_A_MINUTE * MILLISECONDS_A_SECOND;
+  const MILLISECONDS_A_HOUR = SECONDS_A_HOUR * MILLISECONDS_A_SECOND;
+  const MILLISECONDS_A_DAY = SECONDS_A_DAY * MILLISECONDS_A_SECOND;
+  const MILLISECONDS_A_WEEK = SECONDS_A_WEEK * MILLISECONDS_A_SECOND;
+  const MS = "millisecond";
+  const S = "second";
+  const MIN = "minute";
+  const H = "hour";
+  const D = "day";
+  const W = "week";
+  const M = "month";
+  const Q = "quarter";
+  const Y = "year";
+  const DATE = "date";
+  const FORMAT_DEFAULT = "YYYY-MM-DDTHH:mm:ssZ";
+  const INVALID_DATE_STRING = "Invalid Date";
+  const REGEX_PARSE = /^(\d{4})[-/]?(\d{1,2})?[-/]?(\d{0,2})[Tt\s]*(\d{1,2})?:?(\d{1,2})?:?(\d{1,2})?[.:]?(\d+)?$/;
+  const REGEX_FORMAT = /\[([^\]]+)]|Y{1,4}|M{1,4}|D{1,2}|d{1,4}|H{1,2}|h{1,2}|a|A|m{1,2}|s{1,2}|Z{1,2}|SSS/g;
+  function padStart(string2, length, pad) {
+    const str = string2;
+    if (str.length >= length)
+      return str;
+    return str.padStart(length, pad);
+  }
+  function padZoneStr(instance) {
+    const negMinutes = -instance.utcOffset();
+    const minutes = Math.abs(negMinutes);
+    const hourOffset = Math.floor(minutes / 60);
+    const minuteOffset = minutes % 60;
+    return "".concat(negMinutes <= 0 ? "+" : "-").concat(padStart(hourOffset.toString(), 2, "0"), ":").concat(padStart(minuteOffset.toString(), 2, "0"));
+  }
+  function isNumber(value) {
+    return ["Int8", "UInt8", "Int16", "UInt16", "Int32", "UInt32", "Int64", "UInt64", "Int", "UInt", "Float", "Float16", "Float32", "Float64", "Double", "number"].includes(typeof value);
+  }
+  function prettyUnit(u) {
+    var _a2;
+    const special = /* @__PURE__ */ new Map([
+      ["M", M],
+      ["y", Y],
+      ["w", W],
+      ["d", D],
+      ["D", DATE],
+      ["h", H],
+      ["m", MIN],
+      ["s", S],
+      ["ms", MS],
+      ["Q", Q]
+    ]);
+    return (_a2 = special.get(u)) !== null && _a2 !== void 0 ? _a2 : "".concat(u).toLowerCase().replace(/s$/, "");
+  }
+  function monthDiff(a, b) {
+    if (a.date() < b.date())
+      return -monthDiff(b, a);
+    const wholeMonthDiff = (b.year() - a.year()) * 12 + (b.month() - a.month());
+    const anchor2 = a.clone().add(wholeMonthDiff, M).valueOf();
+    const c = b.valueOf() - anchor2 < 0;
+    const anchor22 = a.clone().add(wholeMonthDiff + (c ? -1 : 1), M).valueOf();
+    const decimalMonthDiff = (b.valueOf() - anchor2) / (c ? anchor2 - anchor22 : anchor22 - anchor2);
+    const result = wholeMonthDiff + decimalMonthDiff;
+    const negatedResult = -result;
+    const absResult = +negatedResult;
+    const finalResult = !isNaN(absResult) ? absResult : 0;
+    return finalResult;
+  }
+  function absFloor(n) {
+    return n < 0 ? Math.max(Math.ceil(n), 0) : Math.floor(n);
+  }
+  const en = {
+    name: "en",
+    /**
+     * 星期名称数组。
+     */
+    weekdays: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    /**
+     * 月份名称数组。
+     */
+    months: [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ],
+    relativeTime: {
+      future: "in %s",
+      past: "%s ago",
+      s: "a few seconds",
+      m: "a minute",
+      mm: "%d minutes",
+      h: "an hour",
+      hh: "%d hours",
+      d: "a day",
+      dd: "%d days",
+      M: "a month",
+      MM: "%d months",
+      y: "a year",
+      yy: "%d years"
+    },
+    /**
+     * 序数函数，用于将数字转换为带有序数后缀的字符串。
+     *
+     * @param {number} n - 要转换的数字。
+     * @returns {string} 带有序数后缀的字符串。
+     */
+    ordinal: (n, _) => {
+      const s = ["th", "st", "nd", "rd"];
+      const v = n % 100;
+      const i = (v - 20) % 10;
+      const k = i < s.length ? i : v < s.length ? v : 0;
+      return "[".concat(n).concat(s[k], "]");
+    }
+  };
+  const locale = {
+    name: "zh-cn",
+    weekdays: ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"],
+    weekdaysShort: ["周日", "周一", "周二", "周三", "周四", "周五", "周六"],
+    weekdaysMin: ["日", "一", "二", "三", "四", "五", "六"],
+    months: [
+      "一月",
+      "二月",
+      "三月",
+      "四月",
+      "五月",
+      "六月",
+      "七月",
+      "八月",
+      "九月",
+      "十月",
+      "十一月",
+      "十二月"
+    ],
+    monthsShort: [
+      "1月",
+      "2月",
+      "3月",
+      "4月",
+      "5月",
+      "6月",
+      "7月",
+      "8月",
+      "9月",
+      "10月",
+      "11月",
+      "12月"
+    ],
+    ordinal: (number2, period) => {
+      if (period == "W") {
+        return "".concat(number2, "周");
+      }
+      return "".concat(number2, "日");
+    },
+    weekStart: 1,
+    yearStart: 4,
+    formats: {
+      LT: "HH:mm",
+      LTS: "HH:mm:ss",
+      L: "YYYY/MM/DD",
+      LL: "YYYY年M月D日",
+      LLL: "YYYY年M月D日Ah点mm分",
+      LLLL: "YYYY年M月D日ddddAh点mm分",
+      l: "YYYY/M/D",
+      ll: "YYYY年M月D日",
+      lll: "YYYY年M月D日 HH:mm",
+      llll: "YYYY年M月D日dddd HH:mm"
+    },
+    relativeTime: {
+      future: "%s内",
+      past: "%s前",
+      s: "几秒",
+      m: "1 分钟",
+      mm: "%d 分钟",
+      h: "1 小时",
+      hh: "%d 小时",
+      d: "1 天",
+      dd: "%d 天",
+      M: "1 个月",
+      MM: "%d 个月",
+      y: "1 年",
+      yy: "%d 年"
+    },
+    meridiem: (hour, minute, _) => {
+      const hm = hour * 100 + minute;
+      if (hm < 600) {
+        return "凌晨";
+      } else if (hm < 900) {
+        return "早上";
+      } else if (hm < 1100) {
+        return "上午";
+      } else if (hm < 1300) {
+        return "中午";
+      } else if (hm < 1800) {
+        return "下午";
+      }
+      return "晚上";
+    }
+  };
+  const localesMap = /* @__PURE__ */ new Map();
+  let localeState = vue.reactive({
+    lang: "en",
+    locales: localesMap
+  });
+  localeState.locales.set("en", en);
+  localeState.locales.set("zh-cn", locale);
+  class DayutsIntl {
+    constructor() {
+    }
+    use(locale2) {
+      localeState.locales.set(locale2.name, locale2);
+      return this;
+    }
+    set locale(locale2) {
+      if (localeState.locales.has(locale2)) {
+        localeState.lang = locale2;
+      } else {
+        let list = [];
+        localeState.locales.forEach(function(_, key2) {
+          list.push(key2);
+        });
+        uni.__log__("warn", "at uni_modules/lime-dayuts/common/use.ts:46", '未知语言: "'.concat(locale2, '". 请使用以下已知语言之一:').concat(list.join(", ")));
+      }
+    }
+    get locale() {
+      return localeState.lang;
+    }
+    set(name, locale2) {
+      localeState.locales.set(name, locale2);
+    }
+    has(name) {
+      return localeState.locales.has(name);
+    }
+  }
+  const dayutsIntl = new DayutsIntl();
+  function parseLocale(preset, object = null, isLocal = false) {
+    let l = null;
+    if (preset == null)
+      return dayutsIntl.locale;
+    if (typeof preset == "string") {
+      const presetLower = preset.toLowerCase();
+      if (dayutsIntl.has(presetLower)) {
+        l = presetLower;
+      }
+      if (object != null) {
+        dayutsIntl.set(presetLower, object);
+        l = presetLower;
+      }
+      const presetSplit = preset.split("-");
+      if (l == null && presetSplit.length > 1) {
+        return parseLocale(presetSplit[0]);
+      }
+    } else if (preset instanceof DayutsLocale) {
+      dayutsIntl.set(preset.name, preset);
+      l = preset.name;
+    }
+    if (!isLocal && l != null) {
+      dayutsIntl.locale = l;
+    }
+    return l !== null && l !== void 0 ? l : dayutsIntl.locale;
+  }
+  function tryParseNumberAtIndex(digits, index) {
+    if (index >= 0 && index < digits.length) {
+      if (digits[index] == null)
+        return null;
+      const parsedNumber = isNumber(digits[index]) ? digits[index] : parseInt("".concat(digits[index]), 10);
+      if (!isNaN(parsedNumber)) {
+        return parsedNumber;
+      }
+    }
+    return null;
+  }
+  function createDateFromArray(d, offset = 0) {
+    var _a2, _b2, _c, _e, _f, _g, _h;
+    const year = (_a2 = tryParseNumberAtIndex(d, 1 - offset)) !== null && _a2 !== void 0 ? _a2 : (/* @__PURE__ */ new Date()).getFullYear();
+    const month = ((_b2 = tryParseNumberAtIndex(d, 2 - offset)) !== null && _b2 !== void 0 ? _b2 : 1) - 1;
+    const day = (_c = tryParseNumberAtIndex(d, 3 - offset)) !== null && _c !== void 0 ? _c : 1;
+    const hour = (_e = tryParseNumberAtIndex(d, 4 - offset)) !== null && _e !== void 0 ? _e : 0;
+    const minute = (_f = tryParseNumberAtIndex(d, 5 - offset)) !== null && _f !== void 0 ? _f : 0;
+    const second = (_g = tryParseNumberAtIndex(d, 6 - offset)) !== null && _g !== void 0 ? _g : 0;
+    const millisecond = ((_h = tryParseNumberAtIndex(d, 7 - offset)) !== null && _h !== void 0 ? _h : 0).toString().substring(0, 3);
+    return new Date(year, month, day, hour, minute, second, parseInt(millisecond));
+  }
+  function parseDate(cfg) {
+    const date2 = cfg.date;
+    if (date2 == null)
+      return /* @__PURE__ */ new Date();
+    if (date2 instanceof Date)
+      return date2;
+    try {
+      if (typeof date2 == "string" && !/Z$/i.test(date2)) {
+        const d = date2.match(REGEX_PARSE);
+        const isNull = d == null || Array.isArray(d) && d.length == 0;
+        if (!isNull) {
+          return createDateFromArray(d);
+        }
+      }
+      if (typeof date2 == "string")
+        return new Date(date2);
+      if (Array.isArray(date2)) {
+        return createDateFromArray(date2, 1);
+      }
+      if (isNumber(date2))
+        return new Date(date2);
+      return null;
+    } catch (err) {
+      return null;
+    }
+  }
+  function wrapper(date2, instance) {
+    return dayuts(date2, instance.$L);
+  }
+  class Dayuts {
+    constructor(cfg) {
+      var _a2;
+      this.valid = true;
+      this.$d = /* @__PURE__ */ new Date();
+      this.$y = 0;
+      this.$M = 0;
+      this.$D = 0;
+      this.$W = 0;
+      this.$H = 0;
+      this.$m = 0;
+      this.$s = 0;
+      this.$ms = 0;
+      this.$u = false;
+      this.$L = (_a2 = parseLocale(cfg.locale)) !== null && _a2 !== void 0 ? _a2 : dayutsIntl.locale;
+      this.parse(cfg);
+    }
+    parse(cfg) {
+      const _d = parseDate(cfg);
+      if (_d != null) {
+        this.$d = parseDate(cfg);
+        this.init();
+      } else {
+        this.valid = false;
+      }
+    }
+    init() {
+      const $d = this.$d;
+      this.$y = $d.getFullYear();
+      this.$M = $d.getMonth();
+      this.$D = $d.getDate();
+      this.$W = $d.getDay();
+      this.$H = $d.getHours();
+      this.$m = $d.getMinutes();
+      this.$s = $d.getSeconds();
+      this.$ms = $d.getMilliseconds();
+    }
+    /**
+     * 检查日期对象是否有效。
+     *
+     * @returns {boolean} 如果日期对象有效，则返回true；否则返回false。
+     */
+    isValid() {
+      return this.valid;
+    }
+    isSame(input, units = "millisecond") {
+      const other = input instanceof Dayuts ? input : dayuts(input);
+      const date1 = this.startOf(units).valueOf();
+      const date2 = other.valueOf();
+      const date3 = this.endOf(units).valueOf();
+      return date1 <= date2 && date2 <= date3;
+    }
+    isAfter(input, units = "millisecond") {
+      const other = input instanceof Dayuts ? input : dayuts(input);
+      const date1 = other.valueOf();
+      const date2 = this.startOf(units).valueOf();
+      return date1 < date2;
+    }
+    isBefore(input, units = "millisecond") {
+      const other = input instanceof Dayuts ? input : dayuts(input);
+      const date1 = other.valueOf();
+      const date2 = this.endOf(units).valueOf();
+      return date2 < date1;
+    }
+    isSameOrBefore(input, units = "millisecond") {
+      return this.isSame(input, units) || this.isBefore(input, units);
+    }
+    isSameOrAfter(input, units = "millisecond") {
+      return this.isSame(input, units) || this.isAfter(input, units);
+    }
+    /**
+     * 判断当前Dayuts对象是否在给定的两个时间之间
+     * @param {any} input - 第一个时间输入
+     * @param {any} input2 - 第二个时间输入
+     * @param {DayutsUnit} units - 指定的时间单位
+     * @param {string} interval - 区间符号，表示区间的开闭性，默认为'()'，表示开区间
+     * @returns {boolean} - 如果当前Dayuts对象在给定的两个时间之间，则返回true，否则返回false
+     */
+    isBetween(input, input2, units = "millisecond", interval = "()") {
+      const dA = dayuts(input);
+      const dB = dayuts(input2);
+      const dAi = interval.startsWith("(");
+      const dBi = interval.endsWith(")");
+      return (dAi ? this.isAfter(dA, units) : !this.isBefore(dA, units)) && (dBi ? this.isBefore(dB, units) : !this.isAfter(dB, units)) || (dAi ? this.isBefore(dA, units) : !this.isAfter(dA, units)) && (dBi ? this.isAfter(dB, units) : !this.isBefore(dB, units));
+    }
+    /**
+     * 判断当前Dayuts对象所在的年份是否为闰年
+     * @returns {boolean} - 如果当前Dayuts对象所在的年份是闰年，则返回true，否则返回false
+     */
+    isLeapYear() {
+      return this.$y % 4 == 0 && this.$y % 100 != 0 || this.$y % 400 == 0;
+    }
+    isToday() {
+      const comparisonTemplate = "YYYY-MM-DD";
+      const now = dayuts();
+      return this.format(comparisonTemplate) == now.format(comparisonTemplate);
+    }
+    /**
+     * 获取当前 `dayuts` 对象的 Unix 时间戳（以秒为单位）。
+     *
+     * @returns {number} 返回当前 `dayuts` 对象的 Unix 时间戳（以秒为单位）。
+     */
+    unix() {
+      return Math.floor(this.valueOf() / 1e3);
+    }
+    /**
+     * 将当前日期设置为指定时间单位的开始或结束。
+     *
+     * @param {string} units - 时间单位，例如'year'、'month'、'day'等。
+     * @param {boolean} startOf - 如果为true，则设置为开始；如果为false，则设置为结束。
+     * @returns {Dayuts} 返回一个新的Dayuts对象，表示调整后的日期。
+     */
+    startOf(units, startOf = true) {
+      var _a2;
+      const isStartOf = startOf;
+      const unit = prettyUnit(units);
+      const instanceFactory = (d, m) => {
+        const ins = dayuts(new Date(this.$y, m, d));
+        return isStartOf ? ins : ins.endOf(D);
+      };
+      const instanceFactorySet = (method, slice2) => {
+        const argumentStart = [0, 0, 0, 0];
+        const argumentEnd = [23, 59, 59, 999];
+        const args = (isStartOf ? argumentStart : argumentEnd).slice(slice2);
+        const date2 = this.toDate();
+        if (method == "setHours") {
+          date2.setHours(args[0]);
+          date2.setMinutes(args[1]);
+          date2.setSeconds(args[2]);
+          date2.setMilliseconds(args[3]);
+        } else if (method == "setMinutes") {
+          date2.setMinutes(args[0]);
+          date2.setSeconds(args[1]);
+          date2.setMilliseconds(args[2]);
+        } else if (method == "setSeconds") {
+          date2.setSeconds(args[0]);
+          date2.setMilliseconds(args[1]);
+        } else if (method == "setMilliseconds") {
+          date2.setMilliseconds(args[0]);
+        }
+        return dayuts(date2);
+      };
+      const _b2 = this, $W = _b2.$W, $M = _b2.$M, $D = _b2.$D;
+      const utcPad = "set".concat(this.$u ? "UTC" : "");
+      if (unit == Y) {
+        return isStartOf ? instanceFactory(1, 0) : instanceFactory(31, 11);
+      } else if (unit == M) {
+        return isStartOf ? instanceFactory(1, $M) : instanceFactory(0, $M + 1);
+      } else if (unit == W) {
+        const weekStart = (_a2 = this.$locale().weekStart) !== null && _a2 !== void 0 ? _a2 : 0;
+        const gap = ($W < weekStart ? $W + 7 : $W) - weekStart;
+        return instanceFactory(isStartOf ? $D - gap : $D + (6 - gap), $M);
+      } else if (unit == D || unit == DATE) {
+        return instanceFactorySet("".concat(utcPad, "Hours"), 0);
+      } else if (unit == H) {
+        return instanceFactorySet("".concat(utcPad, "Minutes"), 1);
+      } else if (unit == MIN) {
+        return instanceFactorySet("".concat(utcPad, "Seconds"), 2);
+      } else if (unit == S) {
+        return instanceFactorySet("".concat(utcPad, "Milliseconds"), 3);
+      } else {
+        return this.clone();
+      }
+    }
+    /**
+     * 将当前日期设置为指定时间单位的结束。
+     *
+     * @param {string} arg - 时间单位，例如'year'、'month'、'day'等。
+     * @returns {Dayuts} 返回一个新的Dayuts对象，表示调整后的日期。
+     */
+    endOf(units) {
+      return this.startOf(units, false);
+    }
+    /**
+     * 设置指定的时间单位的值。
+     *
+     * @param {string} units - 要设置的时间单位（如 "year"、"month"、"day" 等）。
+     * @param {number} int - 要设置的值。
+     * @returns {Dayuts} 返回当前对象。
+     */
+    $set(units, int) {
+      const unit = prettyUnit(units);
+      const arg = unit == D ? this.$D + (int - this.$W) : int;
+      const setDateUnit = (date2, unit2, arg2) => {
+        if (unit2 == D || unit2 == DATE) {
+          date2.$d.setDate(arg2);
+        } else if (unit2 == M) {
+          date2.$d.setMonth(arg2);
+        } else if (unit2 == Y) {
+          date2.$d.setFullYear(arg2);
+        } else if (unit2 == H) {
+          date2.$d.setHours(arg2);
+        } else if (unit2 == MIN) {
+          date2.$d.setMinutes(arg2);
+        } else if (unit2 == S) {
+          date2.$d.setSeconds(arg2);
+        } else if (unit2 == MS) {
+          date2.$d.setMilliseconds(arg2);
+        }
+      };
+      if (unit == M || unit == Y) {
+        const date2 = this.clone().set(DATE, 1);
+        setDateUnit(date2, unit, arg);
+        date2.init();
+        this.$d = date2.set(DATE, Math.min(this.$D, date2.daysInMonth())).$d;
+      } else {
+        setDateUnit(this, unit, arg);
+      }
+      this.init();
+      return this;
+    }
+    /**
+     * 创建一个当前对象的副本，并设置指定的时间单位的值。
+     *
+     * @param {string} string - 要设置的时间单位（如 "year"、"month"、"day" 等）。
+     * @param {number} int - 要设置的值。
+     * @returns {Dayuts} 返回一个新的 `dayuts` 对象，其值为当前对象的副本，并设置了指定的时间单位的值。
+     */
+    set(string2, int) {
+      return this.clone().$set(string2, int);
+    }
+    /**
+     * 获取当前 `dayuts` 对象的指定时间单位的值。
+     *
+     * @param {string} units - 要获取的时间单位（如 "year"、"month"、"day" 等）。
+     * @returns {number} 返回当前 `dayuts` 对象的指定时间单位的值。
+     */
+    get(units) {
+      const unit = prettyUnit(units);
+      if (unit == D) {
+        return this.day();
+      } else if (unit == DATE) {
+        return this.date();
+      } else if (unit == M) {
+        return this.month();
+      } else if (unit == Y) {
+        return this.year();
+      } else if (unit == H) {
+        return this.hour();
+      } else if (unit == MIN) {
+        return this.minute();
+      } else if (unit == S) {
+        return this.second();
+      } else if (unit == MS) {
+        return this.millisecond();
+      }
+      return 0;
+    }
+    year(input = null) {
+      if (input == null)
+        return this.$y;
+      return this.set(Y, input);
+    }
+    month(input = null) {
+      if (input == null)
+        return this.$M;
+      return this.set(M, input);
+    }
+    day(input = null) {
+      if (input == null)
+        return this.$W;
+      return this.set(D, input);
+    }
+    date(input = null) {
+      if (input == null)
+        return this.$D;
+      return this.set(DATE, input);
+    }
+    hour(input = null) {
+      if (input == null)
+        return this.$H;
+      return this.set(H, input);
+    }
+    minute(input = null) {
+      if (input == null)
+        return this.$m;
+      return this.set(MIN, input);
+    }
+    second(input = null) {
+      if (input == null)
+        return this.$s;
+      return this.set(S, input);
+    }
+    millisecond(input = null) {
+      if (input == null)
+        return this.$ms;
+      return this.set(MS, input);
+    }
+    /**
+     * 在当前 Dayuts 实例上添加指定的时间长度。
+     * @param {number} number - 要添加的时间长度。
+     * @param {string} units - 要添加的时间单位（例如，“years”，“months”，“days”等）。
+     * @returns {Dayuts} 更新的 Dayuts 实例。
+     */
+    add(number2, units) {
+      var _a2;
+      const unit = prettyUnit(units);
+      const instanceFactorySet = (n) => {
+        const d = dayuts(this);
+        return d.date(d.date() + Math.round(n * number2));
+      };
+      if (unit == M) {
+        return this.set(M, this.$M + number2);
+      }
+      if (unit == Y) {
+        return this.set(Y, this.$y + number2);
+      }
+      if (unit == D) {
+        return instanceFactorySet(1);
+      }
+      if (unit == W) {
+        return instanceFactorySet(7);
+      }
+      const steps = /* @__PURE__ */ new Map([
+        [MIN, MILLISECONDS_A_MINUTE],
+        [H, MILLISECONDS_A_HOUR],
+        [S, MILLISECONDS_A_SECOND]
+      ]);
+      const step = (_a2 = steps.get(unit)) !== null && _a2 !== void 0 ? _a2 : 1;
+      const nextTimeStamp = this.$d.getTime() + number2 * step;
+      return wrapper(nextTimeStamp, this);
+    }
+    /**
+     * 从当前 Dayuts 实例中减去指定的时间。
+     * @param {number} number - 要减去的时间。
+     * @param {string} units - 要减去的时间单位（例如，“years”，“months”，“days”等）。
+     * @returns {Dayuts} 更新的 Dayuts 实例。
+     */
+    subtract(number2, units) {
+      return this.add(number2 * -1, units);
+    }
+    /**
+     * 日期格式化
+     * @param {string} formatStr - 格式化字符串，包含各种格式化占位符（例如，“YYYY-MM-DD”，“HH:mm:ss”等）。
+     * @returns {string} 格式化后的日期字符串。
+     */
+    format(formatStr = null) {
+      const locale2 = this.$locale();
+      if (!this.isValid())
+        return INVALID_DATE_STRING;
+      const str = formatStr !== null && formatStr !== void 0 ? formatStr : FORMAT_DEFAULT;
+      const zoneStr = padZoneStr(this);
+      const _a2 = this, $H = _a2.$H, $m = _a2.$m, $M = _a2.$M;
+      const weekdays = locale2.weekdays, months = locale2.months, meridiem = locale2.meridiem;
+      function getShort(arr, index, full = [], length = 0) {
+        if (arr != null && arr.length >= index) {
+          return arr[index];
+        } else if (full.length >= index) {
+          return full[index].slice(0, length);
+        }
+        return "";
+      }
+      const get$H = (num) => {
+        return padStart(($H % 12 == 0 ? 12 : $H % 12).toString(), num, "0");
+      };
+      const meridiemFunc = meridiem !== null && meridiem !== void 0 ? meridiem : (hour, _, isLowercase) => {
+        const m = hour < 12 ? "AM" : "PM";
+        return isLowercase ? m.toLowerCase() : m;
+      };
+      const matches = (match) => {
+        if (match == "YY") {
+          return this.$y.toString().slice(-2);
+        } else if (match == "YYYY") {
+          return padStart(this.$y.toString(), 4, "0");
+        } else if (match == "M") {
+          return ($M + 1).toString();
+        } else if (match == "MM") {
+          return padStart(($M + 1).toString(), 2, "0");
+        } else if (match == "MMM") {
+          return getShort(locale2.monthsShort, $M, months, 3);
+        } else if (match == "MMMM") {
+          return getShort(months, $M);
+        } else if (match == "D") {
+          return this.$D.toString();
+        } else if (match == "DD") {
+          return padStart(this.$D.toString(), 2, "0");
+        } else if (match == "d") {
+          return this.$W.toString();
+        } else if (match == "dd") {
+          return getShort(locale2.weekdaysMin, this.$W, weekdays, 2);
+        } else if (match == "ddd") {
+          return getShort(locale2.weekdaysShort, this.$W, weekdays, 3);
+        } else if (match == "dddd") {
+          return weekdays[this.$W];
+        } else if (match == "H") {
+          return $H.toString();
+        } else if (match == "HH") {
+          return padStart($H.toString(), 2, "0");
+        } else if (match == "h") {
+          return get$H(1);
+        } else if (match == "hh") {
+          return get$H(2);
+        } else if (match == "a") {
+          return meridiemFunc($H, $m, true);
+        } else if (match == "A") {
+          return meridiemFunc($H, $m, false);
+        } else if (match == "m") {
+          return $m.toString();
+        } else if (match == "mm") {
+          return padStart($m.toString(), 2, "0");
+        } else if (match == "s") {
+          return this.$s.toString();
+        } else if (match == "ss") {
+          return padStart(this.$s.toString(), 2, "0");
+        } else if (match == "SSS") {
+          return padStart(this.$ms.toString(), 3, "0");
+        } else if (match == "Z") {
+          return zoneStr;
+        }
+        return null;
+      };
+      return str.replace(REGEX_FORMAT, (match, $1, offset, string2) => {
+        var _a3;
+        return (_a3 = $1 !== null && $1 !== void 0 ? $1 : matches(match)) !== null && _a3 !== void 0 ? _a3 : zoneStr.replace(":", "");
+      });
+    }
+    /**
+     * 获取 Dayuts 实例的 UTC 偏移量（以分钟为单位）。
+     * @returns {number} UTC 偏移量（以分钟为单位）。
+     */
+    utcOffset() {
+      return 0;
+    }
+    diff(input, units = "millisecond", float = false) {
+      const unit = prettyUnit(units);
+      const that = dayuts(input);
+      const zoneDelta = (that.utcOffset() - this.utcOffset()) * MILLISECONDS_A_MINUTE;
+      const diff = this.valueOf() - that.valueOf();
+      const getMonth = () => {
+        return monthDiff(this, that);
+      };
+      let result;
+      switch (unit) {
+        case Y:
+          result = getMonth() / 12;
+          break;
+        case M:
+          result = getMonth();
+          break;
+        case Q:
+          result = getMonth() / 3;
+          break;
+        case W:
+          result = (diff - zoneDelta) / MILLISECONDS_A_WEEK;
+          break;
+        case D:
+          result = (diff - zoneDelta) / MILLISECONDS_A_DAY;
+          break;
+        case H:
+          result = diff / MILLISECONDS_A_HOUR;
+          break;
+        case MIN:
+          result = diff / MILLISECONDS_A_MINUTE;
+          break;
+        case S:
+          result = diff / MILLISECONDS_A_SECOND;
+          break;
+        default:
+          result = diff;
+          break;
+      }
+      return float ? result : absFloor(result);
+    }
+    /**
+     * 将当前 Dayuts 对象转换为原生 Date 对象。
+     *
+     * @returns {Date} 返回一个表示当前日期的原生 Date 对象。
+     */
+    toDate() {
+      return new Date(this.valueOf());
+    }
+    /**
+     * 将 Moment 对象转换为 JSON 字符串
+     * @returns {string | null} 如果 Moment 对象有效，则返回 ISO 8601 格式的字符串，否则返回 null
+     */
+    toJSON() {
+      return this.isValid() ? this.toISOString() : null;
+    }
+    /**
+     * 将 Moment 对象转换为 ISO 8601 格式的字符串
+     * @returns {string} 返回 ISO 8601 格式的字符串
+     */
+    toISOString() {
+      return this.$d.toString();
+    }
+    toObject() {
+      return {
+        years: this.$y,
+        months: this.$M,
+        date: this.$D,
+        hours: this.$H,
+        minutes: this.$m,
+        seconds: this.$s,
+        milliseconds: this.$ms
+      };
+    }
+    toArray() {
+      return [
+        this.$y,
+        this.$M,
+        this.$D,
+        this.$H,
+        this.$m,
+        this.$s,
+        this.$ms
+      ];
+    }
+    /**
+     * 获取当前日期的毫秒数。
+     *
+     * @returns {number} 返回一个表示当前日期的毫秒数。
+     */
+    valueOf() {
+      return this.$d.getTime();
+    }
+    /**
+     * 获取当前 `dayuts` 对象所在月份的天数。
+     *
+     * @returns {number} 返回当前 `dayuts` 对象所在月份的天数。
+     */
+    daysInMonth() {
+      return this.endOf(M).$D;
+    }
+    /**
+     * 获取当前日期的区域设置对象。
+     *
+     * @returns {Object} 区域设置对象。
+     */
+    $locale() {
+      return localeState.locales.get(this.$L);
+    }
+    locale(preset, object = null) {
+      const that = this.clone();
+      const nextLocaleName = parseLocale(preset, object, true);
+      if (nextLocaleName != null)
+        that.$L = nextLocaleName;
+      return that;
+    }
+    clone() {
+      return wrapper(this.$d.getTime(), this);
+    }
+    /**
+     * 返回当前 dayuts 对象的 UTC 字符串表示。
+     *
+     * @returns {string} 当前 dayuts 对象的 UTC 字符串表示。
+     */
+    toString() {
+      return this.$d.toString();
+    }
+    dayOfYear(input = null) {
+      const dayOfYear = Math.round((this.startOf("day").valueOf() - this.startOf("year").valueOf()) / 864e5) + 1;
+      return input == null ? dayOfYear : this.add(input - dayOfYear, "day");
+    }
+    fromToBase(input, withoutSuffix, instance, isFrom) {
+      var _a2, _b2;
+      const relObj = (_a2 = localeState.locales.get("en")) === null || _a2 === void 0 ? void 0 : _a2.relativeTime;
+      const loc = (_b2 = instance.$locale().relativeTime) !== null && _b2 !== void 0 ? _b2 : relObj;
+      if (loc == null)
+        return "";
+      const T = [
+        { l: "s", r: 44, d: S },
+        { l: "m", r: 89 },
+        { l: "mm", r: 44, d: MIN },
+        { l: "h", r: 89 },
+        { l: "hh", r: 21, d: H },
+        { l: "d", r: 35 },
+        { l: "dd", r: 25, d: D },
+        { l: "M", r: 45 },
+        { l: "MM", r: 10, d: M },
+        { l: "y", r: 17 },
+        { l: "yy", d: Y }
+      ];
+      const Tl = T.length;
+      let result = 0;
+      let out = "";
+      let isFuture = false;
+      for (let i = 0; i < Tl; i += 1) {
+        let t2 = T[i];
+        if (t2.d != null) {
+          result = isFrom ? dayuts(input).diff(instance, t2.d, true) : instance.diff(input, t2.d, true);
+        }
+        let abs = Math.round(Math.abs(result));
+        isFuture = result > 0;
+        if (t2.r == null || t2.r != null && abs <= t2.r) {
+          if (abs <= 1 && i > 0)
+            t2 = T[i - 1];
+          const format = loc[t2.l];
+          if (typeof format == "string") {
+            out = format.replace("%d", abs.toString());
+          }
+          break;
+        }
+      }
+      if (withoutSuffix)
+        return out;
+      const pastOrFuture = isFuture ? loc.future : loc.past;
+      return pastOrFuture.replace("%s", out);
+    }
+    to(input, withoutSuffix = false) {
+      return this.fromToBase(input, withoutSuffix, this, true);
+    }
+    from(input, withoutSuffix = false) {
+      return this.fromToBase(input, withoutSuffix, this, false);
+    }
+    toNow(withoutSuffix = false) {
+      return this.to(dayuts(), withoutSuffix);
+    }
+    fromNow(withoutSuffix = false) {
+      return this.from(dayuts(), withoutSuffix);
+    }
+  }
+  function dayuts(date2 = null, format = null, locale2 = null) {
+    if (date2 != null && date2 instanceof Dayuts)
+      return date2.clone();
+    return new Dayuts({
+      date: date2,
+      format,
+      locale: locale2
+    });
+  }
+  const __className$2U = "GenSrcPagesFunctionComponentsTimeDemoCard";
+  const _sfc_main$2V = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
     __dynamicSharedData: true,
-    __hash: "457495a2",
-    __className: __className$2W,
-    __filename: "src/pages/basic/components/SystemInfoDemoCard.uvue",
-    __name: "SystemInfoDemoCard",
+    __hash: "5ee523bd",
+    __className: __className$2U,
+    __filename: "src/pages/function/components/TimeDemoCard.uvue",
+    __name: "TimeDemoCard",
     setup(__props) {
       const __sharedDataScope = vue.useSharedDataScope();
-      const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesBasicComponentsSystemInfoDemoCardSharedData", sharedDataClassId: 0 })));
-      const screenWidth = vue.computed(() => {
-        var _a2, _b2;
-        return (_b2 = (_a2 = systemInfo.value) === null || _a2 === void 0 ? null : _a2.screenWidth) !== null && _b2 !== void 0 ? _b2 : 0;
+      const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesFunctionComponentsTimeDemoCardSharedData", sharedDataClassId: 0 })));
+      const currentFullTime = vue.ref("");
+      let timerId = 0;
+      const offsetDays = vue.ref(0);
+      function updateClock() {
+        currentFullTime.value = dayuts().format("YYYY-MM-DD HH:mm:ss.SSS dddd");
+      }
+      function adjustOffset(days) {
+        offsetDays.value += days;
+      }
+      const targetOffsetTime = vue.computed(() => {
+        return dayuts().add(offsetDays.value, "day").format("YYYY-MM-DD HH:mm:ss");
       });
-      const screenHeight = vue.computed(() => {
-        var _a2, _b2;
-        return (_b2 = (_a2 = systemInfo.value) === null || _a2 === void 0 ? null : _a2.screenHeight) !== null && _b2 !== void 0 ? _b2 : 0;
+      const startOfMonth = vue.computed(() => {
+        return dayuts().startOf("month").format("YYYY-MM-DD");
       });
-      const windowWidth = vue.computed(() => {
-        var _a2, _b2;
-        return (_b2 = (_a2 = systemInfo.value) === null || _a2 === void 0 ? null : _a2.windowWidth) !== null && _b2 !== void 0 ? _b2 : 0;
+      const endOfMonth = vue.computed(() => {
+        return dayuts().endOf("month").format("YYYY-MM-DD");
       });
-      const windowHeight = vue.computed(() => {
-        var _a2, _b2;
-        return (_b2 = (_a2 = systemInfo.value) === null || _a2 === void 0 ? null : _a2.windowHeight) !== null && _b2 !== void 0 ? _b2 : 0;
+      const isLeapYear = vue.computed(() => {
+        return dayuts().isLeapYear();
       });
-      const statusBarHeight = vue.computed(() => {
-        var _a2, _b2;
-        return (_b2 = (_a2 = systemInfo.value) === null || _a2 === void 0 ? null : _a2.statusBarHeight) !== null && _b2 !== void 0 ? _b2 : 0;
+      const daysToYearEnd = vue.computed(() => {
+        const endOfYear = dayuts().endOf("year");
+        const diffVal = endOfYear.diff(dayuts(), "day");
+        return Math.ceil(diffVal);
       });
-      const pixelRatio = vue.computed(() => {
-        var _a2, _b2;
-        return (_b2 = (_a2 = systemInfo.value) === null || _a2 === void 0 ? null : _a2.pixelRatio) !== null && _b2 !== void 0 ? _b2 : 1;
+      vue.onMounted(() => {
+        updateClock();
+        timerId = setInterval(() => {
+          updateClock();
+        }, 100);
       });
-      const safeAreaTop = vue.computed(() => {
-        return safeAreaInsets.value != null ? "".concat(safeAreaInsets.value.top, "px") : "N/A";
-      });
-      const safeAreaBottom = vue.computed(() => {
-        return safeAreaInsets.value != null ? "".concat(safeAreaInsets.value.bottom, "px") : "N/A";
-      });
-      const safeAreaLeft = vue.computed(() => {
-        return safeAreaInsets.value != null ? "".concat(safeAreaInsets.value.left, "px") : "N/A";
-      });
-      const safeAreaRight = vue.computed(() => {
-        return safeAreaInsets.value != null ? "".concat(safeAreaInsets.value.right, "px") : "N/A";
+      vue.onUnmounted(() => {
+        if (timerId != 0) {
+          clearInterval(timerId);
+        }
       });
       return () => {
         "raw js";
-        const n34 = vue.createSharedDataComponent(Card, {
+        const n39 = vue.createSharedDataComponent(Card, {
           title: () => {
-            return "系统与安全区域信息";
+            return "时间日期操作 (lime-dayuts)";
           },
           __cid: () => {
-            return "e90ea59a";
+            return "9709093e";
           }
         }, {
           "default": () => {
+            vue.setSharedDataEvent(__sharedData, 1, () => {
+              return adjustOffset(-7);
+            });
+            vue.setSharedDataEvent(__sharedData, 2, () => {
+              return adjustOffset(-1);
+            });
+            vue.setSharedDataEvent(__sharedData, 3, () => {
+              return adjustOffset(1);
+            });
+            vue.setSharedDataEvent(__sharedData, 4, () => {
+              return adjustOffset(7);
+            });
             vue.renderSharedDataEffect(() => {
-              vue.setSharedData(__sharedData, 1, vue.toDisplayString(safeAreaTop.value));
-              vue.setSharedData(__sharedData, 2, vue.toDisplayString(safeAreaBottom.value));
-              vue.setSharedData(__sharedData, 3, vue.toDisplayString(safeAreaLeft.value));
-              vue.setSharedData(__sharedData, 4, vue.toDisplayString(safeAreaRight.value));
-              vue.setSharedData(__sharedData, 5, vue.toDisplayString(screenWidth.value));
-              vue.setSharedData(__sharedData, 6, vue.toDisplayString(screenHeight.value));
-              vue.setSharedData(__sharedData, 7, vue.toDisplayString(windowWidth.value));
-              vue.setSharedData(__sharedData, 8, vue.toDisplayString(windowHeight.value));
-              vue.setSharedData(__sharedData, 9, vue.toDisplayString(statusBarHeight.value));
-              vue.setSharedData(__sharedData, 10, vue.toDisplayString(pixelRatio.value));
+              const _offsetDays = offsetDays.value;
+              vue.setSharedData(__sharedData, 5, vue.toDisplayString(currentFullTime.value));
+              vue.setSharedData(__sharedData, 6, vue.toDisplayString(_offsetDays > 0 ? "+" : ""));
+              vue.setSharedData(__sharedData, 7, vue.toDisplayString(_offsetDays));
+              vue.setSharedData(__sharedData, 8, vue.toDisplayString(targetOffsetTime.value));
+              vue.setSharedData(__sharedData, 9, vue.toDisplayString(startOfMonth.value));
+              vue.setSharedData(__sharedData, 10, vue.toDisplayString(endOfMonth.value));
+              vue.setSharedData(__sharedData, 11, vue.toDisplayString(isLeapYear.value ? "366天 (闰年)" : "365天 (平年)"));
+              vue.setSharedData(__sharedData, 12, vue.toDisplayString(daysToYearEnd.value));
             });
           }
+        }, true);
+        vue.setSharedData(__sharedData, 0, n39.sharedData);
+        return __sharedData;
+      };
+    }
+  });
+  const _style_0$2Q = {};
+  const TimeDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main$2V, [["styles", [_style_0$2Q]]]);
+  class LimeSignatureToFileSuccess extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            tempFilePath: { type: String, optional: false },
+            isEmpty: { type: Boolean, optional: false }
+          };
+        },
+        name: "LimeSignatureToFileSuccess"
+      };
+    }
+    constructor(options, metadata = LimeSignatureToFileSuccess.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.tempFilePath = this.__props__.tempFilePath;
+      this.isEmpty = this.__props__.isEmpty;
+      delete this.__props__;
+    }
+  }
+  class LimeSignatureToTempFilePathOptions extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            success: { type: "Unknown", optional: true },
+            fail: { type: "Unknown", optional: true },
+            complete: { type: "Unknown", optional: true },
+            format: { type: String, optional: true }
+          };
+        },
+        name: "LimeSignatureToTempFilePathOptions"
+      };
+    }
+    constructor(options, metadata = LimeSignatureToTempFilePathOptions.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.success = this.__props__.success;
+      this.fail = this.__props__.fail;
+      this.complete = this.__props__.complete;
+      this.format = this.__props__.format;
+      delete this.__props__;
+    }
+  }
+  class LimeSignatureOptions extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            penColor: { type: String, optional: false },
+            openSmooth: { type: Boolean, optional: false },
+            disableScroll: { type: Boolean, optional: false },
+            disabled: { type: Boolean, optional: false },
+            penSize: { type: Number, optional: false },
+            minLineWidth: { type: Number, optional: false },
+            maxLineWidth: { type: Number, optional: false },
+            minSpeed: { type: Number, optional: false },
+            maxWidthDiffRate: { type: Number, optional: false },
+            maxHistoryLength: { type: Number, optional: false }
+          };
+        },
+        name: "LimeSignatureOptions"
+      };
+    }
+    constructor(options, metadata = LimeSignatureOptions.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.penColor = this.__props__.penColor;
+      this.openSmooth = this.__props__.openSmooth;
+      this.disableScroll = this.__props__.disableScroll;
+      this.disabled = this.__props__.disabled;
+      this.penSize = this.__props__.penSize;
+      this.minLineWidth = this.__props__.minLineWidth;
+      this.maxLineWidth = this.__props__.maxLineWidth;
+      this.minSpeed = this.__props__.minSpeed;
+      this.maxWidthDiffRate = this.__props__.maxWidthDiffRate;
+      this.maxHistoryLength = this.__props__.maxHistoryLength;
+      delete this.__props__;
+    }
+  }
+  class LimeSignaturePoint extends UTS.UTSType {
+    static get$UTSMetadata$() {
+      return {
+        kind: 2,
+        get fields() {
+          return {
+            x: { type: Number, optional: false },
+            y: { type: Number, optional: false },
+            c: { type: String, optional: true },
+            w: { type: Number, optional: true }
+          };
+        },
+        name: "LimeSignaturePoint"
+      };
+    }
+    constructor(options, metadata = LimeSignaturePoint.get$UTSMetadata$(), isJSONParse = false) {
+      super();
+      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+      this.x = this.__props__.x;
+      this.y = this.__props__.y;
+      this.c = this.__props__.c;
+      this.w = this.__props__.w;
+      delete this.__props__;
+    }
+  }
+  let points = [];
+  let undoStack = [];
+  let redoStack = [];
+  let lastX = 0;
+  let lastY = 0;
+  class Signature {
+    constructor(el) {
+      this.options = new LimeSignatureOptions({
+        penColor: "black",
+        openSmooth: true,
+        disableScroll: true,
+        disabled: false,
+        penSize: 2,
+        minLineWidth: 2,
+        maxLineWidth: 6,
+        minSpeed: 1.5,
+        maxWidthDiffRate: 20,
+        maxHistoryLength: 20
+      });
+      this.isEmpty = true;
+      this.isDrawing = false;
+      this.touchstartCallbackWrapper = null;
+      this.touchmoveCallbackWrapper = null;
+      this.touchendCallbackWrapper = null;
+      this.change = null;
+      this.onTouchStart = (event) => {
+        if (this.options.disabled) {
+          return null;
+        }
+        this.disableScroll(event);
+        const _a2 = this.getTouchLimeSignaturePoint(event), x = _a2.x, y = _a2.y;
+        this.isDrawing = true;
+        this.isEmpty = false;
+        lastX = x;
+        lastY = y;
+        points.push(new LimeSignaturePoint({
+          c: null,
+          w: null,
+          x,
+          y
+        }));
+      };
+      this.onTouchMove = (event) => {
+        if (this.options.disabled || !this.isDrawing) {
+          return null;
+        }
+        this.disableScroll(event);
+        const _a2 = this.getTouchLimeSignaturePoint(event), x = _a2.x, y = _a2.y;
+        const lineWidth = this.options.penSize;
+        const strokeStyle = this.options.penColor;
+        const point = new LimeSignaturePoint({
+          c: null,
+          w: null,
+          x,
+          y
+        });
+        const last = new LimeSignaturePoint({
+          c: null,
+          w: null,
+          x: lastX,
+          y: lastY
+        });
+        this.drawLine(point, last, lineWidth, strokeStyle);
+        lastX = x;
+        lastY = y;
+        points.push(new LimeSignaturePoint({ x, y, c: strokeStyle, w: lineWidth }));
+      };
+      this.onTouchEnd = (event) => {
+        var _a2;
+        this.disableScroll(event);
+        this.isDrawing = false;
+        undoStack.push(points);
+        redoStack = [];
+        points = [];
+        (_a2 = this.change) === null || _a2 === void 0 ? null : _a2.call(this, this.isEmpty);
+      };
+      this.el = el;
+      this.ctx = el.getDrawableContext();
+      this.init();
+    }
+    onChange(cb) {
+      this.change = cb;
+    }
+    init() {
+      this.touchstartCallbackWrapper = this.el.addEventListener("touchstart", this.onTouchStart);
+      this.touchmoveCallbackWrapper = this.el.addEventListener("touchmove", this.onTouchMove);
+      this.touchendCallbackWrapper = this.el.addEventListener("touchend", this.onTouchEnd);
+    }
+    remove() {
+      if (this.touchstartCallbackWrapper == null)
+        return null;
+      this.el.removeEventListener("touchstart", this.touchstartCallbackWrapper);
+      this.el.removeEventListener("touchmove", this.touchmoveCallbackWrapper);
+      this.el.removeEventListener("touchend", this.touchendCallbackWrapper);
+    }
+    setOption(options) {
+      this.options = options;
+    }
+    disableScroll(event) {
+      event.stopPropagation();
+      if (this.options.disableScroll) {
+        {
+          event.preventDefault();
+        }
+      }
+    }
+    getTouchLimeSignaturePoint(event) {
+      const rect = this.el.getBoundingClientRect();
+      const touche = event.touches[0];
+      const x = touche.clientX;
+      const y = touche.clientY;
+      return new LimeSignaturePoint({
+        c: null,
+        w: null,
+        x: x - rect.left,
+        y: y - rect.top
+      });
+    }
+    drawLine(point, last, lineWidth, strokeStyle) {
+      const ctx = this.ctx;
+      ctx.lineWidth = lineWidth;
+      ctx.strokeStyle = strokeStyle;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.beginPath();
+      ctx.moveTo(last.x, last.y);
+      ctx.lineTo(point.x, point.y);
+      ctx.stroke();
+      ctx.closePath();
+      this._draw();
+    }
+    _clear() {
+      this.ctx.reset();
+    }
+    _draw() {
+      this.ctx.update();
+    }
+    // addHistory() { }
+    clear() {
+      this._clear();
+      this._draw();
+      this.isEmpty = true;
+      undoStack = [];
+      redoStack = [];
+      points = [];
+    }
+    undo() {
+      if (redoStack.length == this.options.maxHistoryLength && this.options.maxHistoryLength != 0) {
+        return null;
+      }
+      this._clear();
+      if (undoStack.length > 0) {
+        const lastPath = UTS.arrayPop(undoStack);
+        redoStack.push(lastPath);
+        if (undoStack.length == 0) {
+          this.isEmpty = true;
+          this._draw();
+          return null;
+        }
+        for (let l = 0; l < undoStack.length; l++) {
+          for (let i = 1; i < undoStack[l].length; i++) {
+            const last = undoStack[l][i - 1];
+            const point = undoStack[l][i];
+            this.drawLine(point, last, point.w, point.c);
+          }
+        }
+      } else {
+        this._draw();
+      }
+    }
+    redo() {
+      if (redoStack.length < 1)
+        return null;
+      const lastPath = UTS.arrayPop(redoStack);
+      undoStack.push(lastPath);
+      this.isEmpty = false;
+      for (let l = 0; l < undoStack.length; l++) {
+        for (let i = 1; i < undoStack[l].length; i++) {
+          const last = undoStack[l][i - 1];
+          const point = undoStack[l][i];
+          this.drawLine(point, last, point.w, point.c);
+        }
+      }
+    }
+  }
+  const __className$2T = "GenUniModulesLimeSignatureComponentsLSignatureLSignature";
+  const _sfc_main$2U = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
+    __dynamicSharedData: true,
+    __hash: "7363d352",
+    __className: __className$2T,
+    __filename: "uni_modules/lime-signature/components/l-signature/l-signature.uvue",
+    __name: "l-signature",
+    props: {
+      styles: {
+        type: String,
+        default: ""
+      },
+      penColor: {
+        type: String,
+        default: "black"
+      },
+      penSize: {
+        type: Number,
+        default: 2
+      },
+      backgroundColor: {
+        type: String,
+        default: ""
+      },
+      openSmooth: {
+        type: Boolean,
+        default: false
+      },
+      minLineWidth: {
+        type: Number,
+        default: 2
+      },
+      maxLineWidth: {
+        type: Number,
+        default: 6
+      },
+      minSpeed: {
+        type: Number,
+        default: 1.5
+      },
+      maxWidthDiffRate: {
+        type: Number,
+        default: 20
+      },
+      maxHistoryLength: {
+        type: Number,
+        default: 20
+      },
+      disableScroll: {
+        type: Boolean,
+        default: true
+      },
+      disabled: {
+        type: Boolean,
+        default: false
+      },
+      landscape: {
+        type: Boolean,
+        default: false
+      }
+    },
+    emits: ["change"],
+    setup(__props, _a2) {
+      var __expose = _a2.expose, __emit = _a2.emit;
+      const __sharedDataScope = vue.useSharedDataScope();
+      const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenUniModulesLimeSignatureComponentsLSignatureLSignatureSharedData", sharedDataClassId: 0 })));
+      const emit = __emit;
+      const props = __props;
+      const drawableStyle = vue.computed(() => {
+        let style = "";
+        if (props.backgroundColor != "") {
+          style += "background-color: ".concat(props.backgroundColor, ";");
+        }
+        if (props.styles != "") {
+          style += props.styles;
+        }
+        return style;
+      });
+      const signatureRef = vue.ref(null);
+      vue.ref(null);
+      let signatureLandscapeRef = vue.ref(null);
+      let landscapeStyle = vue.ref(/* @__PURE__ */ new Map());
+      let landscapeImageStyle = vue.ref(/* @__PURE__ */ new Map());
+      let isCanvasEmpty = true;
+      let signature = null;
+      let url2 = vue.ref("");
+      const checkAndEmitEmptyStatus = () => {
+        var _a3;
+        const isEmpty2 = (_a3 = signature === null || signature === void 0 ? null : signature.isEmpty) !== null && _a3 !== void 0 ? _a3 : true;
+        if (isEmpty2 != isCanvasEmpty) {
+          isCanvasEmpty = isEmpty2;
+          emit("change", isCanvasEmpty);
+        }
+      };
+      const clear2 = () => {
+        signature === null || signature === void 0 ? null : signature.clear();
+        checkAndEmitEmptyStatus();
+      };
+      const redo = () => {
+        signature === null || signature === void 0 ? null : signature.redo();
+        checkAndEmitEmptyStatus();
+      };
+      const undo = () => {
+        signature === null || signature === void 0 ? null : signature.undo();
+        checkAndEmitEmptyStatus();
+      };
+      const canvasToTempFilePath = (options) => {
+        var _a3, _b2;
+        const success = options.success;
+        const fail = options.fail;
+        const complete = options.complete;
+        const format = (_a3 = options.format) !== null && _a3 !== void 0 ? _a3 : "png";
+        (_b2 = signatureRef.value) === null || _b2 === void 0 ? null : _b2.takeSnapshot({
+          format,
+          success: (res) => {
+            var _a4, _b3, _c;
+            if (props.landscape) {
+              url2.value = res.tempFilePath;
+              (_b3 = (_a4 = signatureLandscapeRef.value) === null || _a4 === void 0 ? null : _a4.getBoundingClientRectAsync()) === null || _b3 === void 0 ? null : _b3.then((rect) => {
+                setTimeout(() => {
+                  var _a5;
+                  (_a5 = signatureLandscapeRef.value) === null || _a5 === void 0 ? null : _a5.takeSnapshot(new UTSJSONObject({
+                    format,
+                    success: (res2) => {
+                      var _a6;
+                      success === null || success === void 0 ? null : success(new LimeSignatureToFileSuccess({
+                        tempFilePath: res2.tempFilePath,
+                        isEmpty: (_a6 = signature === null || signature === void 0 ? null : signature.isEmpty) !== null && _a6 !== void 0 ? _a6 : false
+                      }));
+                    }
+                  }));
+                }, 300);
+              });
+            } else {
+              success === null || success === void 0 ? null : success(new LimeSignatureToFileSuccess({
+                tempFilePath: res.tempFilePath,
+                isEmpty: (_c = signature === null || signature === void 0 ? null : signature.isEmpty) !== null && _c !== void 0 ? _c : false
+              }));
+            }
+          },
+          fail: (res) => {
+            fail === null || fail === void 0 ? null : fail(res);
+          },
+          complete: (res = null) => {
+            complete === null || complete === void 0 ? null : complete(res);
+          }
+        });
+      };
+      __expose({
+        clear: clear2,
+        redo,
+        undo,
+        canvasToTempFilePath
+      });
+      vue.onMounted(() => {
+        vue.nextTick(() => {
+          setTimeout(() => {
+            var _a3, _b2;
+            const width = (_a3 = signatureRef.value) === null || _a3 === void 0 ? null : _a3.offsetWidth;
+            const height = (_b2 = signatureRef.value) === null || _b2 === void 0 ? null : _b2.offsetHeight;
+            landscapeStyle.value.set("width", "".concat(height, "px"));
+            landscapeStyle.value.set("height", "".concat(width, "px"));
+            landscapeImageStyle.value.set("width", "".concat(width, "px"));
+            landscapeImageStyle.value.set("height", "".concat(height, "px"));
+            landscapeImageStyle.value.set("transform", "rotate(-90deg) translateX(-".concat(width, "px)"));
+            signature = new Signature(signatureRef.value);
+            vue.watchEffect(() => {
+              const options = new LimeSignatureOptions({
+                penColor: props.penColor,
+                openSmooth: props.openSmooth,
+                disableScroll: props.disableScroll,
+                disabled: props.disabled,
+                penSize: props.penSize,
+                minLineWidth: props.minLineWidth,
+                maxLineWidth: props.maxLineWidth,
+                minSpeed: props.minSpeed,
+                maxWidthDiffRate: props.maxWidthDiffRate,
+                maxHistoryLength: props.maxHistoryLength
+              });
+              signature === null || signature === void 0 ? null : signature.setOption(options);
+              signature === null || signature === void 0 ? null : signature.onChange((_isEmpty) => {
+                checkAndEmitEmptyStatus();
+              });
+            });
+          }, 300);
+        });
+      });
+      vue.onUnmounted(() => {
+      });
+      return () => {
+        "raw js";
+        const _setTemplateRef = vue.createSharedDataTemplateRefSetter();
+        vue.renderSharedDataEffect(() => {
+          return vue.setSharedDataStyle(__sharedData, 6, [vue.unref(drawableStyle)]);
+        });
+        vue.createSharedDataIf(() => {
+          return vue.setSharedData(__sharedData, 0, vue.toSharedDataBoolean(__props.landscape));
+        }, () => {
+          vue.setSharedDataTemplateRef(__sharedData, 1, (n3) => {
+            _setTemplateRef(n3, signatureLandscapeRef, null, "signatureLandscapeRef");
+          });
+          vue.renderSharedDataEffect(() => {
+            vue.setSharedDataStyle(__sharedData, 2, [vue.unref(landscapeStyle)]);
+            vue.setSharedDataStyle(__sharedData, 3, [vue.unref(landscapeImageStyle)]);
+            vue.setSharedDataAttr(__sharedData, 4, vue.toSharedDataString(vue.unref(url2)));
+          });
+        });
+        vue.setSharedDataTemplateRef(__sharedData, 5, (n4) => {
+          _setTemplateRef(n4, signatureRef, null, "signatureRef");
+        });
+        return __sharedData;
+      };
+    }
+  });
+  const _style_0$2P = {};
+  const __easycom_0$8 = /* @__PURE__ */ _export_sfc(_sfc_main$2U, [["styles", [_style_0$2P]]]);
+  const __className$2S = "GenSrcPagesFunctionComponentsSignatureCard";
+  const _sfc_main$2T = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
+    __dynamicSharedData: true,
+    __hash: "7ac5a925",
+    __className: __className$2S,
+    __filename: "src/pages/function/components/SignatureCard.uvue",
+    __name: "SignatureCard",
+    setup(__props) {
+      const __sharedDataScope = vue.useSharedDataScope();
+      const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesFunctionComponentsSignatureCardSharedData", sharedDataClassId: 0 })));
+      let sigInstance = null;
+      function onSigRef(el = null) {
+        sigInstance = el;
+      }
+      const penColor = vue.ref("red");
+      const penSize = vue.ref(4);
+      const openSmooth = vue.ref(true);
+      const signUrl = vue.ref("");
+      const colorList = ["#ef4444", "#000000", "#3b82f6", "#10b981", "#f59e0b"];
+      const penSizeOptions = [1, 3, 5, 8, 12];
+      function onAction(type) {
+        const el = sigInstance;
+        if (el == null) {
+          uni.showToast({ title: "签名组件未就绪", icon: "none" });
+          return null;
+        }
+        if (type === "clear") {
+          el.clear();
+          signUrl.value = "";
+        } else if (type === "undo") {
+          el.undo();
+        } else if (type === "redo") {
+          el.redo();
+        } else if (type === "save") {
+          el.canvasToTempFilePath(new LimeSignatureToTempFilePathOptions({
+            complete: null,
+            format: null,
+            success: (res) => {
+              if (res.isEmpty) {
+                uni.showToast({ title: "请先签名", icon: "none" });
+                return null;
+              }
+              signUrl.value = res.tempFilePath;
+              uni.showToast({ title: "签名保存成功", icon: "success" });
+            },
+            fail: (_err = null) => {
+              uni.showToast({ title: "保存失败", icon: "error" });
+            }
+          }));
+        }
+      }
+      return () => {
+        "raw js";
+        const _setTemplateRef = vue.createSharedDataTemplateRefSetter();
+        const _component_l_signature = __easycom_0$8;
+        const n34 = vue.createSharedDataComponent(Card, {
+          title: () => {
+            return "签名板 lime-signature";
+          },
+          __cid: () => {
+            return "09bbf779";
+          }
+        }, {
+          "default": vue.withSharedDataVaporCtx(() => {
+            const n0 = vue.createSharedDataComponentWithFallback(_component_l_signature, {
+              "pen-color": () => {
+                return penColor.value;
+              },
+              "pen-size": () => {
+                return penSize.value;
+              },
+              "open-smooth": () => {
+                return openSmooth.value;
+              },
+              "disable-scroll": () => {
+                return "";
+              },
+              "background-color": () => {
+                return "#ffffff";
+              },
+              __cid: () => {
+                return "eac800ca";
+              }
+            });
+            vue.setSharedData(__sharedData, 3, n0 == null ? void 0 : n0.sharedData);
+            vue.setSharedDataEvent(__sharedData, 6, () => {
+              return onAction("save");
+            });
+            vue.setSharedDataEvent(__sharedData, 7, () => {
+              return onAction("undo");
+            });
+            vue.setSharedDataEvent(__sharedData, 8, () => {
+              return onAction("redo");
+            });
+            vue.setSharedDataEvent(__sharedData, 9, () => {
+              return onAction("clear");
+            });
+            vue.renderSharedDataEffect(() => {
+              return _setTemplateRef(n0, onSigRef);
+            });
+            vue.createSharedDataFor(vue.setSharedData(__sharedData, 4, vue.createSharedDataVFor(__sharedDataScope, () => {
+              return new UniDynamicSharedData(__sharedDataScope, { bundleKey: "".concat(__className$2S, "SharedData"), sharedDataClassId: 1 });
+            })), () => {
+              return colorList;
+            }, (__sharedData_VFor0, _for_item0) => {
+              vue.setSharedDataEvent(__sharedData_VFor0, 1, () => {
+                return penColor.value = _for_item0.value;
+              });
+              vue.renderSharedDataEffect(() => {
+                const _clr = _for_item0.value;
+                vue.setSharedDataStyle(__sharedData_VFor0, 2, {
+                  backgroundColor: _clr,
+                  borderColor: penColor.value === _clr ? "#1e293b" : "transparent"
+                });
+              });
+              return null;
+            }, (__sharedData_VFor0, clr) => {
+              return vue.setSharedData(__sharedData_VFor0, 0, vue.toDisplayString(clr));
+            }, 1);
+            vue.renderSharedDataEffect(() => {
+              return vue.setSharedData(__sharedData, 10, vue.toDisplayString(penSize.value));
+            });
+            const _selector23_0 = vue.createSharedDataSelector(() => {
+              return penSize.value;
+            });
+            const _selector23_1 = vue.createSharedDataSelector(() => {
+              return penSize.value;
+            });
+            const n23 = vue.createSharedDataFor(vue.setSharedData(__sharedData, 5, vue.createSharedDataVFor(__sharedDataScope, () => {
+              return new UniDynamicSharedData(__sharedDataScope, { bundleKey: "".concat(__className$2S, "SharedData"), sharedDataClassId: 2 });
+            })), () => {
+              return penSizeOptions;
+            }, (__sharedData_VFor1, _for_item1, _for_key1) => {
+              vue.setSharedDataEvent(__sharedData_VFor1, 1, () => {
+                return penSize.value = _for_item1.value;
+              });
+              vue.renderSharedDataEffect(() => {
+                vue.setSharedDataClass(__sharedData_VFor1, 2, ["flex-1 h-32px rounded-6px flex flex-row items-center justify-center", _for_key1.value < penSizeOptions.length - 1 ? "mr-6px" : ""]);
+                vue.setSharedData(__sharedData_VFor1, 5, vue.toDisplayString(_for_item1.value));
+              });
+              _selector23_0(_for_item1.value, () => {
+                vue.setSharedDataStyle(__sharedData_VFor1, 3, { backgroundColor: penSize.value === _for_item1.value ? "#3b82f6" : "#e2e8f0" });
+              });
+              _selector23_1(_for_item1.value, () => {
+                vue.setSharedDataStyle(__sharedData_VFor1, 4, { color: penSize.value === _for_item1.value ? "#ffffff" : "#475569" });
+              });
+              return null;
+            }, (__sharedData_VFor1, sz, _j) => {
+              return vue.setSharedData(__sharedData_VFor1, 0, vue.toDisplayString(sz));
+            }, 1);
+            n23.onReset(_selector23_0.reset);
+            n23.onReset(_selector23_1.reset);
+            vue.createSharedDataIf(() => {
+              return vue.setSharedData(__sharedData, 1, vue.toSharedDataBoolean(signUrl.value !== ""));
+            }, () => {
+              vue.renderSharedDataEffect(() => {
+                return vue.setSharedDataAttr(__sharedData, 2, vue.toSharedDataString(signUrl.value));
+              });
+            });
+          })
         }, true);
         vue.setSharedData(__sharedData, 0, n34.sharedData);
         return __sharedData;
       };
     }
   });
-  const _style_0$2T = {};
-  const SystemInfoDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main$2X, [["styles", [_style_0$2T]]]);
+  const _style_0$2O = {};
+  const SignatureCard = /* @__PURE__ */ _export_sfc(_sfc_main$2T, [["styles", [_style_0$2O]]]);
+  class WebviewEchart {
+    constructor(canvasId, webviewCtx = null, element = null) {
+      this.canvasId = "";
+      this.webviewCtx = null;
+      this.element = null;
+      this.onEventMap = /* @__PURE__ */ new Map();
+      this.onceEventMap = /* @__PURE__ */ new Map();
+      this.canvasId = canvasId;
+      this.webviewCtx = webviewCtx;
+      this.element = element;
+    }
+    evalJS(code2) {
+      if (this.element != null) {
+        this.element.evalJS(code2);
+        return null;
+      }
+      if (this.webviewCtx != null) {
+        this.webviewCtx.evalJS(code2);
+        return null;
+      }
+      if (this.canvasId != "") {
+        const el = uni.getElementById(this.canvasId);
+        if (el != null) {
+          this.element = el;
+          this.element.evalJS(code2);
+          return null;
+        }
+        try {
+          const ctx = uni.createWebviewContext(this.canvasId);
+          if (ctx != null) {
+            this.webviewCtx = ctx;
+            this.webviewCtx.evalJS(code2);
+            return null;
+          }
+        } catch (_e) {
+        }
+      }
+    }
+    init(theme = null, opts = new UTSJSONObject({})) {
+      this.evalJS("init(".concat(UTS.JSON.stringify(new UTSJSONObject({ theme, opts })), ")"));
+    }
+    onWebviewMsg(e) {
+      var e_1, _a2;
+      uni.__log__("log", "at uni_modules/e-chart/components/e-chart/uts/WebviewEchart.uts:51", "onWebviewMsg", e.detail.data);
+      try {
+        for (var _b2 = __values(e.detail.data), _c = _b2.next(); !_c.done; _c = _b2.next()) {
+          var msg = _c.value;
+          const msgType = msg["type"];
+          const data2 = msg["data"];
+          const onEventMap = UTS.mapGet(this.onEventMap, msgType);
+          if (onEventMap != null) {
+            onEventMap(data2);
+          }
+          const onceEvent = UTS.mapGet(this.onceEventMap, msgType);
+          if (onceEvent != null) {
+            onceEvent(data2);
+            this.onceEventMap.delete(msgType);
+          }
+        }
+      } catch (e_1_1) {
+        e_1 = { error: e_1_1 };
+      } finally {
+        try {
+          if (_c && !_c.done && (_a2 = _b2.return))
+            _a2.call(_b2);
+        } finally {
+          if (e_1)
+            throw e_1.error;
+        }
+      }
+    }
+    setOption(option, notMerge = false, lazyUpdate = false) {
+      this.evalJS("setOption(".concat(UTS.JSON.stringify(option), ", ").concat(notMerge, ", ").concat(lazyUpdate, ")"));
+    }
+    getOption(success) {
+      this.onceEventMap.set("getOption", success);
+      this.evalJS("getOption()");
+    }
+    getWidth(success) {
+      this.onceEventMap.set("getWidth", success);
+      this.evalJS("getWidth()");
+    }
+    getHeight(success) {
+      this.onceEventMap.set("getHeight", success);
+      this.evalJS("getHeight()");
+    }
+    resize(option = new UTSJSONObject({})) {
+      this.evalJS("resize(".concat(UTS.JSON.stringify(option), ")"));
+    }
+    on(name, handler) {
+      this.onEventMap.set(name, handler);
+      this.evalJS("on(".concat(UTS.JSON.stringify(new UTSJSONObject({ name })), ")"));
+    }
+    on(name, query, handler) {
+      this.onEventMap.set(name, handler);
+      this.evalJS("on(".concat(UTS.JSON.stringify(new UTSJSONObject({ name, query })), ")"));
+    }
+    off(name) {
+      this.evalJS("off(".concat(UTS.JSON.stringify(new UTSJSONObject({ name })), ")"));
+    }
+    dispatchAction(option) {
+      this.evalJS("dispatchAction(".concat(UTS.JSON.stringify(option), ")"));
+    }
+    showLoading(option) {
+      this.evalJS("showLoading(".concat(UTS.JSON.stringify(option), ")"));
+    }
+    hideLoading() {
+      this.evalJS("hideLoading()");
+    }
+    appendData(option) {
+      this.evalJS("appendData(".concat(UTS.JSON.stringify(option), ")"));
+    }
+    canvasToTempFilePath(option) {
+      const success = option["success"];
+      this.onceEventMap.set("canvasToTempFilePath", success);
+      this.evalJS("canvasToTempFilePath()");
+    }
+    clear() {
+      this.evalJS("clear()");
+    }
+    dispose() {
+      this.evalJS("dispose()");
+    }
+  }
+  function getRandomId() {
+    return "chart_".concat(Math.random().toString(36).substring(2, 16));
+  }
+  function addUnitRpx(num) {
+    return typeof num === "number" ? "".concat(num, "rpx") : num;
+  }
+  const __className$2R = "GenUniModulesEChartComponentsEChartEChart";
+  const _sfc_main$2S = /* @__PURE__ */ vue.defineVaporSharedDataComponent(Object.assign({
+    name: "e-chart"
+  }, { __dynamicSharedData: true, __hash: "c73315bc", __className: __className$2R, __filename: "uni_modules/e-chart/components/e-chart/e-chart.uvue", __name: "e-chart", props: {
+    width: {
+      type: [Number, String],
+      default: "100%"
+    },
+    height: {
+      type: [Number, String],
+      default: 600
+    },
+    disableScroll: {
+      type: Boolean,
+      default: false
+    },
+    theme: {
+      type: String,
+      default: ""
+    }
+  }, emits: ["ready"], setup(__props, _a2) {
+    var __expose = _a2.expose, __emit = _a2.emit;
+    const __sharedDataScope = vue.useSharedDataScope();
+    const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenUniModulesEChartComponentsEChartEChartSharedData", sharedDataClassId: 0 })));
+    const emit = __emit;
+    const props = __props;
+    vue.getCurrentInstance();
+    const echartObj = vue.ref(null);
+    const canvasId = getRandomId();
+    const canvasStyle = vue.computed(() => {
+      return "width:".concat(addUnitRpx(props.width), ";height:").concat(addUnitRpx(props.height));
+    });
+    function onCanvasReady() {
+      emit("ready");
+    }
+    function initAPP(option) {
+      var _a3;
+      let elem = null;
+      let ctx = null;
+      try {
+        const el = uni.getElementById(canvasId);
+        if (el != null) {
+          elem = el;
+        }
+      } catch (_e) {
+      }
+      if (elem == null) {
+        try {
+          ctx = uni.createWebviewContext(canvasId);
+        } catch (_e) {
+        }
+      }
+      echartObj.value = new WebviewEchart(canvasId, ctx, elem);
+      echartObj.value.init(props.theme);
+      (_a3 = echartObj.value) === null || _a3 === void 0 ? null : _a3.setOption(option);
+      setTimeout(() => {
+        var _a4, _b2;
+        (_a4 = echartObj.value) === null || _a4 === void 0 ? null : _a4.init(props.theme);
+        (_b2 = echartObj.value) === null || _b2 === void 0 ? null : _b2.setOption(option);
+      }, 120);
+      return new UTSJSONObject({ echartObj: echartObj.value });
+    }
+    function init(option) {
+      return __awaiter(this, void 0, void 0, function* () {
+        return initAPP(option);
+      });
+    }
+    function getEchartObj() {
+      return echartObj.value;
+    }
+    function setOption(option) {
+      var _a3;
+      (_a3 = echartObj.value) === null || _a3 === void 0 ? null : _a3.setOption(option);
+    }
+    function getOption() {
+      return new Promise((resolve) => {
+        echartObj.value.getOption(resolve);
+      });
+    }
+    function getWidth() {
+      return new Promise((resolve) => {
+        echartObj.value.getWidth((e) => {
+          resolve(e["width"]);
+        });
+      });
+    }
+    function getHeight() {
+      return new Promise((resolve) => {
+        echartObj.value.getHeight((e) => {
+          resolve(e["height"]);
+        });
+      });
+    }
+    function resize() {
+      var _a3;
+      (_a3 = echartObj.value) === null || _a3 === void 0 ? null : _a3.resize();
+    }
+    function canvasToTempFilePath() {
+      return new Promise((resolve, reject) => {
+        var _a3;
+        const fail = (e) => {
+          uni.showModal(new UTSJSONObject({ title: "保存失败", content: UTS.JSON.stringify(e), showCancel: false }));
+          reject(e);
+        };
+        (_a3 = echartObj.value) === null || _a3 === void 0 ? null : _a3.canvasToTempFilePath(new UTSJSONObject({
+          success: (e) => {
+            const base64 = e["base64"];
+            const fileSystemManager = uni.getFileSystemManager();
+            const filePath = "".concat(uni.env.USER_DATA_PATH, "/").concat(Date.now(), ".png");
+            fileSystemManager.writeFile({
+              filePath,
+              encoding: "base64",
+              data: base64.replace("data:image/png;base64,", ""),
+              success: (_res) => {
+                resolve(filePath);
+              },
+              fail: (err) => {
+                fail(err);
+              }
+            });
+          },
+          fail
+        }));
+      });
+    }
+    function showLoading(option) {
+      var _a3;
+      (_a3 = echartObj.value) === null || _a3 === void 0 ? null : _a3.showLoading(option);
+    }
+    function hideLoading() {
+      var _a3;
+      (_a3 = echartObj.value) === null || _a3 === void 0 ? null : _a3.hideLoading();
+    }
+    function onWebviewMsg(e) {
+      var _a3;
+      (_a3 = echartObj.value) === null || _a3 === void 0 ? null : _a3.onWebviewMsg(e);
+    }
+    function onWebviewError(e) {
+      uni.__log__("error", "at uni_modules/e-chart/components/e-chart/e-chart.uvue:434", "onWebviewError:", e);
+    }
+    vue.watch(() => {
+      return props.width;
+    }, () => {
+      resize();
+    });
+    vue.watch(() => {
+      return props.height;
+    }, () => {
+      resize();
+    });
+    vue.onMounted(() => {
+    });
+    __expose({
+      init,
+      setOption,
+      getOption,
+      getWidth,
+      getHeight,
+      resize,
+      getEchartObj,
+      canvasToTempFilePath,
+      showLoading,
+      hideLoading,
+      onCanvasReady
+    });
+    return () => {
+      "raw js";
+      const _component_web_view = vue.resolveComponent("web-view");
+      const n0 = vue.createSharedDataComponentWithFallback(_component_web_view, {
+        id: () => {
+          return vue.unref(canvasId);
+        },
+        style: () => {
+          return canvasStyle.value;
+        },
+        bounces: () => {
+          return false;
+        },
+        horizontalScrollBarAccess: () => {
+          return false;
+        },
+        verticalScrollBarAccess: () => {
+          return false;
+        },
+        "webview-styles": () => {
+          return { progress: false };
+        },
+        src: () => {
+          return "/uni_modules/e-chart/static/app/webview.html";
+        },
+        onLoad: () => {
+          return onCanvasReady;
+        },
+        onError: () => {
+          return onWebviewError;
+        },
+        onMessage: () => {
+          return onWebviewMsg;
+        },
+        __cid: () => {
+          return "8080c770";
+        }
+      }, null, true);
+      vue.setSharedData(__sharedData, 0, n0 == null ? void 0 : n0.sharedData);
+      return __sharedData;
+    };
+  } }));
+  const __className$2Q = "GenSrcPagesFunctionComponentsEchartsDemoCard";
+  const gridKey = "grid";
+  const _sfc_main$2R = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
+    __dynamicSharedData: true,
+    __hash: "513859d0",
+    __className: __className$2Q,
+    __filename: "src/pages/function/components/EchartsDemoCard.uvue",
+    __name: "EchartsDemoCard",
+    setup(__props) {
+      const __sharedDataScope = vue.useSharedDataScope();
+      const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesFunctionComponentsEchartsDemoCardSharedData", sharedDataClassId: 0 })));
+      const echartTitle = vue.computed(() => {
+        return $t("basic.echartTitle");
+      });
+      const echartLineText = vue.computed(() => {
+        return $t("basic.echartLine");
+      });
+      const echartBarText = vue.computed(() => {
+        return $t("basic.echartBar");
+      });
+      const echartPieText = vue.computed(() => {
+        return $t("basic.echartPie");
+      });
+      const echartRef = vue.ref(null);
+      const currentType = vue.ref("line");
+      const lineOption = new UTSJSONObject({
+        title: new UTSJSONObject({
+          text: "访问趋势 (折线图)",
+          textStyle: new UTSJSONObject({
+            fontSize: 12,
+            color: "#64748b"
+          })
+        }),
+        xAxis: new UTSJSONObject({
+          type: "category",
+          data: ["周一", "周二", "周三", "周四", "周五", "周六", "周日"],
+          axisLine: new UTSJSONObject({
+            lineStyle: new UTSJSONObject({
+              color: "#cbd5e1"
+            })
+          }),
+          axisLabel: new UTSJSONObject({
+            color: "#64748b"
+          })
+        }),
+        yAxis: new UTSJSONObject({
+          type: "value",
+          axisLine: new UTSJSONObject({
+            show: false
+          }),
+          splitLine: new UTSJSONObject({
+            lineStyle: new UTSJSONObject({
+              color: "#f1f5f9"
+            })
+          }),
+          axisLabel: new UTSJSONObject({
+            color: "#64748b"
+          })
+        }),
+        [gridKey]: new UTSJSONObject({
+          left: "12%",
+          right: "5%",
+          top: "18%",
+          bottom: "12%"
+        }),
+        series: [new UTSJSONObject({
+          data: [120, 200, 150, 80, 70, 110, 130],
+          type: "line",
+          smooth: true,
+          color: "#3b82f6",
+          areaStyle: new UTSJSONObject({
+            color: new UTSJSONObject({
+              type: "linear",
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1,
+              colorStops: [
+                new UTSJSONObject({ offset: 0, color: "rgba(59, 130, 246, 0.4)" }),
+                new UTSJSONObject({ offset: 1, color: "rgba(59, 130, 246, 0)" })
+              ]
+            })
+          })
+        })]
+      });
+      const barOption = new UTSJSONObject({
+        title: new UTSJSONObject({
+          text: "访问分布 (柱状图)",
+          textStyle: new UTSJSONObject({
+            fontSize: 12,
+            color: "#64748b"
+          })
+        }),
+        xAxis: new UTSJSONObject({
+          type: "category",
+          data: ["周一", "周二", "周三", "周四", "周五", "周六", "周日"],
+          axisLine: new UTSJSONObject({
+            lineStyle: new UTSJSONObject({
+              color: "#cbd5e1"
+            })
+          }),
+          axisLabel: new UTSJSONObject({
+            color: "#64748b"
+          })
+        }),
+        yAxis: new UTSJSONObject({
+          type: "value",
+          axisLine: new UTSJSONObject({
+            show: false
+          }),
+          splitLine: new UTSJSONObject({
+            lineStyle: new UTSJSONObject({
+              color: "#f1f5f9"
+            })
+          }),
+          axisLabel: new UTSJSONObject({
+            color: "#64748b"
+          })
+        }),
+        [gridKey]: new UTSJSONObject({
+          left: "12%",
+          right: "5%",
+          top: "18%",
+          bottom: "12%"
+        }),
+        series: [new UTSJSONObject({
+          data: [120, 200, 150, 80, 70, 110, 130],
+          type: "bar",
+          color: "#10b981"
+        })]
+      });
+      const pieOption = new UTSJSONObject({
+        title: new UTSJSONObject({
+          text: "访问来源 (饼图)",
+          textStyle: new UTSJSONObject({
+            fontSize: 12,
+            color: "#64748b"
+          })
+        }),
+        series: [new UTSJSONObject({
+          name: "访问来源",
+          type: "pie",
+          radius: "52%",
+          center: ["50%", "52%"],
+          label: new UTSJSONObject({
+            fontSize: 11,
+            color: "#64748b"
+          }),
+          data: [
+            new UTSJSONObject({ value: 1048, name: "搜索引擎", itemStyle: new UTSJSONObject({ color: "#3b82f6" }) }),
+            new UTSJSONObject({ value: 735, name: "直接访问", itemStyle: new UTSJSONObject({ color: "#10b981" }) }),
+            new UTSJSONObject({ value: 580, name: "邮件营销", itemStyle: new UTSJSONObject({ color: "#f59e0b" }) }),
+            new UTSJSONObject({ value: 484, name: "联盟广告", itemStyle: new UTSJSONObject({ color: "#8b5cf6" }) })
+          ]
+        })]
+      });
+      function initEchart() {
+        if (echartRef.value != null) {
+          const chart2 = echartRef.value;
+          chart2.$callMethod("init", lineOption);
+        }
+      }
+      function changeToLine() {
+        currentType.value = "line";
+        if (echartRef.value != null) {
+          const chart2 = echartRef.value;
+          chart2.$callMethod("setOption", lineOption);
+        }
+      }
+      function changeToBar() {
+        currentType.value = "bar";
+        if (echartRef.value != null) {
+          const chart2 = echartRef.value;
+          chart2.$callMethod("setOption", barOption);
+        }
+      }
+      function changeToPie() {
+        currentType.value = "pie";
+        if (echartRef.value != null) {
+          const chart2 = echartRef.value;
+          chart2.$callMethod("setOption", pieOption);
+        }
+      }
+      const windowWidth = vue.computed(() => {
+        var _a2, _b2;
+        return (_b2 = (_a2 = systemInfo.value) === null || _a2 === void 0 ? null : _a2.windowWidth) !== null && _b2 !== void 0 ? _b2 : 0;
+      });
+      vue.watch(windowWidth, () => {
+        setTimeout(() => {
+          if (echartRef.value != null) {
+            const chart2 = echartRef.value;
+            chart2.$callMethod("resize");
+          }
+        }, 100);
+      });
+      return () => {
+        "raw js";
+        const _setTemplateRef = vue.createSharedDataTemplateRefSetter();
+        const _component_e_chart = _sfc_main$2S;
+        const n12 = vue.createSharedDataComponent(Card, {
+          title: () => {
+            return echartTitle.value;
+          },
+          __cid: () => {
+            return "207b4afe";
+          }
+        }, {
+          "default": vue.withSharedDataVaporCtx(() => {
+            const n0 = vue.createSharedDataComponentWithFallback(_component_e_chart, {
+              height: () => {
+                return "280px";
+              },
+              class: () => {
+                return "w-full h-full";
+              },
+              onReady: () => {
+                return initEchart;
+              },
+              __cid: () => {
+                return "2223d512";
+              }
+            });
+            vue.setSharedData(__sharedData, 1, n0 == null ? void 0 : n0.sharedData);
+            _setTemplateRef(n0, echartRef, null, "echartRef");
+            vue.setSharedDataEvent(__sharedData, 2, changeToLine);
+            vue.setSharedDataEvent(__sharedData, 3, changeToBar);
+            vue.setSharedDataEvent(__sharedData, 4, changeToPie);
+            vue.renderSharedDataEffect(() => {
+              const _currentType = currentType.value;
+              vue.setSharedDataClass(__sharedData, 5, ["w-full h-36px rounded-8px flex flex-row items-center justify-center", _currentType !== "line" ? "bg-__e0edff_" : "bg-__3b82f6_"]);
+              vue.setSharedDataClass(__sharedData, 6, ["text-12px font-bold", _currentType !== "line" ? "text-__3b82f6_" : "text-__ffffff_"]);
+              vue.setSharedData(__sharedData, 7, vue.toDisplayString(echartLineText.value));
+              vue.setSharedDataClass(__sharedData, 8, ["w-full h-36px rounded-8px flex flex-row items-center justify-center", _currentType !== "bar" ? "bg-__d1fae5_" : "bg-__10b981_"]);
+              vue.setSharedDataClass(__sharedData, 9, ["text-12px font-bold", _currentType !== "bar" ? "text-__10b981_" : "text-__ffffff_"]);
+              vue.setSharedData(__sharedData, 10, vue.toDisplayString(echartBarText.value));
+              vue.setSharedDataClass(__sharedData, 11, ["w-full h-36px rounded-8px flex flex-row items-center justify-center", _currentType !== "pie" ? "bg-__fef3c7_" : "bg-__f59e0b_"]);
+              vue.setSharedDataClass(__sharedData, 12, ["text-12px font-bold", _currentType !== "pie" ? "text-__f59e0b_" : "text-__ffffff_"]);
+              vue.setSharedData(__sharedData, 13, vue.toDisplayString(echartPieText.value));
+            });
+          })
+        }, true);
+        vue.setSharedData(__sharedData, 0, n12.sharedData);
+        return __sharedData;
+      };
+    }
+  });
+  const _style_0$2N = {};
+  const EchartsDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main$2R, [["styles", [_style_0$2N]]]);
   const base64Arrow = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkBAMAAACCzIhnAAAAD1BMVEVHcExRUVFMTExRUVFRUVE9CdWsAAAABHRSTlMAjjrY9ZnUjwAAAQFJREFUWMPt2MsNgzAMgGEEE1B1gKJmAIRYoCH7z9RCXrabh33iYktcIv35EEg5ZBh07pvxJU6MFSPOSRnjnBUjUsaciRUjMsb4xIoRCWNiYsUInzE5sWKEyxiYWDbyefqHx1zIeiYTk7mQYziTYecxHvEJjwmIT3hMQELCYSISEg4TkZj0mYTEpM8kJCU9JiMp6TEZyUmbAUhO2gxAQNJiIAKSFgMRmNQZhMCkziAEJTUGIyipMRjBSZkhCE7KDEFIUmTeGCHJxWz0zXaE0GTCG8ZFtEaS347r/1fe11YyHYVfubxayfjoHmc0YYwmmmiiiSaaaKLJ7ckyz5ve+dw3Xw2emdwm9xSbAAAAAElFTkSuQmCC";
   const base64Flower = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkBAMAAACCzIhnAAAAKlBMVEVHcEzDw8Ovr6+pqamUlJTCwsKenp61tbWxsbGysrLNzc2bm5u5ubmjo6MpovhuAAAACnRSTlMA/P79/sHDhiZS0DxZowAABBBJREFUWMPtl89rE0EUx7ctTXatB3MI1SWnDbUKPUgXqh4ED8Uf7KUVSm3ooVSpSii0Fn/gD4j4o+APiEoVmos9FO2celiqZVgwgaKHPQiCCkv+F99kM7Ozm5kxq1dfD91k9pPve9/3ZjbRNHHok/mKli4eIPNgSuRObuN9SqSEzM20iGnm0yIbqCuV7NSSSIV7uyPM6JMBYdeTOanh/QihJYZsUCSby+VkMj2AvOt0rAeQAwqE3lfKMZVlQCZk1QOCKkkVPadITCfIRNKxfoJI5+0OIFtJx14CMSg1mRSDko7VAfksRQzEbGYqxOJcVTWMCH2I1/IACNW0PWU2M8cmAVHtnH5mM1VRWtwKZjOd5JbF6s1IbaYqaotjNlPHgDAnlAizubTR6ovMYn052g/U5qcmOpi0WL8xTS/3IfSet5m8MEr5ajjF5le6dq/OJpobrdY0t3i9QgefWrxW9/1BLhk0E9m8FeUMhhXal499iD0eQRfDF+ts/tttORRerfp+oV7f4xJj82iUYm1Yzod+ZQEAlS/8mMBwKebVmCVp1f0JLS6zKd17+iwRKTARVg2SHtz3iEbBH+Q+U28zW2Jiza8Tjb1YFoYZMsJyjDqp3M9XBQdSdPLFdxEpvOB37JrHcmR/y9+LgoTlCFGZEa2sc6d4PGlweEa2JSVPoVm+IfGG3ZL037iV9oH+P+Jxc4HGVflNq1M0pivao/EopO4b/ojVCP9GjmiXOeS0DOn1o/iiccT4ORnyvBGF3yUywkQajW4Ti0SGuiy/wVSg/L8w+X/8Q+hvUx8Xd90z4oV5a1i88MbFWHz0WZZ1UrTwBGPX3Rat9AFiXRMRjoMdIdJLEOt2h7jrYOzgOamKZSWSNspOS0X8SAqRYmxRL7sg4eLzYmNehcxh3uoyud/BH2Udux4ywxFTc1xC7Mgf4vMhc5S+kSH3Y7yj+qpwIWSoPTVCOOPVthGx9FbGqrwFw6wSFxJr+17zeKcztt3u+2roAEVgUjDd+AHGuxHy2rZHaa8JMkTHEeyi85ANPO9j9BVuBRD2FY5LDMo/Sz/2hReqGIs/KiFin+CsPsYO/yvM3jL2vE8EbX7/Bf8ejtr2GLN65bioAdgLd8Bis/mD5GmP2qeqyo2ZwQEOtAjRIDH7mBKpUcMoApbZJ5UIxkEwxyMZyMxW/uKFvHCFR3SSmerHyDNQ2dF4JG6zIMpBgLfjSF9x1D6smFcYnGApjmSLICO3ecCDWrQ48geba9DI3STy2i7ax6WIB62fSyIZIiO3GFQqSURp8wCo7GhJBGwuSovJBNjb7kT6FPVnIa9qJ2Ko+l9mefGIdinaMp0yC1URYiwsdfNE45EuA5Cx9EhalfvN5s+UyItm81vaB3p4joniN+SCP7Qc1hblAAAAAElFTkSuQmCC";
   const base64Success = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkBAMAAACCzIhnAAAAElBMVEVRUVFHcExTU1NRUVFRUVFRUVFOSlSUAAAABnRSTlP/AI6+VySB3ZENAAACcElEQVRYw+2YyYKCMAyGI8hdpdxdZu7gcpdZ7jL6/s8yYheSNi0aPdqbwOffpGmaFOYPD3gj4bisN7vddv17N/JVgxn5x12IWgIaWTuO/IE3PseQbwjGPo2cgRmHFLJwdm/X643zwiqOKPPJ1nj3sjEP2iiifZWj5bhopSyGaEO2HX5fbQJzwJ+W7x/jw5ZFjsEU0PMph9xE8i5EqprKALW95eJQURkgzw98uJ/JvwGecR7bIjWWsUgVrrIfFZ2HlLy3sKETD1mmRLRMRhGVssRa0xJkdn3SpJBymBkM8+pSSDXMDNyDaToVHd2fgpNt0sjwiUZO19+jGQ+gQEg9Oq+bufmAVGihomNmjQG7UG3020vrlm7lkFnKFGU3kZ0KGAdmKe821pipQ+qEKcrZeTL2g5FsUks4cStjEZWwXg0b0n4GxmEpkWwIs5VBynjgK7xZaz1/0D7OxkVuLpsY5BQNFyLS84VBjjbg0iL2r2EQHBOxBhikuUOkdxODVF1cxHoWtPPsiyXO455Iv34hssCO8EV4ZIYTjS8SR4qYSHRiTiYQ4ZFbHi0iIhhBTi6dTCgSWRcnw4h4yGTuyTAiOGBIWGoZTgSHJQl+LcOJ4OCnW6yX2bMnJ9pidCOXtkTkTrIGpYuOynAiOF14SamMiOCk5Ke+mq8BcOrrvym8d0zKIQnWT+M1WwOQNO4fFiWb18hhERxJPx2fblbPHHyC41VyiAtKBUFBIih7JMWVoIQTFIr3lKPN80WvoLSWFPC653ioTZA0I0FrQ7qU6asaK0H7JmkSJa2ooOGVtNUsc3j9FYHkIkJy3SG6VHnfXKXGP9t4N9Q4Ye98AAAAAElFTkSuQmCC";
   const base64Empty = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWCAMAAAAL34HQAAALeGlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNi4wLWMwMDIgNzkuMTY0NDg4LCAyMDIwLzA3LzEwLTIyOjA2OjUzICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0RXZ0PSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VFdmVudCMiIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczpwaG90b3Nob3A9Imh0dHA6Ly9ucy5hZG9iZS5jb20vcGhvdG9zaG9wLzEuMC8iIHhtbG5zOnRpZmY9Imh0dHA6Ly9ucy5hZG9iZS5jb20vdGlmZi8xLjAvIiB4bWxuczpleGlmPSJodHRwOi8vbnMuYWRvYmUuY29tL2V4aWYvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxOSAoV2luZG93cykiIHhtcDpDcmVhdGVEYXRlPSIyMDIyLTAyLTIyVDIxOjIxOjQ1KzA4OjAwIiB4bXA6TWV0YWRhdGFEYXRlPSIyMDI0LTAxLTEzVDE5OjA5OjQwKzA4OjAwIiB4bXA6TW9kaWZ5RGF0ZT0iMjAyNC0wMS0xM1QxOTowOTo0MCswODowMCIgZGM6Zm9ybWF0PSJpbWFnZS9wbmciIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6ZWQwMWYzNWQtOWRjOC00MDBiLWEyMmQtNjM5OGZiNzVhNGRiIiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6ZDhlMzQ3ZmEtMDY2My1jYTRiLTgzNTctNTk4YjBkNGIzOTU2IiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6ZDA4MDI4MDItMzUyYS04NTRhLTkxYjctNmRlNmQ1MmViM2QwIiBwaG90b3Nob3A6Q29sb3JNb2RlPSIzIiBwaG90b3Nob3A6SUNDUHJvZmlsZT0ic1JHQiBJRUM2MTk2Ni0yLjEiIHRpZmY6T3JpZW50YXRpb249IjEiIHRpZmY6WFJlc29sdXRpb249IjMwMDAwMDAvMTAwMDAiIHRpZmY6WVJlc29sdXRpb249IjMwMDAwMDAvMTAwMDAiIHRpZmY6UmVzb2x1dGlvblVuaXQ9IjIiIGV4aWY6Q29sb3JTcGFjZT0iMSIgZXhpZjpQaXhlbFhEaW1lbnNpb249IjMwMCIgZXhpZjpQaXhlbFlEaW1lbnNpb249IjMwMCI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6ZDA4MDI4MDItMzUyYS04NTRhLTkxYjctNmRlNmQ1MmViM2QwIiBzdEV2dDp3aGVuPSIyMDIyLTAyLTIyVDIxOjIxOjQ1KzA4OjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxOSAoV2luZG93cykiLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249InNhdmVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjQwNjg2NzJkLWY5NDMtOTU0Mi1iMDBiLTVlMDExNmE1NmIzZSIgc3RFdnQ6d2hlbj0iMjAyNC0wMS0xM1QxMDoyNjoxNiswODowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTkgKFdpbmRvd3MpIiBzdEV2dDpjaGFuZ2VkPSIvIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDphYmJkZmUyZC0xY2Q2LTJiNDgtYjUyNS05YzlhZjdlNjA4NDMiIHN0RXZ0OndoZW49IjIwMjQtMDEtMTNUMTE6MjM6NDArMDg6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAyMDE5IChXaW5kb3dzKSIgc3RFdnQ6Y2hhbmdlZD0iLyIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0iY29udmVydGVkIiBzdEV2dDpwYXJhbWV0ZXJzPSJmcm9tIGFwcGxpY2F0aW9uL3ZuZC5hZG9iZS5waG90b3Nob3AgdG8gaW1hZ2UvcG5nIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJkZXJpdmVkIiBzdEV2dDpwYXJhbWV0ZXJzPSJjb252ZXJ0ZWQgZnJvbSBhcHBsaWNhdGlvbi92bmQuYWRvYmUucGhvdG9zaG9wIHRvIGltYWdlL3BuZyIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6YTQ5MjM5MDAtNDhiZC03YTQ1LWI4NGItYmVlZTVjOWUxYTM1IiBzdEV2dDp3aGVuPSIyMDI0LTAxLTEzVDExOjIzOjQwKzA4OjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxOSAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249InNhdmVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOmVkMDFmMzVkLTlkYzgtNDAwYi1hMjJkLTYzOThmYjc1YTRkYiIgc3RFdnQ6d2hlbj0iMjAyNC0wMS0xM1QxOTowOTo0MCswODowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDIyLjAgKE1hY2ludG9zaCkiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOmFiYmRmZTJkLTFjZDYtMmI0OC1iNTI1LTljOWFmN2U2MDg0MyIgc3RSZWY6ZG9jdW1lbnRJRD0iYWRvYmU6ZG9jaWQ6cGhvdG9zaG9wOjM2ZGQ4NTQxLWQ0MWEtYmY0Yy1iZjA3LWNmNjZhNjZhMDg2MSIgc3RSZWY6b3JpZ2luYWxEb2N1bWVudElEPSJ4bXAuZGlkOmQwODAyODAyLTM1MmEtODU0YS05MWI3LTZkZTZkNTJlYjNkMCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pm30U/gAAAAJcEhZcwAALiMAAC4jAXilP3YAAAA/UExURUdwTODg4O3t7e7u7unp6d7e3uTk5M/Pz8nJyePj4+jo6Pj4+MrKyszMzO7u7unp6fb29vLy8vr6+v7+/sHBweag3xAAAAAOdFJOUwAxia5pF0n+/vzX3KbULQ2DYQAACG1JREFUeNrtm4l2o7gShi20IWFrAd7/WUc7EosDWKZ976Hc7WTmdMKXv0qlqpLyeNx222233Xbbbbfddtv/mOHn8xexSNsiRH5PrbFtW4p+DetpsF4v8Gs+HA3WEwOAfwzriYxaLTVsP8X1QK0z+vqQCzewYogi60aL9SEX5oyxphYVCFTGjfSJCTmN1jBruN5KTGCUS8bhySQGHRaohmW4glwtldbOeYJYKlgvbyUuA8aFFEKc++aIM4hrRnyiMnIZKq1PrihcM3GNKboMF1Naa9X9+8T1KrxIlVbGjv3cAEHOYYMqqgUsVuJqqehV3+sjDwB+DTJp0lYtMCyZpxqjF4e+74+sRcQSFZO8UonUSEFzuUY+DKo59A2kZDatGCjzCauy/2AmhSyCq0WHEj0KTNJDmVeNhErMt1Q8W4xti4/FwMJ4jaxl05TKFiNtD3kBGrHnhiph9V0eXQc6DkyE2xX830AlKshFTErXeuCZXK/9m41wFsGSfZ4lcGeyZ98PrylJ7MWCojQZ3qSukL2QslgdngqJnTEPdTJhXvbNBoR/+7wabIxWduN/Ja5dWEivm4XSZ2uQckNzmRlHrn2lc6eiafvS4V2Hd12tesau8toZW0CtWoZYb9t+OqxdCYKYjVPF16pVbILIy/gR7MVaWMHYPCoa2VkzkX4Iry2rirXbumGyAjGC1h62YLw6ApsNKZph3fpIWHt08JovRWD62sejpXhTrhWrPpl6zZ6PW2oTG5ltlvgtF6weNYCWKeJJSfg4W6PNJlj3sVZgOXV4lc8n4RlkMTLEBDVoYc3nI09kpyzzfgWsjyzBZSNDKF2/wjh+sxYvn8Y1scxlfLF9T1RBO3wVHsnq8Fk4oGkEh/0KJPSa8T2CeWE5X9BPmgLsaRIGeNL2kshCsWoLBmdPJW5Wbz1ndAKUXjPwxXYAUpSV3fy5BJg1aa1tyVXHHMgVH31ewDVrleHr9XqC684SUF4mecR3+wW5SC2QNvxUizRv98mLDhPgYiMDb+v8g0OADxqxcnf9w01mZYJF0fUVP5LcdswbsMmy1DVs5PlE5NpNiTR8M8qAWZkOy6aN13VcoOF2/s3xn3Mes8Xza05tgR/BuNz69nlNzMR0fH45p+G4R9oxh2mKt9MF4J7K/lvWUojwF5nCgCpuRUptnZMQ3au0nSo2UsHgV3xpmeLYzGml3ZFBBzYGPCpOQRwXs1/GG1J74dlZc6JKUOtjBAz9XjVxucGWHbZVJDPJQGYDRl1Qmf1ovk2Sbghb6MQlnF7mBzM1bgOqJAPpoOQaVe+4Skcit3uqHMyG/Sh1rHNN0gAfM0nnPrmulfLVBSm20TSZSdWa0LJl2ukVyE4vTYCgP3uQkwv1TKtQWgxDzBSg80OQjCs4klKvuUzHLCfIbDKIE/S5VIGqD1iD2819pkAqTWdmeina+oZABi7X5B1MGoTJqJSchuk6JNHcgUPAcsVFk0+N0oDN68Vo7FQSmCXjx46OEtUk1lpY2ZFQGr/AcpqVato4wPUD+RhfAeyQI5sJ6l2sDwnKqNFSJvpiyJbFl3kTOjZ2ievwCR7hkUoWeV2vOLAXvB39AJoyqYa81A5cvaAidXYTFTycKDBcalVK5f3XS89kzLVl9txfL+K+p6NUnitz5KkKm7D3DrRPNq4bk7l20aFRppNilmuQI+uzTtj9wPBkTsVwM7HbJ5pwGgujyRyZDzQLNoiRFluRtQ+GzEguqRxUL+ZMFqulMzIfaP3ARj2k/txB8c+2HyjmDizCaVWtNoE5MvMlKs/4VQ7HUJZCrU6qCKcNJ2aSWUZhJZu4VI0LB4CHFdj77DRuGi28WKAxoRyZyzGVrmc0jmk1nP5QaxZo1puqq1YIAqgZb8e/rABZJWNCNxV7DSTpOO7Aail9J9nYHtua/4ouE/aS0X1qtXQzwGx+rnbi2vhF/TfZG52oc6DPo1WCi3RTDnRk7TEntoEp38gg+DjYs2opkR3JW5EpL9rU0XSK5/6LOTAVS+72x7pm60zSf5HMdldjhzJqw1FRcxXdS3ZNZp0s92FiyluUvBPoD9ynZNkBiu2NF11ofnlnQbZgKqvusj9R/f6DOzgVsahbNlXxlsxU8y7qrbTupitRyxFBKG6H3aEPUqj7YrzAymq41FXlZLlO4WLbvG2Kg4vYB+wPfWS2B5Rq8TW9ROpAZbiF6MmCTsx1NLLsx7NOoOiZup2CNbZ36xc96ErcxzuILGrmmFhimjtwKo/yTm7feTVwB61IzbnW4967Kt3cDDotGt8JKrTiUyO3Uy2PZZt9tapXEfXhWmTgcoB+JchFWsiCKvYnhmn/tKuJDbgly897FnFfkE1rQLKy810OU7xW3bEJHCD5gERtuTGuxoJqA6qI9TNMa6MbvZomsiubbPYx78YXDaaRqqsyqfSaLZdjYGHLu65rDgydXCWm1P5EvcQ828f9pcBapTILSMv1nZCAc0WzFIFsGfUi/kmAxc6cFqDSYuPSMIbs1OVrwITTQM9HVRFJ5JL56qcoFzzT1uVcd2v9jFw8BHlcWtmEI86hp5Dy/zOlK8cUp/rVseRUBqawz6kmAcPLM9l5m8h4V53Iz/2mFJaTCvF8JbsMvPjU/7crbUXart0v4WyE0LnDPcAX95Knj4VUE8HCdNdUP8BDcOXKdPl4uSWbh4LfOV0HDdfipOmu+eIRrDsNPkIT7np/8ZAzVdOd1u8wHIqeXt8VqtgiO50ePeNaGG+uO9rHiKdL71pnIun8jxEKXv2r2HYBzO/mz96vFKoMM5WLk7tQXS9U5kwCu5lk7n6++kdCFWRaTUzm0/5fClWGWTrM/AGhCrJO/ZBQhTPFLwmV7ebgcdttt91222233Xbbbf+H9h+2WEtdHVinLAAAAABJRU5ErkJggg==";
   const base64Error = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWCAMAAAAL34HQAAALeGlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNi4wLWMwMDIgNzkuMTY0NDg4LCAyMDIwLzA3LzEwLTIyOjA2OjUzICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0RXZ0PSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VFdmVudCMiIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczpwaG90b3Nob3A9Imh0dHA6Ly9ucy5hZG9iZS5jb20vcGhvdG9zaG9wLzEuMC8iIHhtbG5zOnRpZmY9Imh0dHA6Ly9ucy5hZG9iZS5jb20vdGlmZi8xLjAvIiB4bWxuczpleGlmPSJodHRwOi8vbnMuYWRvYmUuY29tL2V4aWYvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxOSAoV2luZG93cykiIHhtcDpDcmVhdGVEYXRlPSIyMDIyLTAyLTIyVDIxOjIxOjQ1KzA4OjAwIiB4bXA6TWV0YWRhdGFEYXRlPSIyMDI0LTAxLTEzVDE5OjEwOjEwKzA4OjAwIiB4bXA6TW9kaWZ5RGF0ZT0iMjAyNC0wMS0xM1QxOToxMDoxMCswODowMCIgZGM6Zm9ybWF0PSJpbWFnZS9wbmciIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MTQ3NTExNjAtZDY5MC00ZTkzLWFhNGUtNGMwYTViNGU1ZGFjIiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6YzRiNzlkYWMtZTJmYS1iNzQ0LWIxM2ItOWU1N2VjMDhhM2YwIiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6ZDA4MDI4MDItMzUyYS04NTRhLTkxYjctNmRlNmQ1MmViM2QwIiBwaG90b3Nob3A6Q29sb3JNb2RlPSIzIiBwaG90b3Nob3A6SUNDUHJvZmlsZT0ic1JHQiBJRUM2MTk2Ni0yLjEiIHRpZmY6T3JpZW50YXRpb249IjEiIHRpZmY6WFJlc29sdXRpb249IjMwMDAwMDAvMTAwMDAiIHRpZmY6WVJlc29sdXRpb249IjMwMDAwMDAvMTAwMDAiIHRpZmY6UmVzb2x1dGlvblVuaXQ9IjIiIGV4aWY6Q29sb3JTcGFjZT0iMSIgZXhpZjpQaXhlbFhEaW1lbnNpb249IjMwMCIgZXhpZjpQaXhlbFlEaW1lbnNpb249IjMwMCI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6ZDA4MDI4MDItMzUyYS04NTRhLTkxYjctNmRlNmQ1MmViM2QwIiBzdEV2dDp3aGVuPSIyMDIyLTAyLTIyVDIxOjIxOjQ1KzA4OjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxOSAoV2luZG93cykiLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249InNhdmVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjQwNjg2NzJkLWY5NDMtOTU0Mi1iMDBiLTVlMDExNmE1NmIzZSIgc3RFdnQ6d2hlbj0iMjAyNC0wMS0xM1QxMDoyNjoxNiswODowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTkgKFdpbmRvd3MpIiBzdEV2dDpjaGFuZ2VkPSIvIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDpjZjk1NTE1OC04MjFiLTA4NDUtYWJmNS05YTE1NGM1ZTY4NjEiIHN0RXZ0OndoZW49IjIwMjQtMDEtMTNUMTE6MDQ6MDQrMDg6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAyMDE5IChXaW5kb3dzKSIgc3RFdnQ6Y2hhbmdlZD0iLyIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0iY29udmVydGVkIiBzdEV2dDpwYXJhbWV0ZXJzPSJmcm9tIGFwcGxpY2F0aW9uL3ZuZC5hZG9iZS5waG90b3Nob3AgdG8gaW1hZ2UvcG5nIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJkZXJpdmVkIiBzdEV2dDpwYXJhbWV0ZXJzPSJjb252ZXJ0ZWQgZnJvbSBhcHBsaWNhdGlvbi92bmQuYWRvYmUucGhvdG9zaG9wIHRvIGltYWdlL3BuZyIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6ZGM1Y2IyNWItZDZlNC0yZjQ2LTgyODQtZmUwOTNlY2M2ZTkxIiBzdEV2dDp3aGVuPSIyMDI0LTAxLTEzVDExOjA0OjA0KzA4OjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxOSAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249InNhdmVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjE0NzUxMTYwLWQ2OTAtNGU5My1hYTRlLTRjMGE1YjRlNWRhYyIgc3RFdnQ6d2hlbj0iMjAyNC0wMS0xM1QxOToxMDoxMCswODowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDIyLjAgKE1hY2ludG9zaCkiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOmNmOTU1MTU4LTgyMWItMDg0NS1hYmY1LTlhMTU0YzVlNjg2MSIgc3RSZWY6ZG9jdW1lbnRJRD0iYWRvYmU6ZG9jaWQ6cGhvdG9zaG9wOjM2ZGQ4NTQxLWQ0MWEtYmY0Yy1iZjA3LWNmNjZhNjZhMDg2MSIgc3RSZWY6b3JpZ2luYWxEb2N1bWVudElEPSJ4bXAuZGlkOmQwODAyODAyLTM1MmEtODU0YS05MWI3LTZkZTZkNTJlYjNkMCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Ph2LDQsAAAAJcEhZcwAACxMAAAsTAQCanBgAAAA5UExURUdwTNra2s7Ozq2tre3t7dPT087OzuPj4+3t7dbW1u/v79bW1vz8/MrKytDQ0Nzc3MPDw/X19bi4uMZQDnEAAAAKdFJOUwBqEPywotz+wzqApqiTAAAHW0lEQVR42u1b25akIAwcbx2UFoj//7HLTQVBRcSZfTDnbM/uTl/KSlEkwf75eeONN95444033njjjTduR9/0/yOsbqoevObL7101tYX1HFs9QFtfZalRP+rpQVgdAFx990ZnT8L6eZItUl99jeGpf1DxdV/VP9fV1f/PFlF1bYHoVFSRC60IyVjrFRnuB8IoxpExSrstsErKHpJw1eqybNLbAQvAYkKjUrjoBgKRqAaeIjG5+qaps6hKcMWmcdSwqAJWBbAgCZZaIYbsqggqqlHNbFFa5yVR4jKvrKEErOEjNCqNSwHrfE8lpLsod/u+cOPPMPBJ+Gz5dM0cXNgclre+pSxhYI1WW5Tf9ENSMIdLCiWs6q9hwQprBVYKFqyPlx4WtoSvrT9lC/wkGt8qlkQooC3hi6sgW3Bb8gtdpSV/za/mn49pC0oYhONbfyd5hzDLFivKFpTS1gKM0we0tQCEncfgQn7Rt+DC/299i1MSRJcBC0r7VviG5KZvwV5WIUobxHyrJKy8VRjXVgFYsPu5kOtbxdhycCDuihziXVLoW7xwEiUmDgd544B46luWLW+nugMLB2BimmC3cxTNxCDg8xFtuUSNqoFsDKzY8psa+XtBNWXr74N6qxwsS5T6VL5robKl10+ZRu5S9qBvUYuJwVHzjwjrE3G33qKh+WXBgmkmCvHYquTvZ8oo7rLFA4PJgYW0MdePIRQIGUPNbSMw5lubJMKtJI6+Wk6cVFMmACO+VVryeL7ZgI8MhwS2fnNPPK0geHBRd11eJSiyL4KjrL2umm1XIpRii1MKB/mU/iCZwF+pt5z3UJ7UiF3nQqadAXC3T3xEW2IyuDBe3yDTe0+A64it2WTyYSGVHymUI/EduvSWKJ80Dtv2NbYSoQxbMkVC7yzNGIWFvDF7gRD79RYrWW/BDGti4wwLtgvO7gWKUZ8Mt94qX8vLJE70+xVNwzDm9ghNM+FX7p/jlZUId2HJD+Tf79hMe3WNrAK/30E+C8/6xOCqbqxE5JNMYrNbnaLUvJAewfCg8zF0Ba/tbviWLvPYfsGFA1PVD8ZdnjlVc/DS/o7LK4NHjOjKKbfCTSCo5XmwKbaZM4jlc9NGEYd9Ijd0QS5ZGaOR2O+DPlGyRb2nXZzgnI1GdFWF+0gh3ifyTRqvzpXI2eElk58FeHziCF5hY+hSMV9Ge/mohUTGuQ4vzHYe8bW5sNdFQ58St22Vcf5zzJbtcGT4iYQ7iz8dFuxoWRYMjAM7KCnypHOTLSqdUwYIFpndOD/6B2FBzNQxYmW/zxYE4j8yLHga1s2Rbm/O5PXtGcuNDIW1dTj5hpjGsO+7z2Kk9NP1JWDlnWKAM4H6zCUNM05KyVPHBclYzUbgjE3N3tP2JWHBmbqD4GLeCs2jhMT13lMVljwcEbetwZgtHUxVQ21ho3fE7inf2s8vzMWq0EWpfOBg5hcDSGwaF2+LaysRIzNFqRgBv2sMhi/Ix0WiW8rBKNBv4ExBI7eorx9ANazsPCb5FkSNH+Reacos+AYxaFzX76KMH65c8ytzZ40YvpFAqtgC/otn1eCmMI5K8yVRQVVwq3aVtU+jJktwjyP7x+BKv8vtoH098vXYSJcrWGJcAW11r8WVRxe5vgcuFbXqwnaEZejS6mrLwYKUg1ch2RJswTFYgMOwoau+AQsSp/FuDhVZi7J402ifgGla/GJIzGLYG5H4rnKMCUydL9wcsmZSuPikR2QmjQbWqaV2ob2RdMvaLEvFlRiXpYeTwqVOtMZF+qi0dS4uEjJKMvWuYK3S0jHZwaq7BylYp/O2uu3q04lNqudLWEJQd/3paTBz12IaLIPtzE5P1AUuW9TB8NVzaG9/TIfV+eXsWeezz6HWlptEbo4SIAeWur/Y/RZC/gmZTiLzUY2j5ct6fjKsFvxqgyQxE9sbmfYtnJMIciEKo6+FL0wziJmtkzspIcUl0PgWrL7VCKP7hl61U4WLeN+7Ieli2vZhmq0VgjDOgIyhJ62sSpDkWNZa1wiB8WoLlxzy29XpGVPgn1ut5VYcGyRLK7OCiJaDYMrAneJUkZWdw0yDgNm5nDowqLc0Kp581FO7QS4pC9S/YRW9xkVdNOj0ZHCp9anEZw3VEK/fopiDrkMObkcdJtT1g6+uzQ60bIdUPztdWZWy53m+v/zFYPOGHO4AZsalmtJNkyHrCAx1RXX7mt5g1L1pDezpkXv8wJwpVRSSaf2c26Y0rrXXxyWBptu/ovdak+VhkqjGBZUdvKygqANKA/MqZ/36kcGwFn90RnWp66ksKuHgitLFY8BU+F2ZvqpxpMY9qR3YwOUJ12fc0KUHVKdswcKXuwetErCnwvMKuXxfc/3RVJ2yFc+iosQd3X+WGSVz1UiuN2J156FyVyHbsOUp3krezaPUT/VxXqdfwvknb/Zgp+idTxTbrkLqYuKreRnhy65Gf4W0NsDoYiqf6uZsvr8V9eo6XWc5+3TVf/3N1TfeeOONN95444033njjjTfeSI1/IeOYOeO4fGAAAAAASUVORK5CYII=";
   const base64BackToTop = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADIBAMAAABfdrOtAAAAElBMVEVRUVH+/v5HcEyZmZlRUVFRUVGm1ByOAAAABnRSTlPMzADMTZAJBBGsAAAEnElEQVR42t2cS27jMAyGf7/2U+QCQeDsbeQCgZDujaC5/1UmkzaJn+JDFGcw3LdfflKibJkkDnxrL7dbg7sNt6+L4O8OYBM+B0ys+QrGkHZG+OEEQ8g6go8Bx1GIGMdpNOQyIG6XdMgnSPtKhLQDGEZFBgYMkhKFtGBb0EIEjDgFRowoBVaMGAWpMedEfxMiZtwpUsgZCqtlkCNUdpVAWigtCCCDFtLwIWeoreZCWiRYYEKGFEjDg+yRZCUH0iLRAgNyToXUNCRZyMqWhGnUN2IPm3wSlwJ7IUspyCBkIQUZhCykIIeQuRTkEDKXAuM9srrtYbrZN7Y98giZSoFd+t1OxmMITG0dcrSFXFchZ1tIvQZpYWxhBbK3hpQrkMEa0iwh5t4a+QvZvDXyF7J5a+Qv5PPW21/I5623v5DPW29/IaO3Xv5Clrw1y1/Ikrdm+Qs5svw83yNnSJ5BQb4F/F7EIEJSnThGBAXxkFQfLOviQUE8JAUPsosHBfGQfDAtHhREQ1JxIV00KIgmrnRI84S0yAd5BAXxxJUck0f6Qnwr9qmr6xF5xLMjcwn/iudIEAdWnyjkEXlQKZiRVzoqRyLbgeUKKR8Q4alY7cSnoxzSf2ggsqehKr6YVpcXpOd7H93f60cKhOd7Re2LteUF4eLqiVS1mr0ge4io6C2+soaFkJ7MuuuQs1yITEp9hwwKISIpzR2iESKSIoT0rLNwuVHQqoSIpAQJpGce60vIUSdEIuUqgPTsJ5QFZK8UIpBS8iG94GFrDjlrhfCl8CG96Llxmle4kEr6vKWBPIVo9kqDQSRk9/3cWoikcCFPAd33v4dIChPyEvLzBA6RlEYWke4JEUnhKXkLeUEKxRHJFfKCQHGucIW8IdZSRkLeEGMpYyEjiK2UsZARxFTKRMgYYillImQMMZQyFTKB2EmZCplAuFLIHT8TMoWwpQwiIVMIUwqpZP5bp5CCvCTiQKr5f5lCQN+tPCBn2ZvVDFJwIDUP0m1BYAfZYRNSsCB7BqTbhoARePIxtZ9tgwWkoJcwCalmv3MBAemtO4R6dah2HaKQqj8Zvp9sQDjvJ21+SPCBHPJDDk6QITekEV7gqCC19CpKAym9IMfckKv4olMBCeIrWwVEfvkshzQekO9r9P1/ALk+IG1eSPCDiCJfyG+FyU+A6ZCa/piZDinpz7LpkCv5gdkAEshP5emQhv7onw6pGeULyZCSUYiRDAmMkpJkCKs4JhFSq8p8hJBSVbAkhARV6ZUQoisik0FqXTmcDHLVFfbJIEFXoiiCNMpiSxGkVJaNiiBBWQArgTTaUl4JpNQWJUsgQVteXQg+AKkLxQWFGKW+5J2+eVp4S168X3CF1CltCKdTJ8lb84YK2bUBO+wZW0Pqv9nk4tKu49N45NJC5dMM5tLW5tOg59Jq6NM06dL+abFXwr/RkuvTXJwae1abtE/Dt0/ruksTvs84AZ/BCC4jHnyGVfiM3VBQFANEXEah+Ax18RlP4zNox2dkkM/wI58xTn8yDCXGYCDV3W5RGSajtXyGhG1jbpbjzpwGt/0MJft8jqC7iUbQ/QZaxdnKqcIftwAAAABJRU5ErkJggg==";
-  const __className$2V = "GenUniModulesZPagingXComponentsZPagingXEmptyZPagingXEmpty";
-  const _sfc_main$2W = /* @__PURE__ */ vue.defineVaporSharedDataComponent(Object.assign({
+  const __className$2P = "GenUniModulesZPagingXComponentsZPagingXEmptyZPagingXEmpty";
+  const _sfc_main$2Q = /* @__PURE__ */ vue.defineVaporSharedDataComponent(Object.assign({
     name: "z-paging-x-empty"
-  }, { __dynamicSharedData: true, __hash: "7f00fc6c", __className: __className$2V, __filename: "uni_modules/z-paging-x/components/z-paging-x-empty/z-paging-x-empty.uvue", __name: "z-paging-x-empty", props: {
+  }, { __dynamicSharedData: true, __hash: "7f00fc6c", __className: __className$2P, __filename: "uni_modules/z-paging-x/components/z-paging-x-empty/z-paging-x-empty.uvue", __name: "z-paging-x-empty", props: {
     // 空数据描述文字
     emptyText: {
       type: String,
@@ -17392,13 +17914,13 @@
       return __sharedData;
     };
   } }));
-  const _style_0$2S = {};
-  const __easycom_0$7 = /* @__PURE__ */ _export_sfc(_sfc_main$2W, [["styles", [_style_0$2S]]]);
-  const __className$2U = "GenUniModulesZPagingXComponentsZPagingXComponentsZPagingLoading";
-  const _sfc_main$2V = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
+  const _style_0$2M = {};
+  const __easycom_0$7 = /* @__PURE__ */ _export_sfc(_sfc_main$2Q, [["styles", [_style_0$2M]]]);
+  const __className$2O = "GenUniModulesZPagingXComponentsZPagingXComponentsZPagingLoading";
+  const _sfc_main$2P = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
     __dynamicSharedData: true,
     __hash: "1651bc30",
-    __className: __className$2U,
+    __className: __className$2O,
     __filename: "uni_modules/z-paging-x/components/z-paging-x/components/z-paging-loading.uvue",
     __name: "z-paging-loading",
     setup(__props) {
@@ -17432,8 +17954,8 @@
       };
     }
   });
-  const _style_0$2R = {};
-  const zPagingLoading = /* @__PURE__ */ _export_sfc(_sfc_main$2V, [["styles", [_style_0$2R]]]);
+  const _style_0$2L = {};
+  const zPagingLoading = /* @__PURE__ */ _export_sfc(_sfc_main$2P, [["styles", [_style_0$2L]]]);
   class LoadingType extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -17709,10 +18231,10 @@
     const str = value.toString();
     return str.length == 1 ? "0" + str : str;
   }
-  const __className$2T = "GenUniModulesZPagingXComponentsZPagingXComponentsZPagingRefresher";
-  const _sfc_main$2U = /* @__PURE__ */ vue.defineVaporSharedDataComponent(Object.assign({
+  const __className$2N = "GenUniModulesZPagingXComponentsZPagingXComponentsZPagingRefresher";
+  const _sfc_main$2O = /* @__PURE__ */ vue.defineVaporSharedDataComponent(Object.assign({
     name: "z-paging-refresher"
-  }, { __dynamicSharedData: true, __hash: "f87561bc", __className: __className$2T, __filename: "uni_modules/z-paging-x/components/z-paging-x/components/z-paging-refresher.uvue", __name: "z-paging-refresher", props: {
+  }, { __dynamicSharedData: true, __hash: "f87561bc", __className: __className$2N, __filename: "uni_modules/z-paging-x/components/z-paging-x/components/z-paging-refresher.uvue", __name: "z-paging-refresher", props: {
     // 下拉刷新状态
     status: {
       type: String,
@@ -17844,12 +18366,12 @@
       return __sharedData;
     };
   } }));
-  const _style_0$2Q = {};
-  const zPagingRefresher = /* @__PURE__ */ _export_sfc(_sfc_main$2U, [["styles", [_style_0$2Q]]]);
-  const __className$2S = "GenUniModulesZPagingXComponentsZPagingXComponentsZPagingLoadMore";
-  const _sfc_main$2T = /* @__PURE__ */ vue.defineVaporSharedDataComponent(Object.assign({
+  const _style_0$2K = {};
+  const zPagingRefresher = /* @__PURE__ */ _export_sfc(_sfc_main$2O, [["styles", [_style_0$2K]]]);
+  const __className$2M = "GenUniModulesZPagingXComponentsZPagingXComponentsZPagingLoadMore";
+  const _sfc_main$2N = /* @__PURE__ */ vue.defineVaporSharedDataComponent(Object.assign({
     name: "z-paging-load-more"
-  }, { __dynamicSharedData: true, __hash: "dc1c6252", __className: __className$2S, __filename: "uni_modules/z-paging-x/components/z-paging-x/components/z-paging-load-more.uvue", __name: "z-paging-load-more", props: {
+  }, { __dynamicSharedData: true, __hash: "dc1c6252", __className: __className$2M, __filename: "uni_modules/z-paging-x/components/z-paging-x/components/z-paging-load-more.uvue", __name: "z-paging-load-more", props: {
     // 下拉刷新状态
     status: {
       type: String,
@@ -17934,16 +18456,16 @@
       return __sharedData;
     };
   } }));
-  const _style_0$2P = {};
-  const zPagingLoadMore = /* @__PURE__ */ _export_sfc(_sfc_main$2T, [["styles", [_style_0$2P]]]);
+  const _style_0$2J = {};
+  const zPagingLoadMore = /* @__PURE__ */ _export_sfc(_sfc_main$2N, [["styles", [_style_0$2J]]]);
   function gc(key2, defaultValue) {
     return defaultValue;
   }
-  const __className$2R = "GenUniModulesZPagingXComponentsZPagingXZPagingX";
-  const _sfc_main$2S = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
+  const __className$2L = "GenUniModulesZPagingXComponentsZPagingXZPagingX";
+  const _sfc_main$2M = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
     __dynamicSharedData: true,
     __hash: "6c996f9d",
-    __className: __className$2R,
+    __className: __className$2L,
     __filename: "uni_modules/z-paging-x/components/z-paging-x/z-paging-x.uvue",
     __name: "z-paging-x",
     props: {
@@ -19030,9 +19552,9 @@
       };
     }
   });
-  const _style_0$2O = {};
-  const __easycom_1$T = /* @__PURE__ */ _export_sfc(_sfc_main$2S, [["styles", [_style_0$2O]]]);
-  const __className$2Q = "GenSrcPagesBasicComponentsZPagingDemoCard";
+  const _style_0$2I = {};
+  const __easycom_1$T = /* @__PURE__ */ _export_sfc(_sfc_main$2M, [["styles", [_style_0$2I]]]);
+  const __className$2K = "GenSrcPagesFunctionComponentsZPagingDemoCard";
   class CompactArticleItem extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -19062,15 +19584,15 @@
       delete this.__props__;
     }
   }
-  const _sfc_main$2R = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
+  const _sfc_main$2L = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
     __dynamicSharedData: true,
-    __hash: "342d3bef",
-    __className: __className$2Q,
-    __filename: "src/pages/basic/components/ZPagingDemoCard.uvue",
+    __hash: "44617b83",
+    __className: __className$2K,
+    __filename: "src/pages/function/components/ZPagingDemoCard.uvue",
     __name: "ZPagingDemoCard",
     setup(__props) {
       const __sharedDataScope = vue.useSharedDataScope();
-      const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesBasicComponentsZPagingDemoCardSharedData", sharedDataClassId: 0 })));
+      const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesFunctionComponentsZPagingDemoCardSharedData", sharedDataClassId: 0 })));
       const shouldFail = vue.ref(false);
       const tabList = ["全部", "技术", "设计"];
       const tabIndex = vue.ref(0);
@@ -19151,7 +19673,7 @@
             return "数据分页列表 (z-paging-x)";
           },
           __cid: () => {
-            return "78fa5fc8";
+            return "4b4c5faa";
           }
         }, {
           "default": vue.withSharedDataVaporCtx(() => {
@@ -19164,7 +19686,7 @@
               return tabIndex.value;
             });
             const n9 = vue.createSharedDataFor(vue.setSharedData(__sharedData, 3, vue.createSharedDataVFor(__sharedDataScope, () => {
-              return new UniDynamicSharedData(__sharedDataScope, { bundleKey: "".concat(__className$2Q, "SharedData"), sharedDataClassId: 1 });
+              return new UniDynamicSharedData(__sharedDataScope, { bundleKey: "".concat(__className$2K, "SharedData"), sharedDataClassId: 1 });
             })), () => {
               return tabList;
             }, (__sharedData_VFor0, _for_item0, _for_key0) => {
@@ -19206,12 +19728,12 @@
                 return onQuery;
               },
               __cid: () => {
-                return "5850176f";
+                return "e69f1766";
               }
             }, {
               "default": () => {
                 vue.createSharedDataFor(vue.setSharedData(__sharedData, 2, vue.createSharedDataVFor(__sharedDataScope, () => {
-                  return new UniDynamicSharedData(__sharedDataScope, { bundleKey: "".concat(__className$2Q, "SharedData"), sharedDataClassId: 2 });
+                  return new UniDynamicSharedData(__sharedDataScope, { bundleKey: "".concat(__className$2K, "SharedData"), sharedDataClassId: 2 });
                 })), () => {
                   return dataList.value;
                 }, (__sharedData_VFor1, _for_item1) => {
@@ -19240,558 +19762,12 @@
       };
     }
   });
-  const _style_0$2N = {};
-  const ZPagingDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main$2R, [["styles", [_style_0$2N]]]);
-  const __className$2P = "GenSrcPagesBasicComponentsUViewUltraDemoCard";
-  const _sfc_main$2Q = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
-    __dynamicSharedData: true,
-    __hash: "a6d44598",
-    __className: __className$2P,
-    __filename: "src/pages/basic/components/UViewUltraDemoCard.uvue",
-    __name: "UViewUltraDemoCard",
-    setup(__props) {
-      const __sharedDataScope = vue.useSharedDataScope();
-      const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesBasicComponentsUViewUltraDemoCardSharedData", sharedDataClassId: 0 })));
-      function copyWebsiteUrl() {
-        uni.setClipboardData({
-          data: "https://uview-ultra.lingyun.net/",
-          success: () => {
-            uni.showToast({
-              title: "官网网址已复制到剪贴板",
-              icon: "none"
-            });
-          }
-        });
-      }
-      function navigateToShowcase() {
-        uni.navigateTo({
-          url: "/src/sub/uview-ultra/uview-ultra",
-          fail: (err) => {
-            uni.__log__("error", "at src/pages/basic/components/UViewUltraDemoCard.uvue:58", "navigateToShowcase fail:", err);
-          }
-        });
-      }
-      return () => {
-        "raw js";
-        const n15 = vue.createSharedDataComponent(Card, {
-          title: () => {
-            return "uview-ultra 组件库";
-          },
-          __cid: () => {
-            return "169f0af0";
-          }
-        }, {
-          "default": () => {
-            vue.setSharedDataEvent(__sharedData, 1, copyWebsiteUrl);
-            vue.setSharedDataEvent(__sharedData, 2, navigateToShowcase);
-          }
-        }, true);
-        vue.setSharedData(__sharedData, 0, n15.sharedData);
-        return __sharedData;
-      };
-    }
-  });
-  const _style_0$2M = {};
-  const UViewUltraDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main$2Q, [["styles", [_style_0$2M]]]);
-  const __className$2O = "GenSrcPagesBasicBasic";
-  const _sfc_main$2P = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
-    __dynamicSharedData: true,
-    __hash: "3421d1f9",
-    __className: __className$2O,
-    __filename: "src/pages/basic/basic.uvue",
-    __name: "basic",
-    setup(__props) {
-      const __sharedDataRenderer = vue.useSharedDataRenderer();
-      const __sharedData = __sharedDataRenderer == "component" ? vue.withSharedDataComponent(new UniDynamicSharedDataComponent(vue.useSharedDataScope(), vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesBasicBasicSharedData", sharedDataClassId: 0 }))) : vue.withSharedDataPage(new UniDynamicSharedDataPage(vue.useSharedDataPageId(), vue.useSharedDataPageOptions({ bundleKey: "GenSrcPagesBasicBasicSharedData", sharedDataClassId: 0 })));
-      vue.useSharedDataScope(__sharedData);
-      vue.onBackPress((options) => {
-        if (options.from == "backbutton") {
-          return handleBackPressExit();
-        }
-        return false;
-      });
-      vue.onResize(() => {
-        updateSystemInfo();
-      });
-      return () => {
-        "raw js";
-        const n16 = vue.createSharedDataComponent(_sfc_main$3f, { __cid: () => {
-          return "56ab5a5a";
-        } }, {
-          "default": vue.withSharedDataVaporCtx(() => {
-            const n0 = vue.createSharedDataComponent(UViewUltraDemoCard, { __cid: () => {
-              return "5360e8b4";
-            } });
-            vue.setSharedData(__sharedData, 1, n0.sharedData);
-            const n1 = vue.createSharedDataComponent(LodashDemoCard, { __cid: () => {
-              return "5360e9aa";
-            } });
-            vue.setSharedData(__sharedData, 2, n1.sharedData);
-            const n2 = vue.createSharedDataComponent(CryptoDemoCard, { __cid: () => {
-              return "5360ecf1";
-            } });
-            vue.setSharedData(__sharedData, 3, n2.sharedData);
-            const n3 = vue.createSharedDataComponent(PropsDemoCard, { __cid: () => {
-              return "5360f035";
-            } });
-            vue.setSharedData(__sharedData, 4, n3.sharedData);
-            const n4 = vue.createSharedDataComponent(ZPagingDemoCard, { __cid: () => {
-              return "5360f0f3";
-            } });
-            vue.setSharedData(__sharedData, 5, n4.sharedData);
-            const n5 = vue.createSharedDataComponent(SystemInfoDemoCard, { __cid: () => {
-              return "5360f432";
-            } });
-            vue.setSharedData(__sharedData, 6, n5.sharedData);
-            const n6 = vue.createSharedDataComponent(IconDemoCard, { __cid: () => {
-              return "5360f4d4";
-            } });
-            vue.setSharedData(__sharedData, 7, n6.sharedData);
-            const n7 = vue.createSharedDataComponent(LangSwitchCard, { __cid: () => {
-              return "5360f811";
-            } });
-            vue.setSharedData(__sharedData, 8, n7.sharedData);
-            const n8 = vue.createSharedDataComponent(ThemeSwitchCard, { __cid: () => {
-              return "5360f8af";
-            } });
-            vue.setSharedData(__sharedData, 9, n8.sharedData);
-            const n9 = vue.createSharedDataComponent(TimeDemoCard, { __cid: () => {
-              return "5360fc11";
-            } });
-            vue.setSharedData(__sharedData, 10, n9.sharedData);
-            const n10 = vue.createSharedDataComponent(RouterDemoCard, { __cid: () => {
-              return "5360ff3a";
-            } });
-            vue.setSharedData(__sharedData, 11, n10.sharedData);
-            const n11 = vue.createSharedDataComponent(HttpDemoCard, { __cid: () => {
-              return "5360fff1";
-            } });
-            vue.setSharedData(__sharedData, 12, n11.sharedData);
-            const n12 = vue.createSharedDataComponent(EchartsDemoCard, { __cid: () => {
-              return "5361031b";
-            } });
-            vue.setSharedData(__sharedData, 13, n12.sharedData);
-            const n13 = vue.createSharedDataComponent(SignatureCard, { __cid: () => {
-              return "536103f0";
-            } });
-            vue.setSharedData(__sharedData, 14, n13.sharedData);
-          })
-        });
-        vue.setSharedData(__sharedData, 0, n16.sharedData);
-        return __sharedData;
-      };
-    }
-  });
-  const _style_0$2L = {};
-  const SrcPagesBasicBasic = /* @__PURE__ */ _export_sfc(_sfc_main$2P, [["styles", [_style_0$2L]]]);
-  class EnvConfig extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            name: { type: String, optional: false },
-            baseURL: { type: String, optional: false }
-          };
-        },
-        name: "EnvConfig"
-      };
-    }
-    constructor(options, metadata = EnvConfig.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.name = this.__props__.name;
-      this.baseURL = this.__props__.baseURL;
-      delete this.__props__;
-    }
-  }
-  const devConfig = new EnvConfig({
-    name: "开发环境",
-    baseURL: "https://ukw0y1.laf.run"
-  });
-  const testConfig = new EnvConfig({
-    name: "测试环境",
-    baseURL: "https://ukw0y1.laf.run"
-  });
-  const prodConfig = new EnvConfig(
-    {
-      name: "生产环境",
-      baseURL: "https://ukw0y1.laf.run"
-    }
-    // ----- 编译期自动识别 -----
-    // uni-app X 中：HBuilderX「运行」→ 'development'，「发行」→ 'production'
-  );
-  const systemEnv = "development";
-  let overrideEnv = null;
-  function getSystemEnv() {
-    return systemEnv;
-  }
-  function getCurrentEnv() {
-    const env = overrideEnv;
-    if (env != null) {
-      return env;
-    }
-    return systemEnv;
-  }
-  function setCurrentEnv(env) {
-    overrideEnv = env;
-  }
-  function resetEnv() {
-    overrideEnv = null;
-  }
-  function getEnvConfigFor(env) {
-    if (env === "test") {
-      return testConfig;
-    }
-    if (env === "production") {
-      return prodConfig;
-    }
-    return devConfig;
-  }
-  function getEnvLabel(type) {
-    if (type === "development") {
-      return "开发";
-    }
-    if (type === "test") {
-      return "测试";
-    }
-    if (type === "production") {
-      return "生产";
-    }
-    return "未知";
-  }
-  const __className$2N = "GenSrcPagesFunctionComponentsEnvCard";
-  const COLOR_DEV = "#10b981";
-  const COLOR_TEST = "#f59e0b";
-  const COLOR_PROD = "#ef4444";
-  const COLOR_BG = "#e2e8f0";
-  const COLOR_WHITE = "#ffffff";
-  const COLOR_DARK = "#475569";
-  const _sfc_main$2O = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
-    __dynamicSharedData: true,
-    __hash: "4ed548ae",
-    __className: __className$2N,
-    __filename: "src/pages/function/components/EnvCard.uvue",
-    __name: "EnvCard",
-    setup(__props) {
-      const __sharedDataScope = vue.useSharedDataScope();
-      const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesFunctionComponentsEnvCardSharedData", sharedDataClassId: 0 })));
-      const systemEnv2 = getSystemEnv();
-      const systemEnvLabel = vue.computed(() => {
-        return "开发";
-      });
-      const currentEnv = vue.ref(getCurrentEnv());
-      const isOverridden = vue.computed(() => {
-        return currentEnv.value !== systemEnv2;
-      });
-      const currentEnvLabel = vue.computed(() => {
-        return getEnvLabel(currentEnv.value);
-      });
-      const envColor = vue.computed(() => {
-        if (currentEnv.value === "development") {
-          return COLOR_DEV;
-        }
-        if (currentEnv.value === "test") {
-          return COLOR_TEST;
-        }
-        return COLOR_PROD;
-      });
-      const envConfig = vue.computed(() => {
-        return getEnvConfigFor(currentEnv.value);
-      });
-      const devBtnBg = vue.computed(() => {
-        return currentEnv.value === "development" ? COLOR_DEV : COLOR_BG;
-      });
-      const devBtnText = vue.computed(() => {
-        return currentEnv.value === "development" ? COLOR_WHITE : COLOR_DARK;
-      });
-      const testBtnBg = vue.computed(() => {
-        return currentEnv.value === "test" ? COLOR_TEST : COLOR_BG;
-      });
-      const testBtnText = vue.computed(() => {
-        return currentEnv.value === "test" ? COLOR_WHITE : COLOR_DARK;
-      });
-      const prodBtnBg = vue.computed(() => {
-        return currentEnv.value === "production" ? COLOR_PROD : COLOR_BG;
-      });
-      const prodBtnText = vue.computed(() => {
-        return currentEnv.value === "production" ? COLOR_WHITE : COLOR_DARK;
-      });
-      function switchEnv(type) {
-        const env = type;
-        setCurrentEnv(env);
-        currentEnv.value = env;
-        const label = getEnvLabel(env);
-        uni.showToast({
-          title: "已切换至".concat(label, "环境"),
-          icon: "none",
-          duration: 1500
-        });
-      }
-      function handleReset() {
-        resetEnv();
-        currentEnv.value = systemEnv2;
-        uni.showToast({
-          title: "已重置为系统默认环境",
-          icon: "none",
-          duration: 1500
-        });
-      }
-      return () => {
-        "raw js";
-        const n24 = vue.createSharedDataComponent(Card, {
-          title: () => {
-            return "环境变量";
-          },
-          __cid: () => {
-            return "5df1cdee";
-          }
-        }, {
-          "default": () => {
-            vue.setSharedDataEvent(__sharedData, 1, () => {
-              return switchEnv("development");
-            });
-            vue.setSharedDataEvent(__sharedData, 2, () => {
-              return switchEnv("test");
-            });
-            vue.setSharedDataEvent(__sharedData, 3, () => {
-              return switchEnv("production");
-            });
-            vue.setSharedDataEvent(__sharedData, 4, handleReset);
-            vue.renderSharedDataEffect(() => {
-              vue.setSharedData(__sharedData, 5, vue.toDisplayString(systemEnvLabel.value));
-              vue.setSharedDataStyle(__sharedData, 6, { color: envColor.value });
-              vue.setSharedData(__sharedData, 7, vue.toDisplayString(currentEnvLabel.value));
-              vue.setSharedData(__sharedData, 8, vue.toDisplayString(envConfig.value.baseURL));
-              vue.setSharedData(__sharedData, 9, vue.toDisplayString(isOverridden.value ? "是" : "否"));
-              vue.setSharedDataStyle(__sharedData, 10, { backgroundColor: devBtnBg.value });
-              vue.setSharedDataStyle(__sharedData, 11, { color: devBtnText.value });
-              vue.setSharedDataStyle(__sharedData, 12, { backgroundColor: testBtnBg.value });
-              vue.setSharedDataStyle(__sharedData, 13, { color: testBtnText.value });
-              vue.setSharedDataStyle(__sharedData, 14, { backgroundColor: prodBtnBg.value });
-              vue.setSharedDataStyle(__sharedData, 15, { color: prodBtnText.value });
-            });
-          }
-        }, true);
-        vue.setSharedData(__sharedData, 0, n24.sharedData);
-        return __sharedData;
-      };
-    }
-  });
-  const _style_0$2K = {};
-  const EnvCard = /* @__PURE__ */ _export_sfc(_sfc_main$2O, [["styles", [_style_0$2K]]]);
-  const __className$2M = "GenSrcPagesFunctionComponentsSystemInfoCard";
-  const _sfc_main$2N = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
-    __dynamicSharedData: true,
-    __hash: "367f9891",
-    __className: __className$2M,
-    __filename: "src/pages/function/components/SystemInfoCard.uvue",
-    __name: "SystemInfoCard",
-    setup(__props) {
-      const __sharedDataScope = vue.useSharedDataScope();
-      const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesFunctionComponentsSystemInfoCardSharedData", sharedDataClassId: 0 })));
-      const sysBrand = vue.ref("");
-      const sysModel = vue.ref("");
-      const sysSystem = vue.ref("");
-      const sysPlatform = vue.ref("");
-      function fetchSystemInfo() {
-        var _a2, _b2, _c, _d;
-        try {
-          const info = uni.getSystemInfoSync();
-          sysBrand.value = (_a2 = info.brand) !== null && _a2 !== void 0 ? _a2 : "";
-          sysModel.value = (_b2 = info.model) !== null && _b2 !== void 0 ? _b2 : "";
-          sysSystem.value = (_c = info.system) !== null && _c !== void 0 ? _c : "";
-          sysPlatform.value = (_d = info.uniPlatform) !== null && _d !== void 0 ? _d : "";
-        } catch (err) {
-          uni.__log__("error", "at src/pages/function/components/SystemInfoCard.uvue:45", err);
-        }
-      }
-      vue.onMounted(() => {
-        fetchSystemInfo();
-      });
-      return () => {
-        "raw js";
-        const n15 = vue.createSharedDataComponent(Card, {
-          title: () => {
-            return "设备系统信息";
-          },
-          __cid: () => {
-            return "031f20ce";
-          }
-        }, {
-          "default": () => {
-            vue.setSharedDataEvent(__sharedData, 1, fetchSystemInfo);
-            vue.renderSharedDataEffect(() => {
-              const _sysBrand = sysBrand.value;
-              const _sysModel = sysModel.value;
-              const _sysSystem = sysSystem.value;
-              const _sysPlatform = sysPlatform.value;
-              vue.setSharedData(__sharedData, 2, vue.toDisplayString(_sysBrand !== "" ? _sysBrand : "暂无数据"));
-              vue.setSharedData(__sharedData, 3, vue.toDisplayString(_sysModel !== "" ? _sysModel : "暂无数据"));
-              vue.setSharedData(__sharedData, 4, vue.toDisplayString(_sysSystem !== "" ? _sysSystem : "暂无数据"));
-              vue.setSharedData(__sharedData, 5, vue.toDisplayString(_sysPlatform !== "" ? _sysPlatform : "暂无数据"));
-            });
-          }
-        }, true);
-        vue.setSharedData(__sharedData, 0, n15.sharedData);
-        return __sharedData;
-      };
-    }
-  });
-  const _style_0$2J = {};
-  const SystemInfoCard = /* @__PURE__ */ _export_sfc(_sfc_main$2N, [["styles", [_style_0$2J]]]);
-  const __className$2L = "GenSrcPagesFunctionComponentsHapticsCard";
-  const _sfc_main$2M = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
-    __dynamicSharedData: true,
-    __hash: "642b45d7",
-    __className: __className$2L,
-    __filename: "src/pages/function/components/HapticsCard.uvue",
-    __name: "HapticsCard",
-    setup(__props) {
-      const __sharedDataScope = vue.useSharedDataScope();
-      const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesFunctionComponentsHapticsCardSharedData", sharedDataClassId: 0 })));
-      const copyText = vue.ref("Hello unibestX!");
-      function triggerVibration() {
-        uni.vibrateShort({
-          type: "light",
-          success: () => {
-            uni.showToast({ title: "已触发短震动", icon: "none" });
-          },
-          fail: () => {
-            uni.showToast({ title: "震动触发失败", icon: "none" });
-          }
-        });
-      }
-      function handleCopy() {
-        if (copyText.value === "")
-          return null;
-        uni.setClipboardData({
-          data: copyText.value,
-          success: () => {
-            uni.showToast({
-              title: "复制成功",
-              icon: "success"
-            });
-          }
-        });
-      }
-      return () => {
-        "raw js";
-        const _component_input = vue.resolveComponent("input");
-        const n8 = vue.createSharedDataComponent(Card, {
-          title: () => {
-            return "触感与工具";
-          },
-          __cid: () => {
-            return "91c87b06";
-          }
-        }, {
-          "default": vue.withSharedDataVaporCtx(() => {
-            const n1 = vue.createSharedDataComponentWithFallback(_component_input, {
-              modelValue: () => {
-                return copyText.value;
-              },
-              "onUpdate:modelValue": () => {
-                return (_value) => {
-                  return copyText.value = _value;
-                };
-              },
-              placeholder: () => {
-                return "请输入要复制的文本";
-              },
-              class: () => {
-                return "h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-__cbd5e1_ text-14px text-__334155_ mb-12px";
-              },
-              __cid: () => {
-                return "5f35197f";
-              }
-            });
-            vue.setSharedData(__sharedData, 1, n1 == null ? void 0 : n1.sharedData);
-            vue.setSharedDataEvent(__sharedData, 2, handleCopy);
-            vue.setSharedDataEvent(__sharedData, 3, triggerVibration);
-          })
-        }, true);
-        vue.setSharedData(__sharedData, 0, n8.sharedData);
-        return __sharedData;
-      };
-    }
-  });
-  const _style_0$2I = {};
-  const HapticsCard = /* @__PURE__ */ _export_sfc(_sfc_main$2M, [["styles", [_style_0$2I]]]);
-  const __className$2K = "GenSrcPagesFunctionComponentsMediaCard";
-  const _sfc_main$2L = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
-    __dynamicSharedData: true,
-    __hash: "e76e5a26",
-    __className: __className$2K,
-    __filename: "src/pages/function/components/MediaCard.uvue",
-    __name: "MediaCard",
-    setup(__props) {
-      const __sharedDataScope = vue.useSharedDataScope();
-      const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesFunctionComponentsMediaCardSharedData", sharedDataClassId: 0 })));
-      const photoUrl = vue.ref("");
-      const scanResult = vue.ref("");
-      function chooseImage() {
-        uni.chooseImage(new UTSJSONObject({
-          count: 1,
-          success: (res) => {
-            const paths = res.tempFilePaths;
-            if (paths.length > 0) {
-              photoUrl.value = paths[0];
-            }
-          },
-          fail: (err) => {
-            uni.__log__("error", "at src/pages/function/components/MediaCard.uvue:39", err);
-          }
-        }));
-      }
-      function scanCode() {
-        uni.scanCode(new UTSJSONObject({
-          success: (res) => {
-            scanResult.value = res.result;
-          },
-          fail: (err) => {
-            uni.__log__("error", "at src/pages/function/components/MediaCard.uvue:50", err);
-          }
-        }));
-      }
-      return () => {
-        "raw js";
-        const n13 = vue.createSharedDataComponent(Card, {
-          title: () => {
-            return "相机与多媒体";
-          },
-          __cid: () => {
-            return "679fa9a5";
-          }
-        }, {
-          "default": () => {
-            vue.createSharedDataIf(() => {
-              return vue.setSharedData(__sharedData, 1, vue.toSharedDataBoolean(photoUrl.value === ""));
-            }, () => {
-            }, () => {
-              vue.renderSharedDataEffect(() => {
-                return vue.setSharedDataAttr(__sharedData, 2, vue.toSharedDataString(photoUrl.value));
-              });
-            });
-            vue.setSharedDataEvent(__sharedData, 3, chooseImage);
-            vue.setSharedDataEvent(__sharedData, 4, scanCode);
-            vue.renderSharedDataEffect(() => {
-              const _scanResult = scanResult.value;
-              vue.setSharedData(__sharedData, 5, vue.toDisplayString(_scanResult !== "" ? _scanResult : "暂无数据"));
-            });
-          }
-        }, true);
-        vue.setSharedData(__sharedData, 0, n13.sharedData);
-        return __sharedData;
-      };
-    }
-  });
   const _style_0$2H = {};
-  const MediaCard = /* @__PURE__ */ _export_sfc(_sfc_main$2L, [["styles", [_style_0$2H]]]);
+  const ZPagingDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main$2L, [["styles", [_style_0$2H]]]);
   const __className$2J = "GenSrcPagesFunctionFunction";
   const _sfc_main$2K = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
     __dynamicSharedData: true,
-    __hash: "c8a03020",
+    __hash: "09964c09",
     __className: __className$2J,
     __filename: "src/pages/function/function.uvue",
     __name: "function",
@@ -19807,7 +19783,7 @@
       });
       return () => {
         "raw js";
-        const n8 = vue.createSharedDataComponent(_sfc_main$3f, { __cid: () => {
+        const n14 = vue.createSharedDataComponent(_sfc_main$3f, { __cid: () => {
           return "13021a83";
         } }, {
           "default": vue.withSharedDataVaporCtx(() => {
@@ -19815,21 +19791,45 @@
               return "5ae58bc7";
             } });
             vue.setSharedData(__sharedData, 1, n3.sharedData);
-            const n4 = vue.createSharedDataComponent(SystemInfoCard, { __cid: () => {
-              return "5ae58c40";
+            const n4 = vue.createSharedDataComponent(ZPagingDemoCard, { __cid: () => {
+              return "5ae58c66";
             } });
             vue.setSharedData(__sharedData, 2, n4.sharedData);
-            const n5 = vue.createSharedDataComponent(HapticsCard, { __cid: () => {
-              return "5ae58cc1";
+            const n5 = vue.createSharedDataComponent(SystemInfoCard, { __cid: () => {
+              return "5ae58f87";
             } });
             vue.setSharedData(__sharedData, 3, n5.sharedData);
-            const n6 = vue.createSharedDataComponent(MediaCard, { __cid: () => {
-              return "5ae58fcb";
+            const n6 = vue.createSharedDataComponent(HapticsCard, { __cid: () => {
+              return "5ae59008";
             } });
             vue.setSharedData(__sharedData, 4, n6.sharedData);
+            const n7 = vue.createSharedDataComponent(MediaCard, { __cid: () => {
+              return "5ae5909c";
+            } });
+            vue.setSharedData(__sharedData, 5, n7.sharedData);
+            const n8 = vue.createSharedDataComponent(LodashDemoCard, { __cid: () => {
+              return "5ae593e6";
+            } });
+            vue.setSharedData(__sharedData, 6, n8.sharedData);
+            const n9 = vue.createSharedDataComponent(CryptoDemoCard, { __cid: () => {
+              return "5ae59729";
+            } });
+            vue.setSharedData(__sharedData, 7, n9.sharedData);
+            const n10 = vue.createSharedDataComponent(TimeDemoCard, { __cid: () => {
+              return "5ae597e6";
+            } });
+            vue.setSharedData(__sharedData, 8, n10.sharedData);
+            const n11 = vue.createSharedDataComponent(SignatureCard, { __cid: () => {
+              return "5ae59b2a";
+            } });
+            vue.setSharedData(__sharedData, 9, n11.sharedData);
+            const n12 = vue.createSharedDataComponent(EchartsDemoCard, { __cid: () => {
+              return "5ae59bc6";
+            } });
+            vue.setSharedData(__sharedData, 10, n12.sharedData);
           })
         });
-        vue.setSharedData(__sharedData, 0, n8.sharedData);
+        vue.setSharedData(__sharedData, 0, n14.sharedData);
         return __sharedData;
       };
     }
