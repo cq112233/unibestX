@@ -132,9 +132,6 @@ pnpm dev:app-harmony
 
 # 运行到 微信小程序
 pnpm dev:mp-weixin
-
-# 运行到 支付宝小程序
-pnpm dev:mp-alipay
 ```
 
 #### 🛠️ 方式二：HBuilderX 图形化运行
