@@ -45,3 +45,4 @@ Skills 位于 `.Codex/skills/` 目录，每个 skill 有独立的 `SKILL.md` 文
 ## 项目规则
 
 - **必须遵守** `.agents/rules/uniappx.md` 中的 uni-app X 开发规范。每次会话开始时先 Read 该文件，并在编写 `.uvue`、`.uts`、`.ts`、`.scss` 文件时严格遵循其中的规则。
+- **一律禁止使用 `interface`**：在本项目中定义任何对象结构、状态、参数或返回值类型时，**一律禁止使用 `interface`**，**必须全部统一使用 `type`（类型别名）**，避免触发 UTS 底层对对象字面量赋值的 `UTS110111163` 编译错误。

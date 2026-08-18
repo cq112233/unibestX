@@ -7,10 +7,10 @@ import { setLocale as setUViewLocale } from '@/uni_modules/uview-ultra/libs/i18n
 // 类型定义
 // ==========================================
 
-export interface IAppState {
+export type IAppState = {
   theme: string;
   locale: string;
-}
+};
 
 function getSystemLocale(): string {
   try {

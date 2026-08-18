@@ -222,7 +222,11 @@ const swiperVideoStyle = computed((): UTSJSONObject => {
 })
 
 const customIndicatorStyle = computed((): UTSJSONObject => {
-  return addStyle(props.indicatorStyle) as UTSJSONObject
+  const res = addStyle(props.indicatorStyle)
+  if (typeof res === 'object' && res != null) {
+    return res as UTSJSONObject
+  }
+  return {} as UTSJSONObject
 })
 
 function getSource(item: any | null): string {

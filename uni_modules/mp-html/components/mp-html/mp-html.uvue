@@ -13,8 +13,8 @@
       <!-- 表格 -->
       <view v-else-if="n.name == 'table'" style="display:flex;flex-direction:column">
         <view v-for="(row, ri) in (n.children ?? [])" :key="ri" style="display:flex;flex-direction:row">
-          <view v-for="(cell, ci) in (row.children ?? [])" :key="ci" :style="(cell.name == 'th' ? 'font-weight:bold;background-color:#f5f5f5;' : '') + 'flex:1;padding:4px 8px;border-width:1px;border-color:#d0d0d0;border-style:solid'">
-            <text>{{ flatText(cell) }}</text>
+          <view v-for="(cell, ci) in (row.children ?? [])" :key="ci" :style="(cell.name == 'th' ? 'background-color:#f5f5f5;' : '') + 'flex:1;padding:4px 8px;border-width:1px;border-color:#d0d0d0;border-style:solid'">
+            <text :style="cell.name == 'th' ? 'font-weight:bold;' : ''">{{ flatText(cell) }}</text>
           </view>
         </view>
       </view>

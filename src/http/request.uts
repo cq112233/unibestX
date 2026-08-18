@@ -26,10 +26,10 @@ const defaultUrl: string = directBaseUrl.startsWith('/') ? DEFAULT_API_URL : dir
 const secondaryUrl: string = directSecondaryUrl.startsWith('/') ? DEFAULT_API_URL : directSecondaryUrl;
 // #endif
 
-interface ApiDomainConfig {
+type ApiDomainConfig = {
   DEFAULT: string;
   SECONDARY: string;
-}
+};
 
 export const API_DOMAINS: ApiDomainConfig = {
   DEFAULT: defaultUrl,

@@ -1,20 +1,20 @@
 import { ref } from 'vue';
 
-export interface SystemSafeAreaInsets {
+export type SystemSafeAreaInsets = {
   top: number;
   right: number;
   bottom: number;
   left: number;
-}
+};
 
-export interface SystemInfoType {
+export type SystemInfoType = {
   screenWidth: number;
   screenHeight: number;
   windowWidth: number;
   windowHeight: number;
   statusBarHeight: number;
   pixelRatio: number;
-}
+};
 
 export const systemInfo = ref(null as SystemInfoType | null);
 export const safeAreaInsets = ref(null as SystemSafeAreaInsets | null);

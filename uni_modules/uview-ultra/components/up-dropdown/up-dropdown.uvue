@@ -32,7 +32,7 @@
 	import { computed, ref, watch, onMounted, getCurrentInstance, provide } from 'vue'
 	import { addUnit, getWindowInfo, upGetRect, deepMerge } from '../../libs/function/index.uts';
 	import { UPDropdownMenu } from './types.uts';
-	const instance = getCurrentInstance()!.proxy!
+	const instance = getCurrentInstance()
 	
 	defineOptions({
 		name: 'up-dropdown'
@@ -158,7 +158,7 @@
 
 	function getContentHeight() {
 		let windowHeight = getWindowInfo().windowHeight;
-		upGetRect('.up-dropdown__menu', false, instance).then((res) => {
+		upGetRect('.up-dropdown__menu', false, instance?.proxy).then((res) => {
 			if (res.bottom != null && res.bottom! > 0) {
 				contentHeight.value = windowHeight - res.bottom!;
 			} else {
@@ -244,15 +244,29 @@
 			menuList.value[idx].title = title;
 		}
 	}
-	
-	provide('upDropdown', {
-		props,
-		current,
-		active,
-		registerItem,
-		updateItemTitle,
-		close
+
+	const dropdownProps = computed((): UTSJSONObject => {
+		return {
+			activeColor: props.activeColor,
+			inactiveColor: props.inactiveColor,
+			closeOnClickMask: props.closeOnClickMask,
+			closeOnClickSelf: props.closeOnClickSelf,
+			duration: props.duration,
+			height: props.height,
+			borderBottom: props.borderBottom,
+			titleSize: props.titleSize,
+			borderRadius: props.borderRadius,
+			menuIcon: props.menuIcon,
+			menuIconSize: props.menuIconSize
+		} as UTSJSONObject
 	});
+
+	provide('upDropdownProps', dropdownProps);
+	provide('upDropdownActive', active);
+	provide('upDropdownCurrent', current);
+	provide('upDropdownRegisterItem', registerItem);
+	provide('upDropdownUpdateItemTitle', updateItemTitle);
+	provide('upDropdownClose', close);
 
 	onMounted(() => {
 		getContentHeight();

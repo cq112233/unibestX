@@ -176,10 +176,11 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
         *   *正确做法*：`const year = date.getFullYear() as number`
 *   **代码语句分割**：
     *   多行书写时行尾分号 `;` 可省略。同行多条语句必须以分号分割。
-* **对象字面量与接口限制 (Object Literals & Interfaces)**：
-  * UTS 不允许将对象字面量直接赋值给 `interface` 定义的类型（会触发 `UTS110111163` 编译错误）。对于需要接收/赋值对象字面量的类型，必须使用 `type`（类型别名）进行定义。
-  * *错误示例*：`interface Config { name: string }; const c: Config = { name: "UTS" }`
-  * *正确做法*：`type Config = { name: string }; const c: Config = { name: "UTS" }`
+* **一律禁止使用 interface，全面统一使用 type (Strictly Prohibit Interface, Enforce Type Everywhere)**：
+  * **重要铁律**：在本项目的所有 `.uts`、`.uvue`、`.ts` 文件中，**一律禁止使用 `interface` 定义类型，必须统一使用 `type`（类型别名）**。
+  * **原因**：UTS 强类型编译系统将 `interface` 严格映射为底层面向对象纯接口，禁止将任何对象字面量（如 `{ name: 'foo' }`）、Mock 数据、API 返回值等直接赋值给 `interface` 定义的类型，否则在编译为 Android (Kotlin) / iOS (Swift) 时会直接触发 `UTS110111163: Object literals only support object types defined by construction type, and do not support interfaces` 编译崩溃。
+  * *错误示例*：`interface Config { name: string }`
+  * *正确做法*：`type Config = { name: string }`
 * **模板自闭合标签限制 (Template Void Elements)**：
   * 在 `.uvue` 模板中，像 `<input>` 等 HTML Void 元素必须显式地进行自闭合（如 `<input />`），否则 uni-app X 编译器会报 `Element is missing end tag` 错误。同时，可以在 ESLint 中配置或关闭相关的 html-self-closing 规则以避免 lint 冲突。
 * **等值比较限制 (Value Equality vs Identity Equality)**：

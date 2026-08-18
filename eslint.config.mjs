@@ -18,6 +18,10 @@ const composer = uniHelper({
     // uni-pages 生成的类型文件
     'uni-pages.d.ts',
     // 插件生成的文件
+    '**/pages.json',
+    '**/manifest.json',
+    'pages.json',
+    'manifest.json',
     'src/pages.json',
     'src/manifest.json',
     // 忽略外部/文档/工具目录
@@ -61,6 +65,7 @@ const composer = uniHelper({
     'jsdoc/check-param-names': 'off',
     'jsdoc/require-returns-description': 'off',
     'ts/no-empty-object-type': 'off',
+    'ts/consistent-type-definitions': 'off',
     'no-extend-native': 'off',
     // uni 条件编译注释可能包裹 import，自动排序会破坏平台条件边界
     'perfectionist/sort-imports': 'off',
@@ -219,6 +224,8 @@ configs.push({
   rules: {
     'eqeqeq': 'off',
     'vue/eqeqeq': 'off',
+    'ts/consistent-type-definitions': 'off',
+    '@typescript-eslint/consistent-type-definitions': 'off',
     'style/comma-dangle': ['error', 'never'],
     'vue/comma-dangle': ['error', 'never'],
     'vue/no-undef-components': [

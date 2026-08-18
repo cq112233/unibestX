@@ -1,0 +1,208 @@
+import { computed, ref, watch, nextTick } from 'vue'
+import defProps from './transition.uts'
+import { addStyle, sleep } from '../../libs/function/index.uts'
+
+
+const __sfc__ = defineComponent({
+  __name: 'up-transition',
+name: 'up-transition',
+  props: {
+  show: {
+    type: Boolean,
+    default: false
+  },
+  mode: {
+    type: String,
+    default: 'fade'
+  },
+  duration: {
+    type: [Number, String],
+    default: '300'
+  },
+  timingFunction: {
+    type: String,
+    default: 'ease-out'
+  },
+  customStyle: {
+    type: Object,
+    default: () => ({})
+  }
+},
+  emits: ['click', 'beforeEnter', 'enter', 'afterEnter', 'beforeLeave', 'leave', 'afterLeave'],
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+
+
+const props = __props
+
+function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+__ins.emit(event, ...do_not_transform_spread)
+}
+
+const inited = ref<boolean>(false)
+const viewStyle = ref<UTSJSONObject>({} as UTSJSONObject)
+const status = ref<string>('')
+const transitionEnded = ref<boolean>(false)
+const display = ref<boolean>(false)
+const classes = ref<string>('')
+
+const getClassNames = function (name: string): UTSJSONObject {
+  return {
+    'enter': `up-${name}-enter up-${name}-enter-active`,
+    'enter-to': `up-${name}-enter-to up-${name}-enter-active`,
+    'leave': `up-${name}-leave up-${name}-leave-active`,
+    'leave-to': `up-${name}-leave-to up-${name}-leave-active`
+  } as UTSJSONObject
+}
+
+const getModeStyle = function (mode: string, state: string): UTSJSONObject {
+  const style = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-transition/up-transition.uvue", 65, 9), } as UTSJSONObject
+  if (state == 'enter' || state == 'leave-to') {
+    if (mode == 'fade') {
+      style['opacity'] = 0
+    } else if (mode == 'zoom') {
+      style['transform'] = 'scale(0.95)'
+    } else if (mode == 'fade-zoom') {
+      style['transform'] = 'scale(0.95)'
+      style['opacity'] = 0
+    } else if (mode == 'fade-up') {
+      style['transform'] = 'translateY(100%)'
+      style['opacity'] = 0
+    } else if (mode == 'fade-down') {
+      style['transform'] = 'translateY(-100%)'
+      style['opacity'] = 0
+    } else if (mode == 'fade-left') {
+      style['transform'] = 'translateX(-100%)'
+      style['opacity'] = 0
+    } else if (mode == 'fade-right') {
+      style['transform'] = 'translateX(100%)'
+      style['opacity'] = 0
+    } else if (mode == 'slide-up') {
+      style['transform'] = 'translateY(100%)'
+    } else if (mode == 'slide-down') {
+      style['transform'] = 'translateY(-100%)'
+    } else if (mode == 'slide-left') {
+      style['transform'] = 'translateX(-100%)'
+    } else if (mode == 'slide-right') {
+      style['transform'] = 'translateX(100%)'
+    }
+  } else if (state == 'enter-to' || state == 'leave') {
+    if (mode == 'fade') {
+      style['opacity'] = 1
+    } else if (mode == 'zoom') {
+      style['transform'] = 'scale(1)'
+    } else if (mode == 'fade-zoom') {
+      style['transform'] = 'scale(1)'
+      style['opacity'] = 1
+    } else if (mode == 'fade-up' || mode == 'fade-down' || mode == 'fade-left' || mode == 'fade-right' ||
+               mode == 'slide-up' || mode == 'slide-down' || mode == 'slide-left' || mode == 'slide-right') {
+      style['transform'] = 'translate(0, 0)'
+      if (mode.startsWith('fade')) {
+        style['opacity'] = 1
+      }
+    }
+  }
+  return style
+}
+
+const mergeStyle = computed<UTSJSONObject>(() => {
+  const modeVal = (props.mode != '' ? props.mode : 'fade')
+  const durationVal = props.duration
+  const duration = durationVal != null ? durationVal.toString() : '0'
+
+  let transitionProp = 'all'
+  if (modeVal == 'fade') {
+    transitionProp = 'opacity'
+  } else if (modeVal.startsWith('slide')) {
+    transitionProp = 'transform'
+  } else if (modeVal.startsWith('fade-zoom') || modeVal == 'zoom' || modeVal.startsWith('fade-up') || modeVal.startsWith('fade-down') || modeVal.startsWith('fade-left') || modeVal.startsWith('fade-right')) {
+    transitionProp = 'transform, opacity'
+  }
+
+  return {
+    transitionProperty: transitionProp,
+    transitionDuration: `${duration}ms`,
+    transitionTimingFunction: props.timingFunction,
+    ...addStyle(props.customStyle) as UTSJSONObject,
+    ...viewStyle.value
+  } as UTSJSONObject
+})
+
+function clickHandler() {
+  emit('click')
+}
+
+function onTransitionEnd() {
+  if (transitionEnded.value) return
+  transitionEnded.value = true
+  emit(status.value == 'leave' ? 'afterLeave' : 'afterEnter')
+  if (!props.show && display.value) {
+    display.value = false
+    inited.value = false
+  }
+}
+
+async function vueEnter() {
+  const classNames = getClassNames(props.mode)
+  status.value = 'enter'
+  emit('beforeEnter')
+  inited.value = true
+  display.value = true
+  classes.value = classNames['enter']?.toString() ?? ''
+  viewStyle.value = getModeStyle(props.mode, 'enter')
+  await nextTick()
+  await sleep(20)
+  emit('enter')
+  transitionEnded.value = false
+  emit('afterEnter')
+  classes.value = classNames['enter-to']?.toString() ?? ''
+  viewStyle.value = getModeStyle(props.mode, 'enter-to')
+}
+
+async function vueLeave() {
+  if (!display.value) return
+  const classNames = getClassNames(props.mode)
+  status.value = 'leave'
+  emit('beforeLeave')
+  classes.value = classNames['leave']?.toString() ?? ''
+  viewStyle.value = getModeStyle(props.mode, 'leave')
+
+  await nextTick()
+  transitionEnded.value = false
+  emit('leave')
+  setTimeout(onTransitionEnd, parseInt(props.duration != null ? props.duration.toString() : '0'))
+  classes.value = classNames['leave-to']?.toString() ?? ''
+  viewStyle.value = getModeStyle(props.mode, 'leave-to')
+}
+
+watch((): boolean => props.show, (newVal: boolean) => {
+  if (newVal) {
+    vueEnter()
+  } else {
+    vueLeave()
+  }
+}, { immediate: true })
+
+return (): any | null => {
+
+  return isTrue(inited.value)
+    ? _cE("view", _uM({
+        key: 0,
+        class: _nC(["up-transition", classes.value]),
+        ref: "up-transition",
+        onClick: clickHandler,
+        style: _nS(mergeStyle.value)
+      }), [
+        renderSlot(_ctx.$slots, "default")
+      ], 6 /* CLASS, STYLE */)
+    : _cC("v-if", true)
+}
+}
+
+})
+export default __sfc__
+export type UpTransitionComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpTransitionUpTransitionStyles = [_uM([["u-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-fade-enter-active", _pS(_uM([["transitionProperty", "opacity"]]))], ["up-fade-leave-active", _pS(_uM([["transitionProperty", "opacity"]]))], ["up-fade-enter", _pS(_uM([["opacity", 0]]))], ["up-fade-leave-to", _pS(_uM([["opacity", 0]]))], ["up-fade-zoom-enter", _pS(_uM([["transform", "scale(0.95)"], ["opacity", 0]]))], ["up-fade-zoom-leave-to", _pS(_uM([["transform", "scale(0.95)"], ["opacity", 0]]))], ["up-fade-zoom-enter-active", _pS(_uM([["transitionProperty", "transform,opacity"]]))], ["up-fade-zoom-leave-active", _pS(_uM([["transitionProperty", "transform,opacity"]]))], ["up-fade-down-enter-active", _pS(_uM([["transitionProperty", "opacity,transform"]]))], ["up-fade-down-leave-active", _pS(_uM([["transitionProperty", "opacity,transform"]]))], ["up-fade-left-enter-active", _pS(_uM([["transitionProperty", "opacity,transform"]]))], ["up-fade-left-leave-active", _pS(_uM([["transitionProperty", "opacity,transform"]]))], ["up-fade-right-enter-active", _pS(_uM([["transitionProperty", "opacity,transform"]]))], ["up-fade-right-leave-active", _pS(_uM([["transitionProperty", "opacity,transform"]]))], ["up-fade-up-enter-active", _pS(_uM([["transitionProperty", "opacity,transform"]]))], ["up-fade-up-leave-active", _pS(_uM([["transitionProperty", "opacity,transform"]]))], ["up-fade-up-enter", _pS(_uM([["transform", "translateY(100%)"], ["opacity", 0]]))], ["up-fade-up-leave-to", _pS(_uM([["transform", "translateY(100%)"], ["opacity", 0]]))], ["up-fade-down-enter", _pS(_uM([["transform", "translateY(-100%)"], ["opacity", 0]]))], ["up-fade-down-leave-to", _pS(_uM([["transform", "translateY(-100%)"], ["opacity", 0]]))], ["up-fade-left-enter", _pS(_uM([["transform", "translateX(-100%)"], ["opacity", 0]]))], ["up-fade-left-leave-to", _pS(_uM([["transform", "translateX(-100%)"], ["opacity", 0]]))], ["up-fade-right-enter", _pS(_uM([["transform", "translateX(100%)"], ["opacity", 0]]))], ["up-fade-right-leave-to", _pS(_uM([["transform", "translateX(100%)"], ["opacity", 0]]))], ["up-slide-down-enter-active", _pS(_uM([["transitionProperty", "transform"]]))], ["up-slide-down-leave-active", _pS(_uM([["transitionProperty", "transform"]]))], ["up-slide-left-enter-active", _pS(_uM([["transitionProperty", "transform"]]))], ["up-slide-left-leave-active", _pS(_uM([["transitionProperty", "transform"]]))], ["up-slide-right-enter-active", _pS(_uM([["transitionProperty", "transform"]]))], ["up-slide-right-leave-active", _pS(_uM([["transitionProperty", "transform"]]))], ["up-slide-up-enter-active", _pS(_uM([["transitionProperty", "transform"]]))], ["up-slide-up-leave-active", _pS(_uM([["transitionProperty", "transform"]]))], ["up-slide-up-enter", _pS(_uM([["transform", "translateY(100%)"]]))], ["up-slide-up-leave-to", _pS(_uM([["transform", "translateY(100%)"]]))], ["up-slide-down-enter", _pS(_uM([["transform", "translateY(-100%)"]]))], ["up-slide-down-leave-to", _pS(_uM([["transform", "translateY(-100%)"]]))], ["up-slide-left-enter", _pS(_uM([["transform", "translateX(-100%)"]]))], ["up-slide-left-leave-to", _pS(_uM([["transform", "translateX(-100%)"]]))], ["up-slide-right-enter", _pS(_uM([["transform", "translateX(100%)"]]))], ["up-slide-right-leave-to", _pS(_uM([["transform", "translateX(100%)"]]))], ["up-zoom-enter-active", _pS(_uM([["transitionProperty", "transform"]]))], ["up-zoom-leave-active", _pS(_uM([["transitionProperty", "transform"]]))], ["up-zoom-enter", _pS(_uM([["transform", "scale(0.95)"]]))], ["up-zoom-leave-to", _pS(_uM([["transform", "scale(0.95)"]]))], ["@TRANSITION", _uM([["up-fade-enter-active", _uM([["property", "opacity"]])], ["up-fade-leave-active", _uM([["property", "opacity"]])], ["up-fade-zoom-enter-active", _uM([["property", "transform,opacity"]])], ["up-fade-zoom-leave-active", _uM([["property", "transform,opacity"]])], ["up-fade-down-enter-active", _uM([["property", "opacity,transform"]])], ["up-fade-down-leave-active", _uM([["property", "opacity,transform"]])], ["up-fade-left-enter-active", _uM([["property", "opacity,transform"]])], ["up-fade-left-leave-active", _uM([["property", "opacity,transform"]])], ["up-fade-right-enter-active", _uM([["property", "opacity,transform"]])], ["up-fade-right-leave-active", _uM([["property", "opacity,transform"]])], ["up-fade-up-enter-active", _uM([["property", "opacity,transform"]])], ["up-fade-up-leave-active", _uM([["property", "opacity,transform"]])], ["up-slide-down-enter-active", _uM([["property", "transform"]])], ["up-slide-down-leave-active", _uM([["property", "transform"]])], ["up-slide-left-enter-active", _uM([["property", "transform"]])], ["up-slide-left-leave-active", _uM([["property", "transform"]])], ["up-slide-right-enter-active", _uM([["property", "transform"]])], ["up-slide-right-leave-active", _uM([["property", "transform"]])], ["up-slide-up-enter-active", _uM([["property", "transform"]])], ["up-slide-up-leave-active", _uM([["property", "transform"]])], ["up-zoom-enter-active", _uM([["property", "transform"]])], ["up-zoom-leave-active", _uM([["property", "transform"]])]])]])]
