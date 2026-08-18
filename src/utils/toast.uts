@@ -28,23 +28,27 @@ export function unregisterToast(toastInstance: ComponentPublicInstance) {
  */
 export function showToast(options: UTSJSONObject) {
   if (toastStack.length > 0) {
-    const activeToast = toastStack[toastStack.length - 1];
-    activeToast.$callMethod('show', options);
+    try {
+      const activeToast = toastStack[toastStack.length - 1];
+      activeToast.$callMethod('show', options);
+      return;
+    }
+    catch (e) {
+      console.error('activeToast.$callMethod error:', e);
+    }
   }
-  else {
-    // 降级使用原生 uni.showToast
-    uni.showToast({
-      title: options.message as string,
-      icon: 'none'
-    });
-  }
+  // 降级使用原生 uni.showToast
+  const msg = (options.message ?? '') as string;
+  uni.showToast({
+    title: msg,
+    icon: 'none'
+  });
 }
 
 /**
  * 快捷调用 toast
  */
 export function toast(message: string, type: string = 'default') {
-  console.log(3456);
   showToast({
     message,
     type

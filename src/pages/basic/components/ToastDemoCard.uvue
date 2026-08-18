@@ -1,0 +1,67 @@
+<template>
+  <Card title="全局 Toast 轻提示">
+    <!-- 说明区域 -->
+    <view class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
+      <text class="text-12px text-[#64748b] leading-20px">
+        通过 App.ku.uvue 全局挂载的 &lt;up-toast /&gt;，直接导入 @/src/utils/toast 即可在任意页面与逻辑中唤起轻提示。
+      </text>
+    </view>
+
+    <!-- 按钮操作组 -->
+    <view class="flex flex-col">
+      <view class="flex flex-row mb-10px">
+        <view
+          class="flex-1 mr-10px bg-[#3b82f6] rounded-8px h-40px flex flex-row items-center justify-center"
+          @click="handleDefaultToast"
+        >
+          <text class="text-[#ffffff] text-13px font-bold">默认 Toast</text>
+        </view>
+        <view
+          class="flex-1 bg-[#10b981] rounded-8px h-40px flex flex-row items-center justify-center"
+          @click="handleSuccessToast"
+        >
+          <text class="text-[#ffffff] text-13px font-bold">成功 Toast</text>
+        </view>
+      </view>
+
+      <view class="flex flex-row">
+        <view
+          class="flex-1 mr-10px bg-[#ef4444] rounded-8px h-40px flex flex-row items-center justify-center"
+          @click="handleErrorToast"
+        >
+          <text class="text-[#ffffff] text-13px font-bold">错误 Toast</text>
+        </view>
+        <view
+          class="flex-1 bg-[#f59e0b] rounded-8px h-40px flex flex-row items-center justify-center"
+          @click="handleWarningToast"
+        >
+          <text class="text-[#ffffff] text-13px font-bold">警告 Toast</text>
+        </view>
+      </view>
+    </view>
+  </Card>
+</template>
+
+<script setup lang="uts">
+import Card from './Card.uvue';
+import { toast, toastError, toastSuccess, toastWarning } from '@/src/utils/toast';
+
+function handleDefaultToast() {
+  toast('这是一条通过 App.ku 全局组件触发的轻提示');
+}
+
+function handleSuccessToast() {
+  toastSuccess('恭喜！全局 Toast 触发成功');
+}
+
+function handleErrorToast() {
+  toastError('操作异常，全局 Toast 报错提示');
+}
+
+function handleWarningToast() {
+  toastWarning('注意：这是一条全局警告轻提示');
+}
+</script>
+
+<style>
+</style>

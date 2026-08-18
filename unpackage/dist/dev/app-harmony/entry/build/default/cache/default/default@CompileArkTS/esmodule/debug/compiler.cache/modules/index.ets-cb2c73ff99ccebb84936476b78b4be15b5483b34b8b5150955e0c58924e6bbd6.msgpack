@@ -1,0 +1,678 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ Ğimport { GyroscopeNative } from "./GyroscopeNative";
+import { UTSObject, UniError, UTSJSONObject, UTS, UTSHarmony } from "@dcloudio/uni-app-framework";
+class StartGyroscopeSuccess extends UTSObject {
+    constructor() {
+        super(...arguments);
+        this.errMsg = null;
+    }
+}
+class StopGyroscopeSuccess extends UTSObject {
+    constructor() {
+        super(...arguments);
+        this.errMsg = null;
+    }
+}
+class StartGyroscopeOptions extends UTSObject {
+    constructor() {
+        super(...arguments);
+        this.interval = null;
+        this.success = null;
+        this.fail = null;
+        this.complete = null;
+    }
+}
+class StopGyroscopeOptions extends UTSObject {
+    constructor() {
+        super(...arguments);
+        this.success = null;
+        this.fail = null;
+        this.complete = null;
+    }
+}
+class OnGyroscopeChangeCallbackResult extends UTSObject {
+}
+const defaultGyroscopeInterval = 'normal';
+function normalizeGyroscopeInterval(interval) {
+    if (interval != null) {
+        if (interval == 'game') {
+            return 'game';
+        }
+        if (interval == 'ui') {
+            return 'ui';
+        }
+    }
+    return defaultGyroscopeInterval;
+}
+const GyroscopeUniErrorSubject = 'uni-gyroscope';
+const GyroscopeUniErrors = new Map([
+    [
+        601,
+        'gyroscope unsupported'
+    ],
+    [
+        602,
+        'start gyroscope failed'
+    ],
+    [
+        603,
+        'stop gyroscope failed'
+    ],
+    [
+        604,
+        'gyroscope internal error'
+    ],
+    [
+        701,
+        'android sensor manager unavailable'
+    ],
+    [
+        702,
+        'android gyroscope sensor unavailable'
+    ],
+    [
+        703,
+        'android register listener failed'
+    ],
+    [
+        704,
+        'android sensor data invalid'
+    ],
+    [
+        801,
+        'ios gyroscope unavailable'
+    ],
+    [
+        802,
+        'ios motion manager init failed'
+    ],
+    [
+        803,
+        'ios start gyroscope failed'
+    ],
+    [
+        804,
+        'ios stop gyroscope failed'
+    ],
+    [
+        501,
+        'harmony gyroscope unavailable'
+    ],
+    [
+        502,
+        'harmony subscribe gyroscope failed'
+    ],
+    [
+        503,
+        'harmony unsubscribe gyroscope failed'
+    ],
+    [
+        504,
+        'harmony sensor data invalid'
+    ],
+    [
+        901,
+        'web gyroscope unsupported'
+    ]
+]);
+class StartGyroscopeFailImpl extends UniError {
+    constructor(errCode) {
+        super();
+        this.errCode = errCode;
+        this.errSubject = GyroscopeUniErrorSubject;
+    }
+}
+class StopGyroscopeFailImpl extends UniError {
+    constructor(errCode) {
+        super();
+        this.errCode = errCode;
+        this.errSubject = GyroscopeUniErrorSubject;
+    }
+}
+function createStartGyroscopeFail(errCode, errMsg = null, data = null, cause = null) {
+    const error = new StartGyroscopeFailImpl(errCode);
+    const defaultMessage = UTS.mapGet(GyroscopeUniErrors, errCode);
+    error.errMsg = errMsg != null ? errMsg : defaultMessage != null ? defaultMessage : '';
+    error.data = data;
+    if (cause != null) {
+        error.cause = cause;
+    }
+    return error;
+}
+function createStopGyroscopeFail(errCode, errMsg = null, data = null, cause = null) {
+    const error = new StopGyroscopeFailImpl(errCode);
+    const defaultMessage = UTS.mapGet(GyroscopeUniErrors, errCode);
+    error.errMsg = errMsg != null ? errMsg : defaultMessage != null ? defaultMessage : '';
+    error.data = data;
+    if (cause != null) {
+        error.cause = cause;
+    }
+    return error;
+}
+const permissions = [
+    'ohos.permission.GYROSCOPE'
+];
+const callbacks = [];
+let started = false;
+let nativeListenerBound = false;
+function createStartGyroscopeSuccess(errMsg) {
+    return {
+        errMsg: errMsg
+    };
+}
+function createStopGyroscopeSuccess(errMsg) {
+    return {
+        errMsg: errMsg
+    };
+}
+function callStartSuccess(options) {
+    const result = createStartGyroscopeSuccess('startGyroscope:ok');
+    options?.success?.(result);
+    options?.complete?.(result);
+}
+function callStartFail(options, fail) {
+    options?.fail?.(fail);
+    options?.complete?.(fail);
+}
+function callStopSuccess(options) {
+    const result = createStopGyroscopeSuccess('stopGyroscope:ok');
+    options?.success?.(result);
+    options?.complete?.(result);
+}
+function callStopFail(options, fail) {
+    options?.fail?.(fail);
+    options?.complete?.(fail);
+}
+function hasCallback(callback) {
+    let index = 0;
+    while (index < callbacks.length) {
+        if (callbacks[index] == callback) {
+            return true;
+        }
+        index++;
+    }
+    return false;
+}
+function removeCallback(callback) {
+    let index = 0;
+    while (index < callbacks.length) {
+        if (callbacks[index] == callback) {
+            callbacks.splice(index, 1);
+            return;
+        }
+        index++;
+    }
+}
+function dispatchGyroscopeChange(x, y, z) {
+    const result = {
+        x: x,
+        y: y,
+        z: z
+    };
+    let index = 0;
+    while (index < callbacks.length) {
+        callbacks[index](result);
+        index++;
+    }
+}
+function ensureNativeListener() {
+    if (nativeListenerBound) {
+        return;
+    }
+    GyroscopeNative.setListener((x, y, z) => {
+        dispatchGyroscopeChange(x, y, z);
+    });
+    nativeListenerBound = true;
+}
+function mapStartNativeError(code) {
+    let errCode = 604;
+    if (code == 501 || code == 502 || code == 503 || code == 504) {
+        errCode = code;
+    }
+    else {
+        errCode = 602;
+    }
+    return createStartGyroscopeFail(errCode, 'startGyroscope:fail', new UTSJSONObject({
+        platformCode: code
+    }));
+}
+function mapStopNativeError(code) {
+    let errCode = 604;
+    if (code == 501 || code == 502 || code == 503 || code == 504) {
+        errCode = code;
+    }
+    else {
+        errCode = 603;
+    }
+    return createStopGyroscopeFail(errCode, 'stopGyroscope:fail', new UTSJSONObject({
+        platformCode: code
+    }));
+}
+function onGyroscopeChange(callback) {
+    ensureNativeListener();
+    if (!started) {
+        startGyroscope();
+    }
+    if (hasCallback(callback)) {
+        return;
+    }
+    callbacks.push(callback);
+}
+function offGyroscopeChange(callback = null) {
+    if (callback == null) {
+        callbacks.length = 0;
+    }
+    else {
+        removeCallback(callback);
+    }
+    if (callbacks.length == 0) {
+        GyroscopeNative.removeListener();
+        nativeListenerBound = false;
+    }
+}
+function startGyroscope(options = null) {
+    ensureNativeListener();
+    if (started) {
+        callStartSuccess(options);
+        return;
+    }
+    const interval = normalizeGyroscopeInterval(options?.interval ?? null);
+    UTSHarmony.requestSystemPermission(permissions, (allRight, _) => {
+        if (!allRight) {
+            callStartFail(options, createStartGyroscopeFail(602, 'startGyroscope:fail permission denied'));
+            return;
+        }
+        const code = GyroscopeNative.start(interval);
+        if (code != 0) {
+            callStartFail(options, mapStartNativeError(code));
+            return;
+        }
+        started = true;
+        callStartSuccess(options);
+    }, (_granted, _permissions) => {
+        callStartFail(options, createStartGyroscopeFail(502, 'startGyroscope:fail permission request failed'));
+    });
+}
+function stopGyroscope(options = null) {
+    if (!started) {
+        callStopSuccess(options);
+        return;
+    }
+    const code = GyroscopeNative.stop();
+    if (code != 0) {
+        callStopFail(options, mapStopNativeError(code));
+        return;
+    }
+    started = false;
+    callStopSuccess(options);
+}
+export { OnGyroscopeChangeCallbackResult as OnGyroscopeChangeCallbackResult, StartGyroscopeOptions as StartGyroscopeOptions, StartGyroscopeSuccess as StartGyroscopeSuccess, StopGyroscopeOptions as StopGyroscopeOptions, StopGyroscopeSuccess as StopGyroscopeSuccess };
+export { onGyroscopeChange as onGyroscopeChange };
+export { offGyroscopeChange as offGyroscopeChange };
+export { startGyroscope as startGyroscope };
+export { stopGyroscope as stopGyroscope };
+//# sourceMappingURL=index.js.mapÂ’Ú#/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-gyroscope/utssdk/app-harmony/GyroscopeNative.etsÙî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework/index.etsÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-gyroscope/utssdk/app-harmony/index.etsÔrB˜±isLocalDependency¯isNodeEntryFile§pkgPath§pkgNameªpkgVersion±belongProjectPath±dependencyPkgInfo¬shouldEmitJsÂÂÙâ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules¹@dcloudio/uni-app-modules¥1.0.0ÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmonyÔrC’§pkgNameªpkgVersion¹@dcloudio/uni-app-modules¥1.0.0ÃÃÚ-ßimport { GyroscopeNative } from "./GyroscopeNative";
+import { IUniError, UTSObject, UniError, UTSJSONObject, UTS, UTSHarmony } from "@dcloudio/uni-app-framework";
+type GyroscopeInterval = 'game' | 'ui' | 'normal';
+type GyroscopeErrorCode = 601 | 602 | 603 | 604 | 701 | 702 | 703 | 704 | 801 | 802 | 803 | 804 | 501 | 502 | 503 | 504 | 901;
+interface IGyroscopeError extends IUniError {
+    errCode: GyroscopeErrorCode;
+}
+interface IStartGyroscopeFail extends IGyroscopeError {
+}
+interface IStopGyroscopeFail extends IGyroscopeError {
+}
+class StartGyroscopeSuccess extends UTSObject {
+    errMsg: string | null = null;
+}
+type StartGyroscopeFail = IStartGyroscopeFail;
+type StartGyroscopeSuccessCallback = (res: StartGyroscopeSuccess) => void;
+type StartGyroscopeFailCallback = (res: StartGyroscopeFail) => void;
+type StartGyroscopeComplete = StartGyroscopeSuccess | StartGyroscopeFail;
+type StartGyroscopeCompleteCallback = (res: StartGyroscopeComplete) => void;
+class StopGyroscopeSuccess extends UTSObject {
+    errMsg: string | null = null;
+}
+type StopGyroscopeFail = IStopGyroscopeFail;
+type StopGyroscopeSuccessCallback = (res: StopGyroscopeSuccess) => void;
+type StopGyroscopeFailCallback = (res: StopGyroscopeFail) => void;
+type StopGyroscopeComplete = StopGyroscopeSuccess | StopGyroscopeFail;
+type StopGyroscopeCompleteCallback = (res: StopGyroscopeComplete) => void;
+class StartGyroscopeOptions extends UTSObject {
+    interval: GyroscopeInterval | null = null;
+    success: StartGyroscopeSuccessCallback | null = null;
+    fail: StartGyroscopeFailCallback | null = null;
+    complete: StartGyroscopeCompleteCallback | null = null;
+}
+class StopGyroscopeOptions extends UTSObject {
+    success: StopGyroscopeSuccessCallback | null = null;
+    fail: StopGyroscopeFailCallback | null = null;
+    complete: StopGyroscopeCompleteCallback | null = null;
+}
+class OnGyroscopeChangeCallbackResult extends UTSObject {
+    x!: number;
+    y!: number;
+    z!: number;
+}
+type OnGyroscopeChangeCallback = (result: OnGyroscopeChangeCallbackResult) => void;
+type StartGyroscope = (options?: StartGyroscopeOptions | null) => void;
+type StopGyroscope = (options?: StopGyroscopeOptions | null) => void;
+type OnGyroscopeChange = (callback: OnGyroscopeChangeCallback) => void;
+type OffGyroscopeChange = (callback: OnGyroscopeChangeCallback | null) => void;
+const defaultGyroscopeInterval: GyroscopeInterval = 'normal';
+function normalizeGyroscopeInterval(interval: GyroscopeInterval | null): GyroscopeInterval {
+    if (interval != null) {
+        if (interval == 'game') {
+            return 'game';
+        }
+        if (interval == 'ui') {
+            return 'ui';
+        }
+    }
+    return defaultGyroscopeInterval;
+}
+const GyroscopeUniErrorSubject = 'uni-gyroscope';
+const GyroscopeUniErrors: Map<number, string> = new Map([
+    [
+        601,
+        'gyroscope unsupported'
+    ],
+    [
+        602,
+        'start gyroscope failed'
+    ],
+    [
+        603,
+        'stop gyroscope failed'
+    ],
+    [
+        604,
+        'gyroscope internal error'
+    ],
+    [
+        701,
+        'android sensor manager unavailable'
+    ],
+    [
+        702,
+        'android gyroscope sensor unavailable'
+    ],
+    [
+        703,
+        'android register listener failed'
+    ],
+    [
+        704,
+        'android sensor data invalid'
+    ],
+    [
+        801,
+        'ios gyroscope unavailable'
+    ],
+    [
+        802,
+        'ios motion manager init failed'
+    ],
+    [
+        803,
+        'ios start gyroscope failed'
+    ],
+    [
+        804,
+        'ios stop gyroscope failed'
+    ],
+    [
+        501,
+        'harmony gyroscope unavailable'
+    ],
+    [
+        502,
+        'harmony subscribe gyroscope failed'
+    ],
+    [
+        503,
+        'harmony unsubscribe gyroscope failed'
+    ],
+    [
+        504,
+        'harmony sensor data invalid'
+    ],
+    [
+        901,
+        'web gyroscope unsupported'
+    ]
+]);
+class StartGyroscopeFailImpl extends UniError implements IStartGyroscopeFail {
+    errCode: GyroscopeErrorCode;
+    constructor(errCode: GyroscopeErrorCode){
+        super();
+        this.errCode = errCode;
+        this.errSubject = GyroscopeUniErrorSubject;
+    }
+}
+class StopGyroscopeFailImpl extends UniError implements IStopGyroscopeFail {
+    errCode: GyroscopeErrorCode;
+    constructor(errCode: GyroscopeErrorCode){
+        super();
+        this.errCode = errCode;
+        this.errSubject = GyroscopeUniErrorSubject;
+    }
+}
+function createStartGyroscopeFail(errCode: GyroscopeErrorCode, errMsg: string | null = null, data: UTSJSONObject | null = null, cause: Error | null = null): StartGyroscopeFailImpl {
+    const error = new StartGyroscopeFailImpl(errCode);
+    const defaultMessage = UTS.mapGet(GyroscopeUniErrors, errCode);
+    error.errMsg = errMsg != null ? errMsg : defaultMessage != null ? defaultMessage : '';
+    error.data = data;
+    if (cause != null) {
+        error.cause = cause;
+    }
+    return error;
+}
+function createStopGyroscopeFail(errCode: GyroscopeErrorCode, errMsg: string | null = null, data: UTSJSONObject | null = null, cause: Error | null = null): StopGyroscopeFailImpl {
+    const error = new StopGyroscopeFailImpl(errCode);
+    const defaultMessage = UTS.mapGet(GyroscopeUniErrors, errCode);
+    error.errMsg = errMsg != null ? errMsg : defaultMessage != null ? defaultMessage : '';
+    error.data = data;
+    if (cause != null) {
+        error.cause = cause;
+    }
+    return error;
+}
+const permissions = [
+    'ohos.permission.GYROSCOPE'
+];
+const callbacks: Array<OnGyroscopeChangeCallback> = [];
+let started: boolean = false;
+let nativeListenerBound: boolean = false;
+function createStartGyroscopeSuccess(errMsg: string): StartGyroscopeSuccess {
+    return {
+        errMsg: errMsg
+    } as StartGyroscopeSuccess;
+}
+function createStopGyroscopeSuccess(errMsg: string): StopGyroscopeSuccess {
+    return {
+        errMsg: errMsg
+    } as StopGyroscopeSuccess;
+}
+function callStartSuccess(options: StartGyroscopeOptions | null): void {
+    const result = createStartGyroscopeSuccess('startGyroscope:ok');
+    options?.success?.(result);
+    options?.complete?.(result);
+}
+function callStartFail(options: StartGyroscopeOptions | null, fail: StartGyroscopeFail): void {
+    options?.fail?.(fail);
+    options?.complete?.(fail);
+}
+function callStopSuccess(options: StopGyroscopeOptions | null): void {
+    const result = createStopGyroscopeSuccess('stopGyroscope:ok');
+    options?.success?.(result);
+    options?.complete?.(result);
+}
+function callStopFail(options: StopGyroscopeOptions | null, fail: StopGyroscopeFail): void {
+    options?.fail?.(fail);
+    options?.complete?.(fail);
+}
+function hasCallback(callback: OnGyroscopeChangeCallback): boolean {
+    let index = 0;
+    while(index < callbacks.length){
+        if (callbacks[index] == callback) {
+            return true;
+        }
+        index++;
+    }
+    return false;
+}
+function removeCallback(callback: OnGyroscopeChangeCallback): void {
+    let index = 0;
+    while(index < callbacks.length){
+        if (callbacks[index] == callback) {
+            callbacks.splice(index, 1);
+            return;
+        }
+        index++;
+    }
+}
+function dispatchGyroscopeChange(x: number, y: number, z: number): void {
+    const result: OnGyroscopeChangeCallbackResult = {
+        x: x,
+        y: y,
+        z: z
+    };
+    let index = 0;
+    while(index < callbacks.length){
+        callbacks[index](result);
+        index++;
+    }
+}
+function ensureNativeListener(): void {
+    if (nativeListenerBound) {
+        return;
+    }
+    GyroscopeNative.setListener((x: number, y: number, z: number)=>{
+        dispatchGyroscopeChange(x, y, z);
+    });
+    nativeListenerBound = true;
+}
+function mapStartNativeError(code: number): StartGyroscopeFail {
+    let errCode: GyroscopeErrorCode = 604;
+    if (code == 501 || code == 502 || code == 503 || code == 504) {
+        errCode = code as GyroscopeErrorCode;
+    } else {
+        errCode = 602;
+    }
+    return createStartGyroscopeFail(errCode, 'startGyroscope:fail', new UTSJSONObject({
+        platformCode: code
+    }));
+}
+function mapStopNativeError(code: number): StopGyroscopeFail {
+    let errCode: GyroscopeErrorCode = 604;
+    if (code == 501 || code == 502 || code == 503 || code == 504) {
+        errCode = code as GyroscopeErrorCode;
+    } else {
+        errCode = 603;
+    }
+    return createStopGyroscopeFail(errCode, 'stopGyroscope:fail', new UTSJSONObject({
+        platformCode: code
+    }));
+}
+function onGyroscopeChange(callback: OnGyroscopeChangeCallback): void {
+    ensureNativeListener();
+    if (!started) {
+        startGyroscope();
+    }
+    if (hasCallback(callback)) {
+        return;
+    }
+    callbacks.push(callback);
+}
+function offGyroscopeChange(callback: OnGyroscopeChangeCallback | null = null): void {
+    if (callback == null) {
+        callbacks.length = 0;
+    } else {
+        removeCallback(callback);
+    }
+    if (callbacks.length == 0) {
+        GyroscopeNative.removeListener();
+        nativeListenerBound = false;
+    }
+}
+function startGyroscope(options: StartGyroscopeOptions | null = null): void {
+    ensureNativeListener();
+    if (started) {
+        callStartSuccess(options);
+        return;
+    }
+    const interval: GyroscopeInterval = normalizeGyroscopeInterval(options?.interval ?? null);
+    UTSHarmony.requestSystemPermission(permissions, (allRight: boolean, _: Array<string>)=>{
+        if (!allRight) {
+            callStartFail(options, createStartGyroscopeFail(602, 'startGyroscope:fail permission denied'));
+            return;
+        }
+        const code = GyroscopeNative.start(interval);
+        if (code != 0) {
+            callStartFail(options, mapStartNativeError(code));
+            return;
+        }
+        started = true;
+        callStartSuccess(options);
+    }, (_granted: boolean, _permissions: Array<string>)=>{
+        callStartFail(options, createStartGyroscopeFail(502, 'startGyroscope:fail permission request failed'));
+    });
+}
+function stopGyroscope(options: StopGyroscopeOptions | null = null): void {
+    if (!started) {
+        callStopSuccess(options);
+        return;
+    }
+    const code = GyroscopeNative.stop();
+    if (code != 0) {
+        callStopFail(options, mapStopNativeError(code));
+        return;
+    }
+    started = false;
+    callStopSuccess(options);
+}
+export { GyroscopeErrorCode as GyroscopeErrorCode, GyroscopeInterval as GyroscopeInterval, IGyroscopeError as IGyroscopeError, IStartGyroscopeFail as IStartGyroscopeFail, IStopGyroscopeFail as IStopGyroscopeFail, OffGyroscopeChange as OffGyroscopeChange, OnGyroscopeChange as OnGyroscopeChange, OnGyroscopeChangeCallback as OnGyroscopeChangeCallback, OnGyroscopeChangeCallbackResult as OnGyroscopeChangeCallbackResult, StartGyroscope as StartGyroscope, StartGyroscopeComplete as StartGyroscopeComplete, StartGyroscopeCompleteCallback as StartGyroscopeCompleteCallback, StartGyroscopeFail as StartGyroscopeFail, StartGyroscopeFailCallback as StartGyroscopeFailCallback, StartGyroscopeOptions as StartGyroscopeOptions, StartGyroscopeSuccess as StartGyroscopeSuccess, StartGyroscopeSuccessCallback as StartGyroscopeSuccessCallback, StopGyroscope as StopGyroscope, StopGyroscopeComplete as StopGyroscopeComplete, StopGyroscopeCompleteCallback as StopGyroscopeCompleteCallback, StopGyroscopeFail as StopGyroscopeFail, StopGyroscopeFailCallback as StopGyroscopeFailCallback, StopGyroscopeOptions as StopGyroscopeOptions, StopGyroscopeSuccess as StopGyroscopeSuccess, StopGyroscopeSuccessCallback as StopGyroscopeSuccessCallback };
+export { onGyroscopeChange as onGyroscopeChange };
+export { offGyroscopeChange as offGyroscopeChange };
+export { startGyroscope as startGyroscope };
+export { stopGyroscope as stopGyroscope };
+ÀÔrD’±./GyroscopeNative»@dcloudio/uni-app-frameworkÔrE—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÚ#/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-gyroscope/utssdk/app-harmony/GyroscopeNative.etsAÃªoh-resolveÂEAÂÙî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework/index.etsAÃªoh-resolveÂ“ÔrF–§version¤fileªsourceRoot§sources¥names¨mappings¨index.js ‘©index.etsÜ8˜”    ”  ”	  	”  ”  ”    ”3  3”4  4Ü ”   ” ”	 ” ” ” '” )”+ 6”- 8”0 ;”2 =”< ÌG”> ÌI”ÌD ÌO”Ìa Ìl”Ìb Ìm•”   ” ” ”$ $”- -‘”  •” ” 
+” ”  ” !’”  ” ‘” •”   ” ” ”# #”, ,‘”  •” ” 
+” ”  ” !’”  ” ‘” •”   ” ” ”$ $”- -‘”  •” ” ” )” -” .•” ” ” 4” 8” 9•” ” ” .” 2” 3•” ” ” 6” :” ;’”   ”  ‘”  •”  ! ” !” !”# !#”, !,‘” ! •” "” "” "3” "7” "8•” #” #” #-” #1” #2•” $” $” $5” $9” $:’” % ” %‘” %•”  & ” &”% &&”. &.”7 &7‘” *–”  0 ” 0” 0”! 04”) 0<”* 0=•”  1 ”	 1	”# 1#”$ 1$”, 1ÌF–” 2” 2” 2” 2” 2” 2–” 3” 3” 3” 3” 3”  3 ”” 4” 4” 4” 4‘”	 5	–” 6” 6” 6” 6” 6” 6”” 7” 7” 7” 7‘”	 8	‘” 9”” :” :”# :#”$ :$’”  ; ” ;–”  < ” <” <”! <!”0 <0”1 <1—”  = ” =” =” =0” =4”" =7”# =8‘” >’” ?” ?’” Ì@” Ì@‘” ÌA‘” ÌB’” ÌC” ÌC’” ÌD”  ÌD ‘” ÌE‘” ÌF’” ÌG” ÌG’” ÌH” ÌH‘” ÌI‘” ÌJ’” ÌK” ÌK’” ÌL”" ÌL"‘” ÌM‘” ÌN’” ÌO” ÌO’” ÌP”, ÌP,‘” ÌQ‘” ÌR’” ÌS” ÌS’” ÌT”. ÌT.‘” ÌU‘” ÌV’” ÌW” ÌW’” ÌX”* ÌX*‘” ÌY‘” ÌZ’” Ì[” Ì[’” Ì\”% Ì\%‘” Ì]‘” Ì^’” Ì_” Ì_’” Ì`”# Ì`#‘” Ìa‘” Ìb’” Ìc” Ìc’” Ìd”( Ìd(‘” Ìe‘” Ìf’” Ìg” Ìg’” Ìh”$ Ìh$‘” Ìi‘” Ìj’” Ìk” Ìk’” Ìl”# Ìl#‘” Ìm‘” Ìn’” Ìo” Ìo’” Ìp”' Ìp'‘” Ìq‘” Ìr’” Ìs” Ìs’” Ìt”, Ìt,‘” Ìu‘” Ìv’” Ìw” Ìw’” Ìx”. Ìx.‘” Ìy‘” Ìz’” Ì{” Ì{’” Ì|”% Ì|%‘” Ì}‘” Ì~’” Ì” Ì’” Ì€”# Ì€#‘” Ì“” Ì‚” Ì‚” Ì‚•”  Ìƒ ” Ìƒ” Ìƒ”% Ìƒ%”- Ìƒ-“” Ì…” Ì…” Ì…+”” Ì†” Ì†” Ì†” Ì†—” Ì‡” Ì‡” Ì‡” Ì‡” Ì‡” Ì‡” Ì‡—” Ìˆ” Ìˆ” Ìˆ” Ìˆ” Ìˆ”2 Ìˆ2”3 Ìˆ3’” Ì‰” Ì‰‘” ÌŠ•”  Ì‹ ” Ì‹” Ì‹”$ Ì‹$”, Ì‹,“” Ì” Ì” Ì+”” Ì” Ì” Ì” Ì—” Ì” Ì” Ì” Ì” Ì” Ì” Ì—” Ì” Ì” Ì” Ì” Ì”2 Ì2”3 Ì3’” Ì‘” Ì‘‘” Ì’”  Ì“ ”	 Ì“	”! Ì“!”" Ì“"”) Ì“=”+ Ì“?”4 Ì“ÌW”8 Ì“Ì[”: Ì“Ì]”ÌA Ì“Ìz”ÌE Ì“Ì~”ÌG Ì“Ì€”ÌO Ì“Ì–”ÌS Ì“Ìšš” Ì””
+ Ì”
+” Ì”” Ì”” Ì””, Ì”,”- Ì”-”4 Ì”4”5 Ì”5”6 Ì”6” Ì•”
+ Ì•
+” Ì•” Ì•” Ì•” Ì•”% Ì•%”& Ì•&”8 Ì•8”: Ì•:”ÌA Ì•ÌA”ÌB Ì•ÌB”ÌC Ì•ÌCÜ ” Ì–”	 Ì–	”
+ Ì–
+” Ì–” Ì–” Ì–” Ì–”! Ì–!”" Ì–"”# Ì–#”$ Ì–$”* Ì–*”+ Ì–+”, Ì–,”- Ì–-”; Ì–;”? Ì–?”ÌC Ì–ÌC”ÌD Ì–ÌD”ÌE Ì–ÌE”ÌF Ì–ÌF”ÌT Ì–ÌT”ÌU Ì–ÌU”ÌV Ì–ÌV”ÌW Ì–ÌW”ÌY Ì–ÌY”ÌZ Ì–ÌZ—” Ì—”	 Ì—	”
+ Ì—
+” Ì—” Ì—” Ì—” Ì—–” Ì˜” Ì˜” Ì˜” Ì˜” Ì˜” Ì˜—” Ì™” Ì™” Ì™” Ì™” Ì™” Ì™” Ì™‘” Ìš”” Ì›” Ì›” Ì›” Ì›’”  Ìœ ” Ìœ”  Ì ”	 Ì	”  Ì ”! Ì!”( Ì<”* Ì>”3 ÌÌV”7 ÌÌZ”9 ÌÌ\”Ì@ ÌÌy”ÌD ÌÌ}”ÌF ÌÌ”ÌN ÌÌ•”ÌR ÌÌ™š” Ì”
+ Ì
+” Ì” Ì” Ì”+ Ì+”, Ì,”3 Ì3”4 Ì4”5 Ì5” ÌŸ”
+ ÌŸ
+” ÌŸ” ÌŸ” ÌŸ” ÌŸ”% ÌŸ%”& ÌŸ&”8 ÌŸ8”: ÌŸ:”ÌA ÌŸÌA”ÌB ÌŸÌB”ÌC ÌŸÌCÜ ” Ì ”	 Ì 	”
+ Ì 
+” Ì ” Ì ” Ì ” Ì ”! Ì !”" Ì "”# Ì #”$ Ì $”* Ì *”+ Ì +”, Ì ,”- Ì -”; Ì ;”? Ì ?”ÌC Ì ÌC”ÌD Ì ÌD”ÌE Ì ÌE”ÌF Ì ÌF”ÌT Ì ÌT”ÌU Ì ÌU”ÌV Ì ÌV”ÌW Ì ÌW”ÌY Ì ÌY”ÌZ Ì ÌZ—” Ì¡”	 Ì¡	”
+ Ì¡
+” Ì¡” Ì¡” Ì¡” Ì¡–” Ì¢” Ì¢” Ì¢” Ì¢” Ì¢” Ì¢—” Ì£” Ì£” Ì£” Ì£” Ì£” Ì£” Ì£‘” Ì¤”” Ì¥” Ì¥” Ì¥” Ì¥’”  Ì¦ ” Ì¦””  Ì§ ” Ì§” Ì§” Ì§’” Ì¨” Ì¨’” Ì©” Ì©–”  Ìª ” Ìª” Ìª” Ìª4” Ìª6” Ìª7–”  Ì« ” Ì«” Ì«” Ì«” Ì«” Ì«–”  Ì¬ ” Ì¬” Ì¬” Ì¬#” Ì¬(”  Ì¬)•”  Ì­ ”	 Ì­	”$ Ì­$”% Ì­%”+ Ì­3’” Ì®” Ì®”” Ì¯” Ì¯” Ì¯” Ì¯’” Ì°” Ì°’”  Ì± ” Ì±•”  Ì² ”	 Ì²	”# Ì²#”$ Ì²$”* Ì²2’” Ì³” Ì³”” Ì´” Ì´” Ì´” Ì´’” Ìµ” Ìµ’”  Ì¶ ” Ì¶•”  Ì· ”	 Ì·	” Ì·” Ì·”! Ì·?™” Ì¸”
+ Ì¸
+” Ì¸” Ì¸”. Ì¸.”/ Ì¸/”ÌB Ì¸ÌB”ÌC Ì¸ÌC”ÌD Ì¸ÌD™” Ì¹” Ì¹” Ì¹” Ì¹” Ì¹” Ì¹” Ì¹” Ì¹” Ì¹™” Ìº” Ìº” Ìº” Ìº” Ìº” Ìº” Ìº” Ìº”  Ìº ’”  Ì» ” Ì»—”  Ì¼ ”	 Ì¼	” Ì¼” Ì¼” Ì¼<”  Ì¼>”$ Ì¼ÌV™” Ì½” Ì½” Ì½” Ì½” Ì½” Ì½” Ì½” Ì½” Ì½™” Ì¾” Ì¾” Ì¾” Ì¾” Ì¾” Ì¾” Ì¾” Ì¾” Ì¾’”  Ì¿ ” Ì¿•”  ÌÀ ”	 ÌÀ	” ÌÀ” ÌÀ”  ÌÀ=™” ÌÁ”
+ ÌÁ
+” ÌÁ” ÌÁ”- ÌÁ-”. ÌÁ.”Ì@ ÌÁÌ@”ÌA ÌÁÌA”ÌB ÌÁÌB™” ÌÂ” ÌÂ” ÌÂ” ÌÂ” ÌÂ” ÌÂ” ÌÂ” ÌÂ” ÌÂ™” ÌÃ” ÌÃ” ÌÃ” ÌÃ” ÌÃ” ÌÃ” ÌÃ” ÌÃ”  ÌÃ ’”  ÌÄ ” ÌÄ—”  ÌÅ ”	 ÌÅ	” ÌÅ” ÌÅ” ÌÅ:” ÌÅ<”# ÌÅÌS™” ÌÆ” ÌÆ” ÌÆ” ÌÆ” ÌÆ” ÌÆ” ÌÆ” ÌÆ” ÌÆ™” ÌÇ” ÌÇ” ÌÇ” ÌÇ” ÌÇ” ÌÇ” ÌÇ” ÌÇ” ÌÇ’”  ÌÈ ” ÌÈ•”  ÌÉ ”	 ÌÉ	” ÌÉ” ÌÉ” ÌÉ8–” ÌÊ” ÌÊ” ÌÊ” ÌÊ” ÌÊ” ÌÊ˜” ÌË” ÌË
+” ÌË” ÌË” ÌË” ÌË”# ÌË"”% ÌË#™” ÌÌ” ÌÌ” ÌÌ” ÌÌ” ÌÌ” ÌÌ”  ÌÌ ”( ÌÌ(”* ÌÌ*”” ÌÍ” ÌÍ” ÌÍ” ÌÍ‘”	 ÌÎ	”” ÌÏ” ÌÏ” ÌÏ” ÌÏ‘” ÌĞ”” ÌÑ” ÌÑ” ÌÑ” ÌÑ’”  ÌÒ ” ÌÒ•”  ÌÓ ”	 ÌÓ	” ÌÓ” ÌÓ”  ÌÓ;–” ÌÔ” ÌÔ” ÌÔ” ÌÔ” ÌÔ” ÌÔ˜” ÌÕ” ÌÕ
+” ÌÕ” ÌÕ” ÌÕ” ÌÕ”# ÌÕ"”% ÌÕ#™” ÌÖ” ÌÖ” ÌÖ” ÌÖ” ÌÖ” ÌÖ”  ÌÖ ”( ÌÖ(”* ÌÖ*š” Ì×” Ì×” Ì×” Ì×” Ì×”" Ì×"”$ Ì×$”% Ì×%”& Ì×&”' Ì×'’” ÌØ” ÌØ‘”	 ÌÙ	”” ÌÚ” ÌÚ” ÌÚ” ÌÚ‘” ÌÛ’”  ÌÜ ” ÌÜ™”  Ìİ ”	 Ìİ	”  Ìİ ”! Ìİ!”" Ìİ*”$ Ìİ,”% Ìİ5”' Ìİ7”( ÌİÌ@”” ÌŞ”
+ ÌŞ
+” ÌŞ” ÌŞ4”” Ìß”	 Ìß	” Ìß” Ìß”” Ìà”	 Ìà	” Ìà” Ìà”” Ìá”	 Ìá	” Ìá” Ìá’” Ìâ” Ìâ–” Ìã” Ìã” Ìã” Ìã” Ìã” Ìã˜” Ìä” Ìä
+” Ìä” Ìä” Ìä” Ìä”# Ìä"”% Ìä#™” Ìå” Ìå” Ìå” Ìå” Ìå” Ìå” Ìå”  Ìå ”! Ìå!”” Ìæ” Ìæ” Ìæ” Ìæ‘” Ìç’”  Ìè ” Ìè“”  Ìé ”	 Ìé	” Ìé”” Ìê” Ìê” Ìê” Ìê’” Ìë” Ìë‘” Ìì” Ìí” Ìí” Ìí” Ìí”  Ìí ”! Ìí!”" Ìí*”$ Ìí,”% Ìí5”' Ìí7”( ÌíÌ@”* ÌíÌA”, ÌíÌCš” Ìî” Ìî”  Ìî ”! Ìî!”# Ìî#”$ Ìî$”& Ìî&”' Ìî'”( Ìî(”) Ìî)”” Ìï” Ìï” Ìï” Ìï•” Ìğ” Ìğ” Ìğ” Ìğ” Ìğ’”  Ìñ ” Ìñ•”  Ìò ”	 Ìò	” Ìò” Ìò”! Ìò)–” Ìó” Ìó” Ìó” Ìó&” Ìó)” Ìó*Ü ” Ìô” Ìô” Ìô” Ìô” Ìô” Ìô” Ìô” Ìô”" Ìô"”& Ìô&”* Ìô*”. Ìô.”1 Ìô1”5 Ìô5”9 Ìô9”= Ìô=”Ì@ ÌôÌ@”ÌB ÌôÌB•” Ìõ” Ìõ” Ìõ” Ìõ,” Ìõ-‘” Ìö‘”	 Ìö•” Ì÷” Ì÷” Ì÷” Ì÷” Ì÷‘” Ìø›” Ìù” Ìù”# Ìù#”$ Ìù$”+ Ìù+”- Ìù-”ÌB ÌùÌB”ÌD ÌùÌD”ÌH ÌùÌH”ÌU ÌùÌU”ÌV ÌùÌV”” Ìú” Ìú” Ìú” Ìú”” Ìû” Ìû” Ìû” Ìû’”  Ìü ” Ìü•”  Ìı ”	 Ìı	” Ìı” Ìı”  Ìı(–” Ìş” Ìş” Ìş” Ìş&” Ìş)” Ìş*Ü ” Ìÿ” Ìÿ” Ìÿ” Ìÿ” Ìÿ” Ìÿ” Ìÿ” Ìÿ”" Ìÿ"”& Ìÿ&”* Ìÿ*”. Ìÿ.”1 Ìÿ1”5 Ìÿ5”9 Ìÿ9”= Ìÿ=”Ì@ ÌÿÌ@”ÌB ÌÿÌB•” Í ” Í ” Í ” Í ,” Í -‘” Í‘”	 Í•” Í” Í” Í” Í” Í‘” Í›” Í” Í”" Í"”# Í#”* Í*”, Í,”Ì@ ÍÌ@”ÌB ÍÌB”ÌF ÍÌF”ÌS ÍÌS”ÌT ÍÌT”” Í” Í” Í” Í”” Í” Í” Í” Í’”  Í ” Í•”  Í ”	 Í	” Í” Í”# Í>”” Í	” Í	” Í	” Í	•” Í
+” Í
+”	 Í
+	” Í
+” Í
+”” Í” Í” Í” Í‘” Í—” Í” Í” Í” Í” Í” Í” Í’” Í” Í‘” Í˜” Í” Í” Í” Í” Í” Í” Í” Í’”  Í ” Í–”  Í ”	 Í	” Í” Í”' ÍÌI”+ ÍÌM–” Í” Í” Í” Í” Í” Í—” Í” Í” Í” Í” Í” Í” Í‘” Í‘”	 Í–” Í” Í” Í” Í”  Í ”! Í!‘” Í˜” Í” Í” Í” Í” Í” Í” Í” Í–” Í” Í” Í”& Í&”( Í(”) Í)•” Í” Í” Í”# Í#”$ Í$‘” Í’”  Í ” Í–”  Í ”	 Í	” Í” Í”" ÍÌ@”& ÍÌD”” Í” Í” Í” Í”” Í” Í” Í” Í–” Í ” Í ” Í ”  Í  ”! Í !”" Í "’” Í!” Í!‘” Í"” Í#”
+ Í#
+” Í#” Í#(”/ Í#ÌB”0 Í#ÌC”7 Í#ÌJ”9 Í#ÌL”ÌA Í#ÌT”ÌE Í#ÌX”ÌI Í#Ì\”ÌJ Í#Ì]”ÌK Í#Ì^” Í$” Í$” Í$”& Í$&”' Í$'”2 Í$2”4 Í$4”5 Í$5”= Í$ÌF”? Í$ÌH”Ì@ Í$ÌX”ÌB Í$ÌY”ÌD Í$Ì[•” Í%” Í%” Í%” Í%” Í%” Í&” Í&” Í&”! Í&!”# Í&#”; Í&;”< Í&<”? Í&?”ÌA Í&ÌA”Ìh Í&Ìh”Ìi Í&Ìi”Ìj Í&Ìj”Ìk Í&Ìk’” Í'” Í'‘”	 Í(	›” Í)” Í)” Í)” Í)”$ Í)$”% Í)%”* Í)*”+ Í)+”3 Í)3”4 Í)4”5 Í)5–” Í*” Í*” Í*” Í*” Í*” Í*›” Í+” Í+” Í+”! Í+!”# Í+#”6 Í+6”7 Í+7”; Í+;”< Í+<”= Í+=”> Í+>’” Í,” Í,‘”	 Í-	•” Í.” Í.” Í.” Í.” Í.–” Í/” Í/” Í/”  Í/ ”! Í/!”" Í/"™” Í0” Í0” Í0” Í0” Í0” Í0” Í06”  Í07”" Í09” Í1” Í1” Í1” Í1” Í1”7 Í17”8 Í18”; Í1;”= Í1=”Ìl Í1Ìl”Ìm Í1Ìm”Ìn Í1Ìn”Ìo Í1Ìo”” Í2” Í2” Í2” Í2’”  Í3 ” Í3–”  Í4 ”	 Í4	” Í4” Í4”! Í4>”% Í4ÌB•” Í5” Í5”	 Í5	” Í5” Í5–” Í6” Í6” Í6” Í6”  Í6 ”! Í6!’” Í7” Í7‘” Í8™” Í9”
+ Í9
+” Í9” Í9”  Í9 ”! Í9!”% Í9%”' Í9'”( Í9(–” Í:” Í:” Í:” Í:” Í:” Í:›” Í;” Í;” Í;” Í;” Í;”0 Í;0”1 Í;1”5 Í;5”6 Í;6”7 Í;7”8 Í;8’” Í<” Í<‘” Í=•” Í>” Í>” Í>” Í>” Í>–” Í?” Í?” Í?” Í?” Í?” Í?’”  Í@ ” Í@Ü ”  ÍA ” ÍA”	 ÍAÍ_”( ÍAÍ~”, ÍAÍ‚”ÌK ÍAÍ¡”ÌM ÍAÍ”Ìb ÍAÍ²”Ìf ÍAÍ¶”Ì{ ÍAÍË”Ì} ÍAÍÍ”Ì’ ÍAÍâ”Ì– ÍAÍæ”Ì« ÍAÍû”Ì­ ÍAÍ-”ÌÁ ÍAÍA”ÌÅ ÍAÍE”ÌÙ ÍAÍY”ÌÛ ÍAÍ[”Ìï ÍAÍo”Ìó ÍAÍs”Í ÍAÍ‡”Í	 ÍAÍÇ”Í
+ ÍAÍÈ˜”  ÍB ” ÍB”	 ÍB	” ÍB” ÍB”/ ÍB/”1 ÍB1”2 ÍB2˜”  ÍC ” ÍC”	 ÍC	” ÍC” ÍC”1 ÍC1”3 ÍC3”4 ÍC4˜”  ÍD ” ÍD”	 ÍD	” ÍD” ÍD”) ÍD)”+ ÍD+”, ÍD,˜”  ÍE ” ÍE”	 ÍE	” ÍE” ÍE”' ÍE'”) ÍE)”* ÍE*ÔrG–§version¤file§sources®sourcesContent¥names¨mappingsÀ‘À‘ÀÜ9‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘”  ÌÙ ‘”  ÌÚ ‘”  ÌÛ ‘”  ÌÜ ‘”  Ìİ ‘”  ÌŞ ‘”  Ìß ‘”  Ìà ‘”  Ìá ‘”  Ìâ ‘”  Ìã ‘”  Ìä ‘”  Ìå ‘”  Ìæ ‘”  Ìç ‘”  Ìè ‘”  Ìé ‘”  Ìê ‘”  Ìë ‘”  Ìì ‘”  Ìí ‘”  Ìî ‘”  Ìï ‘”  Ìğ ‘”  Ìñ ‘”  Ìò ‘”  Ìó ‘”  Ìô ‘”  Ìõ ‘”  Ìö ‘”  Ì÷ ‘”  Ìø ‘”  Ìù ‘”  Ìú ‘”  Ìû ‘”  Ìü ‘”  Ìı ‘”  Ìş ‘”  Ìÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache•ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍßÍéÀ•ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍèÍ*ÔrL”¤type¥start£end¤nameªIdentifierÍèÍ¿OnGyroscopeChangeCallbackResultLªIdentifierÍÍ*¿OnGyroscopeChangeCallbackResultK¯ExportSpecifierÍ,ÍZLªIdentifierÍ,ÍAµStartGyroscopeOptionsLªIdentifierÍEÍZµStartGyroscopeOptionsK¯ExportSpecifierÍ\ÍŠLªIdentifierÍ\ÍqµStartGyroscopeSuccessLªIdentifierÍuÍŠµStartGyroscopeSuccessK¯ExportSpecifierÍŒÍ¸LªIdentifierÍŒÍ ´StopGyroscopeOptionsLªIdentifierÍ¤Í¸´StopGyroscopeOptionsK¯ExportSpecifierÍºÍæLªIdentifierÍºÍÎ´StopGyroscopeSuccessLªIdentifierÍÒÍæ´StopGyroscopeSuccessÀJ¶ExportNamedDeclarationÍëÍ À‘K¯ExportSpecifierÍôÍ LªIdentifierÍôÍ ±onGyroscopeChangeLªIdentifierÍ 	Í ±onGyroscopeChangeÀJ¶ExportNamedDeclarationÍ Í SÀ‘K¯ExportSpecifierÍ (Í PLªIdentifierÍ (Í :²offGyroscopeChangeLªIdentifierÍ >Í P²offGyroscopeChangeÀJ¶ExportNamedDeclarationÍ UÍ À‘K¯ExportSpecifierÍ ^Í ~LªIdentifierÍ ^Í l®startGyroscopeLªIdentifierÍ pÍ ~®startGyroscopeÀJ¶ExportNamedDeclarationÍ ƒÍ ­À‘K¯ExportSpecifierÍ ŒÍ ªLªIdentifierÍ ŒÍ ™­stopGyroscopeLªIdentifierÍ Í ª­stopGyroscopeÀ’ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration 4‘ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	¯GyroscopeNativeLªIdentifier	¯GyroscopeNativeÔrO•¤type¥start£end¥value£raw§Literal 3±./GyroscopeNative³"./GyroscopeNative"M±ImportDeclaration6Ì˜•N¯ImportSpecifier?ÌHLªIdentifier?ÌH©UTSObjectLªIdentifier?ÌH©UTSObjectN¯ImportSpecifierÌJÌRLªIdentifierÌJÌR¨UniErrorLªIdentifierÌJÌR¨UniErrorN¯ImportSpecifierÌTÌaLªIdentifierÌTÌa­UTSJSONObjectLªIdentifierÌTÌa­UTSJSONObjectN¯ImportSpecifierÌcÌfLªIdentifierÌcÌf£UTSLªIdentifierÌcÌf£UTSN¯ImportSpecifierÌhÌrLªIdentifierÌhÌrªUTSHarmonyLªIdentifierÌhÌrªUTSHarmonyO§LiteralÌzÌ—»@dcloudio/uni-app-framework½"@dcloudio/uni-app-framework"
