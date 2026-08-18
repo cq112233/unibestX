@@ -66,7 +66,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: __props.titleColor,
         d: __props.titleColor
       } : {}, {
-        e: common_vendor.o(handleBack, "ec"),
+        e: common_vendor.o(handleBack, "89"),
         f: common_vendor.t(__props.title),
         g: __props.titleColor,
         h: common_vendor.n(__props.fixed ? "navbar-container navbar-fixed" : "navbar-container"),

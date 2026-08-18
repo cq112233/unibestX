@@ -20,36 +20,36 @@
 </template>
 
 <script setup lang="uts">
-import Card from '../../basic/components/Card.uvue'
-import { ref } from 'vue'
+import Card from '../../basic/components/Card.uvue';
+import { ref } from 'vue';
 
-const photoUrl = ref('')
-const scanResult = ref('')
+const photoUrl = ref('');
+const scanResult = ref('');
 
 function chooseImage() {
   uni.chooseImage({
     count: 1,
     success: (res) => {
-      const paths = res.tempFilePaths
+      const paths = res.tempFilePaths;
       if (paths.length > 0) {
-        photoUrl.value = paths[0]
+        photoUrl.value = paths[0];
       }
     },
     fail: (err) => {
-      console.error(err)
-    },
-  })
+      console.error(err);
+    }
+  });
 }
 
 function scanCode() {
   uni.scanCode({
     success: (res) => {
-      scanResult.value = res.result
+      scanResult.value = res.result;
     },
     fail: (err) => {
-      console.error(err)
-    },
-  })
+      console.error(err);
+    }
+  });
 }
 </script>
 

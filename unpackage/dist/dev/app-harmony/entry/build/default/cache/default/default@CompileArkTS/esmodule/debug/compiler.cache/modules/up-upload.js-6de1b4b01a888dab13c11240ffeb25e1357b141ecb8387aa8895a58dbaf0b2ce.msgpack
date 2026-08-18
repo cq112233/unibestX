@@ -1,5 +1,4 @@
-Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚgËimport { _ as __easycom_0 } from "../up-icon/up-icon.js";
-import { r as resolveEasycom } from "../../../../App.ku.js";
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚbvimport { _ as __easycom_0 } from "../up-icon/up-icon.js";
 import { _ as __easycom_1$1 } from "../up-loading-icon/up-loading-icon.js";
 import { _ as __easycom_1$2 } from "../up-gap/up-gap.js";
 import { _ as __easycom_2 } from "../up-popup/up-popup.js";
@@ -9,13 +8,19 @@ import { i as image, v as video, f as func } from "../../libs/function/test.js";
 import { t } from "../../libs/i18n/index.js";
 import "./types.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataStyle: _setSharedDataStyle, unref: _unref, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, toDisplayString: _toDisplayString, setSharedDataEvent: _setSharedDataEvent, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, toSharedDataImageMode: _toSharedDataImageMode, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, createSharedDataSlot: _createSharedDataSlot, createSharedDataFor: _createSharedDataFor, setSharedDataClass: _setSharedDataClass, withSharedDataVaporCtx: _withSharedDataVaporCtx } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpUploadUpUpload";
 const { ref, watch } = globalThis.Vue;
 const { computed } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-upload"
   },
+  __dynamicSharedData: true,
+  __hash: "4c855d80",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-upload/up-upload.uvue",
   __name: "up-upload",
   props: {
     accept: {
@@ -173,8 +178,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   },
   emits: ["error", "beforeRead", "oversize", "afterRead", "delete", "clickPreview", "update:fileList", "afterAutoUpload"],
   setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
-    __expose();
+    var __emit = _a.emit, $slots = _a.slots;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpUploadUpUploadSharedData", sharedDataClassId: 0 })));
     const props = __props;
     const emit = __emit;
     const lists = ref([]);
@@ -407,242 +413,260 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       }
       emit("clickPreview", UTSJSONObject.assign(UTSJSONObject.assign(new UTSJSONObject({}), item), getDetail(index)));
     }
-    const __returned__ = { props, emit, lists, isInCount, popupShow, currentItemIndex, customUploadStyle, itemDimensionStyle, getProgressStyle, formatFileList, convertFileToUTSJSON, getDetail, getOtherItemText, onAfterRead, onBeforeRead, chooseFileAction, onChooseTap, videoErrorCallback, deleteItem, onPreviewImage, onPreviewVideo, onClickPreview };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
-  }
-});
-const _style_0 = { "up-upload": { "": { "display": "flex", "flexDirection": "column", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-upload__wrap": { "": { "display": "flex", "flexDirection": "row", "flexWrap": "wrap" } }, "up-upload__wrap__preview": { "": { "borderTopLeftRadius": 2, "borderTopRightRadius": 2, "borderBottomRightRadius": 2, "borderBottomLeftRadius": 2, "marginTop": 0, "marginRight": 8, "marginBottom": 8, "marginLeft": 0, "position": "relative", "overflow": "hidden", "display": "flex", "flexDirection": "row" } }, "up-upload__wrap__preview__image": { "": { "width": 80, "height": 80 } }, "up-upload__wrap__preview__video": { "": { "width": 80, "height": 80, "backgroundColor": "#f2f2f2", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column", "justifyContent": "center", "alignItems": "center" } }, "up-upload__wrap__preview__other": { "": { "width": 80, "height": 80, "backgroundColor": "#f2f2f2", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column", "justifyContent": "center", "alignItems": "center" } }, "up-upload__wrap__preview__video__text": { "": { "fontSize": 11, "color": "#909193", "marginTop": 2 } }, "up-upload__wrap__preview__other__text": { "": { "fontSize": 11, "color": "#909193", "marginTop": 2 } }, "up-upload__wrap__play": { "": { "position": "absolute", "top": 0, "left": 0, "bottom": 0, "right": 0, "display": "flex", "justifyContent": "center", "alignItems": "center" } }, "up-upload__wrap__play__icon": { "": { "backgroundImage": "none", "backgroundColor": "#ffffff", "borderTopLeftRadius": 100, "borderTopRightRadius": 100, "borderBottomRightRadius": 100, "borderBottomLeftRadius": 100, "opacity": 0.8 } }, "up-upload__deletable": { "": { "position": "absolute", "top": 0, "right": 0, "backgroundColor": "#373737", "height": 14, "width": 14, "display": "flex", "flexDirection": "row", "borderBottomLeftRadius": 100, "alignItems": "center", "justifyContent": "center", "zIndex": 3 } }, "up-upload__deletable__icon": { "": { "position": "absolute", "transform": "scale(0.7)", "top": 0, "right": 0 } }, "up-upload__success": { "": { "position": "absolute", "bottom": 0, "right": 0, "display": "flex", "flexDirection": "row", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "rgba(0,0,0,0)", "borderLeftColor": "rgba(0,0,0,0)", "borderBottomColor": "#5ac725", "borderRightColor": "#5ac725", "borderTopWidth": 9, "borderRightWidth": 9, "borderBottomWidth": 9, "borderLeftWidth": 9, "alignItems": "center", "justifyContent": "center" } }, "up-upload__success__icon": { "": { "position": "absolute", "transform": "scale(0.7)", "bottom": -10, "right": -10 } }, "up-upload__progress": { "": { "!backgroundColor": "var(--theme-color, #0957de)", "position": "absolute", "bottom": 0, "left": 0 } }, "up-upload__status": { "": { "position": "absolute", "top": 0, "bottom": 0, "left": 0, "right": 0, "backgroundColor": "rgba(0,0,0,0.5)", "display": "flex", "flexDirection": "column", "alignItems": "center", "justifyContent": "center" } }, "up-upload__status__icon": { "": { "position": "relative", "zIndex": 1 } }, "up-upload__status__message": { "": { "fontSize": 12, "color": "#FFFFFF", "marginTop": 5 } }, "up-upload__button": { "": { "display": "flex", "flexDirection": "column", "alignItems": "center", "justifyContent": "center", "width": 80, "height": 80, "backgroundColor": "#f4f5f7", "borderTopLeftRadius": 2, "borderTopRightRadius": 2, "borderBottomRightRadius": 2, "borderBottomLeftRadius": 2, "marginTop": 0, "marginRight": 8, "marginBottom": 8, "marginLeft": 0, "boxSizing": "border-box" } }, "up-upload__button__text": { "": { "fontSize": 11, "color": "#909193", "marginTop": 2 } }, "up-upload__button--hover": { "": { "backgroundColor": "#e6e7e9" } }, "up-upload__button--disabled": { "": { "opacity": 0.5 } } };
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, normalizeStyle: _normalizeStyle, createCommentVNode: _createCommentVNode, resolveComponent: _resolveComponent, createBlock: _createBlock, renderSlot: _renderSlot, createVNode: _createVNode, toDisplayString: _toDisplayString, createElementVNode: _createElementVNode, withModifiers: _withModifiers, normalizeClass: _normalizeClass, withCtx: _withCtx } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
-  const _component_up_loading_icon = resolveEasycom(__resolveDynamicComponent("up-loading-icon"), __easycom_1$1);
-  const _component_up_gap = resolveEasycom(__resolveDynamicComponent("up-gap"), __easycom_1$2);
-  const _component_video = _resolveComponent("video");
-  const _component_up_popup = resolveEasycom(__resolveDynamicComponent("up-popup"), __easycom_2);
-  return _openBlock(), _createElementBlock(
-    "view",
-    {
-      class: "up-upload",
-      style: _normalizeStyle($setup.customUploadStyle)
-    },
-    [
-      _createElementVNode("view", { class: "up-upload__wrap" }, [
-        $props.previewImage ? (_openBlock(true), _createElementBlock(
-          _Fragment,
-          { key: 0 },
-          _renderList($setup.lists, (item, index) => {
-            return _openBlock(), _createElementBlock("view", {
-              class: "up-upload__wrap__preview",
-              key: index
-            }, [
-              item.isImage || item.type != null && item.type == "image" ? (_openBlock(), _createElementBlock("image", {
-                key: 0,
-                src: item.thumb != null ? item.thumb : item.url,
-                mode: $props.imageMode,
-                class: "up-upload__wrap__preview__image",
-                onClick: ($event) => $setup.onClickPreview(item, index),
-                style: _normalizeStyle($setup.itemDimensionStyle)
-              }, null, 12, ["src", "mode", "onClick"])) : (item.isVideo || item.type != null && item.type == "video") && $props.getVideoThumb ? (_openBlock(), _createElementBlock(
-                "view",
-                {
-                  key: 1,
-                  class: "up-upload__wrap__preview__video",
-                  style: _normalizeStyle($setup.itemDimensionStyle)
-                },
-                [
-                  item.thumb ? (_openBlock(), _createElementBlock("image", {
-                    key: 0,
-                    src: item.thumb,
-                    mode: $props.imageMode,
-                    class: "up-upload__wrap__preview__image",
-                    onClick: ($event) => $setup.onClickPreview(item, index),
-                    style: _normalizeStyle($setup.itemDimensionStyle)
-                  }, null, 12, ["src", "mode", "onClick"])) : (_openBlock(), _createBlock(_component_up_icon, {
-                    key: 1,
-                    color: "#80CBF9",
-                    size: "26",
-                    name: item.isVideo || item.type != null && item.type == "video" ? "movie" : "file-text"
-                  }, null, 8, ["name"])),
-                  item.status == "success" ? (_openBlock(), _createElementBlock("view", {
-                    key: 2,
-                    class: "up-upload__wrap__play",
-                    onClick: ($event) => $setup.onClickPreview(item, index)
-                  }, [
-                    _renderSlot(_ctx.$slots, "playIcon"),
-                    _ctx.$slots["playIcon"] == null ? (_openBlock(), _createBlock(_component_up_icon, {
-                      key: 0,
-                      class: "up-upload__wrap__play__icon",
-                      name: "play-right",
-                      size: "22px"
-                    })) : _createCommentVNode("v-if", true)
-                  ], 8, ["onClick"])) : _createCommentVNode("v-if", true)
-                ],
-                4
-                /* STYLE */
-              )) : (_openBlock(), _createElementBlock("view", {
-                key: 2,
-                class: "up-upload__wrap__preview__other",
-                onClick: ($event) => $setup.onClickPreview(item, index),
-                style: _normalizeStyle($setup.itemDimensionStyle)
-              }, [
-                _createVNode(_component_up_icon, {
+    return () => {
+      "raw js";
+      const _component_up_icon = __easycom_0;
+      const _component_up_loading_icon = __easycom_1$1;
+      const _component_up_gap = __easycom_1$2;
+      const _component_video = _resolveComponent("video");
+      const _component_up_popup = __easycom_2;
+      _renderSharedDataEffect(() => {
+        return _setSharedDataStyle(__sharedData, 17, _unref(customUploadStyle));
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 3, _toSharedDataBoolean(__props.previewImage));
+      }, () => {
+        _createSharedDataFor(_setSharedDataScoped(__sharedData, 4, _createSharedDataVFor(__sharedDataScope, () => {
+          return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
+        })), () => {
+          return lists.value;
+        }, (__sharedData_VFor0, _for_item0, _for_key0) => {
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData_VFor0, 1, _toSharedDataBoolean(_for_item0.value.isImage || _for_item0.value.type != null && _for_item0.value.type == "image"));
+          }, () => {
+            _setSharedDataEvent(__sharedData_VFor0, 2, () => {
+              return onClickPreview(_for_item0.value, _for_key0.value);
+            });
+            _renderSharedDataEffect(() => {
+              const _item = _for_item0.value;
+              const _item_thumb = _item.thumb;
+              _setSharedDataAttr(__sharedData_VFor0, 3, _toSharedDataString(_item_thumb != null ? _item_thumb : _item.url));
+              _setSharedDataAttr(__sharedData_VFor0, 4, _toSharedDataImageMode(__props.imageMode));
+              _setSharedDataStyle(__sharedData_VFor0, 5, _unref(itemDimensionStyle));
+            });
+          }, () => {
+            return _createSharedDataIf(() => {
+              return _setSharedData(__sharedData_VFor0, 6, _toSharedDataBoolean((_for_item0.value.isVideo || _for_item0.value.type != null && _for_item0.value.type == "video") && __props.getVideoThumb));
+            }, () => {
+              _renderSharedDataEffect(() => {
+                return _setSharedDataStyle(__sharedData_VFor0, 17, _unref(itemDimensionStyle));
+              });
+              _createSharedDataIf(() => {
+                return _setSharedData(__sharedData_VFor0, 7, _toSharedDataBoolean(_for_item0.value.thumb));
+              }, () => {
+                _setSharedDataEvent(__sharedData_VFor0, 8, () => {
+                  return onClickPreview(_for_item0.value, _for_key0.value);
+                });
+                _renderSharedDataEffect(() => {
+                  _setSharedDataAttr(__sharedData_VFor0, 9, _toSharedDataString(_for_item0.value.thumb));
+                  _setSharedDataAttr(__sharedData_VFor0, 10, _toSharedDataImageMode(__props.imageMode));
+                  _setSharedDataStyle(__sharedData_VFor0, 11, _unref(itemDimensionStyle));
+                });
+              }, () => {
+                const n12 = _createSharedDataComponentWithFallback(_component_up_icon, "6a9793ae-" + _for_key0.value, {
                   color: "#80CBF9",
                   size: "26",
-                  name: item.isVideo || item.type != null && item.type == "video" ? "movie" : "folder"
-                }, null, 8, ["name"]),
-                _createElementVNode(
-                  "text",
-                  { class: "up-upload__wrap__preview__other__text" },
-                  _toDisplayString($setup.getOtherItemText(item)),
-                  1
-                  /* TEXT */
-                )
-              ], 12, ["onClick"])),
-              item.status == "uploading" || item.status == "failed" ? (_openBlock(), _createElementBlock("view", {
-                key: 3,
-                class: "up-upload__status"
-              }, [
-                _createElementVNode("view", { class: "up-upload__status__icon" }, [
-                  item.status == "failed" ? (_openBlock(), _createBlock(_component_up_icon, {
-                    key: 0,
-                    name: "close-circle",
-                    color: "#ffffff",
-                    size: "25"
-                  })) : (_openBlock(), _createBlock(_component_up_loading_icon, {
-                    key: 1,
-                    size: "22",
-                    mode: "circle"
-                  }))
-                ]),
-                item.message != null && item.message != "" ? (_openBlock(), _createElementBlock(
-                  "text",
-                  {
-                    key: 0,
-                    class: "up-upload__status__message"
-                  },
-                  _toDisplayString(item.message),
-                  1
-                  /* TEXT */
-                )) : _createCommentVNode("v-if", true),
-                _createVNode(_component_up_gap, {
-                  class: "up-upload__progress",
-                  height: "3px",
-                  style: _normalizeStyle($setup.getProgressStyle(item))
-                }, null, 8, ["style"])
-              ])) : _createCommentVNode("v-if", true),
-              item.status != "uploading" && ($props.deletable || item.deletable) ? (_openBlock(), _createElementBlock("view", {
-                key: 4,
-                class: "up-upload__deletable",
-                onClick: _withModifiers(($event) => $setup.deleteItem(index), ["stop"])
-              }, [
-                _createElementVNode("view", { class: "up-upload__deletable__icon" }, [
-                  _createVNode(_component_up_icon, {
-                    name: "close",
-                    color: "#ffffff",
-                    size: "10"
-                  })
-                ])
-              ], 8, ["onClick"])) : _createCommentVNode("v-if", true),
-              _renderSlot(_ctx.$slots, "success", {}, () => [
-                item.status == "success" ? (_openBlock(), _createElementBlock("view", {
-                  key: 0,
-                  class: "up-upload__success"
-                }, [
-                  _createElementVNode("view", { class: "up-upload__success__icon" }, [
-                    _createVNode(_component_up_icon, {
-                      name: "checkmark",
-                      color: "#ffffff",
-                      size: "12"
-                    })
-                  ])
-                ])) : _createCommentVNode("v-if", true)
-              ])
-            ]);
-          }),
-          128
-          /* KEYED_FRAGMENT */
-        )) : _createCommentVNode("v-if", true),
-        $setup.isInCount ? (_openBlock(), _createElementBlock(
-          _Fragment,
-          { key: 1 },
-          [
-            _ctx.$slots["trigger"] != null ? (_openBlock(), _createElementBlock("view", {
-              key: 0,
-              onClick: $setup.onChooseTap
-            }, [
-              _renderSlot(_ctx.$slots, "trigger")
-            ])) : _ctx.$slots["trigger"] == null && (_ctx.$slots["default"] != null || _ctx.$slots["$default"] != null) ? (_openBlock(), _createElementBlock("view", {
-              key: 1,
-              onClick: $setup.onChooseTap
-            }, [
-              _renderSlot(_ctx.$slots, "default")
-            ])) : (_openBlock(), _createElementBlock("view", {
-              key: 2,
-              class: _normalizeClass(["up-upload__button", [$props.disabled ? "up-upload__button--disabled" : ""]]),
-              "hover-class": !$props.disabled ? "up-upload__button--hover" : "",
-              "hover-stay-time": "150",
-              onClick: $setup.onChooseTap,
-              style: _normalizeStyle($setup.itemDimensionStyle)
-            }, [
-              _createVNode(_component_up_icon, {
-                name: $props.uploadIcon,
+                  name: () => {
+                    return _for_item0.value.isVideo || _for_item0.value.type != null && _for_item0.value.type == "video" ? "movie" : "file-text";
+                  }
+                });
+                _setSharedData(__sharedData_VFor0, 12, n12?.sharedData);
+              }, 773);
+              _createSharedDataIf(() => {
+                return _setSharedData(__sharedData_VFor0, 13, _toSharedDataBoolean(_for_item0.value.status == "success"));
+              }, () => {
+                _createSharedDataSlot("playIcon", null, null);
+                _createSharedDataIf(() => {
+                  return _setSharedData(__sharedData_VFor0, 14, _toSharedDataBoolean($slots["playIcon"] == null));
+                }, () => {
+                  const n18 = _createSharedDataComponentWithFallback(_component_up_icon, "e8624520-" + _for_key0.value, {
+                    class: "up-upload__wrap__play__icon",
+                    name: "play-right",
+                    size: "22px"
+                  });
+                  _setSharedData(__sharedData_VFor0, 15, n18?.sharedData);
+                });
+                _setSharedDataEvent(__sharedData_VFor0, 16, () => {
+                  return onClickPreview(_for_item0.value, _for_key0.value);
+                });
+              });
+            }, () => {
+              _renderSharedDataEffect(() => {
+                return _setSharedDataStyle(__sharedData_VFor0, 20, _unref(itemDimensionStyle));
+              });
+              const n22 = _createSharedDataComponentWithFallback(_component_up_icon, "e8622de6-" + _for_key0.value, {
+                color: "#80CBF9",
                 size: "26",
-                color: $props.uploadIconColor
-              }, null, 8, ["name", "color"]),
-              $props.uploadText != "" ? (_openBlock(), _createElementBlock(
-                "text",
-                {
-                  key: 0,
-                  class: "up-upload__button__text"
-                },
-                _toDisplayString($props.uploadText),
-                1
-                /* TEXT */
-              )) : _createCommentVNode("v-if", true)
-            ], 14, ["hover-class"]))
-          ],
-          64
-          /* STABLE_FRAGMENT */
-        )) : _createCommentVNode("v-if", true)
-      ]),
-      _createVNode(_component_up_popup, {
+                name: () => {
+                  return _for_item0.value.isVideo || _for_item0.value.type != null && _for_item0.value.type == "video" ? "movie" : "folder";
+                }
+              });
+              _setSharedData(__sharedData_VFor0, 18, n22?.sharedData);
+              _setSharedDataEvent(__sharedData_VFor0, 19, () => {
+                return onClickPreview(_for_item0.value, _for_key0.value);
+              });
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData_VFor0, 21, _toDisplayString(getOtherItemText(_for_item0.value)));
+              });
+            }, 517);
+          }, 261);
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData_VFor0, 22, _toSharedDataBoolean(_for_item0.value.status == "uploading" || _for_item0.value.status == "failed"));
+          }, () => {
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData_VFor0, 26, _toSharedDataBoolean(_for_item0.value.status == "failed"));
+            }, () => {
+              const n29 = _createSharedDataComponentWithFallback(_component_up_icon, "e8616b6e-" + _for_key0.value, {
+                name: "close-circle",
+                color: "#ffffff",
+                size: "25"
+              });
+              _setSharedData(__sharedData_VFor0, 27, n29?.sharedData);
+            }, () => {
+              const n31 = _createSharedDataComponentWithFallback(_component_up_loading_icon, "e86162bc-" + _for_key0.value, {
+                size: "22",
+                mode: "circle"
+              });
+              _setSharedData(__sharedData_VFor0, 28, n31?.sharedData);
+            }, 1541);
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData_VFor0, 23, _toSharedDataBoolean(_for_item0.value.message != null && _for_item0.value.message != ""));
+            }, () => {
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData_VFor0, 24, _toDisplayString(_for_item0.value.message));
+              });
+            });
+            const n36 = _createSharedDataComponentWithFallback(_component_up_gap, "e8614d2c-" + _for_key0.value, {
+              class: "up-upload__progress",
+              height: "3px",
+              style: () => {
+                return getProgressStyle(_for_item0.value);
+              }
+            });
+            _setSharedData(__sharedData_VFor0, 25, n36?.sharedData);
+          });
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData_VFor0, 29, _toSharedDataBoolean(_for_item0.value.status != "uploading" && (__props.deletable || _for_item0.value.deletable)));
+          }, () => {
+            const n40 = _createSharedDataComponentWithFallback(_component_up_icon, "e86135de-" + _for_key0.value, {
+              name: "close",
+              color: "#ffffff",
+              size: "10"
+            });
+            _setSharedData(__sharedData_VFor0, 30, n40?.sharedData);
+            _setSharedDataEvent(__sharedData_VFor0, 31, () => {
+              return deleteItem(_for_key0.value);
+            });
+          });
+          _createSharedDataSlot("success", null, null, () => {
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData_VFor0, 32, _toSharedDataBoolean(_for_item0.value.status == "success"));
+            }, () => {
+              const n47 = _createSharedDataComponentWithFallback(_component_up_icon, "e8608180-" + _for_key0.value, {
+                name: "checkmark",
+                color: "#ffffff",
+                size: "12"
+              });
+              _setSharedData(__sharedData_VFor0, 33, n47?.sharedData);
+            });
+          });
+          return null;
+        }, (__sharedData_VFor0, item, index) => {
+          return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
+        });
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 5, _toSharedDataBoolean(isInCount.value));
+      }, () => {
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 6, _toSharedDataBoolean($slots["trigger"] != null));
+        }, () => {
+          _createSharedDataSlot("trigger", null, null);
+          _setSharedDataEvent(__sharedData, 7, onChooseTap);
+        }, () => {
+          return _createSharedDataIf(() => {
+            return _setSharedData(__sharedData, 8, _toSharedDataBoolean($slots["trigger"] == null && ($slots["default"] != null || $slots["$default"] != null)));
+          }, () => {
+            _createSharedDataSlot("default", null, null);
+            _setSharedDataEvent(__sharedData, 9, onChooseTap);
+          }, () => {
+            _renderSharedDataEffect(() => {
+              const _disabled = __props.disabled;
+              _setSharedDataClass(__sharedData, 14, ["up-upload__button", [_disabled ? "up-upload__button--disabled" : ""]]);
+              _setSharedDataClass(__sharedData, 15, _toSharedDataString(!_disabled ? "up-upload__button--hover" : ""));
+              _setSharedDataStyle(__sharedData, 16, _unref(itemDimensionStyle));
+            });
+            const n62 = _createSharedDataComponentWithFallback(_component_up_icon, "e86045aa", {
+              name: () => {
+                return __props.uploadIcon;
+              },
+              size: "26",
+              color: () => {
+                return __props.uploadIconColor;
+              }
+            });
+            _setSharedData(__sharedData, 10, n62?.sharedData);
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData, 11, _toSharedDataBoolean(__props.uploadText != ""));
+            }, () => {
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData, 12, _toDisplayString(__props.uploadText));
+              });
+            });
+            _setSharedDataEvent(__sharedData, 13, onChooseTap);
+          }, 3333);
+        }, 3077);
+      });
+      const n72 = _createSharedDataComponentWithFallback(_component_up_popup, "e85f9270", {
         mode: "center",
-        show: $setup.popupShow,
-        "onUpdate:show": _cache[0] || (_cache[0] = ($event) => $setup.popupShow = $event)
+        show: () => {
+          return popupShow.value;
+        },
+        "onUpdate:show": () => {
+          return (_value) => {
+            return popupShow.value = _value;
+          };
+        }
       }, {
-        default: _withCtx(() => [
-          $setup.popupShow ? (_openBlock(), _createBlock(_component_video, {
-            key: 0,
-            id: "myVideo",
-            src: $setup.currentItemIndex >= 0 ? $setup.lists[$setup.currentItemIndex].url : "",
-            onError: $setup.videoErrorCallback,
-            "show-center-play-btn": "",
-            "object-fit": $props.videoPreviewObjectFit,
-            "show-fullscreen-btn": "true",
-            "enable-play-gesture": "",
-            controls: "",
-            autoplay: true,
-            "auto-pause-if-open-native": "",
-            "initial-time": 0.1
-          }, null, 8, ["src", "object-fit"])) : _createCommentVNode("v-if", true)
-        ]),
-        _: 1
-        /* STABLE */
-      }, 8, ["show"])
-    ],
-    4
-    /* STYLE */
-  );
-}
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-upload/up-upload.uvue"]]);
+        "default": _withSharedDataVaporCtx(() => {
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData, 1, _toSharedDataBoolean(popupShow.value));
+          }, () => {
+            const n71 = _createSharedDataComponentWithFallback(_component_video, "e85f90fe", {
+              id: "myVideo",
+              src: () => {
+                return currentItemIndex.value >= 0 ? lists.value[currentItemIndex.value].url : "";
+              },
+              onError: () => {
+                return videoErrorCallback;
+              },
+              "show-center-play-btn": "",
+              "object-fit": () => {
+                return __props.videoPreviewObjectFit;
+              },
+              "show-fullscreen-btn": "true",
+              "enable-play-gesture": "",
+              controls: "",
+              autoplay: true,
+              "auto-pause-if-open-native": "",
+              "initial-time": 0.1
+            });
+            _setSharedData(__sharedData, 2, n71?.sharedData);
+          }, null, 129);
+        })
+      });
+      _setSharedData(__sharedData, 0, n72?.sharedData);
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_1 as _
 };
 //# sourceMappingURL=up-upload.js.map
-Â›ÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon.jsÙ /Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku.jsÙÜ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.jsÙÊ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-gap/up-gap.jsÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-popup/up-popup.jsÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-upload/utils.jsÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsÙÄ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/test.jsÙÁ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/index.jsÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-upload/types.jsÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙĞ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-upload/up-upload.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ‘ÔrD’²hostDependencyName®hostModuleNameÙH../../../../../uni_modules/uview-ultra/components/up-upload/up-upload.js¥entryÃÚgËimport { _ as __easycom_0 } from "../up-icon/up-icon.js";
-import { r as resolveEasycom } from "../../../../App.ku.js";
+ÂšÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon.jsÙÜ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.jsÙÊ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-gap/up-gap.jsÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-popup/up-popup.jsÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-upload/utils.jsÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsÙÄ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/test.jsÙÁ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/index.jsÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-upload/types.jsÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙĞ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-upload/up-upload.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ‘ÔrD’²hostDependencyName®hostModuleNameÙH../../../../../uni_modules/uview-ultra/components/up-upload/up-upload.js¥entryÃÚbvimport { _ as __easycom_0 } from "../up-icon/up-icon.js";
 import { _ as __easycom_1$1 } from "../up-loading-icon/up-loading-icon.js";
 import { _ as __easycom_1$2 } from "../up-gap/up-gap.js";
 import { _ as __easycom_2 } from "../up-popup/up-popup.js";
@@ -652,13 +676,19 @@ import { i as image, v as video, f as func } from "../../libs/function/test.js";
 import { t } from "../../libs/i18n/index.js";
 import "./types.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataStyle: _setSharedDataStyle, unref: _unref, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, toDisplayString: _toDisplayString, setSharedDataEvent: _setSharedDataEvent, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, toSharedDataImageMode: _toSharedDataImageMode, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, createSharedDataSlot: _createSharedDataSlot, createSharedDataFor: _createSharedDataFor, setSharedDataClass: _setSharedDataClass, withSharedDataVaporCtx: _withSharedDataVaporCtx } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpUploadUpUpload";
 const { ref, watch } = globalThis.Vue;
 const { computed } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-upload"
   },
+  __dynamicSharedData: true,
+  __hash: "4c855d80",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-upload/up-upload.uvue",
   __name: "up-upload",
   props: {
     accept: {
@@ -816,8 +846,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   },
   emits: ["error", "beforeRead", "oversize", "afterRead", "delete", "clickPreview", "update:fileList", "afterAutoUpload"],
   setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
-    __expose();
+    var __emit = _a.emit, $slots = _a.slots;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpUploadUpUploadSharedData", sharedDataClassId: 0 })));
     const props = __props;
     const emit = __emit;
     const lists = ref([]);
@@ -1050,245 +1081,263 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       }
       emit("clickPreview", UTSJSONObject.assign(UTSJSONObject.assign(new UTSJSONObject({}), item), getDetail(index)));
     }
-    const __returned__ = { props, emit, lists, isInCount, popupShow, currentItemIndex, customUploadStyle, itemDimensionStyle, getProgressStyle, formatFileList, convertFileToUTSJSON, getDetail, getOtherItemText, onAfterRead, onBeforeRead, chooseFileAction, onChooseTap, videoErrorCallback, deleteItem, onPreviewImage, onPreviewVideo, onClickPreview };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
-  }
-});
-const _style_0 = { "up-upload": { "": { "display": "flex", "flexDirection": "column", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-upload__wrap": { "": { "display": "flex", "flexDirection": "row", "flexWrap": "wrap" } }, "up-upload__wrap__preview": { "": { "borderTopLeftRadius": 2, "borderTopRightRadius": 2, "borderBottomRightRadius": 2, "borderBottomLeftRadius": 2, "marginTop": 0, "marginRight": 8, "marginBottom": 8, "marginLeft": 0, "position": "relative", "overflow": "hidden", "display": "flex", "flexDirection": "row" } }, "up-upload__wrap__preview__image": { "": { "width": 80, "height": 80 } }, "up-upload__wrap__preview__video": { "": { "width": 80, "height": 80, "backgroundColor": "#f2f2f2", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column", "justifyContent": "center", "alignItems": "center" } }, "up-upload__wrap__preview__other": { "": { "width": 80, "height": 80, "backgroundColor": "#f2f2f2", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column", "justifyContent": "center", "alignItems": "center" } }, "up-upload__wrap__preview__video__text": { "": { "fontSize": 11, "color": "#909193", "marginTop": 2 } }, "up-upload__wrap__preview__other__text": { "": { "fontSize": 11, "color": "#909193", "marginTop": 2 } }, "up-upload__wrap__play": { "": { "position": "absolute", "top": 0, "left": 0, "bottom": 0, "right": 0, "display": "flex", "justifyContent": "center", "alignItems": "center" } }, "up-upload__wrap__play__icon": { "": { "backgroundImage": "none", "backgroundColor": "#ffffff", "borderTopLeftRadius": 100, "borderTopRightRadius": 100, "borderBottomRightRadius": 100, "borderBottomLeftRadius": 100, "opacity": 0.8 } }, "up-upload__deletable": { "": { "position": "absolute", "top": 0, "right": 0, "backgroundColor": "#373737", "height": 14, "width": 14, "display": "flex", "flexDirection": "row", "borderBottomLeftRadius": 100, "alignItems": "center", "justifyContent": "center", "zIndex": 3 } }, "up-upload__deletable__icon": { "": { "position": "absolute", "transform": "scale(0.7)", "top": 0, "right": 0 } }, "up-upload__success": { "": { "position": "absolute", "bottom": 0, "right": 0, "display": "flex", "flexDirection": "row", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "rgba(0,0,0,0)", "borderLeftColor": "rgba(0,0,0,0)", "borderBottomColor": "#5ac725", "borderRightColor": "#5ac725", "borderTopWidth": 9, "borderRightWidth": 9, "borderBottomWidth": 9, "borderLeftWidth": 9, "alignItems": "center", "justifyContent": "center" } }, "up-upload__success__icon": { "": { "position": "absolute", "transform": "scale(0.7)", "bottom": -10, "right": -10 } }, "up-upload__progress": { "": { "!backgroundColor": "var(--theme-color, #0957de)", "position": "absolute", "bottom": 0, "left": 0 } }, "up-upload__status": { "": { "position": "absolute", "top": 0, "bottom": 0, "left": 0, "right": 0, "backgroundColor": "rgba(0,0,0,0.5)", "display": "flex", "flexDirection": "column", "alignItems": "center", "justifyContent": "center" } }, "up-upload__status__icon": { "": { "position": "relative", "zIndex": 1 } }, "up-upload__status__message": { "": { "fontSize": 12, "color": "#FFFFFF", "marginTop": 5 } }, "up-upload__button": { "": { "display": "flex", "flexDirection": "column", "alignItems": "center", "justifyContent": "center", "width": 80, "height": 80, "backgroundColor": "#f4f5f7", "borderTopLeftRadius": 2, "borderTopRightRadius": 2, "borderBottomRightRadius": 2, "borderBottomLeftRadius": 2, "marginTop": 0, "marginRight": 8, "marginBottom": 8, "marginLeft": 0, "boxSizing": "border-box" } }, "up-upload__button__text": { "": { "fontSize": 11, "color": "#909193", "marginTop": 2 } }, "up-upload__button--hover": { "": { "backgroundColor": "#e6e7e9" } }, "up-upload__button--disabled": { "": { "opacity": 0.5 } } };
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, normalizeStyle: _normalizeStyle, createCommentVNode: _createCommentVNode, resolveComponent: _resolveComponent, createBlock: _createBlock, renderSlot: _renderSlot, createVNode: _createVNode, toDisplayString: _toDisplayString, createElementVNode: _createElementVNode, withModifiers: _withModifiers, normalizeClass: _normalizeClass, withCtx: _withCtx } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
-  const _component_up_loading_icon = resolveEasycom(__resolveDynamicComponent("up-loading-icon"), __easycom_1$1);
-  const _component_up_gap = resolveEasycom(__resolveDynamicComponent("up-gap"), __easycom_1$2);
-  const _component_video = _resolveComponent("video");
-  const _component_up_popup = resolveEasycom(__resolveDynamicComponent("up-popup"), __easycom_2);
-  return _openBlock(), _createElementBlock(
-    "view",
-    {
-      class: "up-upload",
-      style: _normalizeStyle($setup.customUploadStyle)
-    },
-    [
-      _createElementVNode("view", { class: "up-upload__wrap" }, [
-        $props.previewImage ? (_openBlock(true), _createElementBlock(
-          _Fragment,
-          { key: 0 },
-          _renderList($setup.lists, (item, index) => {
-            return _openBlock(), _createElementBlock("view", {
-              class: "up-upload__wrap__preview",
-              key: index
-            }, [
-              item.isImage || item.type != null && item.type == "image" ? (_openBlock(), _createElementBlock("image", {
-                key: 0,
-                src: item.thumb != null ? item.thumb : item.url,
-                mode: $props.imageMode,
-                class: "up-upload__wrap__preview__image",
-                onClick: ($event) => $setup.onClickPreview(item, index),
-                style: _normalizeStyle($setup.itemDimensionStyle)
-              }, null, 12, ["src", "mode", "onClick"])) : (item.isVideo || item.type != null && item.type == "video") && $props.getVideoThumb ? (_openBlock(), _createElementBlock(
-                "view",
-                {
-                  key: 1,
-                  class: "up-upload__wrap__preview__video",
-                  style: _normalizeStyle($setup.itemDimensionStyle)
-                },
-                [
-                  item.thumb ? (_openBlock(), _createElementBlock("image", {
-                    key: 0,
-                    src: item.thumb,
-                    mode: $props.imageMode,
-                    class: "up-upload__wrap__preview__image",
-                    onClick: ($event) => $setup.onClickPreview(item, index),
-                    style: _normalizeStyle($setup.itemDimensionStyle)
-                  }, null, 12, ["src", "mode", "onClick"])) : (_openBlock(), _createBlock(_component_up_icon, {
-                    key: 1,
-                    color: "#80CBF9",
-                    size: "26",
-                    name: item.isVideo || item.type != null && item.type == "video" ? "movie" : "file-text"
-                  }, null, 8, ["name"])),
-                  item.status == "success" ? (_openBlock(), _createElementBlock("view", {
-                    key: 2,
-                    class: "up-upload__wrap__play",
-                    onClick: ($event) => $setup.onClickPreview(item, index)
-                  }, [
-                    _renderSlot(_ctx.$slots, "playIcon"),
-                    _ctx.$slots["playIcon"] == null ? (_openBlock(), _createBlock(_component_up_icon, {
-                      key: 0,
-                      class: "up-upload__wrap__play__icon",
-                      name: "play-right",
-                      size: "22px"
-                    })) : _createCommentVNode("v-if", true)
-                  ], 8, ["onClick"])) : _createCommentVNode("v-if", true)
-                ],
-                4
-                /* STYLE */
-              )) : (_openBlock(), _createElementBlock("view", {
-                key: 2,
-                class: "up-upload__wrap__preview__other",
-                onClick: ($event) => $setup.onClickPreview(item, index),
-                style: _normalizeStyle($setup.itemDimensionStyle)
-              }, [
-                _createVNode(_component_up_icon, {
+    return () => {
+      "raw js";
+      const _component_up_icon = __easycom_0;
+      const _component_up_loading_icon = __easycom_1$1;
+      const _component_up_gap = __easycom_1$2;
+      const _component_video = _resolveComponent("video");
+      const _component_up_popup = __easycom_2;
+      _renderSharedDataEffect(() => {
+        return _setSharedDataStyle(__sharedData, 17, _unref(customUploadStyle));
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 3, _toSharedDataBoolean(__props.previewImage));
+      }, () => {
+        _createSharedDataFor(_setSharedDataScoped(__sharedData, 4, _createSharedDataVFor(__sharedDataScope, () => {
+          return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
+        })), () => {
+          return lists.value;
+        }, (__sharedData_VFor0, _for_item0, _for_key0) => {
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData_VFor0, 1, _toSharedDataBoolean(_for_item0.value.isImage || _for_item0.value.type != null && _for_item0.value.type == "image"));
+          }, () => {
+            _setSharedDataEvent(__sharedData_VFor0, 2, () => {
+              return onClickPreview(_for_item0.value, _for_key0.value);
+            });
+            _renderSharedDataEffect(() => {
+              const _item = _for_item0.value;
+              const _item_thumb = _item.thumb;
+              _setSharedDataAttr(__sharedData_VFor0, 3, _toSharedDataString(_item_thumb != null ? _item_thumb : _item.url));
+              _setSharedDataAttr(__sharedData_VFor0, 4, _toSharedDataImageMode(__props.imageMode));
+              _setSharedDataStyle(__sharedData_VFor0, 5, _unref(itemDimensionStyle));
+            });
+          }, () => {
+            return _createSharedDataIf(() => {
+              return _setSharedData(__sharedData_VFor0, 6, _toSharedDataBoolean((_for_item0.value.isVideo || _for_item0.value.type != null && _for_item0.value.type == "video") && __props.getVideoThumb));
+            }, () => {
+              _renderSharedDataEffect(() => {
+                return _setSharedDataStyle(__sharedData_VFor0, 17, _unref(itemDimensionStyle));
+              });
+              _createSharedDataIf(() => {
+                return _setSharedData(__sharedData_VFor0, 7, _toSharedDataBoolean(_for_item0.value.thumb));
+              }, () => {
+                _setSharedDataEvent(__sharedData_VFor0, 8, () => {
+                  return onClickPreview(_for_item0.value, _for_key0.value);
+                });
+                _renderSharedDataEffect(() => {
+                  _setSharedDataAttr(__sharedData_VFor0, 9, _toSharedDataString(_for_item0.value.thumb));
+                  _setSharedDataAttr(__sharedData_VFor0, 10, _toSharedDataImageMode(__props.imageMode));
+                  _setSharedDataStyle(__sharedData_VFor0, 11, _unref(itemDimensionStyle));
+                });
+              }, () => {
+                const n12 = _createSharedDataComponentWithFallback(_component_up_icon, "6a9793ae-" + _for_key0.value, {
                   color: "#80CBF9",
                   size: "26",
-                  name: item.isVideo || item.type != null && item.type == "video" ? "movie" : "folder"
-                }, null, 8, ["name"]),
-                _createElementVNode(
-                  "text",
-                  { class: "up-upload__wrap__preview__other__text" },
-                  _toDisplayString($setup.getOtherItemText(item)),
-                  1
-                  /* TEXT */
-                )
-              ], 12, ["onClick"])),
-              item.status == "uploading" || item.status == "failed" ? (_openBlock(), _createElementBlock("view", {
-                key: 3,
-                class: "up-upload__status"
-              }, [
-                _createElementVNode("view", { class: "up-upload__status__icon" }, [
-                  item.status == "failed" ? (_openBlock(), _createBlock(_component_up_icon, {
-                    key: 0,
-                    name: "close-circle",
-                    color: "#ffffff",
-                    size: "25"
-                  })) : (_openBlock(), _createBlock(_component_up_loading_icon, {
-                    key: 1,
-                    size: "22",
-                    mode: "circle"
-                  }))
-                ]),
-                item.message != null && item.message != "" ? (_openBlock(), _createElementBlock(
-                  "text",
-                  {
-                    key: 0,
-                    class: "up-upload__status__message"
-                  },
-                  _toDisplayString(item.message),
-                  1
-                  /* TEXT */
-                )) : _createCommentVNode("v-if", true),
-                _createVNode(_component_up_gap, {
-                  class: "up-upload__progress",
-                  height: "3px",
-                  style: _normalizeStyle($setup.getProgressStyle(item))
-                }, null, 8, ["style"])
-              ])) : _createCommentVNode("v-if", true),
-              item.status != "uploading" && ($props.deletable || item.deletable) ? (_openBlock(), _createElementBlock("view", {
-                key: 4,
-                class: "up-upload__deletable",
-                onClick: _withModifiers(($event) => $setup.deleteItem(index), ["stop"])
-              }, [
-                _createElementVNode("view", { class: "up-upload__deletable__icon" }, [
-                  _createVNode(_component_up_icon, {
-                    name: "close",
-                    color: "#ffffff",
-                    size: "10"
-                  })
-                ])
-              ], 8, ["onClick"])) : _createCommentVNode("v-if", true),
-              _renderSlot(_ctx.$slots, "success", {}, () => [
-                item.status == "success" ? (_openBlock(), _createElementBlock("view", {
-                  key: 0,
-                  class: "up-upload__success"
-                }, [
-                  _createElementVNode("view", { class: "up-upload__success__icon" }, [
-                    _createVNode(_component_up_icon, {
-                      name: "checkmark",
-                      color: "#ffffff",
-                      size: "12"
-                    })
-                  ])
-                ])) : _createCommentVNode("v-if", true)
-              ])
-            ]);
-          }),
-          128
-          /* KEYED_FRAGMENT */
-        )) : _createCommentVNode("v-if", true),
-        $setup.isInCount ? (_openBlock(), _createElementBlock(
-          _Fragment,
-          { key: 1 },
-          [
-            _ctx.$slots["trigger"] != null ? (_openBlock(), _createElementBlock("view", {
-              key: 0,
-              onClick: $setup.onChooseTap
-            }, [
-              _renderSlot(_ctx.$slots, "trigger")
-            ])) : _ctx.$slots["trigger"] == null && (_ctx.$slots["default"] != null || _ctx.$slots["$default"] != null) ? (_openBlock(), _createElementBlock("view", {
-              key: 1,
-              onClick: $setup.onChooseTap
-            }, [
-              _renderSlot(_ctx.$slots, "default")
-            ])) : (_openBlock(), _createElementBlock("view", {
-              key: 2,
-              class: _normalizeClass(["up-upload__button", [$props.disabled ? "up-upload__button--disabled" : ""]]),
-              "hover-class": !$props.disabled ? "up-upload__button--hover" : "",
-              "hover-stay-time": "150",
-              onClick: $setup.onChooseTap,
-              style: _normalizeStyle($setup.itemDimensionStyle)
-            }, [
-              _createVNode(_component_up_icon, {
-                name: $props.uploadIcon,
+                  name: () => {
+                    return _for_item0.value.isVideo || _for_item0.value.type != null && _for_item0.value.type == "video" ? "movie" : "file-text";
+                  }
+                });
+                _setSharedData(__sharedData_VFor0, 12, n12?.sharedData);
+              }, 773);
+              _createSharedDataIf(() => {
+                return _setSharedData(__sharedData_VFor0, 13, _toSharedDataBoolean(_for_item0.value.status == "success"));
+              }, () => {
+                _createSharedDataSlot("playIcon", null, null);
+                _createSharedDataIf(() => {
+                  return _setSharedData(__sharedData_VFor0, 14, _toSharedDataBoolean($slots["playIcon"] == null));
+                }, () => {
+                  const n18 = _createSharedDataComponentWithFallback(_component_up_icon, "e8624520-" + _for_key0.value, {
+                    class: "up-upload__wrap__play__icon",
+                    name: "play-right",
+                    size: "22px"
+                  });
+                  _setSharedData(__sharedData_VFor0, 15, n18?.sharedData);
+                });
+                _setSharedDataEvent(__sharedData_VFor0, 16, () => {
+                  return onClickPreview(_for_item0.value, _for_key0.value);
+                });
+              });
+            }, () => {
+              _renderSharedDataEffect(() => {
+                return _setSharedDataStyle(__sharedData_VFor0, 20, _unref(itemDimensionStyle));
+              });
+              const n22 = _createSharedDataComponentWithFallback(_component_up_icon, "e8622de6-" + _for_key0.value, {
+                color: "#80CBF9",
                 size: "26",
-                color: $props.uploadIconColor
-              }, null, 8, ["name", "color"]),
-              $props.uploadText != "" ? (_openBlock(), _createElementBlock(
-                "text",
-                {
-                  key: 0,
-                  class: "up-upload__button__text"
-                },
-                _toDisplayString($props.uploadText),
-                1
-                /* TEXT */
-              )) : _createCommentVNode("v-if", true)
-            ], 14, ["hover-class"]))
-          ],
-          64
-          /* STABLE_FRAGMENT */
-        )) : _createCommentVNode("v-if", true)
-      ]),
-      _createVNode(_component_up_popup, {
+                name: () => {
+                  return _for_item0.value.isVideo || _for_item0.value.type != null && _for_item0.value.type == "video" ? "movie" : "folder";
+                }
+              });
+              _setSharedData(__sharedData_VFor0, 18, n22?.sharedData);
+              _setSharedDataEvent(__sharedData_VFor0, 19, () => {
+                return onClickPreview(_for_item0.value, _for_key0.value);
+              });
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData_VFor0, 21, _toDisplayString(getOtherItemText(_for_item0.value)));
+              });
+            }, 517);
+          }, 261);
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData_VFor0, 22, _toSharedDataBoolean(_for_item0.value.status == "uploading" || _for_item0.value.status == "failed"));
+          }, () => {
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData_VFor0, 26, _toSharedDataBoolean(_for_item0.value.status == "failed"));
+            }, () => {
+              const n29 = _createSharedDataComponentWithFallback(_component_up_icon, "e8616b6e-" + _for_key0.value, {
+                name: "close-circle",
+                color: "#ffffff",
+                size: "25"
+              });
+              _setSharedData(__sharedData_VFor0, 27, n29?.sharedData);
+            }, () => {
+              const n31 = _createSharedDataComponentWithFallback(_component_up_loading_icon, "e86162bc-" + _for_key0.value, {
+                size: "22",
+                mode: "circle"
+              });
+              _setSharedData(__sharedData_VFor0, 28, n31?.sharedData);
+            }, 1541);
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData_VFor0, 23, _toSharedDataBoolean(_for_item0.value.message != null && _for_item0.value.message != ""));
+            }, () => {
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData_VFor0, 24, _toDisplayString(_for_item0.value.message));
+              });
+            });
+            const n36 = _createSharedDataComponentWithFallback(_component_up_gap, "e8614d2c-" + _for_key0.value, {
+              class: "up-upload__progress",
+              height: "3px",
+              style: () => {
+                return getProgressStyle(_for_item0.value);
+              }
+            });
+            _setSharedData(__sharedData_VFor0, 25, n36?.sharedData);
+          });
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData_VFor0, 29, _toSharedDataBoolean(_for_item0.value.status != "uploading" && (__props.deletable || _for_item0.value.deletable)));
+          }, () => {
+            const n40 = _createSharedDataComponentWithFallback(_component_up_icon, "e86135de-" + _for_key0.value, {
+              name: "close",
+              color: "#ffffff",
+              size: "10"
+            });
+            _setSharedData(__sharedData_VFor0, 30, n40?.sharedData);
+            _setSharedDataEvent(__sharedData_VFor0, 31, () => {
+              return deleteItem(_for_key0.value);
+            });
+          });
+          _createSharedDataSlot("success", null, null, () => {
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData_VFor0, 32, _toSharedDataBoolean(_for_item0.value.status == "success"));
+            }, () => {
+              const n47 = _createSharedDataComponentWithFallback(_component_up_icon, "e8608180-" + _for_key0.value, {
+                name: "checkmark",
+                color: "#ffffff",
+                size: "12"
+              });
+              _setSharedData(__sharedData_VFor0, 33, n47?.sharedData);
+            });
+          });
+          return null;
+        }, (__sharedData_VFor0, item, index) => {
+          return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
+        });
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 5, _toSharedDataBoolean(isInCount.value));
+      }, () => {
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 6, _toSharedDataBoolean($slots["trigger"] != null));
+        }, () => {
+          _createSharedDataSlot("trigger", null, null);
+          _setSharedDataEvent(__sharedData, 7, onChooseTap);
+        }, () => {
+          return _createSharedDataIf(() => {
+            return _setSharedData(__sharedData, 8, _toSharedDataBoolean($slots["trigger"] == null && ($slots["default"] != null || $slots["$default"] != null)));
+          }, () => {
+            _createSharedDataSlot("default", null, null);
+            _setSharedDataEvent(__sharedData, 9, onChooseTap);
+          }, () => {
+            _renderSharedDataEffect(() => {
+              const _disabled = __props.disabled;
+              _setSharedDataClass(__sharedData, 14, ["up-upload__button", [_disabled ? "up-upload__button--disabled" : ""]]);
+              _setSharedDataClass(__sharedData, 15, _toSharedDataString(!_disabled ? "up-upload__button--hover" : ""));
+              _setSharedDataStyle(__sharedData, 16, _unref(itemDimensionStyle));
+            });
+            const n62 = _createSharedDataComponentWithFallback(_component_up_icon, "e86045aa", {
+              name: () => {
+                return __props.uploadIcon;
+              },
+              size: "26",
+              color: () => {
+                return __props.uploadIconColor;
+              }
+            });
+            _setSharedData(__sharedData, 10, n62?.sharedData);
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData, 11, _toSharedDataBoolean(__props.uploadText != ""));
+            }, () => {
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData, 12, _toDisplayString(__props.uploadText));
+              });
+            });
+            _setSharedDataEvent(__sharedData, 13, onChooseTap);
+          }, 3333);
+        }, 3077);
+      });
+      const n72 = _createSharedDataComponentWithFallback(_component_up_popup, "e85f9270", {
         mode: "center",
-        show: $setup.popupShow,
-        "onUpdate:show": _cache[0] || (_cache[0] = ($event) => $setup.popupShow = $event)
+        show: () => {
+          return popupShow.value;
+        },
+        "onUpdate:show": () => {
+          return (_value) => {
+            return popupShow.value = _value;
+          };
+        }
       }, {
-        default: _withCtx(() => [
-          $setup.popupShow ? (_openBlock(), _createBlock(_component_video, {
-            key: 0,
-            id: "myVideo",
-            src: $setup.currentItemIndex >= 0 ? $setup.lists[$setup.currentItemIndex].url : "",
-            onError: $setup.videoErrorCallback,
-            "show-center-play-btn": "",
-            "object-fit": $props.videoPreviewObjectFit,
-            "show-fullscreen-btn": "true",
-            "enable-play-gesture": "",
-            controls: "",
-            autoplay: true,
-            "auto-pause-if-open-native": "",
-            "initial-time": 0.1
-          }, null, 8, ["src", "object-fit"])) : _createCommentVNode("v-if", true)
-        ]),
-        _: 1
-        /* STABLE */
-      }, 8, ["show"])
-    ],
-    4
-    /* STYLE */
-  );
-}
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-upload/up-upload.uvue"]]);
+        "default": _withSharedDataVaporCtx(() => {
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData, 1, _toSharedDataBoolean(popupShow.value));
+          }, () => {
+            const n71 = _createSharedDataComponentWithFallback(_component_video, "e85f90fe", {
+              id: "myVideo",
+              src: () => {
+                return currentItemIndex.value >= 0 ? lists.value[currentItemIndex.value].url : "";
+              },
+              onError: () => {
+                return videoErrorCallback;
+              },
+              "show-center-play-btn": "",
+              "object-fit": () => {
+                return __props.videoPreviewObjectFit;
+              },
+              "show-fullscreen-btn": "true",
+              "enable-play-gesture": "",
+              controls: "",
+              autoplay: true,
+              "auto-pause-if-open-native": "",
+              "initial-time": 0.1
+            });
+            _setSharedData(__sharedData, 2, n71?.sharedData);
+          }, null, 129);
+        })
+      });
+      _setSharedData(__sharedData, 0, n72?.sharedData);
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_1 as _
 };
 //# sourceMappingURL=up-upload.js.map
-ÔrE•§version¨mappings¥names§sources®sourcesContentÜ„‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ÔrE•§version¨mappings¥names§sources®sourcesContentÜ‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
  ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘”  ÌÙ ‘”  ÌÚ ‘”  ÌÛ ‘”  ÌÜ ‘”  Ìİ ‘”  ÌŞ ‘”  Ìß ‘”  Ìà ‘”  Ìá ‘”  Ìâ ‘”  Ìã ‘”  Ìä ‘”  Ìå ‘”  Ìæ ‘”  Ìç ‘”  Ìè ‘”  Ìé ‘”  Ìê ‘”  Ìë ‘”  Ìì ‘”  Ìí ‘”  Ìî ‘”  Ìï ‘”  Ìğ ‘”  Ìñ ‘”  Ìò ‘”  Ìó ‘”  Ìô ‘”  Ìõ ‘”  Ìö ‘”  Ì÷ ‘”  Ìø ‘”  Ìù ‘”  Ìú ‘”  Ìû ‘”  Ìü ‘”  Ìı ‘”  Ìş ‘”  Ìÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘”  Í ‘”  Í€ ‘”  Í ‘”  Í‚ ‘”  Íƒ ‘”  Í„ ‘”  Í… ‘”  Í† ‘”  Í‡ ‘”  Íˆ ‘”  Í‰ ‘”  ÍŠ ‘”  Í‹ ‘”  ÍŒ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í‘ ‘”  Í’ ‘”  Í“ ‘”  Í” ‘”  Í• ‘”  Í– ‘”  Í— ‘”  Í˜ ‘”  Í™ ‘”  Íš ‘”  Í› ‘”  Íœ ‘”  Í ‘”  Í ‘”  ÍŸ ‘”  Í  ‘”  Í¡ ‘”  Í¢ ‘”  Í£ ‘”  Í¤ ‘”  Í¥ ‘”  Í¦ ‘”  Í§ ‘”  Í¨ ‘”  Í© ‘”  Íª ‘”  Í« ‘”  Í¬ ‘”  Í­ ‘”  Í® ‘”  Í¯ ‘”  Í° ‘”  Í± ‘”  Í² ‘”  Í³ ‘”  Í´ ‘”  Íµ ‘”  Í¶ ‘”  Í· ‘”  Í¸ ‘”  Í¹ ‘”  Íº ‘”  Í» ‘”  Í¼ ‘”  Í½ ‘”  Í¾ ‘”  Í¿ ‘”  ÍÀ ‘”  ÍÁ ‘”  ÍÂ ‘”  ÍÃ ‘”  ÍÄ ‘”  ÍÅ ‘”  ÍÆ ‘”  ÍÇ ‘”  ÍÈ ‘”  ÍÉ ‘”  ÍÊ ‘”  ÍË ‘”  ÍÌ ‘”  ÍÍ ‘”  ÍÎ ‘”  ÍÏ ‘”  ÍĞ ‘”  ÍÑ ‘”  ÍÒ ‘”  ÍÓ ‘”  ÍÔ ‘”  ÍÕ ‘”  ÍÖ ‘”  Í× ‘”  ÍØ ‘”  ÍÙ ‘”  ÍÚ ‘”  ÍÛ ‘”  ÍÜ ‘”  Íİ ‘”  ÍŞ ‘”  Íß ‘”  Íà ‘”  Íá ‘”  Íâ ‘”  Íã ‘”  Íä ‘”  Íå ‘”  Íæ ‘”  Íç ‘”  Íè ‘”  Íé ‘”  Íê ‘”  Íë ‘”  Íì ‘”  Íí ‘”  Íî ‘”  Íï ‘”  Íğ ‘”  Íñ ‘”  Íò ‘”  Íó ‘”  Íô ‘”  Íõ ‘”  Íö ‘”  Í÷ ‘”  Íø ‘”  Íù ‘”  Íú ‘”  Íû ‘”  Íü ‘”  Íı ‘”  Íş ‘”  Íÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
- ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘”  Í ‘”  Í€ ‘”  Í ‘”  Í‚ ‘ÙĞ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-upload/up-upload.js‘ÚgËimport { _ as __easycom_0 } from "../up-icon/up-icon.js";
-import { r as resolveEasycom } from "../../../../App.ku.js";
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘”  Í ‘”  Í€ ‘”  Í ‘”  Í‚ ‘”  Íƒ ‘”  Í„ ‘”  Í… ‘”  Í† ‘”  Í‡ ‘”  Íˆ ‘”  Í‰ ‘”  ÍŠ ‘”  Í‹ ‘”  ÍŒ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í‘ ‘”  Í’ ‘”  Í“ ‘”  Í” ‘”  Í• ‘”  Í– ‘”  Í— ‘”  Í˜ ‘”  Í™ ‘”  Íš ‘”  Í› ‘ÙĞ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-upload/up-upload.js‘Úbvimport { _ as __easycom_0 } from "../up-icon/up-icon.js";
 import { _ as __easycom_1$1 } from "../up-loading-icon/up-loading-icon.js";
 import { _ as __easycom_1$2 } from "../up-gap/up-gap.js";
 import { _ as __easycom_2 } from "../up-popup/up-popup.js";
@@ -1298,13 +1347,19 @@ import { i as image, v as video, f as func } from "../../libs/function/test.js";
 import { t } from "../../libs/i18n/index.js";
 import "./types.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataStyle: _setSharedDataStyle, unref: _unref, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, toDisplayString: _toDisplayString, setSharedDataEvent: _setSharedDataEvent, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, toSharedDataImageMode: _toSharedDataImageMode, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, createSharedDataSlot: _createSharedDataSlot, createSharedDataFor: _createSharedDataFor, setSharedDataClass: _setSharedDataClass, withSharedDataVaporCtx: _withSharedDataVaporCtx } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpUploadUpUpload";
 const { ref, watch } = globalThis.Vue;
 const { computed } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-upload"
   },
+  __dynamicSharedData: true,
+  __hash: "4c855d80",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-upload/up-upload.uvue",
   __name: "up-upload",
   props: {
     accept: {
@@ -1462,8 +1517,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   },
   emits: ["error", "beforeRead", "oversize", "afterRead", "delete", "clickPreview", "update:fileList", "afterAutoUpload"],
   setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
-    __expose();
+    var __emit = _a.emit, $slots = _a.slots;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpUploadUpUploadSharedData", sharedDataClassId: 0 })));
     const props = __props;
     const emit = __emit;
     const lists = ref([]);
@@ -1696,239 +1752,259 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       }
       emit("clickPreview", UTSJSONObject.assign(UTSJSONObject.assign(new UTSJSONObject({}), item), getDetail(index)));
     }
-    const __returned__ = { props, emit, lists, isInCount, popupShow, currentItemIndex, customUploadStyle, itemDimensionStyle, getProgressStyle, formatFileList, convertFileToUTSJSON, getDetail, getOtherItemText, onAfterRead, onBeforeRead, chooseFileAction, onChooseTap, videoErrorCallback, deleteItem, onPreviewImage, onPreviewVideo, onClickPreview };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
-  }
-});
-const _style_0 = { "up-upload": { "": { "display": "flex", "flexDirection": "column", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-upload__wrap": { "": { "display": "flex", "flexDirection": "row", "flexWrap": "wrap" } }, "up-upload__wrap__preview": { "": { "borderTopLeftRadius": 2, "borderTopRightRadius": 2, "borderBottomRightRadius": 2, "borderBottomLeftRadius": 2, "marginTop": 0, "marginRight": 8, "marginBottom": 8, "marginLeft": 0, "position": "relative", "overflow": "hidden", "display": "flex", "flexDirection": "row" } }, "up-upload__wrap__preview__image": { "": { "width": 80, "height": 80 } }, "up-upload__wrap__preview__video": { "": { "width": 80, "height": 80, "backgroundColor": "#f2f2f2", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column", "justifyContent": "center", "alignItems": "center" } }, "up-upload__wrap__preview__other": { "": { "width": 80, "height": 80, "backgroundColor": "#f2f2f2", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column", "justifyContent": "center", "alignItems": "center" } }, "up-upload__wrap__preview__video__text": { "": { "fontSize": 11, "color": "#909193", "marginTop": 2 } }, "up-upload__wrap__preview__other__text": { "": { "fontSize": 11, "color": "#909193", "marginTop": 2 } }, "up-upload__wrap__play": { "": { "position": "absolute", "top": 0, "left": 0, "bottom": 0, "right": 0, "display": "flex", "justifyContent": "center", "alignItems": "center" } }, "up-upload__wrap__play__icon": { "": { "backgroundImage": "none", "backgroundColor": "#ffffff", "borderTopLeftRadius": 100, "borderTopRightRadius": 100, "borderBottomRightRadius": 100, "borderBottomLeftRadius": 100, "opacity": 0.8 } }, "up-upload__deletable": { "": { "position": "absolute", "top": 0, "right": 0, "backgroundColor": "#373737", "height": 14, "width": 14, "display": "flex", "flexDirection": "row", "borderBottomLeftRadius": 100, "alignItems": "center", "justifyContent": "center", "zIndex": 3 } }, "up-upload__deletable__icon": { "": { "position": "absolute", "transform": "scale(0.7)", "top": 0, "right": 0 } }, "up-upload__success": { "": { "position": "absolute", "bottom": 0, "right": 0, "display": "flex", "flexDirection": "row", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "rgba(0,0,0,0)", "borderLeftColor": "rgba(0,0,0,0)", "borderBottomColor": "#5ac725", "borderRightColor": "#5ac725", "borderTopWidth": 9, "borderRightWidth": 9, "borderBottomWidth": 9, "borderLeftWidth": 9, "alignItems": "center", "justifyContent": "center" } }, "up-upload__success__icon": { "": { "position": "absolute", "transform": "scale(0.7)", "bottom": -10, "right": -10 } }, "up-upload__progress": { "": { "!backgroundColor": "var(--theme-color, #0957de)", "position": "absolute", "bottom": 0, "left": 0 } }, "up-upload__status": { "": { "position": "absolute", "top": 0, "bottom": 0, "left": 0, "right": 0, "backgroundColor": "rgba(0,0,0,0.5)", "display": "flex", "flexDirection": "column", "alignItems": "center", "justifyContent": "center" } }, "up-upload__status__icon": { "": { "position": "relative", "zIndex": 1 } }, "up-upload__status__message": { "": { "fontSize": 12, "color": "#FFFFFF", "marginTop": 5 } }, "up-upload__button": { "": { "display": "flex", "flexDirection": "column", "alignItems": "center", "justifyContent": "center", "width": 80, "height": 80, "backgroundColor": "#f4f5f7", "borderTopLeftRadius": 2, "borderTopRightRadius": 2, "borderBottomRightRadius": 2, "borderBottomLeftRadius": 2, "marginTop": 0, "marginRight": 8, "marginBottom": 8, "marginLeft": 0, "boxSizing": "border-box" } }, "up-upload__button__text": { "": { "fontSize": 11, "color": "#909193", "marginTop": 2 } }, "up-upload__button--hover": { "": { "backgroundColor": "#e6e7e9" } }, "up-upload__button--disabled": { "": { "opacity": 0.5 } } };
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, normalizeStyle: _normalizeStyle, createCommentVNode: _createCommentVNode, resolveComponent: _resolveComponent, createBlock: _createBlock, renderSlot: _renderSlot, createVNode: _createVNode, toDisplayString: _toDisplayString, createElementVNode: _createElementVNode, withModifiers: _withModifiers, normalizeClass: _normalizeClass, withCtx: _withCtx } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
-  const _component_up_loading_icon = resolveEasycom(__resolveDynamicComponent("up-loading-icon"), __easycom_1$1);
-  const _component_up_gap = resolveEasycom(__resolveDynamicComponent("up-gap"), __easycom_1$2);
-  const _component_video = _resolveComponent("video");
-  const _component_up_popup = resolveEasycom(__resolveDynamicComponent("up-popup"), __easycom_2);
-  return _openBlock(), _createElementBlock(
-    "view",
-    {
-      class: "up-upload",
-      style: _normalizeStyle($setup.customUploadStyle)
-    },
-    [
-      _createElementVNode("view", { class: "up-upload__wrap" }, [
-        $props.previewImage ? (_openBlock(true), _createElementBlock(
-          _Fragment,
-          { key: 0 },
-          _renderList($setup.lists, (item, index) => {
-            return _openBlock(), _createElementBlock("view", {
-              class: "up-upload__wrap__preview",
-              key: index
-            }, [
-              item.isImage || item.type != null && item.type == "image" ? (_openBlock(), _createElementBlock("image", {
-                key: 0,
-                src: item.thumb != null ? item.thumb : item.url,
-                mode: $props.imageMode,
-                class: "up-upload__wrap__preview__image",
-                onClick: ($event) => $setup.onClickPreview(item, index),
-                style: _normalizeStyle($setup.itemDimensionStyle)
-              }, null, 12, ["src", "mode", "onClick"])) : (item.isVideo || item.type != null && item.type == "video") && $props.getVideoThumb ? (_openBlock(), _createElementBlock(
-                "view",
-                {
-                  key: 1,
-                  class: "up-upload__wrap__preview__video",
-                  style: _normalizeStyle($setup.itemDimensionStyle)
-                },
-                [
-                  item.thumb ? (_openBlock(), _createElementBlock("image", {
-                    key: 0,
-                    src: item.thumb,
-                    mode: $props.imageMode,
-                    class: "up-upload__wrap__preview__image",
-                    onClick: ($event) => $setup.onClickPreview(item, index),
-                    style: _normalizeStyle($setup.itemDimensionStyle)
-                  }, null, 12, ["src", "mode", "onClick"])) : (_openBlock(), _createBlock(_component_up_icon, {
-                    key: 1,
-                    color: "#80CBF9",
-                    size: "26",
-                    name: item.isVideo || item.type != null && item.type == "video" ? "movie" : "file-text"
-                  }, null, 8, ["name"])),
-                  item.status == "success" ? (_openBlock(), _createElementBlock("view", {
-                    key: 2,
-                    class: "up-upload__wrap__play",
-                    onClick: ($event) => $setup.onClickPreview(item, index)
-                  }, [
-                    _renderSlot(_ctx.$slots, "playIcon"),
-                    _ctx.$slots["playIcon"] == null ? (_openBlock(), _createBlock(_component_up_icon, {
-                      key: 0,
-                      class: "up-upload__wrap__play__icon",
-                      name: "play-right",
-                      size: "22px"
-                    })) : _createCommentVNode("v-if", true)
-                  ], 8, ["onClick"])) : _createCommentVNode("v-if", true)
-                ],
-                4
-                /* STYLE */
-              )) : (_openBlock(), _createElementBlock("view", {
-                key: 2,
-                class: "up-upload__wrap__preview__other",
-                onClick: ($event) => $setup.onClickPreview(item, index),
-                style: _normalizeStyle($setup.itemDimensionStyle)
-              }, [
-                _createVNode(_component_up_icon, {
+    return () => {
+      "raw js";
+      const _component_up_icon = __easycom_0;
+      const _component_up_loading_icon = __easycom_1$1;
+      const _component_up_gap = __easycom_1$2;
+      const _component_video = _resolveComponent("video");
+      const _component_up_popup = __easycom_2;
+      _renderSharedDataEffect(() => {
+        return _setSharedDataStyle(__sharedData, 17, _unref(customUploadStyle));
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 3, _toSharedDataBoolean(__props.previewImage));
+      }, () => {
+        _createSharedDataFor(_setSharedDataScoped(__sharedData, 4, _createSharedDataVFor(__sharedDataScope, () => {
+          return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
+        })), () => {
+          return lists.value;
+        }, (__sharedData_VFor0, _for_item0, _for_key0) => {
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData_VFor0, 1, _toSharedDataBoolean(_for_item0.value.isImage || _for_item0.value.type != null && _for_item0.value.type == "image"));
+          }, () => {
+            _setSharedDataEvent(__sharedData_VFor0, 2, () => {
+              return onClickPreview(_for_item0.value, _for_key0.value);
+            });
+            _renderSharedDataEffect(() => {
+              const _item = _for_item0.value;
+              const _item_thumb = _item.thumb;
+              _setSharedDataAttr(__sharedData_VFor0, 3, _toSharedDataString(_item_thumb != null ? _item_thumb : _item.url));
+              _setSharedDataAttr(__sharedData_VFor0, 4, _toSharedDataImageMode(__props.imageMode));
+              _setSharedDataStyle(__sharedData_VFor0, 5, _unref(itemDimensionStyle));
+            });
+          }, () => {
+            return _createSharedDataIf(() => {
+              return _setSharedData(__sharedData_VFor0, 6, _toSharedDataBoolean((_for_item0.value.isVideo || _for_item0.value.type != null && _for_item0.value.type == "video") && __props.getVideoThumb));
+            }, () => {
+              _renderSharedDataEffect(() => {
+                return _setSharedDataStyle(__sharedData_VFor0, 17, _unref(itemDimensionStyle));
+              });
+              _createSharedDataIf(() => {
+                return _setSharedData(__sharedData_VFor0, 7, _toSharedDataBoolean(_for_item0.value.thumb));
+              }, () => {
+                _setSharedDataEvent(__sharedData_VFor0, 8, () => {
+                  return onClickPreview(_for_item0.value, _for_key0.value);
+                });
+                _renderSharedDataEffect(() => {
+                  _setSharedDataAttr(__sharedData_VFor0, 9, _toSharedDataString(_for_item0.value.thumb));
+                  _setSharedDataAttr(__sharedData_VFor0, 10, _toSharedDataImageMode(__props.imageMode));
+                  _setSharedDataStyle(__sharedData_VFor0, 11, _unref(itemDimensionStyle));
+                });
+              }, () => {
+                const n12 = _createSharedDataComponentWithFallback(_component_up_icon, "6a9793ae-" + _for_key0.value, {
                   color: "#80CBF9",
                   size: "26",
-                  name: item.isVideo || item.type != null && item.type == "video" ? "movie" : "folder"
-                }, null, 8, ["name"]),
-                _createElementVNode(
-                  "text",
-                  { class: "up-upload__wrap__preview__other__text" },
-                  _toDisplayString($setup.getOtherItemText(item)),
-                  1
-                  /* TEXT */
-                )
-              ], 12, ["onClick"])),
-              item.status == "uploading" || item.status == "failed" ? (_openBlock(), _createElementBlock("view", {
-                key: 3,
-                class: "up-upload__status"
-              }, [
-                _createElementVNode("view", { class: "up-upload__status__icon" }, [
-                  item.status == "failed" ? (_openBlock(), _createBlock(_component_up_icon, {
-                    key: 0,
-                    name: "close-circle",
-                    color: "#ffffff",
-                    size: "25"
-                  })) : (_openBlock(), _createBlock(_component_up_loading_icon, {
-                    key: 1,
-                    size: "22",
-                    mode: "circle"
-                  }))
-                ]),
-                item.message != null && item.message != "" ? (_openBlock(), _createElementBlock(
-                  "text",
-                  {
-                    key: 0,
-                    class: "up-upload__status__message"
-                  },
-                  _toDisplayString(item.message),
-                  1
-                  /* TEXT */
-                )) : _createCommentVNode("v-if", true),
-                _createVNode(_component_up_gap, {
-                  class: "up-upload__progress",
-                  height: "3px",
-                  style: _normalizeStyle($setup.getProgressStyle(item))
-                }, null, 8, ["style"])
-              ])) : _createCommentVNode("v-if", true),
-              item.status != "uploading" && ($props.deletable || item.deletable) ? (_openBlock(), _createElementBlock("view", {
-                key: 4,
-                class: "up-upload__deletable",
-                onClick: _withModifiers(($event) => $setup.deleteItem(index), ["stop"])
-              }, [
-                _createElementVNode("view", { class: "up-upload__deletable__icon" }, [
-                  _createVNode(_component_up_icon, {
-                    name: "close",
-                    color: "#ffffff",
-                    size: "10"
-                  })
-                ])
-              ], 8, ["onClick"])) : _createCommentVNode("v-if", true),
-              _renderSlot(_ctx.$slots, "success", {}, () => [
-                item.status == "success" ? (_openBlock(), _createElementBlock("view", {
-                  key: 0,
-                  class: "up-upload__success"
-                }, [
-                  _createElementVNode("view", { class: "up-upload__success__icon" }, [
-                    _createVNode(_component_up_icon, {
-                      name: "checkmark",
-                      color: "#ffffff",
-                      size: "12"
-                    })
-                  ])
-                ])) : _createCommentVNode("v-if", true)
-              ])
-            ]);
-          }),
-          128
-          /* KEYED_FRAGMENT */
-        )) : _createCommentVNode("v-if", true),
-        $setup.isInCount ? (_openBlock(), _createElementBlock(
-          _Fragment,
-          { key: 1 },
-          [
-            _ctx.$slots["trigger"] != null ? (_openBlock(), _createElementBlock("view", {
-              key: 0,
-              onClick: $setup.onChooseTap
-            }, [
-              _renderSlot(_ctx.$slots, "trigger")
-            ])) : _ctx.$slots["trigger"] == null && (_ctx.$slots["default"] != null || _ctx.$slots["$default"] != null) ? (_openBlock(), _createElementBlock("view", {
-              key: 1,
-              onClick: $setup.onChooseTap
-            }, [
-              _renderSlot(_ctx.$slots, "default")
-            ])) : (_openBlock(), _createElementBlock("view", {
-              key: 2,
-              class: _normalizeClass(["up-upload__button", [$props.disabled ? "up-upload__button--disabled" : ""]]),
-              "hover-class": !$props.disabled ? "up-upload__button--hover" : "",
-              "hover-stay-time": "150",
-              onClick: $setup.onChooseTap,
-              style: _normalizeStyle($setup.itemDimensionStyle)
-            }, [
-              _createVNode(_component_up_icon, {
-                name: $props.uploadIcon,
+                  name: () => {
+                    return _for_item0.value.isVideo || _for_item0.value.type != null && _for_item0.value.type == "video" ? "movie" : "file-text";
+                  }
+                });
+                _setSharedData(__sharedData_VFor0, 12, n12?.sharedData);
+              }, 773);
+              _createSharedDataIf(() => {
+                return _setSharedData(__sharedData_VFor0, 13, _toSharedDataBoolean(_for_item0.value.status == "success"));
+              }, () => {
+                _createSharedDataSlot("playIcon", null, null);
+                _createSharedDataIf(() => {
+                  return _setSharedData(__sharedData_VFor0, 14, _toSharedDataBoolean($slots["playIcon"] == null));
+                }, () => {
+                  const n18 = _createSharedDataComponentWithFallback(_component_up_icon, "e8624520-" + _for_key0.value, {
+                    class: "up-upload__wrap__play__icon",
+                    name: "play-right",
+                    size: "22px"
+                  });
+                  _setSharedData(__sharedData_VFor0, 15, n18?.sharedData);
+                });
+                _setSharedDataEvent(__sharedData_VFor0, 16, () => {
+                  return onClickPreview(_for_item0.value, _for_key0.value);
+                });
+              });
+            }, () => {
+              _renderSharedDataEffect(() => {
+                return _setSharedDataStyle(__sharedData_VFor0, 20, _unref(itemDimensionStyle));
+              });
+              const n22 = _createSharedDataComponentWithFallback(_component_up_icon, "e8622de6-" + _for_key0.value, {
+                color: "#80CBF9",
                 size: "26",
-                color: $props.uploadIconColor
-              }, null, 8, ["name", "color"]),
-              $props.uploadText != "" ? (_openBlock(), _createElementBlock(
-                "text",
-                {
-                  key: 0,
-                  class: "up-upload__button__text"
-                },
-                _toDisplayString($props.uploadText),
-                1
-                /* TEXT */
-              )) : _createCommentVNode("v-if", true)
-            ], 14, ["hover-class"]))
-          ],
-          64
-          /* STABLE_FRAGMENT */
-        )) : _createCommentVNode("v-if", true)
-      ]),
-      _createVNode(_component_up_popup, {
+                name: () => {
+                  return _for_item0.value.isVideo || _for_item0.value.type != null && _for_item0.value.type == "video" ? "movie" : "folder";
+                }
+              });
+              _setSharedData(__sharedData_VFor0, 18, n22?.sharedData);
+              _setSharedDataEvent(__sharedData_VFor0, 19, () => {
+                return onClickPreview(_for_item0.value, _for_key0.value);
+              });
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData_VFor0, 21, _toDisplayString(getOtherItemText(_for_item0.value)));
+              });
+            }, 517);
+          }, 261);
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData_VFor0, 22, _toSharedDataBoolean(_for_item0.value.status == "uploading" || _for_item0.value.status == "failed"));
+          }, () => {
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData_VFor0, 26, _toSharedDataBoolean(_for_item0.value.status == "failed"));
+            }, () => {
+              const n29 = _createSharedDataComponentWithFallback(_component_up_icon, "e8616b6e-" + _for_key0.value, {
+                name: "close-circle",
+                color: "#ffffff",
+                size: "25"
+              });
+              _setSharedData(__sharedData_VFor0, 27, n29?.sharedData);
+            }, () => {
+              const n31 = _createSharedDataComponentWithFallback(_component_up_loading_icon, "e86162bc-" + _for_key0.value, {
+                size: "22",
+                mode: "circle"
+              });
+              _setSharedData(__sharedData_VFor0, 28, n31?.sharedData);
+            }, 1541);
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData_VFor0, 23, _toSharedDataBoolean(_for_item0.value.message != null && _for_item0.value.message != ""));
+            }, () => {
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData_VFor0, 24, _toDisplayString(_for_item0.value.message));
+              });
+            });
+            const n36 = _createSharedDataComponentWithFallback(_component_up_gap, "e8614d2c-" + _for_key0.value, {
+              class: "up-upload__progress",
+              height: "3px",
+              style: () => {
+                return getProgressStyle(_for_item0.value);
+              }
+            });
+            _setSharedData(__sharedData_VFor0, 25, n36?.sharedData);
+          });
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData_VFor0, 29, _toSharedDataBoolean(_for_item0.value.status != "uploading" && (__props.deletable || _for_item0.value.deletable)));
+          }, () => {
+            const n40 = _createSharedDataComponentWithFallback(_component_up_icon, "e86135de-" + _for_key0.value, {
+              name: "close",
+              color: "#ffffff",
+              size: "10"
+            });
+            _setSharedData(__sharedData_VFor0, 30, n40?.sharedData);
+            _setSharedDataEvent(__sharedData_VFor0, 31, () => {
+              return deleteItem(_for_key0.value);
+            });
+          });
+          _createSharedDataSlot("success", null, null, () => {
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData_VFor0, 32, _toSharedDataBoolean(_for_item0.value.status == "success"));
+            }, () => {
+              const n47 = _createSharedDataComponentWithFallback(_component_up_icon, "e8608180-" + _for_key0.value, {
+                name: "checkmark",
+                color: "#ffffff",
+                size: "12"
+              });
+              _setSharedData(__sharedData_VFor0, 33, n47?.sharedData);
+            });
+          });
+          return null;
+        }, (__sharedData_VFor0, item, index) => {
+          return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
+        });
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 5, _toSharedDataBoolean(isInCount.value));
+      }, () => {
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 6, _toSharedDataBoolean($slots["trigger"] != null));
+        }, () => {
+          _createSharedDataSlot("trigger", null, null);
+          _setSharedDataEvent(__sharedData, 7, onChooseTap);
+        }, () => {
+          return _createSharedDataIf(() => {
+            return _setSharedData(__sharedData, 8, _toSharedDataBoolean($slots["trigger"] == null && ($slots["default"] != null || $slots["$default"] != null)));
+          }, () => {
+            _createSharedDataSlot("default", null, null);
+            _setSharedDataEvent(__sharedData, 9, onChooseTap);
+          }, () => {
+            _renderSharedDataEffect(() => {
+              const _disabled = __props.disabled;
+              _setSharedDataClass(__sharedData, 14, ["up-upload__button", [_disabled ? "up-upload__button--disabled" : ""]]);
+              _setSharedDataClass(__sharedData, 15, _toSharedDataString(!_disabled ? "up-upload__button--hover" : ""));
+              _setSharedDataStyle(__sharedData, 16, _unref(itemDimensionStyle));
+            });
+            const n62 = _createSharedDataComponentWithFallback(_component_up_icon, "e86045aa", {
+              name: () => {
+                return __props.uploadIcon;
+              },
+              size: "26",
+              color: () => {
+                return __props.uploadIconColor;
+              }
+            });
+            _setSharedData(__sharedData, 10, n62?.sharedData);
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData, 11, _toSharedDataBoolean(__props.uploadText != ""));
+            }, () => {
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData, 12, _toDisplayString(__props.uploadText));
+              });
+            });
+            _setSharedDataEvent(__sharedData, 13, onChooseTap);
+          }, 3333);
+        }, 3077);
+      });
+      const n72 = _createSharedDataComponentWithFallback(_component_up_popup, "e85f9270", {
         mode: "center",
-        show: $setup.popupShow,
-        "onUpdate:show": _cache[0] || (_cache[0] = ($event) => $setup.popupShow = $event)
+        show: () => {
+          return popupShow.value;
+        },
+        "onUpdate:show": () => {
+          return (_value) => {
+            return popupShow.value = _value;
+          };
+        }
       }, {
-        default: _withCtx(() => [
-          $setup.popupShow ? (_openBlock(), _createBlock(_component_video, {
-            key: 0,
-            id: "myVideo",
-            src: $setup.currentItemIndex >= 0 ? $setup.lists[$setup.currentItemIndex].url : "",
-            onError: $setup.videoErrorCallback,
-            "show-center-play-btn": "",
-            "object-fit": $props.videoPreviewObjectFit,
-            "show-fullscreen-btn": "true",
-            "enable-play-gesture": "",
-            controls: "",
-            autoplay: true,
-            "auto-pause-if-open-native": "",
-            "initial-time": 0.1
-          }, null, 8, ["src", "object-fit"])) : _createCommentVNode("v-if", true)
-        ]),
-        _: 1
-        /* STABLE */
-      }, 8, ["show"])
-    ],
-    4
-    /* STYLE */
-  );
-}
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-upload/up-upload.uvue"]]);
+        "default": _withSharedDataVaporCtx(() => {
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData, 1, _toSharedDataBoolean(popupShow.value));
+          }, () => {
+            const n71 = _createSharedDataComponentWithFallback(_component_video, "e85f90fe", {
+              id: "myVideo",
+              src: () => {
+                return currentItemIndex.value >= 0 ? lists.value[currentItemIndex.value].url : "";
+              },
+              onError: () => {
+                return videoErrorCallback;
+              },
+              "show-center-play-btn": "",
+              "object-fit": () => {
+                return __props.videoPreviewObjectFit;
+              },
+              "show-fullscreen-btn": "true",
+              "enable-play-gesture": "",
+              controls: "",
+              autoplay: true,
+              "auto-pause-if-open-native": "",
+              "initial-time": 0.1
+            });
+            _setSharedData(__sharedData, 2, n71?.sharedData);
+          }, null, 129);
+        })
+      });
+      _setSharedData(__sharedData, 0, n72?.sharedData);
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_1 as _
 };
 //# sourceMappingURL=up-upload.js.map
-ÔrF›µ../../../../App.ku.jsµ../up-icon/up-icon.jsÙ%../up-loading-icon/up-loading-icon.js³../up-gap/up-gap.js·../up-popup/up-popup.jsª./utils.js»../../libs/function/test.js¸../../libs/i18n/index.jsª./types.js¼../../libs/function/index.jsÙ'../../../../plugin-vue-export-helper.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙ /Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku.jsAÃªoh-resolveÂGAÂÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon.jsAÃªoh-resolveÂGAÂÙÜ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.jsAÃªoh-resolveÂGAÂÙÊ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-gap/up-gap.jsAÃªoh-resolveÂGAÂÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-popup/up-popup.jsAÃªoh-resolveÂGAÂÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-upload/utils.jsAÃªoh-resolveÂGAÂÙÄ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/test.jsAÃªoh-resolveÂGAÂÙÁ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/index.jsAÃªoh-resolveÂGAÂÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-upload/types.jsAÃªoh-resolveÂGAÂÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsAÃªoh-resolveÂGAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍg†Íg¤À‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍg‘Íg¡ÔrL”¤type¥start£end¤nameªIdentifierÍg‘Ígœ«__easycom_1LªIdentifierÍg Íg¡¡_À›ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration 9‘ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	
-¡_LªIdentifier«__easycom_0ÔrO•¤type¥start£end¥value£raw§Literal!8µ../up-icon/up-icon.js·"../up-icon/up-icon.js"M±ImportDeclaration:Ìv‘N¯ImportSpecifierÌCÌVLªIdentifierÌCÌD¡rLªIdentifierÌHÌV®resolveEasycomO§LiteralÌ^Ìuµ../../../../App.ku.js·"../../../../App.ku.js"M±ImportDeclarationÌwÌÂ‘N¯ImportSpecifierÌ€Ì’LªIdentifierÌ€Ì¡_LªIdentifierÌ…Ì’­__easycom_1$1O§LiteralÌšÌÁÙ%../up-loading-icon/up-loading-icon.jsÙ'"../up-loading-icon/up-loading-icon.js"M±ImportDeclarationÌÃÌü‘N¯ImportSpecifierÌÌÌŞLªIdentifierÌÌÌÍ¡_LªIdentifierÌÑÌŞ­__easycom_1$2O§LiteralÌæÌû³../up-gap/up-gap.jsµ"../up-gap/up-gap.js"M±ImportDeclarationÌıÍ8‘N¯ImportSpecifierÍÍLªIdentifierÍÍ¡_LªIdentifierÍÍ«__easycom_2O§LiteralÍÍ7·../up-popup/up-popup.js¹"../up-popup/up-popup.js"M±ImportDeclarationÍ9Íf‘N¯ImportSpecifierÍBÍQLªIdentifierÍBÍC¡cLªIdentifierÍGÍQªchooseFileO§LiteralÍYÍeª./utils.js¬"./utils.js"M±ImportDeclarationÍgÍ¾“N¯ImportSpecifierÍpÍ}LªIdentifierÍpÍq¡bLªIdentifierÍuÍ}¨addStyleN¯ImportSpecifierÍÍ‹LªIdentifierÍÍ€¡aLªIdentifierÍ„Í‹§addUnitN¯ImportSpecifierÍÍ—LªIdentifierÍÍ¡tLªIdentifierÍ’Í—¥toastO§LiteralÍŸÍ½¼../../libs/function/index.js¾"../../libs/function/index.js"M±ImportDeclarationÍ¿Í“N¯ImportSpecifierÍÈÍÒLªIdentifierÍÈÍÉ¡iLªIdentifierÍÍÍÒ¥imageN¯ImportSpecifierÍÔÍŞLªIdentifierÍÔÍÕ¡vLªIdentifierÍÙÍŞ¥videoN¯ImportSpecifierÍàÍéLªIdentifierÍàÍá¡fLªIdentifierÍåÍé¤funcO§LiteralÍñÍ»../../libs/function/test.js½"../../libs/function/test.js"M±ImportDeclarationÍÍ=‘N¯ImportSpecifierÍÍLªIdentifierÍÍ¡tLªIdentifierÍÍ¡tO§LiteralÍ"Í<¸../../libs/i18n/index.jsº"../../libs/i18n/index.js"M±ImportDeclarationÍ>ÍRO§LiteralÍEÍQª./types.js¬"./types.js"M±ImportDeclarationÍSÍ‘N¯ImportSpecifierÍ\ÍlLªIdentifierÍ\Í]¡_LªIdentifierÍaÍl«_export_sfcO§LiteralÍtÍÙ'../../../../plugin-vue-export-helper.jsÙ)"../../../../plugin-vue-export-helper.js"
+ÔrFšÙ%../up-loading-icon/up-loading-icon.js³../up-gap/up-gap.jsµ../up-icon/up-icon.js·../up-popup/up-popup.jsª./utils.js¸../../libs/i18n/index.js»../../libs/function/test.js¼../../libs/function/index.jsÙ'../../../../plugin-vue-export-helper.jsª./types.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙÜ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.jsAÃªoh-resolveÂGAÂÙÊ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-gap/up-gap.jsAÃªoh-resolveÂGAÂÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon.jsAÃªoh-resolveÂGAÂÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-popup/up-popup.jsAÃªoh-resolveÂGAÂÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-upload/utils.jsAÃªoh-resolveÂGAÂÙÁ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/index.jsAÃªoh-resolveÂGAÂÙÄ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/test.jsAÃªoh-resolveÂGAÂÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsAÃªoh-resolveÂGAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂGAÂÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-upload/types.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍb1ÍbOÀ‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍb<ÍbLÔrL”¤type¥start£end¤nameªIdentifierÍb<ÍbG«__easycom_1LªIdentifierÍbKÍbL¡_ÀšÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration 9‘ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	
+¡_LªIdentifier«__easycom_0ÔrO•¤type¥start£end¥value£raw§Literal!8µ../up-icon/up-icon.js·"../up-icon/up-icon.js"M±ImportDeclaration:Ì…‘N¯ImportSpecifierÌCÌULªIdentifierÌCÌD¡_LªIdentifierÌHÌU­__easycom_1$1O§LiteralÌ]Ì„Ù%../up-loading-icon/up-loading-icon.jsÙ'"../up-loading-icon/up-loading-icon.js"M±ImportDeclarationÌ†Ì¿‘N¯ImportSpecifierÌÌ¡LªIdentifierÌÌ¡_LªIdentifierÌ”Ì¡­__easycom_1$2O§LiteralÌ©Ì¾³../up-gap/up-gap.jsµ"../up-gap/up-gap.js"M±ImportDeclarationÌÀÌû‘N¯ImportSpecifierÌÉÌÙLªIdentifierÌÉÌÊ¡_LªIdentifierÌÎÌÙ«__easycom_2O§LiteralÌáÌú·../up-popup/up-popup.js¹"../up-popup/up-popup.js"M±ImportDeclarationÌüÍ)‘N¯ImportSpecifierÍÍLªIdentifierÍÍ¡cLªIdentifierÍ
+ÍªchooseFileO§LiteralÍÍ(ª./utils.js¬"./utils.js"M±ImportDeclarationÍ*Í“N¯ImportSpecifierÍ3Í@LªIdentifierÍ3Í4¡bLªIdentifierÍ8Í@¨addStyleN¯ImportSpecifierÍBÍNLªIdentifierÍBÍC¡aLªIdentifierÍGÍN§addUnitN¯ImportSpecifierÍPÍZLªIdentifierÍPÍQ¡tLªIdentifierÍUÍZ¥toastO§LiteralÍbÍ€¼../../libs/function/index.js¾"../../libs/function/index.js"M±ImportDeclarationÍ‚ÍÒ“N¯ImportSpecifierÍ‹Í•LªIdentifierÍ‹ÍŒ¡iLªIdentifierÍÍ•¥imageN¯ImportSpecifierÍ—Í¡LªIdentifierÍ—Í˜¡vLªIdentifierÍœÍ¡¥videoN¯ImportSpecifierÍ£Í¬LªIdentifierÍ£Í¤¡fLªIdentifierÍ¨Í¬¤funcO§LiteralÍ´ÍÑ»../../libs/function/test.js½"../../libs/function/test.js"M±ImportDeclarationÍÓÍ ‘N¯ImportSpecifierÍÜÍİLªIdentifierÍÜÍİ¡tLªIdentifierÍÜÍİ¡tO§LiteralÍåÍÿ¸../../libs/i18n/index.jsº"../../libs/i18n/index.js"M±ImportDeclarationÍÍO§LiteralÍÍª./types.js¬"./types.js"M±ImportDeclarationÍÍa‘N¯ImportSpecifierÍÍ/LªIdentifierÍÍ ¡_LªIdentifierÍ$Í/«_export_sfcO§LiteralÍ7Í`Ù'../../../../plugin-vue-export-helper.jsÙ)"../../../../plugin-vue-export-helper.js"

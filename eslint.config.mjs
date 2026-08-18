@@ -1,8 +1,8 @@
-import uniHelper from '@uni-helper/eslint-config'
+import uniHelper from '@uni-helper/eslint-config';
 
 const composer = uniHelper({
   stylistic: {
-    semi: true, // 启用自动分号
+    semi: true // 启用自动分号
   },
   unocss: false,
   vue: true,
@@ -20,8 +20,14 @@ const composer = uniHelper({
     // 插件生成的文件
     'src/pages.json',
     'src/manifest.json',
+    // 忽略外部/文档/工具目录
+    '**/js_sdk/**',
+    'docs/**',
+    'unpackage/**',
+    '.claude/**',
+    '.agents/**',
     // 忽略自动生成文件
-    'src/service/**',
+    'src/service/**'
   ],
   // https://eslint-config.antfu.me/rules
   rules: {
@@ -37,14 +43,18 @@ const composer = uniHelper({
     'eqeqeq': 'off',
     'no-unused-vars': 'off',
     'vue/no-unused-refs': 'off',
+    'node/prefer-global/process': 'off',
+    'unicorn/prefer-number-properties': 'off',
+    'ts/no-redeclare': 'off',
+    'style/no-tabs': 'off',
     'unused-imports/no-unused-vars': [
       'warn',
       {
         vars: 'all',
         varsIgnorePattern: '^_',
         args: 'after-used',
-        argsIgnorePattern: '^_',
-      },
+        argsIgnorePattern: '^_'
+      }
     ],
     'unused-imports/no-unused-imports': 'warn',
     'eslint-comments/no-unlimited-disable': 'off',
@@ -57,8 +67,8 @@ const composer = uniHelper({
     'vue/singleline-html-element-content-newline': [
       'error',
       {
-        externalIgnores: ['text'],
-      },
+        externalIgnores: ['text']
+      }
     ],
     'vue/comment-directive': 'off',
     'no-irregular-whitespace': 'off',
@@ -66,12 +76,12 @@ const composer = uniHelper({
       skipStrings: true,
       skipComments: true,
       skipRegExps: true,
-      skipHTMLTextContents: true,
+      skipHTMLTextContents: true
     }],
     // vue SFC 调换顺序改这里
     'vue/block-order': ['error', {
-      order: [['script', 'template'], 'style'],
-    }],
+      order: [['script', 'template'], 'style']
+    }]
   },
   formatters: {
     /**
@@ -83,47 +93,47 @@ const composer = uniHelper({
      * Format HTML files
      * By default uses Prettier
      */
-    html: true,
-  },
-})
+    html: true
+  }
+});
 
 // Resolve the flat config array and map custom extensions
-const configs = await composer
+const configs = await composer;
 
 for (const config of configs) {
   if (config.files) {
-    const files = Array.isArray(config.files) ? config.files : [config.files]
-    const newFiles = [...files]
-    let matched = false
+    const files = Array.isArray(config.files) ? config.files : [config.files];
+    const newFiles = [...files];
+    let matched = false;
 
     for (const file of files) {
       if (typeof file === 'string') {
-        if (file.includes('*.vue')) {
-          newFiles.push(file.replace(/\*\.vue/g, '*.uvue'))
-          matched = true
+        if (file.includes('vue')) {
+          newFiles.push('**/*.uvue');
+          matched = true;
         }
-        if (file.includes('*.ts') || file.includes('*.ts?')) {
-          newFiles.push(file.replace(/\*\.ts/g, '*.uts'))
-          matched = true
+        if (file.includes('ts') || file.includes('[jt]s')) {
+          newFiles.push('**/*.uts');
+          matched = true;
         }
       }
     }
 
     if (matched) {
-      config.files = newFiles
+      config.files = Array.from(new Set(newFiles));
     }
   }
 
   // Also make sure extraFileExtensions contains .uvue and .uts
   if (config.languageOptions?.parserOptions) {
-    const parserOptions = config.languageOptions.parserOptions
+    const parserOptions = config.languageOptions.parserOptions;
     if (parserOptions.extraFileExtensions) {
       if (Array.isArray(parserOptions.extraFileExtensions)) {
         if (!parserOptions.extraFileExtensions.includes('.uvue')) {
-          parserOptions.extraFileExtensions.push('.uvue')
+          parserOptions.extraFileExtensions.push('.uvue');
         }
         if (!parserOptions.extraFileExtensions.includes('.uts')) {
-          parserOptions.extraFileExtensions.push('.uts')
+          parserOptions.extraFileExtensions.push('.uts');
         }
       }
     }
@@ -131,44 +141,44 @@ for (const config of configs) {
 
   // Wrap the parser to treat .uvue as .vue during parsing
   if (config.languageOptions?.parser && typeof config.languageOptions.parser.parseForESLint === 'function') {
-    const originalParser = config.languageOptions.parser
+    const originalParser = config.languageOptions.parser;
     config.languageOptions.parser = {
       ...originalParser,
       parseForESLint(code, options) {
-        const originalFilePath = options.filePath
+        const originalFilePath = options.filePath;
         if (options.filePath && options.filePath.endsWith('.uvue')) {
-          options.filePath = options.filePath.replace(/\.uvue$/, '.vue')
+          options.filePath = options.filePath.replace(/\.uvue$/, '.vue');
         }
         try {
-          const result = originalParser.parseForESLint(code, options)
+          const result = originalParser.parseForESLint(code, options);
           if (result.services?.defineTemplateBodyVisitor) {
-            const originalDefine = result.services.defineTemplateBodyVisitor
+            const originalDefine = result.services.defineTemplateBodyVisitor;
             result.services.defineTemplateBodyVisitor = function (templateBodyVisitor, scriptVisitor, options) {
-              const wrappedScriptVisitor = originalDefine.call(this, templateBodyVisitor, scriptVisitor, options)
+              const wrappedScriptVisitor = originalDefine.call(this, templateBodyVisitor, scriptVisitor, options);
               if (wrappedScriptVisitor['Program:exit']) {
-                const originalExit = wrappedScriptVisitor['Program:exit']
+                const originalExit = wrappedScriptVisitor['Program:exit'];
                 wrappedScriptVisitor['Program:exit'] = function (node) {
-                  return originalExit.call(this, node)
-                }
+                  return originalExit.call(this, node);
+                };
               }
-              return wrappedScriptVisitor
-            }
+              return wrappedScriptVisitor;
+            };
           }
-          return result
+          return result;
         }
         finally {
-          options.filePath = originalFilePath
+          options.filePath = originalFilePath;
         }
-      },
-    }
+      }
+    };
   }
 
   // Wrap all vue rules to treat .uvue files as .vue files
   if (config.plugins?.vue) {
-    const vuePlugin = config.plugins.vue
+    const vuePlugin = config.plugins.vue;
     if (vuePlugin.rules) {
       for (const ruleName of Object.keys(vuePlugin.rules)) {
-        const originalRule = vuePlugin.rules[ruleName]
+        const originalRule = vuePlugin.rules[ruleName];
         if (originalRule && typeof originalRule.create === 'function') {
           vuePlugin.rules[ruleName] = {
             ...originalRule,
@@ -176,28 +186,28 @@ for (const config of configs) {
               const wrappedContext = Object.create(context, {
                 filename: {
                   get() {
-                    const val = context.filename
+                    const val = context.filename;
                     if (val && val.endsWith('.uvue')) {
-                      return val.replace(/\.uvue$/, '.vue')
+                      return val.replace(/\.uvue$/, '.vue');
                     }
-                    return val
+                    return val;
                   },
-                  configurable: true,
+                  configurable: true
                 },
                 getFilename: {
                   value() {
-                    const val = context.getFilename()
+                    const val = context.getFilename();
                     if (val && val.endsWith('.uvue')) {
-                      return val.replace(/\.uvue$/, '.vue')
+                      return val.replace(/\.uvue$/, '.vue');
                     }
-                    return val
+                    return val;
                   },
-                  configurable: true,
-                },
-              })
-              return originalRule.create(wrappedContext)
-            },
-          }
+                  configurable: true
+                }
+              });
+              return originalRule.create(wrappedContext);
+            }
+          };
         }
       }
     }
@@ -305,7 +315,7 @@ configs.push({
           'nav-bar'
         ]
       }
-    ],
+    ]
   },
   languageOptions: {
     globals: {
@@ -344,9 +354,9 @@ configs.push({
       onShareTimeline: 'readonly',
       onAddToFavorites: 'readonly',
       getCurrentPages: 'readonly',
-      getApp: 'readonly',
-    },
-  },
-})
+      getApp: 'readonly'
+    }
+  }
+});
 
-export default configs
+export default configs;

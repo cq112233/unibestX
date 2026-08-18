@@ -61,49 +61,49 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
-import type { PropType } from 'vue'
+import { ref } from 'vue';
+import type { PropType } from 'vue';
 
 defineProps({
   title: {
     type: String,
-    default: '通信子组件',
+    default: '通信子组件'
   },
   count: {
     type: Number,
-    default: 0,
+    default: 0
   },
   tags: {
     type: Array as PropType<Array<string>>,
-    default: (): Array<string> => ['Vue3', 'uni-app X', 'UTS'] as Array<string>,
-  },
-})
+    default: (): Array<string> => ['Vue3', 'uni-app X', 'UTS'] as Array<string>
+  }
+});
 
-const emit = defineEmits(['add', 'reset', 'send-msg'])
+const emit = defineEmits(['add', 'reset', 'send-msg']);
 
-const inputMsg = ref('Hello Parent from Child!')
+const inputMsg = ref('Hello Parent from Child!');
 
 function handleAdd() {
-  emit('add', 1)
+  emit('add', 1);
 }
 
 function handleReset() {
-  emit('reset')
+  emit('reset');
 }
 
 function handleSendMsg() {
   if (inputMsg.value.trim() == '') {
     uni.showToast({
       title: '请输入消息内容',
-      icon: 'none',
-    })
-    return
+      icon: 'none'
+    });
+    return;
   }
-  emit('send-msg', inputMsg.value)
+  emit('send-msg', inputMsg.value);
   uni.showToast({
     title: '消息已发送',
-    icon: 'success',
-  })
+    icon: 'success'
+  });
 }
 </script>
 

@@ -1,0 +1,37 @@
+import { ExitFullscreenOptions, INodeData, UniDocument, UniPageBody as IUniPageBody } from '@dcloudio/uni-app-x/types/native';
+import { TabBarController } from '../components/Page';
+import { PageContainer } from '../components/Page';
+import { UniNativePageImpl } from './UniNativePage';
+export declare class UniNativeTabBarPage extends UniNativePageImpl {
+    readonly tabBarController: TabBarController;
+    currentItemId: string | null;
+    private requestFullscreenRestore;
+    private readonly tabBarDocument;
+    private onTabBarVisibleChangeCallbacks;
+    private tabBarVisibilityChangeVersion;
+    get type(): string;
+    constructor(pageUrl: string, pageId: string, pageStyle: Map<string, Object>);
+    init(page: PageContainer): void;
+    createDocument(_documentData: INodeData): UniDocument;
+    get pageBody(): IUniPageBody;
+    appendItem(pageId: string): void;
+    initTabBar(tabBar: Map<string, Object>): void;
+    hideTabBar(op: Map<string, Object>): void;
+    showTabBar(op: Map<string, Object>): void;
+    setTabBarBadge(op: Map<string, Object>): void;
+    removeTabBarBadge(op: Map<string, Object>): void;
+    showTabBarRedDot(op: Map<string, Object>): void;
+    hideTabBarRedDot(op: Map<string, Object>): void;
+    setTabBarItem(op: Map<string, Object>): void;
+    setTabBarStyle(tabBar: Map<string, Object>): void;
+    getContentSlotSize(): Size;
+    onContentSlotSizeChange(callback: (size: Size) => void): () => void;
+    getTabBarHeight(): number;
+    private updateTabBarHeight;
+    private animateTabBarHeight;
+    private emitTabBarVisibleChange;
+    private initTabBarList;
+    updateSelectedIndex(index: number): void;
+    requestFullscreen(): void;
+    exitFullscreen(_options?: ExitFullscreenOptions | null): Promise<void> | undefined;
+}

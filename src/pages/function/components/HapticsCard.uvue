@@ -19,43 +19,43 @@
 </template>
 
 <script setup lang="uts">
-import Card from '../../basic/components/Card.uvue'
-import { ref } from 'vue'
+import Card from '../../basic/components/Card.uvue';
+import { ref } from 'vue';
 
-const copyText = ref('Hello unibestX!')
+const copyText = ref('Hello unibestX!');
 
 function triggerVibration() {
   // #ifdef APP || MP-WEIXIN || MP-ALIPAY
   uni.vibrateShort({
     type: 'light',
     success: () => {
-      uni.showToast({ title: '已触发短震动', icon: 'none' })
+      uni.showToast({ title: '已触发短震动', icon: 'none' });
     },
     fail: () => {
-      uni.showToast({ title: '震动触发失败', icon: 'none' })
-    },
-  })
+      uni.showToast({ title: '震动触发失败', icon: 'none' });
+    }
+  });
   // #endif
   // #ifndef APP || MP-WEIXIN || MP-ALIPAY
   uni.showToast({
     title: '当前环境不支持震动',
-    icon: 'none',
-  })
+    icon: 'none'
+  });
   // #endif
 }
 
 function handleCopy() {
   if (copyText.value === '')
-    return
+    return;
   uni.setClipboardData({
     data: copyText.value,
     success: () => {
       uni.showToast({
         title: '复制成功',
-        icon: 'success',
-      })
-    },
-  })
+        icon: 'success'
+      });
+    }
+  });
 }
 </script>
 

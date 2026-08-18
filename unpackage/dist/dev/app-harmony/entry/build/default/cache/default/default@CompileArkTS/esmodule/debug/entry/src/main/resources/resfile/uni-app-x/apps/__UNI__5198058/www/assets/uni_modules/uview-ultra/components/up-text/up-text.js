@@ -1,15 +1,20 @@
 import { _ as __easycom_0$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
-import { r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { _ as __easycom_1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-link/up-link&";
 import { a as addUnit, d as deepMerge, b as addStyle, i as error, v as priceFormat, w as timeFormat } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import { d as date, u as url } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/test&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataIf: _createSharedDataIf, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, toDisplayString: _toDisplayString, withSharedDataVaporCtx: _withSharedDataVaporCtx, setSharedDataEvent: _setSharedDataEvent } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpTextUpText";
 const { computed } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-text"
   },
+  __dynamicSharedData: true,
+  __hash: "22ad2d36",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-text/up-text.uvue",
   __name: "up-text",
   props: {
     type: {
@@ -139,8 +144,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   },
   emits: ["click"],
   setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
-    __expose();
+    var __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpTextUpTextSharedData", sharedDataClassId: 0 })));
     const props = __props;
     const emit = __emit;
     const isMp = computed(() => {
@@ -238,104 +244,154 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     }
     function onOpenSetting() {
     }
-    const __returned__ = { props, emit, isMp, valueStyle, customIconStyle, formatName, value, clickHandler, onGetUserInfo, onContact, onGetPhoneNumber, onError, onLaunchApp, onOpenSetting };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _component_up_icon = __easycom_0$1;
+      const _component_up_link = __easycom_1;
+      const _component_button = _resolveComponent("button");
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.show));
+      }, () => {
+        _renderSharedDataEffect(() => {
+          const _align = __props.align;
+          _setSharedDataClass(__sharedData, 17, ["up-text", [__props.customClass]]);
+          _setSharedDataStyle(__sharedData, 18, {
+            margin: __props.margin,
+            justifyContent: _align === "left" ? "flex-start" : _align === "center" ? "center" : "flex-end"
+          });
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 1, _toSharedDataBoolean(__props.mode === "price"));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            _setSharedDataClass(__sharedData, 2, ["up-text__price", `up-text__value--${__props.type}`]);
+            _setSharedDataStyle(__sharedData, 3, valueStyle.value);
+          });
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 4, _toSharedDataBoolean(__props.prefixIcon != ""));
+        }, () => {
+          const n7 = _createSharedDataComponentWithFallback(_component_up_icon, "4eee4904", {
+            name: () => {
+              return __props.prefixIcon;
+            },
+            customStyle: () => {
+              return customIconStyle.value;
+            }
+          });
+          _setSharedData(__sharedData, 5, n7?.sharedData);
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 6, _toSharedDataBoolean(__props.mode === "link"));
+        }, () => {
+          const n11 = _createSharedDataComponentWithFallback(_component_up_link, "4eee4d40", {
+            class: () => {
+              return ["up-text__value", [`up-text__value--${__props.type}`, `up-line-${__props.lines}`]];
+            },
+            style: () => {
+              return { fontWeight: valueStyle.value["fontWeight"], wordWrap: valueStyle.value["wordWrap"], fontSize: valueStyle.value["fontSize"] };
+            },
+            text: () => {
+              return value.value;
+            },
+            href: () => {
+              return __props.href;
+            },
+            underLine: ""
+          });
+          _setSharedData(__sharedData, 7, n11?.sharedData);
+        }, () => {
+          return _createSharedDataIf(() => {
+            return _setSharedData(__sharedData, 8, _toSharedDataBoolean(__props.openType != "" && isMp.value));
+          }, () => {
+            const n14 = _createSharedDataComponentWithFallback(_component_button, "e24e08ea", {
+              class: "up-reset-button up-text__value",
+              style: () => {
+                return valueStyle.value;
+              },
+              "data-index": "index",
+              openType: () => {
+                return __props.openType;
+              },
+              onGetuserinfo: () => {
+                return onGetUserInfo;
+              },
+              onContact: () => {
+                return onContact;
+              },
+              onGetphonenumber: () => {
+                return onGetPhoneNumber;
+              },
+              onError: () => {
+                return onError;
+              },
+              onLaunchapp: () => {
+                return onLaunchApp;
+              },
+              onOpensetting: () => {
+                return onOpenSetting;
+              },
+              lang: () => {
+                return __props.lang;
+              },
+              "session-from": () => {
+                return __props.sessionFrom;
+              },
+              "send-message-title": () => {
+                return __props.sendMessageTitle;
+              },
+              "send-message-path": () => {
+                return __props.sendMessagePath;
+              },
+              "send-message-img": () => {
+                return __props.sendMessageImg;
+              },
+              "show-message-card": () => {
+                return __props.showMessageCard;
+              },
+              "app-parameter": () => {
+                return __props.appParameter;
+              }
+            }, {
+              "default": _withSharedDataVaporCtx(() => {
+                _renderSharedDataEffect(() => {
+                  return _setSharedData(__sharedData, 10, _toDisplayString(value.value));
+                });
+              }, "string")
+            });
+            _setSharedData(__sharedData, 9, n14?.sharedData);
+          }, () => {
+            _renderSharedDataEffect(() => {
+              _setSharedDataClass(__sharedData, 11, ["up-text__value", [
+                `up-text__value--${__props.type}`,
+                `up-line-${__props.lines}`
+              ]]);
+              _setSharedDataStyle(__sharedData, 12, valueStyle.value);
+              _setSharedData(__sharedData, 13, _toDisplayString(value.value));
+            });
+          }, 1029);
+        }, 773);
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 14, _toSharedDataBoolean(__props.suffixIcon != ""));
+        }, () => {
+          const n19 = _createSharedDataComponentWithFallback(_component_up_icon, "e24d11da", {
+            name: () => {
+              return __props.suffixIcon;
+            },
+            customStyle: () => {
+              return customIconStyle.value;
+            }
+          });
+          _setSharedData(__sharedData, 15, n19?.sharedData);
+        });
+        _setSharedDataEvent(__sharedData, 16, clickHandler);
+      });
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-text": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "flexWrap": "nowrap", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "width": "100%" } }, "up-text__price": { "": { "fontSize": 14, "color": "#606266" } }, "up-text__value": { "": { "fontSize": 14, "color": "#606266", "textOverflow": "ellipsis", "display": "flex", "flexDirection": "row", "alignItems": "center", "flexWrap": "nowrap" } }, "up-text__value--primary": { "": { "color": "var(--theme-color, #0957de)" } }, "up-text__value--warning": { "": { "color": "#f9ae3d" } }, "up-text__value--success": { "": { "color": "#5ac725" } }, "up-text__value--info": { "": { "color": "#909399" } }, "up-text__value--error": { "": { "color": "#f56c6c" } }, "up-text__value--main": { "": { "color": "#303133" } }, "up-text__value--content": { "": { "color": "#606266" } }, "up-text__value--tips": { "": { "color": "#909193" } }, "up-text__value--light": { "": { "color": "#c0c4cc" } }, "up-text__prefix-icon": { "": { "marginRight": 5 } }, "up-text__suffix-icon": { "": { "marginLeft": 5 } } };
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, resolveComponent: _resolveComponent, createVNode: _createVNode, createBlock: _createBlock, toDisplayString: _toDisplayString } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0$1);
-  const _component_up_link = resolveEasycom(__resolveDynamicComponent("up-link"), __easycom_1);
-  return $props.show ? (_openBlock(), _createElementBlock(
-    "view",
-    {
-      key: 0,
-      class: _normalizeClass(["up-text", [$props.customClass]]),
-      style: _normalizeStyle({
-        margin: $props.margin,
-        justifyContent: $props.align === "left" ? "flex-start" : $props.align === "center" ? "center" : "flex-end"
-      }),
-      onClick: $setup.clickHandler
-    },
-    [
-      $props.mode === "price" ? (_openBlock(), _createElementBlock(
-        "text",
-        {
-          key: 0,
-          class: _normalizeClass(["up-text__price", `up-text__value--${$props.type}`]),
-          style: _normalizeStyle($setup.valueStyle)
-        },
-        "￥",
-        6
-        /* CLASS, STYLE */
-      )) : _createCommentVNode("v-if", true),
-      $props.prefixIcon != "" ? (_openBlock(), _createElementBlock("view", {
-        key: 1,
-        class: "up-text__prefix-icon"
-      }, [
-        _createVNode(_component_up_icon, {
-          name: $props.prefixIcon,
-          customStyle: $setup.customIconStyle
-        }, null, 8, ["name", "customStyle"])
-      ])) : _createCommentVNode("v-if", true),
-      $props.mode === "link" ? (_openBlock(), _createBlock(_component_up_link, {
-        key: 2,
-        class: _normalizeClass(["up-text__value", [`up-text__value--${$props.type}`, `up-line-${$props.lines}`]]),
-        style: _normalizeStyle({ fontWeight: $setup.valueStyle["fontWeight"], wordWrap: $setup.valueStyle["wordWrap"], fontSize: $setup.valueStyle["fontSize"] }),
-        text: $setup.value,
-        href: $props.href,
-        underLine: ""
-      }, null, 8, ["style", "class", "text", "href"])) : $props.openType != "" && $setup.isMp ? (_openBlock(), _createElementBlock("button", {
-        key: 3,
-        class: "up-reset-button up-text__value",
-        style: _normalizeStyle($setup.valueStyle),
-        "data-index": "index",
-        openType: $props.openType,
-        onGetuserinfo: $setup.onGetUserInfo,
-        onContact: $setup.onContact,
-        onGetphonenumber: $setup.onGetPhoneNumber,
-        onError: $setup.onError,
-        onLaunchapp: $setup.onLaunchApp,
-        onOpensetting: $setup.onOpenSetting,
-        lang: $props.lang,
-        "session-from": $props.sessionFrom,
-        "send-message-title": $props.sendMessageTitle,
-        "send-message-path": $props.sendMessagePath,
-        "send-message-img": $props.sendMessageImg,
-        "show-message-card": $props.showMessageCard,
-        "app-parameter": $props.appParameter
-      }, _toDisplayString($setup.value), 45, ["openType", "lang", "session-from", "send-message-title", "send-message-path", "send-message-img", "show-message-card", "app-parameter"])) : (_openBlock(), _createElementBlock(
-        "text",
-        {
-          key: 4,
-          class: _normalizeClass(["up-text__value", [
-            `up-text__value--${$props.type}`,
-            `up-line-${$props.lines}`
-          ]]),
-          style: _normalizeStyle($setup.valueStyle)
-        },
-        _toDisplayString($setup.value),
-        7
-        /* TEXT, CLASS, STYLE */
-      )),
-      $props.suffixIcon != "" ? (_openBlock(), _createElementBlock("view", {
-        key: 5,
-        class: "up-text__suffix-icon"
-      }, [
-        _createVNode(_component_up_icon, {
-          name: $props.suffixIcon,
-          customStyle: $setup.customIconStyle
-        }, null, 8, ["name", "customStyle"])
-      ])) : _createCommentVNode("v-if", true)
-    ],
-    6
-    /* CLASS, STYLE */
-  )) : _createCommentVNode("v-if", true);
-}
-const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-text/up-text.uvue"]]);
+const _style_0 = {};
+const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_0 as _
 };

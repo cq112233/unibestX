@@ -31,41 +31,41 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-const pickerShow1 = ref(false)
-const pickerShow2 = ref(false)
-const pickerShow3 = ref(false)
+const pickerShow1 = ref(false);
+const pickerShow2 = ref(false);
+const pickerShow3 = ref(false);
 
 const columns1 = ref([
-  ['中国', '美国', '日本', '英国'],
-])
+  ['中国', '美国', '日本', '英国']
+]);
 const columns2 = ref([
   ['亚洲', '欧洲'],
-  ['中国', '英国'],
-])
+  ['中国', '英国']
+]);
 
 function showPicker1() {
-  pickerShow1.value = true
+  pickerShow1.value = true;
 }
 function showPicker2() {
-  pickerShow2.value = true
+  pickerShow2.value = true;
 }
 function showPicker3() {
-  pickerShow3.value = true
+  pickerShow3.value = true;
 }
 
 function onConfirm1(e: UTSJSONObject) {
-  console.log('picker 1 confirm', e)
-  pickerShow1.value = false
+  console.log('picker 1 confirm', e);
+  pickerShow1.value = false;
 }
 function onConfirm2(e: UTSJSONObject) {
-  console.log('picker 2 confirm', e)
-  pickerShow2.value = false
+  console.log('picker 2 confirm', e);
+  pickerShow2.value = false;
 }
 function onConfirm3(e: UTSJSONObject) {
-  console.log('picker 3 confirm', e)
-  pickerShow3.value = false
+  console.log('picker 3 confirm', e);
+  pickerShow3.value = false;
 }
 </script>
 

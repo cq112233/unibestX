@@ -1,6 +1,5 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-require("./types.js");
 const src_tabbar_store = require("./store.js");
 const src_utils_i18n = require("../utils/i18n.js");
 if (!Array) {

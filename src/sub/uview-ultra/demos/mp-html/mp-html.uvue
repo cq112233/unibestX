@@ -46,14 +46,14 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
+import { ref } from 'vue';
 
 const content1 = ref(`
   <h2>mp-html 跨端富文本组件</h2>
   <p>这是一个专门为 <b>uni-app X</b> 打造的高性能原生 HTML 解析器组件，支持多种 HTML 5 常见标签与样式。</p>
   <hr />
   <p>支持 <i>斜体</i>、<b>加粗</b>、<u>下划线</u> 以及 <span style="color: #e11d48; font-weight: bold;">自定义颜色文本</span>。</p>
-`)
+`);
 
 const contentTable = ref(`
   <table border="1">
@@ -73,7 +73,7 @@ const contentTable = ref(`
       <td>全端支持</td>
     </tr>
   </table>
-`)
+`);
 
 const contentList = ref(`
   <p><b>框架核心优势：</b></p>
@@ -88,19 +88,19 @@ const contentList = ref(`
     <li>配置 uni_modules 节点</li>
     <li>直接使用 &lt;mp-html :content="html" /&gt;</li>
   </ol>
-`)
+`);
 
 const contentCode = ref(`
   <p>示例代码：</p>
   <pre><code>const html = '&lt;h1&gt;Hello UniAppX&lt;/h1&gt;'
 const node = parse(html)</code></pre>
-`)
+`);
 
 const contentMedia = ref(`
   <p>访问官方链接：<a href="https://uniapp.dcloud.net.cn/">DCloud 官方文档</a></p>
   <p>示例图片展示：</p>
   <img src="/static/logo.png" style="width: 120px; height: 120px;" />
-`)
+`);
 </script>
 
 <style scoped>

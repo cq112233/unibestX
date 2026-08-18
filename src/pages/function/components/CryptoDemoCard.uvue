@@ -180,71 +180,71 @@
 
 <script setup lang="uts">
 // 卡片组件、Vue 响应式 API 与加密工具导入
-import Card from '../../basic/components/Card.uvue'
-import { ref } from 'vue'
-import { aesDecrypt, aesEncrypt, base64Decode, base64Encode, desDecrypt, desEncrypt, generateUUID, hmacSha1, md5, rsaDecrypt, rsaEncrypt, rsaGenerateKeyPair, rsaSign, rsaVerify, sha256 } from '@/uni_modules/unix-crypto'
+import Card from '../../basic/components/Card.uvue';
+import { ref } from 'vue';
+import { aesDecrypt, aesEncrypt, base64Decode, base64Encode, desDecrypt, desEncrypt, generateUUID, hmacSha1, md5, rsaDecrypt, rsaEncrypt, rsaGenerateKeyPair, rsaSign, rsaVerify, sha256 } from '@/uni_modules/unix-crypto';
 
 // ===== 1. Base64 编码 / 解码状态 =====
 // 待编码或解码的文本
-const base64Input = ref('hello uni-app x')
+const base64Input = ref('hello uni-app x');
 // Base64 编码结果
-const base64EncodeResult = ref('')
+const base64EncodeResult = ref('');
 // Base64 解码结果
-const base64DecodeResult = ref('')
+const base64DecodeResult = ref('');
 
 // ===== 2. MD5 / SHA-256 摘要状态 =====
 // 待计算摘要的文本
-const hashInput = ref('hello uni-app x')
+const hashInput = ref('hello uni-app x');
 // MD5 摘要计算结果
-const md5Result = ref('')
+const md5Result = ref('');
 // SHA-256 摘要计算结果
-const sha256Result = ref('')
+const sha256Result = ref('');
 
 // ===== 3. HMAC-SHA1 签名状态 =====
 // 待签名的文本
-const hmacText = ref('hello uni-app x')
+const hmacText = ref('hello uni-app x');
 // 签名密钥（可任意修改）
-const hmacKey = ref('secret-key')
+const hmacKey = ref('secret-key');
 // HMAC-SHA1 签名结果
-const hmacResult = ref('')
+const hmacResult = ref('');
 
 // ===== 4. AES 加密 / 解密状态 =====
 // 待加密的文本
-const aesText = ref('hello uni-app x')
+const aesText = ref('hello uni-app x');
 // AES 密钥（必须 16 位）
-const aesKey = ref('1234567890abcdef')
+const aesKey = ref('1234567890abcdef');
 // AES 加密结果（十六进制字符串）
-const aesEncryptResult = ref('')
+const aesEncryptResult = ref('');
 // AES 解密结果（还原后的明文）
-const aesDecryptResult = ref('')
+const aesDecryptResult = ref('');
 
 // ===== 5. DES 加密 / 解密状态 =====
 // 待加密的文本
-const desText = ref('hello uni-app x')
+const desText = ref('hello uni-app x');
 // DES 密钥（必须 8 位）
-const desKey = ref('12345678')
+const desKey = ref('12345678');
 // DES 加密结果（十六进制字符串）
-const desEncryptResult = ref('')
+const desEncryptResult = ref('');
 // DES 解密结果（还原后的明文）
-const desDecryptResult = ref('')
+const desDecryptResult = ref('');
 
 // ===== 6. RSA 非对称加密状态 =====
 // 待加密 / 签名的文本
-const rsaText = ref('hello uni-app x')
+const rsaText = ref('hello uni-app x');
 // RSA 公钥（SPKI，Base64 格式，示例密钥）
-const rsaPublicKey = ref('MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDLJXnLrDV0RxJWMHlsNc2glZlGd9GsJh6XV9LRsgLSlPYz2xEm751nqG1MLtkX+m/ov7YMNwyhwhw13PFCPfcpm0klWkcKPteEPOXUx3H6mVL2YMNUREtsMxub1zrvo0GNm688Py/8WhXzzxXT/nDe0owpCMmaQWaGP/diX7T7uQIDAQAB')
+const rsaPublicKey = ref('MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDLJXnLrDV0RxJWMHlsNc2glZlGd9GsJh6XV9LRsgLSlPYz2xEm751nqG1MLtkX+m/ov7YMNwyhwhw13PFCPfcpm0klWkcKPteEPOXUx3H6mVL2YMNUREtsMxub1zrvo0GNm688Py/8WhXzzxXT/nDe0owpCMmaQWaGP/diX7T7uQIDAQAB');
 // RSA 私钥（PKCS#8，Base64 格式，示例密钥）
-const rsaPrivateKey = ref('MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAMslecusNXRHElYweWw1zaCVmUZ30awmHpdX0tGyAtKU9jPbESbvnWeobUwu2Rf6b+i/tgw3DKHCHDXc8UI99ymbSSVaRwo+14Q85dTHcfqZUvZgw1RES2wzG5vXOu+jQY2brzw/L/xaFfPPFdP+cN7SjCkIyZpBZoY/92JftPu5AgMBAAECgYEAqjidxPdo1yUSjVwS8oRm6A9SnwSZkZljesdhZMq3qMKfRrZiufCAQbKU2whKatgz26CAp92c3RIs10lqc2o+5oKBOPNnAJXCmnjwNG9tlbKs0SpZjAgKgYv/uHlr2YX10xBQi1C7M2ySdbshj0inyyxzb6ibVJTmpHCFSkW1920CQQD/w6OYh87KOUYjan950HaSnc1g20HtI0rzRALRogGeQpo1qSeShfFGYOM219ee+9zawZLpw0X1W7BnH2vkNOXzAkEAy1VrNa4m0uC6NO+ytTEM6G+/WE8CuInIDvUzypLN8pNhev5/cPVzdZOcVlQLFZiPGe0vdu+hXmFvYYqWiymmowJANGdtea85241opZEIlXj1Eo1qq1HBbEky7i0dNr6u/jI/TodeKFNxYC4x3+bRsy1/zwKii2sLRn6G4lo5zQRZqQJAe8cA34mnOqHw2H6+BAza9bfo/EIEvv+o2Got3/gkBLHxGmVIgSP56C42clrw8HGRU1AOn9FaI1Ee83rhD9AIDwJAFs5T4UMe07NfVUIlN1jxyHvRwyXWjgex+6JbYXmhV9wjQ+taO74aO4cRwKhe0Yi5smGSR7+mzgJhJNdxn+5ntQ==')
+const rsaPrivateKey = ref('MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAMslecusNXRHElYweWw1zaCVmUZ30awmHpdX0tGyAtKU9jPbESbvnWeobUwu2Rf6b+i/tgw3DKHCHDXc8UI99ymbSSVaRwo+14Q85dTHcfqZUvZgw1RES2wzG5vXOu+jQY2brzw/L/xaFfPPFdP+cN7SjCkIyZpBZoY/92JftPu5AgMBAAECgYEAqjidxPdo1yUSjVwS8oRm6A9SnwSZkZljesdhZMq3qMKfRrZiufCAQbKU2whKatgz26CAp92c3RIs10lqc2o+5oKBOPNnAJXCmnjwNG9tlbKs0SpZjAgKgYv/uHlr2YX10xBQi1C7M2ySdbshj0inyyxzb6ibVJTmpHCFSkW1920CQQD/w6OYh87KOUYjan950HaSnc1g20HtI0rzRALRogGeQpo1qSeShfFGYOM219ee+9zawZLpw0X1W7BnH2vkNOXzAkEAy1VrNa4m0uC6NO+ytTEM6G+/WE8CuInIDvUzypLN8pNhev5/cPVzdZOcVlQLFZiPGe0vdu+hXmFvYYqWiymmowJANGdtea85241opZEIlXj1Eo1qq1HBbEky7i0dNr6u/jI/TodeKFNxYC4x3+bRsy1/zwKii2sLRn6G4lo5zQRZqQJAe8cA34mnOqHw2H6+BAza9bfo/EIEvv+o2Got3/gkBLHxGmVIgSP56C42clrw8HGRU1AOn9FaI1Ee83rhD9AIDwJAFs5T4UMe07NfVUIlN1jxyHvRwyXWjgex+6JbYXmhV9wjQ+taO74aO4cRwKhe0Yi5smGSR7+mzgJhJNdxn+5ntQ==');
 // RSA 密钥对生成结果
-const rsaKeyPairResult = ref('')
+const rsaKeyPairResult = ref('');
 // RSA 加密结果（十六进制字符串）
-const rsaEncryptResult = ref('')
+const rsaEncryptResult = ref('');
 // RSA 解密结果（还原后的明文）
-const rsaDecryptResult = ref('')
+const rsaDecryptResult = ref('');
 // RSA 签名结果（十六进制字符串）
-const rsaSignResult = ref('')
+const rsaSignResult = ref('');
 // RSA 验签结果
-const rsaVerifyResult = ref('')
+const rsaVerifyResult = ref('');
 
 /**
  * 统一提取 Promise 错误信息，方便界面直接展示
@@ -253,180 +253,180 @@ const rsaVerifyResult = ref('')
  */
 function errorMessage(e: any): string {
   if (e instanceof Error) {
-    return e.message
+    return e.message;
   }
-  return JSON.stringify(e)
+  return JSON.stringify(e);
 }
 
 /** Base64 编码：对输入文本执行编码，并清空上一次的解码结果 */
 async function handleBase64Encode() {
   try {
-    base64EncodeResult.value = await base64Encode(base64Input.value)
-    base64DecodeResult.value = ''
+    base64EncodeResult.value = await base64Encode(base64Input.value);
+    base64DecodeResult.value = '';
   }
   catch (e: any) {
-    base64EncodeResult.value = errorMessage(e)
+    base64EncodeResult.value = errorMessage(e);
   }
 }
 
 /** Base64 解码：优先解码上一步的编码结果，若无则解码输入框文本 */
 async function handleBase64Decode() {
   try {
-    const target = base64EncodeResult.value.length > 0 ? base64EncodeResult.value : base64Input.value
-    base64DecodeResult.value = await base64Decode(target)
+    const target = base64EncodeResult.value.length > 0 ? base64EncodeResult.value : base64Input.value;
+    base64DecodeResult.value = await base64Decode(target);
   }
   catch (e: any) {
-    base64DecodeResult.value = errorMessage(e)
+    base64DecodeResult.value = errorMessage(e);
   }
 }
 
 /** 计算输入文本的 MD5 摘要 */
 async function handleMd5() {
   try {
-    md5Result.value = await md5(hashInput.value)
+    md5Result.value = await md5(hashInput.value);
   }
   catch (e: any) {
-    md5Result.value = errorMessage(e)
+    md5Result.value = errorMessage(e);
   }
 }
 
 /** 计算输入文本的 SHA-256 摘要 */
 async function handleSha256() {
   try {
-    sha256Result.value = await sha256(hashInput.value)
+    sha256Result.value = await sha256(hashInput.value);
   }
   catch (e: any) {
-    sha256Result.value = errorMessage(e)
+    sha256Result.value = errorMessage(e);
   }
 }
 
 /** 使用密钥对文本计算 HMAC-SHA1 签名 */
 async function handleHmac() {
   try {
-    hmacResult.value = await hmacSha1(hmacText.value, hmacKey.value)
+    hmacResult.value = await hmacSha1(hmacText.value, hmacKey.value);
   }
   catch (e: any) {
-    hmacResult.value = errorMessage(e)
+    hmacResult.value = errorMessage(e);
   }
 }
 
 /** AES 加密：对输入文本使用密钥加密，并清空上一次的解密结果 */
 async function handleAesEncrypt() {
   try {
-    aesEncryptResult.value = await aesEncrypt(aesText.value, aesKey.value)
-    aesDecryptResult.value = ''
+    aesEncryptResult.value = await aesEncrypt(aesText.value, aesKey.value);
+    aesDecryptResult.value = '';
   }
   catch (e: any) {
-    aesEncryptResult.value = errorMessage(e)
+    aesEncryptResult.value = errorMessage(e);
   }
 }
 
 /** AES 解密：使用密钥解密上一步的加密结果 */
 async function handleAesDecrypt() {
   try {
-    aesDecryptResult.value = await aesDecrypt(aesEncryptResult.value, aesKey.value)
+    aesDecryptResult.value = await aesDecrypt(aesEncryptResult.value, aesKey.value);
   }
   catch (e: any) {
-    aesDecryptResult.value = errorMessage(e)
+    aesDecryptResult.value = errorMessage(e);
   }
 }
 
 /** DES 加密：对输入文本使用密钥加密，并清空上一次的解密结果 */
 async function handleDesEncrypt() {
   try {
-    desEncryptResult.value = await desEncrypt(desText.value, desKey.value)
-    desDecryptResult.value = ''
+    desEncryptResult.value = await desEncrypt(desText.value, desKey.value);
+    desDecryptResult.value = '';
   }
   catch (e: any) {
-    desEncryptResult.value = errorMessage(e)
+    desEncryptResult.value = errorMessage(e);
   }
 }
 
 /** DES 解密：使用密钥解密上一步的加密结果 */
 async function handleDesDecrypt() {
   try {
-    desDecryptResult.value = await desDecrypt(desEncryptResult.value, desKey.value)
+    desDecryptResult.value = await desDecrypt(desEncryptResult.value, desKey.value);
   }
   catch (e: any) {
-    desDecryptResult.value = errorMessage(e)
+    desDecryptResult.value = errorMessage(e);
   }
 }
 
 /** 生成 RSA 密钥对并自动填入输入框 */
 async function handleRsaGenerateKeyPair() {
   try {
-    const jsonStr = await rsaGenerateKeyPair(1024)
-    rsaKeyPairResult.value = jsonStr
+    const jsonStr = await rsaGenerateKeyPair(1024);
+    rsaKeyPairResult.value = jsonStr;
     try {
       /* eslint-disable dot-notation */
-      const keyData = JSON.parse(jsonStr) as UTSJSONObject
-      const pub = (keyData['publicKey'] ?? '') as string
+      const keyData = JSON.parse(jsonStr) as UTSJSONObject;
+      const pub = (keyData['publicKey'] ?? '') as string;
       if (pub.length > 0) {
-        rsaPublicKey.value = pub
+        rsaPublicKey.value = pub;
       }
-      const pri = (keyData['privateKey'] ?? '') as string
+      const pri = (keyData['privateKey'] ?? '') as string;
       if (pri.length > 0) {
-        rsaPrivateKey.value = pri
+        rsaPrivateKey.value = pri;
       }
       /* eslint-enable dot-notation */
     }
     catch (err: any) {
-      console.error('Failed to parse RSA keypair:', err)
+      console.error('Failed to parse RSA keypair:', err);
     }
   }
   catch (e: any) {
-    rsaKeyPairResult.value = errorMessage(e)
+    rsaKeyPairResult.value = errorMessage(e);
   }
 }
 
 /** RSA 公钥加密：对输入文本使用公钥加密，并清空上一次的解密结果 */
 async function handleRsaEncrypt() {
   try {
-    rsaEncryptResult.value = await rsaEncrypt(rsaText.value, rsaPublicKey.value)
-    rsaDecryptResult.value = ''
+    rsaEncryptResult.value = await rsaEncrypt(rsaText.value, rsaPublicKey.value);
+    rsaDecryptResult.value = '';
   }
   catch (e: any) {
-    rsaEncryptResult.value = errorMessage(e)
+    rsaEncryptResult.value = errorMessage(e);
   }
 }
 
 /** RSA 私钥解密：使用私钥解密上一步的加密结果 */
 async function handleRsaDecrypt() {
   try {
-    rsaDecryptResult.value = await rsaDecrypt(rsaEncryptResult.value, rsaPrivateKey.value)
+    rsaDecryptResult.value = await rsaDecrypt(rsaEncryptResult.value, rsaPrivateKey.value);
   }
   catch (e: any) {
-    rsaDecryptResult.value = errorMessage(e)
+    rsaDecryptResult.value = errorMessage(e);
   }
 }
 
 /** RSA SHA-256 签名：使用私钥对输入文本签名 */
 async function handleRsaSign() {
   try {
-    rsaSignResult.value = await rsaSign(rsaText.value, rsaPrivateKey.value, 'SHA-256')
-    rsaVerifyResult.value = ''
+    rsaSignResult.value = await rsaSign(rsaText.value, rsaPrivateKey.value, 'SHA-256');
+    rsaVerifyResult.value = '';
   }
   catch (e: any) {
-    rsaSignResult.value = errorMessage(e)
+    rsaSignResult.value = errorMessage(e);
   }
 }
 
 /** RSA 验签：使用公钥验证上一步的签名 */
 async function handleRsaVerify() {
   try {
-    const ok = await rsaVerify(rsaText.value, rsaPublicKey.value, rsaSignResult.value, 'SHA-256')
-    rsaVerifyResult.value = ok ? '通过 (true)' : '未通过 (false)'
+    const ok = await rsaVerify(rsaText.value, rsaPublicKey.value, rsaSignResult.value, 'SHA-256');
+    rsaVerifyResult.value = ok ? '通过 (true)' : '未通过 (false)';
   }
   catch (e: any) {
-    rsaVerifyResult.value = errorMessage(e)
+    rsaVerifyResult.value = errorMessage(e);
   }
 }
 
 // ===== 7. UUID 生成状态与方法 =====
-const uuidResult = ref('')
+const uuidResult = ref('');
 
 function handleGenerateUUID() {
-  uuidResult.value = generateUUID()
+  uuidResult.value = generateUUID();
 }
 </script>
 

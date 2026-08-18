@@ -2,12 +2,18 @@ import "./sticky.js";
 import { g as getPx, d as deepMerge, b as addStyle, j as guid } from "../../libs/function/index.js";
 import { z as zIndexConfig } from "../../libs/config/zIndex.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataSlot: _createSharedDataSlot } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpStickyUpSticky";
 const { computed, ref, watch, onMounted, getCurrentInstance } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-sticky"
   },
+  __dynamicSharedData: true,
+  __hash: "6eab6503",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-sticky/up-sticky.uvue",
   __name: "up-sticky",
   props: {
     offsetTop: {
@@ -45,13 +51,13 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       }
     }
   },
-  setup(__props, _a) {
-    var __expose = _a.expose;
-    __expose();
+  setup(__props) {
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpStickyUpStickySharedData", sharedDataClassId: 0 })));
     const props = __props;
     const instance = getCurrentInstance();
     const uZindex = computed(() => {
-      var _a2;
+      var _a;
       const zVal = props.zIndex;
       if (zVal != null && zVal.toString() != "") {
         const parsed = parseInt(zVal.toString());
@@ -59,9 +65,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
           return parsed;
         }
       }
-      return (_a2 = zIndexConfig["sticky"]) !== null && _a2 !== void 0 ? _a2 : 999;
+      return (_a = zIndexConfig["sticky"]) !== null && _a !== void 0 ? _a : 999;
     });
-    const webMpStyle = computed(() => {
+    computed(() => {
       const style = new UTSJSONObject({});
       if (!props.disabled) {
         style["position"] = "sticky";
@@ -145,7 +151,7 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     }
     function init() {
       getRect().then((res) => {
-        var _a2;
+        var _a;
         if (res.height != null && res.height > 0) {
           height.value = res.height;
         }
@@ -155,7 +161,7 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
         if (res.width != null && res.width > 0) {
           width.value = res.width;
         }
-        const currentTop = (_a2 = res.top) !== null && _a2 !== void 0 ? _a2 : 0;
+        const currentTop = (_a = res.top) !== null && _a !== void 0 ? _a : 0;
         const st = parseFloat(props.scrollTop.toString());
         initialTop.value = currentTop + st;
         isInit.value = true;
@@ -173,34 +179,20 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     onMounted(() => {
       init();
     });
-    const __returned__ = { props, instance, uZindex, webMpStyle, elId, isFixed, initialTop, height, left, width, isInit, stickyTop, wrapperStyle, contentStyle, getRect, checkFixed, init };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      _renderSharedDataEffect(() => {
+        _setSharedDataAttr(__sharedData, 0, _toSharedDataString(elId.value));
+        _setSharedDataStyle(__sharedData, 1, wrapperStyle.value);
+        _setSharedDataStyle(__sharedData, 2, contentStyle.value);
+      });
+      _createSharedDataSlot("default", null, null);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "up-sticky": { "": { "width": "100%", "boxSizing": "border-box" } }, "up-sticky__content": { "": { "boxSizing": "border-box" } } };
-const { renderSlot: _renderSlot, normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode, openBlock: _openBlock, createElementBlock: _createElementBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return _openBlock(), _createElementBlock("view", {
-    class: "up-sticky",
-    id: $setup.elId,
-    style: _normalizeStyle($setup.wrapperStyle)
-  }, [
-    _createElementVNode(
-      "view",
-      {
-        class: "up-sticky__content",
-        style: _normalizeStyle($setup.contentStyle)
-      },
-      [
-        _renderSlot(_ctx.$slots, "default")
-      ],
-      4
-      /* STYLE */
-    )
-  ], 12, ["id"]);
-}
-const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-sticky/up-sticky.uvue"]]);
+const _style_0 = {};
+const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_2 as _
 };

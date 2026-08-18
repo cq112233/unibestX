@@ -1,27 +1,6 @@
 import { u as useTokenStore } from "../store/token.js";
 import { i as isPageTabbar, a as setCurIdxByPath } from "../tabbar/store.js";
 import { L as LOGIN_PAGE, i as isNeedLoginMode, E as EXCLUDE_LOGIN_PATH_LIST } from "./config.js";
-class UrlObj extends UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          path: { type: String, optional: false },
-          query: { type: "Unknown", optional: false }
-        };
-      },
-      name: "UrlObj"
-    };
-  }
-  constructor(options, metadata = UrlObj.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.path = this.__props__.path;
-    this.query = this.__props__.query;
-    delete this.__props__;
-  }
-}
 function parseUrlToObj(url) {
   var _a;
   const parts = url.split("?");
@@ -35,7 +14,7 @@ function parseUrlToObj(url) {
       if (pair.length > 1) {
         const key = pair[0];
         let value = pair[1];
-        if (value.indexOf("%") >= 0) {
+        if (value.includes("%")) {
           value = (_a = decodeURIComponent(value)) !== null && _a !== void 0 ? _a : "";
         }
         query.set(key, value);
@@ -44,17 +23,17 @@ function parseUrlToObj(url) {
       }
     }
   }
-  return new UrlObj({ path, query });
+  return { path, query };
 }
 function judgeIsExcludePath(path) {
   let normalizedPath = path;
   if (normalizedPath.startsWith("src/")) {
-    normalizedPath = "/" + normalizedPath;
+    normalizedPath = `/${normalizedPath}`;
   }
-  return EXCLUDE_LOGIN_PATH_LIST.indexOf(normalizedPath) >= 0;
+  return EXCLUDE_LOGIN_PATH_LIST.includes(normalizedPath);
 }
 function doIntercept(url) {
-  uni.__f__("log", "at src/router/interceptor.uts:72", "doIntercept url:", url);
+  uni.__f__("log", "at src/router/interceptor.uts:70", "doIntercept url:", url);
   if (url == null || url == "") {
     return true;
   }
@@ -62,7 +41,7 @@ function doIntercept(url) {
   let path = urlObj.path;
   const query = urlObj.query;
   if (path.startsWith("src/")) {
-    path = "/" + path;
+    path = `/${path}`;
   }
   if (!path.startsWith("/") && !path.startsWith("plugin://") && !path.startsWith("http://") && !path.startsWith("https://")) {
     const pages = getCurrentPages();
@@ -72,10 +51,10 @@ function doIntercept(url) {
     }
     let normalizedCurrentPath = currentPath;
     if (normalizedCurrentPath.startsWith("src/")) {
-      normalizedCurrentPath = "/" + normalizedCurrentPath;
+      normalizedCurrentPath = `/${normalizedCurrentPath}`;
     }
     if (!normalizedCurrentPath.startsWith("/")) {
-      normalizedCurrentPath = "/" + normalizedCurrentPath;
+      normalizedCurrentPath = `/${normalizedCurrentPath}`;
     }
     const lastSlashIdx = normalizedCurrentPath.lastIndexOf("/");
     let baseDir = "";
@@ -85,12 +64,12 @@ function doIntercept(url) {
     path = `${baseDir}/${path}`;
   }
   if (path.startsWith("src/")) {
-    path = "/" + path;
+    path = `/${path}`;
   }
-  uni.__f__("log", "at src/router/interceptor.uts:113", "doIntercept normalized path:", path);
+  uni.__f__("log", "at src/router/interceptor.uts:111", "doIntercept normalized path:", path);
   const tokenStore = useTokenStore();
   const hasLogin = tokenStore.hasValidLogin();
-  uni.__f__("log", "at src/router/interceptor.uts:118", "doIntercept login status - hasLogin:", hasLogin);
+  uni.__f__("log", "at src/router/interceptor.uts:116", "doIntercept login status - hasLogin:", hasLogin);
   if (hasLogin) {
     if (path !== LOGIN_PAGE) {
       return true;
@@ -122,13 +101,13 @@ function doIntercept(url) {
       if (path === LOGIN_PAGE) {
         return true;
       }
-      uni.__f__("log", "at src/router/interceptor.uts:158", "doIntercept: redirecting to login page", redirectUrl);
+      uni.__f__("log", "at src/router/interceptor.uts:159", "doIntercept: redirecting to login page", redirectUrl);
       uni.navigateTo({ url: redirectUrl });
       return false;
     }
   } else {
     if (judgeIsExcludePath(path)) {
-      uni.__f__("log", "at src/router/interceptor.uts:166", "doIntercept: blacklisted path, redirecting to login page", redirectUrl);
+      uni.__f__("log", "at src/router/interceptor.uts:167", "doIntercept: blacklisted path, redirecting to login page", redirectUrl);
       uni.navigateTo({ url: redirectUrl });
       return false;
     }
@@ -136,7 +115,7 @@ function doIntercept(url) {
   }
 }
 const navigateToInterceptor = new UTSJSONObject({
-  invoke: function(options = null) {
+  invoke(options = null) {
     let url = "";
     if (options != null) {
       const opt = options;
@@ -146,7 +125,7 @@ const navigateToInterceptor = new UTSJSONObject({
   }
 });
 const redirectToInterceptor = new UTSJSONObject({
-  invoke: function(options = null) {
+  invoke(options = null) {
     let url = "";
     if (options != null) {
       const opt = options;
@@ -156,7 +135,7 @@ const redirectToInterceptor = new UTSJSONObject({
   }
 });
 const reLaunchInterceptor = new UTSJSONObject({
-  invoke: function(options = null) {
+  invoke(options = null) {
     let url = "";
     if (options != null) {
       const opt = options;
@@ -165,49 +144,29 @@ const reLaunchInterceptor = new UTSJSONObject({
     return doIntercept(url);
   }
 });
-const switchTabInterceptor = new UTSJSONObject(
-  {
-    invoke: function(options = null) {
-      let url = "";
-      if (options != null) {
-        const opt = options;
-        url = opt.url;
-      }
-      return doIntercept(url);
+const switchTabInterceptor = new UTSJSONObject({
+  invoke(options = null) {
+    let url = "";
+    if (options != null) {
+      const opt = options;
+      url = opt.url;
     }
+    return doIntercept(url);
   }
-  /**
-   * 地图选点调用拦截器（默认直接放行）
-   */
-);
-const chooseLocationInterceptor = new UTSJSONObject(
-  {
-    invoke: function(options = null) {
-      return true;
-    }
+});
+const chooseLocationInterceptor = new UTSJSONObject({
+  invoke(options = null) {
+    return true;
   }
-  /**
-   * 全局路由拦截安装器
-   */
-);
-const installRouteInterceptor = () => {
+});
+function installRouteInterceptor() {
   uni.addInterceptor("navigateTo", navigateToInterceptor);
   uni.addInterceptor("reLaunch", reLaunchInterceptor);
   uni.addInterceptor("redirectTo", redirectToInterceptor);
   uni.addInterceptor("switchTab", switchTabInterceptor);
   uni.addInterceptor("chooseLocation", chooseLocationInterceptor);
-};
-function checkDirectEntry(options = null) {
-  if (options != null) {
-    const pathVal = options["path"];
-    if (pathVal != null && pathVal != "") {
-      let url = `/${pathVal}`;
-      navigateToInterceptor.invoke({ url });
-    }
-  }
 }
 export {
-  checkDirectEntry as c,
   installRouteInterceptor as i
 };
 //# sourceMappingURL=interceptor.js.map

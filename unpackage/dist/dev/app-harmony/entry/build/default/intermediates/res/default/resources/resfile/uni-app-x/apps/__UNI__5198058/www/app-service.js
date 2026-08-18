@@ -10,13 +10,10 @@ import "./assets/uni_modules/x-pinia-s/instans/subscriptions.js";
 import "./assets/uni_modules/x-pinia-s/instans/createPinia.js";
 import "./assets/uni_modules/x-pinia-s/instans/rootState.js";
 import "./assets/uni_modules/x-pinia-s/instans/persist.js";
-import "./assets/src/store/token.js";
+import "./assets/src/store/app.js";
 import "./assets/uni_modules/x-pinia-s/instans/storeBase.js";
 import "./assets/uni_modules/x-pinia-s/instans/defineStore.js";
-import "./assets/src/store/user.js";
-import "./assets/src/store/app.js";
 import "./assets/src/tabbar/store.js";
-import "./assets/src/tabbar/types.js";
 import "./assets/src/tabbar/config.js";
 import "./assets/uni_modules/uview-ultra/libs/i18n/index.js";
 import "./assets/uni_modules/uview-ultra/libs/i18n/locales/zh-Hans.js";
@@ -44,6 +41,7 @@ import "./assets/uni_modules/uview-ultra/libs/function/index.js";
 import "./assets/uni_modules/uview-ultra/libs/function/digit.js";
 import "./assets/uni_modules/uview-ultra/libs/config/config.js";
 import "./assets/uni_modules/uview-ultra/libs/config/color.js";
+import "./assets/src/store/token.js";
 import "./assets/src/router/config.js";
 function currentPageCaptureScreenshot(fullPage, callback) {
   var _a;
@@ -583,7 +581,7 @@ const UNI_CONSOLE_RUNTIME_PROMISE = "__uni_console_runtime_promise__";
 function initRuntimeSocketService() {
   const hosts = "127.0.0.1,192.168.100.133,198.18.0.1";
   const port = "8090";
-  const id = "app-harmony_0rsTL9";
+  const id = "app-harmony_GOvify";
   const runtimeGlobal = getRuntimeGlobal();
   const existingPromise = runtimeGlobal === null || runtimeGlobal === void 0 ? void 0 : runtimeGlobal[UNI_CONSOLE_RUNTIME_PROMISE];
   if (existingPromise) {
@@ -683,7 +681,6 @@ function getMiniProgramGlobal() {
   }
 }
 initRuntimeSocketService();
-enableStyleIsolation();
 const __global__ = typeof globalThis === "undefined" ? Function("return this")() : globalThis;
 __global__.__uniX = true;
 const { createSSRApp } = globalThis.Vue;

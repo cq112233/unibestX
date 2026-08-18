@@ -411,17 +411,17 @@
 </template>
 
 <script setup lang="uts">
-import { computed } from 'vue'
-import { useAppStore } from '@/src/store/index.uts'
+import { computed } from 'vue';
+import { useAppStore } from '@/src/store/index.uts';
 
-const appStore = useAppStore()
-const themeColor = computed<string>(() => appStore.state.theme)
-const demoCount: number = 73
+const appStore = useAppStore();
+const themeColor = computed<string>(() => appStore.state.theme);
+const demoCount: number = 73;
 
 function goToDemo(page: string): void {
   uni.navigateTo({
-    url: `/src/sub/uview-ultra/demos/${page}/${page}`,
-  })
+    url: `/src/sub/uview-ultra/demos/${page}/${page}`
+  });
 }
 </script>
 

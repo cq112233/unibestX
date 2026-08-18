@@ -1,70 +1,70 @@
 <script setup lang="uts">
-import type { CustomTabBarItem } from './types'
-import { curIdx, themeColor } from './store'
-import { $t } from '@/src/utils/i18n'
+import type { CustomTabBarItem } from './types';
+import { curIdx, themeColor } from './store';
+import { $t } from '@/src/utils/i18n';
 
 const props = defineProps({
   item: {
     type: Object,
-    required: true,
+    required: true
   },
   index: {
     type: Number,
-    required: true,
+    required: true
   },
   isBulge: {
     type: Boolean,
-    default: false,
-  },
-})
+    default: false
+  }
+});
 
-const inactiveColor = '#999999'
+const inactiveColor = '#999999';
 
 // 将 props.item 转换为强类型的 CustomTabBarItem
 const tabbarItem = computed((): CustomTabBarItem => {
-  return props.item as CustomTabBarItem
-})
+  return props.item as CustomTabBarItem;
+});
 
 /** 根据选中状态返回对应图标 */
 function getIcon(): string {
   if (curIdx.value == props.index && tabbarItem.value.iconActive.length > 0) {
-    return tabbarItem.value.iconActive
+    return tabbarItem.value.iconActive;
   }
-  return tabbarItem.value.icon
+  return tabbarItem.value.icon;
 }
 
 /** 获取当前文字和图标的颜色 */
 function getActiveColor(): string {
-  return curIdx.value == props.index ? themeColor.value : inactiveColor
+  return curIdx.value == props.index ? themeColor.value : inactiveColor;
 }
 
 /** 是否显示小红点 */
 function isDotBadge(): boolean {
-  return tabbarItem.value.badge != null && tabbarItem.value.badge == 'dot'
+  return tabbarItem.value.badge != null && tabbarItem.value.badge == 'dot';
 }
 
 /** 是否显示数字角标 */
 function isNumberBadge(): boolean {
-  return tabbarItem.value.badge != null && tabbarItem.value.badge != 'dot'
+  return tabbarItem.value.badge != null && tabbarItem.value.badge != 'dot';
 }
 
 /** 获取角标文本 */
 function getBadgeText(): string {
-  const badge = tabbarItem.value.badge
+  const badge = tabbarItem.value.badge;
   if (badge == null || badge == 'dot')
-    return ''
+    return '';
   if (typeof badge == 'number') {
-    const num = badge as number
+    const num = badge as number;
     if (num > 99)
-      return '99+'
-    return `${num}`
+      return '99+';
+    return `${num}`;
   }
-  return `${badge}`
+  return `${badge}`;
 }
 
 /** 获取 TabBar 项文本（含多语言翻译） */
 function getText(): string {
-  return $t(tabbarItem.value.text)
+  return $t(tabbarItem.value.text);
 }
 </script>
 

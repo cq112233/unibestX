@@ -75,71 +75,71 @@
 
 <script setup lang="uts">
 /* eslint-disable ts/consistent-type-definitions */
-import { ref } from 'vue'
-import Card from '../../basic/components/Card.uvue'
+import { ref } from 'vue';
+import Card from '../../basic/components/Card.uvue';
 
 type CompactArticleItem = {
-  id: number
-  title: string
-  summary: string
-  tag: string
-  tagBgColor: string
-  tagColor: string
-}
+  id: number;
+  title: string;
+  summary: string;
+  tag: string;
+  tagBgColor: string;
+  tagColor: string;
+};
 
-const shouldFail = ref<boolean>(false)
+const shouldFail = ref<boolean>(false);
 
-const tabList = ['全部', '技术', '设计']
-const tabIndex = ref<number>(0)
+const tabList = ['全部', '技术', '设计'];
+const tabIndex = ref<number>(0);
 
-const pagingX = ref<ComponentPublicInstance | null>(null)
-const dataList = ref<CompactArticleItem[]>([])
+const pagingX = ref<ComponentPublicInstance | null>(null);
+const dataList = ref<CompactArticleItem[]>([]);
 
 function onUpdateModelValue(val: any[]) {
-  dataList.value = val as CompactArticleItem[]
+  dataList.value = val as CompactArticleItem[];
 }
 
 function tabChange(index: number) {
-  tabIndex.value = index
+  tabIndex.value = index;
   if (pagingX.value != null) {
-    pagingX.value!.$callMethod('reload')
+    pagingX.value!.$callMethod('reload');
   }
 }
 
 function triggerError() {
-  shouldFail.value = true
+  shouldFail.value = true;
   if (pagingX.value != null) {
-    pagingX.value!.$callMethod('reload')
+    pagingX.value!.$callMethod('reload');
   }
 }
 
 function triggerClear() {
-  dataList.value = []
+  dataList.value = [];
   if (pagingX.value != null) {
-    pagingX.value!.$callMethod('complete', [] as CompactArticleItem[])
+    pagingX.value!.$callMethod('complete', [] as CompactArticleItem[]);
   }
 }
 
 function getMockArticles(category: string, pageNo: number, pageSize: number): CompactArticleItem[] {
-  const list = [] as CompactArticleItem[]
-  const start = (pageNo - 1) * pageSize
+  const list = [] as CompactArticleItem[];
+  const start = (pageNo - 1) * pageSize;
 
   for (let i = 0; i < pageSize; i++) {
-    const itemId = start + i + 1
+    const itemId = start + i + 1;
     if (itemId > 12) {
-      break
+      break;
     }
 
-    let tag = category
+    let tag = category;
     if (category == '全部') {
-      tag = itemId % 2 == 0 ? '技术' : '设计'
+      tag = itemId % 2 == 0 ? '技术' : '设计';
     }
 
-    let tagBgColor = '#e0f2fe'
-    let tagColor = '#0284c7'
+    let tagBgColor = '#e0f2fe';
+    let tagColor = '#0284c7';
     if (tag == '设计') {
-      tagBgColor = '#f3e8ff'
-      tagColor = '#7c3aed'
+      tagBgColor = '#f3e8ff';
+      tagColor = '#7c3aed';
     }
 
     list.push({
@@ -148,29 +148,29 @@ function getMockArticles(category: string, pageNo: number, pageSize: number): Co
       summary: `卡片演示中的 ${tag} 文章，支持局部滚动加载数据。`,
       tag,
       tagBgColor,
-      tagColor,
-    } as CompactArticleItem)
+      tagColor
+    } as CompactArticleItem);
   }
-  return list
+  return list;
 }
 
 function onQuery(pageNo: number, pageSize: number) {
-  const currentCategory = tabList[tabIndex.value]
+  const currentCategory = tabList[tabIndex.value];
 
   setTimeout(() => {
     if (shouldFail.value) {
-      shouldFail.value = false
+      shouldFail.value = false;
       if (pagingX.value != null) {
-        pagingX.value!.$callMethod('completeByError')
+        pagingX.value!.$callMethod('completeByError');
       }
-      return
+      return;
     }
 
-    const data = getMockArticles(currentCategory, pageNo, pageSize)
+    const data = getMockArticles(currentCategory, pageNo, pageSize);
     if (pagingX.value != null) {
-      pagingX.value!.$callMethod('complete', data)
+      pagingX.value!.$callMethod('complete', data);
     }
-  }, 600)
+  }, 600);
 }
 </script>
 

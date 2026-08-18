@@ -1,98 +1,74 @@
 import { _ as __easycom_1 } from "../../../../uni_modules/uni-icons/components/uni-icons/uni-icons.js";
-import { r as resolveEasycom } from "../../../../App.ku.js";
 import { _ as __easycom_1$1 } from "../../../../uni_modules/lime-icon/components/l-icon/l-icon.js";
 import { _ as __easycom_0 } from "../../../../uni_modules/uview-ultra/components/up-icon/up-icon.js";
 import { C as Card } from "./Card.js";
 import { $ as $t } from "../../../utils/i18n.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
+const __className = "GenSrcPagesBasicComponentsIconDemoCard";
 const { computed } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  __dynamicSharedData: true,
+  __hash: "076cbc24",
+  __className,
+  __filename: "src/pages/basic/components/IconDemoCard.uvue",
   __name: "IconDemoCard",
-  setup(__props, _a) {
-    var __expose = _a.expose;
-    __expose();
+  setup(__props) {
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenSrcPagesBasicComponentsIconDemoCardSharedData", sharedDataClassId: 0 })));
     const iconDemoTitle = computed(() => {
       return $t("basic.iconDemoTitle");
     });
     const svgAuthWarning = computed(() => {
       return $t("basic.svgAuthWarning");
     });
-    const __returned__ = { iconDemoTitle, svgAuthWarning, get Card() {
-      return Card;
-    } };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _component_uni_icons = __easycom_1;
+      const _component_l_icon = __easycom_1$1;
+      const _component_up_icon = __easycom_0;
+      const n24 = _createSharedDataComponent(
+        Card,
+        "ef38193e",
+        { title: () => {
+          return iconDemoTitle.value;
+        } },
+        {
+          "default": _withSharedDataVaporCtx(() => {
+            const n3 = _createSharedDataComponentWithFallback(_component_uni_icons, "f7cb04ac", {
+              type: "contact",
+              size: "26",
+              style: "color: #3b82f6; margin-right: 8px;"
+            });
+            _setSharedData(__sharedData, 1, n3?.sharedData);
+            _renderSharedDataEffect(() => {
+              return _setSharedData(__sharedData, 4, _toDisplayString(svgAuthWarning.value));
+            });
+            const n13 = _createSharedDataComponentWithFallback(_component_l_icon, "0198763c", {
+              name: "circle",
+              size: "24",
+              style: "color: #10b981; margin-right: 8px;"
+            });
+            _setSharedData(__sharedData, 2, n13?.sharedData);
+            const n20 = _createSharedDataComponentWithFallback(_component_up_icon, "019848fc", {
+              name: "setting",
+              size: "24",
+              style: "color: #a855f7; margin-right: 8px;"
+            });
+            _setSharedData(__sharedData, 3, n20?.sharedData);
+          })
+        },
+        1
+        /* SINGLE_ROOT */
+      );
+      _setSharedData(__sharedData, 0, n24.sharedData);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "bg-__10b981_": { "": { "backgroundImage": "none", "backgroundColor": "#10b981" } }, "bg-__3b82f6_": { "": { "backgroundImage": "none", "backgroundColor": "#3b82f6" } }, "bg-__a855f7_": { "": { "backgroundImage": "none", "backgroundColor": "#a855f7" } }, "bg-__fff1f2_": { "": { "backgroundImage": "none", "backgroundColor": "#fff1f2" } }, "border-bottom-color-__f1f5f9_": { "": { "borderBottomColor": "#f1f5f9" } }, "border-bottom-style-solid": { "": { "borderBottomStyle": "solid" } }, "border-bottom-width-1px": { "": { "borderBottomWidth": 1 } }, "border-color-__ffe4e6_": { "": { "borderTopColor": "#ffe4e6", "borderRightColor": "#ffe4e6", "borderBottomColor": "#ffe4e6", "borderLeftColor": "#ffe4e6" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-top-color-__f1f5f9_": { "": { "borderTopColor": "#f1f5f9" } }, "border-top-style-solid": { "": { "borderTopStyle": "solid" } }, "border-top-width-1px": { "": { "borderTopWidth": 1 } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex-col": { "": { "flexDirection": "column" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-medium": { "": { "fontWeight": 500 } }, "h-6px": { "": { "height": 6 } }, "items-center": { "": { "alignItems": "center" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "mr-8px": { "": { "marginRight": 8 } }, "mt-4px": { "": { "marginTop": 4 } }, "px-6px": { "": { "paddingLeft": 6, "paddingRight": 6 } }, "py-12px": { "": { "paddingTop": 12, "paddingBottom": 12 } }, "py-2px": { "": { "paddingTop": 2, "paddingBottom": 2 } }, "rounded-3px": { "": { "borderTopLeftRadius": 3, "borderTopRightRadius": 3, "borderBottomRightRadius": 3, "borderBottomLeftRadius": 3 } }, "rounded-4px": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "self-start": { "": { "alignSelf": "flex-start" } }, "text-__475569_": { "": { "color": "#475569" } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-__f43f5e_": { "": { "color": "#f43f5e" } }, "text-10px": { "": { "fontSize": 10 } }, "text-12px": { "": { "fontSize": 12 } }, "text-14px": { "": { "fontSize": 14 } }, "w-6px": { "": { "width": 6 } } };
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { createElementVNode: _createElementVNode, resolveComponent: _resolveComponent, createVNode: _createVNode, toDisplayString: _toDisplayString, withCtx: _withCtx, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_uni_icons = resolveEasycom(__resolveDynamicComponent("uni-icons"), __easycom_1);
-  const _component_l_icon = resolveEasycom(__resolveDynamicComponent("l-icon"), __easycom_1$1);
-  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
-  return _openBlock(), _createBlock($setup["Card"], { title: $setup.iconDemoTitle }, {
-    default: _withCtx(() => [
-      _createElementVNode("view", { class: "flex-row items-center justify-between py-12px border-bottom-width-1px border-bottom-style-solid border-bottom-color-__f1f5f9_" }, [
-        _createElementVNode("view", { class: "flex-row items-center" }, [
-          _createElementVNode("view", { class: "w-6px h-6px rounded-3px bg-__3b82f6_ mr-8px" }),
-          _createElementVNode("text", { class: "text-14px text-__475569_ font-medium" }, "uni-icon")
-        ]),
-        _createElementVNode("view", { class: "flex-row items-center" }, [
-          _createVNode(_component_uni_icons, {
-            type: "contact",
-            size: "26",
-            style: { "color": "#3b82f6", "margin-right": "8px" }
-          }),
-          _createElementVNode("text", { class: "text-12px text-__94a3b8_" }, "contact")
-        ])
-      ]),
-      _createElementVNode("view", { class: "flex-row items-center justify-between py-12px" }, [
-        _createElementVNode("view", { class: "flex-row items-center" }, [
-          _createElementVNode("view", { class: "w-6px h-6px rounded-3px bg-__10b981_ mr-8px" }),
-          _createElementVNode("view", { class: "flex-col" }, [
-            _createElementVNode("text", { class: "text-14px text-__475569_ font-medium" }, "lime-icon"),
-            _createElementVNode("view", { class: "bg-__fff1f2_ rounded-4px py-2px px-6px mt-4px self-start border-width-1px border-style-solid border-color-__ffe4e6_" }, [
-              _createElementVNode(
-                "text",
-                { class: "text-10px text-__f43f5e_" },
-                _toDisplayString($setup.svgAuthWarning),
-                1
-                /* TEXT */
-              )
-            ])
-          ])
-        ]),
-        _createElementVNode("view", { class: "flex-row items-center" }, [
-          _createVNode(_component_l_icon, {
-            name: "circle",
-            size: "24",
-            style: { "color": "#10b981", "margin-right": "8px" }
-          }),
-          _createElementVNode("text", { class: "text-12px text-__94a3b8_" }, "circle")
-        ])
-      ]),
-      _createElementVNode("view", { class: "flex-row items-center justify-between py-12px border-top-width-1px border-top-style-solid border-top-color-__f1f5f9_" }, [
-        _createElementVNode("view", { class: "flex-row items-center" }, [
-          _createElementVNode("view", { class: "w-6px h-6px rounded-3px bg-__a855f7_ mr-8px" }),
-          _createElementVNode("text", { class: "text-14px text-__475569_ font-medium" }, "up-icon (uview-ultra)")
-        ]),
-        _createElementVNode("view", { class: "flex-row items-center" }, [
-          _createVNode(_component_up_icon, {
-            name: "setting",
-            size: "24",
-            style: { "color": "#a855f7", "margin-right": "8px" }
-          }),
-          _createElementVNode("text", { class: "text-12px text-__94a3b8_" }, "setting")
-        ])
-      ])
-    ]),
-    _: 1
-    /* STABLE */
-  }, 8, ["title"]);
-}
-const IconDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/basic/components/IconDemoCard.uvue"]]);
+const _style_0 = {};
+const IconDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   IconDemoCard as I
 };

@@ -1,12 +1,18 @@
 import { c as base64Flower } from "../static/index.js";
 import { _ as _export_sfc } from "../../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataEvent: _setSharedDataEvent, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, renderSharedDataEffect: _renderSharedDataEffect } = globalThis.Vue;
+const __className = "GenUniModulesZPagingXComponentsZPagingXComponentsZPagingLoading";
 const { ref, onMounted, nextTick } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  __dynamicSharedData: true,
+  __hash: "1651bc30",
+  __className,
+  __filename: "uni_modules/z-paging-x/components/z-paging-x/components/z-paging-loading.uvue",
   __name: "z-paging-loading",
-  setup(__props, _a) {
-    var __expose = _a.expose;
-    __expose();
+  setup(__props) {
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesZPagingXComponentsZPagingXComponentsZPagingLoadingSharedData", sharedDataClassId: 0 })));
     const times = ref(0);
     const element = ref(null);
     const base64FlowerImg = ref(base64Flower);
@@ -25,22 +31,18 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
         }, 10);
       });
     });
-    const __returned__ = { times, element, base64FlowerImg, doRotate };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      _setSharedDataEvent(__sharedData, 0, doRotate);
+      _renderSharedDataEffect(() => {
+        return _setSharedDataAttr(__sharedData, 1, _toSharedDataString(base64FlowerImg.value));
+      });
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "zpx-loading-img": { "": { "width": "34rpx", "height": "34rpx", "transitionDuration": "2000ms", "transitionProperty": "transform", "transitionTimingFunction": "linear", "transform": "rotate(0deg)" } }, "@TRANSITION": { "zpx-loading-img": { "duration": "2000ms", "property": "transform", "timingFunction": "linear" } } };
-const { openBlock: _openBlock, createElementBlock: _createElementBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return _openBlock(), _createElementBlock("image", {
-    class: "zpx-loading-img",
-    id: "z-paging-loading-img",
-    src: $setup.base64FlowerImg,
-    onTransitionend: $setup.doRotate
-  }, null, 40, ["src"]);
-}
-const zPagingLoading = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/z-paging-x/components/z-paging-x/components/z-paging-loading.uvue"]]);
+const _style_0 = {};
+const zPagingLoading = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   zPagingLoading as z
 };

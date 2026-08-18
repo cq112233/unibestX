@@ -1,13 +1,18 @@
 import { _ as __easycom_1$1 } from "../up-loading-icon/up-loading-icon.js";
-import { r as resolveEasycom } from "../../../../App.ku.js";
 import { g as getPx, a as addUnit, d as deepMerge, b as addStyle } from "../../libs/function/index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataIf: _createSharedDataIf, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedDataEvent: _setSharedDataEvent } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpSwitchUpSwitch";
 const { computed, nextTick } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-switch"
   },
+  __dynamicSharedData: true,
+  __hash: "8b5b2c20",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-switch/up-switch.uvue",
   __name: "up-switch",
   props: {
     loading: {
@@ -59,8 +64,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   },
   emits: ["update:modelValue", "change"],
   setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
-    __expose();
+    var __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpSwitchUpSwitchSharedData", sharedDataClassId: 0 })));
     const props = __props;
     const emit = __emit;
     const isActive = computed(() => {
@@ -151,70 +157,52 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
         });
       }
     }
-    const __returned__ = { props, emit, isActive, customInactiveColor, loadingIconSize, loadingColor, switchClass, switchStyle, mergedSwitchStyle, bgActiveStyle, nodeStyle, bgStyle, clickHandler };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _component_up_loading_icon = __easycom_1$1;
+      _renderSharedDataEffect(() => {
+        _setSharedDataClass(__sharedData, 6, switchClass.value);
+        _setSharedDataStyle(__sharedData, 7, mergedSwitchStyle.value);
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(isActive.value));
+      }, () => {
+        _renderSharedDataEffect(() => {
+          return _setSharedDataStyle(__sharedData, 1, bgActiveStyle.value);
+        });
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 2, _toSharedDataBoolean(!isActive.value));
+      }, () => {
+        _renderSharedDataEffect(() => {
+          return _setSharedDataStyle(__sharedData, 3, bgStyle.value);
+        });
+      });
+      _renderSharedDataEffect(() => {
+        _setSharedDataClass(__sharedData, 8, ["up-switch__node", [__props.modelValue == __props.activeValue ? "up-switch__node--on" : ""]]);
+        _setSharedDataStyle(__sharedData, 9, nodeStyle.value);
+      });
+      const n6 = _createSharedDataComponentWithFallback(_component_up_loading_icon, "0a5a6f34", {
+        show: () => {
+          return __props.loading;
+        },
+        mode: "circle",
+        timingFunction: "linear",
+        color: () => {
+          return loadingColor.value;
+        },
+        size: () => {
+          return loadingIconSize.value;
+        }
+      });
+      _setSharedData(__sharedData, 4, n6?.sharedData);
+      _setSharedDataEvent(__sharedData, 5, clickHandler);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "up-switch": { "": { "display": "flex", "flexDirection": "row", "position": "relative", "backgroundColor": "rgba(0,0,0,0)", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopLeftRadius": 100, "borderTopRightRadius": 100, "borderBottomRightRadius": 100, "borderBottomLeftRadius": 100, "transitionProperty": "backgroundColor", "transitionDuration": "0.4s", "borderTopColor": "rgba(0,0,0,0.12)", "borderRightColor": "rgba(0,0,0,0.12)", "borderBottomColor": "rgba(0,0,0,0.12)", "borderLeftColor": "rgba(0,0,0,0.12)", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "justifyContent": "flex-end", "alignItems": "center", "overflow": "hidden", "width": 52, "height": 27 } }, "up-switch__bg-active": { "": { "position": "absolute", "top": -1, "left": -1, "borderTopLeftRadius": 100, "borderTopRightRadius": 100, "borderBottomRightRadius": 100, "borderBottomLeftRadius": 100, "backgroundColor": "var(--theme-color, #0957de)", "width": 52, "height": 27 } }, "up-switch__node": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "borderTopLeftRadius": 100, "borderTopRightRadius": 100, "borderBottomRightRadius": 100, "borderBottomLeftRadius": 100, "backgroundColor": "#ffffff", "boxShadow": "1px 1px 1px 0 rgba(0, 0, 0, 0.25)", "transitionProperty": "transform", "transitionDuration": "0.4s", "transitionTimingFunction": "cubic-bezier(0.3,1.05,0.4,1.05)" } }, "up-switch__bg": { "": { "position": "absolute", "borderTopLeftRadius": 0, "borderTopRightRadius": 100, "borderBottomRightRadius": 100, "borderBottomLeftRadius": 0, "backgroundColor": "#FFFFFF", "transitionProperty": "transform", "transitionDuration": "0.4s", "transitionTimingFunction": "ease" } }, "up-switch--disabled": { "": { "opacity": 0.6 } }, "@TRANSITION": { "up-switch": { "property": "backgroundColor", "duration": "0.4s" }, "up-switch__node": { "property": "transform", "duration": "0.4s", "timingFunction": "cubic-bezier(0.3,1.05,0.4,1.05)" }, "up-switch__bg": { "property": "transform", "duration": "0.4s", "timingFunction": "ease" } } };
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, resolveComponent: _resolveComponent, createVNode: _createVNode, normalizeClass: _normalizeClass, createElementVNode: _createElementVNode } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_loading_icon = resolveEasycom(__resolveDynamicComponent("up-loading-icon"), __easycom_1$1);
-  return _openBlock(), _createElementBlock(
-    "view",
-    {
-      class: _normalizeClass($setup.switchClass),
-      style: _normalizeStyle($setup.mergedSwitchStyle),
-      onClick: $setup.clickHandler
-    },
-    [
-      $setup.isActive ? (_openBlock(), _createElementBlock(
-        "view",
-        {
-          key: 0,
-          class: "up-switch__bg-active",
-          style: _normalizeStyle($setup.bgActiveStyle)
-        },
-        null,
-        4
-        /* STYLE */
-      )) : _createCommentVNode("v-if", true),
-      !$setup.isActive ? (_openBlock(), _createElementBlock(
-        "view",
-        {
-          key: 1,
-          class: "up-switch__bg",
-          style: _normalizeStyle($setup.bgStyle)
-        },
-        null,
-        4
-        /* STYLE */
-      )) : _createCommentVNode("v-if", true),
-      _createElementVNode(
-        "view",
-        {
-          class: _normalizeClass(["up-switch__node", [$props.modelValue == $props.activeValue ? "up-switch__node--on" : ""]]),
-          style: _normalizeStyle($setup.nodeStyle)
-        },
-        [
-          _createVNode(_component_up_loading_icon, {
-            show: $props.loading,
-            mode: "circle",
-            timingFunction: "linear",
-            color: $setup.loadingColor,
-            size: $setup.loadingIconSize
-          }, null, 8, ["show", "color", "size"])
-        ],
-        6
-        /* CLASS, STYLE */
-      )
-    ],
-    6
-    /* CLASS, STYLE */
-  );
-}
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-switch/up-switch.uvue"]]);
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_1 as _
 };

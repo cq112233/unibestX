@@ -3,77 +3,25 @@ import { P as PiniaStoreBase } from "../../uni_modules/x-pinia-s/instans/storeBa
 import { d as defineStore } from "../../uni_modules/x-pinia-s/instans/defineStore.js";
 import "../../uni_modules/x-pinia-s/instans/persist.js";
 const { reactive } = globalThis.Vue;
-class IUserInfo extends UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          userId: { type: Number, optional: false },
-          username: { type: String, optional: false },
-          nickname: { type: String, optional: false },
-          avatar: { type: String, optional: false }
-        };
-      },
-      name: "IUserInfo"
-    };
-  }
-  constructor(options, metadata = IUserInfo.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.userId = this.__props__.userId;
-    this.username = this.__props__.username;
-    this.nickname = this.__props__.nickname;
-    this.avatar = this.__props__.avatar;
-    delete this.__props__;
-  }
-}
-class IUserState extends UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          userInfo: { type: IUserInfo, optional: false }
-        };
-      },
-      name: "IUserState"
-    };
-  }
-  constructor(options, metadata = IUserState.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.userInfo = this.__props__.userInfo;
-    delete this.__props__;
-  }
-}
 const DEFAULT_AVATAR = "/static/logo.png";
-const defaultUserInfo = new IUserInfo({
+const defaultUserInfo = {
   userId: -1,
   username: "",
   nickname: "",
   avatar: DEFAULT_AVATAR
-});
-new IUserState(
-  {
-    userInfo: defaultUserInfo
-  }
-  // ==========================================
-  // Store 实现
-  // ==========================================
-);
+};
 class UserStore extends PiniaStoreBase {
   // 2. constructor
   constructor() {
     super();
-    this.state = reactive(new IUserState({
-      userInfo: new IUserInfo({
+    this.state = reactive({
+      userInfo: {
         userId: -1,
         username: "",
         nickname: "",
         avatar: DEFAULT_AVATAR
-      })
-    }));
+      }
+    });
     this.bindState(this.state);
   }
   // ==========================================
@@ -86,24 +34,24 @@ class UserStore extends PiniaStoreBase {
     this.state.userInfo.avatar = defaultUserInfo.avatar;
   }
   _hydrate(_data) {
-    if (_data["userId"] != null)
-      this.state.userInfo.userId = _data["userId"];
-    if (_data["username"] != null)
-      this.state.userInfo.username = _data["username"];
-    if (_data["nickname"] != null)
-      this.state.userInfo.nickname = _data["nickname"];
-    if (_data["avatar"] != null)
-      this.state.userInfo.avatar = _data["avatar"];
-    if (_data["userInfo"] != null) {
-      const infoObj = _data["userInfo"];
-      if (infoObj["userId"] != null)
-        this.state.userInfo.userId = infoObj["userId"];
-      if (infoObj["username"] != null)
-        this.state.userInfo.username = infoObj["username"];
-      if (infoObj["nickname"] != null)
-        this.state.userInfo.nickname = infoObj["nickname"];
-      if (infoObj["avatar"] != null)
-        this.state.userInfo.avatar = infoObj["avatar"];
+    if (_data.userId != null)
+      this.state.userInfo.userId = _data.userId;
+    if (_data.username != null)
+      this.state.userInfo.username = _data.username;
+    if (_data.nickname != null)
+      this.state.userInfo.nickname = _data.nickname;
+    if (_data.avatar != null)
+      this.state.userInfo.avatar = _data.avatar;
+    if (_data.userInfo != null) {
+      const infoObj = _data.userInfo;
+      if (infoObj.userId != null)
+        this.state.userInfo.userId = infoObj.userId;
+      if (infoObj.username != null)
+        this.state.userInfo.username = infoObj.username;
+      if (infoObj.nickname != null)
+        this.state.userInfo.nickname = infoObj.nickname;
+      if (infoObj.avatar != null)
+        this.state.userInfo.avatar = infoObj.avatar;
     }
   }
   _serialize() {
@@ -124,12 +72,12 @@ class UserStore extends PiniaStoreBase {
    * 设置用户信息，头像为空时使用默认头像
    */
   setUserInfo(info) {
-    this.state.userInfo = new IUserInfo({
+    this.state.userInfo = {
       userId: info.userId,
       username: info.username,
       nickname: info.nickname,
       avatar: info.avatar != "" ? info.avatar : DEFAULT_AVATAR
-    });
+    };
   }
   /**
    * 更新头像
@@ -149,7 +97,6 @@ const useUserStore = defineStore("user", () => {
   return new UserStore();
 });
 export {
-  IUserInfo as I,
   useUserStore as u
 };
 //# sourceMappingURL=user.js.map

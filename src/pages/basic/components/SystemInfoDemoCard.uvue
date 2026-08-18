@@ -55,19 +55,19 @@
 </template>
 
 <script setup lang="uts">
-import Card from './Card.uvue'
-import { safeAreaInsets, systemInfo } from '@/src/utils/systemInfo'
-import { computed } from 'vue'
+import Card from './Card.uvue';
+import { safeAreaInsets, systemInfo } from '@/src/utils/systemInfo';
+import { computed } from 'vue';
 
-const screenWidth = computed((): number => systemInfo.value?.screenWidth ?? 0)
-const screenHeight = computed((): number => systemInfo.value?.screenHeight ?? 0)
-const windowWidth = computed((): number => systemInfo.value?.windowWidth ?? 0)
-const windowHeight = computed((): number => systemInfo.value?.windowHeight ?? 0)
-const statusBarHeight = computed((): number => systemInfo.value?.statusBarHeight ?? 0)
-const pixelRatio = computed((): number => systemInfo.value?.pixelRatio ?? 1)
+const screenWidth = computed((): number => systemInfo.value?.screenWidth ?? 0);
+const screenHeight = computed((): number => systemInfo.value?.screenHeight ?? 0);
+const windowWidth = computed((): number => systemInfo.value?.windowWidth ?? 0);
+const windowHeight = computed((): number => systemInfo.value?.windowHeight ?? 0);
+const statusBarHeight = computed((): number => systemInfo.value?.statusBarHeight ?? 0);
+const pixelRatio = computed((): number => systemInfo.value?.pixelRatio ?? 1);
 
-const safeAreaTop = computed((): string => safeAreaInsets.value != null ? `${safeAreaInsets.value!.top}px` : 'N/A')
-const safeAreaBottom = computed((): string => safeAreaInsets.value != null ? `${safeAreaInsets.value!.bottom}px` : 'N/A')
-const safeAreaLeft = computed((): string => safeAreaInsets.value != null ? `${safeAreaInsets.value!.left}px` : 'N/A')
-const safeAreaRight = computed((): string => safeAreaInsets.value != null ? `${safeAreaInsets.value!.right}px` : 'N/A')
+const safeAreaTop = computed((): string => safeAreaInsets.value != null ? `${safeAreaInsets.value!.top}px` : 'N/A');
+const safeAreaBottom = computed((): string => safeAreaInsets.value != null ? `${safeAreaInsets.value!.bottom}px` : 'N/A');
+const safeAreaLeft = computed((): string => safeAreaInsets.value != null ? `${safeAreaInsets.value!.left}px` : 'N/A');
+const safeAreaRight = computed((): string => safeAreaInsets.value != null ? `${safeAreaInsets.value!.right}px` : 'N/A');
 </script>

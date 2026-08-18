@@ -29,36 +29,37 @@
 </template>
 
 <script setup lang="uts">
-import PropsDemoCard from './components/PropsDemoCard.uvue'
-import IconDemoCard from './components/IconDemoCard.uvue'
-import LangSwitchCard from './components/LangSwitchCard.uvue'
-import ThemeSwitchCard from './components/ThemeSwitchCard.uvue'
-import RouterDemoCard from './components/RouterDemoCard.uvue'
-import HttpDemoCard from './components/HttpDemoCard.uvue'
-import SystemInfoDemoCard from './components/SystemInfoDemoCard.uvue'
-import UViewUltraDemoCard from './components/UViewUltraDemoCard.uvue'
-import { updateSystemInfo } from '@/src/utils/systemInfo'
-import { handleBackPressExit } from '@/src/utils/backPress'
+import PropsDemoCard from './components/PropsDemoCard.uvue';
+import IconDemoCard from './components/IconDemoCard.uvue';
+import LangSwitchCard from './components/LangSwitchCard.uvue';
+import ThemeSwitchCard from './components/ThemeSwitchCard.uvue';
+import RouterDemoCard from './components/RouterDemoCard.uvue';
+import HttpDemoCard from './components/HttpDemoCard.uvue';
+import UViewUltraDemoCard from './components/UViewUltraDemoCard.uvue';
+import SystemInfoDemoCard from './components/SystemInfoDemoCard.uvue';
+import { updateSystemInfo } from '@/src/utils/systemInfo';
+import { handleBackPressExit } from '@/src/utils/backPress';
+
 
 definePage({
   layout: false,
   style: {
-    navigationBarTitleText: '基础',
-  },
-})
+    navigationBarTitleText: '基础'
+  }
+});
 
 onBackPress((options: OnBackPressOptions): boolean => {
   // #ifdef APP
   if (options.from == 'backbutton') {
-    return handleBackPressExit()
+    return handleBackPressExit();
   }
   // #endif
-  return false
-})
+  return false;
+});
 
 onResize(() => {
-  updateSystemInfo()
-})
+  updateSystemInfo();
+});
 </script>
 
 <style>

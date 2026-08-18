@@ -39,33 +39,33 @@
 </template>
 
 <script setup lang="uts">
-import EnvCard from './components/EnvCard.uvue'
-import SystemInfoCard from './components/SystemInfoCard.uvue'
-import HapticsCard from './components/HapticsCard.uvue'
-import MediaCard from './components/MediaCard.uvue'
-import LodashDemoCard from './components/LodashDemoCard.uvue'
-import CryptoDemoCard from './components/CryptoDemoCard.uvue'
-import TimeDemoCard from './components/TimeDemoCard.uvue'
-import SignatureCard from './components/SignatureCard.uvue'
-import EchartsDemoCard from './components/EchartsDemoCard.uvue'
-import ZPagingDemoCard from './components/ZPagingDemoCard.uvue'
-import { handleBackPressExit } from '@/src/utils/backPress'
+import EnvCard from './components/EnvCard.uvue';
+import SystemInfoCard from './components/SystemInfoCard.uvue';
+import HapticsCard from './components/HapticsCard.uvue';
+import MediaCard from './components/MediaCard.uvue';
+import LodashDemoCard from './components/LodashDemoCard.uvue';
+import CryptoDemoCard from './components/CryptoDemoCard.uvue';
+import TimeDemoCard from './components/TimeDemoCard.uvue';
+import SignatureCard from './components/SignatureCard.uvue';
+import EchartsDemoCard from './components/EchartsDemoCard.uvue';
+import ZPagingDemoCard from './components/ZPagingDemoCard.uvue';
+import { handleBackPressExit } from '@/src/utils/backPress';
 
 definePage({
   layout: false,
   style: {
-    navigationBarTitleText: '功能',
-  },
-})
+    navigationBarTitleText: '功能'
+  }
+});
 
 onBackPress((options: OnBackPressOptions): boolean => {
   // #ifdef APP
   if (options.from == 'backbutton') {
-    return handleBackPressExit()
+    return handleBackPressExit();
   }
   // #endif
-  return false
-})
+  return false;
+});
 </script>
 
 <style>

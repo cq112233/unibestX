@@ -63,34 +63,34 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
-import Card from './Card.uvue'
-import ChildDemoBox from './ChildDemoBox.uvue'
+import { ref } from 'vue';
+import Card from './Card.uvue';
+import ChildDemoBox from './ChildDemoBox.uvue';
 
-const parentCount = ref<number>(10)
-const childMessage = ref<string>('暂无子组件消息')
-const tagList = ref<Array<string>>(['响应式 Props 传递', 'Emits 事件监听与回传', '具名 Header/Footer 插槽', '具名 Slot 作用域传参'])
+const parentCount = ref<number>(10);
+const childMessage = ref<string>('暂无子组件消息');
+const tagList = ref<Array<string>>(['响应式 Props 传递', 'Emits 事件监听与回传', '具名 Header/Footer 插槽', '具名 Slot 作用域传参']);
 
 function onChildAdd(delta: number) {
-  parentCount.value += delta
+  parentCount.value += delta;
 }
 
 function onChildReset() {
-  parentCount.value = 0
-  childMessage.value = '已被子组件重置为 0'
+  parentCount.value = 0;
+  childMessage.value = '已被子组件重置为 0';
 }
 
 function onChildSendMsg(msg: string) {
-  childMessage.value = msg
+  childMessage.value = msg;
 }
 
 function addFiveFromParent() {
-  parentCount.value += 5
+  parentCount.value += 5;
 }
 
 function resetParent() {
-  parentCount.value = 10
-  childMessage.value = '已重置为初始状态'
+  parentCount.value = 10;
+  childMessage.value = '已重置为初始状态';
 }
 </script>
 

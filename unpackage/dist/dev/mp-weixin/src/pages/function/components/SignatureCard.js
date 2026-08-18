@@ -106,7 +106,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         l: openSmooth.value ? "#10b981" : "#cbd5e1",
         m: common_vendor.o(($event) => {
           return openSmooth.value = !openSmooth.value;
-        }, "a2"),
+        }, "26"),
         n: signUrl.value !== ""
       }, signUrl.value !== "" ? {
         o: signUrl.value

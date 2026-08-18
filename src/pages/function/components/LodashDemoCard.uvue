@@ -119,29 +119,29 @@
 </template>
 
 <script setup lang="uts">
-import Card from '../../basic/components/Card.uvue'
-import { camelCase, capitalize, chunk, cloneDeep, debounce, get, kebabCase, random, shuffle, uniq } from '@/uni_modules/iRainna-lodash'
-import { computed, ref } from 'vue'
+import Card from '../../basic/components/Card.uvue';
+import { camelCase, capitalize, chunk, cloneDeep, debounce, get, kebabCase, random, shuffle, uniq } from '@/uni_modules/iRainna-lodash';
+import { computed, ref } from 'vue';
 
 // ==========================================
 // 1. 数组处理状态 (Array Operations)
 // ==========================================
-const rawArray = ref<number[]>([1, 2, 2, 3, 4, 4, 5, 6, 7, 8])
+const rawArray = ref<number[]>([1, 2, 2, 3, 4, 4, 5, 6, 7, 8]);
 
 // 使用 uniq 对数组进行去重
 const uniqArray = computed((): number[] => {
-  return uniq(rawArray.value as any[]) as number[]
-})
+  return uniq(rawArray.value as any[]) as number[];
+});
 
 // 使用 chunk 对去重后的数组按照指定大小进行切片分组
 const chunkedArray = computed((): string => {
-  const result = chunk(uniqArray.value as any[], 3)
-  return JSON.stringify(result)
-})
+  const result = chunk(uniqArray.value as any[], 3);
+  return JSON.stringify(result);
+});
 
 // 使用 shuffle 随机打乱数组顺序
 function handleShuffle() {
-  rawArray.value = shuffle(rawArray.value as any[]) as number[]
+  rawArray.value = shuffle(rawArray.value as any[]) as number[];
 }
 
 // ==========================================
@@ -153,80 +153,80 @@ const rawObj: UTSJSONObject = {
   user: {
     info: {
       name: 'UniAppX Developer',
-      age: 25,
-    },
-  },
-}
+      age: 25
+    }
+  }
+};
 
 // 使用 get 链式安全取值 (避免空指针/未定义路径崩溃)
 const getNameResult = computed((): string => {
-  return get(rawObj, 'user.info.name', '未找到') as string
-})
+  return get(rawObj, 'user.info.name', '未找到') as string;
+});
 
 // 使用 get 对不存在的路径进行兜底取值
 const getFallbackResult = computed((): string => {
-  return get(rawObj, 'user.invalid.path', '兜底结果: 未查找到路径') as string
-})
+  return get(rawObj, 'user.invalid.path', '兜底结果: 未查找到路径') as string;
+});
 
 // 使用 cloneDeep 对对象进行深度拷贝测试
-const clonedObj = ref<UTSJSONObject>(cloneDeep(rawObj) as UTSJSONObject)
-const rawObjAge = ref<number>(get(rawObj, 'user.info.age', 0) as number)
+const clonedObj = ref<UTSJSONObject>(cloneDeep(rawObj) as UTSJSONObject);
+const rawObjAge = ref<number>(get(rawObj, 'user.info.age', 0) as number);
 const clonedObjAge = computed((): number => {
-  return get(clonedObj.value, 'user.info.age', 0) as number
-})
+  return get(clonedObj.value, 'user.info.age', 0) as number;
+});
 
 // 修改深拷贝副本的属性值，验证原对象属性未受到修改污染
 function mutateClonedObj() {
   /* eslint-disable dot-notation */
-  const user = clonedObj.value['user'] as UTSJSONObject
-  const info = user['info'] as UTSJSONObject
-  const currentAge = (info['age'] as number) + 1
-  info['age'] = currentAge
+  const user = clonedObj.value['user'] as UTSJSONObject;
+  const info = user['info'] as UTSJSONObject;
+  const currentAge = (info['age'] as number) + 1;
+  info['age'] = currentAge;
   /* eslint-enable dot-notation */
 }
 
 // ==========================================
 // 3. 字符串格式化状态 (String Operations)
 // ==========================================
-const inputText = ref('hello_world lodash-demo-test')
+const inputText = ref('hello_world lodash-demo-test');
 
 // 使用 camelCase 转为驼峰命名
 const camelCaseResult = computed((): string => {
-  return camelCase(inputText.value) as string
-})
+  return camelCase(inputText.value) as string;
+});
 
 // 使用 kebabCase 转为短横线命名
 const kebabCaseResult = computed((): string => {
-  return kebabCase(inputText.value) as string
-})
+  return kebabCase(inputText.value) as string;
+});
 
 // 使用 capitalize 转为首字母大写
 const capitalizeResult = computed((): string => {
-  return capitalize(inputText.value) as string
-})
+  return capitalize(inputText.value) as string;
+});
 
 // ==========================================
 // 4. 防抖与随机数状态 (Debounce & Utilities)
 // ==========================================
-const debouncedCount = ref(0)
-const randomValue = ref<number>(random(1, 100) as number)
+const debouncedCount = ref(0);
+const randomValue = ref<number>(random(1, 100) as number);
 
 // 递增计数回调
 function incrementCount() {
-  debouncedCount.value += 1
+  debouncedCount.value += 1;
 }
 
 // 使用 debounce 包装防抖函数 (间隔 400 毫秒)
-const debouncedIncrement = debounce(incrementCount, 400) as () => void
+const debouncedIncrement = debounce(incrementCount, 400) as () => void;
 
 // 点击防抖测试按钮
 function handleDebounceClick() {
-  debouncedIncrement()
+  debouncedIncrement();
 }
 
 // 重新生成随机数
 function generateRandom() {
-  randomValue.value = random(1, 100) as number
+  randomValue.value = random(1, 100) as number;
 }
 </script>
 

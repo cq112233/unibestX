@@ -36,17 +36,17 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-const popupShow = ref(false)
-const popupMode = ref('bottom')
+const popupShow = ref(false);
+const popupMode = ref('bottom');
 
 function openPopup(mode: string) {
-  popupMode.value = mode
-  popupShow.value = true
+  popupMode.value = mode;
+  popupShow.value = true;
 }
 function onPopupClose() {
-  popupShow.value = false
+  popupShow.value = false;
 }
 </script>
 

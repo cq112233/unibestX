@@ -13,19 +13,19 @@
 </template>
 
 <script setup lang="uts">
-import { LOGIN_PAGE } from '../../router/config'
+import { LOGIN_PAGE } from '../../router/config';
 
 function doRegister() {
   uni.showToast({
     title: '注册成功',
-    icon: 'success',
-  })
+    icon: 'success'
+  });
 
   // 延迟后跳转到登录页
   setTimeout(() => {
     uni.navigateTo({
-      url: LOGIN_PAGE,
-    })
-  }, 1000)
+      url: LOGIN_PAGE
+    });
+  }, 1000);
 }
 </script>

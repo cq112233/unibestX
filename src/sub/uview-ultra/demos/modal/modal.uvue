@@ -36,43 +36,43 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-const modalShow = ref(false)
-const modalTitle = ref('')
-const modalContent = ref('')
-const modalShowCancel = ref(false)
+const modalShow = ref(false);
+const modalTitle = ref('');
+const modalContent = ref('');
+const modalShowCancel = ref(false);
 
 function showModal() {
-  modalTitle.value = '提示'
-  modalContent.value = '这是一个模态弹窗，用于提示重要信息。'
-  modalShowCancel.value = false
-  modalShow.value = true
+  modalTitle.value = '提示';
+  modalContent.value = '这是一个模态弹窗，用于提示重要信息。';
+  modalShowCancel.value = false;
+  modalShow.value = true;
 }
 function showConfirmModal() {
-  modalTitle.value = '确认操作'
-  modalContent.value = '确定要执行此操作吗？此操作不可撤销。'
-  modalShowCancel.value = true
-  modalShow.value = true
+  modalTitle.value = '确认操作';
+  modalContent.value = '确定要执行此操作吗？此操作不可撤销。';
+  modalShowCancel.value = true;
+  modalShow.value = true;
 }
 function showNoTitleModal() {
-  modalTitle.value = ''
-  modalContent.value = '这是一个没有标题的弹窗，显得更加简洁。'
-  modalShowCancel.value = false
-  modalShow.value = true
+  modalTitle.value = '';
+  modalContent.value = '这是一个没有标题的弹窗，显得更加简洁。';
+  modalShowCancel.value = false;
+  modalShow.value = true;
 }
 function showLongModal() {
-  modalTitle.value = '用户协议'
-  modalContent.value = '1. 这是一个很长很长很长很长很长很长很长很长的内容\n2. 这是一个很长很长很长很长很长很长很长很长的内容'
-  modalShowCancel.value = false
-  modalShow.value = true
+  modalTitle.value = '用户协议';
+  modalContent.value = '1. 这是一个很长很长很长很长很长很长很长很长的内容\n2. 这是一个很长很长很长很长很长很长很长很长的内容';
+  modalShowCancel.value = false;
+  modalShow.value = true;
 }
 function onModalConfirm() {
-  modalShow.value = false
-  uni.showToast({ title: '操作成功', icon: 'success' })
+  modalShow.value = false;
+  uni.showToast({ title: '操作成功', icon: 'success' });
 }
 function onModalClose() {
-  modalShow.value = false
+  modalShow.value = false;
 }
 </script>
 

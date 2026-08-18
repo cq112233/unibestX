@@ -24,12 +24,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.ref(30);
     common_vendor.ref(3);
     common_vendor.ref(true);
-    common_vendor.computed(() => {
-      return "development";
-    });
-    common_vendor.computed(() => {
-      return "unibestX";
-    });
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {

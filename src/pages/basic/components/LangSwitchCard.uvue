@@ -47,62 +47,62 @@
 </template>
 
 <script setup lang="uts">
-import Card from './Card.uvue'
-import { computed } from 'vue'
-import { useAppStore } from '@/src/store/index.uts'
-import { $t, setTabbarItem } from '@/src/utils/i18n'
-import { t as uViewT } from '@/uni_modules/uview-ultra/libs/i18n/index.uts'
+import Card from './Card.uvue';
+import { computed } from 'vue';
+import { useAppStore } from '@/src/store/index.uts';
+import { $t, setTabbarItem } from '@/src/utils/i18n';
+import { t as uViewT } from '@/uni_modules/uview-ultra/libs/i18n/index.uts';
 
-const appStore = useAppStore()
+const appStore = useAppStore();
 
-const langTitle = computed((): string => $t('basic.langTitle'))
-const langPreview = computed((): string => $t('basic.langPreview'))
-const welcomeText = computed((): string => $t('message.welcome'))
-const helloText = computed((): string => $t('message.hello', { msg: 'hi' }))
-const uviewPreview = computed((): string => $t('basic.uviewPreview'))
+const langTitle = computed((): string => $t('basic.langTitle'));
+const langPreview = computed((): string => $t('basic.langPreview'));
+const welcomeText = computed((): string => $t('message.welcome'));
+const helloText = computed((): string => $t('message.hello', { msg: 'hi' }));
+const uviewPreview = computed((): string => $t('basic.uviewPreview'));
 
 // 使用 computed 响应式获取当前 i18n 对象的语言环境
 const currentLocale = computed((): string => {
-  return appStore.state.locale
-})
+  return appStore.state.locale;
+});
 
 const isZhCN = computed((): boolean => {
-  return currentLocale.value == 'zh-CN'
-})
+  return currentLocale.value == 'zh-CN';
+});
 
 const isEnUS = computed((): boolean => {
-  return currentLocale.value == 'en-US'
-})
+  return currentLocale.value == 'en-US';
+});
 
 const uViewChooseDates = computed((): string => {
-  const dummy = currentLocale.value
-  return uViewT('up.calendar.chooseDates', {} as UTSJSONObject)
-})
+  const dummy = currentLocale.value;
+  return uViewT('up.calendar.chooseDates', {} as UTSJSONObject);
+});
 
 const uViewConfirm = computed((): string => {
-  const dummy = currentLocale.value
-  return uViewT('up.common.confirm', {} as UTSJSONObject)
-})
+  const dummy = currentLocale.value;
+  return uViewT('up.common.confirm', {} as UTSJSONObject);
+});
 
 const uViewStart = computed((): string => {
-  const dummy = currentLocale.value
-  return uViewT('up.common.start', {} as UTSJSONObject)
-})
+  const dummy = currentLocale.value;
+  return uViewT('up.common.start', {} as UTSJSONObject);
+});
 
 const uViewEnd = computed((): string => {
-  const dummy = currentLocale.value
-  return uViewT('up.common.end', {} as UTSJSONObject)
-})
+  const dummy = currentLocale.value;
+  return uViewT('up.common.end', {} as UTSJSONObject);
+});
 
 function switchLanguage(lang: string) {
-  appStore.setLocale(lang)
-  setTabbarItem()
+  appStore.setLocale(lang);
+  setTabbarItem();
 
   uni.showToast({
     title: $t('message.switch_success'),
     icon: 'none',
-    duration: 1500,
-  })
+    duration: 1500
+  });
 }
 </script>
 

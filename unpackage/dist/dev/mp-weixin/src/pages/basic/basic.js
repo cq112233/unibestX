@@ -11,8 +11,8 @@ const LangSwitchCard = () => "./components/LangSwitchCard.js";
 const ThemeSwitchCard = () => "./components/ThemeSwitchCard.js";
 const RouterDemoCard = () => "./components/RouterDemoCard.js";
 const HttpDemoCard = () => "./components/HttpDemoCard.js";
-const SystemInfoDemoCard = () => "./components/SystemInfoDemoCard.js";
 const UViewUltraDemoCard = () => "./components/UViewUltraDemoCard.js";
+const SystemInfoDemoCard = () => "./components/SystemInfoDemoCard.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "basic",
   setup(__props) {

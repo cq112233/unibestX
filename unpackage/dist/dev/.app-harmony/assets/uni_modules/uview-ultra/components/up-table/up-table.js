@@ -1,12 +1,17 @@
 import "../../libs/composable/useUltraUI.js";
 import { d as defProps } from "./table.js";
-import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataSlot: _createSharedDataSlot, createSharedDataIf: _createSharedDataIf } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpTableUpTable";
 const { ref, watch, computed, getCurrentInstance } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-table"
   },
+  __dynamicSharedData: true,
+  __hash: "0433f533",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-table/up-table.uvue",
   __name: "up-table",
   props: {
     customStyle: {
@@ -61,7 +66,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   },
   setup(__props, _a) {
     var __expose = _a.expose;
-    const instance = getCurrentInstance().proxy;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpTableUpTableSharedData", sharedDataClassId: 0 })));
+    getCurrentInstance().proxy;
     const props = __props;
     const show = ref(true);
     const tableStyle = computed(() => {
@@ -113,28 +120,21 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       getProps,
       getRefs
     });
-    const __returned__ = { instance, props, show, tableStyle, change, getProps, getRefs };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      _renderSharedDataEffect(() => {
+        return _setSharedDataStyle(__sharedData, 1, [tableStyle.value]);
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(show.value));
+      }, () => {
+        _createSharedDataSlot("default", null, null);
+      });
+      return __sharedData;
+    };
   }
 });
-const { renderSlot: _renderSlot, createCommentVNode: _createCommentVNode, normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return _openBlock(), _createElementBlock(
-    "view",
-    {
-      class: "up-table",
-      style: _normalizeStyle([$setup.tableStyle])
-    },
-    [
-      $setup.show ? _renderSlot(_ctx.$slots, "default", { key: 0 }) : _createCommentVNode("v-if", true)
-    ],
-    4
-    /* STYLE */
-  );
-}
-const __easycom_4 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-table/up-table.uvue"]]);
 export {
-  __easycom_4 as _
+  _sfc_main as _
 };
 //# sourceMappingURL=up-table.js.map

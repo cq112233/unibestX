@@ -39,16 +39,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
         return null;
       }
-      tokenStore.setSingleToken(new src_store_token.ISingleTokenRes({
+      tokenStore.setSingleToken({
         token: "mock-token-UNIX-123456",
         expiresIn: 7200
-      }));
-      userStore.setUserInfo(new src_store_user.IUserInfo({
+      });
+      userStore.setUserInfo({
         userId: 1001,
         username: "UNIX",
         nickname: "UNIX 开发者",
         avatar: "/static/logo.png"
-      }));
+      });
       common_vendor.index.showToast({
         title: "登录成功",
         icon: "success"

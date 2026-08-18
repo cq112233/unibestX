@@ -58,41 +58,41 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
+import { ref } from 'vue';
 
 // --- 数字键盘 ---
-const showNumber = ref(false)
-const valNumber = ref('')
+const showNumber = ref(false);
+const valNumber = ref('');
 function onNumberChange(val: string) {
-  valNumber.value += val
+  valNumber.value += val;
 }
 function onNumberBackspace() {
   if (valNumber.value.length > 0) {
-    valNumber.value = valNumber.value.substring(0, valNumber.value.length - 1)
+    valNumber.value = valNumber.value.substring(0, valNumber.value.length - 1);
   }
 }
 
 // --- 身份证键盘 ---
-const showCard = ref(false)
-const valCard = ref('')
+const showCard = ref(false);
+const valCard = ref('');
 function onCardChange(val: string) {
-  valCard.value += val
+  valCard.value += val;
 }
 function onCardBackspace() {
   if (valCard.value.length > 0) {
-    valCard.value = valCard.value.substring(0, valCard.value.length - 1)
+    valCard.value = valCard.value.substring(0, valCard.value.length - 1);
   }
 }
 
 // --- 车牌号键盘 ---
-const showCar = ref(false)
-const valCar = ref('')
+const showCar = ref(false);
+const valCar = ref('');
 function onCarChange(val: string) {
-  valCar.value += val
+  valCar.value += val;
 }
 function onCarBackspace() {
   if (valCar.value.length > 0) {
-    valCar.value = valCar.value.substring(0, valCar.value.length - 1)
+    valCar.value = valCar.value.substring(0, valCar.value.length - 1);
   }
 }
 </script>

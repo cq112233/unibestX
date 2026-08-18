@@ -1,9 +1,15 @@
 import { S as Signature } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-signature/components/l-signature/signature&";
 import { a as LimeSignatureOptions, b as LimeSignatureToFileSuccess } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-signature/index&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedDataStyle: _setSharedDataStyle, unref: _unref, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, setSharedDataTemplateRef: _setSharedDataTemplateRef } = globalThis.Vue;
+const __className = "GenUniModulesLimeSignatureComponentsLSignatureLSignature";
 const { computed, ref, onMounted, nextTick, watchEffect, onUnmounted } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  __dynamicSharedData: true,
+  __hash: "174c8d6e",
+  __className,
+  __filename: "uni_modules/lime-signature/components/l-signature/l-signature.uvue",
   __name: "l-signature",
   props: {
     styles: {
@@ -62,6 +68,8 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   emits: ["change"],
   setup(__props, _a) {
     var __expose = _a.expose, __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesLimeSignatureComponentsLSignatureLSignatureSharedData", sharedDataClassId: 0 })));
     const emit = __emit;
     const props = __props;
     const drawableStyle = computed(() => {
@@ -76,12 +84,12 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     });
     const signatureRef = ref(null);
     const signatureCanvasRef = ref(null);
-    let signatureLandscapeRef = ref(null);
+    ref(null);
     let landscapeStyle = ref(/* @__PURE__ */ new Map());
     let landscapeImageStyle = ref(/* @__PURE__ */ new Map());
     let isCanvasEmpty = true;
     let signature = null;
-    let url = ref("");
+    ref("");
     const checkAndEmitEmptyStatus = () => {
       var _a2;
       const isEmpty = (_a2 = signature === null || signature === void 0 ? null : signature.isEmpty) !== null && _a2 !== void 0 ? _a2 : true;
@@ -155,62 +163,27 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     });
     onUnmounted(() => {
     });
-    const __returned__ = { emit, props, drawableStyle, signatureRef, signatureCanvasRef, get signatureLandscapeRef() {
-      return signatureLandscapeRef;
-    }, set signatureLandscapeRef(v) {
-      signatureLandscapeRef = v;
-    }, get landscapeStyle() {
-      return landscapeStyle;
-    }, set landscapeStyle(v) {
-      landscapeStyle = v;
-    }, get landscapeImageStyle() {
-      return landscapeImageStyle;
-    }, set landscapeImageStyle(v) {
-      landscapeImageStyle = v;
-    }, get isCanvasEmpty() {
-      return isCanvasEmpty;
-    }, set isCanvasEmpty(v) {
-      isCanvasEmpty = v;
-    }, get signature() {
-      return signature;
-    }, set signature(v = null) {
-      signature = v;
-    }, get url() {
-      return url;
-    }, set url(v) {
-      url = v;
-    }, checkAndEmitEmptyStatus, clear, redo, undo, canvasToTempFilePath };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _setTemplateRef = _createSharedDataTemplateRefSetter();
+      const _component_canvas = _resolveComponent("canvas");
+      _renderSharedDataEffect(() => {
+        return _setSharedDataStyle(__sharedData, 3, [_unref(drawableStyle)]);
+      });
+      const n0 = _createSharedDataComponentWithFallback(_component_canvas, "62ff6f14", { class: "l-signature__canvas" });
+      _setSharedData(__sharedData, 0, n0?.sharedData);
+      _setSharedDataTemplateRef(__sharedData, 1, (n02) => {
+        _setTemplateRef(n02, signatureCanvasRef, null, "signatureCanvasRef");
+      });
+      _setSharedDataTemplateRef(__sharedData, 2, (n1) => {
+        _setTemplateRef(n1, signatureRef, null, "signatureRef");
+      });
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "l-signature": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "l-signature__canvas": { "": { "width": "100%", "height": "100%" } }, "l-signature-landscape": { "": { "position": "absolute", "pointerEvents": "none", "overflow": "visible", "left": "99.9%" } }, "l-signature-image": { "": { "transformOrigin": "0% 0%" } } };
-const { createElementVNode: _createElementVNode, normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return _openBlock(), _createElementBlock(
-    "view",
-    {
-      class: "l-signature",
-      ref: "signatureRef",
-      style: _normalizeStyle([$setup.drawableStyle])
-    },
-    [
-      _createElementVNode(
-        "canvas",
-        {
-          ref: "signatureCanvasRef",
-          class: "l-signature__canvas"
-        },
-        null,
-        512
-        /* NEED_PATCH */
-      )
-    ],
-    4
-    /* STYLE */
-  );
-}
-const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/lime-signature/components/l-signature/l-signature.uvue"]]);
+const _style_0 = {};
+const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_0 as _
 };

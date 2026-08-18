@@ -1,8 +1,9 @@
 import { _ as __easycom_1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/z-paging-x/components/z-paging-x/z-paging-x&";
-import { r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { C as Card } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/Card&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedDataEvent: _setSharedDataEvent, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, setSharedData: _setSharedData, toDisplayString: _toDisplayString, createSharedDataSelector: _createSharedDataSelector, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataStyle: _setSharedDataStyle, createSharedDataFor: _createSharedDataFor, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
+const __className = "GenSrcPagesFunctionComponentsZPagingDemoCard";
 const { ref } = globalThis.Vue;
 class CompactArticleItem extends UTS.UTSType {
   static get$UTSMetadata$() {
@@ -33,11 +34,15 @@ class CompactArticleItem extends UTS.UTSType {
     delete this.__props__;
   }
 }
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  __dynamicSharedData: true,
+  __hash: "5932c768",
+  __className,
+  __filename: "src/pages/function/components/ZPagingDemoCard.uvue",
   __name: "ZPagingDemoCard",
-  setup(__props, _a) {
-    var __expose = _a.expose;
-    __expose();
+  setup(__props) {
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenSrcPagesFunctionComponentsZPagingDemoCardSharedData", sharedDataClassId: 0 })));
     const shouldFail = ref(false);
     const tabList = ["全部", "技术", "设计"];
     const tabIndex = ref(0);
@@ -109,149 +114,97 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
         }
       }, 600);
     }
-    const __returned__ = { shouldFail, tabList, tabIndex, pagingX, dataList, onUpdateModelValue, tabChange, triggerError, triggerClear, getMockArticles, onQuery, get Card() {
-      return Card;
-    } };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _setTemplateRef = _createSharedDataTemplateRefSetter();
+      const _component_z_paging_x = __easycom_1;
+      const n26 = _createSharedDataComponent(
+        Card,
+        "4b4c5faa",
+        { title: "数据分页列表 (z-paging-x)" },
+        {
+          "default": _withSharedDataVaporCtx(() => {
+            _setSharedDataEvent(__sharedData, 4, triggerError);
+            _setSharedDataEvent(__sharedData, 5, triggerClear);
+            const _selector9_0 = _createSharedDataSelector(() => {
+              return tabIndex.value;
+            });
+            const _selector9_1 = _createSharedDataSelector(() => {
+              return tabIndex.value;
+            });
+            const n9 = _createSharedDataFor(_setSharedDataScoped(__sharedData, 3, _createSharedDataVFor(__sharedDataScope, () => {
+              return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
+            })), () => {
+              return tabList;
+            }, (__sharedData_VFor0, _for_item0, _for_key0) => {
+              _setSharedDataEvent(__sharedData_VFor0, 1, () => {
+                return tabChange(_for_key0.value);
+              });
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData_VFor0, 4, _toDisplayString(_for_item0.value));
+              });
+              _selector9_0(_for_key0.value, () => {
+                _setSharedDataStyle(__sharedData_VFor0, 2, { backgroundColor: tabIndex.value === _for_key0.value ? "#ffffff" : "transparent" });
+              });
+              _selector9_1(_for_key0.value, () => {
+                _setSharedDataStyle(__sharedData_VFor0, 3, { color: tabIndex.value === _for_key0.value ? "var(--theme-color, #37c2bc)" : "#64748b" });
+              });
+              return null;
+            }, (__sharedData_VFor0, tab, index) => {
+              return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
+            }, 1);
+            n9.onReset(_selector9_0.reset);
+            n9.onReset(_selector9_1.reset);
+            const n25 = _createSharedDataComponentWithFallback(_component_z_paging_x, "e69f1766", {
+              "list-is": "scroll-view",
+              "model-value": () => {
+                return dataList.value;
+              },
+              "default-page-size": 10,
+              "paging-style": { height: "200px", border: "1px solid #edf2f7", borderTopWidth: "0px", borderBottomLeftRadius: "12px", borderBottomRightRadius: "12px", backgroundColor: "#f8fafc" },
+              "onUpdate:modelValue": () => {
+                return onUpdateModelValue;
+              },
+              onQuery: () => {
+                return onQuery;
+              }
+            }, {
+              "default": () => {
+                _createSharedDataFor(_setSharedDataScoped(__sharedData, 2, _createSharedDataVFor(__sharedDataScope, () => {
+                  return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 2 });
+                })), () => {
+                  return dataList.value;
+                }, (__sharedData_VFor1, _for_item1) => {
+                  let _item;
+                  _renderSharedDataEffect(() => {
+                    _item = _for_item1.value;
+                    _setSharedDataStyle(__sharedData_VFor1, 1, { backgroundColor: _item.tagBgColor, padding: "1px 6px", borderRadius: "4px" });
+                    _setSharedDataStyle(__sharedData_VFor1, 2, { color: _item.tagColor, fontSize: "9px", fontWeight: "bold" });
+                    _setSharedData(__sharedData_VFor1, 3, _toDisplayString(_item.tag));
+                    _setSharedData(__sharedData_VFor1, 5, _toDisplayString(_item.title));
+                    _setSharedData(__sharedData_VFor1, 6, _toDisplayString(_item.summary));
+                  });
+                  _setSharedData(__sharedData_VFor1, 4, _toDisplayString(_item.id));
+                  return null;
+                }, (__sharedData_VFor1, item) => {
+                  return _setSharedData(__sharedData_VFor1, 0, _toDisplayString(item.id));
+                }, 32);
+              }
+            });
+            _setSharedData(__sharedData, 1, n25?.sharedData);
+            _setTemplateRef(n25, pagingX, null, "pagingX");
+          })
+        },
+        1
+        /* SINGLE_ROOT */
+      );
+      _setSharedData(__sharedData, 0, n26.sharedData);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "bg-__f1f5f9_": { "": { "backgroundImage": "none", "backgroundColor": "#f1f5f9" } }, "bg-__fee2e2_": { "": { "backgroundImage": "none", "backgroundColor": "#fee2e2" } }, "bg-__fef3c7_": { "": { "backgroundImage": "none", "backgroundColor": "#fef3c7" } }, "bg-white": { "": { "backgroundColor": "rgba(255,255,255,var(--un-bg-opacity,1))" } }, "border-bottom-width-0px": { "": { "borderBottomWidth": 0 } }, "border-color-__edf2f7_": { "": { "borderTopColor": "#edf2f7", "borderRightColor": "#edf2f7", "borderBottomColor": "#edf2f7", "borderLeftColor": "#edf2f7" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex": { "": { "display": "flex" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-col": { "": { "flexDirection": "column" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-36px": { "": { "height": 36 } }, "items-center": { "": { "alignItems": "center" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "justify-center": { "": { "justifyContent": "center" } }, "leading-16px": { "": { "lineHeight": "16px" } }, "leading-18px": { "": { "lineHeight": "18px" } }, "mb-12px": { "": { "marginBottom": 12 } }, "mb-4px": { "": { "marginBottom": 4 } }, "mb-6px": { "": { "marginBottom": 6 } }, "mb-8px": { "": { "marginBottom": 8 } }, "mr-8px": { "": { "marginRight": 8 } }, "mx-12px": { "": { "marginLeft": 12, "marginRight": 12 } }, "my-8px": { "": { "marginTop": 8, "marginBottom": 8 } }, "p-12px": { "": { "paddingTop": 12, "paddingRight": 12, "paddingBottom": 12, "paddingLeft": 12 } }, "p-2px": { "": { "paddingTop": 2, "paddingRight": 2, "paddingBottom": 2, "paddingLeft": 2 } }, "px-12px": { "": { "paddingLeft": 12, "paddingRight": 12 } }, "py-6px": { "": { "paddingTop": 6, "paddingBottom": 6 } }, "py-8px": { "": { "paddingTop": 8, "paddingBottom": 8 } }, "rounded-6px": { "": { "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__64748b_": { "": { "color": "#64748b" } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-__d97706_": { "": { "color": "#d97706" } }, "text-__dc2626_": { "": { "color": "#dc2626" } }, "text-11px": { "": { "fontSize": 11 } }, "text-12px": { "": { "fontSize": 12 } }, "text-13px": { "": { "fontSize": 13 } }, "text-14px": { "": { "fontSize": 14 } }, "w-full": { "": { "width": "100%" } } };
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { createElementVNode: _createElementVNode, renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, toDisplayString: _toDisplayString, normalizeStyle: _normalizeStyle, resolveComponent: _resolveComponent, withCtx: _withCtx, createVNode: _createVNode, createBlock: _createBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_z_paging_x = resolveEasycom(__resolveDynamicComponent("z-paging-x"), __easycom_1);
-  return _openBlock(), _createBlock($setup["Card"], { title: "数据分页列表 (z-paging-x)" }, {
-    default: _withCtx(() => [
-      _createElementVNode("view", { class: "flex-col mb-12px" }, [
-        _createElementVNode("text", { class: "text-13px text-__64748b_ leading-18px mb-8px" }, " 在卡片中直接体验实时分页，支持触底加载、下拉刷新以及各种状态切换。 "),
-        _createElementVNode("view", { class: "flex-row mb-12px" }, [
-          _createElementVNode("view", { class: "flex-1 mr-8px" }, [
-            _createElementVNode("view", {
-              class: "w-full h-36px rounded-8px bg-__fee2e2_ flex flex-row items-center justify-center",
-              onClick: $setup.triggerError
-            }, [
-              _createElementVNode("text", { class: "text-__dc2626_ text-12px font-bold" }, "模拟加载错误")
-            ])
-          ]),
-          _createElementVNode("view", { class: "flex-1" }, [
-            _createElementVNode("view", {
-              class: "w-full h-36px rounded-8px bg-__fef3c7_ flex flex-row items-center justify-center",
-              onClick: $setup.triggerClear
-            }, [
-              _createElementVNode("text", { class: "text-__d97706_ text-12px font-bold" }, "清空数据")
-            ])
-          ])
-        ])
-      ]),
-      _createElementVNode("view", {
-        class: "bg-white py-8px px-12px border-width-1px border-style-solid border-color-__edf2f7_ border-bottom-width-0px",
-        style: { "border-top-left-radius": "12px", "border-top-right-radius": "12px" }
-      }, [
-        _createElementVNode("view", { class: "flex-row bg-__f1f5f9_ rounded-8px p-2px" }, [
-          (_openBlock(), _createElementBlock(
-            _Fragment,
-            null,
-            _renderList($setup.tabList, (tab, index) => {
-              return _createElementVNode("view", {
-                key: index,
-                class: "flex-1 items-center justify-center py-6px rounded-6px",
-                style: _normalizeStyle({ backgroundColor: $setup.tabIndex === index ? "#ffffff" : "transparent" }),
-                onClick: ($event) => $setup.tabChange(index)
-              }, [
-                _createElementVNode(
-                  "text",
-                  {
-                    class: "text-12px font-bold",
-                    style: _normalizeStyle({ color: $setup.tabIndex === index ? "var(--theme-color, #37c2bc)" : "#64748b" })
-                  },
-                  _toDisplayString(tab),
-                  5
-                  /* TEXT, STYLE */
-                )
-              ], 12, ["onClick"]);
-            }),
-            64
-            /* STABLE_FRAGMENT */
-          ))
-        ])
-      ]),
-      _createVNode(_component_z_paging_x, {
-        ref: "pagingX",
-        "list-is": "scroll-view",
-        "model-value": $setup.dataList,
-        "default-page-size": 10,
-        "paging-style": { height: "200px", border: "1px solid #edf2f7", borderTopWidth: "0px", borderBottomLeftRadius: "12px", borderBottomRightRadius: "12px", backgroundColor: "#f8fafc" },
-        "onUpdate:modelValue": $setup.onUpdateModelValue,
-        onQuery: $setup.onQuery
-      }, {
-        default: _withCtx(() => [
-          (_openBlock(true), _createElementBlock(
-            _Fragment,
-            null,
-            _renderList($setup.dataList, (item) => {
-              return _openBlock(), _createElementBlock("view", {
-                key: item.id
-              }, [
-                _createElementVNode("view", { class: "mx-12px my-8px p-12px bg-white rounded-8px border-width-1px border-style-solid border-color-__edf2f7_" }, [
-                  _createElementVNode("view", { class: "flex-row justify-between items-center mb-6px" }, [
-                    _createElementVNode(
-                      "view",
-                      {
-                        style: _normalizeStyle({ backgroundColor: item.tagBgColor, padding: "1px 6px", borderRadius: "4px" })
-                      },
-                      [
-                        _createElementVNode(
-                          "text",
-                          {
-                            style: _normalizeStyle({ color: item.tagColor, fontSize: "9px", fontWeight: "bold" })
-                          },
-                          _toDisplayString(item.tag),
-                          5
-                          /* TEXT, STYLE */
-                        )
-                      ],
-                      4
-                      /* STYLE */
-                    ),
-                    _createElementVNode(
-                      "text",
-                      { class: "text-11px text-__94a3b8_" },
-                      "#" + _toDisplayString(item.id),
-                      1
-                      /* TEXT */
-                    )
-                  ]),
-                  _createElementVNode(
-                    "text",
-                    { class: "text-14px font-bold text-__1e293b_ mb-4px" },
-                    _toDisplayString(item.title),
-                    1
-                    /* TEXT */
-                  ),
-                  _createElementVNode(
-                    "text",
-                    { class: "text-12px text-__64748b_ leading-16px" },
-                    _toDisplayString(item.summary),
-                    1
-                    /* TEXT */
-                  )
-                ])
-              ]);
-            }),
-            128
-            /* KEYED_FRAGMENT */
-          ))
-        ]),
-        _: 1
-        /* STABLE */
-      }, 8, ["model-value"])
-    ]),
-    _: 1
-    /* STABLE */
-  });
-}
-const ZPagingDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/function/components/ZPagingDemoCard.uvue"]]);
+const _style_0 = {};
+const ZPagingDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   ZPagingDemoCard as Z
 };

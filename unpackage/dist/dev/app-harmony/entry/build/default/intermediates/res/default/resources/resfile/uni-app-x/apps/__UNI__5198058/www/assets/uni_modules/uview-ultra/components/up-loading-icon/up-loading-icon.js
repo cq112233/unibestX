@@ -2,12 +2,18 @@ import "./loadingIcon.js";
 import { b as addStyle, a as addUnit, g as getPx } from "../../libs/function/index.js";
 import { c as colorGradient } from "../../libs/function/colorGradient.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, toDisplayString: _toDisplayString, createSharedDataFor: _createSharedDataFor, createSharedDataIf: _createSharedDataIf, setSharedDataTemplateRef: _setSharedDataTemplateRef } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpLoadingIconUpLoadingIcon";
 const { computed, ref, watch, onMounted, onBeforeUnmount } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-loading-icon"
   },
+  __dynamicSharedData: true,
+  __hash: "4d7d5706",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.uvue",
   __name: "up-loading-icon",
   props: {
     show: {
@@ -61,9 +67,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       }
     }
   },
-  setup(__props, _a) {
-    var __expose = _a.expose;
-    __expose();
+  setup(__props) {
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpLoadingIconUpLoadingIconSharedData", sharedDataClassId: 0 })));
     const props = __props;
     const array12 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     const webviewHide = ref(false);
@@ -186,75 +192,58 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     onBeforeUnmount(() => {
       stopRotate();
     });
-    const __returned__ = { props, array12, webviewHide, degree, transform, spinnerItemsStyle, get animationFrame() {
-      return animationFrame;
-    }, set animationFrame(v) {
-      animationFrame = v;
-    }, otherBorderColor, customLoadingIconStyle, spinnerStyle, textStyle, getSpinnerDotStyle, getRotateDuration, getRotateStep, rotateLoader, startRotate, stopRotate, calculateSquareRadius, calcSpinnerTopAndLeft, init };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _setTemplateRef = _createSharedDataTemplateRefSetter();
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.show));
+      }, () => {
+        _renderSharedDataEffect(() => {
+          _setSharedDataClass(__sharedData, 10, ["up-loading-icon", [__props.vertical ? "up-loading-icon--vertical" : ""]]);
+          _setSharedDataStyle(__sharedData, 11, customLoadingIconStyle.value);
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 1, _toSharedDataBoolean(!webviewHide.value));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            _setSharedDataClass(__sharedData, 5, ["up-loading-icon__spinner", [`up-loading-icon__spinner--${__props.mode}`]]);
+            _setSharedDataStyle(__sharedData, 6, spinnerStyle.value);
+          });
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData, 2, _toSharedDataBoolean(__props.mode === "spinner"));
+          }, () => {
+            _createSharedDataFor(_setSharedDataScoped(__sharedData, 3, _createSharedDataVFor(__sharedDataScope, () => {
+              return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
+            })), () => {
+              return array12;
+            }, (__sharedData_VFor0, _for_item0, _for_key0) => {
+              _renderSharedDataEffect(() => {
+                return _setSharedDataStyle(__sharedData_VFor0, 1, getSpinnerDotStyle(_for_key0.value));
+              });
+              return null;
+            }, (__sharedData_VFor0, item, index) => {
+              return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
+            });
+          });
+          _setSharedDataTemplateRef(__sharedData, 4, (n9) => {
+            _setTemplateRef(n9, "ani");
+          });
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 7, _toSharedDataBoolean(__props.text != ""));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            _setSharedDataStyle(__sharedData, 8, textStyle.value);
+            _setSharedData(__sharedData, 9, _toDisplayString(__props.text));
+          });
+        });
+      });
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-loading-icon": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "up-loading-icon__text": { "": { "marginLeft": 4, "color": "#606266", "fontSize": 14, "lineHeight": "20px" } }, "up-loading-icon__spinner": { "": { "width": 30, "height": 30, "position": "relative", "boxSizing": "border-box" } }, "up-loading-icon__spinner--semicircle": { "": { "borderTopWidth": 2, "borderRightWidth": 2, "borderBottomWidth": 2, "borderLeftWidth": 2, "borderTopColor": "rgba(0,0,0,0)", "borderRightColor": "rgba(0,0,0,0)", "borderBottomColor": "rgba(0,0,0,0)", "borderLeftColor": "rgba(0,0,0,0)", "borderTopRightRadius": 100, "borderTopLeftRadius": 100, "borderBottomLeftRadius": 100, "borderBottomRightRadius": 100, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "up-loading-icon__spinner--circle": { "": { "borderTopRightRadius": 100, "borderTopLeftRadius": 100, "borderBottomLeftRadius": 100, "borderBottomRightRadius": 100, "borderTopWidth": 2, "borderRightWidth": 2, "borderBottomWidth": 2, "borderLeftWidth": 2, "borderTopColor": "#e5e5e5", "borderRightColor": "#e5e5e5", "borderBottomColor": "#e5e5e5", "borderLeftColor": "#e5e5e5", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "up-loading-icon--vertical": { "": { "flexDirection": "column" } }, "up-loading-icon__dot": { "": { "position": "absolute", "width": 2, "height": "25%", "backgroundColor": "#ffffff", "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } } };
-const { renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode, createCommentVNode: _createCommentVNode, normalizeClass: _normalizeClass, toDisplayString: _toDisplayString } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return $props.show ? (_openBlock(), _createElementBlock(
-    "view",
-    {
-      key: 0,
-      class: _normalizeClass(["up-loading-icon", [$props.vertical ? "up-loading-icon--vertical" : ""]]),
-      style: _normalizeStyle($setup.customLoadingIconStyle)
-    },
-    [
-      !$setup.webviewHide ? (_openBlock(), _createElementBlock(
-        "view",
-        {
-          key: 0,
-          class: _normalizeClass(["up-loading-icon__spinner", [`up-loading-icon__spinner--${$props.mode}`]]),
-          ref: "ani",
-          style: _normalizeStyle($setup.spinnerStyle)
-        },
-        [
-          $props.mode === "spinner" ? (_openBlock(), _createElementBlock(
-            _Fragment,
-            { key: 0 },
-            _renderList($setup.array12, (item, index) => {
-              return _createElementVNode(
-                "view",
-                {
-                  key: index,
-                  class: "up-loading-icon__dot",
-                  style: _normalizeStyle($setup.getSpinnerDotStyle(index))
-                },
-                null,
-                4
-                /* STYLE */
-              );
-            }),
-            64
-            /* STABLE_FRAGMENT */
-          )) : _createCommentVNode("v-if", true)
-        ],
-        6
-        /* CLASS, STYLE */
-      )) : _createCommentVNode("v-if", true),
-      $props.text != "" ? (_openBlock(), _createElementBlock(
-        "text",
-        {
-          key: 1,
-          class: "up-loading-icon__text",
-          style: _normalizeStyle($setup.textStyle)
-        },
-        _toDisplayString($props.text),
-        5
-        /* TEXT, STYLE */
-      )) : _createCommentVNode("v-if", true)
-    ],
-    6
-    /* CLASS, STYLE */
-  )) : _createCommentVNode("v-if", true);
-}
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.uvue"]]);
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_1 as _
 };

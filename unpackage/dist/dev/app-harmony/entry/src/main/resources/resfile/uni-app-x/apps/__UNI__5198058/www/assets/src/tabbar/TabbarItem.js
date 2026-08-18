@@ -1,13 +1,17 @@
 import { _ as __easycom_1 } from "../../uni_modules/uni-icons/components/uni-icons/uni-icons.js";
-import { r as resolveEasycom } from "../../App.ku.js";
-import "./types.js";
 import { c as curIdx, t as themeColor } from "./store.js";
 import { $ as $t } from "../utils/i18n.js";
 import { _ as _export_sfc } from "../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, unref: _unref, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataIf: _createSharedDataIf, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedDataStyle: _setSharedDataStyle, toDisplayString: _toDisplayString } = globalThis.Vue;
+const __className = "GenSrcTabbarTabbarItem";
 const { computed } = globalThis.Vue;
 const inactiveColor = "#999999";
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  __dynamicSharedData: true,
+  __hash: "62588060",
+  __className,
+  __filename: "src/tabbar/TabbarItem.uvue",
   __name: "TabbarItem",
   props: {
     item: {
@@ -23,9 +27,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       default: false
     }
   },
-  setup(__props, _a) {
-    var __expose = _a.expose;
-    __expose();
+  setup(__props) {
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenSrcTabbarTabbarItemSharedData", sharedDataClassId: 0 })));
     const props = __props;
     const tabbarItem = computed(() => {
       return props.item;
@@ -60,78 +64,56 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     function getText() {
       return $t(tabbarItem.value.text);
     }
-    const __returned__ = { props, inactiveColor, tabbarItem, getIcon, getActiveColor, isDotBadge, isNumberBadge, getBadgeText, getText };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _component_uni_icons = __easycom_1;
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(props.isBulge));
+      }, () => {
+      }, () => {
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 1, _toSharedDataBoolean(_unref(tabbarItem).iconType === "image"));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            return _setSharedDataAttr(__sharedData, 2, _toSharedDataString(getIcon()));
+          });
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 3, _toSharedDataBoolean(_unref(tabbarItem).iconType === "icon"));
+        }, () => {
+          const n11 = _createSharedDataComponentWithFallback(_component_uni_icons, "dc968c9c", {
+            type: () => {
+              return getIcon();
+            },
+            size: 24,
+            color: () => {
+              return getActiveColor();
+            }
+          });
+          _setSharedData(__sharedData, 4, n11?.sharedData);
+        });
+        _renderSharedDataEffect(() => {
+          _setSharedDataStyle(__sharedData, 8, { color: getActiveColor() });
+          _setSharedData(__sharedData, 9, _toDisplayString(getText()));
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 5, _toSharedDataBoolean(isDotBadge()));
+        }, () => {
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 6, _toSharedDataBoolean(isNumberBadge()));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            return _setSharedData(__sharedData, 7, _toDisplayString(getBadgeText()));
+          });
+        });
+      }, 261);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "tabbar-item-inner": { "": { "alignItems": "center", "justifyContent": "center", "position": "relative" } }, "icon-normal": { "": { "width": 24, "height": 24 } }, "tabbar-text": { "": { "fontSize": 10, "marginTop": 2, "textAlign": "center" } }, "badge-dot": { "": { "position": "absolute", "top": 0, "right": 0, "width": 8, "height": 8, "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8, "backgroundColor": "#f56c6c" } }, "badge-count": { "": { "position": "absolute", "top": 0, "right": -6, "height": 16, "paddingLeft": 4, "paddingRight": 4, "borderTopLeftRadius": 16, "borderTopRightRadius": 16, "borderBottomRightRadius": 16, "borderBottomLeftRadius": 16, "backgroundColor": "#f56c6c", "alignItems": "center", "justifyContent": "center" } }, "badge-count-text": { "": { "fontSize": 10, "color": "#ffffff", "textAlign": "center" } }, "bulge-item": { "": { "position": "relative", "width": "100%", "height": 80, "alignItems": "center" } }, "bulge-btn": { "": { "position": "absolute", "top": 18, "width": 52, "height": 52, "borderTopLeftRadius": 26, "borderTopRightRadius": 26, "borderBottomRightRadius": 26, "borderBottomLeftRadius": 26, "backgroundImage": "linear-gradient(to bottom right, #0ea5e9, #2563eb)", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "rgba(255,255,255,0.5)", "borderRightColor": "rgba(255,255,255,0.5)", "borderBottomColor": "rgba(255,255,255,0.5)", "borderLeftColor": "rgba(255,255,255,0.5)", "alignItems": "center", "justifyContent": "center", "boxShadow": "0px 3px 8px rgba(37, 99, 235, 0.25)" } }, "ai-btn-text": { "": { "color": "#ffffff", "fontSize": 14, "fontWeight": 600, "letterSpacing": 1, "textAlign": "center" } } };
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { createElementVNode: _createElementVNode, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, resolveComponent: _resolveComponent, createVNode: _createVNode, toDisplayString: _toDisplayString, normalizeStyle: _normalizeStyle } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_uni_icons = resolveEasycom(__resolveDynamicComponent("uni-icons"), __easycom_1);
-  return _openBlock(), _createElementBlock("view", {
-    class: "tabbar-item-wrapper",
-    style: { "width": "100%", "height": "100%", "align-items": "center", "justify-content": "center" }
-  }, [
-    $setup.props.isBulge ? (_openBlock(), _createElementBlock("view", {
-      key: 0,
-      class: "bulge-item"
-    }, [
-      _createElementVNode("view", { class: "bulge-btn" }, [
-        _createElementVNode("text", { class: "ai-btn-text" }, "AI")
-      ])
-    ])) : (_openBlock(), _createElementBlock("view", {
-      key: 1,
-      class: "tabbar-item-inner"
-    }, [
-      $setup.tabbarItem.iconType === "image" ? (_openBlock(), _createElementBlock("image", {
-        key: 0,
-        src: $setup.getIcon(),
-        mode: "scaleToFill",
-        class: "icon-normal"
-      }, null, 8, ["src"])) : _createCommentVNode("v-if", true),
-      $setup.tabbarItem.iconType === "icon" ? (_openBlock(), _createElementBlock("view", {
-        key: 1,
-        class: "icon-normal",
-        style: { "align-items": "center", "justify-content": "center" }
-      }, [
-        _createVNode(_component_uni_icons, {
-          type: $setup.getIcon(),
-          size: 24,
-          color: $setup.getActiveColor()
-        }, null, 8, ["type", "color"])
-      ])) : _createCommentVNode("v-if", true),
-      _createElementVNode(
-        "text",
-        {
-          class: "tabbar-text",
-          style: _normalizeStyle({ color: $setup.getActiveColor() })
-        },
-        _toDisplayString($setup.getText()),
-        5
-        /* TEXT, STYLE */
-      ),
-      $setup.isDotBadge() ? (_openBlock(), _createElementBlock("view", {
-        key: 2,
-        class: "badge-dot"
-      })) : _createCommentVNode("v-if", true),
-      $setup.isNumberBadge() ? (_openBlock(), _createElementBlock("view", {
-        key: 3,
-        class: "badge-count"
-      }, [
-        _createElementVNode(
-          "text",
-          { class: "badge-count-text" },
-          _toDisplayString($setup.getBadgeText()),
-          1
-          /* TEXT */
-        )
-      ])) : _createCommentVNode("v-if", true)
-    ]))
-  ]);
-}
-const TabbarItem = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/tabbar/TabbarItem.uvue"]]);
+const _style_0 = {};
+const TabbarItem = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   TabbarItem as T
 };

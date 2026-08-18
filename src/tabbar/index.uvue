@@ -1,58 +1,58 @@
 <script setup lang="uts">
-import { curIdx, setCurIdx, syncCurIdxByCurrentPage, tabbarList } from './store'
-import TabbarItem from './TabbarItem.uvue'
-import { safeAreaInsets } from '../utils/systemInfo'
+import { curIdx, setCurIdx, syncCurIdxByCurrentPage, tabbarList } from './store';
+import TabbarItem from './TabbarItem.uvue';
+import { safeAreaInsets } from '../utils/systemInfo';
 
 /** tabbar 白色底板高度（px） */
-const TABBAR_HEIGHT: number = 50
+const TABBAR_HEIGHT: number = 50;
 
 /** tabbar 容器总高度（包含鼓包突出的部分） */
-const TABBAR_CONTAINER_HEIGHT: number = 80
+const TABBAR_CONTAINER_HEIGHT: number = 80;
 
 /** 安全区底部高度，从全局 systemInfo 工具中响应式读取 */
 const safeAreaBottom = computed<number>((): number => {
-  const insets = safeAreaInsets.value
+  const insets = safeAreaInsets.value;
   if (insets != null) {
-    return insets.bottom
+    return insets.bottom;
   }
-  return 0
-})
+  return 0;
+});
 
 /** 中间鼓包 tabbarItem 点击事件 */
 function handleClickBulge() {
   uni.navigateTo({
-    url: '/src/pages/ai/ai',
-  })
+    url: '/src/pages/ai/ai'
+  });
 }
 
 /** 点击 tab 切换 */
 function handleClick(index: number) {
   if (index == curIdx.value)
-    return
-  const list = tabbarList
+    return;
+  const list = tabbarList;
   if (list.length <= index)
-    return
+    return;
   if (list[index].isBulge) {
-    handleClickBulge()
-    return
+    handleClickBulge();
+    return;
   }
-  const url = list[index].pagePath
-  setCurIdx(index)
-  uni.switchTab({ url })
+  const url = list[index].pagePath;
+  setCurIdx(index);
+  uni.switchTab({ url });
 }
 
 // 首次挂载时同步索引
 onMounted(() => {
-  syncCurIdxByCurrentPage()
+  syncCurIdxByCurrentPage();
 
   // #ifndef MP-WEIXIN || MP-ALIPAY
   uni.hideTabBar({
     fail: (err: any) => {
-      console.log('hideTabBar fail: ', err)
-    },
-  })
+      console.log('hideTabBar fail: ', err);
+    }
+  });
   // #endif
-})
+});
 </script>
 
 <template>

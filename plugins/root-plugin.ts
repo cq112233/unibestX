@@ -1,75 +1,75 @@
-import fs from 'node:fs'
-import path from 'node:path'
-import process from 'node:process'
+import fs from 'node:fs';
+import path from 'node:path';
+import process from 'node:process';
 
 // 自动给所有页面套上 App.ku.uvue
 export default function autoRootPlugin() {
   return {
     name: 'auto-root',
     transform(code: string, id: string) {
-      const normalizedId = id.replace(/\\/g, '/')
+      const normalizedId = id.replace(/\\/g, '/');
       // 必须是顶级 SFC 文件，忽略所有带 ? 的子请求（如 ?vue&type=script 等）
       if (normalizedId.includes('?')) {
-        return null
+        return null;
       }
       if (!normalizedId.endsWith('.uvue') && !normalizedId.endsWith('.vue')) {
-        return null
+        return null;
       }
       // 只处理 src/pages 和 src/sub 下的非组件 uvue 页面，排除 App.uvue、App.ku.uvue 以及组件目录
-      const isPage = normalizedId.includes('src/pages/') || normalizedId.includes('src/sub/')
+      const isPage = normalizedId.includes('src/pages/') || normalizedId.includes('src/sub/');
       if (!isPage || normalizedId.includes('/components/') || normalizedId.includes('App.ku.uvue') || normalizedId.includes('/src/layouts/')) {
-        return null
+        return null;
       }
 
       // 自动检测并生成 App.ku.uvue 文件于项目根目录
-      const rootPath = process.cwd()
-      const targetFilePath = path.join(rootPath, 'App.ku.uvue')
+      const rootPath = process.cwd();
+      const targetFilePath = path.join(rootPath, 'App.ku.uvue');
       if (!fs.existsSync(targetFilePath)) {
-        const defaultContent = `<template>\n\t<view class="flex-1">\n\t\t<slot></slot>\n\t</view>\n</template>\n\n<script setup lang="uts">\n</script>\n\n<style>\n</style>\n`
+        const defaultContent = `<template>\n\t<view class="flex-1">\n\t\t<slot></slot>\n\t</view>\n</template>\n\n<script setup lang="uts">\n</script>\n\n<style>\n</style>\n`;
         try {
-          fs.writeFileSync(targetFilePath, defaultContent, 'utf-8')
-          console.log('自动生成了缺少的 App.ku.uvue 文件')
+          fs.writeFileSync(targetFilePath, defaultContent, 'utf-8');
+          console.log('自动生成了缺少的 App.ku.uvue 文件');
         }
         catch (e) {
-          console.error('自动生成 App.ku.uvue 失败:', e)
+          console.error('自动生成 App.ku.uvue 失败:', e);
         }
       }
 
-      let newCode = code
+      let newCode = code;
 
       // 1. 将 template 内的内容用 <AppKu> 包裹
-      const startTemplateIdx = code.indexOf('<template')
-      const endTemplateIdx = code.lastIndexOf('</template>')
+      const startTemplateIdx = code.indexOf('<template');
+      const endTemplateIdx = code.lastIndexOf('</template>');
       if (startTemplateIdx !== -1 && endTemplateIdx !== -1 && startTemplateIdx < endTemplateIdx) {
-        const startTagEndIdx = code.indexOf('>', startTemplateIdx)
+        const startTagEndIdx = code.indexOf('>', startTemplateIdx);
         if (startTagEndIdx !== -1 && startTagEndIdx < endTemplateIdx) {
-          const templateAttrs = code.slice(startTemplateIdx + 9, startTagEndIdx)
-          const content = code.slice(startTagEndIdx + 1, endTemplateIdx)
-          const before = code.slice(0, startTemplateIdx)
-          const after = code.slice(endTemplateIdx + 11)
-          newCode = `${before}<template${templateAttrs}>\n  <AppKu>\n${content}\n  </AppKu>\n</template>${after}`
+          const templateAttrs = code.slice(startTemplateIdx + 9, startTagEndIdx);
+          const content = code.slice(startTagEndIdx + 1, endTemplateIdx);
+          const before = code.slice(0, startTemplateIdx);
+          const after = code.slice(endTemplateIdx + 11);
+          newCode = `${before}<template${templateAttrs}>\n  <AppKu>\n${content}\n  </AppKu>\n</template>${after}`;
         }
       }
       else {
         // 没有 template，不处理
-        return null
+        return null;
       }
 
       // 2. 在 script setup 内引入 AppKu 组件
-      const scriptSetupRegex = /<script\s[^>]*\bsetup\b[^>]*>/
+      const scriptSetupRegex = /<script\s[^>]*\bsetup\b[^>]*>/;
       if (scriptSetupRegex.test(newCode)) {
         newCode = newCode.replace(scriptSetupRegex, (match) => {
-          return `${match}\nimport AppKu from '@/App.ku.uvue'`
-        })
+          return `${match}\nimport AppKu from '@/App.ku.uvue'`;
+        });
       }
       else {
-        newCode = `${newCode}\n<script setup lang="uts">\nimport AppKu from '@/App.ku.uvue'\n</script>\n`
+        newCode = `${newCode}\n<script setup lang="uts">\nimport AppKu from '@/App.ku.uvue'\n</script>\n`;
       }
 
       return {
         code: newCode,
-        map: { mappings: '' },
-      }
-    },
-  }
+        map: { mappings: '' }
+      };
+    }
+  };
 }

@@ -1,12 +1,18 @@
 import { E as Enum } from "../enums/index.js";
 import { z as zPagingLoading } from "./z-paging-loading.js";
 import { _ as _export_sfc } from "../../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataIf: _createSharedDataIf, createSharedDataComponent: _createSharedDataComponent, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataEvent: _setSharedDataEvent } = globalThis.Vue;
+const __className = "GenUniModulesZPagingXComponentsZPagingXComponentsZPagingLoadMore";
 const { computed } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "z-paging-load-more"
   },
+  __dynamicSharedData: true,
+  __hash: "8324cc1c",
+  __className,
+  __filename: "uni_modules/z-paging-x/components/z-paging-x/components/z-paging-load-more.uvue",
   __name: "z-paging-load-more",
   props: {
     // 下拉刷新状态
@@ -37,8 +43,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   },
   emits: ["clickMore"],
   setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
-    __expose();
+    var __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesZPagingXComponentsZPagingXComponentsZPagingLoadMoreSharedData", sharedDataClassId: 0 })));
     const props = __props;
     const emit = __emit;
     const isDefault = computed(() => {
@@ -69,39 +76,32 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     const onClickMore = () => {
       emit("clickMore");
     };
-    const __returned__ = { props, emit, isDefault, isLoading, isNoMore, isFail, statusText, onClickMore, get zPagingLoading() {
-      return zPagingLoading;
-    } };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(isNoMore.value));
+      }, () => {
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 1, _toSharedDataBoolean(isLoading.value));
+      }, () => {
+        const n5 = _createSharedDataComponent(zPagingLoading, "e891cc82");
+        _setSharedData(__sharedData, 2, n5.sharedData);
+      });
+      _renderSharedDataEffect(() => {
+        return _setSharedData(__sharedData, 5, _toDisplayString(statusText.value));
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 3, _toSharedDataBoolean(isNoMore.value));
+      }, () => {
+      });
+      _setSharedDataEvent(__sharedData, 4, onClickMore);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "zpx-l-container": { "": { "height": "80rpx", "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "zpx-l-loading-text": { "": { "color": "#a4a4a4", "marginLeft": "10rpx", "fontSize": "28rpx" } }, "zpx-l-line": { "": { "backgroundColor": "#eeeeee", "width": "100rpx", "height": 1, "marginTop": "0rpx", "marginRight": "10rpx", "marginBottom": "0rpx", "marginLeft": "10rpx" } } };
-const { openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, createBlock: _createBlock, toDisplayString: _toDisplayString, createElementVNode: _createElementVNode } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return _openBlock(), _createElementBlock("view", {
-    class: "zpx-l-container",
-    onClick: $setup.onClickMore
-  }, [
-    $setup.isNoMore ? (_openBlock(), _createElementBlock("view", {
-      key: 0,
-      class: "zpx-l-line"
-    })) : _createCommentVNode("v-if", true),
-    $setup.isLoading ? (_openBlock(), _createBlock($setup["zPagingLoading"], { key: 1 })) : _createCommentVNode("v-if", true),
-    _createElementVNode(
-      "text",
-      { class: "zpx-l-loading-text" },
-      _toDisplayString($setup.statusText),
-      1
-      /* TEXT */
-    ),
-    $setup.isNoMore ? (_openBlock(), _createElementBlock("view", {
-      key: 2,
-      class: "zpx-l-line"
-    })) : _createCommentVNode("v-if", true)
-  ]);
-}
-const zPagingLoadMore = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/z-paging-x/components/z-paging-x/components/z-paging-load-more.uvue"]]);
+const _style_0 = {};
+const zPagingLoadMore = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   zPagingLoadMore as z
 };

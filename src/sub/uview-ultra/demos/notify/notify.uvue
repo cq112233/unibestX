@@ -24,22 +24,22 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-const uNotify = ref(null as ComponentPublicInstance | null)
+const uNotify = ref(null as ComponentPublicInstance | null);
 function showNotify(type: string) {
-  const notify = uNotify.value
+  const notify = uNotify.value;
   if (notify != null) {
     const msgs = {
       primary: '主要通知消息',
       success: '操作成功通知',
       warning: '请注意安全通知',
-      error: '发生错误通知',
-    } as UTSJSONObject
+      error: '发生错误通知'
+    } as UTSJSONObject;
     notify.$callMethod('show', {
       message: msgs[type] as string,
-      type,
-    })
+      type
+    });
   }
 }
 </script>

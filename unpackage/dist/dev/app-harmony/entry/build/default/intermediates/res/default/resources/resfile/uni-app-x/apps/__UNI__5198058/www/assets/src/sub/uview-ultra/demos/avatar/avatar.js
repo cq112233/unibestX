@@ -1,22 +1,25 @@
 import { _ as __easycom_0 } from "../../../../components/NavBar/NavBar.js";
-import { A as AppKu, r as resolveEasycom } from "../../../../../App.ku.js";
 import { _ as __easycom_1 } from "../../../../../uni_modules/uview-ultra/components/up-avatar/up-avatar.js";
+import { _ as _sfc_main$1 } from "../../../../../App.ku.js";
 import { L as LayoutComponent } from "../../../../layouts/default.js";
 import { _ as _export_sfc } from "../../../../../plugin-vue-export-helper.js";
 import "../../../../utils/systemInfo.js";
-import "../../../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
-import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.js";
-import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/loadingIcon.js";
-import "../../../../../uni_modules/uview-ultra/libs/config/config.js";
+import "../../../../../uni_modules/uview-ultra/components/up-icon/up-icon.js";
+import "../../../../../uni_modules/uview-ultra/components/up-icon/icons.js";
 import "../../../../../uni_modules/uview-ultra/libs/function/index.js";
 import "../../../../../uni_modules/uview-ultra/libs/function/test.js";
 import "../../../../../uni_modules/uview-ultra/libs/function/digit.js";
 import "../../../../../uni_modules/e-chart/components/e-chart/uts/WebviewEchart.js";
-import "../../../../../uni_modules/uview-ultra/libs/function/colorGradient.js";
-import "../../../../../uni_modules/uview-ultra/components/up-icon/up-icon.js";
-import "../../../../../uni_modules/uview-ultra/components/up-icon/icons.js";
+import "../../../../../uni_modules/uview-ultra/libs/config/config.js";
 import "../../../../../uni_modules/uview-ultra/libs/composable/useUltraUI.js";
 import "../../../../../uni_modules/uview-ultra/components/up-icon/icon.js";
+import "../../../../../uni_modules/uview-ultra/components/up-text/up-text.js";
+import "../../../../../uni_modules/uview-ultra/components/up-link/up-link.js";
+import "../../../../../uni_modules/uview-ultra/components/up-link/link.js";
+import "../../../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
+import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.js";
+import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/loadingIcon.js";
+import "../../../../../uni_modules/uview-ultra/libs/function/colorGradient.js";
 import "../../../../../uni_modules/uview-ultra/components/up-gap/up-gap.js";
 import "../../../../../uni_modules/uview-ultra/libs/composable/useMp.js";
 import "../../../../../uni_modules/uview-ultra/components/up-gap/gap.js";
@@ -26,7 +29,6 @@ import "../../../../../uni_modules/uview-ultra/components/up-transition/transiti
 import "../../../../../uni_modules/uview-ultra/libs/config/color.js";
 import "../../../../tabbar/index.js";
 import "../../../../tabbar/store.js";
-import "../../../../tabbar/types.js";
 import "../../../../tabbar/config.js";
 import "../../../../tabbar/TabbarItem.js";
 import "../../../../../uni_modules/uni-icons/components/uni-icons/uni-icons.js";
@@ -48,11 +50,9 @@ import "../../../../../uni_modules/x-pinia-s/instans/subscriptions.js";
 import "../../../../../uni_modules/x-pinia-s/instans/createPinia.js";
 import "../../../../../uni_modules/x-pinia-s/instans/rootState.js";
 import "../../../../../uni_modules/x-pinia-s/instans/persist.js";
-import "../../../../store/token.js";
+import "../../../../store/app.js";
 import "../../../../../uni_modules/x-pinia-s/instans/storeBase.js";
 import "../../../../../uni_modules/x-pinia-s/instans/defineStore.js";
-import "../../../../store/user.js";
-import "../../../../store/app.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/index.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hans.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hant.js";
@@ -64,132 +64,114 @@ import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ko.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ja.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ru.js";
 import "../../../../utils/toast.js";
-import "../../../../../uni_modules/uview-ultra/components/up-text/up-text.js";
-import "../../../../../uni_modules/uview-ultra/components/up-link/up-link.js";
-import "../../../../../uni_modules/uview-ultra/components/up-link/link.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, resolveComponent: _resolveComponent, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
+const __className = "GenSrcSubUviewUltraDemosAvatarAvatar";
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  __dynamicSharedData: true,
+  __hash: "3036ce42",
+  __className,
+  __filename: "src/sub/uview-ultra/demos/avatar/avatar.uvue",
   __name: "avatar",
-  setup(__props, _a) {
-    var __expose = _a.expose;
-    __expose();
-    const __returned__ = { get AppKu() {
-      return AppKu;
-    }, get LayoutComponent() {
-      return LayoutComponent;
-    } };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+  setup(__props) {
+    const __sharedDataRenderer = _useSharedDataRenderer();
+    const __sharedData = __sharedDataRenderer == "component" ? _withSharedDataComponent(new UniDynamicSharedDataComponent(_useSharedDataScope(), _useSharedDataComponentOptions({ bundleKey: "GenSrcSubUviewUltraDemosAvatarAvatarSharedData", sharedDataClassId: 0 }))) : _withSharedDataPage(new UniDynamicSharedDataPage(_useSharedDataPageId(), _useSharedDataPageOptions({ bundleKey: "GenSrcSubUviewUltraDemosAvatarAvatarSharedData", sharedDataClassId: 0 })));
+    _useSharedDataScope(__sharedData);
+    return () => {
+      "raw js";
+      const _component_NavBar = __easycom_0;
+      const _component_up_avatar = __easycom_1;
+      const n26 = _createSharedDataComponent(_sfc_main$1, "7aad1313", null, {
+        "default": _withSharedDataVaporCtx(() => {
+          const n25 = _createSharedDataComponent(LayoutComponent, "4a15617a", {
+            "navigation-style": "custom",
+            "navigation-bar-title-text": "up-avatar 头像"
+          }, {
+            "default": _withSharedDataVaporCtx(() => {
+              const n0 = _createSharedDataComponentWithFallback(_component_NavBar, "f896cca0", {
+                title: "up-avatar 头像",
+                "auto-back": true,
+                "safe-area-inset-top": true,
+                "bg-color": "#ffffff"
+              });
+              _setSharedData(__sharedData, 2, n0?.sharedData);
+              const n2 = _createSharedDataComponentWithFallback(_component_up_avatar, "f896b70e", {
+                src: "/static/logo.png",
+                size: "40",
+                class: "mr-10px"
+              });
+              _setSharedData(__sharedData, 3, n2?.sharedData);
+              const n3 = _createSharedDataComponentWithFallback(_component_up_avatar, "f896afd8", {
+                text: "U",
+                size: "40",
+                "bg-color": "#2979ff",
+                class: "mr-10px"
+              });
+              _setSharedData(__sharedData, 4, n3?.sharedData);
+              const n7 = _createSharedDataComponentWithFallback(_component_up_avatar, "f8969fa0", {
+                src: "/static/logo.png",
+                shape: "circle",
+                size: "40",
+                class: "mr-10px"
+              });
+              _setSharedData(__sharedData, 5, n7?.sharedData);
+              const n8 = _createSharedDataComponentWithFallback(_component_up_avatar, "f896984c", {
+                src: "/static/logo.png",
+                shape: "square",
+                size: "40"
+              });
+              _setSharedData(__sharedData, 6, n8?.sharedData);
+              const n12 = _createSharedDataComponentWithFallback(_component_up_avatar, "1a42f540", {
+                src: "/static/logo.png",
+                size: "50",
+                class: "mr-10px"
+              });
+              _setSharedData(__sharedData, 7, n12?.sharedData);
+              const n13 = _createSharedDataComponentWithFallback(_component_up_avatar, "1a42f34a", {
+                src: "/static/logo.png",
+                size: "40",
+                class: "mr-10px"
+              });
+              _setSharedData(__sharedData, 8, n13?.sharedData);
+              const n14 = _createSharedDataComponentWithFallback(_component_up_avatar, "1a42ec3e", {
+                src: "/static/logo.png",
+                size: "30",
+                class: "mr-10px"
+              });
+              _setSharedData(__sharedData, 9, n14?.sharedData);
+              const n18 = _createSharedDataComponentWithFallback(_component_up_avatar, "1a42d6f0", {
+                icon: "level",
+                size: "40",
+                "bg-color": "#fa3534",
+                class: "mr-10px"
+              });
+              _setSharedData(__sharedData, 10, n18?.sharedData);
+              const n19 = _createSharedDataComponentWithFallback(_component_up_avatar, "1a42cfa8", {
+                icon: "photo",
+                size: "40",
+                "bg-color": "#ff9900",
+                class: "mr-10px"
+              });
+              _setSharedData(__sharedData, 11, n19?.sharedData);
+              const n20 = _createSharedDataComponentWithFallback(_component_up_avatar, "1a42c836", {
+                text: "张",
+                size: "40",
+                "bg-color": "#19be6b"
+              });
+              _setSharedData(__sharedData, 12, n20?.sharedData);
+            })
+          });
+          _setSharedData(__sharedData, 1, n25.sharedData);
+        })
+      });
+      _setSharedData(__sharedData, 0, n26.sharedData);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "flex-row": { "": { "flexDirection": "row" } }, "items-center": { "": { "alignItems": "center" } }, "mr-10px": { "": { "marginRight": 10 } }, "mt-12px": { "": { "marginTop": 12 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "pb-30px": { "": { "paddingBottom": 30 } } };
-const _style_1 = { "demo-block": { "": { "marginBottom": 12, "paddingTop": 12, "paddingRight": 12, "paddingBottom": 12, "paddingLeft": 12, "backgroundColor": "#ffffff", "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "demo-label": { "": { "fontSize": 14, "fontWeight": "bold", "color": "#606266", "marginBottom": 10, "paddingLeft": 4, "borderLeftWidth": 3, "borderLeftStyle": "solid", "borderLeftColor": "#2979ff" } } };
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { resolveComponent: _resolveComponent, createVNode: _createVNode, createElementVNode: _createElementVNode, withCtx: _withCtx, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_NavBar = resolveEasycom(__resolveDynamicComponent("NavBar"), __easycom_0);
-  const _component_up_avatar = resolveEasycom(__resolveDynamicComponent("up-avatar"), __easycom_1);
-  return _openBlock(), _createBlock($setup["AppKu"], null, {
-    default: _withCtx(() => [
-      _createVNode($setup["LayoutComponent"], {
-        "navigation-style": "custom",
-        "navigation-bar-title-text": "up-avatar 头像"
-      }, {
-        default: _withCtx(() => [
-          _createElementVNode("view", { class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }, [
-            _createVNode(_component_NavBar, {
-              title: "up-avatar 头像",
-              "auto-back": true,
-              "safe-area-inset-top": true,
-              "bg-color": "#ffffff"
-            }),
-            _createElementVNode("view", { class: "p-16px" }, [
-              _createElementVNode("view", { class: "demo-block" }, [
-                _createElementVNode("text", { class: "demo-label" }, "基础用法"),
-                _createElementVNode("view", { class: "flex-row items-center" }, [
-                  _createVNode(_component_up_avatar, {
-                    src: "/static/logo.png",
-                    size: "40",
-                    class: "mr-10px"
-                  }),
-                  _createVNode(_component_up_avatar, {
-                    text: "U",
-                    size: "40",
-                    "bg-color": "#2979ff",
-                    class: "mr-10px"
-                  })
-                ])
-              ]),
-              _createElementVNode("view", { class: "demo-block mt-12px" }, [
-                _createElementVNode("text", { class: "demo-label" }, "形状设定"),
-                _createElementVNode("view", { class: "flex-row items-center" }, [
-                  _createVNode(_component_up_avatar, {
-                    src: "/static/logo.png",
-                    shape: "circle",
-                    size: "40",
-                    class: "mr-10px"
-                  }),
-                  _createVNode(_component_up_avatar, {
-                    src: "/static/logo.png",
-                    shape: "square",
-                    size: "40"
-                  })
-                ])
-              ]),
-              _createElementVNode("view", { class: "demo-block mt-12px" }, [
-                _createElementVNode("text", { class: "demo-label" }, "不同尺寸"),
-                _createElementVNode("view", { class: "flex-row items-center" }, [
-                  _createVNode(_component_up_avatar, {
-                    src: "/static/logo.png",
-                    size: "50",
-                    class: "mr-10px"
-                  }),
-                  _createVNode(_component_up_avatar, {
-                    src: "/static/logo.png",
-                    size: "40",
-                    class: "mr-10px"
-                  }),
-                  _createVNode(_component_up_avatar, {
-                    src: "/static/logo.png",
-                    size: "30",
-                    class: "mr-10px"
-                  })
-                ])
-              ]),
-              _createElementVNode("view", { class: "demo-block mt-12px" }, [
-                _createElementVNode("text", { class: "demo-label" }, "自定义背景色和图标"),
-                _createElementVNode("view", { class: "flex-row items-center" }, [
-                  _createVNode(_component_up_avatar, {
-                    icon: "level",
-                    size: "40",
-                    "bg-color": "#fa3534",
-                    class: "mr-10px"
-                  }),
-                  _createVNode(_component_up_avatar, {
-                    icon: "photo",
-                    size: "40",
-                    "bg-color": "#ff9900",
-                    class: "mr-10px"
-                  }),
-                  _createVNode(_component_up_avatar, {
-                    text: "张",
-                    size: "40",
-                    "bg-color": "#19be6b"
-                  })
-                ])
-              ])
-            ])
-          ])
-        ]),
-        _: 1
-        /* STABLE */
-      })
-    ]),
-    _: 1
-    /* STABLE */
-  });
-}
-const avatar = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0, _style_1]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/avatar/avatar.uvue"]]);
+const _style_0 = {};
+const _style_1 = {};
+const avatar = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0, _style_1]]]);
 export {
   avatar as default
 };

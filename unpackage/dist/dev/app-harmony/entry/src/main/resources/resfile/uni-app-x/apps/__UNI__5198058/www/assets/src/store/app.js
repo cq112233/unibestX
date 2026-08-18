@@ -6,27 +6,6 @@ import { t as themeColor } from "../tabbar/store.js";
 import { i as i18n } from "../i18n/index.js";
 import { s as setLocale } from "../../uni_modules/uview-ultra/libs/i18n/index.js";
 const { reactive } = globalThis.Vue;
-class IAppState extends UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          theme: { type: String, optional: false },
-          locale: { type: String, optional: false }
-        };
-      },
-      name: "IAppState"
-    };
-  }
-  constructor(options, metadata = IAppState.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.theme = this.__props__.theme;
-    this.locale = this.__props__.locale;
-    delete this.__props__;
-  }
-}
 function getSystemLocale() {
   try {
     const sysInfo = uni.getSystemInfoSync();
@@ -41,23 +20,18 @@ function getSystemLocale() {
   }
   return "zh-CN";
 }
-const defaultAppState = new IAppState(
-  {
-    theme: "#37c2bc",
-    locale: getSystemLocale()
-  }
-  // ==========================================
-  // Store 实现
-  // ==========================================
-);
+const defaultAppState = {
+  theme: "#37c2bc",
+  locale: getSystemLocale()
+};
 class AppStore extends PiniaStoreBase {
   // 2. constructor
   constructor() {
     super();
-    this.state = reactive(new IAppState({
+    this.state = reactive({
       theme: "#37c2bc",
       locale: getSystemLocale()
-    }));
+    });
     this.bindState(this.state);
     themeColor.value = this.state.theme;
     i18n.global.locale.value = this.state.locale;
@@ -74,13 +48,13 @@ class AppStore extends PiniaStoreBase {
     setLocale(defaultAppState.locale);
   }
   _hydrate(_data) {
-    if (_data["theme"] != null) {
-      const colorVal = _data["theme"];
+    if (_data.theme != null) {
+      const colorVal = _data.theme;
       this.state.theme = colorVal;
       themeColor.value = colorVal;
     }
-    if (_data["locale"] != null) {
-      const localeVal = _data["locale"];
+    if (_data.locale != null) {
+      const localeVal = _data.locale;
       this.state.locale = localeVal;
       i18n.global.locale.value = localeVal;
       setLocale(localeVal);

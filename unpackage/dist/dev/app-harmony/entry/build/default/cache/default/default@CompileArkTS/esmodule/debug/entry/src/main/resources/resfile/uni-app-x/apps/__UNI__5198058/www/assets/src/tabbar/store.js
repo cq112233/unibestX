@@ -1,11 +1,10 @@
-import { C as CustomTabBarItem } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/tabbar/types&";
 import { c as customTabbarList } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/tabbar/config&";
 const { reactive, ref } = globalThis.Vue;
 function normalizeList() {
   const result = [];
   for (let i = 0; i < customTabbarList.length; i++) {
     const item = customTabbarList[i];
-    result.push(new CustomTabBarItem({
+    result.push({
       text: item.text,
       pagePath: item.pagePath.startsWith("/") ? item.pagePath : `/${item.pagePath}`,
       iconType: item.iconType,
@@ -13,7 +12,7 @@ function normalizeList() {
       iconActive: item.iconActive,
       badge: item.badge,
       isBulge: item.isBulge
-    }));
+    });
   }
   return result;
 }

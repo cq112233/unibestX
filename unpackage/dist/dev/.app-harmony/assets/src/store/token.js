@@ -3,109 +3,11 @@ import { P as PiniaStoreBase } from "../../uni_modules/x-pinia-s/instans/storeBa
 import { d as defineStore } from "../../uni_modules/x-pinia-s/instans/defineStore.js";
 import "../../uni_modules/x-pinia-s/instans/persist.js";
 const { reactive } = globalThis.Vue;
-class ILoginForm extends UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          username: { type: String, optional: false },
-          password: { type: String, optional: false }
-        };
-      },
-      name: "ILoginForm"
-    };
-  }
-  constructor(options, metadata = ILoginForm.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.username = this.__props__.username;
-    this.password = this.__props__.password;
-    delete this.__props__;
-  }
-}
-class ISingleTokenRes extends UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          token: { type: String, optional: false },
-          expiresIn: { type: Number, optional: false }
-        };
-      },
-      name: "ISingleTokenRes"
-    };
-  }
-  constructor(options, metadata = ISingleTokenRes.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.token = this.__props__.token;
-    this.expiresIn = this.__props__.expiresIn;
-    delete this.__props__;
-  }
-}
-class IDoubleTokenRes extends UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          accessToken: { type: String, optional: false },
-          accessExpiresIn: { type: Number, optional: false },
-          refreshToken: { type: String, optional: false },
-          refreshExpiresIn: { type: Number, optional: false }
-        };
-      },
-      name: "IDoubleTokenRes"
-    };
-  }
-  constructor(options, metadata = IDoubleTokenRes.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.accessToken = this.__props__.accessToken;
-    this.accessExpiresIn = this.__props__.accessExpiresIn;
-    this.refreshToken = this.__props__.refreshToken;
-    this.refreshExpiresIn = this.__props__.refreshExpiresIn;
-    delete this.__props__;
-  }
-}
-class ITokenState extends UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          token: { type: String, optional: false },
-          expiresIn: { type: Number, optional: false },
-          accessToken: { type: String, optional: false },
-          accessExpiresIn: { type: Number, optional: false },
-          refreshToken: { type: String, optional: false },
-          refreshExpiresIn: { type: Number, optional: false },
-          tokenExpireTime: { type: Number, optional: false }
-        };
-      },
-      name: "ITokenState"
-    };
-  }
-  constructor(options, metadata = ITokenState.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.token = this.__props__.token;
-    this.expiresIn = this.__props__.expiresIn;
-    this.accessToken = this.__props__.accessToken;
-    this.accessExpiresIn = this.__props__.accessExpiresIn;
-    this.refreshToken = this.__props__.refreshToken;
-    this.refreshExpiresIn = this.__props__.refreshExpiresIn;
-    this.tokenExpireTime = this.__props__.tokenExpireTime;
-    delete this.__props__;
-  }
-}
 class TokenStore extends PiniaStoreBase {
   // 2. constructor
   constructor() {
     super();
-    this.state = reactive(new ITokenState({
+    this.state = reactive({
       token: "",
       expiresIn: 0,
       accessToken: "",
@@ -113,7 +15,7 @@ class TokenStore extends PiniaStoreBase {
       refreshToken: "",
       refreshExpiresIn: 0,
       tokenExpireTime: 0
-    }));
+    });
     this.bindState(this.state);
   }
   // ==========================================
@@ -129,20 +31,20 @@ class TokenStore extends PiniaStoreBase {
     this.state.tokenExpireTime = 0;
   }
   _hydrate(_data) {
-    if (_data["token"] != null)
-      this.state.token = _data["token"];
-    if (_data["expiresIn"] != null)
-      this.state.expiresIn = _data["expiresIn"];
-    if (_data["accessToken"] != null)
-      this.state.accessToken = _data["accessToken"];
-    if (_data["accessExpiresIn"] != null)
-      this.state.accessExpiresIn = _data["accessExpiresIn"];
-    if (_data["refreshToken"] != null)
-      this.state.refreshToken = _data["refreshToken"];
-    if (_data["refreshExpiresIn"] != null)
-      this.state.refreshExpiresIn = _data["refreshExpiresIn"];
-    if (_data["tokenExpireTime"] != null)
-      this.state.tokenExpireTime = _data["tokenExpireTime"];
+    if (_data.token != null)
+      this.state.token = _data.token;
+    if (_data.expiresIn != null)
+      this.state.expiresIn = _data.expiresIn;
+    if (_data.accessToken != null)
+      this.state.accessToken = _data.accessToken;
+    if (_data.accessExpiresIn != null)
+      this.state.accessExpiresIn = _data.accessExpiresIn;
+    if (_data.refreshToken != null)
+      this.state.refreshToken = _data.refreshToken;
+    if (_data.refreshExpiresIn != null)
+      this.state.refreshExpiresIn = _data.refreshExpiresIn;
+    if (_data.tokenExpireTime != null)
+      this.state.tokenExpireTime = _data.tokenExpireTime;
   }
   _serialize() {
     return new UTSJSONObject({
@@ -207,7 +109,7 @@ class TokenStore extends PiniaStoreBase {
     if (this.state.tokenExpireTime <= 0) {
       const val = uni.getStorageSync("accessTokenExpireTime");
       if (val != null && val !== "") {
-        const num = parseFloat(val.toString());
+        const num = Number.parseFloat(val.toString());
         if (!isNaN(num)) {
           this.state.tokenExpireTime = num;
         }
@@ -222,7 +124,7 @@ class TokenStore extends PiniaStoreBase {
     const val = uni.getStorageSync("refreshTokenExpireTime");
     if (val == null || val === "")
       return false;
-    const num = parseFloat(val.toString());
+    const num = Number.parseFloat(val.toString());
     if (isNaN(num))
       return false;
     return Date.now() < num;
@@ -244,7 +146,6 @@ const useTokenStore = defineStore("token", () => {
   return new TokenStore();
 });
 export {
-  ISingleTokenRes as I,
   useTokenStore as u
 };
 //# sourceMappingURL=token.js.map

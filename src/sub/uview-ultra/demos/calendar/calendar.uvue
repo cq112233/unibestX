@@ -38,41 +38,41 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-const calendarShow1 = ref(false)
-const calendarShow2 = ref(false)
-const calendarShow3 = ref(false)
-const calendarShow4 = ref(false)
+const calendarShow1 = ref(false);
+const calendarShow2 = ref(false);
+const calendarShow3 = ref(false);
+const calendarShow4 = ref(false);
 
 function showCalendar1() {
-  calendarShow1.value = true
+  calendarShow1.value = true;
 }
 function showCalendar2() {
-  calendarShow2.value = true
+  calendarShow2.value = true;
 }
 function showCalendar3() {
-  calendarShow3.value = true
+  calendarShow3.value = true;
 }
 function showCalendar4() {
-  calendarShow4.value = true
+  calendarShow4.value = true;
 }
 
 function onConfirm1(e: string[]) {
-  console.log('single', e)
-  calendarShow1.value = false
+  console.log('single', e);
+  calendarShow1.value = false;
 }
 function onConfirm2(e: string[]) {
-  console.log('multiple', e)
-  calendarShow2.value = false
+  console.log('multiple', e);
+  calendarShow2.value = false;
 }
 function onConfirm3(e: string[]) {
-  console.log('range', e)
-  calendarShow3.value = false
+  console.log('range', e);
+  calendarShow3.value = false;
 }
 function onConfirm4(e: string[]) {
-  console.log('custom color', e)
-  calendarShow4.value = false
+  console.log('custom color', e);
+  calendarShow4.value = false;
 }
 </script>
 

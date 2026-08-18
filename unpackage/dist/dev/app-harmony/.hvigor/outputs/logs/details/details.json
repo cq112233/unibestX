@@ -46,17 +46,49 @@
             "path": "arkOptions.runtimeOnly.sources",
             "traceValue": false,
             "value": ""
+          },
+          {
+            "path": "externalNativeOptions",
+            "traceValue": false,
+            "value": ""
+          },
+          {
+            "path": "externalNativeOptions.path",
+            "traceValue": false,
+            "value": ""
+          },
+          {
+            "path": "externalNativeOptions.abiFilters",
+            "traceValue": true,
+            "value": [
+              "arm64-v8a"
+            ]
+          },
+          {
+            "path": "externalNativeOptions.arguments",
+            "traceValue": false,
+            "value": ""
+          },
+          {
+            "path": "externalNativeOptions.cppFlags",
+            "traceValue": false,
+            "value": ""
           }
         ],
         "PACKAGE_JSON": [],
         "MODULE_TYPE": "entry",
-        "IS_INCREMENTAL_MODULE": true
+        "INCREMENTAL_TASKS": {
+          "BUILD_NATIVE_WITH_CMAKE": false,
+          "COMPILE_ARKTS": false
+        },
+        "IS_INCREMENTAL_MODULE": false
       }
     ],
     "NATIVE_COMPILER": "Default",
-    "IS_FULL_BUILD": false,
+    "IS_FULL_BUILD": true,
     "PACKAGE_JSON": [],
-    "BUILD_MODE": "debug"
+    "BUILD_MODE": "debug",
+    "USE_NORMALIZED_OHMURL": true
   },
   "HVIGOR": {
     "IS_INCREMENTAL": true,
@@ -65,83 +97,60 @@
     "IS_HVIGORFILE_TYPE_CHECK": false,
     "IS_EXECUTION_OHPM_BY_HVIGOR": false,
     "BUILD_ANALYSIS_MODE": "normal",
-    "TASK_TIME": {},
+    "TASK_TIME": {
+      "923fe53966c6cd9343e11af776cd4b05be315ea4b200b02e4d5dfb0f929b73bf": {
+        "clean": 475833,
+        "init": 106917,
+        "PreBuild": 108450125,
+        "CreateModuleInfo": 797250,
+        "GenerateMetadata": 1049625,
+        "ConfigureCmake": 17770667,
+        "MergeProfile": 3647417,
+        "CreateBuildProfile": 538875,
+        "PreCheckSyscap": 109958,
+        "GeneratePkgSdkInfo": 1297500,
+        "ProcessIntegratedHsp": 289542,
+        "MakePackInfo": 846958,
+        "SyscapTransform": 718250,
+        "BuildNativeWithCmake": 1134570125,
+        "BuildNativeWithNinja": 17712916,
+        "GeneratePkgContextInfo": 20498750,
+        "ProcessProfile": 48297917,
+        "ProcessRouterMap": 1105417,
+        "ProcessShareConfig": 706625,
+        "ProcessStartupConfig": 1961792,
+        "ProcessResource": 1546250,
+        "GenerateLoaderJson": 6449125,
+        "ProcessLibs": 85773792,
+        "DoNativeStrip": 56914625,
+        "CacheNativeLibs": 2369042,
+        "CompileResource": 283610292,
+        "BuildJS": 457083,
+        "CompileArkTS": 9738659500,
+        "GeneratePkgModuleJson": 872000,
+        "ProcessCompiledResources": 179375,
+        "PackageHap": 578357459,
+        "PackingCheck": 18736792,
+        "SignHap": 378250125,
+        "CollectDebugSymbol": 357542,
+        "assembleHap": 66208
+      },
+      "APP": {
+        "clean": 103167,
+        "init": 73875
+      }
+    },
     "CUSTOM_TASK_TIME": {},
     "CUSTOM_PLUGIN_TIME": {},
-    "APIS": [],
+    "APIS": [
+      "getProperty"
+    ],
     "CONFIG_EXPERIMENT": {
       "ENABLE_MODULE_SKIP": false,
       "ENABLE_CPP_FUNCTION_LEVEL_INCREMENTAL": false
     },
     "CONFIG_PROPERTIES": {},
-    "TOTAL_TIME": 86241458,
-    "BUILD_ID": "202608171937235620",
-    "ERROR_MESSAGE": [
-      {
-        "CODE": "00303038",
-        "MESSAGE": "%s",
-        "SOLUTIONS": [
-          "Please check the following fields. \n {\n  instancePath: 'app',\n  keyword: 'required',\n  params: { missingProperty: 'icon' },\n  message: \"must have required property 'icon'\",\n  location: '/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/AppScope/app.json5:2:11'\n} \n{\n  instancePath: 'app',\n  keyword: 'required',\n  params: { missingProperty: 'label' },\n  message: \"must have required property 'label'\",\n  location: '/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/AppScope/app.json5:2:11'\n} \n"
-        ],
-        "TIMESTAMP": "1786966643646"
-      },
-      {
-        "CODE": "00303038",
-        "STACK": "00303038 Configuration Error\n...",
-        "PROJECT_CONFIG": {
-          "buildMode": "Debug",
-          "compileMode": "esmodule",
-          "moduleType": "entry",
-          "targetName": ".default",
-          "packageManagerType": "ohpm",
-          "isLocalTest": false,
-          "needCoverageInsert": false,
-          "debugLine": false,
-          "compileSdkVersion": 24,
-          "compatibleSdkVersion": 13,
-          "originCompatibleSdkVersion": "5.0.1(13)",
-          "etsLoaderVersion": "6.1.1.125",
-          "etsLoaderReleaseType": "Release",
-          "aotCompileMode": "type",
-          "isCrossplatform": false,
-          "bundleType": "app",
-          "apiVersion": 24,
-          "isFaMode": false,
-          "deviceTypes": [
-            "phone"
-          ],
-          "integratedHsp": false,
-          "branchElimination": false,
-          "tsImportSendable": false,
-          "resolveConflictMode": true,
-          "useNativeResolver": true,
-          "shouldEmitJs": true,
-          "useTscResolve": false,
-          "singleFileEmit": false,
-          "executionMode": "memory",
-          "isHarDeduplicateEnabled": false,
-          "autoLazyImport": false,
-          "allowEmptyBundleName": false,
-          "reExportCheckMode": "noCheck",
-          "usePathPlaceholder": false,
-          "writeRollupCache": true,
-          "isExpandImportEnabled": false,
-          "ignoreCrossplatformCheck": false,
-          "skipOhModulesLint": false,
-          "enableStrictCheckOHModule": false,
-          "useDeclarationFileSignature": false,
-          "isPreloadSoEnabled": false,
-          "strictMode.caseSensitiveCheck": true,
-          "strictMode.useNormalizedOHMUrl": true,
-          "strictMode.noExternalImportByPath": true,
-          "runtimeOS": "HarmonyOS",
-          "sdkInfo": "false:24:6.1.1.125:Release",
-          "useSourceHash": false,
-          "isByteCodeHarOptimize": false,
-          "copyCodeResourceEnable": true,
-          "uiTransformOptimization": false
-        }
-      }
-    ]
+    "BUILD_ID": "202608181047197650",
+    "TOTAL_TIME": 12460574542
   }
 }

@@ -22,7 +22,7 @@
           backgroundColor: item,
           borderWidth: currentTheme == item ? '3px' : '0px',
           borderStyle: 'solid',
-          borderColor: '#1e293b',
+          borderColor: '#1e293b'
         }"
         @click="changeTheme(item)"
       >
@@ -38,37 +38,37 @@
 </template>
 
 <script setup lang="uts">
-import Card from './Card.uvue'
-import { computed } from 'vue'
-import { useAppStore } from '@/src/store/index.uts'
-import { $t } from '@/src/utils/i18n'
+import Card from './Card.uvue';
+import { computed } from 'vue';
+import { useAppStore } from '@/src/store/index.uts';
+import { $t } from '@/src/utils/i18n';
 
-const appStore = useAppStore()
+const appStore = useAppStore();
 
-const themeTitle = computed((): string => $t('basic.themeTitle'))
-const themePreview = computed((): string => $t('basic.themePreview'))
-const themeButton = computed((): string => $t('basic.themeButton'))
+const themeTitle = computed((): string => $t('basic.themeTitle'));
+const themePreview = computed((): string => $t('basic.themePreview'));
+const themeButton = computed((): string => $t('basic.themeButton'));
 
 const currentTheme = computed((): string => {
-  return appStore.state.theme
-})
+  return appStore.state.theme;
+});
 
 const colorOptions = [
   '#37c2bc',
   '#0957DE',
   '#10b981',
   '#f43f5e',
-  '#f97316',
-]
+  '#f97316'
+];
 
 function changeTheme(color: string) {
-  appStore.setTheme(color)
+  appStore.setTheme(color);
 
   uni.showToast({
     title: $t('basic.themeSuccess'),
     icon: 'none',
-    duration: 1500,
-  })
+    duration: 1500
+  });
 }
 </script>
 

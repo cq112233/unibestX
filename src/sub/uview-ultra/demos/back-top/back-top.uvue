@@ -43,20 +43,20 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-const currentScrollTop = ref(0)
-const scrollTop = ref(0)
-const windowHeight = ref(uni.getWindowInfo().windowHeight)
+const currentScrollTop = ref(0);
+const scrollTop = ref(0);
+const windowHeight = ref(uni.getWindowInfo().windowHeight);
 
 function handleScroll(e: UniScrollEvent) {
-  currentScrollTop.value = e.detail.scrollTop
-  scrollTop.value = e.detail.scrollTop
+  currentScrollTop.value = e.detail.scrollTop;
+  scrollTop.value = e.detail.scrollTop;
 }
 
 function scrollToTop() {
-  scrollTop.value = 0
-  currentScrollTop.value = 0
+  scrollTop.value = 0;
+  currentScrollTop.value = 0;
 }
 </script>
 

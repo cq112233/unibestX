@@ -40,19 +40,19 @@
 </template>
 
 <script setup lang="uts">
-import { computed, ref } from 'vue'
-import { safeAreaInsets, systemInfo } from '@/src/utils/systemInfo'
+import { computed, ref } from 'vue';
+import { safeAreaInsets, systemInfo } from '@/src/utils/systemInfo';
 
-const scrollTop = ref(0)
-const windowHeight = ref(uni.getWindowInfo().windowHeight)
+const scrollTop = ref(0);
+const windowHeight = ref(uni.getWindowInfo().windowHeight);
 
 const navHeight = computed((): number => {
-  const top = safeAreaInsets.value?.top ?? systemInfo.value?.statusBarHeight ?? 0
-  return top + 44
-})
+  const top = safeAreaInsets.value?.top ?? systemInfo.value?.statusBarHeight ?? 0;
+  return top + 44;
+});
 
 function handleScroll(e: UniScrollEvent) {
-  scrollTop.value = e.detail.scrollTop
+  scrollTop.value = e.detail.scrollTop;
 }
 </script>
 

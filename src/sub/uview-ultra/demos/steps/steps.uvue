@@ -47,12 +47,12 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-const currentStep = ref<number>(1)
+const currentStep = ref<number>(1);
 
 function nextStep(): void {
-  currentStep.value = (currentStep.value + 1) % 4
+  currentStep.value = (currentStep.value + 1) % 4;
 }
 </script>
 

@@ -1,8 +1,14 @@
 import { s as safeAreaInsets, a as systemInfo } from "../../utils/systemInfo.js";
 import { _ as _export_sfc } from "../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataIf: _createSharedDataIf, createSharedDataSlot: _createSharedDataSlot, setSharedDataEvent: _setSharedDataEvent, toDisplayString: _toDisplayString } = globalThis.Vue;
+const __className = "GenSrcComponentsNavBarNavBar";
 const { computed } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  __dynamicSharedData: true,
+  __hash: "38b7fc16",
+  __className,
+  __filename: "src/components/NavBar/NavBar.uvue",
   __name: "NavBar",
   props: {
     title: {
@@ -34,10 +40,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       default: true
     }
   },
-  setup(__props, _a) {
-    var __expose = _a.expose;
-    __expose();
-    const props = __props;
+  setup(__props) {
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenSrcComponentsNavBarNavBarSharedData", sharedDataClassId: 0 })));
     const statusBarHeight = computed(() => {
       const insets = safeAreaInsets.value;
       if (insets != null && insets.top > 0) {
@@ -61,95 +66,51 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
         });
       }
     }
-    const __returned__ = { props, statusBarHeight, handleBack };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      _renderSharedDataEffect(() => {
+        const _border = __props.border;
+        _setSharedDataClass(__sharedData, 7, __props.fixed ? "navbar-container navbar-fixed" : "navbar-container");
+        _setSharedDataStyle(__sharedData, 8, {
+          backgroundColor: __props.bgColor,
+          borderBottomWidth: _border ? "1px" : "0px",
+          borderBottomStyle: _border ? "solid" : "none",
+          borderBottomColor: _border ? "#e2e8f0" : "transparent"
+        });
+        _setSharedDataStyle(__sharedData, 9, { height: `${statusBarHeight.value}px` });
+      });
+      _createSharedDataSlot("left", null, null, () => {
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 2, _toSharedDataBoolean(__props.showBack));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            const _titleColor = __props.titleColor;
+            _setSharedDataStyle(__sharedData, 3, { borderLeftColor: _titleColor, borderBottomColor: _titleColor });
+          });
+        });
+      });
+      _setSharedDataEvent(__sharedData, 6, handleBack);
+      _createSharedDataSlot("default", null, null, () => {
+        _renderSharedDataEffect(() => {
+          _setSharedDataStyle(__sharedData, 4, { color: __props.titleColor });
+          _setSharedData(__sharedData, 5, _toDisplayString(__props.title));
+        });
+      });
+      _createSharedDataSlot("right", null, null);
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.fixed && __props.placeholder));
+      }, () => {
+        _renderSharedDataEffect(() => {
+          return _setSharedDataStyle(__sharedData, 1, { height: `${statusBarHeight.value + 44}px` });
+        });
+      });
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "border": { "": { "borderTopWidth": "var(--un-line-width-default,1px)", "borderRightWidth": "var(--un-line-width-default,1px)", "borderBottomWidth": "var(--un-line-width-default,1px)", "borderLeftWidth": "var(--un-line-width-default,1px)" } }, "fixed": { "": { "position": "fixed" } }, "none": { "": { "display": "none" } } };
-const _style_1 = { "navbar-container": { "": { "width": "100%", "display": "flex", "flexDirection": "column" } }, "navbar-fixed": { "": { "position": "fixed", "top": 0, "left": 0, "right": 0, "zIndex": 999 } }, "navbar-content": { "": { "height": 44, "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "position": "relative", "width": "100%" } }, "navbar-left": { "": { "position": "absolute", "left": 0, "top": 0, "bottom": 0, "width": 60, "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "flex-start", "zIndex": 10 } }, "back-btn-wrapper": { "": { "paddingTop": 10, "paddingRight": 15, "paddingBottom": 10, "paddingLeft": 15, "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "back-arrow": { "": { "width": 10, "height": 10, "borderLeftWidth": 2, "borderLeftStyle": "solid", "borderLeftColor": "#1e293b", "borderBottomWidth": 2, "borderBottomStyle": "solid", "borderBottomColor": "#1e293b", "transform": "rotate(45deg)" } }, "navbar-title": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "height": "100%", "paddingLeft": 60, "paddingRight": 60 } }, "title-text": { "": { "fontSize": 16, "fontWeight": 700, "textOverflow": "ellipsis" } }, "navbar-right": { "": { "position": "absolute", "right": 0, "top": 0, "bottom": 0, "width": 60, "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "flex-end", "zIndex": 10, "paddingRight": 15 } } };
-const { normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode, renderSlot: _renderSlot, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, toDisplayString: _toDisplayString, normalizeClass: _normalizeClass } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return _openBlock(), _createElementBlock("view", null, [
-    _createElementVNode(
-      "view",
-      {
-        class: _normalizeClass($props.fixed ? "navbar-container navbar-fixed" : "navbar-container"),
-        style: _normalizeStyle({
-          backgroundColor: $props.bgColor,
-          borderBottomWidth: $props.border ? "1px" : "0px",
-          borderBottomStyle: $props.border ? "solid" : "none",
-          borderBottomColor: $props.border ? "#e2e8f0" : "transparent"
-        })
-      },
-      [
-        _createElementVNode(
-          "view",
-          {
-            style: _normalizeStyle({ height: `${$setup.statusBarHeight}px` })
-          },
-          null,
-          4
-          /* STYLE */
-        ),
-        _createElementVNode("view", { class: "navbar-content" }, [
-          _createElementVNode("view", {
-            class: "navbar-left",
-            onClick: $setup.handleBack
-          }, [
-            _renderSlot(_ctx.$slots, "left", {}, () => [
-              $props.showBack ? (_openBlock(), _createElementBlock("view", {
-                key: 0,
-                class: "back-btn-wrapper"
-              }, [
-                _createElementVNode(
-                  "view",
-                  {
-                    class: "back-arrow",
-                    style: _normalizeStyle({ borderLeftColor: $props.titleColor, borderBottomColor: $props.titleColor })
-                  },
-                  null,
-                  4
-                  /* STYLE */
-                )
-              ])) : _createCommentVNode("v-if", true)
-            ])
-          ]),
-          _createElementVNode("view", { class: "navbar-title" }, [
-            _renderSlot(_ctx.$slots, "default", {}, () => [
-              _createElementVNode(
-                "text",
-                {
-                  class: "title-text",
-                  style: _normalizeStyle({ color: $props.titleColor })
-                },
-                _toDisplayString($props.title),
-                5
-                /* TEXT, STYLE */
-              )
-            ])
-          ]),
-          _createElementVNode("view", { class: "navbar-right" }, [
-            _renderSlot(_ctx.$slots, "right")
-          ])
-        ])
-      ],
-      6
-      /* CLASS, STYLE */
-    ),
-    $props.fixed && $props.placeholder ? (_openBlock(), _createElementBlock(
-      "view",
-      {
-        key: 0,
-        style: _normalizeStyle({ height: `${$setup.statusBarHeight + 44}px` })
-      },
-      null,
-      4
-      /* STYLE */
-    )) : _createCommentVNode("v-if", true)
-  ]);
-}
-const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0, _style_1]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/components/NavBar/NavBar.uvue"]]);
+const _style_0 = {};
+const _style_1 = {};
+const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0, _style_1]]]);
 export {
   __easycom_0 as _
 };

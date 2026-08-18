@@ -59,96 +59,96 @@
 </template>
 
 <script setup lang="uts">
-import Card from '../../basic/components/Card.uvue'
-import { computed, ref } from 'vue'
+import Card from '../../basic/components/Card.uvue';
+import { computed, ref } from 'vue';
 import {
   getCurrentEnv,
   getEnvConfigFor,
   getEnvLabel,
   getSystemEnv,
   resetEnv,
-  setCurrentEnv,
-} from '@/src/utils/env.uts'
-import type { EnvType } from '@/src/utils/env.uts'
+  setCurrentEnv
+} from '@/src/utils/env.uts';
+import type { EnvType } from '@/src/utils/env.uts';
 
-const COLOR_DEV: string = '#10b981'
-const COLOR_TEST: string = '#f59e0b'
-const COLOR_PROD: string = '#ef4444'
-const COLOR_BG: string = '#e2e8f0'
-const COLOR_WHITE: string = '#ffffff'
-const COLOR_DARK: string = '#475569'
+const COLOR_DEV: string = '#10b981';
+const COLOR_TEST: string = '#f59e0b';
+const COLOR_PROD: string = '#ef4444';
+const COLOR_BG: string = '#e2e8f0';
+const COLOR_WHITE: string = '#ffffff';
+const COLOR_DARK: string = '#475569';
 
-const systemEnv: EnvType = getSystemEnv()
+const systemEnv: EnvType = getSystemEnv();
 
 const systemEnvLabel = computed((): string => {
-  return systemEnv === 'development' ? '开发' : '生产'
-})
+  return systemEnv === 'development' ? '开发' : '生产';
+});
 
 // 当前环境（响应式，切换后可驱动 UI 更新）
-const currentEnv = ref<EnvType>(getCurrentEnv())
+const currentEnv = ref<EnvType>(getCurrentEnv());
 
 const isOverridden = computed((): boolean => {
-  return currentEnv.value !== systemEnv
-})
+  return currentEnv.value !== systemEnv;
+});
 
 const currentEnvLabel = computed((): string => {
-  return getEnvLabel(currentEnv.value)
-})
+  return getEnvLabel(currentEnv.value);
+});
 
 const envColor = computed((): string => {
   if (currentEnv.value === 'development') {
-    return COLOR_DEV
+    return COLOR_DEV;
   }
   if (currentEnv.value === 'test') {
-    return COLOR_TEST
+    return COLOR_TEST;
   }
-  return COLOR_PROD
-})
+  return COLOR_PROD;
+});
 
 const envConfig = computed(() => {
-  return getEnvConfigFor(currentEnv.value)
-})
+  return getEnvConfigFor(currentEnv.value);
+});
 
 // 按钮颜色 computed（避免模板中三元运算类型问题）
 const devBtnBg = computed((): string => {
-  return currentEnv.value === 'development' ? COLOR_DEV : COLOR_BG
-})
+  return currentEnv.value === 'development' ? COLOR_DEV : COLOR_BG;
+});
 const devBtnText = computed((): string => {
-  return currentEnv.value === 'development' ? COLOR_WHITE : COLOR_DARK
-})
+  return currentEnv.value === 'development' ? COLOR_WHITE : COLOR_DARK;
+});
 const testBtnBg = computed((): string => {
-  return currentEnv.value === 'test' ? COLOR_TEST : COLOR_BG
-})
+  return currentEnv.value === 'test' ? COLOR_TEST : COLOR_BG;
+});
 const testBtnText = computed((): string => {
-  return currentEnv.value === 'test' ? COLOR_WHITE : COLOR_DARK
-})
+  return currentEnv.value === 'test' ? COLOR_WHITE : COLOR_DARK;
+});
 const prodBtnBg = computed((): string => {
-  return currentEnv.value === 'production' ? COLOR_PROD : COLOR_BG
-})
+  return currentEnv.value === 'production' ? COLOR_PROD : COLOR_BG;
+});
 const prodBtnText = computed((): string => {
-  return currentEnv.value === 'production' ? COLOR_WHITE : COLOR_DARK
-})
+  return currentEnv.value === 'production' ? COLOR_WHITE : COLOR_DARK;
+});
 
 function switchEnv(type: string) {
-  const env = type as EnvType
-  setCurrentEnv(env)
-  currentEnv.value = env
-  const label = getEnvLabel(env)
+  const env = type as EnvType;
+  setCurrentEnv(env);
+  currentEnv.value = env;
+  const label = getEnvLabel(env);
   uni.showToast({
     title: `已切换至${label}环境`,
     icon: 'none',
-    duration: 1500,
-  })
+    duration: 1500
+  });
 }
 
 function handleReset() {
-  resetEnv()
-  currentEnv.value = systemEnv
+  resetEnv();
+  currentEnv.value = systemEnv;
   uni.showToast({
     title: '已重置为系统默认环境',
     icon: 'none',
-    duration: 1500,
-  })
+    duration: 1500
+  });
 }
 </script>
 

@@ -1,12 +1,11 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-const src_tabbar_types = require("./types.js");
 const src_tabbar_config = require("./config.js");
 function normalizeList() {
   const result = [];
   for (let i = 0; i < src_tabbar_config.customTabbarList.length; i++) {
     const item = src_tabbar_config.customTabbarList[i];
-    result.push(new src_tabbar_types.CustomTabBarItem({
+    result.push({
       text: item.text,
       pagePath: item.pagePath.startsWith("/") ? item.pagePath : `/${item.pagePath}`,
       iconType: item.iconType,
@@ -14,7 +13,7 @@ function normalizeList() {
       iconActive: item.iconActive,
       badge: item.badge,
       isBulge: item.isBulge
-    }));
+    });
   }
   return result;
 }

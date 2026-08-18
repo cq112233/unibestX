@@ -19,17 +19,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function handleShuffle() {
       rawArray.value = uni_modules_iRainnaLodash_index.shuffle(rawArray.value);
     }
-    const rawObj = new common_vendor.UTSJSONObject(
-      {
-        user: new common_vendor.UTSJSONObject({
-          info: new common_vendor.UTSJSONObject({
-            name: "UniAppX Developer",
-            age: 25
-          })
+    const rawObj = new common_vendor.UTSJSONObject({
+      user: new common_vendor.UTSJSONObject({
+        info: new common_vendor.UTSJSONObject({
+          name: "UniAppX Developer",
+          age: 25
         })
-      }
-      // 使用 get 链式安全取值 (避免空指针/未定义路径崩溃)
-    );
+      })
+    });
     const getNameResult = common_vendor.computed(() => {
       return uni_modules_iRainnaLodash_index.get(rawObj, "user.info.name", "未找到");
     });

@@ -1,10 +1,16 @@
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataSlot: _createSharedDataSlot, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, setSharedDataEvent: _setSharedDataEvent } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpParseUpParse";
 const { ref, computed, watch, nextTick, getCurrentInstance } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-parse"
   },
+  __dynamicSharedData: true,
+  __hash: "6893e916",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-parse/up-parse.uvue",
   __name: "up-parse",
   props: {
     containerStyle: {
@@ -73,6 +79,8 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   emits: ["load", "ready", "imgTap", "linkTap", "play", "error", "tap", "click"],
   setup(__props, _a) {
     var __expose = _a.expose, __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpParseUpParseSharedData", sharedDataClassId: 0 })));
     const blockTags = ["address", "article", "aside", "blockquote", "body", "caption", "center", "dd", "div", "dl", "dt", "fieldset", "footer", "form", "h1", "h2", "h3", "h4", "h5", "h6", "header", "hr", "li", "main", "nav", "ol", "p", "pre", "section", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "ul"];
     const voidTags = ["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"];
     const ignoreTags = ["area", "base", "canvas", "frame", "head", "iframe", "input", "link", "map", "meta", "param", "script", "style", "textarea", "track", "wbr"];
@@ -216,7 +224,7 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     const copyLinkValue = computed(() => {
       return boolValue(props.copyLink);
     });
-    const showImgMenuValue = computed(() => {
+    computed(() => {
       return boolValue(props.showImgMenu);
     });
     const rootClass = computed(() => {
@@ -486,36 +494,38 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       navigateTo,
       setContent
     });
-    const __returned__ = { blockTags, voidTags, ignoreTags, makeNode, makeText, hasString, decodeHtml, textValue, boolValue, normalizeSpace, readAttr, firstWord, appendChild, collectText, findNodeByAttr, cloneAttrs, props, emit, instance, nodes, imgList, selectableValue, previewImgValue, copyLinkValue, showImgMenuValue, rootClass, getDefaultStyle, resolveUrl, applyAttrs, appendText, closeTag, parseContent, getRect, navigateTo, setContent, getText, handleImgTap, handleLinkTap, onRichTextItemClick, onRootClick };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _component_rich_text = _resolveComponent("rich-text");
+      _renderSharedDataEffect(() => {
+        _setSharedDataClass(__sharedData, 3, rootClass.value);
+        _setSharedDataStyle(__sharedData, 4, __props.containerStyle);
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(nodes.value.length == 0));
+      }, () => {
+        _createSharedDataSlot("default", null, null);
+      }, () => {
+        const n4 = _createSharedDataComponentWithFallback(_component_rich_text, "1f604995", {
+          nodes: () => {
+            return nodes.value;
+          },
+          selectable: () => {
+            return selectableValue.value;
+          },
+          onItemclick: () => {
+            return onRichTextItemClick;
+          }
+        });
+        _setSharedData(__sharedData, 1, n4?.sharedData);
+      }, 261);
+      _setSharedDataEvent(__sharedData, 2, onRootClick);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "_root": { "": { "paddingTop": 1, "paddingRight": 0, "paddingBottom": 1, "paddingLeft": 0 } } };
-const { renderSlot: _renderSlot, resolveComponent: _resolveComponent, openBlock: _openBlock, createBlock: _createBlock, normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, createElementBlock: _createElementBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_rich_text = _resolveComponent("rich-text");
-  return _openBlock(), _createElementBlock(
-    "view",
-    {
-      id: "_root",
-      class: _normalizeClass($setup.rootClass),
-      style: _normalizeStyle($props.containerStyle),
-      onClick: $setup.onRootClick
-    },
-    [
-      $setup.nodes.length == 0 ? _renderSlot(_ctx.$slots, "default", { key: 0 }) : (_openBlock(), _createBlock(_component_rich_text, {
-        key: 1,
-        nodes: $setup.nodes,
-        selectable: $setup.selectableValue,
-        onItemclick: $setup.onRichTextItemClick
-      }, null, 8, ["nodes", "selectable"]))
-    ],
-    6
-    /* CLASS, STYLE */
-  );
-}
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-parse/up-parse.uvue"]]);
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_1 as _
 };

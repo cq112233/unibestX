@@ -1,11 +1,10 @@
 import { _ as __easycom_0 } from "../../../../components/NavBar/NavBar.js";
-import { A as AppKu, r as resolveEasycom } from "../../../../../App.ku.js";
 import { _ as __easycom_2 } from "../../../../../uni_modules/uview-ultra/components/up-button/up-button.js";
 import { _ as __easycom_2$1 } from "../../../../../uni_modules/uview-ultra/components/up-picker/up-picker.js";
+import { _ as _sfc_main$1 } from "../../../../../App.ku.js";
 import { L as LayoutComponent } from "../../../../layouts/default.js";
 import { _ as _export_sfc } from "../../../../../plugin-vue-export-helper.js";
 import "../../../../utils/systemInfo.js";
-import "../../../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
 import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.js";
 import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/loadingIcon.js";
 import "../../../../../uni_modules/uview-ultra/libs/config/config.js";
@@ -18,16 +17,33 @@ import "../../../../../uni_modules/uview-ultra/components/up-icon/up-icon.js";
 import "../../../../../uni_modules/uview-ultra/components/up-icon/icons.js";
 import "../../../../../uni_modules/uview-ultra/libs/composable/useUltraUI.js";
 import "../../../../../uni_modules/uview-ultra/components/up-icon/icon.js";
-import "../../../../../uni_modules/uview-ultra/components/up-gap/up-gap.js";
-import "../../../../../uni_modules/uview-ultra/libs/composable/useMp.js";
-import "../../../../../uni_modules/uview-ultra/components/up-gap/gap.js";
+import "../../../../../uni_modules/uview-ultra/libs/function/throttle.js";
+import "../../../../../uni_modules/uview-ultra/components/up-toolbar/up-toolbar.js";
+import "../../../../../uni_modules/uview-ultra/libs/i18n/index.js";
+import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hans.js";
+import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hant.js";
+import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/en.js";
+import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/es.js";
+import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/fr.js";
+import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/de.js";
+import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ko.js";
+import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ja.js";
+import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ru.js";
+import "../../../../../uni_modules/uview-ultra/components/up-popup/up-popup.js";
 import "../../../../../uni_modules/uview-ultra/components/up-overlay/up-overlay.js";
 import "../../../../../uni_modules/uview-ultra/components/up-transition/up-transition.js";
 import "../../../../../uni_modules/uview-ultra/components/up-transition/transition.js";
+import "../../../../../uni_modules/uview-ultra/components/up-status-bar/up-status-bar.js";
+import "../../../../../uni_modules/uview-ultra/components/up-status-bar/statusBar.js";
+import "../../../../../uni_modules/uview-ultra/components/up-safe-bottom/up-safe-bottom.js";
+import "../../../../../uni_modules/uview-ultra/components/up-popup/popup.js";
+import "../../../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
+import "../../../../../uni_modules/uview-ultra/components/up-gap/up-gap.js";
+import "../../../../../uni_modules/uview-ultra/libs/composable/useMp.js";
+import "../../../../../uni_modules/uview-ultra/components/up-gap/gap.js";
 import "../../../../../uni_modules/uview-ultra/libs/config/color.js";
 import "../../../../tabbar/index.js";
 import "../../../../tabbar/store.js";
-import "../../../../tabbar/types.js";
 import "../../../../tabbar/config.js";
 import "../../../../tabbar/TabbarItem.js";
 import "../../../../../uni_modules/uni-icons/components/uni-icons/uni-icons.js";
@@ -49,36 +65,24 @@ import "../../../../../uni_modules/x-pinia-s/instans/subscriptions.js";
 import "../../../../../uni_modules/x-pinia-s/instans/createPinia.js";
 import "../../../../../uni_modules/x-pinia-s/instans/rootState.js";
 import "../../../../../uni_modules/x-pinia-s/instans/persist.js";
-import "../../../../store/token.js";
+import "../../../../store/app.js";
 import "../../../../../uni_modules/x-pinia-s/instans/storeBase.js";
 import "../../../../../uni_modules/x-pinia-s/instans/defineStore.js";
-import "../../../../store/user.js";
-import "../../../../store/app.js";
-import "../../../../../uni_modules/uview-ultra/libs/i18n/index.js";
-import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hans.js";
-import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hant.js";
-import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/en.js";
-import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/es.js";
-import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/fr.js";
-import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/de.js";
-import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ko.js";
-import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ja.js";
-import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ru.js";
 import "../../../../utils/toast.js";
-import "../../../../../uni_modules/uview-ultra/libs/function/throttle.js";
-import "../../../../../uni_modules/uview-ultra/components/up-toolbar/up-toolbar.js";
-import "../../../../../uni_modules/uview-ultra/components/up-popup/up-popup.js";
-import "../../../../../uni_modules/uview-ultra/components/up-status-bar/up-status-bar.js";
-import "../../../../../uni_modules/uview-ultra/components/up-status-bar/statusBar.js";
-import "../../../../../uni_modules/uview-ultra/components/up-safe-bottom/up-safe-bottom.js";
-import "../../../../../uni_modules/uview-ultra/components/up-popup/popup.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, resolveComponent: _resolveComponent, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
+const __className = "GenSrcSubUviewUltraDemosPickerPicker";
 const { ref } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  __dynamicSharedData: true,
+  __hash: "211d0f9a",
+  __className,
+  __filename: "src/sub/uview-ultra/demos/picker/picker.uvue",
   __name: "picker",
-  setup(__props, _a) {
-    var __expose = _a.expose;
-    __expose();
+  setup(__props) {
+    const __sharedDataRenderer = _useSharedDataRenderer();
+    const __sharedData = __sharedDataRenderer == "component" ? _withSharedDataComponent(new UniDynamicSharedDataComponent(_useSharedDataScope(), _useSharedDataComponentOptions({ bundleKey: "GenSrcSubUviewUltraDemosPickerPickerSharedData", sharedDataClassId: 0 }))) : _withSharedDataPage(new UniDynamicSharedDataPage(_useSharedDataPageId(), _useSharedDataPageOptions({ bundleKey: "GenSrcSubUviewUltraDemosPickerPickerSharedData", sharedDataClassId: 0 })));
+    _useSharedDataScope(__sharedData);
     const pickerShow1 = ref(false);
     const pickerShow2 = ref(false);
     const pickerShow3 = ref(false);
@@ -110,102 +114,120 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       uni.__f__("log", "at src/sub/uview-ultra/demos/picker/picker.uvue:67", "picker 3 confirm", e);
       pickerShow3.value = false;
     }
-    const __returned__ = { pickerShow1, pickerShow2, pickerShow3, columns1, columns2, showPicker1, showPicker2, showPicker3, onConfirm1, onConfirm2, onConfirm3, get AppKu() {
-      return AppKu;
-    }, get LayoutComponent() {
-      return LayoutComponent;
-    } };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _component_NavBar = __easycom_0;
+      const _component_up_button = __easycom_2;
+      const _component_up_picker = __easycom_2$1;
+      const n19 = _createSharedDataComponent(_sfc_main$1, "b01eb986", null, {
+        "default": _withSharedDataVaporCtx(() => {
+          const n18 = _createSharedDataComponent(LayoutComponent, "5623c459", {
+            "navigation-style": "custom",
+            "navigation-bar-title-text": "up-picker 选择器"
+          }, {
+            "default": _withSharedDataVaporCtx(() => {
+              const n0 = _createSharedDataComponentWithFallback(_component_NavBar, "6e54c75b", {
+                title: "up-picker 选择器",
+                "auto-back": true,
+                "safe-area-inset-top": true,
+                "bg-color": "#ffffff"
+              });
+              _setSharedData(__sharedData, 2, n0?.sharedData);
+              const n2 = _createSharedDataComponentWithFallback(_component_up_button, "6e54d23a", {
+                type: "primary",
+                text: "单列选择",
+                size: "mini",
+                onClick: () => {
+                  return showPicker1;
+                }
+              });
+              _setSharedData(__sharedData, 6, n2?.sharedData);
+              const n6 = _createSharedDataComponentWithFallback(_component_up_button, "6e54da5c", {
+                type: "success",
+                text: "多列选择",
+                size: "mini",
+                onClick: () => {
+                  return showPicker2;
+                }
+              });
+              _setSharedData(__sharedData, 7, n6?.sharedData);
+              const n10 = _createSharedDataComponentWithFallback(_component_up_button, "6e54e51e", {
+                type: "warning",
+                text: "加载中选择",
+                size: "mini",
+                onClick: () => {
+                  return showPicker3;
+                }
+              });
+              _setSharedData(__sharedData, 8, n10?.sharedData);
+              const _on_cancel = () => {
+                return pickerShow1.value = false;
+              };
+              const n14 = _createSharedDataComponentWithFallback(_component_up_picker, "5c440a0f", {
+                show: () => {
+                  return pickerShow1.value;
+                },
+                columns: () => {
+                  return columns1.value;
+                },
+                onConfirm: () => {
+                  return onConfirm1;
+                },
+                onCancel: () => {
+                  return _on_cancel;
+                }
+              });
+              _setSharedData(__sharedData, 3, n14?.sharedData);
+              const _on_cancel1 = () => {
+                return pickerShow2.value = false;
+              };
+              const n15 = _createSharedDataComponentWithFallback(_component_up_picker, "5c441099", {
+                show: () => {
+                  return pickerShow2.value;
+                },
+                columns: () => {
+                  return columns2.value;
+                },
+                onConfirm: () => {
+                  return onConfirm2;
+                },
+                onCancel: () => {
+                  return _on_cancel1;
+                }
+              });
+              _setSharedData(__sharedData, 4, n15?.sharedData);
+              const _on_cancel2 = () => {
+                return pickerShow3.value = false;
+              };
+              const n16 = _createSharedDataComponentWithFallback(_component_up_picker, "5c441498", {
+                show: () => {
+                  return pickerShow3.value;
+                },
+                columns: () => {
+                  return columns1.value;
+                },
+                loading: true,
+                onConfirm: () => {
+                  return onConfirm3;
+                },
+                onCancel: () => {
+                  return _on_cancel2;
+                }
+              });
+              _setSharedData(__sharedData, 5, n16?.sharedData);
+            })
+          });
+          _setSharedData(__sharedData, 1, n18.sharedData);
+        })
+      });
+      _setSharedData(__sharedData, 0, n19.sharedData);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "flex-row": { "": { "flexDirection": "row" } }, "items-center": { "": { "alignItems": "center" } }, "mt-12px": { "": { "marginTop": 12 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "pb-30px": { "": { "paddingBottom": 30 } } };
-const _style_1 = { "demo-block": { "": { "marginBottom": 12, "paddingTop": 12, "paddingRight": 12, "paddingBottom": 12, "paddingLeft": 12, "backgroundColor": "#ffffff", "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "demo-label": { "": { "fontSize": 14, "fontWeight": "bold", "color": "#606266", "marginBottom": 10, "paddingLeft": 4, "borderLeftWidth": 3, "borderLeftStyle": "solid", "borderLeftColor": "#2979ff" } } };
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { resolveComponent: _resolveComponent, createVNode: _createVNode, createElementVNode: _createElementVNode, withCtx: _withCtx, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_NavBar = resolveEasycom(__resolveDynamicComponent("NavBar"), __easycom_0);
-  const _component_up_button = resolveEasycom(__resolveDynamicComponent("up-button"), __easycom_2);
-  const _component_up_picker = resolveEasycom(__resolveDynamicComponent("up-picker"), __easycom_2$1);
-  return _openBlock(), _createBlock($setup["AppKu"], null, {
-    default: _withCtx(() => [
-      _createVNode($setup["LayoutComponent"], {
-        "navigation-style": "custom",
-        "navigation-bar-title-text": "up-picker 选择器"
-      }, {
-        default: _withCtx(() => [
-          _createElementVNode("view", { class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }, [
-            _createVNode(_component_NavBar, {
-              title: "up-picker 选择器",
-              "auto-back": true,
-              "safe-area-inset-top": true,
-              "bg-color": "#ffffff"
-            }),
-            _createElementVNode("view", { class: "p-16px" }, [
-              _createElementVNode("view", { class: "demo-block" }, [
-                _createElementVNode("text", { class: "demo-label" }, "基础单列"),
-                _createElementVNode("view", { class: "flex-row items-center" }, [
-                  _createVNode(_component_up_button, {
-                    type: "primary",
-                    text: "单列选择",
-                    size: "mini",
-                    onClick: $setup.showPicker1
-                  })
-                ])
-              ]),
-              _createElementVNode("view", { class: "demo-block mt-12px" }, [
-                _createElementVNode("text", { class: "demo-label" }, "多列选择"),
-                _createElementVNode("view", { class: "flex-row items-center" }, [
-                  _createVNode(_component_up_button, {
-                    type: "success",
-                    text: "多列选择",
-                    size: "mini",
-                    onClick: $setup.showPicker2
-                  })
-                ])
-              ]),
-              _createElementVNode("view", { class: "demo-block mt-12px" }, [
-                _createElementVNode("text", { class: "demo-label" }, "加载状态"),
-                _createElementVNode("view", { class: "flex-row items-center" }, [
-                  _createVNode(_component_up_button, {
-                    type: "warning",
-                    text: "加载中选择",
-                    size: "mini",
-                    onClick: $setup.showPicker3
-                  })
-                ])
-              ])
-            ]),
-            _createVNode(_component_up_picker, {
-              show: $setup.pickerShow1,
-              columns: $setup.columns1,
-              onConfirm: $setup.onConfirm1,
-              onCancel: _cache[0] || (_cache[0] = ($event) => $setup.pickerShow1 = false)
-            }, null, 8, ["show", "columns"]),
-            _createVNode(_component_up_picker, {
-              show: $setup.pickerShow2,
-              columns: $setup.columns2,
-              onConfirm: $setup.onConfirm2,
-              onCancel: _cache[1] || (_cache[1] = ($event) => $setup.pickerShow2 = false)
-            }, null, 8, ["show", "columns"]),
-            _createVNode(_component_up_picker, {
-              show: $setup.pickerShow3,
-              columns: $setup.columns1,
-              loading: true,
-              onConfirm: $setup.onConfirm3,
-              onCancel: _cache[2] || (_cache[2] = ($event) => $setup.pickerShow3 = false)
-            }, null, 8, ["show", "columns"])
-          ])
-        ]),
-        _: 1
-        /* STABLE */
-      })
-    ]),
-    _: 1
-    /* STABLE */
-  });
-}
-const picker = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0, _style_1]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/picker/picker.uvue"]]);
+const _style_0 = {};
+const _style_1 = {};
+const picker = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0, _style_1]]]);
 export {
   picker as default
 };

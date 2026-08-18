@@ -1,7 +1,6 @@
 "use strict";
-const src_tabbar_types = require("./types.js");
 const customTabbarList = [
-  new src_tabbar_types.CustomTabBarItem({
+  {
     text: "tabbar.home",
     pagePath: "src/pages/index/index",
     iconType: "icon",
@@ -9,8 +8,8 @@ const customTabbarList = [
     iconActive: "home-filled",
     badge: null,
     isBulge: false
-  }),
-  new src_tabbar_types.CustomTabBarItem({
+  },
+  {
     text: "tabbar.basic",
     pagePath: "src/pages/basic/basic",
     iconType: "icon",
@@ -18,8 +17,8 @@ const customTabbarList = [
     iconActive: "tune-filled",
     badge: null,
     isBulge: false
-  }),
-  new src_tabbar_types.CustomTabBarItem({
+  },
+  {
     text: "tabbar.ai",
     pagePath: "",
     iconType: "icon",
@@ -27,8 +26,8 @@ const customTabbarList = [
     iconActive: "chatboxes-filled",
     badge: null,
     isBulge: true
-  }),
-  new src_tabbar_types.CustomTabBarItem({
+  },
+  {
     text: "tabbar.function",
     pagePath: "src/pages/function/function",
     iconType: "icon",
@@ -36,8 +35,8 @@ const customTabbarList = [
     iconActive: "gear-filled",
     badge: null,
     isBulge: false
-  }),
-  new src_tabbar_types.CustomTabBarItem({
+  },
+  {
     text: "tabbar.me",
     pagePath: "src/pages/me/me",
     iconType: "icon",
@@ -45,7 +44,7 @@ const customTabbarList = [
     iconActive: "person-filled",
     badge: null,
     isBulge: false
-  })
+  }
 ];
 exports.customTabbarList = customTabbarList;
 //# sourceMappingURL=../../../.sourcemap/mp-weixin/src/tabbar/config.js.map

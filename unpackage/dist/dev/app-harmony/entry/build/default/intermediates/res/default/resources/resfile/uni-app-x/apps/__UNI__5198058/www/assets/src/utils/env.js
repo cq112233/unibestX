@@ -1,40 +1,15 @@
-class EnvConfig extends UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          name: { type: String, optional: false },
-          baseURL: { type: String, optional: false }
-        };
-      },
-      name: "EnvConfig"
-    };
-  }
-  constructor(options, metadata = EnvConfig.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.name = this.__props__.name;
-    this.baseURL = this.__props__.baseURL;
-    delete this.__props__;
-  }
-}
-const devConfig = new EnvConfig({
+const devConfig = {
   name: "开发环境",
   baseURL: "https://ukw0y1.laf.run"
-});
-const testConfig = new EnvConfig({
+};
+const testConfig = {
   name: "测试环境",
   baseURL: "https://ukw0y1.laf.run"
-});
-const prodConfig = new EnvConfig(
-  {
-    name: "生产环境",
-    baseURL: "https://ukw0y1.laf.run"
-  }
-  // ----- 编译期自动识别 -----
-  // uni-app X 中：HBuilderX「运行」→ 'development'，「发行」→ 'production'
-);
+};
+const prodConfig = {
+  name: "生产环境",
+  baseURL: "https://ukw0y1.laf.run"
+};
 const systemEnv = "development";
 let overrideEnv = null;
 function getSystemEnv() {
@@ -75,10 +50,10 @@ function getEnvLabel(type) {
   return "未知";
 }
 export {
-  getEnvLabel as a,
-  getEnvConfigFor as b,
-  getSystemEnv as c,
-  getCurrentEnv as g,
+  getCurrentEnv as a,
+  getEnvLabel as b,
+  getEnvConfigFor as c,
+  getSystemEnv as g,
   resetEnv as r,
   setCurrentEnv as s
 };

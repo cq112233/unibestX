@@ -34,25 +34,22 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-const value1 = ref<number>(0)
-const value2 = ref<number>(0)
-const value3 = ref<number>(0)
+const value1 = ref<number>(0);
+const value2 = ref<number>(0);
+const value3 = ref<number>(0);
 
 function change1(index: any): void {
-  // eslint-disable-next-line unicorn/prefer-number-properties
-  value1.value = parseInt(index.toString())
+  value1.value = parseInt(index.toString());
 }
 
 function change2(index: any): void {
-  // eslint-disable-next-line unicorn/prefer-number-properties
-  value2.value = parseInt(index.toString())
+  value2.value = parseInt(index.toString());
 }
 
 function change3(index: any): void {
-  // eslint-disable-next-line unicorn/prefer-number-properties
-  value3.value = parseInt(index.toString())
+  value3.value = parseInt(index.toString());
 }
 </script>
 

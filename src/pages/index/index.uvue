@@ -89,42 +89,42 @@
 </template>
 
 <script setup lang="uts">
-import { handleBackPressExit } from '../../utils/backPress.uts'
+import { handleBackPressExit } from '../../utils/backPress.uts';
 
 definePage({
   type: 'home',
   layout: 'default',
   style: {
-    navigationBarTitleText: '首页',
-  },
-})
+    navigationBarTitleText: '首页'
+  }
+});
 
 onBackPress((options: OnBackPressOptions): boolean => {
   // #ifdef APP
   if (options.from == 'backbutton') {
-    return handleBackPressExit()
+    return handleBackPressExit();
   }
   // #endif
-  return false
-})
+  return false;
+});
 
-const themeSwitchVal = ref(true)
-const themeSwitchVal2 = ref(false)
+const themeSwitchVal = ref(true);
+const themeSwitchVal2 = ref(false);
 
-const checkboxValue = ref(['apple'] as string[])
-const radioValue = ref('male')
-const sliderValue = ref(30)
-const rateValue = ref(3)
+const checkboxValue = ref(['apple'] as string[]);
+const radioValue = ref('male');
+const sliderValue = ref(30);
+const rateValue = ref(3);
 
-const isBg = ref(true)
+const isBg = ref(true);
 function switchBg() {
-  isBg.value = !isBg.value
+  isBg.value = !isBg.value;
 }
 
 function goToUiTest() {
   uni.navigateTo({
-    url: '/src/pages/haha/haha',
-  })
+    url: '/src/pages/haha/haha'
+  });
 }
 </script>
 

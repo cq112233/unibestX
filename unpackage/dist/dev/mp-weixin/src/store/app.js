@@ -7,27 +7,6 @@ require("../../uni_modules/x-pinia-s/instans/persist.js");
 const src_tabbar_store = require("../tabbar/store.js");
 const src_i18n_index = require("../i18n/index.js");
 const uni_modules_uviewUltra_libs_i18n_index = require("../../uni_modules/uview-ultra/libs/i18n/index.js");
-class IAppState extends common_vendor.UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          theme: { type: String, optional: false },
-          locale: { type: String, optional: false }
-        };
-      },
-      name: "IAppState"
-    };
-  }
-  constructor(options, metadata = IAppState.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.theme = this.__props__.theme;
-    this.locale = this.__props__.locale;
-    delete this.__props__;
-  }
-}
 function getSystemLocale() {
   try {
     const sysInfo = common_vendor.index.getSystemInfoSync();
@@ -42,23 +21,18 @@ function getSystemLocale() {
   }
   return "zh-CN";
 }
-const defaultAppState = new IAppState(
-  {
-    theme: "#37c2bc",
-    locale: getSystemLocale()
-  }
-  // ==========================================
-  // Store 实现
-  // ==========================================
-);
+const defaultAppState = {
+  theme: "#37c2bc",
+  locale: getSystemLocale()
+};
 class AppStore extends uni_modules_xPiniaS_instans_storeBase.PiniaStoreBase {
   // 2. constructor
   constructor() {
     super();
-    this.state = common_vendor.reactive(new IAppState({
+    this.state = common_vendor.reactive({
       theme: "#37c2bc",
       locale: getSystemLocale()
-    }));
+    });
     this.bindState(this.state);
     src_tabbar_store.themeColor.value = this.state.theme;
     src_i18n_index.i18n.global.locale.value = this.state.locale;
@@ -75,13 +49,13 @@ class AppStore extends uni_modules_xPiniaS_instans_storeBase.PiniaStoreBase {
     uni_modules_uviewUltra_libs_i18n_index.setLocale(defaultAppState.locale);
   }
   _hydrate(_data) {
-    if (_data["theme"] != null) {
-      const colorVal = _data["theme"];
+    if (_data.theme != null) {
+      const colorVal = _data.theme;
       this.state.theme = colorVal;
       src_tabbar_store.themeColor.value = colorVal;
     }
-    if (_data["locale"] != null) {
-      const localeVal = _data["locale"];
+    if (_data.locale != null) {
+      const localeVal = _data.locale;
       this.state.locale = localeVal;
       src_i18n_index.i18n.global.locale.value = localeVal;
       uni_modules_uviewUltra_libs_i18n_index.setLocale(localeVal);

@@ -13,55 +13,55 @@
 </template>
 
 <script setup lang="uts">
-import Tabbar from '@/src/tabbar/index.uvue'
-import { useAppStore } from '@/src/store'
-import { isPageTabbar, syncCurIdxByCurrentPage } from '@/src/tabbar/store'
-import { registerToast, unregisterToast } from '@/src/utils/toast'
-import type { ComponentPublicInstance } from 'vue'
-import { onBeforeMount, onMounted, onUnmounted, ref } from 'vue'
+import Tabbar from '@/src/tabbar/index.uvue';
+import { useAppStore } from '@/src/store';
+import { isPageTabbar, syncCurIdxByCurrentPage } from '@/src/tabbar/store';
+import { registerToast, unregisterToast } from '@/src/utils/toast';
+import type { ComponentPublicInstance } from 'vue';
+import { onBeforeMount, onMounted, onUnmounted, ref } from 'vue';
 
 // 激活应用状态管理 Store
-const appStore = useAppStore()
+const appStore = useAppStore();
 
 // 控制当前页面是否需要显示底部导航栏
-const isCurrentPageTabbar = ref(false)
+const isCurrentPageTabbar = ref(false);
 // 挂载全局 Toast 组件的 DOM/组件实例引用
-const uToastRef = ref<ComponentPublicInstance | null>(null)
+const uToastRef = ref<ComponentPublicInstance | null>(null);
 
 // 页面显示钩子：解析当前路由，动态控制导航栏显示及同步选中索引
 onBeforeMount(() => {
-  const pages = getCurrentPages()
+  const pages = getCurrentPages();
   if (pages.length > 0) {
-    const route = pages[pages.length - 1].route
+    const route = pages[pages.length - 1].route;
     if (route != null && route.length > 0) {
-      const path = route.startsWith('/') ? route : `/${route}`
-      const isTabbar = isPageTabbar(path)
-      isCurrentPageTabbar.value = isTabbar
+      const path = route.startsWith('/') ? route : `/${route}`;
+      const isTabbar = isPageTabbar(path);
+      isCurrentPageTabbar.value = isTabbar;
       // 如果是 Tabbar 路由，同步底部导航的激活索引
       if (isTabbar) {
-        syncCurIdxByCurrentPage()
+        syncCurIdxByCurrentPage();
       }
     }
   }
   // 注册全局 Toast 组件引用，供 HTTP 或工具类直接调用
   if (uToastRef.value != null) {
-    registerToast(uToastRef.value!)
+    registerToast(uToastRef.value!);
   }
-})
+});
 
 // 组件挂载钩子：注册全局 Toast
 onMounted(() => {
   // 注册 Toast 实例
   if (uToastRef.value != null) {
-    registerToast(uToastRef.value!)
+    registerToast(uToastRef.value!);
   }
-})
+});
 
 // 组件销毁钩子：反注册 Toast 以释放内存防内存泄漏
 onUnmounted(() => {
   // 卸载 Toast 实例
   if (uToastRef.value != null) {
-    unregisterToast(uToastRef.value!)
+    unregisterToast(uToastRef.value!);
   }
-})
+});
 </script>

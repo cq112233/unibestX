@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="uts">
-import Card from './Card.uvue'
+import Card from './Card.uvue';
 
 function copyWebsiteUrl() {
   uni.setClipboardData({
@@ -45,19 +45,19 @@ function copyWebsiteUrl() {
     success: () => {
       uni.showToast({
         title: '官网网址已复制到剪贴板',
-        icon: 'none',
-      })
-    },
-  })
+        icon: 'none'
+      });
+    }
+  });
 }
 
 function navigateToShowcase() {
   uni.navigateTo({
     url: '/src/sub/uview-ultra/uview-ultra',
     fail: (err) => {
-      console.error('navigateToShowcase fail:', err)
-    },
-  })
+      console.error('navigateToShowcase fail:', err);
+    }
+  });
 }
 </script>
 

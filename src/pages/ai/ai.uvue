@@ -74,103 +74,103 @@
 
 <script setup lang="uts">
 /* eslint-disable ts/consistent-type-definitions */
-import NavBar from '@/src/components/NavBar/NavBar.uvue'
-import { safeAreaInsets } from '@/src/utils/systemInfo'
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import { safeAreaInsets } from '@/src/utils/systemInfo';
 
 definePage({
   layout: false,
   style: {
-    navigationBarTitleText: 'ai',
-  },
-})
+    navigationBarTitleText: 'ai'
+  }
+});
 
 type ChatMessage = {
-  id: string
-  sender: string
-  content: string
-  time: string
-}
+  id: string;
+  sender: string;
+  content: string;
+  time: string;
+};
 
-const messages = ref<ChatMessage[]>([])
-const inputText = ref<string>('')
-const isTyping = ref<boolean>(false)
-const scrollTop = ref<number>(0)
+const messages = ref<ChatMessage[]>([]);
+const inputText = ref<string>('');
+const isTyping = ref<boolean>(false);
+const scrollTop = ref<number>(0);
 
 // 判断是否为 AI 消息
 function isAiMessage(sender: string): boolean {
-  return sender == 'ai'
+  return sender == 'ai';
 }
 
 // 底部安全区
 const safeAreaBottom = computed<number>((): number => {
-  const insets = safeAreaInsets.value
+  const insets = safeAreaInsets.value;
   if (insets != null) {
-    return insets.bottom
+    return insets.bottom;
   }
-  return 0
-})
+  return 0;
+});
 
 // 获取当前时间字符串
 function getCurrentTime(): string {
-  const date = new Date()
-  const hours = date.getHours() as number
-  const minutes = date.getMinutes() as number
-  const hStr = hours < 10 ? `0${hours}` : `${hours}`
-  const mStr = minutes < 10 ? `0${minutes}` : `${minutes}`
-  return `${hStr}:${mStr}`
+  const date = new Date();
+  const hours = date.getHours() as number;
+  const minutes = date.getMinutes() as number;
+  const hStr = hours < 10 ? `0${hours}` : `${hours}`;
+  const mStr = minutes < 10 ? `0${minutes}` : `${minutes}`;
+  return `${hStr}:${mStr}`;
 }
 
 // 自动滚动到底部
 function scrollToBottom() {
   setTimeout(() => {
-    scrollTop.value = scrollTop.value + 1000
-  }, 100)
+    scrollTop.value = scrollTop.value + 1000;
+  }, 100);
 }
 
 // 发送消息
 function sendMessage() {
-  const text = inputText.value.trim()
+  const text = inputText.value.trim();
   if (text == '')
-    return
+    return;
 
   // 添加用户消息
-  const userMsgId = Date.now().toString()
+  const userMsgId = Date.now().toString();
   messages.value.push({
     id: userMsgId,
     sender: 'user',
     content: text,
-    time: getCurrentTime(),
-  } as ChatMessage)
+    time: getCurrentTime()
+  } as ChatMessage);
 
-  inputText.value = ''
-  scrollToBottom()
+  inputText.value = '';
+  scrollToBottom();
 
   // 模拟 AI 回复
-  isTyping.value = true
+  isTyping.value = true;
 
   setTimeout(() => {
-    isTyping.value = false
-    let replyContent = '收到你的消息！目前这只是一个模拟的 AI 对话窗口，你可以在此基础上接入你自己的大语言模型（如 DeepSeek、OpenAI、Gemini等）。'
+    isTyping.value = false;
+    let replyContent = '收到你的消息！目前这只是一个模拟的 AI 对话窗口，你可以在此基础上接入你自己的大语言模型（如 DeepSeek、OpenAI、Gemini等）。';
 
     if (text.includes('你好') || text.includes('hello')) {
-      replyContent = '你好！我是你的 AI 助手，很高兴为你提供服务。有什么我可以帮你的吗？😊'
+      replyContent = '你好！我是你的 AI 助手，很高兴为你提供服务。有什么我可以帮你的吗？😊';
     }
     else if (text.includes('模板') || text.includes('unibest')) {
-      replyContent = 'unibestX 是基于 uni-app X 极速开发模板。它支持 TypeScript、UnoCSS、UTS 插件，并能完美编译为原生 Android/iOS App！'
+      replyContent = 'unibestX 是基于 uni-app X 极速开发模板。它支持 TypeScript、UnoCSS、UTS 插件，并能完美编译为原生 Android/iOS App！';
     }
     else if (text.includes('组件')) {
-      replyContent = '当前模板内置了许多优秀的组件，例如 NavBar 导航栏、uview UI 库组件等，你都可以直接使用。'
+      replyContent = '当前模板内置了许多优秀的组件，例如 NavBar 导航栏、uview UI 库组件等，你都可以直接使用。';
     }
 
     messages.value.push({
       id: Date.now().toString(),
       sender: 'ai',
       content: replyContent,
-      time: getCurrentTime(),
-    } as ChatMessage)
+      time: getCurrentTime()
+    } as ChatMessage);
 
-    scrollToBottom()
-  }, 800)
+    scrollToBottom();
+  }, 800);
 }
 
 onMounted(() => {
@@ -179,9 +179,9 @@ onMounted(() => {
     id: 'welcome',
     sender: 'ai',
     content: '你好！我是你的 AI 智能助手。你可以询问我任何关于本应用的问题，或者只是和我随便聊聊！✨',
-    time: getCurrentTime(),
-  } as ChatMessage)
-})
+    time: getCurrentTime()
+  } as ChatMessage);
+});
 </script>
 
 <style>

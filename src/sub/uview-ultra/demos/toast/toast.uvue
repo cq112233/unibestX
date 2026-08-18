@@ -24,23 +24,23 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-const uToast = ref(null as ComponentPublicInstance | null)
+const uToast = ref(null as ComponentPublicInstance | null);
 function showToast(type: string) {
-  const toast = uToast.value
+  const toast = uToast.value;
   if (toast != null) {
     const configs = {
       success: { message: '操作成功！', type: 'success' },
       error: { message: '操作失败！', type: 'error' },
       warning: { message: '请注意风险！', type: 'warning' },
-      default: { message: '这是一条提示', type: 'default' },
-    } as UTSJSONObject
-    const config = configs[type] as UTSJSONObject
+      default: { message: '这是一条提示', type: 'default' }
+    } as UTSJSONObject;
+    const config = configs[type] as UTSJSONObject;
     toast.$callMethod('show', {
       message: config.message as string,
-      type: config.type as string,
-    })
+      type: config.type as string
+    });
   }
 }
 </script>

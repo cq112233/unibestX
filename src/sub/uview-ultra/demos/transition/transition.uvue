@@ -46,19 +46,19 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-const transitionShow = ref(true)
+const transitionShow = ref(true);
 
-const slideMode = ref('slide-up')
-const slideShow = ref(false)
+const slideMode = ref('slide-up');
+const slideShow = ref(false);
 
 function triggerSlide(mode: string) {
-  slideMode.value = mode
-  slideShow.value = true
+  slideMode.value = mode;
+  slideShow.value = true;
   setTimeout(() => {
-    slideShow.value = false
-  }, 1500)
+    slideShow.value = false;
+  }, 1500);
 }
 </script>
 

@@ -1,17 +1,22 @@
 import { _ as __easycom_0 } from "../up-icon/up-icon.js";
-import { r as resolveEasycom } from "../../../../App.ku.js";
 import "../../libs/composable/useMp.js";
 import "../../libs/composable/useUltraUI.js";
 import { a as addUnit, b as addStyle, d as deepMerge } from "../../libs/function/index.js";
 import { t } from "../../libs/i18n/index.js";
 import { d as defProps } from "./empty.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, createSharedDataIf: _createSharedDataIf, toDisplayString: _toDisplayString, createSharedDataSlot: _createSharedDataSlot } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpEmptyUpEmpty";
 const { computed, getCurrentInstance } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-empty"
   },
+  __dynamicSharedData: true,
+  __hash: "64fb62e4",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-empty/up-empty.uvue",
   __name: "up-empty",
   props: {
     customStyle: {
@@ -84,11 +89,12 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   },
   emits: ["click", "close"],
   setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
-    __expose();
-    const instance = getCurrentInstance().proxy;
+    _a.emit;
+    var $slots = _a.slots;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpEmptyUpEmptySharedData", sharedDataClassId: 0 })));
+    getCurrentInstance().proxy;
     const props = __props;
-    const emit = __emit;
     const icons = computed(() => {
       return new UTSJSONObject({
         car: t("up.empty.car", new UTSJSONObject({})),
@@ -133,58 +139,54 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     const isSrc = computed(() => {
       return props.icon.indexOf("/") >= 0;
     });
-    const __returned__ = { instance, props, emit, icons, emptyStyle, mergedEmptyStyle, imageDimensionStyle, textStyle, isSrc };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _component_up_icon = __easycom_0;
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.show));
+      }, () => {
+        _renderSharedDataEffect(() => {
+          return _setSharedDataStyle(__sharedData, 6, mergedEmptyStyle.value);
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 1, _toSharedDataBoolean(!isSrc.value));
+        }, () => {
+          const n4 = _createSharedDataComponentWithFallback(_component_up_icon, "042edcfc", {
+            name: () => {
+              return __props.mode === "message" ? "chat" : `empty-${__props.mode}`;
+            },
+            size: () => {
+              return __props.iconSize;
+            },
+            color: () => {
+              return __props.iconColor;
+            },
+            "margin-top": "14"
+          });
+          _setSharedData(__sharedData, 2, n4?.sharedData);
+        }, () => {
+          _renderSharedDataEffect(() => {
+            _setSharedDataStyle(__sharedData, 3, imageDimensionStyle.value);
+            _setSharedDataAttr(__sharedData, 4, _toSharedDataString(__props.icon));
+          });
+        }, 261);
+        _renderSharedDataEffect(() => {
+          const _text = __props.text;
+          _setSharedDataStyle(__sharedData, 7, textStyle.value);
+          _setSharedData(__sharedData, 8, _toDisplayString(_text != "" ? _text : icons.value[__props.mode]));
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 5, _toSharedDataBoolean($slots["default"] != null || $slots["$default"] != null));
+        }, () => {
+          _createSharedDataSlot("default", null, null);
+        });
+      });
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "center", "alignContent": "flex-start", "justifyContent": "center" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__text": { "": { "marginTop": "20rpx" } }, "up-slot-wrap": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "marginTop": "20rpx" } } };
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { resolveComponent: _resolveComponent, openBlock: _openBlock, createBlock: _createBlock, createCommentVNode: _createCommentVNode, normalizeStyle: _normalizeStyle, createElementBlock: _createElementBlock, toDisplayString: _toDisplayString, createElementVNode: _createElementVNode, renderSlot: _renderSlot } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
-  return $props.show ? (_openBlock(), _createElementBlock(
-    "view",
-    {
-      key: 0,
-      class: "up-empty",
-      style: _normalizeStyle($setup.mergedEmptyStyle)
-    },
-    [
-      !$setup.isSrc ? (_openBlock(), _createBlock(_component_up_icon, {
-        key: 0,
-        name: $props.mode === "message" ? "chat" : `empty-${$props.mode}`,
-        size: $props.iconSize,
-        color: $props.iconColor,
-        "margin-top": "14"
-      }, null, 8, ["name", "size", "color"])) : (_openBlock(), _createElementBlock("image", {
-        key: 1,
-        style: _normalizeStyle($setup.imageDimensionStyle),
-        src: $props.icon,
-        mode: "widthFix"
-      }, null, 12, ["src"])),
-      _createElementVNode(
-        "text",
-        {
-          class: "up-empty__text",
-          style: _normalizeStyle($setup.textStyle)
-        },
-        _toDisplayString($props.text != "" ? $props.text : $setup.icons[$props.mode]),
-        5
-        /* TEXT, STYLE */
-      ),
-      _ctx.$slots["default"] != null || _ctx.$slots["$default"] != null ? (_openBlock(), _createElementBlock("view", {
-        key: 2,
-        class: "up-empty__wrap"
-      }, [
-        _renderSlot(_ctx.$slots, "default")
-      ])) : _createCommentVNode("v-if", true)
-    ],
-    4
-    /* STYLE */
-  )) : _createCommentVNode("v-if", true);
-}
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-empty/up-empty.uvue"]]);
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_1 as _
 };

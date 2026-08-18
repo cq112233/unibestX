@@ -5,8 +5,6 @@ require("../../uni_modules/x-pinia-s/instans/subscriptions.js");
 const uni_modules_xPiniaS_instans_createPinia = require("../../uni_modules/x-pinia-s/instans/createPinia.js");
 const uni_modules_xPiniaS_instans_rootState = require("../../uni_modules/x-pinia-s/instans/rootState.js");
 const uni_modules_xPiniaS_instans_persist = require("../../uni_modules/x-pinia-s/instans/persist.js");
-require("./token.js");
-require("./user.js");
 require("./app.js");
 const pinia = uni_modules_xPiniaS_instans_createPinia.createPinia();
 pinia.use(uni_modules_xPiniaS_instans_persist.createPersistPlugin(new uni_modules_xPiniaS_instans_types.PersistOptions({

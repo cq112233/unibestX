@@ -1,11 +1,17 @@
 import { a as addUnit, b as addStyle, d as deepMerge } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataIf: _createSharedDataIf } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpBadgeUpBadge";
 const { computed } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-badge"
   },
+  __dynamicSharedData: true,
+  __hash: "37f68b73",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-badge/up-badge.uvue",
   __name: "up-badge",
   props: {
     isDot: {
@@ -73,9 +79,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       }
     }
   },
-  setup(__props, _a) {
-    var __expose = _a.expose;
-    __expose();
+  setup(__props) {
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpBadgeUpBadgeSharedData", sharedDataClassId: 0 })));
     const props = __props;
     const badgeStyle = computed(() => {
       const style = new UTSJSONObject({});
@@ -123,32 +129,31 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       }
       return valueReturn;
     });
-    const __returned__ = { props, badgeStyle, computedBadgeStyle, showValue };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.show && ((parseInt(__props.value.toString()) == 0 ? __props.showZero : true) || __props.isDot)));
+      }, () => {
+        _renderSharedDataEffect(() => {
+          const _isDot = __props.isDot;
+          const _inverted = __props.inverted;
+          const _type = __props.type;
+          _setSharedDataClass(__sharedData, 1, ["up-badge", [
+            _isDot ? "up-badge--dot" : "up-badge--not-dot",
+            _inverted ? "up-badge--inverted" : "",
+            __props.shape === "horn" ? "up-badge--horn" : "",
+            _inverted ? `up-badge--${_type}--inverted` : `up-badge--${_type}`
+          ]]);
+          _setSharedDataStyle(__sharedData, 2, computedBadgeStyle.value);
+          _setSharedData(__sharedData, 3, _toDisplayString(_isDot ? "" : showValue.value));
+        });
+      });
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-badge": { "": { "borderTopRightRadius": 100, "borderTopLeftRadius": 100, "borderBottomLeftRadius": 100, "borderBottomRightRadius": 100, "lineHeight": "11px", "textAlign": "center", "fontSize": 11, "color": "#FFFFFF" } }, "up-badge--dot": { "": { "height": 8, "width": 8 } }, "up-badge--inverted": { "": { "fontSize": 13 } }, "up-badge--not-dot": { "": { "paddingTop": 2, "paddingRight": 5, "paddingBottom": 2, "paddingLeft": 5 } }, "up-badge--horn": { "": { "borderBottomLeftRadius": 0 } }, "up-badge--primary": { "": { "backgroundColor": "var(--theme-color, #0957de)" } }, "up-badge--primary--inverted": { "": { "color": "var(--theme-color, #0957de)" } }, "up-badge--error": { "": { "backgroundColor": "#f56c6c" } }, "up-badge--error--inverted": { "": { "color": "#f56c6c" } }, "up-badge--success": { "": { "backgroundColor": "#5ac725" } }, "up-badge--success--inverted": { "": { "color": "#5ac725" } }, "up-badge--info": { "": { "backgroundColor": "#909399" } }, "up-badge--info--inverted": { "": { "color": "#909399" } }, "up-badge--warning": { "": { "backgroundColor": "#f9ae3d" } }, "up-badge--warning--inverted": { "": { "color": "#f9ae3d" } } };
-const { toDisplayString: _toDisplayString, normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return $props.show && ((parseInt($props.value.toString()) == 0 ? $props.showZero : true) || $props.isDot) ? (_openBlock(), _createElementBlock(
-    "text",
-    {
-      key: 0,
-      class: _normalizeClass(["up-badge", [
-        $props.isDot ? "up-badge--dot" : "up-badge--not-dot",
-        $props.inverted ? "up-badge--inverted" : "",
-        $props.shape === "horn" ? "up-badge--horn" : "",
-        $props.inverted ? `up-badge--${$props.type}--inverted` : `up-badge--${$props.type}`
-      ]]),
-      style: _normalizeStyle($setup.computedBadgeStyle)
-    },
-    _toDisplayString($props.isDot ? "" : $setup.showValue),
-    7
-    /* TEXT, CLASS, STYLE */
-  )) : _createCommentVNode("v-if", true);
-}
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-badge/up-badge.uvue"]]);
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_1 as _
 };

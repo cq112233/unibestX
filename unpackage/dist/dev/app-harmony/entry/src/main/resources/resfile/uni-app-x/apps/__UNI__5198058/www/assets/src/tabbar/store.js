@@ -1,11 +1,10 @@
-import { C as CustomTabBarItem } from "./types.js";
 import { c as customTabbarList } from "./config.js";
 const { reactive, ref } = globalThis.Vue;
 function normalizeList() {
   const result = [];
   for (let i = 0; i < customTabbarList.length; i++) {
     const item = customTabbarList[i];
-    result.push(new CustomTabBarItem({
+    result.push({
       text: item.text,
       pagePath: item.pagePath.startsWith("/") ? item.pagePath : `/${item.pagePath}`,
       iconType: item.iconType,
@@ -13,7 +12,7 @@ function normalizeList() {
       iconActive: item.iconActive,
       badge: item.badge,
       isBulge: item.isBulge
-    }));
+    });
   }
   return result;
 }

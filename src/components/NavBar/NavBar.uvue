@@ -7,7 +7,7 @@
         backgroundColor: bgColor,
         borderBottomWidth: border ? '1px' : '0px',
         borderBottomStyle: border ? 'solid' : 'none',
-        borderBottomColor: border ? '#e2e8f0' : 'transparent',
+        borderBottomColor: border ? '#e2e8f0' : 'transparent'
       }"
     >
       <!-- 安全区域：状态栏占位高度 -->
@@ -44,66 +44,66 @@
 </template>
 
 <script setup lang="uts">
-import { computed } from 'vue'
-import { safeAreaInsets, systemInfo } from '@/src/utils/systemInfo'
+import { computed } from 'vue';
+import { safeAreaInsets, systemInfo } from '@/src/utils/systemInfo';
 
 // 定义组件参数类型
 const props = defineProps({
   title: {
     type: String,
-    default: '',
+    default: ''
   },
   titleColor: {
     type: String,
-    default: '#1e293b',
+    default: '#1e293b'
   },
   bgColor: {
     type: String,
-    default: '#ffffff',
+    default: '#ffffff'
   },
   fixed: {
     type: Boolean,
-    default: true,
+    default: true
   },
   placeholder: {
     type: Boolean,
-    default: true,
+    default: true
   },
   showBack: {
     type: Boolean,
-    default: true,
+    default: true
   },
   border: {
     type: Boolean,
-    default: true,
-  },
-})
+    default: true
+  }
+});
 
 // 计算状态栏高度
 const statusBarHeight = computed<number>((): number => {
-  const insets = safeAreaInsets.value
+  const insets = safeAreaInsets.value;
   if (insets != null && insets.top > 0) {
-    return insets.top
+    return insets.top;
   }
-  const info = systemInfo.value
+  const info = systemInfo.value;
   if (info != null && info.statusBarHeight > 0) {
-    return info.statusBarHeight
+    return info.statusBarHeight;
   }
-  return 0
-})
+  return 0;
+});
 
 // 处理返回事件
 function handleBack() {
-  const pages = getCurrentPages()
+  const pages = getCurrentPages();
   if (pages.length > 1) {
     uni.navigateBack({
-      delta: 1,
-    })
+      delta: 1
+    });
   }
   else {
     uni.reLaunch({
-      url: '/src/pages/index/index',
-    })
+      url: '/src/pages/index/index'
+    });
   }
 }
 </script>
