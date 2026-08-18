@@ -13,10 +13,9 @@
     "uvue"
   ],
 
-  // 禁用内置 TS/JS 验证，避免对 .uvue 文件产生大量假报错
-  // 真正的类型检查由 DCloud 语言服务插件和 ESLint 负责
-  "typescript.validate.enable": false,
-  "javascript.validate.enable": false,
+  // 启用 TS/JS 语法与未导入变量检查
+  "typescript.validate.enable": true,
+  "javascript.validate.enable": true,
 
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.expand": false,
@@ -38,12 +37,14 @@
   "js/ts.tsdk.promptToUseWorkspaceVersion": true,
   // 加载 Volar 的 TypeScript 服务器插件，让其处理 .uvue 文件中 lang="uts" 的 import 跳转定义
   "typescript.tsserver.pluginPaths": [
-    "/Users/chenqi/.antigravity-ide/extensions/vue.volar-3.3.3-universal/dist"
+    "/Users/chenqi/.antigravity-ide/extensions/vue.volar-3.3.10-universal/dist"
   ],
   "editor.tabSize": 2,
   "editor.detectIndentation": false,
   "editor.formatOnSave": true,
   "prettier.enable": false,
+  "eslint.enable": true,
+  "eslint.run": "onType",
   "editor.defaultFormatter": "dbaeumer.vscode-eslint",
   "eslint.format.enable": true,
 
@@ -93,12 +94,10 @@
     "postcss"
   ],
   "[vue]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
-    "editor.diagnostics": false
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   },
   "[uvue]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
-    "editor.diagnostics": false
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   },
   "i18n-ally.localesPaths": [
     "src/i18n/locales"
@@ -137,5 +136,95 @@
   },
   "[typescript]": {
     "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-  }
+  },
+  "cSpell.words": [
+    "uvue",
+    "uts",
+    "UTS",
+    "UTSJSONObject",
+    "uniapp",
+    "uniappx",
+    "unibest",
+    "unibestx",
+    "dcloud",
+    "dcloudio",
+    "hbuilder",
+    "hbuilderx",
+    "HBuilderX",
+    "easycom",
+    "uniCloud",
+    "nativeplugins",
+    "vdom",
+    "waterflow",
+    "flowitem",
+    "listview",
+    "listitem",
+    "stickyheader",
+    "stickysection",
+    "nestedscroll",
+    "nestedscrollheader",
+    "nestedscrollbody",
+    "refreshbox",
+    "refreshheader",
+    "customrefresher",
+    "refresherpulling",
+    "refresherrefresh",
+    "refresherrestore",
+    "refresherenabled",
+    "refreshertriggered",
+    "refresherdefaultstyle",
+    "tabbar",
+    "definePage",
+    "defineProps",
+    "defineEmits",
+    "defineExpose",
+    "defineOptions",
+    "defineSlots",
+    "defineModel",
+    "withDefaults",
+    "onInit",
+    "onLoad",
+    "onShow",
+    "onReady",
+    "onHide",
+    "onUnload",
+    "onPullDownRefresh",
+    "onReachBottom",
+    "onBackPress",
+    "OnBackPressOptions",
+    "onPageScroll",
+    "onResize",
+    "onTabItemTap",
+    "onNavigationBarButtonTap",
+    "onNavigationBarSearchInputChanged",
+    "onNavigationBarSearchInputConfirmed",
+    "onNavigationBarSearchInputClicked",
+    "onShareAppMessage",
+    "onShareTimeline",
+    "onAddToFavorites",
+    "getCurrentPages",
+    "getApp",
+    "onMounted",
+    "onUnmounted",
+    "onBeforeMount",
+    "onBeforeUnmount",
+    "shallowRef",
+    "shallowReactive",
+    "toRef",
+    "toRefs",
+    "toValue",
+    "customRef",
+    "triggerRef",
+    "uview",
+    "zpaging",
+    "unocss",
+    "iconify",
+    "dayuts",
+    "irainna",
+    "echarts",
+    "subpackages",
+    "volar",
+    "vueuse",
+    "antfu"
+  ]
 }

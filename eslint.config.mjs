@@ -1,6 +1,9 @@
 import uniHelper from '@uni-helper/eslint-config'
 
 const composer = uniHelper({
+  stylistic: {
+    semi: true, // 启用自动分号
+  },
   unocss: false,
   vue: true,
   markdown: false,
@@ -22,6 +25,9 @@ const composer = uniHelper({
   ],
   // https://eslint-config.antfu.me/rules
   rules: {
+    // 最后一个元素/属性禁止加尾随逗号
+    'style/comma-dangle': ['error', 'never'],
+    'vue/comma-dangle': ['error', 'never'],
     'vue/v-slot-style': 'off',
     'style/vue/v-slot-style': 'off',
     'vue/no-deprecated-slot-attribute': 'off',
@@ -31,7 +37,16 @@ const composer = uniHelper({
     'eqeqeq': 'off',
     'no-unused-vars': 'off',
     'vue/no-unused-refs': 'off',
-    'unused-imports/no-unused-vars': 'off',
+    'unused-imports/no-unused-vars': [
+      'warn',
+      {
+        vars: 'all',
+        varsIgnorePattern: '^_',
+        args: 'after-used',
+        argsIgnorePattern: '^_',
+      },
+    ],
+    'unused-imports/no-unused-imports': 'warn',
     'eslint-comments/no-unlimited-disable': 'off',
     'jsdoc/check-param-names': 'off',
     'jsdoc/require-returns-description': 'off',
@@ -190,9 +205,147 @@ for (const config of configs) {
 }
 
 configs.push({
+  files: ['**/*.vue', '**/*.uvue', '**/*.uts', '**/*.ts', '**/*.js'],
   rules: {
     'eqeqeq': 'off',
     'vue/eqeqeq': 'off',
+    'style/comma-dangle': ['error', 'never'],
+    'vue/comma-dangle': ['error', 'never'],
+    'vue/no-undef-components': [
+      'warn',
+      {
+        ignorePatterns: [
+          // 基础内容
+          'text',
+          'rich-text',
+          'progress',
+          'icon',
+
+          // 视图容器
+          'view',
+          'scroll-view',
+          'swiper',
+          'swiper-item',
+          'match-media',
+          'movable-area',
+          'movable-view',
+          'cover-view',
+          'cover-image',
+
+          // uni-app X 原生高性能列表与流式组件
+          'list-view',
+          'list-item',
+          'sticky-header',
+          'sticky-section',
+          'waterflow',
+          'flow-item',
+          'nested-scroll-header',
+          'nested-scroll-body',
+          'refresh-box',
+          'refresh-header',
+          'custom-refresher-box',
+
+          // 表单组件
+          'button',
+          'checkbox',
+          'checkbox-group',
+          'editor',
+          'form',
+          'input',
+          'label',
+          'picker',
+          'picker-view',
+          'picker-view-column',
+          'radio',
+          'radio-group',
+          'slider',
+          'switch',
+          'textarea',
+
+          // 导航与页面元信息
+          'navigator',
+          'page-meta',
+          'navigation-bar',
+
+          // 媒体组件
+          'audio',
+          'camera',
+          'image',
+          'video',
+          'live-player',
+          'live-pusher',
+
+          // 地图、画布与网页
+          'map',
+          'canvas',
+          'web-view',
+
+          // 广告与开放能力
+          'ad',
+          'ad-custom',
+          'open-data',
+
+          // Vue 内置虚拟与容器组件
+          'slot',
+          'template',
+          'component',
+          'transition',
+          'transition-group',
+          'keep-alive',
+          'teleport',
+
+          // easycom UI 库与通用组件通配符
+          'up-*',
+          'u-*',
+          'z-paging-x',
+          'z-paging',
+          'lime-*',
+          'iRainna-*',
+          'NavBar',
+          'nav-bar'
+        ]
+      }
+    ],
+  },
+  languageOptions: {
+    globals: {
+      // uni-app X 原生支持的全局变量与宏
+      uni: 'readonly',
+      plus: 'readonly',
+      UTSJSONObject: 'readonly',
+      defineProps: 'readonly',
+      defineEmits: 'readonly',
+      defineExpose: 'readonly',
+      defineOptions: 'readonly',
+      definePage: 'readonly',
+      defineSlots: 'readonly',
+      defineModel: 'readonly',
+      withDefaults: 'readonly',
+
+      // uni-app 页面生命周期（原生支持全局调用）
+      onInit: 'readonly',
+      onLoad: 'readonly',
+      onShow: 'readonly',
+      onReady: 'readonly',
+      onHide: 'readonly',
+      onUnload: 'readonly',
+      onPullDownRefresh: 'readonly',
+      onReachBottom: 'readonly',
+      onBackPress: 'readonly',
+      OnBackPressOptions: 'readonly',
+      onPageScroll: 'readonly',
+      onResize: 'readonly',
+      onTabItemTap: 'readonly',
+      onNavigationBarButtonTap: 'readonly',
+      onNavigationBarSearchInputChanged: 'readonly',
+      onNavigationBarSearchInputConfirmed: 'readonly',
+      onNavigationBarSearchInputClicked: 'readonly',
+      onShareAppMessage: 'readonly',
+      onShareTimeline: 'readonly',
+      onAddToFavorites: 'readonly',
+      getCurrentPages: 'readonly',
+      getApp: 'readonly',
+    },
   },
 })
 
