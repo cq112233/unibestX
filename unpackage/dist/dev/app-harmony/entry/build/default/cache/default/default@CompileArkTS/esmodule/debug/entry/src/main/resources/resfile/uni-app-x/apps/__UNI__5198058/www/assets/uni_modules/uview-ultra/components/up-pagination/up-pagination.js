@@ -1,0 +1,227 @@
+import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
+import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, toDisplayString: _toDisplayString, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, setSharedDataEvent: _setSharedDataEvent, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, createSharedDataFor: _createSharedDataFor } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpPaginationUpPagination";
+const { computed } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  ...{
+    name: "up-pagination"
+  },
+  __dynamicSharedData: true,
+  __hash: "208dc99e",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-pagination/up-pagination.uvue",
+  __name: "up-pagination",
+  props: {
+    currentPage: {
+      type: Number,
+      default: 1
+    },
+    pageSize: {
+      type: Number,
+      default: 10
+    },
+    total: {
+      type: Number,
+      default: 0
+    },
+    prevText: {
+      type: String,
+      default: ""
+    },
+    nextText: {
+      type: String,
+      default: ""
+    },
+    buttonBgColor: {
+      type: String,
+      default: "#f5f7fa"
+    },
+    buttonBorderColor: {
+      type: String,
+      default: "#dcdfe6"
+    },
+    layout: {
+      type: String,
+      default: "prev, pager, next, total"
+    },
+    hideOnSinglePage: {
+      type: Boolean,
+      default: false
+    }
+  },
+  emits: ["update:currentPage", "update:pageSize", "current-change", "size-change"],
+  setup(__props, _a) {
+    var __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpPaginationUpPaginationSharedData", sharedDataClassId: 0 })));
+    const props = __props;
+    const emit = __emit;
+    const totalPages = computed(() => {
+      const t = parseFloat(props.total.toString());
+      const p = parseFloat(props.pageSize.toString());
+      let pages = Math.ceil(t / p);
+      if (pages < 1)
+        pages = 1;
+      return pages;
+    });
+    const shouldShow = computed(() => {
+      if (props.hideOnSinglePage && totalPages.value <= 1) {
+        return false;
+      }
+      return true;
+    });
+    const showPager = computed(() => {
+      if (props.layout == null)
+        return false;
+      return props.layout.indexOf("pager") > -1;
+    });
+    const showTotal = computed(() => {
+      if (props.layout == null)
+        return false;
+      return props.layout.indexOf("total") > -1;
+    });
+    const currentPageStr = computed(() => {
+      return props.currentPage.toString();
+    });
+    const displayedPages = computed(() => {
+      const total = totalPages.value;
+      const current = props.currentPage;
+      const pages = [];
+      if (total <= 4) {
+        for (let i = 1; i <= total; i++) {
+          pages.push(i.toString());
+        }
+        return pages;
+      }
+      if (current <= 2) {
+        for (let i = 1; i <= 4; i++) {
+          pages.push(i.toString());
+        }
+        pages.push("...");
+        pages.push(total.toString());
+        return pages;
+      }
+      if (current >= total - 1) {
+        pages.push("1");
+        pages.push("...");
+        for (let i = total - 3; i <= total; i++) {
+          pages.push(i.toString());
+        }
+        return pages;
+      }
+      pages.push("1");
+      pages.push("...");
+      pages.push((current - 1).toString());
+      pages.push(current.toString());
+      pages.push((current + 1).toString());
+      pages.push("...");
+      pages.push(total.toString());
+      return pages;
+    });
+    function emitChange(page) {
+      emit("update:currentPage", page);
+      emit("current-change", page);
+    }
+    function prev() {
+      if (props.currentPage > 1) {
+        emitChange(props.currentPage - 1);
+      }
+    }
+    function next() {
+      if (props.currentPage < totalPages.value) {
+        emitChange(props.currentPage + 1);
+      }
+    }
+    function goTo(page) {
+      if (page == "..." || page == props.currentPage.toString()) {
+        return null;
+      }
+      const num = parseInt(page);
+      if (!isNaN(num)) {
+        emitChange(num);
+      }
+    }
+    return () => {
+      "raw js";
+      const _component_up_icon = __easycom_0;
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(shouldShow.value));
+      }, () => {
+        _renderSharedDataEffect(() => {
+          _setSharedDataClass(__sharedData, 13, ["up-pagination-btn", { "btn-disabled": __props.currentPage <= 1 }]);
+          _setSharedDataStyle(__sharedData, 14, { backgroundColor: __props.buttonBgColor, borderColor: __props.buttonBorderColor });
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 5, _toSharedDataBoolean(__props.prevText != ""));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            return _setSharedData(__sharedData, 6, _toDisplayString(__props.prevText));
+          });
+        }, () => {
+          const n6 = _createSharedDataComponentWithFallback(_component_up_icon, "0c80eb94", {
+            name: "arrow-left",
+            size: "14"
+          });
+          _setSharedData(__sharedData, 7, n6?.sharedData);
+        }, 261);
+        _setSharedDataEvent(__sharedData, 11, prev);
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 1, _toSharedDataBoolean(showPager.value));
+        }, () => {
+          _createSharedDataFor(_setSharedDataScoped(__sharedData, 2, _createSharedDataVFor(__sharedDataScope, () => {
+            return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
+          })), () => {
+            return displayedPages.value;
+          }, (__sharedData_VFor0, _for_item0, _for_key0) => {
+            _setSharedDataEvent(__sharedData_VFor0, 1, () => {
+              return goTo(_for_item0.value);
+            });
+            _renderSharedDataEffect(() => {
+              const _page = _for_item0.value;
+              _setSharedDataClass(__sharedData_VFor0, 2, ["up-pagination-item", { "item-active": _page == currentPageStr.value }]);
+              _setSharedDataClass(__sharedData_VFor0, 3, ["up-pagination-text", { "text-active": _page == currentPageStr.value }]);
+              _setSharedData(__sharedData_VFor0, 4, _toDisplayString(_page));
+            });
+            return null;
+          }, (__sharedData_VFor0, page, index) => {
+            return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
+          });
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 3, _toSharedDataBoolean(showTotal.value));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            return _setSharedData(__sharedData, 4, _toDisplayString(__props.total));
+          });
+        });
+        _renderSharedDataEffect(() => {
+          _setSharedDataClass(__sharedData, 15, ["up-pagination-btn", { "btn-disabled": __props.currentPage >= totalPages.value }]);
+          _setSharedDataStyle(__sharedData, 16, { backgroundColor: __props.buttonBgColor, borderColor: __props.buttonBorderColor });
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 8, _toSharedDataBoolean(__props.nextText != ""));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            return _setSharedData(__sharedData, 9, _toDisplayString(__props.nextText));
+          });
+        }, () => {
+          const n22 = _createSharedDataComponentWithFallback(_component_up_icon, "3e30c617", {
+            name: "arrow-right",
+            size: "14"
+          });
+          _setSharedData(__sharedData, 10, n22?.sharedData);
+        }, 1029);
+        _setSharedDataEvent(__sharedData, 12, next);
+      });
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-pagination.js.map

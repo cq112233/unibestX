@@ -6,10 +6,9 @@ const src_tabbar_store = require("../../tabbar/store.js");
 const src_store_user = require("../../store/user.js");
 const src_store_token = require("../../store/token.js");
 if (!Math) {
-  (common_vendor.unref(LayoutComponent) + common_vendor.unref(AppKu))();
+  common_vendor.unref(AppKu)();
 }
 const AppKu = () => "../../../App.ku.js";
-const LayoutComponent = () => "../../layouts/default.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "me",
   setup(__props) {
@@ -34,9 +33,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.UTS.JSON.stringify(info, null, 2);
     });
     common_vendor.onShow(() => {
-      common_vendor.index.__f__("log", "at src/pages/me/me.uvue:82", "All storage keys:", common_vendor.index.getStorageInfoSync().keys);
-      common_vendor.index.__f__("log", "at src/pages/me/me.uvue:83", "pinia:token:", common_vendor.index.getStorageSync("pinia:token"));
-      common_vendor.index.__f__("log", "at src/pages/me/me.uvue:84", "pinia:user:", common_vendor.index.getStorageSync("pinia:user"));
+      common_vendor.index.__f__("log", "at src/pages/me/me.uvue:89", "All storage keys:", common_vendor.index.getStorageInfoSync().keys);
+      common_vendor.index.__f__("log", "at src/pages/me/me.uvue:90", "pinia:token:", common_vendor.index.getStorageSync("pinia:token"));
+      common_vendor.index.__f__("log", "at src/pages/me/me.uvue:91", "pinia:user:", common_vendor.index.getStorageSync("pinia:user"));
     });
     function handleLogin() {
       common_vendor.index.navigateTo({
@@ -74,22 +73,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         d: common_vendor.t(common_vendor.unref(userStore).state.userInfo.nickname)
       } : {}, {
         e: common_vendor.t(common_vendor.unref(tokenStore).hasValidLogin() ? "已登录" : "未登录"),
-        f: common_vendor.n(common_vendor.unref(tokenStore).hasValidLogin() ? "bg-_b_hd1fae5_B text-_b_h065f46_B" : "bg-_b_hf1f5f9_B text-_b_h64748b_B"),
+        f: common_vendor.n(common_vendor.unref(tokenStore).hasValidLogin() ? "bg-__d1fae5_ text-__065f46_" : "bg-__f1f5f9_ text-__64748b_"),
         g: common_vendor.t(common_vendor.unref(userInfoJson)),
         h: common_vendor.unref(tokenStore).hasValidLogin()
       }, common_vendor.unref(tokenStore).hasValidLogin() ? {
-        i: common_vendor.o(handleLogout, "d4")
+        i: common_vendor.o(handleLogout, "1a")
       } : {
-        j: common_vendor.o(handleLogin, "f2")
+        j: common_vendor.o(handleLogin, "a5")
       }, {
-        k: common_vendor.p({
-          ["navigation-bar-title-text"]: "我的"
-        }),
-        l: common_vendor.gei(_ctx, ""),
-        m: common_vendor.p({
+        k: common_vendor.gei(_ctx, ""),
+        l: common_vendor.p({
           id: common_vendor.gei(_ctx, "")
         }),
-        n: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        m: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

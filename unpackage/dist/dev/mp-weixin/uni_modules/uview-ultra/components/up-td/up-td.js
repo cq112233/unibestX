@@ -1,31 +1,47 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const uni_modules_uviewUltra_components_upTd_td = require("./td.js");
 const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
 const uni_modules_uviewUltra_libs_composable_useUltraUI = require("../../libs/composable/useUltraUI.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   name: "up-td"
 }, { __name: "up-td", props: {
-  // 宽度，百分比或者具体带单位的值，如30%， 200rpx等，一般使用百分比
+  customStyle: {
+    type: [Object, String],
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
+    }
+  },
+  customClass: {
+    type: String,
+    default: ""
+  },
+  text: {
+    type: [String, Number],
+    default: ""
+  },
+  label: {
+    type: [String, Number],
+    default: ""
+  },
   width: {
     type: [String],
-    default: uni_modules_uviewUltra_components_upTd_td.defProps.getString("td.width")
+    default: "auto"
   },
   textAlign: {
     type: String,
-    default: uni_modules_uviewUltra_components_upTd_td.defProps.getString("td.textAlign")
+    default: ""
   },
   fontSize: {
     type: String,
-    default: uni_modules_uviewUltra_components_upTd_td.defProps.getString("td.fontSize")
+    default: ""
   },
   borderColor: {
     type: String,
-    default: uni_modules_uviewUltra_components_upTd_td.defProps.getString("td.borderColor")
+    default: ""
   },
   color: {
     type: String,
-    default: uni_modules_uviewUltra_components_upTd_td.defProps.getString("td.color")
+    default: ""
   }
 }, setup(__props) {
   const _a = uni_modules_uviewUltra_libs_composable_useUltraUI.useUltraUI(new common_vendor.UTSJSONObject({
@@ -38,7 +54,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   const props = __props;
   const tdStyle = common_vendor.ref(new common_vendor.UTSJSONObject({}));
   const tdTextStyle = common_vendor.ref(new common_vendor.UTSJSONObject({}));
+  const mergedTdStyle = common_vendor.computed(() => {
+    const custom = uni_modules_uviewUltra_libs_function_index.addStyle(props.customStyle);
+    const td = tdStyle.value;
+    return uni_modules_uviewUltra_libs_function_index.deepMerge(td, custom);
+  });
   common_vendor.onMounted(() => {
+    var _a2;
     getParent("up-table", instance);
     if (parent.value != null) {
       let style = new common_vendor.UTSJSONObject({});
@@ -49,8 +71,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       styleText["textAlign"] = parentProps.getString("align");
       styleText["fontSize"] = uni_modules_uviewUltra_libs_function_index.addUnit(parentProps.getString("fontSize"));
       style["padding"] = parentProps.getString("padding");
-      style["borderBottom"] = `solid 1px ` + parentProps.getString("borderColor");
-      style["borderRight"] = `solid 1px ` + parentProps.getString("borderColor");
+      const isBorder = (_a2 = parentProps.getBoolean("border")) !== null && _a2 !== void 0 ? _a2 : true;
+      if (isBorder) {
+        style["borderBottom"] = `solid 1px ` + parentProps.getString("borderColor");
+        style["borderRight"] = `solid 1px ` + parentProps.getString("borderColor");
+      }
       styleText["color"] = parentProps.getString("color");
       if (props.textAlign != "") {
         styleText["textAlign"] = props.textAlign;
@@ -71,14 +96,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   return (_ctx, _cache) => {
     "raw js";
     const __returned__ = {
-      a: common_vendor.s(tdTextStyle.value),
-      b: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-      c: common_vendor.s(tdStyle.value),
-      d: common_vendor.s({
+      a: common_vendor.t((__props.text != null && __props.text != "" ? __props.text : __props.label).toString()),
+      b: common_vendor.s(tdTextStyle.value),
+      c: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+      d: common_vendor.n(__props.customClass),
+      e: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+      f: common_vendor.s(mergedTdStyle.value),
+      g: common_vendor.s({
         "--status-bar-height": `${_ctx.u_s_b_h}px`,
         "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
-      }),
-      e: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+      })
     };
     return __returned__;
   };

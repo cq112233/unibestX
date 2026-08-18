@@ -8,7 +8,7 @@ class SubscriptionMutation extends common_vendor.UTS.UTSType {
         return {
           type: { type: "Unknown", optional: false },
           storeId: { type: String, optional: false },
-          payload: { type: "Unknown", optional: true },
+          payload: { type: "Any", optional: true },
           timestamp: { type: Number, optional: false }
         };
       },

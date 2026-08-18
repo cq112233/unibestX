@@ -297,11 +297,17 @@ class Schema {
 				}
 				if (Array.isArray(errs)) {
 					resolve(
-					  errs.map((e: UTSJSONObject) => {
-					    // @ts-ignore
-					    return typeof e == 'string'
-					      ? createError(field, e.toString())
-					      : (e['message'] != null ? e : createError(field, e.toString() + ''))
+					  (errs as Array<any>).map((e: any): UTSJSONObject => {
+					    if (typeof e == 'string') {
+					      return createError(field, `${e}`)
+					    }
+					    if (e != null && typeof e == 'object') {
+					      const obj = e as UTSJSONObject
+					      if (obj['message'] != null) {
+					        return obj
+					      }
+					    }
+					    return createError(field, `${e}`)
 					  })
 					)
 					return

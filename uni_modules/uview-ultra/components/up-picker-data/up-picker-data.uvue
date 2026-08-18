@@ -3,7 +3,6 @@
 		<view class="up-picker-data__trigger">
 			<slot name="trigger"></slot>
 			<up-input
-				v-if="!hasTrigger"
 				:model-value="current"
 				disabled
 				disabled-color="#ffffff"
@@ -24,7 +23,9 @@
 	</view>
 </template>
 
-<script lang="uts">
+<script setup lang="uts">
+import { ref, computed, watch } from 'vue'
+
 function stringValue(value: any | null): string {
 	return value == null ? '' : value.toString()
 }
@@ -33,104 +34,89 @@ function createIndexList(): Array<number> {
 	return [] as Array<number>
 }
 
-export default {
-	name: 'up-picker-data',
-	props: {
-		modelValue: {
-			type: [String, Number],
-			default: ''
-		},
-		title: {
-			type: String,
-			default: ''
-		},
-		description: {
-			type: String,
-			default: ''
-		},
-		options: {
-			type: Array,
-			default(): Array<UTSJSONObject> {
-				return [] as Array<UTSJSONObject>
-			}
-		},
-		valueKey: {
-			type: String,
-			default: 'id'
-		},
-		labelKey: {
-			type: String,
-			default: 'name'
-		}
+defineOptions({
+	name: 'up-picker-data'
+})
+
+const props = defineProps({
+	modelValue: {
+		type: [String, Number],
+		default: ''
 	},
-	emits: ['update:modelValue', 'cancel', 'close', 'confirm'],
-	data() {
-		return {
-			show: false,
-			current: '',
-			defaultIndex: createIndexList()
-		}
+	title: {
+		type: String,
+		default: ''
 	},
-	computed: {
-		hasTrigger(): boolean {
-			return this.$slots['trigger'] != null
-		},
-		columns(): Array<Array<UTSJSONObject>> {
-			return [this.options as Array<UTSJSONObject>] as Array<Array<UTSJSONObject>>
-		}
+	description: {
+		type: String,
+		default: ''
 	},
-	watch: {
-		modelValue: {
-			handler() {
-				this.syncCurrent()
-			},
-			immediate: true
-		},
-		options: {
-			handler() {
-				this.syncCurrent()
-			},
-			immediate: true
-		}
+	options: {
+		type: Array as PropType<Array<UTSJSONObject>>,
+		default: () => [] as Array<UTSJSONObject>
 	},
-	methods: {
-		syncCurrent(): void {
-			const list = this.options as Array<UTSJSONObject>
-			const model = stringValue(this.modelValue)
-			this.current = ''
-			this.defaultIndex = createIndexList()
-			for (let i = 0; i < list.length; i++) {
-				const item = list[i]
-				if (stringValue(item[this.valueKey]) == model) {
-					this.current = stringValue(item[this.labelKey])
-					this.defaultIndex = [i] as Array<number>
-					return
-				}
-			}
-		},
-		cancel(): void {
-			this.show = false
-			this.$emit('cancel')
-		},
-		close(): void {
-			this.show = false
-			this.$emit('close')
-		},
-		confirm(e: UTSJSONObject): void {
-			const value = e['value'] as Array<UTSJSONObject>
-			if (value.length == 0) {
-				this.show = false
-				this.$emit('confirm')
-				return
-			}
-			const item = value[0]
-			this.show = false
-			this.$emit('update:modelValue', item[this.valueKey])
-			this.current = stringValue(item[this.labelKey])
-			this.$emit('confirm')
+	valueKey: {
+		type: String,
+		default: 'id'
+	},
+	labelKey: {
+		type: String,
+		default: 'name'
+	}
+})
+
+const emit = defineEmits(['update:modelValue', 'cancel', 'close', 'confirm'])
+
+const show = ref<boolean>(false)
+const current = ref<string>('')
+const defaultIndex = ref<Array<number>>(createIndexList())
+
+const columns = computed<Array<Array<UTSJSONObject>>>(() => {
+	return [props.options] as Array<Array<UTSJSONObject>>
+})
+
+function syncCurrent(): void {
+	const list = props.options
+	const model = stringValue(props.modelValue)
+	current.value = ''
+	defaultIndex.value = createIndexList()
+	for (let i = 0; i < list.length; i++) {
+		const item = list[i]
+		if (stringValue(item[props.valueKey]) == model) {
+			current.value = stringValue(item[props.labelKey])
+			defaultIndex.value = [i] as Array<number>
+			return
 		}
 	}
 }
+
+function cancel(): void {
+	show.value = false
+	emit('cancel')
+}
+
+function close(): void {
+	show.value = false
+	emit('close')
+}
+
+function confirm(e: UTSJSONObject): void {
+	const value = e['value'] as Array<UTSJSONObject>
+	if (value.length == 0) {
+		show.value = false
+		emit('confirm')
+		return
+	}
+	const item = value[0]
+	show.value = false
+	emit('update:modelValue', item[props.valueKey])
+	current.value = stringValue(item[props.labelKey])
+	emit('confirm')
+}
+
+watch((): Array<any | null> => [props.modelValue, props.options] as Array<any | null>, () => {
+	syncCurrent()
+}, { immediate: true, deep: true })
 </script>
 
 <style lang="scss" scoped>

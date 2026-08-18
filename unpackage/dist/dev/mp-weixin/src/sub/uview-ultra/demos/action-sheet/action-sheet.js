@@ -47,7 +47,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: common_vendor.o(($event) => {
           return actionSheetShow.value = true;
-        }, "fa"),
+        }, "73"),
         c: common_vendor.p({
           type: "primary",
           text: "弹出面板",
@@ -56,7 +56,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         d: common_vendor.o(($event) => {
           return actionSheetShow2.value = true;
-        }, "67"),
+        }, "c8"),
         e: common_vendor.p({
           type: "success",
           text: "带取消按钮",
@@ -65,7 +65,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         f: common_vendor.o(($event) => {
           return actionSheetShow3.value = true;
-        }, "a0"),
+        }, "4f"),
         g: common_vendor.p({
           type: "warning",
           text: "复杂面板",
@@ -74,8 +74,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         h: common_vendor.o(($event) => {
           return actionSheetShow.value = false;
-        }, "c4"),
-        i: common_vendor.o(onActionSelect, "13"),
+        }, "bc"),
+        i: common_vendor.o(onActionSelect, "87"),
         j: common_vendor.p({
           show: actionSheetShow.value,
           actions: actionList.value,
@@ -84,8 +84,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         k: common_vendor.o(($event) => {
           return actionSheetShow2.value = false;
-        }, "e6"),
-        l: common_vendor.o(onActionSelect, "a3"),
+        }, "57"),
+        l: common_vendor.o(onActionSelect, "22"),
         m: common_vendor.p({
           show: actionSheetShow2.value,
           actions: actionList.value,
@@ -95,8 +95,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         n: common_vendor.o(($event) => {
           return actionSheetShow3.value = false;
-        }, "f6"),
-        o: common_vendor.o(onActionSelect, "f9"),
+        }, "cb"),
+        o: common_vendor.o(onActionSelect, "b3"),
         p: common_vendor.p({
           show: actionSheetShow3.value,
           actions: actionListComplex.value,

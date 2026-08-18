@@ -9,8 +9,8 @@ function toLoginPage(options = null) {
   }
   lastRedirectTime = now;
   const opts = options !== null && options !== void 0 ? options : new common_vendor.UTSJSONObject({});
-  const mode = (_a = opts["mode"]) !== null && _a !== void 0 ? _a : "navigateTo";
-  const queryString = (_b = opts["queryString"]) !== null && _b !== void 0 ? _b : "";
+  const mode = (_a = opts.mode) !== null && _a !== void 0 ? _a : "navigateTo";
+  const queryString = (_b = opts.queryString) !== null && _b !== void 0 ? _b : "";
   const LOGIN_PAGE = "/src/pages/auth/login";
   const url = `${LOGIN_PAGE}${queryString}`;
   const pages = getCurrentPages();

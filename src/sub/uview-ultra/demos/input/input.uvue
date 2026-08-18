@@ -4,7 +4,7 @@
     <view class="p-16px">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
-        <up-input placeholder="请输入内容" border="surround" v-model="inputValue" clearable></up-input>
+        <up-input v-model="inputValue" placeholder="请输入内容" border="surround" clearable></up-input>
       </view>
       <view class="demo-block mt-12px">
         <text class="demo-label">带前后台图标</text>
@@ -15,9 +15,9 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-const inputValue = ref('')
+const inputValue = ref('');
 </script>
 
 <style scoped>

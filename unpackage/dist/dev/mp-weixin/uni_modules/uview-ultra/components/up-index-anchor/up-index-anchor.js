@@ -42,6 +42,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       return false;
     }
   });
+  const anchorStyle = common_vendor.computed(() => {
+    return new common_vendor.UTSJSONObject({
+      height: uni_modules_uviewUltra_libs_function_index.addUnit(props.height),
+      backgroundColor: props.bgColor
+    });
+  });
+  const textStyle = common_vendor.computed(() => {
+    return new common_vendor.UTSJSONObject({
+      fontSize: uni_modules_uviewUltra_libs_function_index.addUnit(props.size),
+      color: props.color
+    });
+  });
   const init = function() {
     const indexList = getParent("up-index-list", instance);
     if (indexList == null) {
@@ -65,17 +77,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     "raw js";
     const __returned__ = {
       a: common_vendor.t(textName.value),
-      b: _ctx.$up.addUnit(__props.size),
-      c: __props.color,
-      d: common_vendor.sei(common_vendor.gei(_ctx, "", "r0-93878528"), "view", `up-index-anchor-${textName.value}`),
-      e: parentSticky.value ? 1 : "",
-      f: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
-      g: `up-index-anchor-${textName.value}`,
+      b: common_vendor.s(textStyle.value),
+      c: common_vendor.sei(common_vendor.gei(_ctx, "", "r0-93878528"), "view", `up-index-anchor-${textName.value}`),
+      d: parentSticky.value ? 1 : "",
+      e: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+      f: `up-index-anchor-${textName.value}`,
+      g: common_vendor.s(anchorStyle.value),
       h: common_vendor.s({
-        height: _ctx.$up.addUnit(__props.height),
-        backgroundColor: __props.bgColor
-      }),
-      i: common_vendor.s({
         "--status-bar-height": `${_ctx.u_s_b_h}px`,
         "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
       })

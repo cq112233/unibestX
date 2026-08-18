@@ -5,6 +5,20 @@ const uni_modules_uviewUltra_components_upTable_table = require("./table.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   name: "up-table"
 }, { __name: "up-table", props: {
+  customStyle: {
+    type: [Object, String],
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
+    }
+  },
+  customClass: {
+    type: String,
+    default: ""
+  },
+  border: {
+    type: Boolean,
+    default: true
+  },
   borderColor: {
     type: String,
     default: uni_modules_uviewUltra_components_upTable_table.defProps.getString("table.borderColor")
@@ -47,8 +61,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   const show = common_vendor.ref(true);
   const tableStyle = common_vendor.computed(() => {
     let style = new common_vendor.UTSJSONObject({});
-    style["borderLeft"] = `solid 1px ${props.borderColor}`;
-    style["borderTop"] = `solid 1px ${props.borderColor}`;
+    if (props.border) {
+      style["borderLeft"] = `solid 1px ${props.borderColor}`;
+      style["borderTop"] = `solid 1px ${props.borderColor}`;
+    }
     style["backgroundColor"] = props.bgColor;
     return style;
   });
@@ -58,6 +74,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       show.value = true;
     }, 0);
   }
+  common_vendor.watch(() => {
+    return props.border;
+  }, () => {
+    change();
+  });
   common_vendor.watch(() => {
     return props.align;
   }, () => {
@@ -70,6 +91,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   });
   const getProps = function() {
     return new common_vendor.UTSJSONObject({
+      border: props.border,
       borderColor: props.borderColor,
       align: props.align,
       padding: props.padding,

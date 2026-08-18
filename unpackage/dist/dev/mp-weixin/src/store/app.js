@@ -42,15 +42,10 @@ function getSystemLocale() {
   }
   return "zh-CN";
 }
-const defaultAppState = new IAppState(
-  {
-    theme: "#37c2bc",
-    locale: getSystemLocale()
-  }
-  // ==========================================
-  // Store 实现
-  // ==========================================
-);
+const defaultAppState = new IAppState({
+  theme: "#37c2bc",
+  locale: getSystemLocale()
+});
 class AppStore extends uni_modules_xPiniaS_instans_storeBase.PiniaStoreBase {
   // 2. constructor
   constructor() {
@@ -75,13 +70,13 @@ class AppStore extends uni_modules_xPiniaS_instans_storeBase.PiniaStoreBase {
     uni_modules_uviewUltra_libs_i18n_index.setLocale(defaultAppState.locale);
   }
   _hydrate(_data) {
-    if (_data["theme"] != null) {
-      const colorVal = _data["theme"];
+    if (_data.theme != null) {
+      const colorVal = _data.theme;
       this.state.theme = colorVal;
       src_tabbar_store.themeColor.value = colorVal;
     }
-    if (_data["locale"] != null) {
-      const localeVal = _data["locale"];
+    if (_data.locale != null) {
+      const localeVal = _data.locale;
       this.state.locale = localeVal;
       src_i18n_index.i18n.global.locale.value = localeVal;
       uni_modules_uviewUltra_libs_i18n_index.setLocale(localeVal);

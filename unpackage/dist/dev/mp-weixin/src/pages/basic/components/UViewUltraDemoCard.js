@@ -7,7 +7,6 @@ const Card = () => "./Card.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "UViewUltraDemoCard",
   setup(__props) {
-    let isNavigating = false;
     function copyWebsiteUrl() {
       common_vendor.index.setClipboardData({
         data: "https://uview-ultra.lingyun.net/",
@@ -20,29 +19,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     }
     function navigateToShowcase() {
-      if (isNavigating) {
-        return null;
-      }
-      isNavigating = true;
       common_vendor.index.navigateTo({
         url: "/src/sub/uview-ultra/uview-ultra",
-        complete: () => {
-          setTimeout(() => {
-            isNavigating = false;
-          }, 500);
+        fail: (err) => {
+          common_vendor.index.__f__("error", "at src/pages/basic/components/UViewUltraDemoCard.uvue:58", "navigateToShowcase fail:", err);
         }
       });
     }
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
-        a: common_vendor.o(copyWebsiteUrl, "16"),
-        b: common_vendor.o(navigateToShowcase, "80"),
+        a: common_vendor.o(copyWebsiteUrl, "39"),
+        b: common_vendor.o(navigateToShowcase, "a8"),
         c: common_vendor.gei(_ctx, ""),
         d: common_vendor.p({
           title: "uview-ultra 组件库",
-          id: common_vendor.gei(_ctx, ""),
-          class: "data-v-d22d3cff"
+          id: common_vendor.gei(_ctx, "")
         }),
         e: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
@@ -50,6 +42,5 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-d22d3cff"]]);
-wx.createComponent(Component);
+wx.createComponent(_sfc_main);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/src/pages/basic/components/UViewUltraDemoCard.js.map

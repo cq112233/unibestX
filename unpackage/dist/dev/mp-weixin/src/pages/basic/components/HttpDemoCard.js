@@ -117,14 +117,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, hasErrorMsg.value ? {
         h: common_vendor.t(errorMsg.value)
       } : {}, {
-        i: common_vendor.o(loadMockData, "63"),
+        i: common_vendor.o(loadMockData, "f1"),
         j: common_vendor.t(loading.value ? "请求中..." : "真实 API 请求"),
-        k: common_vendor.o(fetchRealApi, "cc"),
+        k: common_vendor.o(fetchRealApi, "05"),
         l: common_vendor.gei(_ctx, ""),
         m: common_vendor.p({
           title: "HTTP 请求 Demo",
-          id: common_vendor.gei(_ctx, ""),
-          class: "data-v-98862868"
+          id: common_vendor.gei(_ctx, "")
         }),
         n: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
@@ -132,6 +131,5 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-98862868"]]);
-wx.createComponent(Component);
+wx.createComponent(_sfc_main);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/src/pages/basic/components/HttpDemoCard.js.map

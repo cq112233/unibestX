@@ -22,6 +22,5 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-5d033e87"]]);
-wx.createComponent(Component);
+wx.createComponent(_sfc_main);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/src/pages/basic/components/Card.js.map

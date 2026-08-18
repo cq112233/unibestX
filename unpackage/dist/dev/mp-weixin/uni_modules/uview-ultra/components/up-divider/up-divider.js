@@ -13,6 +13,16 @@ if (!Math) {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "up-divider",
   props: {
+    customStyle: {
+      type: [Object, String],
+      default: () => {
+        return new common_vendor.UTSJSONObject({});
+      }
+    },
+    customClass: {
+      type: String,
+      default: ""
+    },
     // 是否虚线
     dashed: {
       type: Boolean,
@@ -65,6 +75,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       style["color"] = props.textColor;
       return style;
     });
+    const customDividerStyle = common_vendor.computed(() => {
+      return uni_modules_uviewUltra_libs_function_index.addStyle(props.customStyle);
+    });
     const leftLineStyle = common_vendor.computed(() => {
       const style = new common_vendor.UTSJSONObject({});
       if (props.textPosition === "left") {
@@ -110,12 +123,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-06b4239d"
         }),
         g: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        h: common_vendor.s(_ctx.$up.addStyle(_ctx.customStyle)),
+        h: common_vendor.s(customDividerStyle.value),
         i: common_vendor.s({
           "--status-bar-height": `${_ctx.u_s_b_h}px`,
           "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
         }),
-        j: common_vendor.o(clickHandler, "f1"),
+        j: common_vendor.o(clickHandler, "09"),
         k: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;

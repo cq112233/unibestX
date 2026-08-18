@@ -1,3 +1,4 @@
+:host{display:flex;flex-direction:column}
 /**
  * 这里是uni-app内置的常用样式变量
  *
@@ -24,7 +25,22 @@
 /* 透明度 */
 /* 文章场景相关 */
 /* 覆盖 uview-ultra 的 SCSS 变量，使其编译为 CSS 变量 */
-.u-empty.data-v-be09750b,.u-empty__wrap.data-v-be09750b,.u-tabs.data-v-be09750b,.u-tabs__wrapper.data-v-be09750b,.u-tabs__wrapper__scroll-view-wrapper.data-v-be09750b,.u-tabs__wrapper__scroll-view.data-v-be09750b,.u-tabs__wrapper__nav.data-v-be09750b,.u-tabs__wrapper__nav__line.data-v-be09750b,.up-empty.data-v-be09750b,.up-empty__wrap.data-v-be09750b,.up-tabs.data-v-be09750b,.up-tabs__wrapper.data-v-be09750b,.up-tabs__wrapper__scroll-view-wrapper.data-v-be09750b,.up-tabs__wrapper__scroll-view.data-v-be09750b,.up-tabs__wrapper__nav.data-v-be09750b,.up-tabs__wrapper__nav__line.data-v-be09750b {
+.u-empty.data-v-be09750b,
+.u-empty__wrap.data-v-be09750b,
+.u-tabs.data-v-be09750b,
+.u-tabs__wrapper.data-v-be09750b,
+.u-tabs__wrapper__scroll-view-wrapper.data-v-be09750b,
+.u-tabs__wrapper__scroll-view.data-v-be09750b,
+.u-tabs__wrapper__nav.data-v-be09750b,
+.u-tabs__wrapper__nav__line.data-v-be09750b,
+.up-empty.data-v-be09750b,
+.up-empty__wrap.data-v-be09750b,
+.up-tabs.data-v-be09750b,
+.up-tabs__wrapper.data-v-be09750b,
+.up-tabs__wrapper__scroll-view-wrapper.data-v-be09750b,
+.up-tabs__wrapper__scroll-view.data-v-be09750b,
+.up-tabs__wrapper__nav.data-v-be09750b,
+.up-tabs__wrapper__nav__line.data-v-be09750b {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -34,51 +50,49 @@
   align-content: flex-start;
 }
 .up-steps-item.data-v-be09750b {
-  flex: 1;
+  position: relative;
   display: flex;
-  flex-direction: row;
 }
 .up-steps-item--row.data-v-be09750b {
+  flex: 1;
   flex-direction: column;
   align-items: center;
-  position: relative;
+  justify-content: flex-start;
 }
 .up-steps-item--column.data-v-be09750b {
-  position: relative;
   flex-direction: row;
-  justify-content: flex-start;
-  padding-bottom: 5px;
+  align-items: flex-start;
+  width: 100%;
+  min-height: 60px;
 }
 .up-steps-item__wrapper.data-v-be09750b {
   display: flex;
-  flex-direction: row;
   justify-content: center;
   align-items: center;
   position: relative;
-  background-color: #fff;
-  border-radius: 50px;
-}
-.up-steps-item__wrapper--column.data-v-be09750b {
-  width: 20px;
-  height: 20px;
-}
-.up-steps-item__wrapper--column--dot.data-v-be09750b {
-  height: 20px;
-  width: 20px;
+  background-color: #ffffff;
+  z-index: 2;
 }
 .up-steps-item__wrapper--row.data-v-be09750b {
-  width: 20px;
-  height: 20px;
+  height: 24px;
+  width: 24px;
 }
 .up-steps-item__wrapper--row--dot.data-v-be09750b {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
+}
+.up-steps-item__wrapper--column.data-v-be09750b {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+}
+.up-steps-item__wrapper--column--dot.data-v-be09750b {
+  height: 16px;
+  width: 16px;
 }
 .up-steps-item__wrapper__circle.data-v-be09750b {
   width: 20px;
   height: 20px;
-  box-sizing: border-box;
-  flex-shrink: 0;
   border-radius: 100px;
   border-width: 1px;
   border-style: solid;
@@ -87,67 +101,66 @@
   align-items: center;
   justify-content: center;
 }
-.up-steps-item__wrapper__circle--wait.data-v-be09750b {
-  border-color: #909193;
-  background-color: transparent;
-}
-.up-steps-item__wrapper__circle--active.data-v-be09750b {
-  background-color: var(--theme-color, #0957de);
-  border-color: var(--theme-color, #0957de);
-}
-.up-steps-item__wrapper__circle--finish.data-v-be09750b {
-  border-color: var(--theme-color, #0957de);
-  background-color: transparent;
-}
-.up-steps-item__wrapper__circle--error.data-v-be09750b {
-  border-color: #f56c6c;
-  background-color: transparent;
-}
 .up-steps-item__wrapper__circle__text.data-v-be09750b {
-  color: #909193;
   font-size: 11px;
   text-align: center;
-}
-.up-steps-item__wrapper__circle__text--active.data-v-be09750b {
-  color: #ffffff;
+  line-height: 11px;
 }
 .up-steps-item__wrapper__dot.data-v-be09750b {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 100px;
-  background-color: #606266;
-}
-.up-steps-item__wrapper__dot--active.data-v-be09750b {
-  background-color: var(--theme-color, #0957de);
 }
 .up-steps-item__content.data-v-be09750b {
   display: flex;
-  flex-direction: row;
-  flex: 1;
-}
-.up-steps-item__content__title.data-v-be09750b {
-  cursor: pointer;
 }
 .up-steps-item__content--row.data-v-be09750b {
   flex-direction: column;
   align-items: center;
+  margin-top: 6px;
+  width: 100%;
 }
 .up-steps-item__content--column.data-v-be09750b {
   flex-direction: column;
-  margin-left: 6px;
+  flex: 1;
+  padding-bottom: 16px;
+}
+.up-steps-item__content__title-text.data-v-be09750b {
+  font-size: 13px;
+  line-height: 18px;
+  text-align: center;
+}
+.up-steps-item__content__desc-text.data-v-be09750b {
+  font-size: 11px;
+  line-height: 16px;
+  margin-top: 2px;
+  text-align: center;
 }
 .up-steps-item__line.data-v-be09750b {
   position: absolute;
-  background-color: #909193;
+  z-index: 1;
 }
-.up-steps-item__line--active.data-v-be09750b {
-  background-color: var(--theme-color, #0957de);
+.up-steps-item__line--row-left.data-v-be09750b {
+  top: 11px;
+  left: 0;
+  width: 50%;
+  height: 2px;
 }
-.up-steps-item__line--row.data-v-be09750b {
-  top: 10px;
-  height: 1px;
+.up-steps-item__line--row-right.data-v-be09750b {
+  top: 11px;
+  left: 50%;
+  width: 50%;
+  height: 2px;
 }
-.up-steps-item__line--column.data-v-be09750b {
-  width: 1px;
-  left: 10px;
+.up-steps-item__line--col-top.data-v-be09750b {
+  top: 0;
+  left: 11px;
+  width: 2px;
+  height: 12px;
+}
+.up-steps-item__line--col-bottom.data-v-be09750b {
+  top: 12px;
+  bottom: 0;
+  left: 11px;
+  width: 2px;
 }

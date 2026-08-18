@@ -1,187 +1,221 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const uni_modules_uviewUltra_components_upLoadingIcon_props = require("./props.js");
-const uni_modules_uviewUltra_libs_mixin_mpMixin = require("../../libs/mixin/mpMixin.js");
-const uni_modules_uviewUltra_libs_mixin_mixin = require("../../libs/mixin/mixin.js");
+require("./loadingIcon.js");
 const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
 const uni_modules_uviewUltra_libs_function_colorGradient = require("../../libs/function/colorGradient.js");
-const __default__ = common_vendor.defineComponent({
-  name: "up-loading-icon",
-  mixins: [uni_modules_uviewUltra_libs_mixin_mpMixin.mpMixin, uni_modules_uviewUltra_libs_mixin_mixin.mixin, uni_modules_uviewUltra_components_upLoadingIcon_props.propsLoadicon],
-  data() {
-    return {
-      array12: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      // 这里需要设置默认值为360，否则在安卓nvue上，会延迟一个duration周期后才执行
-      // 在iOS nvue上，则会一开始默认执行两个周期的动画
-      aniAngel: 360,
-      webviewHide: false,
-      loading: false,
-      degree: 0,
-      transform: "",
-      spinnerStyle: [
-        new common_vendor.UTSJSONObject({ left: 0, top: 0 }),
-        new common_vendor.UTSJSONObject({ left: 0, top: 0 }),
-        new common_vendor.UTSJSONObject({ left: 0, top: 0 }),
-        new common_vendor.UTSJSONObject({ left: 0, top: 0 }),
-        new common_vendor.UTSJSONObject({ left: 0, top: 0 }),
-        new common_vendor.UTSJSONObject({ left: 0, top: 0 }),
-        new common_vendor.UTSJSONObject({ left: 0, top: 0 }),
-        new common_vendor.UTSJSONObject({ left: 0, top: 0 }),
-        new common_vendor.UTSJSONObject({ left: 0, top: 0 }),
-        new common_vendor.UTSJSONObject({ left: 0, top: 0 }),
-        new common_vendor.UTSJSONObject({ left: 0, top: 0 }),
-        new common_vendor.UTSJSONObject({ left: 0, top: 0 })
-      ],
-      animationFrame: 0
-    };
+const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
+  name: "up-loading-icon"
+}, { __name: "up-loading-icon", props: {
+  show: {
+    type: Boolean,
+    default: true
   },
-  computed: {
-    // 当为circle类型时，给其另外三边设置一个更轻一些的颜色
-    // 之所以需要这么做的原因是，比如父组件传了color为红色，那么需要另外的三个边为浅红色
-    // 而不能是固定的某一个其他颜色(因为这个固定的颜色可能浅蓝，导致效果没有那么细腻良好)
-    otherBorderColor() {
-      const lightColor = uni_modules_uviewUltra_libs_function_colorGradient.colorGradient(this.color, "#ffffff", 100)[80];
-      if (this.mode === "circle") {
-        return this.inactiveColor != "" ? this.inactiveColor : lightColor;
-      } else {
-        return "transparent";
-      }
-    }
+  color: {
+    type: String,
+    default: "#909193"
   },
-  watch: {
-    show(nVal) {
-      if (nVal) {
-        this.startRotate();
-      } else {
-        this.stopRotate();
-      }
-    }
+  textColor: {
+    type: String,
+    default: "#909193"
   },
-  mounted() {
-    this.init();
+  vertical: {
+    type: Boolean,
+    default: false
   },
-  beforeUnmount() {
-    this.stopRotate();
+  mode: {
+    type: String,
+    default: "spinner"
   },
-  methods: {
-    addStyle(val = null) {
-      return uni_modules_uviewUltra_libs_function_index.addStyle(val);
-    },
-    addUnit(val = null) {
-      return uni_modules_uviewUltra_libs_function_index.addUnit(val);
-    },
-    getSpinnerDotStyle(index) {
-      const style = new common_vendor.UTSJSONObject({});
-      style["backgroundColor"] = this.color;
-      style["transform"] = `rotate(${((index + 1) * 30).toString()}deg)`;
-      style["opacity"] = 1 - 0.0625 * index;
-      return style;
-    },
-    rotateLoader() {
-      this.degree = (this.degree + this.getRotateStep()) % 360;
-      this.transform = `rotate(${this.degree.toString()}deg)`;
-    },
-    init() {
-      this.calcSpinnerTopAndLeft();
-      this.startRotate();
-    },
-    getRotateDuration() {
-      const durationValue = this.$props["duration"];
-      const durationNumber = parseInt(durationValue.toString());
-      return durationNumber > 0 ? durationNumber : 1200;
-    },
-    getRotateStep() {
-      return 360 * 16 / this.getRotateDuration();
-    },
-    startRotate() {
-      if (!this.show || this.animationFrame > 0) {
-        return null;
-      }
-      this.animationFrame = setInterval(() => {
-        this.rotateLoader();
-      }, 16);
-    },
-    stopRotate() {
-      if (this.animationFrame > 0) {
-        clearInterval(this.animationFrame);
-        this.animationFrame = 0;
-      }
-    },
-    calculateSquareRadius(sideLength) {
-      const diagonalLength = Math.sqrt(sideLength * sideLength + sideLength * sideLength);
-      const radius = diagonalLength / 2;
-      return radius;
-    },
-    // 因为uni-app-x不支持:before所以实现Spinner得用JS计算坐标
-    calcSpinnerTopAndLeft() {
-      this.array12.forEach((ele, index) => {
-        const angle = index * (360 / 12);
-        const angleRad = angle * (Math.PI / 180);
-        const banjing = this.calculateSquareRadius(parseInt(uni_modules_uviewUltra_libs_function_index.getPx(parseInt(this.$props["size"].toString()) * 2)));
-        const xOffset = banjing * Math.cos(angleRad);
-        const yOffset = banjing * Math.sin(angleRad);
-        this.spinnerStyle[index]["left"] = `${Math.round(45 + xOffset).toString()}%`;
-        this.spinnerStyle[index]["top"] = `${Math.round(34 + yOffset).toString()}%`;
-      });
+  size: {
+    type: [String, Number],
+    default: "24"
+  },
+  textSize: {
+    type: [String, Number],
+    default: "15"
+  },
+  text: {
+    type: [String, Number],
+    default: ""
+  },
+  timingFunction: {
+    type: String,
+    default: "ease-in-out"
+  },
+  duration: {
+    type: [String, Number],
+    default: 1200
+  },
+  inactiveColor: {
+    type: String,
+    default: ""
+  },
+  customStyle: {
+    type: Object,
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
     }
   }
-});
-const __injectCSSVars__ = () => {
-  common_vendor.useCssVars((_ctx = null) => {
+}, setup(__props) {
+  const props = __props;
+  const array12 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  const webviewHide = common_vendor.ref(false);
+  const degree = common_vendor.ref(0);
+  const transform = common_vendor.ref("");
+  const spinnerItemsStyle = common_vendor.ref([
+    new common_vendor.UTSJSONObject({ left: "0", top: "0" }),
+    new common_vendor.UTSJSONObject({ left: "0", top: "0" }),
+    new common_vendor.UTSJSONObject({ left: "0", top: "0" }),
+    new common_vendor.UTSJSONObject({ left: "0", top: "0" }),
+    new common_vendor.UTSJSONObject({ left: "0", top: "0" }),
+    new common_vendor.UTSJSONObject({ left: "0", top: "0" }),
+    new common_vendor.UTSJSONObject({ left: "0", top: "0" }),
+    new common_vendor.UTSJSONObject({ left: "0", top: "0" }),
+    new common_vendor.UTSJSONObject({ left: "0", top: "0" }),
+    new common_vendor.UTSJSONObject({ left: "0", top: "0" }),
+    new common_vendor.UTSJSONObject({ left: "0", top: "0" }),
+    new common_vendor.UTSJSONObject({ left: "0", top: "0" })
+  ]);
+  let animationFrame = 0;
+  const otherBorderColor = common_vendor.computed(() => {
+    if (props.inactiveColor != "") {
+      return props.inactiveColor;
+    }
+    if (props.mode == "circle") {
+      if (props.color.startsWith("#")) {
+        const gradient = uni_modules_uviewUltra_libs_function_colorGradient.colorGradient(props.color, "#ffffff", 100);
+        if (gradient.length > 80) {
+          return gradient[80];
+        }
+      }
+      return "#e5e5e5";
+    } else {
+      return "transparent";
+    }
+  });
+  const customLoadingIconStyle = common_vendor.computed(() => {
+    return uni_modules_uviewUltra_libs_function_index.addStyle(props.customStyle);
+  });
+  const spinnerStyle = common_vendor.computed(() => {
     return new common_vendor.UTSJSONObject({
-      "31cef3a4": _ctx.size
+      transform: transform.value,
+      width: uni_modules_uviewUltra_libs_function_index.addUnit(props.size),
+      height: uni_modules_uviewUltra_libs_function_index.addUnit(props.size),
+      borderTopColor: props.color,
+      borderBottomColor: otherBorderColor.value,
+      borderLeftColor: otherBorderColor.value,
+      borderRightColor: otherBorderColor.value
     });
   });
-};
-const __setup__ = __default__.setup;
-__default__.setup = __setup__ ? (props, ctx) => {
-  __injectCSSVars__();
-  return __setup__(props, ctx);
-} : __injectCSSVars__;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  "raw js";
-  return common_vendor.e({
-    a: _ctx.show
-  }, _ctx.show ? common_vendor.e({
-    b: !$data.webviewHide
-  }, !$data.webviewHide ? common_vendor.e({
-    c: _ctx.mode === "spinner"
-  }, _ctx.mode === "spinner" ? {
-    d: common_vendor.f($data.array12, (item, index, i0) => {
-      return {
-        a: index,
-        b: common_vendor.s($data.spinnerStyle[index]),
-        c: common_vendor.s($options.getSpinnerDotStyle(index))
-      };
-    })
-  } : {}, {
-    e: common_vendor.sei("r0-41713c06", "view", "ani"),
-    f: common_vendor.n(`up-loading-icon__spinner--${_ctx.mode}`),
-    g: $data.transform,
-    h: $options.addUnit(_ctx.size),
-    i: $options.addUnit(_ctx.size),
-    j: _ctx.color,
-    k: $options.otherBorderColor,
-    l: $options.otherBorderColor,
-    m: $options.otherBorderColor
-  }) : {}, {
-    n: _ctx.text != ""
-  }, _ctx.text != "" ? {
-    o: common_vendor.t(_ctx.text),
-    p: $options.addUnit(_ctx.textSize),
-    q: _ctx.textColor
-  } : {}, {
-    r: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    s: common_vendor.s($options.addStyle(_ctx.customStyle)),
-    t: common_vendor.s(_ctx.__cssVars()),
-    v: common_vendor.s({
-      "--status-bar-height": `${_ctx.u_s_b_h}px`,
-      "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
-    }),
-    w: common_vendor.n(_ctx.vertical ? "up-loading-icon--vertical" : ""),
-    x: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
-  }) : {});
-}
-const Component = /* @__PURE__ */ common_vendor._export_sfc(__default__, [["render", _sfc_render], ["__scopeId", "data-v-41713c06"]]);
+  const textStyle = common_vendor.computed(() => {
+    return new common_vendor.UTSJSONObject({
+      fontSize: uni_modules_uviewUltra_libs_function_index.addUnit(props.textSize),
+      color: props.textColor
+    });
+  });
+  function getSpinnerDotStyle(index) {
+    const style = new common_vendor.UTSJSONObject({});
+    style["backgroundColor"] = props.color;
+    style["transform"] = `rotate(${((index + 1) * 30).toString()}deg)`;
+    style["opacity"] = 1 - 0.0625 * index;
+    return style;
+  }
+  function getRotateDuration() {
+    const durationNumber = parseInt(props.duration.toString());
+    return durationNumber > 0 ? durationNumber : 1200;
+  }
+  function getRotateStep() {
+    return 360 * 16 / getRotateDuration();
+  }
+  function rotateLoader() {
+    degree.value = (degree.value + getRotateStep()) % 360;
+    transform.value = `rotate(${degree.value.toString()}deg)`;
+  }
+  function startRotate() {
+    if (!props.show || animationFrame > 0) {
+      return null;
+    }
+    animationFrame = setInterval(() => {
+      rotateLoader();
+    }, 16);
+  }
+  function stopRotate() {
+    if (animationFrame > 0) {
+      clearInterval(animationFrame);
+      animationFrame = 0;
+    }
+  }
+  function calculateSquareRadius(sideLength) {
+    const diagonalLength = Math.sqrt(sideLength * sideLength + sideLength * sideLength);
+    return diagonalLength / 2;
+  }
+  function calcSpinnerTopAndLeft() {
+    array12.forEach((_ele, index) => {
+      const angle = index * (360 / 12);
+      const angleRad = angle * (Math.PI / 180);
+      const banjing = calculateSquareRadius(parseInt(uni_modules_uviewUltra_libs_function_index.getPx(parseInt(props.size.toString()) * 2)));
+      const xOffset = banjing * Math.cos(angleRad);
+      const yOffset = banjing * Math.sin(angleRad);
+      spinnerItemsStyle.value[index]["left"] = `${Math.round(45 + xOffset).toString()}%`;
+      spinnerItemsStyle.value[index]["top"] = `${Math.round(34 + yOffset).toString()}%`;
+    });
+  }
+  function init() {
+    calcSpinnerTopAndLeft();
+    startRotate();
+  }
+  common_vendor.watch(() => {
+    return props.show;
+  }, (nVal) => {
+    if (nVal) {
+      startRotate();
+    } else {
+      stopRotate();
+    }
+  });
+  common_vendor.onMounted(() => {
+    init();
+  });
+  common_vendor.onBeforeUnmount(() => {
+    stopRotate();
+  });
+  return (_ctx, _cache) => {
+    "raw js";
+    const __returned__ = common_vendor.e({
+      a: __props.show
+    }, __props.show ? common_vendor.e({
+      b: !webviewHide.value
+    }, !webviewHide.value ? common_vendor.e({
+      c: __props.mode === "spinner"
+    }, __props.mode === "spinner" ? {
+      d: common_vendor.f(array12, (item, index, i0) => {
+        return {
+          a: index,
+          b: common_vendor.s(getSpinnerDotStyle(index))
+        };
+      })
+    } : {}, {
+      e: common_vendor.sei("r0-41713c06", "view", "ani"),
+      f: common_vendor.n(`up-loading-icon__spinner--${__props.mode}`),
+      g: common_vendor.s(spinnerStyle.value)
+    }) : {}, {
+      h: __props.text != ""
+    }, __props.text != "" ? {
+      i: common_vendor.t(__props.text),
+      j: common_vendor.s(textStyle.value)
+    } : {}, {
+      k: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+      l: common_vendor.s(customLoadingIconStyle.value),
+      m: common_vendor.s({
+        "--status-bar-height": `${_ctx.u_s_b_h}px`,
+        "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
+      }),
+      n: common_vendor.n(__props.vertical ? "up-loading-icon--vertical" : ""),
+      o: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+    }) : {});
+    return __returned__;
+  };
+} }));
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-41713c06"]]);
 wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.js.map

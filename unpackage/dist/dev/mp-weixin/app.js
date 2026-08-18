@@ -89,6 +89,7 @@ if (!Math) {
   "./src/sub/uview-ultra/demos/parse/parse.js";
   "./src/sub/uview-ultra/demos/back-top/back-top.js";
   "./src/sub/uview-ultra/demos/mp-html/mp-html.js";
+  "./src/sub/uview-ultra/demos/circle-progress/circle-progress.js";
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "App",

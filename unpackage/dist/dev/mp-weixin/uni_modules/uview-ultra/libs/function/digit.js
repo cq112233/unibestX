@@ -19,7 +19,7 @@ function digitLength(num) {
   return len > 0 ? len : 0;
 }
 function float2Fixed(num) {
-  if (num.toString().indexOf("e") === -1) {
+  if (num.toString().indexOf("e") == -1) {
     return parseInt(num.toString().replace(".", ""));
   }
   const dLen = digitLength(num);
@@ -82,7 +82,7 @@ function divide(...nums) {
 function round(num, ratio) {
   const base = Math.pow(10, ratio);
   let result = divide(Math.round(Math.abs(times(num, base))), base);
-  if (num < 0 && result !== 0) {
+  if (num < 0 && result != 0) {
     result = times(result, -1);
   }
   return result;

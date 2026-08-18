@@ -36,7 +36,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           size: "mini",
           class: "data-v-609cee78"
         }),
-        c: common_vendor.o(onCopySuccess, "c1"),
+        c: common_vendor.o(onCopySuccess, "a5"),
         d: common_vendor.p({
           content: "uview-ultra is great !",
           class: "data-v-609cee78"

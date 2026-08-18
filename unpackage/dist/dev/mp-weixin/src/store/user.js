@@ -55,14 +55,9 @@ const defaultUserInfo = new IUserInfo({
   nickname: "",
   avatar: DEFAULT_AVATAR
 });
-new IUserState(
-  {
-    userInfo: defaultUserInfo
-  }
-  // ==========================================
-  // Store 实现
-  // ==========================================
-);
+new IUserState({
+  userInfo: defaultUserInfo
+});
 class UserStore extends uni_modules_xPiniaS_instans_storeBase.PiniaStoreBase {
   // 2. constructor
   constructor() {
@@ -87,24 +82,24 @@ class UserStore extends uni_modules_xPiniaS_instans_storeBase.PiniaStoreBase {
     this.state.userInfo.avatar = defaultUserInfo.avatar;
   }
   _hydrate(_data) {
-    if (_data["userId"] != null)
-      this.state.userInfo.userId = _data["userId"];
-    if (_data["username"] != null)
-      this.state.userInfo.username = _data["username"];
-    if (_data["nickname"] != null)
-      this.state.userInfo.nickname = _data["nickname"];
-    if (_data["avatar"] != null)
-      this.state.userInfo.avatar = _data["avatar"];
-    if (_data["userInfo"] != null) {
-      const infoObj = _data["userInfo"];
-      if (infoObj["userId"] != null)
-        this.state.userInfo.userId = infoObj["userId"];
-      if (infoObj["username"] != null)
-        this.state.userInfo.username = infoObj["username"];
-      if (infoObj["nickname"] != null)
-        this.state.userInfo.nickname = infoObj["nickname"];
-      if (infoObj["avatar"] != null)
-        this.state.userInfo.avatar = infoObj["avatar"];
+    if (_data.userId != null)
+      this.state.userInfo.userId = _data.userId;
+    if (_data.username != null)
+      this.state.userInfo.username = _data.username;
+    if (_data.nickname != null)
+      this.state.userInfo.nickname = _data.nickname;
+    if (_data.avatar != null)
+      this.state.userInfo.avatar = _data.avatar;
+    if (_data.userInfo != null) {
+      const infoObj = _data.userInfo;
+      if (infoObj.userId != null)
+        this.state.userInfo.userId = infoObj.userId;
+      if (infoObj.username != null)
+        this.state.userInfo.username = infoObj.username;
+      if (infoObj.nickname != null)
+        this.state.userInfo.nickname = infoObj.nickname;
+      if (infoObj.avatar != null)
+        this.state.userInfo.avatar = infoObj.avatar;
     }
   }
   _serialize() {

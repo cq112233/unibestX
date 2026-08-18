@@ -264,5 +264,4 @@ new common_vendor.UTSJSONObject({
   colorToRgba
 });
 exports.colorGradient = colorGradient;
-exports.hexToRgb = hexToRgb;
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-ultra/libs/function/colorGradient.js.map

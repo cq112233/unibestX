@@ -1,15 +1,27 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const uni_modules_uviewUltra_components_upTh_th = require("./th.js");
 const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
 const uni_modules_uviewUltra_libs_composable_useUltraUI = require("../../libs/composable/useUltraUI.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   name: "up-th"
 }, { __name: "up-th", props: {
-  // 宽度，百分比或者具体带单位的值，如30%， 200rpx等，一般使用百分比
+  customStyle: {
+    type: [Object, String],
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
+    }
+  },
+  customClass: {
+    type: String,
+    default: ""
+  },
+  text: {
+    type: [String, Number],
+    default: ""
+  },
   width: {
     type: [String],
-    default: uni_modules_uviewUltra_components_upTh_th.defProps.getString("th.width")
+    default: ""
   }
 }, setup(__props) {
   const _a = uni_modules_uviewUltra_libs_composable_useUltraUI.useUltraUI(new common_vendor.UTSJSONObject({
@@ -22,18 +34,27 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   const props = __props;
   const thStyle = common_vendor.ref(new common_vendor.UTSJSONObject({}));
   const thTextStyle = common_vendor.ref(new common_vendor.UTSJSONObject({}));
+  const mergedThStyle = common_vendor.computed(() => {
+    const custom = uni_modules_uviewUltra_libs_function_index.addStyle(props.customStyle);
+    const th = thStyle.value;
+    return uni_modules_uviewUltra_libs_function_index.deepMerge(th, custom);
+  });
   common_vendor.onMounted(() => {
+    var _a2;
     getParent("up-table", instance);
     if (parent.value != null) {
       let style = new common_vendor.UTSJSONObject({});
       let styleText = new common_vendor.UTSJSONObject({});
       let parentProps = parent.value.$callMethod("getProps");
       if (props.width != "")
-        style.flex = `0 0 ${props.width}`;
+        style["flex"] = `0 0 ${props.width}`;
       styleText["textAlign"] = parentProps.getString("align");
       style["padding"] = parentProps.getString("padding");
-      style["borderBottom"] = `solid 1px ` + parentProps.getString("borderColor");
-      style["borderRight"] = `solid 1px ` + parentProps.getString("borderColor");
+      const isBorder = (_a2 = parentProps.getBoolean("border")) !== null && _a2 !== void 0 ? _a2 : true;
+      if (isBorder) {
+        style["borderBottom"] = `solid 1px ` + parentProps.getString("borderColor");
+        style["borderRight"] = `solid 1px ` + parentProps.getString("borderColor");
+      }
       style = uni_modules_uviewUltra_libs_function_index.deepMerge(style, parentProps.getAny("thStyle"));
       thStyle.value = style;
       thTextStyle.value = styleText;
@@ -42,14 +63,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   return (_ctx, _cache) => {
     "raw js";
     const __returned__ = {
-      a: common_vendor.s(thTextStyle.value),
-      b: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-      c: common_vendor.s(thStyle.value),
-      d: common_vendor.s({
+      a: common_vendor.t(__props.text),
+      b: common_vendor.s(thTextStyle.value),
+      c: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+      d: common_vendor.n(__props.customClass),
+      e: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+      f: common_vendor.s(mergedThStyle.value),
+      g: common_vendor.s({
         "--status-bar-height": `${_ctx.u_s_b_h}px`,
         "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
-      }),
-      e: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+      })
     };
     return __returned__;
   };

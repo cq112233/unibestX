@@ -5,18 +5,34 @@ require("./digit.js");
 const uni_modules_uviewUltra_libs_config_config = require("../config/config.js");
 function upGetRect(selector, all = false, comp = null) {
   return new Promise((resolve) => {
-    if (all == true) {
-      common_vendor.index.createSelectorQuery().in(comp).select(selector).boundingClientRect((res = null) => {
-        const nodeInfoArray = res;
-        const nodeInfoArrayItem = nodeInfoArray != null && nodeInfoArray.length > 0 ? nodeInfoArray[0] : {};
-        resolve(nodeInfoArrayItem);
-      }).exec();
-    } else {
-      common_vendor.index.createSelectorQuery().in(comp).selectAll(selector).boundingClientRect((res = null) => {
-        const nodeInfoArray = res;
-        const nodeInfoArrayItem = nodeInfoArray != null && nodeInfoArray.length > 0 ? nodeInfoArray[0] : {};
-        resolve(nodeInfoArrayItem);
-      }).exec();
+    try {
+      const query = common_vendor.index.createSelectorQuery();
+      const queryIn = comp != null ? query.in(comp) : query;
+      if (all == true) {
+        queryIn.selectAll(selector).boundingClientRect((res = null) => {
+          if (res != null && Array.isArray(res)) {
+            const arr = res;
+            resolve(arr.length > 0 ? arr[0] : {});
+          } else if (res != null) {
+            resolve(res);
+          } else {
+            resolve({});
+          }
+        }).exec();
+      } else {
+        queryIn.select(selector).boundingClientRect((res = null) => {
+          if (res != null && Array.isArray(res)) {
+            const arr = res;
+            resolve(arr.length > 0 ? arr[0] : {});
+          } else if (res != null) {
+            resolve(res);
+          } else {
+            resolve({});
+          }
+        }).exec();
+      }
+    } catch (_e) {
+      resolve({});
     }
   });
 }
@@ -107,17 +123,20 @@ function guid(len = 32, firstU = true, radix = 0) {
   return uuid.join("");
 }
 function addStyle(customStyle = null, target = "object") {
-  if (uni_modules_uviewUltra_libs_function_test.empty(customStyle) || typeof customStyle === "object" && target === "object" || target === "string" && typeof customStyle === "string") {
+  if (uni_modules_uviewUltra_libs_function_test.empty(customStyle)) {
+    return target === "object" ? new common_vendor.UTSJSONObject({}) : "";
+  }
+  if (typeof customStyle === "object" && target === "object" || target === "string" && typeof customStyle === "string") {
     return customStyle;
   }
   if (target === "object") {
-    let customStyleStr = common_vendor.UTS.JSON.stringify(customStyle);
+    let customStyleStr = typeof customStyle === "string" ? customStyle : common_vendor.UTS.JSON.stringify(customStyle);
     customStyleStr = customStyleStr.trim();
+    if (customStyleStr.startsWith('"') && customStyleStr.endsWith('"')) {
+      customStyleStr = customStyleStr.substring(1, customStyleStr.length - 1);
+    }
     const styleArray = customStyleStr.split(";");
-    const style = new common_vendor.UTSJSONObject(
-      {}
-      // 历遍数组，拼接成对象
-    );
+    const style = new common_vendor.UTSJSONObject({});
     for (let i = 0; i < styleArray.length; i++) {
       if (styleArray[i] != "") {
         const item = styleArray[i].split(":");
@@ -129,11 +148,13 @@ function addStyle(customStyle = null, target = "object") {
     return style;
   }
   let string = "";
-  common_vendor.UTSJSONObject.keys(customStyle).forEach((key) => {
-    key = key.replace(/([A-Z])/g, "-$1").toLowerCase();
-    let val = customStyle[key];
-    string += `${key}: ${val};`;
-  });
+  if (typeof customStyle === "object" && customStyle != null) {
+    common_vendor.UTSJSONObject.keys(customStyle).forEach((key) => {
+      key = key.replace(/([A-Z])/g, "-$1").toLowerCase();
+      let val = customStyle[key];
+      string += `${key}: ${val};`;
+    });
+  }
   return string.trim();
 }
 function addUnit(pvalue = null, punit = "") {
@@ -162,7 +183,7 @@ function deepMerge(targetOrigin = new common_vendor.UTSJSONObject({}), source = 
 }
 function error(err) {
   {
-    common_vendor.index.__f__("error", "at uni_modules/uview-ultra/libs/function/index.uts:321", `uview-plus提示：${err}`);
+    common_vendor.index.__f__("error", "at uni_modules/uview-ultra/libs/function/index.uts:361", `uview-plus提示：${err}`);
   }
 }
 function randomArray(array = []) {
@@ -282,6 +303,8 @@ function padZero(value = null) {
   let str = value.toString();
   return `00${str}`.slice(-2);
 }
+function formValidate(instance = null, event = null) {
+}
 function getProperty(obj = null, key) {
   var _a, _b;
   if (null == obj) {
@@ -358,6 +381,7 @@ exports.bem = bem;
 exports.deepClone = deepClone;
 exports.deepMerge = deepMerge;
 exports.error = error;
+exports.formValidate = formValidate;
 exports.getDeviceInfo = getDeviceInfo;
 exports.getParentFunc = getParentFunc;
 exports.getProperty = getProperty;

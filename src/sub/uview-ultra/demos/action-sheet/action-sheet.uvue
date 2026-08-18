@@ -49,26 +49,26 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-const actionSheetShow = ref(false)
-const actionSheetShow2 = ref(false)
-const actionSheetShow3 = ref(false)
+const actionSheetShow = ref(false);
+const actionSheetShow2 = ref(false);
+const actionSheetShow3 = ref(false);
 const actionList = ref([
   { name: '拍照' },
-  { name: '从相册选择' },
-])
+  { name: '从相册选择' }
+]);
 const actionListComplex = ref([
   { name: '着色选项', color: '#ffaa33' },
   { name: '禁用选项', disabled: true },
-  { name: '带副标题选项', subname: '我是副标题' },
-])
+  { name: '带副标题选项', subname: '我是副标题' }
+]);
 
 function onActionSelect(e: UTSJSONObject) {
-  console.log('action select', e)
-  actionSheetShow.value = false
-  actionSheetShow2.value = false
-  actionSheetShow3.value = false
+  console.log('action select', e);
+  actionSheetShow.value = false;
+  actionSheetShow2.value = false;
+  actionSheetShow3.value = false;
 }
 </script>
 

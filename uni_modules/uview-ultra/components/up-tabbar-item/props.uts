@@ -14,7 +14,7 @@ export const propsTabbarItem = defineMixin({
     props: {
         // item标签的名称，作为与u-tabbar的value参数匹配的标识符
         name: {
-            type: [String, Number, null],
+            type: [String, Number],
             default: tabbarItemProp['name']
         },
         // uview-plus内置图标或者绝对路径的图片
@@ -24,7 +24,7 @@ export const propsTabbarItem = defineMixin({
         },
         // 右上角的角标提示信息
         badge: {
-            type: [String, Number, null],
+            type: [String, Number],
             default: tabbarItemProp['badge']
         },
         // 是否显示圆点，将会覆盖badge参数

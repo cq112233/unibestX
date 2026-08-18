@@ -1,6 +1,6 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const defPropsRadio = new common_vendor.UTSJSONObject({
+const defProps = new common_vendor.UTSJSONObject({
   // radio组件
   radio: new common_vendor.UTSJSONObject({
     name: "",
@@ -18,5 +18,5 @@ const defPropsRadio = new common_vendor.UTSJSONObject({
     placement: ""
   })
 });
-exports.defPropsRadio = defPropsRadio;
+exports.defProps = defProps;
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-ultra/components/up-radio/radio.js.map

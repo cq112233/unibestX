@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
+const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
 const uni_modules_uviewUltra_components_upCellGroup_cellGroup = require("./cellGroup.js");
 if (!Array) {
   const _easycom_up_line_1 = common_vendor.resolveComponent("up-line");
@@ -12,6 +13,16 @@ if (!Math) {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   name: "up-cell-group"
 }, { __name: "up-cell-group", props: {
+  customStyle: {
+    type: [Object, String],
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
+    }
+  },
+  customClass: {
+    type: String,
+    default: ""
+  },
   title: {
     type: String,
     default: uni_modules_uviewUltra_components_upCellGroup_cellGroup.defProps.getString("cellGroup.title")
@@ -21,6 +32,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     default: uni_modules_uviewUltra_components_upCellGroup_cellGroup.defProps.getBoolean("cellGroup.border")
   }
 }, setup(__props) {
+  const props = __props;
+  const customCellGroupStyle = common_vendor.computed(() => {
+    return uni_modules_uviewUltra_libs_function_index.addStyle(props.customStyle);
+  });
   return (_ctx, _cache) => {
     "raw js";
     const __returned__ = common_vendor.e({
@@ -35,12 +50,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       })
     } : {}, {
       e: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-      f: common_vendor.s(_ctx.$up.addStyle(_ctx.customStyle)),
+      f: common_vendor.s(customCellGroupStyle.value),
       g: common_vendor.s({
         "--status-bar-height": `${_ctx.u_s_b_h}px`,
         "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
       }),
-      h: common_vendor.n(_ctx.customClass),
+      h: common_vendor.n(__props.customClass),
       i: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
     });
     return __returned__;

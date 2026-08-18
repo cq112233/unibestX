@@ -23,28 +23,28 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-const optionKeys = ref<string[]>([])
-const queryOptions = ref<UTSJSONObject | null>(null)
+const optionKeys = ref<string[]>([]);
+const queryOptions = ref<UTSJSONObject | null>(null);
 
 onLoad((options: UTSJSONObject | null) => {
-  console.log('test page onLoad options:', options)
+  console.log('test page onLoad options:', options);
   if (options != null) {
-    queryOptions.value = options
-    optionKeys.value = UTSJSONObject.keys(options)
+    queryOptions.value = options;
+    optionKeys.value = UTSJSONObject.keys(options);
   }
-})
+});
 
 function getOptionValue(key: string): string {
-  const options = queryOptions.value
+  const options = queryOptions.value;
   if (options != null) {
-    const val = options[key]
+    const val = options[key];
     if (val != null) {
-      return `${val}`
+      return `${val}`;
     }
   }
-  return ''
+  return '';
 }
 </script>
 

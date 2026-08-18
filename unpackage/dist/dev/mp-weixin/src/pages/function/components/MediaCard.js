@@ -40,14 +40,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, photoUrl.value === "" ? {} : {
         b: photoUrl.value
       }, {
-        c: common_vendor.o(chooseImage, "80"),
+        c: common_vendor.o(chooseImage, "38"),
         d: common_vendor.t(scanResult.value !== "" ? scanResult.value : "暂无数据"),
-        e: common_vendor.o(scanCode, "9d"),
+        e: common_vendor.o(scanCode, "d8"),
         f: common_vendor.gei(_ctx, ""),
         g: common_vendor.p({
           title: "相机与多媒体",
-          id: common_vendor.gei(_ctx, ""),
-          class: "data-v-ae3787e7"
+          id: common_vendor.gei(_ctx, "")
         }),
         h: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
@@ -55,6 +54,5 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-ae3787e7"]]);
-wx.createComponent(Component);
+wx.createComponent(_sfc_main);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/src/pages/function/components/MediaCard.js.map

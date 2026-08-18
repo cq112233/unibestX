@@ -1,7 +1,7 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
 const uni_modules_uviewUltra_libs_config_config = require("../../libs/config/config.js");
-const defProps = new common_vendor.UTSJSONObject({
+new common_vendor.UTSJSONObject({
   // loading-icon加载中图标组件
   loadingIcon: new common_vendor.UTSJSONObject({
     show: true,
@@ -17,5 +17,4 @@ const defProps = new common_vendor.UTSJSONObject({
     inactiveColor: ""
   })
 });
-exports.defProps = defProps;
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-ultra/components/up-loading-icon/loadingIcon.js.map

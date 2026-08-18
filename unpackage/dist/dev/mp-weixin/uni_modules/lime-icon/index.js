@@ -2866,10 +2866,10 @@ function registerFontIcon(config) {
         }
       });
     }
-    if (Object$1.keys(icons).length > 0) {
+    if (common_vendor.UTSJSONObject.keys(icons).length > 0) {
       iconData.set(prefix, icons);
       iconDataChangeCount.value++;
-      common_vendor.index.__f__("log", "at uni_modules/lime-icon/index.ts:327", `已注册字体图标库: ${prefix} (内置${Object$1.keys(icons).length}个图标)`);
+      common_vendor.index.__f__("log", "at uni_modules/lime-icon/index.ts:327", `已注册字体图标库: ${prefix} (内置${common_vendor.UTSJSONObject.keys(icons).length}个图标)`);
       if (!isNullish(jsonUrl)) {
         loadAndMergeJson(prefix, jsonUrl);
       }
@@ -3025,7 +3025,7 @@ function useIcon(name, options = {}) {
       }
       const config = iconifyRegistry.get(targetPrefix);
       const icons = iconData.get(targetPrefix);
-      const isLocal = !isNullish(icons) && Object$1.keys(icons).length > 0;
+      const isLocal = !isNullish(icons) && common_vendor.UTSJSONObject.keys(icons).length > 0;
       let apiUrl = DEFAULT_ICONIFY_API;
       if (!isNullish(config) && !isNullish(config === null || config === void 0 ? void 0 : config.apiUrl)) {
         apiUrl = config.apiUrl;

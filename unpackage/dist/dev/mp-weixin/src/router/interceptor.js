@@ -62,7 +62,7 @@ function parseUrlToObj(url) {
       if (pair.length > 1) {
         const key = pair[0];
         let value = pair[1];
-        if (value.indexOf("%") >= 0) {
+        if (value.includes("%")) {
           value = (_a = decodeURIComponent(value)) !== null && _a !== void 0 ? _a : "";
         }
         query.set(key, value);
@@ -76,12 +76,12 @@ function parseUrlToObj(url) {
 function judgeIsExcludePath(path) {
   let normalizedPath = path;
   if (normalizedPath.startsWith("src/")) {
-    normalizedPath = "/" + normalizedPath;
+    normalizedPath = `/${normalizedPath}`;
   }
-  return src_router_config.EXCLUDE_LOGIN_PATH_LIST.indexOf(normalizedPath) >= 0;
+  return src_router_config.EXCLUDE_LOGIN_PATH_LIST.includes(normalizedPath);
 }
 function doIntercept(url) {
-  common_vendor.index.__f__("log", "at src/router/interceptor.uts:72", "doIntercept url:", url);
+  common_vendor.index.__f__("log", "at src/router/interceptor.uts:70", "doIntercept url:", url);
   if (url == null || url == "") {
     return true;
   }
@@ -89,7 +89,7 @@ function doIntercept(url) {
   let path = urlObj.path;
   const query = urlObj.query;
   if (path.startsWith("src/")) {
-    path = "/" + path;
+    path = `/${path}`;
   }
   if (!path.startsWith("/") && !path.startsWith("plugin://") && !path.startsWith("http://") && !path.startsWith("https://")) {
     const pages = getCurrentPages();
@@ -99,10 +99,10 @@ function doIntercept(url) {
     }
     let normalizedCurrentPath = currentPath;
     if (normalizedCurrentPath.startsWith("src/")) {
-      normalizedCurrentPath = "/" + normalizedCurrentPath;
+      normalizedCurrentPath = `/${normalizedCurrentPath}`;
     }
     if (!normalizedCurrentPath.startsWith("/")) {
-      normalizedCurrentPath = "/" + normalizedCurrentPath;
+      normalizedCurrentPath = `/${normalizedCurrentPath}`;
     }
     const lastSlashIdx = normalizedCurrentPath.lastIndexOf("/");
     let baseDir = "";
@@ -112,12 +112,12 @@ function doIntercept(url) {
     path = `${baseDir}/${path}`;
   }
   if (path.startsWith("src/")) {
-    path = "/" + path;
+    path = `/${path}`;
   }
-  common_vendor.index.__f__("log", "at src/router/interceptor.uts:113", "doIntercept normalized path:", path);
+  common_vendor.index.__f__("log", "at src/router/interceptor.uts:111", "doIntercept normalized path:", path);
   const tokenStore = src_store_token.useTokenStore();
   const hasLogin = tokenStore.hasValidLogin();
-  common_vendor.index.__f__("log", "at src/router/interceptor.uts:118", "doIntercept login status - hasLogin:", hasLogin);
+  common_vendor.index.__f__("log", "at src/router/interceptor.uts:116", "doIntercept login status - hasLogin:", hasLogin);
   if (hasLogin) {
     if (path !== src_router_config.LOGIN_PAGE) {
       return true;
@@ -149,13 +149,13 @@ function doIntercept(url) {
       if (path === src_router_config.LOGIN_PAGE) {
         return true;
       }
-      common_vendor.index.__f__("log", "at src/router/interceptor.uts:158", "doIntercept: redirecting to login page", redirectUrl);
+      common_vendor.index.__f__("log", "at src/router/interceptor.uts:159", "doIntercept: redirecting to login page", redirectUrl);
       common_vendor.index.navigateTo({ url: redirectUrl });
       return false;
     }
   } else {
     if (judgeIsExcludePath(path)) {
-      common_vendor.index.__f__("log", "at src/router/interceptor.uts:166", "doIntercept: blacklisted path, redirecting to login page", redirectUrl);
+      common_vendor.index.__f__("log", "at src/router/interceptor.uts:167", "doIntercept: blacklisted path, redirecting to login page", redirectUrl);
       common_vendor.index.navigateTo({ url: redirectUrl });
       return false;
     }
@@ -166,11 +166,11 @@ const navigateToInterceptor = new Interceptor({
   success: null,
   fail: null,
   complete: null,
-  invoke: function(options = null) {
+  invoke(options = null) {
     let url = "";
     if (options != null) {
       const urlObj = options;
-      url = urlObj["url"] != null ? urlObj["url"] : "";
+      url = urlObj.url != null ? urlObj.url : "";
     }
     return doIntercept(url);
   }
@@ -179,11 +179,11 @@ const redirectToInterceptor = new Interceptor({
   success: null,
   fail: null,
   complete: null,
-  invoke: function(options = null) {
+  invoke(options = null) {
     let url = "";
     if (options != null) {
       const urlObj = options;
-      url = urlObj["url"] != null ? urlObj["url"] : "";
+      url = urlObj.url != null ? urlObj.url : "";
     }
     return doIntercept(url);
   }
@@ -192,11 +192,11 @@ const reLaunchInterceptor = new Interceptor({
   success: null,
   fail: null,
   complete: null,
-  invoke: function(options = null) {
+  invoke(options = null) {
     let url = "";
     if (options != null) {
       const urlObj = options;
-      url = urlObj["url"] != null ? urlObj["url"] : "";
+      url = urlObj.url != null ? urlObj.url : "";
     }
     return doIntercept(url);
   }
@@ -205,11 +205,11 @@ const switchTabInterceptor = new Interceptor({
   success: null,
   fail: null,
   complete: null,
-  invoke: function(options = null) {
+  invoke(options = null) {
     let url = "";
     if (options != null) {
       const urlObj = options;
-      url = urlObj["url"] != null ? urlObj["url"] : "";
+      url = urlObj.url != null ? urlObj.url : "";
     }
     return doIntercept(url);
   }
@@ -218,20 +218,20 @@ const chooseLocationInterceptor = new Interceptor({
   success: null,
   fail: null,
   complete: null,
-  invoke: function(options = null) {
+  invoke(options = null) {
     return true;
   }
 });
-const installRouteInterceptor = () => {
+function installRouteInterceptor() {
   common_vendor.index.addInterceptor("navigateTo", navigateToInterceptor);
   common_vendor.index.addInterceptor("reLaunch", reLaunchInterceptor);
   common_vendor.index.addInterceptor("redirectTo", redirectToInterceptor);
   common_vendor.index.addInterceptor("switchTab", switchTabInterceptor);
   common_vendor.index.addInterceptor("chooseLocation", chooseLocationInterceptor);
-};
+}
 function checkDirectEntry(options = null) {
   if (options != null) {
-    const pathVal = options["path"];
+    const pathVal = options.path;
     if (pathVal != null && pathVal != "") {
       let url = `/${pathVal}`;
       navigateToInterceptor.invoke({ url });

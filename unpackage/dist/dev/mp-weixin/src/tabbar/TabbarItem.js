@@ -2,6 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 require("./types.js");
 const src_tabbar_store = require("./store.js");
+const src_utils_i18n = require("../utils/i18n.js");
 if (!Array) {
   const _easycom_uni_icons_1 = common_vendor.resolveComponent("uni-icons");
   _easycom_uni_icons_1();
@@ -59,37 +60,39 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       return `${badge}`;
     }
+    function getText() {
+      return src_utils_i18n.$t(tabbarItem.value.text);
+    }
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
         a: props.isBulge
-      }, props.isBulge ? {
-        b: `${_ctx.u_s_b_h}px`,
-        c: `${_ctx.u_s_a_i_b}px`
-      } : common_vendor.e({
-        d: common_vendor.unref(tabbarItem).iconType == "image"
-      }, common_vendor.unref(tabbarItem).iconType == "image" ? {
-        e: getIcon()
+      }, props.isBulge ? {} : common_vendor.e({
+        b: common_vendor.unref(tabbarItem).iconType === "image"
+      }, common_vendor.unref(tabbarItem).iconType === "image" ? {
+        c: getIcon()
       } : {}, {
-        f: common_vendor.unref(tabbarItem).iconType == "icon"
-      }, common_vendor.unref(tabbarItem).iconType == "icon" ? {
-        g: common_vendor.p({
+        d: common_vendor.unref(tabbarItem).iconType === "icon"
+      }, common_vendor.unref(tabbarItem).iconType === "icon" ? {
+        e: common_vendor.p({
           type: getIcon(),
-          size: "24",
+          size: 24,
           color: getActiveColor()
         })
       } : {}, {
-        h: common_vendor.t(_ctx.$t(common_vendor.unref(tabbarItem).text)),
-        i: getActiveColor(),
-        j: isDotBadge()
+        f: common_vendor.t(getText()),
+        g: getActiveColor(),
+        h: isDotBadge()
       }, isDotBadge() ? {} : {}, {
-        k: isNumberBadge()
+        i: isNumberBadge()
       }, isNumberBadge() ? {
-        l: common_vendor.t(getBadgeText())
-      } : {}, {
-        m: `${_ctx.u_s_b_h}px`,
-        n: `${_ctx.u_s_a_i_b}px`
-      }));
+        j: common_vendor.t(getBadgeText())
+      } : {}), {
+        k: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        l: `${_ctx.u_s_b_h}px`,
+        m: `${_ctx.u_s_a_i_b}px`,
+        n: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+      });
       return __returned__;
     };
   }

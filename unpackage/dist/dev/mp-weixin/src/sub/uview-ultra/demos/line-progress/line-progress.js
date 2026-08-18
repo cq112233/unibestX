@@ -25,7 +25,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: common_vendor.p({
           percentage: 50,
-          activeColor: "#2979ff",
+          ["active-color"]: "#2979ff",
           class: "data-v-e3beca51"
         }),
         c: common_vendor.p({

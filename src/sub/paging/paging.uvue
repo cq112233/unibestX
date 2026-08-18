@@ -59,66 +59,65 @@
 </template>
 
 <script setup lang="uts">
-/* eslint-disable ts/consistent-type-definitions */
-import { ref } from 'vue'
+import { ref } from 'vue';
 
 // 声明 ArticleItem 类型（使用 type 别名符合 UTS 强类型规范）
 type ArticleItem = {
-  id: number
-  title: string
-  summary: string
-  author: string
-  createTime: string
-  tag: string
-  tagBgColor: string
-  tagColor: string
-}
+  id: number;
+  title: string;
+  summary: string;
+  author: string;
+  createTime: string;
+  tag: string;
+  tagBgColor: string;
+  tagColor: string;
+};
 
 // 选项卡配置
-const tabList = ['全部', '技术', '设计', '生活']
-const tabIndex = ref<number>(0)
+const tabList = ['全部', '技术', '设计', '生活'];
+const tabIndex = ref<number>(0);
 
 // z-paging-x 组件引用与数据绑定
-const pagingX = ref<ComponentPublicInstance | null>(null)
-const dataList = ref<ArticleItem[]>([])
+const pagingX = ref<ComponentPublicInstance | null>(null);
+const dataList = ref<ArticleItem[]>([]);
 
 // 手动更新绑定的列表数据，避免 compiler 产生 union types
 function onUpdateModelValue(val: any[]) {
-  dataList.value = val as ArticleItem[]
+  dataList.value = val as ArticleItem[];
 }
 
 // 模拟获取数据 API 函数
 function getMockArticles(category: string, pageNo: number, pageSize: number): ArticleItem[] {
-  const list = [] as ArticleItem[]
-  const start = (pageNo - 1) * pageSize
+  const list = [] as ArticleItem[];
+  const start = (pageNo - 1) * pageSize;
 
   for (let i = 0; i < pageSize; i++) {
-    const itemId = start + i + 1
+    const itemId = start + i + 1;
     // 限制列表总大小为 35 条，以演示 "没有更多数据"
     if (itemId > 35) {
-      break
+      break;
     }
 
     // 确定文章标签与对应的颜色配方
-    let tag = category
+    let tag = category;
     if (category == '全部') {
-      const idx = itemId % 3
+      const idx = itemId % 3;
       if (idx == 0)
-        tag = '技术'
+        tag = '技术';
       else if (idx == 1)
-        tag = '设计'
-      else tag = '生活'
+        tag = '设计';
+      else tag = '生活';
     }
 
-    let tagBgColor = '#e0f2fe'
-    let tagColor = '#0284c7'
+    let tagBgColor = '#e0f2fe';
+    let tagColor = '#0284c7';
     if (tag == '设计') {
-      tagBgColor = '#f3e8ff'
-      tagColor = '#7c3aed'
+      tagBgColor = '#f3e8ff';
+      tagColor = '#7c3aed';
     }
     else if (tag == '生活') {
-      tagBgColor = '#dcfce7'
-      tagColor = '#16a34a'
+      tagBgColor = '#dcfce7';
+      tagColor = '#16a34a';
     }
 
     list.push({
@@ -129,37 +128,37 @@ function getMockArticles(category: string, pageNo: number, pageSize: number): Ar
       createTime: `06-04 15:${30 - i}`,
       tag,
       tagBgColor,
-      tagColor,
-    } as ArticleItem)
+      tagColor
+    } as ArticleItem);
   }
-  return list
+  return list;
 }
 
 // 下拉刷新或触底加载的回调
 function onQuery(pageNo: number, pageSize: number) {
-  const currentCategory = tabList[tabIndex.value]
+  const currentCategory = tabList[tabIndex.value];
 
   // 模拟 800ms 的网络延时
   setTimeout(() => {
     try {
-      const data = getMockArticles(currentCategory, pageNo, pageSize)
+      const data = getMockArticles(currentCategory, pageNo, pageSize);
       if (pagingX.value != null) {
-        pagingX.value!.$callMethod('complete', data)
+        pagingX.value!.$callMethod('complete', data);
       }
     }
     catch (e) {
       if (pagingX.value != null) {
-        pagingX.value!.$callMethod('completeByError')
+        pagingX.value!.$callMethod('completeByError');
       }
     }
-  }, 800)
+  }, 800);
 }
 
 // 切换 Tab 时触发重新加载
 function tabChange(index: number) {
-  tabIndex.value = index
+  tabIndex.value = index;
   if (pagingX.value != null) {
-    pagingX.value!.$callMethod('reload')
+    pagingX.value!.$callMethod('reload');
   }
 }
 </script>

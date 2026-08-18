@@ -19,124 +19,43 @@
 </template>
 
 <script setup lang="uts">
-import Card from '../../basic/components/Card.uvue'
-import { ref } from 'vue'
+import Card from '../../basic/components/Card.uvue';
+import { ref } from 'vue';
 
-// #ifdef APP-ANDROID
-import Build from 'android.os.Build'
-import Context from 'android.content.Context'
-import Vibrator from 'android.os.Vibrator'
-import VibratorManager from 'android.os.VibratorManager'
-// #endif
-
-// #ifdef APP-HARMONY
-import vibrator from '@ohos.vibrator'
-// #endif
-
-const copyText = ref('Hello unibestX!')
-
-// #ifdef APP-ANDROID
-function vibrationAndroid() : void {
-  const activity = UTSAndroid.getUniActivity()
-  if (activity == null) {
-    uni.showToast({ title: '获取 Activity 失败', icon: 'none' })
-    return
-  }
-
-  try {
-    if (Build.VERSION.SDK_INT >= 31) {
-      const manager = activity.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
-      if (manager != null) {
-        manager.defaultVibrator.vibrate(15)
-        uni.showToast({ title: '已触发短震动', icon: 'none' })
-      } else {
-        uni.showToast({ title: '获取震动服务失败', icon: 'none' })
-      }
-    } else {
-      const vibrator = activity.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-      if (vibrator != null) {
-        vibrator.vibrate(15)
-        uni.showToast({ title: '已触发短震动', icon: 'none' })
-      } else {
-        uni.showToast({ title: '获取震动服务失败', icon: 'none' })
-      }
-    }
-  } catch (e : any) {
-    uni.showToast({ title: '震动调用失败', icon: 'none' })
-  }
-}
-// #endif
-
-// #ifdef APP-IOS
-function vibrationIOS() : void {
-  uni.showToast({ title: 'iOS 震动待实现', icon: 'none' })
-}
-// #endif
-
-// #ifdef APP-HARMONY
-function vibrationHarmony() : void {
-  try {
-    vibrator.startVibration({
-      type: 'time',
-      duration: 15,
-    }, {
-      id: 0,
-      usage: 'unknown',
-    }).then(() => {
-      uni.showToast({ title: '已触发鸿蒙短震动', icon: 'none' })
-    }).catch((_err : any) => {
-      uni.vibrateShort({
-        success: () => {
-          uni.showToast({ title: '已触发鸿蒙短震动', icon: 'none' })
-        },
-        fail: () => {
-          uni.showToast({ title: '鸿蒙震动触发失败', icon: 'none' })
-        }
-      })
-    })
-  } catch (e : any) {
-    uni.vibrateShort({
-      success: () => {
-        uni.showToast({ title: '已触发鸿蒙短震动', icon: 'none' })
-      },
-      fail: () => {
-        uni.showToast({ title: '鸿蒙震动调用失败', icon: 'none' })
-      }
-    })
-  }
-}
-// #endif
+const copyText = ref('Hello unibestX!');
 
 function triggerVibration() {
-  // #ifdef APP-ANDROID
-  vibrationAndroid()
+  // #ifdef APP || MP-WEIXIN || MP-ALIPAY
+  uni.vibrateShort({
+    type: 'light',
+    success: () => {
+      uni.showToast({ title: '已触发短震动', icon: 'none' });
+    },
+    fail: () => {
+      uni.showToast({ title: '震动触发失败', icon: 'none' });
+    }
+  });
   // #endif
-  // #ifdef APP-IOS
-  vibrationIOS()
-  // #endif
-  // #ifdef APP-HARMONY
-  vibrationHarmony()
-  // #endif
-  // #ifndef APP
+  // #ifndef APP || MP-WEIXIN || MP-ALIPAY
   uni.showToast({
     title: '当前环境不支持震动',
-    icon: 'none',
-  })
+    icon: 'none'
+  });
   // #endif
 }
 
 function handleCopy() {
   if (copyText.value === '')
-    return
+    return;
   uni.setClipboardData({
     data: copyText.value,
     success: () => {
       uni.showToast({
         title: '复制成功',
-        icon: 'success',
-      })
-    },
-  })
+        icon: 'success'
+      });
+    }
+  });
 }
 </script>
 

@@ -1,0 +1,248 @@
+<template>
+  <Card :title="echartTitle">
+    <view class="w-full h-280px mt-10px">
+      <e-chart ref="echartRef" height="280px" class="w-full h-full" @ready="initEchart" />
+    </view>
+    <view class="flex-row justify-between mt-15px">
+      <view class="flex-1 mr-8px">
+        <view
+          class="w-full h-36px rounded-8px flex flex-row items-center justify-center"
+          :class="currentType !== 'line' ? 'bg-[#e0edff]' : 'bg-[#3b82f6]'"
+          @click="changeToLine"
+        >
+          <text
+            class="text-12px font-bold"
+            :class="currentType !== 'line' ? 'text-[#3b82f6]' : 'text-[#ffffff]'"
+          >
+            {{ echartLineText }}
+          </text>
+        </view>
+      </view>
+      <view class="flex-1 mr-8px">
+        <view
+          class="w-full h-36px rounded-8px flex flex-row items-center justify-center"
+          :class="currentType !== 'bar' ? 'bg-[#d1fae5]' : 'bg-[#10b981]'"
+          @click="changeToBar"
+        >
+          <text
+            class="text-12px font-bold"
+            :class="currentType !== 'bar' ? 'text-[#10b981]' : 'text-[#ffffff]'"
+          >
+            {{ echartBarText }}
+          </text>
+        </view>
+      </view>
+      <view class="flex-1">
+        <view
+          class="w-full h-36px rounded-8px flex flex-row items-center justify-center"
+          :class="currentType !== 'pie' ? 'bg-[#fef3c7]' : 'bg-[#f59e0b]'"
+          @click="changeToPie"
+        >
+          <text
+            class="text-12px font-bold"
+            :class="currentType !== 'pie' ? 'text-[#f59e0b]' : 'text-[#ffffff]'"
+          >
+            {{ echartPieText }}
+          </text>
+        </view>
+      </view>
+    </view>
+  </Card>
+</template>
+
+<script setup lang="uts">
+import Card from '../../basic/components/Card.uvue';
+import { computed, ref, watch } from 'vue';
+import { systemInfo } from '@/src/utils/systemInfo';
+import { $t } from '@/src/utils/i18n';
+
+const echartTitle = computed((): string => $t('basic.echartTitle'));
+const echartLineText = computed((): string => $t('basic.echartLine'));
+const echartBarText = computed((): string => $t('basic.echartBar'));
+const echartPieText = computed((): string => $t('basic.echartPie'));
+
+const echartRef = ref<ComponentPublicInstance | null>(null);
+const currentType = ref('line');
+const gridKey = 'gr' + 'id';
+
+const lineOption = {
+  title: {
+    text: '访问趋势 (折线图)',
+    textStyle: {
+      fontSize: 12,
+      color: '#64748b'
+    }
+  },
+  xAxis: {
+    type: 'category',
+    data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+    axisLine: {
+      lineStyle: {
+        color: '#cbd5e1'
+      }
+    },
+    axisLabel: {
+      color: '#64748b'
+    }
+  },
+  yAxis: {
+    type: 'value',
+    axisLine: {
+      show: false
+    },
+    splitLine: {
+      lineStyle: {
+        color: '#f1f5f9'
+      }
+    },
+    axisLabel: {
+      color: '#64748b'
+    }
+  },
+  [gridKey]: {
+    left: '12%',
+    right: '5%',
+    top: '18%',
+    bottom: '12%'
+  },
+  series: [{
+    data: [120, 200, 150, 80, 70, 110, 130],
+    type: 'line',
+    smooth: true,
+    color: '#3b82f6',
+    areaStyle: {
+      color: {
+        type: 'linear',
+        x: 0,
+        y: 0,
+        x2: 0,
+        y2: 1,
+        colorStops: [
+          { offset: 0, color: 'rgba(59, 130, 246, 0.4)' },
+          { offset: 1, color: 'rgba(59, 130, 246, 0)' }
+        ]
+      }
+    }
+  }]
+} as UTSJSONObject;
+
+const barOption = {
+  title: {
+    text: '访问分布 (柱状图)',
+    textStyle: {
+      fontSize: 12,
+      color: '#64748b'
+    }
+  },
+  xAxis: {
+    type: 'category',
+    data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+    axisLine: {
+      lineStyle: {
+        color: '#cbd5e1'
+      }
+    },
+    axisLabel: {
+      color: '#64748b'
+    }
+  },
+  yAxis: {
+    type: 'value',
+    axisLine: {
+      show: false
+    },
+    splitLine: {
+      lineStyle: {
+        color: '#f1f5f9'
+      }
+    },
+    axisLabel: {
+      color: '#64748b'
+    }
+  },
+  [gridKey]: {
+    left: '12%',
+    right: '5%',
+    top: '18%',
+    bottom: '12%'
+  },
+  series: [{
+    data: [120, 200, 150, 80, 70, 110, 130],
+    type: 'bar',
+    color: '#10b981'
+  }]
+} as UTSJSONObject;
+
+const pieOption = {
+  title: {
+    text: '访问来源 (饼图)',
+    textStyle: {
+      fontSize: 12,
+      color: '#64748b'
+    }
+  },
+  series: [{
+    name: '访问来源',
+    type: 'pie',
+    radius: '52%',
+    center: ['50%', '52%'],
+    label: {
+      fontSize: 11,
+      color: '#64748b'
+    },
+    data: [
+      { value: 1048, name: '搜索引擎', itemStyle: { color: '#3b82f6' } },
+      { value: 735, name: '直接访问', itemStyle: { color: '#10b981' } },
+      { value: 580, name: '邮件营销', itemStyle: { color: '#f59e0b' } },
+      { value: 484, name: '联盟广告', itemStyle: { color: '#8b5cf6' } }
+    ]
+  }]
+} as UTSJSONObject;
+
+function initEchart() {
+  if (echartRef.value != null) {
+    const chart = echartRef.value as ComponentPublicInstance;
+    chart.$callMethod('init', lineOption);
+  }
+}
+
+function changeToLine() {
+  currentType.value = 'line';
+  if (echartRef.value != null) {
+    const chart = echartRef.value as ComponentPublicInstance;
+    chart.$callMethod('setOption', lineOption);
+  }
+}
+
+function changeToBar() {
+  currentType.value = 'bar';
+  if (echartRef.value != null) {
+    const chart = echartRef.value as ComponentPublicInstance;
+    chart.$callMethod('setOption', barOption);
+  }
+}
+
+function changeToPie() {
+  currentType.value = 'pie';
+  if (echartRef.value != null) {
+    const chart = echartRef.value as ComponentPublicInstance;
+    chart.$callMethod('setOption', pieOption);
+  }
+}
+
+const windowWidth = computed((): number => {
+  return systemInfo.value?.windowWidth ?? 0;
+});
+
+watch(windowWidth, () => {
+  setTimeout(() => {
+    if (echartRef.value != null) {
+      const chart = echartRef.value as ComponentPublicInstance;
+      chart.$callMethod('resize');
+    }
+  }, 100);
+});
+</script>
+
+<style>
+</style>

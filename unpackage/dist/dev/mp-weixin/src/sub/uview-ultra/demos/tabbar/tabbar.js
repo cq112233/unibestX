@@ -17,12 +17,26 @@ const LayoutComponent = () => "../../../../layouts/default.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "tabbar",
   setup(__props) {
+    const value1 = common_vendor.ref(0);
+    const value2 = common_vendor.ref(0);
+    const value3 = common_vendor.ref(0);
+    function change1(index = null) {
+      value1.value = parseInt(index.toString());
+    }
+    function change2(index = null) {
+      value2.value = parseInt(index.toString());
+    }
+    function change3(index = null) {
+      value3.value = parseInt(index.toString());
+    }
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
         a: common_vendor.p({
           title: "Tabbar 底部导航",
           ["auto-back"]: true,
+          ["safe-area-inset-top"]: true,
+          ["bg-color"]: "#ffffff",
           class: "data-v-6c6d21f6"
         }),
         b: common_vendor.p({
@@ -31,44 +45,86 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-6c6d21f6"
         }),
         c: common_vendor.p({
+          text: "放映厅",
+          icon: "photo",
+          class: "data-v-6c6d21f6"
+        }),
+        d: common_vendor.p({
+          text: "直播",
+          icon: "play-right",
+          class: "data-v-6c6d21f6"
+        }),
+        e: common_vendor.p({
           text: "我的",
           icon: "account",
           class: "data-v-6c6d21f6"
         }),
-        d: common_vendor.p({
-          value: 0,
+        f: common_vendor.o(change1, "93"),
+        g: common_vendor.p({
+          value: value1.value,
           fixed: false,
           ["safe-area-inset-bottom"]: false,
           class: "data-v-6c6d21f6"
         }),
-        e: common_vendor.p({
+        h: common_vendor.p({
+          text: "首页",
+          icon: "home",
+          badge: "5",
+          class: "data-v-6c6d21f6"
+        }),
+        i: common_vendor.p({
+          text: "消息",
+          icon: "chat",
+          dot: true,
+          class: "data-v-6c6d21f6"
+        }),
+        j: common_vendor.p({
+          text: "我的",
+          icon: "account",
+          class: "data-v-6c6d21f6"
+        }),
+        k: common_vendor.o(change2, "87"),
+        l: common_vendor.p({
+          value: value2.value,
+          fixed: false,
+          ["safe-area-inset-bottom"]: false,
+          class: "data-v-6c6d21f6"
+        }),
+        m: common_vendor.p({
           text: "发现",
           icon: "search",
           class: "data-v-6c6d21f6"
         }),
-        f: common_vendor.p({
+        n: common_vendor.p({
+          text: "购物车",
+          icon: "shopping-cart",
+          class: "data-v-6c6d21f6"
+        }),
+        o: common_vendor.p({
           text: "我的",
           icon: "account",
           class: "data-v-6c6d21f6"
         }),
-        g: common_vendor.p({
-          value: 0,
+        p: common_vendor.o(change3, "86"),
+        q: common_vendor.p({
+          value: value3.value,
           fixed: false,
           ["safe-area-inset-bottom"]: false,
           ["active-color"]: "#fa3534",
+          ["inactive-color"]: "#909399",
           class: "data-v-6c6d21f6"
         }),
-        h: common_vendor.p({
+        r: common_vendor.p({
           ["navigation-style"]: "custom",
           ["navigation-bar-title-text"]: "up-tabbar 底部导航",
           class: "data-v-6c6d21f6"
         }),
-        i: common_vendor.gei(_ctx, ""),
-        j: common_vendor.p({
+        s: common_vendor.gei(_ctx, ""),
+        t: common_vendor.p({
           id: common_vendor.gei(_ctx, ""),
           class: "data-v-6c6d21f6"
         }),
-        k: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        v: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
       return __returned__;
     };

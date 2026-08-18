@@ -36,9 +36,9 @@ function normalizeLocale(locale) {
     return "ru";
   return "zh-Hans";
 }
-let settings = common_vendor.reactive(new common_vendor.UTSJSONObject({
+let settings = common_vendor.reactive({
   lang: "zh-Hans",
-  locales: new common_vendor.UTSJSONObject({
+  locales: {
     en: uni_modules_uviewUltra_libs_i18n_locales_en.en,
     es: uni_modules_uviewUltra_libs_i18n_locales_es.es,
     fr: uni_modules_uviewUltra_libs_i18n_locales_fr.fr,
@@ -48,8 +48,8 @@ let settings = common_vendor.reactive(new common_vendor.UTSJSONObject({
     ru: uni_modules_uviewUltra_libs_i18n_locales_ru.ru,
     "zh-Hant": uni_modules_uviewUltra_libs_i18n_locales_zhHant.zhHant,
     "zh-Hans": uni_modules_uviewUltra_libs_i18n_locales_zhHans.zhHans
-  })
-}));
+  }
+});
 function setLocale(locale) {
   settings["lang"] = normalizeLocale(locale);
 }
@@ -57,6 +57,7 @@ function getLocale() {
   return settings["lang"];
 }
 function t(value, params = new common_vendor.UTSJSONObject({})) {
+  var _a, _b, _c, _d;
   if (value != "") {
     let key = value.replaceAll(".", "_");
     let lang = normalizeLocale(settings["lang"]);
@@ -67,9 +68,9 @@ function t(value, params = new common_vendor.UTSJSONObject({})) {
     }
     let result = "";
     if (currentDict != null && currentDict[key] != null) {
-      result = currentDict[key].toString();
+      result = (_b = (_a = currentDict[key]) === null || _a === void 0 ? null : _a.toString()) !== null && _b !== void 0 ? _b : "";
     } else if (currentDict != null && currentDict[value] != null) {
-      result = currentDict[value].toString();
+      result = (_d = (_c = currentDict[value]) === null || _c === void 0 ? null : _c.toString()) !== null && _d !== void 0 ? _d : "";
     } else {
       result = value;
     }

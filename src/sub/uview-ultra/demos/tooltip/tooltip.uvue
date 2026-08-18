@@ -65,16 +65,16 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-const tooltipButtons = ref(['编辑', '删除'] as string[])
-const multiButtons = ref(['转发', '收藏', '删除'] as string[])
+const tooltipButtons = ref(['编辑', '删除'] as string[]);
+const multiButtons = ref(['转发', '收藏', '删除'] as string[]);
 
 function handleBtnClick(index: number) {
   uni.showToast({
     title: `点击了第 ${index} 个按钮`,
-    icon: 'none',
-  })
+    icon: 'none'
+  });
 }
 </script>
 

@@ -22,7 +22,7 @@ export type SubscriptionMutation = {
 	/** 触发变更的 store id */
 	storeId : string,
 	/** 当 type 为 patch object 时为传入的 partial 对象 */
-	payload : UTSJSONObject | null,
+	payload : any | null,
 	/** 变更发生的时间戳 */
 	timestamp : number
 }

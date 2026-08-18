@@ -25,30 +25,30 @@
 </template>
 
 <script setup lang="uts">
-import Card from '../../basic/components/Card.uvue'
-import { onMounted, ref } from 'vue'
+import Card from '../../basic/components/Card.uvue';
+import { onMounted, ref } from 'vue';
 
-const sysBrand = ref('')
-const sysModel = ref('')
-const sysSystem = ref('')
-const sysPlatform = ref('')
+const sysBrand = ref('');
+const sysModel = ref('');
+const sysSystem = ref('');
+const sysPlatform = ref('');
 
 function fetchSystemInfo() {
   try {
-    const info = uni.getSystemInfoSync()
-    sysBrand.value = info.brand ?? ''
-    sysModel.value = info.model ?? ''
-    sysSystem.value = info.system ?? ''
-    sysPlatform.value = info.uniPlatform ?? ''
+    const info = uni.getSystemInfoSync();
+    sysBrand.value = info.brand ?? '';
+    sysModel.value = info.model ?? '';
+    sysSystem.value = info.system ?? '';
+    sysPlatform.value = info.uniPlatform ?? '';
   }
   catch (err) {
-    console.error(err)
+    console.error(err);
   }
 }
 
 onMounted(() => {
-  fetchSystemInfo()
-})
+  fetchSystemInfo();
+});
 </script>
 
 <style>

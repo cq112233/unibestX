@@ -1,32 +1,30 @@
 <template>
-	<view class="up-tabs" :class="[customClass]">
-		<view class="up-tabs__wrapper" :style="{ height: addUnit(height) }">
+	<view class="up-tabs">
+		<view class="up-tabs__wrapper" :style="tabsWrapperStyle">
 			<slot name="left" />
 			<view class="up-tabs__wrapper__scroll-view-wrapper">
 				<scroll-view
-					direction="horizontal"
-					:scroll-x="scrollable"
-					:enable-flex="true"
+					:direction="scrollable ? 'horizontal' : 'none'"
 					:scroll-left="scrollLeft"
 					scroll-with-animation
 					class="up-tabs__wrapper__scroll-view"
 					:show-scrollbar="false"
 					ref="up-tabs__wrapper__scroll-view"
-					:style="{ height: addUnit(height) }"
+					:style="tabsWrapperStyle"
 				>
 					<view
 						class="up-tabs__wrapper__nav"
 						ref="up-tabs__wrapper__nav"
-						:style="{ height: addUnit(height) }"
+						:style="tabsWrapperStyle"
 					>
 						<view
 							class="up-tabs__wrapper__nav__item"
 							v-for="(item, index) in list"
 							:key="index"
 							@tap="clickHandler(item, index)"
-							@longpress="longPressHandler(item,index)"
+							@longpress="longPressHandler(item, index)"
 							:ref="`up-tabs__wrapper__nav__item-${index}`"
-							:style="[addStyle(itemStyle), {flex: scrollable ? 'none' : '1'}]"
+							:style="getItemStyle()"
 							:class="[`up-tabs__wrapper__nav__item-${index}`,
 								(item['disabled'] != null && (item['disabled'] as boolean)) ? 'up-tabs__wrapper__nav__item--disabled' : '',
 								innerCurrent == index ? 'up-tabs__wrapper__nav__item-active' : '']"
@@ -34,10 +32,10 @@
 							<slot v-if="$slots['icon']" name="icon" :item="item"
 								:keyName="keyName" :index="index"></slot>
 							<template v-else>
-								<view class="up-tabs__wrapper__nav__item__prefix-icon" v-if="item.icon">
+								<view class="up-tabs__wrapper__nav__item__prefix-icon" v-if="item['icon'] != null">
 									<up-icon
 										:name="item['icon']"
-										:customStyle="addStyle(iconStyle)"
+										:customStyle="iconCustomStyle"
 									></up-icon>
 								</view>
 							</template>
@@ -46,9 +44,9 @@
 							<slot name="default" v-else-if="$slots['content'] == null && ($slots['default'] != null || $slots['$default'] != null)"
 								:item="item" :keyName="keyName" :index="index"></slot>
 							<text v-else
-								:class="[(item['disabled'] != null && (item['disabled'] as boolean)) ?'up-tabs__wrapper__nav__item__text--disabled' : '']"
+								:class="[(item['disabled'] != null && (item['disabled'] as boolean)) ? 'up-tabs__wrapper__nav__item__text--disabled' : '']"
 								class="up-tabs__wrapper__nav__item__text"
-								:style="[textStyle(index)]"
+								:style="textStyle(index)"
 							>{{ item[keyName] }}</text>
 							<up-badge
 								:show="getShowValue(item)"
@@ -79,356 +77,373 @@
 	</view>
 </template>
 
-<script lang="uts">
-	import { propsTabs } from './props';
-	import { mpMixin } from '../../libs/mixin/mpMixin';
-	import { mixin } from '../../libs/mixin/mixin';
-	import badgeProps from '../../components/up-badge/badge'
-	import { addUnit, addStyle, deepMerge, getPx, sleep, getWindowInfo } from '../../libs/function/index';
-	/**
-	 * Tabs 标签
-	 * @description tabs标签组件，在标签多的时候，可以配置为左右滑动，标签少的时候，可以禁止滑动。 该组件的一个特点是配置为滚动模式时，激活的tab会自动移动到组件的中间位置。
-	 * @tutorial https://uview-plus.jiangruyi.com/components/tabs.html
-	 * @property {String | Number}	duration			滑块移动一次所需的时间，单位秒（默认 200 ）
-	 * @property {String | Number}	swierWidth			swiper的宽度（默认 '750rpx' ）
-	 * @property {String}	keyName	 从`list`元素对象中读取的键名（默认 'name' ）
-	 * @event {Function(index)} change 标签改变时触发 index: 点击了第几个tab，索引从0开始
-	 * @event {Function(index)} click 点击标签时触发 index: 点击了第几个tab，索引从0开始
-	 * @event {Function(index)} longPress 长按标签时触发 index: 点击了第几个tab，索引从0开始
-	 * @example <up-tabs :list="list" :is-scroll="false" :current="current" @change="change" @longPress="longPress"></up-tabs>
-	 */
-	export default {
-		name: 'up-tabs',
-		// slots: Object as SlotsType<{
-		//     content: { item: UTSJSONObject, keyName: string, index: number }
-		//     default: { item: UTSJSONObject, keyName: string, index: number }
-		//     icon: { item: UTSJSONObject, keyName: string, index: number }
-		// }>,
-		mixins: [mpMixin, mixin, propsTabs],
-		data() {
-			return {
-				firstTime: true,
-				scrollLeft: 0,
-				scrollViewWidth: 0,
-				lineOffsetLeft: 0,
-				tabsRect: {
-					left: 0,
-					right: 0,
-					
-				} as NodeInfo,
-				innerCurrent: 0,
-				moving: false,
-				retryCount: 0,
-				itemRects: [] as Array<NodeInfo>,
-			}
-		},
-		watch: {
-			current: {
-				immediate: true,
-				handler (newValue: string|number) {
-					// 内外部值不相等时，才尝试移动滑块
-					if (newValue != this.innerCurrent) {
-						if (typeof newValue == 'string') {
-							this.innerCurrent = parseInt(newValue)
-						} else {
-							this.innerCurrent = newValue
-						}
-						this.$nextTick(() => {
-							const hasRect = this.itemRects.length > 0 && this.itemRects.length === this.list.length && (this.itemRects[0].width ?? 0) > 0
-							if (hasRect) {
-								this.setLineLeft()
-								this.setScrollLeft()
-							} else {
-								this.resize()
-							}
-						})
-					}
-				}
-			},
-			// list变化时，重新渲染list各项信息
-			list(newValue: Array<UTSJSONObject>, oldValue: Array<UTSJSONObject> | null) {
-				if (oldValue != null && this.isListEqual(newValue, oldValue)) {
-					return
-				}
-				this.$nextTick(() => {
-					this.resize()
-				})
-			}
-		},
-		computed: {
-			propsBadge(): UTSJSONObject {
-				return badgeProps['badge'] as UTSJSONObject
-			},
-			lineStyle(): any {
-				const style = {} as UTSJSONObject;
-				style['width'] = addUnit(this.lineWidth);
-				style['transform'] = 'translateX('+ (this.lineOffsetLeft)+'px)';
-				style['transitionDuration'] = `${this.firstTime ? 0 : this.duration}ms`;
-				style['height'] = addUnit(this.lineHeight);
-				style['backgroundSize'] = this.lineBgSize;
-				if (this.lineColor != '#3c9cff') {
-					style['backgroundColor'] = this.lineColor;
-				}
-				return style;
-			}
-		},
-		mounted() {
-			this.init()
-			// todo2026 wait uni-app-x
-            // this.windowResizeCallback = (res) => {
-            //     this.init()
-            // }
-            // uni.onWindowResize(this.windowResizeCallback)
-		},
-        beforeUnmount() {
-			// todo2026 wait uni-app-x
-            // uni.offWindowResize(this.windowResizeCallback)
-        },
-		emits: ['click', 'longPress', 'change', 'update:current'],
-		methods: {
-			addStyle(val: any): any {
-				return addStyle(val)
-			},
-			addUnit(val: any): string {
-				return addUnit(val)
-			},
-			getShowValue(itemObj: UTSJSONObject) {
-				if (itemObj['badge'] != null) {
-					let itemObjBadge = itemObj['badge'] as UTSJSONObject
-					if (itemObjBadge['show'] != null && itemObjBadge['show'] as boolean
-						|| (itemObjBadge['isDot'] != null && itemObjBadge['isDot'] as boolean)
-						|| itemObjBadge['value'] != null) {
-						return true
-					}
-				}
-				return false
-			},
-			getBadgePropValue(itemObj: UTSJSONObject, name: string): any|null {
-				if (itemObj!= null && itemObj['badge'] != null) {
-					let itemObjBadge = itemObj['badge'] as UTSJSONObject
-					if (itemObjBadge != null && itemObjBadge[name] != null) {
-						return itemObjBadge[name] != null ? itemObjBadge[name] : ''
-					} else {
-						return (this.propsBadge != null && this.propsBadge[name] != null) ? this.propsBadge[name] : ''
-					}
-				}
-				return ''
-			},
-			textStyle(index: number) {
-				const style = {}
-				// 取当期是否激活的样式
-				const customeStyle = (index == this.innerCurrent)
-					? addStyle(this.activeStyle)
-					: addStyle(this.inactiveStyle)
-				// 如果当前菜单被禁用，则加上对应颜色，需要在此做处理，是因为nvue下，无法在style样式中通过!import覆盖标签的内联样式
-				if (this.list[index]['disabled'] != null && this.list[index]['disabled'] as boolean) {
-					style['color'] = '#c8c9cc'
-				}
-				return deepMerge(customeStyle, style)
-			},
-			isListEqual(list1: Array<UTSJSONObject>, list2: Array<UTSJSONObject>): boolean {
-				if (list1.length != list2.length) {
-					return false
-				}
-				for (let i = 0; i < list1.length; i++) {
-					const item1 = list1[i]
-					const item2 = list2[i]
-					if (item1[this.keyName] != item2[this.keyName]) {
-						return false
-					}
-				}
-				return true
-			},
-			setLineLeft() {
-				if (this.itemRects.length <= this.innerCurrent) {
-					return;
-				}
-				const tabItem = this.itemRects[this.innerCurrent];
-				if (tabItem == null) {
-					return;
-				}
-				// 获取滑块该移动的位置
-				let lineOffsetLeft = this.itemRects
-					.slice(0, this.innerCurrent)
-					.reduce((total: number, curr: NodeInfo) => {
-						return total + (curr.width ?? 0)
-					}, 0);
-                // 获取下划线的数值px表示法
-				const lineWidth = parseFloat(getPx(this.lineWidth));
-				const tabWidth = tabItem.width ?? 0
-				const offset = tabWidth > 0 ? (tabWidth - lineWidth) / 2 : 0
-				this.lineOffsetLeft = lineOffsetLeft + offset
+<script setup lang="uts">
+import { ref, computed, watch, onMounted, getCurrentInstance, nextTick } from 'vue'
+import badgeProps from '../../components/up-badge/badge'
+import { addUnit, addStyle, deepMerge, getPx, sleep, getWindowInfo, upGetRect } from '../../libs/function/index.uts'
 
-				// 如果是第一次执行此方法，让滑块在初始化时，瞬间滑动到第一个tab item的中间
-				// 这里需要一个定时器，因为在非nvue下，是直接通过style绑定过渡时间，需要等其过渡完成后，再设置为false(非第一次移动滑块)
-				if (this.firstTime) {
-					setTimeout(() => {
-						this.firstTime = false
-					}, 30);
-				}
-			},
-			// 点击某一个标签
-			clickHandler(item: any, index: number) {
-				// 因为标签可能为disabled状态，所以click是一定会发出的，但是change事件是需要可用的状态才发出
-				this.$emit('click', {
-					...item as UTSJSONObject,
-					index
-				}, index)
-				// 如果disabled状态，返回
-				if (item['disabled'] != null && item['disabled'] as boolean) return
-				// 如果点击当前不触发change
-				if (this.innerCurrent == index) return
-				this.innerCurrent = index
-                this.$nextTick(() => {
-                    const hasRect = this.itemRects.length > 0 && this.itemRects.length === this.list.length && (this.itemRects[0].width ?? 0) > 0
-                    if (hasRect) {
-                        this.setLineLeft()
-                        this.setScrollLeft()
-                    } else {
-                        this.resize()
-                    }
-                })
-				this.$emit('update:current', index)
-				this.$emit('change', {
-					...item,
-					index
-				}, index)
-			},
-			// 长按事件
-			longPressHandler(item: UTSJSONObject, index: number) {
-				this.$emit('longPress', {
-					...item,
-					index
-				})
-			},
-			init() {
-				this.retryCount = 0
-				// 延迟 30ms 启动测量，搭配自适应的动态宽度期望值重试机制，确保鸿蒙等端稳定排版后精确对齐且无视觉抖动
-				sleep(30).then(() => {
-					this.resize()
-				})
-			},
-			setScrollLeft() {
-				// 当前活动tab的布局信息，有tab菜单的width和left(为元素左边界到父元素左边界的距离)等信息
-				if (this.innerCurrent < 0) {
-                    this.innerCurrent = 0;
-                }
-				if (this.itemRects.length <= this.innerCurrent) {
-					return;
-				}
-				const tabRect = this.itemRects[this.innerCurrent]
-				if (tabRect == null) {
-					return;
-				}
-				// 累加得到当前item到左边的距离
-				const offsetLeft = this.itemRects
-					.slice(0, this.innerCurrent)
-					.reduce((total: number, curr: NodeInfo) => {
-						return total + (curr.width ?? 0)
-					}, 0)
-				// 此处为屏幕宽度
-				const windowWidth = getWindowInfo().windowWidth
-				// 将活动的tabs-item移动到屏幕正中间，实际上是对scroll-view的移动
-				let scrollLeft = offsetLeft - ((this.tabsRect?.width ?? 0) - (tabRect.width ?? 0)) / 2 - (windowWidth - (this.tabsRect
-					?.right ?? 0)) / 2 + (this.tabsRect?.left ?? 0) / 2
-				// 这里做一个限制，限制scrollLeft的最大值为整个scroll-view宽度减去tabs组件的宽度
-				scrollLeft = Math.min(scrollLeft, this.scrollViewWidth - (this.tabsRect?.width ?? 0))
-				this.scrollLeft = Math.max(0, scrollLeft)
-			},
-			// 获取所有标签的尺寸
-			resize() {
-				// 如果不存在list，则不处理
-				if((this.$props['list'] as Array<UTSJSONObject>).length == 0) {
-					return
-				}
-				Promise.all([this.getTabsRect(), this.getAllItemRect()]).then((res: Array<Array<NodeInfo>>) => {
-					// [tabsRect, itemRect = []]
-					let tabsRect = (res[0] as Array<NodeInfo>)[0]
-					let itemRect = res[1] as Array<NodeInfo>
-					
-					// 兼容部分原生平台（如鸿蒙/ArkUI）冷启动渲染排版较慢，导致首次测量为 0 或宽度不准确（未撑开）的情况，进行高精度自适应延迟重试测量
-					const firstWidth = (itemRect.length > 0 && itemRect[0] != null) ? (itemRect[0].width ?? 0) : 0
-					let minWidthExpected = 30
-					if (this.list.length > 0) {
-						const firstItemName = this.list[0][this.keyName]
-						if (firstItemName != null) {
-							const nameStr = firstItemName.toString()
-							minWidthExpected = nameStr.length * 12 + 20
-						}
-					}
-					if ((firstWidth < minWidthExpected) && this.retryCount < 5) {
-						this.retryCount++
-						setTimeout(() => {
-							this.resize()
-						}, 50)
-						return
-					}
-					// console.log('******itemRect******', itemRect)
-					// 兼容在swiper组件中使用
-					if ((tabsRect.left ?? 0) > (tabsRect.width ?? 0)) {
-						tabsRect.right = (tabsRect.right ?? 0) - Math.floor((tabsRect?.left ?? 0) / (tabsRect?.width ?? 0)) * (tabsRect?.width ?? 0)
-						tabsRect.left = (tabsRect.left ?? 0) % (tabsRect.width ?? 1)
-					}
-					// console.log(tabsRect)
-					this.tabsRect = tabsRect
-					this.itemRects = itemRect
-					this.scrollViewWidth = 0
-					itemRect.map((item: NodeInfo, index: number) => {
-						// 计算scroll-view of the width，这里
-						if (item != null) {
-							this.scrollViewWidth = this.scrollViewWidth + (item.width??0)
-							// 另外计算每一个item的中心点X轴坐标
-							// @ts-ignore
-							this.list[index]['rect'] = item
-						}
-					})
-					// console.log('******tabsRect******', this.tabsRect, this.scrollViewWidth)
-					// 获取了tabs的尺寸之后，设置滑块的位置
-					this.setLineLeft()
-					this.setScrollLeft()
-				})
-			},
-			// 获取导航菜单的尺寸
-			getTabsRect(): Promise<Array<NodeInfo>> {
-				return new Promise(resolve => {
-					this.queryRect('up-tabs__wrapper__scroll-view').then((size: NodeInfo) => {
-						resolve([size])
-					})
-				})
-			},
-			// 获取所有标签的尺寸
-			getAllItemRect(): Promise<Array<NodeInfo>>  {
-				return new Promise(resolve => {
-					const promiseAllArr = (this.$props['list'] as Array<UTSJSONObject>).map((item: UTSJSONObject, index: number) => {
-						return this.queryRect(`up-tabs__wrapper__nav__item-${index}`)
-					})
-					Promise.all(promiseAllArr).then((sizes: NodeInfo[]) => resolve(sizes))
-				})
-			},
-			// 获取各个标签的尺寸
-			queryRect(el: string): Promise<NodeInfo> {
-				// upGetRect为uview-plus自带的节点查询简化方法，详见文档介绍：https://uview-plus.jiangruyi.com/js/getRect.html
-				// 组件内部一般用this.$uGetRect，对外的为uni.$u.getRect，二者功能一致，名称不同
-				return new Promise(resolve => {
-					// @ts-ignore
-					this.upGetRect(`.${el}`).then((size: NodeInfo) => {
-						resolve(size)
-					})
-				})
-			},
-		},
+defineOptions({
+	name: 'up-tabs'
+})
+
+const props = defineProps({
+	duration: {
+		type: Number,
+		default: 200
+	},
+	list: {
+		type: Array as PropType<Array<UTSJSONObject>>,
+		default: () => [] as Array<UTSJSONObject>
+	},
+	lineColor: {
+		type: String,
+		default: '#3c9cff'
+	},
+	activeStyle: {
+		type: [String, Object],
+		default: () => ({
+			color: '#303133'
+		})
+	},
+	inactiveStyle: {
+		type: [String, Object],
+		default: () => ({
+			color: '#606266'
+		})
+	},
+	lineWidth: {
+		type: [String, Number],
+		default: '20px'
+	},
+	lineHeight: {
+		type: [String, Number],
+		default: '3px'
+	},
+	lineBgSize: {
+		type: String,
+		default: 'cover'
+	},
+	itemStyle: {
+		type: [String, Object],
+		default: () => ({
+			height: '44px'
+		})
+	},
+	scrollable: {
+		type: Boolean,
+		default: true
+	},
+	current: {
+		type: [Number, String],
+		default: 0
+	},
+	keyName: {
+		type: String,
+		default: 'name'
+	},
+	iconStyle: {
+		type: [String, Object],
+		default: () => ({})
+	},
+	height: {
+		type: [String, Number],
+		default: '44px'
 	}
+})
+
+const emit = defineEmits(['click', 'longPress', 'change', 'update:current'])
+const instance = getCurrentInstance()
+
+const firstTime = ref<boolean>(true)
+const scrollLeft = ref<number>(0)
+const scrollViewWidth = ref<number>(0)
+const lineOffsetLeft = ref<number>(0)
+const tabsRect = ref<NodeInfo>({
+	left: 0,
+	right: 0,
+} as NodeInfo)
+const innerCurrent = ref<number>(0)
+const retryCount = ref<number>(0)
+const itemRects = ref<Array<NodeInfo>>([])
+
+const tabsWrapperStyle = computed((): UTSJSONObject => {
+	return {
+		height: addUnit(props.height)
+	} as UTSJSONObject
+})
+
+const iconCustomStyle = computed((): UTSJSONObject => {
+	return addStyle(props.iconStyle) as UTSJSONObject
+})
+
+const propsBadge = computed<UTSJSONObject>(() => {
+	return badgeProps['badge'] as UTSJSONObject
+})
+
+const lineStyle = computed<UTSJSONObject>(() => {
+	const style = {} as UTSJSONObject
+	style['width'] = addUnit(props.lineWidth)
+	style['transform'] = 'translateX(' + (lineOffsetLeft.value) + 'px)'
+	style['transitionDuration'] = `${firstTime.value ? 0 : props.duration}ms`
+	style['height'] = addUnit(props.lineHeight)
+	style['backgroundSize'] = props.lineBgSize
+	if (props.lineColor != '#3c9cff') {
+		style['backgroundColor'] = props.lineColor
+	}
+	return style
+})
+
+function getShowValue(itemObj: UTSJSONObject): boolean {
+	if (itemObj['badge'] != null) {
+		let itemObjBadge = itemObj['badge'] as UTSJSONObject
+		if (itemObjBadge['show'] != null && (itemObjBadge['show'] as boolean)
+			|| (itemObjBadge['isDot'] != null && (itemObjBadge['isDot'] as boolean))
+			|| itemObjBadge['value'] != null) {
+			return true
+		}
+	}
+	return false
+}
+
+function getBadgePropValue(itemObj: UTSJSONObject, name: string): any {
+	if (itemObj != null && itemObj['badge'] != null) {
+		let itemObjBadge = itemObj['badge'] as UTSJSONObject
+		if (itemObjBadge != null && itemObjBadge[name] != null) {
+			return (itemObjBadge[name] != null ? itemObjBadge[name] : '') as any
+		} else {
+			return (propsBadge.value != null && propsBadge.value[name] != null ? propsBadge.value[name] : '') as any
+		}
+	}
+	return ''
+}
+
+function textStyle(index: number): any {
+	const style = {}
+	const customeStyle = (index == innerCurrent.value)
+		? addStyle(props.activeStyle)
+		: addStyle(props.inactiveStyle)
+	if (props.list[index]['disabled'] != null && (props.list[index]['disabled'] as boolean)) {
+		style['color'] = '#c8c9cc'
+	}
+	return deepMerge(customeStyle, style)
+}
+
+function getItemStyle(): UTSJSONObject {
+	const custom = addStyle(props.itemStyle) as UTSJSONObject
+	const base = {
+		flex: props.scrollable ? 'none' : '1'
+	} as UTSJSONObject
+	return deepMerge(base, custom) as UTSJSONObject
+}
+
+function isListEqual(list1: Array<UTSJSONObject>, list2: Array<UTSJSONObject>): boolean {
+	if (list1.length != list2.length) {
+		return false
+	}
+	for (let i = 0; i < list1.length; i++) {
+		const item1 = list1[i]
+		const item2 = list2[i]
+		if (item1[props.keyName] != item2[props.keyName]) {
+			return false
+		}
+	}
+	return true
+}
+
+function getTabsRect(): Promise<NodeInfo> {
+	return upGetRect('.up-tabs__wrapper__scroll-view', false, instance?.proxy)
+}
+
+function getAllItemRect(): Promise<Array<NodeInfo>> {
+	return new Promise((resolve: (res: Array<NodeInfo>) => void) => {
+		const total = props.list.length
+		if (total == 0) {
+			resolve([] as Array<NodeInfo>)
+			return
+		}
+		let results: Array<NodeInfo> = []
+		let count = 0
+		for (let i = 0; i < total; i++) {
+			const idx = i
+			upGetRect(`.up-tabs__wrapper__nav__item-${idx}`, false, instance?.proxy).then((size: NodeInfo) => {
+				results.push(size)
+				count++
+				if (count == total) {
+					resolve(results)
+				}
+			})
+		}
+	})
+}
+
+function setLineLeft() {
+	if (itemRects.value.length <= innerCurrent.value) {
+		return
+	}
+	const tabItem = itemRects.value[innerCurrent.value]
+	if (tabItem == null) {
+		return
+	}
+	let totalOffset = itemRects.value
+		.slice(0, innerCurrent.value)
+		.reduce((total: number, curr: NodeInfo) => {
+			return total + (curr.width ?? 0)
+		}, 0)
+	const lineWidthVal = parseFloat(getPx(props.lineWidth))
+	const tabWidth = tabItem.width ?? 0
+	const offset = tabWidth > 0 ? (tabWidth - lineWidthVal) / 2 : 0
+	lineOffsetLeft.value = totalOffset + offset
+
+	if (firstTime.value) {
+		setTimeout(() => {
+			firstTime.value = false
+		}, 30)
+	}
+}
+
+function setScrollLeft() {
+	if (innerCurrent.value < 0) {
+		innerCurrent.value = 0
+	}
+	if (itemRects.value.length <= innerCurrent.value) {
+		return
+	}
+	const tabRect = itemRects.value[innerCurrent.value]
+	if (tabRect == null) {
+		return
+	}
+	const offsetLeft = itemRects.value
+		.slice(0, innerCurrent.value)
+		.reduce((total: number, curr: NodeInfo) => {
+			return total + (curr.width ?? 0)
+		}, 0)
+	const windowWidth = getWindowInfo().windowWidth
+	let nextScrollLeft = offsetLeft - ((tabsRect.value.width ?? 0) - (tabRect.width ?? 0)) / 2 - (windowWidth - (tabsRect.value.right ?? 0)) / 2 + (tabsRect.value.left ?? 0) / 2
+	nextScrollLeft = Math.min(nextScrollLeft, scrollViewWidth.value - (tabsRect.value.width ?? 0))
+	scrollLeft.value = Math.max(0, nextScrollLeft)
+}
+
+function resize() {
+	if (props.list.length == 0) {
+		return
+	}
+	getTabsRect().then((tRect: NodeInfo) => {
+		getAllItemRect().then((iRect: Array<NodeInfo>) => {
+			const firstWidth = (iRect.length > 0 && iRect[0] != null) ? (iRect[0].width ?? 0) : 0
+			let minWidthExpected = 30
+			if (props.list.length > 0) {
+				const firstItemName = props.list[0][props.keyName]
+				if (firstItemName != null) {
+					const nameStr = firstItemName.toString()
+					minWidthExpected = nameStr.length * 12 + 20
+				}
+			}
+			if ((firstWidth < minWidthExpected) && retryCount.value < 5) {
+				retryCount.value++
+				setTimeout(() => {
+					resize()
+				}, 50)
+				return
+			}
+			if ((tRect.left ?? 0) > (tRect.width ?? 0)) {
+				tRect.right = (tRect.right ?? 0) - Math.floor((tRect.left ?? 0) / (tRect.width ?? 0)) * (tRect.width ?? 0)
+				tRect.left = (tRect.left ?? 0) % (tRect.width ?? 1)
+			}
+			tabsRect.value = tRect
+			itemRects.value = iRect
+			scrollViewWidth.value = 0
+			for (let i = 0; i < iRect.length; i++) {
+				const item = iRect[i]
+				if (item != null) {
+					scrollViewWidth.value = scrollViewWidth.value + (item.width ?? 0)
+				}
+			}
+			setLineLeft()
+			setScrollLeft()
+		})
+	})
+}
+
+function clickHandler(item: any, index: number) {
+	emit('click', {
+		...item as UTSJSONObject,
+		index
+	}, index)
+	if (item['disabled'] != null && (item['disabled'] as boolean)) return
+	if (innerCurrent.value == index) return
+	innerCurrent.value = index
+	nextTick(() => {
+		const hasRect = itemRects.value.length > 0 && itemRects.value.length == props.list.length && (itemRects.value[0].width ?? 0) > 0
+		if (hasRect) {
+			setLineLeft()
+			setScrollLeft()
+		} else {
+			resize()
+		}
+	})
+	emit('update:current', index)
+	emit('change', {
+		...item as UTSJSONObject,
+		index
+	}, index)
+}
+
+function longPressHandler(item: UTSJSONObject, index: number) {
+	emit('longPress', {
+		...item,
+		index
+	})
+}
+
+function init() {
+	retryCount.value = 0
+	sleep(30).then(() => {
+		resize()
+	})
+}
+
+watch((): any => props.current, (newValue: any) => {
+	let num = typeof newValue == 'string' ? parseInt(newValue.toString()) : (newValue as number)
+	if (num != innerCurrent.value) {
+		innerCurrent.value = num
+		nextTick(() => {
+			const hasRect = itemRects.value.length > 0 && itemRects.value.length == props.list.length && (itemRects.value[0].width ?? 0) > 0
+			if (hasRect) {
+				setLineLeft()
+				setScrollLeft()
+			} else {
+				resize()
+			}
+		})
+	}
+}, { immediate: true })
+
+watch((): Array<UTSJSONObject> => props.list, (newValue: Array<UTSJSONObject>, oldValue: Array<UTSJSONObject> | null) => {
+	if (oldValue != null && isListEqual(newValue, oldValue)) {
+		return
+	}
+	nextTick(() => {
+		resize()
+	})
+})
+
+onMounted(() => {
+	init()
+})
+
+defineExpose({
+	init,
+	resize
+})
 </script>
 
 <style lang="scss" scoped>
-
 	.up-tabs {
-
 		&__wrapper {
 			display: flex;
 			flex-direction: row;
 			align-items: center;
-				width: 100%;
+			width: 100%;
 
 			&__scroll-view-wrapper {
 				flex: 1;
@@ -444,7 +459,7 @@
 				display: flex;
 				flex-direction: row;
 				position: relative;
-					height: 100%;
+				height: 100%;
 
 				&__item {
 					padding: 0 11px;
@@ -453,7 +468,7 @@
 					align-items: center;
 					justify-content: center;
 					flex-shrink: 0;
-						height: 100%;
+					height: 100%;
 					/* #ifdef H5 */
 					cursor: pointer;
 					/* #endif */
@@ -467,7 +482,9 @@
 					&__text {
 						font-size: 15px;
 						color: $up-content-color;
-                        white-space: nowrap !important;
+						/* #ifndef APP-NVUE */
+						white-space: nowrap !important;
+						/* #endif */
 
 						&--disabled {
 							color: $up-disabled-color !important;

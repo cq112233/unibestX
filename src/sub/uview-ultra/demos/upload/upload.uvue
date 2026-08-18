@@ -6,11 +6,11 @@
         <text class="demo-label">基础用法</text>
         <up-upload
           :file-list="fileList1"
-          @after-read="afterRead"
-          @delete="deletePic"
           name="1"
           multiple
           :max-count="3"
+          @after-read="afterRead"
+          @delete="deletePic"
         ></up-upload>
       </view>
       <view class="demo-block mt-12px">
@@ -29,45 +29,45 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-const fileList1 = ref([] as UTSJSONObject[])
-const fileList2 = ref([] as UTSJSONObject[])
+const fileList1 = ref([] as UTSJSONObject[]);
+const fileList2 = ref([] as UTSJSONObject[]);
 
 async function uploadFilePromise(url: string): Promise<string> {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      resolve(url)
-    }, 1000)
-  })
+      resolve(url);
+    }, 1000);
+  });
 }
 
 async function afterRead(event: UTSJSONObject) {
-  const fileData = event.get('file')
-  const lists = (Array.isArray(fileData) ? fileData : [fileData]) as UTSJSONObject[]
-  let fileListLen = fileList1.value.length
+  const fileData = event.get('file');
+  const lists = (Array.isArray(fileData) ? fileData : [fileData]) as UTSJSONObject[];
+  let fileListLen = fileList1.value.length;
   lists.forEach((item) => {
     fileList1.value.push({
       ...item,
       status: 'uploading',
       message: '上传中'
-    } as UTSJSONObject)
-  })
+    } as UTSJSONObject);
+  });
   for (let i = 0; i < lists.length; i++) {
-    const url = lists[i].getString('url') as string
-    const result = await uploadFilePromise(url)
-    const item = fileList1.value[fileListLen]
+    const url = lists[i].getString('url') as string;
+    const result = await uploadFilePromise(url);
+    const item = fileList1.value[fileListLen];
     fileList1.value.splice(fileListLen, 1, Object.assign(item, {
       status: 'success',
       message: '',
       url: result
-    }) as UTSJSONObject)
-    fileListLen++
+    }) as UTSJSONObject);
+    fileListLen++;
   }
 }
 
 function deletePic(event: UTSJSONObject) {
-  fileList1.value.splice(event.getNumber('index') as number, 1)
+  fileList1.value.splice(event.getNumber('index') as number, 1);
 }
 </script>
 

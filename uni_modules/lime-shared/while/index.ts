@@ -32,9 +32,19 @@ export function controllableWhile(
 	
 	return {
 		start: () => {
-			// #ifdef APP-ANDROID
-			UTSAndroid.getDispatcher('io').async((_) => {
-			// #endif
+			if (typeof UTSAndroid !== 'undefined' && UTSAndroid?.getDispatcher != null) {
+				UTSAndroid.getDispatcher('io').async((_) => {
+					while (isActive && condition()) {
+						const result = body(controller);
+						if (result == 'break') {
+							controller.abort();
+							break;
+						} else if (result == 'continue') {
+							continue;
+						}
+					}
+				}, null);
+			} else {
 				while (isActive && condition()) {
 					const result = body(controller);
 					if (result == 'break') {
@@ -44,9 +54,7 @@ export function controllableWhile(
 						continue;
 					}
 				}
-			// #ifdef APP-ANDROID
-			}, null);
-			// #endif
+			}
 		},
 		abort: controller.abort,
 		execContinue: execContinue,

@@ -3,6 +3,7 @@ const common_vendor = require("../../../../common/vendor.js");
 const defProps = new common_vendor.UTSJSONObject({
   // table 组件
   table: new common_vendor.UTSJSONObject({
+    border: true,
     borderColor: "#e4e7ed",
     align: "center",
     padding: "5px 3px",

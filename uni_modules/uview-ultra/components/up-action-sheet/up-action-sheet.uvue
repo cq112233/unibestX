@@ -33,7 +33,7 @@
 			>{{description}}</text>
 			<slot>
 				<up-line v-if="description"></up-line>
-				<scroll-view scroll-y class="up-action-sheet__item-wrap" :style="{maxHeight: wrapMaxHeight}">
+				<scroll-view direction="vertical" class="up-action-sheet__item-wrap" :style="{maxHeight: wrapMaxHeight}">
 					<view :key="index" v-for="(item, index) in actions">
 						<!-- #ifdef MP -->
 						<button

@@ -748,7 +748,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           isLoadFailed: isLoadFailed.value
         })
       } : {
-        p: common_vendor.o(reload, "31"),
+        p: common_vendor.o(reload, "8a"),
         q: common_vendor.p({
           ["empty-text"]: !isLoadFailed.value ? __props.emptyText : __props.emptyErrorText,
           ["empty-img"]: !isLoadFailed.value ? __props.emptyImg : __props.emptyErrorImg,
@@ -791,7 +791,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           loadMoreStatus: loadMoreStatus.value
         })
       } : {
-        R: common_vendor.o(_handleLoadMore, "8d"),
+        R: common_vendor.o(_handleLoadMore, "c2"),
         S: common_vendor.p({
           status: loadMoreStatus.value,
           ["default-text"]: __props.loadMoreDefaultText,
@@ -832,7 +832,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           isLoadFailed: isLoadFailed.value
         })
       } : {
-        ac: common_vendor.o(reload, "c8"),
+        ac: common_vendor.o(reload, "81"),
         ad: common_vendor.p({
           ["empty-text"]: !isLoadFailed.value ? __props.emptyText : __props.emptyErrorText,
           ["empty-img"]: !isLoadFailed.value ? __props.emptyImg : __props.emptyErrorImg,
@@ -851,38 +851,36 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         ai: finalRefresherThreshold.value,
         aj: refresherTriggered.value,
         ak: __props.useCustomRefresher ? "none" : "black",
-        al: __props.customNestedScroll,
-        am: __props.refresherBackground,
-        an: __props.rebound,
-        ao: scrollTop.value,
-        ap: __props.showScrollbar,
-        aq: finalScrollWithAnimation.value,
-        ar: common_vendor.o(_onRefresherpulling, "4d"),
-        as: common_vendor.o(_onRefresherrefresh, "44"),
-        at: common_vendor.o(_onRefresherrestore, "94"),
-        av: common_vendor.o(_onRefresherabort, "02"),
-        aw: common_vendor.o(_onScrolltolower, "f2"),
-        ax: common_vendor.o(_onScrolltoupper, "19"),
-        ay: common_vendor.o(_onScroll, "d6"),
-        az: common_vendor.o(_onStartNestedScroll, "6d"),
-        aA: common_vendor.o(_onNestedPreScroll, "8a")
+        al: __props.refresherBackground,
+        am: scrollTop.value,
+        an: __props.showScrollbar,
+        ao: finalScrollWithAnimation.value,
+        ap: common_vendor.o(_onRefresherpulling, "36"),
+        aq: common_vendor.o(_onRefresherrefresh, "49"),
+        ar: common_vendor.o(_onRefresherrestore, "a9"),
+        as: common_vendor.o(_onRefresherabort, "eb"),
+        at: common_vendor.o(_onScrolltolower, "ca"),
+        av: common_vendor.o(_onScrolltoupper, "9f"),
+        aw: common_vendor.o(_onScroll, "c9"),
+        ax: common_vendor.o(_onStartNestedScroll, "3d"),
+        ay: common_vendor.o(_onNestedPreScroll, "f6")
       }), {
-        aB: showBackToTopClass.value
+        az: showBackToTopClass.value
       }, showBackToTopClass.value ? common_vendor.e({
-        aC: _ctx.$slots["backToTop"]
+        aA: _ctx.$slots["backToTop"]
       }, _ctx.$slots["backToTop"] ? {} : {
-        aD: __props.backToTopImg.length > 0 ? __props.backToTopImg : base64BackToTopImg.value
+        aB: __props.backToTopImg.length > 0 ? __props.backToTopImg : base64BackToTopImg.value
       }, {
-        aE: common_vendor.n(backToTopClass.value),
-        aF: common_vendor.s(__props.backToTopStyle),
-        aG: common_vendor.o(_onBackToTopClick, "fa")
+        aC: common_vendor.n(backToTopClass.value),
+        aD: common_vendor.s(__props.backToTopStyle),
+        aE: common_vendor.o(_onBackToTopClick, "ae")
       }) : {}, {
-        aH: common_vendor.sei(common_vendor.gei(_ctx, "", "r4-6ee3af36"), "view", zPagingX, {
+        aF: common_vendor.sei(common_vendor.gei(_ctx, "", "r4-6ee3af36"), "view", zPagingX, {
           "k": "zPagingX"
         }),
-        aI: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
-        aJ: common_vendor.s(__props.pagingStyle),
-        aK: common_vendor.s({
+        aG: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+        aH: common_vendor.s(__props.pagingStyle),
+        aI: common_vendor.s({
           "--status-bar-height": `${_ctx.u_s_b_h}px`,
           "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
         })

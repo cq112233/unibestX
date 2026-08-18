@@ -1,82 +1,72 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
 const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
-const uni_modules_uviewUltra_components_upBadge_badge = require("./badge.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   name: "up-badge"
 }, { __name: "up-badge", props: {
-  // 是否显示圆点
   isDot: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upBadge_badge.badgeProps.getBoolean("badge.isDot")
+    default: false
   },
-  // 显示的内容
   value: {
     type: [Number, String],
-    default: uni_modules_uviewUltra_components_upBadge_badge.badgeProps.getString("badge.value")
+    default: ""
   },
-  // 显示的内容
   modelValue: {
     type: [Number, String],
-    default: uni_modules_uviewUltra_components_upBadge_badge.badgeProps.getString("badge.modelValue")
+    default: ""
   },
-  // 是否显示
   show: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upBadge_badge.badgeProps.getBoolean("badge.show")
+    default: true
   },
-  // 最大值，超过最大值会显示 '{max}+'
   max: {
     type: [Number, String],
-    default: uni_modules_uviewUltra_components_upBadge_badge.badgeProps.getNumber("badge.max")
+    default: 999
   },
-  // 主题类型，error|warning|success|primary
   type: {
     type: String,
-    default: uni_modules_uviewUltra_components_upBadge_badge.badgeProps.getString("badge.type")
+    default: "error"
   },
-  // 当数值为 0 时，是否展示 Badge
   showZero: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upBadge_badge.badgeProps.getBoolean("badge.showZero")
+    default: false
   },
-  // 背景颜色，优先级比type高，如设置，type参数会失效
   bgColor: {
     type: String,
-    default: uni_modules_uviewUltra_components_upBadge_badge.badgeProps.getString("badge.bgColor")
+    default: ""
   },
-  // 字体颜色
   color: {
     type: String,
-    default: uni_modules_uviewUltra_components_upBadge_badge.badgeProps.getString("badge.color")
+    default: "#ffffff"
   },
-  // 徽标形状，circle-四角均为圆角，horn-左下角为直角
   shape: {
     type: String,
-    default: uni_modules_uviewUltra_components_upBadge_badge.badgeProps.getString("badge.shape")
+    default: "circle"
   },
-  // 设置数字的显示方式，overflow|ellipsis|limit
-  // overflow会根据max字段判断，超出显示`${max}+`
-  // ellipsis会根据max判断，超出显示`${max}...`
-  // limit会依据1000作为判断条件，超出1000，显示`${value/1000}K`，比如2.2k、3.34w，最多保留2位小数
   numberType: {
     type: String,
-    default: uni_modules_uviewUltra_components_upBadge_badge.badgeProps.getString("badge.numberType")
+    default: "overflow"
   },
-  // 设置badge的位置偏移，格式为 [x, y]，也即设置的为top和right的值，absolute为true时有效
   offset: {
     type: Array,
-    default: uni_modules_uviewUltra_components_upBadge_badge.badgeProps.getArray("badge.offset")
+    default: () => {
+      return [];
+    }
   },
-  // 是否反转背景和字体颜色
   inverted: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upBadge_badge.badgeProps.getBoolean("badge.inverted")
+    default: false
   },
-  // 是否绝对定位
   absolute: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upBadge_badge.badgeProps.getBoolean("badge.absolute")
+    default: false
+  },
+  customStyle: {
+    type: Object,
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
+    }
   }
 }, setup(__props) {
   const props = __props;
@@ -103,20 +93,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     }
     return style;
   });
+  const computedBadgeStyle = common_vendor.computed(() => {
+    const custom = uni_modules_uviewUltra_libs_function_index.addStyle(props.customStyle);
+    const badge = badgeStyle.value;
+    return uni_modules_uviewUltra_libs_function_index.deepMerge(badge, custom);
+  });
   const showValue = common_vendor.computed(() => {
     let valueReturn = "";
+    const valStr = props.value != "" ? props.value.toString() : props.modelValue != "" ? props.modelValue.toString() : "0";
     switch (props.numberType.toString()) {
       case "overflow":
-        valueReturn = parseInt(props.value.toString()) > parseInt(props.max.toString()) ? props.max.toString() + "+" : props.value.toString();
+        valueReturn = parseInt(valStr) > parseInt(props.max.toString()) ? props.max.toString() + "+" : valStr;
         break;
       case "ellipsis":
-        valueReturn = parseInt(props.value.toString()) > parseInt(props.max.toString()) ? "..." : props.value.toString();
+        valueReturn = parseInt(valStr) > parseInt(props.max.toString()) ? "..." : valStr;
         break;
       case "limit":
-        valueReturn = parseInt(props.value.toString()) > 999 ? parseInt(props.value.toString()) >= 9999 ? (Math.floor(parseInt(props.value.toString()) / 1e4 * 100) / 100).toString() + "w" : (Math.floor(parseInt(props.value.toString()) / 1e3 * 100) / 100).toString() + "k" : props.value.toString();
+        valueReturn = parseInt(valStr) > 999 ? parseInt(valStr) >= 9999 ? (Math.floor(parseInt(valStr) / 1e4 * 100) / 100).toString() + "w" : (Math.floor(parseInt(valStr) / 1e3 * 100) / 100).toString() + "k" : valStr;
         break;
       default:
-        valueReturn = props.value.toString();
+        valueReturn = valStr;
     }
     return valueReturn;
   });
@@ -132,9 +128,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       f: common_vendor.n(__props.shape === "horn" ? "up-badge--horn" : ""),
       g: common_vendor.n(__props.inverted ? `up-badge--${__props.type}--inverted` : `up-badge--${__props.type}`),
       h: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
-      i: common_vendor.s(_ctx.$upAddStyle(_ctx.customStyle)),
-      j: common_vendor.s(badgeStyle.value),
-      k: common_vendor.s({
+      i: common_vendor.s(computedBadgeStyle.value),
+      j: common_vendor.s({
         "--status-bar-height": `${_ctx.u_s_b_h}px`,
         "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
       })

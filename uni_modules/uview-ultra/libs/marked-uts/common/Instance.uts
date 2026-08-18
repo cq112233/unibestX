@@ -194,9 +194,7 @@ export class Marked implements I_Marked {
 				let tokens: any | null;
 				let html = '';
 				await new Promise<any>((resolve, reject) => {
-					// #ifdef APP-ANDROID
-					UTSAndroid.getDispatcher('io').async((_) => {
-					// #endif
+					const runParse = () => {
 						try {
 							// #ifndef APP-HARMONY
 							// #ifdef APP-ANDROID
@@ -222,9 +220,15 @@ export class Marked implements I_Marked {
 						} catch (e) {
 							reject(e);
 						}
-					// #ifdef APP-ANDROID
-					}, null);
-					// #endif
+					};
+
+					if (typeof UTSAndroid !== 'undefined' && UTSAndroid?.getDispatcher != null) {
+						UTSAndroid.getDispatcher('io').async((_) => {
+							runParse();
+						}, null);
+					} else {
+						runParse();
+					}
 				});
 				if (opt.hooks!= null) {
 					html = opt.hooks!.postprocess(html);

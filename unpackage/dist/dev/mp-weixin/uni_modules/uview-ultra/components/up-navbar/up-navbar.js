@@ -1,117 +1,188 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const uni_modules_uviewUltra_components_upNavbar_props = require("./props.js");
-const uni_modules_uviewUltra_libs_mixin_mpMixin = require("../../libs/mixin/mpMixin.js");
-const uni_modules_uviewUltra_libs_mixin_mixin = require("../../libs/mixin/mixin.js");
 const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
-const _sfc_main = common_vendor.defineComponent({
-  name: "up-navbar",
-  mixins: [uni_modules_uviewUltra_libs_mixin_mpMixin.mpMixin, uni_modules_uviewUltra_libs_mixin_mixin.mixin, uni_modules_uviewUltra_components_upNavbar_props.propsNavbar],
-  data() {
-    return {
-      statusBarHeight: 0,
-      placeholderHeight: "0px"
-    };
-  },
-  emits: ["leftClick", "rightClick"],
-  created() {
-    this.statusBarHeight = common_vendor.index.getSystemInfoSync().statusBarHeight;
-    this.placeholderHeight = uni_modules_uviewUltra_libs_function_index.addUnit(parseInt(uni_modules_uviewUltra_libs_function_index.getPx(this.height)) + this.statusBarHeight, "px");
-  },
-  methods: {
-    addStyle(val = null) {
-      return uni_modules_uviewUltra_libs_function_index.addStyle(val);
-    },
-    addUnit(val = null) {
-      return uni_modules_uviewUltra_libs_function_index.addUnit(val);
-    },
-    getPx(val = null) {
-      return uni_modules_uviewUltra_libs_function_index.getPx(val);
-    },
-    // 点击左侧区域
-    leftClick() {
-      this.$emit("leftClick");
-      if (this.autoBack) {
-        common_vendor.index.navigateBack();
-      }
-    },
-    // 点击右侧区域
-    rightClick() {
-      this.$emit("rightClick");
-    }
-  }
-});
 if (!Array) {
-  const _easycom_up_status_bar2 = common_vendor.resolveComponent("up-status-bar");
-  const _easycom_up_icon2 = common_vendor.resolveComponent("up-icon");
-  (_easycom_up_status_bar2 + _easycom_up_icon2)();
+  const _easycom_up_status_bar_1 = common_vendor.resolveComponent("up-status-bar");
+  const _easycom_up_icon_1 = common_vendor.resolveComponent("up-icon");
+  (_easycom_up_status_bar_1 + _easycom_up_icon_1)();
 }
 const _easycom_up_status_bar = () => "../up-status-bar/up-status-bar.js";
 const _easycom_up_icon = () => "../up-icon/up-icon.js";
 if (!Math) {
   (_easycom_up_status_bar + _easycom_up_icon)();
 }
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  "raw js";
-  return common_vendor.e({
-    a: _ctx.fixed && _ctx.placeholder
-  }, _ctx.fixed && _ctx.placeholder ? {
-    b: $data.placeholderHeight
-  } : {}, {
-    c: _ctx.safeAreaInsetTop
-  }, _ctx.safeAreaInsetTop ? {
-    d: common_vendor.p({
-      bgColor: _ctx.bgColor,
-      class: "data-v-61ef0705"
-    })
-  } : {}, {
-    e: _ctx.leftIcon
-  }, _ctx.leftIcon ? {
-    f: common_vendor.p({
-      name: _ctx.leftIcon,
-      size: _ctx.leftIconSize,
-      color: _ctx.leftIconColor,
-      class: "data-v-61ef0705"
-    })
-  } : {}, {
-    g: _ctx.leftText
-  }, _ctx.leftText ? {
-    h: common_vendor.t(_ctx.leftText),
-    i: _ctx.leftIconColor
-  } : {}, {
-    j: common_vendor.o((...args) => $options.leftClick && $options.leftClick(...args), "ed"),
-    k: common_vendor.t(_ctx.title),
-    l: common_vendor.s({
-      width: $options.addUnit(_ctx.titleWidth)
-    }),
-    m: common_vendor.s($options.addStyle(_ctx.titleStyle)),
-    n: _ctx.$slots["right"] != null || _ctx.rightIcon != "" || _ctx.rightText != ""
-  }, _ctx.$slots["right"] != null || _ctx.rightIcon != "" || _ctx.rightText != "" ? common_vendor.e({
-    o: _ctx.rightIcon
-  }, _ctx.rightIcon ? {
-    p: common_vendor.p({
-      name: _ctx.rightIcon,
-      size: "20",
-      class: "data-v-61ef0705"
-    })
-  } : {}, {
-    q: _ctx.rightText
-  }, _ctx.rightText ? {
-    r: common_vendor.t(_ctx.rightText)
-  } : {}, {
-    s: common_vendor.o((...args) => $options.rightClick && $options.rightClick(...args), "71")
-  }) : {}, {
-    t: common_vendor.n(_ctx.border ? "up-border-bottom" : ""),
-    v: $options.addUnit(_ctx.height),
-    w: _ctx.bgColor,
-    x: common_vendor.n(_ctx.fixed ? "up-navbar--fixed" : ""),
-    y: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    z: common_vendor.n(_ctx.customClass),
-    A: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
-    B: `${_ctx.u_s_b_h}px`,
-    C: `${_ctx.u_s_a_i_b}px`
+const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
+  name: "up-navbar"
+}, { __name: "up-navbar", props: {
+  safeAreaInsetTop: {
+    type: Boolean,
+    default: true
+  },
+  placeholder: {
+    type: Boolean,
+    default: false
+  },
+  fixed: {
+    type: Boolean,
+    default: false
+  },
+  border: {
+    type: Boolean,
+    default: false
+  },
+  leftIcon: {
+    type: String,
+    default: "arrow-left"
+  },
+  leftText: {
+    type: String,
+    default: ""
+  },
+  rightText: {
+    type: String,
+    default: ""
+  },
+  rightIcon: {
+    type: String,
+    default: ""
+  },
+  title: {
+    type: String,
+    default: ""
+  },
+  bgColor: {
+    type: String,
+    default: "#ffffff"
+  },
+  titleWidth: {
+    type: [String, Number],
+    default: "400rpx"
+  },
+  height: {
+    type: [String, Number],
+    default: "44px"
+  },
+  leftIconSize: {
+    type: [String, Number],
+    default: 20
+  },
+  leftIconColor: {
+    type: String,
+    default: "#303133"
+  },
+  autoBack: {
+    type: Boolean,
+    default: false
+  },
+  titleStyle: {
+    type: [Object, String],
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
+    }
+  },
+  customClass: {
+    type: String,
+    default: ""
+  }
+}, emits: ["leftClick", "rightClick"], setup(__props, _a) {
+  var __emit = _a.emit;
+  const props = __props;
+  const emit = __emit;
+  const placeholderHeight = common_vendor.computed(() => {
+    const statusBarHeight = common_vendor.index.getSystemInfoSync().statusBarHeight;
+    return uni_modules_uviewUltra_libs_function_index.addUnit(parseInt(uni_modules_uviewUltra_libs_function_index.getPx(props.height)) + statusBarHeight, "px");
   });
-}
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-61ef0705"]]);
+  const placeholderStyle = common_vendor.computed(() => {
+    return new common_vendor.UTSJSONObject({
+      height: placeholderHeight.value
+    });
+  });
+  const contentStyle = common_vendor.computed(() => {
+    return new common_vendor.UTSJSONObject({
+      height: uni_modules_uviewUltra_libs_function_index.addUnit(props.height),
+      backgroundColor: props.bgColor
+    });
+  });
+  const leftTextStyle = common_vendor.computed(() => {
+    return new common_vendor.UTSJSONObject({
+      color: props.leftIconColor
+    });
+  });
+  const mergedTitleStyle = common_vendor.computed(() => {
+    const custom = uni_modules_uviewUltra_libs_function_index.addStyle(props.titleStyle);
+    const base = new common_vendor.UTSJSONObject({
+      width: uni_modules_uviewUltra_libs_function_index.addUnit(props.titleWidth)
+    });
+    return uni_modules_uviewUltra_libs_function_index.deepMerge(base, custom);
+  });
+  function leftClick() {
+    emit("leftClick");
+    if (props.autoBack) {
+      common_vendor.index.navigateBack();
+    }
+  }
+  function rightClick() {
+    emit("rightClick");
+  }
+  return (_ctx, _cache) => {
+    "raw js";
+    const __returned__ = common_vendor.e({
+      a: __props.fixed && __props.placeholder
+    }, __props.fixed && __props.placeholder ? {
+      b: common_vendor.s(placeholderStyle.value)
+    } : {}, {
+      c: __props.safeAreaInsetTop
+    }, __props.safeAreaInsetTop ? {
+      d: common_vendor.p({
+        bgColor: __props.bgColor,
+        class: "data-v-61ef0705"
+      })
+    } : {}, {
+      e: __props.leftIcon != ""
+    }, __props.leftIcon != "" ? {
+      f: common_vendor.p({
+        name: __props.leftIcon,
+        size: __props.leftIconSize,
+        color: __props.leftIconColor,
+        class: "data-v-61ef0705"
+      })
+    } : {}, {
+      g: __props.leftText != ""
+    }, __props.leftText != "" ? {
+      h: common_vendor.t(__props.leftText),
+      i: common_vendor.s(leftTextStyle.value)
+    } : {}, {
+      j: common_vendor.o(leftClick, "9e"),
+      k: common_vendor.t(__props.title),
+      l: common_vendor.s(mergedTitleStyle.value),
+      m: _ctx.$slots["right"] != null || __props.rightIcon != "" || __props.rightText != ""
+    }, _ctx.$slots["right"] != null || __props.rightIcon != "" || __props.rightText != "" ? common_vendor.e({
+      n: __props.rightIcon != ""
+    }, __props.rightIcon != "" ? {
+      o: common_vendor.p({
+        name: __props.rightIcon,
+        size: "20",
+        class: "data-v-61ef0705"
+      })
+    } : {}, {
+      p: __props.rightText != ""
+    }, __props.rightText != "" ? {
+      q: common_vendor.t(__props.rightText)
+    } : {}, {
+      r: common_vendor.o(rightClick, "69")
+    }) : {}, {
+      s: common_vendor.n(__props.border ? "up-border-bottom" : ""),
+      t: common_vendor.s(contentStyle.value),
+      v: common_vendor.n(__props.fixed ? "up-navbar--fixed" : ""),
+      w: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+      x: common_vendor.n(__props.customClass),
+      y: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+      z: `${_ctx.u_s_b_h}px`,
+      A: `${_ctx.u_s_a_i_b}px`
+    });
+    return __returned__;
+  };
+} }));
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-61ef0705"]]);
 wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-ultra/components/up-navbar/up-navbar.js.map

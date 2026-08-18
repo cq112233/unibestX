@@ -32,36 +32,45 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-53e2aa09"
         }),
         b: common_vendor.p({
+          text: "学校",
           class: "data-v-53e2aa09"
         }),
         c: common_vendor.p({
+          text: "班级",
           class: "data-v-53e2aa09"
         }),
         d: common_vendor.p({
+          text: "年龄",
           class: "data-v-53e2aa09"
         }),
         e: common_vendor.p({
           class: "data-v-53e2aa09"
         }),
         f: common_vendor.p({
+          text: "浙江大学",
           class: "data-v-53e2aa09"
         }),
         g: common_vendor.p({
+          text: "二年级",
           class: "data-v-53e2aa09"
         }),
         h: common_vendor.p({
+          text: "22",
           class: "data-v-53e2aa09"
         }),
         i: common_vendor.p({
           class: "data-v-53e2aa09"
         }),
         j: common_vendor.p({
+          text: "清华大学",
           class: "data-v-53e2aa09"
         }),
         k: common_vendor.p({
+          text: "05班",
           class: "data-v-53e2aa09"
         }),
         l: common_vendor.p({
+          text: "24",
           class: "data-v-53e2aa09"
         }),
         m: common_vendor.p({
@@ -71,27 +80,33 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-53e2aa09"
         }),
         o: common_vendor.p({
+          text: "名称",
           class: "data-v-53e2aa09"
         }),
         p: common_vendor.p({
+          text: "类型",
           class: "data-v-53e2aa09"
         }),
         q: common_vendor.p({
           class: "data-v-53e2aa09"
         }),
         r: common_vendor.p({
+          text: "uview-ultra",
           class: "data-v-53e2aa09"
         }),
         s: common_vendor.p({
+          text: "UI库",
           class: "data-v-53e2aa09"
         }),
         t: common_vendor.p({
           class: "data-v-53e2aa09"
         }),
         v: common_vendor.p({
+          text: "uni-app X",
           class: "data-v-53e2aa09"
         }),
         w: common_vendor.p({
+          text: "框架",
           class: "data-v-53e2aa09"
         }),
         x: common_vendor.p({

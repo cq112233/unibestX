@@ -1,6 +1,6 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const uni_modules_uviewUltra_libs_config_props = require("../../libs/config/props.js");
+require("../../libs/config/props.js");
 const uni_modules_uviewUltra_components_upCountDown_utils = require("./utils.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "up-count-down",
@@ -8,12 +8,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     // 倒计时时长，单位ms
     time: {
       type: [String, Number],
-      default: uni_modules_uviewUltra_libs_config_props.obj.getNumber("countDown.time")
+      default: 0
     },
     // 时间格式，DD-日，HH-时，mm-分，ss-秒，SSS-毫秒
     format: {
       type: String,
-      default: uni_modules_uviewUltra_libs_config_props.obj.getString("countDown.format")
+      default: "HH:mm:ss"
     },
     // 是否自动开始倒计时
     autoStart: {

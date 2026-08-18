@@ -1,277 +1,372 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const uni_modules_uviewUltra_components_upNumberBox_props = require("./props.js");
-const uni_modules_uviewUltra_libs_mixin_mpMixin = require("../../libs/mixin/mpMixin.js");
-const uni_modules_uviewUltra_libs_mixin_mixin = require("../../libs/mixin/mixin.js");
 const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
-const _sfc_main = common_vendor.defineComponent({
-  name: "up-number-box",
-  mixins: [uni_modules_uviewUltra_libs_mixin_mpMixin.mpMixin, uni_modules_uviewUltra_libs_mixin_mixin.mixin, uni_modules_uviewUltra_components_upNumberBox_props.propsNumberBox],
-  data() {
-    return {
-      type: "",
-      // 输入框实际操作的值
-      currentValue: "",
-      // 定时器
-      longPressTimer: null
-    };
-  },
-  watch: {
-    // 多个值之间，只要一个值发生变化，都要重新检查check()函数
-    watchChange(n = null) {
-      this.check();
-    },
-    // 监听v-mode的变化，重新初始化内部的值
-    modelValue: {
-      handler: function(newV, oldV) {
-        if (newV !== this.currentValue) {
-          this.currentValue = this.format(newV.toString());
-        }
-      },
-      immediate: true
-    }
-  },
-  computed: {
-    hideMinus() {
-      return this.currentValue.toString() == "0" && this.miniMode == true;
-    },
-    getCursorSpacing() {
-      return uni_modules_uviewUltra_libs_function_index.getPx(this.cursorSpacing);
-    },
-    // 输入框的样式
-    inputStyle() {
-      this.disabled || this.disabledInput;
-      const style = new common_vendor.UTSJSONObject({
-        color: this.color,
-        backgroundColor: this.inputBgColor != "" ? this.inputBgColor : this.bgColor,
-        height: uni_modules_uviewUltra_libs_function_index.addUnit(this.buttonSize),
-        width: uni_modules_uviewUltra_libs_function_index.addUnit(this.inputWidth)
-      });
-      return style;
-    },
-    // 用于监听多个值发生变化
-    watchChange() {
-      return [this.integer, this.decimalLength, this.min, this.max];
-    }
-  },
-  mounted() {
-    this.init();
-  },
-  emits: ["update:modelValue", "focus", "blur", "overlimit", "change", "plus", "minus"],
-  methods: {
-    init() {
-      this.currentValue = this.format(this.modelValue != null ? this.modelValue.toString() : "0");
-    },
-    // 按钮的样式
-    buttonStyle(type) {
-      const style = new common_vendor.UTSJSONObject({
-        backgroundColor: this.bgColor,
-        width: uni_modules_uviewUltra_libs_function_index.addUnit(this.buttonWidth),
-        height: uni_modules_uviewUltra_libs_function_index.addUnit(this.buttonSize),
-        borderRadius: this.buttonRadius
-      });
-      if (this.isDisabled(type)) {
-        style.backgroundColor = this.disabledBgColor;
-      }
-      return style;
-    },
-    isDisabled(type) {
-      if (type === "plus") {
-        return this.disabled || this.disablePlus;
-      }
-      return this.disabled || this.disableMinus || parseFloat(this.currentValue.toString()) <= parseFloat(this.min.toString());
-    },
-    // 格式化整理数据，限制范围
-    format(value) {
-      value = this.filter(value);
-      let valueNum = value == "" ? 0 : parseFloat(value);
-      valueNum = Math.max(Math.min(parseFloat(this.max.toString()), parseFloat(value.toString())), parseFloat(this.min.toString()));
-      let decimalLength = parseInt(this.decimalLength.toString());
-      if (decimalLength != 0 && valueNum != 0) {
-        valueNum = parseFloat(valueNum.toFixed(decimalLength));
-      }
-      return valueNum;
-    },
-    // 过滤非法的字符
-    filter(value) {
-      value = value.toString();
-      value = value.replace(/[^0-9.-]/g, "");
-      if (this.integer && value.indexOf(".") != -1) {
-        value = value.split(".")[0];
-      }
-      return value;
-    },
-    check() {
-      const val = this.format(this.currentValue.toString());
-      if (val !== this.currentValue) {
-        this.currentValue = val;
-        this.emitChange(val);
-      }
-    },
-    // 输入框活动焦点
-    onFocus(event) {
-      this.$emit("focus", new common_vendor.UTSJSONObject(Object.assign(Object.assign({}, event.detail), { name: this.name })));
-    },
-    // 输入框失去焦点
-    onBlur(event) {
-      const value = this.format(event.detail.value);
-      this.emitChange(value);
-      this.$emit("blur", new common_vendor.UTSJSONObject(Object.assign(Object.assign({}, event.detail), { name: this.name })));
-    },
-    // 输入框值发生变化
-    onInput(e) {
-      let value = e.detail.value;
-      if (value === "") {
-        this.currentValue = "";
-        return null;
-      }
-      let formatted = this.filter(value.toString());
-      this.emitChange(value);
-      if (formatted.indexOf(".") != -1) {
-        const pair = formatted.split(".");
-        formatted = `${pair[0]}.${pair[1].slice(0, parseInt(this.decimalLength.toString()))}`;
-      }
-      let formatted2 = this.format(formatted);
-      this.emitChange(formatted2);
-      return formatted2;
-    },
-    // 发出change事件，type目前只支持点击时有值，手动输入不支持。
-    emitChange(value, type = "") {
-      if (!this.asyncChange) {
-        this.$nextTick(() => {
-          this.$emit("update:modelValue", value);
-          this.currentValue = value;
-          this.$forceUpdate();
-        });
-      }
-      this.$emit("change", new common_vendor.UTSJSONObject({
-        value: parseFloat(value.toString()),
-        name: this.name,
-        type
-        // 当前变更类型
-      }));
-    },
-    onChange() {
-      const type = this.type;
-      if (this.isDisabled(type)) {
-        return this.$emit("overlimit", type);
-      }
-      const diff = type === "minus" ? 0 - parseFloat(this.step.toString()) : 0 + parseFloat(this.step.toString());
-      const value = this.format(this.add(0 + parseFloat(this.currentValue.toString()), diff).toString());
-      this.emitChange(value, type);
-      this.$emit(type);
-    },
-    // 对值扩大后进行四舍五入，再除以扩大因子，避免出现浮点数操作的精度问题
-    add(num1, num2) {
-      const cardinal = Math.pow(10, 10);
-      return Math.round((num1 + num2) * cardinal) / cardinal;
-    },
-    // 点击加减按钮
-    clickHandler(type) {
-      this.type = type;
-      this.onChange();
-    },
-    longPressStep() {
-      this.clearTimeout();
-      this.longPressTimer = setTimeout(() => {
-        this.onChange();
-        this.longPressStep();
-      }, 250);
-    },
-    onTouchStart(type) {
-      if (!this.longPress)
-        return null;
-      this.clearTimeout();
-      this.type = type;
-      this.longPressTimer = setTimeout(() => {
-        this.onChange();
-        this.longPressStep();
-      }, 600);
-    },
-    // 触摸结束，清除定时器，停止长按加减
-    onTouchEnd() {
-      if (!this.longPress)
-        return null;
-      this.clearTimeout();
-    },
-    // 清除定时器
-    clearTimeout() {
-      var _a;
-      clearTimeout((_a = this.longPressTimer) !== null && _a !== void 0 ? _a : 0);
-      this.longPressTimer = null;
-    }
-  }
-});
 if (!Array) {
-  const _easycom_up_icon2 = common_vendor.resolveComponent("up-icon");
-  _easycom_up_icon2();
+  const _easycom_up_icon_1 = common_vendor.resolveComponent("up-icon");
+  _easycom_up_icon_1();
 }
 const _easycom_up_icon = () => "../up-icon/up-icon.js";
 if (!Math) {
   _easycom_up_icon();
 }
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  "raw js";
-  return common_vendor.e({
-    a: _ctx.showMinus && !$options.hideMinus && _ctx.$slots["minus"] != null
-  }, _ctx.showMinus && !$options.hideMinus && _ctx.$slots["minus"] != null ? {
-    b: common_vendor.o(($event) => $options.clickHandler("minus"), "b0"),
-    c: common_vendor.o(($event) => $options.onTouchStart("minus"), "70"),
-    d: common_vendor.o((...args) => $options.clearTimeout && $options.clearTimeout(...args), "0d")
-  } : _ctx.showMinus && !$options.hideMinus ? {
-    f: common_vendor.p({
-      name: "minus",
-      color: $options.isDisabled("minus") ? "#c8c9cc" : "#323233",
-      size: "15",
-      bold: true,
-      customStyle: _ctx.iconStyle,
-      class: "data-v-ea035928"
-    }),
-    g: common_vendor.o(($event) => $options.clickHandler("minus"), "3f"),
-    h: common_vendor.o(($event) => $options.onTouchStart("minus"), "eb"),
-    i: common_vendor.o((...args) => $options.clearTimeout && $options.clearTimeout(...args), "6b"),
-    j: $options.isDisabled("minus") ? 1 : "",
-    k: common_vendor.s($options.buttonStyle("minus"))
-  } : {}, {
-    e: _ctx.showMinus && !$options.hideMinus,
-    l: !$options.hideMinus
-  }, !$options.hideMinus ? {
-    m: _ctx.disabledInput || _ctx.disabled,
-    n: $options.getCursorSpacing,
-    o: _ctx.disabled || _ctx.disabledInput ? 1 : "",
-    p: $data.currentValue,
-    q: common_vendor.o((...args) => $options.onBlur && $options.onBlur(...args), "dc"),
-    r: common_vendor.o((...args) => $options.onFocus && $options.onFocus(...args), "05"),
-    s: common_vendor.o((...args) => $options.onInput && $options.onInput(...args), "6c"),
-    t: common_vendor.s($options.inputStyle)
-  } : {}, {
-    v: _ctx.showPlus && _ctx.$slots["plus"] != null
-  }, _ctx.showPlus && _ctx.$slots["plus"] != null ? {
-    w: common_vendor.o(($event) => $options.clickHandler("plus"), "d2"),
-    x: common_vendor.o(($event) => $options.onTouchStart("plus"), "f6"),
-    y: common_vendor.o((...args) => $options.clearTimeout && $options.clearTimeout(...args), "f8")
-  } : _ctx.showPlus ? {
-    A: common_vendor.p({
-      name: "plus",
-      color: $options.isDisabled("plus") ? "#c8c9cc" : "#323233",
-      size: "15",
-      bold: true,
-      customStyle: _ctx.iconStyle,
-      class: "data-v-ea035928"
-    }),
-    B: common_vendor.o(($event) => $options.clickHandler("plus"), "c3"),
-    C: common_vendor.o(($event) => $options.onTouchStart("plus"), "52"),
-    D: common_vendor.o((...args) => $options.clearTimeout && $options.clearTimeout(...args), "fc"),
-    E: $options.isDisabled("plus") ? 1 : "",
-    F: common_vendor.s($options.buttonStyle("plus"))
-  } : {}, {
-    z: _ctx.showPlus,
-    G: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    H: `${_ctx.u_s_b_h}px`,
-    I: `${_ctx.u_s_a_i_b}px`,
-    J: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
+  name: "up-number-box"
+}, { __name: "up-number-box", props: {
+  name: {
+    type: [String, Number],
+    default: ""
+  },
+  modelValue: {
+    type: [String, Number],
+    default: 0
+  },
+  min: {
+    type: [String, Number],
+    default: 1
+  },
+  max: {
+    type: [String, Number],
+    default: 999999999
+  },
+  step: {
+    type: [String, Number],
+    default: 1
+  },
+  integer: {
+    type: Boolean,
+    default: false
+  },
+  disabled: {
+    type: Boolean,
+    default: false
+  },
+  disabledInput: {
+    type: Boolean,
+    default: false
+  },
+  asyncChange: {
+    type: Boolean,
+    default: false
+  },
+  inputWidth: {
+    type: [String, Number],
+    default: 35
+  },
+  showMinus: {
+    type: Boolean,
+    default: true
+  },
+  showPlus: {
+    type: Boolean,
+    default: true
+  },
+  decimalLength: {
+    type: [String, Number],
+    default: 0
+  },
+  longPress: {
+    type: Boolean,
+    default: true
+  },
+  color: {
+    type: String,
+    default: "#323233"
+  },
+  buttonWidth: {
+    type: [String, Number],
+    default: 35
+  },
+  buttonSize: {
+    type: [String, Number],
+    default: 30
+  },
+  buttonRadius: {
+    type: String,
+    default: "4px"
+  },
+  bgColor: {
+    type: String,
+    default: "#EBECEE"
+  },
+  disabledBgColor: {
+    type: String,
+    default: "#f7f8fa"
+  },
+  inputBgColor: {
+    type: String,
+    default: ""
+  },
+  cursorSpacing: {
+    type: [String, Number],
+    default: 100
+  },
+  disablePlus: {
+    type: Boolean,
+    default: false
+  },
+  disableMinus: {
+    type: Boolean,
+    default: false
+  },
+  iconStyle: {
+    type: [Object, String],
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
+    }
+  },
+  miniMode: {
+    type: Boolean,
+    default: false
+  }
+}, emits: ["update:modelValue", "focus", "blur", "overlimit", "change", "plus", "minus"], setup(__props, _a) {
+  var __emit = _a.emit;
+  const props = __props;
+  const emit = __emit;
+  const type = common_vendor.ref("");
+  const currentValue = common_vendor.ref("");
+  const longPressTimer = common_vendor.ref(null);
+  const hideMinus = common_vendor.computed(() => {
+    return currentValue.value.toString() == "0" && props.miniMode == true;
   });
-}
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-ea035928"]]);
+  const getCursorSpacing = common_vendor.computed(() => {
+    return uni_modules_uviewUltra_libs_function_index.getPx(props.cursorSpacing);
+  });
+  const inputStyle = common_vendor.computed(() => {
+    const style = new common_vendor.UTSJSONObject({
+      color: props.color,
+      backgroundColor: props.inputBgColor != "" ? props.inputBgColor : props.bgColor,
+      height: uni_modules_uviewUltra_libs_function_index.addUnit(props.buttonSize),
+      width: uni_modules_uviewUltra_libs_function_index.addUnit(props.inputWidth)
+    });
+    return style;
+  });
+  function filter(value) {
+    let val = value.toString();
+    val = val.replace(/[^0-9.-]/g, "");
+    if (props.integer && val.indexOf(".") != -1) {
+      val = val.split(".")[0];
+    }
+    return val;
+  }
+  function format(value) {
+    const filtered = filter(value);
+    let valueNum = filtered == "" ? 0 : parseFloat(filtered);
+    const minVal = parseFloat(props.min.toString());
+    const maxVal = parseFloat(props.max.toString());
+    valueNum = Math.max(Math.min(maxVal, valueNum), minVal);
+    const decimalLen = parseInt(props.decimalLength.toString());
+    if (decimalLen != 0 && valueNum != 0) {
+      valueNum = parseFloat(valueNum.toFixed(decimalLen));
+    }
+    return valueNum;
+  }
+  function isDisabled(btnType) {
+    if (btnType === "plus") {
+      return props.disabled || props.disablePlus;
+    }
+    return props.disabled || props.disableMinus || parseFloat(currentValue.value.toString()) <= parseFloat(props.min.toString());
+  }
+  function buttonStyle(btnType) {
+    const style = new common_vendor.UTSJSONObject({
+      backgroundColor: props.bgColor,
+      width: uni_modules_uviewUltra_libs_function_index.addUnit(props.buttonWidth),
+      height: uni_modules_uviewUltra_libs_function_index.addUnit(props.buttonSize),
+      borderRadius: props.buttonRadius
+    });
+    if (isDisabled(btnType)) {
+      style["backgroundColor"] = props.disabledBgColor;
+    }
+    return style;
+  }
+  function emitChange(value, changeType = "") {
+    if (!props.asyncChange) {
+      common_vendor.nextTick$1(() => {
+        emit("update:modelValue", value);
+        currentValue.value = value;
+      });
+    }
+    emit("change", new common_vendor.UTSJSONObject({
+      value: parseFloat(value.toString()),
+      name: props.name,
+      type: changeType
+    }));
+  }
+  function check() {
+    const val = format(currentValue.value.toString());
+    if (val !== currentValue.value) {
+      currentValue.value = val;
+      emitChange(val);
+    }
+  }
+  function add(num1, num2) {
+    const cardinal = Math.pow(10, 10);
+    return Math.round((num1 + num2) * cardinal) / cardinal;
+  }
+  function onChange() {
+    const crtType = type.value;
+    if (isDisabled(crtType)) {
+      emit("overlimit", crtType);
+      return null;
+    }
+    const stepVal = parseFloat(props.step.toString());
+    const diff = crtType === "minus" ? -stepVal : stepVal;
+    const value = format(add(parseFloat(currentValue.value.toString()), diff).toString());
+    emitChange(value, crtType);
+    if (crtType == "plus") {
+      emit("plus");
+    } else if (crtType == "minus") {
+      emit("minus");
+    }
+  }
+  function clearTimeoutHandler() {
+    if (longPressTimer.value != null) {
+      clearTimeout(longPressTimer.value);
+      longPressTimer.value = null;
+    }
+  }
+  function longPressStep() {
+    clearTimeoutHandler();
+    longPressTimer.value = setTimeout(() => {
+      onChange();
+      longPressStep();
+    }, 250);
+  }
+  function onTouchStart(btnType) {
+    if (!props.longPress)
+      return null;
+    clearTimeoutHandler();
+    type.value = btnType;
+    longPressTimer.value = setTimeout(() => {
+      onChange();
+      longPressStep();
+    }, 600);
+  }
+  function clickHandler(btnType) {
+    type.value = btnType;
+    onChange();
+  }
+  function onFocus(event) {
+    emit("focus", new common_vendor.UTSJSONObject(Object.assign(Object.assign({}, event.detail), { name: props.name })));
+  }
+  function onBlur(event) {
+    const value = format(event.detail.value);
+    emitChange(value);
+    emit("blur", new common_vendor.UTSJSONObject(Object.assign(Object.assign({}, event.detail), { name: props.name })));
+  }
+  function onInput(e) {
+    const value = e.detail.value;
+    if (value === "") {
+      currentValue.value = "";
+      return null;
+    }
+    let formatted = filter(value.toString());
+    emitChange(value);
+    const decimalLen = parseInt(props.decimalLength.toString());
+    if (formatted.indexOf(".") != -1 && decimalLen > 0) {
+      const pair = formatted.split(".");
+      formatted = `${pair[0]}.${pair[1].slice(0, decimalLen)}`;
+    }
+    const formatted2 = format(formatted);
+    emitChange(formatted2);
+  }
+  function init() {
+    currentValue.value = format(props.modelValue != null ? props.modelValue.toString() : "0");
+  }
+  common_vendor.watch(() => {
+    return props.modelValue;
+  }, (newV) => {
+    if (newV !== currentValue.value) {
+      currentValue.value = format(newV.toString());
+    }
+  });
+  common_vendor.watch(() => {
+    return [props.integer, props.decimalLength, props.min, props.max];
+  }, () => {
+    check();
+  });
+  common_vendor.onMounted(() => {
+    init();
+  });
+  return (_ctx, _cache) => {
+    "raw js";
+    const __returned__ = common_vendor.e({
+      a: __props.showMinus && !hideMinus.value && _ctx.$slots["minus"] != null
+    }, __props.showMinus && !hideMinus.value && _ctx.$slots["minus"] != null ? {
+      b: common_vendor.o(($event) => {
+        return clickHandler("minus");
+      }, "49"),
+      c: common_vendor.o(($event) => {
+        return onTouchStart("minus");
+      }, "b1"),
+      d: common_vendor.o(clearTimeoutHandler, "f7")
+    } : __props.showMinus && !hideMinus.value ? {
+      f: common_vendor.p({
+        name: "minus",
+        color: isDisabled("minus") ? "#c8c9cc" : "#323233",
+        size: "15",
+        bold: true,
+        customStyle: __props.iconStyle,
+        class: "data-v-ea035928"
+      }),
+      g: common_vendor.o(($event) => {
+        return clickHandler("minus");
+      }, "f4"),
+      h: common_vendor.o(($event) => {
+        return onTouchStart("minus");
+      }, "74"),
+      i: common_vendor.o(clearTimeoutHandler, "63"),
+      j: isDisabled("minus") ? 1 : "",
+      k: common_vendor.s(buttonStyle("minus"))
+    } : {}, {
+      e: __props.showMinus && !hideMinus.value,
+      l: !hideMinus.value
+    }, !hideMinus.value ? {
+      m: __props.disabledInput || __props.disabled,
+      n: getCursorSpacing.value,
+      o: __props.disabled || __props.disabledInput ? 1 : "",
+      p: currentValue.value,
+      q: common_vendor.o(onBlur, "ec"),
+      r: common_vendor.o(onFocus, "17"),
+      s: common_vendor.o(onInput, "dd"),
+      t: common_vendor.s(inputStyle.value)
+    } : {}, {
+      v: __props.showPlus && _ctx.$slots["plus"] != null
+    }, __props.showPlus && _ctx.$slots["plus"] != null ? {
+      w: common_vendor.o(($event) => {
+        return clickHandler("plus");
+      }, "f2"),
+      x: common_vendor.o(($event) => {
+        return onTouchStart("plus");
+      }, "f7"),
+      y: common_vendor.o(clearTimeoutHandler, "96")
+    } : __props.showPlus ? {
+      A: common_vendor.p({
+        name: "plus",
+        color: isDisabled("plus") ? "#c8c9cc" : "#323233",
+        size: "15",
+        bold: true,
+        customStyle: __props.iconStyle,
+        class: "data-v-ea035928"
+      }),
+      B: common_vendor.o(($event) => {
+        return clickHandler("plus");
+      }, "96"),
+      C: common_vendor.o(($event) => {
+        return onTouchStart("plus");
+      }, "10"),
+      D: common_vendor.o(clearTimeoutHandler, "f3"),
+      E: isDisabled("plus") ? 1 : "",
+      F: common_vendor.s(buttonStyle("plus"))
+    } : {}, {
+      z: __props.showPlus,
+      G: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+      H: `${_ctx.u_s_b_h}px`,
+      I: `${_ctx.u_s_a_i_b}px`,
+      J: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+    });
+    return __returned__;
+  };
+} }));
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-ea035928"]]);
 wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-ultra/components/up-number-box/up-number-box.js.map

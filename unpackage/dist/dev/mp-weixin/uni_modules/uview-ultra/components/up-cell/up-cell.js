@@ -16,6 +16,16 @@ if (!Math) {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   name: "up-cell"
 }, { __name: "up-cell", props: {
+  customStyle: {
+    type: [Object, String],
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
+    }
+  },
+  customClass: {
+    type: String,
+    default: ""
+  },
   title: {
     type: String,
     default: uni_modules_uviewUltra_components_upCell_cell.defProps.getString("cell.title")
@@ -98,6 +108,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   const titleTextStyle = common_vendor.computed(() => {
     return uni_modules_uviewUltra_libs_function_index.addStyle(props.titleStyle);
   });
+  const customCellStyle = common_vendor.computed(() => {
+    return uni_modules_uviewUltra_libs_function_index.addStyle(props.customStyle);
+  });
   const clickHandler = (e = null) => {
     if (props.disabled)
       return null;
@@ -125,57 +138,65 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       c: common_vendor.p({
         name: __props.icon,
         ["custom-style"]: __props.iconStyle,
-        size: __props.size === "large" ? "22px" : "18px",
+        size: __props.size == "large" ? "22px" : "18px",
         class: "data-v-7b2bd41d"
       })
     }) : {}, {
       d: _ctx.$slots["title"] != null && __props.title == ""
     }, _ctx.$slots["title"] != null && __props.title == "" ? {} : {
       e: common_vendor.t(__props.title),
-      f: common_vendor.s(titleTextStyle.value)
+      f: common_vendor.s(titleTextStyle.value),
+      g: __props.disabled ? 1 : "",
+      h: __props.size == "large" ? 1 : ""
     }, {
-      g: __props.label
-    }, __props.label ? {
-      h: common_vendor.t(__props.label)
+      i: __props.label != ""
+    }, __props.label != "" ? {
+      j: common_vendor.t(__props.label),
+      k: __props.disabled ? 1 : "",
+      l: __props.size == "large" ? 1 : ""
     } : {}, {
-      i: testEmpty(__props.value) == false
+      m: testEmpty(__props.value) == false
     }, testEmpty(__props.value) == false ? {
-      j: common_vendor.t(__props.value)
+      n: common_vendor.t(__props.value),
+      o: __props.disabled ? 1 : "",
+      p: __props.size == "large" ? 1 : ""
     } : {}, {
-      k: _ctx.$slots["right-icon"] != null || __props.isLink
+      q: _ctx.$slots["right-icon"] != null || __props.isLink
     }, _ctx.$slots["right-icon"] != null || __props.isLink ? common_vendor.e({
-      l: __props.rightIcon
-    }, __props.rightIcon ? {
-      m: common_vendor.p({
+      r: __props.rightIcon != ""
+    }, __props.rightIcon != "" ? {
+      s: common_vendor.p({
         name: __props.rightIcon,
         ["custom-style"]: __props.rightIconStyle,
         color: __props.disabled ? "#c8c9cc" : "info",
-        size: __props.size === "large" ? "18px" : "16px",
+        size: __props.size == "large" ? "18px" : "16px",
         class: "data-v-7b2bd41d"
       })
     } : {}, {
-      n: common_vendor.n(`up-cell__right-icon-wrap--${__props.arrowDirection}`)
+      t: common_vendor.n(`up-cell__right-icon-wrap--${__props.arrowDirection}`)
     }) : {}, {
-      o: _ctx.$slots["righticon"] != null
+      v: _ctx.$slots["righticon"] != null
     }, _ctx.$slots["righticon"] != null ? {
-      p: common_vendor.n(`up-cell__right-icon-wrap--${__props.arrowDirection}`)
+      w: common_vendor.n(`up-cell__right-icon-wrap--${__props.arrowDirection}`)
     } : {}, {
-      q: __props.border
+      x: __props.center ? 1 : "",
+      y: __props.size == "large" ? 1 : "",
+      z: __props.border
     }, __props.border ? {
-      r: common_vendor.p({
+      A: common_vendor.p({
         class: "data-v-7b2bd41d"
       })
     } : {}, {
-      s: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-      t: common_vendor.n(_ctx.customClass),
-      v: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
-      w: common_vendor.s(_ctx.$up.addStyle(_ctx.customStyle)),
-      x: common_vendor.s({
+      B: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+      C: common_vendor.n(__props.customClass),
+      D: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+      E: common_vendor.s(customCellStyle.value),
+      F: common_vendor.s({
         "--status-bar-height": `${_ctx.u_s_b_h}px`,
         "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
       }),
-      y: !__props.disabled && (__props.clickable || __props.isLink) ? "up-cell--clickable" : "",
-      z: common_vendor.o(clickHandler, "d9")
+      G: !__props.disabled && (__props.clickable || __props.isLink) ? "up-cell--clickable" : "",
+      H: common_vendor.o(clickHandler, "b6")
     });
     return __returned__;
   };

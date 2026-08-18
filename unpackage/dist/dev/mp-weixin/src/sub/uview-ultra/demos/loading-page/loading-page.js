@@ -34,7 +34,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           ["bg-color"]: "#ffffff",
           class: "data-v-d347fcfa"
         }),
-        b: common_vendor.o(triggerLoadingPage, "26"),
+        b: common_vendor.o(triggerLoadingPage, "1e"),
         c: common_vendor.p({
           type: "primary",
           text: "触发全屏加载",

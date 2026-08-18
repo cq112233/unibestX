@@ -54,7 +54,7 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
+import { ref } from 'vue';
 
 const listItems = ref([
   { title: '列表 1 - 项目 01', desc: '支持下拉刷新与触底加载' },
@@ -71,8 +71,8 @@ const listItems = ref([
   { title: '列表 1 - 项目 12', desc: '支持单指内部滚动' },
   { title: '列表 1 - 项目 13', desc: '支持单指内部滚动' },
   { title: '列表 1 - 项目 14', desc: '支持单指内部滚动' },
-  { title: '列表 1 - 项目 15', desc: '支持单指内部滚动' },
-] as UTSJSONObject[])
+  { title: '列表 1 - 项目 15', desc: '支持单指内部滚动' }
+] as UTSJSONObject[]);
 
 const staticListItems = ref([
   { title: '列表 2 - 项目 01', desc: '静态列表第 1 项内容' },
@@ -89,38 +89,38 @@ const staticListItems = ref([
   { title: '列表 2 - 项目 12', desc: '静态列表第 12 项内容' },
   { title: '列表 2 - 项目 13', desc: '静态列表第 13 项内容' },
   { title: '列表 2 - 项目 14', desc: '静态列表第 14 项内容' },
-  { title: '列表 2 - 项目 15', desc: '静态列表第 15 项内容' },
-] as UTSJSONObject[])
+  { title: '列表 2 - 项目 15', desc: '静态列表第 15 项内容' }
+] as UTSJSONObject[]);
 
-const listLoading = ref(false)
-const listRefreshing = ref(false)
-let listLoadCount = 1
+const listLoading = ref(false);
+const listRefreshing = ref(false);
+let listLoadCount = 1;
 
 function onListLoadMore(): void {
   if (listLoading.value)
-    return
-  listLoading.value = true
+    return;
+  listLoading.value = true;
   setTimeout(() => {
-    listLoadCount += 1
-    const newItems: UTSJSONObject[] = []
+    listLoadCount += 1;
+    const newItems: UTSJSONObject[] = [];
     for (let i = 1; i <= 3; i++) {
       newItems.push({
         title: `加载项 ${listLoadCount}-${i}`,
-        desc: `这是第 ${listLoadCount} 批加载的第 ${i} 条数据`,
-      } as UTSJSONObject)
+        desc: `这是第 ${listLoadCount} 批加载的第 ${i} 条数据`
+      } as UTSJSONObject);
     }
-    listItems.value = listItems.value.concat(newItems)
-    listLoading.value = false
-    uni.showToast({ title: `加载了 ${newItems.length} 条`, icon: 'none', duration: 1500 })
-  }, 1000)
+    listItems.value = listItems.value.concat(newItems);
+    listLoading.value = false;
+    uni.showToast({ title: `加载了 ${newItems.length} 条`, icon: 'none', duration: 1500 });
+  }, 1000);
 }
 
 function onListRefresh(): void {
-  listRefreshing.value = true
+  listRefreshing.value = true;
   setTimeout(() => {
-    listRefreshing.value = false
-    uni.showToast({ title: '刷新完成', icon: 'none', duration: 1500 })
-  }, 1500)
+    listRefreshing.value = false;
+    uni.showToast({ title: '刷新完成', icon: 'none', duration: 1500 });
+  }, 1500);
 }
 </script>
 

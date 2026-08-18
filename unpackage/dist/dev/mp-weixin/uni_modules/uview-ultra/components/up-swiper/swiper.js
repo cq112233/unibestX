@@ -1,6 +1,6 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const defProps = new common_vendor.UTSJSONObject({
+new common_vendor.UTSJSONObject({
   // swiper 组件
   swiper: new common_vendor.UTSJSONObject({
     list: [],
@@ -30,5 +30,4 @@ const defProps = new common_vendor.UTSJSONObject({
     showTitle: false
   })
 });
-exports.defProps = defProps;
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-ultra/components/up-swiper/swiper.js.map

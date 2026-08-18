@@ -44,10 +44,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           label: "香蕉",
           class: "mb-10px mr-20px data-v-9ec856da"
         }),
-        d: common_vendor.o(checkboxChange, "22"),
+        d: common_vendor.o(checkboxChange, "cf"),
         e: common_vendor.o(($event) => {
           return checkboxValue1.value = $event;
-        }, "b6"),
+        }, "e2"),
         f: common_vendor.p({
           modelValue: checkboxValue1.value,
           class: "data-v-9ec856da"
@@ -65,7 +65,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         i: common_vendor.o(($event) => {
           return checkboxValue2.value = $event;
-        }, "da"),
+        }, "ad"),
         j: common_vendor.p({
           modelValue: checkboxValue2.value,
           class: "data-v-9ec856da"
@@ -86,7 +86,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         m: common_vendor.o(($event) => {
           return checkboxValue3.value = $event;
-        }, "fd"),
+        }, "23"),
         n: common_vendor.p({
           modelValue: checkboxValue3.value,
           class: "data-v-9ec856da"
@@ -99,7 +99,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         p: common_vendor.o(($event) => {
           return checkboxValue4.value = $event;
-        }, "cf"),
+        }, "73"),
         q: common_vendor.p({
           modelValue: checkboxValue4.value,
           class: "data-v-9ec856da"

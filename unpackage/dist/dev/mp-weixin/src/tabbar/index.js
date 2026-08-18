@@ -38,13 +38,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       common_vendor.index.switchTab({ url });
     }
     common_vendor.onMounted(() => {
-      src_utils_systemInfo.updateSystemInfo();
       src_tabbar_store.syncCurIdxByCurrentPage();
-      common_vendor.index.hideTabBar(new common_vendor.UTSJSONObject({
-        fail: (err = null) => {
-          common_vendor.index.__f__("log", "at src/tabbar/index.uvue:52", "hideTabBar fail: ", err);
-        }
-      }));
     });
     return (_ctx, _cache) => {
       "raw js";

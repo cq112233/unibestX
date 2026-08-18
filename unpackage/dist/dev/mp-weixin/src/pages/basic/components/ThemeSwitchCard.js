@@ -11,6 +11,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "ThemeSwitchCard",
   setup(__props) {
     const appStore = src_store_app.useAppStore();
+    const themeTitle = common_vendor.computed(() => {
+      return src_utils_i18n.$t("basic.themeTitle");
+    });
+    const themePreview = common_vendor.computed(() => {
+      return src_utils_i18n.$t("basic.themePreview");
+    });
+    const themeButton = common_vendor.computed(() => {
+      return src_utils_i18n.$t("basic.themeButton");
+    });
+    const currentTheme = common_vendor.computed(() => {
+      return appStore.state.theme;
+    });
     const colorOptions = [
       "#37c2bc",
       "#0957DE",
@@ -21,7 +33,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function changeTheme(color) {
       appStore.setTheme(color);
       common_vendor.index.showToast({
-        title: src_utils_i18n.t("basic.themeSuccess", null),
+        title: src_utils_i18n.$t("basic.themeSuccess"),
         icon: "none",
         duration: 1500
       });
@@ -29,16 +41,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
-        a: common_vendor.t(_ctx.$t("basic.themePreview")),
-        b: common_vendor.t(_ctx.$t("basic.themeButton")),
-        c: common_vendor.unref(appStore).state.theme,
+        a: common_vendor.t(themePreview.value),
+        b: common_vendor.t(themeButton.value),
+        c: currentTheme.value,
         d: common_vendor.f(colorOptions, (item, index, i0) => {
           return common_vendor.e({
-            a: common_vendor.unref(appStore).state.theme === item
-          }, common_vendor.unref(appStore).state.theme === item ? {} : {}, {
+            a: currentTheme.value == item
+          }, currentTheme.value == item ? {} : {}, {
             b: index,
             c: item,
-            d: common_vendor.unref(appStore).state.theme === item ? "3px" : "0px",
+            d: currentTheme.value == item ? "3px" : "0px",
             e: common_vendor.o(($event) => {
               return changeTheme(item);
             }, index)
@@ -46,9 +58,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         e: common_vendor.gei(_ctx, ""),
         f: common_vendor.p({
-          title: _ctx.$t("basic.themeTitle"),
-          id: common_vendor.gei(_ctx, ""),
-          class: "data-v-6f3d2a74"
+          title: themeTitle.value,
+          id: common_vendor.gei(_ctx, "")
         }),
         g: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
@@ -56,6 +67,5 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-6f3d2a74"]]);
-wx.createComponent(Component);
+wx.createComponent(_sfc_main);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/src/pages/basic/components/ThemeSwitchCard.js.map

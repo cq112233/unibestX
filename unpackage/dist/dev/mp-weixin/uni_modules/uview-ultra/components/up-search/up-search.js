@@ -1,196 +1,303 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const uni_modules_uviewUltra_components_upSearch_props = require("./props.js");
-const uni_modules_uviewUltra_libs_mixin_mpMixin = require("../../libs/mixin/mpMixin.js");
-const uni_modules_uviewUltra_libs_mixin_mixin = require("../../libs/mixin/mixin.js");
 const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
-const _sfc_main = common_vendor.defineComponent({
-  name: "up-search",
-  mixins: [uni_modules_uviewUltra_libs_mixin_mpMixin.mpMixin, uni_modules_uviewUltra_libs_mixin_mixin.mixin, uni_modules_uviewUltra_components_upSearch_props.propsSearch],
-  data() {
-    return {
-      keyword: "",
-      show: false,
-      // 标记input当前状态是否处于聚焦中，如果是，才会显示右侧的清除控件
-      focused: false
-      // 绑定输入框的值
-      // inputValue: this.value
-    };
-  },
-  mounted() {
-    this.focused = this.focus;
-  },
-  watch: {
-    keyword(nVal) {
-      this.$emit("update:modelValue", nVal);
-      this.$emit("change", nVal);
-    },
-    modelValue: {
-      immediate: true,
-      handler(nVal) {
-      }
-    }
-  },
-  computed: {
-    showActionBtn() {
-      return !this.animation && this.showAction;
-    },
-    // 是否显示清除控件
-    isShowClear() {
-      let clearabled = this.$props["clearabled"];
-      let focused = this.$data["focused"];
-      let keyword = this.$data["keyword"];
-      let onlyClearableOnFocused = this.$props["onlyClearableOnFocused"];
-      if (!clearabled) {
-        return false;
-      }
-      if (onlyClearableOnFocused) {
-        return !!focused && keyword !== "";
-      } else {
-        return keyword !== "";
-      }
-    }
-  },
-  emits: ["clear", "search", "custom", "focus", "blur", "click", "clickIcon", "update:modelValue", "change"],
-  methods: {
-    addUnit(e = null) {
-      return uni_modules_uviewUltra_libs_function_index.addUnit(e);
-    },
-    addStyle(e = null) {
-      return uni_modules_uviewUltra_libs_function_index.addStyle(e);
-    },
-    // 目前HX2.6.9 v-model双向绑定无效，故监听input事件获取输入框内容的变化
-    inputChange(e) {
-      this.keyword = e.detail.value;
-    },
-    // 清空输入
-    // 也可以作为用户通过this.$refs形式调用清空输入框内容
-    clear() {
-      this.keyword = "";
-      this.$nextTick(() => {
-        this.$emit("clear");
-      });
-    },
-    // 确定搜索
-    search(e) {
-      this.$emit("search", e.detail.value);
-      try {
-        common_vendor.index.hideKeyboard();
-      } catch (e2) {
-      }
-    },
-    // 点击右边自定义按钮的事件
-    custom() {
-      this.$emit("custom", this.keyword);
-      try {
-        common_vendor.index.hideKeyboard();
-      } catch (e) {
-      }
-    },
-    // 获取焦点
-    getFocus() {
-      this.focused = true;
-      if (this.animation && this.showAction)
-        this.show = true;
-      this.$emit("focus", this.keyword);
-    },
-    // 失去焦点
-    blurFunc() {
-      setTimeout(() => {
-        this.focused = false;
-      }, 100);
-      this.show = false;
-      this.$emit("blur", this.keyword);
-    },
-    // 点击搜索框，只有disabled=true时才发出事件，因为禁止了输入，意味着是想跳转真正的搜索页
-    clickHandler() {
-      if (this.disabled)
-        this.$emit("click");
-    },
-    // 点击左边图标
-    clickIcon(e) {
-      this.$emit("clickIcon", this.keyword);
-      try {
-        common_vendor.index.hideKeyboard();
-      } catch (e2) {
-      }
-    }
-  }
-});
 if (!Array) {
-  const _easycom_up_icon2 = common_vendor.resolveComponent("up-icon");
-  _easycom_up_icon2();
+  const _easycom_up_icon_1 = common_vendor.resolveComponent("up-icon");
+  _easycom_up_icon_1();
 }
 const _easycom_up_icon = () => "../up-icon/up-icon.js";
 if (!Math) {
   _easycom_up_icon();
 }
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  "raw js";
-  return common_vendor.e({
-    a: _ctx.$slots["label"] != null || _ctx.label !== null
-  }, _ctx.$slots["label"] != null || _ctx.label !== null ? {
-    b: common_vendor.t(_ctx.label)
-  } : {}, {
-    c: common_vendor.o($options.clickIcon, "10"),
-    d: common_vendor.p({
-      size: _ctx.searchIconSize,
-      name: _ctx.searchIcon,
-      color: _ctx.searchIconColor != "" ? _ctx.searchIconColor : _ctx.color,
-      class: "data-v-86b11a81"
-    }),
-    e: common_vendor.o((...args) => $options.blurFunc && $options.blurFunc(...args), "c9"),
-    f: $data.keyword,
-    g: common_vendor.o((...args) => $options.search && $options.search(...args), "22"),
-    h: common_vendor.o((...args) => $options.inputChange && $options.inputChange(...args), "f8"),
-    i: _ctx.disabled,
-    j: common_vendor.o((...args) => $options.getFocus && $options.getFocus(...args), "87"),
-    k: _ctx.focus,
-    l: _ctx.maxlength,
-    m: _ctx.adjustPosition,
-    n: _ctx.autoBlur,
-    o: _ctx.placeholder,
-    p: `color: ${_ctx.placeholderColor}`,
-    q: common_vendor.s({
-      pointerEvents: _ctx.disabled ? "none" : "auto",
-      textAlign: _ctx.inputAlign,
-      color: _ctx.color,
-      backgroundColor: _ctx.bgColor,
-      height: $options.addUnit(_ctx.height)
-    }),
-    r: common_vendor.s(_ctx.inputStyle),
-    s: $options.isShowClear
-  }, $options.isShowClear ? {
-    t: common_vendor.p({
-      name: "close",
-      size: "11",
-      color: "#ffffff",
-      customStyle: "line-height: 12px",
-      class: "data-v-86b11a81"
-    }),
-    v: common_vendor.o((...args) => $options.clear && $options.clear(...args), "4d")
-  } : {}, {
-    w: _ctx.bgColor,
-    x: _ctx.shape == "round" ? "100px" : "4px",
-    y: _ctx.borderColor,
-    z: common_vendor.t(_ctx.actionText),
-    A: common_vendor.s(_ctx.actionStyle),
-    B: common_vendor.n($options.showActionBtn || $data.show ? "up-search__action--active" : ""),
-    C: common_vendor.o((...args) => $options.custom && $options.custom(...args), "b7"),
-    D: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    E: common_vendor.n(_ctx.iconPosition === "right" ? "up-search__reverse" : ""),
-    F: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
-    G: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args), "74"),
-    H: common_vendor.s({
-      margin: _ctx.margin
-    }),
-    I: common_vendor.s($options.addStyle(_ctx.customStyle)),
-    J: common_vendor.s({
-      "--status-bar-height": `${_ctx.u_s_b_h}px`,
-      "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
-    })
+const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
+  name: "up-search"
+}, { __name: "up-search", props: {
+  shape: {
+    type: String,
+    default: "round"
+  },
+  bgColor: {
+    type: String,
+    default: "#f2f2f2"
+  },
+  placeholder: {
+    type: String,
+    default: "请输入关键字"
+  },
+  clearabled: {
+    type: Boolean,
+    default: true
+  },
+  focus: {
+    type: Boolean,
+    default: false
+  },
+  showAction: {
+    type: Boolean,
+    default: true
+  },
+  actionStyle: {
+    type: Object,
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
+    }
+  },
+  actionText: {
+    type: String,
+    default: "搜索"
+  },
+  inputAlign: {
+    type: String,
+    default: "left"
+  },
+  inputStyle: {
+    type: Object,
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
+    }
+  },
+  disabled: {
+    type: Boolean,
+    default: false
+  },
+  borderColor: {
+    type: String,
+    default: "transparent"
+  },
+  searchIconColor: {
+    type: String,
+    default: "#909399"
+  },
+  searchIconSize: {
+    type: [Number, String],
+    default: 22
+  },
+  color: {
+    type: String,
+    default: "#606266"
+  },
+  placeholderColor: {
+    type: String,
+    default: "#909399"
+  },
+  searchIcon: {
+    type: String,
+    default: "search"
+  },
+  iconPosition: {
+    type: String,
+    default: "left"
+  },
+  margin: {
+    type: String,
+    default: "0"
+  },
+  animation: {
+    type: Boolean,
+    default: false
+  },
+  modelValue: {
+    type: [String, Number],
+    default: ""
+  },
+  maxlength: {
+    type: [String, Number],
+    default: -1
+  },
+  height: {
+    type: [String, Number],
+    default: 34
+  },
+  label: {
+    type: String,
+    default: ""
+  },
+  adjustPosition: {
+    type: Boolean,
+    default: true
+  },
+  autoBlur: {
+    type: Boolean,
+    default: false
+  },
+  onlyClearableOnFocused: {
+    type: Boolean,
+    default: true
+  },
+  customStyle: {
+    type: Object,
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
+    }
+  }
+}, emits: ["clear", "search", "custom", "focus", "blur", "click", "clickIcon", "update:modelValue", "change"], setup(__props, _a) {
+  var __expose = _a.expose, __emit = _a.emit;
+  const props = __props;
+  const emit = __emit;
+  const keyword = common_vendor.ref(props.modelValue.toString());
+  const show = common_vendor.ref(false);
+  const focused = common_vendor.ref(false);
+  common_vendor.watch(() => {
+    return props.modelValue;
+  }, (nVal = null) => {
+    keyword.value = nVal != null ? nVal.toString() : "";
   });
-}
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-86b11a81"]]);
+  const searchStyle = common_vendor.computed(() => {
+    const base = new common_vendor.UTSJSONObject({
+      margin: props.margin
+    });
+    const custom2 = uni_modules_uviewUltra_libs_function_index.addStyle(props.customStyle);
+    return uni_modules_uviewUltra_libs_function_index.deepMerge(base, custom2);
+  });
+  const contentStyle = common_vendor.computed(() => {
+    return new common_vendor.UTSJSONObject({
+      backgroundColor: props.bgColor,
+      borderRadius: props.shape == "round" ? "100px" : "4px",
+      borderColor: props.borderColor
+    });
+  });
+  const inputMergedStyle = common_vendor.computed(() => {
+    var _a2;
+    const base = new common_vendor.UTSJSONObject({
+      pointerEvents: props.disabled ? "none" : "auto",
+      textAlign: props.inputAlign,
+      color: props.color,
+      backgroundColor: props.bgColor,
+      height: uni_modules_uviewUltra_libs_function_index.addUnit(props.height)
+    });
+    const custom2 = (_a2 = props.inputStyle) !== null && _a2 !== void 0 ? _a2 : new common_vendor.UTSJSONObject({});
+    return uni_modules_uviewUltra_libs_function_index.deepMerge(base, custom2);
+  });
+  const actionCustomStyle = common_vendor.computed(() => {
+    var _a2;
+    return (_a2 = props.actionStyle) !== null && _a2 !== void 0 ? _a2 : new common_vendor.UTSJSONObject({});
+  });
+  const showActionBtn = common_vendor.computed(() => {
+    return !props.animation && props.showAction;
+  });
+  const isShowClear = common_vendor.computed(() => {
+    if (!props.clearabled) {
+      return false;
+    }
+    if (props.onlyClearableOnFocused) {
+      return !!focused.value && keyword.value != "";
+    } else {
+      return keyword.value != "";
+    }
+  });
+  common_vendor.onMounted(() => {
+    focused.value = props.focus;
+  });
+  function inputChange(e) {
+    keyword.value = e.detail.value;
+    emit("update:modelValue", keyword.value);
+    emit("change", keyword.value);
+  }
+  function clear() {
+    keyword.value = "";
+    emit("update:modelValue", "");
+    emit("change", "");
+    common_vendor.nextTick$1(() => {
+      emit("clear");
+    });
+  }
+  function search(e) {
+    emit("search", e.detail.value);
+    try {
+      common_vendor.index.hideKeyboard();
+    } catch (err) {
+    }
+  }
+  function custom() {
+    emit("custom", keyword.value);
+    try {
+      common_vendor.index.hideKeyboard();
+    } catch (err) {
+    }
+  }
+  function getFocus() {
+    focused.value = true;
+    if (props.animation && props.showAction)
+      show.value = true;
+    emit("focus", keyword.value);
+  }
+  function blurFunc() {
+    setTimeout(() => {
+      focused.value = false;
+    }, 100);
+    show.value = false;
+    emit("blur", keyword.value);
+  }
+  function clickHandler() {
+    if (props.disabled)
+      emit("click");
+  }
+  function clickIcon(e) {
+    emit("clickIcon", keyword.value);
+    try {
+      common_vendor.index.hideKeyboard();
+    } catch (err) {
+    }
+  }
+  __expose({
+    clear
+  });
+  return (_ctx, _cache) => {
+    "raw js";
+    const __returned__ = common_vendor.e({
+      a: _ctx.$slots["label"] != null || __props.label != ""
+    }, _ctx.$slots["label"] != null || __props.label != "" ? {
+      b: common_vendor.t(__props.label)
+    } : {}, {
+      c: common_vendor.o(clickIcon, "b5"),
+      d: common_vendor.p({
+        size: __props.searchIconSize,
+        name: __props.searchIcon,
+        color: __props.searchIconColor != "" ? __props.searchIconColor : __props.color,
+        class: "data-v-86b11a81"
+      }),
+      e: common_vendor.o(blurFunc, "56"),
+      f: keyword.value,
+      g: common_vendor.o(search, "8d"),
+      h: common_vendor.o(inputChange, "b0"),
+      i: __props.disabled,
+      j: common_vendor.o(getFocus, "cf"),
+      k: __props.focus,
+      l: __props.maxlength,
+      m: __props.adjustPosition,
+      n: __props.autoBlur,
+      o: __props.placeholder,
+      p: `color: ${__props.placeholderColor}`,
+      q: common_vendor.s(inputMergedStyle.value),
+      r: isShowClear.value
+    }, isShowClear.value ? {
+      s: common_vendor.p({
+        name: "close",
+        size: "11",
+        color: "#ffffff",
+        customStyle: "line-height: 12px",
+        class: "data-v-86b11a81"
+      }),
+      t: common_vendor.o(clear, "a5")
+    } : {}, {
+      v: common_vendor.s(contentStyle.value),
+      w: common_vendor.t(__props.actionText),
+      x: common_vendor.s(actionCustomStyle.value),
+      y: common_vendor.n(showActionBtn.value || show.value ? "up-search__action--active" : ""),
+      z: common_vendor.o(custom, "29"),
+      A: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+      B: common_vendor.n(__props.iconPosition == "right" ? "up-search__reverse" : ""),
+      C: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+      D: common_vendor.o(clickHandler, "de"),
+      E: common_vendor.s(searchStyle.value),
+      F: common_vendor.s({
+        "--status-bar-height": `${_ctx.u_s_b_h}px`,
+        "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
+      })
+    });
+    return __returned__;
+  };
+} }));
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-86b11a81"]]);
 wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-ultra/components/up-search/up-search.js.map

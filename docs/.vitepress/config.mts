@@ -1,9 +1,9 @@
-import { defineConfig } from 'vitepress'
+import { defineConfig } from 'vitepress';
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "unibestX",
-  description: "最好的 uni-app X 开发框架",
+  title: 'unibestX',
+  description: '最好的 uni-app X 开发框架',
   base: '/unibestX/docs/',
   head: [
     ['link', { rel: 'icon', href: 'https://uniappx.oss-cn-beijing.aliyuncs.com/logo.png' }]
@@ -11,10 +11,10 @@ export default defineConfig({
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     logo: 'https://uniappx.oss-cn-beijing.aliyuncs.com/logo.png',
-    
+
     nav: [
       { text: '首页', link: '/' },
-      { text: '指南', link: '/guide/getting-started' },
+      { text: '指南', link: '/guide/getting-started' }
     ],
 
     sidebar: [
@@ -23,6 +23,7 @@ export default defineConfig({
         items: [
           { text: '快速上手', link: '/guide/getting-started' },
           { text: '核心功能', link: '/guide/features' },
+          { text: '文件路由 (uni-pages)', link: '/guide/uni-pages' },
           { text: '技术架构', link: '/guide/architecture' },
           { text: 'UTS 开发必读', link: '/guide/uts-tips' }
         ]
@@ -38,4 +39,4 @@ export default defineConfig({
       copyright: 'Copyright © 2026 HTwoO'
     }
   }
-})
+});

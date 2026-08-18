@@ -1,9 +1,9 @@
 <script setup lang="uts">
-import { checkDirectEntry } from './src/router/interceptor'
-import { loadFont } from '@/uni_modules/uview-ultra/index.uts'
+import { checkDirectEntry } from './src/router/interceptor';
+import { loadFont } from '@/uni_modules/uview-ultra/index.uts';
 
 onLaunch(() => {
-  loadFont()
+  loadFont();
   // #ifdef MP-WEIXIN
   // 微信小程序真机 @font-face 不生效，使用 uni.loadFontFace 加载 uni-icons 字体
   uni.loadFontFace({
@@ -11,19 +11,19 @@ onLaunch(() => {
     family: 'UniIconsFontFamily',
     source: 'url(\'/static/uniicons.ttf\')',
     success() {
-      console.log('global loadFontFace uniicons.ttf success')
+      console.log('global loadFontFace uniicons.ttf success');
     },
     fail(error) {
-      console.warn('global loadFontFace uniicons.ttf fail', error.errMsg)
-    },
-  })
+      console.warn('global loadFontFace uniicons.ttf fail', error.errMsg);
+    }
+  });
   // #endif
-})
+});
 
 // #ifndef APP
 onShow((options?) => {
-  checkDirectEntry(options)
-})
+  checkDirectEntry(options);
+});
 // #endif
 </script>
 

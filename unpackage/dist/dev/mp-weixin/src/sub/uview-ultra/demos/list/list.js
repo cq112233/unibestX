@@ -113,8 +113,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-47edb2b5"
         })
       } : {}, {
-        f: common_vendor.o(onListLoadMore, "db"),
-        g: common_vendor.o(onListRefresh, "b0"),
+        f: common_vendor.o(onListLoadMore, "df"),
+        g: common_vendor.o(onListRefresh, "9f"),
         h: common_vendor.p({
           height: 580,
           ["lower-threshold"]: 20,

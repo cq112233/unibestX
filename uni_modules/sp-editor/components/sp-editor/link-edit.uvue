@@ -1,71 +1,77 @@
 <template>
   <view class="link-edit-container" v-if="showPopup">
     <view class="link-edit">
-      <view class="title">添加链接</view>
+      <view class="title"><text>添加链接</text></view>
       <view class="edit">
         <view class="description">
-          链接描述：
+          <text>链接描述：</text>
           <input v-model="descVal" type="text" class="input" placeholder="请输入链接描述" />
         </view>
         <view class="address">
-          链接地址：
+          <text>链接地址：</text>
           <input v-model="addrVal" type="text" class="input" placeholder="请输入链接地址" />
         </view>
       </view>
       <view class="control">
-        <view class="cancel" @click="close">取消</view>
-        <view class="confirm" @click="onConfirm">确认</view>
+        <view class="cancel" @click="close"><text class="cancel-text">取消</text></view>
+        <view class="confirm" @click="onConfirm"><text class="confirm-text">确认</text></view>
       </view>
     </view>
     <view class="mask"></view>
   </view>
 </template>
 
-<script lang="uts">
-export default {
-  name: 'link-edit',
-  emits: ['open', 'close', 'confirm'],
-  data() {
-    return {
-      showPopup: false,
-      descVal: '',
-      addrVal: ''
-    }
-  },
-  methods: {
-    open() {
-      this.showPopup = true
-      this.$emit('open')
-    },
-    close() {
-      this.showPopup = false
-      this.descVal = ''
-      this.addrVal = ''
-      this.$emit('close')
-    },
-    onConfirm() {
-      if (this.descVal == '') {
-        uni.showToast({
-          title: '请输入链接描述',
-          icon: 'none'
-        })
-        return
-      }
-      if (this.addrVal == '') {
-        uni.showToast({
-          title: '请输入链接地址',
-          icon: 'none'
-        })
-        return
-      }
-      this.$emit('confirm', {
-        text: this.descVal,
-        href: this.addrVal
-      } as UTSJSONObject)
-      this.close()
-    }
-  }
+<script setup lang="uts">
+import { ref } from 'vue'
+
+defineOptions({
+  name: 'link-edit'
+})
+
+const emit = defineEmits(['open', 'close', 'confirm'])
+
+const showPopup = ref<boolean>(false)
+const descVal = ref<string>('')
+const addrVal = ref<string>('')
+
+function open() {
+  showPopup.value = true
+  emit('open')
 }
+
+function close() {
+  showPopup.value = false
+  descVal.value = ''
+  addrVal.value = ''
+  emit('close')
+}
+
+function onConfirm() {
+  if (descVal.value == '') {
+    uni.showToast({
+      title: '请输入链接描述',
+      icon: 'none'
+    })
+    return
+  }
+  if (addrVal.value == '') {
+    uni.showToast({
+      title: '请输入链接地址',
+      icon: 'none'
+    })
+    return
+  }
+  emit('confirm', {
+    text: descVal.value,
+    href: addrVal.value
+  } as UTSJSONObject)
+  close()
+}
+
+defineExpose({
+  open,
+  close
+})
 </script>
 
 <style lang="scss">
@@ -102,18 +108,16 @@ export default {
         font-size: 14px;
         border: 1px solid #eeeeee;
         border-radius: 8rpx;
-
-        .uni-input-placeholder {
-          color: #dddddd;
-        }
       }
 
       .description {
         display: flex;
+        flex-direction: row;
         align-items: center;
       }
       .address {
         display: flex;
+        flex-direction: row;
         align-items: center;
         margin-top: 24rpx;
       }
@@ -122,22 +126,26 @@ export default {
     .control {
       height: 80rpx;
       display: flex;
-      cursor: pointer;
+      flex-direction: row;
 
       .cancel {
         flex: 1;
-        color: #dd524d;
         display: flex;
         justify-content: center;
         align-items: center;
       }
+      .cancel-text {
+        color: #dd524d;
+      }
       .confirm {
         border-left: 1px solid #eeeeee;
         flex: 1;
-        color: #007aff;
         display: flex;
         justify-content: center;
         align-items: center;
+      }
+      .confirm-text {
+        color: #007aff;
       }
     }
   }

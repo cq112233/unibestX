@@ -1,92 +1,12 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const uni_modules_uviewUltra_components_upModal_props = require("./props.js");
-const uni_modules_uviewUltra_libs_mixin_mpMixin = require("../../libs/mixin/mpMixin.js");
-const uni_modules_uviewUltra_libs_mixin_mixin = require("../../libs/mixin/mixin.js");
 const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
 const uni_modules_uviewUltra_libs_i18n_index = require("../../libs/i18n/index.js");
-const _sfc_main = common_vendor.defineComponent({
-  name: "up-modal",
-  mixins: [uni_modules_uviewUltra_libs_mixin_mpMixin.mpMixin, uni_modules_uviewUltra_libs_mixin_mixin.mixin, uni_modules_uviewUltra_components_upModal_props.propsModal],
-  data() {
-    return {
-      loading: false
-    };
-  },
-  watch: {
-    show(n) {
-      if (n && this.loading)
-        this.loading = false;
-    }
-  },
-  emits: ["confirm", "cancel", "close", "update:show", "cancelOnAsync"],
-  computed: {
-    elCancelText() {
-      if (this.cancelText == "取消" || this.cancelText == "") {
-        return uni_modules_uviewUltra_libs_i18n_index.t("up_common_cancel", new common_vendor.UTSJSONObject({}));
-      }
-      return this.cancelText;
-    },
-    elConfirmText() {
-      if (this.confirmText == "确认" || this.confirmText == "确定" || this.confirmText == "") {
-        return uni_modules_uviewUltra_libs_i18n_index.t("up_common_confirm", new common_vendor.UTSJSONObject({}));
-      }
-      return this.confirmText;
-    },
-    contentStyleCpu() {
-      let style = this.contentStyle;
-      style["paddingTop"] = `${this.title != "" ? 12 : 25}px`;
-      return style;
-    }
-  },
-  methods: {
-    addUnit(val = null) {
-      return uni_modules_uviewUltra_libs_function_index.addUnit(val);
-    },
-    // 点击确定按钮
-    confirmHandler() {
-      if (this.asyncClose) {
-        this.loading = true;
-      } else {
-        this.$emit("update:show", false);
-      }
-      this.$emit("confirm");
-    },
-    // 点击取消按钮
-    cancelHandler() {
-      if (this.asyncClose && this.loading) {
-        if (this.asyncCloseTip != "") {
-          common_vendor.index.showToast({
-            title: this.asyncCloseTip,
-            icon: "none"
-          });
-        }
-        this.$emit("cancelOnAsync");
-      } else {
-        if (!this.asyncCancelClose) {
-          this.$emit("update:show", false);
-        }
-      }
-      this.$emit("cancel");
-    },
-    // 点击遮罩
-    // 从原理上来说，modal的遮罩点击，并不是真的点击到了遮罩
-    // 因为modal依赖于popup的中部弹窗类型，中部弹窗比较特殊，虽有然遮罩，但是为了让弹窗内容能flex居中
-    // 多了一个透明的遮罩，此透明的遮罩会覆盖在灰色的遮罩上，所以实际上是点击不到灰色遮罩的，popup内部在
-    // 透明遮罩的子元素做了.stop处理，所以点击内容区，也不会导致误触发
-    clickHandler() {
-      if (this.closeOnClickOverlay) {
-        this.$emit("update:show", false);
-        this.$emit("close");
-      }
-    }
-  }
-});
 if (!Array) {
-  const _easycom_up_line2 = common_vendor.resolveComponent("up-line");
-  const _easycom_up_loading_icon2 = common_vendor.resolveComponent("up-loading-icon");
-  const _easycom_up_popup2 = common_vendor.resolveComponent("up-popup");
-  (_easycom_up_line2 + _easycom_up_loading_icon2 + _easycom_up_popup2)();
+  const _easycom_up_line_1 = common_vendor.resolveComponent("up-line");
+  const _easycom_up_loading_icon_1 = common_vendor.resolveComponent("up-loading-icon");
+  const _easycom_up_popup_1 = common_vendor.resolveComponent("up-popup");
+  (_easycom_up_line_1 + _easycom_up_loading_icon_1 + _easycom_up_popup_1)();
 }
 const _easycom_up_line = () => "../up-line/up-line.js";
 const _easycom_up_loading_icon = () => "../up-loading-icon/up-loading-icon.js";
@@ -94,73 +14,256 @@ const _easycom_up_popup = () => "../up-popup/up-popup.js";
 if (!Math) {
   (_easycom_up_line + _easycom_up_loading_icon + _easycom_up_popup)();
 }
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  "raw js";
-  return common_vendor.e({
-    a: _ctx.title
-  }, _ctx.title ? {
-    b: common_vendor.t(_ctx.title)
-  } : {}, {
-    c: common_vendor.t(_ctx.content),
-    d: _ctx.contentTextAlign,
-    e: common_vendor.s($options.contentStyleCpu),
-    f: _ctx.$slots["confirmButton"]
-  }, _ctx.$slots["confirmButton"] ? {} : common_vendor.e({
-    g: common_vendor.p({
-      class: "data-v-767ef2b6"
-    }),
-    h: _ctx.showCancelButton
-  }, _ctx.showCancelButton ? {
-    i: common_vendor.t($options.elCancelText),
-    j: _ctx.cancelColor,
-    k: common_vendor.n(_ctx.showCancelButton && !_ctx.showConfirmButton ? "up-modal__button-group__wrapper--only-cancel" : ""),
-    l: common_vendor.o((...args) => $options.cancelHandler && $options.cancelHandler(...args), "5a")
-  } : {}, {
-    m: _ctx.showConfirmButton && _ctx.showCancelButton
-  }, _ctx.showConfirmButton && _ctx.showCancelButton ? {
-    n: common_vendor.p({
-      direction: "column",
-      class: "data-v-767ef2b6"
-    })
-  } : {}, {
-    o: _ctx.showConfirmButton
-  }, _ctx.showConfirmButton ? common_vendor.e({
-    p: $data.loading
-  }, $data.loading ? {
-    q: common_vendor.p({
-      class: "data-v-767ef2b6"
-    })
-  } : {
-    r: common_vendor.t($options.elConfirmText),
-    s: _ctx.confirmColor
-  }, {
-    t: common_vendor.n(!_ctx.showCancelButton && _ctx.showConfirmButton ? "up-modal__button-group__wrapper--only-confirm" : ""),
-    v: common_vendor.o((...args) => $options.confirmHandler && $options.confirmHandler(...args), "46")
-  }) : {}, {
-    w: _ctx.buttonReverse ? "row-reverse" : "row"
-  }), {
-    x: $options.addUnit(_ctx.width),
-    y: common_vendor.gei(_ctx, ""),
-    z: common_vendor.n(_ctx.customClass),
-    A: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
-    B: common_vendor.o($options.clickHandler, "a6"),
-    C: common_vendor.p({
-      mode: "center",
-      zoom: _ctx.zoom,
-      show: _ctx.show,
-      customStyle: {
-        borderRadius: "6px",
-        overflow: "hidden",
-        marginTop: `-${$options.addUnit(_ctx.negativeTop)}`
-      },
-      closeOnClickOverlay: _ctx.closeOnClickOverlay,
-      safeAreaInsetBottom: false,
-      duration: _ctx.duration,
-      id: common_vendor.gei(_ctx, ""),
-      class: common_vendor.normalizeClass(["data-v-767ef2b6", [_ctx.customClass]])
-    })
+const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
+  name: "up-modal"
+}, { __name: "up-modal", props: {
+  show: {
+    type: Boolean,
+    default: false
+  },
+  title: {
+    type: String,
+    default: ""
+  },
+  content: {
+    type: String,
+    default: ""
+  },
+  confirmText: {
+    type: String,
+    default: "确认"
+  },
+  cancelText: {
+    type: String,
+    default: "取消"
+  },
+  showConfirmButton: {
+    type: Boolean,
+    default: true
+  },
+  showCancelButton: {
+    type: Boolean,
+    default: false
+  },
+  confirmColor: {
+    type: String,
+    default: "#2979ff"
+  },
+  cancelColor: {
+    type: String,
+    default: "#606266"
+  },
+  buttonReverse: {
+    type: Boolean,
+    default: false
+  },
+  zoom: {
+    type: Boolean,
+    default: true
+  },
+  asyncClose: {
+    type: Boolean,
+    default: false
+  },
+  closeOnClickOverlay: {
+    type: Boolean,
+    default: false
+  },
+  negativeTop: {
+    type: [String, Number],
+    default: 0
+  },
+  width: {
+    type: [String, Number],
+    default: "650rpx"
+  },
+  confirmButtonShape: {
+    type: String,
+    default: ""
+  },
+  duration: {
+    type: Number,
+    default: 400
+  },
+  contentTextAlign: {
+    type: String,
+    default: "left"
+  },
+  asyncCloseTip: {
+    type: String,
+    default: ""
+  },
+  asyncCancelClose: {
+    type: Boolean,
+    default: false
+  },
+  contentStyle: {
+    type: Object,
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
+    }
+  },
+  customClass: {
+    type: String,
+    default: ""
+  }
+}, emits: ["confirm", "cancel", "close", "update:show", "cancelOnAsync"], setup(__props, _a) {
+  var __emit = _a.emit;
+  const props = __props;
+  const emit = __emit;
+  const loading = common_vendor.ref(false);
+  common_vendor.watch(() => {
+    return props.show;
+  }, (n) => {
+    if (n && loading.value) {
+      loading.value = false;
+    }
   });
-}
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-767ef2b6"]]);
+  const elCancelText = common_vendor.computed(() => {
+    if (props.cancelText == "取消" || props.cancelText == "") {
+      return uni_modules_uviewUltra_libs_i18n_index.t("up_common_cancel", new common_vendor.UTSJSONObject({}));
+    }
+    return props.cancelText;
+  });
+  const elConfirmText = common_vendor.computed(() => {
+    if (props.confirmText == "确认" || props.confirmText == "确定" || props.confirmText == "") {
+      return uni_modules_uviewUltra_libs_i18n_index.t("up_common_confirm", new common_vendor.UTSJSONObject({}));
+    }
+    return props.confirmText;
+  });
+  const popupCustomStyle = common_vendor.computed(() => {
+    return new common_vendor.UTSJSONObject({
+      borderRadius: "6px",
+      overflow: "hidden",
+      marginTop: `-${uni_modules_uviewUltra_libs_function_index.addUnit(props.negativeTop)}`
+    });
+  });
+  const modalStyle = common_vendor.computed(() => {
+    return new common_vendor.UTSJSONObject({
+      width: uni_modules_uviewUltra_libs_function_index.addUnit(props.width)
+    });
+  });
+  const buttonGroupStyle = common_vendor.computed(() => {
+    return new common_vendor.UTSJSONObject({
+      flexDirection: props.buttonReverse ? "row-reverse" : "row"
+    });
+  });
+  const cancelTextStyle = common_vendor.computed(() => {
+    return new common_vendor.UTSJSONObject({
+      color: props.cancelColor
+    });
+  });
+  const confirmTextStyle = common_vendor.computed(() => {
+    return new common_vendor.UTSJSONObject({
+      color: props.confirmColor
+    });
+  });
+  const contentTextStyle = common_vendor.computed(() => {
+    return new common_vendor.UTSJSONObject({
+      textAlign: props.contentTextAlign
+    });
+  });
+  const contentStyleCpu = common_vendor.computed(() => {
+    var _a2;
+    const style = (_a2 = props.contentStyle) !== null && _a2 !== void 0 ? _a2 : new common_vendor.UTSJSONObject({});
+    style["paddingTop"] = `${props.title != "" ? 12 : 25}px`;
+    return style;
+  });
+  function confirmHandler() {
+    if (props.asyncClose) {
+      loading.value = true;
+    } else {
+      emit("update:show", false);
+    }
+    emit("confirm");
+  }
+  function cancelHandler() {
+    if (props.asyncClose && loading.value) {
+      if (props.asyncCloseTip != "") {
+        common_vendor.index.showToast({
+          title: props.asyncCloseTip,
+          icon: "none"
+        });
+      }
+      emit("cancelOnAsync");
+    } else {
+      if (!props.asyncCancelClose) {
+        emit("update:show", false);
+      }
+    }
+    emit("cancel");
+  }
+  function clickHandler() {
+    if (props.closeOnClickOverlay) {
+      emit("update:show", false);
+    }
+    emit("close");
+  }
+  return (_ctx, _cache) => {
+    "raw js";
+    const __returned__ = common_vendor.e({
+      a: __props.title != ""
+    }, __props.title != "" ? {
+      b: common_vendor.t(__props.title)
+    } : {}, {
+      c: common_vendor.t(__props.content),
+      d: common_vendor.s(contentTextStyle.value),
+      e: common_vendor.s(contentStyleCpu.value),
+      f: _ctx.$slots["confirmButton"] != null
+    }, _ctx.$slots["confirmButton"] != null ? {} : common_vendor.e({
+      g: common_vendor.p({
+        class: "data-v-767ef2b6"
+      }),
+      h: __props.showCancelButton
+    }, __props.showCancelButton ? {
+      i: common_vendor.t(elCancelText.value),
+      j: common_vendor.s(cancelTextStyle.value),
+      k: common_vendor.n(__props.showCancelButton && !__props.showConfirmButton ? "up-modal__button-group__wrapper--only-cancel" : ""),
+      l: common_vendor.o(cancelHandler, "9d")
+    } : {}, {
+      m: __props.showConfirmButton && __props.showCancelButton
+    }, __props.showConfirmButton && __props.showCancelButton ? {
+      n: common_vendor.p({
+        direction: "column",
+        class: "data-v-767ef2b6"
+      })
+    } : {}, {
+      o: __props.showConfirmButton
+    }, __props.showConfirmButton ? common_vendor.e({
+      p: loading.value
+    }, loading.value ? {
+      q: common_vendor.p({
+        class: "data-v-767ef2b6"
+      })
+    } : {
+      r: common_vendor.t(elConfirmText.value),
+      s: common_vendor.s(confirmTextStyle.value)
+    }, {
+      t: common_vendor.n(!__props.showCancelButton && __props.showConfirmButton ? "up-modal__button-group__wrapper--only-confirm" : ""),
+      v: common_vendor.o(confirmHandler, "23")
+    }) : {}, {
+      w: common_vendor.s(buttonGroupStyle.value)
+    }), {
+      x: common_vendor.s(modalStyle.value),
+      y: common_vendor.gei(_ctx, ""),
+      z: common_vendor.n(__props.customClass),
+      A: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+      B: common_vendor.o(clickHandler, "23"),
+      C: common_vendor.p({
+        mode: "center",
+        zoom: __props.zoom,
+        show: __props.show,
+        customStyle: popupCustomStyle.value,
+        closeOnClickOverlay: __props.closeOnClickOverlay,
+        safeAreaInsetBottom: false,
+        duration: __props.duration,
+        id: common_vendor.gei(_ctx, ""),
+        class: common_vendor.normalizeClass(["data-v-767ef2b6", [__props.customClass]])
+      })
+    });
+    return __returned__;
+  };
+} }));
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-767ef2b6"]]);
 wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-ultra/components/up-modal/up-modal.js.map

@@ -69,6 +69,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   const props = __props;
   const emit = __emit;
   const show = common_vendor.ref(true);
+  const alertStyle = common_vendor.computed(() => {
+    return uni_modules_uviewUltra_libs_function_index.addStyle(props.customStyle);
+  });
   const style1 = common_vendor.computed(() => {
     return new common_vendor.UTSJSONObject({
       fontSize: uni_modules_uviewUltra_libs_function_index.addUnit(props.fontSize),
@@ -124,9 +127,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       i: common_vendor.s(style1.value),
       j: common_vendor.n(__props.effect === "dark" ? "up-alert__text--dark" : `up-alert__text--${__props.type}--light`)
     } : {}, {
-      k: common_vendor.s({
-        paddingRight: __props.closable ? "20px" : 0
-      }),
+      k: __props.closable ? "20px" : "0px",
       l: __props.closable
     }, __props.closable ? {
       m: common_vendor.p({
@@ -135,11 +136,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
         size: "15",
         class: "data-v-63fe4c88"
       }),
-      n: common_vendor.o(closeHandler, "2e")
+      n: common_vendor.o(closeHandler, "8b")
     } : {}, {
       o: common_vendor.n(`up-alert--${__props.type}--${__props.effect}`),
       p: common_vendor.o(clickHandler, "bf"),
-      q: common_vendor.s(_ctx.$upAddStyle(__props.customStyle)),
+      q: common_vendor.s(alertStyle.value),
       r: common_vendor.gei(_ctx, ""),
       s: common_vendor.p({
         mode: "fade",

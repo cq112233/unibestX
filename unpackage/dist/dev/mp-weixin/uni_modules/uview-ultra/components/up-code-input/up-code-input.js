@@ -5,6 +5,16 @@ const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "up-code-input",
   props: {
+    customStyle: {
+      type: [Object, String],
+      default: () => {
+        return new common_vendor.UTSJSONObject({});
+      }
+    },
+    customClass: {
+      type: String,
+      default: ""
+    },
     // 键盘弹起时，是否自动上推页面
     adjustPosition: {
       type: Boolean,
@@ -104,6 +114,24 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const length = inputValue.value.length;
       return Math.min(length, codeLength.value.length);
     });
+    const codeTextStyle = common_vendor.computed(() => {
+      return new common_vendor.UTSJSONObject({
+        fontSize: uni_modules_uviewUltra_libs_function_index.addUnit(props.fontSize),
+        fontWeight: props.bold ? "bold" : "normal",
+        color: props.color
+      });
+    });
+    const cursorStyle = common_vendor.computed(() => {
+      return new common_vendor.UTSJSONObject({
+        backgroundColor: props.color,
+        opacity: cursorOpacity.value
+      });
+    });
+    const inputStyle = common_vendor.computed(() => {
+      return new common_vendor.UTSJSONObject({
+        height: uni_modules_uviewUltra_libs_function_index.addUnit(props.size)
+      });
+    });
     const lineStyle = common_vendor.computed(() => {
       const style = new common_vendor.UTSJSONObject({});
       style["height"] = props.hairline ? "2px" : "4px";
@@ -145,13 +173,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, 600);
     };
     const itemStyle = (index) => {
-      const style = new common_vendor.UTSJSONObject(
-        {
-          width: uni_modules_uviewUltra_libs_function_index.addUnit(props.size),
-          height: uni_modules_uviewUltra_libs_function_index.addUnit(props.size)
-        }
-        // 盒子模式下，需要额外进行处理
-      );
+      const style = new common_vendor.UTSJSONObject({
+        width: uni_modules_uviewUltra_libs_function_index.addUnit(props.size),
+        height: uni_modules_uviewUltra_libs_function_index.addUnit(props.size)
+      });
       if (props.mode == "box") {
         style["border"] = `${props.hairline ? 0.5 : 1}px solid ${props.borderColor}`;
         if (uni_modules_uviewUltra_libs_function_index.getPx(props.space) == "0") {
@@ -203,19 +228,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             a: __props.dot && codeArray.value.length > index
           }, __props.dot && codeArray.value.length > index ? {} : {
             b: common_vendor.t(getCodeValue(index)),
-            c: _ctx.$upAddUnit(__props.fontSize),
-            d: __props.bold ? "bold" : "normal",
-            e: __props.color
+            c: common_vendor.s(codeTextStyle.value)
           }, __props.mode == "line" ? {
-            f: common_vendor.s(lineStyle.value)
+            d: common_vendor.s(lineStyle.value)
           } : {}, {
-            g: isFocus.value && inputLength.value === index
-          }, isFocus.value && inputLength.value === index ? {
-            h: __props.color,
-            i: cursorOpacity.value
+            e: isFocus.value && inputLength.value == index
+          }, isFocus.value && inputLength.value == index ? {
+            f: common_vendor.s(cursorStyle.value)
           } : {}, {
-            j: common_vendor.s(itemStyle(index)),
-            k: index
+            g: common_vendor.s(itemStyle(index)),
+            h: index
           });
         }),
         b: __props.mode == "line",
@@ -224,14 +246,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         e: inputValue.value,
         f: __props.maxlength,
         g: __props.adjustPosition,
-        h: common_vendor.o(inputHandler, "82"),
-        i: _ctx.$upAddUnit(__props.size),
+        h: common_vendor.o(inputHandler, "ed"),
+        i: common_vendor.s(inputStyle.value),
         j: common_vendor.o(($event) => {
           return isFocus.value = true;
-        }, "9b"),
+        }, "8d"),
         k: common_vendor.o(($event) => {
           return isFocus.value = false;
-        }, "6a"),
+        }, "fb"),
         l: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
         m: `${_ctx.u_s_b_h}px`,
         n: `${_ctx.u_s_a_i_b}px`,

@@ -44,7 +44,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         c: common_vendor.o(($event) => {
           return transitionShow.value = !transitionShow.value;
-        }, "d9"),
+        }, "12"),
         d: common_vendor.p({
           type: "primary",
           text: transitionShow.value ? "隐藏动画" : "显示动画",
@@ -63,7 +63,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         g: common_vendor.o(($event) => {
           return triggerSlide("slide-up");
-        }, "d6"),
+        }, "2f"),
         h: common_vendor.p({
           type: "primary",
           text: "上滑",
@@ -73,7 +73,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         i: common_vendor.o(($event) => {
           return triggerSlide("slide-down");
-        }, "0d"),
+        }, "31"),
         j: common_vendor.p({
           type: "success",
           text: "下滑",
@@ -83,7 +83,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         k: common_vendor.o(($event) => {
           return triggerSlide("slide-left");
-        }, "83"),
+        }, "be"),
         l: common_vendor.p({
           type: "warning",
           text: "左滑",
@@ -93,7 +93,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         m: common_vendor.o(($event) => {
           return triggerSlide("slide-right");
-        }, "df"),
+        }, "47"),
         n: common_vendor.p({
           type: "error",
           text: "右滑",

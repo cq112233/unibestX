@@ -17,10 +17,6 @@ export class Request {
 		this.defaultConfig = mergeConfig(defaultRequestConfig, config)
 		this.interceptors = createInterceptors<LimeRequestConfig, LimeRequestResponse<any>>()
 	}
-	// #ifdef APP-ANDROID
-	@UTSAndroid.keyword("inline")
-	@UTSAndroid.keyword("reified")
-	// #endif
 	request<T = any>(config : LimeRequestConfig) : Promise<LimeRequestResponse<T>> {
 		return new Promise((resolve, reject) => {
 			let interceptors = this.interceptors as LimeInterceptors<LimeRequestConfig, LimeRequestResponse<T>>
@@ -168,7 +164,7 @@ export class Request {
 							// #ifndef UNI-APP-X
 							const data = config.data
 							// #endif 
-							task = uni.request<T>({
+							task = uni.request({
 								url: mergedUrl,
 								data,
 								header: config.header,
@@ -177,13 +173,13 @@ export class Request {
 								withCredentials: config.withCredentials,
 								firstIpv4: config.firstIpv4,
 								enableChunked: config.enableChunked,
-								success(result: RequestSuccess<T>) {
+								success(result: RequestSuccess<any>) {
 									const {
 										data,
 										statusCode,
 										header,
 										cookies,
-									} = result as RequestSuccess<T>
+									} = result as RequestSuccess<any>
 									
 									const tempFilePath = ''
 									const apFilePath = ''
@@ -193,7 +189,7 @@ export class Request {
 									if (typeof data == 'string') {
 										try {
 											if(isJSON(data as string)) {
-												 parsedData = JSON.parse<T>(data as string)
+												 parsedData = JSON.parse(data as string)
 											}
 										} catch (error) {
 											//TODO handle the exception
@@ -251,55 +247,30 @@ export class Request {
 		})
 	}
 
-	// #ifdef APP-ANDROID
-	@UTSAndroid.keyword("inline")
-	@UTSAndroid.keyword("reified")
-	// @JvmOverloads
-	// #endif
 	get<T>(url : string, config : LimeRequestConfig | null = null): Promise<LimeRequestResponse<T>> {
 		const _config = (config ?? {}) as LimeRequestConfig
 		_config.url = url
 		_config.method = 'GET'
 		return this.request<T>(_config)
 	}
-	// #ifdef APP-ANDROID
-	@UTSAndroid.keyword("inline")
-	@UTSAndroid.keyword("reified")
-	// @JvmOverloads
-	// #endif
 	head<T>(url : string, config : LimeRequestConfig | null = null): Promise<LimeRequestResponse<T>> { 
 		const _config = (config ?? {}) as LimeRequestConfig
 		_config.url = url
 		_config.method = 'HEAD'
 		return this.request<T>(_config)
 	}
-	// #ifdef APP-ANDROID
-	@UTSAndroid.keyword("inline")
-	@UTSAndroid.keyword("reified")
-	// @JvmOverloads
-	// #endif
 	connect<T>(url : string, config : LimeRequestConfig | null = null): Promise<LimeRequestResponse<T>> { 
 		const _config = (config ?? {}) as LimeRequestConfig
 		_config.url = url
 		_config.method = 'CONNECT'
 		return this.request<T>(_config)
 	}
-	// #ifdef APP-ANDROID
-	@UTSAndroid.keyword("inline")
-	@UTSAndroid.keyword("reified")
-	// @JvmOverloads
-	// #endif
 	trace<T>(url : string, config : LimeRequestConfig | null = null): Promise<LimeRequestResponse<T>> { 
 		const _config = (config ?? {}) as LimeRequestConfig
 		_config.url = url
 		_config.method = 'TRACE'
 		return this.request<T>(_config)
 	}
-	// #ifdef APP-ANDROID
-	@UTSAndroid.keyword("inline")
-	@UTSAndroid.keyword("reified")
-	// @JvmOverloads
-	// #endif
 	post<T>(url: string, data: any|null = null, config : LimeRequestConfig | null = null) {
 		const _config = (config ?? {}) as LimeRequestConfig
 		_config.url = url
@@ -307,11 +278,6 @@ export class Request {
 		_config.method = 'POST'
 		return this.request<T>(_config)
 	}
-	// #ifdef APP-ANDROID
-	@UTSAndroid.keyword("inline")
-	@UTSAndroid.keyword("reified")
-	// @JvmOverloads
-	// #endif
 	put<T>(url: string, data: any|null = null, config : LimeRequestConfig | null = null) {
 		const _config = (config ?? {}) as LimeRequestConfig
 		_config.url = url
@@ -319,11 +285,6 @@ export class Request {
 		_config.method = 'PUT'
 		return this.request<T>(_config)
 	}
-	// #ifdef APP-ANDROID
-	@UTSAndroid.keyword("inline")
-	@UTSAndroid.keyword("reified")
-	// @JvmOverloads
-	// #endif
 	delete<T>(url: string, data: any|null = null, config : LimeRequestConfig | null = null) {
 		const _config = (config ?? {}) as LimeRequestConfig
 		_config.url = url
@@ -331,11 +292,6 @@ export class Request {
 		_config.method = 'DELETE'
 		return this.request<T>(_config)
 	}
-	// #ifdef APP-ANDROID
-	@UTSAndroid.keyword("inline")
-	@UTSAndroid.keyword("reified")
-	// @JvmOverloads
-	// #endif
 	options<T>(url: string, data: any|null = null, config : LimeRequestConfig | null = null) {
 		const _config = (config ?? {}) as LimeRequestConfig
 		_config.url = url

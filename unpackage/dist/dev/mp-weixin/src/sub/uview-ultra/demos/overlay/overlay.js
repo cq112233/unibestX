@@ -33,7 +33,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: common_vendor.o(($event) => {
           return overlayShow.value = true;
-        }, "27"),
+        }, "41"),
         c: common_vendor.p({
           type: "primary",
           text: "显示遮罩",
@@ -43,7 +43,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         d: common_vendor.o(($event) => {
           overlayOpacity.value = 0.3;
           overlayShow.value = true;
-        }, "40"),
+        }, "74"),
         e: common_vendor.p({
           type: "warning",
           text: "半透明遮罩",
@@ -55,10 +55,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-3c9ec2b3"
         }),
         g: common_vendor.o(() => {
-        }, "e0"),
+        }, "a3"),
         h: common_vendor.o(($event) => {
           return overlayShow.value = false;
-        }, "fc"),
+        }, "55"),
         i: common_vendor.p({
           show: overlayShow.value,
           opacity: overlayOpacity.value,

@@ -17,14 +17,14 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-const paginationCurrentPage = ref(1)
-const paginationPageSize = ref(10)
-const paginationTotal = ref(100)
+const paginationCurrentPage = ref(1);
+const paginationPageSize = ref(10);
+const paginationTotal = ref(100);
 
 function onPaginationCurrentChange(page: number): void {
-  paginationCurrentPage.value = page
+  paginationCurrentPage.value = page;
 }
 </script>
 

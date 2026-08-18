@@ -1,6 +1,5 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-require("../../libs/function/test.js");
 const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
 const uni_modules_uviewUltra_components_upCheckbox_checkbox = require("./checkbox.js");
 const uni_modules_uviewUltra_libs_composable_useUltraUI = require("../../libs/composable/useUltraUI.js");
@@ -93,42 +92,96 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     default: false
   }
 }, emits: ["change", "update:checked"], setup(__props, _a) {
+  var _b;
   var __expose = _a.expose, __emit = _a.emit;
-  const _b = uni_modules_uviewUltra_libs_composable_useUltraUI.useUltraUI(), parent = _b.parent, parentData = _b.parentData, getParentData = _b.getParentData;
-  const instance = common_vendor.getCurrentInstance().proxy;
+  const _c = uni_modules_uviewUltra_libs_composable_useUltraUI.useUltraUI(), parent = _c.parent, parentData = _c.parentData, getParentData = _c.getParentData;
+  const instance = (_b = common_vendor.getCurrentInstance()) === null || _b === void 0 ? null : _b.proxy;
   const props = __props;
   const emit = __emit;
-  const isChecked = common_vendor.ref(false);
+  const injectedParentProps = common_vendor.inject("upCheckboxGroupProps", null);
+  const injectedParentToggle = common_vendor.inject("upCheckboxGroupToggle", null);
+  function getParentVal(key) {
+    if (!props.usedAlone) {
+      if (injectedParentProps != null && injectedParentProps.value != null) {
+        const obj = injectedParentProps.value;
+        if (obj != null && obj[key] != null) {
+          return obj[key];
+        }
+      }
+      if (parentData.value != null && parentData.value[key] != null) {
+        return parentData.value[key];
+      }
+    }
+    return null;
+  }
+  const selfChecked = common_vendor.ref(props.checked);
+  const isChecked = common_vendor.computed(() => {
+    if (!props.usedAlone) {
+      const val = getParentVal("modelValue");
+      if (val != null) {
+        const arr = val;
+        if (props.name != null) {
+          for (let i = 0; i < arr.length; i++) {
+            if (arr[i] != null && arr[i].toString() == props.name.toString()) {
+              return true;
+            }
+          }
+        }
+        return false;
+      }
+    }
+    return selfChecked.value;
+  });
   const elDisabled = common_vendor.computed(() => {
     let disabledVal = props.disabled;
     if (disabledVal != null && disabledVal.toString() != "") {
       return disabledVal.toString() == "true";
-    } else {
-      return parentData.value["disabled"] != null ? parentData.value["disabled"] : false;
     }
+    const p = getParentVal("disabled");
+    if (p != null) {
+      return p;
+    }
+    return false;
   });
   const elLabelDisabled = common_vendor.computed(() => {
     let labelDisabledVal = props.labelDisabled;
     if (labelDisabledVal != null && labelDisabledVal.toString() != "") {
       return labelDisabledVal.toString() == "true";
-    } else {
-      return parentData.value["labelDisabled"] != null ? parentData.value["labelDisabled"] : false;
     }
+    const p = getParentVal("labelDisabled");
+    if (p != null) {
+      return p;
+    }
+    return false;
   });
   const elSize = common_vendor.computed(() => {
-    return props.size.toString() != "" ? props.size.toString() : parentData.value["size"] != null ? parentData.value["size"].toString() : "21";
+    if (props.size != null && props.size.toString() != "") {
+      return props.size.toString();
+    }
+    const p = getParentVal("size");
+    if (p != null && p.toString() != "") {
+      return p.toString();
+    }
+    return "21";
   });
   const elIconSize = common_vendor.computed(() => {
-    return props.iconSize.toString() != "" ? props.iconSize.toString() : parentData.value["iconSize"] != null ? parentData.value["iconSize"].toString() : "12";
+    if (props.iconSize != null && props.iconSize.toString() != "") {
+      return props.iconSize.toString();
+    }
+    const p = getParentVal("iconSize");
+    if (p != null && p.toString() != "") {
+      return p.toString();
+    }
+    return "12";
   });
   const elActiveColor = common_vendor.computed(() => {
     const activeColorProp = props.activeColor;
     if (activeColorProp != null && activeColorProp.toString() != "") {
       return activeColorProp.toString();
     }
-    const parentActiveColor = parentData.value["activeColor"];
-    if (parentActiveColor != null && parentActiveColor.toString() != "") {
-      return parentActiveColor.toString();
+    const p = getParentVal("activeColor");
+    if (p != null && p.toString() != "") {
+      return p.toString();
     }
     return "#2979ff";
   });
@@ -137,23 +190,52 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     if (inactiveColorProp != null && inactiveColorProp.toString() != "") {
       return inactiveColorProp.toString();
     }
-    const parentInactiveColor = parentData.value["inactiveColor"];
-    if (parentInactiveColor != null && parentInactiveColor.toString() != "") {
-      return parentInactiveColor.toString();
+    const p = getParentVal("inactiveColor");
+    if (p != null && p.toString() != "") {
+      return p.toString();
     }
     return "#c8c9cc";
   });
   const elLabelColor = common_vendor.computed(() => {
-    return props.labelColor != null ? props.labelColor.toString() : parentData.value["labelColor"] != null ? parentData.value["labelColor"].toString() : "#606266";
+    if (props.labelColor != null && props.labelColor.toString() != "") {
+      return props.labelColor.toString();
+    }
+    const p = getParentVal("labelColor");
+    if (p != null && p.toString() != "") {
+      return p.toString();
+    }
+    return "#606266";
   });
   const elShape = common_vendor.computed(() => {
-    return props.shape != null ? props.shape.toString() : parentData.value["shape"] != null ? parentData.value["shape"].toString() : "circle";
+    if (props.shape != null && props.shape.toString() != "") {
+      return props.shape.toString();
+    }
+    const p = getParentVal("shape");
+    if (p != null && p.toString() != "") {
+      return p.toString();
+    }
+    return "circle";
   });
   const elLabelSize = common_vendor.computed(() => {
-    return uni_modules_uviewUltra_libs_function_index.addUnit(props.labelSize != null ? props.labelSize.toString() : parentData.value["labelSize"] != null ? parentData.value["labelSize"].toString() : "15");
+    if (props.labelSize != null && props.labelSize.toString() != "") {
+      return uni_modules_uviewUltra_libs_function_index.addUnit(props.labelSize.toString());
+    }
+    const p = getParentVal("labelSize");
+    if (p != null && p.toString() != "") {
+      return uni_modules_uviewUltra_libs_function_index.addUnit(p.toString());
+    }
+    return uni_modules_uviewUltra_libs_function_index.addUnit("15");
   });
   const elIconColor = common_vendor.computed(() => {
-    const iconColor = props.iconColor.toString() != "" ? props.iconColor.toString() : parentData.value["iconColor"] != null ? parentData.value["iconColor"].toString() : "#ffffff";
+    let iconColor = "#ffffff";
+    if (props.iconColor.toString() != "") {
+      iconColor = props.iconColor.toString();
+    } else {
+      const p = getParentVal("iconColor");
+      if (p != null && p.toString() != "") {
+        iconColor = p.toString();
+      }
+    }
     if (elDisabled.value) {
       return isChecked.value ? elInactiveColor.value : "transparent";
     } else {
@@ -172,9 +254,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     if (isChecked.value && !elDisabled.value && elActiveColor.value == "#2979ff") {
       classes.push("up-checkbox__icon-wrap--active");
     }
-    let classStr = "";
-    classStr = classes.join(" ");
-    return classStr;
+    return classes.join(" ");
   });
   const iconWrapStyle = common_vendor.computed(() => {
     const style = new common_vendor.UTSJSONObject({});
@@ -189,27 +269,41 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     }
     style["width"] = uni_modules_uviewUltra_libs_function_index.addUnit(elSize.value);
     style["height"] = uni_modules_uviewUltra_libs_function_index.addUnit(elSize.value);
-    if (!props.usedAlone && parentData.value != null && parentData.value["iconPlacement"] != null) {
-      if (parentData.value["iconPlacement"].toString() == "right") {
-        style["marginRight"] = 0;
-      }
+    const iconPlacement = getParentVal("iconPlacement");
+    if (iconPlacement != null && iconPlacement.toString() == "right") {
+      style["marginRight"] = 0;
     }
     return style;
   });
   const checkboxStyle = common_vendor.computed(() => {
     const style = new common_vendor.UTSJSONObject({});
-    if (!props.usedAlone && parentData.value != null && parentData.value["borderBottom"] != null) {
-      if (parentData.value["borderBottom"].toString() == "true" && parentData.value["placement"] == "row") {
-        uni_modules_uviewUltra_libs_function_index.error("检测到您将borderBottom设置为true，需要同时将up-checkbox-group的placement设置为column才有效");
-      }
-      if (parentData.value["borderBottom"].toString() == "true" && parentData.value["placement"] == "column") {
-        style["paddingBottom"] = "8px";
-      }
+    const borderBottom = getParentVal("borderBottom");
+    const placement = getParentVal("placement");
+    if (borderBottom != null && borderBottom.toString() == "true" && placement != null && placement.toString() == "row") {
+      uni_modules_uviewUltra_libs_function_index.error("检测到您将borderBottom设置为true，需要同时将up-checkbox-group的placement设置为column才有效");
+    }
+    if (borderBottom != null && borderBottom.toString() == "true" && placement != null && placement.toString() == "column") {
+      style["paddingBottom"] = "8px";
     }
     return uni_modules_uviewUltra_libs_function_index.deepMerge(style, uni_modules_uviewUltra_libs_function_index.addStyle(props.customStyle));
   });
+  const iconPlacementClass = common_vendor.computed(() => {
+    const p = getParentVal("iconPlacement");
+    if (p != null && p.toString() != "") {
+      return "up-checkbox-label--" + p.toString();
+    }
+    return "up-checkbox-label--left";
+  });
+  const borderBottomClass = common_vendor.computed(() => {
+    const borderBottom = getParentVal("borderBottom");
+    const placement = getParentVal("placement");
+    if (borderBottom != null && borderBottom.toString() == "true" && placement != null && placement.toString() == "column") {
+      return "up-border-bottom";
+    }
+    return "";
+  });
   const init = function() {
-    if (!props.usedAlone) {
+    if (!props.usedAlone && injectedParentProps == null) {
       parentData.value = new common_vendor.UTSJSONObject({
         iconSize: 12,
         labelDisabled: null,
@@ -224,42 +318,31 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
         borderBottom: false,
         iconPlacement: "left"
       });
-      getParentData("up-checkbox-group", instance, false);
-      if (parent.value == null) {
-        uni_modules_uviewUltra_libs_function_index.error("up-checkbox必须搭配up-checkbox-group组件使用");
-      }
-      const value = parentData.value["modelValue"];
-      if (props.checked) {
-        isChecked.value = true;
-      } else if (value != null) {
-        const valueTmp = value;
-        if (valueTmp != null) {
-          const even = (element = null) => {
-            return element.toString() == props.name.toString();
-          };
-          isChecked.value = valueTmp.some(even);
-        }
-      }
-    } else {
-      if (props.checked) {
-        isChecked.value = true;
+      if (instance != null) {
+        getParentData("up-checkbox-group", instance, false);
       }
     }
+    if (props.checked) {
+      selfChecked.value = true;
+    }
   };
-  function emitEvent() {
-    emit("change", isChecked.value);
+  function setRadioCheckedStatus() {
+    var _a2;
+    const targetChecked = !isChecked.value;
+    if (!props.usedAlone && injectedParentToggle != null) {
+      injectedParentToggle(props.name != null ? props.name.toString() : "", targetChecked);
+    } else {
+      selfChecked.value = targetChecked;
+      if (!props.usedAlone && parent.value != null && instance != null) {
+        (_a2 = parent.value) === null || _a2 === void 0 ? null : _a2.$callMethod("unCheckedOther", instance);
+      }
+    }
+    emit("change", targetChecked);
     if (props.usedAlone) {
-      emit("update:checked", isChecked.value);
+      emit("update:checked", targetChecked);
     }
     setTimeout(() => {
     }, 10);
-  }
-  function setRadioCheckedStatus() {
-    isChecked.value = !isChecked.value;
-    emitEvent();
-    if (!props.usedAlone && parent.value != null) {
-      parent.value.$callMethod("unCheckedOther", instance);
-    }
   }
   function iconClickHandler(e) {
     e.stopPropagation();
@@ -268,13 +351,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     }
   }
   function wrapperClickHandler(e) {
-    if (!props.usedAlone && parentData.value != null && parentData.value["iconPlacement"] != null) {
-      if (parentData.value["iconPlacement"].toString() == "right") {
-        iconClickHandler(e);
-      } else {
-        iconClickHandler(e);
-      }
-    } else {
+    const iconPlacement = getParentVal("iconPlacement");
+    if (iconPlacement != null && iconPlacement.toString() == "right") {
       iconClickHandler(e);
     }
   }
@@ -287,8 +365,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   common_vendor.watch(() => {
     return props.checked;
   }, (newVal) => {
-    if (newVal != isChecked.value) {
-      isChecked.value = newVal;
+    if (newVal != selfChecked.value) {
+      selfChecked.value = newVal;
     }
   });
   common_vendor.onMounted(() => {
@@ -313,11 +391,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
         color: elIconColor.value,
         class: "up-checkbox__icon-wrap__icon data-v-819863e8"
       }),
-      b: common_vendor.o(iconClickHandler, "87"),
+      b: common_vendor.o(iconClickHandler, "93"),
       c: common_vendor.n(iconClasses.value),
       d: common_vendor.s(iconWrapStyle.value),
       e: common_vendor.t(__props.label),
-      f: common_vendor.o(labelClickHandler, "aa"),
+      f: common_vendor.o(labelClickHandler, "23"),
       g: elDisabled.value ? elInactiveColor.value : elLabelColor.value,
       h: elLabelSize.value,
       i: elLabelSize.value,
@@ -332,8 +410,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
         "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
       }),
       n: common_vendor.o(wrapperClickHandler, "78"),
-      o: common_vendor.n(`up-checkbox-label--` + (common_vendor.unref(parentData)["iconPlacement"] != null ? common_vendor.unref(parentData)["iconPlacement"].toString() : "")),
-      p: common_vendor.n(common_vendor.unref(parentData)["borderBottom"] != false && common_vendor.unref(parentData)["placement"] != null && common_vendor.unref(parentData)["placement"].toString() == "column" ? "up-border-bottom" : ""),
+      o: common_vendor.n(iconPlacementClass.value),
+      p: common_vendor.n(borderBottomClass.value),
       q: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
     };
     return __returned__;

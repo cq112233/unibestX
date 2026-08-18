@@ -19,6 +19,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const appStore = src_store_app.useAppStore();
     const isCurrentPageTabbar = common_vendor.ref(false);
     const uToastRef = common_vendor.ref(null);
+    common_vendor.watch(uToastRef, (val = null) => {
+      if (val != null) {
+        src_utils_toast.registerToast(val);
+      }
+    }, { immediate: true });
     common_vendor.onBeforeMount(() => {
       const pages = getCurrentPages();
       if (pages.length > 0) {
@@ -40,6 +45,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (uToastRef.value != null) {
         src_utils_toast.registerToast(uToastRef.value);
       }
+      common_vendor.nextTick$1(() => {
+        if (uToastRef.value != null) {
+          src_utils_toast.registerToast(uToastRef.value);
+        }
+      });
     });
     common_vendor.onUnmounted(() => {
       if (uToastRef.value != null) {
@@ -59,8 +69,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         d: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
         e: common_vendor.s({
-          "--theme-color": common_vendor.unref(appStore).state.theme,
-          "backgroundColor": "#f8f8f8"
+          "--theme-color": common_vendor.unref(appStore).state.theme
         }),
         f: common_vendor.s({
           "--status-bar-height": `${_ctx.u_s_b_h}px`,

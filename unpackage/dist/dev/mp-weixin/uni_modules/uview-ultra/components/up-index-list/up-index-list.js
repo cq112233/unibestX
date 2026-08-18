@@ -139,12 +139,39 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       };
     });
   };
+  const letterStyle = common_vendor.computed(() => {
+    const topVal = letterInfo.value["top"] != null ? letterInfo.value["top"].toString() : "";
+    return new common_vendor.UTSJSONObject({
+      top: topVal != "" ? uni_modules_uviewUltra_libs_function_index.addUnit(topVal) : "",
+      transform: "translateY(-50%)"
+    });
+  });
   const indicatorTop = common_vendor.computed(() => {
     let top = letterInfo.value["top"];
     let height = letterInfo.value["height"];
     let itemHeight = letterInfo.value["itemHeight"];
     return Math.floor(top - height / 2 + itemHeight * activeIndex.value + itemHeight - 70 / 2);
   });
+  const indicatorTransitionStyle = common_vendor.computed(() => {
+    return new common_vendor.UTSJSONObject({
+      position: "absolute",
+      right: "30px",
+      top: uni_modules_uviewUltra_libs_function_index.addUnit(indicatorTop.value, "px"),
+      width: uni_modules_uviewUltra_libs_function_index.addUnit(indicatorHeight.value + 10),
+      zIndex: 3
+    });
+  });
+  const indicatorBoxStyle = common_vendor.computed(() => {
+    return new common_vendor.UTSJSONObject({
+      height: uni_modules_uviewUltra_libs_function_index.addUnit(indicatorHeight.value),
+      width: uni_modules_uviewUltra_libs_function_index.addUnit(indicatorHeight.value)
+    });
+  });
+  function getItemTextStyle(index) {
+    return new common_vendor.UTSJSONObject({
+      color: activeIndex.value == index ? "#fff" : props.inactiveColor
+    });
+  }
   common_vendor.watch(() => {
     return uIndexList.value;
   }, () => {
@@ -362,41 +389,34 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       e: common_vendor.sei("r0-12381c23", "scroll-view", "up-index-list__scroll-view"),
       f: scrollTop.value,
       g: scrollIntoView.value,
-      h: common_vendor.o(scrollHandler, "fb"),
+      h: common_vendor.o(scrollHandler, "31"),
       i: common_vendor.f(uIndexList.value, (item, index, i0) => {
         return {
           a: common_vendor.t(keyVal(item)),
-          b: activeIndex.value === index ? "#fff" : __props.inactiveColor,
-          c: activeIndex.value === index && __props.activeColor === "#5677fc" ? 1 : "",
+          b: common_vendor.s(getItemTextStyle(index)),
+          c: activeIndex.value == index && __props.activeColor == "#5677fc" ? 1 : "",
           d: index,
           e: common_vendor.s(getItemStyle(index))
         };
       }),
       j: common_vendor.sei("r1-12381c23", "view", "up-index-list__letter"),
-      k: _ctx.$up.addUnit(letterInfo.value["top"] ?? ""),
-      l: common_vendor.o(touchStart, "6d"),
-      m: common_vendor.o(touchMove, "8b"),
-      n: common_vendor.o(touchEnd, "9b"),
-      o: common_vendor.o(touchEnd, "bb"),
+      k: common_vendor.s(letterStyle.value),
+      l: common_vendor.o(touchStart, "62"),
+      m: common_vendor.o(touchMove, "14"),
+      n: common_vendor.o(touchEnd, "b4"),
+      o: common_vendor.o(touchEnd, "82"),
       p: common_vendor.t(activeIndex.value >= 0 ? keyVal(uIndexList.value[activeIndex.value]) : ""),
-      q: _ctx.$up.addUnit(indicatorHeight.value),
-      r: _ctx.$up.addUnit(indicatorHeight.value),
-      s: common_vendor.p({
+      q: common_vendor.s(indicatorBoxStyle.value),
+      r: common_vendor.p({
         mode: "fade",
         show: touching.value,
-        customStyle: {
-          position: "absolute",
-          right: "30px",
-          top: _ctx.$up.addUnit(indicatorTop.value, "px"),
-          width: _ctx.$up.addUnit(indicatorHeight.value + 10),
-          zIndex: 3
-        },
+        customStyle: indicatorTransitionStyle.value,
         class: "data-v-12381c23"
       }),
-      t: common_vendor.sei(common_vendor.gei(_ctx, "", "r2-12381c23"), "view", "up-index-list"),
-      v: `${_ctx.u_s_b_h}px`,
-      w: `${_ctx.u_s_a_i_b}px`,
-      x: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+      s: common_vendor.sei(common_vendor.gei(_ctx, "", "r2-12381c23"), "view", "up-index-list"),
+      t: `${_ctx.u_s_b_h}px`,
+      v: `${_ctx.u_s_a_i_b}px`,
+      w: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
     });
     return __returned__;
   };

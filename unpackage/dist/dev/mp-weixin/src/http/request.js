@@ -5,8 +5,12 @@ const uni_modules_limeRequest_utssdk_interface = require("../../uni_modules/lime
 const src_store_token = require("../store/token.js");
 const src_utils_toLoginPage = require("../utils/toLoginPage.js");
 const src_http_tools_enum = require("./tools/enum.js");
-const defaultUrl = "https://ukw0y1.laf.run";
-const secondaryUrl = "https://ukw0y1.laf.run";
+var _a, _b;
+const DEFAULT_API_URL = "https://ukw0y1.laf.run";
+const directBaseUrl = `${(_a = "https://ukw0y1.laf.run") !== null && _a !== void 0 ? _a : DEFAULT_API_URL}`;
+const directSecondaryUrl = `${(_b = "https://ukw0y1.laf.run") !== null && _b !== void 0 ? _b : DEFAULT_API_URL}`;
+const defaultUrl = directBaseUrl.startsWith("/") ? DEFAULT_API_URL : directBaseUrl;
+const secondaryUrl = directSecondaryUrl.startsWith("/") ? DEFAULT_API_URL : directSecondaryUrl;
 class ApiDomainConfig extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -28,15 +32,10 @@ class ApiDomainConfig extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
-const API_DOMAINS = new ApiDomainConfig(
-  {
-    DEFAULT: defaultUrl,
-    SECONDARY: secondaryUrl
-  }
-  // ==========================================
-  // 创建底层 lime-request 实例
-  // ==========================================
-);
+const API_DOMAINS = new ApiDomainConfig({
+  DEFAULT: defaultUrl,
+  SECONDARY: secondaryUrl
+});
 const requestInstance = new uni_modules_limeRequest_common_index.Request(new uni_modules_limeRequest_utssdk_interface.LimeRequestConfig({
   params: null,
   getTask: null,
@@ -79,8 +78,8 @@ requestInstance.interceptors.request.use((config) => {
   if (header["Content-Type"] == null) {
     header["Content-Type"] = src_http_tools_enum.ContentTypeEnum.AppJson;
   }
-  if (header["Accept"] == null) {
-    header["Accept"] = "application/json, text/plain, */*";
+  if (header.Accept == null) {
+    header.Accept = "application/json, text/plain, */*";
   }
   const extra = config.extra;
   let ignoreAuth = false;
@@ -96,10 +95,10 @@ requestInstance.interceptors.request.use((config) => {
     if (token === "") {
       throw new Error("[请求错误]：未登录");
     }
-    header["token"] = token;
+    header.token = token;
   }
   if (extra !== null) {
-    const domain = extra["domain"];
+    const domain = extra.domain;
     if (domain != null) {
       config.baseURL = domain;
     }
@@ -118,7 +117,7 @@ requestInstance.interceptors.response.use((response) => {
   const statusCode = response.statusCode;
   if (statusCode != 200) {
     const errorMessage = src_http_tools_enum.ShowMessage(statusCode);
-    common_vendor.index.__f__("error", "at src/http/request.uts:108", "errorMessage===>", errorMessage);
+    common_vendor.index.__f__("error", "at src/http/request.uts:115", "errorMessage===>", errorMessage);
     common_vendor.index.showToast({ title: errorMessage, icon: "error" });
     if (statusCode == 401) {
       const tokenStore = src_store_token.useTokenStore();
@@ -134,8 +133,8 @@ requestInstance.interceptors.response.use((response) => {
   const resultObj = common_vendor.UTS.JSON.parseObject(common_vendor.UTS.JSON.stringify(rawData));
   if (resultObj !== null) {
     const code = resultObj.getNumber("code");
-    const msgByKey = resultObj["message"];
-    const msgByMsg = resultObj["msg"];
+    const msgByKey = resultObj.message;
+    const msgByMsg = resultObj.msg;
     const message = msgByKey != null ? msgByKey : msgByMsg != null ? msgByMsg : "未知错误";
     if (code !== null) {
       const codeVal = code;
@@ -161,7 +160,7 @@ requestInstance.interceptors.response.use((response) => {
   }
   return response;
 }, (error) => {
-  common_vendor.index.__f__("error", "at src/http/request.uts:156", "request error ===>", error);
+  common_vendor.index.__f__("error", "at src/http/request.uts:163", "request error ===>", error);
   common_vendor.index.showToast({ title: "网络错误，请稍后再试", icon: "none" });
   return Promise.reject(error);
 });
@@ -183,7 +182,7 @@ class HttpClient {
             if (parsedData !== null) {
               return parsedData;
             } else {
-              throw new Error("响应 data 字段无法解析为指定的类型，请检查数据结构是否匹配。数据：" + innerStr);
+              throw new Error(`响应 data 字段无法解析为指定的类型，请检查数据结构是否匹配。数据：${innerStr}`);
             }
           }
           throw new Error("响应结构包含 code，但 data 字段为空");
@@ -194,7 +193,7 @@ class HttpClient {
       if (parsedRaw !== null) {
         return parsedRaw;
       }
-      throw new Error("原始响应数据无法解析为指定类型。原始数据：" + rawStr);
+      throw new Error(`原始响应数据无法解析为指定类型。原始数据：${rawStr}`);
     });
   }
   get(url, config = null) {

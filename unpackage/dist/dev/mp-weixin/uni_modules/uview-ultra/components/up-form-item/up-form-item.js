@@ -18,6 +18,16 @@ if (!Math) {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   name: "up-form-item"
 }, { __name: "up-form-item", props: {
+  customStyle: {
+    type: [Object, String],
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
+    }
+  },
+  customClass: {
+    type: String,
+    default: ""
+  },
   // input的label提示语
   label: {
     type: String,
@@ -87,6 +97,63 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   const emit = __emit;
   const message = common_vendor.ref("");
   const itemRules = common_vendor.ref(new common_vendor.UTSJSONObject({}));
+  const bodyStyle = common_vendor.computed(() => {
+    const custom = uni_modules_uviewUltra_libs_function_index.addStyle(props.customStyle);
+    const parentPos = parentData.value != null ? parentData.value["labelPosition"] : null;
+    const pos = props.labelPosition != "" ? props.labelPosition : parentPos !== null && parentPos !== void 0 ? parentPos : "left";
+    const base = new common_vendor.UTSJSONObject({
+      flexDirection: pos == "left" ? "row" : "column"
+    });
+    return uni_modules_uviewUltra_libs_function_index.deepMerge(base, custom);
+  });
+  const labelWrapperStyle = common_vendor.computed(() => {
+    var _a2;
+    const parentPos = parentData.value != null ? parentData.value["labelPosition"] : null;
+    const pos = props.labelPosition != "" ? props.labelPosition : parentPos !== null && parentPos !== void 0 ? parentPos : "left";
+    const parentWidth = parentData.value != null ? (_a2 = parentData.value["labelWidth"]) !== null && _a2 !== void 0 ? _a2 : 45 : 45;
+    const widthVal = props.labelWidth != null && props.labelWidth != "" ? props.labelWidth : parentWidth;
+    return new common_vendor.UTSJSONObject({
+      width: uni_modules_uviewUltra_libs_function_index.addUnit(widthVal),
+      marginBottom: pos == "left" ? "0px" : "5px"
+    });
+  });
+  const labelAlignStyle = common_vendor.computed(() => {
+    const align = parentData.value != null ? parentData.value["labelAlign"] : null;
+    return new common_vendor.UTSJSONObject({
+      justifyContent: align == "left" ? "flex-start" : align == "center" ? "center" : "flex-end"
+    });
+  });
+  const labelCustomStyle = common_vendor.computed(() => {
+    if (parentData.value != null && parentData.value["labelStyle"] != null) {
+      return parentData.value["labelStyle"];
+    }
+    return new common_vendor.UTSJSONObject({});
+  });
+  const messageStyle = common_vendor.computed(() => {
+    var _a2;
+    const parentPos = parentData.value != null ? parentData.value["labelPosition"] : null;
+    const pos = props.labelPosition != "" ? props.labelPosition : parentPos !== null && parentPos !== void 0 ? parentPos : "left";
+    const parentWidth = parentData.value != null ? (_a2 = parentData.value["labelWidth"]) !== null && _a2 !== void 0 ? _a2 : 45 : 45;
+    const widthVal = props.labelWidth != null && props.labelWidth != "" ? props.labelWidth : parentWidth;
+    const left = pos == "top" ? "0px" : uni_modules_uviewUltra_libs_function_index.addUnit(widthVal);
+    return new common_vendor.UTSJSONObject({
+      marginLeft: left
+    });
+  });
+  const isErrorMessage = common_vendor.computed(() => {
+    const errorType = parentData.value != null ? parentData.value["errorType"] : null;
+    return message.value != "" && errorType == "message";
+  });
+  const lineColor = common_vendor.computed(() => {
+    var _a2;
+    const errorType = parentData.value != null ? parentData.value["errorType"] : null;
+    return message.value != "" && errorType == "border-bottom" ? uni_modules_uviewUltra_libs_config_color.color["error"] : (_a2 = uni_modules_uviewUltra_components_upLine_line.propsLine["color"]) !== null && _a2 !== void 0 ? _a2 : "#d6d7d9";
+  });
+  const lineStyle = common_vendor.computed(() => {
+    return new common_vendor.UTSJSONObject({
+      marginTop: isErrorMessage.value ? "5px" : "0px"
+    });
+  });
   const updateParentData = () => {
     getParentData("up-form", instance, false);
   };
@@ -165,36 +232,32 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       })
     } : {}, {
       e: common_vendor.t(__props.label),
-      f: common_vendor.s(common_vendor.unref(parentData)["labelStyle"] ?? {}),
-      g: common_vendor.unref(parentData)["labelAlign"] == "left" ? "flex-start" : common_vendor.unref(parentData)["labelAlign"] == "center" ? "center" : "flex-end",
-      h: _ctx.$up.addUnit(__props.labelWidth != "" ? __props.labelWidth : common_vendor.unref(parentData)["labelWidth"]),
-      i: (__props.labelPosition != "" ? __props.labelPosition : common_vendor.unref(parentData)["labelPosition"]) == "left" ? 0 : "5px"
+      f: common_vendor.s(labelCustomStyle.value),
+      g: common_vendor.s(labelAlignStyle.value),
+      h: common_vendor.s(labelWrapperStyle.value)
     }) : {}, {
-      j: _ctx.$slots["right"] != null
+      i: _ctx.$slots["right"] != null
     }, _ctx.$slots["right"] != null ? {} : {}, {
-      k: common_vendor.o(clickHandler, "0e"),
-      l: common_vendor.s(_ctx.$up.addStyle(_ctx.customStyle)),
-      m: common_vendor.s({
-        flexDirection: (__props.labelPosition != "" ? __props.labelPosition : common_vendor.unref(parentData)["labelPosition"]) == "left" ? "row" : "column"
-      }),
-      n: message.value != "" && common_vendor.unref(parentData)["errorType"] == "message"
-    }, message.value != "" && common_vendor.unref(parentData)["errorType"] == "message" ? {
-      o: common_vendor.t(message.value),
-      p: _ctx.$up.addUnit((__props.labelPosition ?? common_vendor.unref(parentData)["labelPosition"]) == "top" ? 0 : __props.labelWidth != null ? __props.labelWidth : common_vendor.unref(parentData)["labelWidth"])
+      j: common_vendor.o(clickHandler, "db"),
+      k: common_vendor.s(bodyStyle.value),
+      l: isErrorMessage.value
+    }, isErrorMessage.value ? {
+      m: common_vendor.t(message.value),
+      n: common_vendor.s(messageStyle.value)
     } : {}, {
-      q: __props.borderBottom
+      o: __props.borderBottom
     }, __props.borderBottom ? {
-      r: common_vendor.p({
-        color: message.value != "" && common_vendor.unref(parentData)["errorType"] == "border-bottom" ? common_vendor.unref(uni_modules_uviewUltra_libs_config_color.color)["error"] : common_vendor.unref(uni_modules_uviewUltra_components_upLine_line.defProps)["color"],
-        customStyle: `margin-top: ${message.value != "" && common_vendor.unref(parentData)["errorType"] == "message" ? "5px" : 0}`,
+      p: common_vendor.p({
+        color: lineColor.value,
+        customStyle: lineStyle.value,
         class: "data-v-dec42e4c"
       })
     } : {}, {
-      s: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-      t: message.value != "" && common_vendor.unref(parentData)["errorType"] == "message" ? 1 : "",
-      v: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
-      w: `${_ctx.u_s_b_h}px`,
-      x: `${_ctx.u_s_a_i_b}px`
+      q: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+      r: isErrorMessage.value ? 1 : "",
+      s: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+      t: `${_ctx.u_s_b_h}px`,
+      v: `${_ctx.u_s_a_i_b}px`
     });
     return __returned__;
   };

@@ -1,0 +1,439 @@
+<template>
+  <Card title="加密解密工具 (crypto)">
+    <!-- 1. Base64 编码解码 -->
+    <view class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
+      <text class="text-13px font-bold text-[#1e293b] mb-8px">1. Base64 编码 / 解码</text>
+      <input
+        v-model="base64Input"
+        placeholder="请输入要编码的文本"
+        class="h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-[#cbd5e1] text-13px text-[#334155] mb-12px"
+      />
+      <view class="flex-row items-center mb-8px">
+        <view class="flex-1 h-36px rounded-8px bg-[#10b981] flex flex-row items-center justify-center mr-8px" @click="handleBase64Encode">
+          <text class="text-[#ffffff] text-13px font-bold">编码</text>
+        </view>
+        <view class="flex-1 h-36px rounded-8px bg-[#6366f1] flex flex-row items-center justify-center" @click="handleBase64Decode">
+          <text class="text-[#ffffff] text-13px font-bold">解码</text>
+        </view>
+      </view>
+      <text class="text-12px text-[#64748b]">编码结果 (Base64):</text>
+      <text class="result-text text-12px font-medium text-[#334155] mt-2px" style="font-family: monospace;">{{ base64EncodeResult }}</text>
+      <text class="text-12px text-[#64748b] mt-8px">解码结果:</text>
+      <text class="result-text text-12px font-medium text-[#334155] mt-2px" style="font-family: monospace;">{{ base64DecodeResult }}</text>
+    </view>
+
+    <!-- 2. MD5 与 SHA-256 摘要 -->
+    <view class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
+      <text class="text-13px font-bold text-[#1e293b] mb-8px">2. MD5 / SHA-256 摘要</text>
+      <input
+        v-model="hashInput"
+        placeholder="请输入要计算摘要的文本"
+        class="h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-[#cbd5e1] text-13px text-[#334155] mb-12px"
+      />
+      <view class="flex-row items-center mb-8px">
+        <view class="flex-1 h-36px rounded-8px bg-[#f59e0b] flex flex-row items-center justify-center mr-8px" @click="handleMd5">
+          <text class="text-[#ffffff] text-13px font-bold">MD5</text>
+        </view>
+        <view class="flex-1 h-36px rounded-8px bg-[#ef4444] flex flex-row items-center justify-center" @click="handleSha256">
+          <text class="text-[#ffffff] text-13px font-bold">SHA-256</text>
+        </view>
+      </view>
+      <text class="text-12px text-[#64748b]">MD5:</text>
+      <text class="result-text text-12px font-medium text-[#059669] mt-2px" style="font-family: monospace;">{{ md5Result }}</text>
+      <text class="text-12px text-[#64748b] mt-8px">SHA-256:</text>
+      <text class="result-text text-12px font-medium text-[#059669] mt-2px" style="font-family: monospace;">{{ sha256Result }}</text>
+    </view>
+
+    <!-- 3. HMAC-SHA1 -->
+    <view class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
+      <text class="text-13px font-bold text-[#1e293b] mb-8px">3. HMAC-SHA1 签名</text>
+      <input
+        v-model="hmacText"
+        placeholder="请输入要签名的文本"
+        class="h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-[#cbd5e1] text-13px text-[#334155] mb-8px"
+      />
+      <input
+        v-model="hmacKey"
+        placeholder="请输入密钥 key"
+        class="h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-[#cbd5e1] text-13px text-[#334155] mb-12px"
+      />
+      <view class="w-full h-36px rounded-8px bg-[#0ea5e9] flex flex-row items-center justify-center" @click="handleHmac">
+        <text class="text-[#ffffff] text-13px font-bold">计算 HMAC-SHA1</text>
+      </view>
+      <text class="result-text text-12px font-medium text-[#334155] mt-8px" style="font-family: monospace;">{{ hmacResult }}</text>
+    </view>
+
+    <!-- 4. AES 加密解密 -->
+    <view class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
+      <text class="text-13px font-bold text-[#1e293b] mb-8px">4. AES 加密 / 解密 (key 需 16 位)</text>
+      <input
+        v-model="aesText"
+        placeholder="请输入要加密的文本"
+        class="h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-[#cbd5e1] text-13px text-[#334155] mb-8px"
+      />
+      <input
+        v-model="aesKey"
+        placeholder="请输入 16 位密钥"
+        class="h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-[#cbd5e1] text-13px text-[#334155] mb-12px"
+      />
+      <view class="flex-row items-center mb-8px">
+        <view class="flex-1 h-36px rounded-8px bg-[#8b5cf6] flex flex-row items-center justify-center mr-8px" @click="handleAesEncrypt">
+          <text class="text-[#ffffff] text-13px font-bold">加密</text>
+        </view>
+        <view class="flex-1 h-36px rounded-8px bg-[#d946ef] flex flex-row items-center justify-center" @click="handleAesDecrypt">
+          <text class="text-[#ffffff] text-13px font-bold">解密</text>
+        </view>
+      </view>
+      <text class="text-12px text-[#64748b]">加密结果 (hex):</text>
+      <text class="result-text text-12px font-medium text-[#334155] mt-2px" style="font-family: monospace;">{{ aesEncryptResult }}</text>
+      <text class="text-12px text-[#64748b] mt-8px">解密结果:</text>
+      <text class="result-text text-12px font-medium text-[#334155] mt-2px" style="font-family: monospace;">{{ aesDecryptResult }}</text>
+    </view>
+
+    <!-- 5. DES 加密解密 -->
+    <view class="rounded-12px p-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
+      <text class="text-13px font-bold text-[#1e293b] mb-8px">5. DES 加密 / 解密 (key 需 8 位)</text>
+      <input
+        v-model="desText"
+        placeholder="请输入要加密的文本"
+        class="h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-[#cbd5e1] text-13px text-[#334155] mb-8px"
+      />
+      <input
+        v-model="desKey"
+        placeholder="请输入 8 位密钥"
+        class="h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-[#cbd5e1] text-13px text-[#334155] mb-12px"
+      />
+      <view class="flex-row items-center mb-8px">
+        <view class="flex-1 h-36px rounded-8px bg-[#14b8a6] flex flex-row items-center justify-center mr-8px" @click="handleDesEncrypt">
+          <text class="text-[#ffffff] text-13px font-bold">加密</text>
+        </view>
+        <view class="flex-1 h-36px rounded-8px bg-[#f97316] flex flex-row items-center justify-center" @click="handleDesDecrypt">
+          <text class="text-[#ffffff] text-13px font-bold">解密</text>
+        </view>
+      </view>
+      <text class="text-12px text-[#64748b]">加密结果 (hex):</text>
+      <text class="result-text text-12px font-medium text-[#334155] mt-2px" style="font-family: monospace;">{{ desEncryptResult }}</text>
+      <text class="text-12px text-[#64748b] mt-8px">解密结果:</text>
+      <text class="result-text text-12px font-medium text-[#334155] mt-2px" style="font-family: monospace;">{{ desDecryptResult }}</text>
+    </view>
+
+    <!-- 6. RSA 非对称加密 / 签名 -->
+    <view class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
+      <text class="text-13px font-bold text-[#1e293b] mb-8px">6. RSA 非对称加密 / 签名 (示例密钥 1024 位)</text>
+      <input
+        v-model="rsaText"
+        placeholder="请输入要加密 / 签名的文本"
+        class="h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-[#cbd5e1] text-13px text-[#334155] mb-8px"
+      />
+      <view class="flex-row items-center mb-8px">
+        <view class="flex-1 h-36px rounded-8px bg-[#0d9488] flex flex-row items-center justify-center mr-8px" @click="handleRsaGenerateKeyPair">
+          <text class="text-[#ffffff] text-13px font-bold">生成密钥对</text>
+        </view>
+        <view class="flex-1 h-36px rounded-8px bg-[#0284c7] flex flex-row items-center justify-center" @click="handleRsaEncrypt">
+          <text class="text-[#ffffff] text-13px font-bold">公钥加密</text>
+        </view>
+      </view>
+      <input
+        v-model="rsaPublicKey"
+        placeholder="RSA 公钥（PKCS#1 / SPKI，PEM 或 Base64）"
+        class="h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-[#cbd5e1] text-13px text-[#334155] mb-8px"
+      />
+      <input
+        v-model="rsaPrivateKey"
+        placeholder="RSA 私钥（PKCS#1 / PKCS#8，PEM 或 Base64）"
+        class="h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-[#cbd5e1] text-13px text-[#334155] mb-12px"
+      />
+      <view class="flex-row items-center mb-8px">
+        <view class="flex-1 h-36px rounded-8px bg-[#7c3aed] flex flex-row items-center justify-center mr-8px" @click="handleRsaDecrypt">
+          <text class="text-[#ffffff] text-13px font-bold">私钥解密</text>
+        </view>
+        <view class="flex-1 h-36px rounded-8px bg-[#db2777] flex flex-row items-center justify-center mr-8px" @click="handleRsaSign">
+          <text class="text-[#ffffff] text-13px font-bold">SHA-256 签名</text>
+        </view>
+        <view class="flex-1 h-36px rounded-8px bg-[#65a30d] flex flex-row items-center justify-center" @click="handleRsaVerify">
+          <text class="text-[#ffffff] text-13px font-bold">验签</text>
+        </view>
+      </view>
+      <text class="text-12px text-[#64748b]">密钥对结果:</text>
+      <text class="result-text text-12px font-medium text-[#334155] mt-2px" style="font-family: monospace;">{{ rsaKeyPairResult }}</text>
+      <text class="text-12px text-[#64748b] mt-8px">加密结果 (hex):</text>
+      <text class="result-text text-12px font-medium text-[#334155] mt-2px" style="font-family: monospace;">{{ rsaEncryptResult }}</text>
+      <text class="text-12px text-[#64748b] mt-8px">解密结果:</text>
+      <text class="result-text text-12px font-medium text-[#334155] mt-2px" style="font-family: monospace;">{{ rsaDecryptResult }}</text>
+      <text class="text-12px text-[#64748b] mt-8px">签名结果 (hex):</text>
+      <text class="result-text text-12px font-medium text-[#334155] mt-2px" style="font-family: monospace;">{{ rsaSignResult }}</text>
+      <text class="text-12px text-[#64748b] mt-8px">验签结果:</text>
+      <text class="result-text text-12px font-medium text-[#334155] mt-2px" style="font-family: monospace;">{{ rsaVerifyResult }}</text>
+    </view>
+
+    <!-- 7. UUID 生成 -->
+    <view class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
+      <text class="text-13px font-bold text-[#1e293b] mb-8px">7. UUID 生成 (v4)</text>
+      <view class="w-full h-36px rounded-8px bg-[#2563eb] flex flex-row items-center justify-center mb-8px" @click="handleGenerateUUID">
+        <text class="text-[#ffffff] text-13px font-bold">生成 UUID</text>
+      </view>
+      <text class="text-12px text-[#64748b]">生成的 UUID:</text>
+      <text class="result-text text-12px font-medium text-[#2563eb] mt-2px" style="font-family: monospace;">{{ uuidResult }}</text>
+    </view>
+  </Card>
+</template>
+
+<script setup lang="uts">
+// 卡片组件、Vue 响应式 API 与加密工具导入
+import Card from '../../basic/components/Card.uvue';
+import { ref } from 'vue';
+import { aesDecrypt, aesEncrypt, base64Decode, base64Encode, desDecrypt, desEncrypt, generateUUID, hmacSha1, md5, rsaDecrypt, rsaEncrypt, rsaGenerateKeyPair, rsaSign, rsaVerify, sha256 } from '@/uni_modules/unix-crypto';
+
+// ===== 1. Base64 编码 / 解码状态 =====
+// 待编码或解码的文本
+const base64Input = ref('hello uni-app x');
+// Base64 编码结果
+const base64EncodeResult = ref('');
+// Base64 解码结果
+const base64DecodeResult = ref('');
+
+// ===== 2. MD5 / SHA-256 摘要状态 =====
+// 待计算摘要的文本
+const hashInput = ref('hello uni-app x');
+// MD5 摘要计算结果
+const md5Result = ref('');
+// SHA-256 摘要计算结果
+const sha256Result = ref('');
+
+// ===== 3. HMAC-SHA1 签名状态 =====
+// 待签名的文本
+const hmacText = ref('hello uni-app x');
+// 签名密钥（可任意修改）
+const hmacKey = ref('secret-key');
+// HMAC-SHA1 签名结果
+const hmacResult = ref('');
+
+// ===== 4. AES 加密 / 解密状态 =====
+// 待加密的文本
+const aesText = ref('hello uni-app x');
+// AES 密钥（必须 16 位）
+const aesKey = ref('1234567890abcdef');
+// AES 加密结果（十六进制字符串）
+const aesEncryptResult = ref('');
+// AES 解密结果（还原后的明文）
+const aesDecryptResult = ref('');
+
+// ===== 5. DES 加密 / 解密状态 =====
+// 待加密的文本
+const desText = ref('hello uni-app x');
+// DES 密钥（必须 8 位）
+const desKey = ref('12345678');
+// DES 加密结果（十六进制字符串）
+const desEncryptResult = ref('');
+// DES 解密结果（还原后的明文）
+const desDecryptResult = ref('');
+
+// ===== 6. RSA 非对称加密状态 =====
+// 待加密 / 签名的文本
+const rsaText = ref('hello uni-app x');
+// RSA 公钥（SPKI，Base64 格式，示例密钥）
+const rsaPublicKey = ref('MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDLJXnLrDV0RxJWMHlsNc2glZlGd9GsJh6XV9LRsgLSlPYz2xEm751nqG1MLtkX+m/ov7YMNwyhwhw13PFCPfcpm0klWkcKPteEPOXUx3H6mVL2YMNUREtsMxub1zrvo0GNm688Py/8WhXzzxXT/nDe0owpCMmaQWaGP/diX7T7uQIDAQAB');
+// RSA 私钥（PKCS#8，Base64 格式，示例密钥）
+const rsaPrivateKey = ref('MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAMslecusNXRHElYweWw1zaCVmUZ30awmHpdX0tGyAtKU9jPbESbvnWeobUwu2Rf6b+i/tgw3DKHCHDXc8UI99ymbSSVaRwo+14Q85dTHcfqZUvZgw1RES2wzG5vXOu+jQY2brzw/L/xaFfPPFdP+cN7SjCkIyZpBZoY/92JftPu5AgMBAAECgYEAqjidxPdo1yUSjVwS8oRm6A9SnwSZkZljesdhZMq3qMKfRrZiufCAQbKU2whKatgz26CAp92c3RIs10lqc2o+5oKBOPNnAJXCmnjwNG9tlbKs0SpZjAgKgYv/uHlr2YX10xBQi1C7M2ySdbshj0inyyxzb6ibVJTmpHCFSkW1920CQQD/w6OYh87KOUYjan950HaSnc1g20HtI0rzRALRogGeQpo1qSeShfFGYOM219ee+9zawZLpw0X1W7BnH2vkNOXzAkEAy1VrNa4m0uC6NO+ytTEM6G+/WE8CuInIDvUzypLN8pNhev5/cPVzdZOcVlQLFZiPGe0vdu+hXmFvYYqWiymmowJANGdtea85241opZEIlXj1Eo1qq1HBbEky7i0dNr6u/jI/TodeKFNxYC4x3+bRsy1/zwKii2sLRn6G4lo5zQRZqQJAe8cA34mnOqHw2H6+BAza9bfo/EIEvv+o2Got3/gkBLHxGmVIgSP56C42clrw8HGRU1AOn9FaI1Ee83rhD9AIDwJAFs5T4UMe07NfVUIlN1jxyHvRwyXWjgex+6JbYXmhV9wjQ+taO74aO4cRwKhe0Yi5smGSR7+mzgJhJNdxn+5ntQ==');
+// RSA 密钥对生成结果
+const rsaKeyPairResult = ref('');
+// RSA 加密结果（十六进制字符串）
+const rsaEncryptResult = ref('');
+// RSA 解密结果（还原后的明文）
+const rsaDecryptResult = ref('');
+// RSA 签名结果（十六进制字符串）
+const rsaSignResult = ref('');
+// RSA 验签结果
+const rsaVerifyResult = ref('');
+
+/**
+ * 统一提取 Promise 错误信息，方便界面直接展示
+ * @param e 捕获到的异常
+ * @returns 可读的错误消息字符串
+ */
+function errorMessage(e: any): string {
+  if (e instanceof Error) {
+    return e.message;
+  }
+  return JSON.stringify(e);
+}
+
+/** Base64 编码：对输入文本执行编码，并清空上一次的解码结果 */
+async function handleBase64Encode() {
+  try {
+    base64EncodeResult.value = await base64Encode(base64Input.value);
+    base64DecodeResult.value = '';
+  }
+  catch (e: any) {
+    base64EncodeResult.value = errorMessage(e);
+  }
+}
+
+/** Base64 解码：优先解码上一步的编码结果，若无则解码输入框文本 */
+async function handleBase64Decode() {
+  try {
+    const target = base64EncodeResult.value.length > 0 ? base64EncodeResult.value : base64Input.value;
+    base64DecodeResult.value = await base64Decode(target);
+  }
+  catch (e: any) {
+    base64DecodeResult.value = errorMessage(e);
+  }
+}
+
+/** 计算输入文本的 MD5 摘要 */
+async function handleMd5() {
+  try {
+    md5Result.value = await md5(hashInput.value);
+  }
+  catch (e: any) {
+    md5Result.value = errorMessage(e);
+  }
+}
+
+/** 计算输入文本的 SHA-256 摘要 */
+async function handleSha256() {
+  try {
+    sha256Result.value = await sha256(hashInput.value);
+  }
+  catch (e: any) {
+    sha256Result.value = errorMessage(e);
+  }
+}
+
+/** 使用密钥对文本计算 HMAC-SHA1 签名 */
+async function handleHmac() {
+  try {
+    hmacResult.value = await hmacSha1(hmacText.value, hmacKey.value);
+  }
+  catch (e: any) {
+    hmacResult.value = errorMessage(e);
+  }
+}
+
+/** AES 加密：对输入文本使用密钥加密，并清空上一次的解密结果 */
+async function handleAesEncrypt() {
+  try {
+    aesEncryptResult.value = await aesEncrypt(aesText.value, aesKey.value);
+    aesDecryptResult.value = '';
+  }
+  catch (e: any) {
+    aesEncryptResult.value = errorMessage(e);
+  }
+}
+
+/** AES 解密：使用密钥解密上一步的加密结果 */
+async function handleAesDecrypt() {
+  try {
+    aesDecryptResult.value = await aesDecrypt(aesEncryptResult.value, aesKey.value);
+  }
+  catch (e: any) {
+    aesDecryptResult.value = errorMessage(e);
+  }
+}
+
+/** DES 加密：对输入文本使用密钥加密，并清空上一次的解密结果 */
+async function handleDesEncrypt() {
+  try {
+    desEncryptResult.value = await desEncrypt(desText.value, desKey.value);
+    desDecryptResult.value = '';
+  }
+  catch (e: any) {
+    desEncryptResult.value = errorMessage(e);
+  }
+}
+
+/** DES 解密：使用密钥解密上一步的加密结果 */
+async function handleDesDecrypt() {
+  try {
+    desDecryptResult.value = await desDecrypt(desEncryptResult.value, desKey.value);
+  }
+  catch (e: any) {
+    desDecryptResult.value = errorMessage(e);
+  }
+}
+
+/** 生成 RSA 密钥对并自动填入输入框 */
+async function handleRsaGenerateKeyPair() {
+  try {
+    const jsonStr = await rsaGenerateKeyPair(1024);
+    rsaKeyPairResult.value = jsonStr;
+    try {
+      /* eslint-disable dot-notation */
+      const keyData = JSON.parse(jsonStr) as UTSJSONObject;
+      const pub = (keyData['publicKey'] ?? '') as string;
+      if (pub.length > 0) {
+        rsaPublicKey.value = pub;
+      }
+      const pri = (keyData['privateKey'] ?? '') as string;
+      if (pri.length > 0) {
+        rsaPrivateKey.value = pri;
+      }
+      /* eslint-enable dot-notation */
+    }
+    catch (err: any) {
+      console.error('Failed to parse RSA keypair:', err);
+    }
+  }
+  catch (e: any) {
+    rsaKeyPairResult.value = errorMessage(e);
+  }
+}
+
+/** RSA 公钥加密：对输入文本使用公钥加密，并清空上一次的解密结果 */
+async function handleRsaEncrypt() {
+  try {
+    rsaEncryptResult.value = await rsaEncrypt(rsaText.value, rsaPublicKey.value);
+    rsaDecryptResult.value = '';
+  }
+  catch (e: any) {
+    rsaEncryptResult.value = errorMessage(e);
+  }
+}
+
+/** RSA 私钥解密：使用私钥解密上一步的加密结果 */
+async function handleRsaDecrypt() {
+  try {
+    rsaDecryptResult.value = await rsaDecrypt(rsaEncryptResult.value, rsaPrivateKey.value);
+  }
+  catch (e: any) {
+    rsaDecryptResult.value = errorMessage(e);
+  }
+}
+
+/** RSA SHA-256 签名：使用私钥对输入文本签名 */
+async function handleRsaSign() {
+  try {
+    rsaSignResult.value = await rsaSign(rsaText.value, rsaPrivateKey.value, 'SHA-256');
+    rsaVerifyResult.value = '';
+  }
+  catch (e: any) {
+    rsaSignResult.value = errorMessage(e);
+  }
+}
+
+/** RSA 验签：使用公钥验证上一步的签名 */
+async function handleRsaVerify() {
+  try {
+    const ok = await rsaVerify(rsaText.value, rsaPublicKey.value, rsaSignResult.value, 'SHA-256');
+    rsaVerifyResult.value = ok ? '通过 (true)' : '未通过 (false)';
+  }
+  catch (e: any) {
+    rsaVerifyResult.value = errorMessage(e);
+  }
+}
+
+// ===== 7. UUID 生成状态与方法 =====
+const uuidResult = ref('');
+
+function handleGenerateUUID() {
+  uuidResult.value = generateUUID();
+}
+</script>
+
+<style scoped>
+/* #ifdef H5 || MP-WEIXIN */
+.result-text {
+  word-break: break-all;
+}
+/* #endif */
+</style>

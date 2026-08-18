@@ -7,10 +7,9 @@ if (!Array) {
 }
 const _easycom_uni_icons = () => "../../../uni_modules/uni-icons/components/uni-icons/uni-icons.js";
 if (!Math) {
-  (common_vendor.unref(NavBar) + _easycom_uni_icons + common_vendor.unref(LayoutComponent) + common_vendor.unref(AppKu))();
+  (common_vendor.unref(NavBar) + _easycom_uni_icons + common_vendor.unref(AppKu))();
 }
 const AppKu = () => "../../../App.ku.js";
-const LayoutComponent = () => "../../layouts/default.js";
 const NavBar = () => "../../components/NavBar/NavBar.js";
 class ChatMessage extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -132,27 +131,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, common_vendor.unref(isTyping) ? {} : {}, {
         d: `${common_vendor.unref(safeAreaBottom) + 70}px`,
         e: common_vendor.unref(scrollTop),
-        f: common_vendor.o(sendMessage, "eb"),
+        f: common_vendor.o(sendMessage, "0d"),
         g: common_vendor.unref(inputText),
         h: common_vendor.o(($event) => {
           return common_vendor.isRef(inputText) ? inputText.value = $event.detail.value : null;
-        }, "15"),
+        }, "a8"),
         i: common_vendor.p({
           type: "paperplane-filled",
           size: "18",
           color: "#ffffff"
         }),
-        j: common_vendor.o(sendMessage, "e8"),
+        j: common_vendor.o(sendMessage, "53"),
         k: `${common_vendor.unref(safeAreaBottom) + 10}px`,
-        l: common_vendor.p({
-          ["navigation-style"]: "custom",
-          ["navigation-bar-title-text"]: "AI助手"
-        }),
-        m: common_vendor.gei(_ctx, ""),
-        n: common_vendor.p({
+        l: common_vendor.gei(_ctx, ""),
+        m: common_vendor.p({
           id: common_vendor.gei(_ctx, "")
         }),
-        o: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        n: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

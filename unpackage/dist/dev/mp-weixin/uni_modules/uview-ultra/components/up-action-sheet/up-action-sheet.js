@@ -254,8 +254,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     }, __props.cancelText ? {
       w: common_vendor.t(__props.cancelText),
       x: common_vendor.o(() => {
-      }, "46"),
-      y: common_vendor.o(cancel, "f7")
+      }, "c1"),
+      y: common_vendor.o(cancel, "32")
     } : {}, {
       z: common_vendor.gei(_ctx, ""),
       A: common_vendor.o(closeHandler, "93"),

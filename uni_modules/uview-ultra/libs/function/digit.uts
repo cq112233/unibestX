@@ -37,7 +37,7 @@ function digitLength(num: number): number {
  * @param {*number} num 输入数
  */
 function float2Fixed(num: number): any {
-  if (num.toString().indexOf('e') === -1) {
+  if (num.toString().indexOf('e') == -1) {
     return parseInt(num.toString().replace('.', ''));
   }
   const dLen: number = digitLength(num);
@@ -154,7 +154,7 @@ export function round(num: number, ratio: number): number {
   // todo
   const base = Math.pow(10, ratio);
   let result = divide(Math.round(Math.abs(times(num, base))), base);
-  if (num < 0 && result !== 0) {
+  if (num < 0 && result != 0) {
     result = times(result, -1);
   }
   // 位数不足则补0

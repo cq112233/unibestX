@@ -26,30 +26,30 @@
 </template>
 
 <script setup lang="uts">
-import { computed } from 'vue'
-import Card from './Card.uvue'
-import { useTokenStore } from '@/src/store/token'
-import { useUserStore } from '@/src/store/user'
+import { computed } from 'vue';
+import Card from './Card.uvue';
+import { useTokenStore } from '@/src/store/token';
+import { useUserStore } from '@/src/store/user';
 
-const tokenStore = useTokenStore()
-const userStore = useUserStore()
+const tokenStore = useTokenStore();
+const userStore = useUserStore();
 
 const hasLogin = computed((): boolean => {
-  return tokenStore.hasValidLogin()
-})
+  return tokenStore.hasValidLogin();
+});
 
 function jumpToTest() {
   uni.navigateTo({
-    url: '/src/sub/test/test?id=999&name=UNIX',
-  })
+    url: '/src/sub/test/test?id=999&name=UNIX'
+  });
 }
 
 function handleLogout() {
-  tokenStore.clearToken()
-  userStore.clearUserInfo()
+  tokenStore.clearToken();
+  userStore.clearUserInfo();
   uni.showToast({
     title: '已清除登录状态',
-    icon: 'success',
-  })
+    icon: 'success'
+  });
 }
 </script>

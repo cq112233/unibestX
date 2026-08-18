@@ -33,12 +33,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         b: common_vendor.t(sysModel.value !== "" ? sysModel.value : "暂无数据"),
         c: common_vendor.t(sysSystem.value !== "" ? sysSystem.value : "暂无数据"),
         d: common_vendor.t(sysPlatform.value !== "" ? sysPlatform.value : "暂无数据"),
-        e: common_vendor.o(fetchSystemInfo, "12"),
+        e: common_vendor.o(fetchSystemInfo, "c8"),
         f: common_vendor.gei(_ctx, ""),
         g: common_vendor.p({
           title: "设备系统信息",
-          id: common_vendor.gei(_ctx, ""),
-          class: "data-v-41f8f8e9"
+          id: common_vendor.gei(_ctx, "")
         }),
         h: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
@@ -46,6 +45,5 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-41f8f8e9"]]);
-wx.createComponent(Component);
+wx.createComponent(_sfc_main);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/src/pages/function/components/SystemInfoCard.js.map

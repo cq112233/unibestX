@@ -10,6 +10,6 @@ function _sfc_render(_ctx, _cache) {
     d: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   };
 }
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render]]);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-f3b09314"]]);
 wx.createComponent(Component);
 //# sourceMappingURL=../../../.sourcemap/mp-weixin/src/layouts/default.js.map

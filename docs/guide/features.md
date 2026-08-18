@@ -51,5 +51,14 @@
 借助自定义 Vite 插件 (`plugins/uni-layouts-plugin.ts`)，实现了灵活的页面布局：
 
 * **自动注入**：自动为页面包裹默认的 Layout 组件，无需在每个页面重复书写。
-* **自定义配置**：支持在 `pages.json` 或页面顶部的 `<route>` 块中配置自定义使用的布局。
+* **自定义配置**：支持在 `pages.json` 或页面 `definePage` / `<route>` 块中配置自定义使用的布局。
 * **按需禁用**：可以通过设置 `layout: false` 单独为某个页面禁用布局包裹。
+
+## 文件路由与 definePage (uni-pages)
+
+基于 `plugins/vite-plugin-uni-pages.ts` 实现现代化的文件路由与页面元数据体系：
+
+* **免手动配置**：自动递归扫描 `src/pages` 与 `src/sub` 生成 `pages.json`。
+* **同源声明**：在页面内通过 `definePage({ style: { ... }, layout: '...', type: 'home' })` 声明页面标题、导航栏与布局。
+* **动态首页**：声明 `type: 'home'` 即可将该页面自动排在 `pages.json` 首位作为应用首页。
+* **类型安全**：配备完整的全局 TypeScript / UTS 宏类型与 IDE 智能补全。

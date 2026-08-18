@@ -1,11 +1,8 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-require("../../libs/function/test.js");
-require("../../libs/function/digit.js");
-const uni_modules_uviewUltra_libs_config_config = require("../../libs/config/config.js");
+const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
 const uni_modules_uviewUltra_components_upDropdownItem_dropdownItem = require("./dropdown-item.js");
 const uni_modules_uviewUltra_components_upDropdown_types = require("../up-dropdown/types.js");
-const uni_modules_uviewUltra_libs_composable_useUltraUI = require("../../libs/composable/useUltraUI.js");
 if (!Array) {
   const _easycom_up_icon_1 = common_vendor.resolveComponent("up-icon");
   const _easycom_up_cell_1 = common_vendor.resolveComponent("up-cell");
@@ -57,96 +54,96 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     default: uni_modules_uviewUltra_components_upDropdownItem_dropdownItem.defProps.getBoolean("dropdownItem.closeOnClickOverlay")
   }
 }, emits: ["update:modelValue", "change"], setup(__props, _a) {
-  var __expose = _a.expose, __emit = _a.emit;
-  const _b = uni_modules_uviewUltra_libs_composable_useUltraUI.useUltraUI(new common_vendor.UTSJSONObject({
-    activeColor: uni_modules_uviewUltra_libs_config_config.config.getString("color.up-primary"),
-    inactiveColor: "#606266"
-  })), parent = _b.parent, parentData = _b.parentData, getParentData = _b.getParentData;
-  const instance = common_vendor.getCurrentInstance().proxy;
+  var __emit = _a.emit;
   const props = __props;
   const emit = __emit;
-  const active = common_vendor.ref(false);
-  const activeColor = common_vendor.ref(uni_modules_uviewUltra_libs_config_config.config.getString("color.up-primary"));
-  const inactiveColor = common_vendor.ref("#606266");
-  const propsChange = common_vendor.computed(() => {
-    return `${props.title}-${props.disabled}`;
-  });
-  common_vendor.watch(active, (val) => {
-  });
-  common_vendor.watch(propsChange, () => {
-    if (parent.value != null)
-      parent.value.$callMethod("init");
-  });
-  function init() {
-    getParentData("up-dropdown", instance, false);
-    let parentRef = parent.value;
-    if (parentRef != null) {
-      if (parentData.value["activeColor"] != null) {
-        activeColor.value = parentData.value["activeColor"];
-      }
-      if (parentData.value["inactiveColor"] != null) {
-        inactiveColor.value = parentData.value["inactiveColor"];
-      }
-      let childrenList = parentRef.$callMethod("getChildren");
-      if (childrenList == null) {
-        childrenList = parentRef.$data["children"];
-      }
-      if (childrenList != null && childrenList.length == 1)
-        active.value = true;
-      parentRef.$callMethod("addMenuListItem", new uni_modules_uviewUltra_components_upDropdown_types.UPDropdownMenu({
-        title: props.title.toString(),
-        disabled: props.disabled
-      }));
+  const parentDropdownProps = common_vendor.inject("upDropdownProps", null);
+  const parentActive = common_vendor.inject("upDropdownActive", null);
+  const parentCurrent = common_vendor.inject("upDropdownCurrent", null);
+  const registerFn = common_vendor.inject("upDropdownRegisterItem", null);
+  const updateFn = common_vendor.inject("upDropdownUpdateItemTitle", null);
+  const closeFn = common_vendor.inject("upDropdownClose", null);
+  const itemIndex = common_vendor.ref(-1);
+  const isActive = common_vendor.computed(() => {
+    if (parentActive != null && parentCurrent != null) {
+      return parentActive.value == true && parentCurrent.value == itemIndex.value;
     }
-  }
+    return false;
+  });
+  const activeColor = common_vendor.computed(() => {
+    var _a2;
+    if (parentDropdownProps != null && parentDropdownProps.value != null && ((_a2 = parentDropdownProps.value["activeColor"]) !== null && _a2 !== void 0 ? _a2 : "") != "") {
+      return parentDropdownProps.value["activeColor"];
+    }
+    return "#2979ff";
+  });
+  const inactiveColor = common_vendor.computed(() => {
+    var _a2;
+    if (parentDropdownProps != null && parentDropdownProps.value != null && ((_a2 = parentDropdownProps.value["inactiveColor"]) !== null && _a2 !== void 0 ? _a2 : "") != "") {
+      return parentDropdownProps.value["inactiveColor"];
+    }
+    return "#606266";
+  });
+  const scrollHeightStyle = common_vendor.computed(() => {
+    return new common_vendor.UTSJSONObject({ height: uni_modules_uviewUltra_libs_function_index.addUnit(props.height) });
+  });
   function cellClick(value = null) {
     emit("update:modelValue", value);
-    if (parent.value != null)
-      parent.value.$callMethod("close");
     emit("change", value);
+    if (closeFn != null) {
+      closeFn();
+    }
   }
-  const setActive = (val) => {
-    active.value = val;
-  };
+  function isItemActive(item) {
+    const val = item["value"];
+    if (props.modelValue == null || val == null)
+      return false;
+    return `${props.modelValue}` == `${val}`;
+  }
   function getItemTextStyle(item) {
     const style = new common_vendor.UTSJSONObject({});
-    const isSelected = props.modelValue.toString() == item["value"].toString();
+    const isSelected = isItemActive(item);
     if (isSelected) {
-      if (activeColor.value != "#2979ff") {
-        style["color"] = activeColor.value;
-      }
+      style["color"] = activeColor.value;
     } else {
       style["color"] = inactiveColor.value;
     }
     return style;
   }
   common_vendor.onMounted(() => {
-    init();
+    if (registerFn != null) {
+      itemIndex.value = registerFn(new uni_modules_uviewUltra_components_upDropdown_types.UPDropdownMenu({
+        title: props.title.toString(),
+        disabled: props.disabled
+      }));
+    }
   });
-  __expose({
-    init,
-    active,
-    setActive
+  common_vendor.watch(() => {
+    return props.title;
+  }, (newTitle = null) => {
+    if (updateFn != null && itemIndex.value >= 0) {
+      updateFn(itemIndex.value, newTitle.toString());
+    }
   });
   return (_ctx, _cache) => {
     "raw js";
     const __returned__ = common_vendor.e({
-      a: active.value
-    }, active.value ? common_vendor.e({
+      a: isActive.value
+    }, isActive.value ? common_vendor.e({
       b: _ctx.$slots["default"] == null && _ctx.$slots["$default"] == null
     }, _ctx.$slots["default"] == null && _ctx.$slots["$default"] == null ? {
       c: common_vendor.f(props.options, (item, index, i0) => {
         return common_vendor.e({
-          a: common_vendor.t(item["label"].toString()),
-          b: props.modelValue.toString() == item["value"].toString() && activeColor.value == "#2979ff" ? 1 : "",
+          a: common_vendor.t(item["label"] != null ? item["label"].toString() : ""),
+          b: isItemActive(item) && activeColor.value == "#2979ff" ? 1 : "",
           c: common_vendor.s(getItemTextStyle(item)),
-          d: props.modelValue.toString() == item["value"].toString()
-        }, props.modelValue.toString() == item["value"].toString() ? {
+          d: isItemActive(item)
+        }, isItemActive(item) ? {
           e: "db1ba5e1-2-" + i0 + "," + ("db1ba5e1-1-" + i0),
           f: common_vendor.p({
             name: "checkbox-mark",
             color: activeColor.value == "#2979ff" ? "primary" : activeColor.value,
-            size: "32",
+            size: "18",
             class: "data-v-db1ba5e1"
           })
         } : {}, {
@@ -164,13 +161,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       e: common_vendor.p({
         class: "data-v-db1ba5e1"
       }),
-      f: _ctx.$up.addUnit(props.height)
+      f: common_vendor.s(scrollHeightStyle.value)
     } : {}, {
       g: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
       h: common_vendor.o(() => {
-      }, "fb"),
+      }, "03"),
       i: common_vendor.o(() => {
-      }, "14"),
+      }, "72"),
       j: `${_ctx.u_s_b_h}px`,
       k: `${_ctx.u_s_a_i_b}px`,
       l: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)

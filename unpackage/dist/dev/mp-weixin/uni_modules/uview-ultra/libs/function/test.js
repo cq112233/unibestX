@@ -60,25 +60,8 @@ function array(value = null) {
     return false;
   }
 }
-function object(value = null) {
-  if (value == null) {
-    return false;
-  }
-  if ("object" == typeof value) {
-    return true;
-  } else {
-    return false;
-  }
-}
 function func(value = null) {
   return typeof value === "function";
-}
-function promise(value = null) {
-  return common_vendor.UTS.isInstanceOf(
-    value,
-    Promise
-    // return object(value) && func(value.then) && func(value.catch)
-  );
 }
 function image(value) {
   const newValue = value.split("?")[0];
@@ -126,8 +109,6 @@ exports.empty = empty;
 exports.func = func;
 exports.image = image;
 exports.number = number;
-exports.object = object;
-exports.promise = promise;
 exports.string = string;
 exports.url = url;
 exports.video = video;

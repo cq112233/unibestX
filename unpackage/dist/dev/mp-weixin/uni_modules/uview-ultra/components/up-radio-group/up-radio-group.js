@@ -1,74 +1,154 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const uni_modules_uviewUltra_components_upRadioGroup_props = require("./props.js");
-const uni_modules_uviewUltra_libs_mixin_mpMixin = require("../../libs/mixin/mpMixin.js");
-const uni_modules_uviewUltra_libs_mixin_mixin = require("../../libs/mixin/mixin.js");
+const uni_modules_uviewUltra_components_upRadioGroup_radioGroup = require("./radioGroup.js");
 const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
-const _sfc_main = common_vendor.defineComponent({
-  name: "up-radio-group",
-  mixins: [uni_modules_uviewUltra_libs_mixin_mpMixin.mpMixin, uni_modules_uviewUltra_libs_mixin_mixin.mixin, uni_modules_uviewUltra_components_upRadioGroup_props.propsRadioGroup],
-  computed: {
-    // 这里computed的变量，都是子组件up-radio需要用到的，由于头条小程序的兼容性差异，子组件无法实时监听父组件参数的变化
-    // 所以需要手动通知子组件，这里返回一个parentData变量，供watch监听，在其中去通知每一个子组件重新从父组件(up-radio-group)
-    // 拉取父组件新的变化后的参数
-    parentChangeData() {
-      return [
-        this.modelValue,
-        this.disabled,
-        this.inactiveColor,
-        this.activeColor,
-        this.size,
-        this.labelDisabled,
-        this.shape,
-        this.iconSize,
-        this.borderBottom,
-        this.placement
-      ];
-    },
-    bemClass() {
-      return uni_modules_uviewUltra_libs_function_index.bem("radio-group", [this.placement], []);
-    }
+const uni_modules_uviewUltra_libs_composable_useUltraUI = require("../../libs/composable/useUltraUI.js");
+const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
+  name: "up-radio-group"
+}, { __name: "up-radio-group", props: {
+  // 标识符 
+  name: {
+    type: String,
+    default: uni_modules_uviewUltra_components_upRadioGroup_radioGroup.defProps.getString("radioGroup.name")
   },
-  watch: {
-    // 当父组件需要子组件需要共享的参数发生了变化，手动通知子组件
-    parentChangeData() {
-      this.children.forEach((child) => {
-        child.$callMethod("init");
-      });
-    }
+  // 绑定的值
+  modelValue: {
+    type: [String, Number, Boolean],
+    default: uni_modules_uviewUltra_components_upRadioGroup_radioGroup.defProps.getString("radioGroup.value")
   },
-  data() {
-    return {
-      children: []
-    };
+  // 形状，circle-圆形，square-方形
+  shape: {
+    type: String,
+    default: uni_modules_uviewUltra_components_upRadioGroup_radioGroup.defProps.getString("radioGroup.shape")
   },
-  created() {
+  // 是否禁用全部radio
+  disabled: {
+    type: Boolean,
+    default: uni_modules_uviewUltra_components_upRadioGroup_radioGroup.defProps.getBoolean("radioGroup.disabled")
   },
-  emits: ["update:modelValue", "change"],
-  methods: {
-    // 将其他的radio设置为未选中的状态
-    unCheckedOther(childInstance) {
-      this.children.map((child) => {
-        if (childInstance !== child) {
-          child.$data["checked"] = false;
-        }
-      });
-      const name = childInstance.$props["name"];
-      this.$emit("update:modelValue", name);
-      this.$emit("change", name);
+  // 选中状态下的颜色，如设置此值，将会覆盖parent的activeColor值
+  activeColor: {
+    type: String,
+    default: uni_modules_uviewUltra_components_upRadioGroup_radioGroup.defProps.getString("radioGroup.activeColor")
+  },
+  // 未选中的颜色
+  inactiveColor: {
+    type: String,
+    default: uni_modules_uviewUltra_components_upRadioGroup_radioGroup.defProps.getString("radioGroup.inactiveColor")
+  },
+  // 整个组件的尺寸 单位px
+  size: {
+    type: [String, Number],
+    default: uni_modules_uviewUltra_components_upRadioGroup_radioGroup.defProps.getNumber("radioGroup.size")
+  },
+  // 布局方式，row-横向，column-纵向
+  placement: {
+    type: String,
+    default: uni_modules_uviewUltra_components_upRadioGroup_radioGroup.defProps.getString("radioGroup.placement")
+  },
+  // label的字体大小，px单位
+  labelSize: {
+    type: [String, Number],
+    default: uni_modules_uviewUltra_components_upRadioGroup_radioGroup.defProps.getNumber("radioGroup.labelSize")
+  },
+  // label的字体颜色
+  labelColor: {
+    type: String,
+    default: uni_modules_uviewUltra_components_upRadioGroup_radioGroup.defProps.getString("radioGroup.labelColor")
+  },
+  // 是否禁止点击文本操作
+  labelDisabled: {
+    type: Boolean,
+    default: uni_modules_uviewUltra_components_upRadioGroup_radioGroup.defProps.getBoolean("radioGroup.labelDisabled")
+  },
+  // 图标颜色
+  iconColor: {
+    type: String,
+    default: uni_modules_uviewUltra_components_upRadioGroup_radioGroup.defProps.getString("radioGroup.iconColor")
+  },
+  // 图标的大小，单位px
+  iconSize: {
+    type: [String, Number],
+    default: uni_modules_uviewUltra_components_upRadioGroup_radioGroup.defProps.getNumber("radioGroup.iconSize")
+  },
+  // 勾选图标的对齐方式，left-左边，right-右边
+  iconPlacement: {
+    type: String,
+    default: uni_modules_uviewUltra_components_upRadioGroup_radioGroup.defProps.getString("radioGroup.iconPlacement")
+  },
+  // placement为column时，是否显示下边框
+  borderBottom: {
+    type: Boolean,
+    default: uni_modules_uviewUltra_components_upRadioGroup_radioGroup.defProps.getBoolean("radioGroup.borderBottom")
+  }
+}, emits: ["update:modelValue", "change"], setup(__props, _a) {
+  var _b;
+  var __expose = _a.expose, __emit = _a.emit;
+  const _c = uni_modules_uviewUltra_libs_composable_useUltraUI.useUltraUI(), getChildren = _c.getChildren, addChild = _c.addChild;
+  (_b = common_vendor.getCurrentInstance()) === null || _b === void 0 ? null : _b.proxy;
+  const props = __props;
+  const emit = __emit;
+  const parentDataSelf = common_vendor.computed(() => {
+    return new common_vendor.UTSJSONObject({
+      modelValue: props.modelValue,
+      disabled: props.disabled,
+      inactiveColor: props.inactiveColor,
+      activeColor: props.activeColor,
+      size: props.size,
+      labelColor: props.labelColor,
+      labelDisabled: props.labelDisabled,
+      labelSize: props.labelSize,
+      shape: props.shape,
+      iconColor: props.iconColor,
+      iconSize: props.iconSize,
+      iconPlacement: props.iconPlacement,
+      borderBottom: props.borderBottom,
+      placement: props.placement
+    });
+  });
+  const bemClass = common_vendor.computed(() => {
+    return uni_modules_uviewUltra_libs_function_index.bem("radio-group", [props.placement], []);
+  });
+  function onRadioChange(name = null) {
+    if (name != null) {
+      emit("update:modelValue", name);
+      emit("change", name);
+    } else {
+      emit("update:modelValue", "");
+      emit("change", "");
     }
   }
-});
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  "raw js";
-  return {
-    a: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    b: common_vendor.n($options.bemClass),
-    c: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
-    d: `${_ctx.u_s_b_h}px`,
-    e: `${_ctx.u_s_a_i_b}px`
+  common_vendor.provide("upRadioGroupProps", parentDataSelf);
+  common_vendor.provide("upRadioGroupChange", onRadioChange);
+  function unCheckedOther(childInstance) {
+    const name = childInstance.$props["name"];
+    onRadioChange(name);
+  }
+  const getProps = function() {
+    return parentDataSelf.value;
   };
-}
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-4a896d15"]]);
+  const getRefs = function() {
+    return new common_vendor.UTSJSONObject({});
+  };
+  __expose({
+    unCheckedOther,
+    getChildren,
+    addChild,
+    getProps,
+    getRefs
+  });
+  return (_ctx, _cache) => {
+    "raw js";
+    const __returned__ = {
+      a: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+      b: common_vendor.n(bemClass.value),
+      c: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+      d: `${_ctx.u_s_b_h}px`,
+      e: `${_ctx.u_s_a_i_b}px`
+    };
+    return __returned__;
+  };
+} }));
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-4a896d15"]]);
 wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-ultra/components/up-radio-group/up-radio-group.js.map

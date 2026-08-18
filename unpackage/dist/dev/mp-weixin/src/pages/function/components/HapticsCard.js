@@ -9,9 +9,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   setup(__props) {
     const copyText = common_vendor.ref("Hello unibestX!");
     function triggerVibration() {
-      common_vendor.index.showToast({
-        title: "当前环境不支持震动",
-        icon: "none"
+      common_vendor.index.vibrateShort({
+        type: "light",
+        success: () => {
+          common_vendor.index.showToast({ title: "已触发短震动", icon: "none" });
+        },
+        fail: () => {
+          common_vendor.index.showToast({ title: "震动触发失败", icon: "none" });
+        }
       });
     }
     function handleCopy() {
@@ -33,14 +38,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         a: copyText.value,
         b: common_vendor.o(($event) => {
           return copyText.value = $event.detail.value;
-        }, "31"),
-        c: common_vendor.o(handleCopy, "d0"),
-        d: common_vendor.o(triggerVibration, "d7"),
+        }, "d9"),
+        c: common_vendor.o(handleCopy, "2b"),
+        d: common_vendor.o(triggerVibration, "d5"),
         e: common_vendor.gei(_ctx, ""),
         f: common_vendor.p({
           title: "触感与工具",
-          id: common_vendor.gei(_ctx, ""),
-          class: "data-v-7e620a30"
+          id: common_vendor.gei(_ctx, "")
         }),
         g: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
@@ -48,6 +52,5 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-7e620a30"]]);
-wx.createComponent(Component);
+wx.createComponent(_sfc_main);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/src/pages/function/components/HapticsCard.js.map

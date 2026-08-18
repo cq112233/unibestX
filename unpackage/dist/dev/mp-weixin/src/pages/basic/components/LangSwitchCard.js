@@ -17,6 +17,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "LangSwitchCard",
   setup(__props) {
     const appStore = src_store_app.useAppStore();
+    const langTitle = common_vendor.computed(() => {
+      return src_utils_i18n.$t("basic.langTitle");
+    });
+    const langPreview = common_vendor.computed(() => {
+      return src_utils_i18n.$t("basic.langPreview");
+    });
+    const welcomeText = common_vendor.computed(() => {
+      return src_utils_i18n.$t("message.welcome");
+    });
+    const helloText = common_vendor.computed(() => {
+      return src_utils_i18n.$t("message.hello", new common_vendor.UTSJSONObject({ msg: "hi" }));
+    });
+    const uviewPreview = common_vendor.computed(() => {
+      return src_utils_i18n.$t("basic.uviewPreview");
+    });
     const currentLocale = common_vendor.computed(() => {
       return appStore.state.locale;
     });
@@ -44,8 +59,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     function switchLanguage(lang) {
       appStore.setLocale(lang);
+      src_utils_i18n.setTabbarItem();
       common_vendor.index.showToast({
-        title: src_utils_i18n.t("message.switch_success", null),
+        title: src_utils_i18n.$t("message.switch_success"),
         icon: "none",
         duration: 1500
       });
@@ -53,45 +69,40 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.t(_ctx.$t("basic.langPreview")),
-        b: common_vendor.t(_ctx.$t("message.welcome")),
-        c: common_vendor.t(_ctx.$t("message.hello", {
-          msg: "hi"
-        })),
-        d: common_vendor.t(_ctx.$t("basic.uviewPreview")),
-        e: common_vendor.t(common_vendor.unref(uViewChooseDates)),
-        f: common_vendor.t(common_vendor.unref(uViewConfirm)),
-        g: common_vendor.t(common_vendor.unref(uViewStart)),
-        h: common_vendor.t(common_vendor.unref(uViewEnd)),
-        i: common_vendor.unref(isZhCN)
-      }, common_vendor.unref(isZhCN) ? {
+        a: common_vendor.t(langPreview.value),
+        b: common_vendor.t(welcomeText.value),
+        c: common_vendor.t(helloText.value),
+        d: common_vendor.t(uviewPreview.value),
+        e: common_vendor.t(uViewChooseDates.value),
+        f: common_vendor.t(uViewConfirm.value),
+        g: common_vendor.t(uViewStart.value),
+        h: common_vendor.t(uViewEnd.value),
+        i: isZhCN.value
+      }, isZhCN.value ? {
         j: common_vendor.p({
           type: "checkmarkempty",
           size: "20",
-          class: "data-v-1f7680f0",
           style: "color:#3b82f6"
         })
       } : {}, {
         k: common_vendor.o(($event) => {
           return switchLanguage("zh-CN");
-        }, "a0"),
-        l: common_vendor.unref(isEnUS)
-      }, common_vendor.unref(isEnUS) ? {
+        }, "85"),
+        l: isEnUS.value
+      }, isEnUS.value ? {
         m: common_vendor.p({
           type: "checkmarkempty",
           size: "20",
-          class: "data-v-1f7680f0",
           style: "color:#3b82f6"
         })
       } : {}, {
         n: common_vendor.o(($event) => {
           return switchLanguage("en-US");
-        }, "4c"),
+        }, "ed"),
         o: common_vendor.gei(_ctx, ""),
         p: common_vendor.p({
-          title: _ctx.$t("basic.langTitle"),
-          id: common_vendor.gei(_ctx, ""),
-          class: "data-v-1f7680f0"
+          title: langTitle.value,
+          id: common_vendor.gei(_ctx, "")
         }),
         q: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
@@ -99,6 +110,5 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-1f7680f0"]]);
-wx.createComponent(Component);
+wx.createComponent(_sfc_main);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/src/pages/basic/components/LangSwitchCard.js.map

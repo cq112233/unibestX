@@ -1,6 +1,6 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const defPropsInput = new common_vendor.UTSJSONObject({
+const defProps = new common_vendor.UTSJSONObject({
   // index 组件
   input: new common_vendor.UTSJSONObject({
     value: "",
@@ -41,5 +41,5 @@ const defPropsInput = new common_vendor.UTSJSONObject({
     }
   })
 });
-exports.defPropsInput = defPropsInput;
+exports.defProps = defProps;
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-ultra/components/up-input/input.js.map

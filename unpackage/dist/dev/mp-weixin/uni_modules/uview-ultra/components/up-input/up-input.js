@@ -14,10 +14,20 @@ if (!Math) {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   name: "up-input"
 }, { __name: "up-input", props: {
+  customStyle: {
+    type: [Object, String],
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
+    }
+  },
+  customClass: {
+    type: String,
+    default: ""
+  },
   // 绑定的值
   modelValue: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getString("input.value")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getString("input.value")
   },
   // number-数字输入键盘，app-vue下可以输入浮点数，app-nvue和小程序平台下只能输入整数
   // idcard-身份证输入键盘，微信、支付宝、百度、QQ小程序
@@ -25,166 +35,166 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   // text-文本输入键盘
   type: {
     type: String,
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getString("input.type")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getString("input.type")
   },
   // 如果 textarea 是在一个 position:fixed 的区域，需要显示指定属性 fixed 为 true，
   // 兼容性：微信小程序、百度小程序、字节跳动小程序、QQ小程序
   fixed: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getBoolean("input.fixed")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getBoolean("input.fixed")
   },
   // 是否禁用输入框
   disabled: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getBoolean("input.disabled")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getBoolean("input.disabled")
   },
   // 禁用状态时的背景色
   disabledColor: {
     type: String,
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getString("input.disabledColor")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getString("input.disabledColor")
   },
   // 是否显示清除控件
   clearable: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getBoolean("input.clearable")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getBoolean("input.clearable")
   },
   // 是否密码类型
   password: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getBoolean("input.password")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getBoolean("input.password")
   },
   // 最大输入长度，设置为 -1 的时候不限制最大长度
   maxlength: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getNumber("input.maxlength")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getNumber("input.maxlength")
   },
   // 	输入框为空时的占位符
   placeholder: {
     type: String,
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getString("input.placeholder")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getString("input.placeholder")
   },
   // 指定placeholder的样式类，注意页面或组件的style中写了scoped时，需要在类名前写/deep/
   placeholderClass: {
     type: String,
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getString("input.placeholderClass")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getString("input.placeholderClass")
   },
   // 指定placeholder的样式
   placeholderStyle: {
     type: [String, Object],
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getString("input.placeholderStyle")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getString("input.placeholderStyle")
   },
   // 是否显示输入字数统计，只在 type ="text"或type ="textarea"时有效
   showWordLimit: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getBoolean("input.showWordLimit")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getBoolean("input.showWordLimit")
   },
   // 设置右下角按钮的文字，有效值：send|search|next|go|done，兼容性详见uni-app文档
   // https://uniapp.dcloud.io/component/input
   // https://uniapp.dcloud.io/component/textarea
   confirmType: {
     type: String,
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getString("input.confirmType")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getString("input.confirmType")
   },
   // 点击键盘右下角按钮时是否保持键盘不收起，H5无效
   confirmHold: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getBoolean("input.confirmHold")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getBoolean("input.confirmHold")
   },
   // focus时，点击页面的时候不收起键盘，微信小程序有效
   holdKeyboard: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getBoolean("input.holdKeyboard")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getBoolean("input.holdKeyboard")
   },
   // 自动获取焦点
   // 在 H5 平台能否聚焦以及软键盘是否跟随弹出，取决于当前浏览器本身的实现。nvue 页面不支持，需使用组件的 focus()、blur() 方法控制焦点
   focus: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getBoolean("input.focus")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getBoolean("input.focus")
   },
   // 键盘收起时，是否自动失去焦点，目前仅App3.0.0+有效
   autoBlur: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getBoolean("input.autoBlur")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getBoolean("input.autoBlur")
   },
   // 是否去掉 iOS 下的默认内边距，仅微信小程序，且type=textarea时有效
   disableDefaultPadding: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getBoolean("input.disableDefaultPadding")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getBoolean("input.disableDefaultPadding")
   },
   // 指定focus时光标的位置
   cursor: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getNumber("input.cursor")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getNumber("input.cursor")
   },
   // 输入框聚焦时底部与键盘的距离
   cursorSpacing: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getNumber("input.cursorSpacing")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getNumber("input.cursorSpacing")
   },
   // 光标起始位置，自动聚集时有效，需与selection-end搭配使用
   selectionStart: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getNumber("input.selectionStart")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getNumber("input.selectionStart")
   },
   // 光标结束位置，自动聚集时有效，需与selection-start搭配使用
   selectionEnd: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getNumber("input.selectionEnd")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getNumber("input.selectionEnd")
   },
   // 键盘弹起时，是否自动上推页面
   adjustPosition: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getBoolean("input.adjustPosition")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getBoolean("input.adjustPosition")
   },
   // 输入框内容对齐方式，可选值为：left|center|right
   inputAlign: {
     type: String,
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getString("input.inputAlign")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getString("input.inputAlign")
   },
   // 输入框字体的大小
   fontSize: {
     type: [String, Number],
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getString("input.fontSize")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getString("input.fontSize")
   },
   // 输入框字体颜色
   color: {
     type: String,
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getString("input.color")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getString("input.color")
   },
   // 输入框前置图标
   prefixIcon: {
     type: String,
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getString("input.prefixIcon")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getString("input.prefixIcon")
   },
   // 前置图标样式，对象或字符串
   prefixIconStyle: {
     type: [String, Object],
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getString("input.prefixIconStyle")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getString("input.prefixIconStyle")
   },
   // 输入框后置图标
   suffixIcon: {
     type: String,
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getString("input.suffixIcon")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getString("input.suffixIcon")
   },
   // 后置图标样式，对象或字符串
   suffixIconStyle: {
     type: [String, Object],
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getString("input.suffixIconStyle")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getString("input.suffixIconStyle")
   },
   // 边框类型，surround-四周边框，bottom-底部边框，none-无边框
   border: {
     type: String,
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getString("input.border")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getString("input.border")
   },
   // 是否只读，与disabled不同之处在于disabled会置灰组件，而readonly则不会
   readonly: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getBoolean("input.readonly")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getBoolean("input.readonly")
   },
   // 输入框形状，circle-圆形，square-方形
   shape: {
     type: String,
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getString("input.shape")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getString("input.shape")
   },
   // 用于处理或者过滤输入框内容的方法
   formatter: {
@@ -198,7 +208,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   // 是否忽略组件内对文本合成系统事件的处理
   ignoreCompositionEvent: {
     type: Boolean,
-    default: uni_modules_uviewUltra_components_upInput_input.defPropsInput.getBoolean("input.ignoreCompositionEvent")
+    default: uni_modules_uviewUltra_components_upInput_input.defProps.getBoolean("input.ignoreCompositionEvent")
   }
 }, emits: ["update:modelValue", "focus", "blur", "change", "confirm", "clear", "keyboardheightchange"], setup(__props, _a) {
   var __emit = _a.emit;
@@ -276,6 +286,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     }
     return uni_modules_uviewUltra_libs_function_index.deepMerge(style, new common_vendor.UTSJSONObject({}));
   });
+  const computedWrapperStyle = common_vendor.computed(() => {
+    const custom = uni_modules_uviewUltra_libs_function_index.addStyle(props.customStyle);
+    const wrapper = wrapperStyle.value;
+    return uni_modules_uviewUltra_libs_function_index.deepMerge(wrapper, custom);
+  });
   const inputStyle = common_vendor.computed(() => {
     const style = new common_vendor.UTSJSONObject({
       color: props.color,
@@ -286,7 +301,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   });
   const onInput = (e) => {
     let value = e.detail.value;
-    common_vendor.index.__f__("log", "at uni_modules/uview-ultra/components/up-input/up-input.uvue:391", "onInput", value, innerValue.value);
+    common_vendor.index.__f__("log", "at uni_modules/uview-ultra/components/up-input/up-input.uvue:405", "onInput", value, innerValue.value);
     innerValue.value = value;
     setTimeout(() => {
       valueChange(value.toString(), false);
@@ -355,12 +370,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       v: __props.selectionStart,
       w: __props.password || __props.type === "password" || false,
       x: __props.ignoreCompositionEvent,
-      y: common_vendor.o(onInput, "cb"),
-      z: common_vendor.o(onBlur, "62"),
-      A: common_vendor.o(onFocus, "a3"),
-      B: common_vendor.o(onConfirm, "25"),
-      C: common_vendor.o(onkeyboardheightchange, "26"),
-      D: common_vendor.o(clickHandler, "79"),
+      y: common_vendor.o(onInput, "3e"),
+      z: common_vendor.o(onBlur, "54"),
+      A: common_vendor.o(onFocus, "7c"),
+      B: common_vendor.o(onConfirm, "ae"),
+      C: common_vendor.o(onkeyboardheightchange, "79"),
+      D: common_vendor.o(clickHandler, "11"),
       E: isShowClear.value
     }, isShowClear.value ? {
       F: common_vendor.p({
@@ -370,7 +385,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
         customStyle: "line-height: 12px",
         class: "data-v-bd93bb3a"
       }),
-      G: common_vendor.o(onClear, "d0")
+      G: common_vendor.o(onClear, "37")
     } : {}, {
       H: __props.suffixIcon != "" || _ctx.$slots["suffix"] != null
     }, __props.suffixIcon != "" || _ctx.$slots["suffix"] != null ? {
@@ -384,9 +399,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       J: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
       K: common_vendor.n(inputClass.value),
       L: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
-      M: common_vendor.s(wrapperStyle.value),
-      N: common_vendor.s(_ctx.$up.addStyle(_ctx.customStyle)),
-      O: common_vendor.s({
+      M: common_vendor.s(computedWrapperStyle.value),
+      N: common_vendor.s({
         "--status-bar-height": `${_ctx.u_s_b_h}px`,
         "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
       })

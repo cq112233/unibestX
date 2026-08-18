@@ -130,20 +130,20 @@ class TokenStore extends uni_modules_xPiniaS_instans_storeBase.PiniaStoreBase {
     this.state.tokenExpireTime = 0;
   }
   _hydrate(_data) {
-    if (_data["token"] != null)
-      this.state.token = _data["token"];
-    if (_data["expiresIn"] != null)
-      this.state.expiresIn = _data["expiresIn"];
-    if (_data["accessToken"] != null)
-      this.state.accessToken = _data["accessToken"];
-    if (_data["accessExpiresIn"] != null)
-      this.state.accessExpiresIn = _data["accessExpiresIn"];
-    if (_data["refreshToken"] != null)
-      this.state.refreshToken = _data["refreshToken"];
-    if (_data["refreshExpiresIn"] != null)
-      this.state.refreshExpiresIn = _data["refreshExpiresIn"];
-    if (_data["tokenExpireTime"] != null)
-      this.state.tokenExpireTime = _data["tokenExpireTime"];
+    if (_data.token != null)
+      this.state.token = _data.token;
+    if (_data.expiresIn != null)
+      this.state.expiresIn = _data.expiresIn;
+    if (_data.accessToken != null)
+      this.state.accessToken = _data.accessToken;
+    if (_data.accessExpiresIn != null)
+      this.state.accessExpiresIn = _data.accessExpiresIn;
+    if (_data.refreshToken != null)
+      this.state.refreshToken = _data.refreshToken;
+    if (_data.refreshExpiresIn != null)
+      this.state.refreshExpiresIn = _data.refreshExpiresIn;
+    if (_data.tokenExpireTime != null)
+      this.state.tokenExpireTime = _data.tokenExpireTime;
   }
   _serialize() {
     return new common_vendor.UTSJSONObject({
@@ -208,7 +208,7 @@ class TokenStore extends uni_modules_xPiniaS_instans_storeBase.PiniaStoreBase {
     if (this.state.tokenExpireTime <= 0) {
       const val = common_vendor.index.getStorageSync("accessTokenExpireTime");
       if (val != null && val !== "") {
-        const num = parseFloat(val.toString());
+        const num = Number.parseFloat(val.toString());
         if (!isNaN(num)) {
           this.state.tokenExpireTime = num;
         }
@@ -223,7 +223,7 @@ class TokenStore extends uni_modules_xPiniaS_instans_storeBase.PiniaStoreBase {
     const val = common_vendor.index.getStorageSync("refreshTokenExpireTime");
     if (val == null || val === "")
       return false;
-    const num = parseFloat(val.toString());
+    const num = Number.parseFloat(val.toString());
     if (isNaN(num))
       return false;
     return Date.now() < num;

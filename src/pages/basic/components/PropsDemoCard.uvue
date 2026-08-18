@@ -1,0 +1,98 @@
+<template>
+  <Card title="父子组件传参 & 具名插槽演示">
+    <!-- 父组件状态展示面板 -->
+    <view class="bg-[#eff6ff] rounded-12px p-14px mb-14px border-width-1px border-style-solid border-color-[#bfdbfe]">
+      <text class="text-14px font-bold text-[#1e40af] mb-6px">👨‍👩‍👧 父组件状态管理面板</text>
+
+      <view class="flex-row items-center mb-4px">
+        <text class="text-12px text-[#3b82f6]">父组件 Count 变量: </text>
+        <text class="text-14px font-bold text-[#1d4ed8] ml-6px">{{ parentCount }}</text>
+      </view>
+
+      <view class="flex-row items-center mb-10px">
+        <text class="text-12px text-[#3b82f6]">接收到的子组件消息: </text>
+        <text class="text-12px font-bold text-[#059669] ml-6px">{{ childMessage }}</text>
+      </view>
+
+      <!-- 父组件主动修改数据操作组 -->
+      <view class="flex-row items-center">
+        <view class="bg-[#2563eb] rounded-6px px-10px h-30px flex-row items-center justify-center mr-8px" @click="addFiveFromParent">
+          <text class="text-white text-12px">父组件直接 Count + 5</text>
+        </view>
+        <view class="bg-[#64748b] rounded-6px px-10px h-30px flex-row items-center justify-center" @click="resetParent">
+          <text class="text-white text-12px">父组件重置状态</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 子组件嵌套调用区 -->
+    <ChildDemoBox
+      title="组件通信演示子节点"
+      :count="parentCount"
+      :tags="tagList"
+      @add="onChildAdd"
+      @reset="onChildReset"
+      @send-msg="onChildSendMsg"
+    >
+      <!-- 1. 具名头部插槽 #header -->
+      <template #header>
+        <view class="flex-row items-center justify-between">
+          <text class="text-14px font-bold text-[#1e293b]">🏷️ 父组件填入的具名 Header 插槽</text>
+          <text class="text-11px text-[#3b82f6] bg-[#dbeafe] px-6px py-2px rounded-4px">自定义 Header</text>
+        </view>
+      </template>
+
+      <!-- 2. 具名传参/作用域插槽 #itemSlot (从子组件接收 item & index) -->
+      <template #itemSlot="{ item, index }">
+        <view class="flex-row items-center bg-[#f0fdf4] rounded-6px p-8px border-width-1px border-style-solid border-color-[#bbf7d0]">
+          <text class="text-11px font-bold text-[#15803d] mr-6px">#{{ (index as number) + 1 }}</text>
+          <text class="text-12px text-[#166534] font-medium">{{ item }}</text>
+          <text class="text-10px text-[#22c55e] ml-auto">具名Slot传参: {{ item }}</text>
+        </view>
+      </template>
+
+      <!-- 3. 具名底部插槽 #footer -->
+      <template #footer>
+        <view class="flex-row items-center justify-between">
+          <text class="text-11px text-[#64748b]">📌 父组件填入的具名 Footer 插槽</text>
+          <text class="text-11px text-[#10b981]">双向通信验证成功</text>
+        </view>
+      </template>
+    </ChildDemoBox>
+  </Card>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue';
+import Card from './Card.uvue';
+import ChildDemoBox from './ChildDemoBox.uvue';
+
+const parentCount = ref<number>(10);
+const childMessage = ref<string>('暂无子组件消息');
+const tagList = ref<Array<string>>(['响应式 Props 传递', 'Emits 事件监听与回传', '具名 Header/Footer 插槽', '具名 Slot 作用域传参']);
+
+function onChildAdd(delta: number) {
+  parentCount.value += delta;
+}
+
+function onChildReset() {
+  parentCount.value = 0;
+  childMessage.value = '已被子组件重置为 0';
+}
+
+function onChildSendMsg(msg: string) {
+  childMessage.value = msg;
+}
+
+function addFiveFromParent() {
+  parentCount.value += 5;
+}
+
+function resetParent() {
+  parentCount.value = 10;
+  childMessage.value = '已重置为初始状态';
+}
+</script>
+
+<style scoped>
+</style>

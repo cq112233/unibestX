@@ -31,7 +31,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: common_vendor.o(($event) => {
           return sliderValue1.value = $event;
-        }, "6d"),
+        }, "f9"),
         c: common_vendor.p({
           min: 0,
           max: 100,
@@ -40,7 +40,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         d: common_vendor.o(($event) => {
           return sliderValue2.value = $event;
-        }, "42"),
+        }, "5d"),
         e: common_vendor.p({
           step: 10,
           modelValue: sliderValue2.value,
@@ -48,7 +48,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         f: common_vendor.o(($event) => {
           return sliderValue3.value = $event;
-        }, "ea"),
+        }, "6b"),
         g: common_vendor.p({
           ["active-color"]: "#fa3534",
           ["inactive-color"]: "#f56c6c",
@@ -57,7 +57,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         h: common_vendor.o(($event) => {
           return sliderValue4.value = $event;
-        }, "a2"),
+        }, "7b"),
         i: common_vendor.p({
           disabled: true,
           modelValue: sliderValue4.value,

@@ -5,7 +5,7 @@
 	    :class="[
 			'up-col-' + span
 		]"
-	    :style="[colStyle, $upAddStyle(customStyle)]"
+	    :style="mergedColStyle"
 	    @tap="clickHandler"
 	>
 		<slot></slot>
@@ -52,6 +52,10 @@
 		textAlign: {
 			type: String,
 			default: defProps.getString('col.textAlign')
+		},
+		customStyle: {
+			type: Object,
+			default: () => ({})
 		}
 	})
 	
@@ -95,6 +99,12 @@
 			marginLeft: (100 / 12 * parseInt(props.offset.toString())).toString() + '%'
 		}
 		return style
+	})
+
+	const mergedColStyle = computed((): UTSJSONObject => {
+		const custom = addStyle(props.customStyle) as UTSJSONObject
+		const col = colStyle.value as UTSJSONObject
+		return deepMerge(col, custom) as UTSJSONObject
 	})
 	
 	const updateParentData = (): void => {

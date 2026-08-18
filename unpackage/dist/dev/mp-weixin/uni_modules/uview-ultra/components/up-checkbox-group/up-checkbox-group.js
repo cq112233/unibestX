@@ -4,7 +4,6 @@ const uni_modules_uviewUltra_components_upCheckboxGroup_checkboxGroup = require(
 const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
 const uni_modules_uviewUltra_libs_composable_useUltraUI = require("../../libs/composable/useUltraUI.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
-  //...mpSharedMpOptions,
   name: "up-checkbox-group"
 }, { __name: "up-checkbox-group", props: {
   // 标识符 
@@ -85,9 +84,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     default: uni_modules_uviewUltra_components_upCheckboxGroup_checkboxGroup.defProps.getBoolean("checkboxGroup.borderBottom")
   }
 }, emits: ["update:modelValue", "change"], setup(__props, _a) {
+  var _b;
   var __expose = _a.expose, __emit = _a.emit;
-  const _b = uni_modules_uviewUltra_libs_composable_useUltraUI.useUltraUI(), children = _b.children, getChildren = _b.getChildren, addChild = _b.addChild;
-  common_vendor.getCurrentInstance().proxy;
+  const _c = uni_modules_uviewUltra_libs_composable_useUltraUI.useUltraUI(), children = _c.children, getChildren = _c.getChildren, addChild = _c.addChild;
+  (_b = common_vendor.getCurrentInstance()) === null || _b === void 0 ? null : _b.proxy;
   const props = __props;
   const emit = __emit;
   const parentDataSelf = common_vendor.computed(() => {
@@ -111,6 +111,33 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   const bemClass = common_vendor.computed(() => {
     return uni_modules_uviewUltra_libs_function_index.bem("checkbox-group", [props.placement], []);
   });
+  function toggleCheckbox(childName, childChecked) {
+    let currentValues = [];
+    if (props.modelValue != null) {
+      const rawArr = props.modelValue;
+      currentValues = rawArr.slice();
+    }
+    let foundIndex = -1;
+    for (let i = 0; i < currentValues.length; i++) {
+      if (currentValues[i] != null && currentValues[i].toString() == childName.toString()) {
+        foundIndex = i;
+        break;
+      }
+    }
+    if (childChecked) {
+      if (foundIndex == -1) {
+        currentValues.push(childName);
+      }
+    } else {
+      if (foundIndex != -1) {
+        currentValues.splice(foundIndex, 1);
+      }
+    }
+    emit("update:modelValue", currentValues);
+    emit("change", currentValues);
+  }
+  common_vendor.provide("upCheckboxGroupProps", parentDataSelf);
+  common_vendor.provide("upCheckboxGroupToggle", toggleCheckbox);
   function unCheckedOther(childInstance) {
     var _a2;
     const values = [];
@@ -120,7 +147,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
         values.push(istats["name"].toString());
       }
     });
-    emit("change", values, childInstance.$callMethod("getInternalState"));
+    emit("change", values);
     emit("update:modelValue", values);
   }
   common_vendor.watch(parentDataSelf, () => {

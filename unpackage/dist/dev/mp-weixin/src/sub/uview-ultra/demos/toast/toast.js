@@ -46,7 +46,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: common_vendor.o(($event) => {
           return showToast("success");
-        }, "3c"),
+        }, "36"),
         c: common_vendor.p({
           type: "primary",
           text: "成功提示",
@@ -55,7 +55,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         d: common_vendor.o(($event) => {
           return showToast("error");
-        }, "76"),
+        }, "b1"),
         e: common_vendor.p({
           type: "error",
           text: "错误提示",
@@ -64,7 +64,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         f: common_vendor.o(($event) => {
           return showToast("warning");
-        }, "43"),
+        }, "ed"),
         g: common_vendor.p({
           type: "warning",
           text: "警告提示",
@@ -73,7 +73,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         h: common_vendor.o(($event) => {
           return showToast("default");
-        }, "4e"),
+        }, "6d"),
         i: common_vendor.p({
           type: "default",
           text: "默认提示",

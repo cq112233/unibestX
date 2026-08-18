@@ -1,21 +1,19 @@
 <template>
-	<view class="up-dropdown-item" v-if="active"
+	<view class="up-dropdown-item" v-if="isActive"
 		@touchmove.stop.prevent="() => {}"@tap.stop.prevent="() => {}">
 		<template v-if="$slots['default'] == null && $slots['$default'] == null">
-			<view class="up-dropdown-item__scroll" scroll-y="false" :style="{
-				height: $up.addUnit(props.height)
-			}">
+			<view class="up-dropdown-item__scroll" :style="scrollHeightStyle">
 				<view class="up-dropdown-item__options">
 					<up-cell-group>
 						<up-cell @click="cellClick(item['value'])" :arrow="false"
 							v-for="(item, index) in props.options" :key="index">
 							<template #title>
 								<text class="up-dropdown-item__text" :class="{
-									'up-dropdown-item__text--active': (props.modelValue).toString() == item['value'].toString() && activeColor == '#2979ff'
-								}" :style="[getItemTextStyle(item)]">{{ item['label'].toString() }}</text>
+									'up-dropdown-item__text--active': isItemActive(item) && activeColor == '#2979ff'
+								}" :style="getItemTextStyle(item)">{{ item['label'] != null ? item['label']!.toString() : '' }}</text>
 							</template>
-							<up-icon v-if="(props.modelValue).toString() == item['value'].toString()"
-								name="checkbox-mark" :color="activeColor == '#2979ff' ? 'primary' : activeColor" size="32"></up-icon>
+							<up-icon v-if="isItemActive(item)"
+								name="checkbox-mark" :color="activeColor == '#2979ff' ? 'primary' : activeColor" size="18"></up-icon>
 						</up-cell>
 					</up-cell-group>
 				</view>
@@ -28,17 +26,11 @@
 </template>
 
 <script setup lang="uts">
-	import { computed, ref, watch, onMounted } from 'vue'
-	import { addUnit, getParentFunc } from '../../libs/function/index.uts';
+	import type { Ref, ComputedRef, PropType } from 'vue'
+	import { computed, ref, watch, onMounted, inject } from 'vue'
+	import { addUnit } from '../../libs/function/index.uts';
 	import defProps from './dropdown-item.uts'
 	import { UPDropdownMenu } from '../up-dropdown/types';
-	import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'
-import config from '../../libs/config/config'
-	const { parent, parentData, getParentData } = useUltraUI({
-		activeColor: config.getString('color.up-primary'),
-		inactiveColor: '#606266'
-	})
-	const instance = getCurrentInstance()!.proxy!
 	
 	defineOptions({
 		name: 'up-dropdown-item',
@@ -49,20 +41,11 @@ import config from '../../libs/config/config'
 	
 	// 定义 props
 	const props = defineProps({
-		// #ifdef VUE3
 		// 当前选中项的value值
 		modelValue: {
 			type: [Number, String, Array],
 			default: defProps.getAny('dropdownItem.value')
 		},
-		// #endif
-		// #ifdef VUE2
-		// 当前选中项的value值
-		value: {
-			type: [Number, String, Array],
-			default: defProps.getAny('dropdownItem.value')
-		},
-		// #endif
 		// 菜单项标题
 		title: {
 			type: [String, Number],
@@ -93,96 +76,80 @@ import config from '../../libs/config/config'
 	// 定义 emit
 	const emit = defineEmits(['update:modelValue', 'change']);
 	
-	// 定义响应式数据
-	const active = ref(false); // 当前项是否处于展开状态
-	const activeColor = ref(config.getString('color.up-primary') as string); // 激活时左边文字和右边对勾图标的颜色
-	const inactiveColor = ref('#606266'); // 未激活时左边文字和右边对勾图标的颜色
+	const parentDropdownProps = inject<ComputedRef<UTSJSONObject> | null>('upDropdownProps', null);
+	const parentActive = inject<Ref<boolean> | null>('upDropdownActive', null);
+	const parentCurrent = inject<Ref<number> | null>('upDropdownCurrent', null);
+	const registerFn = inject<((item: UPDropdownMenu) => number) | null>('upDropdownRegisterItem', null);
+	const updateFn = inject<((idx: number, title: string) => void) | null>('upDropdownUpdateItemTitle', null);
+	const closeFn = inject<(() => void) | null>('upDropdownClose', null);
+	const itemIndex = ref<number>(-1);
 	
-	// 监听props是否发生了变化，有些值需要传递给父组件up-dropdown，无法双向绑定
-	const propsChange = computed(() => {
-		return `${props.title}-${props.disabled}`;
-	});
-	
-	// 监听 active 变化
-	watch(active, (val: boolean) => {
-		// console.log('changed', val)
-	});
-	
-	// 监听 propsChange 变化
-	watch(propsChange, () => {
-		// 当值变化时，通知父组件重新初始化，让父组件执行每个子组件的init()方法
-		// 将所有子组件数据重新整理一遍
-		if (parent.value != null) parent.value.$callMethod('init');
-	});
-	
-	function init() {
-		// 获取父组件up-dropdown
-		getParentData('up-dropdown', instance, false)
-		let parentRef = parent.value;
-		if (parentRef != null) {
-			// 将子组件的激活颜色配置为父组件设置的激活和未激活时的颜色
-			if (parentData.value['activeColor'] != null) {
-				activeColor.value = parentData.value['activeColor'] as string;
-			}
-			if (parentData.value['inactiveColor'] != null) {
-				inactiveColor.value = parentData.value['inactiveColor'] as string;
-			}
-			let childrenList = parentRef.$callMethod('getChildren') as ComponentPublicInstance[] | null;
-			if (childrenList == null) {
-				childrenList = parentRef.$data['children'] as ComponentPublicInstance[] | null;
-			}
-			if (childrenList != null && childrenList.length == 1) active.value = true;
-			// 父组件无法监听children的变化，故将子组件的title，传入父组件的menuList数组中
-			parentRef.$callMethod('addMenuListItem', {
-				title: props.title.toString(),
-				disabled: props.disabled
-			} as UPDropdownMenu)
+	const isActive = computed<boolean>((): boolean => {
+		if (parentActive != null && parentCurrent != null) {
+			return parentActive!.value == true && parentCurrent!.value == itemIndex.value;
 		}
-	}
+		return false;
+	});
+	
+	const activeColor = computed<string>((): string => {
+		if (parentDropdownProps != null && parentDropdownProps!.value != null && (parentDropdownProps!.value['activeColor'] ?? '') != '') {
+			return parentDropdownProps!.value['activeColor'] as string;
+		}
+		return '#2979ff';
+	});
+	
+	const inactiveColor = computed<string>((): string => {
+		if (parentDropdownProps != null && parentDropdownProps!.value != null && (parentDropdownProps!.value['inactiveColor'] ?? '') != '') {
+			return parentDropdownProps!.value['inactiveColor'] as string;
+		}
+		return '#606266';
+	});
+
+	const scrollHeightStyle = computed((): UTSJSONObject => {
+		return { height: addUnit(props.height) } as UTSJSONObject
+	})
 	
 	// cell被点击
 	function cellClick(value?: any) {
-		// 修改通过v-model绑定的值
-        // #ifdef VUE2
-		emit('input', value)
-        // #endif
-        // #ifdef VUE3
         emit('update:modelValue', value)
-        // #endif
-		// 通知父组件(up-dropdown)收起菜单
-		if (parent.value != null) parent.value.$callMethod('close')
-		// 发出事件，抛出当前勾选项的value
 		emit('change', value)
+		if (closeFn != null) {
+			closeFn();
+		}
 	}
 	
-	const setActive = (val: boolean) => {
-		active.value = val
+	function isItemActive(item: UTSJSONObject): boolean {
+		const val = item['value']
+		if (props.modelValue == null || val == null) return false
+		return `${props.modelValue}` == `${val}`
 	}
 	
 	function getItemTextStyle(item: UTSJSONObject): UTSJSONObject {
 		const style = {} as UTSJSONObject
-		const isSelected = (props.modelValue).toString() == item['value'].toString()
+		const isSelected = isItemActive(item)
 		if (isSelected) {
-			if (activeColor.value != '#2979ff') {
-				style['color'] = activeColor.value
-			}
+			style['color'] = activeColor.value
 		} else {
 			style['color'] = inactiveColor.value
 		}
 		return style
 	}
 	
-	// 在组件挂载时初始化
+	// 在组件挂载时注册
 	onMounted(() => {
-		init()
+		if (registerFn != null) {
+			itemIndex.value = registerFn({
+				title: props.title.toString(),
+				disabled: props.disabled
+			} as UPDropdownMenu);
+		}
 	});
 	
-	// 暴露方法给父组件
-	defineExpose({
-		init,
-		active,
-		setActive
-	})
+	watch((): any => props.title, (newTitle: any) => {
+		if (updateFn != null && itemIndex.value >= 0) {
+			updateFn(itemIndex.value, newTitle.toString());
+		}
+	});
 </script>
 
 <style scoped lang="scss">

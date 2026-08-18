@@ -13,8 +13,8 @@
     "uvue"
   ],
 
-  // 禁用内置 TS/JS 验证，避免对 .uvue 文件产生大量假报错
-  // 真正的类型检查由 DCloud 语言服务插件和 ESLint 负责
+  // 禁用内置 TS/JS 验证，避免对 .uvue/.uts 文件的扩展名相对路径产生假报错 ts(2307)
+  // 代码规范与语法校验由 ESLint 负责
   "typescript.validate.enable": false,
   "javascript.validate.enable": false,
 
@@ -36,12 +36,35 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "js/ts.tsdk.path": "node_modules/typescript/lib",
   "js/ts.tsdk.promptToUseWorkspaceVersion": true,
-  // 加载 Volar 的 TypeScript 服务器插件，让其处理 .uvue 文件中 lang="uts" 的 import 跳转定义
-  "typescript.tsserver.pluginPaths": [
-    "/Users/chenqi/.antigravity-ide/extensions/vue.volar-3.3.3-universal/dist"
-  ],
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false,
   "editor.formatOnSave": true,
+  "editor.quickSuggestions": {
+    "other": "on",
+    "comments": "off",
+    "strings": "on"
+  },
+  "windicss.enableCodeCompletion": true,
+  "windicss.enableHover": true,
+  "windicss.include": [
+    "**/*.vue",
+    "**/*.uvue",
+    "**/*.html",
+    "**/*.jsx",
+    "**/*.tsx"
+  ],
+  "unocss.root": ".",
+  "unocss.include": [
+    "**/*.vue",
+    "**/*.uvue",
+    "**/*.uts",
+    "**/*.html",
+    "**/*.ts",
+    "**/*.js"
+  ],
   "prettier.enable": false,
+  "eslint.enable": true,
+  "eslint.run": "onType",
   "editor.defaultFormatter": "dbaeumer.vscode-eslint",
   "eslint.format.enable": true,
 
@@ -91,19 +114,25 @@
     "postcss"
   ],
   "[vue]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
-    "editor.diagnostics": false
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   },
   "[uvue]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
-    "editor.diagnostics": false
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   },
   "i18n-ally.localesPaths": [
     "src/i18n/locales"
   ],
+  "i18n-ally.pathMatcher": "{locale}.json",
   "i18n-ally.keystyle": "nested",
   "i18n-ally.sourceLanguage": "zh-CN",
   "i18n-ally.displayLanguage": "zh-CN",
+  "i18n-ally.include": [
+    "src/**/*.uvue",
+    "src/**/*.uts",
+    "src/**/*.vue",
+    "src/**/*.ts",
+    "src/**/*.js"
+  ],
   "i18n-ally.enabledFrameworks": [
     "vue",
     "vue-sfc"
@@ -114,7 +143,8 @@
     "json"
   ],
   "i18n-ally.parsers.extendFileExtensions": {
-    "uts": "ts"
+    "uts": "ts",
+    "uvue": "vue"
   },
   "i18n-ally.parsers.typescript.compilerOptions": {
     "module": "commonjs",
@@ -126,5 +156,95 @@
   },
   "[typescript]": {
     "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-  }
+  },
+  "cSpell.words": [
+    "uvue",
+    "uts",
+    "UTS",
+    "UTSJSONObject",
+    "uniapp",
+    "uniappx",
+    "unibest",
+    "unibestx",
+    "dcloud",
+    "dcloudio",
+    "hbuilder",
+    "hbuilderx",
+    "HBuilderX",
+    "easycom",
+    "uniCloud",
+    "nativeplugins",
+    "vdom",
+    "waterflow",
+    "flowitem",
+    "listview",
+    "listitem",
+    "stickyheader",
+    "stickysection",
+    "nestedscroll",
+    "nestedscrollheader",
+    "nestedscrollbody",
+    "refreshbox",
+    "refreshheader",
+    "customrefresher",
+    "refresherpulling",
+    "refresherrefresh",
+    "refresherrestore",
+    "refresherenabled",
+    "refreshertriggered",
+    "refresherdefaultstyle",
+    "tabbar",
+    "definePage",
+    "defineProps",
+    "defineEmits",
+    "defineExpose",
+    "defineOptions",
+    "defineSlots",
+    "defineModel",
+    "withDefaults",
+    "onInit",
+    "onLoad",
+    "onShow",
+    "onReady",
+    "onHide",
+    "onUnload",
+    "onPullDownRefresh",
+    "onReachBottom",
+    "onBackPress",
+    "OnBackPressOptions",
+    "onPageScroll",
+    "onResize",
+    "onTabItemTap",
+    "onNavigationBarButtonTap",
+    "onNavigationBarSearchInputChanged",
+    "onNavigationBarSearchInputConfirmed",
+    "onNavigationBarSearchInputClicked",
+    "onShareAppMessage",
+    "onShareTimeline",
+    "onAddToFavorites",
+    "getCurrentPages",
+    "getApp",
+    "onMounted",
+    "onUnmounted",
+    "onBeforeMount",
+    "onBeforeUnmount",
+    "shallowRef",
+    "shallowReactive",
+    "toRef",
+    "toRefs",
+    "toValue",
+    "customRef",
+    "triggerRef",
+    "uview",
+    "zpaging",
+    "unocss",
+    "iconify",
+    "dayuts",
+    "irainna",
+    "echarts",
+    "subpackages",
+    "volar",
+    "vueuse",
+    "antfu"
+  ]
 }

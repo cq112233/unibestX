@@ -9,34 +9,27 @@
 		    v-if="isImg"
 		    :src="name"
 		    :mode="imgMode != '' ? imgMode : 'aspectFit'"
-		    :style="[imgStyle, $up.addStyle(customStyle)]"
+		    :style="mergedImgStyle"
 		></image>
 		<text
 		    v-else
 		    class="up-icon__icon"
 		    :class="uClasses"
-		    :style="[iconStyle, $up.addStyle(customStyle)]"
+		    :style="mergedIconStyle"
 		    :hover-class="hoverClass"
 		>{{icon}}</text>
 		<!-- 这里进行空字符串判断，如果仅仅是v-if="label"，可能会出现传递0的时候，结果也无法显示 -->
 		<text
 		    v-if="label !== ''" 
 		    class="up-icon__label"
-		    :style="{
-			color: labelColor,
-			fontSize: $up.addUnit(labelSize),
-			marginLeft: labelPos == 'right' ? $up.addUnit(space) : 0,
-			marginTop: labelPos == 'bottom' ? $up.addUnit(space) : 0,
-			marginRight: labelPos == 'left' ? $up.addUnit(space) : 0,
-			marginBottom: labelPos == 'top' ? $up.addUnit(space) : 0,
-		}"
+		    :style="labelStyleComputed"
 		>{{ label }}</text>
 	</view>
 </template>
 
 <script setup lang="uts">
 	import icons from './icons.uts'
-	import { addUnit, addStyle } from '../../libs/function/index'
+	import { addUnit, addStyle, deepMerge } from '../../libs/function/index'
 	import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'
 	import config from '../../libs/config/config';
 	import defProps from './icon'
@@ -45,6 +38,14 @@
 	
 	// 定义props
 	const props = defineProps({
+		customStyle: {
+			type: [Object, String],
+			default: () => ({})
+		},
+		customClass: {
+			type: String,
+			default: ''
+		},
 		// 图标类名
 		name: {
 			type: String,
@@ -183,6 +184,29 @@
 		style['width'] = props.width != '' ? addUnit(props.width) : addUnit(props.size!!.toString())
 		style['height'] = props.height != '' ? addUnit(props.height) : addUnit(props.size!!.toString())
 		return style
+	})
+
+	const mergedImgStyle = computed((): UTSJSONObject => {
+		const custom = addStyle(props.customStyle) as UTSJSONObject
+		const img = imgStyle.value as UTSJSONObject
+		return deepMerge(img, custom) as UTSJSONObject
+	})
+
+	const mergedIconStyle = computed((): UTSJSONObject => {
+		const custom = addStyle(props.customStyle) as UTSJSONObject
+		const iconS = iconStyle.value as UTSJSONObject
+		return deepMerge(iconS, custom) as UTSJSONObject
+	})
+
+	const labelStyleComputed = computed((): UTSJSONObject => {
+		return {
+			color: props.labelColor,
+			fontSize: addUnit(props.labelSize),
+			marginLeft: props.labelPos == 'right' ? addUnit(props.space) : '0px',
+			marginTop: props.labelPos == 'bottom' ? addUnit(props.space) : '0px',
+			marginRight: props.labelPos == 'left' ? addUnit(props.space) : '0px',
+			marginBottom: props.labelPos == 'top' ? addUnit(props.space) : '0px',
+		} as UTSJSONObject
 	})
 	
 	// 通过图标名，查找对应的图标

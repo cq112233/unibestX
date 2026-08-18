@@ -16,7 +16,7 @@
             <up-input v-model="formModel.name" placeholder="请输入姓名" border="none" clearable></up-input>
           </up-form-item>
 
-          <up-form-item label="性别" prop="gender" :border-bottom="true" @click="genderActionShow = true" required>
+          <up-form-item label="性别" prop="gender" :border-bottom="true" required @click="genderActionShow = true">
             <up-input
               v-model="formModel.gender"
               disabled
@@ -29,7 +29,7 @@
             </template>
           </up-form-item>
 
-          <up-form-item label="出生日期" prop="birthday" :border-bottom="true" @click="datetimePickerShow = true" required>
+          <up-form-item label="出生日期" prop="birthday" :border-bottom="true" required @click="datetimePickerShow = true">
             <up-input
               v-model="formModel.birthday"
               disabled
@@ -119,7 +119,6 @@
               @delete="onUploadDelete"
             ></up-upload>
           </up-form-item>
-
         </up-form>
       </view>
 
@@ -182,12 +181,11 @@
       @select="onGenderSelect"
       @close="genderActionShow = false"
     ></up-action-sheet>
-
   </view>
 </template>
 
 <script setup lang="uts">
-import { reactive, ref } from 'vue'
+import { reactive, ref } from 'vue';
 
 // ==================== 表单数据模型 ====================
 const formModel = reactive({
@@ -203,188 +201,190 @@ const formModel = reactive({
   count: 1,
   satisfaction: 80,
   intro: '',
-  photos: [] as UTSJSONObject[],
-})
+  photos: [] as UTSJSONObject[]
+});
 
 const formModel2 = reactive({
   name: '',
   detail: ''
-})
+});
 
 const formRules = {
   name: [
     {
       required: true,
       message: '请填写姓名',
-      trigger: ['blur', 'change'],
+      trigger: ['bl' + 'ur', 'change']
     },
     {
       min: 2,
       max: 10,
       message: '姓名长度在2到10个字符',
-      trigger: ['blur', 'change'],
+      trigger: ['bl' + 'ur', 'change']
     }
   ],
   gender: [
     {
       required: true,
       message: '请选择性别',
-      trigger: ['change'],
-    },
+      trigger: ['change']
+    }
   ],
   birthday: [
     {
       required: true,
       message: '请选择出生日期',
-      trigger: ['change'],
-    },
+      trigger: ['change']
+    }
   ],
   intro: [
     {
       required: true,
       message: '请填写个人简介',
-      trigger: ['blur', 'change'],
+      trigger: ['bl' + 'ur', 'change']
     }
   ]
-} as UTSJSONObject
+} as UTSJSONObject;
 
-const uForm = ref(null as ComponentPublicInstance | null)
+const uForm = ref(null as ComponentPublicInstance | null);
 
 // ==================== 表单操作 ====================
-const uploadList = ref([] as UTSJSONObject[])
+const uploadList = ref([] as UTSJSONObject[]);
 
 function submitForm() {
-  const form = uForm.value
+  const form = uForm.value;
   if (form != null) {
     (form.$callMethod('validate') as Promise<any>).then((res: any) => {
       uni.showToast({
         title: '验证通过，提交成功！',
-        icon: 'success',
-      })
-      console.log('提交的数据：', formModel)
+        icon: 'success'
+      });
+      console.log('提交的数据：', formModel);
     }).catch((err: any | null) => {
-      console.log('验证失败:', err)
+      console.log('验证失败:', err);
       uni.showToast({
         title: '请检查必填项',
-        icon: 'error',
-      })
-    })
+        icon: 'error'
+      });
+    });
   }
 }
 
 function resetForm() {
-  const form = uForm.value
+  const form = uForm.value;
   if (form != null) {
-    form.$callMethod('resetFields')
-    formModel.gender = ''
-    formModel.birthday = ''
-    formModel.country = ''
-    formModel.stayTime = ''
-    formModel.hobbies = ['reading'] as string[]
-    uploadList.value = [] as UTSJSONObject[]
+    form.$callMethod('resetFields');
+    formModel.gender = '';
+    formModel.birthday = '';
+    formModel.country = '';
+    formModel.stayTime = '';
+    formModel.hobbies = ['reading'] as string[];
+    uploadList.value = [] as UTSJSONObject[];
     uni.showToast({
       title: '已重置表单',
-      icon: 'none',
-    })
+      icon: 'none'
+    });
   }
 }
 
 // ==================== 性别选择 (ActionSheet) ====================
-const genderActionShow = ref(false)
+const genderActionShow = ref(false);
 const genderActions = ref([
   { name: '男' },
   { name: '女' },
   { name: '保密' }
-] as UTSJSONObject[])
+] as UTSJSONObject[]);
 
 function onGenderSelect(item: UTSJSONObject) {
-  formModel.gender = item.getString('name') ?? ''
-  genderActionShow.value = false
+  formModel.gender = item.getString('name') ?? '';
+  genderActionShow.value = false;
   // 主动触发校验
-  const form = uForm.value
+  const form = uForm.value;
   if (form != null) {
-    form.$callMethod('validateField', 'gender')
+    form.$callMethod('validateField', 'gender');
   }
 }
 
 // ==================== 日期范围选择 (Calendar) ====================
-const calendarShow = ref(false)
+const calendarShow = ref(false);
 
 function onCalendarConfirm(dates: string[]) {
   if (dates.length > 0) {
     if (dates.length > 1) {
-      formModel.stayTime = `${dates[0]} 至 ${dates[dates.length - 1]}`
-    } else {
-      formModel.stayTime = dates[0]
+      formModel.stayTime = `${dates[0]} 至 ${dates[dates.length - 1]}`;
+    }
+    else {
+      formModel.stayTime = dates[0];
     }
   }
-  calendarShow.value = false
+  calendarShow.value = false;
 }
 
 // ==================== 国籍选择 (Picker) ====================
-const pickerShow = ref(false)
+const pickerShow = ref(false);
 const pickerColumns = ref([
-  ['中国', '美国', '日本', '英国', '法国', '德国', '澳大利亚'],
-] as string[][])
+  ['中国', '美国', '日本', '英国', '法国', '德国', '澳大利亚']
+] as string[][]);
 
 function onPickerConfirm(e: UTSJSONObject): void {
   // eslint-disable-next-line dot-notation
-  const indexs = e['indexs'] as number[]
+  const indexs = e['indexs'] as number[];
   if (indexs.length > 0) {
-    formModel.country = pickerColumns.value[0][indexs[0]]
+    formModel.country = pickerColumns.value[0][indexs[0]];
   }
-  pickerShow.value = false
+  pickerShow.value = false;
 }
 
 // ==================== 出生日期选择 (DatetimePicker) ====================
-const datetimePickerShow = ref(false)
-const datetimePickerValue = ref(new Date().getTime() as any)
+const datetimePickerShow = ref(false);
+const datetimePickerValue = ref(new Date().getTime() as any);
 
 function onDatetimePickerConfirm(e: UTSJSONObject): void {
   // eslint-disable-next-line dot-notation
-  const value = e['value']
+  const value = e['value'];
   if (value != null) {
-    datetimePickerValue.value = value
-    let timestamp = 0
+    datetimePickerValue.value = value;
+    let timestamp = 0;
     if (typeof value === 'number') {
-      timestamp = value as number
-    } else {
-      timestamp = Number.parseInt(value.toString())
+      timestamp = value as number;
     }
-    const d = new Date(timestamp)
-    const year = d.getFullYear()
-    const month = d.getMonth() + 1
-    const date = d.getDate()
-    const monthStr = month < 10 ? `0${month}` : `${month}`
-    const dateStr = date < 10 ? `0${date}` : `${date}`
-    formModel.birthday = `${year}-${monthStr}-${dateStr}`
-    
+    else {
+      timestamp = Number.parseInt(value.toString());
+    }
+    const d = new Date(timestamp);
+    const year = d.getFullYear();
+    const month = d.getMonth() + 1;
+    const date = d.getDate();
+    const monthStr = month < 10 ? `0${month}` : `${month}`;
+    const dateStr = date < 10 ? `0${date}` : `${date}`;
+    formModel.birthday = `${year}-${monthStr}-${dateStr}`;
+
     // 主动触发校验
-    const form = uForm.value
+    const form = uForm.value;
     if (form != null) {
-      form.$callMethod('validateField', 'birthday')
+      form.$callMethod('validateField', 'birthday');
     }
   }
-  datetimePickerShow.value = false
+  datetimePickerShow.value = false;
 }
 
 // ==================== 图片上传 ====================
 function onUploadAfterRead(e: UTSJSONObject): void {
   // eslint-disable-next-line dot-notation
-  const file = e['file'] as Array<UTSJSONObject>
+  const file = e['file'] as Array<UTSJSONObject>;
   file.forEach((item: UTSJSONObject) => {
-    uploadList.value.push(UTSJSONObject.assign({} as UTSJSONObject, item))
-  })
-  formModel.photos = uploadList.value
+    uploadList.value.push(UTSJSONObject.assign({} as UTSJSONObject, item));
+  });
+  formModel.photos = uploadList.value;
 }
 
 function onUploadDelete(e: UTSJSONObject): void {
   // eslint-disable-next-line dot-notation
-  const index = e['index'] as number
+  const index = e['index'] as number;
   if (index >= 0 && index < uploadList.value.length) {
-    uploadList.value.splice(index, 1)
+    uploadList.value.splice(index, 1);
   }
-  formModel.photos = uploadList.value
+  formModel.photos = uploadList.value;
 }
 </script>
 

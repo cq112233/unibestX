@@ -17,6 +17,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   //   ...mpSharedMpOptions,
   name: "up-album"
 }, { __name: "up-album", props: {
+  customStyle: {
+    type: [Object, String],
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
+    }
+  },
+  customClass: {
+    type: String,
+    default: ""
+  },
   // 图片地址，Array<String>|Array<Object>形式
   urls: {
     type: Array,
@@ -176,36 +186,37 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     flush: "post",
     immediate: false
   });
-  const imageStyle = common_vendor.computed(() => {
-    return (index1, index2) => {
-      const space = props.space, rowCount = props.rowCount;
-      props.multipleSize;
-      props.urls;
-      const rowLen = showUrls.value.length;
-      props.urls.length;
-      const style = new common_vendor.UTSJSONObject(
-        {
-          marginRight: uni_modules_uviewUltra_libs_function_index.addUnit(space),
-          marginBottom: uni_modules_uviewUltra_libs_function_index.addUnit(space)
-        }
-        // 如果为最后一行，则每个图片都无需下边框
-      );
-      if (index1 === rowLen && !props.autoWrap)
-        style.marginBottom = 0;
-      if (!props.autoWrap) {
-        if (index2 === parseInt(rowCount.toString()) || index1 == rowLen && index2 == showUrls.value[index1 - 1].length)
-          style.marginRight = 0;
-      }
-      return style;
-    };
-  });
+  function getImageStyle(index1, index2) {
+    const space = props.space, rowCount = props.rowCount;
+    props.multipleSize;
+    props.urls;
+    const rowLen = showUrls.value.length;
+    props.urls.length;
+    const style = new common_vendor.UTSJSONObject({
+      marginRight: uni_modules_uviewUltra_libs_function_index.addUnit(space),
+      marginBottom: uni_modules_uviewUltra_libs_function_index.addUnit(space)
+    });
+    if (index1 === rowLen && !props.autoWrap)
+      style["marginBottom"] = 0;
+    if (!props.autoWrap) {
+      if (index2 === parseInt(rowCount.toString()) || index1 == rowLen && index2 == showUrls.value[index1 - 1].length)
+        style["marginRight"] = 0;
+    }
+    return style;
+  }
   const imageWidth = common_vendor.computed(() => {
     return uni_modules_uviewUltra_libs_function_index.addUnit(props.urls.length == 1 ? singleWidth.value : props.multipleSize, props.unit);
   });
   const imageHeight = common_vendor.computed(() => {
     return uni_modules_uviewUltra_libs_function_index.addUnit(props.urls.length == 1 ? singleHeight.value : props.multipleSize, props.unit);
   });
-  const albumWidth = common_vendor.computed(() => {
+  const imageBorderRadius = common_vendor.computed(() => {
+    return props.shape == "circle" ? "10000px" : uni_modules_uviewUltra_libs_function_index.addUnit(props.radius);
+  });
+  const moreBorderRadius = common_vendor.computed(() => {
+    return props.shape == "circle" ? "50%" : uni_modules_uviewUltra_libs_function_index.addUnit(props.radius);
+  });
+  common_vendor.computed(() => {
     let width = 0;
     if (props.urls.length == 1) {
       width = singleWidth.value;
@@ -214,6 +225,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     }
     emit("albumWidth", width);
     return width;
+  });
+  const rowWrapStyle = common_vendor.computed(() => {
+    return new common_vendor.UTSJSONObject({ flexWrap: props.autoWrap ? "wrap" : "nowrap" });
+  });
+  const imageStyleComputed = common_vendor.computed(() => {
+    return new common_vendor.UTSJSONObject({
+      width: imageWidth.value,
+      height: imageHeight.value,
+      borderRadius: imageBorderRadius.value
+    });
+  });
+  const imageModeComputed = common_vendor.computed(() => {
+    if (props.urls.length == 1) {
+      return imageHeight.value != "0px" && imageHeight.value != "0rpx" ? props.singleMode : "widthFix";
+    }
+    return props.multipleMode;
   });
   const onPreviewTap = (e = null, url) => {
     let ee = e;
@@ -254,10 +281,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
                 customStyle: "justify-content: center",
                 class: "data-v-cc69f70e"
               }),
-              e: __props.shape == "circle" ? "50%" : _ctx.$upAddUnit(__props.radius)
+              e: moreBorderRadius.value
             } : {}, {
               f: index1,
-              g: common_vendor.s(imageStyle.value(index + 1, index1 + 1)),
+              g: common_vendor.s(getImageStyle(index + 1, index1 + 1)),
               h: common_vendor.o(($event) => {
                 return onPreviewTap($event, getSrc(item));
               }, index1)
@@ -269,18 +296,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
           c: index
         };
       }),
-      b: __props.urls.length == 1 ? imageHeight.value != "0px" && imageHeight.value != "0rpx" ? __props.singleMode : "widthFix" : __props.multipleMode,
-      c: common_vendor.s({
-        width: imageWidth.value,
-        height: imageHeight.value,
-        borderRadius: __props.shape == "circle" ? "10000px" : _ctx.$upAddUnit(__props.radius)
-      }),
-      d: albumWidth.value,
-      e: __props.autoWrap ? "wrap" : "nowrap",
-      f: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-      g: `${_ctx.u_s_b_h}px`,
-      h: `${_ctx.u_s_a_i_b}px`,
-      i: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+      b: imageModeComputed.value,
+      c: common_vendor.s(imageStyleComputed.value),
+      d: common_vendor.s(rowWrapStyle.value),
+      e: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+      f: `${_ctx.u_s_b_h}px`,
+      g: `${_ctx.u_s_a_i_b}px`,
+      h: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
     };
     return __returned__;
   };

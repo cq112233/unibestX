@@ -37,15 +37,15 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-const checkboxValue1 = ref(['apple'] as string[])
-const checkboxValue2 = ref(['apple'] as string[])
-const checkboxValue3 = ref(['circle'] as string[])
-const checkboxValue4 = ref([] as string[])
+const checkboxValue1 = ref(['apple'] as string[]);
+const checkboxValue2 = ref(['apple'] as string[]);
+const checkboxValue3 = ref(['circle'] as string[]);
+const checkboxValue4 = ref([] as string[]);
 
 function checkboxChange(n: string[]) {
-  console.log('checkbox change', n)
+  console.log('checkbox change', n);
 }
 </script>
 
@@ -60,8 +60,9 @@ function checkboxChange(n: string[]) {
   font-size: 14px;
   font-weight: bold;
   color: #606266;
-  margin-bottom: 10px;
-  padding-left: 4px;
-  border-left: 3px solid #2979ff;
+  padding-left: 6px;
+  border-left-width: 3px;
+  border-left-color: #2979ff;
+  border-left-style: solid;
 }
 </style>

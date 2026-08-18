@@ -1,301 +1,398 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const uni_modules_uviewUltra_components_upRadio_props = require("./props.js");
-const uni_modules_uviewUltra_libs_mixin_mpMixin = require("../../libs/mixin/mpMixin.js");
-const uni_modules_uviewUltra_libs_mixin_mixin = require("../../libs/mixin/mixin.js");
+const uni_modules_uviewUltra_components_upRadio_radio = require("./radio.js");
 const uni_modules_uviewUltra_libs_function_index = require("../../libs/function/index.js");
-const _sfc_main = common_vendor.defineComponent({
-  name: "up-radio",
-  mixins: [uni_modules_uviewUltra_libs_mixin_mpMixin.mpMixin, uni_modules_uviewUltra_libs_mixin_mixin.mixin, uni_modules_uviewUltra_components_upRadio_props.propsRadio],
-  data() {
-    return {
-      checked: false,
-      // 当你看到这段代码的时候，
-      // 父组件的默认值，因为头条小程序不支持在computed中使用this.parent.shape的形式
-      // 故只能使用如此方法
-      parentData: new common_vendor.UTSJSONObject({
-        iconSize: "12px",
-        labelDisabled: false,
-        labelColor: "",
-        labelSize: "",
-        disabled: false,
-        shape: "",
-        activeColor: "",
-        inactiveColor: "",
-        size: "18px",
-        value: "",
-        modelValue: "",
-        iconColor: "",
-        placement: "row",
-        borderBottom: false,
-        iconPlacement: "left"
-      })
-    };
-  },
-  computed: {
-    // 是否禁用，如果父组件up-raios-group禁用的话，将会忽略子组件的配置
-    elDisabled() {
-      const disabledVal = this.disabled;
-      if (disabledVal != null) {
-        const disabledStr = disabledVal.toString();
-        if (disabledStr != "") {
-          return disabledStr == "true";
-        }
-      }
-      return this.parentData["disabled"] != null ? this.parentData["disabled"] : false;
-    },
-    // 是否禁用label点击
-    elLabelDisabled() {
-      const labelDisabledVal = this.labelDisabled;
-      if (labelDisabledVal != null) {
-        const labelDisabledStr = labelDisabledVal.toString();
-        if (labelDisabledStr != "") {
-          return labelDisabledStr == "true";
-        }
-      }
-      return this.parentData["labelDisabled"] != null ? this.parentData["labelDisabled"] : false;
-    },
-    // 组件尺寸，对应size的值，默认值为21px
-    elSize() {
-      const sizeVal = this.size;
-      if (sizeVal != null && sizeVal.toString() != "") {
-        return sizeVal.toString();
-      }
-      const parentSizeVal = this.parentData["size"];
-      if (parentSizeVal != null && parentSizeVal.toString() != "") {
-        return parentSizeVal.toString();
-      }
-      return "21px";
-    },
-    // 组件的勾选图标的尺寸，默认12px
-    elIconSize() {
-      const iconSizeVal = this.iconSize;
-      if (iconSizeVal != null && iconSizeVal.toString() != "") {
-        return iconSizeVal.toString();
-      }
-      const parentIconSizeVal = this.parentData["iconSize"];
-      if (parentIconSizeVal != null && parentIconSizeVal.toString() != "") {
-        return parentIconSizeVal.toString();
-      }
-      return "12px";
-    },
-    // 组件选中激活时的颜色
-    elActiveColor() {
-      const activeColorVal = this.activeColor;
-      if (activeColorVal != null && activeColorVal.toString() != "") {
-        return activeColorVal.toString();
-      }
-      const parentActiveColorVal = this.parentData["activeColor"];
-      if (parentActiveColorVal != null && parentActiveColorVal.toString() != "") {
-        return parentActiveColorVal.toString();
-      }
-      return "#2979ff";
-    },
-    // 组件选未中激活时的颜色
-    elInactiveColor() {
-      const inactiveColorVal = this.inactiveColor;
-      if (inactiveColorVal != null && inactiveColorVal.toString() != "") {
-        return inactiveColorVal.toString();
-      }
-      const parentInactiveColorVal = this.parentData["inactiveColor"];
-      if (parentInactiveColorVal != null && parentInactiveColorVal.toString() != "") {
-        return parentInactiveColorVal.toString();
-      }
-      return "#c8c9cc";
-    },
-    // label的颜色
-    elLabelColor() {
-      const labelColorVal = this.labelColor;
-      if (labelColorVal != null && labelColorVal.toString() != "") {
-        return labelColorVal.toString();
-      }
-      const parentLabelColorVal = this.parentData["labelColor"];
-      if (parentLabelColorVal != null && parentLabelColorVal.toString() != "") {
-        return parentLabelColorVal.toString();
-      }
-      return "#606266";
-    },
-    // 组件的形状
-    elShape() {
-      const shapeVal = this.shape;
-      if (shapeVal != null && shapeVal.toString() != "") {
-        return shapeVal.toString();
-      }
-      const parentShapeVal = this.parentData["shape"];
-      if (parentShapeVal != null && parentShapeVal.toString() != "") {
-        return parentShapeVal.toString();
-      }
-      return "circle";
-    },
-    // label大小
-    elLabelSize() {
-      const labelSizeVal = this.labelSize;
-      if (labelSizeVal != null && labelSizeVal.toString() != "") {
-        return uni_modules_uviewUltra_libs_function_index.addUnit(labelSizeVal);
-      }
-      const parentLabelSizeVal = this.parentData["labelSize"];
-      if (parentLabelSizeVal != null && parentLabelSizeVal.toString() != "") {
-        return uni_modules_uviewUltra_libs_function_index.addUnit(parentLabelSizeVal);
-      }
-      return uni_modules_uviewUltra_libs_function_index.addUnit("15");
-    },
-    elIconColor() {
-      const iconColorVal = this.iconColor;
-      let iconColorStr = "";
-      if (iconColorVal != null && iconColorVal.toString() != "") {
-        iconColorStr = iconColorVal.toString();
-      } else {
-        const parentIconColorVal = this.parentData["iconColor"];
-        if (parentIconColorVal != null && parentIconColorVal.toString() != "") {
-          iconColorStr = parentIconColorVal.toString();
-        } else {
-          iconColorStr = "#ffffff";
-        }
-      }
-      if (this.elDisabled) {
-        return this.checked ? this.elInactiveColor : "transparent";
-      } else {
-        return this.checked ? iconColorStr : "transparent";
-      }
-    },
-    iconClasses() {
-      let classes = [];
-      classes.push("up-radio__icon-wrap--" + this.elShape);
-      if (this.elDisabled) {
-        classes.push("up-radio__icon-wrap--disabled");
-      }
-      if (this.checked && this.elDisabled) {
-        classes.push("up-radio__icon-wrap--disabled--checked");
-      }
-      if (this.checked && !this.elDisabled && this.elActiveColor == "#2979ff") {
-        classes.push("up-radio__icon-wrap--active");
-      }
-      return classes.join(" ");
-    },
-    iconWrapStyle() {
-      const style = new common_vendor.UTSJSONObject({});
-      if (this.checked && !this.elDisabled) {
-        if (this.elActiveColor != "#2979ff") {
-          style["backgroundColor"] = this.elActiveColor;
-          style["borderColor"] = this.elActiveColor;
-        }
-      } else {
-        style["backgroundColor"] = "#ffffff";
-        style["borderColor"] = this.elInactiveColor;
-      }
-      style["width"] = uni_modules_uviewUltra_libs_function_index.addUnit(this.elSize);
-      style["height"] = uni_modules_uviewUltra_libs_function_index.addUnit(this.elSize);
-      if (this.parentData["iconPlacement"] != null && this.parentData["iconPlacement"].toString() == "right") {
-        style["marginRight"] = 0;
-      }
-      return style;
-    },
-    radioStyle() {
-      const style = new common_vendor.UTSJSONObject({});
-      if (this.parentData["borderBottom"] != null && this.parentData["borderBottom"].toString() == "true" && this.parentData["placement"] != null && this.parentData["placement"].toString() == "row") {
-        uni_modules_uviewUltra_libs_function_index.error("检测到您将borderBottom设置为true，需要同时将up-radio-group的placement设置为column才有效");
-      }
-      if (this.parentData["borderBottom"] != null && this.parentData["borderBottom"].toString() == "true" && this.parentData["placement"] != null && this.parentData["placement"].toString() == "column") {
-        style["paddingBottom"] = uni_modules_uviewUltra_libs_function_index.os() == "ios" ? "12px" : "8px";
-      }
-      return uni_modules_uviewUltra_libs_function_index.deepMerge(style, uni_modules_uviewUltra_libs_function_index.addStyle(this.customStyle));
-    }
-  },
-  mounted() {
-    this.init();
-  },
-  emits: ["change"],
-  methods: {
-    init() {
-      this.updateParentData();
-      if (this.parent == null) {
-        uni_modules_uviewUltra_libs_function_index.error("up-radio必须搭配up-radio-group组件使用");
-      }
-      const modelValueVal = this.parentData["modelValue"];
-      if (modelValueVal != null && this.name != null) {
-        this.checked = this.name.toString() == modelValueVal.toString();
-      } else {
-        this.checked = false;
-      }
-    },
-    updateParentData() {
-      this.getParentData("up-radio-group");
-    },
-    // 点击图标
-    iconClickHandler(e) {
-      this.preventEvent(e);
-      if (!this.elDisabled) {
-        this.setRadioCheckedStatus();
-      }
-    },
-    // 横向两端排列时，点击组件即可触发选中事件
-    wrapperClickHandler(e) {
-      if (this.parentData["iconPlacement"] != null && this.parentData["iconPlacement"].toString() == "right") {
-        this.iconClickHandler(e);
-      }
-    },
-    // 点击label
-    labelClickHandler(e) {
-      this.preventEvent(e);
-      if (!this.elLabelDisabled && !this.elDisabled) {
-        this.setRadioCheckedStatus();
-      }
-    },
-    emitEvent() {
-      if (!this.checked) {
-        this.$emit("change", this.name);
-        this.$nextTick(() => {
-        });
-      }
-    },
-    // 改变组件选中状态
-    setRadioCheckedStatus() {
-      this.emitEvent();
-      this.checked = true;
-      if (this.$parent != null) {
-        this.$parent.$callMethod("unCheckedOther", this);
-      }
-    }
-  }
-});
 if (!Array) {
-  const _easycom_up_icon2 = common_vendor.resolveComponent("up-icon");
-  _easycom_up_icon2();
+  const _easycom_up_icon_1 = common_vendor.resolveComponent("up-icon");
+  _easycom_up_icon_1();
 }
 const _easycom_up_icon = () => "../up-icon/up-icon.js";
 if (!Math) {
   _easycom_up_icon();
 }
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  "raw js";
-  return {
-    a: common_vendor.p({
-      name: "checkbox-mark",
-      size: $options.elIconSize,
-      color: $options.elIconColor,
-      class: "up-radio__icon-wrap__icon data-v-45813f6f"
-    }),
-    b: common_vendor.o((...args) => $options.iconClickHandler && $options.iconClickHandler(...args), "fd"),
-    c: common_vendor.n($options.iconClasses),
-    d: common_vendor.s($options.iconWrapStyle),
-    e: common_vendor.t(_ctx.label),
-    f: common_vendor.n($options.elDisabled ? "up-radio__label--disabled" : ""),
-    g: common_vendor.o((...args) => $options.labelClickHandler && $options.labelClickHandler(...args), "1d"),
-    h: $options.elDisabled ? $options.elInactiveColor : $options.elLabelColor,
-    i: $options.elLabelSize,
-    j: $options.elLabelSize,
-    k: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    l: common_vendor.o((...args) => $options.wrapperClickHandler && $options.wrapperClickHandler(...args), "99"),
-    m: common_vendor.s($options.radioStyle),
-    n: common_vendor.s({
-      "--status-bar-height": `${_ctx.u_s_b_h}px`,
-      "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
-    }),
-    o: common_vendor.n("up-radio-label--" + ($data.parentData["iconPlacement"] != null ? $data.parentData["iconPlacement"].toString() : "left")),
-    p: common_vendor.n($data.parentData["borderBottom"] != null && $data.parentData["borderBottom"].toString() == "true" && $data.parentData["placement"] != null && $data.parentData["placement"].toString() == "column" ? "up-border-bottom" : ""),
-    q: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
+  name: "up-radio"
+}, { __name: "up-radio", props: {
+  // radio的名称
+  name: {
+    type: [String, Number, Boolean],
+    default: uni_modules_uviewUltra_components_upRadio_radio.defProps.getString("radio.name")
+  },
+  // 形状，square为方形，circle为圆型
+  shape: {
+    type: String,
+    default: uni_modules_uviewUltra_components_upRadio_radio.defProps.getString("radio.shape")
+  },
+  // 是否禁用
+  disabled: {
+    type: [String, Boolean],
+    default: uni_modules_uviewUltra_components_upRadio_radio.defProps.getString("radio.disabled")
+  },
+  // 是否禁止点击提示语选中单选框
+  labelDisabled: {
+    type: [String, Boolean],
+    default: uni_modules_uviewUltra_components_upRadio_radio.defProps.getString("radio.labelDisabled")
+  },
+  // 选中状态下的颜色，如设置此值，将会覆盖parent的activeColor值
+  activeColor: {
+    type: String,
+    default: uni_modules_uviewUltra_components_upRadio_radio.defProps.getString("radio.activeColor")
+  },
+  // 未选中的颜色
+  inactiveColor: {
+    type: String,
+    default: uni_modules_uviewUltra_components_upRadio_radio.defProps.getString("radio.inactiveColor")
+  },
+  // 图标的大小，单位px
+  iconSize: {
+    type: [String, Number],
+    default: uni_modules_uviewUltra_components_upRadio_radio.defProps.getString("radio.iconSize")
+  },
+  // label的字体大小，px单位
+  labelSize: {
+    type: [String, Number],
+    default: uni_modules_uviewUltra_components_upRadio_radio.defProps.getString("radio.labelSize")
+  },
+  // label提示文字，因为nvue下，直接slot进来的文字，由于特殊的结构，无法修改样式
+  label: {
+    type: [String, Number],
+    default: uni_modules_uviewUltra_components_upRadio_radio.defProps.getString("radio.label")
+  },
+  // 整体的大小
+  size: {
+    type: [String, Number],
+    default: uni_modules_uviewUltra_components_upRadio_radio.defProps.getString("radio.size")
+  },
+  // 图标颜色
+  iconColor: {
+    type: String,
+    default: uni_modules_uviewUltra_components_upRadio_radio.defProps.getString("radio.iconColor")
+  },
+  // label的颜色
+  labelColor: {
+    type: String,
+    default: uni_modules_uviewUltra_components_upRadio_radio.defProps.getString("radio.labelColor")
+  },
+  // 定义需要用到的外部样式
+  customStyle: {
+    type: Object,
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
+    }
+  },
+  // 是否独立使用
+  usedAlone: {
+    type: Boolean,
+    default: false
+  }
+}, emits: ["change", "update:checked"], setup(__props, _a) {
+  var _b;
+  var __expose = _a.expose, __emit = _a.emit;
+  (_b = common_vendor.getCurrentInstance()) === null || _b === void 0 ? null : _b.proxy;
+  const props = __props;
+  const emit = __emit;
+  const parentProps = common_vendor.inject("upRadioGroupProps", null);
+  const parentChange = common_vendor.inject("upRadioGroupChange", null);
+  const selfChecked = common_vendor.ref(false);
+  const isChecked = common_vendor.computed(() => {
+    if (!props.usedAlone && parentProps != null && parentProps.value != null) {
+      const parentVal = parentProps.value["modelValue"];
+      if (parentVal != null && props.name != null) {
+        return parentVal.toString() == props.name.toString();
+      }
+      return false;
+    }
+    return selfChecked.value;
+  });
+  const elDisabled = common_vendor.computed(() => {
+    const disabledVal = props.disabled;
+    if (disabledVal != null && disabledVal.toString() != "") {
+      return disabledVal.toString() == "true";
+    }
+    if (!props.usedAlone && parentProps != null && parentProps.value != null) {
+      const parentDisabled = parentProps.value["disabled"];
+      if (parentDisabled != null) {
+        return parentDisabled;
+      }
+    }
+    return false;
+  });
+  const elLabelDisabled = common_vendor.computed(() => {
+    const labelDisabledVal = props.labelDisabled;
+    if (labelDisabledVal != null && labelDisabledVal.toString() != "") {
+      return labelDisabledVal.toString() == "true";
+    }
+    if (!props.usedAlone && parentProps != null && parentProps.value != null) {
+      const parentLabelDisabled = parentProps.value["labelDisabled"];
+      if (parentLabelDisabled != null) {
+        return parentLabelDisabled;
+      }
+    }
+    return false;
+  });
+  const elSize = common_vendor.computed(() => {
+    const sizeVal = props.size;
+    if (sizeVal != null && sizeVal.toString() != "") {
+      return sizeVal.toString();
+    }
+    if (!props.usedAlone && parentProps != null && parentProps.value != null) {
+      const parentSize = parentProps.value["size"];
+      if (parentSize != null && parentSize.toString() != "") {
+        return parentSize.toString();
+      }
+    }
+    return "21";
+  });
+  const elIconSize = common_vendor.computed(() => {
+    const iconSizeVal = props.iconSize;
+    if (iconSizeVal != null && iconSizeVal.toString() != "") {
+      return iconSizeVal.toString();
+    }
+    if (!props.usedAlone && parentProps != null && parentProps.value != null) {
+      const parentIconSize = parentProps.value["iconSize"];
+      if (parentIconSize != null && parentIconSize.toString() != "") {
+        return parentIconSize.toString();
+      }
+    }
+    return "12";
+  });
+  const elActiveColor = common_vendor.computed(() => {
+    const activeColorVal = props.activeColor;
+    if (activeColorVal != null && activeColorVal.toString() != "") {
+      return activeColorVal.toString();
+    }
+    if (!props.usedAlone && parentProps != null && parentProps.value != null) {
+      const parentActiveColor = parentProps.value["activeColor"];
+      if (parentActiveColor != null && parentActiveColor.toString() != "") {
+        return parentActiveColor.toString();
+      }
+    }
+    return "#2979ff";
+  });
+  const elInactiveColor = common_vendor.computed(() => {
+    const inactiveColorVal = props.inactiveColor;
+    if (inactiveColorVal != null && inactiveColorVal.toString() != "") {
+      return inactiveColorVal.toString();
+    }
+    if (!props.usedAlone && parentProps != null && parentProps.value != null) {
+      const parentInactiveColor = parentProps.value["inactiveColor"];
+      if (parentInactiveColor != null && parentInactiveColor.toString() != "") {
+        return parentInactiveColor.toString();
+      }
+    }
+    return "#c8c9cc";
+  });
+  const elLabelColor = common_vendor.computed(() => {
+    const labelColorVal = props.labelColor;
+    if (labelColorVal != null && labelColorVal.toString() != "") {
+      return labelColorVal.toString();
+    }
+    if (!props.usedAlone && parentProps != null && parentProps.value != null) {
+      const parentLabelColor = parentProps.value["labelColor"];
+      if (parentLabelColor != null && parentLabelColor.toString() != "") {
+        return parentLabelColor.toString();
+      }
+    }
+    return "#606266";
+  });
+  const elShape = common_vendor.computed(() => {
+    const shapeVal = props.shape;
+    if (shapeVal != null && shapeVal.toString() != "") {
+      return shapeVal.toString();
+    }
+    if (!props.usedAlone && parentProps != null && parentProps.value != null) {
+      const parentShape = parentProps.value["shape"];
+      if (parentShape != null && parentShape.toString() != "") {
+        return parentShape.toString();
+      }
+    }
+    return "circle";
+  });
+  const elLabelSize = common_vendor.computed(() => {
+    const labelSizeVal = props.labelSize;
+    if (labelSizeVal != null && labelSizeVal.toString() != "") {
+      return uni_modules_uviewUltra_libs_function_index.addUnit(labelSizeVal);
+    }
+    if (!props.usedAlone && parentProps != null && parentProps.value != null) {
+      const parentLabelSize = parentProps.value["labelSize"];
+      if (parentLabelSize != null && parentLabelSize.toString() != "") {
+        return uni_modules_uviewUltra_libs_function_index.addUnit(parentLabelSize);
+      }
+    }
+    return uni_modules_uviewUltra_libs_function_index.addUnit("15");
+  });
+  const elIconColor = common_vendor.computed(() => {
+    let iconColorStr = "#ffffff";
+    const iconColorVal = props.iconColor;
+    if (iconColorVal != null && iconColorVal.toString() != "") {
+      iconColorStr = iconColorVal.toString();
+    } else if (!props.usedAlone && parentProps != null && parentProps.value != null) {
+      const parentIconColor = parentProps.value["iconColor"];
+      if (parentIconColor != null && parentIconColor.toString() != "") {
+        iconColorStr = parentIconColor.toString();
+      }
+    }
+    if (elDisabled.value) {
+      return isChecked.value ? elInactiveColor.value : "transparent";
+    } else {
+      return isChecked.value ? iconColorStr : "transparent";
+    }
+  });
+  const iconClasses = common_vendor.computed(() => {
+    let classes = [];
+    classes.push("up-radio__icon-wrap--" + elShape.value);
+    if (elDisabled.value) {
+      classes.push("up-radio__icon-wrap--disabled");
+    }
+    if (isChecked.value && elDisabled.value) {
+      classes.push("up-radio__icon-wrap--disabled--checked");
+    }
+    if (isChecked.value && !elDisabled.value && elActiveColor.value == "#2979ff") {
+      classes.push("up-radio__icon-wrap--active");
+    }
+    return classes.join(" ");
+  });
+  const iconWrapStyle = common_vendor.computed(() => {
+    const style = new common_vendor.UTSJSONObject({});
+    if (isChecked.value && !elDisabled.value) {
+      if (elActiveColor.value != "#2979ff") {
+        style["backgroundColor"] = elActiveColor.value;
+        style["borderColor"] = elActiveColor.value;
+      }
+    } else {
+      style["backgroundColor"] = "#ffffff";
+      style["borderColor"] = elInactiveColor.value;
+    }
+    style["width"] = uni_modules_uviewUltra_libs_function_index.addUnit(elSize.value);
+    style["height"] = uni_modules_uviewUltra_libs_function_index.addUnit(elSize.value);
+    if (!props.usedAlone && parentProps != null && parentProps.value != null) {
+      const parentPlacement = parentProps.value["iconPlacement"];
+      if (parentPlacement != null && parentPlacement.toString() == "right") {
+        style["marginRight"] = 0;
+      }
+    }
+    return style;
+  });
+  const radioStyle = common_vendor.computed(() => {
+    const style = new common_vendor.UTSJSONObject({});
+    if (!props.usedAlone && parentProps != null && parentProps.value != null) {
+      const borderBottom = parentProps.value["borderBottom"];
+      const placement = parentProps.value["placement"];
+      if (borderBottom != null && borderBottom.toString() == "true" && placement != null && placement.toString() == "row") {
+        uni_modules_uviewUltra_libs_function_index.error("检测到您将borderBottom设置为true，需要同时将up-radio-group的placement设置为column才有效");
+      }
+      if (borderBottom != null && borderBottom.toString() == "true" && placement != null && placement.toString() == "column") {
+        style["paddingBottom"] = uni_modules_uviewUltra_libs_function_index.os() == "ios" ? "12px" : "8px";
+      }
+    }
+    return uni_modules_uviewUltra_libs_function_index.deepMerge(style, uni_modules_uviewUltra_libs_function_index.addStyle(props.customStyle));
+  });
+  const iconPlacementClass = common_vendor.computed(() => {
+    if (!props.usedAlone && parentProps != null && parentProps.value != null) {
+      const p = parentProps.value["iconPlacement"];
+      if (p != null && p.toString() != "") {
+        return "up-radio-label--" + p.toString();
+      }
+    }
+    return "up-radio-label--left";
+  });
+  const borderBottomClass = common_vendor.computed(() => {
+    if (!props.usedAlone && parentProps != null && parentProps.value != null) {
+      const borderBottom = parentProps.value["borderBottom"];
+      const placement = parentProps.value["placement"];
+      if (borderBottom != null && borderBottom.toString() == "true" && placement != null && placement.toString() == "column") {
+        return "up-border-bottom";
+      }
+    }
+    return "";
+  });
+  function emitEvent() {
+    if (!isChecked.value) {
+      emit("change", props.name);
+      if (props.usedAlone) {
+        emit("update:checked", true);
+      }
+      setTimeout(() => {
+      }, 10);
+    }
+  }
+  function setRadioCheckedStatus() {
+    emitEvent();
+    if (!props.usedAlone && parentChange != null) {
+      parentChange(props.name);
+    } else {
+      selfChecked.value = true;
+    }
+  }
+  function iconClickHandler(e) {
+    e.stopPropagation();
+    if (!elDisabled.value) {
+      setRadioCheckedStatus();
+    }
+  }
+  function wrapperClickHandler(e) {
+    if (!props.usedAlone && parentProps != null && parentProps.value != null) {
+      const p = parentProps.value["iconPlacement"];
+      if (p != null && p.toString() == "right") {
+        iconClickHandler(e);
+        return null;
+      }
+    }
+  }
+  function labelClickHandler(e) {
+    e.stopPropagation();
+    if (!elLabelDisabled.value && !elDisabled.value) {
+      setRadioCheckedStatus();
+    }
+  }
+  const init = function() {
   };
-}
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-45813f6f"]]);
+  const getInternalState = () => {
+    return new common_vendor.UTSJSONObject({
+      name: props.name,
+      isChecked: isChecked.value
+    });
+  };
+  __expose({
+    init,
+    getInternalState
+  });
+  return (_ctx, _cache) => {
+    "raw js";
+    const __returned__ = {
+      a: common_vendor.p({
+        name: "checkbox-mark",
+        size: elIconSize.value,
+        color: elIconColor.value,
+        class: "up-radio__icon-wrap__icon data-v-45813f6f"
+      }),
+      b: common_vendor.o(iconClickHandler, "d2"),
+      c: common_vendor.n(iconClasses.value),
+      d: common_vendor.s(iconWrapStyle.value),
+      e: common_vendor.t(__props.label),
+      f: common_vendor.n(elDisabled.value ? "up-radio__label--disabled" : ""),
+      g: common_vendor.o(labelClickHandler, "c2"),
+      h: elDisabled.value ? elInactiveColor.value : elLabelColor.value,
+      i: elLabelSize.value,
+      j: elLabelSize.value,
+      k: common_vendor.r("label", {
+        label: __props.label,
+        elDisabled: elDisabled.value
+      }),
+      l: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+      m: common_vendor.o(wrapperClickHandler, "dc"),
+      n: common_vendor.s(radioStyle.value),
+      o: common_vendor.s({
+        "--status-bar-height": `${_ctx.u_s_b_h}px`,
+        "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
+      }),
+      p: common_vendor.n(iconPlacementClass.value),
+      q: common_vendor.n(borderBottomClass.value),
+      r: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+    };
+    return __returned__;
+  };
+} }));
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-45813f6f"]]);
 wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-ultra/components/up-radio/up-radio.js.map

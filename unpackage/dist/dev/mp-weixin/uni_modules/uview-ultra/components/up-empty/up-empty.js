@@ -16,6 +16,16 @@ if (!Math) {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   name: "up-empty"
 }, { __name: "up-empty", props: {
+  customStyle: {
+    type: [Object, String],
+    default: () => {
+      return new common_vendor.UTSJSONObject({});
+    }
+  },
+  customClass: {
+    type: String,
+    default: ""
+  },
   // 内置图标名称，或图片路径，建议绝对路径
   icon: {
     type: String,
@@ -101,6 +111,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     style["marginTop"] = uni_modules_uviewUltra_libs_function_index.addUnit(props.marginTop);
     return style;
   });
+  const mergedEmptyStyle = common_vendor.computed(() => {
+    const custom = uni_modules_uviewUltra_libs_function_index.addStyle(props.customStyle);
+    const empty = emptyStyle.value;
+    return uni_modules_uviewUltra_libs_function_index.deepMerge(empty, custom);
+  });
+  const imageDimensionStyle = common_vendor.computed(() => {
+    return new common_vendor.UTSJSONObject({
+      width: uni_modules_uviewUltra_libs_function_index.addUnit(props.width),
+      height: uni_modules_uviewUltra_libs_function_index.addUnit(props.height)
+    });
+  });
   const textStyle = common_vendor.computed(() => {
     const style = new common_vendor.UTSJSONObject({});
     style["color"] = props.textColor;
@@ -125,22 +146,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
         class: "data-v-0d55c80f"
       })
     } : {
-      d: _ctx.$up.addUnit(__props.width),
-      e: _ctx.$up.addUnit(__props.height),
-      f: __props.icon
+      d: common_vendor.s(imageDimensionStyle.value),
+      e: __props.icon
     }, {
-      g: common_vendor.t(__props.text != "" ? __props.text : icons.value[__props.mode]),
-      h: common_vendor.s(textStyle.value),
-      i: _ctx.$slots["default"] != null || _ctx.$slots["$default"] != null
+      f: common_vendor.t(__props.text != "" ? __props.text : icons.value[__props.mode]),
+      g: common_vendor.s(textStyle.value),
+      h: _ctx.$slots["default"] != null || _ctx.$slots["$default"] != null
     }, _ctx.$slots["default"] != null || _ctx.$slots["$default"] != null ? {} : {}, {
-      j: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-      k: common_vendor.s(emptyStyle.value),
-      l: common_vendor.s(_ctx.$up.addStyle(_ctx.customStyle)),
-      m: common_vendor.s({
+      i: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+      j: common_vendor.s(mergedEmptyStyle.value),
+      k: common_vendor.s({
         "--status-bar-height": `${_ctx.u_s_b_h}px`,
         "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
       }),
-      n: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+      l: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
     }) : {});
     return __returned__;
   };

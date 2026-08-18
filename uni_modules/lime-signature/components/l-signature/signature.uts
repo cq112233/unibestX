@@ -1,0 +1,213 @@
+// @ts-nocheck
+import { LimeSignatureOptions, LimeSignaturePoint, LimeSignatureLine } from '../../index.uts'
+
+let points : LimeSignatureLine = []
+let undoStack : LimeSignatureLine[] = [];
+let redoStack : LimeSignatureLine[] = [];
+let lastX = 0;
+let lastY = 0;
+
+// #ifdef APP-ANDROID || APP-IOS
+type SignatureUniElement = UniElement
+type SignatureCanvasContext = DrawableContext
+// #endif
+
+// #ifdef APP-HARMONY
+type SignatureUniElement = UniCanvasElement
+type SignatureCanvasContext = CanvasRenderingContext2D
+// #endif
+
+export class Signature {
+	el : SignatureUniElement
+	ctx : SignatureCanvasContext
+	options : LimeSignatureOptions = {
+		penColor: 'black',
+		openSmooth: true,
+		disableScroll: true,
+		disabled: false,
+		penSize: 2,
+		minLineWidth: 2,
+		maxLineWidth: 6,
+		minSpeed: 1.5,
+		maxWidthDiffRate: 20,
+		maxHistoryLength: 20
+	} as LimeSignatureOptions
+	
+	isEmpty : boolean = true
+	isDrawing : boolean = false
+	// historyList : LimeSignaturePoint[][] = []
+	// id : string
+	// instance : ComponentPublicInstance
+	touchstartCallbackWrapper: UniCallbackWrapper|null = null
+	touchmoveCallbackWrapper: UniCallbackWrapper|null= null
+	touchendCallbackWrapper: UniCallbackWrapper|null= null
+	change: ((isEmpty: boolean) => void)|null = null
+	constructor(el : SignatureUniElement) {
+		this.el = el
+		// #ifdef APP-ANDROID || APP-IOS
+		this.ctx = el.getDrawableContext() as DrawableContext
+		// #endif
+		
+		// #ifdef APP-HARMONY
+		const dpr = uni.getDeviceInfo().devicePixelRatio ?? 1;
+		el.width = el.offsetWidth * dpr;
+		el.height = el.offsetHeight * dpr;
+		
+		
+		this.ctx = el.getContext('2d')
+		this.ctx.scale(dpr, dpr); // 仅需调用一次，当调用 reset 方法后需要再次 scale
+		// #endif
+		this.init()
+	}
+	onChange(cb: (isEmpty: boolean) =>  void){
+		this.change = cb
+	}
+	init() {
+		this.touchstartCallbackWrapper = this.el.addEventListener('touchstart', this.onTouchStart)
+		this.touchmoveCallbackWrapper = this.el.addEventListener('touchmove', this.onTouchMove)
+		this.touchendCallbackWrapper = this.el.addEventListener('touchend', this.onTouchEnd)
+	}
+	remove() {
+		if(this.touchstartCallbackWrapper == null) return
+		this.el.removeEventListener('touchstart', this.touchstartCallbackWrapper!)
+		this.el.removeEventListener('touchmove', this.touchmoveCallbackWrapper!)
+		this.el.removeEventListener('touchend', this.touchendCallbackWrapper!)
+	}
+	setOption(options : LimeSignatureOptions) {
+		this.options = options
+	}
+	disableScroll(event : UniTouchEvent) {
+		event.stopPropagation()
+		if (this.options.disableScroll) {
+			{
+				event.preventDefault()
+			}
+		}
+	}
+	getTouchLimeSignaturePoint(event : UniTouchEvent) : LimeSignaturePoint {
+		const rect = this.el.getBoundingClientRect()
+		const touche = event.touches[0];
+		const x = touche.clientX
+		const y = touche.clientY
+		// const force = touche.force
+		return {
+			x: x - rect.left,
+			y: y - rect.top
+		} as LimeSignaturePoint
+	}
+	onTouchStart: (event : UniTouchEvent) => void = (event : UniTouchEvent) =>{
+		if (this.options.disabled) {
+			return
+		}
+		this.disableScroll(event)
+		const { x, y } = this.getTouchLimeSignaturePoint(event)
+		this.isDrawing = true;
+		this.isEmpty = false
+		lastX = x
+		lastY = y
+		points.push({ x, y } as LimeSignaturePoint);
+	}
+	onTouchMove: (event : UniTouchEvent) => void = (event : UniTouchEvent) =>{
+		if (this.options.disabled || !this.isDrawing) {
+			return
+		}
+		this.disableScroll(event)
+		const { x, y } = this.getTouchLimeSignaturePoint(event)
+		const lineWidth = this.options.penSize
+		const strokeStyle = this.options.penColor
+		const point = { x, y } as LimeSignaturePoint
+		const last = { x: lastX, y: lastY } as LimeSignaturePoint
+		this.drawLine(point, last, lineWidth, strokeStyle)
+
+		lastX = x
+		lastY = y
+		points.push({ x, y, c: strokeStyle, w: lineWidth } as LimeSignaturePoint);
+	}
+	onTouchEnd: (event : UniTouchEvent) => void = (event : UniTouchEvent) =>{
+		this.disableScroll(event)
+		this.isDrawing = false;
+		undoStack.push(points);
+		redoStack = [] as LimeSignatureLine[];
+		points = [] as LimeSignaturePoint[];
+		this.change?.(this.isEmpty);
+	}
+	drawLine(point : LimeSignaturePoint, last : LimeSignaturePoint, lineWidth : number, strokeStyle : string) {
+		const ctx = this.ctx
+		ctx.lineWidth = lineWidth
+		ctx.strokeStyle = strokeStyle
+		ctx.lineCap = 'round'
+		ctx.lineJoin = 'round'
+		ctx.beginPath()
+		ctx.moveTo(last.x, last.y)
+		ctx.lineTo(point.x, point.y)
+		ctx.stroke()
+		ctx.closePath()
+		// ctx.update()
+		this._draw()
+	}
+	_clear() {
+		// #ifdef APP-ANDROID || APP-IOS
+		this.ctx.reset()
+		// #endif
+		// #ifdef APP-HARMONY
+		this.ctx.clearRect(0,0,100000,100000)
+		// #endif
+	}
+	_draw() {
+		// #ifdef APP-ANDROID || APP-IOS
+		this.ctx.update()
+		// #endif
+	}
+	// addHistory() { }
+	clear() {
+		// this.ctx.reset()
+		// this.ctx.update()
+		this._clear()
+		this._draw()
+		this.isEmpty = true
+		undoStack = [] as LimeSignatureLine[];
+		redoStack = [] as LimeSignatureLine[];
+		points = [] as LimeSignaturePoint[];
+	}
+	undo() {
+		if(redoStack.length == this.options.maxHistoryLength && this.options.maxHistoryLength != 0){
+			return
+		}
+		// this.ctx.reset()
+		this._clear()
+		if(undoStack.length > 0){
+			const lastPath : LimeSignatureLine = undoStack.pop()!;
+			redoStack.push(lastPath);
+			if(undoStack.length == 0){
+				this.isEmpty = true
+				// this.ctx.update()
+				this._draw()
+				return
+			}
+			for (let l = 0; l < undoStack.length; l++) {
+				for (let i = 1; i < undoStack[l].length; i++) {
+					const last  = undoStack[l][i - 1]
+					const point = undoStack[l][i]
+					this.drawLine(point, last, point.w!, point.c!)
+				}
+			}
+		} else {
+			// this.ctx.update()
+			this._draw()
+		}
+	}
+	redo() {
+		if(redoStack.length < 1) return
+		const lastPath : LimeSignatureLine = redoStack.pop()!;
+		undoStack.push(lastPath);
+		this.isEmpty = false
+		for (let l = 0; l < undoStack.length; l++) {
+			for (let i = 1; i < undoStack[l].length; i++) {
+				const last  = undoStack[l][i - 1]
+				const point = undoStack[l][i]
+				this.drawLine(point, last, point.w!, point.c!)
+			}
+		}
+	}
+	// restore() { }
+}

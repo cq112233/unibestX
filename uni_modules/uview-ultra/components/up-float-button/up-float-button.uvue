@@ -13,7 +13,6 @@
             @click="clickHandler"
             :style="{
                 backgroundColor: backgroundColor,
-                color: color,
                 display: 'flex',
                 flexDirection: 'row',
                 justifyContent: 'center',
@@ -36,28 +35,77 @@
                 bottom: height
             }"
         >
-                <slot name="list">
-                    <template :key="index" v-for="(item, index) in list">
-                        <view
-                            class="up-float-button__item"
-                            :style="getItemStyle(item)"
-                            @click="itemClick(item, index)"
-                        >
-                            <up-icon :name="getItemName(item)" :color="getItemColor(item)"></up-icon>
-                        </view>
-                    </template>
-                </slot>
+            <slot name="list">
+                <template :key="index" v-for="(item, index) in list">
+                    <view
+                        class="up-float-button__item"
+                        :style="getItemStyle(item)"
+                        @click="itemClick(item, index)"
+                    >
+                        <up-icon :name="getItemName(item)" :color="getItemColor(item)"></up-icon>
+                    </view>
+                </template>
+            </slot>
         </view>
     </view>
 </template>
 
-<script lang="uts">
-import type { PropType } from 'vue'
-import { mpMixin } from '../../libs/mixin/mpMixin.uts'
-import { mixin } from '../../libs/mixin/mixin.uts'
+<script setup lang="uts">
+import { ref } from 'vue'
 
-function createButtonList(): UTSJSONObject[] {
-    return [] as UTSJSONObject[]
+defineOptions({
+    name: 'up-float-button'
+})
+
+const props = defineProps({
+    backgroundColor: {
+        type: String,
+        default: '#2979ff'
+    },
+    color: {
+        type: String,
+        default: '#fff'
+    },
+    width: {
+        type: String,
+        default: '50px'
+    },
+    height: {
+        type: String,
+        default: '50px'
+    },
+    borderColor: {
+        type: String,
+        default: ''
+    },
+    right: {
+        type: [String, Number],
+        default: '30px'
+    },
+    top: {
+        type: [String, Number],
+        default: ''
+    },
+    bottom: {
+        type: [String, Number],
+        default: ''
+    },
+    isMenu: {
+        type: Boolean,
+        default: false
+    },
+    list: {
+        type: Array as PropType<UTSJSONObject[]>,
+        default: () => [] as UTSJSONObject[]
+    }
+})
+
+const emit = defineEmits(['click', 'item-click'])
+
+const showList = ref<boolean>(false)
+
+function stringValue(value: any | null): string {
+    return value == null ? '' : value.toString()
 }
 
 function copyObject(item: UTSJSONObject): UTSJSONObject {
@@ -69,115 +117,56 @@ function copyObject(item: UTSJSONObject): UTSJSONObject {
     return copied
 }
 
-function stringValue(value: any | null): string {
-    return value == null ? '' : value.toString()
+function getItemBackgroundColor(item: UTSJSONObject): string {
+    const value = stringValue(item['backgroundColor'])
+    return value == '' ? props.backgroundColor : value
 }
 
-export default {
-    name: 'up-float-button',
-    mixins: [mpMixin, mixin],
-    emits: ['click', 'item-click'],
-    props: {
-        backgroundColor: {
-            type: String,
-            default: '#2979ff'
-        },
-        color: {
-            type: String,
-            default: '#fff'
-        },
-        width: {
-            type: String,
-            default: '50px'
-        },
-        height: {
-            type: String,
-            default: '50px'
-        },
-        borderColor: {
-            type: String,
-            default: ''
-        },
-        right: {
-            type: [String, Number],
-            default: '30px'
-        },
-        top: {
-            type: [String, Number],
-            default: ''
-        },
-        bottom: {
-            type: [String, Number],
-            default: ''
-        },
-        isMenu: {
-            type: Boolean,
-            default: false
-        },
-        list: {
-            type: Array as PropType<UTSJSONObject[]>,
-            default(): UTSJSONObject[] {
-                return createButtonList()
-            }
-        }
-    },
-    data() {
-        return {
-            showList: false
-        }
-    },
-    methods: {
-        getItemBackgroundColor(item: UTSJSONObject): string {
-            const value = stringValue(item['backgroundColor'])
-            return value == '' ? this.backgroundColor : value
-        },
-        getItemColor(item: UTSJSONObject): string {
-            const value = stringValue(item['color'])
-            return value == '' ? this.color : value
-        },
-        getItemBorderColor(item: UTSJSONObject): string {
-            const value = stringValue(item['borderColor'])
-            return value == '' ? this.borderColor : value
-        },
-        getItemName(item: UTSJSONObject): string {
-            return stringValue(item['name'])
-        },
-        getItemStyle(item: UTSJSONObject): UTSJSONObject {
-            const style = {} as UTSJSONObject
-            style['backgroundColor'] = this.getItemBackgroundColor(item)
-            style['color'] = this.getItemColor(item)
-            style['display'] = 'flex'
-            style['flexDirection'] = 'row'
-            style['justifyContent'] = 'center'
-            style['alignItems'] = 'center'
-            style['width'] = this.width
-            style['height'] = this.height
-            style['borderRadius'] = '50%'
-            style['borderColor'] = this.getItemBorderColor(item)
-            return style
-        },
-        clickHandler(e: UniPointerEvent): void {
-            if (this.isMenu) {
-                this.showList = !this.showList
-            }
-            this.$emit('click', e)
-        },
-        itemClick(item: UTSJSONObject, index: number): void {
-            const payload = copyObject(item)
-            payload['index'] = index
-            this.$emit('item-click', payload)
-        }
+function getItemColor(item: UTSJSONObject): string {
+    const value = stringValue(item['color'])
+    return value == '' ? props.color : value
+}
+
+function getItemBorderColor(item: UTSJSONObject): string {
+    const value = stringValue(item['borderColor'])
+    return value == '' ? props.borderColor : value
+}
+
+function getItemName(item: UTSJSONObject): string {
+    return stringValue(item['name'])
+}
+
+function getItemStyle(item: UTSJSONObject): UTSJSONObject {
+    const style = {} as UTSJSONObject
+    style['backgroundColor'] = getItemBackgroundColor(item)
+    style['display'] = 'flex'
+    style['flexDirection'] = 'row'
+    style['justifyContent'] = 'center'
+    style['alignItems'] = 'center'
+    style['width'] = props.width
+    style['height'] = props.height
+    style['borderRadius'] = '50%'
+    style['borderColor'] = getItemBorderColor(item)
+    return style
+}
+
+function clickHandler(e: UniPointerEvent): void {
+    if (props.isMenu) {
+        showList.value = !showList.value
     }
+    emit('click', e)
+}
+
+function itemClick(item: UTSJSONObject, index: number): void {
+    const payload = copyObject(item)
+    payload['index'] = index
+    emit('item-click', payload)
 }
 </script>
 
 <style lang="scss" scoped>
 .up-float-button {
     z-index: 999;
-
-    .show-list {
-        transform: rotate(45deg);
-    }
 
     &__list {
         position: absolute;
@@ -188,5 +177,9 @@ export default {
         z-index: 999;
         align-items: center;
     }
+}
+
+.show-list {
+    transform: rotate(45deg);
 }
 </style>

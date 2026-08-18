@@ -3,7 +3,12 @@
     <!-- 导航栏外层容器 -->
     <view
       :class="fixed ? 'navbar-container navbar-fixed' : 'navbar-container'"
-      :style="{ backgroundColor: bgColor, borderBottom: border ? '1px solid #e2e8f0' : 'none' }"
+      :style="{
+        backgroundColor: bgColor,
+        borderBottomWidth: border ? '1px' : '0px',
+        borderBottomStyle: border ? 'solid' : 'none',
+        borderBottomColor: border ? '#e2e8f0' : 'transparent'
+      }"
     >
       <!-- 安全区域：状态栏占位高度 -->
       <view :style="{ height: `${statusBarHeight}px` }"></view>
@@ -14,7 +19,7 @@
         <view class="navbar-left" @click="handleBack">
           <slot name="left">
             <view v-if="showBack" class="back-btn-wrapper">
-              <view class="back-arrow" :style="{ borderColor: titleColor }"></view>
+              <view class="back-arrow" :style="{ borderLeftColor: titleColor, borderBottomColor: titleColor }"></view>
             </view>
           </slot>
         </view>
@@ -39,59 +44,67 @@
 </template>
 
 <script setup lang="uts">
-import { computed } from 'vue'
-import { safeAreaInsets, systemInfo } from '@/src/utils/systemInfo'
+import { computed } from 'vue';
+import { safeAreaInsets, systemInfo } from '@/src/utils/systemInfo';
 
 // 定义组件参数类型
 const props = defineProps({
   title: {
     type: String,
-    default: '',
+    default: ''
   },
   titleColor: {
     type: String,
-    default: '#1e293b',
+    default: '#1e293b'
   },
   bgColor: {
     type: String,
-    default: '#ffffff',
-  },
-  showBack: {
-    type: Boolean,
-    default: true,
+    default: '#ffffff'
   },
   fixed: {
     type: Boolean,
-    default: true,
+    default: true
   },
   placeholder: {
     type: Boolean,
-    default: true,
+    default: true
+  },
+  showBack: {
+    type: Boolean,
+    default: true
   },
   border: {
     type: Boolean,
-    default: false,
-  },
-})
+    default: true
+  }
+});
 
-// 计算状态栏高度，优先取安全区域 top 值，再取系统状态栏高度
-const statusBarHeight = computed((): number => {
-  return safeAreaInsets.value?.top ?? systemInfo.value?.statusBarHeight ?? 0
-})
+// 计算状态栏高度
+const statusBarHeight = computed<number>((): number => {
+  const insets = safeAreaInsets.value;
+  if (insets != null && insets.top > 0) {
+    return insets.top;
+  }
+  const info = systemInfo.value;
+  if (info != null && info.statusBarHeight > 0) {
+    return info.statusBarHeight;
+  }
+  return 0;
+});
 
-// 返回操作
+// 处理返回事件
 function handleBack() {
-  uni.navigateBack({
-    success() {
-      console.log('返回成功')
-    },
-    fail() {
-      // 导航返回失败（说明是直接进入页面没有历史），回退到首页
-      uni.switchTab({
-        url: '/src/pages/index/index',
-      })
-    },
-  })
+  const pages = getCurrentPages();
+  if (pages.length > 1) {
+    uni.navigateBack({
+      delta: 1
+    });
+  }
+  else {
+    uni.reLaunch({
+      url: '/src/pages/index/index'
+    });
+  }
 }
 </script>
 
@@ -144,8 +157,12 @@ function handleBack() {
 .back-arrow {
   width: 10px;
   height: 10px;
-  border-left: 2px solid #1e293b;
-  border-bottom: 2px solid #1e293b;
+  border-left-width: 2px;
+  border-left-style: solid;
+  border-left-color: #1e293b;
+  border-bottom-width: 2px;
+  border-bottom-style: solid;
+  border-bottom-color: #1e293b;
   transform: rotate(45deg);
 }
 
@@ -164,8 +181,6 @@ function handleBack() {
   font-size: 16px;
   font-weight: 700;
   text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
 }
 
 .navbar-right {

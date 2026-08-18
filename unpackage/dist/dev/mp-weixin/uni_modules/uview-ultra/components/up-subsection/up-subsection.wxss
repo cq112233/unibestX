@@ -1,3 +1,4 @@
+:host{display:flex;flex-direction:column}
 /**
  * 这里是uni-app内置的常用样式变量
  *
@@ -24,7 +25,22 @@
 /* 透明度 */
 /* 文章场景相关 */
 /* 覆盖 uview-ultra 的 SCSS 变量，使其编译为 CSS 变量 */
-.u-empty.data-v-d80a85c3,.u-empty__wrap.data-v-d80a85c3,.u-tabs.data-v-d80a85c3,.u-tabs__wrapper.data-v-d80a85c3,.u-tabs__wrapper__scroll-view-wrapper.data-v-d80a85c3,.u-tabs__wrapper__scroll-view.data-v-d80a85c3,.u-tabs__wrapper__nav.data-v-d80a85c3,.u-tabs__wrapper__nav__line.data-v-d80a85c3,.up-empty.data-v-d80a85c3,.up-empty__wrap.data-v-d80a85c3,.up-tabs.data-v-d80a85c3,.up-tabs__wrapper.data-v-d80a85c3,.up-tabs__wrapper__scroll-view-wrapper.data-v-d80a85c3,.up-tabs__wrapper__scroll-view.data-v-d80a85c3,.up-tabs__wrapper__nav.data-v-d80a85c3,.up-tabs__wrapper__nav__line.data-v-d80a85c3 {
+.u-empty.data-v-d80a85c3,
+.u-empty__wrap.data-v-d80a85c3,
+.u-tabs.data-v-d80a85c3,
+.u-tabs__wrapper.data-v-d80a85c3,
+.u-tabs__wrapper__scroll-view-wrapper.data-v-d80a85c3,
+.u-tabs__wrapper__scroll-view.data-v-d80a85c3,
+.u-tabs__wrapper__nav.data-v-d80a85c3,
+.u-tabs__wrapper__nav__line.data-v-d80a85c3,
+.up-empty.data-v-d80a85c3,
+.up-empty__wrap.data-v-d80a85c3,
+.up-tabs.data-v-d80a85c3,
+.up-tabs__wrapper.data-v-d80a85c3,
+.up-tabs__wrapper__scroll-view-wrapper.data-v-d80a85c3,
+.up-tabs__wrapper__scroll-view.data-v-d80a85c3,
+.up-tabs__wrapper__nav.data-v-d80a85c3,
+.up-tabs__wrapper__nav__line.data-v-d80a85c3 {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -42,87 +58,75 @@
   box-sizing: border-box;
 }
 .up-subsection--button.data-v-d80a85c3 {
-  height: 34px;
+  height: 32px;
   background-color: #eeeeef;
   padding: 3px;
-  border-radius: 4px;
+  border-radius: 3px;
   align-items: stretch;
 }
 .up-subsection--button__bar.data-v-d80a85c3 {
   background-color: #ffffff;
-  border-radius: 4px !important;
+  border-radius: 3px !important;
 }
 .up-subsection--subsection.data-v-d80a85c3 {
-  height: 32px;
+  height: 30px;
 }
 .up-subsection__bar.data-v-d80a85c3 {
   position: absolute;
-  left: 0;
-  transition-property: color, -webkit-transform;
   transition-property: transform, color;
-  transition-property: transform, color, -webkit-transform;
   transition-duration: 0.3s;
   transition-timing-function: ease-in-out;
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-}
-.up-subsection__bar__inner.data-v-d80a85c3 {
-  flex: 1;
-  align-self: stretch;
-  background-color: var(--theme-color, #0957de);
-}
-.up-subsection__bar__inner--button.data-v-d80a85c3 {
-  margin: 3px;
-  background-color: #ffffff;
 }
 .up-subsection__bar--first.data-v-d80a85c3 {
-  border-top-left-radius: 4px;
-  border-bottom-left-radius: 4px;
-  border-top-right-radius: 0px;
-  border-bottom-right-radius: 0px;
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
 }
 .up-subsection__bar--center.data-v-d80a85c3 {
   border-top-left-radius: 0px;
   border-bottom-left-radius: 0px;
-  border-top-right-radius: 0px;
-  border-bottom-right-radius: 0px;
 }
 .up-subsection__bar--last.data-v-d80a85c3 {
-  border-top-left-radius: 0px;
-  border-bottom-left-radius: 0px;
-  border-top-right-radius: 4px;
-  border-bottom-right-radius: 4px;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+.up-subsection__bar__inner.data-v-d80a85c3 {
+  height: 100%;
+  background-color: var(--theme-color, #0957de);
+}
+.up-subsection__bar__inner--button.data-v-d80a85c3 {
+  border-radius: 3px !important;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 .up-subsection__item.data-v-d80a85c3 {
   display: flex;
   flex-direction: row;
   flex: 1;
-  justify-content: center;
+  height: 100%;
   align-items: center;
+  justify-content: center;
   position: relative;
-  border-color: var(--theme-color, #0957de);
 }
 .up-subsection__item--no-border-right.data-v-d80a85c3 {
   border-right-width: 0 !important;
 }
 .up-subsection__item--first.data-v-d80a85c3 {
-  border-top-left-radius: 4px;
-  border-bottom-left-radius: 4px;
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
 }
 .up-subsection__item--last.data-v-d80a85c3 {
-  border-top-right-radius: 4px;
-  border-bottom-right-radius: 4px;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
 }
 .up-subsection__item__text.data-v-d80a85c3 {
   font-size: 12px;
-  line-height: 14px;
+  line-height: 12px;
   transition-property: color;
   transition-duration: 0.3s;
 }
-.up-subsection__item__text--disabled.data-v-d80a85c3 {
-  color: #c8c9cc !important;
-}
 .up-subsection__item__text--active.data-v-d80a85c3 {
   color: var(--theme-color, #0957de);
+}
+.up-subsection__item__text--disabled.data-v-d80a85c3 {
+  color: #c8c9cc;
 }

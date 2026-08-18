@@ -50,110 +50,92 @@
 	</view>
 </template>
 
-<script lang="uts">
-	export default {
-		name: 'up-coupon',
-		props: {
-			// 金额
-			amount: {
-				type: [String, Number],
-				default: ''
-			},
-			// 金额单位
-			unit: {
-				type: String,
-				default: '￥'
-			},
-			// 单位位置
-			unitPosition: {
-				type: String,
-				default: 'left'
-			},
-			// 使用限制
-			limit: {
-				type: String,
-				default: ''
-			},
-			// 标题
-			title: {
-				type: String,
-				default: '优惠券'
-			},
-			// 描述
-			desc: {
-				type: String,
-				default: ''
-			},
-			// 有效期
-			time: {
-				type: String,
-				default: ''
-			},
-			// 操作按钮文字
-			actionText: {
-				type: String,
-				default: '使用'
-			},
-			// 形状：coupon-优惠券, envelope-红包, card-卡片
-			shape: {
-				type: String,
-				default: 'coupon'
-			},
-			// 尺寸：small, medium, large
-			size: {
-				type: String,
-				default: 'medium'
-			},
-			// 是否圆形按钮
-			circle: {
-				type: Boolean,
-				default: false
-			},
-			// 是否禁用
-			disabled: {
-				type: Boolean,
-				default: false
-			},
-			// 背景颜色
-			bgColor: {
-				type: String,
-				default: ''
-			},
-			// 文字颜色
-			color: {
-				type: String,
-				default: ''
-			},
-            // 内置背景类型
-            type: {
-				type: String,
-				default: ''
-			},
-		},
-		computed: {
-			couponStyle() {
-				const style = {} as UTSJSONObject;
-				if (this.bgColor.length > 0) style['background'] = this.bgColor;
-				if (this.color.length > 0) style['color'] = this.color;
-				return style;
-			},
-			dotCount() {
-				// 根据尺寸计算锯齿数量
-				if (this.size == 'small') return 8;
-				if (this.size == 'large') return 12;
-				return 10;
-			}
-		},
-		methods: {
-			hasType(): boolean {
-				return this.type.length > 0;
-			},
-			handleClick() {
-				if (this.disabled) return;
-				this.$emit('click');
-			}
-		}
+<script setup lang="uts">
+import { computed } from 'vue'
+
+defineOptions({
+	name: 'up-coupon'
+})
+
+const props = defineProps({
+	amount: {
+		type: [String, Number],
+		default: ''
+	},
+	unit: {
+		type: String,
+		default: '￥'
+	},
+	unitPosition: {
+		type: String,
+		default: 'left'
+	},
+	limit: {
+		type: String,
+		default: ''
+	},
+	title: {
+		type: String,
+		default: '优惠券'
+	},
+	desc: {
+		type: String,
+		default: ''
+	},
+	time: {
+		type: String,
+		default: ''
+	},
+	actionText: {
+		type: String,
+		default: '使用'
+	},
+	shape: {
+		type: String,
+		default: 'coupon'
+	},
+	size: {
+		type: String,
+		default: 'medium'
+	},
+	circle: {
+		type: Boolean,
+		default: false
+	},
+	disabled: {
+		type: Boolean,
+		default: false
+	},
+	bgColor: {
+		type: String,
+		default: ''
+	},
+	color: {
+		type: String,
+		default: ''
+	},
+	type: {
+		type: String,
+		default: ''
 	}
+})
+
+const emit = defineEmits(['click'])
+
+const couponStyle = computed<UTSJSONObject>(() => {
+	const style = {} as UTSJSONObject
+	if (props.bgColor.length > 0) style['backgroundColor'] = props.bgColor
+	return style
+})
+
+function hasType(): boolean {
+	return props.type.length > 0
+}
+
+function handleClick() {
+	if (props.disabled) return
+	emit('click')
+}
 </script>
 
 <style lang="scss" scoped>
@@ -161,8 +143,7 @@
 		position: relative;
 		overflow: hidden;
 		border-radius: 8rpx;
-		background: #ffebf0;
-		color: $up-main-color;
+		background-color: #ffebf0;
         width: 100%;
 		
 		&--coupon {
@@ -195,151 +176,80 @@
 		}
 		
 		&__content {
-			display: flex;
-            flex-direction: row;
+			@include flex;
 			align-items: center;
 			justify-content: space-between;
+			padding: 20rpx;
 			height: 100%;
-			padding: 0 30rpx;
-			position: relative;
-			z-index: 2;
+			box-sizing: border-box;
 		}
 		
 		&__amount {
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-            padding-left: 10rpx;
-			padding-right: 30rpx;
-            border-right: 1px dashed #ccc;
+			@include flex;
+			flex-direction: row;
+			align-items: baseline;
+			min-width: 140rpx;
 			
 			&-unit {
-				font-size: 24rpx;
-				font-weight: normal;
+				font-size: 28rpx;
+				color: #eb433d;
+				font-weight: bold;
 			}
 			
 			&-value {
-				font-size: 56rpx;
+				font-size: 52rpx;
+				color: #eb433d;
 				font-weight: bold;
-                color: red;
 				line-height: 1;
-				margin: 10rpx 0;
 			}
 			
 			&-limit {
-				font-size: 24rpx;
-				opacity: 0.9;
+				font-size: 20rpx;
+				color: $up-tips-color;
+				margin-left: 8rpx;
 			}
 		}
 		
 		&__info {
 			flex: 1;
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-            padding-left: 30rpx;
+			padding: 0 20rpx;
+			overflow: hidden;
 			
 			&-title {
-				font-size: 32rpx;
+				font-size: 28rpx;
 				font-weight: bold;
-				margin-bottom: 10rpx;
+				color: $up-main-color;
+				margin-bottom: 8rpx;
+				text-overflow: ellipsis;
 			}
 			
 			&-desc {
-				font-size: 24rpx;
-				opacity: 0.9;
-				margin-bottom: 10rpx;
+				font-size: 22rpx;
+				color: $up-tips-color;
+				margin-bottom: 6rpx;
+				text-overflow: ellipsis;
 			}
 			
 			&-time {
 				font-size: 20rpx;
-				opacity: 0.8;
+				color: $up-light-color;
 			}
 		}
 		
 		&__action {
-			display: flex;
-            flex-direction: row;
+			@include flex;
 			align-items: center;
 			justify-content: center;
 		}
 		
-		&__dots {
-			position: absolute;
-			left: 0;
-			top: 0;
-			bottom: 0;
-			width: 100%;
-			display: flex;
-			flex-direction: column;
-			justify-content: space-between;
-			padding: 30rpx 0;
-			z-index: 1;
-		}
-		
-		&__dot {
-			width: 32rpx;
-			height: 32rpx;
-			background-color: #fff;
-			border-radius: 50%;
-			margin: 0 -16rpx;
-			z-index: 3;
-		}
-		
 		&__rope {
 			position: absolute;
-			top: -40rpx;
-			left: 50%;
-			transform: translateX(-50%);
-			width: 80rpx;
-			height: 80rpx;
-			background: linear-gradient(to right, #ffd000, #ffa000);
-			border-radius: 40rpx 40rpx 0 0;
-			z-index: 1;
-		}
-		
-		&--primary {
-			background: linear-gradient(90deg, #43afff, #3b8cff);
-            color: #fff;
-            .up-coupon__amount {
-                border-right: 1px dashed #eee;
-            }
-            .up-coupon__amount-value {
-                color: #fff;
-            }
-		}
-		
-		&--success {
-			background: linear-gradient(90deg, #67dda9, #19be6b);
-            color: #fff !important;
-            .up-coupon__amount {
-                border-right: 1px dashed #eee;
-            }
-            .up-coupon__amount-value {
-                color: #fff;
-            }
-		}
-		
-		&--warning {
-			background: linear-gradient(90deg, #ff9739, #ff6a39);
-            color: #fff;
-            .up-coupon__amount {
-                border-right: 1px dashed #eee;
-            }
-            .up-coupon__amount-value {
-                color: #fff;
-            }
-		}
-		
-		&--error {
-			background: linear-gradient(90deg, #ff7070, #ff4747);
-            color: #fff;
-            .up-coupon__amount {
-                border-right: 1px dashed #eee;
-            }
-            .up-coupon__amount-value {
-                color: #fff;
-            }
+			top: -10rpx;
+			right: 60rpx;
+			width: 6rpx;
+			height: 40rpx;
+			background-color: #ffd700;
+			border-radius: 3rpx;
 		}
 	}
 </style>

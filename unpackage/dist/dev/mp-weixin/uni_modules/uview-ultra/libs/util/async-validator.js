@@ -229,8 +229,17 @@ class Schema {
           return null;
         }
         if (Array.isArray(errs)) {
-          resolve(errs.map((e) => {
-            return typeof e == "string" ? createError(field, e.toString()) : e["message"] != null ? e : createError(field, e.toString() + "");
+          resolve(errs.map((e = null) => {
+            if (typeof e == "string") {
+              return createError(field, `${e}`);
+            }
+            if (e != null && typeof e == "object") {
+              const obj = e;
+              if (obj["message"] != null) {
+                return obj;
+              }
+            }
+            return createError(field, `${e}`);
           }));
           return null;
         }
@@ -316,7 +325,7 @@ class Schema {
     customValidators[type] = validator;
   }
   static warning(type, errors) {
-    common_vendor.index.__f__("warn", "at uni_modules/uview-ultra/libs/util/async-validator.uts:413", type, errors);
+    common_vendor.index.__f__("warn", "at uni_modules/uview-ultra/libs/util/async-validator.uts:419", type, errors);
   }
 }
 exports.Schema = Schema;

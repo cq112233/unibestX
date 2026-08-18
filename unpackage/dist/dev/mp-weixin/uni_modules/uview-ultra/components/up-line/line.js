@@ -1,6 +1,6 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const defProps = new common_vendor.UTSJSONObject({
+const propsLine = new common_vendor.UTSJSONObject({
   // line组件
   line: new common_vendor.UTSJSONObject({
     color: "#d6d7d9",
@@ -11,5 +11,5 @@ const defProps = new common_vendor.UTSJSONObject({
     dashed: false
   })
 });
-exports.defProps = defProps;
+exports.propsLine = propsLine;
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-ultra/components/up-line/line.js.map

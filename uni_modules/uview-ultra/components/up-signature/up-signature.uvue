@@ -65,7 +65,8 @@
 	</view>
 </template>
 
-<script lang="uts">
+<script setup lang="uts">
+import { ref, computed, watch } from 'vue'
 import { t } from '../../libs/i18n/index.uts'
 
 type SignaturePoint = {
@@ -78,7 +79,7 @@ type SignaturePoint = {
 
 function normalizeNumber(value: any | null, defaultValue: number = 0): number {
 	if (typeof value === 'number') {
-		return value
+		return value as number
 	}
 	if (value == null) {
 		return defaultValue
@@ -131,257 +132,243 @@ function getTouchPoint(e: UniTouchEvent): SignaturePoint {
 	return createPoint(x, y, 'move', '', 0)
 }
 
-export default {
-	name: 'up-signature',
-	props: {
-		width: {
-			type: [String, Number],
-			default: 300
-		},
-		height: {
-			type: [String, Number],
-			default: 200
-		},
-		bgColor: {
-			type: String,
-			default: '#ffffff'
-		},
-		color: {
-			type: String,
-			default: '#000000'
-		},
-		thickness: {
-			type: [String, Number],
-			default: 3
-		},
-		showToolbar: {
-			type: Boolean,
-			default: true
-		}
+defineOptions({
+	name: 'up-signature'
+})
+
+const props = defineProps({
+	width: {
+		type: [String, Number],
+		default: 300
 	},
-	emits: ['confirm', 'error', 'change', 'clear'],
-	data() {
-		return {
-			canvasId: 'up-signature-' + Date.now().toString(),
-			canvasWidth: normalizeNumber(this.width, 300),
-			canvasHeight: normalizeNumber(this.height, 200),
-			lineColor: this.color,
-			lineWidth: normalizeNumber(this.thickness, 3),
-			isDrawing: false,
-			pathStack: createPathStack(),
-			currentPath: createPath(),
-			isEmpty: true,
-			presetColors: createColors(),
-			showBrushSettings: false,
-			showColorSettings: false
-		}
+	height: {
+		type: [String, Number],
+		default: 200
 	},
-	watch: {
-		width: {
-			handler(newVal: any | null) {
-				this.canvasWidth = normalizeNumber(newVal, 300)
-			},
-			immediate: true
-		},
-		height: {
-			handler(newVal: any | null) {
-				this.canvasHeight = normalizeNumber(newVal, 200)
-			},
-			immediate: true
-		},
-		color: {
-			handler(newVal: string) {
-				this.lineColor = newVal
-			},
-			immediate: true
-		},
-		thickness: {
-			handler(newVal: any | null) {
-				this.lineWidth = normalizeNumber(newVal, 3)
-			},
-			immediate: true
-		}
+	bgColor: {
+		type: String,
+		default: '#ffffff'
 	},
-	computed: {
-		pathCount(): number {
-			const stack = this.pathStack as Array<Array<SignaturePoint>>
-			return stack.length
-		},
-		colorItems(): Array<string> {
-			return this.presetColors as Array<string>
-		},
-		canvasWrapStyle(): UTSJSONObject {
-			const style = {} as UTSJSONObject
-			style['width'] = this.canvasWidth.toString() + 'px'
-			style['height'] = this.canvasHeight.toString() + 'px'
-			style['background'] = this.bgColor
-			return style
-		},
-		penSizeLabel(): string {
-			return t('up.signature.penSize')
-		},
-		penColorLabel(): string {
-			return t('up.signature.penColor')
-		}
+	color: {
+		type: String,
+		default: '#000000'
 	},
-	methods: {
-		getColorStyle(color: string): UTSJSONObject {
-			const style = {} as UTSJSONObject
-			style['backgroundColor'] = color
-			return style
-		},
-		getCanvasInstance(): ComponentPublicInstance | null {
-			const canvas = this.$refs['signatureCanvas'] as ComponentPublicInstance | null
-			return canvas
-		},
-		getLineColor(): string {
-			const color = this.lineColor
-			return color == null ? '#000000' : color.toString()
-		},
-		getLineWidth(): number {
-			return normalizeNumber(this.lineWidth, 3)
-		},
-		touchStart(e: UniTouchEvent): void {
-			const canvas = this.getCanvasInstance()
-			if (canvas == null) {
-				return
-			}
-			this.isDrawing = true
-			this.isEmpty = false
-			this.currentPath = createPath()
-			const point = getTouchPoint(e)
-			const color = this.getLineColor()
-			const width = this.getLineWidth()
-			const startPoint = createPoint(normalizeNumber(point.x, 0), normalizeNumber(point.y, 0), 'start', color, width)
-			const currentPath = this.currentPath as Array<SignaturePoint>
-			currentPath.push(startPoint)
-			canvas.$callMethod('setLineStyle', color, width)
-			canvas.$callMethod('beginPath')
-			canvas.$callMethod('moveTo', startPoint.x, startPoint.y)
-			this.$emit('change', currentPath)
-		},
-		touchMove(e: UniTouchEvent): void {
-			if (this.isDrawing == false) {
-				return
-			}
-			const canvas = this.getCanvasInstance()
-			if (canvas == null) {
-				return
-			}
-			const point = getTouchPoint(e)
-			const movePoint = createPoint(normalizeNumber(point.x, 0), normalizeNumber(point.y, 0), 'move', this.getLineColor(), this.getLineWidth())
-			const currentPath = this.currentPath as Array<SignaturePoint>
-			currentPath.push(movePoint)
-			canvas.$callMethod('lineTo', movePoint.x, movePoint.y)
-			canvas.$callMethod('stroke')
-			canvas.$callMethod('draw', false)
-			this.$emit('change', currentPath)
-		},
-		touchEnd(): void {
-			if (this.isDrawing == false) {
-				return
-			}
-			const canvas = this.getCanvasInstance()
-			this.isDrawing = false
-			if (canvas != null) {
-				canvas.$callMethod('closePath')
-				canvas.$callMethod('draw', true)
-			}
-			const currentPath = this.currentPath as Array<SignaturePoint>
-			if (currentPath.length > 0) {
-				const stack = this.pathStack as Array<Array<SignaturePoint>>
-				stack.push(currentPath)
-			}
-			this.currentPath = createPath()
-		},
-		selectColor(color: string): void {
-			this.lineColor = color
-		},
-		undo(): void {
-			const stack = this.pathStack as Array<Array<SignaturePoint>>
-			if (stack.length == 0) {
-				return
-			}
-			stack.pop()
-			this.redraw()
-		},
-		redraw(): void {
-			const canvas = this.getCanvasInstance()
-			if (canvas == null) {
-				return
-			}
-			canvas.$callMethod('clearCanvas')
-			const stack = this.pathStack as Array<Array<SignaturePoint>>
-			if (stack.length == 0) {
-				this.isEmpty = true
-				return
-			}
-			this.isEmpty = false
-			for (let i = 0; i < stack.length; i++) {
-				const path = stack[i]
-				if (path.length == 0) {
-					continue
-				}
-				canvas.$callMethod('beginPath')
-				for (let j = 0; j < path.length; j++) {
-					const point = path[j]
-					if (j == 0 && point.type === 'start') {
-						canvas.$callMethod('setLineStyle', point.color, point.width)
-						canvas.$callMethod('moveTo', point.x, point.y)
-					} else if (point.type === 'move') {
-						canvas.$callMethod('lineTo', point.x, point.y)
-					}
-				}
-				canvas.$callMethod('stroke')
-				canvas.$callMethod('draw', true)
-			}
-		},
-		clearCanvas(): void {
-			const canvas = this.getCanvasInstance()
-			if (canvas != null) {
-				canvas.$callMethod('clearCanvas')
-			}
-			this.pathStack = createPathStack()
-			this.currentPath = createPath()
-			this.isEmpty = true
-			this.$emit('clear')
-		},
-		exportSignature(): void {
-			if (this.isEmpty) {
-				this.$emit('error', '签名为空')
-				return
-			}
-			const canvas = this.getCanvasInstance()
-			if (canvas == null) {
-				this.$emit('error', '无法获取画布实例')
-				return
-			}
-			this.redraw()
-			const result = canvas.$callMethod('exportImage', 'png', 1)
-			if (result == null) {
-				this.$emit('error', '导出签名图片失败')
-				return
-			}
-			;(result as Promise<string>).then((imagePath: string) => {
-				this.$emit('confirm', imagePath)
-			}).catch((error: any | null) => {
-				this.$emit('error', error)
-			})
-		},
-		toggleBrushSettings(): void {
-			this.showBrushSettings = !this.showBrushSettings
-			if (this.showBrushSettings) {
-				this.showColorSettings = false
-			}
-		},
-		toggleColorSettings(): void {
-			this.showColorSettings = !this.showColorSettings
-			if (this.showColorSettings) {
-				this.showBrushSettings = false
+	thickness: {
+		type: [String, Number],
+		default: 3
+	},
+	showToolbar: {
+		type: Boolean,
+		default: true
+	}
+})
+
+const emit = defineEmits(['confirm', 'error', 'change', 'clear'])
+
+const signatureCanvas = ref<any | null>(null)
+const canvasId = ref<string>('up-signature-' + Date.now().toString())
+const canvasWidth = ref<number>(normalizeNumber(props.width, 300))
+const canvasHeight = ref<number>(normalizeNumber(props.height, 200))
+const lineColor = ref<string>(props.color)
+const lineWidth = ref<number>(normalizeNumber(props.thickness, 3))
+const isDrawing = ref<boolean>(false)
+const pathStack = ref<Array<Array<SignaturePoint>>>(createPathStack())
+const currentPath = ref<Array<SignaturePoint>>(createPath())
+const isEmpty = ref<boolean>(true)
+const presetColors = ref<Array<string>>(createColors())
+const showBrushSettings = ref<boolean>(false)
+const showColorSettings = ref<boolean>(false)
+
+const pathCount = computed<number>(() => {
+	return pathStack.value.length
+})
+
+const colorItems = computed<Array<string>>(() => {
+	return presetColors.value
+})
+
+const canvasWrapStyle = computed<UTSJSONObject>(() => {
+	const style = {} as UTSJSONObject
+	style['width'] = canvasWidth.value.toString() + 'px'
+	style['height'] = canvasHeight.value.toString() + 'px'
+	style['backgroundColor'] = props.bgColor
+	return style
+})
+
+const penSizeLabel = computed<string>(() => {
+	return t('up.signature.penSize')
+})
+
+const penColorLabel = computed<string>(() => {
+	return t('up.signature.penColor')
+})
+
+function getColorStyle(col: string): UTSJSONObject {
+	const style = {} as UTSJSONObject
+	style['backgroundColor'] = col
+	return style
+}
+
+function getLineColor(): string {
+	return lineColor.value == null ? '#000000' : lineColor.value.toString()
+}
+
+function getLineWidth(): number {
+	return normalizeNumber(lineWidth.value, 3)
+}
+
+function touchStart(e: UniTouchEvent): void {
+	const canvas = signatureCanvas.value
+	if (canvas == null) return
+	isDrawing.value = true
+	isEmpty.value = false
+	currentPath.value = createPath()
+	const point = getTouchPoint(e)
+	const col = getLineColor()
+	const wid = getLineWidth()
+	const startPoint = createPoint(normalizeNumber(point.x, 0), normalizeNumber(point.y, 0), 'start', col, wid)
+	currentPath.value.push(startPoint)
+	canvas.setLineStyle(col, wid)
+	canvas.beginPath()
+	canvas.moveTo(startPoint.x, startPoint.y)
+	emit('change', currentPath.value)
+}
+
+function touchMove(e: UniTouchEvent): void {
+	if (!isDrawing.value) return
+	const canvas = signatureCanvas.value
+	if (canvas == null) return
+	const point = getTouchPoint(e)
+	const movePoint = createPoint(normalizeNumber(point.x, 0), normalizeNumber(point.y, 0), 'move', getLineColor(), getLineWidth())
+	currentPath.value.push(movePoint)
+	canvas.lineTo(movePoint.x, movePoint.y)
+	canvas.stroke()
+	canvas.draw(false)
+	emit('change', currentPath.value)
+}
+
+function touchEnd(): void {
+	if (!isDrawing.value) return
+	const canvas = signatureCanvas.value
+	isDrawing.value = false
+	if (canvas != null) {
+		canvas.closePath()
+		canvas.draw(true)
+	}
+	if (currentPath.value.length > 0) {
+		pathStack.value.push(currentPath.value)
+	}
+	currentPath.value = createPath()
+}
+
+function selectColor(col: string): void {
+	lineColor.value = col
+}
+
+function redraw(): void {
+	const canvas = signatureCanvas.value
+	if (canvas == null) return
+	canvas.clearCanvas()
+	const stack = pathStack.value
+	if (stack.length == 0) {
+		isEmpty.value = true
+		return
+	}
+	isEmpty.value = false
+	for (let i = 0; i < stack.length; i++) {
+		const path = stack[i]
+		if (path.length == 0) continue
+		canvas.beginPath()
+		for (let j = 0; j < path.length; j++) {
+			const point = path[j]
+			if (j == 0 && point.type === 'start') {
+				canvas.setLineStyle(point.color, point.width)
+				canvas.moveTo(point.x, point.y)
+			} else if (point.type === 'move') {
+				canvas.lineTo(point.x, point.y)
 			}
 		}
+		canvas.stroke()
+		canvas.draw(true)
 	}
 }
+
+function undo(): void {
+	if (pathStack.value.length == 0) return
+	pathStack.value.pop()
+	redraw()
+}
+
+function clearCanvas(): void {
+	const canvas = signatureCanvas.value
+	if (canvas != null) {
+		canvas.clearCanvas()
+	}
+	pathStack.value = createPathStack()
+	currentPath.value = createPath()
+	isEmpty.value = true
+	emit('clear')
+}
+
+function exportSignature(): void {
+	if (isEmpty.value) {
+		emit('error', '签名为空')
+		return
+	}
+	const canvas = signatureCanvas.value
+	if (canvas == null) {
+		emit('error', '无法获取画布实例')
+		return
+	}
+	redraw()
+	const result = canvas.exportImage('png', 1)
+	if (result == null) {
+		emit('error', '导出签名图片失败')
+		return
+	}
+	;(result as Promise<string>).then((imagePath: string) => {
+		emit('confirm', imagePath)
+	}).catch((err: any | null) => {
+		emit('error', err)
+	})
+}
+
+function toggleBrushSettings(): void {
+	showBrushSettings.value = !showBrushSettings.value
+	if (showBrushSettings.value) {
+		showColorSettings.value = false
+	}
+}
+
+function toggleColorSettings(): void {
+	showColorSettings.value = !showColorSettings.value
+	if (showColorSettings.value) {
+		showBrushSettings.value = false
+	}
+}
+
+watch(() => props.width, (newVal: any | null) => {
+	canvasWidth.value = normalizeNumber(newVal, 300)
+})
+
+watch(() => props.height, (newVal: any | null) => {
+	canvasHeight.value = normalizeNumber(newVal, 200)
+})
+
+watch(() => props.color, (newVal: string) => {
+	lineColor.value = newVal
+})
+
+watch(() => props.thickness, (newVal: any | null) => {
+	lineWidth.value = normalizeNumber(newVal, 3)
+})
+
+defineExpose({
+	undo,
+	clearCanvas,
+	redraw,
+	exportSignature
+})
 </script>
 
 <style lang="scss" scoped>
@@ -390,7 +377,9 @@ export default {
 		flex-direction: column;
 
 		&__canvas-wrap {
-			border: 1px solid #e0e0e0;
+			border-width: 1px;
+			border-style: solid;
+			border-color: #e0e0e0;
 			border-radius: 4px;
 			overflow: hidden;
 		}
@@ -444,7 +433,9 @@ export default {
 			border-radius: 50%;
 			margin-right: 10px;
 			margin-bottom: 10px;
-			border: 2px solid transparent;
+			border-width: 2px;
+			border-style: solid;
+			border-color: transparent;
 
 			&--active {
 				border-color: #2979ff;

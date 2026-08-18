@@ -1,7 +1,9 @@
 <template>
-  <text style="text-decoration-line: underline" @click="openURL">
-    <slot></slot>
-  </text>
+  <view style="flex-direction: row; align-items: center;" @click="openURL">
+    <slot>
+      <text style="text-decoration-line: underline">{{ href }}</text>
+    </slot>
+  </view>
 </template>
 <script lang="uts" setup>
   /**

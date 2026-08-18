@@ -57,66 +57,66 @@
 </template>
 
 <script setup lang="uts">
-import { computed, ref } from 'vue'
-import Card from './Card.uvue'
-import { foo, getFooList } from '@/src/api/foo'
-import type { IFoo } from '@/src/api/foo'
-import { toastSuccess } from '@/src/utils/toast.uts'
+import { computed, ref } from 'vue';
+import Card from './Card.uvue';
+import { foo, getFooList } from '@/src/api/foo';
+import type { IFoo } from '@/src/api/foo';
+import { toastSuccess } from '@/src/utils/toast.uts';
 
 // ==========================================
 // 响应式状态
 // ==========================================
-const mockList = ref<IFoo[]>([])
-const loading = ref<boolean>(false)
-const requestStatus = ref<string>('idle') // idle | loading | success | error
-const responseData = ref<IFoo | null>(null)
-const errorMsg = ref<string>('')
+const mockList = ref<IFoo[]>([]);
+const loading = ref<boolean>(false);
+const requestStatus = ref<string>('idle'); // idle | loading | success | error
+const responseData = ref<IFoo | null>(null);
+const errorMsg = ref<string>('');
 
 // ==========================================
 // 计算属性
 // ==========================================
 const statusText = computed((): string => {
   switch (requestStatus.value) {
-    case 'loading': return '请求中'
-    case 'success': return '请求成功'
-    case 'error': return '请求失败'
-    default: return '待请求'
+    case 'loading': return '请求中';
+    case 'success': return '请求成功';
+    case 'error': return '请求失败';
+    default: return '待请求';
   }
-})
+});
 
 const statusColor = computed((): string => {
   switch (requestStatus.value) {
-    case 'loading': return '#d97706'
-    case 'success': return '#059669'
-    case 'error': return '#dc2626'
-    default: return '#94a3b8'
+    case 'loading': return '#d97706';
+    case 'success': return '#059669';
+    case 'error': return '#dc2626';
+    default: return '#94a3b8';
   }
-})
+});
 
 const statusBgColor = computed((): string => {
   switch (requestStatus.value) {
-    case 'loading': return '#fef9c3'
-    case 'success': return '#d1fae5'
-    case 'error': return '#fee2e2'
-    default: return '#f1f5f9'
+    case 'loading': return '#fef9c3';
+    case 'success': return '#d1fae5';
+    case 'error': return '#fee2e2';
+    default: return '#f1f5f9';
   }
-})
+});
 
 // 用显式 boolean 计算属性替换模板里的 != null / != '' 条件判断
 const hasResponseData = computed((): boolean => {
-  return responseData.value != null
-})
+  return responseData.value != null;
+});
 
 const hasErrorMsg = computed((): boolean => {
-  return errorMsg.value.length > 0
-})
+  return errorMsg.value.length > 0;
+});
 
 const responseText = computed((): string => {
-  const data = responseData.value
+  const data = responseData.value;
   if (data == null)
-    return ''
-  return `id: ${data.id}, name: ${data.name}`
-})
+    return '';
+  return `id: ${data.id}, name: ${data.name}`;
+});
 
 // ==========================================
 // 方法
@@ -127,12 +127,12 @@ const responseText = computed((): string => {
  */
 async function loadMockData() {
   try {
-    const list = await getFooList()
-    mockList.value = list
+    const list = await getFooList();
+    mockList.value = list;
     // toastSuccess(`加载了 ${list.length} 条数据`)
   }
   catch (err) {
-    console.error('loadMockData error:', err)
+    console.error('loadMockData error:', err);
   }
 }
 
@@ -141,33 +141,33 @@ async function loadMockData() {
  * 使用 async/await 与 try/catch，这在 UTS 中类型推导更稳定
  */
 async function fetchRealApi() {
-  loading.value = true
-  requestStatus.value = 'loading'
-  responseData.value = null
-  errorMsg.value = ''
+  loading.value = true;
+  requestStatus.value = 'loading';
+  responseData.value = null;
+  errorMsg.value = '';
 
   try {
-    const res = await foo()
-    responseData.value = res
-    requestStatus.value = 'success'
+    const res = await foo();
+    responseData.value = res;
+    requestStatus.value = 'success';
   }
   catch (err) {
-    console.log(err, 'err')
-    requestStatus.value = 'error'
-    let errStr = ''
+    console.log(err, 'err');
+    requestStatus.value = 'error';
+    let errStr = '';
     if (err !== null) {
-      errStr = JSON.stringify(err)
+      errStr = JSON.stringify(err);
     }
-    errorMsg.value = errStr.length > 0 ? errStr : '请求失败'
+    errorMsg.value = errStr.length > 0 ? errStr : '请求失败';
   }
 
-  loading.value = false
+  loading.value = false;
 }
 
 // 页面挂载时自动加载 Mock 数据
 onMounted(() => {
-  loadMockData()
-})
+  loadMockData();
+});
 </script>
 
 <style>

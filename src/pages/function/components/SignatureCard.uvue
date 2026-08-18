@@ -1,0 +1,152 @@
+<template>
+  <Card title="签名板 lime-signature">
+    <!-- 签名画布区域 -->
+    <view class="rounded-12px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0] overflow-hidden" style="width: 100%; height: 300px;">
+      <l-signature
+        :ref="onSigRef"
+        :pen-color="penColor"
+        :pen-size="penSize"
+        :open-smooth="openSmooth"
+        disable-scroll
+        background-color="#ffffff"
+      />
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
+      <text class="text-12px text-[#94a3b8] mb-12px">画板操作</text>
+      <view class="flex-row mb-12px justify-between">
+        <view class="flex-1 h-36px rounded-8px bg-[#10b981] flex flex-row items-center justify-center mr-6px" @click="onAction('save')">
+          <text class="text-[#ffffff] text-13px font-bold">保存图片</text>
+        </view>
+        <view class="flex-1 h-36px rounded-8px bg-[#f59e0b] flex flex-row items-center justify-center mr-6px" @click="onAction('undo')">
+          <text class="text-[#ffffff] text-13px font-bold">撤销</text>
+        </view>
+        <view class="flex-1 h-36px rounded-8px bg-[#3b82f6] flex flex-row items-center justify-center mr-6px" @click="onAction('redo')">
+          <text class="text-[#ffffff] text-13px font-bold">重做</text>
+        </view>
+        <view class="flex-1 h-36px rounded-8px bg-[#ef4444] flex flex-row items-center justify-center" @click="onAction('clear')">
+          <text class="text-[#ffffff] text-13px font-bold">清空</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 画笔设置 -->
+    <view class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
+      <text class="text-12px text-[#94a3b8] mb-12px">画笔设置</text>
+
+      <view class="flex-row justify-between items-center mb-12px">
+        <text class="text-13px text-[#475569]">画笔颜色</text>
+        <view class="flex-row">
+          <view
+            v-for="clr in colorList"
+            :key="clr"
+            class="w-28px h-28px rounded-14px ml-6px border-width-2px border-style-solid items-center justify-center"
+            :style="{
+              backgroundColor: clr,
+              borderColor: penColor === clr ? '#1e293b' : 'transparent'
+            }"
+            @click="penColor = clr"
+          >
+          </view>
+        </view>
+      </view>
+
+      <view class="flex-row justify-between items-center mb-12px">
+        <text class="text-13px text-[#475569]">画笔粗细</text>
+        <text class="text-12px text-[#94a3b8]">{{ penSize }}px</text>
+      </view>
+      <view class="flex-row mb-12px">
+        <view
+          v-for="(sz, _j) in penSizeOptions"
+          :key="sz"
+          class="flex-1 h-32px rounded-6px flex flex-row items-center justify-center"
+          :class="_j < penSizeOptions.length - 1 ? 'mr-6px' : ''"
+          :style="{ backgroundColor: penSize === sz ? '#3b82f6' : '#e2e8f0' }"
+          @click="penSize = sz"
+        >
+          <text class="text-12px font-bold" :style="{ color: penSize === sz ? '#ffffff' : '#475569' }">{{ sz }}px</text>
+        </view>
+      </view>
+
+      <!-- #ifndef APP -->
+      <view class="flex-row justify-between items-center">
+        <text class="text-13px text-[#475569]">模拟压感</text>
+        <view
+          class="h-32px w-60px rounded-16px flex flex-row items-center justify-center"
+          :style="{ backgroundColor: openSmooth ? '#10b981' : '#cbd5e1' }"
+          @click="openSmooth = !openSmooth"
+        >
+          <text class="text-12px text-[#ffffff] font-bold">{{ openSmooth ? '开' : '关' }}</text>
+        </view>
+      </view>
+      <!-- #endif -->
+    </view>
+
+    <!-- 保存预览 -->
+    <view v-if="signUrl !== ''" class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0] items-center">
+      <text class="text-12px text-[#94a3b8] mb-8px">签名预览</text>
+      <image
+        :src="signUrl"
+        class="w-full h-120px rounded-8px border-width-1px border-style-solid border-color-[#e2e8f0]"
+        mode="aspectFit"
+      />
+    </view>
+  </Card>
+</template>
+
+<script setup lang="uts">
+import Card from '../../basic/components/Card.uvue';
+import { ref } from 'vue';
+import type { LimeSignatureToFileSuccess, LimeSignatureToTempFilePathOptions } from '@/uni_modules/lime-signature';
+
+// 签名组件实例（通过回调 ref 获取，避免 ref<any>(null) 类型问题）
+let sigInstance: LSignatureComponentPublicInstance | null = null;
+function onSigRef(el: any) {
+  sigInstance = el as LSignatureComponentPublicInstance;
+}
+
+const penColor = ref('red');
+const penSize = ref(4);
+const openSmooth = ref(true);
+const signUrl = ref('');
+
+const colorList = ['#ef4444', '#000000', '#3b82f6', '#10b981', '#f59e0b'];
+const penSizeOptions = [1, 3, 5, 8, 12];
+
+function onAction(type: string) {
+  const el = sigInstance;
+  if (el == null) {
+    uni.showToast({ title: '签名组件未就绪', icon: 'none' });
+    return;
+  }
+  if (type === 'clear') {
+    el.clear();
+    signUrl.value = '';
+  }
+  else if (type === 'undo') {
+    el.undo();
+  }
+  else if (type === 'redo') {
+    el.redo();
+  }
+  else if (type === 'save') {
+    el.canvasToTempFilePath({
+      success: (res: LimeSignatureToFileSuccess) => {
+        if (res.isEmpty) {
+          uni.showToast({ title: '请先签名', icon: 'none' });
+          return;
+        }
+        signUrl.value = res.tempFilePath;
+        uni.showToast({ title: '签名保存成功', icon: 'success' });
+      },
+      fail: (_err: any) => {
+        uni.showToast({ title: '保存失败', icon: 'error' });
+      }
+    } as LimeSignatureToTempFilePathOptions);
+  }
+}
+</script>
+
+<style>
+</style>

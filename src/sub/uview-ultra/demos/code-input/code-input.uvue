@@ -19,13 +19,13 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-const codeInputValue1 = ref('')
-const codeInputValue2 = ref('')
-const codeInputValue3 = ref('')
+const codeInputValue1 = ref('');
+const codeInputValue2 = ref('');
+const codeInputValue3 = ref('');
 function onCodeInputFinish(val: string): void {
-  uni.showToast({ title: `输入的验证码为: ${val}`, icon: 'none' })
+  uni.showToast({ title: `输入的验证码为: ${val}`, icon: 'none' });
 }
 </script>
 

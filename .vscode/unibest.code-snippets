@@ -1,0 +1,316 @@
+{
+  "Print uni-app X Page SFC": {
+    "scope": "vue,uvue",
+    "prefix": "v3",
+    "body": [
+      "<script lang=\"uts\" setup>",
+      "definePage({",
+      "  style: {",
+      "    navigationBarTitleText: '$1',",
+      "  },",
+      "})",
+      "</script>",
+      "",
+      "<template>",
+      "  <view class=\"\">",
+      "    <text>$2</text>",
+      "  </view>",
+      "</template>",
+      "",
+      "<style lang=\"scss\" scoped>",
+      "//$3",
+      "</style>",
+      ""
+    ],
+    "description": "uni-app X 页面 SFC（含 definePage / template / 样式隔离 2.0 scoped）"
+  },
+  "Print uni-app X Component SFC": {
+    "scope": "vue,uvue",
+    "prefix": "v3c",
+    "body": [
+      "<script lang=\"uts\" setup>",
+      "defineOptions({",
+      "  name: '$1',",
+      "  styleIsolation: 'isolated', // 表示隔离，不受外部影响",
+      "})",
+      "</script>",
+      "",
+      "<template>",
+      "  <view class=\"\">",
+      "    <text>$2</text>",
+      "  </view>",
+      "</template>",
+      "",
+      "<style lang=\"scss\" scoped>",
+      "//$3",
+      "</style>",
+      ""
+    ],
+    "description": "uni-app X 组件 SFC（含 defineOptions / styleIsolation: isolated / scoped 样式）"
+  },
+  "Print uni-app X Script (Page)": {
+    "scope": "vue,uvue",
+    "prefix": "sc",
+    "body": [
+      "<script lang=\"uts\" setup>",
+      "definePage({",
+      "  style: {",
+      "    navigationBarTitleText: '$1',",
+      "  },",
+      "})",
+      "</script>",
+      ""
+    ],
+    "description": "uni-app X 页面 script 块（含 definePage）"
+  },
+  "Print uni-app X Script (Component)": {
+    "scope": "vue,uvue",
+    "prefix": "scc",
+    "body": [
+      "<script lang=\"uts\" setup>",
+      "defineOptions({",
+      "  name: '$1',",
+      "  styleIsolation: 'isolated', // 表示隔离，不受外部影响",
+      "})",
+      "</script>",
+      ""
+    ],
+    "description": "uni-app X 组件 script 块（含 defineOptions / styleIsolation: isolated）"
+  },
+  "Print uni-app X Template": {
+    "scope": "vue,uvue",
+    "prefix": "te",
+    "body": [
+      "<template>",
+      "  <view class=\"\">",
+      "    <text>$1</text>",
+      "  </view>",
+      "</template>",
+      ""
+    ],
+    "description": "uni-app X 模板块（规范包含 text 标签）"
+  },
+  "Print uni-app X Style": {
+    "scope": "vue,uvue",
+    "prefix": "st",
+    "body": [
+      "<style lang=\"scss\" scoped>",
+      "//$1",
+      "</style>",
+      ""
+    ],
+    "description": "uni-app X 样式块（样式隔离 2.0 scoped）"
+  },
+  "Vue Macro definePage": {
+    "scope": "vue,uvue,typescript,javascript",
+    "prefix": ["definePage", "defpage"],
+    "body": [
+      "definePage({",
+      "  style: {",
+      "    navigationBarTitleText: '$1',",
+      "  },",
+      "})"
+    ],
+    "description": "uni-app X 页面配置宏：definePage"
+  },
+  "Vue Macro defineProps": {
+    "scope": "vue,uvue,typescript,javascript",
+    "prefix": ["defineProps", "defprops"],
+    "body": [
+      "defineProps({",
+      "  $1: {",
+      "    type: ${2:String},",
+      "    default: ${3:'$4'},",
+      "  },",
+      "})"
+    ],
+    "description": "Vue 3 / UTS 宏：defineProps"
+  },
+  "Vue Macro defineEmits": {
+    "scope": "vue,uvue,typescript,javascript",
+    "prefix": ["defineEmits", "defemits"],
+    "body": [
+      "const emit = defineEmits(['$1'])"
+    ],
+    "description": "Vue 3 / UTS 宏：defineEmits"
+  },
+  "Vue Macro defineExpose": {
+    "scope": "vue,uvue,typescript,javascript",
+    "prefix": ["defineExpose", "defexpose"],
+    "body": [
+      "defineExpose({",
+      "  $1",
+      "})"
+    ],
+    "description": "Vue 3 / UTS 宏：defineExpose"
+  },
+  "Vue Macro defineOptions": {
+    "scope": "vue,uvue,typescript,javascript",
+    "prefix": ["defineOptions", "defoptions"],
+    "body": [
+      "defineOptions({",
+      "  name: '$1',",
+      "})"
+    ],
+    "description": "Vue 3 / UTS 宏：defineOptions"
+  },
+  "Vue Macro withDefaults": {
+    "scope": "vue,uvue,typescript,javascript",
+    "prefix": ["withDefaults", "withdef"],
+    "body": [
+      "const props = withDefaults(defineProps<$1>(), {",
+      "  $2",
+      "})"
+    ],
+    "description": "Vue 3 / UTS 宏：withDefaults"
+  },
+  "Vue Macro defineSlots": {
+    "scope": "vue,uvue,typescript,javascript",
+    "prefix": ["defineSlots", "defslots"],
+    "body": [
+      "const slots = defineSlots<{\n  default?(props: { $1 }): any\n}>()"
+    ],
+    "description": "Vue 3 / UTS 宏：defineSlots"
+  },
+  "Vue Macro defineModel": {
+    "scope": "vue,uvue,typescript,javascript",
+    "prefix": ["defineModel", "defmodel"],
+    "body": [
+      "const modelValue = defineModel<${1:string}>('$2')"
+    ],
+    "description": "Vue 3 / UTS 宏：defineModel"
+  },
+  "Vue onMounted": {
+    "scope": "vue,uvue,typescript,javascript",
+    "prefix": ["onMounted", "onm"],
+    "body": [
+      "onMounted(() => {",
+      "  $1",
+      "})"
+    ],
+    "description": "Vue 3 生命周期：onMounted"
+  },
+  "Vue onUnmounted": {
+    "scope": "vue,uvue,typescript,javascript",
+    "prefix": ["onUnmounted", "onunm"],
+    "body": [
+      "onUnmounted(() => {",
+      "  $1",
+      "})"
+    ],
+    "description": "Vue 3 生命周期：onUnmounted"
+  },
+  "Style navigationBarTitleText": {
+    "scope": "vue,uvue,typescript,javascript,json,jsonc",
+    "prefix": ["navigationBarTitleText", "navTitle", "titleText"],
+    "body": [
+      "navigationBarTitleText: '$1',"
+    ],
+    "description": "导航栏标题文字内容"
+  },
+  "Style navigationBarBackgroundColor": {
+    "scope": "vue,uvue,typescript,javascript,json,jsonc",
+    "prefix": ["navigationBarBackgroundColor", "navBg"],
+    "body": [
+      "navigationBarBackgroundColor: '${1:#ffffff}',"
+    ],
+    "description": "导航栏背景颜色"
+  },
+  "Style navigationBarTextStyle": {
+    "scope": "vue,uvue,typescript,javascript,json,jsonc",
+    "prefix": ["navigationBarTextStyle", "navText"],
+    "body": [
+      "navigationBarTextStyle: '${1|black,white|}',"
+    ],
+    "description": "导航栏标题文字颜色"
+  },
+  "Style navigationStyle": {
+    "scope": "vue,uvue,typescript,javascript,json,jsonc",
+    "prefix": ["navigationStyle", "navStyle"],
+    "body": [
+      "navigationStyle: '${1|default,custom|}',"
+    ],
+    "description": "导航栏样式（default 或 custom 自定义导航栏）"
+  },
+  "Style backgroundColor": {
+    "scope": "vue,uvue,typescript,javascript,json,jsonc",
+    "prefix": ["backgroundColor", "bg", "bgColor"],
+    "body": [
+      "backgroundColor: '${1:#f8f8f8}',"
+    ],
+    "description": "窗口的背景颜色"
+  },
+  "Style backgroundTextStyle": {
+    "scope": "vue,uvue,typescript,javascript,json,jsonc",
+    "prefix": ["backgroundTextStyle", "bgText"],
+    "body": [
+      "backgroundTextStyle: '${1|dark,light|}',"
+    ],
+    "description": "下拉 loading 图标的样式（dark 或 light）"
+  },
+  "Style enablePullDownRefresh": {
+    "scope": "vue,uvue,typescript,javascript,json,jsonc",
+    "prefix": ["enablePullDownRefresh", "pullDown", "enablePull"],
+    "body": [
+      "enablePullDownRefresh: ${1|true,false|},"
+    ],
+    "description": "是否开启下拉刷新"
+  },
+  "Style onReachBottomDistance": {
+    "scope": "vue,uvue,typescript,javascript,json,jsonc",
+    "prefix": ["onReachBottomDistance", "reachBottom"],
+    "body": [
+      "onReachBottomDistance: ${1:50},"
+    ],
+    "description": "页面上拉触底事件触发距离（px）"
+  },
+  "Style disableScroll": {
+    "scope": "vue,uvue,typescript,javascript,json,jsonc",
+    "prefix": ["disableScroll"],
+    "body": [
+      "disableScroll: ${1|true,false|},"
+    ],
+    "description": "设置为 true 则禁用页面滚动"
+  },
+  "Style disableSwipeBack": {
+    "scope": "vue,uvue,typescript,javascript,json,jsonc",
+    "prefix": ["disableSwipeBack"],
+    "body": [
+      "disableSwipeBack: ${1|true,false|},"
+    ],
+    "description": "是否禁用 iOS 侧滑返回手势"
+  },
+  "Style animationType": {
+    "scope": "vue,uvue,typescript,javascript,json,jsonc",
+    "prefix": ["animationType", "anim"],
+    "body": [
+      "animationType: '${1|pop-in,fade-in,slide-in-right,slide-in-left,slide-in-top,slide-in-bottom,none|}',"
+    ],
+    "description": "窗口显示的动画效果"
+  },
+  "Style animationDuration": {
+    "scope": "vue,uvue,typescript,javascript,json,jsonc",
+    "prefix": ["animationDuration"],
+    "body": [
+      "animationDuration: ${1:300},"
+    ],
+    "description": "窗口显示动画持续时间（ms）"
+  },
+  "DefinePage layout": {
+    "scope": "vue,uvue,typescript,javascript,json,jsonc",
+    "prefix": ["layout"],
+    "body": [
+      "layout: '${1|default,empty|}',"
+    ],
+    "description": "使用的布局模板模版（default 或 empty）"
+  },
+  "DefinePage needLogin": {
+    "scope": "vue,uvue,typescript,javascript,json,jsonc",
+    "prefix": ["needLogin"],
+    "body": [
+      "needLogin: ${1|true,false|},"
+    ],
+    "description": "是否需要登录拦截校验"
+  }
+}
+

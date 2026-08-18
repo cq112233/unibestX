@@ -15,7 +15,6 @@
 				flex: 1
 			}"
 			direction="vertical"
-			:scroll-y="true"
 			@scroll="scrollHandler"
 			ref="up-index-list__scroll-view"
 			class="up-index-list__scroll-view"
@@ -31,7 +30,7 @@
 		<view
 			class="up-index-list__letter"
 			ref="up-index-list__letter"
-			:style="{top: $up.addUnit(letterInfo['top'] ?? '') , transform: 'translateY(-50%)'}"
+			:style="letterStyle"
 			@touchstart="touchStart"
 			@touchmove="touchMove"
 			@touchend="touchEnd"
@@ -39,35 +38,26 @@
 		>
 			<view
 				class="up-index-list__letter__item"
-				:class="{'up-index-list__letter__item--active': activeIndex === index && activeColor === '#5677fc'}"
+				:class="{'up-index-list__letter__item--active': activeIndex == index && activeColor == '#5677fc'}"
 				v-for="(item, index) in uIndexList"
 				:key="index"
 				:style="getItemStyle(index)"
 			>
 				<text
 					class="up-index-list__letter__item__index"
-					:style="{color: activeIndex === index ? '#fff' : inactiveColor}"
+					:style="getItemTextStyle(index)"
 				>{{ keyVal(item) }}</text>
 			</view>
 		</view>
 		<up-transition
 			mode="fade"
 			:show="touching"
-			:customStyle="{
-				position: 'absolute',
-				right: '30px',
-				top: $up.addUnit(indicatorTop, 'px'),
-				width: $up.addUnit(indicatorHeight + 10),
-				zIndex: 3
-			}"
+			:customStyle="indicatorTransitionStyle"
 		>
 			<view
 				class="up-index-list__indicator"
 				:class="['up-index-list__indicator--show']"
-				:style="{
-					height: $up.addUnit(indicatorHeight),
-					width: $up.addUnit(indicatorHeight)
-				}"
+				:style="indicatorBoxStyle"
 			>
 				<text class="up-index-list__indicator__text">
 					{{ activeIndex >= 0 ? keyVal(uIndexList[activeIndex]) : '' }}
@@ -229,6 +219,14 @@
 		})
 	}
 	
+	const letterStyle = computed((): UTSJSONObject => {
+		const topVal = letterInfo.value['top'] != null ? letterInfo.value['top']!.toString() : ''
+		return {
+			top: topVal != '' ? addUnit(topVal) : '',
+			transform: 'translateY(-50%)'
+		} as UTSJSONObject
+	})
+
 	// 字母放大指示器的top值，为了让其指向当前激活的字母
 	const indicatorTop = computed(() => {
 		let top = letterInfo.value['top'] as number
@@ -236,6 +234,29 @@
 		let itemHeight = letterInfo.value['itemHeight'] as number
 		return Math.floor(top - (height / 2) + itemHeight * activeIndex.value + itemHeight - 70 / 2)
 	})
+
+	const indicatorTransitionStyle = computed((): UTSJSONObject => {
+		return {
+			position: 'absolute',
+			right: '30px',
+			top: addUnit(indicatorTop.value, 'px'),
+			width: addUnit(indicatorHeight.value + 10),
+			zIndex: 3
+		} as UTSJSONObject
+	})
+
+	const indicatorBoxStyle = computed((): UTSJSONObject => {
+		return {
+			height: addUnit(indicatorHeight.value),
+			width: addUnit(indicatorHeight.value)
+		} as UTSJSONObject
+	})
+
+	function getItemTextStyle(index: number): UTSJSONObject {
+		return {
+			color: activeIndex.value == index ? '#fff' : props.inactiveColor
+		} as UTSJSONObject
+	}
 	
 	// 监听字母索引的变化，重新设置尺寸
 	watch((): Array<any> => uIndexList.value, () => {

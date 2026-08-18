@@ -1,6 +1,6 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const defProps = new common_vendor.UTSJSONObject({
+new common_vendor.UTSJSONObject({
   // swiperIndicator 组件
   swiperIndicator: new common_vendor.UTSJSONObject({
     length: 0,
@@ -10,5 +10,4 @@ const defProps = new common_vendor.UTSJSONObject({
     indicatorMode: "line"
   })
 });
-exports.defProps = defProps;
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/uview-ultra/components/up-swiper-indicator/swipterIndicator.js.map

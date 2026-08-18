@@ -1,3 +1,5 @@
+:host{display:flex;flex-direction:column}
+
 .tabbar-placeholder {
   /* 高度通过 :style 动态绑定 */
 }
@@ -8,9 +10,8 @@
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 9999;
+  z-index: 1;
   background-color: transparent;
-  display: flex;
   flex-direction: column;
 }
 
@@ -29,14 +30,12 @@
 
 /* 【固定高度层】tab 图标按鈕区，与底板同高；鼓包由 TabbarItem 内绝对定位向上突出 */
 .tabbar-inner {
-  display: flex;
   flex-direction: row;
   height: 80px;
   align-items: flex-end;
   z-index: 2;
 }
 .tabbar-item {
-  display: flex;
   flex: 1;
   align-items: center;
   justify-content: center;

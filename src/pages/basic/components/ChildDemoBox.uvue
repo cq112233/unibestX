@@ -1,0 +1,111 @@
+<template>
+  <view class="bg-[#f1f5f9] rounded-12px p-14px border-width-1px border-style-solid border-color-[#cbd5e1]">
+    <!-- 1. 具名插槽：头部 -->
+    <view class="mb-10px border-b-width-1px border-b-style-solid border-b-color-[#cbd5e1] pb-8px">
+      <slot name="header">
+        <!-- 具名插槽默认内容 -->
+        <text class="text-14px font-bold text-[#334155]">📦 {{ title }}（默认 Header）</text>
+      </slot>
+    </view>
+
+    <!-- 2. 父传子 Props 展示区域 -->
+    <view class="mb-12px bg-white rounded-8px p-10px">
+      <text class="text-12px font-bold text-[#475569] mb-4px">【父传子 Props 动态接收】</text>
+      <view class="flex-row items-center">
+        <text class="text-12px text-[#64748b]">父组件传递的 Count: </text>
+        <text class="text-14px font-bold text-[#2563eb] ml-6px">{{ count }}</text>
+      </view>
+    </view>
+
+    <!-- 3. 具名传参插槽 / 作用域插槽展示 -->
+    <view class="mb-12px bg-white rounded-8px p-10px">
+      <text class="text-12px font-bold text-[#475569] mb-6px">【具名作用域插槽 (Slot 向父组件传参)】</text>
+      <view v-for="(item, index) in tags" :key="index" class="mb-6px">
+        <!-- 具名传参插槽 itemSlot：向父组件暴露 item 和 index 参数 -->
+        <slot name="itemSlot" :item="item" :index="index">
+          <!-- 默认渲染逻辑 -->
+          <view class="bg-[#f8fafc] rounded-4px p-6px">
+            <text class="text-12px text-[#64748b]">Tag {{ index + 1 }}: {{ item }}</text>
+          </view>
+        </slot>
+      </view>
+    </view>
+
+    <!-- 4. 子传父 Emits 触发按钮区域 -->
+    <view class="mb-10px bg-white rounded-8px p-10px">
+      <text class="text-12px font-bold text-[#475569] mb-8px">【子传父 Emits 事件触发】</text>
+      <view class="flex-row justify-between items-center mb-8px">
+        <view class="flex-1 bg-[#2563eb] rounded-6px h-32px flex-row items-center justify-center mr-6px" @click="handleAdd">
+          <text class="text-white text-12px">触发 Count + 1</text>
+        </view>
+        <view class="flex-1 bg-[#dc2626] rounded-6px h-32px flex-row items-center justify-center ml-6px" @click="handleReset">
+          <text class="text-white text-12px">触发 重置事件</text>
+        </view>
+      </view>
+
+      <view class="bg-[#f8fafc] rounded-6px p-8px border-width-1px border-style-solid border-color-[#e2e8f0] flex-row items-center justify-between">
+        <input v-model="inputMsg" placeholder="输入要送回父组件的消息" class="text-12px flex-1 h-30px px-8px bg-white rounded-4px border-width-1px border-style-solid border-color-[#cbd5e1]" />
+        <view class="bg-[#059669] rounded-6px h-30px px-10px flex-row items-center justify-center ml-8px" @click="handleSendMsg">
+          <text class="text-white text-12px">发送给父组件</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 5. 具名插槽：底部 -->
+    <view class="pt-6px border-t-width-1px border-t-style-solid border-t-color-[#cbd5e1]">
+      <slot name="footer">
+        <text class="text-11px text-[#94a3b8]">（默认 Footer）</text>
+      </slot>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue';
+import type { PropType } from 'vue';
+
+defineProps({
+  title: {
+    type: String,
+    default: '通信子组件'
+  },
+  count: {
+    type: Number,
+    default: 0
+  },
+  tags: {
+    type: Array as PropType<Array<string>>,
+    default: (): Array<string> => ['Vue3', 'uni-app X', 'UTS'] as Array<string>
+  }
+});
+
+const emit = defineEmits(['add', 'reset', 'send-msg']);
+
+const inputMsg = ref('Hello Parent from Child!');
+
+function handleAdd() {
+  emit('add', 1);
+}
+
+function handleReset() {
+  emit('reset');
+}
+
+function handleSendMsg() {
+  if (inputMsg.value.trim() == '') {
+    uni.showToast({
+      title: '请输入消息内容',
+      icon: 'none'
+    });
+    return;
+  }
+  emit('send-msg', inputMsg.value);
+  uni.showToast({
+    title: '消息已发送',
+    icon: 'success'
+  });
+}
+</script>
+
+<style scoped>
+</style>

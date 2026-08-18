@@ -1,5 +1,5 @@
 <template>
-    <view class="up-input" :class="inputClass" :style="[wrapperStyle, $up.addStyle(customStyle)]">
+    <view class="up-input" :class="inputClass" :style="computedWrapperStyle">
         <view class="up-input__content">
             <view
                 class="up-input__content__prefix-icon"
@@ -20,7 +20,7 @@
             	<input
                     ref="inputNativeRef"
             	    class="up-input__content__field-wrapper__field"
-            	    :style="[inputStyle]"
+            	    :style="inputStyle"
             	    :type="type"
             	    :focus="focus"
             	    :cursor="cursor"
@@ -79,7 +79,7 @@
 import type { ComponentPublicInstance, PropType } from 'vue'
 import { ref, computed, watch, getCurrentInstance } from 'vue'
 import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'
-import { addStyle, addUnit, deepMerge, formValidate, sleep, os } from '../../libs/function/index'
+import { addStyle, addUnit, deepMerge, formValidate, sleep, os } from '../../libs/function/index.uts'
 import defProps from './input.uts'
 
 const instance = getCurrentInstance()!.proxy!
@@ -91,6 +91,14 @@ defineOptions({
 
 // props
 const props = defineProps({
+    customStyle: {
+        type: [Object, String],
+        default: () => ({})
+    },
+    customClass: {
+        type: String,
+        default: ''
+    },
     // 绑定的值
     modelValue: {
         type: [String, Number],
@@ -372,6 +380,12 @@ const wrapperStyle = computed(() => {
         style['paddingRight'] = "9px"
     }
     return deepMerge(style, {})
+})
+
+const computedWrapperStyle = computed((): UTSJSONObject => {
+    const custom = addStyle(props.customStyle) as UTSJSONObject
+    const wrapper = wrapperStyle.value
+    return deepMerge(wrapper, custom) as UTSJSONObject
 })
 
 // 输入框的样式

@@ -1,122 +1,132 @@
-<script setup lang="uts">
-import WeappTailwindcss from '../../components/WeappTailwindcss.uvue'
-import BindClass from '../../components/BindClass.uvue'
-import TButton from '../../components/t-button/t-button.uvue'
-
-const buttonColors: Array<string> = [
-  'bg-[#000]',
-  'bg-[#111]',
-  'bg-[#222]',
-  'bg-[#333]',
-  'bg-[#444]',
-  'bg-[#555]',
-  'bg-[#666]',
-  'bg-[#777]',
-  'bg-[#888]',
-  'bg-[#999]',
-  'bg-[#aaa]',
-  'bg-[#bbb]',
-  'bg-[#ccc]',
-  'bg-[#ddd]',
-  'bg-[#eee]',
-  'bg-[#fff]',
-]
-
-const globalNum = ref(0)
-
-const buttonClass = computed((): string => {
-  const index: number = globalNum.value % buttonColors.length
-  return buttonColors[index]
-})
-
-const templateCorpusDynamicClass = computed((): string => {
-  return 'template-corpus-dynamic bg-[#68c828] text-slate-700 text-[26px] w-[323px] h-[45px] leading-[45px] px-3'
-})
-
-function setGlobalNum(num: number): void {
-  globalNum.value = num
-}
-
-onLoad((): void => {
-  console.log('欢迎使用 weapp-tailwindcss 模板')
-})
-</script>
-
 <template>
-  <view class="content">
-    <up-button type="primary">
-      按钮11133
-    </up-button>
-    <WeappTailwindcss />
-    <BindClass />
-    <view class="w-full bg-[#164e63] p-[12px] issue-1002-probe">
-      <text class="text-xs text-white">issue-1002 text-xs</text>
-      <text class="text-sm text-white">issue-1002 text-sm</text>
-      <text class="text-base text-white">issue-1002 text-base</text>
-      <text class="text-xl text-white">issue-1002 text-xl</text>
-      <view class="mt-[8px] h-[48px] w-[48px] rounded-full bg-[#f21903]" />
-      <text class="issue-1002-apply">issue-1002 scoped apply</text>
-    </view>
-    <view class="issue-902-theme-probe issue-902-theme-scope bg-primary p-[12px] text-white">
-      <text>issue 902 theme variable</text>
-    </view>
-    <view class="template-corpus-card flex flex-col gap-3 rounded-[28px] border border-slate-200 bg-gradient-to-br from-slate-900 to-slate-700 p-4 text-white shadow-xl wx:bg-blue-500 not-wx:bg-red-500 any-hover:bg-slate-800">
-      <view class="template-corpus-radial bg-[#e0f2fe] px-[48px] py-[24px] text-[#123456]">
-        <text>template corpus radial</text>
-      </view>
-      <view class="template-corpus-space space-y-2">
-        <view class="rounded-[20px] bg-white px-3 py-1 text-[26px] text-slate-700">
-          <text>space item 1</text>
-        </view>
-        <view :class="templateCorpusDynamicClass">
-          <text>space item 2</text>
-        </view>
-      </view>
-      <view class="template-corpus-apply">
-        <text>apply corpus</text>
-      </view>
-    </view>
-    <view class="my-3 w-full border-t border-solid border-gray-200" />
-    <text class="text-xl text-gray-600/95">
-      写法示例Start!
-    </text>
-    <view class="mt-[13.14758px] flex flex-col items-center">
-      <text class="w-32 rounded-md bg-[#f21903] py-2 text-center text-white">
-        圆角+背景+文本
+  <view>
+    <NavBar title="首页" :show-back="false" />
+    <view class="content-container">
+      <image class="w-100px h-100px mx-auto mt-20px rounded-20px" src="/static/logo.png" />
+      <text class="text-32px text-bold mx-auto mt-10px text-[#d14328]">
+        unibestX
       </text>
-      <view class="mt-3">
-        <button class="w-64 text-white" :class="buttonClass" @click="setGlobalNum(globalNum + 1)">
-          click here to inc {{ globalNum }}
+      <!-- <view class="mx-30px mt-15px">
+        <button type="primary" @click="goToUiTest">
+          前往 uiTest 测试页
         </button>
-      </view>
-      <view class="test">
-        <text class="text-[#da0e3c] text-center">
-          @apply 多端写法示例
+      </view> -->
+      <text class="text-center text-25px mt-10px">
+        最好用的 uni-appX 开发模板
+      </text>
+      <text class="mt-10px m-auto px-30px text-justify text-16px text-bold">
+        　　unibestX 是一个集成了多种工具与技术的 uni-appX 开发模板，由
+        uni-appX + Vue3 + Ts + UnoCss + VSCode
+        构建，模板具有代码提示、自动格式化、统一配置、代码片段等功能，并内置了许多常用的基本组件和基本功能，让你编写
+        uni-appX 拥有 best 体验。
+      </text>
+      <view class="mt-15px mx-30px px-20px py-15px rounded-12px" style="background-color: rgba(55, 194, 188, 0.08);">
+        <text class="text-14px text-bold" style="color: #0f8f8a;">
+          ⚡ 渲染模式：本项目全面支持 VDOM / Vapor 两种模式，默认 Vapor 蒸汽模式
+        </text>
+        <text class="text-14px" style="color: #666; line-height: 26px;">
+          　　Vapor 蒸汽模式是新一代渲染引擎，渲染性能超过原生，Android 端语法要求更宽松，AI
+          友好度与动态性更强；从 2026 年起将逐渐替代老的 VDOM 模式。
+        </text>
+        <text class="text-14px" style="color: #666; line-height: 26px;">
+          　　推荐使用 Vapor 蒸汽模式，可在 manifest.json 中按需切换回 VDOM 模式。
+        </text>
+        <text class="text-14px" style="color: #666; line-height: 26px;">
+          　　注意：Vapor 模式下开发过的代码，切换回 VDOM 模式可能因编译检查更严格而报类型或语法错误，请按需选择。
         </text>
       </view>
-      <view class="theme-mode-demo mt-4 rounded bg-white px-4 py-3 text-slate-900 system-dark:bg-slate-900 system-dark:text-slate-100 dark:bg-zinc-900 dark:text-zinc-50">
-        <text>uni-app x Tailwind CSS v4 system dark</text>
-        <view class="theme-dark mt-2 rounded bg-white px-3 py-2 text-slate-900 dark:bg-zinc-950 dark:text-zinc-50">
-          <text>uni-app x Tailwind CSS v4 manual dark</text>
-        </view>
+      <view class="mt-15px mx-30px px-20px py-15px rounded-12px" style="background-color: rgba(245, 158, 11, 0.1);">
+        <text class="text-14px text-bold" style="color: #d97706;">
+          ⚠️ 页面路由配置须知（重要）
+        </text>
+        <text class="text-14px" style="color: #666; line-height: 26px;">
+          　　本项目内置 vite-plugin-uni-pages 自动文件路由插件，pages.json 为自动构建产物（构建打包时会被重新生成并覆盖）。
+        </text>
+        <text class="text-14px" style="color: #666; line-height: 26px;">
+          　　页面配置请在根目录 pages.config.json 中配置，或在页面代码中使用 definePage 编译宏，切勿直接修改 pages.json！
+        </text>
       </view>
-      <t-button t-class="bg-[#0977ee] text-[31rpx]" t-class-content="px-[29rpx]">
-        <text>issue 977 t-class</text>
-      </t-button>
+      <view class="mt-15px mx-30px px-20px py-15px rounded-12px" style="background-color: rgba(55, 194, 188, 0.08);">
+        <text class="text-14px" style="color: #666; line-height: 26px;">
+          📄 文件路由 — 自动扫描路由，通过 pages.config.json / definePage 统一配置
+        </text>
+        <text class="text-14px" style="color: #666; line-height: 26px;">
+          ⚡ 渲染模式 — 全面支持 VDOM / Vapor 两种模式，默认 Vapor 蒸汽模式
+        </text>
+        <text class="text-14px" style="color: #666; line-height: 26px;">
+          🧩 UI 组件库 — 集成 uview-ultra 组件库，按钮、标签、弹窗等开箱即用
+        </text>
+        <text class="text-14px" style="color: #666; line-height: 26px;">
+          📱 系统信息 — 获取安全区域、屏幕尺寸、设备像素比等系统参数
+        </text>
+        <text class="text-14px" style="color: #666; line-height: 26px;">
+          🎨 图标字体 — 支持 uni-icon、lime-icon、up-icon 三套图标方案
+        </text>
+        <text class="text-14px" style="color: #666; line-height: 26px;">
+          🌐 多语言切换 — 内置 i18n 国际化方案，中英文一键切换
+        </text>
+        <text class="text-14px" style="color: #666; line-height: 26px;">
+          🎭 主题换色 — 五种预设主题色，原生与组件同步生效
+        </text>
+        <text class="text-14px" style="color: #666; line-height: 26px;">
+          🕐 日期时间 — 基于 lime-dayuts，实时时钟、日期偏移、月份边界等
+        </text>
+        <text class="text-14px" style="color: #666; line-height: 26px;">
+          🔀 路由拦截 — 登录鉴权路由守卫，未登录自动跳转登录页
+        </text>
+        <text class="text-14px" style="color: #666; line-height: 26px;">
+          🌐 网络请求 — 封装 lime-request，Mock 数据与真实接口演示
+        </text>
+        <text class="text-14px" style="color: #666; line-height: 26px;">
+          📊 图表渲染 — ECharts 图表集成，折线图、柱状图、饼图自适应
+        </text>
+        <text class="text-14px" style="color: #666; line-height: 26px;">
+          📋 分页列表 — z-paging-x 分页加载，Tab 筛选、错误模拟、空数据
+        </text>
+      </view>
     </view>
   </view>
 </template>
 
+<script setup lang="uts">
+import { handleBackPressExit } from '../../utils/backPress.uts';
+
+definePage({
+  type: 'home',
+  layout: 'default',
+  style: {
+    navigationBarTitleText: '首页'
+  }
+});
+
+onBackPress((options: OnBackPressOptions): boolean => {
+  // #ifdef APP
+  if (options.from == 'backbutton') {
+    return handleBackPressExit();
+  }
+  // #endif
+  return false;
+});
+
+const themeSwitchVal = ref(true);
+const themeSwitchVal2 = ref(false);
+
+const checkboxValue = ref(['apple'] as string[]);
+const radioValue = ref('male');
+const sliderValue = ref(30);
+const rateValue = ref(3);
+
+const isBg = ref(true);
+function switchBg() {
+  isBg.value = !isBg.value;
+}
+
+function goToUiTest() {
+  uni.navigateTo({
+    url: '/src/pages/haha/haha'
+  });
+}
+</script>
+
 <style lang="scss" scoped>
-.content {
-  @apply flex flex-col items-center py-4;
-}
-
-.test {
-  @apply flex mt-3 h-[100px] w-[222.222px] items-center justify-center rounded-[40px] bg-[#31edd8]/[0.54];
-}
-
-.issue-1002-apply {
-  @apply text-xs text-white rounded-full bg-[#164e63];
-}
 </style>

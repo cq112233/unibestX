@@ -8,15 +8,15 @@
 </template>
 
 <script setup lang="uts">
-	import { computed, ref, watch } from 'vue'
+	import { computed, ref, watch, provide, getCurrentInstance } from 'vue'
+	import type { ComputedRef } from 'vue'
 	import defProps from './checkboxGroup.uts'
 	import { bem } from '../../libs/function/index'
-	import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'
+	import { useUltraUI } from '../../libs/composable/useUltraUI'
 	const { children, getChildren, addChild } = useUltraUI()
-	const instance = getCurrentInstance()!.proxy!
+	const instance = getCurrentInstance()?.proxy
 	
 	defineOptions({
-		//...mpSharedMpOptions,
 		name: 'up-checkbox-group'
 	})
 	
@@ -97,13 +97,11 @@
 			type: Boolean,
 			default: defProps.getBoolean('checkboxGroup.borderBottom')
 		}
-	});
+	})
 	
 	// 定义 emit
-	const emit = defineEmits(['update:modelValue', 'change']);
+	const emit = defineEmits(['update:modelValue', 'change'])
 	
-	// 这里computed的变量，都是子组件up-checkbox需要用到的，由于头条小程序的兼容性差异，子组件无法实时监听父组件参数的变化
-	// 所以需要手动通知子组件，这里返回一个parentDataSelf变量，供watch监听，在其中去通知每一个子组件
 	const parentDataSelf = computed((): UTSJSONObject => {
 		return {
 			modelValue: props.modelValue,
@@ -120,50 +118,67 @@
 			iconPlacement: props.iconPlacement,
 			borderBottom: props.borderBottom,
 			placement: props.placement,
-		};
-	});
+		} as UTSJSONObject
+	})
 	
 	const bemClass = computed(() => {
 		return bem('checkbox-group', [props.placement], [])
-	});
+	})
 	
-	// 将其他的checkbox设置为未选中的状态
+	function toggleCheckbox(childName: string, childChecked: boolean) {
+		let currentValues: any[] = []
+		if (props.modelValue != null) {
+			const rawArr = props.modelValue as any[]
+			currentValues = rawArr.slice()
+		}
+		let foundIndex = -1
+		for (let i = 0; i < currentValues.length; i++) {
+			if (currentValues[i] != null && currentValues[i].toString() == childName.toString()) {
+				foundIndex = i
+				break
+			}
+		}
+		if (childChecked) {
+			if (foundIndex == -1) {
+				currentValues.push(childName)
+			}
+		} else {
+			if (foundIndex != -1) {
+				currentValues.splice(foundIndex, 1)
+			}
+		}
+		emit('update:modelValue', currentValues)
+		emit('change', currentValues)
+	}
+	
+	provide('upCheckboxGroupProps', parentDataSelf)
+	provide('upCheckboxGroupToggle', toggleCheckbox)
+	
+	// 将其他的checkbox设置为未选中的状态 (兼容旧版 VDOM 模式)
 	function unCheckedOther(childInstance: ComponentPublicInstance) {
-		const values = [] as string[];
-		// if (children.value != null) {
-			children.value?.map((child: ComponentPublicInstance) => {
-				// 将被选中的checkbox，放到数组中返回
-				let istats = child.$callMethod('getInternalState') as UTSJSONObject
-				// console.log(istats)
-				// if (istats != null) {
-					if (istats['name'] != null && istats['isChecked'] != null && istats['isChecked'].toString() == 'true') {
-						values.push(istats['name'].toString())
-					}
-				// }
-			})
-		// }
-		// 发出事件
-		emit('change', values, childInstance.$callMethod('getInternalState') as UTSJSONObject)
-		// 修改通过v-model绑定的值
+		const values = [] as string[]
+		children.value?.map((child: ComponentPublicInstance) => {
+			let istats = child.$callMethod('getInternalState') as UTSJSONObject
+			if (istats['name'] != null && istats['isChecked'] != null && istats['isChecked'].toString() == 'true') {
+				values.push(istats['name'].toString())
+			}
+		})
+		emit('change', values)
 		emit("update:modelValue", values)
 	}
 	
 	// 监听 parentDataSelf 变化
 	watch(parentDataSelf, () => {
-		// if (children.value != null) {
-			children.value?.map((child: ComponentPublicInstance) => {
-				// 判断子组件(up-checkbox)如果有init方法的话，就就执行(执行的结果是子组件重新从父组件拉取了最新的值)
-				child?.$callMethod('init');
-			});
-		// }
-	}, { deep: true });
+		children.value?.map((child: ComponentPublicInstance) => {
+			child?.$callMethod('init')
+		})
+	}, { deep: true })
 	
 	const getProps = function(): UTSJSONObject {
 		return parentDataSelf.value
 	}
-	const getRefs = function() {
-		return {
-		}
+	const getRefs = function(): UTSJSONObject {
+		return {} as UTSJSONObject
 	}
 	
 	// 暴露方法给子组件

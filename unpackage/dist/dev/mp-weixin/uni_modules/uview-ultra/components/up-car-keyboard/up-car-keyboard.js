@@ -192,8 +192,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
           j: common_vendor.o(clearTimer, i)
         } : {}, {
           k: i,
-          l: i,
-          m: common_vendor.n(i + 1 == 4 ? "up-keyboard__button--center" : "")
+          l: common_vendor.n(i + 1 == 4 ? "up-keyboard__button--center" : "")
         });
       }),
       b: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),

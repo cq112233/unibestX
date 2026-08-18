@@ -8,6 +8,16 @@ const uni_modules_uviewUltra_components_upIcon_icon = require("./icon.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "up-icon",
   props: {
+    customStyle: {
+      type: [Object, String],
+      default: () => {
+        return new common_vendor.UTSJSONObject({});
+      }
+    },
+    customClass: {
+      type: String,
+      default: ""
+    },
     // 图标类名
     name: {
       type: String,
@@ -176,6 +186,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       style["height"] = props.height != "" ? uni_modules_uviewUltra_libs_function_index.addUnit(props.height) : uni_modules_uviewUltra_libs_function_index.addUnit(props.size.toString());
       return style;
     });
+    const mergedImgStyle = common_vendor.computed(() => {
+      const custom = uni_modules_uviewUltra_libs_function_index.addStyle(props.customStyle);
+      const img = imgStyle.value;
+      return uni_modules_uviewUltra_libs_function_index.deepMerge(img, custom);
+    });
+    const mergedIconStyle = common_vendor.computed(() => {
+      const custom = uni_modules_uviewUltra_libs_function_index.addStyle(props.customStyle);
+      const iconS = iconStyle.value;
+      return uni_modules_uviewUltra_libs_function_index.deepMerge(iconS, custom);
+    });
+    const labelStyleComputed = common_vendor.computed(() => {
+      return new common_vendor.UTSJSONObject({
+        color: props.labelColor,
+        fontSize: uni_modules_uviewUltra_libs_function_index.addUnit(props.labelSize),
+        marginLeft: props.labelPos == "right" ? uni_modules_uviewUltra_libs_function_index.addUnit(props.space) : "0px",
+        marginTop: props.labelPos == "bottom" ? uni_modules_uviewUltra_libs_function_index.addUnit(props.space) : "0px",
+        marginRight: props.labelPos == "left" ? uni_modules_uviewUltra_libs_function_index.addUnit(props.space) : "0px",
+        marginBottom: props.labelPos == "top" ? uni_modules_uviewUltra_libs_function_index.addUnit(props.space) : "0px"
+      });
+    });
     const icon = common_vendor.computed(() => {
       if (props.customPrefix !== "upicon")
         return "";
@@ -198,31 +228,24 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, isImg.value ? {
         b: __props.name,
         c: __props.imgMode != "" ? __props.imgMode : "aspectFit",
-        d: common_vendor.s(imgStyle.value),
-        e: common_vendor.s(_ctx.$up.addStyle(_ctx.customStyle))
+        d: common_vendor.s(mergedImgStyle.value)
       } : {
-        f: common_vendor.t(icon.value),
-        g: common_vendor.n(uClasses.value),
-        h: common_vendor.s(iconStyle.value),
-        i: common_vendor.s(_ctx.$up.addStyle(_ctx.customStyle)),
-        j: __props.hoverClass
+        e: common_vendor.t(icon.value),
+        f: common_vendor.n(uClasses.value),
+        g: common_vendor.s(mergedIconStyle.value),
+        h: __props.hoverClass
       }, {
-        k: __props.label !== ""
+        i: __props.label !== ""
       }, __props.label !== "" ? {
-        l: common_vendor.t(__props.label),
-        m: __props.labelColor,
-        n: _ctx.$up.addUnit(__props.labelSize),
-        o: __props.labelPos == "right" ? _ctx.$up.addUnit(__props.space) : 0,
-        p: __props.labelPos == "bottom" ? _ctx.$up.addUnit(__props.space) : 0,
-        q: __props.labelPos == "left" ? _ctx.$up.addUnit(__props.space) : 0,
-        r: __props.labelPos == "top" ? _ctx.$up.addUnit(__props.space) : 0
+        j: common_vendor.t(__props.label),
+        k: common_vendor.s(labelStyleComputed.value)
       } : {}, {
-        s: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        t: common_vendor.o(clickHandler, "d8"),
-        v: common_vendor.n("up-icon--" + __props.labelPos),
-        w: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
-        x: `${_ctx.u_s_b_h}px`,
-        y: `${_ctx.u_s_a_i_b}px`
+        l: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        m: common_vendor.o(clickHandler, "d8"),
+        n: common_vendor.n("up-icon--" + __props.labelPos),
+        o: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+        p: `${_ctx.u_s_b_h}px`,
+        q: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

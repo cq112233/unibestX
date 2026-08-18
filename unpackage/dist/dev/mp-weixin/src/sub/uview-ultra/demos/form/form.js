@@ -116,9 +116,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             title: "验证通过，提交成功！",
             icon: "success"
           });
-          common_vendor.index.__f__("log", "at src/sub/uview-ultra/demos/form/form.uvue:264", "提交的数据：", formModel);
+          common_vendor.index.__f__("log", "at src/sub/uview-ultra/demos/form/form.uvue:262", "提交的数据：", formModel);
         }).catch((err = null) => {
-          common_vendor.index.__f__("log", "at src/sub/uview-ultra/demos/form/form.uvue:266", "验证失败:", err);
+          common_vendor.index.__f__("log", "at src/sub/uview-ultra/demos/form/form.uvue:264", "验证失败:", err);
           common_vendor.index.showToast({
             title: "请检查必填项",
             icon: "error"
@@ -265,7 +265,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         h: common_vendor.o(($event) => {
           return genderActionShow.value = true;
-        }, "f1"),
+        }, "df"),
         i: common_vendor.p({
           label: "性别",
           prop: "gender",
@@ -292,7 +292,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         m: common_vendor.o(($event) => {
           return datetimePickerShow.value = true;
-        }, "c5"),
+        }, "e6"),
         n: common_vendor.p({
           label: "出生日期",
           prop: "birthday",
@@ -516,7 +516,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         ag: common_vendor.o(($event) => {
           return formModel2.name = $event;
-        }, "6b"),
+        }, "0c"),
         ah: common_vendor.p({
           placeholder: "请输入活动名称",
           border: "none",
@@ -531,7 +531,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         aj: common_vendor.o(($event) => {
           return formModel2.detail = $event;
-        }, "55"),
+        }, "07"),
         ak: common_vendor.p({
           placeholder: "请输入活动详情",
           border: "none",
@@ -550,49 +550,49 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           ["label-width"]: "100px",
           class: "data-v-a419e6dd"
         }),
-        an: common_vendor.o(submitForm, "44"),
+        an: common_vendor.o(submitForm, "02"),
         ao: common_vendor.p({
           type: "primary",
           text: "提交表单",
           class: "data-v-a419e6dd"
         }),
-        ap: common_vendor.o(resetForm, "e2"),
+        ap: common_vendor.o(resetForm, "6b"),
         aq: common_vendor.p({
           type: "info",
           text: "重置表单",
           class: "data-v-a419e6dd"
         }),
-        ar: common_vendor.o(onCalendarConfirm, "16"),
+        ar: common_vendor.o(onCalendarConfirm, "d5"),
         as: common_vendor.o(($event) => {
           return calendarShow.value = false;
-        }, "b8"),
+        }, "e9"),
         at: common_vendor.p({
           show: calendarShow.value,
           mode: "range",
           class: "data-v-a419e6dd"
         }),
-        av: common_vendor.o(onPickerConfirm, "7d"),
+        av: common_vendor.o(onPickerConfirm, "7e"),
         aw: common_vendor.o(($event) => {
           return pickerShow.value = false;
-        }, "e2"),
+        }, "fc"),
         ax: common_vendor.o(($event) => {
           return pickerShow.value = false;
-        }, "6b"),
+        }, "e3"),
         ay: common_vendor.p({
           show: pickerShow.value,
           columns: pickerColumns.value,
           class: "data-v-a419e6dd"
         }),
-        az: common_vendor.o(onDatetimePickerConfirm, "59"),
+        az: common_vendor.o(onDatetimePickerConfirm, "42"),
         aA: common_vendor.o(($event) => {
           return datetimePickerShow.value = false;
-        }, "11"),
+        }, "03"),
         aB: common_vendor.o(($event) => {
           return datetimePickerShow.value = false;
-        }, "90"),
+        }, "f7"),
         aC: common_vendor.o(($event) => {
           return datetimePickerValue.value = $event;
-        }, "4e"),
+        }, "43"),
         aD: common_vendor.p({
           show: datetimePickerShow.value,
           mode: "date",
@@ -600,10 +600,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           modelValue: datetimePickerValue.value,
           class: "data-v-a419e6dd"
         }),
-        aE: common_vendor.o(onGenderSelect, "72"),
+        aE: common_vendor.o(onGenderSelect, "77"),
         aF: common_vendor.o(($event) => {
           return genderActionShow.value = false;
-        }, "17"),
+        }, "4e"),
         aG: common_vendor.p({
           show: genderActionShow.value,
           actions: genderActions.value,

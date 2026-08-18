@@ -1,5 +1,5 @@
 <template>
-  <view class="flex flex-col items-center px-16px py-24px flex-1">
+  <view class="flex flex-col items-center px-16px py-24px pb-100px">
     <!-- 头部卡片：用户头像及状态 -->
     <view class="w-full bg-white rounded-12px px-20px py-30px mb-20px flex flex-col items-center">
       <image class="w-90px h-90px rounded-45px mb-16px border-width-3px border-color-[#f1f5f9] border-solid" :src="avatarUrl" />
@@ -24,7 +24,7 @@
       <view class="border-bottom-width-1px border-bottom-style-solid border-bottom-color-[#f1f5f9] pb-8px mb-12px flex flex-row">
         <text class="text-15px font-semibold text-[#334155]">用户信息 (JSON)</text>
       </view>
-      <scroll-view class="bg-[#0f172a] rounded-8px p-12px h-180px" scroll-y="true">
+      <scroll-view class="bg-[#0f172a] rounded-8px p-12px h-180px" direction="vertical">
         <text class="text-13px text-[#38bdf8] leading-20px" style="font-family: monospace;">{{ userInfoJson }}</text>
       </scroll-view>
     </view>
@@ -42,30 +42,37 @@
 </template>
 
 <script setup lang="uts">
-import { useTokenStore, useUserStore } from '../../store'
-import { LOGIN_PAGE } from '../../router/config'
-import { handleBackPressExit } from '@/src/utils/backPress'
-import { setCurIdxByPath } from '@/src/tabbar/store'
+import { useTokenStore, useUserStore } from '../../store';
+import { LOGIN_PAGE } from '../../router/config';
+import { handleBackPressExit } from '@/src/utils/backPress';
+import { setCurIdxByPath } from '@/src/tabbar/store';
+
+definePage({
+  layout: false,
+  style: {
+    navigationBarTitleText: '我的'
+  }
+});
 
 onBackPress((options: OnBackPressOptions): boolean => {
   // #ifdef APP
   if (options.from == 'backbutton') {
-    return handleBackPressExit()
+    return handleBackPressExit();
   }
   // #endif
-  return false
-})
+  return false;
+});
 
-const userStore = useUserStore()
-const tokenStore = useTokenStore()
+const userStore = useUserStore();
+const tokenStore = useTokenStore();
 
 // 计算头像
 const avatarUrl = computed((): string => {
   if (userStore.state.userInfo.avatar.length > 0) {
-    return userStore.state.userInfo.avatar
+    return userStore.state.userInfo.avatar;
   }
-  return '/static/logo.png'
-})
+  return '/static/logo.png';
+});
 
 // 序列化用户信息为 JSON
 const userInfoJson = computed((): string => {
@@ -73,22 +80,22 @@ const userInfoJson = computed((): string => {
     userId: userStore.state.userInfo.userId,
     username: userStore.state.userInfo.username,
     nickname: userStore.state.userInfo.nickname,
-    avatar: userStore.state.userInfo.avatar,
-  }
-  return JSON.stringify(info, null, 2)
-})
+    avatar: userStore.state.userInfo.avatar
+  };
+  return JSON.stringify(info, null, 2);
+});
 
 onShow(() => {
-  console.log('All storage keys:', uni.getStorageInfoSync().keys)
-  console.log('pinia:token:', uni.getStorageSync('pinia:token'))
-  console.log('pinia:user:', uni.getStorageSync('pinia:user'))
-})
+  console.log('All storage keys:', uni.getStorageInfoSync().keys);
+  console.log('pinia:token:', uni.getStorageSync('pinia:token'));
+  console.log('pinia:user:', uni.getStorageSync('pinia:user'));
+});
 
 // 登录
 function handleLogin() {
   uni.navigateTo({
-    url: LOGIN_PAGE,
-  })
+    url: LOGIN_PAGE
+  });
 }
 
 // 退出登录
@@ -98,21 +105,21 @@ function handleLogout() {
     content: '确定要退出登录吗？',
     success: (res) => {
       if (res.confirm) {
-        tokenStore.clearToken()
-        userStore.clearUserInfo()
+        tokenStore.clearToken();
+        userStore.clearUserInfo();
         uni.showToast({
           title: '退出登录成功',
-          icon: 'success',
-        })
+          icon: 'success'
+        });
         // 退出后跳回首页（me 页需要登录，不能停留）
         setTimeout(() => {
-          const targetUrl = '/src/pages/index/index'
-          setCurIdxByPath(targetUrl)
-          uni.switchTab({ url: targetUrl })
-        }, 0)
+          const targetUrl = '/src/pages/index/index';
+          setCurIdxByPath(targetUrl);
+          uni.switchTab({ url: targetUrl });
+        }, 0);
       }
-    },
-  })
+    }
+  });
 }
 </script>
 

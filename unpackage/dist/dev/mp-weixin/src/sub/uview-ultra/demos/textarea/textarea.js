@@ -31,7 +31,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: common_vendor.o(($event) => {
           return textValue1.value = $event;
-        }, "cc"),
+        }, "a0"),
         c: common_vendor.p({
           placeholder: "请输入内容",
           count: true,
@@ -41,7 +41,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         d: common_vendor.o(($event) => {
           return textValue2.value = $event;
-        }, "d0"),
+        }, "44"),
         e: common_vendor.p({
           placeholder: "输入文字会自动撑开高度",
           ["auto-height"]: true,
@@ -50,7 +50,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         f: common_vendor.o(($event) => {
           return textValue3.value = $event;
-        }, "05"),
+        }, "2b"),
         g: common_vendor.p({
           placeholder: "下划线输入",
           border: "bottom",
@@ -59,7 +59,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         h: common_vendor.o(($event) => {
           return textValue4.value = $event;
-        }, "7c"),
+        }, "f5"),
         i: common_vendor.p({
           placeholder: "禁止输入内容",
           disabled: true,

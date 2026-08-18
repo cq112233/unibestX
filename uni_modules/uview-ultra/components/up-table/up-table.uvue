@@ -11,14 +11,26 @@
 	import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'
 	import defProps from './table.uts'
 	const instance = getCurrentInstance()!.proxy!
-	
+
 	// options
 	defineOptions({
 	  name: 'up-table'
 	})
-	
+
 	// props
 	const props = defineProps({
+		customStyle: {
+			type: [Object, String],
+			default: () => ({})
+		},
+		customClass: {
+			type: String,
+			default: ''
+		},
+		border: {
+			type: Boolean,
+			default: true
+		},
 		borderColor: {
 			type: String,
 			default: defProps.getString('table.borderColor')
@@ -55,17 +67,19 @@
 			default: defProps.getString('table.bgColor')
 		}
 	})
-	
+
 	const show = ref<boolean>(true)
-	
+
 	const tableStyle = computed(() => {
 		let style = {}
-		style['borderLeft'] = `solid 1px ${props.borderColor}`
-		style['borderTop'] = `solid 1px ${props.borderColor}`
+		if (props.border) {
+			style['borderLeft'] = `solid 1px ${props.borderColor}`
+			style['borderTop'] = `solid 1px ${props.borderColor}`
+		}
 		style['backgroundColor'] = props.bgColor
 		return style
 	})
-	
+
 	function change() {
 		show.value = false
 		// 使用 $nextTick 更新显示状态
@@ -73,19 +87,23 @@
 			show.value = true
 		}, 0)
 	}
-	
-	// 监听align和borderColor的变化
-	// 注意：在组合式API中，我们需要使用watch来监听props的变化
+
+	// 监听border、align和borderColor的变化
+	watch((): boolean => props.border, () => {
+		change()
+	})
+
 	watch(():string => props.align, () => {
 		change()
 	})
-	
+
 	watch((): string => props.borderColor, () => {
 		change()
 	})
-	
+
 	const getProps = function(): UTSJSONObject {
 		return {
+			border: props.border,
 			borderColor: props.borderColor,
 			align: props.align,
 			padding: props.padding,
@@ -107,5 +125,5 @@
 </script>
 
 <style lang="scss" scoped>
-	
+
 </style>
