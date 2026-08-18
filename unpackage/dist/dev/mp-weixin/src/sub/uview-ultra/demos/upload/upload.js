@@ -62,8 +62,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           ["bg-color"]: "#ffffff",
           class: "data-v-0c4ab23d"
         }),
-        b: common_vendor.o(afterRead, "f0"),
-        c: common_vendor.o(deletePic, "f6"),
+        b: common_vendor.o(afterRead, "e7"),
+        c: common_vendor.o(deletePic, "a1"),
         d: common_vendor.p({
           ["file-list"]: fileList1.value,
           name: "1",

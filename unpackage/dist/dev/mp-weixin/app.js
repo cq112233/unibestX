@@ -11,6 +11,7 @@ if (!Math) {
   "./src/pages/basic/basic.js";
   "./src/pages/function/function.js";
   "./src/pages/ai/ai.js";
+  "./src/pages/index/index1.js";
   "./src/sub/auth/login.js";
   "./src/sub/auth/register.js";
   "./src/sub/test/test.js";

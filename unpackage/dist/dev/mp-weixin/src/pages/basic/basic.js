@@ -26,15 +26,44 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
-        a: common_vendor.gei(_ctx, ""),
-        b: common_vendor.p({
-          id: common_vendor.gei(_ctx, "")
+        a: common_vendor.p({
+          class: "data-v-b9b8a39c"
         }),
-        c: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        b: common_vendor.p({
+          class: "data-v-b9b8a39c"
+        }),
+        c: common_vendor.p({
+          class: "data-v-b9b8a39c"
+        }),
+        d: common_vendor.p({
+          class: "data-v-b9b8a39c"
+        }),
+        e: common_vendor.p({
+          class: "data-v-b9b8a39c"
+        }),
+        f: common_vendor.p({
+          class: "data-v-b9b8a39c"
+        }),
+        g: common_vendor.p({
+          class: "data-v-b9b8a39c"
+        }),
+        h: common_vendor.p({
+          class: "data-v-b9b8a39c"
+        }),
+        i: common_vendor.p({
+          class: "data-v-b9b8a39c"
+        }),
+        j: common_vendor.gei(_ctx, ""),
+        k: common_vendor.p({
+          id: common_vendor.gei(_ctx, ""),
+          class: "data-v-b9b8a39c"
+        }),
+        l: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
       return __returned__;
     };
   }
 });
-wx.createPage(_sfc_main);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-b9b8a39c"]]);
+wx.createPage(MiniProgramPage);
 //# sourceMappingURL=../../../../.sourcemap/mp-weixin/src/pages/basic/basic.js.map

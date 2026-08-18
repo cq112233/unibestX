@@ -202,30 +202,31 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
-        a: common_vendor.sr(echartRef, "8ab257f0-1,8ab257f0-0", {
+        a: common_vendor.sr(echartRef, "55532f68-1,55532f68-0", {
           "k": "echartRef"
         }),
-        b: common_vendor.o(initEchart, "0f"),
+        b: common_vendor.o(initEchart, "a2"),
         c: common_vendor.p({
           height: "280px",
-          class: "w-full h-full r"
+          class: "wtu-1gus49c-0 wtu-1hnun9r-1 r data-v-55532f68"
         }),
         d: common_vendor.t(echartLineText.value),
-        e: common_vendor.n(currentType.value !== "line" ? "text-__3b82f6_" : "text-__ffffff_"),
-        f: common_vendor.n(currentType.value !== "line" ? "bg-__e0edff_" : "bg-__3b82f6_"),
-        g: common_vendor.o(changeToLine, "e2"),
+        e: common_vendor.n(currentType.value !== "line" ? "wtu-ecywtr-b" : "wtu-1y2qqu-c"),
+        f: common_vendor.n(currentType.value !== "line" ? "wtu-1t1j6iy-8" : "wtu-1oruciv-9"),
+        g: common_vendor.o(changeToLine, "23"),
         h: common_vendor.t(echartBarText.value),
-        i: common_vendor.n(currentType.value !== "bar" ? "text-__10b981_" : "text-__ffffff_"),
-        j: common_vendor.n(currentType.value !== "bar" ? "bg-__d1fae5_" : "bg-__10b981_"),
+        i: common_vendor.n(currentType.value !== "bar" ? "wtu-rz8j03-f" : "wtu-1y2qqu-c"),
+        j: common_vendor.n(currentType.value !== "bar" ? "wtu-e83h5m-d" : "wtu-96qsb-e"),
         k: common_vendor.o(changeToBar, "28"),
         l: common_vendor.t(echartPieText.value),
-        m: common_vendor.n(currentType.value !== "pie" ? "text-__f59e0b_" : "text-__ffffff_"),
-        n: common_vendor.n(currentType.value !== "pie" ? "bg-__fef3c7_" : "bg-__f59e0b_"),
-        o: common_vendor.o(changeToPie, "9a"),
+        m: common_vendor.n(currentType.value !== "pie" ? "wtu-1sjpi71-i" : "wtu-1y2qqu-c"),
+        n: common_vendor.n(currentType.value !== "pie" ? "wtu-1votq1i-g" : "wtu-kr2m39-h"),
+        o: common_vendor.o(changeToPie, "4e"),
         p: common_vendor.gei(_ctx, ""),
         q: common_vendor.p({
           title: echartTitle.value,
-          id: common_vendor.gei(_ctx, "")
+          id: common_vendor.gei(_ctx, ""),
+          class: "data-v-55532f68"
         }),
         r: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
@@ -233,5 +234,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-wx.createComponent(_sfc_main);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-55532f68"]]);
+wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/src/pages/function/components/EchartsDemoCard.js.map

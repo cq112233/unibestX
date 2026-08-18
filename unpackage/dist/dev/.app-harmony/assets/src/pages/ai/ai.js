@@ -1,9 +1,8 @@
 import { _ as __easycom_0 } from "../../components/NavBar/NavBar.js";
+import { A as AppKu, r as resolveEasycom } from "../../../App.ku.js";
 import { _ as __easycom_1 } from "../../../uni_modules/uni-icons/components/uni-icons/uni-icons.js";
-import { _ as _sfc_main$1 } from "../../../App.ku.js";
 import { s as safeAreaInsets } from "../../utils/systemInfo.js";
 import { _ as _export_sfc } from "../../../plugin-vue-export-helper.js";
-import "../../../uni_modules/uni-icons/components/uni-icons/uniicons_file.js";
 import "../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
 import "../../../uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.js";
 import "../../../uni_modules/uview-ultra/components/up-loading-icon/loadingIcon.js";
@@ -62,9 +61,8 @@ import "../../../uni_modules/uview-ultra/libs/i18n/locales/ru.js";
 import "../../store/token.js";
 import "../../store/user.js";
 import "../../utils/toast.js";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, resolveComponent: _resolveComponent, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, setSharedDataAttr: _setSharedDataAttr, unref: _unref, toSharedDataNumber: _toSharedDataNumber, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, toDisplayString: _toDisplayString, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataIf: _createSharedDataIf, createSharedDataFor: _createSharedDataFor, setSharedDataStyle: _setSharedDataStyle, isRef: _isRef, setSharedDataEvent: _setSharedDataEvent, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
-const __className = "GenSrcPagesAiAi";
+import "../../../uni_modules/uni-icons/components/uni-icons/uniicons_file.js";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref, computed, onMounted } = globalThis.Vue;
 class ChatMessage extends UTS.UTSType {
   static get$UTSMetadata$() {
@@ -91,16 +89,11 @@ class ChatMessage extends UTS.UTSType {
     delete this.__props__;
   }
 }
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "8c18e46a",
-  __className,
-  __filename: "src/pages/ai/ai.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "ai",
-  setup(__props) {
-    const __sharedDataRenderer = _useSharedDataRenderer();
-    const __sharedData = __sharedDataRenderer == "component" ? _withSharedDataComponent(new UniDynamicSharedDataComponent(_useSharedDataScope(), _useSharedDataComponentOptions({ bundleKey: "GenSrcPagesAiAiSharedData", sharedDataClassId: 0 }))) : _withSharedDataPage(new UniDynamicSharedDataPage(_useSharedDataPageId(), _useSharedDataPageOptions({ bundleKey: "GenSrcPagesAiAiSharedData", sharedDataClassId: 0 })));
-    const __sharedDataScope = _useSharedDataScope(__sharedData);
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
     const messages = ref([]);
     const inputText = ref("");
     const isTyping = ref(false);
@@ -169,90 +162,167 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         time: getCurrentTime()
       }));
     });
-    return () => {
-      "raw js";
-      const _component_NavBar = __easycom_0;
-      const _component_input = _resolveComponent("input");
-      const _component_uni_icons = __easycom_1;
-      const n36 = _createSharedDataComponent(_sfc_main$1, "9242dfba", null, {
-        "default": _withSharedDataVaporCtx(() => {
-          const n0 = _createSharedDataComponentWithFallback(_component_NavBar, "24f374cd", {
-            title: "AI 智能助手",
-            "show-back": true
-          });
-          _setSharedData(__sharedData, 1, n0?.sharedData);
-          _renderSharedDataEffect(() => {
-            return _setSharedDataAttr(__sharedData, 7, _toSharedDataNumber(_unref(scrollTop)));
-          });
-          _createSharedDataFor(_setSharedDataScoped(__sharedData, 2, _createSharedDataVFor(__sharedDataScope, () => {
-            return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-          })), () => {
-            return _unref(messages);
-          }, (__sharedData_VFor0, _for_item0) => {
-            _createSharedDataIf(() => {
-              return _setSharedData(__sharedData_VFor0, 1, _toSharedDataBoolean(isAiMessage(_for_item0.value.sender)));
-            }, () => {
-              _renderSharedDataEffect(() => {
-                const _msg = _for_item0.value;
-                _setSharedData(__sharedData_VFor0, 2, _toDisplayString(_msg.content));
-                _setSharedData(__sharedData_VFor0, 3, _toDisplayString(_msg.time));
-              });
-            }, () => {
-              _renderSharedDataEffect(() => {
-                const _msg = _for_item0.value;
-                _setSharedData(__sharedData_VFor0, 4, _toDisplayString(_msg.content));
-                _setSharedData(__sharedData_VFor0, 5, _toDisplayString(_msg.time));
-              });
-            }, 261);
-            return null;
-          }, (__sharedData_VFor0, msg) => {
-            return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(msg.id));
-          });
-          _createSharedDataIf(() => {
-            return _setSharedData(__sharedData, 3, _toSharedDataBoolean(_unref(isTyping)));
-          }, () => {
-          });
-          _renderSharedDataEffect(() => {
-            const _safeAreaBottom = _unref(safeAreaBottom);
-            _setSharedDataStyle(__sharedData, 8, { height: `${_safeAreaBottom + 70}px` });
-            _setSharedDataStyle(__sharedData, 9, { paddingBottom: `${_safeAreaBottom + 10}px` });
-          });
-          const n30 = _createSharedDataComponentWithFallback(_component_input, "94309c5c", {
-            value: () => {
-              return _unref(inputText);
-            },
-            "onUpdate:value": () => {
-              return (_value) => {
-                return _isRef(inputText) ? inputText.value = _value : null;
-              };
-            },
-            type: "text",
-            placeholder: "和 AI 助手聊点什么吧...",
-            "placeholder-style": "color: #94a3b8",
-            class: "chat-input",
-            "confirm-type": "send",
-            onConfirm: () => {
-              return sendMessage;
-            }
-          });
-          _setSharedData(__sharedData, 4, n30?.sharedData);
-          const n31 = _createSharedDataComponentWithFallback(_component_uni_icons, "94308418", {
-            type: "paperplane-filled",
-            size: "18",
-            color: "#ffffff"
-          });
-          _setSharedData(__sharedData, 5, n31?.sharedData);
-          _setSharedDataEvent(__sharedData, 6, sendMessage);
-        })
-      });
-      _setSharedData(__sharedData, 0, n36.sharedData);
-      return __sharedData;
-    };
+    const __returned__ = { messages, inputText, isTyping, scrollTop, isAiMessage, safeAreaBottom, getCurrentTime, scrollToBottom, sendMessage, get AppKu() {
+      return AppKu;
+    }, get NavBar() {
+      return __easycom_0;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const _style_1 = {};
-const ai = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0, _style_1]]]);
+const _style_0 = {"page-root":{"":{"height":"100%","display":"flex","flexDirection":"column"}},"footer-fixed":{"":{"position":"fixed","left":0,"right":0,"bottom":0,"zIndex":100}},"msg-row-start":{"":{"display":"flex","flexDirection":"row","alignItems":"flex-start"}},"msg-row-end":{"":{"display":"flex","flexDirection":"row","alignItems":"flex-start","justifyContent":"flex-end"}},"msg-content-left":{"":{"display":"flex","flexDirection":"column","maxWidth":270}},"msg-content-right":{"":{"display":"flex","flexDirection":"column","alignItems":"flex-end","maxWidth":270}},"flex-col":{"":{"display":"flex","flexDirection":"column"}},"flex-row":{"":{"display":"flex","flexDirection":"row"}},"items-center":{"":{"alignItems":"center"}},"justify-center":{"":{"justifyContent":"center"}},"flex-1":{"":{"flexGrow":1,"flexShrink":1,"flexBasis":"0%"}},"chat-input":{"":{"flexGrow":1,"flexShrink":1,"flexBasis":"0%","height":36,"backgroundColor":"#f1f5f9","color":"#1e293b","fontSize":14,"borderTopWidth":0,"borderRightWidth":0,"borderBottomWidth":0,"borderLeftWidth":0}},"flex":{"":{"display":"flex"}}};
+const _style_1 = {"wtu-12mckpk-0":{"":{"flexGrow":1,"flexShrink":1,"flexBasis":"0%"}},"wtu-1iiedf1-1":{"":{"flexDirection":"column"}},"wtu-8tyvyh-2":{"":{"backgroundColor":"#2563eb"}},"wtu-mqpefj-3":{"":{"alignItems":"center"}},"wtu-1qpn96n-4":{"":{"justifyContent":"center"}},"wtu-1ikrsu4-5":{"":{"--tw-inset-shadow":"0 0 #0000","--tw-inset-ring-shadow":"0 0 #0000","--tw-ring-offset-shadow":"0 0 #0000","--tw-ring-shadow":"0 0 #0000","--tw-shadow":"0 1px 3px 0 var(--tw-shadow-color, rgba(0, 0, 0, 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgba(0, 0, 0, 0.1))","boxShadow":"var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow)"}},"wtu-9vtjee-6":{"":{"color":"#ffffff"}},"wtu-j5w2ks-7":{"":{"--tw-font-weight":"var(--font-weight-bold, 700)","fontWeight":700}},"wtu-rq9s3i-8":{"":{"backgroundColor":"#ffffff"}},"wtu-jpp5lf-9":{"":{"--tw-border-style":"solid","borderTopStyle":"var(--tw-border-style)","borderRightStyle":"var(--tw-border-style)","borderBottomStyle":"var(--tw-border-style)","borderLeftStyle":"var(--tw-border-style)","borderTopWidth":1,"borderRightWidth":1,"borderBottomWidth":1,"borderLeftWidth":1}},"wtu-1nptzfn-a":{"":{"borderTopColor":"#e2e8f0","borderRightColor":"#e2e8f0","borderBottomColor":"#e2e8f0","borderLeftColor":"#e2e8f0"}},"wtu-1gyyuxw-b":{"":{"color":"#1e293b"}},"wtu-1qe55dz-c":{"":{"--tw-leading":"var(--leading-relaxed, 1.625)","lineHeight":1.625}},"wtu-1bj83jj-d":{"":{"color":"#94a3b8"}},"wtu-b3txcv-e":{"":{"backgroundColor":"#10b981"}},"wtu-u5zyoi-f":{"":{"backgroundColor":"#e2e8f0"}},"wtu-ucxd0z-g":{"":{"color":"#64748b"}},"wtu-r4rl0q-h":{"":{"--tw-border-style":"solid","borderTopStyle":"var(--tw-border-style)","borderTopWidth":1}},"wtu-on566v-i":{"":{"flexDirection":"row"}},"wtu-1t3d52l-j":{"":{"backgroundColor":"#f1f5f9"}}};
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { resolveComponent: _resolveComponent, createVNode: _createVNode, renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, createElementVNode: _createElementVNode, toDisplayString: _toDisplayString, createCommentVNode: _createCommentVNode, normalizeStyle: _normalizeStyle, vModelText: _vModelText, withDirectives: _withDirectives, withCtx: _withCtx, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_NavBar = resolveEasycom(__resolveDynamicComponent("NavBar"), __easycom_0);
+  const _component_uni_icons = resolveEasycom(__resolveDynamicComponent("uni-icons"), __easycom_1);
+  return _openBlock(), _createBlock($setup["AppKu"], null, {
+    default: _withCtx(() => [
+      _createElementVNode("view", { class: "page-root" }, [
+        _createVNode(_component_NavBar, {
+          title: "AI 智能助手",
+          "show-back": true
+        }),
+        _createElementVNode("scroll-view", {
+          class: "wtu-12mckpk-0 px-15px py-10px",
+          direction: "vertical",
+          "scroll-top": $setup.scrollTop,
+          "scroll-with-animation": true
+        }, [
+          (_openBlock(true), _createElementBlock(
+            _Fragment,
+            null,
+            _renderList($setup.messages, (msg) => {
+              return _openBlock(), _createElementBlock("view", {
+                key: msg.id,
+                class: "mb-15px wtu-1iiedf1-1"
+              }, [
+                $setup.isAiMessage(msg.sender) ? (_openBlock(), _createElementBlock("view", {
+                  key: 0,
+                  class: "msg-row-start"
+                }, [
+                  _createElementVNode("view", { class: "w-36px h-36px rounded-18px wtu-8tyvyh-2 wtu-mqpefj-3 wtu-1qpn96n-4 mr-10px wtu-1ikrsu4-5" }, [
+                    _createElementVNode("text", { class: "wtu-9vtjee-6 text-12px wtu-j5w2ks-7" }, "AI")
+                  ]),
+                  _createElementVNode("view", { class: "msg-content-left" }, [
+                    _createElementVNode("view", { class: "wtu-rq9s3i-8 p-12px rounded-r-16px rounded-bl-16px wtu-1ikrsu4-5 wtu-jpp5lf-9 wtu-1nptzfn-a" }, [
+                      _createElementVNode(
+                        "text",
+                        { class: "wtu-1gyyuxw-b text-14px wtu-1qe55dz-c" },
+                        _toDisplayString(msg.content),
+                        1
+                        /* TEXT */
+                      )
+                    ]),
+                    _createElementVNode(
+                      "text",
+                      { class: "wtu-1bj83jj-d text-10px mt-4px ml-4px" },
+                      _toDisplayString(msg.time),
+                      1
+                      /* TEXT */
+                    )
+                  ])
+                ])) : (_openBlock(), _createElementBlock("view", {
+                  key: 1,
+                  class: "msg-row-end"
+                }, [
+                  _createElementVNode("view", { class: "msg-content-right" }, [
+                    _createElementVNode("view", { class: "wtu-b3txcv-e p-12px rounded-l-16px rounded-br-16px wtu-1ikrsu4-5" }, [
+                      _createElementVNode(
+                        "text",
+                        { class: "wtu-9vtjee-6 text-14px wtu-1qe55dz-c" },
+                        _toDisplayString(msg.content),
+                        1
+                        /* TEXT */
+                      )
+                    ]),
+                    _createElementVNode(
+                      "text",
+                      { class: "wtu-1bj83jj-d text-10px mt-4px mr-4px" },
+                      _toDisplayString(msg.time),
+                      1
+                      /* TEXT */
+                    )
+                  ]),
+                  _createElementVNode("view", { class: "w-36px h-36px rounded-18px wtu-u5zyoi-f wtu-mqpefj-3 wtu-1qpn96n-4 ml-10px wtu-1ikrsu4-5" }, [
+                    _createElementVNode("text", { class: "wtu-ucxd0z-g text-12px wtu-j5w2ks-7" }, "ME")
+                  ])
+                ]))
+              ]);
+            }),
+            128
+            /* KEYED_FRAGMENT */
+          )),
+          $setup.isTyping ? (_openBlock(), _createElementBlock("view", {
+            key: 0,
+            class: "msg-row-start mb-15px"
+          }, [
+            _createElementVNode("view", { class: "w-36px h-36px rounded-18px wtu-8tyvyh-2 wtu-mqpefj-3 wtu-1qpn96n-4 mr-10px wtu-1ikrsu4-5" }, [
+              _createElementVNode("text", { class: "wtu-9vtjee-6 text-12px wtu-j5w2ks-7" }, "AI")
+            ]),
+            _createElementVNode("view", { class: "wtu-rq9s3i-8 p-12px rounded-r-16px rounded-bl-16px wtu-1ikrsu4-5 wtu-jpp5lf-9 wtu-1nptzfn-a" }, [
+              _createElementVNode("text", { class: "wtu-ucxd0z-g text-14px" }, "AI 正在思考中...")
+            ])
+          ])) : _createCommentVNode("v-if", true),
+          _createElementVNode(
+            "view",
+            {
+              style: _normalizeStyle({ height: `${$setup.safeAreaBottom + 70}px` })
+            },
+            null,
+            4
+            /* STYLE */
+          )
+        ], 8, ["scroll-top"]),
+        _createElementVNode(
+          "view",
+          {
+            class: "footer-fixed wtu-rq9s3i-8 wtu-r4rl0q-h wtu-1nptzfn-a p-10px wtu-1iiedf1-1",
+            style: _normalizeStyle({ paddingBottom: `${$setup.safeAreaBottom + 10}px` })
+          },
+          [
+            _createElementVNode("view", { class: "wtu-on566v-i wtu-mqpefj-3 wtu-1t3d52l-j rounded-24px px-12px py-6px" }, [
+              _withDirectives(_createElementVNode(
+                "input",
+                {
+                  "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.inputText = $event),
+                  type: "text",
+                  placeholder: "和 AI 助手聊点什么吧...",
+                  "placeholder-style": "color: #94a3b8",
+                  class: "chat-input",
+                  "confirm-type": "send",
+                  onConfirm: $setup.sendMessage
+                },
+                null,
+                544
+                /* NEED_HYDRATION, NEED_PATCH */
+              ), [
+                [_vModelText, $setup.inputText]
+              ]),
+              _createElementVNode("view", {
+                class: "w-32px h-32px rounded-16px wtu-8tyvyh-2 wtu-mqpefj-3 wtu-1qpn96n-4 ml-8px",
+                onClick: $setup.sendMessage
+              }, [
+                _createVNode(_component_uni_icons, {
+                  type: "paperplane-filled",
+                  size: "18",
+                  color: "#ffffff"
+                })
+              ])
+            ])
+          ],
+          4
+          /* STYLE */
+        )
+      ])
+    ]),
+    _: 1
+    /* STABLE */
+  });
+}
+const ai = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0, _style_1]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/ai/ai.uvue"]]);
 export {
   ai as default
 };

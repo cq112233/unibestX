@@ -32,12 +32,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const __returned__ = {
         a: common_vendor.t(hasLogin.value ? "已登录" : "未登录"),
         b: hasLogin.value ? "#10b981" : "#f43f5e",
-        c: common_vendor.o(jumpToTest, "db"),
-        d: common_vendor.o(handleLogout, "1e"),
+        c: common_vendor.o(jumpToTest, "80"),
+        d: common_vendor.o(handleLogout, "38"),
         e: common_vendor.gei(_ctx, ""),
         f: common_vendor.p({
           title: "路由拦截与传参测试",
-          id: common_vendor.gei(_ctx, "")
+          id: common_vendor.gei(_ctx, ""),
+          class: "data-v-705f694e"
         }),
         g: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
@@ -45,5 +46,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-wx.createComponent(_sfc_main);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-705f694e"]]);
+wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/src/pages/basic/components/RouterDemoCard.js.map

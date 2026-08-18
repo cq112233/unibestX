@@ -82,27 +82,30 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         j: common_vendor.p({
           type: "checkmarkempty",
           size: "20",
+          class: "data-v-1f7680f0",
           style: "color:#3b82f6"
         })
       } : {}, {
         k: common_vendor.o(($event) => {
           return switchLanguage("zh-CN");
-        }, "85"),
+        }, "ea"),
         l: isEnUS.value
       }, isEnUS.value ? {
         m: common_vendor.p({
           type: "checkmarkempty",
           size: "20",
+          class: "data-v-1f7680f0",
           style: "color:#3b82f6"
         })
       } : {}, {
         n: common_vendor.o(($event) => {
           return switchLanguage("en-US");
-        }, "ed"),
+        }, "51"),
         o: common_vendor.gei(_ctx, ""),
         p: common_vendor.p({
           title: langTitle.value,
-          id: common_vendor.gei(_ctx, "")
+          id: common_vendor.gei(_ctx, ""),
+          class: "data-v-1f7680f0"
         }),
         q: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
@@ -110,5 +113,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-wx.createComponent(_sfc_main);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-1f7680f0"]]);
+wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/src/pages/basic/components/LangSwitchCard.js.map

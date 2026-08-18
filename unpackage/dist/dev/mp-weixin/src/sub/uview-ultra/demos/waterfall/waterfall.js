@@ -57,7 +57,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: common_assets._imports_0,
         d: common_vendor.o(($event) => {
           return list.value = $event;
-        }, "ca"),
+        }, "da"),
         e: common_vendor.p({
           columns: 2,
           modelValue: list.value,

@@ -33,8 +33,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const __returned__ = {
         a: common_vendor.t(parentCount.value),
         b: common_vendor.t(childMessage.value),
-        c: common_vendor.o(addFiveFromParent, "a4"),
-        d: common_vendor.o(resetParent, "7b"),
+        c: common_vendor.o(addFiveFromParent, "bc"),
+        d: common_vendor.o(resetParent, "84"),
         e: common_vendor.w((_a, s0, i0) => {
           var item = _a.item, index = _a.index;
           return {
@@ -47,20 +47,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }, {
           name: "itemSlot",
           path: "e",
-          vueId: "8fe81a80-1,8fe81a80-0"
+          vueId: "9daf880a-1,9daf880a-0"
         }),
-        f: common_vendor.o(onChildAdd, "e2"),
-        g: common_vendor.o(onChildReset, "7b"),
-        h: common_vendor.o(onChildSendMsg, "aa"),
+        f: common_vendor.o(onChildAdd, "39"),
+        g: common_vendor.o(onChildReset, "c7"),
+        h: common_vendor.o(onChildSendMsg, "0d"),
         i: common_vendor.p({
           title: "组件通信演示子节点",
           count: parentCount.value,
-          tags: tagList.value
+          tags: tagList.value,
+          class: "data-v-9daf880a"
         }),
         j: common_vendor.gei(_ctx, ""),
         k: common_vendor.p({
           title: "父子组件传参 & 具名插槽演示",
-          id: common_vendor.gei(_ctx, "")
+          id: common_vendor.gei(_ctx, ""),
+          class: "data-v-9daf880a"
         }),
         l: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
@@ -68,5 +70,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-wx.createComponent(_sfc_main);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-9daf880a"]]);
+wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/src/pages/basic/components/PropsDemoCard.js.map

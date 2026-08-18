@@ -1,22 +1,22 @@
 import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/components/NavBar/NavBar&";
+import { A as AppKu, r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { _ as __easycom_1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-back-top/up-back-top&";
-import { _ as _sfc_main$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { L as LayoutComponent } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/layouts/default&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/systemInfo&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/icons&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-toast/up-toast&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/loadingIcon&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/config/config&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/test&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/digit&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/e-chart/components/e-chart/uts/WebviewEchart&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/config/config&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/colorGradient&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/icons&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useUltraUI&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/icon&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-toast/up-toast&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/loadingIcon&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/colorGradient&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-gap/up-gap&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useMp&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-gap/gap&";
@@ -64,20 +64,13 @@ import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/token&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/user&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/toast&";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, resolveComponent: _resolveComponent, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, setSharedDataAttr: _setSharedDataAttr, toSharedDataNumber: _toSharedDataNumber, toDisplayString: _toDisplayString, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, createSharedDataFor: _createSharedDataFor, setSharedDataEvent: _setSharedDataEvent, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
-const __className = "GenSrcSubUviewUltraDemosBackTopBackTop";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "fa40db24",
-  __className,
-  __filename: "src/sub/uview-ultra/demos/back-top/back-top.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "back-top",
-  setup(__props) {
-    const __sharedDataRenderer = _useSharedDataRenderer();
-    const __sharedData = __sharedDataRenderer == "component" ? _withSharedDataComponent(new UniDynamicSharedDataComponent(_useSharedDataScope(), _useSharedDataComponentOptions({ bundleKey: "GenSrcSubUviewUltraDemosBackTopBackTopSharedData", sharedDataClassId: 0 }))) : _withSharedDataPage(new UniDynamicSharedDataPage(_useSharedDataPageId(), _useSharedDataPageOptions({ bundleKey: "GenSrcSubUviewUltraDemosBackTopBackTopSharedData", sharedDataClassId: 0 })));
-    const __sharedDataScope = _useSharedDataScope(__sharedData);
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
     const currentScrollTop = ref(0);
     const scrollTop = ref(0);
     const windowHeight = ref(uni.getWindowInfo().windowHeight);
@@ -89,67 +82,102 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       scrollTop.value = 0;
       currentScrollTop.value = 0;
     }
-    return () => {
-      "raw js";
-      const _component_NavBar = __easycom_0;
-      const _component_up_back_top = __easycom_1;
-      const n16 = _createSharedDataComponent(_sfc_main$1, "e6fcc4be", null, {
-        "default": _withSharedDataVaporCtx(() => {
-          const n15 = _createSharedDataComponent(LayoutComponent, "03b21675", {
-            "navigation-bar-title-text": "Back Top 返回顶部",
-            "navigation-style": "custom"
-          }, {
-            "default": _withSharedDataVaporCtx(() => {
-              _renderSharedDataEffect(() => {
-                return _setSharedDataStyle(__sharedData, 6, { height: `${windowHeight.value}px` });
-              });
-              const n0 = _createSharedDataComponentWithFallback(_component_NavBar, "7290bbc0", {
+    const __returned__ = { currentScrollTop, scrollTop, windowHeight, handleScroll, scrollToTop, get AppKu() {
+      return AppKu;
+    }, get LayoutComponent() {
+      return LayoutComponent;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = {"page-container":{"":{"display":"flex","flexDirection":"column"}},"flex":{"":{"display":"flex"}},"bg-_b_hf8fafc_B":{"":{"backgroundColor":"#f8fafc"}},"flex-col":{"":{"flexDirection":"column"}},"flex-1":{"":{"flexGrow":1,"flexShrink":1,"flexBasis":"0%"}},"bg-white":{"":{"backgroundColor":"#ffffff"}},"flex-row":{"":{"flexDirection":"row"}},"items-center":{"":{"alignItems":"center"}},"font-bold":{"":{"--tw-font-weight":"700","fontWeight":700}},"text-_b_h1e293b_B":{"":{"color":"#1e293b"}},"text-_b_h64748b_B":{"":{"color":"#64748b"}},"text-_b_h2563eb_B":{"":{"color":"#2563eb"}},"text-_b_h334155_B":{"":{"color":"#334155"}},"text-_b_h94a3b8_B":{"":{"color":"#94a3b8"}}};
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { resolveComponent: _resolveComponent, createVNode: _createVNode, createElementVNode: _createElementVNode, toDisplayString: _toDisplayString, renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, normalizeStyle: _normalizeStyle, withCtx: _withCtx, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_NavBar = resolveEasycom(__resolveDynamicComponent("NavBar"), __easycom_0);
+  const _component_up_back_top = resolveEasycom(__resolveDynamicComponent("up-back-top"), __easycom_1);
+  return _openBlock(), _createBlock($setup["AppKu"], null, {
+    default: _withCtx(() => [
+      _createVNode($setup["LayoutComponent"], {
+        "navigation-bar-title-text": "Back Top 返回顶部",
+        "navigation-style": "custom"
+      }, {
+        default: _withCtx(() => [
+          _createElementVNode(
+            "view",
+            {
+              class: "page-container bg-_b_hf8fafc_B flex flex-col",
+              style: _normalizeStyle({ height: `${$setup.windowHeight}px` })
+            },
+            [
+              _createVNode(_component_NavBar, {
                 title: "Back Top 返回顶部",
                 "auto-back": true
-              });
-              _setSharedData(__sharedData, 2, n0?.sharedData);
-              _renderSharedDataEffect(() => {
-                _setSharedDataAttr(__sharedData, 7, _toSharedDataNumber(scrollTop.value));
-                _setSharedData(__sharedData, 8, _toDisplayString(currentScrollTop.value));
-              });
-              _createSharedDataFor(_setSharedDataScoped(__sharedData, 4, _createSharedDataVFor(__sharedDataScope, () => {
-                return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-              })), () => {
-                return 20;
-              }, (__sharedData_VFor0, _for_item0) => {
-                _renderSharedDataEffect(() => {
-                  return _setSharedData(__sharedData_VFor0, 1, _toDisplayString(_for_item0.value));
-                });
-                return null;
-              }, (__sharedData_VFor0, i) => {
-                return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(i));
-              }, 4);
-              _setSharedDataEvent(__sharedData, 5, handleScroll);
-              const n13 = _createSharedDataComponentWithFallback(_component_up_back_top, "40f360d2", {
-                "scroll-top": () => {
-                  return currentScrollTop.value;
-                },
+              }),
+              _createElementVNode("scroll-view", {
+                class: "flex-1 p-16px",
+                direction: "vertical",
+                "scroll-top": $setup.scrollTop,
+                onScroll: $setup.handleScroll
+              }, [
+                _createElementVNode("view", { class: "bg-white rounded-8px p-12px mb-12px shadow-xs" }, [
+                  _createElementVNode("view", { class: "flex-row items-center mb-10px" }, [
+                    _createElementVNode("view", { class: "w-3px h-14px bg-_b_h2979ff_B mr-6px rounded-2px" }),
+                    _createElementVNode("text", { class: "text-14px font-bold text-_b_h1e293b_B" }, "返回顶部说明")
+                  ]),
+                  _createElementVNode("text", { class: "text-13px text-_b_h64748b_B leading-20px" }, " 请向下滑动页面（超过 100px），右下角会自动浮现返回顶部按钮，点击后平滑一键置顶。 "),
+                  _createElementVNode(
+                    "text",
+                    { class: "text-12px text-_b_h2563eb_B mt-6px" },
+                    "当前 实时高度: " + _toDisplayString($setup.currentScrollTop) + "px",
+                    1
+                    /* TEXT */
+                  )
+                ]),
+                (_openBlock(), _createElementBlock(
+                  _Fragment,
+                  null,
+                  _renderList(20, (i) => {
+                    return _createElementVNode("view", {
+                      key: i,
+                      class: "bg-white rounded-8px p-12px mt-10px shadow-xs"
+                    }, [
+                      _createElementVNode(
+                        "text",
+                        { class: "text-14px font-bold text-_b_h334155_B" },
+                        "长列表测试卡片 #" + _toDisplayString(i),
+                        1
+                        /* TEXT */
+                      ),
+                      _createElementVNode("text", { class: "text-12px text-_b_h94a3b8_B mt-4px" }, "向下滚动触发右下角返回顶部悬浮图标...")
+                    ]);
+                  }),
+                  64
+                  /* STABLE_FRAGMENT */
+                ))
+              ], 40, ["scroll-top"]),
+              _createVNode(_component_up_back_top, {
+                "scroll-top": $setup.currentScrollTop,
                 top: 100,
                 bottom: 80,
                 right: 20,
-                onClick: () => {
-                  return scrollToTop;
-                }
-              });
-              _setSharedData(__sharedData, 3, n13?.sharedData);
-            })
-          });
-          _setSharedData(__sharedData, 1, n15.sharedData);
-        })
-      });
-      _setSharedData(__sharedData, 0, n16.sharedData);
-      return __sharedData;
-    };
-  }
-});
-const _style_0 = {};
-const _style_1 = {};
-const backTop = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0, _style_1]]]);
+                onClick: $setup.scrollToTop
+              }, null, 8, ["scroll-top"])
+            ],
+            4
+            /* STYLE */
+          )
+        ]),
+        _: 1
+        /* STABLE */
+      })
+    ]),
+    _: 1
+    /* STABLE */
+  });
+}
+const backTop = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/back-top/back-top.uvue"]]);
 export {
   backTop as default
 };

@@ -1,15 +1,9 @@
-Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚÚimport { S as Signature } from "./signature.js";
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ¤import { S as Signature } from "./signature.js";
 import { a as LimeSignatureOptions, b as LimeSignatureToFileSuccess } from "../../index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedDataStyle: _setSharedDataStyle, unref: _unref, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, setSharedDataTemplateRef: _setSharedDataTemplateRef } = globalThis.Vue;
-const __className = "GenUniModulesLimeSignatureComponentsLSignatureLSignature";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { computed, ref, onMounted, nextTick, watchEffect, onUnmounted } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "174c8d6e",
-  __className,
-  __filename: "uni_modules/lime-signature/components/l-signature/l-signature.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "l-signature",
   props: {
     styles: {
@@ -68,8 +62,6 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   emits: ["change"],
   setup(__props, _a) {
     var __expose = _a.expose, __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesLimeSignatureComponentsLSignatureLSignatureSharedData", sharedDataClassId: 0 })));
     const emit = __emit;
     const props = __props;
     const drawableStyle = computed(() => {
@@ -84,12 +76,12 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     });
     const signatureRef = ref(null);
     const signatureCanvasRef = ref(null);
-    ref(null);
+    let signatureLandscapeRef = ref(null);
     let landscapeStyle = ref(/* @__PURE__ */ new Map());
     let landscapeImageStyle = ref(/* @__PURE__ */ new Map());
     let isCanvasEmpty = true;
     let signature = null;
-    ref("");
+    let url = ref("");
     const checkAndEmitEmptyStatus = () => {
       var _a2;
       const isEmpty = (_a2 = signature === null || signature === void 0 ? null : signature.isEmpty) !== null && _a2 !== void 0 ? _a2 : true;
@@ -163,43 +155,72 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     });
     onUnmounted(() => {
     });
-    return () => {
-      "raw js";
-      const _setTemplateRef = _createSharedDataTemplateRefSetter();
-      const _component_canvas = _resolveComponent("canvas");
-      _renderSharedDataEffect(() => {
-        return _setSharedDataStyle(__sharedData, 3, [_unref(drawableStyle)]);
-      });
-      const n0 = _createSharedDataComponentWithFallback(_component_canvas, "62ff6f14", { class: "l-signature__canvas" });
-      _setSharedData(__sharedData, 0, n0?.sharedData);
-      _setSharedDataTemplateRef(__sharedData, 1, (n02) => {
-        _setTemplateRef(n02, signatureCanvasRef, null, "signatureCanvasRef");
-      });
-      _setSharedDataTemplateRef(__sharedData, 2, (n1) => {
-        _setTemplateRef(n1, signatureRef, null, "signatureRef");
-      });
-      return __sharedData;
-    };
+    const __returned__ = { emit, props, drawableStyle, signatureRef, signatureCanvasRef, get signatureLandscapeRef() {
+      return signatureLandscapeRef;
+    }, set signatureLandscapeRef(v) {
+      signatureLandscapeRef = v;
+    }, get landscapeStyle() {
+      return landscapeStyle;
+    }, set landscapeStyle(v) {
+      landscapeStyle = v;
+    }, get landscapeImageStyle() {
+      return landscapeImageStyle;
+    }, set landscapeImageStyle(v) {
+      landscapeImageStyle = v;
+    }, get isCanvasEmpty() {
+      return isCanvasEmpty;
+    }, set isCanvasEmpty(v) {
+      isCanvasEmpty = v;
+    }, get signature() {
+      return signature;
+    }, set signature(v = null) {
+      signature = v;
+    }, get url() {
+      return url;
+    }, set url(v) {
+      url = v;
+    }, checkAndEmitEmptyStatus, clear, redo, undo, canvasToTempFilePath };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "l-signature": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "l-signature__canvas": { "": { "width": "100%", "height": "100%" } }, "l-signature-landscape": { "": { "position": "absolute", "pointerEvents": "none", "overflow": "visible", "left": "99.9%" } }, "l-signature-image": { "": { "transformOrigin": "0% 0%" } } };
+const { createElementVNode: _createElementVNode, normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      class: "l-signature",
+      ref: "signatureRef",
+      style: _normalizeStyle([$setup.drawableStyle])
+    },
+    [
+      _createElementVNode(
+        "canvas",
+        {
+          ref: "signatureCanvasRef",
+          class: "l-signature__canvas"
+        },
+        null,
+        512
+        /* NEED_PATCH */
+      )
+    ],
+    4
+    /* STYLE */
+  );
+}
+const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/lime-signature/components/l-signature/l-signature.uvue"]]);
 export {
   __easycom_0 as _
 };
 //# sourceMappingURL=l-signature.js.map
-Â“ÙÕ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-signature/components/l-signature/signature.jsÙº/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-signature/index.jsÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙ×/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-signature/components/l-signature/l-signature.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ’ÔrD’²hostDependencyName®hostModuleNameÙI../../../uni_modules/lime-signature/components/l-signature/l-signature.js¥entryDÙL../../../../uni_modules/lime-signature/components/l-signature/l-signature.js¥entryÃÚÚimport { S as Signature } from "./signature.js";
+Â“ÙÕ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-signature/components/l-signature/signature.jsÙº/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-signature/index.jsÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙ×/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-signature/components/l-signature/l-signature.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ’ÔrD’²hostDependencyName®hostModuleNameÙI../../../uni_modules/lime-signature/components/l-signature/l-signature.js¥entryDÙL../../../../uni_modules/lime-signature/components/l-signature/l-signature.js¥entryÃÚ¤import { S as Signature } from "./signature.js";
 import { a as LimeSignatureOptions, b as LimeSignatureToFileSuccess } from "../../index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedDataStyle: _setSharedDataStyle, unref: _unref, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, setSharedDataTemplateRef: _setSharedDataTemplateRef } = globalThis.Vue;
-const __className = "GenUniModulesLimeSignatureComponentsLSignatureLSignature";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { computed, ref, onMounted, nextTick, watchEffect, onUnmounted } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "174c8d6e",
-  __className,
-  __filename: "uni_modules/lime-signature/components/l-signature/l-signature.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "l-signature",
   props: {
     styles: {
@@ -258,8 +279,6 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   emits: ["change"],
   setup(__props, _a) {
     var __expose = _a.expose, __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesLimeSignatureComponentsLSignatureLSignatureSharedData", sharedDataClassId: 0 })));
     const emit = __emit;
     const props = __props;
     const drawableStyle = computed(() => {
@@ -274,12 +293,12 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     });
     const signatureRef = ref(null);
     const signatureCanvasRef = ref(null);
-    ref(null);
+    let signatureLandscapeRef = ref(null);
     let landscapeStyle = ref(/* @__PURE__ */ new Map());
     let landscapeImageStyle = ref(/* @__PURE__ */ new Map());
     let isCanvasEmpty = true;
     let signature = null;
-    ref("");
+    let url = ref("");
     const checkAndEmitEmptyStatus = () => {
       var _a2;
       const isEmpty = (_a2 = signature === null || signature === void 0 ? null : signature.isEmpty) !== null && _a2 !== void 0 ? _a2 : true;
@@ -353,44 +372,73 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     });
     onUnmounted(() => {
     });
-    return () => {
-      "raw js";
-      const _setTemplateRef = _createSharedDataTemplateRefSetter();
-      const _component_canvas = _resolveComponent("canvas");
-      _renderSharedDataEffect(() => {
-        return _setSharedDataStyle(__sharedData, 3, [_unref(drawableStyle)]);
-      });
-      const n0 = _createSharedDataComponentWithFallback(_component_canvas, "62ff6f14", { class: "l-signature__canvas" });
-      _setSharedData(__sharedData, 0, n0?.sharedData);
-      _setSharedDataTemplateRef(__sharedData, 1, (n02) => {
-        _setTemplateRef(n02, signatureCanvasRef, null, "signatureCanvasRef");
-      });
-      _setSharedDataTemplateRef(__sharedData, 2, (n1) => {
-        _setTemplateRef(n1, signatureRef, null, "signatureRef");
-      });
-      return __sharedData;
-    };
+    const __returned__ = { emit, props, drawableStyle, signatureRef, signatureCanvasRef, get signatureLandscapeRef() {
+      return signatureLandscapeRef;
+    }, set signatureLandscapeRef(v) {
+      signatureLandscapeRef = v;
+    }, get landscapeStyle() {
+      return landscapeStyle;
+    }, set landscapeStyle(v) {
+      landscapeStyle = v;
+    }, get landscapeImageStyle() {
+      return landscapeImageStyle;
+    }, set landscapeImageStyle(v) {
+      landscapeImageStyle = v;
+    }, get isCanvasEmpty() {
+      return isCanvasEmpty;
+    }, set isCanvasEmpty(v) {
+      isCanvasEmpty = v;
+    }, get signature() {
+      return signature;
+    }, set signature(v = null) {
+      signature = v;
+    }, get url() {
+      return url;
+    }, set url(v) {
+      url = v;
+    }, checkAndEmitEmptyStatus, clear, redo, undo, canvasToTempFilePath };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "l-signature": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "l-signature__canvas": { "": { "width": "100%", "height": "100%" } }, "l-signature-landscape": { "": { "position": "absolute", "pointerEvents": "none", "overflow": "visible", "left": "99.9%" } }, "l-signature-image": { "": { "transformOrigin": "0% 0%" } } };
+const { createElementVNode: _createElementVNode, normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      class: "l-signature",
+      ref: "signatureRef",
+      style: _normalizeStyle([$setup.drawableStyle])
+    },
+    [
+      _createElementVNode(
+        "canvas",
+        {
+          ref: "signatureCanvasRef",
+          class: "l-signature__canvas"
+        },
+        null,
+        512
+        /* NEED_PATCH */
+      )
+    ],
+    4
+    /* STYLE */
+  );
+}
+const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/lime-signature/components/l-signature/l-signature.uvue"]]);
 export {
   __easycom_0 as _
 };
 //# sourceMappingURL=l-signature.js.map
-ÔrE•§version¨mappings¥names§sources®sourcesContentÜ ¿‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
- ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘Ù×/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-signature/components/l-signature/l-signature.js‘ÚÚimport { S as Signature } from "./signature.js";
+ÔrE•§version¨mappings¥names§sources®sourcesContentÜ Ú‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘Ù×/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-signature/components/l-signature/l-signature.js‘Ú¤import { S as Signature } from "./signature.js";
 import { a as LimeSignatureOptions, b as LimeSignatureToFileSuccess } from "../../index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedDataStyle: _setSharedDataStyle, unref: _unref, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, setSharedDataTemplateRef: _setSharedDataTemplateRef } = globalThis.Vue;
-const __className = "GenUniModulesLimeSignatureComponentsLSignatureLSignature";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { computed, ref, onMounted, nextTick, watchEffect, onUnmounted } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "174c8d6e",
-  __className,
-  __filename: "uni_modules/lime-signature/components/l-signature/l-signature.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "l-signature",
   props: {
     styles: {
@@ -449,8 +497,6 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   emits: ["change"],
   setup(__props, _a) {
     var __expose = _a.expose, __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesLimeSignatureComponentsLSignatureLSignatureSharedData", sharedDataClassId: 0 })));
     const emit = __emit;
     const props = __props;
     const drawableStyle = computed(() => {
@@ -465,12 +511,12 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     });
     const signatureRef = ref(null);
     const signatureCanvasRef = ref(null);
-    ref(null);
+    let signatureLandscapeRef = ref(null);
     let landscapeStyle = ref(/* @__PURE__ */ new Map());
     let landscapeImageStyle = ref(/* @__PURE__ */ new Map());
     let isCanvasEmpty = true;
     let signature = null;
-    ref("");
+    let url = ref("");
     const checkAndEmitEmptyStatus = () => {
       var _a2;
       const isEmpty = (_a2 = signature === null || signature === void 0 ? null : signature.isEmpty) !== null && _a2 !== void 0 ? _a2 : true;
@@ -544,30 +590,65 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     });
     onUnmounted(() => {
     });
-    return () => {
-      "raw js";
-      const _setTemplateRef = _createSharedDataTemplateRefSetter();
-      const _component_canvas = _resolveComponent("canvas");
-      _renderSharedDataEffect(() => {
-        return _setSharedDataStyle(__sharedData, 3, [_unref(drawableStyle)]);
-      });
-      const n0 = _createSharedDataComponentWithFallback(_component_canvas, "62ff6f14", { class: "l-signature__canvas" });
-      _setSharedData(__sharedData, 0, n0?.sharedData);
-      _setSharedDataTemplateRef(__sharedData, 1, (n02) => {
-        _setTemplateRef(n02, signatureCanvasRef, null, "signatureCanvasRef");
-      });
-      _setSharedDataTemplateRef(__sharedData, 2, (n1) => {
-        _setTemplateRef(n1, signatureRef, null, "signatureRef");
-      });
-      return __sharedData;
-    };
+    const __returned__ = { emit, props, drawableStyle, signatureRef, signatureCanvasRef, get signatureLandscapeRef() {
+      return signatureLandscapeRef;
+    }, set signatureLandscapeRef(v) {
+      signatureLandscapeRef = v;
+    }, get landscapeStyle() {
+      return landscapeStyle;
+    }, set landscapeStyle(v) {
+      landscapeStyle = v;
+    }, get landscapeImageStyle() {
+      return landscapeImageStyle;
+    }, set landscapeImageStyle(v) {
+      landscapeImageStyle = v;
+    }, get isCanvasEmpty() {
+      return isCanvasEmpty;
+    }, set isCanvasEmpty(v) {
+      isCanvasEmpty = v;
+    }, get signature() {
+      return signature;
+    }, set signature(v = null) {
+      signature = v;
+    }, get url() {
+      return url;
+    }, set url(v) {
+      url = v;
+    }, checkAndEmitEmptyStatus, clear, redo, undo, canvasToTempFilePath };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "l-signature": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "l-signature__canvas": { "": { "width": "100%", "height": "100%" } }, "l-signature-landscape": { "": { "position": "absolute", "pointerEvents": "none", "overflow": "visible", "left": "99.9%" } }, "l-signature-image": { "": { "transformOrigin": "0% 0%" } } };
+const { createElementVNode: _createElementVNode, normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      class: "l-signature",
+      ref: "signatureRef",
+      style: _normalizeStyle([$setup.drawableStyle])
+    },
+    [
+      _createElementVNode(
+        "canvas",
+        {
+          ref: "signatureCanvasRef",
+          class: "l-signature__canvas"
+        },
+        null,
+        512
+        /* NEED_PATCH */
+      )
+    ],
+    4
+    /* STYLE */
+  );
+}
+const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/lime-signature/components/l-signature/l-signature.uvue"]]);
 export {
   __easycom_0 as _
 };
 //# sourceMappingURL=l-signature.js.map
-ÔrF“®../../index.js®./signature.jsÙ'../../../../plugin-vue-export-helper.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙº/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-signature/index.jsAÃªoh-resolveÂGAÂÙÕ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-signature/components/l-signature/signature.jsAÃªoh-resolveÂGAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ“Í±À‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍÍ®ÔrL”¤type¥start£end¤nameªIdentifierÍÍ©«__easycom_0LªIdentifierÍ­Í®¡_À“ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration 0‘ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	
+ÔrF“Ù'../../../../plugin-vue-export-helper.js®../../index.js®./signature.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂGAÂÙº/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-signature/index.jsAÃªoh-resolveÂGAÂÙÕ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-signature/components/l-signature/signature.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ]Í{À‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍhÍxÔrL”¤type¥start£end¤nameªIdentifierÍhÍs«__easycom_0LªIdentifierÍwÍx¡_À“ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration 0‘ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	
 ¡SLªIdentifier©SignatureÔrO•¤type¥start£end¥value£raw§Literal/®./signature.js°"./signature.js"M±ImportDeclaration1Ì’N¯ImportSpecifier:ÌSLªIdentifier:;¡aLªIdentifier?ÌS´LimeSignatureOptionsN¯ImportSpecifierÌUÌtLªIdentifierÌUÌV¡bLªIdentifierÌZÌtºLimeSignatureToFileSuccessO§LiteralÌ|ÌŒ®../../index.js°"../../index.js"M±ImportDeclarationÌÌÙ‘N¯ImportSpecifierÌ—Ì§LªIdentifierÌ—Ì˜¡_LªIdentifierÌœÌ§«_export_sfcO§LiteralÌ¯ÌØÙ'../../../../plugin-vue-export-helper.jsÙ)"../../../../plugin-vue-export-helper.js"

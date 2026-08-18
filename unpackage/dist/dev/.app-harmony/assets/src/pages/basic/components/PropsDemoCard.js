@@ -1,19 +1,13 @@
 import { C as Card } from "./Card.js";
 import { C as ChildDemoBox } from "./ChildDemoBox.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataEvent: _setSharedDataEvent, setSharedData: _setSharedData, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataScopedSlot: _createSharedDataScopedSlot, createSharedDataVSlot: _createSharedDataVSlot, createSharedDataComponent: _createSharedDataComponent, withSharedDataVaporCtx: _withSharedDataVaporCtx } = globalThis.Vue;
-const __className = "GenSrcPagesBasicComponentsPropsDemoCard";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "672b911f",
-  __className,
-  __filename: "src/pages/basic/components/PropsDemoCard.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "PropsDemoCard",
-  setup(__props) {
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenSrcPagesBasicComponentsPropsDemoCardSharedData", sharedDataClassId: 0 })));
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
     const parentCount = ref(10);
     const childMessage = ref("暂无子组件消息");
     const tagList = ref(["响应式 Props 传递", "Emits 事件监听与回传", "具名 Header/Footer 插槽", "具名 Slot 作用域传参"]);
@@ -34,66 +28,111 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       parentCount.value = 10;
       childMessage.value = "已重置为初始状态";
     }
-    return () => {
-      "raw js";
-      const n27 = _createSharedDataComponent(
-        Card,
-        "da44ccdc",
-        { title: "父子组件传参 & 具名插槽演示" },
-        {
-          "default": _withSharedDataVaporCtx(() => {
-            _setSharedDataEvent(__sharedData, 2, addFiveFromParent);
-            _setSharedDataEvent(__sharedData, 3, resetParent);
-            _renderSharedDataEffect(() => {
-              _setSharedData(__sharedData, 4, _toDisplayString(parentCount.value));
-              _setSharedData(__sharedData, 5, _toDisplayString(childMessage.value));
-            });
-            const n26 = _createSharedDataComponent(ChildDemoBox, "2c5c02b2", {
-              title: "组件通信演示子节点",
-              count: () => {
-                return parentCount.value;
-              },
-              tags: () => {
-                return tagList.value;
-              },
-              onAdd: () => {
-                return onChildAdd;
-              },
-              onReset: () => {
-                return onChildReset;
-              },
-              onSendMsg: () => {
-                return onChildSendMsg;
-              }
-            }, {
-              "header": () => {
-              },
-              "itemSlot": _createSharedDataScopedSlot(_createSharedDataVSlot(__sharedDataScope, () => {
-                return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-              }), (_slotProps0, __sharedData_VSlot0) => {
-                _renderSharedDataEffect(() => {
-                  const _item = _slotProps0.item;
-                  _setSharedData(__sharedData_VSlot0, 0, _toDisplayString(_slotProps0.index + 1));
-                  _setSharedData(__sharedData_VSlot0, 1, _toDisplayString(_item));
-                  _setSharedData(__sharedData_VSlot0, 2, _toDisplayString(_item));
-                });
-              }),
-              "footer": () => {
-              }
-            });
-            _setSharedData(__sharedData, 1, n26.sharedData);
-          })
-        },
-        1
-        /* SINGLE_ROOT */
-      );
-      _setSharedData(__sharedData, 0, n27.sharedData);
-      return __sharedData;
-    };
+    const __returned__ = { parentCount, childMessage, tagList, onChildAdd, onChildReset, onChildSendMsg, addFiveFromParent, resetParent, get Card() {
+      return Card;
+    }, get ChildDemoBox() {
+      return ChildDemoBox;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const PropsDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "wtu-vxgnz7-0": { "": { "backgroundColor": "#eff6ff" } }, "wtu-sv7fhw-1": { "": { "--tw-font-weight": "var(--font-weight-bold, 700)", "fontWeight": 700 } }, "wtu-44jmxl-2": { "": { "color": "#1e40af" } }, "wtu-1qcvxlr-3": { "": { "flexDirection": "row" } }, "wtu-i6zy5z-4": { "": { "alignItems": "center" } }, "wtu-1581zln-5": { "": { "color": "#3b82f6" } }, "wtu-1cwqag0-6": { "": { "color": "#1d4ed8" } }, "wtu-cj9lbh-7": { "": { "color": "#059669" } }, "wtu-1t9ug01-8": { "": { "backgroundColor": "#2563eb" } }, "wtu-19aj3kn-9": { "": { "justifyContent": "center" } }, "wtu-1c2l3ni-a": { "": { "color": "#ffffff" } }, "wtu-1h73awj-b": { "": { "backgroundColor": "#64748b" } }, "wtu-16203my-c": { "": { "justifyContent": "space-between" } }, "wtu-161zm7w-d": { "": { "color": "#1e293b" } }, "wtu-v9l0kh-e": { "": { "backgroundColor": "#dbeafe" } }, "wtu-1ue7bt4-f": { "": { "backgroundColor": "#f0fdf4" } }, "wtu-1gdtqyh-g": { "": { "color": "#15803d" } }, "wtu-165ep59-h": { "": { "color": "#166534" } }, "wtu-1nu791o-i": { "": { "--tw-font-weight": "var(--font-weight-medium, 500)", "fontWeight": 500 } }, "wtu-1qit6r8-j": { "": { "color": "#22c55e" } }, "wtu-1aizezg-k": { "": { "marginLeft": "auto" } }, "wtu-ntizu3-l": { "": { "color": "#64748b" } }, "wtu-1eoi3xb-m": { "": { "color": "#10b981" } } };
+const { createElementVNode: _createElementVNode, toDisplayString: _toDisplayString, withCtx: _withCtx, createVNode: _createVNode, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createBlock($setup["Card"], { title: "父子组件传参 & 具名插槽演示" }, {
+    default: _withCtx(() => [
+      _createElementVNode("view", { class: "wtu-vxgnz7-0 rounded-12px p-14px mb-14px border-width-1px border-style-solid border-color-[#bfdbfe]" }, [
+        _createElementVNode("text", { class: "text-14px wtu-sv7fhw-1 wtu-44jmxl-2 mb-6px" }, "👨‍👩‍👧 父组件状态管理面板"),
+        _createElementVNode("view", { class: "wtu-1qcvxlr-3 wtu-i6zy5z-4 mb-4px" }, [
+          _createElementVNode("text", { class: "text-12px wtu-1581zln-5" }, "父组件 Count 变量: "),
+          _createElementVNode(
+            "text",
+            { class: "text-14px wtu-sv7fhw-1 wtu-1cwqag0-6 ml-6px" },
+            _toDisplayString($setup.parentCount),
+            1
+            /* TEXT */
+          )
+        ]),
+        _createElementVNode("view", { class: "wtu-1qcvxlr-3 wtu-i6zy5z-4 mb-10px" }, [
+          _createElementVNode("text", { class: "text-12px wtu-1581zln-5" }, "接收到的子组件消息: "),
+          _createElementVNode(
+            "text",
+            { class: "text-12px wtu-sv7fhw-1 wtu-cj9lbh-7 ml-6px" },
+            _toDisplayString($setup.childMessage),
+            1
+            /* TEXT */
+          )
+        ]),
+        _createElementVNode("view", { class: "wtu-1qcvxlr-3 wtu-i6zy5z-4" }, [
+          _createElementVNode("view", {
+            class: "wtu-1t9ug01-8 rounded-6px px-10px h-30px wtu-1qcvxlr-3 wtu-i6zy5z-4 wtu-19aj3kn-9 mr-8px",
+            onClick: $setup.addFiveFromParent
+          }, [
+            _createElementVNode("text", { class: "wtu-1c2l3ni-a text-12px" }, "父组件直接 Count + 5")
+          ]),
+          _createElementVNode("view", {
+            class: "wtu-1h73awj-b rounded-6px px-10px h-30px wtu-1qcvxlr-3 wtu-i6zy5z-4 wtu-19aj3kn-9",
+            onClick: $setup.resetParent
+          }, [
+            _createElementVNode("text", { class: "wtu-1c2l3ni-a text-12px" }, "父组件重置状态")
+          ])
+        ])
+      ]),
+      _createVNode($setup["ChildDemoBox"], {
+        title: "组件通信演示子节点",
+        count: $setup.parentCount,
+        tags: $setup.tagList,
+        onAdd: $setup.onChildAdd,
+        onReset: $setup.onChildReset,
+        onSendMsg: $setup.onChildSendMsg
+      }, {
+        header: _withCtx(() => [
+          _createElementVNode("view", { class: "wtu-1qcvxlr-3 wtu-i6zy5z-4 wtu-16203my-c" }, [
+            _createElementVNode("text", { class: "text-14px wtu-sv7fhw-1 wtu-161zm7w-d" }, "🏷️ 父组件填入的具名 Header 插槽"),
+            _createElementVNode("text", { class: "text-11px wtu-1581zln-5 wtu-v9l0kh-e px-6px py-2px rounded-4px" }, "自定义 Header")
+          ])
+        ]),
+        itemSlot: _withCtx(({ item, index }) => [
+          _createElementVNode("view", { class: "wtu-1qcvxlr-3 wtu-i6zy5z-4 wtu-1ue7bt4-f rounded-6px p-8px border-width-1px border-style-solid border-color-[#bbf7d0]" }, [
+            _createElementVNode(
+              "text",
+              { class: "text-11px wtu-sv7fhw-1 wtu-1gdtqyh-g mr-6px" },
+              "#" + _toDisplayString(index + 1),
+              1
+              /* TEXT */
+            ),
+            _createElementVNode(
+              "text",
+              { class: "text-12px wtu-165ep59-h wtu-1nu791o-i" },
+              _toDisplayString(item),
+              1
+              /* TEXT */
+            ),
+            _createElementVNode(
+              "text",
+              { class: "text-10px wtu-1qit6r8-j wtu-1aizezg-k" },
+              "具名Slot传参: " + _toDisplayString(item),
+              1
+              /* TEXT */
+            )
+          ])
+        ]),
+        footer: _withCtx(() => [
+          _createElementVNode("view", { class: "wtu-1qcvxlr-3 wtu-i6zy5z-4 wtu-16203my-c" }, [
+            _createElementVNode("text", { class: "text-11px wtu-ntizu3-l" }, "📌 父组件填入的具名 Footer 插槽"),
+            _createElementVNode("text", { class: "text-11px wtu-1eoi3xb-m" }, "双向通信验证成功")
+          ])
+        ]),
+        _: 1
+        /* STABLE */
+      }, 8, ["count", "tags"])
+    ]),
+    _: 1
+    /* STABLE */
+  });
+}
+const PropsDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/basic/components/PropsDemoCard.uvue"]]);
 export {
   PropsDemoCard as P
 };

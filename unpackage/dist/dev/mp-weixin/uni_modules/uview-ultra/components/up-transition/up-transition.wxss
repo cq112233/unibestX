@@ -1,4 +1,3 @@
-:host{display:flex;flex-direction:column}
 /**
  * 这里是uni-app内置的常用样式变量
  *
@@ -25,22 +24,7 @@
 /* 透明度 */
 /* 文章场景相关 */
 /* 覆盖 uview-ultra 的 SCSS 变量，使其编译为 CSS 变量 */
-.u-empty.data-v-52d65444,
-.u-empty__wrap.data-v-52d65444,
-.u-tabs.data-v-52d65444,
-.u-tabs__wrapper.data-v-52d65444,
-.u-tabs__wrapper__scroll-view-wrapper.data-v-52d65444,
-.u-tabs__wrapper__scroll-view.data-v-52d65444,
-.u-tabs__wrapper__nav.data-v-52d65444,
-.u-tabs__wrapper__nav__line.data-v-52d65444,
-.up-empty.data-v-52d65444,
-.up-empty__wrap.data-v-52d65444,
-.up-tabs.data-v-52d65444,
-.up-tabs__wrapper.data-v-52d65444,
-.up-tabs__wrapper__scroll-view-wrapper.data-v-52d65444,
-.up-tabs__wrapper__scroll-view.data-v-52d65444,
-.up-tabs__wrapper__nav.data-v-52d65444,
-.up-tabs__wrapper__nav__line.data-v-52d65444 {
+.u-empty.data-v-52d65444,.u-empty__wrap.data-v-52d65444,.u-tabs.data-v-52d65444,.u-tabs__wrapper.data-v-52d65444,.u-tabs__wrapper__scroll-view-wrapper.data-v-52d65444,.u-tabs__wrapper__scroll-view.data-v-52d65444,.u-tabs__wrapper__nav.data-v-52d65444,.u-tabs__wrapper__nav__line.data-v-52d65444,.up-empty.data-v-52d65444,.up-empty__wrap.data-v-52d65444,.up-tabs.data-v-52d65444,.up-tabs__wrapper.data-v-52d65444,.up-tabs__wrapper__scroll-view-wrapper.data-v-52d65444,.up-tabs__wrapper__scroll-view.data-v-52d65444,.up-tabs__wrapper__nav.data-v-52d65444,.up-tabs__wrapper__nav__line.data-v-52d65444 {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -63,84 +47,74 @@
  * slide-left：左滑进入
  * slide-right：右滑进入
  */
-.up-fade-enter-active.data-v-52d65444,
-.up-fade-leave-active.data-v-52d65444 {
+.up-fade-enter-active.data-v-52d65444,.up-fade-leave-active.data-v-52d65444 {
   transition-property: opacity;
 }
-.up-fade-enter.data-v-52d65444,
-.up-fade-leave-to.data-v-52d65444 {
+.up-fade-enter.data-v-52d65444,.up-fade-leave-to.data-v-52d65444 {
   opacity: 0;
 }
-.up-fade-zoom-enter.data-v-52d65444,
-.up-fade-zoom-leave-to.data-v-52d65444 {
-  transform: scale(0.95);
+.up-fade-zoom-enter.data-v-52d65444,.up-fade-zoom-leave-to.data-v-52d65444 {
+  -webkit-transform: scale(0.95);
+          transform: scale(0.95);
   opacity: 0;
 }
-.up-fade-zoom-enter-active.data-v-52d65444,
-.up-fade-zoom-leave-active.data-v-52d65444 {
+.up-fade-zoom-enter-active.data-v-52d65444,.up-fade-zoom-leave-active.data-v-52d65444 {
+  transition-property: opacity, -webkit-transform;
   transition-property: transform, opacity;
+  transition-property: transform, opacity, -webkit-transform;
 }
-.up-fade-down-enter-active.data-v-52d65444,
-.up-fade-down-leave-active.data-v-52d65444,
-.up-fade-left-enter-active.data-v-52d65444,
-.up-fade-left-leave-active.data-v-52d65444,
-.up-fade-right-enter-active.data-v-52d65444,
-.up-fade-right-leave-active.data-v-52d65444,
-.up-fade-up-enter-active.data-v-52d65444,
-.up-fade-up-leave-active.data-v-52d65444 {
+.up-fade-down-enter-active.data-v-52d65444,.up-fade-down-leave-active.data-v-52d65444,.up-fade-left-enter-active.data-v-52d65444,.up-fade-left-leave-active.data-v-52d65444,.up-fade-right-enter-active.data-v-52d65444,.up-fade-right-leave-active.data-v-52d65444,.up-fade-up-enter-active.data-v-52d65444,.up-fade-up-leave-active.data-v-52d65444 {
+  transition-property: opacity, -webkit-transform;
   transition-property: opacity, transform;
+  transition-property: opacity, transform, -webkit-transform;
 }
-.up-fade-up-enter.data-v-52d65444,
-.up-fade-up-leave-to.data-v-52d65444 {
-  transform: translateY(100%);
+.up-fade-up-enter.data-v-52d65444,.up-fade-up-leave-to.data-v-52d65444 {
+  -webkit-transform: translateY(100%);
+          transform: translateY(100%);
   opacity: 0;
 }
-.up-fade-down-enter.data-v-52d65444,
-.up-fade-down-leave-to.data-v-52d65444 {
-  transform: translateY(-100%);
+.up-fade-down-enter.data-v-52d65444,.up-fade-down-leave-to.data-v-52d65444 {
+  -webkit-transform: translateY(-100%);
+          transform: translateY(-100%);
   opacity: 0;
 }
-.up-fade-left-enter.data-v-52d65444,
-.up-fade-left-leave-to.data-v-52d65444 {
-  transform: translateX(-100%);
+.up-fade-left-enter.data-v-52d65444,.up-fade-left-leave-to.data-v-52d65444 {
+  -webkit-transform: translateX(-100%);
+          transform: translateX(-100%);
   opacity: 0;
 }
-.up-fade-right-enter.data-v-52d65444,
-.up-fade-right-leave-to.data-v-52d65444 {
-  transform: translateX(100%);
+.up-fade-right-enter.data-v-52d65444,.up-fade-right-leave-to.data-v-52d65444 {
+  -webkit-transform: translateX(100%);
+          transform: translateX(100%);
   opacity: 0;
 }
-.up-slide-down-enter-active.data-v-52d65444,
-.up-slide-down-leave-active.data-v-52d65444,
-.up-slide-left-enter-active.data-v-52d65444,
-.up-slide-left-leave-active.data-v-52d65444,
-.up-slide-right-enter-active.data-v-52d65444,
-.up-slide-right-leave-active.data-v-52d65444,
-.up-slide-up-enter-active.data-v-52d65444,
-.up-slide-up-leave-active.data-v-52d65444 {
+.up-slide-down-enter-active.data-v-52d65444,.up-slide-down-leave-active.data-v-52d65444,.up-slide-left-enter-active.data-v-52d65444,.up-slide-left-leave-active.data-v-52d65444,.up-slide-right-enter-active.data-v-52d65444,.up-slide-right-leave-active.data-v-52d65444,.up-slide-up-enter-active.data-v-52d65444,.up-slide-up-leave-active.data-v-52d65444 {
+  transition-property: -webkit-transform;
   transition-property: transform;
+  transition-property: transform, -webkit-transform;
 }
-.up-slide-up-enter.data-v-52d65444,
-.up-slide-up-leave-to.data-v-52d65444 {
-  transform: translateY(100%);
+.up-slide-up-enter.data-v-52d65444,.up-slide-up-leave-to.data-v-52d65444 {
+  -webkit-transform: translateY(100%);
+          transform: translateY(100%);
 }
-.up-slide-down-enter.data-v-52d65444,
-.up-slide-down-leave-to.data-v-52d65444 {
-  transform: translateY(-100%);
+.up-slide-down-enter.data-v-52d65444,.up-slide-down-leave-to.data-v-52d65444 {
+  -webkit-transform: translateY(-100%);
+          transform: translateY(-100%);
 }
-.up-slide-left-enter.data-v-52d65444,
-.up-slide-left-leave-to.data-v-52d65444 {
-  transform: translateX(-100%);
+.up-slide-left-enter.data-v-52d65444,.up-slide-left-leave-to.data-v-52d65444 {
+  -webkit-transform: translateX(-100%);
+          transform: translateX(-100%);
 }
-.up-slide-right-enter.data-v-52d65444,
-.up-slide-right-leave-to.data-v-52d65444 {
-  transform: translateX(100%);
+.up-slide-right-enter.data-v-52d65444,.up-slide-right-leave-to.data-v-52d65444 {
+  -webkit-transform: translateX(100%);
+          transform: translateX(100%);
 }
-.up-zoom-enter-active.data-v-52d65444,
-.up-zoom-leave-active.data-v-52d65444 {
+.up-zoom-enter-active.data-v-52d65444,.up-zoom-leave-active.data-v-52d65444 {
+  transition-property: -webkit-transform;
   transition-property: transform;
+  transition-property: transform, -webkit-transform;
 }
-.up-zoom-enter.data-v-52d65444,
-.up-zoom-leave-to.data-v-52d65444 {
-  transform: scale(0.95);
+.up-zoom-enter.data-v-52d65444,.up-zoom-leave-to.data-v-52d65444 {
+  -webkit-transform: scale(0.95);
+          transform: scale(0.95);
 }

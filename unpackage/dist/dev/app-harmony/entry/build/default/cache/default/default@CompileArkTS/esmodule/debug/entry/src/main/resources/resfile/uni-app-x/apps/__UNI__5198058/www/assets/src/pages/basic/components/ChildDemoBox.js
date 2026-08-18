@@ -1,13 +1,7 @@
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedData: _setSharedData, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataSlot: _createSharedDataSlot, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, createSharedDataFor: _createSharedDataFor, setSharedDataEvent: _setSharedDataEvent, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback } = globalThis.Vue;
-const __className = "GenSrcPagesBasicComponentsChildDemoBox";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "818042f2",
-  __className,
-  __filename: "src/pages/basic/components/ChildDemoBox.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "ChildDemoBox",
   props: {
     title: {
@@ -27,9 +21,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   },
   emits: ["add", "reset", "send-msg"],
   setup(__props, _a) {
-    var __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenSrcPagesBasicComponentsChildDemoBoxSharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
     const emit = __emit;
     const inputMsg = ref("Hello Parent from Child!");
     function handleAdd() {
@@ -52,65 +45,115 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         icon: "success"
       });
     }
-    return () => {
-      "raw js";
-      const _component_input = _resolveComponent("input");
-      _createSharedDataSlot("header", null, null, () => {
-        _renderSharedDataEffect(() => {
-          return _setSharedData(__sharedData, 0, _toDisplayString(__props.title));
-        });
-      });
-      _renderSharedDataEffect(() => {
-        return _setSharedData(__sharedData, 6, _toDisplayString(__props.count));
-      });
-      _createSharedDataFor(_setSharedDataScoped(__sharedData, 1, _createSharedDataVFor(__sharedDataScope, () => {
-        return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-      })), () => {
-        return __props.tags;
-      }, (__sharedData_VFor0, _for_item0, _for_key0) => {
-        _createSharedDataSlot("itemSlot", {
-          item: () => {
-            return _for_item0.value;
-          },
-          index: () => {
-            return _for_key0.value;
-          }
-        }, (data) => {
-          return _setSharedData(__sharedData_VFor0, 1, data);
-        }, () => {
-          _renderSharedDataEffect(() => {
-            _setSharedData(__sharedData_VFor0, 2, _toDisplayString(_for_key0.value + 1));
-            _setSharedData(__sharedData_VFor0, 3, _toDisplayString(_for_item0.value));
-          });
-        });
-        return null;
-      }, (__sharedData_VFor0, item, index) => {
-        return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
-      });
-      _setSharedDataEvent(__sharedData, 3, handleAdd);
-      _setSharedDataEvent(__sharedData, 4, handleReset);
-      const n24 = _createSharedDataComponentWithFallback(_component_input, "51e12f6b", {
-        value: () => {
-          return inputMsg.value;
-        },
-        "onUpdate:value": () => {
-          return (_value) => {
-            return inputMsg.value = _value;
-          };
-        },
-        placeholder: "输入要送回父组件的消息",
-        class: "text-12px flex-1 h-30px px-8px bg-white rounded-4px border-width-1px border-style-solid border-color-__cbd5e1_"
-      });
-      _setSharedData(__sharedData, 2, n24?.sharedData);
-      _setSharedDataEvent(__sharedData, 5, handleSendMsg);
-      _createSharedDataSlot("footer", null, null, () => {
-      });
-      return __sharedData;
-    };
+    const __returned__ = { emit, inputMsg, handleAdd, handleReset, handleSendMsg };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const ChildDemoBox = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "wtu-gcabbq-0": { "": { "backgroundColor": "#f1f5f9" } }, "wtu-1nivbe9-1": { "": { "--tw-font-weight": "var(--font-weight-bold, 700)", "fontWeight": 700 } }, "wtu-15nsgd4-2": { "": { "color": "#334155" } }, "wtu-182oteh-3": { "": { "backgroundColor": "#ffffff" } }, "wtu-c3ez2v-4": { "": { "color": "#475569" } }, "wtu-x7nkyg-5": { "": { "flexDirection": "row" } }, "wtu-ix6v4k-6": { "": { "alignItems": "center" } }, "wtu-grng8o-7": { "": { "color": "#64748b" } }, "wtu-18ekrle-8": { "": { "color": "#2563eb" } }, "wtu-zipktt-9": { "": { "backgroundColor": "#f8fafc" } }, "wtu-jpge2z-a": { "": { "justifyContent": "space-between" } }, "wtu-812ws7-b": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "wtu-s60y7a-c": { "": { "backgroundColor": "#2563eb" } }, "wtu-1pd1px4-d": { "": { "justifyContent": "center" } }, "wtu-ih0clp-e": { "": { "color": "#ffffff" } }, "wtu-4dipnu-f": { "": { "backgroundColor": "#dc2626" } }, "wtu-aufsc6-g": { "": { "backgroundColor": "#059669" } }, "wtu-1xb3h6w-h": { "": { "color": "#94a3b8" } } };
+const { renderSlot: _renderSlot, toDisplayString: _toDisplayString, createElementVNode: _createElementVNode, renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, vModelText: _vModelText, withDirectives: _withDirectives } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createElementBlock("view", { class: "wtu-gcabbq-0 rounded-12px p-14px border-width-1px border-style-solid border-color-[#cbd5e1]" }, [
+    _createElementVNode("view", { class: "mb-10px border-b-width-1px border-b-style-solid border-b-color-[#cbd5e1] pb-8px" }, [
+      _renderSlot(_ctx.$slots, "header", {}, () => [
+        _createElementVNode(
+          "text",
+          { class: "text-14px wtu-1nivbe9-1 wtu-15nsgd4-2" },
+          "📦 " + _toDisplayString($props.title) + "（默认 Header）",
+          1
+          /* TEXT */
+        )
+      ])
+    ]),
+    _createElementVNode("view", { class: "mb-12px wtu-182oteh-3 rounded-8px p-10px" }, [
+      _createElementVNode("text", { class: "text-12px wtu-1nivbe9-1 wtu-c3ez2v-4 mb-4px" }, "【父传子 Props 动态接收】"),
+      _createElementVNode("view", { class: "wtu-x7nkyg-5 wtu-ix6v4k-6" }, [
+        _createElementVNode("text", { class: "text-12px wtu-grng8o-7" }, "父组件传递的 Count: "),
+        _createElementVNode(
+          "text",
+          { class: "text-14px wtu-1nivbe9-1 wtu-18ekrle-8 ml-6px" },
+          _toDisplayString($props.count),
+          1
+          /* TEXT */
+        )
+      ])
+    ]),
+    _createElementVNode("view", { class: "mb-12px wtu-182oteh-3 rounded-8px p-10px" }, [
+      _createElementVNode("text", { class: "text-12px wtu-1nivbe9-1 wtu-c3ez2v-4 mb-6px" }, "【具名作用域插槽 (Slot 向父组件传参)】"),
+      (_openBlock(true), _createElementBlock(
+        _Fragment,
+        null,
+        _renderList($props.tags, (item, index) => {
+          return _openBlock(), _createElementBlock("view", {
+            key: index,
+            class: "mb-6px"
+          }, [
+            _renderSlot(_ctx.$slots, "itemSlot", {
+              item,
+              index
+            }, () => [
+              _createElementVNode("view", { class: "wtu-zipktt-9 rounded-4px p-6px" }, [
+                _createElementVNode(
+                  "text",
+                  { class: "text-12px wtu-grng8o-7" },
+                  "Tag " + _toDisplayString(index + 1) + ": " + _toDisplayString(item),
+                  1
+                  /* TEXT */
+                )
+              ])
+            ])
+          ]);
+        }),
+        128
+        /* KEYED_FRAGMENT */
+      ))
+    ]),
+    _createElementVNode("view", { class: "mb-10px wtu-182oteh-3 rounded-8px p-10px" }, [
+      _createElementVNode("text", { class: "text-12px wtu-1nivbe9-1 wtu-c3ez2v-4 mb-8px" }, "【子传父 Emits 事件触发】"),
+      _createElementVNode("view", { class: "wtu-x7nkyg-5 wtu-jpge2z-a wtu-ix6v4k-6 mb-8px" }, [
+        _createElementVNode("view", {
+          class: "wtu-812ws7-b wtu-s60y7a-c rounded-6px h-32px wtu-x7nkyg-5 wtu-ix6v4k-6 wtu-1pd1px4-d mr-6px",
+          onClick: $setup.handleAdd
+        }, [
+          _createElementVNode("text", { class: "wtu-ih0clp-e text-12px" }, "触发 Count + 1")
+        ]),
+        _createElementVNode("view", {
+          class: "wtu-812ws7-b wtu-4dipnu-f rounded-6px h-32px wtu-x7nkyg-5 wtu-ix6v4k-6 wtu-1pd1px4-d ml-6px",
+          onClick: $setup.handleReset
+        }, [
+          _createElementVNode("text", { class: "wtu-ih0clp-e text-12px" }, "触发 重置事件")
+        ])
+      ]),
+      _createElementVNode("view", { class: "wtu-zipktt-9 rounded-6px p-8px border-width-1px border-style-solid border-color-[#e2e8f0] wtu-x7nkyg-5 wtu-ix6v4k-6 wtu-jpge2z-a" }, [
+        _withDirectives(_createElementVNode(
+          "input",
+          {
+            "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.inputMsg = $event),
+            placeholder: "输入要送回父组件的消息",
+            class: "text-12px wtu-812ws7-b h-30px px-8px wtu-182oteh-3 rounded-4px border-width-1px border-style-solid border-color-[#cbd5e1]"
+          },
+          null,
+          512
+          /* NEED_PATCH */
+        ), [
+          [_vModelText, $setup.inputMsg]
+        ]),
+        _createElementVNode("view", {
+          class: "wtu-aufsc6-g rounded-6px h-30px px-10px wtu-x7nkyg-5 wtu-ix6v4k-6 wtu-1pd1px4-d ml-8px",
+          onClick: $setup.handleSendMsg
+        }, [
+          _createElementVNode("text", { class: "wtu-ih0clp-e text-12px" }, "发送给父组件")
+        ])
+      ])
+    ]),
+    _createElementVNode("view", { class: "pt-6px border-t-width-1px border-t-style-solid border-t-color-[#cbd5e1]" }, [
+      _renderSlot(_ctx.$slots, "footer", {}, () => [
+        _createElementVNode("text", { class: "text-11px wtu-1xb3h6w-h" }, "（默认 Footer）")
+      ])
+    ])
+  ]);
+}
+const ChildDemoBox = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/basic/components/ChildDemoBox.uvue"]]);
 export {
   ChildDemoBox as C
 };

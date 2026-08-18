@@ -187,7 +187,17 @@ function installRouteInterceptor() {
   uni.addInterceptor("switchTab", switchTabInterceptor);
   uni.addInterceptor("chooseLocation", chooseLocationInterceptor);
 }
+function checkDirectEntry(options = null) {
+  if (options != null) {
+    const pathVal = options.path;
+    if (pathVal != null && pathVal != "") {
+      let url = `/${pathVal}`;
+      navigateToInterceptor.invoke({ url });
+    }
+  }
+}
 export {
+  checkDirectEntry as c,
   installRouteInterceptor as i
 };
 //# sourceMappingURL=interceptor.js.map

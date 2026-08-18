@@ -2,15 +2,9 @@ import "../../libs/mixin/mixin.js";
 import { a as addUnit } from "../../libs/function/index.js";
 import "./countTo.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataStyle: _setSharedDataStyle, setSharedData: _setSharedData, toDisplayString: _toDisplayString, unref: _unref, renderSharedDataEffect: _renderSharedDataEffect } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpCountToUpCountTo";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref, computed } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "1e9399a0",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-count-to/up-count-to.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "up-count-to",
   props: {
     startVal: {
@@ -61,8 +55,6 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   emits: ["end"],
   setup(__props, _a) {
     var __expose = _a.expose, __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpCountToUpCountToSharedData", sharedDataClassId: 0 })));
     const props = __props;
     const emit = __emit;
     const countStyle = computed(() => {
@@ -78,7 +70,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     let paused = ref(false);
     let localDuration = ref(0);
     let startTime = ref(null);
-    ref(null);
+    let timestamp = ref(null);
     let remaining = ref(null);
     let rAF = ref(0);
     let lastTime = ref(0);
@@ -100,11 +92,11 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       }
       return x1 + x2;
     }
-    function animateCount(timestamp) {
+    function animateCount(timestamp2) {
       if (startTime.value == null)
-        startTime.value = timestamp;
-      timestamp = timestamp;
-      const progress = timestamp - startTime.value;
+        startTime.value = timestamp2;
+      timestamp2 = timestamp2;
+      const progress = timestamp2 - startTime.value;
       remaining.value = localDuration.value - progress;
       if (props.useEasing) {
         if (countDown) {
@@ -137,6 +129,9 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         emit("end");
       }
     }
+    function cancelAnimationFrame(id) {
+      clearTimeout(id);
+    }
     function start() {
       localStartVal.value = parseInt(props.startVal.toString());
       startTime.value = null;
@@ -162,6 +157,22 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         animateCount(currTime);
       }, 0);
     }
+    function reStart() {
+      if (paused.value) {
+        resume();
+        paused.value = false;
+      } else {
+        stop();
+        paused.value = true;
+      }
+    }
+    function reset() {
+      startTime.value = null;
+      if (rAF.value != null) {
+        cancelAnimationFrame(rAF.value);
+      }
+      displayValue.value = formatNumber(props.startVal.toString());
+    }
     function isNumber(val) {
       return !isNaN(parseFloat(val));
     }
@@ -171,23 +182,76 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     if (props.autoplay) {
       start();
     }
+    function destroyed() {
+      if (rAF.value != null) {
+        clearTimeout(rAF.value);
+      }
+    }
     __expose({
       start,
       stop,
       resume
     });
-    return () => {
-      "raw js";
-      _renderSharedDataEffect(() => {
-        _setSharedDataStyle(__sharedData, 0, countStyle.value);
-        _setSharedData(__sharedData, 1, _toDisplayString(_unref(displayValue)));
-      });
-      return __sharedData;
-    };
+    const __returned__ = { props, emit, countStyle, get localStartVal() {
+      return localStartVal;
+    }, set localStartVal(v) {
+      localStartVal = v;
+    }, get displayValue() {
+      return displayValue;
+    }, set displayValue(v) {
+      displayValue = v;
+    }, get printVal() {
+      return printVal;
+    }, set printVal(v) {
+      printVal = v;
+    }, get paused() {
+      return paused;
+    }, set paused(v) {
+      paused = v;
+    }, get localDuration() {
+      return localDuration;
+    }, set localDuration(v) {
+      localDuration = v;
+    }, get startTime() {
+      return startTime;
+    }, set startTime(v) {
+      startTime = v;
+    }, get timestamp() {
+      return timestamp;
+    }, set timestamp(v) {
+      timestamp = v;
+    }, get remaining() {
+      return remaining;
+    }, set remaining(v) {
+      remaining = v;
+    }, get rAF() {
+      return rAF;
+    }, set rAF(v) {
+      rAF = v;
+    }, get lastTime() {
+      return lastTime;
+    }, set lastTime(v) {
+      lastTime = v;
+    }, countDown, easingFn, formatNumber, animateCount, cancelAnimationFrame, start, stop, resume, reStart, reset, isNumber, destroyed };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = {"u-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-count-num":{"":{"display":"flex","textAlign":"center"}},"flex":{"":{"display":"flex"}}};
+const { toDisplayString: _toDisplayString, normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createElementBlock(
+    "text",
+    {
+      class: "up-count-num",
+      style: _normalizeStyle($setup.countStyle)
+    },
+    _toDisplayString($setup.displayValue),
+    5
+    /* TEXT, STYLE */
+  );
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-count-to/up-count-to.uvue"]]);
 export {
   __easycom_1 as _
 };

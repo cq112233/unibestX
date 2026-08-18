@@ -1,0 +1,762 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ.import { FrameNode } from "@ohos.arkui.node";
+import { typeNode } from "@ohos.arkui.node";
+import { SVGImageView, SVGBase } from '@ohos/svg';
+import util from "@ohos.util";
+import { UniElementImpl } from './UniElement';
+import { UniImageLoadEvent } from './UniImageLoadEvent';
+import { UniImageErrorEvent } from './UniImageErrorEvent';
+import { getFileURL } from '../helper';
+const IMAGE_MODE_DEFAULT = 'scaleToFill';
+const IMAGE_MODE_ASPECT_FIT = 'aspectFit';
+const IMAGE_MODE_ASPECT_FILL = 'aspectFill';
+const IMAGE_MODE_WIDTH_FIX = 'widthFix';
+const IMAGE_MODE_HEIGHT_FIX = 'heightFix';
+const WIDTH = 'width';
+const HEIGHT = 'height';
+const IMAGE_MODES = new Map([
+    [IMAGE_MODE_DEFAULT, ImageFit.Fill],
+    [IMAGE_MODE_ASPECT_FIT, ImageFit.Contain],
+    [IMAGE_MODE_ASPECT_FILL, ImageFit.Cover],
+    [IMAGE_MODE_WIDTH_FIX, ImageFit.Fill],
+    [IMAGE_MODE_HEIGHT_FIX, ImageFit.Fill],
+    ['top', ImageFit.TOP],
+    ['bottom', ImageFit.BOTTOM],
+    ['center', ImageFit.CENTER],
+    ['left', ImageFit.START],
+    ['right', ImageFit.END],
+    ['top left', ImageFit.TOP_START],
+    ['top right', ImageFit.TOP_END],
+    ['bottom left', ImageFit.BOTTOM_START],
+    ['bottom right', ImageFit.BOTTOM_END],
+]);
+const IMAGE_MODES_NORMAL = [
+    IMAGE_MODE_DEFAULT,
+    IMAGE_MODE_ASPECT_FIT,
+    IMAGE_MODE_ASPECT_FILL,
+    IMAGE_MODE_WIDTH_FIX,
+    IMAGE_MODE_HEIGHT_FIX,
+];
+const DEFAULT_WIDTH = 320;
+const DEFAULT_HEIGHT = 240;
+const RATIO_DEFAULT = -1;
+const SVGTagRegExp = /<\s*svg\b\s*[^>]*>([\s\S]*?)<\s*\/\s*svg\s*>/;
+export class UniImageElementImpl extends UniElementImpl {
+    get src() {
+        return this.getAttribute('src') ?? '';
+    }
+    get mode() {
+        return this.getAttribute('mode') ?? IMAGE_MODE_DEFAULT;
+    }
+    static get defaultStyle() {
+        // Bug åœ¨uni-app-x-runtimeç¼–è¯‘ä¸ºharåŒ…ä¸”è¢«å…¶ä»–haråŒ…å¼•ç”¨æ—¶çœç•¥æ­¤asä¼šå¯¼è‡´å¼•ç”¨uni-app-x-runtimeçš„haråŒ…æ— æ³•ç¼–è¯‘å‡º.haræ–‡ä»¶
+        const baseDefaultStyle = super.defaultStyle;
+        const defaultStyle = new Map(baseDefaultStyle);
+        defaultStyle.set(WIDTH, [DEFAULT_WIDTH + 'px', true]);
+        defaultStyle.set(HEIGHT, [DEFAULT_HEIGHT + 'px', true]);
+        return defaultStyle;
+    }
+    constructor(data, page) {
+        super(data, page);
+        this.ratio = RATIO_DEFAULT;
+        this.setMeasureFunction((width, widthMode, height, heightMode) => {
+            return this.measure(width, height);
+        });
+        // äº‹ä»¶ç›‘å¬åªèƒ½æ·»åŠ ä¸€ä¸ªï¼Œç»Ÿä¸€åœ¨æ­¤å¤„ç†
+        this.imageFrameNode.attribute.onComplete(event => {
+            if (event?.loadingStatus === 0) {
+                const ratio = event.width / event.height;
+                if (this.ratio !== ratio) {
+                    this.ratio = ratio;
+                    this.layoutNodeDirty(() => {
+                        this.imageFrameNode.attribute.visibility(Visibility.Visible);
+                    });
+                }
+            }
+            if (event?.loadingStatus === 1) {
+                // TODO ç¡®è®¤ä½¿ç”¨å“ªç§ width/contentWidth/componentWidth
+                this.onLoadCallback?.({
+                    width: event.width,
+                    height: event.height,
+                });
+            }
+        });
+    }
+    measure(width, height) {
+        const mode = this.mode;
+        const ratio = this.ratio;
+        // ä»…å¯¹ fix åçš„ç‰©ç†åƒç´ å€¼å‘ä¸‹å–æ•´
+        const calc = vp2px(1);
+        const floor = (value) => Math.floor(value * calc) / calc;
+        if (mode === IMAGE_MODE_WIDTH_FIX) {
+            height = ratio === RATIO_DEFAULT ? DEFAULT_HEIGHT : floor(width / ratio);
+        }
+        else if (mode === IMAGE_MODE_HEIGHT_FIX) {
+            width = ratio === RATIO_DEFAULT ? DEFAULT_WIDTH : floor(height * ratio);
+        }
+        return { width: width, height: height };
+    }
+    createFrameNode() {
+        const context = this.app.context;
+        const wrapper = new FrameNode(context);
+        wrapper.commonAttribute.clip(true);
+        const image = this.imageFrameNode = typeNode.createNode(context, 'Image');
+        // é»˜è®¤éšè—ï¼ŒåŠ è½½å®Œæˆåæ˜¾ç¤º
+        image.attribute.objectFit(IMAGE_MODES.get(IMAGE_MODE_DEFAULT)).visibility(Visibility.Hidden);
+        wrapper.appendChild(image);
+        this.model = new SVGImageView.SVGImageViewModel();
+        return wrapper;
+    }
+    onload() {
+        throw new Error('Method not implemented.');
+    }
+    initializeImageFrameNode(src) {
+        this.ratio = RATIO_DEFAULT;
+        // é»˜è®¤éšè—ï¼ŒåŠ è½½å®Œæˆåæ˜¾ç¤º
+        this.imageFrameNode.initialize(src || ImageContent.EMPTY).visibility(Visibility.Hidden);
+    }
+    updateNativeAttribute(key, value) {
+        switch (key) {
+            case 'src': {
+                let src = getFileURL(value);
+                // ä¸æ”¯æŒ data:image/*; éœ€è¦æ›¿æ¢ * ä¸º png|jpeg|bmp|webp|heif ä»»æ„æ ¼å¼
+                const dataImageFix = 'data:image/*';
+                if (typeof src === 'string' && src.startsWith(dataImageFix)) {
+                    let base64 = src.split(/^\s*data:image\/\*;\s*base64\s*,\s*/)[1];
+                    if (base64 && base64.length > 0) {
+                        try {
+                            const Base64Helper = new util.Base64Helper();
+                            const byteArray = Base64Helper.decodeSync(base64);
+                            const isSVGBase64 = SVGTagRegExp.test(SVGBase.unit8ArrayToString(byteArray));
+                            if (isSVGBase64) {
+                                this.model.getSVGPixelMap(byteArray).then(pixelMap => {
+                                    this.initializeImageFrameNode(pixelMap);
+                                }).catch((err) => {
+                                    this.dispatchEvent(new UniImageErrorEvent('error', {
+                                        errMsg: err.message,
+                                    }));
+                                });
+                                return;
+                            }
+                        }
+                        catch (e) {
+                            this.dispatchEvent(new UniImageErrorEvent('error', {
+                                errMsg: e.message,
+                            }));
+                        }
+                    }
+                    src = src.replace(dataImageFix, 'data:image/png');
+                }
+                this.initializeImageFrameNode(src);
+                break;
+            }
+            case 'mode': {
+                let imageFit = IMAGE_MODES.get(value);
+                if (imageFit) {
+                    this.imageFrameNode.attribute.objectFit(imageFit);
+                }
+                const commonAttribute = this.frameNode.commonAttribute;
+                const layoutNode = this.layoutNode;
+                if (value === IMAGE_MODE_WIDTH_FIX) {
+                    commonAttribute.height(undefined);
+                    layoutNode.setStyleHeight(NaN);
+                    this.layoutNodeDirty();
+                    this.styleFilter = HEIGHT;
+                }
+                else if (value === IMAGE_MODE_HEIGHT_FIX) {
+                    commonAttribute.width(undefined);
+                    layoutNode.setStyleWidth(NaN);
+                    this.layoutNodeDirty();
+                    this.styleFilter = WIDTH;
+                }
+                else {
+                    const styleFilter = this.styleFilter;
+                    if (styleFilter) {
+                        this.styleFilter = undefined;
+                        const layoutStyleArgs = this.layoutStyleArgs;
+                        if (layoutStyleArgs) {
+                            const value = layoutStyleArgs.get(styleFilter);
+                            this.updateLayoutNodeStyle(styleFilter, value[0], ...value[1]);
+                        }
+                        this.layoutNodeDirty();
+                    }
+                }
+                this.updateImageSize();
+                break;
+            }
+        }
+    }
+    updateLayoutNodeStyle(key, method, ...args) {
+        if (key === WIDTH || key === HEIGHT) {
+            let layoutStyleArgs = this.layoutStyleArgs;
+            if (!layoutStyleArgs) {
+                layoutStyleArgs = new Map();
+                this.layoutStyleArgs = layoutStyleArgs;
+            }
+            layoutStyleArgs.set(key, [method, args]);
+        }
+        const styleFilter = this.styleFilter;
+        if (styleFilter && styleFilter === key) {
+            return;
+        }
+        super.updateLayoutNodeStyle(key, method, ...args);
+    }
+    updateImageSize() {
+        // åŸç”Ÿ image ä½¿ç”¨ç‰©ç†åƒç´ ï¼Œéƒ¨åˆ†æ¨¡å¼éœ€è¦è½¬æ¢
+        let width;
+        let height;
+        let scale;
+        const imageAttribute = this.imageFrameNode.attribute;
+        if (IMAGE_MODES_NORMAL.includes(this.mode)) {
+            width = '100%';
+            height = '100%';
+            scale = 1;
+        }
+        else {
+            let nativeStyleArgs = this.nativeStyleArgs;
+            width = (nativeStyleArgs?.get(WIDTH) || 0) + 'px';
+            height = (nativeStyleArgs?.get(HEIGHT) || 0) + 'px';
+            scale = vp2px(1);
+        }
+        imageAttribute.width(width).height(height).scale({
+            x: scale,
+            y: scale,
+            centerX: 0,
+            centerY: 0,
+        });
+    }
+    updateNativeNodeStyle(key, value) {
+        if (key === WIDTH || key === HEIGHT) {
+            let nativeStyleArgs = this.nativeStyleArgs;
+            if (!nativeStyleArgs) {
+                nativeStyleArgs = new Map();
+                this.nativeStyleArgs = nativeStyleArgs;
+            }
+            nativeStyleArgs.set(key, value);
+            this.updateImageSize();
+        }
+        else if (key === 'clip') {
+            return;
+        }
+        if (key === 'pixelRound') {
+            // ä¸å¤–å±‚é‡‡ç”¨ä¸€è‡´çš„åƒç´ å–æ•´ç­–ç•¥
+            this.imageFrameNode.attribute.pixelRound(value);
+        }
+        super.updateNativeNodeStyle(key, value);
+    }
+    initNativeEvent(type) {
+        switch (type) {
+            case 'load': {
+                this.onLoadCallback = (event) => {
+                    this.dispatchEvent(new UniImageLoadEvent('load', event));
+                };
+                break;
+            }
+            case 'error':
+                this.imageFrameNode.attribute.onError((error) => {
+                    const errMsg = error.message;
+                    // å±è”½é¦–æ¬¡åŠ è½½ ImageContent.EMPTY æŠ¥é”™ empty sourceFailed to create image loader, Image source type not supported
+                    if (errMsg.includes('empty sourceFailed')) {
+                        return;
+                    }
+                    this.dispatchEvent(new UniImageErrorEvent('error', {
+                        errMsg,
+                    }));
+                });
+                break;
+            default:
+                super.initNativeEvent(type);
+                break;
+        }
+    }
+    deleteNativeEvent(type, res) {
+        switch (type) {
+            case 'load': {
+                this.onLoadCallback = undefined;
+                return true;
+            }
+            case 'error':
+                this.imageFrameNode.attribute.onError(undefined);
+                return true;
+            default:
+                return super.deleteNativeEvent(type, res);
+        }
+    }
+    dispose() {
+        this.imageFrameNode.attribute.onComplete(undefined).onError(undefined);
+        this.imageFrameNode.dispose();
+        super.dispose();
+    }
+}
+//# sourceMappingURL=UniImageElement.js.mapÂ—Ùm hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.arkui.node.d.tsÙŒ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@ohos+svg@2.2.3/oh_modules/@ohos/svg/index.etsÙg hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.util.d.tsÙõ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/UniElement.etsÙû/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/UniImageLoadEvent.tsÙü/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/UniImageErrorEvent.tsÙó/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/helper/index.etsÙú/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/UniImageElement.etsÔrB˜±isLocalDependency¯isNodeEntryFile§pkgPath§pkgNameªpkgVersion±belongProjectPath±dependencyPkgInfo¬shouldEmitJsÂÂÙâ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime½@dcloudio/uni-runtime-harmony¥1.0.0ÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmonyÔrC’§pkgNameªpkgVersion½@dcloudio/uni-runtime-harmony¥1.0.0ÃÃÚ*Cimport { UniImageElement as IUniImageElement, INodeData } from '@dcloudio/uni-app-x/types/native'
+import { FrameNode, typeNode } from '@kit.ArkUI'
+import { SVGImageView, SVGBase } from '@ohos/svg';
+import { util } from '@kit.ArkTS';
+import { UniElementImpl } from './UniElement'
+import { UniImageLoadEvent } from './UniImageLoadEvent'
+import { UniImageErrorEvent } from './UniImageErrorEvent'
+import { getFileURL } from '../helper'
+import { UniNativePageImpl } from './UniNativePage'
+import { BusinessError } from '@kit.BasicServicesKit';
+
+const IMAGE_MODE_DEFAULT = 'scaleToFill'
+const IMAGE_MODE_ASPECT_FIT = 'aspectFit'
+const IMAGE_MODE_ASPECT_FILL = 'aspectFill'
+const IMAGE_MODE_WIDTH_FIX = 'widthFix'
+const IMAGE_MODE_HEIGHT_FIX = 'heightFix'
+const WIDTH = 'width'
+const HEIGHT = 'height'
+
+const IMAGE_MODES = new Map<string, ImageFit>([
+  [IMAGE_MODE_DEFAULT, ImageFit.Fill],
+  [IMAGE_MODE_ASPECT_FIT, ImageFit.Contain],
+  [IMAGE_MODE_ASPECT_FILL, ImageFit.Cover],
+  [IMAGE_MODE_WIDTH_FIX, ImageFit.Fill],
+  [IMAGE_MODE_HEIGHT_FIX, ImageFit.Fill],
+  ['top', ImageFit.TOP],
+  ['bottom', ImageFit.BOTTOM],
+  ['center', ImageFit.CENTER],
+  ['left', ImageFit.START],
+  ['right', ImageFit.END],
+  ['top left', ImageFit.TOP_START],
+  ['top right', ImageFit.TOP_END],
+  ['bottom left', ImageFit.BOTTOM_START],
+  ['bottom right', ImageFit.BOTTOM_END],
+])
+
+const IMAGE_MODES_NORMAL = [
+  IMAGE_MODE_DEFAULT,
+  IMAGE_MODE_ASPECT_FIT,
+  IMAGE_MODE_ASPECT_FILL,
+  IMAGE_MODE_WIDTH_FIX,
+  IMAGE_MODE_HEIGHT_FIX,
+]
+
+interface Size {
+  width: number
+  height: number
+}
+
+const DEFAULT_WIDTH = 320
+const DEFAULT_HEIGHT = 240
+const RATIO_DEFAULT = -1
+const SVGTagRegExp = /<\s*svg\b\s*[^>]*>([\s\S]*?)<\s*\/\s*svg\s*>/
+
+export class UniImageElementImpl
+  extends UniElementImpl<FrameNode>
+implements IUniImageElement {
+  get src(): string {
+    return this.getAttribute('src') ?? ''
+  }
+
+  private get mode(): string {
+    return this.getAttribute('mode') ?? IMAGE_MODE_DEFAULT
+  }
+
+  private styleFilter?: string
+  private nativeStyleArgs ?: Map<string, Object>
+  private layoutStyleArgs ?: Map<string, [string, Array<Object | undefined>]>
+  private ratio: number = RATIO_DEFAULT
+  private onLoadCallback?: (event: Size) => void
+  private imageFrameNode!: typeNode.Image
+  private model!: SVGImageView.SVGImageViewModel
+
+  static override get defaultStyle() {
+    // Bug åœ¨uni-app-x-runtimeç¼–è¯‘ä¸ºharåŒ…ä¸”è¢«å…¶ä»–haråŒ…å¼•ç”¨æ—¶çœç•¥æ­¤asä¼šå¯¼è‡´å¼•ç”¨uni-app-x-runtimeçš„haråŒ…æ— æ³•ç¼–è¯‘å‡º.haræ–‡ä»¶
+    const baseDefaultStyle = super.defaultStyle as Map<string, [string] | [string, boolean]>
+    const defaultStyle = new Map(baseDefaultStyle)
+
+    defaultStyle.set(WIDTH, [DEFAULT_WIDTH + 'px', true])
+    defaultStyle.set(HEIGHT, [DEFAULT_HEIGHT + 'px', true])
+    return defaultStyle
+  }
+
+  constructor(data?: INodeData, page?: UniNativePageImpl) {
+    super(data, page)
+    this.setMeasureFunction((width, widthMode, height, heightMode) => {
+      return this.measure(width, height)
+    })
+    // äº‹ä»¶ç›‘å¬åªèƒ½æ·»åŠ ä¸€ä¸ªï¼Œç»Ÿä¸€åœ¨æ­¤å¤„ç†
+    this.imageFrameNode.attribute.onComplete(event => {
+      if (event?.loadingStatus === 0) {
+        const ratio = event.width / event.height
+        if (this.ratio !== ratio) {
+          this.ratio = ratio
+          this.layoutNodeDirty(() => {
+            this.imageFrameNode.attribute.visibility(Visibility.Visible)
+          })
+        }
+      }
+      if (event?.loadingStatus === 1) {
+        // TODO ç¡®è®¤ä½¿ç”¨å“ªç§ width/contentWidth/componentWidth
+        this.onLoadCallback?.({
+          width: event.width,
+          height: event.height,
+        })
+      }
+    })
+  }
+
+  private measure(width: number, height: number): Size {
+    const mode = this.mode
+    const ratio = this.ratio
+    // ä»…å¯¹ fix åçš„ç‰©ç†åƒç´ å€¼å‘ä¸‹å–æ•´
+    const calc = vp2px(1)
+    const floor = (value: number) => Math.floor(value * calc) / calc
+    if (mode === IMAGE_MODE_WIDTH_FIX) {
+      height = ratio === RATIO_DEFAULT ? DEFAULT_HEIGHT : floor(width / ratio)
+    } else if (mode === IMAGE_MODE_HEIGHT_FIX) {
+      width = ratio === RATIO_DEFAULT ? DEFAULT_WIDTH : floor(height * ratio)
+    }
+    return { width: width, height: height }
+  }
+
+  protected override createFrameNode(): FrameNode {
+    const context = this.app.context!
+    const wrapper = new FrameNode(context)
+    wrapper.commonAttribute.clip(true)
+    const image = this.imageFrameNode = typeNode.createNode(context, 'Image')
+    // é»˜è®¤éšè—ï¼ŒåŠ è½½å®Œæˆåæ˜¾ç¤º
+    image.attribute.objectFit(IMAGE_MODES.get(IMAGE_MODE_DEFAULT)).visibility(Visibility.Hidden)
+    wrapper.appendChild(image)
+    this.model = new SVGImageView.SVGImageViewModel();
+    return wrapper
+  }
+
+  onload(): void | null {
+    throw new Error('Method not implemented.')
+  }
+
+  private initializeImageFrameNode(src: string | PixelMap) {
+    this.ratio = RATIO_DEFAULT
+    // é»˜è®¤éšè—ï¼ŒåŠ è½½å®Œæˆåæ˜¾ç¤º
+    this.imageFrameNode.initialize(src || ImageContent.EMPTY).visibility(Visibility.Hidden)
+  }
+
+  override updateNativeAttribute(key: string, value: ESObject): void {
+    switch (key) {
+      case 'src': {
+        let src = getFileURL(value)
+        // ä¸æ”¯æŒ data:image/*; éœ€è¦æ›¿æ¢ * ä¸º png|jpeg|bmp|webp|heif ä»»æ„æ ¼å¼
+        const dataImageFix = 'data:image/*'
+        if (typeof src === 'string' && src.startsWith(dataImageFix)) {
+          let base64 = src.split(/^\s*data:image\/\*;\s*base64\s*,\s*/)[1]
+          if (base64 && base64.length > 0) {
+            try {
+              const Base64Helper = new util.Base64Helper()
+              const byteArray = Base64Helper.decodeSync(base64)
+              const isSVGBase64 = SVGTagRegExp.test(SVGBase.unit8ArrayToString(byteArray))
+              if (isSVGBase64) {
+                this.model.getSVGPixelMap(byteArray).then(pixelMap => {
+                  this.initializeImageFrameNode(pixelMap)
+                }).catch((err: BusinessError) => {
+                  this.dispatchEvent(new UniImageErrorEvent('error', {
+                    errMsg: err.message,
+                  }))
+                })
+                return
+              }
+            } catch (e) {
+              this.dispatchEvent(new UniImageErrorEvent('error', {
+                errMsg: (e as BusinessError).message,
+              }))
+            }
+          }
+          src = (src as string).replace(dataImageFix, 'data:image/png')
+        }
+        this.initializeImageFrameNode(src)
+        break
+      }
+      case 'mode': {
+        let imageFit = IMAGE_MODES.get(value)
+        if (imageFit) {
+          this.imageFrameNode.attribute.objectFit(imageFit)
+        }
+        const commonAttribute = this.frameNode.commonAttribute
+        const layoutNode = this.layoutNode
+        if (value === IMAGE_MODE_WIDTH_FIX) {
+          commonAttribute.height(undefined)
+          layoutNode.setStyleHeight(NaN)
+          this.layoutNodeDirty()
+          this.styleFilter = HEIGHT
+        } else if (value === IMAGE_MODE_HEIGHT_FIX) {
+          commonAttribute.width(undefined)
+          layoutNode.setStyleWidth(NaN)
+          this.layoutNodeDirty()
+          this.styleFilter = WIDTH
+        } else {
+          const styleFilter = this.styleFilter
+          if (styleFilter) {
+            this.styleFilter = undefined
+            const layoutStyleArgs = this.layoutStyleArgs
+            if (layoutStyleArgs) {
+              const value = layoutStyleArgs.get(styleFilter)!
+              this.updateLayoutNodeStyle(styleFilter, value[0], ...value[1])
+            }
+            this.layoutNodeDirty()
+          }
+        }
+        this.updateImageSize()
+        break
+      }
+    }
+  }
+
+  protected updateLayoutNodeStyle(key: string, method: string, ...args: Array<Object | undefined>): void {
+    if (key === WIDTH || key === HEIGHT) {
+      let layoutStyleArgs = this.layoutStyleArgs
+      if (!layoutStyleArgs) {
+        layoutStyleArgs = new Map()
+        this.layoutStyleArgs = layoutStyleArgs
+      }
+      layoutStyleArgs.set(key, [method, args])
+    }
+    const styleFilter = this.styleFilter
+    if (styleFilter && styleFilter === key) {
+      return
+    }
+    super.updateLayoutNodeStyle(key, method, ...args)
+  }
+
+  private updateImageSize(): void {
+    // åŸç”Ÿ image ä½¿ç”¨ç‰©ç†åƒç´ ï¼Œéƒ¨åˆ†æ¨¡å¼éœ€è¦è½¬æ¢
+    let width: Length
+    let height: Length
+    let scale: number
+    const imageAttribute = this.imageFrameNode.attribute
+    if (IMAGE_MODES_NORMAL.includes(this.mode)) {
+      width = '100%'
+      height = '100%'
+      scale = 1
+    } else {
+      let nativeStyleArgs = this.nativeStyleArgs
+      width = (nativeStyleArgs?.get(WIDTH) || 0) as number + 'px'
+      height = (nativeStyleArgs?.get(HEIGHT) || 0) as number + 'px'
+      scale = vp2px(1)
+    }
+    imageAttribute.width(width).height(height).scale({
+      x: scale,
+      y: scale,
+      centerX: 0,
+      centerY: 0,
+    })
+  }
+
+  override updateNativeNodeStyle(key: string, value: Object): void {
+    if (key === WIDTH || key === HEIGHT) {
+      let nativeStyleArgs = this.nativeStyleArgs
+      if (!nativeStyleArgs) {
+        nativeStyleArgs = new Map<string, Object>()
+        this.nativeStyleArgs = nativeStyleArgs
+      }
+      nativeStyleArgs.set(key, value)
+      this.updateImageSize()
+    } else if (key === 'clip') {
+      return
+    }
+    if (key === 'pixelRound') {
+      // ä¸å¤–å±‚é‡‡ç”¨ä¸€è‡´çš„åƒç´ å–æ•´ç­–ç•¥
+      this.imageFrameNode.attribute.pixelRound(value as PixelRoundPolicy)
+    }
+    super.updateNativeNodeStyle(key, value)
+  }
+
+  protected override initNativeEvent(type: string): void | Object {
+    switch (type) {
+      case 'load': {
+        this.onLoadCallback = (event: Size) => {
+          this.dispatchEvent(new UniImageLoadEvent('load', event))
+        }
+        break
+      }
+      case 'error':
+        this.imageFrameNode.attribute.onError((error) => {
+          const errMsg = error.message
+          // å±è”½é¦–æ¬¡åŠ è½½ ImageContent.EMPTY æŠ¥é”™ empty sourceFailed to create image loader, Image source type not supported
+          if (errMsg.includes('empty sourceFailed')) {
+            return
+          }
+          this.dispatchEvent(new UniImageErrorEvent('error', {
+            errMsg,
+          }))
+        })
+        break
+      default:
+        super.initNativeEvent(type)
+        break
+    }
+  }
+
+  protected override deleteNativeEvent(type: string, res: void | Object): boolean {
+    switch (type) {
+      case 'load': {
+        this.onLoadCallback = undefined
+        return true
+      }
+      case 'error':
+        this.imageFrameNode.attribute.onError(undefined)
+        return true
+      default:
+        return super.deleteNativeEvent(type, res)
+    }
+  }
+
+  override dispose(): void {
+    this.imageFrameNode.attribute.onComplete(undefined).onError(undefined)
+    this.imageFrameNode.dispose()
+    super.dispose()
+  }
+}
+ÀÔrD—°@ohos.arkui.nodeª@ohos.util´./UniImageErrorEvent¬./UniElement³./UniImageLoadEvent©../helper©@ohos/svgÔrE—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÃÙm hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.arkui.node.d.tsAÃªoh-resolveÂEAÃÙg hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.util.d.tsAÃªoh-resolveÂEAÂÙü/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/UniImageErrorEvent.tsAÃªoh-resolveÂEAÂÙõ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/UniElement.etsAÃªoh-resolveÂEAÂÙû/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/UniImageLoadEvent.tsAÃªoh-resolveÂEAÂÙó/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/helper/index.etsAÃªoh-resolveÂEAÂÙŒ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@ohos+svg@2.2.3/oh_modules/@ohos/svg/index.etsAÃªoh-resolveÂ“ÔrF–§version¤fileªsourceRoot§sources¥names¨mappings²UniImageElement.js ‘³UniImageElement.etsÜ!˜”   ” 	”	 	” ” ” $”, 0”- 0˜”   ” ”	 ” ” ” $”+ 0”, 0š”   ” ”	 	” ” ” ”   ”& &”1 1”2 2–”   ” 	” ” ” !” "˜”   ” ”	 	” ” ” ”- -”. -˜”   ” ”	 	” ” ”" "”7 7”8 7˜”   ” ”	 	” ” ”# #”9 9”: 9˜”   ” ”	 	” ” ” ”& &”' &–”   ” ” ” ”( (”) (–”   ” ” ” ”) )”* )–”   ” ” ” ”+ +”, +–”   ” ” ” ”' '”( '–”   ” ” ” ”) )”* )–”   ” ” ” ” ” –”   ” ” ” ” ” —”   ” ” ” ” ” ” .˜” ” ” ” ”! ”"  ”& $”' %˜” ” ” ” ”$ "”% #”, *”- +˜” ” ” ” ”% #”& $”+ )”, *˜” ” ” ” ”# !”$ "”( &”) '˜” ” ” ” ”$ "”% #”) '”* (˜” ” ”
+ ” 
+” ” ” ” ˜” ” ” ” ” ” ” ” ˜” ” ” ” ” ” ” ” ˜” ” ” 	” ” ” ” ” ˜” ” ” 
+” ” ” ” ” ˜” ” ” ” ” ” ”# !”$ "˜” ” ” ” ” ” ”"  ”# !˜”  ”  ”  ”  ”  ”  ”)  '”*  (˜” !” !” !” !” !” !”( !&”) !'“” "” "” "””  $ ” $” $” $’” %” %’” &” &’” '” '’” (” (’” )” )’” *” *–”  1 ” 1” 1” 1” 1” 1–”  2 ” 2” 2” 2” 2” 2—”  3 ” 3” 3” 3” 3” 3” 3–”  4 ” 4” 4” 4”ÌC 4ÌC”ÌD 4ÌC–”  6 ” 6” 6”  7”) 7
+”7 7#“” 9” 9” 9	›” :” :” :” :”  :”! :”& :"”' :#”+ :'”- :)”. :)’” ;” ;“” =” =” =›” >” >” >” >”  >”! >”' >#”( >$”, >(”> >:”? >:’” ?” ?”” ÌI”
+ ÌI” ÌI” ÌI"’” ÌJ”Ì^ ÌJÌZ˜” ÌK” ÌK
+” ÌK”! ÌK”& ÌK"”' ÌK#”3 ÌKÌ\”4 ÌKÌ\š” ÌL” ÌL
+” ÌL” ÌL”! ÌL”$ ÌL ”% ÌL!”5 ÌL1”6 ÌL2”7 ÌL2Ü ” ÌN” ÌN” ÌN” ÌN” ÌN” ÌN”  ÌN”! ÌN”. ÌN*”1 ÌN-”5 ÌN1”7 ÌN3”; ÌN7”< ÌN8”= ÌN9”> ÌN9Ü ” ÌO” ÌO” ÌO” ÌO” ÌO” ÌO”! ÌO”" ÌO”0 ÌO,”3 ÌO/”7 ÌO3”9 ÌO5”= ÌO9”> ÌO:”? ÌO;”Ì@ ÌO;”” ÌP” ÌP” ÌP” ÌP’” ÌQ” ÌQ•” ÌS” ÌS” ÌS” ÌS ” ÌS8˜” ÌT” ÌT	” ÌT
+” ÌT” ÌT” ÌT” ÌT” ÌT•” ÌD
+” ÌD” ÌD”" ÌD'”# ÌD'Ÿ” ÌU” ÌU” ÌU	” ÌU”  ÌU”! ÌU”& ÌU"”( ÌU$”1 ÌU-”3 ÌU/”9 ÌU5”; ÌU7”ÌE ÌUÌA”ÌG ÌUÌC”ÌI ÌUÌE›” ÌV” ÌV” ÌV” ÌV” ÌV”  ÌV”% ÌV”' ÌV!”- ÌV'”. ÌV(”/ ÌV(”” ÌW”	 ÌW”
+ ÌW” ÌW’” ÌX” ÌXœ” ÌY” ÌY” ÌY	” ÌY” ÌY”% ÌY!”& ÌY"”0 ÌY,”1 ÌY-”6 ÌY2”7 ÌY3”9 ÌY5˜” ÌZ” ÌZ
+” ÌZ” ÌZ”$ ÌZ”) ÌZ#”* ÌZ$”, ÌZ&œ” Ì[” Ì[” Ì[” Ì[”# Ì[”$ Ì[”) Ì[!”, Ì[$”1 Ì[)”2 Ì[*”8 Ì[0”9 Ì[0˜” Ì\” Ì\” Ì\” Ì\” Ì\”# Ì\”( Ì\ ”* Ì\"—” Ì]
+” Ì]” Ì]” Ì]”! Ì]”& Ì]”' Ì]—” Ì^
+” Ì^” Ì^”( Ì^”) Ì^”, Ì^"”. Ì^$” Ì_” Ì_” Ì_”+ Ì_”, Ì_ ”5 Ì_)”6 Ì_*”Ì@ Ì_4”ÌA Ì_5”ÌK Ì_?”ÌL Ì_Ì@”ÌS Ì_ÌG”ÌT Ì_ÌH”ÌU Ì_ÌH”” Ì`
+” Ì`” Ì`” Ì`‘” Ìa	‘” Ìb˜” Ìc” Ìc
+” Ìc” Ìc”$ Ìc”) Ìc#”* Ìc$”, Ìc&’” Ìd”Ì@ Ìd8–” Ìe” Ìe” Ìe”# Ìe”% Ìe”& Ìe–” Ìf
+” Ìf” Ìf”  Ìf”! Ìf”& Ìf–” Ìg
+” Ìg” Ìg”! Ìg”" Ìg”( Ìg“” Ìh	” Ìh
+” Ìh
+‘” Ìi”” Ìj”	 Ìj”
+ Ìj” Ìj’” Ìk” Ìk–” Ìm
+” Ìm” Ìm” Ìm” Ìm!” Ìm/˜” Ìn” Ìn
+” Ìn” Ìn” Ìn” Ìn” Ìn” Ìn˜” Ìo” Ìo
+” Ìo” Ìo” Ìo” Ìo”  Ìo”! Ìo’” Ìp” Ìp™” Ìq” Ìq
+” Ìq” Ìq” Ìq” Ìq” Ìq” Ìq” ÌqÜ ” Ìr” Ìr
+” Ìr” Ìr” Ìr” Ìr ” Ìr"”  Ìr$”! Ìr%”% Ìr)”& Ìr*”+ Ìr/”, Ìr0”1 Ìr5”4 Ìr8”8 Ìr<”9 Ìr=”< ÌrÌ@”Ì@ ÌrÌD”ÌA ÌrÌD–” Ìs” Ìs” Ìs” Ìs”) Ìs%”+ Ìs'Ü ” Ìt” Ìt” Ìt” Ìt” Ìt”, Ìt&”- Ìt'”. Ìt(”/ Ìt)”= Ìt7”> Ìt8”? Ìt9”Ì@ Ìt:”ÌE Ìt?”ÌF ÌtÌ@”ÌK ÌtÌE”ÌN ÌtÌH”ÌS ÌtÌM”ÌT ÌtÌN”ÌU ÌtÌN‘”	 Ìu–” Ìu” Ìu” Ìu” Ìu”/ Ìu-”1 Ìu/Ü ” Ìv” Ìv” Ìv” Ìv” Ìv”+ Ìv%”, Ìv&”- Ìv'”. Ìv(”; Ìv5”< Ìv6”= Ìv7”> Ìv8”ÌC Ìv=”ÌD Ìv>”ÌJ ÌvÌD”ÌM ÌvÌG”ÌR ÌvÌL”ÌS ÌvÌM”ÌT ÌvÌM‘”	 Ìwœ” Ìx” Ìx” Ìx” Ìx” Ìx” Ìx” Ìx”% Ìx!”' Ìx#”- Ìx)”/ Ìx+”0 Ìx+’” Ìy” Ìy’” Ì{” Ì{$š” Ì|” Ì|
+” Ì|” Ì|” Ì|” Ì|”  Ì|”! Ì|”( Ì|%”) Ì|%š” Ì}” Ì}
+” Ì}” Ì}” Ì}”% Ì}!”& Ì}"”- Ì})”. Ì}*”/ Ì}*š” Ì~” Ì~” Ì~” Ì~”  Ì~”$ Ì~ ”% Ì~!”) Ì~%”* Ì~&”+ Ì~&Ü ” Ì” Ì
+” Ì” Ì” Ì” Ì”) Ì%”, Ì(”4 Ì0”5 Ì1”? Ì;”Ì@ Ì<”ÌG ÌÌC”ÌI ÌÌE”ÌP ÌÌL”ÌQ ÌÌM”ÌR ÌÌM’” Ì€” Ì€Ü ” Ì” Ì	” Ì
+” Ì” Ì”! Ì”" Ì”- Ì)”. Ì*”1 Ì-”2 Ì.”ÌD ÌÌ@”ÌE ÌÌA”ÌF ÌÌB”ÌG ÌÌC”ÌQ ÌÌM”ÌR ÌÌN”Ì\ ÌÌX”Ì] ÌÌY”Ìc ÌÌ_”Ìd ÌÌ`”Ìe ÌÌ`˜” Ì‚” Ì‚” Ì‚” Ì‚” Ì‚”! Ì‚”" Ì‚”# Ì‚›” Ìƒ” Ìƒ” Ìƒ	” Ìƒ” Ìƒ” Ìƒ”% Ìƒ!”& Ìƒ"”7 Ìƒ3”9 Ìƒ5”: Ìƒ6”” Ì„” Ì„” Ì„” Ì„’” Ì…” Ì…’” Ì‡”
+ Ì‡˜” Ìˆ” Ìˆ
+” Ìˆ” Ìˆ” Ìˆ”1 Ìˆ-”2 Ìˆ.”3 Ìˆ.’” Ì‰” Ì‰”” Ì‹
+” Ì‹"” Ì‹#”  Ì‹9—” ÌŒ” ÌŒ” ÌŒ	” ÌŒ” ÌŒ”" ÌŒ”# ÌŒ’” Ì” ÌÜ ” Ì” Ì” Ì	” Ì” Ì”& Ì"”' Ì#”* Ì&”. Ì*”: Ì6”; Ì7”Ì@ Ì<”ÌA Ì=”ÌB Ì>”ÌL ÌÌH”ÌM ÌÌI”ÌW ÌÌS”ÌX ÌÌT”Ì^ ÌÌZ”Ì_ ÌÌ[”Ì` ÌÌ[’” Ì” Ì–” Ì‘” Ì‘ ” Ì‘!” Ì‘,” Ì‘.”$ Ì‘=”” Ì’” Ì’” Ì’” Ì’•” Ì“” Ì“” Ì“” Ì“” Ì“™” Ì”” Ì”” Ì”” Ì””$ Ì””% Ì””* Ì”"”+ Ì”#”, Ì”#’” Ì•”ÌI Ì•ÌA–” Ì–” Ì–”" Ì–”% Ì–”3 Ì–+”4 Ì–+” Ì—” Ì—” Ì—” Ì—”# Ì—”+ Ì—#”/ Ì—'”2 Ì—*”3 Ì—+”= Ì—5”> Ì—6”ÌJ Ì—ÌB”ÌK Ì—ÌC”ÌM Ì—ÌE” Ì˜
+” Ì˜” Ì˜”! Ì˜”$ Ì˜”% Ì˜”* Ì˜ ”+ Ì˜!”ÌP Ì˜ÌF”ÌQ Ì˜ÌG”ÌR Ì˜ÌH”ÌS Ì˜ÌI”ÌT Ì˜ÌJ”ÌU Ì˜ÌJš” Ì™
+” Ì™” Ì™”" Ì™”( Ì™”) Ì™”/ Ì™%”2 Ì™(”3 Ì™)”5 Ì™+’” Ìš” Ìšš” Ì›”" Ì›”. Ì› ”1 Ì›#”5 Ì›'”9 Ì›+”: Ì›,”ÌF Ì›8”ÌH Ì›:”ÌI Ì›:›” Ìœ”" Ìœ”+ Ìœ”. Ìœ ”: Ìœ,”; Ìœ-”ÌE Ìœ7”ÌF Ìœ8”ÌL Ìœ>”ÌM Ìœ?”ÌN Ìœ?Ü ” Ì”" Ì”- Ì”0 Ì"”< Ì.”= Ì/”ÌA Ì3”ÌB Ì4”ÌI Ì;”ÌJ Ì<”Ì\ ÌÌN”Ì] ÌÌO”Ìf ÌÌX”Ìg ÌÌY”Ìh ÌÌZ”Ìi ÌÌZ”” Ì”  Ì”+ Ì”- ÌŸ”  ÌŸ”$ ÌŸ”% ÌŸ”* ÌŸ”+ ÌŸ”9 ÌŸ)”: ÌŸ*”ÌC ÌŸ3”ÌD ÌŸ4”ÌE ÌŸ5”ÌI ÌŸ9”ÌJ ÌŸ:”ÌR ÌŸÌB”ÌS ÌŸÌC”ÌU ÌŸÌE˜”$ Ì ”( Ì ”) Ì ”ÌA Ì /”ÌB Ì 0”ÌJ Ì 8”ÌK Ì 9”ÌL Ì 9š”  Ì¡”! Ì¡”" Ì¡”# Ì¡”( Ì¡”) Ì¡”* Ì¡”- Ì¡,”/ Ì¡.”1 Ì¡0š”$ Ì¢”( Ì¢”) Ì¢”6 Ì¢$”7 Ì¢%”; Ì¢)”ÌM Ì¢;”ÌN Ì¢<”ÌU Ì¢ÌC”ÌW Ì¢ÌE–”( Ì£”. Ì£”0 Ì£”3 Ì£”4 Ì£ ”; Ì£'””% Ì¤”& Ì¤”' Ì¤”( Ì¤””  Ì¥”! Ì¥”" Ì¥”# Ì¥’”  Ì¦”' Ì¦‘” Ì§‘” Ì¨”” Ì¨” Ì¨”  Ì¨”" Ì¨š” Ì©”  Ì©”! Ì©”. Ì© ”/ Ì©!”3 Ì©%”ÌE Ì©7”ÌF Ì©8”ÌM Ì©?”ÌO Ì©ÌA–”  Ìª”& Ìª”( Ìª”) Ìª,”* Ìª-”1 Ìª4”” Ì«” Ì«” Ì«”  Ì«‘” Ì¬‘” Ì­œ” Ì®
+” Ì®” Ì®” Ì®” Ì® ”% Ì®'”& Ì®(”2 Ì®4”4 Ì®6”ÌD Ì®ÌF”ÌE Ì®ÌG”ÌF Ì®ÌG‘” Ì¯	˜” Ì°” Ì°” Ì°”- Ì°%”. Ì°&”1 Ì°)”2 Ì°*”3 Ì°*’” Ì±” Ì±‘” Ì²•” Ì³” Ì³” Ì³” Ì³” Ì³›” Ì´” Ì´” Ì´” Ì´”* Ì´"”+ Ì´#”. Ì´&”/ Ì´'”4 Ì´,”5 Ì´-”6 Ì´-”” Ìµ” Ìµ” Ìµ” Ìµœ” Ì¶
+” Ì¶” Ì¶”' Ì¶”( Ì¶”1 Ì¶'”2 Ì¶(”; Ì¶1”< Ì¶2”ÌD Ì¶:”ÌE Ì¶;”ÌF Ì¶;‘” Ì·	š” Ì¸” Ì¸”% Ì¸”( Ì¸ ”, Ì¸$”- Ì¸%”6 Ì¸.”7 Ì¸/”ÌF Ì¸>”ÌG Ì¸>˜” Ì¹” Ì¹”  Ì¹”# Ì¹”' Ì¹”( Ì¹ ”2 Ì¹*”3 Ì¹*–” Ìº” Ìº” Ìº” Ìº”2 Ìº*”4 Ìº,˜” Ì»
+”# Ì»”$ Ì»”* Ì» ”+ Ì»!”4 Ì»*”5 Ì»+”6 Ì»+˜” Ì¼
+” Ì¼” Ì¼”- Ì¼#”. Ì¼$”1 Ì¼'”2 Ì¼(”3 Ì¼(–” Ì½
+” Ì½” Ì½”( Ì½”* Ì½ ”+ Ì½ —” Ì¾
+” Ì¾” Ì¾”$ Ì¾”' Ì¾”- Ì¾#”. Ì¾#‘” Ì¿	–” Ì¿” Ì¿” Ì¿”# Ì¿”8 Ì¿2”: Ì¿4˜” ÌÀ
+”# ÌÀ”$ ÌÀ”) ÌÀ”* ÌÀ ”3 ÌÀ)”4 ÌÀ*”5 ÌÀ*˜” ÌÁ
+” ÌÁ” ÌÁ”, ÌÁ"”- ÌÁ#”0 ÌÁ&”1 ÌÁ'”2 ÌÁ'–” ÌÂ
+” ÌÂ” ÌÂ”( ÌÂ”* ÌÂ ”+ ÌÂ —” ÌÃ
+” ÌÃ” ÌÃ”$ ÌÃ”' ÌÃ”, ÌÃ"”- ÌÃ"‘” ÌÄ	‘” ÌÄ˜” ÌÅ
+” ÌÅ”% ÌÅ”( ÌÅ”, ÌÅ"”- ÌÅ#”8 ÌÅ.”9 ÌÅ.”” ÌÆ
+” ÌÆ”# ÌÆ”% ÌÆ—” ÌÇ” ÌÇ” ÌÇ”( ÌÇ”+ ÌÇ”4 ÌÇ(”5 ÌÇ(˜” ÌÈ” ÌÈ”- ÌÈ!”0 ÌÈ$”4 ÌÈ(”5 ÌÈ)”ÌD ÌÈ8”ÌE ÌÈ8”” ÌÉ” ÌÉ”+ ÌÉ”- ÌÉ!›” ÌÊ”" ÌÊ”' ÌÊ”* ÌÊ”9 ÌÊ+”: ÌÊ,”= ÌÊ/”> ÌÊ0”ÌI ÌÊ;”ÌJ ÌÊ=”ÌK ÌÊ=Ü ” ÌË”  ÌË”! ÌË”6 ÌË(”7 ÌË)”ÌB ÌË4”ÌD ÌË6”ÌI ÌË;”ÌJ ÌË<”ÌK ÌË=”ÌL ÌË>”ÌN ÌËÌ@”ÌQ ÌËÌC”ÌV ÌËÌH”ÌW ÌËÌI”ÌX ÌËÌJ”ÌY ÌËÌK”ÌZ ÌËÌL”Ì[ ÌËÌL‘” ÌÌ–” ÌÍ” ÌÍ” ÌÍ”, ÌÍ ”. ÌÍ"”/ ÌÍ"‘” ÌÎ‘” ÌÏ	–” ÌĞ” ÌĞ” ÌĞ”$ ÌĞ”& ÌĞ”' ÌĞ’” ÌÑ” ÌÑ‘” ÌÒ‘”	 ÌÓ’” ÌÔ” ÌÔ™” ÌÖ” ÌÖ!” ÌÖ"” ÌÖ-” ÌÖ/”% ÌÖ=”' ÌÖ?”* ÌÖÌB”. ÌÖÌaš” Ì×” Ì×” Ì×” Ì×” Ì×” Ì×”  Ì×”% Ì×!”+ Ì×'”- Ì×)˜” ÌØ” ÌØ
+” ÌØ”" ÌØ”& ÌØ ”' ÌØ!”6 ÌØ0”7 ÌØ0•” ÌÙ” ÌÙ
+” ÌÙ”  ÌÙ”" ÌÙ—” ÌÚ” ÌÚ”" ÌÚ”& ÌÚ”) ÌÚ!”+ ÌÚ#”, ÌÚ#—” ÌÛ” ÌÛ” ÌÛ”$ ÌÛ”' ÌÛ”6 ÌÛ.”7 ÌÛ.‘” ÌÜ” Ìİ” Ìİ” Ìİ” Ìİ”  Ìİ”# Ìİ”% Ìİ”& Ìİ ”, Ìİ&”. Ìİ(”2 Ìİ,”3 Ìİ-”4 Ìİ.”5 Ìİ.‘”	 ÌŞ˜” Ìß” Ìß
+” Ìß” Ìß”  Ìß”! Ìß”, Ìß(”- Ìß(˜” Ìà” Ìà” Ìà” Ìà”& Ìà"”+ Ìà'”. Ìà*”0 Ìà,’” Ìá” Ìá‘”	 Ìâ” Ìã” Ìã	” Ìã
+”# Ìã”$ Ìã ”' Ìã#”) Ìã%”/ Ìã+”1 Ìã-”4 Ìã0”8 Ìã4”9 Ìã5”: Ìã5’” Ìä” Ìä’” Ìæ
+” Ìæ’” Ìç”# Ìç”” Ìè” Ìè” Ìè” Ìè”” Ìé” Ìé” Ìé” Ìé”” Ìê” Ìê” Ìê” Ìêš” Ìë” Ìë
+” Ìë” Ìë”# Ìë”$ Ìë ”2 Ìë.”3 Ìë/”< Ìë8”= Ìë8›” Ìì” Ìì” Ìì” Ìì”' Ìì#”( Ìì$”, Ìì(”- Ìì)”1 Ìì-”2 Ìì.”4 Ìì0•” Ìí” Ìí” Ìí” Ìí” Ìí•” Ìî” Ìî” Ìî” Ìî” Ìî•” Ìï” Ìï” Ìï” Ìï” Ìï‘”	 Ìğ‘” Ìğ˜” Ìñ” Ìñ
+” Ìñ”" Ìñ”& Ìñ ”' Ìñ!”6 Ìñ0”7 Ìñ0Ü ” Ìò” Ìò” Ìò” Ìò”$ Ìò”& Ìò ”) Ìò#”* Ìò$”/ Ìò)”0 Ìò*”4 Ìò.”5 Ìò/”6 Ìò:”9 Ìò=”= ÌòÌA”> ÌòÌAÜ ” Ìó” Ìó” Ìó” Ìó”% Ìó”' Ìó!”* Ìó$”+ Ìó%”1 Ìó+”2 Ìó,”6 Ìó0”7 Ìó1”8 Ìó<”; Ìó?”? ÌóÌC”Ì@ ÌóÌC˜” Ìô” Ìô” Ìô” Ìô” Ìô” Ìô” Ìô” Ìô‘”	 ÌõŸ” Ìö” Ìö” Ìö” Ìö” Ìö”" Ìö”# Ìö”$ Ìö ”* Ìö&”+ Ìö'”1 Ìö-”2 Ìö.”3 Ìö/”8 Ìö4”9 Ìö5”” Ì÷” Ì÷” Ì÷	” Ì÷”” Ìø” Ìø” Ìø	” Ìø”” Ìù” Ìù” Ìù” Ìù”” Ìú” Ìú” Ìú” Ìú“”	 Ìû”
+ Ìû” Ìû’” Ìü” Ìü–” Ìş” Ìş ” Ìş!” Ìş,” Ìş.”$ Ìş;š” Ìÿ” Ìÿ” Ìÿ” Ìÿ” Ìÿ” Ìÿ”  Ìÿ”% Ìÿ!”+ Ìÿ'”- Ìÿ)˜” Í ” Í 
+” Í ”" Í ”& Í  ”' Í !”6 Í 0”7 Í 0•” Í” Í
+” Í”  Í”" Í—” Í” Í”" Í”& Í”) Í!”+ Í3”, Í3—” Í” Í” Í”$ Í”' Í”6 Í.”7 Í.‘” Íš” Í” Í” Í” Í”  Í”# Í”% Í”* Í$”+ Í%”, Í%–” Í” Í
+” Í”  Í”" Í”# Í‘”	 Í–” Í” Í” Í” Í” Í”! Í’” Í” Í‘”	 Í	–” Í
+” Í
+” Í
+” Í
+”  Í
+”" Í
+’” Í” Íœ” Í” Í
+” Í” Í”  Í”) Í#”* Í$”4 Í.”5 Í/”: ÍÌH”; ÍÌI”< ÍÌI‘”	 Íš” Í” Í	” Í
+”# Í”$ Í ”' Í#”) Í%”. Í*”/ Í+”0 Í+’” Í” Í”” Í” Í$” Í%” Í1”” Í” Í” Í” Í•” Í” Í” Í” Í” Í™” Í” Í” Í”# Í”& Í”' Í”, Í*”. Í,”0 Í.” Í
+” Í” Í”& Í”' Í”+ Í!”< Í2”= Í3”ÌC Í9”ÌE Í;”ÌJ ÍÌ@”ÌK ÍÌA”ÌL ÍÌB”ÌM ÍÌB“” Í” Í	” Í	’” Í” Í‘” Í“” Í” Í” Í” Í” Í” Í”# Í”$ Í”- Í%”. Í&”5 Í-”6 Í.”7 Í/”< Í4”> Í6”Ì@ Í8˜” Í
+” Í”  Í”# Í”( Í”) Í”0 Í&”1 Í&’” Í
+”Ì~ ÍÌt™” Í
+” Í” Í” Í”' Í”( Í”< Í2”= Í3”? Í5’” Í” Í‘” Íš” Í 
+” Í ” Í ”& Í ”' Í ”+ Í !”= Í 3”> Í 4”ÌE Í ;”ÌG Í =’” Í!” Í!”” Í"” Í"” Í"” Í"”” Í#” Í#	” Í#
+” Í#
+’” Í$” Í$‘” Í%˜” Í&” Í&” Í&”% Í&”& Í&”* Í&"”+ Í&#”, Í&#’” Í'” Í'‘”	 Í(’” Í)” Í)–” Í+” Í+&” Í+'” Í+3” Í+5” Í+ÌG”” Í,” Í,” Í,” Í,•” Í-” Í-” Í-” Í-” Í-—” Í.” Í.” Í.”# Í.”& Í.”/ Í.'”0 Í.'”” Í/” Í/” Í/” Í/‘” Í0“” Í1” Í1” Í1œ” Í2” Í2” Í2”# Í2”$ Í2”- Í2%”. Í2&”5 Í2-”6 Í2.”? Í27”Ì@ Í28”ÌA Í28”” Í3” Í3” Í3” Í3‘” Í4›” Í5” Í5” Í5” Í5”. Í5&”/ Í5'”3 Í5+”5 Í5-”8 Í50”9 Í51”: Í51‘”	 Í6’” Í7” Í7’” Í9” Í9Ü ” Í:” Í:” Í:	” Í:” Í:”% Í:!”& Í:"”0 Í:,”1 Í:-”: Í:6”; Í:7”< Í:8”ÌC Í:?”ÌD Í:Ì@”ÌM Í:ÌI”ÌN Í:ÌJ”ÌO Í:ÌJ˜” Í;” Í;” Í;	” Í;” Í;”# Í;”% Í;!”& Í;!–” Í<” Í<	” Í<
+” Í<” Í<” Í<’” Í=” Í=‘” Í>ÔrG–§version¤file§sources®sourcesContent¥names¨mappingsÀ‘À‘ÀÜ"‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘”  ÌÙ ‘”  ÌÚ ‘”  ÌÛ ‘”  ÌÜ ‘”  Ìİ ‘”  ÌŞ ‘”  Ìß ‘”  Ìà ‘”  Ìá ‘”  Ìâ ‘”  Ìã ‘”  Ìä ‘”  Ìå ‘”  Ìæ ‘”  Ìç ‘”  Ìè ‘”  Ìé ‘”  Ìê ‘”  Ìë ‘”  Ìì ‘”  Ìí ‘”  Ìî ‘”  Ìï ‘”  Ìğ ‘”  Ìñ ‘”  Ìò ‘”  Ìó ‘”  Ìô ‘”  Ìõ ‘”  Ìö ‘”  Ì÷ ‘”  Ìø ‘”  Ìù ‘”  Ìú ‘”  Ìû ‘”  Ìü ‘”  Ìı ‘”  Ìş ‘”  Ìÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍÍ,ÖÔrK–¤type¥start£end¢idªsuperClass¤body°ClassDeclarationÍ"Í,ÖÔrL”¤type¥start£end¤nameªIdentifierÍ(Í;³UniImageElementImplLªIdentifierÍDÍR®UniElementImplÔrM”¤type¥start£end¤body©ClassBodyÍSÍ,ÖŸÔrN˜¤type¥start£end¦static¨computed£key¤kind¥value°MethodDefinitionÍZÍœÂÂLªIdentifierÍ^Ía£src£getÔrO™¤type¥start£end¢idªexpression©generator¥async¦params¤body²FunctionExpressionÍaÍœÀÂÂÂM®BlockStatementÍdÍœ‘ÔrP”¤type¥start£end¨argument¯ReturnStatementÍoÍ•ÔrQ–¤type¥start£end¤left¨operator¥right±LogicalExpressionÍvÍ”ÔrR–¤type¥start£end¦callee©arguments¨optional®CallExpressionÍvÍÔrS—¤type¥start£end¦object¨property¨computed¨optional°MemberExpressionÍvÍ‡ÔrT“¤type¥start£end®ThisExpressionÍvÍzLªIdentifierÍ{Í‡¬getAttributeÂÂ‘ÔrU•¤type¥start£end¥value£raw§LiteralÍˆÍ£src¥'src'Â¢??U§LiteralÍ’Í” ¢''N°MethodDefinitionÍ¢ÍöÂÂLªIdentifierÍ¦Íª¤mode£getO²FunctionExpressionÍªÍöÀÂÂÂM®BlockStatementÍ­Íö‘P¯ReturnStatementÍ¸ÍïQ±LogicalExpressionÍ¿ÍîR®CallExpressionÍ¿ÍØS°MemberExpressionÍ¿ÍĞT®ThisExpressionÍ¿ÍÃLªIdentifierÍÄÍĞ¬getAttributeÂÂ‘U§LiteralÍÑÍ×¤mode¦'mode'Â¢??LªIdentifierÍÜÍî²IMAGE_MODE_DEFAULTN°MethodDefinitionÍüÍÃÂLªIdentifierÍÍ¬defaultStyle£getO²FunctionExpressionÍÍÀÂÂÂM®BlockStatementÍÍ•ÔrV•¤type¥start£end¬declarations¤kind³VariableDeclarationÍÍ­‘ÔrW•¤type¥start£end¢id¤init²VariableDeclaratorÍ‡Í¬LªIdentifierÍ‡Í—°baseDefaultStyleS°MemberExpressionÍšÍ¬T¥SuperÍšÍŸLªIdentifierÍ Í¬¬defaultStyleÂÂ¥constV³VariableDeclarationÍ·Íæ‘W²VariableDeclaratorÍ½ÍåLªIdentifierÍ½ÍÉ¬defaultStyleÔrX•¤type¥start£end¦callee©arguments­NewExpressionÍÌÍåLªIdentifierÍĞÍÓ£Map‘LªIdentifierÍÔÍä°baseDefaultStyle¥constÔrY”¤type¥start£endªexpression³ExpressionStatementÍğÍ&R®CallExpressionÍğÍ%S°MemberExpressionÍğÍ LªIdentifierÍğÍü¬defaultStyleLªIdentifierÍıÍ £setÂÂ’LªIdentifierÍÍ¥WIDTHÔrZ”¤type¥start£end¨elements¯ArrayExpressionÍÍ$’Q°BinaryExpressionÍ	ÍLªIdentifierÍ	Í­DEFAULT_WIDTH¡+U§LiteralÍÍ¢px¤'px'U§LiteralÍÍ#Ã¤trueÂY³ExpressionStatementÍ0ÍhR®CallExpressionÍ0ÍgS°MemberExpressionÍ0Í@LªIdentifierÍ0Í<¬defaultStyleLªIdentifierÍ=Í@£setÂÂ’LªIdentifierÍAÍG¦HEIGHTZ¯ArrayExpressionÍIÍf’Q°BinaryExpressionÍJÍ_LªIdentifierÍJÍX®DEFAULT_HEIGHT¡+U§LiteralÍ[Í_¢px¤'px'U§LiteralÍaÍeÃ¤trueÂP¯ReturnStatementÍrÍ†LªIdentifierÍyÍ…¬defaultStyleN°MethodDefinitionÍ“Í}ÂÂLªIdentifierÍ“Í«constructor«constructorO²FunctionExpressionÍÍ}ÀÂÂÂ’LªIdentifierÍŸÍ£¤dataLªIdentifierÍ¥Í©¤pageM®BlockStatementÍ«Í}”Y³ExpressionStatementÍ¶ÍÈR®CallExpressionÍ¶ÍÇT¥SuperÍ¶Í»’LªIdentifierÍ¼ÍÀ¤dataLªIdentifierÍÂÍÆ¤pageÂY³ExpressionStatementÍÒÍíÔr[–¤type¥start£end¨operator¤left¥right´AssignmentExpressionÍÒÍì¡=S°MemberExpressionÍÒÍÜT®ThisExpressionÍÒÍÖLªIdentifierÍ×ÍÜ¥ratioÂÂLªIdentifierÍßÍì­RATIO_DEFAULTY³ExpressionStatementÍ÷Í	xR®CallExpressionÍ÷Í	wS°MemberExpressionÍ÷Í	T®ThisExpressionÍ÷ÍûLªIdentifierÍüÍ	²setMeasureFunctionÂÂ‘O·ArrowFunctionExpressionÍ	Í	vÀÂÂÂ”LªIdentifierÍ	Í	¥widthLªIdentifierÍ	Í	 ©widthModeLªIdentifierÍ	"Í	(¦heightLªIdentifierÍ	*Í	4ªheightModeM®BlockStatementÍ	9Í	v‘P¯ReturnStatementÍ	HÍ	kR®CallExpressionÍ	OÍ	jS°MemberExpressionÍ	OÍ	[T®ThisExpressionÍ	OÍ	SLªIdentifierÍ	TÍ	[§measureÂÂ’LªIdentifierÍ	\Í	a¥widthLªIdentifierÍ	cÍ	i¦heightÂÂY³ExpressionStatementÍ	 ÍvR®CallExpressionÍ	 ÍuS°MemberExpressionÍ	 Í	ÈS°MemberExpressionÍ	 Í	½S°MemberExpressionÍ	 Í	³T®ThisExpressionÍ	 Í	¤LªIdentifierÍ	¥Í	³®imageFrameNodeÂÂLªIdentifierÍ	´Í	½©attributeÂÂLªIdentifierÍ	¾Í	ÈªonCompleteÂÂ‘O·ArrowFunctionExpressionÍ	ÉÍtÀÂÂÂ‘LªIdentifierÍ	ÉÍ	Î¥eventM®BlockStatementÍ	ÒÍt’Ôr\–¤type¥start£end¤testªconsequent©alternate«IfStatementÍ	áÍWQ°BinaryExpressionÍ	åÍ	ÿY¯ChainExpressionÍ	åÍ	ùS°MemberExpressionÍ	åÍ	ùLªIdentifierÍ	åÍ	ê¥eventLªIdentifierÍ	ìÍ	ù­loadingStatusÂÃ£===U§LiteralÍ	şÍ	ÿ ¡0M®BlockStatementÍ
+ÍW’V³VariableDeclarationÍ
+Í
+=‘W²VariableDeclaratorÍ
+Í
+<LªIdentifierÍ
+Í
+¥ratioQ°BinaryExpressionÍ
+"Í
+<S°MemberExpressionÍ
+"Í
+-LªIdentifierÍ
+"Í
+'¥eventLªIdentifierÍ
+(Í
+-¥widthÂÂ¡/S°MemberExpressionÍ
+0Í
+<LªIdentifierÍ
+0Í
+5¥eventLªIdentifierÍ
+6Í
+<¦heightÂÂ¥const\«IfStatementÍ
+OÍHQ°BinaryExpressionÍ
+SÍ
+gS°MemberExpressionÍ
+SÍ
+]T®ThisExpressionÍ
+SÍ
+WLªIdentifierÍ
+XÍ
+]¥ratioÂÂ£!==LªIdentifierÍ
+bÍ
+g¥ratioM®BlockStatementÍ
+iÍH’Y³ExpressionStatementÍ
+€Í
+“[´AssignmentExpressionÍ
+€Í
+’¡=S°MemberExpressionÍ
+€Í
+ŠT®ThisExpressionÍ
+€Í
+„LªIdentifierÍ
+…Í
+Š¥ratioÂÂLªIdentifierÍ
+Í
+’¥ratioY³ExpressionStatementÍ
+©Í5R®CallExpressionÍ
+©Í4S°MemberExpressionÍ
+©Í
+½T®ThisExpressionÍ
+©Í
+­LªIdentifierÍ
+®Í
+½¯layoutNodeDirtyÂÂ‘O·ArrowFunctionExpressionÍ
+¾Í3ÀÂÂÂM®BlockStatementÍ
+ÄÍ3‘Y³ExpressionStatementÍ
+ßÍR®CallExpressionÍ
+ßÍS°MemberExpressionÍ
+ßÍS°MemberExpressionÍ
+ßÍ
+üS°MemberExpressionÍ
+ßÍ
+òT®ThisExpressionÍ
+ßÍ
+ãLªIdentifierÍ
+äÍ
+ò®imageFrameNodeÂÂLªIdentifierÍ
+óÍ
+ü©attributeÂÂLªIdentifierÍ
+ıÍªvisibilityÂÂ‘S°MemberExpressionÍÍLªIdentifierÍÍªVisibilityLªIdentifierÍÍ§VisibleÂÂÂÂÀÀ\«IfStatementÍeÍiQ°BinaryExpressionÍiÍƒY¯ChainExpressionÍiÍ}S°MemberExpressionÍiÍ}LªIdentifierÍiÍn¥eventLªIdentifierÍpÍ}­loadingStatusÂÃ£===U§LiteralÍ‚Íƒ¡1M®BlockStatementÍ…Íi‘Y³ExpressionStatementÍÚÍZY¯ChainExpressionÍÚÍYR®CallExpressionÍÚÍYS°MemberExpressionÍÚÍíT®ThisExpressionÍÚÍŞLªIdentifierÍßÍí®onLoadCallbackÂÂ‘Ôr]”¤type¥start£endªproperties°ObjectExpressionÍğÍX’Ôr^™¤type¥start£end¦method©shorthand¨computed£key¥value¤kind¨PropertyÍÍÂÂÂLªIdentifierÍÍ¥widthS°MemberExpressionÍÍLªIdentifierÍÍ¥eventLªIdentifierÍÍ¥widthÂÂ¤init^¨PropertyÍ0ÍDÂÂÂLªIdentifierÍ0Í6¦heightS°MemberExpressionÍ8ÍDLªIdentifierÍ8Í=¥eventLªIdentifierÍ>ÍD¦heightÂÂ¤initÃÀÂN°MethodDefinitionÍƒÍ¿ÂÂLªIdentifierÍƒÍŠ§measure¦methodO²FunctionExpressionÍŠÍ¿ÀÂÂÂ’LªIdentifierÍ‹Í¥widthLªIdentifierÍ’Í˜¦heightM®BlockStatementÍšÍ¿–V³VariableDeclarationÍ¥Í¼‘W²VariableDeclaratorÍ«Í»LªIdentifierÍ«Í¯¤modeS°MemberExpressionÍ²Í»T®ThisExpressionÍ²Í¶LªIdentifierÍ·Í»¤modeÂÂ¥constV³VariableDeclarationÍÆÍß‘W²VariableDeclaratorÍÌÍŞLªIdentifierÍÌÍÑ¥ratioS°MemberExpressionÍÔÍŞT®ThisExpressionÍÔÍØLªIdentifierÍÙÍŞ¥ratioÂÂ¥constV³VariableDeclarationÍÍ‘W²VariableDeclaratorÍÍLªIdentifierÍÍ¤calcR®CallExpressionÍÍLªIdentifierÍÍ¥vp2px‘U§LiteralÍÍ¡1Â¥constV³VariableDeclarationÍ(Ía‘W²VariableDeclaratorÍ.Í`LªIdentifierÍ.Í3¥floorO·ArrowFunctionExpressionÍ6Í`ÀÃÂÂ‘LªIdentifierÍ7Í<¥valueQ°BinaryExpressionÍAÍ`R®CallExpressionÍAÍYS°MemberExpressionÍAÍKLªIdentifierÍAÍE¤MathLªIdentifierÍFÍK¥floorÂÂ‘Q°BinaryExpressionÍLÍXLªIdentifierÍLÍQ¥value¡*LªIdentifierÍTÍX¤calcÂ¡/LªIdentifierÍ\Í`¤calc¥const\«IfStatementÍkÍ†Q°BinaryExpressionÍoÍŒLªIdentifierÍoÍs¤mode£===LªIdentifierÍxÍŒ´IMAGE_MODE_WIDTH_FIXM®BlockStatementÍÍñ‘Y³ExpressionStatementÍÍæ[´AssignmentExpressionÍÍå¡=LªIdentifierÍÍ£¦height\µConditionalExpressionÍ¦ÍåQ°BinaryExpressionÍ¦Í½LªIdentifierÍ¦Í«¥ratio£===LªIdentifierÍ°Í½­RATIO_DEFAULTLªIdentifierÍÀÍÎ®DEFAULT_HEIGHTR®CallExpressionÍÑÍåLªIdentifierÍÑÍÖ¥floor‘Q°BinaryExpressionÍ×ÍäLªIdentifierÍ×ÍÜ¥width¡/LªIdentifierÍßÍä¥ratioÂ\«IfStatementÍ Í†Q°BinaryExpressionÍÍ"LªIdentifierÍÍ¤mode£===LªIdentifierÍÍ"µIMAGE_MODE_HEIGHT_FIXM®BlockStatementÍ$Í†‘Y³ExpressionStatementÍ3Í{[´AssignmentExpressionÍ3Íz¡=LªIdentifierÍ3Í8¥width\µConditionalExpressionÍ;ÍzQ°BinaryExpressionÍ;ÍRLªIdentifierÍ;Í@¥ratio£===LªIdentifierÍEÍR­RATIO_DEFAULTLªIdentifierÍUÍb­DEFAULT_WIDTHR®CallExpressionÍeÍzLªIdentifierÍeÍj¥floor‘Q°BinaryExpressionÍkÍyLªIdentifierÍkÍq¦height¡*LªIdentifierÍtÍy¥ratioÂÀP¯ReturnStatementÍÍ¸]°ObjectExpressionÍ—Í·’^¨PropertyÍ™Í¥ÂÂÂLªIdentifierÍ™Í¥widthLªIdentifierÍ Í¥¥width¤init^¨PropertyÍ§ÍµÂÂÂLªIdentifierÍ§Í­¦heightLªIdentifierÍ¯Íµ¦height¤initN°MethodDefinitionÍÅÍ¶ÂÂLªIdentifierÍÅÍÔ¯createFrameNode¦methodO²FunctionExpressionÍÔÍ¶ÀÂÂÂM®BlockStatementÍ×Í¶˜V³VariableDeclarationÍâÍ‘W²VariableDeclaratorÍèÍLªIdentifierÍèÍï§contextS°MemberExpressionÍòÍS°MemberExpressionÍòÍúT®ThisExpressionÍòÍöLªIdentifierÍ÷Íú£appÂÂLªIdentifierÍûÍ§contextÂÂ¥constV³VariableDeclarationÍÍ4‘W²VariableDeclaratorÍÍ3LªIdentifierÍÍ§wrapperX­NewExpressionÍÍ3LªIdentifierÍ!Í*©FrameNode‘LªIdentifierÍ+Í2§context¥constY³ExpressionStatementÍ>ÍaR®CallExpressionÍ>Í`S°MemberExpressionÍ>ÍZS°MemberExpressionÍ>ÍULªIdentifierÍ>ÍE§wrapperLªIdentifierÍFÍU¯commonAttributeÂÂLªIdentifierÍVÍZ¤clipÂÂ‘U§LiteralÍ[Í_Ã¤trueÂV³VariableDeclarationÍkÍµ‘W²VariableDeclaratorÍqÍ´LªIdentifierÍqÍv¥image[´AssignmentExpressionÍyÍ´¡=S°MemberExpressionÍyÍŒT®ThisExpressionÍyÍ}LªIdentifierÍ~ÍŒ®imageFrameNodeÂÂR®CallExpressionÍÍ´S°MemberExpressionÍÍ¢LªIdentifierÍÍ—¨typeNodeLªIdentifierÍ˜Í¢ªcreateNodeÂÂ’LªIdentifierÍ£Íª§contextU§LiteralÍ¬Í³¥Image§'Image'Â¥constY³ExpressionStatementÍØÍ5R®CallExpressionÍØÍ4S°MemberExpressionÍØÍ!R®CallExpressionÍØÍS°MemberExpressionÍØÍñS°MemberExpressionÍØÍçLªIdentifierÍØÍİ¥imageLªIdentifierÍŞÍç©attributeÂÂLªIdentifierÍèÍñ©objectFitÂÂ‘R®CallExpressionÍòÍS°MemberExpressionÍòÍLªIdentifierÍòÍı«IMAGE_MODESLªIdentifierÍşÍ£getÂÂ‘LªIdentifierÍÍ²IMAGE_MODE_DEFAULTÂÂLªIdentifierÍÍ!ªvisibilityÂÂ‘S°MemberExpressionÍ"Í3LªIdentifierÍ"Í,ªVisibilityLªIdentifierÍ-Í3¦HiddenÂÂÂY³ExpressionStatementÍ?ÍZR®CallExpressionÍ?ÍYS°MemberExpressionÍ?ÍRLªIdentifierÍ?ÍF§wrapperLªIdentifierÍGÍR«appendChildÂÂ‘LªIdentifierÍSÍX¥imageÂY³ExpressionStatementÍdÍ–[´AssignmentExpressionÍdÍ•¡=S°MemberExpressionÍdÍnT®ThisExpressionÍdÍhLªIdentifierÍiÍn¥modelÂÂX­NewExpressionÍqÍ•S°MemberExpressionÍuÍ“LªIdentifierÍuÍ¬SVGImageViewLªIdentifierÍ‚Í“±SVGImageViewModelÂÂP¯ReturnStatementÍ Í¯LªIdentifierÍ§Í®§wrapperN°MethodDefinitionÍ¼ÍÂÂLªIdentifierÍ¼ÍÂ¦onload¦methodO²FunctionExpressionÍÂÍÀÂÂÂM®BlockStatementÍÅÍ‘P®ThrowStatementÍĞÍûX­NewExpressionÍÖÍúLªIdentifierÍÚÍß¥Error‘U§LiteralÍàÍù·Method not implemented.¹'Method not implemented.'N°MethodDefinitionÍÍÎÂÂLªIdentifierÍÍ ¸initializeImageFrameNode¦methodO²FunctionExpressionÍ ÍÎÀÂÂÂ‘LªIdentifierÍ!Í$£srcM®BlockStatementÍ&ÍÎ’Y³ExpressionStatementÍ1ÍL[´AssignmentExpressionÍ1ÍK¡=S°MemberExpressionÍ1Í;T®ThisExpressionÍ1Í5LªIdentifierÍ6Í;¥ratioÂÂLªIdentifierÍ>ÍK­RATIO_DEFAULTY³ExpressionStatementÍoÍÇR®CallExpressionÍoÍÆS°MemberExpressionÍoÍ³R®CallExpressionÍoÍ¨S°MemberExpressionÍoÍS°MemberExpressionÍoÍ‚T®ThisExpressionÍoÍsLªIdentifierÍtÍ‚®imageFrameNodeÂÂLªIdentifierÍƒÍªinitializeÂÂ‘Q±LogicalExpressionÍÍ§LªIdentifierÍÍ‘£src¢||S°MemberExpressionÍ•Í§LªIdentifierÍ•Í¡¬ImageContentLªIdentifierÍ¢Í§¥EMPTYÂÂÂLªIdentifierÍ©Í³ªvisibilityÂÂ‘S°MemberExpressionÍ´ÍÅLªIdentifierÍ´Í¾ªVisibilityLªIdentifierÍ¿ÍÅ¦HiddenÂÂÂN°MethodDefinitionÍÔÍÂÂLªIdentifierÍÔÍéµupdateNativeAttribute¦methodO²FunctionExpressionÍéÍÀÂÂÂ’LªIdentifierÍêÍí£keyLªIdentifierÍïÍô¥valueM®BlockStatementÍöÍ‘Ôr_•¤type¥start£end¬discriminant¥cases¯SwitchStatementÍÍLªIdentifierÍ	Í£key’Ôr`•¤type¥start£endªconsequent¤testªSwitchCaseÍÍé‘M®BlockStatementÍ)Íé•V³VariableDeclarationÍ<ÍX‘W²VariableDeclaratorÍ@ÍWLªIdentifierÍ@ÍC£srcR®CallExpressionÍFÍWLªIdentifierÍFÍPªgetFileURL‘LªIdentifierÍQÍV¥valueÂ£letV³VariableDeclarationÍµÍÙ‘W²VariableDeclaratorÍ»ÍØLªIdentifierÍ»ÍÇ¬dataImageFixU§LiteralÍÊÍØ¬data:image/*®'data:image/*'¥const\«IfStatementÍëÍQ±LogicalExpressionÍïÍ&Q°BinaryExpressionÍïÍÔra–¤type¥start£end¨operator¦prefix¨argument¯UnaryExpressionÍïÍù¦typeofÃLªIdentifierÍöÍù£src£===U§LiteralÍşÍ¦string¨'string'¢&&R®CallExpressionÍ
+Í&S°MemberExpressionÍ
+ÍLªIdentifierÍ
+Í£srcLªIdentifierÍÍªstartsWithÂÂ‘LªIdentifierÍÍ%¬dataImageFixÂM®BlockStatementÍ(Í“V³VariableDeclarationÍ?Í€‘W²VariableDeclaratorÍCÍLªIdentifierÍCÍI¦base64S°MemberExpressionÍLÍR®CallExpressionÍLÍ|S°MemberExpressionÍLÍULªIdentifierÍLÍO£srcLªIdentifierÍPÍU¥splitÂÂ‘Ôrb–¤type¥start£end¥value£raw¥regex§LiteralÍVÍ{’Ù#^\s*data:image\/\*;\s*base64\s*,\s* Ù%/^\s*data:image\/\*;\s*base64\s*,\s*/Ôrc’§pattern¥flagsÙ#^\s*data:image\/\*;\s*base64\s*,\s* ÂU§LiteralÍ}Í~¡1ÃÂ£let\«IfStatementÍ–Í2Q±LogicalExpressionÍšÍµLªIdentifierÍšÍ ¦base64¢&&Q°BinaryExpressionÍ¤ÍµS°MemberExpressionÍ¤Í±LªIdentifierÍ¤Íª¦base64LªIdentifierÍ«Í±¦lengthÂÂ¡>U§LiteralÍ´Íµ ¡0M®BlockStatementÍ·Í2‘Ôrd–¤type¥start£end¥block§handler©finalizer¬TryStatementÍÒÍM®BlockStatementÍÖÍ3”V³VariableDeclarationÍõÍ"‘W²VariableDeclaratorÍûÍ!LªIdentifierÍûÍ¬Base64HelperX­NewExpressionÍ
+Í!S°MemberExpressionÍÍLªIdentifierÍÍ¤utilLªIdentifierÍÍ¬Base64HelperÂÂ¥constV³VariableDeclarationÍ@Ír‘W²VariableDeclaratorÍFÍqLªIdentifierÍFÍO©byteArrayR®CallExpressionÍRÍqS°MemberExpressionÍRÍiLªIdentifierÍRÍ^¬Base64HelperLªIdentifierÍ_ÍiªdecodeSyncÂÂ‘LªIdentifierÍjÍp¦base64Â¥constV³VariableDeclarationÍÍİ‘W²VariableDeclaratorÍ–ÍÜLªIdentifierÍ–Í¡«isSVGBase64R®CallExpressionÍ¤ÍÜS°MemberExpressionÍ¤ÍµLªIdentifierÍ¤Í°¬SVGTagRegExpLªIdentifierÍ±Íµ¤testÂÂ‘R®CallExpressionÍ¶ÍÛS°MemberExpressionÍ¶ÍĞLªIdentifierÍ¶Í½§SVGBaseLªIdentifierÍ¾ÍĞ²unit8ArrayToStringÂÂ‘LªIdentifierÍÑÍÚ©byteArrayÂÂ¥const\«IfStatementÍûÍLªIdentifierÍÿÍ
+«isSVGBase64M®BlockStatementÍÍ’Y³ExpressionStatementÍ/ÍĞR®CallExpressionÍ/ÍÏS°MemberExpressionÍ/ÍŞR®CallExpressionÍ/ÍØS°MemberExpressionÍ/ÍXR®CallExpressionÍ/ÍSS°MemberExpressionÍ/ÍHS°MemberExpressionÍ/Í9T®ThisExpressionÍ/Í3LªIdentifierÍ4Í9¥modelÂÂLªIdentifierÍ:ÍH®getSVGPixelMapÂÂ‘LªIdentifierÍIÍR©byteArrayÂLªIdentifierÍTÍX¤thenÂÂ‘O·ArrowFunctionExpressionÍYÍ×ÀÂÂÂ‘LªIdentifierÍYÍa¨pixelMapM®BlockStatementÍeÍ×‘Y³ExpressionStatementÍŒÍ´R®CallExpressionÍŒÍ³S°MemberExpressionÍŒÍ©T®ThisExpressionÍŒÍLªIdentifierÍ‘Í©¸initializeImageFrameNodeÂÂ‘LªIdentifierÍªÍ²¨pixelMapÂÂLªIdentifierÍÙÍŞ¥catchÂÂ‘O·ArrowFunctionExpressionÍßÍÎÀÂÂÂ‘LªIdentifierÍàÍã£errM®BlockStatementÍèÍÎ‘Y³ExpressionStatementÍÍ«R®CallExpressionÍÍªS°MemberExpressionÍÍ!T®ThisExpressionÍÍLªIdentifierÍÍ!­dispatchEventÂÂ‘X­NewExpressionÍ"Í©LªIdentifierÍ&Í8²UniImageErrorEvent’U§LiteralÍ9Í@¥error§'error']°ObjectExpressionÍBÍ¨‘^¨PropertyÍmÍ€ÂÂÂLªIdentifierÍmÍs¦errMsgS°MemberExpressionÍuÍ€LªIdentifierÍuÍx£errLªIdentifierÍyÍ€§messageÂÂ¤initÂÂP¯ReturnStatementÍòÍùÀÀÔre•¤type¥start£end¥param¤body«CatchClauseÍMÍLªIdentifierÍTÍU¡eM®BlockStatementÍWÍ‘Y³ExpressionStatementÍvÍ R®CallExpressionÍvÍÿS°MemberExpressionÍvÍˆT®ThisExpressionÍvÍzLªIdentifierÍ{Íˆ­dispatchEventÂÂ‘X­NewExpressionÍ‰ÍşLªIdentifierÍÍŸ²UniImageErrorEvent’U§LiteralÍ Í§¥error§'error']°ObjectExpressionÍ©Íı‘^¨PropertyÍÌÍİÂÂÂLªIdentifierÍÌÍÒ¦errMsgS°MemberExpressionÍÔÍİLªIdentifierÍÔÍÕ¡eLªIdentifierÍÖÍİ§messageÂÂ¤initÂÀÀY³ExpressionStatementÍHÍz[´AssignmentExpressionÍHÍy¡=LªIdentifierÍHÍK£srcR®CallExpressionÍNÍyS°MemberExpressionÍNÍYLªIdentifierÍNÍQ£srcLªIdentifierÍRÍY§replaceÂÂ’LªIdentifierÍZÍf¬dataImageFixU§LiteralÍhÍx®data:image/png°'data:image/png'ÂÀY³ExpressionStatementÍŸÍÂR®CallExpressionÍŸÍÁS°MemberExpressionÍŸÍ¼T®ThisExpressionÍŸÍ£LªIdentifierÍ¤Í¼¸initializeImageFrameNodeÂÂ‘LªIdentifierÍ½ÍÀ£srcÂÔrf”¤type¥start£end¥label®BreakStatementÍÔÍÚÀU§LiteralÍ"Í'£src¥'src'`ªSwitchCaseÍ÷Íû‘M®BlockStatementÍÍû—V³VariableDeclarationÍÍ=‘W²VariableDeclaratorÍÍ<LªIdentifierÍÍ#¨imageFitR®CallExpressionÍ&Í<S°MemberExpressionÍ&Í5LªIdentifierÍ&Í1«IMAGE_MODESLªIdentifierÍ2Í5£getÂÂ‘LªIdentifierÍ6Í;¥valueÂ£let\«IfStatementÍOÍ¹LªIdentifierÍSÍ[¨imageFitM®BlockStatementÍ]Í¹‘Y³ExpressionStatementÍtÍ¦R®CallExpressionÍtÍ¥S°MemberExpressionÍtÍ›S°MemberExpressionÍtÍ‘S°MemberExpressionÍtÍ‡T®ThisExpressionÍtÍxLªIdentifierÍyÍ‡®imageFrameNodeÂÂLªIdentifierÍˆÍ‘©attributeÂÂLªIdentifierÍ’Í›©objectFitÂÂ‘LªIdentifierÍœÍ¤¨imageFitÂÀV³VariableDeclarationÍËÍ‘W²VariableDeclaratorÍÑÍLªIdentifierÍÑÍà¯commonAttributeS°MemberExpressionÍãÍS°MemberExpressionÍãÍñT®ThisExpressionÍãÍçLªIdentifierÍèÍñ©frameNodeÂÂLªIdentifierÍòÍ¯commonAttributeÂÂ¥constV³VariableDeclarationÍÍ7‘W²VariableDeclaratorÍÍ6LªIdentifierÍÍ$ªlayoutNodeS°MemberExpressionÍ'Í6T®ThisExpressionÍ'Í+LªIdentifierÍ,Í6ªlayoutNodeÂÂ¥const\«IfStatementÍIÍ«Q°BinaryExpressionÍMÍkLªIdentifierÍMÍR¥value£===LªIdentifierÍWÍk´IMAGE_MODE_WIDTH_FIXM®BlockStatementÍmÍK”Y³ExpressionStatementÍ„Í¦R®CallExpressionÍ„Í¥S°MemberExpressionÍ„ÍšLªIdentifierÍ„Í“¯commonAttributeLªIdentifierÍ”Íš¦heightÂÂ‘LªIdentifierÍ›Í¤©undefinedÂY³ExpressionStatementÍ¼ÍÛR®CallExpressionÍ¼ÍÚS°MemberExpressionÍ¼ÍÕLªIdentifierÍ¼ÍÆªlayoutNodeLªIdentifierÍÇÍÕ®setStyleHeightÂÂ‘LªIdentifierÍÖÍÙ£NaNÂY³ExpressionStatementÍñÍR®CallExpressionÍñÍS°MemberExpressionÍñÍT®ThisExpressionÍñÍõLªIdentifierÍöÍ¯layoutNodeDirtyÂÂÂY³ExpressionStatementÍÍ8[´AssignmentExpressionÍÍ7¡=S°MemberExpressionÍÍ.T®ThisExpressionÍÍ"LªIdentifierÍ#Í.«styleFilterÂÂLªIdentifierÍ1Í7¦HEIGHT\«IfStatementÍbÍ«Q°BinaryExpressionÍfÍ…LªIdentifierÍfÍk¥value£===LªIdentifierÍpÍ…µIMAGE_MODE_HEIGHT_FIXM®BlockStatementÍ‡Íb”Y³ExpressionStatementÍÍ¿R®CallExpressionÍÍ¾S°MemberExpressionÍÍ³LªIdentifierÍÍ­¯commonAttributeLªIdentifierÍ®Í³¥widthÂÂ‘LªIdentifierÍ´Í½©undefinedÂY³ExpressionStatementÍÕÍóR®CallExpressionÍÕÍòS°MemberExpressionÍÕÍíLªIdentifierÍÕÍßªlayoutNodeLªIdentifierÍàÍí­setStyleWidthÂÂ‘LªIdentifierÍîÍñ£NaNÂY³ExpressionStatementÍ	Í R®CallExpressionÍ	ÍS°MemberExpressionÍ	ÍT®ThisExpressionÍ	ÍLªIdentifierÍÍ¯layoutNodeDirtyÂÂÂY³ExpressionStatementÍ6ÍO[´AssignmentExpressionÍ6ÍN¡=S°MemberExpressionÍ6ÍFT®ThisExpressionÍ6Í:LªIdentifierÍ;ÍF«styleFilterÂÂLªIdentifierÍIÍN¥WIDTHM®BlockStatementÍyÍ«’V³VariableDeclarationÍÍµ‘W²VariableDeclaratorÍ–Í´LªIdentifierÍ–Í¡«styleFilterS°MemberExpressionÍ¤Í´T®ThisExpressionÍ¤Í¨LªIdentifierÍ©Í´«styleFilterÂÂ¥const\«IfStatementÍËÍ˜LªIdentifierÍÏÍÚ«styleFilterM®BlockStatementÍÜÍ˜”Y³ExpressionStatementÍ÷Í[´AssignmentExpressionÍ÷Í¡=S°MemberExpressionÍ÷ÍT®ThisExpressionÍ÷ÍûLªIdentifierÍüÍ«styleFilterÂÂLªIdentifierÍ
+Í©undefinedV³VariableDeclarationÍ.Í[‘W²VariableDeclaratorÍ4ÍZLªIdentifierÍ4ÍC¯layoutStyleArgsS°MemberExpressionÍFÍZT®ThisExpressionÍFÍJLªIdentifierÍKÍZ¯layoutStyleArgsÂÂ¥const\«IfStatementÍuÍPLªIdentifierÍyÍˆ¯layoutStyleArgsM®BlockStatementÍŠÍP’V³VariableDeclarationÍ©ÍØ‘W²VariableDeclaratorÍ¯Í×LªIdentifierÍ¯Í´¥valueR®CallExpressionÍ·Í×S°MemberExpressionÍ·ÍÊLªIdentifierÍ·ÍÆ¯layoutStyleArgsLªIdentifierÍÇÍÊ£getÂÂ‘LªIdentifierÍËÍÖ«styleFilterÂ¥constY³ExpressionStatementÍöÍ5R®CallExpressionÍöÍ4S°MemberExpressionÍöÍT®ThisExpressionÍöÍúLªIdentifierÍûÍµupdateLayoutNodeStyleÂÂ“LªIdentifierÍÍ«styleFilterS°MemberExpressionÍÍ&LªIdentifierÍÍ#¥valueU§LiteralÍ$Í% ¡0ÃÂP­SpreadElementÍ(Í3S°MemberExpressionÍ+Í3LªIdentifierÍ+Í0¥valueU§LiteralÍ1Í2¡1ÃÂÂÀY³ExpressionStatementÍjÍR®CallExpressionÍjÍ€S°MemberExpressionÍjÍ~T®ThisExpressionÍjÍnLªIdentifierÍoÍ~¯layoutNodeDirtyÂÂÂÀY³ExpressionStatementÍ½ÍÔR®CallExpressionÍ½ÍÓS°MemberExpressionÍ½ÍÑT®ThisExpressionÍ½ÍÁLªIdentifierÍÂÍÑ¯updateImageSizeÂÂÂf®BreakStatementÍæÍìÀU§LiteralÍüÍ¤mode¦'mode'N°MethodDefinitionÍÍ!KÂÂLªIdentifierÍÍ(µupdateLayoutNodeStyle¦methodO²FunctionExpressionÍ(Í!KÀÂÂÂ“LªIdentifierÍ)Í,£keyLªIdentifierÍ.Í4¦methodP«RestElementÍ6Í=LªIdentifierÍ9Í=¤argsM®BlockStatementÍ?Í!K”\«IfStatementÍJÍ †Q±LogicalExpressionÍNÍmQ°BinaryExpressionÍNÍ[LªIdentifierÍNÍQ£key£===LªIdentifierÍVÍ[¥WIDTH¢||Q°BinaryExpressionÍ_ÍmLªIdentifierÍ_Íb£key£===LªIdentifierÍgÍm¦HEIGHTM®BlockStatementÍoÍ †“V³VariableDeclarationÍ~Í©‘W²VariableDeclaratorÍ‚Í¨LªIdentifierÍ‚Í‘¯layoutStyleArgsS°MemberExpressionÍ”Í¨T®ThisExpressionÍ”Í˜LªIdentifierÍ™Í¨¯layoutStyleArgsÂÂ£let\«IfStatementÍ·Í Da¯UnaryExpressionÍ»ÍË¡!ÃLªIdentifierÍ¼ÍË¯layoutStyleArgsM®BlockStatementÍÍÍ D’Y³ExpressionStatementÍàÍü[´AssignmentExpressionÍàÍû¡=LªIdentifierÍàÍï¯layoutStyleArgsX­NewExpressionÍòÍûLªIdentifierÍöÍù£MapY³ExpressionStatementÍ Í 5[´AssignmentExpressionÍ Í 4¡=S°MemberExpressionÍ Í "T®ThisExpressionÍ Í LªIdentifierÍ Í "¯layoutStyleArgsÂÂLªIdentifierÍ %Í 4¯layoutStyleArgsÀY³ExpressionStatementÍ RÍ {R®CallExpressionÍ RÍ zS°MemberExpressionÍ RÍ eLªIdentifierÍ RÍ a¯layoutStyleArgsLªIdentifierÍ bÍ e£setÂÂ’LªIdentifierÍ fÍ i£keyZ¯ArrayExpressionÍ kÍ y’LªIdentifierÍ lÍ r¦methodLªIdentifierÍ tÍ x¤argsÂÀV³VariableDeclarationÍ Í µ‘W²VariableDeclaratorÍ –Í ´LªIdentifierÍ –Í ¡«styleFilterS°MemberExpressionÍ ¤Í ´T®ThisExpressionÍ ¤Í ¨LªIdentifierÍ ©Í ´«styleFilterÂÂ¥const\«IfStatementÍ ¿Í!Q±LogicalExpressionÍ ÃÍ åLªIdentifierÍ ÃÍ Î«styleFilter¢&&Q°BinaryExpressionÍ ÒÍ åLªIdentifierÍ ÒÍ İ«styleFilter£===LªIdentifierÍ âÍ å£keyM®BlockStatementÍ çÍ!‘P¯ReturnStatementÍ öÍ ıÀÀY³ExpressionStatementÍ!Í!DR®CallExpressionÍ!Í!CS°MemberExpressionÍ!Í!-T¥SuperÍ!Í!LªIdentifierÍ!Í!-µupdateLayoutNodeStyleÂÂ“LªIdentifierÍ!.Í!1£keyLªIdentifierÍ!3Í!9¦methodP­SpreadElementÍ!;Í!BLªIdentifierÍ!>Í!B¤argsÂN°MethodDefinitionÍ!QÍ$?ÂÂLªIdentifierÍ!QÍ!`¯updateImageSize¦methodO²FunctionExpressionÍ!`Í$?ÀÂÂÂM®BlockStatementÍ!cÍ$?–V³VariableDeclarationÍ!“Í!‘W²VariableDeclaratorÍ!—Í!œLªIdentifierÍ!—Í!œ¥widthÀ£letV³VariableDeclarationÍ!§Í!²‘W²VariableDeclaratorÍ!«Í!±LªIdentifierÍ!«Í!±¦heightÀ£letV³VariableDeclarationÍ!¼Í!Æ‘W²VariableDeclaratorÍ!ÀÍ!ÅLªIdentifierÍ!ÀÍ!Å¥scaleÀ£letV³VariableDeclarationÍ!ĞÍ"‘W²VariableDeclaratorÍ!ÖÍ"LªIdentifierÍ!ÖÍ!ä®imageAttributeS°MemberExpressionÍ!çÍ"S°MemberExpressionÍ!çÍ!úT®ThisExpressionÍ!çÍ!ëLªIdentifierÍ!ìÍ!ú®imageFrameNodeÂÂLªIdentifierÍ!ûÍ"©attributeÂÂ¥const\«IfStatementÍ"Í#R®CallExpressionÍ"Í"9S°MemberExpressionÍ"Í".LªIdentifierÍ"Í"%²IMAGE_MODES_NORMALLªIdentifierÍ"&Í".¨includesÂÂ‘S°MemberExpressionÍ"/Í"8T®ThisExpressionÍ"/Í"3LªIdentifierÍ"4Í"8¤modeÂÂÂM®BlockStatementÍ";Í"š“Y³ExpressionStatementÍ"JÍ"Y[´AssignmentExpressionÍ"JÍ"X¡=LªIdentifierÍ"JÍ"O¥widthU§LiteralÍ"RÍ"X¤100%¦'100%'Y³ExpressionStatementÍ"gÍ"w[´AssignmentExpressionÍ"gÍ"v¡=LªIdentifierÍ"gÍ"m¦heightU§LiteralÍ"pÍ"v¤100%¦'100%'Y³ExpressionStatementÍ"…Í"[´AssignmentExpressionÍ"…Í"¡=LªIdentifierÍ"…Í"Š¥scaleU§LiteralÍ"Í"¡1M®BlockStatementÍ"©Í#”V³VariableDeclarationÍ"¸Í"ã‘W²VariableDeclaratorÍ"¼Í"âLªIdentifierÍ"¼Í"Ë¯nativeStyleArgsS°MemberExpressionÍ"ÎÍ"âT®ThisExpressionÍ"ÎÍ"ÒLªIdentifierÍ"ÓÍ"â¯nativeStyleArgsÂÂ£letY³ExpressionStatementÍ"ñÍ##[´AssignmentExpressionÍ"ñÍ#"¡=LªIdentifierÍ"ñÍ"ö¥widthQ°BinaryExpressionÍ"ùÍ#"Q±LogicalExpressionÍ"úÍ#Y¯ChainExpressionÍ"úÍ#R®CallExpressionÍ"úÍ#S°MemberExpressionÍ"úÍ#LªIdentifierÍ"úÍ#	¯nativeStyleArgsLªIdentifierÍ#Í#£getÂÃ‘LªIdentifierÍ#Í#¥WIDTHÂ¢||U§LiteralÍ#Í# ¡0¡+U§LiteralÍ#Í#"¢px¤'px'Y³ExpressionStatementÍ#1Í#e[´AssignmentExpressionÍ#1Í#d¡=LªIdentifierÍ#1Í#7¦heightQ°BinaryExpressionÍ#:Í#dQ±LogicalExpressionÍ#;Í#\Y¯ChainExpressionÍ#;Í#WR®CallExpressionÍ#;Í#WS°MemberExpressionÍ#;Í#OLªIdentifierÍ#;Í#J¯nativeStyleArgsLªIdentifierÍ#LÍ#O£getÂÃ‘LªIdentifierÍ#PÍ#V¦HEIGHTÂ¢||U§LiteralÍ#[Í#\ ¡0¡+U§LiteralÍ#`Í#d¢px¤'px'Y³ExpressionStatementÍ#sÍ#„[´AssignmentExpressionÍ#sÍ#ƒ¡=LªIdentifierÍ#sÍ#x¥scaleR®CallExpressionÍ#{Í#ƒLªIdentifierÍ#{Í#€¥vp2px‘U§LiteralÍ#Í#‚¡1ÂY³ExpressionStatementÍ#™Í$8R®CallExpressionÍ#™Í$7S°MemberExpressionÍ#™Í#ÉR®CallExpressionÍ#™Í#ÃS°MemberExpressionÍ#™Í#»R®CallExpressionÍ#™Í#´S°MemberExpressionÍ#™Í#­LªIdentifierÍ#™Í#§®imageAttributeLªIdentifierÍ#¨Í#­¥widthÂÂ‘LªIdentifierÍ#®Í#³¥widthÂLªIdentifierÍ#µÍ#»¦heightÂÂ‘LªIdentifierÍ#¼Í#Â¦heightÂLªIdentifierÍ#ÄÍ#É¥scaleÂÂ‘]°ObjectExpressionÍ#ÊÍ$6”^¨PropertyÍ#ÙÍ#áÂÂÂLªIdentifierÍ#ÙÍ#Ú¡xLªIdentifierÍ#ÜÍ#á¥scale¤init^¨PropertyÍ#ğÍ#øÂÂÂLªIdentifierÍ#ğÍ#ñ¡yLªIdentifierÍ#óÍ#ø¥scale¤init^¨PropertyÍ$Í$ÂÂÂLªIdentifierÍ$Í$§centerXU§LiteralÍ$Í$ ¡0¤init^¨PropertyÍ$ Í$*ÂÂÂLªIdentifierÍ$ Í$'§centerYU§LiteralÍ$)Í$* ¡0¤initÂN°MethodDefinitionÍ$EÍ&ÔÂÂLªIdentifierÍ$EÍ$ZµupdateNativeNodeStyle¦methodO²FunctionExpressionÍ$ZÍ&ÔÀÂÂÂ’LªIdentifierÍ$[Í$^£keyLªIdentifierÍ$`Í$e¥valueM®BlockStatementÍ$gÍ&Ô“\«IfStatementÍ$rÍ&Q±LogicalExpressionÍ$vÍ$•Q°BinaryExpressionÍ$vÍ$ƒLªIdentifierÍ$vÍ$y£key£===LªIdentifierÍ$~Í$ƒ¥WIDTH¢||Q°BinaryExpressionÍ$‡Í$•LªIdentifierÍ$‡Í$Š£key£===LªIdentifierÍ$Í$•¦HEIGHTM®BlockStatementÍ$—Í%Ê”V³VariableDeclarationÍ$¦Í$Ñ‘W²VariableDeclaratorÍ$ªÍ$ĞLªIdentifierÍ$ªÍ$¹¯nativeStyleArgsS°MemberExpressionÍ$¼Í$ĞT®ThisExpressionÍ$¼Í$ÀLªIdentifierÍ$ÁÍ$Ğ¯nativeStyleArgsÂÂ£let\«IfStatementÍ$ßÍ%la¯UnaryExpressionÍ$ãÍ$ó¡!ÃLªIdentifierÍ$äÍ$ó¯nativeStyleArgsM®BlockStatementÍ$õÍ%l’Y³ExpressionStatementÍ%Í%$[´AssignmentExpressionÍ%Í%#¡=LªIdentifierÍ%Í%¯nativeStyleArgsX­NewExpressionÍ%Í%#LªIdentifierÍ%Í%!£MapY³ExpressionStatementÍ%6Í%][´AssignmentExpressionÍ%6Í%\¡=S°MemberExpressionÍ%6Í%JT®ThisExpressionÍ%6Í%:LªIdentifierÍ%;Í%J¯nativeStyleArgsÂÂLªIdentifierÍ%MÍ%\¯nativeStyleArgsÀY³ExpressionStatementÍ%zÍ%šR®CallExpressionÍ%zÍ%™S°MemberExpressionÍ%zÍ%LªIdentifierÍ%zÍ%‰¯nativeStyleArgsLªIdentifierÍ%ŠÍ%£setÂÂ’LªIdentifierÍ%Í%‘£keyLªIdentifierÍ%“Í%˜¥valueÂY³ExpressionStatementÍ%¨Í%¿R®CallExpressionÍ%¨Í%¾S°MemberExpressionÍ%¨Í%¼T®ThisExpressionÍ%¨Í%¬LªIdentifierÍ%­Í%¼¯updateImageSizeÂÂÂ\«IfStatementÍ%ÙÍ&Q°BinaryExpressionÍ%İÍ%ëLªIdentifierÍ%İÍ%à£key£===U§LiteralÍ%åÍ%ë¤clip¦'clip'M®BlockStatementÍ%íÍ&‘P¯ReturnStatementÍ%üÍ&ÀÀ\«IfStatementÍ&Í&›Q°BinaryExpressionÍ&Í&0LªIdentifierÍ&Í&£key£===U§LiteralÍ&$Í&0ªpixelRound¬'pixelRound'M®BlockStatementÍ&2Í&›‘Y³ExpressionStatementÍ&`Í&R®CallExpressionÍ&`Í&S°MemberExpressionÍ&`Í&ˆS°MemberExpressionÍ&`Í&}S°MemberExpressionÍ&`Í&sT®ThisExpressionÍ&`Í&dLªIdentifierÍ&eÍ&s®imageFrameNodeÂÂLªIdentifierÍ&tÍ&}©attributeÂÂLªIdentifierÍ&~Í&ˆªpixelRoundÂÂ‘LªIdentifierÍ&‰Í&¥valueÂÀY³ExpressionStatementÍ&¥Í&ÍR®CallExpressionÍ&¥Í&ÌS°MemberExpressionÍ&¥Í&ÀT¥SuperÍ&¥Í&ªLªIdentifierÍ&«Í&ÀµupdateNativeNodeStyleÂÂ’LªIdentifierÍ&ÁÍ&Ä£keyLªIdentifierÍ&ÆÍ&Ë¥valueÂN°MethodDefinitionÍ&ÚÍ*ÂÂLªIdentifierÍ&ÚÍ&é¯initNativeEvent¦methodO²FunctionExpressionÍ&éÍ*ÀÂÂÂ‘LªIdentifierÍ&êÍ&î¤typeM®BlockStatementÍ&ğÍ*‘_¯SwitchStatementÍ&ûÍ*‰LªIdentifierÍ'Í'¤type“`ªSwitchCaseÍ'Í'ä‘M®BlockStatementÍ'%Í'ä’Y³ExpressionStatementÍ'8Í'½[´AssignmentExpressionÍ'8Í'¼¡=S°MemberExpressionÍ'8Í'KT®ThisExpressionÍ'8Í'<LªIdentifierÍ'=Í'K®onLoadCallbackÂÂO·ArrowFunctionExpressionÍ'NÍ'¼ÀÂÂÂ‘LªIdentifierÍ'OÍ'T¥eventM®BlockStatementÍ'YÍ'¼‘Y³ExpressionStatementÍ'pÍ'©R®CallExpressionÍ'pÍ'¨S°MemberExpressionÍ'pÍ'‚T®ThisExpressionÍ'pÍ'tLªIdentifierÍ'uÍ'‚­dispatchEventÂÂ‘X­NewExpressionÍ'ƒÍ'§LªIdentifierÍ'‡Í'˜±UniImageLoadEvent’U§LiteralÍ'™Í'Ÿ¤load¦'load'LªIdentifierÍ'¡Í'¦¥eventÂf®BreakStatementÍ'ÏÍ'ÕÀU§LiteralÍ'Í'#¤load¦'load'`ªSwitchCaseÍ'òÍ*"’Y³ExpressionStatementÍ(Í*
+R®CallExpressionÍ(Í*	S°MemberExpressionÍ(Í(6S°MemberExpressionÍ(Í(.S°MemberExpressionÍ(Í($T®ThisExpressionÍ(Í(LªIdentifierÍ(Í($®imageFrameNodeÂÂLªIdentifierÍ(%Í(.©attributeÂÂLªIdentifierÍ(/Í(6§onErrorÂÂ‘O·ArrowFunctionExpressionÍ(7Í*ÀÂÂÂ‘LªIdentifierÍ(8Í(=¥errorM®BlockStatementÍ(BÍ*“V³VariableDeclarationÍ(YÍ(v‘W²VariableDeclaratorÍ(_Í(uLªIdentifierÍ(_Í(e¦errMsgS°MemberExpressionÍ(hÍ(uLªIdentifierÍ(hÍ(m¥errorLªIdentifierÍ(nÍ(u§messageÂÂ¥const\«IfStatementÍ)Í)pR®CallExpressionÍ)Í)5S°MemberExpressionÍ)Í)LªIdentifierÍ)Í)¦errMsgLªIdentifierÍ)Í)¨includesÂÂ‘U§LiteralÍ) Í)4²empty sourceFailed´'empty sourceFailed'ÂM®BlockStatementÍ)7Í)p‘P¯ReturnStatementÍ)RÍ)YÀÀY³ExpressionStatementÍ)†Í)õR®CallExpressionÍ)†Í)ôS°MemberExpressionÍ)†Í)˜T®ThisExpressionÍ)†Í)ŠLªIdentifierÍ)‹Í)˜­dispatchEventÂÂ‘X­NewExpressionÍ)™Í)óLªIdentifierÍ)Í)¯²UniImageErrorEvent’U§LiteralÍ)°Í)·¥error§'error']°ObjectExpressionÍ)¹Í)ò‘Ôrg™¤type¥start£end¦method©shorthand¨computed£key¤kind¥value¨PropertyÍ)ÔÍ)ÚÂÃÂLªIdentifierÍ)ÔÍ)Ú¦errMsg¤initLªIdentifierÍ)ÔÍ)Ú¦errMsgÂÂf®BreakStatementÍ*Í*"ÀU§LiteralÍ'÷Í'ş¥error§'error'`ªSwitchCaseÍ*0Í*~’Y³ExpressionStatementÍ*JÍ*fR®CallExpressionÍ*JÍ*eS°MemberExpressionÍ*JÍ*_T¥SuperÍ*JÍ*OLªIdentifierÍ*PÍ*_¯initNativeEventÂÂ‘LªIdentifierÍ*`Í*d¤typeÂf®BreakStatementÍ*xÍ*~ÀÀN°MethodDefinitionÍ*–Í,(ÂÂLªIdentifierÍ*–Í*§±deleteNativeEvent¦methodO²FunctionExpressionÍ*§Í,(ÀÂÂÂ’LªIdentifierÍ*¨Í*¬¤typeLªIdentifierÍ*®Í*±£resM®BlockStatementÍ*³Í,(‘_¯SwitchStatementÍ*¾Í,!LªIdentifierÍ*ÆÍ*Ê¤type“`ªSwitchCaseÍ*ÛÍ+H‘M®BlockStatementÍ*èÍ+H’Y³ExpressionStatementÍ*ûÍ+[´AssignmentExpressionÍ*ûÍ+¡=S°MemberExpressionÍ*ûÍ+T®ThisExpressionÍ*ûÍ*ÿLªIdentifierÍ+ Í+®onLoadCallbackÂÂLªIdentifierÍ+Í+©undefinedP¯ReturnStatementÍ+-Í+9U§LiteralÍ+4Í+8Ã¤trueU§LiteralÍ*àÍ*æ¤load¦'load'`ªSwitchCaseÍ+VÍ+Ä’Y³ExpressionStatementÍ+uÍ+¦R®CallExpressionÍ+uÍ+¥S°MemberExpressionÍ+uÍ+šS°MemberExpressionÍ+uÍ+’S°MemberExpressionÍ+uÍ+ˆT®ThisExpressionÍ+uÍ+yLªIdentifierÍ+zÍ+ˆ®imageFrameNodeÂÂLªIdentifierÍ+‰Í+’©attributeÂÂLªIdentifierÍ+“Í+š§onErrorÂÂ‘LªIdentifierÍ+›Í+¤©undefinedÂP¯ReturnStatementÍ+¸Í+ÄU§LiteralÍ+¿Í+ÃÃ¤trueU§LiteralÍ+[Í+b¥error§'error'`ªSwitchCaseÍ+ÒÍ,‘P¯ReturnStatementÍ+ìÍ,R®CallExpressionÍ+óÍ,S°MemberExpressionÍ+óÍ,
+T¥SuperÍ+óÍ+øLªIdentifierÍ+ùÍ,
+±deleteNativeEventÂÂ’LªIdentifierÍ,Í,¤typeLªIdentifierÍ,Í,£resÂÀN°MethodDefinitionÍ,.Í,ÓÂÂLªIdentifierÍ,.Í,5§dispose¦methodO²FunctionExpressionÍ,5Í,ÓÀÂÂÂM®BlockStatementÍ,8Í,Ó“Y³ExpressionStatementÍ,CÍ,ŠR®CallExpressionÍ,CÍ,‰S°MemberExpressionÍ,CÍ,~R®CallExpressionÍ,CÍ,vS°MemberExpressionÍ,CÍ,kS°MemberExpressionÍ,CÍ,`S°MemberExpressionÍ,CÍ,VT®ThisExpressionÍ,CÍ,GLªIdentifierÍ,HÍ,V®imageFrameNodeÂÂLªIdentifierÍ,WÍ,`©attributeÂÂLªIdentifierÍ,aÍ,kªonCompleteÂÂ‘LªIdentifierÍ,lÍ,u©undefinedÂLªIdentifierÍ,wÍ,~§onErrorÂÂ‘LªIdentifierÍ,Í,ˆ©undefinedÂY³ExpressionStatementÍ,”Í,²R®CallExpressionÍ,”Í,±S°MemberExpressionÍ,”Í,¯S°MemberExpressionÍ,”Í,§T®ThisExpressionÍ,”Í,˜LªIdentifierÍ,™Í,§®imageFrameNodeÂÂLªIdentifierÍ,¨Í,¯§disposeÂÂÂY³ExpressionStatementÍ,¼Í,ÌR®CallExpressionÍ,¼Í,ËS°MemberExpressionÍ,¼Í,ÉT¥SuperÍ,¼Í,ÁLªIdentifierÍ,ÂÍ,É§disposeÂÂÂÀ˜Ôrh•¤type¥start£endªspecifiers¦source±ImportDeclaration -‘Ôri•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	©FrameNodeLªIdentifier	©FrameNodeU§Literal,°@ohos.arkui.node²"@ohos.arkui.node"h±ImportDeclaration/Ì[‘i¯ImportSpecifier8Ì@LªIdentifier8Ì@¨typeNodeLªIdentifier8Ì@¨typeNodeU§LiteralÌHÌZ°@ohos.arkui.node²"@ohos.arkui.node"h±ImportDeclarationÌ]Ì’i¯ImportSpecifierÌfÌrLªIdentifierÌfÌr¬SVGImageViewLªIdentifierÌfÌr¬SVGImageViewi¯ImportSpecifierÌtÌ{LªIdentifierÌtÌ{§SVGBaseLªIdentifierÌtÌ{§SVGBaseU§LiteralÌƒÌ©@ohos/svg«'@ohos/svg'h±ImportDeclarationÌ‘Ì¯‘Ôrj”¤type¥start£end¥local¶ImportDefaultSpecifierÌ˜ÌœLªIdentifierÌ˜Ìœ¤utilU§LiteralÌ¢Ì®ª@ohos.util¬"@ohos.util"h±ImportDeclarationÌ±Ìß‘i¯ImportSpecifierÌºÌÈLªIdentifierÌºÌÈ®UniElementImplLªIdentifierÌºÌÈ®UniElementImplU§LiteralÌĞÌŞ¬./UniElement®'./UniElement'h±ImportDeclarationÌáÍ‘i¯ImportSpecifierÌêÌûLªIdentifierÌêÌû±UniImageLoadEventLªIdentifierÌêÌû±UniImageLoadEventU§LiteralÍÍ³./UniImageLoadEventµ'./UniImageLoadEvent'h±ImportDeclarationÍÍU‘i¯ImportSpecifierÍ$Í6LªIdentifierÍ$Í6²UniImageErrorEventLªIdentifierÍ$Í6²UniImageErrorEventU§LiteralÍ>ÍT´./UniImageErrorEvent¶'./UniImageErrorEvent'h±ImportDeclarationÍWÍ~‘i¯ImportSpecifierÍ`ÍjLªIdentifierÍ`ÍjªgetFileURLLªIdentifierÍ`ÍjªgetFileURLU§LiteralÍrÍ}©../helper«'../helper'

@@ -57,7 +57,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           current: currentStep.value,
           class: "data-v-958efd76"
         }),
-        g: common_vendor.o(nextStep, "ac"),
+        g: common_vendor.o(nextStep, "10"),
         h: common_vendor.p({
           size: "small",
           type: "primary",

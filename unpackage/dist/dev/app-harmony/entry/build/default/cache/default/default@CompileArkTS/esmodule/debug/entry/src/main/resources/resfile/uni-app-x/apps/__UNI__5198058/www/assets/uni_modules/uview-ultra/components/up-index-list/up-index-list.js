@@ -1,12 +1,11 @@
 import { _ as __easycom_1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-index-anchor/up-index-anchor&";
+import { r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { _ as __easycom_1$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-transition/up-transition&";
 import { a as addUnit, s as sleep, e as getWindowInfo, g as getPx, u as upGetRect } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import { u as useUltraUI } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useUltraUI&";
 import { d as defProps } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-index-list/indexList&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, setSharedDataAttr: _setSharedDataAttr, toSharedDataNumber: _toSharedDataNumber, toSharedDataString: _toSharedDataString, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataSlot: _createSharedDataSlot, setSharedDataEvent: _setSharedDataEvent, setSharedDataStyle: _setSharedDataStyle, setSharedDataTemplateRef: _setSharedDataTemplateRef, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, toDisplayString: _toDisplayString, setSharedDataClass: _setSharedDataClass, createSharedDataFor: _createSharedDataFor } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpIndexListUpIndexList";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref, computed, watch, onMounted, getCurrentInstance } = globalThis.Vue;
 class UPIndexListChildrenItemType extends UTS.UTSType {
   static get$UTSMetadata$() {
@@ -29,14 +28,10 @@ class UPIndexListChildrenItemType extends UTS.UTSType {
     delete this.__props__;
   }
 }
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-index-list"
   },
-  __dynamicSharedData: true,
-  __hash: "2fddd6d5",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-index-list/up-index-list.uvue",
   __name: "up-index-list",
   props: {
     inactiveColor: {
@@ -75,9 +70,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     }
   },
   setup(__props, _a) {
-    var __expose = _a.expose, $slots = _a.slots;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpIndexListUpIndexListSharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose;
     const _b = useUltraUI(), children = _b.children, addChild = _b.addChild, getChildren = _b.getChildren;
     const instance = getCurrentInstance().proxy;
     const indexList = () => {
@@ -117,6 +110,13 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         return list;
       }
     });
+    const getIndexListScrollViewRect = () => {
+      return new Promise((resolve) => {
+        upGetRect(".up-index-list", false, instance).then((size) => {
+          resolve(size);
+        });
+      });
+    };
     const getIndexListLetterRect = () => {
       return new Promise((resolve) => {
         upGetRect(".up-index-list__letter", false, instance).then((size) => {
@@ -136,12 +136,12 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
           customNavHeight = parseInt(getPx(props.customNavHeight));
         }
         const scrollHeight = scrollViewHeight.value > 0 ? scrollViewHeight.value : sysData.windowHeight - customNavHeight;
-        letterInfo.value = new UTSJSONObject({
+        letterInfo.value = {
           height: height !== null && height !== void 0 ? height : 0,
           // 为了让字母列表对屏幕绝对居中，让其对导航栏进行修正，也即往上偏移导航栏的一半高度
           top: scrollHeight / 2,
           itemHeight: Math.floor((height !== null && height !== void 0 ? height : 0) / uIndexList.value.length)
-        });
+        };
       });
     };
     const letterStyle = computed(() => {
@@ -376,95 +376,138 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       getProps,
       getRefs
     });
-    return () => {
-      "raw js";
-      const _setTemplateRef = _createSharedDataTemplateRefSetter();
-      const _component_up_index_anchor = __easycom_1;
-      const _component_up_transition = __easycom_1$1;
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.sticky && activeIndex.value >= 0 && activeIndex.value < uIndexList.value.length));
-      }, () => {
-        const n2 = _createSharedDataComponentWithFallback(_component_up_index_anchor, "9ac47056", { text: () => {
-          return keyVal(uIndexList.value[activeIndex.value]);
-        } });
-        _setSharedData(__sharedData, 1, n2?.sharedData);
-      });
-      _renderSharedDataEffect(() => {
-        _setSharedDataAttr(__sharedData, 18, _toSharedDataNumber(scrollTop.value));
-        _setSharedDataAttr(__sharedData, 19, _toSharedDataString(scrollIntoView.value));
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 6, _toSharedDataBoolean($slots["header"] != null));
-      }, () => {
-        _createSharedDataSlot("header", null, null);
-      });
-      _createSharedDataSlot("default", null, null);
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 7, _toSharedDataBoolean($slots["footer"] != null));
-      }, () => {
-        _createSharedDataSlot("footer", null, null);
-      });
-      _setSharedDataEvent(__sharedData, 9, scrollHandler);
-      _setSharedDataStyle(__sharedData, 10, {
-        flex: 1
-      });
-      _setSharedDataTemplateRef(__sharedData, 11, (n13) => {
-        _setTemplateRef(n13, "up-index-list__scroll-view");
-      });
-      _renderSharedDataEffect(() => {
-        return _setSharedDataStyle(__sharedData, 20, letterStyle.value);
-      });
-      _createSharedDataFor(_setSharedDataScoped(__sharedData, 8, _createSharedDataVFor(__sharedDataScope, () => {
-        return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-      })), () => {
-        return uIndexList.value;
-      }, (__sharedData_VFor0, _for_item0, _for_key0) => {
-        _renderSharedDataEffect(() => {
-          const _index = _for_key0.value;
-          _setSharedDataClass(__sharedData_VFor0, 1, ["up-index-list__letter__item", { "up-index-list__letter__item--active": activeIndex.value == _index && __props.activeColor == "#5677fc" }]);
-          _setSharedDataStyle(__sharedData_VFor0, 2, getItemStyle(_index));
-          _setSharedDataStyle(__sharedData_VFor0, 3, getItemTextStyle(_index));
-          _setSharedData(__sharedData_VFor0, 4, _toDisplayString(keyVal(_for_item0.value)));
-        });
-        return null;
-      }, (__sharedData_VFor0, item, index) => {
-        return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
-      }, 1);
-      _setSharedDataEvent(__sharedData, 12, touchStart);
-      _setSharedDataEvent(__sharedData, 13, touchMove);
-      _setSharedDataEvent(__sharedData, 14, touchEnd);
-      _setSharedDataEvent(__sharedData, 15, touchEnd);
-      _setSharedDataTemplateRef(__sharedData, 16, (n18) => {
-        _setTemplateRef(n18, "up-index-list__letter");
-      });
-      const n21 = _createSharedDataComponentWithFallback(_component_up_transition, "bdcb4e28", {
-        mode: "fade",
-        show: () => {
-          return touching.value;
-        },
-        customStyle: () => {
-          return indicatorTransitionStyle.value;
-        }
-      }, {
-        "default": () => {
-          _setSharedDataClass(__sharedData, 3, ["up-index-list__indicator", ["up-index-list__indicator--show"]]);
-          _renderSharedDataEffect(() => {
-            const _activeIndex = activeIndex.value;
-            _setSharedDataStyle(__sharedData, 4, indicatorBoxStyle.value);
-            _setSharedData(__sharedData, 5, _toDisplayString(_activeIndex >= 0 ? keyVal(uIndexList.value[_activeIndex]) : ""));
-          });
-        }
-      });
-      _setSharedData(__sharedData, 2, n21?.sharedData);
-      _setSharedDataTemplateRef(__sharedData, 17, (n22) => {
-        _setTemplateRef(n22, "up-index-list");
-      });
-      return __sharedData;
-    };
+    const __returned__ = { children, addChild, getChildren, instance, indexList, props, activeIndex, touching, scrollTop, scrollIntoView, indicatorHeight, anchors, indicatorText, letterInfo, pageY, topOffset, sys, scrollViewHeight, scrolling, uIndexList, getIndexListScrollViewRect, getIndexListLetterRect, setIndexListLetterInfo, letterStyle, indicatorTop, indicatorTransitionStyle, indicatorBoxStyle, getItemTextStyle, keyVal, getIndexListRect, init, getHeaderRect, setValueForTouch, getIndexListLetter, touchStart, touchMove, touchEnd, scrollHandler, getItemStyle, addAnchors, getProps, getRefs };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_3 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = {"u-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-index-list":{"":{"position":"relative","flexGrow":1,"flexShrink":1,"flexBasis":"0%","display":"flex","flexDirection":"column"}},"up-index-list__letter":{"":{"position":"absolute","right":0,"zIndex":3,"paddingTop":0,"paddingRight":6,"paddingBottom":0,"paddingLeft":6,"width":30}},"up-index-list__letter__item":{"":{"width":16,"height":16,"borderTopLeftRadius":100,"borderTopRightRadius":100,"borderBottomRightRadius":100,"borderBottomLeftRadius":100,"marginTop":1,"marginRight":0,"marginBottom":1,"marginLeft":0,"display":"flex","flexDirection":"row","alignItems":"center","justifyContent":"center"}},"up-index-list__letter__item--active":{"":{"backgroundColor":"var(--theme-color, #0957de)"}},"up-index-list__letter__item__index":{"":{"fontSize":12,"textAlign":"center","lineHeight":"12px"}},"up-index-list__indicator":{"":{"width":50,"height":50,"borderTopLeftRadius":100,"borderTopRightRadius":100,"borderBottomRightRadius":0,"borderBottomLeftRadius":100,"backgroundColor":"#c9c9c9","transform":"rotate(-45deg)","display":"flex","flexDirection":"row","justifyContent":"center","alignItems":"center"}},"up-index-list__indicator__text":{"":{"fontSize":28,"lineHeight":"28px","fontWeight":"bold","color":"#ffffff","transform":"rotate(45deg)","textAlign":"center"}},"flex":{"":{"display":"flex"}}};
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { resolveComponent: _resolveComponent, createVNode: _createVNode, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, renderSlot: _renderSlot, createElementVNode: _createElementVNode, renderList: _renderList, Fragment: _Fragment, toDisplayString: _toDisplayString, normalizeStyle: _normalizeStyle, normalizeClass: _normalizeClass, withCtx: _withCtx } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_index_anchor = resolveEasycom(__resolveDynamicComponent("up-index-anchor"), __easycom_1);
+  const _component_up_transition = resolveEasycom(__resolveDynamicComponent("up-transition"), __easycom_1$1);
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      ref: "up-index-list",
+      class: "up-index-list"
+    },
+    [
+      $props.sticky && $setup.activeIndex >= 0 && $setup.activeIndex < $setup.uIndexList.length ? (_openBlock(), _createElementBlock("view", {
+        key: 0,
+        class: "up-index-list__sticky-header",
+        style: { "position": "absolute", "top": "0", "left": "0", "right": "0", "z-index": "2" }
+      }, [
+        _createVNode(_component_up_index_anchor, {
+          text: $setup.keyVal($setup.uIndexList[$setup.activeIndex])
+        }, null, 8, ["text"])
+      ])) : _createCommentVNode("v-if", true),
+      _createElementVNode("scroll-view", {
+        "scroll-top": $setup.scrollTop,
+        "scroll-into-view": $setup.scrollIntoView,
+        style: {
+          flex: 1
+        },
+        direction: "vertical",
+        onScroll: $setup.scrollHandler,
+        ref: "up-index-list__scroll-view",
+        class: "up-index-list__scroll-view"
+      }, [
+        _ctx.$slots["header"] != null ? (_openBlock(), _createElementBlock("view", {
+          key: 0,
+          class: "up-index-list__header"
+        }, [
+          _renderSlot(_ctx.$slots, "header")
+        ])) : _createCommentVNode("v-if", true),
+        _renderSlot(_ctx.$slots, "default"),
+        _ctx.$slots["footer"] != null ? (_openBlock(), _createElementBlock("view", {
+          key: 1,
+          class: "up-index-list__footer"
+        }, [
+          _renderSlot(_ctx.$slots, "footer")
+        ])) : _createCommentVNode("v-if", true)
+      ], 40, ["scroll-top", "scroll-into-view"]),
+      _createElementVNode(
+        "view",
+        {
+          class: "up-index-list__letter",
+          ref: "up-index-list__letter",
+          style: _normalizeStyle($setup.letterStyle),
+          onTouchstart: $setup.touchStart,
+          onTouchmove: $setup.touchMove,
+          onTouchend: $setup.touchEnd,
+          onTouchcancel: $setup.touchEnd
+        },
+        [
+          (_openBlock(true), _createElementBlock(
+            _Fragment,
+            null,
+            _renderList($setup.uIndexList, (item, index) => {
+              return _openBlock(), _createElementBlock(
+                "view",
+                {
+                  class: _normalizeClass(["up-index-list__letter__item", { "up-index-list__letter__item--active": $setup.activeIndex == index && $props.activeColor == "#5677fc" }]),
+                  key: index,
+                  style: _normalizeStyle($setup.getItemStyle(index))
+                },
+                [
+                  _createElementVNode(
+                    "text",
+                    {
+                      class: "up-index-list__letter__item__index",
+                      style: _normalizeStyle($setup.getItemTextStyle(index))
+                    },
+                    _toDisplayString($setup.keyVal(item)),
+                    5
+                    /* TEXT, STYLE */
+                  )
+                ],
+                6
+                /* CLASS, STYLE */
+              );
+            }),
+            128
+            /* KEYED_FRAGMENT */
+          ))
+        ],
+        36
+        /* STYLE, NEED_HYDRATION */
+      ),
+      _createVNode(_component_up_transition, {
+        mode: "fade",
+        show: $setup.touching,
+        customStyle: $setup.indicatorTransitionStyle
+      }, {
+        default: _withCtx(() => [
+          _createElementVNode(
+            "view",
+            {
+              class: _normalizeClass(["up-index-list__indicator", ["up-index-list__indicator--show"]]),
+              style: _normalizeStyle($setup.indicatorBoxStyle)
+            },
+            [
+              _createElementVNode(
+                "text",
+                { class: "up-index-list__indicator__text" },
+                _toDisplayString($setup.activeIndex >= 0 ? $setup.keyVal($setup.uIndexList[$setup.activeIndex]) : ""),
+                1
+                /* TEXT */
+              )
+            ],
+            4
+            /* STYLE */
+          )
+        ]),
+        _: 1
+        /* STABLE */
+      }, 8, ["show", "customStyle"])
+    ],
+    512
+    /* NEED_PATCH */
+  );
+}
+const __easycom_3 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-index-list/up-index-list.uvue"]]);
 export {
   __easycom_3 as _
 };

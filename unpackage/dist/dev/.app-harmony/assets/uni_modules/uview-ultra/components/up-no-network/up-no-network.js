@@ -1,21 +1,16 @@
 import { _ as __easycom_0 } from "../up-icon/up-icon.js";
+import { r as resolveEasycom } from "../../../../App.ku.js";
 import { _ as __easycom_2 } from "../up-button/up-button.js";
 import { _ as __easycom_2$1 } from "../up-overlay/up-overlay.js";
 import { o as getDeviceInfo, t as toast } from "../../libs/function/index.js";
 import { t } from "../../libs/i18n/index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect, withSharedDataVaporCtx: _withSharedDataVaporCtx, withModifiers: _withModifiers } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpNoNetworkUpNoNetwork";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref, onMounted } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-no-network"
   },
-  __dynamicSharedData: true,
-  __hash: "3dfaf1d8",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-no-network/up-no-network.uvue",
   __name: "up-no-network",
   props: {
     tips: {
@@ -34,8 +29,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   emits: ["disconnected", "connected", "retry"],
   setup(__props, _a) {
     var __expose = _a.expose, __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpNoNetworkUpNoNetworkSharedData", sharedDataClassId: 0 })));
+    const props = __props;
     const emit = __emit;
     const isConnected = ref(true);
     const networkType = ref("none");
@@ -64,6 +58,10 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       }));
       emit("retry");
     }
+    function openSettings() {
+      if (networkType.value == "none")
+        ;
+    }
     onMounted(() => {
       isIOS.value = getDeviceInfo().platform === "ios";
       uni.onNetworkStatusChange((res) => {
@@ -86,68 +84,59 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     __expose({
       retry
     });
-    return () => {
-      "raw js";
-      const _component_up_icon = __easycom_0;
-      const _component_up_button = __easycom_2;
-      const _component_up_overlay = __easycom_2$1;
-      const n5 = _createSharedDataComponentWithFallback(
-        _component_up_overlay,
-        "7572fa11",
-        {
-          show: () => {
-            return !isConnected.value;
-          },
-          zIndex: () => {
-            return __props.zIndex;
-          },
-          onTouchmove: () => {
-            return _withModifiers(noop, ["stop", "prevent"]);
-          },
-          customStyle: {
-            backgroundColor: "#fff",
-            display: "flex",
-            justifyContent: "center"
-          }
-        },
-        {
-          "default": _withSharedDataVaporCtx(() => {
-            const n0 = _createSharedDataComponentWithFallback(_component_up_icon, "36c67f64", {
-              name: () => {
-                return __props.image;
-              },
-              size: "150",
-              imgMode: "widthFit",
-              class: "up-no-network__error-icon"
-            });
-            _setSharedData(__sharedData, 1, n0?.sharedData);
-            _renderSharedDataEffect(() => {
-              return _setSharedData(__sharedData, 3, _toDisplayString(__props.tips));
-            });
-            const n2 = _createSharedDataComponentWithFallback(_component_up_button, "36c66f9c", {
-              size: "mini",
-              text: () => {
-                return t$1("up.common.retry");
-              },
-              type: "primary",
-              plain: "",
-              onClick: () => {
-                return retry;
-              }
-            });
-            _setSharedData(__sharedData, 2, n2?.sharedData);
-          })
-        },
-        1
-        /* SINGLE_ROOT */
-      );
-      _setSharedData(__sharedData, 0, n5?.sharedData);
-      return __sharedData;
-    };
+    const __returned__ = { props, emit, isConnected, networkType, isIOS, noop, t: t$1, emitEvent, retry, openSettings };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = {"u-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-no-network":{"":{"display":"flex","flexDirection":"column","justifyContent":"center","alignItems":"center","marginTop":-100}},"up-no-network__tips":{"":{"color":"#909193","fontSize":14,"marginTop":15}},"up-no-network__app":{"":{"display":"flex","flexDirection":"row","marginTop":6}},"up-no-network__app__setting":{"":{"color":"#c0c4cc","fontSize":13}},"up-no-network__app__to-setting":{"":{"fontSize":13,"color":"var(--theme-color, #0957de)","marginLeft":3}},"up-no-network__retry":{"":{"display":"flex","flexDirection":"row","justifyContent":"center","marginTop":15}},"flex":{"":{"display":"flex"}}};
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { resolveComponent: _resolveComponent, createVNode: _createVNode, toDisplayString: _toDisplayString, createElementVNode: _createElementVNode, withModifiers: _withModifiers, withCtx: _withCtx, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
+  const _component_up_button = resolveEasycom(__resolveDynamicComponent("up-button"), __easycom_2);
+  const _component_up_overlay = resolveEasycom(__resolveDynamicComponent("up-overlay"), __easycom_2$1);
+  return _openBlock(), _createBlock(_component_up_overlay, {
+    show: !$setup.isConnected,
+    zIndex: $props.zIndex,
+    onTouchmove: _withModifiers($setup.noop, ["stop", "prevent"]),
+    customStyle: {
+      backgroundColor: "#fff",
+      display: "flex",
+      justifyContent: "center"
+    }
+  }, {
+    default: _withCtx(() => [
+      _createElementVNode("view", { class: "up-no-network" }, [
+        _createVNode(_component_up_icon, {
+          name: $props.image,
+          size: "150",
+          imgMode: "widthFit",
+          class: "up-no-network__error-icon"
+        }, null, 8, ["name"]),
+        _createElementVNode(
+          "text",
+          { class: "up-no-network__tips" },
+          _toDisplayString($props.tips),
+          1
+          /* TEXT */
+        ),
+        _createElementVNode("view", { class: "up-no-network__retry" }, [
+          _createVNode(_component_up_button, {
+            size: "mini",
+            text: $setup.t("up.common.retry"),
+            type: "primary",
+            plain: "",
+            onClick: $setup.retry
+          }, null, 8, ["text"])
+        ])
+      ])
+    ]),
+    _: 1
+    /* STABLE */
+  }, 8, ["show", "zIndex"]);
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-no-network/up-no-network.uvue"]]);
 export {
   __easycom_1 as _
 };

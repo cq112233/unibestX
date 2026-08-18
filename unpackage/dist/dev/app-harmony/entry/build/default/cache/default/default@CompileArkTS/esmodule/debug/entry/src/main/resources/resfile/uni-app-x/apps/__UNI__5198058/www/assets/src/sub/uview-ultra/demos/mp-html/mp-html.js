@@ -1,6 +1,6 @@
 import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/components/NavBar/NavBar&";
+import { A as AppKu, r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { _ as __easycom_1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/mp-html/components/mp-html/mp-html&";
-import { _ as _sfc_main$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { L as LayoutComponent } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/layouts/default&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/systemInfo&";
@@ -64,20 +64,13 @@ import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/token&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/user&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/toast&";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, resolveComponent: _resolveComponent, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
-const __className = "GenSrcSubUviewUltraDemosMpHtmlMpHtml";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "7bb18bbe",
-  __className,
-  __filename: "src/sub/uview-ultra/demos/mp-html/mp-html.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "mp-html",
-  setup(__props) {
-    const __sharedDataRenderer = _useSharedDataRenderer();
-    const __sharedData = __sharedDataRenderer == "component" ? _withSharedDataComponent(new UniDynamicSharedDataComponent(_useSharedDataScope(), _useSharedDataComponentOptions({ bundleKey: "GenSrcSubUviewUltraDemosMpHtmlMpHtmlSharedData", sharedDataClassId: 0 }))) : _withSharedDataPage(new UniDynamicSharedDataPage(_useSharedDataPageId(), _useSharedDataPageOptions({ bundleKey: "GenSrcSubUviewUltraDemosMpHtmlMpHtmlSharedData", sharedDataClassId: 0 })));
-    _useSharedDataScope(__sharedData);
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
     const content1 = ref(`
   <h2>mp-html 跨端富文本组件</h2>
   <p>这是一个专门为 <b>uni-app X</b> 打造的高性能原生 HTML 解析器组件，支持多种 HTML 5 常见标签与样式。</p>
@@ -127,55 +120,76 @@ const node = parse(html)</code></pre>
   <p>示例图片展示：</p>
   <img src="/static/logo.png" style="width: 120px; height: 120px;" />
 `);
-    return () => {
-      "raw js";
-      const _component_NavBar = __easycom_0;
-      const _component_mp_html = __easycom_1;
-      const n24 = _createSharedDataComponent(_sfc_main$1, "2a02d9fd", null, {
-        "default": _withSharedDataVaporCtx(() => {
-          const n23 = _createSharedDataComponent(LayoutComponent, "16586599", {
-            "navigation-bar-title-text": "mp-html 富文本组件",
-            "navigation-style": "custom"
-          }, {
-            "default": _withSharedDataVaporCtx(() => {
-              const n0 = _createSharedDataComponentWithFallback(_component_NavBar, "969763ca", {
-                title: "mp-html 富文本组件",
-                "auto-back": true
-              });
-              _setSharedData(__sharedData, 2, n0?.sharedData);
-              const n2 = _createSharedDataComponentWithFallback(_component_mp_html, "96974efa", { content: () => {
-                return content1.value;
-              } });
-              _setSharedData(__sharedData, 3, n2?.sharedData);
-              const n6 = _createSharedDataComponentWithFallback(_component_mp_html, "96973f3e", { content: () => {
-                return contentTable.value;
-              } });
-              _setSharedData(__sharedData, 4, n6?.sharedData);
-              const n10 = _createSharedDataComponentWithFallback(_component_mp_html, "96972f80", { content: () => {
-                return contentList.value;
-              } });
-              _setSharedData(__sharedData, 5, n10?.sharedData);
-              const n14 = _createSharedDataComponentWithFallback(_component_mp_html, "3c554928", { content: () => {
-                return contentCode.value;
-              } });
-              _setSharedData(__sharedData, 6, n14?.sharedData);
-              const n18 = _createSharedDataComponentWithFallback(_component_mp_html, "3c55348a", { content: () => {
-                return contentMedia.value;
-              } });
-              _setSharedData(__sharedData, 7, n18?.sharedData);
-            })
-          });
-          _setSharedData(__sharedData, 1, n23.sharedData);
-        })
-      });
-      _setSharedData(__sharedData, 0, n24.sharedData);
-      return __sharedData;
-    };
+    const __returned__ = { content1, contentTable, contentList, contentCode, contentMedia, get AppKu() {
+      return AppKu;
+    }, get LayoutComponent() {
+      return LayoutComponent;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const _style_1 = {};
-const mpHtml = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0, _style_1]]]);
+const _style_0 = {"demo-block":{"":{"marginBottom":12,"paddingTop":12,"paddingRight":12,"paddingBottom":12,"paddingLeft":12,"backgroundColor":"#ffffff","borderTopLeftRadius":8,"borderTopRightRadius":8,"borderBottomRightRadius":8,"borderBottomLeftRadius":8}},"demo-label":{"":{"fontSize":14,"fontWeight":"bold","color":"#606266","marginBottom":10,"paddingLeft":4,"borderLeftWidth":3,"borderLeftStyle":"solid","borderLeftColor":"#2979ff"}},"content-box":{"":{"backgroundColor":"#f8fafc","paddingTop":10,"paddingRight":10,"paddingBottom":10,"paddingLeft":10,"borderTopLeftRadius":6,"borderTopRightRadius":6,"borderBottomRightRadius":6,"borderBottomLeftRadius":6}},"bg-_b_hf8fafc_B":{"":{"backgroundColor":"#f8fafc"}},"content":{"":{"display":"flex","flexDirection":"column","alignItems":"center","paddingTop":"32rpx","paddingBottom":"32rpx"}},"flex":{"":{"display":"flex"}}};
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { resolveComponent: _resolveComponent, createVNode: _createVNode, createElementVNode: _createElementVNode, withCtx: _withCtx, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_NavBar = resolveEasycom(__resolveDynamicComponent("NavBar"), __easycom_0);
+  const _component_mp_html = resolveEasycom(__resolveDynamicComponent("mp-html"), __easycom_1);
+  return _openBlock(), _createBlock($setup["AppKu"], null, {
+    default: _withCtx(() => [
+      _createVNode($setup["LayoutComponent"], {
+        "navigation-bar-title-text": "mp-html 富文本组件",
+        "navigation-style": "custom"
+      }, {
+        default: _withCtx(() => [
+          _createElementVNode("view", { class: "page-container bg-_b_hf8fafc_B min-h-screen pb-30px" }, [
+            _createVNode(_component_NavBar, {
+              title: "mp-html 富文本组件",
+              "auto-back": true
+            }),
+            _createElementVNode("view", { class: "p-16px" }, [
+              _createElementVNode("view", { class: "demo-block" }, [
+                _createElementVNode("text", { class: "demo-label" }, "基础文本与排版"),
+                _createElementVNode("view", { class: "content-box" }, [
+                  _createVNode(_component_mp_html, { content: $setup.content1 }, null, 8, ["content"])
+                ])
+              ]),
+              _createElementVNode("view", { class: "demo-block mt-12px" }, [
+                _createElementVNode("text", { class: "demo-label" }, "HTML 表格解析 (Table)"),
+                _createElementVNode("view", { class: "content-box" }, [
+                  _createVNode(_component_mp_html, { content: $setup.contentTable }, null, 8, ["content"])
+                ])
+              ]),
+              _createElementVNode("view", { class: "demo-block mt-12px" }, [
+                _createElementVNode("text", { class: "demo-label" }, "列表解析 (List)"),
+                _createElementVNode("view", { class: "content-box" }, [
+                  _createVNode(_component_mp_html, { content: $setup.contentList }, null, 8, ["content"])
+                ])
+              ]),
+              _createElementVNode("view", { class: "demo-block mt-12px" }, [
+                _createElementVNode("text", { class: "demo-label" }, "代码块解析 (Code)"),
+                _createElementVNode("view", { class: "content-box" }, [
+                  _createVNode(_component_mp_html, { content: $setup.contentCode }, null, 8, ["content"])
+                ])
+              ]),
+              _createElementVNode("view", { class: "demo-block mt-12px" }, [
+                _createElementVNode("text", { class: "demo-label" }, "超链接与图片展示"),
+                _createElementVNode("view", { class: "content-box" }, [
+                  _createVNode(_component_mp_html, { content: $setup.contentMedia }, null, 8, ["content"])
+                ])
+              ])
+            ])
+          ])
+        ]),
+        _: 1
+        /* STABLE */
+      })
+    ]),
+    _: 1
+    /* STABLE */
+  });
+}
+const mpHtml = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/mp-html/mp-html.uvue"]]);
 export {
   mpHtml as default
 };

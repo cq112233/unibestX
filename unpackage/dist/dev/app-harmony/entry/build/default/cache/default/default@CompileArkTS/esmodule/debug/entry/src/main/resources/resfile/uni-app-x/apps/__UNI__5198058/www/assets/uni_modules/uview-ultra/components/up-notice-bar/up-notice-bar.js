@@ -1,19 +1,14 @@
 import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-column-notice/up-column-notice&";
+import { r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { _ as __easycom_1$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-row-notice/up-row-notice&";
 import { b as addStyle, d as deepMerge } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpNoticeBarUpNoticeBar";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref, computed } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-notice-bar"
   },
-  __dynamicSharedData: true,
-  __hash: "5f435d80",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-notice-bar/up-notice-bar.uvue",
   __name: "up-notice-bar",
   props: {
     text: {
@@ -79,9 +74,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   },
   emits: ["click", "close"],
   setup(__props, _a) {
-    var __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpNoticeBarUpNoticeBarSharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
     const props = __props;
     const emit = __emit;
     const show = ref(true);
@@ -110,100 +104,58 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       show.value = false;
       emit("close");
     }
-    return () => {
-      "raw js";
-      const _component_up_column_notice = __easycom_0;
-      const _component_up_row_notice = __easycom_1$1;
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(show.value));
-      }, () => {
-        _renderSharedDataEffect(() => {
-          return _setSharedDataStyle(__sharedData, 4, noticeBarStyle.value);
-        });
-        _createSharedDataIf(() => {
-          return _setSharedData(__sharedData, 1, _toSharedDataBoolean(__props.direction == "column" || __props.direction == "row" && __props.step));
-        }, () => {
-          const n4 = _createSharedDataComponentWithFallback(_component_up_column_notice, "565f4826", {
-            color: () => {
-              return __props.color;
-            },
-            bgColor: () => {
-              return __props.bgColor;
-            },
-            text: () => {
-              return __props.text;
-            },
-            mode: () => {
-              return __props.mode;
-            },
-            step: () => {
-              return __props.step;
-            },
-            icon: () => {
-              return __props.icon;
-            },
-            "disable-touch": () => {
-              return __props.disableTouch;
-            },
-            fontSize: () => {
-              return __props.fontSize;
-            },
-            duration: () => {
-              return __props.duration;
-            },
-            onClose: () => {
-              return close;
-            },
-            onClick: () => {
-              return click;
-            }
-          });
-          _setSharedData(__sharedData, 2, n4?.sharedData);
-        }, () => {
-          const n6 = _createSharedDataComponentWithFallback(_component_up_row_notice, "565f3160", {
-            color: () => {
-              return __props.color;
-            },
-            bgColor: () => {
-              return __props.bgColor;
-            },
-            text: () => {
-              return __props.text;
-            },
-            mode: () => {
-              return __props.mode;
-            },
-            fontSize: () => {
-              return __props.fontSize;
-            },
-            speed: () => {
-              return __props.speed;
-            },
-            url: () => {
-              return __props.url;
-            },
-            linkType: () => {
-              return __props.linkType;
-            },
-            icon: () => {
-              return __props.icon;
-            },
-            onClose: () => {
-              return close;
-            },
-            onClick: () => {
-              return click;
-            }
-          });
-          _setSharedData(__sharedData, 3, n6?.sharedData);
-        }, 261);
-      });
-      return __sharedData;
-    };
+    const __returned__ = { props, emit, show, noticeBarStyle, click, close };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = {"u-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-notice-bar":{"":{"paddingTop":9,"paddingRight":12,"paddingBottom":9,"paddingLeft":12}},"flex":{"":{"display":"flex"}}};
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { resolveComponent: _resolveComponent, openBlock: _openBlock, createBlock: _createBlock, createCommentVNode: _createCommentVNode, normalizeStyle: _normalizeStyle, createElementBlock: _createElementBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_column_notice = resolveEasycom(__resolveDynamicComponent("up-column-notice"), __easycom_0);
+  const _component_up_row_notice = resolveEasycom(__resolveDynamicComponent("up-row-notice"), __easycom_1$1);
+  return $setup.show ? (_openBlock(), _createElementBlock(
+    "view",
+    {
+      key: 0,
+      class: "up-notice-bar",
+      style: _normalizeStyle($setup.noticeBarStyle)
+    },
+    [
+      $props.direction == "column" || $props.direction == "row" && $props.step ? (_openBlock(), _createBlock(_component_up_column_notice, {
+        key: 0,
+        color: $props.color,
+        bgColor: $props.bgColor,
+        text: $props.text,
+        mode: $props.mode,
+        step: $props.step,
+        icon: $props.icon,
+        "disable-touch": $props.disableTouch,
+        fontSize: $props.fontSize,
+        duration: $props.duration,
+        onClose: $setup.close,
+        onClick: $setup.click
+      }, null, 8, ["color", "bgColor", "text", "mode", "step", "icon", "disable-touch", "fontSize", "duration"])) : (_openBlock(), _createBlock(_component_up_row_notice, {
+        key: 1,
+        color: $props.color,
+        bgColor: $props.bgColor,
+        text: $props.text,
+        mode: $props.mode,
+        fontSize: $props.fontSize,
+        speed: $props.speed,
+        url: $props.url,
+        linkType: $props.linkType,
+        icon: $props.icon,
+        onClose: $setup.close,
+        onClick: $setup.click
+      }, null, 8, ["color", "bgColor", "text", "mode", "fontSize", "speed", "url", "linkType", "icon"]))
+    ],
+    4
+    /* STYLE */
+  )) : _createCommentVNode("v-if", true);
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-notice-bar/up-notice-bar.uvue"]]);
 export {
   __easycom_1 as _
 };

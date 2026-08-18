@@ -57,7 +57,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.sr(onSigRef, "2113a5a6-1,2113a5a6-0"),
+        a: common_vendor.sr(onSigRef, "2da877ec-1,2da877ec-0"),
         b: onSigRef,
         c: common_vendor.p({
           ["pen-color"]: penColor.value,
@@ -65,20 +65,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           ["open-smooth"]: openSmooth.value,
           ["disable-scroll"]: true,
           ["background-color"]: "#ffffff",
-          class: "r"
+          class: "r data-v-2da877ec"
         }),
         d: common_vendor.o(($event) => {
           return onAction("save");
-        }, "fc"),
+        }, "26"),
         e: common_vendor.o(($event) => {
           return onAction("undo");
-        }, "2d"),
+        }, "ff"),
         f: common_vendor.o(($event) => {
           return onAction("redo");
-        }, "c8"),
+        }, "ed"),
         g: common_vendor.o(($event) => {
           return onAction("clear");
-        }, "77"),
+        }, "99"),
         h: common_vendor.f(colorList, (clr, k0, i0) => {
           return {
             a: clr,
@@ -106,7 +106,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         l: openSmooth.value ? "#10b981" : "#cbd5e1",
         m: common_vendor.o(($event) => {
           return openSmooth.value = !openSmooth.value;
-        }, "26"),
+        }, "75"),
         n: signUrl.value !== ""
       }, signUrl.value !== "" ? {
         o: signUrl.value
@@ -114,7 +114,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         p: common_vendor.gei(_ctx, ""),
         q: common_vendor.p({
           title: "签名板 lime-signature",
-          id: common_vendor.gei(_ctx, "")
+          id: common_vendor.gei(_ctx, ""),
+          class: "data-v-2da877ec"
         }),
         r: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
@@ -122,5 +123,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-wx.createComponent(_sfc_main);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-2da877ec"]]);
+wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/src/pages/function/components/SignatureCard.js.map

@@ -73,17 +73,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         d: common_vendor.t(common_vendor.unref(userStore).state.userInfo.nickname)
       } : {}, {
         e: common_vendor.t(common_vendor.unref(tokenStore).hasValidLogin() ? "已登录" : "未登录"),
-        f: common_vendor.n(common_vendor.unref(tokenStore).hasValidLogin() ? "bg-__d1fae5_ text-__065f46_" : "bg-__f1f5f9_ text-__64748b_"),
+        f: common_vendor.n(common_vendor.unref(tokenStore).hasValidLogin() ? "wtu-1x8u93y-c wtu-1obvnxf-d" : "wtu-11a9dql-e wtu-1ya1no3-8"),
         g: common_vendor.t(common_vendor.unref(userInfoJson)),
         h: common_vendor.unref(tokenStore).hasValidLogin()
       }, common_vendor.unref(tokenStore).hasValidLogin() ? {
-        i: common_vendor.o(handleLogout, "1a")
+        i: common_vendor.o(handleLogout, "56")
       } : {
-        j: common_vendor.o(handleLogin, "a5")
+        j: common_vendor.o(handleLogin, "60")
       }, {
         k: common_vendor.gei(_ctx, ""),
         l: common_vendor.p({
-          id: common_vendor.gei(_ctx, "")
+          id: common_vendor.gei(_ctx, ""),
+          class: "data-v-be20ea8a"
         }),
         m: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
@@ -91,5 +92,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-wx.createPage(_sfc_main);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-be20ea8a"]]);
+wx.createPage(MiniProgramPage);
 //# sourceMappingURL=../../../../.sourcemap/mp-weixin/src/pages/me/me.js.map

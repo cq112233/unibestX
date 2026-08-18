@@ -87,22 +87,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         g: devBtnBg.value,
         h: common_vendor.o(($event) => {
           return switchEnv("development");
-        }, "5b"),
+        }, "78"),
         i: testBtnText.value,
         j: testBtnBg.value,
         k: common_vendor.o(($event) => {
           return switchEnv("test");
-        }, "a2"),
+        }, "3c"),
         l: prodBtnText.value,
         m: prodBtnBg.value,
         n: common_vendor.o(($event) => {
           return switchEnv("production");
-        }, "13"),
-        o: common_vendor.o(handleReset, "bb"),
+        }, "0f"),
+        o: common_vendor.o(handleReset, "b9"),
         p: common_vendor.gei(_ctx, ""),
         q: common_vendor.p({
           title: "环境变量",
-          id: common_vendor.gei(_ctx, "")
+          id: common_vendor.gei(_ctx, ""),
+          class: "data-v-f293d664"
         }),
         r: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
@@ -110,5 +111,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-wx.createComponent(_sfc_main);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-f293d664"]]);
+wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/src/pages/function/components/EnvCard.js.map

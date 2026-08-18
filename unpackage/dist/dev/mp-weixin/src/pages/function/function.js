@@ -24,15 +24,50 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
-        a: common_vendor.gei(_ctx, ""),
-        b: common_vendor.p({
-          id: common_vendor.gei(_ctx, "")
+        a: common_vendor.p({
+          class: "data-v-8f9e56dc"
         }),
-        c: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        b: common_vendor.p({
+          class: "data-v-8f9e56dc"
+        }),
+        c: common_vendor.p({
+          class: "data-v-8f9e56dc"
+        }),
+        d: common_vendor.p({
+          class: "data-v-8f9e56dc"
+        }),
+        e: common_vendor.p({
+          class: "data-v-8f9e56dc"
+        }),
+        f: common_vendor.p({
+          class: "data-v-8f9e56dc"
+        }),
+        g: common_vendor.p({
+          class: "data-v-8f9e56dc"
+        }),
+        h: common_vendor.p({
+          class: "data-v-8f9e56dc"
+        }),
+        i: common_vendor.p({
+          class: "data-v-8f9e56dc"
+        }),
+        j: common_vendor.p({
+          class: "data-v-8f9e56dc"
+        }),
+        k: common_vendor.p({
+          class: "data-v-8f9e56dc"
+        }),
+        l: common_vendor.gei(_ctx, ""),
+        m: common_vendor.p({
+          id: common_vendor.gei(_ctx, ""),
+          class: "data-v-8f9e56dc"
+        }),
+        n: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
       return __returned__;
     };
   }
 });
-wx.createPage(_sfc_main);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-8f9e56dc"]]);
+wx.createPage(MiniProgramPage);
 //# sourceMappingURL=../../../../.sourcemap/mp-weixin/src/pages/function/function.js.map

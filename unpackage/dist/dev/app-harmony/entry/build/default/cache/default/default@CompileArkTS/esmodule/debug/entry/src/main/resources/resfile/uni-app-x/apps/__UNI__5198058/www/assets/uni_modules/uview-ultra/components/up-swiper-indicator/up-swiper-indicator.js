@@ -1,18 +1,12 @@
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-swiper-indicator/swipterIndicator&";
 import { a as addUnit } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataIf: _createSharedDataIf, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, toDisplayString: _toDisplayString, createSharedDataFor: _createSharedDataFor } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpSwiperIndicatorUpSwiperIndicator";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { computed, ref } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-swiper-indicator"
   },
-  __dynamicSharedData: true,
-  __hash: "aa7ce418",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-swiper-indicator/up-swiper-indicator.uvue",
   __name: "up-swiper-indicator",
   props: {
     length: {
@@ -36,9 +30,9 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       default: "line"
     }
   },
-  setup(__props) {
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpSwiperIndicatorUpSwiperIndicatorSharedData", sharedDataClassId: 0 })));
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
     const props = __props;
     const lineWidth = ref(22);
     const lengthArray = computed(() => {
@@ -67,41 +61,64 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       style["backgroundColor"] = index === parseInt(props.current.toString()) ? props.indicatorActiveColor : props.indicatorInactiveColor;
       return style;
     }
-    return () => {
-      "raw js";
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.indicatorMode === "line"));
-      }, () => {
-        _renderSharedDataEffect(() => {
-          _setSharedDataClass(__sharedData, 1, ["up-swiper-indicator__wrapper", [`up-swiper-indicator__wrapper--${__props.indicatorMode}`]]);
-          _setSharedDataStyle(__sharedData, 2, lineWrapperStyle.value);
-          _setSharedDataStyle(__sharedData, 3, lineStyle.value);
-        });
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 4, _toSharedDataBoolean(__props.indicatorMode === "dot"));
-      }, () => {
-        _createSharedDataFor(_setSharedDataScoped(__sharedData, 5, _createSharedDataVFor(__sharedDataScope, () => {
-          return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-        })), () => {
-          return lengthArray.value;
-        }, (__sharedData_VFor0, _for_item0, _for_key0) => {
-          _renderSharedDataEffect(() => {
-            const _index = _for_key0.value;
-            _setSharedDataClass(__sharedData_VFor0, 1, ["up-swiper-indicator__wrapper__dot", [_index === parseInt(__props.current.toString()) ? "up-swiper-indicator__wrapper__dot--active" : ""]]);
-            _setSharedDataStyle(__sharedData_VFor0, 2, dotStyle(_index));
-          });
-          return null;
-        }, (__sharedData_VFor0, item, index) => {
-          return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
-        }, 1);
-      });
-      return __sharedData;
-    };
+    const __returned__ = { props, lineWidth, lengthArray, lineStyle, lineWrapperStyle, dotStyle };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = {"u-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-swiper-indicator__wrapper":{"":{"display":"flex","flexDirection":"row"}},"up-swiper-indicator__wrapper--line":{"":{"borderTopLeftRadius":100,"borderTopRightRadius":100,"borderBottomRightRadius":100,"borderBottomLeftRadius":100,"height":4}},"up-swiper-indicator__wrapper--line__bar":{"":{"width":22,"height":4,"borderTopLeftRadius":100,"borderTopRightRadius":100,"borderBottomRightRadius":100,"borderBottomLeftRadius":100,"backgroundColor":"#FFFFFF","transitionProperty":"transform","transitionDuration":"0.3s"}},"up-swiper-indicator__wrapper__dot":{"":{"width":5,"height":5,"borderTopLeftRadius":100,"borderTopRightRadius":100,"borderBottomRightRadius":100,"borderBottomLeftRadius":100,"marginTop":0,"marginRight":4,"marginBottom":0,"marginLeft":4}},"up-swiper-indicator__wrapper__dot--active":{"":{"width":12}},"@TRANSITION":{"up-swiper-indicator__wrapper--line__bar":{"property":"transform","duration":"0.3s"}},"flex":{"":{"display":"flex"}}};
+const { normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode, normalizeClass: _normalizeClass, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, renderList: _renderList, Fragment: _Fragment } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createElementBlock("view", { class: "up-swiper-indicator" }, [
+    $props.indicatorMode === "line" ? (_openBlock(), _createElementBlock(
+      "view",
+      {
+        key: 0,
+        class: _normalizeClass(["up-swiper-indicator__wrapper", [`up-swiper-indicator__wrapper--${$props.indicatorMode}`]]),
+        style: _normalizeStyle($setup.lineWrapperStyle)
+      },
+      [
+        _createElementVNode(
+          "view",
+          {
+            class: "up-swiper-indicator__wrapper--line__bar",
+            style: _normalizeStyle($setup.lineStyle)
+          },
+          null,
+          4
+          /* STYLE */
+        )
+      ],
+      6
+      /* CLASS, STYLE */
+    )) : _createCommentVNode("v-if", true),
+    $props.indicatorMode === "dot" ? (_openBlock(), _createElementBlock("view", {
+      key: 1,
+      class: "up-swiper-indicator__wrapper"
+    }, [
+      (_openBlock(true), _createElementBlock(
+        _Fragment,
+        null,
+        _renderList($setup.lengthArray, (item, index) => {
+          return _openBlock(), _createElementBlock(
+            "view",
+            {
+              class: _normalizeClass(["up-swiper-indicator__wrapper__dot", [index === parseInt($props.current.toString()) ? "up-swiper-indicator__wrapper__dot--active" : ""]]),
+              key: index,
+              style: _normalizeStyle($setup.dotStyle(index))
+            },
+            null,
+            6
+            /* CLASS, STYLE */
+          );
+        }),
+        128
+        /* KEYED_FRAGMENT */
+      ))
+    ])) : _createCommentVNode("v-if", true)
+  ]);
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-swiper-indicator/up-swiper-indicator.uvue"]]);
 export {
   __easycom_1 as _
 };

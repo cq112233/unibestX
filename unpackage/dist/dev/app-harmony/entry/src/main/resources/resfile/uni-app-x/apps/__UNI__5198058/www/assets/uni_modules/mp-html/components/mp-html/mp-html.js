@@ -1,7 +1,5 @@
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, setSharedData: _setSharedData, toDisplayString: _toDisplayString, toSharedDataBoolean: _toSharedDataBoolean, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, setSharedDataEvent: _setSharedDataEvent, setSharedDataStyle: _setSharedDataStyle, createSharedDataFor: _createSharedDataFor, createSharedDataIf: _createSharedDataIf } = globalThis.Vue;
-const __className = "GenUniModulesMpHtmlComponentsMpHtmlMpHtml";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref, watch, onMounted } = globalThis.Vue;
 class HtmlNode extends UTS.UTSType {
   static get$UTSMetadata$() {
@@ -30,14 +28,10 @@ class HtmlNode extends UTS.UTSType {
     delete this.__props__;
   }
 }
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "mp-html"
   },
-  __dynamicSharedData: true,
-  __hash: "10e6a879",
-  __className,
-  __filename: "uni_modules/mp-html/components/mp-html/mp-html.uvue",
   __name: "mp-html",
   props: {
     containerStyle: { type: String, default: "" },
@@ -53,8 +47,6 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   emits: ["load", "ready", "imgtap", "linktap"],
   setup(__props, _a) {
     var __expose = _a.expose, __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesMpHtmlComponentsMpHtmlMpHtmlSharedData", sharedDataClassId: 0 })));
     const props = __props;
     const emit = __emit;
     const localNodes = ref([]);
@@ -503,194 +495,204 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       setContent,
       getText
     });
-    return () => {
-      "raw js";
-      _createSharedDataFor(_setSharedDataScoped(__sharedData, 0, _createSharedDataVFor(__sharedDataScope, () => {
-        return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-      })), () => {
-        return localNodes.value;
-      }, (__sharedData_VFor0, _for_item0, _for_key0) => {
-        _createSharedDataIf(() => {
-          return _setSharedData(__sharedData_VFor0, 1, _toSharedDataBoolean(_for_item0.value.type == "text"));
-        }, () => {
-          _renderSharedDataEffect(() => {
-            return _setSharedData(__sharedData_VFor0, 2, _toDisplayString(_for_item0.value.text));
-          });
-        }, () => {
-          return _createSharedDataIf(() => {
-            return _setSharedData(__sharedData_VFor0, 3, _toSharedDataBoolean(_for_item0.value.name == "br"));
-          }, () => {
-          }, () => {
-            return _createSharedDataIf(() => {
-              return _setSharedData(__sharedData_VFor0, 4, _toSharedDataBoolean(_for_item0.value.name == "img"));
-            }, () => {
-              _renderSharedDataEffect(() => {
-                const _n = _for_item0.value;
-                const _n_attrs = _n.attrs;
-                _setSharedDataAttr(__sharedData_VFor0, 5, _toSharedDataString(_n_attrs != null ? _n_attrs["src"] ?? "" : ""));
-              });
-            }, () => {
-              return _createSharedDataIf(() => {
-                return _setSharedData(__sharedData_VFor0, 6, _toSharedDataBoolean(_for_item0.value.name == "a"));
-              }, () => {
-                _setSharedDataEvent(__sharedData_VFor0, 7, () => {
-                  return onLinkTap(_for_item0.value);
-                });
-                _renderSharedDataEffect(() => {
-                  return _setSharedData(__sharedData_VFor0, 8, _toDisplayString(flatText(_for_item0.value)));
-                });
-              }, () => {
-                return _createSharedDataIf(() => {
-                  return _setSharedData(__sharedData_VFor0, 9, _toSharedDataBoolean(isInline(_for_item0.value.name ?? "")));
-                }, () => {
-                  _renderSharedDataEffect(() => {
-                    const _n = _for_item0.value;
-                    _setSharedDataStyle(__sharedData_VFor0, 10, inlineStyle(_n.name ?? ""));
-                    _setSharedData(__sharedData_VFor0, 11, _toDisplayString(flatText(_n)));
-                  });
-                }, () => {
-                  return _createSharedDataIf(() => {
-                    return _setSharedData(__sharedData_VFor0, 12, _toSharedDataBoolean(_for_item0.value.name == "h1" || _for_item0.value.name == "h2" || _for_item0.value.name == "h3" || _for_item0.value.name == "h4" || _for_item0.value.name == "h5" || _for_item0.value.name == "h6"));
-                  }, () => {
-                    _renderSharedDataEffect(() => {
-                      const _n = _for_item0.value;
-                      _setSharedDataStyle(__sharedData_VFor0, 13, headingStyle(_n.name ?? ""));
-                      _setSharedData(__sharedData_VFor0, 14, _toDisplayString(flatText(_n)));
-                    });
-                  }, () => {
-                    return _createSharedDataIf(() => {
-                      return _setSharedData(__sharedData_VFor0, 15, _toSharedDataBoolean(_for_item0.value.name == "pre" || _for_item0.value.name == "code"));
-                    }, () => {
-                      _renderSharedDataEffect(() => {
-                        return _setSharedData(__sharedData_VFor0, 16, _toDisplayString(flatText(_for_item0.value)));
-                      });
-                    }, () => {
-                      return _createSharedDataIf(() => {
-                        return _setSharedData(__sharedData_VFor0, 17, _toSharedDataBoolean(_for_item0.value.name == "hr"));
-                      }, () => {
-                      }, () => {
-                        return _createSharedDataIf(() => {
-                          return _setSharedData(__sharedData_VFor0, 18, _toSharedDataBoolean(_for_item0.value.name == "table"));
-                        }, () => {
-                          _createSharedDataFor(_setSharedDataScoped(__sharedData_VFor0, 19, _createSharedDataVFor(__sharedDataScope, () => {
-                            return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 2 });
-                          })), () => {
-                            return _for_item0.value.children ?? [];
-                          }, (__sharedData_VFor1, _for_item1, _for_key1) => {
-                            _createSharedDataFor(_setSharedDataScoped(__sharedData_VFor1, 1, _createSharedDataVFor(__sharedDataScope, () => {
-                              return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 3 });
-                            })), () => {
-                              return _for_item1.value.children ?? [];
-                            }, (__sharedData_VFor2, _for_item2, _for_key2) => {
-                              _renderSharedDataEffect(() => {
-                                const _cell = _for_item2.value;
-                                const _cell_name = _cell.name;
-                                _setSharedDataStyle(__sharedData_VFor2, 1, (_cell_name == "th" ? "background-color:#f5f5f5;" : "") + "flex:1;padding:4px 8px;border-width:1px;border-color:#d0d0d0;border-style:solid");
-                                _setSharedDataStyle(__sharedData_VFor2, 2, _cell_name == "th" ? "font-weight:bold;" : "");
-                                _setSharedData(__sharedData_VFor2, 3, _toDisplayString(flatText(_cell)));
-                              });
-                              return null;
-                            }, (__sharedData_VFor2, cell, ci) => {
-                              return _setSharedData(__sharedData_VFor2, 0, _toDisplayString(ci));
-                            }, 1);
-                            return null;
-                          }, (__sharedData_VFor1, row, ri) => {
-                            return _setSharedData(__sharedData_VFor1, 0, _toDisplayString(ri));
-                          }, 1);
-                        }, () => {
-                          return _createSharedDataIf(() => {
-                            return _setSharedData(__sharedData_VFor0, 20, _toSharedDataBoolean(_for_item0.value.name == "ul" || _for_item0.value.name == "ol"));
-                          }, () => {
-                            _createSharedDataFor(_setSharedDataScoped(__sharedData_VFor0, 21, _createSharedDataVFor(__sharedDataScope, () => {
-                              return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 4 });
-                            })), () => {
-                              return _for_item0.value.children ?? [];
-                            }, (__sharedData_VFor3, _for_item3, _for_key3) => {
-                              _renderSharedDataEffect(() => {
-                                _setSharedData(__sharedData_VFor3, 1, _toDisplayString(_for_item0.value.name == "ol" ? (_for_key3.value + 1).toString() + ". " : "• "));
-                                _setSharedData(__sharedData_VFor3, 2, _toDisplayString(flatText(_for_item3.value)));
-                              });
-                              return null;
-                            }, (__sharedData_VFor3, li, lii) => {
-                              return _setSharedData(__sharedData_VFor3, 0, _toDisplayString(lii));
-                            }, 1);
-                          }, () => {
-                            _createSharedDataFor(_setSharedDataScoped(__sharedData_VFor0, 22, _createSharedDataVFor(__sharedDataScope, () => {
-                              return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 5 });
-                            })), () => {
-                              return _for_item0.value.children ?? [];
-                            }, (__sharedData_VFor4, _for_item4, _for_key4) => {
-                              _createSharedDataIf(() => {
-                                return _setSharedData(__sharedData_VFor4, 1, _toSharedDataBoolean(_for_item4.value.type == "text"));
-                              }, () => {
-                                _renderSharedDataEffect(() => {
-                                  return _setSharedData(__sharedData_VFor4, 2, _toDisplayString(_for_item4.value.text));
-                                });
-                              }, () => {
-                                return _createSharedDataIf(() => {
-                                  return _setSharedData(__sharedData_VFor4, 3, _toSharedDataBoolean(_for_item4.value.name == "br"));
-                                }, () => {
-                                }, () => {
-                                  return _createSharedDataIf(() => {
-                                    return _setSharedData(__sharedData_VFor4, 4, _toSharedDataBoolean(_for_item4.value.name == "img"));
-                                  }, () => {
-                                    _renderSharedDataEffect(() => {
-                                      const _cn = _for_item4.value;
-                                      const _cn_attrs = _cn.attrs;
-                                      _setSharedDataAttr(__sharedData_VFor4, 5, _toSharedDataString(_cn_attrs != null ? _cn_attrs["src"] ?? "" : ""));
-                                    });
-                                  }, () => {
-                                    return _createSharedDataIf(() => {
-                                      return _setSharedData(__sharedData_VFor4, 6, _toSharedDataBoolean(_for_item4.value.name == "a"));
-                                    }, () => {
-                                      _setSharedDataEvent(__sharedData_VFor4, 7, () => {
-                                        return onLinkTap(_for_item4.value);
-                                      });
-                                      _renderSharedDataEffect(() => {
-                                        return _setSharedData(__sharedData_VFor4, 8, _toDisplayString(flatText(_for_item4.value)));
-                                      });
-                                    }, () => {
-                                      return _createSharedDataIf(() => {
-                                        return _setSharedData(__sharedData_VFor4, 9, _toSharedDataBoolean(isInline(_for_item4.value.name ?? "")));
-                                      }, () => {
-                                        _renderSharedDataEffect(() => {
-                                          const _cn = _for_item4.value;
-                                          _setSharedDataStyle(__sharedData_VFor4, 10, inlineStyle(_cn.name ?? ""));
-                                          _setSharedData(__sharedData_VFor4, 11, _toDisplayString(flatText(_cn)));
-                                        });
-                                      }, () => {
-                                        _renderSharedDataEffect(() => {
-                                          return _setSharedData(__sharedData_VFor4, 12, _toDisplayString(flatText(_for_item4.value)));
-                                        });
-                                      }, 3850);
-                                    }, 3594);
-                                  }, 3338);
-                                }, 3082);
-                              }, 2826);
-                              return null;
-                            }, (__sharedData_VFor4, cn, ci) => {
-                              return _setSharedData(__sharedData_VFor4, 0, _toDisplayString(ci));
-                            }, 1);
-                          }, 2570);
-                        }, 2314);
-                      }, 2058);
-                    }, 1802);
-                  }, 1546);
-                }, 1290);
-              }, 1034);
-            }, 778);
-          }, 522);
-        }, 266);
-        return null;
-      }, (__sharedData_VFor0, n, i) => {
-        return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(i));
-      }, 1);
-      return __sharedData;
-    };
+    const __returned__ = { props, emit, localNodes, isSpace, isInline, isHeading, cleanText, stripAllTags, flatText, inlineStyle, headingStyle, parseAttrs, findMatchingClose, parseTable, parseList, parseHtml, doParse, setContent, getText, onLinkTap };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = {"_mp_root":{"":{"paddingTop":1,"paddingRight":0,"paddingBottom":1,"paddingLeft":0}},"mp-a":{"":{"color":"#366092"}},"flex":{"":{"display":"flex"}}};
+const { renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, toDisplayString: _toDisplayString, normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createElementBlock("view", { class: "_mp_root" }, [
+    (_openBlock(true), _createElementBlock(
+      _Fragment,
+      null,
+      _renderList($setup.localNodes, (n, i) => {
+        return _openBlock(), _createElementBlock(
+          _Fragment,
+          { key: i },
+          [
+            n.type == "text" ? (_openBlock(), _createElementBlock(
+              "text",
+              { key: 0 },
+              _toDisplayString(n.text),
+              1
+              /* TEXT */
+            )) : n.name == "br" ? (_openBlock(), _createElementBlock("text", { key: 1 }, "\n")) : n.name == "img" ? (_openBlock(), _createElementBlock("image", {
+              key: 2,
+              src: n.attrs != null ? n.attrs["src"] ?? "" : "",
+              style: { "max-width": "750px" },
+              mode: "widthFix"
+            }, null, 8, ["src"])) : n.name == "a" ? (_openBlock(), _createElementBlock("text", {
+              key: 3,
+              class: "mp-a",
+              onClick: ($event) => $setup.onLinkTap(n)
+            }, _toDisplayString($setup.flatText(n)), 9, ["onClick"])) : $setup.isInline(n.name ?? "") ? (_openBlock(), _createElementBlock(
+              "text",
+              {
+                key: 4,
+                style: _normalizeStyle($setup.inlineStyle(n.name ?? ""))
+              },
+              _toDisplayString($setup.flatText(n)),
+              5
+              /* TEXT, STYLE */
+            )) : n.name == "h1" || n.name == "h2" || n.name == "h3" || n.name == "h4" || n.name == "h5" || n.name == "h6" ? (_openBlock(), _createElementBlock(
+              "text",
+              {
+                key: 5,
+                style: _normalizeStyle($setup.headingStyle(n.name ?? ""))
+              },
+              _toDisplayString($setup.flatText(n)),
+              5
+              /* TEXT, STYLE */
+            )) : n.name == "pre" || n.name == "code" ? (_openBlock(), _createElementBlock(
+              "text",
+              {
+                key: 6,
+                style: { "font-family": "monospace", "white-space": "pre-wrap" }
+              },
+              _toDisplayString($setup.flatText(n)),
+              1
+              /* TEXT */
+            )) : n.name == "hr" ? (_openBlock(), _createElementBlock("view", {
+              key: 7,
+              style: { "height": "1px", "background-color": "#e0e0e0", "margin": "10px 0" }
+            })) : n.name == "table" ? (_openBlock(), _createElementBlock("view", {
+              key: 8,
+              style: { "display": "flex", "flex-direction": "column" }
+            }, [
+              (_openBlock(true), _createElementBlock(
+                _Fragment,
+                null,
+                _renderList(n.children ?? [], (row, ri) => {
+                  return _openBlock(), _createElementBlock("view", {
+                    key: ri,
+                    style: { "display": "flex", "flex-direction": "row" }
+                  }, [
+                    (_openBlock(true), _createElementBlock(
+                      _Fragment,
+                      null,
+                      _renderList(row.children ?? [], (cell, ci) => {
+                        return _openBlock(), _createElementBlock(
+                          "view",
+                          {
+                            key: ci,
+                            style: _normalizeStyle((cell.name == "th" ? "background-color:#f5f5f5;" : "") + "flex:1;padding:4px 8px;border-width:1px;border-color:#d0d0d0;border-style:solid")
+                          },
+                          [
+                            _createElementVNode(
+                              "text",
+                              {
+                                style: _normalizeStyle(cell.name == "th" ? "font-weight:bold;" : "")
+                              },
+                              _toDisplayString($setup.flatText(cell)),
+                              5
+                              /* TEXT, STYLE */
+                            )
+                          ],
+                          4
+                          /* STYLE */
+                        );
+                      }),
+                      128
+                      /* KEYED_FRAGMENT */
+                    ))
+                  ]);
+                }),
+                128
+                /* KEYED_FRAGMENT */
+              ))
+            ])) : n.name == "ul" || n.name == "ol" ? (_openBlock(), _createElementBlock("view", {
+              key: 9,
+              style: { "padding-left": "20px" }
+            }, [
+              (_openBlock(true), _createElementBlock(
+                _Fragment,
+                null,
+                _renderList(n.children ?? [], (li, lii) => {
+                  return _openBlock(), _createElementBlock("view", {
+                    key: lii,
+                    style: { "flex-direction": "row" }
+                  }, [
+                    _createElementVNode(
+                      "text",
+                      null,
+                      _toDisplayString(n.name == "ol" ? (lii + 1).toString() + ". " : "• "),
+                      1
+                      /* TEXT */
+                    ),
+                    _createElementVNode(
+                      "text",
+                      null,
+                      _toDisplayString($setup.flatText(li)),
+                      1
+                      /* TEXT */
+                    )
+                  ]);
+                }),
+                128
+                /* KEYED_FRAGMENT */
+              ))
+            ])) : (_openBlock(), _createElementBlock("view", { key: 10 }, [
+              (_openBlock(true), _createElementBlock(
+                _Fragment,
+                null,
+                _renderList(n.children ?? [], (cn, ci) => {
+                  return _openBlock(), _createElementBlock(
+                    _Fragment,
+                    { key: ci },
+                    [
+                      cn.type == "text" ? (_openBlock(), _createElementBlock(
+                        "text",
+                        { key: 0 },
+                        _toDisplayString(cn.text),
+                        1
+                        /* TEXT */
+                      )) : cn.name == "br" ? (_openBlock(), _createElementBlock("text", { key: 1 }, "\n")) : cn.name == "img" ? (_openBlock(), _createElementBlock("image", {
+                        key: 2,
+                        src: cn.attrs != null ? cn.attrs["src"] ?? "" : "",
+                        style: { "max-width": "750px" },
+                        mode: "widthFix"
+                      }, null, 8, ["src"])) : cn.name == "a" ? (_openBlock(), _createElementBlock("text", {
+                        key: 3,
+                        class: "mp-a",
+                        onClick: ($event) => $setup.onLinkTap(cn)
+                      }, _toDisplayString($setup.flatText(cn)), 9, ["onClick"])) : $setup.isInline(cn.name ?? "") ? (_openBlock(), _createElementBlock(
+                        "text",
+                        {
+                          key: 4,
+                          style: _normalizeStyle($setup.inlineStyle(cn.name ?? ""))
+                        },
+                        _toDisplayString($setup.flatText(cn)),
+                        5
+                        /* TEXT, STYLE */
+                      )) : (_openBlock(), _createElementBlock(
+                        "text",
+                        { key: 5 },
+                        _toDisplayString($setup.flatText(cn)),
+                        1
+                        /* TEXT */
+                      ))
+                    ],
+                    64
+                    /* STABLE_FRAGMENT */
+                  );
+                }),
+                128
+                /* KEYED_FRAGMENT */
+              ))
+            ]))
+          ],
+          64
+          /* STABLE_FRAGMENT */
+        );
+      }),
+      128
+      /* KEYED_FRAGMENT */
+    ))
+  ]);
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/mp-html/components/mp-html/mp-html.uvue"]]);
 export {
   __easycom_1 as _
 };

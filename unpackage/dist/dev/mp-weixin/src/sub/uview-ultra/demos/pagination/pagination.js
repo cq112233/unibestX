@@ -31,7 +31,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           ["bg-color"]: "#ffffff",
           class: "data-v-c985d42c"
         }),
-        b: common_vendor.o(onPaginationCurrentChange, "3b"),
+        b: common_vendor.o(onPaginationCurrentChange, "7f"),
         c: common_vendor.p({
           ["current-page"]: paginationCurrentPage.value,
           ["page-size"]: paginationPageSize.value,

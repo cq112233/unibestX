@@ -38,7 +38,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: common_vendor.o(($event) => {
           return openPopup("top");
-        }, "25"),
+        }, "d9"),
         c: common_vendor.p({
           type: "primary",
           text: "顶部弹出",
@@ -47,7 +47,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         d: common_vendor.o(($event) => {
           return openPopup("bottom");
-        }, "1d"),
+        }, "e9"),
         e: common_vendor.p({
           type: "primary",
           text: "底部弹出",
@@ -56,7 +56,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         f: common_vendor.o(($event) => {
           return openPopup("left");
-        }, "c1"),
+        }, "32"),
         g: common_vendor.p({
           type: "success",
           text: "左侧弹出",
@@ -65,7 +65,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         h: common_vendor.o(($event) => {
           return openPopup("right");
-        }, "fe"),
+        }, "ad"),
         i: common_vendor.p({
           type: "success",
           text: "右侧弹出",
@@ -74,7 +74,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         j: common_vendor.o(($event) => {
           return openPopup("center");
-        }, "3b"),
+        }, "83"),
         k: common_vendor.p({
           type: "success",
           text: "居中弹出",
@@ -82,7 +82,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-d0054422"
         }),
         l: common_vendor.t(popupMode.value),
-        m: common_vendor.o(onPopupClose, "03"),
+        m: common_vendor.o(onPopupClose, "49"),
         n: common_vendor.p({
           show: popupShow.value,
           mode: popupMode.value,

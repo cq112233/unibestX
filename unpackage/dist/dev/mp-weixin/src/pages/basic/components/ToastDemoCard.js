@@ -23,14 +23,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
-        a: common_vendor.o(handleDefaultToast, "48"),
-        b: common_vendor.o(handleSuccessToast, "bb"),
-        c: common_vendor.o(handleErrorToast, "7a"),
-        d: common_vendor.o(handleWarningToast, "5c"),
+        a: common_vendor.o(handleDefaultToast, "dc"),
+        b: common_vendor.o(handleSuccessToast, "8c"),
+        c: common_vendor.o(handleErrorToast, "b7"),
+        d: common_vendor.o(handleWarningToast, "a9"),
         e: common_vendor.gei(_ctx, ""),
         f: common_vendor.p({
           title: "全局 Toast 轻提示",
-          id: common_vendor.gei(_ctx, "")
+          id: common_vendor.gei(_ctx, ""),
+          class: "data-v-aa955926"
         }),
         g: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
@@ -38,5 +39,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-wx.createComponent(_sfc_main);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-aa955926"]]);
+wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/src/pages/basic/components/ToastDemoCard.js.map

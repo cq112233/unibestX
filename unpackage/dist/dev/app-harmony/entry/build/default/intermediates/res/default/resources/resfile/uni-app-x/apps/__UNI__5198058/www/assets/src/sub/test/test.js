@@ -1,4 +1,4 @@
-import { _ as _sfc_main$1 } from "../../../App.ku.js";
+import { A as AppKu } from "../../../App.ku.js";
 import { L as LayoutComponent } from "../../layouts/default.js";
 import { _ as _export_sfc } from "../../../plugin-vue-export-helper.js";
 import "../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
@@ -62,21 +62,14 @@ import "../../../uni_modules/uview-ultra/libs/i18n/locales/ru.js";
 import "../../store/token.js";
 import "../../store/user.js";
 import "../../utils/toast.js";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, setSharedData: _setSharedData, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataFor: _createSharedDataFor, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataIf: _createSharedDataIf, createSharedDataComponent: _createSharedDataComponent, withSharedDataVaporCtx: _withSharedDataVaporCtx } = globalThis.Vue;
-const __className = "GenSrcSubTestTest";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref } = globalThis.Vue;
 const { onLoad } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "741c6c24",
-  __className,
-  __filename: "src/sub/test/test.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "test",
-  setup(__props) {
-    const __sharedDataRenderer = _useSharedDataRenderer();
-    const __sharedData = __sharedDataRenderer == "component" ? _withSharedDataComponent(new UniDynamicSharedDataComponent(_useSharedDataScope(), _useSharedDataComponentOptions({ bundleKey: "GenSrcSubTestTestSharedData", sharedDataClassId: 0 }))) : _withSharedDataPage(new UniDynamicSharedDataPage(_useSharedDataPageId(), _useSharedDataPageOptions({ bundleKey: "GenSrcSubTestTestSharedData", sharedDataClassId: 0 })));
-    const __sharedDataScope = _useSharedDataScope(__sharedData);
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
     const optionKeys = ref([]);
     const queryOptions = ref(null);
     onLoad((options = null) => {
@@ -96,42 +89,76 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       }
       return "";
     }
-    return () => {
-      "raw js";
-      const n17 = _createSharedDataComponent(_sfc_main$1, "51fce8f3", null, {
-        "default": _withSharedDataVaporCtx(() => {
-          const n16 = _createSharedDataComponent(LayoutComponent, "24bf953a", { "navigation-bar-title-text": "测试" }, {
-            "default": () => {
-              _createSharedDataFor(_setSharedDataScoped(__sharedData, 2, _createSharedDataVFor(__sharedDataScope, () => {
-                return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-              })), () => {
-                return optionKeys.value;
-              }, (__sharedData_VFor0, _for_item0) => {
-                _renderSharedDataEffect(() => {
-                  const _key = _for_item0.value;
-                  _setSharedData(__sharedData_VFor0, 1, _toDisplayString(_key));
-                  _setSharedData(__sharedData_VFor0, 2, _toDisplayString(getOptionValue(_key)));
-                });
-                return null;
-              }, (__sharedData_VFor0, key) => {
-                return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(key));
-              });
-              _createSharedDataIf(() => {
-                return _setSharedData(__sharedData, 3, _toSharedDataBoolean(optionKeys.value.length == 0));
-              }, () => {
-              });
-            }
-          });
-          _setSharedData(__sharedData, 1, n16.sharedData);
-        })
-      });
-      _setSharedData(__sharedData, 0, n17.sharedData);
-      return __sharedData;
-    };
+    const __returned__ = { optionKeys, queryOptions, getOptionValue, get AppKu() {
+      return AppKu;
+    }, get LayoutComponent() {
+      return LayoutComponent;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const test = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const { createElementVNode: _createElementVNode, renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, toDisplayString: _toDisplayString, createCommentVNode: _createCommentVNode, withCtx: _withCtx, createVNode: _createVNode, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createBlock($setup["AppKu"], null, {
+    default: _withCtx(() => [
+      _createVNode($setup["LayoutComponent"], { "navigation-bar-title-text": "测试" }, {
+        default: _withCtx(() => [
+          _createElementVNode("view", { class: "p-5px min-h-screen bg-_b_hf8fafc_B" }, [
+            _createElementVNode("view", { class: "bg-white rounded-lg p-5px shadow-sm border-width-1px border-style-solid border-color-_b_he2e8f0_B" }, [
+              _createElementVNode("text", { class: "text-20px font-bold text-_b_h1e293b_B" }, "URL Query 页面参数获取测试"),
+              _createElementVNode("text", { class: "text-12px text-_b_h94a3b8_B mt-2px" }, "本页面用于展示并测试如何获取 URL 中携带的 query 参数。"),
+              _createElementVNode("view", { class: "mt-4px border-top-width-1px border-top-style-solid border-top-color-_b_hf1f5f9_B pt-4px" }, [
+                _createElementVNode("view", { class: "mb-4px" }, [
+                  _createElementVNode("text", { class: "text-14px font-bold text-_b_h64748b_B" }, "解析到的参数详情：")
+                ]),
+                (_openBlock(true), _createElementBlock(
+                  _Fragment,
+                  null,
+                  _renderList($setup.optionKeys, (key) => {
+                    return _openBlock(), _createElementBlock("view", {
+                      key,
+                      class: "flex flex-row justify-between items-center py-2px border-bottom-width-1px border-bottom-style-solid border-bottom-color-_b_hf8fafc_B"
+                    }, [
+                      _createElementVNode(
+                        "text",
+                        { class: "text-14px text-_b_h64748b_B font-medium" },
+                        _toDisplayString(key) + ":",
+                        1
+                        /* TEXT */
+                      ),
+                      _createElementVNode(
+                        "text",
+                        { class: "text-14px text-_b_h334155_B font-semibold" },
+                        _toDisplayString($setup.getOptionValue(key)),
+                        1
+                        /* TEXT */
+                      )
+                    ]);
+                  }),
+                  128
+                  /* KEYED_FRAGMENT */
+                )),
+                $setup.optionKeys.length == 0 ? (_openBlock(), _createElementBlock("view", {
+                  key: 0,
+                  class: "py-4px text-center"
+                }, [
+                  _createElementVNode("text", { class: "text-14px text-_b_h94a3b8_B" }, "暂无任何 query 参数")
+                ])) : _createCommentVNode("v-if", true)
+              ])
+            ])
+          ])
+        ]),
+        _: 1
+        /* STABLE */
+      })
+    ]),
+    _: 1
+    /* STABLE */
+  });
+}
+const _style_wt = {"test":{"":{"marginTop":"24rpx","display":"flex","height":100,"width":222.222,"alignItems":"center","justifyContent":"center","borderRadius":40,"backgroundColor":"rgba(49,237,216,0.54)"}},"page":{"":{"--theme-color":"#37c2bc"}},"bg-_b_hf8fafc_B":{"":{"backgroundColor":"#f8fafc"}},"bg-white":{"":{"backgroundColor":"#ffffff"}},"shadow-sm":{"":{"--tw-inset-shadow":"0 0 #0000","--tw-inset-ring-shadow":"0 0 #0000","--tw-ring-offset-shadow":"0 0 #0000","--tw-ring-shadow":"0 0 #0000","--tw-shadow":"0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)","boxShadow":"var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow)"}},"font-bold":{"":{"--tw-font-weight":"700","fontWeight":700}},"text-_b_h1e293b_B":{"":{"color":"#1e293b"}},"text-_b_h94a3b8_B":{"":{"color":"#94a3b8"}},"text-_b_h64748b_B":{"":{"color":"#64748b"}},"flex":{"":{"display":"flex"}},"flex-row":{"":{"flexDirection":"row"}},"justify-between":{"":{"justifyContent":"space-between"}},"items-center":{"":{"alignItems":"center"}},"font-medium":{"":{"--tw-font-weight":"500","fontWeight":500}},"text-_b_h334155_B":{"":{"color":"#334155"}},"font-semibold":{"":{"--tw-font-weight":"600","fontWeight":600}},"text-center":{"":{"textAlign":"center"}}};
+const test = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_wt]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/test/test.uvue"]]);
 export {
   test as default
 };

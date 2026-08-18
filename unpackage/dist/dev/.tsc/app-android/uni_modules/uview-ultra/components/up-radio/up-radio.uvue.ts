@@ -1,0 +1,437 @@
+import _easycom_up_icon from '@/uni_modules/uview-ultra/components/up-icon/up-icon.uvue'
+import { computed, inject, ref, getCurrentInstance } from 'vue'
+	import type { ComputedRef } from 'vue'
+	import defProps from './radio.uts'
+	import { addUnit, addStyle, os, deepMerge, formValidate, error } from '../../libs/function/index'
+
+	
+const __sfc__ = defineComponent({
+  __name: 'up-radio',
+name: "up-radio",
+  props: {
+		// radio的名称
+		name: {
+			type: [String, Number, Boolean],
+			default: defProps.getString('radio.name')
+		},
+		// 形状，square为方形，circle为圆型
+		shape: {
+			type: String,
+			default: defProps.getString('radio.shape')
+		},
+		// 是否禁用
+		disabled: {
+			type: [String, Boolean],
+			default: defProps.getString('radio.disabled')
+		},
+		// 是否禁止点击提示语选中单选框
+		labelDisabled: {
+			type: [String, Boolean],
+			default: defProps.getString('radio.labelDisabled')
+		},
+		// 选中状态下的颜色，如设置此值，将会覆盖parent的activeColor值
+		activeColor: {
+			type: String,
+			default: defProps.getString('radio.activeColor')
+		},
+		// 未选中的颜色
+		inactiveColor: {
+			type: String,
+			default: defProps.getString('radio.inactiveColor')
+		},
+		// 图标的大小，单位px
+		iconSize: {
+			type: [String, Number],
+			default: defProps.getString('radio.iconSize')
+		},
+		// label的字体大小，px单位
+		labelSize: {
+			type: [String, Number],
+			default: defProps.getString('radio.labelSize')
+		},
+		// label提示文字，因为nvue下，直接slot进来的文字，由于特殊的结构，无法修改样式
+		label: {
+			type: [String, Number],
+			default: defProps.getString('radio.label')
+		},
+		// 整体的大小
+		size: {
+			type: [String, Number],
+			default: defProps.getString('radio.size')
+		},
+		// 图标颜色
+		iconColor: {
+			type: String,
+			default: defProps.getString('radio.iconColor')
+		},
+		// label的颜色
+		labelColor: {
+			type: String,
+			default: defProps.getString('radio.labelColor')
+		},
+		// 定义需要用到的外部样式
+		customStyle: {
+			type: Object,
+			default: () => ({})
+		},
+		// 是否独立使用
+		usedAlone: {
+			type: Boolean,
+			default: false
+		}
+	},
+  emits: ['change', 'update:checked'],
+  setup(__props, __setupCtx: SetupContext) {
+const __expose = __setupCtx.expose
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+	const instance = getCurrentInstance()?.proxy
+
+	
+
+	const props = __props
+
+	function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+__ins.emit(event, ...do_not_transform_spread)
+}
+
+	const parentProps = inject<ComputedRef<UTSJSONObject> | null>('upRadioGroupProps', null)
+	const parentChange = inject<((name: any | null) => void) | null>('upRadioGroupChange', null)
+
+	const selfChecked = ref<boolean>(false)
+
+	const isChecked = computed((): boolean => {
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const parentVal = parentProps!.value['modelValue']
+			if (parentVal != null && props.name != null) {
+				return parentVal.toString() == props.name!.toString()
+			}
+			return false
+		}
+		return selfChecked.value
+	})
+
+	const elDisabled = computed((): boolean => {
+		const disabledVal = props.disabled
+		if (disabledVal != null && disabledVal.toString() != '') {
+			return disabledVal.toString() == 'true'
+		}
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const parentDisabled = parentProps!.value['disabled']
+			if (parentDisabled != null) {
+				return parentDisabled as boolean
+			}
+		}
+		return false
+	})
+
+	const elLabelDisabled = computed((): boolean => {
+		const labelDisabledVal = props.labelDisabled
+		if (labelDisabledVal != null && labelDisabledVal.toString() != '') {
+			return labelDisabledVal.toString() == 'true'
+		}
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const parentLabelDisabled = parentProps!.value['labelDisabled']
+			if (parentLabelDisabled != null) {
+				return parentLabelDisabled as boolean
+			}
+		}
+		return false
+	})
+
+	const elSize = computed((): string => {
+		const sizeVal = props.size
+		if (sizeVal != null && sizeVal.toString() != '') {
+			return sizeVal.toString()
+		}
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const parentSize = parentProps!.value['size']
+			if (parentSize != null && parentSize.toString() != '') {
+				return parentSize.toString()
+			}
+		}
+		return '21'
+	})
+
+	const elIconSize = computed((): string => {
+		const iconSizeVal = props.iconSize
+		if (iconSizeVal != null && iconSizeVal.toString() != '') {
+			return iconSizeVal.toString()
+		}
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const parentIconSize = parentProps!.value['iconSize']
+			if (parentIconSize != null && parentIconSize.toString() != '') {
+				return parentIconSize.toString()
+			}
+		}
+		return '12'
+	})
+
+	const elActiveColor = computed((): string => {
+		const activeColorVal = props.activeColor
+		if (activeColorVal != null && activeColorVal.toString() != '') {
+			return activeColorVal.toString()
+		}
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const parentActiveColor = parentProps!.value['activeColor']
+			if (parentActiveColor != null && parentActiveColor.toString() != '') {
+				return parentActiveColor.toString()
+			}
+		}
+		return '#2979ff'
+	})
+
+	const elInactiveColor = computed((): string => {
+		const inactiveColorVal = props.inactiveColor
+		if (inactiveColorVal != null && inactiveColorVal.toString() != '') {
+			return inactiveColorVal.toString()
+		}
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const parentInactiveColor = parentProps!.value['inactiveColor']
+			if (parentInactiveColor != null && parentInactiveColor.toString() != '') {
+				return parentInactiveColor.toString()
+			}
+		}
+		return '#c8c9cc'
+	})
+
+	const elLabelColor = computed((): string => {
+		const labelColorVal = props.labelColor
+		if (labelColorVal != null && labelColorVal.toString() != '') {
+			return labelColorVal.toString()
+		}
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const parentLabelColor = parentProps!.value['labelColor']
+			if (parentLabelColor != null && parentLabelColor.toString() != '') {
+				return parentLabelColor.toString()
+			}
+		}
+		return '#606266'
+	})
+
+	const elShape = computed((): string => {
+		const shapeVal = props.shape
+		if (shapeVal != null && shapeVal.toString() != '') {
+			return shapeVal.toString()
+		}
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const parentShape = parentProps!.value['shape']
+			if (parentShape != null && parentShape.toString() != '') {
+				return parentShape.toString()
+			}
+		}
+		return 'circle'
+	})
+
+	const elLabelSize = computed((): string => {
+		const labelSizeVal = props.labelSize
+		if (labelSizeVal != null && labelSizeVal.toString() != '') {
+			return addUnit(labelSizeVal)
+		}
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const parentLabelSize = parentProps!.value['labelSize']
+			if (parentLabelSize != null && parentLabelSize.toString() != '') {
+				return addUnit(parentLabelSize)
+			}
+		}
+		return addUnit('15')
+	})
+
+	const elIconColor = computed((): string => {
+		let iconColorStr = '#ffffff'
+		const iconColorVal = props.iconColor
+		if (iconColorVal != null && iconColorVal.toString() != '') {
+			iconColorStr = iconColorVal.toString()
+		} else if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const parentIconColor = parentProps!.value['iconColor']
+			if (parentIconColor != null && parentIconColor.toString() != '') {
+				iconColorStr = parentIconColor.toString()
+			}
+		}
+		if (elDisabled.value) {
+			return isChecked.value ? elInactiveColor.value : 'transparent'
+		} else {
+			return isChecked.value ? iconColorStr : 'transparent'
+		}
+	})
+
+	const iconClasses = computed((): string => {
+		let classes: string[] = []
+		classes.push('up-radio__icon-wrap--' + elShape.value)
+		if (elDisabled.value) {
+			classes.push('up-radio__icon-wrap--disabled')
+		}
+		if (isChecked.value && elDisabled.value) {
+			classes.push('up-radio__icon-wrap--disabled--checked')
+		}
+		if (isChecked.value && !elDisabled.value && elActiveColor.value == '#2979ff') {
+			classes.push('up-radio__icon-wrap--active')
+		}
+		return classes.join(' ')
+	})
+
+	const iconWrapStyle = computed((): UTSJSONObject => {
+		const style = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-radio/up-radio.uvue", 301, 9), } as UTSJSONObject
+		if (isChecked.value && !elDisabled.value) {
+			if (elActiveColor.value != '#2979ff') {
+				style['backgroundColor'] = elActiveColor.value
+				style['borderColor'] = elActiveColor.value
+			}
+		} else {
+			style['backgroundColor'] = '#ffffff'
+			style['borderColor'] = elInactiveColor.value
+		}
+		style['width'] = addUnit(elSize.value)
+		style['height'] = addUnit(elSize.value)
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const parentPlacement = parentProps!.value['iconPlacement']
+			if (parentPlacement != null && parentPlacement.toString() == 'right') {
+				style['marginRight'] = 0
+			}
+		}
+		return style
+	})
+
+	const radioStyle = computed((): UTSJSONObject => {
+		const style = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-radio/up-radio.uvue", 323, 9), } as UTSJSONObject
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const borderBottom = parentProps!.value['borderBottom']
+			const placement = parentProps!.value['placement']
+			if (borderBottom != null && borderBottom.toString() == 'true' && placement != null && placement.toString() == 'row') {
+				error('检测到您将borderBottom设置为true，需要同时将up-radio-group的placement设置为column才有效')
+			}
+			if (borderBottom != null && borderBottom.toString() == 'true' && placement != null && placement.toString() == 'column') {
+				style['paddingBottom'] = os() == 'ios' ? '12px' : '8px'
+			}
+		}
+		return deepMerge(style, addStyle(props.customStyle)) as UTSJSONObject
+	})
+
+	const iconPlacementClass = computed((): string => {
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const p = parentProps!.value['iconPlacement']
+			if (p != null && p.toString() != '') {
+				return 'up-radio-label--' + p.toString()
+			}
+		}
+		return 'up-radio-label--left'
+	})
+
+	const borderBottomClass = computed((): string => {
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const borderBottom = parentProps!.value['borderBottom']
+			const placement = parentProps!.value['placement']
+			if (borderBottom != null && borderBottom.toString() == 'true' && placement != null && placement.toString() == 'column') {
+				return 'up-border-bottom'
+			}
+		}
+		return ''
+	})
+
+	function emitEvent() {
+		if (!isChecked.value) {
+			emit('change', props.name)
+			if (props.usedAlone) {
+				emit('update:checked', true)
+			}
+			setTimeout(() => {
+				if (instance != null) {
+					formValidate(instance!, 'change')
+				}
+			}, 10)
+		}
+	}
+
+	function setRadioCheckedStatus() {
+		emitEvent()
+		if (!props.usedAlone && parentChange != null) {
+			parentChange(props.name)
+		} else {
+			selfChecked.value = true
+		}
+	}
+
+	function iconClickHandler(e: UniEvent) {
+		e.stopPropagation()
+		if (!elDisabled.value) {
+			setRadioCheckedStatus()
+		}
+	}
+
+	function wrapperClickHandler(e: UniEvent) {
+		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
+			const p = parentProps!.value['iconPlacement']
+			if (p != null && p.toString() == 'right') {
+				iconClickHandler(e)
+				return
+			}
+		}
+	}
+
+	function labelClickHandler(e: UniEvent) {
+		e.stopPropagation()
+		if (!elLabelDisabled.value && !elDisabled.value) {
+			setRadioCheckedStatus()
+		}
+	}
+
+	const init = function() {}
+	const getInternalState = (): UTSJSONObject => {
+		return {
+			name: props.name,
+			isChecked: isChecked.value
+		} as UTSJSONObject
+	}
+
+	__expose({
+		init,
+		getInternalState
+	})
+
+return (): any | null => {
+
+const _component_up_icon = resolveEasyComponent("up-icon",_easycom_up_icon)
+
+  return _cE("view", _uM({
+    class: _nC(["up-radio cursor-pointer", [iconPlacementClass.value, borderBottomClass.value]]),
+    onClick: withModifiers(wrapperClickHandler, ["stop"]),
+    style: _nS([radioStyle.value])
+  }), [
+    _cE("view", _uM({
+      class: _nC(["up-radio__icon-wrap cursor-pointer", iconClasses.value]),
+      onClick: withModifiers(iconClickHandler, ["stop"]),
+      style: _nS([iconWrapStyle.value])
+    }), [
+      renderSlot(_ctx.$slots, "icon", {}, (): any[] => [
+        _cV(_component_up_icon, _uM({
+          class: "up-radio__icon-wrap__icon",
+          name: "checkbox-mark",
+          size: elIconSize.value,
+          color: elIconColor.value
+        }), null, 8 /* PROPS */, ["size", "color"])
+      ])
+    ], 6 /* CLASS, STYLE */),
+    renderSlot(_ctx.$slots, "label", _uM({
+      label: _ctx.label,
+      elDisabled: elDisabled.value
+    }), (): any[] => [
+      _cE("text", _uM({
+        class: _nC(["up-radio__label", [elDisabled.value ? 'up-radio__label--disabled' : '']]),
+        onClick: withModifiers(labelClickHandler, ["stop"]),
+        style: _nS(_uM({
+					color: elDisabled.value ? elInactiveColor.value : elLabelColor.value,
+					fontSize: elLabelSize.value,
+					lineHeight: elLabelSize.value
+				}))
+      }), _tD(_ctx.label), 7 /* TEXT, CLASS, STYLE */)
+    ])
+  ], 6 /* CLASS, STYLE */)
+}
+}
+
+})
+export default __sfc__
+export type UpRadioComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpRadioUpRadioStyles = [_uM([["u-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-radio", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["overflow", "hidden"], ["alignItems", "center"], ["marginBottom", 5], ["marginTop", 5]]))], ["up-radio-label--left", _pS(_uM([["flexDirection", "row"]]))], ["up-radio-label--right", _pS(_uM([["flexDirection", "row-reverse"], ["justifyContent", "space-between"]]))], ["up-radio__icon-wrap", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["marginRight", 6], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopColor", "#c8c9cc"], ["borderRightColor", "#c8c9cc"], ["borderBottomColor", "#c8c9cc"], ["borderLeftColor", "#c8c9cc"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"]]))], ["up-radio__icon-wrap--circle", _pS(_uM([["borderTopLeftRadius", 50], ["borderTopRightRadius", 50], ["borderBottomRightRadius", 50], ["borderBottomLeftRadius", 50]]))], ["up-radio__icon-wrap--square", _pS(_uM([["borderTopLeftRadius", 3], ["borderTopRightRadius", 3], ["borderBottomRightRadius", 3], ["borderBottomLeftRadius", 3]]))], ["up-radio__icon-wrap--checked", _pS(_uM([["backgroundColor", "#FF0000"], ["borderTopColor", "#2979ff"], ["borderRightColor", "#2979ff"], ["borderBottomColor", "#2979ff"], ["borderLeftColor", "#2979ff"]]))], ["up-radio__icon-wrap--active", _pS(_uM([["backgroundColor", "var(--theme-color, #0957de)"], ["borderTopColor", "var(--theme-color, #0957de)"], ["borderRightColor", "var(--theme-color, #0957de)"], ["borderBottomColor", "var(--theme-color, #0957de)"], ["borderLeftColor", "var(--theme-color, #0957de)"]]))], ["up-radio__icon-wrap--disabled", _pS(_uM([["!backgroundColor", "#ebedf0"]]))], ["up-radio__label", _pS(_uM([["marginLeft", 5], ["marginRight", 12], ["color", "#606266"], ["fontSize", 15]]))], ["up-radio__label--disabled", _pS(_uM([["color", "#c8c9cc"]]))]])]

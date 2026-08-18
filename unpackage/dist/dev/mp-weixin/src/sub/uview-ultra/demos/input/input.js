@@ -28,7 +28,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: common_vendor.o(($event) => {
           return inputValue.value = $event;
-        }, "a8"),
+        }, "18"),
         c: common_vendor.p({
           placeholder: "请输入内容",
           border: "surround",

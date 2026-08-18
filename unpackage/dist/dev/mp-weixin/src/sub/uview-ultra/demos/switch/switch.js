@@ -32,7 +32,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: common_vendor.o(($event) => {
           return switchValue1.value = $event;
-        }, "73"),
+        }, "31"),
         c: common_vendor.p({
           modelValue: switchValue1.value,
           class: "data-v-77fc340c"
@@ -40,7 +40,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         d: common_vendor.t(switchValue1.value ? "已开启" : "已关闭"),
         e: common_vendor.o(($event) => {
           return switchValue2.value = $event;
-        }, "68"),
+        }, "93"),
         f: common_vendor.p({
           disabled: true,
           modelValue: switchValue2.value,
@@ -48,7 +48,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         g: common_vendor.o(($event) => {
           return switchValue3.value = $event;
-        }, "6e"),
+        }, "d7"),
         h: common_vendor.p({
           loading: true,
           modelValue: switchValue3.value,
@@ -56,7 +56,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         i: common_vendor.o(($event) => {
           return switchValue4.value = $event;
-        }, "51"),
+        }, "36"),
         j: common_vendor.p({
           ["active-color"]: "#fa3534",
           ["inactive-color"]: "#f56c6c",
@@ -65,7 +65,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         k: common_vendor.o(($event) => {
           return switchValue5.value = $event;
-        }, "69"),
+        }, "c4"),
         l: common_vendor.p({
           size: "20",
           modelValue: switchValue5.value,
@@ -73,7 +73,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         m: common_vendor.o(($event) => {
           return switchValue5.value = $event;
-        }, "62"),
+        }, "8e"),
         n: common_vendor.p({
           size: "28",
           modelValue: switchValue5.value,

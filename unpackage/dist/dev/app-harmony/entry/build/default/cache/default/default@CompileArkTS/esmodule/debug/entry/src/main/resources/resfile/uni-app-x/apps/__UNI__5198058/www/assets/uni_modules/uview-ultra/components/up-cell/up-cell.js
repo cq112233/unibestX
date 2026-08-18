@@ -1,21 +1,16 @@
 import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
+import { r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { _ as __easycom_0$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-line/up-line&";
 import { d as defProps } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-cell/cell&";
 import { b as addStyle } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import { e as empty } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/test&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, toSharedDataString: _toSharedDataString, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataSlot: _createSharedDataSlot, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, toDisplayString: _toDisplayString, setSharedDataEvent: _setSharedDataEvent } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpCellUpCell";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { computed } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-cell"
   },
-  __dynamicSharedData: true,
-  __hash: "5a187b7f",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-cell/up-cell.uvue",
   __name: "up-cell",
   props: {
     customStyle: {
@@ -103,9 +98,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   },
   emits: ["click"],
   setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit, $slots = _a.slots;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpCellUpCellSharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose, __emit = _a.emit;
     const props = __props;
     const emits = __emit;
     const testEmpty = function(val) {
@@ -134,118 +127,120 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     __expose({
       testEmpty
     });
-    return () => {
-      "raw js";
-      const _component_up_icon = __easycom_0;
-      const _component_up_line = __easycom_0$1;
-      _renderSharedDataEffect(() => {
-        _setSharedDataClass(__sharedData, 22, ["up-cell", [__props.customClass]]);
-        _setSharedDataStyle(__sharedData, 23, customCellStyle.value);
-        _setSharedDataClass(__sharedData, 24, _toSharedDataString(!__props.disabled && (__props.clickable || __props.isLink) ? "up-cell--clickable" : ""));
-        _setSharedDataClass(__sharedData, 25, ["up-cell__body", { "up-cell--center": __props.center, "up-cell__body--large": __props.size == "large" }]);
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 11, _toSharedDataBoolean($slots["icon"] != null || __props.icon != ""));
-      }, () => {
-        _createSharedDataIf(() => {
-          return _setSharedData(__sharedData, 12, _toSharedDataBoolean($slots["icon"] != null));
-        }, () => {
-          _createSharedDataSlot("icon", null, null);
-        }, () => {
-          const n6 = _createSharedDataComponentWithFallback(_component_up_icon, "50dbb0ab", {
-            name: () => {
-              return __props.icon;
-            },
-            "custom-style": () => {
-              return __props.iconStyle;
-            },
-            size: () => {
-              return __props.size == "large" ? "22px" : "18px";
-            }
-          });
-          _setSharedData(__sharedData, 13, n6?.sharedData);
-        }, 261);
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 14, _toSharedDataBoolean($slots["title"] != null && __props.title == ""));
-      }, () => {
-        _createSharedDataSlot("title", null, null);
-      }, () => {
-        _renderSharedDataEffect(() => {
-          _setSharedDataClass(__sharedData, 15, ["up-cell__title-text", { "up-cell--disabled": __props.disabled, "up-cell__title-text--large": __props.size == "large" }]);
-          _setSharedDataStyle(__sharedData, 16, titleTextStyle.value);
-          _setSharedData(__sharedData, 17, _toDisplayString(__props.title));
-        });
-      }, 773);
-      _createSharedDataSlot("label", null, null, () => {
-        _createSharedDataIf(() => {
-          return _setSharedData(__sharedData, 18, _toSharedDataBoolean(__props.label != ""));
-        }, () => {
-          _renderSharedDataEffect(() => {
-            _setSharedDataClass(__sharedData, 19, ["up-cell__label", { "up-cell--disabled": __props.disabled, "up-cell__label--large": __props.size == "large" }]);
-            _setSharedData(__sharedData, 20, _toDisplayString(__props.label));
-          });
-        });
-      });
-      _createSharedDataSlot("value", null, null, () => {
-        _createSharedDataIf(() => {
-          return _setSharedData(__sharedData, 2, _toSharedDataBoolean(testEmpty(__props.value) == false));
-        }, () => {
-          _renderSharedDataEffect(() => {
-            _setSharedDataClass(__sharedData, 3, ["up-cell__value", { "up-cell--disabled": __props.disabled, "up-cell__value--large": __props.size == "large" }]);
-            _setSharedData(__sharedData, 4, _toDisplayString(__props.value));
-          });
-        });
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 5, _toSharedDataBoolean($slots["right-icon"] != null || __props.isLink));
-      }, () => {
-        _renderSharedDataEffect(() => {
-          return _setSharedDataClass(__sharedData, 8, ["up-cell__right-icon-wrap", [`up-cell__right-icon-wrap--${__props.arrowDirection}`]]);
-        });
-        _createSharedDataSlot("right-icon", null, null, () => {
-          _createSharedDataIf(() => {
-            return _setSharedData(__sharedData, 6, _toSharedDataBoolean(__props.rightIcon != ""));
-          }, () => {
-            const n31 = _createSharedDataComponentWithFallback(_component_up_icon, "6acec164", {
-              name: () => {
-                return __props.rightIcon;
-              },
-              "custom-style": () => {
-                return __props.rightIconStyle;
-              },
-              color: () => {
-                return __props.disabled ? "#c8c9cc" : "info";
-              },
-              size: () => {
-                return __props.size == "large" ? "18px" : "16px";
-              }
-            });
-            _setSharedData(__sharedData, 7, n31?.sharedData);
-          });
-        });
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 9, _toSharedDataBoolean($slots["righticon"] != null));
-      }, () => {
-        _renderSharedDataEffect(() => {
-          return _setSharedDataClass(__sharedData, 10, ["up-cell__right-icon-wrap", [`up-cell__right-icon-wrap--${__props.arrowDirection}`]]);
-        });
-        _createSharedDataSlot("righticon", null, null);
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.border));
-      }, () => {
-        const n40 = _createSharedDataComponentWithFallback(_component_up_line, "6ace0534");
-        _setSharedData(__sharedData, 1, n40?.sharedData);
-      });
-      _setSharedDataEvent(__sharedData, 21, clickHandler);
-      return __sharedData;
-    };
+    const __returned__ = { props, emits, testEmpty, titleTextStyle, customCellStyle, clickHandler };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = {"u-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-cell__body":{"":{"display":"flex","flexDirection":"row","boxSizing":"border-box","!paddingTop":10,"!paddingRight":15,"!paddingBottom":10,"!paddingLeft":15,"alignItems":"center"}},"up-cell__body__content":{"":{"display":"flex","flexDirection":"row","alignItems":"center","flexGrow":1,"flexShrink":1,"flexBasis":"0%"}},"up-cell__body--large":{"":{"!paddingTop":13,"!paddingBottom":13}},"up-cell__left-icon-wrap":{"":{"display":"flex","flexDirection":"row","alignItems":"center","!marginRight":4}},"up-cell__right-icon-wrap":{"":{"display":"flex","flexDirection":"row","alignItems":"center","!marginLeft":4,"transitionProperty":"transform","transitionDuration":"0.3s"}},"up-cell__right-icon-wrap--up":{"":{"transform":"rotate(-90deg)"}},"up-cell__right-icon-wrap--down":{"":{"transform":"rotate(90deg)"}},"up-cell__title":{"":{"!flexGrow":1,"!flexShrink":1,"!flexBasis":"0%"}},"up-cell__title-text":{"":{"!fontSize":15,"!lineHeight":"22px","!color":"#303133"}},"up-cell__title-text--large":{"":{"!fontSize":16}},"up-cell__label":{"":{"!marginTop":5,"!fontSize":12,"!color":"#909193","!lineHeight":"18px"}},"up-cell__label--large":{"":{"!fontSize":14}},"up-cell__value":{"":{"textAlign":"right","marginLeft":"auto","!fontSize":14,"!lineHeight":"24px","!color":"#606266"}},"up-cell__value--large":{"":{"!fontSize":15}},"up-cell--clickable":{"":{"!backgroundColor":"#f3f4f6"}},"up-cell--disabled":{"":{"!color":"#c8c9cc"}},"up-cell--center":{"":{"alignItems":"center"}},"@TRANSITION":{"up-cell__right-icon-wrap":{"property":"transform","duration":"0.3s"}},"flex":{"":{"display":"flex"}}};
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { renderSlot: _renderSlot, createCommentVNode: _createCommentVNode, resolveComponent: _resolveComponent, openBlock: _openBlock, createBlock: _createBlock, createElementBlock: _createElementBlock, toDisplayString: _toDisplayString, normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
+  const _component_up_line = resolveEasycom(__resolveDynamicComponent("up-line"), __easycom_0$1);
+  return _openBlock(), _createElementBlock("view", {
+    class: _normalizeClass(["up-cell", [$props.customClass]]),
+    style: _normalizeStyle($setup.customCellStyle),
+    "hover-class": !$props.disabled && ($props.clickable || $props.isLink) ? "up-cell--clickable" : "",
+    "hover-stay-time": 250,
+    onClick: $setup.clickHandler
+  }, [
+    _createElementVNode(
+      "view",
+      {
+        class: _normalizeClass(["up-cell__body", { "up-cell--center": $props.center, "up-cell__body--large": $props.size == "large" }])
+      },
+      [
+        _createElementVNode("view", { class: "up-cell__body__content" }, [
+          _ctx.$slots["icon"] != null || $props.icon != "" ? (_openBlock(), _createElementBlock("view", {
+            key: 0,
+            class: "up-cell__left-icon-wrap"
+          }, [
+            _ctx.$slots["icon"] != null ? _renderSlot(_ctx.$slots, "icon", { key: 0 }) : (_openBlock(), _createBlock(_component_up_icon, {
+              key: 1,
+              name: $props.icon,
+              "custom-style": $props.iconStyle,
+              size: $props.size == "large" ? "22px" : "18px"
+            }, null, 8, ["name", "custom-style", "size"]))
+          ])) : _createCommentVNode("v-if", true),
+          _createElementVNode("view", { class: "up-cell__title" }, [
+            _ctx.$slots["title"] != null && $props.title == "" ? _renderSlot(_ctx.$slots, "title", { key: 0 }) : (_openBlock(), _createElementBlock(
+              "text",
+              {
+                key: 1,
+                class: _normalizeClass(["up-cell__title-text", { "up-cell--disabled": $props.disabled, "up-cell__title-text--large": $props.size == "large" }]),
+                style: _normalizeStyle($setup.titleTextStyle)
+              },
+              _toDisplayString($props.title),
+              7
+              /* TEXT, CLASS, STYLE */
+            )),
+            _renderSlot(_ctx.$slots, "label", {}, () => [
+              $props.label != "" ? (_openBlock(), _createElementBlock(
+                "text",
+                {
+                  key: 0,
+                  class: _normalizeClass(["up-cell__label", { "up-cell--disabled": $props.disabled, "up-cell__label--large": $props.size == "large" }])
+                },
+                _toDisplayString($props.label),
+                3
+                /* TEXT, CLASS */
+              )) : _createCommentVNode("v-if", true)
+            ])
+          ])
+        ]),
+        _renderSlot(_ctx.$slots, "value", {}, () => [
+          $setup.testEmpty($props.value) == false ? (_openBlock(), _createElementBlock(
+            "text",
+            {
+              key: 0,
+              class: _normalizeClass(["up-cell__value", { "up-cell--disabled": $props.disabled, "up-cell__value--large": $props.size == "large" }])
+            },
+            _toDisplayString($props.value),
+            3
+            /* TEXT, CLASS */
+          )) : _createCommentVNode("v-if", true)
+        ]),
+        _ctx.$slots["right-icon"] != null || $props.isLink ? (_openBlock(), _createElementBlock(
+          "view",
+          {
+            key: 0,
+            class: _normalizeClass(["up-cell__right-icon-wrap", [`up-cell__right-icon-wrap--${$props.arrowDirection}`]])
+          },
+          [
+            _renderSlot(_ctx.$slots, "right-icon", {}, () => [
+              $props.rightIcon != "" ? (_openBlock(), _createBlock(_component_up_icon, {
+                key: 0,
+                name: $props.rightIcon,
+                "custom-style": $props.rightIconStyle,
+                color: $props.disabled ? "#c8c9cc" : "info",
+                size: $props.size == "large" ? "18px" : "16px"
+              }, null, 8, ["name", "custom-style", "color", "size"])) : _createCommentVNode("v-if", true)
+            ])
+          ],
+          2
+          /* CLASS */
+        )) : _createCommentVNode("v-if", true),
+        _ctx.$slots["righticon"] != null ? (_openBlock(), _createElementBlock(
+          "view",
+          {
+            key: 1,
+            class: _normalizeClass(["up-cell__right-icon-wrap", [`up-cell__right-icon-wrap--${$props.arrowDirection}`]])
+          },
+          [
+            _renderSlot(_ctx.$slots, "righticon")
+          ],
+          2
+          /* CLASS */
+        )) : _createCommentVNode("v-if", true)
+      ],
+      2
+      /* CLASS */
+    ),
+    $props.border ? (_openBlock(), _createBlock(_component_up_line, { key: 0 })) : _createCommentVNode("v-if", true)
+  ], 14, ["hover-class"]);
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-cell/up-cell.uvue"]]);
 export {
   __easycom_1 as _
 };

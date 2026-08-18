@@ -1,16 +1,10 @@
-Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚGimport { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataSlot: _createSharedDataSlot, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, setSharedDataEvent: _setSharedDataEvent } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpParseUpParse";
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚEºimport { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref, computed, watch, nextTick, getCurrentInstance } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-parse"
   },
-  __dynamicSharedData: true,
-  __hash: "6893e916",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-parse/up-parse.uvue",
   __name: "up-parse",
   props: {
     containerStyle: {
@@ -79,8 +73,6 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   emits: ["load", "ready", "imgTap", "linkTap", "play", "error", "tap", "click"],
   setup(__props, _a) {
     var __expose = _a.expose, __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpParseUpParseSharedData", sharedDataClassId: 0 })));
     const blockTags = ["address", "article", "aside", "blockquote", "body", "caption", "center", "dd", "div", "dl", "dt", "fieldset", "footer", "form", "h1", "h2", "h3", "h4", "h5", "h6", "header", "hr", "li", "main", "nav", "ol", "p", "pre", "section", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "ul"];
     const voidTags = ["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"];
     const ignoreTags = ["area", "base", "canvas", "frame", "head", "iframe", "input", "link", "map", "meta", "param", "script", "style", "textarea", "track", "wbr"];
@@ -224,7 +216,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     const copyLinkValue = computed(() => {
       return boolValue(props.copyLink);
     });
-    computed(() => {
+    const showImgMenuValue = computed(() => {
       return boolValue(props.showImgMenu);
     });
     const rootClass = computed(() => {
@@ -494,55 +486,47 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       navigateTo,
       setContent
     });
-    return () => {
-      "raw js";
-      const _component_rich_text = _resolveComponent("rich-text");
-      _renderSharedDataEffect(() => {
-        _setSharedDataClass(__sharedData, 3, rootClass.value);
-        _setSharedDataStyle(__sharedData, 4, __props.containerStyle);
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(nodes.value.length == 0));
-      }, () => {
-        _createSharedDataSlot("default", null, null);
-      }, () => {
-        const n4 = _createSharedDataComponentWithFallback(_component_rich_text, "1f604995", {
-          nodes: () => {
-            return nodes.value;
-          },
-          selectable: () => {
-            return selectableValue.value;
-          },
-          onItemclick: () => {
-            return onRichTextItemClick;
-          }
-        });
-        _setSharedData(__sharedData, 1, n4?.sharedData);
-      }, 261);
-      _setSharedDataEvent(__sharedData, 2, onRootClick);
-      return __sharedData;
-    };
+    const __returned__ = { blockTags, voidTags, ignoreTags, makeNode, makeText, hasString, decodeHtml, textValue, boolValue, normalizeSpace, readAttr, firstWord, appendChild, collectText, findNodeByAttr, cloneAttrs, props, emit, instance, nodes, imgList, selectableValue, previewImgValue, copyLinkValue, showImgMenuValue, rootClass, getDefaultStyle, resolveUrl, applyAttrs, appendText, closeTag, parseContent, getRect, navigateTo, setContent, getText, handleImgTap, handleLinkTap, onRichTextItemClick, onRootClick };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "_root": { "": { "paddingTop": 1, "paddingRight": 0, "paddingBottom": 1, "paddingLeft": 0 } } };
+const { renderSlot: _renderSlot, resolveComponent: _resolveComponent, openBlock: _openBlock, createBlock: _createBlock, normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, createElementBlock: _createElementBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_rich_text = _resolveComponent("rich-text");
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      id: "_root",
+      class: _normalizeClass($setup.rootClass),
+      style: _normalizeStyle($props.containerStyle),
+      onClick: $setup.onRootClick
+    },
+    [
+      $setup.nodes.length == 0 ? _renderSlot(_ctx.$slots, "default", { key: 0 }) : (_openBlock(), _createBlock(_component_rich_text, {
+        key: 1,
+        nodes: $setup.nodes,
+        selectable: $setup.selectableValue,
+        onItemclick: $setup.onRichTextItemClick
+      }, null, 8, ["nodes", "selectable"]))
+    ],
+    6
+    /* CLASS, STYLE */
+  );
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-parse/up-parse.uvue"]]);
 export {
   __easycom_1 as _
 };
 //# sourceMappingURL=up-parse.js.map
-Â‘Ù²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-parse/up-parse.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ‘ÔrD’²hostDependencyName®hostModuleNameÙF../../../../../uni_modules/uview-ultra/components/up-parse/up-parse.js¥entryÃÚGimport { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataSlot: _createSharedDataSlot, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, setSharedDataEvent: _setSharedDataEvent } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpParseUpParse";
+Â‘Ù²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-parse/up-parse.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ‘ÔrD’²hostDependencyName®hostModuleNameÙF../../../../../uni_modules/uview-ultra/components/up-parse/up-parse.js¥entryÃÚEºimport { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref, computed, watch, nextTick, getCurrentInstance } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-parse"
   },
-  __dynamicSharedData: true,
-  __hash: "6893e916",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-parse/up-parse.uvue",
   __name: "up-parse",
   props: {
     containerStyle: {
@@ -611,8 +595,6 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   emits: ["load", "ready", "imgTap", "linkTap", "play", "error", "tap", "click"],
   setup(__props, _a) {
     var __expose = _a.expose, __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpParseUpParseSharedData", sharedDataClassId: 0 })));
     const blockTags = ["address", "article", "aside", "blockquote", "body", "caption", "center", "dd", "div", "dl", "dt", "fieldset", "footer", "form", "h1", "h2", "h3", "h4", "h5", "h6", "header", "hr", "li", "main", "nav", "ol", "p", "pre", "section", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "ul"];
     const voidTags = ["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"];
     const ignoreTags = ["area", "base", "canvas", "frame", "head", "iframe", "input", "link", "map", "meta", "param", "script", "style", "textarea", "track", "wbr"];
@@ -756,7 +738,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     const copyLinkValue = computed(() => {
       return boolValue(props.copyLink);
     });
-    computed(() => {
+    const showImgMenuValue = computed(() => {
       return boolValue(props.showImgMenu);
     });
     const rootClass = computed(() => {
@@ -1026,58 +1008,49 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       navigateTo,
       setContent
     });
-    return () => {
-      "raw js";
-      const _component_rich_text = _resolveComponent("rich-text");
-      _renderSharedDataEffect(() => {
-        _setSharedDataClass(__sharedData, 3, rootClass.value);
-        _setSharedDataStyle(__sharedData, 4, __props.containerStyle);
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(nodes.value.length == 0));
-      }, () => {
-        _createSharedDataSlot("default", null, null);
-      }, () => {
-        const n4 = _createSharedDataComponentWithFallback(_component_rich_text, "1f604995", {
-          nodes: () => {
-            return nodes.value;
-          },
-          selectable: () => {
-            return selectableValue.value;
-          },
-          onItemclick: () => {
-            return onRichTextItemClick;
-          }
-        });
-        _setSharedData(__sharedData, 1, n4?.sharedData);
-      }, 261);
-      _setSharedDataEvent(__sharedData, 2, onRootClick);
-      return __sharedData;
-    };
+    const __returned__ = { blockTags, voidTags, ignoreTags, makeNode, makeText, hasString, decodeHtml, textValue, boolValue, normalizeSpace, readAttr, firstWord, appendChild, collectText, findNodeByAttr, cloneAttrs, props, emit, instance, nodes, imgList, selectableValue, previewImgValue, copyLinkValue, showImgMenuValue, rootClass, getDefaultStyle, resolveUrl, applyAttrs, appendText, closeTag, parseContent, getRect, navigateTo, setContent, getText, handleImgTap, handleLinkTap, onRichTextItemClick, onRootClick };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "_root": { "": { "paddingTop": 1, "paddingRight": 0, "paddingBottom": 1, "paddingLeft": 0 } } };
+const { renderSlot: _renderSlot, resolveComponent: _resolveComponent, openBlock: _openBlock, createBlock: _createBlock, normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, createElementBlock: _createElementBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_rich_text = _resolveComponent("rich-text");
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      id: "_root",
+      class: _normalizeClass($setup.rootClass),
+      style: _normalizeStyle($props.containerStyle),
+      onClick: $setup.onRootClick
+    },
+    [
+      $setup.nodes.length == 0 ? _renderSlot(_ctx.$slots, "default", { key: 0 }) : (_openBlock(), _createBlock(_component_rich_text, {
+        key: 1,
+        nodes: $setup.nodes,
+        selectable: $setup.selectableValue,
+        onItemclick: $setup.onRichTextItemClick
+      }, null, 8, ["nodes", "selectable"]))
+    ],
+    6
+    /* CLASS, STYLE */
+  );
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-parse/up-parse.uvue"]]);
 export {
   __easycom_1 as _
 };
 //# sourceMappingURL=up-parse.js.map
-ÔrE•§version¨mappings¥names§sources®sourcesContentÜ‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ÔrE•§version¨mappings¥names§sources®sourcesContentÜ‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
  ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘”  ÌÙ ‘”  ÌÚ ‘”  ÌÛ ‘”  ÌÜ ‘”  Ìİ ‘”  ÌŞ ‘”  Ìß ‘”  Ìà ‘”  Ìá ‘”  Ìâ ‘”  Ìã ‘”  Ìä ‘”  Ìå ‘”  Ìæ ‘”  Ìç ‘”  Ìè ‘”  Ìé ‘”  Ìê ‘”  Ìë ‘”  Ìì ‘”  Ìí ‘”  Ìî ‘”  Ìï ‘”  Ìğ ‘”  Ìñ ‘”  Ìò ‘”  Ìó ‘”  Ìô ‘”  Ìõ ‘”  Ìö ‘”  Ì÷ ‘”  Ìø ‘”  Ìù ‘”  Ìú ‘”  Ìû ‘”  Ìü ‘”  Ìı ‘”  Ìş ‘”  Ìÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
- ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘”  Í ‘”  Í€ ‘”  Í ‘”  Í‚ ‘”  Íƒ ‘”  Í„ ‘”  Í… ‘”  Í† ‘”  Í‡ ‘”  Íˆ ‘”  Í‰ ‘”  ÍŠ ‘”  Í‹ ‘”  ÍŒ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í‘ ‘”  Í’ ‘”  Í“ ‘”  Í” ‘”  Í• ‘”  Í– ‘”  Í— ‘”  Í˜ ‘”  Í™ ‘”  Íš ‘”  Í› ‘”  Íœ ‘”  Í ‘”  Í ‘”  ÍŸ ‘”  Í  ‘”  Í¡ ‘”  Í¢ ‘”  Í£ ‘”  Í¤ ‘”  Í¥ ‘”  Í¦ ‘”  Í§ ‘”  Í¨ ‘”  Í© ‘”  Íª ‘”  Í« ‘”  Í¬ ‘”  Í­ ‘”  Í® ‘”  Í¯ ‘”  Í° ‘”  Í± ‘”  Í² ‘”  Í³ ‘”  Í´ ‘”  Íµ ‘”  Í¶ ‘”  Í· ‘”  Í¸ ‘”  Í¹ ‘”  Íº ‘”  Í» ‘”  Í¼ ‘”  Í½ ‘”  Í¾ ‘”  Í¿ ‘”  ÍÀ ‘”  ÍÁ ‘”  ÍÂ ‘”  ÍÃ ‘”  ÍÄ ‘”  ÍÅ ‘”  ÍÆ ‘”  ÍÇ ‘”  ÍÈ ‘”  ÍÉ ‘”  ÍÊ ‘”  ÍË ‘”  ÍÌ ‘”  ÍÍ ‘”  ÍÎ ‘”  ÍÏ ‘”  ÍĞ ‘”  ÍÑ ‘”  ÍÒ ‘”  ÍÓ ‘”  ÍÔ ‘”  ÍÕ ‘”  ÍÖ ‘”  Í× ‘”  ÍØ ‘”  ÍÙ ‘”  ÍÚ ‘”  ÍÛ ‘”  ÍÜ ‘”  Íİ ‘”  ÍŞ ‘”  Íß ‘”  Íà ‘”  Íá ‘”  Íâ ‘”  Íã ‘”  Íä ‘”  Íå ‘”  Íæ ‘”  Íç ‘”  Íè ‘”  Íé ‘”  Íê ‘”  Íë ‘”  Íì ‘”  Íí ‘”  Íî ‘”  Íï ‘”  Íğ ‘”  Íñ ‘”  Íò ‘”  Íó ‘”  Íô ‘”  Íõ ‘”  Íö ‘”  Í÷ ‘”  Íø ‘”  Íù ‘”  Íú ‘”  Íû ‘”  Íü ‘”  Íı ‘”  Íş ‘”  Íÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
- ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘ÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-parse/up-parse.js‘ÚGimport { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataSlot: _createSharedDataSlot, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, setSharedDataEvent: _setSharedDataEvent } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpParseUpParse";
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘”  Í ‘”  Í€ ‘”  Í ‘”  Í‚ ‘”  Íƒ ‘”  Í„ ‘”  Í… ‘”  Í† ‘”  Í‡ ‘”  Íˆ ‘”  Í‰ ‘”  ÍŠ ‘”  Í‹ ‘”  ÍŒ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í‘ ‘”  Í’ ‘”  Í“ ‘”  Í” ‘”  Í• ‘”  Í– ‘”  Í— ‘”  Í˜ ‘”  Í™ ‘”  Íš ‘”  Í› ‘”  Íœ ‘”  Í ‘”  Í ‘”  ÍŸ ‘”  Í  ‘”  Í¡ ‘”  Í¢ ‘”  Í£ ‘”  Í¤ ‘”  Í¥ ‘”  Í¦ ‘”  Í§ ‘”  Í¨ ‘”  Í© ‘”  Íª ‘”  Í« ‘”  Í¬ ‘”  Í­ ‘”  Í® ‘”  Í¯ ‘”  Í° ‘”  Í± ‘”  Í² ‘”  Í³ ‘”  Í´ ‘”  Íµ ‘”  Í¶ ‘”  Í· ‘”  Í¸ ‘”  Í¹ ‘”  Íº ‘”  Í» ‘”  Í¼ ‘”  Í½ ‘”  Í¾ ‘”  Í¿ ‘”  ÍÀ ‘”  ÍÁ ‘”  ÍÂ ‘”  ÍÃ ‘”  ÍÄ ‘”  ÍÅ ‘”  ÍÆ ‘”  ÍÇ ‘”  ÍÈ ‘”  ÍÉ ‘”  ÍÊ ‘”  ÍË ‘”  ÍÌ ‘”  ÍÍ ‘”  ÍÎ ‘”  ÍÏ ‘”  ÍĞ ‘”  ÍÑ ‘”  ÍÒ ‘”  ÍÓ ‘”  ÍÔ ‘”  ÍÕ ‘”  ÍÖ ‘”  Í× ‘”  ÍØ ‘”  ÍÙ ‘”  ÍÚ ‘”  ÍÛ ‘”  ÍÜ ‘”  Íİ ‘”  ÍŞ ‘”  Íß ‘”  Íà ‘”  Íá ‘”  Íâ ‘”  Íã ‘”  Íä ‘”  Íå ‘”  Íæ ‘”  Íç ‘”  Íè ‘”  Íé ‘”  Íê ‘”  Íë ‘”  Íì ‘”  Íí ‘”  Íî ‘”  Íï ‘”  Íğ ‘”  Íñ ‘”  Íò ‘”  Íó ‘”  Íô ‘”  Íõ ‘”  Íö ‘”  Í÷ ‘”  Íø ‘”  Íù ‘”  Íú ‘”  Íû ‘”  Íü ‘”  Íı ‘”  Íş ‘”  Íÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘ÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-parse/up-parse.js‘ÚEºimport { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref, computed, watch, nextTick, getCurrentInstance } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-parse"
   },
-  __dynamicSharedData: true,
-  __hash: "6893e916",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-parse/up-parse.uvue",
   __name: "up-parse",
   props: {
     containerStyle: {
@@ -1146,8 +1119,6 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   emits: ["load", "ready", "imgTap", "linkTap", "play", "error", "tap", "click"],
   setup(__props, _a) {
     var __expose = _a.expose, __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpParseUpParseSharedData", sharedDataClassId: 0 })));
     const blockTags = ["address", "article", "aside", "blockquote", "body", "caption", "center", "dd", "div", "dl", "dt", "fieldset", "footer", "form", "h1", "h2", "h3", "h4", "h5", "h6", "header", "hr", "li", "main", "nav", "ol", "p", "pre", "section", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "ul"];
     const voidTags = ["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"];
     const ignoreTags = ["area", "base", "canvas", "frame", "head", "iframe", "input", "link", "map", "meta", "param", "script", "style", "textarea", "track", "wbr"];
@@ -1291,7 +1262,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     const copyLinkValue = computed(() => {
       return boolValue(props.copyLink);
     });
-    computed(() => {
+    const showImgMenuValue = computed(() => {
       return boolValue(props.showImgMenu);
     });
     const rootClass = computed(() => {
@@ -1561,41 +1532,39 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       navigateTo,
       setContent
     });
-    return () => {
-      "raw js";
-      const _component_rich_text = _resolveComponent("rich-text");
-      _renderSharedDataEffect(() => {
-        _setSharedDataClass(__sharedData, 3, rootClass.value);
-        _setSharedDataStyle(__sharedData, 4, __props.containerStyle);
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(nodes.value.length == 0));
-      }, () => {
-        _createSharedDataSlot("default", null, null);
-      }, () => {
-        const n4 = _createSharedDataComponentWithFallback(_component_rich_text, "1f604995", {
-          nodes: () => {
-            return nodes.value;
-          },
-          selectable: () => {
-            return selectableValue.value;
-          },
-          onItemclick: () => {
-            return onRichTextItemClick;
-          }
-        });
-        _setSharedData(__sharedData, 1, n4?.sharedData);
-      }, 261);
-      _setSharedDataEvent(__sharedData, 2, onRootClick);
-      return __sharedData;
-    };
+    const __returned__ = { blockTags, voidTags, ignoreTags, makeNode, makeText, hasString, decodeHtml, textValue, boolValue, normalizeSpace, readAttr, firstWord, appendChild, collectText, findNodeByAttr, cloneAttrs, props, emit, instance, nodes, imgList, selectableValue, previewImgValue, copyLinkValue, showImgMenuValue, rootClass, getDefaultStyle, resolveUrl, applyAttrs, appendText, closeTag, parseContent, getRect, navigateTo, setContent, getText, handleImgTap, handleLinkTap, onRichTextItemClick, onRootClick };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "_root": { "": { "paddingTop": 1, "paddingRight": 0, "paddingBottom": 1, "paddingLeft": 0 } } };
+const { renderSlot: _renderSlot, resolveComponent: _resolveComponent, openBlock: _openBlock, createBlock: _createBlock, normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, createElementBlock: _createElementBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_rich_text = _resolveComponent("rich-text");
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      id: "_root",
+      class: _normalizeClass($setup.rootClass),
+      style: _normalizeStyle($props.containerStyle),
+      onClick: $setup.onRootClick
+    },
+    [
+      $setup.nodes.length == 0 ? _renderSlot(_ctx.$slots, "default", { key: 0 }) : (_openBlock(), _createBlock(_component_rich_text, {
+        key: 1,
+        nodes: $setup.nodes,
+        selectable: $setup.selectableValue,
+        onItemclick: $setup.onRichTextItemClick
+      }, null, 8, ["nodes", "selectable"]))
+    ],
+    6
+    /* CLASS, STYLE */
+  );
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-parse/up-parse.uvue"]]);
 export {
   __easycom_1 as _
 };
 //# sourceMappingURL=up-parse.js.map
-ÔrF‘Ù'../../../../plugin-vue-export-helper.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍFÊÍFèÀ‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍFÕÍFåÔrL”¤type¥start£end¤nameªIdentifierÍFÕÍFà«__easycom_1LªIdentifierÍFäÍFå¡_À‘ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration ÌK‘ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	
+ÔrF‘Ù'../../../../plugin-vue-export-helper.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍEvÍE”À‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍEÍE‘ÔrL”¤type¥start£end¤nameªIdentifierÍEÍEŒ«__easycom_1LªIdentifierÍEÍE‘¡_À‘ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration ÌK‘ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	
 ¡_LªIdentifier«_export_sfcÔrO•¤type¥start£end¥value£raw§Literal!ÌJÙ'../../../../plugin-vue-export-helper.jsÙ)"../../../../plugin-vue-export-helper.js"

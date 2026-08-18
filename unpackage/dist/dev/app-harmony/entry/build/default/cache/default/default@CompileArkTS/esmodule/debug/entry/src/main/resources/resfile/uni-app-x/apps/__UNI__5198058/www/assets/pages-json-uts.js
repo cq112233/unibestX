@@ -3,6 +3,7 @@ const SrcPagesMeMe = () => import("@normalized:N&&&entry/src/main/resources/resf
 const SrcPagesBasicBasic = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/basic&");
 const SrcPagesFunctionFunction = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/function/function&");
 const SrcPagesAiAi = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/ai/ai&");
+const SrcPagesIndexIndex1 = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/index/index1&");
 const SrcSubAuthLogin = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/sub/auth/login&");
 const SrcSubAuthRegister = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/sub/auth/register&");
 const SrcSubTestTest = () => import("@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/sub/test/test&");
@@ -87,6 +88,7 @@ __definePage("src/pages/me/me", SrcPagesMeMe);
 __definePage("src/pages/basic/basic", SrcPagesBasicBasic);
 __definePage("src/pages/function/function", SrcPagesFunctionFunction);
 __definePage("src/pages/ai/ai", SrcPagesAiAi);
+__definePage("src/pages/index/index1", SrcPagesIndexIndex1);
 __definePage("src/sub/auth/login", SrcSubAuthLogin);
 __definePage("src/sub/auth/register", SrcSubAuthRegister);
 __definePage("src/sub/test/test", SrcSubTestTest);

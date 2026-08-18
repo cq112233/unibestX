@@ -1,18 +1,13 @@
-Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ3Šimport { _ as __easycom_1$1 } from "../up-loading-icon/up-loading-icon.js";
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ7Rimport { _ as __easycom_1$1 } from "../up-loading-icon/up-loading-icon.js";
+import { r as resolveEasycom } from "../../../../App.ku.js";
 import { c as createQrCells, g as getQrRenderCountWithQuietZone } from "./qrcode.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, toDisplayString: _toDisplayString, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, createSharedDataIf: _createSharedDataIf, setSharedDataEvent: _setSharedDataEvent } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpQrcodeUpQrcode";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref, computed, watch, onMounted, getCurrentInstance, nextTick } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-qrcode"
   },
-  __dynamicSharedData: true,
-  __hash: "a5a1bcca",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-qrcode/up-qrcode.uvue",
   __name: "up-qrcode",
   props: {
     cid: {
@@ -95,8 +90,6 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   emits: ["result", "longpressCallback", "preview", "error"],
   setup(__props, _a) {
     var __expose = _a.expose, __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpQrcodeUpQrcodeSharedData", sharedDataClassId: 0 })));
     let qrcodeCounter = 0;
     function makeId(prefix) {
       return prefix + Date.now().toString() + "_" + (++qrcodeCounter).toString();
@@ -337,85 +330,110 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       makeCode,
       toTempFilePath
     });
-    return () => {
-      "raw js";
-      const _component_canvas = _resolveComponent("canvas");
-      const _component_up_loading_icon = __easycom_1$1;
-      _renderSharedDataEffect(() => {
-        return _setSharedDataStyle(__sharedData, 12, rootStyle.value);
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(error.value.length > 0));
-      }, () => {
-        _renderSharedDataEffect(() => {
-          _setSharedDataStyle(__sharedData, 1, matrixStyle.value);
-          _setSharedData(__sharedData, 2, _toDisplayString(error.value));
-        });
-      }, () => {
-        _renderSharedDataEffect(() => {
-          return _setSharedDataStyle(__sharedData, 9, matrixStyle.value);
-        });
-        const n5 = _createSharedDataComponentWithFallback(_component_canvas, "953ddf6e", {
-          class: "up-qrcode__canvas",
-          id: () => {
-            return canvasId.value;
-          },
-          "canvas-id": () => {
-            return canvasId.value;
-          },
-          style: () => {
-            return canvasStyle.value;
-          }
-        });
-        _setSharedData(__sharedData, 3, n5?.sharedData);
-        _createSharedDataIf(() => {
-          return _setSharedData(__sharedData, 4, _toSharedDataBoolean(__props.icon.length > 0));
-        }, () => {
-          _renderSharedDataEffect(() => {
-            _setSharedDataAttr(__sharedData, 5, _toSharedDataString(__props.icon));
-            _setSharedDataStyle(__sharedData, 6, iconStyle.value);
-          });
-        });
-        _createSharedDataIf(() => {
-          return _setSharedData(__sharedData, 7, _toSharedDataBoolean(__props.showLoading && loading.value));
-        }, () => {
-          const n11 = _createSharedDataComponentWithFallback(_component_up_loading_icon, "953dba26", {
-            vertical: "",
-            text: () => {
-              return __props.loadingText;
-            },
-            textSize: "14px"
-          });
-          _setSharedData(__sharedData, 8, n11?.sharedData);
-        });
-      }, 261);
-      _setSharedDataEvent(__sharedData, 10, longpress);
-      _setSharedDataEvent(__sharedData, 11, preview);
-      return __sharedData;
-    };
+    const __returned__ = { get qrcodeCounter() {
+      return qrcodeCounter;
+    }, set qrcodeCounter(v) {
+      qrcodeCounter = v;
+    }, makeId, isEmpty, getPixelRatio, props, emit, instance, cells, loading, result, error, canvasId, get canvasContext() {
+      return canvasContext;
+    }, set canvasContext(v = null) {
+      canvasContext = v;
+    }, get ctx() {
+      return ctx;
+    }, set ctx(v = null) {
+      ctx = v;
+    }, sizeLocal, rootStyle, matrixStyle, iconStyle, canvasStyle, initCanvas, drawQrToCanvas, renderCanvas, makeCode, preview, emitTempFileSuccess, emitTempFileFail, exportImage, toTempFilePath, longpress };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = {"up-qrcode":{"":{"display":"flex","position":"relative"}},"up-qrcode__matrix":{"":{"position":"relative","overflow":"hidden"}},"up-qrcode__canvas":{"":{"position":"absolute","left":0,"top":0}},"up-qrcode__icon":{"":{"position":"absolute","borderTopLeftRadius":4,"borderTopRightRadius":4,"borderBottomRightRadius":4,"borderBottomLeftRadius":4,"backgroundColor":"#ffffff"}},"up-qrcode__loading":{"":{"position":"absolute","left":0,"right":0,"top":0,"bottom":0,"display":"flex","alignItems":"center","justifyContent":"center","backgroundColor":"rgba(255,255,255,0.8)"}},"up-qrcode__error":{"":{"display":"flex","alignItems":"center","justifyContent":"center","backgroundColor":"#f8f8f8"}},"up-qrcode__error-text":{"":{"color":"#fa3534","fontSize":14}},"content":{"":{"display":"flex","flexDirection":"column","alignItems":"center","paddingTop":"32rpx","paddingBottom":"32rpx"}},"flex":{"":{"display":"flex"}}};
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { toDisplayString: _toDisplayString, createElementVNode: _createElementVNode, normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, resolveComponent: _resolveComponent, createVNode: _createVNode } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_loading_icon = resolveEasycom(__resolveDynamicComponent("up-loading-icon"), __easycom_1$1);
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      class: "up-qrcode",
+      style: _normalizeStyle($setup.rootStyle),
+      onLongpress: $setup.longpress,
+      onClick: $setup.preview
+    },
+    [
+      $setup.error.length > 0 ? (_openBlock(), _createElementBlock(
+        "view",
+        {
+          key: 0,
+          class: "up-qrcode__error",
+          style: _normalizeStyle($setup.matrixStyle)
+        },
+        [
+          _createElementVNode(
+            "text",
+            { class: "up-qrcode__error-text" },
+            _toDisplayString($setup.error),
+            1
+            /* TEXT */
+          )
+        ],
+        4
+        /* STYLE */
+      )) : (_openBlock(), _createElementBlock(
+        "view",
+        {
+          key: 1,
+          class: "up-qrcode__matrix",
+          style: _normalizeStyle($setup.matrixStyle)
+        },
+        [
+          _createElementVNode("canvas", {
+            class: "up-qrcode__canvas",
+            id: $setup.canvasId,
+            "canvas-id": $setup.canvasId,
+            style: _normalizeStyle($setup.canvasStyle)
+          }, null, 12, ["id", "canvas-id"]),
+          $props.icon.length > 0 ? (_openBlock(), _createElementBlock("image", {
+            key: 0,
+            class: "up-qrcode__icon",
+            src: $props.icon,
+            mode: "aspectFill",
+            style: _normalizeStyle($setup.iconStyle)
+          }, null, 12, ["src"])) : _createCommentVNode("v-if", true),
+          $props.showLoading && $setup.loading ? (_openBlock(), _createElementBlock("view", {
+            key: 1,
+            class: "up-qrcode__loading"
+          }, [
+            _createVNode(_component_up_loading_icon, {
+              vertical: "",
+              text: $props.loadingText,
+              textSize: "14px"
+            }, null, 8, ["text"])
+          ])) : _createCommentVNode("v-if", true)
+        ],
+        4
+        /* STYLE */
+      ))
+    ],
+    36
+    /* STYLE, NEED_HYDRATION */
+  );
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-qrcode/up-qrcode.uvue"]]);
 export {
   __easycom_1 as _
 };
 //# sourceMappingURL=up-qrcode.js.map
-Â“ÙÜ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.jsÙÍ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-qrcode/qrcode.jsÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙĞ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-qrcode/up-qrcode.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ‘ÔrD’²hostDependencyName®hostModuleNameÙH../../../../../uni_modules/uview-ultra/components/up-qrcode/up-qrcode.js¥entryÃÚ3Šimport { _ as __easycom_1$1 } from "../up-loading-icon/up-loading-icon.js";
+Â”ÙÜ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.jsÙ /Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku.jsÙÍ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-qrcode/qrcode.jsÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙĞ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-qrcode/up-qrcode.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ‘ÔrD’²hostDependencyName®hostModuleNameÙH../../../../../uni_modules/uview-ultra/components/up-qrcode/up-qrcode.js¥entryÃÚ7Rimport { _ as __easycom_1$1 } from "../up-loading-icon/up-loading-icon.js";
+import { r as resolveEasycom } from "../../../../App.ku.js";
 import { c as createQrCells, g as getQrRenderCountWithQuietZone } from "./qrcode.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, toDisplayString: _toDisplayString, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, createSharedDataIf: _createSharedDataIf, setSharedDataEvent: _setSharedDataEvent } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpQrcodeUpQrcode";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref, computed, watch, onMounted, getCurrentInstance, nextTick } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-qrcode"
   },
-  __dynamicSharedData: true,
-  __hash: "a5a1bcca",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-qrcode/up-qrcode.uvue",
   __name: "up-qrcode",
   props: {
     cid: {
@@ -498,8 +516,6 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   emits: ["result", "longpressCallback", "preview", "error"],
   setup(__props, _a) {
     var __expose = _a.expose, __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpQrcodeUpQrcodeSharedData", sharedDataClassId: 0 })));
     let qrcodeCounter = 0;
     function makeId(prefix) {
       return prefix + Date.now().toString() + "_" + (++qrcodeCounter).toString();
@@ -740,87 +756,112 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       makeCode,
       toTempFilePath
     });
-    return () => {
-      "raw js";
-      const _component_canvas = _resolveComponent("canvas");
-      const _component_up_loading_icon = __easycom_1$1;
-      _renderSharedDataEffect(() => {
-        return _setSharedDataStyle(__sharedData, 12, rootStyle.value);
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(error.value.length > 0));
-      }, () => {
-        _renderSharedDataEffect(() => {
-          _setSharedDataStyle(__sharedData, 1, matrixStyle.value);
-          _setSharedData(__sharedData, 2, _toDisplayString(error.value));
-        });
-      }, () => {
-        _renderSharedDataEffect(() => {
-          return _setSharedDataStyle(__sharedData, 9, matrixStyle.value);
-        });
-        const n5 = _createSharedDataComponentWithFallback(_component_canvas, "953ddf6e", {
-          class: "up-qrcode__canvas",
-          id: () => {
-            return canvasId.value;
-          },
-          "canvas-id": () => {
-            return canvasId.value;
-          },
-          style: () => {
-            return canvasStyle.value;
-          }
-        });
-        _setSharedData(__sharedData, 3, n5?.sharedData);
-        _createSharedDataIf(() => {
-          return _setSharedData(__sharedData, 4, _toSharedDataBoolean(__props.icon.length > 0));
-        }, () => {
-          _renderSharedDataEffect(() => {
-            _setSharedDataAttr(__sharedData, 5, _toSharedDataString(__props.icon));
-            _setSharedDataStyle(__sharedData, 6, iconStyle.value);
-          });
-        });
-        _createSharedDataIf(() => {
-          return _setSharedData(__sharedData, 7, _toSharedDataBoolean(__props.showLoading && loading.value));
-        }, () => {
-          const n11 = _createSharedDataComponentWithFallback(_component_up_loading_icon, "953dba26", {
-            vertical: "",
-            text: () => {
-              return __props.loadingText;
-            },
-            textSize: "14px"
-          });
-          _setSharedData(__sharedData, 8, n11?.sharedData);
-        });
-      }, 261);
-      _setSharedDataEvent(__sharedData, 10, longpress);
-      _setSharedDataEvent(__sharedData, 11, preview);
-      return __sharedData;
-    };
+    const __returned__ = { get qrcodeCounter() {
+      return qrcodeCounter;
+    }, set qrcodeCounter(v) {
+      qrcodeCounter = v;
+    }, makeId, isEmpty, getPixelRatio, props, emit, instance, cells, loading, result, error, canvasId, get canvasContext() {
+      return canvasContext;
+    }, set canvasContext(v = null) {
+      canvasContext = v;
+    }, get ctx() {
+      return ctx;
+    }, set ctx(v = null) {
+      ctx = v;
+    }, sizeLocal, rootStyle, matrixStyle, iconStyle, canvasStyle, initCanvas, drawQrToCanvas, renderCanvas, makeCode, preview, emitTempFileSuccess, emitTempFileFail, exportImage, toTempFilePath, longpress };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = {"up-qrcode":{"":{"display":"flex","position":"relative"}},"up-qrcode__matrix":{"":{"position":"relative","overflow":"hidden"}},"up-qrcode__canvas":{"":{"position":"absolute","left":0,"top":0}},"up-qrcode__icon":{"":{"position":"absolute","borderTopLeftRadius":4,"borderTopRightRadius":4,"borderBottomRightRadius":4,"borderBottomLeftRadius":4,"backgroundColor":"#ffffff"}},"up-qrcode__loading":{"":{"position":"absolute","left":0,"right":0,"top":0,"bottom":0,"display":"flex","alignItems":"center","justifyContent":"center","backgroundColor":"rgba(255,255,255,0.8)"}},"up-qrcode__error":{"":{"display":"flex","alignItems":"center","justifyContent":"center","backgroundColor":"#f8f8f8"}},"up-qrcode__error-text":{"":{"color":"#fa3534","fontSize":14}},"content":{"":{"display":"flex","flexDirection":"column","alignItems":"center","paddingTop":"32rpx","paddingBottom":"32rpx"}},"flex":{"":{"display":"flex"}}};
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { toDisplayString: _toDisplayString, createElementVNode: _createElementVNode, normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, resolveComponent: _resolveComponent, createVNode: _createVNode } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_loading_icon = resolveEasycom(__resolveDynamicComponent("up-loading-icon"), __easycom_1$1);
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      class: "up-qrcode",
+      style: _normalizeStyle($setup.rootStyle),
+      onLongpress: $setup.longpress,
+      onClick: $setup.preview
+    },
+    [
+      $setup.error.length > 0 ? (_openBlock(), _createElementBlock(
+        "view",
+        {
+          key: 0,
+          class: "up-qrcode__error",
+          style: _normalizeStyle($setup.matrixStyle)
+        },
+        [
+          _createElementVNode(
+            "text",
+            { class: "up-qrcode__error-text" },
+            _toDisplayString($setup.error),
+            1
+            /* TEXT */
+          )
+        ],
+        4
+        /* STYLE */
+      )) : (_openBlock(), _createElementBlock(
+        "view",
+        {
+          key: 1,
+          class: "up-qrcode__matrix",
+          style: _normalizeStyle($setup.matrixStyle)
+        },
+        [
+          _createElementVNode("canvas", {
+            class: "up-qrcode__canvas",
+            id: $setup.canvasId,
+            "canvas-id": $setup.canvasId,
+            style: _normalizeStyle($setup.canvasStyle)
+          }, null, 12, ["id", "canvas-id"]),
+          $props.icon.length > 0 ? (_openBlock(), _createElementBlock("image", {
+            key: 0,
+            class: "up-qrcode__icon",
+            src: $props.icon,
+            mode: "aspectFill",
+            style: _normalizeStyle($setup.iconStyle)
+          }, null, 12, ["src"])) : _createCommentVNode("v-if", true),
+          $props.showLoading && $setup.loading ? (_openBlock(), _createElementBlock("view", {
+            key: 1,
+            class: "up-qrcode__loading"
+          }, [
+            _createVNode(_component_up_loading_icon, {
+              vertical: "",
+              text: $props.loadingText,
+              textSize: "14px"
+            }, null, 8, ["text"])
+          ])) : _createCommentVNode("v-if", true)
+        ],
+        4
+        /* STYLE */
+      ))
+    ],
+    36
+    /* STYLE, NEED_HYDRATION */
+  );
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-qrcode/up-qrcode.uvue"]]);
 export {
   __easycom_1 as _
 };
 //# sourceMappingURL=up-qrcode.js.map
-ÔrE•§version¨mappings¥names§sources®sourcesContentÜ”‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ÔrE•§version¨mappings¥names§sources®sourcesContentÜ«‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
  ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘”  ÌÙ ‘”  ÌÚ ‘”  ÌÛ ‘”  ÌÜ ‘”  Ìİ ‘”  ÌŞ ‘”  Ìß ‘”  Ìà ‘”  Ìá ‘”  Ìâ ‘”  Ìã ‘”  Ìä ‘”  Ìå ‘”  Ìæ ‘”  Ìç ‘”  Ìè ‘”  Ìé ‘”  Ìê ‘”  Ìë ‘”  Ìì ‘”  Ìí ‘”  Ìî ‘”  Ìï ‘”  Ìğ ‘”  Ìñ ‘”  Ìò ‘”  Ìó ‘”  Ìô ‘”  Ìõ ‘”  Ìö ‘”  Ì÷ ‘”  Ìø ‘”  Ìù ‘”  Ìú ‘”  Ìû ‘”  Ìü ‘”  Ìı ‘”  Ìş ‘”  Ìÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
- ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘”  Í ‘”  Í€ ‘”  Í ‘”  Í‚ ‘”  Íƒ ‘”  Í„ ‘”  Í… ‘”  Í† ‘”  Í‡ ‘”  Íˆ ‘”  Í‰ ‘”  ÍŠ ‘”  Í‹ ‘”  ÍŒ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í‘ ‘”  Í’ ‘ÙĞ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-qrcode/up-qrcode.js‘Ú3Šimport { _ as __easycom_1$1 } from "../up-loading-icon/up-loading-icon.js";
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘”  Í ‘”  Í€ ‘”  Í ‘”  Í‚ ‘”  Íƒ ‘”  Í„ ‘”  Í… ‘”  Í† ‘”  Í‡ ‘”  Íˆ ‘”  Í‰ ‘”  ÍŠ ‘”  Í‹ ‘”  ÍŒ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í‘ ‘”  Í’ ‘”  Í“ ‘”  Í” ‘”  Í• ‘”  Í– ‘”  Í— ‘”  Í˜ ‘”  Í™ ‘”  Íš ‘”  Í› ‘”  Íœ ‘”  Í ‘”  Í ‘”  ÍŸ ‘”  Í  ‘”  Í¡ ‘”  Í¢ ‘”  Í£ ‘”  Í¤ ‘”  Í¥ ‘”  Í¦ ‘”  Í§ ‘”  Í¨ ‘”  Í© ‘ÙĞ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-qrcode/up-qrcode.js‘Ú7Rimport { _ as __easycom_1$1 } from "../up-loading-icon/up-loading-icon.js";
+import { r as resolveEasycom } from "../../../../App.ku.js";
 import { c as createQrCells, g as getQrRenderCountWithQuietZone } from "./qrcode.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, toDisplayString: _toDisplayString, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, createSharedDataIf: _createSharedDataIf, setSharedDataEvent: _setSharedDataEvent } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpQrcodeUpQrcode";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref, computed, watch, onMounted, getCurrentInstance, nextTick } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-qrcode"
   },
-  __dynamicSharedData: true,
-  __hash: "a5a1bcca",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-qrcode/up-qrcode.uvue",
   __name: "up-qrcode",
   props: {
     cid: {
@@ -903,8 +944,6 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   emits: ["result", "longpressCallback", "preview", "error"],
   setup(__props, _a) {
     var __expose = _a.expose, __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpQrcodeUpQrcodeSharedData", sharedDataClassId: 0 })));
     let qrcodeCounter = 0;
     function makeId(prefix) {
       return prefix + Date.now().toString() + "_" + (++qrcodeCounter).toString();
@@ -1145,69 +1184,99 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       makeCode,
       toTempFilePath
     });
-    return () => {
-      "raw js";
-      const _component_canvas = _resolveComponent("canvas");
-      const _component_up_loading_icon = __easycom_1$1;
-      _renderSharedDataEffect(() => {
-        return _setSharedDataStyle(__sharedData, 12, rootStyle.value);
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(error.value.length > 0));
-      }, () => {
-        _renderSharedDataEffect(() => {
-          _setSharedDataStyle(__sharedData, 1, matrixStyle.value);
-          _setSharedData(__sharedData, 2, _toDisplayString(error.value));
-        });
-      }, () => {
-        _renderSharedDataEffect(() => {
-          return _setSharedDataStyle(__sharedData, 9, matrixStyle.value);
-        });
-        const n5 = _createSharedDataComponentWithFallback(_component_canvas, "953ddf6e", {
-          class: "up-qrcode__canvas",
-          id: () => {
-            return canvasId.value;
-          },
-          "canvas-id": () => {
-            return canvasId.value;
-          },
-          style: () => {
-            return canvasStyle.value;
-          }
-        });
-        _setSharedData(__sharedData, 3, n5?.sharedData);
-        _createSharedDataIf(() => {
-          return _setSharedData(__sharedData, 4, _toSharedDataBoolean(__props.icon.length > 0));
-        }, () => {
-          _renderSharedDataEffect(() => {
-            _setSharedDataAttr(__sharedData, 5, _toSharedDataString(__props.icon));
-            _setSharedDataStyle(__sharedData, 6, iconStyle.value);
-          });
-        });
-        _createSharedDataIf(() => {
-          return _setSharedData(__sharedData, 7, _toSharedDataBoolean(__props.showLoading && loading.value));
-        }, () => {
-          const n11 = _createSharedDataComponentWithFallback(_component_up_loading_icon, "953dba26", {
-            vertical: "",
-            text: () => {
-              return __props.loadingText;
-            },
-            textSize: "14px"
-          });
-          _setSharedData(__sharedData, 8, n11?.sharedData);
-        });
-      }, 261);
-      _setSharedDataEvent(__sharedData, 10, longpress);
-      _setSharedDataEvent(__sharedData, 11, preview);
-      return __sharedData;
-    };
+    const __returned__ = { get qrcodeCounter() {
+      return qrcodeCounter;
+    }, set qrcodeCounter(v) {
+      qrcodeCounter = v;
+    }, makeId, isEmpty, getPixelRatio, props, emit, instance, cells, loading, result, error, canvasId, get canvasContext() {
+      return canvasContext;
+    }, set canvasContext(v = null) {
+      canvasContext = v;
+    }, get ctx() {
+      return ctx;
+    }, set ctx(v = null) {
+      ctx = v;
+    }, sizeLocal, rootStyle, matrixStyle, iconStyle, canvasStyle, initCanvas, drawQrToCanvas, renderCanvas, makeCode, preview, emitTempFileSuccess, emitTempFileFail, exportImage, toTempFilePath, longpress };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = {"up-qrcode":{"":{"display":"flex","position":"relative"}},"up-qrcode__matrix":{"":{"position":"relative","overflow":"hidden"}},"up-qrcode__canvas":{"":{"position":"absolute","left":0,"top":0}},"up-qrcode__icon":{"":{"position":"absolute","borderTopLeftRadius":4,"borderTopRightRadius":4,"borderBottomRightRadius":4,"borderBottomLeftRadius":4,"backgroundColor":"#ffffff"}},"up-qrcode__loading":{"":{"position":"absolute","left":0,"right":0,"top":0,"bottom":0,"display":"flex","alignItems":"center","justifyContent":"center","backgroundColor":"rgba(255,255,255,0.8)"}},"up-qrcode__error":{"":{"display":"flex","alignItems":"center","justifyContent":"center","backgroundColor":"#f8f8f8"}},"up-qrcode__error-text":{"":{"color":"#fa3534","fontSize":14}},"content":{"":{"display":"flex","flexDirection":"column","alignItems":"center","paddingTop":"32rpx","paddingBottom":"32rpx"}},"flex":{"":{"display":"flex"}}};
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { toDisplayString: _toDisplayString, createElementVNode: _createElementVNode, normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, resolveComponent: _resolveComponent, createVNode: _createVNode } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_loading_icon = resolveEasycom(__resolveDynamicComponent("up-loading-icon"), __easycom_1$1);
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      class: "up-qrcode",
+      style: _normalizeStyle($setup.rootStyle),
+      onLongpress: $setup.longpress,
+      onClick: $setup.preview
+    },
+    [
+      $setup.error.length > 0 ? (_openBlock(), _createElementBlock(
+        "view",
+        {
+          key: 0,
+          class: "up-qrcode__error",
+          style: _normalizeStyle($setup.matrixStyle)
+        },
+        [
+          _createElementVNode(
+            "text",
+            { class: "up-qrcode__error-text" },
+            _toDisplayString($setup.error),
+            1
+            /* TEXT */
+          )
+        ],
+        4
+        /* STYLE */
+      )) : (_openBlock(), _createElementBlock(
+        "view",
+        {
+          key: 1,
+          class: "up-qrcode__matrix",
+          style: _normalizeStyle($setup.matrixStyle)
+        },
+        [
+          _createElementVNode("canvas", {
+            class: "up-qrcode__canvas",
+            id: $setup.canvasId,
+            "canvas-id": $setup.canvasId,
+            style: _normalizeStyle($setup.canvasStyle)
+          }, null, 12, ["id", "canvas-id"]),
+          $props.icon.length > 0 ? (_openBlock(), _createElementBlock("image", {
+            key: 0,
+            class: "up-qrcode__icon",
+            src: $props.icon,
+            mode: "aspectFill",
+            style: _normalizeStyle($setup.iconStyle)
+          }, null, 12, ["src"])) : _createCommentVNode("v-if", true),
+          $props.showLoading && $setup.loading ? (_openBlock(), _createElementBlock("view", {
+            key: 1,
+            class: "up-qrcode__loading"
+          }, [
+            _createVNode(_component_up_loading_icon, {
+              vertical: "",
+              text: $props.loadingText,
+              textSize: "14px"
+            }, null, 8, ["text"])
+          ])) : _createCommentVNode("v-if", true)
+        ],
+        4
+        /* STYLE */
+      ))
+    ],
+    36
+    /* STYLE, NEED_HYDRATION */
+  );
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-qrcode/up-qrcode.uvue"]]);
 export {
   __easycom_1 as _
 };
 //# sourceMappingURL=up-qrcode.js.map
-ÔrF“«./qrcode.jsÙ%../up-loading-icon/up-loading-icon.jsÙ'../../../../plugin-vue-export-helper.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙÍ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-qrcode/qrcode.jsAÃªoh-resolveÂGAÂÙÜ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.jsAÃªoh-resolveÂGAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ3-Í3KÀ‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍ38Í3HÔrL”¤type¥start£end¤nameªIdentifierÍ38Í3C«__easycom_1LªIdentifierÍ3GÍ3H¡_À“ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration ÌK‘ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	
-¡_LªIdentifier­__easycom_1$1ÔrO•¤type¥start£end¥value£raw§Literal#ÌJÙ%../up-loading-icon/up-loading-icon.jsÙ'"../up-loading-icon/up-loading-icon.js"M±ImportDeclarationÌLÌ¡’N¯ImportSpecifierÌUÌgLªIdentifierÌUÌV¡cLªIdentifierÌZÌg­createQrCellsN¯ImportSpecifierÌiÌ‹LªIdentifierÌiÌj¡gLªIdentifierÌnÌ‹½getQrRenderCountWithQuietZoneO§LiteralÌ“Ì «./qrcode.js­"./qrcode.js"M±ImportDeclarationÌ¢Ìí‘N¯ImportSpecifierÌ«Ì»LªIdentifierÌ«Ì¬¡_LªIdentifierÌ°Ì»«_export_sfcO§LiteralÌÃÌìÙ'../../../../plugin-vue-export-helper.jsÙ)"../../../../plugin-vue-export-helper.js"
+ÔrF”µ../../../../App.ku.jsÙ'../../../../plugin-vue-export-helper.jsÙ%../up-loading-icon/up-loading-icon.js«./qrcode.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙ /Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku.jsAÃªoh-resolveÂGAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂGAÂÙÜ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.jsAÃªoh-resolveÂGAÂÙÍ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-qrcode/qrcode.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ6õÍ7À‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍ7 Í7ÔrL”¤type¥start£end¤nameªIdentifierÍ7 Í7«__easycom_1LªIdentifierÍ7Í7¡_À”ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration ÌK‘ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	
+¡_LªIdentifier­__easycom_1$1ÔrO•¤type¥start£end¥value£raw§Literal#ÌJÙ%../up-loading-icon/up-loading-icon.jsÙ'"../up-loading-icon/up-loading-icon.js"M±ImportDeclarationÌLÌˆ‘N¯ImportSpecifierÌUÌhLªIdentifierÌUÌV¡rLªIdentifierÌZÌh®resolveEasycomO§LiteralÌpÌ‡µ../../../../App.ku.js·"../../../../App.ku.js"M±ImportDeclarationÌ‰ÌŞ’N¯ImportSpecifierÌ’Ì¤LªIdentifierÌ’Ì“¡cLªIdentifierÌ—Ì¤­createQrCellsN¯ImportSpecifierÌ¦ÌÈLªIdentifierÌ¦Ì§¡gLªIdentifierÌ«ÌÈ½getQrRenderCountWithQuietZoneO§LiteralÌĞÌİ«./qrcode.js­"./qrcode.js"M±ImportDeclarationÌßÍ*‘N¯ImportSpecifierÌèÌøLªIdentifierÌèÌé¡_LªIdentifierÌíÌø«_export_sfcO§LiteralÍ Í)Ù'../../../../plugin-vue-export-helper.jsÙ)"../../../../plugin-vue-export-helper.js"

@@ -1,0 +1,319 @@
+import _easycom_up_line from '@/uni_modules/uview-ultra/components/up-line/up-line.uvue'
+import _easycom_up_loading_icon from '@/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.uvue'
+import _easycom_up_popup from '@/uni_modules/uview-ultra/components/up-popup/up-popup.uvue'
+import { computed, ref, watch } from 'vue'
+import { addUnit } from '../../libs/function/index.uts'
+import { t } from '../../libs/i18n/index.uts'
+
+
+const __sfc__ = defineComponent({
+  __name: 'up-modal',
+name: 'up-modal',
+  props: {
+  show: {
+    type: Boolean,
+    default: false
+  },
+  title: {
+    type: String,
+    default: ''
+  },
+  content: {
+    type: String,
+    default: ''
+  },
+  confirmText: {
+    type: String,
+    default: '确认'
+  },
+  cancelText: {
+    type: String,
+    default: '取消'
+  },
+  showConfirmButton: {
+    type: Boolean,
+    default: true
+  },
+  showCancelButton: {
+    type: Boolean,
+    default: false
+  },
+  confirmColor: {
+    type: String,
+    default: '#2979ff'
+  },
+  cancelColor: {
+    type: String,
+    default: '#606266'
+  },
+  buttonReverse: {
+    type: Boolean,
+    default: false
+  },
+  zoom: {
+    type: Boolean,
+    default: true
+  },
+  asyncClose: {
+    type: Boolean,
+    default: false
+  },
+  closeOnClickOverlay: {
+    type: Boolean,
+    default: false
+  },
+  negativeTop: {
+    type: [String, Number],
+    default: 0
+  },
+  width: {
+    type: [String, Number],
+    default: '650rpx'
+  },
+  confirmButtonShape: {
+    type: String,
+    default: ''
+  },
+  duration: {
+    type: Number,
+    default: 400
+  },
+  contentTextAlign: {
+    type: String,
+    default: 'left'
+  },
+  asyncCloseTip: {
+    type: String,
+    default: ''
+  },
+  asyncCancelClose: {
+    type: Boolean,
+    default: false
+  },
+  contentStyle: {
+    type: Object,
+    default: () => ({})
+  },
+  customClass: {
+    type: String,
+    default: ''
+  }
+},
+  emits: ['confirm', 'cancel', 'close', 'update:show', 'cancelOnAsync'],
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+
+
+const props = __props
+
+function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+__ins.emit(event, ...do_not_transform_spread)
+}
+
+const loading = ref<boolean>(false)
+
+watch((): boolean => props.show, (n: boolean) => {
+  if (n && loading.value) {
+    loading.value = false
+  }
+})
+
+const elCancelText = computed<string>(() => {
+  if (props.cancelText == '取消' || props.cancelText == '') {
+    return t('up_common_cancel', {} as UTSJSONObject)
+  }
+  return props.cancelText
+})
+
+const elConfirmText = computed<string>(() => {
+  if (props.confirmText == '确认' || props.confirmText == '确定' || props.confirmText == '') {
+    return t('up_common_confirm', {} as UTSJSONObject)
+  }
+  return props.confirmText
+})
+
+const popupCustomStyle = computed((): UTSJSONObject => {
+  return {
+    borderRadius: '6px',
+    overflow: 'hidden',
+    marginTop: `-${addUnit(props.negativeTop)}`
+  } as UTSJSONObject
+})
+
+const modalStyle = computed((): UTSJSONObject => {
+  return {
+    width: addUnit(props.width)
+  } as UTSJSONObject
+})
+
+const buttonGroupStyle = computed((): UTSJSONObject => {
+  return {
+    flexDirection: props.buttonReverse ? 'row-reverse' : 'row'
+  } as UTSJSONObject
+})
+
+const cancelTextStyle = computed((): UTSJSONObject => {
+  return {
+    color: props.cancelColor
+  } as UTSJSONObject
+})
+
+const confirmTextStyle = computed((): UTSJSONObject => {
+  return {
+    color: props.confirmColor
+  } as UTSJSONObject
+})
+
+const contentTextStyle = computed((): UTSJSONObject => {
+  return {
+    textAlign: props.contentTextAlign
+  } as UTSJSONObject
+})
+
+const contentStyleCpu = computed<UTSJSONObject>(() => {
+  const style = (props.contentStyle ?? {}) as UTSJSONObject
+  style['paddingTop'] = `${props.title != '' ? 12 : 25}px`
+  return style
+})
+
+function confirmHandler() {
+  if (props.asyncClose) {
+    loading.value = true
+  } else {
+    emit('update:show', false)
+  }
+  emit('confirm')
+}
+
+function cancelHandler() {
+  if (props.asyncClose && loading.value) {
+    if (props.asyncCloseTip != '') {
+      uni.showToast({
+        title: props.asyncCloseTip,
+        icon: 'none'
+      })
+    }
+    emit('cancelOnAsync')
+  } else {
+    if (!props.asyncCancelClose) {
+      emit('update:show', false)
+    }
+  }
+  emit('cancel')
+}
+
+function clickHandler() {
+  if (props.closeOnClickOverlay) {
+    emit('update:show', false)
+  }
+  emit('close')
+}
+
+return (): any | null => {
+
+const _component_up_line = resolveEasyComponent("up-line",_easycom_up_line)
+const _component_up_loading_icon = resolveEasyComponent("up-loading-icon",_easycom_up_loading_icon)
+const _component_up_popup = resolveEasyComponent("up-popup",_easycom_up_popup)
+
+  return _cV(_component_up_popup, _uM({
+    mode: "center",
+    zoom: _ctx.zoom,
+    show: _ctx.show,
+    class: _nC([_ctx.customClass]),
+    customStyle: popupCustomStyle.value,
+    closeOnClickOverlay: _ctx.closeOnClickOverlay,
+    safeAreaInsetBottom: false,
+    duration: _ctx.duration,
+    onClick: clickHandler
+  }), _uM({
+    bottom: withSlotCtx((): any[] => [
+      renderSlot(_ctx.$slots, "popupBottom")
+    ]),
+    default: withSlotCtx((): any[] => [
+      _cE("view", _uM({
+        class: "up-modal",
+        style: _nS(modalStyle.value)
+      }), [
+        _ctx.title != ''
+          ? _cE("view", _uM({
+              key: 0,
+              class: "up-modal__title"
+            }), _tD(_ctx.title), 1 /* TEXT */)
+          : _cC("v-if", true),
+        _cE("view", _uM({
+          class: "up-modal__content",
+          style: _nS(contentStyleCpu.value)
+        }), [
+          renderSlot(_ctx.$slots, "default", {}, (): any[] => [
+            _cE("text", _uM({
+              class: "up-modal__content__text",
+              style: _nS(contentTextStyle.value)
+            }), _tD(_ctx.content), 5 /* TEXT, STYLE */)
+          ])
+        ], 4 /* STYLE */),
+        _ctx.$slots['confirmButton'] != null
+          ? _cE("view", _uM({
+              key: 1,
+              class: "up-modal__button-group--confirm-button"
+            }), [
+              renderSlot(_ctx.$slots, "confirmButton")
+            ])
+          : _cE(Fragment, _uM({ key: 2 }), [
+              _cV(_component_up_line),
+              _cE("view", _uM({
+                class: "up-modal__button-group",
+                style: _nS(buttonGroupStyle.value)
+              }), [
+                isTrue(_ctx.showCancelButton)
+                  ? _cE("view", _uM({
+                      key: 0,
+                      class: _nC(["up-modal__button-group__wrapper up-modal__button-group__wrapper--cancel", [(_ctx.showCancelButton && !_ctx.showConfirmButton) ? 'up-modal__button-group__wrapper--only-cancel' : '']]),
+                      "hover-stay-time": 150,
+                      "hover-class": "up-modal__button-group__wrapper--hover",
+                      onClick: cancelHandler
+                    }), [
+                      _cE("text", _uM({
+                        class: "up-modal__button-group__wrapper__text",
+                        style: _nS(cancelTextStyle.value)
+                      }), _tD(elCancelText.value), 5 /* TEXT, STYLE */)
+                    ], 2 /* CLASS */)
+                  : _cC("v-if", true),
+                isTrue(_ctx.showConfirmButton && _ctx.showCancelButton)
+                  ? _cV(_component_up_line, _uM({
+                      key: 1,
+                      direction: "column"
+                    }))
+                  : _cC("v-if", true),
+                isTrue(_ctx.showConfirmButton)
+                  ? _cE("view", _uM({
+                      key: 2,
+                      class: _nC(["up-modal__button-group__wrapper up-modal__button-group__wrapper--confirm", [(!_ctx.showCancelButton && _ctx.showConfirmButton) ? 'up-modal__button-group__wrapper--only-confirm' : '']]),
+                      "hover-stay-time": 150,
+                      "hover-class": "up-modal__button-group__wrapper--hover",
+                      onClick: confirmHandler
+                    }), [
+                      isTrue(loading.value)
+                        ? _cV(_component_up_loading_icon, _uM({ key: 0 }))
+                        : _cE("text", _uM({
+                            key: 1,
+                            class: "up-modal__button-group__wrapper__text",
+                            style: _nS(confirmTextStyle.value)
+                          }), _tD(elConfirmText.value), 5 /* TEXT, STYLE */)
+                    ], 2 /* CLASS */)
+                  : _cC("v-if", true)
+              ], 4 /* STYLE */)
+            ], 64 /* STABLE_FRAGMENT */)
+      ], 4 /* STYLE */)
+    ]),
+    _: 3 /* FORWARDED */
+  }), 8 /* PROPS */, ["zoom", "show", "class", "customStyle", "closeOnClickOverlay", "duration"])
+}
+}
+
+})
+export default __sfc__
+export type UpModalComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpModalUpModalStyles = [_uM([["u-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-modal", _pS(_uM([["width", "650rpx"], ["borderTopLeftRadius", 6], ["borderTopRightRadius", 6], ["borderBottomRightRadius", 6], ["borderBottomLeftRadius", 6], ["overflow", "hidden"]]))], ["up-modal__title", _pS(_uM([["paddingTop", 25], ["fontWeight", "bold"], ["textAlign", "center"], ["fontSize", 16], ["color", "#303133"]]))], ["up-modal__content", _pS(_uM([["paddingTop", 12], ["paddingRight", 20], ["paddingBottom", 20], ["paddingLeft", 20], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"]]))], ["up-modal__content__text", _pS(_uM([["fontSize", 14], ["color", "#606266"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["up-modal__button-group", _pS(_uM([["display", "flex"], ["flexDirection", "row"]]))], ["up-modal__button-group--confirm-button", _pS(_uM([["flexDirection", "column"], ["paddingTop", 0], ["paddingRight", 20], ["paddingBottom", 15], ["paddingLeft", 20]]))], ["up-modal__button-group__wrapper", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["height", 48]]))], ["up-modal__button-group__wrapper--confirm", _pS(_uM([["height", 48], ["lineHeight", "48px"], ["fontSize", 16], ["color", "#606266"], ["textAlign", "center"], ["backgroundColor", "#ffffff"]]))], ["up-modal__button-group__wrapper--only-cancel", _pS(_uM([["borderBottomLeftRadius", 6], ["borderBottomRightRadius", 6]]))], ["up-modal__button-group__wrapper--only-confirm", _pS(_uM([["borderBottomLeftRadius", 6], ["borderBottomRightRadius", 6]]))], ["up-modal__button-group__wrapper--cancel", _pS(_uM([["height", 48], ["lineHeight", "48px"], ["fontSize", 16], ["color", "#606266"], ["textAlign", "center"], ["backgroundColor", "#ffffff"]]))], ["up-modal__button-group__wrapper--hover", _pS(_uM([["backgroundColor", "#e6e6e6"]]))], ["up-modal__button-group__wrapper__text", _pS(_uM([["color", "#606266"], ["fontSize", 16], ["textAlign", "center"]]))]])]

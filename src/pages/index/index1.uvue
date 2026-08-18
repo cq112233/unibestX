@@ -12,7 +12,7 @@
       <text class="text-center text-25px mt-10px">
         最好用的 uni-appX 开发模板
       </text>
-      <text class="mt-10px m-auto px-30px text-justify text-16px text-bold">
+      <text class="mt-10px m-auto px-30px text-16px text-bold">
         　　unibestX 是一个集成了多种工具与技术的 uni-appX 开发模板，由
         uni-appX + Vue3 + Ts + UnoCss + VSCode
         构建，模板具有代码提示、自动格式化、统一配置、代码片段等功能，并内置了许多常用的基本组件和基本功能，让你编写
@@ -55,34 +55,34 @@
 </template>
 
 <script setup lang="uts">
-import { handleBackPressExit } from '../../utils/backPress.uts'
+import { handleBackPressExit } from '../../utils/backPress.uts';
 
 onBackPress((options: OnBackPressOptions): boolean => {
   // #ifdef APP
   if (options.from == 'backbutton') {
-    return handleBackPressExit()
+    return handleBackPressExit();
   }
   // #endif
-  return false
-})
+  return false;
+});
 
-const themeSwitchVal = ref(true)
-const themeSwitchVal2 = ref(false)
+const themeSwitchVal = ref(true);
+const themeSwitchVal2 = ref(false);
 
-const checkboxValue = ref(['apple'] as string[])
-const radioValue = ref('male')
-const sliderValue = ref(30)
-const rateValue = ref(3)
+const checkboxValue = ref(['apple'] as string[]);
+const radioValue = ref('male');
+const sliderValue = ref(30);
+const rateValue = ref(3);
 
-const isBg = ref(true)
+const isBg = ref(true);
 function switchBg() {
-  isBg.value = !isBg.value
+  isBg.value = !isBg.value;
 }
 
 function goToUiTest() {
   uni.navigateTo({
-    url: '/src/sub/uiTest/uiTest',
-  })
+    url: '/src/sub/uiTest/uiTest'
+  });
 }
 </script>
 

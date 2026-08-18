@@ -112,7 +112,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const __returned__ = common_vendor.e({
         a: common_vendor.p({
           title: "AI 智能助手",
-          ["show-back"]: true
+          ["show-back"]: true,
+          class: "data-v-c7a3d6b3"
         }),
         b: common_vendor.f(common_vendor.unref(messages), (msg, k0, i0) => {
           return common_vendor.e({
@@ -131,21 +132,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, common_vendor.unref(isTyping) ? {} : {}, {
         d: `${common_vendor.unref(safeAreaBottom) + 70}px`,
         e: common_vendor.unref(scrollTop),
-        f: common_vendor.o(sendMessage, "0d"),
+        f: common_vendor.o(sendMessage, "22"),
         g: common_vendor.unref(inputText),
         h: common_vendor.o(($event) => {
           return common_vendor.isRef(inputText) ? inputText.value = $event.detail.value : null;
-        }, "a8"),
+        }, "05"),
         i: common_vendor.p({
           type: "paperplane-filled",
           size: "18",
-          color: "#ffffff"
+          color: "#ffffff",
+          class: "data-v-c7a3d6b3"
         }),
-        j: common_vendor.o(sendMessage, "53"),
+        j: common_vendor.o(sendMessage, "17"),
         k: `${common_vendor.unref(safeAreaBottom) + 10}px`,
         l: common_vendor.gei(_ctx, ""),
         m: common_vendor.p({
-          id: common_vendor.gei(_ctx, "")
+          id: common_vendor.gei(_ctx, ""),
+          class: "data-v-c7a3d6b3"
         }),
         n: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
@@ -153,5 +156,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-wx.createPage(_sfc_main);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-c7a3d6b3"]]);
+wx.createPage(MiniProgramPage);
 //# sourceMappingURL=../../../../.sourcemap/mp-weixin/src/pages/ai/ai.js.map

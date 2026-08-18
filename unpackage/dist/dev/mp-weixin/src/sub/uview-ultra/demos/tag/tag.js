@@ -99,7 +99,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         m: showTag.value
       }, showTag.value ? {
-        n: common_vendor.o(closeTag, "b0"),
+        n: common_vendor.o(closeTag, "29"),
         o: common_vendor.p({
           text: "点击关闭",
           type: "primary",

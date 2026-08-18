@@ -1,10 +1,8 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
-const _sfc_main = common_vendor.defineComponent({
-  styleIsolation: "app"
-});
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+const _sfc_main = {};
+function _sfc_render(_ctx, _cache) {
   "raw js";
   return {
     a: common_assets._imports_0$2,

@@ -3,19 +3,13 @@ import "../../../store/index.js";
 import { $ as $t } from "../../../utils/i18n.js";
 import { u as useAppStore } from "../../../store/app.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedData: _setSharedData, toDisplayString: _toDisplayString, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataIf: _createSharedDataIf, setSharedDataEvent: _setSharedDataEvent, createSharedDataFor: _createSharedDataFor, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
-const __className = "GenSrcPagesBasicComponentsThemeSwitchCard";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { computed } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "5ef58938",
-  __className,
-  __filename: "src/pages/basic/components/ThemeSwitchCard.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "ThemeSwitchCard",
-  setup(__props) {
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenSrcPagesBasicComponentsThemeSwitchCardSharedData", sharedDataClassId: 0 })));
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
     const appStore = useAppStore();
     const themeTitle = computed(() => {
       return $t("basic.themeTitle");
@@ -44,58 +38,77 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         duration: 1500
       });
     }
-    return () => {
-      "raw js";
-      const n11 = _createSharedDataComponent(
-        Card,
-        "a1511108",
-        { title: () => {
-          return themeTitle.value;
-        } },
-        {
-          "default": () => {
-            _renderSharedDataEffect(() => {
-              _setSharedData(__sharedData, 2, _toDisplayString(themePreview.value));
-              _setSharedDataStyle(__sharedData, 3, { backgroundColor: currentTheme.value });
-              _setSharedData(__sharedData, 4, _toDisplayString(themeButton.value));
-            });
-            _createSharedDataFor(_setSharedDataScoped(__sharedData, 1, _createSharedDataVFor(__sharedDataScope, () => {
-              return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-            })), () => {
-              return colorOptions;
-            }, (__sharedData_VFor0, _for_item0, _for_key0) => {
-              _renderSharedDataEffect(() => {
-                const _item = _for_item0.value;
-                _setSharedDataStyle(__sharedData_VFor0, 3, {
-                  backgroundColor: _item,
-                  borderWidth: currentTheme.value == _item ? "3px" : "0px",
-                  borderStyle: "solid",
-                  borderColor: "#1e293b"
-                });
-              });
-              _createSharedDataIf(() => {
-                return _setSharedData(__sharedData_VFor0, 1, _toSharedDataBoolean(currentTheme.value == _for_item0.value));
-              }, () => {
-              });
-              _setSharedDataEvent(__sharedData_VFor0, 2, () => {
-                return changeTheme(_for_item0.value);
-              });
-              return null;
-            }, (__sharedData_VFor0, item, index) => {
-              return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
-            }, 1);
-          }
-        },
-        1
-        /* SINGLE_ROOT */
-      );
-      _setSharedData(__sharedData, 0, n11.sharedData);
-      return __sharedData;
-    };
+    const __returned__ = { appStore, themeTitle, themePreview, themeButton, currentTheme, colorOptions, changeTheme, get Card() {
+      return Card;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const ThemeSwitchCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = {"wtu-1vbahwj-0":{"":{"alignItems":"center"}},"wtu-i5demr-1":{"":{"color":"#94a3b8"}},"wtu-7gvrw-2":{"":{"marginLeft":"auto","marginRight":"auto"}},"wtu-27v8zu-3":{"":{"display":"flex"}},"wtu-1q091sr-4":{"":{"flexDirection":"row"}},"wtu-1r3uoj-5":{"":{"justifyContent":"center"}},"wtu-g3vc06-6":{"":{"color":"#ffffff"}},"wtu-1o0f0um-7":{"":{"justifyContent":"space-between"}},"wtu-19gexn6-8":{"":{"color":"#ffffff"}},"wtu-1x7cgzs-9":{"":{"--tw-font-weight":"var(--font-weight-bold, 700)","fontWeight":700}},"flex":{"":{"display":"flex"}}};
+const { toDisplayString: _toDisplayString, createElementVNode: _createElementVNode, normalizeStyle: _normalizeStyle, renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, withCtx: _withCtx, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createBlock($setup["Card"], { title: $setup.themeTitle }, {
+    default: _withCtx(() => [
+      _createElementVNode("view", { class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0] wtu-1vbahwj-0" }, [
+        _createElementVNode(
+          "text",
+          { class: "text-12px wtu-i5demr-1 mb-8px" },
+          _toDisplayString($setup.themePreview),
+          1
+          /* TEXT */
+        ),
+        _createElementVNode(
+          "view",
+          {
+            class: "mt-10px wtu-7gvrw-2 w-200px h-44px rounded-8px wtu-27v8zu-3 wtu-1q091sr-4 wtu-1vbahwj-0 wtu-1r3uoj-5",
+            style: _normalizeStyle({ backgroundColor: $setup.currentTheme })
+          },
+          [
+            _createElementVNode(
+              "text",
+              { class: "wtu-g3vc06-6 text-14px" },
+              _toDisplayString($setup.themeButton),
+              1
+              /* TEXT */
+            )
+          ],
+          4
+          /* STYLE */
+        )
+      ]),
+      _createElementVNode("view", { class: "wtu-1q091sr-4 wtu-1o0f0um-7 py-10px" }, [
+        (_openBlock(), _createElementBlock(
+          _Fragment,
+          null,
+          _renderList($setup.colorOptions, (item, index) => {
+            return _createElementVNode("view", {
+              key: index,
+              class: "w-40px h-40px rounded-20px wtu-1vbahwj-0 wtu-1r3uoj-5",
+              style: _normalizeStyle({
+                backgroundColor: item,
+                borderWidth: $setup.currentTheme == item ? "3px" : "0px",
+                borderStyle: "solid",
+                borderColor: "#1e293b"
+              }),
+              onClick: ($event) => $setup.changeTheme(item)
+            }, [
+              $setup.currentTheme == item ? (_openBlock(), _createElementBlock("text", {
+                key: 0,
+                class: "text-16px wtu-19gexn6-8 wtu-1x7cgzs-9"
+              }, " ✓ ")) : _createCommentVNode("v-if", true)
+            ], 12, ["onClick"]);
+          }),
+          64
+          /* STABLE_FRAGMENT */
+        ))
+      ])
+    ]),
+    _: 1
+    /* STABLE */
+  }, 8, ["title"]);
+}
+const ThemeSwitchCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/basic/components/ThemeSwitchCard.uvue"]]);
 export {
   ThemeSwitchCard as T
 };

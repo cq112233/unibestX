@@ -1,4 +1,4 @@
-import { _ as _sfc_main$1 } from "../../../App.ku.js";
+import { A as AppKu } from "../../../App.ku.js";
 import { L as LayoutComponent } from "../../layouts/default.js";
 import { L as LOGIN_PAGE } from "../../router/config.js";
 import { _ as _export_sfc } from "../../../plugin-vue-export-helper.js";
@@ -63,19 +63,12 @@ import "../../../uni_modules/uview-ultra/libs/i18n/locales/ru.js";
 import "../../store/token.js";
 import "../../store/user.js";
 import "../../utils/toast.js";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, setSharedDataEvent: _setSharedDataEvent, createSharedDataComponent: _createSharedDataComponent, setSharedData: _setSharedData, withSharedDataVaporCtx: _withSharedDataVaporCtx } = globalThis.Vue;
-const __className = "GenSrcSubAuthRegister";
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "6126f08f",
-  __className,
-  __filename: "src/sub/auth/register.uvue",
+const { defineComponent: _defineComponent } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "register",
-  setup(__props) {
-    const __sharedDataRenderer = _useSharedDataRenderer();
-    const __sharedData = __sharedDataRenderer == "component" ? _withSharedDataComponent(new UniDynamicSharedDataComponent(_useSharedDataScope(), _useSharedDataComponentOptions({ bundleKey: "GenSrcSubAuthRegisterSharedData", sharedDataClassId: 0 }))) : _withSharedDataPage(new UniDynamicSharedDataPage(_useSharedDataPageId(), _useSharedDataPageOptions({ bundleKey: "GenSrcSubAuthRegisterSharedData", sharedDataClassId: 0 })));
-    _useSharedDataScope(__sharedData);
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
     function doRegister() {
       uni.showToast({
         title: "注册成功",
@@ -87,25 +80,43 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         });
       }, 1e3);
     }
-    return () => {
-      "raw js";
-      const n6 = _createSharedDataComponent(_sfc_main$1, "505f345a", null, {
-        "default": _withSharedDataVaporCtx(() => {
-          const n5 = _createSharedDataComponent(LayoutComponent, "88f15248", { "navigation-bar-title-text": "注册" }, {
-            "default": () => {
-              _setSharedDataEvent(__sharedData, 2, doRegister);
-            }
-          });
-          _setSharedData(__sharedData, 1, n5.sharedData);
-        })
-      });
-      _setSharedData(__sharedData, 0, n6.sharedData);
-      return __sharedData;
-    };
+    const __returned__ = { doRegister, get AppKu() {
+      return AppKu;
+    }, get LayoutComponent() {
+      return LayoutComponent;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const register = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const { createElementVNode: _createElementVNode, withCtx: _withCtx, createVNode: _createVNode, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createBlock($setup["AppKu"], null, {
+    default: _withCtx(() => [
+      _createVNode($setup["LayoutComponent"], { "navigation-bar-title-text": "注册" }, {
+        default: _withCtx(() => [
+          _createElementVNode("view", { class: "flex-1 p-30px items-center justify-center" }, [
+            _createElementVNode("view", { class: "mb-30px" }, [
+              _createElementVNode("text", { class: "text-20px font-bold text-_b_h1e293b_B" }, "注册页")
+            ]),
+            _createElementVNode("view", {
+              class: "w-200px h-44px rounded-8px bg-_b_h10b981_B flex flex-row items-center justify-center",
+              onClick: $setup.doRegister
+            }, [
+              _createElementVNode("text", { class: "text-_b_hffffff_B text-14px font-bold" }, "点击模拟注册")
+            ])
+          ])
+        ]),
+        _: 1
+        /* STABLE */
+      })
+    ]),
+    _: 1
+    /* STABLE */
+  });
+}
+const _style_wt = {"flex-1":{"":{"flexGrow":1,"flexShrink":1,"flexBasis":"0%"}},"items-center":{"":{"alignItems":"center"}},"justify-center":{"":{"justifyContent":"center"}},"font-bold":{"":{"--tw-font-weight":"700","fontWeight":700}},"text-_b_h1e293b_B":{"":{"color":"#1e293b"}},"bg-_b_h10b981_B":{"":{"backgroundColor":"#10b981"}},"flex":{"":{"display":"flex"}},"flex-row":{"":{"flexDirection":"row"}},"text-_b_hffffff_B":{"":{"color":"#ffffff"}}};
+const register = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_wt]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/auth/register.uvue"]]);
 export {
   register as default
 };

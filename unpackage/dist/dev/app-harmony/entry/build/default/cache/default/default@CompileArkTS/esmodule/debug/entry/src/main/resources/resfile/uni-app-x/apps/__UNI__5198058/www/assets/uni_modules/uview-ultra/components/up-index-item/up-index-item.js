@@ -2,18 +2,12 @@ import { i as error, s as sleep, u as upGetRect } from "@normalized:N&&&entry/sr
 import { d as defProps } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-index-item/indexItem&";
 import { u as useUltraUI } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useUltraUI&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataClass: _setSharedDataClass, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataSlot: _createSharedDataSlot } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpIndexItemUpIndexItem";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref, onMounted, getCurrentInstance } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-index-item"
   },
-  __dynamicSharedData: true,
-  __hash: "7445f843",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-index-item/up-index-item.uvue",
   __name: "up-index-item",
   props: {
     text: {
@@ -23,19 +17,15 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   },
   emits: [],
   setup(__props, _a) {
-    var __expose = _a.expose;
-    _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpIndexItemUpIndexItemSharedData", sharedDataClassId: 0 })));
-    const _b = useUltraUI(), parent = _b.parent;
-    _b.getParent;
-    const getParentData = _b.getParentData;
+    var __expose = _a.expose, __emit = _a.emit;
+    const _b = useUltraUI(), parent = _b.parent, getParent = _b.getParent, getParentData = _b.getParentData;
     const instance = getCurrentInstance().proxy;
     const props = __props;
+    const emit = __emit;
     const top = ref(0);
     const height = ref(0);
     const itemId = ref("");
-    ref(new UTSJSONObject({}));
+    const anchor = ref(new UTSJSONObject({}));
     const getIndexItemRect = function() {
       return new Promise((resolve) => {
         upGetRect(".up-index-item", false, instance).then((size = null) => {
@@ -75,20 +65,22 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       setId,
       getRefs
     });
-    return () => {
-      "raw js";
-      _renderSharedDataEffect(() => {
-        const _itemId = itemId.value;
-        _setSharedDataClass(__sharedData, 0, ["up-index-item", ["up-index-item-" + _itemId]]);
-        _setSharedDataAttr(__sharedData, 1, _toSharedDataString("up-index-item-" + _itemId));
-      });
-      _createSharedDataSlot("default", null, null);
-      return __sharedData;
-    };
+    const __returned__ = { parent, getParent, getParentData, instance, props, emit, top, height, itemId, anchor, getIndexItemRect, init, setId, getRefs };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = {"u-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"flex":{"":{"display":"flex"}}};
+const { renderSlot: _renderSlot, normalizeClass: _normalizeClass, openBlock: _openBlock, createElementBlock: _createElementBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createElementBlock("view", {
+    class: _normalizeClass(["up-index-item", ["up-index-item-" + $setup.itemId]]),
+    id: "up-index-item-" + $setup.itemId
+  }, [
+    _renderSlot(_ctx.$slots, "default")
+  ], 10, ["id"]);
+}
+const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-index-item/up-index-item.uvue"]]);
 export {
   __easycom_2 as _
 };

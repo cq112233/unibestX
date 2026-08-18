@@ -1,20 +1,14 @@
 import { C as Card } from "./Card.js";
 import { g as getFooList, f as foo } from "../../../api/foo.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, setSharedData: _setSharedData, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataFor: _createSharedDataFor, setSharedDataStyle: _setSharedDataStyle, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataIf: _createSharedDataIf, setSharedDataEvent: _setSharedDataEvent, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
-const __className = "GenSrcPagesBasicComponentsHttpDemoCard";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { computed, ref } = globalThis.Vue;
 const { onMounted } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "7920b0f6",
-  __className,
-  __filename: "src/pages/basic/components/HttpDemoCard.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "HttpDemoCard",
-  setup(__props) {
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenSrcPagesBasicComponentsHttpDemoCardSharedData", sharedDataClassId: 0 })));
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
     const mockList = ref([]);
     const loading = ref(false);
     const requestStatus = ref("idle");
@@ -99,64 +93,131 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     onMounted(() => {
       loadMockData();
     });
-    return () => {
-      "raw js";
-      const n30 = _createSharedDataComponent(
-        Card,
-        "51bfa7fe",
-        { title: "HTTP 请求 Demo" },
-        {
-          "default": () => {
-            _createSharedDataFor(_setSharedDataScoped(__sharedData, 1, _createSharedDataVFor(__sharedDataScope, () => {
-              return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-            })), () => {
-              return mockList.value;
-            }, (__sharedData_VFor0, _for_item0, _for_key0) => {
-              _renderSharedDataEffect(() => {
-                const _item = _for_item0.value;
-                _setSharedData(__sharedData_VFor0, 1, _toDisplayString(_item.id));
-                _setSharedData(__sharedData_VFor0, 2, _toDisplayString(_item.name));
-              });
-              return null;
-            }, (__sharedData_VFor0, item, index) => {
-              return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
-            });
-            _renderSharedDataEffect(() => {
-              _setSharedDataStyle(__sharedData, 8, { paddingLeft: "8px", paddingRight: "8px", paddingTop: "2px", paddingBottom: "2px", borderRadius: 10, backgroundColor: statusBgColor.value });
-              _setSharedDataStyle(__sharedData, 9, { fontSize: 12, color: statusColor.value });
-              _setSharedData(__sharedData, 10, _toDisplayString(statusText.value));
-            });
-            _createSharedDataIf(() => {
-              return _setSharedData(__sharedData, 2, _toSharedDataBoolean(hasResponseData.value));
-            }, () => {
-              _renderSharedDataEffect(() => {
-                return _setSharedData(__sharedData, 3, _toDisplayString(responseText.value));
-              });
-            });
-            _createSharedDataIf(() => {
-              return _setSharedData(__sharedData, 4, _toSharedDataBoolean(hasErrorMsg.value));
-            }, () => {
-              _renderSharedDataEffect(() => {
-                return _setSharedData(__sharedData, 5, _toDisplayString(errorMsg.value));
-              });
-            });
-            _setSharedDataEvent(__sharedData, 6, loadMockData);
-            _setSharedDataEvent(__sharedData, 7, fetchRealApi);
-            _renderSharedDataEffect(() => {
-              return _setSharedData(__sharedData, 11, _toDisplayString(loading.value ? "请求中..." : "真实 API 请求"));
-            });
-          }
-        },
-        1
-        /* SINGLE_ROOT */
-      );
-      _setSharedData(__sharedData, 0, n30.sharedData);
-      return __sharedData;
-    };
+    const __returned__ = { mockList, loading, requestStatus, responseData, errorMsg, statusText, statusColor, statusBgColor, hasResponseData, hasErrorMsg, responseText, loadMockData, fetchRealApi, get Card() {
+      return Card;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const HttpDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = {"wtu-pryky7-0":{"":{"color":"#64748b"}},"wtu-1gyo9ug-1":{"":{"--tw-font-weight":"var(--font-weight-bold, 700)","fontWeight":700}},"wtu-1e7koem-2":{"":{"color":"#2d3748"}},"wtu-1p3s0p7-3":{"":{"flexDirection":"row"}},"wtu-or3po3-4":{"":{"alignItems":"center"}},"wtu-1y83w1l-5":{"":{"backgroundColor":"#f1f5f9"}},"wtu-1i8kliw-6":{"":{"backgroundColor":"#3182ce"}},"wtu-ijj99f-7":{"":{"justifyContent":"center"}},"wtu-155p5he-8":{"":{"color":"#ffffff"}},"wtu-xg97j7-9":{"":{"color":"#334155"}},"wtu-ok6iny-a":{"":{"justifyContent":"space-between"}},"wtu-kp3eq2-b":{"":{"backgroundColor":"#ffffff"}},"wtu-s98mzw-c":{"":{"color":"#475569"}},"wtu-snsrpe-d":{"":{"backgroundColor":"#fff5f5"}},"wtu-bquocn-e":{"":{"color":"#ef4444"}},"wtu-wy44gc-f":{"":{"flexGrow":1,"flexShrink":1,"flexBasis":"0%"}},"wtu-1mbx3i8-g":{"":{"width":"100%"}},"wtu-io2yyi-h":{"":{"display":"flex"}},"wtu-1tndks6-i":{"":{"color":"#ffffff"}},"wtu-1dwvvaj-j":{"":{"backgroundColor":"#10b981"}},"flex":{"":{"display":"flex"}}};
+const { createElementVNode: _createElementVNode, renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, toDisplayString: _toDisplayString, normalizeStyle: _normalizeStyle, createCommentVNode: _createCommentVNode, withCtx: _withCtx, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createBlock($setup["Card"], { title: "HTTP 请求 Demo" }, {
+    default: _withCtx(() => [
+      _createElementVNode("view", { class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]" }, [
+        _createElementVNode("text", { class: "text-12px wtu-pryky7-0 leading-20px" }, " 基于 lime-request 封装的 http 请求演示，包含 Mock 数据与真实接口请求两种模式。 ")
+      ]),
+      _createElementVNode("view", { class: "mb-16px" }, [
+        _createElementVNode("text", { class: "text-14px wtu-1gyo9ug-1 wtu-1e7koem-2 mb-10px" }, "Mock 数据列表（ID 为任意类型）"),
+        (_openBlock(true), _createElementBlock(
+          _Fragment,
+          null,
+          _renderList($setup.mockList, (item, index) => {
+            return _openBlock(), _createElementBlock("view", {
+              key: index,
+              class: "wtu-1p3s0p7-3 wtu-or3po3-4 py-10px px-12px wtu-1y83w1l-5 rounded-8px mt-8px"
+            }, [
+              _createElementVNode("view", { class: "w-28px h-28px rounded-14px wtu-1i8kliw-6 wtu-ijj99f-7 wtu-or3po3-4 mr-10px" }, [
+                _createElementVNode(
+                  "text",
+                  { class: "text-12px wtu-155p5he-8 wtu-1gyo9ug-1" },
+                  _toDisplayString(item.id),
+                  1
+                  /* TEXT */
+                )
+              ]),
+              _createElementVNode(
+                "text",
+                { class: "text-14px wtu-xg97j7-9" },
+                _toDisplayString(item.name),
+                1
+                /* TEXT */
+              )
+            ]);
+          }),
+          128
+          /* KEYED_FRAGMENT */
+        ))
+      ]),
+      _createElementVNode("view", { class: "rounded-10px p-12px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]" }, [
+        _createElementVNode("view", { class: "wtu-1p3s0p7-3 wtu-ok6iny-a wtu-or3po3-4 mb-6px" }, [
+          _createElementVNode("text", { class: "text-13px wtu-pryky7-0" }, "接口请求状态:"),
+          _createElementVNode(
+            "view",
+            {
+              style: _normalizeStyle({ paddingLeft: "8px", paddingRight: "8px", paddingTop: "2px", paddingBottom: "2px", borderRadius: 10, backgroundColor: $setup.statusBgColor })
+            },
+            [
+              _createElementVNode(
+                "text",
+                {
+                  style: _normalizeStyle({ fontSize: 12, color: $setup.statusColor })
+                },
+                _toDisplayString($setup.statusText),
+                5
+                /* TEXT, STYLE */
+              )
+            ],
+            4
+            /* STYLE */
+          )
+        ]),
+        $setup.hasResponseData ? (_openBlock(), _createElementBlock("view", {
+          key: 0,
+          class: "wtu-kp3eq2-b rounded-8px p-10px border-width-1px border-style-solid border-color-[#e2e8f0]"
+        }, [
+          _createElementVNode(
+            "text",
+            { class: "text-12px wtu-s98mzw-c" },
+            _toDisplayString($setup.responseText),
+            1
+            /* TEXT */
+          )
+        ])) : _createCommentVNode("v-if", true),
+        $setup.hasErrorMsg ? (_openBlock(), _createElementBlock("view", {
+          key: 1,
+          class: "wtu-snsrpe-d rounded-8px p-10px border-width-1px border-style-solid border-color-[#fecaca] mt-6px"
+        }, [
+          _createElementVNode(
+            "text",
+            { class: "text-12px wtu-bquocn-e" },
+            "错误：" + _toDisplayString($setup.errorMsg),
+            1
+            /* TEXT */
+          )
+        ])) : _createCommentVNode("v-if", true)
+      ]),
+      _createElementVNode("view", { class: "wtu-1p3s0p7-3" }, [
+        _createElementVNode("view", { class: "wtu-wy44gc-f mr-10px" }, [
+          _createElementVNode("view", {
+            class: "wtu-1i8kliw-6 rounded-8px h-42px wtu-1mbx3i8-g wtu-io2yyi-h wtu-1p3s0p7-3 wtu-or3po3-4 wtu-ijj99f-7",
+            onClick: $setup.loadMockData
+          }, [
+            _createElementVNode("text", { class: "wtu-1tndks6-i text-14px" }, "加载 Mock 数据")
+          ])
+        ]),
+        _createElementVNode("view", { class: "wtu-wy44gc-f" }, [
+          _createElementVNode("view", {
+            class: "wtu-1dwvvaj-j rounded-8px h-42px wtu-1mbx3i8-g wtu-io2yyi-h wtu-1p3s0p7-3 wtu-or3po3-4 wtu-ijj99f-7",
+            onClick: $setup.fetchRealApi
+          }, [
+            _createElementVNode(
+              "text",
+              { class: "wtu-1tndks6-i text-14px" },
+              _toDisplayString($setup.loading ? "请求中..." : "真实 API 请求"),
+              1
+              /* TEXT */
+            )
+          ])
+        ])
+      ])
+    ]),
+    _: 1
+    /* STABLE */
+  });
+}
+const HttpDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/basic/components/HttpDemoCard.uvue"]]);
 export {
   HttpDemoCard as H
 };

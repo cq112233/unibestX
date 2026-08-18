@@ -1,18 +1,13 @@
 import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
+import { r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { g as getPx, a as addUnit } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataSlot: _createSharedDataSlot, setSharedDataEvent: _setSharedDataEvent, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpNumberBoxUpNumberBox";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { computed, ref, watch, onMounted, nextTick } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-number-box"
   },
-  __dynamicSharedData: true,
-  __hash: "5854f6d8",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-number-box/up-number-box.uvue",
   __name: "up-number-box",
   props: {
     name: {
@@ -124,9 +119,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   },
   emits: ["update:modelValue", "focus", "blur", "overlimit", "change", "plus", "minus"],
   setup(__props, _a) {
-    var __emit = _a.emit, $slots = _a.slots;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpNumberBoxUpNumberBoxSharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
     const props = __props;
     const emit = __emit;
     const type = ref("");
@@ -300,135 +294,111 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     onMounted(() => {
       init();
     });
-    return () => {
-      "raw js";
-      const _component_up_icon = __easycom_0;
-      const _component_input = _resolveComponent("input");
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.showMinus && !hideMinus.value && $slots["minus"] != null));
-      }, () => {
-        _createSharedDataSlot("minus", null, null);
-        _setSharedDataEvent(__sharedData, 1, () => {
-          return clickHandler("minus");
-        });
-        _setSharedDataEvent(__sharedData, 2, () => {
-          return onTouchStart("minus");
-        });
-        _setSharedDataEvent(__sharedData, 3, clearTimeoutHandler);
-      }, () => {
-        return _createSharedDataIf(() => {
-          return _setSharedData(__sharedData, 4, _toSharedDataBoolean(__props.showMinus && !hideMinus.value));
-        }, () => {
-          _renderSharedDataEffect(() => {
-            _setSharedDataClass(__sharedData, 9, ["up-number-box__minus cursor-pointer", { "up-number-box__minus--disabled": isDisabled("minus") }]);
-            _setSharedDataStyle(__sharedData, 10, buttonStyle("minus"));
-          });
-          const n5 = _createSharedDataComponentWithFallback(_component_up_icon, "74daa3d5", {
-            name: "minus",
-            color: () => {
-              return isDisabled("minus") ? "#c8c9cc" : "#323233";
-            },
-            size: "15",
-            bold: "",
-            customStyle: () => {
-              return __props.iconStyle;
-            }
-          });
-          _setSharedData(__sharedData, 5, n5?.sharedData);
-          _setSharedDataEvent(__sharedData, 6, () => {
-            return clickHandler("minus");
-          });
-          _setSharedDataEvent(__sharedData, 7, () => {
-            return onTouchStart("minus");
-          });
-          _setSharedDataEvent(__sharedData, 8, clearTimeoutHandler);
-        });
-      }, 261);
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 11, _toSharedDataBoolean(!hideMinus.value));
-      }, () => {
-        _createSharedDataSlot("input", null, null, () => {
-          const n11 = _createSharedDataComponentWithFallback(_component_input, "74daabd9", {
-            disabled: () => {
-              return __props.disabledInput || __props.disabled;
-            },
-            "cursor-spacing": () => {
-              return getCursorSpacing.value;
-            },
-            class: () => {
-              return [{ "up-number-box__input--disabled": __props.disabled || __props.disabledInput }, "up-number-box__input"];
-            },
-            value: () => {
-              return currentValue.value;
-            },
-            "onUpdate:value": () => {
-              return (_value) => {
-                return currentValue.value = _value;
-              };
-            },
-            onBlur: () => {
-              return onBlur;
-            },
-            onFocus: () => {
-              return onFocus;
-            },
-            onInput: () => {
-              return onInput;
-            },
-            type: "number",
-            style: () => {
-              return inputStyle.value;
-            }
-          });
-          _setSharedData(__sharedData, 12, n11?.sharedData);
-        });
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 13, _toSharedDataBoolean(__props.showPlus && $slots["plus"] != null));
-      }, () => {
-        _createSharedDataSlot("plus", null, null);
-        _setSharedDataEvent(__sharedData, 14, () => {
-          return clickHandler("plus");
-        });
-        _setSharedDataEvent(__sharedData, 15, () => {
-          return onTouchStart("plus");
-        });
-        _setSharedDataEvent(__sharedData, 16, clearTimeoutHandler);
-      }, () => {
-        return _createSharedDataIf(() => {
-          return _setSharedData(__sharedData, 17, _toSharedDataBoolean(__props.showPlus));
-        }, () => {
-          _renderSharedDataEffect(() => {
-            _setSharedDataClass(__sharedData, 22, ["up-number-box__plus cursor-pointer", { "up-number-box__minus--disabled": isDisabled("plus") }]);
-            _setSharedDataStyle(__sharedData, 23, buttonStyle("plus"));
-          });
-          const n17 = _createSharedDataComponentWithFallback(_component_up_icon, "267785bf", {
-            name: "plus",
-            color: () => {
-              return isDisabled("plus") ? "#c8c9cc" : "#323233";
-            },
-            size: "15",
-            bold: "",
-            customStyle: () => {
-              return __props.iconStyle;
-            }
-          });
-          _setSharedData(__sharedData, 18, n17?.sharedData);
-          _setSharedDataEvent(__sharedData, 19, () => {
-            return clickHandler("plus");
-          });
-          _setSharedDataEvent(__sharedData, 20, () => {
-            return onTouchStart("plus");
-          });
-          _setSharedDataEvent(__sharedData, 21, clearTimeoutHandler);
-        });
-      }, 1029);
-      return __sharedData;
-    };
+    const __returned__ = { props, emit, type, currentValue, longPressTimer, hideMinus, getCursorSpacing, inputStyle, filter, format, isDisabled, buttonStyle, emitChange, check, add, onChange, clearTimeoutHandler, longPressStep, onTouchStart, clickHandler, onFocus, onBlur, onInput, init };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = {"up-number-box":{"":{"display":"flex","flexDirection":"row","alignItems":"center"}},"up-number-box__plus":{"":{"width":35,"display":"flex","flexDirection":"row","justifyContent":"center","alignItems":"center","borderTopRightRadius":4,"borderBottomRightRadius":4}},"up-number-box__minus":{"":{"width":35,"display":"flex","flexDirection":"row","justifyContent":"center","alignItems":"center","borderTopLeftRadius":4,"borderBottomLeftRadius":4}},"up-number-box__plus--hover":{"":{"!backgroundColor":"#E6E6E6"}},"up-number-box__minus--hover":{"":{"!backgroundColor":"#E6E6E6"}},"up-number-box__plus--disabled":{"":{"backgroundColor":"#f7f8fa"}},"up-number-box__minus--disabled":{"":{"backgroundColor":"#f7f8fa"}},"up-number-box__input":{"":{"textAlign":"center","fontSize":15,"paddingTop":0,"paddingRight":0,"paddingBottom":0,"paddingLeft":0,"marginTop":0,"marginRight":2,"marginBottom":0,"marginLeft":2}},"up-number-box__input--disabled":{"":{"color":"#c8c9cc","backgroundColor":"#f2f3f5"}},"flex":{"":{"display":"flex"}}};
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { renderSlot: _renderSlot, withModifiers: _withModifiers, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, resolveComponent: _resolveComponent, createVNode: _createVNode, normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, vModelText: _vModelText, createElementVNode: _createElementVNode, withDirectives: _withDirectives } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
+  return _openBlock(), _createElementBlock("view", { class: "up-number-box" }, [
+    $props.showMinus && !$setup.hideMinus && _ctx.$slots["minus"] != null ? (_openBlock(), _createElementBlock(
+      "view",
+      {
+        key: 0,
+        class: "up-number-box__slot cursor-pointer",
+        onClick: _cache[0] || (_cache[0] = _withModifiers(($event) => $setup.clickHandler("minus"), ["stop"])),
+        onTouchstart: _cache[1] || (_cache[1] = ($event) => $setup.onTouchStart("minus")),
+        onTouchend: _withModifiers($setup.clearTimeoutHandler, ["stop"])
+      },
+      [
+        _renderSlot(_ctx.$slots, "minus")
+      ],
+      32
+      /* NEED_HYDRATION */
+    )) : $props.showMinus && !$setup.hideMinus ? (_openBlock(), _createElementBlock(
+      "view",
+      {
+        key: 1,
+        class: _normalizeClass(["up-number-box__minus cursor-pointer", { "up-number-box__minus--disabled": $setup.isDisabled("minus") }]),
+        onClick: _cache[2] || (_cache[2] = _withModifiers(($event) => $setup.clickHandler("minus"), ["stop"])),
+        onTouchstart: _cache[3] || (_cache[3] = ($event) => $setup.onTouchStart("minus")),
+        onTouchend: _withModifiers($setup.clearTimeoutHandler, ["stop"]),
+        "hover-class": "up-number-box__minus--hover",
+        "hover-stay-time": "150",
+        style: _normalizeStyle($setup.buttonStyle("minus"))
+      },
+      [
+        _createVNode(_component_up_icon, {
+          name: "minus",
+          color: $setup.isDisabled("minus") ? "#c8c9cc" : "#323233",
+          size: "15",
+          bold: "",
+          customStyle: $props.iconStyle
+        }, null, 8, ["color", "customStyle"])
+      ],
+      38
+      /* CLASS, STYLE, NEED_HYDRATION */
+    )) : _createCommentVNode("v-if", true),
+    !$setup.hideMinus ? _renderSlot(_ctx.$slots, "input", { key: 2 }, () => [
+      _withDirectives(_createElementVNode("input", {
+        disabled: $props.disabledInput || $props.disabled,
+        "cursor-spacing": $setup.getCursorSpacing,
+        class: _normalizeClass([{ "up-number-box__input--disabled": $props.disabled || $props.disabledInput }, "up-number-box__input"]),
+        "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => $setup.currentValue = $event),
+        onBlur: $setup.onBlur,
+        onFocus: $setup.onFocus,
+        onInput: $setup.onInput,
+        type: "number",
+        style: _normalizeStyle($setup.inputStyle)
+      }, null, 46, ["disabled", "cursor-spacing"]), [
+        [_vModelText, $setup.currentValue]
+      ])
+    ]) : _createCommentVNode("v-if", true),
+    $props.showPlus && _ctx.$slots["plus"] != null ? (_openBlock(), _createElementBlock(
+      "view",
+      {
+        key: 3,
+        class: "up-number-box__slot cursor-pointer",
+        onClick: _cache[5] || (_cache[5] = _withModifiers(($event) => $setup.clickHandler("plus"), ["stop"])),
+        onTouchstart: _cache[6] || (_cache[6] = ($event) => $setup.onTouchStart("plus")),
+        onTouchend: _withModifiers($setup.clearTimeoutHandler, ["stop"])
+      },
+      [
+        _renderSlot(_ctx.$slots, "plus")
+      ],
+      32
+      /* NEED_HYDRATION */
+    )) : $props.showPlus ? (_openBlock(), _createElementBlock(
+      "view",
+      {
+        key: 4,
+        class: _normalizeClass(["up-number-box__plus cursor-pointer", { "up-number-box__minus--disabled": $setup.isDisabled("plus") }]),
+        onClick: _cache[7] || (_cache[7] = _withModifiers(($event) => $setup.clickHandler("plus"), ["stop"])),
+        onTouchstart: _cache[8] || (_cache[8] = ($event) => $setup.onTouchStart("plus")),
+        onTouchend: _withModifiers($setup.clearTimeoutHandler, ["stop"]),
+        "hover-class": "up-number-box__plus--hover",
+        "hover-stay-time": "150",
+        style: _normalizeStyle($setup.buttonStyle("plus"))
+      },
+      [
+        _createVNode(_component_up_icon, {
+          name: "plus",
+          color: $setup.isDisabled("plus") ? "#c8c9cc" : "#323233",
+          size: "15",
+          bold: "",
+          customStyle: $props.iconStyle
+        }, null, 8, ["color", "customStyle"])
+      ],
+      38
+      /* CLASS, STYLE, NEED_HYDRATION */
+    )) : _createCommentVNode("v-if", true)
+  ]);
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-number-box/up-number-box.uvue"]]);
 export {
   __easycom_1 as _
 };

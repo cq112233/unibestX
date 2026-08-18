@@ -81,10 +81,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           ["auto-back"]: true,
           class: "data-v-01e0da23"
         }),
-        b: common_vendor.o(onLongChange, "7e"),
+        b: common_vendor.o(onLongChange, "c1"),
         c: common_vendor.o(($event) => {
           return currentLong.value = $event;
-        }, "ba"),
+        }, "93"),
         d: common_vendor.p({
           list: longList.value,
           current: currentLong.value,
@@ -92,10 +92,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         e: common_vendor.t(longList.value[currentLong.value].name),
         f: common_vendor.t(currentLong.value + 1),
-        g: common_vendor.o(onBaseChange, "5a"),
+        g: common_vendor.o(onBaseChange, "ce"),
         h: common_vendor.o(($event) => {
           return currentBase.value = $event;
-        }, "4a"),
+        }, "15"),
         i: common_vendor.p({
           list: baseList.value,
           current: currentBase.value,
@@ -104,7 +104,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         j: common_vendor.t(baseList.value[currentBase.value].name),
         k: common_vendor.o(($event) => {
           return currentBadge.value = $event;
-        }, "16"),
+        }, "b9"),
         l: common_vendor.p({
           list: badgeList.value,
           current: currentBadge.value,
@@ -112,7 +112,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         m: common_vendor.o(($event) => {
           return currentDisabled.value = $event;
-        }, "04"),
+        }, "99"),
         n: common_vendor.p({
           list: disabledList.value,
           current: currentDisabled.value,
@@ -120,7 +120,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         o: common_vendor.o(($event) => {
           return currentCustom.value = $event;
-        }, "88"),
+        }, "d6"),
         p: common_vendor.p({
           list: customList.value,
           ["line-color"]: "#fa3534",
@@ -138,7 +138,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         q: common_vendor.o(($event) => {
           return currentEqual.value = $event;
-        }, "ca"),
+        }, "ce"),
         r: common_vendor.p({
           list: equalList.value,
           scrollable: false,

@@ -54,7 +54,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             b: i
           };
         }),
-        e: common_vendor.o(handleScroll, "4f"),
+        e: common_vendor.o(handleScroll, "19"),
         f: `${windowHeight.value}px`,
         g: common_vendor.p({
           ["navigation-style"]: "custom",

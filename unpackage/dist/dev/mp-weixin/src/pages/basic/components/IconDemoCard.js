@@ -29,23 +29,27 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         a: common_vendor.p({
           type: "contact",
           size: "26",
+          class: "data-v-edf36fdd",
           style: "color:#3b82f6;margin-right:8px"
         }),
         b: common_vendor.t(svgAuthWarning.value),
         c: common_vendor.p({
           name: "circle",
           size: "24",
+          class: "data-v-edf36fdd",
           style: "color:#10b981;margin-right:8px"
         }),
         d: common_vendor.p({
           name: "setting",
           size: "24",
+          class: "data-v-edf36fdd",
           style: "color:#a855f7;margin-right:8px"
         }),
         e: common_vendor.gei(_ctx, ""),
         f: common_vendor.p({
           title: iconDemoTitle.value,
-          id: common_vendor.gei(_ctx, "")
+          id: common_vendor.gei(_ctx, ""),
+          class: "data-v-edf36fdd"
         }),
         g: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
@@ -53,5 +57,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-wx.createComponent(_sfc_main);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-edf36fdd"]]);
+wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/src/pages/basic/components/IconDemoCard.js.map

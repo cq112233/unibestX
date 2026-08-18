@@ -17,13 +17,16 @@
     "lint:fix": "eslint . --fix",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:preview": "vitepress preview docs",
+    "postinstall": "node scripts/patch-weapp-tw.mjs"
   },
   "dependencies": {
     "@dcloudio/uni-app": "3.0.0-5020420260813002",
     "@dcloudio/uni-cli-shared": "3.0.0-5020420260813002",
     "@dcloudio/uni-components": "3.0.0-5020420260813002",
     "@dcloudio/vite-plugin-uni": "3.0.0-5020420260813002",
+    "@iconify-json/mdi": "^1.2.3",
+    "@iconify-json/svg-spinners": "^1.2.4",
     "crypto-js": "^4.2.0",
     "json5": "^2.2.3",
     "minimatch": "^10.2.5",
@@ -33,6 +36,8 @@
   "devDependencies": {
     "@dcloudio/hbuilderx-cli": "^1.2.0",
     "@dcloudio/types": "^3.4.31",
+    "@iconify/tailwind4": "^1.2.3",
+    "@tailwindcss/postcss": "^4.3.3",
     "@types/crypto-js": "^4.2.2",
     "@uni-helper/eslint-config": "0.5.0",
     "@uni-helper/uni-app-types": "^1.0.1",
@@ -41,7 +46,9 @@
     "gh-pages": "^6.3.0",
     "sass": "^1.63.2",
     "sass-loader": "10.4.1",
-    "vitepress": "^1.6.4"
+    "tailwindcss": "^4.3.3",
+    "vitepress": "^1.6.4",
+    "weapp-tailwindcss": "5.3.1"
   },
   "pnpm": {
     "overrides": {

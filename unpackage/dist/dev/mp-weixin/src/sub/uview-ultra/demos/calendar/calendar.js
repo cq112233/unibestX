@@ -59,65 +59,65 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           ["bg-color"]: "#ffffff",
           class: "data-v-d19eab76"
         }),
-        b: common_vendor.o(showCalendar1, "23"),
+        b: common_vendor.o(showCalendar1, "2c"),
         c: common_vendor.p({
           type: "primary",
           text: "单选模式",
           size: "mini",
           class: "data-v-d19eab76"
         }),
-        d: common_vendor.o(showCalendar2, "60"),
+        d: common_vendor.o(showCalendar2, "6d"),
         e: common_vendor.p({
           type: "success",
           text: "多选日期",
           size: "mini",
           class: "data-v-d19eab76"
         }),
-        f: common_vendor.o(showCalendar3, "27"),
+        f: common_vendor.o(showCalendar3, "4c"),
         g: common_vendor.p({
           type: "warning",
           text: "范围选择",
           size: "mini",
           class: "data-v-d19eab76"
         }),
-        h: common_vendor.o(showCalendar4, "5c"),
+        h: common_vendor.o(showCalendar4, "67"),
         i: common_vendor.p({
           type: "error",
           text: "自定义颜色",
           size: "mini",
           class: "data-v-d19eab76"
         }),
-        j: common_vendor.o(onConfirm1, "09"),
+        j: common_vendor.o(onConfirm1, "80"),
         k: common_vendor.o(($event) => {
           return calendarShow1.value = false;
-        }, "c5"),
+        }, "fc"),
         l: common_vendor.p({
           show: calendarShow1.value,
           mode: "single",
           class: "data-v-d19eab76"
         }),
-        m: common_vendor.o(onConfirm2, "2d"),
+        m: common_vendor.o(onConfirm2, "c7"),
         n: common_vendor.o(($event) => {
           return calendarShow2.value = false;
-        }, "23"),
+        }, "ef"),
         o: common_vendor.p({
           show: calendarShow2.value,
           mode: "multiple",
           class: "data-v-d19eab76"
         }),
-        p: common_vendor.o(onConfirm3, "ed"),
+        p: common_vendor.o(onConfirm3, "a6"),
         q: common_vendor.o(($event) => {
           return calendarShow3.value = false;
-        }, "33"),
+        }, "5d"),
         r: common_vendor.p({
           show: calendarShow3.value,
           mode: "range",
           class: "data-v-d19eab76"
         }),
-        s: common_vendor.o(onConfirm4, "5e"),
+        s: common_vendor.o(onConfirm4, "e6"),
         t: common_vendor.o(($event) => {
           return calendarShow4.value = false;
-        }, "98"),
+        }, "e4"),
         v: common_vendor.p({
           show: calendarShow4.value,
           mode: "single",

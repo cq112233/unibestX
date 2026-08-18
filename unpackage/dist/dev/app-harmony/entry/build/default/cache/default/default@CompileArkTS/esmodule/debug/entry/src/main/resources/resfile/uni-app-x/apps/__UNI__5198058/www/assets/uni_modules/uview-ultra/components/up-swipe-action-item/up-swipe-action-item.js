@@ -1,18 +1,13 @@
 import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
-import { s as sleep, a as addUnit, u as upGetRect } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
+import { r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
+import { s as sleep, u as upGetRect, a as addUnit } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, setSharedData: _setSharedData, toDisplayString: _toDisplayString, setSharedDataStyle: _setSharedDataStyle, setSharedDataClass: _setSharedDataClass, renderSharedDataEffect: _renderSharedDataEffect, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, setSharedDataEvent: _setSharedDataEvent, createSharedDataFor: _createSharedDataFor, createSharedDataSlot: _createSharedDataSlot, setSharedDataTemplateRef: _setSharedDataTemplateRef } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpSwipeActionItemUpSwipeActionItem";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref, computed, watch, onMounted, onBeforeUnmount, inject, getCurrentInstance } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-swipe-action-item"
   },
-  __dynamicSharedData: true,
-  __hash: "1d25e008",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-swipe-action-item/up-swipe-action-item.uvue",
   __name: "up-swipe-action-item",
   props: {
     show: {
@@ -57,8 +52,6 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   emits: ["click", "update:show", "open", "close"],
   setup(__props, _a) {
     var __expose = _a.expose, __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpSwipeActionItemUpSwipeActionItemSharedData", sharedDataClassId: 0 })));
     let nextSwipeItemId = 0;
     const props = __props;
     const emit = __emit;
@@ -342,81 +335,109 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       open: openSwipeAction,
       close: closeSwipeAction
     });
-    return () => {
-      "raw js";
-      const _setTemplateRef = _createSharedDataTemplateRefSetter();
-      const _component_up_icon = __easycom_0;
-      _createSharedDataSlot("button", null, null, () => {
-        _createSharedDataFor(_setSharedDataScoped(__sharedData, 0, _createSharedDataVFor(__sharedDataScope, () => {
-          return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-        })), () => {
-          return __props.options;
-        }, (__sharedData_VFor0, _for_item0, _for_key0) => {
-          _renderSharedDataEffect(() => {
-            const _item = _for_item0.value;
-            _setSharedDataStyle(__sharedData_VFor0, 7, getButtonStyle(_item));
-            _setSharedDataClass(__sharedData_VFor0, 8, ["up-swipe-action-item__right__button__wrapper", {
-              "up-swipe-action-item__right__button__wrapper--primary": getOptionStyleProp(_item, "backgroundColor", "") == "primary"
-            }]);
-            _setSharedDataStyle(__sharedData_VFor0, 9, getWrapperStyle(_item));
-          });
-          _createSharedDataIf(() => {
-            return _setSharedData(__sharedData_VFor0, 1, _toSharedDataBoolean(_for_item0.value["icon"] != null));
-          }, () => {
-            const n6 = _createSharedDataComponentWithFallback(_component_up_icon, "091262b1-" + _for_key0.value, {
-              name: () => {
-                return _for_item0.value["icon"].toString();
-              },
-              color: () => {
-                return getOptionStyleProp(_for_item0.value, "color", "#ffffff");
-              },
-              size: () => {
-                return getOptionIconSize(_for_item0.value);
-              },
-              customStyle: () => {
-                return getIconCustomStyle(_for_item0.value);
-              }
-            });
-            _setSharedData(__sharedData_VFor0, 2, n6?.sharedData);
-          });
-          _createSharedDataIf(() => {
-            return _setSharedData(__sharedData_VFor0, 3, _toSharedDataBoolean(_for_item0.value["text"] != null));
-          }, () => {
-            _renderSharedDataEffect(() => {
-              const _item = _for_item0.value;
-              _setSharedDataStyle(__sharedData_VFor0, 4, getTextStyle(_item));
-              _setSharedData(__sharedData_VFor0, 5, _toDisplayString(_item["text"]));
-            });
-          });
-          _setSharedDataEvent(__sharedData_VFor0, 6, () => {
-            return buttonClickHandler(_for_item0.value, _for_key0.value);
-          });
-          return null;
-        }, (__sharedData_VFor0, item, index) => {
-          return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
-        });
-      });
-      _setSharedDataTemplateRef(__sharedData, 1, (n12) => {
-        _setTemplateRef(n12, "rightButtonsRef");
-      });
-      _renderSharedDataEffect(() => {
-        return _setSharedDataStyle(__sharedData, 8, sliderStyle.value);
-      });
-      _createSharedDataSlot("default", null, null);
-      _setSharedDataEvent(__sharedData, 2, clickHandler);
-      _setSharedDataEvent(__sharedData, 3, touchstart);
-      _setSharedDataEvent(__sharedData, 4, touchmove);
-      _setSharedDataEvent(__sharedData, 5, touchend);
-      _setSharedDataEvent(__sharedData, 6, touchcancel);
-      _setSharedDataTemplateRef(__sharedData, 7, (n15) => {
-        _setTemplateRef(n15, "swipeActionItemRef");
-      });
-      return __sharedData;
-    };
+    const __returned__ = { get nextSwipeItemId() {
+      return nextSwipeItemId;
+    }, set nextSwipeItemId(v) {
+      nextSwipeItemId = v;
+    }, props, emit, instance, selfItemId, parentContext, status, sliderStyle, buttonsWidth, isMoving, startX, startY, getIconCustomStyle, getOptionStyle, getOptionStyleProp, getButtonStyle, getWrapperStyle, getTextStyle, getOptionIconSize, getDuration, openSwipeAction, closeSwipeAction, moveSwipeAction, closeHandler, buttonClickHandler, clickHandler, getBtnWidth, touchstart, touchmove, touchend, touchcancel };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = {"up-swipe-action-item":{"":{"position":"relative","overflow":"hidden","display":"flex","flexDirection":"column"}},"up-swipe-action-item__content":{"":{"transform":"translateX(0px)","backgroundColor":"#FFFFFF","zIndex":10,"width":"100%","flexGrow":1,"flexShrink":1,"flexBasis":"0%"}},"up-swipe-action-item__right":{"":{"position":"absolute","top":0,"bottom":0,"right":0,"display":"flex","flexDirection":"row","zIndex":1}},"up-swipe-action-item__right__button":{"":{"display":"flex","flexDirection":"row","justifyContent":"center","overflow":"hidden","alignItems":"center"}},"up-swipe-action-item__right__button__wrapper":{"":{"display":"flex","flexDirection":"row","alignItems":"center","justifyContent":"center","paddingTop":0,"paddingRight":15,"paddingBottom":0,"paddingLeft":15}},"up-swipe-action-item__right__button__wrapper--primary":{"":{"backgroundColor":"var(--theme-color, #0957de)"}},"up-swipe-action-item__right__button__wrapper__text":{"":{"color":"#FFFFFF","fontSize":15,"textAlign":"center"}},"flex":{"":{"display":"flex"}},"up-line-1":{"":{"overflow":"hidden"}}};
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { renderSlot: _renderSlot, renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, resolveComponent: _resolveComponent, createBlock: _createBlock, createCommentVNode: _createCommentVNode, toDisplayString: _toDisplayString, normalizeStyle: _normalizeStyle, normalizeClass: _normalizeClass, createElementVNode: _createElementVNode } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      class: "up-swipe-action-item",
+      ref: "swipeActionItemRef"
+    },
+    [
+      _createElementVNode(
+        "view",
+        {
+          class: "up-swipe-action-item__right",
+          ref: "rightButtonsRef"
+        },
+        [
+          _renderSlot(_ctx.$slots, "button", {}, () => [
+            (_openBlock(true), _createElementBlock(
+              _Fragment,
+              null,
+              _renderList($props.options, (item, index) => {
+                return _openBlock(), _createElementBlock("view", {
+                  key: index,
+                  class: "up-swipe-action-item__right__button",
+                  style: _normalizeStyle($setup.getButtonStyle(item)),
+                  onClick: ($event) => $setup.buttonClickHandler(item, index)
+                }, [
+                  _createElementVNode(
+                    "view",
+                    {
+                      class: _normalizeClass(["up-swipe-action-item__right__button__wrapper", {
+                        "up-swipe-action-item__right__button__wrapper--primary": $setup.getOptionStyleProp(item, "backgroundColor", "") == "primary"
+                      }]),
+                      style: _normalizeStyle($setup.getWrapperStyle(item))
+                    },
+                    [
+                      item["icon"] != null ? (_openBlock(), _createBlock(_component_up_icon, {
+                        key: 0,
+                        name: item["icon"].toString(),
+                        color: $setup.getOptionStyleProp(item, "color", "#ffffff"),
+                        size: $setup.getOptionIconSize(item),
+                        customStyle: $setup.getIconCustomStyle(item)
+                      }, null, 8, ["name", "color", "size", "customStyle"])) : _createCommentVNode("v-if", true),
+                      item["text"] != null ? (_openBlock(), _createElementBlock(
+                        "text",
+                        {
+                          key: 1,
+                          class: "up-swipe-action-item__right__button__wrapper__text up-line-1",
+                          style: _normalizeStyle($setup.getTextStyle(item))
+                        },
+                        _toDisplayString(item["text"]),
+                        5
+                        /* TEXT, STYLE */
+                      )) : _createCommentVNode("v-if", true)
+                    ],
+                    6
+                    /* CLASS, STYLE */
+                  )
+                ], 12, ["onClick"]);
+              }),
+              128
+              /* KEYED_FRAGMENT */
+            ))
+          ])
+        ],
+        512
+        /* NEED_PATCH */
+      ),
+      _createElementVNode(
+        "view",
+        {
+          class: "up-swipe-action-item__content",
+          onClick: $setup.clickHandler,
+          onTouchstart: $setup.touchstart,
+          onTouchmove: $setup.touchmove,
+          onTouchend: $setup.touchend,
+          onTouchcancel: $setup.touchcancel,
+          style: _normalizeStyle($setup.sliderStyle)
+        },
+        [
+          _renderSlot(_ctx.$slots, "default")
+        ],
+        36
+        /* STYLE, NEED_HYDRATION */
+      )
+    ],
+    512
+    /* NEED_PATCH */
+  );
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-swipe-action-item/up-swipe-action-item.uvue"]]);
 export {
   __easycom_1 as _
 };

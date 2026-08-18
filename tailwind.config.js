@@ -2,9 +2,9 @@ const darkMode = [
   'variant',
   [
     '&.theme-dark',
-    '.theme-dark &',
-  ],
-]
+    '.theme-dark &'
+  ]
+];
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -15,19 +15,19 @@ export default {
     './src/components/**/*.{uts,uvue}',
     './src/stores/**/*.{uts,uvue}',
     '!./uni_modules/**/*',
-    '!./unpackage/**/*',
+    '!./unpackage/**/*'
   ],
   darkMode,
   theme: {
     extend: {
       colors: {
-        primary: 'var(--theme-color, #0957DE)',
-      },
-    },
+        primary: 'var(--theme-color, #0957DE)'
+      }
+    }
   },
   plugins: [],
   corePlugins: {
     preflight: false,
-    container: false,
-  },
-}
+    container: false
+  }
+};

@@ -4,15 +4,9 @@ import { u as useUltraUI } from "../../libs/composable/useUltraUI.js";
 import { c as config } from "../../libs/config/config.js";
 import { d as defProps } from "./icon.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataClass: _setSharedDataClass, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, toSharedDataImageMode: _toSharedDataImageMode, setSharedDataStyle: _setSharedDataStyle, toDisplayString: _toDisplayString, createSharedDataIf: _createSharedDataIf, setSharedDataEvent: _setSharedDataEvent } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpIconUpIcon";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { computed } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "d1bb5820",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-icon/up-icon.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "up-icon",
   props: {
     customStyle: {
@@ -147,9 +141,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   },
   emits: ["click"],
   setup(__props, _a) {
-    var __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpIconUpIconSharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
     const preventEvent = useUltraUI().preventEvent;
     const props = __props;
     const emit = __emit;
@@ -230,43 +223,51 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         preventEvent(e);
       }
     }
-    return () => {
-      "raw js";
-      _renderSharedDataEffect(() => {
-        return _setSharedDataClass(__sharedData, 12, ["up-icon", ["up-icon--" + __props.labelPos]]);
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(isImg.value));
-      }, () => {
-        _renderSharedDataEffect(() => {
-          const _imgMode = __props.imgMode;
-          _setSharedDataAttr(__sharedData, 1, _toSharedDataString(__props.name));
-          _setSharedDataAttr(__sharedData, 2, _toSharedDataImageMode(_imgMode != "" ? _imgMode : "aspectFit"));
-          _setSharedDataStyle(__sharedData, 3, mergedImgStyle.value);
-        });
-      }, () => {
-        _renderSharedDataEffect(() => {
-          _setSharedDataClass(__sharedData, 4, ["up-icon__icon", uClasses.value]);
-          _setSharedDataStyle(__sharedData, 5, mergedIconStyle.value);
-          _setSharedDataClass(__sharedData, 6, _toSharedDataString(__props.hoverClass));
-          _setSharedData(__sharedData, 7, _toDisplayString(icon.value));
-        });
-      }, 261);
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 8, _toSharedDataBoolean(__props.label !== ""));
-      }, () => {
-        _renderSharedDataEffect(() => {
-          _setSharedDataStyle(__sharedData, 9, labelStyleComputed.value);
-          _setSharedData(__sharedData, 10, _toDisplayString(__props.label));
-        });
-      });
-      _setSharedDataEvent(__sharedData, 11, clickHandler);
-      return __sharedData;
-    };
+    const __returned__ = { preventEvent, props, emit, uClasses, iconStyle, isImg, imgStyle, mergedImgStyle, mergedIconStyle, labelStyleComputed, icon, clickHandler };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {"@FONT-FACE":[{"src":"url(\"/assets/iconfont.4bc8cc97.ttf\")","fontFamily":"iconfont"}]};
-const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-icon": { "": { "display": "flex", "alignItems": "center" } }, "up-icon--left": { "": { "flexDirection": "row-reverse", "alignItems": "center" } }, "up-icon--right": { "": { "flexDirection": "row", "alignItems": "center" } }, "up-icon--top": { "": { "flexDirection": "column-reverse", "justifyContent": "center" } }, "up-icon--bottom": { "": { "flexDirection": "column", "justifyContent": "center" } }, "up-icon__icon": { "": { "fontFamily": "iconfont", "position": "relative" } }, "up-icon__icon--primary": { "": { "color": "var(--theme-color, #0957de)" } }, "up-icon__icon--success": { "": { "color": "#5ac725" } }, "up-icon__icon--error": { "": { "color": "#f56c6c" } }, "up-icon__icon--warning": { "": { "color": "#f9ae3d" } }, "up-icon__icon--info": { "": { "color": "#909399" } }, "up-icon__label": { "": { "lineHeight": 1 } }, "@FONT-FACE": [{ "fontFamily": "iconfont", "src": 'url("/assets/iconfont.4bc8cc97.ttf")' }] };
+const { normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, toDisplayString: _toDisplayString, normalizeClass: _normalizeClass } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      class: _normalizeClass(["up-icon", ["up-icon--" + $props.labelPos]]),
+      onClick: $setup.clickHandler
+    },
+    [
+      $setup.isImg ? (_openBlock(), _createElementBlock("image", {
+        key: 0,
+        class: "up-icon__img",
+        src: $props.name,
+        mode: $props.imgMode != "" ? $props.imgMode : "aspectFit",
+        style: _normalizeStyle($setup.mergedImgStyle)
+      }, null, 12, ["src", "mode"])) : (_openBlock(), _createElementBlock("text", {
+        key: 1,
+        class: _normalizeClass(["up-icon__icon", $setup.uClasses]),
+        style: _normalizeStyle($setup.mergedIconStyle),
+        "hover-class": $props.hoverClass
+      }, _toDisplayString($setup.icon), 15, ["hover-class"])),
+      $props.label !== "" ? (_openBlock(), _createElementBlock(
+        "text",
+        {
+          key: 2,
+          class: "up-icon__label",
+          style: _normalizeStyle($setup.labelStyleComputed)
+        },
+        _toDisplayString($props.label),
+        5
+        /* TEXT, STYLE */
+      )) : _createCommentVNode("v-if", true)
+    ],
+    2
+    /* CLASS */
+  );
+}
+const _style_wt = {"flex":{"":{"display":"flex"}}};
+const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0, _style_wt]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-icon/up-icon.uvue"]]);
 export {
   __easycom_0 as _
 };

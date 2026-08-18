@@ -45,7 +45,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: common_vendor.o(($event) => {
           return showNotify("primary");
-        }, "8d"),
+        }, "3a"),
         c: common_vendor.p({
           type: "primary",
           text: "主要通知",
@@ -54,7 +54,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         d: common_vendor.o(($event) => {
           return showNotify("success");
-        }, "76"),
+        }, "29"),
         e: common_vendor.p({
           type: "success",
           text: "成功通知",
@@ -63,7 +63,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         f: common_vendor.o(($event) => {
           return showNotify("warning");
-        }, "8e"),
+        }, "26"),
         g: common_vendor.p({
           type: "warning",
           text: "警告通知",
@@ -72,7 +72,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         h: common_vendor.o(($event) => {
           return showNotify("error");
-        }, "45"),
+        }, "ed"),
         i: common_vendor.p({
           type: "error",
           text: "错误通知",

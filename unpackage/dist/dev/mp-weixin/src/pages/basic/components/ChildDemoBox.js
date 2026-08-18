@@ -60,13 +60,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             e: index
           };
         }),
-        d: common_vendor.o(handleAdd, "fb"),
-        e: common_vendor.o(handleReset, "7d"),
+        d: common_vendor.o(handleAdd, "3c"),
+        e: common_vendor.o(handleReset, "10"),
         f: inputMsg.value,
         g: common_vendor.o(($event) => {
           return inputMsg.value = $event.detail.value;
-        }, "ff"),
-        h: common_vendor.o(handleSendMsg, "10"),
+        }, "67"),
+        h: common_vendor.o(handleSendMsg, "25"),
         i: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
         j: `${_ctx.u_s_b_h}px`,
         k: `${_ctx.u_s_a_i_b}px`,
@@ -76,5 +76,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-wx.createComponent(_sfc_main);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-1816f19c"]]);
+wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/src/pages/basic/components/ChildDemoBox.js.map

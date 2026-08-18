@@ -29,12 +29,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
-        a: common_vendor.o(copyWebsiteUrl, "39"),
-        b: common_vendor.o(navigateToShowcase, "a8"),
+        a: common_vendor.o(copyWebsiteUrl, "16"),
+        b: common_vendor.o(navigateToShowcase, "80"),
         c: common_vendor.gei(_ctx, ""),
         d: common_vendor.p({
           title: "uview-ultra 组件库",
-          id: common_vendor.gei(_ctx, "")
+          id: common_vendor.gei(_ctx, ""),
+          class: "data-v-d22d3cff"
         }),
         e: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
@@ -42,5 +43,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-wx.createComponent(_sfc_main);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-d22d3cff"]]);
+wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/src/pages/basic/components/UViewUltraDemoCard.js.map
