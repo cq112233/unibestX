@@ -8,11 +8,10 @@
 
 * **Node.js**: `>= 22`
 * **包管理器**: `pnpm >= 7.30`
-* **IDE**: `HBuilderX = 5.15`
-  > [!WARNING] 注意
-  > 升级版本可能会出现各种问题，强烈建议下载并使用 5.15 版本。
-  >
-  > 📥 **HBuilderX 5.15 下载地址**：[https://wwbsy.lanzoue.com/b01eupb32d](https://wwbsy.lanzoue.com/b01eupb32d) （密码：`4xdv`）
+* **IDE**: `HBuilderX >= 5.21`
+  > [!TIP] 建议
+  > 推荐使用 **HBuilderX 5.21 及以上版本**，全面支持 Android / iOS / 鸿蒙三端蒸汽（Vapor）模式；最好升级至最新 **HBuilderX 5.24** 版本。
+  > 旧版本可切换 VDOM 模式（`manifest.json` 中 `"vapor": false`）稳定运行。
 * **Vue Official**: `>= 2.1.10`
 * **TypeScript**: `>= 5.0`
 * **特定平台依赖**:

@@ -1,0 +1,183 @@
+import { defineStore, PiniaStoreBase } from '@/uni_modules/x-pinia-s';
+import { themeColor } from '@/src/tabbar/store';
+import i18n from '@/src/i18n/index.uts';
+import { setLocale as setUViewLocale } from '@/uni_modules/uview-ultra/libs/i18n/index.uts';
+import { getSystemTheme } from '@/src/utils/theme.uts';
+// ==========================================
+// 类型定义
+// ==========================================
+export type IAppState = {
+    theme: string;
+    locale: string;
+    themeMode: string; // 'auto'（跟随系统）| 'light' | 'dark'
+    isDark: boolean; // 实际生效的亮/暗（auto 模式下跟随系统/宿主主题）
+};
+function getSystemLocale(): string {
+    try {
+        const sysInfo = uni.getSystemInfoSync();
+        const appLang = sysInfo.appLanguage;
+        if (appLang != null && appLang.toLowerCase().includes('zh')) {
+            return 'zh-CN';
+        }
+        if (appLang != null && appLang.toLowerCase().includes('en')) {
+            return 'en-US';
+        }
+    }
+    catch (e: any) {
+        // ignore
+    }
+    return 'zh-CN';
+}
+const defaultAppState: IAppState = {
+    theme: '#37c2bc',
+    locale: getSystemLocale(),
+    themeMode: 'auto',
+    isDark: false
+};
+// ==========================================
+// Store 实现
+// ==========================================
+export class AppStore extends PiniaStoreBase {
+    // 1. 响应式状态
+    state: IAppState = reactive<IAppState>({
+        theme: '#37c2bc',
+        locale: getSystemLocale(),
+        themeMode: 'auto',
+        isDark: false
+    } as IAppState);
+    // 是否已注册全局主题监听（防止重复注册）
+    _themeModeInited: boolean = false;
+    // 2. constructor
+    constructor() {
+        super();
+        this.bindState(this.state);
+        // 从持久化或默认状态中同步一次到全局
+        themeColor.value = this.state.theme;
+        // 同步语言到 i18n
+        i18n.global.locale.value = this.state.locale;
+        setUViewLocale(this.state.locale);
+    }
+    // ==========================================
+    // 持久化钩子
+    // ==========================================
+    override _doReset(): void {
+        this.state.theme = defaultAppState.theme;
+        this.state.locale = defaultAppState.locale;
+        this.state.themeMode = defaultAppState.themeMode;
+        this.state.isDark = defaultAppState.isDark;
+        themeColor.value = defaultAppState.theme;
+        i18n.global.locale.value = defaultAppState.locale;
+        setUViewLocale(defaultAppState.locale);
+        // 重新应用外观模式（App 端同步 setAppTheme）
+        this.initThemeMode();
+    }
+    override _hydrate(_data: UTSJSONObject): void {
+        if (_data["theme"] != null) {
+            const colorVal = _data["theme"] as string;
+            this.state.theme = colorVal;
+            themeColor.value = colorVal;
+        }
+        if (_data["locale"] != null) {
+            const localeVal = _data["locale"] as string;
+            this.state.locale = localeVal;
+            i18n.global.locale.value = localeVal;
+            setUViewLocale(localeVal);
+        }
+        if (_data["themeMode"] != null) {
+            const modeVal = _data["themeMode"] as string;
+            // 只接受合法三态，防止脏数据
+            if (modeVal == 'auto' || modeVal == 'light' || modeVal == 'dark') {
+                this.state.themeMode = modeVal;
+            }
+            else {
+                this.state.themeMode = 'auto';
+            }
+        }
+        else if (_data["isDark"] != null) {
+            // 兼容旧版持久化数据：由 isDark 布尔值迁移为手动 light/dark
+            this.state.themeMode = (_data["isDark"] as boolean) ? 'dark' : 'light';
+        }
+    }
+    override _serialize(): UTSJSONObject {
+        return {
+            theme: this.state.theme,
+            locale: this.state.locale,
+            themeMode: this.state.themeMode
+        } as UTSJSONObject;
+    }
+    // ==========================================
+    // Actions
+    // ==========================================
+    /**
+     * 设置主题色
+     */
+    setTheme(theme: string): void {
+        this.state.theme = theme;
+        themeColor.value = theme;
+    }
+    /**
+     * 初始化外观模式：注册全局主题监听并应用当前模式
+     * - App（Android/iOS/鸿蒙）：setAppTheme + onAppThemeChange
+     * - H5：matchMedia 监听 prefers-color-scheme
+     * - 微信小程序：读取宿主主题 + onHostThemeChange
+     * 必须在 onLaunch 中调用（此时持久化已还原，可读取到真实的 themeMode）
+     */
+    initThemeMode(): void {
+        // 全局监听只注册一次
+        if (!this._themeModeInited) {
+            this._themeModeInited = true;
+            // App：手动 light/dark 模式以 appTheme 真实变化为准
+            uni.onAppThemeChange((res: AppThemeChangeResult) => {
+                if (this.state.themeMode != 'auto') {
+                    this.state.isDark = res.appTheme == 'dark';
+                }
+            });
+            // App：auto（跟随系统）模式必须监听 osTheme，系统深浅色变化时实时同步
+            // 官方说明：onAppThemeChange 仅在真实亮暗变化时触发，auto 模式需同时监听 onOsThemeChange
+            uni.onOsThemeChange((res: OsThemeChangeResult) => {
+                if (this.state.themeMode == 'auto') {
+                    this.state.isDark = res.osTheme == 'dark';
+                }
+            });
+        }
+        // App：同步应用主题（light/dark/auto），真实亮暗由 onAppThemeChange 回调维护
+        uni.setAppTheme({ theme: this.state.themeMode as 'light' | 'dark' | 'auto' });
+        // 同步一次当前实际亮暗
+        this.refreshIsDark();
+    }
+    /**
+     * 设置外观模式：auto（跟随系统）/ light / dark
+     */
+    setThemeMode(mode: string): void {
+        this.state.themeMode = mode;
+        // App：同步应用主题（light/dark/auto）
+        uni.setAppTheme({ theme: mode as 'light' | 'dark' | 'auto' });
+        this.refreshIsDark();
+    }
+    /**
+     * 根据 themeMode 刷新实际生效的 isDark，并同步 H5 根节点 data-theme
+     */
+    refreshIsDark(): void {
+        const mode = this.state.themeMode;
+        if (mode == 'light') {
+            this.state.isDark = false;
+        }
+        else if (mode == 'dark') {
+            this.state.isDark = true;
+        }
+        else {
+            // auto：跟随系统 / 宿主主题（App 读 osTheme，H5 用 matchMedia，小程序读 hostTheme，见 src/utils/theme.uts）
+            this.state.isDark = getSystemTheme() == 'dark';
+        }
+    }
+    /**
+     * 设置语言
+     */
+    setLocale(locale: string): void {
+        this.state.locale = locale;
+        i18n.global.locale.value = locale;
+        setUViewLocale(locale);
+    }
+}
+export const useAppStore = defineStore<AppStore>('app', (): AppStore => new AppStore());
+//# sourceMappingURL=app.uts.map

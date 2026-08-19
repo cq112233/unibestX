@@ -136,20 +136,20 @@ const dtShowMinMaxTime = ref<boolean>(false);
 const dtShowStart = ref<boolean>(false);
 const dtShowEnd = ref<boolean>(false);
 
-const dtValue1 = ref<number>(Number(new Date(2026, 7, 10, 8, 30)));
-const dtValue2 = ref<number>(Number(new Date(2026, 7, 10)));
-const dtValue3 = ref<number>(Number(new Date(2026, 7, 10)));
+const dtValue1 = ref<number>(Date.parse('2026-08-10 08:30:00'));
+const dtValue2 = ref<number>(Date.parse('2026-08-10 00:00:00'));
+const dtValue3 = ref<number>(Date.parse('2026-08-10 00:00:00'));
 const dtValue4 = ref<string>('08:30');
 
 // 最大最小日期限制 (2026-08-01 ~ 2026-08-31)
-const limitMinDate = Number(new Date(2026, 7, 1));
-const limitMaxDate = Number(new Date(2026, 7, 31));
-const dtValueMinMaxDate = ref<number>(Number(new Date(2026, 7, 10)));
+const limitMinDate = Date.parse('2026-08-01 00:00:00');
+const limitMaxDate = Date.parse('2026-08-31 00:00:00');
+const dtValueMinMaxDate = ref<number>(Date.parse('2026-08-10 00:00:00'));
 const dtValueMinMaxTime = ref<string>('09:30');
 
 // 开始与结束时间联动 (结束时间不得早于开始时间)
-const dtValueStart = ref<number>(Number(new Date(2026, 7, 10)));
-const dtValueEnd = ref<number>(Number(new Date(2026, 7, 20)));
+const dtValueStart = ref<number>(Date.parse('2026-08-10 00:00:00'));
+const dtValueEnd = ref<number>(Date.parse('2026-08-20 00:00:00'));
 
 function formatDate(timestamp: number): string {
   const d = new Date(timestamp);

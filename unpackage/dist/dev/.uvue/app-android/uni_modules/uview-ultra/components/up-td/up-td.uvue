@@ -1,0 +1,116 @@
+import { ref, computed, onMounted, getCurrentInstance } from 'vue';
+import { addUnit, addStyle, deepMerge } from '../../libs/function/index';
+import { useUltraUI } from '../../libs/composable/useUltraUI';
+const __sfc__ = defineComponent({
+    __name: 'up-td',
+    name: 'up-td',
+    props: {
+        customStyle: {
+            type: [Object, String],
+            default: (): UTSJSONObject => ({})
+        },
+        customClass: {
+            type: String,
+            default: ''
+        },
+        text: {
+            type: [String, Number],
+            default: ''
+        },
+        label: {
+            type: [String, Number],
+            default: ''
+        },
+        width: {
+            type: [String],
+            default: 'auto'
+        },
+        textAlign: {
+            type: String,
+            default: ''
+        },
+        fontSize: {
+            type: String,
+            default: ''
+        },
+        borderColor: {
+            type: String,
+            default: ''
+        },
+        color: {
+            type: String,
+            default: ''
+        }
+    },
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        const { parent, getParent } = useUltraUI({
+            padding: 0,
+            align: '',
+            borderColor: '',
+            thStyle: {}
+        });
+        const instance = getCurrentInstance()!.proxy!;
+        const props = __props;
+        const tdStyle = ref<UTSJSONObject>({});
+        const tdTextStyle = ref<UTSJSONObject>({});
+        const mergedTdStyle = computed((): UTSJSONObject => {
+            const custom = addStyle(props.customStyle) as UTSJSONObject;
+            const td = tdStyle.value;
+            return deepMerge(td, custom) as UTSJSONObject;
+        });
+        onMounted(() => {
+            getParent('up-table', instance);
+            if (parent.value != null) {
+                let style: UTSJSONObject = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-td/up-td.uvue", 77, 8), };
+                let styleText: UTSJSONObject = { __$originalPosition: new UTSSourceMapPosition("styleText", "uni_modules/uview-ultra/components/up-td/up-td.uvue", 78, 8), };
+                let parentProps = parent.value!.$callMethod('getProps') as UTSJSONObject;
+                if (props.width != "auto")
+                    style['flex'] = `0 0 ${props.width}`;
+                styleText['textAlign'] = parentProps.getString('align');
+                styleText['fontSize'] = addUnit(parentProps.getString('fontSize'));
+                style['padding'] = parentProps.getString('padding');
+                const isBorder = parentProps.getBoolean('border') ?? true;
+                if (isBorder) {
+                    style['borderBottom'] = `solid 1px ` + parentProps.getString('borderColor');
+                    style['borderRight'] = `solid 1px ` + parentProps.getString('borderColor');
+                }
+                styleText['color'] = parentProps.getString('color');
+                if (props.textAlign != '') {
+                    styleText['textAlign'] = props.textAlign;
+                }
+                if (props.fontSize != '') {
+                    styleText['fontSize'] = props.fontSize;
+                }
+                if (props.borderColor != '') {
+                    style['borderColor'] = props.borderColor;
+                }
+                if (props.color != '') {
+                    styleText['color'] = props.color;
+                }
+                tdStyle.value = style;
+                tdTextStyle.value = styleText;
+            }
+        });
+        return (): any | null => {
+            return _cE("view", _uM({
+                class: _nC(["up-td", [_ctx.customClass]]),
+                style: _nS(mergedTdStyle.value)
+            }), [
+                renderSlot(_ctx.$slots, "default", {}, (): any[] => [
+                    _cE("text", _uM({
+                        class: "up-td__text",
+                        style: _nS(tdTextStyle.value)
+                    }), _tD((_ctx.text != null && _ctx.text != '' ? _ctx.text : _ctx.label).toString()), 5 /* TEXT, STYLE */)
+                ]),
+                renderSlot(_ctx.$slots, "content")
+            ], 6 /* CLASS, STYLE */);
+        };
+    }
+});
+export default __sfc__;
+export type UpTdComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpTdUpTdStyles = [_uM([["up-td", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["justifyContent", "center"], ["alignSelf", "stretch"], ["boxSizing", "border-box"], ["height", "100%"]]))], ["up-td__text", _pS(_uM([["fontSize", 14], ["color", "#606266"]]))]])];
+//# sourceMappingURL=up-td.uvue.map

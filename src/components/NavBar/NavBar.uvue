@@ -4,7 +4,7 @@
     <view
       :class="fixed ? 'navbar-container navbar-fixed' : 'navbar-container'"
       :style="{
-        backgroundColor: bgColor,
+        backgroundColor: effectiveBgColor,
         borderBottomWidth: border ? '1px' : '0px',
         borderBottomStyle: border ? 'solid' : 'none',
         borderBottomColor: border ? '#e2e8f0' : 'transparent'
@@ -19,7 +19,7 @@
         <view class="navbar-left" @click="handleBack">
           <slot name="left">
             <view v-if="showBack" class="back-btn-wrapper">
-              <view class="back-arrow" :style="{ borderLeftColor: titleColor, borderBottomColor: titleColor }"></view>
+              <view class="back-arrow" :style="{ borderLeftColor: effectiveTitleColor, borderBottomColor: effectiveTitleColor }"></view>
             </view>
           </slot>
         </view>
@@ -27,7 +27,7 @@
         <!-- 中间标题区域 -->
         <view class="navbar-title">
           <slot>
-            <text class="title-text" :style="{ color: titleColor }">{{ title }}</text>
+            <text class="title-text" :style="{ color: effectiveTitleColor }">{{ title }}</text>
           </slot>
         </view>
 
@@ -46,6 +46,9 @@
 <script setup lang="uts">
 import { computed } from 'vue';
 import { safeAreaInsets, systemInfo } from '@/src/utils/systemInfo';
+import { useAppStore } from '@/src/store';
+import { getThemeTokens } from '@/src/utils/theme';
+import type { ThemeTokens } from '@/src/utils/theme';
 
 // 定义组件参数类型
 const props = defineProps({
@@ -55,11 +58,11 @@ const props = defineProps({
   },
   titleColor: {
     type: String,
-    default: '#1e293b'
+    default: ''
   },
   bgColor: {
     type: String,
-    default: '#ffffff'
+    default: ''
   },
   fixed: {
     type: Boolean,
@@ -75,8 +78,23 @@ const props = defineProps({
   },
   border: {
     type: Boolean,
-    default: true
+    default: false
   }
+});
+
+// 亮 / 暗主题 token（与 theme.json 同步）：未显式传色时跟随当前外观模式
+const themeTokens = computed((): ThemeTokens => {
+  return getThemeTokens(useAppStore().state.isDark);
+});
+
+// 实际生效的导航栏背景色：显式传 bgColor 时优先，否则跟随主题
+const effectiveBgColor = computed((): string => {
+  return props.bgColor != '' ? props.bgColor : themeTokens.value.navBg;
+});
+
+// 实际生效的标题 / 返回箭头颜色：显式传 titleColor 时优先，否则跟随主题
+const effectiveTitleColor = computed((): string => {
+  return props.titleColor != '' ? props.titleColor : themeTokens.value.navText;
 });
 
 // 计算状态栏高度
@@ -178,8 +196,9 @@ function handleBack() {
 }
 
 .title-text {
-  font-size: 16px;
-  font-weight: 700;
+  /* 与原生导航栏标题统一：17px 系统 semibold */
+  font-size: 17px;
+  font-weight: 600;
   text-overflow: ellipsis;
 }
 

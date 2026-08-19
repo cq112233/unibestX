@@ -1,0 +1,65 @@
+import Card from './Card.uvue';
+import { toast, toastError, toastSuccess, toastWarning } from '@/src/utils/toast';
+const __sfc__ = defineComponent({
+    __name: 'ToastDemoCard',
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        function handleDefaultToast() {
+            toast('这是一条通过 App.ku 全局组件触发的轻提示');
+        }
+        function handleSuccessToast() {
+            toastSuccess('恭喜！全局 Toast 触发成功');
+        }
+        function handleErrorToast() {
+            toastError('操作异常，全局 Toast 报错提示');
+        }
+        function handleWarningToast() {
+            toastWarning('注意：这是一条全局警告轻提示');
+        }
+        return (): any | null => {
+            return _cV(unref(Card), _uM({ title: "全局 Toast 轻提示" }), _uM({
+                default: withSlotCtx((): any[] => [
+                    _cE("view", _uM({ class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }), [
+                        _cE("text", _uM({ class: "text-12px text-__64748b_ leading-20px" }), " 通过 App.ku.uvue 全局挂载的 <up-toast />，直接导入 @/src/utils/toast 即可在任意页面与逻辑中唤起轻提示。 ")
+                    ]),
+                    _cE("view", _uM({ class: "flex flex-col" }), [
+                        _cE("view", _uM({ class: "flex flex-row mb-10px" }), [
+                            _cE("view", _uM({
+                                class: "flex-1 mr-10px bg-__3b82f6_ rounded-8px h-40px flex flex-row items-center justify-center",
+                                onClick: handleDefaultToast
+                            }), [
+                                _cE("text", _uM({ class: "text-__ffffff_ text-13px font-bold" }), "默认 Toast")
+                            ]),
+                            _cE("view", _uM({
+                                class: "flex-1 bg-__10b981_ rounded-8px h-40px flex flex-row items-center justify-center",
+                                onClick: handleSuccessToast
+                            }), [
+                                _cE("text", _uM({ class: "text-__ffffff_ text-13px font-bold" }), "成功 Toast")
+                            ])
+                        ]),
+                        _cE("view", _uM({ class: "flex flex-row" }), [
+                            _cE("view", _uM({
+                                class: "flex-1 mr-10px bg-__ef4444_ rounded-8px h-40px flex flex-row items-center justify-center",
+                                onClick: handleErrorToast
+                            }), [
+                                _cE("text", _uM({ class: "text-__ffffff_ text-13px font-bold" }), "错误 Toast")
+                            ]),
+                            _cE("view", _uM({
+                                class: "flex-1 bg-__f59e0b_ rounded-8px h-40px flex flex-row items-center justify-center",
+                                onClick: handleWarningToast
+                            }), [
+                                _cE("text", _uM({ class: "text-__ffffff_ text-13px font-bold" }), "警告 Toast")
+                            ])
+                        ])
+                    ])
+                ]),
+                _: 1 /* STABLE */
+            }));
+        };
+    }
+});
+export default __sfc__;
+const GenSrcPagesBasicComponentsToastDemoCardStyles = [_uM([["bg-__10b981_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#10b981"]]))], ["bg-__3b82f6_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#3b82f6"]]))], ["bg-__ef4444_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#ef4444"]]))], ["bg-__f59e0b_", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "#f59e0b"]]))], ["border-color-__e2e8f0_", _pS(_uM([["borderTopColor", "#e2e8f0"], ["borderRightColor", "#e2e8f0"], ["borderBottomColor", "#e2e8f0"], ["borderLeftColor", "#e2e8f0"]]))], ["border-style-solid", _pS(_uM([["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"]]))], ["border-width-1px", _pS(_uM([["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1]]))], ["flex", _pS(_uM([["display", "flex"]]))], ["flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["flex-col", _pS(_uM([["flexDirection", "column"]]))], ["flex-row", _pS(_uM([["flexDirection", "row"]]))], ["font-bold", _pS(_uM([["fontWeight", 700]]))], ["h-40px", _pS(_uM([["height", 40]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["justify-center", _pS(_uM([["justifyContent", "center"]]))], ["leading-20px", _pS(_uM([["lineHeight", "20px"]]))], ["mb-10px", _pS(_uM([["marginBottom", 10]]))], ["mb-16px", _pS(_uM([["marginBottom", 16]]))], ["mr-10px", _pS(_uM([["marginRight", 10]]))], ["p-16px", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["rounded-12px", _pS(_uM([["borderTopLeftRadius", 12], ["borderTopRightRadius", 12], ["borderBottomRightRadius", 12], ["borderBottomLeftRadius", 12]]))], ["rounded-8px", _pS(_uM([["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["text-__64748b_", _pS(_uM([["color", "#64748b"]]))], ["text-__ffffff_", _pS(_uM([["color", "#ffffff"]]))], ["text-12px", _pS(_uM([["fontSize", 12]]))], ["text-13px", _pS(_uM([["fontSize", 13]]))]])];
+//# sourceMappingURL=ToastDemoCard.uvue.map

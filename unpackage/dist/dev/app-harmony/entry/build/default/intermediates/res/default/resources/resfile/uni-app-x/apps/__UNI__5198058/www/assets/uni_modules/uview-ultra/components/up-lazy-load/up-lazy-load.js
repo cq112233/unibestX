@@ -1,14 +1,8 @@
 import { j as guid, a as addUnit } from "../../libs/function/index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, unref: _unref, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, setSharedDataEvent: _setSharedDataEvent, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, toSharedDataImageMode: _toSharedDataImageMode, createSharedDataIf: _createSharedDataIf } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpLazyLoadUpLazyLoad";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "6553f38f",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-lazy-load/up-lazy-load.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "up-lazy-load",
   props: {
     index: {
@@ -69,9 +63,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   },
   emits: ["click", "load", "error"],
   setup(__props, _a) {
-    var __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpLazyLoadUpLazyLoadSharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
     const props = __props;
     const emit = __emit;
     const elIndex = guid();
@@ -99,7 +92,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         height: imgHeight.value
       });
     });
-    computed(() => {
+    const getThreshold = computed(() => {
       const thresholdValue = parseFloat(props.threshold.toString());
       const thresholdPx = uni.rpx2px(Math.abs(thresholdValue));
       return thresholdValue < 0 ? -thresholdPx : thresholdPx;
@@ -165,40 +158,55 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         isShow.value = true;
       }, 30);
     });
-    return () => {
-      "raw js";
-      _renderSharedDataEffect(() => {
-        const __up_lazy_item_elIndex = "up-lazy-item-" + _unref(elIndex);
-        _setSharedDataClass(__sharedData, 12, ["up-wrap", __up_lazy_item_elIndex]);
-        _setSharedDataStyle(__sharedData, 13, wrapStyle.value);
-        _setSharedDataClass(__sharedData, 14, __up_lazy_item_elIndex);
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(!isError.value));
-      }, () => {
-        _setSharedDataEvent(__sharedData, 1, imgLoaded);
-        _setSharedDataEvent(__sharedData, 2, loadError);
-        _setSharedDataEvent(__sharedData, 3, clickImg);
-        _renderSharedDataEffect(() => {
-          _setSharedDataStyle(__sharedData, 4, imageStyle.value);
-          _setSharedDataAttr(__sharedData, 5, _toSharedDataString(isShow.value ? __props.image : __props.loadingImg));
-          _setSharedDataAttr(__sharedData, 6, _toSharedDataImageMode(__props.imgMode));
-        });
-      }, () => {
-        _setSharedDataEvent(__sharedData, 7, errorImgLoaded);
-        _setSharedDataEvent(__sharedData, 8, clickImg);
-        _renderSharedDataEffect(() => {
-          _setSharedDataStyle(__sharedData, 9, imageStyle.value);
-          _setSharedDataAttr(__sharedData, 10, _toSharedDataString(__props.errorImg));
-          _setSharedDataAttr(__sharedData, 11, _toSharedDataImageMode(__props.imgMode));
-        });
-      }, 261);
-      return __sharedData;
-    };
+    const __returned__ = { props, emit, elIndex, isShow, opacity, time, loadStatus, isError, imgHeight, wrapStyle, imageStyle, getThreshold, imageValue, init, clickImg, imgLoaded, errorImgLoaded, loadError };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-wrap": { "": { "backgroundColor": "#eeeeee", "overflow": "hidden" } }, "up-lazy-item": { "": { "transform": "translate3d(0, 0, 0)", "display": "flex", "width": "100%" } } };
+const { normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock, normalizeClass: _normalizeClass, createElementVNode: _createElementVNode } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      class: _normalizeClass(["up-wrap", "up-lazy-item-" + $setup.elIndex]),
+      style: _normalizeStyle($setup.wrapStyle)
+    },
+    [
+      _createElementVNode(
+        "view",
+        {
+          class: _normalizeClass("up-lazy-item-" + $setup.elIndex)
+        },
+        [
+          !$setup.isError ? (_openBlock(), _createElementBlock("image", {
+            key: 0,
+            style: _normalizeStyle($setup.imageStyle),
+            class: "up-lazy-item",
+            src: $setup.isShow ? $props.image : $props.loadingImg,
+            mode: $props.imgMode,
+            onLoad: $setup.imgLoaded,
+            onError: $setup.loadError,
+            onClick: $setup.clickImg
+          }, null, 44, ["src", "mode"])) : (_openBlock(), _createElementBlock("image", {
+            key: 1,
+            style: _normalizeStyle($setup.imageStyle),
+            class: "up-lazy-item error",
+            src: $props.errorImg,
+            mode: $props.imgMode,
+            onLoad: $setup.errorImgLoaded,
+            onClick: $setup.clickImg
+          }, null, 44, ["src", "mode"]))
+        ],
+        2
+        /* CLASS */
+      )
+    ],
+    6
+    /* CLASS, STYLE */
+  );
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-lazy-load/up-lazy-load.uvue"]]);
 export {
   __easycom_1 as _
 };

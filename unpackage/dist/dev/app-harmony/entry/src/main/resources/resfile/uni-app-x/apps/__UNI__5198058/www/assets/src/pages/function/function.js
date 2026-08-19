@@ -50,7 +50,6 @@ import "../../../uni_modules/lime-i18n/common/warnings.js";
 import "../../../uni_modules/lime-i18n/common/types.js";
 import "../../i18n/locales/zh-CN.js";
 import "../../i18n/locales/en-US.js";
-import "../../utils/systemInfo.js";
 import "../../store/index.js";
 import "../../../uni_modules/x-pinia-s/instans/types.js";
 import "../../../uni_modules/x-pinia-s/instans/subscriptions.js";
@@ -70,8 +69,11 @@ import "../../../uni_modules/uview-ultra/libs/i18n/locales/de.js";
 import "../../../uni_modules/uview-ultra/libs/i18n/locales/ko.js";
 import "../../../uni_modules/uview-ultra/libs/i18n/locales/ja.js";
 import "../../../uni_modules/uview-ultra/libs/i18n/locales/ru.js";
+import "../../utils/theme.js";
+import "../../../theme.js";
 import "../../store/token.js";
 import "../../store/user.js";
+import "../../utils/systemInfo.js";
 import "../../utils/toast.js";
 import "../basic/components/Card.js";
 import "../../utils/env.js";
@@ -99,61 +101,76 @@ import "../../../uni_modules/z-paging-x/components/z-paging-x/enums/index.js";
 import "../../../uni_modules/z-paging-x/components/z-paging-x/utils/index.js";
 import "../../../uni_modules/z-paging-x/components/z-paging-x/components/z-paging-load-more.js";
 import "../../../uni_modules/z-paging-x/components/z-paging-x/config/index.js";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, createSharedDataComponent: _createSharedDataComponent, setSharedData: _setSharedData, withSharedDataVaporCtx: _withSharedDataVaporCtx } = globalThis.Vue;
-const __className = "GenSrcPagesFunctionFunction";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { onBackPress } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "889bc4da",
-  __className,
-  __filename: "src/pages/function/function.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "function",
-  setup(__props) {
-    const __sharedDataRenderer = _useSharedDataRenderer();
-    const __sharedData = __sharedDataRenderer == "component" ? _withSharedDataComponent(new UniDynamicSharedDataComponent(_useSharedDataScope(), _useSharedDataComponentOptions({ bundleKey: "GenSrcPagesFunctionFunctionSharedData", sharedDataClassId: 0 }))) : _withSharedDataPage(new UniDynamicSharedDataPage(_useSharedDataPageId(), _useSharedDataPageOptions({ bundleKey: "GenSrcPagesFunctionFunctionSharedData", sharedDataClassId: 0 })));
-    _useSharedDataScope(__sharedData);
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
     onBackPress((options) => {
       if (options.from == "backbutton") {
         return handleBackPressExit();
       }
       return false;
     });
-    return () => {
-      "raw js";
-      const n15 = _createSharedDataComponent(AppKu, "13021a83", null, {
-        "default": _withSharedDataVaporCtx(() => {
-          const n3 = _createSharedDataComponent(EnvCard, "5ae58bc7");
-          _setSharedData(__sharedData, 1, n3.sharedData);
-          const n4 = _createSharedDataComponent(ZPagingDemoCard, "5ae58c66");
-          _setSharedData(__sharedData, 2, n4.sharedData);
-          const n5 = _createSharedDataComponent(SystemInfoCard, "5ae58f87");
-          _setSharedData(__sharedData, 3, n5.sharedData);
-          const n6 = _createSharedDataComponent(HapticsCard, "5ae59008");
-          _setSharedData(__sharedData, 4, n6.sharedData);
-          const n7 = _createSharedDataComponent(ToastCard, "5ae590a3");
-          _setSharedData(__sharedData, 5, n7.sharedData);
-          const n8 = _createSharedDataComponent(MediaCard, "5ae593ab");
-          _setSharedData(__sharedData, 6, n8.sharedData);
-          const n9 = _createSharedDataComponent(LodashDemoCard, "5ae5970a");
-          _setSharedData(__sharedData, 7, n9.sharedData);
-          const n10 = _createSharedDataComponent(CryptoDemoCard, "5ae597c2");
-          _setSharedData(__sharedData, 8, n10.sharedData);
-          const n11 = _createSharedDataComponent(TimeDemoCard, "5ae59b0a");
-          _setSharedData(__sharedData, 9, n11.sharedData);
-          const n12 = _createSharedDataComponent(SignatureCard, "5ae59bc3");
-          _setSharedData(__sharedData, 10, n12.sharedData);
-          const n13 = _createSharedDataComponent(EchartsDemoCard, "5ae59eea");
-          _setSharedData(__sharedData, 11, n13.sharedData);
-        })
-      });
-      _setSharedData(__sharedData, 0, n15.sharedData);
-      return __sharedData;
-    };
+    const __returned__ = { get AppKu() {
+      return AppKu;
+    }, get EnvCard() {
+      return EnvCard;
+    }, get SystemInfoCard() {
+      return SystemInfoCard;
+    }, get HapticsCard() {
+      return HapticsCard;
+    }, get ToastCard() {
+      return ToastCard;
+    }, get MediaCard() {
+      return MediaCard;
+    }, get LodashDemoCard() {
+      return LodashDemoCard;
+    }, get CryptoDemoCard() {
+      return CryptoDemoCard;
+    }, get TimeDemoCard() {
+      return TimeDemoCard;
+    }, get SignatureCard() {
+      return SignatureCard;
+    }, get EchartsDemoCard() {
+      return EchartsDemoCard;
+    }, get ZPagingDemoCard() {
+      return ZPagingDemoCard;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const _function = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "flex-col": { "": { "flexDirection": "column" } }, "font-bold": { "": { "fontWeight": 700 } }, "mt-4px": { "": { "marginTop": 4 } }, "pb-100px": { "": { "paddingBottom": 100 } }, "pb-10px": { "": { "paddingBottom": 10 } }, "pt-20px": { "": { "paddingTop": 20 } }, "px-16px": { "": { "paddingLeft": 16, "paddingRight": 16 } }, "text-__1a202c_": { "": { "color": "#1a202c" } }, "text-__718096_": { "": { "color": "#718096" } }, "text-13px": { "": { "fontSize": 13 } }, "text-20px": { "": { "fontSize": 20 } } };
+const { createElementVNode: _createElementVNode, createVNode: _createVNode, withCtx: _withCtx, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createBlock($setup["AppKu"], null, {
+    default: _withCtx(() => [
+      _createElementVNode("view", { class: "flex-col pb-100px" }, [
+        _createElementVNode("view", { class: "pt-20px px-16px pb-10px" }, [
+          _createElementVNode("text", { class: "text-20px font-bold text-__1a202c_" }, "设备系统信息"),
+          _createElementVNode("text", { class: "text-13px text-__718096_ mt-4px" }, "演示 iOS/Android 原生设备 API 调用与状态读取")
+        ]),
+        _createVNode($setup["EnvCard"]),
+        _createVNode($setup["ZPagingDemoCard"]),
+        _createVNode($setup["SystemInfoCard"]),
+        _createVNode($setup["HapticsCard"]),
+        _createVNode($setup["ToastCard"]),
+        _createVNode($setup["MediaCard"]),
+        _createVNode($setup["LodashDemoCard"]),
+        _createVNode($setup["CryptoDemoCard"]),
+        _createVNode($setup["TimeDemoCard"]),
+        _createVNode($setup["SignatureCard"]),
+        _createVNode($setup["EchartsDemoCard"])
+      ])
+    ]),
+    _: 1
+    /* STABLE */
+  });
+}
+const _function = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/function/function.uvue"]]);
 export {
   _function as default
 };

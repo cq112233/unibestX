@@ -1,0 +1,110 @@
+import themeJson from '../../theme.json';
+
+/**
+ * 获取当前系统 / 宿主主题
+ * - App（Android / iOS / 鸿蒙）：读取系统主题 osTheme（Android 10+ / iOS 13+ 可感知深色）
+ * - H5：通过 prefers-color-scheme 媒体查询判断系统深浅色
+ * - 微信小程序：读取宿主主题 hostTheme（小程序宿主）
+ * @returns 'dark' | 'light'，获取失败时返回 'light'
+ */
+export function getSystemTheme(): string {
+  let theme: string = 'light';
+
+
+  try {
+    theme = uni.getDeviceInfo().osTheme ?? 'light';
+  }
+  catch (e) {
+    // ignore
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  return theme;
+}
+
+/**
+ * 自定义 NavBar / TabBar 等组件使用的主题色板
+ *
+ * 说明：uts 支持直接 import JSON（HBuilderX 4.25+，项目内 i18n 已有先例），
+ * 因此这里以根目录 theme.json 为单源，与 pages.json 的亮 / 暗配置保持一致。
+ * navigationBarTextStyle / tabBarBorderStyle 为 black / white 枚举：
+ * - navigationBarTextStyle：black / white 直接映射为 #000000 / #ffffff
+ * - tabBarBorderStyle：black 表示显示分割线（浅色模式浅灰、深色模式深灰），
+ *   white 映射为 #ffffff；theme.json 的 @ 变量仅用于 pages.json。
+ */
+export type ThemeTokens = {
+  /** 导航栏背景色（navigationBarBackgroundColor） */
+  navBg: string;
+  /** 导航栏文字 / 返回箭头颜色（navigationBarTextStyle，black / white 映射为具体色值） */
+  navText: string;
+  /** tabbar 背景色（tabBarBackgroundColor） */
+  tabBg: string;
+  /** tabbar 未选中颜色（tabBarColor） */
+  tabColor: string;
+  /** tabbar 选中颜色（tabBarSelectedColor） */
+  tabSelected: string;
+  /** tabbar 顶部边框颜色（tabBarBorderStyle，black / white 按主题映射为分割线色） */
+  tabBorder: string;
+  /** 页面内容背景色（backgroundColorContent） */
+  bgContent: string;
+};
+
+/** 获取亮 / 暗模式对应的主题色板（直接读取 theme.json，单源） */
+export function getThemeTokens(isDark: boolean): ThemeTokens {
+  const themeData = themeJson as UTSJSONObject;
+  const scheme = (isDark ? themeData.dark : themeData.light) as UTSJSONObject;
+  return {
+    navBg: scheme.navigationBarBackgroundColor as string,
+    navText: mapNavTextStyle(scheme.navigationBarTextStyle as string),
+    tabBg: scheme.tabBarBackgroundColor as string,
+    tabColor: scheme.tabBarColor as string,
+    tabSelected: scheme.tabBarSelectedColor as string,
+    tabBorder: mapTabBorderStyle(scheme.tabBarBorderStyle as string, isDark),
+    bgContent: scheme.backgroundColorContent as string
+  } as ThemeTokens;
+}
+
+/** 导航栏文字颜色：black / white 枚举映射为具体色值 */
+function mapNavTextStyle(value: string): string {
+  if (value == 'black') {
+    return '#000000';
+  }
+  if (value == 'white') {
+    return '#ffffff';
+  }
+  return value;
+}
+
+/** tabbar 顶部分割线颜色：black / white 枚举按当前主题映射为合适的色值 */
+function mapTabBorderStyle(value: string, isDark: boolean): string {
+  if (value == 'black') {
+    // black = 显示分割线：浅色模式浅灰分割线，深色模式用比背景略亮的深灰
+    return isDark ? '#334155' : '#e2e8f0';
+  }
+  if (value == 'white') {
+    return '#ffffff';
+  }
+  return value;
+}

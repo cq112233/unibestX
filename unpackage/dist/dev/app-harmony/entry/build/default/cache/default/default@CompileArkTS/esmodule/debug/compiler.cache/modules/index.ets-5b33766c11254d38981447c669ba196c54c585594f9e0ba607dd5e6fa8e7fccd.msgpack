@@ -1,0 +1,708 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ*import { Emitter, getCurrentMP } from "@dcloudio/uni-app-framework";
+import { UTSObject, UTS, UniError, defineSyncApi, defineAsyncApi, getUniProvider } from "@dcloudio/uni-app-framework";
+const LocationUniErrorSubject = 'uni-location';
+class GetLocationSuccess extends UTSObject {
+    constructor() {
+        super(...arguments);
+        this.address = null;
+    }
+}
+class GetLocationOptions extends UTSObject {
+    constructor() {
+        super(...arguments);
+        this.provider = null;
+        this.type = null;
+        this.altitude = null;
+        this.geocode = null;
+        this.highAccuracyExpireTime = null;
+        this.isHighAccuracy = null;
+        this.success = null;
+        this.fail = null;
+        this.complete = null;
+    }
+}
+class StartLocationUpdateSuccess extends UTSObject {
+}
+class StartLocationUpdateOptions extends UTSObject {
+    constructor() {
+        super(...arguments);
+        this.provider = null;
+        this.type = null;
+        this.success = null;
+        this.fail = null;
+        this.complete = null;
+    }
+}
+class StopLocationUpdateSuccess extends UTSObject {
+}
+class StopLocationUpdateOptions extends UTSObject {
+    constructor() {
+        super(...arguments);
+        this.success = null;
+        this.fail = null;
+        this.complete = null;
+    }
+}
+class StartLocationUpdateBackgroundOptions extends UTSObject {
+    constructor() {
+        super(...arguments);
+        this.provider = null;
+        this.type = null;
+        this.success = null;
+        this.fail = null;
+        this.complete = null;
+    }
+}
+const LocationUniErrors = new Map([
+    [
+        1505003,
+        'maybe not turn on the system location permission.'
+    ],
+    [
+        1505004,
+        'maybe not obtain GPS Permission.'
+    ],
+    [
+        1505600,
+        'location fail: timeout'
+    ],
+    [
+        1505601,
+        'system location support wgs84 only.'
+    ],
+    [
+        1505602,
+        'location fail: request error'
+    ],
+    [
+        1505603,
+        'The system failed to retrieve geocode for the location.'
+    ],
+    [
+        1505604,
+        'Failed to get provider.'
+    ],
+    [
+        1505700,
+        'system location not support geocode.'
+    ],
+    [
+        1505701,
+        'Provider is not find,Please ensure that the device location function is turned on'
+    ],
+    [
+        1505800,
+        'Unauthorized access to high-accuracy location services.'
+    ],
+    [
+        1505605,
+        'The Tencent api key is misconfigured.'
+    ],
+    [
+        1505607,
+        'GCJ-02 support only.'
+    ],
+    [
+        1505608,
+        "Only one provider can have continuous location updates enabled at a time."
+    ],
+    [
+        1505702,
+        'Missing background location configuration in iOS plist fileï¼šUIBackgroundModes->location '
+    ]
+]);
+class GetLocationFailImpl__1 extends UniError {
+    constructor(errCode) {
+        super();
+        this.errSubject = LocationUniErrorSubject;
+        this.errCode = errCode;
+        this.errMsg = UTS.mapGet(LocationUniErrors, errCode) ?? "";
+    }
+}
+const API_GET_LOCATION = 'getLocation';
+const API_ON_LOCATION_CHANGE = 'onLocationChange';
+const API_OFF_LOCATION_CHANGE = 'offLocationChange';
+const API_ON_LOCATION_CHANGE_ERROR = 'onLocationChangeError';
+const API_OFF_LOCATION_CHANGE_ERROR = 'offLocationChangeError';
+const API_START_LOCATION_UPDATE_BACKGROUND = 'startLocationUpdateBackground';
+const API_STOP_LOCATION_UPDATE = 'stopLocationUpdate';
+const API_START_LOCATION_UPDATE = 'startLocationUpdate';
+const coordTypes = [
+    'wgs84',
+    'gcj02'
+];
+const StartLocationUpdateApiProtocol = new Map([
+    [
+        'type',
+        {
+            type: 'string'
+        }
+    ]
+]);
+const StartLocationUpdateApiOptions = {
+    formatArgs: new Map([
+        [
+            'type',
+            (value, params) => {
+                value = (value || '').toLowerCase();
+                if (coordTypes.indexOf(value) === -1) {
+                    params.type = coordTypes[1];
+                }
+                else {
+                    params.type = value;
+                }
+            }
+        ]
+    ])
+};
+const emitterStore = new Map();
+function getEmitter() {
+    const mp = getCurrentMP();
+    const id = mp.appId;
+    if (emitterStore.has(id)) {
+        return UTS.mapGet(emitterStore, id);
+    }
+    const emitter = new Emitter();
+    emitterStore.set(id, emitter);
+    mp.on('beforeClose', () => {
+        emitterStore.delete(id);
+    });
+    return emitter;
+}
+const OnLocationChangeCallbacks = [];
+const OnLocationChangeErrorCallbacks = [];
+function removeCallback(name, callbacks, callback = null) {
+    if (callback == null) {
+        getEmitter().off(name);
+        callbacks.length = 0;
+    }
+    else if (typeof callback === 'number') {
+        const index = callbacks.findIndex((cb) => cb === callbacks[callback]);
+        if (index !== -1) {
+            getEmitter().off(name, callbacks[index]);
+            callbacks.splice(index, 1);
+        }
+    }
+    else {
+        getEmitter().off(name, callback);
+        const index = callbacks.indexOf(callback);
+        if (index !== -1) {
+            callbacks.splice(index, 1);
+        }
+    }
+}
+const onLocationChange = defineSyncApi(API_ON_LOCATION_CHANGE, (callback) => {
+    getEmitter().on(API_ON_LOCATION_CHANGE, callback);
+    return OnLocationChangeCallbacks.push(callback);
+});
+const offLocationChange = defineSyncApi(API_OFF_LOCATION_CHANGE, (callback = null) => {
+    removeCallback(API_ON_LOCATION_CHANGE, OnLocationChangeCallbacks, callback);
+});
+const onLocationChangeError = defineSyncApi(API_ON_LOCATION_CHANGE_ERROR, (callback) => {
+    getEmitter().on(API_ON_LOCATION_CHANGE_ERROR, callback);
+    return OnLocationChangeErrorCallbacks.push(callback);
+});
+const offLocationChangeError = defineSyncApi(API_OFF_LOCATION_CHANGE_ERROR, (callback = null) => {
+    removeCallback(API_ON_LOCATION_CHANGE_ERROR, OnLocationChangeErrorCallbacks, callback);
+});
+const _onLocationChange = (res) => {
+    getEmitter().emit(API_ON_LOCATION_CHANGE, res);
+};
+const _onLocationChangeError = (err) => {
+    err = new GetLocationFailImpl__1(err.errCode);
+    err.errMsg = `onLocationChange:fail ${err.errMsg}`;
+    getEmitter().emit(API_ON_LOCATION_CHANGE_ERROR, err);
+};
+let locationProvider = null;
+const getLocation = defineAsyncApi(API_GET_LOCATION, (options, exec) => {
+    const realProvider = options.provider || 'system';
+    locationProvider = getUniProvider('location', realProvider);
+    if (!locationProvider) {
+        const errMsg = UTS.mapGet(LocationUniErrors, 1505604) ?? "";
+        exec.reject(errMsg, {
+            errCode: 1505604
+        });
+        return;
+    }
+    locationProvider.getLocation({
+        type: options.type,
+        altitude: options.altitude,
+        geocode: options.geocode,
+        isHighAccuracy: options.isHighAccuracy,
+        highAccuracyExpireTime: options.highAccuracyExpireTime,
+        success: (result) => {
+            exec.resolve(result);
+        },
+        fail: (error) => {
+            error = new GetLocationFailImpl__1(error.errCode);
+            const errMsg = `getLocation:fail ${error.errMsg}`;
+            exec.reject(errMsg, {
+                errCode: error.errCode
+            });
+        }
+    });
+});
+const startLocationUpdate = defineAsyncApi(API_START_LOCATION_UPDATE, (options, ref) => {
+    let resolve = ref.resolve, reject = ref.reject;
+    const realProvider = options.provider || 'system';
+    locationProvider = getUniProvider('location', realProvider);
+    if (!locationProvider) {
+        const errMsg = UTS.mapGet(LocationUniErrors, 1505604) ?? "";
+        reject(errMsg, {
+            errCode: 1505604
+        });
+        return;
+    }
+    locationProvider.startLocationUpdate({
+        type: options.type,
+        success: (result) => {
+            locationProvider?.onLocationChange(_onLocationChange);
+            locationProvider?.onLocationChangeError(_onLocationChangeError);
+            resolve(result);
+        },
+        fail: (error) => {
+            error = new GetLocationFailImpl__1(error.errCode);
+            const errMsg = `startLocationUpdate:fail ${error.errMsg}`;
+            reject(errMsg, error);
+        }
+    });
+}, StartLocationUpdateApiProtocol, StartLocationUpdateApiOptions);
+const startLocationUpdateBackground = defineAsyncApi(API_START_LOCATION_UPDATE_BACKGROUND, (options, ref) => {
+    let resolve = ref.resolve, reject = ref.reject;
+    const realProvider = options.provider || 'system';
+    locationProvider = getUniProvider('location', realProvider);
+    if (!locationProvider) {
+        const errMsg = UTS.mapGet(LocationUniErrors, 1505604) ?? "";
+        reject(errMsg, {
+            errCode: 1505604
+        });
+        return;
+    }
+    locationProvider.startLocationUpdateBackground({
+        type: options.type,
+        success: (result) => {
+            locationProvider?.onLocationChange(_onLocationChange);
+            locationProvider?.onLocationChangeError(_onLocationChangeError);
+            resolve(result);
+        },
+        fail: (error) => {
+            error = new GetLocationFailImpl__1(error.errCode);
+            const errMsg = `startLocationUpdateBackground:fail ${error.errMsg}`;
+            reject(errMsg, error);
+        }
+    });
+});
+const stopLocationUpdate = defineAsyncApi(API_STOP_LOCATION_UPDATE, (_, ref) => {
+    let resolve = ref.resolve, reject = ref.reject;
+    locationProvider?.stopLocationUpdate({
+        success: (result) => {
+            resolve(result);
+        },
+        fail: (error) => {
+            error = new GetLocationFailImpl__1(error.errCode);
+            const errMsg = `stopLocationUpdate:fail ${error.errMsg}`;
+            reject(errMsg, error);
+        }
+    });
+});
+export { GetLocationOptions as GetLocationOptions, GetLocationSuccess as GetLocationSuccess, StartLocationUpdateBackgroundOptions as StartLocationUpdateBackgroundOptions, StartLocationUpdateOptions as StartLocationUpdateOptions, StartLocationUpdateSuccess as StartLocationUpdateSuccess, StopLocationUpdateOptions as StopLocationUpdateOptions, StopLocationUpdateSuccess as StopLocationUpdateSuccess };
+export { onLocationChange as onLocationChange };
+export { offLocationChange as offLocationChange };
+export { onLocationChangeError as onLocationChangeError };
+export { offLocationChangeError as offLocationChangeError };
+export { getLocation as getLocation };
+export { startLocationUpdate as startLocationUpdate };
+export { startLocationUpdateBackground as startLocationUpdateBackground };
+export { stopLocationUpdate as stopLocationUpdate };
+//# sourceMappingURL=index.js.mapÂ‘Ùî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework/index.etsÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-location/utssdk/app-harmony/index.etsÔrB˜±isLocalDependency¯isNodeEntryFile§pkgPath§pkgNameªpkgVersion±belongProjectPath±dependencyPkgInfo¬shouldEmitJsÂÂÙâ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules¹@dcloudio/uni-app-modules¥1.0.0ÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmonyÔrC’§pkgNameªpkgVersion¹@dcloudio/uni-app-modules¥1.0.0ÃÃÚCãimport { Emitter, getCurrentMP } from "@dcloudio/uni-app-framework";
+import { IUniError, UTSObject, UTS, UniError, UniProvider, ProtocolOptions, ApiOptions, defineSyncApi, defineAsyncApi, ApiExecutor, getUniProvider, ApiError, ref } from "@dcloudio/uni-app-framework";
+type GetLocationFailImpl = GetLocationFailImpl__1;
+const LocationUniErrorSubject = 'uni-location';
+type LocationErrorCode = 1505005 | 1505021 | 1505022 | 1505023 | 1505024 | 1505025 | 1505026 | 1505003 | 1505004 | 1505600 | 1505601 | 1505602 | 1505603 | 1505604 | 1505700 | 1505701 | 1505800 | 1505605 | 1505607 | 1505608 | 1505702;
+interface IGetLocationFail extends IUniError {
+    errCode: LocationErrorCode;
+}
+type GetLocationFail = IGetLocationFail;
+type GetLocation = (options: GetLocationOptions) => void;
+class GetLocationSuccess extends UTSObject {
+    latitude!: number;
+    longitude!: number;
+    speed!: number;
+    accuracy!: number;
+    altitude!: number;
+    verticalAccuracy!: number;
+    horizontalAccuracy!: number;
+    address: string | null = null;
+}
+type GetLocationSuccessCallback = (result: GetLocationSuccess) => void;
+type GetLocationFailCallback = (result: GetLocationFail) => void;
+type GetLocationComplete = Object;
+type GetLocationCompleteCallback = (result: GetLocationComplete) => void;
+class GetLocationOptions extends UTSObject {
+    provider: string | null = null;
+    type: "wgs84" | "gcj02" | null = null;
+    altitude: boolean | null = null;
+    geocode: boolean | null = null;
+    highAccuracyExpireTime: number | null = null;
+    isHighAccuracy: boolean | null = null;
+    success: GetLocationSuccessCallback | null = null;
+    fail: GetLocationFailCallback | null = null;
+    complete: GetLocationCompleteCallback | null = null;
+}
+class StartLocationUpdateSuccess extends UTSObject {
+}
+type StartLocationUpdateSuccessCallback = (result: StartLocationUpdateSuccess) => void;
+type StartLocationUpdateFailCallback = (result: IGetLocationFail) => void;
+type StartLocationUpdateComplete = Object;
+type StartLocationUpdateCompleteCallback = (result: StartLocationUpdateComplete) => void;
+type StartLocationUpdateOptionsType = "wgs84" | "gcj02";
+class StartLocationUpdateOptions extends UTSObject {
+    provider: string | null = null;
+    type: StartLocationUpdateOptionsType | null = null;
+    success: StartLocationUpdateSuccessCallback | null = null;
+    fail: StartLocationUpdateFailCallback | null = null;
+    complete: StartLocationUpdateCompleteCallback | null = null;
+}
+type StartLocationUpdate = (options: StartLocationUpdateOptions) => void;
+class StopLocationUpdateSuccess extends UTSObject {
+}
+type StopLocationUpdateSuccessCallback = (result: StopLocationUpdateSuccess) => void;
+type StopLocationUpdateFailCallback = (result: IGetLocationFail) => void;
+type StopLocationUpdateComplete = Object;
+type StopLocationUpdateCompleteCallback = (result: StopLocationUpdateComplete) => void;
+class StopLocationUpdateOptions extends UTSObject {
+    success: StopLocationUpdateSuccessCallback | null = null;
+    fail: StopLocationUpdateFailCallback | null = null;
+    complete: StopLocationUpdateCompleteCallback | null = null;
+}
+type StopLocationUpdate = (options: StopLocationUpdateOptions) => void;
+type OnLocationChangeResult = GetLocationSuccess;
+type OnLocationChangeCallback = (res: OnLocationChangeResult) => void;
+type OnLocationChange = (listener: OnLocationChangeCallback) => number;
+type OffLocationChange = (listener?: number | OnLocationChangeCallback | null) => void;
+type OnLocationChangeErrorCallback = (listener: IGetLocationFail) => void;
+type OnLocationChangeError = (listener: OnLocationChangeErrorCallback) => number;
+type OffLocationChangeError = (listener?: number | OnLocationChangeErrorCallback | null) => void;
+type StartLocationUpdateBackgroundSuccess = StartLocationUpdateSuccess;
+type StartLocationUpdateBackgroundSuccessCallback = (result: StartLocationUpdateBackgroundSuccess) => void;
+type StartLocationUpdateBackgroundFailCallback = (result: IGetLocationFail) => void;
+type StartLocationUpdateBackgroundComplete = Object;
+type StartLocationUpdateBackgroundCompleteCallback = (result: StartLocationUpdateBackgroundComplete) => void;
+type StartLocationUpdateBackgroundOptionsType = "wgs84" | "gcj02";
+class StartLocationUpdateBackgroundOptions extends UTSObject {
+    provider: string | null = null;
+    type: StartLocationUpdateBackgroundOptionsType | null = null;
+    success: StartLocationUpdateBackgroundSuccessCallback | null = null;
+    fail: StartLocationUpdateBackgroundFailCallback | null = null;
+    complete: StartLocationUpdateBackgroundCompleteCallback | null = null;
+}
+type StartLocationUpdateBackground = (options: StartLocationUpdateBackgroundOptions) => void;
+const LocationUniErrors: Map<LocationErrorCode, string> = new Map([
+    [
+        1505003,
+        'maybe not turn on the system location permission.'
+    ],
+    [
+        1505004,
+        'maybe not obtain GPS Permission.'
+    ],
+    [
+        1505600,
+        'location fail: timeout'
+    ],
+    [
+        1505601,
+        'system location support wgs84 only.'
+    ],
+    [
+        1505602,
+        'location fail: request error'
+    ],
+    [
+        1505603,
+        'The system failed to retrieve geocode for the location.'
+    ],
+    [
+        1505604,
+        'Failed to get provider.'
+    ],
+    [
+        1505700,
+        'system location not support geocode.'
+    ],
+    [
+        1505701,
+        'Provider is not find,Please ensure that the device location function is turned on'
+    ],
+    [
+        1505800,
+        'Unauthorized access to high-accuracy location services.'
+    ],
+    [
+        1505605,
+        'The Tencent api key is misconfigured.'
+    ],
+    [
+        1505607,
+        'GCJ-02 support only.'
+    ],
+    [
+        1505608,
+        "Only one provider can have continuous location updates enabled at a time."
+    ],
+    [
+        1505702,
+        'Missing background location configuration in iOS plist fileï¼šUIBackgroundModes->location '
+    ]
+]);
+class GetLocationFailImpl__1 extends UniError implements IGetLocationFail {
+    errCode: LocationErrorCode;
+    constructor(errCode: LocationErrorCode){
+        super();
+        this.errSubject = LocationUniErrorSubject;
+        this.errCode = errCode;
+        this.errMsg = UTS.mapGet(LocationUniErrors, errCode) ?? "";
+    }
+}
+interface UniLocationProvider extends UniProvider {
+    getLocation(options: GetLocationOptions): void;
+    startLocationUpdate(options: StartLocationUpdateOptions): void;
+    stopLocationUpdate(options: StopLocationUpdateOptions): void;
+    onLocationChange(listener: OnLocationChangeCallback): number;
+    startLocationUpdateBackground(options: StartLocationUpdateBackgroundOptions): void;
+    onLocationChangeError(listener: OnLocationChangeErrorCallback): number;
+}
+const API_GET_LOCATION = 'getLocation';
+const API_ON_LOCATION_CHANGE = 'onLocationChange';
+const API_OFF_LOCATION_CHANGE = 'offLocationChange';
+const API_ON_LOCATION_CHANGE_ERROR = 'onLocationChangeError';
+const API_OFF_LOCATION_CHANGE_ERROR = 'offLocationChangeError';
+const API_START_LOCATION_UPDATE_BACKGROUND = 'startLocationUpdateBackground';
+const API_STOP_LOCATION_UPDATE = 'stopLocationUpdate';
+const API_START_LOCATION_UPDATE = 'startLocationUpdate';
+const coordTypes: StartLocationUpdateOptionsType[] = [
+    'wgs84',
+    'gcj02'
+];
+const StartLocationUpdateApiProtocol = new Map<string, ProtocolOptions>([
+    [
+        'type',
+        {
+            type: 'string'
+        }
+    ]
+]);
+const StartLocationUpdateApiOptions: ApiOptions<StartLocationUpdateOptions> = {
+    formatArgs: new Map<string, Function>([
+        [
+            'type',
+            (value: StartLocationUpdateOptionsType, params: StartLocationUpdateOptions)=>{
+                value = (value || '').toLowerCase() as StartLocationUpdateOptionsType;
+                if (coordTypes.indexOf(value) === -1) {
+                    params.type = coordTypes[1];
+                } else {
+                    params.type = value;
+                }
+            }
+        ]
+    ])
+};
+interface ILocationEventEmitter<T = Object> {
+    on: (eventName: string, callback: Function) => void;
+    once: (eventName: string, callback: Function) => void;
+    off: (eventName: string, callback?: Function | null) => void;
+    emit: (eventName: string, ...args: (T | undefined | null)[]) => void;
+}
+const emitterStore = new Map<string, ILocationEventEmitter<Object>>();
+function getEmitter<T extends Object>(): ILocationEventEmitter<T> {
+    const mp = getCurrentMP();
+    const id = mp.appId as string;
+    if (emitterStore.has(id)) {
+        return UTS.mapGet(emitterStore, id) as ILocationEventEmitter<T>;
+    }
+    const emitter = new Emitter() as ILocationEventEmitter<Object>;
+    emitterStore.set(id, emitter);
+    mp.on('beforeClose', ()=>{
+        emitterStore.delete(id);
+    });
+    return emitter as ILocationEventEmitter<T>;
+}
+const OnLocationChangeCallbacks: OnLocationChangeCallback[] = [];
+const OnLocationChangeErrorCallbacks: OnLocationChangeErrorCallback[] = [];
+function removeCallback(name: string, callbacks: (OnLocationChangeErrorCallback | OnLocationChangeCallback)[], callback: number | OnLocationChangeCallback | OnLocationChangeErrorCallback | null = null) {
+    if (callback == null) {
+        getEmitter().off(name);
+        callbacks.length = 0;
+    } else if (typeof callback === 'number') {
+        const index = callbacks.findIndex((cb): boolean =>cb === callbacks[callback]);
+        if (index !== -1) {
+            getEmitter().off(name, callbacks[index]);
+            callbacks.splice(index, 1);
+        }
+    } else {
+        getEmitter().off(name, callback);
+        const index = callbacks.indexOf(callback);
+        if (index !== -1) {
+            callbacks.splice(index, 1);
+        }
+    }
+}
+const onLocationChange = defineSyncApi<number>(API_ON_LOCATION_CHANGE, (callback: OnLocationChangeCallback): number =>{
+    getEmitter().on(API_ON_LOCATION_CHANGE, callback);
+    return OnLocationChangeCallbacks.push(callback);
+});
+const offLocationChange = defineSyncApi<void>(API_OFF_LOCATION_CHANGE, (callback: number | OnLocationChangeCallback | null = null)=>{
+    removeCallback(API_ON_LOCATION_CHANGE, OnLocationChangeCallbacks, callback);
+});
+const onLocationChangeError = defineSyncApi<number>(API_ON_LOCATION_CHANGE_ERROR, (callback: OnLocationChangeErrorCallback): number =>{
+    getEmitter().on(API_ON_LOCATION_CHANGE_ERROR, callback);
+    return OnLocationChangeErrorCallbacks.push(callback);
+});
+const offLocationChangeError = defineSyncApi<void>(API_OFF_LOCATION_CHANGE_ERROR, (callback: number | OnLocationChangeErrorCallback | null = null)=>{
+    removeCallback(API_ON_LOCATION_CHANGE_ERROR, OnLocationChangeErrorCallbacks, callback);
+});
+const _onLocationChange: OnLocationChangeCallback = (res: GetLocationSuccess): void =>{
+    getEmitter<GetLocationSuccess>().emit(API_ON_LOCATION_CHANGE, res);
+};
+const _onLocationChangeError: OnLocationChangeErrorCallback = (err: IGetLocationFail)=>{
+    err = new GetLocationFailImpl__1(err.errCode);
+    err.errMsg = `onLocationChange:fail ${err.errMsg}`;
+    getEmitter<IGetLocationFail>().emit(API_ON_LOCATION_CHANGE_ERROR, err);
+};
+let locationProvider: UniLocationProvider | null = null;
+const getLocation: GetLocation = defineAsyncApi<GetLocationOptions, GetLocationSuccess>(API_GET_LOCATION, (options: GetLocationOptions, exec: ApiExecutor<GetLocationSuccess>): void =>{
+    const realProvider = options.provider || 'system';
+    locationProvider = getUniProvider<UniLocationProvider>('location', realProvider);
+    if (!locationProvider) {
+        const errMsg = UTS.mapGet(LocationUniErrors, 1505604) ?? "";
+        exec.reject(errMsg, {
+            errCode: 1505604
+        } as ApiError);
+        return;
+    }
+    locationProvider.getLocation({
+        type: options.type,
+        altitude: options.altitude,
+        geocode: options.geocode,
+        isHighAccuracy: options.isHighAccuracy,
+        highAccuracyExpireTime: options.highAccuracyExpireTime,
+        success: (result: GetLocationSuccess)=>{
+            exec.resolve(result);
+        },
+        fail: (error: IGetLocationFail)=>{
+            error = new GetLocationFailImpl__1(error.errCode);
+            const errMsg = `getLocation:fail ${error.errMsg}`;
+            exec.reject(errMsg, {
+                errCode: error.errCode
+            } as ApiError);
+        }
+    } as GetLocationOptions);
+}) as GetLocation;
+const startLocationUpdate: StartLocationUpdate = defineAsyncApi<StartLocationUpdateOptions, StartLocationUpdateSuccess>(API_START_LOCATION_UPDATE, (options, ref)=>{
+    let resolve = ref.resolve, reject = ref.reject;
+    const realProvider = options.provider || 'system';
+    locationProvider = getUniProvider<UniLocationProvider>('location', realProvider);
+    if (!locationProvider) {
+        const errMsg = UTS.mapGet(LocationUniErrors, 1505604) ?? "";
+        reject(errMsg, {
+            errCode: 1505604
+        } as ApiError);
+        return;
+    }
+    locationProvider.startLocationUpdate({
+        type: options.type,
+        success: (result: StartLocationUpdateSuccess)=>{
+            locationProvider?.onLocationChange(_onLocationChange);
+            locationProvider?.onLocationChangeError(_onLocationChangeError);
+            resolve(result);
+        },
+        fail: (error: IGetLocationFail)=>{
+            error = new GetLocationFailImpl__1(error.errCode);
+            const errMsg = `startLocationUpdate:fail ${error.errMsg}`;
+            reject(errMsg, error as ApiError);
+        }
+    } as StartLocationUpdateOptions);
+}, StartLocationUpdateApiProtocol, StartLocationUpdateApiOptions) as StartLocationUpdate;
+const startLocationUpdateBackground: StartLocationUpdateBackground = defineAsyncApi<StartLocationUpdateBackgroundOptions, StartLocationUpdateBackgroundSuccess>(API_START_LOCATION_UPDATE_BACKGROUND, (options, ref)=>{
+    let resolve = ref.resolve, reject = ref.reject;
+    const realProvider = options.provider || 'system';
+    locationProvider = getUniProvider<UniLocationProvider>('location', realProvider);
+    if (!locationProvider) {
+        const errMsg = UTS.mapGet(LocationUniErrors, 1505604) ?? "";
+        reject(errMsg, {
+            errCode: 1505604
+        } as ApiError);
+        return;
+    }
+    locationProvider.startLocationUpdateBackground({
+        type: options.type,
+        success: (result: StartLocationUpdateBackgroundSuccess)=>{
+            locationProvider?.onLocationChange(_onLocationChange);
+            locationProvider?.onLocationChangeError(_onLocationChangeError);
+            resolve(result);
+        },
+        fail: (error: IGetLocationFail)=>{
+            error = new GetLocationFailImpl__1(error.errCode);
+            const errMsg = `startLocationUpdateBackground:fail ${error.errMsg}`;
+            reject(errMsg, error as ApiError);
+        }
+    } as StartLocationUpdateBackgroundOptions);
+}) as StartLocationUpdateBackground;
+const stopLocationUpdate: StopLocationUpdate = defineAsyncApi<StopLocationUpdateOptions, StopLocationUpdateSuccess>(API_STOP_LOCATION_UPDATE, (_, ref)=>{
+    let resolve = ref.resolve, reject = ref.reject;
+    locationProvider?.stopLocationUpdate({
+        success: (result: StopLocationUpdateSuccess)=>{
+            resolve(result);
+        },
+        fail: (error: IGetLocationFail)=>{
+            error = new GetLocationFailImpl__1(error.errCode);
+            const errMsg = `stopLocationUpdate:fail ${error.errMsg}`;
+            reject(errMsg, error as ApiError);
+        }
+    } as StopLocationUpdateOptions);
+}) as StopLocationUpdate;
+export { UniLocationProvider as UniLocationProvider };
+export { GetLocation as GetLocation, GetLocationFail as GetLocationFail, GetLocationFailImpl as GetLocationFailImpl, GetLocationOptions as GetLocationOptions, GetLocationSuccess as GetLocationSuccess, IGetLocationFail as IGetLocationFail, LocationErrorCode as LocationErrorCode, OffLocationChange as OffLocationChange, OffLocationChangeError as OffLocationChangeError, OnLocationChange as OnLocationChange, OnLocationChangeCallback as OnLocationChangeCallback, OnLocationChangeError as OnLocationChangeError, OnLocationChangeErrorCallback as OnLocationChangeErrorCallback, OnLocationChangeResult as OnLocationChangeResult, StartLocationUpdate as StartLocationUpdate, StartLocationUpdateBackground as StartLocationUpdateBackground, StartLocationUpdateBackgroundOptions as StartLocationUpdateBackgroundOptions, StartLocationUpdateBackgroundOptionsType as StartLocationUpdateBackgroundOptionsType, StartLocationUpdateBackgroundSuccess as StartLocationUpdateBackgroundSuccess, StartLocationUpdateOptions as StartLocationUpdateOptions, StartLocationUpdateOptionsType as StartLocationUpdateOptionsType, StartLocationUpdateSuccess as StartLocationUpdateSuccess, StopLocationUpdate as StopLocationUpdate, StopLocationUpdateOptions as StopLocationUpdateOptions, StopLocationUpdateSuccess as StopLocationUpdateSuccess };
+export { onLocationChange as onLocationChange };
+export { offLocationChange as offLocationChange };
+export { onLocationChangeError as onLocationChangeError };
+export { offLocationChangeError as offLocationChangeError };
+export { getLocation as getLocation };
+export { startLocationUpdate as startLocationUpdate };
+export { startLocationUpdateBackground as startLocationUpdateBackground };
+export { stopLocationUpdate as stopLocationUpdate };
+ÀÔrD‘»@dcloudio/uni-app-frameworkÔrE—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework/index.etsAÃªoh-resolveÂ“ÔrF–§version¤fileªsourceRoot§sources¥names¨mappings¨index.js ‘©index.etsÜ<š”    ”  ”	  	”  ”  ”  ”    ”&  &”ÌC  ÌC”ÌD  ÌDÜ ”   ” ”	 ” ” ” "” $”! ,”# ÌX”0 Ìe”2 Ìg”Ì@ Ìu”ÌB Ì„”ÌP Ì’”ÌR Ì£”ÌX Ì©”Ìu ÌÆ”Ìv ÌÇ–”   ” ” ”   ”. .”/ /•”  
+ ” 
+” 
+”! 
+!”* 
+*‘” 
+ •” ” ” ” !” "’”  ” ‘” •”   ” ” ”! !”* *‘”  •” ” ” ” "” #•” ” ” %” )” *•” ” ” ” #” $•” ” ” ” "” #•” ”# ”& ,”* 0”+ 1•” ” ” %”" )”# *•” ” ” 1” 5” 6•”  ”  ”  +”  /”  0•” !” !” !3” !7” !8’” " ” "‘” "•”  # ” #”  #!”) #)”2 #2‘” $•”  * ” *”  *!”) *)”2 *2‘” * •” +” +” +” +"” +#•” ,” ,” ,2” ,6” ,7•” -” -” -9” -=” ->•” .” .” .3” .7” .8•” /” /” /;” /?” /Ì@’” 0 ” 0‘” 0•”  2 ” 2” 2 ”( 2(”1 21‘” 3•”  8 ” 8” 8 ”( 8(”1 81‘” 8 •” 9” 9” 98” 9<” 9=•” :” :” :2” :6” :7•” ;” ;” ;:” ;>” ;?’” < ” <‘” <•”  ÌK ” ÌK”* ÌK+”3 ÌK3”< ÌK<‘” ÌK •” ÌL” ÌL” ÌL” ÌL"” ÌL#•” ÌM” ÌM” ÌM<” ÌMÌ@” ÌMÌA•” ÌN” ÌN” ÌNÌC” ÌNÌG” ÌNÌH•” ÌO” ÌO” ÌO=” ÌOÌA” ÌOÌB•” ÌP” ÌP” ÌPÌE” ÌPÌI” ÌPÌJ’” ÌQ ” ÌQ‘” ÌQ—”  ÌS ” ÌS” ÌS” ÌS:” ÌS>”! ÌSÌA”" ÌSÌB‘” ÌT’” ÌU” ÌU’” ÌV”; ÌV;‘” ÌW‘” ÌX’” ÌY” ÌY’” ÌZ”* ÌZ*‘” Ì[‘” Ì\’” Ì]” Ì]’” Ì^”  Ì^ ‘” Ì_‘” Ì`’” Ìa” Ìa’” Ìb”- Ìb-‘” Ìc‘” Ìd’” Ìe” Ìe’” Ìf”& Ìf&‘” Ìg‘” Ìh’” Ìi” Ìi’” Ìj”ÌA ÌjÌA‘” Ìk‘” Ìl’” Ìm” Ìm’” Ìn”! Ìn!‘” Ìo‘” Ìp’” Ìq” Ìq’” Ìr”. Ìr.‘” Ìs‘” Ìt’” Ìu” Ìu’” Ìv”Ì[ ÌvÌ[‘” Ìw‘” Ìx’” Ìy” Ìy’” Ìz”ÌA ÌzÌA‘” Ì{‘” Ì|’” Ì}” Ì}’” Ì~”/ Ì~/‘” Ì‘” Ì€’” Ì” Ì’” Ì‚” Ì‚‘” Ìƒ‘” Ì„’” Ì…” Ì…’” Ì†”ÌS Ì†ÌS‘” Ì‡‘” Ìˆ’” Ì‰” Ì‰’” ÌŠ”Ìb ÌŠÌb‘” Ì‹“” ÌŒ” ÌŒ” ÌŒ•”  Ì ” Ì” Ì”% Ì%”- Ì-“” Ì” Ì” Ì*”” Ì” Ì” Ì” Ì—” Ì‘” Ì‘” Ì‘” Ì‘” Ì‘”1 Ì‘1”2 Ì‘2—” Ì’” Ì’” Ì’” Ì’” Ì’” Ì’” Ì’Ü ” Ì“” Ì“” Ì“” Ì“” Ì“” Ì“” Ì“”  Ì“ ”! Ì“!”2 Ì“2”4 Ì“4”; Ì“;”< Ì“<”Ì@ Ì“Ì@”ÌB Ì“ÌB”ÌC Ì“ÌC’” Ì”” Ì”‘” Ì•–”  Ì ” Ì” Ì” Ì”& Ì&”' Ì'–”  ÌŸ ” ÌŸ” ÌŸ” ÌŸ”1 ÌŸ1”2 ÌŸ2–”  Ì  ” Ì ” Ì ”  Ì  ”3 Ì 3”4 Ì 4–”  Ì¡ ” Ì¡”" Ì¡"”% Ì¡%”< Ì¡<”= Ì¡=–”  Ì¢ ” Ì¢”# Ì¢#”& Ì¢&”> Ì¢>”? Ì¢?–”  Ì£ ” Ì£”* Ì£*”- Ì£-”ÌL Ì£ÌL”ÌM Ì£ÌM–”  Ì¤ ” Ì¤” Ì¤”! Ì¤!”5 Ì¤5”6 Ì¤6–”  Ì¥ ” Ì¥” Ì¥”" Ì¥"”7 Ì¥7”8 Ì¥8””  Ì¦ ” Ì¦” Ì¦” Ì¦5’” Ì§” Ì§’” Ì¨” Ì¨’” Ì©” Ì©—”  Ìª ” Ìª”$ Ìª$”' Ìª'”+ Ìª+”. Ìª.”/ ÌªÌH‘” Ì«’” Ì¬” Ì¬‘” Ì­”” Ì®” Ì®” Ì®” Ì®‘”	 Ì¯	‘” Ì°“” Ì±” Ì±” Ì±””  Ì² ” Ì²”# Ì²#”& Ì²ÌN–” Ì³” Ì³” Ì³” Ì³” Ì³” Ì³*‘” Ì´’” Ìµ” Ìµ—” Ì¶” Ì¶” Ì¶2” Ì¶4” Ì¶ÌV” Ì¶ÌW” Ì¶ÌYœ” Ì·” Ì·” Ì·” Ì·” Ì·”" Ì·"”$ Ì·$”% Ì·%”& Ì·&”1 Ì·1”3 Ì·ÌU”4 Ì·ÌVœ” Ì¸” Ì¸” Ì¸” Ì¸”& Ì¸&”' Ì¸'”, Ì¸,”- Ì¸-”2 Ì¸2”3 Ì¸3”4 Ì¸4”6 Ì¸6š” Ì¹” Ì¹” Ì¹” Ì¹”" Ì¹"”, Ì¹,”- Ì¹-”. Ì¹.”/ Ì¹/”0 Ì¹0‘” Ìº‘” Ìº—” Ì»” Ì»” Ì»” Ì»”" Ì»"”' Ì»'”( Ì»(‘” Ì¼’” Ì½” Ì½‘”	 Ì¾	’” Ì¿” Ì¿’” ÌÀ” ÌÀ˜”  ÌÇ ” ÌÇ” ÌÇ” ÌÇ” ÌÇ” ÌÇ” ÌÇÌE” ÌÇÌF“”  ÌÈ ”	 ÌÈ	” ÌÈ—” ÌÉ”
+ ÌÉ
+” ÌÉ” ÌÉ” ÌÉ” ÌÉ” ÌÉ˜” ÌÊ”
+ ÌÊ
+” ÌÊ” ÌÊ” ÌÊ” ÌÊ” ÌÊ!” ÌÊ"™” ÌË” ÌË” ÌË” ÌË” ÌË” ÌË” ÌË” ÌË” ÌË›” ÌÌ” ÌÌ” ÌÌ” ÌÌ” ÌÌ” ÌÌ”& ÌÌ&”( ÌÌ(”* ÌÌ*”+ ÌÌÌG”, ÌÌÌH‘” ÌÍ˜” ÌÎ”
+ ÌÎ
+” ÌÎ” ÌÎ” ÌÎ” ÌÎ”! ÌÎÌB”" ÌÎÌCš” ÌÏ” ÌÏ” ÌÏ” ÌÏ” ÌÏ” ÌÏ” ÌÏ”  ÌÏ ”! ÌÏ!”" ÌÏ"™” ÌĞ” ÌĞ” ÌĞ”	 ÌĞ	”
+ ÌĞ
+” ÌĞ” ÌĞ” ÌĞ” ÌĞ˜” ÌÑ” ÌÑ” ÌÑ” ÌÑ” ÌÑ” ÌÑ” ÌÑ”  ÌÑ ”” ÌÒ” ÌÒ” ÌÒ” ÌÒ”” ÌÓ” ÌÓ” ÌÓ.” ÌÓ/’”  ÌÔ ” ÌÔ–”  ÌÕ ” ÌÕ” ÌÕ”" ÌÕ>”$ ÌÕÌ@”% ÌÕÌA–”  ÌÖ ” ÌÖ”$ ÌÖ$”' ÌÖÌH”) ÌÖÌJ”* ÌÖÌKš”  Ì× ”	 Ì×	” Ì×” Ì×” Ì×$” Ì×&”' Ì×Ìm”) Ì×Ìo”4 Ì×ÌÄ”8 Ì×ÌÈ–” ÌØ” ÌØ” ÌØ” ÌØ” ÌØ” ÌØ™” ÌÙ” ÌÙ” ÌÙ” ÌÙ” ÌÙ” ÌÙ” ÌÙ” ÌÙ” ÌÙ—” ÌÚ” ÌÚ” ÌÚ” ÌÚ” ÌÚ” ÌÚ” ÌÚ‘” ÌÛ—”	 ÌÛ” ÌÛ” ÌÛ” ÌÛ”! ÌÛ#”) ÌÛ+”+ ÌÛ-Ü ” ÌÜ” ÌÜ” ÌÜ” ÌÜ” ÌÜ”  ÌÜ ”) ÌÜ)”* ÌÜ*”+ ÌÜ+”- ÌÜ-”/ ÌÜ8”1 ÌÜ:”2 ÌÜ:”4 ÌÜ<”9 ÌÜÌA”ÌB ÌÜÌJ”ÌC ÌÜÌK”ÌK ÌÜÌS”ÌL ÌÜÌT”ÌM ÌÜÌU”ÌN ÌÜÌV—” Ìİ” Ìİ” Ìİ” Ìİ” Ìİ” Ìİ” Ìİ” ÌŞ” ÌŞ” ÌŞ” ÌŞ” ÌŞ” ÌŞ”! ÌŞ!”# ÌŞ#”, ÌŞ,”- ÌŞ-”2 ÌŞ2”3 ÌŞ3”4 ÌŞ4”5 ÌŞ5š” Ìß” Ìß” Ìß” Ìß” Ìß”" Ìß"”$ Ìß$”% Ìß%”& Ìß&”' Ìß'‘”	 Ìà	‘” Ìá‘”	 Ìá›” Ìâ” Ìâ” Ìâ” Ìâ” Ìâ” Ìâ” Ìâ” Ìâ”' Ìâ'”( Ìâ(”) Ìâ)›” Ìã” Ìã” Ìã” Ìã” Ìã”  Ìã ”' Ìã'”( Ìã(”0 Ìã0”1 Ìã1”2 Ìã2—” Ìä” Ìä” Ìä” Ìä” Ìä” Ìä” Ìäš” Ìå” Ìå” Ìå” Ìå” Ìå”" Ìå"”$ Ìå$”% Ìå%”& Ìå&”' Ìå'‘”	 Ìæ	‘” Ìç’”  Ìè ” Ìèœ”  Ìé ” Ìé” Ìé” Ìé”& Ìé&”' Ìé/”= ÌéÌE”? ÌéÌG”Ì@ ÌéÌH”ÌH ÌéÌj”ÌJ ÌéÌt”ÌL ÌéÌv›” Ìê” Ìê” Ìê” Ìê” Ìê” Ìê”* Ìê*”, Ìê,”4 Ìê4”5 Ìê5”6 Ìê6™” Ìë” Ìë”$ Ìë$”% Ìë%”) Ìë)”* Ìë*”2 Ìë2”3 Ìë3”4 Ìë4””  Ìì ” Ìì” Ìì” Ìì”  Ìí ” Ìí” Ìí” Ìí”' Ìí'”( Ìí.”? ÌíÌE”ÌA ÌíÌG”ÌB ÌíÌH”ÌM ÌíÌ}”ÌQ ÌíÌ”ÌS ÌíÌ‚”ÌU ÌíÌ„š” Ìî” Ìî” Ìî”) Ìî)”+ Ìî+”ÌD ÌîÌD”ÌF ÌîÌF”ÌN ÌîÌN”ÌO ÌîÌO”ÌP ÌîÌP””  Ìï ” Ìï” Ìï” Ìïœ”  Ìğ ” Ìğ” Ìğ” Ìğ”+ Ìğ+”, Ìğ4”ÌH ÌğÌP”ÌJ ÌğÌR”ÌK ÌğÌS”ÌS ÌğÌz”ÌU ÌğÌ„”ÌW ÌğÌ†›” Ìñ” Ìñ” Ìñ” Ìñ” Ìñ” Ìñ”0 Ìñ0”2 Ìñ2”: Ìñ:”; Ìñ;”< Ìñ<™” Ìò” Ìò”) Ìò)”* Ìò*”. Ìò.”/ Ìò/”7 Ìò7”8 Ìò8”9 Ìò9””  Ìó ” Ìó” Ìó” Ìó”  Ìô ” Ìô” Ìô” Ìô”, Ìô,”- Ìô3”ÌJ ÌôÌP”ÌL ÌôÌR”ÌM ÌôÌS”ÌX ÌôÌ”Ì\ ÌôÌ‘”Ì^ ÌôÌ’”Ì` ÌôÌ”š” Ìõ” Ìõ” Ìõ”/ Ìõ/”1 Ìõ1”ÌO ÌõÌO”ÌQ ÌõÌQ”ÌY ÌõÌY”ÌZ ÌõÌZ”Ì[ ÌõÌ[””  Ìö ” Ìö” Ìö” Ìö˜”  Ì÷ ” Ì÷” Ì÷” Ì÷4” Ì÷5” Ì÷ÌL”  Ì÷ÌT”" Ì÷ÌV›” Ìø” Ìø” Ìø$” Ìø%” Ìø)” Ìø*”, ÌøÌ@”. ÌøÌB”1 ÌøÌE”2 ÌøÌF”3 ÌøÌG“”  Ìù ” Ìù” Ìù˜”  Ìú ” Ìú” Ìú” Ìú>”  Ìú?”# ÌúÌT”% ÌúÌU”' ÌúÌW›” Ìû” Ìû”
+ Ìû
+” Ìû”$ Ìû$”% Ìû%”( Ìû(”) Ìû)”0 Ìû0”1 Ìû1”2 Ìû2›” Ìü” Ìü” Ìü” Ìü” Ìü”* Ìü*”- Ìü-”. Ìü.”4 Ìü4”6 Ìü6”7 Ìü7›” Ìı” Ìı” Ìı"” Ìı#” Ìı'” Ìı(”2 ÌıÌD”4 ÌıÌF”7 ÌıÌI”8 ÌıÌJ”9 ÌıÌK“”  Ìş ” Ìş” Ìş–”  Ìÿ ” Ìÿ” Ìÿ” Ìÿ3” Ìÿ7” Ìÿ8”  Í  ” Í ” Í ” Í !”" Í /”# Í ÌX”3 Í Ìh”5 Í Ìj”6 Í Ìk”= Í Ì†”? Í Ìˆ”ÌC Í Ì­”ÌE Í Ìµ”ÌG Í Ì·š” Í”
+ Í
+” Í” Í”  Í ”! Í!”) Í)”- Í-”5 Í5”6 Í6š” Í” Í” Í”% Í%”& Í;”0 ÍÌE”2 ÍÌG”> ÍÌS”? ÍÌT”Ì@ ÍÌU•” Í” Í”	 Í	” Í” ÍŸ” Í” Í” Í” Í” Í” Í”! Í!”" Í"”3 Í3”5 Í5”< Í<”= Í=”ÌA ÍÌA”ÌC ÍÌC”ÌD ÍÌD—” Í” Í” Í” Í” Í” Í” Í”” Í” Í” Í” Í“”	 Í”
+ Í” Í’” Í” Í‘” Í	•” Í
+” Í
+” Í
+”  Í
+ ”! Í
+!–” Í” Í” Í” Í” Í” Í–” Í” Í” Í” Í” Í”" Í"–” Í” Í” Í” Í” Í”  Í –” Í” Í” Í” Í”  Í ”. Í.–” Í” Í”  Í ”' Í'”( Í(”> Í>—” Í” Í” Í” Í” Í,” Í-” Í/˜” Í” Í” Í” Í” Í” Í”  Í ”! Í!’” Í”	 Í	—” Í” Í” Í” Í” Í&” Í'” Í)›” Í” Í” Í” Í”. Í.”/ Í/”4 Í4”5 Í5”< Í<”= Í=”> Í>š” Í” Í” Í” Í”/ Í/”4 Í4”5 Í5”; Í;”= Í=”> Í>—” Í” Í” Í” Í” Í” Í”  Í –” Í” Í” Í” Í” Í”& Í&“” Í” Í” Í’” Í”	 Í	“” Í” Í” Í””  Í ” Í” Í” Í”  Í ” Í” Í” Í1”* Í?”+ ÍÌx”ÌD ÍÌ‘”ÌF ÍÌ“”ÌG ÍÌ””ÌN ÍÌ›”ÌP ÍÌ”ÌS ÍÌ ”ÌU ÍÌ¡”ÌW ÍÌ£” Í” Í” Í” Í” Í” Í” Í” Í”% Í%”( Í(”+ Í+”, Í,”2 Í2”3 Í3š” Í”
+ Í
+” Í” Í”  Í ”! Í!”) Í)”- Í-”5 Í5”6 Í6š” Í” Í” Í”% Í%”& Í;”0 ÍÌE”2 ÍÌG”> ÍÌS”? ÍÌT”Ì@ ÍÌU•” Í ” Í ”	 Í 	” Í ” Í Ÿ” Í!” Í!” Í!” Í!” Í!” Í!”! Í!!”" Í!"”3 Í!3”5 Í!5”< Í!<”= Í!=”ÌA Í!ÌA”ÌC Í!ÌC”ÌD Í!ÌD•” Í"” Í"” Í"” Í"” Í"”” Í#” Í#” Í#” Í#“”	 Í$”
+ Í$” Í$’” Í%” Í%‘” Í&•” Í'” Í'” Í'”( Í'(”) Í')–” Í(” Í(” Í(” Í(” Í(” Í(—” Í)” Í)” Í)” Í)” Í)4” Í)5” Í)7˜” Í*” Í*” Í*”. Í*.”/ Í*/”Ì@ Í*Ì@”ÌA Í*ÌA”ÌB Í*ÌB˜” Í+” Í+” Í+”3 Í+3”4 Í+4”ÌJ Í+ÌJ”ÌK Í+ÌK”ÌL Í+ÌL–” Í,” Í,” Í,” Í,” Í,” Í,’” Í-”	 Í-	—” Í.” Í.” Í.” Í.” Í.&” Í.'” Í.)›” Í/” Í/” Í/” Í/”. Í/.”/ Í//”4 Í/4”5 Í/5”< Í/<”= Í/=”> Í/>š” Í0” Í0” Í0” Í0”7 Í07”< Í0<”= Í0=”ÌC Í0ÌC”ÌE Í0ÌE”ÌF Í0ÌF˜” Í1” Í1” Í1” Í1” Í1”  Í1,”! Í1-”" Í1.’” Í2”	 Í2	“” Í3#” Í3$” Í3%˜”  Í4 ” Í4” Í4”! Í4!”# Í4#”Ì@ Í4Ì@”ÌA Í4ÌX”ÌB Í4ÌY”  Í5 ” Í5”# Í5#”& Í5ÌE”4 Í5ÌS”5 Í5Ì ”ÌY Í5ÌÄ”Ì[ Í5ÌÆ”Ì\ Í5ÌÇ”Ìc Í5ÌÎ”Ìe Í5ÌĞ”Ìh Í5ÌÓ”Ìj Í5ÌÔ”Ìl Í5ÌÖ” Í6” Í6” Í6” Í6” Í6” Í6” Í6” Í6”% Í6%”( Í6(”+ Í6+”, Í6,”2 Í62”3 Í63š” Í7”
+ Í7
+” Í7” Í7”  Í7 ”! Í7!”) Í7)”- Í7-”5 Í75”6 Í76š” Í8” Í8” Í8”% Í8%”& Í8;”0 Í8ÌE”2 Í8ÌG”> Í8ÌS”? Í8ÌT”Ì@ Í8ÌU•” Í9” Í9”	 Í9	” Í9” Í9Ÿ” Í:” Í:” Í:” Í:” Í:” Í:”! Í:!”" Í:"”3 Í:3”5 Í:5”< Í:<”= Í:=”ÌA Í:ÌA”ÌC Í:ÌC”ÌD Í:ÌD•” Í;” Í;” Í;” Í;” Í;”” Í<” Í<” Í<” Í<“”	 Í=”
+ Í=” Í=’” Í>” Í>‘” Í?•” Í@” Í@” Í@”2 Í@2”3 Í@3–” ÍA” ÍA” ÍA” ÍA” ÍA” ÍA—” ÍB” ÍB” ÍB” ÍB” ÍB>” ÍB?” ÍBÌA˜” ÍC” ÍC” ÍC”. ÍC.”/ ÍC/”Ì@ ÍCÌ@”ÌA ÍCÌA”ÌB ÍCÌB˜” ÍD” ÍD” ÍD”3 ÍD3”4 ÍD4”ÌJ ÍDÌJ”ÌK ÍDÌK”ÌL ÍDÌL–” ÍE” ÍE” ÍE” ÍE” ÍE” ÍE’” ÍF”	 ÍF	—” ÍG” ÍG” ÍG” ÍG” ÍG&” ÍG'” ÍG)›” ÍH” ÍH” ÍH” ÍH”. ÍH.”/ ÍH/”4 ÍH4”5 ÍH5”< ÍH<”= ÍH=”> ÍH>š” ÍI” ÍI” ÍI” ÍI”ÌA ÍIÌA”ÌF ÍIÌF”ÌG ÍIÌG”ÌM ÍIÌM”ÌO ÍIÌO”ÌP ÍIÌP˜” ÍJ” ÍJ” ÍJ” ÍJ” ÍJ”  ÍJ,”! ÍJ-”" ÍJ.’” ÍK”	 ÍK	“” ÍL-” ÍL.” ÍL/””  ÍM ” ÍM” ÍM#” ÍM$”  ÍN ” ÍN” ÍN” ÍN/”) ÍN=”* ÍNÌt”ÌB ÍNÌŒ”ÌD ÍNÌ”ÌE ÍNÌ”ÌF ÍNÌ”ÌH ÍNÌ’”ÌK ÍNÌ•”ÌM ÍNÌ–”ÌO ÍNÌ˜” ÍO” ÍO” ÍO” ÍO” ÍO” ÍO” ÍO” ÍO”% ÍO%”( ÍO(”+ ÍO+”, ÍO,”2 ÍO2”3 ÍO3•” ÍP” ÍP” ÍP”( ÍP(”) ÍP)—” ÍQ” ÍQ” ÍQ” ÍQ” ÍQ3” ÍQ4” ÍQ6–” ÍR” ÍR” ÍR” ÍR” ÍR” ÍR’” ÍS”	 ÍS	—” ÍT” ÍT” ÍT” ÍT” ÍT&” ÍT'” ÍT)›” ÍU” ÍU” ÍU” ÍU”. ÍU.”/ ÍU/”4 ÍU4”5 ÍU5”< ÍU<”= ÍU=”> ÍU>š” ÍV” ÍV” ÍV” ÍV”6 ÍV6”; ÍV;”< ÍV<”ÌB ÍVÌB”ÌD ÍVÌD”ÌE ÍVÌE˜” ÍW” ÍW” ÍW” ÍW” ÍW”  ÍW,”! ÍW-”" ÍW.’” ÍX”	 ÍX	“” ÍY"” ÍY#” ÍY$””  ÍZ ” ÍZ” ÍZ” ÍZÜ  ”  Í\ ” Í\”	 Í\Ìu” Í\Ì‡” Í\Ì‹”1 Í\Ì”3 Í\ÌŸ”ÌE Í\Ì±”ÌI Í\Ìµ”Ì[ Í\ÌÇ”Ì] Í\ÍÛ”Ì Í\Íÿ”Ì… Í\Í”Ì© Í\Í'”Ì« Í\ÍÍ”ÌÅ Í\Íç”ÌÉ Í\Íë”Ìã Í\Í”Ìå Í\ÍI”Ìÿ Í\Íc”Í Í\Íg”Í Í\Í”Í Í\Í­”Í8 Í\ÍÆ”Í< Í\ÍÊ”ÍU Í\Íã”ÍW Í\Íå”Íp Í\Íş”Ít Í\Í”Í Í\Í”Í Í\Í”Í Í\Í˜”  Í] ” Í]”	 Í]	” Í]” Í]”- Í]-”/ Í]/”0 Í]0˜”  Í^ ” Í^”	 Í^	” Í^” Í^”/ Í^/”1 Í^1”2 Í^2˜”  Í_ ” Í_”	 Í_	” Í_”" Í_"”7 Í_7”9 Í_9”: Í_:˜”  Í` ” Í`”	 Í`	” Í`”# Í`#”9 Í`9”; Í`;”< Í`<˜”  Ía ” Ía”	 Ía	” Ía” Ía”# Ía#”% Ía%”& Ía&˜”  Íb ” Íb”	 Íb	” Íb”  Íb ”3 Íb3”5 Íb5”6 Íb6˜”  Íc ” Íc”	 Íc	”& Íc&”* Íc*”ÌG ÍcÌG”ÌI ÍcÌI”ÌJ ÍcÌJ˜”  Íd ” Íd”	 Íd	” Íd” Íd”1 Íd1”3 Íd3”4 Íd4ÔrG–§version¤file§sources®sourcesContent¥names¨mappingsÀ‘À‘ÀÜ=‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘”  ÌÙ ‘”  ÌÚ ‘”  ÌÛ ‘”  ÌÜ ‘”  Ìİ ‘”  ÌŞ ‘”  Ìß ‘”  Ìà ‘”  Ìá ‘”  Ìâ ‘”  Ìã ‘”  Ìä ‘”  Ìå ‘”  Ìæ ‘”  Ìç ‘”  Ìè ‘”  Ìé ‘”  Ìê ‘”  Ìë ‘”  Ìì ‘”  Ìí ‘”  Ìî ‘”  Ìï ‘”  Ìğ ‘”  Ìñ ‘”  Ìò ‘”  Ìó ‘”  Ìô ‘”  Ìõ ‘”  Ìö ‘”  Ì÷ ‘”  Ìø ‘”  Ìù ‘”  Ìú ‘”  Ìû ‘”  Ìü ‘”  Ìı ‘”  Ìş ‘”  Ìÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache™ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ''Í(·À—ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍ'0Í'XÔrL”¤type¥start£end¤nameªIdentifierÍ'0Í'B²GetLocationOptionsLªIdentifierÍ'FÍ'X²GetLocationOptionsK¯ExportSpecifierÍ'ZÍ'‚LªIdentifierÍ'ZÍ'l²GetLocationSuccessLªIdentifierÍ'pÍ'‚²GetLocationSuccessK¯ExportSpecifierÍ'„Í'ĞLªIdentifierÍ'„Í'¨Ù$StartLocationUpdateBackgroundOptionsLªIdentifierÍ'¬Í'ĞÙ$StartLocationUpdateBackgroundOptionsK¯ExportSpecifierÍ'ÒÍ(
+LªIdentifierÍ'ÒÍ'ìºStartLocationUpdateOptionsLªIdentifierÍ'ğÍ(
+ºStartLocationUpdateOptionsK¯ExportSpecifierÍ(Í(DLªIdentifierÍ(Í(&ºStartLocationUpdateSuccessLªIdentifierÍ(*Í(DºStartLocationUpdateSuccessK¯ExportSpecifierÍ(FÍ(|LªIdentifierÍ(FÍ(_¹StopLocationUpdateOptionsLªIdentifierÍ(cÍ(|¹StopLocationUpdateOptionsK¯ExportSpecifierÍ(~Í(´LªIdentifierÍ(~Í(—¹StopLocationUpdateSuccessLªIdentifierÍ(›Í(´¹StopLocationUpdateSuccessÀJ¶ExportNamedDeclarationÍ(¹Í(éÀ‘K¯ExportSpecifierÍ(ÂÍ(æLªIdentifierÍ(ÂÍ(Ò°onLocationChangeLªIdentifierÍ(ÖÍ(æ°onLocationChangeÀJ¶ExportNamedDeclarationÍ(ëÍ)À‘K¯ExportSpecifierÍ(ôÍ)LªIdentifierÍ(ôÍ)±offLocationChangeLªIdentifierÍ)	Í)±offLocationChangeÀJ¶ExportNamedDeclarationÍ)Í)YÀ‘K¯ExportSpecifierÍ)(Í)VLªIdentifierÍ)(Í)=µonLocationChangeErrorLªIdentifierÍ)AÍ)VµonLocationChangeErrorÀJ¶ExportNamedDeclarationÍ)[Í)—À‘K¯ExportSpecifierÍ)dÍ)”LªIdentifierÍ)dÍ)z¶offLocationChangeErrorLªIdentifierÍ)~Í)”¶offLocationChangeErrorÀJ¶ExportNamedDeclarationÍ)™Í)¿À‘K¯ExportSpecifierÍ)¢Í)¼LªIdentifierÍ)¢Í)­«getLocationLªIdentifierÍ)±Í)¼«getLocationÀJ¶ExportNamedDeclarationÍ)ÁÍ)÷À‘K¯ExportSpecifierÍ)ÊÍ)ôLªIdentifierÍ)ÊÍ)İ³startLocationUpdateLªIdentifierÍ)áÍ)ô³startLocationUpdateÀJ¶ExportNamedDeclarationÍ)ùÍ*CÀ‘K¯ExportSpecifierÍ*Í*@LªIdentifierÍ*Í*½startLocationUpdateBackgroundLªIdentifierÍ*#Í*@½startLocationUpdateBackgroundÀJ¶ExportNamedDeclarationÍ*EÍ*yÀ‘K¯ExportSpecifierÍ*NÍ*vLªIdentifierÍ*NÍ*`²stopLocationUpdateLªIdentifierÍ*dÍ*v²stopLocationUpdateÀ’ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration ÌD’ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	§EmitterLªIdentifier	§EmitterN¯ImportSpecifierLªIdentifier¬getCurrentMPLªIdentifier¬getCurrentMPÔrO•¤type¥start£end¥value£raw§Literal&ÌC»@dcloudio/uni-app-framework½"@dcloudio/uni-app-framework"M±ImportDeclarationÌFÌ¼–N¯ImportSpecifierÌOÌXLªIdentifierÌOÌX©UTSObjectLªIdentifierÌOÌX©UTSObjectN¯ImportSpecifierÌZÌ]LªIdentifierÌZÌ]£UTSLªIdentifierÌZÌ]£UTSN¯ImportSpecifierÌ_ÌgLªIdentifierÌ_Ìg¨UniErrorLªIdentifierÌ_Ìg¨UniErrorN¯ImportSpecifierÌiÌvLªIdentifierÌiÌv­defineSyncApiLªIdentifierÌiÌv­defineSyncApiN¯ImportSpecifierÌxÌ†LªIdentifierÌxÌ†®defineAsyncApiLªIdentifierÌxÌ†®defineAsyncApiN¯ImportSpecifierÌˆÌ–LªIdentifierÌˆÌ–®getUniProviderLªIdentifierÌˆÌ–®getUniProviderO§LiteralÌÌ»»@dcloudio/uni-app-framework½"@dcloudio/uni-app-framework"

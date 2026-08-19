@@ -4,15 +4,14 @@ import { p as pinia } from "./assets/src/store/index.js";
 import { i as i18n } from "./assets/src/i18n/index.js";
 import { u as ultraUI } from "./assets/uni_modules/uview-ultra/index.js";
 import { i as installRouteInterceptor } from "./assets/src/router/interceptor.js";
-import "./assets/plugin-vue-export-helper.js";
-import "./assets/uni_modules/x-pinia-s/instans/types.js";
-import "./assets/uni_modules/x-pinia-s/instans/subscriptions.js";
-import "./assets/uni_modules/x-pinia-s/instans/createPinia.js";
-import "./assets/uni_modules/x-pinia-s/instans/rootState.js";
-import "./assets/uni_modules/x-pinia-s/instans/persist.js";
 import "./assets/src/store/app.js";
+import "./assets/uni_modules/x-pinia-s/instans/types.js";
 import "./assets/uni_modules/x-pinia-s/instans/storeBase.js";
+import "./assets/uni_modules/x-pinia-s/instans/subscriptions.js";
 import "./assets/uni_modules/x-pinia-s/instans/defineStore.js";
+import "./assets/uni_modules/x-pinia-s/instans/rootState.js";
+import "./assets/uni_modules/x-pinia-s/instans/createPinia.js";
+import "./assets/uni_modules/x-pinia-s/instans/persist.js";
 import "./assets/src/tabbar/store.js";
 import "./assets/src/tabbar/types.js";
 import "./assets/src/tabbar/config.js";
@@ -26,6 +25,9 @@ import "./assets/uni_modules/uview-ultra/libs/i18n/locales/de.js";
 import "./assets/uni_modules/uview-ultra/libs/i18n/locales/ko.js";
 import "./assets/uni_modules/uview-ultra/libs/i18n/locales/ja.js";
 import "./assets/uni_modules/uview-ultra/libs/i18n/locales/ru.js";
+import "./assets/src/utils/theme.js";
+import "./assets/theme.js";
+import "./assets/plugin-vue-export-helper.js";
 import "./assets/src/store/token.js";
 import "./assets/src/store/user.js";
 import "./assets/uni_modules/lime-i18n/common/index.js";
@@ -581,7 +583,7 @@ function isConsoleWritable() {
 }
 const UNI_CONSOLE_RUNTIME_PROMISE = "__uni_console_runtime_promise__";
 function initRuntimeSocketService() {
-  const hosts = "127.0.0.1,192.168.100.133,198.18.0.1,10.8.0.15";
+  const hosts = "127.0.0.1,192.168.100.133,198.18.0.1,10.8.0.5";
   const port = "8090";
   const id = "app-harmony_YEADDZ";
   const runtimeGlobal = getRuntimeGlobal();
@@ -683,6 +685,7 @@ function getMiniProgramGlobal() {
   }
 }
 initRuntimeSocketService();
+enableStyleIsolation();
 const __global__ = typeof globalThis === "undefined" ? Function("return this")() : globalThis;
 __global__.__uniX = true;
 const { createSSRApp } = globalThis.Vue;

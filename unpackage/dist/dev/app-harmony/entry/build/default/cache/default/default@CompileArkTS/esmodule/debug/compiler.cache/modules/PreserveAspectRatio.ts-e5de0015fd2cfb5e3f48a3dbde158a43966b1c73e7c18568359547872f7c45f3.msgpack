@@ -1,0 +1,305 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚê/**
+ * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import LogUtil from './LogUtil';
+import { TextScanner } from './utils/TextScanner';
+export var Alignment;
+(function (Alignment) {
+    Alignment["none"] = "none";
+    Alignment["xMinYMin"] = "xMinYMin";
+    Alignment["xMidYMin"] = "xMidYMin";
+    Alignment["xMaxYMin"] = "xMaxYMin";
+    Alignment["xMinYMid"] = "xMinYMid";
+    Alignment["xMidYMid"] = "xMidYMid";
+    Alignment["xMaxYMid"] = "xMaxYMid";
+    Alignment["xMinYMax"] = "xMinYMax";
+    Alignment["xMidYMax"] = "xMidYMax";
+    Alignment["xMaxYMax"] = "xMaxYMax";
+})(Alignment || (Alignment = {}));
+export var Scale;
+(function (Scale) {
+    Scale["meet"] = "meet";
+    Scale["slice"] = "slice";
+})(Scale || (Scale = {}));
+export class PreserveAspectRatio {
+    //
+    constructor(alignment, scale) {
+        this.alignment = alignment;
+        this.scale = scale;
+    }
+    static init() {
+        this.aspectRatioKeywords.set("none", Alignment.none);
+        this.aspectRatioKeywords.set("xMinYMin", Alignment.xMinYMin);
+        this.aspectRatioKeywords.set("xMidYMin", Alignment.xMidYMin);
+        this.aspectRatioKeywords.set("xMaxYMin", Alignment.xMaxYMin);
+        this.aspectRatioKeywords.set("xMinYMid", Alignment.xMinYMid);
+        this.aspectRatioKeywords.set("xMidYMid", Alignment.xMidYMid);
+        this.aspectRatioKeywords.set("xMaxYMid", Alignment.xMaxYMid);
+        this.aspectRatioKeywords.set("xMinYMax", Alignment.xMinYMax);
+        this.aspectRatioKeywords.set("xMidYMax", Alignment.xMidYMax);
+        this.aspectRatioKeywords.set("xMaxYMax", Alignment.xMaxYMax);
+    }
+    //
+    static of(value) {
+        return this.parsePreserveAspectRatio(value);
+    }
+    getAlignment() {
+        return this.alignment;
+    }
+    getScale() {
+        return this.scale;
+    }
+    static parsePreserveAspectRatio(val) {
+        var scan = new TextScanner(val);
+        scan.skipWhitespace();
+        let word = scan.nextToken();
+        if ("defer" == word) {
+            scan.skipWhitespace();
+            word = scan.nextToken();
+        }
+        PreserveAspectRatio.init();
+        let align = PreserveAspectRatio.aspectRatioKeywords.get(word);
+        let scale = null;
+        scan.skipWhitespace();
+        if (!scan.empty()) {
+            let meetOrSlice = scan.nextToken();
+            switch (meetOrSlice) {
+                case "meet":
+                    scale = Scale.meet;
+                    break;
+                case "slice":
+                    scale = Scale.slice;
+                    break;
+                default:
+                    LogUtil.error("Invalid preserveAspectRatio definition: " + val);
+                    throw new Error("Invalid preserveAspectRatio definition: " + val);
+            }
+        }
+        return new PreserveAspectRatio(align, scale);
+    }
+}
+PreserveAspectRatio.aspectRatioKeywords = new Map();
+PreserveAspectRatio.UNSCALED = new PreserveAspectRatio(null, null);
+PreserveAspectRatio.STRETCH = new PreserveAspectRatio(Alignment.none, null);
+PreserveAspectRatio.LETTERBOX = new PreserveAspectRatio(Alignment.xMidYMid, Scale.meet);
+PreserveAspectRatio.START = new PreserveAspectRatio(Alignment.xMinYMin, Scale.meet);
+PreserveAspectRatio.END = new PreserveAspectRatio(Alignment.xMaxYMax, Scale.meet);
+PreserveAspectRatio.TOP = new PreserveAspectRatio(Alignment.xMidYMin, Scale.meet);
+PreserveAspectRatio.BOTTOM = new PreserveAspectRatio(Alignment.xMidYMax, Scale.meet);
+PreserveAspectRatio.FULLSCREEN = new PreserveAspectRatio(Alignment.xMidYMid, Scale.slice);
+PreserveAspectRatio.FULLSCREEN_START = new PreserveAspectRatio(Alignment.xMinYMin, Scale.slice);
+//# sourceMappingURL=PreserveAspectRatio.js.mapÂ’Ù¥/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@ohos+svg@2.2.3/oh_modules/@ohos/svg/src/main/ets/components/LogUtil.tsÙ¯/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@ohos+svg@2.2.3/oh_modules/@ohos/svg/src/main/ets/components/utils/TextScanner.tsÙ±/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@ohos+svg@2.2.3/oh_modules/@ohos/svg/src/main/ets/components/PreserveAspectRatio.tsÔrB˜±isLocalDependency¯isNodeEntryFile§pkgPath§pkgNameªpkgVersion±belongProjectPath±dependencyPkgInfo¬shouldEmitJsÂÂÙ‚/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@ohos+svg@2.2.3/oh_modules/@ohos/svg©@ohos/svg¥2.2.3ÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmonyÔrC’§pkgNameªpkgVersion©@ohos/svg¥2.2.3ÃÃÚ|/**
+ * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import LogUtil from './LogUtil';
+import { TextScanner } from './utils/TextScanner';
+
+
+export enum Alignment {
+  none = 'none',
+  xMinYMin = 'xMinYMin',
+  xMidYMin = 'xMidYMin',
+  xMaxYMin = 'xMaxYMin',
+  xMinYMid = 'xMinYMid',
+  xMidYMid = 'xMidYMid',
+  xMaxYMid = 'xMaxYMid',
+  xMinYMax = 'xMinYMax',
+  xMidYMax = 'xMidYMax',
+  xMaxYMax = 'xMaxYMax'
+}
+
+export enum Scale {
+  meet = 'meet',
+  slice = 'slice'
+}
+
+export class PreserveAspectRatio {
+  alignment: Alignment
+  scale: any
+  static aspectRatioKeywords = new Map<string, Alignment>();
+  //
+  constructor(alignment?: Alignment, scale?: any) {
+    this.alignment = alignment;
+    this.scale = scale;
+  }
+
+  private static init() {
+    this.aspectRatioKeywords.set("none", Alignment.none);
+    this.aspectRatioKeywords.set("xMinYMin", Alignment.xMinYMin);
+    this.aspectRatioKeywords.set("xMidYMin", Alignment.xMidYMin);
+    this.aspectRatioKeywords.set("xMaxYMin", Alignment.xMaxYMin);
+    this.aspectRatioKeywords.set("xMinYMid", Alignment.xMinYMid);
+    this.aspectRatioKeywords.set("xMidYMid", Alignment.xMidYMid);
+    this.aspectRatioKeywords.set("xMaxYMid", Alignment.xMaxYMid);
+    this.aspectRatioKeywords.set("xMinYMax", Alignment.xMinYMax);
+    this.aspectRatioKeywords.set("xMidYMax", Alignment.xMidYMax);
+    this.aspectRatioKeywords.set("xMaxYMax", Alignment.xMaxYMax);
+  }
+
+  static UNSCALED: PreserveAspectRatio = new PreserveAspectRatio(null, null);
+  static STRETCH: PreserveAspectRatio = new PreserveAspectRatio(Alignment.none, null);
+  static LETTERBOX: PreserveAspectRatio = new PreserveAspectRatio(Alignment.xMidYMid, Scale.meet);
+  static START: PreserveAspectRatio = new PreserveAspectRatio(Alignment.xMinYMin, Scale.meet);
+  static END: PreserveAspectRatio = new PreserveAspectRatio(Alignment.xMaxYMax, Scale.meet);
+  static TOP: PreserveAspectRatio = new PreserveAspectRatio(Alignment.xMidYMin, Scale.meet);
+  static BOTTOM: PreserveAspectRatio = new PreserveAspectRatio(Alignment.xMidYMax, Scale.meet);
+  static FULLSCREEN: PreserveAspectRatio = new PreserveAspectRatio(Alignment.xMidYMid, Scale.slice);
+  static FULLSCREEN_START: PreserveAspectRatio = new PreserveAspectRatio(Alignment.xMinYMin, Scale.slice);
+  //
+  static of(value: string): PreserveAspectRatio {
+    return this.parsePreserveAspectRatio(value);
+  }
+
+  getAlignment(): Alignment {
+    return this.alignment;
+  }
+
+  public getScale(): Scale {
+    return this.scale;
+  }
+
+  static parsePreserveAspectRatio(val: string): PreserveAspectRatio {
+    var scan: TextScanner = new TextScanner(val);
+    scan.skipWhitespace();
+
+    let word: string = scan.nextToken();
+    if ("defer" == word) {
+      scan.skipWhitespace();
+      word = scan.nextToken();
+    }
+
+    PreserveAspectRatio.init()
+    let align: Alignment = PreserveAspectRatio.aspectRatioKeywords.get(word);
+    let scale: Scale = null;
+
+    scan.skipWhitespace();
+
+    if (!scan.empty()) {
+      let meetOrSlice: string = scan.nextToken();
+      switch (meetOrSlice) {
+        case "meet":
+          scale = Scale.meet;
+          break;
+        case "slice":
+          scale = Scale.slice;
+          break;
+        default:
+          LogUtil.error("Invalid preserveAspectRatio definition: " + val);
+          throw new Error("Invalid preserveAspectRatio definition: " + val);
+      }
+    }
+    return new PreserveAspectRatio(align, scale);
+  }
+}
+
+ÀÔrD’©./LogUtil³./utils/TextScannerÔrE—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙ¥/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@ohos+svg@2.2.3/oh_modules/@ohos/svg/src/main/ets/components/LogUtil.tsAÃªoh-resolveÂEAÂÙ¯/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@ohos+svg@2.2.3/oh_modules/@ohos/svg/src/main/ets/components/utils/TextScanner.tsAÃªoh-resolveÂ“ÔrF–§version¤fileªsourceRoot§sources¥names¨mappings¶PreserveAspectRatio.js ‘¶PreserveAspectRatio.tsÜ e‘”    ‘” –”   ” ” ” ” ”   ˜”   ” ”	 	” ” ” ”1 1”2 2•”   ” ”  ” ” “”   ” ” “” ” ” “” ”& ”' “” ”& ”' “” ”& ”' “” ”& ”' “” ”& ”' “” ”& ”' “” ”& ”' “” ”& ”' “” ”& ”' —”   ” ” ” ” ” ”" •”    ”  ”   ”  ” #“”    ”  ”  “” !” !” !“” "” "” "—”  # ” #”  ”  ”  ”  ” #””  % ” %” %”  % ’” )” )•” *” *” *#” *%”  *0—” +” +” +	” +” +”" +”# +—” ,” ,” ,	” ,” ,” ,” ,’” -” -”” /
+”
+ /” /” /” 0” 0” 0	”  0”! 0”$ 0 ”% 0!”+ 0'”- 0)”6 02”7 03”; 07”< 08”= 09” 1” 1” 1	”  1”! 1”$ 1 ”% 1!”/ 1+”1 1-”: 16”; 17”ÌC 1?”ÌD 1Ì@”ÌE 1ÌA” 2” 2” 2	”  2”! 2”$ 2 ”% 2!”/ 2+”1 2-”: 26”; 27”ÌC 2?”ÌD 2Ì@”ÌE 2ÌA” 3” 3” 3	”  3”! 3”$ 3 ”% 3!”/ 3+”1 3-”: 36”; 37”ÌC 3?”ÌD 3Ì@”ÌE 3ÌA” 4” 4” 4	”  4”! 4”$ 4 ”% 4!”/ 4+”1 4-”: 46”; 47”ÌC 4?”ÌD 4Ì@”ÌE 4ÌA” 5” 5” 5	”  5”! 5”$ 5 ”% 5!”/ 5+”1 5-”: 56”; 57”ÌC 5?”ÌD 5Ì@”ÌE 5ÌA” 6” 6” 6	”  6”! 6”$ 6 ”% 6!”/ 6+”1 6-”: 66”; 67”ÌC 6?”ÌD 6Ì@”ÌE 6ÌA” 7” 7” 7	”  7”! 7”$ 7 ”% 7!”/ 7+”1 7-”: 76”; 77”ÌC 7?”ÌD 7Ì@”ÌE 7ÌA” 8” 8” 8	”  8”! 8”$ 8 ”% 8!”/ 8+”1 8-”: 86”; 87”ÌC 8?”ÌD 8Ì@”ÌE 8ÌA” 9” 9” 9	”  9”! 9”$ 9 ”% 9!”/ 9+”1 9-”: 96”; 97”ÌC 9?”ÌD 9Ì@”ÌE 9ÌA’” :” :’” ÌE” ÌE–” ÌF”
+ ÌF” ÌF	” ÌF” ÌF” ÌF™” ÌG” ÌG” ÌG” ÌG”, ÌG(”- ÌG)”2 ÌG.”3 ÌG/”4 ÌG0’” ÌH” ÌH’” ÌJ” ÌJ–” ÌK” ÌK” ÌK” ÌK” ÌK” ÌK’” ÌL” ÌL’” ÌN	” ÌN–” ÌO” ÌO” ÌO” ÌO” ÌO” ÌO’” ÌP” ÌP–” ÌR”
+ ÌR” ÌR	”# ÌR!”$ ÌR"”' ÌR-š” ÌS” ÌS” ÌS” ÌS” ÌS ”" ÌS+”# ÌS,”& ÌS/”' ÌS0”( ÌS1–” ÌT” ÌT” ÌT	” ÌT” ÌT” ÌT™” ÌV” ÌV” ÌV” ÌV” ÌV” ÌV”! ÌV%”# ÌV'”$ ÌV(–” ÌW” ÌW” ÌW” ÌW” ÌW” ÌW–” ÌX” ÌX
+” ÌX” ÌX”! ÌX”" ÌX˜” ÌY” ÌY
+” ÌY” ÌY” ÌY”! ÌY”# ÌY”$ ÌY‘”	 ÌZ–” Ì\” Ì\” Ì\”  Ì\”" Ì\”# Ì\” Ì]” Ì]” Ì]” Ì]”' Ì].”( Ì]/”; Ì]ÌB”< Ì]ÌC”? Ì]ÌF”Ì@ Ì]ÌG”ÌD Ì]ÌK”ÌE Ì]ÌL”ÌF Ì]ÌM–” Ì^” Ì^” Ì^” Ì^” Ì^” Ì^–” Ì`” Ì`” Ì`	” Ì`” Ì`” Ì`˜” Ìb” Ìb” Ìb	” Ìb” Ìb” Ìb” Ìb” Ìb™” Ìc” Ìc
+” Ìc” Ìc ”" Ìc$”# Ìc%”, Ìc.”. Ìc0”/ Ìc1”” Ìd” Ìd” Ìd”! Ìd“” Ìe” Ìe” Ìe—” Ìf
+” Ìf” Ìf”! Ìf”" Ìf”& Ìf”' Ìf’” Ìg
+” Ìg“” Ìh” Ìh” Ìh—” Ìi
+” Ìi” Ìi”! Ìi”" Ìi”' Ìi”( Ìi’” Ìj
+” Ìj‘” Ìkš” Ìl
+” Ìl” Ìl”! Ìl”" Ìl”ÌL ÌlÌB”ÌO ÌlÌE”ÌR ÌlÌH”ÌS ÌlÌI”ÌT ÌlÌJš” Ìm
+” Ìm” Ìm”# Ìm”$ Ìm”ÌN ÌmÌD”ÌQ ÌmÌG”ÌT ÌmÌJ”ÌU ÌmÌK”ÌV ÌmÌL‘” Ìn‘”	 Ìoš” Ìp” Ìp” Ìp”& Ìp"”' Ìp#”, Ìp(”. Ìp*”3 Ìp/”4 Ìp0”5 Ìp1’” Ìq” Ìq—”  (	”' (”* (”. (#”1 (&”3 (;”4 (<›”  <	” <” <)”# <-”6 <Ì@”7 <ÌA”; <ÌE”= <ÌG”ÌA <ÌK”ÌB <ÌL”ÌC <ÌM”  =	” =” =(”" =,”5 =?”6 =Ì@”? =ÌI”Ì@ =ÌJ”ÌD =ÌN”ÌF =ÌP”ÌJ =ÌT”ÌK =ÌU”ÌL =ÌVŸ”  >	” >”  >*”$ >.”7 >ÌA”8 >ÌB”ÌA >ÌK”ÌB >ÌL”ÌJ >ÌT”ÌL >ÌV”ÌQ >Ì[”ÌR >Ì\”ÌV >Ì`”ÌW >Ìa”ÌX >ÌbŸ”  ?	” ?” ?&”  ?*”3 ?=”4 ?>”= ?ÌG”> ?ÌH”ÌF ?ÌP”ÌH ?ÌR”ÌM ?ÌW”ÌN ?ÌX”ÌR ?Ì\”ÌS ?Ì]”ÌT ?Ì^Ÿ”  Ì@	” Ì@” Ì@$” Ì@(”1 Ì@;”2 Ì@<”; Ì@ÌE”< Ì@ÌF”ÌD Ì@ÌN”ÌF Ì@ÌP”ÌK Ì@ÌU”ÌL Ì@ÌV”ÌP Ì@ÌZ”ÌQ Ì@Ì[”ÌR Ì@Ì\Ÿ”  ÌA	” ÌA” ÌA$” ÌA(”1 ÌA;”2 ÌA<”; ÌAÌE”< ÌAÌF”ÌD ÌAÌN”ÌF ÌAÌP”ÌK ÌAÌU”ÌL ÌAÌV”ÌP ÌAÌZ”ÌQ ÌAÌ[”ÌR ÌAÌ\Ÿ”  ÌB	” ÌB” ÌB'”! ÌB+”4 ÌB>”5 ÌB?”> ÌBÌH”? ÌBÌI”ÌG ÌBÌQ”ÌI ÌBÌS”ÌN ÌBÌX”ÌO ÌBÌY”ÌS ÌBÌ]”ÌT ÌBÌ^”ÌU ÌBÌ_Ÿ”  ÌC	” ÌC”! ÌC+”% ÌC/”8 ÌCÌB”9 ÌCÌC”ÌB ÌCÌL”ÌC ÌCÌM”ÌK ÌCÌU”ÌM ÌCÌW”ÌR ÌCÌ\”ÌS ÌCÌ]”ÌX ÌCÌb”ÌY ÌCÌc”ÌZ ÌCÌdŸ”  ÌD	”$ ÌD”' ÌD1”+ ÌD5”> ÌDÌH”? ÌDÌI”ÌH ÌDÌR”ÌI ÌDÌS”ÌQ ÌDÌ[”ÌS ÌDÌ]”ÌX ÌDÌb”ÌY ÌDÌc”Ì^ ÌDÌh”Ì_ ÌDÌi”Ì` ÌDÌjÔrG–§version¤file§sources®sourcesContent¥names¨mappingsÀ‘À‘ÀÜ f‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache“ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍÅÍÚÔrK•¤type¥start£end¬declarations¤kind³VariableDeclarationÍÌÍÚ‘ÔrL•¤type¥start£end¢id¤init²VariableDeclaratorÍĞÍÙÔrM”¤type¥start£end¤nameªIdentifierÍĞÍÙ©AlignmentÀ£varÀJ¶ExportNamedDeclarationÍ«Í¼K³VariableDeclarationÍ²Í¼‘L²VariableDeclaratorÍ¶Í»MªIdentifierÍ¶Í»¥ScaleÀ£varÀJ¶ExportNamedDeclarationÍ+ÍƒÔrN–¤type¥start£end¢idªsuperClass¤body°ClassDeclarationÍ2ÍƒMªIdentifierÍ8ÍK³PreserveAspectRatioÀÔrO”¤type¥start£end¤body©ClassBodyÍLÍƒ–ÔrP˜¤type¥start£end¦static¨computed£key¤kind¥value°MethodDefinitionÍ[ÍÃÂÂMªIdentifierÍ[Íf«constructor«constructorÔrQ™¤type¥start£end¢idªexpression©generator¥async¦params¤body²FunctionExpressionÍfÍÃÀÂÂÂ’MªIdentifierÍgÍp©alignmentMªIdentifierÍrÍw¥scaleO®BlockStatementÍyÍÃ’ÔrR”¤type¥start£endªexpression³ExpressionStatementÍ„ÍŸÔrS–¤type¥start£end¨operator¤left¥right´AssignmentExpressionÍ„Í¡=ÔrT—¤type¥start£end¦object¨property¨computed¨optional°MemberExpressionÍ„Í’ÔrU“¤type¥start£end®ThisExpressionÍ„ÍˆMªIdentifierÍ‰Í’©alignmentÂÂMªIdentifierÍ•Í©alignmentR³ExpressionStatementÍ©Í¼S´AssignmentExpressionÍ©Í»¡=T°MemberExpressionÍ©Í³U®ThisExpressionÍ©Í­MªIdentifierÍ®Í³¥scaleÂÂMªIdentifierÍ¶Í»¥scaleP°MethodDefinitionÍÉÍÃÂMªIdentifierÍĞÍÔ¤init¦methodQ²FunctionExpressionÍÔÍÀÂÂÂO®BlockStatementÍ×ÍšR³ExpressionStatementÍâÍÔrV–¤type¥start£end¦callee©arguments¨optional®CallExpressionÍâÍT°MemberExpressionÍâÍşT°MemberExpressionÍâÍúU®ThisExpressionÍâÍæMªIdentifierÍçÍú³aspectRatioKeywordsÂÂMªIdentifierÍûÍş£setÂÂ’ÔrW•¤type¥start£end¥value£raw§LiteralÍÿÍ¤none¦"none"T°MemberExpressionÍÍMªIdentifierÍÍ©AlignmentMªIdentifierÍÍ¤noneÂÂÂR³ExpressionStatementÍ!Í^V®CallExpressionÍ!Í]T°MemberExpressionÍ!Í=T°MemberExpressionÍ!Í9U®ThisExpressionÍ!Í%MªIdentifierÍ&Í9³aspectRatioKeywordsÂÂMªIdentifierÍ:Í=£setÂÂ’W§LiteralÍ>ÍH¨xMinYMinª"xMinYMin"T°MemberExpressionÍJÍ\MªIdentifierÍJÍS©AlignmentMªIdentifierÍTÍ\¨xMinYMinÂÂÂR³ExpressionStatementÍhÍ¥V®CallExpressionÍhÍ¤T°MemberExpressionÍhÍ„T°MemberExpressionÍhÍ€U®ThisExpressionÍhÍlMªIdentifierÍmÍ€³aspectRatioKeywordsÂÂMªIdentifierÍÍ„£setÂÂ’W§LiteralÍ…Í¨xMidYMinª"xMidYMin"T°MemberExpressionÍ‘Í£MªIdentifierÍ‘Íš©AlignmentMªIdentifierÍ›Í£¨xMidYMinÂÂÂR³ExpressionStatementÍ¯ÍìV®CallExpressionÍ¯ÍëT°MemberExpressionÍ¯ÍËT°MemberExpressionÍ¯ÍÇU®ThisExpressionÍ¯Í³MªIdentifierÍ´ÍÇ³aspectRatioKeywordsÂÂMªIdentifierÍÈÍË£setÂÂ’W§LiteralÍÌÍÖ¨xMaxYMinª"xMaxYMin"T°MemberExpressionÍØÍêMªIdentifierÍØÍá©AlignmentMªIdentifierÍâÍê¨xMaxYMinÂÂÂR³ExpressionStatementÍöÍ3V®CallExpressionÍöÍ2T°MemberExpressionÍöÍT°MemberExpressionÍöÍU®ThisExpressionÍöÍúMªIdentifierÍûÍ³aspectRatioKeywordsÂÂMªIdentifierÍÍ£setÂÂ’W§LiteralÍÍ¨xMinYMidª"xMinYMid"T°MemberExpressionÍÍ1MªIdentifierÍÍ(©AlignmentMªIdentifierÍ)Í1¨xMinYMidÂÂÂR³ExpressionStatementÍ=ÍzV®CallExpressionÍ=ÍyT°MemberExpressionÍ=ÍYT°MemberExpressionÍ=ÍUU®ThisExpressionÍ=ÍAMªIdentifierÍBÍU³aspectRatioKeywordsÂÂMªIdentifierÍVÍY£setÂÂ’W§LiteralÍZÍd¨xMidYMidª"xMidYMid"T°MemberExpressionÍfÍxMªIdentifierÍfÍo©AlignmentMªIdentifierÍpÍx¨xMidYMidÂÂÂR³ExpressionStatementÍ„ÍÁV®CallExpressionÍ„ÍÀT°MemberExpressionÍ„Í T°MemberExpressionÍ„ÍœU®ThisExpressionÍ„ÍˆMªIdentifierÍ‰Íœ³aspectRatioKeywordsÂÂMªIdentifierÍÍ £setÂÂ’W§LiteralÍ¡Í«¨xMaxYMidª"xMaxYMid"T°MemberExpressionÍ­Í¿MªIdentifierÍ­Í¶©AlignmentMªIdentifierÍ·Í¿¨xMaxYMidÂÂÂR³ExpressionStatementÍËÍV®CallExpressionÍËÍT°MemberExpressionÍËÍçT°MemberExpressionÍËÍãU®ThisExpressionÍËÍÏMªIdentifierÍĞÍã³aspectRatioKeywordsÂÂMªIdentifierÍäÍç£setÂÂ’W§LiteralÍèÍò¨xMinYMaxª"xMinYMax"T°MemberExpressionÍôÍMªIdentifierÍôÍı©AlignmentMªIdentifierÍşÍ¨xMinYMaxÂÂÂR³ExpressionStatementÍÍOV®CallExpressionÍÍNT°MemberExpressionÍÍ.T°MemberExpressionÍÍ*U®ThisExpressionÍÍMªIdentifierÍÍ*³aspectRatioKeywordsÂÂMªIdentifierÍ+Í.£setÂÂ’W§LiteralÍ/Í9¨xMidYMaxª"xMidYMax"T°MemberExpressionÍ;ÍMMªIdentifierÍ;ÍD©AlignmentMªIdentifierÍEÍM¨xMidYMaxÂÂÂR³ExpressionStatementÍYÍ–V®CallExpressionÍYÍ•T°MemberExpressionÍYÍuT°MemberExpressionÍYÍqU®ThisExpressionÍYÍ]MªIdentifierÍ^Íq³aspectRatioKeywordsÂÂMªIdentifierÍrÍu£setÂÂ’W§LiteralÍvÍ€¨xMaxYMaxª"xMaxYMax"T°MemberExpressionÍ‚Í”MªIdentifierÍ‚Í‹©AlignmentMªIdentifierÍŒÍ”¨xMaxYMaxÂÂÂP°MethodDefinitionÍ«ÍúÃÂMªIdentifierÍ²Í´¢of¦methodQ²FunctionExpressionÍ´ÍúÀÂÂÂ‘MªIdentifierÍµÍº¥valueO®BlockStatementÍ¼Íú‘ÔrX”¤type¥start£end¨argument¯ReturnStatementÍÇÍóV®CallExpressionÍÎÍòT°MemberExpressionÍÎÍëU®ThisExpressionÍÎÍÒMªIdentifierÍÓÍë¸parsePreserveAspectRatioÂÂ‘MªIdentifierÍìÍñ¥valueÂP°MethodDefinitionÍ	 Í	7ÂÂMªIdentifierÍ	 Í	¬getAlignment¦methodQ²FunctionExpressionÍ	Í	7ÀÂÂÂO®BlockStatementÍ	Í	7‘X¯ReturnStatementÍ	Í	0T°MemberExpressionÍ	!Í	/U®ThisExpressionÍ	!Í	%MªIdentifierÍ	&Í	/©alignmentÂÂP°MethodDefinitionÍ	=Í	lÂÂMªIdentifierÍ	=Í	E¨getScale¦methodQ²FunctionExpressionÍ	EÍ	lÀÂÂÂO®BlockStatementÍ	HÍ	l‘X¯ReturnStatementÍ	SÍ	eT°MemberExpressionÍ	ZÍ	dU®ThisExpressionÍ	ZÍ	^MªIdentifierÍ	_Í	d¥scaleÂÂP°MethodDefinitionÍ	rÍ€ÃÂMªIdentifierÍ	yÍ	‘¸parsePreserveAspectRatio¦methodQ²FunctionExpressionÍ	‘Í€ÀÂÂÂ‘MªIdentifierÍ	’Í	•£valO®BlockStatementÍ	—Í€šK³VariableDeclarationÍ	¢Í	Â‘L²VariableDeclaratorÍ	¦Í	ÁMªIdentifierÍ	¦Í	ª¤scanÔrY•¤type¥start£end¦callee©arguments­NewExpressionÍ	­Í	ÁMªIdentifierÍ	±Í	¼«TextScanner‘MªIdentifierÍ	½Í	À£val£varR³ExpressionStatementÍ	ÌÍ	âV®CallExpressionÍ	ÌÍ	áT°MemberExpressionÍ	ÌÍ	ßMªIdentifierÍ	ÌÍ	Ğ¤scanMªIdentifierÍ	ÑÍ	ß®skipWhitespaceÂÂÂK³VariableDeclarationÍ	ìÍ
+‘L²VariableDeclaratorÍ	ğÍ
+MªIdentifierÍ	ğÍ	ô¤wordV®CallExpressionÍ	÷Í
+T°MemberExpressionÍ	÷Í
+MªIdentifierÍ	÷Í	û¤scanMªIdentifierÍ	üÍ
+©nextTokenÂÂÂ£letÔrZ–¤type¥start£end¤testªconsequent©alternate«IfStatementÍ
+Í
+}Ôr[–¤type¥start£end¤left¨operator¥right°BinaryExpressionÍ
+Í
+%W§LiteralÍ
+Í
+¥defer§"defer"¢==MªIdentifierÍ
+!Í
+%¤wordO®BlockStatementÍ
+'Í
+}’R³ExpressionStatementÍ
+6Í
+LV®CallExpressionÍ
+6Í
+KT°MemberExpressionÍ
+6Í
+IMªIdentifierÍ
+6Í
+:¤scanMªIdentifierÍ
+;Í
+I®skipWhitespaceÂÂÂR³ExpressionStatementÍ
+ZÍ
+rS´AssignmentExpressionÍ
+ZÍ
+q¡=MªIdentifierÍ
+ZÍ
+^¤wordV®CallExpressionÍ
+aÍ
+qT°MemberExpressionÍ
+aÍ
+oMªIdentifierÍ
+aÍ
+e¤scanMªIdentifierÍ
+fÍ
+o©nextTokenÂÂÂÀR³ExpressionStatementÍ
+‡Í
+¢V®CallExpressionÍ
+‡Í
+¡T°MemberExpressionÍ
+‡Í
+ŸMªIdentifierÍ
+‡Í
+š³PreserveAspectRatioMªIdentifierÍ
+›Í
+Ÿ¤initÂÂÂK³VariableDeclarationÍ
+¬Í
+ê‘L²VariableDeclaratorÍ
+°Í
+éMªIdentifierÍ
+°Í
+µ¥alignV®CallExpressionÍ
+¸Í
+éT°MemberExpressionÍ
+¸Í
+ãT°MemberExpressionÍ
+¸Í
+ßMªIdentifierÍ
+¸Í
+Ë³PreserveAspectRatioMªIdentifierÍ
+ÌÍ
+ß³aspectRatioKeywordsÂÂMªIdentifierÍ
+àÍ
+ã£getÂÂ‘MªIdentifierÍ
+äÍ
+è¤wordÂ£letK³VariableDeclarationÍ
+ôÍ‘L²VariableDeclaratorÍ
+øÍMªIdentifierÍ
+øÍ
+ı¥scaleW§LiteralÍ ÍÀ¤null£letR³ExpressionStatementÍÍ%V®CallExpressionÍÍ$T°MemberExpressionÍÍ"MªIdentifierÍÍ¤scanMªIdentifierÍÍ"®skipWhitespaceÂÂÂZ«IfStatementÍ/ÍBÔr\–¤type¥start£end¨operator¦prefix¨argument¯UnaryExpressionÍ3Í@¡!ÃV®CallExpressionÍ4Í@T°MemberExpressionÍ4Í>MªIdentifierÍ4Í8¤scanMªIdentifierÍ9Í>¥emptyÂÂÂO®BlockStatementÍBÍB’K³VariableDeclarationÍQÍt‘L²VariableDeclaratorÍUÍsMªIdentifierÍUÍ`«meetOrSliceV®CallExpressionÍcÍsT°MemberExpressionÍcÍqMªIdentifierÍcÍg¤scanMªIdentifierÍhÍq©nextTokenÂÂÂ£letÔr]•¤type¥start£end¬discriminant¥cases¯SwitchStatementÍ‚Í7MªIdentifierÍŠÍ•«meetOrSlice“Ôr^•¤type¥start£endªconsequent¤testªSwitchCaseÍªÍû’R³ExpressionStatementÍÌÍßS´AssignmentExpressionÍÌÍŞ¡=MªIdentifierÍÌÍÑ¥scaleT°MemberExpressionÍÔÍŞMªIdentifierÍÔÍÙ¥ScaleMªIdentifierÍÚÍŞ¤meetÂÂÔr_”¤type¥start£end¥label®BreakStatementÍõÍûÀW§LiteralÍ¯Íµ¤meet¦"meet"^ªSwitchCaseÍÍ`’R³ExpressionStatementÍ0ÍDS´AssignmentExpressionÍ0ÍC¡=MªIdentifierÍ0Í5¥scaleT°MemberExpressionÍ8ÍCMªIdentifierÍ8Í=¥ScaleMªIdentifierÍ>ÍC¥sliceÂÂ_®BreakStatementÍZÍ`ÀW§LiteralÍÍ¥slice§"slice"^ªSwitchCaseÍrÍ(’R³ExpressionStatementÍÍĞV®CallExpressionÍÍÏT°MemberExpressionÍÍMªIdentifierÍÍ—§LogUtilMªIdentifierÍ˜Í¥errorÂÂ‘[°BinaryExpressionÍÍÎW§LiteralÍÍÈÙ(Invalid preserveAspectRatio definition: Ù*"Invalid preserveAspectRatio definition: "¡+MªIdentifierÍËÍÎ£valÂX®ThrowStatementÍæÍ(Y­NewExpressionÍìÍ'MªIdentifierÍğÍõ¥Error‘[°BinaryExpressionÍöÍ&W§LiteralÍöÍ Ù(Invalid preserveAspectRatio definition: Ù*"Invalid preserveAspectRatio definition: "¡+MªIdentifierÍ#Í&£valÀÀX¯ReturnStatementÍLÍyY­NewExpressionÍSÍxMªIdentifierÍWÍj³PreserveAspectRatio’MªIdentifierÍkÍp¥alignMªIdentifierÍrÍw¥scaleÀ’Ôr`•¤type¥start£endªspecifiers¦source±ImportDeclarationÍoÍ‘Ôra”¤type¥start£end¥local¶ImportDefaultSpecifierÍvÍ}MªIdentifierÍvÍ}§LogUtilW§LiteralÍƒÍ©./LogUtil«'./LogUtil'`±ImportDeclarationÍ‘ÍÃ‘Ôrb•¤type¥start£end¨imported¥local¯ImportSpecifierÍšÍ¥MªIdentifierÍšÍ¥«TextScannerMªIdentifierÍšÍ¥«TextScannerW§LiteralÍ­ÍÂ³./utils/TextScannerµ'./utils/TextScanner'

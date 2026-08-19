@@ -1,6 +1,9 @@
 "use strict";
 const common_vendor = require("../../../common/vendor.js");
 const src_utils_systemInfo = require("../../utils/systemInfo.js");
+require("../../store/index.js");
+const src_utils_theme = require("../../utils/theme.js");
+const src_store_app = require("../../store/app.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "NavBar",
   props: {
@@ -10,11 +13,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     },
     titleColor: {
       type: String,
-      default: "#1e293b"
+      default: ""
     },
     bgColor: {
       type: String,
-      default: "#ffffff"
+      default: ""
     },
     fixed: {
       type: Boolean,
@@ -30,10 +33,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     },
     border: {
       type: Boolean,
-      default: true
+      default: false
     }
   },
   setup(__props) {
+    const props = __props;
+    const themeTokens = common_vendor.computed(() => {
+      return src_utils_theme.getThemeTokens(src_store_app.useAppStore().state.isDark);
+    });
+    const effectiveBgColor = common_vendor.computed(() => {
+      return props.bgColor != "" ? props.bgColor : themeTokens.value.navBg;
+    });
+    const effectiveTitleColor = common_vendor.computed(() => {
+      return props.titleColor != "" ? props.titleColor : themeTokens.value.navText;
+    });
     const statusBarHeight = common_vendor.computed(() => {
       const insets = src_utils_systemInfo.safeAreaInsets.value;
       if (insets != null && insets.top > 0) {
@@ -63,14 +76,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         a: `${statusBarHeight.value}px`,
         b: __props.showBack
       }, __props.showBack ? {
-        c: __props.titleColor,
-        d: __props.titleColor
+        c: effectiveTitleColor.value,
+        d: effectiveTitleColor.value
       } : {}, {
-        e: common_vendor.o(handleBack, "89"),
+        e: common_vendor.o(handleBack, "96"),
         f: common_vendor.t(__props.title),
-        g: __props.titleColor,
+        g: effectiveTitleColor.value,
         h: common_vendor.n(__props.fixed ? "navbar-container navbar-fixed" : "navbar-container"),
-        i: __props.bgColor,
+        i: effectiveBgColor.value,
         j: __props.border ? "1px" : "0px",
         k: __props.border ? "solid" : "none",
         l: __props.border ? "#e2e8f0" : "transparent",

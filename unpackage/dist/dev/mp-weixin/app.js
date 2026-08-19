@@ -4,6 +4,7 @@ const common_vendor = require("./common/vendor.js");
 const src_router_interceptor = require("./src/router/interceptor.js");
 const uni_modules_uviewUltra_index = require("./uni_modules/uview-ultra/index.js");
 const src_store_index = require("./src/store/index.js");
+const src_store_app = require("./src/store/app.js");
 const src_i18n_index = require("./src/i18n/index.js");
 if (!Math) {
   "./src/pages/index/index.js";
@@ -96,15 +97,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   setup(__props) {
     common_vendor.onLaunch(() => {
       uni_modules_uviewUltra_index.loadFont();
+      src_store_app.useAppStore().initThemeMode();
       common_vendor.index.loadFontFace({
         global: true,
         family: "UniIconsFontFamily",
         source: "url('/static/uniicons.ttf')",
         success() {
-          common_vendor.index.__f__("log", "at App.uvue:14", "global loadFontFace uniicons.ttf success");
+          common_vendor.index.__f__("log", "at App.uvue:17", "global loadFontFace uniicons.ttf success");
         },
         fail(error) {
-          common_vendor.index.__f__("warn", "at App.uvue:17", "global loadFontFace uniicons.ttf fail", error.errMsg);
+          common_vendor.index.__f__("warn", "at App.uvue:20", "global loadFontFace uniicons.ttf fail", error.errMsg);
         }
       });
     });

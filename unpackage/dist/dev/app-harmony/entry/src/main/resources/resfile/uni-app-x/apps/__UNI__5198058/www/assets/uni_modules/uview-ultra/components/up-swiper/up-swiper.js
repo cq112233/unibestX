@@ -1,21 +1,16 @@
 import { _ as __easycom_1$1 } from "../up-loading-icon/up-loading-icon.js";
+import { r as resolveEasycom } from "../../../../App.ku.js";
 import { _ as __easycom_1$2 } from "../up-swiper-indicator/up-swiper-indicator.js";
 import "./swiper.js";
 import { a as addUnit, b as addStyle, i as error } from "../../libs/function/index.js";
 import { i as image, v as video } from "../../libs/function/test.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, toDisplayString: _toDisplayString, setSharedDataEvent: _setSharedDataEvent, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, toSharedDataImageMode: _toSharedDataImageMode, createSharedDataIf: _createSharedDataIf, createSharedDataSlot: _createSharedDataSlot, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataFor: _createSharedDataFor } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpSwiperUpSwiper";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { computed, ref, watch } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-swiper"
   },
-  __dynamicSharedData: true,
-  __hash: "3627ca92",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-swiper/up-swiper.uvue",
   __name: "up-swiper",
   props: {
     list: {
@@ -123,9 +118,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   },
   emits: ["click", "change", "update:current"],
   setup(__props, _a) {
-    var __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpSwiperUpSwiperSharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
     const props = __props;
     const emit = __emit;
     const currentIndex = ref(parseInt(props.current.toString()));
@@ -268,165 +262,131 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         return null;
       currentIndex.value = parseInt(val.toString());
     });
-    return () => {
-      "raw js";
-      const _component_up_loading_icon = __easycom_1$1;
-      const _component_video = _resolveComponent("video");
-      const _component_swiper_item = _resolveComponent("swiper-item");
-      const _component_swiper = _resolveComponent("swiper");
-      const _component_up_swiper_indicator = __easycom_1$2;
-      _renderSharedDataEffect(() => {
-        return _setSharedDataStyle(__sharedData, 6, swiperContainerStyle.value);
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.loading));
-      }, () => {
-        const n2 = _createSharedDataComponentWithFallback(_component_up_loading_icon, "2fb7830c", { mode: "circle" });
-        _setSharedData(__sharedData, 1, n2?.sharedData);
-      }, () => {
-        const n21 = _createSharedDataComponentWithFallback(_component_swiper, "2fb78194", {
-          class: "up-swiper__wrapper",
-          style: () => {
-            return swiperWrapperStyle.value;
-          },
-          onChange: () => {
-            return change;
-          },
-          circular: () => {
-            return __props.circular;
-          },
-          interval: () => {
-            return __props.interval;
-          },
-          duration: () => {
-            return __props.duration;
-          },
-          autoplay: () => {
-            return __props.autoplay;
-          },
-          current: () => {
-            return __props.current;
-          },
-          vertical: () => {
-            return __props.vertical;
-          }
-        }, {
-          "default": _withSharedDataVaporCtx(() => {
-            _createSharedDataFor(_setSharedDataScoped(__sharedData, 3, _createSharedDataVFor(__sharedDataScope, () => {
-              return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-            })), () => {
-              return __props.list;
-            }, (__sharedData_VFor0, _for_item0, _for_key0) => {
-              const n20 = _createSharedDataComponentWithFallback(_component_swiper_item, "2fb76c48-" + _for_key0.value, { class: "up-swiper__wrapper__item" }, {
-                "default": _withSharedDataVaporCtx(() => {
-                  _createSharedDataSlot("default", {
-                    item: () => {
-                      return _for_item0.value;
-                    },
-                    index: () => {
-                      return _for_key0.value;
-                    }
-                  }, (data) => {
-                    return _setSharedData(__sharedData_VFor0, 2, data);
-                  }, () => {
-                    _renderSharedDataEffect(() => {
-                      return _setSharedDataStyle(__sharedData_VFor0, 12, itemStyle(_for_key0.value));
-                    });
-                    _createSharedDataIf(() => {
-                      return _setSharedData(__sharedData_VFor0, 3, _toSharedDataBoolean(getItemType(_for_item0.value) == "image"));
-                    }, () => {
-                      _setSharedDataEvent(__sharedData_VFor0, 4, () => {
-                        return clickHandler(_for_key0.value);
-                      });
-                      _renderSharedDataEffect(() => {
-                        _setSharedDataAttr(__sharedData_VFor0, 5, _toSharedDataString(getSource(_for_item0.value)));
-                        _setSharedDataAttr(__sharedData_VFor0, 6, _toSharedDataImageMode(__props.imgMode));
-                        _setSharedDataStyle(__sharedData_VFor0, 7, swiperImageStyle.value);
-                      });
-                    });
-                    _createSharedDataIf(() => {
-                      return _setSharedData(__sharedData_VFor0, 8, _toSharedDataBoolean(getItemType(_for_item0.value) == "video"));
-                    }, () => {
-                      const _on_click = () => {
-                        return clickHandler(_for_key0.value);
-                      };
-                      const n14 = _createSharedDataComponentWithFallback(_component_video, "1c6388bb-" + _for_key0.value, {
-                        class: "up-swiper__wrapper__item__wrapper__video",
-                        id: () => {
-                          return `video-${_for_key0.value}`;
-                        },
-                        "enable-progress-gesture": false,
-                        src: () => {
-                          return getSource(_for_item0.value);
-                        },
-                        poster: () => {
-                          return getPoster(_for_item0.value);
-                        },
-                        title: () => {
-                          return getVideoTitle(_for_item0.value);
-                        },
-                        style: () => {
-                          return swiperVideoStyle.value;
-                        },
-                        controls: "",
-                        onClick: () => {
-                          return _on_click;
-                        }
-                      });
-                      _setSharedData(__sharedData_VFor0, 9, n14?.sharedData);
-                    });
-                    _createSharedDataIf(() => {
-                      return _setSharedData(__sharedData_VFor0, 10, _toSharedDataBoolean(isImageTitleVisible(_for_item0.value)));
-                    }, () => {
-                      _renderSharedDataEffect(() => {
-                        return _setSharedData(__sharedData_VFor0, 11, _toDisplayString(getItemTitle(_for_item0.value)));
-                      });
-                    });
-                  });
-                })
-              });
-              _setSharedData(__sharedData_VFor0, 1, n20?.sharedData);
-              return n20;
-            }, (__sharedData_VFor0, item, index) => {
-              return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
-            }, 34);
-          })
-        });
-        _setSharedData(__sharedData, 2, n21?.sharedData);
-      }, 261);
-      _renderSharedDataEffect(() => {
-        return _setSharedDataStyle(__sharedData, 7, customIndicatorStyle.value);
-      });
-      _createSharedDataSlot("indicator", null, null, () => {
-        _createSharedDataIf(() => {
-          return _setSharedData(__sharedData, 4, _toSharedDataBoolean(!__props.loading && __props.indicator && !__props.showTitle));
-        }, () => {
-          const n26 = _createSharedDataComponentWithFallback(_component_up_swiper_indicator, "1c63a3a0", {
-            indicatorActiveColor: () => {
-              return __props.indicatorActiveColor;
-            },
-            indicatorInactiveColor: () => {
-              return __props.indicatorInactiveColor;
-            },
-            length: () => {
-              return __props.list.length;
-            },
-            current: () => {
-              return currentIndex.value;
-            },
-            indicatorMode: () => {
-              return __props.indicatorMode;
-            }
-          });
-          _setSharedData(__sharedData, 5, n26?.sharedData);
-        });
-      });
-      return __sharedData;
-    };
+    const __returned__ = { props, emit, currentIndex, swiperContainerStyle, swiperWrapperStyle, swiperImageStyle, swiperVideoStyle, customIndicatorStyle, getSource, getItemTitle, getPoster, getVideoTitle, isImageTitleVisible, getItemType, pauseVideo, change, itemStyle, clickHandler };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-swiper": { "": { "display": "flex", "flexDirection": "column", "position": "relative", "overflow": "hidden", "width": "100%" } }, "up-swiper__loading": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "width": "100%", "height": "100%" } }, "up-swiper__wrapper": { "": { "width": "100%", "minWidth": 0 } }, "up-swiper__wrapper__item": { "": { "width": "100%" } }, "up-swiper__wrapper__item__wrapper": { "": { "display": "flex", "flexDirection": "row", "position": "relative", "overflow": "hidden", "transitionProperty": "transform", "transitionDuration": "0.3s", "width": "100%" } }, "up-swiper__wrapper__item__wrapper__image": { "": { "width": "100%" } }, "up-swiper__wrapper__item__wrapper__video": { "": { "width": "100%" } }, "up-swiper__wrapper__item__wrapper__title": { "": { "position": "absolute", "backgroundColor": "rgba(0,0,0,0.3)", "bottom": 0, "left": 0, "right": 0, "paddingTop": "12rpx", "paddingRight": "24rpx", "paddingBottom": "12rpx", "paddingLeft": "24rpx" } }, "up-swiper__wrapper__item__wrapper__title-text": { "": { "fontSize": "28rpx", "color": "#FFFFFF" } }, "up-swiper__indicator": { "": { "position": "absolute", "bottom": 10, "left": 0, "right": 0, "display": "flex", "flexDirection": "row", "justifyContent": "center", "zIndex": 10 } }, "@TRANSITION": { "up-swiper__wrapper__item__wrapper": { "property": "transform", "duration": "0.3s" } } };
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { resolveComponent: _resolveComponent, createVNode: _createVNode, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, renderList: _renderList, Fragment: _Fragment, renderSlot: _renderSlot, normalizeStyle: _normalizeStyle, createBlock: _createBlock, toDisplayString: _toDisplayString, createElementVNode: _createElementVNode } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_loading_icon = resolveEasycom(__resolveDynamicComponent("up-loading-icon"), __easycom_1$1);
+  const _component_video = _resolveComponent("video");
+  const _component_up_swiper_indicator = resolveEasycom(__resolveDynamicComponent("up-swiper-indicator"), __easycom_1$2);
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      class: "up-swiper",
+      style: _normalizeStyle($setup.swiperContainerStyle)
+    },
+    [
+      $props.loading ? (_openBlock(), _createElementBlock("view", {
+        key: 0,
+        class: "up-swiper__loading"
+      }, [
+        _createVNode(_component_up_loading_icon, { mode: "circle" })
+      ])) : (_openBlock(), _createElementBlock("swiper", {
+        key: 1,
+        class: "up-swiper__wrapper",
+        style: _normalizeStyle($setup.swiperWrapperStyle),
+        onChange: $setup.change,
+        circular: $props.circular,
+        interval: $props.interval,
+        duration: $props.duration,
+        autoplay: $props.autoplay,
+        current: $props.current,
+        vertical: $props.vertical
+      }, [
+        (_openBlock(true), _createElementBlock(
+          _Fragment,
+          null,
+          _renderList($props.list, (item, index) => {
+            return _openBlock(), _createElementBlock("swiper-item", {
+              class: "up-swiper__wrapper__item",
+              key: index
+            }, [
+              _renderSlot(_ctx.$slots, "default", {
+                item,
+                index
+              }, () => [
+                _createElementVNode(
+                  "view",
+                  {
+                    class: "up-swiper__wrapper__item__wrapper",
+                    style: _normalizeStyle($setup.itemStyle(index))
+                  },
+                  [
+                    $setup.getItemType(item) == "image" ? (_openBlock(), _createElementBlock("image", {
+                      key: 0,
+                      class: "up-swiper__wrapper__item__wrapper__image",
+                      src: $setup.getSource(item),
+                      mode: $props.imgMode,
+                      onClick: ($event) => $setup.clickHandler(index),
+                      style: _normalizeStyle($setup.swiperImageStyle)
+                    }, null, 12, ["src", "mode", "onClick"])) : _createCommentVNode("v-if", true),
+                    $setup.getItemType(item) == "video" ? (_openBlock(), _createBlock(_component_video, {
+                      key: 1,
+                      class: "up-swiper__wrapper__item__wrapper__video",
+                      id: `video-${index}`,
+                      "enable-progress-gesture": false,
+                      src: $setup.getSource(item),
+                      poster: $setup.getPoster(item),
+                      title: $setup.getVideoTitle(item),
+                      style: _normalizeStyle($setup.swiperVideoStyle),
+                      controls: "",
+                      onClick: ($event) => $setup.clickHandler(index)
+                    }, null, 8, ["id", "src", "poster", "title", "style", "onClick"])) : _createCommentVNode("v-if", true),
+                    $setup.isImageTitleVisible(item) ? (_openBlock(), _createElementBlock("view", {
+                      key: 2,
+                      class: "up-swiper__wrapper__item__wrapper__title"
+                    }, [
+                      _createElementVNode(
+                        "text",
+                        { class: "up-line-1 up-swiper__wrapper__item__wrapper__title-text" },
+                        _toDisplayString($setup.getItemTitle(item)),
+                        1
+                        /* TEXT */
+                      )
+                    ])) : _createCommentVNode("v-if", true)
+                  ],
+                  4
+                  /* STYLE */
+                )
+              ])
+            ]);
+          }),
+          128
+          /* KEYED_FRAGMENT */
+        ))
+      ], 44, ["circular", "interval", "duration", "autoplay", "current", "vertical"])),
+      _createElementVNode(
+        "view",
+        {
+          class: "up-swiper__indicator",
+          style: _normalizeStyle($setup.customIndicatorStyle)
+        },
+        [
+          _renderSlot(_ctx.$slots, "indicator", {}, () => [
+            !$props.loading && $props.indicator && !$props.showTitle ? (_openBlock(), _createBlock(_component_up_swiper_indicator, {
+              key: 0,
+              indicatorActiveColor: $props.indicatorActiveColor,
+              indicatorInactiveColor: $props.indicatorInactiveColor,
+              length: $props.list.length,
+              current: $setup.currentIndex,
+              indicatorMode: $props.indicatorMode
+            }, null, 8, ["indicatorActiveColor", "indicatorInactiveColor", "length", "current", "indicatorMode"])) : _createCommentVNode("v-if", true)
+          ])
+        ],
+        4
+        /* STYLE */
+      )
+    ],
+    4
+    /* STYLE */
+  );
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-swiper/up-swiper.uvue"]]);
 export {
   __easycom_1 as _
 };

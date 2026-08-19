@@ -93,17 +93,19 @@
     }
   ],
   "window": {
-    "navigationBarTextStyle": "black",
+    "navigationBarTextStyle": "@navigationBarTextStyle",
     "navigationBarTitleText": "uni-app x",
-    "navigationBarBackgroundColor": "#ffffff",
-    "backgroundColor": "#F8F8F8",
-    "backgroundColorContent": "#F8F8F8"
+    "navigationBarBackgroundColor": "@navigationBarBackgroundColor",
+    "backgroundColor": "@backgroundColor",
+    "backgroundColorContent": "@backgroundColorContent",
+    "backgroundTextStyle": "@backgroundTextStyle"
   },
   "tabBar": {
     "custom": true,
-    "color": "#999999",
-    "selectedColor": "#1890ff",
-    "backgroundColor": "#F8F8F8",
+    "color": "@tabBarColor",
+    "selectedColor": "@tabBarSelectedColor",
+    "backgroundColor": "@tabBarBackgroundColor",
+    "borderStyle": "@tabBarBorderStyle",
     "list": [
       {
         "pagePath": "src/pages/index/index",
@@ -123,5 +125,7 @@
       }
     ]
   },
+  "themeLocation": "theme.json",
+  "darkmode": true,
   "usingComponents": {}
 }

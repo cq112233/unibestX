@@ -17,6 +17,7 @@ import Tabbar from '@/src/tabbar/index.uvue';
 import { useAppStore } from '@/src/store';
 import { isPageTabbar, syncCurIdxByCurrentPage } from '@/src/tabbar/store';
 import { registerToast, unregisterToast } from '@/src/utils/toast';
+import { getThemeTokens } from '@/src/utils/theme';
 import type { ComponentPublicInstance } from 'vue';
 import { computed, nextTick, onBeforeMount, onMounted, onUnmounted, ref, watch } from 'vue';
 
@@ -28,7 +29,7 @@ const themeStyle = computed((): UTSJSONObject => {
   const dark = appStore.state.isDark;
   return {
     '--theme-color': appStore.state.theme,
-    '--bg-color': dark ? '#0f172a' : '#f5f6fa',
+    '--bg-color': getThemeTokens(dark).bgContent,
     '--text-color': dark ? '#e2e8f0' : '#1e293b',
     '--text-secondary': dark ? '#94a3b8' : '#64748b',
     '--card-bg': dark ? '#1e293b' : '#ffffff',

@@ -1,0 +1,37 @@
+import { ref, provide, watch } from 'vue';
+const __sfc__ = defineComponent({
+    __name: 'up-swipe-action',
+    name: 'up-swipe-action',
+    props: {
+        autoClose: {
+            type: Boolean,
+            default: true
+        }
+    },
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        const props = __props;
+        const activeItemId = ref<number>(-1);
+        function registerActive(id: number) {
+            if (props.autoClose) {
+                activeItemId.value = id;
+            }
+        }
+        provide('upSwipeActionContext', {
+            autoClose: props.autoClose,
+            activeItemId,
+            registerActive
+        });
+        return (): any | null => {
+            return _cE("view", _uM({ class: "up-swipe-action" }), [
+                renderSlot(_ctx.$slots, "default")
+            ]);
+        };
+    }
+});
+export default __sfc__;
+export type UpSwipeActionComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpSwipeActionUpSwipeActionStyles = [];
+//# sourceMappingURL=up-swipe-action.uvue.map

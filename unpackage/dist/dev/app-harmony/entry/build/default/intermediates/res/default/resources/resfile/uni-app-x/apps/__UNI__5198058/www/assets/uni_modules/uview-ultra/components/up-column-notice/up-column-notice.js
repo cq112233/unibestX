@@ -1,19 +1,14 @@
 import { _ as __easycom_0$1 } from "../up-icon/up-icon.js";
+import { r as resolveEasycom } from "../../../../App.ku.js";
 import { d as defProps } from "./columnNotice.js";
 import { a as addUnit, i as error } from "../../libs/function/index.js";
 import { a as array } from "../../libs/function/test.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, createSharedDataSlot: _createSharedDataSlot, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, toDisplayString: _toDisplayString, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataFor: _createSharedDataFor, withSharedDataVaporCtx: _withSharedDataVaporCtx, setSharedDataEvent: _setSharedDataEvent } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpColumnNoticeUpColumnNotice";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { computed, reactive } = globalThis.Vue;
 const { watch } = globalThis.Vue;
 const { ref } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "9654e4e4",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-column-notice/up-column-notice.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "up-column-notice",
   props: {
     text: {
@@ -79,9 +74,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   },
   emits: ["click", "close"],
   setup(__props, _a) {
-    var __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpColumnNoticeUpColumnNoticeSharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
     const props = __props;
     const emit = __emit;
     const index = ref(0);
@@ -91,7 +85,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       style["fontSize"] = addUnit(props.fontSize);
       return style;
     });
-    computed(() => {
+    const vertical = computed(() => {
       if (props.mode == "horizontal")
         return false;
       else
@@ -115,104 +109,86 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     }, {
       immediate: true
     });
-    return () => {
-      "raw js";
-      const _component_up_icon = __easycom_0$1;
-      const _component_swiper_item = _resolveComponent("swiper-item");
-      const _component_swiper = _resolveComponent("swiper");
-      _createSharedDataSlot("icon", null, null, () => {
-        _createSharedDataIf(() => {
-          return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.icon));
-        }, () => {
-          const n4 = _createSharedDataComponentWithFallback(_component_up_icon, "17ccbc9f", {
-            name: () => {
-              return __props.icon;
-            },
-            color: () => {
-              return __props.color;
-            },
-            size: "19"
-          });
-          _setSharedData(__sharedData, 1, n4?.sharedData);
-        });
-      });
-      const n10 = _createSharedDataComponentWithFallback(_component_swiper, "17ccc061", {
-        "disable-touch": () => {
-          return __props.disableTouch;
-        },
-        vertical: () => {
-          return __props.step ? false : true;
-        },
-        circular: "",
-        interval: () => {
-          return __props.duration;
-        },
-        autoplay: true,
-        class: "up-notice__swiper",
-        onChange: () => {
-          return noticeChange;
-        }
-      }, {
-        "default": _withSharedDataVaporCtx(() => {
-          _createSharedDataFor(_setSharedDataScoped(__sharedData, 3, _createSharedDataVFor(__sharedDataScope, () => {
-            return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-          })), () => {
-            return __props.text;
-          }, (__sharedData_VFor0, _for_item0, _for_key0) => {
-            const n9 = _createSharedDataComponentWithFallback(_component_swiper_item, "17ccc7c8-" + _for_key0.value, { class: "up-notice__swiper__item" }, {
-              "default": () => {
-                _renderSharedDataEffect(() => {
-                  _setSharedDataStyle(__sharedData_VFor0, 2, [textStyle.value]);
-                  _setSharedData(__sharedData_VFor0, 3, _toDisplayString(_for_item0.value));
-                });
-              }
-            });
-            _setSharedData(__sharedData_VFor0, 1, n9?.sharedData);
-            return n9;
-          }, (__sharedData_VFor0, item, index2) => {
-            return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index2));
-          }, 34);
-        })
-      });
-      _setSharedData(__sharedData, 2, n10?.sharedData);
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 4, _toSharedDataBoolean(["link", "closable"].includes(__props.mode)));
-      }, () => {
-        _createSharedDataIf(() => {
-          return _setSharedData(__sharedData, 5, _toSharedDataBoolean(__props.mode === "link"));
-        }, () => {
-          const n15 = _createSharedDataComponentWithFallback(_component_up_icon, "17ccd388", {
-            name: "arrow-right",
-            size: 17,
-            color: () => {
-              return __props.color;
-            }
-          });
-          _setSharedData(__sharedData, 6, n15?.sharedData);
-        });
-        _createSharedDataIf(() => {
-          return _setSharedData(__sharedData, 7, _toSharedDataBoolean(__props.mode === "closable"));
-        }, () => {
-          const n18 = _createSharedDataComponentWithFallback(_component_up_icon, "17ccd769", {
-            name: "close",
-            size: 16,
-            color: () => {
-              return __props.color;
-            },
-            onClick: () => {
-              return close;
-            }
-          });
-          _setSharedData(__sharedData, 8, n18?.sharedData);
-        });
-      });
-      _setSharedDataEvent(__sharedData, 9, clickHandler);
-      return __sharedData;
-    };
+    const __returned__ = { props, emit, index, textStyle, vertical, noticeChange, clickHandler, close };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-notice": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "space-between" } }, "up-notice__left-icon": { "": { "alignItems": "center", "marginRight": 5 } }, "up-notice__right-icon": { "": { "marginLeft": 5, "alignItems": "center" } }, "up-notice__swiper": { "": { "height": 16, "display": "flex", "flexDirection": "row", "alignItems": "center", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-notice__swiper__item": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "overflow": "hidden" } }, "up-notice__swiper__item__text": { "": { "fontSize": 14, "color": "#f9ae3d" } } };
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { renderSlot: _renderSlot, resolveComponent: _resolveComponent, createVNode: _createVNode, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, renderList: _renderList, Fragment: _Fragment, toDisplayString: _toDisplayString, normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0$1);
+  return _openBlock(), _createElementBlock("view", {
+    class: "up-notice",
+    onClick: $setup.clickHandler
+  }, [
+    _renderSlot(_ctx.$slots, "icon", {}, () => [
+      $props.icon ? (_openBlock(), _createElementBlock("view", {
+        key: 0,
+        class: "up-notice__left-icon"
+      }, [
+        _createVNode(_component_up_icon, {
+          name: $props.icon,
+          color: $props.color,
+          size: "19"
+        }, null, 8, ["name", "color"])
+      ])) : _createCommentVNode("v-if", true)
+    ]),
+    _createElementVNode("swiper", {
+      "disable-touch": $props.disableTouch,
+      vertical: $props.step ? false : true,
+      circular: "",
+      interval: $props.duration,
+      autoplay: true,
+      class: "up-notice__swiper",
+      onChange: $setup.noticeChange
+    }, [
+      (_openBlock(true), _createElementBlock(
+        _Fragment,
+        null,
+        _renderList($props.text, (item, index) => {
+          return _openBlock(), _createElementBlock("swiper-item", {
+            key: index,
+            class: "up-notice__swiper__item"
+          }, [
+            _createElementVNode(
+              "text",
+              {
+                class: "up-notice__swiper__item__text up-line-1",
+                style: _normalizeStyle([$setup.textStyle])
+              },
+              _toDisplayString(item),
+              5
+              /* TEXT, STYLE */
+            )
+          ]);
+        }),
+        128
+        /* KEYED_FRAGMENT */
+      ))
+    ], 40, ["disable-touch", "vertical", "interval"]),
+    ["link", "closable"].includes($props.mode) ? (_openBlock(), _createElementBlock("view", {
+      key: 0,
+      class: "up-notice__right-icon"
+    }, [
+      $props.mode === "link" ? (_openBlock(), _createBlock(_component_up_icon, {
+        key: 0,
+        name: "arrow-right",
+        size: 17,
+        color: $props.color
+      }, null, 8, ["color"])) : _createCommentVNode("v-if", true),
+      $props.mode === "closable" ? (_openBlock(), _createBlock(_component_up_icon, {
+        key: 1,
+        name: "close",
+        size: 16,
+        color: $props.color,
+        onClick: $setup.close
+      }, null, 8, ["color"])) : _createCommentVNode("v-if", true)
+    ])) : _createCommentVNode("v-if", true)
+  ]);
+}
+const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-column-notice/up-column-notice.uvue"]]);
 export {
   __easycom_0 as _
 };

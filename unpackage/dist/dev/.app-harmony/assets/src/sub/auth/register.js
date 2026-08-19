@@ -40,7 +40,6 @@ import "../../../uni_modules/lime-i18n/common/warnings.js";
 import "../../../uni_modules/lime-i18n/common/types.js";
 import "../../i18n/locales/zh-CN.js";
 import "../../i18n/locales/en-US.js";
-import "../../utils/systemInfo.js";
 import "../../store/index.js";
 import "../../../uni_modules/x-pinia-s/instans/types.js";
 import "../../../uni_modules/x-pinia-s/instans/subscriptions.js";
@@ -60,22 +59,18 @@ import "../../../uni_modules/uview-ultra/libs/i18n/locales/de.js";
 import "../../../uni_modules/uview-ultra/libs/i18n/locales/ko.js";
 import "../../../uni_modules/uview-ultra/libs/i18n/locales/ja.js";
 import "../../../uni_modules/uview-ultra/libs/i18n/locales/ru.js";
+import "../../utils/theme.js";
+import "../../../theme.js";
 import "../../store/token.js";
 import "../../store/user.js";
+import "../../utils/systemInfo.js";
 import "../../utils/toast.js";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, setSharedDataEvent: _setSharedDataEvent, createSharedDataComponent: _createSharedDataComponent, setSharedData: _setSharedData, withSharedDataVaporCtx: _withSharedDataVaporCtx } = globalThis.Vue;
-const __className = "GenSrcSubAuthRegister";
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "6126f08f",
-  __className,
-  __filename: "src/sub/auth/register.uvue",
+const { defineComponent: _defineComponent } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "register",
-  setup(__props) {
-    const __sharedDataRenderer = _useSharedDataRenderer();
-    const __sharedData = __sharedDataRenderer == "component" ? _withSharedDataComponent(new UniDynamicSharedDataComponent(_useSharedDataScope(), _useSharedDataComponentOptions({ bundleKey: "GenSrcSubAuthRegisterSharedData", sharedDataClassId: 0 }))) : _withSharedDataPage(new UniDynamicSharedDataPage(_useSharedDataPageId(), _useSharedDataPageOptions({ bundleKey: "GenSrcSubAuthRegisterSharedData", sharedDataClassId: 0 })));
-    _useSharedDataScope(__sharedData);
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
     function doRegister() {
       uni.showToast({
         title: "注册成功",
@@ -87,25 +82,43 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         });
       }, 1e3);
     }
-    return () => {
-      "raw js";
-      const n6 = _createSharedDataComponent(AppKu, "505f345a", null, {
-        "default": _withSharedDataVaporCtx(() => {
-          const n5 = _createSharedDataComponent(LayoutComponent, "88f15248", { "navigation-bar-title-text": "注册" }, {
-            "default": () => {
-              _setSharedDataEvent(__sharedData, 2, doRegister);
-            }
-          });
-          _setSharedData(__sharedData, 1, n5.sharedData);
-        })
-      });
-      _setSharedData(__sharedData, 0, n6.sharedData);
-      return __sharedData;
-    };
+    const __returned__ = { doRegister, get AppKu() {
+      return AppKu;
+    }, get LayoutComponent() {
+      return LayoutComponent;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const register = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "bg-__10b981_": { "": { "backgroundImage": "none", "backgroundColor": "#10b981" } }, "flex": { "": { "display": "flex" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-44px": { "": { "height": 44 } }, "items-center": { "": { "alignItems": "center" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-30px": { "": { "marginBottom": 30 } }, "p-30px": { "": { "paddingTop": 30, "paddingRight": 30, "paddingBottom": 30, "paddingLeft": 30 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-14px": { "": { "fontSize": 14 } }, "text-20px": { "": { "fontSize": 20 } }, "w-200px": { "": { "width": 200 } } };
+const { createElementVNode: _createElementVNode, withCtx: _withCtx, createVNode: _createVNode, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createBlock($setup["AppKu"], null, {
+    default: _withCtx(() => [
+      _createVNode($setup["LayoutComponent"], { "navigation-bar-title-text": "注册" }, {
+        default: _withCtx(() => [
+          _createElementVNode("view", { class: "flex-1 p-30px items-center justify-center" }, [
+            _createElementVNode("view", { class: "mb-30px" }, [
+              _createElementVNode("text", { class: "text-20px font-bold text-__1e293b_" }, "注册页")
+            ]),
+            _createElementVNode("view", {
+              class: "w-200px h-44px rounded-8px bg-__10b981_ flex flex-row items-center justify-center",
+              onClick: $setup.doRegister
+            }, [
+              _createElementVNode("text", { class: "text-__ffffff_ text-14px font-bold" }, "点击模拟注册")
+            ])
+          ])
+        ]),
+        _: 1
+        /* STABLE */
+      })
+    ]),
+    _: 1
+    /* STABLE */
+  });
+}
+const register = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/auth/register.uvue"]]);
 export {
   register as default
 };

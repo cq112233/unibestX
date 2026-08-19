@@ -39,7 +39,6 @@ import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-i18n/common/types&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/i18n/locales/zh-CN&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/i18n/locales/en-US&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/systemInfo&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/index&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/x-pinia-s/instans/types&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/x-pinia-s/instans/subscriptions&";
@@ -59,24 +58,20 @@ import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/ko&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/ja&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/ru&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/theme&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/theme&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/token&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/user&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/systemInfo&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/toast&";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, setSharedData: _setSharedData, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataFor: _createSharedDataFor, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataIf: _createSharedDataIf, createSharedDataComponent: _createSharedDataComponent, withSharedDataVaporCtx: _withSharedDataVaporCtx } = globalThis.Vue;
-const __className = "GenSrcSubTestTest";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref } = globalThis.Vue;
 const { onLoad } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "741c6c24",
-  __className,
-  __filename: "src/sub/test/test.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "test",
-  setup(__props) {
-    const __sharedDataRenderer = _useSharedDataRenderer();
-    const __sharedData = __sharedDataRenderer == "component" ? _withSharedDataComponent(new UniDynamicSharedDataComponent(_useSharedDataScope(), _useSharedDataComponentOptions({ bundleKey: "GenSrcSubTestTestSharedData", sharedDataClassId: 0 }))) : _withSharedDataPage(new UniDynamicSharedDataPage(_useSharedDataPageId(), _useSharedDataPageOptions({ bundleKey: "GenSrcSubTestTestSharedData", sharedDataClassId: 0 })));
-    const __sharedDataScope = _useSharedDataScope(__sharedData);
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
     const optionKeys = ref([]);
     const queryOptions = ref(null);
     onLoad((options = null) => {
@@ -96,42 +91,76 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       }
       return "";
     }
-    return () => {
-      "raw js";
-      const n17 = _createSharedDataComponent(AppKu, "51fce8f3", null, {
-        "default": _withSharedDataVaporCtx(() => {
-          const n16 = _createSharedDataComponent(LayoutComponent, "24bf953a", { "navigation-bar-title-text": "测试" }, {
-            "default": () => {
-              _createSharedDataFor(_setSharedDataScoped(__sharedData, 2, _createSharedDataVFor(__sharedDataScope, () => {
-                return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-              })), () => {
-                return optionKeys.value;
-              }, (__sharedData_VFor0, _for_item0) => {
-                _renderSharedDataEffect(() => {
-                  const _key = _for_item0.value;
-                  _setSharedData(__sharedData_VFor0, 1, _toDisplayString(_key));
-                  _setSharedData(__sharedData_VFor0, 2, _toDisplayString(getOptionValue(_key)));
-                });
-                return null;
-              }, (__sharedData_VFor0, key) => {
-                return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(key));
-              });
-              _createSharedDataIf(() => {
-                return _setSharedData(__sharedData, 3, _toSharedDataBoolean(optionKeys.value.length == 0));
-              }, () => {
-              });
-            }
-          });
-          _setSharedData(__sharedData, 1, n16.sharedData);
-        })
-      });
-      _setSharedData(__sharedData, 0, n17.sharedData);
-      return __sharedData;
-    };
+    const __returned__ = { optionKeys, queryOptions, getOptionValue, get AppKu() {
+      return AppKu;
+    }, get LayoutComponent() {
+      return LayoutComponent;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const test = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "bg-white": { "": { "backgroundColor": "rgba(255,255,255,var(--un-bg-opacity,1))" } }, "border-bottom-color-__f8fafc_": { "": { "borderBottomColor": "#f8fafc" } }, "border-bottom-style-solid": { "": { "borderBottomStyle": "solid" } }, "border-bottom-width-1px": { "": { "borderBottomWidth": 1 } }, "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-top-color-__f1f5f9_": { "": { "borderTopColor": "#f1f5f9" } }, "border-top-style-solid": { "": { "borderTopStyle": "solid" } }, "border-top-width-1px": { "": { "borderTopWidth": 1 } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex": { "": { "display": "flex" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "font-medium": { "": { "fontWeight": 500 } }, "font-semibold": { "": { "fontWeight": 600 } }, "items-center": { "": { "alignItems": "center" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "mb-4px": { "": { "marginBottom": 4 } }, "mt-2px": { "": { "marginTop": 2 } }, "mt-4px": { "": { "marginTop": 4 } }, "p-5px": { "": { "paddingTop": 5, "paddingRight": 5, "paddingBottom": 5, "paddingLeft": 5 } }, "pt-4px": { "": { "paddingTop": 4 } }, "py-2px": { "": { "paddingTop": 2, "paddingBottom": 2 } }, "py-4px": { "": { "paddingTop": 4, "paddingBottom": 4 } }, "rounded-lg": { "": { "borderTopLeftRadius": "var(--un-radius-lg-default,8rpx)", "borderTopRightRadius": "var(--un-radius-lg-default,8rpx)", "borderBottomRightRadius": "var(--un-radius-lg-default,8rpx)", "borderBottomLeftRadius": "var(--un-radius-lg-default,8rpx)" } }, "shadow-sm": { "": { "boxShadow": "var(--un-inset-shadow,0 0 #0000),var(--un-inset-ring-shadow,0 0 #0000),var(--un-ring-offset-shadow,0 0 #0000),var(--un-ring-shadow,0 0 #0000),var(--un-shadow,0 1rpx 3rpx 0 var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))))", "--un-shadow": "0 1rpx 3rpx 0rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1)))" } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__334155_": { "": { "color": "#334155" } }, "text-__64748b_": { "": { "color": "#64748b" } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-12px": { "": { "fontSize": 12 } }, "text-14px": { "": { "fontSize": 14 } }, "text-20px": { "": { "fontSize": 20 } }, "text-center": { "": { "textAlign": "center" } } };
+const { createElementVNode: _createElementVNode, renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, toDisplayString: _toDisplayString, createCommentVNode: _createCommentVNode, withCtx: _withCtx, createVNode: _createVNode, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createBlock($setup["AppKu"], null, {
+    default: _withCtx(() => [
+      _createVNode($setup["LayoutComponent"], { "navigation-bar-title-text": "测试" }, {
+        default: _withCtx(() => [
+          _createElementVNode("view", { class: "p-5px min-h-screen bg-__f8fafc_" }, [
+            _createElementVNode("view", { class: "bg-white rounded-lg p-5px shadow-sm border-width-1px border-style-solid border-color-__e2e8f0_" }, [
+              _createElementVNode("text", { class: "text-20px font-bold text-__1e293b_" }, "URL Query 页面参数获取测试"),
+              _createElementVNode("text", { class: "text-12px text-__94a3b8_ mt-2px" }, "本页面用于展示并测试如何获取 URL 中携带的 query 参数。"),
+              _createElementVNode("view", { class: "mt-4px border-top-width-1px border-top-style-solid border-top-color-__f1f5f9_ pt-4px" }, [
+                _createElementVNode("view", { class: "mb-4px" }, [
+                  _createElementVNode("text", { class: "text-14px font-bold text-__64748b_" }, "解析到的参数详情：")
+                ]),
+                (_openBlock(true), _createElementBlock(
+                  _Fragment,
+                  null,
+                  _renderList($setup.optionKeys, (key) => {
+                    return _openBlock(), _createElementBlock("view", {
+                      key,
+                      class: "flex flex-row justify-between items-center py-2px border-bottom-width-1px border-bottom-style-solid border-bottom-color-__f8fafc_"
+                    }, [
+                      _createElementVNode(
+                        "text",
+                        { class: "text-14px text-__64748b_ font-medium" },
+                        _toDisplayString(key) + ":",
+                        1
+                        /* TEXT */
+                      ),
+                      _createElementVNode(
+                        "text",
+                        { class: "text-14px text-__334155_ font-semibold" },
+                        _toDisplayString($setup.getOptionValue(key)),
+                        1
+                        /* TEXT */
+                      )
+                    ]);
+                  }),
+                  128
+                  /* KEYED_FRAGMENT */
+                )),
+                $setup.optionKeys.length == 0 ? (_openBlock(), _createElementBlock("view", {
+                  key: 0,
+                  class: "py-4px text-center"
+                }, [
+                  _createElementVNode("text", { class: "text-14px text-__94a3b8_" }, "暂无任何 query 参数")
+                ])) : _createCommentVNode("v-if", true)
+              ])
+            ])
+          ])
+        ]),
+        _: 1
+        /* STABLE */
+      })
+    ]),
+    _: 1
+    /* STABLE */
+  });
+}
+const test = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/test/test.uvue"]]);
 export {
   test as default
 };

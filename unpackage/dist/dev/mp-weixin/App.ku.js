@@ -3,6 +3,7 @@ const common_vendor = require("./common/vendor.js");
 require("./src/store/index.js");
 const src_tabbar_store = require("./src/tabbar/store.js");
 const src_utils_toast = require("./src/utils/toast.js");
+const src_utils_theme = require("./src/utils/theme.js");
 const src_store_app = require("./src/store/app.js");
 if (!Array) {
   const _easycom_up_toast_1 = common_vendor.resolveComponent("up-toast");
@@ -21,7 +22,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const dark = appStore.state.isDark;
       return new common_vendor.UTSJSONObject({
         "--theme-color": appStore.state.theme,
-        "--bg-color": dark ? "#0f172a" : "#f5f6fa",
+        "--bg-color": src_utils_theme.getThemeTokens(dark).bgContent,
         "--text-color": dark ? "#e2e8f0" : "#1e293b",
         "--text-secondary": dark ? "#94a3b8" : "#64748b",
         "--card-bg": dark ? "#1e293b" : "#ffffff",

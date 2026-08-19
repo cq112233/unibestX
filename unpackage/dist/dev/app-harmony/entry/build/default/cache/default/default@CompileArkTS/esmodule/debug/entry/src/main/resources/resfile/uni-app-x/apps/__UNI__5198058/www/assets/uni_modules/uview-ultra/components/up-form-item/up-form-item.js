@@ -1,23 +1,18 @@
 import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
+import { r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { _ as __easycom_0$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-line/up-line&";
 import { d as defProps } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-form-item/formItem&";
 import { p as propsLine } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-line/line&";
 import { c as color } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/config/color&";
-import { b as addStyle, d as deepMerge, a as addUnit, i as error } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
+import { b as addStyle, d as deepMerge, a as addUnit, i as error, k as getProperty, l as setProperty } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import { u as useUltraUI } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useUltraUI&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataIf: _createSharedDataIf, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, toDisplayString: _toDisplayString, createSharedDataSlot: _createSharedDataSlot, setSharedDataEvent: _setSharedDataEvent } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpFormItemUpFormItem";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { getCurrentInstance, ref, reactive, computed, onMounted, watch } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-form-item"
   },
-  __dynamicSharedData: true,
-  __hash: "7562dee4",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-form-item/up-form-item.uvue",
   __name: "up-form-item",
   props: {
     customStyle: {
@@ -82,9 +77,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   },
   emits: ["click"],
   setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit, $slots = _a.slots;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpFormItemUpFormItemSharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose, __emit = _a.emit;
     const _b = useUltraUI(new UTSJSONObject({
       // 提示文本的位置
       labelPosition: "left",
@@ -183,6 +176,14 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       }
       itemRules.value = rules;
     };
+    const clearValidate = () => {
+      message.value = "";
+    };
+    const resetField = () => {
+      const value = getProperty(parentData.value["originalModel"], props.prop);
+      setProperty(parent.value.$props["model"], props.prop, value);
+      message.value = "";
+    };
     const clickHandler = () => {
       emit("click");
     };
@@ -222,81 +223,122 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       getRefs,
       setMessage
     });
-    return () => {
-      "raw js";
-      const _component_up_icon = __easycom_0;
-      const _component_up_line = __easycom_0$1;
-      _renderSharedDataEffect(() => {
-        _setSharedDataClass(__sharedData, 15, ["up-form-item", { "up-form-item--error": isErrorMessage.value }]);
-        _setSharedDataStyle(__sharedData, 16, bodyStyle.value);
-      });
-      _createSharedDataSlot("label", null, null, () => {
-        _createSharedDataIf(() => {
-          return _setSharedData(__sharedData, 5, _toSharedDataBoolean(__props.required || __props.leftIcon != "" || __props.label != ""));
-        }, () => {
-          _renderSharedDataEffect(() => {
-            return _setSharedDataStyle(__sharedData, 9, labelWrapperStyle.value);
-          });
-          _createSharedDataIf(() => {
-            return _setSharedData(__sharedData, 6, _toSharedDataBoolean(__props.required));
-          }, () => {
-          });
-          _createSharedDataIf(() => {
-            return _setSharedData(__sharedData, 7, _toSharedDataBoolean(__props.leftIcon != ""));
-          }, () => {
-            const n9 = _createSharedDataComponentWithFallback(_component_up_icon, "86e0f900", {
-              name: () => {
-                return __props.leftIcon;
-              },
-              "custom-style": () => {
-                return __props.leftIconStyle;
-              }
-            });
-            _setSharedData(__sharedData, 8, n9?.sharedData);
-          });
-          _renderSharedDataEffect(() => {
-            _setSharedDataStyle(__sharedData, 10, labelAlignStyle.value);
-            _setSharedDataStyle(__sharedData, 11, labelCustomStyle.value);
-            _setSharedData(__sharedData, 12, _toDisplayString(__props.label));
-          });
-        });
-      });
-      _createSharedDataSlot("default", null, null);
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 13, _toSharedDataBoolean($slots["right"] != null));
-      }, () => {
-        _createSharedDataSlot("right", null, null);
-      });
-      _setSharedDataEvent(__sharedData, 14, clickHandler);
-      _createSharedDataSlot("error", null, null, () => {
-        _createSharedDataIf(() => {
-          return _setSharedData(__sharedData, 0, _toSharedDataBoolean(isErrorMessage.value));
-        }, () => {
-          _renderSharedDataEffect(() => {
-            _setSharedDataStyle(__sharedData, 1, messageStyle.value);
-            _setSharedData(__sharedData, 2, _toDisplayString(message.value));
-          });
-        });
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 3, _toSharedDataBoolean(__props.borderBottom));
-      }, () => {
-        const n31 = _createSharedDataComponentWithFallback(_component_up_line, "55437db6", {
-          color: () => {
-            return lineColor.value;
-          },
-          customStyle: () => {
-            return lineStyle.value;
-          }
-        });
-        _setSharedData(__sharedData, 4, n31?.sharedData);
-      });
-      return __sharedData;
-    };
+    const __returned__ = { parent, parentData, getParentData, instance, props, emit, message, itemRules, bodyStyle, labelWrapperStyle, labelAlignStyle, labelCustomStyle, messageStyle, isErrorMessage, lineColor, lineStyle, updateParentData, init, setRules, clearValidate, resetField, clickHandler, getProps, getRefs, setMessage };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "up-form-item": { "": { "display": "flex", "flexDirection": "column" } }, "up-form-item__body": { "": { "display": "flex", "flexDirection": "row", "paddingTop": 10, "paddingRight": 0, "paddingBottom": 10, "paddingLeft": 0 } }, "up-form-item__body__left": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center" } }, "up-form-item__body__left__content": { "": { "position": "relative", "display": "flex", "flexDirection": "row", "alignItems": "center", "paddingRight": "10rpx", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-form-item__body__left__content__icon": { "": { "marginRight": "8rpx" } }, "up-form-item__body__left__content__required": { "": { "position": "absolute", "left": -9, "color": "#f56c6c", "lineHeight": "20px", "fontSize": 20, "top": 3 } }, "up-form-item__body__left__content__label": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-form-item__body__left__content__label__text": { "": { "color": "#303133", "fontSize": 15 } }, "up-form-item__body__right": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-form-item__body__right__content": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-form-item__body__right__content__slot": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "row", "alignItems": "center" } }, "up-form-item__body__right__content__icon": { "": { "marginLeft": "10rpx", "color": "#c0c4cc", "fontSize": "30rpx" } }, "up-form-item__body__right__message": { "": { "fontSize": 12, "lineHeight": "12px", "color": "#f56c6c" } } };
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { renderSlot: _renderSlot, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, resolveComponent: _resolveComponent, createVNode: _createVNode, toDisplayString: _toDisplayString, normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode, createBlock: _createBlock, normalizeClass: _normalizeClass } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
+  const _component_up_line = resolveEasycom(__resolveDynamicComponent("up-line"), __easycom_0$1);
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      class: _normalizeClass(["up-form-item", { "up-form-item--error": $setup.isErrorMessage }])
+    },
+    [
+      _createElementVNode(
+        "view",
+        {
+          class: "up-form-item__body",
+          onClick: $setup.clickHandler,
+          style: _normalizeStyle($setup.bodyStyle)
+        },
+        [
+          _renderSlot(_ctx.$slots, "label", {}, () => [
+            $props.required || $props.leftIcon != "" || $props.label != "" ? (_openBlock(), _createElementBlock(
+              "view",
+              {
+                key: 0,
+                class: "up-form-item__body__left",
+                style: _normalizeStyle($setup.labelWrapperStyle)
+              },
+              [
+                _createElementVNode("view", { class: "up-form-item__body__left__content" }, [
+                  $props.required ? (_openBlock(), _createElementBlock("text", {
+                    key: 0,
+                    class: "up-form-item__body__left__content__required"
+                  }, "*")) : _createCommentVNode("v-if", true),
+                  $props.leftIcon != "" ? (_openBlock(), _createElementBlock("view", {
+                    key: 1,
+                    class: "up-form-item__body__left__content__icon"
+                  }, [
+                    _createVNode(_component_up_icon, {
+                      name: $props.leftIcon,
+                      "custom-style": $props.leftIconStyle
+                    }, null, 8, ["name", "custom-style"])
+                  ])) : _createCommentVNode("v-if", true),
+                  _createElementVNode(
+                    "view",
+                    {
+                      class: "up-form-item__body__left__content__label",
+                      style: _normalizeStyle($setup.labelAlignStyle)
+                    },
+                    [
+                      _createElementVNode(
+                        "text",
+                        {
+                          class: "up-form-item__body__left__content__label__text",
+                          style: _normalizeStyle($setup.labelCustomStyle)
+                        },
+                        _toDisplayString($props.label),
+                        5
+                        /* TEXT, STYLE */
+                      )
+                    ],
+                    4
+                    /* STYLE */
+                  )
+                ])
+              ],
+              4
+              /* STYLE */
+            )) : _createCommentVNode("v-if", true)
+          ]),
+          _createElementVNode("view", { class: "up-form-item__body__right" }, [
+            _createElementVNode("view", { class: "up-form-item__body__right__content" }, [
+              _createElementVNode("view", { class: "up-form-item__body__right__content__slot" }, [
+                _renderSlot(_ctx.$slots, "default")
+              ]),
+              _ctx.$slots["right"] != null ? (_openBlock(), _createElementBlock("view", {
+                key: 0,
+                class: "item__body__right__content__icon"
+              }, [
+                _renderSlot(_ctx.$slots, "right")
+              ])) : _createCommentVNode("v-if", true)
+            ])
+          ])
+        ],
+        4
+        /* STYLE */
+      ),
+      _renderSlot(_ctx.$slots, "error", {}, () => [
+        $setup.isErrorMessage ? (_openBlock(), _createElementBlock(
+          "text",
+          {
+            key: 0,
+            class: "up-form-item__body__right__message",
+            style: _normalizeStyle($setup.messageStyle)
+          },
+          _toDisplayString($setup.message),
+          5
+          /* TEXT, STYLE */
+        )) : _createCommentVNode("v-if", true)
+      ]),
+      $props.borderBottom ? (_openBlock(), _createBlock(_component_up_line, {
+        key: 0,
+        color: $setup.lineColor,
+        customStyle: $setup.lineStyle
+      }, null, 8, ["color", "customStyle"])) : _createCommentVNode("v-if", true)
+    ],
+    2
+    /* CLASS */
+  );
+}
+const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-form-item/up-form-item.uvue"]]);
 export {
   __easycom_2 as _
 };

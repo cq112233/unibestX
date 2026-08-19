@@ -1,22 +1,22 @@
 import { s as syncCurIdxByCurrentPage, b as tabbarList, c as curIdx, d as setCurIdx } from "./store.js";
 import { T as TabbarItem } from "./TabbarItem.js";
 import { s as safeAreaInsets } from "../utils/systemInfo.js";
+import "../store/index.js";
+import { g as getThemeTokens } from "../utils/theme.js";
+import { u as useAppStore } from "../store/app.js";
 import { _ as _export_sfc } from "../../plugin-vue-export-helper.js";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, unref: _unref, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, setSharedData: _setSharedData, toDisplayString: _toDisplayString, setSharedDataClass: _setSharedDataClass, createSharedDataComponent: _createSharedDataComponent, setSharedDataEvent: _setSharedDataEvent, createSharedDataFor: _createSharedDataFor } = globalThis.Vue;
-const __className = "GenSrcTabbarIndex";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { computed, onMounted } = globalThis.Vue;
 const TABBAR_HEIGHT = 50;
 const TABBAR_CONTAINER_HEIGHT = 80;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "066738c8",
-  __className,
-  __filename: "src/tabbar/index.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "index",
-  setup(__props) {
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenSrcTabbarIndexSharedData", sharedDataClassId: 0 })));
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
+    const themeTokens = computed(() => {
+      return getThemeTokens(useAppStore().state.isDark);
+    });
     const safeAreaBottom = computed(() => {
       const insets = safeAreaInsets.value;
       if (insets != null) {
@@ -47,55 +47,87 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       syncCurIdxByCurrentPage();
       uni.hideTabBar(new UTSJSONObject({
         fail: (err = null) => {
-          uni.__f__("log", "at src/tabbar/index.uvue:51", "hideTabBar fail: ", err);
+          uni.__f__("log", "at src/tabbar/index.uvue:59", "hideTabBar fail: ", err);
         }
       }));
     });
-    return () => {
-      "raw js";
-      _renderSharedDataEffect(() => {
-        const _safeAreaBottom = _unref(safeAreaBottom);
-        const __height_TABBAR_HEIGHT_safeAreaBottom_px = { height: `${TABBAR_HEIGHT + _safeAreaBottom}px` };
-        _setSharedDataStyle(__sharedData, 1, __height_TABBAR_HEIGHT_safeAreaBottom_px);
-        _setSharedDataStyle(__sharedData, 2, { height: `${TABBAR_CONTAINER_HEIGHT + _safeAreaBottom}px` });
-        _setSharedDataStyle(__sharedData, 3, __height_TABBAR_HEIGHT_safeAreaBottom_px);
-      });
-      _createSharedDataFor(_setSharedDataScoped(__sharedData, 0, _createSharedDataVFor(__sharedDataScope, () => {
-        return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-      })), () => {
-        return _unref(tabbarList);
-      }, (__sharedData_VFor0, _for_item0, _for_key0) => {
-        _renderSharedDataEffect(() => {
-          return _setSharedDataClass(__sharedData_VFor0, 3, ["tabbar-item", { "tabbar-item-bulge": _for_item0.value.isBulge }]);
-        });
-        const n3 = _createSharedDataComponent(TabbarItem, "10d18caa-" + _for_key0.value, {
-          item: () => {
-            return _for_item0.value;
-          },
-          index: () => {
-            return _for_key0.value;
-          },
-          "is-bulge": () => {
-            return _for_item0.value.isBulge;
-          }
-        });
-        _setSharedData(__sharedData_VFor0, 1, n3.sharedData);
-        _setSharedDataEvent(__sharedData_VFor0, 2, () => {
-          return handleClick(_for_key0.value);
-        });
-        return null;
-      }, (__sharedData_VFor0, item, index) => {
-        return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
-      }, 1);
-      _renderSharedDataEffect(() => {
-        return _setSharedDataStyle(__sharedData, 4, { height: `${_unref(safeAreaBottom)}px` });
-      });
-      return __sharedData;
-    };
+    const __returned__ = { TABBAR_HEIGHT, TABBAR_CONTAINER_HEIGHT, themeTokens, safeAreaBottom, handleClickBulge, handleClick, get tabbarList() {
+      return tabbarList;
+    }, get TabbarItem() {
+      return TabbarItem;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const Tabbar = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "tabbar-container": { "": { "position": "fixed", "bottom": 0, "left": 0, "right": 0, "zIndex": 1, "backgroundColor": "rgba(0,0,0,0)", "flexDirection": "column" } }, "tabbar-bg": { "": { "position": "absolute", "bottom": 0, "left": 0, "right": 0, "borderTopWidth": "1rpx", "borderTopStyle": "solid", "zIndex": 1 } }, "tabbar-inner": { "": { "flexDirection": "row", "height": 80, "alignItems": "flex-end", "zIndex": 2 } }, "tabbar-item": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "alignItems": "center", "justifyContent": "center", "height": 50 } }, "tabbar-item-bulge": { "": { "height": 80 } }, "safe-area-bg": { "": { "zIndex": 1 } } };
+const { normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode, renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, createVNode: _createVNode, normalizeClass: _normalizeClass } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      class: "tabbar-placeholder",
+      style: _normalizeStyle({ height: `${$setup.TABBAR_HEIGHT + $setup.safeAreaBottom}px` })
+    },
+    [
+      _createElementVNode(
+        "view",
+        {
+          class: "tabbar-container",
+          style: _normalizeStyle({ height: `${$setup.TABBAR_CONTAINER_HEIGHT + $setup.safeAreaBottom}px` })
+        },
+        [
+          _createElementVNode(
+            "view",
+            {
+              class: "tabbar-bg",
+              style: _normalizeStyle({ height: `${$setup.TABBAR_HEIGHT + $setup.safeAreaBottom}px`, backgroundColor: $setup.themeTokens.tabBg, borderTopColor: $setup.themeTokens.tabBorder })
+            },
+            null,
+            4
+            /* STYLE */
+          ),
+          _createElementVNode("view", { class: "tabbar-inner" }, [
+            (_openBlock(true), _createElementBlock(
+              _Fragment,
+              null,
+              _renderList($setup.tabbarList, (item, index) => {
+                return _openBlock(), _createElementBlock("view", {
+                  key: index,
+                  class: _normalizeClass(["tabbar-item", { "tabbar-item-bulge": item.isBulge }]),
+                  onClick: ($event) => $setup.handleClick(index)
+                }, [
+                  _createVNode($setup["TabbarItem"], {
+                    item,
+                    index,
+                    "is-bulge": item.isBulge
+                  }, null, 8, ["item", "index", "is-bulge"])
+                ], 10, ["onClick"]);
+              }),
+              128
+              /* KEYED_FRAGMENT */
+            ))
+          ]),
+          _createElementVNode(
+            "view",
+            {
+              class: "safe-area-bg",
+              style: _normalizeStyle({ height: `${$setup.safeAreaBottom}px`, backgroundColor: $setup.themeTokens.tabBg })
+            },
+            null,
+            4
+            /* STYLE */
+          )
+        ],
+        4
+        /* STYLE */
+      )
+    ],
+    4
+    /* STYLE */
+  );
+}
+const Tabbar = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/tabbar/index.uvue"]]);
 export {
   Tabbar as T
 };

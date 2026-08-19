@@ -1,50 +1,11 @@
 import { _ as __easycom_0 } from "../../../../components/NavBar/NavBar.js";
+import { A as AppKu, r as resolveEasycom } from "../../../../../App.ku.js";
 import { _ as __easycom_0$1 } from "../../../../../uni_modules/uview-ultra/components/up-icon/up-icon.js";
 import { _ as __easycom_2 } from "../../../../../uni_modules/uview-ultra/components/up-grid-item/up-grid-item.js";
 import { _ as __easycom_3 } from "../../../../../uni_modules/uview-ultra/components/up-grid/up-grid.js";
-import { A as AppKu } from "../../../../../App.ku.js";
 import { L as LayoutComponent } from "../../../../layouts/default.js";
 import { _ as _export_sfc } from "../../../../../plugin-vue-export-helper.js";
 import "../../../../utils/systemInfo.js";
-import "../../../../../uni_modules/uview-ultra/components/up-icon/icons.js";
-import "../../../../../uni_modules/uview-ultra/libs/function/index.js";
-import "../../../../../uni_modules/uview-ultra/libs/function/test.js";
-import "../../../../../uni_modules/uview-ultra/libs/function/digit.js";
-import "../../../../../uni_modules/e-chart/components/e-chart/uts/WebviewEchart.js";
-import "../../../../../uni_modules/uview-ultra/libs/config/config.js";
-import "../../../../../uni_modules/uview-ultra/libs/composable/useUltraUI.js";
-import "../../../../../uni_modules/uview-ultra/components/up-icon/icon.js";
-import "../../../../../uni_modules/uview-ultra/libs/composable/useMp.js";
-import "../../../../../uni_modules/uview-ultra/components/up-grid-item/gridItem.js";
-import "../../../../../uni_modules/uview-ultra/components/up-grid/grid.js";
-import "../../../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
-import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.js";
-import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/loadingIcon.js";
-import "../../../../../uni_modules/uview-ultra/libs/function/colorGradient.js";
-import "../../../../../uni_modules/uview-ultra/components/up-gap/up-gap.js";
-import "../../../../../uni_modules/uview-ultra/components/up-gap/gap.js";
-import "../../../../../uni_modules/uview-ultra/components/up-overlay/up-overlay.js";
-import "../../../../../uni_modules/uview-ultra/components/up-transition/up-transition.js";
-import "../../../../../uni_modules/uview-ultra/components/up-transition/transition.js";
-import "../../../../../uni_modules/uview-ultra/libs/config/color.js";
-import "../../../../tabbar/index.js";
-import "../../../../tabbar/store.js";
-import "../../../../tabbar/types.js";
-import "../../../../tabbar/config.js";
-import "../../../../tabbar/TabbarItem.js";
-import "../../../../../uni_modules/uni-icons/components/uni-icons/uni-icons.js";
-import "../../../../../uni_modules/uni-icons/components/uni-icons/uniicons_file.js";
-import "../../../../utils/i18n.js";
-import "../../../../i18n/index.js";
-import "../../../../../uni_modules/lime-i18n/common/index.js";
-import "../../../../../uni_modules/lime-i18n/common/composer-class.js";
-import "../../../../../uni_modules/lime-i18n/common/format.js";
-import "../../../../../uni_modules/lime-i18n/common/util.js";
-import "../../../../../uni_modules/lime-i18n/common/errors.js";
-import "../../../../../uni_modules/lime-i18n/common/warnings.js";
-import "../../../../../uni_modules/lime-i18n/common/types.js";
-import "../../../../i18n/locales/zh-CN.js";
-import "../../../../i18n/locales/en-US.js";
 import "../../../../store/index.js";
 import "../../../../../uni_modules/x-pinia-s/instans/types.js";
 import "../../../../../uni_modules/x-pinia-s/instans/subscriptions.js";
@@ -54,6 +15,20 @@ import "../../../../../uni_modules/x-pinia-s/instans/persist.js";
 import "../../../../store/app.js";
 import "../../../../../uni_modules/x-pinia-s/instans/storeBase.js";
 import "../../../../../uni_modules/x-pinia-s/instans/defineStore.js";
+import "../../../../tabbar/store.js";
+import "../../../../tabbar/types.js";
+import "../../../../tabbar/config.js";
+import "../../../../i18n/index.js";
+import "../../../../../uni_modules/lime-i18n/common/index.js";
+import "../../../../../uni_modules/lime-i18n/common/composer-class.js";
+import "../../../../../uni_modules/e-chart/components/e-chart/uts/WebviewEchart.js";
+import "../../../../../uni_modules/lime-i18n/common/format.js";
+import "../../../../../uni_modules/lime-i18n/common/util.js";
+import "../../../../../uni_modules/lime-i18n/common/errors.js";
+import "../../../../../uni_modules/lime-i18n/common/warnings.js";
+import "../../../../../uni_modules/lime-i18n/common/types.js";
+import "../../../../i18n/locales/zh-CN.js";
+import "../../../../i18n/locales/en-US.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/index.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hans.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hant.js";
@@ -64,77 +39,119 @@ import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/de.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ko.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ja.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ru.js";
+import "../../../../utils/theme.js";
+import "../../../../../theme.js";
 import "../../../../store/token.js";
 import "../../../../store/user.js";
+import "../../../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
+import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.js";
+import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/loadingIcon.js";
+import "../../../../../uni_modules/uview-ultra/libs/config/config.js";
+import "../../../../../uni_modules/uview-ultra/libs/function/index.js";
+import "../../../../../uni_modules/uview-ultra/libs/function/test.js";
+import "../../../../../uni_modules/uview-ultra/libs/function/digit.js";
+import "../../../../../uni_modules/uview-ultra/libs/function/colorGradient.js";
+import "../../../../../uni_modules/uview-ultra/components/up-gap/up-gap.js";
+import "../../../../../uni_modules/uview-ultra/libs/composable/useMp.js";
+import "../../../../../uni_modules/uview-ultra/components/up-gap/gap.js";
+import "../../../../../uni_modules/uview-ultra/components/up-overlay/up-overlay.js";
+import "../../../../../uni_modules/uview-ultra/components/up-transition/up-transition.js";
+import "../../../../../uni_modules/uview-ultra/components/up-transition/transition.js";
+import "../../../../../uni_modules/uview-ultra/libs/config/color.js";
+import "../../../../tabbar/index.js";
+import "../../../../tabbar/TabbarItem.js";
+import "../../../../../uni_modules/uni-icons/components/uni-icons/uni-icons.js";
+import "../../../../../uni_modules/uni-icons/components/uni-icons/uniicons_file.js";
+import "../../../../utils/i18n.js";
 import "../../../../utils/toast.js";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, resolveComponent: _resolveComponent, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, toDisplayString: _toDisplayString, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataFor: _createSharedDataFor, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
-const __className = "GenSrcSubUviewUltraDemosGridGrid";
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "0ea470e0",
-  __className,
-  __filename: "src/sub/uview-ultra/demos/grid/grid.uvue",
+import "../../../../../uni_modules/uview-ultra/components/up-icon/icons.js";
+import "../../../../../uni_modules/uview-ultra/libs/composable/useUltraUI.js";
+import "../../../../../uni_modules/uview-ultra/components/up-icon/icon.js";
+import "../../../../../uni_modules/uview-ultra/components/up-grid-item/gridItem.js";
+import "../../../../../uni_modules/uview-ultra/components/up-grid/grid.js";
+const { defineComponent: _defineComponent } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "grid",
-  setup(__props) {
-    const __sharedDataRenderer = _useSharedDataRenderer();
-    const __sharedData = __sharedDataRenderer == "component" ? _withSharedDataComponent(new UniDynamicSharedDataComponent(_useSharedDataScope(), _useSharedDataComponentOptions({ bundleKey: "GenSrcSubUviewUltraDemosGridGridSharedData", sharedDataClassId: 0 }))) : _withSharedDataPage(new UniDynamicSharedDataPage(_useSharedDataPageId(), _useSharedDataPageOptions({ bundleKey: "GenSrcSubUviewUltraDemosGridGridSharedData", sharedDataClassId: 0 })));
-    const __sharedDataScope = _useSharedDataScope(__sharedData);
-    return () => {
-      "raw js";
-      const _component_NavBar = __easycom_0;
-      const _component_up_icon = __easycom_0$1;
-      const _component_up_grid_item = __easycom_2;
-      const _component_up_grid = __easycom_3;
-      const n12 = _createSharedDataComponent(AppKu, "51abafa6", null, {
-        "default": _withSharedDataVaporCtx(() => {
-          const n11 = _createSharedDataComponent(LayoutComponent, "0e1add69", {
-            "navigation-style": "custom",
-            "navigation-bar-title-text": "up-grid 宫格"
-          }, {
-            "default": _withSharedDataVaporCtx(() => {
-              const n0 = _createSharedDataComponentWithFallback(_component_NavBar, "957e5f70", {
-                title: "Grid 宫格",
-                "auto-back": true
-              });
-              _setSharedData(__sharedData, 2, n0?.sharedData);
-              const n7 = _createSharedDataComponentWithFallback(_component_up_grid, "957e516c", { border: true }, {
-                "default": _withSharedDataVaporCtx(() => {
-                  _createSharedDataFor(_setSharedDataScoped(__sharedData, 4, _createSharedDataVFor(__sharedDataScope, () => {
-                    return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-                  })), () => {
-                    return 4;
-                  }, (__sharedData_VFor0, _for_item0) => {
-                    const n6 = _createSharedDataComponentWithFallback(_component_up_grid_item, "957e50a8-" + _for_item0.value, null, {
-                      "default": _withSharedDataVaporCtx(() => {
-                        const n4 = _createSharedDataComponentWithFallback(_component_up_icon, "957e4a5a-" + _for_item0.value, {
-                          name: "photo",
-                          size: 30
-                        });
-                        _setSharedData(__sharedData_VFor0, 2, n4?.sharedData);
-                      })
-                    });
-                    _setSharedData(__sharedData_VFor0, 1, n6?.sharedData);
-                    return n6;
-                  }, (__sharedData_VFor0, i) => {
-                    return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(i));
-                  }, 6);
-                })
-              });
-              _setSharedData(__sharedData, 3, n7?.sharedData);
-            })
-          });
-          _setSharedData(__sharedData, 1, n11.sharedData);
-        })
-      });
-      _setSharedData(__sharedData, 0, n12.sharedData);
-      return __sharedData;
-    };
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
+    const __returned__ = { get AppKu() {
+      return AppKu;
+    }, get LayoutComponent() {
+      return LayoutComponent;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const _style_1 = {};
-const grid = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0, _style_1]]]);
+const _style_0 = { "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "pb-30px": { "": { "paddingBottom": 30 } } };
+const _style_1 = { "demo-block": { "": { "marginBottom": 12, "paddingTop": 12, "paddingRight": 12, "paddingBottom": 12, "paddingLeft": 12, "backgroundColor": "#ffffff", "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "demo-label": { "": { "fontSize": 14, "fontWeight": "bold", "color": "#606266", "marginBottom": 10, "paddingLeft": 4, "borderLeftWidth": 3, "borderLeftStyle": "solid", "borderLeftColor": "#2979ff" } } };
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { resolveComponent: _resolveComponent, createVNode: _createVNode, createElementVNode: _createElementVNode, renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, withCtx: _withCtx, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_NavBar = resolveEasycom(__resolveDynamicComponent("NavBar"), __easycom_0);
+  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0$1);
+  const _component_up_grid_item = resolveEasycom(__resolveDynamicComponent("up-grid-item"), __easycom_2);
+  const _component_up_grid = resolveEasycom(__resolveDynamicComponent("up-grid"), __easycom_3);
+  return _openBlock(), _createBlock($setup["AppKu"], null, {
+    default: _withCtx(() => [
+      _createVNode($setup["LayoutComponent"], {
+        "navigation-style": "custom",
+        "navigation-bar-title-text": "up-grid 宫格"
+      }, {
+        default: _withCtx(() => [
+          _createElementVNode("view", { class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }, [
+            _createVNode(_component_NavBar, {
+              title: "Grid 宫格",
+              "auto-back": true
+            }),
+            _createElementVNode("view", { class: "p-16px" }, [
+              _createElementVNode("view", { class: "demo-block" }, [
+                _createElementVNode("text", { class: "demo-label" }, "基础用法"),
+                _createVNode(_component_up_grid, { border: true }, {
+                  default: _withCtx(() => [
+                    (_openBlock(), _createElementBlock(
+                      _Fragment,
+                      null,
+                      _renderList(4, (i) => {
+                        return _createVNode(
+                          _component_up_grid_item,
+                          { key: i },
+                          {
+                            default: _withCtx(() => [
+                              _createVNode(_component_up_icon, {
+                                name: "photo",
+                                size: 30
+                              }),
+                              _createElementVNode("text", { style: { "margin-top": "10px", "font-size": "14px", "color": "#333" } }, "宫格")
+                            ]),
+                            _: 2
+                            /* DYNAMIC */
+                          },
+                          1024
+                          /* DYNAMIC_SLOTS */
+                        );
+                      }),
+                      64
+                      /* STABLE_FRAGMENT */
+                    ))
+                  ]),
+                  _: 1
+                  /* STABLE */
+                })
+              ])
+            ])
+          ])
+        ]),
+        _: 1
+        /* STABLE */
+      })
+    ]),
+    _: 1
+    /* STABLE */
+  });
+}
+const grid = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0, _style_1]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/grid/grid.uvue"]]);
 export {
   grid as default
 };

@@ -3,6 +3,9 @@ const common_vendor = require("../../common/vendor.js");
 require("./types.js");
 const src_tabbar_store = require("./store.js");
 const src_utils_i18n = require("../utils/i18n.js");
+require("../store/index.js");
+const src_utils_theme = require("../utils/theme.js");
+const src_store_app = require("../store/app.js");
 if (!Array) {
   const _easycom_uni_icons_1 = common_vendor.resolveComponent("uni-icons");
   _easycom_uni_icons_1();
@@ -11,7 +14,6 @@ const _easycom_uni_icons = () => "../../uni_modules/uni-icons/components/uni-ico
 if (!Math) {
   _easycom_uni_icons();
 }
-const inactiveColor = "#999999";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "TabbarItem",
   props: {
@@ -33,6 +35,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const tabbarItem = common_vendor.computed(() => {
       return props.item;
     });
+    const themeTokens = common_vendor.computed(() => {
+      return src_utils_theme.getThemeTokens(src_store_app.useAppStore().state.isDark);
+    });
     function getIcon() {
       if (src_tabbar_store.curIdx.value == props.index && tabbarItem.value.iconActive.length > 0) {
         return tabbarItem.value.iconActive;
@@ -40,7 +45,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return tabbarItem.value.icon;
     }
     function getActiveColor() {
-      return src_tabbar_store.curIdx.value == props.index ? src_tabbar_store.themeColor.value : inactiveColor;
+      return src_tabbar_store.curIdx.value == props.index ? src_tabbar_store.themeColor.value : themeTokens.value.tabColor;
     }
     function isDotBadge() {
       return tabbarItem.value.badge != null && tabbarItem.value.badge == "dot";

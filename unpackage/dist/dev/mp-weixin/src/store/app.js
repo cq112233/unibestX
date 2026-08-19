@@ -7,6 +7,7 @@ require("../../uni_modules/x-pinia-s/instans/persist.js");
 const src_tabbar_store = require("../tabbar/store.js");
 const src_i18n_index = require("../i18n/index.js");
 const uni_modules_uviewUltra_libs_i18n_index = require("../../uni_modules/uview-ultra/libs/i18n/index.js");
+const src_utils_theme = require("../utils/theme.js");
 class IAppState extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -15,6 +16,7 @@ class IAppState extends common_vendor.UTS.UTSType {
         return {
           theme: { type: String, optional: false },
           locale: { type: String, optional: false },
+          themeMode: { type: String, optional: false },
           isDark: { type: Boolean, optional: false }
         };
       },
@@ -26,6 +28,7 @@ class IAppState extends common_vendor.UTS.UTSType {
     this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.theme = this.__props__.theme;
     this.locale = this.__props__.locale;
+    this.themeMode = this.__props__.themeMode;
     this.isDark = this.__props__.isDark;
     delete this.__props__;
   }
@@ -47,6 +50,7 @@ function getSystemLocale() {
 const defaultAppState = new IAppState({
   theme: "#37c2bc",
   locale: getSystemLocale(),
+  themeMode: "auto",
   isDark: false
 });
 class AppStore extends uni_modules_xPiniaS_instans_storeBase.PiniaStoreBase {
@@ -56,8 +60,10 @@ class AppStore extends uni_modules_xPiniaS_instans_storeBase.PiniaStoreBase {
     this.state = common_vendor.reactive(new IAppState({
       theme: "#37c2bc",
       locale: getSystemLocale(),
+      themeMode: "auto",
       isDark: false
     }));
+    this._themeModeInited = false;
     this.bindState(this.state);
     src_tabbar_store.themeColor.value = this.state.theme;
     src_i18n_index.i18n.global.locale.value = this.state.locale;
@@ -69,10 +75,12 @@ class AppStore extends uni_modules_xPiniaS_instans_storeBase.PiniaStoreBase {
   _doReset() {
     this.state.theme = defaultAppState.theme;
     this.state.locale = defaultAppState.locale;
+    this.state.themeMode = defaultAppState.themeMode;
     this.state.isDark = defaultAppState.isDark;
     src_tabbar_store.themeColor.value = defaultAppState.theme;
     src_i18n_index.i18n.global.locale.value = defaultAppState.locale;
     uni_modules_uviewUltra_libs_i18n_index.setLocale(defaultAppState.locale);
+    this.initThemeMode();
   }
   _hydrate(_data) {
     if (_data.theme != null) {
@@ -86,16 +94,22 @@ class AppStore extends uni_modules_xPiniaS_instans_storeBase.PiniaStoreBase {
       src_i18n_index.i18n.global.locale.value = localeVal;
       uni_modules_uviewUltra_libs_i18n_index.setLocale(localeVal);
     }
-    if (_data.isDark != null) {
-      const darkVal = _data.isDark;
-      this.state.isDark = darkVal;
+    if (_data.themeMode != null) {
+      const modeVal = _data.themeMode;
+      if (modeVal == "auto" || modeVal == "light" || modeVal == "dark") {
+        this.state.themeMode = modeVal;
+      } else {
+        this.state.themeMode = "auto";
+      }
+    } else if (_data.isDark != null) {
+      this.state.themeMode = _data.isDark ? "dark" : "light";
     }
   }
   _serialize() {
     return new common_vendor.UTSJSONObject({
       theme: this.state.theme,
       locale: this.state.locale,
-      isDark: this.state.isDark
+      themeMode: this.state.themeMode
     });
   }
   // ==========================================
@@ -109,10 +123,42 @@ class AppStore extends uni_modules_xPiniaS_instans_storeBase.PiniaStoreBase {
     src_tabbar_store.themeColor.value = theme;
   }
   /**
-   * 设置暗黑模式
+   * 初始化外观模式：注册全局主题监听并应用当前模式
+   * - App（Android/iOS/鸿蒙）：setAppTheme + onAppThemeChange
+   * - H5：matchMedia 监听 prefers-color-scheme
+   * - 微信小程序：读取宿主主题 + onHostThemeChange
+   * 必须在 onLaunch 中调用（此时持久化已还原，可读取到真实的 themeMode）
    */
-  setDarkMode(dark) {
-    this.state.isDark = dark;
+  initThemeMode() {
+    if (!this._themeModeInited) {
+      this._themeModeInited = true;
+      common_vendor.index.onHostThemeChange((res) => {
+        if (this.state.themeMode == "auto") {
+          this.refreshIsDark();
+        }
+      });
+    }
+    this.refreshIsDark();
+  }
+  /**
+   * 设置外观模式：auto（跟随系统）/ light / dark
+   */
+  setThemeMode(mode) {
+    this.state.themeMode = mode;
+    this.refreshIsDark();
+  }
+  /**
+   * 根据 themeMode 刷新实际生效的 isDark，并同步 H5 根节点 data-theme
+   */
+  refreshIsDark() {
+    const mode = this.state.themeMode;
+    if (mode == "light") {
+      this.state.isDark = false;
+    } else if (mode == "dark") {
+      this.state.isDark = true;
+    } else {
+      this.state.isDark = src_utils_theme.getSystemTheme() == "dark";
+    }
   }
   /**
    * 设置语言

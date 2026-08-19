@@ -1,20 +1,15 @@
 import { _ as __easycom_0 } from "../up-line/up-line.js";
+import { r as resolveEasycom } from "../../../../App.ku.js";
 import { _ as __easycom_1$1 } from "../up-loading-icon/up-loading-icon.js";
 import { a as addUnit, b as addStyle, d as deepMerge } from "../../libs/function/index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, setSharedDataClass: _setSharedDataClass, setSharedDataEvent: _setSharedDataEvent, toDisplayString: _toDisplayString } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpLoadmoreUpLoadmore";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { computed } = globalThis.Vue;
 const dotText = "●";
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-loadmore"
   },
-  __dynamicSharedData: true,
-  __hash: "2c27d764",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-loadmore/up-loadmore.uvue",
   __name: "up-loadmore",
   props: {
     status: {
@@ -98,9 +93,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   },
   emits: ["loadmore"],
   setup(__props, _a) {
-    var __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpLoadmoreUpLoadmoreSharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
     const props = __props;
     const emit = __emit;
     const loadmoreStyle = computed(() => {
@@ -136,75 +130,75 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       if (props.status == "loadmore")
         emit("loadmore");
     }
-    return () => {
-      "raw js";
-      const _component_up_line = __easycom_0;
-      const _component_up_loading_icon = __easycom_1$1;
-      _renderSharedDataEffect(() => {
-        return _setSharedDataStyle(__sharedData, 7, loadmoreStyle.value);
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.line));
-      }, () => {
-        const n2 = _createSharedDataComponentWithFallback(_component_up_line, "7f252515", {
-          length: "140rpx",
-          color: () => {
-            return __props.lineColor;
-          },
-          hairline: false,
-          dashed: () => {
-            return __props.dashed;
-          }
-        });
-        _setSharedData(__sharedData, 1, n2?.sharedData);
-      });
-      _renderSharedDataEffect(() => {
-        const _status = __props.status;
-        _setSharedDataClass(__sharedData, 8, [_status == "loadmore" || _status == "nomore" ? "up-more" : "", "up-loadmore__content"]);
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 4, _toSharedDataBoolean(__props.status == "loading" && __props.icon));
-      }, () => {
-        const n5 = _createSharedDataComponentWithFallback(_component_up_loading_icon, "657f75c1", {
-          color: () => {
-            return __props.iconColor;
-          },
-          size: () => {
-            return __props.iconSize;
-          },
-          mode: () => {
-            return __props.loadingIcon;
-          }
-        });
-        _setSharedData(__sharedData, 5, n5?.sharedData);
-      });
-      _setSharedDataEvent(__sharedData, 6, loadMore);
-      _renderSharedDataEffect(() => {
-        _setSharedDataClass(__sharedData, 9, ["up-line-11", [__props.status == "nomore" && __props.isDot == true ? "up-loadmore__content__dot-text" : "up-loadmore__content__text"]]);
-        _setSharedDataStyle(__sharedData, 10, loadTextStyle.value);
-        _setSharedData(__sharedData, 11, _toDisplayString(showText.value));
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 2, _toSharedDataBoolean(__props.line));
-      }, () => {
-        const n11 = _createSharedDataComponentWithFallback(_component_up_line, "657f8487", {
-          length: "140rpx",
-          color: () => {
-            return __props.lineColor;
-          },
-          hairline: false,
-          dashed: () => {
-            return __props.dashed;
-          }
-        });
-        _setSharedData(__sharedData, 3, n11?.sharedData);
-      });
-      return __sharedData;
-    };
+    const __returned__ = { props, emit, dotText, loadmoreStyle, loadTextStyle, showText, loadMore };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-loadmore": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "up-loadmore__content": { "": { "marginTop": 0, "marginRight": 15, "marginBottom": 0, "marginLeft": 15, "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "up-loadmore__content__icon-wrap": { "": { "marginRight": 8 } }, "up-loadmore__content__text": { "": { "fontSize": 14, "color": "#606266" } }, "up-loadmore__content__dot-text": { "": { "fontSize": 15, "color": "#909193" } } };
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { resolveComponent: _resolveComponent, openBlock: _openBlock, createBlock: _createBlock, createCommentVNode: _createCommentVNode, createVNode: _createVNode, createElementBlock: _createElementBlock, toDisplayString: _toDisplayString, normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_line = resolveEasycom(__resolveDynamicComponent("up-line"), __easycom_0);
+  const _component_up_loading_icon = resolveEasycom(__resolveDynamicComponent("up-loading-icon"), __easycom_1$1);
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      class: "up-loadmore",
+      style: _normalizeStyle($setup.loadmoreStyle)
+    },
+    [
+      $props.line ? (_openBlock(), _createBlock(_component_up_line, {
+        key: 0,
+        length: "140rpx",
+        color: $props.lineColor,
+        hairline: false,
+        dashed: $props.dashed
+      }, null, 8, ["color", "dashed"])) : _createCommentVNode("v-if", true),
+      _createElementVNode(
+        "view",
+        {
+          class: _normalizeClass([$props.status == "loadmore" || $props.status == "nomore" ? "up-more" : "", "up-loadmore__content"])
+        },
+        [
+          $props.status == "loading" && $props.icon ? (_openBlock(), _createElementBlock("view", {
+            key: 0,
+            class: "up-loadmore__content__icon-wrap"
+          }, [
+            _createVNode(_component_up_loading_icon, {
+              color: $props.iconColor,
+              size: $props.iconSize,
+              mode: $props.loadingIcon
+            }, null, 8, ["color", "size", "mode"])
+          ])) : _createCommentVNode("v-if", true),
+          _createElementVNode(
+            "text",
+            {
+              class: _normalizeClass(["up-line-11", [$props.status == "nomore" && $props.isDot == true ? "up-loadmore__content__dot-text" : "up-loadmore__content__text"]]),
+              style: _normalizeStyle($setup.loadTextStyle),
+              onClick: $setup.loadMore
+            },
+            _toDisplayString($setup.showText),
+            7
+            /* TEXT, CLASS, STYLE */
+          )
+        ],
+        2
+        /* CLASS */
+      ),
+      $props.line ? (_openBlock(), _createBlock(_component_up_line, {
+        key: 1,
+        length: "140rpx",
+        color: $props.lineColor,
+        hairline: false,
+        dashed: $props.dashed
+      }, null, 8, ["color", "dashed"])) : _createCommentVNode("v-if", true)
+    ],
+    4
+    /* STYLE */
+  );
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-loadmore/up-loadmore.uvue"]]);
 export {
   __easycom_1 as _
 };

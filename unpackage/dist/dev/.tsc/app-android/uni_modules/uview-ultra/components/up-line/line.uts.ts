@@ -1,0 +1,20 @@
+/*
+ * @Author       : jry
+ * @Description  :
+ * @version      : 4.0
+ * @Date         : 2024-04-22 16:44:21
+ * @LastAuthor   : jry
+ * @lastTime     : 2024-08-28 11:04:49
+ * @FilePath     : /uview-ultra/libs/config/props/line.js
+ */
+export default {
+    // line组件
+    line: {
+        color: '#d6d7d9',
+        length: '100%',
+        direction: 'row',
+        hairline: true,
+        margin: '0',
+        dashed: false
+    }
+} as UTSJSONObject

@@ -1,9 +1,7 @@
 import { C as Card } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/Card&";
-import { g as getSystemEnv, a as getCurrentEnv, b as getEnvLabel, c as getEnvConfigFor, s as setCurrentEnv, r as resetEnv } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/env&";
+import { g as getCurrentEnv, a as getEnvLabel, b as getEnvConfigFor, c as getSystemEnv, s as setCurrentEnv, r as resetEnv } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/env&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataEvent: _setSharedDataEvent, setSharedData: _setSharedData, toDisplayString: _toDisplayString, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
-const __className = "GenSrcPagesFunctionComponentsEnvCard";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { computed, ref } = globalThis.Vue;
 const COLOR_DEV = "#10b981";
 const COLOR_TEST = "#f59e0b";
@@ -11,18 +9,14 @@ const COLOR_PROD = "#ef4444";
 const COLOR_BG = "#e2e8f0";
 const COLOR_WHITE = "#ffffff";
 const COLOR_DARK = "#475569";
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "032ea384",
-  __className,
-  __filename: "src/pages/function/components/EnvCard.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "EnvCard",
-  setup(__props) {
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenSrcPagesFunctionComponentsEnvCardSharedData", sharedDataClassId: 0 })));
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
     const systemEnv = getSystemEnv();
     const systemEnvLabel = computed(() => {
-      return systemEnv === "development" ? "开发" : "生产";
+      return "开发";
     });
     const currentEnv = ref(getCurrentEnv());
     const isOverridden = computed(() => {
@@ -81,49 +75,146 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         duration: 1500
       });
     }
-    return () => {
-      "raw js";
-      const n24 = _createSharedDataComponent(
-        Card,
-        "5df1cdee",
-        { title: "环境变量" },
-        {
-          "default": () => {
-            _setSharedDataEvent(__sharedData, 1, () => {
-              return switchEnv("development");
-            });
-            _setSharedDataEvent(__sharedData, 2, () => {
-              return switchEnv("test");
-            });
-            _setSharedDataEvent(__sharedData, 3, () => {
-              return switchEnv("production");
-            });
-            _setSharedDataEvent(__sharedData, 4, handleReset);
-            _renderSharedDataEffect(() => {
-              _setSharedData(__sharedData, 5, _toDisplayString(systemEnvLabel.value));
-              _setSharedDataStyle(__sharedData, 6, { color: envColor.value });
-              _setSharedData(__sharedData, 7, _toDisplayString(currentEnvLabel.value));
-              _setSharedData(__sharedData, 8, _toDisplayString(envConfig.value.baseURL));
-              _setSharedData(__sharedData, 9, _toDisplayString(isOverridden.value ? "是" : "否"));
-              _setSharedDataStyle(__sharedData, 10, { backgroundColor: devBtnBg.value });
-              _setSharedDataStyle(__sharedData, 11, { color: devBtnText.value });
-              _setSharedDataStyle(__sharedData, 12, { backgroundColor: testBtnBg.value });
-              _setSharedDataStyle(__sharedData, 13, { color: testBtnText.value });
-              _setSharedDataStyle(__sharedData, 14, { backgroundColor: prodBtnBg.value });
-              _setSharedDataStyle(__sharedData, 15, { color: prodBtnText.value });
-            });
-          }
-        },
-        1
-        /* SINGLE_ROOT */
-      );
-      _setSharedData(__sharedData, 0, n24.sharedData);
-      return __sharedData;
-    };
+    const __returned__ = { COLOR_DEV, COLOR_TEST, COLOR_PROD, COLOR_BG, COLOR_WHITE, COLOR_DARK, systemEnv, systemEnvLabel, currentEnv, isOverridden, currentEnvLabel, envColor, envConfig, devBtnBg, devBtnText, testBtnBg, testBtnText, prodBtnBg, prodBtnText, switchEnv, handleReset, get Card() {
+      return Card;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const EnvCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "bg-__64748b_": { "": { "backgroundImage": "none", "backgroundColor": "#64748b" } }, "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex": { "": { "display": "flex" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-38px": { "": { "height": 38 } }, "h-44px": { "": { "height": 44 } }, "items-center": { "": { "alignItems": "center" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-10px": { "": { "marginBottom": 10 } }, "mb-12px": { "": { "marginBottom": 12 } }, "mb-16px": { "": { "marginBottom": 16 } }, "ml-5px": { "": { "marginLeft": 5 } }, "ml-8px": { "": { "marginLeft": 8 } }, "mr-5px": { "": { "marginRight": 5 } }, "mt-12px": { "": { "marginTop": 12 } }, "none": { "": { "display": "none" } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__2d3748_": { "": { "color": "#2d3748" } }, "text-__64748b_": { "": { "color": "#64748b" } }, "text-__718096_": { "": { "color": "#718096" } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-12px": { "": { "fontSize": 12 } }, "text-14px": { "": { "fontSize": 14 } }, "text-right": { "": { "textAlign": "right" } }, "w-full": { "": { "width": "100%" } } };
+const { createElementVNode: _createElementVNode, toDisplayString: _toDisplayString, normalizeStyle: _normalizeStyle, withCtx: _withCtx, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createBlock($setup["Card"], { title: "环境变量" }, {
+    default: _withCtx(() => [
+      _createElementVNode("view", { class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
+        _createElementVNode("view", { class: "flex-row justify-between mb-10px" }, [
+          _createElementVNode("text", { class: "text-14px text-__718096_" }, "编译环境"),
+          _createElementVNode(
+            "text",
+            { class: "text-14px font-bold text-__2d3748_" },
+            _toDisplayString($setup.systemEnvLabel),
+            1
+            /* TEXT */
+          )
+        ]),
+        _createElementVNode("view", { class: "flex-row justify-between mb-10px" }, [
+          _createElementVNode("text", { class: "text-14px text-__718096_" }, "当前环境"),
+          _createElementVNode(
+            "text",
+            {
+              class: "text-14px font-bold",
+              style: _normalizeStyle({ color: $setup.envColor })
+            },
+            _toDisplayString($setup.currentEnvLabel),
+            5
+            /* TEXT, STYLE */
+          )
+        ]),
+        _createElementVNode("view", { class: "flex-row justify-between mb-10px" }, [
+          _createElementVNode("text", { class: "text-14px text-__718096_" }, "接口地址"),
+          _createElementVNode(
+            "text",
+            { class: "text-12px text-__64748b_ flex-1 ml-8px text-right" },
+            _toDisplayString($setup.envConfig.baseURL),
+            1
+            /* TEXT */
+          )
+        ]),
+        _createElementVNode("view", { class: "flex-row justify-between" }, [
+          _createElementVNode("text", { class: "text-14px text-__718096_" }, "是否已覆盖"),
+          _createElementVNode(
+            "text",
+            { class: "text-14px font-bold text-__2d3748_" },
+            _toDisplayString($setup.isOverridden ? "是" : "否"),
+            1
+            /* TEXT */
+          )
+        ])
+      ]),
+      _createElementVNode("view", { class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
+        _createElementVNode("text", { class: "text-12px text-__94a3b8_ mb-12px" }, "切换环境（仅当前运行生效）"),
+        _createElementVNode("view", { class: "flex-row mt-12px" }, [
+          _createElementVNode(
+            "view",
+            {
+              class: "flex-1 h-38px rounded-8px flex flex-row items-center justify-center ml-5px mr-5px",
+              style: _normalizeStyle({ backgroundColor: $setup.devBtnBg }),
+              onClick: _cache[0] || (_cache[0] = ($event) => $setup.switchEnv("development"))
+            },
+            [
+              _createElementVNode(
+                "text",
+                {
+                  class: "text-14px font-bold",
+                  style: _normalizeStyle({ color: $setup.devBtnText })
+                },
+                "开发",
+                4
+                /* STYLE */
+              )
+            ],
+            4
+            /* STYLE */
+          ),
+          _createElementVNode(
+            "view",
+            {
+              class: "flex-1 h-38px rounded-8px flex flex-row items-center justify-center ml-5px mr-5px",
+              style: _normalizeStyle({ backgroundColor: $setup.testBtnBg }),
+              onClick: _cache[1] || (_cache[1] = ($event) => $setup.switchEnv("test"))
+            },
+            [
+              _createElementVNode(
+                "text",
+                {
+                  class: "text-14px font-bold",
+                  style: _normalizeStyle({ color: $setup.testBtnText })
+                },
+                "测试",
+                4
+                /* STYLE */
+              )
+            ],
+            4
+            /* STYLE */
+          ),
+          _createElementVNode(
+            "view",
+            {
+              class: "flex-1 h-38px rounded-8px flex flex-row items-center justify-center ml-5px mr-5px",
+              style: _normalizeStyle({ backgroundColor: $setup.prodBtnBg }),
+              onClick: _cache[2] || (_cache[2] = ($event) => $setup.switchEnv("production"))
+            },
+            [
+              _createElementVNode(
+                "text",
+                {
+                  class: "text-14px font-bold",
+                  style: _normalizeStyle({ color: $setup.prodBtnText })
+                },
+                "生产",
+                4
+                /* STYLE */
+              )
+            ],
+            4
+            /* STYLE */
+          )
+        ])
+      ]),
+      _createElementVNode("view", {
+        class: "w-full h-44px rounded-8px bg-__64748b_ flex flex-row items-center justify-center",
+        onClick: $setup.handleReset
+      }, [
+        _createElementVNode("text", { class: "text-__ffffff_ text-14px font-bold" }, "重置为系统默认")
+      ])
+    ]),
+    _: 1
+    /* STABLE */
+  });
+}
+const EnvCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/function/components/EnvCard.uvue"]]);
 export {
   EnvCard as E
 };

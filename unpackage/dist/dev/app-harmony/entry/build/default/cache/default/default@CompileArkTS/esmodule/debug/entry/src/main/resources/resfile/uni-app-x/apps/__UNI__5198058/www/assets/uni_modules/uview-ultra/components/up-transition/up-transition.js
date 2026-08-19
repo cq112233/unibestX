@@ -1,18 +1,12 @@
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-transition/transition&";
 import { b as addStyle, s as sleep } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataSlot: _createSharedDataSlot, setSharedDataEvent: _setSharedDataEvent, setSharedDataTemplateRef: _setSharedDataTemplateRef, createSharedDataIf: _createSharedDataIf } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpTransitionUpTransition";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { computed, ref, watch, nextTick } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-transition"
   },
-  __dynamicSharedData: true,
-  __hash: "67df66c6",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-transition/up-transition.uvue",
   __name: "up-transition",
   props: {
     show: {
@@ -40,9 +34,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   },
   emits: ["click", "beforeEnter", "enter", "afterEnter", "beforeLeave", "leave", "afterLeave"],
   setup(__props, _a) {
-    var __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpTransitionUpTransitionSharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
     const props = __props;
     const emit = __emit;
     const inited = ref(false);
@@ -182,28 +175,31 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         vueLeave();
       }
     }, { immediate: true });
-    return () => {
-      "raw js";
-      const _setTemplateRef = _createSharedDataTemplateRefSetter();
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(inited.value));
-      }, () => {
-        _renderSharedDataEffect(() => {
-          _setSharedDataClass(__sharedData, 3, ["up-transition", classes.value]);
-          _setSharedDataStyle(__sharedData, 4, mergeStyle.value);
-        });
-        _createSharedDataSlot("default", null, null);
-        _setSharedDataEvent(__sharedData, 1, clickHandler);
-        _setSharedDataTemplateRef(__sharedData, 2, (n3) => {
-          _setTemplateRef(n3, "up-transition");
-        });
-      });
-      return __sharedData;
-    };
+    const __returned__ = { props, emit, inited, viewStyle, status, transitionEnded, display, classes, getClassNames, getModeStyle, mergeStyle, clickHandler, onTransitionEnd, vueEnter, vueLeave };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-fade-enter-active": { "": { "transitionProperty": "opacity" } }, "up-fade-leave-active": { "": { "transitionProperty": "opacity" } }, "up-fade-enter": { "": { "opacity": 0 } }, "up-fade-leave-to": { "": { "opacity": 0 } }, "up-fade-zoom-enter": { "": { "transform": "scale(0.95)", "opacity": 0 } }, "up-fade-zoom-leave-to": { "": { "transform": "scale(0.95)", "opacity": 0 } }, "up-fade-zoom-enter-active": { "": { "transitionProperty": "transform,opacity" } }, "up-fade-zoom-leave-active": { "": { "transitionProperty": "transform,opacity" } }, "up-fade-down-enter-active": { "": { "transitionProperty": "opacity,transform" } }, "up-fade-down-leave-active": { "": { "transitionProperty": "opacity,transform" } }, "up-fade-left-enter-active": { "": { "transitionProperty": "opacity,transform" } }, "up-fade-left-leave-active": { "": { "transitionProperty": "opacity,transform" } }, "up-fade-right-enter-active": { "": { "transitionProperty": "opacity,transform" } }, "up-fade-right-leave-active": { "": { "transitionProperty": "opacity,transform" } }, "up-fade-up-enter-active": { "": { "transitionProperty": "opacity,transform" } }, "up-fade-up-leave-active": { "": { "transitionProperty": "opacity,transform" } }, "up-fade-up-enter": { "": { "transform": "translateY(100%)", "opacity": 0 } }, "up-fade-up-leave-to": { "": { "transform": "translateY(100%)", "opacity": 0 } }, "up-fade-down-enter": { "": { "transform": "translateY(-100%)", "opacity": 0 } }, "up-fade-down-leave-to": { "": { "transform": "translateY(-100%)", "opacity": 0 } }, "up-fade-left-enter": { "": { "transform": "translateX(-100%)", "opacity": 0 } }, "up-fade-left-leave-to": { "": { "transform": "translateX(-100%)", "opacity": 0 } }, "up-fade-right-enter": { "": { "transform": "translateX(100%)", "opacity": 0 } }, "up-fade-right-leave-to": { "": { "transform": "translateX(100%)", "opacity": 0 } }, "up-slide-down-enter-active": { "": { "transitionProperty": "transform" } }, "up-slide-down-leave-active": { "": { "transitionProperty": "transform" } }, "up-slide-left-enter-active": { "": { "transitionProperty": "transform" } }, "up-slide-left-leave-active": { "": { "transitionProperty": "transform" } }, "up-slide-right-enter-active": { "": { "transitionProperty": "transform" } }, "up-slide-right-leave-active": { "": { "transitionProperty": "transform" } }, "up-slide-up-enter-active": { "": { "transitionProperty": "transform" } }, "up-slide-up-leave-active": { "": { "transitionProperty": "transform" } }, "up-slide-up-enter": { "": { "transform": "translateY(100%)" } }, "up-slide-up-leave-to": { "": { "transform": "translateY(100%)" } }, "up-slide-down-enter": { "": { "transform": "translateY(-100%)" } }, "up-slide-down-leave-to": { "": { "transform": "translateY(-100%)" } }, "up-slide-left-enter": { "": { "transform": "translateX(-100%)" } }, "up-slide-left-leave-to": { "": { "transform": "translateX(-100%)" } }, "up-slide-right-enter": { "": { "transform": "translateX(100%)" } }, "up-slide-right-leave-to": { "": { "transform": "translateX(100%)" } }, "up-zoom-enter-active": { "": { "transitionProperty": "transform" } }, "up-zoom-leave-active": { "": { "transitionProperty": "transform" } }, "up-zoom-enter": { "": { "transform": "scale(0.95)" } }, "up-zoom-leave-to": { "": { "transform": "scale(0.95)" } }, "@TRANSITION": { "up-fade-enter-active": { "property": "opacity" }, "up-fade-leave-active": { "property": "opacity" }, "up-fade-zoom-enter-active": { "property": "transform,opacity" }, "up-fade-zoom-leave-active": { "property": "transform,opacity" }, "up-fade-down-enter-active": { "property": "opacity,transform" }, "up-fade-down-leave-active": { "property": "opacity,transform" }, "up-fade-left-enter-active": { "property": "opacity,transform" }, "up-fade-left-leave-active": { "property": "opacity,transform" }, "up-fade-right-enter-active": { "property": "opacity,transform" }, "up-fade-right-leave-active": { "property": "opacity,transform" }, "up-fade-up-enter-active": { "property": "opacity,transform" }, "up-fade-up-leave-active": { "property": "opacity,transform" }, "up-slide-down-enter-active": { "property": "transform" }, "up-slide-down-leave-active": { "property": "transform" }, "up-slide-left-enter-active": { "property": "transform" }, "up-slide-left-leave-active": { "property": "transform" }, "up-slide-right-enter-active": { "property": "transform" }, "up-slide-right-leave-active": { "property": "transform" }, "up-slide-up-enter-active": { "property": "transform" }, "up-slide-up-leave-active": { "property": "transform" }, "up-zoom-enter-active": { "property": "transform" }, "up-zoom-leave-active": { "property": "transform" } } };
+const { renderSlot: _renderSlot, normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return $setup.inited ? (_openBlock(), _createElementBlock(
+    "view",
+    {
+      key: 0,
+      class: _normalizeClass(["up-transition", $setup.classes]),
+      ref: "up-transition",
+      onClick: $setup.clickHandler,
+      style: _normalizeStyle($setup.mergeStyle)
+    },
+    [
+      _renderSlot(_ctx.$slots, "default")
+    ],
+    6
+    /* CLASS, STYLE */
+  )) : _createCommentVNode("v-if", true);
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-transition/up-transition.uvue"]]);
 export {
   __easycom_1 as _
 };

@@ -1,17 +1,46 @@
 import { _ as __easycom_0 } from "../../components/NavBar/NavBar.js";
+import { A as AppKu, r as resolveEasycom } from "../../../App.ku.js";
 import { _ as __easycom_1 } from "../../../uni_modules/z-paging-x/components/z-paging-x/z-paging-x.js";
-import { A as AppKu } from "../../../App.ku.js";
 import { L as LayoutComponent } from "../../layouts/default.js";
 import { _ as _export_sfc } from "../../../plugin-vue-export-helper.js";
 import "../../utils/systemInfo.js";
-import "../../../uni_modules/z-paging-x/components/z-paging-x-empty/z-paging-x-empty.js";
-import "../../../uni_modules/z-paging-x/components/z-paging-x/static/index.js";
-import "../../../uni_modules/z-paging-x/components/z-paging-x/components/z-paging-refresher.js";
-import "../../../uni_modules/z-paging-x/components/z-paging-x/components/z-paging-loading.js";
-import "../../../uni_modules/z-paging-x/components/z-paging-x/enums/index.js";
-import "../../../uni_modules/z-paging-x/components/z-paging-x/utils/index.js";
-import "../../../uni_modules/z-paging-x/components/z-paging-x/components/z-paging-load-more.js";
-import "../../../uni_modules/z-paging-x/components/z-paging-x/config/index.js";
+import "../../store/index.js";
+import "../../../uni_modules/x-pinia-s/instans/types.js";
+import "../../../uni_modules/x-pinia-s/instans/subscriptions.js";
+import "../../../uni_modules/x-pinia-s/instans/createPinia.js";
+import "../../../uni_modules/x-pinia-s/instans/rootState.js";
+import "../../../uni_modules/x-pinia-s/instans/persist.js";
+import "../../store/app.js";
+import "../../../uni_modules/x-pinia-s/instans/storeBase.js";
+import "../../../uni_modules/x-pinia-s/instans/defineStore.js";
+import "../../tabbar/store.js";
+import "../../tabbar/types.js";
+import "../../tabbar/config.js";
+import "../../i18n/index.js";
+import "../../../uni_modules/lime-i18n/common/index.js";
+import "../../../uni_modules/lime-i18n/common/composer-class.js";
+import "../../../uni_modules/e-chart/components/e-chart/uts/WebviewEchart.js";
+import "../../../uni_modules/lime-i18n/common/format.js";
+import "../../../uni_modules/lime-i18n/common/util.js";
+import "../../../uni_modules/lime-i18n/common/errors.js";
+import "../../../uni_modules/lime-i18n/common/warnings.js";
+import "../../../uni_modules/lime-i18n/common/types.js";
+import "../../i18n/locales/zh-CN.js";
+import "../../i18n/locales/en-US.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/index.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hans.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hant.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/en.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/es.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/fr.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/de.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/ko.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/ja.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/ru.js";
+import "../../utils/theme.js";
+import "../../../theme.js";
+import "../../store/token.js";
+import "../../store/user.js";
 import "../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
 import "../../../uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.js";
 import "../../../uni_modules/uview-ultra/components/up-loading-icon/loadingIcon.js";
@@ -19,7 +48,6 @@ import "../../../uni_modules/uview-ultra/libs/config/config.js";
 import "../../../uni_modules/uview-ultra/libs/function/index.js";
 import "../../../uni_modules/uview-ultra/libs/function/test.js";
 import "../../../uni_modules/uview-ultra/libs/function/digit.js";
-import "../../../uni_modules/e-chart/components/e-chart/uts/WebviewEchart.js";
 import "../../../uni_modules/uview-ultra/libs/function/colorGradient.js";
 import "../../../uni_modules/uview-ultra/components/up-icon/up-icon.js";
 import "../../../uni_modules/uview-ultra/components/up-icon/icons.js";
@@ -33,48 +61,20 @@ import "../../../uni_modules/uview-ultra/components/up-transition/up-transition.
 import "../../../uni_modules/uview-ultra/components/up-transition/transition.js";
 import "../../../uni_modules/uview-ultra/libs/config/color.js";
 import "../../tabbar/index.js";
-import "../../tabbar/store.js";
-import "../../tabbar/types.js";
-import "../../tabbar/config.js";
 import "../../tabbar/TabbarItem.js";
 import "../../../uni_modules/uni-icons/components/uni-icons/uni-icons.js";
 import "../../../uni_modules/uni-icons/components/uni-icons/uniicons_file.js";
 import "../../utils/i18n.js";
-import "../../i18n/index.js";
-import "../../../uni_modules/lime-i18n/common/index.js";
-import "../../../uni_modules/lime-i18n/common/composer-class.js";
-import "../../../uni_modules/lime-i18n/common/format.js";
-import "../../../uni_modules/lime-i18n/common/util.js";
-import "../../../uni_modules/lime-i18n/common/errors.js";
-import "../../../uni_modules/lime-i18n/common/warnings.js";
-import "../../../uni_modules/lime-i18n/common/types.js";
-import "../../i18n/locales/zh-CN.js";
-import "../../i18n/locales/en-US.js";
-import "../../store/index.js";
-import "../../../uni_modules/x-pinia-s/instans/types.js";
-import "../../../uni_modules/x-pinia-s/instans/subscriptions.js";
-import "../../../uni_modules/x-pinia-s/instans/createPinia.js";
-import "../../../uni_modules/x-pinia-s/instans/rootState.js";
-import "../../../uni_modules/x-pinia-s/instans/persist.js";
-import "../../store/app.js";
-import "../../../uni_modules/x-pinia-s/instans/storeBase.js";
-import "../../../uni_modules/x-pinia-s/instans/defineStore.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/index.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hans.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hant.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/en.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/es.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/fr.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/de.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/ko.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/ja.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/ru.js";
-import "../../store/token.js";
-import "../../store/user.js";
 import "../../utils/toast.js";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, toDisplayString: _toDisplayString, createSharedDataSelector: _createSharedDataSelector, setSharedDataEvent: _setSharedDataEvent, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataStyle: _setSharedDataStyle, createSharedDataFor: _createSharedDataFor, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
-const __className = "GenSrcSubPagingPaging";
+import "../../../uni_modules/z-paging-x/components/z-paging-x-empty/z-paging-x-empty.js";
+import "../../../uni_modules/z-paging-x/components/z-paging-x/static/index.js";
+import "../../../uni_modules/z-paging-x/components/z-paging-x/components/z-paging-refresher.js";
+import "../../../uni_modules/z-paging-x/components/z-paging-x/components/z-paging-loading.js";
+import "../../../uni_modules/z-paging-x/components/z-paging-x/enums/index.js";
+import "../../../uni_modules/z-paging-x/components/z-paging-x/utils/index.js";
+import "../../../uni_modules/z-paging-x/components/z-paging-x/components/z-paging-load-more.js";
+import "../../../uni_modules/z-paging-x/components/z-paging-x/config/index.js";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref } = globalThis.Vue;
 class ArticleItem extends UTS.UTSType {
   static get$UTSMetadata$() {
@@ -109,16 +109,11 @@ class ArticleItem extends UTS.UTSType {
     delete this.__props__;
   }
 }
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "19eb5545",
-  __className,
-  __filename: "src/sub/paging/paging.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "paging",
-  setup(__props) {
-    const __sharedDataRenderer = _useSharedDataRenderer();
-    const __sharedData = __sharedDataRenderer == "component" ? _withSharedDataComponent(new UniDynamicSharedDataComponent(_useSharedDataScope(), _useSharedDataComponentOptions({ bundleKey: "GenSrcSubPagingPagingSharedData", sharedDataClassId: 0 }))) : _withSharedDataPage(new UniDynamicSharedDataPage(_useSharedDataPageId(), _useSharedDataPageOptions({ bundleKey: "GenSrcSubPagingPagingSharedData", sharedDataClassId: 0 })));
-    const __sharedDataScope = _useSharedDataScope(__sharedData);
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
     const tabList = ["全部", "技术", "设计", "生活"];
     const tabIndex = ref(0);
     const pagingX = ref(null);
@@ -187,103 +182,158 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         pagingX.value.$callMethod("reload");
       }
     }
-    return () => {
-      "raw js";
-      const _setTemplateRef = _createSharedDataTemplateRefSetter();
-      const _component_NavBar = __easycom_0;
-      const _component_z_paging_x = __easycom_1;
-      const n23 = _createSharedDataComponent(AppKu, "2bd82232", null, {
-        "default": _withSharedDataVaporCtx(() => {
-          const n22 = _createSharedDataComponent(LayoutComponent, "5869edef", {
-            "navigation-style": "custom",
-            "navigation-bar-title-text": "分页加载"
-          }, {
-            "default": _withSharedDataVaporCtx(() => {
-              const n0 = _createSharedDataComponentWithFallback(_component_NavBar, "96585ef6", {
-                title: "分页加载 (z-paging-x)",
-                "show-back": true
-              });
-              _setSharedData(__sharedData, 2, n0?.sharedData);
-              const _selector1_0 = _createSharedDataSelector(() => {
-                return tabIndex.value;
-              });
-              const _selector1_1 = _createSharedDataSelector(() => {
-                return tabIndex.value;
-              });
-              const n1 = _createSharedDataFor(_setSharedDataScoped(__sharedData, 5, _createSharedDataVFor(__sharedDataScope, () => {
-                return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-              })), () => {
-                return tabList;
-              }, (__sharedData_VFor0, _for_item0, _for_key0) => {
-                _setSharedDataEvent(__sharedData_VFor0, 1, () => {
-                  return tabChange(_for_key0.value);
-                });
-                _renderSharedDataEffect(() => {
-                  return _setSharedData(__sharedData_VFor0, 4, _toDisplayString(_for_item0.value));
-                });
-                _selector1_0(_for_key0.value, () => {
-                  _setSharedDataStyle(__sharedData_VFor0, 2, { backgroundColor: tabIndex.value === _for_key0.value ? "#ffffff" : "transparent" });
-                });
-                _selector1_1(_for_key0.value, () => {
-                  _setSharedDataStyle(__sharedData_VFor0, 3, { color: tabIndex.value === _for_key0.value ? "var(--theme-color, #37c2bc)" : "#64748b" });
-                });
-                return null;
-              }, (__sharedData_VFor0, tab, index) => {
-                return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
-              }, 1);
-              n1.onReset(_selector1_0.reset);
-              n1.onReset(_selector1_1.reset);
-              const n20 = _createSharedDataComponentWithFallback(_component_z_paging_x, "34b3b566", {
-                "model-value": () => {
-                  return dataList.value;
-                },
-                "default-page-size": 10,
-                class: "flex-1",
-                "onUpdate:modelValue": () => {
-                  return onUpdateModelValue;
-                },
-                onQuery: () => {
-                  return onQuery;
-                }
-              }, {
-                "default": () => {
-                  _createSharedDataFor(_setSharedDataScoped(__sharedData, 4, _createSharedDataVFor(__sharedDataScope, () => {
-                    return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 2 });
-                  })), () => {
-                    return dataList.value;
-                  }, (__sharedData_VFor1, _for_item1) => {
-                    let _item;
-                    _renderSharedDataEffect(() => {
-                      _item = _for_item1.value;
-                      _setSharedDataStyle(__sharedData_VFor1, 1, { backgroundColor: _item.tagBgColor, padding: "2px 8px", borderRadius: "6px" });
-                      _setSharedDataStyle(__sharedData_VFor1, 2, { color: _item.tagColor, fontSize: "10px", fontWeight: "bold" });
-                      _setSharedData(__sharedData_VFor1, 3, _toDisplayString(_item.tag));
-                      _setSharedData(__sharedData_VFor1, 5, _toDisplayString(_item.title));
-                      _setSharedData(__sharedData_VFor1, 6, _toDisplayString(_item.summary));
-                      _setSharedData(__sharedData_VFor1, 7, _toDisplayString(_item.author));
-                      _setSharedData(__sharedData_VFor1, 8, _toDisplayString(_item.createTime));
-                    });
-                    _setSharedData(__sharedData_VFor1, 4, _toDisplayString(_item.id));
-                    return null;
-                  }, (__sharedData_VFor1, item) => {
-                    return _setSharedData(__sharedData_VFor1, 0, _toDisplayString(item.id));
-                  }, 32);
-                }
-              });
-              _setSharedData(__sharedData, 3, n20?.sharedData);
-              _setTemplateRef(n20, pagingX, null, "pagingX");
-            })
-          });
-          _setSharedData(__sharedData, 1, n22.sharedData);
-        })
-      });
-      _setSharedData(__sharedData, 0, n23.sharedData);
-      return __sharedData;
-    };
+    const __returned__ = { tabList, tabIndex, pagingX, dataList, onUpdateModelValue, getMockArticles, onQuery, tabChange, get AppKu() {
+      return AppKu;
+    }, get LayoutComponent() {
+      return LayoutComponent;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const paging = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "bg-__f1f5f9_": { "": { "backgroundImage": "none", "backgroundColor": "#f1f5f9" } }, "bg-__f7fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f7fafc" } }, "bg-white": { "": { "backgroundColor": "rgba(255,255,255,var(--un-bg-opacity,1))" } }, "border-bottom-color-__f1f5f9_": { "": { "borderBottomColor": "#f1f5f9" } }, "border-bottom-style-solid": { "": { "borderBottomStyle": "solid" } }, "border-bottom-width-1px": { "": { "borderBottomWidth": 1 } }, "border-color-__edf2f7_": { "": { "borderTopColor": "#edf2f7", "borderRightColor": "#edf2f7", "borderBottomColor": "#edf2f7", "borderLeftColor": "#edf2f7" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-top-color-__f8fafc_": { "": { "borderTopColor": "#f8fafc" } }, "border-top-style-solid": { "": { "borderTopStyle": "solid" } }, "border-top-width-1px": { "": { "borderTopWidth": 1 } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex": { "": { "display": "flex" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-col": { "": { "flexDirection": "column" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "font-medium": { "": { "fontWeight": 500 } }, "h-full": { "": { "height": "100%" } }, "items-center": { "": { "alignItems": "center" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "justify-center": { "": { "justifyContent": "center" } }, "leading-18px": { "": { "lineHeight": "18px" } }, "mb-12px": { "": { "marginBottom": 12 } }, "mb-6px": { "": { "marginBottom": 6 } }, "mb-8px": { "": { "marginBottom": 8 } }, "mx-16px": { "": { "marginLeft": 16, "marginRight": 16 } }, "my-8px": { "": { "marginTop": 8, "marginBottom": 8 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "p-4px": { "": { "paddingTop": 4, "paddingRight": 4, "paddingBottom": 4, "paddingLeft": 4 } }, "pt-8px": { "": { "paddingTop": 8 } }, "px-16px": { "": { "paddingLeft": 16, "paddingRight": 16 } }, "py-12px": { "": { "paddingTop": 12, "paddingBottom": 12 } }, "py-8px": { "": { "paddingTop": 8, "paddingBottom": 8 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "shadow-sm": { "": { "boxShadow": "var(--un-inset-shadow,0 0 #0000),var(--un-inset-ring-shadow,0 0 #0000),var(--un-ring-offset-shadow,0 0 #0000),var(--un-ring-shadow,0 0 #0000),var(--un-shadow,0 1rpx 3rpx 0 var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))))", "--un-shadow": "0 1rpx 3rpx 0rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1)))" } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__475569_": { "": { "color": "#475569" } }, "text-__64748b_": { "": { "color": "#64748b" } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-11px": { "": { "fontSize": 11 } }, "text-12px": { "": { "fontSize": 12 } }, "text-13px": { "": { "fontSize": 13 } }, "text-15px": { "": { "fontSize": 15 } } };
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { resolveComponent: _resolveComponent, createVNode: _createVNode, renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, toDisplayString: _toDisplayString, normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode, withCtx: _withCtx, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_NavBar = resolveEasycom(__resolveDynamicComponent("NavBar"), __easycom_0);
+  const _component_z_paging_x = resolveEasycom(__resolveDynamicComponent("z-paging-x"), __easycom_1);
+  return _openBlock(), _createBlock($setup["AppKu"], null, {
+    default: _withCtx(() => [
+      _createVNode($setup["LayoutComponent"], {
+        "navigation-style": "custom",
+        "navigation-bar-title-text": "分页加载"
+      }, {
+        default: _withCtx(() => [
+          _createElementVNode("view", { class: "flex flex-col flex-1 h-full bg-__f7fafc_" }, [
+            _createVNode(_component_NavBar, {
+              title: "分页加载 (z-paging-x)",
+              "show-back": true
+            }),
+            _createElementVNode("view", { class: "bg-white py-12px px-16px border-bottom-width-1px border-bottom-style-solid border-bottom-color-__f1f5f9_" }, [
+              _createElementVNode("view", { class: "flex-row bg-__f1f5f9_ rounded-12px p-4px" }, [
+                (_openBlock(), _createElementBlock(
+                  _Fragment,
+                  null,
+                  _renderList($setup.tabList, (tab, index) => {
+                    return _createElementVNode("view", {
+                      key: index,
+                      class: "flex-1 items-center justify-center py-8px rounded-8px",
+                      style: _normalizeStyle({ backgroundColor: $setup.tabIndex === index ? "#ffffff" : "transparent" }),
+                      onClick: ($event) => $setup.tabChange(index)
+                    }, [
+                      _createElementVNode(
+                        "text",
+                        {
+                          class: "text-13px font-bold",
+                          style: _normalizeStyle({ color: $setup.tabIndex === index ? "var(--theme-color, #37c2bc)" : "#64748b" })
+                        },
+                        _toDisplayString(tab),
+                        5
+                        /* TEXT, STYLE */
+                      )
+                    ], 12, ["onClick"]);
+                  }),
+                  64
+                  /* STABLE_FRAGMENT */
+                ))
+              ])
+            ]),
+            _createVNode(_component_z_paging_x, {
+              ref: "pagingX",
+              "model-value": $setup.dataList,
+              "default-page-size": 10,
+              class: "flex-1",
+              "onUpdate:modelValue": $setup.onUpdateModelValue,
+              onQuery: $setup.onQuery
+            }, {
+              default: _withCtx(() => [
+                (_openBlock(true), _createElementBlock(
+                  _Fragment,
+                  null,
+                  _renderList($setup.dataList, (item) => {
+                    return _openBlock(), _createElementBlock("list-item", {
+                      key: item.id
+                    }, [
+                      _createElementVNode("view", { class: "mx-16px my-8px p-16px bg-white rounded-12px border-width-1px border-style-solid border-color-__edf2f7_ shadow-sm" }, [
+                        _createElementVNode("view", { class: "flex-row justify-between items-center mb-8px" }, [
+                          _createElementVNode(
+                            "view",
+                            {
+                              style: _normalizeStyle({ backgroundColor: item.tagBgColor, padding: "2px 8px", borderRadius: "6px" })
+                            },
+                            [
+                              _createElementVNode(
+                                "text",
+                                {
+                                  style: _normalizeStyle({ color: item.tagColor, fontSize: "10px", fontWeight: "bold" })
+                                },
+                                _toDisplayString(item.tag),
+                                5
+                                /* TEXT, STYLE */
+                              )
+                            ],
+                            4
+                            /* STYLE */
+                          ),
+                          _createElementVNode(
+                            "text",
+                            { class: "text-12px text-__94a3b8_" },
+                            "#" + _toDisplayString(item.id),
+                            1
+                            /* TEXT */
+                          )
+                        ]),
+                        _createElementVNode(
+                          "text",
+                          { class: "text-15px font-bold text-__1e293b_ mb-6px" },
+                          _toDisplayString(item.title),
+                          1
+                          /* TEXT */
+                        ),
+                        _createElementVNode(
+                          "text",
+                          { class: "text-13px text-__64748b_ leading-18px mb-12px" },
+                          _toDisplayString(item.summary),
+                          1
+                          /* TEXT */
+                        ),
+                        _createElementVNode("view", { class: "flex-row justify-between items-center border-top-width-1px border-top-style-solid border-top-color-__f8fafc_ pt-8px" }, [
+                          _createElementVNode(
+                            "text",
+                            { class: "text-12px text-__475569_ font-medium" },
+                            _toDisplayString(item.author),
+                            1
+                            /* TEXT */
+                          ),
+                          _createElementVNode(
+                            "text",
+                            { class: "text-11px text-__94a3b8_" },
+                            _toDisplayString(item.createTime),
+                            1
+                            /* TEXT */
+                          )
+                        ])
+                      ])
+                    ]);
+                  }),
+                  128
+                  /* KEYED_FRAGMENT */
+                ))
+              ]),
+              _: 1
+              /* STABLE */
+            }, 8, ["model-value"])
+          ])
+        ]),
+        _: 1
+        /* STABLE */
+      })
+    ]),
+    _: 1
+    /* STABLE */
+  });
+}
+const paging = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/paging/paging.uvue"]]);
 export {
   paging as default
 };

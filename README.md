@@ -19,12 +19,11 @@
 
 </div>
 
-> 💡 **HBuilderX 版本建议与下载**
+> 💡 **HBuilderX 版本建议**
 >
-> - **不想升级 HBuilderX 版本**：请切换 **VDOM 模式**（`manifest.json` 中 `"vapor": false`），**HBuilderX 5.15 及之后版本** 均可稳定运行；
-> - **建议升级后使用 Vapor 蒸汽模式**：推荐 **HBuilderX 5.24 及以上版本**（可完整体验与使用无虚拟 DOM 高性能原生渲染）。
->
-> 📥 **HBuilderX 5.15 下载地址**：[https://wwbsy.lanzoue.com/b01eupb32d](https://wwbsy.lanzoue.com/b01eupb32d) （密码：`4xdv`）
+> - 推荐使用 **HBuilderX 5.21 及以上版本**：全面支持 **Android / iOS / 鸿蒙三端蒸汽（Vapor）模式**；
+> - 最好升级至最新 **HBuilderX 5.24 版本**，完整体验无虚拟 DOM 高性能原生渲染；
+> - 旧版本可切换 **VDOM 模式**（`manifest.json` 中 `"vapor": false`）稳定运行。
 
 > ⚡ **渲染模式与 UI 组件库重要说明**
 >
@@ -257,7 +256,7 @@ pnpm build:h5
 
 - Node >= 22
 - pnpm >= 7.30
-- HBuilderX >= 5.15（不想升级 HBuilderX 请切换 VDOM 模式，5.15+ 即可；建议升级至 **HBuilderX 5.24** 后使用 Vapor 蒸汽模式）
+- HBuilderX >= 5.21（全面支持三端 Vapor 蒸汽模式；建议升级至最新 **HBuilderX 5.24**；旧版本可切换 VDOM 模式运行）
 - Vue Official >= 2.1.10
 - TypeScript >= 5.0
 - JDK >= 17（Android 平台）
@@ -424,6 +423,28 @@ uni-app x 推出了新一代的 **蒸汽模式（Vapor）**。新版渲染引擎
 - 中间凸起按钮（如 AI 入口）
 - 角标显示
 - 动态主题色
+
+### 主题切换（暗黑模式）
+
+内置三种外观模式：`auto`（跟随系统）/ `light`（浅色）/ `dark`（深色），入口位于「基础」页的主题切换卡片（`src/pages/basic/components/ThemeSwitchCard.uvue`），状态管理在 `src/store/app.uts`。
+
+各端跟随机制：
+
+- **App（Android / iOS / 鸿蒙）**：`auto` 模式监听 `uni.onOsThemeChange` 实时跟随系统深浅色；手动 `light` / `dark` 通过 `uni.setAppTheme` + `uni.onAppThemeChange` 生效。注意 Android 10+ / iOS 13+ 系统才支持深色模式。
+- **H5**：通过 `prefers-color-scheme` 媒体查询监听系统深浅色。
+- **微信小程序**：读取宿主主题 `hostTheme`，`auto` 模式监听 `uni.onHostThemeChange` 跟随微信宿主主题。
+
+颜色配置采用**单源**方案：
+
+- 根目录 `theme.json` 定义 `light` / `dark` 两套色板（导航栏、TabBar、页面背景等）；
+- `pages.json` 通过 `@` 变量引用（如 `"navigationBarBackgroundColor": "@navigationBarBackgroundColor"`），驱动原生导航栏 / TabBar / 页面背景；
+- 自定义组件（NavBar、TabBar、全局容器）通过 `src/utils/theme.uts` 的 `getThemeTokens()` 读取同一份色板，保证与原生配置一致。
+
+> 💡 **修改 `light` / `dark` 主题配色，请统一在根目录 `theme.json` 中配置**（单源维护，`pages.json` 与自定义组件自动同步生效，勿在页面或组件中写死颜色）。
+
+⚠️ **平台限制说明**：
+
+- 小程序原生导航栏背景色 `navigationBarBackgroundColor` 支持 `@theme.json` 变量，**真机可正常随主题切换**，但微信开发者工具模拟器可能无法正确预览深色效果，**以真机效果为准**（真机跟随微信「我 → 设置 → 通用 → 深色模式」）。
 
 ### 路由守卫
 

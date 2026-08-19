@@ -1,0 +1,177 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ
+}import { UniViewElementImpl } from "@dcloudio/uni-app-framework";
+import { buildLoading } from "./builder";
+import { formatColorSync } from "@dcloudio/uni-app-framework";
+const DEFAULT_COLOR = '#000000';
+const DEFAULT_BORDER_WIDTH = 'normal';
+const DEFAULT_ANIMATION_TIMING_FUNCTION = 'linear';
+class NativeLoading {
+    constructor(element, params = {
+        color: DEFAULT_COLOR,
+        borderWidth: DEFAULT_BORDER_WIDTH,
+        animationTimingFunction: DEFAULT_ANIMATION_TIMING_FUNCTION,
+        paused: false
+    }) {
+        this.__v_skip = true;
+        this.harmonyBuilderNode = null;
+        this.params = params;
+        if (this.params.color) {
+            this.params.color = formatColorSync(this.params.color);
+        }
+        element.bindHarmonyWrappedBuilder(wrapBuilder(buildLoading), this.params);
+        if (typeof element['getHarmonyComponentContent'] === 'function') {
+            this.harmonyBuilderNode = element.getHarmonyComponentContent();
+        }
+        else {
+            this.harmonyBuilderNode = element.getHarmonyBuilderNode();
+        }
+        element.bindHarmonyController(this);
+    }
+    updateStyle(color = DEFAULT_COLOR, borderWidth = DEFAULT_BORDER_WIDTH, animationTimingFunction = DEFAULT_ANIMATION_TIMING_FUNCTION) {
+        if (color !== null) {
+            if (this.params.color) {
+                this.params.color = formatColorSync(color);
+            }
+        }
+        else {
+            color = DEFAULT_COLOR;
+        }
+        if (borderWidth !== null) {
+            this.params.borderWidth = borderWidth;
+        }
+        else {
+            borderWidth = DEFAULT_BORDER_WIDTH;
+        }
+        if (animationTimingFunction !== null) {
+            this.params.animationTimingFunction = animationTimingFunction;
+        }
+        else {
+            animationTimingFunction = DEFAULT_ANIMATION_TIMING_FUNCTION;
+        }
+        this.updateParams();
+    }
+    updateDegrees(degrees) {
+        if (degrees !== this.params.degrees) {
+            this.params.degrees = degrees;
+            this.updateParams();
+        }
+    }
+    updatePaused(paused) {
+        if (paused !== this.params.paused) {
+            this.params.paused = paused;
+            this.updateParams();
+        }
+    }
+    updateParams() {
+        this.harmonyBuilderNode?.update(this.params);
+    }
+    destroy() {
+        this.harmonyBuilderNode?.dispose();
+    }
+}
+class _Element extends UniViewElementImpl {
+}
+class UniLoadingElement extends _Element {
+}
+export { NativeLoading as NativeLoading };
+export { UniLoadingElement as UniLoadingElement };
+//# sourceMappingURL=index.js.mapÂ’Ùî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework/index.etsÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-loading/utssdk/app-harmony/builder.etsÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-loading/utssdk/app-harmony/index.etsÔrB˜±isLocalDependency¯isNodeEntryFile§pkgPath§pkgNameªpkgVersion±belongProjectPath±dependencyPkgInfo¬shouldEmitJsÂÂÙâ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules¹@dcloudio/uni-app-modules¥1.0.0ÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmonyÔrC’§pkgNameªpkgVersion¹@dcloudio/uni-app-modules¥1.0.0ÃÃÚgimport { UniNativeViewElement, UniViewElementImpl } from "@dcloudio/uni-app-framework";
+import { buildLoading } from "./builder";
+import { formatColorSync } from "@dcloudio/uni-app-framework";
+type BorderWidth = 'normal' | 'bold';
+type AnimationTimingFunction = 'ease' | 'linear';
+const DEFAULT_COLOR = '#000000';
+const DEFAULT_BORDER_WIDTH = 'normal';
+const DEFAULT_ANIMATION_TIMING_FUNCTION = 'linear';
+interface BuilderLoadingParams {
+    color?: string;
+    borderWidth?: BorderWidth;
+    degrees?: number;
+    paused?: boolean;
+    animationTimingFunction?: AnimationTimingFunction;
+}
+class NativeLoading {
+    __v_skip: boolean = true;
+    private params: BuilderLoadingParams;
+    private harmonyBuilderNode: ComponentContent | null = null;
+    constructor(element: UniNativeViewElement, params: BuilderLoadingParams = {
+        color: DEFAULT_COLOR,
+        borderWidth: DEFAULT_BORDER_WIDTH,
+        animationTimingFunction: DEFAULT_ANIMATION_TIMING_FUNCTION,
+        paused: false
+    }){
+        this.params = params;
+        if (this.params.color) {
+            this.params.color = formatColorSync(this.params.color) as string;
+        }
+        element.bindHarmonyWrappedBuilder(wrapBuilder<[BuilderLoadingParams]>(buildLoading), this.params);
+        if (typeof element['getHarmonyComponentContent'] === 'function') {
+            this.harmonyBuilderNode = (element as ESObject).getHarmonyComponentContent() as ComponentContent;
+        } else {
+            this.harmonyBuilderNode = element.getHarmonyBuilderNode();
+        }
+        element.bindHarmonyController(this);
+    }
+    updateStyle(color: string | null = DEFAULT_COLOR, borderWidth: BorderWidth | null = DEFAULT_BORDER_WIDTH, animationTimingFunction: AnimationTimingFunction | null = DEFAULT_ANIMATION_TIMING_FUNCTION) {
+        if (color !== null) {
+            if (this.params.color) {
+                this.params.color = formatColorSync(color) as string;
+            }
+        } else {
+            color = DEFAULT_COLOR;
+        }
+        if (borderWidth !== null) {
+            this.params.borderWidth = borderWidth;
+        } else {
+            borderWidth = DEFAULT_BORDER_WIDTH;
+        }
+        if (animationTimingFunction !== null) {
+            this.params.animationTimingFunction = animationTimingFunction;
+        } else {
+            animationTimingFunction = DEFAULT_ANIMATION_TIMING_FUNCTION;
+        }
+        this.updateParams();
+    }
+    updateDegrees(degrees: number) {
+        if (degrees !== this.params.degrees) {
+            this.params.degrees = degrees;
+            this.updateParams();
+        }
+    }
+    updatePaused(paused: boolean) {
+        if (paused !== this.params.paused) {
+            this.params.paused = paused;
+            this.updateParams();
+        }
+    }
+    private updateParams() {
+        this.harmonyBuilderNode?.update(this.params);
+    }
+    destroy() {
+        this.harmonyBuilderNode?.dispose();
+    }
+}
+class _Element extends UniViewElementImpl {
+}
+class UniLoadingElement extends _Element {
+}
+export { BuilderLoadingParams as BuilderLoadingParams };
+export { NativeLoading as NativeLoading };
+export { UniLoadingElement as UniLoadingElement };
+ÀÔrD’©./builder»@dcloudio/uni-app-frameworkÔrE—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-loading/utssdk/app-harmony/builder.etsAÃªoh-resolveÂEAÂÙî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework/index.etsAÃªoh-resolveÂ“ÔrF–§version¤fileªsourceRoot§sources¥names¨mappings¨index.js ‘©index.etsÜ L˜”    ”  ”	  ”  1”  3”#  9”Ì@  ÌV”ÌA  ÌW˜”   ” ”	 	” ” ” ”( (”) )˜”   ” ”	 	” ” ”   ”= =”> >–”   ” ” ” ” ”   –”   ” ” ” ”% %”& &–”   ” ”' '”* *”2 2”3 3“”   ” ” •” ” ” -” /”" ÌN”” ” ” ” ”” ” ” ”) )”” ” ”! !”ÌB ÌB”” ” ” ” ‘” •” ” ” ” ” •” ” ”" :”& >”' ?—” ” ” ” ” ” ” ˜” ” ” ” ” ” ” ” Ü ” ” ” ” ” ” ”   ”/ /”0 0”4 4”5 5”; ;”< <”ÌA ÌA”ÌB ÌL”ÌC ÌM‘”	 	Ÿ” ” ” ”) )”* *”5 5”6 ÌN”ÌB ÌZ”ÌC Ì[”ÌE Ì]”ÌI Ìa”ÌJ Ìb”ÌP Ìh”ÌQ Ìi”ÌR Ìjš” ” ” ” ” ”7 7”8 8”= =”ÌG ÌG”ÌI ÌIš” ” ” ”# #”& '”- ;”. <”ÌH ÌV”ÌJ Ìl”ÌK Ìm‘”	  	‘”  š” !” !” !”# !#”& !&”- !-”. !.”ÌC !ÌC”ÌE !ÌE”ÌF !ÌF‘”	 "	˜” #” #” #”% #%”& #&”* #*”+ #+”, #,’” $” $›” %” %” %” %'”% %4”' %6”5 %ÌX”ÌI %Ìl”ÌK %Ìn”Ìe %Ì¨”Ì† %ÌÉ–” &” &” &” &” &” &˜” '” '” '” '” '” '”! '!”# '#œ” (” (” (” (” (”! (!”$ ($”3 (3”4 (4”9 (9”: (ÌD”; (ÌE‘” )‘”	 *	‘” *•” +” +” +”! +!”" +"‘”	 ,	–” -” -” -” -”  - ”" -"™” .” .” .” .” .”# .#”& .&”1 .1”2 .2‘”	 /	‘” /•” 0” 0” 0”. 0.”/ 0/‘”	 1	–” 2” 2”# 2#”( 2(”, 2,”. 2.™” 3” 3” 3” 3” 3”/ 3/”2 32”ÌI 3ÌI”ÌJ 3ÌJ‘”	 4	‘” 4•” 5”# 5#”& 5&”ÌG 5ÌG”ÌH 5ÌH‘”	 6	–” 7” 7” 7” 7” 7” 7’” 8” 8”” 9” 9” 9” 9!š” :” :” :” :” :” :”# :#”$ :$”+ :+”- :-™” ;” ;” ;” ;” ;” ;”" ;"”) ;)”* ;*–” <” <” <” <” <”  < ‘”	 =	’” >” >”” ?” ?” ?” ? š” Ì@” Ì@” Ì@” Ì@” Ì@” Ì@”" Ì@"”# Ì@#”) Ì@)”+ Ì@+™” ÌA” ÌA” ÌA” ÌA” ÌA” ÌA”! ÌA!”' ÌA'”( ÌA(–” ÌB” ÌB” ÌB” ÌB” ÌB”  ÌB ‘”	 ÌC	’” ÌD” ÌD’” ÌE” ÌEœ” ÌF” ÌF” ÌF” ÌF”! ÌF!”' ÌF'”( ÌF(”, ÌF,”- ÌF-”3 ÌF3”4 ÌF4”5 ÌF5’” ÌG” ÌG’” ÌH” ÌH˜” ÌI” ÌI” ÌI” ÌI”! ÌI!”( ÌI(”* ÌI*”+ ÌI+’” ÌJ” ÌJ‘” ÌK•”  ÌL ” ÌL” ÌL” ÌL”) ÌL)‘” ÌM•”  ÌN ” ÌN” ÌN”  ÌN ”( ÌN(‘” ÌO˜”  ÌQ ” ÌQ”	 ÌQ	” ÌQ” ÌQ”' ÌQ'”) ÌQ)”* ÌQ*˜”  ÌR ” ÌR”	 ÌR	” ÌR” ÌR”/ ÌR/”1 ÌR1”2 ÌR2ÔrG–§version¤file§sources®sourcesContent¥names¨mappingsÀ‘À‘ÀÜ M‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache’ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ	üÍ
+&À‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍ
+Í
+#ÔrL”¤type¥start£end¤nameªIdentifierÍ
+Í
+­NativeLoadingLªIdentifierÍ
+Í
+#­NativeLoadingÀJ¶ExportNamedDeclarationÍ
+(Í
+ZÀ‘K¯ExportSpecifierÍ
+1Í
+WLªIdentifierÍ
+1Í
+B±UniLoadingElementLªIdentifierÍ
+FÍ
+W±UniLoadingElementÀ“ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration ÌA‘ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	²UniViewElementImplLªIdentifier	²UniViewElementImplÔrO•¤type¥start£end¥value£raw§Literal#Ì@»@dcloudio/uni-app-framework½"@dcloudio/uni-app-framework"M±ImportDeclarationÌCÌl‘N¯ImportSpecifierÌLÌXLªIdentifierÌLÌX¬buildLoadingLªIdentifierÌLÌX¬buildLoadingO§LiteralÌ`Ìk©./builder«"./builder"M±ImportDeclarationÌnÌ¬‘N¯ImportSpecifierÌwÌ†LªIdentifierÌwÌ†¯formatColorSyncLªIdentifierÌwÌ†¯formatColorSyncO§LiteralÌÌ«»@dcloudio/uni-app-framework½"@dcloudio/uni-app-framework"

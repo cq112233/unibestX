@@ -1,9 +1,45 @@
 import { _ as __easycom_0 } from "../../components/NavBar/NavBar.js";
+import { A as AppKu, r as resolveEasycom } from "../../../App.ku.js";
 import { _ as __easycom_1 } from "../../../uni_modules/uni-icons/components/uni-icons/uni-icons.js";
-import { A as AppKu } from "../../../App.ku.js";
 import { s as safeAreaInsets } from "../../utils/systemInfo.js";
 import { _ as _export_sfc } from "../../../plugin-vue-export-helper.js";
-import "../../../uni_modules/uni-icons/components/uni-icons/uniicons_file.js";
+import "../../store/index.js";
+import "../../../uni_modules/x-pinia-s/instans/types.js";
+import "../../../uni_modules/x-pinia-s/instans/subscriptions.js";
+import "../../../uni_modules/x-pinia-s/instans/createPinia.js";
+import "../../../uni_modules/x-pinia-s/instans/rootState.js";
+import "../../../uni_modules/x-pinia-s/instans/persist.js";
+import "../../store/app.js";
+import "../../../uni_modules/x-pinia-s/instans/storeBase.js";
+import "../../../uni_modules/x-pinia-s/instans/defineStore.js";
+import "../../tabbar/store.js";
+import "../../tabbar/types.js";
+import "../../tabbar/config.js";
+import "../../i18n/index.js";
+import "../../../uni_modules/lime-i18n/common/index.js";
+import "../../../uni_modules/lime-i18n/common/composer-class.js";
+import "../../../uni_modules/e-chart/components/e-chart/uts/WebviewEchart.js";
+import "../../../uni_modules/lime-i18n/common/format.js";
+import "../../../uni_modules/lime-i18n/common/util.js";
+import "../../../uni_modules/lime-i18n/common/errors.js";
+import "../../../uni_modules/lime-i18n/common/warnings.js";
+import "../../../uni_modules/lime-i18n/common/types.js";
+import "../../i18n/locales/zh-CN.js";
+import "../../i18n/locales/en-US.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/index.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hans.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hant.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/en.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/es.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/fr.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/de.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/ko.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/ja.js";
+import "../../../uni_modules/uview-ultra/libs/i18n/locales/ru.js";
+import "../../utils/theme.js";
+import "../../../theme.js";
+import "../../store/token.js";
+import "../../store/user.js";
 import "../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
 import "../../../uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.js";
 import "../../../uni_modules/uview-ultra/components/up-loading-icon/loadingIcon.js";
@@ -11,7 +47,6 @@ import "../../../uni_modules/uview-ultra/libs/config/config.js";
 import "../../../uni_modules/uview-ultra/libs/function/index.js";
 import "../../../uni_modules/uview-ultra/libs/function/test.js";
 import "../../../uni_modules/uview-ultra/libs/function/digit.js";
-import "../../../uni_modules/e-chart/components/e-chart/uts/WebviewEchart.js";
 import "../../../uni_modules/uview-ultra/libs/function/colorGradient.js";
 import "../../../uni_modules/uview-ultra/components/up-icon/up-icon.js";
 import "../../../uni_modules/uview-ultra/components/up-icon/icons.js";
@@ -25,46 +60,11 @@ import "../../../uni_modules/uview-ultra/components/up-transition/up-transition.
 import "../../../uni_modules/uview-ultra/components/up-transition/transition.js";
 import "../../../uni_modules/uview-ultra/libs/config/color.js";
 import "../../tabbar/index.js";
-import "../../tabbar/store.js";
-import "../../tabbar/types.js";
-import "../../tabbar/config.js";
 import "../../tabbar/TabbarItem.js";
 import "../../utils/i18n.js";
-import "../../i18n/index.js";
-import "../../../uni_modules/lime-i18n/common/index.js";
-import "../../../uni_modules/lime-i18n/common/composer-class.js";
-import "../../../uni_modules/lime-i18n/common/format.js";
-import "../../../uni_modules/lime-i18n/common/util.js";
-import "../../../uni_modules/lime-i18n/common/errors.js";
-import "../../../uni_modules/lime-i18n/common/warnings.js";
-import "../../../uni_modules/lime-i18n/common/types.js";
-import "../../i18n/locales/zh-CN.js";
-import "../../i18n/locales/en-US.js";
-import "../../store/index.js";
-import "../../../uni_modules/x-pinia-s/instans/types.js";
-import "../../../uni_modules/x-pinia-s/instans/subscriptions.js";
-import "../../../uni_modules/x-pinia-s/instans/createPinia.js";
-import "../../../uni_modules/x-pinia-s/instans/rootState.js";
-import "../../../uni_modules/x-pinia-s/instans/persist.js";
-import "../../store/app.js";
-import "../../../uni_modules/x-pinia-s/instans/storeBase.js";
-import "../../../uni_modules/x-pinia-s/instans/defineStore.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/index.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hans.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hant.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/en.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/es.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/fr.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/de.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/ko.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/ja.js";
-import "../../../uni_modules/uview-ultra/libs/i18n/locales/ru.js";
-import "../../store/token.js";
-import "../../store/user.js";
 import "../../utils/toast.js";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, resolveComponent: _resolveComponent, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, setSharedDataAttr: _setSharedDataAttr, unref: _unref, toSharedDataNumber: _toSharedDataNumber, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, toDisplayString: _toDisplayString, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataIf: _createSharedDataIf, createSharedDataFor: _createSharedDataFor, setSharedDataStyle: _setSharedDataStyle, isRef: _isRef, setSharedDataEvent: _setSharedDataEvent, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
-const __className = "GenSrcPagesAiAi";
+import "../../../uni_modules/uni-icons/components/uni-icons/uniicons_file.js";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref, computed, onMounted } = globalThis.Vue;
 class ChatMessage extends UTS.UTSType {
   static get$UTSMetadata$() {
@@ -91,16 +91,11 @@ class ChatMessage extends UTS.UTSType {
     delete this.__props__;
   }
 }
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "8c18e46a",
-  __className,
-  __filename: "src/pages/ai/ai.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "ai",
-  setup(__props) {
-    const __sharedDataRenderer = _useSharedDataRenderer();
-    const __sharedData = __sharedDataRenderer == "component" ? _withSharedDataComponent(new UniDynamicSharedDataComponent(_useSharedDataScope(), _useSharedDataComponentOptions({ bundleKey: "GenSrcPagesAiAiSharedData", sharedDataClassId: 0 }))) : _withSharedDataPage(new UniDynamicSharedDataPage(_useSharedDataPageId(), _useSharedDataPageOptions({ bundleKey: "GenSrcPagesAiAiSharedData", sharedDataClassId: 0 })));
-    const __sharedDataScope = _useSharedDataScope(__sharedData);
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
     const messages = ref([]);
     const inputText = ref("");
     const isTyping = ref(false);
@@ -169,90 +164,167 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         time: getCurrentTime()
       }));
     });
-    return () => {
-      "raw js";
-      const _component_NavBar = __easycom_0;
-      const _component_input = _resolveComponent("input");
-      const _component_uni_icons = __easycom_1;
-      const n36 = _createSharedDataComponent(AppKu, "9242dfba", null, {
-        "default": _withSharedDataVaporCtx(() => {
-          const n0 = _createSharedDataComponentWithFallback(_component_NavBar, "24f374cd", {
-            title: "AI 智能助手",
-            "show-back": true
-          });
-          _setSharedData(__sharedData, 1, n0?.sharedData);
-          _renderSharedDataEffect(() => {
-            return _setSharedDataAttr(__sharedData, 7, _toSharedDataNumber(_unref(scrollTop)));
-          });
-          _createSharedDataFor(_setSharedDataScoped(__sharedData, 2, _createSharedDataVFor(__sharedDataScope, () => {
-            return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-          })), () => {
-            return _unref(messages);
-          }, (__sharedData_VFor0, _for_item0) => {
-            _createSharedDataIf(() => {
-              return _setSharedData(__sharedData_VFor0, 1, _toSharedDataBoolean(isAiMessage(_for_item0.value.sender)));
-            }, () => {
-              _renderSharedDataEffect(() => {
-                const _msg = _for_item0.value;
-                _setSharedData(__sharedData_VFor0, 2, _toDisplayString(_msg.content));
-                _setSharedData(__sharedData_VFor0, 3, _toDisplayString(_msg.time));
-              });
-            }, () => {
-              _renderSharedDataEffect(() => {
-                const _msg = _for_item0.value;
-                _setSharedData(__sharedData_VFor0, 4, _toDisplayString(_msg.content));
-                _setSharedData(__sharedData_VFor0, 5, _toDisplayString(_msg.time));
-              });
-            }, 261);
-            return null;
-          }, (__sharedData_VFor0, msg) => {
-            return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(msg.id));
-          });
-          _createSharedDataIf(() => {
-            return _setSharedData(__sharedData, 3, _toSharedDataBoolean(_unref(isTyping)));
-          }, () => {
-          });
-          _renderSharedDataEffect(() => {
-            const _safeAreaBottom = _unref(safeAreaBottom);
-            _setSharedDataStyle(__sharedData, 8, { height: `${_safeAreaBottom + 70}px` });
-            _setSharedDataStyle(__sharedData, 9, { paddingBottom: `${_safeAreaBottom + 10}px` });
-          });
-          const n30 = _createSharedDataComponentWithFallback(_component_input, "94309c5c", {
-            value: () => {
-              return _unref(inputText);
-            },
-            "onUpdate:value": () => {
-              return (_value) => {
-                return _isRef(inputText) ? inputText.value = _value : null;
-              };
-            },
-            type: "text",
-            placeholder: "和 AI 助手聊点什么吧...",
-            "placeholder-style": "color: #94a3b8",
-            class: "chat-input",
-            "confirm-type": "send",
-            onConfirm: () => {
-              return sendMessage;
-            }
-          });
-          _setSharedData(__sharedData, 4, n30?.sharedData);
-          const n31 = _createSharedDataComponentWithFallback(_component_uni_icons, "94308418", {
-            type: "paperplane-filled",
-            size: "18",
-            color: "#ffffff"
-          });
-          _setSharedData(__sharedData, 5, n31?.sharedData);
-          _setSharedDataEvent(__sharedData, 6, sendMessage);
-        })
-      });
-      _setSharedData(__sharedData, 0, n36.sharedData);
-      return __sharedData;
-    };
+    const __returned__ = { messages, inputText, isTyping, scrollTop, isAiMessage, safeAreaBottom, getCurrentTime, scrollToBottom, sendMessage, get AppKu() {
+      return AppKu;
+    }, get NavBar() {
+      return __easycom_0;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const _style_1 = {};
-const ai = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0, _style_1]]]);
+const _style_0 = { "bg-__10b981_": { "": { "backgroundImage": "none", "backgroundColor": "#10b981" } }, "bg-__2563eb_": { "": { "backgroundImage": "none", "backgroundColor": "#2563eb" } }, "bg-__e2e8f0_": { "": { "backgroundImage": "none", "backgroundColor": "#e2e8f0" } }, "bg-__f1f5f9_": { "": { "backgroundImage": "none", "backgroundColor": "#f1f5f9" } }, "bg-white": { "": { "backgroundColor": "rgba(255,255,255,var(--un-bg-opacity,1))" } }, "border": { "": { "borderTopWidth": "var(--un-line-width-default,1px)", "borderRightWidth": "var(--un-line-width-default,1px)", "borderBottomWidth": "var(--un-line-width-default,1px)", "borderLeftWidth": "var(--un-line-width-default,1px)" } }, "border-__e2e8f0_": { "": { "borderTopWidth": "medium", "borderRightWidth": "medium", "borderBottomWidth": "medium", "borderLeftWidth": "medium", "borderTopStyle": "none", "borderRightStyle": "none", "borderBottomStyle": "none", "borderLeftStyle": "none", "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-t": { "": { "borderTopWidth": "var(--un-line-width-default,1px)" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-col": { "": { "flexDirection": "column" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-32px": { "": { "height": 32 } }, "h-36px": { "": { "height": 36 } }, "items-center": { "": { "alignItems": "center" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-15px": { "": { "marginBottom": 15 } }, "ml-10px": { "": { "marginLeft": 10 } }, "ml-4px": { "": { "marginLeft": 4 } }, "ml-8px": { "": { "marginLeft": 8 } }, "mr-10px": { "": { "marginRight": 10 } }, "mr-4px": { "": { "marginRight": 4 } }, "mt-4px": { "": { "marginTop": 4 } }, "p-10px": { "": { "paddingTop": 10, "paddingRight": 10, "paddingBottom": 10, "paddingLeft": 10 } }, "p-12px": { "": { "paddingTop": 12, "paddingRight": 12, "paddingBottom": 12, "paddingLeft": 12 } }, "px-12px": { "": { "paddingLeft": 12, "paddingRight": 12 } }, "px-15px": { "": { "paddingLeft": 15, "paddingRight": 15 } }, "py-10px": { "": { "paddingTop": 10, "paddingBottom": 10 } }, "py-6px": { "": { "paddingTop": 6, "paddingBottom": 6 } }, "rounded-16px": { "": { "borderTopLeftRadius": 16, "borderTopRightRadius": 16, "borderBottomRightRadius": 16, "borderBottomLeftRadius": 16 } }, "rounded-18px": { "": { "borderTopLeftRadius": 18, "borderTopRightRadius": 18, "borderBottomRightRadius": 18, "borderBottomLeftRadius": 18 } }, "rounded-24px": { "": { "borderTopLeftRadius": 24, "borderTopRightRadius": 24, "borderBottomRightRadius": 24, "borderBottomLeftRadius": 24 } }, "rounded-bl-16px": { "": { "borderBottomLeftRadius": 16 } }, "rounded-br-16px": { "": { "borderBottomRightRadius": 16 } }, "rounded-l-16px": { "": { "borderTopLeftRadius": 16, "borderBottomLeftRadius": 16 } }, "rounded-r-16px": { "": { "borderTopRightRadius": 16, "borderBottomRightRadius": 16 } }, "shadow-sm": { "": { "boxShadow": "var(--un-inset-shadow,0 0 #0000),var(--un-inset-ring-shadow,0 0 #0000),var(--un-ring-offset-shadow,0 0 #0000),var(--un-ring-shadow,0 0 #0000),var(--un-shadow,0 1rpx 3rpx 0 var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))))", "--un-shadow": "0 1rpx 3rpx 0rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1))),0 1rpx 2rpx -1rpx var(--un-shadow-color,rgba(0,0,0,var(--un-shadow-opacity,0.1)))" } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__64748b_": { "": { "color": "#64748b" } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-10px": { "": { "fontSize": 10 } }, "text-12px": { "": { "fontSize": 12 } }, "text-14px": { "": { "fontSize": 14 } }, "text-white": { "": { "color": "rgba(255,255,255,var(--un-color-opacity,1))" } }, "w-32px": { "": { "width": 32 } }, "w-36px": { "": { "width": 36 } } };
+const _style_1 = { "page-root": { "": { "height": "100%", "display": "flex", "flexDirection": "column" } }, "footer-fixed": { "": { "position": "fixed", "left": 0, "right": 0, "bottom": 0, "zIndex": 100 } }, "msg-row-start": { "": { "display": "flex", "flexDirection": "row", "alignItems": "flex-start" } }, "msg-row-end": { "": { "display": "flex", "flexDirection": "row", "alignItems": "flex-start", "justifyContent": "flex-end" } }, "msg-content-left": { "": { "display": "flex", "flexDirection": "column", "maxWidth": 270 } }, "msg-content-right": { "": { "display": "flex", "flexDirection": "column", "alignItems": "flex-end", "maxWidth": 270 } }, "flex-col": { "": { "display": "flex", "flexDirection": "column" } }, "flex-row": { "": { "display": "flex", "flexDirection": "row" } }, "items-center": { "": { "alignItems": "center" } }, "justify-center": { "": { "justifyContent": "center" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "chat-input": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "height": 36, "backgroundColor": "#f1f5f9", "color": "#1e293b", "fontSize": 14, "borderTopWidth": 0, "borderRightWidth": 0, "borderBottomWidth": 0, "borderLeftWidth": 0 } } };
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { resolveComponent: _resolveComponent, createVNode: _createVNode, renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, createElementVNode: _createElementVNode, toDisplayString: _toDisplayString, createCommentVNode: _createCommentVNode, normalizeStyle: _normalizeStyle, vModelText: _vModelText, withDirectives: _withDirectives, withCtx: _withCtx, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_NavBar = resolveEasycom(__resolveDynamicComponent("NavBar"), __easycom_0);
+  const _component_uni_icons = resolveEasycom(__resolveDynamicComponent("uni-icons"), __easycom_1);
+  return _openBlock(), _createBlock($setup["AppKu"], null, {
+    default: _withCtx(() => [
+      _createElementVNode("view", { class: "page-root" }, [
+        _createVNode(_component_NavBar, {
+          title: "AI 智能助手",
+          "show-back": true
+        }),
+        _createElementVNode("scroll-view", {
+          class: "flex-1 px-15px py-10px",
+          direction: "vertical",
+          "scroll-top": $setup.scrollTop,
+          "scroll-with-animation": true
+        }, [
+          (_openBlock(true), _createElementBlock(
+            _Fragment,
+            null,
+            _renderList($setup.messages, (msg) => {
+              return _openBlock(), _createElementBlock("view", {
+                key: msg.id,
+                class: "mb-15px flex-col"
+              }, [
+                $setup.isAiMessage(msg.sender) ? (_openBlock(), _createElementBlock("view", {
+                  key: 0,
+                  class: "msg-row-start"
+                }, [
+                  _createElementVNode("view", { class: "w-36px h-36px rounded-18px bg-__2563eb_ items-center justify-center mr-10px shadow-sm" }, [
+                    _createElementVNode("text", { class: "text-white text-12px font-bold" }, "AI")
+                  ]),
+                  _createElementVNode("view", { class: "msg-content-left" }, [
+                    _createElementVNode("view", { class: "bg-white p-12px rounded-r-16px rounded-bl-16px shadow-sm border border-__e2e8f0_" }, [
+                      _createElementVNode(
+                        "text",
+                        { class: "text-__1e293b_ text-14px leading-relaxed" },
+                        _toDisplayString(msg.content),
+                        1
+                        /* TEXT */
+                      )
+                    ]),
+                    _createElementVNode(
+                      "text",
+                      { class: "text-__94a3b8_ text-10px mt-4px ml-4px" },
+                      _toDisplayString(msg.time),
+                      1
+                      /* TEXT */
+                    )
+                  ])
+                ])) : (_openBlock(), _createElementBlock("view", {
+                  key: 1,
+                  class: "msg-row-end"
+                }, [
+                  _createElementVNode("view", { class: "msg-content-right" }, [
+                    _createElementVNode("view", { class: "bg-__10b981_ p-12px rounded-l-16px rounded-br-16px shadow-sm" }, [
+                      _createElementVNode(
+                        "text",
+                        { class: "text-white text-14px leading-relaxed" },
+                        _toDisplayString(msg.content),
+                        1
+                        /* TEXT */
+                      )
+                    ]),
+                    _createElementVNode(
+                      "text",
+                      { class: "text-__94a3b8_ text-10px mt-4px mr-4px" },
+                      _toDisplayString(msg.time),
+                      1
+                      /* TEXT */
+                    )
+                  ]),
+                  _createElementVNode("view", { class: "w-36px h-36px rounded-18px bg-__e2e8f0_ items-center justify-center ml-10px shadow-sm" }, [
+                    _createElementVNode("text", { class: "text-__64748b_ text-12px font-bold" }, "ME")
+                  ])
+                ]))
+              ]);
+            }),
+            128
+            /* KEYED_FRAGMENT */
+          )),
+          $setup.isTyping ? (_openBlock(), _createElementBlock("view", {
+            key: 0,
+            class: "msg-row-start mb-15px"
+          }, [
+            _createElementVNode("view", { class: "w-36px h-36px rounded-18px bg-__2563eb_ items-center justify-center mr-10px shadow-sm" }, [
+              _createElementVNode("text", { class: "text-white text-12px font-bold" }, "AI")
+            ]),
+            _createElementVNode("view", { class: "bg-white p-12px rounded-r-16px rounded-bl-16px shadow-sm border border-__e2e8f0_" }, [
+              _createElementVNode("text", { class: "text-__64748b_ text-14px" }, "AI 正在思考中...")
+            ])
+          ])) : _createCommentVNode("v-if", true),
+          _createElementVNode(
+            "view",
+            {
+              style: _normalizeStyle({ height: `${$setup.safeAreaBottom + 70}px` })
+            },
+            null,
+            4
+            /* STYLE */
+          )
+        ], 8, ["scroll-top"]),
+        _createElementVNode(
+          "view",
+          {
+            class: "footer-fixed bg-white border-t border-__e2e8f0_ p-10px flex-col",
+            style: _normalizeStyle({ paddingBottom: `${$setup.safeAreaBottom + 10}px` })
+          },
+          [
+            _createElementVNode("view", { class: "flex-row items-center bg-__f1f5f9_ rounded-24px px-12px py-6px" }, [
+              _withDirectives(_createElementVNode(
+                "input",
+                {
+                  "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.inputText = $event),
+                  type: "text",
+                  placeholder: "和 AI 助手聊点什么吧...",
+                  "placeholder-style": "color: #94a3b8",
+                  class: "chat-input",
+                  "confirm-type": "send",
+                  onConfirm: $setup.sendMessage
+                },
+                null,
+                544
+                /* NEED_HYDRATION, NEED_PATCH */
+              ), [
+                [_vModelText, $setup.inputText]
+              ]),
+              _createElementVNode("view", {
+                class: "w-32px h-32px rounded-16px bg-__2563eb_ items-center justify-center ml-8px",
+                onClick: $setup.sendMessage
+              }, [
+                _createVNode(_component_uni_icons, {
+                  type: "paperplane-filled",
+                  size: "18",
+                  color: "#ffffff"
+                })
+              ])
+            ])
+          ],
+          4
+          /* STYLE */
+        )
+      ])
+    ]),
+    _: 1
+    /* STABLE */
+  });
+}
+const ai = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0, _style_1]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/ai/ai.uvue"]]);
 export {
   ai as default
 };

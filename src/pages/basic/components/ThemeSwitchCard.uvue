@@ -35,10 +35,34 @@
       </view>
     </view>
 
-    <!-- 暗黑模式开关 -->
+    <!-- 外观模式：跟随系统 / 浅色 / 深色 -->
     <view class="flex-row justify-between items-center mt-10px pt-10px">
-      <text class="text-14px text-[#2d3748]">{{ darkLabel }}</text>
-      <switch :checked="appStore.state.isDark" color="#37c2bc" @change="handleDarkChange" />
+      <text class="text-14px text-[#2d3748]">{{ themeModeLabel }}</text>
+      <view
+        class="flex-row rounded-8px overflow-hidden"
+        :style="{
+          borderWidth: '1px',
+          borderStyle: 'solid',
+          borderColor: 'var(--border-color, #e2e8f0)'
+        }"
+      >
+        <view
+          v-for="(item, index) in themeModeOptions"
+          :key="index"
+          class="px-14px py-8px"
+          :style="{
+            backgroundColor: appStore.state.themeMode == item.value ? appStore.state.theme : 'transparent'
+          }"
+          @click="changeThemeMode(item.value)"
+        >
+          <text
+            class="text-12px"
+            :style="{
+              color: appStore.state.themeMode == item.value ? '#ffffff' : 'var(--text-secondary, #64748b)'
+            }"
+          >{{ item.label }}</text>
+        </view>
+      </view>
     </view>
   </Card>
 </template>
@@ -49,12 +73,26 @@ import { computed } from 'vue';
 import { useAppStore } from '@/src/store/index.uts';
 import { $t } from '@/src/utils/i18n';
 
+// 外观模式选项：auto（跟随系统）/ light（浅色）/ dark（深色）
+type ThemeModeOption = {
+  value: string;
+  label: string;
+};
+
 const appStore = useAppStore();
 
 const themeTitle = computed((): string => $t('basic.themeTitle'));
 const themePreview = computed((): string => $t('basic.themePreview'));
 const themeButton = computed((): string => $t('basic.themeButton'));
-const darkLabel = computed((): string => $t('basic.themeDark'));
+const themeModeLabel = computed((): string => $t('basic.themeModeTitle'));
+
+const themeModeOptions = computed((): ThemeModeOption[] => {
+  return [
+    { value: 'auto', label: $t('basic.themeModeAuto') },
+    { value: 'light', label: $t('basic.themeModeLight') },
+    { value: 'dark', label: $t('basic.themeModeDark') }
+  ];
+});
 
 const currentTheme = computed((): string => {
   return appStore.state.theme;
@@ -78,8 +116,14 @@ function changeTheme(color: string) {
   });
 }
 
-function handleDarkChange(e: SwitchChangeEvent) {
-  appStore.setDarkMode(e.detail.value);
+function changeThemeMode(value: string) {
+  appStore.setThemeMode(value);
+
+  uni.showToast({
+    title: $t('basic.themeModeSuccess'),
+    icon: 'none',
+    duration: 1500
+  });
 }
 </script>
 

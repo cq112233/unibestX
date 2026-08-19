@@ -3,19 +3,34 @@ import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5
 import { $ as $t } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/i18n&";
 import { u as useAppStore } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/app&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedData: _setSharedData, toDisplayString: _toDisplayString, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataIf: _createSharedDataIf, setSharedDataEvent: _setSharedDataEvent, createSharedDataFor: _createSharedDataFor, unref: _unref, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
-const __className = "GenSrcPagesBasicComponentsThemeSwitchCard";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { computed } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "c87d1b72",
-  __className,
-  __filename: "src/pages/basic/components/ThemeSwitchCard.uvue",
+class ThemeModeOption extends UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          value: { type: String, optional: false },
+          label: { type: String, optional: false }
+        };
+      },
+      name: "ThemeModeOption"
+    };
+  }
+  constructor(options, metadata = ThemeModeOption.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.value = this.__props__.value;
+    this.label = this.__props__.label;
+    delete this.__props__;
+  }
+}
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "ThemeSwitchCard",
-  setup(__props) {
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenSrcPagesBasicComponentsThemeSwitchCardSharedData", sharedDataClassId: 0 })));
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
     const appStore = useAppStore();
     const themeTitle = computed(() => {
       return $t("basic.themeTitle");
@@ -26,8 +41,15 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     const themeButton = computed(() => {
       return $t("basic.themeButton");
     });
-    const darkLabel = computed(() => {
-      return $t("basic.themeDark");
+    const themeModeLabel = computed(() => {
+      return $t("basic.themeModeTitle");
+    });
+    const themeModeOptions = computed(() => {
+      return [
+        new ThemeModeOption({ value: "auto", label: $t("basic.themeModeAuto") }),
+        new ThemeModeOption({ value: "light", label: $t("basic.themeModeLight") }),
+        new ThemeModeOption({ value: "dark", label: $t("basic.themeModeDark") })
+      ];
     });
     const currentTheme = computed(() => {
       return appStore.state.theme;
@@ -47,75 +69,138 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         duration: 1500
       });
     }
-    function handleDarkChange(e) {
-      appStore.setDarkMode(e.detail.value);
+    function changeThemeMode(value) {
+      appStore.setThemeMode(value);
+      uni.showToast({
+        title: $t("basic.themeModeSuccess"),
+        icon: "none",
+        duration: 1500
+      });
     }
-    return () => {
-      "raw js";
-      const _component_switch = _resolveComponent("switch");
-      const n14 = _createSharedDataComponent(
-        Card,
-        "a1511108",
-        { title: () => {
-          return themeTitle.value;
-        } },
-        {
-          "default": _withSharedDataVaporCtx(() => {
-            _renderSharedDataEffect(() => {
-              _setSharedData(__sharedData, 3, _toDisplayString(themePreview.value));
-              _setSharedDataStyle(__sharedData, 4, { backgroundColor: currentTheme.value });
-              _setSharedData(__sharedData, 5, _toDisplayString(themeButton.value));
-            });
-            _createSharedDataFor(_setSharedDataScoped(__sharedData, 1, _createSharedDataVFor(__sharedDataScope, () => {
-              return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-            })), () => {
-              return colorOptions;
-            }, (__sharedData_VFor0, _for_item0, _for_key0) => {
-              _renderSharedDataEffect(() => {
-                const _item = _for_item0.value;
-                _setSharedDataStyle(__sharedData_VFor0, 3, {
-                  backgroundColor: _item,
-                  borderWidth: currentTheme.value == _item ? "3px" : "0px",
-                  borderStyle: "solid",
-                  borderColor: "#1e293b"
-                });
-              });
-              _createSharedDataIf(() => {
-                return _setSharedData(__sharedData_VFor0, 1, _toSharedDataBoolean(currentTheme.value == _for_item0.value));
-              }, () => {
-              });
-              _setSharedDataEvent(__sharedData_VFor0, 2, () => {
-                return changeTheme(_for_item0.value);
-              });
-              return null;
-            }, (__sharedData_VFor0, item, index) => {
-              return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
-            }, 1);
-            _renderSharedDataEffect(() => {
-              return _setSharedData(__sharedData, 6, _toDisplayString(darkLabel.value));
-            });
-            const n12 = _createSharedDataComponentWithFallback(_component_switch, "98cd388a", {
-              checked: () => {
-                return _unref(appStore).state.isDark;
-              },
-              color: "#37c2bc",
-              onChange: () => {
-                return handleDarkChange;
-              }
-            });
-            _setSharedData(__sharedData, 2, n12?.sharedData);
-          })
-        },
-        1
-        /* SINGLE_ROOT */
-      );
-      _setSharedData(__sharedData, 0, n14.sharedData);
-      return __sharedData;
-    };
+    const __returned__ = { appStore, themeTitle, themePreview, themeButton, themeModeLabel, themeModeOptions, currentTheme, colorOptions, changeTheme, changeThemeMode, get Card() {
+      return Card;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const ThemeSwitchCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex": { "": { "display": "flex" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-40px": { "": { "height": 40 } }, "h-44px": { "": { "height": 44 } }, "items-center": { "": { "alignItems": "center" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-16px": { "": { "marginBottom": 16 } }, "mb-8px": { "": { "marginBottom": 8 } }, "mt-10px": { "": { "marginTop": 10 } }, "mx-auto": { "": { "marginLeft": "auto", "marginRight": "auto" } }, "none": { "": { "display": "none" } }, "overflow-hidden": { "": { "overflow": "hidden" } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "pt-10px": { "": { "paddingTop": 10 } }, "px-14px": { "": { "paddingLeft": 14, "paddingRight": 14 } }, "py-10px": { "": { "paddingTop": 10, "paddingBottom": 10 } }, "py-8px": { "": { "paddingTop": 8, "paddingBottom": 8 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-20px": { "": { "borderTopLeftRadius": 20, "borderTopRightRadius": 20, "borderBottomRightRadius": 20, "borderBottomLeftRadius": 20 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__2d3748_": { "": { "color": "#2d3748" } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-12px": { "": { "fontSize": 12 } }, "text-14px": { "": { "fontSize": 14 } }, "text-16px": { "": { "fontSize": 16 } }, "text-white": { "": { "color": "rgba(255,255,255,var(--un-color-opacity,1))" } }, "w-200px": { "": { "width": 200 } }, "w-40px": { "": { "width": 40 } } };
+const { toDisplayString: _toDisplayString, createElementVNode: _createElementVNode, normalizeStyle: _normalizeStyle, renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, withCtx: _withCtx, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createBlock($setup["Card"], { title: $setup.themeTitle }, {
+    default: _withCtx(() => [
+      _createElementVNode("view", { class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_ items-center" }, [
+        _createElementVNode(
+          "text",
+          { class: "text-12px text-__94a3b8_ mb-8px" },
+          _toDisplayString($setup.themePreview),
+          1
+          /* TEXT */
+        ),
+        _createElementVNode(
+          "view",
+          {
+            class: "mt-10px mx-auto w-200px h-44px rounded-8px flex flex-row items-center justify-center",
+            style: _normalizeStyle({ backgroundColor: $setup.currentTheme })
+          },
+          [
+            _createElementVNode(
+              "text",
+              { class: "text-__ffffff_ text-14px" },
+              _toDisplayString($setup.themeButton),
+              1
+              /* TEXT */
+            )
+          ],
+          4
+          /* STYLE */
+        )
+      ]),
+      _createElementVNode("view", { class: "flex-row justify-between py-10px" }, [
+        (_openBlock(), _createElementBlock(
+          _Fragment,
+          null,
+          _renderList($setup.colorOptions, (item, index) => {
+            return _createElementVNode("view", {
+              key: index,
+              class: "w-40px h-40px rounded-20px items-center justify-center",
+              style: _normalizeStyle({
+                backgroundColor: item,
+                borderWidth: $setup.currentTheme == item ? "3px" : "0px",
+                borderStyle: "solid",
+                borderColor: "#1e293b"
+              }),
+              onClick: ($event) => $setup.changeTheme(item)
+            }, [
+              $setup.currentTheme == item ? (_openBlock(), _createElementBlock("text", {
+                key: 0,
+                class: "text-16px text-white font-bold"
+              }, " ✓ ")) : _createCommentVNode("v-if", true)
+            ], 12, ["onClick"]);
+          }),
+          64
+          /* STABLE_FRAGMENT */
+        ))
+      ]),
+      _createElementVNode("view", { class: "flex-row justify-between items-center mt-10px pt-10px" }, [
+        _createElementVNode(
+          "text",
+          { class: "text-14px text-__2d3748_" },
+          _toDisplayString($setup.themeModeLabel),
+          1
+          /* TEXT */
+        ),
+        _createElementVNode(
+          "view",
+          {
+            class: "flex-row rounded-8px overflow-hidden",
+            style: _normalizeStyle({
+              borderWidth: "1px",
+              borderStyle: "solid",
+              borderColor: "var(--border-color, #e2e8f0)"
+            })
+          },
+          [
+            (_openBlock(true), _createElementBlock(
+              _Fragment,
+              null,
+              _renderList($setup.themeModeOptions, (item, index) => {
+                return _openBlock(), _createElementBlock("view", {
+                  key: index,
+                  class: "px-14px py-8px",
+                  style: _normalizeStyle({
+                    backgroundColor: $setup.appStore.state.themeMode == item.value ? $setup.appStore.state.theme : "transparent"
+                  }),
+                  onClick: ($event) => $setup.changeThemeMode(item.value)
+                }, [
+                  _createElementVNode(
+                    "text",
+                    {
+                      class: "text-12px",
+                      style: _normalizeStyle({
+                        color: $setup.appStore.state.themeMode == item.value ? "#ffffff" : "var(--text-secondary, #64748b)"
+                      })
+                    },
+                    _toDisplayString(item.label),
+                    5
+                    /* TEXT, STYLE */
+                  )
+                ], 12, ["onClick"]);
+              }),
+              128
+              /* KEYED_FRAGMENT */
+            ))
+          ],
+          4
+          /* STYLE */
+        )
+      ])
+    ]),
+    _: 1
+    /* STABLE */
+  }, 8, ["title"]);
+}
+const ThemeSwitchCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/basic/components/ThemeSwitchCard.uvue"]]);
 export {
   ThemeSwitchCard as T
 };

@@ -2,6 +2,9 @@
 const common_vendor = require("../../common/vendor.js");
 const src_tabbar_store = require("./store.js");
 const src_utils_systemInfo = require("../utils/systemInfo.js");
+require("../store/index.js");
+const src_utils_theme = require("../utils/theme.js");
+const src_store_app = require("../store/app.js");
 if (!Math) {
   common_vendor.unref(TabbarItem)();
 }
@@ -11,6 +14,9 @@ const TABBAR_CONTAINER_HEIGHT = 80;
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "index",
   setup(__props) {
+    const themeTokens = common_vendor.computed(() => {
+      return src_utils_theme.getThemeTokens(src_store_app.useAppStore().state.isDark);
+    });
     const safeAreaBottom = common_vendor.computed(() => {
       const insets = src_utils_systemInfo.safeAreaInsets.value;
       if (insets != null) {
@@ -44,7 +50,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       "raw js";
       const __returned__ = {
         a: `${TABBAR_HEIGHT + common_vendor.unref(safeAreaBottom)}px`,
-        b: common_vendor.f(common_vendor.unref(src_tabbar_store.tabbarList), (item, index, i0) => {
+        b: common_vendor.unref(themeTokens).tabBg,
+        c: common_vendor.unref(themeTokens).tabBorder,
+        d: common_vendor.f(common_vendor.unref(src_tabbar_store.tabbarList), (item, index, i0) => {
           return {
             a: "083506f5-0-" + i0,
             b: common_vendor.p({
@@ -59,17 +67,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }, index)
           };
         }),
-        c: `${common_vendor.unref(safeAreaBottom)}px`,
-        d: `${TABBAR_CONTAINER_HEIGHT + common_vendor.unref(safeAreaBottom)}px`,
-        e: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        f: common_vendor.s({
+        e: `${common_vendor.unref(safeAreaBottom)}px`,
+        f: common_vendor.unref(themeTokens).tabBg,
+        g: `${TABBAR_CONTAINER_HEIGHT + common_vendor.unref(safeAreaBottom)}px`,
+        h: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        i: common_vendor.s({
           height: `${TABBAR_HEIGHT + common_vendor.unref(safeAreaBottom)}px`
         }),
-        g: common_vendor.s({
+        j: common_vendor.s({
           "--status-bar-height": `${_ctx.u_s_b_h}px`,
           "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
         }),
-        h: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        k: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
       return __returned__;
     };

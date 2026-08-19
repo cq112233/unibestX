@@ -2,6 +2,9 @@
 import type { CustomTabBarItem } from './types';
 import { curIdx, themeColor } from './store';
 import { $t } from '@/src/utils/i18n';
+import { useAppStore } from '@/src/store';
+import { getThemeTokens } from '@/src/utils/theme';
+import type { ThemeTokens } from '@/src/utils/theme';
 
 const props = defineProps({
   item: {
@@ -18,11 +21,14 @@ const props = defineProps({
   }
 });
 
-const inactiveColor = '#999999';
-
 // 将 props.item 转换为强类型的 CustomTabBarItem
 const tabbarItem = computed((): CustomTabBarItem => {
   return props.item as CustomTabBarItem;
+});
+
+// 亮 / 暗主题 token（与 theme.json tabBar 配置同步）
+const themeTokens = computed((): ThemeTokens => {
+  return getThemeTokens(useAppStore().state.isDark);
 });
 
 /** 根据选中状态返回对应图标 */
@@ -35,7 +41,8 @@ function getIcon(): string {
 
 /** 获取当前文字和图标的颜色 */
 function getActiveColor(): string {
-  return curIdx.value == props.index ? themeColor.value : inactiveColor;
+  // 选中态按用户可切换的主题色走，未选中态跟随亮 / 暗主题
+  return curIdx.value == props.index ? themeColor.value : themeTokens.value.tabColor;
 }
 
 /** 是否显示小红点 */

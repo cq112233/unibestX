@@ -1,19 +1,13 @@
 import { C as Card } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/Card&";
 import { t as toast, a as toastSuccess } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/toast&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, setSharedDataEvent: _setSharedDataEvent, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
-const __className = "GenSrcPagesFunctionComponentsToastCard";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "7e4538f1",
-  __className,
-  __filename: "src/pages/function/components/ToastCard.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "ToastCard",
-  setup(__props) {
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenSrcPagesFunctionComponentsToastCardSharedData", sharedDataClassId: 0 })));
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
     const customMsg = ref("来自 Function 功能页的 Toast 消息！");
     function showCustomToast() {
       if (customMsg.value.trim() == "") {
@@ -25,42 +19,57 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     function showSuccessToast() {
       toastSuccess("Function 页面全局 Toast 触发成功！");
     }
-    return () => {
-      "raw js";
-      const _component_input = _resolveComponent("input");
-      const n10 = _createSharedDataComponent(
-        Card,
-        "43d3d1a8",
-        { title: "全局 Toast 提示调用" },
-        {
-          "default": _withSharedDataVaporCtx(() => {
-            const n3 = _createSharedDataComponentWithFallback(_component_input, "c3b3dbec", {
-              value: () => {
-                return customMsg.value;
-              },
-              "onUpdate:value": () => {
-                return (_value) => {
-                  return customMsg.value = _value;
-                };
-              },
-              placeholder: "请输入要提示的文字内容",
-              class: "h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-__cbd5e1_ text-14px text-__334155_"
-            });
-            _setSharedData(__sharedData, 1, n3?.sharedData);
-            _setSharedDataEvent(__sharedData, 2, showCustomToast);
-            _setSharedDataEvent(__sharedData, 3, showSuccessToast);
-          })
-        },
-        1
-        /* SINGLE_ROOT */
-      );
-      _setSharedData(__sharedData, 0, n10.sharedData);
-      return __sharedData;
-    };
+    const __returned__ = { customMsg, showCustomToast, showSuccessToast, get Card() {
+      return Card;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const ToastCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "bg-__10b981_": { "": { "backgroundImage": "none", "backgroundColor": "#10b981" } }, "bg-__3b82f6_": { "": { "backgroundImage": "none", "backgroundColor": "#3b82f6" } }, "bg-white": { "": { "backgroundColor": "rgba(255,255,255,var(--un-bg-opacity,1))" } }, "border-color-__cbd5e1_": { "": { "borderTopColor": "#cbd5e1", "borderRightColor": "#cbd5e1", "borderBottomColor": "#cbd5e1", "borderLeftColor": "#cbd5e1" } }, "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex": { "": { "display": "flex" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-38px": { "": { "height": 38 } }, "h-40px": { "": { "height": 40 } }, "items-center": { "": { "alignItems": "center" } }, "justify-center": { "": { "justifyContent": "center" } }, "leading-20px": { "": { "lineHeight": "20px" } }, "mb-12px": { "": { "marginBottom": 12 } }, "mb-16px": { "": { "marginBottom": 16 } }, "mb-6px": { "": { "marginBottom": 6 } }, "mr-10px": { "": { "marginRight": 10 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "px-12px": { "": { "paddingLeft": 12, "paddingRight": 12 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-6px": { "": { "borderTopLeftRadius": 6, "borderTopRightRadius": 6, "borderBottomRightRadius": 6, "borderBottomLeftRadius": 6 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__334155_": { "": { "color": "#334155" } }, "text-__64748b_": { "": { "color": "#64748b" } }, "text-__94a3b8_": { "": { "color": "#94a3b8" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-12px": { "": { "fontSize": 12 } }, "text-13px": { "": { "fontSize": 13 } }, "text-14px": { "": { "fontSize": 14 } } };
+const { createElementVNode: _createElementVNode, vModelText: _vModelText, withDirectives: _withDirectives, withCtx: _withCtx, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createBlock($setup["Card"], { title: "全局 Toast 提示调用" }, {
+    default: _withCtx(() => [
+      _createElementVNode("view", { class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
+        _createElementVNode("text", { class: "text-12px text-__64748b_ leading-20px" }, ' 演示从功能页调用 App.ku.uvue 全局挂载的 <up-toast ref="uToastRef" />，支持自定义消息、类型与轻提示反馈。 ')
+      ]),
+      _createElementVNode("view", { class: "mb-12px" }, [
+        _createElementVNode("text", { class: "text-12px text-__94a3b8_ mb-6px" }, "自定义 Toast 内容"),
+        _withDirectives(_createElementVNode(
+          "input",
+          {
+            "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.customMsg = $event),
+            placeholder: "请输入要提示的文字内容",
+            class: "h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-__cbd5e1_ text-14px text-__334155_"
+          },
+          null,
+          512
+          /* NEED_PATCH */
+        ), [
+          [_vModelText, $setup.customMsg]
+        ])
+      ]),
+      _createElementVNode("view", { class: "flex flex-row" }, [
+        _createElementVNode("view", {
+          class: "flex-1 mr-10px bg-__3b82f6_ rounded-8px h-40px flex flex-row items-center justify-center",
+          onClick: $setup.showCustomToast
+        }, [
+          _createElementVNode("text", { class: "text-__ffffff_ text-13px font-bold" }, "弹出自定义 Toast")
+        ]),
+        _createElementVNode("view", {
+          class: "flex-1 bg-__10b981_ rounded-8px h-40px flex flex-row items-center justify-center",
+          onClick: $setup.showSuccessToast
+        }, [
+          _createElementVNode("text", { class: "text-__ffffff_ text-13px font-bold" }, "弹出成功 Toast")
+        ])
+      ])
+    ]),
+    _: 1
+    /* STABLE */
+  });
+}
+const ToastCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/function/components/ToastCard.uvue"]]);
 export {
   ToastCard as T
 };

@@ -1,12 +1,11 @@
-Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚHäimport { _ as __easycom_1 } from "../up-index-anchor/up-index-anchor.js";
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ[`import { _ as __easycom_1 } from "../up-index-anchor/up-index-anchor.js";
+import { r as resolveEasycom } from "../../../../App.ku.js";
 import { _ as __easycom_1$1 } from "../up-transition/up-transition.js";
 import { a as addUnit, s as sleep, e as getWindowInfo, g as getPx, u as upGetRect } from "../../libs/function/index.js";
 import { u as useUltraUI } from "../../libs/composable/useUltraUI.js";
 import { d as defProps } from "./indexList.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, setSharedDataAttr: _setSharedDataAttr, toSharedDataNumber: _toSharedDataNumber, toSharedDataString: _toSharedDataString, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataSlot: _createSharedDataSlot, setSharedDataEvent: _setSharedDataEvent, setSharedDataStyle: _setSharedDataStyle, setSharedDataTemplateRef: _setSharedDataTemplateRef, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, toDisplayString: _toDisplayString, setSharedDataClass: _setSharedDataClass, createSharedDataFor: _createSharedDataFor } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpIndexListUpIndexList";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref, computed, watch, onMounted, getCurrentInstance } = globalThis.Vue;
 class UPIndexListChildrenItemType extends UTS.UTSType {
   static get$UTSMetadata$() {
@@ -29,14 +28,10 @@ class UPIndexListChildrenItemType extends UTS.UTSType {
     delete this.__props__;
   }
 }
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-index-list"
   },
-  __dynamicSharedData: true,
-  __hash: "2fddd6d5",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-index-list/up-index-list.uvue",
   __name: "up-index-list",
   props: {
     inactiveColor: {
@@ -75,9 +70,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     }
   },
   setup(__props, _a) {
-    var __expose = _a.expose, $slots = _a.slots;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpIndexListUpIndexListSharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose;
     const _b = useUltraUI(), children = _b.children, addChild = _b.addChild, getChildren = _b.getChildren;
     const instance = getCurrentInstance().proxy;
     const indexList = () => {
@@ -117,6 +110,13 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         return list;
       }
     });
+    const getIndexListScrollViewRect = () => {
+      return new Promise((resolve) => {
+        upGetRect(".up-index-list", false, instance).then((size) => {
+          resolve(size);
+        });
+      });
+    };
     const getIndexListLetterRect = () => {
       return new Promise((resolve) => {
         upGetRect(".up-index-list__letter", false, instance).then((size) => {
@@ -136,12 +136,12 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
           customNavHeight = parseInt(getPx(props.customNavHeight));
         }
         const scrollHeight = scrollViewHeight.value > 0 ? scrollViewHeight.value : sysData.windowHeight - customNavHeight;
-        letterInfo.value = new UTSJSONObject({
+        letterInfo.value = {
           height: height !== null && height !== void 0 ? height : 0,
           // ä¸ºäº†è®©å­—æ¯åˆ—è¡¨å¯¹å±å¹•ç»å¯¹å±…ä¸­ï¼Œè®©å…¶å¯¹å¯¼èˆªæ è¿›è¡Œä¿®æ­£ï¼Œä¹Ÿå³å¾€ä¸Šåç§»å¯¼èˆªæ çš„ä¸€åŠé«˜åº¦
           top: scrollHeight / 2,
           itemHeight: Math.floor((height !== null && height !== void 0 ? height : 0) / uIndexList.value.length)
-        });
+        };
       });
     };
     const letterStyle = computed(() => {
@@ -376,108 +376,150 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       getProps,
       getRefs
     });
-    return () => {
-      "raw js";
-      const _setTemplateRef = _createSharedDataTemplateRefSetter();
-      const _component_up_index_anchor = __easycom_1;
-      const _component_up_transition = __easycom_1$1;
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.sticky && activeIndex.value >= 0 && activeIndex.value < uIndexList.value.length));
-      }, () => {
-        const n2 = _createSharedDataComponentWithFallback(_component_up_index_anchor, "9ac47056", { text: () => {
-          return keyVal(uIndexList.value[activeIndex.value]);
-        } });
-        _setSharedData(__sharedData, 1, n2?.sharedData);
-      });
-      _renderSharedDataEffect(() => {
-        _setSharedDataAttr(__sharedData, 18, _toSharedDataNumber(scrollTop.value));
-        _setSharedDataAttr(__sharedData, 19, _toSharedDataString(scrollIntoView.value));
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 6, _toSharedDataBoolean($slots["header"] != null));
-      }, () => {
-        _createSharedDataSlot("header", null, null);
-      });
-      _createSharedDataSlot("default", null, null);
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 7, _toSharedDataBoolean($slots["footer"] != null));
-      }, () => {
-        _createSharedDataSlot("footer", null, null);
-      });
-      _setSharedDataEvent(__sharedData, 9, scrollHandler);
-      _setSharedDataStyle(__sharedData, 10, {
-        flex: 1
-      });
-      _setSharedDataTemplateRef(__sharedData, 11, (n13) => {
-        _setTemplateRef(n13, "up-index-list__scroll-view");
-      });
-      _renderSharedDataEffect(() => {
-        return _setSharedDataStyle(__sharedData, 20, letterStyle.value);
-      });
-      _createSharedDataFor(_setSharedDataScoped(__sharedData, 8, _createSharedDataVFor(__sharedDataScope, () => {
-        return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-      })), () => {
-        return uIndexList.value;
-      }, (__sharedData_VFor0, _for_item0, _for_key0) => {
-        _renderSharedDataEffect(() => {
-          const _index = _for_key0.value;
-          _setSharedDataClass(__sharedData_VFor0, 1, ["up-index-list__letter__item", { "up-index-list__letter__item--active": activeIndex.value == _index && __props.activeColor == "#5677fc" }]);
-          _setSharedDataStyle(__sharedData_VFor0, 2, getItemStyle(_index));
-          _setSharedDataStyle(__sharedData_VFor0, 3, getItemTextStyle(_index));
-          _setSharedData(__sharedData_VFor0, 4, _toDisplayString(keyVal(_for_item0.value)));
-        });
-        return null;
-      }, (__sharedData_VFor0, item, index) => {
-        return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
-      }, 1);
-      _setSharedDataEvent(__sharedData, 12, touchStart);
-      _setSharedDataEvent(__sharedData, 13, touchMove);
-      _setSharedDataEvent(__sharedData, 14, touchEnd);
-      _setSharedDataEvent(__sharedData, 15, touchEnd);
-      _setSharedDataTemplateRef(__sharedData, 16, (n18) => {
-        _setTemplateRef(n18, "up-index-list__letter");
-      });
-      const n21 = _createSharedDataComponentWithFallback(_component_up_transition, "bdcb4e28", {
-        mode: "fade",
-        show: () => {
-          return touching.value;
-        },
-        customStyle: () => {
-          return indicatorTransitionStyle.value;
-        }
-      }, {
-        "default": () => {
-          _setSharedDataClass(__sharedData, 3, ["up-index-list__indicator", ["up-index-list__indicator--show"]]);
-          _renderSharedDataEffect(() => {
-            const _activeIndex = activeIndex.value;
-            _setSharedDataStyle(__sharedData, 4, indicatorBoxStyle.value);
-            _setSharedData(__sharedData, 5, _toDisplayString(_activeIndex >= 0 ? keyVal(uIndexList.value[_activeIndex]) : ""));
-          });
-        }
-      });
-      _setSharedData(__sharedData, 2, n21?.sharedData);
-      _setSharedDataTemplateRef(__sharedData, 17, (n22) => {
-        _setTemplateRef(n22, "up-index-list");
-      });
-      return __sharedData;
-    };
+    const __returned__ = { children, addChild, getChildren, instance, indexList, props, activeIndex, touching, scrollTop, scrollIntoView, indicatorHeight, anchors, indicatorText, letterInfo, pageY, topOffset, sys, scrollViewHeight, scrolling, uIndexList, getIndexListScrollViewRect, getIndexListLetterRect, setIndexListLetterInfo, letterStyle, indicatorTop, indicatorTransitionStyle, indicatorBoxStyle, getItemTextStyle, keyVal, getIndexListRect, init, getHeaderRect, setValueForTouch, getIndexListLetter, touchStart, touchMove, touchEnd, scrollHandler, getItemStyle, addAnchors, getProps, getRefs };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_3 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-index-list": { "": { "position": "relative", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column" } }, "up-index-list__letter": { "": { "position": "absolute", "right": 0, "zIndex": 3, "paddingTop": 0, "paddingRight": 6, "paddingBottom": 0, "paddingLeft": 6, "width": 30 } }, "up-index-list__letter__item": { "": { "width": 16, "height": 16, "borderTopLeftRadius": 100, "borderTopRightRadius": 100, "borderBottomRightRadius": 100, "borderBottomLeftRadius": 100, "marginTop": 1, "marginRight": 0, "marginBottom": 1, "marginLeft": 0, "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "up-index-list__letter__item--active": { "": { "backgroundColor": "var(--theme-color, #0957de)" } }, "up-index-list__letter__item__index": { "": { "fontSize": 12, "textAlign": "center", "lineHeight": "12px" } }, "up-index-list__indicator": { "": { "width": 50, "height": 50, "borderTopLeftRadius": 100, "borderTopRightRadius": 100, "borderBottomRightRadius": 0, "borderBottomLeftRadius": 100, "backgroundColor": "#c9c9c9", "transform": "rotate(-45deg)", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "up-index-list__indicator__text": { "": { "fontSize": 28, "lineHeight": "28px", "fontWeight": "bold", "color": "#ffffff", "transform": "rotate(45deg)", "textAlign": "center" } } };
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { resolveComponent: _resolveComponent, createVNode: _createVNode, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, renderSlot: _renderSlot, createElementVNode: _createElementVNode, renderList: _renderList, Fragment: _Fragment, toDisplayString: _toDisplayString, normalizeStyle: _normalizeStyle, normalizeClass: _normalizeClass, withCtx: _withCtx } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_index_anchor = resolveEasycom(__resolveDynamicComponent("up-index-anchor"), __easycom_1);
+  const _component_up_transition = resolveEasycom(__resolveDynamicComponent("up-transition"), __easycom_1$1);
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      ref: "up-index-list",
+      class: "up-index-list"
+    },
+    [
+      $props.sticky && $setup.activeIndex >= 0 && $setup.activeIndex < $setup.uIndexList.length ? (_openBlock(), _createElementBlock("view", {
+        key: 0,
+        class: "up-index-list__sticky-header",
+        style: { "position": "absolute", "top": "0", "left": "0", "right": "0", "z-index": "2" }
+      }, [
+        _createVNode(_component_up_index_anchor, {
+          text: $setup.keyVal($setup.uIndexList[$setup.activeIndex])
+        }, null, 8, ["text"])
+      ])) : _createCommentVNode("v-if", true),
+      _createElementVNode("scroll-view", {
+        "scroll-top": $setup.scrollTop,
+        "scroll-into-view": $setup.scrollIntoView,
+        style: {
+          flex: 1
+        },
+        direction: "vertical",
+        onScroll: $setup.scrollHandler,
+        ref: "up-index-list__scroll-view",
+        class: "up-index-list__scroll-view"
+      }, [
+        _ctx.$slots["header"] != null ? (_openBlock(), _createElementBlock("view", {
+          key: 0,
+          class: "up-index-list__header"
+        }, [
+          _renderSlot(_ctx.$slots, "header")
+        ])) : _createCommentVNode("v-if", true),
+        _renderSlot(_ctx.$slots, "default"),
+        _ctx.$slots["footer"] != null ? (_openBlock(), _createElementBlock("view", {
+          key: 1,
+          class: "up-index-list__footer"
+        }, [
+          _renderSlot(_ctx.$slots, "footer")
+        ])) : _createCommentVNode("v-if", true)
+      ], 40, ["scroll-top", "scroll-into-view"]),
+      _createElementVNode(
+        "view",
+        {
+          class: "up-index-list__letter",
+          ref: "up-index-list__letter",
+          style: _normalizeStyle($setup.letterStyle),
+          onTouchstart: $setup.touchStart,
+          onTouchmove: $setup.touchMove,
+          onTouchend: $setup.touchEnd,
+          onTouchcancel: $setup.touchEnd
+        },
+        [
+          (_openBlock(true), _createElementBlock(
+            _Fragment,
+            null,
+            _renderList($setup.uIndexList, (item, index) => {
+              return _openBlock(), _createElementBlock(
+                "view",
+                {
+                  class: _normalizeClass(["up-index-list__letter__item", { "up-index-list__letter__item--active": $setup.activeIndex == index && $props.activeColor == "#5677fc" }]),
+                  key: index,
+                  style: _normalizeStyle($setup.getItemStyle(index))
+                },
+                [
+                  _createElementVNode(
+                    "text",
+                    {
+                      class: "up-index-list__letter__item__index",
+                      style: _normalizeStyle($setup.getItemTextStyle(index))
+                    },
+                    _toDisplayString($setup.keyVal(item)),
+                    5
+                    /* TEXT, STYLE */
+                  )
+                ],
+                6
+                /* CLASS, STYLE */
+              );
+            }),
+            128
+            /* KEYED_FRAGMENT */
+          ))
+        ],
+        36
+        /* STYLE, NEED_HYDRATION */
+      ),
+      _createVNode(_component_up_transition, {
+        mode: "fade",
+        show: $setup.touching,
+        customStyle: $setup.indicatorTransitionStyle
+      }, {
+        default: _withCtx(() => [
+          _createElementVNode(
+            "view",
+            {
+              class: _normalizeClass(["up-index-list__indicator", ["up-index-list__indicator--show"]]),
+              style: _normalizeStyle($setup.indicatorBoxStyle)
+            },
+            [
+              _createElementVNode(
+                "text",
+                { class: "up-index-list__indicator__text" },
+                _toDisplayString($setup.activeIndex >= 0 ? $setup.keyVal($setup.uIndexList[$setup.activeIndex]) : ""),
+                1
+                /* TEXT */
+              )
+            ],
+            4
+            /* STYLE */
+          )
+        ]),
+        _: 1
+        /* STABLE */
+      }, 8, ["show", "customStyle"])
+    ],
+    512
+    /* NEED_PATCH */
+  );
+}
+const __easycom_3 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-index-list/up-index-list.uvue"]]);
 export {
   __easycom_3 as _
 };
 //# sourceMappingURL=up-index-list.js.map
-Â–ÙÜ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-index-anchor/up-index-anchor.jsÙØ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-transition/up-transition.jsÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useUltraUI.jsÙÔ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-index-list/indexList.jsÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙØ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-index-list/up-index-list.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ‘ÔrD’²hostDependencyName®hostModuleNameÙP../../../../../uni_modules/uview-ultra/components/up-index-list/up-index-list.js¥entryÃÚHäimport { _ as __easycom_1 } from "../up-index-anchor/up-index-anchor.js";
+Â—ÙÜ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-index-anchor/up-index-anchor.jsÙ /Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku.jsÙØ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-transition/up-transition.jsÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useUltraUI.jsÙÔ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-index-list/indexList.jsÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙØ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-index-list/up-index-list.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ‘ÔrD’²hostDependencyName®hostModuleNameÙP../../../../../uni_modules/uview-ultra/components/up-index-list/up-index-list.js¥entryÃÚ[`import { _ as __easycom_1 } from "../up-index-anchor/up-index-anchor.js";
+import { r as resolveEasycom } from "../../../../App.ku.js";
 import { _ as __easycom_1$1 } from "../up-transition/up-transition.js";
 import { a as addUnit, s as sleep, e as getWindowInfo, g as getPx, u as upGetRect } from "../../libs/function/index.js";
 import { u as useUltraUI } from "../../libs/composable/useUltraUI.js";
 import { d as defProps } from "./indexList.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, setSharedDataAttr: _setSharedDataAttr, toSharedDataNumber: _toSharedDataNumber, toSharedDataString: _toSharedDataString, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataSlot: _createSharedDataSlot, setSharedDataEvent: _setSharedDataEvent, setSharedDataStyle: _setSharedDataStyle, setSharedDataTemplateRef: _setSharedDataTemplateRef, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, toDisplayString: _toDisplayString, setSharedDataClass: _setSharedDataClass, createSharedDataFor: _createSharedDataFor } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpIndexListUpIndexList";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref, computed, watch, onMounted, getCurrentInstance } = globalThis.Vue;
 class UPIndexListChildrenItemType extends UTS.UTSType {
   static get$UTSMetadata$() {
@@ -500,14 +542,10 @@ class UPIndexListChildrenItemType extends UTS.UTSType {
     delete this.__props__;
   }
 }
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-index-list"
   },
-  __dynamicSharedData: true,
-  __hash: "2fddd6d5",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-index-list/up-index-list.uvue",
   __name: "up-index-list",
   props: {
     inactiveColor: {
@@ -546,9 +584,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     }
   },
   setup(__props, _a) {
-    var __expose = _a.expose, $slots = _a.slots;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpIndexListUpIndexListSharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose;
     const _b = useUltraUI(), children = _b.children, addChild = _b.addChild, getChildren = _b.getChildren;
     const instance = getCurrentInstance().proxy;
     const indexList = () => {
@@ -588,6 +624,13 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         return list;
       }
     });
+    const getIndexListScrollViewRect = () => {
+      return new Promise((resolve) => {
+        upGetRect(".up-index-list", false, instance).then((size) => {
+          resolve(size);
+        });
+      });
+    };
     const getIndexListLetterRect = () => {
       return new Promise((resolve) => {
         upGetRect(".up-index-list__letter", false, instance).then((size) => {
@@ -607,12 +650,12 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
           customNavHeight = parseInt(getPx(props.customNavHeight));
         }
         const scrollHeight = scrollViewHeight.value > 0 ? scrollViewHeight.value : sysData.windowHeight - customNavHeight;
-        letterInfo.value = new UTSJSONObject({
+        letterInfo.value = {
           height: height !== null && height !== void 0 ? height : 0,
           // ä¸ºäº†è®©å­—æ¯åˆ—è¡¨å¯¹å±å¹•ç»å¯¹å±…ä¸­ï¼Œè®©å…¶å¯¹å¯¼èˆªæ è¿›è¡Œä¿®æ­£ï¼Œä¹Ÿå³å¾€ä¸Šåç§»å¯¼èˆªæ çš„ä¸€åŠé«˜åº¦
           top: scrollHeight / 2,
           itemHeight: Math.floor((height !== null && height !== void 0 ? height : 0) / uIndexList.value.length)
-        });
+        };
       });
     };
     const letterStyle = computed(() => {
@@ -847,110 +890,152 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       getProps,
       getRefs
     });
-    return () => {
-      "raw js";
-      const _setTemplateRef = _createSharedDataTemplateRefSetter();
-      const _component_up_index_anchor = __easycom_1;
-      const _component_up_transition = __easycom_1$1;
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.sticky && activeIndex.value >= 0 && activeIndex.value < uIndexList.value.length));
-      }, () => {
-        const n2 = _createSharedDataComponentWithFallback(_component_up_index_anchor, "9ac47056", { text: () => {
-          return keyVal(uIndexList.value[activeIndex.value]);
-        } });
-        _setSharedData(__sharedData, 1, n2?.sharedData);
-      });
-      _renderSharedDataEffect(() => {
-        _setSharedDataAttr(__sharedData, 18, _toSharedDataNumber(scrollTop.value));
-        _setSharedDataAttr(__sharedData, 19, _toSharedDataString(scrollIntoView.value));
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 6, _toSharedDataBoolean($slots["header"] != null));
-      }, () => {
-        _createSharedDataSlot("header", null, null);
-      });
-      _createSharedDataSlot("default", null, null);
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 7, _toSharedDataBoolean($slots["footer"] != null));
-      }, () => {
-        _createSharedDataSlot("footer", null, null);
-      });
-      _setSharedDataEvent(__sharedData, 9, scrollHandler);
-      _setSharedDataStyle(__sharedData, 10, {
-        flex: 1
-      });
-      _setSharedDataTemplateRef(__sharedData, 11, (n13) => {
-        _setTemplateRef(n13, "up-index-list__scroll-view");
-      });
-      _renderSharedDataEffect(() => {
-        return _setSharedDataStyle(__sharedData, 20, letterStyle.value);
-      });
-      _createSharedDataFor(_setSharedDataScoped(__sharedData, 8, _createSharedDataVFor(__sharedDataScope, () => {
-        return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-      })), () => {
-        return uIndexList.value;
-      }, (__sharedData_VFor0, _for_item0, _for_key0) => {
-        _renderSharedDataEffect(() => {
-          const _index = _for_key0.value;
-          _setSharedDataClass(__sharedData_VFor0, 1, ["up-index-list__letter__item", { "up-index-list__letter__item--active": activeIndex.value == _index && __props.activeColor == "#5677fc" }]);
-          _setSharedDataStyle(__sharedData_VFor0, 2, getItemStyle(_index));
-          _setSharedDataStyle(__sharedData_VFor0, 3, getItemTextStyle(_index));
-          _setSharedData(__sharedData_VFor0, 4, _toDisplayString(keyVal(_for_item0.value)));
-        });
-        return null;
-      }, (__sharedData_VFor0, item, index) => {
-        return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
-      }, 1);
-      _setSharedDataEvent(__sharedData, 12, touchStart);
-      _setSharedDataEvent(__sharedData, 13, touchMove);
-      _setSharedDataEvent(__sharedData, 14, touchEnd);
-      _setSharedDataEvent(__sharedData, 15, touchEnd);
-      _setSharedDataTemplateRef(__sharedData, 16, (n18) => {
-        _setTemplateRef(n18, "up-index-list__letter");
-      });
-      const n21 = _createSharedDataComponentWithFallback(_component_up_transition, "bdcb4e28", {
-        mode: "fade",
-        show: () => {
-          return touching.value;
-        },
-        customStyle: () => {
-          return indicatorTransitionStyle.value;
-        }
-      }, {
-        "default": () => {
-          _setSharedDataClass(__sharedData, 3, ["up-index-list__indicator", ["up-index-list__indicator--show"]]);
-          _renderSharedDataEffect(() => {
-            const _activeIndex = activeIndex.value;
-            _setSharedDataStyle(__sharedData, 4, indicatorBoxStyle.value);
-            _setSharedData(__sharedData, 5, _toDisplayString(_activeIndex >= 0 ? keyVal(uIndexList.value[_activeIndex]) : ""));
-          });
-        }
-      });
-      _setSharedData(__sharedData, 2, n21?.sharedData);
-      _setSharedDataTemplateRef(__sharedData, 17, (n22) => {
-        _setTemplateRef(n22, "up-index-list");
-      });
-      return __sharedData;
-    };
+    const __returned__ = { children, addChild, getChildren, instance, indexList, props, activeIndex, touching, scrollTop, scrollIntoView, indicatorHeight, anchors, indicatorText, letterInfo, pageY, topOffset, sys, scrollViewHeight, scrolling, uIndexList, getIndexListScrollViewRect, getIndexListLetterRect, setIndexListLetterInfo, letterStyle, indicatorTop, indicatorTransitionStyle, indicatorBoxStyle, getItemTextStyle, keyVal, getIndexListRect, init, getHeaderRect, setValueForTouch, getIndexListLetter, touchStart, touchMove, touchEnd, scrollHandler, getItemStyle, addAnchors, getProps, getRefs };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_3 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-index-list": { "": { "position": "relative", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column" } }, "up-index-list__letter": { "": { "position": "absolute", "right": 0, "zIndex": 3, "paddingTop": 0, "paddingRight": 6, "paddingBottom": 0, "paddingLeft": 6, "width": 30 } }, "up-index-list__letter__item": { "": { "width": 16, "height": 16, "borderTopLeftRadius": 100, "borderTopRightRadius": 100, "borderBottomRightRadius": 100, "borderBottomLeftRadius": 100, "marginTop": 1, "marginRight": 0, "marginBottom": 1, "marginLeft": 0, "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "up-index-list__letter__item--active": { "": { "backgroundColor": "var(--theme-color, #0957de)" } }, "up-index-list__letter__item__index": { "": { "fontSize": 12, "textAlign": "center", "lineHeight": "12px" } }, "up-index-list__indicator": { "": { "width": 50, "height": 50, "borderTopLeftRadius": 100, "borderTopRightRadius": 100, "borderBottomRightRadius": 0, "borderBottomLeftRadius": 100, "backgroundColor": "#c9c9c9", "transform": "rotate(-45deg)", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "up-index-list__indicator__text": { "": { "fontSize": 28, "lineHeight": "28px", "fontWeight": "bold", "color": "#ffffff", "transform": "rotate(45deg)", "textAlign": "center" } } };
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { resolveComponent: _resolveComponent, createVNode: _createVNode, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, renderSlot: _renderSlot, createElementVNode: _createElementVNode, renderList: _renderList, Fragment: _Fragment, toDisplayString: _toDisplayString, normalizeStyle: _normalizeStyle, normalizeClass: _normalizeClass, withCtx: _withCtx } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_index_anchor = resolveEasycom(__resolveDynamicComponent("up-index-anchor"), __easycom_1);
+  const _component_up_transition = resolveEasycom(__resolveDynamicComponent("up-transition"), __easycom_1$1);
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      ref: "up-index-list",
+      class: "up-index-list"
+    },
+    [
+      $props.sticky && $setup.activeIndex >= 0 && $setup.activeIndex < $setup.uIndexList.length ? (_openBlock(), _createElementBlock("view", {
+        key: 0,
+        class: "up-index-list__sticky-header",
+        style: { "position": "absolute", "top": "0", "left": "0", "right": "0", "z-index": "2" }
+      }, [
+        _createVNode(_component_up_index_anchor, {
+          text: $setup.keyVal($setup.uIndexList[$setup.activeIndex])
+        }, null, 8, ["text"])
+      ])) : _createCommentVNode("v-if", true),
+      _createElementVNode("scroll-view", {
+        "scroll-top": $setup.scrollTop,
+        "scroll-into-view": $setup.scrollIntoView,
+        style: {
+          flex: 1
+        },
+        direction: "vertical",
+        onScroll: $setup.scrollHandler,
+        ref: "up-index-list__scroll-view",
+        class: "up-index-list__scroll-view"
+      }, [
+        _ctx.$slots["header"] != null ? (_openBlock(), _createElementBlock("view", {
+          key: 0,
+          class: "up-index-list__header"
+        }, [
+          _renderSlot(_ctx.$slots, "header")
+        ])) : _createCommentVNode("v-if", true),
+        _renderSlot(_ctx.$slots, "default"),
+        _ctx.$slots["footer"] != null ? (_openBlock(), _createElementBlock("view", {
+          key: 1,
+          class: "up-index-list__footer"
+        }, [
+          _renderSlot(_ctx.$slots, "footer")
+        ])) : _createCommentVNode("v-if", true)
+      ], 40, ["scroll-top", "scroll-into-view"]),
+      _createElementVNode(
+        "view",
+        {
+          class: "up-index-list__letter",
+          ref: "up-index-list__letter",
+          style: _normalizeStyle($setup.letterStyle),
+          onTouchstart: $setup.touchStart,
+          onTouchmove: $setup.touchMove,
+          onTouchend: $setup.touchEnd,
+          onTouchcancel: $setup.touchEnd
+        },
+        [
+          (_openBlock(true), _createElementBlock(
+            _Fragment,
+            null,
+            _renderList($setup.uIndexList, (item, index) => {
+              return _openBlock(), _createElementBlock(
+                "view",
+                {
+                  class: _normalizeClass(["up-index-list__letter__item", { "up-index-list__letter__item--active": $setup.activeIndex == index && $props.activeColor == "#5677fc" }]),
+                  key: index,
+                  style: _normalizeStyle($setup.getItemStyle(index))
+                },
+                [
+                  _createElementVNode(
+                    "text",
+                    {
+                      class: "up-index-list__letter__item__index",
+                      style: _normalizeStyle($setup.getItemTextStyle(index))
+                    },
+                    _toDisplayString($setup.keyVal(item)),
+                    5
+                    /* TEXT, STYLE */
+                  )
+                ],
+                6
+                /* CLASS, STYLE */
+              );
+            }),
+            128
+            /* KEYED_FRAGMENT */
+          ))
+        ],
+        36
+        /* STYLE, NEED_HYDRATION */
+      ),
+      _createVNode(_component_up_transition, {
+        mode: "fade",
+        show: $setup.touching,
+        customStyle: $setup.indicatorTransitionStyle
+      }, {
+        default: _withCtx(() => [
+          _createElementVNode(
+            "view",
+            {
+              class: _normalizeClass(["up-index-list__indicator", ["up-index-list__indicator--show"]]),
+              style: _normalizeStyle($setup.indicatorBoxStyle)
+            },
+            [
+              _createElementVNode(
+                "text",
+                { class: "up-index-list__indicator__text" },
+                _toDisplayString($setup.activeIndex >= 0 ? $setup.keyVal($setup.uIndexList[$setup.activeIndex]) : ""),
+                1
+                /* TEXT */
+              )
+            ],
+            4
+            /* STYLE */
+          )
+        ]),
+        _: 1
+        /* STABLE */
+      }, 8, ["show", "customStyle"])
+    ],
+    512
+    /* NEED_PATCH */
+  );
+}
+const __easycom_3 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-index-list/up-index-list.uvue"]]);
 export {
   __easycom_3 as _
 };
 //# sourceMappingURL=up-index-list.js.map
-ÔrE•§version¨mappings¥names§sources®sourcesContentÜØ‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ÔrE•§version¨mappings¥names§sources®sourcesContentÜ‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
  ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘”  ÌÙ ‘”  ÌÚ ‘”  ÌÛ ‘”  ÌÜ ‘”  Ìİ ‘”  ÌŞ ‘”  Ìß ‘”  Ìà ‘”  Ìá ‘”  Ìâ ‘”  Ìã ‘”  Ìä ‘”  Ìå ‘”  Ìæ ‘”  Ìç ‘”  Ìè ‘”  Ìé ‘”  Ìê ‘”  Ìë ‘”  Ìì ‘”  Ìí ‘”  Ìî ‘”  Ìï ‘”  Ìğ ‘”  Ìñ ‘”  Ìò ‘”  Ìó ‘”  Ìô ‘”  Ìõ ‘”  Ìö ‘”  Ì÷ ‘”  Ìø ‘”  Ìù ‘”  Ìú ‘”  Ìû ‘”  Ìü ‘”  Ìı ‘”  Ìş ‘”  Ìÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
- ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘”  Í ‘”  Í€ ‘”  Í ‘”  Í‚ ‘”  Íƒ ‘”  Í„ ‘”  Í… ‘”  Í† ‘”  Í‡ ‘”  Íˆ ‘”  Í‰ ‘”  ÍŠ ‘”  Í‹ ‘”  ÍŒ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í‘ ‘”  Í’ ‘”  Í“ ‘”  Í” ‘”  Í• ‘”  Í– ‘”  Í— ‘”  Í˜ ‘”  Í™ ‘”  Íš ‘”  Í› ‘”  Íœ ‘”  Í ‘”  Í ‘”  ÍŸ ‘”  Í  ‘”  Í¡ ‘”  Í¢ ‘”  Í£ ‘”  Í¤ ‘”  Í¥ ‘”  Í¦ ‘”  Í§ ‘”  Í¨ ‘”  Í© ‘”  Íª ‘”  Í« ‘”  Í¬ ‘”  Í­ ‘”  Í® ‘”  Í¯ ‘”  Í° ‘”  Í± ‘”  Í² ‘”  Í³ ‘”  Í´ ‘”  Íµ ‘”  Í¶ ‘”  Í· ‘”  Í¸ ‘”  Í¹ ‘”  Íº ‘”  Í» ‘”  Í¼ ‘”  Í½ ‘”  Í¾ ‘”  Í¿ ‘”  ÍÀ ‘”  ÍÁ ‘”  ÍÂ ‘”  ÍÃ ‘”  ÍÄ ‘”  ÍÅ ‘”  ÍÆ ‘”  ÍÇ ‘”  ÍÈ ‘”  ÍÉ ‘”  ÍÊ ‘”  ÍË ‘”  ÍÌ ‘”  ÍÍ ‘”  ÍÎ ‘”  ÍÏ ‘”  ÍĞ ‘”  ÍÑ ‘”  ÍÒ ‘”  ÍÓ ‘”  ÍÔ ‘”  ÍÕ ‘”  ÍÖ ‘ÙØ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-index-list/up-index-list.js‘ÚHäimport { _ as __easycom_1 } from "../up-index-anchor/up-index-anchor.js";
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘”  Í ‘”  Í€ ‘”  Í ‘”  Í‚ ‘”  Íƒ ‘”  Í„ ‘”  Í… ‘”  Í† ‘”  Í‡ ‘”  Íˆ ‘”  Í‰ ‘”  ÍŠ ‘”  Í‹ ‘”  ÍŒ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í‘ ‘”  Í’ ‘”  Í“ ‘”  Í” ‘”  Í• ‘”  Í– ‘”  Í— ‘”  Í˜ ‘”  Í™ ‘”  Íš ‘”  Í› ‘”  Íœ ‘”  Í ‘”  Í ‘”  ÍŸ ‘”  Í  ‘”  Í¡ ‘”  Í¢ ‘”  Í£ ‘”  Í¤ ‘”  Í¥ ‘”  Í¦ ‘”  Í§ ‘”  Í¨ ‘”  Í© ‘”  Íª ‘”  Í« ‘”  Í¬ ‘”  Í­ ‘”  Í® ‘”  Í¯ ‘”  Í° ‘”  Í± ‘”  Í² ‘”  Í³ ‘”  Í´ ‘”  Íµ ‘”  Í¶ ‘”  Í· ‘”  Í¸ ‘”  Í¹ ‘”  Íº ‘”  Í» ‘”  Í¼ ‘”  Í½ ‘”  Í¾ ‘”  Í¿ ‘”  ÍÀ ‘”  ÍÁ ‘”  ÍÂ ‘”  ÍÃ ‘”  ÍÄ ‘”  ÍÅ ‘”  ÍÆ ‘”  ÍÇ ‘”  ÍÈ ‘”  ÍÉ ‘”  ÍÊ ‘”  ÍË ‘”  ÍÌ ‘”  ÍÍ ‘”  ÍÎ ‘”  ÍÏ ‘”  ÍĞ ‘”  ÍÑ ‘”  ÍÒ ‘”  ÍÓ ‘”  ÍÔ ‘”  ÍÕ ‘”  ÍÖ ‘”  Í× ‘”  ÍØ ‘”  ÍÙ ‘”  ÍÚ ‘”  ÍÛ ‘”  ÍÜ ‘”  Íİ ‘”  ÍŞ ‘”  Íß ‘”  Íà ‘”  Íá ‘”  Íâ ‘”  Íã ‘”  Íä ‘”  Íå ‘”  Íæ ‘”  Íç ‘”  Íè ‘”  Íé ‘”  Íê ‘”  Íë ‘”  Íì ‘”  Íí ‘”  Íî ‘”  Íï ‘”  Íğ ‘”  Íñ ‘”  Íò ‘”  Íó ‘”  Íô ‘”  Íõ ‘”  Íö ‘”  Í÷ ‘”  Íø ‘”  Íù ‘”  Íú ‘”  Íû ‘”  Íü ‘”  Íı ‘”  Íş ‘”  Íÿ ‘”  Í  ‘”  Í ‘ÙØ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-index-list/up-index-list.js‘Ú[`import { _ as __easycom_1 } from "../up-index-anchor/up-index-anchor.js";
+import { r as resolveEasycom } from "../../../../App.ku.js";
 import { _ as __easycom_1$1 } from "../up-transition/up-transition.js";
 import { a as addUnit, s as sleep, e as getWindowInfo, g as getPx, u as upGetRect } from "../../libs/function/index.js";
 import { u as useUltraUI } from "../../libs/composable/useUltraUI.js";
 import { d as defProps } from "./indexList.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, setSharedDataAttr: _setSharedDataAttr, toSharedDataNumber: _toSharedDataNumber, toSharedDataString: _toSharedDataString, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataSlot: _createSharedDataSlot, setSharedDataEvent: _setSharedDataEvent, setSharedDataStyle: _setSharedDataStyle, setSharedDataTemplateRef: _setSharedDataTemplateRef, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, toDisplayString: _toDisplayString, setSharedDataClass: _setSharedDataClass, createSharedDataFor: _createSharedDataFor } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpIndexListUpIndexList";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref, computed, watch, onMounted, getCurrentInstance } = globalThis.Vue;
 class UPIndexListChildrenItemType extends UTS.UTSType {
   static get$UTSMetadata$() {
@@ -973,14 +1058,10 @@ class UPIndexListChildrenItemType extends UTS.UTSType {
     delete this.__props__;
   }
 }
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-index-list"
   },
-  __dynamicSharedData: true,
-  __hash: "2fddd6d5",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-index-list/up-index-list.uvue",
   __name: "up-index-list",
   props: {
     inactiveColor: {
@@ -1019,9 +1100,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     }
   },
   setup(__props, _a) {
-    var __expose = _a.expose, $slots = _a.slots;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpIndexListUpIndexListSharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose;
     const _b = useUltraUI(), children = _b.children, addChild = _b.addChild, getChildren = _b.getChildren;
     const instance = getCurrentInstance().proxy;
     const indexList = () => {
@@ -1061,6 +1140,13 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         return list;
       }
     });
+    const getIndexListScrollViewRect = () => {
+      return new Promise((resolve) => {
+        upGetRect(".up-index-list", false, instance).then((size) => {
+          resolve(size);
+        });
+      });
+    };
     const getIndexListLetterRect = () => {
       return new Promise((resolve) => {
         upGetRect(".up-index-list__letter", false, instance).then((size) => {
@@ -1080,12 +1166,12 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
           customNavHeight = parseInt(getPx(props.customNavHeight));
         }
         const scrollHeight = scrollViewHeight.value > 0 ? scrollViewHeight.value : sysData.windowHeight - customNavHeight;
-        letterInfo.value = new UTSJSONObject({
+        letterInfo.value = {
           height: height !== null && height !== void 0 ? height : 0,
           // ä¸ºäº†è®©å­—æ¯åˆ—è¡¨å¯¹å±å¹•ç»å¯¹å±…ä¸­ï¼Œè®©å…¶å¯¹å¯¼èˆªæ è¿›è¡Œä¿®æ­£ï¼Œä¹Ÿå³å¾€ä¸Šåç§»å¯¼èˆªæ çš„ä¸€åŠé«˜åº¦
           top: scrollHeight / 2,
           itemHeight: Math.floor((height !== null && height !== void 0 ? height : 0) / uIndexList.value.length)
-        });
+        };
       });
     };
     const letterStyle = computed(() => {
@@ -1320,99 +1406,142 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       getProps,
       getRefs
     });
-    return () => {
-      "raw js";
-      const _setTemplateRef = _createSharedDataTemplateRefSetter();
-      const _component_up_index_anchor = __easycom_1;
-      const _component_up_transition = __easycom_1$1;
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.sticky && activeIndex.value >= 0 && activeIndex.value < uIndexList.value.length));
-      }, () => {
-        const n2 = _createSharedDataComponentWithFallback(_component_up_index_anchor, "9ac47056", { text: () => {
-          return keyVal(uIndexList.value[activeIndex.value]);
-        } });
-        _setSharedData(__sharedData, 1, n2?.sharedData);
-      });
-      _renderSharedDataEffect(() => {
-        _setSharedDataAttr(__sharedData, 18, _toSharedDataNumber(scrollTop.value));
-        _setSharedDataAttr(__sharedData, 19, _toSharedDataString(scrollIntoView.value));
-      });
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 6, _toSharedDataBoolean($slots["header"] != null));
-      }, () => {
-        _createSharedDataSlot("header", null, null);
-      });
-      _createSharedDataSlot("default", null, null);
-      _createSharedDataIf(() => {
-        return _setSharedData(__sharedData, 7, _toSharedDataBoolean($slots["footer"] != null));
-      }, () => {
-        _createSharedDataSlot("footer", null, null);
-      });
-      _setSharedDataEvent(__sharedData, 9, scrollHandler);
-      _setSharedDataStyle(__sharedData, 10, {
-        flex: 1
-      });
-      _setSharedDataTemplateRef(__sharedData, 11, (n13) => {
-        _setTemplateRef(n13, "up-index-list__scroll-view");
-      });
-      _renderSharedDataEffect(() => {
-        return _setSharedDataStyle(__sharedData, 20, letterStyle.value);
-      });
-      _createSharedDataFor(_setSharedDataScoped(__sharedData, 8, _createSharedDataVFor(__sharedDataScope, () => {
-        return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
-      })), () => {
-        return uIndexList.value;
-      }, (__sharedData_VFor0, _for_item0, _for_key0) => {
-        _renderSharedDataEffect(() => {
-          const _index = _for_key0.value;
-          _setSharedDataClass(__sharedData_VFor0, 1, ["up-index-list__letter__item", { "up-index-list__letter__item--active": activeIndex.value == _index && __props.activeColor == "#5677fc" }]);
-          _setSharedDataStyle(__sharedData_VFor0, 2, getItemStyle(_index));
-          _setSharedDataStyle(__sharedData_VFor0, 3, getItemTextStyle(_index));
-          _setSharedData(__sharedData_VFor0, 4, _toDisplayString(keyVal(_for_item0.value)));
-        });
-        return null;
-      }, (__sharedData_VFor0, item, index) => {
-        return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
-      }, 1);
-      _setSharedDataEvent(__sharedData, 12, touchStart);
-      _setSharedDataEvent(__sharedData, 13, touchMove);
-      _setSharedDataEvent(__sharedData, 14, touchEnd);
-      _setSharedDataEvent(__sharedData, 15, touchEnd);
-      _setSharedDataTemplateRef(__sharedData, 16, (n18) => {
-        _setTemplateRef(n18, "up-index-list__letter");
-      });
-      const n21 = _createSharedDataComponentWithFallback(_component_up_transition, "bdcb4e28", {
-        mode: "fade",
-        show: () => {
-          return touching.value;
-        },
-        customStyle: () => {
-          return indicatorTransitionStyle.value;
-        }
-      }, {
-        "default": () => {
-          _setSharedDataClass(__sharedData, 3, ["up-index-list__indicator", ["up-index-list__indicator--show"]]);
-          _renderSharedDataEffect(() => {
-            const _activeIndex = activeIndex.value;
-            _setSharedDataStyle(__sharedData, 4, indicatorBoxStyle.value);
-            _setSharedData(__sharedData, 5, _toDisplayString(_activeIndex >= 0 ? keyVal(uIndexList.value[_activeIndex]) : ""));
-          });
-        }
-      });
-      _setSharedData(__sharedData, 2, n21?.sharedData);
-      _setSharedDataTemplateRef(__sharedData, 17, (n22) => {
-        _setTemplateRef(n22, "up-index-list");
-      });
-      return __sharedData;
-    };
+    const __returned__ = { children, addChild, getChildren, instance, indexList, props, activeIndex, touching, scrollTop, scrollIntoView, indicatorHeight, anchors, indicatorText, letterInfo, pageY, topOffset, sys, scrollViewHeight, scrolling, uIndexList, getIndexListScrollViewRect, getIndexListLetterRect, setIndexListLetterInfo, letterStyle, indicatorTop, indicatorTransitionStyle, indicatorBoxStyle, getItemTextStyle, keyVal, getIndexListRect, init, getHeaderRect, setValueForTouch, getIndexListLetter, touchStart, touchMove, touchEnd, scrollHandler, getItemStyle, addAnchors, getProps, getRefs };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_3 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-index-list": { "": { "position": "relative", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "column" } }, "up-index-list__letter": { "": { "position": "absolute", "right": 0, "zIndex": 3, "paddingTop": 0, "paddingRight": 6, "paddingBottom": 0, "paddingLeft": 6, "width": 30 } }, "up-index-list__letter__item": { "": { "width": 16, "height": 16, "borderTopLeftRadius": 100, "borderTopRightRadius": 100, "borderBottomRightRadius": 100, "borderBottomLeftRadius": 100, "marginTop": 1, "marginRight": 0, "marginBottom": 1, "marginLeft": 0, "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center" } }, "up-index-list__letter__item--active": { "": { "backgroundColor": "var(--theme-color, #0957de)" } }, "up-index-list__letter__item__index": { "": { "fontSize": 12, "textAlign": "center", "lineHeight": "12px" } }, "up-index-list__indicator": { "": { "width": 50, "height": 50, "borderTopLeftRadius": 100, "borderTopRightRadius": 100, "borderBottomRightRadius": 0, "borderBottomLeftRadius": 100, "backgroundColor": "#c9c9c9", "transform": "rotate(-45deg)", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "up-index-list__indicator__text": { "": { "fontSize": 28, "lineHeight": "28px", "fontWeight": "bold", "color": "#ffffff", "transform": "rotate(45deg)", "textAlign": "center" } } };
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { resolveComponent: _resolveComponent, createVNode: _createVNode, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, renderSlot: _renderSlot, createElementVNode: _createElementVNode, renderList: _renderList, Fragment: _Fragment, toDisplayString: _toDisplayString, normalizeStyle: _normalizeStyle, normalizeClass: _normalizeClass, withCtx: _withCtx } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_index_anchor = resolveEasycom(__resolveDynamicComponent("up-index-anchor"), __easycom_1);
+  const _component_up_transition = resolveEasycom(__resolveDynamicComponent("up-transition"), __easycom_1$1);
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      ref: "up-index-list",
+      class: "up-index-list"
+    },
+    [
+      $props.sticky && $setup.activeIndex >= 0 && $setup.activeIndex < $setup.uIndexList.length ? (_openBlock(), _createElementBlock("view", {
+        key: 0,
+        class: "up-index-list__sticky-header",
+        style: { "position": "absolute", "top": "0", "left": "0", "right": "0", "z-index": "2" }
+      }, [
+        _createVNode(_component_up_index_anchor, {
+          text: $setup.keyVal($setup.uIndexList[$setup.activeIndex])
+        }, null, 8, ["text"])
+      ])) : _createCommentVNode("v-if", true),
+      _createElementVNode("scroll-view", {
+        "scroll-top": $setup.scrollTop,
+        "scroll-into-view": $setup.scrollIntoView,
+        style: {
+          flex: 1
+        },
+        direction: "vertical",
+        onScroll: $setup.scrollHandler,
+        ref: "up-index-list__scroll-view",
+        class: "up-index-list__scroll-view"
+      }, [
+        _ctx.$slots["header"] != null ? (_openBlock(), _createElementBlock("view", {
+          key: 0,
+          class: "up-index-list__header"
+        }, [
+          _renderSlot(_ctx.$slots, "header")
+        ])) : _createCommentVNode("v-if", true),
+        _renderSlot(_ctx.$slots, "default"),
+        _ctx.$slots["footer"] != null ? (_openBlock(), _createElementBlock("view", {
+          key: 1,
+          class: "up-index-list__footer"
+        }, [
+          _renderSlot(_ctx.$slots, "footer")
+        ])) : _createCommentVNode("v-if", true)
+      ], 40, ["scroll-top", "scroll-into-view"]),
+      _createElementVNode(
+        "view",
+        {
+          class: "up-index-list__letter",
+          ref: "up-index-list__letter",
+          style: _normalizeStyle($setup.letterStyle),
+          onTouchstart: $setup.touchStart,
+          onTouchmove: $setup.touchMove,
+          onTouchend: $setup.touchEnd,
+          onTouchcancel: $setup.touchEnd
+        },
+        [
+          (_openBlock(true), _createElementBlock(
+            _Fragment,
+            null,
+            _renderList($setup.uIndexList, (item, index) => {
+              return _openBlock(), _createElementBlock(
+                "view",
+                {
+                  class: _normalizeClass(["up-index-list__letter__item", { "up-index-list__letter__item--active": $setup.activeIndex == index && $props.activeColor == "#5677fc" }]),
+                  key: index,
+                  style: _normalizeStyle($setup.getItemStyle(index))
+                },
+                [
+                  _createElementVNode(
+                    "text",
+                    {
+                      class: "up-index-list__letter__item__index",
+                      style: _normalizeStyle($setup.getItemTextStyle(index))
+                    },
+                    _toDisplayString($setup.keyVal(item)),
+                    5
+                    /* TEXT, STYLE */
+                  )
+                ],
+                6
+                /* CLASS, STYLE */
+              );
+            }),
+            128
+            /* KEYED_FRAGMENT */
+          ))
+        ],
+        36
+        /* STYLE, NEED_HYDRATION */
+      ),
+      _createVNode(_component_up_transition, {
+        mode: "fade",
+        show: $setup.touching,
+        customStyle: $setup.indicatorTransitionStyle
+      }, {
+        default: _withCtx(() => [
+          _createElementVNode(
+            "view",
+            {
+              class: _normalizeClass(["up-index-list__indicator", ["up-index-list__indicator--show"]]),
+              style: _normalizeStyle($setup.indicatorBoxStyle)
+            },
+            [
+              _createElementVNode(
+                "text",
+                { class: "up-index-list__indicator__text" },
+                _toDisplayString($setup.activeIndex >= 0 ? $setup.keyVal($setup.uIndexList[$setup.activeIndex]) : ""),
+                1
+                /* TEXT */
+              )
+            ],
+            4
+            /* STYLE */
+          )
+        ]),
+        _: 1
+        /* STABLE */
+      }, 8, ["show", "customStyle"])
+    ],
+    512
+    /* NEED_PATCH */
+  );
+}
+const __easycom_3 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-index-list/up-index-list.uvue"]]);
 export {
   __easycom_3 as _
 };
 //# sourceMappingURL=up-index-list.js.map
-ÔrF–Ù%../up-index-anchor/up-index-anchor.jsÙ!../up-transition/up-transition.js¼../../libs/function/index.jsÙ#../../libs/composable/useUltraUI.js®./indexList.jsÙ'../../../../plugin-vue-export-helper.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙÜ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-index-anchor/up-index-anchor.jsAÃªoh-resolveÂGAÂÙØ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-transition/up-transition.jsAÃªoh-resolveÂGAÂÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsAÃªoh-resolveÂGAÂÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useUltraUI.jsAÃªoh-resolveÂGAÂÙÔ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-index-list/indexList.jsAÃªoh-resolveÂGAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍH-ÍHKÀ‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍH8ÍHHÔrL”¤type¥start£end¤nameªIdentifierÍH8ÍHC«__easycom_3LªIdentifierÍHGÍHH¡_À–ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration ÌI‘ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	
-¡_LªIdentifier«__easycom_1ÔrO•¤type¥start£end¥value£raw§Literal!ÌHÙ%../up-index-anchor/up-index-anchor.jsÙ'"../up-index-anchor/up-index-anchor.js"M±ImportDeclarationÌJÌ‘‘N¯ImportSpecifierÌSÌeLªIdentifierÌSÌT¡_LªIdentifierÌXÌe­__easycom_1$1O§LiteralÌmÌÙ!../up-transition/up-transition.jsÙ#"../up-transition/up-transition.js"M±ImportDeclarationÌ’Í
-•N¯ImportSpecifierÌ›Ì§LªIdentifierÌ›Ìœ¡aLªIdentifierÌ Ì§§addUnitN¯ImportSpecifierÌ©Ì³LªIdentifierÌ©Ìª¡sLªIdentifierÌ®Ì³¥sleepN¯ImportSpecifierÌµÌÇLªIdentifierÌµÌ¶¡eLªIdentifierÌºÌÇ­getWindowInfoN¯ImportSpecifierÌÉÌÓLªIdentifierÌÉÌÊ¡gLªIdentifierÌÎÌÓ¥getPxN¯ImportSpecifierÌÕÌãLªIdentifierÌÕÌÖ¡uLªIdentifierÌÚÌã©upGetRectO§LiteralÌëÍ	¼../../libs/function/index.js¾"../../libs/function/index.js"M±ImportDeclarationÍÍQ‘N¯ImportSpecifierÍÍ#LªIdentifierÍÍ¡uLªIdentifierÍÍ#ªuseUltraUIO§LiteralÍ+ÍPÙ#../../libs/composable/useUltraUI.jsÙ%"../../libs/composable/useUltraUI.js"M±ImportDeclarationÍRÍ‘N¯ImportSpecifierÍ[ÍhLªIdentifierÍ[Í\¡dLªIdentifierÍ`Íh¨defPropsO§LiteralÍpÍ€®./indexList.js°"./indexList.js"M±ImportDeclarationÍ‚ÍÍ‘N¯ImportSpecifierÍ‹Í›LªIdentifierÍ‹ÍŒ¡_LªIdentifierÍÍ›«_export_sfcO§LiteralÍ£ÍÌÙ'../../../../plugin-vue-export-helper.jsÙ)"../../../../plugin-vue-export-helper.js"
+ÔrF—µ../../../../App.ku.jsÙ%../up-index-anchor/up-index-anchor.jsÙ!../up-transition/up-transition.js¼../../libs/function/index.jsÙ#../../libs/composable/useUltraUI.jsÙ'../../../../plugin-vue-export-helper.js®./indexList.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙ /Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku.jsAÃªoh-resolveÂGAÂÙÜ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-index-anchor/up-index-anchor.jsAÃªoh-resolveÂGAÂÙØ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-transition/up-transition.jsAÃªoh-resolveÂGAÂÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsAÃªoh-resolveÂGAÂÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useUltraUI.jsAÃªoh-resolveÂGAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂGAÂÙÔ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-index-list/indexList.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍZ©ÍZÇÀ‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍZ´ÍZÄÔrL”¤type¥start£end¤nameªIdentifierÍZ´ÍZ¿«__easycom_3LªIdentifierÍZÃÍZÄ¡_À—ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration ÌI‘ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	
+¡_LªIdentifier«__easycom_1ÔrO•¤type¥start£end¥value£raw§Literal!ÌHÙ%../up-index-anchor/up-index-anchor.jsÙ'"../up-index-anchor/up-index-anchor.js"M±ImportDeclarationÌJÌ†‘N¯ImportSpecifierÌSÌfLªIdentifierÌSÌT¡rLªIdentifierÌXÌf®resolveEasycomO§LiteralÌnÌ…µ../../../../App.ku.js·"../../../../App.ku.js"M±ImportDeclarationÌ‡ÌÎ‘N¯ImportSpecifierÌÌ¢LªIdentifierÌÌ‘¡_LªIdentifierÌ•Ì¢­__easycom_1$1O§LiteralÌªÌÍÙ!../up-transition/up-transition.jsÙ#"../up-transition/up-transition.js"M±ImportDeclarationÌÏÍG•N¯ImportSpecifierÌØÌäLªIdentifierÌØÌÙ¡aLªIdentifierÌİÌä§addUnitN¯ImportSpecifierÌæÌğLªIdentifierÌæÌç¡sLªIdentifierÌëÌğ¥sleepN¯ImportSpecifierÌòÍLªIdentifierÌòÌó¡eLªIdentifierÌ÷Í­getWindowInfoN¯ImportSpecifierÍÍLªIdentifierÍÍ¡gLªIdentifierÍÍ¥getPxN¯ImportSpecifierÍÍ LªIdentifierÍÍ¡uLªIdentifierÍÍ ©upGetRectO§LiteralÍ(ÍF¼../../libs/function/index.js¾"../../libs/function/index.js"M±ImportDeclarationÍHÍ‘N¯ImportSpecifierÍQÍ`LªIdentifierÍQÍR¡uLªIdentifierÍVÍ`ªuseUltraUIO§LiteralÍhÍÙ#../../libs/composable/useUltraUI.jsÙ%"../../libs/composable/useUltraUI.js"M±ImportDeclarationÍÍ¾‘N¯ImportSpecifierÍ˜Í¥LªIdentifierÍ˜Í™¡dLªIdentifierÍÍ¥¨defPropsO§LiteralÍ­Í½®./indexList.js°"./indexList.js"M±ImportDeclarationÍ¿Í
+‘N¯ImportSpecifierÍÈÍØLªIdentifierÍÈÍÉ¡_LªIdentifierÍÍÍØ«_export_sfcO§LiteralÍàÍ	Ù'../../../../plugin-vue-export-helper.jsÙ)"../../../../plugin-vue-export-helper.js"

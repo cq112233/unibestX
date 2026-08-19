@@ -1,49 +1,10 @@
 import { _ as __easycom_0 } from "../../../../components/NavBar/NavBar.js";
+import { A as AppKu, r as resolveEasycom } from "../../../../../App.ku.js";
 import { _ as __easycom_1 } from "../../../../../uni_modules/uview-ultra/components/up-card/up-card.js";
 import { _ as __easycom_2 } from "../../../../../uni_modules/uview-ultra/components/up-button/up-button.js";
-import { A as AppKu } from "../../../../../App.ku.js";
 import { L as LayoutComponent } from "../../../../layouts/default.js";
 import { _ as _export_sfc } from "../../../../../plugin-vue-export-helper.js";
 import "../../../../utils/systemInfo.js";
-import "../../../../../uni_modules/uview-ultra/libs/function/index.js";
-import "../../../../../uni_modules/uview-ultra/libs/function/test.js";
-import "../../../../../uni_modules/uview-ultra/libs/function/digit.js";
-import "../../../../../uni_modules/e-chart/components/e-chart/uts/WebviewEchart.js";
-import "../../../../../uni_modules/uview-ultra/libs/config/config.js";
-import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.js";
-import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/loadingIcon.js";
-import "../../../../../uni_modules/uview-ultra/libs/function/colorGradient.js";
-import "../../../../../uni_modules/uview-ultra/components/up-icon/up-icon.js";
-import "../../../../../uni_modules/uview-ultra/components/up-icon/icons.js";
-import "../../../../../uni_modules/uview-ultra/libs/composable/useUltraUI.js";
-import "../../../../../uni_modules/uview-ultra/components/up-icon/icon.js";
-import "../../../../../uni_modules/uview-ultra/libs/function/throttle.js";
-import "../../../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
-import "../../../../../uni_modules/uview-ultra/components/up-gap/up-gap.js";
-import "../../../../../uni_modules/uview-ultra/libs/composable/useMp.js";
-import "../../../../../uni_modules/uview-ultra/components/up-gap/gap.js";
-import "../../../../../uni_modules/uview-ultra/components/up-overlay/up-overlay.js";
-import "../../../../../uni_modules/uview-ultra/components/up-transition/up-transition.js";
-import "../../../../../uni_modules/uview-ultra/components/up-transition/transition.js";
-import "../../../../../uni_modules/uview-ultra/libs/config/color.js";
-import "../../../../tabbar/index.js";
-import "../../../../tabbar/store.js";
-import "../../../../tabbar/types.js";
-import "../../../../tabbar/config.js";
-import "../../../../tabbar/TabbarItem.js";
-import "../../../../../uni_modules/uni-icons/components/uni-icons/uni-icons.js";
-import "../../../../../uni_modules/uni-icons/components/uni-icons/uniicons_file.js";
-import "../../../../utils/i18n.js";
-import "../../../../i18n/index.js";
-import "../../../../../uni_modules/lime-i18n/common/index.js";
-import "../../../../../uni_modules/lime-i18n/common/composer-class.js";
-import "../../../../../uni_modules/lime-i18n/common/format.js";
-import "../../../../../uni_modules/lime-i18n/common/util.js";
-import "../../../../../uni_modules/lime-i18n/common/errors.js";
-import "../../../../../uni_modules/lime-i18n/common/warnings.js";
-import "../../../../../uni_modules/lime-i18n/common/types.js";
-import "../../../../i18n/locales/zh-CN.js";
-import "../../../../i18n/locales/en-US.js";
 import "../../../../store/index.js";
 import "../../../../../uni_modules/x-pinia-s/instans/types.js";
 import "../../../../../uni_modules/x-pinia-s/instans/subscriptions.js";
@@ -53,6 +14,20 @@ import "../../../../../uni_modules/x-pinia-s/instans/persist.js";
 import "../../../../store/app.js";
 import "../../../../../uni_modules/x-pinia-s/instans/storeBase.js";
 import "../../../../../uni_modules/x-pinia-s/instans/defineStore.js";
+import "../../../../tabbar/store.js";
+import "../../../../tabbar/types.js";
+import "../../../../tabbar/config.js";
+import "../../../../i18n/index.js";
+import "../../../../../uni_modules/lime-i18n/common/index.js";
+import "../../../../../uni_modules/lime-i18n/common/composer-class.js";
+import "../../../../../uni_modules/e-chart/components/e-chart/uts/WebviewEchart.js";
+import "../../../../../uni_modules/lime-i18n/common/format.js";
+import "../../../../../uni_modules/lime-i18n/common/util.js";
+import "../../../../../uni_modules/lime-i18n/common/errors.js";
+import "../../../../../uni_modules/lime-i18n/common/warnings.js";
+import "../../../../../uni_modules/lime-i18n/common/types.js";
+import "../../../../i18n/locales/zh-CN.js";
+import "../../../../i18n/locales/en-US.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/index.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hans.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/zh-Hant.js";
@@ -63,119 +38,169 @@ import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/de.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ko.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ja.js";
 import "../../../../../uni_modules/uview-ultra/libs/i18n/locales/ru.js";
+import "../../../../utils/theme.js";
+import "../../../../../theme.js";
 import "../../../../store/token.js";
 import "../../../../store/user.js";
+import "../../../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
+import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.js";
+import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/loadingIcon.js";
+import "../../../../../uni_modules/uview-ultra/libs/config/config.js";
+import "../../../../../uni_modules/uview-ultra/libs/function/index.js";
+import "../../../../../uni_modules/uview-ultra/libs/function/test.js";
+import "../../../../../uni_modules/uview-ultra/libs/function/digit.js";
+import "../../../../../uni_modules/uview-ultra/libs/function/colorGradient.js";
+import "../../../../../uni_modules/uview-ultra/components/up-icon/up-icon.js";
+import "../../../../../uni_modules/uview-ultra/components/up-icon/icons.js";
+import "../../../../../uni_modules/uview-ultra/libs/composable/useUltraUI.js";
+import "../../../../../uni_modules/uview-ultra/components/up-icon/icon.js";
+import "../../../../../uni_modules/uview-ultra/components/up-gap/up-gap.js";
+import "../../../../../uni_modules/uview-ultra/libs/composable/useMp.js";
+import "../../../../../uni_modules/uview-ultra/components/up-gap/gap.js";
+import "../../../../../uni_modules/uview-ultra/components/up-overlay/up-overlay.js";
+import "../../../../../uni_modules/uview-ultra/components/up-transition/up-transition.js";
+import "../../../../../uni_modules/uview-ultra/components/up-transition/transition.js";
+import "../../../../../uni_modules/uview-ultra/libs/config/color.js";
+import "../../../../tabbar/index.js";
+import "../../../../tabbar/TabbarItem.js";
+import "../../../../../uni_modules/uni-icons/components/uni-icons/uni-icons.js";
+import "../../../../../uni_modules/uni-icons/components/uni-icons/uniicons_file.js";
+import "../../../../utils/i18n.js";
 import "../../../../utils/toast.js";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, resolveComponent: _resolveComponent, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
-const __className = "GenSrcSubUviewUltraDemosCardCard";
+import "../../../../../uni_modules/uview-ultra/libs/function/throttle.js";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const logoImg = "/static/logo.png";
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "04bcd399",
-  __className,
-  __filename: "src/sub/uview-ultra/demos/card/card.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "card",
-  setup(__props) {
-    const __sharedDataRenderer = _useSharedDataRenderer();
-    const __sharedData = __sharedDataRenderer == "component" ? _withSharedDataComponent(new UniDynamicSharedDataComponent(_useSharedDataScope(), _useSharedDataComponentOptions({ bundleKey: "GenSrcSubUviewUltraDemosCardCardSharedData", sharedDataClassId: 0 }))) : _withSharedDataPage(new UniDynamicSharedDataPage(_useSharedDataPageId(), _useSharedDataPageOptions({ bundleKey: "GenSrcSubUviewUltraDemosCardCardSharedData", sharedDataClassId: 0 })));
-    _useSharedDataScope(__sharedData);
-    return () => {
-      "raw js";
-      const _component_NavBar = __easycom_0;
-      const _component_up_card = __easycom_1;
-      const _component_up_button = __easycom_2;
-      const n32 = _createSharedDataComponent(AppKu, "66b6847e", null, {
-        "default": _withSharedDataVaporCtx(() => {
-          const n31 = _createSharedDataComponent(LayoutComponent, "701a0b56", {
-            "navigation-style": "custom",
-            "navigation-bar-title-text": "up-card 卡片"
-          }, {
-            "default": _withSharedDataVaporCtx(() => {
-              const n0 = _createSharedDataComponentWithFallback(_component_NavBar, "366c50dc", {
-                title: "up-card 卡片",
-                "auto-back": true,
-                "safe-area-inset-top": true,
-                "bg-color": "#ffffff"
-              });
-              _setSharedData(__sharedData, 2, n0?.sharedData);
-              const n4 = _createSharedDataComponentWithFallback(_component_up_card, "366c5880", {
-                title: "基础卡片",
-                "sub-title": "副标题",
-                margin: "0",
-                "show-foot": false
-              }, {
-                "body": () => {
-                }
-              });
-              _setSharedData(__sharedData, 3, n4?.sharedData);
-              const n12 = _createSharedDataComponentWithFallback(_component_up_card, "366c637f", {
-                title: "带缩略图",
-                thumb: () => {
-                  return logoImg;
-                },
-                "thumb-circle": true,
-                "thumb-width": "36px",
-                margin: "0"
-              }, {
-                "body": () => {
-                },
-                "foot": () => {
-                }
-              });
-              _setSharedData(__sharedData, 4, n12?.sharedData);
-              const n22 = _createSharedDataComponentWithFallback(_component_up_card, "d1c48ee2", {
-                title: "订单信息",
-                "sub-title": "已完成",
-                thumb: () => {
-                  return logoImg;
-                },
-                margin: "0"
-              }, {
-                "body": () => {
-                },
-                "foot": _withSharedDataVaporCtx(() => {
-                  const n18 = _createSharedDataComponentWithFallback(_component_up_button, "d1c47248", {
-                    text: "评价",
-                    type: "primary",
-                    size: "mini",
-                    plain: true,
-                    class: "mr-10px"
-                  });
-                  _setSharedData(__sharedData, 6, n18?.sharedData);
-                  const n19 = _createSharedDataComponentWithFallback(_component_up_button, "d1c46a92", {
-                    text: "再次购买",
-                    type: "primary",
-                    size: "mini"
-                  });
-                  _setSharedData(__sharedData, 7, n19?.sharedData);
-                })
-              });
-              _setSharedData(__sharedData, 5, n22?.sharedData);
-              const n27 = _createSharedDataComponentWithFallback(_component_up_card, "d1c45aca", {
-                title: "带明显阴影",
-                "sub-title": "自定义",
-                margin: "0",
-                "box-shadow": "0 4px 12px rgba(0,0,0,0.1)",
-                border: false
-              }, {
-                "body": () => {
-                }
-              });
-              _setSharedData(__sharedData, 8, n27?.sharedData);
-            })
-          });
-          _setSharedData(__sharedData, 1, n31.sharedData);
-        })
-      });
-      _setSharedData(__sharedData, 0, n32.sharedData);
-      return __sharedData;
-    };
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
+    const __returned__ = { logoImg, get AppKu() {
+      return AppKu;
+    }, get LayoutComponent() {
+      return LayoutComponent;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const _style_1 = {};
-const card = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0, _style_1]]]);
+const _style_0 = { "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "flex-row": { "": { "flexDirection": "row" } }, "h-10px": { "": { "height": 10 } }, "justify-between": { "": { "justifyContent": "space-between" } }, "justify-end": { "": { "justifyContent": "flex-end" } }, "leading-20px": { "": { "lineHeight": "20px" } }, "leading-24px": { "": { "lineHeight": "24px" } }, "mr-10px": { "": { "marginRight": 10 } }, "mt-12px": { "": { "marginTop": 12 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "pb-30px": { "": { "paddingBottom": 30 } }, "text-__2979ff_": { "": { "color": "#2979ff" } }, "text-__333_": { "": { "color": "#333333" } }, "text-__606266_": { "": { "color": "#606266" } }, "text-__909399_": { "": { "color": "#909399" } }, "text-12px": { "": { "fontSize": 12 } }, "text-13px": { "": { "fontSize": 13 } }, "text-14px": { "": { "fontSize": 14 } }, "w-full": { "": { "width": "100%" } } };
+const _style_1 = { "demo-block": { "": { "marginBottom": 12, "paddingTop": 12, "paddingRight": 12, "paddingBottom": 12, "paddingLeft": 12, "backgroundColor": "#ffffff", "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "demo-label": { "": { "fontSize": 14, "fontWeight": "bold", "color": "#606266", "marginBottom": 10, "paddingLeft": 4, "borderLeftWidth": 3, "borderLeftStyle": "solid", "borderLeftColor": "#2979ff" } } };
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { resolveComponent: _resolveComponent, createVNode: _createVNode, createElementVNode: _createElementVNode, withCtx: _withCtx, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_NavBar = resolveEasycom(__resolveDynamicComponent("NavBar"), __easycom_0);
+  const _component_up_card = resolveEasycom(__resolveDynamicComponent("up-card"), __easycom_1);
+  const _component_up_button = resolveEasycom(__resolveDynamicComponent("up-button"), __easycom_2);
+  return _openBlock(), _createBlock($setup["AppKu"], null, {
+    default: _withCtx(() => [
+      _createVNode($setup["LayoutComponent"], {
+        "navigation-style": "custom",
+        "navigation-bar-title-text": "up-card 卡片"
+      }, {
+        default: _withCtx(() => [
+          _createElementVNode("view", { class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }, [
+            _createVNode(_component_NavBar, {
+              title: "up-card 卡片",
+              "auto-back": true,
+              "safe-area-inset-top": true,
+              "bg-color": "#ffffff"
+            }),
+            _createElementVNode("view", { class: "p-16px" }, [
+              _createElementVNode("view", { class: "demo-block" }, [
+                _createElementVNode("text", { class: "demo-label" }, "基础卡片"),
+                _createVNode(_component_up_card, {
+                  title: "基础卡片",
+                  "sub-title": "副标题",
+                  margin: "0",
+                  "show-foot": false
+                }, {
+                  body: _withCtx(() => [
+                    _createElementVNode("text", { class: "text-13px text-__606266_ leading-20px" }, "这是卡片主体内容区域，可以放置任意内容。")
+                  ]),
+                  _: 1
+                  /* STABLE */
+                }),
+                _createElementVNode("view", { class: "h-10px" }),
+                _createVNode(_component_up_card, {
+                  title: "带缩略图",
+                  thumb: $setup.logoImg,
+                  "thumb-circle": true,
+                  "thumb-width": "36px",
+                  margin: "0"
+                }, {
+                  body: _withCtx(() => [
+                    _createElementVNode("text", { class: "text-13px text-__606266_ leading-20px" }, "左侧缩略图为圆形，适合展示头像或图标。")
+                  ]),
+                  foot: _withCtx(() => [
+                    _createElementVNode("view", { class: "flex-row justify-between w-full" }, [
+                      _createElementVNode("text", { class: "text-12px text-__909399_" }, "底部区域"),
+                      _createElementVNode("text", { class: "text-12px text-__2979ff_" }, "查看详情")
+                    ])
+                  ]),
+                  _: 1
+                  /* STABLE */
+                })
+              ]),
+              _createElementVNode("view", { class: "demo-block mt-12px" }, [
+                _createElementVNode("text", { class: "demo-label" }, "完整卡片(含头部和尾部)"),
+                _createVNode(_component_up_card, {
+                  title: "订单信息",
+                  "sub-title": "已完成",
+                  thumb: $setup.logoImg,
+                  margin: "0"
+                }, {
+                  body: _withCtx(() => [
+                    _createElementVNode("text", { class: "text-14px text-__333_ leading-24px" }, "订单编号：2023080112345678\n商品名称：某某精美商品一件\n购买时间：2023-08-01 12:34:56")
+                  ]),
+                  foot: _withCtx(() => [
+                    _createElementVNode("view", { class: "flex-row justify-end w-full" }, [
+                      _createVNode(_component_up_button, {
+                        text: "评价",
+                        type: "primary",
+                        size: "mini",
+                        plain: true,
+                        class: "mr-10px"
+                      }),
+                      _createVNode(_component_up_button, {
+                        text: "再次购买",
+                        type: "primary",
+                        size: "mini"
+                      })
+                    ])
+                  ]),
+                  _: 1
+                  /* STABLE */
+                })
+              ]),
+              _createElementVNode("view", { class: "demo-block mt-12px" }, [
+                _createElementVNode("text", { class: "demo-label" }, "自定义阴影与边框"),
+                _createVNode(_component_up_card, {
+                  title: "带明显阴影",
+                  "sub-title": "自定义",
+                  margin: "0",
+                  "box-shadow": "0 4px 12px rgba(0,0,0,0.1)",
+                  border: false
+                }, {
+                  body: _withCtx(() => [
+                    _createElementVNode("text", { class: "text-13px text-__606266_" }, "这个卡片去掉了边框，并自定义了较深的阴影效果。")
+                  ]),
+                  _: 1
+                  /* STABLE */
+                })
+              ])
+            ])
+          ])
+        ]),
+        _: 1
+        /* STABLE */
+      })
+    ]),
+    _: 1
+    /* STABLE */
+  });
+}
+const card = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0, _style_1]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/card/card.uvue"]]);
 export {
   card as default
 };

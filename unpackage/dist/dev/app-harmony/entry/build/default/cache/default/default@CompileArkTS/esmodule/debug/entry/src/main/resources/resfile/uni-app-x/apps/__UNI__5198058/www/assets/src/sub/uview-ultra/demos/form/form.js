@@ -1,4 +1,5 @@
 import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/components/NavBar/NavBar&";
+import { A as AppKu, r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { _ as __easycom_1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-input/up-input&";
 import { _ as __easycom_2 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-form-item/up-form-item&";
 import { _ as __easycom_0$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
@@ -12,49 +13,38 @@ import { _ as __easycom_1$5 } from "@normalized:N&&&entry/src/main/resources/res
 import { _ as __easycom_1$6 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-slider/up-slider&";
 import { _ as __easycom_1$7 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-textarea/up-textarea&";
 import { _ as __easycom_1$8 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-upload/up-upload&";
-import { _ as _sfc_main$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-form/up-form&";
+import { _ as __easycom_14 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-form/up-form&";
 import { _ as __easycom_2$3 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-button/up-button&";
 import { _ as __easycom_2$4 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-calendar/up-calendar&";
 import { _ as __easycom_2$5 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-picker/up-picker&";
 import { _ as __easycom_2$6 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-datetime-picker/up-datetime-picker&";
 import { _ as __easycom_2$7 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-action-sheet/up-action-sheet&";
-import { A as AppKu } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { L as LayoutComponent } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/layouts/default&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/systemInfo&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useUltraUI&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/test&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/digit&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/index&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/x-pinia-s/instans/types&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/x-pinia-s/instans/subscriptions&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/x-pinia-s/instans/createPinia&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/x-pinia-s/instans/rootState&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/x-pinia-s/instans/persist&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/app&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/x-pinia-s/instans/storeBase&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/x-pinia-s/instans/defineStore&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/tabbar/store&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/tabbar/types&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/tabbar/config&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/i18n/index&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-i18n/common/index&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-i18n/common/composer-class&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/e-chart/components/e-chart/uts/WebviewEchart&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/config/config&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-input/input&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-line/up-line&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-line/line&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-form-item/formItem&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/config/color&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/icons&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/icon&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-radio/radio&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-radio-group/radioGroup&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-checkbox/checkbox&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-checkbox-group/checkboxGroup&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/loadingIcon&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/colorGradient&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-gap/up-gap&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useMp&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-gap/gap&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-popup/up-popup&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-overlay/up-overlay&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-transition/up-transition&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-transition/transition&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-status-bar/up-status-bar&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-status-bar/statusBar&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-safe-bottom/up-safe-bottom&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-popup/popup&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-upload/utils&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-upload/types&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-i18n/common/format&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-i18n/common/util&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-i18n/common/errors&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-i18n/common/warnings&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-i18n/common/types&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/i18n/locales/zh-CN&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/i18n/locales/en-US&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/index&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/zh-Hans&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/zh-Hant&";
@@ -65,6 +55,49 @@ import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/ko&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/ja&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/ru&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/theme&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/theme&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/token&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/user&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-toast/up-toast&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/loadingIcon&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/config/config&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/test&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/digit&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/colorGradient&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-gap/up-gap&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useMp&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-gap/gap&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-overlay/up-overlay&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-transition/up-transition&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-transition/transition&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/config/color&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/tabbar/index&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/tabbar/TabbarItem&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uni-icons/components/uni-icons/uni-icons&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uni-icons/components/uni-icons/uniicons_file&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/i18n&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/toast&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useUltraUI&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-input/input&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-line/up-line&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-line/line&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-form-item/formItem&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/icons&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/icon&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-radio/radio&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-radio-group/radioGroup&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-checkbox/checkbox&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-checkbox-group/checkboxGroup&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-popup/up-popup&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-status-bar/up-status-bar&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-status-bar/statusBar&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-safe-bottom/up-safe-bottom&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-popup/popup&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-upload/utils&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-upload/types&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-form/form&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/util/async-validator&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-form/types&";
@@ -84,51 +117,13 @@ import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useButton&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-action-sheet/types&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-action-sheet/actionSheet&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-toast/up-toast&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/tabbar/index&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/tabbar/store&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/tabbar/types&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/tabbar/config&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/tabbar/TabbarItem&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uni-icons/components/uni-icons/uni-icons&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uni-icons/components/uni-icons/uniicons_file&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/i18n&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/i18n/index&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-i18n/common/index&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-i18n/common/composer-class&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-i18n/common/format&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-i18n/common/util&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-i18n/common/errors&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-i18n/common/warnings&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-i18n/common/types&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/i18n/locales/zh-CN&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/i18n/locales/en-US&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/index&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/x-pinia-s/instans/types&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/x-pinia-s/instans/subscriptions&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/x-pinia-s/instans/createPinia&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/x-pinia-s/instans/rootState&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/x-pinia-s/instans/persist&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/app&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/x-pinia-s/instans/storeBase&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/x-pinia-s/instans/defineStore&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/token&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/user&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/toast&";
-const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
-const __className = "GenSrcSubUviewUltraDemosFormForm";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { reactive, ref } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
-  __dynamicSharedData: true,
-  __hash: "469bced5",
-  __className,
-  __filename: "src/sub/uview-ultra/demos/form/form.uvue",
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   __name: "form",
-  setup(__props) {
-    const __sharedDataRenderer = _useSharedDataRenderer();
-    const __sharedData = __sharedDataRenderer == "component" ? _withSharedDataComponent(new UniDynamicSharedDataComponent(_useSharedDataScope(), _useSharedDataComponentOptions({ bundleKey: "GenSrcSubUviewUltraDemosFormFormSharedData", sharedDataClassId: 0 }))) : _withSharedDataPage(new UniDynamicSharedDataPage(_useSharedDataPageId(), _useSharedDataPageOptions({ bundleKey: "GenSrcSubUviewUltraDemosFormFormSharedData", sharedDataClassId: 0 })));
-    _useSharedDataScope(__sharedData);
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
     const formModel = reactive(new UTSJSONObject({
       name: "",
       gender: "",
@@ -227,8 +222,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       new UTSJSONObject({ name: "保密" })
     ]);
     function onGenderSelect(item) {
-      var _a;
-      formModel.gender = (_a = item.getString("name")) !== null && _a !== void 0 ? _a : "";
+      var _a2;
+      formModel.gender = (_a2 = item.getString("name")) !== null && _a2 !== void 0 ? _a2 : "";
       genderActionShow.value = false;
       const form2 = uForm.value;
       if (form2 != null) {
@@ -297,626 +292,467 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       }
       formModel.photos = uploadList.value;
     }
-    return () => {
-      "raw js";
-      const _setTemplateRef = _createSharedDataTemplateRefSetter();
-      const _component_NavBar = __easycom_0;
-      const _component_up_input = __easycom_1;
-      const _component_up_form_item = __easycom_2;
-      const _component_up_icon = __easycom_0$1;
-      const _component_up_radio = __easycom_1$1;
-      const _component_up_radio_group = __easycom_2$1;
-      const _component_up_checkbox = __easycom_1$2;
-      const _component_up_checkbox_group = __easycom_2$2;
-      const _component_up_switch = __easycom_1$3;
-      const _component_up_rate = __easycom_1$4;
-      const _component_up_number_box = __easycom_1$5;
-      const _component_up_slider = __easycom_1$6;
-      const _component_up_textarea = __easycom_1$7;
-      const _component_up_upload = __easycom_1$8;
-      const _component_up_form = _sfc_main$1;
-      const _component_up_button = __easycom_2$3;
-      const _component_up_calendar = __easycom_2$4;
-      const _component_up_picker = __easycom_2$5;
-      const _component_up_datetime_picker = __easycom_2$6;
-      const _component_up_action_sheet = __easycom_2$7;
-      const n67 = _createSharedDataComponent(AppKu, "b189a5ae", null, {
-        "default": _withSharedDataVaporCtx(() => {
-          const n66 = _createSharedDataComponent(LayoutComponent, "402a77ed", {
-            "navigation-style": "custom",
-            "navigation-bar-title-text": "up-form 表单"
-          }, {
-            "default": _withSharedDataVaporCtx(() => {
-              const n0 = _createSharedDataComponentWithFallback(_component_NavBar, "75b6f378", {
-                title: "Form 表单",
-                "auto-back": true,
-                "safe-area-inset-top": true,
-                "bg-color": "#ffffff"
-              });
-              _setSharedData(__sharedData, 2, n0?.sharedData);
-              const n46 = _createSharedDataComponentWithFallback(_component_up_form, "75b6e430", {
-                model: () => {
-                  return formModel;
-                },
-                rules: () => {
-                  return formRules;
-                },
-                "label-width": "90px",
-                "error-type": "toast"
-              }, {
-                "default": _withSharedDataVaporCtx(() => {
-                  const n3 = _createSharedDataComponentWithFallback(_component_up_form_item, "75b6d5ec", {
-                    label: "姓名",
-                    prop: "name",
-                    "border-bottom": true,
-                    required: ""
-                  }, {
-                    "default": _withSharedDataVaporCtx(() => {
-                      const n2 = _createSharedDataComponentWithFallback(_component_up_input, "75b6cee4", {
-                        modelValue: () => {
-                          return formModel.name;
-                        },
-                        "onUpdate:modelValue": () => {
-                          return (_value) => {
-                            return formModel.name = _value;
-                          };
-                        },
-                        placeholder: "请输入姓名",
-                        border: "none",
-                        clearable: ""
-                      });
-                      _setSharedData(__sharedData, 9, n2?.sharedData);
-                    })
-                  });
-                  _setSharedData(__sharedData, 8, n3?.sharedData);
-                  const _on_click = () => {
-                    return genderActionShow.value = true;
-                  };
-                  const n7 = _createSharedDataComponentWithFallback(_component_up_form_item, "75b6c6ac", {
-                    label: "性别",
-                    prop: "gender",
-                    "border-bottom": true,
-                    required: "",
-                    onClick: () => {
-                      return _on_click;
-                    }
-                  }, {
-                    "right": _withSharedDataVaporCtx(() => {
-                      const n5 = _createSharedDataComponentWithFallback(_component_up_icon, "4127a8aa", {
-                        name: "arrow-right",
-                        color: "#c0c4cc",
-                        size: "16"
-                      });
-                      _setSharedData(__sharedData, 11, n5?.sharedData);
-                    }),
-                    "default": _withSharedDataVaporCtx(() => {
-                      const n4 = _createSharedDataComponentWithFallback(_component_up_input, "75b6bee0", {
-                        modelValue: () => {
-                          return formModel.gender;
-                        },
-                        "onUpdate:modelValue": () => {
-                          return (_value) => {
-                            return formModel.gender = _value;
-                          };
-                        },
-                        disabled: "",
-                        "disabled-color": "#ffffff",
-                        placeholder: "请选择性别",
-                        border: "none"
-                      });
-                      _setSharedData(__sharedData, 12, n4?.sharedData);
-                    })
-                  });
-                  _setSharedData(__sharedData, 10, n7?.sharedData);
-                  const _on_click1 = () => {
-                    return datetimePickerShow.value = true;
-                  };
-                  const n11 = _createSharedDataComponentWithFallback(_component_up_form_item, "4127a0a0", {
-                    label: "出生日期",
-                    prop: "birthday",
-                    "border-bottom": true,
-                    required: "",
-                    onClick: () => {
-                      return _on_click1;
-                    }
-                  }, {
-                    "right": _withSharedDataVaporCtx(() => {
-                      const n9 = _createSharedDataComponentWithFallback(_component_up_icon, "41278352", {
-                        name: "arrow-right",
-                        color: "#c0c4cc",
-                        size: "16"
-                      });
-                      _setSharedData(__sharedData, 14, n9?.sharedData);
-                    }),
-                    "default": _withSharedDataVaporCtx(() => {
-                      const n8 = _createSharedDataComponentWithFallback(_component_up_input, "41279874", {
-                        modelValue: () => {
-                          return formModel.birthday;
-                        },
-                        "onUpdate:modelValue": () => {
-                          return (_value) => {
-                            return formModel.birthday = _value;
-                          };
-                        },
-                        disabled: "",
-                        "disabled-color": "#ffffff",
-                        placeholder: "请选择出生日期",
-                        border: "none"
-                      });
-                      _setSharedData(__sharedData, 15, n8?.sharedData);
-                    })
-                  });
-                  _setSharedData(__sharedData, 13, n11?.sharedData);
-                  const _on_click2 = () => {
-                    return pickerShow.value = true;
-                  };
-                  const n15 = _createSharedDataComponentWithFallback(_component_up_form_item, "41277b1e", {
-                    label: "国籍",
-                    prop: "country",
-                    "border-bottom": true,
-                    onClick: () => {
-                      return _on_click2;
-                    }
-                  }, {
-                    "right": _withSharedDataVaporCtx(() => {
-                      const n13 = _createSharedDataComponentWithFallback(_component_up_icon, "4126c5be", {
-                        name: "arrow-right",
-                        color: "#c0c4cc",
-                        size: "16"
-                      });
-                      _setSharedData(__sharedData, 17, n13?.sharedData);
-                    }),
-                    "default": _withSharedDataVaporCtx(() => {
-                      const n12 = _createSharedDataComponentWithFallback(_component_up_input, "41277398", {
-                        modelValue: () => {
-                          return formModel.country;
-                        },
-                        "onUpdate:modelValue": () => {
-                          return (_value) => {
-                            return formModel.country = _value;
-                          };
-                        },
-                        disabled: "",
-                        "disabled-color": "#ffffff",
-                        placeholder: "请选择国籍",
-                        border: "none"
-                      });
-                      _setSharedData(__sharedData, 18, n12?.sharedData);
-                    })
-                  });
-                  _setSharedData(__sharedData, 16, n15?.sharedData);
-                  const _on_click3 = () => {
-                    return calendarShow.value = true;
-                  };
-                  const n19 = _createSharedDataComponentWithFallback(_component_up_form_item, "4126b89e", {
-                    label: "行程时间",
-                    prop: "stayTime",
-                    "border-bottom": true,
-                    onClick: () => {
-                      return _on_click3;
-                    }
-                  }, {
-                    "right": _withSharedDataVaporCtx(() => {
-                      const n17 = _createSharedDataComponentWithFallback(_component_up_icon, "4126a0ae", {
-                        name: "arrow-right",
-                        color: "#c0c4cc",
-                        size: "16"
-                      });
-                      _setSharedData(__sharedData, 20, n17?.sharedData);
-                    }),
-                    "default": _withSharedDataVaporCtx(() => {
-                      const n16 = _createSharedDataComponentWithFallback(_component_up_input, "4126b0e4", {
-                        modelValue: () => {
-                          return formModel.stayTime;
-                        },
-                        "onUpdate:modelValue": () => {
-                          return (_value) => {
-                            return formModel.stayTime = _value;
-                          };
-                        },
-                        disabled: "",
-                        "disabled-color": "#ffffff",
-                        placeholder: "请选择日期范围",
-                        border: "none"
-                      });
-                      _setSharedData(__sharedData, 21, n16?.sharedData);
-                    })
-                  });
-                  _setSharedData(__sharedData, 19, n19?.sharedData);
-                  const n26 = _createSharedDataComponentWithFallback(_component_up_form_item, "412698a4", {
-                    label: "水果最爱",
-                    prop: "fruit",
-                    "border-bottom": true
-                  }, {
-                    "default": _withSharedDataVaporCtx(() => {
-                      const n25 = _createSharedDataComponentWithFallback(_component_up_radio_group, "412691a8", {
-                        modelValue: () => {
-                          return formModel.fruit;
-                        },
-                        "onUpdate:modelValue": () => {
-                          return (_value) => {
-                            return formModel.fruit = _value;
-                          };
-                        },
-                        placement: "row"
-                      }, {
-                        "default": _withSharedDataVaporCtx(() => {
-                          const n20 = _createSharedDataComponentWithFallback(_component_up_radio, "41268ada", {
-                            name: "apple",
-                            label: "苹果"
-                          });
-                          _setSharedData(__sharedData, 24, n20?.sharedData);
-                          const n22 = _createSharedDataComponentWithFallback(_component_up_radio, "41268328", {
-                            name: "banana",
-                            label: "香蕉"
-                          });
-                          _setSharedData(__sharedData, 25, n22?.sharedData);
-                          const n24 = _createSharedDataComponentWithFallback(_component_up_radio, "4125ddf4", {
-                            name: "orange",
-                            label: "橘子"
-                          });
-                          _setSharedData(__sharedData, 26, n24?.sharedData);
-                        })
-                      });
-                      _setSharedData(__sharedData, 23, n25?.sharedData);
-                    })
-                  });
-                  _setSharedData(__sharedData, 22, n26?.sharedData);
-                  const n33 = _createSharedDataComponentWithFallback(_component_up_form_item, "4125d62c", {
-                    label: "兴趣爱好",
-                    prop: "hobbies",
-                    "border-bottom": true
-                  }, {
-                    "default": _withSharedDataVaporCtx(() => {
-                      const n32 = _createSharedDataComponentWithFallback(_component_up_checkbox_group, "4125cf2c", {
-                        modelValue: () => {
-                          return formModel.hobbies;
-                        },
-                        "onUpdate:modelValue": () => {
-                          return (_value) => {
-                            return formModel.hobbies = _value;
-                          };
-                        },
-                        placement: "row"
-                      }, {
-                        "default": _withSharedDataVaporCtx(() => {
-                          const n27 = _createSharedDataComponentWithFallback(_component_up_checkbox, "4125c82a", {
-                            name: "reading",
-                            label: "阅读"
-                          });
-                          _setSharedData(__sharedData, 29, n27?.sharedData);
-                          const n29 = _createSharedDataComponentWithFallback(_component_up_checkbox, "4125c068", {
-                            name: "sports",
-                            label: "运动"
-                          });
-                          _setSharedData(__sharedData, 30, n29?.sharedData);
-                          const n31 = _createSharedDataComponentWithFallback(_component_up_checkbox, "4125b8a8", {
-                            name: "music",
-                            label: "音乐"
-                          });
-                          _setSharedData(__sharedData, 31, n31?.sharedData);
-                        })
-                      });
-                      _setSharedData(__sharedData, 28, n32?.sharedData);
-                    })
-                  });
-                  _setSharedData(__sharedData, 27, n33?.sharedData);
-                  const n35 = _createSharedDataComponentWithFallback(_component_up_form_item, "4125b0a6", {
-                    label: "通知开关",
-                    prop: "notification",
-                    "border-bottom": true
-                  }, {
-                    "default": _withSharedDataVaporCtx(() => {
-                      const n34 = _createSharedDataComponentWithFallback(_component_up_switch, "4125a99c", {
-                        modelValue: () => {
-                          return formModel.notification;
-                        },
-                        "onUpdate:modelValue": () => {
-                          return (_value) => {
-                            return formModel.notification = _value;
-                          };
-                        },
-                        "active-color": "#2979ff"
-                      });
-                      _setSharedData(__sharedData, 33, n34?.sharedData);
-                    })
-                  });
-                  _setSharedData(__sharedData, 32, n35?.sharedData);
-                  const n37 = _createSharedDataComponentWithFallback(_component_up_form_item, "4125a1a4", {
-                    label: "服务评分",
-                    prop: "rate",
-                    "border-bottom": true
-                  }, {
-                    "default": _withSharedDataVaporCtx(() => {
-                      const n36 = _createSharedDataComponentWithFallback(_component_up_rate, "41259ad4", {
-                        modelValue: () => {
-                          return formModel.rate;
-                        },
-                        "onUpdate:modelValue": () => {
-                          return (_value) => {
-                            return formModel.rate = _value;
-                          };
-                        },
-                        count: 5
-                      });
-                      _setSharedData(__sharedData, 35, n36?.sharedData);
-                    })
-                  });
-                  _setSharedData(__sharedData, 34, n37?.sharedData);
-                  const n39 = _createSharedDataComponentWithFallback(_component_up_form_item, "4124f5b6", {
-                    label: "购买数量",
-                    prop: "count",
-                    "border-bottom": true
-                  }, {
-                    "default": _withSharedDataVaporCtx(() => {
-                      const n38 = _createSharedDataComponentWithFallback(_component_up_number_box, "4124eee4", {
-                        modelValue: () => {
-                          return formModel.count;
-                        },
-                        "onUpdate:modelValue": () => {
-                          return (_value) => {
-                            return formModel.count = _value;
-                          };
-                        },
-                        min: 1,
-                        max: 100
-                      });
-                      _setSharedData(__sharedData, 37, n38?.sharedData);
-                    })
-                  });
-                  _setSharedData(__sharedData, 36, n39?.sharedData);
-                  const n41 = _createSharedDataComponentWithFallback(_component_up_form_item, "4124e6f0", {
-                    label: "满意度",
-                    prop: "satisfaction",
-                    "border-bottom": true
-                  }, {
-                    "default": _withSharedDataVaporCtx(() => {
-                      const n40 = _createSharedDataComponentWithFallback(_component_up_slider, "4124dfe8", {
-                        modelValue: () => {
-                          return formModel.satisfaction;
-                        },
-                        "onUpdate:modelValue": () => {
-                          return (_value) => {
-                            return formModel.satisfaction = _value;
-                          };
-                        },
-                        min: 0,
-                        max: 100,
-                        "show-value": true,
-                        style: "width: 100%;"
-                      });
-                      _setSharedData(__sharedData, 39, n40?.sharedData);
-                    })
-                  });
-                  _setSharedData(__sharedData, 38, n41?.sharedData);
-                  const n43 = _createSharedDataComponentWithFallback(_component_up_form_item, "4124d728", {
-                    label: "个人简介",
-                    prop: "intro",
-                    "border-bottom": true,
-                    "label-position": "top"
-                  }, {
-                    "default": _withSharedDataVaporCtx(() => {
-                      const n42 = _createSharedDataComponentWithFallback(_component_up_textarea, "4124cfae", {
-                        modelValue: () => {
-                          return formModel.intro;
-                        },
-                        "onUpdate:modelValue": () => {
-                          return (_value) => {
-                            return formModel.intro = _value;
-                          };
-                        },
-                        placeholder: "请输入个人简介",
-                        count: "",
-                        maxlength: 100
-                      });
-                      _setSharedData(__sharedData, 41, n42?.sharedData);
-                    })
-                  });
-                  _setSharedData(__sharedData, 40, n43?.sharedData);
-                  const n45 = _createSharedDataComponentWithFallback(_component_up_form_item, "4124c766", {
-                    label: "相关照片",
-                    prop: "photos",
-                    "border-bottom": true,
-                    "label-position": "top"
-                  }, {
-                    "default": _withSharedDataVaporCtx(() => {
-                      const n44 = _createSharedDataComponentWithFallback(_component_up_upload, "4124bfea", {
-                        "file-list": () => {
-                          return uploadList.value;
-                        },
-                        multiple: true,
-                        "max-count": 3,
-                        width: "80px",
-                        height: "80px",
-                        onAfterRead: () => {
-                          return onUploadAfterRead;
-                        },
-                        onDelete: () => {
-                          return onUploadDelete;
-                        }
-                      });
-                      _setSharedData(__sharedData, 43, n44?.sharedData);
-                    })
-                  });
-                  _setSharedData(__sharedData, 42, n45?.sharedData);
-                })
-              });
-              _setSharedData(__sharedData, 7, n46?.sharedData);
-              _setTemplateRef(n46, uForm, null, "uForm");
-              const n53 = _createSharedDataComponentWithFallback(_component_up_form, "4123fea2", {
-                model: () => {
-                  return formModel2;
-                },
-                "label-position": "top",
-                "label-width": "100px"
-              }, {
-                "default": _withSharedDataVaporCtx(() => {
-                  const n50 = _createSharedDataComponentWithFallback(_component_up_form_item, "4123fcb0", {
-                    label: "活动名称",
-                    prop: "name",
-                    "border-bottom": true
-                  }, {
-                    "default": _withSharedDataVaporCtx(() => {
-                      const n49 = _createSharedDataComponentWithFallback(_component_up_input, "4123f5b6", {
-                        modelValue: () => {
-                          return formModel2.name;
-                        },
-                        "onUpdate:modelValue": () => {
-                          return (_value) => {
-                            return formModel2.name = _value;
-                          };
-                        },
-                        placeholder: "请输入活动名称",
-                        border: "none"
-                      });
-                      _setSharedData(__sharedData, 46, n49?.sharedData);
-                    })
-                  });
-                  _setSharedData(__sharedData, 45, n50?.sharedData);
-                  const n52 = _createSharedDataComponentWithFallback(_component_up_form_item, "4123edb8", {
-                    label: "活动详情",
-                    prop: "detail",
-                    "border-bottom": true
-                  }, {
-                    "default": _withSharedDataVaporCtx(() => {
-                      const n51 = _createSharedDataComponentWithFallback(_component_up_textarea, "4123e6e4", {
-                        modelValue: () => {
-                          return formModel2.detail;
-                        },
-                        "onUpdate:modelValue": () => {
-                          return (_value) => {
-                            return formModel2.detail = _value;
-                          };
-                        },
-                        placeholder: "请输入活动详情",
-                        border: "none"
-                      });
-                      _setSharedData(__sharedData, 48, n51?.sharedData);
-                    })
-                  });
-                  _setSharedData(__sharedData, 47, n52?.sharedData);
-                })
-              });
-              _setSharedData(__sharedData, 44, n53?.sharedData);
-              const n55 = _createSharedDataComponentWithFallback(_component_up_button, "4123d162", {
-                type: "primary",
-                text: "提交表单",
-                onClick: () => {
-                  return submitForm;
-                }
-              });
-              _setSharedData(__sharedData, 49, n55?.sharedData);
-              const n57 = _createSharedDataComponentWithFallback(_component_up_button, "4123c91c", {
-                type: "info",
-                text: "重置表单",
-                onClick: () => {
-                  return resetForm;
-                }
-              });
-              _setSharedData(__sharedData, 50, n57?.sharedData);
-              const _on_close = () => {
-                return calendarShow.value = false;
-              };
-              const n61 = _createSharedDataComponentWithFallback(_component_up_calendar, "41231d68", {
-                show: () => {
-                  return calendarShow.value;
-                },
-                mode: "range",
-                onConfirm: () => {
-                  return onCalendarConfirm;
-                },
-                onClose: () => {
-                  return _on_close;
-                }
-              });
-              _setSharedData(__sharedData, 3, n61?.sharedData);
-              const _on_cancel = () => {
-                return pickerShow.value = false;
-              };
-              const _on_close1 = () => {
-                return pickerShow.value = false;
-              };
-              const n62 = _createSharedDataComponentWithFallback(_component_up_picker, "412313f6", {
-                show: () => {
-                  return pickerShow.value;
-                },
-                columns: () => {
-                  return pickerColumns.value;
-                },
-                onConfirm: () => {
-                  return onPickerConfirm;
-                },
-                onCancel: () => {
-                  return _on_cancel;
-                },
-                onClose: () => {
-                  return _on_close1;
-                }
-              });
-              _setSharedData(__sharedData, 4, n62?.sharedData);
-              const _on_cancel1 = () => {
-                return datetimePickerShow.value = false;
-              };
-              const _on_close2 = () => {
-                return datetimePickerShow.value = false;
-              };
-              const n63 = _createSharedDataComponentWithFallback(_component_up_datetime_picker, "4122ff2c", {
-                modelValue: () => {
-                  return datetimePickerValue.value;
-                },
-                "onUpdate:modelValue": () => {
-                  return (_value) => {
-                    return datetimePickerValue.value = _value;
-                  };
-                },
-                show: () => {
-                  return datetimePickerShow.value;
-                },
-                mode: "date",
-                "min-date": 0,
-                onConfirm: () => {
-                  return onDatetimePickerConfirm;
-                },
-                onCancel: () => {
-                  return _on_cancel1;
-                },
-                onClose: () => {
-                  return _on_close2;
-                }
-              });
-              _setSharedData(__sharedData, 5, n63?.sharedData);
-              const _on_close3 = () => {
-                return genderActionShow.value = false;
-              };
-              const n64 = _createSharedDataComponentWithFallback(_component_up_action_sheet, "4122e85e", {
-                show: () => {
-                  return genderActionShow.value;
-                },
-                actions: () => {
-                  return genderActions.value;
-                },
-                title: "请选择性别",
-                onSelect: () => {
-                  return onGenderSelect;
-                },
-                onClose: () => {
-                  return _on_close3;
-                }
-              });
-              _setSharedData(__sharedData, 6, n64?.sharedData);
-            })
-          });
-          _setSharedData(__sharedData, 1, n66.sharedData);
-        })
-      });
-      _setSharedData(__sharedData, 0, n67.sharedData);
-      return __sharedData;
-    };
+    const __returned__ = { formModel, formModel2, formRules, uForm, uploadList, submitForm, resetForm, genderActionShow, genderActions, onGenderSelect, calendarShow, onCalendarConfirm, pickerShow, pickerColumns, onPickerConfirm, datetimePickerShow, datetimePickerValue, onDatetimePickerConfirm, onUploadAfterRead, onUploadDelete, get AppKu() {
+      return AppKu;
+    }, get LayoutComponent() {
+      return LayoutComponent;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const _style_1 = {};
-const form = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0, _style_1]]]);
+const _style_0 = { "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-row": { "": { "flexDirection": "row" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "ml-10px": { "": { "marginLeft": 10 } }, "mr-10px": { "": { "marginRight": 10 } }, "mt-20px": { "": { "marginTop": 20 } }, "none": { "": { "display": "none" } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "pb-30px": { "": { "paddingBottom": 30 } }, "w-10px": { "": { "width": 10 } } };
+const _style_1 = { "demo-block": { "": { "marginBottom": 12, "paddingTop": 12, "paddingRight": 12, "paddingBottom": 12, "paddingLeft": 12, "backgroundColor": "#ffffff", "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "demo-label": { "": { "fontSize": 14, "fontWeight": "bold", "color": "#606266", "marginBottom": 10, "paddingLeft": 4, "borderLeftWidth": 3, "borderLeftStyle": "solid", "borderLeftColor": "#2979ff" } }, "w-10px": { "": { "width": 10 } }, "mt-20px": { "": { "marginTop": 20 } }, "mr-10px": { "": { "marginRight": 10 } }, "ml-10px": { "": { "marginLeft": 10 } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } } };
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { resolveComponent: _resolveComponent, createVNode: _createVNode, createElementVNode: _createElementVNode, withCtx: _withCtx, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_NavBar = resolveEasycom(__resolveDynamicComponent("NavBar"), __easycom_0);
+  const _component_up_input = resolveEasycom(__resolveDynamicComponent("up-input"), __easycom_1);
+  const _component_up_form_item = resolveEasycom(__resolveDynamicComponent("up-form-item"), __easycom_2);
+  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0$1);
+  const _component_up_radio = resolveEasycom(__resolveDynamicComponent("up-radio"), __easycom_1$1);
+  const _component_up_radio_group = resolveEasycom(__resolveDynamicComponent("up-radio-group"), __easycom_2$1);
+  const _component_up_checkbox = resolveEasycom(__resolveDynamicComponent("up-checkbox"), __easycom_1$2);
+  const _component_up_checkbox_group = resolveEasycom(__resolveDynamicComponent("up-checkbox-group"), __easycom_2$2);
+  const _component_up_switch = resolveEasycom(__resolveDynamicComponent("up-switch"), __easycom_1$3);
+  const _component_up_rate = resolveEasycom(__resolveDynamicComponent("up-rate"), __easycom_1$4);
+  const _component_up_number_box = resolveEasycom(__resolveDynamicComponent("up-number-box"), __easycom_1$5);
+  const _component_up_slider = resolveEasycom(__resolveDynamicComponent("up-slider"), __easycom_1$6);
+  const _component_up_textarea = resolveEasycom(__resolveDynamicComponent("up-textarea"), __easycom_1$7);
+  const _component_up_upload = resolveEasycom(__resolveDynamicComponent("up-upload"), __easycom_1$8);
+  const _component_up_form = resolveEasycom(__resolveDynamicComponent("up-form"), __easycom_14);
+  const _component_up_button = resolveEasycom(__resolveDynamicComponent("up-button"), __easycom_2$3);
+  const _component_up_calendar = resolveEasycom(__resolveDynamicComponent("up-calendar"), __easycom_2$4);
+  const _component_up_picker = resolveEasycom(__resolveDynamicComponent("up-picker"), __easycom_2$5);
+  const _component_up_datetime_picker = resolveEasycom(__resolveDynamicComponent("up-datetime-picker"), __easycom_2$6);
+  const _component_up_action_sheet = resolveEasycom(__resolveDynamicComponent("up-action-sheet"), __easycom_2$7);
+  return _openBlock(), _createBlock($setup["AppKu"], null, {
+    default: _withCtx(() => [
+      _createVNode($setup["LayoutComponent"], {
+        "navigation-style": "custom",
+        "navigation-bar-title-text": "up-form 表单"
+      }, {
+        default: _withCtx(() => [
+          _createElementVNode("view", { class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }, [
+            _createVNode(_component_NavBar, {
+              title: "Form 表单",
+              "auto-back": true,
+              "safe-area-inset-top": true,
+              "bg-color": "#ffffff"
+            }),
+            _createElementVNode("view", { class: "p-16px" }, [
+              _createElementVNode("view", { class: "demo-block" }, [
+                _createElementVNode("text", { class: "demo-label" }, "基础表单示例"),
+                _createVNode(_component_up_form, {
+                  ref: "uForm",
+                  model: $setup.formModel,
+                  rules: $setup.formRules,
+                  "label-width": "90px",
+                  "error-type": "toast"
+                }, {
+                  default: _withCtx(() => [
+                    _createVNode(_component_up_form_item, {
+                      label: "姓名",
+                      prop: "name",
+                      "border-bottom": true,
+                      required: ""
+                    }, {
+                      default: _withCtx(() => [
+                        _createVNode(_component_up_input, {
+                          modelValue: $setup.formModel.name,
+                          "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.formModel.name = $event),
+                          placeholder: "请输入姓名",
+                          border: "none",
+                          clearable: ""
+                        }, null, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    _createVNode(_component_up_form_item, {
+                      label: "性别",
+                      prop: "gender",
+                      "border-bottom": true,
+                      required: "",
+                      onClick: _cache[2] || (_cache[2] = ($event) => $setup.genderActionShow = true)
+                    }, {
+                      right: _withCtx(() => [
+                        _createVNode(_component_up_icon, {
+                          name: "arrow-right",
+                          color: "#c0c4cc",
+                          size: "16"
+                        })
+                      ]),
+                      default: _withCtx(() => [
+                        _createVNode(_component_up_input, {
+                          modelValue: $setup.formModel.gender,
+                          "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.formModel.gender = $event),
+                          disabled: "",
+                          "disabled-color": "#ffffff",
+                          placeholder: "请选择性别",
+                          border: "none"
+                        }, null, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    _createVNode(_component_up_form_item, {
+                      label: "出生日期",
+                      prop: "birthday",
+                      "border-bottom": true,
+                      required: "",
+                      onClick: _cache[4] || (_cache[4] = ($event) => $setup.datetimePickerShow = true)
+                    }, {
+                      right: _withCtx(() => [
+                        _createVNode(_component_up_icon, {
+                          name: "arrow-right",
+                          color: "#c0c4cc",
+                          size: "16"
+                        })
+                      ]),
+                      default: _withCtx(() => [
+                        _createVNode(_component_up_input, {
+                          modelValue: $setup.formModel.birthday,
+                          "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => $setup.formModel.birthday = $event),
+                          disabled: "",
+                          "disabled-color": "#ffffff",
+                          placeholder: "请选择出生日期",
+                          border: "none"
+                        }, null, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    _createVNode(_component_up_form_item, {
+                      label: "国籍",
+                      prop: "country",
+                      "border-bottom": true,
+                      onClick: _cache[6] || (_cache[6] = ($event) => $setup.pickerShow = true)
+                    }, {
+                      right: _withCtx(() => [
+                        _createVNode(_component_up_icon, {
+                          name: "arrow-right",
+                          color: "#c0c4cc",
+                          size: "16"
+                        })
+                      ]),
+                      default: _withCtx(() => [
+                        _createVNode(_component_up_input, {
+                          modelValue: $setup.formModel.country,
+                          "onUpdate:modelValue": _cache[5] || (_cache[5] = ($event) => $setup.formModel.country = $event),
+                          disabled: "",
+                          "disabled-color": "#ffffff",
+                          placeholder: "请选择国籍",
+                          border: "none"
+                        }, null, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    _createVNode(_component_up_form_item, {
+                      label: "行程时间",
+                      prop: "stayTime",
+                      "border-bottom": true,
+                      onClick: _cache[8] || (_cache[8] = ($event) => $setup.calendarShow = true)
+                    }, {
+                      right: _withCtx(() => [
+                        _createVNode(_component_up_icon, {
+                          name: "arrow-right",
+                          color: "#c0c4cc",
+                          size: "16"
+                        })
+                      ]),
+                      default: _withCtx(() => [
+                        _createVNode(_component_up_input, {
+                          modelValue: $setup.formModel.stayTime,
+                          "onUpdate:modelValue": _cache[7] || (_cache[7] = ($event) => $setup.formModel.stayTime = $event),
+                          disabled: "",
+                          "disabled-color": "#ffffff",
+                          placeholder: "请选择日期范围",
+                          border: "none"
+                        }, null, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    _createVNode(_component_up_form_item, {
+                      label: "水果最爱",
+                      prop: "fruit",
+                      "border-bottom": true
+                    }, {
+                      default: _withCtx(() => [
+                        _createVNode(_component_up_radio_group, {
+                          modelValue: $setup.formModel.fruit,
+                          "onUpdate:modelValue": _cache[9] || (_cache[9] = ($event) => $setup.formModel.fruit = $event),
+                          placement: "row"
+                        }, {
+                          default: _withCtx(() => [
+                            _createVNode(_component_up_radio, {
+                              name: "apple",
+                              label: "苹果"
+                            }),
+                            _createElementVNode("view", { class: "w-10px" }),
+                            _createVNode(_component_up_radio, {
+                              name: "banana",
+                              label: "香蕉"
+                            }),
+                            _createElementVNode("view", { class: "w-10px" }),
+                            _createVNode(_component_up_radio, {
+                              name: "orange",
+                              label: "橘子"
+                            })
+                          ]),
+                          _: 1
+                          /* STABLE */
+                        }, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    _createVNode(_component_up_form_item, {
+                      label: "兴趣爱好",
+                      prop: "hobbies",
+                      "border-bottom": true
+                    }, {
+                      default: _withCtx(() => [
+                        _createVNode(_component_up_checkbox_group, {
+                          modelValue: $setup.formModel.hobbies,
+                          "onUpdate:modelValue": _cache[10] || (_cache[10] = ($event) => $setup.formModel.hobbies = $event),
+                          placement: "row"
+                        }, {
+                          default: _withCtx(() => [
+                            _createVNode(_component_up_checkbox, {
+                              name: "reading",
+                              label: "阅读"
+                            }),
+                            _createElementVNode("view", { class: "w-10px" }),
+                            _createVNode(_component_up_checkbox, {
+                              name: "sports",
+                              label: "运动"
+                            }),
+                            _createElementVNode("view", { class: "w-10px" }),
+                            _createVNode(_component_up_checkbox, {
+                              name: "music",
+                              label: "音乐"
+                            })
+                          ]),
+                          _: 1
+                          /* STABLE */
+                        }, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    _createVNode(_component_up_form_item, {
+                      label: "通知开关",
+                      prop: "notification",
+                      "border-bottom": true
+                    }, {
+                      default: _withCtx(() => [
+                        _createVNode(_component_up_switch, {
+                          modelValue: $setup.formModel.notification,
+                          "onUpdate:modelValue": _cache[11] || (_cache[11] = ($event) => $setup.formModel.notification = $event),
+                          "active-color": "#2979ff"
+                        }, null, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    _createVNode(_component_up_form_item, {
+                      label: "服务评分",
+                      prop: "rate",
+                      "border-bottom": true
+                    }, {
+                      default: _withCtx(() => [
+                        _createVNode(_component_up_rate, {
+                          modelValue: $setup.formModel.rate,
+                          "onUpdate:modelValue": _cache[12] || (_cache[12] = ($event) => $setup.formModel.rate = $event),
+                          count: 5
+                        }, null, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    _createVNode(_component_up_form_item, {
+                      label: "购买数量",
+                      prop: "count",
+                      "border-bottom": true
+                    }, {
+                      default: _withCtx(() => [
+                        _createVNode(_component_up_number_box, {
+                          modelValue: $setup.formModel.count,
+                          "onUpdate:modelValue": _cache[13] || (_cache[13] = ($event) => $setup.formModel.count = $event),
+                          min: 1,
+                          max: 100
+                        }, null, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    _createVNode(_component_up_form_item, {
+                      label: "满意度",
+                      prop: "satisfaction",
+                      "border-bottom": true
+                    }, {
+                      default: _withCtx(() => [
+                        _createVNode(_component_up_slider, {
+                          modelValue: $setup.formModel.satisfaction,
+                          "onUpdate:modelValue": _cache[14] || (_cache[14] = ($event) => $setup.formModel.satisfaction = $event),
+                          min: 0,
+                          max: 100,
+                          "show-value": true,
+                          style: { "width": "100%" }
+                        }, null, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    _createVNode(_component_up_form_item, {
+                      label: "个人简介",
+                      prop: "intro",
+                      "border-bottom": true,
+                      "label-position": "top"
+                    }, {
+                      default: _withCtx(() => [
+                        _createVNode(_component_up_textarea, {
+                          modelValue: $setup.formModel.intro,
+                          "onUpdate:modelValue": _cache[15] || (_cache[15] = ($event) => $setup.formModel.intro = $event),
+                          placeholder: "请输入个人简介",
+                          count: "",
+                          maxlength: 100
+                        }, null, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    _createVNode(_component_up_form_item, {
+                      label: "相关照片",
+                      prop: "photos",
+                      "border-bottom": true,
+                      "label-position": "top"
+                    }, {
+                      default: _withCtx(() => [
+                        _createVNode(_component_up_upload, {
+                          "file-list": $setup.uploadList,
+                          multiple: true,
+                          "max-count": 3,
+                          width: "80px",
+                          height: "80px",
+                          onAfterRead: $setup.onUploadAfterRead,
+                          onDelete: $setup.onUploadDelete
+                        }, null, 8, ["file-list"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    })
+                  ]),
+                  _: 1
+                  /* STABLE */
+                }, 8, ["model"])
+              ]),
+              _createElementVNode("view", { class: "demo-block" }, [
+                _createElementVNode("text", { class: "demo-label" }, "标签上方对齐"),
+                _createVNode(_component_up_form, {
+                  model: $setup.formModel2,
+                  "label-position": "top",
+                  "label-width": "100px"
+                }, {
+                  default: _withCtx(() => [
+                    _createVNode(_component_up_form_item, {
+                      label: "活动名称",
+                      prop: "name",
+                      "border-bottom": true
+                    }, {
+                      default: _withCtx(() => [
+                        _createVNode(_component_up_input, {
+                          modelValue: $setup.formModel2.name,
+                          "onUpdate:modelValue": _cache[16] || (_cache[16] = ($event) => $setup.formModel2.name = $event),
+                          placeholder: "请输入活动名称",
+                          border: "none"
+                        }, null, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    }),
+                    _createVNode(_component_up_form_item, {
+                      label: "活动详情",
+                      prop: "detail",
+                      "border-bottom": true
+                    }, {
+                      default: _withCtx(() => [
+                        _createVNode(_component_up_textarea, {
+                          modelValue: $setup.formModel2.detail,
+                          "onUpdate:modelValue": _cache[17] || (_cache[17] = ($event) => $setup.formModel2.detail = $event),
+                          placeholder: "请输入活动详情",
+                          border: "none"
+                        }, null, 8, ["modelValue"])
+                      ]),
+                      _: 1
+                      /* STABLE */
+                    })
+                  ]),
+                  _: 1
+                  /* STABLE */
+                }, 8, ["model"])
+              ]),
+              _createElementVNode("view", { class: "mt-20px flex-row justify-between" }, [
+                _createElementVNode("view", { class: "flex-1 mr-10px" }, [
+                  _createVNode(_component_up_button, {
+                    type: "primary",
+                    text: "提交表单",
+                    onClick: $setup.submitForm
+                  })
+                ]),
+                _createElementVNode("view", { class: "flex-1 ml-10px" }, [
+                  _createVNode(_component_up_button, {
+                    type: "info",
+                    text: "重置表单",
+                    onClick: $setup.resetForm
+                  })
+                ])
+              ])
+            ]),
+            _createVNode(_component_up_calendar, {
+              show: $setup.calendarShow,
+              mode: "range",
+              onConfirm: $setup.onCalendarConfirm,
+              onClose: _cache[18] || (_cache[18] = ($event) => $setup.calendarShow = false)
+            }, null, 8, ["show"]),
+            _createVNode(_component_up_picker, {
+              show: $setup.pickerShow,
+              columns: $setup.pickerColumns,
+              onConfirm: $setup.onPickerConfirm,
+              onCancel: _cache[19] || (_cache[19] = ($event) => $setup.pickerShow = false),
+              onClose: _cache[20] || (_cache[20] = ($event) => $setup.pickerShow = false)
+            }, null, 8, ["show", "columns"]),
+            _createVNode(_component_up_datetime_picker, {
+              modelValue: $setup.datetimePickerValue,
+              "onUpdate:modelValue": _cache[21] || (_cache[21] = ($event) => $setup.datetimePickerValue = $event),
+              show: $setup.datetimePickerShow,
+              mode: "date",
+              "min-date": 0,
+              onConfirm: $setup.onDatetimePickerConfirm,
+              onCancel: _cache[22] || (_cache[22] = ($event) => $setup.datetimePickerShow = false),
+              onClose: _cache[23] || (_cache[23] = ($event) => $setup.datetimePickerShow = false)
+            }, null, 8, ["modelValue", "show"]),
+            _createVNode(_component_up_action_sheet, {
+              show: $setup.genderActionShow,
+              actions: $setup.genderActions,
+              title: "请选择性别",
+              onSelect: $setup.onGenderSelect,
+              onClose: _cache[24] || (_cache[24] = ($event) => $setup.genderActionShow = false)
+            }, null, 8, ["show", "actions"])
+          ])
+        ]),
+        _: 1
+        /* STABLE */
+      })
+    ]),
+    _: 1
+    /* STABLE */
+  });
+}
+const form = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0, _style_1]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/form/form.uvue"]]);
 export {
   form as default
 };

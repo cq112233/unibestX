@@ -1,17 +1,11 @@
 import { e as getWindowInfo, a as addUnit, d as deepMerge, b as addStyle, s as sleep } from "../../libs/function/index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, setSharedDataStyle: _setSharedDataStyle, toSharedDataNumber: _toSharedDataNumber, toSharedDataAttrBoolean: _toSharedDataAttrBoolean, toSharedDataScrollViewRefresherDefaultStyle: _toSharedDataScrollViewRefresherDefaultStyle, toSharedDataColor: _toSharedDataColor, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataSlot: _createSharedDataSlot, setSharedDataEvent: _setSharedDataEvent } = globalThis.Vue;
-const __className = "GenUniModulesUviewUltraComponentsUpListUpList";
+const { defineComponent: _defineComponent } = globalThis.Vue;
 const { ref, computed, provide } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+const _sfc_main = /* @__PURE__ */ _defineComponent({
   ...{
     name: "up-list"
   },
-  __dynamicSharedData: true,
-  __hash: "3e309736",
-  __className,
-  __filename: "uni_modules/uview-ultra/components/up-list/up-list.uvue",
   __name: "up-list",
   props: {
     showScrollbar: {
@@ -89,9 +83,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     "refresherabort"
   ],
   setup(__props, _a) {
-    var __emit = _a.emit;
-    const __sharedDataScope = _useSharedDataScope();
-    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpListUpListSharedData", sharedDataClassId: 0 })));
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
     const props = __props;
     const emit = __emit;
     const innerScrollTop = ref(0);
@@ -143,36 +136,43 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     function refresherabort(e) {
       emit("refresherabort", e);
     }
-    return () => {
-      "raw js";
-      _renderSharedDataEffect(() => {
-        _setSharedDataAttr(__sharedData, 7, _toSharedDataString(__props.scrollIntoView));
-        _setSharedDataStyle(__sharedData, 8, [listStyle.value]);
-        _setSharedDataAttr(__sharedData, 9, _toSharedDataNumber(parseFloat(__props.scrollTop.toString())));
-        _setSharedDataAttr(__sharedData, 10, _toSharedDataNumber(parseFloat(__props.lowerThreshold.toString())));
-        _setSharedDataAttr(__sharedData, 11, _toSharedDataNumber(parseFloat(__props.upperThreshold.toString())));
-        _setSharedDataAttr(__sharedData, 12, _toSharedDataAttrBoolean(__props.showScrollbar, true));
-        _setSharedDataAttr(__sharedData, 13, _toSharedDataAttrBoolean(__props.scrollWithAnimation, false));
-        _setSharedDataAttr(__sharedData, 14, _toSharedDataAttrBoolean(__props.refresherEnabled, false));
-        _setSharedDataAttr(__sharedData, 15, _toSharedDataNumber(__props.refresherThreshold));
-        _setSharedDataAttr(__sharedData, 16, _toSharedDataScrollViewRefresherDefaultStyle(__props.refresherDefaultStyle));
-        _setSharedDataAttr(__sharedData, 17, _toSharedDataColor(__props.refresherBackground));
-        _setSharedDataAttr(__sharedData, 18, _toSharedDataAttrBoolean(__props.refresherTriggered, false));
-      });
-      _createSharedDataSlot("default", null, null);
-      _setSharedDataEvent(__sharedData, 0, onScroll);
-      _setSharedDataEvent(__sharedData, 1, scrolltolower);
-      _setSharedDataEvent(__sharedData, 2, scrolltoupper);
-      _setSharedDataEvent(__sharedData, 3, refresherpulling);
-      _setSharedDataEvent(__sharedData, 4, refresherrefresh);
-      _setSharedDataEvent(__sharedData, 5, refresherrestore);
-      _setSharedDataEvent(__sharedData, 6, refresherabort);
-      return __sharedData;
-    };
+    const __returned__ = { props, emit, innerScrollTop, offset, sys, listStyle, onScroll, scrolltolower, scrolltoupper, refresherpulling, refresherrefresh, refresherrestore, refresherabort };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
   }
 });
-const _style_0 = {};
-const __easycom_3 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+const _style_0 = { "up-list": { "": { "flexDirection": "column" } } };
+const { renderSlot: _renderSlot, createElementVNode: _createElementVNode, normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createElementBlock("scroll-view", {
+    class: "up-list",
+    direction: "vertical",
+    "scroll-into-view": $props.scrollIntoView,
+    style: _normalizeStyle([$setup.listStyle]),
+    "scroll-top": parseFloat($props.scrollTop.toString()),
+    "lower-threshold": parseFloat($props.lowerThreshold.toString()),
+    "upper-threshold": parseFloat($props.upperThreshold.toString()),
+    "show-scrollbar": $props.showScrollbar,
+    "scroll-with-animation": $props.scrollWithAnimation,
+    onScroll: $setup.onScroll,
+    onScrolltolower: $setup.scrolltolower,
+    onScrolltoupper: $setup.scrolltoupper,
+    "refresher-enabled": $props.refresherEnabled,
+    "refresher-threshold": $props.refresherThreshold,
+    "refresher-default-style": $props.refresherDefaultStyle,
+    "refresher-background": $props.refresherBackground,
+    "refresher-triggered": $props.refresherTriggered,
+    onRefresherpulling: $setup.refresherpulling,
+    onRefresherrefresh: $setup.refresherrefresh,
+    onRefresherrestore: $setup.refresherrestore,
+    onRefresherabort: $setup.refresherabort
+  }, [
+    _createElementVNode("view", null, [
+      _renderSlot(_ctx.$slots, "default")
+    ])
+  ], 44, ["scroll-into-view", "scroll-top", "lower-threshold", "upper-threshold", "show-scrollbar", "scroll-with-animation", "refresher-enabled", "refresher-threshold", "refresher-default-style", "refresher-background", "refresher-triggered"]);
+}
+const __easycom_3 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-list/up-list.uvue"]]);
 export {
   __easycom_3 as _
 };
