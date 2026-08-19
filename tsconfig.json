@@ -2,13 +2,20 @@
   "compilerOptions": {
     "target": "esnext",
     "jsx": "preserve",
-    "lib": ["esnext", "dom"],
+    "lib": [
+      "esnext",
+      "dom"
+    ],
     "baseUrl": ".",
     "module": "esnext",
     "moduleResolution": "bundler",
     "paths": {
-      "@/*": ["./*"],
-      "@img/*": ["./static/*"]
+      "@/*": [
+        "./*"
+      ],
+      "@img/*": [
+        "./static/*"
+      ]
     },
     "resolveJsonModule": true,
     "types": [
@@ -18,7 +25,10 @@
     "plugins": [
       {
         "name": "@vue/typescript-plugin",
-        "languages": ["vue", "uvue"]
+        "languages": [
+          "vue",
+          "uvue"
+        ]
       }
     ],
     "allowArbitraryExtensions": true,
@@ -34,6 +44,9 @@
     "extensions": [
       ".vue",
       ".uvue"
+    ],
+    "plugins": [
+      "./.vscode/uts-volar-plugin/index.cjs"
     ]
   },
   "include": [
