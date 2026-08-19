@@ -20,6 +20,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const themeButton = common_vendor.computed(() => {
       return src_utils_i18n.$t("basic.themeButton");
     });
+    const darkLabel = common_vendor.computed(() => {
+      return src_utils_i18n.$t("basic.themeDark");
+    });
     const currentTheme = common_vendor.computed(() => {
       return appStore.state.theme;
     });
@@ -37,6 +40,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         icon: "none",
         duration: 1500
       });
+    }
+    function handleDarkChange(e) {
+      appStore.setDarkMode(e.detail.value);
     }
     return (_ctx, _cache) => {
       "raw js";
@@ -56,12 +62,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }, index)
           });
         }),
-        e: common_vendor.gei(_ctx, ""),
-        f: common_vendor.p({
+        e: common_vendor.t(darkLabel.value),
+        f: common_vendor.unref(appStore).state.isDark,
+        g: common_vendor.o(handleDarkChange, "c3"),
+        h: common_vendor.gei(_ctx, ""),
+        i: common_vendor.p({
           title: themeTitle.value,
           id: common_vendor.gei(_ctx, "")
         }),
-        g: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        j: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
       return __returned__;
     };

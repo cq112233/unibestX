@@ -1,5 +1,5 @@
 import { _ as __easycom_0 } from "../../components/NavBar/NavBar.js";
-import { _ as _sfc_main$1 } from "../../../App.ku.js";
+import { A as AppKu } from "../../../App.ku.js";
 import { L as LayoutComponent } from "../../layouts/default.js";
 import { h as handleBackPressExit } from "../../utils/backPress.js";
 import { _ as _export_sfc } from "../../../plugin-vue-export-helper.js";
@@ -70,7 +70,7 @@ const __className = "GenSrcPagesIndexIndex";
 const { onBackPress, ref } = globalThis.Vue;
 const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   __dynamicSharedData: true,
-  __hash: "3db0ad20",
+  __hash: "7e8f956c",
   __className,
   __filename: "src/pages/index/index.uvue",
   __name: "index",
@@ -94,7 +94,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     return () => {
       "raw js";
       const _component_NavBar = __easycom_0;
-      const n30 = _createSharedDataComponent(_sfc_main$1, "05e1f953", null, {
+      const n30 = _createSharedDataComponent(AppKu, "05e1f953", null, {
         "default": _withSharedDataVaporCtx(() => {
           const n29 = _createSharedDataComponent(LayoutComponent, "93459dfa", {
             "navigation-style": "custom",

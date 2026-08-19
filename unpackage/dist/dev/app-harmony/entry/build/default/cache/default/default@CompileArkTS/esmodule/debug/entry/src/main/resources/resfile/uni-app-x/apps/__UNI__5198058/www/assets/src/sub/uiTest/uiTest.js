@@ -1,5 +1,5 @@
 import { l as logoImg } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/sub/uiTest/images/logo&";
-import { _ as _sfc_main$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
+import { A as AppKu } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { L as LayoutComponent } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/layouts/default&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-toast/up-toast&";
@@ -79,7 +79,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     const logoSrc = logoImg;
     return () => {
       "raw js";
-      const n10 = _createSharedDataComponent(_sfc_main$1, "86c4cc4a", null, {
+      const n10 = _createSharedDataComponent(AppKu, "86c4cc4a", null, {
         "default": _withSharedDataVaporCtx(() => {
           const n9 = _createSharedDataComponent(LayoutComponent, "51d4bd0a", { "navigation-bar-title-text": "UI 测试" }, {
             "default": () => {

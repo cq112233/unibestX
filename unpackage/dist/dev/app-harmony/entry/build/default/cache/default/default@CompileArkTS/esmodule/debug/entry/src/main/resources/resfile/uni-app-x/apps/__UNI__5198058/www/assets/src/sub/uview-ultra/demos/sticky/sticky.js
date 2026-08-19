@@ -1,7 +1,7 @@
 import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/components/NavBar/NavBar&";
 import { _ as __easycom_2 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-button/up-button&";
 import { _ as __easycom_2$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-sticky/up-sticky&";
-import { _ as _sfc_main$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
+import { A as AppKu } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { L as LayoutComponent } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/layouts/default&";
 import { s as safeAreaInsets, a as systemInfo } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/systemInfo&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
@@ -97,7 +97,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       const _component_NavBar = __easycom_0;
       const _component_up_button = __easycom_2;
       const _component_up_sticky = __easycom_2$1;
-      const n18 = _createSharedDataComponent(_sfc_main$1, "631e8033", null, {
+      const n18 = _createSharedDataComponent(AppKu, "631e8033", null, {
         "default": _withSharedDataVaporCtx(() => {
           const n17 = _createSharedDataComponent(LayoutComponent, "00b18623", {
             "navigation-style": "custom",

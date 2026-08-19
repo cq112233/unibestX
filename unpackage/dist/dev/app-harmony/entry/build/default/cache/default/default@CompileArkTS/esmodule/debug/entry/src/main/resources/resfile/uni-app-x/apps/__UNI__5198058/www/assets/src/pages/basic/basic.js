@@ -1,4 +1,4 @@
-import { _ as _sfc_main$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
+import { A as AppKu } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { T as ToastDemoCard } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/ToastDemoCard&";
 import { P as PropsDemoCard } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/PropsDemoCard&";
 import { I as IconDemoCard } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/IconDemoCard&";
@@ -116,7 +116,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     });
     return () => {
       "raw js";
-      const n11 = _createSharedDataComponent(_sfc_main$1, "56ab5a5a", null, {
+      const n11 = _createSharedDataComponent(AppKu, "56ab5a5a", null, {
         "default": _withSharedDataVaporCtx(() => {
           const n0 = _createSharedDataComponent(UViewUltraDemoCard, "5360e8b4");
           _setSharedData(__sharedData, 1, n0.sharedData);

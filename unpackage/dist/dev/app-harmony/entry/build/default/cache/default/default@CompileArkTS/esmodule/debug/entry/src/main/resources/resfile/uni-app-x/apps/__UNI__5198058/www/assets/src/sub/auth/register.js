@@ -1,4 +1,4 @@
-import { _ as _sfc_main$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
+import { A as AppKu } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { L as LayoutComponent } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/layouts/default&";
 import { L as LOGIN_PAGE } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/router/config&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
@@ -89,7 +89,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     }
     return () => {
       "raw js";
-      const n6 = _createSharedDataComponent(_sfc_main$1, "505f345a", null, {
+      const n6 = _createSharedDataComponent(AppKu, "505f345a", null, {
         "default": _withSharedDataVaporCtx(() => {
           const n5 = _createSharedDataComponent(LayoutComponent, "88f15248", { "navigation-bar-title-text": "注册" }, {
             "default": () => {

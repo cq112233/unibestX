@@ -2,8 +2,8 @@ import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfi
 import { _ as __easycom_1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-th/up-th&";
 import { _ as __easycom_2 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-tr/up-tr&";
 import { _ as __easycom_3 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-td/up-td&";
-import { _ as _sfc_main$2 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-table/up-table&";
-import { _ as _sfc_main$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
+import { _ as _sfc_main$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-table/up-table&";
+import { A as AppKu } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { L as LayoutComponent } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/layouts/default&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/systemInfo&";
@@ -88,8 +88,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       const _component_up_th = __easycom_1;
       const _component_up_tr = __easycom_2;
       const _component_up_td = __easycom_3;
-      const _component_up_table = _sfc_main$2;
-      const n31 = _createSharedDataComponent(_sfc_main$1, "15f49221", null, {
+      const _component_up_table = _sfc_main$1;
+      const n31 = _createSharedDataComponent(AppKu, "15f49221", null, {
         "default": _withSharedDataVaporCtx(() => {
           const n30 = _createSharedDataComponent(LayoutComponent, "aec49c16", {
             "navigation-style": "custom",

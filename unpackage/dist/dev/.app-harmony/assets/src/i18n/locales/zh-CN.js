@@ -20,6 +20,7 @@ const basic = new UTSJSONObject({
   themePreview: "主题色效果预览",
   themeButton: "主题按钮",
   themeSuccess: "应用与组件库主题色切换成功",
+  themeDark: "暗黑模式",
   echartTitle: "ECharts 图表示例",
   echartLine: "折线图",
   echartBar: "柱状图",

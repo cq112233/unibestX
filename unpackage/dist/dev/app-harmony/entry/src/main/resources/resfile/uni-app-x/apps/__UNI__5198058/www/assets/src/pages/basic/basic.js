@@ -1,4 +1,4 @@
-import { _ as _sfc_main$1 } from "../../../App.ku.js";
+import { A as AppKu } from "../../../App.ku.js";
 import { T as ToastDemoCard } from "./components/ToastDemoCard.js";
 import { P as PropsDemoCard } from "./components/PropsDemoCard.js";
 import { I as IconDemoCard } from "./components/IconDemoCard.js";
@@ -116,7 +116,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     });
     return () => {
       "raw js";
-      const n11 = _createSharedDataComponent(_sfc_main$1, "56ab5a5a", null, {
+      const n11 = _createSharedDataComponent(AppKu, "56ab5a5a", null, {
         "default": _withSharedDataVaporCtx(() => {
           const n0 = _createSharedDataComponent(UViewUltraDemoCard, "5360e8b4");
           _setSharedData(__sharedData, 1, n0.sharedData);

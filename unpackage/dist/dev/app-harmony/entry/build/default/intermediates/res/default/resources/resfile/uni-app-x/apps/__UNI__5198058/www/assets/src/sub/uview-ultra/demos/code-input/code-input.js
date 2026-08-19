@@ -1,6 +1,6 @@
 import { _ as __easycom_0 } from "../../../../components/NavBar/NavBar.js";
 import { _ as __easycom_1 } from "../../../../../uni_modules/uview-ultra/components/up-code-input/up-code-input.js";
-import { _ as _sfc_main$1 } from "../../../../../App.ku.js";
+import { A as AppKu } from "../../../../../App.ku.js";
 import { L as LayoutComponent } from "../../../../layouts/default.js";
 import { _ as _export_sfc } from "../../../../../plugin-vue-export-helper.js";
 import "../../../../utils/systemInfo.js";
@@ -89,7 +89,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       "raw js";
       const _component_NavBar = __easycom_0;
       const _component_up_code_input = __easycom_1;
-      const n13 = _createSharedDataComponent(_sfc_main$1, "497d0bfe", null, {
+      const n13 = _createSharedDataComponent(AppKu, "497d0bfe", null, {
         "default": _withSharedDataVaporCtx(() => {
           const n12 = _createSharedDataComponent(LayoutComponent, "e62473d6", {
             "navigation-style": "custom",

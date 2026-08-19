@@ -1,4 +1,4 @@
-import { _ as _sfc_main$1 } from "../../../App.ku.js";
+import { A as AppKu } from "../../../App.ku.js";
 import { L as LayoutComponent } from "../../layouts/default.js";
 import { _ as _export_sfc } from "../../../plugin-vue-export-helper.js";
 import "../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
@@ -98,7 +98,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     }
     return () => {
       "raw js";
-      const n17 = _createSharedDataComponent(_sfc_main$1, "51fce8f3", null, {
+      const n17 = _createSharedDataComponent(AppKu, "51fce8f3", null, {
         "default": _withSharedDataVaporCtx(() => {
           const n16 = _createSharedDataComponent(LayoutComponent, "24bf953a", { "navigation-bar-title-text": "测试" }, {
             "default": () => {

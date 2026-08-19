@@ -1,4 +1,4 @@
-import { _ as _sfc_main$1 } from "../../../App.ku.js";
+import { A as AppKu } from "../../../App.ku.js";
 import { L as LayoutComponent } from "../../layouts/default.js";
 import "../../store/index.js";
 import { i as isPageTabbar, a as setCurIdxByPath } from "../../tabbar/store.js";
@@ -135,7 +135,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     }
     return () => {
       "raw js";
-      const n6 = _createSharedDataComponent(_sfc_main$1, "44259de4", null, {
+      const n6 = _createSharedDataComponent(AppKu, "44259de4", null, {
         "default": _withSharedDataVaporCtx(() => {
           const n5 = _createSharedDataComponent(LayoutComponent, "408e1e92", { "navigation-bar-title-text": "登录" }, {
             "default": () => {

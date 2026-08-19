@@ -1,4 +1,4 @@
-import { _ as _sfc_main$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
+import { A as AppKu } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { E as EnvCard } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/function/components/EnvCard&";
 import { S as SystemInfoCard } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/function/components/SystemInfoCard&";
 import { H as HapticsCard } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/function/components/HapticsCard&";
@@ -121,7 +121,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     });
     return () => {
       "raw js";
-      const n15 = _createSharedDataComponent(_sfc_main$1, "13021a83", null, {
+      const n15 = _createSharedDataComponent(AppKu, "13021a83", null, {
         "default": _withSharedDataVaporCtx(() => {
           const n3 = _createSharedDataComponent(EnvCard, "5ae58bc7");
           _setSharedData(__sharedData, 1, n3.sharedData);

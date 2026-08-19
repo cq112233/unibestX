@@ -12,13 +12,13 @@ import { _ as __easycom_1$5 } from "@normalized:N&&&entry/src/main/resources/res
 import { _ as __easycom_1$6 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-slider/up-slider&";
 import { _ as __easycom_1$7 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-textarea/up-textarea&";
 import { _ as __easycom_1$8 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-upload/up-upload&";
-import { _ as _sfc_main$2 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-form/up-form&";
+import { _ as _sfc_main$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-form/up-form&";
 import { _ as __easycom_2$3 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-button/up-button&";
 import { _ as __easycom_2$4 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-calendar/up-calendar&";
 import { _ as __easycom_2$5 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-picker/up-picker&";
 import { _ as __easycom_2$6 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-datetime-picker/up-datetime-picker&";
 import { _ as __easycom_2$7 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-action-sheet/up-action-sheet&";
-import { _ as _sfc_main$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
+import { A as AppKu } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { L as LayoutComponent } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/layouts/default&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/systemInfo&";
@@ -314,13 +314,13 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       const _component_up_slider = __easycom_1$6;
       const _component_up_textarea = __easycom_1$7;
       const _component_up_upload = __easycom_1$8;
-      const _component_up_form = _sfc_main$2;
+      const _component_up_form = _sfc_main$1;
       const _component_up_button = __easycom_2$3;
       const _component_up_calendar = __easycom_2$4;
       const _component_up_picker = __easycom_2$5;
       const _component_up_datetime_picker = __easycom_2$6;
       const _component_up_action_sheet = __easycom_2$7;
-      const n67 = _createSharedDataComponent(_sfc_main$1, "b189a5ae", null, {
+      const n67 = _createSharedDataComponent(AppKu, "b189a5ae", null, {
         "default": _withSharedDataVaporCtx(() => {
           const n66 = _createSharedDataComponent(LayoutComponent, "402a77ed", {
             "navigation-style": "custom",

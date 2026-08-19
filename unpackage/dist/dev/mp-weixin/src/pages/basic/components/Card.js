@@ -14,8 +14,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const __returned__ = {
         a: common_vendor.t(__props.title),
         b: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        c: `${_ctx.u_s_b_h}px`,
-        d: `${_ctx.u_s_a_i_b}px`,
+        c: common_vendor.s({
+          backgroundColor: "var(--card-bg, #ffffff)",
+          borderColor: "var(--border-color, #edf2f7)"
+        }),
+        d: common_vendor.s({
+          "--status-bar-height": `${_ctx.u_s_b_h}px`,
+          "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
+        }),
         e: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
       return __returned__;

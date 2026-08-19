@@ -1,4 +1,4 @@
-import { _ as _sfc_main$1 } from "../../../App.ku.js";
+import { A as AppKu } from "../../../App.ku.js";
 import { L as LayoutComponent } from "../../layouts/default.js";
 import { L as LOGIN_PAGE } from "../../router/config.js";
 import { _ as _export_sfc } from "../../../plugin-vue-export-helper.js";
@@ -89,7 +89,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     }
     return () => {
       "raw js";
-      const n6 = _createSharedDataComponent(_sfc_main$1, "505f345a", null, {
+      const n6 = _createSharedDataComponent(AppKu, "505f345a", null, {
         "default": _withSharedDataVaporCtx(() => {
           const n5 = _createSharedDataComponent(LayoutComponent, "88f15248", { "navigation-bar-title-text": "注册" }, {
             "default": () => {

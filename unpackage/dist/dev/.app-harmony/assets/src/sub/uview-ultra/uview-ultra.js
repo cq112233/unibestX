@@ -2,7 +2,7 @@ import { _ as __easycom_0 } from "../../components/NavBar/NavBar.js";
 import { _ as __easycom_0$1 } from "../../../uni_modules/uview-ultra/components/up-icon/up-icon.js";
 import { _ as __easycom_1 } from "../../../uni_modules/uview-ultra/components/up-cell/up-cell.js";
 import { _ as __easycom_2 } from "../../../uni_modules/uview-ultra/components/up-cell-group/up-cell-group.js";
-import { _ as _sfc_main$1 } from "../../../App.ku.js";
+import { A as AppKu } from "../../../App.ku.js";
 import { L as LayoutComponent } from "../../layouts/default.js";
 import "../../store/index.js";
 import { u as useAppStore } from "../../store/app.js";
@@ -99,7 +99,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       const _component_up_icon = __easycom_0$1;
       const _component_up_cell = __easycom_1;
       const _component_up_cell_group = __easycom_2;
-      const n237 = _createSharedDataComponent(_sfc_main$1, "078c97b3", null, {
+      const n237 = _createSharedDataComponent(AppKu, "078c97b3", null, {
         "default": _withSharedDataVaporCtx(() => {
           const n236 = _createSharedDataComponent(LayoutComponent, "2bf342ba", {
             "navigation-style": "custom",

@@ -282,7 +282,7 @@
       };
     }
   });
-  const _style_0$3l = {};
+  const _style_0$3m = {};
   const _style_1$1c = {};
   const _export_sfc = (sfc, props) => {
     const target = sfc.__vccOpts || sfc;
@@ -291,7 +291,7 @@
     }
     return target;
   };
-  const __easycom_0$a = /* @__PURE__ */ _export_sfc(_sfc_main$3r, [["styles", [_style_0$3l, _style_1$1c]]]);
+  const __easycom_0$a = /* @__PURE__ */ _export_sfc(_sfc_main$3r, [["styles", [_style_0$3m, _style_1$1c]]]);
   const config = new UTSJSONObject({
     v: "4",
     version: "4",
@@ -1480,8 +1480,8 @@
       return __sharedData;
     };
   } }));
-  const _style_0$3k = {};
-  const __easycom_1$Y = /* @__PURE__ */ _export_sfc(_sfc_main$3q, [["styles", [_style_0$3k]]]);
+  const _style_0$3l = {};
+  const __easycom_1$Y = /* @__PURE__ */ _export_sfc(_sfc_main$3q, [["styles", [_style_0$3l]]]);
   const icons = new UTSJSONObject({
     "upicon-level": "",
     "upicon-column-line": "",
@@ -2152,8 +2152,8 @@
       };
     }
   });
-  const _style_0$3j = {"@FONT-FACE":[{"src":"url(\"/assets/iconfont.4bc8cc97.ttf\")","fontFamily":"iconfont"}]};
-  const __easycom_0$9 = /* @__PURE__ */ _export_sfc(_sfc_main$3p, [["styles", [_style_0$3j]]]);
+  const _style_0$3k = {"@FONT-FACE":[{"src":"url(\"/assets/iconfont.4bc8cc97.ttf\")","fontFamily":"iconfont"}]};
+  const __easycom_0$9 = /* @__PURE__ */ _export_sfc(_sfc_main$3p, [["styles", [_style_0$3k]]]);
   new UTSJSONObject({
     // 将自定义节点设置成虚拟的，更加接近Vue组件的表现，能更好的使用flex属性
   });
@@ -2212,8 +2212,8 @@
       return __sharedData;
     };
   } }));
-  const _style_0$3i = {};
-  const __easycom_1$X = /* @__PURE__ */ _export_sfc(_sfc_main$3o, [["styles", [_style_0$3i]]]);
+  const _style_0$3j = {};
+  const __easycom_1$X = /* @__PURE__ */ _export_sfc(_sfc_main$3o, [["styles", [_style_0$3j]]]);
   new UTSJSONObject({
     // transition动画组件的props
     transition: new UTSJSONObject({
@@ -2409,8 +2409,8 @@
       return __sharedData;
     };
   } }));
-  const _style_0$3h = {};
-  const __easycom_1$W = /* @__PURE__ */ _export_sfc(_sfc_main$3n, [["styles", [_style_0$3h]]]);
+  const _style_0$3i = {};
+  const __easycom_1$W = /* @__PURE__ */ _export_sfc(_sfc_main$3n, [["styles", [_style_0$3i]]]);
   const __className$3l = "GenUniModulesUviewUltraComponentsUpOverlayUpOverlay";
   const _sfc_main$3m = /* @__PURE__ */ vue.defineVaporSharedDataComponent(Object.assign({
     name: "up-overlay"
@@ -2491,8 +2491,8 @@
       return __sharedData;
     };
   } }));
-  const _style_0$3g = {};
-  const __easycom_2$m = /* @__PURE__ */ _export_sfc(_sfc_main$3m, [["styles", [_style_0$3g]]]);
+  const _style_0$3h = {};
+  const __easycom_2$m = /* @__PURE__ */ _export_sfc(_sfc_main$3m, [["styles", [_style_0$3h]]]);
   const color = new UTSJSONObject({
     primary: "#3c9cff",
     info: "#909399",
@@ -2719,8 +2719,8 @@
       return __sharedData;
     };
   } }));
-  const _style_0$3f = {};
-  const __easycom_2$l = /* @__PURE__ */ _export_sfc(_sfc_main$3l, [["styles", [_style_0$3f]]]);
+  const _style_0$3g = {};
+  const __easycom_2$l = /* @__PURE__ */ _export_sfc(_sfc_main$3l, [["styles", [_style_0$3g]]]);
   class CustomTabBarItem extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -3561,8 +3561,8 @@
       return __sharedData;
     };
   } }));
-  const _style_0$3e = {"@FONT-FACE":[{"src":"url('/assets/uniicons.32e978a5.ttf')","fontFamily":"UniIconsFontFamily"}]};
-  const __easycom_1$V = /* @__PURE__ */ _export_sfc(_sfc_main$3k, [["styles", [_style_0$3e]]]);
+  const _style_0$3f = {"@FONT-FACE":[{"src":"url('/assets/uniicons.32e978a5.ttf')","fontFamily":"UniIconsFontFamily"}]};
+  const __easycom_1$V = /* @__PURE__ */ _export_sfc(_sfc_main$3k, [["styles", [_style_0$3f]]]);
   class I18nErrorCodesTypes extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -4451,6 +4451,7 @@
     themePreview: "主题色效果预览",
     themeButton: "主题按钮",
     themeSuccess: "应用与组件库主题色切换成功",
+    themeDark: "暗黑模式",
     echartTitle: "ECharts 图表示例",
     echartLine: "折线图",
     echartBar: "柱状图",
@@ -4501,6 +4502,7 @@
     themePreview: "Theme Color Preview",
     themeButton: "Theme Button",
     themeSuccess: "App & Component Library theme color updated successfully",
+    themeDark: "Dark Mode",
     echartTitle: "ECharts Chart Demo",
     echartLine: "Line Chart",
     echartBar: "Bar Chart",
@@ -4671,8 +4673,8 @@
       };
     }
   });
-  const _style_0$3d = {};
-  const TabbarItem = /* @__PURE__ */ _export_sfc(_sfc_main$3j, [["styles", [_style_0$3d]]]);
+  const _style_0$3e = {};
+  const TabbarItem = /* @__PURE__ */ _export_sfc(_sfc_main$3j, [["styles", [_style_0$3e]]]);
   const __className$3h = "GenSrcTabbarIndex";
   const TABBAR_HEIGHT = 50;
   const TABBAR_CONTAINER_HEIGHT = 80;
@@ -4762,8 +4764,8 @@
       };
     }
   });
-  const _style_0$3c = {};
-  const Tabbar = /* @__PURE__ */ _export_sfc(_sfc_main$3i, [["styles", [_style_0$3c]]]);
+  const _style_0$3d = {};
+  const Tabbar = /* @__PURE__ */ _export_sfc(_sfc_main$3i, [["styles", [_style_0$3d]]]);
   class SubscriptionMutation extends UTS.UTSType {
     static get$UTSMetadata$() {
       return {
@@ -6262,7 +6264,8 @@
         get fields() {
           return {
             theme: { type: String, optional: false },
-            locale: { type: String, optional: false }
+            locale: { type: String, optional: false },
+            isDark: { type: Boolean, optional: false }
           };
         },
         name: "IAppState"
@@ -6273,6 +6276,7 @@
       this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
       this.theme = this.__props__.theme;
       this.locale = this.__props__.locale;
+      this.isDark = this.__props__.isDark;
       delete this.__props__;
     }
   }
@@ -6292,7 +6296,8 @@
   }
   const defaultAppState = new IAppState({
     theme: "#37c2bc",
-    locale: getSystemLocale()
+    locale: getSystemLocale(),
+    isDark: false
   });
   class AppStore extends PiniaStoreBase {
     // 2. constructor
@@ -6300,7 +6305,8 @@
       super();
       this.state = vue.reactive(new IAppState({
         theme: "#37c2bc",
-        locale: getSystemLocale()
+        locale: getSystemLocale(),
+        isDark: false
       }));
       this.bindState(this.state);
       themeColor.value = this.state.theme;
@@ -6313,6 +6319,7 @@
     _doReset() {
       this.state.theme = defaultAppState.theme;
       this.state.locale = defaultAppState.locale;
+      this.state.isDark = defaultAppState.isDark;
       themeColor.value = defaultAppState.theme;
       i18n.global.locale.value = defaultAppState.locale;
       setLocale(defaultAppState.locale);
@@ -6329,11 +6336,16 @@
         i18n.global.locale.value = localeVal;
         setLocale(localeVal);
       }
+      if (_data.isDark != null) {
+        const darkVal = _data.isDark;
+        this.state.isDark = darkVal;
+      }
     }
     _serialize() {
       return new UTSJSONObject({
         theme: this.state.theme,
-        locale: this.state.locale
+        locale: this.state.locale,
+        isDark: this.state.isDark
       });
     }
     // ==========================================
@@ -6345,6 +6357,12 @@
     setTheme(theme) {
       this.state.theme = theme;
       themeColor.value = theme;
+    }
+    /**
+     * 设置暗黑模式
+     */
+    setDarkMode(dark) {
+      this.state.isDark = dark;
     }
     /**
      * 设置语言
@@ -6795,7 +6813,7 @@
   const __className$3g = "GenAppku";
   const _sfc_main$3h = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
     __dynamicSharedData: true,
-    __hash: "41195380",
+    __hash: "8e4dd564",
     __className: __className$3g,
     __filename: "App.ku.uvue",
     __name: "App.ku",
@@ -6803,6 +6821,17 @@
       const __sharedDataScope = vue.useSharedDataScope();
       const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenAppkuSharedData", sharedDataClassId: 0 })));
       const appStore = useAppStore();
+      const themeStyle = vue.computed(() => {
+        const dark = appStore.state.isDark;
+        return new UTSJSONObject({
+          "--theme-color": appStore.state.theme,
+          "--bg-color": dark ? "#0f172a" : "#f5f6fa",
+          "--text-color": dark ? "#e2e8f0" : "#1e293b",
+          "--text-secondary": dark ? "#94a3b8" : "#64748b",
+          "--card-bg": dark ? "#1e293b" : "#ffffff",
+          "--border-color": dark ? "#334155" : "#e2e8f0"
+        });
+      });
       const isCurrentPageTabbar = vue.ref(false);
       const uToastRef = vue.ref(null);
       vue.watch(uToastRef, (val = null) => {
@@ -6847,22 +6876,24 @@
         const _setTemplateRef = vue.createSharedDataTemplateRefSetter();
         const _component_up_toast = __easycom_2$l;
         vue.renderSharedDataEffect(() => {
-          return vue.setSharedDataStyle(__sharedData, 3, ["flex: 1;", { "--theme-color": vue.unref(appStore).state.theme }]);
+          return vue.setSharedDataStyle(__sharedData, 3, ["flex: 1;", themeStyle.value]);
         });
         vue.createSharedDataSlot("default", null, null);
         vue.createSharedDataIf(() => {
           return vue.setSharedData(__sharedData, 0, vue.toSharedDataBoolean(isCurrentPageTabbar.value));
         }, () => {
-          const n4 = vue.createSharedDataComponent(Tabbar, "ca371aa4");
+          const n4 = vue.createSharedDataComponent(Tabbar, "ca371ae0");
           vue.setSharedData(__sharedData, 1, n4.sharedData);
         });
-        const n5 = vue.createSharedDataComponentWithFallback(_component_up_toast, "ca3713a4");
+        const n5 = vue.createSharedDataComponentWithFallback(_component_up_toast, "ca3718f6");
         vue.setSharedData(__sharedData, 2, n5 == null ? void 0 : n5.sharedData);
         _setTemplateRef(n5, uToastRef, null, "uToastRef");
         return __sharedData;
       };
     }
   });
+  const _style_0$3c = {};
+  const AppKu = /* @__PURE__ */ _export_sfc(_sfc_main$3h, [["styles", [_style_0$3c]]]);
   const __className$3f = "GenSrcLayoutsDefault";
   const _sfc_main$3g = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
     __dynamicSharedData: true,
@@ -6905,7 +6936,7 @@
   const __className$3e = "GenSrcPagesIndexIndex";
   const _sfc_main$3f = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
     __dynamicSharedData: true,
-    __hash: "3db0ad20",
+    __hash: "7e8f956c",
     __className: __className$3e,
     __filename: "src/pages/index/index.uvue",
     __name: "index",
@@ -6929,7 +6960,7 @@
       return () => {
         "raw js";
         const _component_NavBar = __easycom_0$a;
-        const n30 = vue.createSharedDataComponent(_sfc_main$3h, "05e1f953", null, {
+        const n30 = vue.createSharedDataComponent(AppKu, "05e1f953", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n29 = vue.createSharedDataComponent(LayoutComponent, "93459dfa", {
               "navigation-style": "custom",
@@ -7033,7 +7064,7 @@
       }
       return () => {
         "raw js";
-        const n23 = vue.createSharedDataComponent(_sfc_main$3h, "69b481fa", null, {
+        const n23 = vue.createSharedDataComponent(AppKu, "69b481fa", null, {
           "default": () => {
             vue.renderSharedDataEffect(() => {
               const _userStore = vue.unref(userStore);
@@ -7073,7 +7104,7 @@
   const __className$3c = "GenSrcPagesBasicComponentsCard";
   const _sfc_main$3d = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
     __dynamicSharedData: true,
-    __hash: "00039df3",
+    __hash: "25b6477d",
     __className: __className$3c,
     __filename: "src/pages/basic/components/Card.uvue",
     __name: "Card",
@@ -7089,11 +7120,16 @@
       return () => {
         "raw js";
         vue.createSharedDataSlot("title", null, null, () => {
+          vue.setSharedDataStyle(__sharedData, 0, { color: "var(--text-color, #2d3748)" });
           vue.renderSharedDataEffect(() => {
-            return vue.setSharedData(__sharedData, 0, vue.toDisplayString(__props.title));
+            return vue.setSharedData(__sharedData, 1, vue.toDisplayString(__props.title));
           });
         });
         vue.createSharedDataSlot("default", null, null);
+        vue.setSharedDataStyle(__sharedData, 2, {
+          backgroundColor: "var(--card-bg, #ffffff)",
+          borderColor: "var(--border-color, #edf2f7)"
+        });
         return __sharedData;
       };
     }
@@ -10836,7 +10872,7 @@
   const __className$35 = "GenSrcPagesBasicComponentsThemeSwitchCard";
   const _sfc_main$36 = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
     __dynamicSharedData: true,
-    __hash: "5ef58938",
+    __hash: "c87d1b72",
     __className: __className$35,
     __filename: "src/pages/basic/components/ThemeSwitchCard.uvue",
     __name: "ThemeSwitchCard",
@@ -10852,6 +10888,9 @@
       });
       const themeButton = vue.computed(() => {
         return $t("basic.themeButton");
+      });
+      const darkLabel = vue.computed(() => {
+        return $t("basic.themeDark");
       });
       const currentTheme = vue.computed(() => {
         return appStore.state.theme;
@@ -10871,20 +10910,24 @@
           duration: 1500
         });
       }
+      function handleDarkChange(e) {
+        appStore.setDarkMode(e.detail.value);
+      }
       return () => {
         "raw js";
-        const n11 = vue.createSharedDataComponent(
+        const _component_switch = vue.resolveComponent("switch");
+        const n14 = vue.createSharedDataComponent(
           Card,
           "a1511108",
           { title: () => {
             return themeTitle.value;
           } },
           {
-            "default": () => {
+            "default": vue.withSharedDataVaporCtx(() => {
               vue.renderSharedDataEffect(() => {
-                vue.setSharedData(__sharedData, 2, vue.toDisplayString(themePreview.value));
-                vue.setSharedDataStyle(__sharedData, 3, { backgroundColor: currentTheme.value });
-                vue.setSharedData(__sharedData, 4, vue.toDisplayString(themeButton.value));
+                vue.setSharedData(__sharedData, 3, vue.toDisplayString(themePreview.value));
+                vue.setSharedDataStyle(__sharedData, 4, { backgroundColor: currentTheme.value });
+                vue.setSharedData(__sharedData, 5, vue.toDisplayString(themeButton.value));
               });
               vue.createSharedDataFor(vue.setSharedDataScoped(__sharedData, 1, vue.createSharedDataVFor(__sharedDataScope, () => {
                 return new UniDynamicSharedData(__sharedDataScope, { bundleKey: "".concat(__className$35, "SharedData"), sharedDataClassId: 1 });
@@ -10911,12 +10954,25 @@
               }, (__sharedData_VFor0, item, index) => {
                 return vue.setSharedData(__sharedData_VFor0, 0, vue.toDisplayString(index));
               }, 1);
-            }
+              vue.renderSharedDataEffect(() => {
+                return vue.setSharedData(__sharedData, 6, vue.toDisplayString(darkLabel.value));
+              });
+              const n12 = vue.createSharedDataComponentWithFallback(_component_switch, "98cd388a", {
+                checked: () => {
+                  return vue.unref(appStore).state.isDark;
+                },
+                color: "#37c2bc",
+                onChange: () => {
+                  return handleDarkChange;
+                }
+              });
+              vue.setSharedData(__sharedData, 2, n12 == null ? void 0 : n12.sharedData);
+            })
           },
           1
           /* SINGLE_ROOT */
         );
-        vue.setSharedData(__sharedData, 0, n11.sharedData);
+        vue.setSharedData(__sharedData, 0, n14.sharedData);
         return __sharedData;
       };
     }
@@ -12454,7 +12510,7 @@
       });
       return () => {
         "raw js";
-        const n11 = vue.createSharedDataComponent(_sfc_main$3h, "56ab5a5a", null, {
+        const n11 = vue.createSharedDataComponent(AppKu, "56ab5a5a", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n0 = vue.createSharedDataComponent(UViewUltraDemoCard, "5360e8b4");
             vue.setSharedData(__sharedData, 1, n0.sharedData);
@@ -19634,7 +19690,7 @@
       });
       return () => {
         "raw js";
-        const n15 = vue.createSharedDataComponent(_sfc_main$3h, "13021a83", null, {
+        const n15 = vue.createSharedDataComponent(AppKu, "13021a83", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n3 = vue.createSharedDataComponent(EnvCard, "5ae58bc7");
             vue.setSharedData(__sharedData, 1, n3.sharedData);
@@ -19776,7 +19832,7 @@
         const _component_NavBar = __easycom_0$a;
         const _component_input = vue.resolveComponent("input");
         const _component_uni_icons = __easycom_1$V;
-        const n36 = vue.createSharedDataComponent(_sfc_main$3h, "9242dfba", null, {
+        const n36 = vue.createSharedDataComponent(AppKu, "9242dfba", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n0 = vue.createSharedDataComponentWithFallback(_component_NavBar, "24f374cd", {
               title: "AI 智能助手",
@@ -19924,7 +19980,7 @@
       }
       return () => {
         "raw js";
-        const n6 = vue.createSharedDataComponent(_sfc_main$3h, "44259de4", null, {
+        const n6 = vue.createSharedDataComponent(AppKu, "44259de4", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n5 = vue.createSharedDataComponent(LayoutComponent, "408e1e92", { "navigation-bar-title-text": "登录" }, {
               "default": () => {
@@ -19965,7 +20021,7 @@
       }
       return () => {
         "raw js";
-        const n6 = vue.createSharedDataComponent(_sfc_main$3h, "505f345a", null, {
+        const n6 = vue.createSharedDataComponent(AppKu, "505f345a", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n5 = vue.createSharedDataComponent(LayoutComponent, "88f15248", { "navigation-bar-title-text": "注册" }, {
               "default": () => {
@@ -20014,7 +20070,7 @@
       }
       return () => {
         "raw js";
-        const n17 = vue.createSharedDataComponent(_sfc_main$3h, "51fce8f3", null, {
+        const n17 = vue.createSharedDataComponent(AppKu, "51fce8f3", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n16 = vue.createSharedDataComponent(LayoutComponent, "24bf953a", { "navigation-bar-title-text": "测试" }, {
               "default": () => {
@@ -20165,7 +20221,7 @@
         const _setTemplateRef = vue.createSharedDataTemplateRefSetter();
         const _component_NavBar = __easycom_0$a;
         const _component_z_paging_x = __easycom_1$T;
-        const n23 = vue.createSharedDataComponent(_sfc_main$3h, "2bd82232", null, {
+        const n23 = vue.createSharedDataComponent(AppKu, "2bd82232", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n22 = vue.createSharedDataComponent(LayoutComponent, "5869edef", {
               "navigation-style": "custom",
@@ -20681,7 +20737,7 @@
         const _component_up_icon = __easycom_0$9;
         const _component_up_cell = __easycom_1$S;
         const _component_up_cell_group = __easycom_2$k;
-        const n237 = vue.createSharedDataComponent(_sfc_main$3h, "078c97b3", null, {
+        const n237 = vue.createSharedDataComponent(AppKu, "078c97b3", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n236 = vue.createSharedDataComponent(LayoutComponent, "2bf342ba", {
               "navigation-style": "custom",
@@ -22406,7 +22462,7 @@
       const logoSrc = logoImg$1;
       return () => {
         "raw js";
-        const n10 = vue.createSharedDataComponent(_sfc_main$3h, "86c4cc4a", null, {
+        const n10 = vue.createSharedDataComponent(AppKu, "86c4cc4a", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n9 = vue.createSharedDataComponent(LayoutComponent, "51d4bd0a", { "navigation-bar-title-text": "UI 测试" }, {
               "default": () => {
@@ -22440,7 +22496,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_icon = __easycom_0$9;
-        const n16 = vue.createSharedDataComponent(_sfc_main$3h, "dacdd0da", null, {
+        const n16 = vue.createSharedDataComponent(AppKu, "dacdd0da", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n15 = vue.createSharedDataComponent(LayoutComponent, "7eec4a7a", {
               "navigation-style": "custom",
@@ -22980,7 +23036,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_text = __easycom_0$5;
-        const n16 = vue.createSharedDataComponent(_sfc_main$3h, "317f74fb", null, {
+        const n16 = vue.createSharedDataComponent(AppKu, "317f74fb", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n15 = vue.createSharedDataComponent(LayoutComponent, "0321ab4a", {
               "navigation-style": "custom",
@@ -23069,7 +23125,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_link = __easycom_1$R;
-        const n13 = vue.createSharedDataComponent(_sfc_main$3h, "302284d6", null, {
+        const n13 = vue.createSharedDataComponent(AppKu, "302284d6", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n12 = vue.createSharedDataComponent(LayoutComponent, "15e8f501", {
               "navigation-style": "custom",
@@ -23311,7 +23367,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_empty = __easycom_1$Q;
-        const n11 = vue.createSharedDataComponent(_sfc_main$3h, "966d5cfe", null, {
+        const n11 = vue.createSharedDataComponent(AppKu, "966d5cfe", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n10 = vue.createSharedDataComponent(LayoutComponent, "373e42d6", {
               "navigation-style": "custom",
@@ -23531,7 +23587,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_divider = __easycom_1$P;
-        const n13 = vue.createSharedDataComponent(_sfc_main$3h, "2c6a817e", null, {
+        const n13 = vue.createSharedDataComponent(AppKu, "2c6a817e", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n12 = vue.createSharedDataComponent(LayoutComponent, "4f8d28d5", {
               "navigation-style": "custom",
@@ -23583,7 +23639,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_loading_icon = __easycom_1$Y;
-        const n11 = vue.createSharedDataComponent(_sfc_main$3h, "282c037e", null, {
+        const n11 = vue.createSharedDataComponent(AppKu, "282c037e", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n10 = vue.createSharedDataComponent(LayoutComponent, "dd546c56", {
               "navigation-style": "custom",
@@ -23811,7 +23867,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_skeleton = __easycom_1$O;
-        const n10 = vue.createSharedDataComponent(_sfc_main$3h, "9110568a", null, {
+        const n10 = vue.createSharedDataComponent(AppKu, "9110568a", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n9 = vue.createSharedDataComponent(LayoutComponent, "3782c29b", {
               "navigation-style": "custom",
@@ -24528,7 +24584,7 @@
         const _component_NavBar = __easycom_0$a;
         const _component_up_card = __easycom_1$N;
         const _component_up_button = __easycom_2$j;
-        const n32 = vue.createSharedDataComponent(_sfc_main$3h, "66b6847e", null, {
+        const n32 = vue.createSharedDataComponent(AppKu, "66b6847e", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n31 = vue.createSharedDataComponent(LayoutComponent, "701a0b56", {
               "navigation-style": "custom",
@@ -24858,7 +24914,7 @@
         const _component_up_icon = __easycom_0$9;
         const _component_up_loading_icon = __easycom_1$Y;
         const _component_up_list = __easycom_3$3;
-        const n30 = vue.createSharedDataComponent(_sfc_main$3h, "6921ca46", null, {
+        const n30 = vue.createSharedDataComponent(AppKu, "6921ca46", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n29 = vue.createSharedDataComponent(LayoutComponent, "bb177e8e", {
               "navigation-style": "custom",
@@ -25515,7 +25571,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_swiper = __easycom_1$L;
-        const n10 = vue.createSharedDataComponent(_sfc_main$3h, "d3d7f2de", null, {
+        const n10 = vue.createSharedDataComponent(AppKu, "d3d7f2de", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n9 = vue.createSharedDataComponent(LayoutComponent, "2c6ccb85", {
               "navigation-style": "custom",
@@ -25877,7 +25933,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_image = __easycom_1$K;
-        const n16 = vue.createSharedDataComponent(_sfc_main$3h, "9e1f0b7e", null, {
+        const n16 = vue.createSharedDataComponent(AppKu, "9e1f0b7e", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n15 = vue.createSharedDataComponent(LayoutComponent, "6d1ecdd5", {
               "navigation-style": "custom",
@@ -25957,7 +26013,7 @@
         const _component_NavBar = __easycom_0$a;
         const _component_up_transition = __easycom_1$W;
         const _component_up_button = __easycom_2$j;
-        const n29 = vue.createSharedDataComponent(_sfc_main$3h, "5d80d4ea", null, {
+        const n29 = vue.createSharedDataComponent(AppKu, "5d80d4ea", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n28 = vue.createSharedDataComponent(LayoutComponent, "56b31bcb", {
               "navigation-style": "custom",
@@ -26488,7 +26544,7 @@
         const _component_up_steps_item = __easycom_1$J;
         const _component_up_steps = __easycom_2$i;
         const _component_up_button = __easycom_2$j;
-        const n33 = vue.createSharedDataComponent(_sfc_main$3h, "39a64c7e", null, {
+        const n33 = vue.createSharedDataComponent(AppKu, "39a64c7e", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n32 = vue.createSharedDataComponent(LayoutComponent, "fb234356", {
               "navigation-style": "custom",
@@ -27152,7 +27208,7 @@
         const _component_up_tr = __easycom_2$h;
         const _component_up_td = __easycom_3$2;
         const _component_up_table = _sfc_main$26;
-        const n31 = vue.createSharedDataComponent(_sfc_main$3h, "15f49221", null, {
+        const n31 = vue.createSharedDataComponent(AppKu, "15f49221", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n30 = vue.createSharedDataComponent(LayoutComponent, "aec49c16", {
               "navigation-style": "custom",
@@ -36469,7 +36525,7 @@
         const _component_up_picker = __easycom_2$b;
         const _component_up_datetime_picker = __easycom_2$a;
         const _component_up_action_sheet = __easycom_2$9;
-        const n67 = vue.createSharedDataComponent(_sfc_main$3h, "b189a5ae", null, {
+        const n67 = vue.createSharedDataComponent(AppKu, "b189a5ae", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n66 = vue.createSharedDataComponent(LayoutComponent, "402a77ed", {
               "navigation-style": "custom",
@@ -37295,7 +37351,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_pagination = __easycom_1$y;
-        const n7 = vue.createSharedDataComponent(_sfc_main$3h, "12236d55", null, {
+        const n7 = vue.createSharedDataComponent(AppKu, "12236d55", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n6 = vue.createSharedDataComponent(LayoutComponent, "324a3d41", {
               "navigation-style": "custom",
@@ -37686,7 +37742,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_code_input = __easycom_1$x;
-        const n13 = vue.createSharedDataComponent(_sfc_main$3h, "497d0bfe", null, {
+        const n13 = vue.createSharedDataComponent(AppKu, "497d0bfe", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n12 = vue.createSharedDataComponent(LayoutComponent, "e62473d6", {
               "navigation-style": "custom",
@@ -37773,7 +37829,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_button = __easycom_2$j;
-        const n30 = vue.createSharedDataComponent(_sfc_main$3h, "5e96e385", null, {
+        const n30 = vue.createSharedDataComponent(AppKu, "5e96e385", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n29 = vue.createSharedDataComponent(LayoutComponent, "74458d11", {
               "navigation-style": "custom",
@@ -37871,7 +37927,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_input = __easycom_1$H;
-        const n10 = vue.createSharedDataComponent(_sfc_main$3h, "6abd60be", null, {
+        const n10 = vue.createSharedDataComponent(AppKu, "6abd60be", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n9 = vue.createSharedDataComponent(LayoutComponent, "eceeb716", {
               "navigation-style": "custom",
@@ -37941,7 +37997,7 @@
         const _component_NavBar = __easycom_0$a;
         const _component_up_checkbox = __easycom_1$F;
         const _component_up_checkbox_group = __easycom_2$e;
-        const n23 = vue.createSharedDataComponent(_sfc_main$3h, "53588ab2", null, {
+        const n23 = vue.createSharedDataComponent(AppKu, "53588ab2", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n22 = vue.createSharedDataComponent(LayoutComponent, "17b8cba2", {
               "navigation-style": "custom",
@@ -38311,7 +38367,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_tag = __easycom_1$w;
-        const n33 = vue.createSharedDataComponent(_sfc_main$3h, "584b9f21", null, {
+        const n33 = vue.createSharedDataComponent(AppKu, "584b9f21", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n32 = vue.createSharedDataComponent(LayoutComponent, "9daf7616", {
               "navigation-style": "custom",
@@ -38454,7 +38510,7 @@
         const _component_NavBar = __easycom_0$a;
         const _component_up_radio = __easycom_1$G;
         const _component_up_radio_group = __easycom_2$f;
-        const n24 = vue.createSharedDataComponent(_sfc_main$3h, "511dc37e", null, {
+        const n24 = vue.createSharedDataComponent(AppKu, "511dc37e", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n23 = vue.createSharedDataComponent(LayoutComponent, "16b2a9d5", {
               "navigation-style": "custom",
@@ -38615,7 +38671,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_switch = __easycom_1$E;
-        const n26 = vue.createSharedDataComponent(_sfc_main$3h, "369ee909", null, {
+        const n26 = vue.createSharedDataComponent(AppKu, "369ee909", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n25 = vue.createSharedDataComponent(LayoutComponent, "c5838fe6", {
               "navigation-style": "custom",
@@ -38738,7 +38794,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_rate = __easycom_1$D;
-        const n19 = vue.createSharedDataComponent(_sfc_main$3h, "3b349161", null, {
+        const n19 = vue.createSharedDataComponent(AppKu, "3b349161", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n18 = vue.createSharedDataComponent(LayoutComponent, "2b5d9ab5", {
               "navigation-style": "custom",
@@ -38850,7 +38906,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_number_box = __easycom_1$C;
-        const n16 = vue.createSharedDataComponent(_sfc_main$3h, "ed49b8be", null, {
+        const n16 = vue.createSharedDataComponent(AppKu, "ed49b8be", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n15 = vue.createSharedDataComponent(LayoutComponent, "bbed5f16", {
               "navigation-style": "custom",
@@ -38944,7 +39000,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_slider = __easycom_1$B;
-        const n16 = vue.createSharedDataComponent(_sfc_main$3h, "152cb823", null, {
+        const n16 = vue.createSharedDataComponent(AppKu, "152cb823", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n15 = vue.createSharedDataComponent(LayoutComponent, "df2b679a", {
               "navigation-style": "custom",
@@ -39040,7 +39096,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_textarea = __easycom_1$A;
-        const n16 = vue.createSharedDataComponent(_sfc_main$3h, "975571d6", null, {
+        const n16 = vue.createSharedDataComponent(AppKu, "975571d6", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n15 = vue.createSharedDataComponent(LayoutComponent, "5358c8fe", {
               "navigation-style": "custom",
@@ -39171,7 +39227,7 @@
         const _component_NavBar = __easycom_0$a;
         const _component_up_upload = __easycom_1$z;
         const _component_up_button = __easycom_2$j;
-        const n11 = vue.createSharedDataComponent(_sfc_main$3h, "67e80b3a", null, {
+        const n11 = vue.createSharedDataComponent(AppKu, "67e80b3a", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n10 = vue.createSharedDataComponent(LayoutComponent, "95195c1a", {
               "navigation-style": "custom",
@@ -39280,7 +39336,7 @@
         const _component_NavBar = __easycom_0$a;
         const _component_up_button = __easycom_2$j;
         const _component_up_calendar = __easycom_2$c;
-        const n24 = vue.createSharedDataComponent(_sfc_main$3h, "5238a91d", null, {
+        const n24 = vue.createSharedDataComponent(AppKu, "5238a91d", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n23 = vue.createSharedDataComponent(LayoutComponent, "16470b0e", {
               "navigation-style": "custom",
@@ -39455,7 +39511,7 @@
         const _component_NavBar = __easycom_0$a;
         const _component_up_button = __easycom_2$j;
         const _component_up_picker = __easycom_2$b;
-        const n19 = vue.createSharedDataComponent(_sfc_main$3h, "b01eb986", null, {
+        const n19 = vue.createSharedDataComponent(AppKu, "b01eb986", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n18 = vue.createSharedDataComponent(LayoutComponent, "5623c459", {
               "navigation-style": "custom",
@@ -39676,7 +39732,7 @@
         const _component_NavBar = __easycom_0$a;
         const _component_up_button = __easycom_2$j;
         const _component_up_datetime_picker = __easycom_2$a;
-        const n54 = vue.createSharedDataComponent(_sfc_main$3h, "014fc333", null, {
+        const n54 = vue.createSharedDataComponent(AppKu, "014fc333", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n53 = vue.createSharedDataComponent(LayoutComponent, "28a8a323", {
               "navigation-style": "custom",
@@ -40063,7 +40119,7 @@
         const _component_NavBar = __easycom_0$a;
         const _component_up_button = __easycom_2$j;
         const _component_up_action_sheet = __easycom_2$9;
-        const n19 = vue.createSharedDataComponent(_sfc_main$3h, "038b847e", null, {
+        const n19 = vue.createSharedDataComponent(AppKu, "038b847e", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n18 = vue.createSharedDataComponent(LayoutComponent, "6de50b56", {
               "navigation-style": "custom",
@@ -40343,7 +40399,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_badge = __easycom_1$v;
-        const n25 = vue.createSharedDataComponent(_sfc_main$3h, "52c5317e", null, {
+        const n25 = vue.createSharedDataComponent(AppKu, "52c5317e", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n24 = vue.createSharedDataComponent(LayoutComponent, "05e0fe56", {
               "navigation-style": "custom",
@@ -40639,7 +40695,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_avatar = __easycom_1$u;
-        const n26 = vue.createSharedDataComponent(_sfc_main$3h, "7aad1313", null, {
+        const n26 = vue.createSharedDataComponent(AppKu, "7aad1313", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n25 = vue.createSharedDataComponent(LayoutComponent, "4a15617a", {
               "navigation-style": "custom",
@@ -41090,7 +41146,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_search = __easycom_1$t;
-        const n19 = vue.createSharedDataComponent(_sfc_main$3h, "441ec4f1", null, {
+        const n19 = vue.createSharedDataComponent(AppKu, "441ec4f1", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n18 = vue.createSharedDataComponent(LayoutComponent, "3fb9d925", {
               "navigation-style": "custom",
@@ -41383,7 +41439,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_alert = __easycom_1$s;
-        const n25 = vue.createSharedDataComponent(_sfc_main$3h, "7c1daae1", null, {
+        const n25 = vue.createSharedDataComponent(AppKu, "7c1daae1", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n24 = vue.createSharedDataComponent(LayoutComponent, "0797b135", {
               "navigation-style": "custom",
@@ -42118,7 +42174,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_notice_bar = __easycom_1$q;
-        const n19 = vue.createSharedDataComponent(_sfc_main$3h, "6aaf6fc1", null, {
+        const n19 = vue.createSharedDataComponent(AppKu, "6aaf6fc1", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n18 = vue.createSharedDataComponent(LayoutComponent, "2982ef56", {
               "navigation-style": "custom",
@@ -42540,7 +42596,7 @@
         const _component_NavBar = __easycom_0$a;
         const _component_up_collapse_item = __easycom_1$p;
         const _component_up_collapse = __easycom_2$8;
-        const n16 = vue.createSharedDataComponent(_sfc_main$3h, "59d01b7b", null, {
+        const n16 = vue.createSharedDataComponent(AppKu, "59d01b7b", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n15 = vue.createSharedDataComponent(LayoutComponent, "3f99584a", {
               "navigation-style": "custom",
@@ -42641,7 +42697,7 @@
         const _component_NavBar = __easycom_0$a;
         const _component_up_button = __easycom_2$j;
         const _component_up_toast = __easycom_2$l;
-        const n17 = vue.createSharedDataComponent(_sfc_main$3h, "fbd28c7e", null, {
+        const n17 = vue.createSharedDataComponent(AppKu, "fbd28c7e", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n16 = vue.createSharedDataComponent(LayoutComponent, "7e7f0356", {
               "navigation-style": "custom",
@@ -42952,7 +43008,7 @@
         const _component_NavBar = __easycom_0$a;
         const _component_up_button = __easycom_2$j;
         const _component_up_notify = __easycom_2$7;
-        const n17 = vue.createSharedDataComponent(_sfc_main$3h, "60fc12f3", null, {
+        const n17 = vue.createSharedDataComponent(AppKu, "60fc12f3", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n16 = vue.createSharedDataComponent(LayoutComponent, "82f3693a", {
               "navigation-style": "custom",
@@ -43190,7 +43246,7 @@
         const _component_NavBar = __easycom_0$a;
         const _component_up_button = __easycom_2$j;
         const _component_up_loading_page = __easycom_2$6;
-        const n9 = vue.createSharedDataComponent(_sfc_main$3h, "acd436fe", null, {
+        const n9 = vue.createSharedDataComponent(AppKu, "acd436fe", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n8 = vue.createSharedDataComponent(LayoutComponent, "edb2a8d6", {
               "navigation-style": "custom",
@@ -43253,7 +43309,7 @@
         const _component_up_button = __easycom_2$j;
         const _component_up_loading_icon = __easycom_1$Y;
         const _component_up_overlay = __easycom_2$m;
-        const n15 = vue.createSharedDataComponent(_sfc_main$3h, "57f1bb61", null, {
+        const n15 = vue.createSharedDataComponent(AppKu, "57f1bb61", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n14 = vue.createSharedDataComponent(LayoutComponent, "b3749e96", {
               "navigation-style": "custom",
@@ -43680,7 +43736,7 @@
         const _component_NavBar = __easycom_0$a;
         const _component_up_button = __easycom_2$j;
         const _component_up_modal = __easycom_2$5;
-        const n19 = vue.createSharedDataComponent(_sfc_main$3h, "0b14ad81", null, {
+        const n19 = vue.createSharedDataComponent(AppKu, "0b14ad81", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n18 = vue.createSharedDataComponent(LayoutComponent, "57810295", {
               "navigation-style": "custom",
@@ -43790,7 +43846,7 @@
         const _component_NavBar = __easycom_0$a;
         const _component_up_button = __easycom_2$j;
         const _component_up_popup = __easycom_2$d;
-        const n22 = vue.createSharedDataComponent(_sfc_main$3h, "69dd3ce1", null, {
+        const n22 = vue.createSharedDataComponent(AppKu, "69dd3ce1", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n21 = vue.createSharedDataComponent(LayoutComponent, "5c6b4196", {
               "navigation-style": "custom",
@@ -44438,7 +44494,7 @@
         const _component_NavBar = __easycom_0$a;
         const _component_up_tooltip = __easycom_1$o;
         const _component_up_button = __easycom_2$j;
-        const n35 = vue.createSharedDataComponent(_sfc_main$3h, "2c37d7fe", null, {
+        const n35 = vue.createSharedDataComponent(AppKu, "2c37d7fe", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n34 = vue.createSharedDataComponent(LayoutComponent, "529e6c15", {
               "navigation-style": "custom",
@@ -44691,7 +44747,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_no_network = __easycom_1$n;
-        const n8 = vue.createSharedDataComponent(_sfc_main$3h, "c3b097fe", null, {
+        const n8 = vue.createSharedDataComponent(AppKu, "c3b097fe", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n7 = vue.createSharedDataComponent(LayoutComponent, "26cecc15", {
               "navigation-style": "custom",
@@ -44807,7 +44863,7 @@
         const _component_NavBar = __easycom_0$a;
         const _component_up_button = __easycom_2$j;
         const _component_up_copy = _sfc_main$Y;
-        const n8 = vue.createSharedDataComponent(_sfc_main$3h, "7048018b", null, {
+        const n8 = vue.createSharedDataComponent(AppKu, "7048018b", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n7 = vue.createSharedDataComponent(LayoutComponent, "ce8fa06a", {
               "navigation-style": "custom",
@@ -45102,7 +45158,7 @@
         const _component_up_icon = __easycom_0$9;
         const _component_up_grid_item = __easycom_2$4;
         const _component_up_grid = __easycom_3$1;
-        const n12 = vue.createSharedDataComponent(_sfc_main$3h, "51abafa6", null, {
+        const n12 = vue.createSharedDataComponent(AppKu, "51abafa6", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n11 = vue.createSharedDataComponent(LayoutComponent, "0e1add69", {
               "navigation-style": "custom",
@@ -45166,7 +45222,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_line = __easycom_0$6;
-        const n21 = vue.createSharedDataComponent(_sfc_main$3h, "aaed78ee", null, {
+        const n21 = vue.createSharedDataComponent(AppKu, "aaed78ee", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n20 = vue.createSharedDataComponent(LayoutComponent, "b2c1a4e6", {
               "navigation-style": "custom",
@@ -45575,7 +45631,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_album = __easycom_1$m;
-        const n16 = vue.createSharedDataComponent(_sfc_main$3h, "f685327e", null, {
+        const n16 = vue.createSharedDataComponent(AppKu, "f685327e", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n15 = vue.createSharedDataComponent(LayoutComponent, "12ef7155", {
               "navigation-style": "custom",
@@ -45635,7 +45691,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_gap = __easycom_1$X;
-        const n19 = vue.createSharedDataComponent(_sfc_main$3h, "2080e5a1", null, {
+        const n19 = vue.createSharedDataComponent(AppKu, "2080e5a1", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n18 = vue.createSharedDataComponent(LayoutComponent, "20c86316", {
               "navigation-style": "custom",
@@ -45909,7 +45965,7 @@
         const _component_NavBar = __easycom_0$a;
         const _component_up_button = __easycom_2$j;
         const _component_up_sticky = __easycom_2$3;
-        const n18 = vue.createSharedDataComponent(_sfc_main$3h, "631e8033", null, {
+        const n18 = vue.createSharedDataComponent(AppKu, "631e8033", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n17 = vue.createSharedDataComponent(LayoutComponent, "00b18623", {
               "navigation-style": "custom",
@@ -46544,7 +46600,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_keyboard = __easycom_1$k;
-        const n19 = vue.createSharedDataComponent(_sfc_main$3h, "319014ef", null, {
+        const n19 = vue.createSharedDataComponent(AppKu, "319014ef", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n18 = vue.createSharedDataComponent(LayoutComponent, "007288e7", {
               "navigation-style": "custom",
@@ -47229,7 +47285,7 @@
         const _component_NavBar = __easycom_0$a;
         const _component_up_dropdown_item = __easycom_1$j;
         const _component_up_dropdown = __easycom_2$2;
-        const n14 = vue.createSharedDataComponent(_sfc_main$3h, "2060b37a", null, {
+        const n14 = vue.createSharedDataComponent(AppKu, "2060b37a", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n13 = vue.createSharedDataComponent(LayoutComponent, "0a252213", {
               "navigation-style": "custom",
@@ -47794,7 +47850,7 @@
         const _component_NavBar = __easycom_0$a;
         const _component_up_swipe_action_item = __easycom_1$i;
         const _component_up_swipe_action = _sfc_main$F;
-        const n14 = vue.createSharedDataComponent(_sfc_main$3h, "a989d93e", null, {
+        const n14 = vue.createSharedDataComponent(AppKu, "a989d93e", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n13 = vue.createSharedDataComponent(LayoutComponent, "87b14e96", {
               "navigation-style": "custom",
@@ -47971,7 +48027,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_line_progress = __easycom_1$h;
-        const n7 = vue.createSharedDataComponent(_sfc_main$3h, "014b5a23", null, {
+        const n7 = vue.createSharedDataComponent(AppKu, "014b5a23", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n6 = vue.createSharedDataComponent(LayoutComponent, "281fea33", {
               "navigation-style": "custom",
@@ -48217,7 +48273,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_count_down = __easycom_1$g;
-        const n10 = vue.createSharedDataComponent(_sfc_main$3h, "685ac6fe", null, {
+        const n10 = vue.createSharedDataComponent(AppKu, "685ac6fe", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n9 = vue.createSharedDataComponent(LayoutComponent, "a2fe18d6", {
               "navigation-style": "custom",
@@ -48470,7 +48526,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_count_to = __easycom_1$f;
-        const n10 = vue.createSharedDataComponent(_sfc_main$3h, "549b2a21", null, {
+        const n10 = vue.createSharedDataComponent(AppKu, "549b2a21", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n9 = vue.createSharedDataComponent(LayoutComponent, "3eca19f5", {
               "navigation-style": "custom",
@@ -48733,7 +48789,7 @@
         const _component_NavBar = __easycom_0$a;
         const _component_up_navbar = __easycom_1$e;
         const _component_up_icon = __easycom_0$9;
-        const n15 = vue.createSharedDataComponent(_sfc_main$3h, "c3d9607e", null, {
+        const n15 = vue.createSharedDataComponent(AppKu, "c3d9607e", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n14 = vue.createSharedDataComponent(LayoutComponent, "2456a855", {
               "navigation-style": "custom",
@@ -49131,7 +49187,7 @@
         const _component_NavBar = __easycom_0$a;
         const _component_up_tabbar_item = __easycom_1$d;
         const _component_up_tabbar = __easycom_2$1;
-        const n23 = vue.createSharedDataComponent(_sfc_main$3h, "c6e98246", null, {
+        const n23 = vue.createSharedDataComponent(AppKu, "c6e98246", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n22 = vue.createSharedDataComponent(LayoutComponent, "1646c68e", {
               "navigation-style": "custom",
@@ -49857,7 +49913,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_tabs = __easycom_1$c;
-        const n28 = vue.createSharedDataComponent(_sfc_main$3h, "84297ec6", null, {
+        const n28 = vue.createSharedDataComponent(AppKu, "84297ec6", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n27 = vue.createSharedDataComponent(LayoutComponent, "01065a0e", {
               "navigation-style": "custom",
@@ -50297,7 +50353,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_subsection = __easycom_1$b;
-        const n7 = vue.createSharedDataComponent(_sfc_main$3h, "5d6b202b", null, {
+        const n7 = vue.createSharedDataComponent(AppKu, "5d6b202b", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n6 = vue.createSharedDataComponent(LayoutComponent, "4ff8e52b", {
               "navigation-style": "custom",
@@ -51013,7 +51069,7 @@
         const _component_up_index_anchor = __easycom_1$a;
         const _component_up_index_item = __easycom_2;
         const _component_up_index_list = __easycom_3;
-        const n13 = vue.createSharedDataComponent(_sfc_main$3h, "1e43093e", null, {
+        const n13 = vue.createSharedDataComponent(AppKu, "1e43093e", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n12 = vue.createSharedDataComponent(LayoutComponent, "2af0f0b5", {
               "navigation-style": "custom",
@@ -51225,7 +51281,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_navbar_mini = __easycom_1$9;
-        const n16 = vue.createSharedDataComponent(_sfc_main$3h, "c5065722", null, {
+        const n16 = vue.createSharedDataComponent(AppKu, "c5065722", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n15 = vue.createSharedDataComponent(LayoutComponent, "121db967", {
               "navigation-style": "custom",
@@ -52290,7 +52346,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_qrcode = __easycom_1$8;
-        const n13 = vue.createSharedDataComponent(_sfc_main$3h, "086a593d", null, {
+        const n13 = vue.createSharedDataComponent(AppKu, "086a593d", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n12 = vue.createSharedDataComponent(LayoutComponent, "04e0ce59", {
               "navigation-style": "custom",
@@ -52545,7 +52601,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_lazy_load = __easycom_1$7;
-        const n20 = vue.createSharedDataComponent(_sfc_main$3h, "40ca44d6", null, {
+        const n20 = vue.createSharedDataComponent(AppKu, "40ca44d6", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n19 = vue.createSharedDataComponent(LayoutComponent, "13c0d501", {
               "navigation-style": "custom",
@@ -52795,7 +52851,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_loadmore = __easycom_1$6;
-        const n19 = vue.createSharedDataComponent(_sfc_main$3h, "1fb86cd2", null, {
+        const n19 = vue.createSharedDataComponent(AppKu, "1fb86cd2", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n18 = vue.createSharedDataComponent(LayoutComponent, "1455693f", {
               "navigation-style": "custom",
@@ -53028,7 +53084,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_waterfall = __easycom_1$5;
-        const n16 = vue.createSharedDataComponent(_sfc_main$3h, "678edda1", null, {
+        const n16 = vue.createSharedDataComponent(AppKu, "678edda1", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n15 = vue.createSharedDataComponent(LayoutComponent, "eb665316", {
               "navigation-style": "custom",
@@ -53262,7 +53318,7 @@
         const _component_NavBar = __easycom_0$a;
         const _component_up_code = __easycom_1$4;
         const _component_up_button = __easycom_2$j;
-        const n9 = vue.createSharedDataComponent(_sfc_main$3h, "6fb7867b", null, {
+        const n9 = vue.createSharedDataComponent(AppKu, "6fb7867b", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n8 = vue.createSharedDataComponent(LayoutComponent, "f18d6e4a", {
               "navigation-style": "custom",
@@ -53842,7 +53898,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_parse = __easycom_1$3;
-        const n13 = vue.createSharedDataComponent(_sfc_main$3h, "76efd141", null, {
+        const n13 = vue.createSharedDataComponent(AppKu, "76efd141", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n12 = vue.createSharedDataComponent(LayoutComponent, "670a56d5", {
               "navigation-bar-title-text": "Parse 富文本解析",
@@ -54051,7 +54107,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_back_top = __easycom_1$2;
-        const n16 = vue.createSharedDataComponent(_sfc_main$3h, "e6fcc4be", null, {
+        const n16 = vue.createSharedDataComponent(AppKu, "e6fcc4be", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n15 = vue.createSharedDataComponent(LayoutComponent, "03b21675", {
               "navigation-bar-title-text": "Back Top 返回顶部",
@@ -54818,7 +54874,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_mp_html = __easycom_1$1;
-        const n24 = vue.createSharedDataComponent(_sfc_main$3h, "2a02d9fd", null, {
+        const n24 = vue.createSharedDataComponent(AppKu, "2a02d9fd", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n23 = vue.createSharedDataComponent(LayoutComponent, "16586599", {
               "navigation-bar-title-text": "mp-html 富文本组件",
@@ -55024,7 +55080,7 @@
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_circle_progress = __easycom_1;
-        const n16 = vue.createSharedDataComponent(_sfc_main$3h, "27c596ca", null, {
+        const n16 = vue.createSharedDataComponent(AppKu, "27c596ca", null, {
           "default": vue.withSharedDataVaporCtx(() => {
             const n15 = vue.createSharedDataComponent(LayoutComponent, "d0ed428a", {
               "navigation-bar-title-text": "CircleProgress 圆形进度条",

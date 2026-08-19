@@ -2,7 +2,7 @@ import { _ as __easycom_0 } from "../../../../components/NavBar/NavBar.js";
 import { _ as __easycom_0$1 } from "../../../../../uni_modules/uview-ultra/components/up-icon/up-icon.js";
 import { _ as __easycom_2 } from "../../../../../uni_modules/uview-ultra/components/up-grid-item/up-grid-item.js";
 import { _ as __easycom_3 } from "../../../../../uni_modules/uview-ultra/components/up-grid/up-grid.js";
-import { _ as _sfc_main$1 } from "../../../../../App.ku.js";
+import { A as AppKu } from "../../../../../App.ku.js";
 import { L as LayoutComponent } from "../../../../layouts/default.js";
 import { _ as _export_sfc } from "../../../../../plugin-vue-export-helper.js";
 import "../../../../utils/systemInfo.js";
@@ -86,7 +86,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       const _component_up_icon = __easycom_0$1;
       const _component_up_grid_item = __easycom_2;
       const _component_up_grid = __easycom_3;
-      const n12 = _createSharedDataComponent(_sfc_main$1, "51abafa6", null, {
+      const n12 = _createSharedDataComponent(AppKu, "51abafa6", null, {
         "default": _withSharedDataVaporCtx(() => {
           const n11 = _createSharedDataComponent(LayoutComponent, "0e1add69", {
             "navigation-style": "custom",

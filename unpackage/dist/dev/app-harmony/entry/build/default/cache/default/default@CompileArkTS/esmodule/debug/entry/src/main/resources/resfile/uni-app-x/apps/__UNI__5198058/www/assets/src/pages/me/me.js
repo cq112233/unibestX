@@ -1,4 +1,4 @@
-import { _ as _sfc_main$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
+import { A as AppKu } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/index&";
 import { L as LOGIN_PAGE } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/router/config&";
 import { h as handleBackPressExit } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/backPress&";
@@ -133,7 +133,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     }
     return () => {
       "raw js";
-      const n23 = _createSharedDataComponent(_sfc_main$1, "69b481fa", null, {
+      const n23 = _createSharedDataComponent(AppKu, "69b481fa", null, {
         "default": () => {
           _renderSharedDataEffect(() => {
             const _userStore = _unref(userStore);

@@ -1,6 +1,6 @@
 import { _ as __easycom_0 } from "../../components/NavBar/NavBar.js";
 import { _ as __easycom_1 } from "../../../uni_modules/uni-icons/components/uni-icons/uni-icons.js";
-import { _ as _sfc_main$1 } from "../../../App.ku.js";
+import { A as AppKu } from "../../../App.ku.js";
 import { s as safeAreaInsets } from "../../utils/systemInfo.js";
 import { _ as _export_sfc } from "../../../plugin-vue-export-helper.js";
 import "../../../uni_modules/uni-icons/components/uni-icons/uniicons_file.js";
@@ -174,7 +174,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       const _component_NavBar = __easycom_0;
       const _component_input = _resolveComponent("input");
       const _component_uni_icons = __easycom_1;
-      const n36 = _createSharedDataComponent(_sfc_main$1, "9242dfba", null, {
+      const n36 = _createSharedDataComponent(AppKu, "9242dfba", null, {
         "default": _withSharedDataVaporCtx(() => {
           const n0 = _createSharedDataComponentWithFallback(_component_NavBar, "24f374cd", {
             title: "AI 智能助手",

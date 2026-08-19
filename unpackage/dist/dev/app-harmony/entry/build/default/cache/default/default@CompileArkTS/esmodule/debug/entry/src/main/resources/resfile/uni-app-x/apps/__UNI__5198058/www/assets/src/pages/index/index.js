@@ -1,5 +1,5 @@
 import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/components/NavBar/NavBar&";
-import { _ as _sfc_main$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
+import { A as AppKu } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { L as LayoutComponent } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/layouts/default&";
 import { h as handleBackPressExit } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/backPress&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
@@ -70,7 +70,7 @@ const __className = "GenSrcPagesIndexIndex";
 const { onBackPress, ref } = globalThis.Vue;
 const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   __dynamicSharedData: true,
-  __hash: "3db0ad20",
+  __hash: "7e8f956c",
   __className,
   __filename: "src/pages/index/index.uvue",
   __name: "index",
@@ -94,7 +94,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     return () => {
       "raw js";
       const _component_NavBar = __easycom_0;
-      const n30 = _createSharedDataComponent(_sfc_main$1, "05e1f953", null, {
+      const n30 = _createSharedDataComponent(AppKu, "05e1f953", null, {
         "default": _withSharedDataVaporCtx(() => {
           const n29 = _createSharedDataComponent(LayoutComponent, "93459dfa", {
             "navigation-style": "custom",

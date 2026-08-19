@@ -17,6 +17,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "App.ku",
   setup(__props) {
     const appStore = src_store_app.useAppStore();
+    const themeStyle = common_vendor.computed(() => {
+      const dark = appStore.state.isDark;
+      return new common_vendor.UTSJSONObject({
+        "--theme-color": appStore.state.theme,
+        "--bg-color": dark ? "#0f172a" : "#f5f6fa",
+        "--text-color": dark ? "#e2e8f0" : "#1e293b",
+        "--text-secondary": dark ? "#94a3b8" : "#64748b",
+        "--card-bg": dark ? "#1e293b" : "#ffffff",
+        "--border-color": dark ? "#334155" : "#e2e8f0"
+      });
+    });
     const isCurrentPageTabbar = common_vendor.ref(false);
     const uToastRef = common_vendor.ref(null);
     common_vendor.watch(uToastRef, (val = null) => {
@@ -60,26 +71,29 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       "raw js";
       const __returned__ = common_vendor.e({
         a: isCurrentPageTabbar.value
-      }, isCurrentPageTabbar.value ? {} : {}, {
-        b: common_vendor.sr(uToastRef, "3c274bec-1", {
+      }, isCurrentPageTabbar.value ? {
+        b: common_vendor.p({
+          class: "data-v-cf1c0046"
+        })
+      } : {}, {
+        c: common_vendor.sr(uToastRef, "cf1c0046-1", {
           "k": "uToastRef"
         }),
-        c: common_vendor.p({
-          class: "r"
+        d: common_vendor.p({
+          class: "r data-v-cf1c0046"
         }),
-        d: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        e: common_vendor.s({
-          "--theme-color": common_vendor.unref(appStore).state.theme
-        }),
-        f: common_vendor.s({
+        e: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        f: common_vendor.s(themeStyle.value),
+        g: common_vendor.s({
           "--status-bar-height": `${_ctx.u_s_b_h}px`,
           "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
         }),
-        g: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        h: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };
   }
 });
-wx.createComponent(_sfc_main);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-cf1c0046"]]);
+wx.createComponent(Component);
 //# sourceMappingURL=../.sourcemap/mp-weixin/App.ku.js.map

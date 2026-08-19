@@ -1,1 +1,0 @@
-import{O as s,c as a,e,w as t,C as o,i as l}from"./index-DuB3nz1q.js";const c=s({},[["render",function(s,c){const d=l;return a(),e(d,{class:"default-layout flex flex-col"},{default:t(()=>[o(s.$slots,"default",{},void 0,!0)]),_:3})}],["__scopeId","data-v-ee96173c"]]);export{c as L};

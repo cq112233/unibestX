@@ -4,12 +4,12 @@ import { $ as $t } from "@normalized:N&&&entry/src/main/resources/resfile/uni-ap
 import { u as useAppStore } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/app&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
 const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedData: _setSharedData, toDisplayString: _toDisplayString, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataIf: _createSharedDataIf, setSharedDataEvent: _setSharedDataEvent, createSharedDataFor: _createSharedDataFor, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedData: _setSharedData, toDisplayString: _toDisplayString, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataIf: _createSharedDataIf, setSharedDataEvent: _setSharedDataEvent, createSharedDataFor: _createSharedDataFor, unref: _unref, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
 const __className = "GenSrcPagesBasicComponentsThemeSwitchCard";
 const { computed } = globalThis.Vue;
 const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   __dynamicSharedData: true,
-  __hash: "5ef58938",
+  __hash: "c87d1b72",
   __className,
   __filename: "src/pages/basic/components/ThemeSwitchCard.uvue",
   __name: "ThemeSwitchCard",
@@ -25,6 +25,9 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     });
     const themeButton = computed(() => {
       return $t("basic.themeButton");
+    });
+    const darkLabel = computed(() => {
+      return $t("basic.themeDark");
     });
     const currentTheme = computed(() => {
       return appStore.state.theme;
@@ -44,20 +47,24 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         duration: 1500
       });
     }
+    function handleDarkChange(e) {
+      appStore.setDarkMode(e.detail.value);
+    }
     return () => {
       "raw js";
-      const n11 = _createSharedDataComponent(
+      const _component_switch = _resolveComponent("switch");
+      const n14 = _createSharedDataComponent(
         Card,
         "a1511108",
         { title: () => {
           return themeTitle.value;
         } },
         {
-          "default": () => {
+          "default": _withSharedDataVaporCtx(() => {
             _renderSharedDataEffect(() => {
-              _setSharedData(__sharedData, 2, _toDisplayString(themePreview.value));
-              _setSharedDataStyle(__sharedData, 3, { backgroundColor: currentTheme.value });
-              _setSharedData(__sharedData, 4, _toDisplayString(themeButton.value));
+              _setSharedData(__sharedData, 3, _toDisplayString(themePreview.value));
+              _setSharedDataStyle(__sharedData, 4, { backgroundColor: currentTheme.value });
+              _setSharedData(__sharedData, 5, _toDisplayString(themeButton.value));
             });
             _createSharedDataFor(_setSharedDataScoped(__sharedData, 1, _createSharedDataVFor(__sharedDataScope, () => {
               return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
@@ -84,12 +91,25 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
             }, (__sharedData_VFor0, item, index) => {
               return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
             }, 1);
-          }
+            _renderSharedDataEffect(() => {
+              return _setSharedData(__sharedData, 6, _toDisplayString(darkLabel.value));
+            });
+            const n12 = _createSharedDataComponentWithFallback(_component_switch, "98cd388a", {
+              checked: () => {
+                return _unref(appStore).state.isDark;
+              },
+              color: "#37c2bc",
+              onChange: () => {
+                return handleDarkChange;
+              }
+            });
+            _setSharedData(__sharedData, 2, n12?.sharedData);
+          })
         },
         1
         /* SINGLE_ROOT */
       );
-      _setSharedData(__sharedData, 0, n11.sharedData);
+      _setSharedData(__sharedData, 0, n14.sharedData);
       return __sharedData;
     };
   }

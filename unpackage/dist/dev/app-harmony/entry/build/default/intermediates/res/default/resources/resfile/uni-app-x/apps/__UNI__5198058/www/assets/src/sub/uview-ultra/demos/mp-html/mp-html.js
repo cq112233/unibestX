@@ -1,6 +1,6 @@
 import { _ as __easycom_0 } from "../../../../components/NavBar/NavBar.js";
 import { _ as __easycom_1 } from "../../../../../uni_modules/mp-html/components/mp-html/mp-html.js";
-import { _ as _sfc_main$1 } from "../../../../../App.ku.js";
+import { A as AppKu } from "../../../../../App.ku.js";
 import { L as LayoutComponent } from "../../../../layouts/default.js";
 import { _ as _export_sfc } from "../../../../../plugin-vue-export-helper.js";
 import "../../../../utils/systemInfo.js";
@@ -131,7 +131,7 @@ const node = parse(html)</code></pre>
       "raw js";
       const _component_NavBar = __easycom_0;
       const _component_mp_html = __easycom_1;
-      const n24 = _createSharedDataComponent(_sfc_main$1, "2a02d9fd", null, {
+      const n24 = _createSharedDataComponent(AppKu, "2a02d9fd", null, {
         "default": _withSharedDataVaporCtx(() => {
           const n23 = _createSharedDataComponent(LayoutComponent, "16586599", {
             "navigation-bar-title-text": "mp-html 富文本组件",

@@ -1,5 +1,5 @@
 import { l as logoImg } from "./images/logo.js";
-import { _ as _sfc_main$1 } from "../../../App.ku.js";
+import { A as AppKu } from "../../../App.ku.js";
 import { L as LayoutComponent } from "../../layouts/default.js";
 import { _ as _export_sfc } from "../../../plugin-vue-export-helper.js";
 import "../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
@@ -79,7 +79,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     const logoSrc = logoImg;
     return () => {
       "raw js";
-      const n10 = _createSharedDataComponent(_sfc_main$1, "86c4cc4a", null, {
+      const n10 = _createSharedDataComponent(AppKu, "86c4cc4a", null, {
         "default": _withSharedDataVaporCtx(() => {
           const n9 = _createSharedDataComponent(LayoutComponent, "51d4bd0a", { "navigation-bar-title-text": "UI 测试" }, {
             "default": () => {

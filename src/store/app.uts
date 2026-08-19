@@ -10,6 +10,7 @@ import { setLocale as setUViewLocale } from '@/uni_modules/uview-ultra/libs/i18n
 export type IAppState = {
   theme: string;
   locale: string;
+  isDark: boolean;
 };
 
 function getSystemLocale(): string {
@@ -31,7 +32,8 @@ function getSystemLocale(): string {
 
 const defaultAppState: IAppState = {
   theme: '#37c2bc',
-  locale: getSystemLocale()
+  locale: getSystemLocale(),
+  isDark: false
 };
 
 // ==========================================
@@ -42,7 +44,8 @@ export class AppStore extends PiniaStoreBase {
   // 1. 响应式状态
   state: IAppState = reactive<IAppState>({
     theme: '#37c2bc',
-    locale: getSystemLocale()
+    locale: getSystemLocale(),
+    isDark: false
   });
 
   // 2. constructor
@@ -71,12 +74,14 @@ export class AppStore extends PiniaStoreBase {
   override _doReset(): void {
     this.state.theme = defaultAppState.theme;
     this.state.locale = defaultAppState.locale;
+    this.state.isDark = defaultAppState.isDark;
 
     themeColor.value = defaultAppState.theme;
     // #ifdef H5
     const docEl = document.documentElement;
     if (docEl != null) {
       docEl.style.setProperty('--theme-color', defaultAppState.theme);
+      docEl.setAttribute('data-theme', 'light');
     }
     // #endif
     i18n.global.locale.value = defaultAppState.locale;
@@ -102,12 +107,24 @@ export class AppStore extends PiniaStoreBase {
       i18n.global.locale.value = localeVal;
       setUViewLocale(localeVal);
     }
+    if (_data.isDark != null) {
+      const darkVal = _data.isDark as boolean;
+      this.state.isDark = darkVal;
+
+      // #ifdef H5
+      const docEl = document.documentElement;
+      if (docEl != null) {
+        docEl.setAttribute('data-theme', darkVal ? 'dark' : 'light');
+      }
+      // #endif
+    }
   }
 
   override _serialize(): UTSJSONObject {
     return {
       theme: this.state.theme,
-      locale: this.state.locale
+      locale: this.state.locale,
+      isDark: this.state.isDark
     } as UTSJSONObject;
   }
 
@@ -126,6 +143,20 @@ export class AppStore extends PiniaStoreBase {
     const docEl = document.documentElement;
     if (docEl != null) {
       docEl.style.setProperty('--theme-color', theme);
+    }
+    // #endif
+  }
+
+  /**
+   * 设置暗黑模式
+   */
+  setDarkMode(dark: boolean): void {
+    this.state.isDark = dark;
+
+    // #ifdef H5
+    const docEl = document.documentElement;
+    if (docEl != null) {
+      docEl.setAttribute('data-theme', dark ? 'dark' : 'light');
     }
     // #endif
   }

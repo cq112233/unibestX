@@ -1,7 +1,7 @@
 import { _ as __easycom_0 } from "../../../../components/NavBar/NavBar.js";
 import { _ as __easycom_1 } from "../../../../../uni_modules/uview-ultra/components/up-swipe-action-item/up-swipe-action-item.js";
-import { _ as _sfc_main$2 } from "../../../../../uni_modules/uview-ultra/components/up-swipe-action/up-swipe-action.js";
-import { _ as _sfc_main$1 } from "../../../../../App.ku.js";
+import { _ as _sfc_main$1 } from "../../../../../uni_modules/uview-ultra/components/up-swipe-action/up-swipe-action.js";
+import { A as AppKu } from "../../../../../App.ku.js";
 import { L as LayoutComponent } from "../../../../layouts/default.js";
 import { _ as _export_sfc } from "../../../../../plugin-vue-export-helper.js";
 import "../../../../utils/systemInfo.js";
@@ -105,8 +105,8 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       "raw js";
       const _component_NavBar = __easycom_0;
       const _component_up_swipe_action_item = __easycom_1;
-      const _component_up_swipe_action = _sfc_main$2;
-      const n14 = _createSharedDataComponent(_sfc_main$1, "a989d93e", null, {
+      const _component_up_swipe_action = _sfc_main$1;
+      const n14 = _createSharedDataComponent(AppKu, "a989d93e", null, {
         "default": _withSharedDataVaporCtx(() => {
           const n13 = _createSharedDataComponent(LayoutComponent, "87b14e96", {
             "navigation-style": "custom",

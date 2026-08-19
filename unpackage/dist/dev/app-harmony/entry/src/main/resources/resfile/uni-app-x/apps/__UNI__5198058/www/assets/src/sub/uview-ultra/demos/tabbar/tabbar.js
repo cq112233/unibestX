@@ -1,7 +1,7 @@
 import { _ as __easycom_0 } from "../../../../components/NavBar/NavBar.js";
 import { _ as __easycom_1 } from "../../../../../uni_modules/uview-ultra/components/up-tabbar-item/up-tabbar-item.js";
 import { _ as __easycom_2 } from "../../../../../uni_modules/uview-ultra/components/up-tabbar/up-tabbar.js";
-import { _ as _sfc_main$1 } from "../../../../../App.ku.js";
+import { A as AppKu } from "../../../../../App.ku.js";
 import { L as LayoutComponent } from "../../../../layouts/default.js";
 import { _ as _export_sfc } from "../../../../../plugin-vue-export-helper.js";
 import "../../../../utils/systemInfo.js";
@@ -98,7 +98,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       const _component_NavBar = __easycom_0;
       const _component_up_tabbar_item = __easycom_1;
       const _component_up_tabbar = __easycom_2;
-      const n23 = _createSharedDataComponent(_sfc_main$1, "c6e98246", null, {
+      const n23 = _createSharedDataComponent(AppKu, "c6e98246", null, {
         "default": _withSharedDataVaporCtx(() => {
           const n22 = _createSharedDataComponent(LayoutComponent, "1646c68e", {
             "navigation-style": "custom",

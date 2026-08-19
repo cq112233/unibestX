@@ -14,7 +14,8 @@ class IAppState extends common_vendor.UTS.UTSType {
       get fields() {
         return {
           theme: { type: String, optional: false },
-          locale: { type: String, optional: false }
+          locale: { type: String, optional: false },
+          isDark: { type: Boolean, optional: false }
         };
       },
       name: "IAppState"
@@ -25,6 +26,7 @@ class IAppState extends common_vendor.UTS.UTSType {
     this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.theme = this.__props__.theme;
     this.locale = this.__props__.locale;
+    this.isDark = this.__props__.isDark;
     delete this.__props__;
   }
 }
@@ -44,7 +46,8 @@ function getSystemLocale() {
 }
 const defaultAppState = new IAppState({
   theme: "#37c2bc",
-  locale: getSystemLocale()
+  locale: getSystemLocale(),
+  isDark: false
 });
 class AppStore extends uni_modules_xPiniaS_instans_storeBase.PiniaStoreBase {
   // 2. constructor
@@ -52,7 +55,8 @@ class AppStore extends uni_modules_xPiniaS_instans_storeBase.PiniaStoreBase {
     super();
     this.state = common_vendor.reactive(new IAppState({
       theme: "#37c2bc",
-      locale: getSystemLocale()
+      locale: getSystemLocale(),
+      isDark: false
     }));
     this.bindState(this.state);
     src_tabbar_store.themeColor.value = this.state.theme;
@@ -65,6 +69,7 @@ class AppStore extends uni_modules_xPiniaS_instans_storeBase.PiniaStoreBase {
   _doReset() {
     this.state.theme = defaultAppState.theme;
     this.state.locale = defaultAppState.locale;
+    this.state.isDark = defaultAppState.isDark;
     src_tabbar_store.themeColor.value = defaultAppState.theme;
     src_i18n_index.i18n.global.locale.value = defaultAppState.locale;
     uni_modules_uviewUltra_libs_i18n_index.setLocale(defaultAppState.locale);
@@ -81,11 +86,16 @@ class AppStore extends uni_modules_xPiniaS_instans_storeBase.PiniaStoreBase {
       src_i18n_index.i18n.global.locale.value = localeVal;
       uni_modules_uviewUltra_libs_i18n_index.setLocale(localeVal);
     }
+    if (_data.isDark != null) {
+      const darkVal = _data.isDark;
+      this.state.isDark = darkVal;
+    }
   }
   _serialize() {
     return new common_vendor.UTSJSONObject({
       theme: this.state.theme,
-      locale: this.state.locale
+      locale: this.state.locale,
+      isDark: this.state.isDark
     });
   }
   // ==========================================
@@ -97,6 +107,12 @@ class AppStore extends uni_modules_xPiniaS_instans_storeBase.PiniaStoreBase {
   setTheme(theme) {
     this.state.theme = theme;
     src_tabbar_store.themeColor.value = theme;
+  }
+  /**
+   * 设置暗黑模式
+   */
+  setDarkMode(dark) {
+    this.state.isDark = dark;
   }
   /**
    * 设置语言

@@ -20,6 +20,7 @@ const basic = new UTSJSONObject({
   themePreview: "Theme Color Preview",
   themeButton: "Theme Button",
   themeSuccess: "App & Component Library theme color updated successfully",
+  themeDark: "Dark Mode",
   echartTitle: "ECharts Chart Demo",
   echartLine: "Line Chart",
   echartBar: "Bar Chart",

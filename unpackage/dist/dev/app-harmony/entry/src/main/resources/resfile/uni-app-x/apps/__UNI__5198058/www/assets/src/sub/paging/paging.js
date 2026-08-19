@@ -1,6 +1,6 @@
 import { _ as __easycom_0 } from "../../components/NavBar/NavBar.js";
 import { _ as __easycom_1 } from "../../../uni_modules/z-paging-x/components/z-paging-x/z-paging-x.js";
-import { _ as _sfc_main$1 } from "../../../App.ku.js";
+import { A as AppKu } from "../../../App.ku.js";
 import { L as LayoutComponent } from "../../layouts/default.js";
 import { _ as _export_sfc } from "../../../plugin-vue-export-helper.js";
 import "../../utils/systemInfo.js";
@@ -192,7 +192,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       const _setTemplateRef = _createSharedDataTemplateRefSetter();
       const _component_NavBar = __easycom_0;
       const _component_z_paging_x = __easycom_1;
-      const n23 = _createSharedDataComponent(_sfc_main$1, "2bd82232", null, {
+      const n23 = _createSharedDataComponent(AppKu, "2bd82232", null, {
         "default": _withSharedDataVaporCtx(() => {
           const n22 = _createSharedDataComponent(LayoutComponent, "5869edef", {
             "navigation-style": "custom",

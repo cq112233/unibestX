@@ -1,6 +1,6 @@
 import { _ as __easycom_0 } from "../../../../components/NavBar/NavBar.js";
 import { _ as __easycom_1 } from "../../../../../uni_modules/uview-ultra/components/up-back-top/up-back-top.js";
-import { _ as _sfc_main$1 } from "../../../../../App.ku.js";
+import { A as AppKu } from "../../../../../App.ku.js";
 import { L as LayoutComponent } from "../../../../layouts/default.js";
 import { _ as _export_sfc } from "../../../../../plugin-vue-export-helper.js";
 import "../../../../utils/systemInfo.js";
@@ -93,7 +93,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       "raw js";
       const _component_NavBar = __easycom_0;
       const _component_up_back_top = __easycom_1;
-      const n16 = _createSharedDataComponent(_sfc_main$1, "e6fcc4be", null, {
+      const n16 = _createSharedDataComponent(AppKu, "e6fcc4be", null, {
         "default": _withSharedDataVaporCtx(() => {
           const n15 = _createSharedDataComponent(LayoutComponent, "03b21675", {
             "navigation-bar-title-text": "Back Top 返回顶部",

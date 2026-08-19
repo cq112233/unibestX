@@ -1,4 +1,4 @@
-import { _ as _sfc_main$1 } from "../../../App.ku.js";
+import { A as AppKu } from "../../../App.ku.js";
 import "../../store/index.js";
 import { L as LOGIN_PAGE } from "../../router/config.js";
 import { h as handleBackPressExit } from "../../utils/backPress.js";
@@ -133,7 +133,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     }
     return () => {
       "raw js";
-      const n23 = _createSharedDataComponent(_sfc_main$1, "69b481fa", null, {
+      const n23 = _createSharedDataComponent(AppKu, "69b481fa", null, {
         "default": () => {
           _renderSharedDataEffect(() => {
             const _userStore = _unref(userStore);

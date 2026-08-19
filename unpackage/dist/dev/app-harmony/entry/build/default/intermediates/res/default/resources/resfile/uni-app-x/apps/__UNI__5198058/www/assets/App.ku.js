@@ -4,13 +4,14 @@ import "./src/store/index.js";
 import { i as isPageTabbar, s as syncCurIdxByCurrentPage } from "./src/tabbar/store.js";
 import { r as registerToast, u as unregisterToast } from "./src/utils/toast.js";
 import { u as useAppStore } from "./src/store/app.js";
+import { _ as _export_sfc } from "./plugin-vue-export-helper.js";
 const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedDataStyle: _setSharedDataStyle, unref: _unref, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataSlot: _createSharedDataSlot, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponent: _createSharedDataComponent, createSharedDataIf: _createSharedDataIf, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataSlot: _createSharedDataSlot, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponent: _createSharedDataComponent, createSharedDataIf: _createSharedDataIf, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback } = globalThis.Vue;
 const __className = "GenAppku";
-const { nextTick, onBeforeMount, onMounted, onUnmounted, ref, watch } = globalThis.Vue;
+const { computed, nextTick, onBeforeMount, onMounted, onUnmounted, ref, watch } = globalThis.Vue;
 const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   __dynamicSharedData: true,
-  __hash: "41195380",
+  __hash: "8e4dd564",
   __className,
   __filename: "App.ku.uvue",
   __name: "App.ku",
@@ -18,6 +19,17 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     const __sharedDataScope = _useSharedDataScope();
     const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenAppkuSharedData", sharedDataClassId: 0 })));
     const appStore = useAppStore();
+    const themeStyle = computed(() => {
+      const dark = appStore.state.isDark;
+      return new UTSJSONObject({
+        "--theme-color": appStore.state.theme,
+        "--bg-color": dark ? "#0f172a" : "#f5f6fa",
+        "--text-color": dark ? "#e2e8f0" : "#1e293b",
+        "--text-secondary": dark ? "#94a3b8" : "#64748b",
+        "--card-bg": dark ? "#1e293b" : "#ffffff",
+        "--border-color": dark ? "#334155" : "#e2e8f0"
+      });
+    });
     const isCurrentPageTabbar = ref(false);
     const uToastRef = ref(null);
     watch(uToastRef, (val = null) => {
@@ -62,23 +74,25 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       const _setTemplateRef = _createSharedDataTemplateRefSetter();
       const _component_up_toast = __easycom_2;
       _renderSharedDataEffect(() => {
-        return _setSharedDataStyle(__sharedData, 3, ["flex: 1;", { "--theme-color": _unref(appStore).state.theme }]);
+        return _setSharedDataStyle(__sharedData, 3, ["flex: 1;", themeStyle.value]);
       });
       _createSharedDataSlot("default", null, null);
       _createSharedDataIf(() => {
         return _setSharedData(__sharedData, 0, _toSharedDataBoolean(isCurrentPageTabbar.value));
       }, () => {
-        const n4 = _createSharedDataComponent(Tabbar, "ca371aa4");
+        const n4 = _createSharedDataComponent(Tabbar, "ca371ae0");
         _setSharedData(__sharedData, 1, n4.sharedData);
       });
-      const n5 = _createSharedDataComponentWithFallback(_component_up_toast, "ca3713a4");
+      const n5 = _createSharedDataComponentWithFallback(_component_up_toast, "ca3718f6");
       _setSharedData(__sharedData, 2, n5?.sharedData);
       _setTemplateRef(n5, uToastRef, null, "uToastRef");
       return __sharedData;
     };
   }
 });
+const _style_0 = {};
+const AppKu = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
-  _sfc_main as _
+  AppKu as A
 };
 //# sourceMappingURL=App.ku.js.map

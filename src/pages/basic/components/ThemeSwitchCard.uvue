@@ -34,6 +34,12 @@
         </text>
       </view>
     </view>
+
+    <!-- 暗黑模式开关 -->
+    <view class="flex-row justify-between items-center mt-10px pt-10px">
+      <text class="text-14px text-[#2d3748]">{{ darkLabel }}</text>
+      <switch :checked="appStore.state.isDark" color="#37c2bc" @change="handleDarkChange" />
+    </view>
   </Card>
 </template>
 
@@ -48,6 +54,7 @@ const appStore = useAppStore();
 const themeTitle = computed((): string => $t('basic.themeTitle'));
 const themePreview = computed((): string => $t('basic.themePreview'));
 const themeButton = computed((): string => $t('basic.themeButton'));
+const darkLabel = computed((): string => $t('basic.themeDark'));
 
 const currentTheme = computed((): string => {
   return appStore.state.theme;
@@ -69,6 +76,10 @@ function changeTheme(color: string) {
     icon: 'none',
     duration: 1500
   });
+}
+
+function handleDarkChange(e: SwitchChangeEvent) {
+  appStore.setDarkMode(e.detail.value);
 }
 </script>
 

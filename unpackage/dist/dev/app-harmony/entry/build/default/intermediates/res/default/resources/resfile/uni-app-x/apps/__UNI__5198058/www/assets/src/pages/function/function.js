@@ -1,4 +1,4 @@
-import { _ as _sfc_main$1 } from "../../../App.ku.js";
+import { A as AppKu } from "../../../App.ku.js";
 import { E as EnvCard } from "./components/EnvCard.js";
 import { S as SystemInfoCard } from "./components/SystemInfoCard.js";
 import { H as HapticsCard } from "./components/HapticsCard.js";
@@ -121,7 +121,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     });
     return () => {
       "raw js";
-      const n15 = _createSharedDataComponent(_sfc_main$1, "13021a83", null, {
+      const n15 = _createSharedDataComponent(AppKu, "13021a83", null, {
         "default": _withSharedDataVaporCtx(() => {
           const n3 = _createSharedDataComponent(EnvCard, "5ae58bc7");
           _setSharedData(__sharedData, 1, n3.sharedData);
