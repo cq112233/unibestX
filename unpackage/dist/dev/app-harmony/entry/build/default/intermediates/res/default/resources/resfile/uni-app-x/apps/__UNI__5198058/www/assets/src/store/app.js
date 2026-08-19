@@ -5,7 +5,7 @@ import "../../uni_modules/x-pinia-s/instans/persist.js";
 import { t as themeColor } from "../tabbar/store.js";
 import { i as i18n } from "../i18n/index.js";
 import { s as setLocale } from "../../uni_modules/uview-ultra/libs/i18n/index.js";
-import { a as getSystemTheme } from "../utils/theme.js";
+import { b as getSystemTheme } from "../utils/theme.js";
 const { reactive } = globalThis.Vue;
 class IAppState extends UTS.UTSType {
   static get$UTSMetadata$() {

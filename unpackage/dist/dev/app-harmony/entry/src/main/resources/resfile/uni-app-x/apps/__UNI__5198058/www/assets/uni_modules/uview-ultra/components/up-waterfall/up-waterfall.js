@@ -1,10 +1,16 @@
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, setSharedData: _setSharedData, toDisplayString: _toDisplayString, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataSlot: _createSharedDataSlot, createSharedDataFor: _createSharedDataFor, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpWaterfallUpWaterfall";
 const { ref, computed, onMounted } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-waterfall"
   },
+  __dynamicSharedData: true,
+  __hash: "96fac1e4",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-waterfall/up-waterfall.uvue",
   __name: "up-waterfall",
   props: {
     modelValue: {
@@ -39,6 +45,8 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   emits: ["update:modelValue", "update:value"],
   setup(__props, _a) {
     var __expose = _a.expose, __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpWaterfallUpWaterfallSharedData", sharedDataClassId: 0 })));
     const props = __props;
     const emit = __emit;
     const windowWidth = ref(375);
@@ -112,52 +120,57 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       remove,
       modify
     });
-    const __returned__ = { props, emit, windowWidth, getColumnsCount, columnList, getColumnStyle, clear, remove, modify };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      _createSharedDataFor(_setSharedDataScoped(__sharedData, 0, _createSharedDataVFor(__sharedDataScope, () => {
+        return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
+      })), () => {
+        return columnList.value;
+      }, (__sharedData_VFor0, _for_item0, _for_key0) => {
+        _renderSharedDataEffect(() => {
+          return _setSharedDataStyle(__sharedData_VFor0, 4, getColumnStyle(_for_key0.value));
+        });
+        _createSharedDataSlot("column", {
+          colIndex: () => {
+            return _for_key0.value;
+          },
+          colList: () => {
+            return _for_item0.value;
+          }
+        }, (data) => {
+          return _setSharedData(__sharedData_VFor0, 1, data);
+        }, () => {
+          _createSharedDataFor(_setSharedDataScoped(__sharedData_VFor0, 2, _createSharedDataVFor(__sharedDataScope, () => {
+            return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 2 });
+          })), () => {
+            return _for_item0.value;
+          }, (__sharedData_VFor1, _for_item1, _for_key1) => {
+            _createSharedDataSlot("default", {
+              item: () => {
+                return _for_item1.value;
+              },
+              itemIndex: () => {
+                return _for_key1.value;
+              }
+            }, (data) => {
+              return _setSharedData(__sharedData_VFor1, 1, data);
+            });
+            return null;
+          }, (__sharedData_VFor1, item, itemIndex) => {
+            return _setSharedData(__sharedData_VFor1, 0, _toDisplayString(itemIndex));
+          });
+        });
+        _setSharedDataAttr(__sharedData_VFor0, 3, _toSharedDataString(`up-column-${_for_key0.value}`));
+        return null;
+      }, (__sharedData_VFor0, column, index) => {
+        return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
+      }, 1);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "up-waterfall": { "": { "display": "flex", "flexDirection": "row", "alignItems": "flex-start" } }, "up-column": { "": { "display": "flex", "flexDirection": "column", "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "overflow": "hidden" } } };
-const { renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, renderSlot: _renderSlot, normalizeStyle: _normalizeStyle } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return _openBlock(), _createElementBlock("view", { class: "up-waterfall" }, [
-    (_openBlock(true), _createElementBlock(
-      _Fragment,
-      null,
-      _renderList($setup.columnList, (column, index) => {
-        return _openBlock(), _createElementBlock("view", {
-          key: index,
-          id: `up-column-${index}`,
-          class: "up-column",
-          style: _normalizeStyle($setup.getColumnStyle(index))
-        }, [
-          _renderSlot(_ctx.$slots, "column", {
-            colIndex: index,
-            colList: column
-          }, () => [
-            (_openBlock(true), _createElementBlock(
-              _Fragment,
-              null,
-              _renderList(column, (item, itemIndex) => {
-                return _openBlock(), _createElementBlock("view", { key: itemIndex }, [
-                  _renderSlot(_ctx.$slots, "default", {
-                    item,
-                    itemIndex
-                  })
-                ]);
-              }),
-              128
-              /* KEYED_FRAGMENT */
-            ))
-          ])
-        ], 12, ["id"]);
-      }),
-      128
-      /* KEYED_FRAGMENT */
-    ))
-  ]);
-}
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-waterfall/up-waterfall.uvue"]]);
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_1 as _
 };

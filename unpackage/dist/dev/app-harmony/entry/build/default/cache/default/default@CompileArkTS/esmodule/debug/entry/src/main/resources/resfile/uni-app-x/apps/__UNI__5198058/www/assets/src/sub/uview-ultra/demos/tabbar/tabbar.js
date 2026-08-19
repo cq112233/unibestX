@@ -1,7 +1,7 @@
 import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/components/NavBar/NavBar&";
-import { A as AppKu, r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { _ as __easycom_1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-tabbar-item/up-tabbar-item&";
 import { _ as __easycom_2 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-tabbar/up-tabbar&";
+import { A as AppKu } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { L as LayoutComponent } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/layouts/default&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/systemInfo&";
@@ -42,18 +42,20 @@ import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/theme&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/token&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/user&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-toast/up-toast&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/loadingIcon&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/config/config&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/icons&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/test&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/digit&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/colorGradient&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/icons&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/config/config&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useUltraUI&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/icon&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-badge/up-badge&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-safe-bottom/up-safe-bottom&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-toast/up-toast&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/loadingIcon&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/colorGradient&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-gap/up-gap&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useMp&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-gap/gap&";
@@ -67,15 +69,20 @@ import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uni-icons/components/uni-icons/uniicons_file&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/i18n&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/toast&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-badge/up-badge&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-safe-bottom/up-safe-bottom&";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, resolveComponent: _resolveComponent, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
+const __className = "GenSrcSubUviewUltraDemosTabbarTabbar";
 const { ref } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  __dynamicSharedData: true,
+  __hash: "7070c1e0",
+  __className,
+  __filename: "src/sub/uview-ultra/demos/tabbar/tabbar.uvue",
   __name: "tabbar",
-  setup(__props, _a) {
-    var __expose = _a.expose;
-    __expose();
+  setup(__props) {
+    const __sharedDataRenderer = _useSharedDataRenderer();
+    const __sharedData = __sharedDataRenderer == "component" ? _withSharedDataComponent(new UniDynamicSharedDataComponent(_useSharedDataScope(), _useSharedDataComponentOptions({ bundleKey: "GenSrcSubUviewUltraDemosTabbarTabbarSharedData", sharedDataClassId: 0 }))) : _withSharedDataPage(new UniDynamicSharedDataPage(_useSharedDataPageId(), _useSharedDataPageOptions({ bundleKey: "GenSrcSubUviewUltraDemosTabbarTabbarSharedData", sharedDataClassId: 0 })));
+    _useSharedDataScope(__sharedData);
     const value1 = ref(0);
     const value2 = ref(0);
     const value3 = ref(0);
@@ -88,136 +95,134 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     function change3(index = null) {
       value3.value = parseInt(index.toString());
     }
-    const __returned__ = { value1, value2, value3, change1, change2, change3, get AppKu() {
-      return AppKu;
-    }, get LayoutComponent() {
-      return LayoutComponent;
-    } };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _component_NavBar = __easycom_0;
+      const _component_up_tabbar_item = __easycom_1;
+      const _component_up_tabbar = __easycom_2;
+      const n23 = _createSharedDataComponent(AppKu, "c6e98246", null, {
+        "default": _withSharedDataVaporCtx(() => {
+          const n22 = _createSharedDataComponent(LayoutComponent, "1646c68e", {
+            "navigation-style": "custom",
+            "navigation-bar-title-text": "up-tabbar 底部导航"
+          }, {
+            "default": _withSharedDataVaporCtx(() => {
+              const n0 = _createSharedDataComponentWithFallback(_component_NavBar, "b2920a08", {
+                title: "Tabbar 底部导航",
+                "auto-back": true,
+                "safe-area-inset-top": true,
+                "bg-color": "#ffffff"
+              });
+              _setSharedData(__sharedData, 2, n0?.sharedData);
+              const n6 = _createSharedDataComponentWithFallback(_component_up_tabbar, "b291facc", {
+                value: () => {
+                  return value1.value;
+                },
+                fixed: false,
+                "safe-area-inset-bottom": false,
+                onChange: () => {
+                  return change1;
+                }
+              }, {
+                "default": _withSharedDataVaporCtx(() => {
+                  const n2 = _createSharedDataComponentWithFallback(_component_up_tabbar_item, "b291f344", {
+                    text: "首页",
+                    icon: "home"
+                  });
+                  _setSharedData(__sharedData, 4, n2?.sharedData);
+                  const n3 = _createSharedDataComponentWithFallback(_component_up_tabbar_item, "b291ec84", {
+                    text: "放映厅",
+                    icon: "photo"
+                  });
+                  _setSharedData(__sharedData, 5, n3?.sharedData);
+                  const n4 = _createSharedDataComponentWithFallback(_component_up_tabbar_item, "b291e5c0", {
+                    text: "直播",
+                    icon: "play-right"
+                  });
+                  _setSharedData(__sharedData, 6, n4?.sharedData);
+                  const n5 = _createSharedDataComponentWithFallback(_component_up_tabbar_item, "b291e40a", {
+                    text: "我的",
+                    icon: "account"
+                  });
+                  _setSharedData(__sharedData, 7, n5?.sharedData);
+                })
+              });
+              _setSharedData(__sharedData, 3, n6?.sharedData);
+              const n12 = _createSharedDataComponentWithFallback(_component_up_tabbar, "b291d540", {
+                value: () => {
+                  return value2.value;
+                },
+                fixed: false,
+                "safe-area-inset-bottom": false,
+                onChange: () => {
+                  return change2;
+                }
+              }, {
+                "default": _withSharedDataVaporCtx(() => {
+                  const n9 = _createSharedDataComponentWithFallback(_component_up_tabbar_item, "b291cdb8", {
+                    text: "首页",
+                    icon: "home",
+                    badge: "5"
+                  });
+                  _setSharedData(__sharedData, 9, n9?.sharedData);
+                  const n10 = _createSharedDataComponentWithFallback(_component_up_tabbar_item, "30284a34", {
+                    text: "消息",
+                    icon: "chat",
+                    dot: true
+                  });
+                  _setSharedData(__sharedData, 10, n10?.sharedData);
+                  const n11 = _createSharedDataComponentWithFallback(_component_up_tabbar_item, "30284db5", {
+                    text: "我的",
+                    icon: "account"
+                  });
+                  _setSharedData(__sharedData, 11, n11?.sharedData);
+                })
+              });
+              _setSharedData(__sharedData, 8, n12?.sharedData);
+              const n18 = _createSharedDataComponentWithFallback(_component_up_tabbar, "30285517", {
+                value: () => {
+                  return value3.value;
+                },
+                fixed: false,
+                "safe-area-inset-bottom": false,
+                "active-color": "#fa3534",
+                "inactive-color": "#909399",
+                onChange: () => {
+                  return change3;
+                }
+              }, {
+                "default": _withSharedDataVaporCtx(() => {
+                  const n15 = _createSharedDataComponentWithFallback(_component_up_tabbar_item, "30285974", {
+                    text: "发现",
+                    icon: "search"
+                  });
+                  _setSharedData(__sharedData, 13, n15?.sharedData);
+                  const n16 = _createSharedDataComponentWithFallback(_component_up_tabbar_item, "30285cd6", {
+                    text: "购物车",
+                    icon: "shopping-cart"
+                  });
+                  _setSharedData(__sharedData, 14, n16?.sharedData);
+                  const n17 = _createSharedDataComponentWithFallback(_component_up_tabbar_item, "30286040", {
+                    text: "我的",
+                    icon: "account"
+                  });
+                  _setSharedData(__sharedData, 15, n17?.sharedData);
+                })
+              });
+              _setSharedData(__sharedData, 12, n18?.sharedData);
+            })
+          });
+          _setSharedData(__sharedData, 1, n22.sharedData);
+        })
+      });
+      _setSharedData(__sharedData, 0, n23.sharedData);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "mt-12px": { "": { "marginTop": 12 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "pb-30px": { "": { "paddingBottom": 30 } } };
-const _style_1 = { "demo-block": { "": { "marginBottom": 12, "paddingTop": 12, "paddingRight": 12, "paddingBottom": 12, "paddingLeft": 12, "backgroundColor": "#ffffff", "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "demo-label": { "": { "fontSize": 14, "fontWeight": "bold", "color": "#606266", "marginBottom": 12, "paddingLeft": 6, "borderLeftWidth": 3, "borderLeftColor": "#2979ff", "borderLeftStyle": "solid" } } };
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { resolveComponent: _resolveComponent, createVNode: _createVNode, createElementVNode: _createElementVNode, withCtx: _withCtx, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_NavBar = resolveEasycom(__resolveDynamicComponent("NavBar"), __easycom_0);
-  const _component_up_tabbar_item = resolveEasycom(__resolveDynamicComponent("up-tabbar-item"), __easycom_1);
-  const _component_up_tabbar = resolveEasycom(__resolveDynamicComponent("up-tabbar"), __easycom_2);
-  return _openBlock(), _createBlock($setup["AppKu"], null, {
-    default: _withCtx(() => [
-      _createVNode($setup["LayoutComponent"], {
-        "navigation-style": "custom",
-        "navigation-bar-title-text": "up-tabbar 底部导航"
-      }, {
-        default: _withCtx(() => [
-          _createElementVNode("view", { class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }, [
-            _createVNode(_component_NavBar, {
-              title: "Tabbar 底部导航",
-              "auto-back": true,
-              "safe-area-inset-top": true,
-              "bg-color": "#ffffff"
-            }),
-            _createElementVNode("view", { class: "p-16px" }, [
-              _createElementVNode("view", { class: "demo-block" }, [
-                _createElementVNode("text", { class: "demo-label" }, "基础用法"),
-                _createVNode(_component_up_tabbar, {
-                  value: $setup.value1,
-                  fixed: false,
-                  "safe-area-inset-bottom": false,
-                  onChange: $setup.change1
-                }, {
-                  default: _withCtx(() => [
-                    _createVNode(_component_up_tabbar_item, {
-                      text: "首页",
-                      icon: "home"
-                    }),
-                    _createVNode(_component_up_tabbar_item, {
-                      text: "放映厅",
-                      icon: "photo"
-                    }),
-                    _createVNode(_component_up_tabbar_item, {
-                      text: "直播",
-                      icon: "play-right"
-                    }),
-                    _createVNode(_component_up_tabbar_item, {
-                      text: "我的",
-                      icon: "account"
-                    })
-                  ]),
-                  _: 1
-                  /* STABLE */
-                }, 8, ["value"])
-              ]),
-              _createElementVNode("view", { class: "demo-block mt-12px" }, [
-                _createElementVNode("text", { class: "demo-label" }, "徽标提示与小红点"),
-                _createVNode(_component_up_tabbar, {
-                  value: $setup.value2,
-                  fixed: false,
-                  "safe-area-inset-bottom": false,
-                  onChange: $setup.change2
-                }, {
-                  default: _withCtx(() => [
-                    _createVNode(_component_up_tabbar_item, {
-                      text: "首页",
-                      icon: "home",
-                      badge: "5"
-                    }),
-                    _createVNode(_component_up_tabbar_item, {
-                      text: "消息",
-                      icon: "chat",
-                      dot: true
-                    }),
-                    _createVNode(_component_up_tabbar_item, {
-                      text: "我的",
-                      icon: "account"
-                    })
-                  ]),
-                  _: 1
-                  /* STABLE */
-                }, 8, ["value"])
-              ]),
-              _createElementVNode("view", { class: "demo-block mt-12px" }, [
-                _createElementVNode("text", { class: "demo-label" }, "自定义颜色"),
-                _createVNode(_component_up_tabbar, {
-                  value: $setup.value3,
-                  fixed: false,
-                  "safe-area-inset-bottom": false,
-                  "active-color": "#fa3534",
-                  "inactive-color": "#909399",
-                  onChange: $setup.change3
-                }, {
-                  default: _withCtx(() => [
-                    _createVNode(_component_up_tabbar_item, {
-                      text: "发现",
-                      icon: "search"
-                    }),
-                    _createVNode(_component_up_tabbar_item, {
-                      text: "购物车",
-                      icon: "shopping-cart"
-                    }),
-                    _createVNode(_component_up_tabbar_item, {
-                      text: "我的",
-                      icon: "account"
-                    })
-                  ]),
-                  _: 1
-                  /* STABLE */
-                }, 8, ["value"])
-              ])
-            ])
-          ])
-        ]),
-        _: 1
-        /* STABLE */
-      })
-    ]),
-    _: 1
-    /* STABLE */
-  });
-}
-const tabbar = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0, _style_1]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/tabbar/tabbar.uvue"]]);
+const _style_0 = {};
+const _style_1 = {};
+const tabbar = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0, _style_1]]]);
 export {
   tabbar as default
 };

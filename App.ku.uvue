@@ -17,7 +17,7 @@ import Tabbar from '@/src/tabbar/index.uvue';
 import { useAppStore } from '@/src/store';
 import { isPageTabbar, syncCurIdxByCurrentPage } from '@/src/tabbar/store';
 import { registerToast, unregisterToast } from '@/src/utils/toast';
-import { getThemeTokens } from '@/src/utils/theme';
+import { applyNavbarTheme, getThemeTokens } from '@/src/utils/theme';
 import type { ComponentPublicInstance } from 'vue';
 import { computed, nextTick, onBeforeMount, onMounted, onUnmounted, ref, watch } from 'vue';
 
@@ -86,6 +86,16 @@ onUnmounted(() => {
   if (uToastRef.value != null) {
     unregisterToast(uToastRef.value!);
   }
+});
+
+// 每个页面切换都会触发：同步 H5 / 小程序原生导航栏主题
+onShow(() => {
+  applyNavbarTheme(appStore.state.isDark);
+});
+
+// 主题模式 / 系统深浅色变化时，当前页面不切换也实时同步导航栏
+watch(() => appStore.state.isDark, () => {
+  applyNavbarTheme(appStore.state.isDark);
 });
 </script>
 

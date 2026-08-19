@@ -68,6 +68,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         src_utils_toast.unregisterToast(uToastRef.value);
       }
     });
+    common_vendor.onShow(() => {
+      src_utils_theme.applyNavbarTheme(appStore.state.isDark);
+    });
+    common_vendor.watch(() => {
+      return appStore.state.isDark;
+    }, () => {
+      src_utils_theme.applyNavbarTheme(appStore.state.isDark);
+    });
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({

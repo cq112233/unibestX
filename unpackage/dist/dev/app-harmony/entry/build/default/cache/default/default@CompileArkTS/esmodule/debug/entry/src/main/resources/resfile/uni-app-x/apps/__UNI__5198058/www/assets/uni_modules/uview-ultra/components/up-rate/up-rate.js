@@ -1,13 +1,18 @@
 import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
-import { r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
-import { j as guid, b as addStyle, a as addUnit, s as sleep, u as upGetRect, f as range, q as os } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
+import { j as guid, b as addStyle, a as addUnit, q as os, s as sleep, u as upGetRect, f as range } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, setSharedData: _setSharedData, toDisplayString: _toDisplayString, setSharedDataClass: _setSharedDataClass, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedDataEvent: _setSharedDataEvent, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataIf: _createSharedDataIf, createSharedDataFor: _createSharedDataFor } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpRateUpRate";
 const { computed, ref, watch, onMounted, getCurrentInstance } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-rate"
   },
+  __dynamicSharedData: true,
+  __hash: "1422d7be",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-rate/up-rate.uvue",
   __name: "up-rate",
   props: {
     modelValue: {
@@ -71,8 +76,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   },
   emits: ["update:modelValue", "change"],
   setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
-    __expose();
+    var __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpRateUpRateSharedData", sharedDataClassId: 0 })));
     const props = __props;
     const emit = __emit;
     const instance = getCurrentInstance();
@@ -248,79 +254,76 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     onMounted(() => {
       init();
     });
-    const __returned__ = { props, emit, instance, elId, elClass, rateBoxLeft, activeIndex, rateWidth, moving, customRateStyle, iconPaddingStyle, halfWidthStyle, toNumber, getMinCountValue, getCountValue, normalizeActiveIndex, getFallbackRateWidth, getRateIconWrapRect, getRateItemRect, ensureRateMetrics, emitEvent, getActiveIndex, touchMove, touchEnd, clickHandler, init };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _component_up_icon = __easycom_0;
+      _renderSharedDataEffect(() => {
+        _setSharedDataAttr(__sharedData, 3, _toSharedDataString(elId.value));
+        _setSharedDataStyle(__sharedData, 4, customRateStyle.value);
+      });
+      _createSharedDataFor(_setSharedDataScoped(__sharedData, 0, _createSharedDataVFor(__sharedDataScope, () => {
+        return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
+      })), () => {
+        return parseInt(__props.count.toString());
+      }, (__sharedData_VFor0, _for_item0, _for_key0) => {
+        _renderSharedDataEffect(() => {
+          return _setSharedDataClass(__sharedData_VFor0, 7, ["up-rate__content__item cursor-pointer", [elClass.value]]);
+        });
+        const n2 = _createSharedDataComponentWithFallback(_component_up_icon, "4df7870a-" + _for_key0.value, {
+          name: () => {
+            return Math.floor(parseFloat(activeIndex.value.toString())) > _for_key0.value ? __props.activeIcon : __props.inactiveIcon;
+          },
+          color: () => {
+            return __props.disabled ? "#c8c9cc" : Math.floor(parseFloat(activeIndex.value.toString())) > _for_key0.value ? __props.activeColor == "#FA3534" ? "primary" : __props.activeColor : __props.inactiveColor;
+          },
+          "custom-style": () => {
+            return iconPaddingStyle.value;
+          },
+          size: () => {
+            return __props.size;
+          }
+        });
+        _setSharedData(__sharedData_VFor0, 5, n2?.sharedData);
+        _setSharedDataEvent(__sharedData_VFor0, 6, ($event) => {
+          return clickHandler($event, _for_key0.value + 1);
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData_VFor0, 1, _toSharedDataBoolean(__props.allowHalf));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            return _setSharedDataStyle(__sharedData_VFor0, 4, halfWidthStyle.value);
+          });
+          const n6 = _createSharedDataComponentWithFallback(_component_up_icon, "70f71f79-" + _for_key0.value, {
+            name: () => {
+              return Math.floor(parseFloat(activeIndex.value.toString())) > _for_key0.value ? __props.activeIcon : __props.inactiveIcon;
+            },
+            color: () => {
+              return __props.disabled ? "#c8c9cc" : Math.ceil(parseFloat(activeIndex.value.toString())) > _for_key0.value ? __props.activeColor == "#FA3534" ? "primary" : __props.activeColor : __props.inactiveColor;
+            },
+            "custom-style": () => {
+              return iconPaddingStyle.value;
+            },
+            size: () => {
+              return __props.size;
+            }
+          });
+          _setSharedData(__sharedData_VFor0, 2, n6?.sharedData);
+          _setSharedDataEvent(__sharedData_VFor0, 3, ($event) => {
+            return clickHandler($event, _for_key0.value + 1);
+          });
+        });
+        return null;
+      }, (__sharedData_VFor0, _, index) => {
+        return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
+      }, 1);
+      _setSharedDataEvent(__sharedData, 1, touchMove);
+      _setSharedDataEvent(__sharedData, 2, touchEnd);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "up-rate": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "marginTop": 0, "marginRight": 0, "marginBottom": 0, "marginLeft": 0, "paddingTop": 0, "paddingRight": 0, "paddingBottom": 0, "paddingLeft": 0 } }, "up-rate__content": { "": { "display": "flex", "flexDirection": "row" } }, "up-rate__content__item": { "": { "position": "relative" } }, "up-rate__content__item__icon-wrap--half": { "": { "position": "absolute", "overflow": "hidden", "top": 0, "left": 0 } }, "up-icon": { "": { "boxSizing": "border-box" } } };
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, resolveComponent: _resolveComponent, createVNode: _createVNode, withModifiers: _withModifiers, createElementVNode: _createElementVNode, normalizeStyle: _normalizeStyle, createCommentVNode: _createCommentVNode, normalizeClass: _normalizeClass } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
-  return _openBlock(), _createElementBlock("view", {
-    class: "up-rate",
-    id: $setup.elId,
-    style: _normalizeStyle($setup.customRateStyle)
-  }, [
-    _createElementVNode(
-      "view",
-      {
-        class: "up-rate__content",
-        onTouchmove: _withModifiers($setup.touchMove, ["stop"]),
-        onTouchend: _withModifiers($setup.touchEnd, ["stop"])
-      },
-      [
-        (_openBlock(true), _createElementBlock(
-          _Fragment,
-          null,
-          _renderList(parseInt($props.count.toString()), (_, index) => {
-            return _openBlock(), _createElementBlock(
-              "view",
-              {
-                class: _normalizeClass(["up-rate__content__item cursor-pointer", [$setup.elClass]]),
-                key: index
-              },
-              [
-                _createElementVNode("view", {
-                  class: "up-rate__content__item__icon-wrap",
-                  onClick: _withModifiers(($event) => $setup.clickHandler($event, index + 1), ["stop"])
-                }, [
-                  _createVNode(_component_up_icon, {
-                    name: Math.floor(parseFloat($setup.activeIndex.toString())) > index ? $props.activeIcon : $props.inactiveIcon,
-                    color: $props.disabled ? "#c8c9cc" : Math.floor(parseFloat($setup.activeIndex.toString())) > index ? $props.activeColor == "#FA3534" ? "primary" : $props.activeColor : $props.inactiveColor,
-                    "custom-style": $setup.iconPaddingStyle,
-                    size: $props.size
-                  }, null, 8, ["name", "color", "custom-style", "size"])
-                ], 8, ["onClick"]),
-                $props.allowHalf ? (_openBlock(), _createElementBlock("view", {
-                  key: 0,
-                  onClick: _withModifiers(($event) => $setup.clickHandler($event, index + 1), ["stop"]),
-                  class: "up-rate__content__item__icon-wrap up-rate__content__item__icon-wrap--half",
-                  style: _normalizeStyle($setup.halfWidthStyle)
-                }, [
-                  _createVNode(_component_up_icon, {
-                    name: Math.floor(parseFloat($setup.activeIndex.toString())) > index ? $props.activeIcon : $props.inactiveIcon,
-                    color: $props.disabled ? "#c8c9cc" : Math.ceil(parseFloat($setup.activeIndex.toString())) > index ? $props.activeColor == "#FA3534" ? "primary" : $props.activeColor : $props.inactiveColor,
-                    "custom-style": $setup.iconPaddingStyle,
-                    size: $props.size
-                  }, null, 8, ["name", "color", "custom-style", "size"])
-                ], 12, ["onClick"])) : _createCommentVNode("v-if", true)
-              ],
-              2
-              /* CLASS */
-            );
-          }),
-          128
-          /* KEYED_FRAGMENT */
-        ))
-      ],
-      32
-      /* NEED_HYDRATION */
-    )
-  ], 12, ["id"]);
-}
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-rate/up-rate.uvue"]]);
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_1 as _
 };

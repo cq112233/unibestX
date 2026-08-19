@@ -122,7 +122,8 @@ export class AppStore extends PiniaStoreBase {
       // 只接受合法三态，防止脏数据
       if (modeVal == 'auto' || modeVal == 'light' || modeVal == 'dark') {
         this.state.themeMode = modeVal;
-      } else {
+      }
+      else {
         this.state.themeMode = 'auto';
       }
     }

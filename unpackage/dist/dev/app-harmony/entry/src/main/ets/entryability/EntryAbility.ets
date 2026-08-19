@@ -1,6 +1,7 @@
 import { UniEntryAbility } from '@dcloudio/uni-app-x-runtime'
 import BuildProfile from 'BuildProfile'
 import { initUniModules } from "../uni_modules/index.generated";
+import 'libentry.so';
 
 initUniModules()
 

@@ -1,13 +1,18 @@
 import { _ as __easycom_0 } from "../up-icon/up-icon.js";
-import { r as resolveEasycom } from "../../../../App.ku.js";
 import { d as deepMerge, b as addStyle } from "../../libs/function/index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, toDisplayString: _toDisplayString, createSharedDataIf: _createSharedDataIf, createSharedDataSlot: _createSharedDataSlot, setSharedDataEvent: _setSharedDataEvent } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpBackTopUpBackTop";
 const { computed } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-back-top"
   },
+  __dynamicSharedData: true,
+  __hash: "7937cd8a",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-back-top/up-back-top.uvue",
   __name: "up-back-top",
   props: {
     mode: {
@@ -61,8 +66,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   },
   emits: ["click"],
   setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
-    __expose();
+    var __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpBackTopUpBackTopSharedData", sharedDataClassId: 0 })));
     const props = __props;
     const emit = __emit;
     const show = computed(() => {
@@ -112,48 +118,40 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       }));
       emit("click", e);
     }
-    const __returned__ = { props, emit, show, finalStyle, backToTop };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _component_up_icon = __easycom_0;
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(show.value));
+      }, () => {
+        _renderSharedDataEffect(() => {
+          return _setSharedDataStyle(__sharedData, 5, finalStyle.value);
+        });
+        _createSharedDataSlot("default", null, null, () => {
+          const n4 = _createSharedDataComponentWithFallback(_component_up_icon, "5178bd53", {
+            name: () => {
+              return __props.icon;
+            },
+            size: "22",
+            color: "#2563eb"
+          });
+          _setSharedData(__sharedData, 1, n4?.sharedData);
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData, 2, _toSharedDataBoolean(__props.text != ""));
+          }, () => {
+            _renderSharedDataEffect(() => {
+              return _setSharedData(__sharedData, 3, _toDisplayString(__props.text));
+            });
+          });
+        });
+        _setSharedDataEvent(__sharedData, 4, backToTop);
+      });
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "up-back-top__text": { "": { "fontSize": 10, "color": "#2563eb", "marginTop": 2 } } };
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { renderSlot: _renderSlot, resolveComponent: _resolveComponent, createVNode: _createVNode, toDisplayString: _toDisplayString, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, normalizeStyle: _normalizeStyle } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
-  return $setup.show ? (_openBlock(), _createElementBlock(
-    "view",
-    {
-      key: 0,
-      style: _normalizeStyle($setup.finalStyle),
-      class: "up-back-top",
-      onClick: $setup.backToTop
-    },
-    [
-      _renderSlot(_ctx.$slots, "default", {}, () => [
-        _createVNode(_component_up_icon, {
-          name: $props.icon,
-          size: "22",
-          color: "#2563eb"
-        }, null, 8, ["name"]),
-        $props.text != "" ? (_openBlock(), _createElementBlock(
-          "text",
-          {
-            key: 0,
-            class: "up-back-top__text"
-          },
-          _toDisplayString($props.text),
-          1
-          /* TEXT */
-        )) : _createCommentVNode("v-if", true)
-      ])
-    ],
-    4
-    /* STYLE */
-  )) : _createCommentVNode("v-if", true);
-}
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-back-top/up-back-top.uvue"]]);
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_1 as _
 };

@@ -1,14 +1,19 @@
-Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚR<import { _ as __easycom_0 } from "../up-icon/up-icon.js";
-import { r as resolveEasycom } from "../../../../App.ku.js";
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ?vimport { _ as __easycom_0 } from "../up-icon/up-icon.js";
 import { d as defProps } from "./radio.js";
 import { a as addUnit, i as error, q as os, d as deepMerge, b as addStyle } from "../../libs/function/index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, createSharedDataSlot: _createSharedDataSlot, setSharedDataEvent: _setSharedDataEvent, toDisplayString: _toDisplayString } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpRadioUpRadio";
 const { computed, inject, ref, getCurrentInstance } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-radio"
   },
+  __dynamicSharedData: true,
+  __hash: "5ded71f8",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-radio/up-radio.uvue",
   __name: "up-radio",
   props: {
     // radioçš„åç§°
@@ -88,7 +93,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   setup(__props, _a) {
     var _b;
     var __expose = _a.expose, __emit = _a.emit;
-    const instance = (_b = getCurrentInstance()) === null || _b === void 0 ? null : _b.proxy;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpRadioUpRadioSharedData", sharedDataClassId: 0 })));
+    (_b = getCurrentInstance()) === null || _b === void 0 ? null : _b.proxy;
     const props = __props;
     const emit = __emit;
     const parentProps = inject("upRadioGroupProps", null);
@@ -357,85 +364,79 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       init,
       getInternalState
     });
-    const __returned__ = { instance, props, emit, parentProps, parentChange, selfChecked, isChecked, elDisabled, elLabelDisabled, elSize, elIconSize, elActiveColor, elInactiveColor, elLabelColor, elShape, elLabelSize, elIconColor, iconClasses, iconWrapStyle, radioStyle, iconPlacementClass, borderBottomClass, emitEvent, setRadioCheckedStatus, iconClickHandler, wrapperClickHandler, labelClickHandler, init, getInternalState };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _component_up_icon = __easycom_0;
+      _renderSharedDataEffect(() => {
+        _setSharedDataClass(__sharedData, 8, ["up-radio cursor-pointer", [iconPlacementClass.value, borderBottomClass.value]]);
+        _setSharedDataStyle(__sharedData, 9, [radioStyle.value]);
+        _setSharedDataClass(__sharedData, 10, ["up-radio__icon-wrap cursor-pointer", iconClasses.value]);
+        _setSharedDataStyle(__sharedData, 11, [iconWrapStyle.value]);
+      });
+      _createSharedDataSlot("icon", null, null, () => {
+        const n2 = _createSharedDataComponentWithFallback(_component_up_icon, "90b95f5e", {
+          class: "up-radio__icon-wrap__icon",
+          name: "checkbox-mark",
+          size: () => {
+            return elIconSize.value;
+          },
+          color: () => {
+            return elIconColor.value;
+          }
+        });
+        _setSharedData(__sharedData, 5, n2?.sharedData);
+      });
+      _setSharedDataEvent(__sharedData, 6, iconClickHandler);
+      _createSharedDataSlot("label", {
+        label: () => {
+          return __props.label;
+        },
+        elDisabled: () => {
+          return elDisabled.value;
+        }
+      }, (data) => {
+        return _setSharedData(__sharedData, 0, data);
+      }, () => {
+        _setSharedDataEvent(__sharedData, 1, labelClickHandler);
+        _renderSharedDataEffect(() => {
+          const _elDisabled = elDisabled.value;
+          const _elLabelSize = elLabelSize.value;
+          _setSharedDataClass(__sharedData, 2, ["up-radio__label", [_elDisabled ? "up-radio__label--disabled" : ""]]);
+          _setSharedDataStyle(__sharedData, 3, {
+            color: _elDisabled ? elInactiveColor.value : elLabelColor.value,
+            fontSize: _elLabelSize,
+            lineHeight: _elLabelSize
+          });
+          _setSharedData(__sharedData, 4, _toDisplayString(__props.label));
+        });
+      });
+      _setSharedDataEvent(__sharedData, 7, wrapperClickHandler);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-radio": { "": { "display": "flex", "flexDirection": "row", "overflow": "hidden", "alignItems": "center", "marginBottom": 5, "marginTop": 5 } }, "up-radio-label--left": { "": { "flexDirection": "row" } }, "up-radio-label--right": { "": { "flexDirection": "row-reverse", "justifyContent": "space-between" } }, "up-radio__icon-wrap": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "marginRight": 6, "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopColor": "#c8c9cc", "borderRightColor": "#c8c9cc", "borderBottomColor": "#c8c9cc", "borderLeftColor": "#c8c9cc", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "up-radio__icon-wrap--circle": { "": { "borderTopLeftRadius": 50, "borderTopRightRadius": 50, "borderBottomRightRadius": 50, "borderBottomLeftRadius": 50 } }, "up-radio__icon-wrap--square": { "": { "borderTopLeftRadius": 3, "borderTopRightRadius": 3, "borderBottomRightRadius": 3, "borderBottomLeftRadius": 3 } }, "up-radio__icon-wrap--checked": { "": { "backgroundColor": "#FF0000", "borderTopColor": "#2979ff", "borderRightColor": "#2979ff", "borderBottomColor": "#2979ff", "borderLeftColor": "#2979ff" } }, "up-radio__icon-wrap--active": { "": { "backgroundColor": "var(--theme-color, #0957de)", "borderTopColor": "var(--theme-color, #0957de)", "borderRightColor": "var(--theme-color, #0957de)", "borderBottomColor": "var(--theme-color, #0957de)", "borderLeftColor": "var(--theme-color, #0957de)" } }, "up-radio__icon-wrap--disabled": { "": { "!backgroundColor": "#ebedf0" } }, "up-radio__label": { "": { "marginLeft": 5, "marginRight": 12, "color": "#606266", "fontSize": 15 } }, "up-radio__label--disabled": { "": { "color": "#c8c9cc" } } };
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { renderSlot: _renderSlot, resolveComponent: _resolveComponent, createVNode: _createVNode, withModifiers: _withModifiers, normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode, toDisplayString: _toDisplayString, openBlock: _openBlock, createElementBlock: _createElementBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
-  return _openBlock(), _createElementBlock(
-    "view",
-    {
-      class: _normalizeClass(["up-radio cursor-pointer", [$setup.iconPlacementClass, $setup.borderBottomClass]]),
-      onClick: _withModifiers($setup.wrapperClickHandler, ["stop"]),
-      style: _normalizeStyle([$setup.radioStyle])
-    },
-    [
-      _createElementVNode(
-        "view",
-        {
-          class: _normalizeClass(["up-radio__icon-wrap cursor-pointer", $setup.iconClasses]),
-          onClick: _withModifiers($setup.iconClickHandler, ["stop"]),
-          style: _normalizeStyle([$setup.iconWrapStyle])
-        },
-        [
-          _renderSlot(_ctx.$slots, "icon", {}, () => [
-            _createVNode(_component_up_icon, {
-              class: "up-radio__icon-wrap__icon",
-              name: "checkbox-mark",
-              size: $setup.elIconSize,
-              color: $setup.elIconColor
-            }, null, 8, ["size", "color"])
-          ])
-        ],
-        6
-        /* CLASS, STYLE */
-      ),
-      _renderSlot(_ctx.$slots, "label", {
-        label: $props.label,
-        elDisabled: $setup.elDisabled
-      }, () => [
-        _createElementVNode(
-          "text",
-          {
-            class: _normalizeClass(["up-radio__label", [$setup.elDisabled ? "up-radio__label--disabled" : ""]]),
-            onClick: _withModifiers($setup.labelClickHandler, ["stop"]),
-            style: _normalizeStyle({
-              color: $setup.elDisabled ? $setup.elInactiveColor : $setup.elLabelColor,
-              fontSize: $setup.elLabelSize,
-              lineHeight: $setup.elLabelSize
-            })
-          },
-          _toDisplayString($props.label),
-          7
-          /* TEXT, CLASS, STYLE */
-        )
-      ])
-    ],
-    6
-    /* CLASS, STYLE */
-  );
-}
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-radio/up-radio.uvue"]]);
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_1 as _
 };
 //# sourceMappingURL=up-radio.js.map
-Â•ÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon.jsÙ /Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku.jsÙË/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-radio/radio.jsÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-radio/up-radio.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ‘ÔrD’²hostDependencyName®hostModuleNameÙF../../../../../uni_modules/uview-ultra/components/up-radio/up-radio.js¥entryÃÚR<import { _ as __easycom_0 } from "../up-icon/up-icon.js";
-import { r as resolveEasycom } from "../../../../App.ku.js";
+Â”ÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon.jsÙË/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-radio/radio.jsÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-radio/up-radio.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ‘ÔrD’²hostDependencyName®hostModuleNameÙF../../../../../uni_modules/uview-ultra/components/up-radio/up-radio.js¥entryÃÚ?vimport { _ as __easycom_0 } from "../up-icon/up-icon.js";
 import { d as defProps } from "./radio.js";
 import { a as addUnit, i as error, q as os, d as deepMerge, b as addStyle } from "../../libs/function/index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, createSharedDataSlot: _createSharedDataSlot, setSharedDataEvent: _setSharedDataEvent, toDisplayString: _toDisplayString } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpRadioUpRadio";
 const { computed, inject, ref, getCurrentInstance } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-radio"
   },
+  __dynamicSharedData: true,
+  __hash: "5ded71f8",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-radio/up-radio.uvue",
   __name: "up-radio",
   props: {
     // radioçš„åç§°
@@ -515,7 +516,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   setup(__props, _a) {
     var _b;
     var __expose = _a.expose, __emit = _a.emit;
-    const instance = (_b = getCurrentInstance()) === null || _b === void 0 ? null : _b.proxy;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpRadioUpRadioSharedData", sharedDataClassId: 0 })));
+    (_b = getCurrentInstance()) === null || _b === void 0 ? null : _b.proxy;
     const props = __props;
     const emit = __emit;
     const parentProps = inject("upRadioGroupProps", null);
@@ -784,87 +787,81 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       init,
       getInternalState
     });
-    const __returned__ = { instance, props, emit, parentProps, parentChange, selfChecked, isChecked, elDisabled, elLabelDisabled, elSize, elIconSize, elActiveColor, elInactiveColor, elLabelColor, elShape, elLabelSize, elIconColor, iconClasses, iconWrapStyle, radioStyle, iconPlacementClass, borderBottomClass, emitEvent, setRadioCheckedStatus, iconClickHandler, wrapperClickHandler, labelClickHandler, init, getInternalState };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _component_up_icon = __easycom_0;
+      _renderSharedDataEffect(() => {
+        _setSharedDataClass(__sharedData, 8, ["up-radio cursor-pointer", [iconPlacementClass.value, borderBottomClass.value]]);
+        _setSharedDataStyle(__sharedData, 9, [radioStyle.value]);
+        _setSharedDataClass(__sharedData, 10, ["up-radio__icon-wrap cursor-pointer", iconClasses.value]);
+        _setSharedDataStyle(__sharedData, 11, [iconWrapStyle.value]);
+      });
+      _createSharedDataSlot("icon", null, null, () => {
+        const n2 = _createSharedDataComponentWithFallback(_component_up_icon, "90b95f5e", {
+          class: "up-radio__icon-wrap__icon",
+          name: "checkbox-mark",
+          size: () => {
+            return elIconSize.value;
+          },
+          color: () => {
+            return elIconColor.value;
+          }
+        });
+        _setSharedData(__sharedData, 5, n2?.sharedData);
+      });
+      _setSharedDataEvent(__sharedData, 6, iconClickHandler);
+      _createSharedDataSlot("label", {
+        label: () => {
+          return __props.label;
+        },
+        elDisabled: () => {
+          return elDisabled.value;
+        }
+      }, (data) => {
+        return _setSharedData(__sharedData, 0, data);
+      }, () => {
+        _setSharedDataEvent(__sharedData, 1, labelClickHandler);
+        _renderSharedDataEffect(() => {
+          const _elDisabled = elDisabled.value;
+          const _elLabelSize = elLabelSize.value;
+          _setSharedDataClass(__sharedData, 2, ["up-radio__label", [_elDisabled ? "up-radio__label--disabled" : ""]]);
+          _setSharedDataStyle(__sharedData, 3, {
+            color: _elDisabled ? elInactiveColor.value : elLabelColor.value,
+            fontSize: _elLabelSize,
+            lineHeight: _elLabelSize
+          });
+          _setSharedData(__sharedData, 4, _toDisplayString(__props.label));
+        });
+      });
+      _setSharedDataEvent(__sharedData, 7, wrapperClickHandler);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-radio": { "": { "display": "flex", "flexDirection": "row", "overflow": "hidden", "alignItems": "center", "marginBottom": 5, "marginTop": 5 } }, "up-radio-label--left": { "": { "flexDirection": "row" } }, "up-radio-label--right": { "": { "flexDirection": "row-reverse", "justifyContent": "space-between" } }, "up-radio__icon-wrap": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "marginRight": 6, "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopColor": "#c8c9cc", "borderRightColor": "#c8c9cc", "borderBottomColor": "#c8c9cc", "borderLeftColor": "#c8c9cc", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "up-radio__icon-wrap--circle": { "": { "borderTopLeftRadius": 50, "borderTopRightRadius": 50, "borderBottomRightRadius": 50, "borderBottomLeftRadius": 50 } }, "up-radio__icon-wrap--square": { "": { "borderTopLeftRadius": 3, "borderTopRightRadius": 3, "borderBottomRightRadius": 3, "borderBottomLeftRadius": 3 } }, "up-radio__icon-wrap--checked": { "": { "backgroundColor": "#FF0000", "borderTopColor": "#2979ff", "borderRightColor": "#2979ff", "borderBottomColor": "#2979ff", "borderLeftColor": "#2979ff" } }, "up-radio__icon-wrap--active": { "": { "backgroundColor": "var(--theme-color, #0957de)", "borderTopColor": "var(--theme-color, #0957de)", "borderRightColor": "var(--theme-color, #0957de)", "borderBottomColor": "var(--theme-color, #0957de)", "borderLeftColor": "var(--theme-color, #0957de)" } }, "up-radio__icon-wrap--disabled": { "": { "!backgroundColor": "#ebedf0" } }, "up-radio__label": { "": { "marginLeft": 5, "marginRight": 12, "color": "#606266", "fontSize": 15 } }, "up-radio__label--disabled": { "": { "color": "#c8c9cc" } } };
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { renderSlot: _renderSlot, resolveComponent: _resolveComponent, createVNode: _createVNode, withModifiers: _withModifiers, normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode, toDisplayString: _toDisplayString, openBlock: _openBlock, createElementBlock: _createElementBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
-  return _openBlock(), _createElementBlock(
-    "view",
-    {
-      class: _normalizeClass(["up-radio cursor-pointer", [$setup.iconPlacementClass, $setup.borderBottomClass]]),
-      onClick: _withModifiers($setup.wrapperClickHandler, ["stop"]),
-      style: _normalizeStyle([$setup.radioStyle])
-    },
-    [
-      _createElementVNode(
-        "view",
-        {
-          class: _normalizeClass(["up-radio__icon-wrap cursor-pointer", $setup.iconClasses]),
-          onClick: _withModifiers($setup.iconClickHandler, ["stop"]),
-          style: _normalizeStyle([$setup.iconWrapStyle])
-        },
-        [
-          _renderSlot(_ctx.$slots, "icon", {}, () => [
-            _createVNode(_component_up_icon, {
-              class: "up-radio__icon-wrap__icon",
-              name: "checkbox-mark",
-              size: $setup.elIconSize,
-              color: $setup.elIconColor
-            }, null, 8, ["size", "color"])
-          ])
-        ],
-        6
-        /* CLASS, STYLE */
-      ),
-      _renderSlot(_ctx.$slots, "label", {
-        label: $props.label,
-        elDisabled: $setup.elDisabled
-      }, () => [
-        _createElementVNode(
-          "text",
-          {
-            class: _normalizeClass(["up-radio__label", [$setup.elDisabled ? "up-radio__label--disabled" : ""]]),
-            onClick: _withModifiers($setup.labelClickHandler, ["stop"]),
-            style: _normalizeStyle({
-              color: $setup.elDisabled ? $setup.elInactiveColor : $setup.elLabelColor,
-              fontSize: $setup.elLabelSize,
-              lineHeight: $setup.elLabelSize
-            })
-          },
-          _toDisplayString($props.label),
-          7
-          /* TEXT, CLASS, STYLE */
-        )
-      ])
-    ],
-    6
-    /* CLASS, STYLE */
-  );
-}
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-radio/up-radio.uvue"]]);
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_1 as _
 };
 //# sourceMappingURL=up-radio.js.map
-ÔrE•§version¨mappings¥names§sources®sourcesContentÜ¬‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ÔrE•§version¨mappings¥names§sources®sourcesContentÜ¨‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
  ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘”  ÌÙ ‘”  ÌÚ ‘”  ÌÛ ‘”  ÌÜ ‘”  Ìİ ‘”  ÌŞ ‘”  Ìß ‘”  Ìà ‘”  Ìá ‘”  Ìâ ‘”  Ìã ‘”  Ìä ‘”  Ìå ‘”  Ìæ ‘”  Ìç ‘”  Ìè ‘”  Ìé ‘”  Ìê ‘”  Ìë ‘”  Ìì ‘”  Ìí ‘”  Ìî ‘”  Ìï ‘”  Ìğ ‘”  Ìñ ‘”  Ìò ‘”  Ìó ‘”  Ìô ‘”  Ìõ ‘”  Ìö ‘”  Ì÷ ‘”  Ìø ‘”  Ìù ‘”  Ìú ‘”  Ìû ‘”  Ìü ‘”  Ìı ‘”  Ìş ‘”  Ìÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
- ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘”  Í ‘”  Í€ ‘”  Í ‘”  Í‚ ‘”  Íƒ ‘”  Í„ ‘”  Í… ‘”  Í† ‘”  Í‡ ‘”  Íˆ ‘”  Í‰ ‘”  ÍŠ ‘”  Í‹ ‘”  ÍŒ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í‘ ‘”  Í’ ‘”  Í“ ‘”  Í” ‘”  Í• ‘”  Í– ‘”  Í— ‘”  Í˜ ‘”  Í™ ‘”  Íš ‘”  Í› ‘”  Íœ ‘”  Í ‘”  Í ‘”  ÍŸ ‘”  Í  ‘”  Í¡ ‘”  Í¢ ‘”  Í£ ‘”  Í¤ ‘”  Í¥ ‘”  Í¦ ‘”  Í§ ‘”  Í¨ ‘”  Í© ‘”  Íª ‘ÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-radio/up-radio.js‘ÚR<import { _ as __easycom_0 } from "../up-icon/up-icon.js";
-import { r as resolveEasycom } from "../../../../App.ku.js";
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘”  Í ‘”  Í€ ‘”  Í ‘”  Í‚ ‘”  Íƒ ‘”  Í„ ‘”  Í… ‘”  Í† ‘”  Í‡ ‘”  Íˆ ‘”  Í‰ ‘”  ÍŠ ‘”  Í‹ ‘”  ÍŒ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í‘ ‘”  Í’ ‘”  Í“ ‘”  Í” ‘”  Í• ‘”  Í– ‘”  Í— ‘”  Í˜ ‘”  Í™ ‘”  Íš ‘”  Í› ‘”  Íœ ‘”  Í ‘”  Í ‘”  ÍŸ ‘”  Í  ‘”  Í¡ ‘”  Í¢ ‘”  Í£ ‘”  Í¤ ‘”  Í¥ ‘”  Í¦ ‘ÙÎ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-radio/up-radio.js‘Ú?vimport { _ as __easycom_0 } from "../up-icon/up-icon.js";
 import { d as defProps } from "./radio.js";
 import { a as addUnit, i as error, q as os, d as deepMerge, b as addStyle } from "../../libs/function/index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, createSharedDataSlot: _createSharedDataSlot, setSharedDataEvent: _setSharedDataEvent, toDisplayString: _toDisplayString } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpRadioUpRadio";
 const { computed, inject, ref, getCurrentInstance } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-radio"
   },
+  __dynamicSharedData: true,
+  __hash: "5ded71f8",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-radio/up-radio.uvue",
   __name: "up-radio",
   props: {
     // radioçš„åç§°
@@ -944,7 +941,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   setup(__props, _a) {
     var _b;
     var __expose = _a.expose, __emit = _a.emit;
-    const instance = (_b = getCurrentInstance()) === null || _b === void 0 ? null : _b.proxy;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpRadioUpRadioSharedData", sharedDataClassId: 0 })));
+    (_b = getCurrentInstance()) === null || _b === void 0 ? null : _b.proxy;
     const props = __props;
     const emit = __emit;
     const parentProps = inject("upRadioGroupProps", null);
@@ -1213,73 +1212,62 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       init,
       getInternalState
     });
-    const __returned__ = { instance, props, emit, parentProps, parentChange, selfChecked, isChecked, elDisabled, elLabelDisabled, elSize, elIconSize, elActiveColor, elInactiveColor, elLabelColor, elShape, elLabelSize, elIconColor, iconClasses, iconWrapStyle, radioStyle, iconPlacementClass, borderBottomClass, emitEvent, setRadioCheckedStatus, iconClickHandler, wrapperClickHandler, labelClickHandler, init, getInternalState };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _component_up_icon = __easycom_0;
+      _renderSharedDataEffect(() => {
+        _setSharedDataClass(__sharedData, 8, ["up-radio cursor-pointer", [iconPlacementClass.value, borderBottomClass.value]]);
+        _setSharedDataStyle(__sharedData, 9, [radioStyle.value]);
+        _setSharedDataClass(__sharedData, 10, ["up-radio__icon-wrap cursor-pointer", iconClasses.value]);
+        _setSharedDataStyle(__sharedData, 11, [iconWrapStyle.value]);
+      });
+      _createSharedDataSlot("icon", null, null, () => {
+        const n2 = _createSharedDataComponentWithFallback(_component_up_icon, "90b95f5e", {
+          class: "up-radio__icon-wrap__icon",
+          name: "checkbox-mark",
+          size: () => {
+            return elIconSize.value;
+          },
+          color: () => {
+            return elIconColor.value;
+          }
+        });
+        _setSharedData(__sharedData, 5, n2?.sharedData);
+      });
+      _setSharedDataEvent(__sharedData, 6, iconClickHandler);
+      _createSharedDataSlot("label", {
+        label: () => {
+          return __props.label;
+        },
+        elDisabled: () => {
+          return elDisabled.value;
+        }
+      }, (data) => {
+        return _setSharedData(__sharedData, 0, data);
+      }, () => {
+        _setSharedDataEvent(__sharedData, 1, labelClickHandler);
+        _renderSharedDataEffect(() => {
+          const _elDisabled = elDisabled.value;
+          const _elLabelSize = elLabelSize.value;
+          _setSharedDataClass(__sharedData, 2, ["up-radio__label", [_elDisabled ? "up-radio__label--disabled" : ""]]);
+          _setSharedDataStyle(__sharedData, 3, {
+            color: _elDisabled ? elInactiveColor.value : elLabelColor.value,
+            fontSize: _elLabelSize,
+            lineHeight: _elLabelSize
+          });
+          _setSharedData(__sharedData, 4, _toDisplayString(__props.label));
+        });
+      });
+      _setSharedDataEvent(__sharedData, 7, wrapperClickHandler);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-radio": { "": { "display": "flex", "flexDirection": "row", "overflow": "hidden", "alignItems": "center", "marginBottom": 5, "marginTop": 5 } }, "up-radio-label--left": { "": { "flexDirection": "row" } }, "up-radio-label--right": { "": { "flexDirection": "row-reverse", "justifyContent": "space-between" } }, "up-radio__icon-wrap": { "": { "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "marginRight": 6, "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1, "borderTopColor": "#c8c9cc", "borderRightColor": "#c8c9cc", "borderBottomColor": "#c8c9cc", "borderLeftColor": "#c8c9cc", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "up-radio__icon-wrap--circle": { "": { "borderTopLeftRadius": 50, "borderTopRightRadius": 50, "borderBottomRightRadius": 50, "borderBottomLeftRadius": 50 } }, "up-radio__icon-wrap--square": { "": { "borderTopLeftRadius": 3, "borderTopRightRadius": 3, "borderBottomRightRadius": 3, "borderBottomLeftRadius": 3 } }, "up-radio__icon-wrap--checked": { "": { "backgroundColor": "#FF0000", "borderTopColor": "#2979ff", "borderRightColor": "#2979ff", "borderBottomColor": "#2979ff", "borderLeftColor": "#2979ff" } }, "up-radio__icon-wrap--active": { "": { "backgroundColor": "var(--theme-color, #0957de)", "borderTopColor": "var(--theme-color, #0957de)", "borderRightColor": "var(--theme-color, #0957de)", "borderBottomColor": "var(--theme-color, #0957de)", "borderLeftColor": "var(--theme-color, #0957de)" } }, "up-radio__icon-wrap--disabled": { "": { "!backgroundColor": "#ebedf0" } }, "up-radio__label": { "": { "marginLeft": 5, "marginRight": 12, "color": "#606266", "fontSize": 15 } }, "up-radio__label--disabled": { "": { "color": "#c8c9cc" } } };
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { renderSlot: _renderSlot, resolveComponent: _resolveComponent, createVNode: _createVNode, withModifiers: _withModifiers, normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode, toDisplayString: _toDisplayString, openBlock: _openBlock, createElementBlock: _createElementBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
-  return _openBlock(), _createElementBlock(
-    "view",
-    {
-      class: _normalizeClass(["up-radio cursor-pointer", [$setup.iconPlacementClass, $setup.borderBottomClass]]),
-      onClick: _withModifiers($setup.wrapperClickHandler, ["stop"]),
-      style: _normalizeStyle([$setup.radioStyle])
-    },
-    [
-      _createElementVNode(
-        "view",
-        {
-          class: _normalizeClass(["up-radio__icon-wrap cursor-pointer", $setup.iconClasses]),
-          onClick: _withModifiers($setup.iconClickHandler, ["stop"]),
-          style: _normalizeStyle([$setup.iconWrapStyle])
-        },
-        [
-          _renderSlot(_ctx.$slots, "icon", {}, () => [
-            _createVNode(_component_up_icon, {
-              class: "up-radio__icon-wrap__icon",
-              name: "checkbox-mark",
-              size: $setup.elIconSize,
-              color: $setup.elIconColor
-            }, null, 8, ["size", "color"])
-          ])
-        ],
-        6
-        /* CLASS, STYLE */
-      ),
-      _renderSlot(_ctx.$slots, "label", {
-        label: $props.label,
-        elDisabled: $setup.elDisabled
-      }, () => [
-        _createElementVNode(
-          "text",
-          {
-            class: _normalizeClass(["up-radio__label", [$setup.elDisabled ? "up-radio__label--disabled" : ""]]),
-            onClick: _withModifiers($setup.labelClickHandler, ["stop"]),
-            style: _normalizeStyle({
-              color: $setup.elDisabled ? $setup.elInactiveColor : $setup.elLabelColor,
-              fontSize: $setup.elLabelSize,
-              lineHeight: $setup.elLabelSize
-            })
-          },
-          _toDisplayString($props.label),
-          7
-          /* TEXT, CLASS, STYLE */
-        )
-      ])
-    ],
-    6
-    /* CLASS, STYLE */
-  );
-}
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-radio/up-radio.uvue"]]);
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_1 as _
 };
 //# sourceMappingURL=up-radio.js.map
-ÔrF•µ../../../../App.ku.js¼../../libs/function/index.jsª./radio.jsµ../up-icon/up-icon.jsÙ'../../../../plugin-vue-export-helper.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙ /Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku.jsAÃªoh-resolveÂGAÂÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsAÃªoh-resolveÂGAÂÙË/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-radio/radio.jsAÃªoh-resolveÂGAÂÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon.jsAÃªoh-resolveÂGAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍPÂÍPàÀ‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍPÍÍPİÔrL”¤type¥start£end¤nameªIdentifierÍPÍÍPØ«__easycom_1LªIdentifierÍPÜÍPİ¡_À•ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration 9‘ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	
-¡_LªIdentifier«__easycom_0ÔrO•¤type¥start£end¥value£raw§Literal!8µ../up-icon/up-icon.js·"../up-icon/up-icon.js"M±ImportDeclaration:Ìv‘N¯ImportSpecifierÌCÌVLªIdentifierÌCÌD¡rLªIdentifierÌHÌV®resolveEasycomO§LiteralÌ^Ìuµ../../../../App.ku.js·"../../../../App.ku.js"M±ImportDeclarationÌwÌ¢‘N¯ImportSpecifierÌ€ÌLªIdentifierÌ€Ì¡dLªIdentifierÌ…Ì¨defPropsO§LiteralÌ•Ì¡ª./radio.js¬"./radio.js"M±ImportDeclarationÌ£Í•N¯ImportSpecifierÌ¬Ì¸LªIdentifierÌ¬Ì­¡aLªIdentifierÌ±Ì¸§addUnitN¯ImportSpecifierÌºÌÄLªIdentifierÌºÌ»¡iLªIdentifierÌ¿ÌÄ¥errorN¯ImportSpecifierÌÆÌÍLªIdentifierÌÆÌÇ¡qLªIdentifierÌËÌÍ¢osN¯ImportSpecifierÌÏÌİLªIdentifierÌÏÌĞ¡dLªIdentifierÌÔÌİ©deepMergeN¯ImportSpecifierÌßÌìLªIdentifierÌßÌà¡bLªIdentifierÌäÌì¨addStyleO§LiteralÌôÍ¼../../libs/function/index.js¾"../../libs/function/index.js"M±ImportDeclarationÍÍ_‘N¯ImportSpecifierÍÍ-LªIdentifierÍÍ¡_LªIdentifierÍ"Í-«_export_sfcO§LiteralÍ5Í^Ù'../../../../plugin-vue-export-helper.jsÙ)"../../../../plugin-vue-export-helper.js"
+ÔrF”µ../up-icon/up-icon.jsÙ'../../../../plugin-vue-export-helper.js¼../../libs/function/index.jsª./radio.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙÌ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon.jsAÃªoh-resolveÂGAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂGAÂÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsAÃªoh-resolveÂGAÂÙË/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-radio/radio.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ=üÍ>À‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍ>Í>ÔrL”¤type¥start£end¤nameªIdentifierÍ>Í>«__easycom_1LªIdentifierÍ>Í>¡_À”ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration 9‘ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	
+¡_LªIdentifier«__easycom_0ÔrO•¤type¥start£end¥value£raw§Literal!8µ../up-icon/up-icon.js·"../up-icon/up-icon.js"M±ImportDeclaration:Ìe‘N¯ImportSpecifierÌCÌPLªIdentifierÌCÌD¡dLªIdentifierÌHÌP¨defPropsO§LiteralÌXÌdª./radio.js¬"./radio.js"M±ImportDeclarationÌfÌÖ•N¯ImportSpecifierÌoÌ{LªIdentifierÌoÌp¡aLªIdentifierÌtÌ{§addUnitN¯ImportSpecifierÌ}Ì‡LªIdentifierÌ}Ì~¡iLªIdentifierÌ‚Ì‡¥errorN¯ImportSpecifierÌ‰ÌLªIdentifierÌ‰ÌŠ¡qLªIdentifierÌÌ¢osN¯ImportSpecifierÌ’Ì LªIdentifierÌ’Ì“¡dLªIdentifierÌ—Ì ©deepMergeN¯ImportSpecifierÌ¢Ì¯LªIdentifierÌ¢Ì£¡bLªIdentifierÌ§Ì¯¨addStyleO§LiteralÌ·ÌÕ¼../../libs/function/index.js¾"../../libs/function/index.js"M±ImportDeclarationÌ×Í"‘N¯ImportSpecifierÌàÌğLªIdentifierÌàÌá¡_LªIdentifierÌåÌğ«_export_sfcO§LiteralÌøÍ!Ù'../../../../plugin-vue-export-helper.jsÙ)"../../../../plugin-vue-export-helper.js"

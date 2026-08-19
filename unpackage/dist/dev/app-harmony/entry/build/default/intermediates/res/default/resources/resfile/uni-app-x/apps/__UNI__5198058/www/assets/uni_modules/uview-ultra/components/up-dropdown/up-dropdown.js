@@ -1,14 +1,19 @@
 import { _ as __easycom_0 } from "../up-icon/up-icon.js";
-import { r as resolveEasycom } from "../../../../App.ku.js";
 import { a as addUnit, d as deepMerge, e as getWindowInfo, u as upGetRect } from "../../libs/function/index.js";
 import "./types.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataStyle: _setSharedDataStyle, setSharedDataClass: _setSharedDataClass, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, setSharedData: _setSharedData, toDisplayString: _toDisplayString, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedDataEvent: _setSharedDataEvent, createSharedDataFor: _createSharedDataFor, createSharedDataSlot: _createSharedDataSlot } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpDropdownUpDropdown";
 const { computed, ref, watch, onMounted, getCurrentInstance, provide } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-dropdown"
   },
+  __dynamicSharedData: true,
+  __hash: "e39e5d86",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-dropdown/up-dropdown.uvue",
   __name: "up-dropdown",
   props: {
     // 菜单标题和选项的激活态颜色
@@ -70,6 +75,8 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   emits: ["open", "close"],
   setup(__props, _a) {
     var __expose = _a.expose, __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpDropdownUpDropdownSharedData", sharedDataClassId: 0 })));
     const instance = getCurrentInstance();
     const props = __props;
     const emit = __emit;
@@ -230,117 +237,70 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       open,
       getContentHeight
     });
-    const __returned__ = { instance, props, emit, menuList, active, current, contentStyle, highlightIndexList, contentHeight, dropdownStyle, menuStyle, contentWrapStyle, menuIconSizeUnit, getMenuIconColor, popupStyle, getContentHeight, open, close, menuClick, maskClick, highlight, getContentTextStyle, registerItem, updateItemTitle, dropdownProps };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _component_up_icon = __easycom_0;
+      _renderSharedDataEffect(() => {
+        _setSharedDataStyle(__sharedData, 4, dropdownStyle.value);
+        _setSharedDataClass(__sharedData, 5, ["up-dropdown__menu", {
+          "u-border-bottom": props.borderBottom
+        }]);
+        _setSharedDataStyle(__sharedData, 6, menuStyle.value);
+      });
+      _createSharedDataFor(_setSharedDataScoped(__sharedData, 0, _createSharedDataVFor(__sharedDataScope, () => {
+        return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
+      })), () => {
+        return menuList.value;
+      }, (__sharedData_VFor0, _for_item0, _for_key0) => {
+        _renderSharedDataEffect(() => {
+          const _index = _for_key0.value;
+          const _current = current.value;
+          const _item = _for_item0.value;
+          _setSharedDataClass(__sharedData_VFor0, 3, ["up-dropdown__menu__item__text", {
+            "up-dropdown__menu__item__text--active": (_index == _current || highlightIndexList.value.includes(_index)) && props.activeColor == "#2979ff"
+          }]);
+          _setSharedDataStyle(__sharedData_VFor0, 4, getContentTextStyle(_item, _index));
+          _setSharedData(__sharedData_VFor0, 5, _toDisplayString(_item["title"]));
+          _setSharedDataClass(__sharedData_VFor0, 6, ["up-dropdown__menu__item__arrow", {
+            "up-dropdown__menu__item__arrow--rotate": _index == _current
+          }]);
+        });
+        const n3 = _createSharedDataComponentWithFallback(_component_up_icon, "7fd8c54c-" + _for_key0.value, {
+          "custom-style": { display: "flex" },
+          name: () => {
+            return props.menuIcon;
+          },
+          size: () => {
+            return menuIconSizeUnit.value;
+          },
+          color: () => {
+            return getMenuIconColor(_for_key0.value);
+          }
+        });
+        _setSharedData(__sharedData_VFor0, 1, n3?.sharedData);
+        _setSharedDataEvent(__sharedData_VFor0, 2, () => {
+          return menuClick(_for_key0.value);
+        });
+        return null;
+      }, (__sharedData_VFor0, item, index) => {
+        return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
+      }, 1);
+      _renderSharedDataEffect(() => {
+        _setSharedDataStyle(__sharedData, 7, contentWrapStyle.value);
+        _setSharedDataStyle(__sharedData, 8, popupStyle.value);
+      });
+      _createSharedDataSlot("default", null, null);
+      _setSharedDataEvent(__sharedData, 1, () => {
+      });
+      _setSharedDataEvent(__sharedData, 2, maskClick);
+      _setSharedDataEvent(__sharedData, 3, () => {
+      });
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "up-dropdown": { "": { "flexGrow": 0, "flexShrink": 0, "flexBasis": "auto", "width": "100%", "position": "relative" } }, "up-dropdown__menu": { "": { "display": "flex", "flexDirection": "row", "position": "relative", "zIndex": 11, "height": "80rpx" } }, "up-dropdown__menu__item": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center" } }, "up-dropdown__menu__item__text": { "": { "fontSize": "28rpx", "color": "#606266" } }, "up-dropdown__menu__item__text--active": { "": { "color": "var(--theme-color, #0957de)" } }, "up-dropdown__menu__item__arrow": { "": { "marginLeft": "6rpx", "transitionProperty": "transform", "transitionDuration": "0.3s", "alignItems": "center", "display": "flex", "flexDirection": "row" } }, "up-dropdown__menu__item__arrow--rotate": { "": { "transform": "rotate(180deg)" } }, "up-dropdown__content": { "": { "borderTopWidth": 0, "borderRightWidth": 0, "borderBottomWidth": 0, "borderLeftWidth": 0, "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderTopColor": "#0000FF", "borderRightColor": "#0000FF", "borderBottomColor": "#0000FF", "borderLeftColor": "#0000FF", "position": "absolute", "zIndex": 8, "width": "100%", "left": 0, "bottom": 0, "top": "80rpx", "overflow": "hidden" } }, "up-dropdown__content__mask": { "": { "position": "absolute", "zIndex": 9, "backgroundImage": "none", "backgroundColor": "rgba(0,0,0,0.3)", "width": "100%", "left": 0, "top": 0, "bottom": 0 } }, "up-dropdown__content__popup": { "": { "position": "relative", "zIndex": 10, "transitionProperty": "transform", "transitionDuration": "0.3s", "transform": "translate3d(0, -100%, 0)", "overflow": "hidden" } }, "up-flex-row": { "": { "display": "flex", "flexDirection": "row" } }, "@TRANSITION": { "up-dropdown__menu__item__arrow": { "property": "transform", "duration": "0.3s" }, "up-dropdown__content__popup": { "property": "transform", "duration": "0.3s" } } };
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, toDisplayString: _toDisplayString, normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode, resolveComponent: _resolveComponent, createVNode: _createVNode, withModifiers: _withModifiers, renderSlot: _renderSlot } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
-  return _openBlock(), _createElementBlock(
-    "view",
-    {
-      class: "up-dropdown",
-      style: _normalizeStyle($setup.dropdownStyle)
-    },
-    [
-      _createElementVNode(
-        "view",
-        {
-          class: _normalizeClass(["up-dropdown__menu", {
-            "u-border-bottom": $setup.props.borderBottom
-          }]),
-          style: _normalizeStyle($setup.menuStyle)
-        },
-        [
-          (_openBlock(true), _createElementBlock(
-            _Fragment,
-            null,
-            _renderList($setup.menuList, (item, index) => {
-              return _openBlock(), _createElementBlock("view", {
-                class: "up-dropdown__menu__item",
-                key: index,
-                onClick: _withModifiers(($event) => $setup.menuClick(index), ["stop"])
-              }, [
-                _createElementVNode("view", { class: "up-flex up-flex-row" }, [
-                  _createElementVNode(
-                    "text",
-                    {
-                      class: _normalizeClass(["up-dropdown__menu__item__text", {
-                        "up-dropdown__menu__item__text--active": (index == $setup.current || $setup.highlightIndexList.includes(index)) && $setup.props.activeColor == "#2979ff"
-                      }]),
-                      style: _normalizeStyle($setup.getContentTextStyle(item, index))
-                    },
-                    _toDisplayString(item["title"]),
-                    7
-                    /* TEXT, CLASS, STYLE */
-                  ),
-                  _createElementVNode(
-                    "view",
-                    {
-                      class: _normalizeClass(["up-dropdown__menu__item__arrow", {
-                        "up-dropdown__menu__item__arrow--rotate": index == $setup.current
-                      }])
-                    },
-                    [
-                      _createVNode(_component_up_icon, {
-                        "custom-style": { display: "flex" },
-                        name: $setup.props.menuIcon,
-                        size: $setup.menuIconSizeUnit,
-                        color: $setup.getMenuIconColor(index)
-                      }, null, 8, ["name", "size", "color"])
-                    ],
-                    2
-                    /* CLASS */
-                  )
-                ])
-              ], 8, ["onClick"]);
-            }),
-            128
-            /* KEYED_FRAGMENT */
-          ))
-        ],
-        6
-        /* CLASS, STYLE */
-      ),
-      _createElementVNode(
-        "view",
-        {
-          class: "up-dropdown__content",
-          style: _normalizeStyle($setup.contentWrapStyle),
-          onClick: $setup.maskClick,
-          onTouchmove: _cache[1] || (_cache[1] = _withModifiers(() => {
-          }, ["stop", "prevent"]))
-        },
-        [
-          _createElementVNode(
-            "view",
-            {
-              onClick: _cache[0] || (_cache[0] = _withModifiers(() => {
-              }, ["stop", "prevent"])),
-              class: "up-dropdown__content__popup",
-              style: _normalizeStyle($setup.popupStyle)
-            },
-            [
-              _renderSlot(_ctx.$slots, "default")
-            ],
-            4
-            /* STYLE */
-          ),
-          _createElementVNode("view", { class: "up-dropdown__content__mask" })
-        ],
-        36
-        /* STYLE, NEED_HYDRATION */
-      )
-    ],
-    4
-    /* STYLE */
-  );
-}
-const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-dropdown/up-dropdown.uvue"]]);
+const _style_0 = {};
+const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_2 as _
 };

@@ -39,7 +39,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           title: "uview-ultra 组件演示",
           ["auto-back"]: true,
           ["safe-area-inset-top"]: true,
-          ["bg-color"]: "#ffffff",
           class: "data-v-e0cc545a"
         }),
         b: common_assets._imports_0,
@@ -52,7 +51,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         e: common_vendor.o(($event) => {
           return goToDemo("button");
-        }, "80"),
+        }, "4a"),
         f: common_vendor.p({
           title: "Button 按钮",
           ["is-link"]: true,
@@ -66,7 +65,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         h: common_vendor.o(($event) => {
           return goToDemo("icon");
-        }, "e4"),
+        }, "a0"),
         i: common_vendor.p({
           title: "Icon 图标",
           ["is-link"]: true,
@@ -80,7 +79,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         k: common_vendor.o(($event) => {
           return goToDemo("text");
-        }, "2c"),
+        }, "f8"),
         l: common_vendor.p({
           title: "Text 文本",
           ["is-link"]: true,
@@ -94,7 +93,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         n: common_vendor.o(($event) => {
           return goToDemo("link");
-        }, "b9"),
+        }, "b5"),
         o: common_vendor.p({
           title: "Link 超链接",
           ["is-link"]: true,
@@ -108,7 +107,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         q: common_vendor.o(($event) => {
           return goToDemo("empty");
-        }, "ad"),
+        }, "6d"),
         r: common_vendor.p({
           title: "Empty 空白页",
           ["is-link"]: true,
@@ -122,7 +121,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         t: common_vendor.o(($event) => {
           return goToDemo("divider");
-        }, "9e"),
+        }, "62"),
         v: common_vendor.p({
           title: "Divider 分割线",
           ["is-link"]: true,
@@ -136,7 +135,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         x: common_vendor.o(($event) => {
           return goToDemo("loading-icon");
-        }, "b9"),
+        }, "fd"),
         y: common_vendor.p({
           title: "LoadingIcon 加载图标",
           ["is-link"]: true,
@@ -150,7 +149,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         A: common_vendor.o(($event) => {
           return goToDemo("skeleton");
-        }, "ae"),
+        }, "f4"),
         B: common_vendor.p({
           title: "Skeleton 骨架屏",
           ["is-link"]: true,
@@ -164,7 +163,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         D: common_vendor.o(($event) => {
           return goToDemo("tag");
-        }, "50"),
+        }, "ec"),
         E: common_vendor.p({
           title: "Tag 标签",
           ["is-link"]: true,
@@ -178,7 +177,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         G: common_vendor.o(($event) => {
           return goToDemo("badge");
-        }, "8f"),
+        }, "64"),
         H: common_vendor.p({
           title: "Badge 徽标",
           ["is-link"]: true,
@@ -192,7 +191,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         J: common_vendor.o(($event) => {
           return goToDemo("avatar");
-        }, "c4"),
+        }, "39"),
         K: common_vendor.p({
           title: "Avatar 头像",
           ["is-link"]: true,
@@ -206,7 +205,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         M: common_vendor.o(($event) => {
           return goToDemo("card");
-        }, "54"),
+        }, "ac"),
         N: common_vendor.p({
           title: "Card 卡片",
           ["is-link"]: true,
@@ -220,7 +219,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         P: common_vendor.o(($event) => {
           return goToDemo("list");
-        }, "c4"),
+        }, "8f"),
         Q: common_vendor.p({
           title: "List 列表",
           ["is-link"]: true,
@@ -234,7 +233,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         S: common_vendor.o(($event) => {
           return goToDemo("swiper");
-        }, "29"),
+        }, "e2"),
         T: common_vendor.p({
           title: "Swiper 轮播图",
           ["is-link"]: true,
@@ -248,7 +247,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         V: common_vendor.o(($event) => {
           return goToDemo("image");
-        }, "7f"),
+        }, "5c"),
         W: common_vendor.p({
           title: "Image 图片组件",
           ["is-link"]: true,
@@ -262,7 +261,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         Y: common_vendor.o(($event) => {
           return goToDemo("transition");
-        }, "ff"),
+        }, "07"),
         Z: common_vendor.p({
           title: "Transition 动画过渡",
           ["is-link"]: true,
@@ -276,7 +275,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         ab: common_vendor.o(($event) => {
           return goToDemo("steps");
-        }, "ac"),
+        }, "ba"),
         ac: common_vendor.p({
           title: "Steps 步骤条",
           ["is-link"]: true,
@@ -290,7 +289,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         ae: common_vendor.o(($event) => {
           return goToDemo("grid");
-        }, "b6"),
+        }, "a9"),
         af: common_vendor.p({
           title: "Grid 宫格",
           ["is-link"]: true,
@@ -304,7 +303,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         ah: common_vendor.o(($event) => {
           return goToDemo("line");
-        }, "6e"),
+        }, "32"),
         ai: common_vendor.p({
           title: "Line 线条",
           ["is-link"]: true,
@@ -318,7 +317,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         ak: common_vendor.o(($event) => {
           return goToDemo("album");
-        }, "32"),
+        }, "c0"),
         al: common_vendor.p({
           title: "Album 相册",
           ["is-link"]: true,
@@ -332,7 +331,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         an: common_vendor.o(($event) => {
           return goToDemo("gap");
-        }, "81"),
+        }, "34"),
         ao: common_vendor.p({
           title: "Gap 间隔槽",
           ["is-link"]: true,
@@ -346,7 +345,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         aq: common_vendor.o(($event) => {
           return goToDemo("sticky");
-        }, "c9"),
+        }, "15"),
         ar: common_vendor.p({
           title: "Sticky 吸顶",
           ["is-link"]: true,
@@ -360,7 +359,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         at: common_vendor.o(($event) => {
           return goToDemo("table");
-        }, "7c"),
+        }, "66"),
         av: common_vendor.p({
           title: "Table 表格",
           ["is-link"]: true,
@@ -374,7 +373,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         ax: common_vendor.o(($event) => {
           return goToDemo("lazy-load");
-        }, "ab"),
+        }, "cf"),
         ay: common_vendor.p({
           title: "LazyLoad 懒加载",
           ["is-link"]: true,
@@ -388,7 +387,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         aA: common_vendor.o(($event) => {
           return goToDemo("loadmore");
-        }, "84"),
+        }, "24"),
         aB: common_vendor.p({
           title: "Loadmore 加载更多",
           ["is-link"]: true,
@@ -402,7 +401,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         aD: common_vendor.o(($event) => {
           return goToDemo("parse");
-        }, "68"),
+        }, "59"),
         aE: common_vendor.p({
           title: "Parse 富文本解析",
           ["is-link"]: true,
@@ -416,7 +415,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         aG: common_vendor.o(($event) => {
           return goToDemo("qrcode");
-        }, "4a"),
+        }, "e9"),
         aH: common_vendor.p({
           title: "Qrcode 二维码",
           ["is-link"]: true,
@@ -430,7 +429,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         aJ: common_vendor.o(($event) => {
           return goToDemo("waterfall");
-        }, "e7"),
+        }, "90"),
         aK: common_vendor.p({
           title: "Waterfall 瀑布流",
           ["is-link"]: true,
@@ -448,7 +447,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         aN: common_vendor.o(($event) => {
           return goToDemo("input");
-        }, "ee"),
+        }, "23"),
         aO: common_vendor.p({
           title: "Input 输入框",
           ["is-link"]: true,
@@ -462,7 +461,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         aQ: common_vendor.o(($event) => {
           return goToDemo("checkbox");
-        }, "bc"),
+        }, "11"),
         aR: common_vendor.p({
           title: "Checkbox 复选框",
           ["is-link"]: true,
@@ -476,7 +475,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         aT: common_vendor.o(($event) => {
           return goToDemo("radio");
-        }, "ea"),
+        }, "1d"),
         aU: common_vendor.p({
           title: "Radio 单选框",
           ["is-link"]: true,
@@ -490,7 +489,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         aW: common_vendor.o(($event) => {
           return goToDemo("switch");
-        }, "e6"),
+        }, "48"),
         aX: common_vendor.p({
           title: "Switch 开关",
           ["is-link"]: true,
@@ -504,7 +503,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         aZ: common_vendor.o(($event) => {
           return goToDemo("rate");
-        }, "1c"),
+        }, "f6"),
         ba: common_vendor.p({
           title: "Rate 评分",
           ["is-link"]: true,
@@ -518,7 +517,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         bc: common_vendor.o(($event) => {
           return goToDemo("number-box");
-        }, "6e"),
+        }, "bb"),
         bd: common_vendor.p({
           title: "NumberBox 步进器",
           ["is-link"]: true,
@@ -532,7 +531,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         bf: common_vendor.o(($event) => {
           return goToDemo("slider");
-        }, "d1"),
+        }, "93"),
         bg: common_vendor.p({
           title: "Slider 滑块",
           ["is-link"]: true,
@@ -546,7 +545,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         bi: common_vendor.o(($event) => {
           return goToDemo("textarea");
-        }, "12"),
+        }, "a9"),
         bj: common_vendor.p({
           title: "Textarea 多行文本",
           ["is-link"]: true,
@@ -560,7 +559,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         bl: common_vendor.o(($event) => {
           return goToDemo("upload");
-        }, "cd"),
+        }, "c5"),
         bm: common_vendor.p({
           title: "Upload 上传",
           ["is-link"]: true,
@@ -574,7 +573,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         bo: common_vendor.o(($event) => {
           return goToDemo("search");
-        }, "cf"),
+        }, "0e"),
         bp: common_vendor.p({
           title: "Search 搜索",
           ["is-link"]: true,
@@ -588,7 +587,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         br: common_vendor.o(($event) => {
           return goToDemo("form");
-        }, "5c"),
+        }, "35"),
         bs: common_vendor.p({
           title: "完整 Form 表单示例",
           ["is-link"]: true,
@@ -602,7 +601,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         bv: common_vendor.o(($event) => {
           return goToDemo("pagination");
-        }, "fb"),
+        }, "14"),
         bw: common_vendor.p({
           title: "Pagination 分页器",
           ["is-link"]: true,
@@ -616,7 +615,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         by: common_vendor.o(($event) => {
           return goToDemo("keyboard");
-        }, "24"),
+        }, "a4"),
         bz: common_vendor.p({
           title: "Keyboard 键盘",
           ["is-link"]: true,
@@ -630,7 +629,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         bB: common_vendor.o(($event) => {
           return goToDemo("dropdown");
-        }, "3c"),
+        }, "6b"),
         bC: common_vendor.p({
           title: "Dropdown 下拉菜单",
           ["is-link"]: true,
@@ -644,7 +643,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         bE: common_vendor.o(($event) => {
           return goToDemo("swipe-action");
-        }, "d6"),
+        }, "c2"),
         bF: common_vendor.p({
           title: "SwipeAction 滑动操作",
           ["is-link"]: true,
@@ -658,7 +657,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         bH: common_vendor.o(($event) => {
           return goToDemo("code-input");
-        }, "0a"),
+        }, "00"),
         bI: common_vendor.p({
           title: "CodeInput 验证码输入",
           ["is-link"]: true,
@@ -672,7 +671,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         bK: common_vendor.o(($event) => {
           return goToDemo("code");
-        }, "b9"),
+        }, "8c"),
         bL: common_vendor.p({
           title: "Code 验证码倒计时",
           ["is-link"]: true,
@@ -690,7 +689,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         bO: common_vendor.o(($event) => {
           return goToDemo("alert");
-        }, "c3"),
+        }, "da"),
         bP: common_vendor.p({
           title: "Alert 警告提示",
           ["is-link"]: true,
@@ -704,7 +703,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         bR: common_vendor.o(($event) => {
           return goToDemo("calendar");
-        }, "ec"),
+        }, "6b"),
         bS: common_vendor.p({
           title: "Calendar 日历",
           ["is-link"]: true,
@@ -718,7 +717,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         bU: common_vendor.o(($event) => {
           return goToDemo("picker");
-        }, "e9"),
+        }, "95"),
         bV: common_vendor.p({
           title: "Picker 选择器",
           ["is-link"]: true,
@@ -732,7 +731,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         bX: common_vendor.o(($event) => {
           return goToDemo("datetime-picker");
-        }, "c7"),
+        }, "b4"),
         bY: common_vendor.p({
           title: "DatetimePicker 时间选择",
           ["is-link"]: true,
@@ -746,7 +745,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         ca: common_vendor.o(($event) => {
           return goToDemo("action-sheet");
-        }, "12"),
+        }, "3d"),
         cb: common_vendor.p({
           title: "ActionSheet 动作面板",
           ["is-link"]: true,
@@ -760,7 +759,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         cd: common_vendor.o(($event) => {
           return goToDemo("notice-bar");
-        }, "af"),
+        }, "b4"),
         ce: common_vendor.p({
           title: "NoticeBar 滚动通知",
           ["is-link"]: true,
@@ -774,7 +773,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         cg: common_vendor.o(($event) => {
           return goToDemo("collapse");
-        }, "ae"),
+        }, "f2"),
         ch: common_vendor.p({
           title: "Collapse 折叠面板",
           ["is-link"]: true,
@@ -788,7 +787,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         cj: common_vendor.o(($event) => {
           return goToDemo("toast");
-        }, "40"),
+        }, "20"),
         ck: common_vendor.p({
           title: "Toast 消息提示",
           ["is-link"]: true,
@@ -802,7 +801,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         cm: common_vendor.o(($event) => {
           return goToDemo("notify");
-        }, "71"),
+        }, "3a"),
         cn: common_vendor.p({
           title: "Notify 消息通知",
           ["is-link"]: true,
@@ -816,7 +815,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         cp: common_vendor.o(($event) => {
           return goToDemo("loading-page");
-        }, "54"),
+        }, "08"),
         cq: common_vendor.p({
           title: "LoadingPage 加载页",
           ["is-link"]: true,
@@ -830,7 +829,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         cs: common_vendor.o(($event) => {
           return goToDemo("overlay");
-        }, "61"),
+        }, "be"),
         ct: common_vendor.p({
           title: "Overlay 遮罩层",
           ["is-link"]: true,
@@ -844,7 +843,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         cw: common_vendor.o(($event) => {
           return goToDemo("modal");
-        }, "13"),
+        }, "7f"),
         cx: common_vendor.p({
           title: "Modal 模态框",
           ["is-link"]: true,
@@ -858,7 +857,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         cz: common_vendor.o(($event) => {
           return goToDemo("popup");
-        }, "ca"),
+        }, "57"),
         cA: common_vendor.p({
           title: "Popup 弹出层",
           ["is-link"]: true,
@@ -872,7 +871,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         cC: common_vendor.o(($event) => {
           return goToDemo("no-network");
-        }, "f6"),
+        }, "73"),
         cD: common_vendor.p({
           title: "NoNetwork 无网络提示",
           ["is-link"]: true,
@@ -886,7 +885,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         cF: common_vendor.o(($event) => {
           return goToDemo("line-progress");
-        }, "38"),
+        }, "66"),
         cG: common_vendor.p({
           title: "LineProgress 线型进度",
           ["is-link"]: true,
@@ -900,7 +899,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         cI: common_vendor.o(($event) => {
           return goToDemo("circle-progress");
-        }, "d8"),
+        }, "e4"),
         cJ: common_vendor.p({
           title: "CircleProgress 圆形进度条",
           ["is-link"]: true,
@@ -914,7 +913,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         cL: common_vendor.o(($event) => {
           return goToDemo("count-down");
-        }, "a6"),
+        }, "ab"),
         cM: common_vendor.p({
           title: "CountDown 倒计时",
           ["is-link"]: true,
@@ -928,7 +927,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         cO: common_vendor.o(($event) => {
           return goToDemo("count-to");
-        }, "4a"),
+        }, "14"),
         cP: common_vendor.p({
           title: "CountTo 数字滚动",
           ["is-link"]: true,
@@ -942,7 +941,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         cR: common_vendor.o(($event) => {
           return goToDemo("copy");
-        }, "73"),
+        }, "d5"),
         cS: common_vendor.p({
           title: "Copy 文本复制",
           ["is-link"]: true,
@@ -960,7 +959,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         cV: common_vendor.o(($event) => {
           return goToDemo("navbar");
-        }, "96"),
+        }, "d3"),
         cW: common_vendor.p({
           title: "Navbar 导航栏",
           ["is-link"]: true,
@@ -974,7 +973,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         cY: common_vendor.o(($event) => {
           return goToDemo("navbar-mini");
-        }, "1e"),
+        }, "25"),
         cZ: common_vendor.p({
           title: "NavbarMini 迷你导航",
           ["is-link"]: true,
@@ -988,7 +987,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         db: common_vendor.o(($event) => {
           return goToDemo("back-top");
-        }, "d8"),
+        }, "cd"),
         dc: common_vendor.p({
           title: "BackTop 返回顶部",
           ["is-link"]: true,
@@ -1002,7 +1001,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         de: common_vendor.o(($event) => {
           return goToDemo("tabbar");
-        }, "f4"),
+        }, "84"),
         df: common_vendor.p({
           title: "Tabbar 底部导航",
           ["is-link"]: true,
@@ -1016,7 +1015,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         dh: common_vendor.o(($event) => {
           return goToDemo("tabs");
-        }, "78"),
+        }, "bc"),
         di: common_vendor.p({
           title: "Tabs 标签页",
           ["is-link"]: true,
@@ -1030,7 +1029,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         dk: common_vendor.o(($event) => {
           return goToDemo("subsection");
-        }, "1e"),
+        }, "41"),
         dl: common_vendor.p({
           title: "Subsection 分段器",
           ["is-link"]: true,
@@ -1044,7 +1043,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         dn: common_vendor.o(($event) => {
           return goToDemo("index-list");
-        }, "da"),
+        }, "af"),
         dp: common_vendor.p({
           title: "IndexList 索引列表",
           ["is-link"]: true,
@@ -1058,7 +1057,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         dr: common_vendor.o(($event) => {
           return goToDemo("mp-html");
-        }, "33"),
+        }, "d4"),
         ds: common_vendor.p({
           title: "MpHtml 富文本组件",
           ["is-link"]: true,

@@ -64,14 +64,21 @@ import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/systemInfo&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/toast&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/tabbar/config&";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, setSharedDataEvent: _setSharedDataEvent, createSharedDataComponent: _createSharedDataComponent, setSharedData: _setSharedData, withSharedDataVaporCtx: _withSharedDataVaporCtx } = globalThis.Vue;
+const __className = "GenSrcSubAuthLogin";
 const { ref } = globalThis.Vue;
 const { onLoad } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  __dynamicSharedData: true,
+  __hash: "7a34a651",
+  __className,
+  __filename: "src/sub/auth/login.uvue",
   __name: "login",
-  setup(__props, _a) {
-    var __expose = _a.expose;
-    __expose();
+  setup(__props) {
+    const __sharedDataRenderer = _useSharedDataRenderer();
+    const __sharedData = __sharedDataRenderer == "component" ? _withSharedDataComponent(new UniDynamicSharedDataComponent(_useSharedDataScope(), _useSharedDataComponentOptions({ bundleKey: "GenSrcSubAuthLoginSharedData", sharedDataClassId: 0 }))) : _withSharedDataPage(new UniDynamicSharedDataPage(_useSharedDataPageId(), _useSharedDataPageOptions({ bundleKey: "GenSrcSubAuthLoginSharedData", sharedDataClassId: 0 })));
+    _useSharedDataScope(__sharedData);
     const tokenStore = useTokenStore();
     const userStore = useUserStore();
     const redirectUrl = ref("");
@@ -84,10 +91,10 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       }
     });
     function doLogin() {
-      var _a2;
+      var _a;
       if (tokenStore.hasValidLogin()) {
         if (redirectUrl.value !== "") {
-          const targetUrl = (_a2 = decodeURIComponent(redirectUrl.value)) !== null && _a2 !== void 0 ? _a2 : "";
+          const targetUrl = (_a = decodeURIComponent(redirectUrl.value)) !== null && _a !== void 0 ? _a : "";
           if (isPageTabbar(targetUrl)) {
             setCurIdxByPath(targetUrl);
             uni.switchTab({ url: targetUrl });
@@ -114,9 +121,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
         icon: "success"
       });
       setTimeout(() => {
-        var _a3;
+        var _a2;
         if (redirectUrl.value !== "") {
-          const targetUrl = (_a3 = decodeURIComponent(redirectUrl.value)) !== null && _a3 !== void 0 ? _a3 : "";
+          const targetUrl = (_a2 = decodeURIComponent(redirectUrl.value)) !== null && _a2 !== void 0 ? _a2 : "";
           if (isPageTabbar(targetUrl)) {
             setCurIdxByPath(targetUrl);
             uni.switchTab({ url: targetUrl });
@@ -128,43 +135,25 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
         }
       }, 1e3);
     }
-    const __returned__ = { tokenStore, userStore, redirectUrl, doLogin, get AppKu() {
-      return AppKu;
-    }, get LayoutComponent() {
-      return LayoutComponent;
-    } };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const n6 = _createSharedDataComponent(AppKu, "44259de4", null, {
+        "default": _withSharedDataVaporCtx(() => {
+          const n5 = _createSharedDataComponent(LayoutComponent, "408e1e92", { "navigation-bar-title-text": "登录" }, {
+            "default": () => {
+              _setSharedDataEvent(__sharedData, 2, doLogin);
+            }
+          });
+          _setSharedData(__sharedData, 1, n5.sharedData);
+        })
+      });
+      _setSharedData(__sharedData, 0, n6.sharedData);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "bg-__3b82f6_": { "": { "backgroundImage": "none", "backgroundColor": "#3b82f6" } }, "flex": { "": { "display": "flex" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-44px": { "": { "height": 44 } }, "items-center": { "": { "alignItems": "center" } }, "justify-center": { "": { "justifyContent": "center" } }, "mb-30px": { "": { "marginBottom": 30 } }, "p-30px": { "": { "paddingTop": 30, "paddingRight": 30, "paddingBottom": 30, "paddingLeft": 30 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__1e293b_": { "": { "color": "#1e293b" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-14px": { "": { "fontSize": 14 } }, "text-20px": { "": { "fontSize": 20 } }, "w-200px": { "": { "width": 200 } } };
-const { createElementVNode: _createElementVNode, withCtx: _withCtx, createVNode: _createVNode, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return _openBlock(), _createBlock($setup["AppKu"], null, {
-    default: _withCtx(() => [
-      _createVNode($setup["LayoutComponent"], { "navigation-bar-title-text": "登录" }, {
-        default: _withCtx(() => [
-          _createElementVNode("view", { class: "flex-1 p-30px items-center justify-center" }, [
-            _createElementVNode("view", { class: "mb-30px" }, [
-              _createElementVNode("text", { class: "text-20px font-bold text-__1e293b_" }, "登录页")
-            ]),
-            _createElementVNode("view", {
-              class: "w-200px h-44px rounded-8px bg-__3b82f6_ flex flex-row items-center justify-center",
-              onClick: $setup.doLogin
-            }, [
-              _createElementVNode("text", { class: "text-__ffffff_ text-14px font-bold" }, "点击模拟登录")
-            ])
-          ])
-        ]),
-        _: 1
-        /* STABLE */
-      })
-    ]),
-    _: 1
-    /* STABLE */
-  });
-}
-const login = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/auth/login.uvue"]]);
+const _style_0 = {};
+const login = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   login as default
 };

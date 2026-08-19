@@ -1,35 +1,36 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const light = new common_vendor.UTSJSONObject({
-  navigationBarTextStyle: "black",
-  navigationBarBackgroundColor: "#ffffff",
   backgroundColor: "#f8fafc",
   backgroundColorContent: "#f8fafc",
   backgroundTextStyle: "dark",
-  tabBarColor: "#94a3b8",
-  tabBarSelectedColor: "#1890ff",
+  navigationBarBackgroundColor: "#ffffff",
+  navigationBarTextStyle: "black",
   tabBarBackgroundColor: "#ffffff",
-  tabBarBorderStyle: "black"
+  tabBarBorderStyle: "black",
+  tabBarColor: "#94a3b8",
+  tabBarSelectedColor: "#1890ff"
 });
 const dark = new common_vendor.UTSJSONObject({
-  navigationBarTextStyle: "white",
-  navigationBarBackgroundColor: "#0f172a",
   backgroundColor: "#0f172a",
   backgroundColorContent: "#0f172a",
   backgroundTextStyle: "light",
-  tabBarColor: "#94a3b8",
-  tabBarSelectedColor: "#1890ff",
+  navigationBarBackgroundColor: "#0f172a",
+  navigationBarTextStyle: "white",
   tabBarBackgroundColor: "#0f172a",
-  tabBarBorderStyle: "black"
+  tabBarBorderStyle: "black",
+  tabBarColor: "#94a3b8",
+  tabBarSelectedColor: "#1890ff"
 });
 const themeJson = new common_vendor.UTSJSONObject({
   light,
   dark
 });
 function getSystemTheme() {
+  var _a;
   let theme = "light";
   try {
-    theme = common_vendor.index.getAppBaseInfo().hostTheme;
+    theme = (_a = common_vendor.index.getAppBaseInfo().hostTheme) !== null && _a !== void 0 ? _a : "light";
   } catch (e) {
   }
   return theme;
@@ -96,6 +97,17 @@ function mapTabBorderStyle(value, isDark) {
   }
   return value;
 }
+function applyNavbarTheme(isDark) {
+  const tokens = getThemeTokens(isDark);
+  try {
+    common_vendor.index.setNavigationBarColor({
+      frontColor: tokens.navText,
+      backgroundColor: tokens.navBg
+    });
+  } catch (e) {
+  }
+}
+exports.applyNavbarTheme = applyNavbarTheme;
 exports.getSystemTheme = getSystemTheme;
 exports.getThemeTokens = getThemeTokens;
 //# sourceMappingURL=../../../.sourcemap/mp-weixin/src/utils/theme.js.map

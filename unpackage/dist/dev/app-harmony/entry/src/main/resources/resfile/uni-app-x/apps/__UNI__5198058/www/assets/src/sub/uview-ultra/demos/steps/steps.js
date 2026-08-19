@@ -1,8 +1,8 @@
 import { _ as __easycom_0 } from "../../../../components/NavBar/NavBar.js";
-import { A as AppKu, r as resolveEasycom } from "../../../../../App.ku.js";
 import { _ as __easycom_1 } from "../../../../../uni_modules/uview-ultra/components/up-steps-item/up-steps-item.js";
 import { _ as __easycom_2 } from "../../../../../uni_modules/uview-ultra/components/up-steps/up-steps.js";
 import { _ as __easycom_2$1 } from "../../../../../uni_modules/uview-ultra/components/up-button/up-button.js";
+import { A as AppKu } from "../../../../../App.ku.js";
 import { L as LayoutComponent } from "../../../../layouts/default.js";
 import { _ as _export_sfc } from "../../../../../plugin-vue-export-helper.js";
 import "../../../../utils/systemInfo.js";
@@ -43,18 +43,19 @@ import "../../../../utils/theme.js";
 import "../../../../../theme.js";
 import "../../../../store/token.js";
 import "../../../../store/user.js";
-import "../../../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
-import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.js";
-import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/loadingIcon.js";
-import "../../../../../uni_modules/uview-ultra/libs/config/config.js";
+import "../../../../../uni_modules/uview-ultra/components/up-icon/up-icon.js";
+import "../../../../../uni_modules/uview-ultra/components/up-icon/icons.js";
 import "../../../../../uni_modules/uview-ultra/libs/function/index.js";
 import "../../../../../uni_modules/uview-ultra/libs/function/test.js";
 import "../../../../../uni_modules/uview-ultra/libs/function/digit.js";
-import "../../../../../uni_modules/uview-ultra/libs/function/colorGradient.js";
-import "../../../../../uni_modules/uview-ultra/components/up-icon/up-icon.js";
-import "../../../../../uni_modules/uview-ultra/components/up-icon/icons.js";
+import "../../../../../uni_modules/uview-ultra/libs/config/config.js";
 import "../../../../../uni_modules/uview-ultra/libs/composable/useUltraUI.js";
 import "../../../../../uni_modules/uview-ultra/components/up-icon/icon.js";
+import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.js";
+import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/loadingIcon.js";
+import "../../../../../uni_modules/uview-ultra/libs/function/colorGradient.js";
+import "../../../../../uni_modules/uview-ultra/libs/function/throttle.js";
+import "../../../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
 import "../../../../../uni_modules/uview-ultra/components/up-gap/up-gap.js";
 import "../../../../../uni_modules/uview-ultra/libs/composable/useMp.js";
 import "../../../../../uni_modules/uview-ultra/components/up-gap/gap.js";
@@ -68,173 +69,168 @@ import "../../../../../uni_modules/uni-icons/components/uni-icons/uni-icons.js";
 import "../../../../../uni_modules/uni-icons/components/uni-icons/uniicons_file.js";
 import "../../../../utils/i18n.js";
 import "../../../../utils/toast.js";
-import "../../../../../uni_modules/uview-ultra/libs/function/throttle.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, resolveComponent: _resolveComponent, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
+const __className = "GenSrcSubUviewUltraDemosStepsSteps";
 const { ref } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  __dynamicSharedData: true,
+  __hash: "12246b9a",
+  __className,
+  __filename: "src/sub/uview-ultra/demos/steps/steps.uvue",
   __name: "steps",
-  setup(__props, _a) {
-    var __expose = _a.expose;
-    __expose();
+  setup(__props) {
+    const __sharedDataRenderer = _useSharedDataRenderer();
+    const __sharedData = __sharedDataRenderer == "component" ? _withSharedDataComponent(new UniDynamicSharedDataComponent(_useSharedDataScope(), _useSharedDataComponentOptions({ bundleKey: "GenSrcSubUviewUltraDemosStepsStepsSharedData", sharedDataClassId: 0 }))) : _withSharedDataPage(new UniDynamicSharedDataPage(_useSharedDataPageId(), _useSharedDataPageOptions({ bundleKey: "GenSrcSubUviewUltraDemosStepsStepsSharedData", sharedDataClassId: 0 })));
+    _useSharedDataScope(__sharedData);
     const currentStep = ref(1);
     function nextStep() {
       currentStep.value = (currentStep.value + 1) % 4;
     }
-    const __returned__ = { currentStep, nextStep, get AppKu() {
-      return AppKu;
-    }, get LayoutComponent() {
-      return LayoutComponent;
-    } };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _component_NavBar = __easycom_0;
+      const _component_up_steps_item = __easycom_1;
+      const _component_up_steps = __easycom_2;
+      const _component_up_button = __easycom_2$1;
+      const n33 = _createSharedDataComponent(AppKu, "39a64c7e", null, {
+        "default": _withSharedDataVaporCtx(() => {
+          const n32 = _createSharedDataComponent(LayoutComponent, "fb234356", {
+            "navigation-style": "custom",
+            "navigation-bar-title-text": "up-steps 步骤条"
+          }, {
+            "default": _withSharedDataVaporCtx(() => {
+              const n0 = _createSharedDataComponentWithFallback(_component_NavBar, "69452644", {
+                title: "Steps 步骤条",
+                "auto-back": true,
+                "safe-area-inset-top": true,
+                "bg-color": "#ffffff"
+              });
+              _setSharedData(__sharedData, 2, n0?.sharedData);
+              const n6 = _createSharedDataComponentWithFallback(_component_up_steps, "694516fc", { current: () => {
+                return currentStep.value;
+              } }, {
+                "default": _withSharedDataVaporCtx(() => {
+                  const n2 = _createSharedDataComponentWithFallback(_component_up_steps_item, "694510bc", {
+                    title: "已下单",
+                    desc: "10:30"
+                  });
+                  _setSharedData(__sharedData, 4, n2?.sharedData);
+                  const n3 = _createSharedDataComponentWithFallback(_component_up_steps_item, "694509fa", {
+                    title: "已出库",
+                    desc: "10:35"
+                  });
+                  _setSharedData(__sharedData, 5, n3?.sharedData);
+                  const n4 = _createSharedDataComponentWithFallback(_component_up_steps_item, "69450878", {
+                    title: "运输中",
+                    desc: "11:40"
+                  });
+                  _setSharedData(__sharedData, 6, n4?.sharedData);
+                  const n5 = _createSharedDataComponentWithFallback(_component_up_steps_item, "694501b6", {
+                    title: "已签收",
+                    desc: "14:20"
+                  });
+                  _setSharedData(__sharedData, 7, n5?.sharedData);
+                })
+              });
+              _setSharedData(__sharedData, 3, n6?.sharedData);
+              const n7 = _createSharedDataComponentWithFallback(_component_up_button, "6944f938", {
+                size: "small",
+                type: "primary",
+                text: "下一步",
+                onClick: () => {
+                  return nextStep;
+                }
+              });
+              _setSharedData(__sharedData, 8, n7?.sharedData);
+              const n15 = _createSharedDataComponentWithFallback(_component_up_steps, "6944e9f4", {
+                current: 1,
+                dot: true
+              }, {
+                "default": _withSharedDataVaporCtx(() => {
+                  const n12 = _createSharedDataComponentWithFallback(_component_up_steps_item, "bf5fd71e", {
+                    title: "已下单",
+                    desc: "10:30"
+                  });
+                  _setSharedData(__sharedData, 10, n12?.sharedData);
+                  const n13 = _createSharedDataComponentWithFallback(_component_up_steps_item, "bf5fd05c", {
+                    title: "已出库",
+                    desc: "10:35"
+                  });
+                  _setSharedData(__sharedData, 11, n13?.sharedData);
+                  const n14 = _createSharedDataComponentWithFallback(_component_up_steps_item, "bf5fceda", {
+                    title: "运输中",
+                    desc: "11:40"
+                  });
+                  _setSharedData(__sharedData, 12, n14?.sharedData);
+                })
+              });
+              _setSharedData(__sharedData, 9, n15?.sharedData);
+              const n21 = _createSharedDataComponentWithFallback(_component_up_steps, "bf5fc012", {
+                current: 1,
+                "active-color": "#19be6b"
+              }, {
+                "default": _withSharedDataVaporCtx(() => {
+                  const n18 = _createSharedDataComponentWithFallback(_component_up_steps_item, "bf5fb98e", {
+                    title: "已下单",
+                    desc: "10:30"
+                  });
+                  _setSharedData(__sharedData, 14, n18?.sharedData);
+                  const n19 = _createSharedDataComponentWithFallback(_component_up_steps_item, "bf5fb7e2", {
+                    title: "出库异常",
+                    desc: "10:35",
+                    error: true
+                  });
+                  _setSharedData(__sharedData, 15, n19?.sharedData);
+                  const n20 = _createSharedDataComponentWithFallback(_component_up_steps_item, "bf5fb0d8", {
+                    title: "运输中",
+                    desc: "11:40"
+                  });
+                  _setSharedData(__sharedData, 16, n20?.sharedData);
+                })
+              });
+              _setSharedData(__sharedData, 13, n21?.sharedData);
+              const n28 = _createSharedDataComponentWithFallback(_component_up_steps, "bf5fa246", {
+                current: 1,
+                direction: "column"
+              }, {
+                "default": _withSharedDataVaporCtx(() => {
+                  const n24 = _createSharedDataComponentWithFallback(_component_up_steps_item, "bf5f9bca", {
+                    title: "已下单",
+                    desc: "买家已提交订单 10:30"
+                  });
+                  _setSharedData(__sharedData, 18, n24?.sharedData);
+                  const n25 = _createSharedDataComponentWithFallback(_component_up_steps_item, "bf5f9a0e", {
+                    title: "已出库",
+                    desc: "包裹已出库并在分拣 10:35"
+                  });
+                  _setSharedData(__sharedData, 19, n25?.sharedData);
+                  const n26 = _createSharedDataComponentWithFallback(_component_up_steps_item, "bf5f930e", {
+                    title: "运输中",
+                    desc: "快件正在运往目的地 11:40"
+                  });
+                  _setSharedData(__sharedData, 20, n26?.sharedData);
+                  const n27 = _createSharedDataComponentWithFallback(_component_up_steps_item, "bf5eee64", {
+                    title: "已签收",
+                    desc: "快件已安全送达 14:20"
+                  });
+                  _setSharedData(__sharedData, 21, n27?.sharedData);
+                })
+              });
+              _setSharedData(__sharedData, 17, n28?.sharedData);
+            })
+          });
+          _setSharedData(__sharedData, 1, n32.sharedData);
+        })
+      });
+      _setSharedData(__sharedData, 0, n33.sharedData);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "flex-row": { "": { "flexDirection": "row" } }, "justify-center": { "": { "justifyContent": "center" } }, "mt-12px": { "": { "marginTop": 12 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "pb-30px": { "": { "paddingBottom": 30 } } };
-const _style_1 = { "demo-block": { "": { "marginBottom": 12, "paddingTop": 12, "paddingRight": 12, "paddingBottom": 12, "paddingLeft": 12, "backgroundColor": "#ffffff", "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "demo-label": { "": { "fontSize": 14, "fontWeight": "bold", "color": "#606266", "marginBottom": 12, "paddingLeft": 4, "borderLeftWidth": 3, "borderLeftColor": "#2979ff", "borderLeftStyle": "solid" } } };
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { resolveComponent: _resolveComponent, createVNode: _createVNode, createElementVNode: _createElementVNode, withCtx: _withCtx, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_NavBar = resolveEasycom(__resolveDynamicComponent("NavBar"), __easycom_0);
-  const _component_up_steps_item = resolveEasycom(__resolveDynamicComponent("up-steps-item"), __easycom_1);
-  const _component_up_steps = resolveEasycom(__resolveDynamicComponent("up-steps"), __easycom_2);
-  const _component_up_button = resolveEasycom(__resolveDynamicComponent("up-button"), __easycom_2$1);
-  return _openBlock(), _createBlock($setup["AppKu"], null, {
-    default: _withCtx(() => [
-      _createVNode($setup["LayoutComponent"], {
-        "navigation-style": "custom",
-        "navigation-bar-title-text": "up-steps 步骤条"
-      }, {
-        default: _withCtx(() => [
-          _createElementVNode("view", { class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }, [
-            _createVNode(_component_NavBar, {
-              title: "Steps 步骤条",
-              "auto-back": true,
-              "safe-area-inset-top": true,
-              "bg-color": "#ffffff"
-            }),
-            _createElementVNode("view", { class: "p-16px" }, [
-              _createElementVNode("view", { class: "demo-block" }, [
-                _createElementVNode("text", { class: "demo-label" }, "基础步骤条"),
-                _createVNode(_component_up_steps, { current: $setup.currentStep }, {
-                  default: _withCtx(() => [
-                    _createVNode(_component_up_steps_item, {
-                      title: "已下单",
-                      desc: "10:30"
-                    }),
-                    _createVNode(_component_up_steps_item, {
-                      title: "已出库",
-                      desc: "10:35"
-                    }),
-                    _createVNode(_component_up_steps_item, {
-                      title: "运输中",
-                      desc: "11:40"
-                    }),
-                    _createVNode(_component_up_steps_item, {
-                      title: "已签收",
-                      desc: "14:20"
-                    })
-                  ]),
-                  _: 1
-                  /* STABLE */
-                }, 8, ["current"]),
-                _createElementVNode("view", { class: "mt-12px flex-row justify-center" }, [
-                  _createVNode(_component_up_button, {
-                    size: "small",
-                    type: "primary",
-                    text: "下一步",
-                    onClick: $setup.nextStep
-                  })
-                ])
-              ]),
-              _createElementVNode("view", { class: "demo-block mt-12px" }, [
-                _createElementVNode("text", { class: "demo-label" }, "圆点模式 (dot)"),
-                _createVNode(_component_up_steps, {
-                  current: 1,
-                  dot: true
-                }, {
-                  default: _withCtx(() => [
-                    _createVNode(_component_up_steps_item, {
-                      title: "已下单",
-                      desc: "10:30"
-                    }),
-                    _createVNode(_component_up_steps_item, {
-                      title: "已出库",
-                      desc: "10:35"
-                    }),
-                    _createVNode(_component_up_steps_item, {
-                      title: "运输中",
-                      desc: "11:40"
-                    })
-                  ]),
-                  _: 1
-                  /* STABLE */
-                })
-              ]),
-              _createElementVNode("view", { class: "demo-block mt-12px" }, [
-                _createElementVNode("text", { class: "demo-label" }, "自定义颜色与错误状态"),
-                _createVNode(_component_up_steps, {
-                  current: 1,
-                  "active-color": "#19be6b"
-                }, {
-                  default: _withCtx(() => [
-                    _createVNode(_component_up_steps_item, {
-                      title: "已下单",
-                      desc: "10:30"
-                    }),
-                    _createVNode(_component_up_steps_item, {
-                      title: "出库异常",
-                      desc: "10:35",
-                      error: true
-                    }),
-                    _createVNode(_component_up_steps_item, {
-                      title: "运输中",
-                      desc: "11:40"
-                    })
-                  ]),
-                  _: 1
-                  /* STABLE */
-                })
-              ]),
-              _createElementVNode("view", { class: "demo-block mt-12px" }, [
-                _createElementVNode("text", { class: "demo-label" }, "垂直方向"),
-                _createVNode(_component_up_steps, {
-                  current: 1,
-                  direction: "column"
-                }, {
-                  default: _withCtx(() => [
-                    _createVNode(_component_up_steps_item, {
-                      title: "已下单",
-                      desc: "买家已提交订单 10:30"
-                    }),
-                    _createVNode(_component_up_steps_item, {
-                      title: "已出库",
-                      desc: "包裹已出库并在分拣 10:35"
-                    }),
-                    _createVNode(_component_up_steps_item, {
-                      title: "运输中",
-                      desc: "快件正在运往目的地 11:40"
-                    }),
-                    _createVNode(_component_up_steps_item, {
-                      title: "已签收",
-                      desc: "快件已安全送达 14:20"
-                    })
-                  ]),
-                  _: 1
-                  /* STABLE */
-                })
-              ])
-            ])
-          ])
-        ]),
-        _: 1
-        /* STABLE */
-      })
-    ]),
-    _: 1
-    /* STABLE */
-  });
-}
-const steps = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0, _style_1]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/steps/steps.uvue"]]);
+const _style_0 = {};
+const _style_1 = {};
+const steps = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0, _style_1]]]);
 export {
   steps as default
 };

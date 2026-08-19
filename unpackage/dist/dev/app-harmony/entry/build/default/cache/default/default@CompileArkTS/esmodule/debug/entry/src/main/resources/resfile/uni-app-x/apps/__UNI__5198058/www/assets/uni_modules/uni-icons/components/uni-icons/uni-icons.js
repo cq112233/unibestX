@@ -1,11 +1,17 @@
 import { f as fontData } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uni-icons/components/uni-icons/uniicons_file&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataStyle: _setSharedDataStyle, setSharedData: _setSharedData, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect } = globalThis.Vue;
+const __className = "GenUniModulesUniIconsComponentsUniIconsUniIcons";
 const { computed } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "uni-icons"
   },
+  __dynamicSharedData: true,
+  __hash: "bd952b70",
+  __className,
+  __filename: "uni_modules/uni-icons/components/uni-icons/uni-icons.uvue",
   __name: "uni-icons",
   props: {
     type: {
@@ -25,9 +31,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       default: ""
     }
   },
-  setup(__props, _a) {
-    var __expose = _a.expose;
-    __expose();
+  setup(__props) {
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUniIconsComponentsUniIconsUniIconsSharedData", sharedDataClassId: 0 })));
     const props = __props;
     function getFontSize(size) {
       return size + "px";
@@ -55,26 +61,18 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       }
       return new UTSJSONObject({ color: props.color, fontSize: iconSize.value });
     });
-    const __returned__ = { props, getFontSize, unicode, iconSize, styleObj };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      _renderSharedDataEffect(() => {
+        _setSharedDataStyle(__sharedData, 0, styleObj.value);
+        _setSharedData(__sharedData, 1, _toDisplayString(unicode.value));
+      });
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "uni-icons": { "": { "fontFamily": "UniIconsFontFamily", "fontSize": 18, "fontStyle": "normal", "color": "#333333" } }, "@FONT-FACE": [{ "fontFamily": "UniIconsFontFamily", "src": "url('/assets/uniicons.32e978a5.ttf')" }] };
-const { toDisplayString: _toDisplayString, normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return _openBlock(), _createElementBlock(
-    "text",
-    {
-      class: "uni-icons",
-      style: _normalizeStyle($setup.styleObj)
-    },
-    _toDisplayString($setup.unicode),
-    5
-    /* TEXT, STYLE */
-  );
-}
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uni-icons/components/uni-icons/uni-icons.uvue"]]);
+const _style_0 = {"@FONT-FACE":[{"src":"url('/assets/uniicons.32e978a5.ttf')","fontFamily":"UniIconsFontFamily"}]};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_1 as _
 };

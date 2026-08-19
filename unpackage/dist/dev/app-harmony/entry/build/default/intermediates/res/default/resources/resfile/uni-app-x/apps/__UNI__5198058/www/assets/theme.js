@@ -1,24 +1,24 @@
 const light = new UTSJSONObject({
-  navigationBarTextStyle: "black",
-  navigationBarBackgroundColor: "#ffffff",
   backgroundColor: "#f8fafc",
   backgroundColorContent: "#f8fafc",
   backgroundTextStyle: "dark",
-  tabBarColor: "#94a3b8",
-  tabBarSelectedColor: "#1890ff",
+  navigationBarBackgroundColor: "#ffffff",
+  navigationBarTextStyle: "black",
   tabBarBackgroundColor: "#ffffff",
-  tabBarBorderStyle: "black"
+  tabBarBorderStyle: "black",
+  tabBarColor: "#94a3b8",
+  tabBarSelectedColor: "#1890ff"
 });
 const dark = new UTSJSONObject({
-  navigationBarTextStyle: "white",
-  navigationBarBackgroundColor: "#0f172a",
   backgroundColor: "#0f172a",
   backgroundColorContent: "#0f172a",
   backgroundTextStyle: "light",
-  tabBarColor: "#94a3b8",
-  tabBarSelectedColor: "#1890ff",
+  navigationBarBackgroundColor: "#0f172a",
+  navigationBarTextStyle: "white",
   tabBarBackgroundColor: "#0f172a",
-  tabBarBorderStyle: "black"
+  tabBarBorderStyle: "black",
+  tabBarColor: "#94a3b8",
+  tabBarSelectedColor: "#1890ff"
 });
 const themeJson = new UTSJSONObject({
   light,

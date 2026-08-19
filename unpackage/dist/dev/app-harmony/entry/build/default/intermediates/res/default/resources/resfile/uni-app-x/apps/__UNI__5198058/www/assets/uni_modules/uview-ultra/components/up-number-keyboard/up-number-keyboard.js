@@ -1,15 +1,20 @@
 import { _ as __easycom_0$1 } from "../up-icon/up-icon.js";
-import { r as resolveEasycom } from "../../../../App.ku.js";
 import { h as randomArray } from "../../libs/function/index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, setSharedData: _setSharedData, toDisplayString: _toDisplayString, setSharedDataEvent: _setSharedDataEvent, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataFor: _createSharedDataFor, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpNumberKeyboardUpNumberKeyboard";
 const { ref, computed } = globalThis.Vue;
 const dot = ".";
 const cardX = "X";
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-number-keyboard"
   },
+  __dynamicSharedData: true,
+  __hash: "509631a5",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-number-keyboard/up-number-keyboard.uvue",
   __name: "up-number-keyboard",
   props: {
     mode: {
@@ -27,8 +32,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   },
   emits: ["change", "backspace"],
   setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
-    __expose();
+    var __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpNumberKeyboardUpNumberKeyboardSharedData", sharedDataClassId: 0 })));
     const props = __props;
     const emit = __emit;
     let timer = null;
@@ -87,82 +93,40 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       }
       emit("change", res);
     }
-    const __returned__ = { props, emit, dot, cardX, get timer() {
-      return timer;
-    }, set timer(v = null) {
-      timer = v;
-    }, noop, numList, itemStyle, backspaceClick, clearTimer, keyboardClick };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _component_up_icon = __easycom_0$1;
+      _createSharedDataFor(_setSharedDataScoped(__sharedData, 0, _createSharedDataVFor(__sharedDataScope, () => {
+        return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
+      })), () => {
+        return numList.value;
+      }, (__sharedData_VFor0, _for_item0, _for_key0) => {
+        _setSharedDataEvent(__sharedData_VFor0, 1, () => {
+          return keyboardClick(_for_item0.value);
+        });
+        _renderSharedDataEffect(() => {
+          _setSharedDataStyle(__sharedData_VFor0, 2, [itemStyle(_for_key0.value)]);
+          _setSharedData(__sharedData_VFor0, 3, _toDisplayString(_for_item0.value));
+        });
+        return null;
+      }, (__sharedData_VFor0, item, index) => {
+        return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
+      });
+      const n5 = _createSharedDataComponentWithFallback(_component_up_icon, "05b085d0", {
+        name: "backspace",
+        color: "#303133",
+        size: "28"
+      });
+      _setSharedData(__sharedData, 1, n5?.sharedData);
+      _setSharedDataEvent(__sharedData, 2, backspaceClick);
+      _setSharedDataEvent(__sharedData, 3, clearTimer);
+      _setSharedDataEvent(__sharedData, 4, noop);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-keyboard": { "": { "display": "flex", "flexDirection": "row", "justifyContent": "space-around", "backgroundColor": "#e0e4e6", "flexWrap": "wrap", "paddingTop": 8, "paddingRight": "10rpx", "paddingBottom": 8, "paddingLeft": "10rpx" } }, "up-keyboard__button-wrapper": { "": { "boxShadow": "0 2px 0px #BBBCBE", "marginTop": 4, "marginRight": "6rpx", "marginBottom": 4, "marginLeft": "6rpx", "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomLeftRadius": 4, "borderBottomRightRadius": 4 } }, "up-keyboard__button-wrapper__button": { "": { "width": "222rpx", "height": "90rpx", "backgroundColor": "#FFFFFF", "display": "flex", "flexDirection": "row", "justifyContent": "center", "alignItems": "center", "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomLeftRadius": 4, "borderBottomRightRadius": 4 } }, "up-keyboard__button-wrapper__button__text": { "": { "fontSize": 20, "fontWeight": 400, "color": "#303133" } }, "up-keyboard__button-wrapper__button--gray": { "": { "backgroundColor": "#c8cad2" } }, "up-hover-class": { "": { "backgroundColor": "#BBBCC6" } } };
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, toDisplayString: _toDisplayString, createElementVNode: _createElementVNode, normalizeStyle: _normalizeStyle, resolveComponent: _resolveComponent, createVNode: _createVNode, withModifiers: _withModifiers } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0$1);
-  return _openBlock(), _createElementBlock(
-    "view",
-    {
-      class: "up-keyboard",
-      onTouchmove: _withModifiers($setup.noop, ["stop", "prevent"])
-    },
-    [
-      (_openBlock(true), _createElementBlock(
-        _Fragment,
-        null,
-        _renderList($setup.numList, (item, index) => {
-          return _openBlock(), _createElementBlock("view", {
-            class: "up-keyboard__button-wrapper",
-            key: index
-          }, [
-            _createElementVNode("view", {
-              class: "up-keyboard__button-wrapper__button",
-              style: _normalizeStyle([$setup.itemStyle(index)]),
-              onClick: ($event) => $setup.keyboardClick(item),
-              "hover-class": "up-hover-class",
-              "hover-stay-time": 200
-            }, [
-              _createElementVNode(
-                "text",
-                { class: "up-keyboard__button-wrapper__button__text" },
-                _toDisplayString(item),
-                1
-                /* TEXT */
-              )
-            ], 12, ["onClick"])
-          ]);
-        }),
-        128
-        /* KEYED_FRAGMENT */
-      )),
-      _createElementVNode("view", { class: "up-keyboard__button-wrapper" }, [
-        _createElementVNode(
-          "view",
-          {
-            class: "up-keyboard__button-wrapper__button up-keyboard__button-wrapper__button--gray",
-            "hover-class": "up-hover-class",
-            "hover-stay-time": 200,
-            onTouchstart: _withModifiers($setup.backspaceClick, ["stop"]),
-            onTouchend: $setup.clearTimer
-          },
-          [
-            _createVNode(_component_up_icon, {
-              name: "backspace",
-              color: "#303133",
-              size: "28"
-            })
-          ],
-          32
-          /* NEED_HYDRATION */
-        )
-      ])
-    ],
-    32
-    /* NEED_HYDRATION */
-  );
-}
-const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-number-keyboard/up-number-keyboard.uvue"]]);
+const _style_0 = {};
+const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_0 as _
 };

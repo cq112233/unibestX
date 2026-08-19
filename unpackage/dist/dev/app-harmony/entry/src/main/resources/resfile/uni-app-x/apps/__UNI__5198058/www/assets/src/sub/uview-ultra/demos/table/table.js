@@ -1,9 +1,9 @@
 import { _ as __easycom_0 } from "../../../../components/NavBar/NavBar.js";
-import { A as AppKu, r as resolveEasycom } from "../../../../../App.ku.js";
 import { _ as __easycom_1 } from "../../../../../uni_modules/uview-ultra/components/up-th/up-th.js";
 import { _ as __easycom_2 } from "../../../../../uni_modules/uview-ultra/components/up-tr/up-tr.js";
 import { _ as __easycom_3 } from "../../../../../uni_modules/uview-ultra/components/up-td/up-td.js";
-import { _ as __easycom_4 } from "../../../../../uni_modules/uview-ultra/components/up-table/up-table.js";
+import { _ as _sfc_main$1 } from "../../../../../uni_modules/uview-ultra/components/up-table/up-table.js";
+import { A as AppKu } from "../../../../../App.ku.js";
 import { L as LayoutComponent } from "../../../../layouts/default.js";
 import { _ as _export_sfc } from "../../../../../plugin-vue-export-helper.js";
 import "../../../../utils/systemInfo.js";
@@ -44,17 +44,19 @@ import "../../../../utils/theme.js";
 import "../../../../../theme.js";
 import "../../../../store/token.js";
 import "../../../../store/user.js";
-import "../../../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
-import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.js";
-import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/loadingIcon.js";
-import "../../../../../uni_modules/uview-ultra/libs/config/config.js";
 import "../../../../../uni_modules/uview-ultra/libs/function/index.js";
 import "../../../../../uni_modules/uview-ultra/libs/function/test.js";
 import "../../../../../uni_modules/uview-ultra/libs/function/digit.js";
+import "../../../../../uni_modules/uview-ultra/libs/config/config.js";
+import "../../../../../uni_modules/uview-ultra/libs/composable/useUltraUI.js";
+import "../../../../../uni_modules/uview-ultra/libs/mixin/mixin.js";
+import "../../../../../uni_modules/uview-ultra/components/up-table/table.js";
+import "../../../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
+import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.js";
+import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/loadingIcon.js";
 import "../../../../../uni_modules/uview-ultra/libs/function/colorGradient.js";
 import "../../../../../uni_modules/uview-ultra/components/up-icon/up-icon.js";
 import "../../../../../uni_modules/uview-ultra/components/up-icon/icons.js";
-import "../../../../../uni_modules/uview-ultra/libs/composable/useUltraUI.js";
 import "../../../../../uni_modules/uview-ultra/components/up-icon/icon.js";
 import "../../../../../uni_modules/uview-ultra/components/up-gap/up-gap.js";
 import "../../../../../uni_modules/uview-ultra/libs/composable/useMp.js";
@@ -69,129 +71,123 @@ import "../../../../../uni_modules/uni-icons/components/uni-icons/uni-icons.js";
 import "../../../../../uni_modules/uni-icons/components/uni-icons/uniicons_file.js";
 import "../../../../utils/i18n.js";
 import "../../../../utils/toast.js";
-import "../../../../../uni_modules/uview-ultra/libs/mixin/mixin.js";
-import "../../../../../uni_modules/uview-ultra/components/up-table/table.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, resolveComponent: _resolveComponent, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
+const __className = "GenSrcSubUviewUltraDemosTableTable";
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  __dynamicSharedData: true,
+  __hash: "2a02cea3",
+  __className,
+  __filename: "src/sub/uview-ultra/demos/table/table.uvue",
   __name: "table",
-  setup(__props, _a) {
-    var __expose = _a.expose;
-    __expose();
-    const __returned__ = { get AppKu() {
-      return AppKu;
-    }, get LayoutComponent() {
-      return LayoutComponent;
-    } };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+  setup(__props) {
+    const __sharedDataRenderer = _useSharedDataRenderer();
+    const __sharedData = __sharedDataRenderer == "component" ? _withSharedDataComponent(new UniDynamicSharedDataComponent(_useSharedDataScope(), _useSharedDataComponentOptions({ bundleKey: "GenSrcSubUviewUltraDemosTableTableSharedData", sharedDataClassId: 0 }))) : _withSharedDataPage(new UniDynamicSharedDataPage(_useSharedDataPageId(), _useSharedDataPageOptions({ bundleKey: "GenSrcSubUviewUltraDemosTableTableSharedData", sharedDataClassId: 0 })));
+    _useSharedDataScope(__sharedData);
+    return () => {
+      "raw js";
+      const _component_NavBar = __easycom_0;
+      const _component_up_th = __easycom_1;
+      const _component_up_tr = __easycom_2;
+      const _component_up_td = __easycom_3;
+      const _component_up_table = _sfc_main$1;
+      const n31 = _createSharedDataComponent(AppKu, "15f49221", null, {
+        "default": _withSharedDataVaporCtx(() => {
+          const n30 = _createSharedDataComponent(LayoutComponent, "aec49c16", {
+            "navigation-style": "custom",
+            "navigation-bar-title-text": "up-table 表格"
+          }, {
+            "default": _withSharedDataVaporCtx(() => {
+              const n0 = _createSharedDataComponentWithFallback(_component_NavBar, "6b188d3d", {
+                title: "Table 表格",
+                "auto-back": true,
+                "safe-area-inset-top": true,
+                "bg-color": "#ffffff"
+              });
+              _setSharedData(__sharedData, 2, n0?.sharedData);
+              const n14 = _createSharedDataComponentWithFallback(_component_up_table, "6b1894df", null, {
+                "default": _withSharedDataVaporCtx(() => {
+                  const n5 = _createSharedDataComponentWithFallback(_component_up_tr, "6b1897a9", null, {
+                    "default": _withSharedDataVaporCtx(() => {
+                      const n2 = _createSharedDataComponentWithFallback(_component_up_th, "6b1897e7", { text: "学校" });
+                      _setSharedData(__sharedData, 5, n2?.sharedData);
+                      const n3 = _createSharedDataComponentWithFallback(_component_up_th, "6b189861", { text: "班级" });
+                      _setSharedData(__sharedData, 6, n3?.sharedData);
+                      const n4 = _createSharedDataComponentWithFallback(_component_up_th, "6b189b66", { text: "年龄" });
+                      _setSharedData(__sharedData, 7, n4?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 4, n5?.sharedData);
+                  const n9 = _createSharedDataComponentWithFallback(_component_up_tr, "6b189c06", null, {
+                    "default": _withSharedDataVaporCtx(() => {
+                      const n6 = _createSharedDataComponentWithFallback(_component_up_td, "6b189c44", { text: "浙江大学" });
+                      _setSharedData(__sharedData, 9, n6?.sharedData);
+                      const n7 = _createSharedDataComponentWithFallback(_component_up_td, "6b189f4b", { text: "二年级" });
+                      _setSharedData(__sharedData, 10, n7?.sharedData);
+                      const n8 = _createSharedDataComponentWithFallback(_component_up_td, "6b189fc6", { text: "22" });
+                      _setSharedData(__sharedData, 11, n8?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 8, n9?.sharedData);
+                  const n13 = _createSharedDataComponentWithFallback(_component_up_tr, "6b18a306", null, {
+                    "default": _withSharedDataVaporCtx(() => {
+                      const n10 = _createSharedDataComponentWithFallback(_component_up_td, "6b18a344", { text: "清华大学" });
+                      _setSharedData(__sharedData, 13, n10?.sharedData);
+                      const n11 = _createSharedDataComponentWithFallback(_component_up_td, "6b18a3c0", { text: "05班" });
+                      _setSharedData(__sharedData, 14, n11?.sharedData);
+                      const n12 = _createSharedDataComponentWithFallback(_component_up_td, "6b18a6c6", { text: "24" });
+                      _setSharedData(__sharedData, 15, n12?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 12, n13?.sharedData);
+                })
+              });
+              _setSharedData(__sharedData, 3, n14?.sharedData);
+              const n26 = _createSharedDataComponentWithFallback(_component_up_table, "6b18ab61", { border: false }, {
+                "default": _withSharedDataVaporCtx(() => {
+                  const n19 = _createSharedDataComponentWithFallback(_component_up_tr, "100e004e", null, {
+                    "default": _withSharedDataVaporCtx(() => {
+                      const n17 = _createSharedDataComponentWithFallback(_component_up_th, "100dffd2", { text: "名称" });
+                      _setSharedData(__sharedData, 18, n17?.sharedData);
+                      const n18 = _createSharedDataComponentWithFallback(_component_up_th, "100dfede", { text: "类型" });
+                      _setSharedData(__sharedData, 19, n18?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 17, n19?.sharedData);
+                  const n22 = _createSharedDataComponentWithFallback(_component_up_tr, "100df85e", null, {
+                    "default": _withSharedDataVaporCtx(() => {
+                      const n20 = _createSharedDataComponentWithFallback(_component_up_td, "100df7e2", { text: "uview-ultra" });
+                      _setSharedData(__sharedData, 21, n20?.sharedData);
+                      const n21 = _createSharedDataComponentWithFallback(_component_up_td, "100df6dc", { text: "UI库" });
+                      _setSharedData(__sharedData, 22, n21?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 20, n22?.sharedData);
+                  const n25 = _createSharedDataComponentWithFallback(_component_up_tr, "100df05a", null, {
+                    "default": _withSharedDataVaporCtx(() => {
+                      const n23 = _createSharedDataComponentWithFallback(_component_up_td, "100defde", { text: "uni-app X" });
+                      _setSharedData(__sharedData, 24, n23?.sharedData);
+                      const n24 = _createSharedDataComponentWithFallback(_component_up_td, "100de99c", { text: "框架" });
+                      _setSharedData(__sharedData, 25, n24?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 23, n25?.sharedData);
+                })
+              });
+              _setSharedData(__sharedData, 16, n26?.sharedData);
+            })
+          });
+          _setSharedData(__sharedData, 1, n30.sharedData);
+        })
+      });
+      _setSharedData(__sharedData, 0, n31.sharedData);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "bg-__f8fafc_": { "": { "backgroundImage": "none", "backgroundColor": "#f8fafc" } }, "mt-12px": { "": { "marginTop": 12 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "pb-30px": { "": { "paddingBottom": 30 } } };
-const _style_1 = { "demo-block": { "": { "marginBottom": 12, "paddingTop": 12, "paddingRight": 12, "paddingBottom": 12, "paddingLeft": 12, "backgroundColor": "#ffffff", "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "demo-label": { "": { "fontSize": 14, "fontWeight": "bold", "color": "#606266", "marginBottom": 10, "paddingLeft": 4, "borderLeftWidth": 3, "borderLeftStyle": "solid", "borderLeftColor": "#2979ff" } } };
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { resolveComponent: _resolveComponent, createVNode: _createVNode, createElementVNode: _createElementVNode, withCtx: _withCtx, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_NavBar = resolveEasycom(__resolveDynamicComponent("NavBar"), __easycom_0);
-  const _component_up_th = resolveEasycom(__resolveDynamicComponent("up-th"), __easycom_1);
-  const _component_up_tr = resolveEasycom(__resolveDynamicComponent("up-tr"), __easycom_2);
-  const _component_up_td = resolveEasycom(__resolveDynamicComponent("up-td"), __easycom_3);
-  const _component_up_table = resolveEasycom(__resolveDynamicComponent("up-table"), __easycom_4);
-  return _openBlock(), _createBlock($setup["AppKu"], null, {
-    default: _withCtx(() => [
-      _createVNode($setup["LayoutComponent"], {
-        "navigation-style": "custom",
-        "navigation-bar-title-text": "up-table 表格"
-      }, {
-        default: _withCtx(() => [
-          _createElementVNode("view", { class: "page-container bg-__f8fafc_ min-h-screen pb-30px" }, [
-            _createVNode(_component_NavBar, {
-              title: "Table 表格",
-              "auto-back": true,
-              "safe-area-inset-top": true,
-              "bg-color": "#ffffff"
-            }),
-            _createElementVNode("view", { class: "p-16px" }, [
-              _createElementVNode("view", { class: "demo-block" }, [
-                _createElementVNode("text", { class: "demo-label" }, "基础表格"),
-                _createVNode(_component_up_table, null, {
-                  default: _withCtx(() => [
-                    _createVNode(_component_up_tr, null, {
-                      default: _withCtx(() => [
-                        _createVNode(_component_up_th, { text: "学校" }),
-                        _createVNode(_component_up_th, { text: "班级" }),
-                        _createVNode(_component_up_th, { text: "年龄" })
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    }),
-                    _createVNode(_component_up_tr, null, {
-                      default: _withCtx(() => [
-                        _createVNode(_component_up_td, { text: "浙江大学" }),
-                        _createVNode(_component_up_td, { text: "二年级" }),
-                        _createVNode(_component_up_td, { text: "22" })
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    }),
-                    _createVNode(_component_up_tr, null, {
-                      default: _withCtx(() => [
-                        _createVNode(_component_up_td, { text: "清华大学" }),
-                        _createVNode(_component_up_td, { text: "05班" }),
-                        _createVNode(_component_up_td, { text: "24" })
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    })
-                  ]),
-                  _: 1
-                  /* STABLE */
-                })
-              ]),
-              _createElementVNode("view", { class: "demo-block mt-12px" }, [
-                _createElementVNode("text", { class: "demo-label" }, "无边框"),
-                _createVNode(_component_up_table, { border: false }, {
-                  default: _withCtx(() => [
-                    _createVNode(_component_up_tr, null, {
-                      default: _withCtx(() => [
-                        _createVNode(_component_up_th, { text: "名称" }),
-                        _createVNode(_component_up_th, { text: "类型" })
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    }),
-                    _createVNode(_component_up_tr, null, {
-                      default: _withCtx(() => [
-                        _createVNode(_component_up_td, { text: "uview-ultra" }),
-                        _createVNode(_component_up_td, { text: "UI库" })
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    }),
-                    _createVNode(_component_up_tr, null, {
-                      default: _withCtx(() => [
-                        _createVNode(_component_up_td, { text: "uni-app X" }),
-                        _createVNode(_component_up_td, { text: "框架" })
-                      ]),
-                      _: 1
-                      /* STABLE */
-                    })
-                  ]),
-                  _: 1
-                  /* STABLE */
-                })
-              ])
-            ])
-          ])
-        ]),
-        _: 1
-        /* STABLE */
-      })
-    ]),
-    _: 1
-    /* STABLE */
-  });
-}
-const table = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0, _style_1]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/table/table.uvue"]]);
+const _style_0 = {};
+const _style_1 = {};
+const table = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0, _style_1]]]);
 export {
   table as default
 };

@@ -70,8 +70,12 @@ function mapTabBorderStyle(value, isDark) {
   }
   return value;
 }
+function applyNavbarTheme(isDark) {
+  getThemeTokens(isDark);
+}
 export {
-  getSystemTheme as a,
+  applyNavbarTheme as a,
+  getSystemTheme as b,
   getThemeTokens as g
 };
 //# sourceMappingURL=theme.js.map

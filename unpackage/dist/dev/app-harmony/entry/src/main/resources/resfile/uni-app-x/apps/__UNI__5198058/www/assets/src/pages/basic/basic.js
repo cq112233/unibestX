@@ -93,13 +93,20 @@ import "../../../uni_modules/lime-request/common/url-query.js";
 import "../../../uni_modules/lime-request/utssdk/unierror.js";
 import "../../utils/toLoginPage.js";
 import "../../http/tools/enum.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, createSharedDataComponent: _createSharedDataComponent, setSharedData: _setSharedData, withSharedDataVaporCtx: _withSharedDataVaporCtx } = globalThis.Vue;
+const __className = "GenSrcPagesBasicBasic";
 const { onBackPress, onResize } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  __dynamicSharedData: true,
+  __hash: "2b087632",
+  __className,
+  __filename: "src/pages/basic/basic.uvue",
   __name: "basic",
-  setup(__props, _a) {
-    var __expose = _a.expose;
-    __expose();
+  setup(__props) {
+    const __sharedDataRenderer = _useSharedDataRenderer();
+    const __sharedData = __sharedDataRenderer == "component" ? _withSharedDataComponent(new UniDynamicSharedDataComponent(_useSharedDataScope(), _useSharedDataComponentOptions({ bundleKey: "GenSrcPagesBasicBasicSharedData", sharedDataClassId: 0 }))) : _withSharedDataPage(new UniDynamicSharedDataPage(_useSharedDataPageId(), _useSharedDataPageOptions({ bundleKey: "GenSrcPagesBasicBasicSharedData", sharedDataClassId: 0 })));
+    _useSharedDataScope(__sharedData);
     onBackPress((options) => {
       if (options.from == "backbutton") {
         return handleBackPressExit();
@@ -109,55 +116,37 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     onResize(() => {
       updateSystemInfo();
     });
-    const __returned__ = { get AppKu() {
-      return AppKu;
-    }, get ToastDemoCard() {
-      return ToastDemoCard;
-    }, get PropsDemoCard() {
-      return PropsDemoCard;
-    }, get IconDemoCard() {
-      return IconDemoCard;
-    }, get LangSwitchCard() {
-      return LangSwitchCard;
-    }, get ThemeSwitchCard() {
-      return ThemeSwitchCard;
-    }, get RouterDemoCard() {
-      return RouterDemoCard;
-    }, get HttpDemoCard() {
-      return HttpDemoCard;
-    }, get UViewUltraDemoCard() {
-      return UViewUltraDemoCard;
-    }, get SystemInfoDemoCard() {
-      return SystemInfoDemoCard;
-    } };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const n11 = _createSharedDataComponent(AppKu, "56ab5a5a", null, {
+        "default": _withSharedDataVaporCtx(() => {
+          const n0 = _createSharedDataComponent(UViewUltraDemoCard, "5360e8b4");
+          _setSharedData(__sharedData, 1, n0.sharedData);
+          const n1 = _createSharedDataComponent(ThemeSwitchCard, "5360e96b");
+          _setSharedData(__sharedData, 2, n1.sharedData);
+          const n2 = _createSharedDataComponent(RouterDemoCard, "5360ec97");
+          _setSharedData(__sharedData, 3, n2.sharedData);
+          const n3 = _createSharedDataComponent(LangSwitchCard, "5360ed4b");
+          _setSharedData(__sharedData, 4, n3.sharedData);
+          const n4 = _createSharedDataComponent(IconDemoCard, "5360f074");
+          _setSharedData(__sharedData, 5, n4.sharedData);
+          const n5 = _createSharedDataComponent(HttpDemoCard, "5360f114");
+          _setSharedData(__sharedData, 6, n5.sharedData);
+          const n6 = _createSharedDataComponent(ToastDemoCard, "5360f455");
+          _setSharedData(__sharedData, 7, n6.sharedData);
+          const n7 = _createSharedDataComponent(PropsDemoCard, "5360f798");
+          _setSharedData(__sharedData, 8, n7.sharedData);
+          const n8 = _createSharedDataComponent(SystemInfoDemoCard, "5360f835");
+          _setSharedData(__sharedData, 9, n8.sharedData);
+        })
+      });
+      _setSharedData(__sharedData, 0, n11.sharedData);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "flex-col": { "": { "flexDirection": "column" } }, "pb-100px": { "": { "paddingBottom": 100 } } };
-const { createVNode: _createVNode, createElementVNode: _createElementVNode, withCtx: _withCtx, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return _openBlock(), _createBlock($setup["AppKu"], null, {
-    default: _withCtx(() => [
-      _createElementVNode("view", { class: "flex-col pb-100px" }, [
-        _createElementVNode("view", { class: "flex-col" }, [
-          _createVNode($setup["UViewUltraDemoCard"]),
-          _createVNode($setup["ThemeSwitchCard"]),
-          _createVNode($setup["RouterDemoCard"]),
-          _createVNode($setup["LangSwitchCard"]),
-          _createVNode($setup["IconDemoCard"]),
-          _createVNode($setup["HttpDemoCard"]),
-          _createVNode($setup["ToastDemoCard"]),
-          _createVNode($setup["PropsDemoCard"]),
-          _createVNode($setup["SystemInfoDemoCard"])
-        ])
-      ])
-    ]),
-    _: 1
-    /* STABLE */
-  });
-}
-const basic = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/basic/basic.uvue"]]);
+const _style_0 = {};
+const basic = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   basic as default
 };

@@ -1,14 +1,20 @@
 import { C as Card } from "./Card.js";
 import { g as getFooList, f as foo } from "../../../api/foo.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, setSharedData: _setSharedData, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataFor: _createSharedDataFor, setSharedDataStyle: _setSharedDataStyle, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataIf: _createSharedDataIf, setSharedDataEvent: _setSharedDataEvent, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
+const __className = "GenSrcPagesBasicComponentsHttpDemoCard";
 const { computed, ref } = globalThis.Vue;
 const { onMounted } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  __dynamicSharedData: true,
+  __hash: "7920b0f6",
+  __className,
+  __filename: "src/pages/basic/components/HttpDemoCard.uvue",
   __name: "HttpDemoCard",
-  setup(__props, _a) {
-    var __expose = _a.expose;
-    __expose();
+  setup(__props) {
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenSrcPagesBasicComponentsHttpDemoCardSharedData", sharedDataClassId: 0 })));
     const mockList = ref([]);
     const loading = ref(false);
     const requestStatus = ref("idle");
@@ -93,131 +99,64 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     onMounted(() => {
       loadMockData();
     });
-    const __returned__ = { mockList, loading, requestStatus, responseData, errorMsg, statusText, statusColor, statusBgColor, hasResponseData, hasErrorMsg, responseText, loadMockData, fetchRealApi, get Card() {
-      return Card;
-    } };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const n30 = _createSharedDataComponent(
+        Card,
+        "51bfa7fe",
+        { title: "HTTP 请求 Demo" },
+        {
+          "default": () => {
+            _createSharedDataFor(_setSharedDataScoped(__sharedData, 1, _createSharedDataVFor(__sharedDataScope, () => {
+              return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
+            })), () => {
+              return mockList.value;
+            }, (__sharedData_VFor0, _for_item0, _for_key0) => {
+              _renderSharedDataEffect(() => {
+                const _item = _for_item0.value;
+                _setSharedData(__sharedData_VFor0, 1, _toDisplayString(_item.id));
+                _setSharedData(__sharedData_VFor0, 2, _toDisplayString(_item.name));
+              });
+              return null;
+            }, (__sharedData_VFor0, item, index) => {
+              return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
+            });
+            _renderSharedDataEffect(() => {
+              _setSharedDataStyle(__sharedData, 8, { paddingLeft: "8px", paddingRight: "8px", paddingTop: "2px", paddingBottom: "2px", borderRadius: 10, backgroundColor: statusBgColor.value });
+              _setSharedDataStyle(__sharedData, 9, { fontSize: 12, color: statusColor.value });
+              _setSharedData(__sharedData, 10, _toDisplayString(statusText.value));
+            });
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData, 2, _toSharedDataBoolean(hasResponseData.value));
+            }, () => {
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData, 3, _toDisplayString(responseText.value));
+              });
+            });
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData, 4, _toSharedDataBoolean(hasErrorMsg.value));
+            }, () => {
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData, 5, _toDisplayString(errorMsg.value));
+              });
+            });
+            _setSharedDataEvent(__sharedData, 6, loadMockData);
+            _setSharedDataEvent(__sharedData, 7, fetchRealApi);
+            _renderSharedDataEffect(() => {
+              return _setSharedData(__sharedData, 11, _toDisplayString(loading.value ? "请求中..." : "真实 API 请求"));
+            });
+          }
+        },
+        1
+        /* SINGLE_ROOT */
+      );
+      _setSharedData(__sharedData, 0, n30.sharedData);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "bg-__10b981_": { "": { "backgroundImage": "none", "backgroundColor": "#10b981" } }, "bg-__3182ce_": { "": { "backgroundImage": "none", "backgroundColor": "#3182ce" } }, "bg-__f1f5f9_": { "": { "backgroundImage": "none", "backgroundColor": "#f1f5f9" } }, "bg-__fff5f5_": { "": { "backgroundImage": "none", "backgroundColor": "#fff5f5" } }, "bg-white": { "": { "backgroundColor": "rgba(255,255,255,var(--un-bg-opacity,1))" } }, "border-color-__e2e8f0_": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "border-color-__fecaca_": { "": { "borderTopColor": "#fecaca", "borderRightColor": "#fecaca", "borderBottomColor": "#fecaca", "borderLeftColor": "#fecaca" } }, "border-style-solid": { "": { "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "border-width-1px": { "": { "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "flex": { "": { "display": "flex" } }, "flex-1": { "": { "flexGrow": 1, "flexShrink": 1, "flexBasis": "0%" } }, "flex-row": { "": { "flexDirection": "row" } }, "font-bold": { "": { "fontWeight": 700 } }, "h-28px": { "": { "height": 28 } }, "h-42px": { "": { "height": 42 } }, "items-center": { "": { "alignItems": "center" } }, "justify-between": { "": { "justifyContent": "space-between" } }, "justify-center": { "": { "justifyContent": "center" } }, "leading-20px": { "": { "lineHeight": "20px" } }, "mb-10px": { "": { "marginBottom": 10 } }, "mb-16px": { "": { "marginBottom": 16 } }, "mb-6px": { "": { "marginBottom": 6 } }, "mr-10px": { "": { "marginRight": 10 } }, "mt-6px": { "": { "marginTop": 6 } }, "mt-8px": { "": { "marginTop": 8 } }, "p-10px": { "": { "paddingTop": 10, "paddingRight": 10, "paddingBottom": 10, "paddingLeft": 10 } }, "p-12px": { "": { "paddingTop": 12, "paddingRight": 12, "paddingBottom": 12, "paddingLeft": 12 } }, "p-16px": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "px-12px": { "": { "paddingLeft": 12, "paddingRight": 12 } }, "py-10px": { "": { "paddingTop": 10, "paddingBottom": 10 } }, "rounded-10px": { "": { "borderTopLeftRadius": 10, "borderTopRightRadius": 10, "borderBottomRightRadius": 10, "borderBottomLeftRadius": 10 } }, "rounded-12px": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "rounded-14px": { "": { "borderTopLeftRadius": 14, "borderTopRightRadius": 14, "borderBottomRightRadius": 14, "borderBottomLeftRadius": 14 } }, "rounded-8px": { "": { "borderTopLeftRadius": 8, "borderTopRightRadius": 8, "borderBottomRightRadius": 8, "borderBottomLeftRadius": 8 } }, "text-__2d3748_": { "": { "color": "#2d3748" } }, "text-__334155_": { "": { "color": "#334155" } }, "text-__475569_": { "": { "color": "#475569" } }, "text-__64748b_": { "": { "color": "#64748b" } }, "text-__ef4444_": { "": { "color": "#ef4444" } }, "text-__ffffff_": { "": { "color": "#ffffff" } }, "text-12px": { "": { "fontSize": 12 } }, "text-13px": { "": { "fontSize": 13 } }, "text-14px": { "": { "fontSize": 14 } }, "text-white": { "": { "color": "rgba(255,255,255,var(--un-color-opacity,1))" } }, "w-28px": { "": { "width": 28 } }, "w-full": { "": { "width": "100%" } } };
-const { createElementVNode: _createElementVNode, renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, toDisplayString: _toDisplayString, normalizeStyle: _normalizeStyle, createCommentVNode: _createCommentVNode, withCtx: _withCtx, createBlock: _createBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return _openBlock(), _createBlock($setup["Card"], { title: "HTTP 请求 Demo" }, {
-    default: _withCtx(() => [
-      _createElementVNode("view", { class: "rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
-        _createElementVNode("text", { class: "text-12px text-__64748b_ leading-20px" }, " 基于 lime-request 封装的 http 请求演示，包含 Mock 数据与真实接口请求两种模式。 ")
-      ]),
-      _createElementVNode("view", { class: "mb-16px" }, [
-        _createElementVNode("text", { class: "text-14px font-bold text-__2d3748_ mb-10px" }, "Mock 数据列表（ID 为任意类型）"),
-        (_openBlock(true), _createElementBlock(
-          _Fragment,
-          null,
-          _renderList($setup.mockList, (item, index) => {
-            return _openBlock(), _createElementBlock("view", {
-              key: index,
-              class: "flex-row items-center py-10px px-12px bg-__f1f5f9_ rounded-8px mt-8px"
-            }, [
-              _createElementVNode("view", { class: "w-28px h-28px rounded-14px bg-__3182ce_ justify-center items-center mr-10px" }, [
-                _createElementVNode(
-                  "text",
-                  { class: "text-12px text-white font-bold" },
-                  _toDisplayString(item.id),
-                  1
-                  /* TEXT */
-                )
-              ]),
-              _createElementVNode(
-                "text",
-                { class: "text-14px text-__334155_" },
-                _toDisplayString(item.name),
-                1
-                /* TEXT */
-              )
-            ]);
-          }),
-          128
-          /* KEYED_FRAGMENT */
-        ))
-      ]),
-      _createElementVNode("view", { class: "rounded-10px p-12px mb-16px border-width-1px border-style-solid border-color-__e2e8f0_" }, [
-        _createElementVNode("view", { class: "flex-row justify-between items-center mb-6px" }, [
-          _createElementVNode("text", { class: "text-13px text-__64748b_" }, "接口请求状态:"),
-          _createElementVNode(
-            "view",
-            {
-              style: _normalizeStyle({ paddingLeft: "8px", paddingRight: "8px", paddingTop: "2px", paddingBottom: "2px", borderRadius: 10, backgroundColor: $setup.statusBgColor })
-            },
-            [
-              _createElementVNode(
-                "text",
-                {
-                  style: _normalizeStyle({ fontSize: 12, color: $setup.statusColor })
-                },
-                _toDisplayString($setup.statusText),
-                5
-                /* TEXT, STYLE */
-              )
-            ],
-            4
-            /* STYLE */
-          )
-        ]),
-        $setup.hasResponseData ? (_openBlock(), _createElementBlock("view", {
-          key: 0,
-          class: "bg-white rounded-8px p-10px border-width-1px border-style-solid border-color-__e2e8f0_"
-        }, [
-          _createElementVNode(
-            "text",
-            { class: "text-12px text-__475569_" },
-            _toDisplayString($setup.responseText),
-            1
-            /* TEXT */
-          )
-        ])) : _createCommentVNode("v-if", true),
-        $setup.hasErrorMsg ? (_openBlock(), _createElementBlock("view", {
-          key: 1,
-          class: "bg-__fff5f5_ rounded-8px p-10px border-width-1px border-style-solid border-color-__fecaca_ mt-6px"
-        }, [
-          _createElementVNode(
-            "text",
-            { class: "text-12px text-__ef4444_" },
-            "错误：" + _toDisplayString($setup.errorMsg),
-            1
-            /* TEXT */
-          )
-        ])) : _createCommentVNode("v-if", true)
-      ]),
-      _createElementVNode("view", { class: "flex-row" }, [
-        _createElementVNode("view", { class: "flex-1 mr-10px" }, [
-          _createElementVNode("view", {
-            class: "bg-__3182ce_ rounded-8px h-42px w-full flex flex-row items-center justify-center",
-            onClick: $setup.loadMockData
-          }, [
-            _createElementVNode("text", { class: "text-__ffffff_ text-14px" }, "加载 Mock 数据")
-          ])
-        ]),
-        _createElementVNode("view", { class: "flex-1" }, [
-          _createElementVNode("view", {
-            class: "bg-__10b981_ rounded-8px h-42px w-full flex flex-row items-center justify-center",
-            onClick: $setup.fetchRealApi
-          }, [
-            _createElementVNode(
-              "text",
-              { class: "text-__ffffff_ text-14px" },
-              _toDisplayString($setup.loading ? "请求中..." : "真实 API 请求"),
-              1
-              /* TEXT */
-            )
-          ])
-        ])
-      ])
-    ]),
-    _: 1
-    /* STABLE */
-  });
-}
-const HttpDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/basic/components/HttpDemoCard.uvue"]]);
+const _style_0 = {};
+const HttpDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   HttpDemoCard as H
 };

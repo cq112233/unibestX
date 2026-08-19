@@ -1,11 +1,17 @@
 import { f as range, a as addUnit, b as addStyle, d as deepMerge } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, setSharedDataClass: _setSharedDataClass, createSharedDataIf: _createSharedDataIf, toDisplayString: _toDisplayString, createSharedDataSlot: _createSharedDataSlot } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpCircleProgressUpCircleProgress";
 const { computed } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-circle-progress"
   },
+  __dynamicSharedData: true,
+  __hash: "424fe104",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-circle-progress/up-circle-progress.uvue",
   __name: "up-circle-progress",
   props: {
     percentage: {
@@ -35,9 +41,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       }
     }
   },
-  setup(__props, _a) {
-    var __expose = _a.expose;
-    __expose();
+  setup(__props) {
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpCircleProgressUpCircleProgressSharedData", sharedDataClassId: 0 })));
     function normalizeNumber(value = null, defaultValue = 0) {
       if (typeof value == "number") {
         return value;
@@ -117,81 +123,41 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       }
       return buildFillStyle(deg);
     });
-    const __returned__ = { normalizeNumber, props, isDefaultColor, percent, size, stroke, rootStyle, trackStyle, textStyle, buildFillStyle, rightStyle, leftStyle };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      _renderSharedDataEffect(() => {
+        _setSharedDataStyle(__sharedData, 9, rootStyle.value);
+        _setSharedDataStyle(__sharedData, 10, trackStyle.value);
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(percent.value > 0));
+      }, () => {
+        _renderSharedDataEffect(() => {
+          _setSharedDataClass(__sharedData, 1, ["up-circle-progress__fill up-circle-progress__fill--right", [isDefaultColor.value ? "up-circle-progress__fill--primary" : ""]]);
+          _setSharedDataStyle(__sharedData, 2, rightStyle.value);
+        });
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 3, _toSharedDataBoolean(percent.value > 50));
+      }, () => {
+        _renderSharedDataEffect(() => {
+          _setSharedDataClass(__sharedData, 4, ["up-circle-progress__fill up-circle-progress__fill--left", [isDefaultColor.value ? "up-circle-progress__fill--primary" : ""]]);
+          _setSharedDataStyle(__sharedData, 5, leftStyle.value);
+        });
+      });
+      _createSharedDataSlot("default", null, null, () => {
+        _renderSharedDataEffect(() => {
+          _setSharedDataClass(__sharedData, 6, ["up-circle-progress__text", [isDefaultColor.value ? "up-circle-progress__text--primary" : ""]]);
+          _setSharedDataStyle(__sharedData, 7, textStyle.value);
+          _setSharedData(__sharedData, 8, _toDisplayString(percent.value));
+        });
+      });
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "up-circle-progress": { "": { "position": "relative", "display": "flex", "alignItems": "center", "justifyContent": "center", "boxSizing": "border-box" } }, "up-circle-progress__track": { "": { "position": "absolute", "top": 0, "left": 0, "boxSizing": "border-box", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "up-circle-progress__mask": { "": { "position": "absolute", "top": 0, "width": "50%", "height": "100%", "overflow": "hidden", "boxSizing": "border-box" } }, "up-circle-progress__mask--right": { "": { "right": 0 } }, "up-circle-progress__mask--left": { "": { "left": 0 } }, "up-circle-progress__fill": { "": { "position": "absolute", "top": 0, "boxSizing": "border-box", "borderTopLeftRadius": "50%", "borderTopRightRadius": "50%", "borderBottomRightRadius": "50%", "borderBottomLeftRadius": "50%", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid", "borderBottomColor": "rgba(0,0,0,0)", "borderLeftColor": "rgba(0,0,0,0)" } }, "up-circle-progress__fill--primary": { "": { "borderTopColor": "var(--theme-color, #0957de)", "borderRightColor": "var(--theme-color, #0957de)" } }, "up-circle-progress__fill--right": { "": { "right": 0 } }, "up-circle-progress__fill--left": { "": { "left": 0 } }, "up-circle-progress__content": { "": { "position": "relative", "display": "flex", "alignItems": "center", "justifyContent": "center", "zIndex": 2 } }, "up-circle-progress__text": { "": { "fontSize": 14, "fontWeight": 500 } }, "up-circle-progress__text--primary": { "": { "color": "var(--theme-color, #0957de)" } } };
-const { normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode, normalizeClass: _normalizeClass, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, renderSlot: _renderSlot, toDisplayString: _toDisplayString } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return _openBlock(), _createElementBlock(
-    "view",
-    {
-      class: "up-circle-progress",
-      style: _normalizeStyle($setup.rootStyle)
-    },
-    [
-      _createElementVNode(
-        "view",
-        {
-          class: "up-circle-progress__track",
-          style: _normalizeStyle($setup.trackStyle)
-        },
-        null,
-        4
-        /* STYLE */
-      ),
-      $setup.percent > 0 ? (_openBlock(), _createElementBlock("view", {
-        key: 0,
-        class: "up-circle-progress__mask up-circle-progress__mask--right"
-      }, [
-        _createElementVNode(
-          "view",
-          {
-            class: _normalizeClass(["up-circle-progress__fill up-circle-progress__fill--right", [$setup.isDefaultColor ? "up-circle-progress__fill--primary" : ""]]),
-            style: _normalizeStyle($setup.rightStyle)
-          },
-          null,
-          6
-          /* CLASS, STYLE */
-        )
-      ])) : _createCommentVNode("v-if", true),
-      $setup.percent > 50 ? (_openBlock(), _createElementBlock("view", {
-        key: 1,
-        class: "up-circle-progress__mask up-circle-progress__mask--left"
-      }, [
-        _createElementVNode(
-          "view",
-          {
-            class: _normalizeClass(["up-circle-progress__fill up-circle-progress__fill--left", [$setup.isDefaultColor ? "up-circle-progress__fill--primary" : ""]]),
-            style: _normalizeStyle($setup.leftStyle)
-          },
-          null,
-          6
-          /* CLASS, STYLE */
-        )
-      ])) : _createCommentVNode("v-if", true),
-      _createElementVNode("view", { class: "up-circle-progress__content" }, [
-        _renderSlot(_ctx.$slots, "default", {}, () => [
-          _createElementVNode(
-            "text",
-            {
-              class: _normalizeClass(["up-circle-progress__text", [$setup.isDefaultColor ? "up-circle-progress__text--primary" : ""]]),
-              style: _normalizeStyle($setup.textStyle)
-            },
-            _toDisplayString($setup.percent) + "%",
-            7
-            /* TEXT, CLASS, STYLE */
-          )
-        ])
-      ])
-    ],
-    4
-    /* STYLE */
-  );
-}
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-circle-progress/up-circle-progress.uvue"]]);
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_1 as _
 };

@@ -12,8 +12,8 @@
       "name": "",
       "dependencies": {
         "@dcloudio/uni-app-x-runtime": {
-          "specifier": "file:libs/runtime.har",
-          "version": "file:libs/runtime.har"
+          "specifier": "file:libs/sdk.har",
+          "version": "file:libs/sdk.har"
         }
       },
       "devDependencies": {
@@ -31,7 +31,24 @@
     },
     "entry": {
       "name": "entry",
-      "dependencies": {},
+      "dependencies": {
+        "imageknifepro": {
+          "specifier": "file:libs/imageknifepro.har",
+          "version": "file:libs/imageknifepro.har"
+        },
+        "richtext": {
+          "specifier": "file:libs/richtext.har",
+          "version": "file:libs/richtext.har"
+        },
+        "@dcloudio/uni-app-x-runtime": {
+          "specifier": "file:libs/sdk.har",
+          "version": "file:libs/sdk.har"
+        },
+        "libentry.so": {
+          "specifier": "file:entry/src/main/cpp/types/libentry",
+          "version": "file:entry/src/main/cpp/types/libentry"
+        }
+      },
       "devDependencies": {},
       "dynamicDependencies": {},
       "maskedByOverrideDependencyMap": false
@@ -56,45 +73,35 @@
       "dynamic": false,
       "maskedByOverrideDependencyMap": false
     },
-    "@dcloudio/uni-app-x-runtime@file:libs/runtime.har": {
-      "storePath": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=",
+    "@dcloudio/uni-app-x-runtime@file:libs/sdk.har": {
+      "storePath": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=",
       "dependencies": {
-        "@dcloudio/uni-app-harmony": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/uni-app-harmony",
-        "@dcloudio/uni-runtime-harmony": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime",
-        "@dcloudio/uni-app-framework": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework",
-        "@dcloudio/uni-app-modules": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules",
-        "@ohos/videocompressor": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/libs/videoCompressor.har",
-        "@dcloudio/uni-app-x": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/libs/@dcloudio+uni-app-x@0.7.61.har",
-        "dcloudlayout": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/libs/DCloudLayout-20251216.har",
-        "tiny-emitter": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/libs/tiny-emitter@2.1.0.har",
-        "@ohos/svg": "2.2.3",
-        "uni_modules__uni_crash_lib": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/libs/uni_modules__uni_crash_lib.har"
+        "@dcloudio/uni-app-x-ext": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/ext",
+        "@dcloudio/uni-app-harmony": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/uni-app-harmony",
+        "@dcloudio/uni-runtime-harmony": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime",
+        "@dcloudio/uni-app-framework": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework",
+        "@dcloudio/uni-app-modules": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules",
+        "@ohos/videocompressor": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/libs/videoCompressor.har",
+        "@dcloudio/uni-app-x": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/libs/@dcloudio/uni-app-x",
+        "tiny-emitter": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/libs/tiny-emitter@2.1.0.har",
+        "@ppd/ffrt": "1.1.11",
+        "uni_modules__uni_crash_lib": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/libs/uni_modules__uni_crash_lib.har"
       },
       "dynamicDependencies": {},
       "dev": false,
       "dynamic": false,
       "maskedByOverrideDependencyMap": false
     },
-    "@ohos/svg@2.2.3": {
-      "integrity": "sha512-2NCRDtPa+a6TAh3dd46lcdNCUiXKXDkWzrn1cJaonPO0QtOs4f54Ei51bppdlhFiVSHcjdaT1Uo/Me4Damj0AA==",
-      "storePath": "oh_modules/.ohpm/@ohos+svg@2.2.3",
+    "@ppd/ffrt@1.1.11": {
+      "integrity": "sha512-5AWjn+MUj88L6v5zkz9AimhZ/CrQq1+xlzOeDkBp0aTWFoC6qHH6A/LKwyloPW+pUQrDGr8gYi36RARFdws/9g==",
+      "storePath": "oh_modules/.ohpm/@ppd+ffrt@1.1.11",
       "dependencies": {},
       "dynamicDependencies": {},
       "dev": false,
       "dynamic": false,
       "maskedByOverrideDependencyMap": false
     },
-    "dcloudlayout@file:oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/libs/DCloudLayout-20251216.har": {
-      "storePath": "oh_modules/.ohpm/dcloudlayout@o4tfyyku4j+xy1uhhxsidhq7z+e20ujbdzeiurzgnfy=",
-      "dependencies": {
-        "libdcloudlayout.so": "oh_modules/.ohpm/dcloudlayout@o4tfyyku4j+xy1uhhxsidhq7z+e20ujbdzeiurzgnfy=/oh_modules/dcloudlayout/src/main/cpp/types/libdcloudlayout"
-      },
-      "dynamicDependencies": {},
-      "dev": false,
-      "dynamic": false,
-      "maskedByOverrideDependencyMap": false
-    },
-    "uni_modules__uni_crash_lib@file:oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/libs/uni_modules__uni_crash_lib.har": {
+    "uni_modules__uni_crash_lib@file:oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/libs/uni_modules__uni_crash_lib.har": {
       "storePath": "oh_modules/.ohpm/uni_modules__uni_crash_lib@52lbsbiymmolbsgju3dusxipv9esdf4ryhndsun2mk8=",
       "dependencies": {
         "libuni_modules__uni_crash_lib.so": "oh_modules/.ohpm/uni_modules__uni_crash_lib@52lbsbiymmolbsgju3dusxipv9esdf4ryhndsun2mk8=/oh_modules/uni_modules__uni_crash_lib/src/main/cpp/types/libuni_modules__uni_crash_lib"
@@ -104,7 +111,7 @@
       "dynamic": false,
       "maskedByOverrideDependencyMap": false
     },
-    "tiny-emitter@file:oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/libs/tiny-emitter@2.1.0.har": {
+    "tiny-emitter@file:oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/libs/tiny-emitter@2.1.0.har": {
       "storePath": "oh_modules/.ohpm/tiny-emitter@2bbuysb+ygqpdccpkrwbr7yfkdtt9ybgnmj+zggaoy8=",
       "dependencies": {},
       "dynamicDependencies": {},
@@ -112,15 +119,7 @@
       "dynamic": false,
       "maskedByOverrideDependencyMap": false
     },
-    "@dcloudio/uni-app-x@file:oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/libs/@dcloudio+uni-app-x@0.7.61.har": {
-      "storePath": "oh_modules/.ohpm/@dcloudio+uni-app-x@tpoxnhlswspuz4rtcldt7c6weauuputhabkuvwhrima=",
-      "dependencies": {},
-      "dynamicDependencies": {},
-      "dev": false,
-      "dynamic": false,
-      "maskedByOverrideDependencyMap": false
-    },
-    "@ohos/videocompressor@file:oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/libs/videoCompressor.har": {
+    "@ohos/videocompressor@file:oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/libs/videoCompressor.har": {
       "storePath": "oh_modules/.ohpm/@ohos+videocompressor@soegz02lhnnihit14ad03wcy4dhlg8y+cdslhkqxb5s=",
       "dependencies": {},
       "dynamicDependencies": {},
@@ -128,40 +127,48 @@
       "dynamic": false,
       "maskedByOverrideDependencyMap": false
     },
-    "@dcloudio/uni-app-harmony@file:oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/uni-app-harmony": {
-      "storePath": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/uni-app-harmony",
+    "@dcloudio/uni-app-x-ext@file:oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/ext": {
+      "storePath": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/ext",
       "dependencies": {},
       "dynamicDependencies": {},
       "dev": false,
       "dynamic": false,
       "maskedByOverrideDependencyMap": false
     },
-    "@dcloudio/uni-runtime-harmony@file:oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime": {
-      "storePath": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime",
+    "@dcloudio/uni-app-harmony@file:oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/uni-app-harmony": {
+      "storePath": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/uni-app-harmony",
       "dependencies": {},
       "dynamicDependencies": {},
       "dev": false,
       "dynamic": false,
       "maskedByOverrideDependencyMap": false
     },
-    "@dcloudio/uni-app-framework@file:oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework": {
-      "storePath": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework",
+    "@dcloudio/uni-app-framework@file:oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework": {
+      "storePath": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework",
       "dependencies": {},
       "dynamicDependencies": {},
       "dev": false,
       "dynamic": false,
       "maskedByOverrideDependencyMap": false
     },
-    "@dcloudio/uni-app-modules@file:oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules": {
-      "storePath": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules",
+    "@dcloudio/uni-app-modules@file:oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules": {
+      "storePath": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules",
       "dependencies": {},
       "dynamicDependencies": {},
       "dev": false,
       "dynamic": false,
       "maskedByOverrideDependencyMap": false
     },
-    "libdcloudlayout.so@file:oh_modules/.ohpm/dcloudlayout@o4tfyyku4j+xy1uhhxsidhq7z+e20ujbdzeiurzgnfy=/oh_modules/dcloudlayout/src/main/cpp/types/libdcloudlayout": {
-      "storePath": "oh_modules/.ohpm/dcloudlayout@o4tfyyku4j+xy1uhhxsidhq7z+e20ujbdzeiurzgnfy=/oh_modules/dcloudlayout/src/main/cpp/types/libdcloudlayout",
+    "@dcloudio/uni-runtime-harmony@file:oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime": {
+      "storePath": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime",
+      "dependencies": {},
+      "dynamicDependencies": {},
+      "dev": false,
+      "dynamic": false,
+      "maskedByOverrideDependencyMap": false
+    },
+    "@dcloudio/uni-app-x@file:oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/libs/@dcloudio/uni-app-x": {
+      "storePath": "oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/libs/@dcloudio/uni-app-x",
       "dependencies": {},
       "dynamicDependencies": {},
       "dev": false,
@@ -170,6 +177,40 @@
     },
     "libuni_modules__uni_crash_lib.so@file:oh_modules/.ohpm/uni_modules__uni_crash_lib@52lbsbiymmolbsgju3dusxipv9esdf4ryhndsun2mk8=/oh_modules/uni_modules__uni_crash_lib/src/main/cpp/types/libuni_modules__uni_crash_lib": {
       "storePath": "oh_modules/.ohpm/uni_modules__uni_crash_lib@52lbsbiymmolbsgju3dusxipv9esdf4ryhndsun2mk8=/oh_modules/uni_modules__uni_crash_lib/src/main/cpp/types/libuni_modules__uni_crash_lib",
+      "dependencies": {},
+      "dynamicDependencies": {},
+      "dev": false,
+      "dynamic": false,
+      "maskedByOverrideDependencyMap": false
+    },
+    "imageknifepro@file:libs/imageknifepro.har": {
+      "storePath": "oh_modules/.ohpm/imageknifepro@72n3knmnscfufsvmrkrad8lqknizxxfeoqoesh0ytbm=",
+      "dependencies": {
+        "libimageknifepro.so": "oh_modules/.ohpm/imageknifepro@72n3knmnscfufsvmrkrad8lqknizxxfeoqoesh0ytbm=/oh_modules/imageknifepro/src/main/cpp/types/libentry"
+      },
+      "dynamicDependencies": {},
+      "dev": false,
+      "dynamic": false,
+      "maskedByOverrideDependencyMap": false
+    },
+    "richtext@file:libs/richtext.har": {
+      "storePath": "oh_modules/.ohpm/richtext@gkig+3szoby80newhj9i4izv7h5v3u05x0tkyyi86nk=",
+      "dependencies": {},
+      "dynamicDependencies": {},
+      "dev": false,
+      "dynamic": false,
+      "maskedByOverrideDependencyMap": false
+    },
+    "libentry.so@file:entry/src/main/cpp/types/libentry": {
+      "storePath": "entry/src/main/cpp/types/libentry",
+      "dependencies": {},
+      "dynamicDependencies": {},
+      "dev": false,
+      "dynamic": false,
+      "maskedByOverrideDependencyMap": false
+    },
+    "libimageknifepro.so@file:oh_modules/.ohpm/imageknifepro@72n3knmnscfufsvmrkrad8lqknizxxfeoqoesh0ytbm=/oh_modules/imageknifepro/src/main/cpp/types/libentry": {
+      "storePath": "oh_modules/.ohpm/imageknifepro@72n3knmnscfufsvmrkrad8lqknizxxfeoqoesh0ytbm=/oh_modules/imageknifepro/src/main/cpp/types/libentry",
       "dependencies": {},
       "dynamicDependencies": {},
       "dev": false,

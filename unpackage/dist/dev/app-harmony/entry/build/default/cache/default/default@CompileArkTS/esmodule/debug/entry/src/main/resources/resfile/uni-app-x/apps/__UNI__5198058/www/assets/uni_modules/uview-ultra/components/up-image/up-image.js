@@ -1,11 +1,16 @@
 import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
-import { r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { a as addUnit, d as deepMerge, b as addStyle } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import { i as imageProps } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-image/image&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataEvent: _setSharedDataEvent, setSharedDataStyle: _setSharedDataStyle, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, toSharedDataImageMode: _toSharedDataImageMode, toSharedDataAttrBoolean: _toSharedDataAttrBoolean, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataSlot: _createSharedDataSlot, createSharedDataIf: _createSharedDataIf } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpImageUpImage";
 const { nextTick, ref, computed, onMounted, watch } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  __dynamicSharedData: true,
+  __hash: "12840405",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-image/up-image.uvue",
   __name: "up-image",
   props: {
     src: {
@@ -114,10 +119,12 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   emits: ["click", "error", "load"],
   setup(__props, _a) {
     var __expose = _a.expose, __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpImageUpImageSharedData", sharedDataClassId: 0 })));
     const props = __props;
     const isError = ref(true);
     const loading = ref(true);
-    const opacity = ref(1);
+    ref(1);
     const backgroundStyle = ref(new UTSJSONObject({}));
     const show = ref(false);
     const emit = __emit;
@@ -207,77 +214,67 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       onErrorHandler,
       onLoadHandler
     });
-    const __returned__ = { props, isError, loading, opacity, backgroundStyle, show, emit, realSrc, wrapStyle, mergedCustomStyle, imageStyle, loadingStyle, errorStyle, initLoading, onClick, onErrorHandler, removeBgColor, onLoadHandler };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _component_up_icon = __easycom_0;
+      _setSharedDataEvent(__sharedData, 6, onErrorHandler);
+      _setSharedDataEvent(__sharedData, 7, onLoadHandler);
+      _renderSharedDataEffect(() => {
+        _setSharedDataStyle(__sharedData, 9, [wrapStyle.value, backgroundStyle.value, mergedCustomStyle.value]);
+        _setSharedDataAttr(__sharedData, 10, _toSharedDataString(realSrc.value));
+        _setSharedDataAttr(__sharedData, 11, _toSharedDataImageMode(__props.mode));
+        _setSharedDataAttr(__sharedData, 12, _toSharedDataAttrBoolean(__props.lazyLoad, false));
+        _setSharedDataStyle(__sharedData, 13, imageStyle.value);
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.showLoading && loading.value));
+      }, () => {
+        _renderSharedDataEffect(() => {
+          return _setSharedDataStyle(__sharedData, 2, loadingStyle.value);
+        });
+        _createSharedDataSlot("loading", null, null, () => {
+          const n5 = _createSharedDataComponentWithFallback(_component_up_icon, "35b887b8", {
+            name: () => {
+              return __props.loadingIcon;
+            },
+            width: () => {
+              return __props.width;
+            },
+            height: () => {
+              return __props.height;
+            }
+          });
+          _setSharedData(__sharedData, 1, n5?.sharedData);
+        });
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 3, _toSharedDataBoolean(__props.showError && isError.value && !loading.value));
+      }, () => {
+        _renderSharedDataEffect(() => {
+          return _setSharedDataStyle(__sharedData, 5, errorStyle.value);
+        });
+        _createSharedDataSlot("error", null, null, () => {
+          const n11 = _createSharedDataComponentWithFallback(_component_up_icon, "35b88fd0", {
+            name: () => {
+              return __props.errorIcon;
+            },
+            width: () => {
+              return __props.width;
+            },
+            height: () => {
+              return __props.height;
+            }
+          });
+          _setSharedData(__sharedData, 4, n11?.sharedData);
+        });
+      });
+      _setSharedDataEvent(__sharedData, 8, onClick);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "u-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "u-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-empty__wrap": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view-wrapper": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__scroll-view": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-tabs__wrapper__nav__line": { "": { "display": "flex", "flexDirection": "column", "flexShrink": 0, "flexGrow": 0, "flexBasis": "auto", "alignItems": "stretch", "alignContent": "flex-start" } }, "up-image": { "": { "position": "relative", "transitionProperty": "opacity", "transitionDuration": "0.5s", "transitionTimingFunction": "ease-in-out" } }, "up-image__image": { "": { "width": "100%", "height": "100%" } }, "up-image__loading": { "": { "position": "absolute", "top": 0, "left": 0, "width": "100%", "height": "100%", "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "backgroundColor": "#f3f4f6" } }, "up-image__error": { "": { "position": "absolute", "top": 0, "left": 0, "width": "100%", "height": "100%", "display": "flex", "flexDirection": "row", "alignItems": "center", "justifyContent": "center", "backgroundColor": "#f3f4f6" } }, "@TRANSITION": { "up-image": { "property": "opacity", "duration": "0.5s", "timingFunction": "ease-in-out" } } };
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode, renderSlot: _renderSlot, resolveComponent: _resolveComponent, createVNode: _createVNode, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
-  return _openBlock(), _createElementBlock(
-    "view",
-    {
-      class: "up-image",
-      onClick: $setup.onClick,
-      style: _normalizeStyle([$setup.wrapStyle, $setup.backgroundStyle, $setup.mergedCustomStyle])
-    },
-    [
-      _createElementVNode("image", {
-        src: $setup.realSrc,
-        mode: $props.mode,
-        onError: $setup.onErrorHandler,
-        onLoad: $setup.onLoadHandler,
-        "lazy-load": $props.lazyLoad,
-        class: "up-image__image",
-        style: _normalizeStyle($setup.imageStyle)
-      }, null, 44, ["src", "mode", "lazy-load"]),
-      $props.showLoading && $setup.loading ? (_openBlock(), _createElementBlock(
-        "view",
-        {
-          key: 0,
-          class: "up-image__loading",
-          style: _normalizeStyle($setup.loadingStyle)
-        },
-        [
-          _renderSlot(_ctx.$slots, "loading", {}, () => [
-            _createVNode(_component_up_icon, {
-              name: $props.loadingIcon,
-              width: $props.width,
-              height: $props.height
-            }, null, 8, ["name", "width", "height"])
-          ])
-        ],
-        4
-        /* STYLE */
-      )) : _createCommentVNode("v-if", true),
-      $props.showError && $setup.isError && !$setup.loading ? (_openBlock(), _createElementBlock(
-        "view",
-        {
-          key: 1,
-          class: "up-image__error",
-          style: _normalizeStyle($setup.errorStyle)
-        },
-        [
-          _renderSlot(_ctx.$slots, "error", {}, () => [
-            _createVNode(_component_up_icon, {
-              name: $props.errorIcon,
-              width: $props.width,
-              height: $props.height
-            }, null, 8, ["name", "width", "height"])
-          ])
-        ],
-        4
-        /* STYLE */
-      )) : _createCommentVNode("v-if", true)
-    ],
-    4
-    /* STYLE */
-  );
-}
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-image/up-image.uvue"]]);
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_1 as _
 };
