@@ -1,0 +1,1 @@
+import{O as s,c as a,e,w as t,C as o,i as d}from"./index-CsX50PUA.js";const l=s({},[["render",function(s,l){const f=d;return a(),e(f,{class:"default-layout flex flex-col"},{default:t(()=>[o(s.$slots,"default",{},void 0,!0)]),_:3})}],["__scopeId","data-v-3f4db399"]]);export{l as L};
