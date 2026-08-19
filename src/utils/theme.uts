@@ -1,4 +1,5 @@
 import themeJson from '../../theme.json';
+import { nextTick } from 'vue';
 
 /**
  * 获取当前系统 / 宿主主题
@@ -133,17 +134,19 @@ export function applyNavbarTheme(isDark: boolean): void {
   // #ifdef H5
   // H5：直接修改 uni-page-head 的 DOM 样式（背景色 + 文字色 + 按钮色）
   try {
-    const heads = document.querySelectorAll('uni-page-head .uni-page-head');
-    for (let i = 0; i < heads.length; i++) {
-      const el = heads[i] as HTMLElement;
-      el.style.backgroundColor = tokens.navBg;
-      el.style.color = tokens.navText;
-    }
-    const btns = document.querySelectorAll('uni-page-head .uni-page-head-btn');
-    for (let i = 0; i < btns.length; i++) {
-      const btn = btns[i] as HTMLElement;
-      btn.style.color = tokens.navText;
-    }
+    nextTick(() => {
+      const heads = document.querySelectorAll('uni-page-head .uni-page-head');
+      for (let i = 0; i < heads.length; i++) {
+        const el = heads[i] as HTMLElement;
+        el.style.backgroundColor = tokens.navBg;
+        el.style.color = tokens.navText;
+      }
+      const btns = document.querySelectorAll('uni-page-head .uni-page-head-btn');
+      for (let i = 0; i < btns.length; i++) {
+        const btn = btns[i] as HTMLElement;
+        btn.style.color = tokens.navText;
+      }
+    });
   }
   catch (e) {
     // 页面未就绪时忽略
