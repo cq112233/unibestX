@@ -33,9 +33,12 @@
             <slot name="toolbar-right"></slot>
           </template>
         </up-toolbar>
-        <slot name="toolbar-bottom"></slot>
+        <view v-if="toolbarBottomSlot">
+          <slot name="toolbar-bottom"></slot>
+        </view>
 
-        <!-- 自定义高保真滚动选择器区域 -->
+        <!-- #ifdef APP -->
+        <!-- App 原生端（iOS / Android）：使用用户原生平滑滚动容器 -->
         <view class="up-picker__body" :style="{ height: pickerViewHeight }">
           <!-- 中间选中高亮边框 -->
           <view
@@ -91,8 +94,48 @@
             </scroll-view>
           </view>
         </view>
+        <!-- #endif -->
 
-        <view v-if="loading" class="up-picker--loading">
+        <!-- #ifndef APP -->
+        <!-- 非 App 平台（微信小程序 / H5 / Web 等）：使用标准原生 3D 滚轮 picker-view -->
+        <picker-view
+          class="up-picker__view"
+          :indicator-style="`height: ${itemHeightUnit}`"
+          :value="innerIndex"
+          :immediate-change="immediateChange"
+          :style="{ height: pickerViewHeight }"
+          @change="changeHandler"
+        >
+          <picker-view-column
+            v-for="(column, colIndex) in innerColumns"
+            :key="colIndex"
+            class="up-picker__view__column"
+          >
+            <view
+              v-for="(item, itemIndex) in column"
+              :key="itemIndex"
+              class="up-picker__view__column__item up-line-1"
+              :style="{ height: itemHeightUnit }"
+            >
+              <text
+                class="up-picker__view__column__item__text"
+                :style="{
+                  lineHeight: itemHeightUnit,
+                  color: (innerIndex.length > colIndex && itemIndex == innerIndex[colIndex]) ? '#303133' : '#606266',
+                  fontWeight: (innerIndex.length > colIndex && itemIndex == innerIndex[colIndex]) ? 'bold' : 'normal',
+                }"
+              >
+                {{ getItemText(item) }}
+              </text>
+            </view>
+          </picker-view-column>
+        </picker-view>
+        <!-- #endif -->
+
+        <view
+          v-if="loading"
+          class="up-picker--loading"
+        >
           <up-loading-icon mode="circle"></up-loading-icon>
         </view>
       </view>
@@ -138,6 +181,10 @@ const props = defineProps({
 		default: true
 	},
 	toolbarRightSlot: {
+		type: Boolean,
+		default: false
+	},
+	toolbarBottomSlot: {
 		type: Boolean,
 		default: false
 	},
@@ -390,6 +437,42 @@ function onItemClick(colIndex: number, itemIndex: number): void {
 	}
 }
 
+function changeHandler(e: any): void {
+	const val = (e as UniPickerViewChangeEvent).detail.value
+	let index = 0
+	let colIdx = 0
+	for (let i = 0; i < val.length; i++) {
+		const item = val[i]
+		if (item != (i < lastIndex.value.length ? lastIndex.value[i] : 0)) {
+			colIdx = i
+			index = item
+			break
+		}
+	}
+	columnIndex.value = colIdx
+	setLastIndex(val)
+	setIndexs(val, false)
+
+	emit('update:modelValue', inputValue.value)
+
+	let valueOrigin: Array<any> = []
+	for (let i = 0; i < innerColumns.value.length; i++) {
+		const col = innerColumns.value[i]
+		const selectedIdx = i < val.length ? val[i] : 0
+		if (selectedIdx < col.length) {
+			valueOrigin.push(col[selectedIdx])
+		}
+	}
+
+	emit('change', {
+		value: valueOrigin,
+		index,
+		indexs: val,
+		values: innerColumns.value,
+		columnIndex: colIdx
+	} as UTSJSONObject)
+}
+
 function closeHandler(): void {
 	if (props.closeOnClickOverlay) {
 		if (props.hasInput) {
@@ -571,6 +654,29 @@ defineExpose({
 		&__text {
 			font-size: 16px;
 			text-align: center;
+		}
+	}
+
+	&__view {
+		width: 100%;
+
+		&__column {
+			@include flex;
+			flex: 1;
+			justify-content: center;
+
+			&__item {
+				@include flex;
+				justify-content: center;
+				align-items: center;
+				width: 100%;
+
+				&__text {
+					font-size: 16px;
+					text-align: center;
+					color: #303133;
+				}
+			}
 		}
 	}
 

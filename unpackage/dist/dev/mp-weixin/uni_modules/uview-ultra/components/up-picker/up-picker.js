@@ -50,6 +50,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     type: Boolean,
     default: false
   },
+  toolbarBottomSlot: {
+    type: Boolean,
+    default: false
+  },
   title: {
     type: String,
     default: ""
@@ -134,13 +138,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   const itemHeightUnit = common_vendor.computed(() => {
     return uni_modules_uviewUltra_libs_function_index.addUnit(itemHeightNumber.value);
   });
-  const indicatorStyle = common_vendor.computed(() => {
+  common_vendor.computed(() => {
     return new common_vendor.UTSJSONObject({
       top: indicatorTop.value,
       height: itemHeightUnit.value
     });
   });
-  const itemStyle = common_vendor.computed(() => {
+  common_vendor.computed(() => {
     return new common_vendor.UTSJSONObject({
       height: itemHeightUnit.value
     });
@@ -195,21 +199,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     }
     return item != null ? item.toString() : "";
   }
-  function isItemSelected(colIdx, itemIdx) {
-    if (innerIndex.value.length > colIdx) {
-      return innerIndex.value[colIdx] == itemIdx;
-    }
-    return itemIdx == 0;
-  }
-  function getItemTextStyle(colIndex, itemIndex) {
-    const isSel = isItemSelected(colIndex, itemIndex);
-    return new common_vendor.UTSJSONObject({
-      lineHeight: itemHeightUnit.value,
-      color: isSel ? "#303133" : "#909399",
-      fontWeight: isSel ? "bold" : "normal",
-      fontSize: "16px"
-    });
-  }
   function setLastIndex(index) {
     lastIndex.value = [...index];
   }
@@ -236,51 +225,37 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     }
     syncScrollPositions();
   }
-  function notifyChange(colIdx, changedItemIdx) {
-    const values = innerColumns.value;
-    setLastIndex(innerIndex.value);
+  function changeHandler(e = null) {
+    const val = e.detail.value;
+    let index = 0;
+    let colIdx = 0;
+    for (let i = 0; i < val.length; i++) {
+      const item = val[i];
+      if (item != (i < lastIndex.value.length ? lastIndex.value[i] : 0)) {
+        colIdx = i;
+        index = item;
+        break;
+      }
+    }
+    columnIndex.value = colIdx;
+    setLastIndex(val);
+    setIndexs(val, false);
     emit("update:modelValue", inputValue.value);
     let valueOrigin = [];
-    for (let index = 0; index < innerColumns.value.length; index++) {
-      const item = innerColumns.value[index];
-      const idx = index < innerIndex.value.length ? innerIndex.value[index] : 0;
-      if (idx < item.length) {
-        valueOrigin.push(item[idx]);
+    for (let i = 0; i < innerColumns.value.length; i++) {
+      const col = innerColumns.value[i];
+      const selectedIdx = i < val.length ? val[i] : 0;
+      if (selectedIdx < col.length) {
+        valueOrigin.push(col[selectedIdx]);
       }
     }
     emit("change", new common_vendor.UTSJSONObject({
       value: valueOrigin,
-      index: changedItemIdx,
-      indexs: innerIndex.value,
-      values,
+      index,
+      indexs: val,
+      values: innerColumns.value,
       columnIndex: colIdx
     }));
-  }
-  function onColumnScroll(e = null, colIndex) {
-    const scrollEvent = e;
-    const scrollTop = scrollEvent.detail.scrollTop;
-    const targetIndex = Math.max(0, Math.min(innerColumns.value[colIndex].length - 1, Math.round(scrollTop / itemHeightNumber.value)));
-    if (innerIndex.value.length > colIndex && innerIndex.value[colIndex] != targetIndex) {
-      innerIndex.value[colIndex] = targetIndex;
-      columnIndex.value = colIndex;
-      notifyChange(colIndex, targetIndex);
-    }
-  }
-  function onColumnTouchEnd(colIndex) {
-    setTimeout(() => {
-      if (innerIndex.value.length > colIndex) {
-        const idx = innerIndex.value[colIndex];
-        columnScrollTops.value[colIndex] = idx * itemHeightNumber.value;
-      }
-    }, 80);
-  }
-  function onItemClick(colIndex, itemIndex) {
-    if (innerIndex.value.length > colIndex) {
-      innerIndex.value[colIndex] = itemIndex;
-      columnScrollTops.value[colIndex] = itemIndex * itemHeightNumber.value;
-      columnIndex.value = colIndex;
-      notifyChange(colIndex, itemIndex);
-    }
   }
   function closeHandler() {
     if (props.closeOnClickOverlay) {
@@ -412,53 +387,46 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
         class: "data-v-4aec16d9"
       })
     } : {}, {
-      h: common_vendor.s(indicatorStyle.value),
-      i: indicatorTop.value,
-      j: indicatorTop.value,
-      k: common_vendor.f(innerColumns.value, (column, colIndex, i0) => {
+      h: __props.toolbarBottomSlot
+    }, __props.toolbarBottomSlot ? {} : {}, {
+      i: common_vendor.f(innerColumns.value, (column, colIndex, i0) => {
         return {
           a: common_vendor.f(column, (item, itemIndex, i1) => {
             return {
               a: common_vendor.t(getItemText(item)),
-              b: common_vendor.s(getItemTextStyle(colIndex, itemIndex)),
-              c: itemIndex,
-              d: common_vendor.o(($event) => {
-                return onItemClick(colIndex, itemIndex);
-              }, itemIndex)
+              b: innerIndex.value.length > colIndex && itemIndex == innerIndex.value[colIndex] ? "#303133" : "#606266",
+              c: innerIndex.value.length > colIndex && itemIndex == innerIndex.value[colIndex] ? "bold" : "normal",
+              d: itemIndex
             };
           }),
-          b: colIndex,
-          c: columnScrollTops.value[colIndex],
-          d: common_vendor.o(($event) => {
-            return onColumnScroll($event, colIndex);
-          }, colIndex),
-          e: common_vendor.o(($event) => {
-            return onColumnTouchEnd(colIndex);
-          }, colIndex)
+          b: colIndex
         };
       }),
-      l: indicatorTop.value,
-      m: common_vendor.s(itemStyle.value),
-      n: indicatorTop.value,
+      j: itemHeightUnit.value,
+      k: itemHeightUnit.value,
+      l: `height: ${itemHeightUnit.value}`,
+      m: innerIndex.value,
+      n: __props.immediateChange,
       o: pickerViewHeight.value,
-      p: __props.loading
+      p: common_vendor.o(changeHandler, "48"),
+      q: __props.loading
     }, __props.loading ? {
-      q: common_vendor.p({
+      r: common_vendor.p({
         mode: "circle",
         class: "data-v-4aec16d9"
       })
     } : {}, {
-      r: common_vendor.o(closeHandler, "8d"),
-      s: common_vendor.p({
+      s: common_vendor.o(closeHandler, "8d"),
+      t: common_vendor.p({
         show: __props.pageInline || __props.show || __props.hasInput && showByClickInput.value,
         mode: __props.popupMode,
         pageInline: __props.pageInline,
         class: "data-v-4aec16d9"
       }),
-      t: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-      v: `${_ctx.u_s_b_h}px`,
-      w: `${_ctx.u_s_a_i_b}px`,
-      x: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+      v: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+      w: `${_ctx.u_s_b_h}px`,
+      x: `${_ctx.u_s_a_i_b}px`,
+      y: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
     });
     return __returned__;
   };

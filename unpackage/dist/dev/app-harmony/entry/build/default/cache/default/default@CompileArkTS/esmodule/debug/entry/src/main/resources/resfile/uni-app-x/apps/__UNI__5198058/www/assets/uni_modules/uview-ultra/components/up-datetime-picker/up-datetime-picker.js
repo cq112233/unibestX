@@ -3,7 +3,7 @@ import { _ as __easycom_2$1 } from "@normalized:N&&&entry/src/main/resources/res
 import { d as dayuts } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-dayuts/common/index&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-dayuts/common/use&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-dayuts/utssdk/interface&";
-import { p as padZero, f as range, i as error } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
+import { p as padZero, i as error, f as range } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/test&";
 import { d as defProps } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-datetime-picker/datetimePicker&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
@@ -259,30 +259,31 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
           values.push(formatterFunc("second", secondVal));
         }
       } else {
-        new Date(value.toString());
+        const date = typeof value === "number" ? new Date(value) : new Date(value.toString());
+        const validDate = isNaN(date.getTime()) ? /* @__PURE__ */ new Date() : date;
         values = [
-          formatterFunc("year", `${dayuts(value).year()}`),
+          formatterFunc("year", `${validDate.getFullYear()}`),
           // 月份补0
-          formatterFunc("month", padZero(dayuts(value).month() + 1))
+          formatterFunc("month", padZero(validDate.getMonth() + 1))
         ];
         if (props.mode === "date" || props.mode === "datehour" || props.mode === "datetime" || props.mode === "datetimesecond") {
-          values.push(formatterFunc("day", padZero(dayuts(value).date())));
+          values.push(formatterFunc("day", padZero(validDate.getDate())));
         }
         if (props.mode === "datehour" || props.mode === "datetime" || props.mode === "datetimesecond") {
-          values.push(formatterFunc("hour", padZero(dayuts(value).hour())));
+          values.push(formatterFunc("hour", padZero(validDate.getHours())));
         }
         if (props.mode === "datetime" || props.mode === "datetimesecond") {
-          values.push(formatterFunc("minute", padZero(dayuts(value).minute())));
+          values.push(formatterFunc("minute", padZero(validDate.getMinutes())));
         }
         if (props.mode === "datetimesecond") {
-          values.push(formatterFunc("second", padZero(dayuts(value).second())));
+          values.push(formatterFunc("second", padZero(validDate.getSeconds())));
         }
       }
       let indexs = [];
       columns.value.forEach((column, index) => {
         const targetVal = index < values.length ? values[index] : "";
         indexs.push(Math.max(0, column.findIndex((item) => {
-          return item === targetVal;
+          return item == targetVal;
         })));
       });
       innerDefaultIndex.value = indexs;
@@ -485,6 +486,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     function updateColumnValue(value = null) {
       innerValue.value = value;
       updateColumns();
+      updateIndexs(value);
       nextTick(() => {
         setTimeout(() => {
           updateIndexs(value);
@@ -695,11 +697,18 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         showByClickInput.value = false;
       }
       if (newValue) {
+        innerValue.value = correctValue(props.modelValue);
         updateColumnValue(innerValue.value);
         setTimeout(() => {
           updateIndexs(innerValue.value);
         }, 150);
       }
+    });
+    watch(() => {
+      return props.modelValue;
+    }, (newVal = null) => {
+      innerValue.value = correctValue(newVal);
+      updateColumnValue(innerValue.value);
     });
     init();
     onMounted(() => {

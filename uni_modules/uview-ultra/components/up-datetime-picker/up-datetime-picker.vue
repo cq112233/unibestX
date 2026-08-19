@@ -112,6 +112,12 @@
 					this.showByClickInput = false
 				}
 				if (newValue) {
+					// #ifdef VUE3
+					this.innerValue = this.correctValue(this.modelValue)
+					// #endif
+					// #ifdef VUE2
+					this.innerValue = this.correctValue(this.value)
+					// #endif
 					this.updateColumnValue(this.innerValue)
 					// 弹窗打开时，原生picker-view需要一定时间完成渲染，在Android/HarmonyOS端
 					// 仅靠updateColumnValue中的$nextTick不足以保证索引设置成功，需额外兜底
@@ -374,6 +380,7 @@
 			updateColumnValue(value) {
 				this.innerValue = value
 				this.updateColumns()
+				this.updateIndexs(value)
 				// 延迟执行，等待up-picker组件列数据更新完后再设置选中值索引
 				// 用$nextTick包裹确保columns已更新到DOM后再设置索引
 				this.$nextTick(() => {
@@ -407,32 +414,32 @@
 						values.push(formatter('second', timeArr[2]))
 					}
 				} else {
-				    const date = new Date(value)
-				    values = [
-				        formatter('year', `${dayjs(value).year()}`),
+					const validDate = typeof value === 'number' ? new Date(value) : (!isNaN(new Date(value).getTime()) ? new Date(value) : new Date())
+					values = [
+						formatter('year', `${validDate.getFullYear()}`),
 						// 月份补0
-				        formatter('month', padZero(dayjs(value).month() + 1))
-				    ]
-				    if (this.mode === 'date' || this.mode === 'datehour' || this.mode === 'datetime' || this.mode === 'datetimesecond') {
+						formatter('month', padZero(validDate.getMonth() + 1))
+					]
+					if (this.mode === 'date' || this.mode === 'datehour' || this.mode === 'datetime' || this.mode === 'datetimesecond') {
 						// date模式，需要添加天列
-				        values.push(formatter('day', padZero(dayjs(value).date())))
-				    }
-				    if (this.mode === 'datehour' || this.mode === 'datetime' || this.mode === 'datetimesecond') {
-				        values.push(formatter('hour', padZero(dayjs(value).hour())))
-				    }
-				    if (this.mode === 'datetime' || this.mode === 'datetimesecond') {
+						values.push(formatter('day', padZero(validDate.getDate())))
+					}
+					if (this.mode === 'datehour' || this.mode === 'datetime' || this.mode === 'datetimesecond') {
+						values.push(formatter('hour', padZero(validDate.getHours())))
+					}
+					if (this.mode === 'datetime' || this.mode === 'datetimesecond') {
 						// 数组的push方法，可以写入多个参数
-				        values.push(formatter('minute', padZero(dayjs(value).minute())))
-				    }
-				    if (this.mode === 'datetimesecond') {
-				        values.push(formatter('second', padZero(dayjs(value).second())))
-				    }
+						values.push(formatter('minute', padZero(validDate.getMinutes())))
+					}
+					if (this.mode === 'datetimesecond') {
+						values.push(formatter('second', padZero(validDate.getSeconds())))
+					}
 				}
 
 				// 根据当前各列的所有值，从各列默认值中找到默认值在各列中的索引
 				const indexs = this.columns.map((column, index) => {
 					// 通过取大值，可以保证不会出现找不到索引的-1情况
-					return Math.max(0, column.findIndex(item => item === values[index]))
+					return Math.max(0, column.findIndex(item => item == values[index]))
 				})
 				this.innerDefaultIndex = indexs
 			},
@@ -476,13 +483,14 @@
 			correctValue(value) {
 				const isDateMode = !['time', 'timesecond'].includes(this.mode)
 				if (isDateMode && !test.date(value)) {
-					// 如果是日期类型，但是又没有设置合法的当前时间的话，使用最小时间为当前时间
-					value = this.minDate
+					// 如果是日期类型，但是又没有设置合法的当前时间的话，使用当前时间为默认时间
+					value = Number(new Date())
 				} else if (!isDateMode && !value) {
-					// 如果是时间类型，而又没有默认值的话，就用最小时间
+					// 如果是时间类型，而又没有默认值的话，就用当前时间的时分秒
+					const now = new Date()
 					value = this.mode === 'timesecond'
-						? `${padZero(this.minHour)}:${padZero(this.minMinute)}:${padZero(this.minSecond)}`
-						: `${padZero(this.minHour)}:${padZero(this.minMinute)}`
+						? `${padZero(now.getHours())}:${padZero(now.getMinutes())}:${padZero(now.getSeconds())}`
+						: `${padZero(now.getHours())}:${padZero(now.getMinutes())}`
 				}
 				// 时间类型
 				if (!isDateMode) {

@@ -85,9 +85,9 @@
     });
   }
   function initRuntimeSocketService() {
-    const hosts = "127.0.0.1,192.168.100.133,198.18.0.1";
+    const hosts = "127.0.0.1,192.168.100.133,198.18.0.1,10.8.0.15";
     const port = "8090";
-    const id = "app-ios_QG1jfU";
+    const id = "app-ios_GyKjQx";
     return Promise.resolve().then(() => {
       return initRuntimeSocket(hosts, port, id).then((socket) => {
         if (socket == null) {
@@ -6905,7 +6905,7 @@
   const __className$3e = "GenSrcPagesIndexIndex";
   const _sfc_main$3f = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
     __dynamicSharedData: true,
-    __hash: "7e8f956c",
+    __hash: "3db0ad20",
     __className: __className$3e,
     __filename: "src/pages/index/index.uvue",
     __name: "index",
@@ -34478,7 +34478,7 @@
   const __className$1L = "GenUniModulesUviewUltraComponentsUpPickerUpPicker";
   const _sfc_main$1M = /* @__PURE__ */ vue.defineVaporSharedDataComponent(Object.assign({
     name: "up-picker"
-  }, { __dynamicSharedData: true, __hash: "8477c334", __className: __className$1L, __filename: "uni_modules/uview-ultra/components/up-picker/up-picker.uvue", __name: "up-picker", props: {
+  }, { __dynamicSharedData: true, __hash: "b590628c", __className: __className$1L, __filename: "uni_modules/uview-ultra/components/up-picker/up-picker.uvue", __name: "up-picker", props: {
     modelValue: {
       type: Array,
       default: () => {
@@ -34510,6 +34510,10 @@
       default: true
     },
     toolbarRightSlot: {
+      type: Boolean,
+      default: false
+    },
+    toolbarBottomSlot: {
       type: Boolean,
       default: false
     },
@@ -34871,7 +34875,7 @@
           return showByClickInput.value = !showByClickInput.value;
         });
       });
-      const n32 = vue.createSharedDataComponentWithFallback(_component_up_popup, "93e0cbbc", {
+      const n35 = vue.createSharedDataComponentWithFallback(_component_up_popup, "93e0cbbc", {
         show: () => {
           return __props.pageInline || __props.show || __props.hasInput && showByClickInput.value;
         },
@@ -34921,15 +34925,19 @@
             });
             vue.setSharedData(__sharedData, 5, n10 == null ? void 0 : n10.sharedData);
           });
-          vue.createSharedDataSlot("toolbar-bottom", null, null);
+          vue.createSharedDataIf(() => {
+            return vue.setSharedData(__sharedData, 6, vue.toSharedDataBoolean(__props.toolbarBottomSlot));
+          }, () => {
+            vue.createSharedDataSlot("toolbar-bottom", null, null);
+          });
           vue.renderSharedDataEffect(() => {
             const __height_indicatorTop = { height: indicatorTop.value };
-            vue.setSharedDataStyle(__sharedData, 9, { height: pickerViewHeight.value });
-            vue.setSharedDataStyle(__sharedData, 10, indicatorStyle.value);
-            vue.setSharedDataStyle(__sharedData, 11, __height_indicatorTop);
+            vue.setSharedDataStyle(__sharedData, 10, { height: pickerViewHeight.value });
+            vue.setSharedDataStyle(__sharedData, 11, indicatorStyle.value);
             vue.setSharedDataStyle(__sharedData, 12, __height_indicatorTop);
+            vue.setSharedDataStyle(__sharedData, 13, __height_indicatorTop);
           });
-          vue.createSharedDataFor(vue.setSharedDataScoped(__sharedData, 8, vue.createSharedDataVFor(__sharedDataScope, () => {
+          vue.createSharedDataFor(vue.setSharedDataScoped(__sharedData, 9, vue.createSharedDataVFor(__sharedDataScope, () => {
             return new UniDynamicSharedData(__sharedDataScope, { bundleKey: "".concat(__className$1L, "SharedData"), sharedDataClassId: 1 });
           })), () => {
             return innerColumns.value;
@@ -34969,14 +34977,14 @@
             return vue.setSharedData(__sharedData_VFor0, 0, vue.toDisplayString(colIndex));
           }, 1);
           vue.createSharedDataIf(() => {
-            return vue.setSharedData(__sharedData, 6, vue.toSharedDataBoolean(__props.loading));
+            return vue.setSharedData(__sharedData, 7, vue.toSharedDataBoolean(__props.loading));
           }, () => {
-            const n29 = vue.createSharedDataComponentWithFallback(_component_up_loading_icon, "0be3507c", { mode: "circle" });
-            vue.setSharedData(__sharedData, 7, n29 == null ? void 0 : n29.sharedData);
+            const n32 = vue.createSharedDataComponentWithFallback(_component_up_loading_icon, "0be3a3aa", { mode: "circle" });
+            vue.setSharedData(__sharedData, 8, n32 == null ? void 0 : n32.sharedData);
           });
         })
       });
-      vue.setSharedData(__sharedData, 3, n32 == null ? void 0 : n32.sharedData);
+      vue.setSharedData(__sharedData, 3, n35 == null ? void 0 : n35.sharedData);
       return __sharedData;
     };
   } }));
@@ -34996,8 +35004,8 @@
       modelValue: "",
       title: "",
       mode: "datetime",
-      maxDate: new Date((/* @__PURE__ */ new Date()).getFullYear() + 10, 0, 1).getTime(),
-      minDate: new Date((/* @__PURE__ */ new Date()).getFullYear() - 10, 0, 1).getTime(),
+      maxDate: new Date((/* @__PURE__ */ new Date()).getFullYear() + 10, 11, 31, 23, 59, 59).getTime(),
+      minDate: new Date((/* @__PURE__ */ new Date()).getFullYear() - 10, 0, 1, 0, 0, 0).getTime(),
       minHour: 0,
       maxHour: 23,
       minMinute: 0,
@@ -35267,30 +35275,31 @@
             values.push(formatterFunc("second", secondVal));
           }
         } else {
-          new Date(value.toString());
+          const date2 = typeof value === "number" ? new Date(value) : new Date(value.toString());
+          const validDate = isNaN(date2.getTime()) ? /* @__PURE__ */ new Date() : date2;
           values = [
-            formatterFunc("year", "".concat(dayuts(value).year())),
+            formatterFunc("year", "".concat(validDate.getFullYear())),
             // 月份补0
-            formatterFunc("month", padZero$1(dayuts(value).month() + 1))
+            formatterFunc("month", padZero$1(validDate.getMonth() + 1))
           ];
           if (props.mode === "date" || props.mode === "datehour" || props.mode === "datetime" || props.mode === "datetimesecond") {
-            values.push(formatterFunc("day", padZero$1(dayuts(value).date())));
+            values.push(formatterFunc("day", padZero$1(validDate.getDate())));
           }
           if (props.mode === "datehour" || props.mode === "datetime" || props.mode === "datetimesecond") {
-            values.push(formatterFunc("hour", padZero$1(dayuts(value).hour())));
+            values.push(formatterFunc("hour", padZero$1(validDate.getHours())));
           }
           if (props.mode === "datetime" || props.mode === "datetimesecond") {
-            values.push(formatterFunc("minute", padZero$1(dayuts(value).minute())));
+            values.push(formatterFunc("minute", padZero$1(validDate.getMinutes())));
           }
           if (props.mode === "datetimesecond") {
-            values.push(formatterFunc("second", padZero$1(dayuts(value).second())));
+            values.push(formatterFunc("second", padZero$1(validDate.getSeconds())));
           }
         }
         let indexs = [];
         columns.value.forEach((column, index) => {
           const targetVal = index < values.length ? values[index] : "";
           indexs.push(Math.max(0, column.findIndex((item) => {
-            return item === targetVal;
+            return item == targetVal;
           })));
         });
         innerDefaultIndex.value = indexs;
@@ -35493,6 +35502,7 @@
       function updateColumnValue(value = null) {
         innerValue.value = value;
         updateColumns();
+        updateIndexs(value);
         vue.nextTick(() => {
           setTimeout(() => {
             updateIndexs(value);
@@ -35703,11 +35713,18 @@
           showByClickInput.value = false;
         }
         if (newValue) {
+          innerValue.value = correctValue(props.modelValue);
           updateColumnValue(innerValue.value);
           setTimeout(() => {
             updateIndexs(innerValue.value);
           }, 150);
         }
+      });
+      vue.watch(() => {
+        return props.modelValue;
+      }, (newVal = null) => {
+        innerValue.value = correctValue(newVal);
+        updateColumnValue(innerValue.value);
       });
       init();
       vue.onMounted(() => {
@@ -39550,7 +39567,7 @@
   const __className$1p = "GenSrcSubUviewUltraDemosDatetimePickerDatetimePicker";
   const _sfc_main$1q = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
     __dynamicSharedData: true,
-    __hash: "758369a8",
+    __hash: "ea6377d4",
     __className: __className$1p,
     __filename: "src/sub/uview-ultra/demos/datetime-picker/datetime-picker.uvue",
     __name: "datetime-picker",
@@ -39562,42 +39579,106 @@
       const dtShow2 = vue.ref(false);
       const dtShow3 = vue.ref(false);
       const dtShow4 = vue.ref(false);
-      function showDt1() {
-        dtShow1.value = true;
+      const dtShowMinMaxDate = vue.ref(false);
+      const dtShowMinMaxTime = vue.ref(false);
+      const dtShowStart = vue.ref(false);
+      const dtShowEnd = vue.ref(false);
+      const dtValue1 = vue.ref(Number(new Date(2026, 7, 10, 8, 30)));
+      const dtValue2 = vue.ref(Number(new Date(2026, 7, 10)));
+      const dtValue3 = vue.ref(Number(new Date(2026, 7, 10)));
+      const dtValue4 = vue.ref("08:30");
+      const limitMinDate = Number(new Date(2026, 7, 1));
+      const limitMaxDate = Number(new Date(2026, 7, 31));
+      const dtValueMinMaxDate = vue.ref(Number(new Date(2026, 7, 10)));
+      const dtValueMinMaxTime = vue.ref("09:30");
+      const dtValueStart = vue.ref(Number(new Date(2026, 7, 10)));
+      const dtValueEnd = vue.ref(Number(new Date(2026, 7, 20)));
+      function formatDate(timestamp) {
+        const d = new Date(timestamp);
+        const year = d.getFullYear();
+        const month = (d.getMonth() + 1 < 10 ? "0" : "") + (d.getMonth() + 1);
+        const date2 = (d.getDate() < 10 ? "0" : "") + d.getDate();
+        const hours = (d.getHours() < 10 ? "0" : "") + d.getHours();
+        const minutes = (d.getMinutes() < 10 ? "0" : "") + d.getMinutes();
+        return "".concat(year, "-").concat(month, "-").concat(date2, " ").concat(hours, ":").concat(minutes);
       }
-      function showDt2() {
-        dtShow2.value = true;
+      function formatDateOnly(timestamp) {
+        const d = new Date(timestamp);
+        const year = d.getFullYear();
+        const month = (d.getMonth() + 1 < 10 ? "0" : "") + (d.getMonth() + 1);
+        const date2 = (d.getDate() < 10 ? "0" : "") + d.getDate();
+        return "".concat(year, "-").concat(month, "-").concat(date2);
       }
-      function showDt3() {
-        dtShow3.value = true;
-      }
-      function showDt4() {
-        dtShow4.value = true;
+      function formatYearMonth(timestamp) {
+        const d = new Date(timestamp);
+        const year = d.getFullYear();
+        const month = (d.getMonth() + 1 < 10 ? "0" : "") + (d.getMonth() + 1);
+        return "".concat(year, "-").concat(month);
       }
       function onConfirm1(e) {
-        uni.__log__("log", "at src/sub/uview-ultra/demos/datetime-picker/datetime-picker.uvue:63", "datetime", e);
+        const val = e["value"];
+        if (val != null) {
+          dtValue1.value = val;
+        }
         dtShow1.value = false;
       }
       function onConfirm2(e) {
-        uni.__log__("log", "at src/sub/uview-ultra/demos/datetime-picker/datetime-picker.uvue:67", "date", e);
+        const val = e["value"];
+        if (val != null) {
+          dtValue2.value = val;
+        }
         dtShow2.value = false;
       }
       function onConfirm3(e) {
-        uni.__log__("log", "at src/sub/uview-ultra/demos/datetime-picker/datetime-picker.uvue:71", "year-month", e);
+        const val = e["value"];
+        if (val != null) {
+          dtValue3.value = val;
+        }
         dtShow3.value = false;
       }
       function onConfirm4(e) {
-        uni.__log__("log", "at src/sub/uview-ultra/demos/datetime-picker/datetime-picker.uvue:75", "time", e);
+        const val = e["value"];
+        if (val != null) {
+          dtValue4.value = val.toString();
+        }
         dtShow4.value = false;
+      }
+      function onConfirmMinMaxDate(e) {
+        const val = e["value"];
+        if (val != null) {
+          dtValueMinMaxDate.value = val;
+        }
+        dtShowMinMaxDate.value = false;
+      }
+      function onConfirmMinMaxTime(e) {
+        const val = e["value"];
+        if (val != null) {
+          dtValueMinMaxTime.value = val.toString();
+        }
+        dtShowMinMaxTime.value = false;
+      }
+      function onConfirmStart(e) {
+        const val = e["value"];
+        if (val != null) {
+          dtValueStart.value = val;
+        }
+        dtShowStart.value = false;
+      }
+      function onConfirmEnd(e) {
+        const val = e["value"];
+        if (val != null) {
+          dtValueEnd.value = val;
+        }
+        dtShowEnd.value = false;
       }
       return () => {
         "raw js";
         const _component_NavBar = __easycom_0$a;
         const _component_up_button = __easycom_2$j;
         const _component_up_datetime_picker = __easycom_2$a;
-        const n24 = vue.createSharedDataComponent(_sfc_main$3h, "014fc333", null, {
+        const n54 = vue.createSharedDataComponent(_sfc_main$3h, "014fc333", null, {
           "default": vue.withSharedDataVaporCtx(() => {
-            const n23 = vue.createSharedDataComponent(LayoutComponent, "28a8a323", {
+            const n53 = vue.createSharedDataComponent(LayoutComponent, "28a8a323", {
               "navigation-style": "custom",
               "navigation-bar-title-text": "up-datetime-picker 时间选择"
             }, {
@@ -39609,46 +39690,138 @@
                   "bg-color": "#ffffff"
                 });
                 vue.setSharedData(__sharedData, 2, n0 == null ? void 0 : n0.sharedData);
-                const n2 = vue.createSharedDataComponentWithFallback(_component_up_button, "27286624", {
+                const _on_click = () => {
+                  return dtShow1.value = true;
+                };
+                const n2 = vue.createSharedDataComponentWithFallback(_component_up_button, "27286558", {
                   type: "primary",
                   text: "年月日时分",
                   size: "mini",
                   onClick: () => {
-                    return showDt1;
+                    return _on_click;
                   }
                 });
-                vue.setSharedData(__sharedData, 7, n2 == null ? void 0 : n2.sharedData);
-                const n6 = vue.createSharedDataComponentWithFallback(_component_up_button, "272850d0", {
+                vue.setSharedData(__sharedData, 11, n2 == null ? void 0 : n2.sharedData);
+                vue.renderSharedDataEffect(() => {
+                  return vue.setSharedData(__sharedData, 19, vue.toDisplayString(formatDate(dtValue1.value)));
+                });
+                const _on_click1 = () => {
+                  return dtShow2.value = true;
+                };
+                const n7 = vue.createSharedDataComponentWithFallback(_component_up_button, "2728484e", {
                   type: "success",
                   text: "年月日",
                   size: "mini",
                   onClick: () => {
-                    return showDt2;
+                    return _on_click1;
                   }
                 });
-                vue.setSharedData(__sharedData, 8, n6 == null ? void 0 : n6.sharedData);
-                const n10 = vue.createSharedDataComponentWithFallback(_component_up_button, "27284096", {
+                vue.setSharedData(__sharedData, 12, n7 == null ? void 0 : n7.sharedData);
+                vue.renderSharedDataEffect(() => {
+                  return vue.setSharedData(__sharedData, 20, vue.toDisplayString(formatDateOnly(dtValue2.value)));
+                });
+                const _on_click2 = () => {
+                  return dtShow3.value = true;
+                };
+                const n12 = vue.createSharedDataComponentWithFallback(_component_up_button, "bde735f6", {
                   type: "warning",
                   text: "年月",
                   size: "mini",
                   onClick: () => {
-                    return showDt3;
+                    return _on_click2;
                   }
                 });
-                vue.setSharedData(__sharedData, 9, n10 == null ? void 0 : n10.sharedData);
-                const n14 = vue.createSharedDataComponentWithFallback(_component_up_button, "bde735fe", {
+                vue.setSharedData(__sharedData, 13, n12 == null ? void 0 : n12.sharedData);
+                vue.renderSharedDataEffect(() => {
+                  return vue.setSharedData(__sharedData, 21, vue.toDisplayString(formatYearMonth(dtValue3.value)));
+                });
+                const _on_click3 = () => {
+                  return dtShow4.value = true;
+                };
+                const n17 = vue.createSharedDataComponentWithFallback(_component_up_button, "bde71dfe", {
                   type: "error",
                   text: "时分",
                   size: "mini",
                   onClick: () => {
-                    return showDt4;
+                    return _on_click3;
                   }
                 });
-                vue.setSharedData(__sharedData, 10, n14 == null ? void 0 : n14.sharedData);
+                vue.setSharedData(__sharedData, 14, n17 == null ? void 0 : n17.sharedData);
+                vue.renderSharedDataEffect(() => {
+                  return vue.setSharedData(__sharedData, 22, vue.toDisplayString(dtValue4.value));
+                });
+                const _on_click4 = () => {
+                  return dtShowMinMaxDate.value = true;
+                };
+                const n22 = vue.createSharedDataComponentWithFallback(_component_up_button, "bde6fffc", {
+                  type: "primary",
+                  text: "选择当月日期",
+                  size: "mini",
+                  onClick: () => {
+                    return _on_click4;
+                  }
+                });
+                vue.setSharedData(__sharedData, 15, n22 == null ? void 0 : n22.sharedData);
+                vue.renderSharedDataEffect(() => {
+                  return vue.setSharedData(__sharedData, 23, vue.toDisplayString(formatDateOnly(dtValueMinMaxDate.value)));
+                });
+                const _on_click5 = () => {
+                  return dtShowMinMaxTime.value = true;
+                };
+                const n27 = vue.createSharedDataComponentWithFallback(_component_up_button, "bde643c4", {
+                  type: "warning",
+                  text: "选择时分范围",
+                  size: "mini",
+                  onClick: () => {
+                    return _on_click5;
+                  }
+                });
+                vue.setSharedData(__sharedData, 16, n27 == null ? void 0 : n27.sharedData);
+                vue.renderSharedDataEffect(() => {
+                  return vue.setSharedData(__sharedData, 24, vue.toDisplayString(dtValueMinMaxTime.value));
+                });
+                const _on_click6 = () => {
+                  return dtShowStart.value = true;
+                };
+                const n33 = vue.createSharedDataComponentWithFallback(_component_up_button, "bde61872", {
+                  type: "primary",
+                  text: "选择开始",
+                  size: "mini",
+                  onClick: () => {
+                    return _on_click6;
+                  }
+                });
+                vue.setSharedData(__sharedData, 17, n33 == null ? void 0 : n33.sharedData);
+                vue.renderSharedDataEffect(() => {
+                  return vue.setSharedData(__sharedData, 25, vue.toDisplayString(formatDateOnly(dtValueStart.value)));
+                });
+                const _on_click7 = () => {
+                  return dtShowEnd.value = true;
+                };
+                const n38 = vue.createSharedDataComponentWithFallback(_component_up_button, "bde55cb4", {
+                  type: "success",
+                  text: "选择结束",
+                  size: "mini",
+                  onClick: () => {
+                    return _on_click7;
+                  }
+                });
+                vue.setSharedData(__sharedData, 18, n38 == null ? void 0 : n38.sharedData);
+                vue.renderSharedDataEffect(() => {
+                  return vue.setSharedData(__sharedData, 26, vue.toDisplayString(formatDateOnly(dtValueEnd.value)));
+                });
                 const _on_cancel = () => {
                   return dtShow1.value = false;
                 };
-                const n18 = vue.createSharedDataComponentWithFallback(_component_up_datetime_picker, "bde72dfa", {
+                const n44 = vue.createSharedDataComponentWithFallback(_component_up_datetime_picker, "bde54bfc", {
+                  modelValue: () => {
+                    return dtValue1.value;
+                  },
+                  "onUpdate:modelValue": () => {
+                    return (_value) => {
+                      return dtValue1.value = _value;
+                    };
+                  },
                   show: () => {
                     return dtShow1.value;
                   },
@@ -39660,11 +39833,19 @@
                     return _on_cancel;
                   }
                 });
-                vue.setSharedData(__sharedData, 3, n18 == null ? void 0 : n18.sharedData);
+                vue.setSharedData(__sharedData, 3, n44 == null ? void 0 : n44.sharedData);
                 const _on_cancel1 = () => {
                   return dtShow2.value = false;
                 };
-                const n19 = vue.createSharedDataComponentWithFallback(_component_up_datetime_picker, "bde725c6", {
+                const n45 = vue.createSharedDataComponentWithFallback(_component_up_datetime_picker, "bde53e38", {
+                  modelValue: () => {
+                    return dtValue2.value;
+                  },
+                  "onUpdate:modelValue": () => {
+                    return (_value) => {
+                      return dtValue2.value = _value;
+                    };
+                  },
                   show: () => {
                     return dtShow2.value;
                   },
@@ -39676,11 +39857,19 @@
                     return _on_cancel1;
                   }
                 });
-                vue.setSharedData(__sharedData, 4, n19 == null ? void 0 : n19.sharedData);
+                vue.setSharedData(__sharedData, 4, n45 == null ? void 0 : n45.sharedData);
                 const _on_cancel2 = () => {
                   return dtShow3.value = false;
                 };
-                const n20 = vue.createSharedDataComponentWithFallback(_component_up_datetime_picker, "bde71dc4", {
+                const n46 = vue.createSharedDataComponentWithFallback(_component_up_datetime_picker, "bde535bc", {
+                  modelValue: () => {
+                    return dtValue3.value;
+                  },
+                  "onUpdate:modelValue": () => {
+                    return (_value) => {
+                      return dtValue3.value = _value;
+                    };
+                  },
                   show: () => {
                     return dtShow3.value;
                   },
@@ -39692,11 +39881,19 @@
                     return _on_cancel2;
                   }
                 });
-                vue.setSharedData(__sharedData, 5, n20 == null ? void 0 : n20.sharedData);
+                vue.setSharedData(__sharedData, 5, n46 == null ? void 0 : n46.sharedData);
                 const _on_cancel3 = () => {
                   return dtShow4.value = false;
                 };
-                const n21 = vue.createSharedDataComponentWithFallback(_component_up_datetime_picker, "bde71076", {
+                const n47 = vue.createSharedDataComponentWithFallback(_component_up_datetime_picker, "bde48a4a", {
+                  modelValue: () => {
+                    return dtValue4.value;
+                  },
+                  "onUpdate:modelValue": () => {
+                    return (_value) => {
+                      return dtValue4.value = _value;
+                    };
+                  },
                   show: () => {
                     return dtShow4.value;
                   },
@@ -39708,13 +39905,123 @@
                     return _on_cancel3;
                   }
                 });
-                vue.setSharedData(__sharedData, 6, n21 == null ? void 0 : n21.sharedData);
+                vue.setSharedData(__sharedData, 6, n47 == null ? void 0 : n47.sharedData);
+                const _on_cancel4 = () => {
+                  return dtShowMinMaxDate.value = false;
+                };
+                const n48 = vue.createSharedDataComponentWithFallback(_component_up_datetime_picker, "bde4814c", {
+                  modelValue: () => {
+                    return dtValueMinMaxDate.value;
+                  },
+                  "onUpdate:modelValue": () => {
+                    return (_value) => {
+                      return dtValueMinMaxDate.value = _value;
+                    };
+                  },
+                  show: () => {
+                    return dtShowMinMaxDate.value;
+                  },
+                  mode: "date",
+                  "min-date": () => {
+                    return vue.unref(limitMinDate);
+                  },
+                  "max-date": () => {
+                    return vue.unref(limitMaxDate);
+                  },
+                  onConfirm: () => {
+                    return onConfirmMinMaxDate;
+                  },
+                  onCancel: () => {
+                    return _on_cancel4;
+                  }
+                });
+                vue.setSharedData(__sharedData, 7, n48 == null ? void 0 : n48.sharedData);
+                const _on_cancel5 = () => {
+                  return dtShowMinMaxTime.value = false;
+                };
+                const n49 = vue.createSharedDataComponentWithFallback(_component_up_datetime_picker, "bde46acc", {
+                  modelValue: () => {
+                    return dtValueMinMaxTime.value;
+                  },
+                  "onUpdate:modelValue": () => {
+                    return (_value) => {
+                      return dtValueMinMaxTime.value = _value;
+                    };
+                  },
+                  show: () => {
+                    return dtShowMinMaxTime.value;
+                  },
+                  mode: "time",
+                  "min-hour": 9,
+                  "max-hour": 18,
+                  onConfirm: () => {
+                    return onConfirmMinMaxTime;
+                  },
+                  onCancel: () => {
+                    return _on_cancel5;
+                  }
+                });
+                vue.setSharedData(__sharedData, 8, n49 == null ? void 0 : n49.sharedData);
+                const _on_cancel6 = () => {
+                  return dtShowStart.value = false;
+                };
+                const n50 = vue.createSharedDataComponentWithFallback(_component_up_datetime_picker, "bde454b8", {
+                  modelValue: () => {
+                    return dtValueStart.value;
+                  },
+                  "onUpdate:modelValue": () => {
+                    return (_value) => {
+                      return dtValueStart.value = _value;
+                    };
+                  },
+                  show: () => {
+                    return dtShowStart.value;
+                  },
+                  mode: "date",
+                  "max-date": () => {
+                    return dtValueEnd.value;
+                  },
+                  onConfirm: () => {
+                    return onConfirmStart;
+                  },
+                  onCancel: () => {
+                    return _on_cancel6;
+                  }
+                });
+                vue.setSharedData(__sharedData, 9, n50 == null ? void 0 : n50.sharedData);
+                const _on_cancel7 = () => {
+                  return dtShowEnd.value = false;
+                };
+                const n51 = vue.createSharedDataComponentWithFallback(_component_up_datetime_picker, "bde3a18e", {
+                  modelValue: () => {
+                    return dtValueEnd.value;
+                  },
+                  "onUpdate:modelValue": () => {
+                    return (_value) => {
+                      return dtValueEnd.value = _value;
+                    };
+                  },
+                  show: () => {
+                    return dtShowEnd.value;
+                  },
+                  mode: "date",
+                  "min-date": () => {
+                    return dtValueStart.value;
+                  },
+                  onConfirm: () => {
+                    return onConfirmEnd;
+                  },
+                  onCancel: () => {
+                    return _on_cancel7;
+                  }
+                });
+                vue.setSharedData(__sharedData, 10, n51 == null ? void 0 : n51.sharedData);
               })
             });
-            vue.setSharedData(__sharedData, 1, n23.sharedData);
+            vue.setSharedData(__sharedData, 1, n53.sharedData);
           })
         });
-        vue.setSharedData(__sharedData, 0, n24.sharedData);
+        vue.setSharedData(__sharedData, 0, n54.sharedData);
         return __sharedData;
       };
     }

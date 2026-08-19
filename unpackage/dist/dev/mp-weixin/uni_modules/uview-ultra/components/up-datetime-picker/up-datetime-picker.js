@@ -258,30 +258,31 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           values.push(formatterFunc("second", secondVal));
         }
       } else {
-        new Date(value.toString());
+        const date = typeof value === "number" ? new Date(value) : new Date(value.toString());
+        const validDate = isNaN(date.getTime()) ? /* @__PURE__ */ new Date() : date;
         values = [
-          formatterFunc("year", `${uni_modules_limeDayuts_common_index.dayuts(value).year()}`),
+          formatterFunc("year", `${validDate.getFullYear()}`),
           // 月份补0
-          formatterFunc("month", uni_modules_uviewUltra_libs_function_index.padZero(uni_modules_limeDayuts_common_index.dayuts(value).month() + 1))
+          formatterFunc("month", uni_modules_uviewUltra_libs_function_index.padZero(validDate.getMonth() + 1))
         ];
         if (props.mode === "date" || props.mode === "datehour" || props.mode === "datetime" || props.mode === "datetimesecond") {
-          values.push(formatterFunc("day", uni_modules_uviewUltra_libs_function_index.padZero(uni_modules_limeDayuts_common_index.dayuts(value).date())));
+          values.push(formatterFunc("day", uni_modules_uviewUltra_libs_function_index.padZero(validDate.getDate())));
         }
         if (props.mode === "datehour" || props.mode === "datetime" || props.mode === "datetimesecond") {
-          values.push(formatterFunc("hour", uni_modules_uviewUltra_libs_function_index.padZero(uni_modules_limeDayuts_common_index.dayuts(value).hour())));
+          values.push(formatterFunc("hour", uni_modules_uviewUltra_libs_function_index.padZero(validDate.getHours())));
         }
         if (props.mode === "datetime" || props.mode === "datetimesecond") {
-          values.push(formatterFunc("minute", uni_modules_uviewUltra_libs_function_index.padZero(uni_modules_limeDayuts_common_index.dayuts(value).minute())));
+          values.push(formatterFunc("minute", uni_modules_uviewUltra_libs_function_index.padZero(validDate.getMinutes())));
         }
         if (props.mode === "datetimesecond") {
-          values.push(formatterFunc("second", uni_modules_uviewUltra_libs_function_index.padZero(uni_modules_limeDayuts_common_index.dayuts(value).second())));
+          values.push(formatterFunc("second", uni_modules_uviewUltra_libs_function_index.padZero(validDate.getSeconds())));
         }
       }
       let indexs = [];
       columns.value.forEach((column, index) => {
         const targetVal = index < values.length ? values[index] : "";
         indexs.push(Math.max(0, column.findIndex((item) => {
-          return item === targetVal;
+          return item == targetVal;
         })));
       });
       innerDefaultIndex.value = indexs;
@@ -484,6 +485,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function updateColumnValue(value = null) {
       innerValue.value = value;
       updateColumns();
+      updateIndexs(value);
       common_vendor.nextTick$1(() => {
         setTimeout(() => {
           updateIndexs(value);
@@ -692,11 +694,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         showByClickInput.value = false;
       }
       if (newValue) {
+        innerValue.value = correctValue(props.modelValue);
         updateColumnValue(innerValue.value);
         setTimeout(() => {
           updateIndexs(innerValue.value);
         }, 150);
       }
+    });
+    common_vendor.watch(() => {
+      return props.modelValue;
+    }, (newVal = null) => {
+      innerValue.value = correctValue(newVal);
+      updateColumnValue(innerValue.value);
     });
     init();
     common_vendor.onMounted(() => {

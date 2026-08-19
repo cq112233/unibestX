@@ -84,12 +84,12 @@ import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/user&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/toast&";
 const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, resolveComponent: _resolveComponent, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
+const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, resolveComponent: _resolveComponent, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect, unref: _unref, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
 const __className = "GenSrcSubUviewUltraDemosDatetimePickerDatetimePicker";
 const { ref } = globalThis.Vue;
 const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   __dynamicSharedData: true,
-  __hash: "758369a8",
+  __hash: "ea6377d4",
   __className,
   __filename: "src/sub/uview-ultra/demos/datetime-picker/datetime-picker.uvue",
   __name: "datetime-picker",
@@ -101,42 +101,106 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     const dtShow2 = ref(false);
     const dtShow3 = ref(false);
     const dtShow4 = ref(false);
-    function showDt1() {
-      dtShow1.value = true;
+    const dtShowMinMaxDate = ref(false);
+    const dtShowMinMaxTime = ref(false);
+    const dtShowStart = ref(false);
+    const dtShowEnd = ref(false);
+    const dtValue1 = ref(Number(new Date(2026, 7, 10, 8, 30)));
+    const dtValue2 = ref(Number(new Date(2026, 7, 10)));
+    const dtValue3 = ref(Number(new Date(2026, 7, 10)));
+    const dtValue4 = ref("08:30");
+    const limitMinDate = Number(new Date(2026, 7, 1));
+    const limitMaxDate = Number(new Date(2026, 7, 31));
+    const dtValueMinMaxDate = ref(Number(new Date(2026, 7, 10)));
+    const dtValueMinMaxTime = ref("09:30");
+    const dtValueStart = ref(Number(new Date(2026, 7, 10)));
+    const dtValueEnd = ref(Number(new Date(2026, 7, 20)));
+    function formatDate(timestamp) {
+      const d = new Date(timestamp);
+      const year = d.getFullYear();
+      const month = (d.getMonth() + 1 < 10 ? "0" : "") + (d.getMonth() + 1);
+      const date = (d.getDate() < 10 ? "0" : "") + d.getDate();
+      const hours = (d.getHours() < 10 ? "0" : "") + d.getHours();
+      const minutes = (d.getMinutes() < 10 ? "0" : "") + d.getMinutes();
+      return `${year}-${month}-${date} ${hours}:${minutes}`;
     }
-    function showDt2() {
-      dtShow2.value = true;
+    function formatDateOnly(timestamp) {
+      const d = new Date(timestamp);
+      const year = d.getFullYear();
+      const month = (d.getMonth() + 1 < 10 ? "0" : "") + (d.getMonth() + 1);
+      const date = (d.getDate() < 10 ? "0" : "") + d.getDate();
+      return `${year}-${month}-${date}`;
     }
-    function showDt3() {
-      dtShow3.value = true;
-    }
-    function showDt4() {
-      dtShow4.value = true;
+    function formatYearMonth(timestamp) {
+      const d = new Date(timestamp);
+      const year = d.getFullYear();
+      const month = (d.getMonth() + 1 < 10 ? "0" : "") + (d.getMonth() + 1);
+      return `${year}-${month}`;
     }
     function onConfirm1(e) {
-      uni.__f__("log", "at src/sub/uview-ultra/demos/datetime-picker/datetime-picker.uvue:63", "datetime", e);
+      const val = e["value"];
+      if (val != null) {
+        dtValue1.value = val;
+      }
       dtShow1.value = false;
     }
     function onConfirm2(e) {
-      uni.__f__("log", "at src/sub/uview-ultra/demos/datetime-picker/datetime-picker.uvue:67", "date", e);
+      const val = e["value"];
+      if (val != null) {
+        dtValue2.value = val;
+      }
       dtShow2.value = false;
     }
     function onConfirm3(e) {
-      uni.__f__("log", "at src/sub/uview-ultra/demos/datetime-picker/datetime-picker.uvue:71", "year-month", e);
+      const val = e["value"];
+      if (val != null) {
+        dtValue3.value = val;
+      }
       dtShow3.value = false;
     }
     function onConfirm4(e) {
-      uni.__f__("log", "at src/sub/uview-ultra/demos/datetime-picker/datetime-picker.uvue:75", "time", e);
+      const val = e["value"];
+      if (val != null) {
+        dtValue4.value = val.toString();
+      }
       dtShow4.value = false;
+    }
+    function onConfirmMinMaxDate(e) {
+      const val = e["value"];
+      if (val != null) {
+        dtValueMinMaxDate.value = val;
+      }
+      dtShowMinMaxDate.value = false;
+    }
+    function onConfirmMinMaxTime(e) {
+      const val = e["value"];
+      if (val != null) {
+        dtValueMinMaxTime.value = val.toString();
+      }
+      dtShowMinMaxTime.value = false;
+    }
+    function onConfirmStart(e) {
+      const val = e["value"];
+      if (val != null) {
+        dtValueStart.value = val;
+      }
+      dtShowStart.value = false;
+    }
+    function onConfirmEnd(e) {
+      const val = e["value"];
+      if (val != null) {
+        dtValueEnd.value = val;
+      }
+      dtShowEnd.value = false;
     }
     return () => {
       "raw js";
       const _component_NavBar = __easycom_0;
       const _component_up_button = __easycom_2;
       const _component_up_datetime_picker = __easycom_2$1;
-      const n24 = _createSharedDataComponent(_sfc_main$1, "014fc333", null, {
+      const n54 = _createSharedDataComponent(_sfc_main$1, "014fc333", null, {
         "default": _withSharedDataVaporCtx(() => {
-          const n23 = _createSharedDataComponent(LayoutComponent, "28a8a323", {
+          const n53 = _createSharedDataComponent(LayoutComponent, "28a8a323", {
             "navigation-style": "custom",
             "navigation-bar-title-text": "up-datetime-picker 时间选择"
           }, {
@@ -148,46 +212,138 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
                 "bg-color": "#ffffff"
               });
               _setSharedData(__sharedData, 2, n0?.sharedData);
-              const n2 = _createSharedDataComponentWithFallback(_component_up_button, "27286624", {
+              const _on_click = () => {
+                return dtShow1.value = true;
+              };
+              const n2 = _createSharedDataComponentWithFallback(_component_up_button, "27286558", {
                 type: "primary",
                 text: "年月日时分",
                 size: "mini",
                 onClick: () => {
-                  return showDt1;
+                  return _on_click;
                 }
               });
-              _setSharedData(__sharedData, 7, n2?.sharedData);
-              const n6 = _createSharedDataComponentWithFallback(_component_up_button, "272850d0", {
+              _setSharedData(__sharedData, 11, n2?.sharedData);
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData, 19, _toDisplayString(formatDate(dtValue1.value)));
+              });
+              const _on_click1 = () => {
+                return dtShow2.value = true;
+              };
+              const n7 = _createSharedDataComponentWithFallback(_component_up_button, "2728484e", {
                 type: "success",
                 text: "年月日",
                 size: "mini",
                 onClick: () => {
-                  return showDt2;
+                  return _on_click1;
                 }
               });
-              _setSharedData(__sharedData, 8, n6?.sharedData);
-              const n10 = _createSharedDataComponentWithFallback(_component_up_button, "27284096", {
+              _setSharedData(__sharedData, 12, n7?.sharedData);
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData, 20, _toDisplayString(formatDateOnly(dtValue2.value)));
+              });
+              const _on_click2 = () => {
+                return dtShow3.value = true;
+              };
+              const n12 = _createSharedDataComponentWithFallback(_component_up_button, "bde735f6", {
                 type: "warning",
                 text: "年月",
                 size: "mini",
                 onClick: () => {
-                  return showDt3;
+                  return _on_click2;
                 }
               });
-              _setSharedData(__sharedData, 9, n10?.sharedData);
-              const n14 = _createSharedDataComponentWithFallback(_component_up_button, "bde735fe", {
+              _setSharedData(__sharedData, 13, n12?.sharedData);
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData, 21, _toDisplayString(formatYearMonth(dtValue3.value)));
+              });
+              const _on_click3 = () => {
+                return dtShow4.value = true;
+              };
+              const n17 = _createSharedDataComponentWithFallback(_component_up_button, "bde71dfe", {
                 type: "error",
                 text: "时分",
                 size: "mini",
                 onClick: () => {
-                  return showDt4;
+                  return _on_click3;
                 }
               });
-              _setSharedData(__sharedData, 10, n14?.sharedData);
+              _setSharedData(__sharedData, 14, n17?.sharedData);
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData, 22, _toDisplayString(dtValue4.value));
+              });
+              const _on_click4 = () => {
+                return dtShowMinMaxDate.value = true;
+              };
+              const n22 = _createSharedDataComponentWithFallback(_component_up_button, "bde6fffc", {
+                type: "primary",
+                text: "选择当月日期",
+                size: "mini",
+                onClick: () => {
+                  return _on_click4;
+                }
+              });
+              _setSharedData(__sharedData, 15, n22?.sharedData);
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData, 23, _toDisplayString(formatDateOnly(dtValueMinMaxDate.value)));
+              });
+              const _on_click5 = () => {
+                return dtShowMinMaxTime.value = true;
+              };
+              const n27 = _createSharedDataComponentWithFallback(_component_up_button, "bde643c4", {
+                type: "warning",
+                text: "选择时分范围",
+                size: "mini",
+                onClick: () => {
+                  return _on_click5;
+                }
+              });
+              _setSharedData(__sharedData, 16, n27?.sharedData);
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData, 24, _toDisplayString(dtValueMinMaxTime.value));
+              });
+              const _on_click6 = () => {
+                return dtShowStart.value = true;
+              };
+              const n33 = _createSharedDataComponentWithFallback(_component_up_button, "bde61872", {
+                type: "primary",
+                text: "选择开始",
+                size: "mini",
+                onClick: () => {
+                  return _on_click6;
+                }
+              });
+              _setSharedData(__sharedData, 17, n33?.sharedData);
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData, 25, _toDisplayString(formatDateOnly(dtValueStart.value)));
+              });
+              const _on_click7 = () => {
+                return dtShowEnd.value = true;
+              };
+              const n38 = _createSharedDataComponentWithFallback(_component_up_button, "bde55cb4", {
+                type: "success",
+                text: "选择结束",
+                size: "mini",
+                onClick: () => {
+                  return _on_click7;
+                }
+              });
+              _setSharedData(__sharedData, 18, n38?.sharedData);
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData, 26, _toDisplayString(formatDateOnly(dtValueEnd.value)));
+              });
               const _on_cancel = () => {
                 return dtShow1.value = false;
               };
-              const n18 = _createSharedDataComponentWithFallback(_component_up_datetime_picker, "bde72dfa", {
+              const n44 = _createSharedDataComponentWithFallback(_component_up_datetime_picker, "bde54bfc", {
+                modelValue: () => {
+                  return dtValue1.value;
+                },
+                "onUpdate:modelValue": () => {
+                  return (_value) => {
+                    return dtValue1.value = _value;
+                  };
+                },
                 show: () => {
                   return dtShow1.value;
                 },
@@ -199,11 +355,19 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
                   return _on_cancel;
                 }
               });
-              _setSharedData(__sharedData, 3, n18?.sharedData);
+              _setSharedData(__sharedData, 3, n44?.sharedData);
               const _on_cancel1 = () => {
                 return dtShow2.value = false;
               };
-              const n19 = _createSharedDataComponentWithFallback(_component_up_datetime_picker, "bde725c6", {
+              const n45 = _createSharedDataComponentWithFallback(_component_up_datetime_picker, "bde53e38", {
+                modelValue: () => {
+                  return dtValue2.value;
+                },
+                "onUpdate:modelValue": () => {
+                  return (_value) => {
+                    return dtValue2.value = _value;
+                  };
+                },
                 show: () => {
                   return dtShow2.value;
                 },
@@ -215,11 +379,19 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
                   return _on_cancel1;
                 }
               });
-              _setSharedData(__sharedData, 4, n19?.sharedData);
+              _setSharedData(__sharedData, 4, n45?.sharedData);
               const _on_cancel2 = () => {
                 return dtShow3.value = false;
               };
-              const n20 = _createSharedDataComponentWithFallback(_component_up_datetime_picker, "bde71dc4", {
+              const n46 = _createSharedDataComponentWithFallback(_component_up_datetime_picker, "bde535bc", {
+                modelValue: () => {
+                  return dtValue3.value;
+                },
+                "onUpdate:modelValue": () => {
+                  return (_value) => {
+                    return dtValue3.value = _value;
+                  };
+                },
                 show: () => {
                   return dtShow3.value;
                 },
@@ -231,11 +403,19 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
                   return _on_cancel2;
                 }
               });
-              _setSharedData(__sharedData, 5, n20?.sharedData);
+              _setSharedData(__sharedData, 5, n46?.sharedData);
               const _on_cancel3 = () => {
                 return dtShow4.value = false;
               };
-              const n21 = _createSharedDataComponentWithFallback(_component_up_datetime_picker, "bde71076", {
+              const n47 = _createSharedDataComponentWithFallback(_component_up_datetime_picker, "bde48a4a", {
+                modelValue: () => {
+                  return dtValue4.value;
+                },
+                "onUpdate:modelValue": () => {
+                  return (_value) => {
+                    return dtValue4.value = _value;
+                  };
+                },
                 show: () => {
                   return dtShow4.value;
                 },
@@ -247,13 +427,123 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
                   return _on_cancel3;
                 }
               });
-              _setSharedData(__sharedData, 6, n21?.sharedData);
+              _setSharedData(__sharedData, 6, n47?.sharedData);
+              const _on_cancel4 = () => {
+                return dtShowMinMaxDate.value = false;
+              };
+              const n48 = _createSharedDataComponentWithFallback(_component_up_datetime_picker, "bde4814c", {
+                modelValue: () => {
+                  return dtValueMinMaxDate.value;
+                },
+                "onUpdate:modelValue": () => {
+                  return (_value) => {
+                    return dtValueMinMaxDate.value = _value;
+                  };
+                },
+                show: () => {
+                  return dtShowMinMaxDate.value;
+                },
+                mode: "date",
+                "min-date": () => {
+                  return _unref(limitMinDate);
+                },
+                "max-date": () => {
+                  return _unref(limitMaxDate);
+                },
+                onConfirm: () => {
+                  return onConfirmMinMaxDate;
+                },
+                onCancel: () => {
+                  return _on_cancel4;
+                }
+              });
+              _setSharedData(__sharedData, 7, n48?.sharedData);
+              const _on_cancel5 = () => {
+                return dtShowMinMaxTime.value = false;
+              };
+              const n49 = _createSharedDataComponentWithFallback(_component_up_datetime_picker, "bde46acc", {
+                modelValue: () => {
+                  return dtValueMinMaxTime.value;
+                },
+                "onUpdate:modelValue": () => {
+                  return (_value) => {
+                    return dtValueMinMaxTime.value = _value;
+                  };
+                },
+                show: () => {
+                  return dtShowMinMaxTime.value;
+                },
+                mode: "time",
+                "min-hour": 9,
+                "max-hour": 18,
+                onConfirm: () => {
+                  return onConfirmMinMaxTime;
+                },
+                onCancel: () => {
+                  return _on_cancel5;
+                }
+              });
+              _setSharedData(__sharedData, 8, n49?.sharedData);
+              const _on_cancel6 = () => {
+                return dtShowStart.value = false;
+              };
+              const n50 = _createSharedDataComponentWithFallback(_component_up_datetime_picker, "bde454b8", {
+                modelValue: () => {
+                  return dtValueStart.value;
+                },
+                "onUpdate:modelValue": () => {
+                  return (_value) => {
+                    return dtValueStart.value = _value;
+                  };
+                },
+                show: () => {
+                  return dtShowStart.value;
+                },
+                mode: "date",
+                "max-date": () => {
+                  return dtValueEnd.value;
+                },
+                onConfirm: () => {
+                  return onConfirmStart;
+                },
+                onCancel: () => {
+                  return _on_cancel6;
+                }
+              });
+              _setSharedData(__sharedData, 9, n50?.sharedData);
+              const _on_cancel7 = () => {
+                return dtShowEnd.value = false;
+              };
+              const n51 = _createSharedDataComponentWithFallback(_component_up_datetime_picker, "bde3a18e", {
+                modelValue: () => {
+                  return dtValueEnd.value;
+                },
+                "onUpdate:modelValue": () => {
+                  return (_value) => {
+                    return dtValueEnd.value = _value;
+                  };
+                },
+                show: () => {
+                  return dtShowEnd.value;
+                },
+                mode: "date",
+                "min-date": () => {
+                  return dtValueStart.value;
+                },
+                onConfirm: () => {
+                  return onConfirmEnd;
+                },
+                onCancel: () => {
+                  return _on_cancel7;
+                }
+              });
+              _setSharedData(__sharedData, 10, n51?.sharedData);
             })
           });
-          _setSharedData(__sharedData, 1, n23.sharedData);
+          _setSharedData(__sharedData, 1, n53.sharedData);
         })
       });
-      _setSharedData(__sharedData, 0, n24.sharedData);
+      _setSharedData(__sharedData, 0, n54.sharedData);
       return __sharedData;
     };
   }

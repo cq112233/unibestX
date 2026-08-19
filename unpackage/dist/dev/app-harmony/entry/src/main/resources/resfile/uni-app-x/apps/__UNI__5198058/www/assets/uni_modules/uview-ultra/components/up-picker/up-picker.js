@@ -12,7 +12,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     name: "up-picker"
   },
   __dynamicSharedData: true,
-  __hash: "8477c334",
+  __hash: "b590628c",
   __className,
   __filename: "uni_modules/uview-ultra/components/up-picker/up-picker.uvue",
   __name: "up-picker",
@@ -48,6 +48,10 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       default: true
     },
     toolbarRightSlot: {
+      type: Boolean,
+      default: false
+    },
+    toolbarBottomSlot: {
       type: Boolean,
       default: false
     },
@@ -411,7 +415,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
           return showByClickInput.value = !showByClickInput.value;
         });
       });
-      const n32 = _createSharedDataComponentWithFallback(_component_up_popup, "93e0cbbc", {
+      const n35 = _createSharedDataComponentWithFallback(_component_up_popup, "93e0cbbc", {
         show: () => {
           return __props.pageInline || __props.show || __props.hasInput && showByClickInput.value;
         },
@@ -461,15 +465,19 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
             });
             _setSharedData(__sharedData, 5, n10?.sharedData);
           });
-          _createSharedDataSlot("toolbar-bottom", null, null);
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData, 6, _toSharedDataBoolean(__props.toolbarBottomSlot));
+          }, () => {
+            _createSharedDataSlot("toolbar-bottom", null, null);
+          });
           _renderSharedDataEffect(() => {
             const __height_indicatorTop = { height: indicatorTop.value };
-            _setSharedDataStyle(__sharedData, 9, { height: pickerViewHeight.value });
-            _setSharedDataStyle(__sharedData, 10, indicatorStyle.value);
-            _setSharedDataStyle(__sharedData, 11, __height_indicatorTop);
+            _setSharedDataStyle(__sharedData, 10, { height: pickerViewHeight.value });
+            _setSharedDataStyle(__sharedData, 11, indicatorStyle.value);
             _setSharedDataStyle(__sharedData, 12, __height_indicatorTop);
+            _setSharedDataStyle(__sharedData, 13, __height_indicatorTop);
           });
-          _createSharedDataFor(_setSharedDataScoped(__sharedData, 8, _createSharedDataVFor(__sharedDataScope, () => {
+          _createSharedDataFor(_setSharedDataScoped(__sharedData, 9, _createSharedDataVFor(__sharedDataScope, () => {
             return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
           })), () => {
             return innerColumns.value;
@@ -509,14 +517,14 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
             return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(colIndex));
           }, 1);
           _createSharedDataIf(() => {
-            return _setSharedData(__sharedData, 6, _toSharedDataBoolean(__props.loading));
+            return _setSharedData(__sharedData, 7, _toSharedDataBoolean(__props.loading));
           }, () => {
-            const n29 = _createSharedDataComponentWithFallback(_component_up_loading_icon, "0be3507c", { mode: "circle" });
-            _setSharedData(__sharedData, 7, n29?.sharedData);
+            const n32 = _createSharedDataComponentWithFallback(_component_up_loading_icon, "0be3a3aa", { mode: "circle" });
+            _setSharedData(__sharedData, 8, n32?.sharedData);
           });
         })
       });
-      _setSharedData(__sharedData, 3, n32?.sharedData);
+      _setSharedData(__sharedData, 3, n35?.sharedData);
       return __sharedData;
     };
   }

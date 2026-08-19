@@ -70,7 +70,7 @@ const __className = "GenSrcPagesIndexIndex";
 const { onBackPress, ref } = globalThis.Vue;
 const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   __dynamicSharedData: true,
-  __hash: "7e8f956c",
+  __hash: "3db0ad20",
   __className,
   __filename: "src/pages/index/index.uvue",
   __name: "index",
