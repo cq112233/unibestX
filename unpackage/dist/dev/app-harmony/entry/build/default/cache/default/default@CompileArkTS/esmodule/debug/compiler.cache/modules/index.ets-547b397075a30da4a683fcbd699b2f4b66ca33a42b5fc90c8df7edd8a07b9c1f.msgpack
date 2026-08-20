@@ -1,225 +1,0 @@
-Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚrimport { MemoryWarningNative } from "./MemoryWarningNative";
-import { UTSObject, UTS, UniError, UTSJSONObject, UTSHarmony } from "@dcloudio/uni-app-framework";
-class MemoryWarningCallbackResult extends UTSObject {
-    constructor() {
-        super(...arguments);
-        this.level = null;
-    }
-}
-const MemoryWarningUniErrorSubject = 'uni-memorywarning';
-const MemoryWarningUniErrors = new Map([
-    [
-        1100601,
-        'memory warning listener registration failed'
-    ],
-    [
-        1100602,
-        'memory warning listener removal failed'
-    ]
-]);
-class MemoryWarningFailImpl extends UniError {
-    constructor(errCode) {
-        super();
-        this.errSubject = MemoryWarningUniErrorSubject;
-        this.errCode = errCode;
-        this.errMsg = UTS.mapGet(MemoryWarningUniErrors, errCode) ?? '';
-    }
-}
-function createMemoryWarningNativeError(errCode, platformCode, detail = null) {
-    const fail = new MemoryWarningFailImpl(errCode);
-    if (detail != null) {
-        fail.errMsg = detail;
-    }
-    if (platformCode != null) {
-        fail.data = new UTSJSONObject({
-            platformCode: platformCode
-        });
-    }
-    return fail;
-}
-let listeners = [];
-let nativeWrappers = new Map();
-const onMemoryWarning = (callback) => {
-    if (listeners.indexOf(callback) != -1) {
-        return;
-    }
-    const wrapper = (event) => {
-        callback(event);
-    };
-    const shouldStartNativeListen = listeners.length == 0;
-    try {
-        if (shouldStartNativeListen) {
-            const uiAbilityContext = UTSHarmony.getUIAbilityContext();
-            MemoryWarningNative.startListen(uiAbilityContext);
-        }
-        MemoryWarningNative.addListener(wrapper);
-    }
-    catch (e) {
-        throw createMemoryWarningNativeError(1100601, 501, e.message);
-    }
-    listeners.push(callback);
-    nativeWrappers.set(callback, wrapper);
-};
-const offMemoryWarning = (callback = null) => {
-    if (callback == null) {
-        try {
-            listeners.forEach((item) => {
-                const wrapper = UTS.mapGet(nativeWrappers, item);
-                if (wrapper != null) {
-                    MemoryWarningNative.removeListener(wrapper);
-                }
-            });
-            const uiAbilityContext = UTSHarmony.getUIAbilityContext();
-            MemoryWarningNative.stopListen(uiAbilityContext);
-            listeners = [];
-            nativeWrappers.clear();
-        }
-        catch (e) {
-            throw createMemoryWarningNativeError(1100602, 502, e.message);
-        }
-        return;
-    }
-    const wrapper = UTS.mapGet(nativeWrappers, callback);
-    if (wrapper == null) {
-        return;
-    }
-    try {
-        MemoryWarningNative.removeListener(wrapper);
-        if (listeners.length == 1) {
-            const uiAbilityContext = UTSHarmony.getUIAbilityContext();
-            MemoryWarningNative.stopListen(uiAbilityContext);
-        }
-    }
-    catch (e) {
-        throw createMemoryWarningNativeError(1100602, 502, e.message);
-    }
-    nativeWrappers.delete(callback);
-    const index = listeners.indexOf(callback);
-    if (index != -1) {
-        listeners.splice(index, 1);
-    }
-};
-export { MemoryWarningCallbackResult as MemoryWarningCallbackResult };
-export { onMemoryWarning as onMemoryWarning };
-export { offMemoryWarning as offMemoryWarning };
-//# sourceMappingURL=index.js.mapÂ’Ú$/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-memory/utssdk/app-harmony/MemoryWarningNative.etsÙî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework/index.etsÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-memory/utssdk/app-harmony/index.etsÔrB˜±isLocalDependency¯isNodeEntryFile§pkgPath§pkgNameªpkgVersion±belongProjectPath±dependencyPkgInfo¬shouldEmitJsÂÂÙâ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules¹@dcloudio/uni-app-modules¥1.0.0ÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmonyÔrC’§pkgNameªpkgVersion¹@dcloudio/uni-app-modules¥1.0.0ÃÃÚ¼import { MemoryWarningNative } from "./MemoryWarningNative";
-import { UTSObject, IUniError, UTS, UniError, UTSJSONObject, UTSHarmony } from "@dcloudio/uni-app-framework";
-class MemoryWarningCallbackResult extends UTSObject {
-    level: number | null = null;
-}
-type OnMemoryWarningCallback = (result: MemoryWarningCallbackResult) => void;
-type OnMemoryWarning = (callback: OnMemoryWarningCallback) => void;
-type OffMemoryWarning = (callback: OnMemoryWarningCallback | null) => void;
-type MemoryWarningErrorCode = 1100601 | 1100602;
-interface MemoryWarningFail extends IUniError {
-    errCode: MemoryWarningErrorCode;
-}
-const MemoryWarningUniErrorSubject = 'uni-memorywarning';
-const MemoryWarningUniErrors: Map<MemoryWarningErrorCode, string> = new Map([
-    [
-        1100601,
-        'memory warning listener registration failed'
-    ],
-    [
-        1100602,
-        'memory warning listener removal failed'
-    ]
-]);
-class MemoryWarningFailImpl extends UniError implements MemoryWarningFail {
-    errCode: MemoryWarningErrorCode;
-    constructor(errCode: MemoryWarningErrorCode){
-        super();
-        this.errSubject = MemoryWarningUniErrorSubject;
-        this.errCode = errCode;
-        this.errMsg = UTS.mapGet(MemoryWarningUniErrors, errCode) ?? '';
-    }
-}
-function createMemoryWarningNativeError(errCode: MemoryWarningErrorCode, platformCode: number | null, detail: string | null = null): MemoryWarningFailImpl {
-    const fail = new MemoryWarningFailImpl(errCode);
-    if (detail != null) {
-        fail.errMsg = detail;
-    }
-    if (platformCode != null) {
-        fail.data = new UTSJSONObject({
-            platformCode: platformCode
-        });
-    }
-    return fail;
-}
-let listeners: OnMemoryWarningCallback[] = [];
-let nativeWrappers: Map<OnMemoryWarningCallback, (event: MemoryWarningCallbackResult) => void> = new Map();
-const onMemoryWarning: OnMemoryWarning = (callback: OnMemoryWarningCallback)=>{
-    if (listeners.indexOf(callback) != -1) {
-        return;
-    }
-    const wrapper = (event: MemoryWarningCallbackResult): void =>{
-        callback(event);
-    };
-    const shouldStartNativeListen = listeners.length == 0;
-    try {
-        if (shouldStartNativeListen) {
-            const uiAbilityContext = UTSHarmony.getUIAbilityContext();
-            MemoryWarningNative.startListen(uiAbilityContext);
-        }
-        MemoryWarningNative.addListener(wrapper);
-    } catch (e) {
-        throw createMemoryWarningNativeError(1100601, 501, (e as Error).message);
-    }
-    listeners.push(callback);
-    nativeWrappers.set(callback, wrapper);
-};
-const offMemoryWarning: OffMemoryWarning = (callback: OnMemoryWarningCallback | null = null)=>{
-    if (callback == null) {
-        try {
-            listeners.forEach((item)=>{
-                const wrapper = UTS.mapGet(nativeWrappers, item);
-                if (wrapper != null) {
-                    MemoryWarningNative.removeListener(wrapper);
-                }
-            });
-            const uiAbilityContext = UTSHarmony.getUIAbilityContext();
-            MemoryWarningNative.stopListen(uiAbilityContext);
-            listeners = [];
-            nativeWrappers.clear();
-        } catch (e) {
-            throw createMemoryWarningNativeError(1100602, 502, (e as Error).message);
-        }
-        return;
-    }
-    const wrapper = UTS.mapGet(nativeWrappers, callback);
-    if (wrapper == null) {
-        return;
-    }
-    try {
-        MemoryWarningNative.removeListener(wrapper);
-        if (listeners.length == 1) {
-            const uiAbilityContext = UTSHarmony.getUIAbilityContext();
-            MemoryWarningNative.stopListen(uiAbilityContext);
-        }
-    } catch (e) {
-        throw createMemoryWarningNativeError(1100602, 502, (e as Error).message);
-    }
-    nativeWrappers.delete(callback);
-    const index = listeners.indexOf(callback);
-    if (index != -1) {
-        listeners.splice(index, 1);
-    }
-};
-export { MemoryWarningCallbackResult as MemoryWarningCallbackResult, MemoryWarningErrorCode as MemoryWarningErrorCode, MemoryWarningFail as MemoryWarningFail, OffMemoryWarning as OffMemoryWarning, OnMemoryWarning as OnMemoryWarning, OnMemoryWarningCallback as OnMemoryWarningCallback };
-export { onMemoryWarning as onMemoryWarning };
-export { offMemoryWarning as offMemoryWarning };
-ÀÔrD’»@dcloudio/uni-app-frameworkµ./MemoryWarningNativeÔrE—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework/index.etsAÃªoh-resolveÂEAÂÚ$/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-memory/utssdk/app-harmony/MemoryWarningNative.etsAÃªoh-resolveÂ“ÔrF–§version¤fileªsourceRoot§sources¥names¨mappings¨index.js ‘©index.etsÜ h˜”    ”  ”	  	”  ”  ”$  $”;  ;”<  <Ü ”   ” ”	 	” ” ” "” $”! ,”# .”0 ;”2 =”< ÌG”> ÌI”ÌD ÌO”Ìa Ìl”Ìb Ìm•”   ” ”! "”* *”3 3‘”  •” ” 	” ” ”  ’”  ” ‘” –”   ” ”" "”% %”8 8”9 9—”   ” ” ” ÌD”# ÌH”& ÌK”' ÌL‘” ’” ” ’” ”5 5‘” ‘” ’” ” ’” ”0 0‘” “” ” ” •”   ” ” ”$ $”, ,“” ” ” /”” ” ” ” —” ” ” ” ” ”6 6”7 7—” ” ” ” ” ” ” Ü ” ” ” ” ” ” ” ”   ”! !”7 7”9 9”Ì@ Ì@”ÌA ÌA”ÌE ÌE”ÌG ÌG”ÌH ÌH’” ” ‘” š”    ”	  	”'  '”(  (”/  ÌG”1  ÌI”=  Ìd”?  Ìf”ÌH  Ì~”ÌL  Ì‚š” !”
- !
-” !” !” !”* !*”+ !+”2 !2”3 !3”4 !4–” "” "” "” "” "” "—” #” #” #” #” #” #” #‘” $–” %” %” %” %” %” %˜” &” &” &” &” &” &”% &%”& &&”” '” '” '”& '&“”	 (	”
- (
-” (‘” )”” *” *” *” *’”  + ” +–”  , ” ,” ,” ,+” ,-” ,.˜”  - ” -” -” -Ìa” -Ìe” -Ìh” -Ìj” -Ìk˜”  . ” .” .” .)” .*”! .ÌK”# .ÌL”% .ÌNœ” /” /” /” /” /” /”" /"”# /#”' /'”( /(”) /)”+ /+’” 0” 0‘” 1˜” 2”
- 2
-” 2” 2” 2” 27” 2?” 2ÌA–” 3” 3” 3” 3” 3” 3“” 4” 4” 4š” 5”
- 5
-”! 5!”$ 5$”- 5-”. 5.”4 54”8 58”9 59”: 5:’” 6” 6”” 7” 7”# 7#”% 7%™” 8” 8”" 8"”% 8%”/ 8/”0 80”ÌC 8ÌC”ÌE 8ÌE”ÌF 8ÌF˜” 9” 9”  9 ”+ 9+”, 9,”< 9<”= 9=”> 9>‘”	 :	˜” ;” ;” ;”' ;'”( ;(”/ ;/”0 ;0”1 ;1‘” <”” <” <” <” <” =” =”, =,”- =-”4 =4”6 =6”9 =9”; =<”< =ÌG”= =ÌH”ÌD =ÌO”ÌE =ÌP”ÌF =ÌQ‘” >˜” ?” ?” ?” ?” ?” ?” ?” ?š” Ì@” Ì@” Ì@” Ì@” Ì@” Ì@”! Ì@!”( Ì@(”) Ì@)”* Ì@*“”  ÌA ” ÌA” ÌA™”  ÌB ” ÌB” ÌB” ÌB+” ÌB,”% ÌBÌW”) ÌBÌ[”+ ÌBÌ\”- ÌBÌ^–” ÌC” ÌC” ÌC” ÌC” ÌC” ÌC’” ÌD” ÌD™” ÌE” ÌE” ÌE” ÌE” ÌE” ÌE”# ÌE#”% ÌE$”' ÌE&” ÌF” ÌF” ÌF”  ÌF ”# ÌF#”$ ÌF$”* ÌF*”+ ÌF+”9 ÌF9”; ÌF;”? ÌF?”Ì@ ÌFÌ@”ÌA ÌFÌA–” ÌG” ÌG” ÌG” ÌG”# ÌG#”% ÌG%˜” ÌH”' ÌH'”( ÌH(”6 ÌH6”7 ÌH7”> ÌH>”? ÌH?”Ì@ ÌHÌ@‘” ÌI”” ÌJ” ÌJ” ÌJ” ÌJ™” ÌK” ÌK”" ÌK"”% ÌK%”/ ÌK/”0 ÌK0”ÌC ÌKÌC”ÌE ÌKÌE”ÌF ÌKÌF˜” ÌL” ÌL”  ÌL ”* ÌL*”+ ÌL+”; ÌL;”< ÌL<”= ÌL=•” ÌM” ÌM” ÌM” ÌM” ÌM–” ÌN” ÌN” ÌN”  ÌN ”" ÌN"”# ÌN#‘”	 ÌO	”” ÌO
-” ÌO” ÌO” ÌO” ÌP” ÌP”0 ÌP0”1 ÌP1”8 ÌP8”: ÌP:”= ÌP=”? ÌPÌ@”Ì@ ÌPÌK”ÌA ÌPÌL”ÌH ÌPÌS”ÌI ÌPÌT”ÌJ ÌPÌU‘”	 ÌQ	’” ÌR” ÌR‘” ÌS” ÌT”
- ÌT
-” ÌT” ÌT” ÌT” ÌT” ÌT” ÌT”- ÌT-”/ ÌT/”7 ÌT7”8 ÌT8”9 ÌT9–” ÌU” ÌU” ÌU” ÌU” ÌU” ÌU’” ÌV” ÌV‘” ÌW’” ÌX” ÌX˜” ÌY” ÌY” ÌY”* ÌY*”+ ÌY+”2 ÌY2”3 ÌY3”4 ÌY4˜” ÌZ” ÌZ” ÌZ” ÌZ” ÌZ”  ÌZ ”! ÌZ!”# ÌZ#™” Ì[” Ì[”" Ì["”% Ì[%”/ Ì[/”0 Ì[0”ÌC Ì[ÌC”ÌE Ì[ÌE”ÌF Ì[ÌF˜” Ì\” Ì\”  Ì\ ”* Ì\*”+ Ì\+”; Ì\;”< Ì\<”= Ì\=‘”	 Ì]	‘” Ì^”” Ì^” Ì^” Ì^” Ì^” Ì_” Ì_”, Ì_,”- Ì_-”4 Ì_4”6 Ì_6”9 Ì_9”; Ì_<”< Ì_ÌG”= Ì_ÌH”ÌD Ì_ÌO”ÌE Ì_ÌP”ÌF Ì_ÌQ‘” Ì`˜” Ìa” Ìa” Ìa” Ìa” Ìa”" Ìa"”# Ìa#”$ Ìa$›” Ìb”
- Ìb
-” Ìb” Ìb” Ìb” Ìb”# Ìb#”$ Ìb$”, Ìb,”- Ìb-”. Ìb.—” Ìc” Ìc” Ìc” Ìc” Ìc” Ìc” Ìcš” Ìd” Ìd” Ìd” Ìd” Ìd” Ìd”  Ìd ”! Ìd!”" Ìd"”# Ìd#‘” Ìe“”  Ìf ” Ìf” Ìf˜”  Ìg ” Ìg”	 Ìg	”$ Ìg$”( Ìg(”ÌC ÌgÌC”ÌE ÌgÍ”ÌF ÌgÍ˜”  Ìh ” Ìh”	 Ìh	” Ìh” Ìh”+ Ìh+”- Ìh-”. Ìh.˜”  Ìi ” Ìi”	 Ìi	” Ìi” Ìi”- Ìi-”/ Ìi/”0 Ìi0ÔrG–§version¤file§sources®sourcesContent¥names¨mappingsÀ‘À‘ÀÜ i‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
- ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache“ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ§ÍíÀ‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍ°ÍêÔrL”¤type¥start£end¤nameªIdentifierÍ°ÍË»MemoryWarningCallbackResultLªIdentifierÍÏÍê»MemoryWarningCallbackResultÀJ¶ExportNamedDeclarationÍïÍÀ‘K¯ExportSpecifierÍøÍLªIdentifierÍøÍ¯onMemoryWarningLªIdentifierÍÍ¯onMemoryWarningÀJ¶ExportNamedDeclarationÍÍOÀ‘K¯ExportSpecifierÍ(ÍLLªIdentifierÍ(Í8°offMemoryWarningLªIdentifierÍ<ÍL°offMemoryWarningÀ’ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration <‘ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	³MemoryWarningNativeLªIdentifier	³MemoryWarningNativeÔrO•¤type¥start£end¥value£raw§Literal$;µ./MemoryWarningNative·"./MemoryWarningNative"M±ImportDeclaration>Ì •N¯ImportSpecifierÌGÌPLªIdentifierÌGÌP©UTSObjectLªIdentifierÌGÌP©UTSObjectN¯ImportSpecifierÌRÌULªIdentifierÌRÌU£UTSLªIdentifierÌRÌU£UTSN¯ImportSpecifierÌWÌ_LªIdentifierÌWÌ_¨UniErrorLªIdentifierÌWÌ_¨UniErrorN¯ImportSpecifierÌaÌnLªIdentifierÌaÌn­UTSJSONObjectLªIdentifierÌaÌn­UTSJSONObjectN¯ImportSpecifierÌpÌzLªIdentifierÌpÌzªUTSHarmonyLªIdentifierÌpÌzªUTSHarmonyO§LiteralÌ‚ÌŸ»@dcloudio/uni-app-framework½"@dcloudio/uni-app-framework"
