@@ -108,7 +108,7 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     return __returned__;
   }
 });
-const _style_0 = {"page-container":{"":{"display":"flex","flexDirection":"column"}},"list-cell":{"":{"display":"flex","boxSizing":"border-box","width":"100%","paddingTop":10,"paddingRight":12,"paddingBottom":10,"paddingLeft":12,"overflow":"hidden","backgroundColor":"#ffffff","borderBottomWidth":1,"borderBottomStyle":"solid","borderBottomColor":"#f3f4f6"}},"list-item-text":{"":{"fontSize":14,"lineHeight":"24px","color":"#323233"}},"flex":{"":{"display":"flex"}},"bg-_b_hf8fafc_B":{"":{"backgroundColor":"#f8fafc"}},"flex-1":{"":{"flexGrow":1,"flexShrink":1,"flexBasis":"0%"}}};
+const _style_0 = {"page-container":{"":{"display":"flex","flexDirection":"column"}},"list-cell":{"":{"display":"flex","boxSizing":"border-box","width":"100%","paddingTop":10,"paddingRight":12,"paddingBottom":10,"paddingLeft":12,"overflow":"hidden","backgroundColor":"#ffffff","borderBottomWidth":1,"borderBottomStyle":"solid","borderBottomColor":"#f3f4f6"}},"list-item-text":{"":{"fontSize":14,"lineHeight":"24px","color":"#323233"}},"flex":{"":{"display":"flex"}},"bg-_b_hf8fafc_B":{"":{"backgroundColor":"#f8fafc"}},"flex-1":{"":{"flexGrow":1,"flexShrink":1,"flexBasis":"0%","flex":"1"}}};
 const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
 const { resolveComponent: _resolveComponent, createVNode: _createVNode, renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, toDisplayString: _toDisplayString, createElementVNode: _createElementVNode, withCtx: _withCtx, createBlock: _createBlock, normalizeStyle: _normalizeStyle } = globalThis.Vue;
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {

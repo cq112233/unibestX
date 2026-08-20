@@ -141,7 +141,7 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     return __returned__;
   }
 });
-const _style_0 = { "wtu-1n5rv11-0": { "": { "flexDirection": "column" } }, "wtu-dexfdw-1": { "": { "--tw-font-weight": "var(--font-weight-bold, 700)", "fontWeight": 700 } }, "wtu-1macy2r-2": { "": { "color": "#1a202c" } }, "wtu-17u3i8b-3": { "": { "color": "#718096" } } };
+const _style_0 = {"wtu-1n5rv11-0":{"":{"flexDirection":"column"}},"wtu-dexfdw-1":{"":{"--tw-font-weight":"var(--font-weight-bold, 700)","fontWeight":"700","-TwFontWeight":"var(--font-weight-bold,700)"}},"wtu-1macy2r-2":{"":{"color":"#1a202c"}},"wtu-17u3i8b-3":{"":{"color":"#718096"}}};
 const { createElementVNode: _createElementVNode, createVNode: _createVNode, withCtx: _withCtx, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return _openBlock(), _createBlock($setup["AppKu"], null, {

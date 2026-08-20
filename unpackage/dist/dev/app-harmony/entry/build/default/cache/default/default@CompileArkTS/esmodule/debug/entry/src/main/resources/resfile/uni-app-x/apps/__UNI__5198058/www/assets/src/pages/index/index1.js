@@ -102,7 +102,7 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     return __returned__;
   }
 });
-const _style_0 = { "wtu-9c7mkn-0": { "": { "marginLeft": "auto", "marginRight": "auto" } }, "wtu-zk2y1r-1": { "": { "color": "#d14328" } }, "wtu-1kxknsj-2": { "": { "textAlign": "center" } }, "wtu-1mffext-3": { "": { "marginTop": "auto", "marginRight": "auto", "marginBottom": "auto", "marginLeft": "auto" } } };
+const _style_0 = {"wtu-9c7mkn-0":{"":{"marginLeft":"auto","marginRight":"auto"}},"wtu-zk2y1r-1":{"":{"color":"#d14328"}},"wtu-1kxknsj-2":{"":{"textAlign":"center"}},"wtu-1mffext-3":{"":{"marginTop":"auto","marginRight":"auto","marginBottom":"auto","marginLeft":"auto","margin":"auto"}}};
 const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
 const { resolveComponent: _resolveComponent, createVNode: _createVNode, createElementVNode: _createElementVNode, withCtx: _withCtx, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
