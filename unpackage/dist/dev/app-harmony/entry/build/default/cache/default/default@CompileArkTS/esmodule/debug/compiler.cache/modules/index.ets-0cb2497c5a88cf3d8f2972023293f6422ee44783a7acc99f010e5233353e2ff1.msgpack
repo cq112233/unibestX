@@ -1,1585 +1,0 @@
-Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ\Vimport audio from "@ohos.multimedia.audio";
-import avSession from "@ohos.multimedia.avsession";
-import backgroundTaskManager from "@ohos.resourceschedule.backgroundTaskManager";
-import fileIo from "@ohos.file.fs";
-import { getRealPath } from "@dcloudio/uni-app-framework";
-import media from "@ohos.multimedia.media";
-import { UTS, UTSHarmony, defineSyncApi } from "@dcloudio/uni-app-framework";
-import uri from "@ohos.uri";
-import wantAgent from "@ohos.app.ability.wantAgent";
-const API_GET_BACKGROUND_AUDIO_MANAGER = 'getBackgroundAudioManager';
-function isFileUri(path) {
-    return path && typeof path === 'string' && (path.startsWith('file://') || path.startsWith('datashare://'));
-}
-function isSandboxPath(path) {
-    return path && typeof path === 'string' && path.startsWith('/data/storage/');
-}
-function getFdFromUriOrSandBoxPath(uri) {
-    try {
-        const file = fileIo.openSync(uri, fileIo.OpenMode.READ_ONLY);
-        return file.fd;
-    }
-    catch (error) {
-        UTS.console.info(`[AdvancedAPI] Can not get file from uri: ${uri} `);
-    }
-    throw new Error('file is not exist');
-}
-function callCallbacks(callbacks, ...args) {
-    callbacks.forEach((cb) => {
-        typeof cb === 'function' && cb(...args);
-    });
-}
-function remoteCallback(callbacks, callback) {
-    const index = callbacks.indexOf(callback);
-    if (index > -1) {
-        callbacks.splice(index, 1);
-    }
-}
-class AudioPlayerError {
-    constructor(errMsg, errCode) {
-        this.errMsg = errMsg;
-        this.errCode = errCode;
-    }
-}
-class AudioPlayerCallback {
-    constructor() {
-        this.onCanplayCallbacks = [];
-        this.onPlayCallbacks = [];
-        this.onPauseCallbacks = [];
-        this.onStopCallbacks = [];
-        this.onEndedCallbacks = [];
-        this.onTimeUpdateCallbacks = [];
-        this.onErrorCallbacks = [];
-        this.onWaitingCallbacks = [];
-        this.onSeekingCallbacks = [];
-        this.onSeekedCallbacks = [];
-        this.onPrevCallbacks = [];
-        this.onNextCallbacks = [];
-    }
-    destroy() {
-        this.onCanplayCallbacks = [];
-        this.onPlayCallbacks = [];
-        this.onPauseCallbacks = [];
-        this.onStopCallbacks = [];
-        this.onEndedCallbacks = [];
-        this.onTimeUpdateCallbacks = [];
-        this.onErrorCallbacks = [];
-        this.onWaitingCallbacks = [];
-        this.onSeekingCallbacks = [];
-        this.onSeekedCallbacks = [];
-        this.onPrevCallbacks = [];
-        this.onNextCallbacks = [];
-    }
-    canPlay() {
-        callCallbacks(this.onCanplayCallbacks);
-    }
-    onCanplay(callback) {
-        this.onCanplayCallbacks.push(callback);
-    }
-    offCanplay(callback) {
-        remoteCallback(this.onCanplayCallbacks, callback);
-    }
-    play() {
-        callCallbacks(this.onPlayCallbacks);
-    }
-    onPlay(callback) {
-        this.onPlayCallbacks.push(callback);
-    }
-    offPlay(callback) {
-        remoteCallback(this.onPlayCallbacks, callback);
-    }
-    pause() {
-        callCallbacks(this.onPauseCallbacks);
-    }
-    onPause(callback) {
-        this.onPauseCallbacks.push(callback);
-    }
-    offPause(callback) {
-        remoteCallback(this.onPauseCallbacks, callback);
-    }
-    stop() {
-        callCallbacks(this.onStopCallbacks);
-    }
-    onStop(callback) {
-        this.onStopCallbacks.push(callback);
-    }
-    offStop(callback) {
-        remoteCallback(this.onStopCallbacks, callback);
-    }
-    ended() {
-        callCallbacks(this.onEndedCallbacks);
-    }
-    onEnded(callback) {
-        this.onEndedCallbacks.push(callback);
-    }
-    offEnded(callback) {
-        remoteCallback(this.onEndedCallbacks, callback);
-    }
-    timeUpdate(time) {
-        callCallbacks(this.onTimeUpdateCallbacks, time);
-    }
-    onTimeUpdate(callback) {
-        this.onTimeUpdateCallbacks.push(callback);
-    }
-    offTimeUpdate(callback) {
-        remoteCallback(this.onTimeUpdateCallbacks, callback);
-    }
-    error(res) {
-        callCallbacks(this.onErrorCallbacks, res);
-    }
-    onError(callback) {
-        this.onErrorCallbacks.push(callback);
-    }
-    offError(callback) {
-        remoteCallback(this.onErrorCallbacks, callback);
-    }
-    prev() {
-        callCallbacks(this.onPrevCallbacks);
-    }
-    onPrev(callback) {
-        this.onPrevCallbacks.push(callback);
-    }
-    offPrev(callback) {
-        remoteCallback(this.onPrevCallbacks, callback);
-    }
-    next() {
-        callCallbacks(this.onNextCallbacks);
-    }
-    onNext(callback) {
-        this.onNextCallbacks.push(callback);
-    }
-    offNext(callback) {
-        remoteCallback(this.onNextCallbacks, callback);
-    }
-    waiting() {
-        callCallbacks(this.onWaitingCallbacks);
-    }
-    onWaiting(callback) {
-        this.onWaitingCallbacks.push(callback);
-    }
-    offWaiting(callback) {
-        remoteCallback(this.onWaitingCallbacks, callback);
-    }
-    seeking() {
-        callCallbacks(this.onSeekingCallbacks);
-    }
-    onSeeking(callback) {
-        this.onSeekingCallbacks.push(callback);
-    }
-    offSeeking(callback) {
-        remoteCallback(this.onSeekingCallbacks, callback);
-    }
-    seeked() {
-        callCallbacks(this.onSeekedCallbacks);
-    }
-    onSeeked(callback) {
-        this.onSeekedCallbacks.push(callback);
-    }
-    offSeeked(callback) {
-        remoteCallback(this.onSeekedCallbacks, callback);
-    }
-}
-const audioPlayerCallback = new AudioPlayerCallback();
-let id = 0;
-class AVSession {
-    constructor() {
-        this.session = null;
-        this.metadata = {
-            assetId: '',
-            skipIntervals: avSession.SkipIntervals.SECONDS_10
-        };
-        this.playbackState = {
-            state: avSession.PlaybackState.PLAYBACK_STATE_INITIAL,
-            position: {
-                elapsedTime: 0,
-                updateTime: new Date().getTime()
-            },
-            bufferedTime: 1000,
-            isFavorite: false
-        };
-        this.createSessionPromise = null;
-    }
-    async init() {
-        if (this.session)
-            return this.session;
-        this.metadata.assetId = `${id++}`;
-        this.createSessionPromise = avSession.createAVSession(UTSHarmony.getUIAbilityContext(), `backgroundAudioPlayer_${id}`, 'audio');
-        this.session = await this.createSessionPromise;
-        this.createSessionPromise = null;
-        this.setAVMetadata();
-        this.setAVPlaybackState();
-        return this.session;
-    }
-    async setAVMetadata() {
-        if (!this.session) {
-            await this.createSessionPromise;
-        }
-        this.session?.setAVMetadata(this.metadata);
-    }
-    async setAVPlaybackState() {
-        if (!this.session) {
-            await this.createSessionPromise;
-        }
-        this.session?.setAVPlaybackState(this.playbackState);
-    }
-    async destroy() {
-        if (this.session) {
-            this.session.off('play');
-            this.session.off('pause');
-            this.session.off('stop');
-            this.session.off('playNext');
-            this.session.off('playPrevious');
-            this.session.off('seek');
-            return this.session.deactivate();
-        }
-        this.session = null;
-    }
-}
-function startBackgroundTask() {
-    const abilityInfo = UTSHarmony.getUIAbilityContext().abilityInfo;
-    const wantAgentInfo = {
-        wants: [
-            {
-                bundleName: abilityInfo.bundleName,
-                abilityName: abilityInfo.name
-            }
-        ],
-        operationType: wantAgent.OperationType.START_ABILITY,
-        requestCode: 0,
-        wantAgentFlags: [
-            wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG
-        ]
-    };
-    return wantAgent.getWantAgent(wantAgentInfo).then((wantAgentObj) => {
-        return backgroundTaskManager.startBackgroundRunning(UTSHarmony.getUIAbilityContext(), backgroundTaskManager.BackgroundMode.AUDIO_PLAYBACK, wantAgentObj);
-    }).catch((err) => { });
-}
-async function stopBackgroundTask() {
-    return backgroundTaskManager.stopBackgroundRunning(UTSHarmony.getUIAbilityContext()).then(() => { }).catch((err) => { });
-}
-async function START_BACKGROUND() {
-    await startBackgroundTask();
-}
-async function STOP_BACKGROUND() {
-    await stopBackgroundTask();
-}
-const LOG = (msg) => UTS.console.log(`[getBackgroundAudioManager]: ${msg}`);
-class STATE_TYPE {
-}
-STATE_TYPE.IDLE = 'idle';
-STATE_TYPE.PLAYING = 'playing';
-STATE_TYPE.PAUSED = 'paused';
-STATE_TYPE.STOPPED = 'stopped';
-STATE_TYPE.ERROR = 'error';
-class BGAManagerImpl {
-    constructor() {
-        this.__v_skip = true;
-        this._src = '';
-        this._startTime = 0;
-        this._buffered = 0;
-        this._title = '';
-        this._epname = '';
-        this._singer = '';
-        this._coverImgUrl = '';
-        this._webUrl = '';
-        this._protocol = '';
-        this._playbackRate = 1;
-        this._dataloaded = false;
-        this.isPlaying = false;
-        this.avSessionIsActive = false;
-        this.obeyMuteSwitch = false;
-        this._onDataLoad = () => { };
-        this._onPlay = () => { };
-        this._onPause = () => { };
-        this._onEnded = () => { };
-        this._onTimeUpdate = (positionMS) => { };
-        this._onError = () => { };
-        this._onBufferingUpdate = () => { };
-        this.avSessionDestroyPromise = null;
-        this._cache = false;
-        this.init();
-        this.createAVSession();
-    }
-    async createAVSession() {
-        const _audioPlayer = BGAManagerImpl.audioPlayer;
-        BGAManagerImpl.avSession = new AVSession();
-        const _avSession = BGAManagerImpl.avSession;
-        this._onDataLoad = async () => {
-            _avSession.metadata.duration = _audioPlayer.duration;
-            _avSession.setAVMetadata();
-        };
-        this._onPlay = async () => {
-            _avSession.playbackState.state = avSession.PlaybackState.PLAYBACK_STATE_PLAY;
-            _avSession.setAVPlaybackState();
-        };
-        this._onPause = () => {
-            _avSession.playbackState.state = avSession.PlaybackState.PLAYBACK_STATE_PAUSE;
-            _avSession.setAVPlaybackState();
-        };
-        this._onEnded = () => {
-            _avSession.playbackState.state = avSession.PlaybackState.PLAYBACK_STATE_COMPLETED;
-            _avSession.setAVPlaybackState();
-        };
-        this._onTimeUpdate = (positionMS) => {
-            _avSession.playbackState.position = {
-                elapsedTime: positionMS,
-                updateTime: new Date().getTime()
-            };
-            _avSession?.setAVPlaybackState();
-        };
-        this._onError = () => {
-            _avSession.playbackState.state = avSession.PlaybackState.PLAYBACK_STATE_ERROR;
-            _avSession.setAVPlaybackState();
-        };
-        this._onBufferingUpdate = () => {
-            _avSession.playbackState.state = avSession.PlaybackState.PLAYBACK_STATE_BUFFERING;
-            _avSession.setAVPlaybackState();
-        };
-    }
-    async avSessionInit() {
-        const _avSession = BGAManagerImpl.avSession;
-        if (!_avSession)
-            return;
-        if (_avSession.session == null) {
-            await _avSession.init();
-        }
-        if (this.avSessionDestroyPromise != null) {
-            await this.avSessionDestroyPromise;
-        }
-        if (this.avSessionIsActive)
-            return;
-        this.avSessionDestroyPromise = null;
-        _avSession.session?.on('play', () => this.play());
-        _avSession.session?.on('pause', () => this.pause());
-        _avSession.session?.on('stop', () => this.stop());
-        _avSession.session?.on('playNext', () => audioPlayerCallback.next());
-        _avSession.session?.on('playPrevious', () => audioPlayerCallback.prev());
-        _avSession.session?.on('seek', (position) => {
-            this.seek(position / 1000);
-        });
-        await _avSession.session?.activate();
-        this.avSessionIsActive = true;
-        return _avSession.session;
-    }
-    init() {
-        BGAManagerImpl.audioPlayer = media.createAudioPlayer();
-        const _audioPlayer = BGAManagerImpl.audioPlayer;
-        _audioPlayer.on('dataLoad', () => {
-            this._dataloaded = true;
-            this._onDataLoad();
-            audioPlayerCallback.canPlay();
-        });
-        _audioPlayer.on('play', () => {
-            this.isPlaying = true;
-            this._onPlay();
-            audioPlayerCallback.play();
-        });
-        _audioPlayer.on('pause', () => {
-            this.isPlaying = false;
-            this._onPause();
-            audioPlayerCallback.pause();
-        });
-        _audioPlayer.on('stop', () => {
-            this.isPlaying = false;
-        });
-        _audioPlayer.on('finish', () => {
-            this.isPlaying = false;
-            if (BGAManagerImpl.avSession) {
-                this.avSessionDestroyPromise = BGAManagerImpl.avSession.destroy().then(() => {
-                    this.avSessionIsActive = false;
-                });
-            }
-            this._onEnded();
-            STOP_BACKGROUND();
-            audioPlayerCallback.ended();
-        });
-        _audioPlayer.on('timeUpdate', (res) => {
-            this._onTimeUpdate(res);
-            audioPlayerCallback.timeUpdate(res / 1000);
-        });
-        _audioPlayer.on('error', (err) => {
-            this.isPlaying = false;
-            this._onError();
-            audioPlayerCallback.error(new AudioPlayerError(err.message, err.code));
-        });
-        _audioPlayer.on('bufferingUpdate', (infoType, value) => {
-            switch (infoType) {
-                case media.BufferingInfoType.BUFFERING_START:
-                    this._onBufferingUpdate();
-                    audioPlayerCallback.waiting();
-                    break;
-                case media.BufferingInfoType.BUFFERING_END:
-                    if (this._dataloaded) {
-                        this._onPlay();
-                        audioPlayerCallback.canPlay();
-                    }
-                    break;
-                case media.BufferingInfoType.BUFFERING_PERCENT:
-                    break;
-                case media.BufferingInfoType.CACHED_DURATION:
-                    this._buffered = value;
-                    break;
-            }
-        });
-        _audioPlayer.on('audioInterrupt', (InterruptEvent) => {
-            if (_audioPlayer && InterruptEvent.hintType === audio.InterruptHint.INTERRUPT_HINT_PAUSE) {
-                this.isPlaying = false;
-                _audioPlayer.pause();
-            }
-            if (_audioPlayer && InterruptEvent.hintType === audio.InterruptHint.INTERRUPT_HINT_RESUME) {
-                this.isPlaying = true;
-                _audioPlayer.play();
-            }
-        });
-    }
-    get duration() {
-        if (!BGAManagerImpl.audioPlayer) {
-            return 0;
-        }
-        return BGAManagerImpl.audioPlayer.duration / 1000;
-    }
-    get currentTime() {
-        return (BGAManagerImpl.audioPlayer?.currentTime ?? 0) / 1000;
-    }
-    get paused() {
-        if (!BGAManagerImpl.audioPlayer) {
-            return false;
-        }
-        return BGAManagerImpl.audioPlayer.state === STATE_TYPE.PAUSED;
-    }
-    get src() {
-        if (!BGAManagerImpl.audioPlayer) {
-            return '';
-        }
-        return BGAManagerImpl.audioPlayer.src;
-    }
-    set src(value) {
-        if (typeof value !== 'string') {
-            audioPlayerCallback.error(new AudioPlayerError(`set src: ${value} is not string`, 10004));
-            return;
-        }
-        if (!BGAManagerImpl.audioPlayer) {
-            audioPlayerCallback.error(new AudioPlayerError(`player is not exist`, 10001));
-            return;
-        }
-        value = getRealPath(value);
-        if (value.startsWith('/')) {
-            value = `file://${value}`;
-        }
-        if (!value || !(value.startsWith('http:') || value.startsWith('https:') || isFileUri(value) || isSandboxPath(value))) {
-            LOG(`set src: ${value} is invalid`);
-            return;
-        }
-        let path = '';
-        if (value.startsWith('http:') || value.startsWith('https:')) {
-            path = value;
-        }
-        else if (isFileUri(value) || isSandboxPath(value)) {
-            try {
-                const fd = getFdFromUriOrSandBoxPath(value);
-                path = `fd://${fd}`;
-            }
-            catch (err) {
-                audioPlayerCallback.error(new AudioPlayerError(err.message, err.code));
-            }
-        }
-        if (BGAManagerImpl.audioPlayer.src) {
-            BGAManagerImpl.audioPlayer.reset();
-        }
-        BGAManagerImpl.audioPlayer.src = path;
-        this._src = value;
-        if (this._startTime) {
-            this.seek(this._startTime);
-        }
-        if (BGAManagerImpl.avSession) {
-            if (this.title.length === 0) {
-                BGAManagerImpl.avSession.metadata.title = new uri.URI(value).getLastSegment();
-            }
-            BGAManagerImpl.avSession.metadata.description = value;
-        }
-        this.play();
-    }
-    get startTime() {
-        return this._startTime;
-    }
-    set startTime(time) {
-        this._startTime = time;
-    }
-    get title() {
-        return this._title;
-    }
-    set title(titleName) {
-        this._title = titleName;
-        BGAManagerImpl.avSession.metadata.title = titleName;
-    }
-    get buffered() {
-        if (!BGAManagerImpl.audioPlayer)
-            return 0;
-        media.PlaybackInfoKey.BUFFER_DURATION;
-        return this._buffered / 1000;
-    }
-    get epname() {
-        return this._epname;
-    }
-    set epname(epName) {
-        this._epname = epName;
-        BGAManagerImpl.avSession.metadata.album = epName;
-    }
-    get singer() {
-        return this._singer;
-    }
-    set singer(singerName) {
-        this._singer = singerName;
-        BGAManagerImpl.avSession.metadata.artist = singerName;
-    }
-    get coverImgUrl() {
-        return this._coverImgUrl;
-    }
-    set coverImgUrl(url) {
-        this._coverImgUrl = url;
-        BGAManagerImpl.avSession.metadata.mediaImage = url;
-    }
-    get webUrl() {
-        return this._webUrl;
-    }
-    set webUrl(url) {
-        this._webUrl = url;
-    }
-    get protocol() {
-        return this._protocol;
-    }
-    set protocol(protocolType) {
-        this._protocol = protocolType;
-    }
-    set playbackRate(rate) {
-        audioPlayerCallback.error(new AudioPlayerError('HarmonyOS Audio setting playbackRate is not supported.', -1));
-    }
-    get playbackRate() {
-        return this._playbackRate;
-    }
-    set cache(value) {
-        this._cache = value;
-    }
-    get cache() {
-        return this._cache;
-    }
-    async play() {
-        if (!BGAManagerImpl.audioPlayer) {
-            return;
-        }
-        const state = BGAManagerImpl.audioPlayer.state;
-        if (this.isPlaying || ![
-            STATE_TYPE.PAUSED,
-            STATE_TYPE.STOPPED,
-            STATE_TYPE.IDLE
-        ].includes(state)) {
-            return;
-        }
-        this.isPlaying = true;
-        if (this._src && BGAManagerImpl.audioPlayer.src === '') {
-            this.src = this._src;
-        }
-        await this.avSessionInit();
-        BGAManagerImpl.audioPlayer.play();
-        START_BACKGROUND();
-    }
-    pause() {
-        if (!BGAManagerImpl.audioPlayer) {
-            return;
-        }
-        this.isPlaying = false;
-        const state = BGAManagerImpl.audioPlayer.state;
-        if (STATE_TYPE.PLAYING !== state) {
-            return;
-        }
-        BGAManagerImpl.audioPlayer.pause();
-    }
-    stop() {
-        if (!BGAManagerImpl.audioPlayer) {
-            return;
-        }
-        if (![
-            STATE_TYPE.PAUSED,
-            STATE_TYPE.PLAYING
-        ].includes(BGAManagerImpl.audioPlayer.state)) {
-            return;
-        }
-        this.isPlaying = false;
-        BGAManagerImpl.audioPlayer.seek(0);
-        BGAManagerImpl.audioPlayer.stop();
-        STOP_BACKGROUND();
-        audioPlayerCallback.stop();
-        BGAManagerImpl.audioPlayer.reset();
-        BGAManagerImpl.audioPlayer.src = '';
-        if (BGAManagerImpl.avSession) {
-            BGAManagerImpl.avSession.playbackState.state = avSession.PlaybackState.PLAYBACK_STATE_STOP;
-            BGAManagerImpl.avSession.setAVPlaybackState();
-            this.avSessionDestroyPromise = BGAManagerImpl.avSession.destroy().then(() => {
-                this.avSessionIsActive = false;
-            });
-        }
-    }
-    seek(position) {
-        if (!BGAManagerImpl.audioPlayer) {
-            return;
-        }
-        const state = BGAManagerImpl.audioPlayer.state;
-        if (![
-            STATE_TYPE.PAUSED,
-            STATE_TYPE.PLAYING,
-            STATE_TYPE.IDLE
-        ].includes(state)) {
-            return;
-        }
-        audioPlayerCallback.seeking();
-        const positionMS = position * 1000;
-        BGAManagerImpl.audioPlayer.seek(positionMS);
-        audioPlayerCallback.seeked();
-    }
-    onCanplay(callback) {
-        audioPlayerCallback.onCanplay(callback);
-    }
-    onPlay(callback) {
-        audioPlayerCallback.onPlay(callback);
-    }
-    onPause(callback) {
-        audioPlayerCallback.onPause(callback);
-    }
-    onStop(callback) {
-        audioPlayerCallback.onStop(callback);
-    }
-    onEnded(callback) {
-        audioPlayerCallback.onEnded(callback);
-    }
-    onTimeUpdate(callback) {
-        audioPlayerCallback.onTimeUpdate(callback);
-    }
-    onError(callback) {
-        audioPlayerCallback.onError(callback);
-    }
-    onWaiting(callback) {
-        audioPlayerCallback.onWaiting(callback);
-    }
-    onPrev(callback) {
-        audioPlayerCallback.onPrev(callback);
-    }
-    onNext(callback) {
-        audioPlayerCallback.onNext(callback);
-    }
-    onSeeking(callback) {
-        audioPlayerCallback.onSeeking(callback);
-    }
-    onSeeked(callback) {
-        audioPlayerCallback.onSeeked(callback);
-    }
-    offCanplay() {
-        audioPlayerCallback.onCanplayCallbacks = [];
-    }
-    offPlay() {
-        audioPlayerCallback.onPlayCallbacks = [];
-    }
-    offPause() {
-        audioPlayerCallback.onPauseCallbacks = [];
-    }
-    offStop() {
-        audioPlayerCallback.onStopCallbacks = [];
-    }
-    offEnded() {
-        audioPlayerCallback.onEndedCallbacks = [];
-    }
-    offTimeUpdate() {
-        audioPlayerCallback.onTimeUpdateCallbacks = [];
-    }
-    offError() {
-        audioPlayerCallback.onErrorCallbacks = [];
-    }
-    offWaiting() {
-        audioPlayerCallback.onWaitingCallbacks = [];
-    }
-    offPrev() {
-        audioPlayerCallback.onPrevCallbacks = [];
-    }
-    offNext() {
-        audioPlayerCallback.onNextCallbacks = [];
-    }
-    offSeeking() {
-        audioPlayerCallback.onSeekingCallbacks = [];
-    }
-    offSeeked() {
-        audioPlayerCallback.onSeekedCallbacks = [];
-    }
-}
-let backgroundAudioManager = null;
-const getBackgroundAudioManager = defineSyncApi(API_GET_BACKGROUND_AUDIO_MANAGER, () => {
-    if (!backgroundAudioManager)
-        backgroundAudioManager = new BGAManagerImpl();
-    return backgroundAudioManager;
-});
-export { getBackgroundAudioManager as getBackgroundAudioManager };
-//# sourceMappingURL=index.js.mapÂ˜Ùs hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.multimedia.audio.d.tsÙw hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.multimedia.avsession.d.tsÙ‰ hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.resourceschedule.backgroundTaskManager.d.tsÙj hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.file.fs.d.tsÙî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework/index.etsÙs hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.multimedia.media.d.tsÙf hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.uri.d.tsÙx hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.app.ability.wantAgent.d.tsÚ)/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-getBackgroundAudioManager/utssdk/app-harmony/index.etsÔrB˜±isLocalDependency¯isNodeEntryFile§pkgPath§pkgNameªpkgVersion±belongProjectPath±dependencyPkgInfo¬shouldEmitJsÂÂÙâ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules¹@dcloudio/uni-app-modules¥1.0.0ÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmonyÔrC’§pkgNameªpkgVersion¹@dcloudio/uni-app-modules¥1.0.0ÃÃÚheimport { BusinessError } from '@ohos.base';
-import { audio } from '@kit.AudioKit';
-import { avSession } from '@kit.AVSessionKit';
-import { backgroundTaskManager } from '@kit.BackgroundTasksKit';
-import { fileIo } from '@kit.CoreFileKit';
-import { getRealPath } from "@dcloudio/uni-app-framework";
-import { media } from '@kit.MediaKit';
-import { onError, IUniError, UTS, UTSHarmony, defineSyncApi } from "@dcloudio/uni-app-framework";
-import { uri } from '@kit.ArkTS';
-import { wantAgent } from '@kit.AbilityKit';
-type GetBackgroundAudioManager = () => BackgroundAudioManager;
-interface BackgroundAudioManager {
-    duration: number;
-    currentTime: number;
-    paused: boolean;
-    src: string;
-    startTime: number;
-    buffered: number;
-    title: string;
-    epname: string;
-    singer: string;
-    coverImgUrl: string;
-    webUrl: string;
-    protocol: string;
-    playbackRate?: number;
-    cache: boolean;
-    play(): void;
-    pause(): void;
-    seek(position: number): void;
-    stop(): void;
-    onCanplay(callback: (result: Object) => void): void;
-    onPlay(callback: (result: Object) => void): void;
-    onPause(callback: (result: Object) => void): void;
-    onStop(callback: (result: Object) => void): void;
-    onEnded(callback: (result: Object) => void): void;
-    onSeeking(callback: (result: Object) => void): void;
-    onSeeked(callback: (result: Object) => void): void;
-    onTimeUpdate(callback: (result: Object) => void): void;
-    onPrev(callback: (result: Object) => void): void;
-    onNext(callback: (result: Object) => void): void;
-    onError(callback: (result: ICreateBackgroundAudioFail) => void): void;
-    onWaiting(callback: (result: Object) => void): void;
-    offCanplay(): void;
-    offPlay(): void;
-    offPause(): void;
-    offStop(): void;
-    offEnded(): void;
-    offSeeking(): void;
-    offSeeked(): void;
-    offTimeUpdate(): void;
-    offPrev(): void;
-    offNext(): void;
-    offError(): void;
-    offWaiting(): void;
-}
-type CreateBackgroundAudioErrorCode = 1107601 | 1107602 | 1107603 | 1107604 | 1107605 | 1107609;
-interface ICreateBackgroundAudioFail extends IUniError {
-    errCode: CreateBackgroundAudioErrorCode;
-}
-const API_GET_BACKGROUND_AUDIO_MANAGER = 'getBackgroundAudioManager';
-function isFileUri(path: string): boolean | "" {
-    return path && typeof path === 'string' && (path.startsWith('file://') || path.startsWith('datashare://'));
-}
-function isSandboxPath(path: string): boolean | "" {
-    return path && typeof path === 'string' && path.startsWith('/data/storage/');
-}
-function getFdFromUriOrSandBoxPath(uri: string): number {
-    try {
-        const file = fileIo.openSync(uri, fileIo.OpenMode.READ_ONLY);
-        return file.fd;
-    } catch (error) {
-        UTS.console.info(`[AdvancedAPI] Can not get file from uri: ${uri} `);
-    }
-    throw new Error('file is not exist');
-}
-function callCallbacks(callbacks: Function[], ...args: Object[]) {
-    callbacks.forEach((cb)=>{
-        typeof cb === 'function' && cb(...args);
-    });
-}
-function remoteCallback(callbacks: Function[], callback: Function) {
-    const index = callbacks.indexOf(callback);
-    if (index > -1) {
-        callbacks.splice(index, 1);
-    }
-}
-class AudioPlayerError {
-    errMsg: string;
-    errCode: number;
-    constructor(errMsg: string, errCode: number){
-        this.errMsg = errMsg;
-        this.errCode = errCode;
-    }
-}
-class AudioPlayerCallback {
-    onCanplayCallbacks: Function[] = [];
-    onPlayCallbacks: Function[] = [];
-    onPauseCallbacks: Function[] = [];
-    onStopCallbacks: Function[] = [];
-    onEndedCallbacks: Function[] = [];
-    onTimeUpdateCallbacks: Function[] = [];
-    onErrorCallbacks: Function[] = [];
-    onWaitingCallbacks: Function[] = [];
-    onSeekingCallbacks: Function[] = [];
-    onSeekedCallbacks: Function[] = [];
-    onPrevCallbacks: Function[] = [];
-    onNextCallbacks: Function[] = [];
-    constructor(){}
-    destroy() {
-        this.onCanplayCallbacks = [];
-        this.onPlayCallbacks = [];
-        this.onPauseCallbacks = [];
-        this.onStopCallbacks = [];
-        this.onEndedCallbacks = [];
-        this.onTimeUpdateCallbacks = [];
-        this.onErrorCallbacks = [];
-        this.onWaitingCallbacks = [];
-        this.onSeekingCallbacks = [];
-        this.onSeekedCallbacks = [];
-        this.onPrevCallbacks = [];
-        this.onNextCallbacks = [];
-    }
-    canPlay() {
-        callCallbacks(this.onCanplayCallbacks);
-    }
-    onCanplay(callback: Function) {
-        this.onCanplayCallbacks.push(callback);
-    }
-    offCanplay(callback: Function) {
-        remoteCallback(this.onCanplayCallbacks, callback);
-    }
-    play() {
-        callCallbacks(this.onPlayCallbacks);
-    }
-    onPlay(callback: Function) {
-        this.onPlayCallbacks.push(callback);
-    }
-    offPlay(callback: Function) {
-        remoteCallback(this.onPlayCallbacks, callback);
-    }
-    pause() {
-        callCallbacks(this.onPauseCallbacks);
-    }
-    onPause(callback: Function) {
-        this.onPauseCallbacks.push(callback);
-    }
-    offPause(callback: Function) {
-        remoteCallback(this.onPauseCallbacks, callback);
-    }
-    stop() {
-        callCallbacks(this.onStopCallbacks);
-    }
-    onStop(callback: Function) {
-        this.onStopCallbacks.push(callback);
-    }
-    offStop(callback: Function) {
-        remoteCallback(this.onStopCallbacks, callback);
-    }
-    ended() {
-        callCallbacks(this.onEndedCallbacks);
-    }
-    onEnded(callback: Function) {
-        this.onEndedCallbacks.push(callback);
-    }
-    offEnded(callback: Function) {
-        remoteCallback(this.onEndedCallbacks, callback);
-    }
-    timeUpdate(time: number) {
-        callCallbacks(this.onTimeUpdateCallbacks, time);
-    }
-    onTimeUpdate(callback: Function) {
-        this.onTimeUpdateCallbacks.push(callback);
-    }
-    offTimeUpdate(callback: Function) {
-        remoteCallback(this.onTimeUpdateCallbacks, callback);
-    }
-    error(res: AudioPlayerError) {
-        callCallbacks(this.onErrorCallbacks, res);
-    }
-    onError(callback: Function) {
-        this.onErrorCallbacks.push(callback);
-    }
-    offError(callback: Function) {
-        remoteCallback(this.onErrorCallbacks, callback);
-    }
-    prev() {
-        callCallbacks(this.onPrevCallbacks);
-    }
-    onPrev(callback: Function) {
-        this.onPrevCallbacks.push(callback);
-    }
-    offPrev(callback: Function) {
-        remoteCallback(this.onPrevCallbacks, callback);
-    }
-    next() {
-        callCallbacks(this.onNextCallbacks);
-    }
-    onNext(callback: Function) {
-        this.onNextCallbacks.push(callback);
-    }
-    offNext(callback: Function) {
-        remoteCallback(this.onNextCallbacks, callback);
-    }
-    waiting() {
-        callCallbacks(this.onWaitingCallbacks);
-    }
-    onWaiting(callback: Function) {
-        this.onWaitingCallbacks.push(callback);
-    }
-    offWaiting(callback: Function) {
-        remoteCallback(this.onWaitingCallbacks, callback);
-    }
-    seeking() {
-        callCallbacks(this.onSeekingCallbacks);
-    }
-    onSeeking(callback: Function) {
-        this.onSeekingCallbacks.push(callback);
-    }
-    offSeeking(callback: Function) {
-        remoteCallback(this.onSeekingCallbacks, callback);
-    }
-    seeked() {
-        callCallbacks(this.onSeekedCallbacks);
-    }
-    onSeeked(callback: Function) {
-        this.onSeekedCallbacks.push(callback);
-    }
-    offSeeked(callback: Function) {
-        remoteCallback(this.onSeekedCallbacks, callback);
-    }
-}
-interface TempAbilityInfo {
-    bundleName: string;
-    name: string;
-}
-const audioPlayerCallback = new AudioPlayerCallback();
-let id: number = 0;
-class AVSession {
-    session: avSession.AVSession | null = null;
-    metadata: avSession.AVMetadata = {
-        assetId: '',
-        skipIntervals: avSession.SkipIntervals.SECONDS_10
-    };
-    playbackState: avSession.AVPlaybackState = {
-        state: avSession.PlaybackState.PLAYBACK_STATE_INITIAL,
-        position: {
-            elapsedTime: 0,
-            updateTime: new Date().getTime()
-        },
-        bufferedTime: 1000,
-        isFavorite: false
-    };
-    createSessionPromise: Promise<avSession.AVSession> | null = null;
-    constructor(){}
-    async init(): Promise<avSession.AVSession> {
-        if (this.session) return this.session;
-        this.metadata.assetId = `${id++}`;
-        this.createSessionPromise = avSession.createAVSession(UTSHarmony.getUIAbilityContext()!, `backgroundAudioPlayer_${id}`, 'audio');
-        this.session = await this.createSessionPromise;
-        this.createSessionPromise = null;
-        this.setAVMetadata();
-        this.setAVPlaybackState();
-        return this.session!;
-    }
-    async setAVMetadata(): Promise<void> {
-        if (!this.session) {
-            await this.createSessionPromise;
-        }
-        this.session?.setAVMetadata(this.metadata);
-    }
-    async setAVPlaybackState(): Promise<void> {
-        if (!this.session) {
-            await this.createSessionPromise;
-        }
-        this.session?.setAVPlaybackState(this.playbackState);
-    }
-    async destroy(): Promise<void> {
-        if (this.session) {
-            this.session.off('play');
-            this.session.off('pause');
-            this.session.off('stop');
-            this.session.off('playNext');
-            this.session.off('playPrevious');
-            this.session.off('seek');
-            return this.session.deactivate();
-        }
-        this.session = null;
-    }
-}
-function startBackgroundTask(): Promise<void> {
-    const abilityInfo = UTSHarmony.getUIAbilityContext()!.abilityInfo as TempAbilityInfo;
-    const wantAgentInfo: wantAgent.WantAgentInfo = {
-        wants: [
-            {
-                bundleName: abilityInfo.bundleName,
-                abilityName: abilityInfo.name
-            }
-        ],
-        operationType: wantAgent.OperationType.START_ABILITY,
-        requestCode: 0,
-        wantAgentFlags: [
-            wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG
-        ]
-    };
-    return wantAgent.getWantAgent(wantAgentInfo).then((wantAgentObj)=>{
-        return backgroundTaskManager.startBackgroundRunning(UTSHarmony.getUIAbilityContext()!, backgroundTaskManager.BackgroundMode.AUDIO_PLAYBACK, wantAgentObj);
-    }).catch((err: BusinessError)=>{});
-}
-async function stopBackgroundTask(): Promise<void> {
-    return backgroundTaskManager.stopBackgroundRunning(UTSHarmony.getUIAbilityContext()!).then(()=>{}).catch((err: BusinessError)=>{});
-}
-async function START_BACKGROUND(): Promise<void> {
-    await startBackgroundTask();
-}
-async function STOP_BACKGROUND(): Promise<void> {
-    await stopBackgroundTask();
-}
-const LOG = (msg: string): void =>UTS.console.log(`[getBackgroundAudioManager]: ${msg}`);
-class STATE_TYPE {
-    static IDLE: string = 'idle';
-    static PLAYING: string = 'playing';
-    static PAUSED: string = 'paused';
-    static STOPPED: string = 'stopped';
-    static ERROR: string = 'error';
-}
-class BGAManagerImpl implements BackgroundAudioManager {
-    __v_skip: boolean = true;
-    static audioPlayer?: media.AudioPlayer;
-    static avSession?: AVSession;
-    private _src: string = '';
-    private _startTime: number = 0;
-    private _buffered: number = 0;
-    private _title: string = '';
-    private _epname: string = '';
-    private _singer: string = '';
-    private _coverImgUrl: string = '';
-    private _webUrl: string = '';
-    private _protocol: string = '';
-    private _playbackRate: number = 1;
-    private _dataloaded: boolean = false;
-    private isPlaying: boolean = false;
-    private avSessionIsActive: boolean = false;
-    readonly obeyMuteSwitch: boolean = false;
-    private _onDataLoad: Function = ()=>{};
-    private _onPlay: Function = ()=>{};
-    private _onPause: Function = ()=>{};
-    private _onEnded: Function = ()=>{};
-    private _onTimeUpdate: (positionMS: number) => void = (positionMS: number)=>{};
-    private _onError: Function = ()=>{};
-    private _onBufferingUpdate: Function = ()=>{};
-    private avSessionDestroyPromise: Promise<void> | null = null;
-    private _cache: boolean = false;
-    constructor(){
-        this.init();
-        this.createAVSession();
-    }
-    private async createAVSession(): Promise<void> {
-        const _audioPlayer = BGAManagerImpl.audioPlayer;
-        BGAManagerImpl.avSession = new AVSession();
-        const _avSession = BGAManagerImpl.avSession;
-        this._onDataLoad = async (): Promise<void> =>{
-            _avSession.metadata.duration = _audioPlayer!.duration;
-            _avSession.setAVMetadata();
-        };
-        this._onPlay = async (): Promise<void> =>{
-            _avSession.playbackState.state = avSession.PlaybackState.PLAYBACK_STATE_PLAY;
-            _avSession.setAVPlaybackState();
-        };
-        this._onPause = ()=>{
-            _avSession.playbackState.state = avSession.PlaybackState.PLAYBACK_STATE_PAUSE;
-            _avSession.setAVPlaybackState();
-        };
-        this._onEnded = ()=>{
-            _avSession.playbackState.state = avSession.PlaybackState.PLAYBACK_STATE_COMPLETED;
-            _avSession.setAVPlaybackState();
-        };
-        this._onTimeUpdate = (positionMS: number)=>{
-            _avSession.playbackState.position = {
-                elapsedTime: positionMS,
-                updateTime: new Date().getTime()
-            } as avSession.PlaybackPosition;
-            _avSession?.setAVPlaybackState();
-        };
-        this._onError = ()=>{
-            _avSession.playbackState.state = avSession.PlaybackState.PLAYBACK_STATE_ERROR;
-            _avSession.setAVPlaybackState();
-        };
-        this._onBufferingUpdate = ()=>{
-            _avSession.playbackState.state = avSession.PlaybackState.PLAYBACK_STATE_BUFFERING;
-            _avSession.setAVPlaybackState();
-        };
-    }
-    private async avSessionInit(): Promise<avSession.AVSession | null | undefined> {
-        const _avSession = BGAManagerImpl.avSession;
-        if (!_avSession) return;
-        if (_avSession.session == null) {
-            await _avSession.init();
-        }
-        if (this.avSessionDestroyPromise != null) {
-            await this.avSessionDestroyPromise;
-        }
-        if (this.avSessionIsActive) return;
-        this.avSessionDestroyPromise = null;
-        _avSession.session?.on('play', ()=>this.play());
-        _avSession.session?.on('pause', ()=>this.pause());
-        _avSession.session?.on('stop', ()=>this.stop());
-        _avSession.session?.on('playNext', ()=>audioPlayerCallback.next());
-        _avSession.session?.on('playPrevious', ()=>audioPlayerCallback.prev());
-        _avSession.session?.on('seek', (position)=>{
-            this.seek(position / 1000);
-        });
-        await _avSession.session?.activate();
-        this.avSessionIsActive = true;
-        return _avSession.session;
-    }
-    init() {
-        BGAManagerImpl.audioPlayer = media.createAudioPlayer();
-        const _audioPlayer = BGAManagerImpl.audioPlayer;
-        _audioPlayer.on('dataLoad', ()=>{
-            this._dataloaded = true;
-            this._onDataLoad();
-            audioPlayerCallback.canPlay();
-        });
-        _audioPlayer.on('play', ()=>{
-            this.isPlaying = true;
-            this._onPlay();
-            audioPlayerCallback.play();
-        });
-        _audioPlayer.on('pause', ()=>{
-            this.isPlaying = false;
-            this._onPause();
-            audioPlayerCallback.pause();
-        });
-        _audioPlayer.on('stop', ()=>{
-            this.isPlaying = false;
-        });
-        _audioPlayer.on('finish', ()=>{
-            this.isPlaying = false;
-            if (BGAManagerImpl.avSession) {
-                this.avSessionDestroyPromise = BGAManagerImpl.avSession.destroy().then(()=>{
-                    this.avSessionIsActive = false;
-                });
-            }
-            this._onEnded();
-            STOP_BACKGROUND();
-            audioPlayerCallback.ended();
-        });
-        _audioPlayer.on('timeUpdate', (res)=>{
-            this._onTimeUpdate(res);
-            audioPlayerCallback.timeUpdate(res / 1000);
-        });
-        _audioPlayer.on('error', (err)=>{
-            this.isPlaying = false;
-            this._onError();
-            audioPlayerCallback.error(new AudioPlayerError(err.message, err.code));
-        });
-        _audioPlayer.on('bufferingUpdate', (infoType, value)=>{
-            switch(infoType){
-                case media.BufferingInfoType.BUFFERING_START:
-                    this._onBufferingUpdate();
-                    audioPlayerCallback.waiting();
-                    break;
-                case media.BufferingInfoType.BUFFERING_END:
-                    if (this._dataloaded) {
-                        this._onPlay();
-                        audioPlayerCallback.canPlay();
-                    }
-                    break;
-                case media.BufferingInfoType.BUFFERING_PERCENT:
-                    break;
-                case media.BufferingInfoType.CACHED_DURATION:
-                    this._buffered = value;
-                    break;
-            }
-        });
-        _audioPlayer.on('audioInterrupt', (InterruptEvent)=>{
-            if (_audioPlayer && InterruptEvent.hintType === audio.InterruptHint.INTERRUPT_HINT_PAUSE) {
-                this.isPlaying = false;
-                _audioPlayer.pause();
-            }
-            if (_audioPlayer && InterruptEvent.hintType === audio.InterruptHint.INTERRUPT_HINT_RESUME) {
-                this.isPlaying = true;
-                _audioPlayer.play();
-            }
-        });
-    }
-    get duration() {
-        if (!BGAManagerImpl.audioPlayer) {
-            return 0;
-        }
-        return BGAManagerImpl.audioPlayer.duration / 1000;
-    }
-    get currentTime() {
-        return (BGAManagerImpl.audioPlayer?.currentTime ?? 0) / 1000;
-    }
-    get paused() {
-        if (!BGAManagerImpl.audioPlayer) {
-            return false;
-        }
-        return BGAManagerImpl.audioPlayer.state === STATE_TYPE.PAUSED;
-    }
-    get src() {
-        if (!BGAManagerImpl.audioPlayer) {
-            return '';
-        }
-        return BGAManagerImpl.audioPlayer.src;
-    }
-    set src(value) {
-        if (typeof value !== 'string') {
-            audioPlayerCallback.error(new AudioPlayerError(`set src: ${value} is not string`, 10004));
-            return;
-        }
-        if (!BGAManagerImpl.audioPlayer) {
-            audioPlayerCallback.error(new AudioPlayerError(`player is not exist`, 10001));
-            return;
-        }
-        value = getRealPath(value);
-        if (value.startsWith('/')) {
-            value = `file://${value}`;
-        }
-        if (!value || !(value.startsWith('http:') || value.startsWith('https:') || isFileUri(value) || isSandboxPath(value))) {
-            LOG(`set src: ${value} is invalid`);
-            return;
-        }
-        let path: string = '';
-        if (value.startsWith('http:') || value.startsWith('https:')) {
-            path = value;
-        } else if (isFileUri(value) || isSandboxPath(value)) {
-            try {
-                const fd = getFdFromUriOrSandBoxPath(value);
-                path = `fd://${fd}`;
-            } catch (err) {
-                audioPlayerCallback.error(new AudioPlayerError((err as BusinessError).message, (err as BusinessError).code));
-            }
-        }
-        if (BGAManagerImpl.audioPlayer.src) {
-            BGAManagerImpl.audioPlayer.reset();
-        }
-        BGAManagerImpl.audioPlayer.src = path;
-        this._src = value;
-        if (this._startTime) {
-            this.seek(this._startTime);
-        }
-        if (BGAManagerImpl.avSession) {
-            if (this.title.length === 0) {
-                BGAManagerImpl.avSession.metadata.title = new uri.URI(value).getLastSegment();
-            }
-            BGAManagerImpl.avSession.metadata.description = value;
-        }
-        this.play();
-    }
-    get startTime() {
-        return this._startTime;
-    }
-    set startTime(time: number) {
-        this._startTime = time;
-    }
-    get title() {
-        return this._title;
-    }
-    set title(titleName: string) {
-        this._title = titleName;
-        BGAManagerImpl.avSession!.metadata.title = titleName;
-    }
-    get buffered() {
-        if (!BGAManagerImpl.audioPlayer) return 0;
-        media.PlaybackInfoKey.BUFFER_DURATION;
-        return this._buffered / 1000;
-    }
-    get epname() {
-        return this._epname;
-    }
-    set epname(epName: string) {
-        this._epname = epName;
-        BGAManagerImpl.avSession!.metadata.album = epName;
-    }
-    get singer() {
-        return this._singer;
-    }
-    set singer(singerName: string) {
-        this._singer = singerName;
-        BGAManagerImpl.avSession!.metadata.artist = singerName;
-    }
-    get coverImgUrl() {
-        return this._coverImgUrl;
-    }
-    set coverImgUrl(url: string) {
-        this._coverImgUrl = url;
-        BGAManagerImpl.avSession!.metadata.mediaImage = url;
-    }
-    get webUrl() {
-        return this._webUrl;
-    }
-    set webUrl(url: string) {
-        this._webUrl = url;
-    }
-    get protocol() {
-        return this._protocol;
-    }
-    set protocol(protocolType: string) {
-        this._protocol = protocolType;
-    }
-    set playbackRate(rate: number) {
-        audioPlayerCallback.error(new AudioPlayerError('HarmonyOS Audio setting playbackRate is not supported.', -1));
-    }
-    get playbackRate() {
-        return this._playbackRate;
-    }
-    set cache(value: boolean) {
-        this._cache = value;
-    }
-    get cache() {
-        return this._cache;
-    }
-    async play(): Promise<void> {
-        if (!BGAManagerImpl.audioPlayer) {
-            return;
-        }
-        const state = BGAManagerImpl.audioPlayer.state;
-        if (this.isPlaying || ![
-            STATE_TYPE.PAUSED,
-            STATE_TYPE.STOPPED,
-            STATE_TYPE.IDLE
-        ].includes(state)) {
-            return;
-        }
-        this.isPlaying = true;
-        if (this._src && BGAManagerImpl.audioPlayer.src === '') {
-            this.src = this._src;
-        }
-        await this.avSessionInit();
-        BGAManagerImpl.audioPlayer.play();
-        START_BACKGROUND();
-    }
-    pause() {
-        if (!BGAManagerImpl.audioPlayer) {
-            return;
-        }
-        this.isPlaying = false;
-        const state = BGAManagerImpl.audioPlayer.state;
-        if (STATE_TYPE.PLAYING !== state) {
-            return;
-        }
-        BGAManagerImpl.audioPlayer.pause();
-    }
-    stop() {
-        if (!BGAManagerImpl.audioPlayer) {
-            return;
-        }
-        if (![
-            STATE_TYPE.PAUSED,
-            STATE_TYPE.PLAYING
-        ].includes(BGAManagerImpl.audioPlayer.state)) {
-            return;
-        }
-        this.isPlaying = false;
-        BGAManagerImpl.audioPlayer.seek(0);
-        BGAManagerImpl.audioPlayer.stop();
-        STOP_BACKGROUND();
-        audioPlayerCallback.stop();
-        BGAManagerImpl.audioPlayer.reset();
-        BGAManagerImpl.audioPlayer.src = '';
-        if (BGAManagerImpl.avSession) {
-            BGAManagerImpl.avSession.playbackState.state = avSession.PlaybackState.PLAYBACK_STATE_STOP;
-            BGAManagerImpl.avSession.setAVPlaybackState();
-            this.avSessionDestroyPromise = BGAManagerImpl.avSession.destroy().then(()=>{
-                this.avSessionIsActive = false;
-            });
-        }
-    }
-    seek(position: number) {
-        if (!BGAManagerImpl.audioPlayer) {
-            return;
-        }
-        const state = BGAManagerImpl.audioPlayer.state;
-        if (![
-            STATE_TYPE.PAUSED,
-            STATE_TYPE.PLAYING,
-            STATE_TYPE.IDLE
-        ].includes(state)) {
-            return;
-        }
-        audioPlayerCallback.seeking();
-        const positionMS = position * 1000;
-        BGAManagerImpl.audioPlayer.seek(positionMS);
-        audioPlayerCallback.seeked();
-    }
-    onCanplay(callback: (result: Object) => void): void {
-        audioPlayerCallback.onCanplay(callback);
-    }
-    onPlay(callback: (result: Object) => void): void {
-        audioPlayerCallback.onPlay(callback);
-    }
-    onPause(callback: (result: Object) => void): void {
-        audioPlayerCallback.onPause(callback);
-    }
-    onStop(callback: (result: Object) => void): void {
-        audioPlayerCallback.onStop(callback);
-    }
-    onEnded(callback: (result: Object) => void): void {
-        audioPlayerCallback.onEnded(callback);
-    }
-    onTimeUpdate(callback: (result: Object) => void): void {
-        audioPlayerCallback.onTimeUpdate(callback);
-    }
-    onError(callback: (result: ICreateBackgroundAudioFail) => void): void {
-        audioPlayerCallback.onError(callback);
-    }
-    onWaiting(callback: (result: Object) => void): void {
-        audioPlayerCallback.onWaiting(callback);
-    }
-    onPrev(callback: (result: Object) => void): void {
-        audioPlayerCallback.onPrev(callback);
-    }
-    onNext(callback: (result: Object) => void): void {
-        audioPlayerCallback.onNext(callback);
-    }
-    onSeeking(callback: (result: Object) => void): void {
-        audioPlayerCallback.onSeeking(callback);
-    }
-    onSeeked(callback: (result: Object) => void): void {
-        audioPlayerCallback.onSeeked(callback);
-    }
-    offCanplay(): void {
-        audioPlayerCallback.onCanplayCallbacks = [];
-    }
-    offPlay(): void {
-        audioPlayerCallback.onPlayCallbacks = [];
-    }
-    offPause(): void {
-        audioPlayerCallback.onPauseCallbacks = [];
-    }
-    offStop(): void {
-        audioPlayerCallback.onStopCallbacks = [];
-    }
-    offEnded(): void {
-        audioPlayerCallback.onEndedCallbacks = [];
-    }
-    offTimeUpdate(): void {
-        audioPlayerCallback.onTimeUpdateCallbacks = [];
-    }
-    offError(): void {
-        audioPlayerCallback.onErrorCallbacks = [];
-    }
-    offWaiting(): void {
-        audioPlayerCallback.onWaitingCallbacks = [];
-    }
-    offPrev(): void {
-        audioPlayerCallback.onPrevCallbacks = [];
-    }
-    offNext(): void {
-        audioPlayerCallback.onNextCallbacks = [];
-    }
-    offSeeking(): void {
-        audioPlayerCallback.onSeekingCallbacks = [];
-    }
-    offSeeked(): void {
-        audioPlayerCallback.onSeekedCallbacks = [];
-    }
-}
-let backgroundAudioManager: BackgroundAudioManager | null = null;
-const getBackgroundAudioManager: GetBackgroundAudioManager = defineSyncApi<BackgroundAudioManager>(API_GET_BACKGROUND_AUDIO_MANAGER, (): BackgroundAudioManager =>{
-    if (!backgroundAudioManager) backgroundAudioManager = new BGAManagerImpl();
-    return backgroundAudioManager;
-}) as GetBackgroundAudioManager;
-export { BackgroundAudioManager as BackgroundAudioManager, CreateBackgroundAudioErrorCode as CreateBackgroundAudioErrorCode, GetBackgroundAudioManager as GetBackgroundAudioManager, ICreateBackgroundAudioFail as ICreateBackgroundAudioFail };
-export { getBackgroundAudioManager as getBackgroundAudioManager };
-ÀÔrD˜¶@ohos.multimedia.audioº@ohos.multimedia.avsessionÙ,@ohos.resourceschedule.backgroundTaskManager­@ohos.file.fs¶@ohos.multimedia.media©@ohos.uri»@ohos.app.ability.wantAgent»@dcloudio/uni-app-frameworkÔrE—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÃÙs hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.multimedia.audio.d.tsAÃªoh-resolveÂEAÃÙw hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.multimedia.avsession.d.tsAÃªoh-resolveÂEAÃÙ‰ hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.resourceschedule.backgroundTaskManager.d.tsAÃªoh-resolveÂEAÃÙj hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.file.fs.d.tsAÃªoh-resolveÂEAÃÙs hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.multimedia.media.d.tsAÃªoh-resolveÂEAÃÙf hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.uri.d.tsAÃªoh-resolveÂEAÃÙx hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.app.ability.wantAgent.d.tsAÃªoh-resolveÂEAÂÙî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework/index.etsAÃªoh-resolveÂ“ÔrF–§version¤fileªsourceRoot§sources¥names¨mappings¨index.js ‘©index.etsÜÎ–”   ” 	” ” ”* %”+ &–”   ” 	” ” ”2 -”3 .–”   ” 	” ”" &”ÌP ?”ÌQ Ì@–”   ” 	” ” ”" )”# *˜”   ” ”	 	” ” ” ”9 9”: :–”   ” 	” ” ”* %”+ &œ”   ” ”	 ”  ” "” ,” .”' ;”) =”/ ÌC”ÌL Ì`”ÌM Ìa–”   ” 	”
- ” ”  ” !–”  	 ” 		” 	” 	”3 	+”4 	,–”  ; ” ;”& ;&”) ;)”ÌD ;ÌD”ÌE ;ÌE•”  < ”	 <	” <” <” <Ü ” =” =” =” =” =” =”# =#”+ =+”/ =/”0 =0”4 =4”5 =5”? =?”Ì@ =Ì@”ÌI =ÌI”ÌJ =ÌJ”ÌN =ÌN”ÌR =ÌR”ÌS =ÌS”Ì] =Ì]”Ì^ =Ì^”Ìl =Ìl”Ìm =Ìm”Ìn =Ìn”Ìo =Ìo’”  > ” >•”  ? ”	 ?	” ?” ?” ?#Ü ” Ì@” Ì@” Ì@” Ì@” Ì@” Ì@”# Ì@#”+ Ì@+”/ Ì@/”3 Ì@3”4 Ì@4”> Ì@>”? Ì@?”ÌO Ì@ÌO”ÌP Ì@ÌP”ÌQ Ì@ÌQ’”  ÌA ” ÌA•”  ÌB ”	 ÌB	”" ÌB"”# ÌB#”& ÌB.’” ÌC” ÌCÜ ” ÌD” ÌD” ÌD” ÌD” ÌD” ÌD”$ ÌD$”% ÌD%”( ÌD(”* ÌD*”0 ÌD0”1 ÌD1”9 ÌD9”: ÌD:”ÌC ÌDÌC”ÌD ÌDÌD”ÌE ÌDÌE–” ÌE” ÌE” ÌE” ÌE” ÌE” ÌE‘” ÌF”” ÌF” ÌF” ÌF” ÌFœ” ÌG” ÌG” ÌG” ÌG” ÌG” ÌG” ÌG”ÌE ÌGÌE”ÌH ÌGÌH”ÌK ÌGÌK”ÌL ÌGÌL”ÌM ÌGÌM‘” ÌH˜” ÌI”
- ÌI
-” ÌI” ÌI” ÌI”' ÌI'”( ÌI(”) ÌI)’”  ÌJ ” ÌJ˜”  ÌK ”	 ÌK	” ÌK” ÌK”  ÌK,”" ÌK.”% ÌK1”) ÌK?™” ÌL” ÌL” ÌL” ÌL” ÌL” ÌL” ÌL” ÌL” ÌLœ” ÌM” ÌM” ÌM” ÌM”  ÌM ”$ ÌM$”& ÌM&”' ÌM'”* ÌM*”. ÌM.”/ ÌM/”0 ÌM0”” ÌN” ÌN” ÌN” ÌN’”  ÌO ” ÌO—”  ÌP ”	 ÌP	” ÌP” ÌP”! ÌP-”# ÌP/”+ ÌPÌA›” ÌQ”
- ÌQ
-” ÌQ” ÌQ” ÌQ” ÌQ”# ÌQ#”$ ÌQ$”, ÌQ,”- ÌQ-”. ÌQ.—” ÌR” ÌR” ÌR” ÌR” ÌR” ÌR” ÌRš” ÌS” ÌS” ÌS” ÌS” ÌS” ÌS”  ÌS ”! ÌS!”" ÌS"”# ÌS#‘” ÌT’”  ÌU ” ÌU“”  ÌV ” ÌV” ÌV•” ÌY” ÌY” ÌY” ÌY ” ÌY/—” ÌZ” ÌZ” ÌZ” ÌZ” ÌZ” ÌZ” ÌZ—” Ì[” Ì[” Ì[” Ì[” Ì[” Ì[” Ì[’” Ì\” Ì\‘” Ì]“”  Ì^ ” Ì^” Ì^‘” Ìk•” Ì_” Ì_”" Ì_%”$ Ì_'”% Ì_(•” Ì`” Ì`” Ì`"”! Ì`$”" Ì`%•” Ìa” Ìa”  Ìa#”" Ìa%”# Ìa&•” Ìb” Ìb” Ìb"”! Ìb$”" Ìb%•” Ìc” Ìc”  Ìc#”" Ìc%”# Ìc&•” Ìd”" Ìd”% Ìd(”' Ìd*”( Ìd+•” Ìe” Ìe”  Ìe#”" Ìe%”# Ìe&•” Ìf” Ìf”" Ìf%”$ Ìf'”% Ìf(•” Ìg” Ìg”" Ìg%”$ Ìg'”% Ìg(•” Ìh” Ìh”! Ìh$”# Ìh&”$ Ìh'•” Ìi” Ìi” Ìi"”! Ìi$”" Ìi%•” Ìj” Ìj” Ìj"”! Ìj$”" Ìj%’” Ìk” Ìk’” Ìl” Ìl—” Ìm” Ìm” Ìm” Ìm”" Ìm"”$ Ìm$”% Ìm%—” Ìn” Ìn” Ìn” Ìn” Ìn”! Ìn!”" Ìn"—” Ìo” Ìo” Ìo” Ìo”  Ìo ”" Ìo"”# Ìo#—” Ìp” Ìp” Ìp” Ìp” Ìp”! Ìp!”" Ìp"—” Ìq” Ìq” Ìq” Ìq”  Ìq ”" Ìq"”# Ìq#—” Ìr” Ìr” Ìr”" Ìr"”% Ìr%”' Ìr'”( Ìr(—” Ìs” Ìs” Ìs” Ìs”  Ìs ”" Ìs"”# Ìs#—” Ìt” Ìt” Ìt” Ìt”" Ìt"”$ Ìt$”% Ìt%—” Ìu” Ìu” Ìu” Ìu”" Ìu"”$ Ìu$”% Ìu%—” Ìv” Ìv” Ìv” Ìv”! Ìv!”# Ìv#”$ Ìv$—” Ìw” Ìw” Ìw” Ìw” Ìw”! Ìw!”" Ìw"—” Ìx” Ìx” Ìx” Ìx” Ìx”! Ìx!”" Ìx"’” Ìy” Ìy’” Ìz” Ìz˜” Ì{” Ì{” Ì{” Ì{” Ì{”- Ì{-”. Ì{.”/ Ì{/’” Ì|” Ì|”” Ì}” Ì}” Ì}” Ì} š” Ì~” Ì~” Ì~” Ì~”  Ì~ ”$ Ì~$”% Ì~%”- Ì~-”. Ì~.”/ Ì~/’” Ì” Ì”” Ì€” Ì€” Ì€” Ì€!š” Ì” Ì” Ì” Ì” Ì”. Ì.”0 Ì0”8 Ì8”9 Ì9”: Ì:’” Ì‚” Ì‚’” Ìƒ” Ìƒ˜” Ì„” Ì„” Ì„” Ì„” Ì„”* Ì„*”+ Ì„+”, Ì„,’” Ì…” Ì…”” Ì†”
- Ì†
-” Ì†” Ì†š” Ì‡” Ì‡” Ì‡” Ì‡” Ì‡”! Ì‡!”" Ì‡"”* Ì‡*”+ Ì‡+”, Ì‡,’” Ìˆ” Ìˆ”” Ì‰” Ì‰” Ì‰” Ì‰š” ÌŠ” ÌŠ” ÌŠ” ÌŠ” ÌŠ”+ ÌŠ+”- ÌŠ-”5 ÌŠ5”6 ÌŠ6”7 ÌŠ7’” Ì‹” Ì‹’” ÌŒ”	 ÌŒ	˜” Ì” Ì” Ì” Ì” Ì”+ Ì+”, Ì,”- Ì-’” Ì” Ì”” Ì” Ì” Ì” Ìš” Ì” Ì” Ì” Ì” Ì”" Ì"”# Ì#”+ Ì+”, Ì,”- Ì-’” Ì‘” Ì‘”” Ì’” Ì’” Ì’” Ì’š” Ì“” Ì“” Ì“” Ì“” Ì“”, Ì“,”. Ì“.”6 Ì“6”7 Ì“7”8 Ì“8’” Ì”” Ì”’” Ì•” Ì•˜” Ì–” Ì–” Ì–” Ì–” Ì–”* Ì–*”+ Ì–+”, Ì–,’” Ì—” Ì—”” Ì˜”
- Ì˜
-” Ì˜” Ì˜š” Ì™” Ì™” Ì™” Ì™” Ì™”! Ì™!”" Ì™"”* Ì™*”+ Ì™+”, Ì™,’” Ìš” Ìš”” Ì›” Ì›” Ì›” Ì›š” Ìœ” Ìœ” Ìœ” Ìœ” Ìœ”+ Ìœ+”- Ìœ-”5 Ìœ5”6 Ìœ6”7 Ìœ7’” Ì” Ì’” Ì”	 Ì	˜” ÌŸ” ÌŸ” ÌŸ” ÌŸ” ÌŸ”+ ÌŸ+”, ÌŸ,”- ÌŸ-’” Ì ” Ì ”” Ì¡” Ì¡” Ì¡” Ì¡š” Ì¢” Ì¢” Ì¢” Ì¢” Ì¢”" Ì¢"”# Ì¢#”+ Ì¢+”, Ì¢,”- Ì¢-’” Ì£” Ì£”” Ì¤” Ì¤” Ì¤” Ì¤š” Ì¥” Ì¥” Ì¥” Ì¥” Ì¥”, Ì¥,”. Ì¥.”6 Ì¥6”7 Ì¥7”8 Ì¥8’” Ì¦” Ì¦”” Ì§” Ì§” Ì§” Ì§š” Ì¨” Ì¨” Ì¨” Ì¨” Ì¨”0 Ì¨0”2 Ì¨2”6 Ì¨6”7 Ì¨7”8 Ì¨8’” Ì©” Ì©”” Ìª” Ìª” Ìª” Ìª#š” Ì«” Ì«” Ì«”" Ì«"”# Ì«#”' Ì«'”( Ì«(”0 Ì«0”1 Ì«1”2 Ì«2’” Ì¬” Ì¬”” Ì­” Ì­” Ì­” Ì­$š” Ì®” Ì®” Ì®” Ì®” Ì®”1 Ì®1”3 Ì®3”; Ì®;”< Ì®<”= Ì®=’” Ì¯” Ì¯”” Ì°”	 Ì°	”
- Ì°
-” Ì°š” Ì±” Ì±” Ì±” Ì±” Ì±”+ Ì±+”- Ì±-”0 Ì±0”1 Ì±1”2 Ì±2’” Ì²” Ì²”” Ì³” Ì³” Ì³” Ì³š” Ì´” Ì´” Ì´” Ì´” Ì´”" Ì´"”# Ì´#”+ Ì´+”, Ì´,”- Ì´-’” Ìµ” Ìµ”” Ì¶” Ì¶” Ì¶” Ì¶š” Ì·” Ì·” Ì·” Ì·” Ì·”, Ì·,”. Ì·.”6 Ì·6”7 Ì·7”8 Ì·8’” Ì¸” Ì¸’” Ì¹” Ì¹˜” Ìº” Ìº” Ìº” Ìº” Ìº”* Ìº*”+ Ìº+”, Ìº,’” Ì»” Ì»”” Ì¼”
- Ì¼
-” Ì¼” Ì¼š” Ì½” Ì½” Ì½” Ì½” Ì½”! Ì½!”" Ì½"”* Ì½*”+ Ì½+”, Ì½,’” Ì¾” Ì¾”” Ì¿” Ì¿” Ì¿” Ì¿š” ÌÀ” ÌÀ” ÌÀ” ÌÀ” ÌÀ”+ ÌÀ+”- ÌÀ-”5 ÌÀ5”6 ÌÀ6”7 ÌÀ7’” ÌÁ” ÌÁ’” ÌÂ” ÌÂ˜” ÌÃ” ÌÃ” ÌÃ” ÌÃ” ÌÃ”* ÌÃ*”+ ÌÃ+”, ÌÃ,’” ÌÄ” ÌÄ”” ÌÅ”
- ÌÅ
-” ÌÅ” ÌÅš” ÌÆ” ÌÆ” ÌÆ” ÌÆ” ÌÆ”! ÌÆ!”" ÌÆ"”* ÌÆ*”+ ÌÆ+”, ÌÆ,’” ÌÇ” ÌÇ”” ÌÈ” ÌÈ” ÌÈ” ÌÈš” ÌÉ” ÌÉ” ÌÉ” ÌÉ” ÌÉ”+ ÌÉ+”- ÌÉ-”5 ÌÉ5”6 ÌÉ6”7 ÌÉ7’” ÌÊ” ÌÊ’” ÌË” ÌË˜” ÌÌ” ÌÌ” ÌÌ” ÌÌ” ÌÌ”- ÌÌ-”. ÌÌ.”/ ÌÌ/’” ÌÍ” ÌÍ”” ÌÎ” ÌÎ” ÌÎ” ÌÎ š” ÌÏ” ÌÏ” ÌÏ” ÌÏ”  ÌÏ ”$ ÌÏ$”% ÌÏ%”- ÌÏ-”. ÌÏ.”/ ÌÏ/’” ÌĞ” ÌĞ”” ÌÑ” ÌÑ” ÌÑ” ÌÑ!š” ÌÒ” ÌÒ” ÌÒ” ÌÒ” ÌÒ”. ÌÒ.”0 ÌÒ0”8 ÌÒ8”9 ÌÒ9”: ÌÒ:’” ÌÓ” ÌÓ’” ÌÔ” ÌÔ˜” ÌÕ” ÌÕ” ÌÕ” ÌÕ” ÌÕ”- ÌÕ-”. ÌÕ.”/ ÌÕ/’” ÌÖ” ÌÖ”” Ì×” Ì×” Ì×” Ì× š” ÌØ” ÌØ” ÌØ” ÌØ”  ÌØ ”$ ÌØ$”% ÌØ%”- ÌØ-”. ÌØ.”/ ÌØ/’” ÌÙ” ÌÙ”” ÌÚ” ÌÚ” ÌÚ” ÌÚ!š” ÌÛ” ÌÛ” ÌÛ” ÌÛ” ÌÛ”. ÌÛ.”0 ÌÛ0”8 ÌÛ8”9 ÌÛ9”: ÌÛ:’” ÌÜ” ÌÜ’” Ìİ”
- Ìİ
-˜” ÌŞ” ÌŞ” ÌŞ” ÌŞ” ÌŞ”, ÌŞ,”- ÌŞ-”. ÌŞ.’” Ìß” Ìß”” Ìà” Ìà” Ìà” Ìàš” Ìá” Ìá” Ìá” Ìá” Ìá”# Ìá#”$ Ìá$”, Ìá,”- Ìá-”. Ìá.’” Ìâ” Ìâ”” Ìã” Ìã” Ìã” Ìã š” Ìä” Ìä” Ìä” Ìä” Ìä”- Ìä-”/ Ìä/”7 Ìä7”8 Ìä8”9 Ìä9’” Ìå” Ìå‘” Ìæ˜”  Ìë ” Ìë” Ìë” Ìë”  Ìë ”3 Ìë3”5 Ìë5”6 Ìë6–”  Ìì ” Ìì” Ìì”	 Ìì”
- Ìì” Ìì“”  Ìí ” Ìí” Ìí‘” Ìı•” Ìî” Ìî” Ìî*” Ìî.” Ìî/“” Ìï” Ìï” Ìï%”” Ìğ” Ìğ” Ìğ” Ìğ˜” Ìñ” Ìñ” Ìñ”$ Ìñ ”% Ìñ!”2 Ìñ.”3 Ìñ/”= Ìñ9’”	 Ìò”
- Ìò“” Ìó” Ìó” Ìó/˜” Ìô” Ìô” Ìô” Ìô” Ìô”* Ìô&”+ Ìô'”ÌA Ìô=“” Ìõ” Ìõ” Ìõ”” Ìö” Ìö” Ìö” Ìö™” Ì÷” Ì÷” Ì÷”  Ì÷”$ Ì÷ ”& Ì÷"”' Ì÷#”. Ì÷*”0 Ì÷,‘” Ìø	”” Ìù” Ìù” Ìù” Ìù”” Ìú” Ìú” Ìú” Ìú’”	 Ìû”
- Ìû•” Ìü”! Ìü”$ ÌüÌ@”( ÌüÌD”) ÌüÌE’” Ìı” Ìı”” Ìş”	 Ìş	”
- Ìş
-” Ìş•” Ìÿ” Ìÿ” Ìÿ” Ìÿ” Ìÿ–” Ìÿ” Ìÿ!” Ìÿ%” Ìÿ&” Ìÿ-”  Ìÿ.œ” Í ” Í ” Í ” Í ” Í ” Í ”  Í  ”# Í #”% Í %”' Í '”) Í )”* Í *Ü ” Í” Í” Í”! Í!”$ Í$”- Í-”. Í.”= Í=”> Í>”ÌH ÍÌH”ÌI ÍÌI”Ì\ ÍÌ\”Ì^ ÍÌ_”Ì` ÍÌa”Ìy ÍÌz”Ì{ ÍÌ|”Ì} ÍÌ~”Ì ÍÌ€”Ì† ÍÌ‡”Ì‡ ÍÌˆ”Ìˆ ÍÌ‰š” Í” Í” Í” Í” Í” Í”! Í!”" Í"”6 Í6”7 Í7—” Í” Í” Í”! Í!”$ Í$”( Í(”) Í)–” Í” Í” Í” Í” Í” Í–” Í” Í” Í” Í”! Í!”" Í"–” Í” Í” Í” Í” Í” Í’” Í” Í”” Í”	 Í	”
- Í
-” Í—” Í	” Í	” Í	” Í	” Í	” Í	” Í	–” Í
-” Í
-” Í
-” Í
-”+ Í
-+”, Í
-,‘”	 Í	œ” Í” Í” Í” Í” Í”# Í#”$ Í$”( Í(”) Í)”1 Í1”2 Í2”3 Í3’” Í” Í”” Í”	 Í	”
- Í
-” Í—” Í” Í” Í” Í” Í” Í” Í–” Í” Í” Í” Í”+ Í+”, Í,‘”	 Í	œ” Í” Í” Í” Í” Í”( Í(”) Í)”- Í-”. Í.”; Í;”< Í<”= Í=’” Í” Í”” Í”	 Í	”
- Í
-” Í–” Í” Í” Í” Í” Í” Íš” Í” Í” Í” Í” Í” Í” Í”# Í#”$ Í$”% Í%š” Í” Í” Í” Í” Í” Í” Í”$ Í$”% Í%”& Í&š” Í” Í” Í” Í” Í” Í” Í”# Í#”$ Í$”% Í%š” Í” Í” Í” Í” Í” Í” Í”' Í'”( Í(”) Í)š” Í” Í” Í” Í” Í” Í” Í”+ Í+”, Í,”- Í-š” Í” Í” Í” Í” Í” Í” Í”# Í#”$ Í$”% Í%™” Í” Í” Í” Í” Í”  Í ”* Í*”, Í,”- Í-‘”	 Í	—” Í” Í” Í” Í” Í” Í” Í’” Í” Í‘” Í “”  Í! ”	 Í!	” Í!›” Í"”
- Í"
-” Í"” Í"”" Í""”# Í"#”6 Í"6”8 Í"9”9 Í":”ÌD Í"ÌX”ÌE Í"ÌY”” Í#”
- Í#
-” Í#” Í#3“” Í$” Í$” Í$‘” Í%–” Í&” Í&” Í&”' Í&'”( Í&(”2 Í&2–” Í'” Í'” Í'”( Í'(”) Í')”- Í'-‘” Í(‘”	 Í)	˜” Í*” Í*” Í*”  Í* ”! Í*!”. Í*.”/ Í*/”< Í*<”” Í+” Í+” Í+” Í+“” Í,” Í,” Í,–” Í-” Í-” Í-”$ Í-$”% Í-%”8 Í-8‘”	 Í.	’” Í/” Í/Ÿ” Í0” Í0” Í0” Í0”! Í0!”" Í0"”/ Í0/”0 Í00”1 Í01”5 Í05”6 Í06”7 Í07”ÌC Í0ÌC”ÌE Í0ÌD”ÌG Í0ÌFÜ ” Í1” Í1”$ Í1$”% Í1%”; Í1;”< Í1<”ÌF Í1ÌF”ÌG Í1ÌG”ÌZ Í1ÌZ”Ì\ Í1Ì]”Ì^ Í1Ì_”Ìs Í1Ìt”Ìt Í1Ìu”Ì‚ Í1Ìƒ”Ìƒ Í1Ì„”Ì‘ Í1Ì’”Ì“ Í1Ì””ÌŸ Í1Ì ”Ì  Í1Ì¡”Ì¡ Í1Ì¢” Í2” Í2” Í2” Í2” Í2” Í2” Í2” Í2 ” Í2!” Í2#” Í2$” Í2%” Í2&” Í2'’”  Í3 ” Í3””  Í4 ” Í4” Í4”! Í4!Ü ” Í5” Í5”  Í5 ”! Í5!”6 Í56”7 Í57”ÌA Í5ÌA”ÌB Í5ÌB”ÌU Í5ÌU”ÌW Í5ÌX”ÌX Í5ÌY”ÌY Í5ÌZ”Ì] Í5Ì^”Ì^ Í5Ì_”Ìa Í5Ìa”Ìc Í5Ìc”Ìf Í5Ìd”Ìg Í5Ìe”Ìh Í5Ìf”Ìi Í5Ìg”Ìn Í5Ìl”Ìo Í5Ìm”Ìp Í5Ìn”Ìs Í5Ì€”Ìu Í5Ì”Ìw Í5Ìƒ”Ìz Í5Ì„”Ì{ Í5Ì…”Ì| Í5Ì†”Ì} Í5Ì‡’”  Í6 ” Í6””  Í7 ” Í7” Í7” Í7•” Í8”
- Í8
-” Í8” Í8”  Í8 ’”  Í9 ” Í9””  Í: ” Í:” Í:” Í:•” Í;”
- Í;
-” Í;” Í;” Í;’”  Í< ” Í<Ü ”  Í= ” Í=”	 Í=	” Í=” Í=” Í=” Í= ” Í="” Í="” Í=%” Í=&”  Í=-”! Í=.”$ Í=1”% Í=2”ÌE Í=ÌR”ÌH Í=ÌU”ÌJ Í=ÌW”ÌK Í=ÌX”ÌL Í=ÌY“”  Í> ” Í>” Í>•”  Í?” Í?” Í?” Í? ” Í?!•”  Í@” Í@” Í@” Í@&” Í@'•”  ÍA” ÍA” ÍA” ÍA$” ÍA%•”  ÍB” ÍB” ÍB” ÍB&” ÍB'•”  ÍC” ÍC” ÍC” ÍC"” ÍC#“”  ÍE ” ÍE” ÍE‘” Í`•” ÍF” ÍF” ÍF” ÍF” ÍF•” ÍI” ÍI” ÍI” ÍI” ÍI•” ÍJ” ÍJ” ÍJ!” ÍJ"” ÍJ#•” ÍK” ÍK” ÍK ” ÍK!” ÍK"•” ÍL” ÍL” ÍL” ÍL” ÍL •” ÍM” ÍM” ÍM” ÍM ” ÍM!•” ÍN” ÍN” ÍN” ÍN ” ÍN!•” ÍO” ÍO” ÍO#” ÍO%” ÍO&•” ÍP” ÍP” ÍP” ÍP ” ÍP!•” ÍQ” ÍQ” ÍQ ” ÍQ"” ÍQ#•” ÍR” ÍR” ÍR$” ÍR%” ÍR&•” ÍS” ÍS” ÍS#”  ÍS(”! ÍS)•” ÍT” ÍT” ÍT!” ÍT&” ÍT'•” ÍU” ÍU”! ÍU)”& ÍU.”' ÍU/•” ÍV” ÍV” ÍV'”# ÍV,”$ ÍV-˜” ÍW” ÍW” ÍW$” ÍW&”  ÍW(”# ÍW)”$ ÍW*”% ÍW+˜” ÍX” ÍX” ÍX ” ÍX"” ÍX$” ÍX%”  ÍX&”! ÍX'˜” ÍY” ÍY” ÍY!” ÍY#” ÍY%”  ÍY&”! ÍY'”" ÍY(˜” ÍZ” ÍZ” ÍZ!” ÍZ#” ÍZ%”  ÍZ&”! ÍZ'”" ÍZ(š” Í[” Í[” Í[:” Í[;”( Í[ÌM”* Í[ÌN”, Í[ÌP”/ Í[ÌQ”0 Í[ÌR”1 Í[ÌS˜” Í\” Í\” Í\!” Í\#” Í\%”  Í\&”! Í\'”" Í\(˜” Í]” Í]”" Í]+”% Í]-”' Í]/”* Í]0”+ Í]1”, Í]2•” Í^”$ Í^#”' Í^<”+ Í^Ì@”, Í^ÌA•” Í_” Í_” Í_” Í_#” Í_$–” Ía” Ía” Ía” Ía” Ía” Ía–” Íb” Íb” Íb” Íb” Íb” Íb’” Íc” Íc”” Íd”	 Íd”
- Íd” Íd!˜” Íe” Íe” Íe” Íe”+ Íe+”, Íe,”7 Íe7”8 Íe8™” Íf” Íf” Íf”  Íf ”# Íf#”' Íf'”0 Íf0”2 Íf2”3 Íf3˜” Íg” Íg” Íg” Íg”) Íg)”* Íg*”3 Íg3”4 Íg4˜” Íh” Íh” Íh” Íh” Íh”  Íh ”$ Íh3”& Íh5›” Íi” Íi” Íi” Íi”  Íi ”( Íi(”+ Íi+”7 Íi8”8 Íi9”Ì@ ÍiÌA”ÌA ÍiÌB–” Íj” Íj” Íj”$ Íj$”& Íj&”' Íj'“” Ík”	 Ík	”
- Ík
-˜” Íl” Íl” Íl” Íl” Íl” Íl”  Íl/”" Íl1” Ím” Ím” Ím”$ Ím$”% Ím%”* Ím*”- Ím-”6 Ím6”7 Ím7”ÌD ÍmÌD”ÌE ÍmÌE”ÌX ÍmÌX”ÌY ÍmÌY–” Ín” Ín” Ín”) Ín)”+ Ín+”, Ín,“” Ío”	 Ío	”
- Ío
-—” Íp” Íp” Íp” Íp” Íp” Íp” Íp” Íq” Íq” Íq”$ Íq$”% Íq%”* Íq*”- Íq-”6 Íq6”7 Íq7”ÌD ÍqÌD”ÌE ÍqÌE”ÌY ÍqÌY”ÌZ ÍqÌZ–” Ír” Ír” Ír”) Ír)”+ Ír+”, Ír,“” Ís”	 Ís	”
- Ís
-—” Ít” Ít” Ít” Ít” Ít” Ít” Ít” Íu” Íu” Íu”$ Íu$”% Íu%”* Íu*”- Íu-”6 Íu6”7 Íu7”ÌD ÍuÌD”ÌE ÍuÌE”Ì] ÍuÌ]”Ì^ ÍuÌ^–” Ív” Ív” Ív”) Ív)”+ Ív+”, Ív,“” Íw”	 Íw	”
- Íw
-™” Íx” Íx” Íx” Íx” Íx” Íx”( Íx0”* Íx1”, Íx3—” Íy” Íy” Íy”$ Íy$”% Íy%”- Íy-”0 Íy0”” Íz” Íz” Íz”' Íz'™” Í{” Í{” Í{”  Í{ ”$ Í{$”& Í{&”' Í{'”. Í{.”0 Í{0’” Í|+” Í|,–” Í}” Í}” Í}”* Í}*”, Í},”- Í}-“” Í~”	 Í~	”
- Í~
-—” Í” Í” Í” Í” Í” Í” Í” Í€” Í€” Í€”$ Í€$”% Í€%”* Í€*”- Í€-”6 Í€6”7 Í€7”ÌD Í€ÌD”ÌE Í€ÌE”ÌY Í€ÌY”ÌZ Í€ÌZ–” Í” Í” Í”) Í)”+ Í+”, Í,“” Í‚”	 Í‚	”
- Í‚
-—” Íƒ” Íƒ” Íƒ” Íƒ”" Íƒ"”% Íƒ$”' Íƒ&” Í„” Í„” Í„”$ Í„$”% Í„%”* Í„*”- Í„-”6 Í„6”7 Í„7”ÌD Í„ÌD”ÌE Í„ÌE”Ì] Í„Ì]”Ì^ Í„Ì^–” Í…” Í…” Í…”) Í…)”+ Í…+”, Í…,“” Í†”	 Í†	”
- Í†
-’” Í‡” Í‡”” Íˆ”	 Íˆ”
- Íˆ” Íˆ˜” Í‰” Í‰” Í‰” Í‰”) Í‰)”* Í‰*”3 Í‰3”4 Í‰4”” ÍŠ” ÍŠ” ÍŠ” ÍŠ’” ÍŠ” ÍŠ ˜” Í‹” Í‹” Í‹” Í‹” Í‹”" Í‹"”& Í‹&”( Í‹(—” ÍŒ” ÍŒ” ÍŒ” ÍŒ”! ÍŒ!”# ÍŒ#”$ ÍŒ$‘”	 Í	˜” Í” Í” Í” Í”( Í(”, Í,”0 Í0”2 Í2–” Í” Í” Í” Í”. Í.”/ Í/‘”	 Í	•” Í‘” Í‘” Í‘” Í‘”" Í‘"’” Í‘$” Í‘+—” Í’” Í’” Í’”$ Í’$”' Í’'”+ Í’+”, Í’,Ü ” Í“” Í“” Í“” Í“” Í“” Í“” Í“”% Í“%”' Í“'”* Í“)”, Í“+”- Í“+”1 Í“/”2 Í“0”6 Í“4”8 Í“6”9 Í“7”: Í“8Ü ” Í”” Í”” Í”” Í”” Í”” Í”” Í””& Í”&”( Í”(”+ Í”*”- Í”,”. Í”,”2 Í”0”3 Í”1”8 Í”6”: Í”8”; Í”9”< Í”:Ü ” Í•” Í•” Í•” Í•” Í•” Í•” Í•”% Í•%”' Í•'”* Í•)”, Í•+”- Í•+”1 Í•/”2 Í•0”6 Í•4”8 Í•6”9 Í•7”: Í•8Ü ” Í–” Í–” Í–” Í–” Í–” Í–” Í–”) Í–)”+ Í–+”. Í–-”0 Í–/”1 Í–/”ÌD Í–ÌB”ÌE Í–ÌC”ÌI Í–ÌG”ÌK Í–ÌI”ÌL Í–ÌJ”ÌM Í–ÌKÜ ” Í—” Í—” Í—” Í—” Í—” Í—” Í—”- Í—-”/ Í—/”2 Í—1”4 Í—3”5 Í—3”ÌH Í—ÌF”ÌI Í—ÌG”ÌM Í—ÌK”ÌO Í—ÌM”ÌP Í—ÌN”ÌQ Í—ÌO” Í˜” Í˜” Í˜” Í˜” Í˜” Í˜” Í˜”% Í˜%”' Í˜'”( Í˜(”0 Í˜0”2 Í˜1”4 Í˜3š” Í™” Í™” Í™” Í™” Í™” Í™”! Í™!”% Í™%”& Í™&”' Í™'”” Íš”	 Íš	”
- Íš
-” Íš™” Í›” Í›” Í›” Í›”  Í› ”" Í›"”* Í›*”, Í›,”- Í›-—” Íœ” Íœ” Íœ” Íœ”! Íœ!”% Íœ%”& Íœ&–” Í” Í” Í” Í”! Í!”" Í"’” Í” Í’” ÍŸ” ÍŸš” Í ” Í ” Í ”" Í "”% Í %”* Í *”+ Í +”< Í <”> Í >”? Í ?˜” Í¡” Í¡” Í¡” Í¡”+ Í¡+”, Í¡,”7 Í¡7”8 Í¡8™” Í¢” Í¢” Í¢” Í¢” Í¢”" Í¢"”$ Í¢$”' Í¢&”) Í¢(—” Í£” Í£” Í£” Í£” Í£”# Í£#”$ Í£$–” Í¤” Í¤” Í¤” Í¤” Í¤” Í¤–” Í¥” Í¥”  Í¥ ”' Í¥'”) Í¥)”* Í¥*”” Í¦”	 Í¦	”
- Í¦
-” Í¦™” Í§” Í§” Í§” Í§” Í§” Í§”  Í§ ”# Í§"”% Í§$—” Í¨” Í¨” Í¨” Í¨” Í¨”! Í¨!”" Í¨"–” Í©” Í©” Í©” Í©” Í©” Í©–” Íª” Íª”  Íª ”$ Íª$”& Íª&”' Íª'”” Í«”	 Í«	”
- Í«
-” Í«™” Í¬” Í¬” Í¬” Í¬” Í¬” Í¬”! Í¬!”$ Í¬#”& Í¬%—” Í­” Í­” Í­” Í­” Í­”" Í­"”# Í­#–” Í®” Í®” Í®” Í®” Í®” Í®–” Í¯” Í¯”  Í¯ ”% Í¯%”' Í¯'”( Í¯(”” Í°”	 Í°	”
- Í°
-” Í°™” Í±” Í±” Í±” Í±” Í±” Í±”  Í± ”# Í±"”% Í±$—” Í²” Í²” Í²” Í²” Í²”" Í²"”# Í²#”” Í³”	 Í³	”
- Í³
-” Í³™” Í´” Í´” Í´” Í´” Í´”  Í´ ”" Í´"”% Í´$”' Í´&—” Íµ” Íµ” Íµ” Íµ” Íµ”" Íµ"”# Íµ#–” Í¶” Í¶” Í¶” Í¶”( Í¶(”* Í¶*Ü ” Í·” Í·” Í·”, Í·,”/ Í·/”= Í·=”> Í·>”ÌG Í·ÌG”ÌH Í·ÌH”ÌO Í·ÌO”ÌQ Í·ÌQ”ÌR Í·ÌR”ÌV Í·ÌV”ÌW Í·ÌW”ÌZ Í·ÌY”Ì\ Í·Ì[—” Í¸” Í¸” Í¸”* Í¸*”- Í¸-”2 Í¸2”3 Í¸3”” Í¹” Í¹” Í¹” Í¹‘” Íº–” Í»” Í»” Í»” Í»” Í»” Í»”” Í¼” Í¼” Í¼” Í¼–” Í½” Í½”  Í½ ”% Í½%”' Í½'”( Í½(”” Í¾”	 Í¾	”
- Í¾
-” Í¾›” Í¿” Í¿” Í¿” Í¿” Í¿”$ Í¿$”& Í¿&”' Í¿'”* Í¿*”, Í¿+”. Í¿-˜” ÍÀ” ÍÀ” ÍÀ” ÍÀ” ÍÀ”" ÍÀ"”# ÍÀ#”$ ÍÀ$š” ÍÁ” ÍÁ”  ÍÁ ”* ÍÁ*”+ ÍÁ+”. ÍÁ.”1 ÍÁ1”5 ÍÁ5”6 ÍÁ6”7 ÍÁ7”” ÍÂ”	 ÍÂ	”
- ÍÂ
-” ÍÂ›” ÍÃ” ÍÃ” ÍÃ” ÍÃ” ÍÃ” ÍÃ”! ÍÃ!”" ÍÃ"”% ÍÃ%”' ÍÃ&”) ÍÃ(—” ÍÄ” ÍÄ” ÍÄ” ÍÄ” ÍÄ”" ÍÄ"”# ÍÄ#–” ÍÅ” ÍÅ” ÍÅ” ÍÅ” ÍÅ” ÍÅÜ ” ÍÆ” ÍÆ”  ÍÆ ”% ÍÆ%”& ÍÆ&”* ÍÆ*”: ÍÆ:”; ÍÆ;”> ÍÆ>”? ÍÆ?”ÌF ÍÆÌF”ÌH ÍÆÌH”ÌK ÍÆÌK”ÌL ÍÆÌL”ÌP ÍÆÌP”ÌQ ÍÆÌQ”ÌR ÍÆÌR”ÌS ÍÆÌS”” ÍÇ”	 ÍÇ	”
- ÍÇ
-” ÍÇ” ÍÈ” ÍÈ” ÍÈ” ÍÈ” ÍÈ”) ÍÈ)”+ ÍÈ+”, ÍÈ,”4 ÍÈ4”6 ÍÈ6”; ÍÈ;”= ÍÈ<”? ÍÈ>”” ÍÉ” ÍÉ” ÍÉ” ÍÉ—” ÍÊ” ÍÊ” ÍÊ” ÍÊ”, ÍÊ,”- ÍÊ-”< ÍÊ<–” ÍË” ÍË” ÍË”+ ÍË+”- ÍË-”. ÍË.–” ÍÌ”' ÍÌ'”( ÍÌ(”/ ÍÌ/”1 ÍÌ1”2 ÍÌ2’” ÍÍ” ÍÍ—” ÍÎ” ÍÎ” ÍÎ” ÍÎ”, ÍÎ,”- ÍÎ-”: ÍÎ:–” ÍÏ” ÍÏ” ÍÏ” ÍÏ”( ÍÏ(”* ÍÏ*–” ÍĞ” ÍĞ” ÍĞ”$ ÍĞ$”& ÍĞ&”' ÍĞ'–” ÍÑ”+ ÍÑ+”, ÍÑ,”3 ÍÑ3”5 ÍÑ5”6 ÍÑ6‘” ÍÒ’” ÍÓ” ÍÓ—” ÍÔ” ÍÔ” ÍÔ” ÍÔ”, ÍÔ,”- ÍÔ-”> ÍÔ>’” ÍÕ” ÍÕ—” ÍÖ” ÍÖ” ÍÖ” ÍÖ”, ÍÖ,”- ÍÖ-”< ÍÖ<—” Í×” Í×” Í×”" Í×"”% Í×%”* Í×*”+ Í×+’” ÍØ” ÍØ‘” ÍÙ”” ÍÚ”	 ÍÚ	”
- ÍÚ
-” ÍÚ›” ÍÛ” ÍÛ” ÍÛ” ÍÛ” ÍÛ”( ÍÛ(”* ÍÛ*”+ ÍÛ+”9 ÍÛ9”; ÍÛ:”= ÍÛ<” ÍÜ” ÍÜ” ÍÜ”  ÍÜ ”. ÍÜ.”/ ÍÜ/”7 ÍÜ7”< ÍÜ<”ÌA ÍÜÌA”ÌB ÍÜÌB”ÌO ÍÜÌO”ÌP ÍÜÌP”Ìd ÍÜÌd”Ìf ÍÜÌf—” Íİ” Íİ” Íİ” Íİ”! Íİ!”& Íİ&”' Íİ'–” ÍŞ” ÍŞ” ÍŞ”" ÍŞ"”$ ÍŞ$”% ÍŞ%‘” Íß” Íà” Íà” Íà”  Íà ”. Íà.”/ Íà/”7 Íà7”< Íà<”ÌA ÍàÌA”ÌB ÍàÌB”ÌO ÍàÌO”ÌP ÍàÌP”Ìe ÍàÌe”Ìg ÍàÌg—” Íá” Íá” Íá” Íá”! Íá!”% Íá%”& Íá&–” Íâ” Íâ” Íâ”! Íâ!”# Íâ#”$ Íâ$‘” Íã”” Íä”	 Íä	”
- Íä
-” Íä’” Íå” Íå“” Íæ” Íæ” Íæ—” Íç” Íç” Íç” Íç” Íç”' Íç'”) Íç)”” Íè” Íè” Íè” Íè‘”	 Íé	š” Íê” Íê” Íê” Íê”) Íê)”* Íê*”2 Íê2”5 Íê5”9 Íê9”: Íê:’” Íë” Íë“” Íì” Íì” Íì” Íí” Íí” Íí” Íí” Íí”* Íí*”, Íí,”7 Íí7”; Íí;”< Íí<”= Íí=”Ì@ ÍíÌ@”ÌD ÍíÌD”ÌE ÍíÌE’” Íî” Íî“” Íï” Íï” Íï—” Íğ” Íğ” Íğ” Íğ” Íğ”' Íğ'”) Íğ)”” Íñ” Íñ” Íñ” Íñ‘”	 Íò	œ” Íó” Íó” Íó” Íó”) Íó)”* Íó*”/ Íó/”4 Íó4”> Íó>”? Íó?”ÌE ÍóÌE”ÌF ÍóÌF’” Íô” Íô“” Íõ” Íõ” Íõ—” Íö” Íö” Íö” Íö” Íö”' Íö'”) Íö)”” Í÷” Í÷” Í÷” Í÷‘”	 Íø	˜” Íù” Íù” Íù” Íù”) Íù)”* Íù*”- Íù-”. Íù.’” Íú” Íú•” Íû” Íû” Íû” Íû” Íû—” Íü” Íü” Íü” Íü” Íü”% Íü%”' Íü'Ü ” Íı” Íı”  Íı ”% Íı%”& Íı&”* Íı*”: Íı:”; Íı;”ÌG ÍıÌG”ÌL ÍıÌL”Ì\ ÍıÌ\”Ì^ ÍıÌ^”Ìc ÍıÌc”Ìd ÍıÌd”Ìe ÍıÌe”Ìf ÍıÌf’” Íş” Íş‘”	 Íÿ	—” Í ” Í ” Í ” Í ” Í ”' Í '”) Í )” Í” Í”  Í ”% Í%”& Í&”* Í*”: Í:”; Í;”ÌP ÍÌP”ÌR ÍÌR”ÌW ÍÌW”ÌX ÍÌX”ÌY ÍÌY”ÌZ ÍÌZ’” Í” Í‘”	 Í	˜” Í” Í” Í” Í” Í”! Í!”" Í"”# Í#™” Í” Í” Í” Í” Í” Í”  Í ”! Í!”# Í#—” Í” Í” Í” Í”# Í#”% Í%”& Í&‘”	 Í	Ü  ” Í” Í” Í” Í” Í” Í” Í” Í” Í”( Í(”) Í)”0 Í0”1 Í1”5 Í5”: Í:”; Í;”ÌE ÍÌE”ÌF ÍÌF”ÌN ÍÌN”ÌO ÍÌO”ÌS ÍÌS”Ì\ ÍÌ\”Ì] ÍÌ]”Ìb ÍÌb”Ìc ÍÌc”Ìg ÍÌg”Ìt ÍÌt”Ìu ÍÌu”Ìz ÍÌz”Ì{ ÍÌ{”Ì| ÍÌ|”Ì~ ÍÌ~˜” Í	” Í	” Í	” Í	”! Í	!”. Í	.”/ Í	/”0 Í	0’” Í
-” Í
-‘”	 Í	–” Í” Í” Í” Í” Í” ÍÜ ” Í” Í” Í” Í” Í” Í”$ Í$”% Í%”) Í)”. Í.”/ Í/”9 Í9”: Í:”ÌB ÍÌB”ÌC ÍÌC”ÌE ÍÌE•” Í” Í” Í” Í” Í‘”	 Í	œ” Í” Í” Í” Í”  Í"”! Í#”% Í'”2 Í4”3 Í5”8 Í:”9 Í;”; Í=’” Í” Í™” Í” Í” Í” Í”4 Í4”5 Í5”: Í:”; Í;”< Í<—” Í” Í” Í” Í”! Í!”# Í#”$ Í$‘” Í”” Í” Í” Í” ÍÜ ” Í”# Í#”$ Í$”) Í)”* Í*”. Í.”> Í>”? ÍÌ@”ÌB ÍÌU”ÌC ÍÌV”ÌJ ÍÌ]”ÌL ÍÌ`”ÌO ÍÌu”ÌP ÍÌv”ÌT ÍÌz”ÌU ÍÌ{”ÌV ÍÌ|”ÌW ÍÌ}‘” Í‘”	 Í	˜” Í” Í” Í” Í”& Í&”' Í'”* Í*”, Í,˜” Í” Í” Í”& Í&”' Í'”, Í,”. Í.”/ Í/‘”	 Í	™” Í” Í” Í”" Í"”# Í#”& Í&”) Í)”- Í-”. Í.—” Í” Í” Í” Í” Í” Í” Í–” Í” Í” Í” Í” Í” Íš” Í” Í” Í” Í” Í” Í” Í”% Í%”& Í&”' Í'‘”	 Í	–” Í” Í” Í” Í”$ Í$”& Í&š” Í ” Í ” Í ” Í ” Í ” Í ”! Í !”& Í &”' Í '”) Í )Ü ” Í!” Í!” Í!”( Í!(”) Í!)”1 Í!1”2 Í!2”7 Í!7”: Í!:”> Í!>”ÌA Í!ÌA”ÌB Í!ÌB”ÌE Í!ÌE”ÌF Í!ÌF”ÌK Í!ÌK”ÌL Í!ÌL”ÌM Í!ÌM”Ì[ Í!Ì[”Ì] Í!Ì]”Ì^ Í!Ì^‘” Í"›” Í#” Í#” Í#”$ Í#$”% Í#%”- Í#-”. Í#.”9 Í#9”< Í#<”ÌA Í#ÌA”ÌB Í#ÌB‘”	 Í$	–” Í%” Í%” Í%” Í%” Í%” Í%’” Í&” Í&“” Í'” Í'” Í'–” Í(” Í(” Í(” Í(” Í(” Í(’” Í)” Í)•” Í*” Í*” Í*” Í*” Í*—” Í+” Í+” Í+” Í+” Í+” Í+” Í+’” Í,” Í,“” Í-” Í-” Í-–” Í.” Í.” Í.” Í.” Í.” Í.’” Í/” Í/•” Í0” Í0” Í0” Í0” Í0—” Í1” Í1” Í1” Í1” Í1” Í1”  Í1 ›” Í2” Í2” Í2”  Í2!”! Í2"”) Í2*”* Í2+”/ Í20”2 Í23”; Í2<”< Í2=’” Í3” Í3“” Í4” Í4” Í4–” Í5” Í5” Í5” Í5” Í5”' Í5'”” Í5)” Í50” Í51” Í52—” Í6” Í6” Í6” Í6” Í6”- Í6-”. Í6.˜” Í7” Í7” Í7” Í7” Í7”  Í7 ”$ Í7$”% Í7%’” Í8” Í8“” Í9” Í9” Í9–” Í:” Í:” Í:” Í:” Í:” Í:’” Í;” Í;•” Í<” Í<” Í<” Í<” Í<—” Í=” Í=” Í=” Í=” Í=” Í=” Í=›” Í>” Í>” Í>”  Í>!”! Í>"”) Í>*”* Í>+”/ Í>0”2 Í>3”8 Í>9”9 Í>:’” Í?” Í?“” Í@” Í@” Í@–” ÍA” ÍA” ÍA” ÍA” ÍA” ÍA’” ÍB” ÍB•” ÍC” ÍC” ÍC” ÍC” ÍC!—” ÍD” ÍD” ÍD” ÍD” ÍD”! ÍD!”" ÍD"›” ÍE” ÍE” ÍE”  ÍE!”! ÍE"”) ÍE*”* ÍE+”0 ÍE1”3 ÍE4”= ÍE>”> ÍE?’” ÍF” ÍF“” ÍG” ÍG” ÍG–” ÍH” ÍH” ÍH” ÍH”  ÍH ”! ÍH!’” ÍI” ÍI•” ÍJ” ÍJ” ÍJ” ÍJ” ÍJ—” ÍK” ÍK” ÍK” ÍK” ÍK” ÍK”  ÍK ›” ÍL” ÍL” ÍL”  ÍL!”! ÍL"”) ÍL*”* ÍL+”4 ÍL5”7 ÍL8”: ÍL;”; ÍL<’” ÍM” ÍM“” ÍN” ÍN” ÍN–” ÍO” ÍO” ÍO” ÍO” ÍO” ÍO’” ÍP” ÍP•” ÍQ” ÍQ” ÍQ” ÍQ” ÍQ—” ÍR” ÍR” ÍR” ÍR” ÍR” ÍR” ÍR’” ÍS” ÍS“” ÍT” ÍT” ÍT–” ÍU” ÍU” ÍU” ÍU” ÍU” ÍU’” ÍV” ÍV•” ÍW” ÍW” ÍW” ÍW” ÍW%—” ÍX” ÍX” ÍX” ÍX” ÍX”% ÍX%”& ÍX&’” ÍY” ÍY•” ÍZ” ÍZ” ÍZ” ÍZ” ÍZ!Ÿ” Í[” Í[” Í[”! Í[!”" Í["”& Í[&”6 Í[6”7 Í[7”Ìo Í[Ìo”Ìq Í[Ìq”Ìr Í[Ìr”Ìs Í[Ìs”Ìt Í[Ìt”Ìu Í[Ìu”Ìv Í[Ìv’” Í\” Í\“” Í]” Í]” Í]–” Í^” Í^” Í^” Í^”! Í^!”" Í^"’” Í_” Í_•” Í`” Í`” Í`” Í`” Í`—” Ía” Ía” Ía” Ía” Ía” Ía” Ía’” Íb” Íb“” Íc” Íc” Íc–” Íd” Íd” Íd” Íd” Íd” Íd’” Íe” Íe”” Íf”	 Íf	”
- Íf
-” Íf—” Íg” Íg” Íg” Íg” Íg”' Íg'”) Íg)’” Íh” Íh‘”	 Íi	š” Íj” Íj” Íj” Íj”$ Íj$”% Íj%”0 Íj0”1 Íj1”6 Íj6”7 Íj7—” Ík” Ík” Ík” Ík” Ík” Ík” Ík”” Íl” Íl” Íl” Íl”” Ím” Ím” Ím” Ím”” Ín” Ín” Ín” Ín—”	 Ío	”
- Ío
-” Ío” Ío” Ío” Ío” Ío’” Íp” Íp‘”	 Íq	—” Ír” Ír” Ír” Ír” Ír” Ír” Ír” Ís” Ís” Ís” Ís” Ís” Ís”' Ís'”( Ís(”3 Ís3”4 Ís4”7 Ís7”< Ís<”> Ís>”Ì@ ÍsÌ@™” Ít” Ít” Ít” Ít” Ít” Ít” Ít”  Ít ”! Ít!‘”	 Íu	—” Ív” Ív” Ív” Ív”  Ív ”" Ív"”# Ív#˜” Íw” Íw” Íw”" Íw"”# Íw#”' Íw'”) Íw)”* Íw*”” Íx” Íx” Íx” Íx’” Íy” Íy’” Íz”	 Íz	—” Í{” Í{” Í{” Í{” Í{”' Í{'”) Í{)’” Í|” Í|‘”	 Í}	—” Í~” Í~” Í~” Í~” Í~” Í~” Í~š” Í” Í” Í” Í”$ Í$”% Í%”0 Í0”1 Í1”6 Í6”7 Í7˜” Í€” Í€” Í€” Í€” Í€”# Í€#”( Í€(”* Í€*’” Í” Í‘”	 Í‚	˜” Íƒ” Íƒ” Íƒ”" Íƒ"”# Íƒ#”( Íƒ(”* Íƒ*”+ Íƒ+’” Í„” Í„’” Í…” Í…—” Í†” Í†” Í†” Í†” Í†”' Í†'”) Í†)’” Í‡” Í‡‘”	 Íˆ	“” Í‰” Í‰” Í‰”” ÍŠ” ÍŠ” ÍŠ” ÍŠ”” Í‹” Í‹” Í‹” Í‹›”	 ÍŒ	”
- ÍŒ
-” ÍŒ” ÍŒ”! ÍŒ!”" ÍŒ"”- ÍŒ-”. ÍŒ.”3 ÍŒ3”4 ÍŒ4”6 ÍŒ6’” Í” Í‘”	 Í	—” Í” Í” Í” Í” Í” Í” Íš” Í” Í” Í”" Í"”# Í#”' Í'”( Í(”) Í)”* Í*”+ Í+˜” Í‘” Í‘” Í‘”" Í‘"”# Í‘#”' Í‘'”) Í‘)”* Í‘*”” Í’” Í’” Í’” Í’–” Í“” Í“” Í“”  Í“ ”" Í“"”# Í“#˜” Í”” Í”” Í””" Í”"”# Í”#”( Í”(”* Í”*”+ Í”+™” Í•” Í•” Í•”" Í•"”# Í•#”& Í•&”) Í•)”+ Í•+”, Í•,–” Í–” Í–” Í–” Í–”$ Í–$”& Í–&Ÿ” Í—” Í—” Í—”$ Í—$”% Í—%”2 Í—2”3 Í—3”8 Í—8”; Í—;”ÌD Í—ÌD”ÌE Í—ÌE”ÌR Í—ÌR”ÌS Í—ÌS”Ìf Í—Ìf”Ìg Í—Ìg˜” Í˜” Í˜” Í˜”$ Í˜$”% Í˜%”7 Í˜7”9 Í˜9”: Í˜:Ü ” Í™” Í™” Í™”( Í™(”+ Í™+”9 Í™9”: Í™:”ÌC Í™ÌC”ÌD Í™ÌD”ÌK Í™ÌK”ÌM Í™ÌM”ÌN Í™ÌN”ÌR Í™ÌR”ÌS Í™ÌS”ÌV Í™ÌU”ÌX Í™ÌW—” Íš” Íš” Íš”& Íš&”) Íš)”. Íš.”/ Íš/”” Í›” Í›” Í›” Í›‘”	 Íœ	’” Í” Í”” Í” Í”	 Í	” Í—” ÍŸ” ÍŸ” ÍŸ” ÍŸ” ÍŸ”' ÍŸ'”) ÍŸ)’” Í ” Í ‘”	 Í¡	š” Í¢” Í¢” Í¢” Í¢”$ Í¢$”% Í¢%”0 Í¢0”1 Í¢1”6 Í¢6”7 Í¢7“” Í£” Í£” Í£”” Í¤” Í¤” Í¤” Í¤”” Í¥” Í¥” Í¥” Í¥”” Í¦” Í¦” Í¦” Í¦—”	 Í§	”
- Í§
-” Í§” Í§” Í§” Í§” Í§’” Í¨” Í¨‘”	 Í©	–” Íª” Íª” Íª”# Íª#”% Íª%”& Íª&˜” Í«” Í«” Í«” Í«”# Í«#”& Í«&”* Í«*”+ Í«+š” Í¬” Í¬” Í¬”" Í¬"”# Í¬#”' Í¬'”( Í¬(”2 Í¬2”3 Í¬3”4 Í¬4–” Í­” Í­” Í­”" Í­"”$ Í­$”% Í­%’” Í®” Í®”” Í¯” Í¯” Í¯” Í¯0˜” Í°” Í°” Í°”% Í°%”& Í°&”. Í°.”/ Í°/”0 Í°0’” Í±” Í±”” Í²”
- Í²
-” Í²” Í²-˜” Í³” Í³” Í³”" Í³"”# Í³#”+ Í³+”, Í³,”- Í³-’” Í´” Í´”” Íµ” Íµ” Íµ” Íµ.˜” Í¶” Í¶” Í¶”# Í¶#”$ Í¶$”, Í¶,”- Í¶-”. Í¶.’” Í·” Í·”” Í¸”
- Í¸
-” Í¸” Í¸-˜” Í¹” Í¹” Í¹”" Í¹"”# Í¹#”+ Í¹+”, Í¹,”- Í¹-’” Íº” Íº”” Í»” Í»” Í»” Í».˜” Í¼” Í¼” Í¼”# Í¼#”$ Í¼$”, Í¼,”- Í¼-”. Í¼.’” Í½” Í½”” Í¾” Í¾” Í¾” Í¾3˜” Í¿” Í¿” Í¿”( Í¿(”) Í¿)”1 Í¿1”2 Í¿2”3 Í¿3’” ÍÀ” ÍÀ”” ÍÁ” ÍÁ” ÍÁ” ÍÁÌB˜” ÍÂ” ÍÂ” ÍÂ”# ÍÂ#”$ ÍÂ$”, ÍÂ,”- ÍÂ-”. ÍÂ.’” ÍÃ” ÍÃ”” ÍÄ” ÍÄ” ÍÄ” ÍÄ0˜” ÍÅ” ÍÅ” ÍÅ”% ÍÅ%”& ÍÅ&”. ÍÅ.”/ ÍÅ/”0 ÍÅ0’” ÍÆ” ÍÆ”” ÍÇ”
- ÍÇ
-” ÍÇ” ÍÇ-˜” ÍÈ” ÍÈ” ÍÈ”" ÍÈ"”# ÍÈ#”+ ÍÈ+”, ÍÈ,”- ÍÈ-’” ÍÉ” ÍÉ”” ÍÊ”
- ÍÊ
-” ÍÊ” ÍÊ-˜” ÍË” ÍË” ÍË”" ÍË"”# ÍË#”+ ÍË+”, ÍË,”- ÍË-’” ÍÌ” ÍÌ”” ÍÍ” ÍÍ” ÍÍ” ÍÍ0˜” ÍÎ” ÍÎ” ÍÎ”% ÍÎ%”& ÍÎ&”. ÍÎ.”/ ÍÎ/”0 ÍÎ0’” ÍÏ” ÍÏ”” ÍĞ” ÍĞ” ÍĞ” ÍĞ/˜” ÍÑ” ÍÑ” ÍÑ”$ ÍÑ$”% ÍÑ%”- ÍÑ-”. ÍÑ.”/ ÍÑ/’” ÍÒ” ÍÒ’” ÍÓ” ÍÓ—” ÍÔ” ÍÔ” ÍÔ”. ÍÔ.”1 ÍÔ1”3 ÍÔ3”4 ÍÔ4’” ÍÕ” ÍÕ’” ÍÖ” ÍÖ—” Í×” Í×” Í×”+ Í×+”. Í×.”0 Í×0”1 Í×1’” ÍØ” ÍØ’” ÍÙ” ÍÙ—” ÍÚ” ÍÚ” ÍÚ”, ÍÚ,”/ ÍÚ/”1 ÍÚ1”2 ÍÚ2’” ÍÛ” ÍÛ’” ÍÜ” ÍÜ—” Íİ” Íİ” Íİ”+ Íİ+”. Íİ.”0 Íİ0”1 Íİ1’” ÍŞ” ÍŞ’” Íß” Íß—” Íà” Íà” Íà”, Íà,”/ Íà/”1 Íà1”2 Íà2’” Íá” Íá’” Íâ” Íâ—” Íã” Íã” Íã”1 Íã1”4 Íã4”6 Íã6”7 Íã7’” Íä” Íä’” Íå” Íå—” Íæ” Íæ” Íæ”, Íæ,”/ Íæ/”1 Íæ1”2 Íæ2’” Íç” Íç’” Íè” Íè—” Íé” Íé” Íé”. Íé.”1 Íé1”3 Íé3”4 Íé4’” Íê” Íê’” Íë” Íë—” Íì” Íì” Íì”+ Íì+”. Íì.”0 Íì0”1 Íì1’” Íí” Íí’” Íî” Íî—” Íï” Íï” Íï”+ Íï+”. Íï.”0 Íï0”1 Íï1’” Íğ” Íğ’” Íñ” Íñ—” Íò” Íò” Íò”. Íò.”1 Íò1”3 Íò3”4 Íò4’” Íó” Íó’” Íô” Íô—” Íõ” Íõ” Íõ”- Íõ-”0 Íõ0”2 Íõ2”3 Íõ3’” Íö” Íö‘” Í÷–”  Íø ” Íø” Íø” Íø<”! ÍøÌ@”" ÍøÌAš”  Íù ” Íù” Íù”" Íù=”/ ÍùÌJ”0 ÍùÌc”ÌP ÍùÌƒ”ÌR ÍùÌ…”ÌU ÍùÌ ”ÌW ÍùÌ¢”” Íú” Íú”	 Íú	” Íú—” Íú!” Íú7”! Íú:”% Íú>”3 ÍúÌL”5 ÍúÌN”6 ÍúÌO”” Íû” Íû”! Íû!”" Íû"””  Íü ” Íü” Íü” Íü ˜”  Íş ” Íş”	 Íş	”" Íş"”& Íş&”? Íş?”ÌA ÍşÌA”ÌB ÍşÌBÔrG–§version¤file§sources®sourcesContent¥names¨mappingsÀ‘À‘ÀÜÏ‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
- ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘”  ÌÙ ‘”  ÌÚ ‘”  ÌÛ ‘”  ÌÜ ‘”  Ìİ ‘”  ÌŞ ‘”  Ìß ‘”  Ìà ‘”  Ìá ‘”  Ìâ ‘”  Ìã ‘”  Ìä ‘”  Ìå ‘”  Ìæ ‘”  Ìç ‘”  Ìè ‘”  Ìé ‘”  Ìê ‘”  Ìë ‘”  Ìì ‘”  Ìí ‘”  Ìî ‘”  Ìï ‘”  Ìğ ‘”  Ìñ ‘”  Ìò ‘”  Ìó ‘”  Ìô ‘”  Ìõ ‘”  Ìö ‘”  Ì÷ ‘”  Ìø ‘”  Ìù ‘”  Ìú ‘”  Ìû ‘”  Ìü ‘”  Ìı ‘”  Ìş ‘”  Ìÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
- ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘”  Í ‘”  Í€ ‘”  Í ‘”  Í‚ ‘”  Íƒ ‘”  Í„ ‘”  Í… ‘”  Í† ‘”  Í‡ ‘”  Íˆ ‘”  Í‰ ‘”  ÍŠ ‘”  Í‹ ‘”  ÍŒ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í‘ ‘”  Í’ ‘”  Í“ ‘”  Í” ‘”  Í• ‘”  Í– ‘”  Í— ‘”  Í˜ ‘”  Í™ ‘”  Íš ‘”  Í› ‘”  Íœ ‘”  Í ‘”  Í ‘”  ÍŸ ‘”  Í  ‘”  Í¡ ‘”  Í¢ ‘”  Í£ ‘”  Í¤ ‘”  Í¥ ‘”  Í¦ ‘”  Í§ ‘”  Í¨ ‘”  Í© ‘”  Íª ‘”  Í« ‘”  Í¬ ‘”  Í­ ‘”  Í® ‘”  Í¯ ‘”  Í° ‘”  Í± ‘”  Í² ‘”  Í³ ‘”  Í´ ‘”  Íµ ‘”  Í¶ ‘”  Í· ‘”  Í¸ ‘”  Í¹ ‘”  Íº ‘”  Í» ‘”  Í¼ ‘”  Í½ ‘”  Í¾ ‘”  Í¿ ‘”  ÍÀ ‘”  ÍÁ ‘”  ÍÂ ‘”  ÍÃ ‘”  ÍÄ ‘”  ÍÅ ‘”  ÍÆ ‘”  ÍÇ ‘”  ÍÈ ‘”  ÍÉ ‘”  ÍÊ ‘”  ÍË ‘”  ÍÌ ‘”  ÍÍ ‘”  ÍÎ ‘”  ÍÏ ‘”  ÍĞ ‘”  ÍÑ ‘”  ÍÒ ‘”  ÍÓ ‘”  ÍÔ ‘”  ÍÕ ‘”  ÍÖ ‘”  Í× ‘”  ÍØ ‘”  ÍÙ ‘”  ÍÚ ‘”  ÍÛ ‘”  ÍÜ ‘”  Íİ ‘”  ÍŞ ‘”  Íß ‘”  Íà ‘”  Íá ‘”  Íâ ‘”  Íã ‘”  Íä ‘”  Íå ‘”  Íæ ‘”  Íç ‘”  Íè ‘”  Íé ‘”  Íê ‘”  Íë ‘”  Íì ‘”  Íí ‘”  Íî ‘”  Íï ‘”  Íğ ‘”  Íñ ‘”  Íò ‘”  Íó ‘”  Íô ‘”  Íõ ‘”  Íö ‘”  Í÷ ‘”  Íø ‘”  Íù ‘”  Íú ‘”  Íû ‘”  Íü ‘”  Íı ‘”  Íş ‘”  Íÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
- ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘”  Í ‘”  Í€ ‘”  Í ‘”  Í‚ ‘”  Íƒ ‘”  Í„ ‘”  Í… ‘”  Í† ‘”  Í‡ ‘”  Íˆ ‘”  Í‰ ‘”  ÍŠ ‘”  Í‹ ‘”  ÍŒ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í‘ ‘”  Í’ ‘”  Í“ ‘”  Í” ‘”  Í• ‘”  Í– ‘”  Í— ‘”  Í˜ ‘”  Í™ ‘”  Íš ‘”  Í› ‘”  Íœ ‘”  Í ‘”  Í ‘”  ÍŸ ‘”  Í  ‘”  Í¡ ‘”  Í¢ ‘”  Í£ ‘”  Í¤ ‘”  Í¥ ‘”  Í¦ ‘”  Í§ ‘”  Í¨ ‘”  Í© ‘”  Íª ‘”  Í« ‘”  Í¬ ‘”  Í­ ‘”  Í® ‘”  Í¯ ‘”  Í° ‘”  Í± ‘”  Í² ‘”  Í³ ‘”  Í´ ‘”  Íµ ‘”  Í¶ ‘”  Í· ‘”  Í¸ ‘”  Í¹ ‘”  Íº ‘”  Í» ‘”  Í¼ ‘”  Í½ ‘”  Í¾ ‘”  Í¿ ‘”  ÍÀ ‘”  ÍÁ ‘”  ÍÂ ‘”  ÍÃ ‘”  ÍÄ ‘”  ÍÅ ‘”  ÍÆ ‘”  ÍÇ ‘”  ÍÈ ‘”  ÍÉ ‘”  ÍÊ ‘”  ÍË ‘”  ÍÌ ‘”  ÍÍ ‘”  ÍÎ ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ[ñÍ\3À‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍ[úÍ\0ÔrL”¤type¥start£end¤nameªIdentifierÍ[úÍ\¹getBackgroundAudioManagerLªIdentifierÍ\Í\0¹getBackgroundAudioManagerÀ™ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration +‘ÔrN”¤type¥start£end¥local¶ImportDefaultSpecifierLªIdentifier¥audioÔrO•¤type¥start£end¥value£raw§Literal*¶@ohos.multimedia.audio¸"@ohos.multimedia.audio"M±ImportDeclaration-Ì`‘N¶ImportDefaultSpecifier4=LªIdentifier4=©avSessionO§LiteralÌCÌ_º@ohos.multimedia.avsession¼"@ohos.multimedia.avsession"M±ImportDeclarationÌbÌ³‘N¶ImportDefaultSpecifierÌiÌ~LªIdentifierÌiÌ~µbackgroundTaskManagerO§LiteralÌ„Ì²Ù,@ohos.resourceschedule.backgroundTaskManagerÙ."@ohos.resourceschedule.backgroundTaskManager"M±ImportDeclarationÌµÌØ‘N¶ImportDefaultSpecifierÌ¼ÌÂLªIdentifierÌ¼ÌÂ¦fileIoO§LiteralÌÈÌ×­@ohos.file.fs¯"@ohos.file.fs"M±ImportDeclarationÌÚÍ‘ÔrP•¤type¥start£end¨imported¥local¯ImportSpecifierÌãÌîLªIdentifierÌãÌî«getRealPathLªIdentifierÌãÌî«getRealPathO§LiteralÌöÍ»@dcloudio/uni-app-framework½"@dcloudio/uni-app-framework"M±ImportDeclarationÍÍA‘N¶ImportDefaultSpecifierÍÍ"LªIdentifierÍÍ"¥mediaO§LiteralÍ(Í@¶@ohos.multimedia.media¸"@ohos.multimedia.media"M±ImportDeclarationÍCÍ“P¯ImportSpecifierÍLÍOLªIdentifierÍLÍO£UTSLªIdentifierÍLÍO£UTSP¯ImportSpecifierÍQÍ[LªIdentifierÍQÍ[ªUTSHarmonyLªIdentifierÍQÍ[ªUTSHarmonyP¯ImportSpecifierÍ]ÍjLªIdentifierÍ]Íj­defineSyncApiLªIdentifierÍ]Íj­defineSyncApiO§LiteralÍrÍ»@dcloudio/uni-app-framework½"@dcloudio/uni-app-framework"M±ImportDeclarationÍ’Í®‘N¶ImportDefaultSpecifierÍ™ÍœLªIdentifierÍ™Íœ£uriO§LiteralÍ¢Í­©@ohos.uri«"@ohos.uri"M±ImportDeclarationÍ°Íä‘N¶ImportDefaultSpecifierÍ·ÍÀLªIdentifierÍ·ÍÀ©wantAgentO§LiteralÍÆÍã»@ohos.app.ability.wantAgent½"@ohos.app.ability.wantAgent"
