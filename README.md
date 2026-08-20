@@ -19,12 +19,11 @@
 
 </div>
 
-> 💡 **HBuilderX 版本建议与下载**
+> 💡 **HBuilderX 版本建议**
 >
-> - **不想升级 HBuilderX 版本**：请切换 **VDOM 模式**（`manifest.json` 中 `"vapor": false`），**HBuilderX 5.15 及之后版本** 均可稳定运行；
-> - **建议升级后使用 Vapor 蒸汽模式**：推荐 **HBuilderX 5.24 及以上版本**（可完整体验与使用无虚拟 DOM 高性能原生渲染）。
->
-> 📥 **HBuilderX 5.15 下载地址**：[https://wwbsy.lanzoue.com/b01eupb32d](https://wwbsy.lanzoue.com/b01eupb32d) （密码：`4xdv`）
+> - 推荐使用 **HBuilderX 5.21 及以上版本**：全面支持 **Android / iOS / 鸿蒙三端蒸汽（Vapor）模式**；
+> - 最好升级至最新 **HBuilderX 5.24 版本**，完整体验无虚拟 DOM 高性能原生渲染；
+> - 旧版本可切换 **VDOM 模式**（`manifest.json` 中 `"vapor": false`）稳定运行。
 
 > ⚡ **渲染模式与 UI 组件库重要说明**
 >
@@ -257,7 +256,7 @@ pnpm build:h5
 
 - Node >= 22
 - pnpm >= 7.30
-- HBuilderX >= 5.15（不想升级 HBuilderX 请切换 VDOM 模式，5.15+ 即可；建议升级至 **HBuilderX 5.24** 后使用 Vapor 蒸汽模式）
+- HBuilderX >= 5.21（全面支持三端 Vapor 蒸汽模式；建议升级至最新 **HBuilderX 5.24**；旧版本可切换 VDOM 模式运行）
 - Vue Official >= 2.1.10
 - TypeScript >= 5.0
 - JDK >= 17（Android 平台）
@@ -322,7 +321,6 @@ unibestX/
 │       ├── toast.uts         #   全局 Toast 轻提示
 │       ├── systemInfo.uts    #   屏幕与系统信息获取
 │       ├── backPress.uts     #   Android 物理返回键双击退出
-│       ├── env.uts           #   多环境配置管理
 │       ├── toLoginPage.uts   #   跳转登录页逻辑封装
 │       └── i18n.uts          #   多语言辅助工具
 ├── uni_modules/              # uni-app 扩展插件模块
@@ -424,6 +422,31 @@ uni-app x 推出了新一代的 **蒸汽模式（Vapor）**。新版渲染引擎
 - 中间凸起按钮（如 AI 入口）
 - 角标显示
 - 动态主题色
+
+### 主题切换（暗黑模式）
+
+内置三种外观模式：`auto`（跟随系统）/ `light`（浅色）/ `dark`（深色），入口位于「基础」页的主题切换卡片（`src/pages/basic/components/ThemeSwitchCard.uvue`），状态管理在 `src/store/app.uts`。
+
+各端跟随机制：
+
+- **App（Android / iOS / 鸿蒙）**：`auto` 模式监听 `uni.onOsThemeChange` 实时跟随系统深浅色；手动 `light` / `dark` 通过 `uni.setAppTheme` + `uni.onAppThemeChange` 生效。注意 Android 10+ / iOS 13+ 系统才支持深色模式。
+- **H5**：通过 `prefers-color-scheme` 媒体查询监听系统深浅色。
+- **微信小程序**：读取宿主主题 `hostTheme`，`auto` 模式监听 `uni.onHostThemeChange` 跟随微信宿主主题。
+
+颜色配置采用**单源**方案：
+
+- 根目录 `theme.json` 定义 `light` / `dark` 两套色板（导航栏、TabBar、页面背景等）；
+- `pages.json` 通过 `@` 变量引用（如 `"navigationBarBackgroundColor": "@navigationBarBackgroundColor"`），驱动原生导航栏 / TabBar / 页面背景；
+- 自定义组件（NavBar、TabBar、全局容器）通过 `src/utils/theme.uts` 的 `getThemeTokens()` 读取同一份色板，保证与原生配置一致。
+
+> 💡 **修改 `light` / `dark` 主题配色，请统一在根目录 `theme.json` 中配置**（单源维护，`pages.json` 与自定义组件自动同步生效，勿在页面或组件中写死颜色）。
+
+> 💡 **全局导航栏如何跟随主题**：uni-app X 没有「运行时全局 navbar 配置」API，原生导航栏样式属于**编译期静态配置**（`pages.json` 的 `@变量`）。运行时切换主题时，由 `src/utils/theme.uts` 的 `applyNavbarTheme()` 同步（挂载在全局根包裹组件 `App.ku.uvue` 的 `onShow` 与主题监听上，每个页面切换都会触发）：H5 直接修改 `uni-page-head` 的 DOM 样式（背景 / 文字 / 按钮色）；微信小程序无 DOM，走官方 `uni.setNavigationBarColor`；App 端由 `uni.setAppTheme` 系统级切换，自动跟随。`navigationStyle: custom` 的页面没有 `uni-page-head`，H5 自动跳过。
+
+⚠️ **平台限制说明**：
+
+- 小程序原生导航栏背景色 `navigationBarBackgroundColor` 支持 `@theme.json` 变量，**真机可正常随主题切换**，但微信开发者工具模拟器可能无法正确预览深色效果，**以真机效果为准**（真机跟随微信「我 → 设置 → 通用 → 深色模式」）。
+- 微信小程序端 `uni.setNavigationBarColor` 的 `frontColor` 仅支持 `#ffffff` / `#000000`，自定义导航栏文字颜色请通过组件 props 传入（`src/components/NavBar/NavBar.uvue`）。
 
 ### 路由守卫
 

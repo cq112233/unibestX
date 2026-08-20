@@ -1,6 +1,6 @@
 <template>
-  <!-- 应用全局骨架与皮肤容器，通过 CSS 变量绑定响应式主题色 -->
-  <view class="flex flex-col flex-1" style="flex: 1;" :style="{ '--theme-color': appStore.state.theme }">
+  <!-- 应用全局骨架与皮肤容器，通过 CSS 变量绑定响应式主题色 / 暗黑模式 -->
+  <view class="root-container flex flex-col flex-1" style="flex: 1;" :style="themeStyle">
     <!-- 页面内容滚动容器 -->
     <scroll-view direction="vertical" class="flex-1" style="flex: 1;">
       <slot></slot>
@@ -17,11 +17,25 @@ import Tabbar from '@/src/tabbar/index.uvue';
 import { useAppStore } from '@/src/store';
 import { isPageTabbar, syncCurIdxByCurrentPage } from '@/src/tabbar/store';
 import { registerToast, unregisterToast } from '@/src/utils/toast';
+import { applyNavbarTheme, getThemeTokens } from '@/src/utils/theme';
 import type { ComponentPublicInstance } from 'vue';
-import { nextTick, onBeforeMount, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeMount, onMounted, onUnmounted, ref, watch } from 'vue';
 
 // 激活应用状态管理 Store
 const appStore = useAppStore();
+
+// 主题样式变量：亮 / 暗两套，跟随 appStore.state.isDark 响应式切换
+const themeStyle = computed((): UTSJSONObject => {
+  const dark = appStore.state.isDark;
+  return {
+    '--theme-color': appStore.state.theme,
+    '--bg-color': getThemeTokens(dark).bgContent,
+    '--text-color': dark ? '#e2e8f0' : '#1e293b',
+    '--text-secondary': dark ? '#94a3b8' : '#64748b',
+    '--card-bg': dark ? '#1e293b' : '#ffffff',
+    '--border-color': dark ? '#334155' : '#e2e8f0'
+  } as UTSJSONObject;
+});
 
 // 控制当前页面是否需要显示底部导航栏
 const isCurrentPageTabbar = ref(false);
@@ -73,4 +87,23 @@ onUnmounted(() => {
     unregisterToast(uToastRef.value!);
   }
 });
+
+// 每个页面切换都会触发：同步 H5 / 小程序原生导航栏主题
+onShow(() => {
+  if (uToastRef.value != null) {
+    registerToast(uToastRef.value!);
+  }
+  applyNavbarTheme(appStore.state.isDark);
+});
+
+// 主题模式 / 系统深浅色变化时，当前页面不切换也实时同步导航栏
+watch(() => appStore.state.isDark, () => {
+  applyNavbarTheme(appStore.state.isDark);
+});
 </script>
+
+<style lang="scss" scoped>
+.root-container {
+  background-color: var(--bg-color, #f5f6fa);
+}
+</style>

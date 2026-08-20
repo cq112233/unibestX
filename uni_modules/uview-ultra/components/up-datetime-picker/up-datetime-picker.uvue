@@ -300,24 +300,25 @@
 				values.push(formatterFunc('second', secondVal))
 			}
 		} else {
-			const date = new Date(value.toString())
+			const date = typeof value === 'number' ? new Date(value as number) : new Date(value.toString())
+			const validDate = isNaN(date.getTime()) ? new Date() : date
 			values = [
-				formatterFunc('year', `${dayuts(value).year()}`),
+				formatterFunc('year', `${validDate.getFullYear()}`),
 				// 月份补0
-				formatterFunc('month', padZero(dayuts(value).month() + 1))
+				formatterFunc('month', padZero(validDate.getMonth() + 1))
 			]
 			if (props.mode === 'date' || props.mode === 'datehour' || props.mode === 'datetime' || props.mode === 'datetimesecond') {
 				// date模式，需要添加天列
-				values.push(formatterFunc('day', padZero(dayuts(value).date())))
+				values.push(formatterFunc('day', padZero(validDate.getDate())))
 			}
 			if (props.mode === 'datehour' || props.mode === 'datetime' || props.mode === 'datetimesecond') {
-				values.push(formatterFunc('hour', padZero(dayuts(value).hour())))
+				values.push(formatterFunc('hour', padZero(validDate.getHours())))
 			}
 			if (props.mode === 'datetime' || props.mode === 'datetimesecond') {
-				values.push(formatterFunc('minute', padZero(dayuts(value).minute())))
+				values.push(formatterFunc('minute', padZero(validDate.getMinutes())))
 			}
 			if (props.mode === 'datetimesecond') {
-				values.push(formatterFunc('second', padZero(dayuts(value).second())))
+				values.push(formatterFunc('second', padZero(validDate.getSeconds())))
 			}
 		}
 	
@@ -325,7 +326,7 @@
 		let indexs: Array<number> = []
 		columns.value.forEach((column: string[], index: number) => {
 			const targetVal = index < values.length ? values[index] : ''
-			indexs.push(Math.max(0, column.findIndex((item: string) => item === targetVal)))
+			indexs.push(Math.max(0, column.findIndex((item: string): boolean => item == targetVal)))
 		});
 		// const indexs = this.columns.map((column: any[], index: number): number => {
 		// 	// 通过取大值，可以保证不会出现找不到索引的-1情况
@@ -553,6 +554,7 @@
 	function updateColumnValue(value: any) {
 		innerValue.value = value
 		updateColumns()
+		updateIndexs(value)
 		// 延迟执行，等待up-picker组件列数据更新完后再设置选中值索引
 		// 用nextTick包裹确保columns已更新到DOM后再设置索引
 		nextTick(() => {
@@ -831,6 +833,7 @@
 				showByClickInput.value = false
 			}
 			if (newValue) {
+				innerValue.value = correctValue(props.modelValue)
 				updateColumnValue(innerValue.value)
 				// 弹窗打开时，原生picker-view需要一定时间完成渲染，在Android/HarmonyOS端
 				// 仅靠updateColumnValue中的nextTick不足以保证索引设置成功，需额外兜底
@@ -839,24 +842,10 @@
 				}, 150)
 			}
 		})
-		// watch((): any => props.modelValue, () => {
-		// 	init();
-		// })
-		// watch(
-		// 	(): Array<any|null> => [
-		// 		props.mode,
-		// 		props.maxDate,
-		// 		props.minDate,
-		// 		props.minHour,
-		// 		props.maxHour,
-		// 		props.minMinute,
-		// 		props.maxMinute,
-		// 		props.filter
-		// 	],
-		// 	() => {
-		// 		init();
-		// 	}
-		// )
+		watch((): any => props.modelValue, (newVal: any) => {
+			innerValue.value = correctValue(newVal)
+			updateColumnValue(innerValue.value)
+		})
 		
 		// 初始化
 		init();

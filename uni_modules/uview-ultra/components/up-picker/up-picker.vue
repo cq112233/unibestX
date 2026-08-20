@@ -1,5 +1,5 @@
 <template>
-  <view class="up-picker-wrapper">
+  <view class="up-picker-warrper">
     <view
       v-if="hasInput"
       class="up-picker-input cursor-pointer"
@@ -7,7 +7,7 @@
     >
       <slot>
         <view>
-          {{ inputLabel.length > 0 ? inputLabel.join('/') : placeholder }}
+          {{ inputLabel && inputLabel.length ? inputLabel.join('/') : placeholder }}
         </view>
       </slot>
     </view>
@@ -33,11 +33,13 @@
             <slot name="toolbar-right"></slot>
           </template>
         </up-toolbar>
-        <slot name="toolbar-bottom"></slot>
+        <view v-if="toolbarBottomSlot">
+          <slot name="toolbar-bottom"></slot>
+        </view>
 
-        <!-- 自定义高保真滚动选择器区域 -->
+        <!-- #ifdef APP -->
+        <!-- App 原生端（iOS / Android）：使用用户原生平滑滚动容器 -->
         <view class="up-picker__body" :style="{ height: pickerViewHeight }">
-          <!-- 中间选中高亮边框 -->
           <view
             class="up-picker__indicator"
             :style="{
@@ -45,20 +47,14 @@
               height: addUnit(itemHeight)
             }"
           ></view>
-
-          <!-- 顶部渐变遮罩 -->
           <view
             class="up-picker__mask up-picker__mask--top"
             :style="{ height: indicatorTop }"
           ></view>
-
-          <!-- 底部渐变遮罩 -->
           <view
             class="up-picker__mask up-picker__mask--bottom"
             :style="{ height: indicatorTop }"
           ></view>
-
-          <!-- 列滚动容器 -->
           <view class="up-picker__columns">
             <scroll-view
               v-for="(column, colIndex) in innerColumns"
@@ -70,10 +66,7 @@
               @scroll="onColumnScroll($event, colIndex)"
               @touchend="onColumnTouchEnd(colIndex)"
             >
-              <!-- 顶部占位，使第一项居中 -->
               <view :style="{ height: indicatorTop }"></view>
-
-              <!-- 选项列表 -->
               <view
                 v-for="(item, itemIndex) in column"
                 :key="itemIndex"
@@ -93,14 +86,52 @@
                   {{ getItemText(item) }}
                 </text>
               </view>
-
-              <!-- 底部占位，使最后一项居中 -->
               <view :style="{ height: indicatorTop }"></view>
             </scroll-view>
           </view>
         </view>
+        <!-- #endif -->
 
-        <view v-if="loading" class="up-picker--loading">
+        <!-- #ifndef APP -->
+        <!-- 非 App 平台（微信小程序 / H5 / Web 等）：使用标准原生 3D 滚轮 picker-view -->
+        <picker-view
+          class="up-picker__view"
+          :indicator-style="`height: ${addUnit(itemHeight)}`"
+          :value="innerIndex"
+          :immediate-change="immediateChange"
+          :style="{ height: pickerViewHeight }"
+          @change="changeHandler"
+        >
+          <picker-view-column
+            v-for="(column, colIndex) in innerColumns"
+            :key="colIndex"
+            class="up-picker__view__column"
+          >
+            <view
+              v-for="(item, itemIndex) in column"
+              :key="itemIndex"
+              class="up-picker__view__column__item up-line-1"
+              :style="{ height: addUnit(itemHeight) }"
+            >
+              <text
+                class="up-picker__view__column__item__text"
+                :style="{
+                  lineHeight: addUnit(itemHeight),
+                  color: (innerIndex.length > colIndex && itemIndex == innerIndex[colIndex]) ? '#303133' : '#606266',
+                  fontWeight: (innerIndex.length > colIndex && itemIndex == innerIndex[colIndex]) ? 'bold' : 'normal',
+                }"
+              >
+                {{ getItemText(item) }}
+              </text>
+            </view>
+          </picker-view-column>
+        </picker-view>
+        <!-- #endif -->
+
+        <view
+          v-if="loading"
+          class="up-picker--loading"
+        >
           <up-loading-icon mode="circle"></up-loading-icon>
         </view>
       </view>
@@ -113,7 +144,7 @@ import props from './props.js'
 import mpMixin from '../../libs/mixin/mpMixin.js'
 import mixin from '../../libs/mixin/mixin.js'
 import test from '../../libs/function/test.js'
-import { addUnit, deepClone } from '../../libs/function/index.js'
+import { addUnit } from '../../libs/function/index.js'
 
 export default {
 	name: 'up-picker',
@@ -145,6 +176,9 @@ export default {
 		show(val) {
 			if (val) {
 				this.setColumns(this.columns)
+				if (this.defaultIndex && this.defaultIndex.length > 0) {
+					this.setIndexs(this.defaultIndex, true)
+				}
 				this.$nextTick(() => {
 					this.syncScrollPositions()
 				})
@@ -193,6 +227,7 @@ export default {
 	},
 	methods: {
 		addUnit,
+		testArray: test.array,
 		getItemText(item) {
 			if (test.object(item)) {
 				return item[this.keyName]
@@ -200,57 +235,8 @@ export default {
 				return item != null ? item : ''
 			}
 		},
-		isItemSelected(colIdx, itemIdx) {
-			if (this.innerIndex.length > colIdx) {
-				return this.innerIndex[colIdx] == itemIdx
-			}
-			return itemIdx == 0
-		},
-		syncScrollPositions() {
-			let tops = []
-			for (let i = 0; i < this.innerColumns.length; i++) {
-				const idx = i < this.innerIndex.length ? this.innerIndex[i] : 0
-				tops.push(idx * this.itemHeightNumber)
-			}
-			this.columnScrollTops = tops
-		},
-		onColumnScroll(e, colIndex) {
-			const scrollTop = e.detail.scrollTop
-			const targetIndex = Math.max(0, Math.min(this.innerColumns[colIndex].length - 1, Math.round(scrollTop / this.itemHeightNumber)))
-			if (this.innerIndex.length > colIndex && this.innerIndex[colIndex] != targetIndex) {
-				this.innerIndex[colIndex] = targetIndex
-				this.columnIndex = colIndex
-				this.notifyChange(colIndex, targetIndex)
-			}
-		},
-		onColumnTouchEnd(colIndex) {
-			setTimeout(() => {
-				if (this.innerIndex.length > colIndex) {
-					const idx = this.innerIndex[colIndex]
-					this.columnScrollTops.splice(colIndex, 1, idx * this.itemHeightNumber)
-				}
-			}, 80)
-		},
-		onItemClick(colIndex, itemIndex) {
-			if (this.innerIndex.length > colIndex) {
-				this.innerIndex[colIndex] = itemIndex
-				this.columnScrollTops.splice(colIndex, 1, itemIndex * this.itemHeightNumber)
-				this.columnIndex = colIndex
-				this.notifyChange(colIndex, itemIndex)
-			}
-		},
-		notifyChange(colIdx, changedItemIdx) {
-			const values = this.innerColumns
-			this.setLastIndex(this.innerIndex)
-			this.$emit('update:modelValue', this.inputValue)
-
-			this.$emit('change', {
-				value: this.innerColumns.map((item, index) => item[this.innerIndex[index]]),
-				index: changedItemIdx,
-				indexs: this.innerIndex,
-				values,
-				columnIndex: colIdx
-			})
+		isItemSelected(colIndex, itemIndex) {
+			return this.innerIndex.length > colIndex && this.innerIndex[colIndex] == itemIndex
 		},
 		closeHandler() {
 			if (this.closeOnClickOverlay) {
@@ -271,15 +257,106 @@ export default {
 			if (this.hasInput) {
 				this.showByClickInput = false
 			}
+			let valueOrigin = []
+			for (let index = 0; index < this.innerColumns.length; index++) {
+				const item = this.innerColumns[index]
+				const idx = index < this.innerIndex.length ? this.innerIndex[index] : 0
+				if (idx < item.length) {
+					valueOrigin.push(item[idx])
+				}
+			}
 			this.$emit('confirm', {
 				indexs: this.innerIndex,
-				value: this.innerColumns.map((item, index) => item[this.innerIndex[index]]),
+				value: valueOrigin,
 				values: this.innerColumns
 			})
 		},
-		setIndexs(index, shouldSetLast = true) {
+		onItemClick(colIndex, itemIndex) {
+			if (this.innerIndex.length > colIndex) {
+				this.innerIndex[colIndex] = itemIndex
+				if (this.columnScrollTops.length > colIndex) {
+					this.columnScrollTops.splice(colIndex, 1, itemIndex * this.itemHeightNumber)
+				}
+				this.columnIndex = colIndex
+				this.notifyChange(colIndex, itemIndex)
+			}
+		},
+		onColumnScroll(e, colIndex) {
+			const scrollTop = e.detail.scrollTop
+			const targetIndex = Math.max(0, Math.min(this.innerColumns[colIndex].length - 1, Math.round(scrollTop / this.itemHeightNumber)))
+			if (this.innerIndex.length > colIndex && this.innerIndex[colIndex] != targetIndex) {
+				this.innerIndex[colIndex] = targetIndex
+				this.columnIndex = colIndex
+				this.notifyChange(colIndex, targetIndex)
+			}
+		},
+		onColumnTouchEnd(colIndex) {
+			setTimeout(() => {
+				if (this.innerIndex.length > colIndex && this.columnScrollTops.length > colIndex) {
+					const idx = this.innerIndex[colIndex]
+					this.columnScrollTops.splice(colIndex, 1, idx * this.itemHeightNumber)
+				}
+			}, 80)
+		},
+		notifyChange(colIdx, changedItemIdx) {
+			this.setLastIndex(this.innerIndex)
+			this.$emit('update:modelValue', this.inputValue)
+
+			let valueOrigin = []
+			for (let i = 0; i < this.innerColumns.length; i++) {
+				const col = this.innerColumns[i]
+				const selectedIdx = i < this.innerIndex.length ? this.innerIndex[i] : 0
+				if (selectedIdx < col.length) {
+					valueOrigin.push(col[selectedIdx])
+				}
+			}
+
+			this.$emit('change', {
+				value: valueOrigin,
+				index: changedItemIdx,
+				indexs: this.innerIndex,
+				values: this.innerColumns,
+				columnIndex: colIdx
+			})
+		},
+		changeHandler(e) {
+			const val = e.detail.value
+			let index = 0
+			let colIdx = 0
+			for (let i = 0; i < val.length; i++) {
+				const item = val[i]
+				if (item != (i < this.lastIndex.length ? this.lastIndex[i] : 0)) {
+					colIdx = i
+					index = item
+					break
+				}
+			}
+			this.columnIndex = colIdx
+			this.setLastIndex(val)
+			this.setIndexs(val, false)
+
+			this.$emit('update:modelValue', this.inputValue)
+
+			let valueOrigin = []
+			for (let i = 0; i < this.innerColumns.length; i++) {
+				const col = this.innerColumns[i]
+				const selectedIdx = i < val.length ? val[i] : 0
+				if (selectedIdx < col.length) {
+					valueOrigin.push(col[selectedIdx])
+				}
+			}
+
+			this.$emit('change', {
+				value: valueOrigin,
+				index,
+				indexs: val,
+				values: this.innerColumns,
+				columnIndex: colIdx
+			})
+		},
+		setIndexs(index, shouldSetLast) {
 			if (index != null && index.length > 0) {
-				this.innerIndex = deepClone(index)
+				this.innerIndex = [...index]
 			} else {
 				let newIndexes = []
 				for (let i = 0; i < this.innerColumns.length; i++) {
@@ -292,44 +369,63 @@ export default {
 			}
 			this.syncScrollPositions()
 		},
-		setLastIndex(index) {
-			this.lastIndex = deepClone(index)
-		},
-		setColumnValues(colIdx, values) {
-			this.innerColumns.splice(colIdx, 1, values)
-			this.setLastIndex(this.innerIndex.slice(0, colIdx))
-			let tmpIndex = deepClone(this.innerIndex)
+		syncScrollPositions() {
+			let tops = []
 			for (let i = 0; i < this.innerColumns.length; i++) {
-				if (i > this.columnIndex) {
+				const idx = i < this.innerIndex.length ? this.innerIndex[i] : 0
+				tops.push(idx * this.itemHeightNumber)
+			}
+			this.columnScrollTops = tops
+		},
+		setLastIndex(index) {
+			this.lastIndex = [...index]
+		},
+		setColumnValues(colIndex, values) {
+			this.innerColumns.splice(colIndex, 1, values)
+			this.setLastIndex(this.innerIndex.slice(0, colIndex))
+			let tmpIndex = [...this.innerIndex]
+			for (let i = 0; i < this.innerColumns.length; i++) {
+				if (i > colIndex) {
 					tmpIndex[i] = 0
 				}
 			}
 			this.setIndexs(tmpIndex, false)
 		},
-		getColumnValues(colIdx) {
-			return this.innerColumns[colIdx]
+		getColumnValues(colIndex) {
+			if (colIndex >= 0 && colIndex < this.innerColumns.length) {
+				return this.innerColumns[colIndex]
+			}
+			return []
 		},
 		setColumns(cols) {
 			this.innerColumns = cols
-			let newIndexes = []
-			for (let i = 0; i < cols.length; i++) {
-				if (this.defaultIndex && this.defaultIndex.length > i) {
-					newIndexes.push(this.defaultIndex[i])
-				} else if (this.innerIndex.length > i) {
-					newIndexes.push(this.innerIndex[i])
-				} else {
-					newIndexes.push(0)
+			if (this.innerIndex.length == 0 || this.innerIndex.length != cols.length) {
+				let newIndexes = []
+				for (let i = 0; i < cols.length; i++) {
+					if (this.defaultIndex && this.defaultIndex.length > i) {
+						newIndexes.push(this.defaultIndex[i])
+					} else {
+						newIndexes.push(0)
+					}
 				}
+				this.innerIndex = newIndexes
+				this.setLastIndex(newIndexes)
 			}
-			this.innerIndex = newIndexes
-			this.setLastIndex(newIndexes)
 			this.syncScrollPositions()
 		},
 		getIndexs() {
 			return this.innerIndex
 		},
 		getValues() {
-			return this.innerColumns.map((item, index) => item[this.innerIndex[index]])
+			let res = []
+			for (let index = 0; index < this.innerColumns.length; index++) {
+				const item = this.innerColumns[index]
+				const idx = index < this.innerIndex.length ? this.innerIndex[index] : 0
+				if (idx < item.length) {
+					res.push(item[idx])
+				}
+			}
+			return res
 		}
 	}
 }
@@ -346,6 +442,7 @@ export default {
 		position: relative;
 		overflow: hidden;
 		background-color: #ffffff;
+		width: 100%;
 	}
 
 	&__indicator {
@@ -401,8 +498,30 @@ export default {
 		width: 100%;
 
 		&__text {
-			font-size: 16px;
 			text-align: center;
+		}
+	}
+
+	&__view {
+		width: 100%;
+
+		&__column {
+			@include flex;
+			flex: 1;
+			justify-content: center;
+
+			&__item {
+				@include flex;
+				justify-content: center;
+				align-items: center;
+				width: 100%;
+
+				&__text {
+					font-size: 16px;
+					text-align: center;
+					color: #303133;
+				}
+			}
 		}
 	}
 
