@@ -176,6 +176,7 @@ class Signature {
   redo() {
     if (redoStack.length < 1)
       return null;
+    this._clear();
     const lastPath = UTS.arrayPop(redoStack);
     undoStack.push(lastPath);
     this.isEmpty = false;
@@ -183,9 +184,12 @@ class Signature {
       for (let i = 1; i < undoStack[l].length; i++) {
         const last = undoStack[l][i - 1];
         const point = undoStack[l][i];
-        this.drawLine(point, last, point.w, point.c);
+        const w = point.w != null ? point.w : this.options.penSize;
+        const c = point.c != null ? point.c : this.options.penColor;
+        this.drawLine(point, last, w, c);
       }
     }
+    this._draw();
   }
 }
 export {

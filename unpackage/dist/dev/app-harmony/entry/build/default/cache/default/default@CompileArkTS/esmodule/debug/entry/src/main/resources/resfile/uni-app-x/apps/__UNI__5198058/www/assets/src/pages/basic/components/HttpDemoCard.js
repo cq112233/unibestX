@@ -67,10 +67,11 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
         const list = await getFooList();
         mockList.value = list;
       } catch (err) {
-        uni.__f__("error", "at src/pages/basic/components/HttpDemoCard.uvue:135", "loadMockData error:", err);
+        uni.__f__("error", "at src/pages/basic/components/HttpDemoCard.uvue:134", "loadMockData error:", err);
       }
     }
     async function fetchRealApi() {
+      var _a2, _b;
       loading.value = true;
       requestStatus.value = "loading";
       responseData.value = null;
@@ -80,13 +81,22 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
         responseData.value = res;
         requestStatus.value = "success";
       } catch (err) {
-        uni.__f__("log", "at src/pages/basic/components/HttpDemoCard.uvue:155", err, "err");
+        uni.__f__("log", "at src/pages/basic/components/HttpDemoCard.uvue:154", err, "err");
         requestStatus.value = "error";
-        let errStr = "";
-        if (err !== null) {
-          errStr = UTS.JSON.stringify(err);
+        let msg = "请求失败";
+        if (UTS.isInstanceOf(err, Error)) {
+          msg = err.message;
+        } else if (UTS.isInstanceOf(err, UTSJSONObject)) {
+          const errMsg = (_b = (_a2 = err.getString("message")) !== null && _a2 !== void 0 ? _a2 : err.getString("msg")) !== null && _b !== void 0 ? _b : err.getString("errMsg");
+          if (errMsg != null) {
+            msg = errMsg;
+          } else {
+            msg = UTS.JSON.stringify(err);
+          }
+        } else if (err != null) {
+          msg = `${err}`;
         }
-        errorMsg.value = errStr.length > 0 ? errStr : "请求失败";
+        errorMsg.value = msg;
       }
       loading.value = false;
     }

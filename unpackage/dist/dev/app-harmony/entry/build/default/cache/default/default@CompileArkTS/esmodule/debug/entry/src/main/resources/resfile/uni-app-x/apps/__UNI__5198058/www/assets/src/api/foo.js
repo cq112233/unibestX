@@ -7,7 +7,7 @@ class IFoo extends UTS.UTSType {
       kind: 2,
       get fields() {
         return {
-          id: { type: "Any", optional: false },
+          id: { type: "Any", optional: true },
           name: { type: String, optional: false }
         };
       },
@@ -52,11 +52,11 @@ const MOCK_FOO_LIST = [
   new IFoo({ id: 2, name: "UnibestX" }),
   new IFoo({ id: 3, name: "lime-request" })
 ];
-function getFooList(params = null) {
+function getFooList(_params = null) {
   return Promise.resolve(MOCK_FOO_LIST);
 }
 function foo() {
-  const res = http.get("/foo", new LimeRequestConfig({
+  return http.get("/foo", new LimeRequestConfig({
     getTask: null,
     data: null,
     url: null,
@@ -93,9 +93,13 @@ function foo() {
       ignoreAuth: true
       // 此接口不需要鉴权
     })
-  }));
-  uni.__f__("log", "at src/api/foo.uts:66", res, "res112233");
-  return res;
+  })).then((data) => {
+    var _a, _b;
+    return new IFoo({
+      id: (_a = data.get("id")) !== null && _a !== void 0 ? _a : "",
+      name: (_b = data.getString("name")) !== null && _b !== void 0 ? _b : ""
+    });
+  });
 }
 export {
   foo as f,

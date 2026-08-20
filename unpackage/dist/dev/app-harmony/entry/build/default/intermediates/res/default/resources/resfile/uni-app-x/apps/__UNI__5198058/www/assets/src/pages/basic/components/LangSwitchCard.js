@@ -70,7 +70,7 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     return __returned__;
   }
 });
-const _style_0 = { "wtu-zeqk4z-0": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "wtu-1py2ikc-1": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "wtu-1aqjbfx-2": { "": { "marginBottom": 16 } }, "wtu-w8jmyu-3": { "": { "--tw-border-style": "solid", "borderTopStyle": "var(--tw-border-style)", "borderRightStyle": "var(--tw-border-style)", "borderBottomStyle": "var(--tw-border-style)", "borderLeftStyle": "var(--tw-border-style)", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "wtu-opyasy-4": { "": { "--tw-border-style": "solid", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "wtu-13g5z0w-5": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "wtu-1vqucrp-6": { "": { "fontSize": 12 } }, "wtu-9qob8-7": { "": { "color": "#94a3b8" } }, "wtu-1hy0bj4-8": { "": { "marginBottom": 6 } }, "wtu-f1cbux-9": { "": { "fontSize": 16 } }, "wtu-tg5bk5-a": { "": { "--tw-font-weight": "var(--font-weight-bold, 700)", "fontWeight": 700 } }, "wtu-uqoqln-b": { "": { "color": "#1e293b" } }, "wtu-1wrjlrz-c": { "": { "fontSize": 14 } }, "wtu-apgfmb-d": { "": { "color": "#475569" } }, "wtu-1nykptg-e": { "": { "marginTop": 8 } }, "wtu-9r0xrv-f": { "": { "marginTop": 12 } }, "wtu-txv1ug-g": { "": { "paddingTop": 12 } }, "wtu-8ks4d7-h": { "": { "--tw-border-style": "solid", "borderTopStyle": "var(--tw-border-style)", "borderTopWidth": 1 } }, "wtu-1xpqddw-i": { "": { "flexDirection": "row" } }, "wtu-1t7tavk-j": { "": { "alignItems": "center" } }, "wtu-uadth0-k": { "": { "flexWrap": "wrap" } }, "wtu-3p92ns-l": { "": { "fontSize": 13 } }, "wtu-zus43i-m": { "": { "color": "#2563eb" } }, "wtu-grn2i8-n": { "": { "backgroundColor": "#eff6ff" } }, "wtu-j3s3ch-o": { "": { "paddingLeft": 8, "paddingRight": 8 } }, "wtu-1x56in2-p": { "": { "paddingTop": 4, "paddingBottom": 4 } }, "wtu-8n2rm8-q": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "wtu-re8qpd-r": { "": { "--tw-font-weight": "var(--font-weight-medium, 500)", "fontWeight": 500 } }, "wtu-11kd58a-s": { "": { "marginRight": 8 } }, "wtu-l3s08e-t": { "": { "marginBottom": 4 } }, "wtu-6g0b4e-u": { "": { "color": "#059669" } }, "wtu-en5wvg-v": { "": { "backgroundColor": "#ecfdf5" } }, "wtu-ky8bvg-w": { "": { "color": "#d97706" } }, "wtu-14ion4g-x": { "": { "backgroundColor": "#fffbe2" } }, "wtu-1fek2j3-y": { "": { "justifyContent": "space-between" } }, "wtu-17qg8e9-z": { "": { "paddingTop": 12, "paddingBottom": 12 } }, "wtu-weix9h-10": { "": { "--tw-border-style": "solid", "borderBottomStyle": "var(--tw-border-style)", "borderBottomWidth": 1 } }, "wtu-6xv57u-11": { "": { "fontSize": 15 } }, "wtu-1au22ic-12": { "": { "color": "#334155" } } };
+const _style_0 = { "wtu-zeqk4z-0": { "": { "borderTopLeftRadius": 12, "borderTopRightRadius": 12, "borderBottomRightRadius": 12, "borderBottomLeftRadius": 12 } }, "wtu-1py2ikc-1": { "": { "paddingTop": 16, "paddingRight": 16, "paddingBottom": 16, "paddingLeft": 16 } }, "wtu-1aqjbfx-2": { "": { "marginBottom": 16 } }, "wtu-w8jmyu-3": { "": { "--tw-border-style": "solid", "borderTopStyle": "var(--tw-border-style)", "borderRightStyle": "var(--tw-border-style)", "borderBottomStyle": "var(--tw-border-style)", "borderLeftStyle": "var(--tw-border-style)", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "wtu-opyasy-4": { "": { "--tw-border-style": "solid", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "wtu-13g5z0w-5": { "": { "borderTopColor": "#e2e8f0", "borderRightColor": "#e2e8f0", "borderBottomColor": "#e2e8f0", "borderLeftColor": "#e2e8f0" } }, "wtu-1vqucrp-6": { "": { "fontSize": 12 } }, "wtu-9qob8-7": { "": { "color": "#94a3b8" } }, "wtu-1hy0bj4-8": { "": { "marginBottom": 6 } }, "wtu-f1cbux-9": { "": { "fontSize": 16 } }, "wtu-tg5bk5-a": { "": { "--tw-font-weight": "var(--font-weight-bold, 700)", "fontWeight": 700 } }, "wtu-uqoqln-b": { "": { "color": "#1e293b" } }, "wtu-1wrjlrz-c": { "": { "fontSize": 14 } }, "wtu-apgfmb-d": { "": { "color": "#475569" } }, "wtu-1nykptg-e": { "": { "marginTop": 8 } }, "wtu-16287mo-f": { "": { "height": 1 } }, "wtu-u63ba2-g": { "": { "backgroundColor": "#f1f5f9" } }, "wtu-ui2fkq-h": { "": { "marginTop": 12, "marginBottom": 12 } }, "wtu-1xpqddw-i": { "": { "flexDirection": "row" } }, "wtu-1t7tavk-j": { "": { "alignItems": "center" } }, "wtu-uadth0-k": { "": { "flexWrap": "wrap" } }, "wtu-3p92ns-l": { "": { "fontSize": 13 } }, "wtu-zus43i-m": { "": { "color": "#2563eb" } }, "wtu-grn2i8-n": { "": { "backgroundColor": "#eff6ff" } }, "wtu-j3s3ch-o": { "": { "paddingLeft": 8, "paddingRight": 8 } }, "wtu-1x56in2-p": { "": { "paddingTop": 4, "paddingBottom": 4 } }, "wtu-8n2rm8-q": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "wtu-re8qpd-r": { "": { "--tw-font-weight": "var(--font-weight-medium, 500)", "fontWeight": 500 } }, "wtu-11kd58a-s": { "": { "marginRight": 8 } }, "wtu-l3s08e-t": { "": { "marginBottom": 4 } }, "wtu-6g0b4e-u": { "": { "color": "#059669" } }, "wtu-en5wvg-v": { "": { "backgroundColor": "#ecfdf5" } }, "wtu-ky8bvg-w": { "": { "color": "#d97706" } }, "wtu-14ion4g-x": { "": { "backgroundColor": "#fffbe2" } }, "wtu-1fek2j3-y": { "": { "justifyContent": "space-between" } }, "wtu-17qg8e9-z": { "": { "paddingTop": 12, "paddingBottom": 12 } }, "wtu-6xv57u-10": { "": { "fontSize": 15 } }, "wtu-1au22ic-11": { "": { "color": "#334155" } } };
 const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
 const { toDisplayString: _toDisplayString, createElementVNode: _createElementVNode, resolveComponent: _resolveComponent, openBlock: _openBlock, createBlock: _createBlock, createCommentVNode: _createCommentVNode, withCtx: _withCtx } = globalThis.Vue;
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -99,7 +99,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
           1
           /* TEXT */
         ),
-        _createElementVNode("view", { class: "wtu-9r0xrv-f wtu-txv1ug-g wtu-8ks4d7-h border-top-style-solid border-top-color-[#f1f5f9]" }, [
+        _createElementVNode("view", { class: "wtu-16287mo-f wtu-u63ba2-g wtu-ui2fkq-h" }),
+        _createElementVNode("view", null, [
           _createElementVNode(
             "text",
             { class: "wtu-1vqucrp-6 wtu-9qob8-7 wtu-1hy0bj4-8" },
@@ -133,11 +134,11 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         ])
       ]),
       _createElementVNode("view", {
-        class: "wtu-1xpqddw-i wtu-1t7tavk-j wtu-1fek2j3-y wtu-17qg8e9-z wtu-weix9h-10 border-bottom-style-solid border-bottom-color-[#f1f5f9]",
+        class: "wtu-1xpqddw-i wtu-1t7tavk-j wtu-1fek2j3-y wtu-17qg8e9-z",
         onClick: _cache[0] || (_cache[0] = ($event) => $setup.switchLanguage("zh-CN"))
       }, [
         _createElementVNode("view", { class: "wtu-1xpqddw-i wtu-1t7tavk-j" }, [
-          _createElementVNode("text", { class: "wtu-6xv57u-11 wtu-1au22ic-12 wtu-re8qpd-r" }, "简体中文")
+          _createElementVNode("text", { class: "wtu-6xv57u-10 wtu-1au22ic-11 wtu-re8qpd-r" }, "简体中文")
         ]),
         _createElementVNode("view", { class: "wtu-1xpqddw-i wtu-1t7tavk-j" }, [
           $setup.isZhCN ? (_openBlock(), _createBlock(_component_uni_icons, {
@@ -148,12 +149,13 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
           })) : _createCommentVNode("v-if", true)
         ])
       ]),
+      _createElementVNode("view", { class: "wtu-16287mo-f wtu-u63ba2-g" }),
       _createElementVNode("view", {
         class: "wtu-1xpqddw-i wtu-1t7tavk-j wtu-1fek2j3-y wtu-17qg8e9-z",
         onClick: _cache[1] || (_cache[1] = ($event) => $setup.switchLanguage("en-US"))
       }, [
         _createElementVNode("view", { class: "wtu-1xpqddw-i wtu-1t7tavk-j" }, [
-          _createElementVNode("text", { class: "wtu-6xv57u-11 wtu-1au22ic-12 wtu-re8qpd-r" }, "English")
+          _createElementVNode("text", { class: "wtu-6xv57u-10 wtu-1au22ic-11 wtu-re8qpd-r" }, "English")
         ]),
         _createElementVNode("view", { class: "wtu-1xpqddw-i wtu-1t7tavk-j" }, [
           $setup.isEnUS ? (_openBlock(), _createBlock(_component_uni_icons, {

@@ -175,23 +175,12 @@ class HttpClient {
         if (code !== null) {
           const innerData = obj.get("data");
           if (innerData !== null) {
-            const innerStr = UTS.JSON.stringify(innerData);
-            const parsedData = UTS.JSON.parse(innerStr);
-            if (parsedData !== null) {
-              return parsedData;
-            } else {
-              throw new Error(`响应 data 字段无法解析为指定的类型，请检查数据结构是否匹配。数据：${innerStr}`);
-            }
+            return innerData;
           }
           throw new Error("响应结构包含 code，但 data 字段为空");
         }
       }
-      const rawStr = UTS.JSON.stringify(rawData);
-      const parsedRaw = UTS.JSON.parse(rawStr);
-      if (parsedRaw !== null) {
-        return parsedRaw;
-      }
-      throw new Error(`原始响应数据无法解析为指定类型。原始数据：${rawStr}`);
+      return rawData;
     });
   }
   get(url, config = null) {

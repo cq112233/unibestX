@@ -152,7 +152,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
             _renderList($setup.penSizeOptions, (sz, _j) => {
               return _createElementVNode("view", {
                 key: sz,
-                class: _normalizeClass(["wtu-dhurvf-c wtu-1ia7rtq-w wtu-cjnkl2-x wtu-1icw4t1-g wtu-15uu4fg-a wtu-q3ffeg-h wtu-m0xl7g-i", _j < $setup.penSizeOptions.length - 1 ? "mr-6px" : ""]),
+                class: _normalizeClass(["wtu-dhurvf-c wtu-1ia7rtq-w wtu-cjnkl2-x wtu-1icw4t1-g wtu-15uu4fg-a wtu-q3ffeg-h wtu-m0xl7g-i", _j < $setup.penSizeOptions.length - 1 ? "wtu-rtg07c-j" : ""]),
                 style: _normalizeStyle({ backgroundColor: $setup.penSize === sz ? "#3b82f6" : "#e2e8f0" }),
                 onClick: ($event) => $setup.penSize = sz
               }, [

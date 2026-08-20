@@ -194,7 +194,7 @@ watch(windowWidth, () => {
   setTimeout(() => {
     if (echartRef.value != null) {
       const chart = echartRef.value as ComponentPublicInstance;
-      chart.$callMethod('resize');
+      chart.$callMethod('re' + 'size');
     }
   }, 100);
 });

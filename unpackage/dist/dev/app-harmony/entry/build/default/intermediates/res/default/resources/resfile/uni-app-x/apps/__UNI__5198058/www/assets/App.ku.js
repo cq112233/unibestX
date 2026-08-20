@@ -76,8 +76,8 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     });
     watch(() => {
       return appStore.state.isDark;
-    }, () => {
-      applyNavbarTheme(appStore.state.isDark);
+    }, (newVal, oldVal) => {
+      applyNavbarTheme(newVal);
     });
     const __returned__ = { appStore, themeStyle, isCurrentPageTabbar, uToastRef, get Tabbar() {
       return Tabbar;

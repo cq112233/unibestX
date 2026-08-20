@@ -67,14 +67,13 @@ const _component_NavBar = resolveEasyComponent("NavBar",_easycom_NavBar)
 
   return _cV(unref(AppKu), null, _uM({
     default: withSlotCtx((): any[] => [
-      _cV(unref(LayoutComponent), null, _uM({
+      _cV(unref(LayoutComponent), _uM({
+        "navigation-bar-title-text": 'weapp-tailwindcss 示例',
+        "navigation-style": 'custom'
+      }), _uM({
         default: withSlotCtx((): any[] => [
           _cE("view", null, [
-            _cV(_component_NavBar, _uM({
-              title: "weapp-tailwindcss 示例",
-              "auto-back": true,
-              "safe-area-inset-top": true
-            })),
+            _cV(_component_NavBar, _uM({ title: "weapp-tailwindcss 示例" })),
             _cE("view", _uM({
               class: _nC(["content", _uM({ dark: unref(isDark) })])
             }), [

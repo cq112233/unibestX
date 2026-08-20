@@ -25,7 +25,7 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     return __returned__;
   }
 });
-const _style_0 = { "wtu-edh1ze-0": { "": { "flexDirection": "row" } }, "wtu-r2og8u-1": { "": { "alignItems": "center" } }, "wtu-1c6w9qp-2": { "": { "justifyContent": "space-between" } }, "wtu-e32pgj-3": { "": { "paddingTop": 12, "paddingBottom": 12 } }, "wtu-1sf4qgj-4": { "": { "--tw-border-style": "solid", "borderBottomStyle": "var(--tw-border-style)", "borderBottomWidth": 1 } }, "wtu-jjoyn4-5": { "": { "width": 6 } }, "wtu-ubwupt-6": { "": { "height": 6 } }, "wtu-1u0ls6d-7": { "": { "borderTopLeftRadius": 3, "borderTopRightRadius": 3, "borderBottomRightRadius": 3, "borderBottomLeftRadius": 3 } }, "wtu-1i1fm6y-8": { "": { "backgroundColor": "#3b82f6" } }, "wtu-b8dflc-9": { "": { "marginRight": 8 } }, "wtu-kba525-a": { "": { "fontSize": 14 } }, "wtu-1dcwght-b": { "": { "color": "#475569" } }, "wtu-1lor33j-c": { "": { "--tw-font-weight": "var(--font-weight-medium, 500)", "fontWeight": 500 } }, "wtu-lbze2f-d": { "": { "fontSize": 12 } }, "wtu-1uc842y-e": { "": { "color": "#94a3b8" } }, "wtu-vs4ahm-f": { "": { "backgroundColor": "#10b981" } }, "wtu-no3ft0-g": { "": { "flexDirection": "column" } }, "wtu-159q4wc-h": { "": { "backgroundColor": "#fff1f2" } }, "wtu-1wj9wbu-i": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "wtu-dktp6a-j": { "": { "paddingTop": 2, "paddingBottom": 2 } }, "wtu-vjo5gh-k": { "": { "paddingLeft": 6, "paddingRight": 6 } }, "wtu-bevybu-l": { "": { "marginTop": 4 } }, "wtu-p0dhsv-m": { "": { "alignSelf": "flex-start" } }, "wtu-kl7gdk-n": { "": { "--tw-border-style": "solid", "borderTopStyle": "var(--tw-border-style)", "borderRightStyle": "var(--tw-border-style)", "borderBottomStyle": "var(--tw-border-style)", "borderLeftStyle": "var(--tw-border-style)", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "wtu-11fbxns-o": { "": { "--tw-border-style": "solid", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "wtu-1da3t5c-p": { "": { "borderTopColor": "#ffe4e6", "borderRightColor": "#ffe4e6", "borderBottomColor": "#ffe4e6", "borderLeftColor": "#ffe4e6" } }, "wtu-12mw64h-q": { "": { "fontSize": 10 } }, "wtu-nnvrio-r": { "": { "color": "#f43f5e" } }, "wtu-17gdztp-s": { "": { "--tw-border-style": "solid", "borderTopStyle": "var(--tw-border-style)", "borderTopWidth": 1 } }, "wtu-1fmwiif-t": { "": { "backgroundColor": "#a855f7" } } };
+const _style_0 = { "wtu-edh1ze-0": { "": { "flexDirection": "row" } }, "wtu-r2og8u-1": { "": { "alignItems": "center" } }, "wtu-1c6w9qp-2": { "": { "justifyContent": "space-between" } }, "wtu-e32pgj-3": { "": { "paddingTop": 12, "paddingBottom": 12 } }, "wtu-jjoyn4-4": { "": { "width": 6 } }, "wtu-ubwupt-5": { "": { "height": 6 } }, "wtu-1u0ls6d-6": { "": { "borderTopLeftRadius": 3, "borderTopRightRadius": 3, "borderBottomRightRadius": 3, "borderBottomLeftRadius": 3 } }, "wtu-1i1fm6y-7": { "": { "backgroundColor": "#3b82f6" } }, "wtu-b8dflc-8": { "": { "marginRight": 8 } }, "wtu-kba525-9": { "": { "fontSize": 14 } }, "wtu-1dcwght-a": { "": { "color": "#475569" } }, "wtu-1lor33j-b": { "": { "--tw-font-weight": "var(--font-weight-medium, 500)", "fontWeight": 500 } }, "wtu-lbze2f-c": { "": { "fontSize": 12 } }, "wtu-1uc842y-d": { "": { "color": "#94a3b8" } }, "wtu-3wtn0e-e": { "": { "height": 1 } }, "wtu-u07xcs-f": { "": { "backgroundColor": "#f1f5f9" } }, "wtu-vs4ahm-g": { "": { "backgroundColor": "#10b981" } }, "wtu-no3ft0-h": { "": { "flexDirection": "column" } }, "wtu-159q4wc-i": { "": { "backgroundColor": "#fff1f2" } }, "wtu-1wj9wbu-j": { "": { "borderTopLeftRadius": 4, "borderTopRightRadius": 4, "borderBottomRightRadius": 4, "borderBottomLeftRadius": 4 } }, "wtu-dktp6a-k": { "": { "paddingTop": 2, "paddingBottom": 2 } }, "wtu-vjo5gh-l": { "": { "paddingLeft": 6, "paddingRight": 6 } }, "wtu-bevybu-m": { "": { "marginTop": 4 } }, "wtu-p0dhsv-n": { "": { "alignSelf": "flex-start" } }, "wtu-kl7gdk-o": { "": { "--tw-border-style": "solid", "borderTopStyle": "var(--tw-border-style)", "borderRightStyle": "var(--tw-border-style)", "borderBottomStyle": "var(--tw-border-style)", "borderLeftStyle": "var(--tw-border-style)", "borderTopWidth": 1, "borderRightWidth": 1, "borderBottomWidth": 1, "borderLeftWidth": 1 } }, "wtu-11fbxns-p": { "": { "--tw-border-style": "solid", "borderTopStyle": "solid", "borderRightStyle": "solid", "borderBottomStyle": "solid", "borderLeftStyle": "solid" } }, "wtu-1da3t5c-q": { "": { "borderTopColor": "#ffe4e6", "borderRightColor": "#ffe4e6", "borderBottomColor": "#ffe4e6", "borderLeftColor": "#ffe4e6" } }, "wtu-12mw64h-r": { "": { "fontSize": 10 } }, "wtu-nnvrio-s": { "": { "color": "#f43f5e" } }, "wtu-1fmwiif-t": { "": { "backgroundColor": "#a855f7" } } };
 const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
 const { createElementVNode: _createElementVNode, resolveComponent: _resolveComponent, createVNode: _createVNode, toDisplayString: _toDisplayString, withCtx: _withCtx, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -34,10 +34,10 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
   return _openBlock(), _createBlock($setup["Card"], { title: $setup.iconDemoTitle }, {
     default: _withCtx(() => [
-      _createElementVNode("view", { class: "wtu-edh1ze-0 wtu-r2og8u-1 wtu-1c6w9qp-2 wtu-e32pgj-3 wtu-1sf4qgj-4 border-bottom-style-solid border-bottom-color-[#f1f5f9]" }, [
+      _createElementVNode("view", { class: "wtu-edh1ze-0 wtu-r2og8u-1 wtu-1c6w9qp-2 wtu-e32pgj-3" }, [
         _createElementVNode("view", { class: "wtu-edh1ze-0 wtu-r2og8u-1" }, [
-          _createElementVNode("view", { class: "wtu-jjoyn4-5 wtu-ubwupt-6 wtu-1u0ls6d-7 wtu-1i1fm6y-8 wtu-b8dflc-9" }),
-          _createElementVNode("text", { class: "wtu-kba525-a wtu-1dcwght-b wtu-1lor33j-c" }, "uni-icon")
+          _createElementVNode("view", { class: "wtu-jjoyn4-4 wtu-ubwupt-5 wtu-1u0ls6d-6 wtu-1i1fm6y-7 wtu-b8dflc-8" }),
+          _createElementVNode("text", { class: "wtu-kba525-9 wtu-1dcwght-a wtu-1lor33j-b" }, "uni-icon")
         ]),
         _createElementVNode("view", { class: "wtu-edh1ze-0 wtu-r2og8u-1" }, [
           _createVNode(_component_uni_icons, {
@@ -45,18 +45,19 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
             size: "26",
             style: { "color": "#3b82f6", "margin-right": "8px" }
           }),
-          _createElementVNode("text", { class: "wtu-lbze2f-d wtu-1uc842y-e" }, "contact")
+          _createElementVNode("text", { class: "wtu-lbze2f-c wtu-1uc842y-d" }, "contact")
         ])
       ]),
+      _createElementVNode("view", { class: "wtu-3wtn0e-e wtu-u07xcs-f" }),
       _createElementVNode("view", { class: "wtu-edh1ze-0 wtu-r2og8u-1 wtu-1c6w9qp-2 wtu-e32pgj-3" }, [
         _createElementVNode("view", { class: "wtu-edh1ze-0 wtu-r2og8u-1" }, [
-          _createElementVNode("view", { class: "wtu-jjoyn4-5 wtu-ubwupt-6 wtu-1u0ls6d-7 wtu-vs4ahm-f wtu-b8dflc-9" }),
-          _createElementVNode("view", { class: "wtu-no3ft0-g" }, [
-            _createElementVNode("text", { class: "wtu-kba525-a wtu-1dcwght-b wtu-1lor33j-c" }, "lime-icon"),
-            _createElementVNode("view", { class: "wtu-159q4wc-h wtu-1wj9wbu-i wtu-dktp6a-j wtu-vjo5gh-k wtu-bevybu-l wtu-p0dhsv-m wtu-kl7gdk-n wtu-11fbxns-o wtu-1da3t5c-p" }, [
+          _createElementVNode("view", { class: "wtu-jjoyn4-4 wtu-ubwupt-5 wtu-1u0ls6d-6 wtu-vs4ahm-g wtu-b8dflc-8" }),
+          _createElementVNode("view", { class: "wtu-no3ft0-h" }, [
+            _createElementVNode("text", { class: "wtu-kba525-9 wtu-1dcwght-a wtu-1lor33j-b" }, "lime-icon"),
+            _createElementVNode("view", { class: "wtu-159q4wc-i wtu-1wj9wbu-j wtu-dktp6a-k wtu-vjo5gh-l wtu-bevybu-m wtu-p0dhsv-n wtu-kl7gdk-o wtu-11fbxns-p wtu-1da3t5c-q" }, [
               _createElementVNode(
                 "text",
-                { class: "wtu-12mw64h-q wtu-nnvrio-r" },
+                { class: "wtu-12mw64h-r wtu-nnvrio-s" },
                 _toDisplayString($setup.svgAuthWarning),
                 1
                 /* TEXT */
@@ -70,13 +71,14 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
             size: "24",
             style: { "color": "#10b981", "margin-right": "8px" }
           }),
-          _createElementVNode("text", { class: "wtu-lbze2f-d wtu-1uc842y-e" }, "circle")
+          _createElementVNode("text", { class: "wtu-lbze2f-c wtu-1uc842y-d" }, "circle")
         ])
       ]),
-      _createElementVNode("view", { class: "wtu-edh1ze-0 wtu-r2og8u-1 wtu-1c6w9qp-2 wtu-e32pgj-3 wtu-17gdztp-s border-top-style-solid border-top-color-[#f1f5f9]" }, [
+      _createElementVNode("view", { class: "wtu-3wtn0e-e wtu-u07xcs-f" }),
+      _createElementVNode("view", { class: "wtu-edh1ze-0 wtu-r2og8u-1 wtu-1c6w9qp-2 wtu-e32pgj-3" }, [
         _createElementVNode("view", { class: "wtu-edh1ze-0 wtu-r2og8u-1" }, [
-          _createElementVNode("view", { class: "wtu-jjoyn4-5 wtu-ubwupt-6 wtu-1u0ls6d-7 wtu-1fmwiif-t wtu-b8dflc-9" }),
-          _createElementVNode("text", { class: "wtu-kba525-a wtu-1dcwght-b wtu-1lor33j-c" }, "up-icon (uview-ultra)")
+          _createElementVNode("view", { class: "wtu-jjoyn4-4 wtu-ubwupt-5 wtu-1u0ls6d-6 wtu-1fmwiif-t wtu-b8dflc-8" }),
+          _createElementVNode("text", { class: "wtu-kba525-9 wtu-1dcwght-a wtu-1lor33j-b" }, "up-icon (uview-ultra)")
         ]),
         _createElementVNode("view", { class: "wtu-edh1ze-0 wtu-r2og8u-1" }, [
           _createVNode(_component_up_icon, {
@@ -84,7 +86,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
             size: "24",
             style: { "color": "#a855f7", "margin-right": "8px" }
           }),
-          _createElementVNode("text", { class: "wtu-lbze2f-d wtu-1uc842y-e" }, "setting")
+          _createElementVNode("text", { class: "wtu-lbze2f-c wtu-1uc842y-d" }, "setting")
         ])
       ])
     ]),

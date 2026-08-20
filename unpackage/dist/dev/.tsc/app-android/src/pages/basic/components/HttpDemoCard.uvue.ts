@@ -2,7 +2,6 @@ import { computed, ref } from 'vue';
 import Card from './Card.uvue';
 import { foo, getFooList } from '@/src/api/foo';
 import type { IFoo } from '@/src/api/foo';
-import { toastSuccess } from '@/src/utils/toast.uts';
 
 // ==========================================
 // 响应式状态
@@ -81,7 +80,7 @@ async function loadMockData() {
     // toastSuccess(`加载了 ${list.length} 条数据`)
   }
   catch (err) {
-    console.error('loadMockData error:', err, " at src/pages/basic/components/HttpDemoCard.uvue:135");
+    console.error('loadMockData error:', err, " at src/pages/basic/components/HttpDemoCard.uvue:134");
   }
 }
 
@@ -101,13 +100,25 @@ async function fetchRealApi() {
     requestStatus.value = 'success';
   }
   catch (err) {
-    console.log(err, 'err', " at src/pages/basic/components/HttpDemoCard.uvue:155");
+    console.log(err, 'err', " at src/pages/basic/components/HttpDemoCard.uvue:154");
     requestStatus.value = 'error';
-    let errStr = '';
-    if (err !== null) {
-      errStr = JSON.stringify(err);
+    let msg = '请求失败';
+    if (err instanceof Error) {
+      msg = (err as Error).message;
     }
-    errorMsg.value = errStr.length > 0 ? errStr : '请求失败';
+    else if (err instanceof UTSJSONObject) {
+      const errMsg = (err as UTSJSONObject).getString('message') ?? (err as UTSJSONObject).getString('msg') ?? (err as UTSJSONObject).getString('errMsg');
+      if (errMsg != null) {
+        msg = errMsg;
+      }
+      else {
+        msg = JSON.stringify(err);
+      }
+    }
+    else if (err != null) {
+      msg = `${err}`;
+    }
+    errorMsg.value = msg;
   }
 
   loading.value = false;

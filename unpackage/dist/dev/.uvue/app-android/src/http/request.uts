@@ -150,28 +150,12 @@ export class HttpClient {
                 if (code != null) {
                     const innerData = obj.get('data');
                     if (innerData != null) {
-                        const innerStr = JSON.stringify(innerData);
-                        const parsedData = JSON.parse(innerStr);
-                        if (parsedData != null) {
-                            return parsedData as T;
-                        }
-                        else {
-                            throw new Error(`响应 data 字段无法解析为指定的类型，请检查数据结构是否匹配。数据：${innerStr}`);
-                        }
+                        return innerData as T;
                     }
-                    // 如果外层有 code 但没有 data 字段，或者 data 为 null
-                    // 有些接口可能只返回 code 和 msg，不返回 data。此时如果 T 是 any 可以，否则应该报错
                     throw new Error('响应结构包含 code，但 data 字段为空');
                 }
             }
-            // 如果没有 code，说明不是外层包装格式
-            const rawStr = JSON.stringify(rawData);
-            const parsedRaw = JSON.parse(rawStr);
-            if (parsedRaw != null) {
-                return parsedRaw as T;
-            }
-            // 无法反序列化为 T，直接强转必定导致 Kotlin NPE
-            throw new Error(`原始响应数据无法解析为指定类型。原始数据：${rawStr}`);
+            return rawData as T;
         });
     }
     get<T>(url: string, config: LimeRequestConfig | null = null): Promise<T> {

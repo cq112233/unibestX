@@ -6,7 +6,7 @@ import type { LimeRequestConfig } from '@/uni_modules/lime-request';
 // ==========================================
 
 export type IFoo = {
-  id: any;
+  id: any | null;
   name: string;
 };
 
@@ -34,7 +34,7 @@ const MOCK_FOO_LIST: IFoo[] = [
 /**
  * 获取 Foo 列表（使用 mock 数据）
  */
-export function getFooList(params: UTSJSONObject | null = null): Promise<IFoo[]> {
+export function getFooList(_params: UTSJSONObject | null = null): Promise<IFoo[]> {
   return Promise.resolve(MOCK_FOO_LIST);
 }
 
@@ -51,7 +51,7 @@ export function getFooById(id: number): Promise<IFoo | null> {
  * 使用次要域名（SECONDARY），参考 API_DOMAINS 配置
  */
 export function foo(): Promise<IFoo> {
-  const res = http.get<IFoo>('/foo', {
+  return http.get<UTSJSONObject>('/foo', {
     params: {
       name: 'unix',
       page: 1,
@@ -61,31 +61,36 @@ export function foo(): Promise<IFoo> {
     extra: {
       ignoreAuth: true // 此接口不需要鉴权
     } as UTSJSONObject
-  } as LimeRequestConfig);
-  // __f__('log','at src/api/foo.uts:65',333)
-  __f__('log','at src/api/foo.uts:66',res, 'res112233');
-  return res;
-
-  // return new Promise((resolve)=>{
-  // 	resolve({
-  // 	  id:1,
-  // 			name:'cq'
-  // 	})
-  // })
+  } as LimeRequestConfig).then((data: UTSJSONObject): IFoo => {
+    return {
+      id: (data.get('id') ?? '') as any,
+      name: data.getString('name') ?? ''
+    } as IFoo;
+  });
 }
 
 /**
  * POST 请求示例 —— 新建一个 Foo
  */
 export function createFoo(data: IFoo): Promise<IFoo> {
-  return http.post<IFoo>('/foo', data);
+  return http.post<UTSJSONObject>('/foo', data).then((res: UTSJSONObject): IFoo => {
+    return {
+      id: (res.get('id') ?? '') as any,
+      name: res.getString('name') ?? ''
+    } as IFoo;
+  });
 }
 
 /**
  * PUT 请求示例 —— 更新一个 Foo
  */
 export function updateFoo(id: number, data: IFoo): Promise<IFoo> {
-  return http.put<IFoo>(`/foo/${id}`, data);
+  return http.put<UTSJSONObject>(`/foo/${id}`, data).then((res: UTSJSONObject): IFoo => {
+    return {
+      id: (res.get('id') ?? '') as any,
+      name: res.getString('name') ?? ''
+    } as IFoo;
+  });
 }
 
 /**

@@ -138,14 +138,13 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_NavBar = resolveEasycom(__resolveDynamicComponent("NavBar"), __easycom_0);
   return _openBlock(), _createBlock($setup["AppKu"], null, {
     default: _withCtx(() => [
-      _createVNode($setup["LayoutComponent"], null, {
+      _createVNode($setup["LayoutComponent"], {
+        "navigation-bar-title-text": "weapp-tailwindcss 示例",
+        "navigation-style": "custom"
+      }, {
         default: _withCtx(() => [
           _createElementVNode("view", null, [
-            _createVNode(_component_NavBar, {
-              title: "weapp-tailwindcss 示例",
-              "auto-back": true,
-              "safe-area-inset-top": true
-            }),
+            _createVNode(_component_NavBar, { title: "weapp-tailwindcss 示例" }),
             _createElementVNode(
               "view",
               {
