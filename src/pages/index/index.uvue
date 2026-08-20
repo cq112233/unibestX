@@ -51,10 +51,10 @@
           ⚠️ 页面路由配置须知（重要）
         </text>
         <text class="text-[14px]" style="color: #666; line-height: 26px;">
-          　　本项目内置 vite-plugin-uni-pages 自动文件路由插件，pages.json 为自动构建产物（构建打包时会被重新生成并覆盖）。
+          　　本项目内置 vite-plugin-uni-pages 自动文件路由插件：当页面代码中有 definePage 或 &lt;route&gt; 配置时，插件会自动双向同步 pages.config.json 和 pages.json；当页面中未写配置时，请在 pages.config.json 中配置，也会自动同步到 pages.json。
         </text>
-        <text class="text-[14px]" style="color: #666; line-height: 26px;">
-          　　页面配置请在根目录 pages.config.json 中配置，或在页面代码中使用 definePage 编译宏，切勿直接修改 pages.json！
+        <text class="text-[14px] font-bold mt-[4px]" style="color: #d97706; line-height: 24px;">
+          　　注意：pages.json 为自动构建产物，切勿直接在 pages.json 中修改！
         </text>
       </view>
       <view class="mt-[15px] mx-[30px] px-[20px] py-[15px] rounded-[12px]" style="background-color: rgba(55, 194, 188, 0.08);">

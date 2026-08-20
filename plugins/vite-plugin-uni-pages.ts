@@ -224,36 +224,6 @@ function fileToPagePath(filePath: string, pagesDir: string, projectRoot: string)
   return path.posix.join(pagesDir, withoutExt);
 }
 
-/** 合并手动 pages 与扫描 pages（页面内 definePage / <route> 优先级更高，支持覆盖与深度合并） */
-function mergePages(manual: PageConfig[], scanned: PageConfig[]): PageConfig[] {
-  const map = new Map<string, PageConfig>();
-
-  // 1. 先加入 manual（作为默认/基础配置）
-  for (let i = 0; i < manual.length; i++) {
-    map.set(manual[i].path, { ...manual[i] });
-  }
-
-  // 2. 将扫描出的配置合并进去（页面内 definePage / <route> 优先覆盖）
-  for (let i = 0; i < scanned.length; i++) {
-    const s = scanned[i];
-    if (!map.has(s.path)) {
-      map.set(s.path, s);
-    }
-    else {
-      const m = map.get(s.path)!;
-      map.set(s.path, {
-        ...m,
-        ...s,
-        style: {
-          ...(m.style || {}),
-          ...(s.style || {})
-        }
-      });
-    }
-  }
-  return Array.from(map.values());
-}
-
 // ==========================================
 // 核心：生成 pages.json
 // ==========================================
@@ -352,14 +322,32 @@ function generatePagesJson(
       subPages.push(page);
     }
 
-    // 与 baseConfig 中同名 root 的分包合并
+    // 与 baseConfig 中同名 root 的分包合并（以磁盘实际存在的文件为准，自动剔除已删除的页面）
     const existing = configSubPkgs.find(p => p.root === subDir);
-    let mergedPages: PageConfig[];
-    if (existing != null) {
-      mergedPages = mergePages(existing.pages, subPages);
+    const existingMap = new Map<string, PageConfig>();
+    if (existing != null && Array.isArray(existing.pages)) {
+      for (let k = 0; k < existing.pages.length; k++) {
+        existingMap.set(existing.pages[k].path, existing.pages[k]);
+      }
     }
-    else {
-      mergedPages = subPages;
+
+    const mergedPages: PageConfig[] = [];
+    for (let k = 0; k < subPages.length; k++) {
+      const sp = subPages[k];
+      const manual = existingMap.get(sp.path);
+      if (manual != null) {
+        mergedPages.push({
+          ...manual,
+          ...sp,
+          style: {
+            ...(manual.style || {}),
+            ...(sp.style || {})
+          }
+        });
+      }
+      else {
+        mergedPages.push(sp);
+      }
     }
 
     scannedSubPkgs.push({ root: subDir, pages: mergedPages });
@@ -373,9 +361,31 @@ function generatePagesJson(
     }
   }
 
-  // 4. 合并主包 pages
+  // 4. 合并主包 pages（以磁盘实际存在的文件为准，自动剔除已删除的页面）
   const manualPages = baseConfig.pages ?? [];
-  const finalPages = mergePages(manualPages, scanned);
+  const manualPagesMap = new Map<string, PageConfig>();
+  for (let k = 0; k < manualPages.length; k++) {
+    manualPagesMap.set(manualPages[k].path, manualPages[k]);
+  }
+
+  const finalPages: PageConfig[] = [];
+  for (let k = 0; k < scanned.length; k++) {
+    const sp = scanned[k];
+    const manual = manualPagesMap.get(sp.path);
+    if (manual != null) {
+      finalPages.push({
+        ...manual,
+        ...sp,
+        style: {
+          ...(manual.style || {}),
+          ...(sp.style || {})
+        }
+      });
+    }
+    else {
+      finalPages.push(sp);
+    }
+  }
 
   // 5. 首页排最前（在 uni-app 中 pages.json 的第一项 pages[0] 即为应用默认启动首页）
   // 优先级：definePage type: 'home' / isHome: true（页面内显式声明最高）> opts.homePage（插件选项）> baseConfig.homePage（配置文件）
@@ -420,7 +430,7 @@ function generatePagesJson(
     output.subPackages = scannedSubPkgs;
   }
 
-  // 7. 写入
+  // 7. 写入 pages.json
   const jsonStr = JSON.stringify(output, null, 2);
   let existing = '';
   if (fs.existsSync(outPath)) {
@@ -429,6 +439,54 @@ function generatePagesJson(
   if (jsonStr !== existing) {
     fs.writeFileSync(outPath, jsonStr, 'utf-8');
     console.log(`[uni-pages] Generated ${opts.outFile} (${finalPages.length} pages, ${scannedSubPkgs.length} subpackages)`);
+  }
+
+  // 8. 自动同步回写 pages.config.json（保证手动配置文件与新建/删除/修改页面完全双向同步）
+  if (fs.existsSync(configPath)) {
+    let configUpdated = false;
+    const currentConfigRaw = fs.readFileSync(configPath, 'utf-8');
+    let currentConfig: BaseConfig = {};
+    try {
+      currentConfig = JSON5.parse(currentConfigRaw) as BaseConfig;
+    }
+    catch {}
+
+    // 1) 同步主包（新增、修改、剔除已删除）
+    const newMainPages: PageConfig[] = [];
+    for (let i = 0; i < finalPages.length; i++) {
+      newMainPages.push(finalPages[i]);
+    }
+    if (currentConfig.pages == null || JSON.stringify(currentConfig.pages) !== JSON.stringify(newMainPages)) {
+      currentConfig.pages = newMainPages;
+      configUpdated = true;
+    }
+
+    // 2) 同步分包（新增、修改、剔除已删除）
+    if (currentConfig.subPackages == null) {
+      currentConfig.subPackages = [];
+    }
+    for (let s = 0; s < scannedSubPkgs.length; s++) {
+      const spkg = scannedSubPkgs[s];
+      const targetSub = currentConfig.subPackages.find(cp => cp.root === spkg.root);
+      if (targetSub == null) {
+        currentConfig.subPackages.push({ root: spkg.root, pages: spkg.pages });
+        configUpdated = true;
+      }
+      else {
+        if (JSON.stringify(targetSub.pages) !== JSON.stringify(spkg.pages)) {
+          targetSub.pages = spkg.pages;
+          configUpdated = true;
+        }
+      }
+    }
+
+    if (configUpdated) {
+      const newConfigJson = JSON.stringify(currentConfig, null, 2);
+      if (newConfigJson !== currentConfigRaw) {
+        fs.writeFileSync(configPath, newConfigJson, 'utf-8');
+        console.log(`[uni-pages] Automatically synced changes into ${opts.configFile}`);
+      }
+    }
   }
 }
 
