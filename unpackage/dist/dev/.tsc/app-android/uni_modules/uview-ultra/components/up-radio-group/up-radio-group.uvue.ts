@@ -1,0 +1,176 @@
+import { computed, provide, getCurrentInstance } from 'vue'
+	import type { ComputedRef } from 'vue'
+	import defProps from './radioGroup.uts'
+	import { bem } from '../../libs/function/index'
+	import { useUltraUI } from '../../libs/composable/useUltraUI'
+	
+	
+const __sfc__ = defineComponent({
+  __name: 'up-radio-group',
+name: 'up-radio-group',
+  props: {
+		// 标识符 
+		name: {
+			type: String,
+			default: defProps.getString('radioGroup.name')
+		},
+		// 绑定的值
+		modelValue: {
+			type: [String, Number, Boolean],
+			default: defProps.getString('radioGroup.value')
+		},
+		// 形状，circle-圆形，square-方形
+		shape: {
+			type: String,
+			default: defProps.getString('radioGroup.shape')
+		},
+		// 是否禁用全部radio
+		disabled: {
+			type: Boolean,
+			default: defProps.getBoolean('radioGroup.disabled')
+		},
+		// 选中状态下的颜色，如设置此值，将会覆盖parent的activeColor值
+		activeColor: {
+			type: String,
+			default: defProps.getString('radioGroup.activeColor')
+		},
+		// 未选中的颜色
+		inactiveColor: {
+			type: String,
+			default: defProps.getString('radioGroup.inactiveColor')
+		},
+		// 整个组件的尺寸 单位px
+		size: {
+			type: [String, Number],
+			default: defProps.getNumber('radioGroup.size')
+		},
+		// 布局方式，row-横向，column-纵向
+		placement: {
+			type: String,
+			default: defProps.getString('radioGroup.placement')
+		},
+		// label的字体大小，px单位
+		labelSize: {
+			type: [String, Number],
+			default: defProps.getNumber('radioGroup.labelSize')
+		},
+		// label的字体颜色
+		labelColor: {
+			type: String,
+			default: defProps.getString('radioGroup.labelColor')
+		},
+		// 是否禁止点击文本操作
+		labelDisabled: {
+			type: Boolean,
+			default: defProps.getBoolean('radioGroup.labelDisabled')
+		},
+		// 图标颜色
+		iconColor: {
+			type: String,
+			default: defProps.getString('radioGroup.iconColor')
+		},
+		// 图标的大小，单位px
+		iconSize: {
+			type: [String, Number],
+			default: defProps.getNumber('radioGroup.iconSize')
+		},
+		// 勾选图标的对齐方式，left-左边，right-右边
+		iconPlacement: {
+			type: String,
+			default: defProps.getString('radioGroup.iconPlacement')
+		},
+		// placement为column时，是否显示下边框
+		borderBottom: {
+			type: Boolean,
+			default: defProps.getBoolean('radioGroup.borderBottom')
+		}
+	},
+  emits: ['update:modelValue', 'change'],
+  setup(__props, __setupCtx: SetupContext) {
+const __expose = __setupCtx.expose
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+	const { getChildren, addChild } = useUltraUI()
+	const instance = getCurrentInstance()?.proxy
+	
+	
+	
+	const props = __props
+	
+	function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+__ins.emit(event, ...do_not_transform_spread)
+}
+	
+	const parentDataSelf = computed((): UTSJSONObject => {
+		return {
+			modelValue: props.modelValue,
+			disabled: props.disabled,
+			inactiveColor: props.inactiveColor,
+			activeColor: props.activeColor,
+			size: props.size,
+			labelColor: props.labelColor,
+			labelDisabled: props.labelDisabled,
+			labelSize: props.labelSize,
+			shape: props.shape,
+			iconColor: props.iconColor,
+			iconSize: props.iconSize,
+			iconPlacement: props.iconPlacement,
+			borderBottom: props.borderBottom,
+			placement: props.placement
+		} as UTSJSONObject
+	})
+	
+	const bemClass = computed(() => {
+		return bem('radio-group', [props.placement], [])
+	})
+	
+	function onRadioChange(name: any | null) {
+		if (name != null) {
+			emit('update:modelValue', name!)
+			emit('change', name!)
+		} else {
+			emit('update:modelValue', '')
+			emit('change', '')
+		}
+	}
+	
+	provide('upRadioGroupProps', parentDataSelf)
+	provide('upRadioGroupChange', onRadioChange)
+	
+	// 兼容通过 $callMethod 或 children 调用的老方法
+	function unCheckedOther(childInstance: ComponentPublicInstance) {
+		const name = childInstance.$props['name']
+		onRadioChange(name)
+	}
+	
+	const getProps = function(): UTSJSONObject {
+		return parentDataSelf.value
+	}
+	const getRefs = function(): UTSJSONObject {
+		return {} as UTSJSONObject
+	}
+	
+	__expose({
+		unCheckedOther,
+		getChildren,
+		addChild,
+		getProps,
+		getRefs
+	})
+
+return (): any | null => {
+
+  return _cE("view", _uM({
+    class: _nC(["up-radio-group", bemClass.value])
+  }), [
+    renderSlot(_ctx.$slots, "default")
+  ], 2 /* CLASS */)
+}
+}
+
+})
+export default __sfc__
+export type UpRadioGroupComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpRadioGroupUpRadioGroupStyles = [_uM([["u-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-radio-group", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["up-radio-group--row", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["flexWrap", "wrap"]]))], ["up-radio-group--column", _pS(_uM([["display", "flex"], ["flexDirection", "column"]]))]])]

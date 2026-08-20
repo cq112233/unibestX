@@ -1,0 +1,137 @@
+<script setup lang="uts">
+import WeappTailwindcss from './components/WeappTailwindcss.uvue';
+import BindClass from './components/BindClass.uvue';
+import TButton from './components/t-button.uvue';
+import { useAppStore } from '@/src/store/index.uts';
+
+const appStore = useAppStore();
+
+const isDark = computed((): boolean => appStore.state.isDark);
+
+function toggleDark(): void {
+  const nextMode = appStore.state.isDark ? 'light' : 'dark';
+  appStore.setThemeMode(nextMode);
+}
+
+const buttonColors: Array<string> = [
+  'bg-[#000]',
+  'bg-[#111]',
+  'bg-[#222]',
+  'bg-[#333]',
+  'bg-[#444]',
+  'bg-[#555]',
+  'bg-[#666]',
+  'bg-[#777]',
+  'bg-[#888]',
+  'bg-[#999]',
+  'bg-[#aaa]',
+  'bg-[#bbb]',
+  'bg-[#ccc]',
+  'bg-[#ddd]',
+  'bg-[#eee]',
+  'bg-[#fff]'
+];
+
+const globalNum = ref(0);
+
+const buttonClass = computed((): string => {
+  const index: number = globalNum.value % buttonColors.length;
+  return buttonColors[index];
+});
+
+const templateCorpusDynamicClass = computed((): string => {
+  return 'template-corpus-dynamic bg-[#68c828] text-slate-700 text-[26px] w-[323px] h-[45px] leading-[45px] px-3';
+});
+
+function setGlobalNum(num: number): void {
+  globalNum.value = num;
+}
+
+onLoad((): void => {
+  console.log('欢迎使用 weapp-tailwindcss 模板');
+});
+</script>
+
+<template>
+  <view class="content" :class="{ dark: isDark }">
+    <WeappTailwindcss />
+    <BindClass />
+    <button class="mt-4 w-64 rounded-full bg-[#eccc68] px-4 py-2 text-white dark:bg-[#3498db]" @click="toggleDark">
+      <text>{{ isDark ? '切换到亮色模式' : '切换到暗色模式' }}</text>
+    </button>
+    <up-button type="primary">
+      <text class="text-[#000000] text-[20px]">
+        主要按钮
+      </text>
+    </up-button>
+    <view class="w-full bg-[#164e63] p-[12px] issue-1002-probe">
+      <text class="text-xs text-white">issue-1002 text-xs</text>
+      <text class="text-sm text-white">issue-1002 text-sm</text>
+      <text class="text-base text-white">issue-1002 text-base</text>
+      <text class="text-xl text-white">issue-1002 text-xl</text>
+      <view class="mt-[8px] h-[48px] w-[48px] rounded-full bg-[#f21903]" />
+      <text class="issue-1002-apply">issue-1002 scoped apply</text>
+    </view>
+    <view class="issue-902-theme-probe issue-902-theme-scope bg-primary p-[12px] text-white">
+      <text>issue 902 theme variable</text>
+    </view>
+    <view class="template-corpus-card flex flex-col gap-3 rounded-[28px] border border-slate-200 bg-gradient-to-br from-slate-900 to-slate-700 p-4 text-white shadow-xl wx:bg-blue-500 h5:bg-green-500 harmony:bg-[#c64b4b] ios:bg-[#0169f0] android:bg-[#2d6f08] dark:bg-white dark:h5:bg-[#0169f0]">
+      <view class="template-corpus-radial bg-[#e0f2fe] px-[48px] py-[24px] text-[#123456]">
+        <text>template corpus radial</text>
+      </view>
+      <view class="template-corpus-space space-y-2">
+        <view class="rounded-[20px] bg-white px-3 py-1 text-[26px] text-slate-700">
+          <text>space item 1</text>
+        </view>
+        <view :class="templateCorpusDynamicClass">
+          <text>space item 2</text>
+        </view>
+      </view>
+      <view class="template-corpus-apply">
+        <text>apply corpus</text>
+      </view>
+    </view>
+    <view class="my-3 w-full border-t border-solid border-gray-200" />
+    <text class="text-xl text-gray-600/95">
+      写法示例Start!
+    </text>
+    <view class="mt-[13.14758px] flex flex-col items-center">
+      <text class="w-32 rounded-md bg-[#f21903] py-2 text-center text-white">
+        圆角+背景+文本
+      </text>
+      <view class="mt-3">
+        <button class="w-64 text-white" :class="buttonClass" @click="setGlobalNum(globalNum + 1)">
+          click here to inc {{ globalNum }}
+        </button>
+      </view>
+      <view class="test">
+        <text class="text-[#da0e3c] text-center">
+          @apply 多端写法示例
+        </text>
+      </view>
+      <view class="theme-mode-demo mt-4 rounded bg-white px-4 py-3 text-slate-900 system-dark:bg-slate-900 system-dark:text-slate-100 dark:bg-zinc-900 dark:text-zinc-50">
+        <text>uni-app x Tailwind CSS v4 system dark</text>
+        <view class="theme-dark mt-2 rounded bg-white px-3 py-2 text-slate-900 dark:bg-zinc-950 dark:text-zinc-50">
+          <text>uni-app x Tailwind CSS v4 manual dark</text>
+        </view>
+      </view>
+      <t-button t-class="bg-[#0977ee] text-[31rpx]" t-class-content="px-[29rpx]">
+        <text>issue 977 t-class</text>
+      </t-button>
+    </view>
+  </view>
+</template>
+
+<style lang="scss" scoped>
+.content {
+  @apply flex flex-col items-center py-4;
+}
+
+.test {
+  @apply flex mt-3 h-[100px] w-[222.222px] items-center justify-center rounded-[40px] bg-[#31edd8]/[0.54];
+}
+
+.issue-1002-apply {
+  @apply text-xs text-white rounded-full bg-[#164e63];
+}
+</style>
