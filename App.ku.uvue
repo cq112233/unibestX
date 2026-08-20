@@ -90,6 +90,9 @@ onUnmounted(() => {
 
 // 每个页面切换都会触发：同步 H5 / 小程序原生导航栏主题
 onShow(() => {
+  if (uToastRef.value != null) {
+    registerToast(uToastRef.value!);
+  }
   applyNavbarTheme(appStore.state.isDark);
 });
 

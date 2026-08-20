@@ -585,7 +585,7 @@ const UNI_CONSOLE_RUNTIME_PROMISE = "__uni_console_runtime_promise__";
 function initRuntimeSocketService() {
   const hosts = "127.0.0.1,192.168.100.133,198.18.0.1,10.8.0.15";
   const port = "8090";
-  const id = "app-harmony_YEADDZ";
+  const id = "app-harmony_udA2lq";
   const runtimeGlobal = getRuntimeGlobal();
   const existingPromise = runtimeGlobal === null || runtimeGlobal === void 0 ? void 0 : runtimeGlobal[UNI_CONSOLE_RUNTIME_PROMISE];
   if (existingPromise) {

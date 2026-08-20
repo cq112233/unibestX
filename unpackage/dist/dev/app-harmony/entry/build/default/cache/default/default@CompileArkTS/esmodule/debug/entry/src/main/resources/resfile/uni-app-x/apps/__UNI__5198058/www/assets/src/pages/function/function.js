@@ -76,7 +76,6 @@ import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/systemInfo&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/toast&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/Card&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/env&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/iRainna-lodash/index&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/unix-crypto/index&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/unix-crypto/rsa&";
@@ -107,7 +106,7 @@ const __className = "GenSrcPagesFunctionFunction";
 const { onBackPress } = globalThis.Vue;
 const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   __dynamicSharedData: true,
-  __hash: "889bc4da",
+  __hash: "93b6fa68",
   __className,
   __filename: "src/pages/function/function.uvue",
   __name: "function",
@@ -125,27 +124,27 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       "raw js";
       const n15 = _createSharedDataComponent(AppKu, "13021a83", null, {
         "default": _withSharedDataVaporCtx(() => {
-          const n3 = _createSharedDataComponent(EnvCard, "5ae58bc7");
+          const n3 = _createSharedDataComponent(EnvCard, "5ae58be7");
           _setSharedData(__sharedData, 1, n3.sharedData);
-          const n4 = _createSharedDataComponent(ZPagingDemoCard, "5ae58c66");
+          const n4 = _createSharedDataComponent(ZPagingDemoCard, "5ae58c86");
           _setSharedData(__sharedData, 2, n4.sharedData);
-          const n5 = _createSharedDataComponent(SystemInfoCard, "5ae58f87");
+          const n5 = _createSharedDataComponent(SystemInfoCard, "5ae58fa7");
           _setSharedData(__sharedData, 3, n5.sharedData);
-          const n6 = _createSharedDataComponent(HapticsCard, "5ae59008");
+          const n6 = _createSharedDataComponent(HapticsCard, "5ae59028");
           _setSharedData(__sharedData, 4, n6.sharedData);
-          const n7 = _createSharedDataComponent(ToastCard, "5ae590a3");
+          const n7 = _createSharedDataComponent(ToastCard, "5ae5934e");
           _setSharedData(__sharedData, 5, n7.sharedData);
-          const n8 = _createSharedDataComponent(MediaCard, "5ae593ab");
+          const n8 = _createSharedDataComponent(MediaCard, "5ae593e0");
           _setSharedData(__sharedData, 6, n8.sharedData);
-          const n9 = _createSharedDataComponent(LodashDemoCard, "5ae5970a");
+          const n9 = _createSharedDataComponent(LodashDemoCard, "5ae5972a");
           _setSharedData(__sharedData, 7, n9.sharedData);
-          const n10 = _createSharedDataComponent(CryptoDemoCard, "5ae597c2");
+          const n10 = _createSharedDataComponent(CryptoDemoCard, "5ae597e2");
           _setSharedData(__sharedData, 8, n10.sharedData);
-          const n11 = _createSharedDataComponent(TimeDemoCard, "5ae59b0a");
+          const n11 = _createSharedDataComponent(TimeDemoCard, "5ae59b2a");
           _setSharedData(__sharedData, 9, n11.sharedData);
-          const n12 = _createSharedDataComponent(SignatureCard, "5ae59bc3");
+          const n12 = _createSharedDataComponent(SignatureCard, "5ae59be3");
           _setSharedData(__sharedData, 10, n12.sharedData);
-          const n13 = _createSharedDataComponent(EchartsDemoCard, "5ae59eea");
+          const n13 = _createSharedDataComponent(EchartsDemoCard, "5ae59f0a");
           _setSharedData(__sharedData, 11, n13.sharedData);
         })
       });

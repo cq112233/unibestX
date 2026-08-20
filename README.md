@@ -321,7 +321,6 @@ unibestX/
 │       ├── toast.uts         #   全局 Toast 轻提示
 │       ├── systemInfo.uts    #   屏幕与系统信息获取
 │       ├── backPress.uts     #   Android 物理返回键双击退出
-│       ├── env.uts           #   多环境配置管理
 │       ├── toLoginPage.uts   #   跳转登录页逻辑封装
 │       └── i18n.uts          #   多语言辅助工具
 ├── uni_modules/              # uni-app 扩展插件模块

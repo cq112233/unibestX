@@ -87,7 +87,7 @@
   function initRuntimeSocketService() {
     const hosts = "127.0.0.1,192.168.100.133,198.18.0.1,10.8.0.15";
     const port = "8090";
-    const id = "app-android_ZYESal";
+    const id = "app-android_bGcrQU";
     return Promise.resolve().then(() => {
       return initRuntimeSocket(hosts, port, id).then((socket) => {
         if (socket == null) {
@@ -7050,6 +7050,9 @@
         }
       });
       vue.onShow(() => {
+        if (uToastRef.value != null) {
+          registerToast(uToastRef.value);
+        }
         applyNavbarTheme(appStore.state.isDark);
       });
       vue.watch(() => {
@@ -10021,192 +10024,63 @@
   });
   const _style_0$2Y = {};
   const SrcPagesBasicBasic = /* @__PURE__ */ _export_sfc(_sfc_main$31, [["styles", [_style_0$2Y]]]);
-  class EnvConfig extends UTS.UTSType {
-    static get$UTSMetadata$() {
-      return {
-        kind: 2,
-        get fields() {
-          return {
-            name: { type: String, optional: false },
-            baseURL: { type: String, optional: false }
-          };
-        },
-        name: "EnvConfig"
-      };
-    }
-    constructor(options, metadata = EnvConfig.get$UTSMetadata$(), isJSONParse = false) {
-      super();
-      this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
-      this.name = this.__props__.name;
-      this.baseURL = this.__props__.baseURL;
-      delete this.__props__;
-    }
-  }
-  const devConfig = new EnvConfig({
-    name: "开发环境",
-    baseURL: "https://ukw0y1.laf.run"
-  });
-  const testConfig = new EnvConfig({
-    name: "测试环境",
-    baseURL: "https://ukw0y1.laf.run"
-  });
-  const prodConfig = new EnvConfig({
-    name: "生产环境",
-    baseURL: "https://ukw0y1.laf.run"
-  });
-  const systemEnv = "development";
-  let overrideEnv = null;
-  function getSystemEnv() {
-    return systemEnv;
-  }
-  function getCurrentEnv() {
-    const env = overrideEnv;
-    if (env != null) {
-      return env;
-    }
-    return systemEnv;
-  }
-  function setCurrentEnv(env) {
-    overrideEnv = env;
-  }
-  function resetEnv() {
-    overrideEnv = null;
-  }
-  function getEnvConfigFor(env) {
-    if (env === "test") {
-      return testConfig;
-    }
-    if (env === "production") {
-      return prodConfig;
-    }
-    return devConfig;
-  }
-  function getEnvLabel(type) {
-    if (type === "development") {
-      return "开发";
-    }
-    if (type === "test") {
-      return "测试";
-    }
-    if (type === "production") {
-      return "生产";
-    }
-    return "未知";
-  }
   const __className$2$ = "GenSrcPagesFunctionComponentsEnvCard";
-  const COLOR_DEV = "#10b981";
-  const COLOR_TEST = "#f59e0b";
-  const COLOR_PROD = "#ef4444";
-  const COLOR_BG = "#e2e8f0";
-  const COLOR_WHITE = "#ffffff";
-  const COLOR_DARK = "#475569";
   const _sfc_main$30 = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
     __dynamicSharedData: true,
-    __hash: "15d07547",
+    __hash: "c5ecb3f0",
     __className: __className$2$,
     __filename: "src/pages/function/components/EnvCard.uvue",
     __name: "EnvCard",
     setup(__props) {
+      var _a2, _b2;
       const __sharedDataScope = vue.useSharedDataScope();
       const __sharedData = vue.withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, vue.useSharedDataComponentOptions({ bundleKey: "GenSrcPagesFunctionComponentsEnvCardSharedData", sharedDataClassId: 0 })));
-      const systemEnv2 = getSystemEnv();
-      const systemEnvLabel = vue.computed(() => {
+      const appTitle = `${"unibestX"}`;
+      const appVersion = `${"1.0.0"}`;
+      const buildEnvType = `${(_a2 = "development") !== null && _a2 !== void 0 ? _a2 : ""}`;
+      const systemEnv = buildEnvType == "test" ? "test" : "development";
+      const apiBaseUrl = `${(_b2 = "https://ukw0y1.laf.run") !== null && _b2 !== void 0 ? _b2 : "https://ukw0y1.laf.run"}`;
+      const envTypeText = systemEnv;
+      const envLabel = vue.computed(() => {
+        if (systemEnv === "test") {
+          return "测试";
+        }
+        if (systemEnv === "production") {
+          return "生产";
+        }
         return "开发";
       });
-      const currentEnv = vue.ref(getCurrentEnv());
-      const isOverridden = vue.computed(() => {
-        return currentEnv.value !== systemEnv2;
-      });
-      const currentEnvLabel = vue.computed(() => {
-        return getEnvLabel(currentEnv.value);
-      });
       const envColor = vue.computed(() => {
-        if (currentEnv.value === "development") {
-          return COLOR_DEV;
+        if (systemEnv === "test") {
+          return "#f59e0b";
         }
-        if (currentEnv.value === "test") {
-          return COLOR_TEST;
+        if (systemEnv === "production") {
+          return "#ef4444";
         }
-        return COLOR_PROD;
+        return "#10b981";
       });
-      const envConfig = vue.computed(() => {
-        return getEnvConfigFor(currentEnv.value);
-      });
-      const devBtnBg = vue.computed(() => {
-        return currentEnv.value === "development" ? COLOR_DEV : COLOR_BG;
-      });
-      const devBtnText = vue.computed(() => {
-        return currentEnv.value === "development" ? COLOR_WHITE : COLOR_DARK;
-      });
-      const testBtnBg = vue.computed(() => {
-        return currentEnv.value === "test" ? COLOR_TEST : COLOR_BG;
-      });
-      const testBtnText = vue.computed(() => {
-        return currentEnv.value === "test" ? COLOR_WHITE : COLOR_DARK;
-      });
-      const prodBtnBg = vue.computed(() => {
-        return currentEnv.value === "production" ? COLOR_PROD : COLOR_BG;
-      });
-      const prodBtnText = vue.computed(() => {
-        return currentEnv.value === "production" ? COLOR_WHITE : COLOR_DARK;
-      });
-      function switchEnv(type) {
-        const env = type;
-        setCurrentEnv(env);
-        currentEnv.value = env;
-        const label = getEnvLabel(env);
-        uni.showToast({
-          title: `已切换至${label}环境`,
-          icon: "none",
-          duration: 1500
-        });
-      }
-      function handleReset() {
-        resetEnv();
-        currentEnv.value = systemEnv2;
-        uni.showToast({
-          title: "已重置为系统默认环境",
-          icon: "none",
-          duration: 1500
-        });
-      }
       return () => {
         "raw js";
-        const n24 = vue.createSharedDataComponent(
+        const n16 = vue.createSharedDataComponent(
           Card,
           "5df1cdee",
           { title: "环境变量" },
           {
             "default": () => {
-              vue.setSharedDataEvent(__sharedData, 1, () => {
-                return switchEnv("development");
-              });
-              vue.setSharedDataEvent(__sharedData, 2, () => {
-                return switchEnv("test");
-              });
-              vue.setSharedDataEvent(__sharedData, 3, () => {
-                return switchEnv("production");
-              });
-              vue.setSharedDataEvent(__sharedData, 4, handleReset);
               vue.renderSharedDataEffect(() => {
-                vue.setSharedData(__sharedData, 5, vue.toDisplayString(systemEnvLabel.value));
-                vue.setSharedDataStyle(__sharedData, 6, { color: envColor.value });
-                vue.setSharedData(__sharedData, 7, vue.toDisplayString(currentEnvLabel.value));
-                vue.setSharedData(__sharedData, 8, vue.toDisplayString(envConfig.value.baseURL));
-                vue.setSharedData(__sharedData, 9, vue.toDisplayString(isOverridden.value ? "是" : "否"));
-                vue.setSharedDataStyle(__sharedData, 10, { backgroundColor: devBtnBg.value });
-                vue.setSharedDataStyle(__sharedData, 11, { color: devBtnText.value });
-                vue.setSharedDataStyle(__sharedData, 12, { backgroundColor: testBtnBg.value });
-                vue.setSharedDataStyle(__sharedData, 13, { color: testBtnText.value });
-                vue.setSharedDataStyle(__sharedData, 14, { backgroundColor: prodBtnBg.value });
-                vue.setSharedDataStyle(__sharedData, 15, { color: prodBtnText.value });
+                vue.setSharedData(__sharedData, 1, vue.toDisplayString(appTitle));
+                vue.setSharedData(__sharedData, 2, vue.toDisplayString(appVersion));
+                vue.setSharedDataStyle(__sharedData, 3, { color: envColor.value });
+                vue.setSharedData(__sharedData, 4, vue.toDisplayString(envLabel.value));
+                vue.setSharedData(__sharedData, 5, vue.toDisplayString(vue.unref(envTypeText)));
+                vue.setSharedData(__sharedData, 6, vue.toDisplayString(apiBaseUrl));
               });
             }
           },
           1
           /* SINGLE_ROOT */
         );
-        vue.setSharedData(__sharedData, 0, n24.sharedData);
+        vue.setSharedData(__sharedData, 0, n16.sharedData);
         return __sharedData;
       };
     }
@@ -16896,7 +16770,7 @@
   const __className$2J = "GenSrcPagesFunctionFunction";
   const _sfc_main$2K = /* @__PURE__ */ vue.defineVaporSharedDataComponent({
     __dynamicSharedData: true,
-    __hash: "fdbe7738",
+    __hash: "8f44044a",
     __className: __className$2J,
     __filename: "src/pages/function/function.uvue",
     __name: "function",
@@ -16914,27 +16788,27 @@
         "raw js";
         const n15 = vue.createSharedDataComponent(AppKu, "13021a83", null, {
           "default": vue.withSharedDataVaporCtx(() => {
-            const n3 = vue.createSharedDataComponent(EnvCard, "5ae58bc7");
+            const n3 = vue.createSharedDataComponent(EnvCard, "5ae58be7");
             vue.setSharedData(__sharedData, 1, n3.sharedData);
-            const n4 = vue.createSharedDataComponent(ZPagingDemoCard, "5ae58c66");
+            const n4 = vue.createSharedDataComponent(ZPagingDemoCard, "5ae58c86");
             vue.setSharedData(__sharedData, 2, n4.sharedData);
-            const n5 = vue.createSharedDataComponent(SystemInfoCard, "5ae58f87");
+            const n5 = vue.createSharedDataComponent(SystemInfoCard, "5ae58fa7");
             vue.setSharedData(__sharedData, 3, n5.sharedData);
-            const n6 = vue.createSharedDataComponent(HapticsCard, "5ae59008");
+            const n6 = vue.createSharedDataComponent(HapticsCard, "5ae59028");
             vue.setSharedData(__sharedData, 4, n6.sharedData);
-            const n7 = vue.createSharedDataComponent(ToastCard, "5ae590a3");
+            const n7 = vue.createSharedDataComponent(ToastCard, "5ae5934e");
             vue.setSharedData(__sharedData, 5, n7.sharedData);
-            const n8 = vue.createSharedDataComponent(MediaCard, "5ae593ab");
+            const n8 = vue.createSharedDataComponent(MediaCard, "5ae593e0");
             vue.setSharedData(__sharedData, 6, n8.sharedData);
-            const n9 = vue.createSharedDataComponent(LodashDemoCard, "5ae5970a");
+            const n9 = vue.createSharedDataComponent(LodashDemoCard, "5ae5972a");
             vue.setSharedData(__sharedData, 7, n9.sharedData);
-            const n10 = vue.createSharedDataComponent(CryptoDemoCard, "5ae597c2");
+            const n10 = vue.createSharedDataComponent(CryptoDemoCard, "5ae597e2");
             vue.setSharedData(__sharedData, 8, n10.sharedData);
-            const n11 = vue.createSharedDataComponent(TimeDemoCard, "5ae59b0a");
+            const n11 = vue.createSharedDataComponent(TimeDemoCard, "5ae59b2a");
             vue.setSharedData(__sharedData, 9, n11.sharedData);
-            const n12 = vue.createSharedDataComponent(SignatureCard, "5ae59bc3");
+            const n12 = vue.createSharedDataComponent(SignatureCard, "5ae59be3");
             vue.setSharedData(__sharedData, 10, n12.sharedData);
-            const n13 = vue.createSharedDataComponent(EchartsDemoCard, "5ae59eea");
+            const n13 = vue.createSharedDataComponent(EchartsDemoCard, "5ae59f0a");
             vue.setSharedData(__sharedData, 11, n13.sharedData);
           })
         });
