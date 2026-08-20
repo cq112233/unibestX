@@ -4,7 +4,7 @@ const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useShared
 const __className = "GenSrcLayoutsDefault";
 const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   __dynamicSharedData: true,
-  __hash: "22c92cc6",
+  __hash: "6aba59a0",
   __className,
   __filename: "src/layouts/default.uvue",
   __name: "default",

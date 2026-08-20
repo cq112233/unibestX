@@ -13,7 +13,7 @@ const config = new common_vendor.UTSJSONObject({
   ],
   // 颜色部分，本来可以通过scss的:export导出供js使用，但是奈何nvue不支持
   color: new common_vendor.UTSJSONObject({
-    "up-primary": "var(--theme-color, #0957de)",
+    "up-primary": "#3c9cff",
     "up-warning": "#ff9900",
     "up-success": "#19be6b",
     "up-error": "#fa3534",

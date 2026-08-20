@@ -79,7 +79,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     });
     watch(() => {
       return appStore.state.isDark;
-    }, (newVal, oldVal) => {
+    }, (newVal) => {
       applyNavbarTheme(newVal);
     });
     return () => {

@@ -1,6 +1,6 @@
 import { _ as __easycom_0 } from "../../components/NavBar/NavBar.js";
 import { A as AppKu } from "../../../App.ku.js";
-import { L as LayoutComponent } from "../../components/layouts/default.js";
+import { L as LayoutComponent } from "../../layouts/default.js";
 import { h as handleBackPressExit } from "../../utils/backPress.js";
 import { _ as _export_sfc } from "../../../plugin-vue-export-helper.js";
 import "../../utils/systemInfo.js";
@@ -37,6 +37,7 @@ import "../../../uni_modules/uview-ultra/libs/i18n/locales/de.js";
 import "../../../uni_modules/uview-ultra/libs/i18n/locales/ko.js";
 import "../../../uni_modules/uview-ultra/libs/i18n/locales/ja.js";
 import "../../../uni_modules/uview-ultra/libs/i18n/locales/ru.js";
+import "../../../uni_modules/uview-ultra/libs/config/config.js";
 import "../../utils/theme.js";
 import "../../../theme.js";
 import "../../store/token.js";
@@ -44,7 +45,6 @@ import "../../store/user.js";
 import "../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
 import "../../../uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.js";
 import "../../../uni_modules/uview-ultra/components/up-loading-icon/loadingIcon.js";
-import "../../../uni_modules/uview-ultra/libs/config/config.js";
 import "../../../uni_modules/uview-ultra/libs/function/index.js";
 import "../../../uni_modules/uview-ultra/libs/function/test.js";
 import "../../../uni_modules/uview-ultra/libs/function/digit.js";
@@ -72,7 +72,7 @@ const __className = "GenSrcPagesIndexIndex";
 const { onBackPress } = globalThis.Vue;
 const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   __dynamicSharedData: true,
-  __hash: "3fc198c8",
+  __hash: "3590e2cc",
   __className,
   __filename: "src/pages/index/index.uvue",
   __name: "index",

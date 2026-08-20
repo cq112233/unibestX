@@ -1,5 +1,5 @@
 import { A as AppKu } from "../../../App.ku.js";
-import { L as LayoutComponent } from "../../components/layouts/default.js";
+import { L as LayoutComponent } from "../../layouts/default.js";
 import "../../store/index.js";
 import { i as isPageTabbar, a as setCurIdxByPath } from "../../tabbar/store.js";
 import { u as useTokenStore, I as ISingleTokenRes } from "../../store/token.js";

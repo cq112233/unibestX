@@ -71,7 +71,7 @@ const __className = "GenSrcPagesMeMe";
 const { onBackPress, computed, onShow } = globalThis.Vue;
 const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   __dynamicSharedData: true,
-  __hash: "dd349096",
+  __hash: "2d6c5bf1",
   __className,
   __filename: "src/pages/me/me.uvue",
   __name: "me",
@@ -152,7 +152,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
           });
           _renderSharedDataEffect(() => {
             const _tokenStore = _unref(tokenStore);
-            _setSharedDataClass(__sharedData, 8, ["wtu-15s69u4-r wtu-jzjlp-s wtu-1vsb6g1-t wtu-w73263-u wtu-17lenqs-v wtu-j5499y-w", _tokenStore.hasValidLogin() ? "wtu-1x8u93y-x wtu-1obvnxf-y" : "wtu-11a9dql-z wtu-1ya1no3-o"]);
+            _setSharedDataClass(__sharedData, 8, ["wtu-15s69u4-q wtu-jzjlp-r wtu-1vsb6g1-s wtu-w73263-t wtu-17lenqs-u wtu-j5499y-v", _tokenStore.hasValidLogin() ? "wtu-1x8u93y-w wtu-1obvnxf-x" : "wtu-11a9dql-y wtu-1ya1no3-n"]);
             _setSharedData(__sharedData, 9, _toDisplayString(_tokenStore.hasValidLogin() ? "已登录" : "未登录"));
             _setSharedData(__sharedData, 10, _toDisplayString(_unref(userInfoJson)));
           });
@@ -170,7 +170,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     };
   }
 });
-const _style_0 = {"wtu-15s69u4-r":{"":{"fontSize":12}},"wtu-jzjlp-s":{"":{"paddingLeft":12,"paddingRight":12}},"wtu-1vsb6g1-t":{"":{"paddingTop":4,"paddingBottom":4}},"wtu-w73263-u":{"":{"borderRadius":20}},"wtu-17lenqs-v":{"":{"-TwFontWeight":"var(--font-weight-medium,500)","fontWeight":"500"}},"wtu-j5499y-w":{"":{"overflow":"hidden"}},"wtu-1x8u93y-x":{"":{"backgroundColor":"#d1fae5"}},"wtu-1obvnxf-y":{"":{"color":"#065f46"}},"wtu-11a9dql-z":{"":{"backgroundColor":"#f1f5f9"}},"wtu-1ya1no3-o":{"":{"color":"#64748b"}}};
+const _style_0 = {"wtu-15s69u4-q":{"":{"fontSize":12}},"wtu-jzjlp-r":{"":{"paddingLeft":12,"paddingRight":12}},"wtu-1vsb6g1-s":{"":{"paddingTop":4,"paddingBottom":4}},"wtu-w73263-t":{"":{"borderRadius":20}},"wtu-17lenqs-u":{"":{"-TwFontWeight":"var(--font-weight-medium,500)","fontWeight":"500"}},"wtu-j5499y-v":{"":{"overflow":"hidden"}},"wtu-1x8u93y-w":{"":{"backgroundColor":"#d1fae5"}},"wtu-1obvnxf-x":{"":{"color":"#065f46"}},"wtu-11a9dql-y":{"":{"backgroundColor":"#f1f5f9"}},"wtu-1ya1no3-n":{"":{"color":"#64748b"}}};
 const me = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   me as default

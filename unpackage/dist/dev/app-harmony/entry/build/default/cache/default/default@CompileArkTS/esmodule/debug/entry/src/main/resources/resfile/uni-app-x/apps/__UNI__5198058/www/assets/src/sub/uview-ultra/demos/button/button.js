@@ -1,7 +1,7 @@
 import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/components/NavBar/NavBar&";
 import { _ as __easycom_2 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-button/up-button&";
 import { A as AppKu } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
-import { L as LayoutComponent } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/components/layouts/default&";
+import { L as LayoutComponent } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/layouts/default&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/systemInfo&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/index&";
@@ -37,13 +37,13 @@ import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/ko&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/ja&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/ru&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/config/config&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/theme&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/theme&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/token&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/user&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/loadingIcon&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/config/config&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/test&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/digit&";
@@ -72,7 +72,7 @@ const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _us
 const __className = "GenSrcSubUviewUltraDemosButtonButton";
 const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   __dynamicSharedData: true,
-  __hash: "c3b25a58",
+  __hash: "646c773d",
   __className,
   __filename: "src/sub/uview-ultra/demos/button/button.uvue",
   __name: "button",
@@ -93,61 +93,59 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
             "default": _withSharedDataVaporCtx(() => {
               const n0 = _createSharedDataComponentWithFallback(_component_NavBar, "146c15be", {
                 title: "up-button 按钮",
-                "auto-back": true,
-                "safe-area-inset-top": true,
-                "bg-color": "#ffffff"
+                "auto-back": true
               });
               _setSharedData(__sharedData, 2, n0?.sharedData);
-              const n2 = _createSharedDataComponentWithFallback(_component_up_button, "146c206c", {
+              const n2 = _createSharedDataComponentWithFallback(_component_up_button, "146c1d5e", {
                 type: "primary",
                 text: "主要按钮"
               });
               _setSharedData(__sharedData, 3, n2?.sharedData);
-              const n4 = _createSharedDataComponentWithFallback(_component_up_button, "146c2463", {
+              const n4 = _createSharedDataComponentWithFallback(_component_up_button, "146c23cb", {
                 type: "success",
                 text: "成功按钮"
               });
               _setSharedData(__sharedData, 4, n4?.sharedData);
-              const n6 = _createSharedDataComponentWithFallback(_component_up_button, "146c2845", {
+              const n6 = _createSharedDataComponentWithFallback(_component_up_button, "146c27ad", {
                 type: "info",
                 text: "信息按钮"
               });
               _setSharedData(__sharedData, 5, n6?.sharedData);
-              const n8 = _createSharedDataComponentWithFallback(_component_up_button, "146c2c24", {
+              const n8 = _createSharedDataComponentWithFallback(_component_up_button, "146c2b8c", {
                 type: "warning",
                 text: "警告按钮"
               });
               _setSharedData(__sharedData, 6, n8?.sharedData);
-              const n10 = _createSharedDataComponentWithFallback(_component_up_button, "146c3006", {
+              const n10 = _createSharedDataComponentWithFallback(_component_up_button, "146c2f6e", {
                 type: "error",
                 text: "危险按钮"
               });
               _setSharedData(__sharedData, 7, n10?.sharedData);
-              const n14 = _createSharedDataComponentWithFallback(_component_up_button, "791684cb", {
+              const n14 = _createSharedDataComponentWithFallback(_component_up_button, "79168433", {
                 type: "primary",
                 text: "主要按钮",
                 plain: true
               });
               _setSharedData(__sharedData, 8, n14?.sharedData);
-              const n18 = _createSharedDataComponentWithFallback(_component_up_button, "79168f54", {
+              const n18 = _createSharedDataComponentWithFallback(_component_up_button, "79168c31", {
                 type: "primary",
                 text: "大尺寸",
                 size: "large"
               });
               _setSharedData(__sharedData, 9, n18?.sharedData);
-              const n20 = _createSharedDataComponentWithFallback(_component_up_button, "791693ac", {
+              const n20 = _createSharedDataComponentWithFallback(_component_up_button, "79169314", {
                 type: "primary",
                 text: "普通尺寸",
                 size: "normal"
               });
               _setSharedData(__sharedData, 10, n20?.sharedData);
-              const n22 = _createSharedDataComponentWithFallback(_component_up_button, "79169a91", {
+              const n22 = _createSharedDataComponentWithFallback(_component_up_button, "7916976e", {
                 type: "primary",
                 text: "小尺寸",
                 size: "small"
               });
               _setSharedData(__sharedData, 11, n22?.sharedData);
-              const n24 = _createSharedDataComponentWithFallback(_component_up_button, "79169ed4", {
+              const n24 = _createSharedDataComponentWithFallback(_component_up_button, "79169e3c", {
                 type: "primary",
                 text: "迷你尺寸",
                 size: "mini"

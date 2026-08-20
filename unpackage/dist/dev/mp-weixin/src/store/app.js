@@ -7,7 +7,15 @@ require("../../uni_modules/x-pinia-s/instans/persist.js");
 const src_tabbar_store = require("../tabbar/store.js");
 const src_i18n_index = require("../i18n/index.js");
 const uni_modules_uviewUltra_libs_i18n_index = require("../../uni_modules/uview-ultra/libs/i18n/index.js");
+const uni_modules_uviewUltra_libs_config_config = require("../../uni_modules/uview-ultra/libs/config/config.js");
 const src_utils_theme = require("../utils/theme.js");
+function syncUViewTheme(color) {
+  try {
+    const colorMap = uni_modules_uviewUltra_libs_config_config.config.color;
+    colorMap["up-primary"] = color;
+  } catch (_a) {
+  }
+}
 class IAppState extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -66,6 +74,7 @@ class AppStore extends uni_modules_xPiniaS_instans_storeBase.PiniaStoreBase {
     this._themeModeInited = false;
     this.bindState(this.state);
     src_tabbar_store.themeColor.value = this.state.theme;
+    syncUViewTheme(this.state.theme);
     src_i18n_index.i18n.global.locale.value = this.state.locale;
     uni_modules_uviewUltra_libs_i18n_index.setLocale(this.state.locale);
   }
@@ -78,6 +87,7 @@ class AppStore extends uni_modules_xPiniaS_instans_storeBase.PiniaStoreBase {
     this.state.themeMode = defaultAppState.themeMode;
     this.state.isDark = defaultAppState.isDark;
     src_tabbar_store.themeColor.value = defaultAppState.theme;
+    syncUViewTheme(defaultAppState.theme);
     src_i18n_index.i18n.global.locale.value = defaultAppState.locale;
     uni_modules_uviewUltra_libs_i18n_index.setLocale(defaultAppState.locale);
     this.initThemeMode();
@@ -87,6 +97,7 @@ class AppStore extends uni_modules_xPiniaS_instans_storeBase.PiniaStoreBase {
       const colorVal = _data.theme;
       this.state.theme = colorVal;
       src_tabbar_store.themeColor.value = colorVal;
+      syncUViewTheme(colorVal);
     }
     if (_data.locale != null) {
       const localeVal = _data.locale;
@@ -121,6 +132,7 @@ class AppStore extends uni_modules_xPiniaS_instans_storeBase.PiniaStoreBase {
   setTheme(theme) {
     this.state.theme = theme;
     src_tabbar_store.themeColor.value = theme;
+    syncUViewTheme(theme);
   }
   /**
    * 初始化外观模式：注册全局主题监听并应用当前模式

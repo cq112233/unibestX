@@ -5,8 +5,16 @@ import "../../uni_modules/x-pinia-s/instans/persist.js";
 import { t as themeColor } from "../tabbar/store.js";
 import { i as i18n } from "../i18n/index.js";
 import { s as setLocale } from "../../uni_modules/uview-ultra/libs/i18n/index.js";
+import { c as config } from "../../uni_modules/uview-ultra/libs/config/config.js";
 import { b as getSystemTheme } from "../utils/theme.js";
 const { reactive } = globalThis.Vue;
+function syncUViewTheme(color) {
+  try {
+    const colorMap = config.color;
+    colorMap["up-primary"] = color;
+  } catch {
+  }
+}
 class IAppState extends UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -42,7 +50,7 @@ function getSystemLocale() {
     if (appLang != null && appLang.toLowerCase().includes("en")) {
       return "en-US";
     }
-  } catch (e) {
+  } catch {
   }
   return "zh-CN";
 }
@@ -65,6 +73,7 @@ class AppStore extends PiniaStoreBase {
     this._themeModeInited = false;
     this.bindState(this.state);
     themeColor.value = this.state.theme;
+    syncUViewTheme(this.state.theme);
     i18n.global.locale.value = this.state.locale;
     setLocale(this.state.locale);
   }
@@ -77,6 +86,7 @@ class AppStore extends PiniaStoreBase {
     this.state.themeMode = defaultAppState.themeMode;
     this.state.isDark = defaultAppState.isDark;
     themeColor.value = defaultAppState.theme;
+    syncUViewTheme(defaultAppState.theme);
     i18n.global.locale.value = defaultAppState.locale;
     setLocale(defaultAppState.locale);
     this.initThemeMode();
@@ -86,6 +96,7 @@ class AppStore extends PiniaStoreBase {
       const colorVal = _data.theme;
       this.state.theme = colorVal;
       themeColor.value = colorVal;
+      syncUViewTheme(colorVal);
     }
     if (_data.locale != null) {
       const localeVal = _data.locale;
@@ -120,6 +131,7 @@ class AppStore extends PiniaStoreBase {
   setTheme(theme) {
     this.state.theme = theme;
     themeColor.value = theme;
+    syncUViewTheme(theme);
   }
   /**
    * 初始化外观模式：注册全局主题监听并应用当前模式

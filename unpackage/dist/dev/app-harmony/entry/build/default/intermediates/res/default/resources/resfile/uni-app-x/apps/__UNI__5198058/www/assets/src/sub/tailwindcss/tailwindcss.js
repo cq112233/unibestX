@@ -1,6 +1,6 @@
 import { _ as __easycom_0 } from "../../components/NavBar/NavBar.js";
 import { A as AppKu } from "../../../App.ku.js";
-import { L as LayoutComponent } from "../../components/layouts/default.js";
+import { L as LayoutComponent } from "../../layouts/default.js";
 import { W as WeappTailwindcss } from "./components/WeappTailwindcss.js";
 import { B as BindClass } from "./components/BindClass.js";
 import { _ as _sfc_main$1 } from "./components/t-button.js";

@@ -1,5 +1,6 @@
 import { _ as __easycom_0 } from "../up-loading-icon/up-loading-icon.js";
 import { g as getPx, a as addUnit, d as deepMerge, b as addStyle } from "../../libs/function/index.js";
+import { c as config } from "../../libs/config/config.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
 const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
 const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataIf: _createSharedDataIf, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedDataEvent: _setSharedDataEvent } = globalThis.Vue;
@@ -83,7 +84,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
         if (props.activeColor != "" && props.activeColor != "#2979ff") {
           return props.activeColor;
         }
-        return "var(--theme-color, #2979ff)";
+        return config.getString("color.up-primary");
       }
       return "#AAABAD";
     });

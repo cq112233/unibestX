@@ -1,5 +1,5 @@
 import { A as AppKu } from "../../../App.ku.js";
-import { L as LayoutComponent } from "../../components/layouts/default.js";
+import { L as LayoutComponent } from "../../layouts/default.js";
 import "../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
 import "../../../uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.js";
 import "../../../uni_modules/uview-ultra/components/up-loading-icon/loadingIcon.js";

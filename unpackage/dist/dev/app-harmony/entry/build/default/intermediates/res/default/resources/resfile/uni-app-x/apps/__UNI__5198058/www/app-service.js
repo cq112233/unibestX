@@ -25,6 +25,7 @@ import "./assets/uni_modules/uview-ultra/libs/i18n/locales/de.js";
 import "./assets/uni_modules/uview-ultra/libs/i18n/locales/ko.js";
 import "./assets/uni_modules/uview-ultra/libs/i18n/locales/ja.js";
 import "./assets/uni_modules/uview-ultra/libs/i18n/locales/ru.js";
+import "./assets/uni_modules/uview-ultra/libs/config/config.js";
 import "./assets/src/utils/theme.js";
 import "./assets/theme.js";
 import "./assets/plugin-vue-export-helper.js";
@@ -44,7 +45,6 @@ import "./assets/uni_modules/uview-ultra/libs/mixin/mixin.js";
 import "./assets/uni_modules/uview-ultra/libs/function/test.js";
 import "./assets/uni_modules/uview-ultra/libs/function/index.js";
 import "./assets/uni_modules/uview-ultra/libs/function/digit.js";
-import "./assets/uni_modules/uview-ultra/libs/config/config.js";
 import "./assets/uni_modules/uview-ultra/libs/config/color.js";
 import "./assets/src/router/config.js";
 function currentPageCaptureScreenshot(fullPage, callback) {
@@ -585,7 +585,7 @@ const UNI_CONSOLE_RUNTIME_PROMISE = "__uni_console_runtime_promise__";
 function initRuntimeSocketService() {
   const hosts = "127.0.0.1,192.168.100.133,198.18.0.1,10.8.0.5";
   const port = "8090";
-  const id = "app-harmony_xuyYXM";
+  const id = "app-harmony_WO54nw";
   const runtimeGlobal = getRuntimeGlobal();
   const existingPromise = runtimeGlobal === null || runtimeGlobal === void 0 ? void 0 : runtimeGlobal[UNI_CONSOLE_RUNTIME_PROMISE];
   if (existingPromise) {

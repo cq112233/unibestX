@@ -21,8 +21,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         a: common_vendor.p({
           title: "up-button 按钮",
           ["auto-back"]: true,
-          ["safe-area-inset-top"]: true,
-          ["bg-color"]: "#ffffff",
           class: "data-v-bf43e27b"
         }),
         b: common_vendor.p({

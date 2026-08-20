@@ -167,7 +167,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       }
       if (props.plain) {
         if (props.type == "primary")
-          return "var(--theme-color, #0957de)";
+          return config.getString("color.up-primary");
         if (props.type == "info")
           return "#000000";
         if (props.type == "success")

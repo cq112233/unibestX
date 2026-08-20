@@ -100,7 +100,7 @@ const __className = "GenSrcPagesBasicBasic";
 const { onBackPress, onResize } = globalThis.Vue;
 const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   __dynamicSharedData: true,
-  __hash: "6a5b90c5",
+  __hash: "f4ddda52",
   __className,
   __filename: "src/pages/basic/basic.uvue",
   __name: "basic",
@@ -121,25 +121,25 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
       "raw js";
       const n12 = _createSharedDataComponent(AppKu, "56ab5a5a", null, {
         "default": _withSharedDataVaporCtx(() => {
-          const n0 = _createSharedDataComponent(UViewUltraDemoCard, "5360e8d7");
+          const n0 = _createSharedDataComponent(UViewUltraDemoCard, "5360e8b5");
           _setSharedData(__sharedData, 1, n0.sharedData);
-          const n1 = _createSharedDataComponent(TailwindcssDemoCard, "5360e9b0");
+          const n1 = _createSharedDataComponent(TailwindcssDemoCard, "5360e98e");
           _setSharedData(__sharedData, 2, n1.sharedData);
-          const n2 = _createSharedDataComponent(ThemeSwitchCard, "5360ecf3");
+          const n2 = _createSharedDataComponent(ThemeSwitchCard, "5360ecd1");
           _setSharedData(__sharedData, 3, n2.sharedData);
-          const n3 = _createSharedDataComponent(RouterDemoCard, "5360f034");
+          const n3 = _createSharedDataComponent(RouterDemoCard, "5360ed72");
           _setSharedData(__sharedData, 4, n3.sharedData);
-          const n4 = _createSharedDataComponent(LangSwitchCard, "5360f0d3");
+          const n4 = _createSharedDataComponent(LangSwitchCard, "5360f0b1");
           _setSharedData(__sharedData, 5, n4.sharedData);
-          const n5 = _createSharedDataComponent(IconDemoCard, "5360f3fc");
+          const n5 = _createSharedDataComponent(IconDemoCard, "5360f3da");
           _setSharedData(__sharedData, 6, n5.sharedData);
-          const n6 = _createSharedDataComponent(HttpDemoCard, "5360f4b1");
+          const n6 = _createSharedDataComponent(HttpDemoCard, "5360f48f");
           _setSharedData(__sharedData, 7, n6.sharedData);
-          const n7 = _createSharedDataComponent(ToastDemoCard, "5360f7f2");
+          const n7 = _createSharedDataComponent(ToastDemoCard, "5360f7bb");
           _setSharedData(__sharedData, 8, n7.sharedData);
-          const n8 = _createSharedDataComponent(PropsDemoCard, "5360f895");
+          const n8 = _createSharedDataComponent(PropsDemoCard, "5360f873");
           _setSharedData(__sharedData, 9, n8.sharedData);
-          const n9 = _createSharedDataComponent(SystemInfoDemoCard, "5360fbd2");
+          const n9 = _createSharedDataComponent(SystemInfoDemoCard, "5360fb9b");
           _setSharedData(__sharedData, 10, n9.sharedData);
         })
       });
